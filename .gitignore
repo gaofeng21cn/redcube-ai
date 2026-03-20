@@ -1,0 +1,29 @@
+# 环境配置
+.env
+.cursor/
+.default_project
+
+# 运行产物
+.redcube_pi/
+projects/
+publish/
+input/
+output/
+data/
+external/
+config/local/*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Node
+node_modules/
+coverage/
+*.log
+
+# macOS
+.DS_Store

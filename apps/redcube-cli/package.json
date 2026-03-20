@@ -1,0 +1,9 @@
+{
+  "name": "@redcube/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "redcube": "src/cli.js"
+  }
+}

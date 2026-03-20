@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RedCube AI Workbench Settings</title>
+  <style>
+    :root {
+      --bg: #f6f0e8;
+      --panel: rgba(255, 250, 244, 0.88);
+      --line: rgba(82, 52, 22, 0.12);
+      --ink: #23170e;
+      --muted: #77614c;
+      --brand: #b74f12;
+      --shadow: 0 24px 60px rgba(56, 35, 13, 0.10);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(183, 79, 18, 0.12), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(15, 118, 110, 0.10), transparent 26%),
+        linear-gradient(180deg, #fdf9f4, var(--bg));
+      color: var(--ink);
+      font-family: "Avenir Next", "SF Pro Display", "PingFang SC", "Noto Sans SC", sans-serif;
+    }
+
+    button, input, select, a {
+      font: inherit;
+    }
+
+    button, a.button-link {
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    button:hover, a.button-link:hover {
+      transform: translateY(-1px);
+    }
+
+    .shell {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      padding: 26px;
+      margin-bottom: 18px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hero-title {
+      margin: 18px 0 8px;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      max-width: 62ch;
+      line-height: 1.7;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .workspace-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .workspace-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      max-width: 100%;
+    }
+
+    .workspace-badge-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .workspace-badge-value {
+      font-size: 13px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 480px;
+    }
+
+    .workspace-editor {
+      display: none;
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    .workspace-editor.open {
+      display: block;
+    }
+
+    .workspace-editor input,
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+      border-radius: 16px;
+      padding: 12px 14px;
+      outline: none;
+      color: var(--ink);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #cb5c18, #9f3f0c);
+      color: #fff7ef;
+      padding: 12px 18px;
+      box-shadow: 0 12px 26px rgba(159, 63, 12, 0.22);
+    }
+
+    .btn-secondary {
+      background: rgba(35, 23, 14, 0.08);
+      color: var(--ink);
+      padding: 12px 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .column {
+      padding: 22px;
+    }
+
+    .section + .section {
+      margin-top: 20px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .button-mini {
+      padding: 8px 12px;
+      background: rgba(35, 23, 14, 0.08);
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .button-mini.danger {
+      background: rgba(154, 52, 18, 0.12);
+      color: #9a3412;
+    }
+
+    .log-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .log-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .log-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .log-card span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .empty {
+      padding: 18px;
+      border: 1px dashed rgba(82, 52, 22, 0.24);
+      border-radius: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .grid { grid-template-columns: 1fr; }
+      .toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero panel">
+      <div class="hero-top">
+        <a class="button-link btn-secondary" id="backLink" href="/">返回工作台</a>
+        <div class="card-actions">
+          <button class="btn-secondary" id="refreshBtn">刷新配置</button>
+          <button class="btn-primary" id="saveBtn">保存供应商与模型</button>
+        </div>
+      </div>
+      <h1 class="hero-title">RedCube AI Workbench Settings</h1>
+      <p class="hero-subtitle">
+        这里只管理 OpenAI-compatible 供应商、Base URL、API Key 和模型库。首页工作台只负责选择默认模型和阶段覆盖，不再暴露密钥细节。
+      </p>
+      <div class="toolbar">
+        <div class="toolbar-actions">
+          <button class="btn-secondary" id="toggleWorkspaceBtn">更换工作区</button>
+          <button class="btn-secondary" id="addProviderBtn">新增供应商</button>
+          <button class="btn-secondary" id="addModelBtn">新增模型</button>
+        </div>
+        <span id="summaryText" class="section-meta"></span>
+      </div>
+      <div class="workspace-bar">
+        <div class="workspace-badge">
+          <span class="workspace-badge-label">当前工作区</span>
+          <span class="workspace-badge-value" id="workspaceBadgeValue"></span>
+        </div>
+      </div>
+      <div class="workspace-editor" id="workspaceEditor">
+        <input id="workspaceRoot" placeholder="工作区路径" />
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="column panel">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">供应商</div>
+            <div class="section-meta">Base URL / API Key</div>
+          </div>
+          <div class="field-grid" id="providerList"></div>
+        </div>
+      </div>
+
+      <div class="column panel">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">模型库</div>
+            <div class="section-meta">给工作流选择用</div>
+          </div>
+          <div class="field-grid" id="modelList"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">日志</div>
+            <div class="section-meta">最近动作</div>
+          </div>
+          <div class="log-list" id="logList"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="/settings.js"></script>
+</body>
+</html>

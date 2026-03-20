@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小红书信息图生成器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+body { font-family: 'Noto Sans SC', 'Inter', sans-serif; }
+.slide-content-wrapper {
+  background-color: white;
+  width: 448px;
+  height: 597px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.page-container {
+  width: 448px !important;
+  max-width: none !important;
+}
+</style>
+</head>
+<body class="bg-slate-100 flex flex-col items-center min-h-screen">
+<div id="control-panel" class="w-full max-w-md mx-auto my-4 p-3 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg flex items-center justify-center sticky top-4 z-10">
+  <button id="export-zip-btn" class="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+    <i class="fas fa-file-archive fa-lg"></i>
+    打包导出全部 (ZIP)
+  </button>
+</div>
+<div id="display-area" class="w-full flex flex-col items-center gap-8 px-4 pb-8"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+const slidesData = [
+  // 在这里逐页直写内容，不得复用历史页面结构
+  // { content: `<section>...</section>` }
+];
+
+const displayArea = document.getElementById('display-area');
+const exportZipBtn = document.getElementById('export-zip-btn');
+const docTitle = document.title || 'xiaohongshu-infographic';
+
+if (slidesData.length === 0) {
+  displayArea.innerHTML = `<div class="text-center text-slate-500 p-8"><p class="text-2xl">内容待填充</p></div>`;
+  exportZipBtn.disabled = true;
+  return;
+}
+
+slidesData.forEach((slide, index) => {
+  const pageContainer = document.createElement('div');
+  pageContainer.className = 'page-container bg-white rounded-xl shadow-lg overflow-hidden flex flex-col mb-8';
+
+  const header = `
+<div class="p-2 flex justify-between items-center bg-gray-50 border-b">
+  <p class="font-semibold text-sm text-gray-600">第 ${index + 1} 页 / ${slidesData.length}</p>
+  <button class="export-png-btn text-xs bg-sky-500 text-white px-2 py-1 rounded-md hover:bg-sky-600 transition-colors" data-index="${index}"><i class="fas fa-camera"></i> 导出PNG</button>
+</div>`;
+
+  let cleanContent = slide.content;
+  cleanContent = cleanContent.replace(/\\n/g, '\n');
+  cleanContent = cleanContent.replace(/\\t/g, '\t');
+  cleanContent = cleanContent.replace(/\\r/g, '\r');
+
+  const content = `<div class="slide-content-wrapper" data-slide-index="${index}">${cleanContent}</div>`;
+  pageContainer.innerHTML = header + content;
+  displayArea.appendChild(pageContainer);
+});
+
+async function exportSinglePng(index, button) {
+  const originalText = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+  try {
+    const node = document.querySelector(`.slide-content-wrapper[data-slide-index='${index}']`);
+    const dataUrl = await window.htmlToImage.toPng(node, { quality: 0.98, pixelRatio: 3 });
+    const link = document.createElement('a');
+    link.download = `${docTitle}-第${index + 1}页.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (error) {
+    console.error(`导出第 ${index + 1} 页失败:`, error);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = originalText;
+  }
+}
+
+async function exportAllAsZip() {
+  exportZipBtn.disabled = true;
+  exportZipBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 生成中... (0/${slidesData.length})`;
+  try {
+    const zip = new JSZip();
+    const nodesToCapture = document.querySelectorAll('.slide-content-wrapper');
+    for (let i = 0; i < nodesToCapture.length; i++) {
+      const node = nodesToCapture[i];
+      const dataUrl = await window.htmlToImage.toPng(node, { quality: 0.98, pixelRatio: 3 });
+      const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+      zip.file(`${docTitle}-第${i + 1}页.png`, base64Data, { base64: true });
+      exportZipBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 生成中... (${i + 1}/${slidesData.length})`;
+    }
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = `${docTitle}.zip`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    console.error('打包导出失败:', error);
+  } finally {
+    exportZipBtn.disabled = false;
+    exportZipBtn.innerHTML = `<i class="fas fa-file-archive fa-lg"></i> 打包导出全部 (ZIP)`;
+  }
+}
+
+displayArea.addEventListener('click', (e) => {
+  const button = e.target.closest('.export-png-btn');
+  if (button) {
+    exportSinglePng(button.dataset.index, button);
+  }
+});
+
+exportZipBtn.addEventListener('click', exportAllAsZip);
+});
+</script>
+</body>
+</html>

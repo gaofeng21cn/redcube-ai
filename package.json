@@ -1,0 +1,19 @@
+{
+  "name": "redcube-pi-mono",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "redcube": "node apps/redcube-cli/src/cli.js",
+    "web": "node apps/redcube-web/src/server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "optionalDependencies": {
+    "@mariozechner/pi-ai": "^0.54.2",
+    "@mariozechner/pi-agent-core": "^0.54.2"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "defaultProfileId": "general_public",
+  "routing": {
+    "medicalProfileId": "medical_public",
+    "generalProfileId": "general_public"
+  },
+  "profiles": {
+    "general_public": {
+      "signatureDisplay": "公开通用作者",
+      "signatureSubtitle": "公开默认品牌"
+    },
+    "medical_public": {
+      "signatureDisplay": "公开医学作者",
+      "signatureSubtitle": "公开默认品牌"
+    }
+  }
+}
