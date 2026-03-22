@@ -86,11 +86,14 @@ node apps/redcube-web/src/server.js
 - [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
 - [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
 - [贡献指南](CONTRIBUTING.md)
+- [安全策略](SECURITY.md)
 - [许可证](LICENSE)
 - [本次公开仓库收口设计](docs/plans/2026-03-22-public-github-publish-design.md)
 - [README 与 GitHub 首页收口实施计划](docs/plans/2026-03-22-readme-github-homepage-plan.md)
 - [README 流程图与开源文档设计](docs/plans/2026-03-22-readme-license-contributing-design.md)
 - [README 流程图与开源文档实施计划](docs/plans/2026-03-22-readme-license-contributing-plan.md)
+- [安全策略设计](docs/plans/2026-03-22-security-policy-design.md)
+- [安全策略实施计划](docs/plans/2026-03-22-security-policy-plan.md)
 
 ## 目录结构
 
