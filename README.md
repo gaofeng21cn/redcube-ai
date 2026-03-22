@@ -1,12 +1,79 @@
 # RedCube AI
 
-RedCube 已切换为 Node/ESM 的 `apps + packages` 架构，统一提供：
+RedCube AI 是一个可配置的 Node/ESM AI 内容工作流引擎，用于把原始材料或自动 research 结果串成可执行的内容生产流程：系列规划、单篇策划、笔记生成、评估修复与发布。
 
-- 新 CLI：`redcube run/eval/publish/doctor`
-- 新 Web UI API：`RunWorkflow/GetRunStatus/ListProjects/GetTaskArtifacts/RetryTaskStep`
-- 领域层工作流：规划 -> 生成 -> 评估 -> 修复 -> 发布
-- Workbench 闭环：修改指令回写真相源后自动局部重跑当前笔记
-- 主题级自动 research：当材料为空/不足或任务显式要求时，自动多轮联网补料并落盘
+## 核心能力
+
+- Node 主线统一运行：CLI、Web UI、Workbench 共用一套 Node prompts 与领域工作流
+- 自动 research：当原始材料为空、材料明显不足，或任务显式要求联网时，自动多轮搜索、抓取、抽取与落盘
+- Workbench 闭环：修改真相源后按当前页或当前阶段自动局部重跑，不再整条链路重算
+- 多入口协同：同时提供命令行入口、Web UI API、Workbench 主题工作台
+- 私有层隔离：作者人设、品牌、正式 prompts、默认工作区都通过仓库外配置注入
+
+## 架构概览
+
+- `apps/redcube-cli/`
+  - 新命令行入口，提供 `create/run/eval/publish/doctor/profile`
+- `apps/redcube-web/`
+  - Web UI 与 API 服务，覆盖项目主流程和 Workbench 工作台
+- `packages/redcube-agent/`
+  - 负责 research、workflow、truth sync、workbench 编排
+- `packages/redcube-domain/`
+  - 负责领域状态机与阶段运行规则
+- `packages/redcube-llm/`
+  - 负责离线模式与 OpenAI 兼容接口模式
+- `packages/redcube-tools/`
+  - 负责文件、项目、发布与评估工具
+- `packages/redcube-memory/`
+  - 负责运行状态持久化
+
+主题级主流程：
+
+`sync_inputs -> research -> storyline -> workflow -> truth_sync`
+
+其中 `workflow` 主链为：
+
+`规划 -> 生成 -> 评估 -> 修复 -> 发布`
+
+## 快速开始
+
+当前仓库不再依赖 git submodule，克隆后可直接安装：
+
+```bash
+npm install
+```
+
+建议把真实使用工作区放到仓库外，再通过环境变量或私有配置指向它：
+
+```bash
+export WORKSPACE_ROOT="/absolute/path/to/your/workspace"
+export REDCUBE_ROOT_DIR="$WORKSPACE_ROOT"
+export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
+```
+
+常用命令：
+
+```bash
+# 1) 查看命令
+node apps/redcube-cli/src/cli.js help
+
+# 2) 新建项目骨架
+node apps/redcube-cli/src/cli.js create --project "archive/我的新主题" --root-dir "$WORKSPACE_ROOT"
+
+# 3) 运行全流程
+node apps/redcube-cli/src/cli.js run --project "项目名" --root-dir "$WORKSPACE_ROOT"
+
+# 4) 启动 Web UI
+node apps/redcube-web/src/server.js
+# 打开 http://127.0.0.1:3100
+```
+
+## 文档导航
+
+- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
+- [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
+- [本次公开仓库收口设计](docs/plans/2026-03-22-public-github-publish-design.md)
+- [README 与 GitHub 首页收口实施计划](docs/plans/2026-03-22-readme-github-homepage-plan.md)
 
 ## 目录结构
 
@@ -22,18 +89,6 @@ packages/
   redcube-memory/  # 运行状态持久化
 tests/             # Node 内置 test 冒烟集
 ```
-
-当前仓库不再依赖 git submodule，克隆后可直接使用：
-
-```bash
-npm install
-```
-
-## 文档导航
-
-- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
-- [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
-- [本次公开仓库收口设计](docs/plans/2026-03-22-public-github-publish-design.md)
 
 ## 仓库与工作区
 
