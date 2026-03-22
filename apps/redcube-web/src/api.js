@@ -31,6 +31,7 @@ import {
   uploadWorkbenchFile,
 } from '../../../packages/redcube-agent/src/index.js';
 import { loadRuntimeConfig } from '../../../packages/redcube-config/src/index.js';
+import { selectDirectory as selectWorkspaceDirectory } from './system-dialog.js';
 
 function resolveApiRuntime({ query = {}, body = {}, defaultRootDir = '', defaultRepoRoot = '' }) {
   const repoRoot = path.resolve(defaultRepoRoot || process.cwd());
@@ -57,7 +58,7 @@ function resolveApiRuntime({ query = {}, body = {}, defaultRootDir = '', default
   return runtime;
 }
 
-export async function handleApiRequest({ method, pathname, query, body, defaultRootDir, defaultRepoRoot }) {
+export async function handleApiRequest({ method, pathname, query, body, defaultRootDir, defaultRepoRoot, deps = {} }) {
   const runtime = resolveApiRuntime({ query, body, defaultRootDir, defaultRepoRoot });
   const rootDir = runtime.rootDir;
   const workspaceRoot = runtime.workspaceRoot;
@@ -72,6 +73,15 @@ export async function handleApiRequest({ method, pathname, query, body, defaultR
   if (method === 'GET' && (pathname === '/api/GetRuntimeConfig' || pathname === '/api/getruntimeconfig')) {
     const result = await getRuntimeConfig({}, sharedContext);
     return { status: 200, payload: result };
+  }
+
+  if (method === 'POST' && (pathname === '/api/SelectWorkspaceDirectory' || pathname === '/api/selectworkspacedirectory')) {
+    const picker = deps.selectDirectory || selectWorkspaceDirectory;
+    const result = await picker({
+      prompt: body.prompt || '选择工作区目录',
+      defaultPath: body.defaultPath || workspaceRoot,
+    });
+    return { status: result.ok ? 200 : 400, payload: result };
   }
 
   if (method === 'GET' && (pathname === '/api/GetWorkbenchOverview' || pathname === '/api/getworkbenchoverview')) {

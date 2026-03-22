@@ -64,7 +64,6 @@ let workflowPollTimer = 0;
 const el = {
   workspaceRoot: document.getElementById('workspaceRoot'),
   workspaceBadgeValue: document.getElementById('workspaceBadgeValue'),
-  workspaceEditor: document.getElementById('workspaceEditor'),
   toggleWorkspaceBtn: document.getElementById('toggleWorkspaceBtn'),
   tabsNav: document.getElementById('tabsNav'),
   metricsStrip: document.getElementById('metricsStrip'),
@@ -132,6 +131,17 @@ function syncSettingsLink() {
 
 function renderWorkspaceBadge() {
   el.workspaceBadgeValue.textContent = getWorkspaceRoot();
+}
+
+function applyWorkspaceRoot(workspaceRoot) {
+  const nextWorkspaceRoot = String(workspaceRoot || '').trim();
+  el.workspaceRoot.value = nextWorkspaceRoot;
+  if (state.runtimeConfig) {
+    state.runtimeConfig.workspaceRoot = nextWorkspaceRoot;
+  }
+  syncSettingsLink();
+  renderWorkspaceBadge();
+  syncUrl();
 }
 
 function getSelectedTopic() {
@@ -519,7 +529,8 @@ async function loadModelConfig() {
 async function loadRuntimeDefaults() {
   state.runtimeConfig = await requestJson('/api/GetRuntimeConfig');
   if (!el.workspaceRoot.value.trim()) {
-    el.workspaceRoot.value = state.runtimeConfig.workspaceRoot || '';
+    applyWorkspaceRoot(state.runtimeConfig.workspaceRoot || '');
+    return;
   }
   syncSettingsLink();
   renderWorkspaceBadge();
@@ -917,7 +928,7 @@ function renderWorkbenchOnboarding(options = {}) {
           <p class="onboarding-copy">${escapeHtml(contextCopy)}</p>
           <div class="hero-actions">
             <button class="btn-primary" data-action="open-create-task">新建任务</button>
-            <button class="btn-secondary" data-action="toggle-workspace-editor">更换工作区</button>
+            <button class="btn-secondary" data-action="choose-workspace-directory">更换工作区</button>
             <button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>
           </div>
         </div>
@@ -927,7 +938,7 @@ function renderWorkbenchOnboarding(options = {}) {
             title: '连接工作区',
             copy: '把真实 workspace 挂进来，系统才能识别主题目录、输入材料和运行产物。',
             actionHtml: `
-              <button class="btn-secondary" data-action="toggle-workspace-editor">更换工作区</button>
+              <button class="btn-secondary" data-action="choose-workspace-directory">更换工作区</button>
               <button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>
             `,
           })}
@@ -1818,14 +1829,32 @@ async function createTask() {
   }
 }
 
-function toggleWorkspaceEditor(forceOpen = null) {
-  const nextOpen = typeof forceOpen === 'boolean'
-    ? forceOpen
-    : !el.workspaceEditor.classList.contains('open');
-  el.workspaceEditor.classList.toggle('open', nextOpen);
-  if (nextOpen) {
-    queueMicrotask(() => el.workspaceRoot.focus());
+async function selectWorkspaceDirectory() {
+  const result = await requestJson('/api/SelectWorkspaceDirectory', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      defaultPath: getWorkspaceRoot(),
+    }),
+  });
+
+  if (result.canceled || !result.path) {
+    logAction('未切换工作区', '你取消了目录选择。');
+    render();
+    return;
   }
+
+  applyWorkspaceRoot(result.path);
+  state.selectedTopicSlug = '';
+  state.selectedNoteSlug = '';
+  state.selectedPreviewKey = '';
+  state.selectedInputFilePath = '';
+  state.inputDraftLoadedPath = '';
+  state.previewCache.clear();
+
+  await Promise.all([loadOverview(), loadModelConfig()]);
+  logAction('工作区已切换', result.path);
+  render();
 }
 
 function openCreateTaskModal() {
@@ -1871,8 +1900,8 @@ document.addEventListener('click', async (event) => {
       return;
     }
 
-    if (action === 'toggle-workspace-editor') {
-      toggleWorkspaceEditor();
+    if (action === 'choose-workspace-directory') {
+      await selectWorkspaceDirectory();
       return;
     }
 
@@ -2074,13 +2103,6 @@ document.addEventListener('input', (event) => {
   const target = event.target;
   if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
 
-  if (target.id === 'workspaceRoot') {
-    syncSettingsLink();
-    syncUrl();
-    renderWorkspaceBadge();
-    return;
-  }
-
   if (target.id === 'instructionScope') {
     state.instructionDraft.scope = target.value;
     render();
@@ -2111,7 +2133,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   el.workspaceRoot.value = params.get('workspaceRoot') || '';
   el.toggleWorkspaceBtn.addEventListener('click', () => {
-    toggleWorkspaceEditor();
+    void selectWorkspaceDirectory().catch((error) => {
+      logAction('切换工作区失败', String(error));
+      render();
+    });
   });
   el.openCreateTaskBtn.addEventListener('click', () => {
     openCreateTaskModal();

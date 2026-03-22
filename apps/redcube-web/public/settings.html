@@ -139,17 +139,6 @@
       max-width: 480px;
     }
 
-    .workspace-editor {
-      display: none;
-      width: 100%;
-      margin-top: 14px;
-    }
-
-    .workspace-editor.open {
-      display: block;
-    }
-
-    .workspace-editor input,
     .field input,
     .field select {
       width: 100%;
@@ -316,9 +305,7 @@
           <span class="workspace-badge-value" id="workspaceBadgeValue"></span>
         </div>
       </div>
-      <div class="workspace-editor" id="workspaceEditor">
-        <input id="workspaceRoot" placeholder="工作区路径" />
-      </div>
+      <input id="workspaceRoot" type="hidden" />
     </section>
 
     <section class="grid">

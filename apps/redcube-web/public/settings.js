@@ -7,7 +7,6 @@ const state = {
 const el = {
   workspaceRoot: document.getElementById('workspaceRoot'),
   workspaceBadgeValue: document.getElementById('workspaceBadgeValue'),
-  workspaceEditor: document.getElementById('workspaceEditor'),
   toggleWorkspaceBtn: document.getElementById('toggleWorkspaceBtn'),
   summaryText: document.getElementById('summaryText'),
   providerList: document.getElementById('providerList'),
@@ -57,6 +56,16 @@ function renderWorkspaceBadge() {
   el.workspaceBadgeValue.textContent = getWorkspaceRoot();
 }
 
+function applyWorkspaceRoot(workspaceRoot) {
+  const nextWorkspaceRoot = String(workspaceRoot || '').trim();
+  el.workspaceRoot.value = nextWorkspaceRoot;
+  if (state.runtimeConfig) {
+    state.runtimeConfig.workspaceRoot = nextWorkspaceRoot;
+  }
+  syncBackLink();
+  renderWorkspaceBadge();
+}
+
 async function loadConfig() {
   const params = new URLSearchParams({ workspaceRoot: getWorkspaceRoot() });
   state.config = await requestJson(`/api/GetModelConfig?${params.toString()}`);
@@ -66,10 +75,30 @@ async function loadConfig() {
 async function loadRuntimeDefaults() {
   state.runtimeConfig = await requestJson('/api/GetRuntimeConfig');
   if (!el.workspaceRoot.value.trim()) {
-    el.workspaceRoot.value = state.runtimeConfig.workspaceRoot || '';
+    applyWorkspaceRoot(state.runtimeConfig.workspaceRoot || '');
+    return;
   }
   syncBackLink();
   renderWorkspaceBadge();
+}
+
+async function selectWorkspaceDirectory() {
+  const result = await requestJson('/api/SelectWorkspaceDirectory', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      defaultPath: getWorkspaceRoot(),
+    }),
+  });
+
+  if (result.canceled || !result.path) {
+    logAction('未切换工作区', '你取消了目录选择。');
+    return;
+  }
+
+  applyWorkspaceRoot(result.path);
+  await loadConfig();
+  logAction('工作区已切换', result.path);
 }
 
 async function saveConfig() {
@@ -274,7 +303,9 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 document.getElementById('addProviderBtn').addEventListener('click', addProvider);
 document.getElementById('addModelBtn').addEventListener('click', addModel);
 el.toggleWorkspaceBtn.addEventListener('click', () => {
-  el.workspaceEditor.classList.toggle('open');
+  void selectWorkspaceDirectory().catch((error) => {
+    logAction('切换工作区失败', String(error));
+  });
 });
 
 document.addEventListener('click', (event) => {
@@ -292,11 +323,6 @@ document.addEventListener('click', (event) => {
 document.addEventListener('input', (event) => {
   const target = event.target;
   if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
-  if (target.id === 'workspaceRoot') {
-    syncBackLink();
-    renderWorkspaceBadge();
-    return;
-  }
   if (target.dataset.kind) {
     updateBoundValue(target);
   }

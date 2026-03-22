@@ -70,8 +70,33 @@ test('workbench onboarding guides empty workspaces and first-run startup with di
   assert.match(appJs, /首轮启动/);
   assert.match(appJs, /创建后会自动进入首轮生成/);
   assert.match(appJs, /data-action="open-create-task"/);
-  assert.match(appJs, /data-action="toggle-workspace-editor"/);
+  assert.match(appJs, /data-action="choose-workspace-directory"/);
   assert.doesNotMatch(appJs, /当前工作区还没有可识别主题。先准备好真相源目录，再刷新工作台。/);
+});
+
+test('workspace switching uses system directory picker instead of manual path input', () => {
+  const html = readFileSync(new URL('../apps/redcube-web/public/index.html', import.meta.url), 'utf-8');
+  const appJs = readFileSync(new URL('../apps/redcube-web/public/app.js', import.meta.url), 'utf-8');
+  const settingsHtml = readFileSync(new URL('../apps/redcube-web/public/settings.html', import.meta.url), 'utf-8');
+  const settingsJs = readFileSync(new URL('../apps/redcube-web/public/settings.js', import.meta.url), 'utf-8');
+
+  assert.doesNotMatch(html, /<input id="workspaceRoot" placeholder="工作区路径"/);
+  assert.doesNotMatch(settingsHtml, /<input id="workspaceRoot" placeholder="工作区路径"/);
+  assert.match(appJs, /\/api\/SelectWorkspaceDirectory/);
+  assert.match(settingsJs, /\/api\/SelectWorkspaceDirectory/);
+  assert.doesNotMatch(appJs, /toggleWorkspaceEditor/);
+  assert.doesNotMatch(settingsJs, /workspaceEditor\.classList\.toggle/);
+});
+
+test('workbench shell uses a more editorial visual system for modern product UI', () => {
+  const html = readFileSync(new URL('../apps/redcube-web/public/index.html', import.meta.url), 'utf-8');
+
+  assert.match(html, /--display-font:/);
+  assert.match(html, /\.shell::before\s*\{/);
+  assert.match(html, /\.app-header::before\s*\{/);
+  assert.match(html, /\.metric-pill\s*\{[\s\S]*flex-direction:\s*column;/);
+  assert.match(html, /font-family:\s*var\(--display-font\)/);
+  assert.match(html, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });
 
 test('settings page is dedicated to provider and api key management', () => {

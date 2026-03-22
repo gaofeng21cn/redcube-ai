@@ -99,6 +99,35 @@ test('web api GetRuntimeConfig exposes resolved directories from local runtime c
   assert.equal(result.payload.promptsDir, configuredPromptsDir);
 });
 
+test('web api SelectWorkspaceDirectory returns chosen directory from injected picker', async () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'redcube-pi-web-'));
+  const pickedDir = path.join(root, 'picked-workspace');
+
+  const result = await handleApiRequest({
+    method: 'POST',
+    pathname: '/api/SelectWorkspaceDirectory',
+    query: {},
+    body: {
+      defaultPath: path.join(root, 'seed-workspace'),
+    },
+    defaultRootDir: root,
+    deps: {
+      selectDirectory: async ({ defaultPath }) => ({
+        ok: true,
+        canceled: false,
+        path: pickedDir,
+        defaultPath,
+      }),
+    },
+  });
+
+  assert.equal(result.status, 200);
+  assert.equal(result.payload.ok, true);
+  assert.equal(result.payload.canceled, false);
+  assert.equal(result.payload.path, pickedDir);
+  assert.equal(result.payload.defaultPath, path.join(root, 'seed-workspace'));
+});
+
 test('web api GenerateSeriesToc and GenerateStoryline write project inputs', async () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'redcube-pi-web-'));
   const project = 'web-input-project';
