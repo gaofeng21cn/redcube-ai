@@ -1,13 +1,16 @@
 # RedCube AI
 
-RedCube AI 是一个可配置的 Node/ESM AI 内容工作流引擎，用于把原始材料或自动 research 结果串成可执行的内容生产流程：系列规划、单篇策划、笔记生成、评估修复与发布。
+[![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
+
+RedCube AI 是一个面向高质量图文笔记自动生产的 Node/ESM 工作流系统，重点覆盖从原始材料或自动 research 到系列规划、单篇策划、笔记生成、评估修复与发布的完整链路，尤其适合小红书等图文平台的内容生产。
 
 ## 核心能力
 
 - Node 主线统一运行：CLI、Web UI、Workbench 共用一套 Node prompts 与领域工作流
+- 图文笔记主链清晰：围绕高质量图文笔记生成，而不是通用聊天或通用 Agent 编排
 - 自动 research：当原始材料为空、材料明显不足，或任务显式要求联网时，自动多轮搜索、抓取、抽取与落盘
 - Workbench 闭环：修改真相源后按当前页或当前阶段自动局部重跑，不再整条链路重算
-- 多入口协同：同时提供命令行入口、Web UI API、Workbench 主题工作台
+- 多入口协同：同时提供命令行入口、Web UI API、Workbench 主题工作台，服务同一套图文生产流程
 - 私有层隔离：作者人设、品牌、正式 prompts、默认工作区都通过仓库外配置注入
 
 ## 架构概览
@@ -85,6 +88,7 @@ node apps/redcube-web/src/server.js
 
 - [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
 - [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
+- [更新日志](CHANGELOG.md)
 - [贡献指南](CONTRIBUTING.md)
 - [安全策略](SECURITY.md)
 - [许可证](LICENSE)
@@ -92,6 +96,8 @@ node apps/redcube-web/src/server.js
 - [README 与 GitHub 首页收口实施计划](docs/plans/2026-03-22-readme-github-homepage-plan.md)
 - [README 流程图与开源文档设计](docs/plans/2026-03-22-readme-license-contributing-design.md)
 - [README 流程图与开源文档实施计划](docs/plans/2026-03-22-readme-license-contributing-plan.md)
+- [CHANGELOG 与基础 CI 设计](docs/plans/2026-03-22-changelog-ci-design.md)
+- [CHANGELOG 与基础 CI 实施计划](docs/plans/2026-03-22-changelog-ci-plan.md)
 - [安全策略设计](docs/plans/2026-03-22-security-policy-design.md)
 - [安全策略实施计划](docs/plans/2026-03-22-security-policy-plan.md)
 
