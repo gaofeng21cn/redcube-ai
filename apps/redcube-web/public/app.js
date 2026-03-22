@@ -893,6 +893,101 @@ function renderTopicRunSummaryPanel(topic) {
   `;
 }
 
+function renderOnboardingStepCard({ step, title, copy, actionHtml = '' }) {
+  return `
+    <article class="onboarding-step-card">
+      <div class="onboarding-step-index">${escapeHtml(String(step).padStart(2, '0'))}</div>
+      <div class="onboarding-step-title">${escapeHtml(title)}</div>
+      <div class="onboarding-step-copy">${escapeHtml(copy)}</div>
+      ${actionHtml ? `<div class="onboarding-step-actions">${actionHtml}</div>` : ''}
+    </article>
+  `;
+}
+
+function renderWorkbenchOnboarding(options = {}) {
+  const contextTitle = options.contextTitle || '工作台尚未接入可识别主题';
+  const contextCopy = options.contextCopy || '先连接真实工作区，再创建任务，系统就会自动进入首轮生成。整个入口不应该藏在页头按钮里，而应该直接出现在正文首屏。';
+
+  return `
+    <div class="tab-pane active">
+      <section class="onboarding-shell surface">
+        <div class="onboarding-header">
+          <div class="canvas-kicker">三步启动</div>
+          <h2 class="onboarding-title">${escapeHtml(contextTitle)}</h2>
+          <p class="onboarding-copy">${escapeHtml(contextCopy)}</p>
+          <div class="hero-actions">
+            <button class="btn-primary" data-action="open-create-task">新建任务</button>
+            <button class="btn-secondary" data-action="toggle-workspace-editor">更换工作区</button>
+            <button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>
+          </div>
+        </div>
+        <div class="onboarding-grid">
+          ${renderOnboardingStepCard({
+            step: 1,
+            title: '连接工作区',
+            copy: '把真实 workspace 挂进来，系统才能识别主题目录、输入材料和运行产物。',
+            actionHtml: `
+              <button class="btn-secondary" data-action="toggle-workspace-editor">更换工作区</button>
+              <button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>
+            `,
+          })}
+          ${renderOnboardingStepCard({
+            step: 2,
+            title: '创建任务骨架',
+            copy: '直接在界面里描述主题、粘贴材料，或勾选允许联网搜集资料，系统会帮你落任务骨架。',
+            actionHtml: '<button class="btn-primary" data-action="open-create-task">新建任务</button>',
+          })}
+          ${renderOnboardingStepCard({
+            step: 3,
+            title: '自动首轮生成',
+            copy: '任务创建后会自动启动首轮流程，你只需要回来看方向是否正确，再决定补输入还是继续细修。',
+            actionHtml: '<button class="btn-secondary" data-action="select-tab" data-tab="runs">查看运行页</button>',
+          })}
+        </div>
+        <div class="onboarding-callout">创建后会自动进入首轮生成。你不需要再跳去别的页面手动找运行入口，首轮完成后再回到项目总览检查方向即可。</div>
+      </section>
+    </div>
+  `;
+}
+
+function renderFirstRunLaunchpad(topic) {
+  const inputFiles = getTopicInputFiles(topic);
+  const workflowState = getTopicWorkflowState(topic);
+  const hasInputs = inputFiles.length > 0;
+
+  return `
+    <section class="onboarding-shell compact surface">
+      <div class="onboarding-header">
+        <div class="canvas-kicker">首轮启动</div>
+        <h3 class="onboarding-title">先把第一轮跑出来，再决定细修哪里。</h3>
+        <p class="onboarding-copy">${escapeHtml(hasInputs
+          ? '输入层已经接入，可以直接从项目首页发起首轮生成。生成完成后优先看运行摘要和首批产物，再决定是否补材料或继续返工。'
+          : '当前主题还缺少足够输入。先补任务说明、原始材料或风格规则，再从这里直接发起首轮生成。')}</p>
+      </div>
+      <div class="onboarding-grid">
+        ${renderOnboardingStepCard({
+          step: 1,
+          title: '补齐输入材料',
+          copy: hasInputs ? '当前已经有输入文件，可继续补充任务说明、参考材料或风格约束。' : '没有足够输入时，先进入材料页补任务说明、原始材料或上传附件。',
+          actionHtml: '<button class="btn-secondary" data-action="show-inputs">管理输入材料</button>',
+        })}
+        ${renderOnboardingStepCard({
+          step: 2,
+          title: '开始首轮生成',
+          copy: '不需要先切别的 tab。项目总览就应该直接承担启动入口和当前阶段状态。',
+          actionHtml: `<button class="btn-primary" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>${escapeHtml(workflowState.actionLabel)}</button>`,
+        })}
+        ${renderOnboardingStepCard({
+          step: 3,
+          title: '回看首轮结果',
+          copy: '先看最新运行摘要和项目方向，再决定回写输入、局部重跑还是继续看单篇成品。',
+          actionHtml: '<button class="btn-secondary" data-action="select-tab" data-tab="runs">查看历史运行</button>',
+        })}
+      </div>
+    </section>
+  `;
+}
+
 function renderTopicHeroSection(topic, options = {}) {
   const workflowState = getTopicWorkflowState(topic);
   const progress = topicProgress(topic);
@@ -968,6 +1063,7 @@ function renderWorkbenchOverviewView(topic) {
   const progress = topicProgress(topic);
   const inputFiles = getTopicInputFiles(topic);
   const workflowState = getTopicWorkflowState(topic);
+  const showFirstRunLaunchpad = (topic.notes || []).length === 0;
   const nextActionTitle = inputFiles.length === 0
     ? '先补输入材料'
     : (topic.notes || []).length === 0
@@ -1013,6 +1109,7 @@ function renderWorkbenchOverviewView(topic) {
             kicker: '项目首页',
             returnActionHtml: '<button class="btn-secondary" data-action="open-projects">返回项目目录</button>',
           })}
+          ${showFirstRunLaunchpad ? renderFirstRunLaunchpad(topic) : ''}
           ${renderTopicOverviewCards(topic)}
         </section>
 
@@ -1246,7 +1343,10 @@ function renderWorkbenchView() {
   const note = getSelectedNote();
 
   if (!topic) {
-    return `<div class="empty-state">当前工作区还没有可识别主题。先准备好真相源目录，再刷新工作台。</div>`;
+    return renderWorkbenchOnboarding({
+      contextTitle: '当前工作区还没有可识别主题',
+      contextCopy: '先连接真实 workspace，再新建任务。创建后系统会自动进入首轮生成，你回来时应该看到的是项目总览和运行状态，而不是空白面板。',
+    });
   }
 
   if (state.workbenchMode === 'overview') {
@@ -1265,11 +1365,10 @@ function renderProjectsView() {
   const selected = getSelectedTopic() || topics[0] || null;
 
   if (!topics.length) {
-    return `
-      <div class="tab-pane active">
-        <div class="empty-state">当前还没有主题。先新建任务或准备真相源目录，然后再回来查看项目首页。</div>
-      </div>
-    `;
+    return renderWorkbenchOnboarding({
+      contextTitle: '当前项目目录还是空的',
+      contextCopy: '项目页不应该只显示一句“暂无主题”。这里应该直接告诉你如何挂工作区、创建任务，并让首轮生成顺滑发生。',
+    });
   }
 
   return `
@@ -1719,6 +1818,25 @@ async function createTask() {
   }
 }
 
+function toggleWorkspaceEditor(forceOpen = null) {
+  const nextOpen = typeof forceOpen === 'boolean'
+    ? forceOpen
+    : !el.workspaceEditor.classList.contains('open');
+  el.workspaceEditor.classList.toggle('open', nextOpen);
+  if (nextOpen) {
+    queueMicrotask(() => el.workspaceRoot.focus());
+  }
+}
+
+function openCreateTaskModal() {
+  el.createTaskModal.classList.add('open');
+  queueMicrotask(() => el.createTaskTopic.focus());
+}
+
+function closeCreateTaskModal() {
+  el.createTaskModal.classList.remove('open');
+}
+
 function updateModelSelection(target) {
   const { kind, stage } = target.dataset;
   if (!state.modelConfig) return;
@@ -1750,6 +1868,16 @@ document.addEventListener('click', async (event) => {
     if (action === 'select-tab') {
       state.activeTab = target.dataset.tab || 'workbench';
       render();
+      return;
+    }
+
+    if (action === 'toggle-workspace-editor') {
+      toggleWorkspaceEditor();
+      return;
+    }
+
+    if (action === 'open-create-task') {
+      openCreateTaskModal();
       return;
     }
 
@@ -1983,13 +2111,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   el.workspaceRoot.value = params.get('workspaceRoot') || '';
   el.toggleWorkspaceBtn.addEventListener('click', () => {
-    el.workspaceEditor.classList.toggle('open');
+    toggleWorkspaceEditor();
   });
   el.openCreateTaskBtn.addEventListener('click', () => {
-    el.createTaskModal.classList.add('open');
+    openCreateTaskModal();
   });
   el.closeCreateTaskBtn.addEventListener('click', () => {
-    el.createTaskModal.classList.remove('open');
+    closeCreateTaskModal();
   });
   el.submitCreateTaskBtn.addEventListener('click', async () => {
     try {
@@ -2012,7 +2140,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   el.createTaskModal.addEventListener('click', (event) => {
     if (event.target === el.createTaskModal) {
-      el.createTaskModal.classList.remove('open');
+      closeCreateTaskModal();
     }
   });
   const requestedTab = params.get('tab');

@@ -57,6 +57,23 @@ test('workbench view uses project overview as the default entry and separates in
   assert.match(appJs, /await startTopicWorkflow\(result\.topic\);/);
 });
 
+test('workbench onboarding guides empty workspaces and first-run startup with direct actions', () => {
+  const html = readFileSync(new URL('../apps/redcube-web/public/index.html', import.meta.url), 'utf-8');
+  const appJs = readFileSync(new URL('../apps/redcube-web/public/app.js', import.meta.url), 'utf-8');
+
+  assert.match(html, /\.onboarding-shell\s*\{/);
+  assert.match(html, /\.onboarding-step-card\s*\{/);
+  assert.match(appJs, /三步启动/);
+  assert.match(appJs, /连接工作区/);
+  assert.match(appJs, /创建任务骨架/);
+  assert.match(appJs, /自动首轮生成/);
+  assert.match(appJs, /首轮启动/);
+  assert.match(appJs, /创建后会自动进入首轮生成/);
+  assert.match(appJs, /data-action="open-create-task"/);
+  assert.match(appJs, /data-action="toggle-workspace-editor"/);
+  assert.doesNotMatch(appJs, /当前工作区还没有可识别主题。先准备好真相源目录，再刷新工作台。/);
+});
+
 test('settings page is dedicated to provider and api key management', () => {
   const html = readFileSync(new URL('../apps/redcube-web/public/settings.html', import.meta.url), 'utf-8');
 

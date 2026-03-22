@@ -96,6 +96,8 @@ node apps/redcube-web/src/server.js
 - [README 与 GitHub 首页收口实施计划](docs/plans/2026-03-22-readme-github-homepage-plan.md)
 - [README 流程图与开源文档设计](docs/plans/2026-03-22-readme-license-contributing-design.md)
 - [README 流程图与开源文档实施计划](docs/plans/2026-03-22-readme-license-contributing-plan.md)
+- [Workbench 空状态与首轮启动引导设计](docs/plans/2026-03-22-workbench-onboarding-design.md)
+- [Workbench 空状态与首轮启动引导实施计划](docs/plans/2026-03-22-workbench-onboarding-plan.md)
 - [CHANGELOG 与基础 CI 设计](docs/plans/2026-03-22-changelog-ci-design.md)
 - [CHANGELOG 与基础 CI 实施计划](docs/plans/2026-03-22-changelog-ci-plan.md)
 - [安全策略设计](docs/plans/2026-03-22-security-policy-design.md)
