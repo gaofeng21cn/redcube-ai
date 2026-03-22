@@ -11,7 +11,10 @@ input/
 output/
 data/
 external/
-config/local/*.json
+config/local/**
+!config/local/
+!config/local/.gitkeep
+!config/local/README.md
 
 # Python
 __pycache__/

@@ -29,6 +29,12 @@ tests/             # Node 内置 test 冒烟集
 npm install
 ```
 
+## 文档导航
+
+- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
+- [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
+- [本次公开仓库收口设计](docs/plans/2026-03-22-public-github-publish-design.md)
+
 ## 仓库与工作区
 
 - 本仓库只保留功能代码、提示词、测试与文档，不保留业务数据目录。
@@ -39,6 +45,7 @@ npm install
   - `config/local/*.json`
   - `~/.config/redcube/*.json`
   - `<workspace>/.redcube/*.json`
+- `config/local/` 在公开仓库内默认整体忽略，只保留说明文件和占位文件，用于放本机私有覆盖配置。
 
 ## 快速开始
 
@@ -190,6 +197,24 @@ prompts/node/
 ```bash
 export REDCUBE_PROMPTS_DIR=/absolute/path/to/your/prompts
 ```
+
+## 发布公开仓库
+
+当前仓库已经适合直接作为公开仓库发布：
+
+- 业务工作区与运行产物不应留在本仓库
+- 私有作者信息、品牌、人设与正式 prompts 应放到仓库外
+- 推荐通过 `gh` 创建并推送 GitHub 仓库
+
+最短命令：
+
+```bash
+gh repo create gaofeng21cn/redcube-ai --public --source=. --remote=origin --push
+```
+
+更完整的发布说明见：
+
+- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
 
 ## 私有人设与跨机迁移
 
