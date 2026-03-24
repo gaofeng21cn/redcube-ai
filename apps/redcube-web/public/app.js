@@ -383,6 +383,60 @@ function getLedgerRuns() {
   });
 }
 
+function findTopicForNoteSlug(noteSlug = '') {
+  return (state.overview?.topics || []).find((topic) => (topic.notes || []).some((note) => note.slug === noteSlug)) || null;
+}
+
+function getRunTargetTopic(run) {
+  const topics = state.overview?.topics || [];
+  if (run?.topic) {
+    return topics.find((topic) => topic.slug === run.topic) || null;
+  }
+  if (run?.project) {
+    return topics.find((topic) => topic.slug === run.project) || null;
+  }
+  if (run?.noteSlug) {
+    return findTopicForNoteSlug(run.noteSlug);
+  }
+  return null;
+}
+
+function getRunLedgerId(run, index) {
+  const raw = String(run?.runId || run?.id || `${run?.kind || 'run'}-${index + 1}`);
+  const cleaned = raw.replace(/[^a-z0-9]/gi, '').toUpperCase();
+  return `#${(cleaned || `RUN${index + 1}`).slice(0, 10)}`;
+}
+
+function getRunHealth(run) {
+  const totalTasks = Number(run?.summary?.totalTasks);
+  const successTasks = Number(run?.summary?.successTasks);
+  if (Number.isFinite(totalTasks) && totalTasks > 0 && Number.isFinite(successTasks)) {
+    return `${Math.round((successTasks / totalTasks) * 100)}%`;
+  }
+
+  const totalSteps = Number(run?.summary?.totalSteps);
+  const completedSteps = Number(run?.summary?.completedSteps);
+  if (Number.isFinite(totalSteps) && totalSteps > 0 && Number.isFinite(completedSteps)) {
+    return `${Math.round((completedSteps / totalSteps) * 100)}%`;
+  }
+
+  if (run?.status === 'completed' || run?.status === 'done') return '100%';
+  if (run?.status === 'running') return '68%';
+  if (run?.status === 'failed' || run?.status === 'blocked') return '24%';
+  return '0%';
+}
+
+function getRunNarrative(run) {
+  const topic = getRunTargetTopic(run);
+  return {
+    topic,
+    subject: topic?.name || run?.topic || run?.project || run?.noteSlug || '未绑定主题',
+    stepTitle: run?.summary?.currentStep?.title || run?.summary?.currentStepTitle || getStatusText(run?.status),
+    modelId: run?.defaultModelId || run?.summary?.defaultModelId || '默认路由',
+    updatedAt: run?.finishedAt || run?.startedAt || '',
+  };
+}
+
 function getInstructionEntries() {
   return state.overview?.ledger?.instructions || [];
 }
@@ -747,7 +801,13 @@ async function startTopicWorkflow(topicSlug) {
 function renderTabs() {
   el.tabsNav.innerHTML = TABS.map((tab) => `
     <button class="tab-button ${tab.id === state.activeTab ? 'active' : ''}" data-action="select-tab" data-tab="${tab.id}">
-      ${tab.label}
+      <span class="material-symbols-outlined">${escapeHtml({
+        workbench: 'dashboard',
+        projects: 'folder_open',
+        runs: 'monitoring',
+        models: 'tune',
+      }[tab.id] || 'dashboard')}</span>
+      <span>${escapeHtml(tab.label)}</span>
     </button>
   `).join('');
 }
@@ -772,10 +832,10 @@ function renderMetrics() {
 
 function metricPill(label, value) {
   return `
-    <div class="metric-pill">
-      <strong>${escapeHtml(value)}</strong>
+    <article class="console-metric-card glass-card">
       <span>${escapeHtml(label)}</span>
-    </div>
+      <strong>${escapeHtml(value)}</strong>
+    </article>
   `;
 }
 
@@ -824,48 +884,335 @@ function renderTopicRunStatusCard(topic, options = {}) {
   `;
 }
 
+function renderDirectorStatusCard({ label, value, copy, tone = 'neutral' }) {
+  return `
+    <article class="director-status-card ${escapeHtml(tone)}">
+      <div class="director-status-label">${escapeHtml(label)}</div>
+      <div class="director-status-value">${escapeHtml(value)}</div>
+      <div class="director-status-copy">${escapeHtml(copy)}</div>
+    </article>
+  `;
+}
+
+function renderDirectorActionCard({ eyebrow, title, copy, actionHtml = '', tone = 'neutral' }) {
+  return `
+    <article class="director-action-card ${escapeHtml(tone)}">
+      <div class="director-card-eyebrow">${escapeHtml(eyebrow)}</div>
+      <div class="director-card-title">${escapeHtml(title)}</div>
+      <div class="director-card-copy">${escapeHtml(copy)}</div>
+      ${actionHtml ? `<div class="director-card-actions">${actionHtml}</div>` : ''}
+    </article>
+  `;
+}
+
+function renderDirectorSummaryCard({ label, metric, title, copy, actionHtml = '', tone = 'neutral' }) {
+  return `
+    <article class="director-summary-card ${escapeHtml(tone)}">
+      <div class="director-card-eyebrow">${escapeHtml(label)}</div>
+      <div class="director-summary-metric">${escapeHtml(metric)}</div>
+      <div class="director-card-title">${escapeHtml(title)}</div>
+      <div class="director-card-copy">${escapeHtml(copy)}</div>
+      ${actionHtml ? `<div class="director-card-actions">${actionHtml}</div>` : ''}
+    </article>
+  `;
+}
+
+function getTopicDirectorGuidance(topic) {
+  const inputFiles = getTopicInputFiles(topic);
+  const notes = topic?.notes || [];
+  if (inputFiles.length === 0) {
+    return {
+      title: '先补输入材料',
+      copy: '当前还没有形成可生产的输入层。先补任务说明、原始材料、人设或风格规则，再启动主线。',
+      localRerunCopy: '还没有首轮产物，先跑出第一轮，再决定是否需要局部重跑。',
+    };
+  }
+  if (notes.length === 0) {
+    return {
+      title: '开始首轮生成',
+      copy: '输入层已经具备，下一步不是继续堆信息，而是让主线先跑出第一版结果。',
+      localRerunCopy: '首轮完成后再判断是回写输入，还是进入单篇做局部重跑。',
+    };
+  }
+  return {
+    title: '查看最近产物并决定是否局部重跑',
+    copy: '先看最近产物和最新运行状态。方向没偏时优先局部重跑，方向偏了再回到输入层修主叙事。',
+    localRerunCopy: '当前页和当前阶段的问题，优先进入单篇执行修改做局部重跑，不必整轮重启。',
+  };
+}
+
+function getTopicInputReadiness(topic) {
+  const categories = getTopicInputCategories(topic);
+  const coreCategories = ['task_brief', 'reference_material', 'persona_rule', 'style', 'template'];
+  const ready = coreCategories.filter((id) => categories.some((item) => item.id === id && item.count > 0)).length;
+  const fileCount = getTopicInputFiles(topic).length;
+  const percent = ready > 0
+    ? Math.round((ready / coreCategories.length) * 100)
+    : (fileCount > 0 ? Math.min(40, fileCount * 10) : 0);
+
+  return {
+    ready,
+    total: coreCategories.length,
+    fileCount,
+    percent,
+  };
+}
+
+function getNoteProductionState(note) {
+  const stages = note.workflow?.stages || [];
+  if (stages.some((stage) => stage.status === 'failed' || stage.status === 'blocked')) {
+    return { tone: 'failed', label: '阻断' };
+  }
+  if (stages.some((stage) => stage.status === 'running')) {
+    return { tone: 'running', label: '处理中' };
+  }
+  if (stages.length > 0 && stages.every((stage) => stage.status === 'done')) {
+    return { tone: 'done', label: '已完成' };
+  }
+  return { tone: 'pending', label: note.workflow?.nextAction ? '待继续' : '待启动' };
+}
+
+function getNoteEfficiency(note) {
+  const stages = note.workflow?.stages || [];
+  if (!stages.length) return 0;
+  const doneCount = stages.filter((stage) => stage.status === 'done').length;
+  const running = stages.some((stage) => stage.status === 'running');
+  const base = Math.round((doneCount / stages.length) * 100);
+  return running ? Math.max(base, Math.min(94, base + 12)) : base;
+}
+
+function getTopicDirectionLine(topic, workflowState) {
+  const notes = topic?.notes || [];
+  if (workflowState.status === 'failed') {
+    return '先修当前失败阶段，再决定是否整轮重跑。';
+  }
+  if (notes.length === 0) {
+    return '输入层已经接入，当前方向应当是先完成首轮启动。';
+  }
+  if (workflowState.status === 'running') {
+    return '主线仍在推进，先看运行状态，等首轮稳定后再做页面级优化。';
+  }
+  return '方向稳定时优先按当前页或当前阶段执行局部重跑，不要整轮回滚。';
+}
+
+function renderConsoleMetricCard({ label, value, copy }) {
+  return `
+    <article class="console-metric-card glass-card">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <p>${escapeHtml(copy)}</p>
+    </article>
+  `;
+}
+
+function renderConsoleHeroShell({ eyebrow, title, copy, actionsHtml = '', taskTitle, taskCopy, taskItems = [] }) {
+  const taskItemsHtml = taskItems.map((item) => `
+    <div class="console-task-item">
+      <span>${escapeHtml(item.label)}</span>
+      <strong>${escapeHtml(item.value)}</strong>
+    </div>
+  `).join('');
+
+  return `
+    <section class="console-hero-shell glass-panel">
+      <div class="console-hero-grid">
+        <div class="console-hero-main">
+          <span class="console-badge">${escapeHtml(eyebrow)}</span>
+          <h2 class="console-hero-title">${escapeHtml(title)}</h2>
+          <p class="console-hero-copy">${escapeHtml(copy)}</p>
+          ${actionsHtml ? `<div class="console-action-row">${actionsHtml}</div>` : ''}
+        </div>
+        <aside class="console-side-card glass-card">
+          <div>
+            <div class="section-title">当前导演任务</div>
+            <div class="console-prod-title">${escapeHtml(taskTitle)}</div>
+            <div class="section-copy">${escapeHtml(taskCopy)}</div>
+          </div>
+          <div class="console-task-list">${taskItemsHtml}</div>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderConsoleProductionTable({
+  rows,
+  subtitle,
+  title = '当前主线',
+  headings = {},
+  emptyText = '当前还没有可展示的 production。',
+}) {
+  const tableHeadings = {
+    id: '编号',
+    title: '当前内容',
+    status: '状态',
+    efficiency: '完成度',
+    action: '操作',
+    ...headings,
+  };
+  const bodyHtml = rows.length
+    ? rows.map((row) => `
+      <tr>
+        <td class="console-prod-id">${escapeHtml(row.id)}</td>
+        <td>
+          <div class="console-prod-title">${escapeHtml(row.title)}</div>
+          <div class="console-prod-meta">${escapeHtml(row.meta)}</div>
+        </td>
+        <td><span class="table-status ${escapeHtml(row.statusTone)}">${escapeHtml(row.statusLabel)}</span></td>
+        <td class="console-prod-efficiency">${escapeHtml(row.efficiency)}</td>
+        <td class="table-action-cell">${row.actionHtml || ''}</td>
+      </tr>
+    `).join('')
+    : `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">${escapeHtml(emptyText)}</div>
+        </td>
+      </tr>
+    `;
+
+  return `
+    <section class="console-table-shell glass-panel">
+      <div class="console-section-head">
+        <div>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(subtitle)}</p>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="console-table">
+          <thead>
+            <tr>
+              <th>${escapeHtml(tableHeadings.id)}</th>
+              <th>${escapeHtml(tableHeadings.title)}</th>
+              <th>${escapeHtml(tableHeadings.status)}</th>
+              <th style="text-align:right;">${escapeHtml(tableHeadings.efficiency)}</th>
+              <th style="text-align:right;">${escapeHtml(tableHeadings.action)}</th>
+            </tr>
+          </thead>
+          <tbody>${bodyHtml}</tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function renderConsoleInsightPane({ title, copy, points = [], actionHtml = '' }) {
+  return `
+    <aside class="insight-pane">
+      <div>
+        <div class="section-title">导演建议 · AI INSIGHT</div>
+        <strong>${escapeHtml(title)}</strong>
+      </div>
+      <p>${escapeHtml(copy)}</p>
+      ${points.map((point) => `<div class="insight-point">${escapeHtml(point)}</div>`).join('')}
+      ${actionHtml ? `<div class="console-action-row">${actionHtml}</div>` : ''}
+    </aside>
+  `;
+}
+
+function renderConsoleProductionDeck({ rows, subtitle, insightHtml }) {
+  return `
+    <div class="console-production-layout">
+      ${renderConsoleProductionTable({ rows, subtitle })}
+      ${insightHtml}
+    </div>
+  `;
+}
+
+function buildTopicProductionRows(topic, options = {}) {
+  const workflowState = getTopicWorkflowState(topic);
+  const notes = topic.notes || [];
+  const artifactAction = options.context === 'projects'
+    ? `<button class="table-action" data-action="open-topic-mode" data-topic="${escapeHtml(topic.slug)}" data-mode="artifacts" ${notes.length === 0 ? 'disabled' : ''}>局部重跑</button>`
+    : `<button class="table-action" data-action="show-artifacts" ${notes.length === 0 ? 'disabled' : ''}>局部重跑</button>`;
+
+  if (!notes.length) {
+    const readiness = getTopicInputReadiness(topic);
+    return [{
+      id: `#${String(topic.slug || 'topic').slice(0, 8).toUpperCase()}`,
+      title: topic.name,
+      meta: `${modelLabelForStage('__default__')} · ${workflowState.currentStepTitle}`,
+      statusTone: workflowState.pillClass,
+      statusLabel: workflowState.pillLabel,
+      efficiency: `${readiness.percent}%`,
+      actionHtml: `<button class="table-action" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>${escapeHtml(workflowState.actionLabel)}</button>`,
+    }];
+  }
+
+  return notes.slice(0, 6).map((note, index) => {
+    const productionState = getNoteProductionState(note);
+    const stageId = note.workflow?.nextAction?.stageId || 'html_generation';
+    return {
+      id: `#PRD-${String(index + 1).padStart(4, '0')}`,
+      title: note.name,
+      meta: `${modelLabelForStage(stageId)} · ${note.workflow?.nextAction?.title || '最近产物已落盘'}`,
+      statusTone: productionState.tone,
+      statusLabel: productionState.label,
+      efficiency: `${getNoteEfficiency(note)}%`,
+      actionHtml: artifactAction,
+    };
+  });
+}
+
 function renderTopicOverviewCards(topic, options = {}) {
   const progress = topicProgress(topic);
-  const inputFiles = getTopicInputFiles(topic);
-  const categories = getTopicInputCategories(topic).filter((item) => item.count > 0);
+  const inputReadiness = getTopicInputReadiness(topic);
+  const workflowState = getTopicWorkflowState(topic);
+  const guidance = getTopicDirectorGuidance(topic);
   const manageInputsAction = options.context === 'projects'
     ? `<button class="btn-secondary" data-action="open-topic-mode" data-topic="${escapeHtml(topic.slug)}" data-mode="inputs">管理输入材料</button>`
     : '<button class="btn-secondary" data-action="show-inputs">管理输入材料</button>';
   const viewArtifactsAction = options.context === 'projects'
     ? `<button class="btn-secondary" data-action="open-topic-mode" data-topic="${escapeHtml(topic.slug)}" data-mode="artifacts" ${(topic.notes || []).length === 0 ? 'disabled' : ''}>查看笔记产物</button>`
     : `<button class="btn-secondary" data-action="show-artifacts" ${(topic.notes || []).length === 0 ? 'disabled' : ''}>查看笔记产物</button>`;
+  const optimizationAction = options.context === 'projects'
+    ? `<button class="btn-primary" data-action="open-topic-mode" data-topic="${escapeHtml(topic.slug)}" data-mode="artifacts" ${(topic.notes || []).length === 0 ? 'disabled' : ''}>执行优化</button>`
+    : `<button class="btn-primary" data-action="show-artifacts" ${(topic.notes || []).length === 0 ? 'disabled' : ''}>执行优化</button>`;
+  const enterOverviewAction = options.context === 'projects'
+    ? `<button class="btn-secondary" data-action="open-topic-mode" data-topic="${escapeHtml(topic.slug)}" data-mode="overview">进入项目总览</button>`
+    : '<button class="btn-secondary" data-action="show-overview">进入项目总览</button>';
+  const rows = buildTopicProductionRows(topic, options);
 
   return `
-    <section class="surface content-column workspace-overview-panel">
-      <div class="section-title">工作区概览</div>
-      <div class="section-copy">项目首页不应该把所有文件和日志同时摊开，而是先把输入、系列结构和产物层级讲清楚。</div>
-      <div class="overview-card-grid">
-        <article class="overview-card">
-          <div class="overview-card-kicker">输入材料</div>
-          <div class="overview-card-metric">${escapeHtml(String(inputFiles.length))}</div>
-          <div class="overview-card-title">材料系统已接入 ${escapeHtml(String(categories.length || 0))} 类输入</div>
-          <div class="overview-card-copy">${escapeHtml(categories.length ? categories.map((item) => `${item.label} ${item.count}`).join(' · ') : '还没有可用输入，建议先补任务说明或上传参考材料。')}</div>
-          <div class="card-actions">${manageInputsAction}</div>
-        </article>
-        <article class="overview-card">
-          <div class="overview-card-kicker">系列蓝图</div>
-          <div class="overview-card-metric">${escapeHtml(String([topic.stageFiles?.storyline, topic.stageFiles?.seriesPlan].filter(Boolean).length))}/2</div>
-          <div class="overview-card-title">故事线与系列目录${topic.stageFiles?.storyline && topic.stageFiles?.seriesPlan ? '已具备' : '待补齐'}</div>
-          <div class="overview-card-copy">${escapeHtml(topic.stageFiles?.storyline ? '故事线已生成' : '故事线待生成')} · ${escapeHtml(topic.stageFiles?.seriesPlan ? '系列目录已生成' : '系列目录待生成')}</div>
-          <div class="card-actions">
-            ${options.context === 'projects'
-              ? `<button class="btn-secondary" data-action="open-topic-mode" data-topic="${escapeHtml(topic.slug)}" data-mode="overview">进入项目总览</button>`
-              : '<button class="btn-secondary" data-action="show-overview">刷新项目总览</button>'}
-          </div>
-        </article>
-        <article class="overview-card">
-          <div class="overview-card-kicker">笔记产物</div>
-          <div class="overview-card-metric">${escapeHtml(String(progress.total))}</div>
-          <div class="overview-card-title">${escapeHtml(String(progress.done))} 篇已完成 · ${escapeHtml(String(progress.blocked))} 篇阻断</div>
-          <div class="overview-card-copy">${escapeHtml(progress.total > 0 ? '产物系统已经建立，可以直接进入单篇查看 HTML、截图和发布文案。' : '还没有产出笔记，首轮生成后产物系统会自动出现。')}</div>
-          <div class="card-actions">${viewArtifactsAction}</div>
-        </article>
+    <section class="console-stack">
+      <div class="section-title">状态摘要</div>
+      <div class="console-status-grid">
+        ${renderConsoleMetricCard({
+          label: '输入准备度',
+          value: `${inputReadiness.percent}%`,
+          copy: inputReadiness.fileCount > 0 ? `材料系统已接入 ${inputReadiness.fileCount} 份输入文件。` : '材料系统还没有形成可生产的输入层。',
+        })}
+        ${renderConsoleMetricCard({
+          label: '最近产物',
+          value: `${progress.total} 篇`,
+          copy: progress.total > 0 ? `产物系统已有 ${progress.done} 篇完成，${progress.blocked} 篇存在阻断。` : '首轮生成后产物系统会开始形成最近产物。',
+        })}
+        ${renderConsoleMetricCard({
+          label: '当前方向',
+          value: guidance.title,
+          copy: getTopicDirectionLine(topic, workflowState),
+        })}
+        ${renderConsoleMetricCard({
+          label: '局部重跑',
+          value: progress.total > 0 ? '已就绪' : '等待首轮',
+          copy: guidance.localRerunCopy,
+        })}
       </div>
+      ${renderConsoleProductionDeck({
+        rows,
+        subtitle: '当前主题下的主线产物、方向状态与局部重跑入口。',
+        insightHtml: renderConsoleInsightPane({
+          title: guidance.title,
+          copy: guidance.copy,
+          points: [
+            `当前步骤：${workflowState.currentStepTitle}`,
+            progress.total > 0 ? '最近产物已经形成，方向正确时优先修当前页。' : '还没有最近产物，先把第一轮跑出来。',
+            workflowState.status === 'failed' ? `失败原因：${workflowState.failureReason}` : '运行总览里保留完整账本，首页只保留关键判断。',
+          ],
+          actionHtml: `${optimizationAction}${progress.total > 0 ? viewArtifactsAction : manageInputsAction}${enterOverviewAction}`,
+        }),
+      })}
     </section>
   `;
 }
@@ -904,98 +1251,205 @@ function renderTopicRunSummaryPanel(topic) {
   `;
 }
 
-function renderOnboardingStepCard({ step, title, copy, actionHtml = '' }) {
-  return `
-    <article class="onboarding-step-card">
-      <div class="onboarding-step-index">${escapeHtml(String(step).padStart(2, '0'))}</div>
-      <div class="onboarding-step-title">${escapeHtml(title)}</div>
-      <div class="onboarding-step-copy">${escapeHtml(copy)}</div>
-      ${actionHtml ? `<div class="onboarding-step-actions">${actionHtml}</div>` : ''}
-    </article>
-  `;
-}
-
 function renderWorkbenchOnboarding(options = {}) {
-  const contextTitle = options.contextTitle || '工作台尚未接入可识别主题';
-  const contextCopy = options.contextCopy || '先连接真实工作区，再创建任务，系统就会自动进入首轮生成。整个入口不应该藏在页头按钮里，而应该直接出现在正文首屏。';
+  const contextTitle = options.contextTitle || '把创作主线接回工作台。';
+  const contextCopy = options.contextCopy || '先连接真实工作区，再创建任务，系统会把联网调研、主线生产和运行账本按顺序串起来。首页应当直接承担接入、启动和运行入口。';
+  const hasWorkspace = Boolean(getWorkspaceRoot());
+  const runCount = getLedgerRuns().length;
+  const primaryAction = hasWorkspace
+    ? '<button class="btn-primary" data-action="open-create-task">创建任务</button>'
+    : '<button class="btn-primary" data-action="choose-workspace-directory">连接工作区</button>';
+  const secondaryAction = hasWorkspace
+    ? '<button class="btn-secondary" data-action="choose-workspace-directory">更换工作区</button>'
+    : '<button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>';
+  const taskTitle = hasWorkspace ? '创建任务并决定是否允许联网搜集资料' : '先连接真实工作区';
+  const taskCopy = hasWorkspace
+    ? '工作区已经接入，下一步只需要定义主题、材料和研究权限，系统就会按主线推进。'
+    : '没有真实工作区时，系统不会识别主题目录、输入层和运行账本，因此现在先做接入。';
+  const rows = [
+    {
+      id: '#BOOT-001',
+      title: '连接工作区',
+      meta: '通过 Finder 选择真实工作区，让系统识别输入目录、运行账本与产物镜像。',
+      statusTone: hasWorkspace ? 'done' : 'pending',
+      statusLabel: hasWorkspace ? '已接入' : '待接入',
+      efficiency: hasWorkspace ? '100%' : '24%',
+      actionHtml: '<button class="table-action" data-action="choose-workspace-directory">连接工作区</button>',
+    },
+    {
+      id: '#TASK-002',
+      title: '创建任务',
+      meta: '定义主题、任务说明、原始材料，并决定是否允许联网搜集资料。',
+      statusTone: hasWorkspace ? 'running' : 'pending',
+      statusLabel: hasWorkspace ? '可执行' : '等待工作区',
+      efficiency: hasWorkspace ? '68%' : '0%',
+      actionHtml: '<button class="table-action" data-action="open-create-task">创建任务</button>',
+    },
+    {
+      id: '#RUN-003',
+      title: '打开运行页',
+      meta: '查看主线推进、失败原因与历史账本，不需要再翻原始日志。',
+      statusTone: runCount > 0 ? 'running' : 'pending',
+      statusLabel: runCount > 0 ? '账本已建立' : '尚无运行',
+      efficiency: runCount > 0 ? `${Math.min(100, 40 + runCount * 10)}%` : '0%',
+      actionHtml: '<button class="table-action" data-action="select-tab" data-tab="runs">打开运行页</button>',
+    },
+  ];
 
   return `
     <div class="tab-pane active">
-      <section class="onboarding-shell surface">
-        <div class="onboarding-header">
-          <div class="canvas-kicker">三步启动</div>
-          <h2 class="onboarding-title">${escapeHtml(contextTitle)}</h2>
-          <p class="onboarding-copy">${escapeHtml(contextCopy)}</p>
-          <div class="hero-actions">
-            <button class="btn-primary" data-action="open-create-task">新建任务</button>
-            <button class="btn-secondary" data-action="choose-workspace-directory">更换工作区</button>
-            <button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>
-          </div>
+      <div class="console-page">
+        ${renderConsoleHeroShell({
+          eyebrow: '工作台在线',
+          title: contextTitle,
+          copy: contextCopy,
+          actionsHtml: `${primaryAction}${secondaryAction}<button class="btn-secondary" data-action="select-tab" data-tab="runs">打开运行页</button>`,
+          taskTitle,
+          taskCopy,
+          taskItems: [
+            { label: '主线阶段', value: hasWorkspace ? '等待任务创建' : '等待工作区接入' },
+            { label: '首轮启动', value: hasWorkspace ? '接入条件已满足' : '尚未满足' },
+            { label: '运行账本', value: runCount > 0 ? `${runCount} 条记录` : '尚无运行记录' },
+          ],
+        })}
+        <div class="console-status-grid">
+          ${renderConsoleMetricCard({
+            label: '工作区接入',
+            value: hasWorkspace ? '已接入' : '待接入',
+            copy: hasWorkspace ? '真实工作区已连接。' : '先用 Finder 接入真实目录。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '当前导演任务',
+            value: hasWorkspace ? '创建任务' : '连接工作区',
+            copy: taskCopy,
+          })}
+          ${renderConsoleMetricCard({
+            label: '允许联网搜集资料',
+            value: hasWorkspace ? '可开启' : '待接入后开启',
+            copy: '当原始材料为空或明显不足时，可以让系统先做联网调研。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '首轮启动',
+            value: hasWorkspace ? '已就绪' : '待接入',
+            copy: hasWorkspace ? '创建任务后即可进入主线生产。' : '当前还不能进入首轮生成。',
+          })}
         </div>
-        <div class="onboarding-grid">
-          ${renderOnboardingStepCard({
-            step: 1,
-            title: '连接工作区',
-            copy: '把真实 workspace 挂进来，系统才能识别主题目录、输入材料和运行产物。',
-            actionHtml: `
-              <button class="btn-secondary" data-action="choose-workspace-directory">更换工作区</button>
-              <button class="btn-secondary" data-action="refresh-overview">刷新工作区</button>
-            `,
-          })}
-          ${renderOnboardingStepCard({
-            step: 2,
-            title: '创建任务骨架',
-            copy: '直接在界面里描述主题、粘贴材料，或勾选允许联网搜集资料，系统会帮你落任务骨架。',
-            actionHtml: '<button class="btn-primary" data-action="open-create-task">新建任务</button>',
-          })}
-          ${renderOnboardingStepCard({
-            step: 3,
-            title: '自动首轮生成',
-            copy: '任务创建后会自动启动首轮流程，你只需要回来看方向是否正确，再决定补输入还是继续细修。',
-            actionHtml: '<button class="btn-secondary" data-action="select-tab" data-tab="runs">查看运行页</button>',
-          })}
-        </div>
-        <div class="onboarding-callout">创建后会自动进入首轮生成。你不需要再跳去别的页面手动找运行入口，首轮完成后再回到项目总览检查方向即可。</div>
-      </section>
+        ${renderConsoleProductionDeck({
+          rows,
+          subtitle: '把接入、任务创建和运行账本都收口在第一屏，不再分散到多个入口。',
+          insightHtml: renderConsoleInsightPane({
+            title: '允许联网搜集资料',
+            copy: '如果你的原始材料为空，或者你显式要求联网搜集资料，系统会先补足研究材料，再继续主线生产。',
+            points: [
+              '创建任务时即可决定是否允许联网搜集资料。',
+              '系统会先补足研究材料，再继续主线生产。',
+              '运行页会保留后续阶段的完整账本与失败原因。',
+            ],
+            actionHtml: '<button class="btn-primary" data-action="open-create-task">创建任务</button><button class="btn-secondary" data-action="choose-workspace-directory">连接工作区</button>',
+          }),
+        })}
+      </div>
     </div>
   `;
 }
 
 function renderFirstRunLaunchpad(topic) {
-  const inputFiles = getTopicInputFiles(topic);
+  const inputReadiness = getTopicInputReadiness(topic);
   const workflowState = getTopicWorkflowState(topic);
-  const hasInputs = inputFiles.length > 0;
+  const hasInputs = inputReadiness.fileCount > 0;
+  const runCount = getTopicWorkflowRuns(topic).length;
+  const directorTask = hasInputs ? '开始首轮生成' : '先补齐输入材料';
+  const directorCopy = hasInputs
+    ? '输入层已经接入，主线现在最应该做的是跑出第一轮结果，而不是继续停留在准备阶段。'
+    : '当前主题还缺少足够输入。先补任务说明、原始材料或风格规则，再从这里启动首轮。';
+  const rows = [
+    {
+      id: '#FR-001',
+      title: '首轮启动',
+      meta: `${modelLabelForStage('__default__')} · ${workflowState.currentStepTitle}`,
+      statusTone: workflowState.pillClass,
+      statusLabel: workflowState.pillLabel,
+      efficiency: `${inputReadiness.percent}%`,
+      actionHtml: `<button class="table-action" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>${escapeHtml(workflowState.actionLabel)}</button>`,
+    },
+    {
+      id: '#FR-002',
+      title: '输入材料',
+      meta: hasInputs ? `已接入 ${inputReadiness.fileCount} 份输入，可继续补强。` : '当前仍缺少可生产输入，建议先补任务说明或参考材料。',
+      statusTone: hasInputs ? 'done' : 'pending',
+      statusLabel: hasInputs ? '已就绪' : '待补齐',
+      efficiency: `${inputReadiness.percent}%`,
+      actionHtml: '<button class="table-action" data-action="show-inputs">管理输入材料</button>',
+    },
+    {
+      id: '#FR-003',
+      title: '运行账本',
+      meta: runCount > 0 ? '首轮已经留下运行记录，可继续查看。' : '启动后会自动形成运行账本。',
+      statusTone: runCount > 0 ? 'running' : 'pending',
+      statusLabel: runCount > 0 ? '已有记录' : '尚未生成',
+      efficiency: runCount > 0 ? `${Math.min(100, 38 + runCount * 12)}%` : '0%',
+      actionHtml: '<button class="table-action" data-action="select-tab" data-tab="runs">打开运行页</button>',
+    },
+  ];
 
   return `
-    <section class="onboarding-shell compact surface">
-      <div class="onboarding-header">
-        <div class="canvas-kicker">首轮启动</div>
-        <h3 class="onboarding-title">先把第一轮跑出来，再决定细修哪里。</h3>
-        <p class="onboarding-copy">${escapeHtml(hasInputs
-          ? '输入层已经接入，可以直接从项目首页发起首轮生成。生成完成后优先看运行摘要和首批产物，再决定是否补材料或继续返工。'
-          : '当前主题还缺少足够输入。先补任务说明、原始材料或风格规则，再从这里直接发起首轮生成。')}</p>
-      </div>
-      <div class="onboarding-grid">
-        ${renderOnboardingStepCard({
-          step: 1,
-          title: '补齐输入材料',
-          copy: hasInputs ? '当前已经有输入文件，可继续补充任务说明、参考材料或风格约束。' : '没有足够输入时，先进入材料页补任务说明、原始材料或上传附件。',
-          actionHtml: '<button class="btn-secondary" data-action="show-inputs">管理输入材料</button>',
+    <div class="console-stack">
+      ${renderConsoleHeroShell({
+        eyebrow: '首轮启动',
+        title: '先把第一轮跑出来，再决定细修哪里。',
+        copy: directorCopy,
+        actionsHtml: `
+          <button class="btn-primary" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>${escapeHtml(workflowState.actionLabel)}</button>
+          <button class="btn-secondary" data-action="show-inputs">管理输入材料</button>
+          <button class="btn-secondary" data-action="select-tab" data-tab="runs">打开运行页</button>
+        `,
+        taskTitle: directorTask,
+        taskCopy: '首轮启动页不是教程，而是项目从输入层进入生产链路的启动板。',
+        taskItems: [
+          { label: '输入准备度', value: hasInputs ? `已接入 ${inputReadiness.fileCount} 份输入` : '仍缺少可生产输入' },
+          { label: '首轮状态', value: workflowState.pillLabel },
+          { label: '最近运行', value: runCount > 0 ? `${runCount} 条记录` : '还没有运行' },
+        ],
+      })}
+      <div class="console-status-grid">
+        ${renderConsoleMetricCard({
+          label: '输入准备度',
+          value: `${inputReadiness.percent}%`,
+          copy: hasInputs ? '输入层已经建立，可以继续补强或直接启动。' : '建议先补任务说明、参考材料或风格规则。',
         })}
-        ${renderOnboardingStepCard({
-          step: 2,
-          title: '开始首轮生成',
-          copy: '不需要先切别的 tab。项目总览就应该直接承担启动入口和当前阶段状态。',
+        ${renderConsoleMetricCard({
+          label: '首轮状态',
+          value: workflowState.pillLabel,
+          copy: workflowState.description,
+        })}
+        ${renderConsoleMetricCard({
+          label: '最近运行',
+          value: runCount > 0 ? `${runCount}` : '0',
+          copy: runCount > 0 ? '运行账本已经建立。' : '启动后会自动保留完整运行记录。',
+        })}
+        ${renderConsoleMetricCard({
+          label: '当前方向',
+          value: directorTask,
+          copy: '首轮稳定后再判断是回写输入还是进入页面级局部重跑。',
+        })}
+      </div>
+      ${renderConsoleProductionDeck({
+        rows,
+        subtitle: '首轮启动阶段的关键动作都直接放在首页，不再拆成教程步骤。',
+        insightHtml: renderConsoleInsightPane({
+          title: '首轮启动',
+          copy: hasInputs
+            ? '输入层已经具备，下一步应当让主线先跑出第一轮结果。'
+            : '当前仍缺输入，建议先补材料，再从这里启动主线。',
+          points: [
+            `当前步骤：${workflowState.currentStepTitle}`,
+            runCount > 0 ? '已有运行记录，可先查看最新状态后再重跑。' : '还没有运行记录，启动后这里会形成完整账本。',
+            '方向正确时优先局部重跑，方向偏了再回到输入层修主线。',
+          ],
           actionHtml: `<button class="btn-primary" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>${escapeHtml(workflowState.actionLabel)}</button>`,
-        })}
-        ${renderOnboardingStepCard({
-          step: 3,
-          title: '回看首轮结果',
-          copy: '先看最新运行摘要和项目方向，再决定回写输入、局部重跑还是继续看单篇成品。',
-          actionHtml: '<button class="btn-secondary" data-action="select-tab" data-tab="runs">查看历史运行</button>',
-        })}
-      </div>
-    </section>
+        }),
+      })}
+    </div>
   `;
 }
 
@@ -1003,6 +1457,7 @@ function renderTopicHeroSection(topic, options = {}) {
   const workflowState = getTopicWorkflowState(topic);
   const progress = topicProgress(topic);
   const narrative = options.description || getTopicWorkspaceNarrative(topic);
+  const guidance = getTopicDirectorGuidance(topic);
   const primaryAction = `
     <button class="btn-primary" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>
       ${escapeHtml(workflowState.actionLabel)}
@@ -1017,13 +1472,13 @@ function renderTopicHeroSection(topic, options = {}) {
   const returnAction = options.returnActionHtml || '';
 
   return `
-    <section class="project-hero-shell surface">
-      <div class="project-hero-grid">
-        <div class="project-hero-body">
+    <section class="project-hero-shell director-hero-shell surface">
+      <div class="director-hero-grid">
+        <div class="director-hero-main">
           <div class="canvas-kicker">${escapeHtml(options.kicker || '项目首页')}</div>
-          <h2 class="project-hero-title">${escapeHtml(topic.name)}</h2>
-          <p class="project-hero-copy">${escapeHtml(narrative)}</p>
-          <div class="inline-stats">
+          <h2 class="director-hero-title">${escapeHtml(topic.name)}</h2>
+          <p class="director-hero-copy">${escapeHtml(narrative)}</p>
+          <div class="inline-stats director-inline-stats">
             <div class="stat-chip"><strong>${escapeHtml(String(getTopicInputFiles(topic).length))}</strong> 输入文件</div>
             <div class="stat-chip"><strong>${escapeHtml(String(progress.total))}</strong> 笔记产物</div>
             <div class="stat-chip"><strong>${escapeHtml(String(getTopicWorkflowRuns(topic).length))}</strong> 最近运行</div>
@@ -1037,9 +1492,27 @@ function renderTopicHeroSection(topic, options = {}) {
             ${returnAction}
           </div>
         </div>
-        <div class="project-hero-side">
-          ${renderTopicRunStatusCard(topic, { compact: true })}
-        </div>
+        <aside class="director-side-card">
+          <div>
+            <div class="section-title">当前导演任务</div>
+            <div class="director-side-title">${escapeHtml(guidance.title)}</div>
+            <div class="section-copy">${escapeHtml(guidance.copy)}</div>
+          </div>
+          <div class="director-brief-list">
+            <div class="director-brief-item">
+              <span>运行状态</span>
+              <strong>${escapeHtml(workflowState.pillLabel)}</strong>
+            </div>
+            <div class="director-brief-item">
+              <span>当前步骤</span>
+              <strong>${escapeHtml(workflowState.currentStepTitle)}</strong>
+            </div>
+            <div class="director-brief-item">
+              <span>下一步</span>
+              <strong>${escapeHtml(guidance.title)}</strong>
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
   `;
@@ -1072,74 +1545,41 @@ function renderProjectDirectoryCards(topics, selectedTopicSlug) {
 
 function renderWorkbenchOverviewView(topic) {
   const progress = topicProgress(topic);
-  const inputFiles = getTopicInputFiles(topic);
   const workflowState = getTopicWorkflowState(topic);
   const showFirstRunLaunchpad = (topic.notes || []).length === 0;
-  const nextActionTitle = inputFiles.length === 0
-    ? '先补输入材料'
-    : (topic.notes || []).length === 0
-      ? '开始首轮生成'
-      : '查看最近产物并决定是否重跑';
-  const nextActionCopy = inputFiles.length === 0
-    ? '建议先进入输入材料页，补任务说明、原始材料、风格或人设约束。'
-    : (topic.notes || []).length === 0
-      ? '输入层已经准备好，下一步应该从项目首页直接发起首轮生成。'
-      : '先看当前运行摘要，如果方向偏了就改输入，如果只是局部问题再进单篇返工。';
+  const guidance = getTopicDirectorGuidance(topic);
+  const inputReadiness = getTopicInputReadiness(topic);
+
+  if (showFirstRunLaunchpad) {
+    return `
+      <div class="tab-pane active">
+        ${renderFirstRunLaunchpad(topic)}
+      </div>
+    `;
+  }
 
   return `
     <div class="tab-pane active">
-      <div class="workbench-layout project-home-layout">
-        <aside class="rail surface">
-          <div class="rail-section">
-            <div class="section-title">当前项目</div>
-            <div class="rail-project-name">${escapeHtml(topic.name)}</div>
-            <button class="btn-secondary rail-project-switch" data-action="open-projects">返回项目列表</button>
-            <button class="btn-danger rail-project-switch" data-action="delete-topic" data-topic="${escapeHtml(topic.slug)}" ${state.deletingTopicSlug === topic.slug ? 'disabled' : ''}>${state.deletingTopicSlug === topic.slug ? '删除中…' : '删除项目'}</button>
-          </div>
-          <div class="rail-section">
-            <div class="section-title">项目状态</div>
-            <div class="list-stack">
-              <div class="run-row">
-                <strong>${progress.total} 篇笔记 · ${progress.done} 篇已完成</strong>
-                <div class="run-meta">当前状态：${getStatusText(progress.status)}</div>
-              </div>
-              <div class="run-row">
-                <strong>${inputFiles.length} 个输入文件</strong>
-                <div class="run-meta">${escapeHtml(topic.inputDir || '未绑定输入目录')}</div>
-              </div>
-              <div class="run-row">
-                <strong>${escapeHtml(workflowState.pillLabel)}</strong>
-                <div class="run-meta">当前步骤：${escapeHtml(workflowState.currentStepTitle)}</div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <section class="canvas surface project-home-canvas">
-          ${renderTopicHeroSection(topic, {
-            kicker: '项目首页',
-            returnActionHtml: '<button class="btn-secondary" data-action="open-projects">返回项目目录</button>',
-          })}
-          ${showFirstRunLaunchpad ? renderFirstRunLaunchpad(topic) : ''}
-          ${renderTopicOverviewCards(topic)}
-        </section>
-
-        <aside class="instruction-panel surface project-trajectory-panel">
-          <div>
-            <div class="section-title">当前运行摘要</div>
-            <div class="section-copy">项目页右侧只保留最新一次运行状态，历史失败和完成记录统一收拢到运行总览。</div>
-          </div>
-          ${renderTopicRunSummaryPanel(topic)}
-          <div>
-            <div class="section-title">运行建议</div>
-            <div class="run-list">
-              <div class="run-row status-callout">
-                <strong>${escapeHtml(nextActionTitle)}</strong>
-                <div class="run-meta">${escapeHtml(nextActionCopy)}</div>
-              </div>
-            </div>
-          </div>
-        </aside>
+      <div class="console-page">
+        ${renderConsoleHeroShell({
+          eyebrow: '项目在线',
+          title: topic.name,
+          copy: getTopicWorkspaceNarrative(topic),
+          actionsHtml: `
+            <button class="btn-primary" data-action="start-topic-workflow" data-topic="${escapeHtml(topic.slug)}" ${workflowState.canStart ? '' : 'disabled'}>${escapeHtml(workflowState.actionLabel)}</button>
+            <button class="btn-secondary" data-action="show-inputs">管理输入材料</button>
+            <button class="btn-secondary" data-action="show-artifacts">查看笔记产物</button>
+            <button class="btn-secondary" data-action="open-projects">返回项目目录</button>
+          `,
+          taskTitle: guidance.title,
+          taskCopy: guidance.copy,
+          taskItems: [
+            { label: '输入准备度', value: `${inputReadiness.percent}%` },
+            { label: '当前步骤', value: workflowState.currentStepTitle },
+            { label: '最近产物', value: `${progress.total} 篇` },
+          ],
+        })}
+        ${renderTopicOverviewCards(topic)}
       </div>
     </div>
   `;
@@ -1355,8 +1795,8 @@ function renderWorkbenchView() {
 
   if (!topic) {
     return renderWorkbenchOnboarding({
-      contextTitle: '当前工作区还没有可识别主题',
-      contextCopy: '先连接真实 workspace，再新建任务。创建后系统会自动进入首轮生成，你回来时应该看到的是项目总览和运行状态，而不是空白面板。',
+      contextTitle: '把创作主线接回工作台。',
+      contextCopy: '先连接真实工作区，再新建任务。创建后系统会自动进入首轮生成，你回来时应该看到的是项目总览、运行状态和可直接操作的主线面板。',
     });
   }
 
@@ -1377,7 +1817,7 @@ function renderProjectsView() {
 
   if (!topics.length) {
     return renderWorkbenchOnboarding({
-      contextTitle: '当前项目目录还是空的',
+      contextTitle: 'Initialize Your Production Archive.',
       contextCopy: '项目页不应该只显示一句“暂无主题”。这里应该直接告诉你如何挂工作区、创建任务，并让首轮生成顺滑发生。',
     });
   }
@@ -1414,72 +1854,111 @@ function renderRunsView() {
   const blockedNotes = notes.filter((note) => (note.workflow?.stages || []).some((stage) => stage.status === 'blocked'));
   const pendingNotes = notes.filter((note) => note.workflow?.nextAction);
   const ledgerRuns = getLedgerRuns();
+  const runningRuns = ledgerRuns.filter((run) => run.status === 'running');
+  const latestRun = ledgerRuns[0] || null;
+  const latestAction = state.logs[0] || null;
+  const focusNote = blockedNotes[0] || pendingNotes[0] || null;
+  const focusTopic = (focusNote && findTopicForNoteSlug(focusNote.slug)) || getRunTargetTopic(latestRun) || null;
+  const latestNarrative = latestRun ? getRunNarrative(latestRun) : null;
+  const primaryAction = focusTopic
+    ? `<button class="btn-primary" data-action="open-topic-mode" data-topic="${escapeHtml(focusTopic.slug)}" data-mode="overview">定位焦点项目</button>`
+    : '<button class="btn-primary" data-action="select-tab" data-tab="workbench">返回工作台</button>';
+  const insightActions = focusTopic
+    ? `${primaryAction}<button class="btn-secondary" data-action="select-tab" data-tab="workbench">返回工作台</button>`
+    : `${primaryAction}<button class="btn-secondary" data-action="refresh-overview">刷新账本</button>`;
+  const runRows = ledgerRuns.slice(0, 6).map((run, index) => {
+    const narrative = getRunNarrative(run);
+    const targetTopic = getRunTargetTopic(run);
+    return {
+      id: getRunLedgerId(run, index),
+      title: narrative.subject,
+      meta: `${run.kind || 'run'} · ${narrative.modelId} · ${narrative.stepTitle}`,
+      statusTone: getRunBadgeClass(run.status),
+      statusLabel: getStatusText(run.status),
+      efficiency: getRunHealth(run),
+      actionHtml: targetTopic
+        ? `<button class="table-action" data-action="open-topic-mode" data-topic="${escapeHtml(targetTopic.slug)}" data-mode="overview">定位项目</button>`
+        : '<button class="table-action" data-action="refresh-overview">刷新账本</button>',
+    };
+  });
+  const taskTitle = blockedNotes.length
+    ? '优先处理阻断单篇'
+    : runningRuns.length
+      ? '盯住进行中的主线运行'
+      : ledgerRuns.length
+        ? '复核最近一次运行结果'
+        : '先从工作台启动首轮生产';
+  const taskCopy = blockedNotes.length
+    ? '运行页先判断哪里卡住，再一键回到对应项目处理，不需要在日志和项目页之间来回跳。'
+    : runningRuns.length
+      ? '当前存在进行中的运行，先看账本里的最新一条，再决定是否需要介入。'
+      : ledgerRuns.length
+        ? '主线记录已经形成，下一步通常是定位到对应项目做检查或局部重跑。'
+        : '还没有运行账本时，不需要停留在这里，直接回到工作台创建任务即可。';
 
   return `
     <div class="tab-pane active">
-      <div class="runs-layout">
-        <section class="content-column surface">
-          <div class="section-title">运行总览</div>
-          <div class="field-grid">
-            <div class="matrix-row">
-              <div>
-              <div class="matrix-title">运行账本</div>
-              <div class="field-hint">RedCube 持久化的运行态记录</div>
-            </div>
-              <div class="status-pill pending">${ledgerRuns.length} 条记录</div>
-            </div>
-            <div class="matrix-row">
-              <div>
-                <div class="matrix-title">待处理笔记</div>
-                <div class="field-hint">还有下一步动作的单篇</div>
-              </div>
-              <div class="status-pill pending">${pendingNotes.length} 篇</div>
-            </div>
-            <div class="matrix-row">
-              <div>
-                <div class="matrix-title">阻断笔记</div>
-                <div class="field-hint">存在阶段依赖未满足的单篇</div>
-              </div>
-              <div class="status-pill blocked">${blockedNotes.length} 篇</div>
-            </div>
-          </div>
-          <div class="section-title" style="margin-top:8px;">阻断明细</div>
-          <div class="run-list">
-            ${blockedNotes.length
-              ? blockedNotes.map((note) => `
-                <div class="run-row">
-                  <strong>${escapeHtml(note.name)}</strong>
-                  <div class="run-meta">${escapeHtml(note.workflow?.nextAction?.title || '等待上游阶段补齐')}</div>
-                </div>
-              `).join('')
-              : '<div class="empty-state">当前没有阻断项。</div>'}
-          </div>
-        </section>
-
-        <aside class="content-column surface">
-          <div class="section-title">最近运行</div>
-          <div class="run-list">
-            ${ledgerRuns.length
-              ? ledgerRuns.slice(0, 6).map((run) => `
-                <div class="run-row">
-                  <strong>${escapeHtml(run.kind || 'run')} · ${escapeHtml(run.defaultModelId || '未配置模型')}</strong>
-                  <div class="run-meta">${escapeHtml(run.status || 'unknown')} · ${escapeHtml(run.summary?.successTasks ?? '')}/${escapeHtml(run.summary?.totalTasks ?? '')} 任务成功</div>
-                </div>
-              `).join('')
-              : '<div class="empty-state">还没有 smoke run 记录。</div>'}
-          </div>
-          <div class="section-title" style="margin-top:8px;">最近动作</div>
-          <div class="run-list">
-            ${state.logs.length
-              ? state.logs.map((entry) => `
-                <div class="run-row">
-                  <strong>${escapeHtml(entry.time)} · ${escapeHtml(entry.title)}</strong>
-                  <div class="run-meta">${escapeHtml(entry.detail)}</div>
-                </div>
-              `).join('')
-              : '<div class="empty-state">这里会显示最近的界面动作和运行摘要。</div>'}
-          </div>
-        </aside>
+      <div class="console-page">
+        ${renderConsoleHeroShell({
+          eyebrow: '运行账本',
+          title: '所有主线运行都在这里留痕。',
+          copy: '从首轮启动到局部重跑，账本、阻断与最近动作统一收口，不再在后台式列表里翻记录。',
+          actionsHtml: `${primaryAction}<button class="btn-secondary" data-action="refresh-overview">刷新账本</button>`,
+          taskTitle,
+          taskCopy,
+          taskItems: [
+            { label: '运行账本', value: `${ledgerRuns.length} 条记录` },
+            { label: '处理中', value: runningRuns.length ? `${runningRuns.length} 条运行中` : '当前空闲' },
+            { label: '最新更新', value: latestRun ? formatDateTime(latestRun.finishedAt || latestRun.startedAt) : '暂无记录' },
+          ],
+        })}
+        <div class="console-status-grid">
+          ${renderConsoleMetricCard({
+            label: '主线账本',
+            value: `${ledgerRuns.length}`,
+            copy: ledgerRuns.length ? '所有主线运行已经统一沉淀到账本。' : '首轮启动后，这里会开始形成完整运行记录。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '处理中',
+            value: `${runningRuns.length}`,
+            copy: runningRuns.length ? '存在仍在推进的主线运行。' : '当前没有运行中的账本条目。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '失败定位',
+            value: blockedNotes.length ? `${blockedNotes.length} 项` : '正常',
+            copy: blockedNotes.length ? '有单篇被上游阶段阻断，优先回到对应项目处理。' : '当前没有需要立即排查的阻断项。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '最近动作',
+            value: latestAction?.title || '待命',
+            copy: latestAction ? `${latestAction.time} · ${latestAction.detail}` : '界面动作和运行摘要会同步显示在这里。',
+          })}
+        </div>
+        <div class="console-production-layout">
+          ${renderConsoleProductionTable({
+            title: '运行账本',
+            subtitle: '按时间查看主线运行、模型路由与下一步处理入口。',
+            rows: runRows,
+            headings: {
+              id: '账本编号',
+              title: '运行内容',
+              status: '状态',
+              efficiency: '健康度',
+              action: '操作',
+            },
+            emptyText: '还没有运行账本。回到工作台创建任务后，这里会自动形成主线记录。',
+          })}
+          ${renderConsoleInsightPane({
+            title: blockedNotes.length ? '先处理阻断，再继续推进' : runningRuns.length ? '盯住最新运行，不要分散' : '账本已收口，按项目回查即可',
+            copy: '当前页只负责判断哪里卡住、最近一次跑到了哪，以及下一步应该回到哪个项目。',
+            points: [
+              blockedNotes.length ? `阻断焦点：${blockedNotes[0].name}` : '阻断焦点：当前没有阻断项。',
+              latestNarrative ? `最近运行：${latestNarrative.subject} · ${getStatusText(latestRun?.status)}` : '最近运行：还没有主线记录。',
+              latestAction ? `最近动作：${latestAction.time} · ${latestAction.title}` : '最近动作：界面动作会在这里同步显示。',
+            ],
+            actionHtml: insightActions,
+          })}
+        </div>
       </div>
     </div>
   `;
@@ -1515,38 +1994,104 @@ function renderModelsView() {
   const modelList = (config.models || []).map((model) => `
     <span class="model-chip">${escapeHtml(model.label || model.modelName || model.id)}</span>
   `).join('');
+  const defaultModel = (config.models || []).find((model) => model.id === config.defaultModelId) || null;
+  const defaultModelLabel = defaultModel?.label || defaultModel?.modelName || defaultModel?.id || '未配置';
+  const configuredOverrideCount = STAGE_LABELS.filter((stage) => Boolean(config.stageOverrides?.[stage.id])).length;
+  const hasModels = (config.models || []).length > 0;
+  const modelSettingsHref = `/settings?workspaceRoot=${encodeURIComponent(getWorkspaceRoot())}`;
 
   return `
     <div class="tab-pane active">
-      <div class="models-layout">
-        <section class="content-column surface">
-          <div class="section-title">工作流模型</div>
-          <div class="section-copy">这里专门负责默认模型和阶段覆盖。供应商、Base URL、API Key 和模型库维护已经收进独立设置页。</div>
-          <div class="field-grid">
-            <div class="field">
-              <label>默认模型</label>
-              <select data-kind="default-model">
-                <option value="">请选择默认模型</option>
-                ${(config.models || []).map((model) => `
-                  <option value="${escapeHtml(model.id)}" ${model.id === config.defaultModelId ? 'selected' : ''}>
-                    ${escapeHtml(model.label || model.modelName || model.id)}
-                  </option>
-                `).join('')}
-              </select>
+      <div class="console-page">
+        ${renderConsoleHeroShell({
+          eyebrow: '模型路由',
+          title: '让每个阶段都走对模型。',
+          copy: '默认模型、阶段覆盖和 smoke 验证统一放在这一页；供应商、Base URL 和 API Key 则继续留在模型设置里管理。',
+          actionsHtml: `
+            <button class="btn-primary" data-action="save-model-config">保存工作流模型</button>
+            <button class="btn-secondary" data-action="run-workflow-smoke" ${state.smokeRunning ? 'disabled' : ''}>${state.smokeRunning ? '验证中…' : '一键跑一轮'}</button>
+            <a class="button-link btn-secondary" href="${modelSettingsHref}">打开模型设置</a>
+          `,
+          taskTitle: hasModels ? '确认默认模型与阶段覆盖' : '先补齐可用模型',
+          taskCopy: hasModels
+            ? '这一页只处理工作流路由。供应商、密钥和模型目录维护已经从这里拆出去，避免职责混杂。'
+            : '当前还没有可用模型，先去模型设置页维护供应商和模型目录，再回到这里做路由选择。',
+          taskItems: [
+            { label: '默认模型', value: defaultModelLabel },
+            { label: '阶段覆盖', value: configuredOverrideCount ? `${configuredOverrideCount} 项` : '继承默认' },
+            { label: '验证链路', value: state.smokeRunning ? '验证中' : '待触发' },
+          ],
+        })}
+        <div class="console-status-grid">
+          ${renderConsoleMetricCard({
+            label: '可选模型',
+            value: `${config.models?.length || 0}`,
+            copy: hasModels ? '这些模型可被工作流默认路由或阶段覆盖直接使用。' : '先在模型设置页补齐模型目录。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '默认模型',
+            value: defaultModelLabel,
+            copy: defaultModel ? '没有显式覆盖时，所有阶段都会继承它。' : '当前还没有全局默认模型。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '阶段覆盖',
+            value: configuredOverrideCount ? `${configuredOverrideCount}` : '0',
+            copy: configuredOverrideCount ? '部分阶段已经改走专用模型。' : '当前所有阶段都继承默认模型。',
+          })}
+          ${renderConsoleMetricCard({
+            label: '验证链路',
+            value: state.smokeRunning ? '进行中' : '待命',
+            copy: state.smokeRunning ? '正在执行 smoke run，验证当前模型路由是否可用。' : '保存后可以直接跑一轮 smoke 验证模型链路。',
+          })}
+        </div>
+        <div class="console-production-layout">
+          <section class="console-table-shell glass-panel">
+            <div class="console-section-head">
+              <div>
+                <h3>路由控制台</h3>
+                <p>选择默认模型，并确认当前工作流可用的模型集合。</p>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label>默认模型</label>
+                <select data-kind="default-model">
+                  <option value="">请选择默认模型</option>
+                  ${(config.models || []).map((model) => `
+                    <option value="${escapeHtml(model.id)}" ${model.id === config.defaultModelId ? 'selected' : ''}>
+                      ${escapeHtml(model.label || model.modelName || model.id)}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+            <div class="model-list">${modelList || '<span class="model-chip">暂无模型</span>'}</div>
+            <div class="console-action-row">
+              <button class="btn-primary" data-action="save-model-config">保存工作流模型</button>
+              <button class="btn-secondary" data-action="run-workflow-smoke" ${state.smokeRunning ? 'disabled' : ''}>${state.smokeRunning ? '验证中…' : '一键跑一轮'}</button>
+              <a class="button-link btn-secondary" href="${modelSettingsHref}">打开模型设置</a>
+            </div>
+          </section>
+          ${renderConsoleInsightPane({
+            title: '路由判断先于供应商维护',
+            copy: '模型页只负责回答“哪一阶段走哪一个模型”。供应商、Base URL、API Key 与模型目录维护已经统一放到模型设置页。',
+            points: [
+              `默认模型：${defaultModelLabel}`,
+              configuredOverrideCount ? `已配置 ${configuredOverrideCount} 个阶段覆盖。` : '当前所有阶段都继承默认模型。',
+              state.smokeRunning ? 'Smoke 验证正在进行中。' : '保存后可以直接触发一轮 smoke run 检查链路。',
+            ],
+            actionHtml: `<a class="button-link btn-secondary" href="${modelSettingsHref}">打开模型设置</a>`,
+          })}
+        </div>
+        <section class="console-table-shell glass-panel">
+          <div class="console-section-head">
+            <div>
+              <h3>阶段覆盖</h3>
+              <p>为不同阶段指定例外模型；留空时自动继承默认模型。</p>
             </div>
           </div>
-          <div class="model-list">${modelList || '<span class="model-chip">暂无模型</span>'}</div>
-          <div class="save-bar">
-            <button class="btn-primary" data-action="save-model-config">保存工作流模型</button>
-            <button class="btn-secondary" data-action="run-workflow-smoke" ${state.smokeRunning ? 'disabled' : ''} style="margin-left:10px;">${state.smokeRunning ? '验证中…' : '一键跑一轮'}</button>
-            <a class="button-link btn-secondary" href="/settings?workspaceRoot=${encodeURIComponent(getWorkspaceRoot())}" style="margin-left:10px;">打开模型设置</a>
-          </div>
-        </section>
-
-        <aside class="content-column surface">
-          <div class="section-title">阶段覆盖</div>
           <div class="matrix-grid">${matrix}</div>
-        </aside>
+        </section>
       </div>
     </div>
   `;

@@ -7,8 +7,15 @@ const state = {
 const el = {
   workspaceRoot: document.getElementById('workspaceRoot'),
   workspaceBadgeValue: document.getElementById('workspaceBadgeValue'),
+  workspaceHeroValue: document.getElementById('workspaceHeroValue'),
   toggleWorkspaceBtn: document.getElementById('toggleWorkspaceBtn'),
   summaryText: document.getElementById('summaryText'),
+  providerCountValue: document.getElementById('providerCountValue'),
+  providerCountMeta: document.getElementById('providerCountMeta'),
+  modelCountValue: document.getElementById('modelCountValue'),
+  modelCountMeta: document.getElementById('modelCountMeta'),
+  activityStateValue: document.getElementById('activityStateValue'),
+  activityStateMeta: document.getElementById('activityStateMeta'),
   providerList: document.getElementById('providerList'),
   modelList: document.getElementById('modelList'),
   logList: document.getElementById('logList'),
@@ -31,6 +38,7 @@ function logAction(title, detail) {
     time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
   });
   state.logs = state.logs.slice(0, 8);
+  renderActivitySummary();
   renderLogs();
 }
 
@@ -53,7 +61,11 @@ function syncBackLink() {
 }
 
 function renderWorkspaceBadge() {
-  el.workspaceBadgeValue.textContent = getWorkspaceRoot();
+  const workspaceRoot = getWorkspaceRoot() || '尚未连接工作区';
+  el.workspaceBadgeValue.textContent = workspaceRoot;
+  if (el.workspaceHeroValue) {
+    el.workspaceHeroValue.textContent = workspaceRoot;
+  }
 }
 
 function applyWorkspaceRoot(workspaceRoot) {
@@ -157,7 +169,7 @@ function renderProviders() {
         </div>
       </div>
     `).join('')
-    : '<div class="empty">还没有供应商，先新增一个 OpenAI-compatible endpoint。</div>';
+    : '<div class="empty">还没有供应商，先新增一个 OpenAI-compatible 接口。</div>';
 }
 
 function renderModels() {
@@ -208,12 +220,37 @@ function renderSummary() {
   const providerCount = state.config?.providers?.length || 0;
   const modelCount = state.config?.models?.length || 0;
   el.summaryText.textContent = `${providerCount} 个供应商 · ${modelCount} 个模型`;
+  if (el.providerCountValue) {
+    el.providerCountValue.textContent = String(providerCount);
+  }
+  if (el.providerCountMeta) {
+    el.providerCountMeta.textContent = providerCount ? '已接入 OpenAI-compatible 接口' : '尚未接入供应商';
+  }
+  if (el.modelCountValue) {
+    el.modelCountValue.textContent = String(modelCount);
+  }
+  if (el.modelCountMeta) {
+    el.modelCountMeta.textContent = modelCount ? '主线与 workbench 共用同一模型目录' : '尚未定义可用模型';
+  }
+}
+
+function renderActivitySummary() {
+  const latestEntry = state.logs[0];
+  if (!el.activityStateValue || !el.activityStateMeta) return;
+  if (!latestEntry) {
+    el.activityStateValue.textContent = '待命';
+    el.activityStateMeta.textContent = '尚未执行配置动作。';
+    return;
+  }
+  el.activityStateValue.textContent = latestEntry.title;
+  el.activityStateMeta.textContent = `${latestEntry.time} · ${latestEntry.detail}`;
 }
 
 function render() {
   syncBackLink();
   renderWorkspaceBadge();
   renderSummary();
+  renderActivitySummary();
   renderProviders();
   renderModels();
   renderLogs();

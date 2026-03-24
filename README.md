@@ -82,6 +82,10 @@ node apps/redcube-cli/src/cli.js run --project "项目名" --root-dir "$WORKSPAC
 # 4) 启动 Web UI
 node apps/redcube-web/src/server.js
 # 打开 http://127.0.0.1:3100
+
+# 5) 构建 macOS 双击启动 App
+./scripts/build-macos-app.sh
+# 生成 RedCube AI.app
 ```
 
 ## 文档导航
@@ -163,9 +167,19 @@ node apps/redcube-cli/src/cli.js doctor --project "项目名" --root-dir "$WORKS
 node apps/redcube-web/src/server.js
 # 打开 http://127.0.0.1:3100
 
-# 或双击启动
+# 或双击启动命令文件
 ./RedCube AI Web.command
+
+# 或先构建 macOS App，再双击 RedCube AI.app
+./scripts/build-macos-app.sh
 ```
+
+- `scripts/launch-redcube-web.sh`
+  - 统一处理服务探测、后台拉起本地 Web 服务、等待就绪并自动打开浏览器
+- `scripts/build-macos-app.sh`
+  - 用 `osacompile` 生成本地 `RedCube AI.app`
+- `RedCube AI.app`
+  - 构建产物，不入库；适合在 macOS 下像普通 App 一样双击启动
 
 ### API 接口
 

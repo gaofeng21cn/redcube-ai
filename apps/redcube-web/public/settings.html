@@ -3,131 +3,362 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RedCube AI Workbench Settings</title>
+  <title>RedCube AI Model Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #f6f0e8;
-      --panel: rgba(255, 250, 244, 0.88);
-      --line: rgba(82, 52, 22, 0.12);
-      --ink: #23170e;
-      --muted: #77614c;
-      --brand: #b74f12;
-      --shadow: 0 24px 60px rgba(56, 35, 13, 0.10);
+      --ui-font: "Manrope", "Avenir Next", "SF Pro Text", "PingFang SC", "Noto Sans SC", sans-serif;
+      --display-font: "Space Grotesk", "Avenir Next Condensed", "SF Pro Display", "PingFang SC", sans-serif;
+      --primary: #00646b;
+      --primary-container: #107f87;
+      --primary-fixed-dim: #7ad4dd;
+      --secondary: #4c6267;
+      --surface: #f6fafb;
+      --surface-container-low: #f0f4f5;
+      --surface-container: #eaeef0;
+      --surface-container-high: #e5e9ea;
+      --surface-container-highest: #dfe3e4;
+      --surface-container-lowest: #ffffff;
+      --tertiary-fixed: #ffdbcb;
+      --panel: rgba(255, 255, 255, 0.70);
+      --panel-strong: rgba(255, 255, 255, 0.84);
+      --line: rgba(189, 201, 200, 0.34);
+      --line-strong: rgba(110, 121, 121, 0.20);
+      --outline-variant: rgba(189, 201, 200, 0.72);
+      --ink: #181c1d;
+      --muted: #3e4949;
+      --brand-soft: rgba(16, 127, 135, 0.12);
+      --danger: #ba1a1a;
+      --danger-soft: rgba(186, 26, 26, 0.10);
+      --shadow: 0 20px 40px rgba(8, 31, 35, 0.06);
+      --shadow-strong: 0 24px 48px rgba(8, 31, 35, 0.08);
       --radius-xl: 28px;
       --radius-lg: 20px;
       --radius-md: 14px;
     }
 
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(183, 79, 18, 0.12), transparent 24%),
-        radial-gradient(circle at 100% 0%, rgba(15, 118, 110, 0.10), transparent 26%),
-        linear-gradient(180deg, #fdf9f4, var(--bg));
-      color: var(--ink);
-      font-family: "Avenir Next", "SF Pro Display", "PingFang SC", "Noto Sans SC", sans-serif;
+    * {
+      box-sizing: border-box;
     }
 
-    button, input, select, a {
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(122, 212, 221, 0.14), transparent 26%),
+        radial-gradient(circle at 100% 0%, rgba(255, 219, 203, 0.16), transparent 24%),
+        linear-gradient(180deg, #fbfefe 0%, var(--surface) 52%, #e8eef0 100%);
+      font-family: var(--ui-font);
+      letter-spacing: 0.01em;
+    }
+
+    button,
+    a,
+    input,
+    select {
       font: inherit;
     }
 
-    button, a.button-link {
-      cursor: pointer;
+    button,
+    a.button-link,
+    .tab-button,
+    .sidebar-meta-link {
       border: none;
-      border-radius: 999px;
       text-decoration: none;
-      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
 
-    button:hover, a.button-link:hover {
+    button:hover,
+    a.button-link:hover,
+    .tab-button:hover,
+    .sidebar-meta-link:hover {
       transform: translateY(-1px);
     }
 
-    .shell {
-      max-width: 1380px;
-      margin: 0 auto;
-      padding: 28px;
+    button:focus-visible,
+    a.button-link:focus-visible,
+    .tab-button:focus-visible,
+    .sidebar-meta-link:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 1px rgba(16, 127, 135, 0.30),
+        0 0 0 4px rgba(16, 127, 135, 0.14);
     }
 
-    .panel {
+    .material-symbols-outlined {
+      font-variation-settings: "FILL" 0, "wght" 430, "GRAD" 0, "opsz" 24;
+    }
+
+    .glass-panel {
       background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(12px);
     }
 
-    .hero {
-      padding: 26px;
-      margin-bottom: 18px;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.40);
+      backdrop-filter: blur(8px);
     }
 
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .shell-app {
+      min-height: 100vh;
+    }
+
+    .shell-sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 264px;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      border-right: 1px solid rgba(255, 255, 255, 0.52);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+      z-index: 40;
+    }
+
+    .shell-content {
+      min-height: 100vh;
+      margin-left: 264px;
+    }
+
+    .shell-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 18px;
       align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.58);
+      box-shadow: var(--shadow);
     }
 
-    .hero-title {
-      margin: 18px 0 8px;
-      font-size: clamp(30px, 4vw, 44px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
+    .shell-main {
+      padding: 24px 24px 40px;
+      display: grid;
+      gap: 18px;
     }
 
-    .hero-subtitle {
-      margin: 0 0 18px;
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 4px;
+    }
+
+    .sidebar-mark {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-container));
+      color: #fff;
+      box-shadow: 0 18px 32px rgba(0, 100, 107, 0.18);
+    }
+
+    .sidebar-overline {
+      color: var(--secondary);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-title {
+      margin-top: 4px;
+      font-family: var(--display-font);
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .sidebar-subtitle {
+      margin-top: 4px;
+      color: var(--secondary);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .tabs-nav {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .tab-button {
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      border-radius: 18px;
+      color: rgba(24, 28, 29, 0.72);
+      background: transparent;
+      border: 1px solid transparent;
+      box-shadow: none;
+    }
+
+    .tab-button.active {
+      background: rgba(0, 100, 107, 0.10);
+      color: var(--primary);
+      border-color: rgba(122, 212, 221, 0.28);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .tab-button .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    .sidebar-footer {
+      display: grid;
+      gap: 10px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(189, 201, 200, 0.28);
+    }
+
+    .sidebar-note {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.48);
+      border: 1px solid rgba(189, 201, 200, 0.22);
       color: var(--muted);
-      max-width: 62ch;
+      font-size: 13px;
       line-height: 1.7;
     }
 
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .sidebar-meta-link {
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: 16px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.48);
+      border: 1px solid rgba(189, 201, 200, 0.22);
     }
 
-    .toolbar-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
+    .topbar-heading {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
     }
 
-    .workspace-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .topbar-kicker {
+      color: var(--secondary);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .topbar-heading h1 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(24px, 2.8vw, 32px);
+      letter-spacing: -0.04em;
+    }
+
+    .topbar-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .topbar-status {
+      display: inline-flex;
       align-items: center;
-      margin-top: 18px;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(189, 201, 200, 0.26);
+      color: var(--primary);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.52);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-container));
+      box-shadow: 0 0 0 6px rgba(16, 127, 135, 0.12);
+    }
+
+    .topbar-status span:last-child {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .button-link,
+    .btn-secondary,
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 18px;
+      border-radius: 999px;
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(189, 201, 200, 0.24);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+
+    .btn-primary {
+      color: #f7feff;
+      background: linear-gradient(135deg, var(--primary), var(--primary-container));
+      box-shadow: 0 18px 32px rgba(0, 100, 107, 0.18);
     }
 
     .workspace-badge {
       display: inline-flex;
       align-items: center;
       gap: 10px;
+      min-height: 44px;
       padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid var(--line);
-      color: var(--ink);
-      max-width: 100%;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(189, 201, 200, 0.24);
+      max-width: min(520px, 100%);
     }
 
     .workspace-badge-label {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.14em;
+      white-space: nowrap;
     }
 
     .workspace-badge-value {
@@ -136,69 +367,153 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 480px;
     }
 
-    .field input,
-    .field select {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.78);
-      border-radius: 16px;
-      padding: 12px 14px;
-      outline: none;
-      color: var(--ink);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #cb5c18, #9f3f0c);
-      color: #fff7ef;
-      padding: 12px 18px;
-      box-shadow: 0 12px 26px rgba(159, 63, 12, 0.22);
-    }
-
-    .btn-secondary {
-      background: rgba(35, 23, 14, 0.08);
-      color: var(--ink);
-      padding: 12px 18px;
-    }
-
-    .grid {
+    .settings-hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      padding: 26px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(189, 201, 200, 0.24);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-eyebrow {
+      color: var(--secondary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+    }
+
+    .hero-copy h2 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      max-width: 12ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.84;
+      max-width: 62ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .hero-aside {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .console-metric-card {
+      padding: 18px 18px 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(189, 201, 200, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46);
+    }
+
+    .metric-kicker {
+      color: var(--secondary);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 12px;
+      font-family: var(--display-font);
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-value.metric-path {
+      font-family: var(--ui-font);
+      font-size: 14px;
+      line-height: 1.6;
+      letter-spacing: 0;
+      word-break: break-all;
+    }
+
+    .metric-note {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .settings-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .settings-column {
+      display: grid;
       gap: 18px;
     }
 
-    .column {
+    .editor-panel {
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(189, 201, 200, 0.24);
+      box-shadow: var(--shadow);
       padding: 22px;
     }
 
-    .section + .section {
-      margin-top: 20px;
-    }
-
-    .section-head {
+    .panel-head {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 16px;
+      margin-bottom: 16px;
     }
 
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    .panel-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 28px;
+      letter-spacing: -0.04em;
     }
 
-    .section-meta {
-      font-size: 12px;
+    .panel-meta {
+      margin-top: 6px;
       color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
     }
 
-    .field-grid {
+    .field-grid,
+    .log-list {
       display: grid;
-      gap: 12px;
+      gap: 14px;
     }
 
     .field {
@@ -207,137 +522,309 @@
     }
 
     .field label {
-      font-size: 12px;
-      color: var(--muted);
+      color: var(--secondary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(189, 201, 200, 0.28);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.44);
     }
 
     .card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px;
-      background: rgba(255, 255, 255, 0.78);
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid rgba(189, 201, 200, 0.24);
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.40);
     }
 
     .card-actions {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
     }
 
     .button-mini {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
       padding: 8px 12px;
-      background: rgba(35, 23, 14, 0.08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
       color: var(--ink);
-      font-size: 12px;
+      border: 1px solid rgba(189, 201, 200, 0.24);
     }
 
     .button-mini.danger {
-      background: rgba(154, 52, 18, 0.12);
-      color: #9a3412;
-    }
-
-    .log-list {
-      display: grid;
-      gap: 10px;
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-color: rgba(186, 26, 26, 0.18);
     }
 
     .log-card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px;
-      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(189, 201, 200, 0.24);
+      border-radius: 20px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.40);
     }
 
     .log-card strong {
       display: block;
-      margin-bottom: 6px;
       font-size: 13px;
+      margin-bottom: 6px;
     }
 
     .log-card span {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     .empty {
-      padding: 18px;
-      border: 1px dashed rgba(82, 52, 22, 0.24);
-      border-radius: 18px;
+      padding: 20px;
+      border: 1px dashed rgba(110, 121, 121, 0.28);
+      border-radius: 20px;
       color: var(--muted);
-      line-height: 1.7;
       text-align: center;
+      line-height: 1.8;
+      background: rgba(255, 255, 255, 0.42);
     }
 
-    @media (max-width: 1080px) {
-      .grid { grid-template-columns: 1fr; }
-      .toolbar { grid-template-columns: 1fr; }
+    @media (max-width: 1360px) {
+      .shell-topbar {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .topbar-status {
+        justify-self: start;
+      }
+
+      .topbar-actions {
+        justify-content: flex-start;
+      }
+
+      .settings-hero,
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .shell-sidebar {
+        position: static;
+        width: auto;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+      }
+
+      .shell-content {
+        margin-left: 0;
+      }
+
+      .settings-metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .shell-topbar,
+      .shell-main {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .settings-hero,
+      .editor-panel {
+        padding: 18px;
+      }
+
+      .hero-copy h2 {
+        max-width: none;
+      }
+
+      .workspace-badge {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <section class="hero panel">
-      <div class="hero-top">
-        <a class="button-link btn-secondary" id="backLink" href="/">返回工作台</a>
-        <div class="card-actions">
+  <div class="shell-app">
+    <aside class="shell-sidebar glass-panel">
+      <div class="sidebar-brand">
+        <div class="sidebar-mark">
+          <span class="material-symbols-outlined">psychology</span>
+        </div>
+        <div>
+          <div class="sidebar-overline">RedCube AI</div>
+          <div class="sidebar-title">AI_WORKBENCH</div>
+          <div class="sidebar-subtitle">Crystalline Logic</div>
+        </div>
+      </div>
+
+      <nav class="tabs-nav" aria-label="Primary">
+        <a class="tab-button" href="/?tab=workbench">
+          <span class="material-symbols-outlined">edit_note</span>
+          <span>工作台</span>
+        </a>
+        <a class="tab-button" href="/?tab=projects">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <span>项目</span>
+        </a>
+        <a class="tab-button" href="/?tab=runs">
+          <span class="material-symbols-outlined">monitoring</span>
+          <span>运行</span>
+        </a>
+        <a class="tab-button active" href="/settings" aria-current="page">
+          <span class="material-symbols-outlined">model_training</span>
+          <span>模型设置</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a class="sidebar-meta-link" id="backLink" href="/">返回工作台</a>
+        <div class="sidebar-note">
+          RedCube AI 在这里统一管理 OpenAI-compatible 供应商、Base URL、API Key 与模型库定义，工作台只消费经过验证的配置结果。
+        </div>
+      </div>
+    </aside>
+
+    <div class="shell-content">
+      <header class="shell-topbar glass-panel">
+        <div class="topbar-heading">
+          <div class="topbar-kicker">RedCube AI</div>
+          <h1>MODEL_CONSOLE</h1>
+          <p class="topbar-note">集中管理供应商、密钥与模型路由，让主线和 workbench 使用同一套可追踪配置。</p>
+        </div>
+
+        <div class="topbar-status glass-card">
+          <span class="status-dot"></span>
+          <span>供应商图谱在线</span>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="workspace-badge">
+            <span class="workspace-badge-label">当前工作区</span>
+            <span class="workspace-badge-value" id="workspaceBadgeValue"></span>
+          </div>
+          <button class="btn-secondary" id="toggleWorkspaceBtn">更换工作区</button>
           <button class="btn-secondary" id="refreshBtn">刷新配置</button>
           <button class="btn-primary" id="saveBtn">保存供应商与模型</button>
         </div>
-      </div>
-      <h1 class="hero-title">RedCube AI Workbench Settings</h1>
-      <p class="hero-subtitle">
-        这里只管理 OpenAI-compatible 供应商、Base URL、API Key 和模型库。首页工作台只负责选择默认模型和阶段覆盖，不再暴露密钥细节。
-      </p>
-      <div class="toolbar">
-        <div class="toolbar-actions">
-          <button class="btn-secondary" id="toggleWorkspaceBtn">更换工作区</button>
-          <button class="btn-secondary" id="addProviderBtn">新增供应商</button>
-          <button class="btn-secondary" id="addModelBtn">新增模型</button>
-        </div>
-        <span id="summaryText" class="section-meta"></span>
-      </div>
-      <div class="workspace-bar">
-        <div class="workspace-badge">
-          <span class="workspace-badge-label">当前工作区</span>
-          <span class="workspace-badge-value" id="workspaceBadgeValue"></span>
-        </div>
-      </div>
-      <input id="workspaceRoot" type="hidden" />
-    </section>
+      </header>
 
-    <section class="grid">
-      <div class="column panel">
-        <div class="section">
-          <div class="section-head">
-            <div class="section-title">供应商</div>
-            <div class="section-meta">Base URL / API Key</div>
-          </div>
-          <div class="field-grid" id="providerList"></div>
-        </div>
-      </div>
+      <main class="shell-main">
+        <input id="workspaceRoot" type="hidden" />
 
-      <div class="column panel">
-        <div class="section">
-          <div class="section-head">
-            <div class="section-title">模型库</div>
-            <div class="section-meta">给工作流选择用</div>
+        <section class="settings-hero glass-panel">
+          <div class="hero-copy">
+            <div class="hero-eyebrow">RedCube AI / 模型基础设施</div>
+            <h2>让 RedCube AI 的模型底座清晰、可控、可追踪。</h2>
+            <p>
+              在这里集中管理 OpenAI-compatible 供应商、Base URL、API Key 和模型库。工作台与主线执行从同一份配置读取模型路由，配置变化也会在下方账本中留痕。
+            </p>
+            <div class="hero-actions">
+              <button class="btn-secondary" id="addProviderBtn">新增供应商</button>
+              <button class="btn-secondary" id="addModelBtn">新增模型</button>
+            </div>
           </div>
-          <div class="field-grid" id="modelList"></div>
-        </div>
 
-        <div class="section">
-          <div class="section-head">
-            <div class="section-title">日志</div>
-            <div class="section-meta">最近动作</div>
+          <div class="hero-aside">
+            <article class="console-metric-card glass-card">
+              <span class="metric-kicker">配置快照</span>
+              <strong class="metric-value" id="summaryText">0 个供应商 · 0 个模型</strong>
+              <span class="metric-note">当前工作台只消费这里保存后的供应商与模型结果。</span>
+            </article>
+
+            <article class="console-metric-card glass-card">
+              <span class="metric-kicker">工作区镜像</span>
+              <strong class="metric-value metric-path" id="workspaceHeroValue"></strong>
+              <span class="metric-note">切换工作区后会自动加载对应目录下的模型配置，并同步返回链接。</span>
+            </article>
           </div>
-          <div class="log-list" id="logList"></div>
-        </div>
-      </div>
-    </section>
+        </section>
+
+        <section class="settings-metric-grid">
+          <article class="console-metric-card glass-card">
+            <span class="metric-kicker">供应商</span>
+            <strong class="metric-value" id="providerCountValue">0</strong>
+            <span class="metric-note" id="providerCountMeta">OpenAI-compatible 接口</span>
+          </article>
+
+          <article class="console-metric-card glass-card">
+            <span class="metric-kicker">模型</span>
+            <strong class="metric-value" id="modelCountValue">0</strong>
+            <span class="metric-note" id="modelCountMeta">可供阶段路由使用的模型目录</span>
+          </article>
+
+          <article class="console-metric-card glass-card">
+            <span class="metric-kicker">控制台状态</span>
+            <strong class="metric-value" id="activityStateValue">待命</strong>
+            <span class="metric-note" id="activityStateMeta">尚未执行配置动作。</span>
+          </article>
+        </section>
+
+        <section class="settings-grid">
+          <section class="editor-panel glass-panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">供应商矩阵</h2>
+                <div class="panel-meta">维护供应商名称、Provider ID、Base URL 与 API Key。</div>
+              </div>
+            </div>
+            <div class="field-grid" id="providerList"></div>
+          </section>
+
+          <div class="settings-column">
+            <section class="editor-panel glass-panel">
+              <div class="panel-head">
+                <div>
+                  <h2 class="panel-title">模型库</h2>
+                <div class="panel-meta">为主线和 workbench 维护唯一的模型目录与供应商绑定。</div>
+                </div>
+              </div>
+              <div class="field-grid" id="modelList"></div>
+            </section>
+
+            <section class="editor-panel glass-panel">
+              <div class="panel-head">
+                <div>
+                  <h2 class="panel-title">操作账本</h2>
+                  <div class="panel-meta">记录最近的配置动作与目录切换，方便定位变更来源。</div>
+                </div>
+              </div>
+              <div class="log-list" id="logList" aria-live="polite"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
   </div>
+
   <script src="/settings.js"></script>
 </body>
 </html>

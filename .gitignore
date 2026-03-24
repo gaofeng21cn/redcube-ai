@@ -2,6 +2,7 @@
 .env
 .cursor/
 .default_project
+.superpowers/
 
 # 运行产物
 .redcube_pi/
@@ -30,3 +31,4 @@ coverage/
 
 # macOS
 .DS_Store
+RedCube AI.app/
