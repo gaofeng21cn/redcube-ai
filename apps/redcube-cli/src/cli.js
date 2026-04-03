@@ -72,8 +72,25 @@ async function loadLegacyAgentModule() {
   return legacyAgentModulePromise;
 }
 
-async function resolveLegacyRootDir(options) {
-  const { loadRuntimeConfig } = await loadLegacyConfigModule();
+function wrapLegacyRuntimeError(command, error) {
+  const wrapped = new Error(`legacy runtime 不可用，无法执行命令: ${command}`);
+  wrapped.cause = error;
+  return wrapped;
+}
+
+async function requireLegacyModule(loadModule, command) {
+  try {
+    return await loadModule();
+  } catch (error) {
+    throw wrapLegacyRuntimeError(command, error);
+  }
+}
+
+async function resolveLegacyRootDir(options, command) {
+  const { loadRuntimeConfig } = await requireLegacyModule(
+    loadLegacyConfigModule,
+    command,
+  );
   const runtimeConfig = loadRuntimeConfig({
     env: process.env,
     explicit: {
@@ -135,11 +152,10 @@ async function main() {
     return;
   }
 
-  const rootDir = await resolveLegacyRootDir(options);
-
   if (command === 'run') {
     if (!options.project) fail('run 命令需要 --project');
-    const { runWorkflow } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { runWorkflow } = await requireLegacyModule(loadLegacyAgentModule, command);
 
     const result = await runWorkflow(
       {
@@ -157,7 +173,8 @@ async function main() {
 
   if (command === 'eval') {
     if (!options.project) fail('eval 命令需要 --project');
-    const { evaluateWorkflow } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { evaluateWorkflow } = await requireLegacyModule(loadLegacyAgentModule, command);
 
     const result = await evaluateWorkflow(
       {
@@ -175,7 +192,8 @@ async function main() {
     if (!options.project && !options.all) {
       fail('publish 命令需要 --project 或 --all');
     }
-    const { publishProject } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { publishProject } = await requireLegacyModule(loadLegacyAgentModule, command);
 
     const result = await publishProject(
       {
@@ -190,7 +208,8 @@ async function main() {
 
   if (command === 'doctor') {
     if (!options.project) fail('doctor 命令需要 --project');
-    const { doctorProject } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { doctorProject } = await requireLegacyModule(loadLegacyAgentModule, command);
 
     const result = await doctorProject(
       {
@@ -204,7 +223,8 @@ async function main() {
 
   if (command === 'create') {
     if (!options.project) fail('create 命令需要 --project');
-    const { createProject } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { createProject } = await requireLegacyModule(loadLegacyAgentModule, command);
     const result = await createProject(
       {
         project: options.project,
@@ -217,7 +237,8 @@ async function main() {
 
   if (command === 'toc') {
     if (!options.project) fail('toc 命令需要 --project');
-    const { generateSeriesToc } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { generateSeriesToc } = await requireLegacyModule(loadLegacyAgentModule, command);
     const result = await generateSeriesToc(
       {
         project: options.project,
@@ -231,7 +252,8 @@ async function main() {
 
   if (command === 'storyline') {
     if (!options.project) fail('storyline 命令需要 --project');
-    const { generateStoryline } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { generateStoryline } = await requireLegacyModule(loadLegacyAgentModule, command);
     const result = await generateStoryline(
       {
         project: options.project,
@@ -244,14 +266,16 @@ async function main() {
   }
 
   if (command === 'list') {
-    const { listProjects } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { listProjects } = await requireLegacyModule(loadLegacyAgentModule, command);
     const result = await listProjects({}, { rootDir });
     printJson(result);
     return;
   }
 
   if (command === 'status') {
-    const { getRunStatus } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { getRunStatus } = await requireLegacyModule(loadLegacyAgentModule, command);
     const result = await getRunStatus(
       {
         runId: options.runId || '',
@@ -266,7 +290,8 @@ async function main() {
     if (!options.project || !options.taskFolder) {
       fail('artifacts 命令需要 --project 和 --task-folder');
     }
-    const { getTaskArtifacts } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { getTaskArtifacts } = await requireLegacyModule(loadLegacyAgentModule, command);
 
     const result = await getTaskArtifacts(
       {
@@ -283,7 +308,8 @@ async function main() {
     if (!options.project || !options.taskFolder) {
       fail('retry 命令需要 --project 和 --task-folder');
     }
-    const { retryTaskStep } = await loadLegacyAgentModule();
+    const rootDir = await resolveLegacyRootDir(options, command);
+    const { retryTaskStep } = await requireLegacyModule(loadLegacyAgentModule, command);
 
     const result = await retryTaskStep(
       {
@@ -299,7 +325,10 @@ async function main() {
 
   if (command === 'profile') {
     if (options.action === 'bootstrap') {
-      const { bootstrapPrivateProfile } = await loadPrivateProfileModule();
+      const { bootstrapPrivateProfile } = await requireLegacyModule(
+        loadPrivateProfileModule,
+        'profile bootstrap',
+      );
       const result = bootstrapPrivateProfile({
         sourceSystemDir: options.sourceDir || '',
         configHome: options.configHome || '',
@@ -310,7 +339,10 @@ async function main() {
     }
 
     if (options.action === 'export') {
-      const { exportPrivateProfile } = await loadPrivateProfileModule();
+      const { exportPrivateProfile } = await requireLegacyModule(
+        loadPrivateProfileModule,
+        'profile export',
+      );
       const result = exportPrivateProfile({
         configHome: options.configHome || '',
         bundleFile: options.bundle || '',
@@ -321,7 +353,10 @@ async function main() {
     }
 
     if (options.action === 'install') {
-      const { installPrivateProfile } = await loadPrivateProfileModule();
+      const { installPrivateProfile } = await requireLegacyModule(
+        loadPrivateProfileModule,
+        'profile install',
+      );
       const result = installPrivateProfile({
         configHome: options.configHome || '',
         bundleFile: options.bundle || '',
