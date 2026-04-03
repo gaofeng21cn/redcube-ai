@@ -56,3 +56,40 @@ test('createRunRecord creates a stable minimal run envelope', () => {
     error: null,
   });
 });
+
+test('getTopicPaths rejects unsafe topic ids', () => {
+  assert.throws(() => getTopicPaths('/tmp/redcube', '../topic-a'), {
+    message: /topicId/,
+  });
+  assert.throws(() => getTopicPaths('/tmp/redcube', 'topic/a'), {
+    message: /topicId/,
+  });
+});
+
+test('getNotePaths rejects unsafe note ids', () => {
+  assert.throws(() => getNotePaths('/tmp/redcube', 'topic-a', '../note-01'), {
+    message: /noteId/,
+  });
+  assert.throws(() => getNotePaths('/tmp/redcube', 'topic-a', 'note/01'), {
+    message: /noteId/,
+  });
+});
+
+test('createRunRecord rejects missing identity fields', () => {
+  const template = {
+    runId: 'run-001',
+    route: 'topic.storyline',
+    scope: 'topic',
+    target: 'topic-a',
+    overlay: 'xiaohongshu',
+  };
+
+  const required = ['runId', 'route', 'scope', 'target', 'overlay'];
+  for (const field of required) {
+    const input = { ...template };
+    delete input[field];
+    assert.throws(() => createRunRecord(input), {
+      message: new RegExp(field),
+    });
+  }
+});

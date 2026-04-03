@@ -1,10 +1,19 @@
 import path from 'node:path';
 
-function requireSegment(name, value) {
+function requireSegment(name, value, options = {}) {
   const text = String(value || '').trim();
   if (!text) {
     throw new Error(`${name} 不能为空`);
   }
+
+  if (options.disallowParent && text.includes('..')) {
+    throw new Error(`${name} 不能包含父目录引用`);
+  }
+
+  if (options.disallowSeparator && /[\\/]/.test(text)) {
+    throw new Error(`${name} 不能包含路径分隔符`);
+  }
+
   return text;
 }
 
@@ -22,7 +31,10 @@ export function resolveWorkspaceContract({ workspaceRoot }) {
 
 export function getTopicPaths(workspaceRoot, topicId) {
   const contract = resolveWorkspaceContract({ workspaceRoot });
-  const topic = requireSegment('topicId', topicId);
+  const topic = requireSegment('topicId', topicId, {
+    disallowParent: true,
+    disallowSeparator: true,
+  });
   const topicDir = path.join(contract.topicsDir, topic);
   return {
     topicId: topic,
@@ -37,7 +49,10 @@ export function getTopicPaths(workspaceRoot, topicId) {
 
 export function getNotePaths(workspaceRoot, topicId, noteId) {
   const topicPaths = getTopicPaths(workspaceRoot, topicId);
-  const note = requireSegment('noteId', noteId);
+  const note = requireSegment('noteId', noteId, {
+    disallowParent: true,
+    disallowSeparator: true,
+  });
   const noteDir = path.join(topicPaths.notesDir, note);
   return {
     noteId: note,
