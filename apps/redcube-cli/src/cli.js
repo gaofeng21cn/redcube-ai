@@ -1,28 +1,9 @@
 #!/usr/bin/env node
 
-import { loadRuntimeConfig } from '../../../packages/redcube-config/src/index.js';
-import {
-  bootstrapPrivateProfile,
-  exportPrivateProfile,
-  installPrivateProfile,
-} from '../../../packages/redcube-config/src/private-profile.js';
 import {
   doctorWorkspace,
   listTopics as listTopicsGateway,
 } from '@redcube/gateway';
-import {
-  createProject,
-  doctorProject,
-  evaluateWorkflow,
-  generateSeriesToc,
-  generateStoryline,
-  getRunStatus,
-  getTaskArtifacts,
-  listProjects,
-  publishProject,
-  retryTaskStep,
-  runWorkflow,
-} from '../../../packages/redcube-agent/src/index.js';
 
 function parseArgs(argv) {
   const options = {};
@@ -63,17 +44,50 @@ function resolveWorkspaceRoot(options) {
   return options.workspaceRoot || options.rootDir || process.cwd();
 }
 
-async function main() {
-  const [command, ...rest] = process.argv.slice(2);
-  const subcommand = rest[0];
-  const options = parseArgs(rest);
+let legacyConfigModulePromise;
+let privateProfileModulePromise;
+let legacyAgentModulePromise;
+
+async function loadLegacyConfigModule() {
+  if (!legacyConfigModulePromise) {
+    legacyConfigModulePromise = import('../../../packages/redcube-config/src/index.js');
+  }
+
+  return legacyConfigModulePromise;
+}
+
+async function loadPrivateProfileModule() {
+  if (!privateProfileModulePromise) {
+    privateProfileModulePromise = import('../../../packages/redcube-config/src/private-profile.js');
+  }
+
+  return privateProfileModulePromise;
+}
+
+async function loadLegacyAgentModule() {
+  if (!legacyAgentModulePromise) {
+    legacyAgentModulePromise = import('../../../packages/redcube-agent/src/index.js');
+  }
+
+  return legacyAgentModulePromise;
+}
+
+async function resolveLegacyRootDir(options) {
+  const { loadRuntimeConfig } = await loadLegacyConfigModule();
   const runtimeConfig = loadRuntimeConfig({
     env: process.env,
     explicit: {
       rootDir: options.rootDir || '',
     },
   });
-  const rootDir = runtimeConfig.rootDir;
+
+  return runtimeConfig.rootDir;
+}
+
+async function main() {
+  const [command, ...rest] = process.argv.slice(2);
+  const subcommand = rest[0];
+  const options = parseArgs(rest);
 
   if (!command || command === 'help' || command === '--help') {
     printJson({
@@ -121,8 +135,11 @@ async function main() {
     return;
   }
 
+  const rootDir = await resolveLegacyRootDir(options);
+
   if (command === 'run') {
     if (!options.project) fail('run 命令需要 --project');
+    const { runWorkflow } = await loadLegacyAgentModule();
 
     const result = await runWorkflow(
       {
@@ -140,6 +157,7 @@ async function main() {
 
   if (command === 'eval') {
     if (!options.project) fail('eval 命令需要 --project');
+    const { evaluateWorkflow } = await loadLegacyAgentModule();
 
     const result = await evaluateWorkflow(
       {
@@ -157,6 +175,7 @@ async function main() {
     if (!options.project && !options.all) {
       fail('publish 命令需要 --project 或 --all');
     }
+    const { publishProject } = await loadLegacyAgentModule();
 
     const result = await publishProject(
       {
@@ -171,6 +190,7 @@ async function main() {
 
   if (command === 'doctor') {
     if (!options.project) fail('doctor 命令需要 --project');
+    const { doctorProject } = await loadLegacyAgentModule();
 
     const result = await doctorProject(
       {
@@ -184,6 +204,7 @@ async function main() {
 
   if (command === 'create') {
     if (!options.project) fail('create 命令需要 --project');
+    const { createProject } = await loadLegacyAgentModule();
     const result = await createProject(
       {
         project: options.project,
@@ -196,6 +217,7 @@ async function main() {
 
   if (command === 'toc') {
     if (!options.project) fail('toc 命令需要 --project');
+    const { generateSeriesToc } = await loadLegacyAgentModule();
     const result = await generateSeriesToc(
       {
         project: options.project,
@@ -209,6 +231,7 @@ async function main() {
 
   if (command === 'storyline') {
     if (!options.project) fail('storyline 命令需要 --project');
+    const { generateStoryline } = await loadLegacyAgentModule();
     const result = await generateStoryline(
       {
         project: options.project,
@@ -221,12 +244,14 @@ async function main() {
   }
 
   if (command === 'list') {
+    const { listProjects } = await loadLegacyAgentModule();
     const result = await listProjects({}, { rootDir });
     printJson(result);
     return;
   }
 
   if (command === 'status') {
+    const { getRunStatus } = await loadLegacyAgentModule();
     const result = await getRunStatus(
       {
         runId: options.runId || '',
@@ -241,6 +266,7 @@ async function main() {
     if (!options.project || !options.taskFolder) {
       fail('artifacts 命令需要 --project 和 --task-folder');
     }
+    const { getTaskArtifacts } = await loadLegacyAgentModule();
 
     const result = await getTaskArtifacts(
       {
@@ -257,6 +283,7 @@ async function main() {
     if (!options.project || !options.taskFolder) {
       fail('retry 命令需要 --project 和 --task-folder');
     }
+    const { retryTaskStep } = await loadLegacyAgentModule();
 
     const result = await retryTaskStep(
       {
@@ -272,6 +299,7 @@ async function main() {
 
   if (command === 'profile') {
     if (options.action === 'bootstrap') {
+      const { bootstrapPrivateProfile } = await loadPrivateProfileModule();
       const result = bootstrapPrivateProfile({
         sourceSystemDir: options.sourceDir || '',
         configHome: options.configHome || '',
@@ -282,6 +310,7 @@ async function main() {
     }
 
     if (options.action === 'export') {
+      const { exportPrivateProfile } = await loadPrivateProfileModule();
       const result = exportPrivateProfile({
         configHome: options.configHome || '',
         bundleFile: options.bundle || '',
@@ -292,6 +321,7 @@ async function main() {
     }
 
     if (options.action === 'install') {
+      const { installPrivateProfile } = await loadPrivateProfileModule();
       const result = installPrivateProfile({
         configHome: options.configHome || '',
         bundleFile: options.bundle || '',

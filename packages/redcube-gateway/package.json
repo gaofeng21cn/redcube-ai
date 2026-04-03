@@ -7,6 +7,6 @@
     ".": "./src/index.js"
   },
   "dependencies": {
-    "@redcube/runtime-protocol": "file:../redcube-runtime-protocol"
+    "@redcube/runtime-protocol": "workspace:*"
   }
 }

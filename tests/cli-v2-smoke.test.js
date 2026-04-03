@@ -3,7 +3,56 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
+
+function createIsolatedCliInstall() {
+  const installRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-isolated-'));
+  const cliDir = path.join(installRoot, 'dist');
+  const nodeModulesDir = path.join(installRoot, 'node_modules', '@redcube');
+
+  mkdirSync(cliDir, { recursive: true });
+  mkdirSync(nodeModulesDir, { recursive: true });
+
+  copyFileSync(
+    path.resolve('apps/redcube-cli/src/cli.js'),
+    path.join(cliDir, 'cli.js'),
+  );
+  writeFileSync(
+    path.join(installRoot, 'package.json'),
+    JSON.stringify({
+      name: 'redcube-cli-isolated-test',
+      private: true,
+      type: 'module',
+      dependencies: {
+        '@redcube/gateway': 'workspace:*',
+        '@redcube/runtime-protocol': 'workspace:*',
+      },
+    }, null, 2),
+    'utf-8',
+  );
+  symlinkSync(
+    path.resolve('packages/redcube-gateway'),
+    path.join(nodeModulesDir, 'gateway'),
+    'dir',
+  );
+  symlinkSync(
+    path.resolve('packages/redcube-runtime-protocol'),
+    path.join(nodeModulesDir, 'runtime-protocol'),
+    'dir',
+  );
+
+  return {
+    cliPath: path.join(cliDir, 'cli.js'),
+    installRoot,
+  };
+}
 
 test('CLI workspace doctor proxies gateway doctorWorkspace', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-'));
@@ -17,6 +66,27 @@ test('CLI workspace doctor proxies gateway doctorWorkspace', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.workspaceFileExists, true);
+});
+
+test('CLI workspace doctor works from isolated install without monorepo sibling source packages', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-isolated-'));
+  writeFileSync(
+    path.join(workspaceRoot, 'redcube.workspace.json'),
+    JSON.stringify({ overlay: 'xiaohongshu' }),
+    'utf-8',
+  );
+
+  const output = execFileSync(
+    'node',
+    [cliPath, 'workspace', 'doctor', '--workspace-root', workspaceRoot],
+    { encoding: 'utf-8', cwd: installRoot },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.workspaceRoot, workspaceRoot);
   assert.equal(parsed.workspaceFileExists, true);
 });
 
@@ -34,6 +104,29 @@ test('CLI topics list proxies gateway listTopics', () => {
     'node',
     [path.resolve('apps/redcube-cli/src/cli.js'), 'topics', 'list', '--workspace-root', workspaceRoot],
     { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.total, 1);
+  assert.equal(parsed.topics[0].topic_id, 'topic-a');
+});
+
+test('CLI topics list works from isolated install without monorepo sibling source packages', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-isolated-topics-'));
+  const topicDir = path.join(workspaceRoot, 'topics', 'topic-a');
+  mkdirSync(topicDir, { recursive: true });
+  writeFileSync(path.join(topicDir, 'topic.json'), JSON.stringify({
+    topic_id: 'topic-a',
+    status: 'draft',
+    overlay: 'xiaohongshu',
+  }), 'utf-8');
+
+  const output = execFileSync(
+    'node',
+    [cliPath, 'topics', 'list', '--workspace-root', workspaceRoot],
+    { encoding: 'utf-8', cwd: installRoot },
   );
 
   const parsed = JSON.parse(output);

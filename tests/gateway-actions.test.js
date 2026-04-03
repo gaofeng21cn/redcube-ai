@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   doctorWorkspace,
@@ -37,4 +37,15 @@ test('listTopics returns topic metadata from canonical workspace tree', async ()
   assert.equal(result.total, 1);
   assert.equal(result.topics[0].topic_id, 'topic-a');
   assert.equal(result.topics[0].status, 'draft');
+});
+
+test('@redcube/gateway manifest declares runtime-protocol without sibling file dependency', () => {
+  const packageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  );
+
+  assert.equal(
+    packageJson.dependencies?.['@redcube/runtime-protocol'],
+    'workspace:*',
+  );
 });
