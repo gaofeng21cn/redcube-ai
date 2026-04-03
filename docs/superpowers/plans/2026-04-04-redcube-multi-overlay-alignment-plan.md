@@ -376,7 +376,10 @@ git commit -m "feat: add ppt deck overlay foundation"
 ### Task 4: 建立审计门控与 review loop foundation
 
 **Files:**
+- Create: `packages/redcube-runtime/package.json`
+- Create: `packages/redcube-runtime/src/index.js`
 - Create: `packages/redcube-runtime/src/reviews.js`
+- Modify: `packages/redcube-gateway/package.json`
 - Create: `packages/redcube-gateway/src/actions/audit-deliverable.js`
 - Create: `packages/redcube-gateway/src/actions/review-render-output.js`
 - Create: `packages/redcube-gateway/src/actions/runtime-watch.js`
@@ -414,6 +417,31 @@ test('reviewRenderOutput emits rerun target when visual density is too high', as
   assert.equal(report.status, 'block');
   assert.equal(report.rerun_from_stage, 'visual_direction');
 });
+
+test('reviewRenderOutput reports missing visual density check separately', async () => {
+  const report = await reviewRenderOutput({
+    overlay: 'ppt_deck',
+    checks: {},
+  });
+
+  assert.equal(report.status, 'block');
+  assert.deepEqual(report.issues, ['visual_density_check_missing']);
+  assert.equal(report.rerun_from_stage, 'render_review');
+});
+
+test('@redcube/gateway manifest declares runtime dependency for review loop actions', () => {
+  const gatewayPackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  );
+  const runtimePackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-runtime/package.json'), 'utf-8'),
+  );
+
+  assert.equal(
+    gatewayPackageJson.dependencies?.['@redcube/runtime'],
+    runtimePackageJson.version,
+  );
+});
 ```
 
 - [ ] **Step 2: 跑测试，确认 review loop foundation 尚未实现**
@@ -422,6 +450,28 @@ Run: `node --test tests/deliverable-review-loop.test.js`
 Expected: FAIL，报缺少 action 或 review module。
 
 - [ ] **Step 3: 写最小实现**
+
+```js
+// packages/redcube-runtime/package.json
+{
+  "name": "@redcube/runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  }
+}
+```
+
+```js
+// packages/redcube-runtime/src/index.js
+export {
+  auditDeliverableRequest,
+  reviewRenderedDeliverable,
+  watchRuntimeReviewLoop,
+} from './reviews.js';
+```
 
 ```js
 // packages/redcube-runtime/src/reviews.js
@@ -444,6 +494,15 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
 }
 
 export function reviewRenderedDeliverable({ checks }) {
+  if (!Object.hasOwn(checks || {}, 'visual_density_ok')) {
+    return {
+      status: 'block',
+      issues: ['visual_density_check_missing'],
+      rerun_from_stage: 'render_review',
+      recommended_action: 'supply_render_checks',
+    };
+  }
+
   if (!checks.visual_density_ok) {
     return {
       status: 'block',
@@ -459,6 +518,31 @@ export function reviewRenderedDeliverable({ checks }) {
     rerun_from_stage: null,
     recommended_action: 'continue',
   };
+}
+
+export function watchRuntimeReviewLoop({ run }) {
+  const pendingReviews = Array.isArray(run?.pending_reviews)
+    ? run.pending_reviews.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+
+  return {
+    ok: true,
+    run_id: String(run?.run_id || '').trim(),
+    current_stage: String(run?.current_stage || '').trim() || null,
+    status: pendingReviews.length > 0 ? 'review_pending' : String(run?.status || 'idle'),
+    pending_reviews: pendingReviews,
+    resumable: Boolean(run?.resumable),
+  };
+}
+```
+
+```json
+// packages/redcube-gateway/package.json
+{
+  "dependencies": {
+    "@redcube/runtime": "0.1.0",
+    "@redcube/runtime-protocol": "0.1.0"
+  }
 }
 ```
 
