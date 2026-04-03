@@ -59,6 +59,10 @@ function fail(message, code = 1) {
   process.exit(code);
 }
 
+function resolveWorkspaceRoot(options) {
+  return options.workspaceRoot || options.rootDir || process.cwd();
+}
+
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
   const subcommand = rest[0];
@@ -99,7 +103,7 @@ async function main() {
     }
 
     const result = await doctorWorkspace({
-      workspaceRoot: options.workspaceRoot || options.rootDir || process.cwd(),
+      workspaceRoot: resolveWorkspaceRoot(options),
     });
     printJson(result);
     return;
@@ -111,7 +115,7 @@ async function main() {
     }
 
     const result = await listTopicsGateway({
-      workspaceRoot: options.workspaceRoot || options.rootDir || process.cwd(),
+      workspaceRoot: resolveWorkspaceRoot(options),
     });
     printJson(result);
     return;

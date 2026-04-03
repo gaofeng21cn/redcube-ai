@@ -42,6 +42,98 @@ test('CLI topics list proxies gateway listTopics', () => {
   assert.equal(parsed.topics[0].topic_id, 'topic-a');
 });
 
+test('CLI topics list resolves root by priority: --workspace-root over --root-dir', () => {
+  const preferredRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-topics-priority-'));
+  const fallbackRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-topics-priority-'));
+
+  const preferredTopicDir = path.join(preferredRoot, 'topics', 'topic-preferred');
+  mkdirSync(preferredTopicDir, { recursive: true });
+  writeFileSync(path.join(preferredTopicDir, 'topic.json'), JSON.stringify({
+    topic_id: 'topic-preferred',
+    status: 'draft',
+    overlay: 'xiaohongshu',
+  }), 'utf-8');
+
+  const fallbackTopicDir = path.join(fallbackRoot, 'topics', 'topic-fallback');
+  mkdirSync(fallbackTopicDir, { recursive: true });
+  writeFileSync(path.join(fallbackTopicDir, 'topic.json'), JSON.stringify({
+    topic_id: 'topic-fallback',
+    status: 'draft',
+    overlay: 'douyin',
+  }), 'utf-8');
+
+  const output = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'topics',
+      'list',
+      '--workspace-root',
+      preferredRoot,
+      '--root-dir',
+      fallbackRoot,
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.workspaceRoot, preferredRoot);
+  assert.equal(parsed.total, 1);
+  assert.equal(parsed.topics[0].topic_id, 'topic-preferred');
+});
+
+test('CLI topics list falls back to --root-dir when --workspace-root is absent', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-topics-rootdir-'));
+  const topicDir = path.join(workspaceRoot, 'topics', 'topic-rootdir');
+  mkdirSync(topicDir, { recursive: true });
+  writeFileSync(path.join(topicDir, 'topic.json'), JSON.stringify({
+    topic_id: 'topic-rootdir',
+    status: 'draft',
+    overlay: 'xiaohongshu',
+  }), 'utf-8');
+
+  const output = execFileSync(
+    'node',
+    [path.resolve('apps/redcube-cli/src/cli.js'), 'topics', 'list', '--root-dir', workspaceRoot],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.workspaceRoot, workspaceRoot);
+  assert.equal(parsed.total, 1);
+  assert.equal(parsed.topics[0].topic_id, 'topic-rootdir');
+});
+
+test('CLI topics list falls back to process.cwd() when root flags are absent', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-topics-cwd-'));
+  const topicDir = path.join(workspaceRoot, 'topics', 'topic-cwd');
+  mkdirSync(topicDir, { recursive: true });
+  writeFileSync(path.join(topicDir, 'topic.json'), JSON.stringify({
+    topic_id: 'topic-cwd',
+    status: 'draft',
+    overlay: 'xiaohongshu',
+  }), 'utf-8');
+  const expectedCwd = execFileSync(
+    'node',
+    ['-e', 'process.stdout.write(process.cwd())'],
+    { encoding: 'utf-8', cwd: workspaceRoot },
+  );
+
+  const output = execFileSync(
+    'node',
+    [path.resolve('apps/redcube-cli/src/cli.js'), 'topics', 'list'],
+    { encoding: 'utf-8', cwd: workspaceRoot },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.workspaceRoot, expectedCwd);
+  assert.equal(parsed.total, 1);
+  assert.equal(parsed.topics[0].topic_id, 'topic-cwd');
+});
+
 test('CLI workspace doctor resolves root by priority: --workspace-root over --root-dir', () => {
   const preferredRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-priority-'));
   const fallbackRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-priority-'));
