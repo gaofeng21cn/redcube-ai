@@ -153,3 +153,36 @@ export function buildDeckSurfaceBundle({ title }) {
 export function listDeckSurfaceArtifactPaths() {
   return buildDeckSurfaceBundle({ title: '' }).map(({ relativePath }) => relativePath);
 }
+
+const SURFACE_VALIDATORS = {
+  'contracts/stage-sequence.json': (content) =>
+    Array.isArray(content?.standard_flow)
+    && content.standard_flow.length > 0
+    && content.research_entry_gate?.required_surface === 'source_index',
+  'contracts/review-surface.json': (content) =>
+    Array.isArray(content?.required_checks)
+    && content.required_checks.length > 0
+    && content.rerun_from_stage
+    && typeof content.rerun_from_stage === 'object',
+  'contracts/layout-rules.json': (content) =>
+    Array.isArray(content?.structured_families_require_anchor)
+    && content.structured_families_require_anchor.length > 0
+    && content.evidence_surface_rules?.require_public_source_label === true,
+  'contracts/baseline-policy.json': (content) =>
+    content?.modes?.draft_new?.baseline_required === false
+    && content?.modes?.optimize_existing?.baseline_required === true,
+  'views/display-registry.json': (content) =>
+    Array.isArray(content?.surfaces)
+    && content.surfaces.some((surface) => surface?.id === 'source_index')
+    && content.surfaces.some((surface) => surface?.id === 'screenshot_review')
+    && content.surfaces.some((surface) => surface?.id === 'export_pptx'),
+};
+
+export function validateDeckSurfaceArtifact(relativePath, content) {
+  const validator = SURFACE_VALIDATORS[relativePath];
+  if (!validator) {
+    throw new Error(`Unknown deck surface artifact: ${relativePath}`);
+  }
+
+  return Boolean(validator(content));
+}

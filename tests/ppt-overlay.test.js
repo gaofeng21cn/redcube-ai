@@ -20,7 +20,7 @@ test('buildDeckRecord emits canonical ppt deck metadata', () => {
   assert.equal(deck.kind, 'ppt_deck');
   assert.equal(deck.slide_ratio, '16:9');
   assert.equal(deck.status, 'draft');
-  assert.deepEqual(deck.routes, ['research', 'storyline', 'slides']);
+  assert.deepEqual(deck.routes, ['storyline']);
 });
 
 test('buildDeckRecord rejects blank required fields', () => {

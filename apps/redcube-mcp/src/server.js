@@ -73,7 +73,10 @@ const TOOL_DEFINITIONS = [
     description: 'Run preflight audit gates before higher-cost routes.',
     actionKey: 'auditDeliverable',
     inputSchema: {
+      workspaceRoot: z.string().optional().describe('Absolute workspace root path when auditing a concrete deliverable surface.'),
       overlay: z.string().describe('Overlay id.'),
+      topicId: z.string().optional().describe('Topic identifier when auditing a concrete deliverable surface.'),
+      deliverableId: z.string().optional().describe('Deliverable identifier when auditing a concrete deliverable surface.'),
       mode: z.string().describe('Audit mode such as optimize_existing or draft_new.'),
       baselineDeliverableId: z.string().optional().describe('Approved baseline deliverable id when optimizing existing outputs.'),
     },

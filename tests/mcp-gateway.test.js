@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import os from 'node:os';
+import path from 'node:path';
+import { mkdtempSync, unlinkSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -9,6 +12,7 @@ import {
   callGatewayTool,
   listGatewayTools,
 } from '../apps/redcube-mcp/src/server.js';
+import { createDeliverable } from '../packages/redcube-gateway/src/index.js';
 
 test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
   const tools = listGatewayTools();
@@ -103,6 +107,58 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
     assert.equal(result.structuredContent.status, 'review_pending');
     assert.equal(result.structuredContent.current_stage, 'storyline');
     assert.deepEqual(result.structuredContent.pending_reviews, ['render_review']);
+  } finally {
+    await transport.close();
+  }
+});
+
+test('stdio MCP server preserves deliverable locator fields for audit_deliverable', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-audit-'));
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+  });
+  unlinkSync(
+    path.join(path.dirname(created.deliverableFile), 'contracts/review-surface.json'),
+  );
+
+  const serverPath = fileURLToPath(
+    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+  );
+  const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: repoRoot,
+    stderr: 'pipe',
+  });
+  const client = new Client({
+    name: 'redcube-mcp-test-client',
+    version: '0.1.0',
+  });
+
+  await client.connect(transport);
+
+  try {
+    const result = await client.callTool({
+      name: 'audit_deliverable',
+      arguments: {
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        mode: 'draft_new',
+      },
+    });
+
+    assert.equal(result.structuredContent.status, 'block');
+    assert.deepEqual(
+      result.structuredContent.issues,
+      ['deliverable_contract_missing:review_surface'],
+    );
   } finally {
     await transport.close();
   }

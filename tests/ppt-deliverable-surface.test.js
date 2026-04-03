@@ -2,7 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync, unlinkSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 
 import {
   auditDeliverable,
@@ -105,4 +111,35 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
   assert.deepEqual(report.issues, []);
   assert.equal(report.rerun_from_stage, null);
   assert.equal(report.recommended_action, 'continue');
+});
+
+test('auditDeliverable blocks when hydrated ppt deck surface content is invalid', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+  });
+
+  writeFileSync(
+    path.join(path.dirname(created.deliverableFile), 'contracts/review-surface.json'),
+    '{}',
+    'utf-8',
+  );
+
+  const report = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    mode: 'draft_new',
+  });
+
+  assert.equal(report.status, 'block');
+  assert.deepEqual(report.issues, ['deliverable_contract_invalid:review_surface']);
+  assert.equal(report.rerun_from_stage, 'intake');
+  assert.equal(report.recommended_action, 'rehydrate_deliverable_surface');
 });

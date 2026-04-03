@@ -12,6 +12,6 @@ export function buildDeckRecord({ topicId, deliverableId, title }) {
   return {
     ...deliverable,
     slide_ratio: '16:9',
-    routes: ['research', 'storyline', 'slides'],
+    routes: ['storyline'],
   };
 }

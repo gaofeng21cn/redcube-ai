@@ -1,7 +1,10 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
-import { listDeckSurfaceArtifactPaths } from '@redcube/overlay-ppt';
+import {
+  listDeckSurfaceArtifactPaths,
+  validateDeckSurfaceArtifact,
+} from '@redcube/overlay-ppt';
 import { auditDeliverableRequest } from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
@@ -54,14 +57,30 @@ function auditPptDeckSurface({
   }
 
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  const missingIssues = listDeckSurfaceArtifactPaths()
-    .filter((relativePath) => !existsSync(path.join(deliverablePaths.deliverableDir, relativePath)))
-    .map((relativePath) => `deliverable_contract_missing:${artifactKey(relativePath)}`);
+  const missingIssues = [];
+  const invalidIssues = [];
 
-  if (missingIssues.length > 0) {
+  for (const relativePath of listDeckSurfaceArtifactPaths()) {
+    const absolutePath = path.join(deliverablePaths.deliverableDir, relativePath);
+    if (!existsSync(absolutePath)) {
+      missingIssues.push(`deliverable_contract_missing:${artifactKey(relativePath)}`);
+      continue;
+    }
+
+    try {
+      const content = JSON.parse(readFileSync(absolutePath, 'utf-8'));
+      if (!validateDeckSurfaceArtifact(relativePath, content)) {
+        invalidIssues.push(`deliverable_contract_invalid:${artifactKey(relativePath)}`);
+      }
+    } catch {
+      invalidIssues.push(`deliverable_contract_invalid:${artifactKey(relativePath)}`);
+    }
+  }
+
+  if (missingIssues.length > 0 || invalidIssues.length > 0) {
     return {
       status: 'block',
-      issues: missingIssues,
+      issues: [...missingIssues, ...invalidIssues],
       rerun_from_stage: 'intake',
       recommended_action: 'rehydrate_deliverable_surface',
     };

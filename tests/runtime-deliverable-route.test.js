@@ -35,6 +35,7 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
   assert.equal(stored.deliverable.overlay, 'ppt_deck');
   assert.equal(stored.deliverable.kind, 'ppt_deck');
   assert.equal(stored.deliverable.slide_ratio, '16:9');
+  assert.deepEqual(stored.deliverable.routes, ['storyline']);
 });
 
 test('createDeliverable rejects unsupported overlay ids', async () => {
