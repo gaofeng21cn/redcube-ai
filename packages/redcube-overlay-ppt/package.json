@@ -1,0 +1,12 @@
+{
+  "name": "@redcube/overlay-ppt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@redcube/overlay-core": "0.1.0"
+  }
+}

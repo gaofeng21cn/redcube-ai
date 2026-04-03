@@ -260,11 +260,29 @@ test('buildDeckRecord emits canonical ppt deck metadata', () => {
   assert.deepEqual(deck.routes, ['research', 'storyline', 'slides']);
 });
 
+test('buildDeckRecord rejects blank required fields', () => {
+  assert.throws(
+    () => buildDeckRecord({
+      topicId: 'topic-a',
+      deliverableId: '',
+      title: '甲状腺门诊科普 deck',
+    }),
+    /Missing deliverable field: deliverableId/,
+  );
+});
+
 test('evaluateStoryboardGate blocks empty slide list', () => {
   const report = evaluateStoryboardGate({ slides: [] });
 
   assert.equal(report.status, 'block');
   assert.deepEqual(report.blockers, ['slides_empty']);
+});
+
+test('evaluateStoryboardGate blocks malformed slide entries', () => {
+  const report = evaluateStoryboardGate({ slides: [null, {}] });
+
+  assert.equal(report.status, 'block');
+  assert.deepEqual(report.blockers, ['slides_invalid']);
 });
 ```
 
@@ -277,15 +295,20 @@ Expected: FAIL，报缺少 `overlay-ppt` 包或导出。
 
 ```js
 // packages/redcube-overlay-ppt/src/contracts.js
+import { buildDeliverableRecord } from '../../redcube-overlay-core/src/index.js';
+
 export function buildDeckRecord({ topicId, deliverableId, title }) {
-  return {
-    topic_id: String(topicId || '').trim(),
-    deliverable_id: String(deliverableId || '').trim(),
-    title: String(title || '').trim(),
+  const deliverable = buildDeliverableRecord({
+    topicId,
+    deliverableId,
     overlay: 'ppt_deck',
     kind: 'ppt_deck',
+    title,
+  });
+
+  return {
+    ...deliverable,
     slide_ratio: '16:9',
-    status: 'draft',
     routes: ['research', 'storyline', 'slides'],
   };
 }
@@ -294,8 +317,8 @@ export function buildDeckRecord({ topicId, deliverableId, title }) {
 ```js
 // packages/redcube-overlay-ppt/src/gates.js
 export function evaluateStoryboardGate({ slides }) {
-  const count = Array.isArray(slides) ? slides.length : 0;
-  if (count === 0) {
+  const slideList = Array.isArray(slides) ? slides : [];
+  if (slideList.length === 0) {
     return {
       status: 'block',
       blockers: ['slides_empty'],
@@ -305,11 +328,30 @@ export function evaluateStoryboardGate({ slides }) {
     };
   }
 
+  const validSlides = slideList.filter((slide) => {
+    if (!slide || typeof slide !== 'object') {
+      return false;
+    }
+    const slideId = String(slide.slide_id || '').trim();
+    const title = String(slide.title || '').trim();
+    return Boolean(slideId || title);
+  });
+
+  if (validSlides.length !== slideList.length) {
+    return {
+      status: 'block',
+      blockers: ['slides_invalid'],
+      advisories: [],
+      metrics: { slide_count: validSlides.length },
+      next_action: 'rerun_storyboard',
+    };
+  }
+
   return {
     status: 'pass',
     blockers: [],
     advisories: [],
-    metrics: { slide_count: count },
+    metrics: { slide_count: validSlides.length },
     next_action: 'continue',
   };
 }
