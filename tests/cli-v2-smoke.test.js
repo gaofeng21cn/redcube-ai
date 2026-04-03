@@ -4,21 +4,36 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
+  cpSync,
   copyFileSync,
   mkdtempSync,
   mkdirSync,
+  realpathSync,
   readFileSync,
-  symlinkSync,
   writeFileSync,
 } from 'node:fs';
+
+function copyPackageIntoInstall(sourceDir, targetDir) {
+  cpSync(sourceDir, targetDir, {
+    recursive: true,
+    force: true,
+  });
+}
 
 function createIsolatedCliInstall() {
   const installRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-isolated-'));
   const cliDir = path.join(installRoot, 'dist');
-  const nodeModulesDir = path.join(installRoot, 'node_modules', '@redcube');
+  const consumerNodeModulesDir = path.join(installRoot, 'node_modules', '@redcube');
+  const gatewayPackagePath = path.join(consumerNodeModulesDir, 'gateway');
+  const runtimeProtocolPackagePath = path.join(
+    gatewayPackagePath,
+    'node_modules',
+    '@redcube',
+    'runtime-protocol',
+  );
 
   mkdirSync(cliDir, { recursive: true });
-  mkdirSync(nodeModulesDir, { recursive: true });
+  mkdirSync(consumerNodeModulesDir, { recursive: true });
 
   copyFileSync(
     path.resolve('apps/redcube-cli/src/cli.js'),
@@ -32,24 +47,24 @@ function createIsolatedCliInstall() {
       type: 'module',
       dependencies: {
         '@redcube/gateway': 'workspace:*',
-        '@redcube/runtime-protocol': 'workspace:*',
       },
     }, null, 2),
     'utf-8',
   );
-  symlinkSync(
+
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-gateway'),
-    path.join(nodeModulesDir, 'gateway'),
-    'dir',
+    gatewayPackagePath,
   );
-  symlinkSync(
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-protocol'),
-    path.join(nodeModulesDir, 'runtime-protocol'),
-    'dir',
+    runtimeProtocolPackagePath,
   );
 
   return {
     cliPath: path.join(cliDir, 'cli.js'),
+    gatewayPackagePath,
+    runtimeProtocolPackagePath,
     installRoot,
   };
 }
@@ -88,6 +103,24 @@ test('CLI workspace doctor works from isolated install without monorepo sibling 
   assert.equal(parsed.ok, true);
   assert.equal(parsed.workspaceRoot, workspaceRoot);
   assert.equal(parsed.workspaceFileExists, true);
+});
+
+test('CLI isolated install fixture keeps package realpaths inside temp install and consumer only depends on gateway', () => {
+  const {
+    gatewayPackagePath,
+    installRoot,
+    runtimeProtocolPackagePath,
+  } = createIsolatedCliInstall();
+  const packageJson = JSON.parse(
+    readFileSync(path.join(installRoot, 'package.json'), 'utf-8'),
+  );
+  const installRootRealpath = realpathSync(installRoot);
+
+  assert.deepEqual(packageJson.dependencies, {
+    '@redcube/gateway': 'workspace:*',
+  });
+  assert.equal(realpathSync(gatewayPackagePath).startsWith(installRootRealpath), true);
+  assert.equal(realpathSync(runtimeProtocolPackagePath).startsWith(installRootRealpath), true);
 });
 
 test('CLI topics list proxies gateway listTopics', () => {
