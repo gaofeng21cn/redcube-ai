@@ -3,6 +3,7 @@
 .cursor/
 .default_project
 .superpowers/
+.worktrees/
 
 # 运行产物
 .redcube_pi/
