@@ -7,6 +7,10 @@ import {
   installPrivateProfile,
 } from '../../../packages/redcube-config/src/private-profile.js';
 import {
+  doctorWorkspace,
+  listTopics as listTopicsGateway,
+} from '@redcube/gateway';
+import {
   createProject,
   doctorProject,
   evaluateWorkflow,
@@ -57,6 +61,7 @@ function fail(message, code = 1) {
 
 async function main() {
   const [command, ...rest] = process.argv.slice(2);
+  const subcommand = rest[0];
   const options = parseArgs(rest);
   const runtimeConfig = loadRuntimeConfig({
     env: process.env,
@@ -81,8 +86,34 @@ async function main() {
         artifacts: 'redcube artifacts --project <name> --task-folder <folder> --root-dir <dir>',
         retry: 'redcube retry --project <name> --task-folder <folder> --step <plan|html|full> --root-dir <dir>',
         profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
+        workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
+        topicsList: 'redcube topics list --workspace-root <dir>',
       },
     });
+    return;
+  }
+
+  if (command === 'workspace') {
+    if (subcommand !== 'doctor') {
+      fail('workspace 命令仅支持 doctor');
+    }
+
+    const result = await doctorWorkspace({
+      workspaceRoot: options.workspaceRoot || options.rootDir || process.cwd(),
+    });
+    printJson(result);
+    return;
+  }
+
+  if (command === 'topics') {
+    if (subcommand !== 'list') {
+      fail('topics 命令仅支持 list');
+    }
+
+    const result = await listTopicsGateway({
+      workspaceRoot: options.workspaceRoot || options.rootDir || process.cwd(),
+    });
+    printJson(result);
     return;
   }
 
