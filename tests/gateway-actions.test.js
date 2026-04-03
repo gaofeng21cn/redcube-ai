@@ -43,9 +43,12 @@ test('@redcube/gateway manifest declares runtime-protocol without sibling file d
   const packageJson = JSON.parse(
     readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
   );
+  const runtimeProtocolPackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-runtime-protocol/package.json'), 'utf-8'),
+  );
 
   assert.equal(
     packageJson.dependencies?.['@redcube/runtime-protocol'],
-    'workspace:*',
+    runtimeProtocolPackageJson.version,
   );
 });

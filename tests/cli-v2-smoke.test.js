@@ -35,6 +35,10 @@ function createIsolatedCliInstall() {
   mkdirSync(cliDir, { recursive: true });
   mkdirSync(consumerNodeModulesDir, { recursive: true });
 
+  const gatewaySourcePackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  );
+
   copyFileSync(
     path.resolve('apps/redcube-cli/src/cli.js'),
     path.join(cliDir, 'cli.js'),
@@ -46,7 +50,7 @@ function createIsolatedCliInstall() {
       private: true,
       type: 'module',
       dependencies: {
-        '@redcube/gateway': 'workspace:*',
+        '@redcube/gateway': gatewaySourcePackageJson.version,
       },
     }, null, 2),
     'utf-8',
@@ -159,9 +163,12 @@ test('CLI isolated install fixture keeps package realpaths inside temp install a
     readFileSync(path.join(installRoot, 'package.json'), 'utf-8'),
   );
   const installRootRealpath = realpathSync(installRoot);
+  const gatewaySourcePackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  );
 
   assert.deepEqual(packageJson.dependencies, {
-    '@redcube/gateway': 'workspace:*',
+    '@redcube/gateway': gatewaySourcePackageJson.version,
   });
   assert.equal(realpathSync(gatewayPackagePath).startsWith(installRootRealpath), true);
   assert.equal(realpathSync(runtimeProtocolPackagePath).startsWith(installRootRealpath), true);
@@ -368,6 +375,12 @@ test('@redcube/cli declares @redcube/gateway dependency explicitly', () => {
   const packageJson = JSON.parse(
     readFileSync(path.resolve('apps/redcube-cli/package.json'), 'utf-8'),
   );
+  const gatewayPackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  );
 
-  assert.equal(typeof packageJson.dependencies?.['@redcube/gateway'], 'string');
+  assert.equal(
+    packageJson.dependencies?.['@redcube/gateway'],
+    gatewayPackageJson.version,
+  );
 });

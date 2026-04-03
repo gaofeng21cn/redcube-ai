@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@redcube/gateway": "workspace:*"
+    "@redcube/gateway": "0.1.0"
   },
   "bin": {
     "redcube": "src/cli.js"
