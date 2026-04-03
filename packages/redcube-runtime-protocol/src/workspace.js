@@ -42,8 +42,27 @@ export function getTopicPaths(workspaceRoot, topicId) {
     topicFile: path.join(topicDir, 'topic.json'),
     inputsDir: path.join(topicDir, 'inputs'),
     canonicalDir: path.join(topicDir, 'canonical'),
+    deliverablesDir: path.join(topicDir, 'deliverables'),
     notesDir: path.join(topicDir, 'notes'),
     runsDir: path.join(topicDir, 'runs'),
+  };
+}
+
+export function getDeliverablePaths(workspaceRoot, topicId, deliverableId) {
+  const topicPaths = getTopicPaths(workspaceRoot, topicId);
+  const deliverable = requireSegment('deliverableId', deliverableId, {
+    disallowParent: true,
+    disallowSeparator: true,
+  });
+  const deliverableDir = path.join(topicPaths.deliverablesDir, deliverable);
+  return {
+    deliverableId: deliverable,
+    deliverableDir,
+    deliverableFile: path.join(deliverableDir, 'deliverable.json'),
+    artifactsDir: path.join(deliverableDir, 'artifacts'),
+    contractsDir: path.join(deliverableDir, 'contracts'),
+    reportsDir: path.join(deliverableDir, 'reports'),
+    viewsDir: path.join(deliverableDir, 'views'),
   };
 }
 

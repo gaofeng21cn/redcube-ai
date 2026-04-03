@@ -77,6 +77,7 @@ Overlay 必须定义：
 - deliverable contract
 - stage contract
 - gate report contract
+- hydrated deliverable surface contract
 - visual/layout constraints
 - export contract
 
@@ -111,6 +112,8 @@ Overlay 必须定义：
   - 识别 run 当前卡点、待处理 review、可恢复阶段
 - baseline 对照
   - 优化已有交付物时，必须把旧版认可稿作为质量基线
+- contract hydration
+  - `create_deliverable` 时先水合 stage / review / layout / baseline / display surface，再允许进入主线
 
 这部分思路直接吸收了两类已验证经验：
 
@@ -179,6 +182,12 @@ Overlay 必须定义：
 - 多 overlay 对齐
   - `xiaohongshu`
   - `ppt_deck`
+- `ppt_deck` contract hydration
+  - `stage-sequence`
+  - `review-surface`
+  - `layout-rules`
+  - `baseline-policy`
+  - `display-registry`
 - legacy Web / Workbench 退场
 
 ## 当前推荐入口
@@ -188,6 +197,15 @@ Overlay 必须定义：
 1. `MCP`
 2. `CLI`
 3. legacy Web / Workbench 仅用于过渡，不再作为未来产品主线
+
+## Legacy Workbench 过渡入口
+
+如果你还需要临时打开旧版 Workbench：
+
+- 直接运行仓库根目录下的 `RedCube AI Web.command`
+- 或执行 `scripts/build-macos-app.sh` 生成 `RedCube AI.app`
+
+这两个入口都只用于过渡期兼容，不代表项目重新回到 GUI-first 方向。
 
 ## 快速开始
 
@@ -210,6 +228,20 @@ export WORKSPACE_ROOT="/absolute/path/to/your/workspace"
 export REDCUBE_ROOT_DIR="$WORKSPACE_ROOT"
 export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 ```
+
+如果你要把 RedCube 当成面向 Agent 的正式入口，可以直接启动 MCP：
+
+```bash
+npm run mcp
+```
+
+当前 `ppt_deck` 的 `create_deliverable` 已经会自动水合这些 surface：
+
+- `contracts/stage-sequence.json`
+- `contracts/review-surface.json`
+- `contracts/layout-rules.json`
+- `contracts/baseline-policy.json`
+- `views/display-registry.json`
 
 ## 当前文档入口
 

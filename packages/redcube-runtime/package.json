@@ -5,5 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@redcube/runtime-protocol": "0.1.0"
   }
 }

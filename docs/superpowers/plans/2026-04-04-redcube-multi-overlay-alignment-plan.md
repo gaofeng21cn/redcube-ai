@@ -4,7 +4,7 @@
 
 **Goal:** 把 `RedCube` 从“小红书图文单用途系统”校正为“面向 Agent 的视觉交付物运行层”，并完成多 overlay、审计门控、review loop 与 host-agent runtime 主路径的整体对齐。
 
-**Architecture:** 先收口公开叙事和设计真相源，再把 overlay 抽象从单一 `xiaohongshu` 扩大到 `xiaohongshu + ppt_deck`。随后引入显式的审计 controller、review loop 和 `host-agent executor adapter`，把“先审计、再高成本渲染/导出”的治理方式变成 runtime 的正式行为，而不是 prompt 约定。
+**Architecture:** 先收口公开叙事和设计真相源，再把 overlay 抽象从单一 `xiaohongshu` 扩大到 `xiaohongshu + ppt_deck`。随后引入显式的审计 controller、review loop 和 `host-agent executor adapter`，把“先审计、再高成本渲染/导出”的治理方式变成 runtime 的正式行为，而不是 prompt 约定。对 `ppt_deck`，`create_deliverable` 还必须先水合 stage / review / layout / baseline / display surface，避免 runtime 在缺少真相源 contract 时直接进入执行。
 
 **Tech Stack:** Node.js ESM, `node:test`, JSON canonical artifacts, CLI + MCP, host-agent executor adapters
 
@@ -46,6 +46,8 @@
 - Create: `apps/redcube-mcp/package.json`
 - Create: `apps/redcube-mcp/src/server.js`
 - Test: `tests/mcp-gateway.test.js`
+- Create: `packages/redcube-overlay-ppt/src/surface.js`
+- Test: `tests/ppt-deliverable-surface.test.js`
 
 ### Task 1: 重写公开叙事与计划入口
 
@@ -566,13 +568,15 @@ git commit -m "feat: add deliverable audit and review loop foundation"
 ### Task 5: 建立 host-agent executor 为主路径的 runtime 纵切片
 
 **Files:**
-- Create: `packages/redcube-runtime/package.json`
-- Create: `packages/redcube-runtime/src/index.js`
 - Create: `packages/redcube-runtime/src/run-store.js`
 - Create: `packages/redcube-runtime/src/event-log.js`
 - Create: `packages/redcube-runtime/src/executors.js`
 - Create: `packages/redcube-runtime/src/deliverable-routes.js`
-- Create: `packages/redcube-runtime/src/reviews.js`
+- Modify: `packages/redcube-runtime/package.json`
+- Modify: `packages/redcube-runtime/src/index.js`
+- Modify: `packages/redcube-runtime-protocol/src/index.js`
+- Modify: `packages/redcube-runtime-protocol/src/workspace.js`
+- Modify: `packages/redcube-gateway/package.json`
 - Create: `packages/redcube-gateway/src/actions/create-deliverable.js`
 - Create: `packages/redcube-gateway/src/actions/get-deliverable.js`
 - Create: `packages/redcube-gateway/src/actions/run-deliverable-route.js`
@@ -591,9 +595,35 @@ import { mkdtempSync } from 'node:fs';
 
 import {
   createDeliverable,
+  getDeliverable,
   getRun,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
+
+test('createDeliverable writes canonical deliverable metadata', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+  });
+
+  assert.equal(created.ok, true);
+
+  const stored = await getDeliverable({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+  });
+
+  assert.equal(stored.ok, true);
+  assert.equal(stored.deliverable.overlay, 'ppt_deck');
+  assert.equal(stored.deliverable.kind, 'ppt_deck');
+  assert.equal(stored.deliverable.slide_ratio, '16:9');
+});
 
 test('runDeliverableRoute uses host-agent executor by default', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
@@ -617,9 +647,90 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(result.ok, true);
   assert.equal(result.run.executor.adapter, 'host_agent');
   assert.equal(result.run.status, 'completed');
+  assert.equal(result.events.length >= 2, true);
 
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.executor.adapter, 'host_agent');
+  assert.equal(
+    JSON.parse(readFileSync(result.artifactFile, 'utf-8')).route,
+    'storyline',
+  );
+});
+
+test('getRun rejects unsafe run identifiers', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+  await assert.rejects(
+    () => getRun({ workspaceRoot, runId: '../run-a' }),
+    /runId 不能包含路径分隔符/,
+  );
+});
+
+test('runDeliverableRoute rejects unsafe route segments', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+  });
+
+  await assert.rejects(
+    () => runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: '../storyline',
+    }),
+    /route 不能包含路径分隔符/,
+  );
+});
+
+test('runDeliverableRoute rejects overlay mismatch against stored deliverable', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+  });
+
+  await assert.rejects(
+    () => runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    }),
+    /overlay mismatch: expected ppt_deck, got xiaohongshu/,
+  );
+});
+
+test('runDeliverableRoute records failed run when executor cannot run route', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+  });
+
+  const result = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    route: 'slides',
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.run.status, 'failed');
+  assert.equal(result.run.error.message, 'Unsupported route: slides');
 });
 ```
 
@@ -640,6 +751,10 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
   return {
     adapter,
     async runRoute({ overlay, route, topicId, deliverableId }) {
+      if (route !== 'storyline') {
+        throw new Error(`Unsupported route: ${route}`);
+      }
+
       return {
         overlay,
         route,
@@ -649,6 +764,43 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
       };
     },
   };
+}
+```
+
+```js
+// packages/redcube-runtime-protocol/src/workspace.js
+export function getDeliverablePaths(workspaceRoot, topicId, deliverableId) {
+  const topicPaths = getTopicPaths(workspaceRoot, topicId);
+  const deliverableDir = path.join(topicPaths.deliverablesDir, deliverableId);
+  return {
+    deliverableDir,
+    deliverableFile: path.join(deliverableDir, 'deliverable.json'),
+    artifactsDir: path.join(deliverableDir, 'artifacts'),
+    reportsDir: path.join(deliverableDir, 'reports'),
+    viewsDir: path.join(deliverableDir, 'views'),
+  };
+}
+```
+
+```js
+// packages/redcube-gateway/src/actions/create-deliverable.js
+export async function createDeliverable({
+  workspaceRoot,
+  overlay,
+  topicId,
+  deliverableId,
+  title,
+}) {
+  const deliverable = buildDeckRecord({ topicId, deliverableId, title });
+  // ensure topic dir and deliverable dir, then write topic.json + deliverable.json
+  return { ok: true, deliverable };
+}
+```
+
+```js
+// packages/redcube-runtime/src/run-store.js
+export function failRun({ workspaceRoot, runId, currentStage, error, executor }) {
+  // mark run failed and persist structured error payload
 }
 ```
 
@@ -736,3 +888,50 @@ git add tests/mcp-gateway.test.js \
   apps/redcube-mcp/src/server.js
 git commit -m "feat: add mcp gateway surface"
 ```
+
+### Task 7: 为 `ppt_deck` 水合交付物 contract surface 并纳入审计
+
+**Files:**
+- Create: `packages/redcube-overlay-ppt/src/surface.js`
+- Modify: `packages/redcube-overlay-ppt/src/index.js`
+- Modify: `packages/redcube-runtime-protocol/src/workspace.js`
+- Modify: `packages/redcube-gateway/src/actions/create-deliverable.js`
+- Modify: `packages/redcube-gateway/src/actions/audit-deliverable.js`
+- Test: `tests/ppt-deliverable-surface.test.js`
+
+- [ ] **Step 1: 写失败测试，锁定 `create_deliverable` 的 contract hydration 与 `audit_deliverable` 的 surface gate**
+
+```js
+test('createDeliverable hydrates ppt deck contract surface', async () => {
+  // expect stage / review / layout / baseline / display surface files
+});
+
+test('auditDeliverable blocks when hydrated ppt deck surface is missing', async () => {
+  // remove review-surface.json, expect block + rehydrate_deliverable_surface
+});
+```
+
+- [ ] **Step 2: 写最小实现**
+
+```js
+// packages/redcube-overlay-ppt/src/surface.js
+export function buildDeckSurfaceBundle({ title }) {
+  return [
+    { relativePath: 'contracts/stage-sequence.json', content: { /* ... */ } },
+    { relativePath: 'contracts/review-surface.json', content: { /* ... */ } },
+    { relativePath: 'contracts/layout-rules.json', content: { /* ... */ } },
+    { relativePath: 'contracts/baseline-policy.json', content: { /* ... */ } },
+    { relativePath: 'views/display-registry.json', content: { /* ... */ } },
+  ];
+}
+```
+
+```js
+// packages/redcube-gateway/src/actions/audit-deliverable.js
+// merge runtime generic audit with ppt deck surface existence audit
+```
+
+- [ ] **Step 3: 重新跑测试**
+
+Run: `node --test tests/ppt-deliverable-surface.test.js tests/deliverable-review-loop.test.js tests/runtime-deliverable-route.test.js`
+Expected: PASS。

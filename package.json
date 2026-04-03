@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "redcube": "node apps/redcube-cli/src/cli.js",
+    "mcp": "node apps/redcube-mcp/src/server.js",
     "web": "node apps/redcube-web/src/server.js",
     "test": "node --test tests/*.test.js"
   },

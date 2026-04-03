@@ -1,0 +1,14 @@
+{
+  "name": "@redcube/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "redcube-mcp": "./src/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "@redcube/gateway": "0.1.0",
+    "zod": "4.3.6"
+  }
+}
