@@ -1,6 +1,24 @@
 # RedCube Agent-First Runtime Program Plan
 
-已批准的重构 spec 过大，已拆分为三份可独立执行的实现计划：
+`2026-04-03` 的三份计划仍保留为 foundation 阶段的历史记录。
+
+截至 `2026-04-04`，项目方向已进一步收敛为：
+
+- `Agent-first, human-auditable`
+- `visual deliverable runtime`
+- `xiaohongshu + ppt_deck` 多 overlay
+- `host-agent executor adapter` 作为 runtime 主路径
+
+因此，vertical slice 的后续执行以新计划为准：
+
+1. [2026-04-04-redcube-multi-overlay-alignment-plan.md](/Users/gaofeng/workspace/RedCube%20AI/.worktrees/redcube-agent-vertical-slice/docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
+   - README / public narrative refresh
+   - visual deliverable runtime 对齐
+   - `ppt_deck overlay`
+   - host-agent runtime adapter direction
+   - deliverable-centric gateway / MCP surface
+
+之前拆分出的三份计划如下：
 
 1. [2026-04-03-redcube-foundation-cutover-plan.md](/Users/gaofeng/workspace/RedCube%20AI/docs/superpowers/plans/2026-04-03-redcube-foundation-cutover-plan.md)
    - workspace contract
@@ -22,5 +40,5 @@
 建议执行顺序：
 
 1. Foundation
-2. Vertical Slice
+2. Multi-Overlay Alignment
 3. Legacy Cutover
