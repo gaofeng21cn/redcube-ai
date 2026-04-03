@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 
-import { resolveWorkspaceContract } from '../../../redcube-runtime-protocol/src/index.js';
+import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 
 export async function doctorWorkspace({ workspaceRoot }) {
   const contract = resolveWorkspaceContract({ workspaceRoot });

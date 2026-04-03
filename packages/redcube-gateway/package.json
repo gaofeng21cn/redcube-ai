@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
   "dependencies": {
-    "@redcube/runtime-protocol": "workspace:*"
+    "@redcube/runtime-protocol": "file:../redcube-runtime-protocol"
   }
 }

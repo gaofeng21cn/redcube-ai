@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
-import { resolveWorkspaceContract } from '../../../redcube-runtime-protocol/src/index.js';
+import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 
 export async function listTopics({ workspaceRoot }) {
   const contract = resolveWorkspaceContract({ workspaceRoot });

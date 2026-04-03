@@ -7,7 +7,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import {
   doctorWorkspace,
   listTopics,
-} from '../packages/redcube-gateway/src/index.js';
+} from '@redcube/gateway';
 
 test('doctorWorkspace reports canonical directories and workspace file presence', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-'));
