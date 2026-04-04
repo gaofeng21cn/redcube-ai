@@ -121,9 +121,15 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
     blueprint.slide_blueprint.slides.every((slide) => Array.isArray(slide.page_core_content) && slide.page_core_content.length > 0),
     true,
   );
+  assert.equal(blueprint.slide_blueprint.slides.every((slide) => typeof slide.speaker_notes === 'string' && slide.speaker_notes.length > 0), true);
+  assert.equal(blueprint.slide_blueprint.slides.every((slide) => typeof slide.transition_sentence === 'string' && slide.transition_sentence.length > 0), true);
+  assert.equal(blueprint.slide_blueprint.slides.some((slide) => Array.isArray(slide.visual_presentation?.anchor_tracks) && slide.visual_presentation.anchor_tracks.length > 0), true);
 
   const visualDirection = readJson(chain[3].result.artifactFile);
+  assert.equal(Array.isArray(visualDirection.visual_direction?.rhythm_curve), true);
   assert.equal(Array.isArray(visualDirection.visual_direction?.peak_pages), true);
+  assert.equal(typeof visualDirection.visual_direction?.page_family_ceiling, 'object');
+  assert.equal(Array.isArray(visualDirection.visual_direction?.forbidden_regressions), true);
   assert.equal(Array.isArray(visualDirection.visual_direction?.page_role_table), true);
 
   const renderBundle = readJson(chain[4].result.artifactFile);

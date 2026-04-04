@@ -445,7 +445,29 @@ function buildVisualDirection(contract, blueprintArtifact, mode, baselineDeliver
         '来源与页码按页控制',
         '复杂结构页必须显式写出锚点/轨道/网格',
       ],
+      rhythm_curve: [
+        { slide_id: 'S01', role: 'opening_peak' },
+        { slide_id: 'S02', role: 'stakes_rise' },
+        { slide_id: 'S03', role: 'clarify_buffer' },
+        { slide_id: 'S04', role: 'mechanism_peak' },
+        { slide_id: 'S05', role: 'decision_bridge' },
+        { slide_id: 'S06', role: 'evidence_peak' },
+        { slide_id: 'S07', role: 'practice_bridge' },
+        { slide_id: 'S08', role: 'closing_peak' },
+      ],
       peak_pages: ['S01', 'S04', 'S06', 'S08'],
+      page_family_ceiling: {
+        cover_hero: 1,
+        central_axis: 1,
+        multi_zone_compare: 2,
+        timeline_band: 1,
+        judgement_ladder: 1,
+        ring_cross: 1,
+        summary_cross: 1,
+      },
+      forbidden_regressions: mode === 'optimize_existing'
+        ? ['更粗糙', '更单调', '更重', '更挤', '更像统一模板页']
+        : ['退化成统一安全模板页'],
       page_role_table: slides.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
