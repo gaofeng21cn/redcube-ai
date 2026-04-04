@@ -103,14 +103,29 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
   const research = readJson(chain[0].result.artifactFile);
   assert.equal(typeof research.research?.topic_summary, 'string');
   assert.equal(Array.isArray(research.research?.reference_source_list), true);
+  assert.equal(typeof research.research?.audience_judgement, 'string');
+  assert.equal(typeof research.research?.why_now, 'string');
 
   const plan = readJson(chain[2].result.artifactFile);
   assert.equal(Array.isArray(plan.single_note_plan?.title_options), true);
   assert.equal(plan.single_note_plan.title_options.length >= 3, true);
   assert.equal(Array.isArray(plan.single_note_plan?.slides), true);
+  assert.equal(plan.single_note_plan.slides.every((slide) => typeof slide.page_goal === 'string' && slide.page_goal.length > 0), true);
+  assert.equal(plan.single_note_plan.slides.every((slide) => Array.isArray(slide.page_core_content) && slide.page_core_content.length >= 3), true);
+  assert.equal(plan.single_note_plan.slides.every((slide) => typeof slide.visual_presentation?.layout_family === 'string'), true);
+  assert.equal(plan.single_note_plan.slides.every((slide) => typeof slide.source_language === 'string' && slide.source_language.length > 0), true);
+  assert.equal(plan.single_note_plan.slides.every((slide) => typeof slide.progression_role === 'string' && slide.progression_role.length > 0), true);
+  assert.equal(plan.single_note_plan.slides.every((slide) => typeof slide.transition === 'string' && slide.transition.length > 0), true);
 
   const visual = readJson(chain[3].result.artifactFile);
   assert.equal(typeof visual.visual_direction?.director_statement, 'string');
+  assert.equal(typeof visual.visual_direction?.visual_motif, 'string');
+  assert.equal(Array.isArray(visual.visual_direction?.rhythm_curve), true);
+  assert.equal(Array.isArray(visual.visual_direction?.peak_pages), true);
+  assert.equal(typeof visual.visual_direction?.page_family_ceiling, 'object');
+  assert.equal(Array.isArray(visual.visual_direction?.forbidden_regressions), true);
+  assert.equal(Array.isArray(visual.visual_direction?.anti_template_constraints), true);
+  assert.equal(typeof visual.visual_direction?.source_language_discipline, 'string');
   assert.equal(Array.isArray(visual.visual_direction?.page_role_table), true);
 
   const render = readJson(chain[4].result.artifactFile);
@@ -121,9 +136,14 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
 
   const directorReview = readJson(chain[5].result.artifactFile);
   assert.equal(typeof directorReview.visual_director_review?.director_intent_landed, 'boolean');
+  assert.equal(typeof directorReview.visual_director_review?.memory_hook_present, 'boolean');
+  assert.equal(typeof directorReview.visual_director_review?.homogeneous_layout_risk, 'number');
+  assert.equal(Array.isArray(directorReview.visual_director_review?.weak_pages), true);
   const review = readJson(chain[6].result.artifactFile);
   assert.equal(typeof review.checks?.overflow_free, 'boolean');
   assert.equal(typeof review.checks?.visual_density_ok, 'boolean');
+  assert.equal(typeof review.checks?.anti_template_ok, 'boolean');
+  assert.equal(typeof review.checks?.memory_hook_present, 'boolean');
   assert.equal(review.slide_reviews.every((slide) => existsSync(slide.screenshot_file)), true);
 
   const copy = readJson(chain[7].result.artifactFile);
@@ -173,6 +193,9 @@ test('xiaohongshu optimize_existing binds baseline and emits relative review', a
 
   const directorReview = readJson(chain[5].result.artifactFile);
   assert.equal(typeof directorReview.visual_director_review?.director_intent_landed, 'boolean');
+  assert.equal(typeof directorReview.visual_director_review?.memory_hook_present, 'boolean');
+  assert.equal(typeof directorReview.visual_director_review?.homogeneous_layout_risk, 'number');
+  assert.equal(Array.isArray(directorReview.visual_director_review?.weak_pages), true);
   const review = readJson(chain[6].result.artifactFile);
   assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
   assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-a');

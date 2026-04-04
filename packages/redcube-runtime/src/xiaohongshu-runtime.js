@@ -102,6 +102,142 @@ function publicSources() {
   ];
 }
 
+
+function inferAudience(contract) {
+  const joined = `${safeText(contract.title)} ${safeText(contract.goal)}`;
+  if (/门诊|患者|科普/.test(joined)) {
+    return '门诊患者和家属：更关心先做什么、怎么避免走弯路，而不是完整术语体系';
+  }
+  if (/医生|临床/.test(joined)) {
+    return '临床一线读者：更关心判断顺序、误区成本与可执行动作';
+  }
+  return '泛知识读者：更关心先理解冲突，再拿走一个能立刻复用的动作';
+}
+
+function inferWhyNow(contract) {
+  const joined = `${safeText(contract.title)} ${safeText(contract.goal)}`;
+  if (/AI|工具/.test(joined)) {
+    return '因为工具和信息都变多了，越是看起来容易，越需要先把判断顺序讲清，不然最容易被表面答案带偏';
+  }
+  return '因为现在信息源更多、判断压力更大，越需要先给读者一条最短的判断路径';
+}
+
+function inferTension(contract) {
+  return '旧习惯看起来省事，但会把判断顺序做反，最后把时间花在错误动作上';
+}
+
+function inferMemoryHook(contract) {
+  const joined = `${safeText(contract.title)} ${safeText(contract.goal)}`;
+  if (/AI|工具/.test(joined)) {
+    return '先别急着上工具，先把顺序做对';
+  }
+  return '先别急着记概念，先抓最值钱的判断句';
+}
+
+function inferPageContent(slide, context, index, slides) {
+  const sourceLabel = context.public_sources[index % context.public_sources.length];
+  switch (slide.layout_family) {
+    case 'cover_note':
+      return [
+        `一句话先把冲突说清：${context.tension}`,
+        `这篇真正要帮你判断的是：${context.audience_judgement}`,
+        `记忆钩子：${context.memory_hook}`,
+      ];
+    case 'myth_compare':
+      return [
+        '很多人一上来就先找工具、先看功能、先抄别人的做法',
+        '真正该先看的，是这件事的判断顺序有没有被做反',
+        `为什么现在更容易做反：${context.why_now}`,
+      ];
+    case 'sequence_stack':
+      return [
+        '先把问题翻译成人话，再决定要不要引入工具或方法',
+        '先看证据和适用边界，再看执行路径和输出形式',
+        '最后才谈效率、模板和扩展动作',
+      ];
+    case 'process_track':
+      return [
+        '第1步：先判断这是不是一个需要立刻处理的问题',
+        '第2步：再判断有哪些公开来源能支撑这一步',
+        '第3步：最后把动作压成一条能照着走的轨道',
+      ];
+    case 'evidence_strip':
+      return [
+        `把来源写成人能看懂的口径：${sourceLabel}`,
+        '证据页不是摆引用，而是告诉读者为什么这句结论可信',
+        '来源与行动建议必须同屏出现，不能只留脚注',
+      ];
+    case 'action_checklist':
+      return [
+        `先记住这句：${context.memory_hook}`,
+        '离开这一页后，按“先问题、再来源、后动作”的顺序执行',
+        `如果只带走一件事，就是：${slides[0]?.title || '先把最短判断句记住'}`,
+      ];
+    default:
+      return [
+        '先把这页的判断句说清',
+        '再给读者一个可执行动作',
+        '最后用公开来源口径托住结论',
+      ];
+  }
+}
+
+function inferVisualPresentation(slide) {
+  const family = slide.layout_family;
+  if (family === 'cover_note') {
+    return {
+      layout_family: family,
+      main_visual_action: '大标题钩子 + 批注式记忆句',
+      action_primitive: 'hero note + highlight ribbon',
+      anchor_tracks: ['cover-hook', 'memory-ribbon', 'benefit-chip'],
+      anti_template_note: '封面必须是一页抓人，不是普通三卡封面',
+    };
+  }
+  if (family === 'myth_compare') {
+    return {
+      layout_family: family,
+      main_visual_action: '错误做法 vs 正确顺序双区对撞',
+      action_primitive: 'asymmetric compare columns',
+      anchor_tracks: ['myth-column', 'divider', 'correction-column'],
+      anti_template_note: '不能退化成同构卡片列表',
+    };
+  }
+  if (family === 'sequence_stack') {
+    return {
+      layout_family: family,
+      main_visual_action: '阶梯式顺序卡，让读者看到先后关系',
+      action_primitive: 'staggered step stack',
+      anchor_tracks: ['step-one', 'step-two', 'step-three'],
+      anti_template_note: '顺序页必须有明显推进，不可做平铺列表',
+    };
+  }
+  if (family === 'process_track') {
+    return {
+      layout_family: family,
+      main_visual_action: '轨道化机制说明',
+      action_primitive: 'process track with nodes',
+      anchor_tracks: ['track-start', 'track-middle', 'track-end'],
+      anti_template_note: '机制页必须显式轨道，不可只写文字卡片',
+    };
+  }
+  if (family === 'evidence_strip') {
+    return {
+      layout_family: family,
+      main_visual_action: '证据条 + 来源标签 + 结论高亮',
+      action_primitive: 'source strip with highlight bands',
+      anchor_tracks: ['evidence-strip', 'source-chip-rail', 'claim-highlight'],
+      anti_template_note: '证据页必须同时给来源与结论，不可只留脚注',
+    };
+  }
+  return {
+    layout_family: family,
+    main_visual_action: '动作清单压缩收尾',
+    action_primitive: 'checklist blocks',
+    anchor_tracks: ['check-one', 'check-two', 'check-three'],
+    anti_template_note: '收尾页要像收藏清单，不是普通总结卡',
+  };
+}
+
 function attachCommon(route, contract) {
   return {
     overlay: contract.overlay,
@@ -140,7 +276,12 @@ function buildResearch(contract) {
     research: {
       topic_summary: safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`),
       mode: isSeries(contract) ? 'series' : 'single',
+      audience_judgement: inferAudience(contract),
+      why_now: inferWhyNow(contract),
+      tension: inferTension(contract),
+      memory_hook: inferMemoryHook(contract),
       reference_source_list: references,
+      public_sources: references,
       forbidden_source_hit_count: Number(seed?.research?.forbidden_source_hit_count || 0),
       input_output_state: {
         current: 'input_ready',
@@ -157,7 +298,12 @@ function buildStoryline(contract, deliverablePaths) {
     ...attachCommon('storyline', contract),
     storyline: {
       mode: research?.research?.mode || 'single',
+      audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement),
+      tension: safeText(seed?.storyline?.tension, research?.research?.tension),
+      why_now: safeText(seed?.storyline?.why_now, research?.research?.why_now),
+      memory_hook: safeText(seed?.storyline?.memory_hook, research?.research?.memory_hook),
       hook: safeText(seed?.storyline?.hook, '先打破旧认知，再给动作收益'),
+      narrative_progression: safeArray(seed?.storyline?.narrative_progression),
       journey: safeArray(seed?.storyline?.journey),
       resolution: safeText(seed?.storyline?.resolution, '让读者愿意收藏并继续看下一页/下一篇'),
       series_needed: (research?.research?.mode || 'single') === 'series',
@@ -165,28 +311,34 @@ function buildStoryline(contract, deliverablePaths) {
   };
 }
 
-function buildPlanSlides(contract) {
+function buildPlanSlides(contract, storyline) {
   const seed = promptSeed('single_note_plan', { title: contract.title });
   const slides = safeArray(seed?.plan?.slides);
-  const sources = publicSources();
+  const sources = safeArray(storyline?.research?.public_sources).length > 0 ? storyline.research.public_sources : publicSources();
   return slides.map((slide, index) => ({
     slide_id: slide.slide_id,
     slide_no: index + 1,
     title: slide.title,
     layout_family: slide.layout_family,
     page_goal: slide.page_goal,
-    core_sentence: slide.title,
-    page_core_content: [
-      `${slide.title}：先用一句人话把问题讲清`,
-      `给读者一个可以马上执行的判断动作`,
-      `用公开来源支持这页结论`,
-    ],
+    progression_role: safeText(slide.progression_role, ['hook','tension','explain','mechanism_peak','evidence_peak','memory_close'][index] || 'explain'),
+    core_sentence: `${slide.title}｜${safeText(storyline?.storyline?.memory_hook, inferMemoryHook(contract))}`,
+    page_core_content: inferPageContent(slide, {
+      audience_judgement: safeText(storyline?.storyline?.audience_judgement, inferAudience(contract)),
+      why_now: safeText(storyline?.storyline?.why_now, inferWhyNow(contract)),
+      tension: safeText(storyline?.storyline?.tension, inferTension(contract)),
+      memory_hook: safeText(storyline?.storyline?.memory_hook, inferMemoryHook(contract)),
+      public_sources: sources,
+    }, index, slides),
+    visual_presentation: inferVisualPresentation(slide),
+    source_language: safeText(slide.source_language, '来源必须翻译成读者能理解的公开口径'),
     evidence_and_sources: sources.map((source, sourceIndex) => ({
       source_id: `SRC-${index + 1}-${sourceIndex + 1}`,
       public_label: source,
     })),
-    speaker_notes: `这页不是堆概念，而是让读者知道：${slide.page_goal}。`,
-    transition_sentence: index === slides.length - 1 ? '最后收束成可收藏的行动清单。' : `下一页进入：${slides[index + 1].title}`,
+    speaker_notes: `这页要让读者立刻感到：${slide.page_goal}。先用一句人话把判断句讲清，再补一条公开来源托住可信度。`,
+    transition: safeText(slide.transition, index === slides.length - 1 ? '最后收束成可收藏的行动清单。' : `下一页进入：${slides[index + 1].title}`),
+    transition_sentence: safeText(slide.transition, index === slides.length - 1 ? '最后收束成可收藏的行动清单。' : `下一页进入：${slides[index + 1].title}`),
   }));
 }
 
@@ -207,12 +359,15 @@ function buildSingleNotePlan(contract) {
 
 function buildVisualDirection(contract, deliverablePaths, mode, baselineDeliverableId) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
+  const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const seed = promptSeed('visual_direction');
-  const pageRoleTable = safeArray(plan?.single_note_plan?.slides).map((slide) => ({
+  const slides = safeArray(plan?.single_note_plan?.slides);
+  const peakPages = safeArray(seed?.visual_direction?.peak_pages).length > 0 ? seed.visual_direction.peak_pages : slides.filter((slide) => ['hook','mechanism_peak','evidence_peak'].includes(slide.progression_role)).map((slide) => slide.slide_id);
+  const pageRoleTable = slides.map((slide) => ({
     slide_id: slide.slide_id,
     title: slide.title,
-    page_role: slide.layout_family,
-    first_glance: slide.title,
+    page_role: slide.progression_role,
+    first_glance: slide.visual_presentation?.main_visual_action || slide.title,
     second_glance: slide.page_goal,
   }));
   return {
@@ -220,14 +375,21 @@ function buildVisualDirection(contract, deliverablePaths, mode, baselineDelivera
     mode,
     visual_direction: {
       director_statement: safeText(seed?.visual_direction?.director_statement, '像一个认真做过整理的人，把复杂内容画成可收藏的笔记'),
+      visual_motif: safeText(seed?.visual_direction?.visual_motif, '纸面感 + 高亮批注 + 便签式收束'),
       material_rules: seed?.visual_direction?.material_rules || {
         paper_base: '米白纸 + 轻网格',
         main_accent: '#2563EB',
         warning_accent: '#DC2626',
       },
+      rhythm_curve: safeArray(seed?.visual_direction?.rhythm_curve).length > 0 ? seed.visual_direction.rhythm_curve : slides.map((slide) => ({ slide_id: slide.slide_id, role: slide.progression_role })),
+      peak_pages: peakPages,
+      page_family_ceiling: seed?.visual_direction?.page_family_ceiling || Object.fromEntries(slides.map((slide) => [slide.layout_family, 1])),
+      anti_template_constraints: safeArray(seed?.visual_direction?.anti_template_constraints),
+      source_language_discipline: safeText(seed?.visual_direction?.source_language_discipline, '来源必须翻译成读者能理解的公开口径'),
       page_role_table: pageRoleTable,
       forbidden_regressions: safeArray(seed?.visual_direction?.forbidden_regressions),
       baseline_deliverable_id: mode === 'optimize_existing' ? baselineDeliverableId : null,
+      memory_hook: safeText(storyline?.storyline?.memory_hook, inferMemoryHook(contract)),
     },
   };
 }
@@ -422,19 +584,46 @@ function computeSeriesSurfaces(contract, deliverablePaths, exportBundle) {
 function buildDirectorReview(contract, deliverablePaths) {
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const slides = safeArray(render?.html_bundle?.slides);
-  const layoutFamilies = Array.from(new Set(slides.map((slide) => slide.layout_family)));
-  const weakPages = slides.filter((slide) => ['myth_compare', 'sequence_stack'].includes(slide.layout_family)).map((slide) => slide.slide_id).slice(0, 1);
-  const directorIntentLanded = layoutFamilies.length >= 4 && safeArray(visual?.visual_direction?.forbidden_regressions).length >= 3;
-  const antiTemplateOk = layoutFamilies.length >= 4;
-  const status = directorIntentLanded && antiTemplateOk ? 'pass' : 'block';
+  const layoutFamilies = slides.map((slide) => slide.layout_family);
+  const uniqueLayoutCount = Array.from(new Set(layoutFamilies)).length;
+  let maxConsecutiveSame = 1;
+  let currentRun = 1;
+  for (let i = 1; i < layoutFamilies.length; i += 1) {
+    if (layoutFamilies[i] === layoutFamilies[i - 1]) {
+      currentRun += 1;
+      maxConsecutiveSame = Math.max(maxConsecutiveSame, currentRun);
+    } else {
+      currentRun = 1;
+    }
+  }
+  const memoryHook = safeText(storyline?.storyline?.memory_hook);
+  const firstTitle = safeText(slides[0]?.title);
+  const memoryHookPresent = memoryHook.length > 0 && (firstTitle.includes(memoryHook.slice(0, Math.min(6, memoryHook.length))) || slides.some((slide) => safeText(slide.title).includes('顺序') || safeText(slide.title).includes('动作')));
+  const homogeneousLayoutRisk = Number((maxConsecutiveSame / Math.max(layoutFamilies.length, 1)).toFixed(2));
+  const directorIntentLanded = uniqueLayoutCount >= 5 && safeArray(visual?.visual_direction?.peak_pages).length >= 3;
+  const antiTemplateOk = homogeneousLayoutRisk <= 0.34 && uniqueLayoutCount >= 5;
+  const weakPages = slides.filter((slide) => ['myth_compare', 'sequence_stack'].includes(slide.layout_family)).map((slide) => slide.slide_id).slice(0, 2);
+  const status = directorIntentLanded && antiTemplateOk && memoryHookPresent ? 'pass' : 'block';
   const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
+  writeText(reviewFile, [
+    '# 视觉总监复盘',
+    '',
+    `- director_intent_landed: ${directorIntentLanded}`,
+    `- anti_template_ok: ${antiTemplateOk}`,
+    `- memory_hook_present: ${memoryHookPresent}`,
+    `- homogeneous_layout_risk: ${homogeneousLayoutRisk}`,
+    `- weak_pages: ${weakPages.join(',') || 'none'}`,
+  ].join('\n'));
   return {
     ...attachCommon('visual_director_review', contract),
     status,
     visual_director_review: {
       director_intent_landed: directorIntentLanded,
       anti_template_ok: antiTemplateOk,
+      memory_hook_present: memoryHookPresent,
+      homogeneous_layout_risk: homogeneousLayoutRisk,
       weak_pages: weakPages,
       rewrite_action: status === 'pass' ? 'none' : 'revise_render_html',
     },
@@ -446,6 +635,7 @@ function buildDirectorReview(contract, deliverablePaths) {
       latest_checks: {
         director_intent_landed: directorIntentLanded,
         anti_template_ok: antiTemplateOk,
+        memory_hook_present: memoryHookPresent,
       },
       pending_reviews: status === 'pass' ? [] : ['director_intent_landed'],
       blocking_reasons: status === 'pass' ? [] : ['director_intent_landed'],
@@ -518,13 +708,15 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
       issues,
     };
   });
+  const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const checks = {
     overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
     occlusion_free: slideReviews.every((slide) => slide.checks.occlusion_free),
     visual_density_ok: slideReviews.every((slide) => slide.checks.visual_density_ok),
     speaker_fit_ok: slideReviews.every((slide) => slide.checks.speaker_fit_ok),
     cover_density_ok: slideReviews.length > 0 && Number(slideReviews[0]?.metrics?.occupied_ratio || 0) >= 0.22,
-    anti_template_ok: slideReviews.filter((item) => item.layout_family).length >= 3,
+    anti_template_ok: Boolean(directorReview?.visual_director_review?.anti_template_ok),
+    memory_hook_present: Boolean(directorReview?.visual_director_review?.memory_hook_present),
   };
   const status = Object.values(checks).every((value) => value === true) ? 'pass' : 'block';
   const artifact = {
