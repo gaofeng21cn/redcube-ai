@@ -5,7 +5,14 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
 
   return {
     adapter,
-    async runRoute({ overlay, route, topicId, deliverableId }) {
+    async runRoute({
+      overlay,
+      route,
+      topicId,
+      deliverableId,
+      contract,
+      stageContract,
+    }) {
       if (route !== 'storyline') {
         throw new Error(`Unsupported route: ${route}`);
       }
@@ -15,6 +22,11 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         route,
         topic_id: topicId,
         deliverable_id: deliverableId,
+        contract,
+        stage_contract: stageContract,
+        executor: {
+          adapter,
+        },
         produced_at: new Date().toISOString(),
       };
     },

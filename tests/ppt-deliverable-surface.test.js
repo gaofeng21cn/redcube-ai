@@ -21,9 +21,11 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   const created = await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   const deliverableDir = path.dirname(created.deliverableFile);
@@ -32,6 +34,8 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
     'contracts/review-surface.json',
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
+    'contracts/export-bundle.json',
+    'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
 
@@ -41,6 +45,9 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
 
   const displayRegistry = JSON.parse(
     readFileSync(path.join(deliverableDir, 'views/display-registry.json'), 'utf-8'),
+  );
+  const hydratedContract = JSON.parse(
+    readFileSync(path.join(deliverableDir, 'contracts/hydrated-deliverable.json'), 'utf-8'),
   );
 
   assert.deepEqual(
@@ -56,6 +63,12 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
       'export_pptx',
     ],
   );
+  assert.equal(hydratedContract.profile_id, 'lecture_student');
+  assert.equal(hydratedContract.export_bundle.bundle_id, 'lecture_student_bundle');
+  assert.equal(
+    hydratedContract.review_surface.required_checks.includes('term_explained_on_first_use'),
+    true,
+  );
 });
 
 test('auditDeliverable blocks when hydrated ppt deck surface is missing', async () => {
@@ -64,9 +77,11 @@ test('auditDeliverable blocks when hydrated ppt deck surface is missing', async 
   const created = await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   unlinkSync(
@@ -93,9 +108,11 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   const report = await auditDeliverable({
@@ -119,9 +136,11 @@ test('auditDeliverable blocks when hydrated ppt deck surface content is invalid'
   const created = await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'executive_briefing',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '向院领导汇报门诊容量与改造建议',
   });
 
   writeFileSync(

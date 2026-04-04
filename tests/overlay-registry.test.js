@@ -6,6 +6,8 @@ import {
   createOverlayRegistry,
 } from '../packages/redcube-overlay-core/src/index.js';
 import { buildTopicRecord as buildXiaohongshuTopic } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
+import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
+import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
 
 test('buildDeliverableRecord emits canonical visual-deliverable metadata', () => {
   const deliverable = buildDeliverableRecord({
@@ -39,14 +41,16 @@ test('buildDeliverableRecord rejects blank required fields', () => {
 
 test('createOverlayRegistry resolves registered overlays by id', () => {
   const registry = createOverlayRegistry({
-    xiaohongshu: { overlayId: 'xiaohongshu', buildTopicRecord: buildXiaohongshuTopic },
+    ppt_deck: pptDeckOverlay,
+    xiaohongshu: xiaohongshuOverlay,
   });
 
   assert.equal(registry.getOverlay('xiaohongshu').overlayId, 'xiaohongshu');
-  assert.deepEqual(registry.listOverlays(), ['xiaohongshu']);
-  assert.throws(
-    () => registry.getOverlay('ppt_deck'),
-    /Unknown overlay: ppt_deck/,
+  assert.equal(registry.getOverlay('ppt_deck').overlayId, 'ppt_deck');
+  assert.deepEqual(registry.listOverlays(), ['ppt_deck', 'xiaohongshu']);
+  assert.deepEqual(
+    registry.listProfiles('ppt_deck'),
+    ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
   );
 });
 
@@ -57,4 +61,16 @@ test('createOverlayRegistry rejects overlayId mismatch against registry key', ()
     }),
     /Overlay registry key mismatch: expected xiaohongshu, got ppt_deck/,
   );
+});
+
+test('createOverlayRegistry rejects profile lookup for unknown overlays', () => {
+  const registry = createOverlayRegistry({
+    xiaohongshu: xiaohongshuOverlay,
+  });
+
+  assert.throws(
+    () => registry.listProfiles('ppt_deck'),
+    /Unknown overlay: ppt_deck/,
+  );
+  assert.equal(typeof buildXiaohongshuTopic, 'function');
 });

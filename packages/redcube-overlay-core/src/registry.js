@@ -20,5 +20,9 @@ export function createOverlayRegistry(overlays) {
     listOverlays() {
       return Object.keys(table);
     },
+    listProfiles(overlayId) {
+      const overlay = this.getOverlay(overlayId);
+      return Object.keys(overlay.profiles || {});
+    },
   };
 }

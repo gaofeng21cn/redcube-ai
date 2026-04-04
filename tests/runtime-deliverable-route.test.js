@@ -18,9 +18,11 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
   const created = await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   assert.equal(created.ok, true);
@@ -34,8 +36,19 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
   assert.equal(stored.ok, true);
   assert.equal(stored.deliverable.overlay, 'ppt_deck');
   assert.equal(stored.deliverable.kind, 'ppt_deck');
+  assert.equal(stored.deliverable.profile_id, 'lecture_student');
+  assert.equal(stored.deliverable.goal, '为本科生讲授甲状腺基础知识');
+  assert.equal(stored.deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
   assert.equal(stored.deliverable.slide_ratio, '16:9');
-  assert.deepEqual(stored.deliverable.routes, ['storyline']);
+  assert.deepEqual(stored.deliverable.routes, [
+    'storyline',
+    'detailed_outline',
+    'slide_blueprint',
+    'visual_direction',
+    'render_html',
+    'screenshot_review',
+    'export_pptx',
+  ]);
 });
 
 test('createDeliverable rejects unsupported overlay ids', async () => {
@@ -45,9 +58,11 @@ test('createDeliverable rejects unsupported overlay ids', async () => {
     () => createDeliverable({
       workspaceRoot,
       overlay: 'xiaohongshu',
+      profileId: 'standard_note',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       title: '甲状腺门诊科普 deck',
+      goal: '为门诊患者生成可发布的科普图文',
     }),
     /Unsupported overlay: xiaohongshu/,
   );
@@ -59,9 +74,11 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   const result = await runDeliverableRoute({
@@ -79,10 +96,11 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
 
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.executor.adapter, 'host_agent');
-  assert.equal(
-    JSON.parse(readFileSync(result.artifactFile, 'utf-8')).route,
-    'storyline',
-  );
+  const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+  assert.equal(artifact.route, 'storyline');
+  assert.equal(artifact.contract.profile_id, 'lecture_student');
+  assert.equal(artifact.contract.goal, '为本科生讲授甲状腺基础知识');
+  assert.equal(artifact.stage_contract.stage_id, 'storyline');
 });
 
 test('getRun rejects unsafe run identifiers', async () => {
@@ -109,9 +127,11 @@ test('runDeliverableRoute rejects unsafe route segments', async () => {
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   await assert.rejects(
@@ -132,9 +152,11 @@ test('runDeliverableRoute rejects overlay mismatch against stored deliverable', 
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   await assert.rejects(
@@ -155,9 +177,11 @@ test('runDeliverableRoute records failed run when executor cannot run route', as
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
 
   const result = await runDeliverableRoute({
@@ -165,13 +189,38 @@ test('runDeliverableRoute records failed run when executor cannot run route', as
     overlay: 'ppt_deck',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
-    route: 'slides',
+    route: 'detailed_outline',
   });
 
   assert.equal(result.ok, false);
   assert.equal(result.run.status, 'failed');
-  assert.equal(result.run.error.message, 'Unsupported route: slides');
+  assert.equal(result.run.error.message, 'Unsupported route: detailed_outline');
 
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.status, 'failed');
+});
+
+test('runDeliverableRoute rejects route not declared by hydrated deliverable contract', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+
+  await assert.rejects(
+    () => runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'publish_live',
+    }),
+    /Route publish_live is not declared by hydrated deliverable contract/,
+  );
 });

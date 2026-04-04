@@ -53,9 +53,11 @@ const TOOL_DEFINITIONS = [
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       overlay: z.string().describe('Overlay id, for example ppt_deck.'),
+      profileId: z.string().describe('Overlay profile id, for example lecture_student.'),
       topicId: z.string().describe('Topic identifier.'),
       deliverableId: z.string().describe('Deliverable identifier.'),
       title: z.string().describe('Deliverable title.'),
+      goal: z.string().describe('Deliverable goal expressed in business/task terms.'),
     },
   },
   {

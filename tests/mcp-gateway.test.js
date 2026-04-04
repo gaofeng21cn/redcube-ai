@@ -39,15 +39,18 @@ test('callGatewayTool delegates to injected gateway action', async () => {
     {
       workspaceRoot: '/tmp/redcube-workspace',
       overlay: 'ppt_deck',
+      profileId: 'lecture_student',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       title: '甲状腺门诊科普 deck',
+      goal: '为本科生讲授甲状腺基础知识',
     },
     {
       createDeliverable: async (request) => ({
         ok: true,
         deliverable: {
           overlay: request.overlay,
+          profile_id: request.profileId,
           deliverable_id: request.deliverableId,
         },
       }),
@@ -56,6 +59,7 @@ test('callGatewayTool delegates to injected gateway action', async () => {
 
   assert.equal(result.ok, true);
   assert.equal(result.deliverable.overlay, 'ppt_deck');
+  assert.equal(result.deliverable.profile_id, 'lecture_student');
   assert.equal(result.deliverable.deliverable_id, 'deck-a');
 });
 
@@ -117,9 +121,11 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
   const created = await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
+    profileId: 'lecture_student',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
   });
   unlinkSync(
     path.join(path.dirname(created.deliverableFile), 'contracts/review-surface.json'),

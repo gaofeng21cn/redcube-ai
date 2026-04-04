@@ -4,7 +4,13 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import {
   buildDeckRecord,
   buildDeckSurfaceBundle,
+  pptDeckOverlay,
 } from '@redcube/overlay-ppt';
+import {
+  createOverlayRegistry,
+  hydrateDeliverableContract,
+} from '@redcube/overlay-core';
+import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
 import { getDeliverablePaths, getTopicPaths } from '@redcube/runtime-protocol';
 
 function buildTopicRecord({ topicId, title, overlay }) {
@@ -16,12 +22,19 @@ function buildTopicRecord({ topicId, title, overlay }) {
   };
 }
 
+const overlayRegistry = createOverlayRegistry({
+  ppt_deck: pptDeckOverlay,
+  xiaohongshu: xiaohongshuOverlay,
+});
+
 export async function createDeliverable({
   workspaceRoot,
   overlay,
+  profileId,
   topicId,
   deliverableId,
   title,
+  goal,
 }) {
   if (overlay !== 'ppt_deck') {
     throw new Error(`Unsupported overlay: ${overlay}`);
@@ -39,7 +52,22 @@ export async function createDeliverable({
     );
   }
 
-  const deliverable = buildDeckRecord({ topicId, deliverableId, title });
+  const hydratedContract = hydrateDeliverableContract(overlayRegistry, {
+    overlay,
+    profileId,
+    topicId,
+    deliverableId,
+    title,
+    goal,
+  });
+  const deliverable = buildDeckRecord({
+    topicId,
+    deliverableId,
+    title,
+    profileId,
+    goal,
+    hydratedContract,
+  });
   mkdirSync(deliverablePaths.deliverableDir, { recursive: true });
   writeFileSync(
     deliverablePaths.deliverableFile,
@@ -48,7 +76,7 @@ export async function createDeliverable({
   );
 
   const surfaceFiles = [];
-  for (const artifact of buildDeckSurfaceBundle({ title })) {
+  for (const artifact of buildDeckSurfaceBundle({ contract: hydratedContract })) {
     const targetFile = path.join(deliverablePaths.deliverableDir, artifact.relativePath);
     mkdirSync(path.dirname(targetFile), { recursive: true });
     writeFileSync(targetFile, JSON.stringify(artifact.content, null, 2), 'utf-8');
@@ -60,5 +88,6 @@ export async function createDeliverable({
     deliverableFile: deliverablePaths.deliverableFile,
     deliverable,
     surfaceFiles,
+    hydratedContract,
   };
 }

@@ -4,13 +4,24 @@ import assert from 'node:assert/strict';
 import {
   buildDeckRecord,
   evaluateStoryboardGate,
+  hydratePptDeckContract,
 } from '../packages/redcube-overlay-ppt/src/index.js';
 
 test('buildDeckRecord emits canonical ppt deck metadata', () => {
+  const hydratedContract = hydratePptDeckContract({
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    profileId: 'lecture_student',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
   const deck = buildDeckRecord({
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: '甲状腺门诊科普 deck',
+    profileId: 'lecture_student',
+    goal: '为本科生讲授甲状腺基础知识',
+    hydratedContract,
   });
 
   assert.equal(deck.topic_id, 'topic-a');
@@ -18,9 +29,20 @@ test('buildDeckRecord emits canonical ppt deck metadata', () => {
   assert.equal(deck.title, '甲状腺门诊科普 deck');
   assert.equal(deck.overlay, 'ppt_deck');
   assert.equal(deck.kind, 'ppt_deck');
+  assert.equal(deck.profile_id, 'lecture_student');
+  assert.equal(deck.goal, '为本科生讲授甲状腺基础知识');
+  assert.equal(deck.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
   assert.equal(deck.slide_ratio, '16:9');
   assert.equal(deck.status, 'draft');
-  assert.deepEqual(deck.routes, ['storyline']);
+  assert.deepEqual(deck.routes, [
+    'storyline',
+    'detailed_outline',
+    'slide_blueprint',
+    'visual_direction',
+    'render_html',
+    'screenshot_review',
+    'export_pptx',
+  ]);
 });
 
 test('buildDeckRecord rejects blank required fields', () => {
@@ -29,9 +51,49 @@ test('buildDeckRecord rejects blank required fields', () => {
       topicId: 'topic-a',
       deliverableId: '',
       title: '甲状腺门诊科普 deck',
+      profileId: 'lecture_student',
+      goal: '为本科生讲授甲状腺基础知识',
+      hydratedContract: hydratePptDeckContract({
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: '甲状腺门诊科普 deck',
+        profileId: 'lecture_student',
+        goal: '为本科生讲授甲状腺基础知识',
+      }),
     }),
     /Missing deliverable field: deliverableId/,
   );
+});
+
+test('hydratePptDeckContract emits profile-specific teaching and executive rules', () => {
+  const lectureStudent = hydratePptDeckContract({
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    profileId: 'lecture_student',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+  const executiveBriefing = hydratePptDeckContract({
+    topicId: 'topic-a',
+    deliverableId: 'deck-b',
+    title: '门诊改造汇报 deck',
+    profileId: 'executive_briefing',
+    goal: '向院领导汇报门诊容量与改造建议',
+  });
+
+  assert.equal(
+    lectureStudent.review_surface.required_checks.includes('term_explained_on_first_use'),
+    true,
+  );
+  assert.equal(lectureStudent.layout_rules.density_mode, 'teaching_spread');
+  assert.equal(lectureStudent.export_bundle.bundle_id, 'lecture_student_bundle');
+
+  assert.equal(
+    executiveBriefing.review_surface.required_checks.includes('decision_implication_clear'),
+    true,
+  );
+  assert.equal(executiveBriefing.layout_rules.max_primary_points_per_slide, 3);
+  assert.equal(executiveBriefing.export_bundle.include_presenter_notes, false);
 });
 
 test('evaluateStoryboardGate blocks empty slide list', () => {

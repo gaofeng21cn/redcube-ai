@@ -252,6 +252,13 @@ Overlay 必须定义：
 - 不再要求为了保留 GUI 路径而牺牲 runtime / gateway 重构质量
 - 如果重构主线需要，可以直接删除，而不是继续做兼容性续命
 
+如果你只是为了处理历史遗留的本地 GUI 启动器，仓库里仍保留：
+
+- `scripts/build-macos-app.sh`
+- 构建产物占位：`RedCube AI.app`
+
+它们只服务遗留打包链路，不代表 Web/Workbench 重新回到主线。
+
 ## 快速开始
 
 ```bash

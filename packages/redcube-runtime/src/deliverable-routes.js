@@ -21,6 +21,14 @@ function requireSafeSegment(name, value) {
   return text;
 }
 
+function loadHydratedContract(deliverablePaths, storedDeliverable) {
+  const contractRef = String(
+    storedDeliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
+  ).trim();
+  const contractFile = path.join(deliverablePaths.deliverableDir, contractRef);
+  return JSON.parse(readFileSync(contractFile, 'utf-8'));
+}
+
 export async function runDeliverableRoute({
   workspaceRoot,
   overlay,
@@ -39,6 +47,13 @@ export async function runDeliverableRoute({
     throw new Error(
       `overlay mismatch: expected ${storedDeliverable.overlay}, got ${overlay}`,
     );
+  }
+  const contract = loadHydratedContract(deliverablePaths, storedDeliverable);
+  const stageContract = contract.stage_sequence?.stages?.find(
+    (stage) => stage?.stage_id === safeRoute,
+  ) || null;
+  if (!stageContract) {
+    throw new Error(`Route ${safeRoute} is not declared by hydrated deliverable contract`);
   }
 
   const run = startRun({
@@ -62,6 +77,8 @@ export async function runDeliverableRoute({
       route: safeRoute,
       topicId,
       deliverableId,
+      contract,
+      stageContract,
     });
 
     mkdirSync(deliverablePaths.artifactsDir, { recursive: true });
@@ -82,6 +99,7 @@ export async function runDeliverableRoute({
       route: safeRoute,
       overlay,
       deliverable_id: deliverableId,
+      profile_id: contract.profile_id,
       artifact_file: artifactFile,
     });
 
@@ -105,6 +123,7 @@ export async function runDeliverableRoute({
       route: safeRoute,
       overlay,
       deliverable_id: deliverableId,
+      profile_id: contract.profile_id,
       error: failedRun.error,
     });
 
