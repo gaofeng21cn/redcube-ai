@@ -103,6 +103,35 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(artifact.stage_contract.stage_id, 'storyline');
 });
 
+test('runDeliverableRoute executes other declared stages through host-agent executor', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_peer',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '同行讲解 deck',
+    goal: '向小同行解释问题、方法、证据与边界',
+  });
+
+  const result = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    route: 'detailed_outline',
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.run.executor.adapter, 'host_agent');
+  assert.equal(result.run.current_stage, 'detailed_outline');
+  const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+  assert.equal(artifact.stage_contract.stage_id, 'detailed_outline');
+  assert.equal(artifact.contract.profile_id, 'lecture_peer');
+});
+
 test('getRun rejects unsafe run identifiers', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
@@ -171,7 +200,7 @@ test('runDeliverableRoute rejects overlay mismatch against stored deliverable', 
   );
 });
 
-test('runDeliverableRoute records failed run when executor cannot run route', async () => {
+test('runDeliverableRoute records failed run when secondary adapter cannot run declared route', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
   await createDeliverable({
@@ -190,11 +219,15 @@ test('runDeliverableRoute records failed run when executor cannot run route', as
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     route: 'detailed_outline',
+    adapter: 'external_llm',
   });
 
   assert.equal(result.ok, false);
   assert.equal(result.run.status, 'failed');
-  assert.equal(result.run.error.message, 'Unsupported route: detailed_outline');
+  assert.equal(
+    result.run.error.message,
+    'Unsupported route for adapter external_llm: detailed_outline',
+  );
 
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.status, 'failed');

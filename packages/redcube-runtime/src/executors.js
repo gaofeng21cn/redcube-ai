@@ -13,8 +13,15 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
       contract,
       stageContract,
     }) {
-      if (route !== 'storyline') {
-        throw new Error(`Unsupported route: ${route}`);
+      if (!stageContract?.stage_id) {
+        throw new Error(`Missing stage contract for route: ${route}`);
+      }
+      if (stageContract.stage_id !== route) {
+        throw new Error(`Stage contract mismatch: expected ${route}, got ${stageContract.stage_id}`);
+      }
+
+      if (adapter === 'external_llm' && route !== 'storyline') {
+        throw new Error(`Unsupported route for adapter external_llm: ${route}`);
       }
 
       return {

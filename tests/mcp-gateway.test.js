@@ -169,3 +169,67 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
     await transport.close();
   }
 });
+
+test('stdio MCP server can create deliverable, run declared route, and fetch run state', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-run-'));
+  const serverPath = fileURLToPath(
+    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+  );
+  const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: repoRoot,
+    stderr: 'pipe',
+  });
+  const client = new Client({
+    name: 'redcube-mcp-test-client',
+    version: '0.1.0',
+  });
+
+  await client.connect(transport);
+
+  try {
+    const created = await client.callTool({
+      name: 'create_deliverable',
+      arguments: {
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: '同行讲解 deck',
+        goal: '向小同行解释问题、方法、证据与边界',
+      },
+    });
+
+    assert.equal(created.structuredContent.deliverable.profile_id, 'lecture_peer');
+
+    const runResult = await client.callTool({
+      name: 'run_deliverable_route',
+      arguments: {
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'detailed_outline',
+      },
+    });
+
+    assert.equal(runResult.structuredContent.ok, true);
+    assert.equal(runResult.structuredContent.run.current_stage, 'detailed_outline');
+
+    const runState = await client.callTool({
+      name: 'get_run',
+      arguments: {
+        workspaceRoot,
+        runId: runResult.structuredContent.run.run_id,
+      },
+    });
+
+    assert.equal(runState.structuredContent.run.status, 'completed');
+    assert.equal(runState.structuredContent.run.current_stage, 'detailed_outline');
+  } finally {
+    await transport.close();
+  }
+});
