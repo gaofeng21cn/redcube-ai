@@ -86,9 +86,61 @@ function promptMeta(route) {
   };
 }
 
+function renderSeedValue(value, vars) {
+  if (Array.isArray(value)) {
+    return value.map((item) => renderSeedValue(item, vars));
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, renderSeedValue(item, vars)]));
+  }
+  if (typeof value === 'string') {
+    return value.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_match, key) => safeText(vars[key]));
+  }
+  return value;
+}
+
+function promptSeed(route, vars = {}) {
+  const relativePath = PROMPT_PACK[route];
+  const absolutePath = path.join(REPO_ROOT, relativePath);
+  if (!existsSync(absolutePath)) return null;
+  const raw = readFileSync(absolutePath, 'utf-8');
+  const match = raw.match(/## runtime_seed\s*```json\s*([\s\S]*?)\s*```/);
+  if (!match) return null;
+  return renderSeedValue(JSON.parse(match[1]), vars);
+}
+
 function extraChecks(contract) {
   const required = safeArray(contract?.review_surface?.required_checks);
   return required.filter((check) => !['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok'].includes(check));
+}
+
+function deriveProfileChecks(contract, blueprintArtifact, storylineArtifact) {
+  const slides = safeArray(blueprintArtifact?.slide_blueprint?.slides);
+  const pageTypes = slides.map((slide) => slide.page_type);
+  switch (contract.profile_id) {
+    case 'lecture_student':
+      return {
+        term_explained_on_first_use: slides.some((slide) => ['central_axis', 'myth_fact_split', 'cover_signal'].includes(slide.page_type) && safeArray(slide.page_core_content).length >= 2),
+        teaching_progression_clear: ['cover_signal', 'mechanism_track', 'decision_gate', 'closure_peak'].every((type) => pageTypes.includes(type)),
+      };
+    case 'lecture_peer':
+      return {
+        novelty_position_clear: safeText(storylineArtifact?.storyline?.narrative_arc?.journey?.[0]).length > 0,
+        method_boundary_explicit: pageTypes.includes('judgement_ladder'),
+      };
+    case 'executive_briefing':
+      return {
+        decision_implication_clear: slides.some((slide) => safeText(slide.page_goal).includes('动作') || safeText(slide.page_goal).includes('决策')),
+        conclusion_up_front: safeText(slides[0]?.core_sentence || '').length > 0,
+      };
+    case 'defense_deck':
+      return {
+        claim_evidence_traceable: slides.some((slide) => safeArray(slide.evidence_and_sources).length >= 2),
+        backup_qa_ready: pageTypes.includes('ring_cross') || pageTypes.includes('summary_peak'),
+      };
+    default:
+      return {};
+  }
 }
 
 function deckPreset(profileId) {
@@ -133,6 +185,21 @@ function buildOutlineSlides(contract) {
     '公开来源：同行评议论文 / 真实世界研究',
     '公开来源：公开流程规范 / 教学案例',
   ];
+  const seed = promptSeed('detailed_outline', {
+    title,
+    goal,
+    public_source_1: publicSources[0],
+    public_source_2: publicSources[1],
+    public_source_3: publicSources[2],
+  });
+  if (Array.isArray(seed?.slides) && seed.slides.length > 0) {
+    return seed.slides.map((slide) => ({
+      ...slide,
+      public_sources: Array.isArray(slide.public_sources) && slide.public_sources.length > 0
+        ? slide.public_sources
+        : [publicSources[0], publicSources[1], publicSources[2]],
+    }));
+  }
 
   return [
     {
@@ -246,6 +313,7 @@ function attachCommon(route, contract) {
 
 function buildStoryline(contract) {
   const preset = deckPreset(contract.profile_id);
+  const seed = promptSeed('storyline', { promise: preset.promise });
   return {
     ...attachCommon('storyline', contract),
     storyline: {
@@ -253,14 +321,15 @@ function buildStoryline(contract) {
       audience: preset.audience,
       goal: safeText(contract.goal),
       style: preset.promise,
+      core_metaphor: safeText(seed?.storyline?.core_metaphor, '把 AI 放回科研链，而不是神化成万能入口'),
       narrative_arc: {
-        hook: '先定义问题与听众收益',
-        journey: [
+        hook: safeArray(seed?.storyline?.hook).length > 0 ? seed.storyline.hook : ['先定义问题与听众收益'],
+        journey: safeArray(seed?.storyline?.journey).length > 0 ? seed.storyline.journey : [
           '把问题拆成可解释的结构',
           '把证据放回公开来源与适用边界',
           '把结论落成可执行动作',
         ],
-        resolution: '带着判断框架与复盘清单离场',
+        resolution: safeArray(seed?.storyline?.resolution).length > 0 ? seed.storyline.resolution : ['带着判断框架与复盘清单离场'],
       },
     },
   };
@@ -337,6 +406,7 @@ function anchorTracksForFamily(layoutFamily) {
 }
 
 function buildSlideBlueprint(contract) {
+  const seed = promptSeed('slide_blueprint');
   const slides = buildOutlineSlides(contract);
   return {
     ...attachCommon('slide_blueprint', contract),
@@ -344,22 +414,25 @@ function buildSlideBlueprint(contract) {
       chapter_goal: '逐页落实讲授型 deck 的页面目标、视觉结构与讲稿动作',
       slides: slides.map((slide, index) => makeBlueprintSlide(slide, index, slides, contract)),
       quality_guards: {
+        ...(seed?.quality_guards || {}),
         require_visual_direction_before_html: true,
         forbid_template_route_tokens: BANNED_RENDER_TOKENS,
         canvas: CANVAS,
       },
+      profile_checks: safeArray(seed?.profile_checks?.[contract.profile_id]),
     },
   };
 }
 
 function buildVisualDirection(contract, blueprintArtifact, mode, baselineDeliverableId) {
   const slides = blueprintArtifact.slide_blueprint.slides;
+  const seed = promptSeed('visual_direction', { title: contract.title });
   return {
     ...attachCommon('visual_direction', contract),
     visual_direction: {
-      visual_manifest: '浅底高对比、关键页允许峰值、复杂结构显式锚点',
-      what_it_is: ['成熟讲者工作台', '结构解释驱动视觉组织'],
-      what_it_is_not: ['统一安全模板页', '内部占位来源', '小红书语义替代'],
+      visual_manifest: safeText(seed?.visual_direction?.visual_manifest, '浅底高对比、关键页允许峰值、复杂结构显式锚点'),
+      what_it_is: safeArray(seed?.visual_direction?.what_it_is).length > 0 ? seed.visual_direction.what_it_is : ['成熟讲者工作台', '结构解释驱动视觉组织'],
+      what_it_is_not: safeArray(seed?.visual_direction?.what_it_is_not).length > 0 ? seed.visual_direction.what_it_is_not : ['统一安全模板页', '内部占位来源', '小红书语义替代'],
       palette: {
         canvas: '#F7F8FC',
         ink: '#0F172A',
@@ -380,11 +453,13 @@ function buildVisualDirection(contract, blueprintArtifact, mode, baselineDeliver
         first_glance: slide.visual_presentation.anchor_tracks[0],
         second_glance: slide.visual_presentation.anchor_tracks[1] || slide.visual_presentation.anchor_tracks[0],
       })),
-      final_instruction_to_html_generator: [
-        '每页在 slidesData 中独立 content',
-        '不得退化成统一模板页',
-        '先落实导演稿峰值页，再处理安全页',
-      ],
+      final_instruction_to_html_generator: safeArray(seed?.visual_direction?.final_instruction_to_html_generator).length > 0
+        ? seed.visual_direction.final_instruction_to_html_generator
+        : [
+          '每页在 slidesData 中独立 content',
+          '不得退化成统一模板页',
+          '先落实导演稿峰值页，再处理安全页',
+        ],
       baseline_deliverable_id: safeText(baselineDeliverableId) || null,
       mode,
     },
@@ -721,6 +796,8 @@ function buildReviewMarkdown(contract, reviewArtifact) {
 function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
   const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
   const args = [
@@ -745,7 +822,7 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
     status: python.status,
     checks: {
       ...python.checks,
-      ...Object.fromEntries(extraChecks(contract).map((check) => [check, true])),
+      ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
     },
     slide_reviews: python.slide_reviews,
     report_markdown: python.review_markdown || reviewMarkdown,

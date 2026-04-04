@@ -1,20 +1,28 @@
-# ppt_deck / slide_blueprint
+# ppt_deck slide_blueprint
 
-目标：把详细大纲落成逐页设计。
-
+逐页设计是进入 HTML 前的强制 stage。
 每页必须包含：
-- slide_no
-- page_type
-- title
-- page_goal
+- slide_no / title / page_goal
 - page_core_content
 - visual_presentation
 - evidence_and_sources
 - speaker_notes
 - transition_sentence
+- explicit anchor / grid / track for complex structure pages
 
-硬约束：
-- 没有 detailed_outline 不得继续
-- 复杂结构页必须显式给出网格 / 轨道 / 锚点
-- 公开证据页必须使用面向听众的公开来源口径
-- 不得把所有页写成“标题 + 三条要点”
+## runtime_seed
+```json
+{
+  "quality_guards": {
+    "no_generic_card_route": true,
+    "independent_slides_data_content": true,
+    "require_visual_direction_before_html": true
+  },
+  "profile_checks": {
+    "lecture_student": ["term_explained_on_first_use", "teaching_progression_clear"],
+    "lecture_peer": ["novelty_position_clear", "method_boundary_explicit"],
+    "executive_briefing": ["decision_implication_clear", "conclusion_up_front"],
+    "defense_deck": ["claim_evidence_traceable", "backup_qa_ready"]
+  }
+}
+```
