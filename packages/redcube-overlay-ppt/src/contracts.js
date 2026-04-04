@@ -1,4 +1,4 @@
-import { buildDeliverableRecord } from '../../redcube-overlay-core/src/index.js';
+import { buildDeliverableRecord } from '@redcube/overlay-core';
 import { hydratePptDeckContract } from './profiles.js';
 
 export function buildDeckRecord({

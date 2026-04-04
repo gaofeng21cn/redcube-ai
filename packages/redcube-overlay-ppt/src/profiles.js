@@ -1,4 +1,4 @@
-import { mergeContractLayers } from '../../redcube-overlay-core/src/index.js';
+import { mergeContractLayers } from '@redcube/overlay-core';
 
 const FAMILY_STAGE_SEQUENCE = {
   flow_id: 'ppt_deck_standard_flow',

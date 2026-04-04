@@ -25,12 +25,8 @@ function createIsolatedCliInstall() {
   const cliDir = path.join(installRoot, 'dist');
   const consumerNodeModulesDir = path.join(installRoot, 'node_modules', '@redcube');
   const gatewayPackagePath = path.join(consumerNodeModulesDir, 'gateway');
-  const runtimeProtocolPackagePath = path.join(
-    gatewayPackagePath,
-    'node_modules',
-    '@redcube',
-    'runtime-protocol',
-  );
+  const gatewayNodeModulesDir = path.join(gatewayPackagePath, 'node_modules', '@redcube');
+  const runtimeProtocolPackagePath = path.join(gatewayNodeModulesDir, 'runtime-protocol');
 
   mkdirSync(cliDir, { recursive: true });
   mkdirSync(consumerNodeModulesDir, { recursive: true });
@@ -63,6 +59,22 @@ function createIsolatedCliInstall() {
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-protocol'),
     runtimeProtocolPackagePath,
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-runtime'),
+    path.join(gatewayNodeModulesDir, 'runtime'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-overlay-core'),
+    path.join(gatewayNodeModulesDir, 'overlay-core'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-overlay-ppt'),
+    path.join(gatewayNodeModulesDir, 'overlay-ppt'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-overlay-xiaohongshu'),
+    path.join(gatewayNodeModulesDir, 'overlay-xiaohongshu'),
   );
 
   return {
@@ -194,6 +206,145 @@ test('CLI topics list proxies gateway listTopics', () => {
   assert.equal(parsed.ok, true);
   assert.equal(parsed.total, 1);
   assert.equal(parsed.topics[0].topic_id, 'topic-a');
+});
+
+test('CLI deliverable create proxies gateway createDeliverable', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-'));
+
+  const output = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'ppt_deck',
+      '--profile-id',
+      'lecture_student',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'deck-a',
+      '--title',
+      '甲状腺门诊科普 deck',
+      '--goal',
+      '为本科生讲授甲状腺基础知识',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.deliverable.overlay, 'ppt_deck');
+  assert.equal(parsed.deliverable.profile_id, 'lecture_student');
+  assert.equal(parsed.deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
+});
+
+test('CLI deliverable create works from isolated install without monorepo sibling source packages', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-isolated-'));
+
+  const output = execFileSync(
+    'node',
+    [
+      cliPath,
+      'deliverable',
+      'create',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'xiaohongshu',
+      '--profile-id',
+      'standard_note',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'note-a',
+      '--title',
+      '甲状腺门诊小红书科普',
+      '--goal',
+      '为门诊患者生成可发布的科普图文',
+    ],
+    { encoding: 'utf-8', cwd: installRoot },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.deliverable.overlay, 'xiaohongshu');
+  assert.equal(parsed.deliverable.profile_id, 'standard_note');
+});
+
+test('CLI deliverable run and runs get proxy the contract-driven runtime mainline', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-run-'));
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'ppt_deck',
+      '--profile-id',
+      'lecture_peer',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'deck-a',
+      '--title',
+      '同行讲解 deck',
+      '--goal',
+      '向小同行解释问题、方法、证据与边界',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const runOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'run',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'ppt_deck',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'deck-a',
+      '--route',
+      'detailed_outline',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const runParsed = JSON.parse(runOutput);
+  assert.equal(runParsed.ok, true);
+  assert.equal(runParsed.run.current_stage, 'detailed_outline');
+
+  const getOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'runs',
+      'get',
+      '--workspace-root',
+      workspaceRoot,
+      '--run-id',
+      runParsed.run.run_id,
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const getParsed = JSON.parse(getOutput);
+  assert.equal(getParsed.ok, true);
+  assert.equal(getParsed.run.status, 'completed');
+  assert.equal(getParsed.run.current_stage, 'detailed_outline');
 });
 
 test('CLI topics list works from isolated install without monorepo sibling source packages', () => {

@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
 import {
+  auditDeliverable,
+  createDeliverable,
   doctorWorkspace,
+  getDeliverable,
+  getRun as getGatewayRun,
   listTopics as listTopicsGateway,
+  runDeliverableRoute,
 } from '@redcube/gateway';
 
 function parseArgs(argv) {
@@ -123,6 +128,11 @@ async function main() {
         profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
         workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
         topicsList: 'redcube topics list --workspace-root <dir>',
+        deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
+        deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
+        deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
+        deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+        runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       },
     });
     return;
@@ -147,6 +157,73 @@ async function main() {
 
     const result = await listTopicsGateway({
       workspaceRoot: resolveWorkspaceRoot(options),
+    });
+    printJson(result);
+    return;
+  }
+
+  if (command === 'deliverable') {
+    if (subcommand === 'create') {
+      const result = await createDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        overlay: options.overlay || '',
+        profileId: options.profileId || '',
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        title: options.title || '',
+        goal: options.goal || '',
+      });
+      printJson(result);
+      return;
+    }
+
+    if (subcommand === 'get') {
+      const result = await getDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+      });
+      printJson(result);
+      return;
+    }
+
+    if (subcommand === 'audit') {
+      const result = await auditDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        overlay: options.overlay || '',
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        mode: options.mode || 'draft_new',
+        baselineDeliverableId: options.baselineDeliverableId || '',
+      });
+      printJson(result);
+      return;
+    }
+
+    if (subcommand === 'run') {
+      const result = await runDeliverableRoute({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        overlay: options.overlay || '',
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        route: options.route || '',
+        adapter: options.adapter || undefined,
+      });
+      printJson(result);
+      return;
+    }
+
+    fail('deliverable 命令仅支持 create|get|audit|run');
+  }
+
+  if (command === 'runs') {
+    if (subcommand !== 'get') {
+      fail('runs 命令仅支持 get');
+    }
+
+    const result = await getGatewayRun({
+      workspaceRoot: resolveWorkspaceRoot(options),
+      runId: options.runId || '',
     });
     printJson(result);
     return;
