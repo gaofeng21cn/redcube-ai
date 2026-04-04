@@ -76,9 +76,9 @@
 
 继续阅读：
 
-- [人类用户快速上手](guides/human_quickstart.md)
-- [典型交付示例](guides/deliverable_examples.md)
-- [运行架构说明](guides/runtime_architecture.md)
+- [人类用户快速上手](docs/human_quickstart.md)
+- [典型交付示例](docs/deliverable_examples.md)
+- [运行架构说明](docs/runtime_architecture.md)
 
 ## 平台如何工作
 
@@ -101,9 +101,9 @@
 
 ## 文档约定
 
-- 面向 GitHub 与外部读者的文档，统一放在 [`guides/`](guides/README.md)
-- `docs/` 目录保留给内部 AI / Superpowers 开发文档，不作为公开首页入口
-- 开发过程中的计划、草案与中间设计，不应继续作为公开仓库主文档面
+- 面向 GitHub 与外部读者的文档，统一放在 [`docs/`](docs/README.md)
+- `docs/superpowers/` 目录只保留本地 AI / Superpowers 文档，并在 Git 中忽略
+- 开发过程中的计划、草案与中间设计，不应继续进入公开仓库文档面
 
 <details>
 <summary><strong>给技术同事 / AI 执行者</strong></summary>
@@ -214,21 +214,21 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 
 相关说明见：
 
-- [人类用户快速上手](guides/human_quickstart.md)
-- [典型交付示例](guides/deliverable_examples.md)
-- [运行架构说明](guides/runtime_architecture.md)
-- [私有作者信息与 prompts 配置](guides/private-profile-setup.md)
-- [公开发布到 GitHub](guides/public-github-publish.md)
+- [人类用户快速上手](docs/human_quickstart.md)
+- [典型交付示例](docs/deliverable_examples.md)
+- [运行架构说明](docs/runtime_architecture.md)
+- [私有作者信息与 prompts 配置](docs/private-profile-setup.md)
+- [公开发布到 GitHub](docs/public-github-publish.md)
 
 ## 公开文档入口
 
-- [Guides 索引](guides/README.md)
-- [Policies 索引](policies/README.md)
-- [人类用户快速上手](guides/human_quickstart.md)
-- [典型交付示例](guides/deliverable_examples.md)
-- [运行架构说明](guides/runtime_architecture.md)
-- [运行模型 Policy](policies/runtime_operating_model.md)
-- [交付合同模型 Policy](policies/deliverable_contract_model.md)
+- [Docs 索引](docs/README.md)
+- [人类用户快速上手](docs/human_quickstart.md)
+- [典型交付示例](docs/deliverable_examples.md)
+- [运行架构说明](docs/runtime_architecture.md)
+- [Policies 索引](docs/policies/README.md)
+- [运行模型 Policy](docs/policies/runtime_operating_model.md)
+- [交付合同模型 Policy](docs/policies/deliverable_contract_model.md)
 - [贡献指南](CONTRIBUTING.md)
 - [更新日志](CHANGELOG.md)
 - [安全策略](SECURITY.md)

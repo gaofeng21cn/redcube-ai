@@ -30,11 +30,8 @@ node_modules/
 coverage/
 *.log
 
-# Public docs live in guides/. docs/ is reserved for internal AI / Superpowers materials.
-docs/plans/
-docs/tutorials/
-docs/superpowers/plans/
-docs/superpowers/specs/
+# Public docs live under docs/. Internal AI / Superpowers working docs stay under docs/superpowers/ only.
+docs/superpowers/
 
 # macOS
 .DS_Store

@@ -102,12 +102,12 @@ function buildHelp() {
       profile: ['bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
-      humanQuickstart: 'guides/human_quickstart.md',
-      deliverableExamples: 'guides/deliverable_examples.md',
-      runtimeArchitecture: 'guides/runtime_architecture.md',
-      runtimePolicy: 'policies/runtime_operating_model.md',
-      contractPolicy: 'policies/deliverable_contract_model.md',
-      privateProfileSetup: 'guides/private-profile-setup.md',
+      humanQuickstart: 'docs/human_quickstart.md',
+      deliverableExamples: 'docs/deliverable_examples.md',
+      runtimeArchitecture: 'docs/runtime_architecture.md',
+      runtimePolicy: 'docs/policies/runtime_operating_model.md',
+      contractPolicy: 'docs/policies/deliverable_contract_model.md',
+      privateProfileSetup: 'docs/private-profile-setup.md',
     },
     usage: {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',

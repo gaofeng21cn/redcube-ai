@@ -14,8 +14,9 @@ RedCube AI 当前定位为：
 - 仓库默认值必须可公开
 - 私有目录、作者、人设、品牌、署名不写死在代码与文档中
 - `projects/`、`publish/`、`.redcube_pi/` 都属于运行产物，不应保留在仓库根
-- 面向 GitHub 的公开文档统一放在 `guides/`
-- `docs/` 目录保留给内部 AI / Superpowers 文档与开发痕迹，不再承担公开入口职责
+- 面向 GitHub 的公开文档统一放在 `docs/`
+- 长期稳定规则统一放在 `docs/policies/`
+- `docs/superpowers/` 目录保留给本地 AI / Superpowers 文档与开发痕迹，并在 Git 中忽略
 
 ## 推荐私有配置位置
 

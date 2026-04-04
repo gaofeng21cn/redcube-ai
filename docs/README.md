@@ -1,12 +1,26 @@
-# Internal Docs
+# Docs
 
-`docs/` 目录保留给内部 AI / Superpowers 文档、设计草案、开发计划和过程痕迹。
+这里是 `RedCube AI` 面向 GitHub 与外部读者的公开文档入口。
 
-对外公开、会在 GitHub 首页或 README 中引用的文档，请放到仓库根目录下的 `guides/`。
+## 面向人类用户
 
-当前约定：
+- [人类用户快速上手](human_quickstart.md)
+- [典型交付示例](deliverable_examples.md)
 
-- `guides/`：公开文档
-- `docs/`：内部开发文档
+## 面向技术同事 / AI 执行者
 
-不要再把新的公开教程写到 `docs/tutorials/`，也不要继续把开发计划写成 GitHub 首页入口文档。
+- [运行架构说明](runtime_architecture.md)
+- [私有作者信息与 prompts 配置](private-profile-setup.md)
+- [公开发布到 GitHub](public-github-publish.md)
+
+## 长期稳定规则
+
+- [Policies 索引](policies/README.md)
+- [运行模型 Policy](policies/runtime_operating_model.md)
+- [交付合同模型 Policy](policies/deliverable_contract_model.md)
+
+## 文档边界
+
+- `docs/`：公开文档
+- `docs/policies/`：稳定、长期公开保留的规则文档
+- `docs/superpowers/`：本地 AI / Superpowers 文档、开发计划、设计草案与过程痕迹，不进入 Git 跟踪面
