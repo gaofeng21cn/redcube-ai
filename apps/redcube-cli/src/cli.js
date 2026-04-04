@@ -6,6 +6,7 @@ import {
   doctorWorkspace,
   getDeliverable,
   getRun as getGatewayRun,
+  importLegacyProject,
   listTopics as listTopicsGateway,
   runDeliverableRoute,
 } from '@redcube/gateway';
@@ -128,6 +129,7 @@ async function main() {
         profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
         workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
         topicsList: 'redcube topics list --workspace-root <dir>',
+        importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
         deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
         deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
         deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
@@ -157,6 +159,20 @@ async function main() {
 
     const result = await listTopicsGateway({
       workspaceRoot: resolveWorkspaceRoot(options),
+    });
+    printJson(result);
+    return;
+  }
+
+  if (command === 'import') {
+    if (subcommand !== 'legacy-project') {
+      fail('import 命令仅支持 legacy-project');
+    }
+
+    const result = await importLegacyProject({
+      rootDir: options.rootDir || '',
+      workspaceRoot: resolveWorkspaceRoot(options),
+      project: options.project || '',
     });
     printJson(result);
     return;

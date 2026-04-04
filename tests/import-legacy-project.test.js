@@ -1,0 +1,118 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs';
+
+import { importLegacyProject } from '../packages/redcube-gateway/src/index.js';
+
+function createLegacyProjectFixture() {
+  const rootDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-legacy-root-'));
+  const projectDir = path.join(rootDir, 'projects', 'topic-a');
+  const inputsDir = path.join(projectDir, 'inputs');
+  const rawMaterialsDir = path.join(inputsDir, 'raw_materials');
+  mkdirSync(rawMaterialsDir, { recursive: true });
+  writeFileSync(path.join(inputsDir, 'series_toc.md'), '# 系列目录\n\n## 1. 主题', 'utf-8');
+  writeFileSync(path.join(inputsDir, 'style_guide.md'), '风格规范', 'utf-8');
+  writeFileSync(path.join(inputsDir, 'storyline_logic.md'), '叙事逻辑', 'utf-8');
+  writeFileSync(path.join(rawMaterialsDir, 'source.md'), '# 原始素材', 'utf-8');
+
+  return { rootDir, projectDir, inputsDir, rawMaterialsDir };
+}
+
+test('importLegacyProject copies legacy project inputs into canonical workspace topic', async () => {
+  const { rootDir } = createLegacyProjectFixture();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+
+  const result = await importLegacyProject({
+    rootDir,
+    workspaceRoot,
+    project: 'topic-a',
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.mode, 'legacy_to_workspace');
+  assert.equal(result.project, 'topic-a');
+  assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'inputs', 'raw_materials', 'source.md')),
+    true,
+  );
+  assert.equal(
+    JSON.parse(readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'topic.json'), 'utf-8')).topic_id,
+    'topic-a',
+  );
+  assert.equal(
+    JSON.parse(readFileSync(path.join(workspaceRoot, 'redcube.workspace.json'), 'utf-8')).workspace_version,
+    1,
+  );
+});
+
+test('importLegacyProject is one-way and does not mutate legacy project tree', async () => {
+  const { rootDir, inputsDir } = createLegacyProjectFixture();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+  const beforeEntries = readdirSync(inputsDir).sort();
+
+  await importLegacyProject({
+    rootDir,
+    workspaceRoot,
+    project: 'topic-a',
+  });
+
+  assert.deepEqual(readdirSync(inputsDir).sort(), beforeEntries);
+  assert.equal(
+    readFileSync(path.join(inputsDir, 'raw_materials', 'source.md'), 'utf-8'),
+    '# 原始素材',
+  );
+  assert.equal(
+    existsSync(path.join(rootDir, 'projects', 'topic-a', 'deliverables')),
+    false,
+  );
+});
+
+test('importLegacyProject rejects missing legacy project inputs', async () => {
+  const rootDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-legacy-root-'));
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+
+  await assert.rejects(
+    () => importLegacyProject({
+      rootDir,
+      workspaceRoot,
+      project: 'missing-topic',
+    }),
+    /legacy project 不存在/,
+  );
+});
+
+test('CLI import legacy-project proxies gateway importer', () => {
+  const { rootDir } = createLegacyProjectFixture();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+
+  const output = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'import',
+      'legacy-project',
+      '--root-dir',
+      rootDir,
+      '--workspace-root',
+      workspaceRoot,
+      '--project',
+      'topic-a',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.mode, 'legacy_to_workspace');
+  assert.equal(parsed.project, 'topic-a');
+});
