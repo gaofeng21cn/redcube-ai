@@ -68,7 +68,7 @@ test('createDeliverable supports xiaohongshu on the shared runtime mainline', as
   assert.equal(created.deliverable.overlay, 'xiaohongshu');
   assert.equal(created.deliverable.kind, 'xiaohongshu_note');
   assert.equal(created.deliverable.profile_id, 'standard_note');
-  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'note']);
+  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle']);
 });
 
 test('createDeliverable rejects unknown overlay ids', async () => {
@@ -310,7 +310,7 @@ test('runDeliverableRoute supports xiaohongshu routes on shared runtime', async 
 
   assert.equal(result.ok, true);
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
-  assert.equal(artifact.contract.overlay, 'xiaohongshu');
-  assert.equal(artifact.stage_contract.stage_id, 'research');
+  assert.equal(artifact.overlay, 'xiaohongshu');
   assert.equal(artifact.route, 'research');
+  assert.equal(typeof artifact.research.topic_summary, 'string');
 });

@@ -14,7 +14,7 @@ test('buildTopicRecord emits canonical xiaohongshu topic metadata', () => {
   assert.equal(topic.topic_id, 'topic-a');
   assert.equal(topic.overlay, 'xiaohongshu');
   assert.equal(topic.status, 'draft');
-  assert.deepEqual(topic.routes, ['research', 'storyline', 'note']);
+  assert.deepEqual(topic.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle']);
 });
 
 test('evaluateStorylineGate blocks empty storyline content', () => {
@@ -47,7 +47,7 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
   assert.equal(contract.deliverable_kind, 'xiaohongshu_note');
   assert.deepEqual(
     contract.stage_sequence.stages.map((stage) => stage.stage_id),
-    ['research', 'storyline', 'note'],
+    ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
   );
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
 });
@@ -74,5 +74,5 @@ test('buildXiaohongshuDeliverableRecord emits canonical xiaohongshu deliverable 
   assert.equal(deliverable.deliverable_kind, 'xiaohongshu_note');
   assert.equal(deliverable.profile_id, 'standard_note');
   assert.equal(deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
-  assert.deepEqual(deliverable.routes, ['research', 'storyline', 'note']);
+  assert.deepEqual(deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle']);
 });

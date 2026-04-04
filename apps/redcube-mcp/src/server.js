@@ -6,9 +6,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   auditDeliverable,
+  applyReviewMutation,
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getReviewState,
   getRun,
   listTopics,
   reviewRenderOutput,
@@ -27,6 +29,8 @@ const DEFAULT_GATEWAY_ACTIONS = {
   runDeliverableRoute,
   getRun,
   runtimeWatch,
+  getReviewState,
+  applyReviewMutation,
 };
 
 const TOOL_DEFINITIONS = [
@@ -115,6 +119,28 @@ const TOOL_DEFINITIONS = [
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       runId: z.string().describe('Run identifier.'),
+    },
+  },
+
+  {
+    name: 'get_review_state',
+    description: 'Read the platform-level review state for one deliverable.',
+    actionKey: 'getReviewState',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      deliverableId: z.string().describe('Deliverable identifier.'),
+    },
+  },
+  {
+    name: 'apply_review_mutation',
+    description: 'Apply a platform-level review mutation such as request_changes or bind_baseline.',
+    actionKey: 'applyReviewMutation',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      deliverableId: z.string().describe('Deliverable identifier.'),
+      mutation: z.object({}).passthrough().describe('Structured review mutation payload.'),
     },
   },
   {

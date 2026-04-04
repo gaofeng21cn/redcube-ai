@@ -1,4 +1,5 @@
 import { canRunPptDeck, runPptDeckRoute } from './ppt-deck-runtime.js';
+import { canRunXiaohongshu, runXiaohongshuRoute } from './xiaohongshu-runtime.js';
 
 export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
   if (adapter !== 'host_agent' && adapter !== 'external_llm') {
@@ -31,6 +32,18 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
 
       if (adapter === 'host_agent' && canRunPptDeck(contract)) {
         return runPptDeckRoute({
+          workspaceRoot,
+          route,
+          topicId,
+          deliverableId,
+          contract,
+          mode,
+          baselineDeliverableId,
+        });
+      }
+
+      if (adapter === 'host_agent' && canRunXiaohongshu(contract)) {
+        return runXiaohongshuRoute({
           workspaceRoot,
           route,
           topicId,

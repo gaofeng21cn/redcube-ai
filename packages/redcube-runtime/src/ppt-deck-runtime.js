@@ -816,18 +816,28 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
     args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
   }
   const python = runPython(PYTHON_REVIEW, args);
+  const latestChecks = {
+    ...python.checks,
+    ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
+  };
   const artifact = {
     ...attachCommon('screenshot_review', contract),
     mode,
     status: python.status,
-    checks: {
-      ...python.checks,
-      ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
-    },
+    checks: latestChecks,
     slide_reviews: python.slide_reviews,
     report_markdown: python.review_markdown || reviewMarkdown,
     metrics: python.metrics,
     artifact_refs: [python.review_markdown || reviewMarkdown, ...python.slide_reviews.map((slide) => slide.screenshot_file)],
+    review_state_patch: {
+      current_status: python.status === 'pass' ? 'export_ready' : 'blocked_for_revision',
+      ready_for_export: python.status === 'pass',
+      latest_review_stage: 'screenshot_review',
+      latest_checks: latestChecks,
+      pending_reviews: python.status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
+      blocking_reasons: python.status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
+      rerun_from_stage: python.status === 'pass' ? null : 'render_html',
+    },
   };
   if (mode === 'optimize_existing' && python.baseline) {
     artifact.baseline_review = {
@@ -859,6 +869,14 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
   return {
     ...attachCommon('export_pptx', contract),
     status: 'completed',
+    review_state_patch: {
+      current_status: 'completed',
+      ready_for_export: true,
+      latest_review_stage: 'export_pptx',
+      pending_reviews: [],
+      blocking_reasons: [],
+      rerun_from_stage: null,
+    },
     export_bundle: {
       source_html: renderArtifact.html_bundle.html_file,
       pptx_file: pptxPath,

@@ -2,9 +2,11 @@
 
 import {
   auditDeliverable,
+  applyReviewMutation,
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getReviewState,
   getRun as getGatewayRun,
   importLegacyProject,
   listTopics as listTopicsGateway,
@@ -99,6 +101,7 @@ function buildHelp() {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
+      review: ['get', 'mutate'],
       profile: ['bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
@@ -118,6 +121,8 @@ function buildHelp() {
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
+      reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
+      reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>]',
       profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };
@@ -233,6 +238,41 @@ async function main() {
     }
 
     fail('deliverable 命令仅支持 create|get|audit|run');
+  }
+
+
+  if (command === 'review') {
+    if (subcommand === 'get') {
+      const result = await getReviewState({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+      });
+      printJson(result);
+      return;
+    }
+
+    if (subcommand === 'mutate') {
+      const issues = String(options.issues || '').trim();
+      const result = await applyReviewMutation({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        mutation: {
+          type: options.type || '',
+          actor: options.actor || 'agent',
+          review_stage: options.reviewStage || '',
+          rerun_from_stage: options.rerunFromStage || '',
+          issues: issues ? issues.split(',').map((item) => item.trim()).filter(Boolean) : [],
+          baseline_deliverable_id: options.baselineDeliverableId || '',
+          notes: options.notes || '',
+        },
+      });
+      printJson(result);
+      return;
+    }
+
+    fail('review 命令仅支持 get|mutate');
   }
 
   if (command === 'runs') {

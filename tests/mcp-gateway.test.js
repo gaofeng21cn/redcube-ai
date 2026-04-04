@@ -28,6 +28,8 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'review_render_output',
       'run_deliverable_route',
       'get_run',
+      'get_review_state',
+      'apply_review_mutation',
       'runtime_watch',
     ],
   );
@@ -61,6 +63,34 @@ test('callGatewayTool delegates to injected gateway action', async () => {
   assert.equal(result.deliverable.overlay, 'ppt_deck');
   assert.equal(result.deliverable.profile_id, 'lecture_student');
   assert.equal(result.deliverable.deliverable_id, 'deck-a');
+});
+
+
+
+test('callGatewayTool delegates review mutation gateway action', async () => {
+  const result = await callGatewayTool(
+    'apply_review_mutation',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      mutation: { type: 'request_changes' },
+    },
+    {
+      applyReviewMutation: async (request) => ({
+        ok: true,
+        state: {
+          topic_id: request.topicId,
+          deliverable_id: request.deliverableId,
+          current_status: 'blocked_for_revision',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.state.current_status, 'blocked_for_revision');
+  assert.equal(result.state.deliverable_id, 'deck-a');
 });
 
 test('callGatewayTool rejects unknown tool names', async () => {

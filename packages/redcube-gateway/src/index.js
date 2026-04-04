@@ -37,3 +37,13 @@ export async function runtimeWatch(request) {
   const module = await import('./actions/runtime-watch.js');
   return module.runtimeWatch(request);
 }
+
+export async function getReviewState(request) {
+  const module = await import('./actions/get-review-state.js');
+  return module.getReviewState(request);
+}
+
+export async function applyReviewMutation(request) {
+  const module = await import('./actions/apply-review-mutation.js');
+  return module.applyReviewMutation(request);
+}

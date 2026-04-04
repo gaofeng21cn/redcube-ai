@@ -375,6 +375,65 @@ test('CLI deliverable run and runs get proxy the contract-driven runtime mainlin
   assert.equal(getParsed.run.current_stage, 'detailed_outline');
 });
 
+
+
+test('CLI review get and mutate proxy review platform actions', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-'));
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root', workspaceRoot,
+      '--overlay', 'ppt_deck',
+      '--profile-id', 'lecture_student',
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+      '--title', '肠癌 AI 讲课 deck',
+      '--goal', '给学生讲清肠癌 AI 的问题、方法与边界',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const getOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'review',
+      'get',
+      '--workspace-root', workspaceRoot,
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  const getParsed = JSON.parse(getOutput);
+  assert.equal(getParsed.ok, true);
+  assert.equal(getParsed.state.deliverable_id, 'deck-a');
+
+  const mutateOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'review',
+      'mutate',
+      '--workspace-root', workspaceRoot,
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+      '--type', 'bind_baseline',
+      '--baseline-deliverable-id', 'deck-v1',
+      '--actor', 'agent',
+      '--notes', 'bind baseline',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  const mutateParsed = JSON.parse(mutateOutput);
+  assert.equal(mutateParsed.ok, true);
+  assert.equal(mutateParsed.state.baseline.baseline_deliverable_id, 'deck-v1');
+});
+
 test('CLI topics list works from isolated install without monorepo sibling source packages', () => {
   const { cliPath, installRoot } = createIsolatedCliInstall();
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-isolated-topics-'));

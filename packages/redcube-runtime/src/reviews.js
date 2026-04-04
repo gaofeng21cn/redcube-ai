@@ -2,6 +2,7 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import { getReviewState as loadReviewState } from './review-state.js';
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   if (!workspaceRoot || !topicId || !deliverableId) {
@@ -16,6 +17,16 @@ function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   return JSON.parse(
     readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'),
   );
+}
+
+
+function loadPlatformReviewState(request) {
+  if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) return null;
+  try {
+    return loadReviewState(request).state;
+  } catch {
+    return null;
+  }
 }
 
 function loadReviewArtifact(request, contract) {
@@ -72,10 +83,11 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
 export function reviewRenderedDeliverable(request) {
   const contract = loadHydratedContract(request);
   const reviewArtifact = loadReviewArtifact(request, contract);
+  const reviewState = loadPlatformReviewState(request);
   const suppliedChecks = request?.checks && typeof request.checks === 'object'
     ? request.checks
     : null;
-  const checks = suppliedChecks || reviewArtifact?.checks || {};
+  const checks = suppliedChecks || reviewState?.latest_checks || reviewArtifact?.checks || {};
   const reviewSurface = contract?.review_surface || null;
   const baseChecks = Array.isArray(reviewSurface?.required_checks)
     ? reviewSurface.required_checks
@@ -84,6 +96,14 @@ export function reviewRenderedDeliverable(request) {
     ? reviewSurface.conditional_checks[request.mode]
     : [];
   const requiredChecks = [...baseChecks, ...conditionalChecks];
+  if (!suppliedChecks && reviewState?.pending_reviews?.length > 0) {
+    return {
+      status: 'block',
+      issues: reviewState.pending_reviews,
+      rerun_from_stage: reviewState.rerun_from_stage || null,
+      recommended_action: 'revise_render_output',
+    };
+  }
   const rerunFromStage = reviewSurface?.rerun_from_stage || {
     visual_density_ok: 'visual_direction',
   };
@@ -119,7 +139,7 @@ export function reviewRenderedDeliverable(request) {
   }
 
   return {
-    status: reviewArtifact?.status || 'pass',
+    status: (reviewState?.current_status === 'publish_ready' || reviewState?.current_status === 'export_ready') ? 'pass' : (reviewArtifact?.status || 'pass'),
     issues: [],
     rerun_from_stage: null,
     recommended_action: 'continue',
@@ -132,13 +152,15 @@ export function watchRuntimeReviewLoop(request) {
     ? run.pending_reviews.map((item) => String(item).trim()).filter(Boolean)
     : [];
   const contract = loadHydratedContract(request);
+  const reviewState = loadPlatformReviewState(request);
 
   return {
     ok: true,
     run_id: String(run?.run_id || '').trim(),
     current_stage: String(run?.current_stage || '').trim() || null,
-    status: pendingReviews.length > 0 ? 'review_pending' : String(run?.status || 'idle'),
-    pending_reviews: pendingReviews,
+    status: reviewState?.pending_reviews?.length > 0 ? 'review_pending' : (pendingReviews.length > 0 ? 'review_pending' : String(run?.status || reviewState?.current_status || 'idle')),
+    pending_reviews: reviewState?.pending_reviews || pendingReviews,
+    review_state: reviewState,
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
     required_export_bundle: contract?.export_bundle || null,

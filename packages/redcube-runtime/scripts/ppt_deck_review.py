@@ -161,6 +161,9 @@ def build_markdown(result: Dict[str, Any]) -> str:
 
 
 async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
+    global FRAME_WIDTH, FRAME_HEIGHT
+    FRAME_WIDTH = float(args.frame_width)
+    FRAME_HEIGHT = float(args.frame_height)
     html_file = Path(args.html).resolve()
     if not html_file.exists():
         fail(f'HTML file not found: {html_file}')
@@ -238,6 +241,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--review-markdown')
     parser.add_argument('--baseline-review')
     parser.add_argument('--max-primary-points', type=int, default=5)
+    parser.add_argument('--frame-width', type=float, default=1152)
+    parser.add_argument('--frame-height', type=float, default=648)
     return parser.parse_args()
 
 

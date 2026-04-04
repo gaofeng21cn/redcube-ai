@@ -5,6 +5,7 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { appendEvent, readEvents } from './event-log.js';
 import { resolveExecutorAdapter } from './executors.js';
+import { persistReviewStatePatch } from './review-state.js';
 import { completeRun, failRun, startRun } from './run-store.js';
 
 function requireSafeSegment(name, value) {
@@ -93,6 +94,18 @@ export async function runDeliverableRoute({
       String(stageContract.output_artifact || `${safeRoute}.json`).trim(),
     );
     writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
+
+    if (artifact?.review_state_patch) {
+      persistReviewStatePatch({
+        workspaceRoot,
+        topicId,
+        deliverableId,
+        patch: {
+          latest_review_artifact: artifactFile,
+          ...artifact.review_state_patch,
+        },
+      });
+    }
 
     if (artifact?.status === 'block' || artifact?.status === 'failed') {
       throw new Error(
