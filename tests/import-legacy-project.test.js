@@ -19,13 +19,16 @@ function createLegacyProjectFixture() {
   const projectDir = path.join(rootDir, 'projects', 'topic-a');
   const inputsDir = path.join(projectDir, 'inputs');
   const rawMaterialsDir = path.join(inputsDir, 'raw_materials');
+  const outputsDir = path.join(projectDir, 'outputs_pi', '01_胰岛素基础');
   mkdirSync(rawMaterialsDir, { recursive: true });
+  mkdirSync(outputsDir, { recursive: true });
   writeFileSync(path.join(inputsDir, 'series_toc.md'), '# 系列目录\n\n## 1. 主题', 'utf-8');
   writeFileSync(path.join(inputsDir, 'style_guide.md'), '风格规范', 'utf-8');
   writeFileSync(path.join(inputsDir, 'storyline_logic.md'), '叙事逻辑', 'utf-8');
   writeFileSync(path.join(rawMaterialsDir, 'source.md'), '# 原始素材', 'utf-8');
+  writeFileSync(path.join(outputsDir, 'content_plan.md'), '# 单篇策划', 'utf-8');
 
-  return { rootDir, projectDir, inputsDir, rawMaterialsDir };
+  return { rootDir, projectDir, inputsDir, rawMaterialsDir, outputsDir };
 }
 
 test('importLegacyProject copies legacy project inputs into canonical workspace topic', async () => {
@@ -46,8 +49,28 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
     true,
   );
   assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'brief.json')),
+    true,
+  );
+  assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'storyline.json')),
+    true,
+  );
+  assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'legacy-project.json')),
+    true,
+  );
+  assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'legacy-import-report.json')),
+    true,
+  );
+  assert.equal(
     JSON.parse(readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'topic.json'), 'utf-8')).topic_id,
     'topic-a',
+  );
+  assert.equal(
+    JSON.parse(readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'legacy-import-report.json'), 'utf-8')).status,
+    'pass',
   );
   assert.equal(
     JSON.parse(readFileSync(path.join(workspaceRoot, 'redcube.workspace.json'), 'utf-8')).workspace_version,
@@ -75,6 +98,11 @@ test('importLegacyProject is one-way and does not mutate legacy project tree', a
     existsSync(path.join(rootDir, 'projects', 'topic-a', 'deliverables')),
     false,
   );
+  const legacyProject = JSON.parse(
+    readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'legacy-project.json'), 'utf-8'),
+  );
+  assert.deepEqual(legacyProject.output_folders, ['01_胰岛素基础']);
+  assert.equal(legacyProject.raw_materials[0].relative_path, 'source.md');
 });
 
 test('importLegacyProject rejects missing legacy project inputs', async () => {
@@ -88,6 +116,22 @@ test('importLegacyProject rejects missing legacy project inputs', async () => {
       project: 'missing-topic',
     }),
     /legacy project 不存在/,
+  );
+});
+
+test('importLegacyProject rejects importing into an existing canonical topic', async () => {
+  const { rootDir } = createLegacyProjectFixture();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+  mkdirSync(path.join(workspaceRoot, 'topics', 'topic-a'), { recursive: true });
+  writeFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'topic.json'), '{}', 'utf-8');
+
+  await assert.rejects(
+    () => importLegacyProject({
+      rootDir,
+      workspaceRoot,
+      project: 'topic-a',
+    }),
+    /目标 topic 已存在: topic-a/,
   );
 });
 

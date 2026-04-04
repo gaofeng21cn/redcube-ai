@@ -111,4 +111,4 @@ node apps/redcube-cli/src/cli.js profile \
 2. 在新机器克隆公开仓库并 `npm install`
 3. 在新机器执行 `profile install`
 4. 检查 `~/.config/redcube/runtime.json` 中的工作区路径是否需要按新机器调整
-5. 启动 CLI 或 Web UI 验证 prompts 与 identity 是否已生效
+5. 启动 CLI 或 MCP 验证 prompts 与 identity 是否已生效

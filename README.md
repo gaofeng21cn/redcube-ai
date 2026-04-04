@@ -246,19 +246,6 @@ Overlay 必须定义：
 1. `MCP`
 2. `CLI`
 
-`apps/redcube-web` 与旧 Workbench shell 现在只应被视为待删除遗留层：
-
-- 不再作为任何新实现的兼容约束
-- 不再要求为了保留 GUI 路径而牺牲 runtime / gateway 重构质量
-- 如果重构主线需要，可以直接删除，而不是继续做兼容性续命
-
-如果你只是为了处理历史遗留的本地 GUI 启动器，仓库里仍保留：
-
-- `scripts/build-macos-app.sh`
-- 构建产物占位：`RedCube AI.app`
-
-它们只服务遗留打包链路，不代表 Web/Workbench 重新回到主线。
-
 ## 快速开始
 
 ```bash
@@ -311,14 +298,14 @@ npm run mcp
 ```text
 apps/
   redcube-cli/   # CLI gateway client
-  redcube-web/   # legacy Web / Workbench entry, not future-facing
+  redcube-mcp/   # MCP gateway server
 packages/
   redcube-gateway/             # Agent-first gateway actions
   redcube-runtime-protocol/    # workspace contract + run schema
+  redcube-runtime/             # run store / event log / executors
+  redcube-overlay-ppt/         # ppt_deck family contracts
   redcube-overlay-xiaohongshu/ # xiaohongshu overlay foundation
-  redcube-agent/               # legacy orchestration surface pending retirement
-  redcube-llm/                 # external LLM compatibility layer
-  redcube-tools/               # file/publish/evaluation tools
+  redcube-overlay-core/        # shared overlay registry / hydration primitives
 tests/                         # Node built-in test suite
 ```
 
@@ -345,15 +332,12 @@ tests/                         # Node built-in test suite
 - 外部 LLM 兼容 executor
 - 旧版 `自动小红书` prompts 目录
 - 私有作者 `profile` bundle
-- Workbench / topic workflow / `outputs_pi` 说明
 
 它们保留是为了迁移，不代表项目重新回到：
 
 - GUI-first
 - xiaohongshu-first
 - 内置外部 LLM 为主路径
-
-其中 `apps/redcube-web` 与旧 Workbench UI 不再被视为必须兼容的历史表面；后续主线可以直接以删除这些遗留界面为目标推进。
 
 默认离线规则生成（无外部依赖）。
 如需调用 OpenAI 兼容接口：
@@ -403,7 +387,7 @@ prompts/node/
 - 仓库内这套目录提供公开安全的默认 prompts
 - 如果你有私有正式版 prompts，可通过私有配置或 `REDCUBE_PROMPTS_DIR` 指向外部目录
 - `note_draft.* / storyline_templates/*.md` 仍保留作兼容入口，但不再是默认正式版来源
-- CLI、Web API、Workbench 主线统一只读取这一套 Node 提示词体系，不再切回 Python 或第二套 workflow 提示词
+- 正式 CLI/MCP 主线统一只读取这一套 Node 提示词体系，不再切回 Python 或第二套 workflow 提示词
 
 可通过环境变量切换到你自己的提示词目录：
 
@@ -474,47 +458,6 @@ node apps/redcube-cli/src/cli.js profile \
 
 如目标目录已存在私有层，可追加 `--force` 覆盖。
 
-## Workbench 闭环
-
-### 主题 workflow
-
-当前主题级主线为：
-
-```text
-sync_inputs -> research -> storyline -> workflow -> truth_sync
-```
-
-- `research` 会在以下情况下自动触发：
-  - `00_启动任务.md` 中 `允许联网搜集资料：是`
-  - 本地材料为空或明显不足
-  - brief 明确要求“联网研究 / 自行搜索 / 查最新 / 补充资料”
-- 默认研究链：
-  - 搜索：Bing RSS
-  - 正文抽取：`r.jina.ai`
-  - 产物落盘：`research_brief.md / research_report.md / sources.json / clips/*.md`
-
-### 修改后自动局部重跑
-
-- 修改 `单篇策划 / 信息图大纲 / 视觉导演稿`
-  - 真相源统一映射到 `projects/<topic>/outputs_pi/<task>/content_plan.md`
-  - 改完后回建 `note.json`，再重跑当前笔记后续链路
-- 修改 `HTML / 当前页 / 截图`
-  - 真相源统一映射到 `projects/<topic>/outputs_pi/<task>/visual.html`
-  - 改完后只重跑当前笔记的 HTML 后续链路
-
-## 正式阶段文档
-
-Node 主线现在会在 `projects/<项目>/outputs_pi/<任务>/` 下真实落盘阶段文档，而不是只靠 workbench 镜像回填：
-
-- `01_单篇策划.md`
-- `02_信息图大纲.md`
-- `02A_视觉导演稿.md`
-- `03_HTML生成说明.md`
-- `04_发布文案.md`
-- `05_视觉质控复核.md`
-
-Workbench truth sync 会优先同步这些真实阶段文档；缺失时才回退到旧派生逻辑。
-
 ## 测试
 
 ```bash
@@ -523,10 +466,10 @@ node --test tests/*.test.js
 
 当前测试覆盖：
 - TOC 解析与任务过滤
-- 全流程运行冒烟
-- 发布器输出
-- CLI 冒烟
-- Web API 无端口单测
+- gateway / runtime / overlay contracts
+- deliverable CLI / MCP 主线
+- importer / cutover gate
+- legacy node workflow core（仅作为迁移剩余能力）
 
 ## 仓库边界
 

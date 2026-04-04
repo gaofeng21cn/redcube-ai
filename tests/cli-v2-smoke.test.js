@@ -136,7 +136,7 @@ test('CLI workspace doctor works from isolated install without monorepo sibling 
   assert.equal(parsed.workspaceFileExists, true);
 });
 
-test('CLI isolated install returns CLI JSON for unknown commands before touching legacy runtime', () => {
+test('CLI isolated install returns CLI JSON for unknown commands', () => {
   const { cliPath, installRoot } = createIsolatedCliInstall();
 
   const parsed = execCliExpectFailure(
@@ -149,20 +149,6 @@ test('CLI isolated install returns CLI JSON for unknown commands before touching
     ok: false,
     error: '未知命令: foo',
   });
-});
-
-test('CLI isolated install wraps legacy runtime import failures as CLI JSON errors', () => {
-  const { cliPath, installRoot } = createIsolatedCliInstall();
-
-  const parsed = execCliExpectFailure(
-    cliPath,
-    ['list'],
-    { cwd: installRoot },
-  );
-
-  assert.equal(parsed.ok, false);
-  assert.match(parsed.error, /legacy runtime/i);
-  assert.doesNotMatch(parsed.error, /Cannot find module/);
 });
 
 test('CLI isolated install fixture keeps package realpaths inside temp install and consumer only depends on gateway', () => {

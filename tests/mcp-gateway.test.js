@@ -233,3 +233,68 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
     await transport.close();
   }
 });
+
+test('stdio MCP server can create and run xiaohongshu deliverable routes on shared runtime', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-xhs-'));
+  const serverPath = fileURLToPath(
+    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+  );
+  const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: repoRoot,
+    stderr: 'pipe',
+  });
+  const client = new Client({
+    name: 'redcube-mcp-test-client',
+    version: '0.1.0',
+  });
+
+  await client.connect(transport);
+
+  try {
+    const created = await client.callTool({
+      name: 'create_deliverable',
+      arguments: {
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        profileId: 'standard_note',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        title: '甲状腺门诊小红书科普',
+        goal: '为门诊患者生成可发布的科普图文',
+      },
+    });
+
+    assert.equal(created.structuredContent.deliverable.overlay, 'xiaohongshu');
+    assert.equal(created.structuredContent.deliverable.profile_id, 'standard_note');
+
+    const runResult = await client.callTool({
+      name: 'run_deliverable_route',
+      arguments: {
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        route: 'research',
+      },
+    });
+
+    assert.equal(runResult.structuredContent.ok, true);
+    assert.equal(runResult.structuredContent.run.current_stage, 'research');
+
+    const runState = await client.callTool({
+      name: 'get_run',
+      arguments: {
+        workspaceRoot,
+        runId: runResult.structuredContent.run.run_id,
+      },
+    });
+
+    assert.equal(runState.structuredContent.run.status, 'completed');
+    assert.equal(runState.structuredContent.run.current_stage, 'research');
+  } finally {
+    await transport.close();
+  }
+});

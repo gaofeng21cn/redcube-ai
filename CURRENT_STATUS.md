@@ -5,7 +5,7 @@
 RedCube AI 当前定位为：
 
 - 一个可公开托管的功能仓
-- 只保留 Node 主线 workflow / workbench
+- 只保留 agent-first gateway / runtime / overlay 主线
 - 通过运行时配置挂接外部 workspace、私有 prompts、私有人设与品牌配置
 - 仓库本体只保留 Node 主线所需代码，不再保留旧 Python 运行时与本地业务状态
 

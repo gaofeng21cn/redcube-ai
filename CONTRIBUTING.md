@@ -26,7 +26,7 @@ node --test tests/*.test.js
 
 ```bash
 node apps/redcube-cli/src/cli.js help
-node apps/redcube-web/src/server.js
+node apps/redcube-mcp/src/server.js
 ```
 
 ## 提交要求
@@ -52,4 +52,4 @@ node apps/redcube-web/src/server.js
 
 - 在描述里写清楚问题、方案和验证方式
 - 如涉及界面或流程变化，附上关键截图、流程图或操作说明
-- 如涉及 prompts、workflow 或 workbench 行为变化，说明影响阶段和回归范围
+- 如涉及 prompts、workflow 或 deliverable contract 行为变化，说明影响阶段和回归范围
