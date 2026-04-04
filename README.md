@@ -28,10 +28,11 @@ RedCube 不再定义为“小红书自动生成器”，而是定义为：
 
 当前最重要的判断是：
 
-- `小红书图文笔记` 是一个 overlay
-- `PPT deck` 也是一个 overlay
+- `小红书图文笔记` 与 `PPT deck` 是两类视觉交付物 family
 - 二者共享同一套 runtime、artifact store、event log 与 gateway surface
-- 二者的差异只应出现在 `overlay contract + gate policy + export bundle`
+- family 只定义共同执行面，不足以表达具体任务类型
+- 具体任务差异应通过 `profile pack + deliverable contract` 显式表达
+- 差异不应继续藏在 prompt 拼接、人工默契或导出前补救里
 
 如果是 `PPT deck`，你之前的讲者工作台逻辑不会被丢掉，而是会被拆进：
 
@@ -39,6 +40,23 @@ RedCube 不再定义为“小红书自动生成器”，而是定义为：
 - overlay stage contracts
 - review loop contracts
 - final delivery sync
+
+## 与 OPL / Presentation Ops 的关系
+
+`OPL` 是顶层蓝图，不是运行时系统；`Presentation Ops` 是 `OPL` 下的一个任务面，不是单一仓库名。
+
+`RedCube AI` 在这里的正确位置是：
+
+- `RedCube AI` = 视觉交付物的 agent-first runtime
+- `Presentation Ops` = `OPL` 里的正式任务面
+- `ppt_deck` = 当前最直接承接 `Presentation Ops` 的 overlay family
+- `xiaohongshu` = 继续保留在 `RedCube`，但在 `OPL` 顶层语义中不应直接等同于 `Presentation Ops`
+
+所以：
+
+- `RedCube AI` 不是整个 `OPL`
+- `RedCube AI` 也不等于整个 `Presentation Ops`
+- 它更准确地说，是 `Presentation Ops` 当前最重要的实现面之一
 
 ## 三层结构
 
@@ -67,13 +85,20 @@ Agent
 
 `Overlay` 负责定义交付物应当长成什么样，以及什么是合格、什么是不合格。
 
-当前正式方向：
+正式控制模型不是单层 overlay，而是：
 
-- `xiaohongshu`
-- `ppt_deck`
+1. `overlay family`
+   - 例如 `xiaohongshu`、`ppt_deck`
+2. `profile pack`
+   - 例如 `lecture_student`、`lecture_peer`、`executive_briefing`、`defense_deck`
+3. `deliverable contract`
+   - family 基础合同 + profile 覆盖层 + 单次任务参数解析后的最终执行协议
+
+这里的 `profile pack` 专指 overlay 级正式质量协议，不等于后文“私有人设与跨机迁移”里的作者 `profile` bundle。
 
 Overlay 必须定义：
 
+- profile pack contract
 - deliverable contract
 - stage contract
 - gate report contract
@@ -81,9 +106,10 @@ Overlay 必须定义：
 - visual/layout constraints
 - export contract
 
-例如对 `ppt_deck`，overlay 需要明确：
+例如对 `ppt_deck`，不能只说“这是一个 PPT”。它还需要明确：
 
 - `故事主线 -> 详细大纲 -> 逐页设计 -> 视觉导演稿 -> render -> review -> export` 的强制顺序
+- `lecture_student` 与 `executive_briefing` 的 gate 不会相同
 - 哪些 slide family 必须声明 `grid / track / anchor`
 - 哪些证据页必须绑定公开来源 surface
 - 哪些优化任务必须绑定 baseline deck
@@ -156,6 +182,29 @@ Overlay 必须定义：
 - PPT 关注 16:9 比例、分节节奏、演讲逻辑和演示导出 bundle
 
 所以 `PPT` 应该直接进入当前仓库，作为并列 overlay，而不是另起一个项目。
+
+## 为什么只有 overlay family 还不够
+
+即便都属于 `ppt_deck`，下面这些对象的正式标准也完全不同：
+
+- 给学生讲课的 `lecture_student`
+- 给小同行讲课的 `lecture_peer`
+- 给领导汇报的 `executive_briefing`
+- 用于正式答辩的 `defense_deck`
+
+它们共享 runtime，但不共享：
+
+- 目标受众
+- 信息密度上限
+- 证据展示方式
+- review rubric
+- 导出 bundle 结构
+
+因此当前正式模型应当是：
+
+- `overlay family` 负责共同执行面
+- `profile pack` 负责场景化 gate、review、layout 与 export 规则
+- `deliverable contract` 负责把这两层解析成可执行、可审计的单次交付协议
 
 ## 当前仓库状态
 
@@ -246,6 +295,7 @@ npm run mcp
 ## 当前文档入口
 
 - [视觉交付物 runtime 设计增量](docs/superpowers/specs/2026-04-04-redcube-visual-deliverable-runtime-design.md)
+- [Presentation Ops profile 设计冻结稿](docs/superpowers/specs/2026-04-04-redcube-presentation-ops-profile-design.md)
 - [多 overlay 对齐实施计划](docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
 - [Agent-first Runtime Program Plan](docs/superpowers/plans/2026-04-03-redcube-agent-first-runtime-plan-index.md)
 - [更新日志](CHANGELOG.md)
@@ -284,6 +334,21 @@ tests/                         # Node built-in test suite
 应该把它理解成：
 
 > 一个让 Agent 稳定生产视觉交付物的运行层，小红书和 PPT 只是其中两个 overlay。
+
+## 兼容与迁移说明
+
+下面这些内容主要服务于过渡期兼容与旧链路迁移：
+
+- 外部 LLM 兼容 executor
+- 旧版 `自动小红书` prompts 目录
+- 私有作者 `profile` bundle
+- Workbench / topic workflow / `outputs_pi` 说明
+
+它们保留是为了迁移，不代表项目重新回到：
+
+- GUI-first
+- xiaohongshu-first
+- 内置外部 LLM 为主路径
 
 默认离线规则生成（无外部依赖）。
 如需调用 OpenAI 兼容接口：
@@ -360,6 +425,8 @@ gh repo create gaofeng21cn/redcube-ai --public --source=. --remote=origin --push
 - [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
 
 ## 私有人设与跨机迁移
+
+这一节中的 `profile` 命令指作者私有人设 bundle，不是前文 `ppt_deck` / `xiaohongshu` 的 overlay `profile pack`。
 
 推荐把你的真实作者人设、品牌与正式 prompts 放在用户私有配置目录：
 

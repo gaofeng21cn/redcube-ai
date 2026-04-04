@@ -146,6 +146,28 @@ Agent
 - `xiaohongshu_note`
 - `ppt_deck`
 
+## 5.1 `Presentation Ops` 到运行对象的映射
+
+在 `OPL` 顶层语义里，`Presentation Ops` 不是一个 runtime 字段名，而是一类正式任务面。
+
+它在 `RedCube` 里应映射为：
+
+- `topic`
+  - 一次课程、一次汇报主题、一次答辩任务
+- `deliverable`
+  - 某个具体 deck 实例，例如初稿、优化稿、答辩正式稿
+- `run`
+  - 某次 `storyline -> slide design -> render -> review -> export` 的执行记录
+- `artifact`
+  - 该次执行过程中产生的主线、逐页设计、视觉导演稿、评审报告与导出包
+
+也就是说：
+
+- `Presentation Ops` 决定任务语义
+- `ppt_deck family` 决定视觉交付物类型
+- `profile pack` 决定学生课、同行课、领导汇报、答辩稿等不同正式协议
+- `Runtime` 负责把这些协议下的执行过程稳定落盘
+
 ## 6. Canonical Artifact 应抽象为视觉交付物公共层
 
 公共 artifact 层不应再写成“小红书专属文件名”。建议抽象为：

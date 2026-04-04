@@ -11,12 +11,20 @@
 
 因此，vertical slice 的后续执行以新计划为准：
 
-1. [2026-04-04-redcube-multi-overlay-alignment-plan.md](/Users/gaofeng/workspace/RedCube%20AI/.worktrees/redcube-agent-vertical-slice/docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
+1. [2026-04-04-redcube-presentation-ops-profile-design.md](/Users/gaofeng/workspace/RedCube%20AI/.worktrees/redcube-agent-vertical-slice/docs/superpowers/specs/2026-04-04-redcube-presentation-ops-profile-design.md)
+   - `RedCube` 与 `OPL / Presentation Ops` 的边界
+   - `overlay family -> profile pack -> deliverable contract`
+   - `ppt_deck` 首批正式 profile pack
+   - `xiaohongshu` 与 `Presentation Ops` 的边界
+
+2. [2026-04-04-redcube-multi-overlay-alignment-plan.md](/Users/gaofeng/workspace/RedCube%20AI/.worktrees/redcube-agent-vertical-slice/docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
    - README / public narrative refresh
    - visual deliverable runtime 对齐
    - `ppt_deck overlay`
    - host-agent runtime adapter direction
    - deliverable-centric gateway / MCP surface
+
+下面三份历史计划主要服务于 `xiaohongshu foundation` 与 foundation cutover，不应再直接当成 `Presentation Ops / ppt_deck` 的完整蓝图。
 
 之前拆分出的三份计划如下：
 
