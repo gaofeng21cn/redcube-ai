@@ -1142,7 +1142,6 @@ export async function runWorkbenchInstruction(config = {}, context = {}) {
 export async function runWorkflow(config, context = {}) {
   const runtimeConfig = resolveRuntimeConfig(context, config);
   const rootDir = runtimeConfig.rootDir;
-  const workspaceRoot = runtimeConfig.workspaceRoot;
   const project = String(config.project || '').trim();
   const runId = createRunId();
 
@@ -1159,25 +1158,13 @@ export async function runWorkflow(config, context = {}) {
   const result = await runWorkflowDomain({ ...config, project }, {
     rootDir,
     runId,
-    workspaceRoot,
+    workspaceRoot: runtimeConfig.workspaceRoot,
     repoRoot: context.repoRoot || process.cwd(),
     runtimeConfig,
-    planningLlmConfig: loadStageLlmConfig(workspaceRoot, 'planning'),
-    htmlGenerationLlmConfig: loadStageLlmConfig(workspaceRoot, 'html_generation'),
-    htmlFixLlmConfig: loadStageLlmConfig(workspaceRoot, 'html_fix'),
+    planningLlmConfig: loadStageLlmConfig(runtimeConfig.workspaceRoot, 'planning'),
+    htmlGenerationLlmConfig: loadStageLlmConfig(runtimeConfig.workspaceRoot, 'html_generation'),
+    htmlFixLlmConfig: loadStageLlmConfig(runtimeConfig.workspaceRoot, 'html_fix'),
   });
-
-  if (result?.ok && project && existsSync(path.join(workspaceRoot, 'input', project))) {
-    try {
-      syncProjectOutputsToWorkbenchTopic({
-        workspaceRoot,
-        topic: project,
-        sourceProjectDir: path.join(rootDir, 'projects', project),
-      });
-    } catch (error) {
-      result.warnings = [...(result.warnings || []), `workbench sync failed: ${error instanceof Error ? error.message : String(error)}`];
-    }
-  }
 
   const ended = {
     ...started,
