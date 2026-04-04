@@ -88,7 +88,10 @@ const TOOL_DEFINITIONS = [
     description: 'Review rendered deliverable checks and decide rerun stage.',
     actionKey: 'reviewRenderOutput',
     inputSchema: {
+      workspaceRoot: z.string().optional().describe('Absolute workspace root path when loading hydrated contract from disk.'),
       overlay: z.string().describe('Overlay id.'),
+      topicId: z.string().optional().describe('Topic identifier when loading hydrated contract from disk.'),
+      deliverableId: z.string().optional().describe('Deliverable identifier when loading hydrated contract from disk.'),
       checks: z.record(z.string(), z.unknown()).describe('Structured render review checks.'),
     },
   },
@@ -119,6 +122,9 @@ const TOOL_DEFINITIONS = [
     description: 'Summarize current runtime review-loop status from a run envelope.',
     actionKey: 'runtimeWatch',
     inputSchema: {
+      workspaceRoot: z.string().optional().describe('Absolute workspace root path when loading hydrated contract from disk.'),
+      topicId: z.string().optional().describe('Topic identifier when loading hydrated contract from disk.'),
+      deliverableId: z.string().optional().describe('Deliverable identifier when loading hydrated contract from disk.'),
       run: z.object({}).passthrough().describe('Run envelope to inspect.'),
     },
   },
