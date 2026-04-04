@@ -2,63 +2,101 @@
 
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
-RedCube AI 是一个面向 Agent 的视觉交付物运行层，用来稳定生产可交付的图文视觉成果。
+<p align="center"><strong>面向专家与教授的视觉交付平台</strong></p>
+<p align="center">PPT 演示文稿 · 小红书图文 · Agent-first · Human-auditable</p>
 
-截至 `2026-04-04`，这个项目已经不再以 GUI / Web Workbench 作为主线产品，而是收敛为：
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>面向谁</strong><br/>
+      希望把知识稳定交付为视觉成果的专家、教授与专业团队
+    </td>
+    <td width="33%" valign="top">
+      <strong>控制什么</strong><br/>
+      交付质量、审阅节奏、阶段约束，以及从草稿到导出的收口过程
+    </td>
+    <td width="33%" valign="top">
+      <strong>最终产出</strong><br/>
+      面向讲授、汇报、传播与发布的高质量视觉交付物
+    </td>
+  </tr>
+</table>
 
-> `Agent-first, human-auditable` 的 Gateway + Overlay + Runtime 体系。
+> 对外，它是帮助专家和教授组织与生产视觉交付物的平台；对内，它是一个 `Agent-first, human-auditable` 的 Gateway + Overlay + Runtime 体系。
 
-这套体系面向的是 `Codex`、`OpenClaw` 之类的 Agent，而不是面向人类在图形界面里点按钮操作。
+## 这个平台适合谁
 
-## Agent 合同分层
+如果你经常遇到下面这些场景，`RedCube AI` 就是为你准备的：
 
-- 根目录 `AGENTS.md` 仅用于本仓库开发环境中的 Codex/OMX 协作，不是对外服务合同
-- 宿主适配层位于 `contracts/dev-hosts/`，用于区分 OMX CLI 与 Codex App / plain Codex 的开发宿主行为
-- 对外服务 Agent 的版本化合同位于 `contracts/redcube-runtime-service/AGENTS.md`
-- 可选本机私有覆盖层约定为 `.omx/local/AGENTS.local.md`，保持未跟踪
-- 本地工具运行态目录 `.omx/` 与 `.codex/` 必须保持未跟踪，不进入版本库
+- 你需要把课程内容、学术材料、行业知识或专业观点组织成正式的 `PPT deck`
+- 你需要持续产出 `小红书图文` 或其他适合传播的知识型视觉内容
+- 你不想只得到一堆临时脚本或一次性 prompt，而是希望把交付过程变成可重复、可审阅、可迭代的正式生产线
+- 你希望让 `Codex`、`Claude Code`、`OpenClaw` 等 Agent 承担执行，但关键质量判断仍由人类把关
 
-## 项目现在到底是什么
+## 当前稳定支持的交付物
 
-RedCube 不再定义为“小红书自动生成器”，而是定义为：
+| 交付物 | 当前定位 | 典型场景 |
+| --- | --- | --- |
+| `PPT deck` | 面向讲授、汇报、答辩与正式演示的视觉交付物 | 课程讲义、学术报告、内部 briefing、答辩材料 |
+| `小红书图文` | 面向知识传播与发布导向的视觉交付物 | 科普图文、观点表达、系列内容发布 |
 
-- 一个面向 Agent 的控制面
-- 一个面向视觉交付物的 overlay 体系
-- 一个可长时运行、可重跑、可审计的 runtime
+当前 `PPT` 和 `小红书图文` 不是两套彼此割裂的系统，而是共享同一条运行主线：
 
-当前最重要的判断是：
+- 共享 `Gateway`
+- 共享 `Runtime`
+- 共享 `Run Store / Event Log / Artifact Store`
+- 共享可审计的 review 与 rerun 机制
 
-- `小红书图文笔记` 与 `PPT deck` 是两类视觉交付物 family
-- 二者共享同一套 runtime、artifact store、event log 与 gateway surface
-- family 只定义共同执行面，不足以表达具体任务类型
-- 具体任务差异应通过 `profile pack + deliverable contract` 显式表达
-- 差异不应继续藏在 prompt 拼接、人工默契或导出前补救里
+真正的差异，落在各自的交付合同上，而不是藏在临时 prompt 拼接或人工补救里。
 
-如果是 `PPT deck`，你之前的讲者工作台逻辑不会被丢掉，而是会被拆进：
+## 它控制的不是“一次生成”，而是交付质量
 
-- workspace shared assets
-- overlay stage contracts
-- review loop contracts
-- final delivery sync
+很多内容生成工具更像一次性出稿器。`RedCube AI` 想解决的是另一件事：
 
-## 与 OPL / Presentation Ops 的关系
+- 先明确这次交付物到底要服务谁，而不是先把东西生成出来再补救
+- 先把阶段顺序、审阅节点和导出要求写清楚，而不是靠人工默契维持
+- 先建立 review loop、baseline 对照和结构化 gate，再进入高成本 render / export
+- 先保留可审计的中间状态与运行记录，再谈“结果好不好”
 
-`OPL` 是顶层蓝图，不是运行时系统；`Presentation Ops` 是 `OPL` 下的一个任务面，不是单一仓库名。
+对专家与教授来说，这意味着你看到的不只是一个最终文件，而是一条可追溯、可复查、可重跑的视觉交付过程。
 
-`RedCube AI` 在这里的正确位置是：
+## 最快开始方式
 
-- `RedCube AI` = 视觉交付物的 agent-first runtime
-- `Presentation Ops` = `OPL` 里的正式任务面
-- `ppt_deck` = 当前最直接承接 `Presentation Ops` 的 overlay family
-- `xiaohongshu` = 继续保留在 `RedCube`，但在 `OPL` 顶层语义中不应直接等同于 `Presentation Ops`
+如果你是内容专家、教授或专业团队负责人，最快的使用方式不是先研究底层命令，而是把目标、受众、材料和约束清楚地交给你的 Agent，再让它带着 `RedCube AI` 推进。
 
-所以：
+通常只需要三步：
 
-- `RedCube AI` 不是整个 `OPL`
-- `RedCube AI` 也不等于整个 `Presentation Ops`
-- 它更准确地说，是 `Presentation Ops` 当前最重要的实现面之一
+1. 准备一个独立工作区，把你的素材放进去。
+2. 告诉 Agent 这次要做的是 `PPT` 还是 `小红书图文`，目标受众是谁，最终要交付什么。
+3. 让 Agent 使用 `RedCube AI` 作为视觉交付运行层推进，并由你审核关键结果。
 
-## 三层结构
+你可以直接把下面这段话发给 Agent：
+
+> 请先读取我提供的材料，并判断这次交付更适合做成 PPT 演示文稿还是小红书图文。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）作为视觉交付运行框架，把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、阶段顺序、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊的结果。
+
+## 平台如何工作
+
+从高层看，这个平台的工作方式很简单：
+
+1. 人类定义目标、受众、约束和最终用途
+2. Agent 调用 `RedCube AI` 的正式接口，创建并推进交付任务
+3. 平台把阶段结果、审阅意见、运行状态和导出物持续落盘
+4. 人类在关键节点审核，决定继续、修改、重跑或结束
+
+所以它更像一个“交付运行层”，而不是一个让人类自己点按钮操作的 Web 工具。
+
+## 当前推荐入口
+
+如果你是普通用户，优先通过你的 Agent 来使用它。  
+如果你是技术同事或 AI 执行者，正式入口优先级如下：
+
+1. `MCP`
+2. `CLI`
+
+<details>
+<summary><strong>给技术同事 / AI 执行者</strong></summary>
+
+## 当前架构
 
 ```text
 Agent
@@ -71,196 +109,79 @@ Agent
               -> Event Log
 ```
 
-### Gateway
+- `Gateway` 是唯一正式入口，负责 workspace contract 装载、overlay 选择、run 状态读取与 artifact 引用返回
+- `Overlay` 定义交付物合同、阶段约束、质量门控、review surface 与 export 要求
+- `Runtime` 负责执行、审计、event log、rerun 与 canonical artifact 落盘
 
-`Gateway` 是唯一正式入口，负责：
+当前正式主线已经不再使用 `GUI / Web Workbench`。旧的 Web / Workbench surface 已经退出 production path。
 
-- CLI / MCP 机器接口
-- workspace contract 装载
-- overlay 选择与路由
-- run 状态读取
-- artifact 引用返回
+## 当前支持的运行入口
 
-### Overlay
-
-`Overlay` 负责定义交付物应当长成什么样，以及什么是合格、什么是不合格。
-
-正式控制模型不是单层 overlay，而是：
-
-1. `overlay family`
-   - 例如 `xiaohongshu`、`ppt_deck`
-2. `profile pack`
-   - 例如 `lecture_student`、`lecture_peer`、`executive_briefing`、`defense_deck`
-3. `deliverable contract`
-   - family 基础合同 + profile 覆盖层 + 单次任务参数解析后的最终执行协议
-
-这里的 `profile pack` 专指 overlay 级正式质量协议，不等于后文“私有人设与跨机迁移”里的作者 `profile` bundle。
-
-Overlay 必须定义：
-
-- profile pack contract
-- deliverable contract
-- stage contract
-- gate report contract
-- hydrated deliverable surface contract
-- visual/layout constraints
-- export contract
-
-例如对 `ppt_deck`，不能只说“这是一个 PPT”。它还需要明确：
-
-- `故事主线 -> 详细大纲 -> 逐页设计 -> 视觉导演稿 -> render -> review -> export` 的强制顺序
-- `lecture_student` 与 `executive_briefing` 的 gate 不会相同
-- 哪些 slide family 必须声明 `grid / track / anchor`
-- 哪些证据页必须绑定公开来源 surface
-- 哪些优化任务必须绑定 baseline deck
-
-### Runtime
-
-`Runtime` 只负责执行与审计，不负责领域判断。它负责：
-
-- run ledger
-- event log
-- checkpoint / resume / rerun
-- canonical artifact 落盘
-- executor adapter 调度
-
-## 质量不是“一次生成”，而是正式治理机制
-
-这次重构里，RedCube 不再采用“每一步尽量出好成果，最终自然得到好成果”的单通路假设。
-
-我们会把下面这些变成正式 contract：
-
-- 审计门控
-  - 先审计，再决定是否进入高成本 render / export
-- review loop
-  - 允许在结构、视觉方向、渲染结果、相对质量上反复修整
-- runtime watch
-  - 识别 run 当前卡点、待处理 review、可恢复阶段
-- baseline 对照
-  - 优化已有交付物时，必须把旧版认可稿作为质量基线
-- contract hydration
-  - `create_deliverable` 时先水合 stage / review / layout / baseline / display surface，再允许进入主线
-
-这部分思路直接吸收了两类已验证经验：
-
-- 你的 PPT 工作台
-  - 中间工件不能跳过
-  - 旧版 vs 新版相对质量审阅
-  - AI 原生截图质控
-  - 复杂版式必须显式声明结构锚点
-- MedAutoScience
-  - controller-first 机器接口
-  - 先审计、后进入高成本阶段
-  - runtime watch
-  - 结构化 gate 与 decision
-
-## Runtime 复用策略
-
-默认主路径不是“RedCube 自己再包一层外部大语言模型调用”，而是：
-
-1. 优先复用宿主 Agent runtime
-2. 把外部 LLM 兼容性保留为次级 executor adapter
-
-这意味着：
-
-- 在 `Codex` 里，RedCube 的 route 执行可以直接委托给 `Codex`
-- 在 `OpenClaw` 里，也应优先走宿主 Agent runtime
-- `OpenAI` 兼容接口、离线模型或其他外部模型后端仍可保留，但不再是架构主线
-
-## 为什么 PPT 应该直接放在这个项目里
-
-技术上，`PPT` 和 `小红书图文` 并不是两种完全不同的系统：
-
-- 二者都依赖 `视觉导演 + 前端页面/版式表达`
-- 二者都需要结构化 planning / storyline / visual / export artifacts
-- 二者都需要显式 gate，而不是生成后再启发式修补
-- 二者都适合通过 Agent 调 Gateway 来驱动
-
-真正不同的是 overlay 控制层：
-
-- 小红书关注封面、信息密度、平台文案和发布 bundle
-- PPT 关注 16:9 比例、分节节奏、演讲逻辑和演示导出 bundle
-
-所以 `PPT` 应该直接进入当前仓库，作为并列 overlay，而不是另起一个项目。
-
-## 为什么只有 overlay family 还不够
-
-即便都属于 `ppt_deck`，下面这些对象的正式标准也完全不同：
-
-- 给学生讲课的 `lecture_student`
-- 给小同行讲课的 `lecture_peer`
-- 给领导汇报的 `executive_briefing`
-- 用于正式答辩的 `defense_deck`
-
-它们共享 runtime，但不共享：
-
-- 目标受众
-- 信息密度上限
-- 证据展示方式
-- review rubric
-- 导出 bundle 结构
-
-因此当前正式模型应当是：
-
-- `overlay family` 负责共同执行面
-- `profile pack` 负责场景化 gate、review、layout 与 export 规则
-- `deliverable contract` 负责把这两层解析成可执行、可审计的单次交付协议
-
-## 当前仓库状态
-
-这次重构目前分为两个层次：
-
-### 已完成基础层
-
-- `packages/redcube-runtime-protocol`
-  - 单一 workspace contract
-  - run schema 与路径解析
-- `packages/redcube-gateway`
-  - 新的 gateway foundation
-- CLI v2
-  - 已改成 Gateway 的薄包装
-- `packages/redcube-overlay-xiaohongshu`
-  - 已有最小 contract 与 storyline gate foundation
-
-### 正在推进的主线
-
-- `packages/redcube-runtime`
-  - host-agent executor adapter 主路径
-- `apps/redcube-mcp`
-  - 面向 Agent 的正式接口层
-- 多 overlay 对齐
-  - `xiaohongshu`
-  - `ppt_deck`
-- `ppt_deck` contract hydration
-  - `stage-sequence`
-  - `review-surface`
-  - `layout-rules`
-  - `baseline-policy`
-  - `display-registry`
-- legacy Web / Workbench 删除
-
-## 当前推荐入口
-
-在这条新主线下，正式入口优先级如下：
-
-1. `MCP`
-2. `CLI`
-
-## 快速开始
+安装与验证：
 
 ```bash
 npm install
 npm test
 ```
 
-如果你只是想验证当前 foundation：
+查看 CLI：
 
 ```bash
-node apps/redcube-cli/src/cli.js help
-node --test tests/*.test.js
+npm run redcube -- help
 ```
 
-建议把真实运行工作区放到仓库外，再通过环境变量指向它：
+启动 MCP：
+
+```bash
+npm run mcp
+```
+
+## 一个最小 CLI 例子
+
+```bash
+npm run redcube -- deliverable create \
+  --workspace-root /ABS/PATH/TO/WORKSPACE \
+  --overlay ppt_deck \
+  --profile-id lecture_student \
+  --topic-id thyroid-basics \
+  --deliverable-id lecture-01 \
+  --title "甲状腺基础" \
+  --goal "向本科生讲清甲状腺基础知识"
+```
+
+也可以把旧 `projects/<name>` 单向迁入新 canonical workspace：
+
+```bash
+npm run redcube -- import legacy-project \
+  --project legacy-project-name \
+  --root-dir /ABS/PATH/TO/LEGACY-ROOT \
+  --workspace-root /ABS/PATH/TO/WORKSPACE
+```
+
+## 仓库结构
+
+```text
+apps/
+  redcube-cli/   # CLI gateway client
+  redcube-mcp/   # MCP gateway server
+packages/
+  redcube-gateway/             # Gateway actions
+  redcube-runtime-protocol/    # workspace contract + run schema
+  redcube-runtime/             # run store / event log / executors
+  redcube-overlay-ppt/         # ppt_deck contracts
+  redcube-overlay-xiaohongshu/ # xiaohongshu contracts
+  redcube-overlay-core/        # overlay registry / hydration primitives
+tests/                         # Node built-in test suite
+```
+
+## 仓库与工作区边界
+
+- 本仓库存放代码、测试、提示词和文档，不存放实际业务运行数据
+- 真实运行工作区应位于仓库外部，再通过环境变量或 CLI/MCP 参数指向它
+- canonical JSON artifact 是运行真相源
+- Markdown / HTML / TXT 只作为导出视图，不作为反向真相
+
+建议把真实运行工作区放到仓库外：
 
 ```bash
 export WORKSPACE_ROOT="/absolute/path/to/your/workspace"
@@ -268,210 +189,40 @@ export REDCUBE_ROOT_DIR="$WORKSPACE_ROOT"
 export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 ```
 
-如果你要把 RedCube 当成面向 Agent 的正式入口，可以直接启动 MCP：
+## 私有 profile 与 prompts
 
-```bash
-npm run mcp
-```
-
-当前 `ppt_deck` 的 `create_deliverable` 已经会自动水合这些 surface：
-
-- `contracts/stage-sequence.json`
-- `contracts/review-surface.json`
-- `contracts/layout-rules.json`
-- `contracts/baseline-policy.json`
-- `views/display-registry.json`
-
-## 当前文档入口
-
-- [视觉交付物 runtime 设计增量](docs/superpowers/specs/2026-04-04-redcube-visual-deliverable-runtime-design.md)
-- [Presentation Ops profile 设计冻结稿](docs/superpowers/specs/2026-04-04-redcube-presentation-ops-profile-design.md)
-- [多 overlay 对齐实施计划](docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
-- [Agent-first Runtime Program Plan](docs/superpowers/plans/2026-04-03-redcube-agent-first-runtime-plan-index.md)
-- [更新日志](CHANGELOG.md)
-- [贡献指南](CONTRIBUTING.md)
-- [安全策略](SECURITY.md)
-- [许可证](LICENSE)
-
-## 目录结构
-
-```text
-apps/
-  redcube-cli/   # CLI gateway client
-  redcube-mcp/   # MCP gateway server
-packages/
-  redcube-gateway/             # Agent-first gateway actions
-  redcube-runtime-protocol/    # workspace contract + run schema
-  redcube-runtime/             # run store / event log / executors
-  redcube-overlay-ppt/         # ppt_deck family contracts
-  redcube-overlay-xiaohongshu/ # xiaohongshu overlay foundation
-  redcube-overlay-core/        # shared overlay registry / hydration primitives
-tests/                         # Node built-in test suite
-```
-
-## 仓库与工作区约束
-
-- 本仓库保存代码、测试、提示词与文档，不保存业务运行数据
-- 运行真相应落在独立 workspace 根目录，而不是仓库根目录
-- canonical JSON artifact 才是运行真相源
-- Markdown / HTML / TXT 仅作为导出视图，不得反向成为运行真相
-- 不再接受旧的双真相结构长期存在
-
-## 对外部读者最重要的一句话
-
-如果你要理解 RedCube 的未来方向，不要再把它理解成“一个给人点按钮用的小红书 Web 工具”。
-
-应该把它理解成：
-
-> 一个让 Agent 稳定生产视觉交付物的运行层，小红书和 PPT 只是其中两个 overlay。
-
-## 兼容与迁移说明
-
-下面这些内容主要服务于旧链路迁移：
-
-- 外部 LLM 兼容 executor
-- 旧版 `自动小红书` prompts 目录
-- 私有作者 `profile` bundle
-
-它们保留是为了迁移，不代表项目重新回到：
-
-- GUI-first
-- xiaohongshu-first
-- 内置外部 LLM 为主路径
-
-默认离线规则生成（无外部依赖）。
-如需调用 OpenAI 兼容接口：
-
-```bash
-export REDCUBE_LLM_MODE=openai
-export OPENAI_API_KEY=...
-export OPENAI_BASE_URL=https://api.openai.com/v1
-export OPENAI_MODEL=gpt-4o-mini
-```
-
-如需走 `pi-mono` 官方 `pi-ai` / `pi-agent-core`：
-
-```bash
-npm install @mariozechner/pi-ai @mariozechner/pi-agent-core
-export REDCUBE_LLM_MODE=pi
-export PI_MODEL_PROVIDER=openai
-export PI_MODEL_NAME=gpt-4o-mini
-```
-
-## 提示词管理（Node 主链路）
-
-新架构下，LLM 提示词已外置为独立文件，默认目录：
-
-```text
-prompts/node/
-  aligned/
-    自动小红书/
-      提示词编排与调用顺序.md
-      作者档案库.md
-      人设自动路由规则.md
-      风格指南/
-      故事指南/
-      策划提示词/
-      视觉提示词/
-      defaults/templates/
-  note_draft.system.md
-  note_draft.user.md
-  storyline.system.md
-  storyline_templates/
-    medical_deep.md
-    medical_traffic.md
-    general_standard.md
-```
-
-- 正式版主线默认读取：`prompts/node/aligned/自动小红书/`
-- 仓库内这套目录提供公开安全的默认 prompts
-- 如果你有私有正式版 prompts，可通过私有配置或 `REDCUBE_PROMPTS_DIR` 指向外部目录
-- `note_draft.* / storyline_templates/*.md` 仍保留作兼容入口，但不再是默认正式版来源
-- 正式 CLI/MCP 主线统一只读取这一套 Node 提示词体系，不再切回 Python 或第二套 workflow 提示词
-
-可通过环境变量切换到你自己的提示词目录：
-
-```bash
-export REDCUBE_PROMPTS_DIR=/absolute/path/to/your/prompts
-```
-
-## 发布公开仓库
-
-当前仓库已经适合直接作为公开仓库发布：
-
-- 业务工作区与运行产物不应留在本仓库
-- 私有作者信息、品牌、人设与正式 prompts 应放到仓库外
-- 推荐通过 `gh` 创建并推送 GitHub 仓库
-
-最短命令：
-
-```bash
-gh repo create gaofeng21cn/redcube-ai --public --source=. --remote=origin --push
-```
-
-更完整的发布说明见：
-
-- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
-
-## 私有人设与跨机迁移
-
-这一节中的 `profile` 命令指作者私有人设 bundle，不是前文 `ppt_deck` / `xiaohongshu` 的 overlay `profile pack`。
-
-推荐把你的真实作者人设、品牌与正式 prompts 放在用户私有配置目录：
+如果你有私有作者信息、品牌、人设或 prompts，建议放到用户私有配置目录，而不是写回公开仓库：
 
 ```text
 ~/.config/redcube/
   runtime.json
   identity.json
   prompts/
-    aligned/
-      自动小红书/
-        作者档案库.md
-        人设自动路由规则.md
-        defaults/AGENT_PRESET.default.md
-        ...
 ```
 
-首次从外部工作目录迁移：
+相关说明见：
 
-```bash
-node apps/redcube-cli/src/cli.js profile \
-  --action bootstrap \
-  --source-dir "/absolute/path/to/your-private-prompts/system/自动小红书"
-```
+- [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
+- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
 
-导出当前私有层为 bundle：
+## 重要设计与计划文档
 
-```bash
-node apps/redcube-cli/src/cli.js profile \
-  --action export \
-  --bundle "~/Downloads/redcube-private-profile.tgz"
-```
+- [视觉交付物 runtime 设计增量](docs/superpowers/specs/2026-04-04-redcube-visual-deliverable-runtime-design.md)
+- [Presentation Ops profile 设计冻结稿](docs/superpowers/specs/2026-04-04-redcube-presentation-ops-profile-design.md)
+- [多 overlay 对齐实施计划](docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
+- [Agent-first Runtime Program Plan](docs/superpowers/plans/2026-04-03-redcube-agent-first-runtime-plan-index.md)
+- [贡献指南](CONTRIBUTING.md)
+- [更新日志](CHANGELOG.md)
+- [安全策略](SECURITY.md)
+- [许可证](LICENSE)
 
-在另一台机器安装 bundle：
+</details>
 
-```bash
-node apps/redcube-cli/src/cli.js profile \
-  --action install \
-  --bundle "~/Downloads/redcube-private-profile.tgz"
-```
+## 当前最重要的一句话
 
-如目标目录已存在私有层，可追加 `--force` 覆盖。
+不要再把 `RedCube AI` 理解成“一个给人类手工操作的小红书 Web 工具”。
 
-## 测试
+更准确的理解是：
 
-```bash
-node --test tests/*.test.js
-```
+> 一个让 Agent 稳定生产视觉交付物的运行层，而 `PPT` 与 `小红书图文` 是当前两类最重要的正式交付面。
 
-当前测试覆盖：
-- TOC 解析与任务过滤
-- gateway / runtime / overlay contracts
-- deliverable CLI / MCP 主线
-- importer / cutover gate
-- legacy node workflow core（仅作为迁移剩余能力）
-
-## 仓库边界
-
-公开仓库当前只保留 Node 主线所需的功能代码、提示词、测试与最小文档。
-历史 Python 运行时、旧文档、本地状态文件与业务数据目录不再随仓库分发。
