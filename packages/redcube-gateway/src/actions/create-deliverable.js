@@ -36,8 +36,12 @@ export async function createDeliverable({
   title,
   goal,
 }) {
-  if (overlay !== 'ppt_deck') {
-    throw new Error(`Unsupported overlay: ${overlay}`);
+  const overlayDefinition = overlayRegistry.getOverlay(overlay);
+  if (typeof overlayDefinition.buildDeliverableRecord !== 'function') {
+    throw new Error(`Overlay ${overlay} cannot create deliverables`);
+  }
+  if (typeof overlayDefinition.buildSurfaceBundle !== 'function') {
+    throw new Error(`Overlay ${overlay} cannot hydrate deliverable surfaces`);
   }
 
   const topicPaths = getTopicPaths(workspaceRoot, topicId);
@@ -60,7 +64,7 @@ export async function createDeliverable({
     title,
     goal,
   });
-  const deliverable = buildDeckRecord({
+  const deliverable = overlayDefinition.buildDeliverableRecord({
     topicId,
     deliverableId,
     title,
@@ -76,7 +80,7 @@ export async function createDeliverable({
   );
 
   const surfaceFiles = [];
-  for (const artifact of buildDeckSurfaceBundle({ contract: hydratedContract })) {
+  for (const artifact of overlayDefinition.buildSurfaceBundle({ contract: hydratedContract })) {
     const targetFile = path.join(deliverablePaths.deliverableDir, artifact.relativePath);
     mkdirSync(path.dirname(targetFile), { recursive: true });
     writeFileSync(targetFile, JSON.stringify(artifact.content, null, 2), 'utf-8');

@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import {
   buildTopicRecord,
   evaluateStorylineGate,
+  buildXiaohongshuDeliverableRecord,
+  hydrateXiaohongshuContract,
 } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
 
 test('buildTopicRecord emits canonical xiaohongshu topic metadata', () => {
@@ -29,4 +31,48 @@ test('evaluateStorylineGate passes well-formed storyline content', () => {
 
   assert.equal(report.status, 'pass');
   assert.deepEqual(report.blockers, []);
+});
+
+test('hydrateXiaohongshuContract emits standard_note contract on shared runtime model', () => {
+  const contract = hydrateXiaohongshuContract({
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+    profileId: 'standard_note',
+  });
+
+  assert.equal(contract.overlay, 'xiaohongshu');
+  assert.equal(contract.profile_id, 'standard_note');
+  assert.equal(contract.deliverable_kind, 'xiaohongshu_note');
+  assert.deepEqual(
+    contract.stage_sequence.stages.map((stage) => stage.stage_id),
+    ['research', 'storyline', 'note'],
+  );
+  assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
+});
+
+test('buildXiaohongshuDeliverableRecord emits canonical xiaohongshu deliverable metadata', () => {
+  const hydratedContract = hydrateXiaohongshuContract({
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+    profileId: 'standard_note',
+  });
+  const deliverable = buildXiaohongshuDeliverableRecord({
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+    profileId: 'standard_note',
+    hydratedContract,
+  });
+
+  assert.equal(deliverable.overlay, 'xiaohongshu');
+  assert.equal(deliverable.kind, 'xiaohongshu_note');
+  assert.equal(deliverable.deliverable_kind, 'xiaohongshu_note');
+  assert.equal(deliverable.profile_id, 'standard_note');
+  assert.equal(deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
+  assert.deepEqual(deliverable.routes, ['research', 'storyline', 'note']);
 });

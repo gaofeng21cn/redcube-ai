@@ -51,20 +51,40 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
   ]);
 });
 
-test('createDeliverable rejects unsupported overlay ids', async () => {
+test('createDeliverable supports xiaohongshu on the shared runtime mainline', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  assert.equal(created.ok, true);
+  assert.equal(created.deliverable.overlay, 'xiaohongshu');
+  assert.equal(created.deliverable.kind, 'xiaohongshu_note');
+  assert.equal(created.deliverable.profile_id, 'standard_note');
+  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'note']);
+});
+
+test('createDeliverable rejects unknown overlay ids', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
   await assert.rejects(
     () => createDeliverable({
       workspaceRoot,
-      overlay: 'xiaohongshu',
+      overlay: 'poster',
       profileId: 'standard_note',
       topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: '甲状腺门诊科普 deck',
-      goal: '为门诊患者生成可发布的科普图文',
+      deliverableId: 'poster-a',
+      title: '未知交付物',
+      goal: '测试未知 overlay',
     }),
-    /Unsupported overlay: xiaohongshu/,
+    /Unknown overlay: poster/,
   );
 });
 
@@ -256,4 +276,32 @@ test('runDeliverableRoute rejects route not declared by hydrated deliverable con
     }),
     /Route publish_live is not declared by hydrated deliverable contract/,
   );
+});
+
+test('runDeliverableRoute supports xiaohongshu routes on shared runtime', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  const result = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    route: 'research',
+  });
+
+  assert.equal(result.ok, true);
+  const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+  assert.equal(artifact.contract.overlay, 'xiaohongshu');
+  assert.equal(artifact.stage_contract.stage_id, 'research');
+  assert.equal(artifact.route, 'research');
 });

@@ -1,3 +1,5 @@
+import { buildDeliverableRecord } from '../../redcube-overlay-core/src/index.js';
+
 export function buildTopicRecord({ topicId, title }) {
   return {
     topic_id: String(topicId || '').trim(),
@@ -86,5 +88,38 @@ export function hydrateXiaohongshuContract({
         { id: 'note', kind: 'render_output', required_when: 'always' },
       ],
     },
+  };
+}
+
+export function buildXiaohongshuDeliverableRecord({
+  topicId,
+  deliverableId,
+  title,
+  goal,
+  profileId,
+  hydratedContract,
+}) {
+  const contract = hydratedContract || hydrateXiaohongshuContract({
+    topicId,
+    deliverableId,
+    title,
+    goal,
+    profileId,
+  });
+  const deliverable = buildDeliverableRecord({
+    topicId,
+    deliverableId,
+    overlay: 'xiaohongshu',
+    kind: 'xiaohongshu_note',
+    title,
+  });
+
+  return {
+    ...deliverable,
+    deliverable_kind: 'xiaohongshu_note',
+    profile_id: String(profileId || contract.profile_id || '').trim(),
+    goal: String(goal || contract.goal || '').trim(),
+    hydrated_contract_ref: 'contracts/hydrated-deliverable.json',
+    routes: contract.stage_sequence.stages.map((stage) => stage.stage_id),
   };
 }
