@@ -20,4 +20,5 @@ Typical signals include:
 ## Boundary
 
 This adapter controls host behavior only.
-It must not override the product/runtime truth source in `contracts/redcube-runtime-service/AGENTS.md`.
+It must not override the project truth source in `contracts/project-truth/AGENTS.md`.
+
