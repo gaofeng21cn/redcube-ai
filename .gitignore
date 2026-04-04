@@ -30,6 +30,11 @@ node_modules/
 coverage/
 *.log
 
+# Public docs live in guides/. docs/ is reserved for internal AI / Superpowers materials.
+docs/plans/
+docs/tutorials/
+docs/superpowers/plans/
+
 # macOS
 .DS_Store
 RedCube AI.app/

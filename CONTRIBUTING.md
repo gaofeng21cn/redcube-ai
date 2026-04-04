@@ -5,7 +5,8 @@
 ## 开始之前
 
 - 先阅读 [README.md](README.md)
-- 如变更涉及公开仓库边界，优先阅读 `docs/tutorials/` 和 `docs/plans/` 下的相关文档
+- 如变更涉及公开仓库边界，优先阅读 [`guides/`](guides/README.md)
+- `docs/` 目录默认视为内部 AI / Superpowers 文档面，不作为公开 GitHub 文档入口
 - 这个仓库只保留功能代码、公开 prompts、测试与文档，不保留业务工作区和私有素材
 
 ## 本地开发
@@ -33,6 +34,7 @@ node apps/redcube-mcp/src/server.js
 
 - 变更保持聚焦，不把无关重构混进同一个提交
 - 如果改了行为、命令、目录约定或公开接口，请同步更新文档
+- 面向外部读者的文档更新优先写入 `guides/`，不要继续把公开教程写到 `docs/`
 - 提交前至少运行一次 Node 测试，并确认结果为 `fail 0`
 - 保持 Node 主线一致，不要重新引入 Python 严格流程入口或第二套 prompts 主链
 

@@ -74,6 +74,11 @@
 
 > 请先读取我提供的材料，并判断这次交付更适合做成 PPT 演示文稿还是小红书图文。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）作为视觉交付运行框架，把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、阶段顺序、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊的结果。
 
+继续阅读：
+
+- [人类用户快速上手](guides/human_quickstart.md)
+- [典型交付示例](guides/deliverable_examples.md)
+
 ## 平台如何工作
 
 从高层看，这个平台的工作方式很简单：
@@ -92,6 +97,12 @@
 
 1. `MCP`
 2. `CLI`
+
+## 文档约定
+
+- 面向 GitHub 与外部读者的文档，统一放在 [`guides/`](guides/README.md)
+- `docs/` 目录保留给内部 AI / Superpowers 开发文档，不作为公开首页入口
+- 开发过程中的计划、草案与中间设计，不应继续作为公开仓库主文档面
 
 <details>
 <summary><strong>给技术同事 / AI 执行者</strong></summary>
@@ -202,15 +213,16 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 
 相关说明见：
 
-- [私有作者信息与 prompts 配置](docs/tutorials/private-profile-setup.md)
-- [公开发布到 GitHub](docs/tutorials/public-github-publish.md)
+- [人类用户快速上手](guides/human_quickstart.md)
+- [典型交付示例](guides/deliverable_examples.md)
+- [私有作者信息与 prompts 配置](guides/private-profile-setup.md)
+- [公开发布到 GitHub](guides/public-github-publish.md)
 
-## 重要设计与计划文档
+## 公开文档入口
 
-- [视觉交付物 runtime 设计增量](docs/superpowers/specs/2026-04-04-redcube-visual-deliverable-runtime-design.md)
-- [Presentation Ops profile 设计冻结稿](docs/superpowers/specs/2026-04-04-redcube-presentation-ops-profile-design.md)
-- [多 overlay 对齐实施计划](docs/superpowers/plans/2026-04-04-redcube-multi-overlay-alignment-plan.md)
-- [Agent-first Runtime Program Plan](docs/superpowers/plans/2026-04-03-redcube-agent-first-runtime-plan-index.md)
+- [Guides 索引](guides/README.md)
+- [人类用户快速上手](guides/human_quickstart.md)
+- [典型交付示例](guides/deliverable_examples.md)
 - [贡献指南](CONTRIBUTING.md)
 - [更新日志](CHANGELOG.md)
 - [安全策略](SECURITY.md)
@@ -225,4 +237,3 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 更准确的理解是：
 
 > 一个让 Agent 稳定生产视觉交付物的运行层，而 `PPT` 与 `小红书图文` 是当前两类最重要的正式交付面。
-
