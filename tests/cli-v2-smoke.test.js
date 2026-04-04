@@ -151,6 +151,24 @@ test('CLI isolated install returns CLI JSON for unknown commands', () => {
   });
 });
 
+test('CLI help exposes task-oriented onboarding surface', () => {
+  const output = execFileSync(
+    'node',
+    [path.resolve('apps/redcube-cli/src/cli.js'), 'help'],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.match(parsed.whatIsRedCube, /PPT deck/);
+  assert.match(parsed.whatIsRedCube, /小红书图文/);
+  assert.equal(Array.isArray(parsed.commonTasks), true);
+  assert.equal(parsed.commonTasks.length >= 4, true);
+  assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
+  assert.equal(parsed.whereToReadNext.humanQuickstart, 'guides/human_quickstart.md');
+  assert.equal(typeof parsed.usage.deliverableCreate, 'string');
+});
+
 test('CLI isolated install fixture keeps package realpaths inside temp install and consumer only depends on gateway', () => {
   const {
     gatewayPackagePath,

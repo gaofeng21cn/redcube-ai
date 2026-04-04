@@ -50,6 +50,79 @@ function resolveWorkspaceRoot(options) {
   return options.workspaceRoot || options.rootDir || process.cwd();
 }
 
+function buildHelp() {
+  return {
+    ok: true,
+    whatIsRedCube: 'RedCube AI 是面向专家与 PIs 的视觉交付运行入口，当前重点支持 PPT deck 与小红书图文。',
+    preferredEntry: ['MCP', 'CLI'],
+    commonTasks: [
+      {
+        task: '检查工作区是否可用',
+        command: 'redcube workspace doctor --workspace-root <dir>',
+      },
+      {
+        task: '查看当前已有主题',
+        command: 'redcube topics list --workspace-root <dir>',
+      },
+      {
+        task: '从旧 projects 目录单向迁入 canonical workspace',
+        command: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+      },
+      {
+        task: '创建一个新的视觉交付物',
+        command: 'redcube deliverable create --workspace-root <dir> --overlay <ppt_deck|xiaohongshu> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
+      },
+      {
+        task: '审计交付物是否达到进入下一阶段的条件',
+        command: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing>',
+      },
+      {
+        task: '运行某个正式阶段并查看 run 状态',
+        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> && redcube runs get --workspace-root <dir> --run-id <id>',
+      },
+    ],
+    commonFlows: {
+      pptDeck: [
+        '1. redcube deliverable create --overlay ppt_deck --profile-id lecture_student ...',
+        '2. redcube deliverable audit --overlay ppt_deck --mode draft_new ...',
+        '3. redcube deliverable run --overlay ppt_deck --route storyline ...',
+      ],
+      xiaohongshu: [
+        '1. redcube deliverable create --overlay xiaohongshu --profile-id standard_note ...',
+        '2. redcube deliverable audit --overlay xiaohongshu --mode draft_new ...',
+        '3. redcube deliverable run --overlay xiaohongshu --route storyline ...',
+      ],
+    },
+    commandGroups: {
+      workspace: ['doctor'],
+      topics: ['list'],
+      import: ['legacy-project'],
+      deliverable: ['create', 'get', 'audit', 'run'],
+      runs: ['get'],
+      profile: ['bootstrap', 'export', 'install'],
+    },
+    whereToReadNext: {
+      humanQuickstart: 'guides/human_quickstart.md',
+      deliverableExamples: 'guides/deliverable_examples.md',
+      runtimeArchitecture: 'guides/runtime_architecture.md',
+      runtimePolicy: 'policies/runtime_operating_model.md',
+      contractPolicy: 'policies/deliverable_contract_model.md',
+      privateProfileSetup: 'guides/private-profile-setup.md',
+    },
+    usage: {
+      workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
+      topicsList: 'redcube topics list --workspace-root <dir>',
+      importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+      deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
+      deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
+      deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
+      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+      runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
+      profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
+    },
+  };
+}
+
 let privateProfileModulePromise;
 
 async function loadPrivateProfileModule() {
@@ -66,19 +139,7 @@ async function main() {
   const options = parseArgs(rest);
 
   if (!command || command === 'help' || command === '--help') {
-    printJson({
-      usage: {
-        workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
-        topicsList: 'redcube topics list --workspace-root <dir>',
-        importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
-        deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
-        deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
-        deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
-        deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
-        runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
-        profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
-      },
-    });
+    printJson(buildHelp());
     return;
   }
 

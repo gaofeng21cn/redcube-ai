@@ -2,14 +2,14 @@
 
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
-<p align="center"><strong>面向专家与教授的视觉交付平台</strong></p>
+<p align="center"><strong>面向专家与 PIs 的视觉交付平台</strong></p>
 <p align="center">PPT 演示文稿 · 小红书图文 · Agent-first · Human-auditable</p>
 
 <table>
   <tr>
     <td width="33%" valign="top">
       <strong>面向谁</strong><br/>
-      希望把知识稳定交付为视觉成果的专家、教授与专业团队
+      希望把知识稳定交付为视觉成果的专家、PIs 与专业团队
     </td>
     <td width="33%" valign="top">
       <strong>控制什么</strong><br/>
@@ -22,7 +22,7 @@
   </tr>
 </table>
 
-> 对外，它是帮助专家和教授组织与生产视觉交付物的平台；对内，它是一个 `Agent-first, human-auditable` 的 Gateway + Overlay + Runtime 体系。
+> 对外，它是帮助专家和 PIs 组织与生产视觉交付物的平台；对内，它是一个 `Agent-first, human-auditable` 的 Gateway + Overlay + Runtime 体系。
 
 ## 这个平台适合谁
 
@@ -58,11 +58,11 @@
 - 先建立 review loop、baseline 对照和结构化 gate，再进入高成本 render / export
 - 先保留可审计的中间状态与运行记录，再谈“结果好不好”
 
-对专家与教授来说，这意味着你看到的不只是一个最终文件，而是一条可追溯、可复查、可重跑的视觉交付过程。
+对专家与 PIs 来说，这意味着你看到的不只是一个最终文件，而是一条可追溯、可复查、可重跑的视觉交付过程。
 
 ## 最快开始方式
 
-如果你是内容专家、教授或专业团队负责人，最快的使用方式不是先研究底层命令，而是把目标、受众、材料和约束清楚地交给你的 Agent，再让它带着 `RedCube AI` 推进。
+如果你是内容专家、PI 或专业团队负责人，最快的使用方式不是先研究底层命令，而是把目标、受众、材料和约束清楚地交给你的 Agent，再让它带着 `RedCube AI` 推进。
 
 通常只需要三步：
 
@@ -78,6 +78,7 @@
 
 - [人类用户快速上手](guides/human_quickstart.md)
 - [典型交付示例](guides/deliverable_examples.md)
+- [运行架构说明](guides/runtime_architecture.md)
 
 ## 平台如何工作
 
@@ -215,14 +216,19 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 
 - [人类用户快速上手](guides/human_quickstart.md)
 - [典型交付示例](guides/deliverable_examples.md)
+- [运行架构说明](guides/runtime_architecture.md)
 - [私有作者信息与 prompts 配置](guides/private-profile-setup.md)
 - [公开发布到 GitHub](guides/public-github-publish.md)
 
 ## 公开文档入口
 
 - [Guides 索引](guides/README.md)
+- [Policies 索引](policies/README.md)
 - [人类用户快速上手](guides/human_quickstart.md)
 - [典型交付示例](guides/deliverable_examples.md)
+- [运行架构说明](guides/runtime_architecture.md)
+- [运行模型 Policy](policies/runtime_operating_model.md)
+- [交付合同模型 Policy](policies/deliverable_contract_model.md)
 - [贡献指南](CONTRIBUTING.md)
 - [更新日志](CHANGELOG.md)
 - [安全策略](SECURITY.md)
