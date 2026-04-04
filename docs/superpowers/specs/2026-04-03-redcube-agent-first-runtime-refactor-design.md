@@ -17,7 +17,7 @@
 核心决策如下：
 
 - 以 `Agent-first, human-auditable` 作为顶层运行原则
-- 废弃 Web UI / Workbench 作为产品主线，不再继续扩展 [apps/redcube-web](/Users/gaofeng/workspace/RedCube%20AI/apps/redcube-web)
+- 废弃 Web UI / Workbench 作为产品主线，不再继续扩展 [apps/redcube-web](/Users/gaofeng/workspace/redcube-ai/apps/redcube-web)
 - 废弃当前 `workspaceRoot/input|output` 与 `rootDir/projects` 的双真相结构
 - 建立单一 `workspace contract`
 - 建立结构化 canonical artifacts，禁止再以面向人类的 Markdown 文档作为运行真相源
@@ -53,7 +53,7 @@
 
 ### 2.2 控制面与执行面耦合过深
 
-[packages/redcube-agent/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/index.js) 当前同时承担了：
+[packages/redcube-agent/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/index.js) 当前同时承担了：
 
 - Web API 背后的公开入口
 - Workbench topic 管理
@@ -75,8 +75,8 @@
 
 并通过这些模块反复同步：
 
-- [packages/redcube-agent/src/workbench-project-sync.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/workbench-project-sync.js)
-- [packages/redcube-agent/src/workbench-truth-sync.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/workbench-truth-sync.js)
+- [packages/redcube-agent/src/workbench-project-sync.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/workbench-project-sync.js)
+- [packages/redcube-agent/src/workbench-truth-sync.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/workbench-truth-sync.js)
 
 这意味着：
 
@@ -444,7 +444,7 @@ Runtime 不应直接包含：
 
 ### 9.3 CLI 职责
 
-[apps/redcube-cli/src/cli.js](/Users/gaofeng/workspace/RedCube%20AI/apps/redcube-cli/src/cli.js) 继续保留，但改造为 Gateway 的薄包装。
+[apps/redcube-cli/src/cli.js](/Users/gaofeng/workspace/redcube-ai/apps/redcube-cli/src/cli.js) 继续保留，但改造为 Gateway 的薄包装。
 
 CLI 应从“命令行版旧系统入口”收敛为“可脚本化的 Gateway client”。
 
@@ -492,15 +492,15 @@ Runtime 支持：
 
 这些模块可保留核心能力，但需要重新挂接到新边界下：
 
-- [packages/redcube-domain/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-domain/src/index.js)
-- [packages/redcube-tools/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-tools/src/index.js)
-- [packages/redcube-llm/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-llm/src/index.js)
-- [packages/redcube-memory/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-memory/src/index.js)
-- [packages/redcube-config/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-config/src/index.js)
+- [packages/redcube-domain/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-domain/src/index.js)
+- [packages/redcube-tools/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-tools/src/index.js)
+- [packages/redcube-llm/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-llm/src/index.js)
+- [packages/redcube-memory/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-memory/src/index.js)
+- [packages/redcube-config/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-config/src/index.js)
 
 ### 11.2 需要拆解的模块
 
-[packages/redcube-agent/src/index.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/index.js) 应拆成：
+[packages/redcube-agent/src/index.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/index.js) 应拆成：
 
 - `packages/redcube-gateway`
 - `packages/redcube-runtime`
@@ -511,13 +511,13 @@ Runtime 支持：
 
 以下模块不再是主线能力：
 
-- [apps/redcube-web/src/api.js](/Users/gaofeng/workspace/RedCube%20AI/apps/redcube-web/src/api.js)
-- [apps/redcube-web/src/server.js](/Users/gaofeng/workspace/RedCube%20AI/apps/redcube-web/src/server.js)
-- [apps/redcube-web/public/app.js](/Users/gaofeng/workspace/RedCube%20AI/apps/redcube-web/public/app.js)
-- [packages/redcube-agent/src/workbench-workflow.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/workbench-workflow.js)
-- [packages/redcube-agent/src/workbench-project-sync.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/workbench-project-sync.js)
-- [packages/redcube-agent/src/workbench-truth-sync.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/workbench-truth-sync.js)
-- [packages/redcube-agent/src/workbench-workspace.js](/Users/gaofeng/workspace/RedCube%20AI/packages/redcube-agent/src/workbench-workspace.js)
+- [apps/redcube-web/src/api.js](/Users/gaofeng/workspace/redcube-ai/apps/redcube-web/src/api.js)
+- [apps/redcube-web/src/server.js](/Users/gaofeng/workspace/redcube-ai/apps/redcube-web/src/server.js)
+- [apps/redcube-web/public/app.js](/Users/gaofeng/workspace/redcube-ai/apps/redcube-web/public/app.js)
+- [packages/redcube-agent/src/workbench-workflow.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/workbench-workflow.js)
+- [packages/redcube-agent/src/workbench-project-sync.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/workbench-project-sync.js)
+- [packages/redcube-agent/src/workbench-truth-sync.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/workbench-truth-sync.js)
+- [packages/redcube-agent/src/workbench-workspace.js](/Users/gaofeng/workspace/redcube-ai/packages/redcube-agent/src/workbench-workspace.js)
 
 ### 11.4 新包建议
 

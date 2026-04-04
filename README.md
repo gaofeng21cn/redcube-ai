@@ -237,7 +237,7 @@ Overlay 必须定义：
   - `layout-rules`
   - `baseline-policy`
   - `display-registry`
-- legacy Web / Workbench 退场
+- legacy Web / Workbench 删除
 
 ## 当前推荐入口
 
@@ -245,16 +245,12 @@ Overlay 必须定义：
 
 1. `MCP`
 2. `CLI`
-3. legacy Web / Workbench 仅用于过渡，不再作为未来产品主线
 
-## Legacy Workbench 过渡入口
+`apps/redcube-web` 与旧 Workbench shell 现在只应被视为待删除遗留层：
 
-如果你还需要临时打开旧版 Workbench：
-
-- 直接运行仓库根目录下的 `RedCube AI Web.command`
-- 或执行 `scripts/build-macos-app.sh` 生成 `RedCube AI.app`
-
-这两个入口都只用于过渡期兼容，不代表项目重新回到 GUI-first 方向。
+- 不再作为任何新实现的兼容约束
+- 不再要求为了保留 GUI 路径而牺牲 runtime / gateway 重构质量
+- 如果重构主线需要，可以直接删除，而不是继续做兼容性续命
 
 ## 快速开始
 
@@ -337,7 +333,7 @@ tests/                         # Node built-in test suite
 
 ## 兼容与迁移说明
 
-下面这些内容主要服务于过渡期兼容与旧链路迁移：
+下面这些内容主要服务于旧链路迁移：
 
 - 外部 LLM 兼容 executor
 - 旧版 `自动小红书` prompts 目录
@@ -349,6 +345,8 @@ tests/                         # Node built-in test suite
 - GUI-first
 - xiaohongshu-first
 - 内置外部 LLM 为主路径
+
+其中 `apps/redcube-web` 与旧 Workbench UI 不再被视为必须兼容的历史表面；后续主线可以直接以删除这些遗留界面为目标推进。
 
 默认离线规则生成（无外部依赖）。
 如需调用 OpenAI 兼容接口：
