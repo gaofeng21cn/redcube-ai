@@ -1,8 +1,37 @@
+function deriveStageRequirements(contract) {
+  if (contract?.stage_requirements) {
+    return contract.stage_requirements;
+  }
+  const stages = Array.isArray(contract?.stage_sequence?.stages)
+    ? contract.stage_sequence.stages
+    : [];
+  const hardStops = Array.isArray(contract?.stage_sequence?.hard_stops)
+    ? contract.stage_sequence.hard_stops
+    : [];
+  const derived = {};
+  for (const stage of stages) {
+    const hardStop = hardStops.find((item) => item?.stage_id === stage?.stage_id) || null;
+    derived[stage.stage_id] = {
+      requires_artifacts: Array.isArray(stage?.requires_stages) ? stage.requires_stages : [],
+      requires_review_pass: Boolean(hardStop?.requires_review?.length),
+    };
+  }
+  return derived;
+}
+
 export function buildDeckSurfaceBundle({ contract }) {
   return [
     {
       relativePath: 'contracts/stage-sequence.json',
       content: contract.stage_sequence,
+    },
+    {
+      relativePath: 'contracts/stage-requirements.json',
+      content: deriveStageRequirements(contract),
+    },
+    {
+      relativePath: 'contracts/prompt-pack.json',
+      content: contract.prompt_pack,
     },
     {
       relativePath: 'contracts/review-surface.json',
@@ -34,6 +63,8 @@ export function buildDeckSurfaceBundle({ contract }) {
 export function listDeckSurfaceArtifactPaths() {
   return [
     'contracts/stage-sequence.json',
+    'contracts/stage-requirements.json',
+    'contracts/prompt-pack.json',
     'contracts/review-surface.json',
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
@@ -48,6 +79,18 @@ const SURFACE_VALIDATORS = {
     Array.isArray(content?.stages)
     && content.stages.length > 0
     && content.stages.some((stage) => stage?.stage_id === 'storyline'),
+  'contracts/stage-requirements.json': (content) =>
+    Array.isArray(content?.render_html?.requires_artifacts)
+    && content.render_html.requires_artifacts.includes('slide_blueprint')
+    && content.render_html.requires_artifacts.includes('visual_direction')
+    && content.export_pptx?.requires_review_pass === true,
+  'contracts/prompt-pack.json': (content) =>
+    typeof content?.root === 'string'
+    && content.root === 'prompts/ppt_deck'
+    && typeof content?.routes?.render_html === 'string'
+    && content.routes.render_html === 'prompts/ppt_deck/render_html.md'
+    && typeof content?.stages?.render_html?.file === 'string'
+    && content.stages.render_html.file === 'render_html.md',
   'contracts/review-surface.json': (content) =>
     Array.isArray(content?.required_checks)
     && content.required_checks.length > 0

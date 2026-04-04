@@ -31,6 +31,8 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   const deliverableDir = path.dirname(created.deliverableFile);
   const surfaceFiles = [
     'contracts/stage-sequence.json',
+    'contracts/stage-requirements.json',
+    'contracts/prompt-pack.json',
     'contracts/review-surface.json',
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
@@ -65,6 +67,14 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   );
   assert.equal(hydratedContract.profile_id, 'lecture_student');
   assert.equal(hydratedContract.export_bundle.bundle_id, 'lecture_student_bundle');
+  assert.equal(hydratedContract.prompt_pack.root, 'prompts/ppt_deck');
+  assert.equal(hydratedContract.prompt_pack.stages.render_html.file, 'render_html.md');
+  assert.deepEqual(
+    JSON.parse(
+      readFileSync(path.join(deliverableDir, 'contracts/stage-requirements.json'), 'utf-8'),
+    ).render_html.requires_artifacts,
+    ['slide_blueprint', 'visual_direction'],
+  );
   assert.equal(
     hydratedContract.review_surface.required_checks.includes('term_explained_on_first_use'),
     true,

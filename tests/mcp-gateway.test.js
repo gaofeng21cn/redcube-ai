@@ -205,6 +205,20 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
 
     assert.equal(created.structuredContent.deliverable.profile_id, 'lecture_peer');
 
+    const preflight = await client.callTool({
+      name: 'run_deliverable_route',
+      arguments: {
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'storyline',
+      },
+    });
+
+    assert.equal(preflight.structuredContent.ok, true);
+    assert.equal(preflight.structuredContent.run.current_stage, 'storyline');
+
     const runResult = await client.callTool({
       name: 'run_deliverable_route',
       arguments: {

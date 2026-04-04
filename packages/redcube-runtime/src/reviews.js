@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
@@ -16,6 +16,25 @@ function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   return JSON.parse(
     readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'),
   );
+}
+
+function loadReviewArtifact(request, contract) {
+  if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId || !contract) {
+    return null;
+  }
+  const deliverablePaths = getDeliverablePaths(
+    request.workspaceRoot,
+    request.topicId,
+    request.deliverableId,
+  );
+  const reviewFile = path.join(
+    deliverablePaths.artifactsDir,
+    String(contract?.review_surface?.artifact_file || 'quality_gate.json').trim(),
+  );
+  if (!existsSync(reviewFile)) {
+    return null;
+  }
+  return JSON.parse(readFileSync(reviewFile, 'utf-8'));
 }
 
 function toMissingIssue(check) {
@@ -51,12 +70,20 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
 }
 
 export function reviewRenderedDeliverable(request) {
-  const checks = request?.checks || {};
   const contract = loadHydratedContract(request);
+  const reviewArtifact = loadReviewArtifact(request, contract);
+  const suppliedChecks = request?.checks && typeof request.checks === 'object'
+    ? request.checks
+    : null;
+  const checks = suppliedChecks || reviewArtifact?.checks || {};
   const reviewSurface = contract?.review_surface || null;
-  const requiredChecks = Array.isArray(reviewSurface?.required_checks)
+  const baseChecks = Array.isArray(reviewSurface?.required_checks)
     ? reviewSurface.required_checks
     : ['visual_density_ok'];
+  const conditionalChecks = Array.isArray(reviewSurface?.conditional_checks?.[request?.mode])
+    ? reviewSurface.conditional_checks[request.mode]
+    : [];
+  const requiredChecks = [...baseChecks, ...conditionalChecks];
   const rerunFromStage = reviewSurface?.rerun_from_stage || {
     visual_density_ok: 'visual_direction',
   };
@@ -92,7 +119,7 @@ export function reviewRenderedDeliverable(request) {
   }
 
   return {
-    status: 'pass',
+    status: reviewArtifact?.status || 'pass',
     issues: [],
     rerun_from_stage: null,
     recommended_action: 'continue',

@@ -5,34 +5,53 @@ const FAMILY_STAGE_SEQUENCE = {
   stages: [
     {
       stage_id: 'storyline',
+      prompt_file: 'storyline.md',
       output_artifact: 'storyline.json',
+      requires_stages: [],
     },
     {
       stage_id: 'detailed_outline',
+      prompt_file: 'detailed_outline.md',
       output_artifact: 'detailed_outline.json',
+      requires_stages: ['storyline'],
     },
     {
       stage_id: 'slide_blueprint',
+      prompt_file: 'slide_blueprint.md',
       output_artifact: 'slide_blueprint.json',
+      requires_stages: ['detailed_outline'],
     },
     {
       stage_id: 'visual_direction',
+      prompt_file: 'visual_direction.md',
       output_artifact: 'visual_direction.json',
+      requires_stages: ['slide_blueprint'],
     },
     {
       stage_id: 'render_html',
+      prompt_file: 'render_html.md',
       output_artifact: 'render_bundle.json',
+      requires_stages: ['slide_blueprint', 'visual_direction'],
     },
     {
       stage_id: 'screenshot_review',
+      prompt_file: 'screenshot_review.md',
       output_artifact: 'quality_gate.json',
+      requires_stages: ['render_html'],
     },
     {
       stage_id: 'export_pptx',
+      prompt_file: 'export_pptx.md',
       output_artifact: 'publish_bundle.json',
+      requires_stages: ['screenshot_review'],
     },
   ],
   hard_stops: [
+    {
+      stage_id: 'render_html',
+      requires_stage_outputs: ['slide_blueprint', 'visual_direction'],
+      rerun_from_stage: 'slide_blueprint',
+    },
     {
       stage_id: 'export_pptx',
       requires_review: ['screenshot_review'],
@@ -48,6 +67,8 @@ const FAMILY_REVIEW_SURFACE = {
     'visual_density_ok',
     'speaker_fit_ok',
   ],
+  artifact_stage: 'screenshot_review',
+  artifact_file: 'quality_gate.json',
   conditional_checks: {
     optimize_existing: ['baseline_comparison_passed'],
   },
@@ -63,6 +84,14 @@ const FAMILY_REVIEW_SURFACE = {
 const FAMILY_LAYOUT_RULES = {
   density_mode: 'balanced_deck',
   max_primary_points_per_slide: 5,
+  canvas: {
+    ratio: '16:9',
+    width: 1152,
+    height: 648,
+    scrollbars_forbidden: true,
+  },
+  slides_data_rule: 'independent_content',
+  forbidden_template_routes: ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'],
   structured_families_require_anchor: [
     'central_axis',
     'judgement_ladder',
@@ -94,12 +123,61 @@ const FAMILY_BASELINE_POLICY = {
   },
 };
 
+const FAMILY_STAGE_REQUIREMENTS = {
+  storyline: {
+    requires_artifacts: [],
+  },
+  detailed_outline: {
+    requires_artifacts: ['storyline'],
+  },
+  slide_blueprint: {
+    requires_artifacts: ['detailed_outline'],
+  },
+  visual_direction: {
+    requires_artifacts: ['slide_blueprint'],
+  },
+  render_html: {
+    requires_artifacts: ['slide_blueprint', 'visual_direction'],
+  },
+  screenshot_review: {
+    requires_artifacts: ['render_html'],
+  },
+  export_pptx: {
+    requires_artifacts: ['screenshot_review'],
+    requires_review_pass: true,
+  },
+};
+
+const FAMILY_PROMPT_PACK = {
+  pack_id: 'ppt_deck_mainline_v1',
+  root: 'prompts/ppt_deck',
+  routes: {
+    storyline: 'prompts/ppt_deck/storyline.md',
+    detailed_outline: 'prompts/ppt_deck/detailed_outline.md',
+    slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
+    visual_direction: 'prompts/ppt_deck/visual_direction.md',
+    render_html: 'prompts/ppt_deck/render_html.md',
+    screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
+    export_pptx: 'prompts/ppt_deck/export_pptx.md',
+  },
+  stages: {
+    storyline: { file: 'storyline.md' },
+    detailed_outline: { file: 'detailed_outline.md' },
+    slide_blueprint: { file: 'slide_blueprint.md' },
+    visual_direction: { file: 'visual_direction.md' },
+    render_html: { file: 'render_html.md' },
+    screenshot_review: { file: 'screenshot_review.md' },
+    export_pptx: { file: 'export_pptx.md' },
+  },
+};
+
 const FAMILY_EXPORT_BUNDLE = {
   bundle_id: 'ppt_deck_bundle',
   include_pptx: true,
   include_pdf: true,
   include_presenter_notes: true,
   include_backup_slides: false,
+  review_required_before_export: true,
 };
 
 const FAMILY_DISPLAY_REGISTRY = {
@@ -272,6 +350,8 @@ export function hydratePptDeckContract({
     review_surface: FAMILY_REVIEW_SURFACE,
     layout_rules: FAMILY_LAYOUT_RULES,
     baseline_policy: FAMILY_BASELINE_POLICY,
+    stage_requirements: FAMILY_STAGE_REQUIREMENTS,
+    prompt_pack: FAMILY_PROMPT_PACK,
     export_bundle: FAMILY_EXPORT_BUNDLE,
     display_registry: FAMILY_DISPLAY_REGISTRY,
   };

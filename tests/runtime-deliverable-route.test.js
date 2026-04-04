@@ -136,6 +136,15 @@ test('runDeliverableRoute executes other declared stages through host-agent exec
     goal: '向小同行解释问题、方法、证据与边界',
   });
 
+  const preflight = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    route: 'storyline',
+  });
+  assert.equal(preflight.ok, true);
+
   const result = await runDeliverableRoute({
     workspaceRoot,
     overlay: 'ppt_deck',

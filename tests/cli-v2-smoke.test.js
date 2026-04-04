@@ -322,14 +322,38 @@ test('CLI deliverable run and runs get proxy the contract-driven runtime mainlin
       '--deliverable-id',
       'deck-a',
       '--route',
-      'detailed_outline',
+      'storyline',
     ],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
 
   const runParsed = JSON.parse(runOutput);
   assert.equal(runParsed.ok, true);
-  assert.equal(runParsed.run.current_stage, 'detailed_outline');
+  assert.equal(runParsed.run.current_stage, 'storyline');
+
+  const secondRunOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'run',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'ppt_deck',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'deck-a',
+      '--route',
+      'detailed_outline',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const secondRunParsed = JSON.parse(secondRunOutput);
+  assert.equal(secondRunParsed.ok, true);
+  assert.equal(secondRunParsed.run.current_stage, 'detailed_outline');
 
   const getOutput = execFileSync(
     'node',
@@ -340,7 +364,7 @@ test('CLI deliverable run and runs get proxy the contract-driven runtime mainlin
       '--workspace-root',
       workspaceRoot,
       '--run-id',
-      runParsed.run.run_id,
+      secondRunParsed.run.run_id,
     ],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
