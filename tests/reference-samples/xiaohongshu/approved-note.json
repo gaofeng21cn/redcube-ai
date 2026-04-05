@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "sampleId": "approved-note",
+  "status": "approved",
+  "overlay": "xiaohongshu",
+  "profileId": "standard_note",
+  "topicId": "xhs-reference",
+  "title": "甲状腺门诊小红书认可稿",
+  "goal": "验证小红书认可稿相对质量回归",
+  "sourceFile": "approved-note.md",
+  "referenceMode": "source_backed",
+  "approval": {
+    "approvedBy": "human",
+    "approvedAt": "2026-04-05T00:00:00.000Z",
+    "decisionRef": "step7-reference-regression-xhs"
+  },
+  "provenance": {
+    "kind": "reference_regression_baseline",
+    "sourceRef": "tests/reference-samples/xiaohongshu/approved-note.md"
+  },
+  "scope": {
+    "overlay": "xiaohongshu",
+    "profileIds": ["standard_note"],
+    "supportedModes": ["draft_new", "optimize_existing"]
+  }
+}

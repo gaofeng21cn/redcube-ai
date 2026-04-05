@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "sampleId": "approved-peer-deck",
+  "status": "approved",
+  "overlay": "ppt_deck",
+  "profileId": "lecture_peer",
+  "topicId": "ppt-reference-peer",
+  "title": "肠癌 AI 方法边界同行汇报",
+  "goal": "给同行讲清问题定义、novelty 和方法边界",
+  "sourceFile": "approved-peer-deck.md",
+  "referenceMode": "seed_backed_with_source_provenance",
+  "approval": {
+    "approvedBy": "human",
+    "approvedAt": "2026-04-05T00:00:00.000Z",
+    "decisionRef": "p3-c2-reference-regression-ppt-peer"
+  },
+  "provenance": {
+    "kind": "reference_regression_baseline",
+    "sourceRef": "tests/reference-samples/ppt_deck/approved-peer-deck.md"
+  },
+  "scope": {
+    "overlay": "ppt_deck",
+    "profileIds": ["lecture_peer"],
+    "supportedModes": ["draft_new", "optimize_existing"]
+  }
+}

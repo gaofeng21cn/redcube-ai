@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>__PPT_DECK_TITLE__</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; overflow: hidden; background: #e2e8f0; }
+    body { display: flex; align-items: center; justify-content: center; padding: 24px; color: #0F172A; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    #app-container { width: min(1280px, 96vw); }
+    #slide-display-area { width: 100%; aspect-ratio: 16 / 9; position: relative; overflow: hidden; border-radius: 28px; background: #FFFFFF; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14); }
+    #control-panel { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,0.92); border-radius: 20px; padding: 12px 18px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10); }
+    button { border: 0; cursor: pointer; border-radius: 14px; padding: 12px 20px; font-weight: 700; background: #0F172A; color: white; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 180ms ease; display: flex; align-items: center; justify-content: center; }
+    .slide.visible { opacity: 1; visibility: visible; }
+    .slide-content-wrapper { width: 1152px; height: 648px; overflow: hidden; position: relative; }
+  </style>
+</head>
+<body data-render-strategy="__REDCUBE_RENDER_STRATEGY__">
+  <div id="app-container">
+    <div id="slide-display-area"></div>
+    <div id="control-panel">
+      <button id="prev-btn">上一页</button>
+      <div id="progress-indicator"></div>
+      <button id="next-btn">下一页</button>
+    </div>
+  </div>
+  <script id="redcube-render-plan" type="application/json">__REDCUBE_RENDER_PLAN__</script>
+  <script>
+    const slidesData = __PPT_DECK_SLIDES_DATA__;
+    const slideDisplayArea = document.getElementById('slide-display-area');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const progressIndicator = document.getElementById('progress-indicator');
+    let currentSlide = 0;
+    function setupSlides() {
+      slideDisplayArea.innerHTML = '';
+      slidesData.forEach((slide) => {
+        const element = document.createElement('div');
+        element.className = 'slide';
+        element.innerHTML = '<div class="slide-content-wrapper">' + slide.content + '</div>';
+        slideDisplayArea.appendChild(element);
+      });
+    }
+    function updateView() {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      slides.forEach((slide, index) => slide.classList.toggle('visible', index === currentSlide));
+      progressIndicator.textContent = (currentSlide + 1) + ' / ' + slidesData.length;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slidesData.length - 1;
+    }
+    function inspectCurrentSlide() {
+      const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
+      const root = wrapper?.querySelector('[data-slide-root]');
+      const bounds = wrapper?.getBoundingClientRect();
+      const blocks = Array.from(wrapper?.querySelectorAll('[data-qa-block]') || [])
+        .filter((node) => !node.querySelector('[data-qa-block]'))
+        .map((node, index) => {
+          const rect = node.getBoundingClientRect();
+          return {
+            id: node.getAttribute('data-qa-block') || ('block-' + (index + 1)),
+            left: rect.left - bounds.left,
+            top: rect.top - bounds.top,
+            width: rect.width,
+            height: rect.height,
+            area: rect.width * rect.height,
+          };
+        });
+      return {
+        slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
+        title: root?.dataset.title || slidesData[currentSlide]?.title || '',
+        layoutFamily: root?.dataset.layoutFamily || slidesData[currentSlide]?.layoutFamily || '',
+        speakerSeconds: Number(root?.dataset.speakerSeconds || 0),
+        primaryPoints: wrapper?.querySelectorAll('[data-primary-point="true"]').length || 0,
+        wrapper: {
+          clientWidth: wrapper?.clientWidth || 1152,
+          clientHeight: wrapper?.clientHeight || 648,
+          scrollWidth: wrapper?.scrollWidth || 1152,
+          scrollHeight: wrapper?.scrollHeight || 648,
+        },
+        bodyScroll: false,
+        blocks,
+      };
+    }
+    prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide -= 1; updateView(); } });
+    nextBtn.addEventListener('click', () => { if (currentSlide < slidesData.length - 1) { currentSlide += 1; updateView(); } });
+    window.redcubeDeckReview = {
+      totalSlides: slidesData.length,
+      showSlide(index) {
+        currentSlide = index;
+        updateView();
+        return inspectCurrentSlide();
+      },
+      inspectCurrentSlide,
+    };
+    setupSlides();
+    updateView();
+  </script>
+</body>
+</html>

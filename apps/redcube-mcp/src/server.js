@@ -6,10 +6,14 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   auditDeliverable,
+  applyReviewMutation,
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getPublicationProjection,
+  getReviewState,
   getRun,
+  intakeSource,
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -22,11 +26,15 @@ const DEFAULT_GATEWAY_ACTIONS = {
   listTopics,
   createDeliverable,
   getDeliverable,
+  getPublicationProjection,
+  intakeSource,
   auditDeliverable,
   reviewRenderOutput,
   runDeliverableRoute,
   getRun,
   runtimeWatch,
+  getReviewState,
+  applyReviewMutation,
 };
 
 const TOOL_DEFINITIONS = [
@@ -44,6 +52,20 @@ const TOOL_DEFINITIONS = [
     actionKey: 'listTopics',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
+    },
+  },
+  {
+    name: 'intake_source',
+    description: 'Hydrate brief / keywords / source files into canonical shared source artifacts.',
+    actionKey: 'intakeSource',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      title: z.string().optional().describe('Topic title.'),
+      brief: z.string().optional().describe('Short textual brief.'),
+      keywords: z.union([z.string(), z.array(z.string())]).optional().describe('Keyword list or comma-separated keywords.'),
+      sourceFiles: z.union([z.string(), z.array(z.string())]).optional().describe('Absolute source file paths or comma-separated file list.'),
+      modeHint: z.string().optional().describe('Optional intake mode hint such as legacy_import.'),
     },
   },
   {
@@ -68,6 +90,15 @@ const TOOL_DEFINITIONS = [
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       topicId: z.string().describe('Topic identifier.'),
       deliverableId: z.string().describe('Deliverable identifier.'),
+    },
+  },
+  {
+    name: 'get_publication_projection',
+    description: 'Read topic-level publication projection rebuilt from canonical publish truth.',
+    actionKey: 'getPublicationProjection',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
     },
   },
   {
@@ -115,6 +146,28 @@ const TOOL_DEFINITIONS = [
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       runId: z.string().describe('Run identifier.'),
+    },
+  },
+
+  {
+    name: 'get_review_state',
+    description: 'Read the platform-level review state for one deliverable.',
+    actionKey: 'getReviewState',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      deliverableId: z.string().describe('Deliverable identifier.'),
+    },
+  },
+  {
+    name: 'apply_review_mutation',
+    description: 'Apply a platform-level review mutation such as request_changes or bind_baseline.',
+    actionKey: 'applyReviewMutation',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      deliverableId: z.string().describe('Deliverable identifier.'),
+      mutation: z.object({}).passthrough().describe('Structured review mutation payload.'),
     },
   },
   {

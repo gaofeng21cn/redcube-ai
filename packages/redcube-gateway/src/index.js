@@ -1,5 +1,9 @@
 export { doctorWorkspace } from './actions/doctor-workspace.js';
 export { listTopics } from './actions/list-topics.js';
+export async function intakeSource(request) {
+  const module = await import('./actions/intake-source.js');
+  return module.intakeSource(request);
+}
 export async function importLegacyProject(request) {
   const module = await import('./actions/import-legacy-project.js');
   return module.importLegacyProject(request);
@@ -12,6 +16,10 @@ export async function createDeliverable(request) {
 export async function getDeliverable(request) {
   const module = await import('./actions/get-deliverable.js');
   return module.getDeliverable(request);
+}
+export async function getPublicationProjection(request) {
+  const module = await import('./actions/get-publication-projection.js');
+  return module.getPublicationProjection(request);
 }
 
 export async function getRun(request) {
@@ -36,4 +44,14 @@ export async function reviewRenderOutput(request) {
 export async function runtimeWatch(request) {
   const module = await import('./actions/runtime-watch.js');
   return module.runtimeWatch(request);
+}
+
+export async function getReviewState(request) {
+  const module = await import('./actions/get-review-state.js');
+  return module.getReviewState(request);
+}
+
+export async function applyReviewMutation(request) {
+  const module = await import('./actions/apply-review-mutation.js');
+  return module.applyReviewMutation(request);
 }

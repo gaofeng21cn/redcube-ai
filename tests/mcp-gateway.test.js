@@ -22,12 +22,16 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
     [
       'doctor',
       'list_topics',
+      'intake_source',
       'create_deliverable',
       'get_deliverable',
+      'get_publication_projection',
       'audit_deliverable',
       'review_render_output',
       'run_deliverable_route',
       'get_run',
+      'get_review_state',
+      'apply_review_mutation',
       'runtime_watch',
     ],
   );
@@ -61,6 +65,84 @@ test('callGatewayTool delegates to injected gateway action', async () => {
   assert.equal(result.deliverable.overlay, 'ppt_deck');
   assert.equal(result.deliverable.profile_id, 'lecture_student');
   assert.equal(result.deliverable.deliverable_id, 'deck-a');
+});
+
+test('callGatewayTool delegates source intake gateway action', async () => {
+  const result = await callGatewayTool(
+    'intake_source',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      title: '共享输入',
+      brief: 'brief',
+      keywords: ['a', 'b'],
+      sourceFiles: [],
+    },
+    {
+      intakeSource: async (request) => ({
+        ok: true,
+        audit: {
+          topic_id: request.topicId,
+          status: 'pass',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.audit.topic_id, 'topic-a');
+  assert.equal(result.audit.status, 'pass');
+});
+
+test('callGatewayTool delegates publication projection gateway action', async () => {
+  const result = await callGatewayTool(
+    'get_publication_projection',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+    },
+    {
+      getPublicationProjection: async (request) => ({
+        ok: true,
+        topic_id: request.topicId,
+        state_type: 'projection',
+        publication: { current: 'approval_pending' },
+        canonical_source: { kind: 'review_state.publish_state' },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.publication.current, 'approval_pending');
+  assert.equal(result.canonical_source.kind, 'review_state.publish_state');
+});
+
+
+
+test('callGatewayTool delegates review mutation gateway action', async () => {
+  const result = await callGatewayTool(
+    'apply_review_mutation',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      mutation: { type: 'request_changes' },
+    },
+    {
+      applyReviewMutation: async (request) => ({
+        ok: true,
+        state: {
+          topic_id: request.topicId,
+          deliverable_id: request.deliverableId,
+          current_status: 'blocked_for_revision',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.state.current_status, 'blocked_for_revision');
+  assert.equal(result.state.deliverable_id, 'deck-a');
 });
 
 test('callGatewayTool rejects unknown tool names', async () => {
@@ -204,6 +286,20 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
     });
 
     assert.equal(created.structuredContent.deliverable.profile_id, 'lecture_peer');
+
+    const preflight = await client.callTool({
+      name: 'run_deliverable_route',
+      arguments: {
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'storyline',
+      },
+    });
+
+    assert.equal(preflight.structuredContent.ok, true);
+    assert.equal(preflight.structuredContent.run.current_stage, 'storyline');
 
     const runResult = await client.callTool({
       name: 'run_deliverable_route',

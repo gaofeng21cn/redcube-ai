@@ -1,3 +1,6 @@
+import { canRunPptDeck, runPptDeckRoute } from '@redcube/runtime-family-ppt';
+import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-xiaohongshu';
+
 export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
   if (adapter !== 'host_agent' && adapter !== 'external_llm') {
     throw new Error(`Unsupported executor adapter: ${adapter}`);
@@ -6,12 +9,15 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
   return {
     adapter,
     async runRoute({
+      workspaceRoot,
       overlay,
       route,
       topicId,
       deliverableId,
       contract,
       stageContract,
+      mode = 'draft_new',
+      baselineDeliverableId = '',
     }) {
       if (!stageContract?.stage_id) {
         throw new Error(`Missing stage contract for route: ${route}`);
@@ -22,6 +28,30 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
 
       if (adapter === 'external_llm' && route !== 'storyline') {
         throw new Error(`Unsupported route for adapter external_llm: ${route}`);
+      }
+
+      if (adapter === 'host_agent' && canRunPptDeck(contract)) {
+        return runPptDeckRoute({
+          workspaceRoot,
+          route,
+          topicId,
+          deliverableId,
+          contract,
+          mode,
+          baselineDeliverableId,
+        });
+      }
+
+      if (adapter === 'host_agent' && canRunXiaohongshu(contract)) {
+        return runXiaohongshuRoute({
+          workspaceRoot,
+          route,
+          topicId,
+          deliverableId,
+          contract,
+          mode,
+          baselineDeliverableId,
+        });
       }
 
       return {

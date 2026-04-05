@@ -2,10 +2,14 @@
 
 import {
   auditDeliverable,
+  applyReviewMutation,
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getPublicationProjection,
+  getReviewState,
   getRun as getGatewayRun,
+  intakeSource,
   importLegacyProject,
   listTopics as listTopicsGateway,
   runDeliverableRoute,
@@ -69,6 +73,10 @@ function buildHelp() {
         command: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
       },
       {
+        task: '把 brief / keywords / source files 水合成 shared source truth',
+        command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+      },
+      {
         task: '创建一个新的视觉交付物',
         command: 'redcube deliverable create --workspace-root <dir> --overlay <ppt_deck|xiaohongshu> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       },
@@ -96,9 +104,11 @@ function buildHelp() {
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
+      source: ['intake'],
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
+      review: ['get', 'projection', 'mutate'],
       profile: ['bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
@@ -113,11 +123,15 @@ function buildHelp() {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
       importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+      sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
+      reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
+      reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
+      reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>]',
       profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };
@@ -181,6 +195,23 @@ async function main() {
     return;
   }
 
+  if (command === 'source') {
+    if (subcommand !== 'intake') {
+      fail('source 命令仅支持 intake');
+    }
+
+    const result = await intakeSource({
+      workspaceRoot: resolveWorkspaceRoot(options),
+      topicId: options.topicId || '',
+      title: options.title || '',
+      brief: options.brief || '',
+      keywords: options.keywords || '',
+      sourceFiles: options.sourceFiles || '',
+    });
+    printJson(result);
+    return;
+  }
+
   if (command === 'deliverable') {
     if (subcommand === 'create') {
       const result = await createDeliverable({
@@ -233,6 +264,50 @@ async function main() {
     }
 
     fail('deliverable 命令仅支持 create|get|audit|run');
+  }
+
+
+  if (command === 'review') {
+    if (subcommand === 'get') {
+      const result = await getReviewState({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+      });
+      printJson(result);
+      return;
+    }
+
+    if (subcommand === 'projection') {
+      const result = await getPublicationProjection({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+      });
+      printJson(result);
+      return;
+    }
+
+    if (subcommand === 'mutate') {
+      const issues = String(options.issues || '').trim();
+      const result = await applyReviewMutation({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        mutation: {
+          type: options.type || '',
+          actor: options.actor || 'agent',
+          review_stage: options.reviewStage || '',
+          rerun_from_stage: options.rerunFromStage || '',
+          issues: issues ? issues.split(',').map((item) => item.trim()).filter(Boolean) : [],
+          baseline_deliverable_id: options.baselineDeliverableId || '',
+          notes: options.notes || '',
+        },
+      });
+      printJson(result);
+      return;
+    }
+
+    fail('review 命令仅支持 get|projection|mutate');
   }
 
   if (command === 'runs') {

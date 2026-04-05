@@ -12,7 +12,7 @@
     "contracts/project-truth/AGENTS.md",
     ".codex/AGENTS.md"
   ],
-  "updated_at": "2026-04-05T01:47:59.911451+00:00",
+  "updated_at": "2026-04-05T10:16:19Z",
   "preserved_existing_root": {
     "backed_up": false,
     "backup_path": "",
@@ -35,7 +35,7 @@
   "config_reconcile": {
     "applied": false,
     "user_config_present": true,
-    "project_config_present": false,
+    "project_config_present": true,
     "keys_synced": [],
     "tables_synced": []
   },
@@ -43,12 +43,11 @@
     "repaired": [
       "analyze",
       "build-fix",
-      "tdd"
-    ],
-    "skipped": [
+      "tdd",
       "ecomode",
       "ultraqa",
       "swarm"
-    ]
+    ],
+    "skipped": []
   }
 }

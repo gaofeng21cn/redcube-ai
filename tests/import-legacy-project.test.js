@@ -49,11 +49,19 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
     true,
   );
   assert.equal(
-    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'brief.json')),
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-brief.json')),
     true,
   );
   assert.equal(
-    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'storyline.json')),
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-index.json')),
+    true,
+  );
+  assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'extracted-materials.json')),
+    true,
+  );
+  assert.equal(
+    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-audit.json')),
     true,
   );
   assert.equal(
@@ -61,15 +69,11 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
     true,
   );
   assert.equal(
-    existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'legacy-import-report.json')),
-    true,
-  );
-  assert.equal(
     JSON.parse(readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'topic.json'), 'utf-8')).topic_id,
     'topic-a',
   );
   assert.equal(
-    JSON.parse(readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'legacy-import-report.json'), 'utf-8')).status,
+    JSON.parse(readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-audit.json'), 'utf-8')).status,
     'pass',
   );
   assert.equal(
@@ -103,6 +107,11 @@ test('importLegacyProject is one-way and does not mutate legacy project tree', a
   );
   assert.deepEqual(legacyProject.output_folders, ['01_胰岛素基础']);
   assert.equal(legacyProject.raw_materials[0].relative_path, 'source.md');
+
+  const sourceBrief = JSON.parse(
+    readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-brief.json'), 'utf-8'),
+  );
+  assert.equal(sourceBrief.input_mode, 'legacy_import');
 });
 
 test('importLegacyProject rejects missing legacy project inputs', async () => {
