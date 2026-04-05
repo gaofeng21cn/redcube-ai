@@ -91,7 +91,7 @@ async function buildHelp() {
       },
       {
         task: '从旧 projects 目录单向迁入 canonical workspace',
-        command: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+        command: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       },
       {
         task: '把 brief / keywords / source files 水合成 shared source truth',
@@ -132,7 +132,7 @@ async function buildHelp() {
     usage: {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
-      importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+      importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
@@ -198,13 +198,14 @@ async function main() {
       fail('import 命令仅支持 legacy-project');
     }
 
-    const result = await importLegacyProject({
-      rootDir: options.rootDir || '',
-      workspaceRoot: resolveWorkspaceRoot(options),
-      project: options.project || '',
-    });
-    printJson(result);
-    return;
+      const result = await importLegacyProject({
+        rootDir: options.rootDir || '',
+        workspaceRoot: resolveWorkspaceRoot(options),
+        project: options.project || '',
+        overlay: options.overlay || '',
+      });
+      printJson(result);
+      return;
   }
 
   if (command === 'source') {

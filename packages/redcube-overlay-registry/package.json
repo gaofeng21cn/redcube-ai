@@ -6,6 +6,20 @@
   "exports": {
     ".": "./src/index.js"
   },
+  "redcube": {
+    "defaultOverlayModules": [
+      {
+        "overlayId": "ppt_deck",
+        "module": "@redcube/overlay-ppt",
+        "exportName": "pptDeckOverlay"
+      },
+      {
+        "overlayId": "xiaohongshu",
+        "module": "@redcube/overlay-xiaohongshu",
+        "exportName": "xiaohongshuOverlay"
+      }
+    ]
+  },
   "dependencies": {
     "@redcube/overlay-core": "0.1.0",
     "@redcube/overlay-ppt": "0.1.0",

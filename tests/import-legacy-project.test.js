@@ -39,6 +39,7 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
     rootDir,
     workspaceRoot,
     project: 'topic-a',
+    overlay: 'xiaohongshu',
   });
 
   assert.equal(result.ok, true);
@@ -91,6 +92,7 @@ test('importLegacyProject is one-way and does not mutate legacy project tree', a
     rootDir,
     workspaceRoot,
     project: 'topic-a',
+    overlay: 'xiaohongshu',
   });
 
   assert.deepEqual(readdirSync(inputsDir).sort(), beforeEntries);
@@ -123,8 +125,23 @@ test('importLegacyProject rejects missing legacy project inputs', async () => {
       rootDir,
       workspaceRoot,
       project: 'missing-topic',
+      overlay: 'xiaohongshu',
     }),
     /legacy project 不存在/,
+  );
+});
+
+test('importLegacyProject rejects missing overlay for registry-validated onboarding', async () => {
+  const { rootDir } = createLegacyProjectFixture();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+
+  await assert.rejects(
+    () => importLegacyProject({
+      rootDir,
+      workspaceRoot,
+      project: 'topic-a',
+    }),
+    /overlay 不能为空/,
   );
 });
 
@@ -139,6 +156,7 @@ test('importLegacyProject rejects importing into an existing canonical topic', a
       rootDir,
       workspaceRoot,
       project: 'topic-a',
+      overlay: 'xiaohongshu',
     }),
     /目标 topic 已存在: topic-a/,
   );
@@ -158,6 +176,8 @@ test('CLI import legacy-project proxies gateway importer', () => {
       rootDir,
       '--workspace-root',
       workspaceRoot,
+      '--overlay',
+      'xiaohongshu',
       '--project',
       'topic-a',
     ],
@@ -168,4 +188,30 @@ test('CLI import legacy-project proxies gateway importer', () => {
   assert.equal(parsed.ok, true);
   assert.equal(parsed.mode, 'legacy_to_workspace');
   assert.equal(parsed.project, 'topic-a');
+});
+
+test('CLI import legacy-project rejects missing overlay', () => {
+  const { rootDir } = createLegacyProjectFixture();
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-workspace-'));
+
+  try {
+    execFileSync(
+      'node',
+      [
+        path.resolve('apps/redcube-cli/src/cli.js'),
+        'import',
+        'legacy-project',
+        '--root-dir',
+        rootDir,
+        '--workspace-root',
+        workspaceRoot,
+        '--project',
+        'topic-a',
+      ],
+      { encoding: 'utf-8', cwd: path.resolve('.') },
+    );
+    assert.fail('expected CLI import legacy-project to reject missing overlay');
+  } catch (error) {
+    assert.match(error.stdout, /overlay 不能为空/);
+  }
 });

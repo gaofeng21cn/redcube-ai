@@ -10,13 +10,16 @@ function read(file) {
 test('gateway actions no longer hardcode overlay family packages directly', () => {
   const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.js');
   const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.js');
+  const importLegacyProject = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
 
   assert.equal(createDeliverable.includes("@redcube/overlay-ppt"), false);
   assert.equal(createDeliverable.includes("@redcube/overlay-xiaohongshu"), false);
   assert.equal(auditDeliverable.includes("@redcube/overlay-ppt"), false);
   assert.equal(auditDeliverable.includes("@redcube/overlay-xiaohongshu"), false);
+  assert.equal(importLegacyProject.includes("@redcube/overlay-xiaohongshu"), false);
   assert.equal(createDeliverable.includes('@redcube/overlay-registry'), true);
   assert.equal(auditDeliverable.includes('@redcube/overlay-registry'), true);
+  assert.equal(importLegacyProject.includes('@redcube/overlay-registry'), true);
 });
 
 test('overlay registry package exports default registry entrypoint', () => {
@@ -26,7 +29,24 @@ test('overlay registry package exports default registry entrypoint', () => {
 
   assert.equal(registryIndex.includes('getDefaultOverlayRegistry'), true);
   assert.equal(registryIndex.includes('getDefaultOverlayCatalog'), true);
+  assert.equal(registryIndex.includes("from '@redcube/overlay-ppt'"), false);
+  assert.equal(registryIndex.includes("from '@redcube/overlay-xiaohongshu'"), false);
   assert.equal(registryPackage.name, '@redcube/overlay-registry');
+  assert.deepEqual(
+    registryPackage.redcube?.defaultOverlayModules,
+    [
+      {
+        overlayId: 'ppt_deck',
+        module: '@redcube/overlay-ppt',
+        exportName: 'pptDeckOverlay',
+      },
+      {
+        overlayId: 'xiaohongshu',
+        module: '@redcube/overlay-xiaohongshu',
+        exportName: 'xiaohongshuOverlay',
+      },
+    ],
+  );
   assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-ppt']), false);
   assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
 });
