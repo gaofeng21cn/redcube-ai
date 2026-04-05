@@ -1,0 +1,8 @@
+{
+  "overlay": "xiaohongshu",
+  "profileId": "standard_note",
+  "topicId": "xhs-reference",
+  "title": "甲状腺门诊小红书认可稿",
+  "goal": "验证小红书认可稿相对质量回归",
+  "sourceFile": "approved-note.md"
+}

@@ -7,6 +7,7 @@ import { appendEvent, readEvents } from './event-log.js';
 import { resolveExecutorAdapter } from './executors.js';
 import { persistReviewStatePatch } from './review-state.js';
 import { completeRun, failRun, startRun } from './run-store.js';
+import { loadSharedSourceTruth } from './shared-source-truth.js';
 
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
@@ -51,7 +52,11 @@ export async function runDeliverableRoute({
       `overlay mismatch: expected ${storedDeliverable.overlay}, got ${overlay}`,
     );
   }
-  const contract = loadHydratedContract(deliverablePaths, storedDeliverable);
+  const baseContract = loadHydratedContract(deliverablePaths, storedDeliverable);
+  const contract = {
+    ...baseContract,
+    shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId),
+  };
   const stageContract = contract.stage_sequence?.stages?.find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;

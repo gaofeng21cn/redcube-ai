@@ -42,7 +42,23 @@ function defaultState({ contract, topicId, deliverableId }) {
     pending_reviews: [],
     blocking_reasons: [],
     rerun_from_stage: null,
+    rerun_policy: {
+      status: 'idle',
+      rerun_from_stage: null,
+    },
     baseline: null,
+    approval_state: {
+      required: contract.overlay === 'xiaohongshu',
+      status: contract.overlay === 'xiaohongshu' ? 'pending_artifacts' : 'not_required',
+      requested_at: null,
+      approved_at: null,
+      approved_by: null,
+    },
+    publish_state: {
+      current: contract.overlay === 'xiaohongshu' ? 'draft' : 'not_applicable',
+      promoted_at: null,
+      approved_by: null,
+    },
     mutation_count: 0,
     history_count: 0,
     last_mutation: null,
@@ -62,6 +78,14 @@ function writeState(file, state) {
 function appendHistory(file, entry) {
   ensureDir(path.dirname(file));
   appendFileSync(file, `${JSON.stringify(entry)}\n`, 'utf-8');
+}
+
+export function isBaselineApprovedState(state) {
+  if (!state) return false;
+  if (state.approval_state?.required) {
+    return state.approval_state.status === 'approved' || state.publish_state?.current === 'published';
+  }
+  return Boolean(state.ready_for_export);
 }
 
 export function getReviewState(request) {
@@ -95,6 +119,9 @@ export function persistReviewStatePatch({ workspaceRoot, topicId, deliverableId,
     rerun_from_stage: Object.hasOwn(patch, 'rerun_from_stage') ? patch.rerun_from_stage : previous.rerun_from_stage,
     latest_checks: patch.latest_checks ? { ...previous.latest_checks, ...patch.latest_checks } : previous.latest_checks,
     baseline: patch.baseline ? { ...(previous.baseline || {}), ...patch.baseline } : previous.baseline,
+    rerun_policy: patch.rerun_policy ? { ...(previous.rerun_policy || {}), ...patch.rerun_policy } : previous.rerun_policy,
+    approval_state: patch.approval_state ? { ...(previous.approval_state || {}), ...patch.approval_state } : previous.approval_state,
+    publish_state: patch.publish_state ? { ...(previous.publish_state || {}), ...patch.publish_state } : previous.publish_state,
     last_updated_at: nowIso(),
   };
   next.history_count = Number(previous.history_count || 0) + 1;
@@ -135,6 +162,20 @@ export function applyReviewMutation({ workspaceRoot, topicId, deliverableId, mut
         pending_reviews: normalizeList(mutation?.issues),
         blocking_reasons: normalizeList([...(mutation?.issues || []), mutation?.notes || '']).filter(Boolean),
         rerun_from_stage: String(mutation?.rerun_from_stage || '').trim() || null,
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: String(mutation?.rerun_from_stage || '').trim() || null,
+        },
+        approval_state: {
+          status: 'changes_requested',
+          approved_at: null,
+          approved_by: null,
+        },
+        publish_state: {
+          current: 'draft',
+          promoted_at: null,
+          approved_by: null,
+        },
         last_mutation: {
           type,
           actor: String(mutation?.actor || 'unknown'),
@@ -145,6 +186,9 @@ export function applyReviewMutation({ workspaceRoot, topicId, deliverableId, mut
     });
   }
   if (type === 'bind_baseline') {
+    if (!String(mutation?.baseline_deliverable_id || '').trim()) {
+      throw new Error('bind_baseline 需要 baseline_deliverable_id');
+    }
     return persistReviewStatePatch({
       workspaceRoot,
       topicId,
@@ -154,6 +198,75 @@ export function applyReviewMutation({ workspaceRoot, topicId, deliverableId, mut
         baseline: {
           baseline_deliverable_id: String(mutation?.baseline_deliverable_id || '').trim(),
           notes: String(mutation?.notes || '').trim() || null,
+        },
+        last_mutation: {
+          type,
+          actor: String(mutation?.actor || 'unknown'),
+          notes: String(mutation?.notes || '').trim() || null,
+        },
+      },
+    });
+  }
+  if (type === 'approve_publish') {
+    const current = getReviewState({ workspaceRoot, topicId, deliverableId }).state;
+    if (current?.current_status !== 'publish_ready') {
+      throw new Error('approve_publish requires current_status === publish_ready');
+    }
+    if (current?.approval_state?.status !== 'pending_human') {
+      throw new Error('approve_publish requires approval_state.status === pending_human');
+    }
+    if (!current?.ready_for_export) {
+      throw new Error('approve_publish requires ready_for_export === true');
+    }
+    if (normalizeList(current?.pending_reviews).length > 0) {
+      throw new Error('approve_publish requires pending_reviews to be empty');
+    }
+    return persistReviewStatePatch({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+      source: 'mutation',
+      patch: {
+        current_status: 'approved_for_publish',
+        approval_state: {
+          status: 'approved',
+          approved_at: nowIso(),
+          approved_by: String(mutation?.actor || 'unknown'),
+        },
+        publish_state: {
+          current: 'approved_pending_publish',
+          approved_by: String(mutation?.actor || 'unknown'),
+        },
+        last_mutation: {
+          type,
+          actor: String(mutation?.actor || 'unknown'),
+          notes: String(mutation?.notes || '').trim() || null,
+        },
+      },
+    });
+  }
+  if (type === 'promote_publish') {
+    const current = getReviewState({ workspaceRoot, topicId, deliverableId }).state;
+    if (current?.approval_state?.status !== 'approved') {
+      throw new Error('promote_publish requires approval_state.status === approved');
+    }
+    if (current?.current_status !== 'approved_for_publish') {
+      throw new Error('promote_publish requires current_status === approved_for_publish');
+    }
+    if (current?.publish_state?.current !== 'approved_pending_publish') {
+      throw new Error('promote_publish requires publish_state.current === approved_pending_publish');
+    }
+    return persistReviewStatePatch({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+      source: 'mutation',
+      patch: {
+        current_status: 'published',
+        publish_state: {
+          current: 'published',
+          promoted_at: nowIso(),
+          approved_by: String(mutation?.actor || current?.approval_state?.approved_by || 'unknown'),
         },
         last_mutation: {
           type,

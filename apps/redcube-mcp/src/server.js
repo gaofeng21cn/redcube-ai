@@ -12,6 +12,7 @@ import {
   getDeliverable,
   getReviewState,
   getRun,
+  intakeSource,
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -24,6 +25,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   listTopics,
   createDeliverable,
   getDeliverable,
+  intakeSource,
   auditDeliverable,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -48,6 +50,20 @@ const TOOL_DEFINITIONS = [
     actionKey: 'listTopics',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
+    },
+  },
+  {
+    name: 'intake_source',
+    description: 'Hydrate brief / keywords / source files into canonical shared source artifacts.',
+    actionKey: 'intakeSource',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      title: z.string().optional().describe('Topic title.'),
+      brief: z.string().optional().describe('Short textual brief.'),
+      keywords: z.union([z.string(), z.array(z.string())]).optional().describe('Keyword list or comma-separated keywords.'),
+      sourceFiles: z.union([z.string(), z.array(z.string())]).optional().describe('Absolute source file paths or comma-separated file list.'),
+      modeHint: z.string().optional().describe('Optional intake mode hint such as legacy_import.'),
     },
   },
   {

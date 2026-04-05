@@ -7,7 +7,7 @@ import {
 import {
   createOverlayRegistry,
 } from '@redcube/overlay-core';
-import { auditDeliverableRequest } from '@redcube/runtime';
+import { auditDeliverableRequest, getReviewState as getRuntimeReviewState, isBaselineApprovedState } from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
 
@@ -114,6 +114,21 @@ function auditOverlaySurface({
 
 export async function auditDeliverable(request) {
   const reports = [auditDeliverableRequest(request)];
+  if (request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId) {
+    const baselineState = getRuntimeReviewState({
+      workspaceRoot: request.workspaceRoot,
+      topicId: request.topicId,
+      deliverableId: request.baselineDeliverableId,
+    }).state;
+    if (!isBaselineApprovedState(baselineState)) {
+      reports.push({
+        status: 'block',
+        issues: ['baseline_not_approved'],
+        rerun_from_stage: 'intake',
+        recommended_action: 'approve_or_publish_baseline',
+      });
+    }
+  }
   reports.push(auditOverlaySurface(request));
 
   return mergeAuditReports(reports);

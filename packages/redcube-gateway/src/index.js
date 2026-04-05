@@ -1,5 +1,9 @@
 export { doctorWorkspace } from './actions/doctor-workspace.js';
 export { listTopics } from './actions/list-topics.js';
+export async function intakeSource(request) {
+  const module = await import('./actions/intake-source.js');
+  return module.intakeSource(request);
+}
 export async function importLegacyProject(request) {
   const module = await import('./actions/import-legacy-project.js');
   return module.importLegacyProject(request);

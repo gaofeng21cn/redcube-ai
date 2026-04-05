@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
+  applyReviewMutation,
   createDeliverable,
+  intakeSource,
   reviewRenderOutput,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
@@ -130,9 +132,16 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
 
   const render = readJson(chain[4].result.artifactFile);
   assert.equal(existsSync(render.html_bundle?.html_file), true);
+  assert.equal(render.html_bundle?.render_strategy, 'prompt_director_first');
+  assert.deepEqual(render.html_bundle?.director_contract?.peak_pages, visual.visual_direction?.peak_pages);
+  assert.deepEqual(render.html_bundle?.director_contract?.page_family_ceiling, visual.visual_direction?.page_family_ceiling);
+  assert.equal(render.html_bundle?.slides.every((slide) => typeof slide.recipe_id === 'string' && slide.recipe_id.length > 0), true);
+  assert.equal(render.html_bundle?.slides.every((slide) => typeof slide.content === 'string' && slide.content.includes('data-recipe-id=')), true);
   const html = readFileSync(render.html_bundle.html_file, 'utf-8');
   assert.match(html, /slide-display-area/);
   assert.match(html, /const slidesData = \[/);
+  assert.match(html, /data-render-strategy="prompt-director-first"/);
+  assert.match(html, /id="redcube-render-plan"/);
 
   const directorReview = readJson(chain[5].result.artifactFile);
   assert.equal(typeof directorReview.visual_director_review?.director_intent_landed, 'boolean');
@@ -173,6 +182,17 @@ test('xiaohongshu optimize_existing binds baseline and emits relative review', a
   });
   const baselineChain = await runXhsChain({ workspaceRoot, deliverableId: 'baseline-a' });
   assert.equal(baselineChain.at(-1).result.ok, true);
+  const baselineApproved = await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'baseline-a',
+    mutation: {
+      type: 'approve_publish',
+      actor: 'human',
+      notes: '认可稿基线',
+    },
+  });
+  assert.equal(baselineApproved.state.approval_state.status, 'approved');
 
   await createDeliverable({
     workspaceRoot,
@@ -234,4 +254,87 @@ test('xiaohongshu export_bundle performs real delivery and series surfaces when 
   assert.equal(existsSync(bundle.series_surfaces?.delivery_overview_file), true);
   assert.equal(existsSync(bundle.series_surfaces?.path_mapping_file), true);
   assert.equal(existsSync(bundle.series_surfaces?.cadence_file), true);
+});
+
+test('xiaohongshu research/storyline/plan/visual_direction consume shared source truth', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-source-'));
+  const richFile = path.join(workspaceRoot, 'rich-material.md');
+  writeFileSync(
+    richFile,
+    [
+      '# 门诊沟通记录',
+      '患者最关心的是“先复查还是先吃药”。',
+      '如果没有先讲清判断顺序，患者会把时间花在错误动作上。',
+      '门诊真实痛点是：把来源翻译成人能理解的话。',
+    ].join('\n'),
+    'utf-8',
+  );
+
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-rich',
+    title: '门诊沟通 rich',
+    sourceFiles: [richFile],
+  });
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-brief',
+    title: '门诊沟通 brief',
+    brief: '做一个门诊患者可收藏的判断顺序总结。',
+    keywords: ['门诊', '患者', '判断顺序'],
+  });
+
+  for (const topicId of ['topic-rich', 'topic-brief']) {
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId,
+      deliverableId: `${topicId}-note`,
+      title: `交付物 ${topicId}`,
+      goal: '验证 shared source truth 消费',
+    });
+  }
+
+  const richChain = [];
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
+    richChain.push(await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-rich',
+      deliverableId: 'topic-rich-note',
+      route,
+    }));
+  }
+  const briefChain = [];
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
+    briefChain.push(await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-brief',
+      deliverableId: 'topic-brief-note',
+      route,
+    }));
+  }
+
+  const richResearch = readJson(richChain[0].artifactFile);
+  const briefResearch = readJson(briefChain[0].artifactFile);
+  assert.equal(richResearch.research?.input_mode, 'files');
+  assert.equal(briefResearch.research?.input_mode, 'brief_keywords');
+  assert.equal(richResearch.research?.source_truth_material_count > 0, true);
+  assert.equal(Array.isArray(richResearch.research?.source_truth_material_ids), true);
+  assert.notEqual(richResearch.research?.topic_summary, briefResearch.research?.topic_summary);
+
+  const richStoryline = readJson(richChain[1].artifactFile);
+  assert.equal(Array.isArray(richStoryline.storyline?.source_truth_material_ids), true);
+  assert.notDeepEqual(richStoryline.storyline?.source_truth_material_ids, briefResearch.research?.source_truth_material_ids || []);
+
+  const richPlan = readJson(richChain[2].artifactFile);
+  assert.equal(
+    richPlan.single_note_plan.slides.some((slide) => slide.page_core_content.some((item) => item.includes('先复查还是先吃药'))),
+    true,
+  );
+
+  const richVisual = readJson(richChain[3].artifactFile);
+  assert.equal(richVisual.visual_direction?.source_truth_confidence, 'medium');
 });

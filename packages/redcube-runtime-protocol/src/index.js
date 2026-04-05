@@ -5,3 +5,7 @@ export {
   getTopicPaths,
   resolveWorkspaceContract,
 } from './workspace.js';
+export {
+  getSourceArtifactPaths,
+  getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
+} from './source-truth.js';

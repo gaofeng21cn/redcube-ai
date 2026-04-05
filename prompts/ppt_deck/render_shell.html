@@ -1,129 +1,102 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>__PPT_DECK_TITLE__</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Noto Sans SC', 'Inter', sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; overflow: hidden; background: #e2e8f0; }
+    body { display: flex; align-items: center; justify-content: center; padding: 24px; color: #0F172A; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    #app-container { width: min(1280px, 96vw); }
+    #slide-display-area { width: 100%; aspect-ratio: 16 / 9; position: relative; overflow: hidden; border-radius: 28px; background: #FFFFFF; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14); }
+    #control-panel { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,0.92); border-radius: 20px; padding: 12px 18px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10); }
+    button { border: 0; cursor: pointer; border-radius: 14px; padding: 12px 20px; font-weight: 700; background: #0F172A; color: white; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 180ms ease; display: flex; align-items: center; justify-content: center; }
+    .slide.visible { opacity: 1; visibility: visible; }
+    .slide-content-wrapper { width: 1152px; height: 648px; overflow: hidden; position: relative; }
   </style>
 </head>
-<body class="bg-slate-100 flex flex-col items-center justify-center min-h-screen p-4">
-  <div id="app-container" class="w-full max-w-6xl">
-    <div id="slide-display-area" class="w-full bg-white rounded-xl shadow-2xl aspect-[16/9] relative overflow-hidden flex justify-center items-center"></div>
-    <div id="control-panel" class="w-full max-w-4xl mx-auto mt-4 p-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg flex items-center justify-between">
-      <button id="prev-btn" class="px-6 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">上一页</button>
-      <div id="progress-indicator" class="text-xl font-semibold text-slate-700 w-48 text-center"></div>
-      <div class="flex items-center gap-3">
-        <button id="export-png-btn" title="导出当前页为PNG" class="flex items-center justify-center w-12 h-12 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"><i class="fas fa-camera fa-lg"></i></button>
-        <button id="export-pdf-btn" title="导出为PDF" class="flex items-center justify-center w-12 h-12 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"><i class="fas fa-file-pdf fa-lg"></i></button>
-        <button id="export-pptx-btn" title="导出为PPTX" class="flex items-center justify-center w-12 h-12 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"><i class="fas fa-file-powerpoint fa-lg"></i></button>
-        <button id="next-btn" class="px-6 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">下一页</button>
-      </div>
+<body data-render-strategy="__REDCUBE_RENDER_STRATEGY__">
+  <div id="app-container">
+    <div id="slide-display-area"></div>
+    <div id="control-panel">
+      <button id="prev-btn">上一页</button>
+      <div id="progress-indicator"></div>
+      <button id="next-btn">下一页</button>
     </div>
   </div>
+  <script id="redcube-render-plan" type="application/json">__REDCUBE_RENDER_PLAN__</script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const slidesData = __PPT_DECK_SLIDES_DATA__;
-      const slideDisplayArea = document.getElementById('slide-display-area');
-      const prevBtn = document.getElementById('prev-btn');
-      const nextBtn = document.getElementById('next-btn');
-      const progressIndicator = document.getElementById('progress-indicator');
-      const exportPngBtn = document.getElementById('export-png-btn');
-      const exportPdfBtn = document.getElementById('export-pdf-btn');
-      const exportPptxBtn = document.getElementById('export-pptx-btn');
-      let currentSlide = 0;
-      const totalSlides = slidesData.length;
-      if (totalSlides === 0) {
-        slideDisplayArea.innerHTML = '<div class="text-center text-slate-500 p-8"><p class="text-2xl">内容待填充</p></div>';
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
-        return;
-      }
-      function setupSlides() {
-        slideDisplayArea.innerHTML = '';
-        slidesData.forEach((slide) => {
-          const slideElement = document.createElement('div');
-          slideElement.className = 'slide w-full h-full absolute top-0 left-0 transition-opacity duration-300 ease-in-out flex justify-center items-center opacity-0 invisible';
-          slideElement.innerHTML = `<div class="slide-content-wrapper flex flex-col" style="width: 1152px; height: 648px; overflow: hidden; font-family: 'Noto Sans SC', 'Inter', sans-serif;">${slide.content}</div>`;
-          slideDisplayArea.appendChild(slideElement);
-        });
-      }
-      function updateView() {
-        const slides = document.querySelectorAll('.slide');
-        slides.forEach((slide, index) => {
-          if (index === currentSlide) slide.classList.remove('opacity-0', 'invisible');
-          else slide.classList.add('opacity-0', 'invisible');
-        });
-        progressIndicator.textContent = `${currentSlide + 1} / ${totalSlides}`;
-        prevBtn.disabled = currentSlide === 0;
-        nextBtn.disabled = currentSlide === totalSlides - 1;
-      }
-      async function captureNodeAsPng(node) {
-        return window.htmlToImage.toPng(node, { quality: 0.98, pixelRatio: 2, cacheBust: true });
-      }
-      async function processAllSlides() {
-        const images = [];
-        const originalSlide = currentSlide;
-        try {
-          for (let i = 0; i < totalSlides; i += 1) {
-            currentSlide = i;
-            updateView();
-            await new Promise((resolve) => setTimeout(resolve, 250));
-            const visibleNode = document.querySelector('.slide:not(.invisible) .slide-content-wrapper');
-            images.push(await captureNodeAsPng(visibleNode));
-          }
-        } finally {
-          currentSlide = originalSlide;
-          updateView();
-        }
-        return images;
-      }
-      exportPngBtn.addEventListener('click', async () => {
-        const visibleNode = document.querySelector('.slide:not(.invisible) .slide-content-wrapper');
-        const imgData = await captureNodeAsPng(visibleNode);
-        const link = document.createElement('a');
-        link.download = `${document.title}-第${currentSlide + 1}页.png`;
-        link.href = imgData;
-        link.click();
+    const slidesData = __PPT_DECK_SLIDES_DATA__;
+    const slideDisplayArea = document.getElementById('slide-display-area');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const progressIndicator = document.getElementById('progress-indicator');
+    let currentSlide = 0;
+    function setupSlides() {
+      slideDisplayArea.innerHTML = '';
+      slidesData.forEach((slide) => {
+        const element = document.createElement('div');
+        element.className = 'slide';
+        element.innerHTML = '<div class="slide-content-wrapper">' + slide.content + '</div>';
+        slideDisplayArea.appendChild(element);
       });
-      exportPdfBtn.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1152, 648] });
-        const images = await processAllSlides();
-        images.forEach((imgData, index) => {
-          if (index > 0) pdf.addPage([1152, 648], 'landscape');
-          pdf.addImage(imgData, 'PNG', 0, 0, 1152, 648, undefined, 'FAST');
+    }
+    function updateView() {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      slides.forEach((slide, index) => slide.classList.toggle('visible', index === currentSlide));
+      progressIndicator.textContent = (currentSlide + 1) + ' / ' + slidesData.length;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slidesData.length - 1;
+    }
+    function inspectCurrentSlide() {
+      const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
+      const root = wrapper?.querySelector('[data-slide-root]');
+      const bounds = wrapper?.getBoundingClientRect();
+      const blocks = Array.from(wrapper?.querySelectorAll('[data-qa-block]') || [])
+        .filter((node) => !node.querySelector('[data-qa-block]'))
+        .map((node, index) => {
+          const rect = node.getBoundingClientRect();
+          return {
+            id: node.getAttribute('data-qa-block') || ('block-' + (index + 1)),
+            left: rect.left - bounds.left,
+            top: rect.top - bounds.top,
+            width: rect.width,
+            height: rect.height,
+            area: rect.width * rect.height,
+          };
         });
-        await Promise.resolve(pdf.save(`${document.title}.pdf`));
-      });
-      exportPptxBtn.addEventListener('click', async () => {
-        const images = await processAllSlides();
-        const pptx = new window.PptxGenJS();
-        pptx.layout = 'LAYOUT_WIDE';
-        images.forEach((imgData) => {
-          const slide = pptx.addSlide();
-          slide.addImage({ data: imgData, x: 0, y: 0, w: '100%', h: '100%' });
-        });
-        await pptx.writeFile({ fileName: `${document.title}.pptx` });
-      });
-      nextBtn.addEventListener('click', () => { if (currentSlide < totalSlides - 1) { currentSlide += 1; updateView(); } });
-      prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide -= 1; updateView(); } });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowRight') nextBtn.click();
-        if (event.key === 'ArrowLeft') prevBtn.click();
-      });
-      setupSlides();
-      updateView();
-    });
+      return {
+        slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
+        title: root?.dataset.title || slidesData[currentSlide]?.title || '',
+        layoutFamily: root?.dataset.layoutFamily || slidesData[currentSlide]?.layoutFamily || '',
+        speakerSeconds: Number(root?.dataset.speakerSeconds || 0),
+        primaryPoints: wrapper?.querySelectorAll('[data-primary-point="true"]').length || 0,
+        wrapper: {
+          clientWidth: wrapper?.clientWidth || 1152,
+          clientHeight: wrapper?.clientHeight || 648,
+          scrollWidth: wrapper?.scrollWidth || 1152,
+          scrollHeight: wrapper?.scrollHeight || 648,
+        },
+        bodyScroll: false,
+        blocks,
+      };
+    }
+    prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide -= 1; updateView(); } });
+    nextBtn.addEventListener('click', () => { if (currentSlide < slidesData.length - 1) { currentSlide += 1; updateView(); } });
+    window.redcubeDeckReview = {
+      totalSlides: slidesData.length,
+      showSlide(index) {
+        currentSlide = index;
+        updateView();
+        return inspectCurrentSlide();
+      },
+      inspectCurrentSlide,
+    };
+    setupSlides();
+    updateView();
   </script>
 </body>
 </html>

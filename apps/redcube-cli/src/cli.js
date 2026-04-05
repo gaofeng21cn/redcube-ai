@@ -8,6 +8,7 @@ import {
   getDeliverable,
   getReviewState,
   getRun as getGatewayRun,
+  intakeSource,
   importLegacyProject,
   listTopics as listTopicsGateway,
   runDeliverableRoute,
@@ -71,6 +72,10 @@ function buildHelp() {
         command: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
       },
       {
+        task: '把 brief / keywords / source files 水合成 shared source truth',
+        command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+      },
+      {
         task: '创建一个新的视觉交付物',
         command: 'redcube deliverable create --workspace-root <dir> --overlay <ppt_deck|xiaohongshu> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       },
@@ -98,6 +103,7 @@ function buildHelp() {
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
+      source: ['intake'],
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
@@ -116,6 +122,7 @@ function buildHelp() {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
       importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+      sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
@@ -181,6 +188,23 @@ async function main() {
       rootDir: options.rootDir || '',
       workspaceRoot: resolveWorkspaceRoot(options),
       project: options.project || '',
+    });
+    printJson(result);
+    return;
+  }
+
+  if (command === 'source') {
+    if (subcommand !== 'intake') {
+      fail('source 命令仅支持 intake');
+    }
+
+    const result = await intakeSource({
+      workspaceRoot: resolveWorkspaceRoot(options),
+      topicId: options.topicId || '',
+      title: options.title || '',
+      brief: options.brief || '',
+      keywords: options.keywords || '',
+      sourceFiles: options.sourceFiles || '',
     });
     printJson(result);
     return;

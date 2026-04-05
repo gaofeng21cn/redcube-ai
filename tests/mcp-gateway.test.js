@@ -22,6 +22,7 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
     [
       'doctor',
       'list_topics',
+      'intake_source',
       'create_deliverable',
       'get_deliverable',
       'audit_deliverable',
@@ -63,6 +64,33 @@ test('callGatewayTool delegates to injected gateway action', async () => {
   assert.equal(result.deliverable.overlay, 'ppt_deck');
   assert.equal(result.deliverable.profile_id, 'lecture_student');
   assert.equal(result.deliverable.deliverable_id, 'deck-a');
+});
+
+test('callGatewayTool delegates source intake gateway action', async () => {
+  const result = await callGatewayTool(
+    'intake_source',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      title: '共享输入',
+      brief: 'brief',
+      keywords: ['a', 'b'],
+      sourceFiles: [],
+    },
+    {
+      intakeSource: async (request) => ({
+        ok: true,
+        audit: {
+          topic_id: request.topicId,
+          status: 'pass',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.audit.topic_id, 'topic-a');
+  assert.equal(result.audit.status, 'pass');
 });
 
 

@@ -13,6 +13,7 @@ import {
 import {
   auditDeliverable,
   createDeliverable,
+  runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
 
 test('createDeliverable hydrates ppt deck contract surface', async () => {
@@ -114,6 +115,26 @@ test('auditDeliverable blocks when hydrated ppt deck surface is missing', async 
 
 test('auditDeliverable passes when hydrated ppt deck surface exists and baseline is bound', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-approved-v1',
+    title: '甲状腺门诊科普 baseline',
+    goal: '已认可基线',
+  });
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-approved-v1',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
 
   await createDeliverable({
     workspaceRoot,

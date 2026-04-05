@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 import {
   createDeliverable,
+  intakeSource,
   reviewRenderOutput,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
@@ -135,11 +136,23 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
   const renderBundle = readJson(chain[4].result.artifactFile);
   assert.equal(typeof renderBundle.html_bundle?.html_file, 'string');
   assert.equal(existsSync(renderBundle.html_bundle.html_file), true);
+  assert.equal(renderBundle.html_bundle?.render_strategy, 'prompt_director_first');
+  assert.deepEqual(
+    renderBundle.html_bundle?.generator_instructions,
+    visualDirection.visual_direction?.final_instruction_to_html_generator,
+  );
+  assert.deepEqual(
+    renderBundle.html_bundle?.slides?.map((slide) => slide.layout_family),
+    blueprint.slide_blueprint.slides.map((slide) => slide.visual_presentation.layout_family),
+  );
+  assert.equal(renderBundle.html_bundle?.slides.every((slide) => typeof slide.recipe_id === 'string' && slide.recipe_id.length > 0), true);
   const html = readFileSync(renderBundle.html_bundle.html_file, 'utf-8');
   assert.match(html, /id="slide-display-area"/);
   assert.match(html, /id="prev-btn"/);
   assert.match(html, /id="next-btn"/);
   assert.match(html, /const slidesData = \[/);
+  assert.match(html, /data-render-strategy="prompt-director-first"/);
+  assert.match(html, /id="redcube-render-plan"/);
   assert.equal(/renderSlide|layoutByType|cardsGrid|pageType/.test(html), false);
 
   const reviewBundle = readJson(chain[5].result.artifactFile);
@@ -232,4 +245,87 @@ test('export_pptx performs real delivery or explicit hard block', async () => {
     assert.equal(exportResult.ok, false);
     assert.match(exportResult.run.error.message, /python|playwright|pptx/i);
   }
+});
+
+test('ppt_deck storyline/outline/blueprint/visual_direction consume shared source truth', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-source-'));
+  const richFile = path.join(workspaceRoot, 'rich-outline.md');
+  writeFileSync(
+    richFile,
+    [
+      '# 肠癌 AI 课堂素材',
+      '课堂主问题：先定义问题，再判断证据，再决定动作。',
+      '听众最容易误判的是把工具演示当成任务定义。',
+      '必须把公开来源翻译成学生能复述的话。',
+    ].join('\n'),
+    'utf-8',
+  );
+
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-rich',
+    title: 'PPT rich',
+    sourceFiles: [richFile],
+  });
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-brief',
+    title: 'PPT brief',
+    brief: '给学生讲清 AI 讲课 deck 的判断顺序。',
+    keywords: ['AI', '课堂', '判断顺序'],
+  });
+
+  for (const topicId of ['topic-rich', 'topic-brief']) {
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId,
+      deliverableId: `${topicId}-deck`,
+      title: `课件 ${topicId}`,
+      goal: '验证 ppt shared source truth 消费',
+    });
+  }
+
+  const richResults = [];
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
+    richResults.push(await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-rich',
+      deliverableId: 'topic-rich-deck',
+      route,
+    }));
+  }
+  const briefResults = [];
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
+    briefResults.push(await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-brief',
+      deliverableId: 'topic-brief-deck',
+      route,
+    }));
+  }
+
+  const richStoryline = readJson(richResults[0].artifactFile);
+  const briefStoryline = readJson(briefResults[0].artifactFile);
+  assert.equal(richStoryline.storyline?.source_truth_input_mode, 'files');
+  assert.equal(briefStoryline.storyline?.source_truth_input_mode, 'brief_keywords');
+  assert.notEqual(richStoryline.storyline?.core_metaphor, briefStoryline.storyline?.core_metaphor);
+
+  const richOutline = readJson(richResults[1].artifactFile);
+  assert.equal(
+    richOutline.detailed_outline.slides.some((slide) => slide.core_sentence.includes('先定义问题，再判断证据，再决定动作')),
+    true,
+  );
+
+  const richBlueprint = readJson(richResults[2].artifactFile);
+  assert.equal(
+    richBlueprint.slide_blueprint.slides.some((slide) => slide.page_core_content.some((item) => item.text.includes('公开来源翻译成学生能复述的话'))),
+    true,
+  );
+
+  const richVisual = readJson(richResults[3].artifactFile);
+  assert.equal(richVisual.visual_direction?.source_truth_confidence, 'medium');
 });

@@ -5,6 +5,8 @@ import { spawnSync } from 'node:child_process';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
+import { getReviewState, isBaselineApprovedState } from './review-state.js';
+
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYTHON_REVIEW = path.join(MODULE_DIR, '../scripts/ppt_deck_review.py');
@@ -70,6 +72,14 @@ function promptMeta(route) {
   };
 }
 
+function readPromptPackText(relativePath) {
+  const absolutePath = path.join(REPO_ROOT, relativePath);
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Missing prompt pack asset: ${relativePath}`);
+  }
+  return readFileSync(absolutePath, 'utf-8');
+}
+
 function renderSeedValue(value, vars) {
   if (Array.isArray(value)) return value.map((item) => renderSeedValue(item, vars));
   if (value && typeof value === 'object') {
@@ -132,6 +142,67 @@ function inferMemoryHook(contract) {
     return '先别急着上工具，先把顺序做对';
   }
   return '先别急着记概念，先抓最值钱的判断句';
+}
+
+function sourceTruth(contract) {
+  return contract?.shared_source_truth || null;
+}
+
+function sourceMaterials(contract) {
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials);
+}
+
+function sourceMaterialIds(contract) {
+  return sourceMaterials(contract).map((material) => material.material_id);
+}
+
+function sourceLabels(contract) {
+  const truth = sourceTruth(contract);
+  const labels = safeArray(truth?.source_index?.sources)
+    .filter((source) => source.status === 'ready')
+    .map((source) => source.relative_path || source.kind);
+  return labels.length > 0 ? labels : publicSources();
+}
+
+function sourceSnippet(contract, index = 0) {
+  const materials = sourceMaterials(contract);
+  if (materials.length === 0) return '';
+  const material = materials[index % materials.length];
+  return safeText(material?.excerpt || material?.content_text).replace(/\s+/g, ' ').slice(0, 64);
+}
+
+function sourceInputMode(contract) {
+  return safeText(sourceTruth(contract)?.source_brief?.input_mode);
+}
+
+function sourceConfidence(contract) {
+  return safeText(sourceTruth(contract)?.source_brief?.confidence);
+}
+
+function deriveAudienceFromSource(contract) {
+  const corpus = `${safeText(sourceTruth(contract)?.source_brief?.brief_text)} ${sourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ')}`;
+  if (/患者|门诊|家属/.test(corpus)) {
+    return '门诊患者和家属：更关心先做什么、怎么避免走弯路，而不是完整术语体系';
+  }
+  if (/医生|临床|同行/.test(corpus)) {
+    return '临床一线读者：更关心判断顺序、误区成本与可执行动作';
+  }
+  return inferAudience(contract);
+}
+
+function deriveWhyNowFromSource(contract) {
+  const snippet = sourceSnippet(contract, 0);
+  return snippet ? `当前输入材料反复指向的现实问题是：${snippet}` : inferWhyNow(contract);
+}
+
+function deriveTensionFromSource(contract) {
+  const snippet = sourceSnippet(contract, 1) || sourceSnippet(contract, 0);
+  return snippet ? `输入材料里的核心冲突是：${snippet}` : inferTension(contract);
+}
+
+function deriveMemoryHookFromSource(contract) {
+  const snippet = sourceSnippet(contract, 0);
+  return snippet ? `先记住这句：${snippet}` : inferMemoryHook(contract);
 }
 
 function inferPageContent(slide, context, index, slides) {
@@ -265,24 +336,43 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {
     throw new Error('screenshot_review requires baselineDeliverableId in optimize_existing mode');
   }
+  if (route === 'screenshot_review' && mode === 'optimize_existing' && safeText(baselineDeliverableId)) {
+    const baselineState = getReviewState({
+      workspaceRoot,
+      topicId,
+      deliverableId: baselineDeliverableId,
+    }).state;
+    if (!isBaselineApprovedState(baselineState)) {
+      throw new Error(`Baseline deliverable is not approved: ${baselineDeliverableId}`);
+    }
+  }
   return { deliverablePaths, contract };
 }
 
 function buildResearch(contract) {
   const seed = promptSeed('research', { title: contract.title });
-  const references = safeArray(seed?.research?.reference_source_list).length > 0 ? seed.research.reference_source_list : publicSources();
+  const references = sourceTruth(contract)
+    ? sourceLabels(contract)
+    : safeArray(seed?.research?.reference_source_list).length > 0 ? seed.research.reference_source_list : publicSources();
+  const topicSummary = sourceTruth(contract) && sourceSnippet(contract, 0)
+    ? `${contract.title} 的 shared source truth 显示：${sourceSnippet(contract, 0)}`
+    : safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`);
   return {
     ...attachCommon('research', contract),
     research: {
-      topic_summary: safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`),
+      topic_summary: topicSummary,
       mode: isSeries(contract) ? 'series' : 'single',
-      audience_judgement: inferAudience(contract),
-      why_now: inferWhyNow(contract),
-      tension: inferTension(contract),
-      memory_hook: inferMemoryHook(contract),
+      audience_judgement: sourceTruth(contract) ? deriveAudienceFromSource(contract) : inferAudience(contract),
+      why_now: sourceTruth(contract) ? deriveWhyNowFromSource(contract) : inferWhyNow(contract),
+      tension: sourceTruth(contract) ? deriveTensionFromSource(contract) : inferTension(contract),
+      memory_hook: sourceTruth(contract) ? deriveMemoryHookFromSource(contract) : inferMemoryHook(contract),
       reference_source_list: references,
       public_sources: references,
       forbidden_source_hit_count: Number(seed?.research?.forbidden_source_hit_count || 0),
+      input_mode: sourceInputMode(contract) || 'seed_only',
+      confidence: sourceConfidence(contract) || 'low',
+      source_truth_material_count: sourceMaterials(contract).length,
+      source_truth_material_ids: sourceMaterialIds(contract),
       input_output_state: {
         current: 'input_ready',
         next: 'planning_ready',
@@ -307,14 +397,17 @@ function buildStoryline(contract, deliverablePaths) {
       journey: safeArray(seed?.storyline?.journey),
       resolution: safeText(seed?.storyline?.resolution, '让读者愿意收藏并继续看下一页/下一篇'),
       series_needed: (research?.research?.mode || 'single') === 'series',
+      source_truth_material_ids: safeArray(research?.research?.source_truth_material_ids),
+      source_truth_confidence: safeText(research?.research?.confidence),
     },
   };
 }
 
-function buildPlanSlides(contract, storyline) {
+function buildPlanSlides(contract, storyline, research) {
   const seed = promptSeed('single_note_plan', { title: contract.title });
   const slides = safeArray(seed?.plan?.slides);
-  const sources = safeArray(storyline?.research?.public_sources).length > 0 ? storyline.research.public_sources : publicSources();
+  const sources = safeArray(research?.research?.public_sources).length > 0 ? research.research.public_sources : sourceLabels(contract);
+  const sourceClaims = sourceMaterials(contract).map((material) => safeText(material.excerpt || material.content_text).replace(/\s+/g, ' ').slice(0, 64)).filter(Boolean);
   return slides.map((slide, index) => ({
     slide_id: slide.slide_id,
     slide_no: index + 1,
@@ -323,13 +416,21 @@ function buildPlanSlides(contract, storyline) {
     page_goal: slide.page_goal,
     progression_role: safeText(slide.progression_role, ['hook','tension','explain','mechanism_peak','evidence_peak','memory_close'][index] || 'explain'),
     core_sentence: `${slide.title}｜${safeText(storyline?.storyline?.memory_hook, inferMemoryHook(contract))}`,
-    page_core_content: inferPageContent(slide, {
+    page_core_content: (() => {
+      const inferred = inferPageContent(slide, {
       audience_judgement: safeText(storyline?.storyline?.audience_judgement, inferAudience(contract)),
       why_now: safeText(storyline?.storyline?.why_now, inferWhyNow(contract)),
       tension: safeText(storyline?.storyline?.tension, inferTension(contract)),
       memory_hook: safeText(storyline?.storyline?.memory_hook, inferMemoryHook(contract)),
       public_sources: sources,
-    }, index, slides),
+      }, index, slides);
+      if (sourceClaims.length === 0) return inferred;
+      const sourceClaim = sourceClaims[index % sourceClaims.length];
+      if (index === 0) {
+        return [sourceClaim, ...inferred.slice(1)];
+      }
+      return [...inferred.slice(0, 2), sourceClaim];
+    })(),
     visual_presentation: inferVisualPresentation(slide),
     source_language: safeText(slide.source_language, '来源必须翻译成读者能理解的公开口径'),
     evidence_and_sources: sources.map((source, sourceIndex) => ({
@@ -342,10 +443,12 @@ function buildPlanSlides(contract, storyline) {
   }));
 }
 
-function buildSingleNotePlan(contract) {
+function buildSingleNotePlan(contract, deliverablePaths) {
   const seed = promptSeed('single_note_plan', { title: contract.title });
   const titleOptions = safeArray(seed?.plan?.title_options);
-  const slides = buildPlanSlides(contract);
+  const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const research = readStageArtifact(contract, deliverablePaths, 'research');
+  const slides = buildPlanSlides(contract, storyline, research);
   return {
     ...attachCommon('single_note_plan', contract),
     single_note_plan: {
@@ -353,6 +456,7 @@ function buildSingleNotePlan(contract) {
       title_options: titleOptions,
       planning_doc_markdown: [`# 01_单篇策划`, '', `- 目标：${contract.goal}`, `- 封面钩子：${titleOptions[0] || contract.title}`].join('\n'),
       slides,
+      source_truth_material_ids: sourceMaterialIds(contract),
     },
   };
 }
@@ -386,6 +490,7 @@ function buildVisualDirection(contract, deliverablePaths, mode, baselineDelivera
       page_family_ceiling: seed?.visual_direction?.page_family_ceiling || Object.fromEntries(slides.map((slide) => [slide.layout_family, 1])),
       anti_template_constraints: safeArray(seed?.visual_direction?.anti_template_constraints),
       source_language_discipline: safeText(seed?.visual_direction?.source_language_discipline, '来源必须翻译成读者能理解的公开口径'),
+      source_truth_confidence: sourceConfidence(contract) || safeText(storyline?.storyline?.source_truth_confidence),
       page_role_table: pageRoleTable,
       forbidden_regressions: safeArray(seed?.visual_direction?.forbidden_regressions),
       baseline_deliverable_id: mode === 'optimize_existing' ? baselineDeliverableId : null,
@@ -411,107 +516,85 @@ function renderCard(text, accent) {
   return `<div data-qa-block="card" data-primary-point="true" style="padding:16px;border-radius:20px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);box-shadow:0 8px 18px rgba(15,23,42,0.05);"><div style="font-size:20px;line-height:1.5;color:#0F172A;">${escapeHtml(text)}</div><div style="margin-top:10px;width:52px;height:4px;border-radius:999px;background:${accent};"></div></div>`;
 }
 
-function renderSlideMarkup(slide, totalSlides) {
-  const accent = '#2563EB';
-  const header = `<header data-qa-block="header" style="display:grid;gap:8px;"><div style="font-size:14px;font-weight:800;color:${accent};letter-spacing:0.06em;text-transform:uppercase;">${escapeHtml(slide.page_goal)}</div><h2 style="margin:0;font-size:28px;line-height:1.25;color:#0F172A;">${escapeHtml(slide.title)}</h2></header>`;
-  const footer = `<footer style="position:absolute;left:20px;right:20px;bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;"><div data-source-label="true">${escapeHtml(slide.evidence_and_sources[0]?.public_label || '')}</div><div>${slide.slide_no} / ${totalSlides}</div></footer>`;
-
-  if (slide.layout_family === 'cover_note') {
-    return `<div data-slide-root="true" data-slide-id="${slide.slide_id}" data-title="${escapeHtml(slide.title)}" data-layout-family="cover_note" data-speaker-seconds="34" style="position:relative;width:${CANVAS.width}px;height:${CANVAS.height}px;background:#FFFBF0;overflow:hidden;padding:20px 22px 44px;"><div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));"></div><div style="position:relative;display:grid;gap:18px;height:100%;align-content:start;">${header}<div data-qa-block="hero" style="padding:20px 18px;border-radius:24px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);font-size:22px;line-height:1.55;font-weight:700;color:#0F172A;">${escapeHtml(slide.page_core_content[0])}</div><div style="display:grid;gap:14px;">${slide.page_core_content.slice(1).map((item) => renderCard(item, accent)).join('')}</div></div>${footer}</div>`;
-  }
-  if (slide.layout_family === 'process_track') {
-    return `<div data-slide-root="true" data-slide-id="${slide.slide_id}" data-title="${escapeHtml(slide.title)}" data-layout-family="process_track" data-speaker-seconds="40" style="position:relative;width:${CANVAS.width}px;height:${CANVAS.height}px;background:#F8FAFC;overflow:hidden;padding:20px 20px 44px;"><div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;gap:12px;align-content:start;">${slide.page_core_content.map((item, index) => `<div data-qa-block="track-row" data-primary-point="true" style="display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:center;"><div style="width:36px;height:36px;border-radius:999px;background:${accent};color:#fff;display:grid;place-items:center;font-weight:800;">${index + 1}</div><div style="padding:14px 16px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);font-size:18px;line-height:1.45;color:#0F172A;">${escapeHtml(item)}</div></div>`).join('')}</div></div>${footer}</div>`;
-  }
-  if (slide.layout_family === 'action_checklist') {
-    return `<div data-slide-root="true" data-slide-id="${slide.slide_id}" data-title="${escapeHtml(slide.title)}" data-layout-family="action_checklist" data-speaker-seconds="32" style="position:relative;width:${CANVAS.width}px;height:${CANVAS.height}px;background:#F8FAFC;overflow:hidden;padding:20px 20px 44px;"><div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;grid-template-columns:1fr;gap:12px;align-content:start;">${slide.page_core_content.map((item, index) => `<div data-qa-block="check-row" data-primary-point="true" style="display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);"><div style="width:28px;height:28px;border-radius:999px;background:#0F766E;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800;">✓</div><div style="font-size:18px;line-height:1.45;color:#0F172A;">${escapeHtml(item)}</div></div>`).join('')}</div></div>${footer}</div>`;
-  }
-  return `<div data-slide-root="true" data-slide-id="${slide.slide_id}" data-title="${escapeHtml(slide.title)}" data-layout-family="${slide.layout_family}" data-speaker-seconds="36" style="position:relative;width:${CANVAS.width}px;height:${CANVAS.height}px;background:#F8FAFC;overflow:hidden;padding:20px 20px 44px;"><div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;gap:14px;align-content:start;">${slide.page_core_content.map((item) => renderCard(item, accent)).join('')}</div></div>${footer}</div>`;
+function xhsRecipeRegistry(seed) {
+  return seed?.render_contract?.recipe_registry || {};
 }
 
-function buildHtml({ title, slides }) {
-  const slidesLiteral = slides.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, content: \`${escapeTemplate(slide.content)}\` }`).join(',\n');
-  return `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(title)}</title>
-<style>
-body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; margin:0; padding:24px; background:#E2E8F0; color:#0F172A; }
-#app-container { max-width: 560px; margin: 0 auto; }
-#slide-display-area { width: 100%; aspect-ratio: 3 / 4; position: relative; overflow: hidden; border-radius: 24px; background: white; box-shadow: 0 18px 40px rgba(15,23,42,0.12); }
-#control-panel { margin-top: 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:rgba(255,255,255,0.92); border-radius:18px; padding:12px 16px; }
-button { border:0; border-radius:12px; padding:10px 14px; background:#0F172A; color:#fff; font-weight:800; cursor:pointer; }
-button:disabled { opacity:0.5; cursor:default; }
-.slide { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:opacity 180ms ease; }
-.slide.visible { opacity:1; visibility:visible; }
-.slide-content-wrapper { width:${CANVAS.width}px; height:${CANVAS.height}px; overflow:hidden; position:relative; background:#fff; }
-</style>
-</head>
-<body>
-<div id="app-container">
-  <div id="slide-display-area"></div>
-  <div id="control-panel">
-    <button id="prev-btn">上一页</button>
-    <div id="progress-indicator"></div>
-    <button id="next-btn">下一页</button>
-  </div>
-</div>
-<script>
-const slidesData = [
-${slidesLiteral}
-];
-const slideDisplayArea = document.getElementById('slide-display-area');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const progressIndicator = document.getElementById('progress-indicator');
-let currentSlide = 0;
-function setupSlides() {
-  slideDisplayArea.innerHTML = '';
-  slidesData.forEach((slide) => {
-    const element = document.createElement('div');
-    element.className = 'slide';
-    element.innerHTML = '<div class="slide-content-wrapper">' + slide.content + '</div>';
-    slideDisplayArea.appendChild(element);
-  });
+function pickXhsRecipeId(slide, seed) {
+  const registry = xhsRecipeRegistry(seed);
+  return registry[slide.layout_family] || registry.default || `xhs.${slide.layout_family}`;
 }
-function updateView() {
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  slides.forEach((slide, index) => slide.classList.toggle('visible', index === currentSlide));
-  progressIndicator.textContent = (currentSlide + 1) + ' / ' + slidesData.length;
-  prevBtn.disabled = currentSlide === 0;
-  nextBtn.disabled = currentSlide === slidesData.length - 1;
-}
-function inspectCurrentSlide() {
-  const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
-  const root = wrapper ? wrapper.querySelector('[data-slide-root]') : null;
-  const blocks = Array.from(wrapper?.querySelectorAll('[data-qa-block], [data-source-label], [data-primary-point]') || []).map((node, index) => {
-    const rect = node.getBoundingClientRect();
-    return { id: node.getAttribute('data-qa-block') || node.getAttribute('data-source-label') || ('block-' + (index + 1)), left: rect.left, top: rect.top, width: rect.width, height: rect.height, area: rect.width * rect.height };
-  });
-  return {
-    slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
-    title: root?.dataset.title || slidesData[currentSlide]?.title || '',
-    layoutFamily: root?.dataset.layoutFamily || '',
-    speakerSeconds: Number(root?.dataset.speakerSeconds || 0),
-    primaryPoints: wrapper?.querySelectorAll('[data-primary-point="true"]').length || 0,
-    wrapper: { clientWidth: wrapper?.clientWidth || ${CANVAS.width}, clientHeight: wrapper?.clientHeight || ${CANVAS.height}, scrollWidth: wrapper?.scrollWidth || ${CANVAS.width}, scrollHeight: wrapper?.scrollHeight || ${CANVAS.height} },
-    bodyScroll: false,
-    blocks,
+
+function compileXhsRenderSlide(slide, visualDirection, seed, totalSlides) {
+  const materialRules = visualDirection?.material_rules || {};
+  const directorContract = {
+    visual_motif: safeText(visualDirection?.visual_motif, '纸面感 + 高亮批注 + 便签式收束'),
+    source_language_discipline: safeText(visualDirection?.source_language_discipline, '来源必须翻译成读者能理解的公开口径'),
+    anti_template_constraints: safeArray(visualDirection?.anti_template_constraints),
+    peak_page: safeArray(visualDirection?.peak_pages).includes(slide.slide_id),
+    page_role: slide.progression_role,
+    memory_hook: safeText(visualDirection?.memory_hook),
+    material_rules: {
+      paper_base: safeText(materialRules.paper_base, '#FFFBF0'),
+      main_accent: safeText(materialRules.main_accent, '#2563EB'),
+      warning_accent: safeText(materialRules.warning_accent, '#DC2626'),
+    },
   };
+  const compiled = {
+    slide_id: slide.slide_id,
+    slide_no: slide.slide_no,
+    title: slide.title,
+    layout_family: slide.layout_family,
+    recipe_id: pickXhsRecipeId(slide, seed),
+    page_goal: slide.page_goal,
+    page_core_content: safeArray(slide.page_core_content),
+    evidence_and_sources: safeArray(slide.evidence_and_sources),
+    director_contract: directorContract,
+    speaker_seconds: slide.layout_family === 'process_track' ? 40 : slide.layout_family === 'action_checklist' ? 32 : 36,
+    total_slides: totalSlides,
+  };
+  compiled.content = renderSlideMarkup(compiled);
+  return compiled;
 }
-prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide -= 1; updateView(); } });
-nextBtn.addEventListener('click', () => { if (currentSlide < slidesData.length - 1) { currentSlide += 1; updateView(); } });
-window.redcubeDeckReview = {
-  totalSlides: slidesData.length,
-  showSlide(index) { currentSlide = Math.max(0, Math.min(index, slidesData.length - 1)); updateView(); return inspectCurrentSlide(); },
-  inspectCurrentSlide,
-};
-setupSlides();
-updateView();
-</script>
-</body>
-</html>`;
+
+function renderSlideMarkup(slide) {
+  const accent = slide.director_contract.material_rules.main_accent;
+  const warning = slide.director_contract.material_rules.warning_accent;
+  const paperBase = slide.director_contract.peak_page ? '#FFF7ED' : '#F8FAFC';
+  const roleLabel = slide.director_contract.page_role || slide.page_goal;
+  const header = `<header data-qa-block="header" style="display:grid;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div style="font-size:14px;font-weight:800;color:${accent};letter-spacing:0.06em;text-transform:uppercase;">${escapeHtml(roleLabel)}</div>${slide.director_contract.peak_page ? `<span style="display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(220,38,38,0.12);color:${warning};font-size:11px;font-weight:800;">峰值页</span>` : ''}</div><h2 style="margin:0;font-size:26px;line-height:1.22;color:#0F172A;">${escapeHtml(slide.title)}</h2><div style="font-size:11px;line-height:1.45;color:#64748B;">${escapeHtml(slide.director_contract.visual_motif)}</div></header>`;
+  const footer = `<footer style="position:absolute;left:20px;right:20px;bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;"><div data-source-label="true">${escapeHtml(slide.evidence_and_sources[0]?.public_label || '')}</div><div>${slide.slide_no} / ${slide.total_slides}</div></footer>`;
+  const rootStart = `<div data-slide-root="true" data-slide-id="${slide.slide_id}" data-title="${escapeHtml(slide.title)}" data-layout-family="${slide.layout_family}" data-recipe-id="${slide.recipe_id}" data-peak-page="${String(slide.director_contract.peak_page)}" data-director-role="${escapeHtml(slide.director_contract.page_role || '')}" data-speaker-seconds="${slide.speaker_seconds}" style="position:relative;width:${CANVAS.width}px;height:${CANVAS.height}px;background:${paperBase};overflow:hidden;padding:20px 20px 44px;">`;
+
+  if (slide.recipe_id === 'xhs.hero_note') {
+    return `${rootStart}<div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));"></div><div style="position:relative;display:grid;gap:18px;height:100%;align-content:start;">${header}<div data-qa-block="hero" style="padding:20px 18px;border-radius:24px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);font-size:22px;line-height:1.55;font-weight:700;color:#0F172A;">${escapeHtml(slide.page_core_content[0])}</div><div style="display:grid;gap:14px;">${slide.page_core_content.slice(1).map((item) => renderCard(item, accent)).join('')}</div></div>${footer}</div>`;
+  }
+  if (slide.recipe_id === 'xhs.split_contrast') {
+    return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:14px;">${header}<div style="display:grid;gap:10px;align-content:start;"><section data-qa-block="myth" data-primary-point="true" style="padding:14px;border-radius:20px;background:rgba(220,38,38,0.09);border:1px solid rgba(220,38,38,0.18);display:grid;gap:8px;"><div style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${warning};">不要先做</div><div style="font-size:17px;line-height:1.45;color:#0F172A;">${escapeHtml(slide.page_core_content[0] || '')}</div></section><section style="display:grid;gap:10px;">${slide.page_core_content.slice(1).map((item, index) => `<div data-qa-block="${index === 0 ? 'correction' : 'proof'}" data-primary-point="true" style="padding:12px 14px;border-radius:16px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);"><div style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${accent};margin-bottom:6px;">${index === 0 ? '真正顺序' : '为什么'}</div><div style="font-size:16px;line-height:1.4;color:#0F172A;">${escapeHtml(item)}</div></div>`).join('')}</section></div></div>${footer}</div>`;
+  }
+  if (slide.recipe_id === 'xhs.staggered_steps') {
+    return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:14px;">${header}<div style="display:grid;gap:10px;align-content:start;">${slide.page_core_content.map((item, index) => `<div data-qa-block="step-card" data-primary-point="true" style="margin-left:${index * 8}px;padding:12px 14px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);box-shadow:0 8px 18px rgba(15,23,42,0.05);display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;"><div style="width:28px;height:28px;border-radius:999px;background:${accent};color:#FFFFFF;display:grid;place-items:center;font-size:13px;font-weight:800;">${index + 1}</div><div style="font-size:16px;line-height:1.38;color:#0F172A;">${escapeHtml(item)}</div></div>`).join('')}</div></div>${footer}</div>`;
+  }
+  if (slide.recipe_id === 'xhs.track_rail') {
+    return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;gap:12px;align-content:start;">${slide.page_core_content.map((item, index) => `<div data-qa-block="track-row" data-primary-point="true" style="display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:center;"><div style="width:36px;height:36px;border-radius:999px;background:${accent};color:#fff;display:grid;place-items:center;font-weight:800;">${index + 1}</div><div style="padding:14px 16px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);font-size:18px;line-height:1.45;color:#0F172A;">${escapeHtml(item)}</div></div>`).join('')}</div></div>${footer}</div>`;
+  }
+  if (slide.recipe_id === 'xhs.evidence_bands') {
+    return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:14px;">${header}<div style="display:grid;gap:10px;align-content:start;"><div data-qa-block="claim-band" data-primary-point="true" style="padding:14px;border-radius:18px;background:linear-gradient(135deg, rgba(37,99,235,0.12), #FFFFFF);border:1px solid rgba(37,99,235,0.18);font-size:17px;line-height:1.42;color:#0F172A;">${escapeHtml(slide.page_core_content[0] || '')}</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${slide.evidence_and_sources.slice(0, 2).map((source) => `<span data-qa-block="source-chip" data-source-label="true" style="display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(15,23,42,0.08);font-size:11px;color:#0F172A;">${escapeHtml(source.public_label)}</span>`).join('')}</div>${slide.page_core_content.slice(1).map((item) => `<div data-qa-block="evidence-row" data-primary-point="true" style="padding:12px 14px;border-radius:16px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);font-size:16px;line-height:1.38;color:#0F172A;">${escapeHtml(item)}</div>`).join('')}</div></div>${footer}</div>`;
+  }
+  if (slide.recipe_id === 'xhs.checklist_close') {
+    return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;grid-template-columns:1fr;gap:12px;align-content:start;">${slide.page_core_content.map((item) => `<div data-qa-block="check-row" data-primary-point="true" style="display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);"><div style="width:28px;height:28px;border-radius:999px;background:#0F766E;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800;">✓</div><div style="font-size:18px;line-height:1.45;color:#0F172A;">${escapeHtml(item)}</div></div>`).join('')}</div></div>${footer}</div>`;
+  }
+  return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;gap:14px;align-content:start;">${slide.page_core_content.map((item) => renderCard(item, accent)).join('')}</div></div>${footer}</div>`;
+}
+
+function buildHtml({ title, slides, renderPlan, renderStrategy, shellFile }) {
+  const shell = readPromptPackText(shellFile);
+  const slidesLiteral = `[\n${slides.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
+  return shell
+    .replaceAll('__REDCUBE_TITLE__', escapeHtml(title))
+    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
+    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
+    .replaceAll('__REDCUBE_SLIDES_DATA__', slidesLiteral);
 }
 
 function runPython(script, args) {
@@ -545,20 +628,49 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
 
 function buildRenderHtml(contract, deliverablePaths) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-  const slides = safeArray(plan?.single_note_plan?.slides).map((slide) => ({
-    slide_id: slide.slide_id,
-    title: slide.title,
-    layout_family: slide.layout_family,
-    content: renderSlideMarkup(slide, safeArray(plan.single_note_plan.slides).length),
-  }));
+  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const seed = promptSeed('render_html');
+  if (!seed?.render_contract) {
+    throw new Error('render_html prompt pack missing render_contract runtime seed');
+  }
+  const sourceSlides = safeArray(plan?.single_note_plan?.slides);
+  const visualDirection = visual?.visual_direction || {};
+  const slides = sourceSlides.map((slide) => compileXhsRenderSlide(slide, visualDirection, seed, sourceSlides.length));
+  const renderPlan = {
+    render_strategy: safeText(seed.render_contract.render_strategy, 'prompt_director_first'),
+    shell_file: safeText(seed.render_contract.shell_file, 'prompts/xiaohongshu/render_shell.html'),
+    director_contract: {
+      visual_motif: safeText(visualDirection.visual_motif),
+      peak_pages: safeArray(visualDirection.peak_pages),
+      page_family_ceiling: visualDirection.page_family_ceiling || {},
+      anti_template_constraints: safeArray(visualDirection.anti_template_constraints),
+      source_language_discipline: safeText(visualDirection.source_language_discipline),
+    },
+    slides: slides.map((slide) => ({
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.recipe_id,
+      peak_page: slide.director_contract.peak_page,
+      director_role: slide.director_contract.page_role,
+    })),
+  };
   const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverablePaths.deliverableId}.html`);
-  writeText(htmlFile, buildHtml({ title: contract.title, slides }));
+  writeText(htmlFile, buildHtml({
+    title: contract.title,
+    slides,
+    renderPlan,
+    renderStrategy: renderPlan.render_strategy,
+    shellFile: `prompts/xiaohongshu/${safeText(seed.render_contract.shell_file, 'render_shell.html')}`,
+  }));
   return {
     ...attachCommon('render_html', contract),
     html_bundle: {
       html_file: htmlFile,
       page_count: slides.length,
       shell_contract: CANVAS,
+      render_strategy: renderPlan.render_strategy,
+      director_contract: renderPlan.director_contract,
       slides,
     },
     artifact_refs: [htmlFile],
@@ -640,6 +752,10 @@ function buildDirectorReview(contract, deliverablePaths) {
       pending_reviews: status === 'pass' ? [] : ['director_intent_landed'],
       blocking_reasons: status === 'pass' ? [] : ['director_intent_landed'],
       rerun_from_stage: status === 'pass' ? null : 'render_html',
+      rerun_policy: {
+        status: status === 'pass' ? 'idle' : 'rerun_required',
+        rerun_from_stage: status === 'pass' ? null : 'render_html',
+      },
     },
   };
 }
@@ -736,6 +852,10 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
       pending_reviews: status === 'pass' ? [] : Object.entries(checks).filter(([, value]) => value === false).map(([key]) => key),
       blocking_reasons: status === 'pass' ? [] : Object.entries(checks).filter(([, value]) => value === false).map(([key]) => key),
       rerun_from_stage: status === 'pass' ? null : 'render_html',
+      rerun_policy: {
+        status: status === 'pass' ? 'idle' : 'rerun_required',
+        rerun_from_stage: status === 'pass' ? null : 'render_html',
+      },
     },
   };
   if (mode === 'optimize_existing') {
@@ -801,6 +921,22 @@ function buildPublishCopy(contract, deliverablePaths) {
       pending_reviews: quality_gate.gate_pass ? [] : ['platform_copy_complete'],
       blocking_reasons: quality_gate.gate_pass ? [] : ['platform_copy_complete'],
       rerun_from_stage: quality_gate.gate_pass ? null : 'publish_copy',
+      rerun_policy: {
+        status: quality_gate.gate_pass ? 'idle' : 'rerun_required',
+        rerun_from_stage: quality_gate.gate_pass ? null : 'publish_copy',
+      },
+      approval_state: {
+        required: true,
+        status: quality_gate.gate_pass ? 'pending_human' : 'changes_requested',
+        requested_at: quality_gate.gate_pass ? new Date().toISOString() : null,
+        approved_at: null,
+        approved_by: null,
+      },
+      publish_state: {
+        current: quality_gate.gate_pass ? 'approval_pending' : 'draft',
+        promoted_at: null,
+        approved_by: null,
+      },
     },
   };
 }
@@ -831,7 +967,7 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
     publication_state_file: publicationStateFile,
     artifact_refs: [manifestFile, render.html_bundle.html_file, copy.publish_copy.caption_file, ...pngFiles].filter(Boolean),
     review_state_patch: {
-      current_status: 'completed',
+      current_status: 'publish_ready',
       ready_for_export: true,
       latest_review_stage: 'export_bundle',
       latest_checks: {
@@ -841,6 +977,17 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
       pending_reviews: [],
       blocking_reasons: [],
       rerun_from_stage: null,
+      rerun_policy: {
+        status: 'idle',
+        rerun_from_stage: null,
+      },
+      approval_state: {
+        required: true,
+        status: 'pending_human',
+      },
+      publish_state: {
+        current: 'published_pending_human',
+      },
     },
   };
 }
@@ -857,7 +1004,7 @@ export function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableId, rou
     case 'storyline':
       return buildStoryline(contract, deliverablePaths);
     case 'single_note_plan':
-      return buildSingleNotePlan(contract);
+      return buildSingleNotePlan(contract, deliverablePaths);
     case 'visual_direction':
       return buildVisualDirection(contract, deliverablePaths, mode, baselineDeliverableId);
     case 'render_html':

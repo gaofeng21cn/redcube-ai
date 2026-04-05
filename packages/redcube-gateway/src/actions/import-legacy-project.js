@@ -14,6 +14,7 @@ import {
   getTopicPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
+import { intakeSource } from '@redcube/runtime';
 
 function ensureWorkspaceContract(workspaceRoot) {
   const contract = resolveWorkspaceContract({ workspaceRoot });
@@ -83,20 +84,11 @@ function buildImportedCanonicalArtifacts({ projectDir, topicId }) {
   const outputFolders = listOutputFolders(projectDir);
 
   return {
-    brief: {
-      schema_version: 1,
-      topic_id: topicId,
-      imported_from: 'legacy_project_inputs',
-      series_toc_markdown: seriesToc,
-      style_guide_markdown: styleGuide,
-      raw_materials: rawMaterials,
-    },
-    storyline: {
-      schema_version: 1,
-      topic_id: topicId,
-      imported_from: 'legacy_storyline_logic',
-      storyline_markdown: storyline,
-    },
+    intakeBrief: [
+      seriesToc ? `# legacy_series_toc\n${seriesToc}` : '',
+      styleGuide ? `# legacy_style_guide\n${styleGuide}` : '',
+      storyline ? `# legacy_storyline_logic\n${storyline}` : '',
+    ].filter(Boolean).join('\n\n'),
     legacyProject: {
       schema_version: 1,
       topic_id: topicId,
@@ -104,18 +96,6 @@ function buildImportedCanonicalArtifacts({ projectDir, topicId }) {
       inputs_dir: path.join(projectDir, 'inputs'),
       raw_materials: rawMaterials,
       output_folders: outputFolders,
-    },
-    report: {
-      schema_version: 1,
-      status: 'pass',
-      mode: 'legacy_to_workspace',
-      topic_id: topicId,
-      checks: {
-        series_toc_present: Boolean(seriesToc.trim()),
-        storyline_present: Boolean(storyline.trim()),
-        raw_material_count: rawMaterials.length,
-      },
-      imported_output_folders: outputFolders,
     },
   };
 }
@@ -156,31 +136,28 @@ export async function importLegacyProject({
   });
   writeFileSync(topicPaths.topicFile, JSON.stringify(topic, null, 2), 'utf-8');
   writeFileSync(
-    path.join(topicPaths.canonicalDir, 'brief.json'),
-    JSON.stringify(canonicalArtifacts.brief, null, 2),
-    'utf-8',
-  );
-  writeFileSync(
-    path.join(topicPaths.canonicalDir, 'storyline.json'),
-    JSON.stringify(canonicalArtifacts.storyline, null, 2),
-    'utf-8',
-  );
-  writeFileSync(
     path.join(topicPaths.canonicalDir, 'legacy-project.json'),
     JSON.stringify(canonicalArtifacts.legacyProject, null, 2),
     'utf-8',
   );
-  writeFileSync(
-    path.join(topicPaths.canonicalDir, 'legacy-import-report.json'),
-    JSON.stringify(canonicalArtifacts.report, null, 2),
-    'utf-8',
-  );
+  const sourceFiles = canonicalArtifacts.legacyProject.raw_materials
+    .map((item) => path.join(topicPaths.inputsDir, 'raw_materials', item.relative_path));
+  const intake = await intakeSource({
+    workspaceRoot,
+    topicId: projectId,
+    title: projectId,
+    brief: canonicalArtifacts.intakeBrief,
+    sourceFiles,
+    modeHint: 'legacy_import',
+  });
 
   return {
-    ok: true,
+    ok: intake.ok,
     mode: 'legacy_to_workspace',
     project: projectId,
     topicFile: topicPaths.topicFile,
     importedInputsDir: topicPaths.inputsDir,
+    artifactFiles: intake.artifactFiles,
+    audit: intake.audit,
   };
 }

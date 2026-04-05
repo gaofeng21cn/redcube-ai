@@ -51,6 +51,8 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
   const readyState = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
   assert.equal(readyState.state.current_status, 'export_ready');
   assert.equal(readyState.state.ready_for_export, true);
+  assert.equal(readyState.state.approval_state.status, 'not_required');
+  assert.equal(readyState.state.publish_state.current, 'not_applicable');
 
   const blocked = await applyReviewMutation({
     workspaceRoot,
@@ -93,6 +95,8 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(state.state.overlay, 'xiaohongshu');
   assert.equal(state.state.current_status, 'publish_ready');
   assert.equal(state.state.ready_for_export, true);
+  assert.equal(state.state.approval_state.status, 'pending_human');
+  assert.equal(state.state.publish_state.current, 'approval_pending');
 
   const mutation = await applyReviewMutation({
     workspaceRoot,
@@ -107,4 +111,70 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   });
   assert.equal(mutation.state.baseline.baseline_deliverable_id, 'note-baseline');
   assert.equal(mutation.state.mutation_count >= 1, true);
+
+  await assert.rejects(
+    () => applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      mutation: {
+        type: 'promote_publish',
+        actor: 'human',
+      },
+    }),
+    /approval/i,
+  );
+
+  const approved = await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    mutation: {
+      type: 'approve_publish',
+      actor: 'human',
+      notes: '人工确认可发布',
+    },
+  });
+  assert.equal(approved.state.approval_state.status, 'approved');
+  assert.equal(approved.state.publish_state.current, 'approved_pending_publish');
+
+  const published = await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    mutation: {
+      type: 'promote_publish',
+      actor: 'human',
+      notes: '正式发布',
+    },
+  });
+  assert.equal(published.state.current_status, 'published');
+  assert.equal(published.state.publish_state.current, 'published');
+  assert.equal(published.state.publish_state.approved_by, 'human');
+});
+
+test('approve_publish rejects xiaohongshu deliverable before publish_ready', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-platform-'));
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  await assert.rejects(
+    () => applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      mutation: {
+        type: 'approve_publish',
+        actor: 'human',
+      },
+    }),
+    /publish_ready|pending_human|ready_for_export/i,
+  );
 });
