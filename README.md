@@ -39,10 +39,13 @@
 
 如果放在 `One Person Lab (OPL)` 顶层语义里，更准确的定位是：
 
+- `OPL` 是顶层 federation / gateway
+- `Research Foundry -> Med Auto Science` 是当前 active 的 `Research Ops` 主线
 - `RedCube AI` 是视觉交付 domain 的正式 gateway
 - 它下面承载的是视觉交付 harness，而不是一个一次性生成脚本集合
 - `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
 - `xiaohongshu` 与 `ppt_deck` 共享同一 harness，但在 OPL 顶层不自动等于 `Presentation Ops`
+- 在概念层，未来 `deck` 可以作为 `Research Foundry` 的 formal deliverable family 出现；在实现层，`RedCube AI` 仍保持独立的 domain gateway 与强执行器角色
 
 理想链路是：
 
