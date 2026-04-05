@@ -42,3 +42,19 @@ test('@redcube/runtime manifest declares family runtime package dependencies exp
   assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt'], '0.1.0');
   assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu'], '0.1.0');
 });
+
+test('runtime manifest declares pack-runtime dependency explicitly', () => {
+  const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
+
+  assert.equal(runtimePackageJson.dependencies?.['@redcube/pack-runtime'], '0.1.0');
+});
+
+test('family runtime packages no longer import render-pack loader from runtime internals', () => {
+  const pptFamily = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
+  const xhsFamily = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+
+  assert.equal(pptFamily.includes("../../redcube-runtime/src/render-pack-compiler.js"), false);
+  assert.equal(xhsFamily.includes("../../redcube-runtime/src/render-pack-compiler.js"), false);
+  assert.equal(pptFamily.includes("@redcube/pack-runtime"), true);
+  assert.equal(xhsFamily.includes("@redcube/pack-runtime"), true);
+});
