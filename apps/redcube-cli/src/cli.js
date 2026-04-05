@@ -12,6 +12,7 @@ import {
   intakeSource,
   importLegacyProject,
   listTopics as listTopicsGateway,
+  runtimeWatch,
   runDeliverableRoute,
 } from '@redcube/gateway';
 
@@ -108,7 +109,7 @@ function buildHelp() {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
-      review: ['get', 'projection', 'mutate'],
+      review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
@@ -131,6 +132,7 @@ function buildHelp() {
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
+      reviewWatch: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline|approve_publish|promote_publish|promote_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>] [--promoted-reference-id <id>]',
       profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
@@ -287,6 +289,21 @@ async function main() {
       return;
     }
 
+    if (subcommand === 'watch') {
+      const runState = await getGatewayRun({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        runId: options.runId || '',
+      });
+      const result = await runtimeWatch({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        run: runState.run || {},
+      });
+      printJson(result);
+      return;
+    }
+
     if (subcommand === 'mutate') {
       const issues = String(options.issues || '').trim();
       const result = await applyReviewMutation({
@@ -307,7 +324,7 @@ async function main() {
       return;
     }
 
-    fail('review 命令仅支持 get|projection|mutate');
+    fail('review 命令仅支持 get|projection|watch|mutate');
   }
 
   if (command === 'runs') {
