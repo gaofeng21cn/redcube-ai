@@ -80,6 +80,13 @@ export async function createDeliverable({
 
   return {
     ok: true,
+    surface_kind: 'deliverable_create',
+    recommended_action: 'run_deliverable_route',
+    summary: {
+      overlay: deliverable.overlay,
+      deliverable_id: deliverable.deliverable_id,
+      surface_file_count: surfaceFiles.length,
+    },
     deliverableFile: deliverablePaths.deliverableFile,
     deliverable,
     surfaceFiles,

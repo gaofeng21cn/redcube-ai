@@ -26,6 +26,10 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
   });
 
   assert.equal(created.ok, true);
+  assert.equal(created.surface_kind, 'deliverable_create');
+  assert.equal(created.recommended_action, 'run_deliverable_route');
+  assert.equal(created.summary.deliverable_id, 'deck-a');
+  assert.equal(created.summary.overlay, 'ppt_deck');
 
   const stored = await getDeliverable({
     workspaceRoot,
@@ -65,6 +69,8 @@ test('createDeliverable supports xiaohongshu on the shared runtime mainline', as
   });
 
   assert.equal(created.ok, true);
+  assert.equal(created.surface_kind, 'deliverable_create');
+  assert.equal(created.recommended_action, 'run_deliverable_route');
   assert.equal(created.deliverable.overlay, 'xiaohongshu');
   assert.equal(created.deliverable.kind, 'xiaohongshu_note');
   assert.equal(created.deliverable.profile_id, 'standard_note');
@@ -115,6 +121,9 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(result.events.length >= 2, true);
 
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
+  assert.equal(stored.surface_kind, 'run_record');
+  assert.equal(stored.recommended_action, 'review_runtime_state');
+  assert.equal(stored.summary.run_id, result.run.run_id);
   assert.equal(stored.run.executor.adapter, 'host_agent');
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
   assert.equal(artifact.route, 'storyline');

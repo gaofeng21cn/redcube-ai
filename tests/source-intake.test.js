@@ -29,6 +29,10 @@ test('intakeSource creates canonical source truth from brief and keywords', asyn
   });
 
   assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'source_intake');
+  assert.equal(result.recommended_action, 'create_deliverable');
+  assert.equal(result.summary.topic_id, 'topic-a');
+  assert.equal(result.summary.audit_status, 'pass');
   assert.equal(result.audit.status, 'pass');
   assert.equal(existsSync(result.artifactFiles.sourceIndexFile), true);
   assert.equal(existsSync(result.artifactFiles.extractedMaterialsFile), true);
@@ -70,6 +74,9 @@ test('intakeSource blocks pdf extraction explicitly when mineru is unavailable',
     });
 
     assert.equal(result.ok, false);
+    assert.equal(result.surface_kind, 'source_intake');
+    assert.equal(result.recommended_action, 'resolve_source_blocks');
+    assert.equal(result.summary.audit_status, 'block');
     assert.equal(existsSync(result.artifactFiles.sourceAuditFile), true);
     const audit = readJson(result.artifactFiles.sourceAuditFile);
     assert.equal(audit.status, 'block');
@@ -112,6 +119,8 @@ test('CLI source intake proxies gateway action', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'source_intake');
+  assert.equal(parsed.recommended_action, 'create_deliverable');
   assert.equal(parsed.audit.status, 'pass');
   assert.equal(existsSync(parsed.artifactFiles.sourceBriefFile), true);
 });

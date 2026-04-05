@@ -177,6 +177,13 @@ export async function importLegacyProject({
 
   return {
     ok: intake.ok,
+    surface_kind: 'legacy_import',
+    recommended_action: intake.audit?.status === 'pass' ? 'create_deliverable' : 'resolve_source_blocks',
+    summary: {
+      project: projectId,
+      overlay: overlayId,
+      audit_status: intake.audit?.status || null,
+    },
     mode: 'legacy_to_workspace',
     project: projectId,
     topicFile: topicPaths.topicFile,
