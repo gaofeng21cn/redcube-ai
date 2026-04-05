@@ -11,6 +11,7 @@ import {
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { loadRenderPackCompiler } from './render-pack-compiler.js';
+import { compareFailuresAndDensity, summarizeRelativeQuality } from './relative-quality.js';
 import { getReviewState, isBaselineApprovedState } from './review-state.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -782,15 +783,25 @@ function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, sli
   const baselineFailures = safeArray(baselineArtifact.slide_reviews).filter((slide) => safeArray(slide.issues).length > 0).length;
   const currentDensity = slideReviews.reduce((sum, slide) => sum + Number(slide.metrics.text_char_count || 0), 0) / Math.max(slideReviews.length, 1);
   const baselineDensity = safeArray(baselineArtifact.slide_reviews).reduce((sum, slide) => sum + Number(slide.metrics?.text_char_count || 0), 0) / Math.max(safeArray(baselineArtifact.slide_reviews).length, 1);
-  const passed = currentFailures <= baselineFailures && currentDensity <= baselineDensity + 18;
+  const relativeQuality = compareFailuresAndDensity({
+    currentFailures,
+    baselineFailures,
+    currentDensity,
+    baselineDensity,
+    densityTolerance: 18,
+    densityDigits: 2,
+    densityLabel: '平均文本量',
+  });
+  const passed = relativeQuality.verdict !== 'degraded';
   return {
     baseline_deliverable_id: baselineDeliverableId,
     baseline_failures: baselineFailures,
     current_failures: currentFailures,
     baseline_average_text: Number(baselineDensity.toFixed(2)),
     current_average_text: Number(currentDensity.toFixed(2)),
-    summary: passed ? '新版未比 baseline 更挤或更粗糙。' : '新版相对 baseline 出现挤压或回归风险。',
+    summary: summarizeRelativeQuality(relativeQuality),
     passed,
+    relative_quality: relativeQuality,
   };
 }
 
@@ -875,9 +886,20 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
     },
   };
   if (mode === 'optimize_existing' && python.baseline) {
+    const relativeQuality = compareFailuresAndDensity({
+      currentFailures: python.baseline.current_failed_slides,
+      baselineFailures: python.baseline.baseline_failed_slides,
+      currentDensity: python.baseline.current_average_density,
+      baselineDensity: python.baseline.baseline_average_density,
+      densityTolerance: 0.08,
+      densityDigits: 4,
+      densityLabel: '平均占用率',
+    });
     artifact.baseline_review = {
       baseline_deliverable_id: baselineDeliverableId,
       ...python.baseline,
+      relative_quality: relativeQuality,
+      summary: summarizeRelativeQuality(relativeQuality),
     };
   }
   return artifact;

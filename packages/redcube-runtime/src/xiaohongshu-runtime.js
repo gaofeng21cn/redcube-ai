@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { loadRenderPackCompiler } from './render-pack-compiler.js';
+import { compareFailuresAndDensity, summarizeRelativeQuality } from './relative-quality.js';
 import { getReviewState, isBaselineApprovedState } from './review-state.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -570,7 +571,16 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
   const baselineFailures = safeArray(baselineArtifact.slide_reviews).filter((slide) => safeArray(slide.issues).length > 0).length;
   const currentDensity = slideReviews.reduce((sum, slide) => sum + Number(slide.metrics?.occupied_ratio || 0), 0) / Math.max(slideReviews.length, 1);
   const baselineDensity = safeArray(baselineArtifact.slide_reviews).reduce((sum, slide) => sum + Number(slide.metrics?.occupied_ratio || 0), 0) / Math.max(safeArray(baselineArtifact.slide_reviews).length, 1);
-  const passed = currentFailures <= baselineFailures && currentDensity <= baselineDensity + 0.2;
+  const relativeQuality = compareFailuresAndDensity({
+    currentFailures,
+    baselineFailures,
+    currentDensity,
+    baselineDensity,
+    densityTolerance: 0.2,
+    densityDigits: 4,
+    densityLabel: '平均占用率',
+  });
+  const passed = relativeQuality.verdict !== 'degraded';
   return {
     baseline_deliverable_id: baselineDeliverableId,
     current_failed_slides: currentFailures,
@@ -578,6 +588,8 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
     current_average_density: Number(currentDensity.toFixed(4)),
     baseline_average_density: Number(baselineDensity.toFixed(4)),
     baseline_comparison_passed: passed,
+    relative_quality: relativeQuality,
+    summary: summarizeRelativeQuality(relativeQuality),
   };
 }
 
