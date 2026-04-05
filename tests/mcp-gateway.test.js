@@ -285,9 +285,13 @@ test('listGatewayTools descriptions mention quality-facing runtime watch and rev
   const tools = listGatewayTools();
   const reviewMutation = tools.find((tool) => tool.name === 'apply_review_mutation');
   const runtimeWatch = tools.find((tool) => tool.name === 'runtime_watch');
+  const getDeliverableTool = tools.find((tool) => tool.name === 'get_deliverable');
+  const runRouteTool = tools.find((tool) => tool.name === 'run_deliverable_route');
 
   assert.match(reviewMutation.description, /mutation/i);
   assert.match(runtimeWatch.description, /review-loop status/i);
+  assert.doesNotMatch(getDeliverableTool.description, /from disk/i);
+  assert.doesNotMatch(runRouteTool.description, /host-agent runtime adapter/i);
 });
 
 test('callGatewayTool rejects unknown tool names', async () => {

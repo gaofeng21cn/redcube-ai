@@ -92,7 +92,7 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: 'get_deliverable',
-    description: 'Read one canonical deliverable record from disk.',
+    description: 'Read one visual deliverable record with product-facing metadata.',
     actionKey: 'getDeliverable',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
@@ -136,7 +136,7 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: 'run_deliverable_route',
-    description: 'Run one deliverable route through the host-agent runtime adapter.',
+    description: 'Run one deliverable route and return the current route execution surface.',
     actionKey: 'runDeliverableRoute',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),

@@ -109,6 +109,18 @@ async function buildHelp() {
         task: '运行某个正式阶段并查看 run 状态',
         command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> && redcube runs get --workspace-root <dir> --run-id <id>',
       },
+      {
+        task: '读取交付物当前 review 状态',
+        command: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
+      },
+      {
+        task: '读取 topic 级发布投影',
+        command: 'redcube review projection --workspace-root <dir> --topic-id <id>',
+      },
+      {
+        task: '观察一个 run 的当前 review loop 状态',
+        command: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
+      },
     ],
     commonFlows: buildCommonFlows(overlayCatalog),
     commandGroups: {

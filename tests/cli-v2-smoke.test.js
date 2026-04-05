@@ -207,6 +207,9 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   );
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('review get')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('review projection')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
