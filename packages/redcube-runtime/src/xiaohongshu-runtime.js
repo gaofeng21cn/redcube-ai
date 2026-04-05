@@ -11,7 +11,7 @@ const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYTHON_REVIEW = path.join(MODULE_DIR, '../scripts/ppt_deck_review.py');
 const CANVAS = { ratio: '3:4', width: 448, height: 597 };
-const PROMPT_PACK = {
+const DEFAULT_PROMPT_PACK = {
   research: 'prompts/xiaohongshu/research.md',
   storyline: 'prompts/xiaohongshu/storyline.md',
   single_note_plan: 'prompts/xiaohongshu/single_note_plan.md',
@@ -61,11 +61,26 @@ function readStageArtifact(contract, deliverablePaths, stageId) {
   return existsSync(file) ? readJson(file) : null;
 }
 
-function promptMeta(route) {
-  const relativePath = PROMPT_PACK[route];
+function promptPackRoot(contract) {
+  return safeText(contract?.prompt_pack?.root, 'prompts/xiaohongshu');
+}
+
+function promptRoute(contract, route) {
+  return safeText(contract?.prompt_pack?.routes?.[route]) || DEFAULT_PROMPT_PACK[route];
+}
+
+function resolvePromptPackAsset(contract, relativePath) {
+  const assetPath = safeText(relativePath);
+  if (!assetPath) return '';
+  if (assetPath.includes('/')) return assetPath;
+  return path.posix.join(promptPackRoot(contract), assetPath);
+}
+
+function promptMeta(contract, route) {
+  const relativePath = promptRoute(contract, route);
   const absolutePath = path.join(REPO_ROOT, relativePath);
   return {
-    root: 'prompts/xiaohongshu',
+    root: promptPackRoot(contract),
     file: path.basename(relativePath),
     relative_path: relativePath,
     source: existsSync(absolutePath) ? 'repo' : 'embedded',
@@ -91,8 +106,8 @@ function renderSeedValue(value, vars) {
   return value;
 }
 
-function promptSeed(route, vars = {}) {
-  const absolutePath = path.join(REPO_ROOT, PROMPT_PACK[route]);
+function promptSeed(contract, route, vars = {}) {
+  const absolutePath = path.join(REPO_ROOT, promptRoute(contract, route));
   if (!existsSync(absolutePath)) return null;
   const raw = readFileSync(absolutePath, 'utf-8');
   const match = raw.match(/## runtime_seed\s*```json\s*([\s\S]*?)\s*```/);
@@ -315,7 +330,7 @@ function attachCommon(route, contract) {
     route,
     profile_id: contract.profile_id,
     produced_at: new Date().toISOString(),
-    prompt_pack: promptMeta(route),
+    prompt_pack: promptMeta(contract, route),
   };
 }
 
@@ -350,7 +365,7 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
 }
 
 function buildResearch(contract) {
-  const seed = promptSeed('research', { title: contract.title });
+  const seed = promptSeed(contract, 'research', { title: contract.title });
   const references = sourceTruth(contract)
     ? sourceLabels(contract)
     : safeArray(seed?.research?.reference_source_list).length > 0 ? seed.research.reference_source_list : publicSources();
@@ -383,7 +398,7 @@ function buildResearch(contract) {
 
 function buildStoryline(contract, deliverablePaths) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
-  const seed = promptSeed('storyline');
+  const seed = promptSeed(contract, 'storyline');
   return {
     ...attachCommon('storyline', contract),
     storyline: {
@@ -404,7 +419,7 @@ function buildStoryline(contract, deliverablePaths) {
 }
 
 function buildPlanSlides(contract, storyline, research) {
-  const seed = promptSeed('single_note_plan', { title: contract.title });
+  const seed = promptSeed(contract, 'single_note_plan', { title: contract.title });
   const slides = safeArray(seed?.plan?.slides);
   const sources = safeArray(research?.research?.public_sources).length > 0 ? research.research.public_sources : sourceLabels(contract);
   const sourceClaims = sourceMaterials(contract).map((material) => safeText(material.excerpt || material.content_text).replace(/\s+/g, ' ').slice(0, 64)).filter(Boolean);
@@ -444,7 +459,7 @@ function buildPlanSlides(contract, storyline, research) {
 }
 
 function buildSingleNotePlan(contract, deliverablePaths) {
-  const seed = promptSeed('single_note_plan', { title: contract.title });
+  const seed = promptSeed(contract, 'single_note_plan', { title: contract.title });
   const titleOptions = safeArray(seed?.plan?.title_options);
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const research = readStageArtifact(contract, deliverablePaths, 'research');
@@ -464,7 +479,7 @@ function buildSingleNotePlan(contract, deliverablePaths) {
 function buildVisualDirection(contract, deliverablePaths, mode, baselineDeliverableId) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
-  const seed = promptSeed('visual_direction');
+  const seed = promptSeed(contract, 'visual_direction');
   const slides = safeArray(plan?.single_note_plan?.slides);
   const peakPages = safeArray(seed?.visual_direction?.peak_pages).length > 0 ? seed.visual_direction.peak_pages : slides.filter((slide) => ['hook','mechanism_peak','evidence_peak'].includes(slide.progression_role)).map((slide) => slide.slide_id);
   const pageRoleTable = slides.map((slide) => ({
@@ -629,7 +644,7 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
 function buildRenderHtml(contract, deliverablePaths) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const seed = promptSeed('render_html');
+  const seed = promptSeed(contract, 'render_html');
   if (!seed?.render_contract) {
     throw new Error('render_html prompt pack missing render_contract runtime seed');
   }
@@ -638,7 +653,7 @@ function buildRenderHtml(contract, deliverablePaths) {
   const slides = sourceSlides.map((slide) => compileXhsRenderSlide(slide, visualDirection, seed, sourceSlides.length));
   const renderPlan = {
     render_strategy: safeText(seed.render_contract.render_strategy, 'prompt_director_first'),
-    shell_file: safeText(seed.render_contract.shell_file, 'prompts/xiaohongshu/render_shell.html'),
+    shell_file: resolvePromptPackAsset(contract, safeText(seed.render_contract.shell_file, 'render_shell.html')),
     director_contract: {
       visual_motif: safeText(visualDirection.visual_motif),
       peak_pages: safeArray(visualDirection.peak_pages),
@@ -661,7 +676,7 @@ function buildRenderHtml(contract, deliverablePaths) {
     slides,
     renderPlan,
     renderStrategy: renderPlan.render_strategy,
-    shellFile: `prompts/xiaohongshu/${safeText(seed.render_contract.shell_file, 'render_shell.html')}`,
+    shellFile: renderPlan.shell_file,
   }));
   return {
     ...attachCommon('render_html', contract),
