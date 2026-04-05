@@ -85,6 +85,46 @@ test('xiaohongshu render_html blocks until single_note_plan and visual_direction
   assert.match(result.run.error.message, /render_html.*single_note_plan.*visual_direction/i);
 });
 
+test('xiaohongshu render_html fails when compiler_module in prompt_pack contract is invalid', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
+  const contract = readJson(contractFile);
+  contract.prompt_pack.render_contract.compiler_module = 'missing-render-pack.js';
+  writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
+
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
+
+  const result = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    route: 'render_html',
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(result.run.error.message, /Missing render pack compiler/i);
+});
+
 test('xiaohongshu mainline produces real stage artifacts through publish_copy', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
   await createDeliverable({

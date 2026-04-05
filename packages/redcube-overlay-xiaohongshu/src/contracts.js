@@ -131,6 +131,20 @@ const PROMPT_PACK = {
     publish_copy: { file: 'publish_copy.md' },
     export_bundle: { file: 'export_bundle.md' },
   },
+  render_contract: {
+    render_strategy: 'prompt_director_first',
+    shell_file: 'render_shell.html',
+    compiler_module: 'render_pack.js',
+    recipe_registry: {
+      cover_note: 'xhs.hero_note',
+      myth_compare: 'xhs.split_contrast',
+      sequence_stack: 'xhs.staggered_steps',
+      process_track: 'xhs.track_rail',
+      evidence_strip: 'xhs.evidence_bands',
+      action_checklist: 'xhs.checklist_close',
+      default: 'xhs.annotated_cards',
+    },
+  },
 };
 
 const EXPORT_BUNDLE = {
