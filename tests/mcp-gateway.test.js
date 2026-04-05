@@ -183,6 +183,50 @@ test('callGatewayTool delegates publication projection gateway action', async ()
   assert.equal(result.canonical_source.kind, 'review_state.publish_state');
 });
 
+test('callGatewayTool can return operator-facing deliverable and route-run surfaces', async () => {
+  const deliverable = await callGatewayTool(
+    'get_deliverable',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+    },
+    {
+      getDeliverable: async () => ({
+        ok: true,
+        surface_kind: 'deliverable_record',
+        recommended_action: 'run_deliverable_route',
+        summary: { deliverable_id: 'deck-a' },
+        deliverable: { deliverable_id: 'deck-a' },
+      }),
+    },
+  );
+  const routeRun = await callGatewayTool(
+    'run_deliverable_route',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    },
+    {
+      runDeliverableRoute: async () => ({
+        ok: true,
+        surface_kind: 'route_run',
+        recommended_action: 'continue',
+        summary: { route: 'storyline' },
+        run: { run_id: 'run-a' },
+      }),
+    },
+  );
+
+  assert.equal(deliverable.surface_kind, 'deliverable_record');
+  assert.equal(deliverable.recommended_action, 'run_deliverable_route');
+  assert.equal(routeRun.surface_kind, 'route_run');
+  assert.equal(routeRun.summary.route, 'storyline');
+});
+
 
 
 test('callGatewayTool delegates review mutation gateway action', async () => {

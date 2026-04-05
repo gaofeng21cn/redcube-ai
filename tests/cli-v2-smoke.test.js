@@ -318,6 +318,45 @@ test('CLI deliverable create proxies gateway createDeliverable', () => {
   assert.equal(parsed.deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
 });
 
+test('CLI deliverable get returns operator-facing deliverable record surface', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-get-'));
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root', workspaceRoot,
+      '--overlay', 'ppt_deck',
+      '--profile-id', 'lecture_student',
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+      '--title', '甲状腺门诊科普 deck',
+      '--goal', '为本科生讲授甲状腺基础知识',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const output = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'get',
+      '--workspace-root', workspaceRoot,
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'deliverable_record');
+  assert.equal(parsed.recommended_action, 'run_deliverable_route');
+  assert.equal(parsed.summary.deliverable_id, 'deck-a');
+});
+
 test('CLI deliverable create works from isolated install without monorepo sibling source packages', () => {
   const { cliPath, installRoot } = createIsolatedCliInstall();
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-isolated-'));

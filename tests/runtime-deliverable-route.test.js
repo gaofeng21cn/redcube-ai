@@ -38,6 +38,9 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
   });
 
   assert.equal(stored.ok, true);
+  assert.equal(stored.surface_kind, 'deliverable_record');
+  assert.equal(stored.recommended_action, 'run_deliverable_route');
+  assert.equal(stored.summary.deliverable_id, 'deck-a');
   assert.equal(stored.deliverable.overlay, 'ppt_deck');
   assert.equal(stored.deliverable.kind, 'ppt_deck');
   assert.equal(stored.deliverable.profile_id, 'lecture_student');
@@ -116,6 +119,9 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   });
 
   assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'route_run');
+  assert.equal(result.recommended_action, 'continue');
+  assert.equal(result.summary.route, 'storyline');
   assert.equal(result.run.executor.adapter, 'host_agent');
   assert.equal(result.run.status, 'completed');
   assert.equal(result.events.length >= 2, true);
