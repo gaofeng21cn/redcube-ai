@@ -382,5 +382,55 @@ export function applyReviewMutation({ workspaceRoot, topicId, deliverableId, mut
       },
     });
   }
+  if (type === 'promote_baseline') {
+    const current = getReviewState({ workspaceRoot, topicId, deliverableId }).state;
+    const { deliverablePaths, contract } = loadContractAndPaths({ workspaceRoot, topicId, deliverableId });
+    if (!current?.ready_for_export) {
+      throw new Error('promote_baseline requires ready_for_export === true');
+    }
+    if (current?.approval_state?.required && current?.approval_state?.status !== 'approved' && current?.publish_state?.current !== 'published') {
+      throw new Error('promote_baseline requires approval_state.status === approved or publish_state.current === published');
+    }
+    const promotedReferenceId = String(mutation?.promoted_reference_id || '').trim();
+    if (!promotedReferenceId) {
+      throw new Error('promote_baseline requires promoted_reference_id');
+    }
+    const latestArtifactFile = String(current?.latest_review_artifact || '').trim();
+    const latestArtifact = latestArtifactFile ? safeReadJson(latestArtifactFile) : null;
+    const screenshotStage = Array.isArray(contract?.stage_sequence?.stages)
+      ? contract.stage_sequence.stages.find((stage) => stage?.stage_id === 'screenshot_review')
+      : null;
+    const screenshotArtifactName = String(screenshotStage?.output_artifact || 'screenshot_review.json').trim();
+    const screenshotReviewArtifact = safeReadJson(path.join(deliverablePaths.artifactsDir, screenshotArtifactName));
+    const relativeQuality = latestArtifact?.baseline_review?.relative_quality
+      || screenshotReviewArtifact?.baseline_review?.relative_quality
+      || null;
+    if (!relativeQuality || !Array.isArray(relativeQuality.dimensions) || relativeQuality.dimensions.length === 0) {
+      throw new Error('promote_baseline requires structured relative_quality');
+    }
+    return persistReviewStatePatch({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+      source: 'mutation',
+      patch: {
+        baseline: {
+          ...(current?.baseline || {}),
+          promotion_state: 'promoted',
+          promoted_reference_id: promotedReferenceId,
+          source_deliverable_id: deliverableId,
+          promoted_at: nowIso(),
+          promoted_by: String(mutation?.actor || 'unknown'),
+          promotion_notes: String(mutation?.notes || '').trim() || null,
+          relative_quality: relativeQuality,
+        },
+        last_mutation: {
+          type,
+          actor: String(mutation?.actor || 'unknown'),
+          notes: String(mutation?.notes || '').trim() || null,
+        },
+      },
+    });
+  }
   throw new Error(`Unsupported review mutation type: ${type}`);
 }

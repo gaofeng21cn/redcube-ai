@@ -179,6 +179,111 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(rebuilt.publication.current, 'published');
 });
 
+test('promote_baseline requires structured relative quality and approval gates, then records promotion state', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-platform-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'baseline-a',
+    title: '甲状腺门诊小红书 baseline',
+    goal: '旧版认可稿',
+  });
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'baseline-a',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
+  await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'baseline-a',
+    mutation: {
+      type: 'approve_publish',
+      actor: 'human',
+      notes: 'baseline approved',
+    },
+  });
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    title: '甲状腺门诊小红书优化版',
+    goal: '在 baseline 基础上优化可读性',
+  });
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'candidate-a',
+      route,
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'baseline-a',
+    });
+    assert.equal(result.ok, true, route);
+  }
+
+  await assert.rejects(
+    () => applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'candidate-a',
+      mutation: {
+        type: 'promote_baseline',
+        actor: 'human',
+        promoted_reference_id: 'xhs-standard-note-v2',
+      },
+    }),
+    /approval|approved/i,
+  );
+
+  await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    mutation: {
+      type: 'approve_publish',
+      actor: 'human',
+      notes: 'candidate approved before promotion',
+    },
+  });
+
+  const promoted = await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    mutation: {
+      type: 'promote_baseline',
+      actor: 'human',
+      promoted_reference_id: 'xhs-standard-note-v2',
+      notes: 'promote optimized note into approved reference',
+    },
+  });
+  assert.equal(promoted.state.baseline.promotion_state, 'promoted');
+  assert.equal(promoted.state.baseline.promoted_reference_id, 'xhs-standard-note-v2');
+  assert.equal(promoted.state.baseline.source_deliverable_id, 'candidate-a');
+  assert.equal(typeof promoted.state.baseline.promoted_at, 'string');
+  assert.equal(promoted.state.baseline.promoted_by, 'human');
+
+  const history = readFileSync(promoted.history_file, 'utf-8')
+    .trim()
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  assert.equal(history.at(-1)?.patch?.last_mutation?.type, 'promote_baseline');
+});
+
 test('approve_publish rejects xiaohongshu deliverable before publish_ready', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-platform-'));
   await createDeliverable({
@@ -203,4 +308,64 @@ test('approve_publish rejects xiaohongshu deliverable before publish_ready', asy
     }),
     /publish_ready|pending_human|ready_for_export/i,
   );
+});
+
+test('promote_baseline works for ppt_deck without human approval gate once relative quality exists', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-platform-'));
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-baseline',
+    title: '肠癌 AI 讲课 baseline',
+    goal: '旧版认可稿',
+  });
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-baseline',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-candidate',
+    title: '肠癌 AI 讲课优化版',
+    goal: '在 baseline 基础上提升教学性',
+  });
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-candidate',
+      route,
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'deck-baseline',
+    });
+    assert.equal(result.ok, true, route);
+  }
+
+  const promoted = await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-candidate',
+    mutation: {
+      type: 'promote_baseline',
+      actor: 'human',
+      promoted_reference_id: 'ppt-lecture-student-v2',
+      notes: 'promote improved lecture deck into approved reference',
+    },
+  });
+  assert.equal(promoted.state.baseline.promotion_state, 'promoted');
+  assert.equal(promoted.state.baseline.promoted_reference_id, 'ppt-lecture-student-v2');
+  assert.equal(promoted.state.baseline.source_deliverable_id, 'deck-candidate');
 });
