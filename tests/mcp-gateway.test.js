@@ -103,6 +103,11 @@ test('callGatewayTool delegates overlay catalog gateway action', async () => {
       getOverlayCatalog: async () => ({
         ok: true,
         surface_kind: 'overlay_catalog',
+        recommended_action: 'create_deliverable',
+        summary: {
+          total_overlays: 1,
+          total_profiles: 1,
+        },
         overlays: [{ overlay_id: 'poster', profiles: ['default'] }],
       }),
     },
@@ -110,7 +115,47 @@ test('callGatewayTool delegates overlay catalog gateway action', async () => {
 
   assert.equal(result.ok, true);
   assert.equal(result.surface_kind, 'overlay_catalog');
+  assert.equal(result.recommended_action, 'create_deliverable');
+  assert.equal(result.summary.total_overlays, 1);
   assert.deepEqual(result.overlays, [{ overlay_id: 'poster', profiles: ['default'] }]);
+});
+
+test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
+  const doctor = await callGatewayTool(
+    'doctor',
+    { workspaceRoot: '/tmp/redcube-workspace' },
+    {
+      doctorWorkspace: async () => ({
+        ok: true,
+        surface_kind: 'workspace_doctor',
+        recommended_action: 'continue',
+        summary: {
+          workspace_file_exists: true,
+        },
+      }),
+    },
+  );
+  const topics = await callGatewayTool(
+    'list_topics',
+    { workspaceRoot: '/tmp/redcube-workspace' },
+    {
+      listTopics: async () => ({
+        ok: true,
+        surface_kind: 'topic_catalog',
+        recommended_action: 'create_or_import_topic',
+        summary: {
+          total_topics: 0,
+        },
+        topics: [],
+      }),
+    },
+  );
+
+  assert.equal(doctor.surface_kind, 'workspace_doctor');
+  assert.equal(doctor.summary.workspace_file_exists, true);
+  assert.equal(topics.surface_kind, 'topic_catalog');
+  assert.equal(topics.recommended_action, 'create_or_import_topic');
+  assert.equal(topics.summary.total_topics, 0);
 });
 
 test('callGatewayTool delegates publication projection gateway action', async () => {

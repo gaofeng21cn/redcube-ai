@@ -144,6 +144,9 @@ test('CLI workspace doctor proxies gateway doctorWorkspace', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'workspace_doctor');
+  assert.equal(parsed.recommended_action, 'continue');
+  assert.equal(parsed.summary.workspace_file_exists, true);
   assert.equal(parsed.workspaceFileExists, true);
 });
 
@@ -164,6 +167,8 @@ test('CLI workspace doctor works from isolated install without monorepo sibling 
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'workspace_doctor');
+  assert.equal(parsed.recommended_action, 'continue');
   assert.equal(parsed.workspaceRoot, workspaceRoot);
   assert.equal(parsed.workspaceFileExists, true);
 });
@@ -221,6 +226,8 @@ test('CLI profile list exposes registry-driven overlay catalog from isolated ins
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'overlay_catalog');
+  assert.equal(parsed.recommended_action, 'create_deliverable');
+  assert.equal(parsed.summary.total_overlays, 2);
   assert.deepEqual(
     parsed.overlays.map((overlay) => overlay.overlay_id),
     ['ppt_deck', 'xiaohongshu'],
@@ -270,6 +277,9 @@ test('CLI topics list proxies gateway listTopics', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'topic_catalog');
+  assert.equal(parsed.recommended_action, 'continue');
+  assert.equal(parsed.summary.total_topics, 1);
   assert.equal(parsed.total, 1);
   assert.equal(parsed.topics[0].topic_id, 'topic-a');
 });

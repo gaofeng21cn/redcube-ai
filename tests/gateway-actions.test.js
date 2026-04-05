@@ -17,6 +17,9 @@ test('doctorWorkspace reports canonical directories and workspace file presence'
   const result = await doctorWorkspace({ workspaceRoot });
 
   assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'workspace_doctor');
+  assert.equal(result.recommended_action, 'continue');
+  assert.equal(result.summary.workspace_file_exists, true);
   assert.equal(result.workspaceRoot, workspaceRoot);
   assert.equal(result.workspaceFileExists, true);
   assert.equal(result.contract.topicsDir, path.join(workspaceRoot, 'topics'));
@@ -35,6 +38,9 @@ test('listTopics returns topic metadata from canonical workspace tree', async ()
   const result = await listTopics({ workspaceRoot });
 
   assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'topic_catalog');
+  assert.equal(result.recommended_action, 'continue');
+  assert.equal(result.summary.total_topics, 1);
   assert.equal(result.total, 1);
   assert.equal(result.topics[0].topic_id, 'topic-a');
   assert.equal(result.topics[0].status, 'draft');
@@ -59,6 +65,9 @@ test('getOverlayCatalog exposes registry-driven overlay/profile discovery surfac
 
   assert.equal(result.ok, true);
   assert.equal(result.surface_kind, 'overlay_catalog');
+  assert.equal(result.recommended_action, 'create_deliverable');
+  assert.equal(result.summary.total_overlays, 2);
+  assert.equal(result.summary.total_profiles, 5);
   assert.deepEqual(
     result.overlays.map((overlay) => overlay.overlay_id),
     ['ppt_deck', 'xiaohongshu'],
