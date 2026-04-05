@@ -2,7 +2,7 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
-import { getReviewState as loadReviewState } from './review-state.js';
+import { getPublicationProjection as loadPublicationProjection, getReviewState as loadReviewState } from './review-state.js';
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   if (!workspaceRoot || !topicId || !deliverableId) {
@@ -153,6 +153,9 @@ export function watchRuntimeReviewLoop(request) {
     : [];
   const contract = loadHydratedContract(request);
   const reviewState = loadPlatformReviewState(request);
+  const publicationProjection = request?.workspaceRoot && request?.topicId
+    ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
+    : null;
 
   return {
     ok: true,
@@ -161,6 +164,7 @@ export function watchRuntimeReviewLoop(request) {
     status: reviewState?.pending_reviews?.length > 0 ? 'review_pending' : (pendingReviews.length > 0 ? 'review_pending' : String(run?.status || reviewState?.current_status || 'idle')),
     pending_reviews: reviewState?.pending_reviews || pendingReviews,
     review_state: reviewState,
+    publication_projection: publicationProjection,
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
     required_export_bundle: contract?.export_bundle || null,

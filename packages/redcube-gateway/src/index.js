@@ -17,6 +17,10 @@ export async function getDeliverable(request) {
   const module = await import('./actions/get-deliverable.js');
   return module.getDeliverable(request);
 }
+export async function getPublicationProjection(request) {
+  const module = await import('./actions/get-publication-projection.js');
+  return module.getPublicationProjection(request);
+}
 
 export async function getRun(request) {
   const module = await import('./actions/get-run.js');

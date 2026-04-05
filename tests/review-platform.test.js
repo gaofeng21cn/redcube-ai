@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 
 import {
   applyReviewMutation,
   createDeliverable,
+  getPublicationProjection,
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
@@ -49,6 +50,8 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
   await runPptReviewReady(workspaceRoot);
 
   const readyState = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
+  assert.equal(readyState.state_type, 'canonical');
+  assert.equal(readyState.canonical_source.kind, 'review_state.publish_state');
   assert.equal(readyState.state.current_status, 'export_ready');
   assert.equal(readyState.state.ready_for_export, true);
   assert.equal(readyState.state.approval_state.status, 'not_required');
@@ -92,6 +95,8 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   await runXhsReviewReady(workspaceRoot);
 
   const state = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'note-a' });
+  assert.equal(state.state_type, 'canonical');
+  assert.equal(state.canonical_source.kind, 'review_state.publish_state');
   assert.equal(state.state.overlay, 'xiaohongshu');
   assert.equal(state.state.current_status, 'publish_ready');
   assert.equal(state.state.ready_for_export, true);
@@ -100,6 +105,14 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   const publicationStateFile = path.join(workspaceRoot, 'topics', 'topic-a', 'publication-state.json');
   assert.equal(existsSync(publicationStateFile), true);
   assert.equal(JSON.parse(readFileSync(publicationStateFile, 'utf-8')).current, 'approval_pending');
+  const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+  assert.equal(projection.state_type, 'projection');
+  assert.equal(projection.publication.current, 'approval_pending');
+  assert.equal(projection.canonical_source.kind, 'review_state.publish_state');
+  rmSync(publicationStateFile);
+  const rebuiltAfterDelete = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+  assert.equal(rebuiltAfterDelete.publication.current, 'approval_pending');
+  assert.equal(existsSync(publicationStateFile), true);
 
   const mutation = await applyReviewMutation({
     workspaceRoot,
@@ -154,7 +167,16 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(published.state.current_status, 'published');
   assert.equal(published.state.publish_state.current, 'published');
   assert.equal(published.state.publish_state.approved_by, 'human');
+  const publishHistory = readFileSync(published.history_file, 'utf-8')
+    .trim()
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  assert.equal(publishHistory.at(-2)?.patch?.last_mutation?.type, 'approve_publish');
+  assert.equal(publishHistory.at(-1)?.patch?.last_mutation?.type, 'promote_publish');
   assert.equal(JSON.parse(readFileSync(publicationStateFile, 'utf-8')).current, 'published');
+  const rebuilt = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+  assert.equal(rebuilt.publication.current, 'published');
 });
 
 test('approve_publish rejects xiaohongshu deliverable before publish_ready', async () => {

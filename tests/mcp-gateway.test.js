@@ -25,6 +25,7 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'intake_source',
       'create_deliverable',
       'get_deliverable',
+      'get_publication_projection',
       'audit_deliverable',
       'review_render_output',
       'run_deliverable_route',
@@ -91,6 +92,29 @@ test('callGatewayTool delegates source intake gateway action', async () => {
   assert.equal(result.ok, true);
   assert.equal(result.audit.topic_id, 'topic-a');
   assert.equal(result.audit.status, 'pass');
+});
+
+test('callGatewayTool delegates publication projection gateway action', async () => {
+  const result = await callGatewayTool(
+    'get_publication_projection',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+    },
+    {
+      getPublicationProjection: async (request) => ({
+        ok: true,
+        topic_id: request.topicId,
+        state_type: 'projection',
+        publication: { current: 'approval_pending' },
+        canonical_source: { kind: 'review_state.publish_state' },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.publication.current, 'approval_pending');
+  assert.equal(result.canonical_source.kind, 'review_state.publish_state');
 });
 
 

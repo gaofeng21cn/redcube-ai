@@ -13,7 +13,7 @@
 
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
-<p align="center"><strong>面向专家与 PIs 的视觉交付平台</strong></p>
+<p align="center"><strong>面向 Agent 的 Visual Deliverable Gateway</strong></p>
 <p align="center">PPT 演示文稿 · 小红书图文 · Agent-first · Human-auditable</p>
 
 <table>
@@ -33,7 +33,22 @@
   </tr>
 </table>
 
-> 对外，它是帮助专家和 PIs 组织与生产视觉交付物的平台；对内，它是一个 `Agent-first, human-auditable` 的 Gateway + Overlay + Runtime 体系。
+> 对外，它是面向 Agent 的 `Visual Deliverable Gateway`；对内，它由一个 `Agent-first, human-auditable` 的 `Visual Deliverable Harness OS` 驱动。
+
+## 在 OPL 联邦中的位置
+
+如果放在 `One Person Lab (OPL)` 顶层语义里，更准确的定位是：
+
+- `RedCube AI` 是视觉交付 domain 的正式 gateway
+- 它下面承载的是视觉交付 harness，而不是一个一次性生成脚本集合
+- `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
+- `xiaohongshu` 与 `ppt_deck` 共享同一 harness，但在 OPL 顶层不自动等于 `Presentation Ops`
+
+理想链路是：
+
+`User / Agent -> OPL Gateway（可选顶层）-> RedCube Gateway -> RedCube Harness OS`
+
+即使不经过 `OPL` 顶层，`RedCube AI` 也应保留独立可用的 domain gateway 角色，而不是退化成 OPL 的内部实现细节。
 
 ## 这个平台适合谁
 
@@ -54,7 +69,7 @@
 当前 `PPT` 和 `小红书图文` 不是两套彼此割裂的系统，而是共享同一条运行主线：
 
 - 共享 `Gateway`
-- 共享 `Runtime`
+- 共享 `Harness OS`
 - 共享 `Run Store / Event Log / Artifact Store`
 - 共享可审计的 review 与 rerun 机制
 
@@ -79,11 +94,11 @@
 
 1. 准备一个独立工作区，把你的素材放进去。
 2. 告诉 Agent 这次要做的是 `PPT` 还是 `小红书图文`，目标受众是谁，最终要交付什么。
-3. 让 Agent 使用 `RedCube AI` 作为视觉交付运行层推进，并由你审核关键结果。
+3. 让 Agent 使用 `RedCube AI` 作为视觉交付 gateway 推进，并由你审核关键结果。
 
 你可以直接把下面这段话发给 Agent：
 
-> 请先读取我提供的材料，并判断这次交付更适合做成 PPT 演示文稿还是小红书图文。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）作为视觉交付运行框架，把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、阶段顺序、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊的结果。
+> 请先读取我提供的材料，并判断这次交付更适合做成 PPT 演示文稿还是小红书图文。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）作为视觉交付 gateway / harness 框架，把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、阶段顺序、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊的结果。
 
 继续阅读：
 
@@ -100,7 +115,7 @@
 3. 平台把阶段结果、审阅意见、运行状态和导出物持续落盘
 4. 人类在关键节点审核，决定继续、修改、重跑或结束
 
-所以它更像一个“交付运行层”，而不是一个让人类自己点按钮操作的 Web 工具。
+所以更准确的理解是：它是一个 `Visual Deliverable Gateway + Harness OS`，而不是一个让人类自己点按钮操作的 Web 工具。
 
 ## 当前推荐入口
 
@@ -125,16 +140,26 @@
 Agent
   -> Gateway
       -> Overlay
-          -> Runtime
+          -> Harness OS
               -> Executor Adapter
               -> Artifact Store
               -> Run Store
               -> Event Log
 ```
 
+如果放回 OPL 顶层语义，可以理解为：
+
+```text
+User / Agent
+  -> OPL Gateway (optional)
+      -> RedCube Gateway
+          -> Overlay / Family / Profile / Pack
+              -> RedCube Harness OS
+```
+
 - `Gateway` 是唯一正式入口，负责 workspace contract 装载、overlay 选择、run 状态读取与 artifact 引用返回
 - `Overlay` 定义交付物合同、阶段约束、质量门控、review surface 与 export 要求
-- `Runtime` 负责执行、审计、event log、rerun 与 canonical artifact 落盘
+- `Harness OS` 负责执行、审计、event log、rerun 与 canonical artifact 落盘
 
 当前正式主线已经不再使用 `GUI / Web Workbench`。旧的 Web / Workbench surface 已经退出 production path。
 
@@ -253,4 +278,4 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 
 更准确的理解是：
 
-> 一个让 Agent 稳定生产视觉交付物的运行层，而 `PPT` 与 `小红书图文` 是当前两类最重要的正式交付面。
+> 一个面向 Agent 的 Visual Deliverable Gateway，由 Visual Deliverable Harness OS 驱动；`PPT` 与 `小红书图文` 是当前两类最重要的正式交付面。

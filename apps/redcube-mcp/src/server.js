@@ -10,6 +10,7 @@ import {
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getPublicationProjection,
   getReviewState,
   getRun,
   intakeSource,
@@ -25,6 +26,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   listTopics,
   createDeliverable,
   getDeliverable,
+  getPublicationProjection,
   intakeSource,
   auditDeliverable,
   reviewRenderOutput,
@@ -88,6 +90,15 @@ const TOOL_DEFINITIONS = [
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       topicId: z.string().describe('Topic identifier.'),
       deliverableId: z.string().describe('Deliverable identifier.'),
+    },
+  },
+  {
+    name: 'get_publication_projection',
+    description: 'Read topic-level publication projection rebuilt from canonical publish truth.',
+    actionKey: 'getPublicationProjection',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
     },
   },
   {

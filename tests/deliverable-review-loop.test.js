@@ -8,6 +8,7 @@ import {
   auditDeliverable,
   createDeliverable,
   reviewRenderOutput,
+  runDeliverableRoute,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
 
@@ -235,6 +236,47 @@ test('runtimeWatch exposes export bundle obligations from hydrated contract', as
   assert.equal(report.profile_id, 'defense_deck');
   assert.equal(report.required_export_bundle.bundle_id, 'defense_deck_bundle');
   assert.equal(report.required_export_bundle.include_backup_slides, true);
+});
+
+test('runtimeWatch exposes publication projection separately from canonical review state', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
+
+  const report = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    run: {
+      run_id: 'run-1',
+      current_stage: 'publish_copy',
+      status: 'completed',
+      pending_reviews: [],
+      resumable: false,
+    },
+  });
+
+  assert.equal(report.review_state.publish_state.current, 'approval_pending');
+  assert.equal(report.publication_projection.current, 'approval_pending');
 });
 
 test('@redcube/gateway manifest declares runtime dependency for review loop actions', () => {

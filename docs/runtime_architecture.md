@@ -4,38 +4,50 @@
 
 ## 一句话理解
 
-`RedCube AI` 不是一个 GUI 工具集合，而是一个面向 Agent 的视觉交付运行层。
+`RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由内部的 `Visual Deliverable Harness OS` 驱动。
 
 当前最重要的两类交付物是：
 
 - `PPT deck`
 - `小红书图文`
 
-## 统一运行主线
+## 顶层链路
+
+独立使用时：
 
 ```text
 Agent
-  -> Gateway
-      -> Overlay
-          -> Runtime
+  -> RedCube Gateway
+      -> Overlay / Family / Profile / Pack
+          -> RedCube Harness OS
+```
+
+放在 `OPL` 顶层语义里时：
+
+```text
+User / Agent
+  -> OPL Gateway
+      -> RedCube Gateway
+          -> Overlay / Family / Profile / Pack
+              -> RedCube Harness OS
 ```
 
 ## 各层职责
 
-### Gateway
+### RedCube Gateway
 
 唯一正式入口，负责：
 
 - 对外暴露 `CLI` 与 `MCP`
 - 装载 workspace contract
-- 路由到正确的 overlay 与任务对象
+- 路由到正确的 family / profile / pack
 - 返回结构化状态与 artifact 引用
 
-### Overlay
+### Overlay / Family / Profile / Pack
 
 负责定义交付物质量协议，而不是只定义 prompt 风格。
 
-它决定：
+它们决定：
 
 - 交付物类型
 - 阶段顺序
@@ -43,9 +55,9 @@ Agent
 - review surface
 - 导出要求
 
-### Runtime
+### RedCube Harness OS
 
-负责执行、记录与审计，不负责领域判断。
+负责执行、记录与审计，不负责顶层产品语义。
 
 它负责：
 
@@ -63,7 +75,15 @@ Agent
 - 都需要视觉与质量约束
 - 都适合由 Agent 发起，而不是由人类手工点击界面
 
-因此它们应该共享同一 runtime，只在 overlay contract 上分化。
+因此它们共享同一 harness，只在 family / profile / pack contract 上分化。
+
+## OPL 语义边界
+
+如果放回 `OPL` 顶层：
+
+- `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
+- `xiaohongshu` 共享同一 harness，但不自动等同于 `Presentation Ops`
+- `RedCube AI` 仍然必须保留独立 domain gateway 角色，而不是退化成 OPL 的内部模块
 
 ## 更稳定的规则在哪里
 

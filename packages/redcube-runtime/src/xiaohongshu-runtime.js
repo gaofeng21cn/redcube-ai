@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { loadRenderPackCompiler } from './render-pack-compiler.js';
-import { getReviewState, isBaselineApprovedState, rebuildTopicPublicationProjection } from './review-state.js';
+import { getReviewState, isBaselineApprovedState } from './review-state.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
@@ -891,7 +891,7 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
     },
   };
   writeJson(manifestFile, exportBundle);
-  const publicationStateFile = rebuildTopicPublicationProjection({ workspaceRoot, topicId });
+  const publicationStateFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
   return {
     ...attachCommon('export_bundle', contract),
     status: 'completed',

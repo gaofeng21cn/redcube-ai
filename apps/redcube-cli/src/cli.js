@@ -6,6 +6,7 @@ import {
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getPublicationProjection,
   getReviewState,
   getRun as getGatewayRun,
   intakeSource,
@@ -107,7 +108,7 @@ function buildHelp() {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
-      review: ['get', 'mutate'],
+      review: ['get', 'projection', 'mutate'],
       profile: ['bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
@@ -129,6 +130,7 @@ function buildHelp() {
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
+      reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
       reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>]',
       profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
@@ -276,6 +278,15 @@ async function main() {
       return;
     }
 
+    if (subcommand === 'projection') {
+      const result = await getPublicationProjection({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+      });
+      printJson(result);
+      return;
+    }
+
     if (subcommand === 'mutate') {
       const issues = String(options.issues || '').trim();
       const result = await applyReviewMutation({
@@ -296,7 +307,7 @@ async function main() {
       return;
     }
 
-    fail('review 命令仅支持 get|mutate');
+    fail('review 命令仅支持 get|projection|mutate');
   }
 
   if (command === 'runs') {

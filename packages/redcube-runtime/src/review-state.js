@@ -171,9 +171,37 @@ export function getReviewState(request) {
     : defaultState({ contract, topicId, deliverableId });
   return {
     ok: true,
+    state_type: 'canonical',
+    canonical_source: {
+      kind: 'review_state.publish_state',
+    },
     state,
     state_file: file,
     history_file: reviewHistoryFile(deliverablePaths),
+  };
+}
+
+export function getPublicationProjection({ workspaceRoot, topicId }) {
+  const projectionFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
+  const publication = safeReadJson(projectionFile) || (() => {
+    rebuildTopicPublicationProjection({ workspaceRoot, topicId });
+    return safeReadJson(projectionFile);
+  })() || {
+    schema_version: 1,
+    topic_id: topicId,
+    current: 'input_ready',
+    next: null,
+    deliverables: {},
+  };
+  return {
+    ok: true,
+    topic_id: topicId,
+    state_type: 'projection',
+    projection_file: projectionFile,
+    publication,
+    canonical_source: {
+      kind: 'review_state.publish_state',
+    },
   };
 }
 

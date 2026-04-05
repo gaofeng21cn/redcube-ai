@@ -165,6 +165,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
+  assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
 });
@@ -411,6 +412,8 @@ test('CLI review get and mutate proxy review platform actions', () => {
   );
   const getParsed = JSON.parse(getOutput);
   assert.equal(getParsed.ok, true);
+  assert.equal(getParsed.state_type, 'canonical');
+  assert.equal(getParsed.canonical_source.kind, 'review_state.publish_state');
   assert.equal(getParsed.state.deliverable_id, 'deck-a');
 
   const mutateOutput = execFileSync(
@@ -432,6 +435,64 @@ test('CLI review get and mutate proxy review platform actions', () => {
   const mutateParsed = JSON.parse(mutateOutput);
   assert.equal(mutateParsed.ok, true);
   assert.equal(mutateParsed.state.baseline.baseline_deliverable_id, 'deck-v1');
+});
+
+test('CLI review projection proxies topic publication projection read path', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-projection-'));
+
+  const createOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root', workspaceRoot,
+      '--overlay', 'xiaohongshu',
+      '--profile-id', 'standard_note',
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'note-a',
+      '--title', '甲状腺门诊小红书科普',
+      '--goal', '为门诊患者生成可发布的科普图文',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  assert.equal(JSON.parse(createOutput).ok, true);
+
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    const output = execFileSync(
+      'node',
+      [
+        path.resolve('apps/redcube-cli/src/cli.js'),
+        'deliverable',
+        'run',
+        '--workspace-root', workspaceRoot,
+        '--overlay', 'xiaohongshu',
+        '--topic-id', 'topic-a',
+        '--deliverable-id', 'note-a',
+        '--route', route,
+      ],
+      { encoding: 'utf-8', cwd: path.resolve('.') },
+    );
+    assert.equal(JSON.parse(output).ok, true, route);
+  }
+
+  const projectionOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'review',
+      'projection',
+      '--workspace-root', workspaceRoot,
+      '--topic-id', 'topic-a',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const projection = JSON.parse(projectionOutput);
+  assert.equal(projection.ok, true);
+  assert.equal(projection.state_type, 'projection');
+  assert.equal(projection.publication.current, 'approval_pending');
+  assert.equal(projection.canonical_source.kind, 'review_state.publish_state');
 });
 
 test('CLI topics list works from isolated install without monorepo sibling source packages', () => {
