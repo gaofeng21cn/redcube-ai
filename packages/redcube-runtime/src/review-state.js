@@ -122,7 +122,7 @@ function sortPublicationEntries(left, right) {
   return String(right?.updated_at || '').localeCompare(String(left?.updated_at || ''));
 }
 
-function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
+export function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
   const topicDir = path.join(workspaceRoot, 'topics', topicId);
   const deliverablesDir = path.join(topicDir, 'deliverables');
   const projectionFile = path.join(topicDir, 'publication-state.json');

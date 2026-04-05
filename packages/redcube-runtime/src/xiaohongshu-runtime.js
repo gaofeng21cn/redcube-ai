@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
-import { getReviewState, isBaselineApprovedState } from './review-state.js';
+import { getReviewState, isBaselineApprovedState, rebuildTopicPublicationProjection } from './review-state.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
@@ -939,7 +939,6 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
   const copy = readStageArtifact(contract, deliverablePaths, 'publish_copy');
   const pngFiles = safeArray(review?.slide_reviews).map((slide) => slide.screenshot_file);
   const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
-  const publicationStateFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
   const exportBundle = {
     html_file: render.html_bundle.html_file,
     png_files: pngFiles,
@@ -951,7 +950,7 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
     },
   };
   writeJson(manifestFile, exportBundle);
-  const publicationStateFile = updateTopicPublicationState(workspaceRoot, topicId, deliverablePaths.deliverableId, exportBundle.publish_state);
+  const publicationStateFile = rebuildTopicPublicationProjection({ workspaceRoot, topicId });
   return {
     ...attachCommon('export_bundle', contract),
     status: 'completed',
