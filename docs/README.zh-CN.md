@@ -1,0 +1,36 @@
+# Docs
+
+[English](./README.md) | **中文**
+
+这里是 `RedCube AI` 面向 GitHub 与外部读者的公开文档入口。
+
+公开口径统一按下面这条理解：
+
+- 对外：`RedCube AI` 是 `Visual Deliverable Gateway`
+- 对内：它由 `Visual Deliverable Harness OS` 驱动
+- 在 `OPL` 顶层语义里：它是视觉交付 domain gateway，而不是 `OPL` 本体
+
+如果你是专家、PI、内容团队负责人或需要接入本项目的技术同事，优先从这里开始。
+
+## 面向人类用户
+
+- [人类用户快速上手](human_quickstart.md)
+- [典型交付示例](deliverable_examples.md)
+
+## 面向技术同事 / AI 执行者
+
+- [运行架构说明](runtime_architecture.md)
+- [私有作者信息与 prompts 配置](private-profile-setup.md)
+- [公开发布到 GitHub](public-github-publish.md)
+
+## 长期稳定规则
+
+- [Policies 索引](policies/README.md)
+- [运行模型 Policy](policies/runtime_operating_model.md)
+- [交付合同模型 Policy](policies/deliverable_contract_model.md)
+
+## 文档边界
+
+- `docs/`：公开文档
+- `docs/policies/`：稳定、长期公开保留的规则文档
+- `docs/superpowers/`：本地 AI / Superpowers 文档、开发计划、设计草案与过程痕迹，不进入 Git 跟踪面
