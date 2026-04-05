@@ -90,7 +90,10 @@ const SURFACE_VALIDATORS = {
     && typeof content?.routes?.render_html === 'string'
     && content.routes.render_html === 'prompts/ppt_deck/render_html.md'
     && typeof content?.stages?.render_html?.file === 'string'
-    && content.stages.render_html.file === 'render_html.md',
+    && content.stages.render_html.file === 'render_html.md'
+    && content?.render_contract?.render_strategy === 'prompt_director_first'
+    && content?.render_contract?.shell_file === 'render_shell.html'
+    && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content) =>
     Array.isArray(content?.required_checks)
     && content.required_checks.length > 0
