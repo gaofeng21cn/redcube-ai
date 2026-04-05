@@ -401,6 +401,48 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
   }
 });
 
+test('stdio MCP server returns operator-facing error metadata for failing tools', async () => {
+  const serverPath = fileURLToPath(
+    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+  );
+  const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: repoRoot,
+    stderr: 'pipe',
+  });
+  const client = new Client({
+    name: 'redcube-mcp-test-client',
+    version: '0.1.0',
+  });
+
+  await client.connect(transport);
+
+  try {
+    const result = await client.callTool({
+      name: 'create_deliverable',
+      arguments: {
+        workspaceRoot: '/tmp/redcube-workspace',
+        overlay: 'poster',
+        profileId: 'default',
+        topicId: 'topic-a',
+        deliverableId: 'poster-a',
+        title: '未知交付物',
+        goal: '测试失败面',
+      },
+    });
+
+    assert.equal(result.isError, true);
+    assert.equal(result.structuredContent.ok, false);
+    assert.equal(result.structuredContent.error_kind, 'gateway_tool_error');
+    assert.equal(result.structuredContent.recommended_action, 'inspect_tool_request');
+    assert.match(result.structuredContent.error, /Unknown overlay/i);
+  } finally {
+    await transport.close();
+  }
+});
+
 test('stdio MCP server can create deliverable, run declared route, and fetch run state', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-run-'));
   const serverPath = fileURLToPath(

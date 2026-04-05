@@ -6,6 +6,7 @@ export async function runDeliverableRoute(request) {
     ...result,
     surface_kind: 'route_run',
     recommended_action: result.ok ? 'continue' : 'inspect_run_failure',
+    error_kind: result.ok ? null : 'route_failure',
     summary: {
       route: request.route,
       run_id: result.run?.run_id || null,

@@ -48,7 +48,12 @@ function printJson(data) {
 }
 
 function fail(message, code = 1) {
-  printJson({ ok: false, error: message });
+  printJson({
+    ok: false,
+    error_kind: 'cli_usage_error',
+    recommended_action: 'read_help',
+    error: message,
+  });
   process.exit(code);
 }
 

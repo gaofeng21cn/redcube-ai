@@ -225,6 +225,8 @@ function toToolError(error) {
     ],
     structuredContent: {
       ok: false,
+      error_kind: 'gateway_tool_error',
+      recommended_action: 'inspect_tool_request',
       error: message,
     },
     isError: true,

@@ -184,6 +184,8 @@ test('CLI isolated install returns CLI JSON for unknown commands', () => {
 
   assert.deepEqual(parsed, {
     ok: false,
+    error_kind: 'cli_usage_error',
+    recommended_action: 'read_help',
     error: '未知命令: foo',
   });
 });

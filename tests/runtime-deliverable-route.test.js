@@ -267,6 +267,9 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   });
 
   assert.equal(result.ok, false);
+  assert.equal(result.surface_kind, 'route_run');
+  assert.equal(result.error_kind, 'route_failure');
+  assert.equal(result.recommended_action, 'inspect_run_failure');
   assert.equal(result.run.status, 'failed');
   assert.equal(
     result.run.error.message,
