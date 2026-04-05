@@ -169,6 +169,20 @@ const FAMILY_PROMPT_PACK = {
     screenshot_review: { file: 'screenshot_review.md' },
     export_pptx: { file: 'export_pptx.md' },
   },
+  render_contract: {
+    render_strategy: 'prompt_director_first',
+    shell_file: 'render_shell.html',
+    recipe_registry: {
+      cover_hero: 'ppt.hero_signal',
+      multi_zone_compare: 'ppt.compare_zones',
+      timeline_band: 'ppt.timeline_rail',
+      judgement_ladder: 'ppt.judgement_ladder',
+      ring_cross: 'ppt.ring_cross',
+      central_axis: 'ppt.central_axis',
+      summary_peak: 'ppt.summary_peak',
+      default: 'ppt.compare_zones',
+    },
+  },
 };
 
 const FAMILY_EXPORT_BUNDLE = {
