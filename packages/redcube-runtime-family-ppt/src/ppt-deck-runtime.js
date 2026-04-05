@@ -493,13 +493,6 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
         status: python.status === 'pass' ? 'idle' : 'rerun_required',
         rerun_from_stage: python.status === 'pass' ? null : 'render_html',
       },
-      approval_state: {
-        required: false,
-        status: 'not_required',
-      },
-      publish_state: {
-        current: 'not_applicable',
-      },
     },
   };
   if (mode === 'optimize_existing' && python.baseline) {
@@ -553,13 +546,6 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
       rerun_policy: {
         status: 'idle',
         rerun_from_stage: null,
-      },
-      approval_state: {
-        required: false,
-        status: 'not_required',
-      },
-      publish_state: {
-        current: 'not_applicable',
       },
     },
     export_bundle: {

@@ -100,6 +100,82 @@ function buildQualitySummary(state) {
   };
 }
 
+function deriveArtifactGovernanceState({ previous, patch, contract }) {
+  const overlay = String(contract?.overlay || '').trim();
+  const baseApproval = previous?.approval_state || defaultState({
+    contract,
+    topicId: previous?.topic_id || '',
+    deliverableId: previous?.deliverable_id || '',
+  }).approval_state;
+  const basePublish = previous?.publish_state || defaultState({
+    contract,
+    topicId: previous?.topic_id || '',
+    deliverableId: previous?.deliverable_id || '',
+  }).publish_state;
+
+  if (overlay !== 'xiaohongshu') {
+    return {
+      approval_state: baseApproval,
+      publish_state: basePublish,
+    };
+  }
+
+  const stage = String(patch?.latest_review_stage || '').trim();
+  if (!['publish_copy', 'export_bundle'].includes(stage)) {
+    return {
+      approval_state: baseApproval,
+      publish_state: basePublish,
+    };
+  }
+
+  const readyForExport = Boolean(patch?.ready_for_export);
+  const pendingReviews = normalizeList(patch?.pending_reviews);
+  const blocked = String(patch?.current_status || '').trim() === 'blocked_for_revision' || !readyForExport;
+
+  if (blocked) {
+    return {
+      approval_state: {
+        ...baseApproval,
+        required: true,
+        status: 'changes_requested',
+        requested_at: null,
+        approved_at: null,
+        approved_by: null,
+      },
+      publish_state: {
+        ...basePublish,
+        current: 'draft',
+        promoted_at: null,
+        approved_by: null,
+      },
+    };
+  }
+
+  if (readyForExport && pendingReviews.length === 0) {
+    return {
+      approval_state: {
+        ...baseApproval,
+        required: true,
+        status: 'pending_human',
+        requested_at: baseApproval.requested_at || nowIso(),
+        approved_at: null,
+        approved_by: null,
+      },
+      publish_state: {
+        ...basePublish,
+        current: 'approval_pending',
+        promoted_at: null,
+        approved_by: null,
+      },
+    };
+  }
+
+  return {
+    approval_state: baseApproval,
+    publish_state: basePublish,
+  };
+}
+
 function derivePublishNext(current) {
   if (current === 'draft') return 'approval_pending';
   if (current === 'approval_pending') return 'approved_pending_publish';
@@ -228,6 +304,10 @@ export function persistReviewStatePatch({ workspaceRoot, topicId, deliverableId,
     ? JSON.parse(readFileSync(file, 'utf-8'))
     : defaultState({ contract, topicId, deliverableId });
 
+  const artifactGovernanceState = source === 'artifact'
+    ? deriveArtifactGovernanceState({ previous, patch, contract })
+    : null;
+
   const next = {
     ...previous,
     ...patch,
@@ -237,8 +317,12 @@ export function persistReviewStatePatch({ workspaceRoot, topicId, deliverableId,
     latest_checks: patch.latest_checks ? { ...previous.latest_checks, ...patch.latest_checks } : previous.latest_checks,
     baseline: patch.baseline ? { ...(previous.baseline || {}), ...patch.baseline } : previous.baseline,
     rerun_policy: patch.rerun_policy ? { ...(previous.rerun_policy || {}), ...patch.rerun_policy } : previous.rerun_policy,
-    approval_state: patch.approval_state ? { ...(previous.approval_state || {}), ...patch.approval_state } : previous.approval_state,
-    publish_state: patch.publish_state ? { ...(previous.publish_state || {}), ...patch.publish_state } : previous.publish_state,
+    approval_state: patch.approval_state
+      ? { ...(previous.approval_state || {}), ...patch.approval_state }
+      : (artifactGovernanceState?.approval_state || previous.approval_state),
+    publish_state: patch.publish_state
+      ? { ...(previous.publish_state || {}), ...patch.publish_state }
+      : (artifactGovernanceState?.publish_state || previous.publish_state),
     last_updated_at: nowIso(),
   };
   next.history_count = Number(previous.history_count || 0) + 1;

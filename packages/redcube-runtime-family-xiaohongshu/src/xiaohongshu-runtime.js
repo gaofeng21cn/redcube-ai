@@ -618,18 +618,6 @@ function buildPublishCopy(contract, deliverablePaths) {
         status: quality_gate.gate_pass ? 'idle' : 'rerun_required',
         rerun_from_stage: quality_gate.gate_pass ? null : 'publish_copy',
       },
-      approval_state: {
-        required: true,
-        status: quality_gate.gate_pass ? 'pending_human' : 'changes_requested',
-        requested_at: quality_gate.gate_pass ? new Date().toISOString() : null,
-        approved_at: null,
-        approved_by: null,
-      },
-      publish_state: {
-        current: quality_gate.gate_pass ? 'approval_pending' : 'draft',
-        promoted_at: null,
-        approved_by: null,
-      },
     },
   };
 }
@@ -673,13 +661,6 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
       rerun_policy: {
         status: 'idle',
         rerun_from_stage: null,
-      },
-      approval_state: {
-        required: true,
-        status: 'pending_human',
-      },
-      publish_state: {
-        current: 'approval_pending',
       },
     },
   };
