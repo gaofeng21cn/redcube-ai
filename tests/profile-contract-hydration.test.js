@@ -58,6 +58,10 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   );
   assert.equal(contract.layout_rules.density_mode, 'teaching_spread');
   assert.equal(contract.export_bundle.bundle_id, 'lecture_student_bundle');
+  assert.equal(contract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
+  assert.equal(contract.prompt_pack.render_contract.shell_file, 'render_shell.html');
+  assert.equal(contract.prompt_pack.render_contract.recipe_registry.cover_hero, 'ppt.hero_signal');
+  assert.equal(contract.prompt_pack.render_contract.recipe_registry.default, 'ppt.compare_zones');
 });
 
 test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared runtime model', () => {

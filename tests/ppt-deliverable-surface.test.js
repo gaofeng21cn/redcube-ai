@@ -52,6 +52,9 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   const hydratedContract = JSON.parse(
     readFileSync(path.join(deliverableDir, 'contracts/hydrated-deliverable.json'), 'utf-8'),
   );
+  const promptPack = JSON.parse(
+    readFileSync(path.join(deliverableDir, 'contracts/prompt-pack.json'), 'utf-8'),
+  );
 
   assert.deepEqual(
     displayRegistry.surfaces.map((surface) => surface.id),
@@ -70,6 +73,11 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.equal(hydratedContract.export_bundle.bundle_id, 'lecture_student_bundle');
   assert.equal(hydratedContract.prompt_pack.root, 'prompts/ppt_deck');
   assert.equal(hydratedContract.prompt_pack.stages.render_html.file, 'render_html.md');
+  assert.equal(hydratedContract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
+  assert.equal(hydratedContract.prompt_pack.render_contract.shell_file, 'render_shell.html');
+  assert.equal(hydratedContract.prompt_pack.render_contract.recipe_registry.default, 'ppt.compare_zones');
+  assert.equal(promptPack.render_contract.recipe_registry.cover_hero, 'ppt.hero_signal');
+  assert.equal(promptPack.render_contract.recipe_registry.summary_peak, 'ppt.summary_peak');
   assert.deepEqual(
     JSON.parse(
       readFileSync(path.join(deliverableDir, 'contracts/stage-requirements.json'), 'utf-8'),
@@ -190,6 +198,48 @@ test('auditDeliverable blocks when hydrated ppt deck surface content is invalid'
 
   assert.equal(report.status, 'block');
   assert.deepEqual(report.issues, ['deliverable_contract_invalid:review_surface']);
+  assert.equal(report.rerun_from_stage, 'intake');
+  assert.equal(report.recommended_action, 'rehydrate_deliverable_surface');
+});
+
+test('auditDeliverable blocks when prompt pack misses render contract seed', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+
+  writeFileSync(
+    path.join(path.dirname(created.deliverableFile), 'contracts/prompt-pack.json'),
+    JSON.stringify({
+      pack_id: 'ppt_deck_mainline_v1',
+      root: 'prompts/ppt_deck',
+      routes: {
+        render_html: 'prompts/ppt_deck/render_html.md',
+      },
+      stages: {
+        render_html: { file: 'render_html.md' },
+      },
+    }, null, 2),
+    'utf-8',
+  );
+
+  const report = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    mode: 'draft_new',
+  });
+
+  assert.equal(report.status, 'block');
+  assert.deepEqual(report.issues, ['deliverable_contract_invalid:prompt_pack']);
   assert.equal(report.rerun_from_stage, 'intake');
   assert.equal(report.recommended_action, 'rehydrate_deliverable_surface');
 });
