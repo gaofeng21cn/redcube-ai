@@ -1,9 +1,14 @@
-import { buildTopicRecord, hydrateXiaohongshuContract } from './contracts.js';
-import { buildXiaohongshuDeliverableRecord } from './contracts.js';
+import {
+  buildTopicRecord,
+  buildXiaohongshuDeliverableRecord,
+  describeXiaohongshuOverlay,
+  hydrateXiaohongshuContract,
+} from './contracts.js';
 
 export {
   buildTopicRecord,
   buildXiaohongshuDeliverableRecord,
+  describeXiaohongshuOverlay,
   hydrateXiaohongshuContract,
 } from './contracts.js';
 export { evaluateStorylineGate } from './gates.js';
@@ -32,4 +37,5 @@ export const xiaohongshuOverlay = {
   listSurfaceArtifactPaths: listXiaohongshuSurfaceArtifactPaths,
   validateSurfaceArtifact: validateXiaohongshuSurfaceArtifact,
   hydrateDeliverableContract: hydrateXiaohongshuContract,
+  describeOverlay: describeXiaohongshuOverlay,
 };

@@ -338,6 +338,22 @@ export const PPT_DECK_PROFILES = Object.freeze({
   defense_deck: { profile_id: 'defense_deck' },
 });
 
+export function describePptDeckOverlay() {
+  return {
+    overlay_id: 'ppt_deck',
+    default_profile_id: 'lecture_student',
+    profiles: Object.keys(PPT_DECK_PROFILES),
+    deliverable_kind: 'ppt_deck',
+    prompt_pack_id: FAMILY_PROMPT_PACK.pack_id,
+    route_sequence: FAMILY_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
+    packages: {
+      overlay: '@redcube/overlay-ppt',
+      runtime_family: '@redcube/runtime-family-ppt',
+      pack: '@redcube/pack-ppt',
+    },
+  };
+}
+
 export function hydratePptDeckContract({
   overlay = 'ppt_deck',
   topicId,

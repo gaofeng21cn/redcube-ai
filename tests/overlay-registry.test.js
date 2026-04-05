@@ -5,6 +5,7 @@ import {
   buildDeliverableRecord,
   createOverlayRegistry,
 } from '../packages/redcube-overlay-core/src/index.js';
+import { getDefaultOverlayCatalog } from '../packages/redcube-overlay-registry/src/index.js';
 import { buildTopicRecord as buildXiaohongshuTopic } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
 import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
 import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
@@ -73,4 +74,44 @@ test('createOverlayRegistry rejects profile lookup for unknown overlays', () => 
     /Unknown overlay: ppt_deck/,
   );
   assert.equal(typeof buildXiaohongshuTopic, 'function');
+});
+
+test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding discovery', () => {
+  const catalog = getDefaultOverlayCatalog();
+  const ppt = catalog.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck');
+  const xiaohongshu = catalog.overlays.find((overlay) => overlay.overlay_id === 'xiaohongshu');
+
+  assert.equal(catalog.surface_kind, 'overlay_catalog');
+  assert.deepEqual(
+    ppt,
+    {
+      overlay_id: 'ppt_deck',
+      default_profile_id: 'lecture_student',
+      profiles: ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+      route_sequence: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review', 'export_pptx'],
+      deliverable_kind: 'ppt_deck',
+      prompt_pack_id: 'ppt_deck_mainline_v1',
+      packages: {
+        overlay: '@redcube/overlay-ppt',
+        runtime_family: '@redcube/runtime-family-ppt',
+        pack: '@redcube/pack-ppt',
+      },
+    },
+  );
+  assert.deepEqual(
+    xiaohongshu,
+    {
+      overlay_id: 'xiaohongshu',
+      default_profile_id: 'standard_note',
+      profiles: ['standard_note'],
+      route_sequence: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
+      deliverable_kind: 'xiaohongshu_note',
+      prompt_pack_id: 'xiaohongshu_mainline_v1',
+      packages: {
+        overlay: '@redcube/overlay-xiaohongshu',
+        runtime_family: '@redcube/runtime-family-xiaohongshu',
+        pack: '@redcube/pack-xiaohongshu',
+      },
+    },
+  );
 });
