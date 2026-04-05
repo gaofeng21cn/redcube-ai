@@ -8,4 +8,5 @@ export { runDeliverableRoute } from './deliverable-routes.js';
 export { resolveExecutorAdapter } from './executors.js';
 export { completeRun, loadRun, startRun } from './run-store.js';
 export { applyReviewMutation, getPublicationProjection, getReviewState, isBaselineApprovedState, persistReviewStatePatch, rebuildTopicPublicationProjection } from './review-state.js';
+export { loadReferenceSampleFixture, validateReferenceSampleMeta } from './reference-samples.js';
 export { intakeSource } from './source-intake.js';

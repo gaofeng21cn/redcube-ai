@@ -10,16 +10,21 @@ import {
   intakeSource,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
+import {
+  loadReferenceSampleFixture,
+  validateReferenceSampleMeta,
+} from '../packages/redcube-runtime/src/index.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 function loadFixture(relativeDir, name) {
-  const dir = path.resolve('tests', 'reference-samples', relativeDir);
-  const meta = readJson(path.join(dir, `${name}.json`));
-  const sourceText = meta.sourceFile ? readFileSync(path.join(dir, meta.sourceFile), 'utf-8') : '';
-  return { dir, meta, sourceText };
+  return loadReferenceSampleFixture({
+    rootDir: path.resolve('tests', 'reference-samples'),
+    familyId: relativeDir,
+    sampleId: name,
+  });
 }
 
 function fixtureUsesSourceBackedRuntime(fixture) {
@@ -73,6 +78,47 @@ test('reference samples declare provenance metadata and runtime mode explicitly'
     assert.equal(fixture.sourceText.length > 0, true);
     assert.match(fixture.meta.referenceMode, /^(seed_backed_with_source_provenance|source_backed)$/);
   }
+});
+
+test('approved reference samples conform to formal schema with approval, provenance, and scope', () => {
+  for (const [familyId, sampleId] of [['ppt_deck', 'approved-deck'], ['xiaohongshu', 'approved-note']]) {
+    const fixture = loadReferenceSampleFixture({
+      rootDir: path.resolve('tests', 'reference-samples'),
+      familyId,
+      sampleId,
+    });
+    assert.equal(fixture.validation.ok, true);
+    assert.equal(fixture.meta.schemaVersion, 1);
+    assert.equal(fixture.meta.sampleId, sampleId);
+    assert.equal(fixture.meta.status, 'approved');
+    assert.equal(fixture.meta.scope.overlay, familyId);
+    assert.deepEqual(fixture.meta.scope.profileIds, [fixture.meta.profileId]);
+    assert.equal(Array.isArray(fixture.meta.scope.supportedModes), true);
+    assert.equal(fixture.meta.scope.supportedModes.includes('optimize_existing'), true);
+    assert.equal(typeof fixture.meta.approval.approvedBy, 'string');
+    assert.match(fixture.meta.approval.approvedAt, /^\d{4}-\d{2}-\d{2}T/);
+    assert.equal(typeof fixture.meta.provenance.kind, 'string');
+    assert.equal(typeof fixture.meta.provenance.sourceRef, 'string');
+  }
+});
+
+test('reference sample schema validator rejects incomplete approved metadata', () => {
+  const result = validateReferenceSampleMeta({
+    schemaVersion: 1,
+    sampleId: 'broken-sample',
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'ppt-reference',
+    title: 'broken',
+    goal: 'broken',
+    sourceFile: 'broken.md',
+    referenceMode: 'source_backed',
+    status: 'approved',
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.errors.some((item) => item.includes('approval')), true);
+  assert.equal(result.errors.some((item) => item.includes('provenance')), true);
+  assert.equal(result.errors.some((item) => item.includes('scope')), true);
 });
 
 test('xiaohongshu approved sample supports relative regression review', async () => {
