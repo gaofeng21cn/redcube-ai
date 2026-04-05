@@ -1,4 +1,8 @@
-import { PPT_DECK_PROFILES, hydratePptDeckContract } from './profiles.js';
+import {
+  PPT_DECK_PROFILES,
+  describePptDeckOverlay,
+  hydratePptDeckContract,
+} from './profiles.js';
 import { buildDeckRecord } from './contracts.js';
 import {
   buildDeckSurfaceBundle,
@@ -8,7 +12,11 @@ import {
 
 export { buildDeckRecord } from './contracts.js';
 export { evaluateStoryboardGate } from './gates.js';
-export { PPT_DECK_PROFILES, hydratePptDeckContract } from './profiles.js';
+export {
+  PPT_DECK_PROFILES,
+  describePptDeckOverlay,
+  hydratePptDeckContract,
+} from './profiles.js';
 export {
   buildDeckSurfaceBundle,
   listDeckSurfaceArtifactPaths,
@@ -23,4 +31,5 @@ export const pptDeckOverlay = {
   listSurfaceArtifactPaths: listDeckSurfaceArtifactPaths,
   validateSurfaceArtifact: validateDeckSurfaceArtifact,
   hydrateDeliverableContract: hydratePptDeckContract,
+  describeOverlay: describePptDeckOverlay,
 };
