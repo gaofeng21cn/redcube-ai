@@ -8,6 +8,8 @@
 - 对内：它由 `Visual Deliverable Harness OS` 驱动
 - 在 `OPL` 顶层语义里：它是视觉交付 domain gateway，而不是 `OPL` 本体
 
+如果你是专家、PI、内容团队负责人或需要接入本项目的技术同事，优先从这里开始。
+
 ## 面向人类用户
 
 - [人类用户快速上手](human_quickstart.md)
