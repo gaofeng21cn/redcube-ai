@@ -97,6 +97,10 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-overlay-registry'),
+    path.join(gatewayNodeModulesDir, 'overlay-registry'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-ppt'),
     path.join(gatewayNodeModulesDir, 'overlay-ppt'),
   );
