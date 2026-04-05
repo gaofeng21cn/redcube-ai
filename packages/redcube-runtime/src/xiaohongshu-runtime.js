@@ -775,29 +775,6 @@ function buildDirectorReview(contract, deliverablePaths) {
   };
 }
 
-function updateTopicPublicationState(workspaceRoot, topicId, deliverableId, publishState) {
-  const topicDir = path.join(workspaceRoot, 'topics', topicId);
-  const stateFile = path.join(topicDir, 'publication-state.json');
-  const previous = existsSync(stateFile) ? readJson(stateFile) : {
-    schema_version: 1,
-    topic_id: topicId,
-    current: 'input_ready',
-    deliverables: {},
-  };
-  const next = {
-    ...previous,
-    current: publishState.current,
-    next: publishState.next,
-    deliverables: {
-      ...(previous.deliverables || {}),
-      [deliverableId]: publishState,
-    },
-    updated_at: new Date().toISOString(),
-  };
-  writeJson(stateFile, next);
-  return stateFile;
-}
-
 function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId) {
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
@@ -962,6 +939,7 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
   const copy = readStageArtifact(contract, deliverablePaths, 'publish_copy');
   const pngFiles = safeArray(review?.slide_reviews).map((slide) => slide.screenshot_file);
   const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
+  const publicationStateFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
   const exportBundle = {
     html_file: render.html_bundle.html_file,
     png_files: pngFiles,
@@ -1001,7 +979,7 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
         status: 'pending_human',
       },
       publish_state: {
-        current: 'published_pending_human',
+        current: 'approval_pending',
       },
     },
   };

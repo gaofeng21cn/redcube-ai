@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdirSync, existsSync, readFileSync, appendFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, existsSync, readFileSync, appendFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
@@ -80,6 +80,80 @@ function appendHistory(file, entry) {
   appendFileSync(file, `${JSON.stringify(entry)}\n`, 'utf-8');
 }
 
+function safeReadJson(file) {
+  try {
+    return JSON.parse(readFileSync(file, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+function derivePublishNext(current) {
+  if (current === 'draft') return 'approval_pending';
+  if (current === 'approval_pending') return 'approved_pending_publish';
+  if (current === 'approved_pending_publish') return 'published';
+  return null;
+}
+
+function toPublicationProjectionEntry(reviewState, deliverableId) {
+  const current = String(reviewState?.publish_state?.current || 'draft').trim() || 'draft';
+  return {
+    deliverable_id: deliverableId,
+    current,
+    next: derivePublishNext(current),
+    current_status: String(reviewState?.current_status || '').trim() || 'idle',
+    ready_for_export: Boolean(reviewState?.ready_for_export),
+    approval_status: String(reviewState?.approval_state?.status || '').trim() || 'not_required',
+    updated_at: String(reviewState?.last_updated_at || '').trim() || null,
+  };
+}
+
+function publicationPriority(current) {
+  if (current === 'published') return 4;
+  if (current === 'approved_pending_publish') return 3;
+  if (current === 'approval_pending') return 2;
+  if (current === 'draft') return 1;
+  return 0;
+}
+
+function sortPublicationEntries(left, right) {
+  const priorityDelta = publicationPriority(right?.current) - publicationPriority(left?.current);
+  if (priorityDelta !== 0) return priorityDelta;
+  return String(right?.updated_at || '').localeCompare(String(left?.updated_at || ''));
+}
+
+function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
+  const topicDir = path.join(workspaceRoot, 'topics', topicId);
+  const deliverablesDir = path.join(topicDir, 'deliverables');
+  const projectionFile = path.join(topicDir, 'publication-state.json');
+  const entries = {};
+
+  if (existsSync(deliverablesDir)) {
+    for (const item of readdirSync(deliverablesDir, { withFileTypes: true })) {
+      if (!item.isDirectory()) continue;
+      const deliverableId = item.name;
+      const deliverableDir = path.join(deliverablesDir, deliverableId);
+      const deliverable = safeReadJson(path.join(deliverableDir, 'deliverable.json'));
+      if (deliverable?.overlay !== 'xiaohongshu') continue;
+      const reviewState = safeReadJson(path.join(deliverableDir, 'reports', 'review-state.json'));
+      if (!reviewState) continue;
+      entries[deliverableId] = toPublicationProjectionEntry(reviewState, deliverableId);
+    }
+  }
+
+  const orderedEntries = Object.values(entries).sort(sortPublicationEntries);
+  const topEntry = orderedEntries[0] || null;
+  writeState(projectionFile, {
+    schema_version: 1,
+    topic_id: topicId,
+    current: topEntry?.current || 'input_ready',
+    next: topEntry?.next || null,
+    deliverables: entries,
+    updated_at: nowIso(),
+  });
+  return projectionFile;
+}
+
 export function isBaselineApprovedState(state) {
   if (!state) return false;
   if (state.approval_state?.required) {
@@ -137,11 +211,15 @@ export function persistReviewStatePatch({ workspaceRoot, topicId, deliverableId,
     source,
     patch,
   });
+  const publicationStateFile = next.overlay === 'xiaohongshu'
+    ? rebuildTopicPublicationProjection({ workspaceRoot, topicId })
+    : null;
   return {
     ok: true,
     state: next,
     state_file: file,
     history_file: historyFile,
+    publication_state_file: publicationStateFile,
   };
 }
 
