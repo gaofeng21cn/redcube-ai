@@ -214,3 +214,48 @@ export function summarizeReferenceCoverage({ rootDir, overlayRegistry }) {
     missingProfiles,
   };
 }
+
+export function listReferenceSamples({ rootDir }) {
+  if (!isNonEmptyString(rootDir)) {
+    throw new Error('rootDir 不能为空');
+  }
+
+  const approvedSamples = [];
+  const invalidSamples = [];
+
+  for (const familyDir of readdirSync(path.resolve(rootDir), { withFileTypes: true })) {
+    if (!familyDir.isDirectory()) continue;
+    const familyId = familyDir.name;
+    const dir = path.resolve(rootDir, familyId);
+    for (const item of readdirSync(dir, { withFileTypes: true })) {
+      if (!item.isFile() || !item.name.endsWith('.json')) continue;
+      const sampleId = item.name.replace(/\.json$/u, '');
+      const fixture = loadReferenceSampleFixture({
+        rootDir,
+        familyId,
+        sampleId,
+      });
+      const record = {
+        overlay: fixture.meta.overlay,
+        profile_id: fixture.meta.profileId,
+        sample_id: fixture.meta.sampleId,
+        approval: fixture.meta.approval || null,
+        provenance: fixture.meta.provenance || null,
+      };
+      if (fixture.validation.ok && fixture.meta.status === 'approved') {
+        approvedSamples.push(record);
+      } else {
+        invalidSamples.push({
+          ...record,
+          errors: fixture.validation.errors,
+        });
+      }
+    }
+  }
+
+  return {
+    surface_kind: 'reference_sample_catalog',
+    approved_samples: approvedSamples,
+    invalid_samples: invalidSamples,
+  };
+}

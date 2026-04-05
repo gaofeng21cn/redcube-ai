@@ -105,3 +105,21 @@ export function summarizeRelativeQuality(relativeQuality) {
   }
   return '相对 baseline 变化可接受。';
 }
+
+export function buildReferenceQualityReport({ rootDir, overlayRegistry }) {
+  const catalog = listReferenceSamples({ rootDir });
+  const coverage = summarizeReferenceCoverage({ rootDir, overlayRegistry });
+
+  return {
+    surface_kind: 'reference_quality_report',
+    ready: coverage.ok && catalog.invalid_samples.length === 0,
+    coverage: {
+      expected_profile_count: coverage.expectedProfileCount,
+      approved_sample_count: coverage.approvedSampleCount,
+      missing_profiles: coverage.missingProfiles,
+    },
+    invalid_samples: catalog.invalid_samples,
+    approved_samples: catalog.approved_samples,
+  };
+}
+import { listReferenceSamples, summarizeReferenceCoverage } from './reference-samples.js';
