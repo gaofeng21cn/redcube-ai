@@ -17,6 +17,16 @@ test('family runtimes no longer directly author canonical publish owner fields',
   assert.equal(xhsRuntime.includes('publish_state:'), false);
 });
 
+test('family runtimes no longer directly author publication projection file hints', () => {
+  const pptRuntime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
+  const xhsRuntime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+
+  assert.equal(pptRuntime.includes('publication_state_file'), false);
+  assert.equal(pptRuntime.includes('publication-state.json'), false);
+  assert.equal(xhsRuntime.includes('publication_state_file'), false);
+  assert.equal(xhsRuntime.includes('publication-state.json'), false);
+});
+
 test('@redcube/governance remains the canonical publish truth owner surface', () => {
   const runtimeIndex = read('packages/redcube-runtime/src/index.js');
   const governanceReviewState = read('packages/redcube-governance/src/review-state.js');

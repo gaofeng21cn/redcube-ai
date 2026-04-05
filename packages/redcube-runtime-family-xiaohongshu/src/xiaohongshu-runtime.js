@@ -639,13 +639,11 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
     },
   };
   writeJson(manifestFile, exportBundle);
-  const publicationStateFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
   return {
     ...attachCommon('export_bundle', contract),
     status: 'completed',
     export_bundle: exportBundle,
     series_surfaces: computeSeriesSurfaces(contract, deliverablePaths, exportBundle),
-    publication_state_file: publicationStateFile,
     artifact_refs: [manifestFile, render.html_bundle.html_file, copy.publish_copy.caption_file, ...pngFiles].filter(Boolean),
     review_state_patch: {
       current_status: 'publish_ready',

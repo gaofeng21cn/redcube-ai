@@ -290,7 +290,8 @@ test('xiaohongshu export_bundle performs real delivery and series surfaces when 
   assert.equal(bundle.export_bundle.png_files.length > 0, true);
   assert.equal(typeof bundle.export_bundle?.delivery_state?.current, 'string');
   assert.equal(bundle.export_bundle.delivery_state.current, 'output_ready');
-  assert.equal(existsSync(bundle.publication_state_file), true);
+  assert.equal(Object.hasOwn(bundle, 'publication_state_file'), false);
+  assert.equal(existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'publication-state.json')), true);
   assert.equal(existsSync(bundle.series_surfaces?.delivery_overview_file), true);
   assert.equal(existsSync(bundle.series_surfaces?.path_mapping_file), true);
   assert.equal(existsSync(bundle.series_surfaces?.cadence_file), true);
