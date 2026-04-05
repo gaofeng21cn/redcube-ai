@@ -169,6 +169,15 @@ test('callGatewayTool can return operator-facing quality summary surfaces', asyn
   assert.equal(result.quality_summary.baseline_promotion_state, 'promoted');
 });
 
+test('listGatewayTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {
+  const tools = listGatewayTools();
+  const reviewMutation = tools.find((tool) => tool.name === 'apply_review_mutation');
+  const runtimeWatch = tools.find((tool) => tool.name === 'runtime_watch');
+
+  assert.match(reviewMutation.description, /mutation/i);
+  assert.match(runtimeWatch.description, /review-loop status/i);
+});
+
 test('callGatewayTool rejects unknown tool names', async () => {
   await assert.rejects(
     () => callGatewayTool('unknown_tool', {}),

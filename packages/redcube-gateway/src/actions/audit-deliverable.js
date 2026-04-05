@@ -114,12 +114,20 @@ function auditOverlaySurface({
 
 export async function auditDeliverable(request) {
   const reports = [auditDeliverableRequest(request)];
+  let qualitySummary = {
+    baseline_promotion_state: null,
+    promoted_reference_id: null,
+  };
   if (request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId) {
     const baselineState = getRuntimeReviewState({
       workspaceRoot: request.workspaceRoot,
       topicId: request.topicId,
       deliverableId: request.baselineDeliverableId,
     }).state;
+    qualitySummary = {
+      baseline_promotion_state: baselineState?.baseline?.promotion_state || null,
+      promoted_reference_id: baselineState?.baseline?.promoted_reference_id || null,
+    };
     if (!isBaselineApprovedState(baselineState)) {
       reports.push({
         status: 'block',
@@ -130,6 +138,8 @@ export async function auditDeliverable(request) {
     }
   }
   reports.push(auditOverlaySurface(request));
-
-  return mergeAuditReports(reports);
+  return {
+    ...mergeAuditReports(reports),
+    quality_summary: qualitySummary,
+  };
 }

@@ -131,7 +131,7 @@ function buildHelp() {
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
-      reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>]',
+      reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline|approve_publish|promote_publish|promote_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>] [--promoted-reference-id <id>]',
       profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };

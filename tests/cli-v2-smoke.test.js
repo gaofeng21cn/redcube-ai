@@ -196,6 +196,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
+  assert.match(parsed.usage.reviewMutate, /promote_baseline/);
 });
 
 test('CLI isolated install fixture keeps package realpaths inside temp install and consumer only depends on gateway', () => {
