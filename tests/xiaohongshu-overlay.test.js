@@ -50,8 +50,8 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
     ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
   );
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
-  assert.equal(contract.prompt_pack.render_contract.compiler_module, '@redcube/pack-xiaohongshu');
-  assert.equal(contract.prompt_pack.render_contract.compiler_export, 'compileXhsRenderSlides');
+  assert.equal(contract.prompt_pack.render_contract.compiler_module ?? null, null);
+  assert.equal(contract.prompt_pack.render_contract.compiler_export ?? null, null);
 });
 
 test('buildXiaohongshuDeliverableRecord emits canonical xiaohongshu deliverable metadata', () => {

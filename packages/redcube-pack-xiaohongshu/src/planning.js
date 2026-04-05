@@ -182,9 +182,6 @@ export async function buildXhsRenderHtml(contract, deliverablePaths, deps) {
   const plan = deps.readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const contractRender = deps.renderContract(contract);
-  if (!deps.safeText(contractRender.compiler_module)) {
-    throw new Error('Missing render pack compiler');
-  }
   const compiler = await loadRenderPackCompiler(contract);
   const slides = await compiler.compileRenderSlides({
     slides: deps.safeArray(plan?.single_note_plan?.slides),
@@ -196,8 +193,7 @@ export async function buildXhsRenderHtml(contract, deliverablePaths, deps) {
   const renderPlan = {
     render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
     shell_file: deps.resolvePromptPackAsset(contract, deps.safeText(contractRender.shell_file, 'render_shell.html')),
-    compiler_module: deps.safeText(contractRender.compiler_module),
-    compiler_export: deps.safeText(contractRender.compiler_export),
+    pack_id: deps.safeText(contract?.prompt_pack?.pack_id),
     director_contract: {
       visual_motif: deps.safeText(visualDirection.visual_motif),
       peak_pages: deps.safeArray(visualDirection.peak_pages),

@@ -134,8 +134,6 @@ const PROMPT_PACK = {
   render_contract: {
     render_strategy: 'prompt_director_first',
     shell_file: 'render_shell.html',
-    compiler_module: '@redcube/pack-xiaohongshu',
-    compiler_export: 'compileXhsRenderSlides',
     recipe_registry: {
       cover_note: 'xhs.hero_note',
       myth_compare: 'xhs.split_contrast',

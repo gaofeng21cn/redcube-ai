@@ -172,8 +172,6 @@ const FAMILY_PROMPT_PACK = {
   render_contract: {
     render_strategy: 'prompt_director_first',
     shell_file: 'render_shell.html',
-    compiler_module: '@redcube/pack-ppt',
-    compiler_export: 'compilePptRenderSlides',
     recipe_registry: {
       cover_hero: 'ppt.hero_signal',
       multi_zone_compare: 'ppt.compare_zones',

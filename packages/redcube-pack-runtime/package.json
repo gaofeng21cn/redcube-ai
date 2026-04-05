@@ -5,5 +5,19 @@
   "type": "module",
   "exports": {
     ".": "./src/index.js"
+  },
+  "redcube": {
+    "defaultPackCompilerModules": [
+      {
+        "packId": "ppt_deck_mainline_v1",
+        "module": "@redcube/pack-ppt",
+        "exportName": "compilePptRenderSlides"
+      },
+      {
+        "packId": "xiaohongshu_mainline_v1",
+        "module": "@redcube/pack-xiaohongshu",
+        "exportName": "compileXhsRenderSlides"
+      }
+    ]
   }
 }

@@ -46,8 +46,7 @@ const SURFACE_VALIDATORS = {
     && typeof content?.routes?.visual_director_review === 'string'
     && content?.render_contract?.render_strategy === 'prompt_director_first'
     && content?.render_contract?.shell_file === 'render_shell.html'
-    && content?.render_contract?.compiler_module === '@redcube/pack-xiaohongshu'
-    && content?.render_contract?.compiler_export === 'compileXhsRenderSlides',
+    && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content) =>
     Array.isArray(content?.required_checks)
     && content.required_checks.includes('platform_copy_complete')

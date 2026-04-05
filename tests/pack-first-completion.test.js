@@ -32,11 +32,13 @@ test('overlay render contracts use package-native compiler registry instead of r
   const xhsOverlay = read('packages/redcube-overlay-xiaohongshu/src/contracts.js');
   const packRuntime = read('packages/redcube-pack-runtime/src/index.js');
 
-  assert.equal(pptOverlay.includes("compiler_module: '@redcube/pack-ppt'"), true);
-  assert.equal(pptOverlay.includes("compiler_export: 'compilePptRenderSlides'"), true);
-  assert.equal(xhsOverlay.includes("compiler_module: '@redcube/pack-xiaohongshu'"), true);
-  assert.equal(xhsOverlay.includes("compiler_export: 'compileXhsRenderSlides'"), true);
+  assert.equal(pptOverlay.includes("compiler_module:"), false);
+  assert.equal(pptOverlay.includes("compiler_export:"), false);
+  assert.equal(xhsOverlay.includes("compiler_module:"), false);
+  assert.equal(xhsOverlay.includes("compiler_export:"), false);
   assert.equal(packRuntime.includes('render_pack.js'), false);
+  assert.equal(packRuntime.includes('defaultPackCompilerModules'), true);
+  assert.equal(packRuntime.includes('prompt_pack?.pack_id'), true);
 });
 
 test('runtime executor no longer imports local family runtime files directly', () => {

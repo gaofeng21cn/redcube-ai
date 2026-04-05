@@ -1,20 +1,23 @@
+import packageJson from '../package.json' with { type: 'json' };
+
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
 }
 
 export function resolveRenderCompilerModule(contract) {
-  const moduleName = safeText(contract?.prompt_pack?.render_contract?.compiler_module);
-  const exportName = safeText(contract?.prompt_pack?.render_contract?.compiler_export);
-  if (!moduleName) {
-    throw new Error('render pack compiler_module 未配置');
+  const packId = safeText(contract?.prompt_pack?.pack_id);
+  if (!packId) {
+    throw new Error('render pack pack_id 未配置');
   }
-  if (!exportName) {
-    throw new Error('render pack compiler_export 未配置');
+  const spec = (packageJson.redcube?.defaultPackCompilerModules || []).find((item) => item.packId === packId);
+  if (!spec) {
+    throw new Error(`render pack registry 未配置: ${packId}`);
   }
   return {
-    module_name: moduleName,
-    export_name: exportName,
+    pack_id: packId,
+    module_name: safeText(spec.module),
+    export_name: safeText(spec.exportName),
   };
 }
 

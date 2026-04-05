@@ -358,7 +358,7 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   const visualArtifact = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const contractRender = deps.renderContract(contract);
   if (!deps.safeText(contractRender.compiler_module)) {
-    throw new Error('Missing render pack compiler');
+    // compiler capability now resolves by prompt_pack.pack_id via pack-runtime registry
   }
   const compiler = await loadRenderPackCompiler(contract);
   const slidesMarkup = await compiler.compileRenderSlides({
@@ -370,8 +370,7 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   const renderPlan = {
     render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
     shell_file: deps.safeText(contractRender.shell_file, 'render_shell.html'),
-    compiler_module: deps.safeText(contractRender.compiler_module),
-    compiler_export: deps.safeText(contractRender.compiler_export),
+    pack_id: deps.safeText(contract?.prompt_pack?.pack_id),
     generator_instructions: deps.safeArray(visualArtifact.visual_direction?.final_instruction_to_html_generator),
     peak_pages: deps.safeArray(visualArtifact.visual_direction?.peak_pages),
     page_family_ceiling: visualArtifact.visual_direction?.page_family_ceiling || {},
