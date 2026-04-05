@@ -275,6 +275,9 @@ test('promote_baseline requires structured relative quality and approval gates, 
   assert.equal(promoted.state.baseline.source_deliverable_id, 'candidate-a');
   assert.equal(typeof promoted.state.baseline.promoted_at, 'string');
   assert.equal(promoted.state.baseline.promoted_by, 'human');
+  assert.equal(promoted.quality_summary?.relative_quality_verdict, 'acceptable');
+  assert.equal(promoted.quality_summary?.baseline_promotion_state, 'promoted');
+  assert.equal(promoted.quality_summary?.promoted_reference_id, 'xhs-standard-note-v2');
 
   const history = readFileSync(promoted.history_file, 'utf-8')
     .trim()
@@ -368,4 +371,5 @@ test('promote_baseline works for ppt_deck without human approval gate once relat
   assert.equal(promoted.state.baseline.promotion_state, 'promoted');
   assert.equal(promoted.state.baseline.promoted_reference_id, 'ppt-lecture-student-v2');
   assert.equal(promoted.state.baseline.source_deliverable_id, 'deck-candidate');
+  assert.equal(promoted.quality_summary?.baseline_promotion_state, 'promoted');
 });

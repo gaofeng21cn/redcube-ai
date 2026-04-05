@@ -145,6 +145,30 @@ test('callGatewayTool delegates review mutation gateway action', async () => {
   assert.equal(result.state.deliverable_id, 'deck-a');
 });
 
+test('callGatewayTool can return operator-facing quality summary surfaces', async () => {
+  const result = await callGatewayTool(
+    'get_review_state',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+    },
+    {
+      getReviewState: async () => ({
+        ok: true,
+        state: { deliverable_id: 'deck-a' },
+        quality_summary: {
+          relative_quality_verdict: 'acceptable',
+          baseline_promotion_state: 'promoted',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.quality_summary.relative_quality_verdict, 'acceptable');
+  assert.equal(result.quality_summary.baseline_promotion_state, 'promoted');
+});
+
 test('callGatewayTool rejects unknown tool names', async () => {
   await assert.rejects(
     () => callGatewayTool('unknown_tool', {}),

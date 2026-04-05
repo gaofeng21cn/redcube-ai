@@ -443,6 +443,8 @@ test('CLI review get and mutate proxy review platform actions', () => {
   assert.equal(getParsed.state_type, 'canonical');
   assert.equal(getParsed.canonical_source.kind, 'review_state.publish_state');
   assert.equal(getParsed.state.deliverable_id, 'deck-a');
+  assert.equal(getParsed.quality_summary?.relative_quality_verdict, null);
+  assert.equal(getParsed.quality_summary?.baseline_promotion_state, null);
 
   const mutateOutput = execFileSync(
     'node',

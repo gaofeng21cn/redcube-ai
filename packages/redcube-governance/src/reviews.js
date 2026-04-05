@@ -156,6 +156,7 @@ export function watchRuntimeReviewLoop(request) {
   const publicationProjection = request?.workspaceRoot && request?.topicId
     ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
     : null;
+  const relativeQuality = reviewState?.baseline?.relative_quality || null;
 
   return {
     ok: true,
@@ -164,6 +165,14 @@ export function watchRuntimeReviewLoop(request) {
     status: reviewState?.pending_reviews?.length > 0 ? 'review_pending' : (pendingReviews.length > 0 ? 'review_pending' : String(run?.status || reviewState?.current_status || 'idle')),
     pending_reviews: reviewState?.pending_reviews || pendingReviews,
     review_state: reviewState,
+    quality_summary: {
+      relative_quality_verdict: relativeQuality?.verdict || null,
+      degradations: Array.isArray(relativeQuality?.degradations) ? relativeQuality.degradations : [],
+      improvements: Array.isArray(relativeQuality?.improvements) ? relativeQuality.improvements : [],
+      acceptable_changes: Array.isArray(relativeQuality?.acceptable_changes) ? relativeQuality.acceptable_changes : [],
+      baseline_promotion_state: reviewState?.baseline?.promotion_state || null,
+      promoted_reference_id: reviewState?.baseline?.promoted_reference_id || null,
+    },
     publication_projection: publicationProjection,
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,

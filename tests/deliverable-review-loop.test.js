@@ -277,6 +277,8 @@ test('runtimeWatch exposes publication projection separately from canonical revi
 
   assert.equal(report.review_state.publish_state.current, 'approval_pending');
   assert.equal(report.publication_projection.current, 'approval_pending');
+  assert.equal(report.quality_summary?.relative_quality_verdict, null);
+  assert.equal(report.quality_summary?.baseline_promotion_state, null);
 });
 
 test('@redcube/gateway manifest declares runtime dependency for review loop actions', () => {
