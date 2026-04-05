@@ -1,5 +1,5 @@
-import { canRunPptDeck, runPptDeckRoute } from './ppt-deck-runtime.js';
-import { canRunXiaohongshu, runXiaohongshuRoute } from './xiaohongshu-runtime.js';
+import { canRunPptDeck, runPptDeckRoute } from '@redcube/runtime-family-ppt';
+import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-xiaohongshu';
 
 export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
   if (adapter !== 'host_agent' && adapter !== 'external_llm') {

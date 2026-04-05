@@ -1,1 +1,1 @@
-export { canRunPptDeck, runPptDeckRoute } from './ppt-deck-runtime.js';
+export { canRunPptDeck, runPptDeckRoute } from '@redcube/runtime-family-ppt';

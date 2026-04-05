@@ -26,3 +26,19 @@ test('runtime no longer owns ppt slide recipe compiler branches', () => {
   assert.equal(pack.includes('export function compileRenderSlides'), true);
   assert.equal(pack.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), true);
 });
+
+test('runtime executor no longer imports local family runtime files directly', () => {
+  const executors = read('packages/redcube-runtime/src/executors.js');
+
+  assert.equal(executors.includes("./ppt-deck-runtime.js"), false);
+  assert.equal(executors.includes("./xiaohongshu-runtime.js"), false);
+  assert.equal(executors.includes("@redcube/runtime-family-ppt"), true);
+  assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), true);
+});
+
+test('@redcube/runtime manifest declares family runtime package dependencies explicitly', () => {
+  const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
+
+  assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt'], '0.1.0');
+  assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu'], '0.1.0');
+});

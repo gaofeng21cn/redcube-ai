@@ -1,1 +1,1 @@
-export { canRunXiaohongshu, runXiaohongshuRoute } from './xiaohongshu-runtime.js';
+export { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-xiaohongshu';

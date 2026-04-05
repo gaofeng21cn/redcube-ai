@@ -65,6 +65,14 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'runtime'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-runtime-family-ppt'),
+    path.join(gatewayNodeModulesDir, 'runtime-family-ppt'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-runtime-family-xiaohongshu'),
+    path.join(gatewayNodeModulesDir, 'runtime-family-xiaohongshu'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-core'),
     path.join(gatewayNodeModulesDir, 'overlay-core'),
   );

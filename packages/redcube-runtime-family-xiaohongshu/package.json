@@ -1,5 +1,5 @@
 {
-  "name": "@redcube/runtime",
+  "name": "@redcube/runtime-family-xiaohongshu",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,8 +7,6 @@
     ".": "./src/index.js"
   },
   "dependencies": {
-    "@redcube/runtime-family-ppt": "0.1.0",
-    "@redcube/runtime-family-xiaohongshu": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"
   }
 }
