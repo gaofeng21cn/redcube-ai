@@ -22,8 +22,12 @@ function loadFixture(relativeDir, name) {
   return { dir, meta, sourceText };
 }
 
-async function createSourceBackedDeliverable({ workspaceRoot, fixture, deliverableId, mode = 'draft_new', baselineDeliverableId = '' }) {
-  if (fixture.sourceText) {
+function fixtureUsesSourceBackedRuntime(fixture) {
+  return fixture.meta.referenceMode === 'source_backed';
+}
+
+async function createReferenceDeliverable({ workspaceRoot, fixture, deliverableId, mode = 'draft_new', baselineDeliverableId = '' }) {
+  if (fixtureUsesSourceBackedRuntime(fixture)) {
     const sourceFile = path.join(workspaceRoot, `${deliverableId}.md`);
     writeFileSync(sourceFile, fixture.sourceText, 'utf-8');
     await intakeSource({
@@ -62,11 +66,12 @@ async function createSourceBackedDeliverable({ workspaceRoot, fixture, deliverab
   return results;
 }
 
-test('reference samples declare their sidecar source file so regressions are truly source-backed', () => {
+test('reference samples declare provenance metadata and runtime mode explicitly', () => {
   for (const [relativeDir, name] of [['ppt_deck', 'approved-deck'], ['xiaohongshu', 'approved-note']]) {
     const fixture = loadFixture(relativeDir, name);
     assert.equal(fixture.meta.sourceFile, `${name}.md`);
     assert.equal(fixture.sourceText.length > 0, true);
+    assert.match(fixture.meta.referenceMode, /^(seed_backed_with_source_provenance|source_backed)$/);
   }
 });
 
@@ -74,7 +79,7 @@ test('xiaohongshu approved sample supports relative regression review', async ()
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
   const fixture = loadFixture('xiaohongshu', 'approved-note');
 
-  const baseline = await createSourceBackedDeliverable({
+  const baseline = await createReferenceDeliverable({
     workspaceRoot,
     fixture,
     deliverableId: 'baseline-approved',
@@ -92,7 +97,7 @@ test('xiaohongshu approved sample supports relative regression review', async ()
   });
   assert.equal(approved.state.approval_state.status, 'approved');
 
-  const candidate = await createSourceBackedDeliverable({
+  const candidate = await createReferenceDeliverable({
     workspaceRoot,
     fixture,
     deliverableId: 'candidate-next',
@@ -109,14 +114,14 @@ test('xiaohongshu optimize_existing blocks unapproved baseline sample', async ()
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
   const fixture = loadFixture('xiaohongshu', 'approved-note');
 
-  const baseline = await createSourceBackedDeliverable({
+  const baseline = await createReferenceDeliverable({
     workspaceRoot,
     fixture,
     deliverableId: 'baseline-unapproved',
   });
   assert.equal(baseline.at(-1).ok, true);
 
-  const candidate = await createSourceBackedDeliverable({
+  const candidate = await createReferenceDeliverable({
     workspaceRoot,
     fixture,
     deliverableId: 'candidate-blocked',
@@ -131,14 +136,14 @@ test('ppt_deck approved sample supports relative regression review', async () =>
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-ppt-'));
   const fixture = loadFixture('ppt_deck', 'approved-deck');
 
-  const baseline = await createSourceBackedDeliverable({
+  const baseline = await createReferenceDeliverable({
     workspaceRoot,
     fixture,
     deliverableId: 'baseline-approved',
   });
   assert.equal(baseline.at(-1).ok, true);
 
-  const candidate = await createSourceBackedDeliverable({
+  const candidate = await createReferenceDeliverable({
     workspaceRoot,
     fixture,
     deliverableId: 'candidate-next',
