@@ -62,6 +62,14 @@ async function createSourceBackedDeliverable({ workspaceRoot, fixture, deliverab
   return results;
 }
 
+test('reference samples declare their sidecar source file so regressions are truly source-backed', () => {
+  for (const [relativeDir, name] of [['ppt_deck', 'approved-deck'], ['xiaohongshu', 'approved-note']]) {
+    const fixture = loadFixture(relativeDir, name);
+    assert.equal(fixture.meta.sourceFile, `${name}.md`);
+    assert.equal(fixture.sourceText.length > 0, true);
+  }
+});
+
 test('xiaohongshu approved sample supports relative regression review', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
   const fixture = loadFixture('xiaohongshu', 'approved-note');
