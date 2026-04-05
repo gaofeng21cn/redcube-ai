@@ -8,3 +8,11 @@ export function getDefaultOverlayRegistry() {
     xiaohongshu: xiaohongshuOverlay,
   });
 }
+
+export function getDefaultOverlayCatalog() {
+  const registry = getDefaultOverlayRegistry();
+  return {
+    surface_kind: 'overlay_catalog',
+    overlays: registry.listOverlayCatalog(),
+  };
+}

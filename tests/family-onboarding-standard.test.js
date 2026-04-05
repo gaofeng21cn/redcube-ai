@@ -22,7 +22,18 @@ test('gateway actions no longer hardcode overlay family packages directly', () =
 test('overlay registry package exports default registry entrypoint', () => {
   const registryIndex = read('packages/redcube-overlay-registry/src/index.js');
   const registryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
+  const gatewayPackage = JSON.parse(read('packages/redcube-gateway/package.json'));
 
   assert.equal(registryIndex.includes('getDefaultOverlayRegistry'), true);
+  assert.equal(registryIndex.includes('getDefaultOverlayCatalog'), true);
   assert.equal(registryPackage.name, '@redcube/overlay-registry');
+  assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-ppt']), false);
+  assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
+});
+
+test('CLI onboarding usage no longer hardcodes current overlay ids in deliverable create help', () => {
+  const cliSource = read('apps/redcube-cli/src/cli.js');
+
+  assert.equal(cliSource.includes('<ppt_deck|xiaohongshu>'), false);
+  assert.equal(cliSource.includes('profile --action list'), true);
 });

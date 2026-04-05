@@ -194,6 +194,12 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.ok, true);
   assert.match(parsed.whatIsRedCube, /PPT deck/);
   assert.match(parsed.whatIsRedCube, /小红书图文/);
+  assert.equal(parsed.usage.deliverableCreate.includes('<ppt_deck|xiaohongshu>'), false);
+  assert.equal(parsed.discovery.profileList, 'redcube profile --action list');
+  assert.deepEqual(
+    parsed.availableOverlays.map((overlay) => overlay.overlay_id),
+    ['ppt_deck', 'xiaohongshu'],
+  );
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
@@ -201,6 +207,28 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
   assert.match(parsed.usage.reviewMutate, /promote_baseline/);
+});
+
+test('CLI profile list exposes registry-driven overlay catalog from isolated install', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+
+  const output = execFileSync(
+    'node',
+    [cliPath, 'profile', '--action', 'list'],
+    { encoding: 'utf-8', cwd: installRoot },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'overlay_catalog');
+  assert.deepEqual(
+    parsed.overlays.map((overlay) => overlay.overlay_id),
+    ['ppt_deck', 'xiaohongshu'],
+  );
+  assert.deepEqual(
+    parsed.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck')?.profiles,
+    ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+  );
 });
 
 test('CLI isolated install fixture keeps package realpaths inside temp install and consumer only depends on gateway', () => {

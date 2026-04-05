@@ -22,6 +22,7 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
     [
       'doctor',
       'list_topics',
+      'get_overlay_catalog',
       'intake_source',
       'create_deliverable',
       'get_deliverable',
@@ -92,6 +93,24 @@ test('callGatewayTool delegates source intake gateway action', async () => {
   assert.equal(result.ok, true);
   assert.equal(result.audit.topic_id, 'topic-a');
   assert.equal(result.audit.status, 'pass');
+});
+
+test('callGatewayTool delegates overlay catalog gateway action', async () => {
+  const result = await callGatewayTool(
+    'get_overlay_catalog',
+    {},
+    {
+      getOverlayCatalog: async () => ({
+        ok: true,
+        surface_kind: 'overlay_catalog',
+        overlays: [{ overlay_id: 'poster', profiles: ['default'] }],
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'overlay_catalog');
+  assert.deepEqual(result.overlays, [{ overlay_id: 'poster', profiles: ['default'] }]);
 });
 
 test('callGatewayTool delegates publication projection gateway action', async () => {

@@ -6,6 +6,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   doctorWorkspace,
+  getOverlayCatalog,
   listTopics,
 } from '@redcube/gateway';
 
@@ -50,5 +51,24 @@ test('@redcube/gateway manifest declares runtime-protocol without sibling file d
   assert.equal(
     packageJson.dependencies?.['@redcube/runtime-protocol'],
     runtimeProtocolPackageJson.version,
+  );
+});
+
+test('getOverlayCatalog exposes registry-driven overlay/profile discovery surface', async () => {
+  const result = await getOverlayCatalog();
+
+  assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'overlay_catalog');
+  assert.deepEqual(
+    result.overlays.map((overlay) => overlay.overlay_id),
+    ['ppt_deck', 'xiaohongshu'],
+  );
+  assert.deepEqual(
+    result.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck')?.profiles,
+    ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+  );
+  assert.equal(
+    result.overlays.find((overlay) => overlay.overlay_id === 'xiaohongshu')?.default_profile_id,
+    'standard_note',
   );
 });

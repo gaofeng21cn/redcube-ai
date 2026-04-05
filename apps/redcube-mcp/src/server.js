@@ -10,6 +10,7 @@ import {
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
   getRun,
@@ -24,6 +25,7 @@ import * as z from 'zod/v4';
 const DEFAULT_GATEWAY_ACTIONS = {
   doctorWorkspace,
   listTopics,
+  getOverlayCatalog,
   createDeliverable,
   getDeliverable,
   getPublicationProjection,
@@ -53,6 +55,12 @@ const TOOL_DEFINITIONS = [
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
     },
+  },
+  {
+    name: 'get_overlay_catalog',
+    description: 'Read registry-driven overlay/profile discovery surface for onboarding.',
+    actionKey: 'getOverlayCatalog',
+    inputSchema: {},
   },
   {
     name: 'intake_source',
