@@ -3,5 +3,6 @@
   "profileId": "lecture_student",
   "topicId": "ppt-reference",
   "title": "肠癌 AI 讲课认可稿",
-  "goal": "验证 PPT 认可稿相对质量回归"
+  "goal": "验证 PPT 认可稿相对质量回归",
+  "sourceFile": "approved-deck.md"
 }
