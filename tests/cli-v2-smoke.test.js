@@ -73,6 +73,10 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'reference-os'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-pack-runtime'),
+    path.join(gatewayNodeModulesDir, 'pack-runtime'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
     path.join(gatewayNodeModulesDir, 'runtime-family-ppt'),
   );

@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
-import { loadRenderPackCompiler } from '../../redcube-runtime/src/render-pack-compiler.js';
+import { loadRenderPackCompiler } from '@redcube/pack-runtime';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
