@@ -259,3 +259,49 @@ export function listReferenceSamples({ rootDir }) {
     invalid_samples: invalidSamples,
   };
 }
+
+export function listPromotedReferences({ workspaceRoot }) {
+  if (!isNonEmptyString(workspaceRoot)) {
+    throw new Error('workspaceRoot 不能为空');
+  }
+
+  const topicsDir = path.resolve(workspaceRoot, 'topics');
+  if (!existsSync(topicsDir)) {
+    return [];
+  }
+
+  const promotedReferences = [];
+  for (const topicEntry of readdirSync(topicsDir, { withFileTypes: true })) {
+    if (!topicEntry.isDirectory()) continue;
+    const topicId = topicEntry.name;
+    const deliverablesDir = path.join(topicsDir, topicId, 'deliverables');
+    if (!existsSync(deliverablesDir)) continue;
+
+    for (const deliverableEntry of readdirSync(deliverablesDir, { withFileTypes: true })) {
+      if (!deliverableEntry.isDirectory()) continue;
+      const deliverableId = deliverableEntry.name;
+      const deliverableDir = path.join(deliverablesDir, deliverableId);
+      const deliverableFile = path.join(deliverableDir, 'deliverable.json');
+      const reviewStateFile = path.join(deliverableDir, 'reports', 'review-state.json');
+      if (!existsSync(deliverableFile) || !existsSync(reviewStateFile)) continue;
+
+      const deliverable = readJson(deliverableFile);
+      const reviewState = readJson(reviewStateFile);
+      const baseline = reviewState?.baseline || null;
+      if (baseline?.promotion_state !== 'promoted') continue;
+
+      promotedReferences.push({
+        promoted_reference_id: baseline.promoted_reference_id,
+        promoted_at: baseline.promoted_at || null,
+        promoted_by: baseline.promoted_by || null,
+        source_deliverable_id: baseline.source_deliverable_id || deliverableId,
+        deliverable_id: deliverableId,
+        topic_id: topicId,
+        overlay: deliverable.overlay,
+        profile_id: deliverable.profile_id,
+      });
+    }
+  }
+
+  return promotedReferences;
+}

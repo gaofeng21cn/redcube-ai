@@ -1,3 +1,9 @@
+import {
+  listPromotedReferences,
+  listReferenceSamples,
+  summarizeReferenceCoverage,
+} from './reference-samples.js';
+
 function roundNumber(value, digits = 4) {
   return Number(Number(value || 0).toFixed(digits));
 }
@@ -122,4 +128,10 @@ export function buildReferenceQualityReport({ rootDir, overlayRegistry }) {
     approved_samples: catalog.approved_samples,
   };
 }
-import { listReferenceSamples, summarizeReferenceCoverage } from './reference-samples.js';
+
+export function buildReferencePromotionReport({ workspaceRoot }) {
+  return {
+    surface_kind: 'reference_promotion_report',
+    promoted_references: listPromotedReferences({ workspaceRoot }),
+  };
+}
