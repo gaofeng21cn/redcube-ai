@@ -4,16 +4,6 @@
   <a href="./README.md">English</a> | <a href="./README.zh-CN.md"><strong>中文</strong></a>
 </p>
 
-## Agent 合同分层
-
-<!-- AGENT-CONTRACT-BASELINE:START -->
-- 根目录 `AGENTS.md` 仅用于本仓库开发环境中的 Codex/OMX 协作，不单独承载项目真相合同
-- 项目真相合同位于 `contracts/project-truth/AGENTS.md`
-- OMX project-scope 编排层位于 `.codex/AGENTS.md`，只供 OMX / CODEX_HOME 会话加载
-- 可选本机私有覆盖层约定为 `.omx/local/AGENTS.local.md`，保持未跟踪
-- 本地工具运行态目录 `.omx/` 与 `.codex/` 必须保持未跟踪，不进入版本库
-<!-- AGENT-CONTRACT-BASELINE:END -->
-
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
 <p align="center"><strong>面向 Agent 的 Visual Deliverable Gateway</strong></p>

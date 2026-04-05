@@ -4,16 +4,6 @@
   <a href="./README.md"><strong>English</strong></a> | <a href="./README.zh-CN.md">中文</a>
 </p>
 
-## Agent Contract Layering
-
-<!-- AGENT-CONTRACT-BASELINE:START -->
-- Root `AGENTS.md` is for development-session coordination in this repository and is not the project truth contract by itself.
-- Project truth contract: `contracts/project-truth/AGENTS.md`.
-- OMX project-scope orchestration layer: `.codex/AGENTS.md` (for OMX / CODEX_HOME sessions only).
-- Optional machine-private overlay: `.omx/local/AGENTS.local.md` (must stay untracked).
-- Local runtime state directories `.omx/` and `.codex/` must remain untracked.
-<!-- AGENT-CONTRACT-BASELINE:END -->
-
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
 <p align="center"><strong>Agent-first Visual Deliverable Gateway</strong></p>
