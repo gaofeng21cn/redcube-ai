@@ -6,8 +6,8 @@ import { spawnSync } from 'node:child_process';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { loadRenderPackCompiler } from '../../redcube-runtime/src/render-pack-compiler.js';
-import { compareFailuresAndDensity, summarizeRelativeQuality } from '../../redcube-runtime/src/relative-quality.js';
-import { getReviewState, isBaselineApprovedState } from '../../redcube-runtime/src/review-state.js';
+import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
+import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');

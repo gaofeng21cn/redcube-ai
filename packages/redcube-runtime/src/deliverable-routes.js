@@ -5,7 +5,7 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { appendEvent, readEvents } from './event-log.js';
 import { resolveExecutorAdapter } from './executors.js';
-import { persistReviewStatePatch } from './review-state.js';
+import { persistReviewStatePatch } from '@redcube/governance';
 import { completeRun, failRun, startRun } from './run-store.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
 

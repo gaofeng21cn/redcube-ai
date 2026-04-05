@@ -7,6 +7,8 @@
     ".": "./src/index.js"
   },
   "dependencies": {
+    "@redcube/governance": "0.1.0",
+    "@redcube/reference-os": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"
   }
 }
