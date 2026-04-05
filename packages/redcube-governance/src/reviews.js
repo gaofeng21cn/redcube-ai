@@ -160,6 +160,7 @@ export function watchRuntimeReviewLoop(request) {
 
   return {
     ok: true,
+    surface_kind: 'runtime_watch',
     run_id: String(run?.run_id || '').trim(),
     current_stage: String(run?.current_stage || '').trim() || null,
     status: reviewState?.pending_reviews?.length > 0 ? 'review_pending' : (pendingReviews.length > 0 ? 'review_pending' : String(run?.status || reviewState?.current_status || 'idle')),

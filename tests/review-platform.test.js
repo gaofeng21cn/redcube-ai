@@ -50,6 +50,7 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
   await runPptReviewReady(workspaceRoot);
 
   const readyState = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
+  assert.equal(readyState.surface_kind, 'review_state');
   assert.equal(readyState.state_type, 'canonical');
   assert.equal(readyState.canonical_source.kind, 'review_state.publish_state');
   assert.equal(readyState.state.current_status, 'export_ready');
@@ -106,6 +107,7 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(existsSync(publicationStateFile), true);
   assert.equal(JSON.parse(readFileSync(publicationStateFile, 'utf-8')).current, 'approval_pending');
   const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+  assert.equal(projection.surface_kind, 'publication_projection');
   assert.equal(projection.state_type, 'projection');
   assert.equal(projection.publication.current, 'approval_pending');
   assert.equal(projection.canonical_source.kind, 'review_state.publish_state');

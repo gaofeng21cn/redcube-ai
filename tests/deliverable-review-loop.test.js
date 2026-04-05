@@ -20,6 +20,7 @@ test('auditDeliverable blocks optimize_existing task without baseline', async ()
     baselineDeliverableId: '',
   });
 
+  assert.equal(report.surface_kind, 'audit');
   assert.equal(report.status, 'block');
   assert.deepEqual(report.issues, ['baseline_missing']);
   assert.equal(report.rerun_from_stage, 'intake');
@@ -283,6 +284,7 @@ test('runtimeWatch reports pending review loop state', async () => {
   });
 
   assert.equal(report.ok, true);
+  assert.equal(report.surface_kind, 'runtime_watch');
   assert.equal(report.run_id, 'run-1');
   assert.equal(report.current_stage, 'render_review');
   assert.equal(report.status, 'review_pending');
@@ -359,6 +361,7 @@ test('runtimeWatch exposes publication projection separately from canonical revi
     },
   });
 
+  assert.equal(report.surface_kind, 'runtime_watch');
   assert.equal(report.review_state.publish_state.current, 'approval_pending');
   assert.equal(report.publication_projection.current, 'approval_pending');
   assert.equal(report.quality_summary?.relative_quality_verdict, null);

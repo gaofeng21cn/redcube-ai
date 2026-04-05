@@ -445,6 +445,7 @@ test('CLI review get and mutate proxy review platform actions', () => {
   );
   const getParsed = JSON.parse(getOutput);
   assert.equal(getParsed.ok, true);
+  assert.equal(getParsed.surface_kind, 'review_state');
   assert.equal(getParsed.state_type, 'canonical');
   assert.equal(getParsed.canonical_source.kind, 'review_state.publish_state');
   assert.equal(getParsed.state.deliverable_id, 'deck-a');
@@ -525,6 +526,7 @@ test('CLI review projection proxies topic publication projection read path', asy
 
   const projection = JSON.parse(projectionOutput);
   assert.equal(projection.ok, true);
+  assert.equal(projection.surface_kind, 'publication_projection');
   assert.equal(projection.state_type, 'projection');
   assert.equal(projection.publication.current, 'approval_pending');
   assert.equal(projection.canonical_source.kind, 'review_state.publish_state');

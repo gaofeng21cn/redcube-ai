@@ -104,6 +104,7 @@ test('callGatewayTool delegates publication projection gateway action', async ()
     {
       getPublicationProjection: async (request) => ({
         ok: true,
+        surface_kind: 'publication_projection',
         topic_id: request.topicId,
         state_type: 'projection',
         publication: { current: 'approval_pending' },
@@ -113,6 +114,7 @@ test('callGatewayTool delegates publication projection gateway action', async ()
   );
 
   assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'publication_projection');
   assert.equal(result.publication.current, 'approval_pending');
   assert.equal(result.canonical_source.kind, 'review_state.publish_state');
 });
@@ -156,6 +158,7 @@ test('callGatewayTool can return operator-facing quality summary surfaces', asyn
     {
       getReviewState: async () => ({
         ok: true,
+        surface_kind: 'review_state',
         state: { deliverable_id: 'deck-a' },
         quality_summary: {
           relative_quality_verdict: 'acceptable',
@@ -167,6 +170,7 @@ test('callGatewayTool can return operator-facing quality summary surfaces', asyn
 
   assert.equal(result.quality_summary.relative_quality_verdict, 'acceptable');
   assert.equal(result.quality_summary.baseline_promotion_state, 'promoted');
+  assert.equal(result.surface_kind, 'review_state');
 });
 
 test('listGatewayTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {

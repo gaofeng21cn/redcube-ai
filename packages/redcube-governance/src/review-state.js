@@ -183,6 +183,7 @@ export function getReviewState(request) {
     : defaultState({ contract, topicId, deliverableId });
   return {
     ok: true,
+    surface_kind: 'review_state',
     state_type: 'canonical',
     canonical_source: {
       kind: 'review_state.publish_state',
@@ -208,6 +209,7 @@ export function getPublicationProjection({ workspaceRoot, topicId }) {
   };
   return {
     ok: true,
+    surface_kind: 'publication_projection',
     topic_id: topicId,
     state_type: 'projection',
     projection_file: projectionFile,

@@ -130,6 +130,7 @@ export async function auditDeliverable(request) {
   }
   reports.push(auditOverlaySurface(request));
   return {
+    surface_kind: 'audit',
     ...mergeAuditReports(reports),
     quality_summary: qualitySummary,
   };
