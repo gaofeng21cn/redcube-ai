@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-import { buildTopicRecord } from '@redcube/overlay-xiaohongshu';
+import { getDefaultOverlayCatalog } from '@redcube/overlay-registry';
 import {
   getTopicPaths,
   resolveWorkspaceContract,
@@ -100,20 +100,42 @@ function buildImportedCanonicalArtifacts({ projectDir, topicId }) {
   };
 }
 
+function buildTopicRecordFromCatalog({ topicId, title, overlayId, descriptor }) {
+  return {
+    topic_id: String(topicId || '').trim(),
+    title: String(title || '').trim(),
+    overlay: overlayId,
+    deliverable_kind: descriptor.deliverable_kind,
+    status: 'draft',
+    routes: [...descriptor.route_sequence],
+  };
+}
+
 export async function importLegacyProject({
   rootDir,
   workspaceRoot,
   project,
+  overlay,
 }) {
   const projectId = String(project || '').trim();
+  const overlayId = String(overlay || '').trim();
   const legacyProjectDir = path.join(String(rootDir || '').trim(), 'projects', projectId);
   const legacyInputsDir = path.join(legacyProjectDir, 'inputs');
 
   if (!projectId) {
     throw new Error('project 不能为空');
   }
+  if (!overlayId) {
+    throw new Error('overlay 不能为空');
+  }
   if (!existsSync(legacyInputsDir)) {
     throw new Error(`legacy project 不存在: ${legacyProjectDir}`);
+  }
+
+  const overlayCatalog = getDefaultOverlayCatalog();
+  const descriptor = overlayCatalog.overlays.find((item) => item.overlay_id === overlayId);
+  if (!descriptor) {
+    throw new Error(`Unknown overlay: ${overlayId}`);
   }
 
   ensureWorkspaceContract(workspaceRoot);
@@ -126,9 +148,11 @@ export async function importLegacyProject({
   mkdirSync(topicPaths.canonicalDir, { recursive: true });
   cpSync(legacyInputsDir, topicPaths.inputsDir, { recursive: true });
 
-  const topic = buildTopicRecord({
+  const topic = buildTopicRecordFromCatalog({
     topicId: projectId,
     title: projectId,
+    overlayId,
+    descriptor,
   });
   const canonicalArtifacts = buildImportedCanonicalArtifacts({
     projectDir: legacyProjectDir,
@@ -153,6 +177,13 @@ export async function importLegacyProject({
 
   return {
     ok: intake.ok,
+    surface_kind: 'legacy_import',
+    recommended_action: intake.audit?.status === 'pass' ? 'create_deliverable' : 'resolve_source_blocks',
+    summary: {
+      project: projectId,
+      overlay: overlayId,
+      audit_status: intake.audit?.status || null,
+    },
     mode: 'legacy_to_workspace',
     project: projectId,
     topicFile: topicPaths.topicFile,

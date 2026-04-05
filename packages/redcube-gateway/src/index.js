@@ -1,5 +1,9 @@
 export { doctorWorkspace } from './actions/doctor-workspace.js';
 export { listTopics } from './actions/list-topics.js';
+export async function getOverlayCatalog(request) {
+  const module = await import('./actions/get-overlay-catalog.js');
+  return module.getOverlayCatalog(request);
+}
 export async function intakeSource(request) {
   const module = await import('./actions/intake-source.js');
   return module.intakeSource(request);

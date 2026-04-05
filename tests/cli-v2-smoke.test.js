@@ -97,6 +97,10 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-overlay-registry'),
+    path.join(gatewayNodeModulesDir, 'overlay-registry'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-ppt'),
     path.join(gatewayNodeModulesDir, 'overlay-ppt'),
   );
@@ -140,6 +144,9 @@ test('CLI workspace doctor proxies gateway doctorWorkspace', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'workspace_doctor');
+  assert.equal(parsed.recommended_action, 'continue');
+  assert.equal(parsed.summary.workspace_file_exists, true);
   assert.equal(parsed.workspaceFileExists, true);
 });
 
@@ -160,6 +167,8 @@ test('CLI workspace doctor works from isolated install without monorepo sibling 
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'workspace_doctor');
+  assert.equal(parsed.recommended_action, 'continue');
   assert.equal(parsed.workspaceRoot, workspaceRoot);
   assert.equal(parsed.workspaceFileExists, true);
 });
@@ -190,12 +199,43 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.ok, true);
   assert.match(parsed.whatIsRedCube, /PPT deck/);
   assert.match(parsed.whatIsRedCube, /小红书图文/);
+  assert.equal(parsed.usage.deliverableCreate.includes('<ppt_deck|xiaohongshu>'), false);
+  assert.equal(parsed.discovery.profileList, 'redcube profile --action list');
+  assert.deepEqual(
+    parsed.availableOverlays.map((overlay) => overlay.overlay_id),
+    ['ppt_deck', 'xiaohongshu'],
+  );
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
+  assert.match(parsed.usage.reviewMutate, /promote_baseline/);
+});
+
+test('CLI profile list exposes registry-driven overlay catalog from isolated install', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+
+  const output = execFileSync(
+    'node',
+    [cliPath, 'profile', '--action', 'list'],
+    { encoding: 'utf-8', cwd: installRoot },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'overlay_catalog');
+  assert.equal(parsed.recommended_action, 'create_deliverable');
+  assert.equal(parsed.summary.total_overlays, 2);
+  assert.deepEqual(
+    parsed.overlays.map((overlay) => overlay.overlay_id),
+    ['ppt_deck', 'xiaohongshu'],
+  );
+  assert.deepEqual(
+    parsed.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck')?.profiles,
+    ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+  );
 });
 
 test('CLI isolated install fixture keeps package realpaths inside temp install and consumer only depends on gateway', () => {
@@ -237,6 +277,9 @@ test('CLI topics list proxies gateway listTopics', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'topic_catalog');
+  assert.equal(parsed.recommended_action, 'continue');
+  assert.equal(parsed.summary.total_topics, 1);
   assert.equal(parsed.total, 1);
   assert.equal(parsed.topics[0].topic_id, 'topic-a');
 });
@@ -440,9 +483,12 @@ test('CLI review get and mutate proxy review platform actions', () => {
   );
   const getParsed = JSON.parse(getOutput);
   assert.equal(getParsed.ok, true);
+  assert.equal(getParsed.surface_kind, 'review_state');
   assert.equal(getParsed.state_type, 'canonical');
   assert.equal(getParsed.canonical_source.kind, 'review_state.publish_state');
   assert.equal(getParsed.state.deliverable_id, 'deck-a');
+  assert.equal(getParsed.quality_summary?.relative_quality_verdict, null);
+  assert.equal(getParsed.quality_summary?.baseline_promotion_state, null);
 
   const mutateOutput = execFileSync(
     'node',
@@ -518,9 +564,67 @@ test('CLI review projection proxies topic publication projection read path', asy
 
   const projection = JSON.parse(projectionOutput);
   assert.equal(projection.ok, true);
+  assert.equal(projection.surface_kind, 'publication_projection');
   assert.equal(projection.state_type, 'projection');
   assert.equal(projection.publication.current, 'approval_pending');
   assert.equal(projection.canonical_source.kind, 'review_state.publish_state');
+});
+
+test('CLI review watch returns operator-facing runtime watch surface for a persisted run', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-'));
+
+  const createOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root', workspaceRoot,
+      '--overlay', 'ppt_deck',
+      '--profile-id', 'lecture_student',
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+      '--title', '甲状腺门诊科普 deck',
+      '--goal', '为本科生讲授甲状腺基础知识',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  assert.equal(JSON.parse(createOutput).ok, true);
+
+  const runOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'run',
+      '--workspace-root', workspaceRoot,
+      '--overlay', 'ppt_deck',
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+      '--route', 'storyline',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  const runParsed = JSON.parse(runOutput);
+  assert.equal(runParsed.ok, true);
+
+  const watchOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'review',
+      'watch',
+      '--workspace-root', workspaceRoot,
+      '--topic-id', 'topic-a',
+      '--deliverable-id', 'deck-a',
+      '--run-id', runParsed.run.run_id,
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+  const watched = JSON.parse(watchOutput);
+  assert.equal(watched.ok, true);
+  assert.equal(watched.surface_kind, 'runtime_watch');
+  assert.equal(watched.run_id, runParsed.run.run_id);
 });
 
 test('CLI topics list works from isolated install without monorepo sibling source packages', () => {

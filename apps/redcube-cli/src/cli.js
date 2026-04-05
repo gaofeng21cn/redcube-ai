@@ -6,12 +6,14 @@ import {
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
   getRun as getGatewayRun,
   intakeSource,
   importLegacyProject,
   listTopics as listTopicsGateway,
+  runtimeWatch,
   runDeliverableRoute,
 } from '@redcube/gateway';
 
@@ -54,11 +56,30 @@ function resolveWorkspaceRoot(options) {
   return options.workspaceRoot || options.rootDir || process.cwd();
 }
 
-function buildHelp() {
+function buildCommonFlows(overlayCatalog) {
+  return Object.fromEntries(
+    overlayCatalog.overlays.map((overlay) => [
+      overlay.overlay_id,
+      [
+        `1. redcube deliverable create --overlay ${overlay.overlay_id} --profile-id ${overlay.default_profile_id || '<profile-id>'} ...`,
+        `2. redcube deliverable audit --overlay ${overlay.overlay_id} --mode draft_new ...`,
+        `3. redcube deliverable run --overlay ${overlay.overlay_id} --route storyline ...`,
+      ],
+    ]),
+  );
+}
+
+async function buildHelp() {
+  const overlayCatalog = await getOverlayCatalog();
+
   return {
     ok: true,
     whatIsRedCube: 'RedCube AI 是面向专家与 PIs 的视觉交付运行入口，当前重点支持 PPT deck 与小红书图文。',
     preferredEntry: ['MCP', 'CLI'],
+    discovery: {
+      profileList: 'redcube profile --action list',
+    },
+    availableOverlays: overlayCatalog.overlays,
     commonTasks: [
       {
         task: '检查工作区是否可用',
@@ -70,7 +91,7 @@ function buildHelp() {
       },
       {
         task: '从旧 projects 目录单向迁入 canonical workspace',
-        command: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+        command: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       },
       {
         task: '把 brief / keywords / source files 水合成 shared source truth',
@@ -78,7 +99,7 @@ function buildHelp() {
       },
       {
         task: '创建一个新的视觉交付物',
-        command: 'redcube deliverable create --workspace-root <dir> --overlay <ppt_deck|xiaohongshu> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
+        command: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       },
       {
         task: '审计交付物是否达到进入下一阶段的条件',
@@ -89,18 +110,7 @@ function buildHelp() {
         command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> && redcube runs get --workspace-root <dir> --run-id <id>',
       },
     ],
-    commonFlows: {
-      pptDeck: [
-        '1. redcube deliverable create --overlay ppt_deck --profile-id lecture_student ...',
-        '2. redcube deliverable audit --overlay ppt_deck --mode draft_new ...',
-        '3. redcube deliverable run --overlay ppt_deck --route storyline ...',
-      ],
-      xiaohongshu: [
-        '1. redcube deliverable create --overlay xiaohongshu --profile-id standard_note ...',
-        '2. redcube deliverable audit --overlay xiaohongshu --mode draft_new ...',
-        '3. redcube deliverable run --overlay xiaohongshu --route storyline ...',
-      ],
-    },
+    commonFlows: buildCommonFlows(overlayCatalog),
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
@@ -108,8 +118,8 @@ function buildHelp() {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
-      review: ['get', 'projection', 'mutate'],
-      profile: ['bootstrap', 'export', 'install'],
+      review: ['get', 'projection', 'watch', 'mutate'],
+      profile: ['list', 'bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
       humanQuickstart: 'docs/human_quickstart.md',
@@ -122,17 +132,19 @@ function buildHelp() {
     usage: {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
-      importLegacyProject: 'redcube import legacy-project --project <name> --root-dir <dir> --workspace-root <dir>',
+      importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
-      deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <id> --profile-id <id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
+      deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
+      profileList: 'redcube profile --action list',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
-      reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>]',
-      profile: 'redcube profile --action <bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
+      reviewWatch: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
+      reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline|approve_publish|promote_publish|promote_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>] [--promoted-reference-id <id>]',
+      profile: 'redcube profile --action <list|bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };
 }
@@ -153,7 +165,7 @@ async function main() {
   const options = parseArgs(rest);
 
   if (!command || command === 'help' || command === '--help') {
-    printJson(buildHelp());
+    printJson(await buildHelp());
     return;
   }
 
@@ -186,13 +198,14 @@ async function main() {
       fail('import 命令仅支持 legacy-project');
     }
 
-    const result = await importLegacyProject({
-      rootDir: options.rootDir || '',
-      workspaceRoot: resolveWorkspaceRoot(options),
-      project: options.project || '',
-    });
-    printJson(result);
-    return;
+      const result = await importLegacyProject({
+        rootDir: options.rootDir || '',
+        workspaceRoot: resolveWorkspaceRoot(options),
+        project: options.project || '',
+        overlay: options.overlay || '',
+      });
+      printJson(result);
+      return;
   }
 
   if (command === 'source') {
@@ -287,6 +300,21 @@ async function main() {
       return;
     }
 
+    if (subcommand === 'watch') {
+      const runState = await getGatewayRun({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        runId: options.runId || '',
+      });
+      const result = await runtimeWatch({
+        workspaceRoot: resolveWorkspaceRoot(options),
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        run: runState.run || {},
+      });
+      printJson(result);
+      return;
+    }
+
     if (subcommand === 'mutate') {
       const issues = String(options.issues || '').trim();
       const result = await applyReviewMutation({
@@ -307,7 +335,7 @@ async function main() {
       return;
     }
 
-    fail('review 命令仅支持 get|projection|mutate');
+    fail('review 命令仅支持 get|projection|watch|mutate');
   }
 
   if (command === 'runs') {
@@ -324,6 +352,11 @@ async function main() {
   }
 
   if (command === 'profile') {
+    if (options.action === 'list') {
+      printJson(await getOverlayCatalog());
+      return;
+    }
+
     if (options.action === 'bootstrap') {
       const { bootstrapPrivateProfile } = await loadPrivateProfileModule();
       const result = bootstrapPrivateProfile({
@@ -357,7 +390,7 @@ async function main() {
       return;
     }
 
-    fail('profile 命令需要 --action <bootstrap|export|install>');
+    fail('profile 命令需要 --action <list|bootstrap|export|install>');
   }
 
   fail(`未知命令: ${command}`);

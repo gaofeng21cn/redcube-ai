@@ -1,15 +1,9 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
-import {
-  pptDeckOverlay,
-} from '@redcube/overlay-ppt';
-import {
-  createOverlayRegistry,
-} from '@redcube/overlay-core';
+import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { auditDeliverableRequest, getReviewState as getRuntimeReviewState, isBaselineApprovedState } from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
 
 function mergeAuditReports(reports) {
   const normalized = reports.filter(Boolean);
@@ -45,10 +39,7 @@ function artifactKey(relativePath) {
   return path.basename(relativePath, '.json').replace(/-/g, '_');
 }
 
-const overlayRegistry = createOverlayRegistry({
-  ppt_deck: pptDeckOverlay,
-  xiaohongshu: xiaohongshuOverlay,
-});
+const overlayRegistry = getDefaultOverlayRegistry();
 
 function auditOverlaySurface({
   workspaceRoot,
@@ -114,12 +105,20 @@ function auditOverlaySurface({
 
 export async function auditDeliverable(request) {
   const reports = [auditDeliverableRequest(request)];
+  let qualitySummary = {
+    baseline_promotion_state: null,
+    promoted_reference_id: null,
+  };
   if (request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId) {
     const baselineState = getRuntimeReviewState({
       workspaceRoot: request.workspaceRoot,
       topicId: request.topicId,
       deliverableId: request.baselineDeliverableId,
     }).state;
+    qualitySummary = {
+      baseline_promotion_state: baselineState?.baseline?.promotion_state || null,
+      promoted_reference_id: baselineState?.baseline?.promoted_reference_id || null,
+    };
     if (!isBaselineApprovedState(baselineState)) {
       reports.push({
         status: 'block',
@@ -130,6 +129,9 @@ export async function auditDeliverable(request) {
     }
   }
   reports.push(auditOverlaySurface(request));
-
-  return mergeAuditReports(reports);
+  return {
+    surface_kind: 'audit',
+    ...mergeAuditReports(reports),
+    quality_summary: qualitySummary,
+  };
 }

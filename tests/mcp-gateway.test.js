@@ -22,6 +22,7 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
     [
       'doctor',
       'list_topics',
+      'get_overlay_catalog',
       'intake_source',
       'create_deliverable',
       'get_deliverable',
@@ -94,6 +95,69 @@ test('callGatewayTool delegates source intake gateway action', async () => {
   assert.equal(result.audit.status, 'pass');
 });
 
+test('callGatewayTool delegates overlay catalog gateway action', async () => {
+  const result = await callGatewayTool(
+    'get_overlay_catalog',
+    {},
+    {
+      getOverlayCatalog: async () => ({
+        ok: true,
+        surface_kind: 'overlay_catalog',
+        recommended_action: 'create_deliverable',
+        summary: {
+          total_overlays: 1,
+          total_profiles: 1,
+        },
+        overlays: [{ overlay_id: 'poster', profiles: ['default'] }],
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'overlay_catalog');
+  assert.equal(result.recommended_action, 'create_deliverable');
+  assert.equal(result.summary.total_overlays, 1);
+  assert.deepEqual(result.overlays, [{ overlay_id: 'poster', profiles: ['default'] }]);
+});
+
+test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
+  const doctor = await callGatewayTool(
+    'doctor',
+    { workspaceRoot: '/tmp/redcube-workspace' },
+    {
+      doctorWorkspace: async () => ({
+        ok: true,
+        surface_kind: 'workspace_doctor',
+        recommended_action: 'continue',
+        summary: {
+          workspace_file_exists: true,
+        },
+      }),
+    },
+  );
+  const topics = await callGatewayTool(
+    'list_topics',
+    { workspaceRoot: '/tmp/redcube-workspace' },
+    {
+      listTopics: async () => ({
+        ok: true,
+        surface_kind: 'topic_catalog',
+        recommended_action: 'create_or_import_topic',
+        summary: {
+          total_topics: 0,
+        },
+        topics: [],
+      }),
+    },
+  );
+
+  assert.equal(doctor.surface_kind, 'workspace_doctor');
+  assert.equal(doctor.summary.workspace_file_exists, true);
+  assert.equal(topics.surface_kind, 'topic_catalog');
+  assert.equal(topics.recommended_action, 'create_or_import_topic');
+  assert.equal(topics.summary.total_topics, 0);
+});
+
 test('callGatewayTool delegates publication projection gateway action', async () => {
   const result = await callGatewayTool(
     'get_publication_projection',
@@ -104,6 +168,7 @@ test('callGatewayTool delegates publication projection gateway action', async ()
     {
       getPublicationProjection: async (request) => ({
         ok: true,
+        surface_kind: 'publication_projection',
         topic_id: request.topicId,
         state_type: 'projection',
         publication: { current: 'approval_pending' },
@@ -113,6 +178,7 @@ test('callGatewayTool delegates publication projection gateway action', async ()
   );
 
   assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'publication_projection');
   assert.equal(result.publication.current, 'approval_pending');
   assert.equal(result.canonical_source.kind, 'review_state.publish_state');
 });
@@ -143,6 +209,41 @@ test('callGatewayTool delegates review mutation gateway action', async () => {
   assert.equal(result.ok, true);
   assert.equal(result.state.current_status, 'blocked_for_revision');
   assert.equal(result.state.deliverable_id, 'deck-a');
+});
+
+test('callGatewayTool can return operator-facing quality summary surfaces', async () => {
+  const result = await callGatewayTool(
+    'get_review_state',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+    },
+    {
+      getReviewState: async () => ({
+        ok: true,
+        surface_kind: 'review_state',
+        state: { deliverable_id: 'deck-a' },
+        quality_summary: {
+          relative_quality_verdict: 'acceptable',
+          baseline_promotion_state: 'promoted',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.quality_summary.relative_quality_verdict, 'acceptable');
+  assert.equal(result.quality_summary.baseline_promotion_state, 'promoted');
+  assert.equal(result.surface_kind, 'review_state');
+});
+
+test('listGatewayTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {
+  const tools = listGatewayTools();
+  const reviewMutation = tools.find((tool) => tool.name === 'apply_review_mutation');
+  const runtimeWatch = tools.find((tool) => tool.name === 'runtime_watch');
+
+  assert.match(reviewMutation.description, /mutation/i);
+  assert.match(runtimeWatch.description, /review-loop status/i);
 });
 
 test('callGatewayTool rejects unknown tool names', async () => {

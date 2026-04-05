@@ -9,6 +9,11 @@ export async function listTopics({ workspaceRoot }) {
   if (!existsSync(contract.topicsDir)) {
     return {
       ok: true,
+      surface_kind: 'topic_catalog',
+      recommended_action: 'create_or_import_topic',
+      summary: {
+        total_topics: 0,
+      },
       workspaceRoot: contract.workspaceRoot,
       total: 0,
       topics: [],
@@ -23,6 +28,11 @@ export async function listTopics({ workspaceRoot }) {
 
   return {
     ok: true,
+    surface_kind: 'topic_catalog',
+    recommended_action: topics.length > 0 ? 'continue' : 'create_or_import_topic',
+    summary: {
+      total_topics: topics.length,
+    },
     workspaceRoot: contract.workspaceRoot,
     total: topics.length,
     topics,

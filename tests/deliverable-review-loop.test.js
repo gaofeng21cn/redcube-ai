@@ -6,6 +6,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 
 import {
   auditDeliverable,
+  applyReviewMutation,
   createDeliverable,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -19,6 +20,7 @@ test('auditDeliverable blocks optimize_existing task without baseline', async ()
     baselineDeliverableId: '',
   });
 
+  assert.equal(report.surface_kind, 'audit');
   assert.equal(report.status, 'block');
   assert.deepEqual(report.issues, ['baseline_missing']);
   assert.equal(report.rerun_from_stage, 'intake');
@@ -60,6 +62,89 @@ test('auditDeliverable blocks optimize_existing task when baseline is not approv
   assert.deepEqual(report.issues, ['baseline_not_approved']);
   assert.equal(report.rerun_from_stage, 'intake');
   assert.equal(report.recommended_action, 'approve_or_publish_baseline');
+  assert.equal(report.quality_summary?.baseline_promotion_state ?? null, null);
+  assert.equal(report.quality_summary?.promoted_reference_id ?? null, null);
+});
+
+test('auditDeliverable surfaces promoted baseline summary for optimize_existing', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'baseline-a',
+    title: '甲状腺门诊小红书 baseline',
+    goal: '旧版认可稿',
+  });
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'baseline-a',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
+  await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'baseline-a',
+    mutation: { type: 'approve_publish', actor: 'human', notes: 'approve baseline' },
+  });
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    title: '甲状腺门诊小红书优化版',
+    goal: '在 baseline 基础上优化可读性',
+  });
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'candidate-a',
+      route,
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'baseline-a',
+    });
+    assert.equal(result.ok, true, route);
+  }
+  await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    mutation: { type: 'approve_publish', actor: 'human', notes: 'approve optimized baseline' },
+  });
+  await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    mutation: {
+      type: 'promote_baseline',
+      actor: 'human',
+      promoted_reference_id: 'xhs-note-v1',
+      notes: 'promote baseline into reference',
+    },
+  });
+
+  const report = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    topicId: 'topic-a',
+    deliverableId: 'candidate-a',
+    mode: 'optimize_existing',
+    baselineDeliverableId: 'candidate-a',
+  });
+
+  assert.equal(report.status, 'pass');
+  assert.equal(report.quality_summary?.baseline_promotion_state, 'promoted');
+  assert.equal(report.quality_summary?.promoted_reference_id, 'xhs-note-v1');
 });
 
 test('auditDeliverable blocks missing hydrated surface artifact', async () => {
@@ -199,6 +284,7 @@ test('runtimeWatch reports pending review loop state', async () => {
   });
 
   assert.equal(report.ok, true);
+  assert.equal(report.surface_kind, 'runtime_watch');
   assert.equal(report.run_id, 'run-1');
   assert.equal(report.current_stage, 'render_review');
   assert.equal(report.status, 'review_pending');
@@ -275,8 +361,11 @@ test('runtimeWatch exposes publication projection separately from canonical revi
     },
   });
 
+  assert.equal(report.surface_kind, 'runtime_watch');
   assert.equal(report.review_state.publish_state.current, 'approval_pending');
   assert.equal(report.publication_projection.current, 'approval_pending');
+  assert.equal(report.quality_summary?.relative_quality_verdict, null);
+  assert.equal(report.quality_summary?.baseline_promotion_state, null);
 });
 
 test('@redcube/gateway manifest declares runtime dependency for review loop actions', () => {

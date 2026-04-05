@@ -172,6 +172,22 @@ const DISPLAY_REGISTRY = {
   ],
 };
 
+export function describeXiaohongshuOverlay() {
+  return {
+    overlay_id: 'xiaohongshu',
+    default_profile_id: 'standard_note',
+    profiles: ['standard_note'],
+    deliverable_kind: 'xiaohongshu_note',
+    prompt_pack_id: PROMPT_PACK.pack_id,
+    route_sequence: STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
+    packages: {
+      overlay: '@redcube/overlay-xiaohongshu',
+      runtime_family: '@redcube/runtime-family-xiaohongshu',
+      pack: '@redcube/pack-xiaohongshu',
+    },
+  };
+}
+
 export function buildTopicRecord({ topicId, title }) {
   return {
     topic_id: String(topicId || '').trim(),

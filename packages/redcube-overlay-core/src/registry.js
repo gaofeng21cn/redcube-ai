@@ -17,8 +17,22 @@ export function createOverlayRegistry(overlays) {
       }
       return overlay;
     },
+    describeOverlay(overlayId) {
+      const overlay = this.getOverlay(overlayId);
+      if (typeof overlay.describeOverlay === 'function') {
+        return overlay.describeOverlay();
+      }
+      return {
+        overlay_id: overlay.overlayId,
+        default_profile_id: overlay.defaultProfileId || null,
+        profiles: Object.keys(overlay.profiles || {}),
+      };
+    },
     listOverlays() {
       return Object.keys(table);
+    },
+    listOverlayCatalog() {
+      return this.listOverlays().map((overlayId) => this.describeOverlay(overlayId));
     },
     listProfiles(overlayId) {
       const overlay = this.getOverlay(overlayId);

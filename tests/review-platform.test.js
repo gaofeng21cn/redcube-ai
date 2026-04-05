@@ -50,6 +50,7 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
   await runPptReviewReady(workspaceRoot);
 
   const readyState = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
+  assert.equal(readyState.surface_kind, 'review_state');
   assert.equal(readyState.state_type, 'canonical');
   assert.equal(readyState.canonical_source.kind, 'review_state.publish_state');
   assert.equal(readyState.state.current_status, 'export_ready');
@@ -106,6 +107,7 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(existsSync(publicationStateFile), true);
   assert.equal(JSON.parse(readFileSync(publicationStateFile, 'utf-8')).current, 'approval_pending');
   const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+  assert.equal(projection.surface_kind, 'publication_projection');
   assert.equal(projection.state_type, 'projection');
   assert.equal(projection.publication.current, 'approval_pending');
   assert.equal(projection.canonical_source.kind, 'review_state.publish_state');
@@ -275,6 +277,9 @@ test('promote_baseline requires structured relative quality and approval gates, 
   assert.equal(promoted.state.baseline.source_deliverable_id, 'candidate-a');
   assert.equal(typeof promoted.state.baseline.promoted_at, 'string');
   assert.equal(promoted.state.baseline.promoted_by, 'human');
+  assert.equal(promoted.quality_summary?.relative_quality_verdict, 'acceptable');
+  assert.equal(promoted.quality_summary?.baseline_promotion_state, 'promoted');
+  assert.equal(promoted.quality_summary?.promoted_reference_id, 'xhs-standard-note-v2');
 
   const history = readFileSync(promoted.history_file, 'utf-8')
     .trim()
@@ -368,4 +373,5 @@ test('promote_baseline works for ppt_deck without human approval gate once relat
   assert.equal(promoted.state.baseline.promotion_state, 'promoted');
   assert.equal(promoted.state.baseline.promoted_reference_id, 'ppt-lecture-student-v2');
   assert.equal(promoted.state.baseline.source_deliverable_id, 'deck-candidate');
+  assert.equal(promoted.quality_summary?.baseline_promotion_state, 'promoted');
 });

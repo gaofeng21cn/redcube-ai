@@ -2,15 +2,9 @@ import path from 'node:path';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 
 import {
-  buildDeckRecord,
-  buildDeckSurfaceBundle,
-  pptDeckOverlay,
-} from '@redcube/overlay-ppt';
-import {
-  createOverlayRegistry,
   hydrateDeliverableContract,
 } from '@redcube/overlay-core';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
+import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { getDeliverablePaths, getTopicPaths } from '@redcube/runtime-protocol';
 
 function buildTopicRecord({ topicId, title, overlay }) {
@@ -22,10 +16,7 @@ function buildTopicRecord({ topicId, title, overlay }) {
   };
 }
 
-const overlayRegistry = createOverlayRegistry({
-  ppt_deck: pptDeckOverlay,
-  xiaohongshu: xiaohongshuOverlay,
-});
+const overlayRegistry = getDefaultOverlayRegistry();
 
 export async function createDeliverable({
   workspaceRoot,
@@ -89,6 +80,13 @@ export async function createDeliverable({
 
   return {
     ok: true,
+    surface_kind: 'deliverable_create',
+    recommended_action: 'run_deliverable_route',
+    summary: {
+      overlay: deliverable.overlay,
+      deliverable_id: deliverable.deliverable_id,
+      surface_file_count: surfaceFiles.length,
+    },
     deliverableFile: deliverablePaths.deliverableFile,
     deliverable,
     surfaceFiles,

@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "@redcube/overlay-core": "0.1.0",
-    "@redcube/overlay-ppt": "0.1.0",
-    "@redcube/overlay-xiaohongshu": "0.1.0",
+    "@redcube/overlay-registry": "0.1.0",
     "@redcube/runtime": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"
   }
