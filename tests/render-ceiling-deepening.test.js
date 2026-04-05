@@ -14,7 +14,7 @@ test('ppt family runtime no longer owns slide planning and visual direction buil
   assert.equal(runtime.includes('function buildSlideBlueprint('), false);
   assert.equal(runtime.includes('function buildVisualDirection('), false);
   assert.equal(runtime.includes('@redcube/pack-ppt'), true);
-  assert.equal(runtime.includes('function buildRenderArtifact('), true);
+  assert.equal(runtime.includes('function buildRenderArtifact('), false);
 });
 
 test('xiaohongshu family runtime no longer owns note planning and visual presentation builders', () => {
@@ -24,5 +24,5 @@ test('xiaohongshu family runtime no longer owns note planning and visual present
   assert.equal(runtime.includes('function buildPlanSlides('), false);
   assert.equal(runtime.includes('function buildVisualDirection('), false);
   assert.equal(runtime.includes('@redcube/pack-xiaohongshu'), true);
-  assert.equal(runtime.includes('async function buildRenderHtml('), true);
+  assert.equal(runtime.includes('async function buildRenderHtml('), false);
 });

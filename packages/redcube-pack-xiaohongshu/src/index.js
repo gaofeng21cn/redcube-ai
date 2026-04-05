@@ -1,1 +1,1 @@
-export { inferXhsVisualPresentation, buildXhsPlanSlides, buildXhsVisualDirection } from './planning.js';
+export { inferXhsVisualPresentation, buildXhsPlanSlides, buildXhsVisualDirection, buildXhsRenderHtml } from './planning.js';

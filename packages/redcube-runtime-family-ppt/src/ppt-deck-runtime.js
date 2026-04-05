@@ -12,6 +12,7 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import {
   buildPptDetailedOutline,
+  buildPptRenderArtifact,
   buildPptSlideBlueprint,
   buildPptVisualDirection,
 } from '@redcube/pack-ppt';
@@ -290,39 +291,8 @@ function buildStoryline(contract) {
   };
 }
 
-function escapeHtml(text) {
-  return String(text || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-function escapeTemplate(text) {
-  return String(text || '').replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-}
-
 function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
-}
-
-async function compileRenderSlides(contract, slides, visualDirection) {
-  const compiler = await loadRenderPackCompiler(contract, 'render_pack.js');
-  return compiler.compileRenderSlides({
-    slides,
-    visualDirection,
-    renderContract: renderContract(contract),
-    canvas: CANVAS,
-  });
-}
-
-function buildDeckHtml({ title, slidesMarkup, renderPlan, renderStrategy, shellFile }) {
-  const shell = readPromptPackText(shellFile);
-  const slidesLiteral = `[\n${slidesMarkup.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
-  return shell
-    .replaceAll('__PPT_DECK_TITLE__', escapeHtml(title))
-    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
-    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
-    .replaceAll('__PPT_DECK_SLIDES_DATA__', slidesLiteral);
 }
 
 function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
@@ -367,69 +337,6 @@ function runPython(script, args) {
     throw new Error((result.stderr || result.stdout || `ppt_deck python helper failed: ${script}`).trim());
   }
   return JSON.parse(result.stdout);
-}
-
-async function buildRenderArtifact({ workspaceRoot, topicId, deliverableId, contract }) {
-  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
-  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const contractRender = renderContract(contract);
-  if (!safeText(contractRender.compiler_module)) {
-    throw new Error('Missing render pack compiler');
-  }
-  const slides = blueprintArtifact.slide_blueprint.slides;
-  const slidesMarkup = await compileRenderSlides(contract, slides, visualArtifact.visual_direction);
-  const renderPlan = {
-    render_strategy: safeText(contractRender.render_strategy, 'prompt_director_first'),
-    shell_file: safeText(contractRender.shell_file, 'render_shell.html'),
-    compiler_module: safeText(contractRender.compiler_module, 'render_pack.js'),
-    generator_instructions: safeArray(visualArtifact.visual_direction?.final_instruction_to_html_generator),
-    peak_pages: safeArray(visualArtifact.visual_direction?.peak_pages),
-    page_family_ceiling: visualArtifact.visual_direction?.page_family_ceiling || {},
-    slides: slidesMarkup.map((slide) => ({
-      slide_id: slide.slide_id,
-      title: slide.title,
-      layout_family: slide.layout_family,
-      recipe_id: slide.recipe_id,
-      peak_page: slide.director_contract.peak_page,
-    })),
-  };
-  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
-  const slidesFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
-  writeText(htmlFile, buildDeckHtml({
-    title: contract.title,
-    slidesMarkup,
-    renderPlan,
-    renderStrategy: renderPlan.render_strategy,
-    shellFile: `prompts/ppt_deck/${safeText(contractRender.shell_file, 'render_shell.html')}`,
-  }));
-  writeJson(slidesFile, {
-    title: contract.title,
-    slides: slidesMarkup.map((slide) => ({
-      slideId: slide.slide_id,
-      title: slide.title,
-      recipeId: slide.recipe_id,
-      content: slide.content,
-    })),
-  });
-  return {
-    ...attachCommon('render_html', contract),
-    html_bundle: {
-      html_file: htmlFile,
-      slides_file: slidesFile,
-      page_count: slidesMarkup.length,
-      render_strategy: renderPlan.render_strategy,
-      generator_instructions: renderPlan.generator_instructions,
-      shell_contract: {
-        ratio: CANVAS.ratio,
-        width: CANVAS.width,
-        height: CANVAS.height,
-        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
-      },
-      slides: slidesMarkup,
-    },
-    artifact_refs: [htmlFile, slidesFile],
-  };
 }
 
 function computeSlideReview(page, blueprintSlide, maxPrimaryPoints) {
@@ -725,7 +632,18 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
       );
       break;
     case 'render_html':
-      payload = await buildRenderArtifact({ workspaceRoot, topicId, deliverableId, contract });
+      payload = await buildPptRenderArtifact({ workspaceRoot, topicId, deliverableId, contract, deliverablePaths }, {
+        readStageArtifact,
+        renderContract,
+        safeText,
+        safeArray,
+        attachCommon,
+        CANVAS,
+        path,
+        readPromptPackText,
+        writeText,
+        writeJson,
+      });
       break;
     case 'screenshot_review':
       payload = buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId });

@@ -177,3 +177,84 @@ export function buildXhsVisualDirection(contract, deliverablePaths, mode, baseli
     },
   };
 }
+
+export async function buildXhsRenderHtml(contract, deliverablePaths, deps) {
+  const plan = deps.readStageArtifact(contract, deliverablePaths, 'single_note_plan');
+  const visual = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const contractRender = deps.renderContract(contract);
+  if (!deps.safeText(contractRender.compiler_module)) {
+    throw new Error('Missing render pack compiler');
+  }
+  const compiler = await loadRenderPackCompiler(contract, 'render_pack.js');
+  const slides = await compiler.compileRenderSlides({
+    slides: deps.safeArray(plan?.single_note_plan?.slides),
+    visualDirection: visual?.visual_direction || {},
+    renderContract: contractRender,
+    canvas: deps.CANVAS,
+  });
+  const visualDirection = visual?.visual_direction || {};
+  const renderPlan = {
+    render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
+    shell_file: deps.resolvePromptPackAsset(contract, deps.safeText(contractRender.shell_file, 'render_shell.html')),
+    compiler_module: deps.resolvePromptPackAsset(contract, deps.safeText(contractRender.compiler_module, 'render_pack.js')),
+    director_contract: {
+      visual_motif: deps.safeText(visualDirection.visual_motif),
+      peak_pages: deps.safeArray(visualDirection.peak_pages),
+      page_family_ceiling: visualDirection.page_family_ceiling || {},
+      anti_template_constraints: deps.safeArray(visualDirection.anti_template_constraints),
+      source_language_discipline: deps.safeText(visualDirection.source_language_discipline),
+    },
+    slides: slides.map((slide) => ({
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.recipe_id,
+      peak_page: slide.director_contract.peak_page,
+      director_role: slide.director_contract.page_role,
+    })),
+  };
+  const htmlFile = deps.path.join(deliverablePaths.viewsDir, `${deliverablePaths.deliverableId}.html`);
+  const shellText = deps.readPromptPackText(renderPlan.shell_file);
+  deps.writeText(htmlFile, buildHtml({
+    title: contract.title,
+    slides,
+    renderPlan,
+    renderStrategy: renderPlan.render_strategy,
+    shellText,
+  }));
+  return {
+    ...deps.attachCommon('render_html', contract),
+    html_bundle: {
+      html_file: htmlFile,
+      page_count: slides.length,
+      shell_contract: deps.CANVAS,
+      render_strategy: renderPlan.render_strategy,
+      director_contract: renderPlan.director_contract,
+      slides,
+    },
+    artifact_refs: [htmlFile],
+  };
+}
+import { loadRenderPackCompiler } from '@redcube/pack-runtime';
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function escapeTemplate(text) {
+  return String(text || '').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('${', '\\${');
+}
+
+function buildHtml({ title, slides, renderPlan, renderStrategy, shellText }) {
+  const slidesLiteral = `[\n${slides.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
+  return shellText
+    .replaceAll('__REDCUBE_TITLE__', escapeHtml(title))
+    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
+    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
+    .replaceAll('__REDCUBE_SLIDES_DATA__', slidesLiteral);
+}

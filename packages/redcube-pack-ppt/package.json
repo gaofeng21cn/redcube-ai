@@ -5,5 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@redcube/pack-runtime": "0.1.0"
   }
 }

@@ -1,3 +1,25 @@
+import { loadRenderPackCompiler } from '@redcube/pack-runtime';
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeTemplate(text) {
+  return String(text || '').replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+}
+
+function buildDeckHtml({ title, slidesMarkup, renderPlan, renderStrategy, shellText }) {
+  const slidesLiteral = `[\n${slidesMarkup.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
+  return shellText
+    .replaceAll('__PPT_DECK_TITLE__', escapeHtml(title))
+    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
+    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
+    .replaceAll('__PPT_DECK_SLIDES_DATA__', slidesLiteral);
+}
+
 function deckPreset(profileId) {
   switch (profileId) {
     case 'lecture_student':
@@ -327,5 +349,73 @@ export function buildPptVisualDirection(contract, blueprintArtifact, mode, basel
       baseline_deliverable_id: deps.safeText(baselineDeliverableId) || null,
       mode,
     },
+  };
+}
+
+export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverableId, contract, deliverablePaths }, deps) {
+  const blueprintArtifact = deps.readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const visualArtifact = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const contractRender = deps.renderContract(contract);
+  if (!deps.safeText(contractRender.compiler_module)) {
+    throw new Error('Missing render pack compiler');
+  }
+  const compiler = await loadRenderPackCompiler(contract, 'render_pack.js');
+  const slidesMarkup = await compiler.compileRenderSlides({
+    slides: blueprintArtifact.slide_blueprint.slides,
+    visualDirection: visualArtifact.visual_direction,
+    renderContract: contractRender,
+    canvas: deps.CANVAS,
+  });
+  const renderPlan = {
+    render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
+    shell_file: deps.safeText(contractRender.shell_file, 'render_shell.html'),
+    compiler_module: deps.safeText(contractRender.compiler_module, 'render_pack.js'),
+    generator_instructions: deps.safeArray(visualArtifact.visual_direction?.final_instruction_to_html_generator),
+    peak_pages: deps.safeArray(visualArtifact.visual_direction?.peak_pages),
+    page_family_ceiling: visualArtifact.visual_direction?.page_family_ceiling || {},
+    slides: slidesMarkup.map((slide) => ({
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.recipe_id,
+      peak_page: slide.director_contract.peak_page,
+    })),
+  };
+  const htmlFile = deps.path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
+  const slidesFile = deps.path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
+  const shellText = deps.readPromptPackText(`prompts/ppt_deck/${deps.safeText(contractRender.shell_file, 'render_shell.html')}`);
+  deps.writeText(htmlFile, buildDeckHtml({
+    title: contract.title,
+    slidesMarkup,
+    renderPlan,
+    renderStrategy: renderPlan.render_strategy,
+    shellText,
+  }));
+  deps.writeJson(slidesFile, {
+    title: contract.title,
+    slides: slidesMarkup.map((slide) => ({
+      slideId: slide.slide_id,
+      title: slide.title,
+      recipeId: slide.recipe_id,
+      content: slide.content,
+    })),
+  });
+  return {
+    ...deps.attachCommon('render_html', contract),
+    html_bundle: {
+      html_file: htmlFile,
+      slides_file: slidesFile,
+      page_count: slidesMarkup.length,
+      render_strategy: renderPlan.render_strategy,
+      generator_instructions: renderPlan.generator_instructions,
+      shell_contract: {
+        ratio: deps.CANVAS.ratio,
+        width: deps.CANVAS.width,
+        height: deps.CANVAS.height,
+        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+      },
+      slides: slidesMarkup,
+    },
+    artifact_refs: [htmlFile, slidesFile],
   };
 }

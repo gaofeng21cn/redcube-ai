@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import {
+  buildXhsRenderHtml,
   buildXhsPlanSlides,
   buildXhsVisualDirection,
 } from '@redcube/pack-xiaohongshu';
@@ -348,41 +349,8 @@ function buildSingleNotePlan(contract, deliverablePaths) {
   };
 }
 
-function escapeHtml(text) {
-  return String(text || '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function escapeTemplate(text) {
-  return String(text || '').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('${', '\\${');
-}
-
 function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
-}
-
-async function compileRenderSlides(contract, slides, visualDirection) {
-  const compiler = await loadRenderPackCompiler(contract, 'render_pack.js');
-  return compiler.compileRenderSlides({
-    slides,
-    visualDirection,
-    renderContract: renderContract(contract),
-    canvas: CANVAS,
-  });
-}
-
-function buildHtml({ title, slides, renderPlan, renderStrategy, shellFile }) {
-  const shell = readPromptPackText(shellFile);
-  const slidesLiteral = `[\n${slides.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
-  return shell
-    .replaceAll('__REDCUBE_TITLE__', escapeHtml(title))
-    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
-    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
-    .replaceAll('__REDCUBE_SLIDES_DATA__', slidesLiteral);
 }
 
 function runPython(script, args) {
@@ -422,58 +390,6 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
     baseline_comparison_passed: passed,
     relative_quality: relativeQuality,
     summary: summarizeRelativeQuality(relativeQuality),
-  };
-}
-
-async function buildRenderHtml(contract, deliverablePaths) {
-  const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const sourceSlides = safeArray(plan?.single_note_plan?.slides);
-  const visualDirection = visual?.visual_direction || {};
-  const contractRender = renderContract(contract);
-  if (!safeText(contractRender.compiler_module)) {
-    throw new Error('Missing render pack compiler');
-  }
-  const slides = await compileRenderSlides(contract, sourceSlides, visualDirection);
-  const renderPlan = {
-    render_strategy: safeText(contractRender.render_strategy, 'prompt_director_first'),
-    shell_file: resolvePromptPackAsset(contract, safeText(contractRender.shell_file, 'render_shell.html')),
-    compiler_module: resolvePromptPackAsset(contract, safeText(contractRender.compiler_module, 'render_pack.js')),
-    director_contract: {
-      visual_motif: safeText(visualDirection.visual_motif),
-      peak_pages: safeArray(visualDirection.peak_pages),
-      page_family_ceiling: visualDirection.page_family_ceiling || {},
-      anti_template_constraints: safeArray(visualDirection.anti_template_constraints),
-      source_language_discipline: safeText(visualDirection.source_language_discipline),
-    },
-    slides: slides.map((slide) => ({
-      slide_id: slide.slide_id,
-      title: slide.title,
-      layout_family: slide.layout_family,
-      recipe_id: slide.recipe_id,
-      peak_page: slide.director_contract.peak_page,
-      director_role: slide.director_contract.page_role,
-    })),
-  };
-  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverablePaths.deliverableId}.html`);
-  writeText(htmlFile, buildHtml({
-    title: contract.title,
-    slides,
-    renderPlan,
-    renderStrategy: renderPlan.render_strategy,
-    shellFile: renderPlan.shell_file,
-  }));
-  return {
-    ...attachCommon('render_html', contract),
-    html_bundle: {
-      html_file: htmlFile,
-      page_count: slides.length,
-      shell_contract: CANVAS,
-      render_strategy: renderPlan.render_strategy,
-      director_contract: renderPlan.director_contract,
-      slides,
-    },
-    artifact_refs: [htmlFile],
   };
 }
 
@@ -793,7 +709,18 @@ export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableI
         inferMemoryHook,
       });
     case 'render_html':
-      return await buildRenderHtml(contract, deliverablePaths);
+      return await buildXhsRenderHtml(contract, deliverablePaths, {
+        readStageArtifact,
+        renderContract,
+        safeText,
+        safeArray,
+        attachCommon,
+        CANVAS,
+        resolvePromptPackAsset,
+        readPromptPackText,
+        writeText,
+        path,
+      });
     case 'visual_director_review':
       return buildDirectorReview(contract, deliverablePaths);
     case 'screenshot_review':
