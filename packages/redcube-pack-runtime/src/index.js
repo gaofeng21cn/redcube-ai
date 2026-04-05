@@ -1,41 +1,37 @@
-import path from 'node:path';
-import { existsSync } from 'node:fs';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-
-const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
-
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
 }
 
-export function resolveRenderCompilerModule(contract, fallbackRelativePath) {
-  const root = safeText(contract?.prompt_pack?.root);
-  const configured = safeText(contract?.prompt_pack?.render_contract?.compiler_module);
-  const relative = configured || fallbackRelativePath;
-  if (!relative) {
+export function resolveRenderCompilerModule(contract) {
+  const moduleName = safeText(contract?.prompt_pack?.render_contract?.compiler_module);
+  const exportName = safeText(contract?.prompt_pack?.render_contract?.compiler_export);
+  if (!moduleName) {
     throw new Error('render pack compiler_module 未配置');
   }
-  const repoRelative = relative.includes('/') ? relative : path.posix.join(root, relative);
-  const absolute = path.join(REPO_ROOT, repoRelative);
-  if (!existsSync(absolute)) {
-    throw new Error(`Missing render pack compiler: ${repoRelative}`);
+  if (!exportName) {
+    throw new Error('render pack compiler_export 未配置');
   }
   return {
-    relative_path: repoRelative,
-    absolute_path: absolute,
+    module_name: moduleName,
+    export_name: exportName,
   };
 }
 
-export async function loadRenderPackCompiler(contract, fallbackRelativePath) {
-  const moduleRef = resolveRenderCompilerModule(contract, fallbackRelativePath);
-  const loaded = await import(pathToFileURL(moduleRef.absolute_path).href);
-  if (typeof loaded.compileRenderSlides !== 'function') {
-    throw new Error(`Render pack compiler must export compileRenderSlides: ${moduleRef.relative_path}`);
+export async function loadRenderPackCompiler(contract) {
+  const moduleRef = resolveRenderCompilerModule(contract);
+  let loaded;
+  try {
+    loaded = await import(moduleRef.module_name);
+  } catch {
+    throw new Error(`Missing render pack compiler package: ${moduleRef.module_name}`);
+  }
+  const compileRenderSlides = loaded?.[moduleRef.export_name];
+  if (typeof compileRenderSlides !== 'function') {
+    throw new Error(`Render pack compiler export missing: ${moduleRef.module_name}#${moduleRef.export_name}`);
   }
   return {
     ...moduleRef,
-    compileRenderSlides: loaded.compileRenderSlides,
+    compileRenderSlides,
   };
 }

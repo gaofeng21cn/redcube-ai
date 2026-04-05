@@ -85,7 +85,7 @@ test('xiaohongshu render_html blocks until single_note_plan and visual_direction
   assert.match(result.run.error.message, /render_html.*single_note_plan.*visual_direction/i);
 });
 
-test('xiaohongshu render_html fails when compiler_module in prompt_pack contract is invalid', async () => {
+test('xiaohongshu render_html fails when compiler package in prompt_pack contract is invalid', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
   const created = await createDeliverable({
     workspaceRoot,
@@ -99,7 +99,7 @@ test('xiaohongshu render_html fails when compiler_module in prompt_pack contract
 
   const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
   const contract = readJson(contractFile);
-  contract.prompt_pack.render_contract.compiler_module = 'missing-render-pack.js';
+  contract.prompt_pack.render_contract.compiler_module = '@redcube/missing-pack-xiaohongshu';
   writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
 
   for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
@@ -122,7 +122,7 @@ test('xiaohongshu render_html fails when compiler_module in prompt_pack contract
   });
 
   assert.equal(result.ok, false);
-  assert.match(result.run.error.message, /Missing render pack compiler/i);
+  assert.match(result.run.error.message, /Missing render pack compiler package/i);
 });
 
 test('xiaohongshu mainline produces real stage artifacts through publish_copy', async () => {

@@ -55,7 +55,7 @@ function renderSlideMarkup(slide, canvas) {
   return `${rootStart}<div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">${header}<div style="display:grid;gap:14px;align-content:start;">${slide.page_core_content.map((item) => renderCard(item, accent)).join('')}</div></div>${footer}</div>`;
 }
 
-export function compileRenderSlides({ slides, visualDirection, renderContract, canvas }) {
+export function compileXhsRenderSlides({ slides, visualDirection, renderContract, canvas }) {
   return safeArray(slides).map((slide) => {
     const materialRules = visualDirection?.material_rules || {};
     const compiled = {

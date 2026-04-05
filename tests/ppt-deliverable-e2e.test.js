@@ -93,7 +93,7 @@ test('ppt_deck render_html blocks until slide_blueprint and visual_direction exi
   assert.match(result.run.error.message, /render_html.*slide_blueprint.*visual_direction/i);
 });
 
-test('ppt_deck render_html fails when compiler_module in prompt_pack contract is invalid', async () => {
+test('ppt_deck render_html fails when compiler package in prompt_pack contract is invalid', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
   const created = await createDeliverable({
@@ -108,7 +108,7 @@ test('ppt_deck render_html fails when compiler_module in prompt_pack contract is
 
   const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
   const contract = readJson(contractFile);
-  contract.prompt_pack.render_contract.compiler_module = 'missing-render-pack.js';
+  contract.prompt_pack.render_contract.compiler_module = '@redcube/missing-pack-ppt';
   writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
 
   for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
@@ -131,7 +131,7 @@ test('ppt_deck render_html fails when compiler_module in prompt_pack contract is
   });
 
   assert.equal(result.ok, false);
-  assert.match(result.run.error.message, /Missing render pack compiler/i);
+  assert.match(result.run.error.message, /Missing render pack compiler package/i);
 });
 
 test('lecture_student mainline produces real ppt_deck artifacts through screenshot review', async () => {

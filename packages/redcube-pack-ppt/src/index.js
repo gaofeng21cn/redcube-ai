@@ -1,4 +1,5 @@
 import { loadRenderPackCompiler } from '@redcube/pack-runtime';
+export { compilePptRenderSlides } from './render-compiler.js';
 
 function escapeHtml(text) {
   return String(text || '')
@@ -359,7 +360,7 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   if (!deps.safeText(contractRender.compiler_module)) {
     throw new Error('Missing render pack compiler');
   }
-  const compiler = await loadRenderPackCompiler(contract, 'render_pack.js');
+  const compiler = await loadRenderPackCompiler(contract);
   const slidesMarkup = await compiler.compileRenderSlides({
     slides: blueprintArtifact.slide_blueprint.slides,
     visualDirection: visualArtifact.visual_direction,
@@ -369,7 +370,8 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   const renderPlan = {
     render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
     shell_file: deps.safeText(contractRender.shell_file, 'render_shell.html'),
-    compiler_module: deps.safeText(contractRender.compiler_module, 'render_pack.js'),
+    compiler_module: deps.safeText(contractRender.compiler_module),
+    compiler_export: deps.safeText(contractRender.compiler_export),
     generator_instructions: deps.safeArray(visualArtifact.visual_direction?.final_instruction_to_html_generator),
     peak_pages: deps.safeArray(visualArtifact.visual_direction?.peak_pages),
     page_family_ceiling: visualArtifact.visual_direction?.page_family_ceiling || {},

@@ -93,6 +93,8 @@ const SURFACE_VALIDATORS = {
     && content.stages.render_html.file === 'render_html.md'
     && content?.render_contract?.render_strategy === 'prompt_director_first'
     && content?.render_contract?.shell_file === 'render_shell.html'
+    && content?.render_contract?.compiler_module === '@redcube/pack-ppt'
+    && content?.render_contract?.compiler_export === 'compilePptRenderSlides'
     && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content) =>
     Array.isArray(content?.required_checks)

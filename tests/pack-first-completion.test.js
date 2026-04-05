@@ -9,22 +9,34 @@ function read(file) {
 
 test('runtime no longer owns xiaohongshu slide recipe compiler branches', () => {
   const runtime = read('packages/redcube-runtime/src/xiaohongshu-runtime.js');
-  const pack = read('prompts/xiaohongshu/render_pack.js');
+  const pack = read('packages/redcube-pack-xiaohongshu/src/render-compiler.js');
 
   assert.equal(runtime.includes('function compileXhsRenderSlide('), false);
   assert.equal(runtime.includes("if (slide.recipe_id === 'xhs.hero_note')"), false);
-  assert.equal(pack.includes('export function compileRenderSlides'), true);
+  assert.equal(pack.includes('export function compileXhsRenderSlides'), true);
   assert.equal(pack.includes("if (slide.recipe_id === 'xhs.hero_note')"), true);
 });
 
 test('runtime no longer owns ppt slide recipe compiler branches', () => {
   const runtime = read('packages/redcube-runtime/src/ppt-deck-runtime.js');
-  const pack = read('prompts/ppt_deck/render_pack.js');
+  const pack = read('packages/redcube-pack-ppt/src/render-compiler.js');
 
   assert.equal(runtime.includes('function compilePptRenderSlide('), false);
   assert.equal(runtime.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), false);
-  assert.equal(pack.includes('export function compileRenderSlides'), true);
+  assert.equal(pack.includes('export function compilePptRenderSlides'), true);
   assert.equal(pack.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), true);
+});
+
+test('overlay render contracts use package-native compiler registry instead of render_pack.js path strings', () => {
+  const pptOverlay = read('packages/redcube-overlay-ppt/src/profiles.js');
+  const xhsOverlay = read('packages/redcube-overlay-xiaohongshu/src/contracts.js');
+  const packRuntime = read('packages/redcube-pack-runtime/src/index.js');
+
+  assert.equal(pptOverlay.includes("compiler_module: '@redcube/pack-ppt'"), true);
+  assert.equal(pptOverlay.includes("compiler_export: 'compilePptRenderSlides'"), true);
+  assert.equal(xhsOverlay.includes("compiler_module: '@redcube/pack-xiaohongshu'"), true);
+  assert.equal(xhsOverlay.includes("compiler_export: 'compileXhsRenderSlides'"), true);
+  assert.equal(packRuntime.includes('render_pack.js'), false);
 });
 
 test('runtime executor no longer imports local family runtime files directly', () => {

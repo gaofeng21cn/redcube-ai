@@ -75,11 +75,13 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.equal(hydratedContract.prompt_pack.stages.render_html.file, 'render_html.md');
   assert.equal(hydratedContract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
   assert.equal(hydratedContract.prompt_pack.render_contract.shell_file, 'render_shell.html');
-  assert.equal(hydratedContract.prompt_pack.render_contract.compiler_module, 'render_pack.js');
+  assert.equal(hydratedContract.prompt_pack.render_contract.compiler_module, '@redcube/pack-ppt');
+  assert.equal(hydratedContract.prompt_pack.render_contract.compiler_export, 'compilePptRenderSlides');
   assert.equal(hydratedContract.prompt_pack.render_contract.recipe_registry.default, 'ppt.compare_zones');
   assert.equal(promptPack.render_contract.recipe_registry.cover_hero, 'ppt.hero_signal');
   assert.equal(promptPack.render_contract.recipe_registry.summary_peak, 'ppt.summary_peak');
-  assert.equal(promptPack.render_contract.compiler_module, 'render_pack.js');
+  assert.equal(promptPack.render_contract.compiler_module, '@redcube/pack-ppt');
+  assert.equal(promptPack.render_contract.compiler_export, 'compilePptRenderSlides');
   assert.deepEqual(
     JSON.parse(
       readFileSync(path.join(deliverableDir, 'contracts/stage-requirements.json'), 'utf-8'),

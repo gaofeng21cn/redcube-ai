@@ -50,7 +50,7 @@ function renderSlideMarkup(slide, canvas) {
   return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:20px;height:100%;">${header}<div data-qa-block="zones" style="display:grid;grid-template-columns:repeat(${Math.max(points.length, 2)},1fr);gap:18px;align-items:stretch;">${points.map((point, index) => `<section data-qa-block="zone-card" data-primary-point="true" style="padding:20px;border-radius:24px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;gap:10px;"><div style="font-size:13px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${palette.accent};">展开 ${index + 1}</div><div style="font-size:24px;line-height:1.45;color:${palette.ink};">${escapeHtml(point.text)}</div></section>`).join('')}</div></div>${footer}</div>`;
 }
 
-export function compileRenderSlides({ slides, visualDirection, renderContract, canvas }) {
+export function compilePptRenderSlides({ slides, visualDirection, renderContract, canvas }) {
   return safeArray(slides).map((slide) => {
     const compiled = {
       slide_id: slide.slide_id,
