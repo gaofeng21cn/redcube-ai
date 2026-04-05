@@ -171,6 +171,116 @@
       "speaker_notes": "结尾用三件必须带走的事收束整场讲授。",
       "transition_sentence": "完。"
     }
-  ]
+  ],
+  "profile_variants": {
+    "executive_briefing": {
+      "slides": [
+        {
+          "slide_id": "S01",
+          "slide_no": 1,
+          "chapter_id": "C1",
+          "page_type": "cover_peak",
+          "layout_family": "multi_zone_compare",
+          "title": "{{title}}",
+          "page_goal": "先给决策结论",
+          "core_sentence": "先试点，再决定是否扩容。",
+          "page_objective": "开场直接说清建议与范围",
+          "evidence_points": ["建议先做小规模试点", "当前不建议全面铺开"],
+          "public_sources": ["{{public_source_1}}"]
+        },
+        {
+          "slide_id": "S02",
+          "slide_no": 2,
+          "chapter_id": "C1",
+          "page_type": "stakes_window",
+          "layout_family": "multi_zone_compare",
+          "title": "为什么现在要决定",
+          "page_goal": "说明决策窗口",
+          "core_sentence": "问题不在工具多，而在资源是否投到正确场景。",
+          "page_objective": "把不决策的代价说清",
+          "evidence_points": ["试点窗口有限", "错误扩容成本高"],
+          "public_sources": ["{{public_source_1}}", "{{public_source_2}}"]
+        },
+        {
+          "slide_id": "S03",
+          "slide_no": 3,
+          "chapter_id": "C1",
+          "page_type": "central_axis",
+          "layout_family": "central_axis",
+          "title": "本次决策只看三条线",
+          "page_goal": "压缩判断维度",
+          "core_sentence": "收益、风险、资源三条线必须同屏判断。",
+          "page_objective": "避免管理层被技术细节淹没",
+          "evidence_points": ["收益线", "风险线", "资源线"],
+          "public_sources": ["{{public_source_1}}"]
+        },
+        {
+          "slide_id": "S04",
+          "slide_no": 4,
+          "chapter_id": "C2",
+          "page_type": "timeline_band",
+          "layout_family": "timeline_band",
+          "title": "建议动作分三步走",
+          "page_goal": "给出决策动作",
+          "core_sentence": "先试点、再复核、后扩容，动作不能倒序。",
+          "page_objective": "让下一步动作可执行",
+          "evidence_points": ["限定场景试点", "按周期复核", "达标后扩容"],
+          "public_sources": ["{{public_source_1}}", "{{public_source_2}}"]
+        },
+        {
+          "slide_id": "S05",
+          "slide_no": 5,
+          "chapter_id": "C2",
+          "page_type": "decision_gate",
+          "layout_family": "judgement_ladder",
+          "title": "什么时候该停，什么时候该推",
+          "page_goal": "明确决策闸口",
+          "core_sentence": "有一个关键前提答不清，就不该继续投入。",
+          "page_objective": "把推进条件和停止条件讲清",
+          "evidence_points": ["场景是否稳定", "责任人是否明确", "复核机制是否到位"],
+          "public_sources": ["{{public_source_2}}"]
+        },
+        {
+          "slide_id": "S06",
+          "slide_no": 6,
+          "chapter_id": "C2",
+          "page_type": "evidence_surface",
+          "layout_family": "multi_zone_compare",
+          "title": "证据只保留管理层需要的部分",
+          "page_goal": "给出决策证据",
+          "core_sentence": "证据页只回答：值不值得、风险大不大、下一步怎么走。",
+          "page_objective": "避免技术细节挤占决策注意力",
+          "evidence_points": ["价值证据", "风险证据", "动作证据"],
+          "public_sources": ["{{public_source_1}}", "{{public_source_2}}", "{{public_source_3}}"]
+        },
+        {
+          "slide_id": "S07",
+          "slide_no": 7,
+          "chapter_id": "C3",
+          "page_type": "ring_cross",
+          "layout_family": "ring_cross",
+          "title": "把责任、节奏、资源绑成闭环",
+          "page_goal": "形成推进闭环",
+          "core_sentence": "责任人、评估周期、资源边界缺一不可。",
+          "page_objective": "让管理动作落到具体 owner",
+          "evidence_points": ["责任人", "评估周期", "资源边界"],
+          "public_sources": ["{{public_source_2}}"]
+        },
+        {
+          "slide_id": "S08",
+          "slide_no": 8,
+          "chapter_id": "C3",
+          "page_type": "closure_peak",
+          "layout_family": "summary_peak",
+          "title": "最后只收三句决策话",
+          "page_goal": "回收决策主线",
+          "core_sentence": "先试点、严复核、达标后扩容。",
+          "page_objective": "留下一句能直接复述的决策口径",
+          "evidence_points": ["先试点", "严复核", "后扩容"],
+          "public_sources": ["{{public_source_1}}"]
+        }
+      ]
+    }
+  }
 }
 ```

@@ -12,8 +12,12 @@ import {
 } from '../packages/redcube-gateway/src/index.js';
 import {
   loadReferenceSampleFixture,
+  summarizeReferenceCoverage,
   validateReferenceSampleMeta,
 } from '../packages/redcube-runtime/src/index.js';
+import { createOverlayRegistry } from '../packages/redcube-overlay-core/src/index.js';
+import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
+import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -121,6 +125,22 @@ test('reference sample schema validator rejects incomplete approved metadata', (
   assert.equal(result.errors.some((item) => item.includes('scope')), true);
 });
 
+test('reference coverage matrix fully covers active family/profile combinations', () => {
+  const overlayRegistry = createOverlayRegistry({
+    ppt_deck: pptDeckOverlay,
+    xiaohongshu: xiaohongshuOverlay,
+  });
+  const coverage = summarizeReferenceCoverage({
+    rootDir: path.resolve('tests', 'reference-samples'),
+    overlayRegistry,
+  });
+
+  assert.equal(coverage.expectedProfileCount, 5);
+  assert.equal(coverage.approvedSampleCount, 5);
+  assert.equal(coverage.ok, true);
+  assert.deepEqual(coverage.missingProfiles, []);
+});
+
 test('xiaohongshu approved sample supports relative regression review', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
   const fixture = loadFixture('xiaohongshu', 'approved-note');
@@ -200,4 +220,30 @@ test('ppt_deck approved sample supports relative regression review', async () =>
   assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
   assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
   assert.equal(review.checks?.baseline_comparison_passed, true);
+});
+
+test('ppt_deck active profiles all have approved samples that support relative regression review', async () => {
+  for (const sampleId of ['approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), `redcube-reference-${sampleId}-`));
+    const fixture = loadFixture('ppt_deck', sampleId);
+
+    const baseline = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: `${sampleId}-baseline`,
+    });
+    assert.equal(baseline.at(-1).ok, true, sampleId);
+
+    const candidate = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: `${sampleId}-candidate`,
+      mode: 'optimize_existing',
+      baselineDeliverableId: `${sampleId}-baseline`,
+    });
+    const review = readJson(candidate.at(-1).artifactFile);
+    assert.equal(review.baseline_review?.baseline_deliverable_id, `${sampleId}-baseline`);
+    assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
+    assert.equal(review.checks?.baseline_comparison_passed, true);
+  }
 });

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const ALLOWED_REFERENCE_MODES = new Set([
   'seed_backed_with_source_provenance',
@@ -151,5 +151,66 @@ export function loadReferenceSampleFixture({ rootDir, familyId, sampleId }) {
     meta,
     sourceText,
     validation,
+  };
+}
+
+export function summarizeReferenceCoverage({ rootDir, overlayRegistry }) {
+  if (!isNonEmptyString(rootDir)) {
+    throw new Error('rootDir 不能为空');
+  }
+  if (!overlayRegistry || typeof overlayRegistry.listOverlays !== 'function') {
+    throw new Error('overlayRegistry 不能为空');
+  }
+
+  const approvedSamples = [];
+  const invalidSamples = [];
+  const coveredProfiles = new Set();
+  const overlays = overlayRegistry.listOverlays();
+
+  for (const overlay of overlays) {
+    const overlayDir = path.resolve(rootDir, overlay);
+    if (!existsSync(overlayDir)) continue;
+    for (const item of readdirSync(overlayDir, { withFileTypes: true })) {
+      if (!item.isFile() || !item.name.endsWith('.json')) continue;
+      const sampleId = item.name.replace(/\.json$/u, '');
+      const fixture = loadReferenceSampleFixture({
+        rootDir,
+        familyId: overlay,
+        sampleId,
+      });
+      if (!fixture.validation.ok) {
+        invalidSamples.push({
+          overlay,
+          sampleId,
+          errors: fixture.validation.errors,
+        });
+        continue;
+      }
+      if (fixture.meta.status !== 'approved') continue;
+      approvedSamples.push({
+        overlay: fixture.meta.overlay,
+        profileId: fixture.meta.profileId,
+        sampleId: fixture.meta.sampleId,
+      });
+      coveredProfiles.add(`${fixture.meta.overlay}::${fixture.meta.profileId}`);
+    }
+  }
+
+  const missingProfiles = [];
+  for (const overlay of overlays) {
+    for (const profileId of overlayRegistry.listProfiles(overlay)) {
+      if (!coveredProfiles.has(`${overlay}::${profileId}`)) {
+        missingProfiles.push({ overlay, profileId });
+      }
+    }
+  }
+
+  return {
+    ok: missingProfiles.length === 0 && invalidSamples.length === 0,
+    expectedProfileCount: overlays.reduce((sum, overlay) => sum + overlayRegistry.listProfiles(overlay).length, 0),
+    approvedSampleCount: approvedSamples.length,
+    approvedSamples,
+    invalidSamples,
+    missingProfiles,
   };
 }

@@ -117,7 +117,16 @@ function promptSeed(route, vars = {}) {
   const raw = readFileSync(absolutePath, 'utf-8');
   const match = raw.match(/## runtime_seed\s*```json\s*([\s\S]*?)\s*```/);
   if (!match) return null;
-  return renderSeedValue(JSON.parse(match[1]), vars);
+  const rendered = renderSeedValue(JSON.parse(match[1]), vars);
+  const profileId = safeText(vars.profile_id);
+  if (profileId && rendered?.profile_variants?.[profileId] && typeof rendered.profile_variants[profileId] === 'object') {
+    const { profile_variants, ...base } = rendered;
+    return {
+      ...base,
+      ...rendered.profile_variants[profileId],
+    };
+  }
+  return rendered;
 }
 
 function sharedSourceTruth(contract) {
@@ -174,6 +183,7 @@ function extraChecks(contract) {
 function deriveProfileChecks(contract, blueprintArtifact, storylineArtifact) {
   const slides = safeArray(blueprintArtifact?.slide_blueprint?.slides);
   const pageTypes = slides.map((slide) => slide.page_type);
+  const layoutFamilies = slides.map((slide) => safeText(slide?.visual_presentation?.layout_family));
   switch (contract.profile_id) {
     case 'lecture_student':
       return {
@@ -183,12 +193,14 @@ function deriveProfileChecks(contract, blueprintArtifact, storylineArtifact) {
     case 'lecture_peer':
       return {
         novelty_position_clear: safeText(storylineArtifact?.storyline?.narrative_arc?.journey?.[0]).length > 0,
-        method_boundary_explicit: pageTypes.includes('judgement_ladder'),
+        method_boundary_explicit: pageTypes.includes('judgement_ladder')
+          || pageTypes.includes('decision_gate')
+          || layoutFamilies.includes('judgement_ladder'),
       };
     case 'executive_briefing':
       return {
         decision_implication_clear: slides.some((slide) => safeText(slide.page_goal).includes('动作') || safeText(slide.page_goal).includes('决策')),
-        conclusion_up_front: safeText(slides[0]?.core_sentence || '').length > 0,
+        conclusion_up_front: safeText(slides[0]?.core_sentence || slides[0]?.page_core_content?.[0]?.text || '').length > 0,
       };
     case 'defense_deck':
       return {
@@ -244,6 +256,7 @@ function buildOutlineSlides(contract) {
   const seed = promptSeed('detailed_outline', {
     title,
     goal,
+    profile_id: contract.profile_id,
     public_source_1: publicSources[0],
     public_source_2: publicSources[1],
     public_source_3: publicSources[2],
@@ -443,6 +456,7 @@ function makeBlueprintSlide(slide, index, slides, contract) {
     page_type: slide.page_type,
     title: slide.title,
     page_goal: slide.page_goal,
+    core_sentence: slide.core_sentence,
     page_core_content: [
       { label: '核心句', text: slide.core_sentence },
       ...slide.evidence_points.map((item, itemIndex) => ({ label: `展开${itemIndex + 1}`, text: item })),
