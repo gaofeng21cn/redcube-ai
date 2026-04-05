@@ -6,6 +6,7 @@ export {
   validateReferenceSampleMeta,
 } from './reference-samples.js';
 export {
+  buildReferenceReplacementReport,
   buildReferencePromotionReport,
   buildReferenceQualityReport,
   buildRelativeQualityRubric,

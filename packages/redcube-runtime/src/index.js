@@ -9,5 +9,5 @@ export { resolveExecutorAdapter } from './executors.js';
 export { completeRun, loadRun, startRun } from './run-store.js';
 export { applyReviewMutation, getPublicationProjection, getReviewState, isBaselineApprovedState, persistReviewStatePatch, rebuildTopicPublicationProjection } from '@redcube/governance';
 export { loadReferenceSampleFixture, listPromotedReferences, listReferenceSamples, summarizeReferenceCoverage, validateReferenceSampleMeta } from '@redcube/reference-os';
-export { buildReferencePromotionReport, buildReferenceQualityReport, buildRelativeQualityRubric, compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
+export { buildReferencePromotionReport, buildReferenceQualityReport, buildReferenceReplacementReport, buildRelativeQualityRubric, compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 export { intakeSource } from './source-intake.js';

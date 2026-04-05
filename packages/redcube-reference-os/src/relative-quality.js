@@ -135,3 +135,41 @@ export function buildReferencePromotionReport({ workspaceRoot }) {
     promoted_references: listPromotedReferences({ workspaceRoot }),
   };
 }
+
+export function buildReferenceReplacementReport({ workspaceRoot }) {
+  const promotedReferences = listPromotedReferences({ workspaceRoot });
+  const groups = new Map();
+
+  for (const item of promotedReferences) {
+    const key = `${item.overlay}::${item.profile_id}::${item.topic_id}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+
+  const replacements = [];
+  for (const entries of groups.values()) {
+    const ordered = [...entries].sort((left, right) => {
+      const leftTime = Date.parse(left.promoted_at || '') || 0;
+      const rightTime = Date.parse(right.promoted_at || '') || 0;
+      return leftTime - rightTime;
+    });
+    if (ordered.length < 2) continue;
+    const latest = ordered.at(-1);
+    for (const older of ordered.slice(0, -1)) {
+      replacements.push({
+        superseded_reference_id: older.promoted_reference_id,
+        replacement_reference_id: latest.promoted_reference_id,
+        overlay: latest.overlay,
+        profile_id: latest.profile_id,
+        topic_id: latest.topic_id,
+        superseded_deliverable_id: older.deliverable_id,
+        replacement_deliverable_id: latest.deliverable_id,
+      });
+    }
+  }
+
+  return {
+    surface_kind: 'reference_replacement_report',
+    replacements,
+  };
+}
