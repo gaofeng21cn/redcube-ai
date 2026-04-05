@@ -77,6 +77,14 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'pack-runtime'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-pack-ppt'),
+    path.join(gatewayNodeModulesDir, 'pack-ppt'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-pack-xiaohongshu'),
+    path.join(gatewayNodeModulesDir, 'pack-xiaohongshu'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
     path.join(gatewayNodeModulesDir, 'runtime-family-ppt'),
   );
