@@ -640,7 +640,7 @@ function computeSeriesSurfaces(contract, deliverablePaths, exportBundle) {
   const overviewFile = path.join(deliverablePaths.reportsDir, '99_交付总览.md');
   writeText(cadenceFile, ['# 05_全系列发布节奏建议', '', '1. 先发认知破冰页', '2. 再发机制解释页', '3. 最后发动作清单页'].join('\n'));
   writeText(mappingFile, ['# 06_目录索引与路径映射', '', `- HTML: ${exportBundle.html_file}`, `- Caption: ${exportBundle.caption_file}`].join('\n'));
-  writeText(overviewFile, ['# 99_交付总览', '', `- 当前状态：${exportBundle.publish_state.current}`, `- PNG页数：${exportBundle.png_files.length}`].join('\n'));
+  writeText(overviewFile, ['# 99_交付总览', '', `- 当前状态：${exportBundle.delivery_state.current}`, `- PNG页数：${exportBundle.png_files.length}`].join('\n'));
   return {
     cadence_file: cadenceFile,
     path_mapping_file: mappingFile,
@@ -885,7 +885,7 @@ function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths) {
     png_files: pngFiles,
     caption_file: copy.publish_copy.caption_file,
     publish_manifest_file: manifestFile,
-    publish_state: {
+    delivery_state: {
       current: 'output_ready',
       next: 'published_pending_human',
     },

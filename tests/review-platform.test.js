@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   applyReviewMutation,
@@ -97,6 +97,9 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(state.state.ready_for_export, true);
   assert.equal(state.state.approval_state.status, 'pending_human');
   assert.equal(state.state.publish_state.current, 'approval_pending');
+  const publicationStateFile = path.join(workspaceRoot, 'topics', 'topic-a', 'publication-state.json');
+  assert.equal(existsSync(publicationStateFile), true);
+  assert.equal(JSON.parse(readFileSync(publicationStateFile, 'utf-8')).current, 'approval_pending');
 
   const mutation = await applyReviewMutation({
     workspaceRoot,
@@ -151,6 +154,7 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(published.state.current_status, 'published');
   assert.equal(published.state.publish_state.current, 'published');
   assert.equal(published.state.publish_state.approved_by, 'human');
+  assert.equal(JSON.parse(readFileSync(publicationStateFile, 'utf-8')).current, 'published');
 });
 
 test('approve_publish rejects xiaohongshu deliverable before publish_ready', async () => {
