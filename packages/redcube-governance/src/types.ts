@@ -84,3 +84,11 @@ export interface RuntimeWatchResponse {
   profile_id: string | null;
   required_export_bundle: Record<string, unknown> | null;
 }
+
+export interface MetricExtensionRegistration {
+  extension_id: string;
+  overlay_scope: string[];
+  profile_scope: string[];
+  metric_ids: string[];
+  status: 'declared' | 'inactive';
+}

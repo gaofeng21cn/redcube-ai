@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
 import { createRunRecord, resolveWorkspaceContract } from '@redcube/runtime-protocol';
 
@@ -25,15 +25,94 @@ function runFile(workspaceRoot, runId) {
   return path.join(runsDir, `${requireSafeSegment('runId', runId)}.json`);
 }
 
+function getRunsDir(workspaceRoot) {
+  const contract = resolveWorkspaceContract({ workspaceRoot });
+  const runsDir = path.join(contract.runtimeDir, 'runs');
+  mkdirSync(runsDir, { recursive: true });
+  return runsDir;
+}
+
+function readStoredRuns(workspaceRoot) {
+  const runsDir = getRunsDir(workspaceRoot);
+  return readdirSync(runsDir)
+    .filter((file) => file.endsWith('.json'))
+    .map((file) => {
+      try {
+        return JSON.parse(readFileSync(path.join(runsDir, file), 'utf-8'));
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function findPriorRuns({ workspaceRoot, route, scope, target, overlay }) {
+  return readStoredRuns(workspaceRoot)
+    .filter((run) => run?.route === route
+      && run?.scope === scope
+      && run?.target === target
+      && run?.overlay === overlay)
+    .sort((left, right) => {
+      const leftTime = Date.parse(left?.started_at || '') || 0;
+      const rightTime = Date.parse(right?.started_at || '') || 0;
+      return leftTime - rightTime;
+    });
+}
+
+function computeLatencyMs(startedAt, finishedAt) {
+  const startMs = Date.parse(String(startedAt || ''));
+  const finishMs = Date.parse(String(finishedAt || ''));
+  if (!Number.isFinite(startMs) || !Number.isFinite(finishMs)) {
+    return null;
+  }
+  return Math.max(finishMs - startMs, 0);
+}
+
+function buildRunTelemetry(run, executor, status, finishedAt = run.finished_at) {
+  return {
+    ...(run?.telemetry || {}),
+    run_id: run.run_id,
+    route: run.route,
+    scope: run.scope,
+    target: run.target,
+    overlay: run.overlay,
+    executor_kind: String(
+      executor?.adapter
+      || run?.telemetry?.executor_kind
+      || '',
+    ).trim() || null,
+    execution_surface: String(
+      executor?.execution_surface
+      || run?.telemetry?.execution_surface
+      || '',
+    ).trim() || null,
+    status,
+    started_at: run.started_at || null,
+    finished_at: finishedAt || null,
+    latency_ms: computeLatencyMs(run.started_at, finishedAt),
+    prompt_tokens: run?.telemetry?.prompt_tokens ?? null,
+    completion_tokens: run?.telemetry?.completion_tokens ?? null,
+    estimated_cost: run?.telemetry?.estimated_cost ?? null,
+  };
+}
+
 export function startRun({
   workspaceRoot,
   route,
   overlay,
   scope = 'deliverable',
   target,
+  baselineDeliverableId = '',
   executor,
 }) {
   const runId = `run-${randomUUID()}`;
+  const priorRuns = findPriorRuns({
+    workspaceRoot,
+    route,
+    scope,
+    target,
+    overlay,
+  });
   const run = {
     ...createRunRecord({
       runId,
@@ -41,11 +120,16 @@ export function startRun({
       scope,
       target,
       overlay,
+      rerunCount: priorRuns.length,
+      previousRunId: priorRuns.at(-1)?.run_id || null,
+      sourceStage: priorRuns.at(-1)?.current_stage || null,
+      baselineDeliverableId,
     }),
     started_at: new Date().toISOString(),
     current_stage: route,
     executor,
   };
+  run.telemetry = buildRunTelemetry(run, executor, 'running', null);
 
   writeFileSync(runFile(workspaceRoot, runId), JSON.stringify(run, null, 2), 'utf-8');
   return run;
@@ -67,8 +151,15 @@ export function completeRun({
     current_stage: currentStage,
     stage_results: stageResults,
     artifact_refs: artifactRefs,
+    error_kind: null,
     executor,
   };
+  completedRun.telemetry = buildRunTelemetry(
+    completedRun,
+    executor,
+    'completed',
+    completedRun.finished_at,
+  );
 
   writeFileSync(runFile(workspaceRoot, runId), JSON.stringify(completedRun, null, 2), 'utf-8');
   return completedRun;
@@ -79,6 +170,7 @@ export function failRun({
   runId,
   currentStage,
   error,
+  errorKind = 'execution_error',
   executor,
 }) {
   const run = loadRun({ workspaceRoot, runId });
@@ -87,11 +179,18 @@ export function failRun({
     status: 'failed',
     finished_at: new Date().toISOString(),
     current_stage: currentStage,
+    error_kind: errorKind,
     executor,
     error: {
       message: error instanceof Error ? error.message : String(error),
     },
   };
+  failedRun.telemetry = buildRunTelemetry(
+    failedRun,
+    executor,
+    'failed',
+    failedRun.finished_at,
+  );
 
   writeFileSync(runFile(workspaceRoot, runId), JSON.stringify(failedRun, null, 2), 'utf-8');
   return failedRun;

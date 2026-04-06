@@ -173,6 +173,14 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(stored.run.executor.execution_surface, 'codex_native_host_agent');
   assert.equal(stored.run.executor.execution_model.mainline_adapter, 'host_agent');
   assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(stored.run_telemetry.run_id, result.run.run_id);
+  assert.equal(stored.run_telemetry.route, 'storyline');
+  assert.equal(stored.run_telemetry.executor_kind, 'host_agent');
+  assert.equal(stored.error_taxonomy.error_kind, null);
+  assert.equal(stored.rerun_analytics.rerun_count, 0);
+  assert.equal(stored.cost_summary.executor_identity, 'codex_native_host_agent');
+  assert.equal(stored.quality_drift_summary.relative_quality_verdict, null);
+  assert.equal(stored.approval_throughput_summary.pending_review_count, 0);
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
   assert.equal(artifact.route, 'storyline');
   assert.equal(artifact.contract.profile_id, 'lecture_student');
@@ -333,6 +341,9 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   assert.equal(stored.run.status, 'failed');
   assert.equal(stored.run.executor.execution_surface, 'external_llm_adapter');
   assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(stored.run_telemetry.executor_kind, 'external_llm');
+  assert.equal(stored.error_taxonomy.error_kind, 'execution_error');
+  assert.equal(stored.approval_throughput_summary.blocked, true);
 });
 
 test('runDeliverableRoute rejects route not declared by hydrated deliverable contract', async () => {

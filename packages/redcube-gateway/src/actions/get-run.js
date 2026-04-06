@@ -1,4 +1,13 @@
 import { loadRun } from '@redcube/runtime';
+import {
+  buildApprovalThroughputSummary,
+  buildCostSummary,
+  buildErrorTaxonomySummary,
+  buildMetricExtensions,
+  buildQualityDriftSummary,
+  buildRerunAnalyticsSummary,
+  buildRunTelemetrySummary,
+} from './ops-eval-summary.js';
 
 export async function getRun({ workspaceRoot, runId }) {
   const run = loadRun({ workspaceRoot, runId });
@@ -15,5 +24,17 @@ export async function getRun({ workspaceRoot, runId }) {
       current_stage: run.current_stage,
     },
     run,
+    run_telemetry: buildRunTelemetrySummary(run),
+    error_taxonomy: buildErrorTaxonomySummary(run),
+    rerun_analytics: buildRerunAnalyticsSummary(run),
+    cost_summary: buildCostSummary(run),
+    quality_drift_summary: buildQualityDriftSummary(),
+    approval_throughput_summary: buildApprovalThroughputSummary({
+      status: run.status,
+      pendingReviews: run?.pending_reviews,
+    }),
+    metric_extensions: buildMetricExtensions({
+      overlay: run?.overlay,
+    }),
   };
 }

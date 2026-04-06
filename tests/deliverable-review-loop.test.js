@@ -294,6 +294,13 @@ test('runtimeWatch reports pending review loop state', async () => {
   assert.equal(report.status, 'review_pending');
   assert.deepEqual(report.pending_reviews, ['render_review']);
   assert.equal(report.resumable, true);
+  assert.equal(report.run_telemetry.run_id, 'run-1');
+  assert.equal(report.run_telemetry.status, 'blocked');
+  assert.equal(report.error_taxonomy.error_kind, null);
+  assert.equal(report.rerun_analytics.rerun_count, 0);
+  assert.equal(report.cost_summary.executor_identity, null);
+  assert.equal(report.quality_drift_summary.relative_quality_verdict, null);
+  assert.equal(report.approval_throughput_summary.pending_review_count, 1);
 });
 
 test('runtimeWatch exposes export bundle obligations from hydrated contract', async () => {
@@ -370,6 +377,43 @@ test('runtimeWatch exposes publication projection separately from canonical revi
   assert.equal(report.publication_projection.current, 'approval_pending');
   assert.equal(report.quality_summary?.relative_quality_verdict, null);
   assert.equal(report.quality_summary?.baseline_promotion_state, null);
+  assert.equal(report.approval_throughput_summary.publish_state, 'approval_pending');
+  assert.equal(report.approval_throughput_summary.pending_review_count, 0);
+});
+
+test('runtimeWatch exposes poster-specific metric extension surface separately from generic ops-eval base', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'poster_onepager',
+    profileId: 'knowledge_poster',
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    title: '甲状腺门诊知识海报',
+    goal: '为门诊患者生成单页知识海报',
+  });
+
+  const report = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    run: {
+      run_id: 'run-poster-1',
+      current_stage: 'visual_direction',
+      status: 'running',
+      pending_reviews: [],
+      resumable: true,
+    },
+  });
+
+  assert.equal(Array.isArray(report.metric_extensions), true);
+  assert.equal(report.metric_extensions.length, 1);
+  assert.equal(report.metric_extensions[0].extension_id, 'poster_specific_metrics');
+  assert.equal(report.metric_extensions[0].status, 'declared');
+  assert.equal(report.metric_extensions[0].metrics.some((item) => item.metric_id === 'far_view_readability'), true);
+  assert.equal(report.metric_extensions[0].metrics.some((item) => item.metric_id === 'print_export_safe'), true);
+  assert.equal(report.metric_extensions[0].metrics.every((item) => item.status === 'not_evaluated'), true);
 });
 
 test('@redcube/gateway manifest declares runtime dependency for review loop actions', () => {

@@ -1,3 +1,9 @@
+import type {
+  RerunLinkage,
+  RunTelemetryEnvelope,
+  RuntimeErrorKind,
+} from '@redcube/runtime-protocol';
+
 export interface RuntimeRunRecord {
   run_id: string;
   route: string;
@@ -10,6 +16,9 @@ export interface RuntimeRunRecord {
   current_stage: string | null;
   stage_results: unknown[];
   artifact_refs: string[];
+  telemetry: RunTelemetryEnvelope | null;
+  error_kind: RuntimeErrorKind | null;
+  rerun_linkage: RerunLinkage;
   error: { message: string } | null;
   executor?: Record<string, unknown>;
 }
@@ -303,6 +312,7 @@ export interface RuntimeStartRunRequest {
   overlay: string;
   scope?: string;
   target: string;
+  baselineDeliverableId?: string;
   executor: Record<string, unknown>;
 }
 
@@ -320,6 +330,7 @@ export interface RuntimeFailRunRequest {
   runId: string;
   currentStage: string;
   error: unknown;
+  errorKind?: RuntimeErrorKind;
   executor: Record<string, unknown>;
 }
 
