@@ -22,7 +22,7 @@ import {
 } from '@redcube/gateway';
 import * as z from 'zod/v4';
 
-const DEFAULT_GATEWAY_ACTIONS = {
+export const DEFAULT_GATEWAY_ACTIONS = {
   doctorWorkspace,
   listTopics,
   getOverlayCatalog,
@@ -39,7 +39,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   applyReviewMutation,
 };
 
-const TOOL_DEFINITIONS = [
+export const TOOL_DEFINITIONS = [
   {
     name: 'doctor',
     description: 'Inspect workspace contract and canonical directories.',
@@ -191,7 +191,7 @@ const TOOL_DEFINITIONS = [
   },
 ];
 
-function getGatewayActions(overrides = {}) {
+export function getGatewayActions(overrides = {}) {
   return {
     ...DEFAULT_GATEWAY_ACTIONS,
     ...overrides,
@@ -238,6 +238,10 @@ export function listGatewayTools() {
     name,
     description,
   }));
+}
+
+export function getToolDefinitions() {
+  return TOOL_DEFINITIONS;
 }
 
 export async function callGatewayTool(name, args, deps = {}) {

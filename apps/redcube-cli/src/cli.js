@@ -17,7 +17,24 @@ import {
   runDeliverableRoute,
 } from '@redcube/gateway';
 
-function parseArgs(argv) {
+const DEFAULT_GATEWAY_ACTIONS = {
+  auditDeliverable,
+  applyReviewMutation,
+  createDeliverable,
+  doctorWorkspace,
+  getDeliverable,
+  getOverlayCatalog,
+  getPublicationProjection,
+  getReviewState,
+  getRun: getGatewayRun,
+  intakeSource,
+  importLegacyProject,
+  listTopics: listTopicsGateway,
+  runtimeWatch,
+  runDeliverableRoute,
+};
+
+export function parseArgs(argv) {
   const options = {};
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -57,8 +74,8 @@ function fail(message, code = 1) {
   process.exit(code);
 }
 
-function resolveWorkspaceRoot(options) {
-  return options.workspaceRoot || options.rootDir || process.cwd();
+export function resolveWorkspaceRoot(options, cwd = process.cwd) {
+  return options.workspaceRoot || options.rootDir || cwd();
 }
 
 function buildCommonFlows(overlayCatalog) {
@@ -74,8 +91,19 @@ function buildCommonFlows(overlayCatalog) {
   );
 }
 
-async function buildHelp() {
-  const overlayCatalog = await getOverlayCatalog();
+export function getCliGatewayActions(overrides = {}) {
+  return {
+    ...DEFAULT_GATEWAY_ACTIONS,
+    ...overrides,
+  };
+}
+
+/**
+ * @param {Record<string, unknown>} [gatewayActions]
+ * @returns {Promise<Record<string, unknown>>}
+ */
+export async function buildHelp(gatewayActions = getCliGatewayActions()) {
+  const overlayCatalog = await gatewayActions.getOverlayCatalog();
 
   return {
     ok: true,
@@ -176,76 +204,70 @@ async function loadPrivateProfileModule() {
   return privateProfileModulePromise;
 }
 
-async function main() {
-  const [command, ...rest] = process.argv.slice(2);
+export async function executeCli(argv, deps = {}) {
+  const [command, ...rest] = argv;
   const subcommand = rest[0];
   const options = parseArgs(rest);
+  const gateway = getCliGatewayActions(deps.gateway || {});
+  const cwd = deps.cwd || process.cwd;
+  const loadPrivateProfile = deps.loadPrivateProfileModule || loadPrivateProfileModule;
 
   if (!command || command === 'help' || command === '--help') {
-    printJson(await buildHelp());
-    return;
+    return buildHelp(gateway);
   }
 
   if (command === 'workspace') {
     if (subcommand !== 'doctor') {
-      fail('workspace 命令仅支持 doctor');
+      throw new Error('workspace 命令仅支持 doctor');
     }
 
-    const result = await doctorWorkspace({
-      workspaceRoot: resolveWorkspaceRoot(options),
+    return gateway.doctorWorkspace({
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
     });
-    printJson(result);
-    return;
   }
 
   if (command === 'topics') {
     if (subcommand !== 'list') {
-      fail('topics 命令仅支持 list');
+      throw new Error('topics 命令仅支持 list');
     }
 
-    const result = await listTopicsGateway({
-      workspaceRoot: resolveWorkspaceRoot(options),
+    return gateway.listTopics({
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
     });
-    printJson(result);
-    return;
   }
 
   if (command === 'import') {
     if (subcommand !== 'legacy-project') {
-      fail('import 命令仅支持 legacy-project');
+      throw new Error('import 命令仅支持 legacy-project');
     }
 
-      const result = await importLegacyProject({
-        rootDir: options.rootDir || '',
-        workspaceRoot: resolveWorkspaceRoot(options),
-        project: options.project || '',
-        overlay: options.overlay || '',
-      });
-      printJson(result);
-      return;
+    return gateway.importLegacyProject({
+      rootDir: options.rootDir || '',
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
+      project: options.project || '',
+      overlay: options.overlay || '',
+    });
   }
 
   if (command === 'source') {
     if (subcommand !== 'intake') {
-      fail('source 命令仅支持 intake');
+      throw new Error('source 命令仅支持 intake');
     }
 
-    const result = await intakeSource({
-      workspaceRoot: resolveWorkspaceRoot(options),
+    return gateway.intakeSource({
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
       topicId: options.topicId || '',
       title: options.title || '',
       brief: options.brief || '',
       keywords: options.keywords || '',
       sourceFiles: options.sourceFiles || '',
     });
-    printJson(result);
-    return;
   }
 
   if (command === 'deliverable') {
     if (subcommand === 'create') {
-      const result = await createDeliverable({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.createDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         overlay: options.overlay || '',
         profileId: options.profileId || '',
         topicId: options.topicId || '',
@@ -253,89 +275,75 @@ async function main() {
         title: options.title || '',
         goal: options.goal || '',
       });
-      printJson(result);
-      return;
     }
 
     if (subcommand === 'get') {
-      const result = await getDeliverable({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.getDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
       });
-      printJson(result);
-      return;
     }
 
     if (subcommand === 'audit') {
-      const result = await auditDeliverable({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.auditDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         overlay: options.overlay || '',
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
         mode: options.mode || 'draft_new',
         baselineDeliverableId: options.baselineDeliverableId || '',
       });
-      printJson(result);
-      return;
     }
 
     if (subcommand === 'run') {
-      const result = await runDeliverableRoute({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.runDeliverableRoute({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         overlay: options.overlay || '',
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
         route: options.route || '',
         adapter: options.adapter || undefined,
       });
-      printJson(result);
-      return;
     }
 
-    fail('deliverable 命令仅支持 create|get|audit|run');
+    throw new Error('deliverable 命令仅支持 create|get|audit|run');
   }
 
 
   if (command === 'review') {
     if (subcommand === 'get') {
-      const result = await getReviewState({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.getReviewState({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
       });
-      printJson(result);
-      return;
     }
 
     if (subcommand === 'projection') {
-      const result = await getPublicationProjection({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.getPublicationProjection({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
       });
-      printJson(result);
-      return;
     }
 
     if (subcommand === 'watch') {
-      const runState = await getGatewayRun({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      const runState = await gateway.getRun({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         runId: options.runId || '',
       });
-      const result = await runtimeWatch({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.runtimeWatch({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
         run: runState.run || {},
       });
-      printJson(result);
-      return;
     }
 
     if (subcommand === 'mutate') {
       const issues = String(options.issues || '').trim();
-      const result = await applyReviewMutation({
-        workspaceRoot: resolveWorkspaceRoot(options),
+      return gateway.applyReviewMutation({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
         mutation: {
@@ -348,69 +356,69 @@ async function main() {
           notes: options.notes || '',
         },
       });
-      printJson(result);
-      return;
     }
 
-    fail('review 命令仅支持 get|projection|watch|mutate');
+    throw new Error('review 命令仅支持 get|projection|watch|mutate');
   }
 
   if (command === 'runs') {
     if (subcommand !== 'get') {
-      fail('runs 命令仅支持 get');
+      throw new Error('runs 命令仅支持 get');
     }
 
-    const result = await getGatewayRun({
-      workspaceRoot: resolveWorkspaceRoot(options),
+    return gateway.getRun({
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
       runId: options.runId || '',
     });
-    printJson(result);
-    return;
   }
 
   if (command === 'profile') {
     if (options.action === 'list') {
-      printJson(await getOverlayCatalog());
-      return;
+      return gateway.getOverlayCatalog();
     }
 
     if (options.action === 'bootstrap') {
-      const { bootstrapPrivateProfile } = await loadPrivateProfileModule();
-      const result = bootstrapPrivateProfile({
+      const { bootstrapPrivateProfile } = await loadPrivateProfile();
+      return bootstrapPrivateProfile({
         sourceSystemDir: options.sourceDir || '',
         configHome: options.configHome || '',
         force: options.force === true,
       });
-      printJson(result);
-      return;
     }
 
     if (options.action === 'export') {
-      const { exportPrivateProfile } = await loadPrivateProfileModule();
-      const result = exportPrivateProfile({
+      const { exportPrivateProfile } = await loadPrivateProfile();
+      return exportPrivateProfile({
         configHome: options.configHome || '',
         bundleFile: options.bundle || '',
         force: options.force === true,
       });
-      printJson(result);
-      return;
     }
 
     if (options.action === 'install') {
-      const { installPrivateProfile } = await loadPrivateProfileModule();
-      const result = installPrivateProfile({
+      const { installPrivateProfile } = await loadPrivateProfile();
+      return installPrivateProfile({
         configHome: options.configHome || '',
         bundleFile: options.bundle || '',
         force: options.force === true,
       });
-      printJson(result);
-      return;
     }
 
-    fail('profile 命令需要 --action <list|bootstrap|export|install>');
+    throw new Error('profile 命令需要 --action <list|bootstrap|export|install>');
   }
 
-  fail(`未知命令: ${command}`);
+  throw new Error(`未知命令: ${command}`);
+}
+
+export async function runCli(argv, deps = {}) {
+  const result = await executeCli(argv, deps);
+  const printer = deps.printJson || printJson;
+  printer(result);
+  return result;
+}
+
+export async function main(argv = process.argv.slice(2), deps = {}) {
+  return runCli(argv, deps);
 }
 
 main().catch((error) => {

@@ -33,3 +33,33 @@ test('P16 slice 2: pack-runtime exposes a TypeScript service entrypoint and type
   assert.match(types, /interface PackCompilerRegistryEntry/);
   assert.match(types, /interface ResolvedRenderCompilerModule/);
 });
+
+test('P16 slice 3: CLI exposes a TypeScript service entrypoint and typed command contracts', () => {
+  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/types.ts')), true);
+
+  const pkg = JSON.parse(readFileSync(path.resolve('apps/redcube-cli/package.json'), 'utf-8'));
+  const entry = readFileSync(path.resolve('apps/redcube-cli/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('apps/redcube-cli/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.match(entry, /runCli/);
+  assert.match(entry, /buildHelp/);
+  assert.match(types, /interface CliOptions/);
+  assert.match(types, /interface CliRunResult/);
+});
+
+test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed tool gateway contracts', () => {
+  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/types.ts')), true);
+
+  const pkg = JSON.parse(readFileSync(path.resolve('apps/redcube-mcp/package.json'), 'utf-8'));
+  const entry = readFileSync(path.resolve('apps/redcube-mcp/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('apps/redcube-mcp/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.match(entry, /callGatewayTool/);
+  assert.match(entry, /createMcpServer/);
+  assert.match(types, /interface GatewayToolDefinition/);
+  assert.match(types, /interface GatewayActionMap/);
+});
