@@ -2,6 +2,7 @@
 .env
 .cursor/
 .default_project
+RTK.md
 .superpowers/
 .worktrees/
 

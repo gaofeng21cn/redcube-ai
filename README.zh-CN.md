@@ -358,7 +358,6 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 - [许可证](LICENSE)
 
 更细的 `docs/*.md`、`docs/policies/*.md` 默认按仓库跟踪的内部中文文档维护。
-`CONTRIBUTING.md` 与 `SECURITY.md` 属于 GitHub 会识别的仓库元文档，仍由仓库维护，但不属于默认双语公开正文面。
 
 </details>
 

@@ -50,10 +50,8 @@ Any detailed document promoted into that surface must ship with synchronized Eng
 - [Runtime operating model policy](policies/runtime_operating_model.md) (Chinese only)
 - [Deliverable contract model policy](policies/deliverable_contract_model.md) (Chinese only)
 
-## Repo Metadata Docs
+## Repository History
 
-- [Contributing](../CONTRIBUTING.md) (Chinese only)
-- [Security policy](../SECURITY.md) (Chinese only)
 - [Changelog](../CHANGELOG.md)
 
 ## Documentation Boundary
@@ -61,5 +59,4 @@ Any detailed document promoted into that surface must ship with synchronized Eng
 - `README*` and `docs/README*`: the default bilingual public surface
 - detailed `docs/*.md`: repo-tracked operator/internal docs by default
 - `docs/policies/`: repo-tracked stable internal rules by default
-- `CONTRIBUTING.md` and `SECURITY.md`: GitHub-recognized repo metadata docs outside the default bilingual public surface
 - `docs/superpowers/`: local AI/Superpowers notes, plans, and drafts that should not enter Git-tracked public docs.

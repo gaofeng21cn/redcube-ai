@@ -52,10 +52,8 @@
 - [运行模型 Policy](policies/runtime_operating_model.md)
 - [交付合同模型 Policy](policies/deliverable_contract_model.md)
 
-## 仓库元文档
+## 仓库历史
 
-- [贡献指南](../CONTRIBUTING.md)
-- [安全策略](../SECURITY.md)
 - [更新日志](../CHANGELOG.md)
 
 ## 文档边界
@@ -63,5 +61,4 @@
 - `README*` 与 `docs/README*`：默认对外双语公开面
 - 详细 `docs/*.md`：默认仓库跟踪的内部操作文档
 - `docs/policies/`：默认仓库跟踪的稳定内部规则
-- `CONTRIBUTING.md` 与 `SECURITY.md`：GitHub 识别的仓库元文档，不属于默认双语公开正文面
 - `docs/superpowers/`：本地 AI / Superpowers 文档、开发计划、设计草案与过程痕迹，不进入 Git 跟踪面
