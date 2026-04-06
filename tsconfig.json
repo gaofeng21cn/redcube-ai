@@ -47,6 +47,9 @@
       "path": "./packages/redcube-runtime-family-xiaohongshu"
     },
     {
+      "path": "./packages/redcube-runtime-family-ppt"
+    },
+    {
       "path": "./tsconfig.tests.json"
     }
   ]

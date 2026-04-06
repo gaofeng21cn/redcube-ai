@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.js"
   },
   "dependencies": {
     "@redcube/governance": "0.1.0",
+    "@redcube/overlay-ppt": "0.1.0",
     "@redcube/pack-ppt": "0.1.0",
     "@redcube/pack-runtime": "0.1.0",
     "@redcube/reference-os": "0.1.0",
