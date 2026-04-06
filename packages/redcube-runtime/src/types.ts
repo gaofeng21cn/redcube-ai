@@ -174,7 +174,7 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
       status: 'active';
     };
     ppt_deck: {
-      status: 'active' | 'inactive';
+      status: 'active' | 'missing_visual_director_review_contract';
     };
   };
   creative_ownership_boundary: {
@@ -190,6 +190,20 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
       status: 'open' | 'cleared';
       findings: RuntimeCreativeOwnershipCloseoutAuditFinding[];
     };
+  };
+  team_lane_contract: {
+    tracking_model: 'unified_lifecycle';
+    lanes: Array<{
+      lane_id: string;
+      lifecycle_focus: string[];
+      write_scopes: string[];
+      verification_commands: string[];
+    }>;
+    overlapping_write_scopes: Array<{
+      scope: string;
+      lanes: string[];
+    }>;
+    final_convergence_order: string[];
   };
   team_gate: {
     shared_contract_frozen: boolean;

@@ -97,33 +97,112 @@ export const P19_REVIEW_OVERLAY_CONTRACT = Object.freeze({
 });
 
 export const P19_TEAM_GATE_CONTRACT = Object.freeze({
+  tracking_model: P19_UNIFIED_LIFECYCLE_CONTRACT.tracking_model,
   required_gates: [
     'shared_contract_frozen',
     'shared_lifecycle_contract_frozen',
     'research_ownership_frozen',
     'ppt_visual_director_review_contract_frozen',
     'lifecycle_alignment_red_tests_written',
-    'lane_write_scopes_aligned_to_shared_lifecycle',
+    'lane_write_scopes_by_shared_lifecycle',
     'independent_verification_defined',
     'final_convergence_order_defined',
+  ],
+  frozen_contracts: {
+    shared_contract: [
+      'packages/redcube-runtime/src/executors.js',
+      'packages/redcube-runtime/src/deliverable-routes.js',
+      'packages/redcube-runtime/src/creative-ownership.js',
+    ],
+    shared_lifecycle_contract: [
+      'packages/redcube-runtime/src/creative-ownership.js',
+      'tests/p19-creative-ownership-freeze.test.js',
+      'tests/creative-ownership-recovery-audit.test.js',
+    ],
+    research_ownership: [
+      'packages/redcube-runtime/src/creative-ownership.js',
+      '.omx/plans/spec-redcube-unified-stage-lifecycle-and-family-alignment.md',
+      '.omx/plans/spec-redcube-agent-first-execution-and-creative-ownership-recovery.md',
+    ],
+    ppt_visual_director_review_contract: [
+      'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
+      'packages/redcube-overlay-ppt/src/profiles.js',
+      'tests/ppt-creative-ownership.test.js',
+    ],
+  },
+  lifecycle_alignment_red_tests: [
+    'tests/p19-creative-ownership-freeze.test.js',
+    'tests/creative-ownership-recovery-audit.test.js',
+    'tests/xiaohongshu-creative-ownership.test.js',
+    'tests/ppt-creative-ownership.test.js',
   ],
   candidate_lanes: [
     {
       lane_id: 'shared_lifecycle_review_overlay_convergence',
       lifecycle_focus: ['source_readiness', 'review_overlay'],
+      write_scopes: [
+        'packages/redcube-runtime/src/creative-ownership.js',
+        'scripts/p19-creative-ownership-audit-lib.mjs',
+        'tests/p19-creative-ownership-freeze.test.js',
+        'tests/creative-ownership-recovery-audit.test.js',
+      ],
+      verification_commands: [
+        'node --test tests/p19-creative-ownership-freeze.test.js',
+        'node --test tests/creative-ownership-recovery-audit.test.js',
+      ],
     },
     {
       lane_id: 'xiaohongshu_creative_ownership_recovery',
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'delivery_packaging'],
+      write_scopes: [
+        'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
+        'packages/redcube-pack-xiaohongshu/src/planning.js',
+        'packages/redcube-pack-xiaohongshu/src/render-compiler.js',
+        'prompts/xiaohongshu/**',
+        'tests/xiaohongshu-creative-ownership.test.js',
+        'tests/xiaohongshu-deliverable-e2e.test.js',
+      ],
+      verification_commands: [
+        'node --test tests/xiaohongshu-creative-ownership.test.js',
+        'node --test tests/xiaohongshu-deliverable-e2e.test.js',
+      ],
     },
     {
       lane_id: 'ppt_deck_creative_ownership_recovery',
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'review_overlay'],
+      write_scopes: [
+        'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
+        'packages/redcube-pack-ppt/src/index.js',
+        'packages/redcube-pack-ppt/src/render-compiler.js',
+        'prompts/ppt_deck/**',
+        'tests/ppt-creative-ownership.test.js',
+        'tests/ppt-deliverable-e2e.test.js',
+      ],
+      verification_commands: [
+        'node --test tests/ppt-creative-ownership.test.js',
+        'node --test tests/ppt-deliverable-e2e.test.js',
+      ],
     },
     {
       lane_id: 'red_tests_regression_audit_closeout',
       lifecycle_focus: ['regression', 'audit', 'reports'],
+      write_scopes: [
+        'tests/review-platform.test.js',
+        'tests/reference-regression.test.js',
+        '.omx/reports/redcube-runtime-program/**',
+      ],
+      verification_commands: [
+        'node --test tests/review-platform.test.js',
+        'node --test tests/reference-regression.test.js',
+        'npm test -- --test-reporter=dot',
+      ],
     },
+  ],
+  final_convergence_order: [
+    'shared_lifecycle_review_overlay_convergence',
+    'xiaohongshu_creative_ownership_recovery',
+    'ppt_deck_creative_ownership_recovery',
+    'red_tests_regression_audit_closeout',
   ],
 });
 

@@ -6,14 +6,15 @@
 - 不允许只给“标题 + 要点”结构骨架
 - 先给认知冲突，再给解释路径，再给收藏理由
 
-## runtime_seed
+## runtime_artifact
 ```json
 {
   "storyline": {
-    "audience_judgement": "读者不是想学完整理论，而是想先判断：这件事到底该不该立刻调整做法",
-    "tension": "旧习惯看起来省事，但会把判断顺序做反，最后把时间浪费在错误动作上",
-    "why_now": "现在工具更多、信息更杂，越需要先把判断顺序讲清，否则越容易被表面答案带偏",
-    "memory_hook": "先别急着上工具，先把顺序做对",
+    "mode": "{{mode}}",
+    "audience_judgement": "{{audience_judgement}}",
+    "tension": "{{tension}}",
+    "why_now": "{{why_now}}",
+    "memory_hook": "{{memory_hook}}",
     "hook": "先打破旧认知，再给动作收益",
     "narrative_progression": [
       "先用反直觉钩子把读者拉停",

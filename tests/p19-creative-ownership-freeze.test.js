@@ -7,6 +7,7 @@ import {
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
+  P19_TEAM_GATE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
 } from '../packages/redcube-runtime/src/index.js';
 import { buildCreativeOwnershipAudit } from '../scripts/p19-creative-ownership-audit-lib.mjs';
@@ -24,6 +25,7 @@ function writeStatus() {
     shared_execution_contract: audit.shared_execution_contract,
     unified_lifecycle: audit.unified_lifecycle,
     residue_by_family: audit.families,
+    team_lane_contract: closeout.team_lane_contract,
     team_gate: {
       satisfied: closeout.team_gate.missing_gates.length === 0,
       missing_gates: closeout.team_gate.missing_gates,
@@ -89,6 +91,73 @@ test('P19.A freezes the creative ownership forbidden boundary for both families'
   ]);
 });
 
+test('P19.A freezes lane write scopes by unified lifecycle before any short-lived team opens', () => {
+  assert.deepEqual(P19_TEAM_GATE_CONTRACT.required_gates, [
+    'shared_contract_frozen',
+    'shared_lifecycle_contract_frozen',
+    'research_ownership_frozen',
+    'ppt_visual_director_review_contract_frozen',
+    'lifecycle_alignment_red_tests_written',
+    'lane_write_scopes_by_shared_lifecycle',
+    'independent_verification_defined',
+    'final_convergence_order_defined',
+  ]);
+  assert.deepEqual(
+    P19_TEAM_GATE_CONTRACT.candidate_lanes.map((lane) => lane.lane_id),
+    [
+      'shared_lifecycle_review_overlay_convergence',
+      'xiaohongshu_creative_ownership_recovery',
+      'ppt_deck_creative_ownership_recovery',
+      'red_tests_regression_audit_closeout',
+    ],
+  );
+  assert.deepEqual(
+    P19_TEAM_GATE_CONTRACT.candidate_lanes[0].write_scopes,
+    [
+      'packages/redcube-runtime/src/creative-ownership.js',
+      'scripts/p19-creative-ownership-audit-lib.mjs',
+      'tests/p19-creative-ownership-freeze.test.js',
+      'tests/creative-ownership-recovery-audit.test.js',
+    ],
+  );
+  assert.deepEqual(
+    P19_TEAM_GATE_CONTRACT.candidate_lanes[1].write_scopes,
+    [
+      'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
+      'packages/redcube-pack-xiaohongshu/src/planning.js',
+      'packages/redcube-pack-xiaohongshu/src/render-compiler.js',
+      'prompts/xiaohongshu/**',
+      'tests/xiaohongshu-creative-ownership.test.js',
+      'tests/xiaohongshu-deliverable-e2e.test.js',
+    ],
+  );
+  assert.deepEqual(
+    P19_TEAM_GATE_CONTRACT.candidate_lanes[2].write_scopes,
+    [
+      'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
+      'packages/redcube-pack-ppt/src/index.js',
+      'packages/redcube-pack-ppt/src/render-compiler.js',
+      'prompts/ppt_deck/**',
+      'tests/ppt-creative-ownership.test.js',
+      'tests/ppt-deliverable-e2e.test.js',
+    ],
+  );
+  assert.deepEqual(
+    P19_TEAM_GATE_CONTRACT.candidate_lanes[3].write_scopes,
+    [
+      'tests/review-platform.test.js',
+      'tests/reference-regression.test.js',
+      '.omx/reports/redcube-runtime-program/**',
+    ],
+  );
+  assert.deepEqual(P19_TEAM_GATE_CONTRACT.final_convergence_order, [
+    'shared_lifecycle_review_overlay_convergence',
+    'xiaohongshu_creative_ownership_recovery',
+    'ppt_deck_creative_ownership_recovery',
+    'red_tests_regression_audit_closeout',
+  ]);
+});
+
 test('P19.A machine-readable audit records lifecycle residue for both families', () => {
   const audit = buildCreativeOwnershipResidueAudit();
 
@@ -104,7 +173,7 @@ test('P19.A machine-readable audit records lifecycle residue for both families',
   assert.equal(typeof audit.families.ppt_deck.lifecycle_residue.visual_authorship.status, 'string');
   assert.deepEqual(
     audit.families.xiaohongshu.violations.filter((item) => item.status === 'present').map((item) => item.violation_id),
-    ['xhs.storyline.prompt_seed_authorship', 'xhs.render_html.template_authorship', 'xhs.publish_copy.seed_authorship'],
+    ['xhs.render_html.template_authorship'],
   );
   assert.deepEqual(
     audit.families.ppt_deck.violations.filter((item) => item.status === 'present').map((item) => item.violation_id),
@@ -123,8 +192,11 @@ test('P19.A status report is synchronized with lifecycle freeze, residue, and te
   assert.equal(status.macro_lifecycle_stage, 'shared_lifecycle_freeze');
   assert.deepEqual(status.shared_execution_contract, audit.shared_execution_contract);
   assert.deepEqual(status.unified_lifecycle, audit.unified_lifecycle);
+  assert.equal(status.team_lane_contract.tracking_model, 'unified_lifecycle');
+  assert.equal(status.team_lane_contract.lanes.length, 4);
   assert.equal(status.residue_by_family.xiaohongshu.status, audit.families.xiaohongshu.status);
   assert.equal(status.residue_by_family.ppt_deck.status, audit.families.ppt_deck.status);
-  assert.equal(status.team_gate.satisfied, false);
+  assert.equal(status.team_gate.satisfied, true);
   assert.deepEqual(status.team_gate.missing_gates, closeout.team_gate.missing_gates);
+  assert.deepEqual(status.team_gate.missing_gates, []);
 });

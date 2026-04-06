@@ -5,6 +5,7 @@ import {
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
+  P19_TEAM_GATE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
 } from '../packages/redcube-runtime/src/index.js';
 
@@ -22,19 +23,63 @@ function mapFindings(familyAudit) {
     }));
 }
 
-function buildTeamGate() {
+function hasEntries(value) {
+  return Array.isArray(value) && value.length > 0;
+}
+
+function collectLaneWriteScopeOverlaps(lanes) {
+  const seen = new Map();
+  const overlaps = [];
+
+  for (const lane of lanes) {
+    for (const scope of lane.write_scopes || []) {
+      if (seen.has(scope)) {
+        overlaps.push({
+          scope,
+          lanes: [seen.get(scope), lane.lane_id],
+        });
+        continue;
+      }
+      seen.set(scope, lane.lane_id);
+    }
+  }
+
+  return overlaps;
+}
+
+function buildTeamLaneContract() {
+  const lanes = P19_TEAM_GATE_CONTRACT.candidate_lanes;
   return {
-    shared_contract_frozen: true,
-    shared_lifecycle_contract_frozen: true,
-    research_ownership_frozen: true,
-    lifecycle_alignment_red_tests_written: true,
-    ppt_visual_director_review_contract_frozen: true,
-    lane_write_scopes_by_shared_lifecycle: false,
-    independent_verification_defined: true,
-    final_convergence_order_defined: true,
-    missing_gates: [
-      'lane_write_scopes_by_shared_lifecycle',
-    ],
+    tracking_model: P19_TEAM_GATE_CONTRACT.tracking_model,
+    lanes,
+    overlapping_write_scopes: collectLaneWriteScopeOverlaps(lanes),
+    final_convergence_order: P19_TEAM_GATE_CONTRACT.final_convergence_order,
+  };
+}
+
+function buildTeamGate() {
+  const laneContract = buildTeamLaneContract();
+  const laneIds = new Set(P19_TEAM_GATE_CONTRACT.candidate_lanes.map((lane) => lane.lane_id));
+  const convergenceOrder = P19_TEAM_GATE_CONTRACT.final_convergence_order || [];
+
+  const gate = {
+    shared_contract_frozen: hasEntries(P19_TEAM_GATE_CONTRACT.frozen_contracts?.shared_contract),
+    shared_lifecycle_contract_frozen: hasEntries(P19_TEAM_GATE_CONTRACT.frozen_contracts?.shared_lifecycle_contract),
+    research_ownership_frozen: hasEntries(P19_TEAM_GATE_CONTRACT.frozen_contracts?.research_ownership),
+    lifecycle_alignment_red_tests_written: hasEntries(P19_TEAM_GATE_CONTRACT.lifecycle_alignment_red_tests),
+    ppt_visual_director_review_contract_frozen: hasEntries(P19_TEAM_GATE_CONTRACT.frozen_contracts?.ppt_visual_director_review_contract),
+    lane_write_scopes_by_shared_lifecycle: hasEntries(P19_TEAM_GATE_CONTRACT.candidate_lanes)
+      && P19_TEAM_GATE_CONTRACT.candidate_lanes.every((lane) => hasEntries(lane.lifecycle_focus) && hasEntries(lane.write_scopes))
+      && laneContract.overlapping_write_scopes.length === 0,
+    independent_verification_defined: hasEntries(P19_TEAM_GATE_CONTRACT.candidate_lanes)
+      && P19_TEAM_GATE_CONTRACT.candidate_lanes.every((lane) => hasEntries(lane.verification_commands)),
+    final_convergence_order_defined: convergenceOrder.length === laneIds.size
+      && convergenceOrder.every((laneId) => laneIds.has(laneId)),
+  };
+
+  return {
+    ...gate,
+    missing_gates: P19_TEAM_GATE_CONTRACT.required_gates.filter((key) => gate[key] !== true),
   };
 }
 
@@ -88,6 +133,7 @@ export function buildCreativeOwnershipAudit() {
         findings: mapFindings(residueAudit.families.ppt_deck),
       },
     },
+    team_lane_contract: buildTeamLaneContract(),
     team_gate: buildTeamGate(),
   };
 }

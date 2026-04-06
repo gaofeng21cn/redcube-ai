@@ -21,6 +21,7 @@ test('xiaohongshu host-agent mainline owns protected creative outputs instead of
   const planning = read('packages/redcube-pack-xiaohongshu/src/planning.js');
   const renderCompiler = read('packages/redcube-pack-xiaohongshu/src/render-compiler.js');
   const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const storylinePrompt = read('prompts/xiaohongshu/storyline.md');
   const singleNotePlanPrompt = read('prompts/xiaohongshu/single_note_plan.md');
   const publishCopyPrompt = read('prompts/xiaohongshu/publish_copy.md');
   const directorReviewPrompt = read('prompts/xiaohongshu/director_review.md');
@@ -29,11 +30,17 @@ test('xiaohongshu host-agent mainline owns protected creative outputs instead of
   assert.equal(planning.includes('export function inferXhsVisualPresentation('), false);
   assert.equal(renderCompiler.includes('function pickRecipeId('), false);
   assert.equal(renderCompiler.includes('function renderSlideMarkup('), false);
+  assert.equal(runtime.includes("const seed = promptSeed(contract, 'storyline');"), false);
+  assert.equal(runtime.includes("audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement)"), false);
+  assert.equal(runtime.includes("const seed = promptSeed(contract, 'publish_copy', {"), false);
+  assert.equal(runtime.includes('const body = safeText(publishSeed.body);'), false);
   assert.equal(runtime.includes('const body = `${titles[0] || contract.title}。先别急着上工具'), false);
   assert.equal(runtime.includes('const distinctLayoutRatio = Number((layoutFamilies.length / Math.max(slides.length, 1)).toFixed(2));'), false);
   assert.equal(runtime.includes('const directorIntentLanded = layoutFamilies.length >='), false);
+  assert.match(storylinePrompt, /## runtime_artifact/);
   assert.match(singleNotePlanPrompt, /"page_core_content": \[/);
   assert.match(singleNotePlanPrompt, /"visual_presentation": \{/);
+  assert.match(publishCopyPrompt, /## runtime_artifact/);
   assert.match(publishCopyPrompt, /"body": "/);
   assert.match(directorReviewPrompt, /"visual_director_review": \{/);
 });
@@ -68,6 +75,7 @@ test('xiaohongshu route artifacts record host-agent creative ownership for story
   assert.equal(storyline.lifecycle_stage, 'story_architecture');
   assert.equal(storyline.storyline.creative_sources.narrative_arc.owner, 'host_agent');
   assert.equal(storyline.storyline.creative_sources.narrative_arc.primary_surface, 'codex_native_host_agent');
+  assert.equal(storyline.storyline.creative_sources.narrative_arc.materialized_from, 'prompt_pack_artifact');
 
   const plan = readJson(results[2].artifactFile);
   assert.equal(
@@ -115,4 +123,5 @@ test('xiaohongshu route artifacts record host-agent creative ownership for story
   assert.equal(copy.lifecycle_stage, 'delivery_packaging');
   assert.equal(copy.publish_copy.creative_sources.body.owner, 'host_agent');
   assert.equal(copy.publish_copy.creative_sources.first_comment.primary_surface, 'codex_native_host_agent');
+  assert.equal(copy.publish_copy.creative_sources.body.materialized_from, 'prompt_pack_artifact');
 });

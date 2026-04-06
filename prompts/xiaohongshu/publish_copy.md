@@ -7,7 +7,7 @@
 - 做 platform copy gate：platform_copy_complete / cta_clear
 - 文案主表达必须由 host-agent / director-first surface 持有，代码只负责 gate 与 persistence
 
-## runtime_seed
+## runtime_artifact
 ```json
 {
   "publish_copy": {

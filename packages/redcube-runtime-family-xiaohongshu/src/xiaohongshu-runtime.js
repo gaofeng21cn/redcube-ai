@@ -170,13 +170,21 @@ function renderSeedValue(value, vars) {
   return value;
 }
 
-function promptSeed(contract, route, vars = {}) {
+function promptPackJsonSection(contract, route, section, vars = {}) {
   const absolutePath = path.join(REPO_ROOT, promptRoute(contract, route));
   if (!existsSync(absolutePath)) return null;
   const raw = readFileSync(absolutePath, 'utf-8');
-  const match = raw.match(/## runtime_seed\s*```json\s*([\s\S]*?)\s*```/);
+  const match = raw.match(new RegExp(`## ${section}\\s*\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\``));
   if (!match) return null;
   return renderSeedValue(JSON.parse(match[1]), vars);
+}
+
+function promptArtifact(contract, route, vars = {}) {
+  return promptPackJsonSection(contract, route, 'runtime_artifact', vars);
+}
+
+function promptSeed(contract, route, vars = {}) {
+  return promptPackJsonSection(contract, route, 'runtime_seed', vars);
 }
 
 function isSeries(contract) {
@@ -374,20 +382,30 @@ function buildResearch(contract) {
 
 function buildStoryline(contract, deliverablePaths) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
-  const seed = promptSeed(contract, 'storyline');
+  const authoredArtifact = promptArtifact(contract, 'storyline', {
+    mode: safeText(research?.research?.mode, 'single'),
+    audience_judgement: safeText(research?.research?.audience_judgement),
+    tension: safeText(research?.research?.tension),
+    why_now: safeText(research?.research?.why_now),
+    memory_hook: safeText(research?.research?.memory_hook),
+  });
+  const authoredStoryline = authoredArtifact?.storyline;
+  if (!authoredStoryline) {
+    throw new Error(`Missing xiaohongshu storyline runtime_artifact for profile: ${contract.profile_id}`);
+  }
   return {
     ...attachCommon('storyline', contract),
     creative_execution: creativeExecution('storyline'),
     storyline: {
-      mode: research?.research?.mode || 'single',
-      audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement),
-      tension: safeText(seed?.storyline?.tension, research?.research?.tension),
-      why_now: safeText(seed?.storyline?.why_now, research?.research?.why_now),
-      memory_hook: safeText(seed?.storyline?.memory_hook, research?.research?.memory_hook),
-      hook: safeText(seed?.storyline?.hook),
-      narrative_progression: safeArray(seed?.storyline?.narrative_progression),
-      journey: safeArray(seed?.storyline?.journey),
-      resolution: safeText(seed?.storyline?.resolution),
+      mode: safeText(authoredStoryline.mode, research?.research?.mode || 'single'),
+      audience_judgement: safeText(authoredStoryline.audience_judgement),
+      tension: safeText(authoredStoryline.tension),
+      why_now: safeText(authoredStoryline.why_now),
+      memory_hook: safeText(authoredStoryline.memory_hook),
+      hook: safeText(authoredStoryline.hook),
+      narrative_progression: safeArray(authoredStoryline.narrative_progression),
+      journey: safeArray(authoredStoryline.journey),
+      resolution: safeText(authoredStoryline.resolution),
       series_needed: (research?.research?.mode || 'single') === 'series',
       source_truth_material_ids: safeArray(research?.research?.source_truth_material_ids),
       source_truth_confidence: safeText(research?.research?.confidence),
@@ -396,11 +414,13 @@ function buildStoryline(contract, deliverablePaths) {
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'narrative_arc',
+          materializedFrom: 'prompt_pack_artifact',
         }),
         memory_hook: creativeSourceStamp({
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'memory_hook',
+          materializedFrom: 'prompt_pack_artifact',
         }),
       },
     },
@@ -678,7 +698,7 @@ function buildPublishCopy(contract, deliverablePaths) {
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const titles = safeArray(plan?.single_note_plan?.title_options).slice(0, 3);
-  const seed = promptSeed(contract, 'publish_copy', {
+  const authoredArtifact = promptArtifact(contract, 'publish_copy', {
     title: contract.title,
     title_1: titles[0] || contract.title,
     title_2: titles[1] || titles[0] || contract.title,
@@ -687,12 +707,15 @@ function buildPublishCopy(contract, deliverablePaths) {
     audience_judgement: safeText(storyline?.storyline?.audience_judgement),
     cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
   });
-  const publishSeed = seed?.publish_copy || {};
+  const publishArtifact = authoredArtifact?.publish_copy;
+  if (!publishArtifact) {
+    throw new Error(`Missing xiaohongshu publish_copy runtime_artifact for profile: ${contract.profile_id}`);
+  }
   const hydratedTitles = titles;
-  const body = safeText(publishSeed.body);
-  const interactionQuestions = safeArray(publishSeed.interaction_questions).filter(Boolean);
-  const hashtags = safeArray(publishSeed.hashtags).filter(Boolean);
-  const firstComment = safeText(publishSeed.first_comment);
+  const body = safeText(publishArtifact.body);
+  const interactionQuestions = safeArray(publishArtifact.interaction_questions).filter(Boolean);
+  const hashtags = safeArray(publishArtifact.hashtags).filter(Boolean);
+  const firstComment = safeText(publishArtifact.first_comment);
   const quality_gate = {
     title_count: hydratedTitles.length,
     body_char_count: body.length,
@@ -718,7 +741,7 @@ function buildPublishCopy(contract, deliverablePaths) {
       hashtags,
       publish_suggestion: {
         cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
-        recommended_time: safeText(publishSeed.publish_suggestion?.recommended_time, '19:00-21:00'),
+        recommended_time: safeText(publishArtifact.publish_suggestion?.recommended_time),
       },
       quality_gate,
       caption_file: captionFile,
@@ -727,16 +750,19 @@ function buildPublishCopy(contract, deliverablePaths) {
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'titles',
+          materializedFrom: 'prompt_pack_artifact',
         }),
         body: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'body',
+          materializedFrom: 'prompt_pack_artifact',
         }),
         first_comment: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'first_comment',
+          materializedFrom: 'prompt_pack_artifact',
         }),
       },
       creative_authorship: {
@@ -744,16 +770,19 @@ function buildPublishCopy(contract, deliverablePaths) {
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'titles',
+          materializedFrom: 'prompt_pack_artifact',
         }),
         body: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'body',
+          materializedFrom: 'prompt_pack_artifact',
         }),
         first_comment: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'first_comment',
+          materializedFrom: 'prompt_pack_artifact',
         }),
       },
     },

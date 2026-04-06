@@ -83,7 +83,10 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
   assert.equal(audit.review_overlay.ppt_deck.status, 'active');
 
   assert.equal(audit.residue.xiaohongshu.status, 'open');
-  assert.equal(audit.residue.xiaohongshu.findings.length >= 3, true);
+  assert.deepEqual(
+    audit.residue.xiaohongshu.findings.map((finding) => finding.protected_output),
+    ['final_html_markup'],
+  );
   assert.equal(audit.residue.ppt_deck.status, 'open');
   assert.equal(audit.residue.ppt_deck.findings.length >= 3, true);
 
@@ -92,9 +95,23 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
   assert.equal(audit.team_gate.research_ownership_frozen, true);
   assert.equal(audit.team_gate.lifecycle_alignment_red_tests_written, true);
   assert.equal(audit.team_gate.ppt_visual_director_review_contract_frozen, true);
-  assert.equal(audit.team_gate.lane_write_scopes_by_shared_lifecycle, false);
-  assert.deepEqual(audit.team_gate.missing_gates, [
-    'lane_write_scopes_by_shared_lifecycle',
+  assert.equal(audit.team_gate.lane_write_scopes_by_shared_lifecycle, true);
+  assert.deepEqual(audit.team_gate.missing_gates, []);
+  assert.equal(audit.team_lane_contract.tracking_model, 'unified_lifecycle');
+  assert.deepEqual(
+    audit.team_lane_contract.lanes.map((lane) => lane.lane_id),
+    [
+      'shared_lifecycle_review_overlay_convergence',
+      'xiaohongshu_creative_ownership_recovery',
+      'ppt_deck_creative_ownership_recovery',
+      'red_tests_regression_audit_closeout',
+    ],
+  );
+  assert.deepEqual(audit.team_lane_contract.final_convergence_order, [
+    'shared_lifecycle_review_overlay_convergence',
+    'xiaohongshu_creative_ownership_recovery',
+    'ppt_deck_creative_ownership_recovery',
+    'red_tests_regression_audit_closeout',
   ]);
 });
 
