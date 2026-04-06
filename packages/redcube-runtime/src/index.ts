@@ -25,9 +25,14 @@ import {
 
 import { appendEvent as appendEventJs, readEvents as readEventsJs } from './event-log.js';
 import {
+  P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT as P19CreativeOwnershipProgramCloseoutJs,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT as P19CreativeOwnershipExecutionContractJs,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT as P19CreativeOwnershipLifecycleContractJs,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES as P19CreativeOwnershipForbiddenBoundariesJs,
+  P19_RESEARCH_OWNERSHIP_CONTRACT as P19ResearchOwnershipContractJs,
+  P19_REVIEW_OVERLAY_CONTRACT as P19ReviewOverlayContractJs,
+  P19_TEAM_GATE_CONTRACT as P19TeamGateContractJs,
+  P19_UNIFIED_LIFECYCLE_CONTRACT as P19UnifiedLifecycleContractJs,
   buildCreativeOwnershipResidueAudit as buildCreativeOwnershipResidueAuditJs,
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
@@ -44,9 +49,14 @@ import type {
   RuntimeRunRouteRequest,
   RuntimeRunRouteResponse,
   RuntimeCreativeOwnershipAudit,
+  RuntimeCreativeOwnershipCloseoutAudit,
   RuntimeCreativeOwnershipExecutionContract,
   RuntimeCreativeOwnershipLifecycleContract,
   RuntimeCreativeOwnershipForbiddenBoundaries,
+  RuntimeCreativeOwnershipProgramCloseout,
+  RuntimeCreativeOwnershipProgramStatus,
+  RuntimeCreativeOwnershipResearchOwnershipContract,
+  RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
   RuntimeStartRunRequest,
@@ -82,12 +92,21 @@ export function readEvents(workspaceRoot: string, runId: string): unknown[] {
   return readEventsJs(workspaceRoot, runId) as unknown[];
 }
 
+export const P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT
+  = P19CreativeOwnershipProgramCloseoutJs as RuntimeCreativeOwnershipProgramCloseout;
 export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT
   = P19CreativeOwnershipExecutionContractJs as RuntimeCreativeOwnershipExecutionContract;
 export const P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT
   = P19CreativeOwnershipLifecycleContractJs as RuntimeCreativeOwnershipLifecycleContract;
 export const P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES
   = P19CreativeOwnershipForbiddenBoundariesJs as RuntimeCreativeOwnershipForbiddenBoundaries;
+export const P19_RESEARCH_OWNERSHIP_CONTRACT
+  = P19ResearchOwnershipContractJs as RuntimeCreativeOwnershipResearchOwnershipContract;
+export const P19_REVIEW_OVERLAY_CONTRACT
+  = P19ReviewOverlayContractJs as RuntimeCreativeOwnershipReviewOverlayContract;
+export const P19_TEAM_GATE_CONTRACT = P19TeamGateContractJs;
+export const P19_UNIFIED_LIFECYCLE_CONTRACT
+  = P19UnifiedLifecycleContractJs as RuntimeCreativeOwnershipLifecycleContract;
 
 export function buildCreativeOwnershipResidueAudit(): RuntimeCreativeOwnershipAudit {
   return buildCreativeOwnershipResidueAuditJs() as RuntimeCreativeOwnershipAudit;
@@ -129,9 +148,14 @@ export type {
   RuntimeRunRouteRequest,
   RuntimeRunRouteResponse,
   RuntimeCreativeOwnershipAudit,
+  RuntimeCreativeOwnershipCloseoutAudit,
   RuntimeCreativeOwnershipExecutionContract,
   RuntimeCreativeOwnershipLifecycleContract,
   RuntimeCreativeOwnershipForbiddenBoundaries,
+  RuntimeCreativeOwnershipProgramCloseout,
+  RuntimeCreativeOwnershipProgramStatus,
+  RuntimeCreativeOwnershipResearchOwnershipContract,
+  RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
   RuntimeStartRunRequest,

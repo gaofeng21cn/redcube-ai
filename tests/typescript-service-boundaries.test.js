@@ -14,9 +14,12 @@ test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed bou
   assert.equal(pkg.types, './src/index.ts');
   assert.match(entry, /runDeliverableRoute/);
   assert.match(entry, /resolveExecutorAdapter/);
+  assert.match(entry, /P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT/);
+  assert.match(entry, /P19_REVIEW_OVERLAY_CONTRACT/);
   assert.match(entry, /startRun/);
   assert.match(types, /interface RuntimeRunRecord/);
   assert.match(types, /interface RuntimeRunRouteResponse/);
+  assert.match(types, /interface RuntimeCreativeOwnershipProgramCloseout/);
 });
 
 test('P16 slice 2: pack-runtime exposes a TypeScript service entrypoint and typed registry contracts', () => {

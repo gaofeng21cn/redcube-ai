@@ -161,6 +161,20 @@ export interface RuntimeCreativeOwnershipCloseoutAuditFinding {
   summary: string;
 }
 
+export interface RuntimeCreativeOwnershipProgramCloseout {
+  current_milestone: 'P19.D';
+  macro_lifecycle_stage: 'cross_lifecycle_closeout';
+  completed_milestones: Array<'P19.A' | 'P19.B' | 'P19.C'>;
+  closeout_ready: true;
+  closeout_scope: {
+    story_architecture: 'cleared_across_families';
+    visual_authorship: 'cleared_across_families';
+    delivery_packaging: 'no_creative_residue_priority_deferred';
+    review_overlay: 'dual_layer_active_across_families';
+    remaining_shared_closeout: string[];
+  };
+}
+
 export interface RuntimeCreativeOwnershipCloseoutAudit {
   milestone: 'P19.D';
   phase: 'shared_execution_and_audit_closeout';
