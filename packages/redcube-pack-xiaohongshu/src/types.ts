@@ -241,7 +241,6 @@ export interface XhsRenderContract {
   render_strategy?: string;
   shell_file?: string;
   recipe_registry?: Partial<Record<XhsLayoutFamily | 'default', XhsRecipeId>>;
-  template_registry?: Partial<Record<XhsRecipeId, string>>;
 }
 
 export interface XhsRenderSlideDirectorContract {
@@ -269,7 +268,7 @@ export interface XhsRenderSlide {
   total_slides: number;
   creative_sources: {
     recipe_selection: 'prompt_pack_seed';
-    final_markup: 'prompt_pack_template';
+    final_markup: 'prompt_pack_artifact';
   };
   content: string;
 }
@@ -288,6 +287,8 @@ export interface XhsRenderPlan {
   render_strategy: string;
   shell_file: string;
   pack_id: string;
+  authored_markup_surface?: string;
+  markup_binding_model?: string;
   director_contract: {
     visual_motif: string;
     peak_pages: string[];
@@ -323,15 +324,16 @@ export interface XhsRenderArtifact {
 export interface CompileXhsRenderSlidesInput {
   slides: XhsPlanSlide[];
   visualDirection: XhsVisualDirection;
-  renderContract: XhsRenderContract;
   canvas: RenderCanvas;
-  recipeTemplates: Partial<Record<XhsRecipeId, string>>;
+  recipeMarkupRegistry: Partial<Record<XhsRecipeId, string>>;
+  recipeMarkupArtifacts: Partial<Record<XhsRecipeId, string>>;
 }
 
 export interface XhsPlanningDependencies {
   safeText(value: unknown, fallback?: string): string;
   safeArray<T>(value: T[] | null | undefined): T[];
   promptSeed(contract: XhsHydratedContract, route: XhsPromptRoute, vars?: { title?: string }): XhsPlanningSeed | XhsVisualDirectionSeed | null;
+  promptArtifact(contract: XhsHydratedContract, route: string, vars?: Record<string, string>): Record<string, unknown> | null;
   sourceLabels(contract: XhsHydratedContract): string[];
   sourceMaterials(contract: XhsHydratedContract): XhsSourceMaterial[];
   inferMemoryHook(contract: XhsHydratedContract): string;

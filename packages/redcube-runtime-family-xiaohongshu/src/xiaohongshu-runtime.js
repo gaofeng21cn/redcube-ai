@@ -136,7 +136,9 @@ function promptRoute(contract, route) {
 function resolvePromptPackAsset(contract, relativePath) {
   const assetPath = safeText(relativePath);
   if (!assetPath) return '';
-  if (assetPath.includes('/')) return assetPath;
+  if (path.isAbsolute(assetPath)) return assetPath;
+  if (assetPath.startsWith('prompts/')) return assetPath;
+  if (assetPath.startsWith(`${promptPackRoot(contract)}/`)) return assetPath;
   return path.posix.join(promptPackRoot(contract), assetPath);
 }
 
@@ -874,6 +876,7 @@ export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableI
     case 'render_html':
       return await buildXhsRenderHtml(contract, deliverablePaths, {
         readStageArtifact,
+        promptArtifact,
         renderContract,
         safeText,
         safeArray,

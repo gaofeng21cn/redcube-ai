@@ -16,31 +16,28 @@ function escapeHtml(text) {
     .replaceAll("'", '&#39;');
 }
 
-function readPath(target, path) {
-  return String(path || '')
-    .split('.')
-    .filter(Boolean)
-    .reduce((value, key) => (value == null ? undefined : value[key]), target);
+function slotToken(name) {
+  return `__REDCUBE_SLOT_${name}__`;
 }
 
-function renderTemplate(template, vars) {
-  let output = String(template || '');
+function slotValue(value) {
+  return escapeHtml(String(value ?? ''));
+}
 
-  output = output.replace(/{{#each ([a-zA-Z0-9_.]+)}}([\s\S]*?){{\/each}}/g, (_match, path, block) => {
-    const items = safeArray(readPath(vars, path));
-    return items.map((item, index) => renderTemplate(block, {
-      ...vars,
-      ...(item && typeof item === 'object' ? item : { value: item }),
-      index,
-      index1: index + 1,
-    })).join('');
-  });
+function displayValue(value, visibleDisplay = 'block') {
+  return safeText(value) ? visibleDisplay : 'none';
+}
 
-  output = output.replace(/{{#if ([a-zA-Z0-9_.]+)}}([\s\S]*?){{\/if}}/g, (_match, path, block) => (
-    readPath(vars, path) ? renderTemplate(block, vars) : ''
-  ));
-
-  return output.replace(/{{([a-zA-Z0-9_.]+)}}/g, (_match, path) => escapeHtml(readPath(vars, path)));
+function hydrateAuthoredMarkup(markupArtifact, slotValues) {
+  let output = String(markupArtifact || '');
+  for (const [name, value] of Object.entries(slotValues)) {
+    output = output.replaceAll(slotToken(name), String(value ?? ''));
+  }
+  const unresolved = output.match(/__REDCUBE_SLOT_[A-Za-z0-9_]+__/g);
+  if (unresolved) {
+    throw new Error(`Unresolved xiaohongshu authored markup slots: ${Array.from(new Set(unresolved)).join(', ')}`);
+  }
+  return output;
 }
 
 function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom }) {
@@ -55,68 +52,102 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
   };
 }
 
-function buildTemplateState(slide, canvas) {
+function buildMarkupSlots(slide, canvas) {
   const accent = slide.director_contract.material_rules.main_accent;
   const warning = slide.director_contract.material_rules.warning_accent;
   const peakPage = slide.director_contract.peak_page;
   const roleLabel = slide.director_contract.page_role || slide.page_goal;
   const pageCoreContent = safeArray(slide.page_core_content);
+  const supportCards = pageCoreContent.slice(1, 4);
+  const contrastCards = pageCoreContent.slice(1, 4).map((text, index) => ({
+    text,
+    qa_block: ['correction', 'proof', 'extension'][index] || `contrast-${index + 1}`,
+    label: ['真正顺序', '为什么', '补充'][index] || `要点${index + 1}`,
+  }));
+  const numberedCards = pageCoreContent.slice(0, 4).map((text, index) => ({
+    text,
+    index1: index + 1,
+    offset_px: index * 8,
+  }));
+  const sourceItems = safeArray(slide.evidence_and_sources).slice(0, 2).map((source) => ({
+    public_label: source.public_label,
+  }));
+  const evidenceRows = pageCoreContent.slice(1, 4).map((text) => ({ text }));
+  const checklistRows = pageCoreContent.slice(0, 4).map((text) => ({ text }));
 
-  return {
-    slide_id: slide.slide_id,
-    title: slide.title,
-    layout_family: slide.layout_family,
-    recipe_id: slide.recipe_id,
-    template_id: slide.template_id,
-    peak_page: peakPage,
-    director_role: safeText(slide.director_contract.page_role),
-    speaker_seconds: slide.speaker_seconds,
-    canvas_width: canvas.width,
-    canvas_height: canvas.height,
-    root_background: peakPage ? '#FFF7ED' : '#F8FAFC',
-    accent,
-    warning,
-    role_label: roleLabel,
-    visual_motif: slide.director_contract.visual_motif,
-    source_label_1: slide.evidence_and_sources[0]?.public_label || '',
-    slide_no: slide.slide_no,
-    total_slides: slide.total_slides,
-    hero_text: pageCoreContent[0] || '',
-    content_1: pageCoreContent[0] || '',
-    content_2: pageCoreContent[1] || '',
-    content_3: pageCoreContent[2] || '',
-    content_4: pageCoreContent[3] || '',
-    support_cards: pageCoreContent.slice(1).map((text) => ({ text })),
-    contrast_cards: pageCoreContent.slice(1).map((text, index) => ({
-      text,
-      qa_block: index === 0 ? 'correction' : 'proof',
-      label: index === 0 ? '真正顺序' : '为什么',
-    })),
-    numbered_cards: pageCoreContent.map((text, index) => ({
-      text,
-      index1: index + 1,
-      offset_px: index * 8,
-    })),
-    evidence_rows: pageCoreContent.slice(1).map((text) => ({ text })),
-    source_items: safeArray(slide.evidence_and_sources).slice(0, 2).map((source) => ({
-      public_label: source.public_label,
-    })),
-    checklist_rows: pageCoreContent.map((text) => ({ text })),
+  const slots = {
+    template_id: slotValue(slide.template_id),
+    slide_id: slotValue(slide.slide_id),
+    title: slotValue(slide.title),
+    layout_family: slotValue(slide.layout_family),
+    recipe_id: slotValue(slide.recipe_id),
+    peak_page: slotValue(peakPage),
+    director_role: slotValue(safeText(slide.director_contract.page_role)),
+    speaker_seconds: slotValue(slide.speaker_seconds),
+    canvas_width: slotValue(canvas.width),
+    canvas_height: slotValue(canvas.height),
+    root_background: slotValue(peakPage ? '#FFF7ED' : '#F8FAFC'),
+    accent: slotValue(accent),
+    warning: slotValue(warning),
+    role_label: slotValue(roleLabel),
+    visual_motif: slotValue(slide.director_contract.visual_motif),
+    source_label_1: slotValue(slide.evidence_and_sources[0]?.public_label || ''),
+    slide_no: slotValue(slide.slide_no),
+    total_slides: slotValue(slide.total_slides),
+    peak_badge_display: slotValue(peakPage ? 'inline-flex' : 'none'),
+    hero_text: slotValue(pageCoreContent[0] || ''),
+    content_1: slotValue(pageCoreContent[0] || ''),
+    content_2: slotValue(pageCoreContent[1] || ''),
+    content_3: slotValue(pageCoreContent[2] || ''),
+    content_4: slotValue(pageCoreContent[3] || ''),
   };
+
+  for (let index = 0; index < 3; index += 1) {
+    const supportText = supportCards[index]?.text || '';
+    const contrastCard = contrastCards[index] || {};
+    const evidenceText = evidenceRows[index]?.text || '';
+    slots[`support_card_${index + 1}_display`] = slotValue(displayValue(supportText));
+    slots[`support_card_${index + 1}_text`] = slotValue(supportText);
+    slots[`contrast_card_${index + 1}_display`] = slotValue(displayValue(contrastCard.text));
+    slots[`contrast_card_${index + 1}_qa_block`] = slotValue(contrastCard.qa_block || '');
+    slots[`contrast_card_${index + 1}_label`] = slotValue(contrastCard.label || '');
+    slots[`contrast_card_${index + 1}_text`] = slotValue(contrastCard.text || '');
+    slots[`evidence_row_${index + 1}_display`] = slotValue(displayValue(evidenceText));
+    slots[`evidence_row_${index + 1}_text`] = slotValue(evidenceText);
+  }
+
+  for (let index = 0; index < 4; index += 1) {
+    const numberedCard = numberedCards[index] || {};
+    const checklistText = checklistRows[index]?.text || '';
+    slots[`numbered_card_${index + 1}_display`] = slotValue(displayValue(numberedCard.text));
+    slots[`numbered_card_${index + 1}_index`] = slotValue(numberedCard.index1 || '');
+    slots[`numbered_card_${index + 1}_offset_px`] = slotValue(numberedCard.offset_px || 0);
+    slots[`numbered_card_${index + 1}_text`] = slotValue(numberedCard.text || '');
+    slots[`checklist_row_${index + 1}_display`] = slotValue(displayValue(checklistText));
+    slots[`checklist_row_${index + 1}_text`] = slotValue(checklistText);
+  }
+
+  for (let index = 0; index < 2; index += 1) {
+    const sourceLabel = sourceItems[index]?.public_label || '';
+    slots[`source_item_${index + 1}_display`] = slotValue(displayValue(sourceLabel, 'inline-flex'));
+    slots[`source_item_${index + 1}_label`] = slotValue(sourceLabel);
+  }
+
+  return slots;
 }
 
-export function compileXhsRenderSlides({ slides, visualDirection, renderContract, canvas, recipeTemplates }) {
+export function compileXhsRenderSlides({ slides, visualDirection, canvas, recipeMarkupRegistry, recipeMarkupArtifacts }) {
   return safeArray(slides).map((slide) => {
     const materialRules = visualDirection?.material_rules || {};
     const recipeId = safeText(slide.render_recipe_id);
-    const templateId = safeText(renderContract?.template_registry?.[recipeId]);
-    const templateText = safeText(recipeTemplates?.[recipeId]);
+    const templateId = safeText(recipeMarkupRegistry?.[recipeId]);
+    const markupArtifact = safeText(recipeMarkupArtifacts?.[recipeId]);
 
     if (!recipeId) {
       throw new Error(`Missing xiaohongshu render_recipe_id for slide: ${slide.slide_id}`);
     }
-    if (!templateId || !templateText) {
-      throw new Error(`Missing xiaohongshu render template for recipe: ${recipeId}`);
+    if (!templateId || !markupArtifact) {
+      throw new Error(`Missing xiaohongshu authored markup artifact for recipe: ${recipeId}`);
     }
 
     const creativeSources = {
@@ -130,7 +161,7 @@ export function compileXhsRenderSlides({ slides, visualDirection, renderContract
         route: 'render_html',
         lifecycleStage: 'visual_authorship',
         authoredSurface: 'final_html_markup',
-        materializedFrom: 'prompt_pack_template',
+        materializedFrom: 'prompt_pack_artifact',
       }),
     };
     const compiled = {
@@ -163,10 +194,11 @@ export function compileXhsRenderSlides({ slides, visualDirection, renderContract
         recipe_decision: creativeSources.recipe_selection,
         final_html_markup: creativeSources.final_markup,
       },
+      markup_contract_source: 'prompt_pack_artifact',
       content: '',
     };
 
-    compiled.content = renderTemplate(templateText, buildTemplateState(compiled, canvas));
+    compiled.content = hydrateAuthoredMarkup(markupArtifact, buildMarkupSlots(compiled, canvas));
     return compiled;
   });
 }

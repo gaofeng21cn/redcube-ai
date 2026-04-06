@@ -10,13 +10,15 @@ function read(file) {
 test('runtime no longer owns xiaohongshu slide recipe compiler branches', () => {
   const runtime = read('packages/redcube-runtime/src/xiaohongshu-runtime.js');
   const pack = read('packages/redcube-pack-xiaohongshu/src/render-compiler.js');
+  const renderPrompt = read('prompts/xiaohongshu/render_html.md');
 
   assert.equal(runtime.includes('function compileXhsRenderSlide('), false);
   assert.equal(runtime.includes("if (slide.recipe_id === 'xhs.hero_note')"), false);
   assert.equal(pack.includes('export function compileXhsRenderSlides'), true);
   assert.equal(pack.includes("if (slide.recipe_id === 'xhs.hero_note')"), false);
-  assert.equal(pack.includes('renderContract?.template_registry?.[recipeId]'), true);
-  assert.equal(pack.includes('renderTemplate(templateText'), true);
+  assert.equal(pack.includes("materializedFrom: 'prompt_pack_template'"), false);
+  assert.equal(pack.includes('renderTemplate(templateText'), false);
+  assert.equal(renderPrompt.includes('authored_markup_registry'), true);
 });
 
 test('runtime no longer owns ppt slide recipe compiler branches', () => {
@@ -40,6 +42,7 @@ test('overlay render contracts use package-native compiler registry instead of r
   assert.equal(pptOverlay.includes("compiler_export:"), false);
   assert.equal(xhsOverlay.includes("compiler_module:"), false);
   assert.equal(xhsOverlay.includes("compiler_export:"), false);
+  assert.equal(xhsOverlay.includes('template_registry:'), false);
   assert.equal(packRuntime.includes('render_pack.js'), false);
   assert.equal(packRuntime.includes('defaultPackCompilerModules'), true);
   assert.equal(packRuntime.includes('prompt_pack?.pack_id'), true);

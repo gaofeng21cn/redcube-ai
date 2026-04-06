@@ -23,6 +23,7 @@ test('xiaohongshu host-agent mainline owns protected creative outputs instead of
   const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
   const storylinePrompt = read('prompts/xiaohongshu/storyline.md');
   const singleNotePlanPrompt = read('prompts/xiaohongshu/single_note_plan.md');
+  const renderHtmlPrompt = read('prompts/xiaohongshu/render_html.md');
   const publishCopyPrompt = read('prompts/xiaohongshu/publish_copy.md');
   const directorReviewPrompt = read('prompts/xiaohongshu/director_review.md');
 
@@ -30,6 +31,8 @@ test('xiaohongshu host-agent mainline owns protected creative outputs instead of
   assert.equal(planning.includes('export function inferXhsVisualPresentation('), false);
   assert.equal(renderCompiler.includes('function pickRecipeId('), false);
   assert.equal(renderCompiler.includes('function renderSlideMarkup('), false);
+  assert.equal(renderCompiler.includes("materializedFrom: 'prompt_pack_template'"), false);
+  assert.equal(renderCompiler.includes('compiled.content = renderTemplate('), false);
   assert.equal(runtime.includes("const seed = promptSeed(contract, 'storyline');"), false);
   assert.equal(runtime.includes("audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement)"), false);
   assert.equal(runtime.includes("const seed = promptSeed(contract, 'publish_copy', {"), false);
@@ -40,6 +43,8 @@ test('xiaohongshu host-agent mainline owns protected creative outputs instead of
   assert.match(storylinePrompt, /## runtime_artifact/);
   assert.match(singleNotePlanPrompt, /"page_core_content": \[/);
   assert.match(singleNotePlanPrompt, /"visual_presentation": \{/);
+  assert.match(renderHtmlPrompt, /## runtime_artifact/);
+  assert.equal(renderHtmlPrompt.includes('"template_registry"'), false);
   assert.match(publishCopyPrompt, /## runtime_artifact/);
   assert.match(publishCopyPrompt, /"body": "/);
   assert.match(directorReviewPrompt, /"visual_director_review": \{/);
@@ -102,7 +107,7 @@ test('xiaohongshu route artifacts record host-agent creative ownership for story
     true,
   );
   assert.equal(
-    render.html_bundle.slides.every((slide) => slide.creative_sources?.final_markup?.materialized_from === 'prompt_pack_template'),
+    render.html_bundle.slides.every((slide) => slide.creative_sources?.final_markup?.materialized_from === 'prompt_pack_artifact'),
     true,
   );
   const html = readFileSync(render.html_bundle.html_file, 'utf-8');

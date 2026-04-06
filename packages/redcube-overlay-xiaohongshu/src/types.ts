@@ -230,15 +230,6 @@ export interface XiaohongshuPromptPack {
       action_checklist: 'xhs.checklist_close';
       default: 'xhs.annotated_cards';
     };
-    template_registry: {
-      'xhs.hero_note': 'prompts/xiaohongshu/render-templates/xhs.hero_note.html';
-      'xhs.split_contrast': 'prompts/xiaohongshu/render-templates/xhs.split_contrast.html';
-      'xhs.staggered_steps': 'prompts/xiaohongshu/render-templates/xhs.staggered_steps.html';
-      'xhs.track_rail': 'prompts/xiaohongshu/render-templates/xhs.track_rail.html';
-      'xhs.evidence_bands': 'prompts/xiaohongshu/render-templates/xhs.evidence_bands.html';
-      'xhs.checklist_close': 'prompts/xiaohongshu/render-templates/xhs.checklist_close.html';
-      'xhs.annotated_cards': 'prompts/xiaohongshu/render-templates/xhs.annotated_cards.html';
-    };
   };
 }
 

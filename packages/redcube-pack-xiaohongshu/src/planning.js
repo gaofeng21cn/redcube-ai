@@ -196,14 +196,19 @@ export async function buildXhsRenderHtml(contract, deliverablePaths, deps) {
   const plan = deps.readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const contractRender = deps.renderContract(contract);
+  const renderArtifact = deps.promptArtifact(contract, 'render_html')?.render_markup_artifact || {};
+  const recipeMarkupRegistry = renderArtifact.authored_markup_registry || {};
+  if (Object.keys(recipeMarkupRegistry).length === 0) {
+    throw new Error(`Missing xiaohongshu render_html authored markup registry for profile: ${contract.profile_id}`);
+  }
   const compiler = await loadRenderPackCompiler(contract);
   const slides = await compiler.compileRenderSlides({
     slides: deps.safeArray(plan?.single_note_plan?.slides),
     visualDirection: visual?.visual_direction || {},
-    renderContract: contractRender,
     canvas: deps.CANVAS,
-    recipeTemplates: Object.fromEntries(
-      Object.entries(contractRender.template_registry || {}).map(([recipeId, relativePath]) => [
+    recipeMarkupRegistry,
+    recipeMarkupArtifacts: Object.fromEntries(
+      Object.entries(recipeMarkupRegistry).map(([recipeId, relativePath]) => [
         recipeId,
         deps.readPromptPackText(deps.resolvePromptPackAsset(contract, deps.safeText(relativePath))),
       ]),
@@ -214,6 +219,8 @@ export async function buildXhsRenderHtml(contract, deliverablePaths, deps) {
     render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
     shell_file: deps.resolvePromptPackAsset(contract, deps.safeText(contractRender.shell_file, 'render_shell.html')),
     pack_id: deps.safeText(contract?.prompt_pack?.pack_id),
+    authored_markup_surface: deps.safeText(renderArtifact.artifact_surface, 'prompt_pack_artifact'),
+    markup_binding_model: deps.safeText(renderArtifact.binding_model, 'slot_hydration_only'),
     director_contract: {
       visual_motif: deps.safeText(visualDirection.visual_motif),
       peak_pages: deps.safeArray(visualDirection.peak_pages),
