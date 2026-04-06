@@ -18,3 +18,18 @@ test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed bou
   assert.match(types, /interface RuntimeRunRecord/);
   assert.match(types, /interface RuntimeRunRouteResponse/);
 });
+
+test('P16 slice 2: pack-runtime exposes a TypeScript service entrypoint and typed registry contracts', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime/src/types.ts')), true);
+
+  const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-pack-runtime/package.json'), 'utf-8'));
+  const entry = readFileSync(path.resolve('packages/redcube-pack-runtime/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('packages/redcube-pack-runtime/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.match(entry, /resolveRenderCompilerModule/);
+  assert.match(entry, /loadRenderPackCompiler/);
+  assert.match(types, /interface PackCompilerRegistryEntry/);
+  assert.match(types, /interface ResolvedRenderCompilerModule/);
+});
