@@ -72,8 +72,17 @@ test('freeze docs state that future academic poster surface cannot reuse slot_hy
   assert.equal(combined.includes('future academic poster surface 不能沿用 `slot_hydration_only` 作为正式主线'), true);
 });
 
-test('red: future academic poster machine-readable surface must exist and stay independent from current knowledge poster', () => {
-  const requiredFuturePaths = [
+test('active program switches to poster production hardening while keeping P21 completed', () => {
+  const roadmap = read('.omx/plans/roadmap-redcube-post-step7-long-term-programs.md');
+  const latest = read('.omx/reports/redcube-runtime-program/LATEST_STATUS.md');
+
+  assert.equal(roadmap.includes('状态：P20 extension proof complete；P21 complete；Poster Production Hardening active'), true);
+  assert.equal(latest.includes('当前阶段：Poster Production Hardening / Academic Poster Contract'), true);
+  assert.equal(latest.includes('P21 现视为 completed'), true);
+});
+
+test('current M2.A machine-readable surface slice exists for paper_poster without touching knowledge poster', () => {
+  const requiredCurrentSlicePaths = [
     'packages/redcube-overlay-paper-poster/package.json',
     'prompts/paper_poster/paper_asset_library.md',
     'prompts/paper_poster/poster_storyboard.md',
@@ -82,9 +91,57 @@ test('red: future academic poster machine-readable surface must exist and stay i
   ];
 
   assert.deepEqual(
-    requiredFuturePaths.filter((file) => existsSync(path.resolve(file))),
-    requiredFuturePaths,
+    requiredCurrentSlicePaths.filter((file) => existsSync(path.resolve(file))),
+    requiredCurrentSlicePaths,
   );
+});
+
+test('current M2.A prompt surface is academic-poster specific instead of knowledge-poster seeds', () => {
+  const combined = [
+    read('prompts/paper_poster/paper_asset_library.md'),
+    read('prompts/paper_poster/poster_storyboard.md'),
+    read('prompts/paper_poster/layout_plan.md'),
+    read('prompts/paper_poster/render_bundle.md'),
+  ].join('\n');
+
+  for (const token of [
+    'figures',
+    'tables',
+    'citations',
+    'affiliations',
+    'venue_metadata',
+    'far_view_readability',
+    'scan_path_clarity',
+    'citation_visibility',
+    'print_export_safe',
+  ]) {
+    assert.equal(combined.includes(token), true, token);
+  }
+
+  for (const forbidden of [
+    '"panel_id": "hero"',
+    '"region": "hero_band"',
+    '"render_strategy": "slot_hydration_only"',
+  ]) {
+    assert.equal(combined.includes(forbidden), false, forbidden);
+  }
+});
+
+test('remaining academic poster surface stays explicit after current M2.A slice', () => {
+  const openIssues = read('.omx/reports/redcube-runtime-program/OPEN_ISSUES.md');
+
+  for (const token of [
+    'prompts/paper_poster/figure_table_bank.md',
+    'prompts/paper_poster/evidence_map.md',
+    'prompts/paper_poster/panel_plan.md',
+    'prompts/paper_poster/figure_priority_plan.md',
+    'prompts/paper_poster/figure_caption_rewrite.md',
+    'prompts/paper_poster/poster_eval_report.md',
+    'prompts/paper_poster/visual_director_review.md',
+    'prompts/paper_poster/screenshot_review.md',
+  ]) {
+    assert.equal(openIssues.includes(token), true, token);
+  }
 });
 
 test('P21 docs freeze generic base contract, extension surface, lane write scopes, and convergence order', () => {
