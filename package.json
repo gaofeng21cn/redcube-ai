@@ -11,7 +11,8 @@
     "redcube": "node apps/redcube-cli/src/cli.js",
     "mcp": "node apps/redcube-mcp/src/server.js",
     "test": "node --test tests/*.test.js",
-    "typecheck": "tsc --noEmit --project tsconfig.tests.json --pretty false"
+    "typecheck": "tsc --noEmit --project tsconfig.tests.json --pretty false",
+    "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs"
   },
   "optionalDependencies": {
     "@mariozechner/pi-ai": "^0.54.2",
