@@ -43,7 +43,7 @@ test('workspace packages and apps participate in package-level tsconfig layering
 });
 
 test('typescript migration policy freezes new code defaults and JS compatibility shell rules', () => {
-  const strategy = readFileSync(path.resolve('.omx/plans/spec-redcube-typescript-migration-strategy.md'), 'utf-8');
+  const strategy = readFileSync(path.resolve('docs/policies/typescript_migration_policy.md'), 'utf-8');
   assert.match(strategy, /新代码默认使用 TypeScript/);
   assert.match(strategy, /旧 JS 只在明确迁移窗口内短期共存/);
   assert.match(strategy, /NodeNext/);

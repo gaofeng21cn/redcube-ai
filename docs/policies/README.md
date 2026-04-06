@@ -11,3 +11,4 @@
 
 - [运行模型 Policy](runtime_operating_model.md)
 - [交付合同模型 Policy](deliverable_contract_model.md)
+- [TypeScript 迁移 Policy](typescript_migration_policy.md)
