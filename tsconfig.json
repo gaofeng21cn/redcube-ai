@@ -20,6 +20,9 @@
       "path": "./packages/redcube-overlay-registry"
     },
     {
+      "path": "./packages/redcube-overlay-xiaohongshu"
+    },
+    {
       "path": "./packages/redcube-reference-os"
     },
     {

@@ -61,3 +61,37 @@ test('P17 slice 3: overlay-registry exposes a TypeScript entrypoint and typed de
   assert.match(types, /interface OverlayCatalogSurface/);
   assert.doesNotMatch(types, /\bany\b/);
 });
+
+test('P17 slice 4: overlay-xiaohongshu exposes a TypeScript entrypoint and typed overlay contracts', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/types.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/tsconfig.json')), true);
+
+  const pkg = readJson('packages/redcube-overlay-xiaohongshu/package.json');
+  const rootTsconfig = readJson('tsconfig.json');
+  const packageTsconfig = readJson('packages/redcube-overlay-xiaohongshu/tsconfig.json');
+  const entry = readFileSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-xiaohongshu'),
+    true,
+  );
+
+  assert.match(entry, /buildTopicRecord/);
+  assert.match(entry, /buildXiaohongshuDeliverableRecord/);
+  assert.match(entry, /hydrateXiaohongshuContract/);
+  assert.match(entry, /evaluateStorylineGate/);
+  assert.match(entry, /buildXiaohongshuSurfaceBundle/);
+  assert.match(entry, /xiaohongshuOverlay/);
+
+  assert.match(types, /interface XiaohongshuTopicRecord/);
+  assert.match(types, /interface XiaohongshuDeliverableRecord/);
+  assert.match(types, /interface XiaohongshuHydratedContract/);
+  assert.match(types, /interface XiaohongshuStorylineGateReport/);
+  assert.match(types, /interface XiaohongshuSurfaceArtifact/);
+  assert.match(types, /interface XiaohongshuOverlayDefinition/);
+  assert.doesNotMatch(types, /\bany\b/);
+});
