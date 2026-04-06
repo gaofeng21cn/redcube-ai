@@ -5,6 +5,7 @@ export {
 } from '@redcube/governance';
 export { appendEvent, readEvents } from './event-log.js';
 export {
+  P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,

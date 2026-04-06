@@ -131,6 +131,7 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
   assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
   assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
+  assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
   assert.equal(result.run.status, 'completed');
   assert.equal(result.events.length >= 2, true);
 
@@ -141,6 +142,7 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(stored.run.executor.adapter, 'host_agent');
   assert.equal(stored.run.executor.execution_surface, 'codex_native_host_agent');
   assert.equal(stored.run.executor.execution_model.mainline_adapter, 'host_agent');
+  assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
   assert.equal(artifact.route, 'storyline');
   assert.equal(artifact.contract.profile_id, 'lecture_student');
@@ -149,6 +151,7 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
   assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
   assert.equal(artifact.execution_model.external_llm_role, 'optional_compatibility_adapter');
+  assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
 });
 
 test('runDeliverableRoute executes other declared stages through host-agent executor', async () => {
@@ -290,6 +293,7 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   assert.equal(result.run.executor.primary, false);
   assert.equal(result.run.executor.execution_surface, 'external_llm_adapter');
   assert.equal(result.run.executor.compatibility_role, 'optional_compatibility_adapter');
+  assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
   assert.equal(
     result.run.error.message,
     'Unsupported route for adapter external_llm: detailed_outline',
@@ -298,6 +302,7 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.status, 'failed');
   assert.equal(stored.run.executor.execution_surface, 'external_llm_adapter');
+  assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
 });
 
 test('runDeliverableRoute rejects route not declared by hydrated deliverable contract', async () => {

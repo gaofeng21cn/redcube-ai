@@ -1,38 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import path from 'node:path';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 
 import {
+  P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_TEAM_GATE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
 } from '../packages/redcube-runtime/src/index.js';
-import { buildCreativeOwnershipAudit } from '../scripts/p19-creative-ownership-audit-lib.mjs';
-
-const STATUS_FILE = path.resolve('.omx/reports/redcube-runtime-program/P19_CREATIVE_OWNERSHIP_STATUS.json');
+import {
+  STATUS_FILE,
+  buildCreativeOwnershipAudit,
+  buildCreativeOwnershipStatus,
+  writeStatusFile,
+} from '../scripts/p19-creative-ownership-audit-lib.mjs';
 
 function writeStatus() {
-  const audit = buildCreativeOwnershipResidueAudit();
-  const closeout = buildCreativeOwnershipAudit();
-  const status = {
-    program: 'P19',
-    current_milestone: 'P19.A',
-    current_mode: 'ralph',
-    macro_lifecycle_stage: 'shared_lifecycle_freeze',
-    shared_execution_contract: audit.shared_execution_contract,
-    unified_lifecycle: audit.unified_lifecycle,
-    residue_by_family: audit.families,
-    team_lane_contract: closeout.team_lane_contract,
-    team_gate: {
-      satisfied: closeout.team_gate.missing_gates.length === 0,
-      missing_gates: closeout.team_gate.missing_gates,
-    },
-  };
-  mkdirSync(path.dirname(STATUS_FILE), { recursive: true });
-  writeFileSync(STATUS_FILE, `${JSON.stringify(status, null, 2)}\n`, 'utf-8');
+  const status = buildCreativeOwnershipStatus({ currentMode: 'ralph' });
+  writeStatusFile(status);
   return JSON.parse(readFileSync(STATUS_FILE, 'utf-8'));
 }
 
@@ -158,12 +145,18 @@ test('P19.A freezes lane write scopes by unified lifecycle before any short-live
   ]);
 });
 
-test('P19.A machine-readable audit records lifecycle residue for both families', () => {
+test('P19.D machine-readable audit records lifecycle residue and shared closeout context for both families', () => {
   const audit = buildCreativeOwnershipResidueAudit();
 
+  assert.equal(audit.milestone, P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.current_milestone);
+  assert.equal(audit.macro_lifecycle_stage, P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.macro_lifecycle_stage);
+  assert.deepEqual(audit.completed_milestones, P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.completed_milestones);
+  assert.equal(audit.closeout_ready, true);
   assert.equal(audit.shared_execution_contract.primary_adapter, 'host_agent');
   assert.equal(audit.shared_execution_contract.external_llm_status, 'optional_compatibility_adapter');
+  assert.equal(audit.shared_execution_contract.freeze_origin_milestone, 'P19.A');
   assert.deepEqual(audit.unified_lifecycle.review_overlay, ['visual_director_review', 'screenshot_review']);
+  assert.deepEqual(audit.shared_closeout.remaining_shared_closeout, []);
   assert.equal(audit.families.xiaohongshu.status, 'cleared');
   assert.equal(audit.families.ppt_deck.status, 'cleared');
   assert.equal(typeof audit.families.xiaohongshu.lifecycle_residue.story_architecture.status, 'string');
@@ -181,17 +174,20 @@ test('P19.A machine-readable audit records lifecycle residue for both families',
   );
 });
 
-test('P19.A status report is synchronized with lifecycle freeze, residue, and team gate', () => {
+test('P19.D status report is synchronized with closeout milestone, residue, and team gate', () => {
   const status = writeStatus();
   const audit = buildCreativeOwnershipResidueAudit();
   const closeout = buildCreativeOwnershipAudit();
 
   assert.equal(status.program, 'P19');
-  assert.equal(status.current_milestone, 'P19.A');
+  assert.equal(status.current_milestone, 'P19.D');
+  assert.deepEqual(status.completed_milestones, ['P19.A', 'P19.B', 'P19.C']);
+  assert.equal(status.closeout_ready, true);
   assert.equal(status.current_mode, 'ralph');
-  assert.equal(status.macro_lifecycle_stage, 'shared_lifecycle_freeze');
+  assert.equal(status.macro_lifecycle_stage, 'cross_lifecycle_closeout');
   assert.deepEqual(status.shared_execution_contract, audit.shared_execution_contract);
   assert.deepEqual(status.unified_lifecycle, audit.unified_lifecycle);
+  assert.deepEqual(status.shared_closeout, closeout.closeout_scope);
   assert.equal(status.team_lane_contract.tracking_model, 'unified_lifecycle');
   assert.equal(status.team_lane_contract.lanes.length, 4);
   assert.equal(status.residue_by_family.xiaohongshu.status, audit.families.xiaohongshu.status);

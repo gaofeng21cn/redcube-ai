@@ -67,10 +67,14 @@ test('P19 keeps codex-native host-agent as the primary execution contract and ex
 test('P19 audit freezes unified lifecycle, shared review overlay, and current open residue across xiaohongshu + ppt', () => {
   const audit = buildCreativeOwnershipAudit();
 
-  assert.equal(audit.milestone, 'P19.A');
+  assert.equal(audit.milestone, 'P19.D');
+  assert.equal(audit.phase, 'shared_execution_and_audit_closeout');
+  assert.deepEqual(audit.completed_milestones, ['P19.A', 'P19.B', 'P19.C']);
+  assert.equal(audit.closeout_ready, true);
   assert.equal(audit.execution_model.mainline_adapter, 'host_agent');
   assert.equal(audit.execution_model.primary_surface, 'codex_native_host_agent');
   assert.equal(audit.execution_model.agent_first_requires_external_llm, false);
+  assert.equal(audit.execution_model.freeze_origin_milestone, 'P19.A');
   assert.deepEqual(audit.unified_lifecycle.stages, [
     'source_readiness',
     'story_architecture',
@@ -86,6 +90,10 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
   assert.deepEqual(audit.residue.xiaohongshu.findings, []);
   assert.equal(audit.residue.ppt_deck.status, 'cleared');
   assert.equal(audit.residue.ppt_deck.findings.length, 0);
+  assert.equal(audit.closeout_scope.story_architecture, 'cleared_across_families');
+  assert.equal(audit.closeout_scope.visual_authorship, 'cleared_across_families');
+  assert.equal(audit.closeout_scope.review_overlay, 'dual_layer_active_across_families');
+  assert.deepEqual(audit.closeout_scope.remaining_shared_closeout, []);
   assert.deepEqual(
     audit.residue.ppt_deck.findings.map((finding) => finding.protected_output),
     [],
@@ -122,7 +130,9 @@ test('P19 audit emits a machine-readable closeout report artifact', () => {
 
   assert.equal(existsSync(AUDIT_FILE), true);
   const stored = readJson(AUDIT_FILE);
-  assert.equal(stored.milestone, 'P19.A');
+  assert.equal(stored.milestone, 'P19.D');
+  assert.equal(stored.phase, 'shared_execution_and_audit_closeout');
+  assert.equal(stored.closeout_ready, true);
   assert.equal(stored.residue.xiaohongshu.status, 'cleared');
   assert.equal(stored.residue.ppt_deck.status, 'cleared');
   assert.equal(stored.review_overlay.ppt_deck.status, 'active');

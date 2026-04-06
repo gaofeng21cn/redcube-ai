@@ -238,6 +238,20 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   ],
 });
 
+export const P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT = Object.freeze({
+  current_milestone: 'P19.D',
+  macro_lifecycle_stage: 'cross_lifecycle_closeout',
+  completed_milestones: ['P19.A', 'P19.B', 'P19.C'],
+  closeout_ready: true,
+  closeout_scope: {
+    story_architecture: 'cleared_across_families',
+    visual_authorship: 'cleared_across_families',
+    delivery_packaging: 'no_creative_residue_priority_deferred',
+    review_overlay: 'dual_layer_active_across_families',
+    remaining_shared_closeout: [],
+  },
+});
+
 export const P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES = Object.freeze({
   allowed_code_responsibilities: [
     'contract',
@@ -378,17 +392,22 @@ export function buildCreativeOwnershipResidueAudit() {
 
   return {
     program: 'P19',
-    milestone: 'P19.A',
+    milestone: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.current_milestone,
+    macro_lifecycle_stage: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.macro_lifecycle_stage,
+    completed_milestones: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.completed_milestones,
+    closeout_ready: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.closeout_ready,
     tracking_model: P19_UNIFIED_LIFECYCLE_CONTRACT.tracking_model,
     shared_execution_contract: {
       primary_adapter: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.adapter,
       primary_runtime: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.runtime,
       external_llm_status: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.adapter_roles.external_llm,
+      freeze_origin_milestone: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.milestone,
       mainline_topology: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.mainline_topology,
     },
     unified_lifecycle: P19_UNIFIED_LIFECYCLE_CONTRACT,
     research_ownership: P19_RESEARCH_OWNERSHIP_CONTRACT,
     review_overlay: buildReviewOverlayStatus(),
+    shared_closeout: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.closeout_scope,
     families: {
       xiaohongshu: {
         status: xiaohongshuViolations.some((item) => item.status === 'present') ? 'present' : 'cleared',

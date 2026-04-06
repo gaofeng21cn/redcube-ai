@@ -2,6 +2,7 @@ import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 import {
+  P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
@@ -10,6 +11,7 @@ import {
 } from '../packages/redcube-runtime/src/index.js';
 
 export const AUDIT_FILE = path.resolve('.omx/reports/redcube-runtime-program/P19_CREATIVE_OWNERSHIP_AUDIT.json');
+export const STATUS_FILE = path.resolve('.omx/reports/redcube-runtime-program/P19_CREATIVE_OWNERSHIP_STATUS.json');
 
 function mapFindings(familyAudit) {
   return familyAudit.violations
@@ -90,14 +92,17 @@ export function buildCreativeOwnershipAudit() {
   const residueAudit = buildCreativeOwnershipResidueAudit();
 
   return {
-    milestone: 'P19.A',
-    phase: 'freeze_execution_model_and_shared_lifecycle',
+    milestone: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.current_milestone,
+    phase: 'shared_execution_and_audit_closeout',
+    completed_milestones: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.completed_milestones,
+    closeout_ready: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.closeout_ready,
     execution_model: {
       mainline_adapter: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.adapter,
       primary_surface: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.runtime,
       adapter_role: 'primary_creative_executor',
       agent_first_requires_external_llm: false,
       external_llm_role: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.adapter_roles.external_llm,
+      freeze_origin_milestone: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.milestone,
     },
     unified_lifecycle: {
       stages: P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT.macro_lifecycle,
@@ -133,6 +138,7 @@ export function buildCreativeOwnershipAudit() {
         findings: mapFindings(residueAudit.families.ppt_deck),
       },
     },
+    closeout_scope: P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.closeout_scope,
     team_lane_contract: buildTeamLaneContract(),
     team_gate: buildTeamGate(),
   };
@@ -141,4 +147,36 @@ export function buildCreativeOwnershipAudit() {
 export function writeAuditFile(audit) {
   mkdirSync(path.dirname(AUDIT_FILE), { recursive: true });
   writeFileSync(AUDIT_FILE, `${JSON.stringify(audit, null, 2)}\n`, 'utf-8');
+}
+
+/**
+ * @param {{ currentMode?: string }} [options]
+ * @returns {import('../packages/redcube-runtime/src/types.js').RuntimeCreativeOwnershipProgramStatus}
+ */
+export function buildCreativeOwnershipStatus({ currentMode = 'ralph' } = {}) {
+  const residueAudit = buildCreativeOwnershipResidueAudit();
+  const closeout = buildCreativeOwnershipAudit();
+
+  return {
+    program: 'P19',
+    current_milestone: closeout.milestone,
+    completed_milestones: closeout.completed_milestones,
+    closeout_ready: closeout.closeout_ready,
+    current_mode: currentMode,
+    macro_lifecycle_stage: residueAudit.macro_lifecycle_stage,
+    shared_execution_contract: residueAudit.shared_execution_contract,
+    unified_lifecycle: residueAudit.unified_lifecycle,
+    residue_by_family: residueAudit.families,
+    shared_closeout: closeout.closeout_scope,
+    team_lane_contract: closeout.team_lane_contract,
+    team_gate: {
+      satisfied: closeout.team_gate.missing_gates.length === 0,
+      missing_gates: closeout.team_gate.missing_gates,
+    },
+  };
+}
+
+export function writeStatusFile(status) {
+  mkdirSync(path.dirname(STATUS_FILE), { recursive: true });
+  writeFileSync(STATUS_FILE, `${JSON.stringify(status, null, 2)}\n`, 'utf-8');
 }

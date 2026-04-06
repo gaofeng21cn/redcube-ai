@@ -115,17 +115,28 @@ export interface RuntimeCreativeOwnershipViolation {
 
 export interface RuntimeCreativeOwnershipAudit {
   program: 'P19';
-  milestone: 'P19.A';
+  milestone: 'P19.D';
+  macro_lifecycle_stage: 'cross_lifecycle_closeout';
+  completed_milestones: Array<'P19.A' | 'P19.B' | 'P19.C'>;
+  closeout_ready: true;
   tracking_model: 'unified_lifecycle';
   shared_execution_contract: {
     primary_adapter: 'host_agent';
     primary_runtime: 'codex_native_host_agent';
     external_llm_status: 'optional_compatibility_adapter';
+    freeze_origin_milestone: 'P19.A';
     mainline_topology: string[];
   };
   unified_lifecycle: RuntimeCreativeOwnershipLifecycleContract;
   research_ownership: RuntimeCreativeOwnershipResearchOwnershipContract;
   review_overlay: RuntimeCreativeOwnershipReviewOverlayContract;
+  shared_closeout: {
+    story_architecture: 'cleared_across_families';
+    visual_authorship: 'cleared_across_families';
+    delivery_packaging: 'no_creative_residue_priority_deferred';
+    review_overlay: 'dual_layer_active_across_families';
+    remaining_shared_closeout: string[];
+  };
   families: {
     xiaohongshu: {
       status: 'present' | 'cleared';
@@ -151,14 +162,17 @@ export interface RuntimeCreativeOwnershipCloseoutAuditFinding {
 }
 
 export interface RuntimeCreativeOwnershipCloseoutAudit {
-  milestone: 'P19.A';
-  phase: 'freeze_execution_model_and_shared_lifecycle';
+  milestone: 'P19.D';
+  phase: 'shared_execution_and_audit_closeout';
+  completed_milestones: Array<'P19.A' | 'P19.B' | 'P19.C'>;
+  closeout_ready: true;
   execution_model: {
     mainline_adapter: 'host_agent';
     primary_surface: 'codex_native_host_agent';
     adapter_role: 'primary_creative_executor';
     agent_first_requires_external_llm: false;
     external_llm_role: 'optional_compatibility_adapter';
+    freeze_origin_milestone: 'P19.A';
   };
   unified_lifecycle: {
     stages: RuntimeCreativeOwnershipLifecycleContract['macro_lifecycle'];
@@ -191,6 +205,13 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
       findings: RuntimeCreativeOwnershipCloseoutAuditFinding[];
     };
   };
+  closeout_scope: {
+    story_architecture: 'cleared_across_families';
+    visual_authorship: 'cleared_across_families';
+    delivery_packaging: 'no_creative_residue_priority_deferred';
+    review_overlay: 'dual_layer_active_across_families';
+    remaining_shared_closeout: string[];
+  };
   team_lane_contract: {
     tracking_model: 'unified_lifecycle';
     lanes: Array<{
@@ -214,6 +235,24 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
     lane_write_scopes_by_shared_lifecycle: boolean;
     independent_verification_defined: boolean;
     final_convergence_order_defined: boolean;
+    missing_gates: string[];
+  };
+}
+
+export interface RuntimeCreativeOwnershipProgramStatus {
+  program: 'P19';
+  current_milestone: 'P19.D';
+  completed_milestones: Array<'P19.A' | 'P19.B' | 'P19.C'>;
+  closeout_ready: true;
+  current_mode: string;
+  macro_lifecycle_stage: 'cross_lifecycle_closeout';
+  shared_execution_contract: RuntimeCreativeOwnershipAudit['shared_execution_contract'];
+  unified_lifecycle: RuntimeCreativeOwnershipLifecycleContract;
+  residue_by_family: RuntimeCreativeOwnershipAudit['families'];
+  shared_closeout: RuntimeCreativeOwnershipCloseoutAudit['closeout_scope'];
+  team_lane_contract: RuntimeCreativeOwnershipCloseoutAudit['team_lane_contract'];
+  team_gate: {
+    satisfied: boolean;
     missing_gates: string[];
   };
 }

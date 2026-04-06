@@ -28,6 +28,7 @@ import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-
  *     adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
  *     agent_first_requires_external_llm: false,
  *     external_llm_role: "optional_compatibility_adapter",
+ *     freeze_origin_milestone: "P19.A",
  *   },
  *   runRoute(input: ExecutorRouteInput): Promise<{
  *     artifact_refs?: string[],
@@ -48,6 +49,7 @@ import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-
  *       adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
  *       agent_first_requires_external_llm: false,
  *       external_llm_role: "optional_compatibility_adapter",
+ *       freeze_origin_milestone: "P19.A",
  *     },
  *     produced_at?: string,
  *   }>,
@@ -69,6 +71,7 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
     adapter_role: adapter === 'host_agent' ? 'primary_creative_executor' : 'optional_compatibility_adapter',
     agent_first_requires_external_llm: false,
     external_llm_role: 'optional_compatibility_adapter',
+    freeze_origin_milestone: 'P19.A',
   });
 
   return {
