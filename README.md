@@ -7,7 +7,7 @@
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
 <p align="center"><strong>Agent-first Visual Deliverable Gateway</strong></p>
-<p align="center">PPT Decks · Xiaohongshu Posts · AI-first Intent · Human-auditable</p>
+<p align="center">Slides · Xiaohongshu Notes · Posters</p>
 
 <table>
   <tr>
@@ -26,158 +26,124 @@
   </tr>
 </table>
 
-> Externally, RedCube AI is a `Visual Deliverable Gateway`; internally, it runs on an `Agent-first, human-auditable Visual Deliverable Harness OS`. Typed contracts are engineering guardrails, not the product identity.
+> `RedCube AI` helps experts turn structured knowledge into formal visual deliverables that can be reviewed, rerun, and exported with more control.
 
-Agent-first here does not mean `external_llm` only. In the Codex / OMX operating model, a `Codex-native host agent` can be the primary creative executor, while code stays on contract, governance, audit, and artifact boundaries.
+## Product Position
 
-## What Is Proven Today
+If your goal is to keep turning structured knowledge into formal visual outputs, `RedCube AI` gives you one governed delivery line instead of a pile of one-off prompts, scattered scripts, and manual cleanup.
 
-The current repository is no longer a loose prototype. The following baseline is already verified on `main`:
+It is designed for experts who want the speed of agents without losing control over quality.
 
-- `PPT deck` and `Xiaohongshu note` are both formal families on the same runtime mainline
-- `typecheck`, end-to-end routes, review / publish governance, and full regression suite are green
-- TypeScript baseline, typed contract surfaces, typed service boundaries, and high-churn package boundaries are covered by a machine-readable closeout audit
+## What It Helps You Do
 
-In other words: RedCube already works as an agent-first visual-deliverable baseline with typed engineering guardrails, not just a prompt experiment.
+- Turn source materials into formal `slides` for teaching, reporting, academic talks, and internal briefings.
+- Turn structured knowledge into `Xiaohongshu notes` for science communication, educational publishing, and serialized content.
+- Produce single-page `posters` when you need something more shareable than slides and more structured than a social post.
+- Keep review checkpoints, reruns, and exports inside one governed process instead of rebuilding the workflow every time.
 
-## Position In The OPL Federation
+## Current Deliverables
 
-Under the top-level `One Person Lab (OPL)` semantics:
-
-- `RedCube AI` is the formal gateway for the visual-deliverable domain.
-- It is a harness-based runtime surface, not a one-shot script bundle.
-- `ppt_deck` is the family currently mapping most directly to `Presentation Ops`.
-- `xiaohongshu` shares the same harness but is not automatically equal to `Presentation Ops`.
-
-Target path:
-
-`User / Agent -> OPL Gateway (optional) -> RedCube Gateway -> RedCube Harness OS`
-
-## Current Scope
-
-RedCube currently has two production-grade baseline families:
-
-| Family | Current state | Typical use |
+| Deliverable | Current state | Typical use |
 | --- | --- | --- |
-| `ppt_deck` | Verified baseline | Teaching decks, reports, academic talks, internal briefings |
-| `xiaohongshu` | Verified baseline | Knowledge posts, science communication, serialized social publishing |
+| `Slides` | Production-grade baseline | Teaching decks, academic talks, internal briefings, formal reports |
+| `Xiaohongshu notes` | Production-grade baseline | Knowledge posts, science communication, serialized publishing |
+| `Posters` | Partially complete | The current poster surface is a `knowledge poster`; academic paper/conference poster support is still being hardened |
 
-These families share the same:
+Important boundary for the poster lane:
 
-- gateway
-- runtime / harness
-- governance model
-- reference quality OS
-- review / rerun / publish control model
+- poster support already exists
+- the current poster surface is useful for `knowledge posters`
+- a full academic `paper poster / conference poster` contract is still a follow-on program
 
-The difference lives in family / profile / pack contracts, not in hidden one-off scripts.
+## Why It Exists
 
-## Lifecycle Model
+Many content-generation tools are good at producing a draft quickly but weak at controlling delivery quality.
 
-RedCube is converging on one shared macro lifecycle across families:
+`RedCube AI` is built around a different priority:
 
-1. `Source Readiness`
-2. `Story Architecture`
-3. `Visual Authorship`
-4. `Delivery Packaging`
+- decide what the deliverable is actually for before generating final output
+- keep intermediate state reviewable instead of hiding everything in transient chat context
+- let agents do the heavy execution while humans keep approval authority
+- treat review, rerun, and export as first-class parts of the workflow
 
-Review is tracked as a shared dual-layer overlay:
+## Best-Fit Use Cases
 
-- `visual_director_review`
-- `screenshot_review`
+`RedCube AI` is especially useful when:
 
-Important clarification:
+- you already have source materials and need to turn them into a formal visual deliverable
+- you want one governed pipeline instead of separate slide, social-post, and export workflows
+- you care about review checkpoints, not just one-shot generation
+- you want an agent to do the heavy execution while a human stays in charge of acceptance
 
-- `research` is not meant to be a Xiaohongshu-only creative stage
-- it belongs to shared source readiness / source augmentation
-- it should be triggered when source truth is missing, weak, or insufficient for downstream story and visual work
+## Fast Start Through Your Agent
 
-Family-specific route granularity can still differ:
-
-- `Xiaohongshu`
-  - story architecture currently maps to `storyline + single_note_plan`
-  - delivery packaging currently maps to `publish_copy + export_bundle`
-- `PPT deck`
-  - story architecture currently maps to `storyline + detailed_outline + slide_blueprint`
-  - delivery packaging currently maps to `export_pptx`
-
-The architectural goal is semantic alignment first, not premature route renaming.
-
-## Current Limits
-
-RedCube is already usable, but it is not yet the final form.
-
-Current limits to be honest about:
-
-- creative ownership is still the highest-priority unfinished issue:
-  - director-first contracts already exist
-  - but deterministic compilers and JS pack logic still own part of the actual expression path
-  - full AI-first / director-first authoring has not been fully restored yet
-  - the shared dual-layer review model is not fully converged yet:
-    - `xiaohongshu` already exposes `visual_director_review + screenshot_review`
-    - `ppt_deck` still needs an explicit `visual_director_review` surface
-- third-family extension proof is not finished yet
-- formal operations / evaluation OS is not finished yet
-- OPL federation integration is not finished yet
-
-## Fast Start
-
-For most users, the fastest path is to provide your target, audience, source material, and constraints to your agent, then let it run RedCube AI as the gateway.
+For most expert users, the fastest path is not to learn low-level commands first. The better entry is to hand your goal, audience, source material, and constraints to your own agent, then let it run `RedCube AI`.
 
 Typical three-step start:
 
 1. Prepare an isolated workspace and place your source materials in it.
-2. Specify deliverable type (`PPT` or `Xiaohongshu`), audience, and final objective.
-3. Ask your agent to execute via RedCube AI and review key checkpoints with you.
+2. Tell your agent whether you want `slides`, a `Xiaohongshu note`, or a `poster`, who the audience is, and what the final goal is.
+3. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
 
-Continue reading:
+You can give your agent an instruction like this:
+
+> Read the materials in this workspace first. Then decide whether the requested deliverable should be a PPT deck, a Xiaohongshu post, or a knowledge poster. If I already specified the deliverable type, follow that choice. Use RedCube AI (`https://github.com/gaofeng21cn/redcube-ai`) as the visual-deliverable gateway and harness. Make the audience, deliverable goal, information structure, review checkpoints, and export requirements explicit. If the direction is unclear, ask clarifying questions before generating a vague draft.
+
+## Current Limits
+
+`RedCube AI` is already usable, but it is not yet the final form.
+
+The main unfinished areas are:
+
+- formal operations and evaluation surfaces are still being completed
+- poster support is still incomplete:
+  - the current poster lane is a `knowledge poster`
+  - academic `paper poster / conference poster` support is still being hardened
+- OPL federation integration is still a follow-on step
+
+## Documentation
 
 - [Docs index](docs/README.md)
 
 Detailed operator docs remain repo-tracked, but they are not part of the default bilingual public surface unless synchronized English `.md` and Chinese `.zh-CN.md` mirrors are published together.
 
+<details>
+<summary><strong>For Technical Collaborators / Agent Executors</strong></summary>
+
 ## Runtime Shape
 
 ```text
-Agent
+User / Agent
   -> Gateway
-      -> Overlay
+      -> Overlay / Family / Profile / Pack
           -> Harness OS
-              -> Executor Adapter
               -> Artifact Store
               -> Run Store
               -> Event Log
 ```
 
-Current lifecycle reality:
+## Current Technical Reality
 
-- the shared source plane already exists
-- both families already share governance, artifacts, and runtime surfaces
-- but the creative chain is still not aligned enough:
-  - deterministic JS still owns too much of story architecture and visual authorship
-  - `ppt_deck` and `xiaohongshu` still expose slightly different route surfaces
-  - semantic lifecycle alignment is ahead of route naming convergence
+- `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
+- `P20 / Extension Proof And Third-Family Onboarding` is treated as completed for `poster_onepager`.
+- The active follow-on programs are:
+  - `P21 / Operations And Evaluation OS`
+  - `Poster Production Hardening / Academic Poster Contract`
+  - `P22 / OPL Federation Integration`
+
+Current honest limits:
+
+- formal operations / evaluation OS is not finished yet
+- poster production hardening is not finished yet:
+  - `poster_onepager` is only the current `knowledge poster` surface
+  - `paper_poster / conference_poster` academic-poster contract is still a follow-on program
+  - poster-specific review and ops/eval surfaces are not finished yet
+- OPL federation integration is not finished yet
 
 ## Recommended Entry Priority
 
 1. `MCP`
 2. `CLI`
-
-## What Comes Next
-
-The next long-term direction is not “more random features”. It is:
-
-1. recover AI-first / director-first creative ownership from residual deterministic JS logic
-2. prove RedCube is a real extensible visual-deliverable OS
-3. turn runtime quality into a true operations / evaluation surface
-4. integrate RedCube into the OPL federation as a formal domain node
-
-That next sequence is currently organized as:
-
-- `P19 / Creative Ownership Recovery And Director-First Mainline`
-- `P20 / Extension Proof And Third-Family Onboarding`
-- `P21 / Operations And Evaluation OS`
-- `P22 / OPL Federation Integration`
 
 ## Installation And Basic Verification
 
@@ -210,6 +176,8 @@ npm run redcube -- deliverable create \
   --title "Thyroid Basics" \
   --goal "Explain thyroid fundamentals to undergraduate students"
 ```
+
+</details>
 
 ## Documentation Boundary
 

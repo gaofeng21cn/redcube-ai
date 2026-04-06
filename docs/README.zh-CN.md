@@ -23,6 +23,12 @@
 - `visual_director_review`
 - `screenshot_review`
 
+当前能力快照：
+
+- `ppt_deck`：已验证的 production-grade baseline family
+- `xiaohongshu`：已验证的 production-grade baseline family
+- `poster_onepager`：已完成 extension proof 的 `knowledge poster` surface，不等于 academic poster closeout
+
 如果你是专家、PI、内容团队负责人或需要接入本项目的技术同事，优先从这里开始。
 
 ## 默认对外双语公开面

@@ -12,10 +12,11 @@
 在当前 Codex / OMX 语境里，`Codex-native host agent` 可以是正式主执行器；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
 
-当前最重要的两类交付物是：
+当前最成熟的两类交付物，加上一条已完成 extension proof 的海报 surface，是：
 
 - `PPT deck`
 - `小红书图文`
+- `poster_onepager / knowledge_poster`
 
 ## 顶层链路
 
@@ -175,16 +176,17 @@ User / Agent
 当前 reality：
 
 - shared source plane 已存在
-- 两条 family 已共享 gateway / runtime / governance / artifact surfaces
+- 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
 - `ppt_deck` 还只有显式 `screenshot_review`
-- Story Architecture 与 Visual Authorship 中仍有 deterministic JS 越界创作
+- `poster_onepager` 已完成第三 family onboarding / extension proof，但当前只应被解释为 knowledge poster
+- `paper_poster / conference_poster` academic poster contract 仍未正式存在
 
 当前目标态：
 
-- 两条 family 在语义上统一到同一生命周期
+- 多条 family 在语义上统一到同一生命周期
 - `ppt_deck` 也具备显式 `visual_director_review`
-- AI / director 主导 story 与 visual 创作
+- `knowledge poster` 与 `academic poster` 正式切开
 - 代码只保留边界、校验、治理、审计、落盘与导出
 
 ## 为什么 PPT 和小红书放在同一套系统里

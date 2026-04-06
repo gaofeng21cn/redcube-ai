@@ -58,6 +58,10 @@
 
 ## 面向未来的约束
 
+- 当前正式 surface 已包括：
+  - `ppt_deck`
+  - `xiaohongshu`
+  - `poster_onepager`（当前只代表 knowledge poster，不代表 academic poster closeout）
 - 新交付物类型应通过 overlay 扩展，而不是重新引入独立主线
 - 新入口应挂在 Gateway 之上，而不是在外面包一层平行系统
 - 新的质量规则应进入 contract / gate / policy，而不是依赖 prompt 补救

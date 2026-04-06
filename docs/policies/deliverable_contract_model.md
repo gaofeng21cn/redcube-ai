@@ -20,6 +20,13 @@
 
 - `ppt_deck`
 - `xiaohongshu`
+- `poster_onepager`
+
+补充定位：
+
+- `ppt_deck` 与 `xiaohongshu` 是当前 production-grade baseline family
+- `poster_onepager` 当前是已完成 extension proof 的 `knowledge poster` family
+- `paper_poster / conference_poster` academic poster contract 尚未正式存在，不能偷换成当前 `poster_onepager`
 
 ### Profile Pack
 

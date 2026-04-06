@@ -23,6 +23,12 @@ Shared review overlay:
 - `visual_director_review`
 - `screenshot_review`
 
+Current capability snapshot:
+
+- `ppt_deck`: verified production-grade baseline family
+- `xiaohongshu`: verified production-grade baseline family
+- `poster_onepager`: extension-proven `knowledge poster` surface, not an academic-poster closeout
+
 ## External Bilingual Surface
 
 This index and the repository home are the default GitHub-facing bilingual public surface.
