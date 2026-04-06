@@ -26,3 +26,26 @@
   }
 }
 ```
+
+## runtime_artifact
+```json
+{
+  "storyline": {
+    "speaker": "{{speaker}}",
+    "audience": "{{audience}}",
+    "style": "先拆问题与误区，再拆机制与判断，再用公开证据收束成动作路径",
+    "core_metaphor": "把 AI 放回科研链：{{source_claim_1}}",
+    "hook": [
+      "为什么现在要讲：{{promise}}"
+    ],
+    "journey": [
+      "先拆问题与误区，再拆机制轨道与判断梯",
+      "再用公开证据页建立可信度",
+      "最后收束成课后动作清单"
+    ],
+    "resolution": [
+      "听众带走一条可复述的判断链"
+    ]
+  }
+}
+```

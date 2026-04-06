@@ -15,6 +15,7 @@
 - 禁止 renderSlide / layoutByType / cardsGrid / pageType
 - 必须落实视觉导演稿中的节奏曲线、峰值页、页面家族上限、禁退化语法
 - 复杂结构页必须显式网格 / 轨道 / 锚点
+- final HTML markup 必须来自 prompt-pack authored markup artifact，代码只负责 slot hydration
 
 ## runtime_seed
 ```json
@@ -32,15 +33,36 @@
       "summary_peak": "ppt.summary_peak",
       "default": "ppt.compare_zones"
     },
-    "template_registry": {
-      "ppt.hero_signal": "render-templates/ppt.hero_signal.html",
-      "ppt.compare_zones": "render-templates/ppt.compare_zones.html",
-      "ppt.timeline_rail": "render-templates/ppt.timeline_rail.html",
-      "ppt.judgement_ladder": "render-templates/ppt.judgement_ladder.html",
-      "ppt.ring_cross": "render-templates/ppt.ring_cross.html",
-      "ppt.central_axis": "render-templates/ppt.central_axis.html",
-      "ppt.summary_peak": "render-templates/ppt.summary_peak.html"
-    }
+    "shell_guards": [
+      "保留 slide-display-area / prev-btn / next-btn / slidesData",
+      "输出 render plan 供 review 与审计读取",
+      "在每页根节点写入 recipe_id / peak_page / director_role"
+    ]
+  }
+}
+```
+
+## runtime_artifact
+```json
+{
+  "render_markup_artifact": {
+    "artifact_surface": "prompt_pack_artifact",
+    "binding_model": "slot_hydration_only",
+    "authored_markup_registry": {
+      "ppt.hero_signal": "render-artifacts/ppt.hero_signal.html",
+      "ppt.compare_zones": "render-artifacts/ppt.compare_zones.html",
+      "ppt.timeline_rail": "render-artifacts/ppt.timeline_rail.html",
+      "ppt.judgement_ladder": "render-artifacts/ppt.judgement_ladder.html",
+      "ppt.ring_cross": "render-artifacts/ppt.ring_cross.html",
+      "ppt.central_axis": "render-artifacts/ppt.central_axis.html",
+      "ppt.summary_peak": "render-artifacts/ppt.summary_peak.html"
+    },
+    "allowed_shell_bindings": [
+      "metadata_attrs",
+      "display_gates",
+      "text_slots",
+      "source_slots"
+    ]
   }
 }
 ```

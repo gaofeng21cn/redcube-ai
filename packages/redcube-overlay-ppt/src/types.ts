@@ -231,7 +231,6 @@ export interface PptDeckRenderContract {
   render_strategy: 'prompt_director_first';
   shell_file: 'render_shell.html';
   recipe_registry: PptDeckRecipeRegistry;
-  template_registry: Record<PptDeckRecipeRegistry[keyof PptDeckRecipeRegistry], string>;
 }
 
 export interface PptDeckPromptPack {

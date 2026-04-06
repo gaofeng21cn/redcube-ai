@@ -283,7 +283,18 @@
           "public_sources": [
             "{{public_source_1}}"
           ],
-          "render_recipe_id": "ppt.compare_zones"
+          "render_recipe_id": "ppt.compare_zones",
+          "page_core_content": [
+            "建议先在高确定性、可复核的单点场景启动试点。",
+            "当前不建议全面铺开，因为责任归属、复核机制与资源边界尚未同时闭环。"
+          ],
+          "visual_anchor_tracks": [
+            "left-decision-card",
+            "right-boundary-card",
+            "bottom-commitment-band"
+          ],
+          "speaker_notes": "开场先给管理结论：先试点，不扩容。让听众立刻知道今天讨论的是决策条件，不是技术展演。",
+          "transition_sentence": "结论先说完，下一页解释为什么这个决策窗口已经到来。"
         },
         {
           "slide_id": "S02",
@@ -303,7 +314,19 @@
             "{{public_source_1}}",
             "{{public_source_2}}"
           ],
-          "render_recipe_id": "ppt.compare_zones"
+          "render_recipe_id": "ppt.compare_zones",
+          "page_core_content": [
+            "不决策的代价，是继续把资源投向边界不清的尝试。",
+            "过早扩容的代价，是把试点风险直接放大成组织性成本。",
+            "现在要做的，是在窗口期内把试点、复核、扩容顺序锁定。"
+          ],
+          "visual_anchor_tracks": [
+            "left-window-zone",
+            "right-cost-zone",
+            "bottom-action-band"
+          ],
+          "speaker_notes": "这一页只解释为什么现在必须决策：拖延会错过窗口，盲目扩容会放大成本。",
+          "transition_sentence": "既然窗口已经出现，下一页把决策压缩成管理层真正需要看的三条线。"
         },
         {
           "slide_id": "S03",
@@ -323,7 +346,19 @@
           "public_sources": [
             "{{public_source_1}}"
           ],
-          "render_recipe_id": "ppt.central_axis"
+          "render_recipe_id": "ppt.central_axis",
+          "page_core_content": [
+            "收益线：这件事是否真的改善关键业务结果。",
+            "风险线：失败代价、责任归属与监管压力是否可控。",
+            "资源线：现有团队、预算与节奏能否支撑试点闭环。"
+          ],
+          "visual_anchor_tracks": [
+            "left-benefit-axis",
+            "center-risk-axis",
+            "right-resource-axis"
+          ],
+          "speaker_notes": "把管理判断从技术细节里抽出来：所有讨论只围绕收益、风险、资源三条线。",
+          "transition_sentence": "三条线对齐后，下一页直接给出建议动作顺序。"
         },
         {
           "slide_id": "S04",
@@ -344,7 +379,19 @@
             "{{public_source_1}}",
             "{{public_source_2}}"
           ],
-          "render_recipe_id": "ppt.timeline_rail"
+          "render_recipe_id": "ppt.timeline_rail",
+          "page_core_content": [
+            "先限定场景试点，只验证最关键的一段闭环。",
+            "再按固定周期复核，用真实失败样例校准边界。",
+            "最后在指标与责任同时达标后，再讨论扩容。"
+          ],
+          "visual_anchor_tracks": [
+            "top-title-band",
+            "center-execution-track",
+            "bottom-timeline-guard"
+          ],
+          "speaker_notes": "动作顺序不能颠倒：先试点、再复核、后扩容。任何跳步都会把风险转嫁给组织。",
+          "transition_sentence": "动作顺序确定后，下一页说明哪些闸口没过就必须停。"
         },
         {
           "slide_id": "S05",
@@ -364,7 +411,19 @@
           "public_sources": [
             "{{public_source_2}}"
           ],
-          "render_recipe_id": "ppt.judgement_ladder"
+          "render_recipe_id": "ppt.judgement_ladder",
+          "page_core_content": [
+            "场景不稳定：暂停投入，先把使用边界与责任重新定义。",
+            "责任人不明确：暂停推进，先补治理 owner 与签收路径。",
+            "复核机制不到位：暂停扩容，先补失败样例与周期性复盘。"
+          ],
+          "visual_anchor_tracks": [
+            "left-stop-questions",
+            "right-stop-actions",
+            "bottom-governance-rail"
+          ],
+          "speaker_notes": "把这页讲成管理闸口：有一个关键前提答不清，就不该继续追加资源。",
+          "transition_sentence": "闸口清楚后，下一页只保留管理层真正需要的证据。"
         },
         {
           "slide_id": "S06",
@@ -386,7 +445,19 @@
             "{{public_source_2}}",
             "{{public_source_3}}"
           ],
-          "render_recipe_id": "ppt.compare_zones"
+          "render_recipe_id": "ppt.compare_zones",
+          "page_core_content": [
+            "价值证据：试点是否真的换来效率、质量或风险下降。",
+            "风险证据：失败样例、误判代价与监管约束是否被看见。",
+            "动作证据：下一步要谁负责、按什么节奏复核、何时决定扩容。"
+          ],
+          "visual_anchor_tracks": [
+            "top-claim-band",
+            "center-evidence-zones",
+            "bottom-source-rail"
+          ],
+          "speaker_notes": "证据页不能退回技术细节堆砌，只回答管理层关心的价值、风险、动作三件事。",
+          "transition_sentence": "证据口径讲清后，下一页把责任、节奏和资源绑成一个推进闭环。"
         },
         {
           "slide_id": "S07",
@@ -406,7 +477,22 @@
           "public_sources": [
             "{{public_source_2}}"
           ],
-          "render_recipe_id": "ppt.ring_cross"
+          "render_recipe_id": "ppt.ring_cross",
+          "page_core_content": [
+            "责任人：谁对试点结果与风险签收负责。",
+            "评估周期：多久复核一次，何时做去留判断。",
+            "资源边界：预算、人手、场景范围不能越线。",
+            "回修机制：一旦失败，如何停下、复盘并回到试点。"
+          ],
+          "visual_anchor_tracks": [
+            "center-owner-hub",
+            "north-cycle-zone",
+            "east-resource-zone",
+            "south-repair-zone",
+            "west-accountability-zone"
+          ],
+          "speaker_notes": "这一页把推进闭环说完整：责任、节奏、资源和回修机制要同时在场，组织才不会被动。",
+          "transition_sentence": "闭环成立后，最后一页把整场决策压缩成三句能直接复述的话。"
         },
         {
           "slide_id": "S08",
@@ -426,7 +512,19 @@
           "public_sources": [
             "{{public_source_1}}"
           ],
-          "render_recipe_id": "ppt.summary_peak"
+          "render_recipe_id": "ppt.summary_peak",
+          "page_core_content": [
+            "先试点，只在高确定性场景验证最小闭环。",
+            "严复核，用真实失败样例决定要不要继续投入。",
+            "后扩容，只有指标、责任与资源同时达标才放大。"
+          ],
+          "visual_anchor_tracks": [
+            "summary-left",
+            "summary-center",
+            "summary-right"
+          ],
+          "speaker_notes": "结尾不重复过程，只留下三句决策口径，让管理层会后仍能原样复述。",
+          "transition_sentence": "完。"
         }
       ]
     }

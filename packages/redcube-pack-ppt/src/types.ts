@@ -282,7 +282,6 @@ export interface PptRenderContract {
   render_strategy?: string;
   shell_file?: string;
   recipe_registry?: Partial<Record<PptLayoutFamily | 'default', PptRecipeId>>;
-  template_registry?: Partial<Record<PptRecipeId, string>>;
 }
 
 export interface PptRenderSlideDirectorContract {
@@ -312,7 +311,7 @@ export interface PptRenderSlide {
     recipe_selection: 'host_agent';
     final_markup: 'host_agent';
   };
-  template_contract_source: 'prompt_pack';
+  markup_contract_source: 'prompt_pack_artifact';
   content: string;
 }
 
@@ -320,6 +319,8 @@ export interface PptRenderPlan {
   render_strategy: string;
   shell_file: string;
   pack_id: string;
+  authored_markup_surface?: string;
+  markup_binding_model?: string;
   generator_instructions: string[];
   peak_pages: string[];
   page_family_ceiling: Partial<Record<PptLayoutFamily, number>>;
@@ -328,7 +329,9 @@ export interface PptRenderPlan {
     title: string;
     layout_family: PptLayoutFamily;
     recipe_id: PptRecipeId;
+    template_id?: string;
     peak_page: boolean;
+    director_role?: PptLayoutFamily;
   }>;
 }
 
@@ -414,6 +417,7 @@ export interface PptRenderArtifactDependencies {
     stageId: Extract<PptStageRoute, 'slide_blueprint' | 'visual_direction'>,
   ): T;
   renderContract(contract: PptHydratedContract): PptRenderContract;
+  promptArtifact(route: 'render_html', vars?: Record<string, string>): Record<string, unknown> | null;
   safeText(value: unknown, fallback?: string): string;
   safeArray<T>(value: T[] | null | undefined): T[];
   readPromptPackText(relativePath: string): string;
@@ -435,7 +439,7 @@ export interface PptRenderArtifactDependencies {
 export interface CompilePptRenderSlidesInput {
   slides: PptBlueprintSlide[];
   visualDirection: PptVisualDirection;
-  renderContract: PptRenderContract;
   canvas: PptCanvasContract;
-  recipeTemplates: Partial<Record<PptRecipeId, string>>;
+  recipeMarkupRegistry: Partial<Record<PptRecipeId, string>>;
+  recipeMarkupArtifacts: Partial<Record<PptRecipeId, string>>;
 }

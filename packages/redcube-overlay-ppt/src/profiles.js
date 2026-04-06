@@ -202,15 +202,6 @@ const FAMILY_PROMPT_PACK = {
       summary_peak: 'ppt.summary_peak',
       default: 'ppt.compare_zones',
     },
-    template_registry: {
-      'ppt.hero_signal': 'render-templates/ppt.hero_signal.html',
-      'ppt.compare_zones': 'render-templates/ppt.compare_zones.html',
-      'ppt.timeline_rail': 'render-templates/ppt.timeline_rail.html',
-      'ppt.judgement_ladder': 'render-templates/ppt.judgement_ladder.html',
-      'ppt.ring_cross': 'render-templates/ppt.ring_cross.html',
-      'ppt.central_axis': 'render-templates/ppt.central_axis.html',
-      'ppt.summary_peak': 'render-templates/ppt.summary_peak.html',
-    },
   },
 };
 

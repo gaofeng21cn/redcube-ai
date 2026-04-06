@@ -54,23 +54,6 @@ function deckPreset(profileId) {
   }
 }
 
-function anchorTracksForFamily(layoutFamily) {
-  switch (layoutFamily) {
-    case 'central_axis':
-      return ['vertical-axis', 'judgement-stops'];
-    case 'timeline_band':
-      return ['horizontal-track', 'timeline-stops'];
-    case 'judgement_ladder':
-      return ['ladder-rungs', 'action-checkpoints'];
-    case 'ring_cross':
-      return ['center-hub', 'cross-zones'];
-    case 'multi_zone_compare':
-      return ['left-zone', 'center-divider', 'right-zone'];
-    default:
-      return ['title-column', 'argument-band'];
-  }
-}
-
 function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_runtime_seed' }) {
   return {
     owner: 'host_agent',
@@ -142,17 +125,24 @@ export function buildPptOutlineSlides(contract, deps) {
   });
 }
 
-function toBlueprintContent(slide, deps) {
-  const explicit = deps.safeArray(slide.page_core_content);
-  const fallback = [
-    deps.safeText(slide.core_sentence),
-    ...deps.safeArray(slide.evidence_points),
-  ].filter(Boolean);
-  const items = explicit.length > 0 ? explicit : fallback;
-  return items.map((text, index) => ({
-    label: index === 0 ? '核心句' : `展开${index}`,
-    text,
-  }));
+function normalizeAuthoredPageCoreContent(slide, deps) {
+  const items = deps.safeArray(slide.page_core_content)
+    .map((item) => (item && typeof item === 'object'
+      ? {
+        label: deps.safeText(item.label),
+        text: deps.safeText(item.text),
+      }
+      : {
+        label: '',
+        text: deps.safeText(item),
+      }))
+    .filter((item) => item.text);
+
+  if (items.length === 0) {
+    throw new Error(`Missing ppt slide_blueprint authored page_core_content for slide: ${slide.slide_id}`);
+  }
+
+  return items;
 }
 
 function hydrateBlueprintSlidesFromPromptPack(contract, slides, deps) {
@@ -165,25 +155,39 @@ function hydrateBlueprintSlidesFromPromptPack(contract, slides, deps) {
     page_goal: slide.page_goal,
     core_sentence: slide.core_sentence,
     render_recipe_id: slide.render_recipe_id,
-    page_core_content: toBlueprintContent(slide, deps),
+    page_core_content: normalizeAuthoredPageCoreContent(slide, deps),
     visual_presentation: {
       layout_family: slide.layout_family,
-      anchor_tracks: deps.safeArray(slide.visual_anchor_tracks).length > 0
-        ? slide.visual_anchor_tracks
-        : anchorTracksForFamily(slide.layout_family),
+      anchor_tracks: (() => {
+        const anchorTracks = deps.safeArray(slide.visual_anchor_tracks).filter(Boolean);
+        if (anchorTracks.length === 0) {
+          throw new Error(`Missing ppt slide_blueprint authored visual_anchor_tracks for slide: ${slide.slide_id}`);
+        }
+        return anchorTracks;
+      })(),
       canvas: deps.CANVAS,
     },
     evidence_and_sources: deps.safeArray(slide.public_sources).map((source, sourceIndex) => ({
       source_id: `SRC-${slide.slide_no}-${sourceIndex + 1}`,
       public_label: source,
     })),
-    speaker_notes: deps.safeText(slide.speaker_notes)
-      || `${deps.safeText(slide.core_sentence)}。先用一句话点明本页任务，再按 ${deps.safeArray(slide.evidence_points).length} 个展开点说明为什么这一步不能跳过。`,
-    speaker_seconds: preset.speaker_seconds + (slide.layout_family === 'judgement_ladder' ? 10 : 0),
-    transition_sentence: deps.safeText(slide.transition_sentence)
-      || (index === slides.length - 1
-        ? '最后用一句总结把主线收束。'
-        : `讲完这一页后，顺着“${slides[index + 1].title}”进入下一页。`),
+    speaker_notes: (() => {
+      const speakerNotes = deps.safeText(slide.speaker_notes);
+      if (!speakerNotes) {
+        throw new Error(`Missing ppt slide_blueprint authored speaker_notes for slide: ${slide.slide_id}`);
+      }
+      return speakerNotes;
+    })(),
+    speaker_seconds: Number.isFinite(Number(slide.speaker_seconds))
+      ? Number(slide.speaker_seconds)
+      : preset.speaker_seconds,
+    transition_sentence: (() => {
+      const transitionSentence = deps.safeText(slide.transition_sentence);
+      if (!transitionSentence) {
+        throw new Error(`Missing ppt slide_blueprint authored transition_sentence for slide: ${slide.slide_id}`);
+      }
+      return transitionSentence;
+    })(),
     creative_sources: {
       page_core_content: creativeSourceStamp({
         route: 'slide_blueprint',
@@ -240,13 +244,21 @@ export function buildPptDetailedOutline(contract, deps) {
         core_sentence: slide.core_sentence,
         evidence_points: slide.evidence_points,
         public_sources: slide.public_sources,
-        page_core_content: toBlueprintContent(slide, deps).map((item) => item.text),
-        speaker_notes: deps.safeText(slide.speaker_notes)
-          || `${deps.safeText(slide.core_sentence)}。先用一句话点明本页任务，再按 ${deps.safeArray(slide.evidence_points).length} 个展开点说明为什么这一步不能跳过。`,
-        transition_sentence: deps.safeText(slide.transition_sentence)
-          || (index === slides.length - 1
-            ? '最后用一句总结把主线收束。'
-            : `讲完这一页后，顺着“${slides[index + 1].title}”进入下一页。`),
+        page_core_content: normalizeAuthoredPageCoreContent(slide, deps).map((item) => item.text),
+        speaker_notes: (() => {
+          const speakerNotes = deps.safeText(slide.speaker_notes);
+          if (!speakerNotes) {
+            throw new Error(`Missing ppt detailed_outline authored speaker_notes for slide: ${slide.slide_id}`);
+          }
+          return speakerNotes;
+        })(),
+        transition_sentence: (() => {
+          const transitionSentence = deps.safeText(slide.transition_sentence);
+          if (!transitionSentence) {
+            throw new Error(`Missing ppt detailed_outline authored transition_sentence for slide: ${slide.slide_id}`);
+          }
+          return transitionSentence;
+        })(),
         render_recipe_id: slide.render_recipe_id,
         creative_sources: {
           major_text: creativeSourceStamp({
@@ -348,23 +360,30 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   const blueprintArtifact = deps.readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const contractRender = deps.renderContract(contract);
+  const renderArtifact = deps.promptArtifact('render_html')?.render_markup_artifact || {};
+  const recipeMarkupRegistry = renderArtifact.authored_markup_registry || {};
+  if (Object.keys(recipeMarkupRegistry).length === 0) {
+    throw new Error(`Missing ppt render_html authored markup registry for profile: ${contract.profile_id}`);
+  }
   const compiler = await loadRenderPackCompiler(contract);
   const slidesMarkup = await compiler.compileRenderSlides({
     slides: blueprintArtifact.slide_blueprint.slides,
     visualDirection: visualArtifact.visual_direction,
-    renderContract: contractRender,
     canvas: deps.CANVAS,
-    recipeTemplates: Object.fromEntries(
-      Object.entries(contractRender.template_registry || {}).map(([recipeId, relativePath]) => [
+    recipeMarkupRegistry,
+    recipeMarkupArtifacts: Object.fromEntries(
+      Object.entries(recipeMarkupRegistry).map(([recipeId, relativePath]) => [
         recipeId,
-        deps.readPromptPackText(resolvePromptPackAsset(contract, relativePath, deps)),
+        deps.readPromptPackText(resolvePromptPackAsset(contract, deps.safeText(relativePath), deps)),
       ]),
     ),
   });
   const renderPlan = {
     render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
-    shell_file: deps.safeText(contractRender.shell_file, 'render_shell.html'),
+    shell_file: resolvePromptPackAsset(contract, deps.safeText(contractRender.shell_file, 'render_shell.html'), deps),
     pack_id: deps.safeText(contract?.prompt_pack?.pack_id),
+    authored_markup_surface: deps.safeText(renderArtifact.artifact_surface, 'prompt_pack_artifact'),
+    markup_binding_model: deps.safeText(renderArtifact.binding_model, 'slot_hydration_only'),
     generator_instructions: deps.safeArray(visualArtifact.visual_direction?.final_instruction_to_html_generator),
     peak_pages: deps.safeArray(visualArtifact.visual_direction?.peak_pages),
     page_family_ceiling: visualArtifact.visual_direction?.page_family_ceiling || {},
@@ -375,15 +394,12 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
       recipe_id: slide.recipe_id,
       template_id: slide.template_id,
       peak_page: slide.director_contract.peak_page,
+      director_role: slide.director_contract.director_role,
     })),
   };
   const htmlFile = deps.path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
   const slidesFile = deps.path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
-  const shellText = deps.readPromptPackText(resolvePromptPackAsset(
-    contract,
-    deps.safeText(contractRender.shell_file, 'render_shell.html'),
-    deps,
-  ));
+  const shellText = deps.readPromptPackText(renderPlan.shell_file);
   deps.writeText(htmlFile, buildDeckHtml({
     title: contract.title,
     slidesMarkup,

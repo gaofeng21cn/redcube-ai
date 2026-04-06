@@ -84,8 +84,12 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
 
   assert.equal(audit.residue.xiaohongshu.status, 'cleared');
   assert.deepEqual(audit.residue.xiaohongshu.findings, []);
-  assert.equal(audit.residue.ppt_deck.status, 'open');
-  assert.equal(audit.residue.ppt_deck.findings.length >= 3, true);
+  assert.equal(audit.residue.ppt_deck.status, 'cleared');
+  assert.equal(audit.residue.ppt_deck.findings.length, 0);
+  assert.deepEqual(
+    audit.residue.ppt_deck.findings.map((finding) => finding.protected_output),
+    [],
+  );
 
   assert.equal(audit.team_gate.shared_contract_frozen, true);
   assert.equal(audit.team_gate.shared_lifecycle_contract_frozen, true);
@@ -120,6 +124,6 @@ test('P19 audit emits a machine-readable closeout report artifact', () => {
   const stored = readJson(AUDIT_FILE);
   assert.equal(stored.milestone, 'P19.A');
   assert.equal(stored.residue.xiaohongshu.status, 'cleared');
-  assert.equal(stored.residue.ppt_deck.status, 'open');
+  assert.equal(stored.residue.ppt_deck.status, 'cleared');
   assert.equal(stored.review_overlay.ppt_deck.status, 'active');
 });

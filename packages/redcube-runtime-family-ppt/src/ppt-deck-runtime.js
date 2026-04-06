@@ -148,13 +148,8 @@ function renderSeedValue(value, vars) {
 }
 
 function promptSeed(route, vars = {}) {
-  const relativePath = PROMPT_PACK[route];
-  const absolutePath = path.join(REPO_ROOT, relativePath);
-  if (!existsSync(absolutePath)) return null;
-  const raw = readFileSync(absolutePath, 'utf-8');
-  const match = raw.match(/## runtime_seed\s*```json\s*([\s\S]*?)\s*```/);
-  if (!match) return null;
-  const rendered = renderSeedValue(JSON.parse(match[1]), vars);
+  const rendered = promptPackJsonSection(route, 'runtime_seed', vars);
+  if (!rendered) return null;
   const profileId = safeText(vars.profile_id);
   if (profileId && rendered?.profile_variants?.[profileId] && typeof rendered.profile_variants[profileId] === 'object') {
     const { profile_variants, ...base } = rendered;
@@ -164,6 +159,20 @@ function promptSeed(route, vars = {}) {
     };
   }
   return rendered;
+}
+
+function promptPackJsonSection(route, section, vars = {}) {
+  const relativePath = PROMPT_PACK[route];
+  const absolutePath = path.join(REPO_ROOT, relativePath);
+  if (!existsSync(absolutePath)) return null;
+  const raw = readFileSync(absolutePath, 'utf-8');
+  const match = raw.match(new RegExp(`## ${section}\\s*\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\``));
+  if (!match) return null;
+  return renderSeedValue(JSON.parse(match[1]), vars);
+}
+
+function promptArtifact(route, vars = {}) {
+  return promptPackJsonSection(route, 'runtime_artifact', vars);
 }
 
 function sharedSourceTruth(contract) {
@@ -323,10 +332,18 @@ function attachCommon(route, contract) {
 }
 
 function buildStoryline(contract) {
-  const seed = promptSeed('storyline', {
+  const preset = deckPreset(contract.profile_id);
+  const authoredArtifact = promptArtifact('storyline', {
+    speaker: preset.speaker,
+    audience: sharedSourceAudience(contract, preset.audience),
     goal: safeText(contract.goal),
+    promise: preset.promise,
     source_claim_1: sharedSourceSnippet(contract, 0) || safeText(contract.goal),
   });
+  const authoredStoryline = authoredArtifact?.storyline;
+  if (!authoredStoryline) {
+    throw new Error(`Missing ppt_deck storyline runtime_artifact for profile: ${contract.profile_id}`);
+  }
   return {
     ...attachCommon('storyline', contract),
     creative_execution: {
@@ -334,22 +351,22 @@ function buildStoryline(contract) {
       lifecycle_stage: lifecycleStageForRoute(contract, 'storyline'),
     },
     storyline: {
-      speaker: safeText(seed?.storyline?.speaker, '正式讲者'),
-      audience: safeText(seed?.storyline?.audience),
+      speaker: safeText(authoredStoryline.speaker),
+      audience: safeText(authoredStoryline.audience),
       goal: safeText(contract.goal),
-      style: safeText(seed?.storyline?.style),
-      core_metaphor: safeText(seed?.storyline?.core_metaphor),
+      style: safeText(authoredStoryline.style),
+      core_metaphor: safeText(authoredStoryline.core_metaphor),
       narrative_arc: {
-        hook: safeArray(seed?.storyline?.hook),
-        journey: safeArray(seed?.storyline?.journey),
-        resolution: safeArray(seed?.storyline?.resolution),
+        hook: safeArray(authoredStoryline.hook),
+        journey: safeArray(authoredStoryline.journey),
+        resolution: safeArray(authoredStoryline.resolution),
       },
       source_truth_input_mode: sharedSourceInputMode(contract) || 'seed_only',
       source_truth_confidence: sharedSourceConfidence(contract) || 'low',
       source_truth_material_ids: sharedSourceMaterialIds(contract),
       creative_sources: {
-        core_metaphor: hostAgentCreativeSource('outline_major_text', 'prompt_runtime_seed'),
-        narrative_arc: hostAgentCreativeSource('outline_major_text', 'prompt_runtime_seed'),
+        core_metaphor: hostAgentCreativeSource('outline_major_text', 'prompt_pack_artifact'),
+        narrative_arc: hostAgentCreativeSource('outline_major_text', 'prompt_pack_artifact'),
       },
     },
   };
@@ -769,6 +786,7 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
       payload = await buildPptRenderArtifact({ workspaceRoot, topicId, deliverableId, contract, deliverablePaths }, {
         readStageArtifact,
         renderContract,
+        promptArtifact,
         safeText,
         safeArray,
         attachCommon,

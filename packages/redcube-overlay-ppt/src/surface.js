@@ -100,8 +100,7 @@ const SURFACE_VALIDATORS = {
     && content.stages.visual_director_review.file === 'director_review.md'
     && content?.render_contract?.render_strategy === 'prompt_director_first'
     && content?.render_contract?.shell_file === 'render_shell.html'
-    && typeof content?.render_contract?.recipe_registry?.default === 'string'
-    && typeof content?.render_contract?.template_registry?.['ppt.summary_peak'] === 'string',
+    && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content) =>
     Array.isArray(content?.required_checks)
     && content.required_checks.length > 0

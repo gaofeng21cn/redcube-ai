@@ -165,7 +165,7 @@ test('P19.A machine-readable audit records lifecycle residue for both families',
   assert.equal(audit.shared_execution_contract.external_llm_status, 'optional_compatibility_adapter');
   assert.deepEqual(audit.unified_lifecycle.review_overlay, ['visual_director_review', 'screenshot_review']);
   assert.equal(audit.families.xiaohongshu.status, 'cleared');
-  assert.equal(audit.families.ppt_deck.status, 'present');
+  assert.equal(audit.families.ppt_deck.status, 'cleared');
   assert.equal(typeof audit.families.xiaohongshu.lifecycle_residue.story_architecture.status, 'string');
   assert.equal(typeof audit.families.xiaohongshu.lifecycle_residue.visual_authorship.status, 'string');
   assert.equal(typeof audit.families.xiaohongshu.lifecycle_residue.delivery_packaging.status, 'string');
@@ -177,7 +177,7 @@ test('P19.A machine-readable audit records lifecycle residue for both families',
   );
   assert.deepEqual(
     audit.families.ppt_deck.violations.filter((item) => item.status === 'present').map((item) => item.violation_id),
-    ['ppt.storyline.prompt_seed_authorship', 'ppt.slide_blueprint.shaping_authorship', 'ppt.render_html.template_authorship'],
+    [],
   );
 });
 

@@ -24,13 +24,15 @@ test('runtime no longer owns xiaohongshu slide recipe compiler branches', () => 
 test('runtime no longer owns ppt slide recipe compiler branches', () => {
   const runtime = read('packages/redcube-runtime/src/ppt-deck-runtime.js');
   const pack = read('packages/redcube-pack-ppt/src/render-compiler.js');
+  const renderPrompt = read('prompts/ppt_deck/render_html.md');
 
   assert.equal(runtime.includes('function compilePptRenderSlide('), false);
   assert.equal(runtime.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), false);
   assert.equal(pack.includes('export function compilePptRenderSlides'), true);
   assert.equal(pack.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), false);
-  assert.equal(pack.includes('renderContract?.template_registry?.[recipeId]'), true);
-  assert.equal(pack.includes('renderTemplate(templateText'), true);
+  assert.equal(pack.includes('renderContract?.template_registry?.[recipeId]'), false);
+  assert.equal(pack.includes('renderTemplate(templateText'), false);
+  assert.equal(renderPrompt.includes('authored_markup_registry'), true);
 });
 
 test('overlay render contracts use package-native compiler registry instead of render_pack.js path strings', () => {

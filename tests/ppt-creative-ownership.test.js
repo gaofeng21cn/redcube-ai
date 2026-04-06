@@ -23,18 +23,29 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const renderCompiler = existsSync(path.resolve('packages/redcube-pack-ppt/src/render-compiler.js'))
     ? read('packages/redcube-pack-ppt/src/render-compiler.js')
     : '';
+  const storylinePrompt = read('prompts/ppt_deck/storyline.md');
   const outlinePrompt = read('prompts/ppt_deck/detailed_outline.md');
   const visualPrompt = read('prompts/ppt_deck/visual_direction.md');
+  const renderHtmlPrompt = read('prompts/ppt_deck/render_html.md');
 
-  assert.equal(runtime.includes("safeText(seed?.storyline?.core_metaphor, '把 AI 放回科研链，而不是神化成万能入口')"), false);
-  assert.equal(runtime.includes("safeArray(seed?.storyline?.journey).length > 0 ? seed.storyline.journey : ["), false);
+  assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);
+  assert.equal(runtime.includes("core_metaphor: safeText(seed?.storyline?.core_metaphor)"), false);
   assert.equal(renderCompiler.includes('function pickRecipeId('), false);
   assert.equal(renderCompiler.includes('function renderSlideMarkup('), false);
+  assert.equal(renderCompiler.includes('function renderTemplate('), false);
+  assert.equal(renderCompiler.includes("renderContract?.template_registry?.[recipeId]"), false);
+  assert.equal(renderCompiler.includes("materializedFrom: 'prompt_runtime_template'"), false);
+  assert.equal(renderCompiler.includes('compiled.content = renderTemplate(templateText, buildTemplateState(compiled, canvas));'), false);
+  assert.equal(pack.includes('function toBlueprintContent('), false);
+  assert.equal(pack.includes("speaker_seconds: preset.speaker_seconds + (slide.layout_family === 'judgement_ladder' ? 10 : 0),"), false);
+  assert.match(storylinePrompt, /## runtime_artifact/);
   assert.match(outlinePrompt, /"render_recipe_id": "ppt\./);
   assert.match(visualPrompt, /"peak_pages": \[/);
+  assert.match(renderHtmlPrompt, /## runtime_artifact/);
+  assert.equal(renderHtmlPrompt.includes('"template_registry"'), false);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/director_review.md')), true);
-  assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-templates/ppt.hero_signal.html')), true);
-  assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-templates/ppt.summary_peak.html')), true);
+  assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.hero_signal.html')), true);
+  assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.summary_peak.html')), true);
 });
 
 test('ppt route artifacts record host-agent ownership for Story Architecture, Visual Authorship, and visual_director_review overlay', async () => {
@@ -66,6 +77,8 @@ test('ppt route artifacts record host-agent ownership for Story Architecture, Vi
   const storyline = readJson(results[0].artifactFile);
   assert.equal(storyline.creative_execution?.owner, 'host_agent');
   assert.equal(storyline.creative_execution?.lifecycle_stage, 'story_architecture');
+  assert.equal(storyline.storyline.creative_sources?.core_metaphor?.materialized_from, 'prompt_pack_artifact');
+  assert.equal(storyline.storyline.creative_sources?.narrative_arc?.materialized_from, 'prompt_pack_artifact');
 
   const outline = readJson(results[1].artifactFile);
   assert.equal(outline.creative_execution?.owner, 'host_agent');
@@ -100,7 +113,7 @@ test('ppt route artifacts record host-agent ownership for Story Architecture, Vi
     true,
   );
   assert.equal(
-    render.html_bundle.slides.every((slide) => typeof slide.template_id === 'string' && slide.template_id.endsWith('.html')),
+    render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.materialized_from === 'prompt_pack_artifact'),
     true,
   );
 
