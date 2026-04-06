@@ -7,6 +7,10 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readJson(file) {
+  return JSON.parse(read(file));
+}
+
 test('P21.A red: run record contract must freeze telemetry, error taxonomy, and rerun lineage surfaces', () => {
   const runtimeProtocolTypes = read('packages/redcube-runtime-protocol/src/types.ts');
   const runRecordFactory = read('packages/redcube-runtime-protocol/src/runs.js');
@@ -73,4 +77,20 @@ test('P21.A red: machine-readable ops-eval closeout artifact must exist', () => 
     existsSync(path.resolve('.omx/reports/redcube-runtime-program/P21_OPERATIONS_EVALUATION_STATUS.json')),
     true,
   );
+});
+
+test('P21.D closeout audit records implemented ops-eval scope and isolates remaining non-P21 red', () => {
+  const audit = readJson('.omx/reports/redcube-runtime-program/P21_OPERATIONS_EVALUATION_STATUS.json');
+
+  assert.equal(audit.program, 'P21');
+  assert.equal(audit.closeout_scope_ready, true);
+  assert.equal(audit.shared_generic_ops_eval_base_contract.run_telemetry, 'implemented');
+  assert.equal(audit.shared_generic_ops_eval_base_contract.error_taxonomy, 'implemented');
+  assert.equal(audit.shared_generic_ops_eval_base_contract.rerun_analytics, 'implemented');
+  assert.equal(audit.shared_generic_ops_eval_base_contract.cost_latency_token, 'implemented');
+  assert.equal(audit.shared_generic_ops_eval_base_contract.quality_drift_regression, 'implemented');
+  assert.equal(audit.shared_generic_ops_eval_base_contract.publish_approval_throughput, 'implemented');
+  assert.equal(audit.family_profile_metric_extension_surface.status, 'declared_machine_readable_extension');
+  assert.deepEqual(audit.remaining_red_failures, ['future academic poster machine-readable surface missing']);
+  assert.deepEqual(audit.out_of_scope_remaining_reds, ['poster_production_hardening.academic_surface_missing']);
 });
