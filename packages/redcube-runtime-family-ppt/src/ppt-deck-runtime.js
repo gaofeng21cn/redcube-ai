@@ -20,6 +20,34 @@ import { loadRenderPackCompiler } from '@redcube/pack-runtime';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
+/**
+ * @typedef {{
+ *   status?: string,
+ *   artifact_refs?: string[],
+ *   review_state_patch?: {
+ *     current_status?: string,
+ *     ready_for_export?: boolean,
+ *     latest_review_stage?: string,
+ *     pending_reviews?: string[],
+ *     blocking_reasons?: string[],
+ *     rerun_from_stage?: string | null,
+ *     rerun_policy?: {
+ *       status?: string,
+ *       rerun_from_stage?: string | null,
+ *     },
+ *   },
+ *   html_bundle?: {
+ *     html_file?: string,
+ *     page_count?: number,
+ *   },
+ *   export_bundle?: {
+ *     pptx_file?: string,
+ *     pdf_file?: string,
+ *     page_count?: number,
+ *   },
+ * }} PptRouteArtifact
+ */
+
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYTHON_REVIEW = path.join(MODULE_DIR, '../../redcube-runtime/scripts/ppt_deck_review.py');
@@ -569,6 +597,18 @@ export function canRunPptDeck(contract) {
   return contract?.deliverable_kind === 'ppt_deck';
 }
 
+/**
+ * @param {{
+ *   workspaceRoot: string,
+ *   topicId: string,
+ *   deliverableId: string,
+ *   route: string,
+ *   contract: { deliverable_kind?: string, profile_id?: string, stage_sequence?: { stages?: Array<{ stage_id?: string }> } },
+ *   mode?: string,
+ *   baselineDeliverableId?: string,
+ * }} input
+ * @returns {Promise<PptRouteArtifact>}
+ */
 export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, route, contract, mode = 'draft_new', baselineDeliverableId = '' }) {
   ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
