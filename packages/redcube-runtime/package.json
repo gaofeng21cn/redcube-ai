@@ -11,8 +11,7 @@
     "@redcube/governance": "0.1.0",
     "@redcube/pack-runtime": "0.1.0",
     "@redcube/reference-os": "0.1.0",
-    "@redcube/runtime-family-ppt": "0.1.0",
-    "@redcube/runtime-family-xiaohongshu": "0.1.0",
+    "@redcube/runtime-family-registry": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"
   }
 }

@@ -11,16 +11,25 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   const runtimeIndex = read('packages/redcube-runtime/src/index.js');
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
   const executors = read('packages/redcube-runtime/src/executors.js');
+  const runtimeFamilyRegistryPackageJson = JSON.parse(read('packages/redcube-runtime-family-registry/package.json'));
 
   assert.equal(runtimeIndex.includes("@redcube/governance"), true);
   assert.equal(runtimeIndex.includes("@redcube/reference-os"), true);
   assert.equal(runtimePackageJson.dependencies['@redcube/governance'], '0.1.0');
   assert.equal(runtimePackageJson.dependencies['@redcube/reference-os'], '0.1.0');
   assert.equal(runtimePackageJson.dependencies['@redcube/pack-runtime'], '0.1.0');
-  assert.equal(executors.includes("@redcube/runtime-family-ppt"), true);
-  assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), true);
+  assert.equal(runtimePackageJson.dependencies['@redcube/runtime-family-registry'], '0.1.0');
+  assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-ppt']), false);
+  assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-xiaohongshu']), false);
+  assert.equal(executors.includes("@redcube/runtime-family-registry"), true);
+  assert.equal(executors.includes("@redcube/runtime-family-ppt"), false);
+  assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), false);
   assert.equal(executors.includes('./ppt-deck-runtime.js'), false);
   assert.equal(executors.includes('./xiaohongshu-runtime.js'), false);
+  assert.deepEqual(
+    runtimeFamilyRegistryPackageJson.redcube.defaultRuntimeFamilyModules.map((entry) => entry.overlayId),
+    ['ppt_deck', 'xiaohongshu'],
+  );
 });
 
 test('harness audit: source truth remains canonical and legacy import feeds the same source intake path', () => {

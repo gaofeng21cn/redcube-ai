@@ -1,5 +1,4 @@
-import { canRunPptDeck, runPptDeckRoute } from '@redcube/runtime-family-ppt';
-import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-xiaohongshu';
+import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 
 /**
  * @typedef {{
@@ -8,7 +7,7 @@ import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-
  *   route: string,
  *   topicId: string,
  *   deliverableId: string,
- *   contract: { deliverable_kind?: string },
+ *   contract: { overlay?: string, deliverable_kind?: string },
  *   stageContract: { stage_id?: string } | null,
  *   mode?: string,
  *   baselineDeliverableId?: string,
@@ -104,24 +103,9 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         throw new Error(`Unsupported route for adapter external_llm: ${route}`);
       }
 
-      if (adapter === 'host_agent' && canRunPptDeck(contract)) {
-        const artifact = await runPptDeckRoute({
-          workspaceRoot,
-          route,
-          topicId,
-          deliverableId,
-          contract,
-          mode,
-          baselineDeliverableId,
-        });
-        return {
-          ...artifact,
-          execution_model: executionModel,
-        };
-      }
-
-      if (adapter === 'host_agent' && canRunXiaohongshu(contract)) {
-        const artifact = await runXiaohongshuRoute({
+      if (adapter === 'host_agent') {
+        const familyRunner = await loadRuntimeFamilyRunner(contract);
+        const artifact = await familyRunner.runRoute({
           workspaceRoot,
           route,
           topicId,

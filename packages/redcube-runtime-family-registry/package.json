@@ -1,0 +1,30 @@
+{
+  "name": "@redcube/runtime-family-registry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "redcube": {
+    "defaultRuntimeFamilyModules": [
+      {
+        "overlayId": "ppt_deck",
+        "deliverableKind": "ppt_deck",
+        "module": "@redcube/runtime-family-ppt",
+        "exportName": "runPptDeckRoute"
+      },
+      {
+        "overlayId": "xiaohongshu",
+        "deliverableKind": "xiaohongshu_note",
+        "module": "@redcube/runtime-family-xiaohongshu",
+        "exportName": "runXiaohongshuRoute"
+      }
+    ]
+  },
+  "dependencies": {
+    "@redcube/runtime-family-ppt": "0.1.0",
+    "@redcube/runtime-family-xiaohongshu": "0.1.0"
+  }
+}

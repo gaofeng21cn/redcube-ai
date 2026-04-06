@@ -66,3 +66,31 @@ test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed tool ga
   assert.match(types, /interface GatewayToolDefinition/);
   assert.match(types, /interface GatewayActionMap/);
 });
+
+test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and typed registry contracts', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/types.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json')), true);
+
+  const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/package.json'), 'utf-8'));
+  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
+  const packageTsconfig = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json'), 'utf-8'));
+  const entry = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-registry'),
+    true,
+  );
+
+  assert.match(entry, /listDefaultRuntimeFamilyModules/);
+  assert.match(entry, /getDefaultRuntimeFamilyCatalog/);
+  assert.match(entry, /resolveRuntimeFamilyModule/);
+  assert.match(entry, /loadRuntimeFamilyRunner/);
+
+  assert.match(types, /interface RuntimeFamilyModuleSpec/);
+  assert.match(types, /interface RuntimeFamilyCatalogSurface/);
+  assert.match(types, /interface LoadedRuntimeFamilyRunner/);
+});

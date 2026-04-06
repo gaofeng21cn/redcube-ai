@@ -32,9 +32,6 @@
       "path": "./packages/redcube-runtime-protocol"
     },
     {
-      "path": "./packages/redcube-runtime"
-    },
-    {
       "path": "./packages/redcube-pack-runtime"
     },
     {
@@ -48,6 +45,12 @@
     },
     {
       "path": "./packages/redcube-runtime-family-ppt"
+    },
+    {
+      "path": "./packages/redcube-runtime-family-registry"
+    },
+    {
+      "path": "./packages/redcube-runtime"
     },
     {
       "path": "./tsconfig.tests.json"

@@ -55,15 +55,20 @@ test('runtime executor no longer imports local family runtime files directly', (
 
   assert.equal(executors.includes("./ppt-deck-runtime.js"), false);
   assert.equal(executors.includes("./xiaohongshu-runtime.js"), false);
-  assert.equal(executors.includes("@redcube/runtime-family-ppt"), true);
-  assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), true);
+  assert.equal(executors.includes("@redcube/runtime-family-registry"), true);
+  assert.equal(executors.includes("@redcube/runtime-family-ppt"), false);
+  assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), false);
 });
 
-test('@redcube/runtime manifest declares family runtime package dependencies explicitly', () => {
+test('@redcube/runtime manifest declares runtime-family-registry dependency explicitly', () => {
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
+  const runtimeFamilyRegistryPackageJson = JSON.parse(read('packages/redcube-runtime-family-registry/package.json'));
 
-  assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt'], '0.1.0');
-  assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu'], '0.1.0');
+  assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-registry'], '0.1.0');
+  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt']), false);
+  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu']), false);
+  assert.equal(runtimeFamilyRegistryPackageJson.dependencies?.['@redcube/runtime-family-ppt'], '0.1.0');
+  assert.equal(runtimeFamilyRegistryPackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu'], '0.1.0');
 });
 
 test('runtime manifest declares pack-runtime dependency explicitly', () => {

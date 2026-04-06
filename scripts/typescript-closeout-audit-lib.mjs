@@ -24,6 +24,7 @@ const CONTRACT_SURFACES = [
 const SERVICE_BOUNDARIES = [
   'packages/redcube-runtime',
   'packages/redcube-pack-runtime',
+  'packages/redcube-runtime-family-registry',
   'apps/redcube-cli',
   'apps/redcube-mcp',
 ];
@@ -75,6 +76,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/xiaohongshu.js',
   ],
   'packages/redcube-pack-runtime': ['src/index.js'],
+  'packages/redcube-runtime-family-registry': ['src/index.js'],
   'packages/redcube-pack-xiaohongshu': [
     'src/index.js',
     'src/planning.js',
