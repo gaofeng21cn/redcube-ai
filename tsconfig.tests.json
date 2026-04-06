@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./.tsbuildinfo/tests.tsbuildinfo"
+  },
+  "include": [
+    "tests/**/*.js"
+  ]
+}
