@@ -20,7 +20,7 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
 
 test('root package exposes formal typecheck entrypoint', () => {
   const pkg = readJson('package.json');
-  assert.equal(pkg.scripts.typecheck, 'tsc -b tsconfig.json --pretty false');
+  assert.equal(pkg.scripts.typecheck, 'tsc --noEmit --project tsconfig.tests.json --pretty false');
 });
 
 test('workspace packages and apps participate in package-level tsconfig layering', () => {

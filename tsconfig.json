@@ -26,6 +26,9 @@
       "path": "./packages/redcube-pack-runtime"
     },
     {
+      "path": "./packages/redcube-pack-xiaohongshu"
+    },
+    {
       "path": "./tsconfig.tests.json"
     }
   ]
