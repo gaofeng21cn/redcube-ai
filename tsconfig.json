@@ -23,6 +23,9 @@
       "path": "./packages/redcube-overlay-xiaohongshu"
     },
     {
+      "path": "./packages/redcube-overlay-ppt"
+    },
+    {
       "path": "./packages/redcube-reference-os"
     },
     {

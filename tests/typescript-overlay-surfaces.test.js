@@ -95,3 +95,37 @@ test('P17 slice 4: overlay-xiaohongshu exposes a TypeScript entrypoint and typed
   assert.match(types, /interface XiaohongshuOverlayDefinition/);
   assert.doesNotMatch(types, /\bany\b/);
 });
+
+test('P17 slice 5: overlay-ppt exposes a TypeScript entrypoint and typed overlay contracts', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/types.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/tsconfig.json')), true);
+
+  const pkg = readJson('packages/redcube-overlay-ppt/package.json');
+  const rootTsconfig = readJson('tsconfig.json');
+  const packageTsconfig = readJson('packages/redcube-overlay-ppt/tsconfig.json');
+  const entry = readFileSync(path.resolve('packages/redcube-overlay-ppt/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('packages/redcube-overlay-ppt/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-ppt'),
+    true,
+  );
+
+  assert.match(entry, /buildDeckRecord/);
+  assert.match(entry, /PPT_DECK_PROFILES/);
+  assert.match(entry, /describePptDeckOverlay/);
+  assert.match(entry, /hydratePptDeckContract/);
+  assert.match(entry, /evaluateStoryboardGate/);
+  assert.match(entry, /buildDeckSurfaceBundle/);
+  assert.match(entry, /pptDeckOverlay/);
+
+  assert.match(types, /interface PptDeckRecord/);
+  assert.match(types, /interface PptDeckHydratedContract/);
+  assert.match(types, /interface PptDeckStoryboardGateReport/);
+  assert.match(types, /interface PptDeckSurfaceArtifact/);
+  assert.match(types, /interface PptDeckOverlayDefinition/);
+  assert.doesNotMatch(types, /\bany\b/);
+});
