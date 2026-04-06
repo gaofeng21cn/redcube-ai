@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -26,5 +26,41 @@ test('P20.B: runtime executor resolves host-agent family runners through runtime
   assert.equal(runtimePackage.dependencies?.['@redcube/runtime-family-registry'], '0.1.0');
 });
 
-test.todo('P20.C: overlay registry must expose poster_onepager as the third family candidate');
-test.todo('P20.C: poster_onepager onboarding packages and prompt surface must exist as machine-readable truth');
+test('P20.C red: overlay registry must expose poster_onepager as the third family candidate', () => {
+  const registryPackage = readJson('packages/redcube-overlay-registry/package.json');
+  const overlayIds = registryPackage.redcube?.defaultOverlayModules?.map((entry) => entry.overlayId) || [];
+  const posterEntry = registryPackage.redcube?.defaultOverlayModules?.find((entry) => entry.overlayId === 'poster_onepager');
+
+  assert.deepEqual(overlayIds, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);
+  assert.deepEqual(posterEntry, {
+    overlayId: 'poster_onepager',
+    module: '@redcube/overlay-poster-onepager',
+    exportName: 'posterOnepagerOverlay',
+  });
+});
+
+test('P20.C red: poster_onepager onboarding packages and prompt surface must exist as machine-readable truth', () => {
+  const requiredPaths = [
+    'packages/redcube-overlay-poster-onepager/package.json',
+    'packages/redcube-overlay-poster-onepager/src/index.js',
+    'packages/redcube-overlay-poster-onepager/src/index.ts',
+    'packages/redcube-runtime-family-poster-onepager/package.json',
+    'packages/redcube-runtime-family-poster-onepager/src/index.js',
+    'packages/redcube-runtime-family-poster-onepager/src/index.ts',
+    'packages/redcube-pack-poster-onepager/package.json',
+    'packages/redcube-pack-poster-onepager/src/index.js',
+    'packages/redcube-pack-poster-onepager/src/index.ts',
+    'prompts/poster_onepager/storyline.md',
+    'prompts/poster_onepager/poster_blueprint.md',
+    'prompts/poster_onepager/visual_direction.md',
+    'prompts/poster_onepager/render_html.md',
+    'prompts/poster_onepager/director_review.md',
+    'prompts/poster_onepager/screenshot_review.md',
+    'prompts/poster_onepager/export_bundle.md',
+  ];
+
+  assert.deepEqual(
+    requiredPaths.filter((file) => existsSync(path.resolve(file))),
+    requiredPaths,
+  );
+});

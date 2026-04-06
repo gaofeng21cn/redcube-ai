@@ -18,12 +18,18 @@
         "overlayId": "xiaohongshu",
         "module": "@redcube/overlay-xiaohongshu",
         "exportName": "xiaohongshuOverlay"
+      },
+      {
+        "overlayId": "poster_onepager",
+        "module": "@redcube/overlay-poster-onepager",
+        "exportName": "posterOnepagerOverlay"
       }
     ]
   },
   "dependencies": {
     "@redcube/overlay-core": "0.1.0",
     "@redcube/overlay-ppt": "0.1.0",
-    "@redcube/overlay-xiaohongshu": "0.1.0"
+    "@redcube/overlay-xiaohongshu": "0.1.0",
+    "@redcube/overlay-poster-onepager": "0.1.0"
   }
 }

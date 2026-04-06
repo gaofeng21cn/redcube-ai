@@ -18,7 +18,17 @@
         "packId": "xiaohongshu_mainline_v1",
         "module": "@redcube/pack-xiaohongshu",
         "exportName": "compileXhsRenderSlides"
+      },
+      {
+        "packId": "poster_onepager_mainline_v1",
+        "module": "@redcube/pack-poster-onepager",
+        "exportName": "compilePosterRenderSlides"
       }
     ]
+  },
+  "dependencies": {
+    "@redcube/pack-ppt": "0.1.0",
+    "@redcube/pack-xiaohongshu": "0.1.0",
+    "@redcube/pack-poster-onepager": "0.1.0"
   }
 }

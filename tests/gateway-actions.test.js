@@ -66,11 +66,11 @@ test('getOverlayCatalog exposes registry-driven overlay/profile discovery surfac
   assert.equal(result.ok, true);
   assert.equal(result.surface_kind, 'overlay_catalog');
   assert.equal(result.recommended_action, 'create_deliverable');
-  assert.equal(result.summary.total_overlays, 2);
-  assert.equal(result.summary.total_profiles, 5);
+  assert.equal(result.summary.total_overlays, 3);
+  assert.equal(result.summary.total_profiles, 6);
   assert.deepEqual(
     result.overlays.map((overlay) => overlay.overlay_id),
-    ['ppt_deck', 'xiaohongshu'],
+    ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.deepEqual(
     result.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck')?.profiles,
@@ -79,5 +79,9 @@ test('getOverlayCatalog exposes registry-driven overlay/profile discovery surfac
   assert.equal(
     result.overlays.find((overlay) => overlay.overlay_id === 'xiaohongshu')?.default_profile_id,
     'standard_note',
+  );
+  assert.equal(
+    result.overlays.find((overlay) => overlay.overlay_id === 'poster_onepager')?.default_profile_id,
+    'knowledge_poster',
   );
 });

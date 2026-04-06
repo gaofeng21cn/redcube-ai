@@ -85,12 +85,24 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'pack-xiaohongshu'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-pack-poster-onepager'),
+    path.join(gatewayNodeModulesDir, 'pack-poster-onepager'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
     path.join(gatewayNodeModulesDir, 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-xiaohongshu'),
     path.join(gatewayNodeModulesDir, 'runtime-family-xiaohongshu'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-runtime-family-poster-onepager'),
+    path.join(gatewayNodeModulesDir, 'runtime-family-poster-onepager'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-runtime-family-registry'),
+    path.join(gatewayNodeModulesDir, 'runtime-family-registry'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-core'),
@@ -107,6 +119,10 @@ function createIsolatedCliInstall() {
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-xiaohongshu'),
     path.join(gatewayNodeModulesDir, 'overlay-xiaohongshu'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-overlay-poster-onepager'),
+    path.join(gatewayNodeModulesDir, 'overlay-poster-onepager'),
   );
 
   return {
@@ -201,11 +217,12 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.ok, true);
   assert.match(parsed.whatIsRedCube, /PPT deck/);
   assert.match(parsed.whatIsRedCube, /小红书图文/);
+  assert.match(parsed.whatIsRedCube, /单页知识海报/);
   assert.equal(parsed.usage.deliverableCreate.includes('<ppt_deck|xiaohongshu>'), false);
   assert.equal(parsed.discovery.profileList, 'redcube profile --action list');
   assert.deepEqual(
     parsed.availableOverlays.map((overlay) => overlay.overlay_id),
-    ['ppt_deck', 'xiaohongshu'],
+    ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
@@ -232,14 +249,18 @@ test('CLI profile list exposes registry-driven overlay catalog from isolated ins
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'overlay_catalog');
   assert.equal(parsed.recommended_action, 'create_deliverable');
-  assert.equal(parsed.summary.total_overlays, 2);
+  assert.equal(parsed.summary.total_overlays, 3);
   assert.deepEqual(
     parsed.overlays.map((overlay) => overlay.overlay_id),
-    ['ppt_deck', 'xiaohongshu'],
+    ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.deepEqual(
     parsed.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck')?.profiles,
     ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+  );
+  assert.deepEqual(
+    parsed.overlays.find((overlay) => overlay.overlay_id === 'poster_onepager')?.profiles,
+    ['knowledge_poster'],
   );
 });
 

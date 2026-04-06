@@ -5,6 +5,7 @@ import {
   createOverlayRegistry,
   hydrateDeliverableContract,
 } from '../packages/redcube-overlay-core/src/index.js';
+import { getDefaultOverlayRegistry } from '../packages/redcube-overlay-registry/src/index.js';
 import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
 import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
 
@@ -106,4 +107,27 @@ test('hydrateDeliverableContract rejects unknown profile_id for a family', () =>
     }),
     /Unknown profile_id for overlay ppt_deck: not-exist/,
   );
+});
+
+test('hydrateDeliverableContract resolves poster_onepager knowledge_poster contract as machine-readable surface', () => {
+  const registry = getDefaultOverlayRegistry();
+
+  const contract = hydrateDeliverableContract(registry, {
+    overlay: 'poster_onepager',
+    profileId: 'knowledge_poster',
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    title: '甲状腺门诊知识海报',
+    goal: '为门诊患者生成单页知识海报',
+  });
+
+  assert.equal(contract.overlay, 'poster_onepager');
+  assert.equal(contract.profile_id, 'knowledge_poster');
+  assert.equal(contract.deliverable_kind, 'poster_onepager');
+  assert.deepEqual(
+    contract.stage_sequence.stages.map((stage) => stage.stage_id),
+    ['storyline', 'poster_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'export_bundle'],
+  );
+  assert.equal(contract.prompt_pack.pack_id, 'poster_onepager_mainline_v1');
+  assert.equal(contract.export_bundle.bundle_id, 'poster_onepager_bundle');
 });

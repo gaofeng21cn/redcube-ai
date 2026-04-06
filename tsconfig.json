@@ -26,6 +26,9 @@
       "path": "./packages/redcube-overlay-ppt"
     },
     {
+      "path": "./packages/redcube-overlay-poster-onepager"
+    },
+    {
       "path": "./packages/redcube-reference-os"
     },
     {
@@ -41,10 +44,16 @@
       "path": "./packages/redcube-pack-xiaohongshu"
     },
     {
+      "path": "./packages/redcube-pack-poster-onepager"
+    },
+    {
       "path": "./packages/redcube-runtime-family-xiaohongshu"
     },
     {
       "path": "./packages/redcube-runtime-family-ppt"
+    },
+    {
+      "path": "./packages/redcube-runtime-family-poster-onepager"
     },
     {
       "path": "./packages/redcube-runtime-family-registry"

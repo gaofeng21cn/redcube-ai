@@ -71,6 +71,31 @@ test('@redcube/runtime manifest declares runtime-family-registry dependency expl
   assert.equal(runtimeFamilyRegistryPackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu'], '0.1.0');
 });
 
+test('pack-runtime manifest reserves poster_onepager compiler slot through registry truth', () => {
+  const packRuntimePackageJson = JSON.parse(read('packages/redcube-pack-runtime/package.json'));
+
+  assert.deepEqual(
+    packRuntimePackageJson.redcube?.defaultPackCompilerModules,
+    [
+      {
+        packId: 'ppt_deck_mainline_v1',
+        module: '@redcube/pack-ppt',
+        exportName: 'compilePptRenderSlides',
+      },
+      {
+        packId: 'xiaohongshu_mainline_v1',
+        module: '@redcube/pack-xiaohongshu',
+        exportName: 'compileXhsRenderSlides',
+      },
+      {
+        packId: 'poster_onepager_mainline_v1',
+        module: '@redcube/pack-poster-onepager',
+        exportName: 'compilePosterRenderSlides',
+      },
+    ],
+  );
+});
+
 test('runtime manifest declares pack-runtime dependency explicitly', () => {
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
 
@@ -85,4 +110,14 @@ test('family runtime packages no longer import render-pack loader from runtime i
   assert.equal(xhsFamily.includes("../../redcube-runtime/src/render-pack-compiler.js"), false);
   assert.equal(pptFamily.includes("@redcube/pack-runtime"), true);
   assert.equal(xhsFamily.includes("@redcube/pack-runtime"), true);
+});
+
+test('poster_onepager onboarding reads prompt-pack and rerun policy from hydrated contract instead of family-local fallback', () => {
+  const posterPack = read('packages/redcube-pack-poster-onepager/src/index.js');
+  const posterRuntime = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js');
+
+  assert.equal(posterPack.includes("prompts/poster_onepager"), false);
+  assert.equal(posterRuntime.includes("prompts/poster_onepager"), false);
+  assert.equal(posterRuntime.includes('DEFAULT_PROMPT_PACK'), false);
+  assert.equal(posterRuntime.includes('review_surface?.rerun_from_stage'), true);
 });

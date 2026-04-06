@@ -68,6 +68,35 @@ test('P17 slice 2: pack-ppt exposes a TypeScript pack entrypoint and typed high-
   assert.doesNotMatch(types, /\bany\b/);
 });
 
+test('P20.C: pack-poster-onepager exposes a TypeScript pack entrypoint and typed onboarding contracts', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/types.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/tsconfig.json')), true);
+
+  const pkg = readJson('packages/redcube-pack-poster-onepager/package.json');
+  const rootTsconfig = readJson('tsconfig.json');
+  const packageTsconfig = readJson('packages/redcube-pack-poster-onepager/tsconfig.json');
+  const entry = readFileSync(path.resolve('packages/redcube-pack-poster-onepager/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('packages/redcube-pack-poster-onepager/src/types.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-pack-poster-onepager'),
+    true,
+  );
+
+  assert.match(entry, /buildPosterBlueprint/);
+  assert.match(entry, /buildPosterVisualDirection/);
+  assert.match(entry, /buildPosterRenderArtifact/);
+  assert.match(entry, /compilePosterRenderSlides/);
+
+  assert.match(types, /interface PosterBlueprintArtifact/);
+  assert.match(types, /interface PosterVisualDirectionArtifact/);
+  assert.match(types, /interface PosterRenderSlide/);
+  assert.doesNotMatch(types, /\bany\b/);
+});
+
 
 test('P17 slice 6: runtime-family-xiaohongshu exposes a TypeScript runtime entrypoint and typed family contracts', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-xiaohongshu/src/index.ts')), true);

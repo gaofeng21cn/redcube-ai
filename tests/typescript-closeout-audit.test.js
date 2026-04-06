@@ -21,6 +21,7 @@ const CONTRACT_SURFACES = [
   'packages/redcube-overlay-registry',
   'packages/redcube-overlay-xiaohongshu',
   'packages/redcube-overlay-ppt',
+  'packages/redcube-overlay-poster-onepager',
 ];
 
 const SERVICE_BOUNDARIES = [
@@ -34,12 +35,15 @@ const SERVICE_BOUNDARIES = [
 const HIGH_CHURN_PACKAGES = [
   'packages/redcube-pack-xiaohongshu',
   'packages/redcube-pack-ppt',
+  'packages/redcube-pack-poster-onepager',
   'packages/redcube-overlay-core',
   'packages/redcube-overlay-registry',
   'packages/redcube-overlay-xiaohongshu',
   'packages/redcube-overlay-ppt',
+  'packages/redcube-overlay-poster-onepager',
   'packages/redcube-runtime-family-xiaohongshu',
   'packages/redcube-runtime-family-ppt',
+  'packages/redcube-runtime-family-poster-onepager',
 ];
 
 const JS_RESIDUE_ALLOWLIST = {
@@ -107,6 +111,12 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/profiles.js',
     'src/surface.js',
   ],
+  'packages/redcube-overlay-poster-onepager': [
+    'src/contracts.js',
+    'src/gates.js',
+    'src/index.js',
+    'src/surface.js',
+  ],
   'packages/redcube-runtime-family-xiaohongshu': [
     'src/index.js',
     'src/xiaohongshu-runtime.js',
@@ -114,6 +124,14 @@ const JS_RESIDUE_ALLOWLIST = {
   'packages/redcube-runtime-family-ppt': [
     'src/index.js',
     'src/ppt-deck-runtime.js',
+  ],
+  'packages/redcube-runtime-family-poster-onepager': [
+    'src/index.js',
+    'src/poster-onepager-runtime.js',
+  ],
+  'packages/redcube-pack-poster-onepager': [
+    'src/index.js',
+    'src/render-compiler.js',
   ],
 };
 

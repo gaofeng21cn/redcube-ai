@@ -107,7 +107,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
 
   return {
     ok: true,
-    whatIsRedCube: 'RedCube AI 是面向专家与 PIs 的视觉交付运行入口，当前重点支持 PPT deck 与小红书图文。',
+    whatIsRedCube: 'RedCube AI 是面向专家与 PIs 的视觉交付运行入口，当前重点支持 PPT deck、小红书图文与单页知识海报。',
     preferredEntry: ['MCP', 'CLI'],
     discovery: {
       profileList: 'redcube profile --action list',

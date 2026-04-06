@@ -80,6 +80,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   const catalog = getDefaultOverlayCatalog();
   const ppt = catalog.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck');
   const xiaohongshu = catalog.overlays.find((overlay) => overlay.overlay_id === 'xiaohongshu');
+  const poster = catalog.overlays.find((overlay) => overlay.overlay_id === 'poster_onepager');
 
   assert.equal(catalog.surface_kind, 'overlay_catalog');
   assert.deepEqual(
@@ -111,6 +112,22 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
         overlay: '@redcube/overlay-xiaohongshu',
         runtime_family: '@redcube/runtime-family-xiaohongshu',
         pack: '@redcube/pack-xiaohongshu',
+      },
+    },
+  );
+  assert.deepEqual(
+    poster,
+    {
+      overlay_id: 'poster_onepager',
+      default_profile_id: 'knowledge_poster',
+      profiles: ['knowledge_poster'],
+      route_sequence: ['storyline', 'poster_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'export_bundle'],
+      deliverable_kind: 'poster_onepager',
+      prompt_pack_id: 'poster_onepager_mainline_v1',
+      packages: {
+        overlay: '@redcube/overlay-poster-onepager',
+        runtime_family: '@redcube/runtime-family-poster-onepager',
+        pack: '@redcube/pack-poster-onepager',
       },
     },
   );

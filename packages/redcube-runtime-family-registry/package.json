@@ -20,11 +20,18 @@
         "deliverableKind": "xiaohongshu_note",
         "module": "@redcube/runtime-family-xiaohongshu",
         "exportName": "runXiaohongshuRoute"
+      },
+      {
+        "overlayId": "poster_onepager",
+        "deliverableKind": "poster_onepager",
+        "module": "@redcube/runtime-family-poster-onepager",
+        "exportName": "runPosterOnepagerRoute"
       }
     ]
   },
   "dependencies": {
     "@redcube/runtime-family-ppt": "0.1.0",
-    "@redcube/runtime-family-xiaohongshu": "0.1.0"
+    "@redcube/runtime-family-xiaohongshu": "0.1.0",
+    "@redcube/runtime-family-poster-onepager": "0.1.0"
   }
 }

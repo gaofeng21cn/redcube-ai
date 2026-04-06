@@ -28,7 +28,7 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   assert.equal(executors.includes('./xiaohongshu-runtime.js'), false);
   assert.deepEqual(
     runtimeFamilyRegistryPackageJson.redcube.defaultRuntimeFamilyModules.map((entry) => entry.overlayId),
-    ['ppt_deck', 'xiaohongshu'],
+    ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
 });
 
@@ -115,11 +115,11 @@ test('harness audit: extension proof shows onboarding is registry-driven instead
 
   assert.deepEqual(
     overlayRegistryPackage.redcube.defaultOverlayModules.map((item) => item.overlayId),
-    ['ppt_deck', 'xiaohongshu'],
+    ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.deepEqual(
     packRuntimePackage.redcube.defaultPackCompilerModules.map((item) => item.packId),
-    ['ppt_deck_mainline_v1', 'xiaohongshu_mainline_v1'],
+    ['ppt_deck_mainline_v1', 'xiaohongshu_mainline_v1', 'poster_onepager_mainline_v1'],
   );
   assert.equal(createDeliverable.includes('@redcube/overlay-ppt'), false);
   assert.equal(createDeliverable.includes('@redcube/overlay-xiaohongshu'), false);

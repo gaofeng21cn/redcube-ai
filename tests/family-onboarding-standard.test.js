@@ -45,6 +45,11 @@ test('overlay registry package exports default registry entrypoint', () => {
         module: '@redcube/overlay-xiaohongshu',
         exportName: 'xiaohongshuOverlay',
       },
+      {
+        overlayId: 'poster_onepager',
+        module: '@redcube/overlay-poster-onepager',
+        exportName: 'posterOnepagerOverlay',
+      },
     ],
   );
   assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-ppt']), false);
