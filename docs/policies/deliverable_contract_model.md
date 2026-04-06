@@ -44,6 +44,25 @@
 - 可审计的
 - 可被 runtime 直接消费的
 
+它还必须能被映射到共享生命周期：
+
+1. `Source Readiness`
+2. `Story Architecture`
+3. `Visual Authorship`
+4. `Delivery Packaging`
+
+审核与治理采用共享双层 overlay：
+
+- `visual_director_review`
+- `screenshot_review`
+
+补充约束：
+
+- `research` 不应作为小红书专属 creative stage 固化在长期语义里
+- `single_note_plan` 与 `detailed_outline + slide_blueprint` 可以在 route 粒度上不同，但在宏观上都属于 `Story Architecture`
+- `visual_direction + render_html` 在两条 family 中都属于 `Visual Authorship`
+- `publish_copy + export_bundle` 与 `export_pptx` 在宏观上都属于 `Delivery Packaging`
+
 ## 稳定对象模型
 
 正式运行对象采用：
@@ -61,3 +80,6 @@
 - 不能把质量标准拖到导出前靠人工补救
 - 不能让 family 直接承担所有细分场景语义
 - 不能让 runtime 直接内嵌 overlay 领域判断
+- 不能让 deterministic JS 重新主导 story / visual 主要创作
+- 不能让 `research` 长期变成小红书专属 creative 路由语义
+- 不能让 PPT 永久缺失显式 `visual_director_review`

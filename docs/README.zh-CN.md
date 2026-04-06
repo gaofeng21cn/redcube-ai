@@ -9,6 +9,19 @@
 - 对外：`RedCube AI` 是 `Visual Deliverable Gateway`
 - 对内：它由 `Visual Deliverable Harness OS` 驱动
 - 在 `OPL` 顶层语义里：它是视觉交付 domain gateway，而不是 `OPL` 本体
+- 在 Codex / OMX 语境里：`Agent-first` 不等于只能走 `external_llm`，`Codex-native host agent` 可以是正式主执行器
+
+统一生命周期口径：
+
+1. `Source Readiness`
+2. `Story Architecture`
+3. `Visual Authorship`
+4. `Delivery Packaging`
+
+统一审核 overlay：
+
+- `visual_director_review`
+- `screenshot_review`
 
 如果你是专家、PI、内容团队负责人或需要接入本项目的技术同事，优先从这里开始。
 

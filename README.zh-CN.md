@@ -7,7 +7,7 @@
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
 <p align="center"><strong>面向 Agent 的 Visual Deliverable Gateway</strong></p>
-<p align="center">PPT 演示文稿 · 小红书图文 · Agent-first · Human-auditable</p>
+<p align="center">PPT 演示文稿 · 小红书图文 · Agent-first · AI-first Intent · Human-auditable</p>
 
 <table>
   <tr>
@@ -26,7 +26,19 @@
   </tr>
 </table>
 
-> 对外，它是面向 Agent 的 `Visual Deliverable Gateway`；对内，它由一个 `Agent-first, human-auditable` 的 `Visual Deliverable Harness OS` 驱动。
+> 对外，它是面向 Agent 的 `Visual Deliverable Gateway`；对内，它由一个 `Agent-first, human-auditable` 的 `Visual Deliverable Harness OS` 驱动。typed contract 只是工程护栏，不是产品定位。
+
+这里的 Agent-first 不等于必须走 `external_llm`。在 Codex / OMX 的执行语境里，`Codex-native host agent` 可以是正式主执行器，而代码退回 contract、governance、audit 与 artifact 边界。
+
+## 今天已经被证明的是什么
+
+当前仓库已经不再是松散原型，以下 baseline 已经在 `main` 上被验证：
+
+- `PPT deck` 和 `小红书图文` 都已经是同一条正式 runtime 主线上的 family
+- `typecheck`、端到端路由、review / publish governance、全量回归测试都已全绿
+- TypeScript baseline、typed contract、typed service boundary、high-churn package boundary 都已经被 machine-readable closeout audit 覆盖
+
+也就是说：现在的 RedCube 已经是一个带 typed 工程护栏的 Agent-first visual-deliverable baseline，而不只是 prompt 试验田。
 
 ## 在 OPL 联邦中的位置
 
@@ -42,6 +54,73 @@
 `User / Agent -> OPL Gateway（可选顶层）-> RedCube Gateway -> RedCube Harness OS`
 
 即使不经过 `OPL` 顶层，`RedCube AI` 也应保留独立可用的 domain gateway 角色，而不是退化成 OPL 的内部实现细节。
+
+## 当前能力范围
+
+RedCube 当前正式支持两条 production-grade baseline family：
+
+| Family | 当前状态 | 典型用途 |
+| --- | --- | --- |
+| `ppt_deck` | 已验证的 baseline | 课程讲义、报告、答辩、正式 briefing |
+| `xiaohongshu` | 已验证的 baseline | 知识图文、科普传播、系列发布 |
+
+这两条 family 共享同一套：
+
+- gateway
+- runtime / harness
+- governance model
+- reference quality OS
+- review / rerun / publish control model
+
+真正的差异落在 family / profile / pack contract，而不是隐藏在一次性脚本里。
+
+## 统一生命周期模型
+
+RedCube 现在应收敛到一套共享的宏观生命周期：
+
+1. `Source Readiness`
+2. `Story Architecture`
+3. `Visual Authorship`
+4. `Delivery Packaging`
+
+审核统一按双层 overlay 跟踪：
+
+- `visual_director_review`
+- `screenshot_review`
+
+这里有一个关键澄清：
+
+- `research` 不应再被理解成小红书专属 creative stage
+- 它属于 shared source readiness / source augmentation
+- 只有当 source truth 不足、原始材料不够、或后续 story / visual 判断缺少支撑时，才应触发
+
+family 级 route 粒度仍然可以不同：
+
+- `小红书`
+  - `Story Architecture` 当前对应 `storyline + single_note_plan`
+  - `Delivery Packaging` 当前对应 `publish_copy + export_bundle`
+- `PPT deck`
+  - `Story Architecture` 当前对应 `storyline + detailed_outline + slide_blueprint`
+  - `Delivery Packaging` 当前对应 `export_pptx`
+
+当前优先级是先统一语义和职责边界，而不是先做大规模 route 改名。
+
+## 当前限制
+
+RedCube 现在已经可用，但还不是终态。
+
+需要诚实写清的限制有：
+
+- 创作主导权仍然是当前最高优先级问题：
+  - director-first contract 已存在
+  - 但 deterministic compiler 和 JS pack logic 仍然拥有一部分实际表达路径
+  - 真正的 AI-first / director-first authoring 还没有完全恢复
+  - 双层审核模型也还没有完全收口：
+    - `小红书` 已经有 `visual_director_review + screenshot_review`
+    - `PPT deck` 还缺显式 `visual_director_review`
+- 第三个 family 的 extension proof 还没做完
+- 正式的 operations / evaluation OS 还没做完
+- OPL federation integration 还没做完
 
 ## 这个平台适合谁
 
@@ -110,6 +189,15 @@
 
 所以更准确的理解是：它是一个 `Visual Deliverable Gateway + Harness OS`，而不是一个让人类自己点按钮操作的 Web 工具。
 
+当前真实状态还要再补一层理解：
+
+- shared source plane 已经存在
+- 两条 family 已共享 runtime、治理与 artifact 面
+- 但 creative chain 仍未完全收口：
+  - Story Architecture 和 Visual Authorship 里仍有 deterministic JS 越界创作
+  - `ppt_deck` 与 `xiaohongshu` 的 route surface 仍未完全语义对齐
+  - 当前是“生命周期语义先统一，route naming 后统一”的阶段
+
 ## 当前推荐入口
 
 如果你是普通用户，优先通过你的 Agent 来使用它。  
@@ -117,6 +205,22 @@
 
 1. `MCP`
 2. `CLI`
+
+## 下一阶段会做什么
+
+下一阶段不应该继续补零散 feature，而是围绕 4 个更高层目标：
+
+1. 先把创作主导权从残余的 deterministic JS 逻辑里夺回来，恢复 AI-first / director-first 主线
+2. 再证明 RedCube 真的是可扩展的 visual-deliverable OS
+3. 把 runtime quality 推进成正式的 operations / evaluation surface
+4. 把 RedCube 正式接入 OPL federation，成为 visual-deliverable domain node
+
+当前下一阶段的 program 顺序是：
+
+- `P19 / Creative Ownership Recovery And Director-First Mainline`
+- `P20 / Extension Proof And Third-Family Onboarding`
+- `P21 / Operations And Evaluation OS`
+- `P22 / OPL Federation Integration`
 
 ## 文档约定
 

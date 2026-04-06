@@ -6,6 +6,10 @@
 
 `RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由内部的 `Visual Deliverable Harness OS` 驱动。
 
+这里的 `Agent-first` 不等于必须走 `external_llm` API。
+在当前 Codex / OMX 语境里，`Codex-native host agent` 可以是正式主执行器；
+代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
+
 当前最重要的两类交付物是：
 
 - `PPT deck`
@@ -32,6 +36,17 @@ User / Agent
               -> RedCube Harness OS
 ```
 
+更贴近当前目标态的执行主线是：
+
+```text
+User / Agent
+  -> CLI / MCP
+      -> Gateway
+          -> Harness OS
+              -> Codex-native host agent executor
+              -> Governance / Audit / Artifact persistence
+```
+
 ## 各层职责
 
 ### RedCube Gateway
@@ -55,6 +70,12 @@ User / Agent
 - review surface
 - 导出要求
 
+这里要特别避免一个错误：
+
+- `pack-first` 不等于 `AI-first`
+- 如果主要 story / visual / render authorship 仍由 deterministic JS 完成，
+  即使这些逻辑已经移到 pack，也仍然不算恢复了 AI-first 主线
+
 ### RedCube Harness OS
 
 负责执行、记录与审计，不负责顶层产品语义。
@@ -66,6 +87,104 @@ User / Agent
 - rerun / resume
 - canonical artifact 落盘
 
+它不应该继续主导：
+
+- story architecture major text authorship
+- visual direction major expression
+- final HTML markup authorship
+
+这些都应逐步回到 agent / director 主执行面。
+
+## 统一生命周期
+
+`RedCube` 现在应该按一套共享宏观生命周期理解，而不是把 `ppt_deck` 和 `xiaohongshu` 当成两套彼此割裂的流程：
+
+1. `Source Readiness`
+2. `Story Architecture`
+3. `Visual Authorship`
+4. `Delivery Packaging`
+
+审核与治理采用双层 overlay：
+
+- `visual_director_review`
+- `screenshot_review`
+
+### Source Readiness
+
+负责：
+
+- intake / extract / normalize / audit
+- source sufficiency judgement
+- 在 source truth 不足时触发 research augmentation
+
+因此：
+
+- `research` 不应继续被理解成 `xiaohongshu` 专属 creative stage
+- 它属于 shared source readiness / source augmentation
+
+### Story Architecture
+
+负责：
+
+- 讲什么
+- 怎么讲
+- 页/章节/篇章顺序
+
+当前语义映射：
+
+- `xiaohongshu`：`storyline + single_note_plan`
+- `ppt_deck`：`storyline + detailed_outline + slide_blueprint`
+
+### Visual Authorship
+
+负责：
+
+- `visual_direction`
+- `render_html`
+
+这一步必须由 agent / director 主导。
+代码只保留 shell、canvas、artifact write、render gate。
+
+### Delivery Packaging
+
+负责最终交付包装：
+
+- `xiaohongshu`：`publish_copy + export_bundle`
+- `ppt_deck`：`export_pptx`
+
+### Review Overlay
+
+`visual_director_review` 负责导演层审片：
+
+- 导演意图是否落地
+- 是否反模板化
+- 是否有节奏、峰值页、记忆点
+
+`screenshot_review` 负责技术质控：
+
+- overflow
+- occlusion
+- density
+- speaker/time fit
+- baseline relative comparison
+
+## 当前 reality 与目标态
+
+当前 reality：
+
+- shared source plane 已存在
+- 两条 family 已共享 gateway / runtime / governance / artifact surfaces
+- `xiaohongshu` 已有 `visual_director_review + screenshot_review`
+- `ppt_deck` 还只有显式 `screenshot_review`
+- Story Architecture 与 Visual Authorship 中仍有 deterministic JS 越界创作
+
+当前目标态：
+
+- 两条 family 在语义上统一到同一生命周期
+- `ppt_deck` 也具备显式 `visual_director_review`
+- AI / director 主导 story 与 visual 创作
+- 代码只保留边界、校验、治理、审计、落盘与导出
+
 ## 为什么 PPT 和小红书放在同一套系统里
 
 它们在目标场景上不同，但在运行形态上高度一致：
@@ -76,6 +195,12 @@ User / Agent
 - 都适合由 Agent 发起，而不是由人类手工点击界面
 
 因此它们共享同一 harness，只在 family / profile / pack contract 上分化。
+
+更准确地说：
+
+- 它们共享同一套宏观生命周期
+- 只是 family-specific 子工件数量不同
+- 当前阶段先统一生命周期语义与职责，再决定是否收敛 route naming
 
 ## OPL 语义边界
 

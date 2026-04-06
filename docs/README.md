@@ -9,6 +9,19 @@ Public framing:
 - External: `RedCube AI` is a `Visual Deliverable Gateway`.
 - Internal: it is powered by a `Visual Deliverable Harness OS`.
 - Under `OPL` top-level semantics: it is a visual-deliverable domain gateway, not the OPL system itself.
+- In the Codex / OMX operating model: `Agent-first` does not mean `external_llm` only; a `Codex-native host agent` can be the primary executor.
+
+Shared lifecycle framing:
+
+1. `Source Readiness`
+2. `Story Architecture`
+3. `Visual Authorship`
+4. `Delivery Packaging`
+
+Shared review overlay:
+
+- `visual_director_review`
+- `screenshot_review`
 
 ## For Human Users
 

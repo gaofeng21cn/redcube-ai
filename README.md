@@ -7,7 +7,7 @@
 [![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
 
 <p align="center"><strong>Agent-first Visual Deliverable Gateway</strong></p>
-<p align="center">PPT Decks · Xiaohongshu Posts · Human-auditable</p>
+<p align="center">PPT Decks · Xiaohongshu Posts · AI-first Intent · Human-auditable</p>
 
 <table>
   <tr>
@@ -26,7 +26,19 @@
   </tr>
 </table>
 
-> Externally, RedCube AI is a `Visual Deliverable Gateway`; internally, it runs on an `Agent-first, human-auditable Visual Deliverable Harness OS`.
+> Externally, RedCube AI is a `Visual Deliverable Gateway`; internally, it runs on an `Agent-first, human-auditable Visual Deliverable Harness OS`. Typed contracts are engineering guardrails, not the product identity.
+
+Agent-first here does not mean `external_llm` only. In the Codex / OMX operating model, a `Codex-native host agent` can be the primary creative executor, while code stays on contract, governance, audit, and artifact boundaries.
+
+## What Is Proven Today
+
+The current repository is no longer a loose prototype. The following baseline is already verified on `main`:
+
+- `PPT deck` and `Xiaohongshu note` are both formal families on the same runtime mainline
+- `typecheck`, end-to-end routes, review / publish governance, and full regression suite are green
+- TypeScript baseline, typed contract surfaces, typed service boundaries, and high-churn package boundaries are covered by a machine-readable closeout audit
+
+In other words: RedCube already works as an agent-first visual-deliverable baseline with typed engineering guardrails, not just a prompt experiment.
 
 ## Position In The OPL Federation
 
@@ -40,6 +52,73 @@ Under the top-level `One Person Lab (OPL)` semantics:
 Target path:
 
 `User / Agent -> OPL Gateway (optional) -> RedCube Gateway -> RedCube Harness OS`
+
+## Current Scope
+
+RedCube currently has two production-grade baseline families:
+
+| Family | Current state | Typical use |
+| --- | --- | --- |
+| `ppt_deck` | Verified baseline | Teaching decks, reports, academic talks, internal briefings |
+| `xiaohongshu` | Verified baseline | Knowledge posts, science communication, serialized social publishing |
+
+These families share the same:
+
+- gateway
+- runtime / harness
+- governance model
+- reference quality OS
+- review / rerun / publish control model
+
+The difference lives in family / profile / pack contracts, not in hidden one-off scripts.
+
+## Lifecycle Model
+
+RedCube is converging on one shared macro lifecycle across families:
+
+1. `Source Readiness`
+2. `Story Architecture`
+3. `Visual Authorship`
+4. `Delivery Packaging`
+
+Review is tracked as a shared dual-layer overlay:
+
+- `visual_director_review`
+- `screenshot_review`
+
+Important clarification:
+
+- `research` is not meant to be a Xiaohongshu-only creative stage
+- it belongs to shared source readiness / source augmentation
+- it should be triggered when source truth is missing, weak, or insufficient for downstream story and visual work
+
+Family-specific route granularity can still differ:
+
+- `Xiaohongshu`
+  - story architecture currently maps to `storyline + single_note_plan`
+  - delivery packaging currently maps to `publish_copy + export_bundle`
+- `PPT deck`
+  - story architecture currently maps to `storyline + detailed_outline + slide_blueprint`
+  - delivery packaging currently maps to `export_pptx`
+
+The architectural goal is semantic alignment first, not premature route renaming.
+
+## Current Limits
+
+RedCube is already usable, but it is not yet the final form.
+
+Current limits to be honest about:
+
+- creative ownership is still the highest-priority unfinished issue:
+  - director-first contracts already exist
+  - but deterministic compilers and JS pack logic still own part of the actual expression path
+  - full AI-first / director-first authoring has not been fully restored yet
+  - the shared dual-layer review model is not fully converged yet:
+    - `xiaohongshu` already exposes `visual_director_review + screenshot_review`
+    - `ppt_deck` still needs an explicit `visual_director_review` surface
+- third-family extension proof is not finished yet
+- formal operations / evaluation OS is not finished yet
+- OPL federation integration is not finished yet
 
 ## Fast Start
 
@@ -70,10 +149,35 @@ Agent
               -> Event Log
 ```
 
+Current lifecycle reality:
+
+- the shared source plane already exists
+- both families already share governance, artifacts, and runtime surfaces
+- but the creative chain is still not aligned enough:
+  - deterministic JS still owns too much of story architecture and visual authorship
+  - `ppt_deck` and `xiaohongshu` still expose slightly different route surfaces
+  - semantic lifecycle alignment is ahead of route naming convergence
+
 ## Recommended Entry Priority
 
 1. `MCP`
 2. `CLI`
+
+## What Comes Next
+
+The next long-term direction is not “more random features”. It is:
+
+1. recover AI-first / director-first creative ownership from residual deterministic JS logic
+2. prove RedCube is a real extensible visual-deliverable OS
+3. turn runtime quality into a true operations / evaluation surface
+4. integrate RedCube into the OPL federation as a formal domain node
+
+That next sequence is currently organized as:
+
+- `P19 / Creative Ownership Recovery And Director-First Mainline`
+- `P20 / Extension Proof And Third-Family Onboarding`
+- `P21 / Operations And Evaluation OS`
+- `P22 / OPL Federation Integration`
 
 ## Installation And Basic Verification
 
