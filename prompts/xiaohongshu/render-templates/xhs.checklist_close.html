@@ -1,0 +1,24 @@
+<div data-slide-root="true" data-template-id="{{template_id}}" data-slide-id="{{slide_id}}" data-title="{{title}}" data-layout-family="{{layout_family}}" data-recipe-id="{{recipe_id}}" data-peak-page="{{peak_page}}" data-director-role="{{director_role}}" data-speaker-seconds="{{speaker_seconds}}" style="position:relative;width:{{canvas_width}}px;height:{{canvas_height}}px;background:{{root_background}};overflow:hidden;padding:20px 20px 44px;">
+  <div style="display:grid;grid-template-rows:auto 1fr;height:100%;gap:16px;">
+    <header data-qa-block="header" style="display:grid;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-size:14px;font-weight:800;color:{{accent}};letter-spacing:0.06em;text-transform:uppercase;">{{role_label}}</div>
+        {{#if peak_page}}<span style="display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(220,38,38,0.12);color:{{warning}};font-size:11px;font-weight:800;">峰值页</span>{{/if}}
+      </div>
+      <h2 style="margin:0;font-size:26px;line-height:1.22;color:#0F172A;">{{title}}</h2>
+      <div style="font-size:11px;line-height:1.45;color:#64748B;">{{visual_motif}}</div>
+    </header>
+    <div style="display:grid;grid-template-columns:1fr;gap:12px;align-content:start;">
+      {{#each checklist_rows}}
+      <div data-qa-block="check-row" data-primary-point="true" style="display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:18px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);">
+        <div style="width:28px;height:28px;border-radius:999px;background:#0F766E;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800;">✓</div>
+        <div style="font-size:18px;line-height:1.45;color:#0F172A;">{{text}}</div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <footer style="position:absolute;left:20px;right:20px;bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
+    <div data-source-label="true">{{source_label_1}}</div>
+    <div>{{slide_no}} / {{total_slides}}</div>
+  </footer>
+</div>

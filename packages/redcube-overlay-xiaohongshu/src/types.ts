@@ -230,6 +230,15 @@ export interface XiaohongshuPromptPack {
       action_checklist: 'xhs.checklist_close';
       default: 'xhs.annotated_cards';
     };
+    template_registry: {
+      'xhs.hero_note': 'prompts/xiaohongshu/render-templates/xhs.hero_note.html';
+      'xhs.split_contrast': 'prompts/xiaohongshu/render-templates/xhs.split_contrast.html';
+      'xhs.staggered_steps': 'prompts/xiaohongshu/render-templates/xhs.staggered_steps.html';
+      'xhs.track_rail': 'prompts/xiaohongshu/render-templates/xhs.track_rail.html';
+      'xhs.evidence_bands': 'prompts/xiaohongshu/render-templates/xhs.evidence_bands.html';
+      'xhs.checklist_close': 'prompts/xiaohongshu/render-templates/xhs.checklist_close.html';
+      'xhs.annotated_cards': 'prompts/xiaohongshu/render-templates/xhs.annotated_cards.html';
+    };
   };
 }
 
@@ -249,6 +258,24 @@ export interface XiaohongshuDisplaySurface {
 
 export interface XiaohongshuDisplayRegistry {
   surfaces: XiaohongshuDisplaySurface[];
+}
+
+export interface XiaohongshuLifecycleModel {
+  macro_lifecycle: Array<
+    'source_readiness'
+    | 'story_architecture'
+    | 'visual_authorship'
+    | 'delivery_packaging'
+  >;
+  route_to_stage: Partial<Record<Exclude<XiaohongshuStageId, 'visual_director_review' | 'screenshot_review'>, string>>;
+  review_overlay_routes: {
+    visual_director_review: 'visual_director_review';
+    screenshot_review: 'screenshot_review';
+  };
+  research_ownership: {
+    semantic_role: 'shared_source_readiness_augmentation';
+    trigger_conditions: string[];
+  };
 }
 
 export interface XiaohongshuHydrateContractRequest {
@@ -276,6 +303,7 @@ export interface XiaohongshuHydratedContract {
   prompt_pack: XiaohongshuPromptPack;
   export_bundle: XiaohongshuExportBundle;
   display_registry: XiaohongshuDisplayRegistry;
+  lifecycle_model: XiaohongshuLifecycleModel;
 }
 
 export interface XiaohongshuDeliverableRecordInput {

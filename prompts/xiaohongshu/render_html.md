@@ -22,6 +22,15 @@
       "action_checklist": "xhs.checklist_close",
       "default": "xhs.annotated_cards"
     },
+    "template_registry": {
+      "xhs.hero_note": "render-templates/xhs.hero_note.html",
+      "xhs.split_contrast": "render-templates/xhs.split_contrast.html",
+      "xhs.staggered_steps": "render-templates/xhs.staggered_steps.html",
+      "xhs.track_rail": "render-templates/xhs.track_rail.html",
+      "xhs.evidence_bands": "render-templates/xhs.evidence_bands.html",
+      "xhs.checklist_close": "render-templates/xhs.checklist_close.html",
+      "xhs.annotated_cards": "render-templates/xhs.annotated_cards.html"
+    },
     "shell_guards": [
       "保留 slide-display-area / prev-btn / next-btn / slidesData",
       "输出 render plan 供 review 与审计读取",

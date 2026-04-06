@@ -11,69 +11,154 @@ function escapeHtml(text) {
   return String(text || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-function sourceRail(sources) {
-  return `<div data-qa-block="sources" style="display:flex;gap:8px;flex-wrap:wrap;">${sources.map((source) => `<span data-source-label="true" style="display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,0.08);font-size:12px;color:#0F172A;">${escapeHtml(source.public_label)}</span>`).join('')}</div>`;
+function readPath(target, path) {
+  return String(path || '')
+    .split('.')
+    .filter(Boolean)
+    .reduce((value, key) => (value == null ? undefined : value[key]), target);
 }
 
-function pickRecipeId(slide, renderContract) {
-  const registry = renderContract?.recipe_registry || {};
-  return registry[slide.visual_presentation.layout_family] || registry.default || `ppt.${slide.visual_presentation.layout_family}`;
+function renderTemplate(template, vars) {
+  let output = String(template || '');
+
+  output = output.replace(/{{#each ([a-zA-Z0-9_.]+)}}([\s\S]*?){{\/each}}/g, (_match, path, block) => {
+    const items = safeArray(readPath(vars, path));
+    return items.map((item, index) => renderTemplate(block, {
+      ...vars,
+      ...(item && typeof item === 'object' ? item : { value: item }),
+      index,
+      index1: index + 1,
+    })).join('');
+  });
+
+  output = output.replace(/{{#if ([a-zA-Z0-9_.]+)}}([\s\S]*?){{\/if}}/g, (_match, path, block) => (
+    readPath(vars, path) ? renderTemplate(block, vars) : ''
+  ));
+
+  return output.replace(/{{([a-zA-Z0-9_.]+)}}/g, (_match, path) => escapeHtml(readPath(vars, path)));
 }
 
-function renderSlideMarkup(slide, canvas) {
-  const palette = slide.palette;
-  const points = slide.page_core_content.slice(1);
-  const peakBadge = slide.director_contract.peak_page ? `<span style="display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(37,99,235,0.12);color:${palette.accent};font-size:11px;font-weight:800;">PEAK</span>` : '';
-  const footer = `<div data-qa-block="footer" style="position:absolute;left:48px;right:48px;bottom:24px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#475569;"><div>${sourceRail(slide.evidence_and_sources)}</div><div style="font-weight:700;">${String(slide.slide_no).padStart(2, '0')} / ${String(slide.total_slides).padStart(2, '0')}</div></div>`;
-  const header = `<header data-qa-block="header" style="display:grid;gap:8px;"><div style="display:flex;align-items:center;gap:10px;"><div style="font-size:14px;letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:${palette.accent};">${escapeHtml(slide.page_goal)}</div>${peakBadge}</div><h2 style="margin:0;font-size:${slide.director_contract.peak_page ? '44px' : '40px'};line-height:1.15;color:${palette.ink};">${escapeHtml(slide.title)}</h2><p style="margin:0;font-size:22px;line-height:1.55;color:#334155;max-width:760px;">${escapeHtml(slide.page_core_content[0]?.text || '')}</p><div style="font-size:13px;line-height:1.5;color:#64748B;">${escapeHtml(slide.director_contract.visual_manifest)}</div></header>`;
-  const rootStart = `<div data-slide-root="true" data-slide-id="${slide.slide_id}" data-title="${escapeHtml(slide.title)}" data-speaker-seconds="${slide.speaker_seconds}" data-layout-family="${slide.layout_family}" data-recipe-id="${slide.recipe_id}" data-peak-page="${String(slide.director_contract.peak_page)}" style="position:relative;width:${canvas.width}px;height:${canvas.height}px;background:${palette.canvas};overflow:hidden;padding:44px 52px 56px;">`;
-
-  if (slide.recipe_id === 'ppt.timeline_rail') {
-    return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:24px;height:100%;">${header}<div data-qa-block="timeline" style="display:grid;grid-template-columns:repeat(${points.length},1fr);gap:16px;align-items:end;">${points.map((point, index) => `<section data-qa-block="timeline-card" style="display:grid;gap:12px;"><div style="width:22px;height:22px;border-radius:999px;background:${palette.accent};box-shadow:0 0 0 10px rgba(37,99,235,0.12);"></div><div style="padding:18px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;min-height:220px;"><div style="font-size:17px;font-weight:800;color:${palette.accent};margin-bottom:8px;">Step ${index + 1}</div><div style="font-size:22px;line-height:1.45;color:${palette.ink};">${escapeHtml(point.text)}</div></div></section>`).join('')}</div></div>${footer}</div>`;
-  }
-  if (slide.recipe_id === 'ppt.judgement_ladder') {
-    return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:20px;height:100%;">${header}<div data-qa-block="ladder" style="display:grid;gap:14px;">${points.map((point, index) => `<div data-qa-block="ladder-row" data-primary-point="true" style="display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:stretch;"><div style="border-radius:18px;background:${palette.accent};color:#FFFFFF;font-size:26px;font-weight:800;display:flex;align-items:center;justify-content:center;">${index + 1}</div><div style="padding:16px 18px;border-radius:18px;background:#FFFFFF;border:1px solid #CBD5E1;display:flex;align-items:center;font-size:22px;line-height:1.45;color:${palette.ink};">${escapeHtml(point.text)}</div></div>`).join('')}</div></div>${footer}</div>`;
-  }
-  if (slide.recipe_id === 'ppt.ring_cross') {
-    const center = points[0]?.text || slide.page_goal;
-    return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:20px;height:100%;">${header}<div data-qa-block="cross" style="position:relative;min-height:360px;"><div data-qa-block="hub" style="position:absolute;left:50%;top:50%;transform:translate(-50%, -50%);width:260px;min-height:140px;border-radius:28px;background:linear-gradient(135deg, rgba(37,99,235,0.16), #FFFFFF);border:1px solid rgba(37,99,235,0.22);display:grid;place-items:center;text-align:center;padding:28px;font-size:24px;font-weight:800;color:${palette.ink};">${escapeHtml(center)}</div><div data-qa-block="north" style="position:absolute;left:50%;top:0;transform:translateX(-50%);width:250px;min-height:98px;padding:16px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;place-items:center;text-align:center;font-size:22px;font-weight:700;color:${palette.ink};">${escapeHtml(points[1]?.text || '')}</div><div data-qa-block="east" style="position:absolute;right:0;top:50%;transform:translateY(-50%);width:250px;min-height:98px;padding:16px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;place-items:center;text-align:center;font-size:22px;font-weight:700;color:${palette.ink};">${escapeHtml(points[2]?.text || '')}</div><div data-qa-block="south" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:250px;min-height:98px;padding:16px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;place-items:center;text-align:center;font-size:22px;font-weight:700;color:${palette.ink};">${escapeHtml(points[3]?.text || slide.transition_sentence)}</div><div data-qa-block="west" style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:250px;min-height:98px;padding:16px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;place-items:center;text-align:center;font-size:22px;font-weight:700;color:${palette.ink};">${escapeHtml(slide.transition_sentence)}</div></div></div>${footer}</div>`;
-  }
-  if (slide.recipe_id === 'ppt.central_axis') {
-    return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:20px;height:100%;">${header}<div data-qa-block="axis" style="position:relative;display:grid;grid-template-columns:repeat(${points.length},1fr);gap:18px;align-items:center;"><div style="position:absolute;left:40px;right:40px;top:50%;height:6px;border-radius:999px;background:linear-gradient(90deg, rgba(37,99,235,0.2), rgba(37,99,235,0.65));"></div>${points.map((point, index) => `<section data-qa-block="axis-card" data-primary-point="true" style="position:relative;display:grid;gap:10px;justify-items:center;"><div style="width:56px;height:56px;border-radius:999px;background:${palette.accent};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 10px 24px rgba(37,99,235,0.25);">${index + 1}</div><div style="padding:16px 16px 18px;min-height:170px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;gap:8px;"><div style="font-size:17px;font-weight:800;color:${palette.accent};">轴线 ${index + 1}</div><div style="font-size:22px;line-height:1.45;color:${palette.ink};">${escapeHtml(point.text)}</div></div></section>`).join('')}</div></div>${footer}</div>`;
-  }
-  if (slide.recipe_id === 'ppt.summary_peak') {
-    return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:20px;height:100%;">${header}<div data-qa-block="summary" style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;align-items:stretch;">${points.map((point, index) => `<section data-qa-block="summary-card" data-primary-point="true" style="padding:20px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;gap:10px;"><div style="font-size:13px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${palette.accent};">带走 ${index + 1}</div><div style="font-size:24px;line-height:1.45;color:${palette.ink};">${escapeHtml(point.text)}</div></section>`).join('')}</div></div>${footer}</div>`;
-  }
-  return `${rootStart}<div class="deck-slide" style="display:grid;grid-template-rows:auto 1fr;gap:20px;height:100%;">${header}<div data-qa-block="zones" style="display:grid;grid-template-columns:repeat(${Math.max(points.length, 2)},1fr);gap:18px;align-items:stretch;">${points.map((point, index) => `<section data-qa-block="zone-card" data-primary-point="true" style="padding:20px;border-radius:24px;background:#FFFFFF;border:1px solid #CBD5E1;display:grid;gap:10px;"><div style="font-size:13px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${palette.accent};">展开 ${index + 1}</div><div style="font-size:24px;line-height:1.45;color:${palette.ink};">${escapeHtml(point.text)}</div></section>`).join('')}</div></div>${footer}</div>`;
+function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom }) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
+    ownership_model: 'director_first',
+    route,
+    lifecycle_stage: lifecycleStage,
+    authored_surface: authoredSurface,
+    materialized_from: materializedFrom,
+  };
 }
 
-export function compilePptRenderSlides({ slides, visualDirection, renderContract, canvas }) {
+function buildTemplateState(slide, canvas) {
+  const items = safeArray(slide.page_core_content).map((item, index) => ({
+    label: safeText(item.label, index === 0 ? '核心句' : `展开${index}`),
+    text: safeText(item.text),
+    index1: index + 1,
+  }));
+  const lead = items[0]?.text || '';
+  const supporting = items.slice(1);
+  const sourceItems = safeArray(slide.evidence_and_sources).map((source) => ({ public_label: source.public_label }));
+  return {
+    slide_id: slide.slide_id,
+    slide_no: String(slide.slide_no).padStart(2, '0'),
+    total_slides: String(slide.total_slides).padStart(2, '0'),
+    title: slide.title,
+    page_goal: slide.page_goal,
+    layout_family: slide.layout_family,
+    recipe_id: slide.recipe_id,
+    template_id: slide.template_id,
+    peak_page: slide.director_contract.peak_page,
+    director_role: slide.director_contract.director_role,
+    speaker_seconds: slide.speaker_seconds,
+    canvas_width: canvas.width,
+    canvas_height: canvas.height,
+    palette_canvas: slide.palette.canvas,
+    palette_ink: slide.palette.ink,
+    palette_accent: slide.palette.accent,
+    palette_soft: slide.palette.accentSoft || '#DBEAFE',
+    palette_success: slide.palette.success || '#0F766E',
+    lead_text: lead,
+    lead_label: items[0]?.label || '核心句',
+    visual_manifest: slide.director_contract.visual_manifest,
+    source_items: sourceItems,
+    points: items.length > 0 ? items : [{ label: '核心句', text: lead, index1: 1 }],
+    secondary_points: supporting,
+    hub_text: lead || slide.page_goal,
+    north_text: supporting[0]?.text || '',
+    east_text: supporting[1]?.text || '',
+    south_text: supporting[2]?.text || slide.transition_sentence,
+    west_text: supporting[3]?.text || slide.transition_sentence,
+  };
+}
+
+export function compilePptRenderSlides({ slides, visualDirection, renderContract, canvas, recipeTemplates }) {
   return safeArray(slides).map((slide) => {
+    const recipeId = safeText(slide.render_recipe_id);
+    const templateId = safeText(renderContract?.template_registry?.[recipeId]);
+    const templateText = safeText(recipeTemplates?.[recipeId]);
+
+    if (!recipeId) {
+      throw new Error(`Missing ppt render_recipe_id for slide: ${slide.slide_id}`);
+    }
+    if (!templateId || !templateText) {
+      throw new Error(`Missing ppt render template for recipe: ${recipeId}`);
+    }
+
+    const creativeSources = {
+      recipe_selection: creativeSourceStamp({
+        route: 'render_html',
+        lifecycleStage: 'visual_authorship',
+        authoredSurface: 'recipe_selection',
+        materializedFrom: 'prompt_runtime_seed',
+      }),
+      final_markup: creativeSourceStamp({
+        route: 'render_html',
+        lifecycleStage: 'visual_authorship',
+        authoredSurface: 'final_html_markup',
+        materializedFrom: 'prompt_runtime_template',
+      }),
+    };
     const compiled = {
       slide_id: slide.slide_id,
       slide_no: slide.slide_no,
       title: slide.title,
       layout_family: slide.visual_presentation.layout_family,
-      recipe_id: pickRecipeId(slide, renderContract),
+      recipe_id: recipeId,
+      template_id: templateId,
       page_goal: slide.page_goal,
       page_core_content: safeArray(slide.page_core_content),
       evidence_and_sources: safeArray(slide.evidence_and_sources),
       speaker_seconds: slide.speaker_seconds,
       transition_sentence: slide.transition_sentence,
       director_contract: {
-        peak_page: safeArray(visualDirection.peak_pages).includes(slide.slide_id),
-        director_role: safeArray(visualDirection.page_role_table).find((item) => item.slide_id === slide.slide_id)?.page_role || slide.visual_presentation.layout_family,
-        generator_instructions: safeArray(visualDirection.final_instruction_to_html_generator),
-        page_family_ceiling: visualDirection.page_family_ceiling || {},
-        visual_manifest: safeText(visualDirection.visual_manifest),
+        peak_page: safeArray(visualDirection?.peak_pages).includes(slide.slide_id),
+        director_role: safeArray(visualDirection?.page_role_table).find((item) => item.slide_id === slide.slide_id)?.page_role || slide.visual_presentation.layout_family,
+        generator_instructions: safeArray(visualDirection?.final_instruction_to_html_generator),
+        page_family_ceiling: visualDirection?.page_family_ceiling || {},
+        visual_manifest: safeText(visualDirection?.visual_manifest),
       },
-      palette: visualDirection.palette,
+      palette: visualDirection?.palette || {
+        canvas: '#F7F8FC',
+        ink: '#0F172A',
+        accent: '#2563EB',
+      },
       total_slides: safeArray(slides).length,
+      creative_sources: creativeSources,
+      creative_authorship: {
+        recipe_decision: creativeSources.recipe_selection,
+        final_html_markup: creativeSources.final_markup,
+      },
+      template_contract_source: 'prompt_pack',
+      content: '',
     };
-    compiled.content = renderSlideMarkup(compiled, canvas);
+    compiled.content = renderTemplate(templateText, buildTemplateState(compiled, canvas));
     return compiled;
   });
 }

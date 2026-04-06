@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 
 import {
   createDeliverable,
+  getReviewState,
   intakeSource,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -39,6 +40,7 @@ async function runChain({ workspaceRoot, deliverableId, mode = 'draft_new', base
     'slide_blueprint',
     'visual_direction',
     'render_html',
+    'visual_director_review',
     'screenshot_review',
   ];
 
@@ -57,6 +59,7 @@ test('ppt_deck ships dedicated prompt pack instead of xiaohongshu prompt semanti
     'slide_blueprint.md',
     'visual_direction.md',
     'render_html.md',
+    'director_review.md',
     'screenshot_review.md',
     'export_pptx.md',
   ].map((file) => path.resolve('prompts', 'ppt_deck', file));
@@ -191,12 +194,16 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
   assert.match(html, /id="slide-display-area"/);
   assert.match(html, /id="prev-btn"/);
   assert.match(html, /id="next-btn"/);
-  assert.match(html, /const slidesData = \[/);
+  assert.match(html, /const slidesData =\s*\[/);
   assert.match(html, /data-render-strategy="prompt-director-first"/);
   assert.match(html, /id="redcube-render-plan"/);
   assert.equal(/renderSlide|layoutByType|cardsGrid|pageType/.test(html), false);
 
-  const reviewBundle = readJson(chain[5].result.artifactFile);
+  const directorReview = readJson(chain[5].result.artifactFile);
+  assert.equal(directorReview.review_overlay, 'visual_director_review');
+  assert.equal(directorReview.visual_director_review?.review_model, 'director_first_visual_judgement');
+
+  const reviewBundle = readJson(chain[6].result.artifactFile);
   assert.equal(typeof reviewBundle.status, 'string');
   assert.equal(Array.isArray(reviewBundle.slide_reviews), true);
   assert.equal(reviewBundle.slide_reviews.length, renderBundle.html_bundle.page_count);
@@ -229,6 +236,12 @@ test('optimize_existing screenshot review binds baseline and emits relative revi
   });
   const baselineChain = await runChain({ workspaceRoot, deliverableId: 'deck-baseline' });
   assert.equal(baselineChain.at(-1).result.ok, true);
+  const baselineState = await getReviewState({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-baseline',
+  });
+  assert.equal(baselineState.state.ready_for_export, true);
 
   await createDeliverable({
     workspaceRoot,
@@ -357,13 +370,13 @@ test('ppt_deck storyline/outline/blueprint/visual_direction consume shared sourc
 
   const richOutline = readJson(richResults[1].artifactFile);
   assert.equal(
-    richOutline.detailed_outline.slides.some((slide) => slide.core_sentence.includes('先定义问题，再判断证据，再决定动作')),
+    richOutline.detailed_outline.slides.some((slide) => slide.public_sources.includes('inputs/raw_materials/source-intake/01-rich-outline.md')),
     true,
   );
 
   const richBlueprint = readJson(richResults[2].artifactFile);
   assert.equal(
-    richBlueprint.slide_blueprint.slides.some((slide) => slide.page_core_content.some((item) => item.text.includes('公开来源翻译成学生能复述的话'))),
+    richBlueprint.slide_blueprint.slides.some((slide) => slide.evidence_and_sources.some((item) => item.public_label.includes('inputs/raw_materials/source-intake/01-rich-outline.md'))),
     true,
   );
 

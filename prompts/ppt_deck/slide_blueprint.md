@@ -13,6 +13,7 @@
 ## runtime_seed
 ```json
 {
+  "chapter_goal": "逐页落实讲授型 deck 的页面目标、视觉结构与讲稿动作",
   "quality_guards": {
     "no_generic_card_route": true,
     "independent_slides_data_content": true,

@@ -24,6 +24,12 @@ import {
 } from '@redcube/reference-os';
 
 import { appendEvent as appendEventJs, readEvents as readEventsJs } from './event-log.js';
+import {
+  P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT as P19CreativeOwnershipExecutionContractJs,
+  P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT as P19CreativeOwnershipLifecycleContractJs,
+  P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES as P19CreativeOwnershipForbiddenBoundariesJs,
+  buildCreativeOwnershipResidueAudit as buildCreativeOwnershipResidueAuditJs,
+} from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
@@ -37,6 +43,10 @@ import type {
   RuntimeRunRecord,
   RuntimeRunRouteRequest,
   RuntimeRunRouteResponse,
+  RuntimeCreativeOwnershipAudit,
+  RuntimeCreativeOwnershipExecutionContract,
+  RuntimeCreativeOwnershipLifecycleContract,
+  RuntimeCreativeOwnershipForbiddenBoundaries,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
   RuntimeStartRunRequest,
@@ -70,6 +80,17 @@ export function appendEvent(workspaceRoot: string, runId: string, event: Runtime
 
 export function readEvents(workspaceRoot: string, runId: string): unknown[] {
   return readEventsJs(workspaceRoot, runId) as unknown[];
+}
+
+export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT
+  = P19CreativeOwnershipExecutionContractJs as RuntimeCreativeOwnershipExecutionContract;
+export const P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT
+  = P19CreativeOwnershipLifecycleContractJs as RuntimeCreativeOwnershipLifecycleContract;
+export const P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES
+  = P19CreativeOwnershipForbiddenBoundariesJs as RuntimeCreativeOwnershipForbiddenBoundaries;
+
+export function buildCreativeOwnershipResidueAudit(): RuntimeCreativeOwnershipAudit {
+  return buildCreativeOwnershipResidueAuditJs() as RuntimeCreativeOwnershipAudit;
 }
 
 export async function runDeliverableRoute(request: RuntimeRunRouteRequest): Promise<RuntimeRunRouteResponse> {
@@ -107,6 +128,10 @@ export type {
   RuntimeRunRecord,
   RuntimeRunRouteRequest,
   RuntimeRunRouteResponse,
+  RuntimeCreativeOwnershipAudit,
+  RuntimeCreativeOwnershipExecutionContract,
+  RuntimeCreativeOwnershipLifecycleContract,
+  RuntimeCreativeOwnershipForbiddenBoundaries,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
   RuntimeStartRunRequest,

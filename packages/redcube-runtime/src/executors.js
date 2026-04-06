@@ -18,6 +18,17 @@ import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-
 /**
  * @typedef {{
  *   adapter: string,
+ *   primary?: boolean,
+ *   execution_surface?: string,
+ *   creative_execution?: string,
+ *   external_llm_role?: string,
+ *   execution_model?: {
+ *     mainline_adapter: "host_agent",
+ *     primary_surface: "codex_native_host_agent",
+ *     adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
+ *     agent_first_requires_external_llm: false,
+ *     external_llm_role: "optional_compatibility_adapter",
+ *   },
  *   runRoute(input: ExecutorRouteInput): Promise<{
  *     artifact_refs?: string[],
  *     review_state_patch?: {
@@ -31,6 +42,13 @@ import { canRunXiaohongshu, runXiaohongshuRoute } from '@redcube/runtime-family-
  *     route?: string,
  *     topic_id?: string,
  *     deliverable_id?: string,
+ *     execution_model?: {
+ *       mainline_adapter: "host_agent",
+ *       primary_surface: "codex_native_host_agent",
+ *       adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
+ *       agent_first_requires_external_llm: false,
+ *       external_llm_role: "optional_compatibility_adapter",
+ *     },
  *     produced_at?: string,
  *   }>,
  * }} ExecutorAdapter
@@ -45,8 +63,22 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
     throw new Error(`Unsupported executor adapter: ${adapter}`);
   }
 
+  const executionModel = Object.freeze({
+    mainline_adapter: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    adapter_role: adapter === 'host_agent' ? 'primary_creative_executor' : 'optional_compatibility_adapter',
+    agent_first_requires_external_llm: false,
+    external_llm_role: 'optional_compatibility_adapter',
+  });
+
   return {
     adapter,
+    primary: adapter === 'host_agent',
+    execution_surface: adapter === 'host_agent' ? 'codex_native_host_agent' : 'external_llm_adapter',
+    creative_execution: adapter === 'host_agent' ? 'agent_first_director_first' : 'compatibility_adapter_only',
+    external_llm_role: 'optional_compatibility_adapter',
+    compatibility_role: adapter === 'external_llm' ? 'optional_compatibility_adapter' : null,
+    execution_model: executionModel,
     async runRoute({
       workspaceRoot,
       overlay,
@@ -70,7 +102,7 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
       }
 
       if (adapter === 'host_agent' && canRunPptDeck(contract)) {
-        return runPptDeckRoute({
+        const artifact = await runPptDeckRoute({
           workspaceRoot,
           route,
           topicId,
@@ -79,10 +111,14 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
           mode,
           baselineDeliverableId,
         });
+        return {
+          ...artifact,
+          execution_model: executionModel,
+        };
       }
 
       if (adapter === 'host_agent' && canRunXiaohongshu(contract)) {
-        return runXiaohongshuRoute({
+        const artifact = await runXiaohongshuRoute({
           workspaceRoot,
           route,
           topicId,
@@ -91,6 +127,10 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
           mode,
           baselineDeliverableId,
         });
+        return {
+          ...artifact,
+          execution_model: executionModel,
+        };
       }
 
       return {
@@ -102,6 +142,12 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         stage_contract: stageContract,
         executor: {
           adapter,
+          primary: adapter === 'host_agent',
+          execution_surface: adapter === 'host_agent' ? 'codex_native_host_agent' : 'external_llm_adapter',
+          creative_execution: adapter === 'host_agent' ? 'agent_first_director_first' : 'compatibility_adapter_only',
+          external_llm_role: 'optional_compatibility_adapter',
+          compatibility_role: adapter === 'external_llm' ? 'optional_compatibility_adapter' : null,
+          execution_model: executionModel,
         },
         produced_at: new Date().toISOString(),
       };

@@ -1,0 +1,23 @@
+<div data-slide-root="true" data-slide-id="{{slide_id}}" data-title="{{title}}" data-speaker-seconds="{{speaker_seconds}}" data-layout-family="{{layout_family}}" data-recipe-id="{{recipe_id}}" data-template-id="{{template_id}}" data-peak-page="{{peak_page}}" style="position:relative;width:{{canvas_width}}px;height:{{canvas_height}}px;background:{{canvas_color}};overflow:hidden;padding:44px 52px 56px;display:grid;grid-template-rows:auto 1fr auto;gap:18px;">
+  <header data-qa-block="header" style="display:grid;gap:10px;">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span style="font-size:14px;letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:{{accent}};">{{page_goal}}</span>
+      {{#if peak_page}}<span style="display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(37,99,235,0.12);color:{{accent}};font-size:11px;font-weight:800;">PEAK</span>{{/if}}
+    </div>
+    <h2 style="margin:0;font-size:42px;line-height:1.12;color:{{ink}};">{{title}}</h2>
+    <p style="margin:0;font-size:22px;line-height:1.5;color:#334155;">{{lead_text}}</p>
+  </header>
+  <section data-qa-block="timeline" style="display:grid;grid-template-columns:repeat({{timeline_count}},1fr);gap:16px;align-items:end;">
+    {{#each timeline_cards}}<article data-qa-block="timeline-card" data-primary-point="true" style="display:grid;gap:12px;">
+      <div style="width:22px;height:22px;border-radius:999px;background:{{accent}};box-shadow:0 0 0 10px rgba(37,99,235,0.12);"></div>
+      <div style="padding:18px;border-radius:22px;background:#FFFFFF;border:1px solid #CBD5E1;min-height:220px;display:grid;gap:8px;">
+        <div style="font-size:17px;font-weight:800;color:{{accent}};">Step {{index1}}</div>
+        <div style="font-size:22px;line-height:1.45;color:{{ink}};">{{text}}</div>
+      </div>
+    </article>{{/each}}
+  </section>
+  <footer data-qa-block="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#475569;">
+    <div>{{source_label_1}}</div>
+    <div style="font-weight:700;">{{slide_no}} / {{total_slides}}</div>
+  </footer>
+</div>

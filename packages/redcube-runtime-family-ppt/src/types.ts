@@ -68,6 +68,8 @@ export interface PptRuntimeReviewPolicy {
 }
 
 export interface PptRuntimeLatestChecks {
+  director_intent_landed?: boolean;
+  anti_template_ok?: boolean;
   overflow_free?: boolean;
   occlusion_free?: boolean;
   visual_density_ok?: boolean;
@@ -123,6 +125,25 @@ export interface PptStorylineArtifact extends PptRuntimeArtifactBase {
   };
 }
 
+export interface PptVisualDirectorReviewArtifact extends PptRuntimeArtifactBase {
+  route: 'visual_director_review';
+  status: 'pass' | 'block';
+  visual_director_review: {
+    director_intent_landed: boolean;
+    anti_template_ok: boolean;
+    memory_hook_present: boolean;
+    homogeneous_layout_risk: number;
+    weak_pages: string[];
+    rewrite_action: string;
+    review_summary: string;
+    creative_sources: {
+      review_judgement: 'host_agent';
+    };
+  };
+  artifact_refs: string[];
+  review_state_patch: PptRuntimeReviewStatePatch;
+}
+
 export interface PptSlideReviewChecks {
   overflow_free: boolean;
   occlusion_free: boolean;
@@ -165,6 +186,8 @@ export interface PptScreenshotReviewArtifact extends PptRuntimeArtifactBase {
   mode: PptRuntimeMode;
   status: 'pass' | 'block';
   checks: PptRuntimeLatestChecks & {
+    director_intent_landed?: boolean;
+    anti_template_ok?: boolean;
     overflow_free: boolean;
     occlusion_free: boolean;
     visual_density_ok: boolean;
@@ -220,6 +243,7 @@ export type PptRuntimeRouteResult =
   | PptRuntimeRouteOutput<'slide_blueprint', PptBlueprintArtifact>
   | PptRuntimeRouteOutput<'visual_direction', PptVisualDirectionArtifact>
   | PptRuntimeRouteOutput<'render_html', PptRenderArtifact>
+  | PptRuntimeRouteOutput<'visual_director_review', PptVisualDirectorReviewArtifact>
   | PptRuntimeRouteOutput<'screenshot_review', PptScreenshotReviewArtifact>
   | PptRuntimeRouteOutput<'export_pptx', PptExportBundleArtifact>;
 

@@ -34,10 +34,16 @@ const FAMILY_STAGE_SEQUENCE = {
       requires_stages: ['slide_blueprint', 'visual_direction'],
     },
     {
+      stage_id: 'visual_director_review',
+      prompt_file: 'director_review.md',
+      output_artifact: 'director_review.json',
+      requires_stages: ['render_html'],
+    },
+    {
       stage_id: 'screenshot_review',
       prompt_file: 'screenshot_review.md',
       output_artifact: 'quality_gate.json',
-      requires_stages: ['render_html'],
+      requires_stages: ['visual_director_review'],
     },
     {
       stage_id: 'export_pptx',
@@ -53,6 +59,11 @@ const FAMILY_STAGE_SEQUENCE = {
       rerun_from_stage: 'slide_blueprint',
     },
     {
+      stage_id: 'screenshot_review',
+      requires_review: ['visual_director_review'],
+      rerun_from_stage: 'visual_director_review',
+    },
+    {
       stage_id: 'export_pptx',
       requires_review: ['screenshot_review'],
       rerun_from_stage: 'screenshot_review',
@@ -66,6 +77,8 @@ const FAMILY_REVIEW_SURFACE = {
     'occlusion_free',
     'visual_density_ok',
     'speaker_fit_ok',
+    'director_intent_landed',
+    'anti_template_ok',
   ],
   artifact_stage: 'screenshot_review',
   artifact_file: 'quality_gate.json',
@@ -77,6 +90,8 @@ const FAMILY_REVIEW_SURFACE = {
     occlusion_free: 'render_html',
     visual_density_ok: 'visual_direction',
     speaker_fit_ok: 'slide_blueprint',
+    director_intent_landed: 'visual_director_review',
+    anti_template_ok: 'visual_director_review',
     baseline_comparison_passed: 'visual_direction',
   },
 };
@@ -139,8 +154,11 @@ const FAMILY_STAGE_REQUIREMENTS = {
   render_html: {
     requires_artifacts: ['slide_blueprint', 'visual_direction'],
   },
-  screenshot_review: {
+  visual_director_review: {
     requires_artifacts: ['render_html'],
+  },
+  screenshot_review: {
+    requires_artifacts: ['visual_director_review'],
   },
   export_pptx: {
     requires_artifacts: ['screenshot_review'],
@@ -157,6 +175,7 @@ const FAMILY_PROMPT_PACK = {
     slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
     visual_direction: 'prompts/ppt_deck/visual_direction.md',
     render_html: 'prompts/ppt_deck/render_html.md',
+    visual_director_review: 'prompts/ppt_deck/director_review.md',
     screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
     export_pptx: 'prompts/ppt_deck/export_pptx.md',
   },
@@ -166,6 +185,7 @@ const FAMILY_PROMPT_PACK = {
     slide_blueprint: { file: 'slide_blueprint.md' },
     visual_direction: { file: 'visual_direction.md' },
     render_html: { file: 'render_html.md' },
+    visual_director_review: { file: 'director_review.md' },
     screenshot_review: { file: 'screenshot_review.md' },
     export_pptx: { file: 'export_pptx.md' },
   },
@@ -181,6 +201,15 @@ const FAMILY_PROMPT_PACK = {
       central_axis: 'ppt.central_axis',
       summary_peak: 'ppt.summary_peak',
       default: 'ppt.compare_zones',
+    },
+    template_registry: {
+      'ppt.hero_signal': 'render-templates/ppt.hero_signal.html',
+      'ppt.compare_zones': 'render-templates/ppt.compare_zones.html',
+      'ppt.timeline_rail': 'render-templates/ppt.timeline_rail.html',
+      'ppt.judgement_ladder': 'render-templates/ppt.judgement_ladder.html',
+      'ppt.ring_cross': 'render-templates/ppt.ring_cross.html',
+      'ppt.central_axis': 'render-templates/ppt.central_axis.html',
+      'ppt.summary_peak': 'render-templates/ppt.summary_peak.html',
     },
   },
 };
@@ -227,6 +256,11 @@ const FAMILY_DISPLAY_REGISTRY = {
       required_when: 'always',
     },
     {
+      id: 'visual_director_review',
+      kind: 'review_output',
+      required_when: 'always',
+    },
+    {
       id: 'screenshot_review',
       kind: 'review_output',
       required_when: 'always',
@@ -237,6 +271,36 @@ const FAMILY_DISPLAY_REGISTRY = {
       required_when: 'approved_for_export',
     },
   ],
+};
+
+const FAMILY_LIFECYCLE_MODEL = {
+  macro_lifecycle: [
+    'source_readiness',
+    'story_architecture',
+    'visual_authorship',
+    'delivery_packaging',
+  ],
+  route_to_stage: {
+    storyline: 'story_architecture',
+    detailed_outline: 'story_architecture',
+    slide_blueprint: 'story_architecture',
+    visual_direction: 'visual_authorship',
+    render_html: 'visual_authorship',
+    export_pptx: 'delivery_packaging',
+  },
+  review_overlay_routes: {
+    visual_director_review: 'visual_director_review',
+    screenshot_review: 'screenshot_review',
+  },
+  research_ownership: {
+    semantic_role: 'shared_source_readiness_augmentation',
+    trigger_conditions: [
+      'source_truth_missing_or_thin',
+      'source_audit_not_sufficient',
+      'task_requires_public_evidence_or_background',
+      'current_source_truth_cannot_support_story_or_visual_judgement',
+    ],
+  },
 };
 
 const PPT_DECK_PROFILE_OVERRIDES = {
@@ -384,6 +448,7 @@ export function hydratePptDeckContract({
     prompt_pack: FAMILY_PROMPT_PACK,
     export_bundle: FAMILY_EXPORT_BUNDLE,
     display_registry: FAMILY_DISPLAY_REGISTRY,
+    lifecycle_model: FAMILY_LIFECYCLE_MODEL,
   };
 
   return mergeContractLayers(familyContract, override);

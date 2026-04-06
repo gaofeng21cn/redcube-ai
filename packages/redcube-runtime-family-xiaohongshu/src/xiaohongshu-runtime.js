@@ -30,6 +30,63 @@ const DEFAULT_PROMPT_PACK = {
   export_bundle: 'prompts/xiaohongshu/export_bundle.md',
 };
 
+const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
+  research: 'source_readiness',
+  storyline: 'story_architecture',
+  single_note_plan: 'story_architecture',
+  visual_direction: 'visual_authorship',
+  render_html: 'visual_authorship',
+  visual_director_review: 'review_overlay',
+  screenshot_review: 'review_overlay',
+  publish_copy: 'delivery_packaging',
+  export_bundle: 'delivery_packaging',
+});
+
+const HOST_AGENT_EXECUTION_MODEL = Object.freeze({
+  mainline_adapter: 'host_agent',
+  primary_surface: 'codex_native_host_agent',
+  adapter_role: 'primary_creative_executor',
+  agent_first_requires_external_llm: false,
+  external_llm_role: 'optional_compatibility_adapter',
+});
+
+function hostAgentCreativeSource(contractAsset) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
+    adapter: 'host_agent',
+    supporting_contract: safeText(contractAsset, 'prompt_pack_seed'),
+  };
+}
+
+function creativeExecution(route) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
+    ownership_model: 'director_first',
+  };
+}
+
+function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
+  return {
+    ...hostAgentCreativeSource(materializedFrom),
+    route,
+    lifecycle_stage: lifecycleStage,
+    authored_surface: authoredSurface,
+    materialized_from: materializedFrom,
+  };
+}
+
+function reviewAuthorship(overlay) {
+  return {
+    overlay,
+    primary_surface: 'codex_native_host_agent',
+    contract_asset: 'prompt_pack_seed',
+  };
+}
+
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -233,6 +290,8 @@ function attachCommon(route, contract) {
     route,
     profile_id: contract.profile_id,
     produced_at: new Date().toISOString(),
+    lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
+    execution_model: HOST_AGENT_EXECUTION_MODEL,
     prompt_pack: promptMeta(contract, route),
   };
 }
@@ -249,6 +308,12 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
     const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     if (!reviewArtifact || reviewArtifact.status !== 'pass') {
       throw new Error(`Route ${route} requires screenshot_review to pass before export`);
+    }
+  }
+  if (route === 'screenshot_review') {
+    const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+    if (!directorReviewArtifact || directorReviewArtifact.status !== 'pass') {
+      throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
     }
   }
   if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {
@@ -277,6 +342,14 @@ function buildResearch(contract) {
     : safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`);
   return {
     ...attachCommon('research', contract),
+    source_readiness: {
+      research_positioning: 'shared_source_readiness_optional_augmentation',
+      augmentation_triggered: sourceMaterials(contract).length === 0 || sourceInputMode(contract) === 'brief_keywords',
+      trigger_signals: {
+        source_missing_or_insufficient: sourceMaterials(contract).length === 0,
+        task_requires_public_evidence: true,
+      },
+    },
     research: {
       topic_summary: topicSummary,
       mode: isSeries(contract) ? 'series' : 'single',
@@ -304,19 +377,32 @@ function buildStoryline(contract, deliverablePaths) {
   const seed = promptSeed(contract, 'storyline');
   return {
     ...attachCommon('storyline', contract),
+    creative_execution: creativeExecution('storyline'),
     storyline: {
       mode: research?.research?.mode || 'single',
       audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement),
       tension: safeText(seed?.storyline?.tension, research?.research?.tension),
       why_now: safeText(seed?.storyline?.why_now, research?.research?.why_now),
       memory_hook: safeText(seed?.storyline?.memory_hook, research?.research?.memory_hook),
-      hook: safeText(seed?.storyline?.hook, '先打破旧认知，再给动作收益'),
+      hook: safeText(seed?.storyline?.hook),
       narrative_progression: safeArray(seed?.storyline?.narrative_progression),
       journey: safeArray(seed?.storyline?.journey),
-      resolution: safeText(seed?.storyline?.resolution, '让读者愿意收藏并继续看下一页/下一篇'),
+      resolution: safeText(seed?.storyline?.resolution),
       series_needed: (research?.research?.mode || 'single') === 'series',
       source_truth_material_ids: safeArray(research?.research?.source_truth_material_ids),
       source_truth_confidence: safeText(research?.research?.confidence),
+      creative_sources: {
+        narrative_arc: creativeSourceStamp({
+          route: 'storyline',
+          lifecycleStage: 'story_architecture',
+          authoredSurface: 'narrative_arc',
+        }),
+        memory_hook: creativeSourceStamp({
+          route: 'storyline',
+          lifecycleStage: 'story_architecture',
+          authoredSurface: 'memory_hook',
+        }),
+      },
     },
   };
 }
@@ -339,6 +425,7 @@ function buildSingleNotePlan(contract, deliverablePaths) {
   });
   return {
     ...attachCommon('single_note_plan', contract),
+    creative_execution: creativeExecution('single_note_plan'),
     single_note_plan: {
       mode: isSeries(contract) ? 'series' : 'single',
       title_options: titleOptions,
@@ -410,50 +497,55 @@ function computeSeriesSurfaces(contract, deliverablePaths, exportBundle) {
 
 
 function buildDirectorReview(contract, deliverablePaths) {
-  const render = readStageArtifact(contract, deliverablePaths, 'render_html');
-  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
-  const slides = safeArray(render?.html_bundle?.slides);
-  const layoutFamilies = slides.map((slide) => slide.layout_family);
-  const uniqueLayoutCount = Array.from(new Set(layoutFamilies)).length;
-  let maxConsecutiveSame = 1;
-  let currentRun = 1;
-  for (let i = 1; i < layoutFamilies.length; i += 1) {
-    if (layoutFamilies[i] === layoutFamilies[i - 1]) {
-      currentRun += 1;
-      maxConsecutiveSame = Math.max(maxConsecutiveSame, currentRun);
-    } else {
-      currentRun = 1;
-    }
-  }
-  const memoryHook = safeText(storyline?.storyline?.memory_hook);
-  const firstTitle = safeText(slides[0]?.title);
-  const memoryHookPresent = memoryHook.length > 0 && (firstTitle.includes(memoryHook.slice(0, Math.min(6, memoryHook.length))) || slides.some((slide) => safeText(slide.title).includes('顺序') || safeText(slide.title).includes('动作')));
-  const homogeneousLayoutRisk = Number((maxConsecutiveSame / Math.max(layoutFamilies.length, 1)).toFixed(2));
-  const directorIntentLanded = uniqueLayoutCount >= 5 && safeArray(visual?.visual_direction?.peak_pages).length >= 3;
-  const antiTemplateOk = homogeneousLayoutRisk <= 0.34 && uniqueLayoutCount >= 5;
-  const weakPages = slides.filter((slide) => ['myth_compare', 'sequence_stack'].includes(slide.layout_family)).map((slide) => slide.slide_id).slice(0, 2);
+  const seed = promptSeed(contract, 'visual_director_review', {
+    memory_hook: safeText(storyline?.storyline?.memory_hook),
+  });
+  const reviewSeed = seed?.visual_director_review || {};
+  const directorIntentLanded = Boolean(reviewSeed.director_intent_landed);
+  const antiTemplateOk = Boolean(reviewSeed.anti_template_ok);
+  const memoryHookPresent = Boolean(reviewSeed.memory_hook_present);
+  const weakPages = safeArray(reviewSeed.weak_pages);
+  const homogeneousLayoutRisk = Number(reviewSeed.homogeneous_layout_risk || 0);
+  const reviewSummary = safeText(reviewSeed.review_summary);
   const status = directorIntentLanded && antiTemplateOk && memoryHookPresent ? 'pass' : 'block';
   const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
+    '- review_owner: codex_native_host_agent',
     `- director_intent_landed: ${directorIntentLanded}`,
     `- anti_template_ok: ${antiTemplateOk}`,
     `- memory_hook_present: ${memoryHookPresent}`,
     `- homogeneous_layout_risk: ${homogeneousLayoutRisk}`,
     `- weak_pages: ${weakPages.join(',') || 'none'}`,
+    `- review_summary: ${reviewSummary || 'none'}`,
   ].join('\n'));
   return {
     ...attachCommon('visual_director_review', contract),
+    review_overlay: 'visual_director_review',
+    review_authorship: reviewAuthorship('visual_director_review'),
+    review_execution: {
+      ...creativeExecution('visual_director_review'),
+      overlay: 'visual_director_review',
+    },
     status,
     visual_director_review: {
+      review_model: 'director_first_visual_judgement',
       director_intent_landed: directorIntentLanded,
       anti_template_ok: antiTemplateOk,
       memory_hook_present: memoryHookPresent,
       homogeneous_layout_risk: homogeneousLayoutRisk,
       weak_pages: weakPages,
-      rewrite_action: status === 'pass' ? 'none' : 'revise_render_html',
+      review_summary: reviewSummary,
+      rewrite_action: status === 'pass' ? 'none' : safeText(reviewSeed.rewrite_action, 'revise_render_html'),
+      creative_sources: {
+        review_judgement: creativeSourceStamp({
+          route: 'visual_director_review',
+          lifecycleStage: 'review_overlay',
+          authoredSurface: 'review_judgement',
+        }),
+      },
     },
     artifact_refs: [reviewFile],
     review_state_patch: {
@@ -465,8 +557,16 @@ function buildDirectorReview(contract, deliverablePaths) {
         anti_template_ok: antiTemplateOk,
         memory_hook_present: memoryHookPresent,
       },
-      pending_reviews: status === 'pass' ? [] : ['director_intent_landed'],
-      blocking_reasons: status === 'pass' ? [] : ['director_intent_landed'],
+      pending_reviews: status === 'pass' ? [] : Object.entries({
+        director_intent_landed: directorIntentLanded,
+        anti_template_ok: antiTemplateOk,
+        memory_hook_present: memoryHookPresent,
+      }).filter(([, value]) => value === false).map(([key]) => key),
+      blocking_reasons: status === 'pass' ? [] : Object.entries({
+        director_intent_landed: directorIntentLanded,
+        anti_template_ok: antiTemplateOk,
+        memory_hook_present: memoryHookPresent,
+      }).filter(([, value]) => value === false).map(([key]) => key),
       rerun_from_stage: status === 'pass' ? null : 'render_html',
       rerun_policy: {
         status: status === 'pass' ? 'idle' : 'rerun_required',
@@ -519,6 +619,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
   });
   const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const checks = {
+    director_intent_landed: Boolean(directorReview?.visual_director_review?.director_intent_landed),
     overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
     occlusion_free: slideReviews.every((slide) => slide.checks.occlusion_free),
     visual_density_ok: slideReviews.every((slide) => slide.checks.visual_density_ok),
@@ -530,6 +631,11 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
   const status = Object.values(checks).every((value) => value === true) ? 'pass' : 'block';
   const artifact = {
     ...attachCommon('screenshot_review', contract),
+    review_overlay: 'screenshot_review',
+    review_authorship: {
+      primary_surface: 'governed_screenshot_review',
+      contract_asset: 'python_review_pipeline',
+    },
     mode,
     status,
     checks,
@@ -570,37 +676,86 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
 function buildPublishCopy(contract, deliverablePaths) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const titles = safeArray(plan?.single_note_plan?.title_options).slice(0, 3);
-  const body = `${titles[0] || contract.title}。先别急着上工具，先看这几个判断顺序：先把问题说清，再把公开证据放对位置，最后再决定要不要把 AI 放进执行链。看完可以直接照着清单走。`;
-  const hashtags = ['#甲状腺', '#门诊科普', '#AI流程', '#小红书图文', '#患者沟通'];
+  const seed = promptSeed(contract, 'publish_copy', {
+    title: contract.title,
+    title_1: titles[0] || contract.title,
+    title_2: titles[1] || titles[0] || contract.title,
+    title_3: titles[2] || titles[1] || titles[0] || contract.title,
+    memory_hook: safeText(storyline?.storyline?.memory_hook),
+    audience_judgement: safeText(storyline?.storyline?.audience_judgement),
+    cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
+  });
+  const publishSeed = seed?.publish_copy || {};
+  const hydratedTitles = titles;
+  const body = safeText(publishSeed.body);
+  const interactionQuestions = safeArray(publishSeed.interaction_questions).filter(Boolean);
+  const hashtags = safeArray(publishSeed.hashtags).filter(Boolean);
+  const firstComment = safeText(publishSeed.first_comment);
   const quality_gate = {
-    title_count: titles.length,
+    title_count: hydratedTitles.length,
     body_char_count: body.length,
-    comment_prompt_count: 1,
-    interaction_question_count: 2,
-    actionable_step_count: 3,
+    comment_prompt_count: firstComment.length > 0 ? 1 : 0,
+    interaction_question_count: interactionQuestions.length,
+    actionable_step_count: Array.from(body.matchAll(/先|再|最后|第[0-9一二三四五六七八九十]/g)).length,
     hashtag_count: hashtags.length,
     banned_terms_hit_count: 0,
     meta_instruction_leak_count: 0,
-    gate_pass: titles.length >= 3 && body.length >= 80 && body.length <= 420,
+    gate_pass: hydratedTitles.length >= 3 && body.length >= 80 && body.length <= 420,
   };
   const captionFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-copy.txt`);
-  writeText(captionFile, [`标题候选：${titles.join(' / ')}`, '', body, '', hashtags.join(' ')].join('\n'));
+  writeText(captionFile, [`标题候选：${hydratedTitles.join(' / ')}`, '', body, '', hashtags.join(' ')].join('\n'));
   return {
     ...attachCommon('publish_copy', contract),
+    creative_execution: creativeExecution('publish_copy'),
     status: quality_gate.gate_pass ? 'pass' : 'block',
     publish_copy: {
-      titles,
+      titles: hydratedTitles,
       body,
-      first_comment: '如果你也在做门诊科普，评论区回“清单”我给你一份整理模板。',
-      interaction_questions: ['你现在做科普最卡在哪一步？', '你会先整理问题还是先找工具？'],
+      first_comment: firstComment,
+      interaction_questions: interactionQuestions,
       hashtags,
       publish_suggestion: {
-        cover_slide_id: render.html_bundle.slides[0]?.slide_id || 'N01',
-        recommended_time: '19:00-21:00',
+        cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
+        recommended_time: safeText(publishSeed.publish_suggestion?.recommended_time, '19:00-21:00'),
       },
       quality_gate,
       caption_file: captionFile,
+      creative_sources: {
+        titles: creativeSourceStamp({
+          route: 'publish_copy',
+          lifecycleStage: 'delivery_packaging',
+          authoredSurface: 'titles',
+        }),
+        body: creativeSourceStamp({
+          route: 'publish_copy',
+          lifecycleStage: 'delivery_packaging',
+          authoredSurface: 'body',
+        }),
+        first_comment: creativeSourceStamp({
+          route: 'publish_copy',
+          lifecycleStage: 'delivery_packaging',
+          authoredSurface: 'first_comment',
+        }),
+      },
+      creative_authorship: {
+        titles: creativeSourceStamp({
+          route: 'publish_copy',
+          lifecycleStage: 'delivery_packaging',
+          authoredSurface: 'titles',
+        }),
+        body: creativeSourceStamp({
+          route: 'publish_copy',
+          lifecycleStage: 'delivery_packaging',
+          authoredSurface: 'body',
+        }),
+        first_comment: creativeSourceStamp({
+          route: 'publish_copy',
+          lifecycleStage: 'delivery_packaging',
+          authoredSurface: 'first_comment',
+        }),
+      },
     },
     artifact_refs: [captionFile],
     review_state_patch: {

@@ -53,6 +53,7 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
     'slide_blueprint',
     'visual_direction',
     'render_html',
+    'visual_director_review',
     'screenshot_review',
     'export_pptx',
   ]);
@@ -123,6 +124,13 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(result.recommended_action, 'continue');
   assert.equal(result.summary.route, 'storyline');
   assert.equal(result.run.executor.adapter, 'host_agent');
+  assert.equal(result.run.executor.primary, true);
+  assert.equal(result.run.executor.execution_surface, 'codex_native_host_agent');
+  assert.equal(result.run.executor.creative_execution, 'agent_first_director_first');
+  assert.equal(result.run.executor.external_llm_role, 'optional_compatibility_adapter');
+  assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
+  assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
+  assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
   assert.equal(result.run.status, 'completed');
   assert.equal(result.events.length >= 2, true);
 
@@ -131,11 +139,16 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(stored.recommended_action, 'review_runtime_state');
   assert.equal(stored.summary.run_id, result.run.run_id);
   assert.equal(stored.run.executor.adapter, 'host_agent');
+  assert.equal(stored.run.executor.execution_surface, 'codex_native_host_agent');
+  assert.equal(stored.run.executor.execution_model.mainline_adapter, 'host_agent');
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
   assert.equal(artifact.route, 'storyline');
   assert.equal(artifact.contract.profile_id, 'lecture_student');
   assert.equal(artifact.contract.goal, '为本科生讲授甲状腺基础知识');
   assert.equal(artifact.stage_contract.stage_id, 'storyline');
+  assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
+  assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
+  assert.equal(artifact.execution_model.external_llm_role, 'optional_compatibility_adapter');
 });
 
 test('runDeliverableRoute executes other declared stages through host-agent executor', async () => {
@@ -170,10 +183,12 @@ test('runDeliverableRoute executes other declared stages through host-agent exec
 
   assert.equal(result.ok, true);
   assert.equal(result.run.executor.adapter, 'host_agent');
+  assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
   assert.equal(result.run.current_stage, 'detailed_outline');
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
   assert.equal(artifact.stage_contract.stage_id, 'detailed_outline');
   assert.equal(artifact.contract.profile_id, 'lecture_peer');
+  assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
 });
 
 test('getRun rejects unsafe run identifiers', async () => {
@@ -271,6 +286,10 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   assert.equal(result.error_kind, 'route_failure');
   assert.equal(result.recommended_action, 'inspect_run_failure');
   assert.equal(result.run.status, 'failed');
+  assert.equal(result.run.executor.adapter, 'external_llm');
+  assert.equal(result.run.executor.primary, false);
+  assert.equal(result.run.executor.execution_surface, 'external_llm_adapter');
+  assert.equal(result.run.executor.compatibility_role, 'optional_compatibility_adapter');
   assert.equal(
     result.run.error.message,
     'Unsupported route for adapter external_llm: detailed_outline',
@@ -278,6 +297,7 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
 
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.status, 'failed');
+  assert.equal(stored.run.executor.execution_surface, 'external_llm_adapter');
 });
 
 test('runDeliverableRoute rejects route not declared by hydrated deliverable contract', async () => {

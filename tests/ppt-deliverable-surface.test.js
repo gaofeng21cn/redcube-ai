@@ -65,6 +65,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
       'slide_blueprint',
       'visual_direction',
       'render_html',
+      'visual_director_review',
       'screenshot_review',
       'export_pptx',
     ],
@@ -137,7 +138,7 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
     title: '甲状腺门诊科普 baseline',
     goal: '已认可基线',
   });
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
     const result = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',

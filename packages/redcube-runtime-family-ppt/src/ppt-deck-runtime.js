@@ -58,6 +58,7 @@ const PROMPT_PACK = Object.freeze({
   slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
   visual_direction: 'prompts/ppt_deck/visual_direction.md',
   render_html: 'prompts/ppt_deck/render_html.md',
+  visual_director_review: 'prompts/ppt_deck/director_review.md',
   screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
   export_pptx: 'prompts/ppt_deck/export_pptx.md',
 });
@@ -67,7 +68,8 @@ const STAGE_REQUIREMENTS = Object.freeze({
   slide_blueprint: { requires_artifacts: ['detailed_outline'] },
   visual_direction: { requires_artifacts: ['slide_blueprint'] },
   render_html: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
-  screenshot_review: { requires_artifacts: ['render_html'] },
+  visual_director_review: { requires_artifacts: ['render_html'] },
+  screenshot_review: { requires_artifacts: ['visual_director_review'] },
   export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
 });
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
@@ -280,6 +282,34 @@ function deckPreset(profileId) {
   }
 }
 
+function hostAgentCreativeSource(protectedSurface, artifactSource) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
+    ownership_model: 'director_first',
+    authored_surface: protectedSurface,
+    materialized_from: artifactSource,
+  };
+}
+
+function lifecycleStageForRoute(contract, route) {
+  return contract?.lifecycle_model?.route_to_stage?.[route] || null;
+}
+
+function reviewOverlayForRoute(contract, route) {
+  return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
+}
+
+function creativeExecution(routeOrLifecycleStage) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    lifecycle_stage: routeOrLifecycleStage,
+    ownership_model: 'director_first',
+  };
+}
+
 function attachCommon(route, contract) {
   return {
     route,
@@ -287,34 +317,40 @@ function attachCommon(route, contract) {
     profile_id: contract.profile_id,
     produced_at: new Date().toISOString(),
     prompt_pack: promptMeta(route),
+    lifecycle_stage: lifecycleStageForRoute(contract, route),
+    review_overlay: reviewOverlayForRoute(contract, route),
   };
 }
 
 function buildStoryline(contract) {
-  const preset = deckPreset(contract.profile_id);
-  const seed = promptSeed('storyline', { promise: preset.promise });
+  const seed = promptSeed('storyline', {
+    goal: safeText(contract.goal),
+    source_claim_1: sharedSourceSnippet(contract, 0) || safeText(contract.goal),
+  });
   return {
     ...attachCommon('storyline', contract),
+    creative_execution: {
+      ...creativeExecution('storyline'),
+      lifecycle_stage: lifecycleStageForRoute(contract, 'storyline'),
+    },
     storyline: {
-      speaker: preset.speaker,
-      audience: sharedSourceTruth(contract) ? sharedSourceAudience(contract, preset.audience) : preset.audience,
+      speaker: safeText(seed?.storyline?.speaker, '正式讲者'),
+      audience: safeText(seed?.storyline?.audience),
       goal: safeText(contract.goal),
-      style: preset.promise,
-      core_metaphor: sharedSourceTruth(contract) && sharedSourceSnippet(contract, 0)
-        ? `shared source truth 首要命题：${sharedSourceSnippet(contract, 0)}`
-        : safeText(seed?.storyline?.core_metaphor, '把 AI 放回科研链，而不是神化成万能入口'),
+      style: safeText(seed?.storyline?.style),
+      core_metaphor: safeText(seed?.storyline?.core_metaphor),
       narrative_arc: {
-        hook: safeArray(seed?.storyline?.hook).length > 0 ? seed.storyline.hook : ['先定义问题与听众收益'],
-        journey: safeArray(seed?.storyline?.journey).length > 0 ? seed.storyline.journey : [
-          '把问题拆成可解释的结构',
-          '把证据放回公开来源与适用边界',
-          '把结论落成可执行动作',
-        ],
-        resolution: safeArray(seed?.storyline?.resolution).length > 0 ? seed.storyline.resolution : ['带着判断框架与复盘清单离场'],
+        hook: safeArray(seed?.storyline?.hook),
+        journey: safeArray(seed?.storyline?.journey),
+        resolution: safeArray(seed?.storyline?.resolution),
       },
       source_truth_input_mode: sharedSourceInputMode(contract) || 'seed_only',
       source_truth_confidence: sharedSourceConfidence(contract) || 'low',
       source_truth_material_ids: sharedSourceMaterialIds(contract),
+      creative_sources: {
+        core_metaphor: hostAgentCreativeSource('outline_major_text', 'prompt_runtime_seed'),
+        narrative_arc: hostAgentCreativeSource('outline_major_text', 'prompt_runtime_seed'),
+      },
     },
   };
 }
@@ -455,6 +491,8 @@ function buildReviewMarkdown(contract, reviewArtifact) {
     `# ${contract.title} 视觉质控`,
     '',
     `- 状态：${reviewArtifact.status}`,
+    `- director_intent_landed：${reviewArtifact.checks.director_intent_landed}`,
+    `- anti_template_ok：${reviewArtifact.checks.anti_template_ok}`,
     `- overflow_free：${reviewArtifact.checks.overflow_free}`,
     `- occlusion_free：${reviewArtifact.checks.occlusion_free}`,
     `- visual_density_ok：${reviewArtifact.checks.visual_density_ok}`,
@@ -473,11 +511,78 @@ function buildReviewMarkdown(contract, reviewArtifact) {
   return `${lines.join('\n')}\n`;
 }
 
+function buildDirectorReview(contract, deliverablePaths) {
+  const seed = promptSeed('visual_director_review')?.visual_director_review || {};
+  const directorIntentLanded = Boolean(seed.director_intent_landed);
+  const antiTemplateOk = Boolean(seed.anti_template_ok);
+  const memoryHookPresent = Boolean(seed.memory_hook_present);
+  const peakPagesLanded = Boolean(seed.peak_pages_landed ?? true);
+  const weakPages = safeArray(seed.weak_pages);
+  const homogeneousLayoutRisk = Number(seed.homogeneous_layout_risk || 0);
+  const reviewSummary = safeText(seed.review_summary);
+  const status = directorIntentLanded && antiTemplateOk && peakPagesLanded ? 'pass' : 'block';
+  const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
+  writeText(reviewFile, [
+    '# 视觉总监复盘',
+    '',
+    `- director_intent_landed: ${directorIntentLanded}`,
+    `- anti_template_ok: ${antiTemplateOk}`,
+    `- peak_pages_landed: ${peakPagesLanded}`,
+    `- memory_hook_present: ${memoryHookPresent}`,
+    `- homogeneous_layout_risk: ${homogeneousLayoutRisk}`,
+    `- weak_pages: ${weakPages.join(',') || 'none'}`,
+    `- review_summary: ${reviewSummary || 'none'}`,
+  ].join('\n'));
+  return {
+    ...attachCommon('visual_director_review', contract),
+    review_execution: {
+      ...creativeExecution('visual_director_review'),
+      overlay: 'visual_director_review',
+    },
+    review_overlay: 'visual_director_review',
+    status,
+    visual_director_review: {
+      review_model: 'director_first_visual_judgement',
+      director_intent_landed: directorIntentLanded,
+      anti_template_ok: antiTemplateOk,
+      peak_pages_landed: peakPagesLanded,
+      memory_hook_present: memoryHookPresent,
+      weak_pages: weakPages,
+      homogeneous_layout_risk: homogeneousLayoutRisk,
+      review_summary: reviewSummary,
+      rewrite_action: safeText(seed.rewrite_action) || (status === 'pass' ? 'none' : 'revise_render_html'),
+      overlay_handoff: 'screenshot_review',
+      creative_sources: {
+        review_judgement: hostAgentCreativeSource('visual_director_review_decision', 'director_review_contract'),
+      },
+    },
+    artifact_refs: [reviewFile],
+    review_state_patch: {
+      current_status: status === 'pass' ? 'director_review_passed' : 'blocked_for_revision',
+      ready_for_export: false,
+      latest_review_stage: 'visual_director_review',
+      latest_checks: {
+        director_intent_landed: directorIntentLanded,
+        anti_template_ok: antiTemplateOk,
+        memory_hook_present: memoryHookPresent,
+      },
+      pending_reviews: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
+      blocking_reasons: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
+      rerun_from_stage: status === 'pass' ? null : 'render_html',
+      rerun_policy: {
+        status: status === 'pass' ? 'idle' : 'rerun_required',
+        rerun_from_stage: status === 'pass' ? null : 'render_html',
+      },
+    },
+  };
+}
+
 function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
   const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
   const args = [
@@ -497,29 +602,32 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
   }
   const python = runPython(PYTHON_REVIEW, args);
   const latestChecks = {
+    director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed),
+    anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok),
     ...python.checks,
     ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
   };
+  const status = Object.values(latestChecks).every((value) => value === true) ? 'pass' : 'block';
   const artifact = {
     ...attachCommon('screenshot_review', contract),
     mode,
-    status: python.status,
+    status,
     checks: latestChecks,
     slide_reviews: python.slide_reviews,
     report_markdown: python.review_markdown || reviewMarkdown,
     metrics: python.metrics,
     artifact_refs: [python.review_markdown || reviewMarkdown, ...python.slide_reviews.map((slide) => slide.screenshot_file)],
     review_state_patch: {
-      current_status: python.status === 'pass' ? 'export_ready' : 'blocked_for_revision',
-      ready_for_export: python.status === 'pass',
+      current_status: status === 'pass' ? 'export_ready' : 'blocked_for_revision',
+      ready_for_export: status === 'pass',
       latest_review_stage: 'screenshot_review',
       latest_checks: latestChecks,
-      pending_reviews: python.status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
-      blocking_reasons: python.status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
-      rerun_from_stage: python.status === 'pass' ? null : 'render_html',
+      pending_reviews: status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
+      blocking_reasons: status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
+      rerun_from_stage: status === 'pass' ? null : 'render_html',
       rerun_policy: {
-        status: python.status === 'pass' ? 'idle' : 'rerun_required',
-        rerun_from_stage: python.status === 'pass' ? null : 'render_html',
+        status: status === 'pass' ? 'idle' : 'rerun_required',
+        rerun_from_stage: status === 'pass' ? null : 'render_html',
       },
     },
   };
@@ -670,6 +778,9 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
         writeText,
         writeJson,
       });
+      break;
+    case 'visual_director_review':
+      payload = buildDirectorReview(contract, deliverablePaths);
       break;
     case 'screenshot_review':
       payload = buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId });

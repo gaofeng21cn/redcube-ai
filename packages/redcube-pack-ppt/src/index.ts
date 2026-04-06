@@ -69,7 +69,7 @@ export async function buildPptRenderArtifact(
 }
 
 export function compilePptRenderSlides(input: CompilePptRenderSlidesInput): PptRenderSlide[] {
-  return compilePptRenderSlidesJs(input) as PptRenderSlide[];
+  return compilePptRenderSlidesJs(input) as unknown as PptRenderSlide[];
 }
 
 export type {

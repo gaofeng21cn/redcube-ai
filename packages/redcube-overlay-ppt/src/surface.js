@@ -78,27 +78,39 @@ const SURFACE_VALIDATORS = {
   'contracts/stage-sequence.json': (content) =>
     Array.isArray(content?.stages)
     && content.stages.length > 0
-    && content.stages.some((stage) => stage?.stage_id === 'storyline'),
+    && content.stages.some((stage) => stage?.stage_id === 'storyline')
+    && content.stages.some((stage) => stage?.stage_id === 'visual_director_review'),
   'contracts/stage-requirements.json': (content) =>
     Array.isArray(content?.render_html?.requires_artifacts)
     && content.render_html.requires_artifacts.includes('slide_blueprint')
     && content.render_html.requires_artifacts.includes('visual_direction')
+    && Array.isArray(content?.screenshot_review?.requires_artifacts)
+    && content.screenshot_review.requires_artifacts.includes('visual_director_review')
     && content.export_pptx?.requires_review_pass === true,
   'contracts/prompt-pack.json': (content) =>
     typeof content?.root === 'string'
     && content.root === 'prompts/ppt_deck'
     && typeof content?.routes?.render_html === 'string'
     && content.routes.render_html === 'prompts/ppt_deck/render_html.md'
+    && typeof content?.routes?.visual_director_review === 'string'
+    && content.routes.visual_director_review === 'prompts/ppt_deck/director_review.md'
     && typeof content?.stages?.render_html?.file === 'string'
     && content.stages.render_html.file === 'render_html.md'
+    && typeof content?.stages?.visual_director_review?.file === 'string'
+    && content.stages.visual_director_review.file === 'director_review.md'
     && content?.render_contract?.render_strategy === 'prompt_director_first'
     && content?.render_contract?.shell_file === 'render_shell.html'
-    && typeof content?.render_contract?.recipe_registry?.default === 'string',
+    && typeof content?.render_contract?.recipe_registry?.default === 'string'
+    && typeof content?.render_contract?.template_registry?.['ppt.summary_peak'] === 'string',
   'contracts/review-surface.json': (content) =>
     Array.isArray(content?.required_checks)
     && content.required_checks.length > 0
+    && content.required_checks.includes('director_intent_landed')
+    && content.required_checks.includes('anti_template_ok')
     && content.rerun_from_stage
-    && typeof content.rerun_from_stage === 'object',
+    && typeof content.rerun_from_stage === 'object'
+    && content.rerun_from_stage.director_intent_landed === 'visual_director_review'
+    && content.rerun_from_stage.anti_template_ok === 'visual_director_review',
   'contracts/layout-rules.json': (content) =>
     typeof content?.density_mode === 'string'
     && content.density_mode.length > 0
@@ -117,10 +129,12 @@ const SURFACE_VALIDATORS = {
     && content.profile_id.length > 0
     && Array.isArray(content?.stage_sequence?.stages)
     && content.stage_sequence.stages.length > 0
+    && content.stage_sequence.stages.some((stage) => stage?.stage_id === 'visual_director_review')
     && typeof content?.export_bundle?.bundle_id === 'string',
   'views/display-registry.json': (content) =>
     Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'source_index')
+    && content.surfaces.some((surface) => surface?.id === 'visual_director_review')
     && content.surfaces.some((surface) => surface?.id === 'screenshot_review')
     && content.surfaces.some((surface) => surface?.id === 'export_pptx'),
 };

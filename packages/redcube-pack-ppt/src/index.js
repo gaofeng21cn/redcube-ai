@@ -13,7 +13,7 @@ function escapeTemplate(text) {
 }
 
 function buildDeckHtml({ title, slidesMarkup, renderPlan, renderStrategy, shellText }) {
-  const slidesLiteral = `[\n${slidesMarkup.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
+  const slidesLiteral = `\n[${slidesMarkup.map((slide) => `\n  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
   return shellText
     .replaceAll('__PPT_DECK_TITLE__', escapeHtml(title))
     .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
@@ -71,212 +71,212 @@ function anchorTracksForFamily(layoutFamily) {
   }
 }
 
-export function buildPptOutlineSlides(contract, deps) {
-  const {
-    safeText,
-    promptSeed,
-    sharedSourceLabels,
-    sharedSourceMaterials,
-  } = deps;
-  const title = safeText(contract.title || '未命名课件');
-  const goal = safeText(contract.goal || '讲清主线与动作');
-  const preset = deckPreset(contract.profile_id);
-  const publicSources = sharedSourceLabels(contract);
-  const sourceClaims = sharedSourceMaterials(contract)
-    .map((material) => safeText(material.excerpt || material.content_text).replace(/\s+/g, ' ').slice(0, 80))
-    .filter(Boolean);
-  const seed = promptSeed('detailed_outline', {
-    title,
-    goal,
+function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_runtime_seed' }) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
+    route,
+    lifecycle_stage: lifecycleStage,
+    ownership_model: 'director_first',
+    authored_surface: authoredSurface,
+    materialized_from: materializedFrom,
+  };
+}
+
+function creativeExecution(lifecycleStage) {
+  return {
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    lifecycle_stage: lifecycleStage,
+    ownership_model: 'director_first',
+  };
+}
+
+function buildOutlineSeedVars(contract, deps) {
+  const publicSources = deps.sharedSourceLabels(contract);
+  return {
+    title: deps.safeText(contract.title || '未命名课件'),
+    goal: deps.safeText(contract.goal || '讲清主线与动作'),
     profile_id: contract.profile_id,
     public_source_1: publicSources[0],
     public_source_2: publicSources[1],
     public_source_3: publicSources[2],
-  });
-  let slides;
-  if (Array.isArray(seed?.slides) && seed.slides.length > 0) {
-    slides = seed.slides.map((slide) => ({
-      ...slide,
-      public_sources: Array.isArray(slide.public_sources) && slide.public_sources.length > 0
-        ? slide.public_sources
-        : [publicSources[0], publicSources[1], publicSources[2]],
-    }));
-  } else {
-    slides = [
-      {
-        slide_id: 'S01',
-        slide_no: 1,
-        page_type: 'cover_peak',
-        layout_family: 'cover_hero',
-        title,
-        page_goal: '先定义讲课主问题与听众收益',
-        core_sentence: preset.promise,
-        page_objective: '建立全场问题、听众收益与课程基调',
-        evidence_points: ['为什么现在值得学', '今天不讲工具堆砌', goal],
-        public_sources: publicSources.slice(0, 1),
-      },
-      {
-        slide_id: 'S02',
-        slide_no: 2,
-        page_type: 'stakes_window',
-        layout_family: 'multi_zone_compare',
-        title: '旧工作流为什么会在这里失效',
-        page_goal: '建立问题紧迫性',
-        core_sentence: '如果不先拆清任务边界，AI 只会放大错误期待',
-        page_objective: '先讲失败模式，再讲 AI 能接什么、不能接什么',
-        evidence_points: ['任务定义断裂', '证据质量断裂', '输出解释断裂'],
-        public_sources: publicSources.slice(0, 2),
-      },
-      {
-        slide_id: 'S03',
-        slide_no: 3,
-        page_type: 'central_axis',
-        layout_family: 'central_axis',
-        title: '把问题、证据、动作绑到同一条轴线',
-        page_goal: '让听众抓住总框架',
-        core_sentence: '课堂不是堆信息，而是让问题、证据、动作同步推进',
-        page_objective: '建立同轴推进的教学骨架',
-        evidence_points: ['问题轴', '证据轴', '动作轴'],
-        public_sources: publicSources.slice(0, 1),
-      },
-      {
-        slide_id: 'S04',
-        slide_no: 4,
-        page_type: 'timeline_band',
-        layout_family: 'timeline_band',
-        title: '从首问到落地的讲授推进轨道',
-        page_goal: '展示页面推进节奏',
-        core_sentence: '每一页都要知道自己在推进哪一步，而不是重复安全模板',
-        page_objective: '显式给出起势、解释、证据、动作、复盘的推进顺序',
-        evidence_points: ['起势', '解释', '证据', '动作', '复盘'],
-        public_sources: publicSources.slice(0, 2),
-      },
-      {
-        slide_id: 'S05',
-        slide_no: 5,
-        page_type: 'judgement_ladder',
-        layout_family: 'judgement_ladder',
-        title: '判断梯：哪些环节适合 AI，哪些必须人工签收',
-        page_goal: '讲清边界与风险控制',
-        core_sentence: '不要把所有节点都交给同一种模型能力',
-        page_objective: '让听众知道何时可信、何时必须人工兜底',
-        evidence_points: ['可自动整理', '可 AI 辅助判断', '必须人工签收'],
-        public_sources: publicSources.slice(0, 2),
-      },
-      {
-        slide_id: 'S06',
-        slide_no: 6,
-        page_type: 'evidence_surface',
-        layout_family: 'multi_zone_compare',
-        title: '证据页必须把来源口径讲给听众听懂',
-        page_goal: '建立可信度',
-        core_sentence: '证据页不只是贴引用，而是让听众知道结论站在什么公开来源上',
-        page_objective: '公开来源与结论必须同屏出现',
-        evidence_points: ['公开指南', '同行评议文献', '公开流程资料'],
-        public_sources: publicSources,
-      },
-      {
-        slide_id: 'S07',
-        slide_no: 7,
-        page_type: 'ring_cross',
-        layout_family: 'ring_cross',
-        title: '把方法落成课堂上的四格动作',
-        page_goal: '形成课后可执行框架',
-        core_sentence: '讲者最终要给听众一个下课后还能复用的动作框架',
-        page_objective: '从课堂内容落成实践步骤',
-        evidence_points: ['定义问题', '绑定证据', '组织执行', '复盘回修'],
-        public_sources: publicSources.slice(1),
-      },
-      {
-        slide_id: 'S08',
-        slide_no: 8,
-        page_type: 'closure_peak',
-        layout_family: 'summary_peak',
-        title: '最后只收束三件必须带走的事',
-        page_goal: '回收主线并给出动作清单',
-        core_sentence: '结尾页不是重复目录，而是把整条主线压成可回忆的判断句',
-        page_objective: '留下记忆点与下一步动作',
-        evidence_points: ['先把任务定义清楚', '再把证据界面搭出来', '最后再让 AI 进入执行链'],
-        public_sources: publicSources.slice(0, 1),
-      },
-    ];
+  };
+}
+
+function resolvePromptPackAsset(contract, relativePath, deps) {
+  const assetPath = deps.safeText(relativePath);
+  if (!assetPath) return '';
+  if (assetPath.startsWith('prompts/')) {
+    return assetPath;
+  }
+  const root = deps.safeText(contract?.prompt_pack?.root, 'prompts/ppt_deck');
+  return `${root}/${assetPath}`;
+}
+
+function outlineSeed(contract, deps) {
+  return deps.promptSeed('detailed_outline', buildOutlineSeedVars(contract, deps)) || {};
+}
+
+export function buildPptOutlineSlides(contract, deps) {
+  const publicSources = deps.sharedSourceLabels(contract);
+  const seed = outlineSeed(contract, deps);
+  const slides = deps.safeArray(seed?.slides);
+
+  if (slides.length === 0) {
+    throw new Error(`Missing ppt_deck detailed_outline runtime_seed for profile: ${contract.profile_id}`);
   }
 
-  if (sourceClaims.length === 0) return slides;
+  return slides.map((slide) => {
+    if (!deps.safeText(slide.render_recipe_id)) {
+      throw new Error(`Missing ppt render_recipe_id in detailed_outline seed: ${slide.slide_id}`);
+    }
 
-  return slides.map((slide, index) => {
-    const sourceClaim = sourceClaims[index % sourceClaims.length];
     return {
       ...slide,
-      core_sentence: index === 0 ? sourceClaim : slide.core_sentence,
-      evidence_points: [...slide.evidence_points.slice(0, 2), sourceClaim].slice(0, 3),
-      public_sources: publicSources.slice(0, Math.max(1, Math.min(publicSources.length, 3))),
+      public_sources: deps.safeArray(slide.public_sources).length > 0
+        ? slide.public_sources
+        : publicSources.slice(0, 3),
     };
   });
 }
 
-function makeBlueprintSlide(slide, index, slides, contract, deps) {
+function toBlueprintContent(slide, deps) {
+  const explicit = deps.safeArray(slide.page_core_content);
+  const fallback = [
+    deps.safeText(slide.core_sentence),
+    ...deps.safeArray(slide.evidence_points),
+  ].filter(Boolean);
+  const items = explicit.length > 0 ? explicit : fallback;
+  return items.map((text, index) => ({
+    label: index === 0 ? '核心句' : `展开${index}`,
+    text,
+  }));
+}
+
+function hydrateBlueprintSlidesFromPromptPack(contract, slides, deps) {
   const preset = deckPreset(contract.profile_id);
-  return {
+  return slides.map((slide, index) => ({
     slide_id: slide.slide_id,
     slide_no: slide.slide_no,
     page_type: slide.page_type,
     title: slide.title,
     page_goal: slide.page_goal,
     core_sentence: slide.core_sentence,
-    page_core_content: [
-      { label: '核心句', text: slide.core_sentence },
-      ...slide.evidence_points.map((item, itemIndex) => ({ label: `展开${itemIndex + 1}`, text: item })),
-    ],
+    render_recipe_id: slide.render_recipe_id,
+    page_core_content: toBlueprintContent(slide, deps),
     visual_presentation: {
       layout_family: slide.layout_family,
-      anchor_tracks: anchorTracksForFamily(slide.layout_family),
+      anchor_tracks: deps.safeArray(slide.visual_anchor_tracks).length > 0
+        ? slide.visual_anchor_tracks
+        : anchorTracksForFamily(slide.layout_family),
       canvas: deps.CANVAS,
     },
-    evidence_and_sources: slide.public_sources.map((source, sourceIndex) => ({
+    evidence_and_sources: deps.safeArray(slide.public_sources).map((source, sourceIndex) => ({
       source_id: `SRC-${slide.slide_no}-${sourceIndex + 1}`,
       public_label: source,
     })),
-    speaker_notes: `${slide.core_sentence}。先用一句话点明本页任务，再按 ${slide.evidence_points.length} 个展开点说明为什么这一步不能跳过。`,
+    speaker_notes: deps.safeText(slide.speaker_notes)
+      || `${deps.safeText(slide.core_sentence)}。先用一句话点明本页任务，再按 ${deps.safeArray(slide.evidence_points).length} 个展开点说明为什么这一步不能跳过。`,
     speaker_seconds: preset.speaker_seconds + (slide.layout_family === 'judgement_ladder' ? 10 : 0),
-    transition_sentence: index === slides.length - 1
-      ? '最后把三件必须带走的事压成行动清单。'
-      : `讲完这一页后，顺着“${slides[index + 1].title}”进入下一页。`,
-  };
+    transition_sentence: deps.safeText(slide.transition_sentence)
+      || (index === slides.length - 1
+        ? '最后用一句总结把主线收束。'
+        : `讲完这一页后，顺着“${slides[index + 1].title}”进入下一页。`),
+    creative_sources: {
+      page_core_content: creativeSourceStamp({
+        route: 'slide_blueprint',
+        lifecycleStage: 'story_architecture',
+        authoredSurface: 'major_blueprint_text',
+      }),
+      speaker_notes: creativeSourceStamp({
+        route: 'slide_blueprint',
+        lifecycleStage: 'story_architecture',
+        authoredSurface: 'major_blueprint_text',
+      }),
+      transition_sentence: creativeSourceStamp({
+        route: 'slide_blueprint',
+        lifecycleStage: 'story_architecture',
+        authoredSurface: 'major_blueprint_text',
+      }),
+    },
+    creative_authorship: {
+      page_core_content: creativeSourceStamp({
+        route: 'slide_blueprint',
+        lifecycleStage: 'story_architecture',
+        authoredSurface: 'major_blueprint_text',
+      }),
+      speaker_notes: creativeSourceStamp({
+        route: 'slide_blueprint',
+        lifecycleStage: 'story_architecture',
+        authoredSurface: 'major_blueprint_text',
+      }),
+      transition_sentence: creativeSourceStamp({
+        route: 'slide_blueprint',
+        lifecycleStage: 'story_architecture',
+        authoredSurface: 'major_blueprint_text',
+      }),
+    },
+  }));
 }
 
 export function buildPptDetailedOutline(contract, deps) {
+  const seed = outlineSeed(contract, deps);
   const slides = buildPptOutlineSlides(contract, deps);
   return {
     ...deps.attachCommon('detailed_outline', contract),
+    creative_execution: creativeExecution(contract.lifecycle_model?.route_to_stage?.detailed_outline || 'story_architecture'),
+    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.detailed_outline || 'story_architecture',
     detailed_outline: {
-      chapter_structure: [
-        { chapter_id: 'C1', title: '问题重构', slide_range: '01-03' },
-        { chapter_id: 'C2', title: '结构与节奏', slide_range: '04-06' },
-        { chapter_id: 'C3', title: '实践收束', slide_range: '07-08' },
-      ],
+      chapter_structure: deps.safeArray(seed?.chapter_structure),
       page_budget: {
         total_slides: slides.length,
       },
-      slides: slides.map((slide) => ({
+      slides: slides.map((slide, index) => ({
         slide_no: String(slide.slide_no).padStart(2, '0'),
         title: slide.title,
         page_objective: slide.page_objective,
         core_sentence: slide.core_sentence,
         evidence_points: slide.evidence_points,
+        public_sources: slide.public_sources,
+        page_core_content: toBlueprintContent(slide, deps).map((item) => item.text),
+        speaker_notes: deps.safeText(slide.speaker_notes)
+          || `${deps.safeText(slide.core_sentence)}。先用一句话点明本页任务，再按 ${deps.safeArray(slide.evidence_points).length} 个展开点说明为什么这一步不能跳过。`,
+        transition_sentence: deps.safeText(slide.transition_sentence)
+          || (index === slides.length - 1
+            ? '最后用一句总结把主线收束。'
+            : `讲完这一页后，顺着“${slides[index + 1].title}”进入下一页。`),
+        render_recipe_id: slide.render_recipe_id,
+        creative_sources: {
+          major_text: creativeSourceStamp({
+            route: 'detailed_outline',
+            lifecycleStage: 'story_architecture',
+            authoredSurface: 'outline_major_text',
+          }),
+        },
+        creative_authorship: {
+          major_text: creativeSourceStamp({
+            route: 'detailed_outline',
+            lifecycleStage: 'story_architecture',
+            authoredSurface: 'outline_major_text',
+          }),
+        },
       })),
     },
   };
 }
 
 export function buildPptSlideBlueprint(contract, deps) {
-  const seed = deps.promptSeed('slide_blueprint');
+  const seed = deps.promptSeed('slide_blueprint') || {};
   const slides = buildPptOutlineSlides(contract, deps);
   return {
     ...deps.attachCommon('slide_blueprint', contract),
+    creative_execution: creativeExecution(contract.lifecycle_model?.route_to_stage?.slide_blueprint || 'story_architecture'),
+    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.slide_blueprint || 'story_architecture',
     slide_blueprint: {
-      chapter_goal: '逐页落实讲授型 deck 的页面目标、视觉结构与讲稿动作',
-      slides: slides.map((slide, index) => makeBlueprintSlide(slide, index, slides, contract, deps)),
+      chapter_goal: deps.safeText(seed?.chapter_goal),
+      slides: hydrateBlueprintSlidesFromPromptPack(contract, slides, deps),
       quality_guards: {
         ...(seed?.quality_guards || {}),
         require_visual_direction_before_html: true,
@@ -290,48 +290,21 @@ export function buildPptSlideBlueprint(contract, deps) {
 
 export function buildPptVisualDirection(contract, blueprintArtifact, mode, baselineDeliverableId, deps) {
   const slides = blueprintArtifact.slide_blueprint.slides;
-  const seed = deps.promptSeed('visual_direction', { title: contract.title });
+  const visualSeed = deps.promptSeed('visual_direction', { title: contract.title })?.visual_direction || {};
   return {
     ...deps.attachCommon('visual_direction', contract),
+    creative_execution: creativeExecution(contract.lifecycle_model?.route_to_stage?.visual_direction || 'visual_authorship'),
+    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.visual_direction || 'visual_authorship',
     visual_direction: {
-      visual_manifest: deps.safeText(seed?.visual_direction?.visual_manifest, '浅底高对比、关键页允许峰值、复杂结构显式锚点'),
-      what_it_is: deps.safeArray(seed?.visual_direction?.what_it_is).length > 0 ? seed.visual_direction.what_it_is : ['成熟讲者工作台', '结构解释驱动视觉组织'],
-      what_it_is_not: deps.safeArray(seed?.visual_direction?.what_it_is_not).length > 0 ? seed.visual_direction.what_it_is_not : ['统一安全模板页', '内部占位来源', '小红书语义替代'],
-      palette: {
-        canvas: '#F7F8FC',
-        ink: '#0F172A',
-        accent: '#2563EB',
-        accentSoft: '#DBEAFE',
-        success: '#0F766E',
-      },
-      continuity_constraints: [
-        '关键页必须与相邻页形成明显差异',
-        '来源与页码按页控制',
-        '复杂结构页必须显式写出锚点/轨道/网格',
-      ],
-      rhythm_curve: [
-        { slide_id: 'S01', role: 'opening_peak' },
-        { slide_id: 'S02', role: 'stakes_rise' },
-        { slide_id: 'S03', role: 'clarify_buffer' },
-        { slide_id: 'S04', role: 'mechanism_peak' },
-        { slide_id: 'S05', role: 'decision_bridge' },
-        { slide_id: 'S06', role: 'evidence_peak' },
-        { slide_id: 'S07', role: 'practice_bridge' },
-        { slide_id: 'S08', role: 'closing_peak' },
-      ],
-      peak_pages: ['S01', 'S04', 'S06', 'S08'],
-      page_family_ceiling: {
-        cover_hero: 1,
-        central_axis: 1,
-        multi_zone_compare: 2,
-        timeline_band: 1,
-        judgement_ladder: 1,
-        ring_cross: 1,
-        summary_cross: 1,
-      },
-      forbidden_regressions: mode === 'optimize_existing'
-        ? ['更粗糙', '更单调', '更重', '更挤', '更像统一模板页']
-        : ['退化成统一安全模板页'],
+      visual_manifest: deps.safeText(visualSeed.visual_manifest),
+      what_it_is: deps.safeArray(visualSeed.what_it_is),
+      what_it_is_not: deps.safeArray(visualSeed.what_it_is_not),
+      palette: visualSeed.palette,
+      continuity_constraints: deps.safeArray(visualSeed.continuity_constraints),
+      rhythm_curve: deps.safeArray(visualSeed.rhythm_curve),
+      peak_pages: deps.safeArray(visualSeed.peak_pages),
+      page_family_ceiling: visualSeed.page_family_ceiling || {},
+      forbidden_regressions: deps.safeArray(visualSeed.forbidden_regressions),
       page_role_table: slides.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
@@ -339,16 +312,34 @@ export function buildPptVisualDirection(contract, blueprintArtifact, mode, basel
         first_glance: slide.visual_presentation.anchor_tracks[0],
         second_glance: slide.visual_presentation.anchor_tracks[1] || slide.visual_presentation.anchor_tracks[0],
       })),
-      final_instruction_to_html_generator: deps.safeArray(seed?.visual_direction?.final_instruction_to_html_generator).length > 0
-        ? seed.visual_direction.final_instruction_to_html_generator
-        : [
-          '每页在 slidesData 中独立 content',
-          '不得退化成统一模板页',
-          '先落实导演稿峰值页，再处理安全页',
-        ],
+      final_instruction_to_html_generator: deps.safeArray(visualSeed.final_instruction_to_html_generator),
       source_truth_confidence: deps.sharedSourceConfidence(contract) || 'low',
       baseline_deliverable_id: deps.safeText(baselineDeliverableId) || null,
       mode,
+      creative_sources: {
+        visual_manifest: creativeSourceStamp({
+          route: 'visual_direction',
+          lifecycleStage: 'visual_authorship',
+          authoredSurface: 'visual_direction_major_expression',
+        }),
+        rhythm_curve: creativeSourceStamp({
+          route: 'visual_direction',
+          lifecycleStage: 'visual_authorship',
+          authoredSurface: 'visual_direction_major_expression',
+        }),
+        page_family_ceiling: creativeSourceStamp({
+          route: 'visual_direction',
+          lifecycleStage: 'visual_authorship',
+          authoredSurface: 'visual_direction_major_expression',
+        }),
+      },
+      creative_authorship: {
+        visual_direction: creativeSourceStamp({
+          route: 'visual_direction',
+          lifecycleStage: 'visual_authorship',
+          authoredSurface: 'visual_direction_major_expression',
+        }),
+      },
     },
   };
 }
@@ -357,15 +348,18 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   const blueprintArtifact = deps.readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = deps.readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const contractRender = deps.renderContract(contract);
-  if (!deps.safeText(contractRender.compiler_module)) {
-    // compiler capability now resolves by prompt_pack.pack_id via pack-runtime registry
-  }
   const compiler = await loadRenderPackCompiler(contract);
   const slidesMarkup = await compiler.compileRenderSlides({
     slides: blueprintArtifact.slide_blueprint.slides,
     visualDirection: visualArtifact.visual_direction,
     renderContract: contractRender,
     canvas: deps.CANVAS,
+    recipeTemplates: Object.fromEntries(
+      Object.entries(contractRender.template_registry || {}).map(([recipeId, relativePath]) => [
+        recipeId,
+        deps.readPromptPackText(resolvePromptPackAsset(contract, relativePath, deps)),
+      ]),
+    ),
   });
   const renderPlan = {
     render_strategy: deps.safeText(contractRender.render_strategy, 'prompt_director_first'),
@@ -379,12 +373,17 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
       title: slide.title,
       layout_family: slide.layout_family,
       recipe_id: slide.recipe_id,
+      template_id: slide.template_id,
       peak_page: slide.director_contract.peak_page,
     })),
   };
   const htmlFile = deps.path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
   const slidesFile = deps.path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
-  const shellText = deps.readPromptPackText(`prompts/ppt_deck/${deps.safeText(contractRender.shell_file, 'render_shell.html')}`);
+  const shellText = deps.readPromptPackText(resolvePromptPackAsset(
+    contract,
+    deps.safeText(contractRender.shell_file, 'render_shell.html'),
+    deps,
+  ));
   deps.writeText(htmlFile, buildDeckHtml({
     title: contract.title,
     slidesMarkup,
@@ -403,6 +402,8 @@ export async function buildPptRenderArtifact({ workspaceRoot, topicId, deliverab
   });
   return {
     ...deps.attachCommon('render_html', contract),
+    creative_execution: creativeExecution(contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship'),
+    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
     html_bundle: {
       html_file: htmlFile,
       slides_file: slidesFile,

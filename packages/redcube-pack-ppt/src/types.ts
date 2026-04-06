@@ -87,6 +87,11 @@ export interface PptDetailedOutlineSeedSlide {
   core_sentence: string;
   page_objective: string;
   evidence_points: string[];
+  page_core_content?: string[];
+  visual_anchor_tracks?: string[];
+  speaker_notes?: string;
+  transition_sentence?: string;
+  render_recipe_id?: PptRecipeId;
   public_sources?: string[];
 }
 
@@ -136,6 +141,12 @@ export interface PptDetailedOutlineSummary {
   page_objective: string;
   core_sentence: string;
   evidence_points: string[];
+  public_sources: string[];
+  render_recipe_id: PptRecipeId;
+  creative_sources: {
+    major_text: 'host_agent';
+    recipe_selection: 'host_agent';
+  };
 }
 
 export interface PptDetailedOutlineArtifact {
@@ -169,6 +180,7 @@ export interface PptBlueprintSlide {
   title: string;
   page_goal: string;
   core_sentence: string;
+  render_recipe_id: PptRecipeId;
   page_core_content: PptPageCoreContentItem[];
   visual_presentation: {
     layout_family: PptLayoutFamily;
@@ -179,6 +191,13 @@ export interface PptBlueprintSlide {
   speaker_notes: string;
   speaker_seconds: number;
   transition_sentence: string;
+  creative_sources: {
+    page_core_content: 'host_agent';
+    speaker_notes: 'host_agent';
+    transition_sentence: 'host_agent';
+    visual_presentation: 'host_agent';
+    recipe_selection: 'host_agent';
+  };
 }
 
 export interface PptBlueprintArtifact {
@@ -234,6 +253,12 @@ export interface PptVisualDirection {
   source_truth_confidence: string;
   baseline_deliverable_id: string | null;
   mode: PptMigrationMode;
+  creative_sources?: {
+    visual_manifest: 'host_agent';
+    rhythm_curve: 'host_agent';
+    peak_pages: 'host_agent';
+    page_family_ceiling: 'host_agent';
+  };
 }
 
 export interface PptVisualDirectionArtifact {
@@ -257,6 +282,7 @@ export interface PptRenderContract {
   render_strategy?: string;
   shell_file?: string;
   recipe_registry?: Partial<Record<PptLayoutFamily | 'default', PptRecipeId>>;
+  template_registry?: Partial<Record<PptRecipeId, string>>;
 }
 
 export interface PptRenderSlideDirectorContract {
@@ -273,6 +299,7 @@ export interface PptRenderSlide {
   title: string;
   layout_family: PptLayoutFamily;
   recipe_id: PptRecipeId;
+  template_id?: string;
   page_goal: string;
   page_core_content: PptPageCoreContentItem[];
   evidence_and_sources: PptSourceReference[];
@@ -281,6 +308,11 @@ export interface PptRenderSlide {
   director_contract: PptRenderSlideDirectorContract;
   palette: PptPalette;
   total_slides: number;
+  creative_sources: {
+    recipe_selection: 'host_agent';
+    final_markup: 'host_agent';
+  };
+  template_contract_source: 'prompt_pack';
   content: string;
 }
 
@@ -405,4 +437,5 @@ export interface CompilePptRenderSlidesInput {
   visualDirection: PptVisualDirection;
   renderContract: PptRenderContract;
   canvas: PptCanvasContract;
+  recipeTemplates: Partial<Record<PptRecipeId, string>>;
 }

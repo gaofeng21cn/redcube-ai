@@ -62,6 +62,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/relative-quality.js',
   ],
   'packages/redcube-runtime': [
+    'src/creative-ownership.js',
     'src/deliverable-routes.js',
     'src/event-log.js',
     'src/executors.js',

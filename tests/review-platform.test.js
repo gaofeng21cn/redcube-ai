@@ -23,7 +23,7 @@ async function runPptReviewReady(workspaceRoot) {
     title: '肠癌 AI 讲课 deck',
     goal: '给学生讲清肠癌 AI 的问题、方法与边界',
   });
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
     const result = await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: 'topic-a', deliverableId: 'deck-a', route });
     assert.equal(result.ok, true, route);
   }
@@ -326,7 +326,7 @@ test('promote_baseline works for ppt_deck without human approval gate once relat
     title: '肠癌 AI 讲课 baseline',
     goal: '旧版认可稿',
   });
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
     const result = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',
@@ -346,7 +346,7 @@ test('promote_baseline works for ppt_deck without human approval gate once relat
     title: '肠癌 AI 讲课优化版',
     goal: '在 baseline 基础上提升教学性',
   });
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review']) {
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
     const result = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',

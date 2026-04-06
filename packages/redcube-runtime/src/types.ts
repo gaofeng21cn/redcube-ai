@@ -14,6 +14,196 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
+export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
+  source_readiness: string[];
+  story_architecture: string[];
+  visual_authorship: string[];
+  delivery_packaging: string[];
+  review_overlay: string[];
+}
+
+export interface RuntimeCreativeOwnershipResearchOwnershipContract {
+  semantic_role?: 'shared_source_readiness_augmentation';
+  positioning?: 'shared_source_readiness_optional_augmentation';
+  trigger_conditions: string[];
+}
+
+export interface RuntimeCreativeOwnershipReviewOverlayContract {
+  shared_layers: string[];
+  family_mapping?: {
+    xiaohongshu: string[];
+    ppt_deck: string[];
+  };
+  xiaohongshu?: {
+    status: 'active' | 'inactive';
+    layers?: string[];
+  };
+  ppt_deck?: {
+    status: 'active' | 'inactive';
+    layers?: string[];
+  };
+}
+
+export interface RuntimeCreativeOwnershipExecutionContract {
+  program: 'P19';
+  milestone: 'P19.A';
+  tracking_model: 'unified_lifecycle';
+  primary_executor: {
+    adapter: 'host_agent';
+    runtime: 'codex_native_host_agent';
+    status: 'formal_primary_executor';
+  };
+  adapter_roles: {
+    host_agent: 'formal_primary_executor';
+    external_llm: 'optional_compatibility_adapter';
+  };
+  optional_compatibility_adapters: string[];
+  protected_creative_routes: {
+    xiaohongshu: RuntimeCreativeOwnershipLifecycleFamilyMapping;
+    ppt_deck: RuntimeCreativeOwnershipLifecycleFamilyMapping;
+  };
+  primary_creative_routes: {
+    xiaohongshu: string[];
+    ppt_deck: string[];
+  };
+  unified_lifecycle: RuntimeCreativeOwnershipLifecycleContract;
+  review_overlay: RuntimeCreativeOwnershipReviewOverlayContract;
+  research_ownership: RuntimeCreativeOwnershipResearchOwnershipContract;
+  mainline_topology: string[];
+}
+
+export interface RuntimeCreativeOwnershipLifecycleContract {
+  tracking_model: 'unified_lifecycle';
+  macro_lifecycle: Array<
+    'source_readiness'
+    | 'story_architecture'
+    | 'visual_authorship'
+    | 'delivery_packaging'
+  >;
+  review_overlay: string[];
+  research_ownership: RuntimeCreativeOwnershipResearchOwnershipContract;
+  stages: Array<
+    'source_readiness'
+    | 'story_architecture'
+    | 'visual_authorship'
+    | 'delivery_packaging'
+  >;
+  family_mapping: {
+    xiaohongshu: RuntimeCreativeOwnershipLifecycleFamilyMapping;
+    ppt_deck: RuntimeCreativeOwnershipLifecycleFamilyMapping;
+  };
+}
+
+export interface RuntimeCreativeOwnershipForbiddenBoundaries {
+  allowed_code_responsibilities: string[];
+  forbidden_code_authorship: {
+    xiaohongshu: string[];
+    ppt_deck: string[];
+  };
+  fake_progress_conditions: string[];
+}
+
+export interface RuntimeCreativeOwnershipViolation {
+  violation_id: string;
+  stage: string;
+  protected_surface: string;
+  file: string;
+  evidence_patterns: string[];
+  why_blocked: string;
+  status: 'present' | 'cleared';
+}
+
+export interface RuntimeCreativeOwnershipAudit {
+  program: 'P19';
+  milestone: 'P19.A';
+  tracking_model: 'unified_lifecycle';
+  shared_execution_contract: {
+    primary_adapter: 'host_agent';
+    primary_runtime: 'codex_native_host_agent';
+    external_llm_status: 'optional_compatibility_adapter';
+    mainline_topology: string[];
+  };
+  unified_lifecycle: RuntimeCreativeOwnershipLifecycleContract;
+  research_ownership: RuntimeCreativeOwnershipResearchOwnershipContract;
+  review_overlay: RuntimeCreativeOwnershipReviewOverlayContract;
+  families: {
+    xiaohongshu: {
+      status: 'present' | 'cleared';
+      protected_routes: string[];
+      lifecycle_residue: Record<string, { status: 'present' | 'cleared'; violations: RuntimeCreativeOwnershipViolation[] }>;
+      violations: RuntimeCreativeOwnershipViolation[];
+    };
+    ppt_deck: {
+      status: 'present' | 'cleared';
+      protected_routes: string[];
+      lifecycle_residue: Record<string, { status: 'present' | 'cleared'; violations: RuntimeCreativeOwnershipViolation[] }>;
+      violations: RuntimeCreativeOwnershipViolation[];
+    };
+  };
+}
+
+export interface RuntimeCreativeOwnershipCloseoutAuditFinding {
+  file: string;
+  protected_output: string;
+  residue_kind: string;
+  evidence_patterns: string[];
+  summary: string;
+}
+
+export interface RuntimeCreativeOwnershipCloseoutAudit {
+  milestone: 'P19.A';
+  phase: 'freeze_execution_model_and_shared_lifecycle';
+  execution_model: {
+    mainline_adapter: 'host_agent';
+    primary_surface: 'codex_native_host_agent';
+    adapter_role: 'primary_creative_executor';
+    agent_first_requires_external_llm: false;
+    external_llm_role: 'optional_compatibility_adapter';
+  };
+  unified_lifecycle: {
+    stages: RuntimeCreativeOwnershipLifecycleContract['macro_lifecycle'];
+    family_mapping: RuntimeCreativeOwnershipLifecycleContract['family_mapping'];
+  };
+  research_ownership: {
+    positioning: 'shared_source_readiness_optional_augmentation';
+    trigger_conditions: string[];
+  };
+  review_overlay: {
+    shared_layers: string[];
+    xiaohongshu: {
+      status: 'active';
+    };
+    ppt_deck: {
+      status: 'active' | 'inactive';
+    };
+  };
+  creative_ownership_boundary: {
+    code_allowed_responsibilities: string[];
+    code_forbidden_outputs: string[];
+  };
+  residue: {
+    xiaohongshu: {
+      status: 'open' | 'cleared';
+      findings: RuntimeCreativeOwnershipCloseoutAuditFinding[];
+    };
+    ppt_deck: {
+      status: 'open' | 'cleared';
+      findings: RuntimeCreativeOwnershipCloseoutAuditFinding[];
+    };
+  };
+  team_gate: {
+    shared_contract_frozen: boolean;
+    shared_lifecycle_contract_frozen: boolean;
+    research_ownership_frozen: boolean;
+    lifecycle_alignment_red_tests_written: boolean;
+    ppt_visual_director_review_contract_frozen: boolean;
+    lane_write_scopes_by_shared_lifecycle: boolean;
+    independent_verification_defined: boolean;
+    final_convergence_order_defined: boolean;
+    missing_gates: string[];
+  };
+}
+
 export interface RuntimeRunRouteRequest {
   workspaceRoot: string;
   overlay: string;

@@ -1,0 +1,26 @@
+<div data-slide-root="true" data-template-id="{{template_id}}" data-slide-id="{{slide_id}}" data-title="{{title}}" data-layout-family="{{layout_family}}" data-recipe-id="{{recipe_id}}" data-peak-page="{{peak_page}}" data-director-role="{{director_role}}" data-speaker-seconds="{{speaker_seconds}}" style="position:relative;width:{{canvas_width}}px;height:{{canvas_height}}px;background:{{root_background}};overflow:hidden;padding:20px 20px 44px;">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));"></div>
+  <div style="position:relative;display:grid;gap:18px;height:100%;align-content:start;">
+    <header data-qa-block="header" style="display:grid;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-size:14px;font-weight:800;color:{{accent}};letter-spacing:0.06em;text-transform:uppercase;">{{role_label}}</div>
+        {{#if peak_page}}<span style="display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(220,38,38,0.12);color:{{warning}};font-size:11px;font-weight:800;">峰值页</span>{{/if}}
+      </div>
+      <h2 style="margin:0;font-size:26px;line-height:1.22;color:#0F172A;">{{title}}</h2>
+      <div style="font-size:11px;line-height:1.45;color:#64748B;">{{visual_motif}}</div>
+    </header>
+    <div data-qa-block="hero" data-primary-point="true" style="padding:20px 18px;border-radius:24px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);font-size:22px;line-height:1.55;font-weight:700;color:#0F172A;">{{hero_text}}</div>
+    <div style="display:grid;gap:14px;">
+      {{#each support_cards}}
+      <div data-qa-block="card" data-primary-point="true" style="padding:16px;border-radius:20px;background:#FFFFFF;border:1px solid rgba(15,23,42,0.08);box-shadow:0 8px 18px rgba(15,23,42,0.05);">
+        <div style="font-size:20px;line-height:1.5;color:#0F172A;">{{text}}</div>
+        <div style="margin-top:10px;width:52px;height:4px;border-radius:999px;background:{{accent}};"></div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <footer style="position:absolute;left:20px;right:20px;bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
+    <div data-source-label="true">{{source_label_1}}</div>
+    <div>{{slide_no}} / {{total_slides}}</div>
+  </footer>
+</div>

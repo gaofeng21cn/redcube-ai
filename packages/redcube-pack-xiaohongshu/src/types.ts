@@ -106,10 +106,15 @@ export interface XhsPlanningSeedSlide {
   slide_id: string;
   title: string;
   layout_family: XhsLayoutFamily;
+  render_recipe_id: XhsRecipeId;
   page_goal: string;
   progression_role?: XhsProgressionRole;
+  page_core_content?: string[];
+  visual_presentation?: XhsSourceVisualPresentation;
   source_language?: string;
+  speaker_notes?: string;
   transition?: string;
+  core_sentence?: string;
 }
 
 export interface XhsPlanningSeed {
@@ -162,6 +167,7 @@ export interface XhsPlanSlide {
   slide_no: number;
   title: string;
   layout_family: XhsLayoutFamily;
+  render_recipe_id: XhsRecipeId;
   page_goal: string;
   progression_role: XhsProgressionRole;
   core_sentence: string;
@@ -172,6 +178,10 @@ export interface XhsPlanSlide {
   speaker_notes: string;
   transition: string;
   transition_sentence: string;
+  creative_sources: {
+    page_core_content: 'prompt_pack_seed';
+    visual_presentation: 'prompt_pack_seed';
+  };
 }
 
 export interface XhsPlanArtifact {
@@ -210,6 +220,12 @@ export interface XhsVisualDirection {
   forbidden_regressions: string[];
   baseline_deliverable_id: string | null;
   memory_hook: string;
+  creative_sources?: {
+    director_statement: 'prompt_pack_seed';
+    visual_motif: 'prompt_pack_seed';
+    rhythm_curve: 'prompt_pack_seed';
+    page_family_ceiling: 'prompt_pack_seed';
+  };
 }
 
 export interface XhsVisualDirectionArtifact {
@@ -225,6 +241,7 @@ export interface XhsRenderContract {
   render_strategy?: string;
   shell_file?: string;
   recipe_registry?: Partial<Record<XhsLayoutFamily | 'default', XhsRecipeId>>;
+  template_registry?: Partial<Record<XhsRecipeId, string>>;
 }
 
 export interface XhsRenderSlideDirectorContract {
@@ -243,12 +260,17 @@ export interface XhsRenderSlide {
   title: string;
   layout_family: XhsLayoutFamily;
   recipe_id: XhsRecipeId;
+  template_id: string;
   page_goal: string;
   page_core_content: string[];
   evidence_and_sources: XhsSourceReference[];
   director_contract: XhsRenderSlideDirectorContract;
   speaker_seconds: number;
   total_slides: number;
+  creative_sources: {
+    recipe_selection: 'prompt_pack_seed';
+    final_markup: 'prompt_pack_template';
+  };
   content: string;
 }
 
@@ -257,6 +279,7 @@ export interface XhsRenderPlanSlideSummary {
   title: string;
   layout_family: XhsLayoutFamily;
   recipe_id: XhsRecipeId;
+  template_id?: string;
   peak_page: boolean;
   director_role: XhsProgressionRole;
 }
@@ -302,6 +325,7 @@ export interface CompileXhsRenderSlidesInput {
   visualDirection: XhsVisualDirection;
   renderContract: XhsRenderContract;
   canvas: RenderCanvas;
+  recipeTemplates: Partial<Record<XhsRecipeId, string>>;
 }
 
 export interface XhsPlanningDependencies {

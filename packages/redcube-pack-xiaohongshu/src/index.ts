@@ -2,7 +2,6 @@ import {
   buildXhsPlanSlides as buildXhsPlanSlidesJs,
   buildXhsRenderHtml as buildXhsRenderHtmlJs,
   buildXhsVisualDirection as buildXhsVisualDirectionJs,
-  inferXhsVisualPresentation as inferXhsVisualPresentationJs,
 } from './planning.js';
 import { compileXhsRenderSlides as compileXhsRenderSlidesJs } from './render-compiler.js';
 
@@ -17,15 +16,10 @@ import type {
   XhsRenderArtifact,
   XhsRenderArtifactDependencies,
   XhsRenderSlide,
-  XhsSourceVisualPresentation,
   XhsStorylineArtifact,
   XhsVisualDirectionArtifact,
   XhsVisualDirectionDependencies,
 } from './types.js';
-
-export function inferXhsVisualPresentation(slide: { layout_family: XhsPlanSlide['layout_family'] }): XhsSourceVisualPresentation {
-  return inferXhsVisualPresentationJs(slide) as XhsSourceVisualPresentation;
-}
 
 export function buildXhsPlanSlides(
   contract: XhsHydratedContract,
@@ -61,7 +55,7 @@ export async function buildXhsRenderHtml(
 }
 
 export function compileXhsRenderSlides(input: CompileXhsRenderSlidesInput): XhsRenderSlide[] {
-  return compileXhsRenderSlidesJs(input) as XhsRenderSlide[];
+  return compileXhsRenderSlidesJs(input) as unknown as XhsRenderSlide[];
 }
 
 export type {

@@ -4,6 +4,16 @@ export {
   watchRuntimeReviewLoop,
 } from '@redcube/governance';
 export { appendEvent, readEvents } from './event-log.js';
+export {
+  P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
+  P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
+  P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
+  P19_RESEARCH_OWNERSHIP_CONTRACT,
+  P19_REVIEW_OVERLAY_CONTRACT,
+  P19_TEAM_GATE_CONTRACT,
+  P19_UNIFIED_LIFECYCLE_CONTRACT,
+  buildCreativeOwnershipResidueAudit,
+} from './creative-ownership.js';
 export { runDeliverableRoute } from './deliverable-routes.js';
 export { resolveExecutorAdapter } from './executors.js';
 export { completeRun, loadRun, startRun } from './run-store.js';

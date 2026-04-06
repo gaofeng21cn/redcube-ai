@@ -11,7 +11,7 @@
 ```json
 {
   "storyline": {
-    "core_metaphor": "把 AI 放回科研链，而不是神化成万能入口",
+    "core_metaphor": "把 AI 放回科研链：{{source_claim_1}}",
     "hook": [
       "为什么现在要讲：{{promise}}"
     ],

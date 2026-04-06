@@ -40,6 +40,7 @@ test('buildDeckRecord emits canonical ppt deck metadata', () => {
     'slide_blueprint',
     'visual_direction',
     'render_html',
+    'visual_director_review',
     'screenshot_review',
     'export_pptx',
   ]);

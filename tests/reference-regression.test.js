@@ -58,7 +58,7 @@ async function createReferenceDeliverable({ workspaceRoot, fixture, deliverableI
 
   const routes = fixture.meta.overlay === 'xiaohongshu'
     ? ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']
-    : ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'screenshot_review'];
+    : ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
 
   const results = [];
   for (const route of routes) {

@@ -69,7 +69,15 @@ export async function runDeliverableRoute({
     route: safeRoute,
     overlay,
     target: deliverableId,
-    executor: { adapter: executor.adapter },
+    executor: {
+      adapter: executor.adapter,
+      primary: executor.primary,
+      execution_surface: executor.execution_surface,
+      creative_execution: executor.creative_execution,
+      external_llm_role: executor.external_llm_role,
+      compatibility_role: executor.compatibility_role,
+      execution_model: executor.execution_model,
+    },
   });
 
   appendEvent(workspaceRoot, run.run_id, {
@@ -131,7 +139,15 @@ export async function runDeliverableRoute({
       currentStage: safeRoute,
       stageResults: [{ stage: safeRoute, status: 'completed' }],
       artifactRefs,
-      executor: { adapter: executor.adapter },
+      executor: {
+        adapter: executor.adapter,
+        primary: executor.primary,
+        execution_surface: executor.execution_surface,
+        creative_execution: executor.creative_execution,
+        external_llm_role: executor.external_llm_role,
+        compatibility_role: executor.compatibility_role,
+        execution_model: executor.execution_model,
+      },
     });
 
     appendEvent(workspaceRoot, completedRun.run_id, {
@@ -155,7 +171,15 @@ export async function runDeliverableRoute({
       runId: run.run_id,
       currentStage: safeRoute,
       error,
-      executor: { adapter: executor.adapter },
+      executor: {
+        adapter: executor.adapter,
+        primary: executor.primary,
+        execution_surface: executor.execution_surface,
+        creative_execution: executor.creative_execution,
+        external_llm_role: executor.external_llm_role,
+        compatibility_role: executor.compatibility_role,
+        execution_model: executor.execution_model,
+      },
     });
 
     appendEvent(workspaceRoot, failedRun.run_id, {

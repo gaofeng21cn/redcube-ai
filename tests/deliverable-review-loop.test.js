@@ -224,6 +224,8 @@ test('reviewRenderOutput loads lecture_student profile checks from hydrated cont
     deliverableId: 'deck-a',
     overlay: 'ppt_deck',
     checks: {
+      director_intent_landed: true,
+      anti_template_ok: true,
       overflow_free: true,
       occlusion_free: true,
       visual_density_ok: true,
@@ -257,6 +259,8 @@ test('reviewRenderOutput loads executive_briefing profile checks from hydrated c
     deliverableId: 'deck-a',
     overlay: 'ppt_deck',
     checks: {
+      director_intent_landed: true,
+      anti_template_ok: true,
       overflow_free: true,
       occlusion_free: true,
       visual_density_ok: true,

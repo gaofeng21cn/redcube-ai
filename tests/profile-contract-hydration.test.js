@@ -48,6 +48,7 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
       'slide_blueprint',
       'visual_direction',
       'render_html',
+      'visual_director_review',
       'screenshot_review',
       'export_pptx',
     ],

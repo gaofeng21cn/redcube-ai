@@ -16,6 +16,7 @@ export type PptDeckStageId =
   | 'slide_blueprint'
   | 'visual_direction'
   | 'render_html'
+  | 'visual_director_review'
   | 'screenshot_review'
   | 'export_pptx';
 export type PptDeckPromptFile =
@@ -24,6 +25,7 @@ export type PptDeckPromptFile =
   | 'slide_blueprint.md'
   | 'visual_direction.md'
   | 'render_html.md'
+  | 'director_review.md'
   | 'screenshot_review.md'
   | 'export_pptx.md';
 export type PptDeckOutputArtifactFile =
@@ -32,6 +34,7 @@ export type PptDeckOutputArtifactFile =
   | 'slide_blueprint.json'
   | 'visual_direction.json'
   | 'render_bundle.json'
+  | 'director_review.json'
   | 'quality_gate.json'
   | 'publish_bundle.json';
 export type PptDeckReviewCheck =
@@ -39,6 +42,8 @@ export type PptDeckReviewCheck =
   | 'occlusion_free'
   | 'visual_density_ok'
   | 'speaker_fit_ok'
+  | 'director_intent_landed'
+  | 'anti_template_ok'
   | 'baseline_comparison_passed'
   | 'term_explained_on_first_use'
   | 'teaching_progression_clear'
@@ -104,6 +109,7 @@ export interface PptDeckStageRequirements {
   slide_blueprint: PptDeckStageRequirement;
   visual_direction: PptDeckStageRequirement;
   render_html: PptDeckStageRequirement;
+  visual_director_review: PptDeckStageRequirement;
   screenshot_review: PptDeckStageRequirement;
   export_pptx: PptDeckStageRequirement;
 }
@@ -117,6 +123,8 @@ export interface PptDeckReviewRerunMap {
   occlusion_free: 'render_html';
   visual_density_ok: 'visual_direction';
   speaker_fit_ok: 'slide_blueprint';
+  director_intent_landed: 'visual_director_review';
+  anti_template_ok: 'visual_director_review';
   baseline_comparison_passed: 'visual_direction';
   term_explained_on_first_use?: 'storyline';
   teaching_progression_clear?: 'detailed_outline';
@@ -188,6 +196,7 @@ export interface PptDeckPromptRoutes {
   slide_blueprint: string;
   visual_direction: string;
   render_html: string;
+  visual_director_review: string;
   screenshot_review: string;
   export_pptx: string;
 }
@@ -202,6 +211,7 @@ export interface PptDeckPromptStages {
   slide_blueprint: PptDeckPromptStageFile;
   visual_direction: PptDeckPromptStageFile;
   render_html: PptDeckPromptStageFile;
+  visual_director_review: PptDeckPromptStageFile;
   screenshot_review: PptDeckPromptStageFile;
   export_pptx: PptDeckPromptStageFile;
 }
@@ -221,6 +231,7 @@ export interface PptDeckRenderContract {
   render_strategy: 'prompt_director_first';
   shell_file: 'render_shell.html';
   recipe_registry: PptDeckRecipeRegistry;
+  template_registry: Record<PptDeckRecipeRegistry[keyof PptDeckRecipeRegistry], string>;
 }
 
 export interface PptDeckPromptPack {
@@ -247,6 +258,7 @@ export type PptDeckDisplaySurfaceId =
   | 'slide_blueprint'
   | 'visual_direction'
   | 'render_html'
+  | 'visual_director_review'
   | 'screenshot_review'
   | 'export_pptx';
 export type PptDeckDisplaySurfaceKind =
@@ -265,6 +277,24 @@ export interface PptDeckDisplaySurface {
 
 export interface PptDeckDisplayRegistry {
   surfaces: PptDeckDisplaySurface[];
+}
+
+export interface PptDeckLifecycleModel {
+  macro_lifecycle: Array<
+    'source_readiness'
+    | 'story_architecture'
+    | 'visual_authorship'
+    | 'delivery_packaging'
+  >;
+  route_to_stage: Partial<Record<Exclude<PptDeckStageId, 'visual_director_review' | 'screenshot_review'>, string>>;
+  review_overlay_routes: {
+    visual_director_review: 'visual_director_review';
+    screenshot_review: 'screenshot_review';
+  };
+  research_ownership: {
+    semantic_role: 'shared_source_readiness_augmentation';
+    trigger_conditions: string[];
+  };
 }
 
 export interface PptDeckHydrateContractRequest {
@@ -293,6 +323,7 @@ export interface PptDeckHydratedContract {
   prompt_pack: PptDeckPromptPack;
   export_bundle: PptDeckExportBundle;
   display_registry: PptDeckDisplayRegistry;
+  lifecycle_model: PptDeckLifecycleModel;
 }
 
 export interface PptDeckRecordInput {
@@ -353,7 +384,8 @@ export type PptDeckSurfaceArtifactContent =
   | PptDeckBaselinePolicy
   | PptDeckExportBundle
   | PptDeckHydratedContract
-  | PptDeckDisplayRegistry;
+  | PptDeckDisplayRegistry
+  | PptDeckLifecycleModel;
 
 export interface PptDeckSurfaceArtifact {
   relativePath: PptDeckSurfaceArtifactPath;
