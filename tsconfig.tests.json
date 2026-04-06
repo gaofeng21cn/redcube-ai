@@ -5,6 +5,11 @@
     "tsBuildInfoFile": "./.tsbuildinfo/tests.tsbuildinfo"
   },
   "include": [
-    "tests/**/*.js"
+    "tests/**/*.js",
+    "tests/**/*.ts",
+    "packages/**/*.js",
+    "packages/**/*.ts",
+    "apps/**/*.js",
+    "apps/**/*.ts"
   ]
 }
