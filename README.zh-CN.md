@@ -174,9 +174,9 @@ RedCube 现在已经可用，但还不是终态。
 
 继续阅读：
 
-- [人类用户快速上手](docs/human_quickstart.md)
-- [典型交付示例](docs/deliverable_examples.md)
-- [运行架构说明](docs/runtime_architecture.md)
+- [Docs 索引](docs/README.zh-CN.md)
+
+更细的操作文档继续保留在仓库中，但默认不属于对外双语公开正文面；只有在英文 `.md` 与中文 `.zh-CN.md` 镜像同步补齐后，才会被提升到默认公开面。
 
 ## 平台如何工作
 
@@ -224,7 +224,7 @@ RedCube 现在已经可用，但还不是终态。
 
 ## 文档约定
 
-- 面向 GitHub 与外部读者的文档，统一放在 [`docs/`](docs/README.md)
+- 面向 GitHub 与外部读者的默认双语公开面，统一通过 [`docs/`](docs/README.zh-CN.md) 进入
 - `docs/superpowers/` 目录只保留本地 AI / Superpowers 文档，并在 Git 中忽略
 - 开发过程中的计划、草案与中间设计，不应继续进入公开仓库文档面
 
@@ -347,25 +347,18 @@ export REDCUBE_WORKSPACE_ROOT="$WORKSPACE_ROOT"
 
 相关说明见：
 
-- [人类用户快速上手](docs/human_quickstart.md)
-- [典型交付示例](docs/deliverable_examples.md)
-- [运行架构说明](docs/runtime_architecture.md)
-- [私有作者信息与 prompts 配置](docs/private-profile-setup.md)
-- [公开发布到 GitHub](docs/public-github-publish.md)
+- [Docs 索引](docs/README.zh-CN.md)
+
+更细的私有配置、运行架构和发布说明继续保留在仓库跟踪的内部中文文档里，不直接作为公开首页的正文导航。
 
 ## 公开文档入口
 
-- [Docs 索引](docs/README.md)
-- [人类用户快速上手](docs/human_quickstart.md)
-- [典型交付示例](docs/deliverable_examples.md)
-- [运行架构说明](docs/runtime_architecture.md)
-- [Policies 索引](docs/policies/README.md)
-- [运行模型 Policy](docs/policies/runtime_operating_model.md)
-- [交付合同模型 Policy](docs/policies/deliverable_contract_model.md)
-- [贡献指南](CONTRIBUTING.md)
+- [Docs 索引](docs/README.zh-CN.md)
 - [更新日志](CHANGELOG.md)
-- [安全策略](SECURITY.md)
 - [许可证](LICENSE)
+
+更细的 `docs/*.md`、`docs/policies/*.md` 默认按仓库跟踪的内部中文文档维护。
+`CONTRIBUTING.md` 与 `SECURITY.md` 属于 GitHub 会识别的仓库元文档，仍由仓库维护，但不属于默认双语公开正文面。
 
 </details>
 

@@ -1,5 +1,7 @@
 # Security Policy
 
+这是 GitHub 会识别的仓库元文档，仍由本仓库维护，但不属于默认对外双语公开正文面。
+
 ## Supported Versions
 
 当前公开维护范围仅包括：

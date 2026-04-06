@@ -2,7 +2,7 @@
 
 **English** | [中文](./README.zh-CN.md)
 
-This directory is the public documentation entrypoint for GitHub and external readers of `RedCube AI`.
+This file is the bilingual documentation index for `RedCube AI`.
 
 Public framing:
 
@@ -23,25 +23,43 @@ Shared review overlay:
 - `visual_director_review`
 - `screenshot_review`
 
-## For Human Users
+## External Bilingual Surface
 
-- [Human quickstart](human_quickstart.md)
-- [Deliverable examples](deliverable_examples.md)
+This index and the repository home are the default GitHub-facing bilingual public surface.
+Any detailed document promoted into that surface must ship with synchronized English `.md` and Chinese `.zh-CN.md` mirrors.
 
-## For Technical Collaborators / Agent Executors
+## Repo-Tracked Internal Operator Docs
 
-- [Runtime architecture](runtime_architecture.md)
-- [Private author profile and prompts setup](private-profile-setup.md)
-- [Public GitHub publishing](public-github-publish.md)
+### For Human Operators
 
-## Long-Term Stable Policies
+- [Human quickstart](human_quickstart.md) (Chinese only)
+- [Deliverable examples](deliverable_examples.md) (Chinese only)
 
-- [Policies index](policies/README.md)
-- [Runtime operating model policy](policies/runtime_operating_model.md)
-- [Deliverable contract model policy](policies/deliverable_contract_model.md)
+### For Technical Collaborators / Agent Executors
+
+- [Runtime architecture](runtime_architecture.md) (Chinese only)
+- [Public GitHub publishing](public-github-publish.md) (Chinese only)
+
+### Private / Local Configuration Docs
+
+- [Private author profile and prompts setup](private-profile-setup.md) (Chinese only, internal/private)
+
+## Stable Internal Rules
+
+- [Policies index](policies/README.md) (Chinese only)
+- [Runtime operating model policy](policies/runtime_operating_model.md) (Chinese only)
+- [Deliverable contract model policy](policies/deliverable_contract_model.md) (Chinese only)
+
+## Repo Metadata Docs
+
+- [Contributing](../CONTRIBUTING.md) (Chinese only)
+- [Security policy](../SECURITY.md) (Chinese only)
+- [Changelog](../CHANGELOG.md)
 
 ## Documentation Boundary
 
-- `docs/`: public documentation.
-- `docs/policies/`: stable public policy documents.
+- `README*` and `docs/README*`: the default bilingual public surface
+- detailed `docs/*.md`: repo-tracked operator/internal docs by default
+- `docs/policies/`: repo-tracked stable internal rules by default
+- `CONTRIBUTING.md` and `SECURITY.md`: GitHub-recognized repo metadata docs outside the default bilingual public surface
 - `docs/superpowers/`: local AI/Superpowers notes, plans, and drafts that should not enter Git-tracked public docs.

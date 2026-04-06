@@ -132,9 +132,9 @@ Typical three-step start:
 
 Continue reading:
 
-- [Human quickstart](docs/human_quickstart.md)
-- [Deliverable examples](docs/deliverable_examples.md)
-- [Runtime architecture](docs/runtime_architecture.md)
+- [Docs index](docs/README.md)
+
+Detailed operator docs remain repo-tracked, but they are not part of the default bilingual public surface unless synchronized English `.md` and Chinese `.zh-CN.md` mirrors are published together.
 
 ## Runtime Shape
 
@@ -213,6 +213,8 @@ npm run redcube -- deliverable create \
 
 ## Documentation Boundary
 
-- Public docs for GitHub readers live in [`docs/`](docs/README.md).
+- `README*` and `docs/README*` define the default bilingual public surface for GitHub readers.
+- Detailed `docs/*.md` and `docs/policies/*.md` remain repo-tracked operator/internal docs by default unless they are explicitly promoted with synchronized bilingual mirrors.
+- `CONTRIBUTING.md` and `SECURITY.md` are GitHub-recognized repository metadata docs maintained in this repo, but they are outside the default bilingual public surface.
 - `docs/superpowers/` is local AI/Superpowers documentation and should stay ignored.
 - Development drafts and transient planning artifacts should not be published as public documentation.

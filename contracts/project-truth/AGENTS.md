@@ -23,6 +23,13 @@ Read and follow these sources before changing runtime behavior:
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 
+## Documentation Surface Boundary
+
+- `README.md` / `README.zh-CN.md` 和 `docs/README.md` / `docs/README.zh-CN.md` 构成默认对外双语公开面。
+- `docs/*.md` 与 `docs/policies/*.md` 默认是仓库跟踪的操作文档与稳定规则文档；除非被显式提升到默认公开面，否则可只保留中文。
+- `CONTRIBUTING.md`、`SECURITY.md` 等 GitHub 识别的仓库元文档仍由仓库自己维护，但不属于默认双语公开正文面。
+- `docs/superpowers/` 只保留本地 AI / Superpowers 文档，不进入 Git 跟踪公开面。
+
 ## Identity Boundary
 
 - `RedCube AI` = visual-deliverable domain gateway + visual-deliverable harness OS
