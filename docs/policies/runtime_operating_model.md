@@ -8,8 +8,9 @@
 
 ## 稳定原则
 
-- 正式入口优先 `MCP`、`CLI`、`controller`
-- `Gateway` 是唯一正式控制面
+- 当前正式入口优先 `MCP`、`CLI`
+- `Gateway` 是 `CLI / MCP` 共享的唯一正式控制面
+- `controller` 当前不是独立、可验证的仓内正式入口
 - `Overlay` 负责领域约束与交付质量协议
 - `Harness OS` 只负责执行、记录、重跑与审计
 - 正式主线优先复用宿主 Agent runtime

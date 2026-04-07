@@ -3,7 +3,7 @@
 [English](./README.md) | **中文**
 
 这里是 `RedCube AI` 的双语文档索引，也是默认对外公开面。
-内容与产品真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的领域承载操作系统（Domain Harness OS），本地执行呈现为 Codex 默认 host-agent runtime，正式入口包括 MCP、CLI 与 controller。
+内容与产品真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的领域承载操作系统（Domain Harness OS），本地执行呈现为 Codex 默认 host-agent runtime；当前仓内已实现且可验证的正式入口只有 MCP 与 CLI，`controller` 目前不是独立、可验证的仓内入口。
 
 ## 统一文档治理
 

@@ -1,0 +1,40 @@
+{
+  "program": "P21",
+  "historical_snapshot": true,
+  "is_active_mainline": false,
+  "closeout_scope_ready": true,
+  "freeze_contract": {
+    "generic_base_contract": "shared_generic_ops_eval_base_contract",
+    "extension_surface": "family_profile_metric_extension_surface",
+    "operator_surface": "run_watch_ops_eval_summaries",
+    "leader_reserved_freeze_files": [
+      "contracts/runtime-program/current-program.json",
+      "contracts/runtime-program/p21-operations-evaluation-closeout.json",
+      "contracts/runtime-program/poster-production-hardening-freeze.json"
+    ]
+  },
+  "shared_generic_ops_eval_base_contract": {
+    "run_telemetry": "implemented",
+    "error_taxonomy": "implemented",
+    "rerun_analytics": "implemented",
+    "cost_latency_token": "implemented",
+    "quality_drift_regression": "implemented",
+    "publish_approval_throughput": "implemented"
+  },
+  "family_profile_metric_extension_surface": {
+    "status": "declared_machine_readable_extension",
+    "metric_ids": [
+      "far_view_readability",
+      "scan_path_clarity",
+      "figure_claim_alignment",
+      "citation_visibility",
+      "print_export_safe"
+    ]
+  },
+  "remaining_red_failures": [
+    "future academic poster machine-readable surface missing"
+  ],
+  "out_of_scope_remaining_reds": [
+    "poster_production_hardening.academic_surface_missing"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "program_id": "redcube-runtime-program",
+  "date_anchor": "2026-04-07",
+  "formal_entry": {
+    "repo_verified": [
+      "MCP",
+      "CLI"
+    ],
+    "controller_repo_verified": false
+  },
+  "current_state": {
+    "phase_id": "P0",
+    "phase_label": "P0 / truth surface and green baseline convergence",
+    "workstream": "credible_green_baseline_repair",
+    "review_closeout": {
+      "status": "failed",
+      "blocker": "green_baseline_not_credible",
+      "root_cause": "truth_freeze_tests_depend_on_ignored_local_state"
+    },
+    "active_mainline": {
+      "id": "redcube-runtime-program",
+      "label": "redcube-runtime-program / P0 credible green baseline repair",
+      "unique": true
+    },
+    "green_baseline": {
+      "credible": false,
+      "clean_clone_required": true,
+      "blocked_by": [
+        "ignored_local_omx_state",
+        "ignored_local_codex_state"
+      ],
+      "required_verification": [
+        "git status --short",
+        "git diff --check",
+        "git diff --stat",
+        "npm test",
+        "npm run typecheck"
+      ]
+    },
+    "team_mode": {
+      "default_enabled": false,
+      "enable_after": "next-phase write scopes are frozen"
+    },
+    "next_phase": {
+      "p1_allowed": false,
+      "phase_2_allowed": false,
+      "only_after": "P0 review-closeout passes with credible clean-clone baseline"
+    }
+  },
+  "historical_snapshots": {
+    "p21_operations_evaluation": {
+      "status": "historical_snapshot",
+      "is_active_mainline": false
+    },
+    "poster_production_hardening": {
+      "status": "historical_snapshot",
+      "is_active_mainline": false
+    },
+    "legacy_redcube_ai_mainline": {
+      "status": "inactive_historical_scaffold",
+      "is_active_mainline": false
+    }
+  },
+  "current_non_goals": [
+    "P1",
+    "Phase 2 / source intake + shared source truth",
+    "controller expansion",
+    "new family or overlay expansion",
+    "poster academic contract advancement",
+    "OPL federation integration"
+  ]
+}

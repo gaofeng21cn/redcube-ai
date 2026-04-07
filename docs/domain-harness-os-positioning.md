@@ -49,7 +49,11 @@
 
 1. `MCP`
 2. `CLI`
-3. `controller`
+
+补充说明：
+
+- `controller` 目前不是 repo-verified independent entry
+- `Gateway` 是 `CLI / MCP` 背后的共享正式控制面
 
 约束说明：
 

@@ -36,7 +36,7 @@ If your goal is to keep turning structured knowledge into formal visual outputs,
 It is designed for experts who want the speed of agents without losing control over quality.
 
 Today, its default local execution shape is the `Codex-default host-agent runtime`.
-Formal entry surfaces are `MCP`, `CLI`, and `controller`.
+Current repo-verified formal entry surfaces are `MCP` and `CLI`; `controller` is not a repo-verified independent entry in the current mainline.
 As long as the same substrate and contracts are kept, this line can later move to a managed web runtime without changing the domain identity.
 
 ## What It Helps You Do
@@ -119,7 +119,7 @@ Detailed operator docs remain repo-tracked, but they are not part of the default
 
 ```text
 User / Agent
-  -> MCP / CLI / controller
+  -> MCP / CLI
       -> Gateway
           -> Overlay / Family / Profile / Pack
               -> Domain Harness OS (on Unified Harness Engineering Substrate)
@@ -138,33 +138,33 @@ Gateway
 
 ## Current Technical Reality
 
+Current repo mainline has these verified runtime surfaces:
+
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
-- `P20 / Extension Proof And Third-Family Onboarding` is treated as completed for `poster_onepager`.
-- The active follow-on programs are:
-  - `P21 / Operations And Evaluation OS`
-  - `Poster Production Hardening / Academic Poster Contract`
-  - `P22 / OPL Federation Integration`
+- `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
+- `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
+- The current active mainline is `redcube-runtime-program`, and the repo is currently held in `P0 / credible green baseline repair`: `Phase 1 / Render Ceiling Upgrade` stays frozen, while `P1` and `Phase 2 / source intake + shared source truth` remain blocked until `P0 review-closeout` passes with a credible clean-clone baseline.
+- shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
 
-- formal operations / evaluation OS is not finished yet
-- poster production hardening is not finished yet:
-  - `poster_onepager` is only the current `knowledge poster` surface
-  - `paper_poster / conference_poster` academic-poster contract is still a follow-on program
-  - poster-specific review and ops/eval surfaces are not finished yet
-- OPL federation integration is not finished yet
+- `controller` has not landed as an independent formal entry in this repository.
+- `poster_onepager` is only the current `knowledge poster` surface.
+- `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
+- `P1` and `Phase 2 / source intake + shared source truth` have not been reopened for implementation; both remain blocked until `P0 review-closeout` passes.
+- broader operations closeout and OPL federation are still follow-on work.
 
 ## Recommended Entry Priority
 
 1. `MCP`
 2. `CLI`
-3. `controller`
 
 ## Installation And Basic Verification
 
 ```bash
 npm install
 npm test
+npm run typecheck
 ```
 
 CLI:

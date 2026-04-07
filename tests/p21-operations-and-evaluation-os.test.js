@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
+const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluation-closeout.json';
+
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
@@ -39,30 +41,21 @@ test('P21.A red: operator-facing run/watch surfaces must expose formal ops-eval 
   assert.equal(gatewayTypes.includes('approval_throughput_summary:'), true);
 });
 
-test('P21.A freeze docs define generic base contract, extension surface, lane write scopes, and convergence order', () => {
-  const combined = [
-    read('.omx/plans/spec-redcube-p21-operations-and-evaluation-os.md'),
-    read('.omx/plans/plan-redcube-p21-operations-and-evaluation-os.md'),
-    read('.omx/plans/test-spec-redcube-p21-operations-and-evaluation-os.md'),
-  ].join('\n');
+test('P21 tracked closeout contract defines generic base contract, extension surface, and reserved freeze files', () => {
+  const audit = readJson(P21_CLOSEOUT_CONTRACT);
 
-  for (const token of [
-    'shared generic ops-eval base contract',
-    'family/profile-specific metric extension surface',
-    'far_view_readability',
-    'Leader-reserved freeze files',
-    'P21 generic shared ops/eval contract',
-    'P21 operator-facing surface',
-    'poster-specific metric extension contract',
-    'closeout artifact',
-  ]) {
-    assert.equal(combined.includes(token), true, token);
-  }
+  assert.equal(audit.freeze_contract.generic_base_contract, 'shared_generic_ops_eval_base_contract');
+  assert.equal(audit.freeze_contract.extension_surface, 'family_profile_metric_extension_surface');
+  assert.equal(audit.freeze_contract.operator_surface, 'run_watch_ops_eval_summaries');
+  assert.equal(audit.freeze_contract.leader_reserved_freeze_files.length >= 2, true);
+  assert.equal(audit.freeze_contract.leader_reserved_freeze_files.includes('contracts/runtime-program/p21-operations-evaluation-closeout.json'), true);
+  assert.equal(audit.freeze_contract.leader_reserved_freeze_files.includes('contracts/runtime-program/poster-production-hardening-freeze.json'), true);
 });
 
 test('P21.C red: poster-specific metrics must be registered through a formal extension surface', () => {
   const governanceTypes = read('packages/redcube-governance/src/types.ts');
   const gatewayTypes = read('packages/redcube-gateway/src/types.ts');
+  const audit = readJson(P21_CLOSEOUT_CONTRACT);
 
   assert.equal(governanceTypes.includes('export interface MetricExtensionRegistration'), true);
   assert.equal(governanceTypes.includes('metric_ids: string[];'), true);
@@ -70,19 +63,29 @@ test('P21.C red: poster-specific metrics must be registered through a formal ext
   assert.equal(gatewayTypes.includes('extension_id: string;'), true);
   assert.equal(gatewayTypes.includes('far_view_readability'), true);
   assert.equal(gatewayTypes.includes('print_export_safe'), true);
+  assert.equal(audit.family_profile_metric_extension_surface.status, 'declared_machine_readable_extension');
+  assert.deepEqual(audit.family_profile_metric_extension_surface.metric_ids, [
+    'far_view_readability',
+    'scan_path_clarity',
+    'figure_claim_alignment',
+    'citation_visibility',
+    'print_export_safe',
+  ]);
 });
 
-test('P21.A red: machine-readable ops-eval closeout artifact must exist', () => {
+test('P21.A tracked machine-readable closeout contract must exist', () => {
   assert.equal(
-    existsSync(path.resolve('.omx/reports/redcube-runtime-program/P21_OPERATIONS_EVALUATION_STATUS.json')),
+    existsSync(path.resolve(P21_CLOSEOUT_CONTRACT)),
     true,
   );
 });
 
-test('P21.D closeout audit records implemented ops-eval scope and isolates remaining non-P21 red', () => {
-  const audit = readJson('.omx/reports/redcube-runtime-program/P21_OPERATIONS_EVALUATION_STATUS.json');
+test('P21.D tracked closeout contract records implemented ops-eval scope and isolates remaining non-P21 red', () => {
+  const audit = readJson(P21_CLOSEOUT_CONTRACT);
 
   assert.equal(audit.program, 'P21');
+  assert.equal(audit.historical_snapshot, true);
+  assert.equal(audit.is_active_mainline, false);
   assert.equal(audit.closeout_scope_ready, true);
   assert.equal(audit.shared_generic_ops_eval_base_contract.run_telemetry, 'implemented');
   assert.equal(audit.shared_generic_ops_eval_base_contract.error_taxonomy, 'implemented');

@@ -1,0 +1,79 @@
+{
+  "program": "poster_production_hardening",
+  "historical_snapshot": true,
+  "is_active_mainline": false,
+  "snapshot_note": "2026-04-06_long_term_roadmap_snapshot",
+  "boundary": {
+    "poster_onepager": "knowledge_poster",
+    "academic_poster_surfaces": [
+      "paper_poster",
+      "conference_poster"
+    ],
+    "not_equal_to": "poster_production_quality_closeout"
+  },
+  "future_academic_poster_constraints": {
+    "cannot_reuse_knowledge_poster_fixed_seed": "hero/proof/pathway/cta",
+    "cannot_reuse_formal_mainline_strategy": "slot_hydration_only"
+  },
+  "surface_catalog": {
+    "declared_artifacts": [
+      "paper_asset_library",
+      "figure_table_bank",
+      "evidence_map",
+      "poster_storyboard",
+      "panel_plan",
+      "figure_priority_plan",
+      "layout_plan",
+      "figure_caption_rewrite",
+      "render_bundle",
+      "poster_eval_report",
+      "far_view_readability",
+      "scan_path_clarity",
+      "figure_claim_alignment",
+      "density_balance",
+      "citation_visibility",
+      "venue_metadata_complete",
+      "print_export_safe",
+      "paper_poster",
+      "conference_poster"
+    ],
+    "remaining_surfaces": [
+      "prompts/paper_poster/figure_table_bank.md",
+      "prompts/paper_poster/evidence_map.md",
+      "prompts/paper_poster/panel_plan.md",
+      "prompts/paper_poster/figure_priority_plan.md",
+      "prompts/paper_poster/figure_caption_rewrite.md",
+      "prompts/paper_poster/poster_eval_report.md",
+      "prompts/paper_poster/visual_director_review.md",
+      "prompts/paper_poster/screenshot_review.md"
+    ]
+  },
+  "current_slice": {
+    "required_paths": [
+      "prompts/paper_poster/paper_asset_library.md",
+      "prompts/paper_poster/poster_storyboard.md",
+      "prompts/paper_poster/layout_plan.md",
+      "prompts/paper_poster/render_bundle.md"
+    ],
+    "required_content_tokens": [
+      "figures",
+      "tables",
+      "citations",
+      "affiliations",
+      "venue_metadata",
+      "far_view_readability",
+      "scan_path_clarity",
+      "figure_claim_alignment",
+      "citation_visibility",
+      "print_export_safe"
+    ],
+    "forbidden_content_tokens": [
+      "\"panel_id\": \"hero\"",
+      "\"region\": \"hero_band\"",
+      "\"render_strategy\": \"slot_hydration_only\""
+    ]
+  },
+  "dependencies": {
+    "ops_eval_extension_contract": "contracts/runtime-program/p21-operations-evaluation-closeout.json"
+  }
+}

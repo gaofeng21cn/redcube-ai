@@ -3,27 +3,30 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
+const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
+const POSTER_FREEZE_CONTRACT = 'contracts/runtime-program/poster-production-hardening-freeze.json';
+const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluation-closeout.json';
+
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
-test('poster hardening freeze docs distinguish knowledge poster, academic poster, and P20 boundary', () => {
-  const roadmap = read('.omx/plans/roadmap-redcube-post-step7-long-term-programs.md');
-  const latest = read('.omx/reports/redcube-runtime-program/LATEST_STATUS.md');
-  const openIssues = read('.omx/reports/redcube-runtime-program/OPEN_ISSUES.md');
+function readJson(file) {
+  return JSON.parse(read(file));
+}
 
-  assert.equal(roadmap.includes('`poster_onepager` = knowledge poster'), true);
-  assert.equal(roadmap.includes('`paper_poster` / `conference_poster` = academic poster'), true);
-  assert.equal(roadmap.includes('**不**等于 poster production quality closeout'), true);
+test('poster freeze contract distinguishes knowledge poster, academic poster, and P20 boundary under historical-snapshot framing', () => {
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
-  assert.equal(latest.includes('`P20` 完成定义固定为 extension proof，不等于 poster quality closeout'), true);
-  assert.equal(openIssues.includes('knowledge poster，不是 academic poster closeout'), true);
+  assert.equal(poster.historical_snapshot, true);
+  assert.equal(poster.snapshot_note, '2026-04-06_long_term_roadmap_snapshot');
+  assert.equal(poster.boundary.poster_onepager, 'knowledge_poster');
+  assert.deepEqual(poster.boundary.academic_poster_surfaces, ['paper_poster', 'conference_poster']);
+  assert.equal(poster.boundary.not_equal_to, 'poster_production_quality_closeout');
 });
 
-test('poster hardening freeze docs freeze academic poster artifacts and review rubric', () => {
-  const spec = read('.omx/plans/spec-redcube-poster-production-hardening.md');
-  const plan = read('.omx/plans/plan-redcube-poster-production-hardening.md');
-  const testSpec = read('.omx/plans/test-spec-redcube-poster-production-hardening.md');
+test('poster freeze contract enumerates academic poster artifacts and review rubric explicitly', () => {
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   for (const token of [
     'paper_asset_library',
@@ -46,89 +49,60 @@ test('poster hardening freeze docs freeze academic poster artifacts and review r
     'paper_poster',
     'conference_poster',
   ]) {
-    assert.equal(spec.includes(token) || plan.includes(token) || testSpec.includes(token), true, token);
+    assert.equal(poster.surface_catalog.declared_artifacts.includes(token), true, token);
   }
 });
 
-test('freeze docs state that future academic poster surface cannot reuse knowledge-poster fixed seed as the formal mainline', () => {
-  const combined = [
-    read('.omx/plans/spec-redcube-poster-production-hardening.md'),
-    read('.omx/plans/plan-redcube-poster-production-hardening.md'),
-    read('.omx/plans/test-spec-redcube-poster-production-hardening.md'),
-  ].join('\n');
+test('poster freeze contract states that future academic poster surface cannot reuse knowledge-poster fixed seed as the formal mainline', () => {
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
-  assert.equal(combined.includes('hero/proof/pathway/cta'), true);
-  assert.equal(combined.includes('future academic poster surface 不能沿用 knowledge-poster 固定'), true);
+  assert.equal(poster.future_academic_poster_constraints.cannot_reuse_knowledge_poster_fixed_seed, 'hero/proof/pathway/cta');
 });
 
-test('freeze docs state that future academic poster surface cannot reuse slot_hydration_only as the formal mainline', () => {
-  const combined = [
-    read('.omx/plans/spec-redcube-poster-production-hardening.md'),
-    read('.omx/plans/plan-redcube-poster-production-hardening.md'),
-    read('.omx/plans/test-spec-redcube-poster-production-hardening.md'),
-  ].join('\n');
+test('poster freeze contract states that future academic poster surface cannot reuse slot_hydration_only as the formal mainline', () => {
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
-  assert.equal(combined.includes('slot_hydration_only'), true);
-  assert.equal(combined.includes('future academic poster surface 不能沿用 `slot_hydration_only` 作为正式主线'), true);
+  assert.equal(poster.future_academic_poster_constraints.cannot_reuse_formal_mainline_strategy, 'slot_hydration_only');
 });
 
-test('active program switches to poster production hardening while keeping P21 completed', () => {
-  const roadmap = read('.omx/plans/roadmap-redcube-post-step7-long-term-programs.md');
-  const latest = read('.omx/reports/redcube-runtime-program/LATEST_STATUS.md');
+test('current tracked program truth stays in P0 credible green baseline repair instead of poster-hardening active wording', () => {
+  const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
+  const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
-  assert.equal(roadmap.includes('状态：P20 extension proof complete；P21 complete；Poster Production Hardening active'), true);
-  assert.equal(latest.includes('当前阶段：Poster Production Hardening / Academic Poster Contract'), true);
-  assert.equal(latest.includes('P21 现视为 completed'), true);
+  assert.equal(currentProgram.current_state.phase_id, 'P0');
+  assert.equal(currentProgram.current_state.workstream, 'credible_green_baseline_repair');
+  assert.equal(currentProgram.current_state.review_closeout.status, 'failed');
+  assert.equal(latestP21.historical_snapshot, true);
+  assert.equal(latestP21.is_active_mainline, false);
+  assert.equal(poster.historical_snapshot, true);
+  assert.equal(poster.is_active_mainline, false);
 });
 
 test('current M2.A machine-readable surface slice exists for paper_poster without touching knowledge poster', () => {
-  const requiredCurrentSlicePaths = [
-    'packages/redcube-overlay-paper-poster/package.json',
-    'prompts/paper_poster/paper_asset_library.md',
-    'prompts/paper_poster/poster_storyboard.md',
-    'prompts/paper_poster/layout_plan.md',
-    'prompts/paper_poster/render_bundle.md',
-  ];
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   assert.deepEqual(
-    requiredCurrentSlicePaths.filter((file) => existsSync(path.resolve(file))),
-    requiredCurrentSlicePaths,
+    poster.current_slice.required_paths.filter((file) => existsSync(path.resolve(file))),
+    poster.current_slice.required_paths,
   );
 });
 
 test('current M2.A prompt surface is academic-poster specific instead of knowledge-poster seeds', () => {
-  const combined = [
-    read('prompts/paper_poster/paper_asset_library.md'),
-    read('prompts/paper_poster/poster_storyboard.md'),
-    read('prompts/paper_poster/layout_plan.md'),
-    read('prompts/paper_poster/render_bundle.md'),
-  ].join('\n');
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
+  const combined = poster.current_slice.required_paths.map((file) => read(file)).join('\n');
 
-  for (const token of [
-    'figures',
-    'tables',
-    'citations',
-    'affiliations',
-    'venue_metadata',
-    'far_view_readability',
-    'scan_path_clarity',
-    'citation_visibility',
-    'print_export_safe',
-  ]) {
+  for (const token of poster.current_slice.required_content_tokens) {
     assert.equal(combined.includes(token), true, token);
   }
 
-  for (const forbidden of [
-    '"panel_id": "hero"',
-    '"region": "hero_band"',
-    '"render_strategy": "slot_hydration_only"',
-  ]) {
+  for (const forbidden of poster.current_slice.forbidden_content_tokens) {
     assert.equal(combined.includes(forbidden), false, forbidden);
   }
 });
 
 test('remaining academic poster surface stays explicit after current M2.A slice', () => {
-  const openIssues = read('.omx/reports/redcube-runtime-program/OPEN_ISSUES.md');
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   for (const token of [
     'prompts/paper_poster/figure_table_bank.md',
@@ -140,33 +114,22 @@ test('remaining academic poster surface stays explicit after current M2.A slice'
     'prompts/paper_poster/visual_director_review.md',
     'prompts/paper_poster/screenshot_review.md',
   ]) {
-    assert.equal(openIssues.includes(token), true, token);
+    assert.equal(poster.surface_catalog.remaining_surfaces.includes(token), true, token);
   }
 });
 
-test('P21 docs freeze generic base contract, extension surface, lane write scopes, and convergence order', () => {
-  const combined = [
-    read('.omx/plans/spec-redcube-p21-operations-and-evaluation-os.md'),
-    read('.omx/plans/plan-redcube-p21-operations-and-evaluation-os.md'),
-    read('.omx/plans/test-spec-redcube-p21-operations-and-evaluation-os.md'),
-    read('.omx/plans/spec-redcube-poster-production-hardening.md'),
-    read('.omx/plans/plan-redcube-poster-production-hardening.md'),
-  ].join('\n');
+test('P21 closeout contract stays linked as the poster metrics extension surface authority', () => {
+  const poster = readJson(POSTER_FREEZE_CONTRACT);
+  const p21 = readJson(P21_CLOSEOUT_CONTRACT);
 
+  assert.equal(poster.dependencies.ops_eval_extension_contract, P21_CLOSEOUT_CONTRACT);
   for (const token of [
-    'shared generic ops-eval base contract',
-    'family/profile-specific metric extension surface',
     'far_view_readability',
     'scan_path_clarity',
     'figure_claim_alignment',
     'citation_visibility',
     'print_export_safe',
-    'P21 generic shared ops/eval contract',
-    'P21 operator-facing surface',
-    'poster-specific metric extension contract',
-    'academic poster contract freeze',
-    'Leader-reserved freeze files',
   ]) {
-    assert.equal(combined.includes(token), true, token);
+    assert.equal(p21.family_profile_metric_extension_surface.metric_ids.includes(token), true, token);
   }
 });

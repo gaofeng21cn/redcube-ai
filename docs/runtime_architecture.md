@@ -10,6 +10,7 @@
 
 这里的 `Agent-first` 不等于必须走 `external_llm` API。
 在当前 Codex / OMX 语境里，默认本地执行形态是 `Codex-default host-agent runtime`；
+当前已验证的 formal entry 是 `MCP`、`CLI`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
 
 当前最成熟的两类交付物，加上一条已完成 extension proof 的海报 surface，是：
@@ -24,7 +25,7 @@
 
 ```text
 Agent
-  -> MCP / CLI / controller
+  -> MCP / CLI
       -> RedCube Gateway
           -> Overlay / Family / Profile / Pack
               -> RedCube Domain Harness OS
@@ -55,9 +56,10 @@ User / Agent
 
 ### RedCube Gateway
 
-唯一正式入口，负责：
+CLI 与 MCP 共享的唯一正式控制面，负责：
 
-- 对外暴露 `MCP`、`CLI`、`controller`
+- 承接当前已实现的正式入口 `MCP`、`CLI`
+- `controller` 当前未作为独立 public entry 在仓内落地
 - 装载 workspace contract
 - 路由到正确的 family / profile / pack
 - 返回结构化状态与 artifact 引用
@@ -182,12 +184,12 @@ User / Agent
 
 当前 reality：
 
-- shared source plane 已存在
+- shared source plane / source intake code path 已存在，但当前 active mainline 的门控阶段是 `P0 / credible green baseline repair`；`Phase 1` 继续冻结，`P1` 与 `Phase 2 / source intake + shared source truth` 在 `P0 review-closeout` 重新通过前均不得开启
 - 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
-- `ppt_deck` 还只有显式 `screenshot_review`
+- `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`
 - `poster_onepager` 已完成第三 family onboarding / extension proof，但当前只应被解释为 knowledge poster
-- `paper_poster / conference_poster` academic poster contract 仍未正式存在
+- `paper_poster / conference_poster` academic poster contract 只保留为后续或历史冻结残留，不构成当前 active mainline
 
 当前目标态：
 

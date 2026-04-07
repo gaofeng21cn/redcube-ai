@@ -36,7 +36,7 @@
 它的重点不是“先生成一版”，而是把视觉交付这件事变成正式生产线。
 
 当前默认本地执行形态是 `Codex-default host-agent runtime`。
-正式入口优先 `MCP`、`CLI`、`controller`。
+当前仓内已实现且可验证的正式入口只有 `MCP` 与 `CLI`；`controller` 目前不是独立、可验证的仓内入口。
 只要保持同一套 substrate 与 contract，后续可以迁移到同一 substrate 上的托管 web runtime，而不改变本项目的 domain 身份。
 
 ## 它能帮你做什么
@@ -119,7 +119,7 @@
 
 ```text
 用户 / 智能代理
-  -> MCP / CLI / controller
+  -> MCP / CLI
       -> 网关
           -> 交付物层 / 场景层 / 配置层 / 包层
               -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
@@ -138,33 +138,33 @@
 
 ## 当前技术情况
 
-- `P19 / 创作主导权修复` 已被视为完成，当前不允许回退
-- `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成
-- 当前后续主线是：
-  - `P21 / 运行评估与运营面`
-  - `海报能力完善 / 学术海报合同`
-  - `P22 / OPL 联动`
+当前 repo main 已稳定可验证的运行边界：
+
+- `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
+- `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
+- `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`，但仓内当前处于 `P0 / credible green baseline repair`：`Phase 1 / Render Ceiling Upgrade` 继续冻结，`P1` 与 `Phase 2 / source intake + shared source truth` 在 `P0 review-closeout` 以可信 clean-clone baseline 重新通过前均不得开启。
+- 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
 
-- 正式的运行评估与运营面还没做完
-- 海报能力的正式完善还没做完：
-  - `poster_onepager` 当前主要对应 `知识海报`
-  - `paper_poster / conference_poster` 这条学术海报合同仍属后续阶段
-  - 海报专属审阅与运行评估面还没正式收口
-- 与 OPL 的正式联动还没做完
+- `controller` 还没有作为独立正式入口在仓内落地。
+- `poster_onepager` 当前只代表 `知识海报`。
+- `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
+- `P1` 与 `Phase 2 / source intake + shared source truth` 目前都还没有重新开工；在 `P0 review-closeout` 重新通过前都不得开启。
+- 更大范围的运营面收口与 OPL 联动仍属后续工作。
 
 ## 当前推荐入口
 
 1. `MCP`
 2. `CLI`
-3. `controller`
 
 ## 安装与基础验证
 
 ```bash
 npm install
 npm test
+npm run typecheck
 ```
 
 查看 CLI：

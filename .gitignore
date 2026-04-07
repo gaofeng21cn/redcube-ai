@@ -38,6 +38,15 @@ docs/superpowers/
 .DS_Store
 RedCube AI.app/
 .omx/
-.codex/
 
 .tsbuildinfo/
+.codex/*
+!.codex/agents/
+!.codex/agents/**
+!.codex/skills/
+!.codex/skills/**
+.codex/skills/.system/**
+!.codex/prompts/
+!.codex/prompts/**
+
+.codex/

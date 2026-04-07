@@ -17,9 +17,11 @@ Read and follow these sources before changing runtime behavior:
 
 - `README.md`
 - `docs/runtime_architecture.md`
+- `docs/domain-harness-os-positioning.md`
 - `docs/policies/runtime_operating_model.md`
-- `.omx/plans/spec-redcube-harness-os-architecture.md`
-- `.omx/plans/spec-redcube-external-product-surface-and-gateway-role.md`
+- `contracts/runtime-program/current-program.json`
+- `contracts/runtime-program/p21-operations-evaluation-closeout.json`
+- `contracts/runtime-program/poster-production-hardening-freeze.json`
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 
@@ -44,7 +46,7 @@ If code and docs disagree, align code to the frozen design instead of inventing 
 
 - Deployment shape and ontology semantics are different layers and must not be collapsed.
 - Current default local runtime shape: `Codex-default host-agent runtime`.
-- Formal entry surfaces: `MCP`, `CLI`, `controller`.
+- Current repo-verified formal entry surfaces: `MCP`, `CLI`. `controller` is not a current independently verifiable entry in this repository.
 - Future managed web runtime is allowed on the same substrate, but runtime migration does not change RedCube ontology.
 - Do not rewrite ontology based on runtime packaging choices.
 
