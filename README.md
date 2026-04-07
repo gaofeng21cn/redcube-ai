@@ -100,10 +100,11 @@ You can give your agent an instruction like this:
 
 The main unfinished areas are:
 
-- formal operations and evaluation surfaces are still being completed
+- the next hardening baton is `stable deliverable manual-test-driven hardening`, scoped only to `ppt_deck` and `xiaohongshu`
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
+- `Phase 2 / source intake + shared source truth` remains closed in the current baton
 - OPL federation integration is still a follow-on step
 
 ## Documentation
@@ -143,7 +144,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`, and `P0 review-closeout` is now passed with a credible clean-clone baseline: `Phase 1 / Render Ceiling Upgrade` stays frozen, while the next baton still requires explicit `Codex App` activation instead of auto-opening `P1` or `Phase 2 / source intake + shared source truth`.
+- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline, and the only explicitly activated next baton is `stable deliverable manual-test-driven hardening` for `ppt_deck` and `xiaohongshu`; `P1` and `Phase 2 / source intake + shared source truth` remain closed.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -151,8 +152,8 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- `P1` and `Phase 2 / source intake + shared source truth` have not been reopened for implementation; the next baton must be explicitly activated by `Codex App` after `P0` closeout.
-- broader operations closeout and OPL federation are still follow-on work.
+- The current active mainline remains `redcube-runtime-program`: `P0 review-closeout` is now passed with a credible clean-clone baseline, and the only opened post-P0 baton is `stable deliverable manual-test-driven hardening`; it is explicitly activated by `Codex App`, and it does not reopen `P1` or `Phase 2 / source intake + shared source truth`.
+- manual-test-driven hardening execution and broader OPL federation are still follow-on work.
 
 ## Recommended Entry Priority
 

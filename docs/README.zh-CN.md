@@ -25,6 +25,7 @@
 
 - [人类快速上手](human_quickstart.md)
 - [典型交付示例](deliverable_examples.md)
+- [稳定交付手工测试 brief](stable_deliverable_manual_test_brief.md)
 
 ### 面向技术协作 / Agent 执行者
 

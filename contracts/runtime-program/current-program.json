@@ -11,7 +11,7 @@
   "current_state": {
     "phase_id": "P0",
     "phase_label": "P0 / truth surface and green baseline convergence",
-    "workstream": "p0_durable_closeout",
+    "workstream": "stable_deliverable_manual_test_driven_hardening",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -19,7 +19,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / P0 durable closeout",
+      "label": "redcube-runtime-program / stable deliverable manual-test-driven hardening",
       "unique": true
     },
     "green_baseline": {
@@ -42,23 +42,43 @@
     "next_phase": {
       "p1_allowed": false,
       "phase_2_allowed": false,
-      "only_after": "Codex App explicitly activates the next baton after the passed P0 closeout is durably committed or explicitly adopted from the ready-to-commit closeout surface"
+      "only_after": "P1 and Phase 2 remain closed; only Codex App may explicitly activate a non-Phase-2 next baton after P0 closeout"
     },
     "next_baton": {
       "id": "stable_deliverable_manual_test_driven_hardening",
-      "label": "stable deliverable manual-test-driven hardening",
-      "status": "defined_ready_for_manual_test",
-      "activation_owner": "Codex App",
-      "explicit_activation_required": true,
-      "allowed_after": "P0 durable closeout is durably committed or explicitly adopted from the ready-to-commit closeout surface",
-      "scoped_overlays": [
-        "ppt_deck",
-        "xiaohongshu"
-      ],
-      "phase_2_allowed": false,
-      "controller_expansion_allowed": false,
-      "manual_test_package": "contracts/runtime-program/stable-deliverable-manual-test-package.json",
-      "hardening_backlog": "contracts/runtime-program/stable-deliverable-manual-test-hardening-backlog.json"
+      "status": "ready_for_manual_test",
+      "review_status": "ready_for_review",
+      "activation": {
+        "required": true,
+        "mode": "explicit_codex_app_only",
+        "activated": true,
+        "activated_by": "Codex App",
+        "opens_p1": false,
+        "opens_phase_2": false
+      },
+      "scope": {
+        "deliverables": [
+          "ppt_deck",
+          "xiaohongshu"
+        ],
+        "formal_entry": [
+          "MCP",
+          "CLI"
+        ],
+        "controller_repo_verified": false
+      },
+      "artifacts": {
+        "manual_test_contract": "contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json",
+        "manual_test_brief": "docs/stable_deliverable_manual_test_brief.md",
+        "hardening_backlog": "contracts/runtime-program/stable-deliverable-hardening-backlog.json"
+      },
+      "non_goals": [
+        "Phase 2 / source intake + shared source truth",
+        "controller expansion",
+        "new family or overlay expansion",
+        "poster academic contract advancement",
+        "OPL federation integration"
+      ]
     }
   },
   "historical_snapshots": {

@@ -1,0 +1,16 @@
+{
+  "baton_id": "stable_deliverable_manual_test_driven_hardening",
+  "status": "awaiting_manual_findings",
+  "allowed_scope": [
+    "ppt_deck",
+    "xiaohongshu"
+  ],
+  "forbidden_scope": [
+    "Phase 2 / source intake + shared source truth",
+    "controller expansion",
+    "new family or overlay expansion",
+    "poster academic contract advancement",
+    "OPL federation integration"
+  ],
+  "items": []
+}

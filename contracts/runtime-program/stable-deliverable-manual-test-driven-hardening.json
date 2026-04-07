@@ -1,0 +1,170 @@
+{
+  "baton_id": "stable_deliverable_manual_test_driven_hardening",
+  "status": "ready_for_manual_test",
+  "review_status": "ready_for_review",
+  "activation": {
+    "owner": "Codex App",
+    "required": true,
+    "mode": "explicit_codex_app_only",
+    "opens_p1": false,
+    "opens_phase_2": false,
+    "activated": true,
+    "activated_by": "Codex App"
+  },
+  "scope": {
+    "deliverables": [
+      "ppt_deck",
+      "xiaohongshu"
+    ],
+    "formal_entry": [
+      "MCP",
+      "CLI"
+    ],
+    "controller_repo_verified": false
+  },
+  "tracked_only_truth_freeze_reproduction": {
+    "required": true,
+    "clean_clone_required": true,
+    "targeted_tests": [
+      "tests/runtime-alignment-p0.test.js",
+      "tests/poster-production-hardening-freeze.test.js",
+      "tests/p21-operations-and-evaluation-os.test.js",
+      "tests/stable-deliverable-manual-test-package.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm test",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/p21-operations-and-evaluation-os.test.js",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/p21-operations-and-evaluation-os.test.js tests/stable-deliverable-manual-test-package.test.js"
+    ]
+  },
+  "manual_cases": [
+    {
+      "deliverable": "ppt_deck",
+      "profile_id": "lecture_student",
+      "topic_id": "manual-ppt-thyroid-basics",
+      "deliverable_id": "lecture-01",
+      "title": "Thyroid Basics",
+      "goal": "Explain thyroid fundamentals to undergraduate students",
+      "reference_surface": "docs/deliverable_examples.md#示例一：给学生讲课的-PPT",
+      "test_input": [
+        "课程提纲：定义、功能、常见检查、诊疗边界",
+        "讲义笔记：TSH / T3 / T4、甲减 / 甲亢症状、就诊路径",
+        "边界：不能替代临床诊断；示例仅用于教学"
+      ],
+      "route_sequence": [
+        "storyline",
+        "detailed_outline",
+        "slide_blueprint",
+        "visual_direction",
+        "render_html",
+        "visual_director_review",
+        "screenshot_review",
+        "export_pptx"
+      ],
+      "expected_artifacts": [
+        "hydrated deliverable contract",
+        "storyline artifact",
+        "detailed outline artifact",
+        "slide blueprint artifact",
+        "visual direction artifact",
+        "rendered html artifact",
+        "visual director review report",
+        "screenshot review report",
+        "ppt export bundle or explicit hard block"
+      ],
+      "failure_sampling": [
+        "artifact gap",
+        "structure drift",
+        "visual direction miss",
+        "screenshot regression",
+        "export contract failure"
+      ],
+      "pass_criteria": [
+        "全部 route 顺序可执行，且 review surfaces 可回读",
+        "render_html 与 screenshot_review 不出现阻断性失败",
+        "导出阶段产出真实 bundle，或给出显式 hard block"
+      ],
+      "fail_criteria": [
+        "缺失关键 artifact / review 报告 / 导出结果",
+        "review surfaces 明确给出阻断结论",
+        "通过结论只能依赖 machine-local ignored state 才成立"
+      ]
+    },
+    {
+      "deliverable": "xiaohongshu",
+      "profile_id": "standard_note",
+      "topic_id": "manual-xhs-thyroid-clinic",
+      "deliverable_id": "note-01",
+      "title": "甲状腺门诊小红书科普",
+      "goal": "为门诊患者生成可发布的科普图文",
+      "reference_surface": "docs/deliverable_examples.md#示例二：知识传播型小红书图文",
+      "test_input": [
+        "门诊常见问题列表：症状、检查、何时复诊",
+        "专业边界说明：不能替代医生面诊；避免夸大疗效",
+        "平台风格要求：首页钩子、分屏节奏、结尾行动建议"
+      ],
+      "route_sequence": [
+        "research",
+        "storyline",
+        "single_note_plan",
+        "visual_direction",
+        "render_html",
+        "visual_director_review",
+        "screenshot_review",
+        "publish_copy",
+        "export_bundle"
+      ],
+      "expected_artifacts": [
+        "research artifact",
+        "storyline artifact",
+        "single note plan artifact",
+        "visual direction artifact",
+        "rendered html artifact",
+        "visual director review report",
+        "screenshot review report",
+        "publish copy artifact",
+        "export bundle with html/caption/png delivery surfaces"
+      ],
+      "failure_sampling": [
+        "content boundary miss",
+        "visual hook miss",
+        "screenshot regression",
+        "publish surface failure",
+        "export contract failure"
+      ],
+      "pass_criteria": [
+        "全部 route 顺序可执行，且 review surfaces 可回读",
+        "发布文案、视觉审阅与截图审阅结论相互一致",
+        "导出阶段产出 html / caption / png bundle，或给出显式 hard block"
+      ],
+      "fail_criteria": [
+        "缺失关键 artifact / review 报告 / publish copy / export bundle",
+        "review surfaces 明确给出阻断结论",
+        "通过结论只能依赖 machine-local ignored state 才成立"
+      ]
+    }
+  ],
+  "backlog_capture": {
+    "file": "contracts/runtime-program/stable-deliverable-hardening-backlog.json",
+    "required_fields": [
+      "id",
+      "deliverable",
+      "surface",
+      "symptom",
+      "severity",
+      "evidence",
+      "repro_steps",
+      "next_action"
+    ],
+    "policy": "Any manual-test failure or unstable pass enters the next hardening backlog. Do not reroute findings into Phase 2, controller expansion, new family work, poster academic work, or OPL federation."
+  },
+  "non_goals": [
+    "Phase 2 / source intake + shared source truth",
+    "controller expansion",
+    "new family or overlay expansion",
+    "poster academic contract advancement",
+    "OPL federation integration"
+  ]
+}

@@ -22,6 +22,8 @@ Read and follow these sources before changing runtime behavior:
 - `contracts/runtime-program/current-program.json`
 - `contracts/runtime-program/p21-operations-evaluation-closeout.json`
 - `contracts/runtime-program/poster-production-hardening-freeze.json`
+- `contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json`
+- `contracts/runtime-program/stable-deliverable-hardening-backlog.json`
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 

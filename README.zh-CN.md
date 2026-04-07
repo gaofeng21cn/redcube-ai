@@ -100,10 +100,11 @@
 
 当前最主要的待完善项有：
 
-- 正式的运行评估与运营面还在继续完善
+- `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面，但新近显式打开的 `stable deliverable manual-test-driven hardening` 下一棒仍需人工执行手工测试并完成 backlog 分诊
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
+- 当前这条下一棒不会打开 `Phase 2 / source intake + shared source truth`
 - 与 OPL 的正式联动还在后续阶段
 
 ## 文档入口
@@ -143,7 +144,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`，且 `P0 review-closeout` 已以可信的 clean-clone baseline 通过：`Phase 1 / Render Ceiling Upgrade` 继续冻结，但下一棒仍需由 `Codex App` 显式激活，不会自动打开 `P1` 或 `Phase 2 / source intake + shared source truth`。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；当前唯一被显式激活的下一棒是面向 `ppt_deck` 与 `xiaohongshu` 的 `stable deliverable manual-test-driven hardening`，`P1` 与 `Phase 2 / source intake + shared source truth` 仍保持关闭。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -151,7 +152,7 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- `P1` 与 `Phase 2 / source intake + shared source truth` 目前都还没有重新开工；下一棒必须在 `P0` closeout 之后由 `Codex App` 显式激活。
+- `P1` 与 `Phase 2 / source intake + shared source truth` 目前都还没有重新开工；当前的 post-P0 下一棒，是只围绕 `ppt_deck` 与 `xiaohongshu` 的 `stable deliverable manual-test-driven hardening`，并且它不属于 `P1`，也不属于 `Phase 2`。
 - 更大范围的运营面收口与 OPL 联动仍属后续工作。
 
 ## 当前推荐入口

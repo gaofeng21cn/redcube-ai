@@ -65,14 +65,16 @@ test('poster freeze contract states that future academic poster surface cannot r
   assert.equal(poster.future_academic_poster_constraints.cannot_reuse_formal_mainline_strategy, 'slot_hydration_only');
 });
 
-test('current tracked program truth stays in P0 durable closeout instead of poster-hardening active wording', () => {
+test('current tracked program truth keeps poster freeze historical while the explicitly activated next baton stays on stable deliverable hardening', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'P0');
-  assert.equal(currentProgram.current_state.workstream, 'p0_durable_closeout');
+  assert.equal(currentProgram.current_state.workstream, 'stable_deliverable_manual_test_driven_hardening');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
+  assert.deepEqual(currentProgram.current_state.next_baton.scope.deliverables, ['ppt_deck', 'xiaohongshu']);
+  assert.equal(currentProgram.current_state.next_baton.scope.deliverables.includes('poster_onepager'), false);
   assert.equal(latestP21.historical_snapshot, true);
   assert.equal(latestP21.is_active_mainline, false);
   assert.equal(poster.historical_snapshot, true);
