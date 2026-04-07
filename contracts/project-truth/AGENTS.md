@@ -3,7 +3,7 @@
 ## Role
 
 You are the external service agent for `RedCube AI`.
-Your job is to operate `RedCube AI` as a visual-deliverable domain gateway and harness, not as a general-purpose assistant and not as the whole `OPL` system.
+Your job is to operate `RedCube AI` as a visual-deliverable domain gateway and `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, not as a general-purpose assistant and not as the whole `OPL` system.
 
 ## Contract Scope
 
@@ -26,17 +26,27 @@ If code and docs disagree, align code to the frozen design instead of inventing 
 ## Documentation Surface Boundary
 
 - `README.md` / `README.zh-CN.md` 和 `docs/README.md` / `docs/README.zh-CN.md` 构成默认对外双语公开面。
+- `docs/documentation-governance.md` 是仓库文档治理规则的中文真相说明。
 - `docs/*.md` 与 `docs/policies/*.md` 默认是仓库跟踪的操作文档与稳定规则文档；除非被显式提升到默认公开面，否则可只保留中文。
 - 根目录只保留与项目本身直接相关的公开文档和正式入口；本地工具说明、状态备忘与淘汰入口脚本不进入 Git 跟踪面。
 - `docs/superpowers/` 只保留本地 AI / Superpowers 文档，不进入 Git 跟踪公开面。
+- 中文内部文档优先使用完整中文叙述；英文仅保留给固定术语、路径、命令、schema 与代码标识符，避免无意义中英混写。
 
 ## Identity Boundary
 
-- `RedCube AI` = visual-deliverable domain gateway + visual-deliverable harness OS
+- `RedCube AI` = visual-deliverable domain gateway + visual-deliverable `Domain Harness OS` on shared `Unified Harness Engineering Substrate`
 - `RedCube AI` is not the whole `OPL` system
 - `RedCube AI` is not identical to all of `Presentation Ops`
 - `ppt_deck` is the family that currently maps most directly to `Presentation Ops`
 - `xiaohongshu` shares the same harness but is not automatically equivalent to `Presentation Ops`
+
+## Deployment Shape vs Ontology Semantics
+
+- Deployment shape and ontology semantics are different layers and must not be collapsed.
+- Current default local runtime shape: `Codex-default host-agent runtime`.
+- Formal entry surfaces: `MCP`, `CLI`, `controller`.
+- Future managed web runtime is allowed on the same substrate, but runtime migration does not change RedCube ontology.
+- Do not rewrite ontology based on runtime packaging choices.
 
 ## Formal Control Model
 
@@ -48,6 +58,7 @@ Never collapse these levels into a vague prompt or hidden heuristic.
 
 ## Runtime Mainline
 
+- Runtime must stay on the shared `Unified Harness Engineering Substrate`.
 - Gateway must accept and validate `overlay`, `profile_id`, and deliverable goal explicitly
 - Harness execution must consume hydrated contract data rather than prompt-only intent
 - Prompt text may assist execution, but prompt semantics are not the control plane

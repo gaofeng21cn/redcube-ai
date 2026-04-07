@@ -6,10 +6,10 @@
 
 ## 一句话理解
 
-`RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由内部的 `Visual Deliverable Harness OS` 驱动。
+`RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS` 驱动。
 
 这里的 `Agent-first` 不等于必须走 `external_llm` API。
-在当前 Codex / OMX 语境里，`Codex-native host agent` 可以是正式主执行器；
+在当前 Codex / OMX 语境里，默认本地执行形态是 `Codex-default host-agent runtime`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
 
 当前最成熟的两类交付物，加上一条已完成 extension proof 的海报 surface，是：
@@ -20,13 +20,15 @@
 
 ## 顶层链路
 
-独立使用时：
+独立使用时（当前默认）：
 
 ```text
 Agent
-  -> RedCube Gateway
-      -> Overlay / Family / Profile / Pack
-          -> RedCube Harness OS
+  -> MCP / CLI / controller
+      -> RedCube Gateway
+          -> Overlay / Family / Profile / Pack
+              -> RedCube Domain Harness OS
+                  -> Codex-default host-agent runtime
 ```
 
 放在 `OPL` 顶层语义里时：
@@ -39,14 +41,13 @@ User / Agent
               -> RedCube Harness OS
 ```
 
-更贴近当前目标态的执行主线是：
+同一 substrate 上的可迁移形态：
 
 ```text
 User / Agent
-  -> CLI / MCP
+  -> managed web runtime
       -> Gateway
-          -> Harness OS
-              -> Codex-native host agent executor
+          -> Domain Harness OS
               -> Governance / Audit / Artifact persistence
 ```
 
@@ -56,7 +57,7 @@ User / Agent
 
 唯一正式入口，负责：
 
-- 对外暴露 `CLI` 与 `MCP`
+- 对外暴露 `MCP`、`CLI`、`controller`
 - 装载 workspace contract
 - 路由到正确的 family / profile / pack
 - 返回结构化状态与 artifact 引用
@@ -79,7 +80,7 @@ User / Agent
 - 如果主要 story / visual / render authorship 仍由 deterministic JS 完成，
   即使这些逻辑已经移到 pack，也仍然不算恢复了 AI-first 主线
 
-### RedCube Harness OS
+### RedCube Domain Harness OS
 
 负责执行、记录与审计，不负责顶层产品语义。
 
@@ -97,6 +98,12 @@ User / Agent
 - final HTML markup authorship
 
 这些都应逐步回到 agent / director 主执行面。
+
+## 部署形态与本体语义分离
+
+- `Codex-default host-agent runtime` 是当前默认部署形态，不是 RedCube 本体定义。
+- 未来切到 managed web runtime 时，只要仍在同一 `Unified Harness Engineering Substrate` 上并保持同一 contract，RedCube 的 domain 语义不变。
+- `OPL` 是上层语义系统；RedCube 在其中是视觉交付 domain gateway + Domain Harness OS，不是 `OPL` 本体。
 
 ## 统一生命周期
 
@@ -218,8 +225,8 @@ User / Agent
 
 如果你要读长期稳定的正式规则，请继续看：
 
-- [运行模型 Policy](../policies/runtime_operating_model.md)
-- [交付合同模型 Policy](../policies/deliverable_contract_model.md)
+- [运行模型 Policy](policies/runtime_operating_model.md)
+- [交付合同模型 Policy](policies/deliverable_contract_model.md)
 
 如果你只想快速开始，而不关心技术层次，请回到：
 

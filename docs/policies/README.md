@@ -19,7 +19,7 @@
 当前统一口径：
 
 - `Agent-first` 不等于 `external_llm-only`
-- `Codex-native host agent` 可以是正式主执行器
+- `Codex-default host-agent runtime` 是当前正式默认执行形态
 - 共享宏观生命周期是：
   - `Source Readiness`
   - `Story Architecture`

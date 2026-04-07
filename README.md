@@ -27,12 +27,17 @@
 </table>
 
 > `RedCube AI` helps experts turn structured knowledge into formal visual deliverables that can be reviewed, rerun, and exported with more control.
+> It is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`.
 
 ## Product Position
 
 If your goal is to keep turning structured knowledge into formal visual outputs, `RedCube AI` gives you one governed delivery line instead of a pile of one-off prompts, scattered scripts, and manual cleanup.
 
 It is designed for experts who want the speed of agents without losing control over quality.
+
+Today, its default local execution shape is the `Codex-default host-agent runtime`.
+Formal entry surfaces are `MCP`, `CLI`, and `controller`.
+As long as the same substrate and contracts are kept, this line can later move to a managed web runtime without changing the domain identity.
 
 ## What It Helps You Do
 
@@ -87,7 +92,7 @@ Typical three-step start:
 
 You can give your agent an instruction like this:
 
-> Read the materials in this workspace first. Then decide whether the requested deliverable should be a PPT deck, a Xiaohongshu post, or a knowledge poster. If I already specified the deliverable type, follow that choice. Use RedCube AI (`https://github.com/gaofeng21cn/redcube-ai`) as the visual-deliverable gateway and harness. Make the audience, deliverable goal, information structure, review checkpoints, and export requirements explicit. If the direction is unclear, ask clarifying questions before generating a vague draft.
+> Read the materials in this workspace first. Then decide whether the requested deliverable should be a PPT deck, a Xiaohongshu post, or a knowledge poster. If I already specified the deliverable type, follow that choice. Use RedCube AI (`https://github.com/gaofeng21cn/redcube-ai`) as the visual-deliverable gateway and Domain Harness OS. Make the audience, deliverable goal, information structure, review checkpoints, and export requirements explicit. If the direction is unclear, ask clarifying questions before generating a vague draft.
 
 ## Current Limits
 
@@ -114,12 +119,21 @@ Detailed operator docs remain repo-tracked, but they are not part of the default
 
 ```text
 User / Agent
-  -> Gateway
+  -> MCP / CLI / controller
+      -> Gateway
+          -> Overlay / Family / Profile / Pack
+              -> Domain Harness OS (on Unified Harness Engineering Substrate)
+                  -> Codex-default host-agent runtime (current default)
+                  -> managed web runtime (future option on same substrate)
+```
+
+Formal control chain:
+
+```text
+Gateway
       -> Overlay / Family / Profile / Pack
-          -> Harness OS
-              -> Artifact Store
-              -> Run Store
-              -> Event Log
+          -> Harness Execution
+              -> Artifact Store / Run Store / Event Log
 ```
 
 ## Current Technical Reality
@@ -144,6 +158,7 @@ Current honest limits:
 
 1. `MCP`
 2. `CLI`
+3. `controller`
 
 ## Installation And Basic Verification
 

@@ -27,12 +27,17 @@
 </table>
 
 > `RedCube AI` 的目标，是帮助专家把结构化知识稳定做成正式视觉交付物，并让整个过程可审阅、可重跑、可导出。
+> 在统一口径下，它是共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS`。
 
 ## 产品定位
 
 如果你的目标，是把知识稳定地交付成正式的视觉成果，那么 `RedCube AI` 提供的是一条可治理、可审阅、可重跑的交付主线，而不是一堆一次性提示词、零散脚本或人工补救流程。
 
 它的重点不是“先生成一版”，而是把视觉交付这件事变成正式生产线。
+
+当前默认本地执行形态是 `Codex-default host-agent runtime`。
+正式入口优先 `MCP`、`CLI`、`controller`。
+只要保持同一套 substrate 与 contract，后续可以迁移到同一 substrate 上的托管 web runtime，而不改变本项目的 domain 身份。
 
 ## 它能帮你做什么
 
@@ -87,7 +92,7 @@
 
 你可以直接把下面这段话发给智能代理：
 
-> 请先读取我提供的材料，并判断这次交付更适合做成幻灯片、小红书笔记，还是海报。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊结果。
+> 请先读取我提供的材料，并判断这次交付更适合做成幻灯片、小红书笔记，还是海报。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）作为视觉交付 gateway 与 Domain Harness OS，把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊结果。
 
 ## 当前待完善的地方
 
@@ -114,12 +119,21 @@
 
 ```text
 用户 / 智能代理
-  -> 网关
-      -> 交付物层 / 场景层 / 配置层 / 包层
-          -> 执行与审计内核
-              -> 交付物存储
-              -> 运行记录
-              -> 事件日志
+  -> MCP / CLI / controller
+      -> 网关
+          -> 交付物层 / 场景层 / 配置层 / 包层
+              -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
+                  -> Codex-default host-agent runtime（当前默认）
+                  -> managed web runtime（同一 substrate 上的未来形态）
+```
+
+正式控制链：
+
+```text
+网关
+  -> 交付物层 / 场景层 / 配置层 / 包层
+      -> 执行与审计内核
+          -> 交付物存储 / 运行记录 / 事件日志
 ```
 
 ## 当前技术情况
@@ -144,6 +158,7 @@
 
 1. `MCP`
 2. `CLI`
+3. `controller`
 
 ## 安装与基础验证
 

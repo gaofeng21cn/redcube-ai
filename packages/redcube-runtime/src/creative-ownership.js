@@ -231,7 +231,7 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   mainline_topology: [
     'Gateway',
     'Harness OS',
-    'Codex-native host agent',
+    'Codex-default host-agent runtime',
     'family/profile/pack contracts',
     'review/governance/audit',
     'artifacts',

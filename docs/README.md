@@ -2,67 +2,54 @@
 
 **English** | [中文](./README.zh-CN.md)
 
-This file is the bilingual documentation index for `RedCube AI`.
+This bilingual index is the default public surface for `RedCube AI`.
+It stays aligned with the product truth: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, running via the `Codex-default host-agent runtime` with formal entry surfaces such as `MCP`, `CLI`, and `controller`.
 
-Public framing:
+## Unified Documentation Governance
 
-- External: `RedCube AI` is a `Visual Deliverable Gateway`.
-- Internal: it is powered by a `Visual Deliverable Harness OS`.
-- Under `OPL` top-level semantics: it is a visual-deliverable domain gateway, not the OPL system itself.
-- In the Codex / OMX operating model: `Agent-first` does not mean `external_llm` only; a `Codex-native host agent` can be the primary executor.
-
-Shared lifecycle framing:
-
-1. `Source Readiness`
-2. `Story Architecture`
-3. `Visual Authorship`
-4. `Delivery Packaging`
-
-Shared review overlay:
-
-- `visual_director_review`
-- `screenshot_review`
-
-Current capability snapshot:
-
-- `ppt_deck`: verified production-grade baseline family
-- `xiaohongshu`: verified production-grade baseline family
-- `poster_onepager`: extension-proven `knowledge poster` surface, not an academic-poster closeout
+- External documents must ship as paired English `.md` and Chinese `.zh-CN.md` files with synchronized updates.
+- Internal design, planning, and operational notes default to Chinese unless explicitly elevated into the bilingual surface.
+- Terminology may remain English when it denotes stable domain language, but avoid unnecessary mixed-language prose.
+- Keep `docs/README*` consistent so readers can immediately see which content is public bilingual versus internal.
+- For more detail, see [Documentation Governance](documentation-governance.md) (Chinese only).
 
 ## External Bilingual Surface
 
-This index and the repository home are the default GitHub-facing bilingual public surface.
-Any detailed document promoted into that surface must ship with synchronized English `.md` and Chinese `.zh-CN.md` mirrors.
+- [Repository home](../README.md)
+
+This index along with the repository home forms the default GitHub-facing bilingual surface. Any document meant for external readers must land on this surface with mirrored English and Chinese variants.
 
 ## Repo-Tracked Internal Operator Docs
 
-### For Human Operators
+### For human operators
 
-- [Human quickstart](human_quickstart.md) (Chinese only)
-- [Deliverable examples](deliverable_examples.md) (Chinese only)
+- [Human quickstart](human_quickstart.md)
+- [Deliverable examples](deliverable_examples.md)
 
-### For Technical Collaborators / Agent Executors
+### For technical collaborators / agent executors
 
-- [Runtime architecture](runtime_architecture.md) (Chinese only)
-- [Public GitHub publishing](public-github-publish.md) (Chinese only)
+- [Runtime architecture](runtime_architecture.md)
+- [Domain Harness OS positioning map](domain-harness-os-positioning.md)
+- [Public GitHub publishing](public-github-publish.md)
+- [Documentation Governance](documentation-governance.md) (Chinese only)
 
-### Private / Local Configuration Docs
+### Private / local configuration docs
 
-- [Private author profile and prompts setup](private-profile-setup.md) (Chinese only, internal/private)
+- [Private author profile and prompts setup](private-profile-setup.md)
 
 ## Stable Internal Rules
 
-- [Policies index](policies/README.md) (Chinese only)
-- [Runtime operating model policy](policies/runtime_operating_model.md) (Chinese only)
-- [Deliverable contract model policy](policies/deliverable_contract_model.md) (Chinese only)
+- [Policies index](policies/README.md)
+- [Runtime operating model policy](policies/runtime_operating_model.md)
+- [Deliverable contract model policy](policies/deliverable_contract_model.md)
 
-## Repository History
+## Repository history
 
 - [Changelog](../CHANGELOG.md)
 
 ## Documentation Boundary
 
-- `README*` and `docs/README*`: the default bilingual public surface
-- detailed `docs/*.md`: repo-tracked operator/internal docs by default
-- `docs/policies/`: repo-tracked stable internal rules by default
-- `docs/superpowers/`: local AI/Superpowers notes, plans, and drafts that should not enter Git-tracked public docs.
+- `README*` and `docs/README*`: default bilingual public surface.
+- Detailed `docs/*.md`: repository-tracked internal/operator documents unless explicitly promoted.
+- `docs/policies/`: stable internal rules, Chinese by default.
+- `docs/superpowers/`: local AI / Superpowers notes, plans, and drafts; keep them untracked.
