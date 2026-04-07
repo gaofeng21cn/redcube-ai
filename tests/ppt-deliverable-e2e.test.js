@@ -222,6 +222,47 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
   assert.equal(reviewReport.status, 'pass');
 });
 
+test('ppt_deck manual thyroid case keeps topic fidelity instead of falling back to stale AI workflow copy', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-manual-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'lecture-01',
+    title: 'Thyroid Basics',
+    goal: 'Explain thyroid fundamentals to undergraduate students',
+  });
+
+  const chain = await runChain({ workspaceRoot, deliverableId: 'lecture-01' });
+  for (const { route, result } of chain) {
+    assert.equal(result.ok, true, route);
+  }
+
+  const outline = readJson(chain[1].result.artifactFile);
+  const slides = outline.detailed_outline?.slides || [];
+  const staleTitles = new Set([
+    '旧工作流为什么会在这里失效',
+    '把科研任务拆成一条 4 段式机制轨道',
+    '判断梯：哪些环节适合 AI，哪些必须人工签收',
+    '证据页必须把来源口径讲给听众听懂',
+    '把方法落成课堂上的四格动作',
+    '最后只收束三件必须带走的事',
+  ]);
+  assert.equal(slides.some((slide) => staleTitles.has(slide.title)), false);
+
+  const nonCoverTopicAnchored = slides
+    .slice(1)
+    .some((slide) => /thyroid|甲状腺/i.test([
+      slide.title,
+      slide.page_objective,
+      slide.core_sentence,
+      ...(slide.page_core_content || []),
+    ].join(' ')));
+  assert.equal(nonCoverTopicAnchored, true);
+});
+
 test('optimize_existing screenshot review binds baseline and emits relative review', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 

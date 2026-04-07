@@ -29,9 +29,15 @@ test('stable deliverable manual-test contract stays explicitly gated behind Code
   assert.equal(currentProgram.current_state.next_baton.activation.mode, 'explicit_codex_app_only');
   assert.equal(currentProgram.current_state.next_baton.activation.activated, true);
   assert.equal(currentProgram.current_state.next_baton.activation.opens_phase_2, false);
+  assert.equal(currentProgram.current_state.next_baton.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.next_baton.review_status, 'passed');
+  assert.equal(currentProgram.current_state.next_baton.closeout.suite_result, 'pass');
   assert.equal(contract.activation.owner, 'Codex App');
   assert.equal(contract.activation.required, true);
   assert.equal(contract.activation.opens_phase_2, false);
+  assert.equal(contract.status, 'closeout_completed');
+  assert.equal(contract.review_status, 'passed');
+  assert.equal(contract.execution_summary.suite_result, 'pass');
 });
 
 test('stable deliverable manual-test contract is scoped only to ppt_deck and xiaohongshu', () => {
@@ -116,10 +122,13 @@ test('stable deliverable manual-test brief and backlog surface stay repo-tracked
   assert.equal(currentProgram.current_state.next_baton.artifacts.manual_test_brief, OPERATOR_BRIEF);
   assert.equal(currentProgram.current_state.next_baton.artifacts.hardening_backlog, HARDENING_BACKLOG);
   assert.equal(contract.backlog_capture.file, HARDENING_BACKLOG);
-  assert.equal(backlog.status, 'awaiting_manual_findings');
+  assert.equal(backlog.status, 'manual_test_completed_no_findings');
   assert.deepEqual(backlog.allowed_scope, ['ppt_deck', 'xiaohongshu']);
+  assert.equal(backlog.execution_summary.suite_result, 'pass');
+  assert.equal(backlog.execution_summary.findings_recorded, 0);
   assert.deepEqual(backlog.items, []);
   assert.equal(brief.includes('stable deliverable manual-test-driven hardening'), true);
+  assert.equal(brief.includes('closeout_completed'), true);
   assert.equal(brief.includes('Codex App'), true);
   assert.equal(brief.includes('ppt_deck'), true);
   assert.equal(brief.includes('xiaohongshu'), true);

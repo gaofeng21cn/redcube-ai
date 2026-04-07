@@ -42,15 +42,15 @@
         "先问题定义，后证据分层，再执行与复核"
       ],
       "page_core_content": [
-        "今天的主题不是‘工具大全’，而是‘如何把 AI 放回正确的科研链条’",
-        "先讲为什么现在必须讲，再讲怎么判断，最后讲怎样执行与回修"
+        "今天的主题不是“概念堆砌”，而是“{{title}} 的核心概念、判断顺序与课堂带走点”",
+        "先讲 {{goal}}，再讲关键概念与判断边界，最后讲课堂里的下一步动作"
       ],
       "visual_anchor_tracks": [
         "left-identity-rail",
         "center-title-stage",
         "right-promise-card"
       ],
-      "speaker_notes": "开场先立契约：今天不是堆工具，而是把 AI 放回问题定义、证据约束与执行复核这条成熟链路。",
+      "speaker_notes": "开场先立契约：今天不是堆概念，而是把 {{title}} 讲成一条从概念到判断再到动作的课堂主线。",
       "transition_sentence": "既然今天讲的是链路，就先解释为什么这件事现在必须讲清。",
       "render_recipe_id": "ppt.hero_signal"
     },
@@ -60,25 +60,25 @@
       "chapter_id": "C1",
       "page_type": "stakes_window",
       "layout_family": "multi_zone_compare",
-      "title": "旧工作流为什么会在这里失效",
+      "title": "为什么 {{title}} 需要先讲清判断顺序",
       "page_goal": "建立问题紧迫性",
-      "core_sentence": "如果不先拆清任务边界，AI 只会放大错误期待",
-      "page_objective": "把‘现在不讲清会发生什么’讲透",
+      "core_sentence": "如果一开始不先讲清核心概念与判断边界，后面的记忆点只会越讲越乱",
+      "page_objective": "把“为什么这个主题值得先讲清”讲透",
       "evidence_points": [
         "{{public_source_1}}",
-        "任务定义错误会直接污染后续数据、方法和解释"
+        "概念、症状与判断顺序没对齐时，听众最容易把重点理解反"
       ],
       "page_core_content": [
-        "左侧讲‘现在不讲清’的代价：任务被工具化、证据被模糊化、输出被神化",
-        "右侧讲‘讲清之后’的收益：知道哪些环节该问人、该问数据、该问模型"
+        "左侧讲“没先讲清概念和边界”的代价：术语记不住、重点抓不住、动作顺序会做反",
+        "右侧讲“讲清之后”的收益：知道先看什么、如何判断、何时该停下来复核"
       ],
       "visual_anchor_tracks": [
         "left-risk-zone",
         "right-value-zone",
         "bottom-bridge"
       ],
-      "speaker_notes": "这一页要把压力建起来：不是 AI 很厉害，而是如果不先定义任务边界，后面的每一步都会被带偏。",
-      "transition_sentence": "知道为什么现在必须讲清之后，下一页先拆误区。",
+      "speaker_notes": "这一页要把压力建起来：不是信息不够，而是如果不先把主题概念和判断边界讲清，后面的每一步都会被带偏。",
+      "transition_sentence": "知道为什么这个主题必须先讲清之后，下一页先拆误区。",
       "render_recipe_id": "ppt.compare_zones"
     },
     {
@@ -96,17 +96,17 @@
         "把‘结果好看’与‘证据可靠’分开"
       ],
       "page_core_content": [
-        "误区一：只要模型新，任务就会更好",
-        "误区二：只要结果像答案，就可以直接使用",
-        "误区三：只要图表漂亮，就说明流程成熟"
+        "混淆一：只背术语，不先理解概念之间的关系",
+        "混淆二：只看结论，不先判断适用边界",
+        "混淆三：只记动作，不先理解为什么要这样做"
       ],
       "visual_anchor_tracks": [
         "left-myth-column",
         "right-correction-column",
         "bottom-coach-note"
       ],
-      "speaker_notes": "这一页是缓冲页：先让听众承认常见误区，再把注意力带到下一页的机制轨道。",
-      "transition_sentence": "拆完误区，下一页直接把科研任务拆成显式轨道。",
+      "speaker_notes": "这一页是缓冲页：先让听众承认常见混淆点，再把注意力带到下一页的主题主线。",
+      "transition_sentence": "拆完误区，下一页直接把主题主线讲成显式轨道。",
       "render_recipe_id": "ppt.compare_zones"
     },
     {
@@ -115,29 +115,29 @@
       "chapter_id": "C2",
       "page_type": "mechanism_track",
       "layout_family": "timeline_band",
-      "title": "把科研任务拆成一条 4 段式机制轨道",
+      "title": "把 {{title}} 讲成一条 4 段式主线",
       "page_goal": "建立结构理解",
-      "core_sentence": "只有先把输入、判断、执行、复核分层，AI 才能被正确放置",
-      "page_objective": "让听众看到整条执行链",
+      "core_sentence": "只有先把概念、判断、证据与动作分层，听众才能真正跟上这节课",
+      "page_objective": "让听众看到整条课堂主线",
       "evidence_points": [
-        "输入质量",
-        "判断约束",
-        "执行链路",
-        "复核与回退"
+        "核心概念",
+        "判断边界",
+        "公开证据",
+        "课堂动作"
       ],
       "page_core_content": [
-        "输入层：问题、样本、标签、场景边界",
-        "判断层：先问问题是否可验证，再问证据是否够",
-        "执行层：只让模型承担已被约束的局部任务",
-        "复核层：结果必须回到真实场景与失败样例"
+        "概念层：先讲定义、作用与最常见的判断对象",
+        "判断层：先分清常见情况，再确认哪些边界需要停下来复核",
+        "证据层：用公开来源解释为什么这条判断成立",
+        "动作层：把课后该做什么压成能直接复述的步骤"
       ],
       "visual_anchor_tracks": [
         "top-title",
         "center-horizontal-track",
         "bottom-source-rail"
       ],
-      "speaker_notes": "这页是机制峰值页，要用显式轨道告诉听众：AI 只能嵌进链条，不能替代整条链。",
-      "transition_sentence": "有了轨道之后，再看讲授型场景里的判断梯。",
+      "speaker_notes": "这页是机制峰值页，要用显式轨道告诉听众：这节课的重点是先抓主线，再记细节。",
+      "transition_sentence": "有了主线之后，再看讲授场景里的判断边界。",
       "render_recipe_id": "ppt.timeline_rail"
     },
     {
@@ -146,29 +146,29 @@
       "chapter_id": "C2",
       "page_type": "decision_gate",
       "layout_family": "judgement_ladder",
-      "title": "判断梯：哪些环节适合 AI，哪些必须人工签收",
+      "title": "判断边界：哪些情况要先确认再继续",
       "page_goal": "建立停顿点与推进点",
-      "core_sentence": "如果上一个台阶回答不清，继续往下只会放大偏差",
-      "page_objective": "让听众看到哪些节点必须停下来",
+      "core_sentence": "如果上一个判断点没有讲清，继续往下只会放大误解",
+      "page_objective": "让听众看到哪些节点必须先停下来确认",
       "evidence_points": [
-        "问题是否可验证",
-        "数据是否支撑",
-        "方法是否最小充分",
-        "结果是否回到场景"
+        "概念是否分清",
+        "边界是否明确",
+        "证据是否够用",
+        "动作是否对应场景"
       ],
       "page_core_content": [
-        "问题不清：回到研究问题重写",
-        "数据不稳：先补样本与标注协议",
-        "方法过重：退回最小可验证方案",
-        "验证不足：先补外部复核与失败样例"
+        "概念没分清：回到定义和常见混淆点",
+        "边界不明确：先补充场景与例外情况",
+        "证据不够：先补公开来源与课堂可解释口径",
+        "动作太散：先压缩成课后能照着做的步骤"
       ],
       "visual_anchor_tracks": [
         "left-questions",
         "right-actions",
         "bottom-transition"
       ],
-      "speaker_notes": "把这一页讲成停顿点清单：真正成熟的 AI 流程不是一路往前冲，而是知道在哪里停、问、回退。",
-      "transition_sentence": "知道怎么判断之后，再看一页公开证据如何支撑这些停顿点。",
+      "speaker_notes": "把这一页讲成停顿点清单：真正成熟的讲授不是一路往前冲，而是知道在哪里停下来重新确认。",
+      "transition_sentence": "知道怎么判断之后，再看一页公开证据如何支撑这些判断点。",
       "render_recipe_id": "ppt.judgement_ladder"
     },
     {
@@ -177,18 +177,18 @@
       "chapter_id": "C3",
       "page_type": "public_evidence",
       "layout_family": "multi_zone_compare",
-      "title": "证据页必须把来源口径讲给听众听懂",
+      "title": "{{title}} 的证据页要把来源讲成人能听懂的话",
       "page_goal": "建立可信度",
       "core_sentence": "证据页不只是贴引用，而是让听众知道结论站在什么公开来源上",
-      "page_objective": "示范证据页不能退回内部占位来源",
+      "page_objective": "示范证据页不能退回空泛来源占位",
       "evidence_points": [
         "{{public_source_1}}",
         "{{public_source_2}}",
         "{{public_source_3}}"
       ],
       "page_core_content": [
-        "用公开指南界定主题的共识底线",
-        "用综述与原则文件说明 AI 进入流程的边界",
+        "用公开指南界定 {{title}} 的共识底线",
+        "用综述与正规资料说明关键判断的边界",
         "用来源矩阵把事实、判断、行动三层对齐"
       ],
       "visual_anchor_tracks": [
@@ -196,8 +196,8 @@
         "center-three-zone-evidence",
         "bottom-source-rail"
       ],
-      "speaker_notes": "这里要明确示范：证据页绝不能写‘内部资料’或‘来源索引’。来源必须是听众能理解、能公开查到的正式口径。",
-      "transition_sentence": "最后一页把今天的判断压缩成学生带得走的行动清单。",
+      "speaker_notes": "这里要明确示范：证据页绝不能写“内部资料”或“来源索引”。来源必须是听众能理解、能公开查到的正式口径。",
+      "transition_sentence": "最后一页把今天的判断压缩成听众带得走的行动清单。",
       "render_recipe_id": "ppt.compare_zones"
     },
     {
@@ -206,21 +206,21 @@
       "chapter_id": "C3",
       "page_type": "ring_cross",
       "layout_family": "ring_cross",
-      "title": "把方法落成课堂上的四格动作",
+      "title": "把课堂重点压成四个可执行动作",
       "page_goal": "形成课后可执行框架",
       "core_sentence": "讲者最终要给听众一个下课后还能复用的动作框架",
-      "page_objective": "从课堂内容落成实践步骤",
+      "page_objective": "从课堂内容落成课后步骤",
       "evidence_points": [
-        "定义问题",
-        "绑定证据",
-        "组织执行",
-        "复盘回修"
+        "先认概念",
+        "再抓判断",
+        "再看证据",
+        "最后定动作"
       ],
       "page_core_content": [
-        "定义问题",
-        "绑定证据",
-        "组织执行",
-        "复盘回修"
+        "先认概念",
+        "再抓判断",
+        "再看证据",
+        "最后定动作"
       ],
       "visual_anchor_tracks": [
         "center-hub",
@@ -229,7 +229,7 @@
         "south-zone",
         "west-zone"
       ],
-      "speaker_notes": "收尾时不要复述所有概念，而是把今天的判断压缩成四个动作，让听众知道下一次遇到 AI 课题该先做什么。",
+      "speaker_notes": "收尾时不要复述所有概念，而是把今天的主线压缩成四个动作，让听众知道下一次遇到类似主题该先做什么。",
       "transition_sentence": "最后用一句总结把主线收束。",
       "render_recipe_id": "ppt.ring_cross"
     },
@@ -239,19 +239,19 @@
       "chapter_id": "C3",
       "page_type": "closure_peak",
       "layout_family": "summary_peak",
-      "title": "最后只收束三件必须带走的事",
+      "title": "最后收束 {{title}} 的三条带走点",
       "page_goal": "回收主线并给出动作清单",
       "core_sentence": "结尾页不是重复目录，而是把整条主线压成可回忆的判断句",
       "page_objective": "留下记忆点与下一步动作",
       "evidence_points": [
-        "先把任务定义清楚",
-        "再把证据界面搭出来",
-        "最后再让 AI 进入执行链"
+        "先讲清核心概念",
+        "再连上公开证据",
+        "最后压成动作顺序"
       ],
       "page_core_content": [
-        "先把任务定义清楚",
-        "再把证据界面搭出来",
-        "最后再让 AI 进入执行链"
+        "先讲清核心概念",
+        "再连上公开证据",
+        "最后压成动作顺序"
       ],
       "visual_anchor_tracks": [
         "summary-left",

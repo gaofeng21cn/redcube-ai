@@ -209,6 +209,32 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
   assert.equal(report.status, 'pass');
 });
 
+test('xiaohongshu manual thyroid clinic case keeps clinic-topic fidelity instead of generic tool-flow copy', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-manual-'));
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-01',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  const chain = await runXhsChain({ workspaceRoot, deliverableId: 'note-01' });
+  for (const { route, result } of chain) {
+    assert.equal(result.ok, true, route);
+  }
+
+  const plan = readJson(chain[2].result.artifactFile);
+  const copy = readJson(chain[7].result.artifactFile);
+  const planText = (plan.single_note_plan?.slides || [])
+    .map((slide) => [slide.title, ...(slide.page_core_content || [])].join(' '))
+    .join(' ');
+  assert.equal(/工具清单|先找工具|先看功能/i.test(planText), false);
+  assert.equal(/甲状腺|门诊/i.test(`${planText}\n${copy.publish_copy?.body || ''}`), true);
+});
+
 test('xiaohongshu optimize_existing binds baseline and emits relative review', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
   await createDeliverable({

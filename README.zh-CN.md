@@ -98,7 +98,7 @@
 
 当前最主要的待完善项有：
 
-- `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面，但新近显式打开的 `stable deliverable manual-test-driven hardening` 下一棒仍需人工执行手工测试并完成 backlog 分诊
+- `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面；当前 `stable deliverable manual-test-driven hardening` 已完成首轮正式手工测试收口，并形成了 tracked stable backlog（当前无新增 findings）
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善

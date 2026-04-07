@@ -98,7 +98,7 @@ You can give your agent an instruction like this:
 
 The main unfinished areas are:
 
-- the next hardening baton is `stable deliverable manual-test-driven hardening`, scoped only to `ppt_deck` and `xiaohongshu`
+- the current hardening baton `stable deliverable manual-test-driven hardening` has completed its initial formal manual-test closeout for `ppt_deck` and `xiaohongshu`, with a tracked stable backlog and no recorded findings
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
@@ -150,7 +150,7 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- The current active mainline remains `redcube-runtime-program`: `P0 review-closeout` is now passed with a credible clean-clone baseline, and the only opened post-P0 baton is `stable deliverable manual-test-driven hardening`; it is explicitly activated by `Codex App`, and it does not reopen `P1` or `Phase 2 / source intake + shared source truth`.
+- The current active mainline remains `redcube-runtime-program`: `P0 review-closeout` is now passed with a credible clean-clone baseline, and the only opened post-P0 baton is `stable deliverable manual-test-driven hardening`; it remains explicitly activated by `Codex App`, its first formal manual-test closeout is completed, and it still does not reopen `P1` or `Phase 2 / source intake + shared source truth`.
 - manual-test-driven hardening execution and broader OPL federation are still follow-on work.
 
 ## Recommended Entry Priority

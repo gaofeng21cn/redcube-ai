@@ -63,14 +63,16 @@ test('P0 tracked program contract records passed closeout, credible green baseli
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, false);
   assert.equal(currentProgram.current_state.next_baton.id, 'stable_deliverable_manual_test_driven_hardening');
-  assert.equal(currentProgram.current_state.next_baton.status, 'ready_for_manual_test');
-  assert.equal(currentProgram.current_state.next_baton.review_status, 'ready_for_review');
+  assert.equal(currentProgram.current_state.next_baton.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.next_baton.review_status, 'passed');
   assert.equal(currentProgram.current_state.next_baton.activation.required, true);
   assert.equal(currentProgram.current_state.next_baton.activation.mode, 'explicit_codex_app_only');
   assert.equal(currentProgram.current_state.next_baton.activation.activated, true);
   assert.equal(currentProgram.current_state.next_baton.activation.activated_by, 'Codex App');
   assert.equal(currentProgram.current_state.next_baton.activation.opens_p1, false);
   assert.equal(currentProgram.current_state.next_baton.activation.opens_phase_2, false);
+  assert.equal(currentProgram.current_state.next_baton.closeout.suite_result, 'pass');
+  assert.equal(currentProgram.current_state.next_baton.closeout.findings_recorded, 0);
   assert.deepEqual(currentProgram.current_state.next_baton.scope.deliverables, ['ppt_deck', 'xiaohongshu']);
 });
 

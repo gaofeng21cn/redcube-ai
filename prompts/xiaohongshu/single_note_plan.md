@@ -12,8 +12,8 @@
 {
   "plan": {
     "title_options": [
-      "{{title}}为什么很多人总做反",
-      "{{title}}先别急着上工具",
+      "{{title}}为什么很多人总抓不住重点",
+      "{{title}}先别急着记一堆概念",
       "{{title}}这4步更重要"
     ],
     "slides": [
@@ -26,7 +26,7 @@
         "progression_role": "hook",
         "page_core_content": [
           "{{source_claim_1}}",
-          "这篇真正要帮你判断的是：{{audience_judgement}}",
+          "这篇真正要帮你判断的是：{{title}} 里最容易混淆的重点是什么",
           "记忆钩子：{{memory_hook}}"
         ],
         "visual_presentation": {
@@ -42,18 +42,18 @@
         },
         "source_language": "封面不直接甩术语，用读者能立即理解的问题句开场",
         "speaker_notes": "这页先用一句人话把冲突钉住：{{tension}}。再明确读者收益：{{audience_judgement}}。",
-        "transition": "先被一句话拉停，再进入为什么很多人会做反"
+        "transition": "先被一句话拉停，再进入为什么很多人会抓错重点"
       },
       {
         "slide_id": "N02",
-        "title": "为什么很多人第一步就做反",
+        "title": "为什么很多人一开始就抓错重点",
         "layout_family": "myth_compare",
         "render_recipe_id": "xhs.split_contrast",
         "page_goal": "先拆误区",
         "progression_role": "tension",
         "page_core_content": [
-          "很多人一上来就先找工具、先看功能、先抄别人的做法",
-          "真正该先看的，是这件事的判断顺序有没有被做反",
+          "很多人一上来就先背术语、先看碎片经验、先照抄别人的做法",
+          "真正该先看的，是这件事的判断顺序有没有被讲清",
           "为什么现在更容易做反：{{why_now}}"
         ],
         "visual_presentation": {
@@ -73,15 +73,15 @@
       },
       {
         "slide_id": "N03",
-        "title": "真正该先看的不是工具，而是判断顺序",
+        "title": "真正该先看的不是更多信息，而是判断顺序",
         "layout_family": "sequence_stack",
         "render_recipe_id": "xhs.staggered_steps",
         "page_goal": "建立判断顺序",
         "progression_role": "explain",
         "page_core_content": [
-          "先把问题翻译成人话，再决定要不要引入工具或方法",
+          "先把问题翻译成人话，再决定接下来该看哪类信息",
           "先看证据和适用边界，再看执行路径和输出形式",
-          "最后才谈效率、模板和扩展动作"
+          "最后才谈收藏、模板和延伸动作"
         ],
         "visual_presentation": {
           "layout_family": "sequence_stack",
@@ -96,19 +96,19 @@
         },
         "source_language": "把顺序写成读者能照着做的步骤语言",
         "speaker_notes": "这页不解释工具参数，只解释先后顺序和停顿点。",
-        "transition": "顺序讲明白之后，再把关键机制画成轨道"
+        "transition": "顺序讲明白之后，再把关键判断画成轨道"
       },
       {
         "slide_id": "N04",
-        "title": "把关键机制画成一眼能懂的轨道",
+        "title": "把关键判断画成一眼能懂的轨道",
         "layout_family": "process_track",
         "render_recipe_id": "xhs.track_rail",
         "page_goal": "解释机制",
         "progression_role": "mechanism_peak",
         "page_core_content": [
-          "第1步：先判断这是不是一个需要立刻处理的问题",
-          "第2步：再判断有哪些公开来源能支撑这一步",
-          "第3步：最后把动作压成一条能照着走的轨道"
+          "第1步：先判断这是不是当前最值得先解释的重点",
+          "第2步：再判断有哪些公开来源能支撑这条判断",
+          "第3步：最后把动作压成一条能照着走的顺序"
         ],
         "visual_presentation": {
           "layout_family": "process_track",
@@ -127,7 +127,7 @@
       },
       {
         "slide_id": "N05",
-        "title": "公开来源要让读者看得懂",
+        "title": "{{title}} 的公开来源要让读者听得懂",
         "layout_family": "evidence_strip",
         "render_recipe_id": "xhs.evidence_bands",
         "page_goal": "建立可信度",

@@ -27,21 +27,21 @@ function deckPreset(profileId) {
       return {
         speaker: '教学型讲者',
         audience: '医学生与住院学员',
-        promise: '让学生看懂 AI 不是工具清单，而是问题拆解、证据判断与执行闭环',
+        promise: '让学生看懂主题的核心概念、判断顺序与课堂带走点',
         speaker_seconds: 55,
       };
     case 'lecture_peer':
       return {
         speaker: '同行讲者',
         audience: '临床科研同行',
-        promise: '让同行快速对齐问题、方法、证据与边界',
+        promise: '让同行快速对齐主题主线、证据边界与可复用判断',
         speaker_seconds: 65,
       };
     case 'executive_briefing':
       return {
         speaker: '汇报型讲者',
         audience: '医院管理层',
-        promise: '让决策者先看到关键判断，再理解资源路径与风险',
+        promise: '让决策者先看到主题要点、判断依据与后续动作',
         speaker_seconds: 45,
       };
     default:

@@ -5,9 +5,11 @@
 ## 状态
 
 - baton id：`stable_deliverable_manual_test_driven_hardening`
-- 当前状态：`ready_for_review` + `ready_for_manual_test`
+- 当前状态：`closeout_completed`
+- 当前 review：`passed`
 - 激活状态：这条下一棒已由 `Codex App` 显式激活
 - 前置条件：`P0 review-closeout` 已通过，且 durable closeout 已 durably committed
+- 2026-04-07 首轮正式手工测试结果：`ppt_deck = pass`、`xiaohongshu = pass`、hardening backlog = `manual_test_completed_no_findings`
 - 范围只限：`ppt_deck`、`xiaohongshu`
 - 明确不做：不打开 `Phase 2 / source intake + shared source truth`、不扩 `controller`、不新增 family / overlay、不推进 poster academic contract、不扩大 OPL federation
 
