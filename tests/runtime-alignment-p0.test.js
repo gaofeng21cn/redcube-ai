@@ -42,18 +42,20 @@ test('P0 truth surfaces freeze current formal entry to MCP and CLI until control
   }
 });
 
-test('P0 tracked program contract records one active mainline and blocks P1 / Phase 2 until credible green baseline repair passes', () => {
+test('P0 tracked program contract records one active mainline and holds the next baton behind explicit activation after closeout', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
   assert.equal(currentProgram.current_state.phase_id, 'P0');
-  assert.equal(currentProgram.current_state.review_closeout.status, 'failed');
-  assert.equal(currentProgram.current_state.review_closeout.blocker, 'green_baseline_not_credible');
-  assert.equal(currentProgram.current_state.review_closeout.root_cause, 'truth_freeze_tests_depend_on_ignored_local_state');
+  assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
+  assert.equal(currentProgram.current_state.review_closeout.blocker, 'none');
+  assert.equal(currentProgram.current_state.review_closeout.root_cause, 'none');
+  assert.equal(currentProgram.current_state.workstream, 'p0_durable_closeout');
   assert.equal(currentProgram.current_state.active_mainline.id, 'redcube-runtime-program');
+  assert.equal(currentProgram.current_state.active_mainline.label, 'redcube-runtime-program / P0 durable closeout');
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
   assert.equal(currentProgram.current_state.team_mode.default_enabled, false);
-  assert.equal(currentProgram.current_state.green_baseline.credible, false);
+  assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, false);
 });
@@ -79,6 +81,7 @@ test('P0 tracked program contract records the required credible green baseline v
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.current_state.green_baseline.clean_clone_required, true);
+  assert.deepEqual(currentProgram.current_state.green_baseline.blocked_by, []);
   assert.deepEqual(currentProgram.current_state.green_baseline.required_verification, [
     'git status --short',
     'git diff --check',
@@ -101,7 +104,7 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 
-test('P0 tracked docs keep Phase 2 blocked until P0 review-closeout passes', () => {
+test('P0 tracked docs keep Phase 2 closed and require explicit next-baton activation after passed closeout', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
@@ -109,12 +112,12 @@ test('P0 tracked docs keep Phase 2 blocked until P0 review-closeout passes', () 
 
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, false);
-  assert.equal(readme.includes('P0 / credible green baseline repair'), true);
-  assert.equal(readme.includes('Phase 2 / source intake + shared source truth` is the only next gated line'), false);
-  assert.equal(readmeZh.includes('`P0 / credible green baseline repair`'), true);
-  assert.equal(readmeZh.includes('`Phase 2 / source intake + shared source truth` 是唯一下一条门控主线'), false);
-  assert.equal(runtimeArchitecture.includes('`P0 / credible green baseline repair`'), true);
-  assert.equal(runtimeArchitecture.includes('当前 active mainline 仍停在 `Phase 1` closeout freeze，`Phase 2` 尚未重新开工'), false);
+  assert.equal(readme.includes('`P0 review-closeout` is now passed with a credible clean-clone baseline'), true);
+  assert.equal(readme.includes('explicit `Codex App` activation'), true);
+  assert.equal(readmeZh.includes('`P0 review-closeout` 已以可信的 clean-clone baseline 通过'), true);
+  assert.equal(readmeZh.includes('显式激活'), true);
+  assert.equal(runtimeArchitecture.includes('`P0 review-closeout` 已以可信 clean-clone baseline 通过'), true);
+  assert.equal(runtimeArchitecture.includes('`Codex App` 显式激活'), true);
 });
 
 test('truth-freeze suites do not read ignored local tooling state directly', () => {

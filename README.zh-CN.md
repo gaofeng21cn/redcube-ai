@@ -143,7 +143,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`，但仓内当前处于 `P0 / credible green baseline repair`：`Phase 1 / Render Ceiling Upgrade` 继续冻结，`P1` 与 `Phase 2 / source intake + shared source truth` 在 `P0 review-closeout` 以可信 clean-clone baseline 重新通过前均不得开启。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`，且 `P0 review-closeout` 已以可信的 clean-clone baseline 通过：`Phase 1 / Render Ceiling Upgrade` 继续冻结，但下一棒仍需由 `Codex App` 显式激活，不会自动打开 `P1` 或 `Phase 2 / source intake + shared source truth`。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -151,7 +151,7 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- `P1` 与 `Phase 2 / source intake + shared source truth` 目前都还没有重新开工；在 `P0 review-closeout` 重新通过前都不得开启。
+- `P1` 与 `Phase 2 / source intake + shared source truth` 目前都还没有重新开工；下一棒必须在 `P0` closeout 之后由 `Codex App` 显式激活。
 - 更大范围的运营面收口与 OPL 联动仍属后续工作。
 
 ## 当前推荐入口

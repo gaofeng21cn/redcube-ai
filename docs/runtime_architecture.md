@@ -184,7 +184,7 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 
 当前 reality：
 
-- shared source plane / source intake code path 已存在，但当前 active mainline 的门控阶段是 `P0 / credible green baseline repair`；`Phase 1` 继续冻结，`P1` 与 `Phase 2 / source intake + shared source truth` 在 `P0 review-closeout` 重新通过前均不得开启
+- shared source plane / source intake code path 已存在；当前 active mainline 的 `P0 review-closeout` 已以可信 clean-clone baseline 通过。`Phase 1` 继续冻结，但下一棒仍需由 `Codex App` 显式激活，`P1` 与 `Phase 2 / source intake + shared source truth` 都不会自动开启
 - 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
 - `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`

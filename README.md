@@ -143,7 +143,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`, and the repo is currently held in `P0 / credible green baseline repair`: `Phase 1 / Render Ceiling Upgrade` stays frozen, while `P1` and `Phase 2 / source intake + shared source truth` remain blocked until `P0 review-closeout` passes with a credible clean-clone baseline.
+- The current active mainline is `redcube-runtime-program`, and `P0 review-closeout` is now passed with a credible clean-clone baseline: `Phase 1 / Render Ceiling Upgrade` stays frozen, while the next baton still requires explicit `Codex App` activation instead of auto-opening `P1` or `Phase 2 / source intake + shared source truth`.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -151,7 +151,7 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- `P1` and `Phase 2 / source intake + shared source truth` have not been reopened for implementation; both remain blocked until `P0 review-closeout` passes.
+- `P1` and `Phase 2 / source intake + shared source truth` have not been reopened for implementation; the next baton must be explicitly activated by `Codex App` after `P0` closeout.
 - broader operations closeout and OPL federation are still follow-on work.
 
 ## Recommended Entry Priority

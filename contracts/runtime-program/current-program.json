@@ -11,24 +11,22 @@
   "current_state": {
     "phase_id": "P0",
     "phase_label": "P0 / truth surface and green baseline convergence",
-    "workstream": "credible_green_baseline_repair",
+    "workstream": "p0_durable_closeout",
     "review_closeout": {
-      "status": "failed",
-      "blocker": "green_baseline_not_credible",
-      "root_cause": "truth_freeze_tests_depend_on_ignored_local_state"
+      "status": "passed",
+      "blocker": "none",
+      "root_cause": "none"
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / P0 credible green baseline repair",
+      "label": "redcube-runtime-program / P0 durable closeout",
       "unique": true
     },
     "green_baseline": {
-      "credible": false,
+      "credible": true,
       "clean_clone_required": true,
-      "blocked_by": [
-        "ignored_local_omx_state",
-        "ignored_local_codex_state"
-      ],
+      "blocked_by": [],
+      "reproduction_mode": "tracked_only_verified",
       "required_verification": [
         "git status --short",
         "git diff --check",
@@ -44,7 +42,23 @@
     "next_phase": {
       "p1_allowed": false,
       "phase_2_allowed": false,
-      "only_after": "P0 review-closeout passes with credible clean-clone baseline"
+      "only_after": "Codex App explicitly activates the next baton after the passed P0 closeout is durably committed or explicitly adopted from the ready-to-commit closeout surface"
+    },
+    "next_baton": {
+      "id": "stable_deliverable_manual_test_driven_hardening",
+      "label": "stable deliverable manual-test-driven hardening",
+      "status": "defined_ready_for_manual_test",
+      "activation_owner": "Codex App",
+      "explicit_activation_required": true,
+      "allowed_after": "P0 durable closeout is durably committed or explicitly adopted from the ready-to-commit closeout surface",
+      "scoped_overlays": [
+        "ppt_deck",
+        "xiaohongshu"
+      ],
+      "phase_2_allowed": false,
+      "controller_expansion_allowed": false,
+      "manual_test_package": "contracts/runtime-program/stable-deliverable-manual-test-package.json",
+      "hardening_backlog": "contracts/runtime-program/stable-deliverable-manual-test-hardening-backlog.json"
     }
   },
   "historical_snapshots": {
