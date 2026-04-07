@@ -4,8 +4,6 @@
   <a href="./README.md"><strong>English</strong></a> | <a href="./README.zh-CN.md">中文</a>
 </p>
 
-[![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
-
 <p align="center"><strong>Agent-first Visual Deliverable Gateway</strong></p>
 <p align="center">Slides · Xiaohongshu Notes · Posters</p>
 

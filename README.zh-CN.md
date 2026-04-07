@@ -4,8 +4,6 @@
   <a href="./README.md">English</a> | <a href="./README.zh-CN.md"><strong>中文</strong></a>
 </p>
 
-[![CI](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/gaofeng21cn/redcube-ai/actions/workflows/ci.yml)
-
 <p align="center"><strong>帮助专家把知识稳定做成正式视觉成果</strong></p>
 <p align="center">幻灯片 · 小红书笔记 · 海报</p>
 
