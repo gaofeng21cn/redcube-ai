@@ -14,9 +14,9 @@
 - 当前 active mainline：`redcube-runtime-program`
 - `P0 review-closeout`：`passed`
 - 最新已完成 baton：`stable deliverable manual-test-driven hardening`
-- 当前显式激活的 follow-on baton：`phase 2 activation package freeze for source intake + shared source truth`
-- 当前 baton 状态：`closeout_completed`
-- 当前仍保持：`P1 = closed`、`Phase 2 implementation = closed`
+- 这份 freeze 已作为 predecessor baton 完成 closeout，并以 `3a7fbd6` 吸收到 `main`
+- 它曾冻结 future activation order；当前最小 Phase 2 baseline 已在其基础上进入主线
+- 当前仍保持：`controller` 不扩大、poster academic contract 不进入当前主线、OPL federation 不进入当前主线
 
 ## 目标
 

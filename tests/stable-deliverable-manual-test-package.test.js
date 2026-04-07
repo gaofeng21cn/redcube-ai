@@ -7,6 +7,7 @@ const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json
 const MANUAL_TEST_CONTRACT = 'contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json';
 const HARDENING_BACKLOG = 'contracts/runtime-program/stable-deliverable-hardening-backlog.json';
 const OPERATOR_BRIEF = 'docs/stable_deliverable_manual_test_brief.md';
+const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -16,15 +17,18 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('stable deliverable manual-test contract remains the completed baton behind the current activation-package freeze', () => {
+test('stable deliverable manual-test contract remains the completed foundation baton behind the current Phase 2 baseline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
   const completed = currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening;
 
-  assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
+  assert.equal(currentProgram.current_state.phase_id, 'Phase2');
+  assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
-  assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, false);
+  assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_intake_shared_source_truth_baseline');
+  assert.equal(currentProgram.current_state.active_baton.artifacts.baseline_contract, BASELINE_CONTRACT);
   assert.equal(completed.status, 'closeout_completed');
   assert.equal(completed.review_status, 'passed');
   assert.equal(completed.commit, '96dc6c1');

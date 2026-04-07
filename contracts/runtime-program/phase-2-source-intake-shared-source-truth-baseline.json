@@ -1,0 +1,169 @@
+{
+  "tranche_id": "phase_2_source_intake_shared_source_truth_baseline",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "formal_entry": {
+    "repo_verified": ["MCP", "CLI"],
+    "controller_repo_verified": false
+  },
+  "foundations": {
+    "phase_1_render_ceiling_upgrade": {"status": "completed"},
+    "p0_truth_surface_and_green_baseline_convergence": {
+      "review_closeout": "passed",
+      "green_baseline_credible": true
+    },
+    "stable_deliverable_manual_test_driven_hardening": {
+      "status": "closeout_completed",
+      "commit": "96dc6c1"
+    },
+    "phase_2_activation_package_freeze": {
+      "status": "closeout_completed",
+      "commit": "3a7fbd6"
+    }
+  },
+  "object_boundary": {
+    "in_scope": [
+      "source intake baseline on shared substrate",
+      "shared source truth baseline on shared substrate",
+      "canonical quartet persistence",
+      "CLI and MCP source-intake formal entry surfaces",
+      "legacy import feeding the same canonical intake path",
+      "ppt_deck and xiaohongshu consuming shared source truth",
+      "review, audit, and gate surfaces aligned to hydrated source truth"
+    ],
+    "out_of_scope": [
+      "controller expansion",
+      "new family or overlay expansion",
+      "poster academic contract advancement",
+      "OPL federation integration",
+      "managed web runtime migration",
+      "hidden fallback chains as main behavior",
+      "prompt patch replacing contract hydration"
+    ]
+  },
+  "artifact_schema": {
+    "canonical_artifacts": [
+      {
+        "artifact_id": "source_index",
+        "path": "topics/<topic>/canonical/source-index.json",
+        "required_fields": ["sources", "stage_results"]
+      },
+      {
+        "artifact_id": "extracted_materials",
+        "path": "topics/<topic>/canonical/extracted-materials.json",
+        "required_fields": ["materials"]
+      },
+      {
+        "artifact_id": "source_audit",
+        "path": "topics/<topic>/canonical/source-audit.json",
+        "required_fields": ["status", "blocking_reasons", "completed_stages"]
+      },
+      {
+        "artifact_id": "source_brief",
+        "path": "topics/<topic>/canonical/source-brief.json",
+        "required_fields": ["input_mode", "confidence", "keywords"]
+      }
+    ],
+    "integration_contracts": {
+      "gateway_actions": ["intakeSource", "createDeliverable", "runDeliverableRoute", "auditDeliverable", "runtimeWatch"],
+      "mcp_tools": ["intake_source", "create_deliverable", "run_deliverable_route", "audit_deliverable", "runtime_watch"],
+      "cli_commands": [
+        "redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]",
+        "redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>"
+      ],
+      "consumer_families": {
+        "ppt_deck": ["storyline", "detailed_outline", "slide_blueprint", "visual_direction"],
+        "xiaohongshu": ["research", "storyline", "single_note_plan", "visual_direction"]
+      }
+    }
+  },
+  "gate_surface": {
+    "required_truth": [
+      "formal entry remains MCP / CLI only",
+      "tracked-only green baseline remains credible",
+      "stable family manual-test hardening remains closed out",
+      "source intake and shared source truth stay on the same substrate",
+      "review/export/gate/audit surfaces read hydrated contract and shared source truth"
+    ],
+    "source_readiness_gate": {
+      "authoritative_artifact": "topics/<topic>/canonical/source-audit.json",
+      "pass_condition": "status = pass before downstream family stages depend on shared source truth"
+    },
+    "audit_and_review_surfaces": [
+      "auditDeliverable",
+      "reviewRenderOutput",
+      "runtimeWatch",
+      "visual_director_review",
+      "screenshot_review"
+    ]
+  },
+  "operator_flow": [
+    {"step": 1, "action": "hydrate canonical source truth", "surface": "CLI/MCP source intake", "expected_result": "canonical quartet written under topics/<topic>/canonical"},
+    {"step": 2, "action": "create deliverable on the same substrate", "surface": "gateway -> family -> profile -> pack -> harness execution", "expected_result": "hydrated deliverable contract references shared source truth"},
+    {"step": 3, "action": "run family stages against shared source truth", "surface": "ppt_deck / xiaohongshu route chain", "expected_result": "story and visual stages consume canonical shared source truth"},
+    {"step": 4, "action": "review and audit closeout", "surface": "audit/review/runtime watch surfaces", "expected_result": "review/export/gate/audit surfaces remain aligned to hydrated truth"},
+    {"step": 5, "action": "absorb tranche to main", "surface": "program closeout", "expected_result": "Phase 2 baseline is repo-tracked, verified, and reproducible"}
+  ],
+  "minimal_test_surface": {
+    "truth_freeze_tests": [
+      "tests/runtime-alignment-p0.test.js",
+      "tests/poster-production-hardening-freeze.test.js",
+      "tests/phase-2-source-intake-activation-package-freeze.test.js",
+      "tests/phase-2-source-intake-shared-source-truth-baseline.test.js"
+    ],
+    "baseline_capability_tests": [
+      "tests/source-intake.test.js",
+      "tests/import-legacy-project.test.js",
+      "tests/mcp-gateway.test.js",
+      "tests/ppt-deliverable-e2e.test.js",
+      "tests/xiaohongshu-deliverable-e2e.test.js",
+      "tests/harness-completion-audit.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/source-intake.test.js tests/import-legacy-project.test.js",
+      "npm test"
+    ]
+  },
+  "closeout_evidence": {
+    "repo_tracked_truth_surfaces": [
+      "contracts/runtime-program/current-program.json",
+      "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json",
+      "contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json",
+      "docs/phase_2_source_intake_activation_package_freeze.md",
+      "docs/phase_2_source_intake_shared_source_truth_baseline.md",
+      "README.md",
+      "README.zh-CN.md",
+      "docs/runtime_architecture.md",
+      "docs/domain-harness-os-positioning.md",
+      "docs/policies/runtime_operating_model.md"
+    ],
+    "local_report_surfaces": [
+      ".omx/context/CURRENT_PROGRAM.md",
+      ".omx/reports/redcube-runtime-program/LATEST_STATUS.md",
+      ".omx/reports/redcube-runtime-program/OPEN_ISSUES.md",
+      ".omx/reports/redcube-runtime-program/ITERATION_LOG.md"
+    ],
+    "must_record": [
+      "Phase 2 minimal baseline is now on the mainline",
+      "formal entry remains MCP / CLI",
+      "ppt_deck and xiaohongshu continue to hold their manual-test hardening result",
+      "shared source truth is hydrated canonically and consumed on the same substrate"
+    ],
+    "must_not_claim": [
+      "controller became a formal entry",
+      "RedCube AI became the whole OPL",
+      "poster academic contract entered the active mainline",
+      "hidden fallback chains define the primary behavior model"
+    ]
+  },
+  "closeout": {
+    "executed_at": "2026-04-07",
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "absorbed_to_main": true,
+    "next_tranche_candidate": "phase_2_review_export_gate_audit_hardening"
+  }
+}

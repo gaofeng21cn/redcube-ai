@@ -45,6 +45,13 @@
 - `screenshot_review` 允许代码主导技术质控，但 `visual_director_review` 不能继续长期退化成纯 heuristic gate
 - 当前优先级是先统一生命周期语义与职责边界，再决定是否收敛 route naming
 
+## 当前 Phase 2 最小 baseline
+
+- `source intake` 已通过 `CLI` / `MCP` 成为 `Source Readiness` 的正式 baseline surface
+- canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
+- `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`
+- `Phase 2` 当前只在 minimum baseline scope 激活；更大范围的 review / export / gate / audit hardening 仍是后续 tranche
+
 ## 真相源原则
 
 - 正式运行真相源是 canonical artifact

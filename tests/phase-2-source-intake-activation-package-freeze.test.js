@@ -6,6 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const ACTIVATION_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json';
 const ACTIVATION_BRIEF = 'docs/phase_2_source_intake_activation_package_freeze.md';
+const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
 const DOCS_INDEX = 'docs/README.md';
 const DOCS_INDEX_ZH = 'docs/README.zh-CN.md';
 
@@ -17,11 +18,17 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 activation package freeze stays machine-readable, explicit, and implementation-closed', () => {
+test('phase-2 activation package freeze remains a machine-readable completed predecessor after the baseline reached mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(ACTIVATION_CONTRACT);
+  const completed = currentProgram.current_state.completed_batons.phase_2_activation_package_freeze;
 
-  assert.equal(currentProgram.current_state.next_baton.id, contract.baton_id);
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_intake_shared_source_truth_baseline');
+  assert.equal(currentProgram.current_state.active_baton.artifacts.baseline_contract, BASELINE_CONTRACT);
+  assert.equal(completed.status, 'closeout_completed');
+  assert.equal(completed.review_status, 'passed');
+  assert.equal(completed.commit, '3a7fbd6');
+  assert.equal(completed.artifacts.activation_package_contract, ACTIVATION_CONTRACT);
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.activation.owner, 'Codex App');
@@ -56,21 +63,9 @@ test('phase-2 activation package freeze records activation conditions and canoni
     contract.artifact_schema.canonical_artifacts.some((item) => item.required_fields.includes('confidence')),
     true,
   );
-  assert.deepEqual(contract.artifact_schema.shared_consumption_expectations.ppt_deck, [
-    'storyline',
-    'detailed_outline',
-    'slide_blueprint',
-    'visual_direction',
-  ]);
-  assert.deepEqual(contract.artifact_schema.shared_consumption_expectations.xiaohongshu, [
-    'research',
-    'storyline',
-    'single_note_plan',
-    'visual_direction',
-  ]);
 });
 
-test('phase-2 activation package freeze defines gate surface, operator flow, minimum test surface, and closeout evidence', () => {
+test('phase-2 activation package freeze keeps gate surface, operator flow, minimum test surface, and closeout evidence intact', () => {
   const contract = readJson(ACTIVATION_CONTRACT);
 
   assert.equal(contract.gate_surface.pre_activation_review_gates.includes('formal entry remains MCP / CLI only'), true);
@@ -90,7 +85,7 @@ test('phase-2 activation package freeze defines gate surface, operator flow, min
   assert.equal(contract.closeout_evidence_requirements.must_not_claim.includes('Phase 2 implementation has started'), true);
 });
 
-test('phase-2 activation package brief and docs indexes stay synced to the contract', () => {
+test('phase-2 activation package brief and docs indexes stay synced to the contract after baseline absorption', () => {
   const brief = read(ACTIVATION_BRIEF);
   const docsIndex = read(DOCS_INDEX);
   const docsIndexZh = read(DOCS_INDEX_ZH);
@@ -100,7 +95,7 @@ test('phase-2 activation package brief and docs indexes stay synced to the contr
   assert.equal(brief.includes('如何被显式激活'), true);
   assert.equal(brief.includes('不是 `Phase 2` 实现启动令'), true);
   assert.equal(brief.includes('当前 baton 明确不做'), true);
-  assert.equal(brief.includes('future explicit promotion decision for a dedicated Phase 2 implementation baton'), true);
+  assert.equal(brief.includes('最小 Phase 2 baseline 已在其基础上进入主线'), true);
   assert.equal(docsIndex.includes('phase_2_source_intake_activation_package_freeze.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_source_intake_activation_package_freeze.md'), true);
 });

@@ -61,6 +61,13 @@
 - `external_llm` 仅作为兼容层能力，不是并列主线
 - Domain contract 决定控制面，prompt 仅作为辅助信息
 
+## 4.1 当前 Phase 2 最小 baseline 状态
+
+- `source intake` 已作为 `Source Readiness` 的正式 baseline surface 进入主线
+- canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
+- `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`
+- `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
+
 ## 5. 未来托管 runtime 形态
 
 未来可以迁移到同一 substrate 上的 managed web runtime，前提是：
