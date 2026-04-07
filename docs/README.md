@@ -26,6 +26,7 @@ This index along with the repository home forms the default GitHub-facing biling
 - [Human quickstart](human_quickstart.md)
 - [Deliverable examples](deliverable_examples.md)
 - [Stable deliverable manual test brief](stable_deliverable_manual_test_brief.md)
+- [Phase 2 activation package freeze](phase_2_source_intake_activation_package_freeze.md) (Chinese only)
 
 ### For technical collaborators / agent executors
 

@@ -98,7 +98,8 @@ You can give your agent an instruction like this:
 
 The main unfinished areas are:
 
-- the current hardening baton `stable deliverable manual-test-driven hardening` has completed its initial formal manual-test closeout for `ppt_deck` and `xiaohongshu`, with a tracked stable backlog and no recorded findings
+- `stable deliverable manual-test-driven hardening` has completed closeout for `ppt_deck` and `xiaohongshu`, with a tracked stable backlog and no recorded findings
+- the current explicitly activated follow-on baton is `Phase 2 activation package freeze for source intake + shared source truth`; it freezes activation conditions, canonical artifacts, gate surfaces, operator flow, minimum tests, and closeout evidence while keeping `Phase 2` implementation closed
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
@@ -142,7 +143,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline, and the only explicitly activated next baton is `stable deliverable manual-test-driven hardening` for `ppt_deck` and `xiaohongshu`; `P1` and `Phase 2 / source intake + shared source truth` remain closed.
+- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; and the current explicitly activated follow-on baton is the `Phase 2 activation package freeze for source intake + shared source truth`, which still keeps `P1` and `Phase 2 / source intake + shared source truth` implementation closed.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -150,8 +151,8 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- The current active mainline remains `redcube-runtime-program`: `P0 review-closeout` is now passed with a credible clean-clone baseline, and the only opened post-P0 baton is `stable deliverable manual-test-driven hardening`; it remains explicitly activated by `Codex App`, its first formal manual-test closeout is completed, and it still does not reopen `P1` or `Phase 2 / source intake + shared source truth`.
-- manual-test-driven hardening execution and broader OPL federation are still follow-on work.
+- The current active mainline remains `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is durably closed; and the currently activated follow-on baton is the `Phase 2 activation package freeze for source intake + shared source truth`. That baton defines activation conditions, canonical source artifacts, gate surfaces, operator flow, minimum tests, and closeout evidence, but it still does not open `P1` or `Phase 2 / source intake + shared source truth` implementation.
+- broader source-intake implementation work and OPL federation remain follow-on work after a future explicit promotion decision.
 
 ## Recommended Entry Priority
 

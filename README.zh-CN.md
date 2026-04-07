@@ -98,7 +98,8 @@
 
 当前最主要的待完善项有：
 
-- `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面；当前 `stable deliverable manual-test-driven hardening` 已完成首轮正式手工测试收口，并形成了 tracked stable backlog（当前无新增 findings）
+- `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面；`stable deliverable manual-test-driven hardening` 已完成 closeout，并形成了 tracked stable backlog（当前无新增 findings）
+- 当前被显式激活的 follow-on baton 是 `Phase 2 activation package freeze for source intake + shared source truth`；它只冻结激活条件、canonical artifacts、gate surface、operator flow、最小测试面与 closeout evidence，不打开 `Phase 2` implementation
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
@@ -142,7 +143,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；当前唯一被显式激活的下一棒是面向 `ppt_deck` 与 `xiaohongshu` 的 `stable deliverable manual-test-driven hardening`，`P1` 与 `Phase 2 / source intake + shared source truth` 仍保持关闭。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；当前被显式激活的 follow-on baton 是 `Phase 2 activation package freeze for source intake + shared source truth`，但 `P1` 与 `Phase 2 / source intake + shared source truth` implementation 仍保持关闭。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -150,8 +151,8 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- `P1` 与 `Phase 2 / source intake + shared source truth` 目前都还没有重新开工；当前的 post-P0 下一棒，是只围绕 `ppt_deck` 与 `xiaohongshu` 的 `stable deliverable manual-test-driven hardening`，并且它不属于 `P1`，也不属于 `Phase 2`。
-- 更大范围的运营面收口与 OPL 联动仍属后续工作。
+- `P1` 与 `Phase 2 / source intake + shared source truth` implementation 目前都还没有重新开工；当前被显式激活的是 `Phase 2 activation package freeze for source intake + shared source truth`，它只定义未来如何显式打开实现面，不等于 `Phase 2` 已开始。
+- 更大范围的 source intake implementation、运营面收口与 OPL 联动仍属后续工作。
 
 ## 当前推荐入口
 

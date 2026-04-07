@@ -16,22 +16,21 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('stable deliverable manual-test contract stays explicitly gated behind Codex App activation', () => {
+test('stable deliverable manual-test contract remains the completed baton behind the current activation-package freeze', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
+  const completed = currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening;
 
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, false);
-  assert.equal(currentProgram.current_state.next_baton.id, contract.baton_id);
-  assert.equal(currentProgram.current_state.next_baton.activation.required, true);
-  assert.equal(currentProgram.current_state.next_baton.activation.mode, 'explicit_codex_app_only');
-  assert.equal(currentProgram.current_state.next_baton.activation.activated, true);
-  assert.equal(currentProgram.current_state.next_baton.activation.opens_phase_2, false);
-  assert.equal(currentProgram.current_state.next_baton.status, 'closeout_completed');
-  assert.equal(currentProgram.current_state.next_baton.review_status, 'passed');
-  assert.equal(currentProgram.current_state.next_baton.closeout.suite_result, 'pass');
+  assert.equal(completed.status, 'closeout_completed');
+  assert.equal(completed.review_status, 'passed');
+  assert.equal(completed.commit, '96dc6c1');
+  assert.equal(completed.artifacts.manual_test_contract, MANUAL_TEST_CONTRACT);
+  assert.equal(completed.artifacts.manual_test_brief, OPERATOR_BRIEF);
+  assert.equal(completed.artifacts.hardening_backlog, HARDENING_BACKLOG);
   assert.equal(contract.activation.owner, 'Codex App');
   assert.equal(contract.activation.required, true);
   assert.equal(contract.activation.opens_phase_2, false);
@@ -109,8 +108,7 @@ test('stable deliverable manual-test contract defines ppt_deck and xiaohongshu m
   assert.equal(xhs.fail_criteria.length > 0, true);
 });
 
-test('stable deliverable manual-test brief and backlog surface stay repo-tracked and machine-readable', () => {
-  const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
+test('stable deliverable manual-test brief and backlog surface remain repo-tracked and machine-readable after baton absorption', () => {
   const contract = readJson(MANUAL_TEST_CONTRACT);
   const backlog = readJson(HARDENING_BACKLOG);
   const brief = read(OPERATOR_BRIEF);
@@ -118,9 +116,6 @@ test('stable deliverable manual-test brief and backlog surface stay repo-tracked
   assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(HARDENING_BACKLOG)), true);
   assert.equal(existsSync(path.resolve(OPERATOR_BRIEF)), true);
-  assert.equal(currentProgram.current_state.next_baton.artifacts.manual_test_contract, MANUAL_TEST_CONTRACT);
-  assert.equal(currentProgram.current_state.next_baton.artifacts.manual_test_brief, OPERATOR_BRIEF);
-  assert.equal(currentProgram.current_state.next_baton.artifacts.hardening_backlog, HARDENING_BACKLOG);
   assert.equal(contract.backlog_capture.file, HARDENING_BACKLOG);
   assert.equal(backlog.status, 'manual_test_completed_no_findings');
   assert.deepEqual(backlog.allowed_scope, ['ppt_deck', 'xiaohongshu']);

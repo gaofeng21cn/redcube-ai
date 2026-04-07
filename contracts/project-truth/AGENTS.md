@@ -24,6 +24,7 @@ Read and follow these sources before changing runtime behavior:
 - `contracts/runtime-program/poster-production-hardening-freeze.json`
 - `contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json`
 - `contracts/runtime-program/stable-deliverable-hardening-backlog.json`
+- `contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json`
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 

@@ -184,7 +184,7 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 
 当前 reality：
 
-- shared source plane / source intake code path 已存在，但当前并未打开 `Phase 2`；`P0 review-closeout` 已以可信 clean-clone baseline 通过，当前由 `Codex App` 显式激活的 `stable deliverable manual-test-driven hardening` 已完成首轮正式手工测试 closeout，仅覆盖 `ppt_deck` / `xiaohongshu`，`P1` 与 `Phase 2 / source intake + shared source truth` 仍保持关闭
+- shared source plane / source intake code path 已存在，但当前并未打开 `Phase 2` implementation；`P0 review-closeout` 已以可信 clean-clone baseline 通过；`stable deliverable manual-test-driven hardening` 已完成 closeout；当前由 `Codex App` 显式激活的是 `Phase 2 activation package freeze for source intake + shared source truth`，它只冻结 activation conditions、canonical artifacts、gate surface、operator flow、最小测试面与 closeout evidence，`P1` 与 `Phase 2 / source intake + shared source truth` implementation 仍保持关闭
 - 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
 - `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`

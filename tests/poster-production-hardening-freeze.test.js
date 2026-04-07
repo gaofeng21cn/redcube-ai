@@ -65,16 +65,19 @@ test('poster freeze contract states that future academic poster surface cannot r
   assert.equal(poster.future_academic_poster_constraints.cannot_reuse_formal_mainline_strategy, 'slot_hydration_only');
 });
 
-test('current tracked program truth keeps poster freeze historical while the explicitly activated next baton stays on stable deliverable hardening', () => {
+test('current tracked program truth keeps poster freeze historical while the explicitly activated baton stays on phase-2 activation-package freeze', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'P0');
-  assert.equal(currentProgram.current_state.workstream, 'stable_deliverable_manual_test_driven_hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_intake_shared_source_truth_activation_package_freeze');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
-  assert.deepEqual(currentProgram.current_state.next_baton.scope.deliverables, ['ppt_deck', 'xiaohongshu']);
-  assert.equal(currentProgram.current_state.next_baton.scope.deliverables.includes('poster_onepager'), false);
+  assert.equal(currentProgram.current_state.next_baton.scope.future_phase_label, 'Phase 2 / source intake + shared source truth');
+  assert.equal(currentProgram.current_state.next_baton.scope.freeze_only, true);
+  assert.equal(currentProgram.current_state.next_baton.scope.implementation_in_scope, false);
+  assert.deepEqual(currentProgram.current_state.next_baton.scope.consumer_families_after_activation, ['ppt_deck', 'xiaohongshu']);
+  assert.equal(currentProgram.current_state.next_baton.scope.consumer_families_after_activation.includes('poster_onepager'), false);
   assert.equal(latestP21.historical_snapshot, true);
   assert.equal(latestP21.is_active_mainline, false);
   assert.equal(poster.historical_snapshot, true);

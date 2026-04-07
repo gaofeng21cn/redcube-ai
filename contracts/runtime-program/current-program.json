@@ -11,7 +11,7 @@
   "current_state": {
     "phase_id": "P0",
     "phase_label": "P0 / truth surface and green baseline convergence",
-    "workstream": "stable_deliverable_manual_test_driven_hardening",
+    "workstream": "phase_2_source_intake_shared_source_truth_activation_package_freeze",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -19,7 +19,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / stable deliverable manual-test-driven hardening",
+      "label": "redcube-runtime-program / phase 2 activation package freeze for source intake + shared source truth",
       "unique": true
     },
     "green_baseline": {
@@ -37,43 +37,60 @@
     },
     "team_mode": {
       "default_enabled": false,
-      "enable_after": "next-phase write scopes are frozen"
+      "enable_after": "phase_2 implementation write scopes are frozen"
     },
     "next_phase": {
       "p1_allowed": false,
       "phase_2_allowed": false,
-      "only_after": "P1 and Phase 2 remain closed; only Codex App may explicitly activate a non-Phase-2 next baton after P0 closeout"
+      "only_after": "Phase 2 implementation remains closed; only Codex App may explicitly promote from the activation package freeze to a dedicated implementation baton after activation gates pass"
     },
     "next_baton": {
-      "id": "stable_deliverable_manual_test_driven_hardening",
+      "id": "phase_2_source_intake_shared_source_truth_activation_package_freeze",
       "status": "closeout_completed",
       "review_status": "passed",
       "activation": {
+        "owner": "Codex App",
         "required": true,
         "mode": "explicit_codex_app_only",
         "activated": true,
         "activated_by": "Codex App",
         "opens_p1": false,
-        "opens_phase_2": false
+        "opens_phase_2": false,
+        "opens_phase_2_implementation": false
       },
       "scope": {
-        "deliverables": [
-          "ppt_deck",
-          "xiaohongshu"
-        ],
+        "future_phase_label": "Phase 2 / source intake + shared source truth",
+        "freeze_only": true,
+        "implementation_in_scope": false,
         "formal_entry": [
           "MCP",
           "CLI"
         ],
-        "controller_repo_verified": false
+        "controller_repo_verified": false,
+        "consumer_families_after_activation": [
+          "ppt_deck",
+          "xiaohongshu"
+        ],
+        "future_runtime_planes": [
+          "source_intake",
+          "shared_source_truth"
+        ],
+        "excluded_scope": [
+          "direct source intake runtime build-out",
+          "direct shared source truth implementation build-out",
+          "controller expansion",
+          "new family or overlay expansion",
+          "poster academic contract advancement",
+          "OPL federation integration"
+        ]
       },
       "artifacts": {
-        "manual_test_contract": "contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json",
-        "manual_test_brief": "docs/stable_deliverable_manual_test_brief.md",
-        "hardening_backlog": "contracts/runtime-program/stable-deliverable-hardening-backlog.json"
+        "activation_package_contract": "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json",
+        "activation_package_brief": "docs/phase_2_source_intake_activation_package_freeze.md",
+        "activation_package_test": "tests/phase-2-source-intake-activation-package-freeze.test.js"
       },
       "non_goals": [
-        "Phase 2 / source intake + shared source truth",
+        "direct Phase 2 / source intake + shared source truth implementation",
         "controller expansion",
         "new family or overlay expansion",
         "poster academic contract advancement",
@@ -81,83 +98,44 @@
       ],
       "closeout": {
         "executed_at": "2026-04-07",
-        "formal_entry_exercised": [
-          "CLI"
+        "verification_commands": [
+          "git diff --check",
+          "npm run typecheck",
+          "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/stable-deliverable-manual-test-package.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/source-intake.test.js",
+          "npm test"
         ],
-        "tracked_only_baseline_reconfirmed": true,
         "suite_result": "pass",
         "findings_recorded": 0,
-        "case_summaries": [
-          {
-            "deliverable": "ppt_deck",
-            "profile_id": "lecture_student",
-            "topic_id": "manual-ppt-thyroid-basics",
-            "deliverable_id": "lecture-01",
-            "execution_surface": "CLI",
-            "audit_status": "pass",
-            "routes_completed": [
-              "storyline",
-              "detailed_outline",
-              "slide_blueprint",
-              "visual_direction",
-              "render_html",
-              "visual_director_review",
-              "screenshot_review",
-              "export_pptx"
-            ],
-            "screenshot_review_status": "pass",
-            "export_result": {
-              "status": "pass",
-              "bundle_surfaces": [
-                "source_html",
-                "pptx_file",
-                "pdf_file",
-                "presenter_notes_file",
-                "page_count",
-                "page_count_match",
-                "real_conversion_invocation"
-              ]
-            },
-            "review_state": "completed",
-            "findings_recorded": 0
-          },
-          {
-            "deliverable": "xiaohongshu",
-            "profile_id": "standard_note",
-            "topic_id": "manual-xhs-thyroid-clinic",
-            "deliverable_id": "note-01",
-            "execution_surface": "CLI",
-            "audit_status": "pass",
-            "routes_completed": [
-              "research",
-              "storyline",
-              "single_note_plan",
-              "visual_direction",
-              "render_html",
-              "visual_director_review",
-              "screenshot_review",
-              "publish_copy",
-              "export_bundle"
-            ],
-            "screenshot_review_status": "pass",
-            "export_result": {
-              "status": "pass",
-              "delivery_state": {
-                "current": "output_ready",
-                "next": "published_pending_human"
-              },
-              "bundle_surfaces": [
-                "html_file",
-                "png_files",
-                "caption_file",
-                "publish_manifest_file",
-                "delivery_state"
-              ]
-            },
-            "review_state": "publish_ready",
-            "findings_recorded": 0
-          }
-        ]
+        "implementation_opened": false,
+        "next_stop": "phase_2_implementation_remains_closed_until_future_explicit_promotion"
+      }
+    },
+    "completed_batons": {
+      "stable_deliverable_manual_test_driven_hardening": {
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "commit": "96dc6c1",
+        "scope": {
+          "deliverables": [
+            "ppt_deck",
+            "xiaohongshu"
+          ],
+          "formal_entry": [
+            "MCP",
+            "CLI"
+          ],
+          "controller_repo_verified": false
+        },
+        "artifacts": {
+          "manual_test_contract": "contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json",
+          "manual_test_brief": "docs/stable_deliverable_manual_test_brief.md",
+          "hardening_backlog": "contracts/runtime-program/stable-deliverable-hardening-backlog.json"
+        },
+        "closeout": {
+          "executed_at": "2026-04-07",
+          "suite_result": "pass",
+          "findings_recorded": 0
+        }
       }
     }
   },
@@ -177,7 +155,7 @@
   },
   "current_non_goals": [
     "P1",
-    "Phase 2 / source intake + shared source truth",
+    "Phase 2 / source intake + shared source truth implementation",
     "controller expansion",
     "new family or overlay expansion",
     "poster academic contract advancement",

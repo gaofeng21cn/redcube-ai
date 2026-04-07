@@ -1,0 +1,272 @@
+{
+  "baton_id": "phase_2_source_intake_shared_source_truth_activation_package_freeze",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "activation": {
+    "owner": "Codex App",
+    "required": true,
+    "mode": "explicit_codex_app_only",
+    "activated": true,
+    "activated_by": "Codex App",
+    "opens_p1": false,
+    "opens_phase_2": false,
+    "opens_phase_2_implementation": false
+  },
+  "scope": {
+    "future_phase_label": "Phase 2 / source intake + shared source truth",
+    "freeze_only": true,
+    "implementation_in_scope": false,
+    "formal_entry": [
+      "MCP",
+      "CLI"
+    ],
+    "controller_repo_verified": false,
+    "consumer_families_after_activation": [
+      "ppt_deck",
+      "xiaohongshu"
+    ],
+    "future_runtime_planes": [
+      "source_intake",
+      "shared_source_truth"
+    ],
+    "excluded_scope": [
+      "direct source intake runtime build-out",
+      "direct shared source truth implementation build-out",
+      "controller expansion",
+      "new family or overlay expansion",
+      "poster academic contract advancement",
+      "OPL federation integration"
+    ]
+  },
+  "activation_conditions": {
+    "required_completed_batons": [
+      {
+        "id": "stable_deliverable_manual_test_driven_hardening",
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "artifacts": {
+          "manual_test_contract": "contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json",
+          "manual_test_brief": "docs/stable_deliverable_manual_test_brief.md",
+          "hardening_backlog": "contracts/runtime-program/stable-deliverable-hardening-backlog.json"
+        }
+      }
+    ],
+    "required_program_truth": {
+      "p0_review_closeout": "passed",
+      "green_baseline_credible": true,
+      "active_mainline_unique": true,
+      "formal_entry": [
+        "MCP",
+        "CLI"
+      ],
+      "controller_repo_verified": false
+    },
+    "required_verification": [
+      "git status --short",
+      "git diff --check",
+      "git diff --stat",
+      "npm test",
+      "npm run typecheck"
+    ],
+    "explicit_promotion_required_before_phase_2_implementation": true
+  },
+  "object_boundary": {
+    "in_scope": [
+      "activation conditions",
+      "object boundary",
+      "canonical artifact schema",
+      "gate surface",
+      "operator flow",
+      "minimal test surface",
+      "closeout evidence requirements"
+    ],
+    "out_of_scope": [
+      "source intake runtime implementation",
+      "shared source truth runtime implementation",
+      "Phase 2 route execution changes",
+      "controller implementation",
+      "new family work",
+      "poster academic implementation"
+    ]
+  },
+  "artifact_schema": {
+    "canonical_artifacts": [
+      {
+        "artifact_id": "source_index",
+        "path": "topics/<topic>/canonical/source-index.json",
+        "required_fields": [
+          "sources",
+          "stage_results"
+        ],
+        "purpose": "记录来源文件、来源状态、stage 结果与阻塞原因"
+      },
+      {
+        "artifact_id": "extracted_materials",
+        "path": "topics/<topic>/canonical/extracted-materials.json",
+        "required_fields": [
+          "materials"
+        ],
+        "purpose": "保存可被 family stage 消费的标准化素材"
+      },
+      {
+        "artifact_id": "source_audit",
+        "path": "topics/<topic>/canonical/source-audit.json",
+        "required_fields": [
+          "status",
+          "blocking_reasons",
+          "completed_stages"
+        ],
+        "purpose": "给出 source intake 是否可进入后续 stage 的正式 gate"
+      },
+      {
+        "artifact_id": "source_brief",
+        "path": "topics/<topic>/canonical/source-brief.json",
+        "required_fields": [
+          "input_mode",
+          "confidence",
+          "keywords"
+        ],
+        "purpose": "保存 brief / keyword 起步输入，并显式标记输入置信度"
+      }
+    ],
+    "shared_consumption_expectations": {
+      "ppt_deck": [
+        "storyline",
+        "detailed_outline",
+        "slide_blueprint",
+        "visual_direction"
+      ],
+      "xiaohongshu": [
+        "research",
+        "storyline",
+        "single_note_plan",
+        "visual_direction"
+      ]
+    }
+  },
+  "gate_surface": {
+    "pre_activation_review_gates": [
+      "formal entry remains MCP / CLI only",
+      "P0 review-closeout remains passed",
+      "green baseline remains credible",
+      "stable deliverable manual hardening closeout remains committed",
+      "Phase 2 implementation remains closed until explicit promotion"
+    ],
+    "operator_gates": [
+      {
+        "gate_id": "canonical_artifact_schema_frozen",
+        "surface": "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json",
+        "pass_condition": "four canonical source artifacts and required fields are frozen machine-readably"
+      },
+      {
+        "gate_id": "operator_flow_frozen",
+        "surface": "docs/phase_2_source_intake_activation_package_freeze.md",
+        "pass_condition": "operators can see explicit activation order, gate surfaces, and stop conditions"
+      },
+      {
+        "gate_id": "truth_surface_synced",
+        "surface": "README / runtime docs / current-program / reports / tests",
+        "pass_condition": "repo-tracked truth uses the same activation-package wording and keeps implementation closed"
+      }
+    ],
+    "implementation_opening_gates": [
+      "activation package review_status = passed",
+      "activation package closeout evidence remains reproducible",
+      "current_program.current_state.next_phase.phase_2_allowed remains false until a future explicit promotion happens",
+      "Codex App must explicitly activate a dedicated Phase 2 implementation baton"
+    ]
+  },
+  "operator_flow": [
+    {
+      "step": 1,
+      "action": "confirm current frozen truth",
+      "surface": "contracts/runtime-program/current-program.json",
+      "expected_result": "stable deliverable hardening is completed and Phase 2 implementation is still closed"
+    },
+    {
+      "step": 2,
+      "action": "inspect previous closeout evidence",
+      "surface": "stable deliverable manual-test contract + backlog",
+      "expected_result": "future activation starts from a credible green baseline instead of reopening prior work"
+    },
+    {
+      "step": 3,
+      "action": "review source intake activation package",
+      "surface": "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json",
+      "expected_result": "activation conditions, canonical artifacts, gates, and closeout evidence are frozen"
+    },
+    {
+      "step": 4,
+      "action": "run freeze verification",
+      "surface": "tests/phase-2-source-intake-activation-package-freeze.test.js + existing source-intake/shared-source-truth tests",
+      "expected_result": "package freeze is auditable without opening Phase 2 implementation"
+    },
+    {
+      "step": 5,
+      "action": "future explicit promotion only",
+      "surface": "Codex App explicit activation",
+      "expected_result": "only then may a separate Phase 2 implementation baton open"
+    }
+  ],
+  "minimal_test_surface": {
+    "freeze_tests": [
+      "tests/runtime-alignment-p0.test.js",
+      "tests/poster-production-hardening-freeze.test.js",
+      "tests/stable-deliverable-manual-test-package.test.js",
+      "tests/phase-2-source-intake-activation-package-freeze.test.js"
+    ],
+    "existing_capability_tests_to_hold": [
+      "tests/source-intake.test.js",
+      "tests/ppt-deliverable-e2e.test.js",
+      "tests/xiaohongshu-deliverable-e2e.test.js",
+      "tests/mcp-gateway.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/stable-deliverable-manual-test-package.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/source-intake.test.js",
+      "npm test"
+    ]
+  },
+  "closeout_evidence_requirements": {
+    "report_surfaces": [
+      ".omx/context/CURRENT_PROGRAM.md",
+      ".omx/reports/redcube-runtime-program/LATEST_STATUS.md",
+      ".omx/reports/redcube-runtime-program/OPEN_ISSUES.md",
+      ".omx/reports/redcube-runtime-program/ITERATION_LOG.md"
+    ],
+    "repo_tracked_truth_surfaces": [
+      "README.md",
+      "README.zh-CN.md",
+      "docs/runtime_architecture.md",
+      "docs/phase_2_source_intake_activation_package_freeze.md",
+      "contracts/runtime-program/current-program.json",
+      "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json"
+    ],
+    "must_record": [
+      "activation package stays freeze-only",
+      "Phase 2 implementation remains closed",
+      "formal entry remains MCP / CLI",
+      "future implementation promotion requires explicit Codex App activation"
+    ],
+    "must_not_claim": [
+      "Phase 2 implementation has started",
+      "shared source truth implementation is now open",
+      "controller became a formal entry",
+      "new family or federation scope entered this baton"
+    ]
+  },
+  "closeout": {
+    "executed_at": "2026-04-07",
+    "verification_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/stable-deliverable-manual-test-package.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/source-intake.test.js",
+      "npm test"
+    ],
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "implementation_opened": false,
+    "next_stop": "phase_2_implementation_remains_closed_until_future_explicit_promotion"
+  }
+}
