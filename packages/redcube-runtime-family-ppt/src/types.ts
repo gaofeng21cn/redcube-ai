@@ -43,12 +43,44 @@ export interface PptRuntimeSourceBrief {
   brief_text?: string;
   input_mode?: string;
   confidence?: string;
+  material_ids?: string[];
+}
+
+export interface PptRuntimeSourceReadiness {
+  input_mode?: string;
+  confidence?: string;
+  sufficiency_status?: string;
+  deep_research_state?: string;
+  material_count?: number;
+  material_ids?: string[];
+  audit_status?: string;
+  audit_blocking_reasons?: string[];
+}
+
+export interface PptRuntimeFactLibrary {
+  topic_summary?: string;
+  reference_source_list?: string[];
+  key_fact_groups?: {
+    fact_id?: string;
+    label?: string;
+    source_id?: string;
+  }[];
+  evidence_gaps?: string[];
+}
+
+export interface PptRuntimeSourceReadinessPack {
+  schema_version?: number;
+  topic_id?: string;
+  title?: string;
+  readiness?: PptRuntimeSourceReadiness;
+  fact_library?: PptRuntimeFactLibrary;
 }
 
 export interface PptRuntimeSharedSourceTruth {
   source_index?: PptRuntimeSourceIndex;
   extracted_materials?: PptRuntimeExtractedMaterials;
   source_brief?: PptRuntimeSourceBrief;
+  source_readiness_pack?: PptRuntimeSourceReadinessPack;
 }
 
 export interface PptRuntimeContract extends PptDeckHydratedContract {
@@ -122,6 +154,9 @@ export interface PptStorylineArtifact extends PptRuntimeArtifactBase {
     source_truth_input_mode: string;
     source_truth_confidence: string;
     source_truth_material_ids: string[];
+    source_sufficiency_judgement: string;
+    deep_research_state: string;
+    fact_library_summary: string;
   };
 }
 

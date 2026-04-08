@@ -188,6 +188,10 @@ function sharedSourceTruth(contract) {
   return contract?.shared_source_truth || null;
 }
 
+function sharedSourceReadinessPack(contract) {
+  return sharedSourceTruth(contract)?.source_readiness_pack || null;
+}
+
 function sharedSourceMaterials(contract) {
   return safeArray(sharedSourceTruth(contract)?.extracted_materials?.materials);
 }
@@ -220,6 +224,26 @@ function sharedSourceInputMode(contract) {
 
 function sharedSourceConfidence(contract) {
   return safeText(sharedSourceTruth(contract)?.source_brief?.confidence);
+}
+
+function sharedSourceSufficiencyStatus(contract) {
+  if (!sharedSourceTruth(contract)) return 'augmentation_required';
+  return safeText(sharedSourceReadinessPack(contract)?.readiness?.sufficiency_status, 'augmentation_required');
+}
+
+function sharedSourceDeepResearchState(contract) {
+  if (!sharedSourceTruth(contract)) return 'required';
+  return safeText(sharedSourceReadinessPack(contract)?.readiness?.deep_research_state, 'required');
+}
+
+function sharedFactLibrarySummary(contract) {
+  if (!sharedSourceTruth(contract)) {
+    return safeText(contract.goal) || safeText(contract.title);
+  }
+  return safeText(
+    sharedSourceReadinessPack(contract)?.fact_library?.topic_summary,
+    sharedSourceSnippet(contract, 0) || safeText(contract.goal) || safeText(contract.title),
+  );
 }
 
 function sharedSourceAudience(contract, fallback) {
@@ -374,6 +398,9 @@ function buildStoryline(contract) {
       source_truth_input_mode: sharedSourceInputMode(contract) || 'seed_only',
       source_truth_confidence: sharedSourceConfidence(contract) || 'low',
       source_truth_material_ids: sharedSourceMaterialIds(contract),
+      source_sufficiency_judgement: sharedSourceSufficiencyStatus(contract),
+      deep_research_state: sharedSourceDeepResearchState(contract),
+      fact_library_summary: sharedFactLibrarySummary(contract),
       creative_sources: {
         core_metaphor: hostAgentCreativeSource('outline_major_text', 'prompt_pack_artifact'),
         narrative_arc: hostAgentCreativeSource('outline_major_text', 'prompt_pack_artifact'),

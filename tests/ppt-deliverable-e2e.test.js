@@ -407,6 +407,11 @@ test('ppt_deck storyline/outline/blueprint/visual_direction consume shared sourc
   const briefStoryline = readJson(briefResults[0].artifactFile);
   assert.equal(richStoryline.storyline?.source_truth_input_mode, 'files');
   assert.equal(briefStoryline.storyline?.source_truth_input_mode, 'brief_keywords');
+  assert.equal(richStoryline.storyline?.source_sufficiency_judgement, 'planning_ready');
+  assert.equal(briefStoryline.storyline?.source_sufficiency_judgement, 'augmentation_required');
+  assert.equal(briefStoryline.storyline?.deep_research_state, 'required');
+  assert.equal(typeof briefStoryline.storyline?.fact_library_summary, 'string');
+  assert.equal(briefStoryline.storyline?.fact_library_summary.length > 0, true);
   assert.notEqual(richStoryline.storyline?.core_metaphor, briefStoryline.storyline?.core_metaphor);
 
   const richOutline = readJson(richResults[1].artifactFile);
