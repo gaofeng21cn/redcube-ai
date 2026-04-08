@@ -18,7 +18,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('stable deliverable manual-test contract remains the completed foundation baton behind the current publication projection delivery contract convergence tranche', () => {
+test('stable deliverable manual-test contract remains the completed foundation baton behind the current direct-delivery operator handoff tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
   const completed = currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening;
@@ -28,10 +28,11 @@ test('stable deliverable manual-test contract remains the completed foundation b
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_publication_projection_delivery_contract_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_direct_delivery_operator_handoff_hardening');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, HARDENING_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.commit, '57c9310');
   assert.equal(completed.status, 'closeout_completed');
   assert.equal(completed.review_status, 'passed');
   assert.equal(completed.commit, '96dc6c1');

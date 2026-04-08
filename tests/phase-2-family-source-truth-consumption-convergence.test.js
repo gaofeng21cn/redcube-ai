@@ -16,19 +16,20 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 family source-truth consumption convergence stays absorbed provenance while publication projection delivery contract convergence is the active tranche', () => {
+test('phase-2 family source-truth consumption convergence stays absorbed provenance while direct-delivery operator handoff hardening is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_publication_projection_delivery_contract_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_publication_projection_delivery_contract_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_direct_delivery_operator_handoff_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_direct_delivery_operator_handoff_hardening');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.formal_entry.controller_repo_verified, false);
   assert.deepEqual(contract.formal_entry.repo_verified, ['MCP', 'CLI']);
   assert.equal(contract.foundations.phase_2_review_export_gate_audit_hardening.commit, 'a5b1158');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.commit, '57c9310');
   assert.equal(
     currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.artifacts.tranche_contract,
     TRANCHE_CONTRACT,

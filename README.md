@@ -116,10 +116,11 @@ The main unfinished areas are:
 - current behavior convergence keeps `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` aligned on the same deliverable/topic boundary instead of letting audit and projection drift apart
 - family source-truth consumption convergence now has an absorbed tranche on the same mainline: `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager` now converge around one hydrated `source_truth_contract` plus one shared `source_truth_consumption` summary while the authoritative fail-closed source gate stays in `auditDeliverable` / `runtimeWatch`
 - publication projection / delivery contract convergence now has an absorbed tranche on the same mainline: `delivery_contract` is now hydrated across `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`, while `publication-state.json` aligns topic-level projection entries to hydrated delivery contracts plus canonical review state
+- direct-delivery operator handoff hardening now has an absorbed tranche on the same mainline: `ppt_deck` and guarded `poster_onepager` now expose one machine-readable `operator_handoff` surface while `xiaohongshu` remains explicit human publication
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
-- direct-delivery operator handoff hardening and broader source-plane expansion remain follow-on work on the same mainline
+- broader source-plane expansion remains follow-on work on the same mainline
 - OPL federation integration is still a follow-on step
 
 ## Documentation
@@ -159,7 +160,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening` remains absorbed provenance; `family source-truth consumption convergence` remains absorbed provenance; and the current absorbed tranche tightens topic-level publication projection around hydrated `delivery_contract` plus canonical review state while keeping `xiaohongshu` human publication semantics distinct from `ppt_deck` / `poster_onepager` direct delivery.
+- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening` remains absorbed provenance; `family source-truth consumption convergence` remains absorbed provenance; `publication projection / delivery contract convergence` remains absorbed provenance; and the current absorbed tranche freezes direct-delivery `operator_handoff` semantics across `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` while keeping `xiaohongshu` human publication semantics distinct from `ppt_deck` / `poster_onepager` direct delivery.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -167,8 +168,8 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- the current active tranche is `publication projection / delivery contract convergence`, but the product longrun goal is broader than that one absorbed tranche.
-- direct-delivery operator handoff hardening and further source-plane expansion remain follow-on work on the same mainline.
+- the current active tranche is `direct-delivery operator handoff hardening`, but the product longrun goal is broader than that one absorbed tranche.
+- further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.
 
 ## Recommended Entry Priority

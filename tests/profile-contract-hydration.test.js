@@ -69,6 +69,14 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.delivery_contract.required_export_route, 'export_pptx');
   assert.equal(contract.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, false);
+  assert.equal(contract.delivery_contract.operator_handoff.owner_surface, 'required_export_artifact.delivery_state');
+  assert.equal(contract.delivery_contract.operator_handoff.handoff_ready_state, 'output_ready');
+  assert.deepEqual(
+    contract.delivery_contract.operator_handoff.gate_surfaces,
+    ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection'],
+  );
+  assert.equal(contract.delivery_contract.operator_handoff.reopen_mutation_surface, 'request_changes');
+  assert.equal(contract.delivery_contract.operator_handoff.closeout_mutation_surface, 'promote_baseline');
 });
 
 test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared runtime model', () => {
@@ -99,6 +107,7 @@ test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared
   assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
   assert.equal(contract.delivery_contract.required_export_bundle_id, 'xiaohongshu_standard_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, true);
+  assert.equal(Object.hasOwn(contract.delivery_contract, 'operator_handoff'), false);
 });
 
 test('hydrateDeliverableContract rejects unknown profile_id for a family', () => {
@@ -145,4 +154,8 @@ test('hydrateDeliverableContract resolves poster_onepager knowledge_poster contr
   assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
   assert.equal(contract.delivery_contract.required_export_bundle_id, 'poster_onepager_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, false);
+  assert.equal(contract.delivery_contract.operator_handoff.owner_surface, 'required_export_artifact.delivery_state');
+  assert.equal(contract.delivery_contract.operator_handoff.handoff_ready_state, 'output_ready');
+  assert.equal(contract.delivery_contract.operator_handoff.reopen_mutation_surface, 'request_changes');
+  assert.equal(contract.delivery_contract.operator_handoff.closeout_mutation_surface, 'promote_baseline');
 });

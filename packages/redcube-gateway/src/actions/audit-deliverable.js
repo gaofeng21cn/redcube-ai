@@ -71,7 +71,7 @@ function loadReviewState({ workspaceRoot, topicId, deliverableId }) {
       workspaceRoot,
       topicId,
       deliverableId,
-    }).state;
+    });
   } catch {
     return null;
   }
@@ -197,7 +197,13 @@ function buildSourceReadinessReport(summary) {
   };
 }
 
-function buildGateSummary({ sourceReadinessSummary, reviewState, contract, publicationProjectionEntry }) {
+function buildGateSummary({
+  sourceReadinessSummary,
+  reviewState,
+  contract,
+  publicationProjectionEntry,
+  operatorHandoff,
+}) {
   return {
     source_readiness_status: sourceReadinessSummary?.status || null,
     review_status: String(reviewState?.current_status || '').trim() || null,
@@ -211,6 +217,8 @@ function buildGateSummary({ sourceReadinessSummary, reviewState, contract, publi
     approval_required: Boolean(contract?.delivery_contract?.human_gate?.required),
     delivery_projection_current: String(publicationProjectionEntry?.current || '').trim() || null,
     delivery_projection_next: String(publicationProjectionEntry?.next || '').trim() || null,
+    operator_handoff_status: String(operatorHandoff?.gate_status || '').trim() || null,
+    delivery_state_owner: String(operatorHandoff?.delivery_state_owner || '').trim() || null,
   };
 }
 
@@ -281,9 +289,11 @@ function auditOverlaySurface({
 export async function auditDeliverable(request) {
   const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const contract = loadHydratedContract(request);
-  const reviewState = loadReviewState(request);
+  const reviewResponse = loadReviewState(request);
+  const reviewState = reviewResponse?.state || null;
   const publicationProjection = loadPublicationProjection(request);
   const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
+  const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
@@ -321,7 +331,9 @@ export async function auditDeliverable(request) {
       reviewState,
       contract,
       publicationProjectionEntry,
+      operatorHandoff,
     }),
+    operator_handoff: operatorHandoff,
     delivery_contract: contract?.delivery_contract || null,
   };
 }

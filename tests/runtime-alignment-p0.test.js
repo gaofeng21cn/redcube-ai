@@ -17,6 +17,8 @@ const PHASE_2_FAMILY_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-f
 const PHASE_2_FAMILY_CONVERGENCE_BRIEF = 'docs/phase_2_family_source_truth_consumption_convergence.md';
 const PHASE_2_PUBLICATION_PROJECTION_CONTRACT = 'contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json';
 const PHASE_2_PUBLICATION_PROJECTION_BRIEF = 'docs/phase_2_publication_projection_delivery_contract_convergence.md';
+const PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json';
+const PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF = 'docs/phase_2_direct_delivery_operator_handoff_hardening.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -48,6 +50,7 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   assert.equal(projectTruth.includes(PHASE_2_ACTIVATION_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_BASELINE_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_HARDENING_CONTRACT), true);
+  assert.equal(projectTruth.includes(PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT), true);
   assert.equal(runtimePolicy.includes('当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
 
   for (const file of [
@@ -64,7 +67,7 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   }
 });
 
-test('P0 truth remains passed and credible while Phase 2 publication projection delivery contract convergence is the active mainline tranche', () => {
+test('P0 truth remains passed and credible while Phase 2 direct-delivery operator handoff hardening is the active mainline tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
@@ -86,15 +89,15 @@ test('P0 truth remains passed and credible while Phase 2 publication projection 
   ]);
   assert.deepEqual(currentProgram.durable_surface_contract.audit_and_watch_surfaces, ['auditDeliverable', 'runtimeWatch']);
   assert.deepEqual(currentProgram.durable_surface_contract.review_and_projection_surfaces, ['getReviewState', 'getPublicationProjection']);
-  assert.deepEqual(currentProgram.durable_surface_contract.required_embedded_summaries, ['source_readiness_summary', 'gate_summary']);
+  assert.deepEqual(currentProgram.durable_surface_contract.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff']);
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / publication projection delivery contract convergence');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_publication_projection_delivery_contract_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / direct-delivery operator handoff hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_direct_delivery_operator_handoff_hardening');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.active_mainline.id, 'redcube-runtime-program');
   assert.equal(
     currentProgram.current_state.active_mainline.label,
-    'redcube-runtime-program / phase 2 publication projection delivery contract convergence',
+    'redcube-runtime-program / phase 2 direct-delivery operator handoff hardening',
   );
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
@@ -104,25 +107,26 @@ test('P0 truth remains passed and credible while Phase 2 publication projection 
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_publication_projection_delivery_contract_convergence.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_direct_delivery_operator_handoff_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_publication_projection_delivery_contract_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_direct_delivery_operator_handoff_hardening');
   assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.active_baton.review_status, 'passed');
-  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'publication_projection_delivery_contract_convergence');
+  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'direct_delivery_operator_handoff_hardening');
   assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, true);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.guarded_poster_surface, ['poster_onepager']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['delivery_packaging', 'publication_projection', 'review', 'export', 'gate', 'audit']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_shared_contract_surfaces, ['delivery_contract', 'publication_projection']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['delivery_packaging', 'direct_delivery_operator_handoff', 'review', 'export', 'gate', 'audit']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_shared_contract_surfaces, ['delivery_contract', 'operator_handoff']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.required_audit_surfaces, ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection']);
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_contract,
-    PHASE_2_PUBLICATION_PROJECTION_CONTRACT,
+    PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT,
   );
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_brief,
-    PHASE_2_PUBLICATION_PROJECTION_BRIEF,
+    PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF,
   );
   assert.equal(
     currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening.commit,
@@ -139,6 +143,10 @@ test('P0 truth remains passed and credible while Phase 2 publication projection 
   assert.equal(
     currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit,
     'e894641',
+  );
+  assert.equal(
+    currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.commit,
+    '57c9310',
   );
 });
 
@@ -186,7 +194,7 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 
-test('P0 tracked docs keep source readiness baseline on the mainline while review/export/gate/audit hardening advances on the same mainline', () => {
+test('P0 tracked docs keep source readiness baseline on the mainline while direct-delivery operator handoff advances on the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
@@ -194,6 +202,7 @@ test('P0 tracked docs keep source readiness baseline on the mainline while revie
   const runtimePolicy = read('docs/policies/runtime_operating_model.md');
   const baselineBrief = read(PHASE_2_BASELINE_BRIEF);
   const hardeningBrief = read(PHASE_2_HARDENING_BRIEF);
+  const handoffBrief = read(PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF);
 
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
@@ -202,17 +211,22 @@ test('P0 tracked docs keep source readiness baseline on the mainline while revie
   assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution'), true);
   assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
   assert.equal(readmeZh.includes('review / export / gate / audit hardening` 已在同一主线上吸收一条 tranche') || readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
+  assert.equal(readme.includes('direct-delivery operator handoff hardening now has an absorbed tranche on the same mainline'), true);
+  assert.equal(readmeZh.includes('direct-delivery operator handoff hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
   assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
+  assert.equal(runtimeArchitecture.includes('`operator_handoff`'), true);
   assert.equal(runtimeArchitecture.includes('`program_id`'), true);
   assert.equal(runtimeArchitecture.includes('`run_id`'), true);
   assert.equal(runtimeArchitecture.includes('`getReviewState`、`getPublicationProjection`'), true);
   assert.equal(runtimePolicy.includes('`program_id`'), true);
   assert.equal(runtimePolicy.includes('`run_id`'), true);
+  assert.equal(runtimePolicy.includes('machine-readable `operator_handoff`'), true);
   assert.equal(runtimePolicy.includes('`topics/<topic>/deliverables/<deliverable>/reports/review-state.json`'), true);
   assert.equal(baselineBrief.includes('当前这份文档记录的是已经吸收到主线的最小 baseline'), true);
   assert.equal(hardeningBrief.includes('source_readiness_summary'), true);
+  assert.equal(handoffBrief.includes('operator_handoff.owner_surface'), true);
 });
 
 test('truth-freeze suites do not read ignored local tooling state directly', () => {
@@ -236,6 +250,7 @@ test('truth-freeze suites do not read ignored local tooling state directly', () 
     'tests/phase-2-source-intake-shared-source-truth-baseline.test.js',
     'tests/phase-2-family-source-truth-consumption-convergence.test.js',
     'tests/phase-2-publication-projection-delivery-contract-convergence.test.js',
+    'tests/phase-2-direct-delivery-operator-handoff-hardening.test.js',
   ]) {
     const text = read(file);
     for (const root of forbiddenRoots) {

@@ -49,6 +49,7 @@ export interface ReviewStateResponse {
   quality_summary: Record<string, unknown>;
   state_file: string;
   history_file: string;
+  operator_handoff?: Record<string, unknown> | null;
 }
 
 export interface PublicationProjectionResponse {
@@ -82,6 +83,7 @@ export interface RuntimeWatchResponse {
   publication_projection: Record<string, unknown> | null;
   source_readiness_summary: Record<string, unknown> | null;
   gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
   resumable: boolean;
   profile_id: string | null;
   delivery_contract: Record<string, unknown> | null;

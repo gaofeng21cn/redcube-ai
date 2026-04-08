@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { mkdirSync, existsSync, readFileSync, appendFileSync, writeFileSync, readdirSync } from 'node:fs';
 
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import { getDeliverablePaths, getSourceArtifactPaths } from '@redcube/runtime-protocol';
 
 function loadContractAndPaths({ workspaceRoot, topicId, deliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
@@ -76,6 +76,10 @@ function safeText(value, fallback = '') {
   return text || fallback;
 }
 
+function uniqueList(items) {
+  return [...new Set(normalizeList(items))];
+}
+
 function writeState(file, state) {
   ensureDir(path.dirname(file));
   writeFileSync(file, JSON.stringify(state, null, 2), 'utf-8');
@@ -106,6 +110,55 @@ function loadDeliveryArtifact({ contract, deliverablePaths }) {
   const route = safeText(contract?.delivery_contract?.required_export_route);
   if (!route) return null;
   return safeReadJson(stageArtifactPath(contract, deliverablePaths, route));
+}
+
+function loadSourceReadinessSummary({ workspaceRoot, topicId }) {
+  if (!workspaceRoot || !topicId) {
+    return null;
+  }
+
+  const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
+  if (!existsSync(sourcePaths.sourceAuditFile)) {
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: 'missing',
+      completed_stages: [],
+      blocking_reasons: ['source_audit_missing'],
+      checks: {
+        source_audit_written: false,
+      },
+    };
+  }
+
+  const sourceAudit = safeReadJson(sourcePaths.sourceAuditFile);
+  if (!sourceAudit) {
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: 'invalid',
+      completed_stages: [],
+      blocking_reasons: ['source_audit_invalid'],
+      checks: {
+        source_audit_written: true,
+      },
+    };
+  }
+
+  return {
+    canonical_source: {
+      kind: 'shared_source_truth.source_audit',
+    },
+    authoritative_artifact: sourcePaths.sourceAuditFile,
+    status: safeText(sourceAudit.status, 'unknown'),
+    completed_stages: normalizeList(sourceAudit.completed_stages),
+    blocking_reasons: normalizeList(sourceAudit.blocking_reasons),
+    checks: sourceAudit.checks && typeof sourceAudit.checks === 'object' ? sourceAudit.checks : {},
+  };
 }
 
 function buildQualitySummary(state) {
@@ -245,11 +298,76 @@ function buildProjectionState({ reviewState, contract, deliveryArtifact }) {
   };
 }
 
-function toPublicationProjectionEntry({ reviewState, deliverableId, contract, deliverablePaths }) {
+function buildOperatorHandoffSummary({
+  sourceReadinessSummary,
+  reviewState,
+  contract,
+  publicationProjectionEntry,
+}) {
+  const handoffContract = contract?.delivery_contract?.operator_handoff || null;
+  if (!handoffContract) {
+    return null;
+  }
+
+  const readyState = safeText(
+    handoffContract?.handoff_ready_state,
+    safeText(contract?.delivery_contract?.projection_states?.output_ready, 'output_ready'),
+  );
+  const deliveryStateCurrent = safeText(publicationProjectionEntry?.delivery_state?.current);
+  const projectionCurrent = safeText(publicationProjectionEntry?.current);
+  const blockingReasons = [];
+
+  if (sourceReadinessSummary?.status !== 'pass') {
+    const sourceBlocks = uniqueList(sourceReadinessSummary?.blocking_reasons);
+    blockingReasons.push(...(sourceBlocks.length > 0 ? sourceBlocks : [`source_readiness_${safeText(sourceReadinessSummary?.status, 'unknown')}`]));
+  }
+
+  const reviewBlocks = uniqueList([
+    ...(reviewState?.current_status === 'blocked_for_revision' ? reviewState?.blocking_reasons : []),
+    ...reviewState?.pending_reviews,
+  ]);
+  if (reviewBlocks.length > 0) {
+    blockingReasons.push(...reviewBlocks);
+  }
+
+  if (!reviewState?.ready_for_export) {
+    blockingReasons.push('export_not_ready');
+  }
+
+  if (deliveryStateCurrent !== readyState && projectionCurrent !== readyState) {
+    blockingReasons.push(`handoff_state_not_${readyState}`);
+  }
+
+  return {
+    handoff_kind: 'direct_delivery_operator',
+    gate_status: blockingReasons.length === 0 ? 'ready' : 'blocked',
+    blocking_reasons: uniqueList(blockingReasons),
+    delivery_state_owner: safeText(handoffContract?.owner_surface) || null,
+    required_export_route: safeText(contract?.delivery_contract?.required_export_route) || null,
+    required_export_bundle_id: safeText(contract?.delivery_contract?.required_export_bundle_id) || null,
+    canonical_export_artifact: publicationProjectionEntry?.canonical_export_artifact || null,
+    delivery_state_current: deliveryStateCurrent || null,
+    delivery_state_next: safeText(publicationProjectionEntry?.delivery_state?.next) || null,
+    reopen_mutation_surface: safeText(handoffContract?.reopen_mutation_surface) || null,
+    closeout_mutation_surface: safeText(handoffContract?.closeout_mutation_surface) || null,
+    gate_surfaces: Array.isArray(handoffContract?.gate_surfaces)
+      ? handoffContract.gate_surfaces.map((surface) => safeText(surface)).filter(Boolean)
+      : [],
+    handoff_ready_state: readyState,
+  };
+}
+
+function toPublicationProjectionEntry({
+  reviewState,
+  deliverableId,
+  contract,
+  deliverablePaths,
+  sourceReadinessSummary,
+}) {
   const deliveryContract = contract?.delivery_contract || null;
   const deliveryArtifact = loadDeliveryArtifact({ contract, deliverablePaths });
   const projectionState = buildProjectionState({ reviewState, contract, deliveryArtifact });
-  return {
+  const entry = {
     deliverable_id: deliverableId,
     overlay: safeText(contract?.overlay) || null,
     profile_id: safeText(contract?.profile_id) || null,
@@ -268,6 +386,15 @@ function toPublicationProjectionEntry({ reviewState, deliverableId, contract, de
       : null,
     delivery_state: projectionState.delivery_state,
     updated_at: safeText(reviewState?.last_updated_at) || null,
+  };
+  return {
+    ...entry,
+    operator_handoff: buildOperatorHandoffSummary({
+      sourceReadinessSummary,
+      reviewState,
+      contract,
+      publicationProjectionEntry: entry,
+    }),
   };
 }
 
@@ -294,6 +421,7 @@ export function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
   const deliverablesDir = path.join(topicDir, 'deliverables');
   const projectionFile = path.join(topicDir, 'publication-state.json');
   const entries = {};
+  const sourceReadinessSummary = loadSourceReadinessSummary({ workspaceRoot, topicId });
 
   if (existsSync(deliverablesDir)) {
     for (const item of readdirSync(deliverablesDir, { withFileTypes: true })) {
@@ -313,6 +441,7 @@ export function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
         deliverableId,
         contract,
         deliverablePaths,
+        sourceReadinessSummary,
       });
     }
   }
@@ -346,6 +475,14 @@ export function getReviewState(request) {
   const state = existsSync(file)
     ? JSON.parse(readFileSync(file, 'utf-8'))
     : defaultState({ contract, topicId, deliverableId });
+  const sourceReadinessSummary = loadSourceReadinessSummary({ workspaceRoot, topicId });
+  const publicationProjectionEntry = toPublicationProjectionEntry({
+    reviewState: state,
+    deliverableId,
+    contract,
+    deliverablePaths,
+    sourceReadinessSummary,
+  });
   return {
     ok: true,
     surface_kind: 'review_state',
@@ -357,6 +494,7 @@ export function getReviewState(request) {
     quality_summary: buildQualitySummary(state),
     state_file: file,
     history_file: reviewHistoryFile(deliverablePaths),
+    operator_handoff: publicationProjectionEntry.operator_handoff,
   };
 }
 

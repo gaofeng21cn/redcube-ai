@@ -48,7 +48,7 @@ function loadPublicationProjectionEntry(request) {
 function loadPlatformReviewState(request) {
   if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) return null;
   try {
-    return loadReviewState(request).state;
+    return loadReviewState(request);
   } catch {
     return null;
   }
@@ -172,7 +172,13 @@ function buildSourceReadinessReport(summary) {
   };
 }
 
-function buildGateSummary({ sourceReadinessSummary, reviewState, contract, publicationProjectionEntry }) {
+function buildGateSummary({
+  sourceReadinessSummary,
+  reviewState,
+  contract,
+  publicationProjectionEntry,
+  operatorHandoff,
+}) {
   return {
     source_readiness_status: sourceReadinessSummary?.status || null,
     review_status: String(reviewState?.current_status || '').trim() || null,
@@ -186,6 +192,8 @@ function buildGateSummary({ sourceReadinessSummary, reviewState, contract, publi
     approval_required: Boolean(contract?.delivery_contract?.human_gate?.required),
     delivery_projection_current: String(publicationProjectionEntry?.current || '').trim() || null,
     delivery_projection_next: String(publicationProjectionEntry?.next || '').trim() || null,
+    operator_handoff_status: String(operatorHandoff?.gate_status || '').trim() || null,
+    delivery_state_owner: String(operatorHandoff?.delivery_state_owner || '').trim() || null,
   };
 }
 
@@ -209,9 +217,11 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
 
 export async function auditDeliverable(request) {
   const sourceReadinessSummary = loadSourceReadinessSummary(request);
-  const reviewState = loadPlatformReviewState(request);
+  const reviewResponse = loadPlatformReviewState(request);
+  const reviewState = reviewResponse?.state || null;
   const contract = loadHydratedContract(request);
   const publicationProjectionEntry = loadPublicationProjectionEntry(request);
+  const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
@@ -258,14 +268,16 @@ export async function auditDeliverable(request) {
       reviewState,
       contract,
       publicationProjectionEntry,
+      operatorHandoff,
     }),
+    operator_handoff: operatorHandoff,
   };
 }
 
 export function reviewRenderedDeliverable(request) {
   const contract = loadHydratedContract(request);
   const reviewArtifact = loadReviewArtifact(request, contract);
-  const reviewState = loadPlatformReviewState(request);
+  const reviewState = loadPlatformReviewState(request)?.state || null;
   const suppliedChecks = request?.checks && typeof request.checks === 'object'
     ? request.checks
     : null;
@@ -334,12 +346,14 @@ export function watchRuntimeReviewLoop(request) {
     ? run.pending_reviews.map((item) => String(item).trim()).filter(Boolean)
     : [];
   const contract = loadHydratedContract(request);
-  const reviewState = loadPlatformReviewState(request);
+  const reviewResponse = loadPlatformReviewState(request);
+  const reviewState = reviewResponse?.state || null;
   const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const publicationProjection = request?.workspaceRoot && request?.topicId
     ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
     : null;
   const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
+  const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const relativeQuality = reviewState?.baseline?.relative_quality || null;
 
   return {
@@ -365,7 +379,9 @@ export function watchRuntimeReviewLoop(request) {
       reviewState,
       contract,
       publicationProjectionEntry,
+      operatorHandoff,
     }),
+    operator_handoff: operatorHandoff,
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
     delivery_contract: contract?.delivery_contract || null,

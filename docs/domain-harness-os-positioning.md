@@ -71,7 +71,7 @@
 - `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
 - `review / export / gate / audit` hardening 与 `family source-truth consumption convergence` 均已吸收为前置 provenance；当前 absorbed tranche 则把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state
-- authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；更深层 direct-delivery operator handoff hardening 仍属于同一主线上的持续增强
+- authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；当前 absorbed tranche 已把 direct-delivery `operator_handoff` 收紧到同一 canonical governance path，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 
 ## 5. 未来托管 runtime 形态

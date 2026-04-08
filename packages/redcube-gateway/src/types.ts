@@ -136,6 +136,7 @@ export interface ReviewStateResponse extends SurfaceBase<'review_state'> {
     kind: string;
   };
   quality_summary: Record<string, unknown>;
+  operator_handoff?: Record<string, unknown> | null;
 }
 
 export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
@@ -148,6 +149,7 @@ export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
   publication_projection: Record<string, unknown> | null;
   source_readiness_summary: Record<string, unknown> | null;
   gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
   resumable: boolean;
   profile_id: string | null;
   delivery_contract: Record<string, unknown> | null;
@@ -305,6 +307,7 @@ export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
   publication_projection?: Record<string, unknown> | null;
   source_readiness_summary?: Record<string, unknown> | null;
   gate_summary?: Record<string, unknown> | null;
+  operator_handoff?: Record<string, unknown> | null;
   delivery_contract?: Record<string, unknown> | null;
 }
 

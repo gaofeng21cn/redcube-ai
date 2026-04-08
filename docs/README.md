@@ -34,6 +34,7 @@ This index along with the repository home forms the default GitHub-facing biling
 - [Phase 2 review / export / gate / audit hardening](phase_2_review_export_gate_audit_hardening.md) (Chinese only)
 - [Phase 2 family source-truth consumption convergence](phase_2_family_source_truth_consumption_convergence.md) (Chinese only)
 - [Phase 2 publication projection / delivery contract convergence](phase_2_publication_projection_delivery_contract_convergence.md) (Chinese only)
+- [Phase 2 direct-delivery operator handoff hardening](phase_2_direct_delivery_operator_handoff_hardening.md) (Chinese only)
 
 ### For technical collaborators / agent executors
 
