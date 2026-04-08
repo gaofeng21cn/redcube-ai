@@ -55,6 +55,34 @@ test('intakeSource creates canonical source truth from brief and keywords', asyn
   assert.equal(materials.materials.some((item) => item.kind === 'brief'), true);
 });
 
+test('intakeSource writes canonical source readiness pack for downstream planning', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-pack-'));
+
+  const result = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-pack',
+    title: '甲状腺门诊沟通',
+    brief: '仅有主题和简要说明，需要后续做完整内容交付。',
+    keywords: ['甲状腺', '门诊', '患者沟通'],
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(existsSync(result.artifactFiles.sourceReadinessPackFile), true);
+
+  const pack = readJson(result.artifactFiles.sourceReadinessPackFile);
+  assert.equal(pack.schema_version, 1);
+  assert.equal(pack.topic_id, 'topic-pack');
+  assert.equal(pack.title, '甲状腺门诊沟通');
+  assert.equal(pack.readiness.input_mode, 'brief_keywords');
+  assert.equal(pack.readiness.deep_research_state, 'required');
+  assert.equal(pack.readiness.sufficiency_status, 'augmentation_required');
+  assert.equal(pack.readiness.material_count >= 1, true);
+  assert.equal(Array.isArray(pack.fact_library.reference_source_list), true);
+  assert.equal(Array.isArray(pack.fact_library.evidence_gaps), true);
+  assert.equal(pack.fact_library.reference_source_list.length > 0, true);
+  assert.equal(pack.fact_library.evidence_gaps.includes('public_evidence_missing'), true);
+});
+
 test('intakeSource blocks pdf extraction explicitly when mineru is unavailable', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
   const pdfFile = path.join(workspaceRoot, 'mock.pdf');

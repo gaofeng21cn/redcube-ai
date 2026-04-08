@@ -11,7 +11,8 @@ export function loadSharedSourceTruth(workspaceRoot, topicId) {
   if (!existsSync(paths.sourceIndexFile)
     || !existsSync(paths.extractedMaterialsFile)
     || !existsSync(paths.sourceAuditFile)
-    || !existsSync(paths.sourceBriefFile)) {
+    || !existsSync(paths.sourceBriefFile)
+    || !existsSync(paths.sourceReadinessPackFile)) {
     return null;
   }
 
@@ -21,10 +22,12 @@ export function loadSharedSourceTruth(workspaceRoot, topicId) {
       extracted_materials: paths.extractedMaterialsFile,
       source_audit: paths.sourceAuditFile,
       source_brief: paths.sourceBriefFile,
+      source_readiness_pack: paths.sourceReadinessPackFile,
     },
     source_index: readJson(paths.sourceIndexFile),
     extracted_materials: readJson(paths.extractedMaterialsFile),
     source_audit: readJson(paths.sourceAuditFile),
     source_brief: readJson(paths.sourceBriefFile),
+    source_readiness_pack: readJson(paths.sourceReadinessPackFile),
   };
 }

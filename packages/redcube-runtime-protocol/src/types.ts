@@ -43,6 +43,7 @@ export interface SourceArtifactPaths {
   extractedMaterialsFile: string;
   sourceAuditFile: string;
   sourceBriefFile: string;
+  sourceReadinessPackFile: string;
 }
 
 export interface SourceTruthConsumptionSummary {

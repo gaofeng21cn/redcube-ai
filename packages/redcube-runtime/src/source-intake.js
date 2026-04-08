@@ -12,6 +12,7 @@ import {
   getSourceArtifactPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
+import { buildSourceReadinessPack } from './source-readiness-pack.js';
 
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
@@ -360,10 +361,20 @@ export async function intakeSource({
     },
   };
 
+  const sourceReadinessPack = buildSourceReadinessPack({
+    topicId: sourcePaths.topicPaths.topicId,
+    title: safeText(title) || sourcePaths.topicPaths.topicId,
+    sourceIndex,
+    extractedMaterials,
+    sourceBrief,
+    sourceAudit,
+  });
+
   writeJson(sourcePaths.sourceIndexFile, sourceIndex);
   writeJson(sourcePaths.extractedMaterialsFile, extractedMaterials);
   writeJson(sourcePaths.sourceBriefFile, sourceBrief);
   writeJson(sourcePaths.sourceAuditFile, sourceAudit);
+  writeJson(sourcePaths.sourceReadinessPackFile, sourceReadinessPack);
 
   return {
     ok: auditStatus === 'pass',
@@ -373,6 +384,7 @@ export async function intakeSource({
       extractedMaterialsFile: sourcePaths.extractedMaterialsFile,
       sourceAuditFile: sourcePaths.sourceAuditFile,
       sourceBriefFile: sourcePaths.sourceBriefFile,
+      sourceReadinessPackFile: sourcePaths.sourceReadinessPackFile,
     },
     audit: sourceAudit,
   };
