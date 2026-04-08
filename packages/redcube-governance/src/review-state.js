@@ -28,6 +28,7 @@ function nowIso() {
 }
 
 function defaultState({ contract, topicId, deliverableId }) {
+  const approvalRequired = Boolean(contract?.delivery_contract?.human_gate?.required);
   return {
     schema_version: 1,
     overlay: contract.overlay,
@@ -48,14 +49,14 @@ function defaultState({ contract, topicId, deliverableId }) {
     },
     baseline: null,
     approval_state: {
-      required: contract.overlay === 'xiaohongshu',
-      status: contract.overlay === 'xiaohongshu' ? 'pending_artifacts' : 'not_required',
+      required: approvalRequired,
+      status: approvalRequired ? 'pending_artifacts' : 'not_required',
       requested_at: null,
       approved_at: null,
       approved_by: null,
     },
     publish_state: {
-      current: contract.overlay === 'xiaohongshu' ? 'draft' : 'not_applicable',
+      current: approvalRequired ? 'draft' : 'not_applicable',
       promoted_at: null,
       approved_by: null,
     },
@@ -68,6 +69,11 @@ function defaultState({ contract, topicId, deliverableId }) {
 
 function normalizeList(value) {
   return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : [];
+}
+
+function safeText(value, fallback = '') {
+  const text = String(value || '').trim();
+  return text || fallback;
 }
 
 function writeState(file, state) {
@@ -88,6 +94,20 @@ function safeReadJson(file) {
   }
 }
 
+function stageArtifactPath(contract, deliverablePaths, stageId) {
+  const stage = Array.isArray(contract?.stage_sequence?.stages)
+    ? contract.stage_sequence.stages.find((item) => item?.stage_id === stageId)
+    : null;
+  const artifactName = safeText(stage?.output_artifact, `${stageId}.json`);
+  return path.join(deliverablePaths.artifactsDir, artifactName);
+}
+
+function loadDeliveryArtifact({ contract, deliverablePaths }) {
+  const route = safeText(contract?.delivery_contract?.required_export_route);
+  if (!route) return null;
+  return safeReadJson(stageArtifactPath(contract, deliverablePaths, route));
+}
+
 function buildQualitySummary(state) {
   const relativeQuality = state?.baseline?.relative_quality || null;
   return {
@@ -101,7 +121,7 @@ function buildQualitySummary(state) {
 }
 
 function deriveArtifactGovernanceState({ previous, patch, contract }) {
-  const overlay = String(contract?.overlay || '').trim();
+  const approvalRequired = Boolean(contract?.delivery_contract?.human_gate?.required);
   const baseApproval = previous?.approval_state || defaultState({
     contract,
     topicId: previous?.topic_id || '',
@@ -113,7 +133,7 @@ function deriveArtifactGovernanceState({ previous, patch, contract }) {
     deliverableId: previous?.deliverable_id || '',
   }).publish_state;
 
-  if (overlay !== 'xiaohongshu') {
+  if (!approvalRequired) {
     return {
       approval_state: baseApproval,
       publish_state: basePublish,
@@ -183,23 +203,82 @@ function derivePublishNext(current) {
   return null;
 }
 
-function toPublicationProjectionEntry(reviewState, deliverableId) {
-  const current = String(reviewState?.publish_state?.current || 'draft').trim() || 'draft';
+function toDirectDeliveryNext(current) {
+  if (current === 'draft') return 'export_ready';
+  if (current === 'export_ready') return 'output_ready';
+  return null;
+}
+
+function buildProjectionState({ reviewState, contract, deliveryArtifact }) {
+  const deliveryContract = contract?.delivery_contract || null;
+  const projectionModel = safeText(deliveryContract?.projection_model);
+  const artifactDeliveryState = deliveryArtifact?.export_bundle?.delivery_state || null;
+  if (projectionModel === 'human_publication') {
+    const current = safeText(reviewState?.publish_state?.current, 'draft');
+    return {
+      current,
+      next: derivePublishNext(current),
+      delivery_state: artifactDeliveryState,
+    };
+  }
+
+  if (artifactDeliveryState?.current) {
+    return {
+      current: safeText(artifactDeliveryState.current),
+      next: safeText(artifactDeliveryState.next) || null,
+      delivery_state: artifactDeliveryState,
+    };
+  }
+
+  if (reviewState?.ready_for_export) {
+    return {
+      current: safeText(deliveryContract?.projection_states?.ready_for_export, 'export_ready'),
+      next: safeText(deliveryContract?.projection_states?.output_ready) || null,
+      delivery_state: null,
+    };
+  }
+
+  return {
+    current: 'draft',
+    next: safeText(deliveryContract?.projection_states?.ready_for_export, toDirectDeliveryNext('draft')) || null,
+    delivery_state: null,
+  };
+}
+
+function toPublicationProjectionEntry({ reviewState, deliverableId, contract, deliverablePaths }) {
+  const deliveryContract = contract?.delivery_contract || null;
+  const deliveryArtifact = loadDeliveryArtifact({ contract, deliverablePaths });
+  const projectionState = buildProjectionState({ reviewState, contract, deliveryArtifact });
   return {
     deliverable_id: deliverableId,
-    current,
-    next: derivePublishNext(current),
-    current_status: String(reviewState?.current_status || '').trim() || 'idle',
+    overlay: safeText(contract?.overlay) || null,
+    profile_id: safeText(contract?.profile_id) || null,
+    projection_model: safeText(deliveryContract?.projection_model) || null,
+    current: projectionState.current,
+    next: projectionState.next,
+    current_status: safeText(reviewState?.current_status, 'idle'),
     ready_for_export: Boolean(reviewState?.ready_for_export),
-    approval_status: String(reviewState?.approval_state?.status || '').trim() || 'not_required',
-    updated_at: String(reviewState?.last_updated_at || '').trim() || null,
+    approval_status: safeText(reviewState?.approval_state?.status, 'not_required'),
+    approval_required: Boolean(deliveryContract?.human_gate?.required),
+    latest_review_stage: safeText(reviewState?.latest_review_stage) || null,
+    required_export_route: safeText(deliveryContract?.required_export_route) || null,
+    required_export_bundle_id: safeText(deliveryContract?.required_export_bundle_id) || null,
+    canonical_export_artifact: deliveryContract?.required_export_route
+      ? stageArtifactPath(contract, deliverablePaths, deliveryContract.required_export_route)
+      : null,
+    delivery_state: projectionState.delivery_state,
+    updated_at: safeText(reviewState?.last_updated_at) || null,
   };
 }
 
 function publicationPriority(current) {
-  if (current === 'published') return 4;
-  if (current === 'approved_pending_publish') return 3;
-  if (current === 'approval_pending') return 2;
+  if (current === 'published') return 6;
+  if (current === 'approved_pending_publish') return 5;
+  if (current === 'approval_pending') return 4;
+  if (current === 'output_ready') return 3;
+  if (current === 'completed') return 3;
+  if (current === 'export_ready') return 2;
+  if (current === 'publish_ready') return 2;
   if (current === 'draft') return 1;
   return 0;
 }
@@ -222,17 +301,27 @@ export function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
       const deliverableId = item.name;
       const deliverableDir = path.join(deliverablesDir, deliverableId);
       const deliverable = safeReadJson(path.join(deliverableDir, 'deliverable.json'));
-      if (deliverable?.overlay !== 'xiaohongshu') continue;
-      const reviewState = safeReadJson(path.join(deliverableDir, 'reports', 'review-state.json'));
-      if (!reviewState) continue;
-      entries[deliverableId] = toPublicationProjectionEntry(reviewState, deliverableId);
+      if (!deliverable) continue;
+      const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+      const contractRef = safeText(deliverable?.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
+      const contract = safeReadJson(path.join(deliverableDir, contractRef));
+      if (!contract) continue;
+      const reviewState = safeReadJson(path.join(deliverableDir, 'reports', 'review-state.json'))
+        || defaultState({ contract, topicId, deliverableId });
+      entries[deliverableId] = toPublicationProjectionEntry({
+        reviewState,
+        deliverableId,
+        contract,
+        deliverablePaths,
+      });
     }
   }
 
   const orderedEntries = Object.values(entries).sort(sortPublicationEntries);
   const topEntry = orderedEntries[0] || null;
   writeState(projectionFile, {
-    schema_version: 1,
+    schema_version: 2,
+    projection_kind: 'topic_delivery_projection',
     topic_id: topicId,
     current: topEntry?.current || 'input_ready',
     next: topEntry?.next || null,
@@ -277,7 +366,8 @@ export function getPublicationProjection({ workspaceRoot, topicId }) {
     rebuildTopicPublicationProjection({ workspaceRoot, topicId });
     return safeReadJson(projectionFile);
   })() || {
-    schema_version: 1,
+    schema_version: 2,
+    projection_kind: 'topic_delivery_projection',
     topic_id: topicId,
     current: 'input_ready',
     next: null,
@@ -291,7 +381,7 @@ export function getPublicationProjection({ workspaceRoot, topicId }) {
     projection_file: projectionFile,
     publication,
     canonical_source: {
-      kind: 'review_state.publish_state',
+      kind: 'review_state.delivery_projection',
     },
   };
 }
@@ -338,9 +428,7 @@ export function persistReviewStatePatch({ workspaceRoot, topicId, deliverableId,
     source,
     patch,
   });
-  const publicationStateFile = next.overlay === 'xiaohongshu'
-    ? rebuildTopicPublicationProjection({ workspaceRoot, topicId })
-    : null;
+  const publicationStateFile = rebuildTopicPublicationProjection({ workspaceRoot, topicId });
   return {
     ok: true,
     state: next,

@@ -19,14 +19,15 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 activation package freeze remains a machine-readable completed predecessor after later absorbed tranches advanced the same mainline', () => {
+test('phase-2 activation package freeze remains a machine-readable completed predecessor after publication projection delivery contract convergence advanced the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(ACTIVATION_CONTRACT);
   const completed = currentProgram.current_state.completed_batons.phase_2_activation_package_freeze;
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_family_source_truth_consumption_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_publication_projection_delivery_contract_convergence');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, HARDENING_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
   assert.equal(completed.status, 'closeout_completed');
   assert.equal(completed.review_status, 'passed');
   assert.equal(completed.commit, '3a7fbd6');

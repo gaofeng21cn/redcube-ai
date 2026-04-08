@@ -69,6 +69,7 @@ export type PptDeckSurfaceArtifactPath =
   | 'contracts/layout-rules.json'
   | 'contracts/baseline-policy.json'
   | 'contracts/export-bundle.json'
+  | 'contracts/delivery-contract.json'
   | 'contracts/hydrated-deliverable.json'
   | 'views/display-registry.json';
 export type PptDeckBundleId =
@@ -321,6 +322,24 @@ export interface PptDeckSourceTruthContract {
   required_hydrated_export_surface: 'export_pptx';
 }
 
+export interface PptDeckDeliveryContract {
+  authoritative_projection_surface: 'getPublicationProjection';
+  authoritative_review_surface: 'getReviewState';
+  required_export_route: 'export_pptx';
+  required_export_bundle_id: string;
+  export_artifact_field: 'export_bundle';
+  delivery_state_field: 'export_bundle.delivery_state';
+  projection_model: 'direct_delivery';
+  human_gate: {
+    required: false;
+    mutation_surfaces: ReadonlyArray<string>;
+  };
+  projection_states: {
+    ready_for_export: 'export_ready';
+    output_ready: 'output_ready';
+  };
+}
+
 export interface PptDeckHydrateContractRequest {
   overlay?: PptDeckOverlayId;
   topicId: string;
@@ -349,6 +368,7 @@ export interface PptDeckHydratedContract {
   display_registry: PptDeckDisplayRegistry;
   lifecycle_model: PptDeckLifecycleModel;
   source_truth_contract: PptDeckSourceTruthContract;
+  delivery_contract: PptDeckDeliveryContract;
 }
 
 export interface PptDeckRecordInput {
@@ -408,6 +428,7 @@ export type PptDeckSurfaceArtifactContent =
   | PptDeckLayoutRules
   | PptDeckBaselinePolicy
   | PptDeckExportBundle
+  | PptDeckDeliveryContract
   | PptDeckHydratedContract
   | PptDeckDisplayRegistry
   | PptDeckLifecycleModel;

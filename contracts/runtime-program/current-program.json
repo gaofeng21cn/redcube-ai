@@ -29,8 +29,8 @@
       ]
     },
     "phase_id": "Phase2",
-    "phase_label": "Phase 2 / family source-truth consumption convergence",
-    "workstream": "phase_2_family_source_truth_consumption_convergence",
+    "phase_label": "Phase 2 / publication projection delivery contract convergence",
+    "workstream": "phase_2_publication_projection_delivery_contract_convergence",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -38,7 +38,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / phase 2 family source-truth consumption convergence",
+      "label": "redcube-runtime-program / phase 2 publication projection delivery contract convergence",
       "unique": true
     },
     "green_baseline": {
@@ -79,6 +79,10 @@
         "commit": "24f9f61"
       },
       "phase_2_family_source_truth_consumption_convergence": {
+        "status": "closeout_completed",
+        "commit": "e894641"
+      },
+      "phase_2_publication_projection_delivery_contract_convergence": {
         "status": "closeout_completed"
       }
     },
@@ -92,12 +96,12 @@
       "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
     },
     "active_baton": {
-      "id": "phase_2_family_source_truth_consumption_convergence",
+      "id": "phase_2_publication_projection_delivery_contract_convergence",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "hardening_axis": "family_source_truth_consumption_convergence",
+        "hardening_axis": "publication_projection_delivery_contract_convergence",
         "implementation_in_scope": true,
         "formal_entry": [
           "MCP",
@@ -112,18 +116,16 @@
           "poster_onepager"
         ],
         "runtime_planes": [
-          "shared_source_truth",
-          "story_architecture",
-          "visual_authorship",
           "delivery_packaging",
+          "publication_projection",
           "review",
           "export",
           "gate",
           "audit"
         ],
         "required_shared_contract_surfaces": [
-          "source_truth_contract",
-          "source_truth_consumption"
+          "delivery_contract",
+          "publication_projection"
         ],
         "required_audit_surfaces": [
           "auditDeliverable",
@@ -146,22 +148,22 @@
         ]
       },
       "artifacts": {
-        "tranche_contract": "contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json",
-        "tranche_brief": "docs/phase_2_family_source_truth_consumption_convergence.md",
-        "tranche_test": "tests/phase-2-family-source-truth-consumption-convergence.test.js"
+        "tranche_contract": "contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json",
+        "tranche_brief": "docs/phase_2_publication_projection_delivery_contract_convergence.md",
+        "tranche_test": "tests/phase-2-publication-projection-delivery-contract-convergence.test.js"
       },
       "closeout": {
         "executed_at": "2026-04-08",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/profile-contract-hydration.test.js tests/family-source-truth-consumption.test.js tests/deliverable-review-loop.test.js tests/mcp-gateway.test.js",
+          "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js",
           "npm test"
         ],
         "suite_result": "pass",
         "findings_recorded": 0,
         "absorbed_to_main": true,
-        "next_tranche_candidate": "phase_2_publication_projection_delivery_contract_convergence",
+        "next_tranche_candidate": "phase_2_direct_delivery_operator_handoff_hardening",
         "next_tranche_kind": "ongoing_hardening_axis"
       }
     },
@@ -339,6 +341,81 @@
           "next_tranche_kind": "ongoing_hardening_axis"
         },
         "commit": "a5b1158"
+      },
+      "phase_2_family_source_truth_consumption_convergence": {
+        "id": "phase_2_family_source_truth_consumption_convergence",
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "program_mode": "autonomous_longrun",
+        "scope": {
+          "hardening_axis": "family_source_truth_consumption_convergence",
+          "implementation_in_scope": true,
+          "formal_entry": [
+            "MCP",
+            "CLI"
+          ],
+          "controller_repo_verified": false,
+          "consumer_families": [
+            "ppt_deck",
+            "xiaohongshu"
+          ],
+          "guarded_poster_surface": [
+            "poster_onepager"
+          ],
+          "runtime_planes": [
+            "shared_source_truth",
+            "story_architecture",
+            "visual_authorship",
+            "delivery_packaging",
+            "review",
+            "export",
+            "gate",
+            "audit"
+          ],
+          "required_shared_contract_surfaces": [
+            "source_truth_contract",
+            "source_truth_consumption"
+          ],
+          "required_audit_surfaces": [
+            "auditDeliverable",
+            "runtimeWatch",
+            "getReviewState",
+            "getPublicationProjection"
+          ],
+          "required_export_surfaces": [
+            "export_pptx",
+            "export_bundle"
+          ],
+          "excluded_scope": [
+            "controller expansion",
+            "new family or overlay expansion",
+            "paper_poster or conference_poster academic contract advancement",
+            "OPL federation integration",
+            "managed web runtime migration",
+            "hidden fallback chains as main behavior",
+            "prompt patch replacing contract hydration"
+          ]
+        },
+        "artifacts": {
+          "tranche_contract": "contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json",
+          "tranche_brief": "docs/phase_2_family_source_truth_consumption_convergence.md",
+          "tranche_test": "tests/phase-2-family-source-truth-consumption-convergence.test.js"
+        },
+        "closeout": {
+          "executed_at": "2026-04-08",
+          "verification_commands": [
+            "git diff --check",
+            "npm run typecheck",
+            "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/profile-contract-hydration.test.js tests/family-source-truth-consumption.test.js tests/deliverable-review-loop.test.js tests/mcp-gateway.test.js",
+            "npm test"
+          ],
+          "suite_result": "pass",
+          "findings_recorded": 0,
+          "absorbed_to_main": true,
+          "next_tranche_candidate": "phase_2_publication_projection_delivery_contract_convergence",
+          "next_tranche_kind": "ongoing_hardening_axis"
+        },
+        "commit": "e894641"
       }
     }
   },

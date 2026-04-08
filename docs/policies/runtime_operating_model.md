@@ -78,7 +78,9 @@
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
 - `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - authoritative fail-closed source gate 继续留在 auditDeliverable / runtimeWatch，而 family artifact 需输出统一的 source_truth_consumption summary
-- `review / export / gate / audit hardening` 已在当前主线上吸收为前置 provenance；共享 gate summary 继续围绕 canonical source-audit 与 hydrated export contract 输出
+- `review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance
+- `publication-state.json` 现在必须围绕 hydrated `delivery_contract` 与 canonical `review_state` 输出 topic 级 projection；`xiaohongshu` 保持 explicit human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery semantics
+- 更深层 `direct-delivery operator handoff hardening` 仍属于同一主线上的后续增强，不应被误写成当前已完成的 repo truth
 - 当前 repo-tracked phase 标签仍可保留为 program pointer，但它不等于长线目标本身
 
 ## 真相源原则

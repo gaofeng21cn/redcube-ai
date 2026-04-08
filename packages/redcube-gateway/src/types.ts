@@ -150,6 +150,7 @@ export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
   gate_summary: Record<string, unknown> | null;
   resumable: boolean;
   profile_id: string | null;
+  delivery_contract: Record<string, unknown> | null;
   required_export_bundle: Record<string, unknown> | null;
   run_telemetry: RunTelemetrySummary;
   error_taxonomy: ErrorTaxonomySummary;

@@ -1,0 +1,178 @@
+{
+  "tranche_id": "phase_2_publication_projection_delivery_contract_convergence",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "formal_entry": {
+    "repo_verified": ["MCP", "CLI"],
+    "controller_repo_verified": false
+  },
+  "foundations": {
+    "phase_1_render_ceiling_upgrade": { "status": "completed" },
+    "p0_truth_surface_and_green_baseline_convergence": {
+      "review_closeout": "passed",
+      "green_baseline_credible": true
+    },
+    "stable_deliverable_manual_test_driven_hardening": {
+      "status": "closeout_completed",
+      "commit": "96dc6c1"
+    },
+    "phase_2_activation_package_freeze": {
+      "status": "closeout_completed",
+      "commit": "3a7fbd6"
+    },
+    "phase_2_source_intake_shared_source_truth_baseline": {
+      "status": "closeout_completed",
+      "commit": "a4424d2"
+    },
+    "phase_2_review_export_gate_audit_hardening": {
+      "status": "closeout_completed",
+      "commit": "a5b1158"
+    },
+    "phase_2_family_source_truth_consumption_convergence": {
+      "status": "closeout_completed",
+      "commit": "e894641"
+    }
+  },
+  "object_boundary": {
+    "in_scope": [
+      "ppt_deck, xiaohongshu, and guarded poster_onepager expose one shared delivery_contract surface inside hydrated deliverable contracts",
+      "topic-level publication projection converges direct-delivery families and human-publication families without rewriting controller or academic-poster truth",
+      "publication-state.json remains the canonical topic-level projection artifact, but its entry model must now align to hydrated delivery contracts plus canonical review state",
+      "runtimeWatch and auditDeliverable must surface the same required export route, required export bundle id, and delivery projection state from the hydrated governance path",
+      "xiaohongshu keeps explicit human publication mutations while ppt_deck and poster_onepager stay on direct-delivery semantics"
+    ],
+    "out_of_scope": [
+      "controller expansion",
+      "new family or overlay expansion",
+      "paper_poster or conference_poster academic contract advancement",
+      "OPL federation integration",
+      "managed web runtime migration",
+      "hidden fallback chains as main behavior",
+      "prompt patch replacing contract hydration"
+    ]
+  },
+  "delivery_contract_surface": {
+    "authoritative_projection_surface": "getPublicationProjection",
+    "authoritative_review_surface": "getReviewState",
+    "families": {
+      "ppt_deck": {
+        "required_export_route": "export_pptx",
+        "projection_model": "direct_delivery",
+        "human_gate_required": false
+      },
+      "xiaohongshu": {
+        "required_export_route": "export_bundle",
+        "projection_model": "human_publication",
+        "human_gate_required": true,
+        "mutation_surfaces": ["approve_publish", "promote_publish"]
+      },
+      "poster_onepager": {
+        "required_export_route": "export_bundle",
+        "projection_model": "direct_delivery",
+        "human_gate_required": false,
+        "guarded_profile": "knowledge_poster"
+      }
+    },
+    "required_fields": [
+      "required_export_route",
+      "required_export_bundle_id",
+      "projection_model",
+      "human_gate",
+      "projection_states"
+    ]
+  },
+  "publication_projection_surface": {
+    "projection_file": "topics/<topic>/publication-state.json",
+    "schema_version": 2,
+    "projection_kind": "topic_delivery_projection",
+    "canonical_source": "review_state.delivery_projection",
+    "required_entry_fields": [
+      "deliverable_id",
+      "overlay",
+      "profile_id",
+      "projection_model",
+      "current",
+      "next",
+      "current_status",
+      "ready_for_export",
+      "approval_status",
+      "approval_required",
+      "required_export_route",
+      "required_export_bundle_id",
+      "delivery_state"
+    ]
+  },
+  "governance_alignment": {
+    "required_shared_surfaces": [
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "required_gate_summary_fields": [
+      "required_export_route",
+      "required_export_bundle_id",
+      "approval_required",
+      "delivery_projection_current",
+      "delivery_projection_next"
+    ],
+    "must_keep_honest": [
+      "ppt_deck and poster_onepager do not inherit xiaohongshu human publish semantics",
+      "poster_onepager remains a guarded knowledge-poster surface",
+      "formal entry remains MCP / CLI"
+    ]
+  },
+  "minimal_test_surface": {
+    "truth_freeze_tests": [
+      "tests/runtime-alignment-p0.test.js",
+      "tests/poster-production-hardening-freeze.test.js",
+      "tests/phase-2-family-source-truth-consumption-convergence.test.js",
+      "tests/phase-2-publication-projection-delivery-contract-convergence.test.js"
+    ],
+    "behavior_tests": [
+      "tests/profile-contract-hydration.test.js",
+      "tests/publication-projection-delivery-contract.test.js",
+      "tests/review-platform.test.js",
+      "tests/deliverable-review-loop.test.js",
+      "tests/cli-v2-smoke.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js",
+      "npm test"
+    ]
+  },
+  "closeout_evidence": {
+    "repo_tracked_truth_surfaces": [
+      "contracts/runtime-program/current-program.json",
+      "contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json",
+      "docs/phase_2_publication_projection_delivery_contract_convergence.md",
+      "README.md",
+      "README.zh-CN.md",
+      "docs/runtime_architecture.md",
+      "docs/domain-harness-os-positioning.md",
+      "docs/policies/runtime_operating_model.md"
+    ],
+    "must_record": [
+      "publication projection / delivery contract convergence has an absorbed tranche on the same mainline",
+      "publication-state.json now aligns to hydrated delivery contracts plus canonical review state across ppt_deck, xiaohongshu, and guarded poster_onepager",
+      "runtimeWatch and auditDeliverable surface the same required export route and delivery projection summary",
+      "formal entry remains MCP / CLI"
+    ],
+    "must_not_claim": [
+      "controller became a formal entry",
+      "academic poster contract became active",
+      "managed web runtime migration is now the current repo truth",
+      "RedCube AI became the whole OPL"
+    ]
+  },
+  "closeout": {
+    "executed_at": "2026-04-08",
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "absorbed_to_main": true,
+    "next_tranche_candidate": "phase_2_direct_delivery_operator_handoff_hardening"
+  }
+}

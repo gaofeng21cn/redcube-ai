@@ -198,7 +198,8 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 - `paper_poster / conference_poster` academic poster contract 只保留为后续或历史冻结残留，不构成当前 active mainline
 - `review / export / gate / audit hardening` 已吸收为前置 provenance：`auditDeliverable / runtimeWatch` 已把 canonical source readiness 与 export gate summary 收口为共享治理面
 - `ppt_deck / xiaohongshu / poster_onepager 已围绕同一 source_truth_contract 与 source_truth_consumption summary 收口消费语义`
-- `poster_onepager` 继续保持 guarded knowledge-poster 边界，不借此激活 academic poster contract；更深的 publication projection / delivery contract convergence 仍属于同一主线上的持续增强
+- `publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state；`xiaohongshu` 保持 human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery 语义
+- `poster_onepager` 继续保持 guarded knowledge-poster 边界，不借此激活 academic poster contract；更深的 direct-delivery operator handoff hardening 仍属于同一主线上的持续增强
 
 当前目标态：
 

@@ -39,6 +39,26 @@ const XIAOHONGSHU_SOURCE_TRUTH_CONTRACT = Object.freeze({
   required_hydrated_export_surface: 'export_bundle',
 });
 
+const XIAOHONGSHU_DELIVERY_CONTRACT = Object.freeze({
+  authoritative_projection_surface: 'getPublicationProjection',
+  authoritative_review_surface: 'getReviewState',
+  required_export_route: 'export_bundle',
+  required_export_bundle_id: 'xiaohongshu_standard_bundle',
+  export_artifact_field: 'export_bundle',
+  delivery_state_field: 'export_bundle.delivery_state',
+  projection_model: 'human_publication',
+  human_gate: {
+    required: true,
+    mutation_surfaces: ['approve_publish', 'promote_publish'],
+  },
+  projection_states: {
+    ready_for_export: 'approval_pending',
+    output_ready: 'approval_pending',
+    approved: 'approved_pending_publish',
+    published: 'published',
+  },
+});
+
 const STAGE_SEQUENCE = {
   flow_id: 'xiaohongshu_official_flow',
   stages: [
@@ -294,6 +314,7 @@ export function hydrateXiaohongshuContract({
     display_registry: DISPLAY_REGISTRY,
     lifecycle_model: LIFECYCLE_MODEL,
     source_truth_contract: XIAOHONGSHU_SOURCE_TRUTH_CONTRACT,
+    delivery_contract: XIAOHONGSHU_DELIVERY_CONTRACT,
   };
 }
 

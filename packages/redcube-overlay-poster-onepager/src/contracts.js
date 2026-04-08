@@ -42,6 +42,24 @@ const POSTER_SOURCE_TRUTH_CONTRACT = Object.freeze({
   },
 });
 
+const POSTER_DELIVERY_CONTRACT = Object.freeze({
+  authoritative_projection_surface: 'getPublicationProjection',
+  authoritative_review_surface: 'getReviewState',
+  required_export_route: 'export_bundle',
+  required_export_bundle_id: 'poster_onepager_bundle',
+  export_artifact_field: 'export_bundle',
+  delivery_state_field: 'export_bundle.delivery_state',
+  projection_model: 'direct_delivery',
+  human_gate: {
+    required: false,
+    mutation_surfaces: [],
+  },
+  projection_states: {
+    ready_for_export: 'export_ready',
+    output_ready: 'output_ready',
+  },
+});
+
 const STAGE_SEQUENCE = {
   flow_id: 'poster_onepager_mainline_flow',
   stages: [
@@ -243,6 +261,7 @@ export function hydratePosterOnepagerContract({ topicId, deliverableId, title, g
     display_registry: DISPLAY_REGISTRY,
     lifecycle_model: LIFECYCLE_MODEL,
     source_truth_contract: POSTER_SOURCE_TRUTH_CONTRACT,
+    delivery_contract: POSTER_DELIVERY_CONTRACT,
   };
 }
 

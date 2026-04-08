@@ -415,6 +415,8 @@ test('runtimeWatch exposes export bundle obligations from hydrated contract', as
 
   assert.equal(report.ok, true);
   assert.equal(report.profile_id, 'defense_deck');
+  assert.equal(report.delivery_contract.required_export_route, 'export_pptx');
+  assert.equal(report.delivery_contract.required_export_bundle_id, 'defense_deck_bundle');
   assert.equal(report.required_export_bundle.bundle_id, 'defense_deck_bundle');
   assert.equal(report.required_export_bundle.include_backup_slides, true);
 });
@@ -455,6 +457,7 @@ test('runtimeWatch exposes source readiness summary and gate summary from canoni
   assert.equal(report.source_readiness_summary?.status, 'pass');
   assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_audit');
   assert.equal(report.gate_summary?.source_readiness_status, 'pass');
+  assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
   assert.equal(report.gate_summary?.required_export_bundle_id, 'defense_deck_bundle');
   assert.equal(report.gate_summary?.approval_status, 'not_required');
 });

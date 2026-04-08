@@ -530,7 +530,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
     metrics: python.metrics,
     artifact_refs: [python.review_markdown || reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)].filter(Boolean),
     review_state_patch: {
-      current_status: failedChecks.length === 0 ? 'review_passed' : 'blocked_for_revision',
+      current_status: failedChecks.length === 0 ? 'export_ready' : 'blocked_for_revision',
       ready_for_export: failedChecks.length === 0,
       latest_review_stage: 'screenshot_review',
       latest_checks: checks,
@@ -574,7 +574,7 @@ function buildExportBundle(contract, deliverablePaths) {
     publish_manifest_file: manifestFile,
     delivery_state: {
       current: 'output_ready',
-      next: 'published_pending_human',
+      next: null,
     },
   };
   writeJson(manifestFile, exportBundle);
@@ -584,7 +584,7 @@ function buildExportBundle(contract, deliverablePaths) {
     export_bundle: exportBundle,
     artifact_refs: [manifestFile, exportBundle.source_html, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean),
     review_state_patch: {
-      current_status: 'publish_ready',
+      current_status: 'completed',
       ready_for_export: true,
       latest_review_stage: 'export_bundle',
       latest_checks: {

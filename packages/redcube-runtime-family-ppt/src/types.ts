@@ -210,6 +210,10 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     pptx_file: string;
     pdf_file: string;
     presenter_notes_file: string;
+    delivery_state: {
+      current: 'output_ready';
+      next: null;
+    };
     page_count: number;
     page_count_match: boolean;
     real_conversion_invocation: {

@@ -110,7 +110,7 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
   assert.equal(projection.surface_kind, 'publication_projection');
   assert.equal(projection.state_type, 'projection');
   assert.equal(projection.publication.current, 'approval_pending');
-  assert.equal(projection.canonical_source.kind, 'review_state.publish_state');
+  assert.equal(projection.canonical_source.kind, 'review_state.delivery_projection');
   rmSync(publicationStateFile);
   const rebuiltAfterDelete = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
   assert.equal(rebuiltAfterDelete.publication.current, 'approval_pending');

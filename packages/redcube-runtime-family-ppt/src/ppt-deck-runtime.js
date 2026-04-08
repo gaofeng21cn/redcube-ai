@@ -716,6 +716,10 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
       pptx_file: pptxPath,
       pdf_file: pdfPath,
       presenter_notes_file: notesFile,
+      delivery_state: {
+        current: 'output_ready',
+        next: null,
+      },
       page_count: python.page_count,
       page_count_match: python.page_count === renderArtifact.html_bundle.page_count,
       real_conversion_invocation: {

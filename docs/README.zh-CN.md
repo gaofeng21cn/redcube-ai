@@ -33,6 +33,7 @@
 - [Phase 2 source intake + shared source truth baseline](phase_2_source_intake_shared_source_truth_baseline.md)
 - [Phase 2 review / export / gate / audit hardening](phase_2_review_export_gate_audit_hardening.md)
 - [Phase 2 family source-truth consumption convergence](phase_2_family_source_truth_consumption_convergence.md)
+- [Phase 2 publication projection / delivery contract convergence](phase_2_publication_projection_delivery_contract_convergence.md)
 
 ### 面向技术协作 / Agent 执行者
 

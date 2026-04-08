@@ -7,6 +7,7 @@ export function buildXiaohongshuSurfaceBundle({ contract }) {
     { relativePath: 'contracts/layout-rules.json', content: contract.layout_rules },
     { relativePath: 'contracts/baseline-policy.json', content: contract.baseline_policy },
     { relativePath: 'contracts/export-bundle.json', content: contract.export_bundle },
+    { relativePath: 'contracts/delivery-contract.json', content: contract.delivery_contract },
     { relativePath: 'contracts/hydrated-deliverable.json', content: contract },
     { relativePath: 'views/display-registry.json', content: contract.display_registry },
   ];
@@ -21,6 +22,7 @@ export function listXiaohongshuSurfaceArtifactPaths() {
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
     'contracts/export-bundle.json',
+    'contracts/delivery-contract.json',
     'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
@@ -64,12 +66,20 @@ const SURFACE_VALIDATORS = {
   'contracts/export-bundle.json': (content) =>
     typeof content?.bundle_id === 'string'
     && content?.include_publish_manifest === true,
+  'contracts/delivery-contract.json': (content) =>
+    content?.authoritative_projection_surface === 'getPublicationProjection'
+    && content?.authoritative_review_surface === 'getReviewState'
+    && content?.required_export_route === 'export_bundle'
+    && content?.required_export_bundle_id === 'xiaohongshu_standard_bundle'
+    && content?.projection_model === 'human_publication'
+    && content?.human_gate?.required === true,
   'contracts/hydrated-deliverable.json': (content) =>
     content?.overlay === 'xiaohongshu'
     && Array.isArray(content?.stage_sequence?.stages)
     && typeof content?.prompt_pack?.root === 'string'
     && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
-    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch',
+    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
+    && content?.delivery_contract?.required_export_route === 'export_bundle',
   'views/display-registry.json': (content) =>
     Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'publish_copy')

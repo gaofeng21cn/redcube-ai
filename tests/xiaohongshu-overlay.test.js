@@ -52,6 +52,8 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
   assert.equal(contract.prompt_pack.render_contract.compiler_module ?? null, null);
   assert.equal(contract.prompt_pack.render_contract.compiler_export ?? null, null);
+  assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
+  assert.equal(contract.delivery_contract.human_gate.required, true);
 });
 
 test('buildXiaohongshuDeliverableRecord emits canonical xiaohongshu deliverable metadata', () => {

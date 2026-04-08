@@ -7,6 +7,7 @@ export function buildPosterSurfaceBundle({ contract }) {
     { relativePath: 'contracts/layout-rules.json', content: contract.layout_rules },
     { relativePath: 'contracts/baseline-policy.json', content: contract.baseline_policy },
     { relativePath: 'contracts/export-bundle.json', content: contract.export_bundle },
+    { relativePath: 'contracts/delivery-contract.json', content: contract.delivery_contract },
     { relativePath: 'contracts/hydrated-deliverable.json', content: contract },
     { relativePath: 'views/display-registry.json', content: contract.display_registry },
   ];
@@ -21,6 +22,7 @@ export function listPosterSurfaceArtifactPaths() {
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
     'contracts/export-bundle.json',
+    'contracts/delivery-contract.json',
     'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
@@ -47,10 +49,17 @@ const SURFACE_VALIDATORS = {
     && content?.modes?.optimize_existing?.baseline_required === true,
   'contracts/export-bundle.json': (content) => content?.bundle_id === 'poster_onepager_bundle'
     && content?.include_html === true,
+  'contracts/delivery-contract.json': (content) => content?.authoritative_projection_surface === 'getPublicationProjection'
+    && content?.authoritative_review_surface === 'getReviewState'
+    && content?.required_export_route === 'export_bundle'
+    && content?.required_export_bundle_id === 'poster_onepager_bundle'
+    && content?.projection_model === 'direct_delivery'
+    && content?.human_gate?.required === false,
   'contracts/hydrated-deliverable.json': (content) => content?.overlay === 'poster_onepager'
     && content?.prompt_pack?.pack_id === 'poster_onepager_mainline_v1'
     && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
-    && content?.source_truth_contract?.poster_guarded_boundary?.academic_contract_active === false,
+    && content?.source_truth_contract?.poster_guarded_boundary?.academic_contract_active === false
+    && content?.delivery_contract?.required_export_route === 'export_bundle',
   'views/display-registry.json': (content) => Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'poster_blueprint')
     && content.surfaces.some((surface) => surface?.id === 'visual_director_review')

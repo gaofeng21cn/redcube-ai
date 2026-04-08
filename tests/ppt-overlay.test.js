@@ -88,6 +88,8 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   );
   assert.equal(lectureStudent.layout_rules.density_mode, 'teaching_spread');
   assert.equal(lectureStudent.export_bundle.bundle_id, 'lecture_student_bundle');
+  assert.equal(lectureStudent.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
+  assert.equal(lectureStudent.delivery_contract.required_export_route, 'export_pptx');
 
   assert.equal(
     executiveBriefing.review_surface.required_checks.includes('decision_implication_clear'),
@@ -95,6 +97,7 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   );
   assert.equal(executiveBriefing.layout_rules.max_primary_points_per_slide, 3);
   assert.equal(executiveBriefing.export_bundle.include_presenter_notes, false);
+  assert.equal(executiveBriefing.delivery_contract.required_export_bundle_id, 'executive_briefing_bundle');
 });
 
 test('evaluateStoryboardGate blocks empty slide list', () => {

@@ -50,6 +50,10 @@ export function buildDeckSurfaceBundle({ contract }) {
       content: contract.export_bundle,
     },
     {
+      relativePath: 'contracts/delivery-contract.json',
+      content: contract.delivery_contract,
+    },
+    {
       relativePath: 'contracts/hydrated-deliverable.json',
       content: contract,
     },
@@ -69,6 +73,7 @@ export function listDeckSurfaceArtifactPaths() {
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
     'contracts/export-bundle.json',
+    'contracts/delivery-contract.json',
     'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
@@ -123,6 +128,14 @@ const SURFACE_VALIDATORS = {
     typeof content?.bundle_id === 'string'
     && content.bundle_id.length > 0
     && typeof content?.include_pptx === 'boolean',
+  'contracts/delivery-contract.json': (content) =>
+    content?.authoritative_projection_surface === 'getPublicationProjection'
+    && content?.authoritative_review_surface === 'getReviewState'
+    && content?.required_export_route === 'export_pptx'
+    && typeof content?.required_export_bundle_id === 'string'
+    && content.required_export_bundle_id.length > 0
+    && content?.projection_model === 'direct_delivery'
+    && content?.human_gate?.required === false,
   'contracts/hydrated-deliverable.json': (content) =>
     typeof content?.profile_id === 'string'
     && content.profile_id.length > 0
@@ -131,7 +144,8 @@ const SURFACE_VALIDATORS = {
     && content.stage_sequence.stages.some((stage) => stage?.stage_id === 'visual_director_review')
     && typeof content?.export_bundle?.bundle_id === 'string'
     && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
-    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch',
+    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
+    && content?.delivery_contract?.required_export_route === 'export_pptx',
   'views/display-registry.json': (content) =>
     Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'source_index')

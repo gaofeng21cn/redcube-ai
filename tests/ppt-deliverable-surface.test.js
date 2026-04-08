@@ -49,6 +49,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
     'contracts/layout-rules.json',
     'contracts/baseline-policy.json',
     'contracts/export-bundle.json',
+    'contracts/delivery-contract.json',
     'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
@@ -104,6 +105,8 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
     hydratedContract.review_surface.required_checks.includes('term_explained_on_first_use'),
     true,
   );
+  assert.equal(hydratedContract.delivery_contract.required_export_route, 'export_pptx');
+  assert.equal(hydratedContract.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
 });
 
 test('auditDeliverable blocks when hydrated ppt deck surface is missing', async () => {
@@ -185,6 +188,11 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
   assert.deepEqual(report.issues, []);
   assert.equal(report.rerun_from_stage, null);
   assert.equal(report.recommended_action, 'continue');
+  assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
+  assert.equal(report.gate_summary?.required_export_bundle_id, 'lecture_student_bundle');
+  assert.equal(report.gate_summary?.approval_required, false);
+  assert.equal(report.gate_summary?.delivery_projection_current, null);
+  assert.equal(report.gate_summary?.delivery_projection_next, null);
 });
 
 test('auditDeliverable blocks when hydrated ppt deck surface content is invalid', async () => {

@@ -16,13 +16,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 review/export/gate/audit hardening stays absorbed provenance while family source-truth consumption convergence is the active tranche', () => {
+test('phase-2 review/export/gate/audit hardening stays absorbed provenance while publication projection delivery contract convergence is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(HARDENING_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_family_source_truth_consumption_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_family_source_truth_consumption_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_publication_projection_delivery_contract_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_publication_projection_delivery_contract_convergence');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -75,7 +75,10 @@ test('phase-2 review/export/gate/audit hardening brief and public docs keep the 
   assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('review / export / gate / audit hardening` 已吸收为前置 provenance'), true);
-  assert.equal(policy.includes('review / export / gate / audit hardening` 已在当前主线上吸收为前置 provenance'), true);
+  assert.equal(
+    policy.includes('review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance'),
+    true,
+  );
   assert.equal(docsIndex.includes('phase_2_review_export_gate_audit_hardening.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_review_export_gate_audit_hardening.md'), true);
 });

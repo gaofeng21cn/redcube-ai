@@ -89,6 +89,7 @@ export type XiaohongshuSurfaceArtifactPath =
   | 'contracts/layout-rules.json'
   | 'contracts/baseline-policy.json'
   | 'contracts/export-bundle.json'
+  | 'contracts/delivery-contract.json'
   | 'contracts/hydrated-deliverable.json'
   | 'views/display-registry.json';
 
@@ -294,6 +295,26 @@ export interface XiaohongshuSourceTruthContract {
   required_hydrated_export_surface: 'export_bundle';
 }
 
+export interface XiaohongshuDeliveryContract {
+  authoritative_projection_surface: 'getPublicationProjection';
+  authoritative_review_surface: 'getReviewState';
+  required_export_route: 'export_bundle';
+  required_export_bundle_id: 'xiaohongshu_standard_bundle';
+  export_artifact_field: 'export_bundle';
+  delivery_state_field: 'export_bundle.delivery_state';
+  projection_model: 'human_publication';
+  human_gate: {
+    required: true;
+    mutation_surfaces: ReadonlyArray<'approve_publish' | 'promote_publish'>;
+  };
+  projection_states: {
+    ready_for_export: 'approval_pending';
+    output_ready: 'approval_pending';
+    approved: 'approved_pending_publish';
+    published: 'published';
+  };
+}
+
 export interface XiaohongshuHydrateContractRequest {
   topicId: string;
   deliverableId: string;
@@ -321,6 +342,7 @@ export interface XiaohongshuHydratedContract {
   display_registry: XiaohongshuDisplayRegistry;
   lifecycle_model: XiaohongshuLifecycleModel;
   source_truth_contract: XiaohongshuSourceTruthContract;
+  delivery_contract: XiaohongshuDeliveryContract;
 }
 
 export interface XiaohongshuDeliverableRecordInput {
@@ -372,6 +394,7 @@ export type XiaohongshuSurfaceArtifactContent =
   | XiaohongshuLayoutRules
   | XiaohongshuBaselinePolicy
   | XiaohongshuExportBundle
+  | XiaohongshuDeliveryContract
   | XiaohongshuHydratedContract
   | XiaohongshuDisplayRegistry;
 

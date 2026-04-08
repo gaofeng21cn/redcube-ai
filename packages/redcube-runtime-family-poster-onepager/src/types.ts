@@ -177,7 +177,7 @@ export interface PosterExportBundleArtifact extends PosterRuntimeArtifactBase {
     publish_manifest_file: string;
     delivery_state: {
       current: 'output_ready';
-      next: 'published_pending_human';
+      next: null;
     };
   };
   artifact_refs: string[];

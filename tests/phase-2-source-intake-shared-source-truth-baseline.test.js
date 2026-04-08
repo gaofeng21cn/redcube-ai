@@ -15,14 +15,15 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 minimum baseline contract remains absorbed provenance behind the current family source-truth consumption convergence tranche', () => {
+test('phase-2 minimum baseline contract remains absorbed provenance behind the current publication projection delivery contract convergence tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(BASELINE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_family_source_truth_consumption_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_publication_projection_delivery_contract_convergence');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -77,7 +78,7 @@ test('phase-2 minimum baseline brief and docs indexes expose the baseline as abs
   assert.equal(brief.includes('formal entry：仍只有 `MCP / CLI`'), true);
   assert.equal(brief.includes('它已经不是 activation-package freeze'), true);
   assert.equal(brief.includes('但也不是“整个 Phase 2 都已完成”'), true);
-  assert.equal(brief.includes('当前 active tranche：`Phase 2 review / export / gate / audit hardening`'), true);
+  assert.equal(brief.includes('当前 active tranche：`Phase 2 publication projection / delivery contract convergence`'), true);
   assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
   assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);

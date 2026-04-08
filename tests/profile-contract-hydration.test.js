@@ -66,6 +66,9 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.prompt_pack.render_contract.recipe_registry.default, 'ppt.compare_zones');
   assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
   assert.equal(contract.source_truth_contract.route_to_consumption_role.visual_direction, 'visual_authorship');
+  assert.equal(contract.delivery_contract.required_export_route, 'export_pptx');
+  assert.equal(contract.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
+  assert.equal(contract.delivery_contract.human_gate.required, false);
 });
 
 test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared runtime model', () => {
@@ -93,6 +96,9 @@ test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
   assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
   assert.equal(contract.source_truth_contract.route_to_consumption_role.research, 'source_readiness');
+  assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
+  assert.equal(contract.delivery_contract.required_export_bundle_id, 'xiaohongshu_standard_bundle');
+  assert.equal(contract.delivery_contract.human_gate.required, true);
 });
 
 test('hydrateDeliverableContract rejects unknown profile_id for a family', () => {
@@ -136,4 +142,7 @@ test('hydrateDeliverableContract resolves poster_onepager knowledge_poster contr
   assert.equal(contract.export_bundle.bundle_id, 'poster_onepager_bundle');
   assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
   assert.equal(contract.source_truth_contract.poster_guarded_boundary.academic_contract_active, false);
+  assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
+  assert.equal(contract.delivery_contract.required_export_bundle_id, 'poster_onepager_bundle');
+  assert.equal(contract.delivery_contract.human_gate.required, false);
 });

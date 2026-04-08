@@ -632,7 +632,7 @@ test('CLI review projection proxies topic publication projection read path', asy
   assert.equal(projection.surface_kind, 'publication_projection');
   assert.equal(projection.state_type, 'projection');
   assert.equal(projection.publication.current, 'approval_pending');
-  assert.equal(projection.canonical_source.kind, 'review_state.publish_state');
+  assert.equal(projection.canonical_source.kind, 'review_state.delivery_projection');
 });
 
 test('CLI review watch returns operator-facing runtime watch surface for a persisted run', () => {

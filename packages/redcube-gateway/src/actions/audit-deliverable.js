@@ -2,7 +2,12 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
-import { auditDeliverableRequest, getReviewState as getRuntimeReviewState, isBaselineApprovedState } from '@redcube/runtime';
+import {
+  auditDeliverableRequest,
+  getPublicationProjection as getRuntimePublicationProjection,
+  getReviewState as getRuntimeReviewState,
+  isBaselineApprovedState,
+} from '@redcube/runtime';
 import { getDeliverablePaths, getSourceArtifactPaths } from '@redcube/runtime-protocol';
 
 function mergeAuditReports(reports) {
@@ -67,6 +72,22 @@ function loadReviewState({ workspaceRoot, topicId, deliverableId }) {
       topicId,
       deliverableId,
     }).state;
+  } catch {
+    return null;
+  }
+}
+
+function loadPublicationProjectionEntry({ workspaceRoot, topicId, deliverableId }) {
+  if (!workspaceRoot || !topicId || !deliverableId) {
+    return null;
+  }
+
+  try {
+    const publicationProjection = getRuntimePublicationProjection({
+      workspaceRoot,
+      topicId,
+    });
+    return publicationProjection?.deliverables?.[deliverableId] || null;
   } catch {
     return null;
   }
@@ -161,14 +182,20 @@ function buildSourceReadinessReport(summary) {
   };
 }
 
-function buildGateSummary({ sourceReadinessSummary, reviewState, contract }) {
+function buildGateSummary({ sourceReadinessSummary, reviewState, contract, publicationProjectionEntry }) {
   return {
     source_readiness_status: sourceReadinessSummary?.status || null,
     review_status: String(reviewState?.current_status || '').trim() || null,
     approval_status: String(reviewState?.approval_state?.status || '').trim() || null,
     latest_review_stage: String(reviewState?.latest_review_stage || '').trim() || null,
     export_status: reviewState ? (reviewState.ready_for_export ? 'ready' : 'not_ready') : null,
-    required_export_bundle_id: String(contract?.export_bundle?.bundle_id || '').trim() || null,
+    required_export_route: String(contract?.delivery_contract?.required_export_route || '').trim() || null,
+    required_export_bundle_id: String(
+      contract?.delivery_contract?.required_export_bundle_id || contract?.export_bundle?.bundle_id || '',
+    ).trim() || null,
+    approval_required: Boolean(contract?.delivery_contract?.human_gate?.required),
+    delivery_projection_current: String(publicationProjectionEntry?.current || '').trim() || null,
+    delivery_projection_next: String(publicationProjectionEntry?.next || '').trim() || null,
   };
 }
 
@@ -240,6 +267,7 @@ export async function auditDeliverable(request) {
   const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const contract = loadHydratedContract(request);
   const reviewState = loadReviewState(request);
+  const publicationProjectionEntry = loadPublicationProjectionEntry(request);
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
@@ -274,6 +302,7 @@ export async function auditDeliverable(request) {
       sourceReadinessSummary,
       reviewState,
       contract,
+      publicationProjectionEntry,
     }),
   };
 }

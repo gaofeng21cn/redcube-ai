@@ -43,6 +43,7 @@ export type PosterSurfaceArtifactPath =
   | 'contracts/layout-rules.json'
   | 'contracts/baseline-policy.json'
   | 'contracts/export-bundle.json'
+  | 'contracts/delivery-contract.json'
   | 'contracts/hydrated-deliverable.json'
   | 'views/display-registry.json';
 
@@ -180,6 +181,24 @@ export interface PosterOnepagerSourceTruthContract {
   };
 }
 
+export interface PosterOnepagerDeliveryContract {
+  authoritative_projection_surface: 'getPublicationProjection';
+  authoritative_review_surface: 'getReviewState';
+  required_export_route: 'export_bundle';
+  required_export_bundle_id: 'poster_onepager_bundle';
+  export_artifact_field: 'export_bundle';
+  delivery_state_field: 'export_bundle.delivery_state';
+  projection_model: 'direct_delivery';
+  human_gate: {
+    required: false;
+    mutation_surfaces: ReadonlyArray<string>;
+  };
+  projection_states: {
+    ready_for_export: 'export_ready';
+    output_ready: 'output_ready';
+  };
+}
+
 export interface PosterOnepagerHydrateContractRequest {
   topicId: string;
   deliverableId: string;
@@ -213,6 +232,7 @@ export interface PosterOnepagerHydratedContract {
   display_registry: PosterOnepagerDisplayRegistry;
   lifecycle_model: PosterOnepagerLifecycleModel;
   source_truth_contract: PosterOnepagerSourceTruthContract;
+  delivery_contract: PosterOnepagerDeliveryContract;
 }
 
 export interface PosterOnepagerDeliverableRecordInput {
@@ -261,6 +281,7 @@ export type PosterSurfaceArtifactContent =
   | PosterOnepagerReviewSurface
   | PosterOnepagerLayoutRules
   | PosterOnepagerBaselinePolicy
+  | PosterOnepagerDeliveryContract
   | PosterOnepagerHydratedContract
   | PosterOnepagerDisplayRegistry
   | {

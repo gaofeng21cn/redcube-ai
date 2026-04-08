@@ -31,6 +31,19 @@ function normalizeList(value) {
   return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : [];
 }
 
+function loadPublicationProjectionEntry(request) {
+  if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) return null;
+  try {
+    const projection = loadPublicationProjection({
+      workspaceRoot: request.workspaceRoot,
+      topicId: request.topicId,
+    }).publication;
+    return projection?.deliverables?.[request.deliverableId] || null;
+  } catch {
+    return null;
+  }
+}
+
 
 function loadPlatformReviewState(request) {
   if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) return null;
@@ -159,14 +172,20 @@ function buildSourceReadinessReport(summary) {
   };
 }
 
-function buildGateSummary({ sourceReadinessSummary, reviewState, contract }) {
+function buildGateSummary({ sourceReadinessSummary, reviewState, contract, publicationProjectionEntry }) {
   return {
     source_readiness_status: sourceReadinessSummary?.status || null,
     review_status: String(reviewState?.current_status || '').trim() || null,
     approval_status: String(reviewState?.approval_state?.status || '').trim() || null,
     latest_review_stage: String(reviewState?.latest_review_stage || '').trim() || null,
     export_status: reviewState ? (reviewState.ready_for_export ? 'ready' : 'not_ready') : null,
-    required_export_bundle_id: String(contract?.export_bundle?.bundle_id || '').trim() || null,
+    required_export_route: String(contract?.delivery_contract?.required_export_route || '').trim() || null,
+    required_export_bundle_id: String(
+      contract?.delivery_contract?.required_export_bundle_id || contract?.export_bundle?.bundle_id || '',
+    ).trim() || null,
+    approval_required: Boolean(contract?.delivery_contract?.human_gate?.required),
+    delivery_projection_current: String(publicationProjectionEntry?.current || '').trim() || null,
+    delivery_projection_next: String(publicationProjectionEntry?.next || '').trim() || null,
   };
 }
 
@@ -192,6 +211,7 @@ export async function auditDeliverable(request) {
   const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const reviewState = loadPlatformReviewState(request);
   const contract = loadHydratedContract(request);
+  const publicationProjectionEntry = loadPublicationProjectionEntry(request);
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
@@ -237,6 +257,7 @@ export async function auditDeliverable(request) {
       sourceReadinessSummary,
       reviewState,
       contract,
+      publicationProjectionEntry,
     }),
   };
 }
@@ -318,6 +339,7 @@ export function watchRuntimeReviewLoop(request) {
   const publicationProjection = request?.workspaceRoot && request?.topicId
     ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
     : null;
+  const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
   const relativeQuality = reviewState?.baseline?.relative_quality || null;
 
   return {
@@ -342,9 +364,11 @@ export function watchRuntimeReviewLoop(request) {
       sourceReadinessSummary,
       reviewState,
       contract,
+      publicationProjectionEntry,
     }),
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
+    delivery_contract: contract?.delivery_contract || null,
     required_export_bundle: contract?.export_bundle || null,
   };
 }

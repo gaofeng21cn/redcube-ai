@@ -39,6 +39,23 @@ const PPT_SOURCE_TRUTH_CONTRACT = Object.freeze({
   required_hydrated_export_surface: 'export_pptx',
 });
 
+const PPT_DELIVERY_CONTRACT_BASE = Object.freeze({
+  authoritative_projection_surface: 'getPublicationProjection',
+  authoritative_review_surface: 'getReviewState',
+  required_export_route: 'export_pptx',
+  export_artifact_field: 'export_bundle',
+  delivery_state_field: 'export_bundle.delivery_state',
+  projection_model: 'direct_delivery',
+  human_gate: {
+    required: false,
+    mutation_surfaces: [],
+  },
+  projection_states: {
+    ready_for_export: 'export_ready',
+    output_ready: 'output_ready',
+  },
+});
+
 const FAMILY_STAGE_SEQUENCE = {
   flow_id: 'ppt_deck_standard_flow',
   stages: [
@@ -482,5 +499,12 @@ export function hydratePptDeckContract({
     source_truth_contract: PPT_SOURCE_TRUTH_CONTRACT,
   };
 
-  return mergeContractLayers(familyContract, override);
+  const merged = mergeContractLayers(familyContract, override);
+  return {
+    ...merged,
+    delivery_contract: {
+      ...PPT_DELIVERY_CONTRACT_BASE,
+      required_export_bundle_id: String(merged?.export_bundle?.bundle_id || '').trim(),
+    },
+  };
 }
