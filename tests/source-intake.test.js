@@ -223,7 +223,9 @@ test('CLI source augment prepares canonical augmentation contract from source re
 test('executeSourceAugmentation blocks explicitly when augmentation executor is unavailable', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
   const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
   delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
 
   try {
     await intakeSource({
@@ -248,9 +250,46 @@ test('executeSourceAugmentation blocks explicitly when augmentation executor is 
     const report = readJson(result.artifactFiles.sourceAugmentationReportFile);
     assert.equal(report.status, 'blocked');
     assert.equal(report.blocking_reason, 'source_augmentation_executor_unconfigured');
+    assert.equal(report.executor.adapter, 'external_command');
+    assert.equal(report.executor.execution_surface, 'external_command');
+    assert.equal(report.executor.executor_identity, 'source_augmentation_external_command');
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
+  }
+});
+
+test('executeSourceAugmentation blocks explicitly when adapter id is unsupported', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'unknown_adapter';
+
+  try {
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-augment-unsupported-adapter',
+      title: 'augment adapter blocked',
+      brief: '只有主题和关键词，需要联网补料。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    const result = await executeSourceAugmentation({
+      workspaceRoot,
+      topicId: 'topic-augment-unsupported-adapter',
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.report.status, 'blocked');
+    assert.match(result.report.blocking_reason, /Unsupported source augmentation adapter/);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
   }
 });
 
@@ -377,6 +416,7 @@ test('CLI source execute-augmentation runs configured executor and upgrades read
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
   const scriptFile = path.join(workspaceRoot, 'mock-source-augment.js');
   const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
 
   writeFileSync(
     scriptFile,
@@ -415,6 +455,7 @@ process.stdout.write(JSON.stringify({
   );
   chmodSync(scriptFile, 0o755);
   process.env.REDCUBE_SOURCE_AUGMENT_CMD = scriptFile;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
 
   try {
     execFileSync(
@@ -460,6 +501,9 @@ process.stdout.write(JSON.stringify({
 
     const report = readJson(parsed.artifactFiles.sourceAugmentationReportFile);
     assert.equal(report.status, 'completed');
+    assert.equal(report.executor.adapter, 'external_command');
+    assert.equal(report.executor.execution_surface, 'external_command');
+    assert.equal(report.executor.executor_identity, scriptFile);
     assert.equal(report.added_source_count, 2);
     assert.equal(report.resolved_evidence_gaps.includes('public_evidence_missing'), true);
 
@@ -475,5 +519,7 @@ process.stdout.write(JSON.stringify({
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
   }
 });

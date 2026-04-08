@@ -11,7 +11,10 @@ import {
   validateSourceAugmentationRequestContract,
 } from '@redcube/runtime-protocol';
 
-import { executeSourceAugmentationWithCommand } from './source-augmentation-executor.js';
+import {
+  getRequestedSourceAugmentationAdapterId,
+  resolveSourceAugmentationAdapter,
+} from './source-augmentation-executor.js';
 
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
@@ -56,7 +59,15 @@ function referenceDisplayLabel(source) {
   return label || url;
 }
 
-function buildBlockedReport({ topicId, request, blockingReason }) {
+function buildExecutorSummary(executor) {
+  return {
+    adapter: safeText(executor?.adapter),
+    execution_surface: safeText(executor?.execution_surface) || null,
+    executor_identity: safeText(executor?.executor_identity) || null,
+  };
+}
+
+function buildBlockedReport({ topicId, request, blockingReason, executor }) {
   return {
     schema_version: 1,
     topic_id: topicId,
@@ -64,6 +75,7 @@ function buildBlockedReport({ topicId, request, blockingReason }) {
     status: 'blocked',
     readiness_target: safeText(request?.readiness_target, 'planning_ready'),
     blocking_reason: safeText(blockingReason, 'source_augmentation_execution_failed'),
+    executor: buildExecutorSummary(executor),
     resolved_evidence_gaps: [],
     unresolved_evidence_gaps: safeArray(request?.trigger?.evidence_gaps),
     added_source_count: 0,
@@ -79,6 +91,7 @@ function applyAugmentation({
   sourceReadinessPack,
   executorOutput,
   executionSurface,
+  executor,
 }) {
   const references = safeArray(executorOutput?.reference_source_list).map((item) => ({
     reference_id: safeText(item?.reference_id),
@@ -230,6 +243,7 @@ function applyAugmentation({
     status: 'completed',
     readiness_target: 'planning_ready',
     execution_surface: safeText(executionSurface, 'external_command'),
+    executor: buildExecutorSummary(executor),
     resolved_evidence_gaps: resolvedEvidenceGaps,
     unresolved_evidence_gaps: unresolvedEvidenceGaps,
     topic_summary: safeText(mergedSourceReadinessPack?.fact_library?.topic_summary),
@@ -281,12 +295,41 @@ export async function executeSourceAugmentation({
   const sourceBrief = readJson(sourcePaths.sourceBriefFile);
   const sourceReadinessPack = readJson(sourcePaths.sourceReadinessPackFile);
   const request = readJson(sourcePaths.sourceAugmentationRequestFile);
+  const requestedAdapterId = getRequestedSourceAugmentationAdapterId();
   const requestValidation = validateSourceAugmentationRequestContract(request);
   if (!requestValidation.ok) {
     const report = buildBlockedReport({
       topicId,
       request,
       blockingReason: `source augmentation request contract invalid: ${requestValidation.errors.join('; ')}`,
+      executor: {
+        adapter: requestedAdapterId,
+      },
+    });
+    writeJson(sourcePaths.sourceAugmentationReportFile, report);
+    return {
+      ok: false,
+      topicId,
+      artifactFiles: {
+        sourceAugmentationReportFile: sourcePaths.sourceAugmentationReportFile,
+      },
+      report,
+    };
+  }
+
+  let adapter;
+  try {
+    adapter = resolveSourceAugmentationAdapter({
+      adapter: requestedAdapterId,
+    });
+  } catch (error) {
+    const report = buildBlockedReport({
+      topicId,
+      request,
+      blockingReason: error instanceof Error ? error.message : String(error),
+      executor: {
+        adapter: requestedAdapterId,
+      },
     });
     writeJson(sourcePaths.sourceAugmentationReportFile, report);
     return {
@@ -307,6 +350,7 @@ export async function executeSourceAugmentation({
       status: 'skipped',
       readiness_target: safeText(request?.readiness_target, 'planning_ready'),
       blocking_reason: null,
+      executor: buildExecutorSummary(adapter),
       resolved_evidence_gaps: [],
       unresolved_evidence_gaps: [],
       added_source_count: 0,
@@ -323,8 +367,7 @@ export async function executeSourceAugmentation({
     };
   }
 
-  const execution = executeSourceAugmentationWithCommand({
-    command: process.env.REDCUBE_SOURCE_AUGMENT_CMD,
+  const execution = adapter.run({
     requestFile: sourcePaths.sourceAugmentationRequestFile,
     request,
   });
@@ -333,6 +376,7 @@ export async function executeSourceAugmentation({
       topicId,
       request,
       blockingReason: execution.blockingReason,
+      executor: adapter,
     });
     writeJson(sourcePaths.sourceAugmentationReportFile, report);
     return {
@@ -353,6 +397,7 @@ export async function executeSourceAugmentation({
     sourceReadinessPack,
     executorOutput: execution.executorOutput,
     executionSurface: execution.executionSurface,
+    executor: adapter,
   });
 
   writeJson(sourcePaths.sourceIndexFile, applied.sourceIndex);

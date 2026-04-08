@@ -39,6 +39,7 @@ import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-rout
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
+import { resolveSourceAugmentationAdapter as resolveSourceAugmentationAdapterJs } from './source-augmentation-executor.js';
 import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
 import { intakeSource as intakeSourceJs } from './source-intake.js';
 
@@ -123,6 +124,7 @@ export async function runDeliverableRoute(request: RuntimeRunRouteRequest): Prom
 }
 
 export const resolveExecutorAdapter = resolveExecutorAdapterJs;
+export const resolveSourceAugmentationAdapter = resolveSourceAugmentationAdapterJs;
 
 export function completeRun(request: RuntimeCompleteRunRequest): RuntimeRunRecord {
   return completeRunJs(request) as RuntimeRunRecord;

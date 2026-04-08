@@ -24,3 +24,4 @@ export { buildReferencePromotionReport, buildReferenceQualityReport, buildRefere
 export { intakeSource } from './source-intake.js';
 export { prepareSourceAugmentation } from './source-augmentation-request.js';
 export { executeSourceAugmentation } from './source-augmentation-execution.js';
+export { resolveSourceAugmentationAdapter } from './source-augmentation-executor.js';

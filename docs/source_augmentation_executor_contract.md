@@ -43,11 +43,19 @@ Step 1 的正式链路固定为：
 
 ## 外部执行器如何接入
 
-运行时通过环境变量 `REDCUBE_SOURCE_AUGMENT_CMD` 指向外部执行器。
+运行时先通过环境变量 `REDCUBE_SOURCE_AUGMENT_ADAPTER` 选择正式 adapter。
+当前 repo 内唯一正式支持的 adapter 是：
+
+- `external_command`
+
+如果不显式配置，默认也会落到 `external_command`。
+
+随后，再通过环境变量 `REDCUBE_SOURCE_AUGMENT_CMD` 指向这个 adapter 背后的外部执行器命令。
 
 例如：
 
 ```bash
+export REDCUBE_SOURCE_AUGMENT_ADAPTER=external_command
 export REDCUBE_SOURCE_AUGMENT_CMD=/absolute/path/to/source-augment-executor
 ```
 
@@ -58,6 +66,8 @@ export REDCUBE_SOURCE_AUGMENT_CMD=/absolute/path/to/source-augment-executor
 ```text
 <executor> <source-augmentation-request.json>
 ```
+
+如果 `REDCUBE_SOURCE_AUGMENT_ADAPTER` 是未知值，系统会显式返回 `blocked`，并报告 unsupported adapter。
 
 如果 `REDCUBE_SOURCE_AUGMENT_CMD` 没有配置，系统会显式返回：
 
@@ -149,6 +159,12 @@ export REDCUBE_SOURCE_AUGMENT_CMD=/absolute/path/to/source-augment-executor
 - `blocking_reason` 包含 `result contract invalid`
 
 同样不会伪装成成功。
+
+另外，执行报告里现在也会保留 formal executor metadata：
+
+- `executor.adapter`
+- `executor.execution_surface`
+- `executor.executor_identity`
 
 ## 回写后的 canonical 效果
 
