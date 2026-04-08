@@ -25,6 +25,35 @@
 - 在 Codex / OMX 语境里，`Codex-default host-agent runtime` 是当前正式默认执行形态
 - code 必须退回 contract、governance、audit、artifact persistence 与 render boundary
 
+## 执行句柄与 durable surface 原则
+
+当前主线的身份边界固定为：
+
+- `program_id`
+  - 控制面与 report-routing 指针
+  - 不得误写成某次 deliverable run 的句柄
+- `topic_id`
+  - topic 聚合根身份
+  - canonical source truth 与 publication projection 的 durable root
+- `deliverable_id`
+  - topic 内持久交付物身份
+  - hydrated `delivery_contract`、`review-state.json` 与 export gate 都围绕它收口
+- `run_id`
+  - 单次 routed execution 的正式执行句柄
+  - rerun linkage、runtime watch、runtime event / telemetry 都以它为 per-run handle
+
+当前 canonical durable surfaces 固定为：
+
+- audit / watch：`auditDeliverable`、`runtimeWatch`
+- review / projection：`getReviewState`、`getPublicationProjection`
+- canonical artifacts：
+  - `topics/<topic>/canonical/source-audit.json`
+  - `topics/<topic>/publication-state.json`
+  - `topics/<topic>/deliverables/<deliverable>/contracts/delivery-contract.json`
+  - `topics/<topic>/deliverables/<deliverable>/reports/review-state.json`
+
+后续即使迁移到 managed web runtime，也只能迁移宿主形态，不能改写这些 execution handle 与 durable surface 语义。
+
 ## 长线目标与当前 program 必须分开理解
 
 这里必须严格区分：

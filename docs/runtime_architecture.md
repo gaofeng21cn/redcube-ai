@@ -117,6 +117,31 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 - `OPL` 是上层语义系统；RedCube 在其中是视觉交付 domain gateway + Domain Harness OS，不是 `OPL` 本体。
 - 当前仓库主线是 `Auto-only`；未来如需更高判断密度的 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
 
+## 执行句柄与持久表面
+
+当前主线已经把身份与治理表面收紧成一组更明确的 contract：
+
+- `program_id`
+  - active mainline 的 control-plane pointer
+  - 用于 program truth、reports 路由与 absorbed provenance 追踪
+- `topic_id`
+  - topic 聚合根身份
+  - `topics/<topic>/canonical/source-audit.json` 与 `topics/<topic>/publication-state.json` 都挂在这一层
+- `deliverable_id`
+  - topic 内部的 durable deliverable 身份
+  - `contracts/delivery-contract.json`、`reports/review-state.json` 与 export readiness 都围绕它收口
+- `run_id`
+  - 单次 routed execution 的正式执行句柄
+  - run telemetry、rerun linkage、runtime watch 与 event log 必须持续回显同一个 `run_id`
+
+当前 canonical durable surfaces 也已经固定为：
+
+- audit / watch：`auditDeliverable`、`runtimeWatch`
+- review / projection：`getReviewState`、`getPublicationProjection`
+
+这意味着后续如果继续统一三个业务仓，不应再重复发明“这次 run 到底靠什么识别、哪份 artifact 才算正式 durable truth”。
+RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
+
 ## 统一生命周期
 
 `RedCube` 现在应该按一套共享宏观生命周期理解，而不是把 `ppt_deck` 和 `xiaohongshu` 当成两套彼此割裂的流程：

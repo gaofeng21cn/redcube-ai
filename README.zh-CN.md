@@ -39,6 +39,15 @@
 当前仓库主线按 `Auto-only` 理解；如果未来要做 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
 只要保持同一套 substrate 与 contract，后续可以迁移到同一 substrate 上的托管 web runtime，而不改变本项目的 domain 身份。
 
+当前主线还冻结了一套明确的执行句柄与持久表面合同：
+
+- `program_id`：active mainline 的 control-plane 指针
+- `topic_id`：canonical source truth 与 publication projection 所属的 topic 聚合根身份
+- `deliverable_id`：review、export 与 delivery contract 所绑定的持久交付物身份
+- `run_id`：单次 routed delivery execution 的 per-run 执行句柄
+- `auditDeliverable` / `runtimeWatch`：当前 canonical audit / watch 表面
+- `getReviewState` / `getPublicationProjection`：当前 canonical review / projection 表面
+
 ## 它能帮你做什么
 
 - 把课程内容、学术材料、行业知识和专业观点组织成正式的 `幻灯片`

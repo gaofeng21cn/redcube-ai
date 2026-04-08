@@ -39,6 +39,15 @@ Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` is
 The current repository mainline is `Auto-only`; if a future `Human-in-the-loop` product is built, it should reuse the same substrate as a compatible sibling or upper-layer product rather than split this repository into same-repo dual-mode logic.
 As long as the same substrate and contracts are kept, this line can later move to a managed web runtime without changing the domain identity.
 
+The current mainline also freezes one explicit execution-handle and durable-surface contract:
+
+- `program_id` is the active mainline control-plane pointer.
+- `topic_id` is the topic aggregate identity for canonical source truth and publication projection.
+- `deliverable_id` is the durable deliverable identity for review, export, and delivery contracts.
+- `run_id` is the per-run execution handle for one routed delivery execution.
+- `auditDeliverable` / `runtimeWatch` are the current canonical audit-and-watch surfaces.
+- `getReviewState` / `getPublicationProjection` are the current canonical review-and-projection surfaces.
+
 ## What It Helps You Do
 
 - Turn source materials into formal `slides` for teaching, reporting, academic talks, and internal briefings.

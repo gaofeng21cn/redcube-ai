@@ -79,6 +79,21 @@ All formal control flows through:
 
 Never collapse these levels into a vague prompt or hidden heuristic.
 
+## Execution Handle And Durable Surface Boundary
+
+- `program_id` is the control-plane pointer for the active RedCube mainline and report-routing surface; it is not a single deliverable run handle.
+- `topic_id` is the topic aggregate-root identity; topic-level canonical source truth and publication projection bind to this layer.
+- `deliverable_id` is the durable deliverable identity inside a topic; hydrated delivery contracts, review state, export readiness, and promotion history stay attached to this identity.
+- `run_id` is the single route-execution handle; rerun linkage, runtime watch, event logs, and run telemetry must preserve it as the per-run handle instead of overloading `deliverable_id` or `program_id`.
+- Current canonical audit and watch surfaces are `auditDeliverable` and `runtimeWatch`.
+- Current canonical review and projection surfaces are `getReviewState` and `getPublicationProjection`.
+- Current canonical durable artifacts include:
+  - `topics/<topic>/canonical/source-audit.json`
+  - `topics/<topic>/publication-state.json`
+  - `topics/<topic>/deliverables/<deliverable>/contracts/delivery-contract.json`
+  - `topics/<topic>/deliverables/<deliverable>/reports/review-state.json`
+- Do not let host packaging, route convenience, or review UX blur these identity and durable-surface boundaries.
+
 ## Runtime Mainline
 
 - Runtime must stay on the shared `Unified Harness Engineering Substrate`.

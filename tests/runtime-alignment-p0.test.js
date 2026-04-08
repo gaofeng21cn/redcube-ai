@@ -40,6 +40,10 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   assert.equal(projectTruth.includes('`supported_protocol_layer`: `MCP`'), true);
   assert.equal(projectTruth.includes('`internal_controller_surface`: `controller`'), true);
   assert.equal(projectTruth.includes('`MCP` is repo-verified in the current mainline'), true);
+  assert.equal(projectTruth.includes('`program_id` is the control-plane pointer for the active RedCube mainline'), true);
+  assert.equal(projectTruth.includes('`topic_id` is the topic aggregate-root identity'), true);
+  assert.equal(projectTruth.includes('`deliverable_id` is the durable deliverable identity inside a topic'), true);
+  assert.equal(projectTruth.includes('`run_id` is the single route-execution handle'), true);
   assert.equal(projectTruth.includes(MANUAL_TEST_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_ACTIVATION_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_BASELINE_CONTRACT), true);
@@ -64,6 +68,25 @@ test('P0 truth remains passed and credible while Phase 2 publication projection 
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
+  assert.equal(currentProgram.execution_handle_contract.program_id.role, 'active mainline control-plane pointer');
+  assert.deepEqual(currentProgram.execution_handle_contract.topic_id.durable_surfaces, [
+    'topics/<topic>/canonical/source-audit.json',
+    'topics/<topic>/publication-state.json',
+  ]);
+  assert.deepEqual(currentProgram.execution_handle_contract.deliverable_id.durable_surfaces, [
+    'topics/<topic>/deliverables/<deliverable>/deliverable.json',
+    'topics/<topic>/deliverables/<deliverable>/contracts/delivery-contract.json',
+    'topics/<topic>/deliverables/<deliverable>/reports/review-state.json',
+  ]);
+  assert.deepEqual(currentProgram.execution_handle_contract.run_id.durable_surfaces, [
+    'runtime/runs/<run>.json',
+    'runtime/events/<run>.jsonl',
+    'runtimeWatch',
+    'ops_eval_summary',
+  ]);
+  assert.deepEqual(currentProgram.durable_surface_contract.audit_and_watch_surfaces, ['auditDeliverable', 'runtimeWatch']);
+  assert.deepEqual(currentProgram.durable_surface_contract.review_and_projection_surfaces, ['getReviewState', 'getPublicationProjection']);
+  assert.deepEqual(currentProgram.durable_surface_contract.required_embedded_summaries, ['source_readiness_summary', 'gate_summary']);
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
   assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / publication projection delivery contract convergence');
   assert.equal(currentProgram.current_state.workstream, 'phase_2_publication_projection_delivery_contract_convergence');
@@ -168,15 +191,26 @@ test('P0 tracked docs keep source readiness baseline on the mainline while revie
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
   const runtimeArchitecture = read('docs/runtime_architecture.md');
+  const runtimePolicy = read('docs/policies/runtime_operating_model.md');
   const baselineBrief = read(PHASE_2_BASELINE_BRIEF);
   const hardeningBrief = read(PHASE_2_HARDENING_BRIEF);
 
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
   assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
+  assert.equal(readme.includes('`program_id` is the active mainline control-plane pointer'), true);
+  assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution'), true);
   assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
   assert.equal(readmeZh.includes('review / export / gate / audit hardening` 已在同一主线上吸收一条 tranche') || readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
+  assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
+  assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
+  assert.equal(runtimeArchitecture.includes('`program_id`'), true);
+  assert.equal(runtimeArchitecture.includes('`run_id`'), true);
+  assert.equal(runtimeArchitecture.includes('`getReviewState`、`getPublicationProjection`'), true);
+  assert.equal(runtimePolicy.includes('`program_id`'), true);
+  assert.equal(runtimePolicy.includes('`run_id`'), true);
+  assert.equal(runtimePolicy.includes('`topics/<topic>/deliverables/<deliverable>/reports/review-state.json`'), true);
   assert.equal(baselineBrief.includes('当前这份文档记录的是已经吸收到主线的最小 baseline'), true);
   assert.equal(hardeningBrief.includes('source_readiness_summary'), true);
 });
