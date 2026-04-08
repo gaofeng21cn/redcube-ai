@@ -16,13 +16,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 review/export/gate/audit hardening is the active tranche while source-readiness baseline remains absorbed provenance', () => {
+test('phase-2 review/export/gate/audit hardening stays absorbed provenance while family source-truth consumption convergence is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(HARDENING_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_review_export_gate_audit_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, contract.tranche_id);
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_family_source_truth_consumption_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_family_source_truth_consumption_convergence');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -30,6 +30,10 @@ test('phase-2 review/export/gate/audit hardening is the active tranche while sou
   assert.equal(contract.formal_entry.controller_repo_verified, false);
   assert.equal(contract.foundations.phase_2_source_intake_shared_source_truth_baseline.status, 'closeout_completed');
   assert.equal(contract.foundations.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
+  assert.equal(
+    currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract,
+    HARDENING_CONTRACT,
+  );
   assert.equal(
     currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract,
     BASELINE_CONTRACT,
@@ -54,7 +58,7 @@ test('phase-2 review/export/gate/audit hardening contract freezes canonical audi
   assert.equal(runtimeWatchAction.includes('source_readiness_summary'), true);
 });
 
-test('phase-2 review/export/gate/audit hardening brief and public docs explain the tranche honestly', () => {
+test('phase-2 review/export/gate/audit hardening brief and public docs keep the absorbed tranche honest', () => {
   const brief = read(HARDENING_BRIEF);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
@@ -70,8 +74,8 @@ test('phase-2 review/export/gate/audit hardening brief and public docs explain t
   assert.equal(brief.includes('gate_summary'), true);
   assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
-  assert.equal(runtimeArchitecture.includes('auditDeliverable / runtimeWatch 已把 canonical source readiness 与 export gate summary 收口为共享治理面'), true);
-  assert.equal(policy.includes('auditDeliverable / runtimeWatch 应继续围绕 canonical source-audit 与 hydrated export contract 输出共享 gate summary'), true);
+  assert.equal(runtimeArchitecture.includes('review / export / gate / audit hardening` 已吸收为前置 provenance'), true);
+  assert.equal(policy.includes('review / export / gate / audit hardening` 已在当前主线上吸收为前置 provenance'), true);
   assert.equal(docsIndex.includes('phase_2_review_export_gate_audit_hardening.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_review_export_gate_audit_hardening.md'), true);
 });

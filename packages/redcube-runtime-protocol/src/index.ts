@@ -8,15 +8,18 @@ import {
   resolveWorkspaceContract as resolveWorkspaceContractJs,
 } from './workspace.js';
 import {
+  buildSourceTruthConsumptionSummary as buildSourceTruthConsumptionSummaryJs,
   getSourceArtifactPaths as getSourceArtifactPathsJs,
 } from './source-truth.js';
 
 import type {
+  BuildSourceTruthConsumptionSummaryOptions,
   CreateRunRecordInput,
   DeliverablePaths,
   NotePaths,
   RerunLinkage,
   RunRecord,
+  SourceTruthConsumptionSummary,
   RunTelemetryEnvelope,
   RuntimeErrorKind,
   SourceArtifactPaths,
@@ -48,16 +51,25 @@ export function getSourceArtifactPaths(workspaceRoot: string, topicId: string): 
   return getSourceArtifactPathsJs(workspaceRoot, topicId) as SourceArtifactPaths;
 }
 
+export function buildSourceTruthConsumptionSummary(
+  sharedSourceTruth: unknown,
+  options: BuildSourceTruthConsumptionSummaryOptions,
+): SourceTruthConsumptionSummary {
+  return buildSourceTruthConsumptionSummaryJs(sharedSourceTruth, options) as SourceTruthConsumptionSummary;
+}
+
 export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 };
 
 export type {
+  BuildSourceTruthConsumptionSummaryOptions,
   CreateRunRecordInput,
   DeliverablePaths,
   NotePaths,
   RerunLinkage,
   RunRecord,
+  SourceTruthConsumptionSummary,
   RunTelemetryEnvelope,
   RuntimeErrorKind,
   SourceArtifactPaths,

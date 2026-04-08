@@ -13,6 +13,8 @@ const PHASE_2_BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-inta
 const PHASE_2_BASELINE_BRIEF = 'docs/phase_2_source_intake_shared_source_truth_baseline.md';
 const PHASE_2_HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
 const PHASE_2_HARDENING_BRIEF = 'docs/phase_2_review_export_gate_audit_hardening.md';
+const PHASE_2_FAMILY_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json';
+const PHASE_2_FAMILY_CONVERGENCE_BRIEF = 'docs/phase_2_family_source_truth_consumption_convergence.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -53,40 +55,43 @@ test('P0 truth surfaces freeze current formal entry to MCP and CLI until control
   }
 });
 
-test('P0 truth remains passed and credible while Phase 2 review/export/gate/audit hardening is the active mainline tranche', () => {
+test('P0 truth remains passed and credible while Phase 2 family source-truth consumption convergence is the active mainline tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / review export gate audit hardening');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_review_export_gate_audit_hardening');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / family source-truth consumption convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_family_source_truth_consumption_convergence');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.active_mainline.id, 'redcube-runtime-program');
   assert.equal(
     currentProgram.current_state.active_mainline.label,
-    'redcube-runtime-program / phase 2 review export gate audit hardening',
+    'redcube-runtime-program / phase 2 family source-truth consumption convergence',
   );
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.green_baseline_credible, true);
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_review_export_gate_audit_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_family_source_truth_consumption_convergence');
   assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.active_baton.review_status, 'passed');
-  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'review_export_gate_audit');
+  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'family_source_truth_consumption_convergence');
   assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, true);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.guarded_poster_surface, ['poster_onepager']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_shared_contract_surfaces, ['source_truth_contract', 'source_truth_consumption']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.required_audit_surfaces, ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection']);
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_contract,
-    PHASE_2_HARDENING_CONTRACT,
+    PHASE_2_FAMILY_CONVERGENCE_CONTRACT,
   );
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_brief,
-    PHASE_2_HARDENING_BRIEF,
+    PHASE_2_FAMILY_CONVERGENCE_BRIEF,
   );
   assert.equal(
     currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening.commit,
@@ -95,6 +100,10 @@ test('P0 truth remains passed and credible while Phase 2 review/export/gate/audi
   assert.equal(
     currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.commit,
     'a4424d2',
+  );
+  assert.equal(
+    currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.commit,
+    'a5b1158',
   );
 });
 

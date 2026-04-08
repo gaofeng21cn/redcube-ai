@@ -45,6 +45,27 @@ export interface SourceArtifactPaths {
   sourceBriefFile: string;
 }
 
+export interface SourceTruthConsumptionSummary {
+  authoritative_source_kind: 'shared_source_truth';
+  consumption_role: string;
+  input_mode: string;
+  confidence: string;
+  material_count: number;
+  material_ids: string[];
+  source_labels: string[];
+  source_audit_status: string;
+  source_audit_blocking_reasons: string[];
+}
+
+export interface BuildSourceTruthConsumptionSummaryOptions {
+  consumptionRole: string;
+  defaultInputMode?: string;
+  defaultConfidence?: string;
+  defaultAuditStatus?: string;
+  defaultBlockingReasons?: string[];
+  defaultSourceLabels?: string[];
+}
+
 export interface CreateRunRecordInput {
   runId?: string;
   route?: string;

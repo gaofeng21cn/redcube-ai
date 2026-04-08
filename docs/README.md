@@ -32,6 +32,7 @@ This index along with the repository home forms the default GitHub-facing biling
 - [Phase 2 activation package freeze](phase_2_source_intake_activation_package_freeze.md) (Chinese only)
 - [Phase 2 source intake + shared source truth baseline](phase_2_source_intake_shared_source_truth_baseline.md) (Chinese only)
 - [Phase 2 review / export / gate / audit hardening](phase_2_review_export_gate_audit_hardening.md) (Chinese only)
+- [Phase 2 family source-truth consumption convergence](phase_2_family_source_truth_consumption_convergence.md) (Chinese only)
 
 ### For technical collaborators / agent executors
 

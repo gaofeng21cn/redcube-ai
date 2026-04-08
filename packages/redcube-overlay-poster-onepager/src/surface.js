@@ -48,7 +48,9 @@ const SURFACE_VALIDATORS = {
   'contracts/export-bundle.json': (content) => content?.bundle_id === 'poster_onepager_bundle'
     && content?.include_html === true,
   'contracts/hydrated-deliverable.json': (content) => content?.overlay === 'poster_onepager'
-    && content?.prompt_pack?.pack_id === 'poster_onepager_mainline_v1',
+    && content?.prompt_pack?.pack_id === 'poster_onepager_mainline_v1'
+    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
+    && content?.source_truth_contract?.poster_guarded_boundary?.academic_contract_active === false,
   'views/display-registry.json': (content) => Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'poster_blueprint')
     && content.surfaces.some((surface) => surface?.id === 'visual_director_review')

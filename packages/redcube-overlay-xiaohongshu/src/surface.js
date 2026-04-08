@@ -67,7 +67,9 @@ const SURFACE_VALIDATORS = {
   'contracts/hydrated-deliverable.json': (content) =>
     content?.overlay === 'xiaohongshu'
     && Array.isArray(content?.stage_sequence?.stages)
-    && typeof content?.prompt_pack?.root === 'string',
+    && typeof content?.prompt_pack?.root === 'string'
+    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
+    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch',
   'views/display-registry.json': (content) =>
     Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'publish_copy')

@@ -35,6 +35,7 @@ They must not be reinterpreted as the whole current product identity by themselv
 - `contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json`
 - `contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json`
 - `contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json`
+- `contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json`
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 

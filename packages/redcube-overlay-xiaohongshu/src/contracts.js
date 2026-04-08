@@ -1,5 +1,44 @@
 import { buildDeliverableRecord } from '@redcube/overlay-core';
 
+const SOURCE_TRUTH_CONSUMPTION_FIELDS = Object.freeze([
+  'authoritative_source_kind',
+  'consumption_role',
+  'input_mode',
+  'confidence',
+  'material_count',
+  'material_ids',
+  'source_labels',
+  'source_audit_status',
+  'source_audit_blocking_reasons',
+]);
+
+const SOURCE_TRUTH_FIELD_WHITELIST = Object.freeze({
+  source_index: ['sources[].status', 'sources[].relative_path', 'sources[].kind'],
+  extracted_materials: ['materials[].material_id', 'materials[].excerpt', 'materials[].content_text'],
+  source_brief: ['brief_text', 'input_mode', 'confidence'],
+});
+
+const XIAOHONGSHU_SOURCE_TRUTH_CONTRACT = Object.freeze({
+  authoritative_surface: 'shared_source_truth',
+  authoritative_gate: 'topics/<topic>/canonical/source-audit.json',
+  authoritative_artifacts: ['source_index', 'extracted_materials', 'source_audit', 'source_brief'],
+  route_gate_rule: 'authoritative_fail_closed_in_audit_and_runtime_watch',
+  hydration_model: {
+    hydrated_contract_surface: 'contracts/hydrated-deliverable.json',
+    runtime_injection_surface: 'shared_source_truth',
+    static_contract_written_at_create_deliverable: true,
+  },
+  readable_shared_source_truth_fields: SOURCE_TRUTH_FIELD_WHITELIST,
+  consumption_summary_fields: SOURCE_TRUTH_CONSUMPTION_FIELDS,
+  route_to_consumption_role: {
+    research: 'source_readiness',
+    storyline: 'story_architecture',
+    single_note_plan: 'story_architecture',
+    visual_direction: 'visual_authorship',
+  },
+  required_hydrated_export_surface: 'export_bundle',
+});
+
 const STAGE_SEQUENCE = {
   flow_id: 'xiaohongshu_official_flow',
   stages: [
@@ -254,6 +293,7 @@ export function hydrateXiaohongshuContract({
     export_bundle: EXPORT_BUNDLE,
     display_registry: DISPLAY_REGISTRY,
     lifecycle_model: LIFECYCLE_MODEL,
+    source_truth_contract: XIAOHONGSHU_SOURCE_TRUTH_CONTRACT,
   };
 }
 

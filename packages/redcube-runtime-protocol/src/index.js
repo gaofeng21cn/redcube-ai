@@ -6,6 +6,7 @@ export {
   resolveWorkspaceContract,
 } from './workspace.js';
 export {
+  buildSourceTruthConsumptionSummary,
   getSourceArtifactPaths,
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 } from './source-truth.js';

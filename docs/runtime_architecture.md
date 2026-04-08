@@ -196,7 +196,9 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 - `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`
 - `poster_onepager` 已完成第三 family onboarding / extension proof，但当前只应被解释为 knowledge poster
 - `paper_poster / conference_poster` academic poster contract 只保留为后续或历史冻结残留，不构成当前 active mainline
-- `review / export / gate / audit hardening` 已吸收当前 tranche：`auditDeliverable / runtimeWatch` 已把 canonical source readiness 与 export gate summary 收口为共享治理面；换句话说，auditDeliverable / runtimeWatch 已把 canonical source readiness 与 export gate summary 收口为共享治理面；更深的 family convergence 仍属于同一主线上的持续增强
+- `review / export / gate / audit hardening` 已吸收为前置 provenance：`auditDeliverable / runtimeWatch` 已把 canonical source readiness 与 export gate summary 收口为共享治理面
+- `ppt_deck / xiaohongshu / poster_onepager 已围绕同一 source_truth_contract 与 source_truth_consumption summary 收口消费语义`
+- `poster_onepager` 继续保持 guarded knowledge-poster 边界，不借此激活 academic poster contract；更深的 publication projection / delivery contract convergence 仍属于同一主线上的持续增强
 
 当前目标态：
 

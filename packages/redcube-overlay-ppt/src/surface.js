@@ -129,7 +129,9 @@ const SURFACE_VALIDATORS = {
     && Array.isArray(content?.stage_sequence?.stages)
     && content.stage_sequence.stages.length > 0
     && content.stage_sequence.stages.some((stage) => stage?.stage_id === 'visual_director_review')
-    && typeof content?.export_bundle?.bundle_id === 'string',
+    && typeof content?.export_bundle?.bundle_id === 'string'
+    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
+    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch',
   'views/display-registry.json': (content) =>
     Array.isArray(content?.surfaces)
     && content.surfaces.some((surface) => surface?.id === 'source_index')

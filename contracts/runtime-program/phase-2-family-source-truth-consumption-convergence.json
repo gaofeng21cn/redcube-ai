@@ -1,0 +1,168 @@
+{
+  "tranche_id": "phase_2_family_source_truth_consumption_convergence",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "formal_entry": {
+    "repo_verified": ["MCP", "CLI"],
+    "controller_repo_verified": false
+  },
+  "foundations": {
+    "phase_1_render_ceiling_upgrade": { "status": "completed" },
+    "p0_truth_surface_and_green_baseline_convergence": {
+      "review_closeout": "passed",
+      "green_baseline_credible": true
+    },
+    "stable_deliverable_manual_test_driven_hardening": {
+      "status": "closeout_completed",
+      "commit": "96dc6c1"
+    },
+    "phase_2_activation_package_freeze": {
+      "status": "closeout_completed",
+      "commit": "3a7fbd6"
+    },
+    "phase_2_source_intake_shared_source_truth_baseline": {
+      "status": "closeout_completed",
+      "commit": "a4424d2"
+    },
+    "phase_2_review_export_gate_audit_hardening": {
+      "status": "closeout_completed",
+      "commit": "a5b1158"
+    }
+  },
+  "object_boundary": {
+    "in_scope": [
+      "ppt_deck, xiaohongshu, and guarded poster_onepager expose one shared source_truth_contract surface inside hydrated deliverable contracts",
+      "story-architecture and visual-authorship artifacts emit one shared source_truth_consumption summary shape instead of family-private field drift",
+      "authoritative fail-closed source-readiness gating stays canonical in auditDeliverable and runtimeWatch over topics/<topic>/canonical/source-audit.json",
+      "family-specific export obligations remain hydrated from deliverable contracts rather than prompt-only or family-local inference",
+      "poster_onepager remains a guarded knowledge-poster surface and does not activate academic poster contract semantics"
+    ],
+    "out_of_scope": [
+      "controller expansion",
+      "new family or overlay expansion",
+      "paper_poster or conference_poster academic contract advancement",
+      "OPL federation integration",
+      "managed web runtime migration",
+      "hidden fallback chains as main behavior",
+      "prompt patch replacing contract hydration"
+    ]
+  },
+  "source_truth_contract_surface": {
+    "authoritative_surface": "shared_source_truth",
+    "authoritative_gate": "topics/<topic>/canonical/source-audit.json",
+    "authoritative_artifacts": [
+      "source_index",
+      "extracted_materials",
+      "source_audit",
+      "source_brief"
+    ],
+    "route_gate_rule": "authoritative_fail_closed_in_audit_and_runtime_watch",
+    "consumption_summary_fields": [
+      "authoritative_source_kind",
+      "consumption_role",
+      "input_mode",
+      "confidence",
+      "material_count",
+      "material_ids",
+      "source_labels",
+      "source_audit_status",
+      "source_audit_blocking_reasons"
+    ],
+    "family_route_maps": {
+      "ppt_deck": {
+        "storyline": "story_architecture",
+        "detailed_outline": "story_architecture",
+        "slide_blueprint": "story_architecture",
+        "visual_direction": "visual_authorship"
+      },
+      "xiaohongshu": {
+        "research": "source_readiness",
+        "storyline": "story_architecture",
+        "single_note_plan": "story_architecture",
+        "visual_direction": "visual_authorship"
+      },
+      "poster_onepager": {
+        "storyline": "story_architecture",
+        "poster_blueprint": "story_architecture",
+        "visual_direction": "visual_authorship"
+      }
+    },
+    "poster_guarded_boundary": {
+      "overlay": "poster_onepager",
+      "profile_id": "knowledge_poster",
+      "academic_contract_active": false
+    }
+  },
+  "export_and_governance_alignment": {
+    "required_shared_surfaces": [
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "required_hydrated_export_surfaces": {
+      "ppt_deck": "export_pptx",
+      "xiaohongshu": "export_bundle",
+      "poster_onepager": "export_bundle"
+    },
+    "required_contract_fields": [
+      "review_surface",
+      "export_bundle",
+      "source_truth_contract"
+    ],
+    "shared_summary_expectation": "family-private stage artifacts may differ in payload details, but source_truth_consumption must follow the same machine-readable summary shape"
+  },
+  "minimal_test_surface": {
+    "truth_freeze_tests": [
+      "tests/runtime-alignment-p0.test.js",
+      "tests/poster-production-hardening-freeze.test.js",
+      "tests/phase-2-review-export-gate-audit-hardening.test.js",
+      "tests/phase-2-family-source-truth-consumption-convergence.test.js"
+    ],
+    "behavior_tests": [
+      "tests/profile-contract-hydration.test.js",
+      "tests/family-source-truth-consumption.test.js",
+      "tests/deliverable-review-loop.test.js",
+      "tests/mcp-gateway.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/profile-contract-hydration.test.js tests/family-source-truth-consumption.test.js tests/deliverable-review-loop.test.js tests/mcp-gateway.test.js",
+      "npm test"
+    ]
+  },
+  "closeout_evidence": {
+    "repo_tracked_truth_surfaces": [
+      "contracts/runtime-program/current-program.json",
+      "contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json",
+      "contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json",
+      "docs/phase_2_family_source_truth_consumption_convergence.md",
+      "README.md",
+      "README.zh-CN.md",
+      "docs/runtime_architecture.md",
+      "docs/domain-harness-os-positioning.md",
+      "docs/policies/runtime_operating_model.md"
+    ],
+    "must_record": [
+      "family source-truth consumption convergence has an absorbed tranche on the same mainline",
+      "authoritative fail-closed source gating remains canonical in auditDeliverable/runtimeWatch rather than family-local heuristics",
+      "ppt_deck, xiaohongshu, and guarded poster_onepager emit one shared source_truth_consumption summary shape",
+      "formal entry remains MCP / CLI"
+    ],
+    "must_not_claim": [
+      "controller became a formal entry",
+      "academic poster contract became active",
+      "managed web runtime migration is now the current repo truth",
+      "RedCube AI became the whole OPL"
+    ]
+  },
+  "closeout": {
+    "executed_at": "2026-04-08",
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "absorbed_to_main": true,
+    "next_tranche_candidate": "phase_2_publication_projection_delivery_contract_convergence"
+  }
+}

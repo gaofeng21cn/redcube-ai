@@ -269,6 +269,31 @@ export interface XiaohongshuLifecycleModel {
   };
 }
 
+export interface XiaohongshuSourceTruthContract {
+  authoritative_surface: 'shared_source_truth';
+  authoritative_gate: 'topics/<topic>/canonical/source-audit.json';
+  authoritative_artifacts: ReadonlyArray<'source_index' | 'extracted_materials' | 'source_audit' | 'source_brief'>;
+  route_gate_rule: 'authoritative_fail_closed_in_audit_and_runtime_watch';
+  hydration_model: {
+    hydrated_contract_surface: 'contracts/hydrated-deliverable.json';
+    runtime_injection_surface: 'shared_source_truth';
+    static_contract_written_at_create_deliverable: true;
+  };
+  readable_shared_source_truth_fields: {
+    source_index: ReadonlyArray<string>;
+    extracted_materials: ReadonlyArray<string>;
+    source_brief: ReadonlyArray<string>;
+  };
+  consumption_summary_fields: ReadonlyArray<string>;
+  route_to_consumption_role: {
+    research: 'source_readiness';
+    storyline: 'story_architecture';
+    single_note_plan: 'story_architecture';
+    visual_direction: 'visual_authorship';
+  };
+  required_hydrated_export_surface: 'export_bundle';
+}
+
 export interface XiaohongshuHydrateContractRequest {
   topicId: string;
   deliverableId: string;
@@ -295,6 +320,7 @@ export interface XiaohongshuHydratedContract {
   export_bundle: XiaohongshuExportBundle;
   display_registry: XiaohongshuDisplayRegistry;
   lifecycle_model: XiaohongshuLifecycleModel;
+  source_truth_contract: XiaohongshuSourceTruthContract;
 }
 
 export interface XiaohongshuDeliverableRecordInput {

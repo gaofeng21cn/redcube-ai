@@ -64,6 +64,8 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.prompt_pack.render_contract.shell_file, 'render_shell.html');
   assert.equal(contract.prompt_pack.render_contract.recipe_registry.cover_hero, 'ppt.hero_signal');
   assert.equal(contract.prompt_pack.render_contract.recipe_registry.default, 'ppt.compare_zones');
+  assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
+  assert.equal(contract.source_truth_contract.route_to_consumption_role.visual_direction, 'visual_authorship');
 });
 
 test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared runtime model', () => {
@@ -89,6 +91,8 @@ test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared
   );
   assert.equal(contract.review_surface.required_checks.includes('platform_copy_complete'), true);
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
+  assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
+  assert.equal(contract.source_truth_contract.route_to_consumption_role.research, 'source_readiness');
 });
 
 test('hydrateDeliverableContract rejects unknown profile_id for a family', () => {
@@ -130,4 +134,6 @@ test('hydrateDeliverableContract resolves poster_onepager knowledge_poster contr
   );
   assert.equal(contract.prompt_pack.pack_id, 'poster_onepager_mainline_v1');
   assert.equal(contract.export_bundle.bundle_id, 'poster_onepager_bundle');
+  assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
+  assert.equal(contract.source_truth_contract.poster_guarded_boundary.academic_contract_active, false);
 });

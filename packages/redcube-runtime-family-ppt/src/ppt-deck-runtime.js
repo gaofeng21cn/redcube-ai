@@ -8,7 +8,10 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  buildSourceTruthConsumptionSummary,
+  getDeliverablePaths,
+} from '@redcube/runtime-protocol';
 
 import {
   buildPptDetailedOutline,
@@ -74,6 +77,12 @@ const STAGE_REQUIREMENTS = Object.freeze({
 });
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
+const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
+  storyline: 'story_architecture',
+  detailed_outline: 'story_architecture',
+  slide_blueprint: 'story_architecture',
+  visual_direction: 'visual_authorship',
+});
 
 function safeText(value) {
   return String(value || '').trim();
@@ -810,6 +819,7 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
     default:
       throw new Error(`Unsupported ppt_deck route: ${route}`);
   }
+  const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
   return {
     overlay: contract.overlay,
     route,
@@ -817,6 +827,14 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
     deliverable_id: deliverableId,
     contract,
     stage_contract: stageContract,
+    ...(sourceTruthConsumptionRole
+      ? {
+          source_truth_consumption: buildSourceTruthConsumptionSummary(contract.shared_source_truth, {
+            consumptionRole: sourceTruthConsumptionRole,
+            defaultSourceLabels: sharedSourceLabels(contract),
+          }),
+        }
+      : {}),
     ...payload,
   };
 }

@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  buildSourceTruthConsumptionSummary,
+  getDeliverablePaths,
+} from '@redcube/runtime-protocol';
 import {
   buildPosterBlueprint,
   buildPosterRenderArtifact,
@@ -22,6 +25,11 @@ const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYTHON_REVIEW = path.join(MODULE_DIR, '../../redcube-runtime/scripts/ppt_deck_review.py');
 const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
 const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
+const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
+  storyline: 'story_architecture',
+  poster_blueprint: 'story_architecture',
+  visual_direction: 'visual_authorship',
+});
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -648,6 +656,7 @@ export async function runPosterOnepagerRoute({ workspaceRoot, topicId, deliverab
     default:
       throw new Error(`Unsupported poster_onepager route: ${route}`);
   }
+  const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
   return {
     overlay: contract.overlay,
     route,
@@ -655,6 +664,14 @@ export async function runPosterOnepagerRoute({ workspaceRoot, topicId, deliverab
     deliverable_id: deliverableId,
     contract,
     stage_contract: stageContract,
+    ...(sourceTruthConsumptionRole
+      ? {
+          source_truth_consumption: buildSourceTruthConsumptionSummary(contract.shared_source_truth, {
+            consumptionRole: sourceTruthConsumptionRole,
+            defaultSourceLabels: sourceLabels(contract),
+          }),
+        }
+      : {}),
     ...payload,
   };
 }

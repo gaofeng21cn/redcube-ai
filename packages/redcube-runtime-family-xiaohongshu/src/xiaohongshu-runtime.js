@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  buildSourceTruthConsumptionSummary,
+  getDeliverablePaths,
+} from '@redcube/runtime-protocol';
 
 import {
   buildXhsRenderHtml,
@@ -13,6 +16,11 @@ import {
 import { loadRenderPackCompiler } from '@redcube/pack-runtime';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
+
+/**
+ * @typedef {import('./types.js').XhsRuntimeRunRequest} XhsRuntimeRunRequest
+ * @typedef {import('./types.js').XhsRuntimeRouteResult} XhsRuntimeRouteResult
+ */
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
@@ -48,6 +56,12 @@ const HOST_AGENT_EXECUTION_MODEL = Object.freeze({
   adapter_role: 'primary_creative_executor',
   agent_first_requires_external_llm: false,
   external_llm_role: 'optional_compatibility_adapter',
+});
+const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
+  research: 'source_readiness',
+  storyline: 'story_architecture',
+  single_note_plan: 'story_architecture',
+  visual_direction: 'visual_authorship',
 });
 
 function hostAgentCreativeSource(contractAsset) {
@@ -854,8 +868,14 @@ export function canRunXiaohongshu(contract) {
   return contract?.deliverable_kind === 'xiaohongshu_note';
 }
 
+/**
+ * @param {XhsRuntimeRunRequest} request
+ * @returns {Promise<XhsRuntimeRouteResult>}
+ */
 export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableId, route, contract, mode = 'draft_new', baselineDeliverableId = '' }) {
   const { deliverablePaths } = ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
+  const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
+  const payload = await (async () => {
   switch (route) {
     case 'research':
       return buildResearch(contract);
@@ -898,4 +918,16 @@ export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableI
     default:
       throw new Error(`Unsupported xiaohongshu route: ${route}`);
   }
+  })();
+  return {
+    ...payload,
+    ...(sourceTruthConsumptionRole
+      ? {
+          source_truth_consumption: buildSourceTruthConsumptionSummary(contract.shared_source_truth, {
+            consumptionRole: sourceTruthConsumptionRole,
+            defaultSourceLabels: sourceLabels(contract),
+          }),
+        }
+      : {}),
+  };
 }
