@@ -39,6 +39,7 @@ This index along with the repository home forms the default GitHub-facing biling
 ### For technical collaborators / agent executors
 
 - [Runtime architecture](runtime_architecture.md)
+- [Source Augmentation / Deep Research executor contract](source_augmentation_executor_contract.md) (Chinese only)
 - [Domain Harness OS positioning map](domain-harness-os-positioning.md)
 - [Public GitHub publishing](public-github-publish.md)
 - [Documentation Governance](documentation-governance.md) (Chinese only)

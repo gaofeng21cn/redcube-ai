@@ -18,6 +18,35 @@
 - 你可以在任意大步骤边界介入，通过 Codex 查看、修改、继续推进
 - 真正阻断放行的是循环式 Review Gate，而不是一次性的 review
 
+## 推荐的工作区结构
+
+你可以直接拿一个全新目录当 `workspace`，不需要先手工搭完整棵树。
+只要把参考材料放进去，然后让 Codex / Agent 在这个目录下调用 `RedCube AI`，它就应该按 canonical workspace contract 自动把结构水合出来。
+
+稳定结构如下：
+
+```text
+<workspace>/
+  redcube.workspace.json
+  topics/
+    <topic-id>/
+      inputs/
+      canonical/
+      deliverables/
+      notes/
+      runs/
+  runtime/
+  publish/
+  overlays/
+```
+
+你真正需要先理解的只有两层：
+
+- 工作区根目录会有 `redcube.workspace.json`
+- 每个主题最关键的事实真相面都落在 `topics/<topic-id>/canonical/`
+
+如果你已经准备好了参考材料，建议直接放到 `topics/<topic-id>/inputs/`，或者让 Agent 通过绝对路径作为 `source-files` 读取。
+
 ## 你需要先准备什么
 
 建议先准备下面几类材料：
@@ -50,7 +79,21 @@
 4. 让 Agent 使用 `RedCube AI` 作为视觉交付运行层推进。
 5. 你只在关键节点审核，不手工操作底层运行细节。
 
+对 Step 1，可以把它收口成一条稳定链路理解：
+
+`source intake -> source augment -> source execute-augmentation`
+
 ## 你可以直接发给 Agent 的话
+
+### Codex 的一句话启动指令
+
+#### 场景一：你已经准备好了参考材料
+
+> 请把这个目录当作 RedCube AI 的工作区。先读取这里已有的参考材料，必要时在同一工作区下完成 `Source Readiness`，如果 canonical source truth 还不够支撑后续判断，就继续执行 `source augmentation` / `Deep Research`，然后再推进到 Storyline、Plan、Visual 和 Delivery。
+
+#### 场景二：你只有主题、关键词或粗略想法
+
+> 请把这个目录当作 RedCube AI 的工作区，并围绕这个主题先建立 canonical `Source Readiness`。如果输入材料不足，请强制启动 `source augmentation` / `Deep Research` 去补全事实材料，等 Step 1 达到 `planning_ready` 后，再继续推进后续视觉交付步骤。
 
 ### 场景一：PPT 演示文稿
 
