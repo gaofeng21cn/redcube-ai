@@ -56,18 +56,6 @@ The current mainline also freezes one explicit execution-handle and durable-surf
 - Produce single-page `posters` when you need something more shareable than slides and more structured than a social post.
 - Keep review checkpoints, reruns, and exports inside one governed process instead of rebuilding the workflow every time.
 
-## Working Contract
-
-For end users, the product should be understood as one `5-step` line:
-
-`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`
-
-Within that line:
-
-- `Deep Research` belongs to `Source Readiness` when the input is too thin to support later judgement
-- humans can interrupt and review at any stage boundary through their agent
-- delivery is protected by a looped review gate rather than a one-shot review step
-
 ## Current Deliverables
 
 | Deliverable | Current state | Typical use |
@@ -110,12 +98,82 @@ Typical three-step start:
 
 1. Prepare an isolated workspace and place your source materials in it.
 2. Tell your agent whether you want `slides`, a `Xiaohongshu note`, or a `poster`, who the audience is, and what the final goal is.
-3. If you only have a topic, keywords, or a rough idea, let the agent enter `Source Readiness` first: run `source intake`, then materialize and execute the canonical `source augmentation` / `Deep Research` step when needed.
-4. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
+3. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
+
+If you want a faster handoff, you can give your agent a one-line start instruction.
+
+Scenario 1, you already prepared reference materials:
+
+> Treat this directory as the isolated RedCube workspace for this project. Run `workspace doctor` first, then `source intake` to read and hydrate the materials I provided; then create the required `topic` and `deliverable`, and move the work through the formal review, rerun, and export chain. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`.
+
+Scenario 2, you only have a topic and want facts prepared first:
+
+> Treat this directory as the isolated RedCube workspace for this project. For the topic "{{topic}}", enter `Source Readiness` first: if materials are still insufficient, produce a research brief, a public-source posture, and a missing-material checklist before drafting; only create the deliverable and continue the formal delivery chain after shared source truth becomes sufficient. For a serialized Xiaohongshu project, model one deliverable per note.
+
+There is an important boundary to state honestly:
+
+- the current formally stable baseline is `source intake + shared source truth`
+- `research` currently exists mainly as a `source_readiness / source_augmentation` route inside the `xiaohongshu` family
+- it should not be described as already equivalent to `MedDeepScientist` `Scout + Idea`
+- more accurately, it is currently a research-brief layer on top of source truth; the real content strategy and narrative line still start from `storyline`
+
+The recommended mental model is to treat `RedCube AI` as a runtime operating on one isolated workspace, not as a content folder embedded inside the repository itself.
+The most practical working granularity today is:
+
+- `1 workspace = 1 relatively independent content project or series`
+- `1 topic = 1 thematic line`
+- `1 deliverable = 1 formal output`, such as `one Xiaohongshu note`, `one PPT deck`, or `one poster`
+
+For a serialized Xiaohongshu project, the default mapping should be:
+
+- `1 workspace = 1 series project`
+- `1 topic = 1 series theme`
+- `1 deliverable = 1 note in the series`, such as `note-01`, `note-02`
+
+The current canonical workspace contract is:
+
+```text
+<workspace>/
+├── redcube.workspace.json
+├── topics/
+│   └── <topic-id>/
+│       ├── topic.json
+│       ├── inputs/
+│       ├── canonical/
+│       ├── deliverables/
+│       │   └── <deliverable-id>/
+│       │       ├── deliverable.json
+│       │       ├── artifacts/
+│       │       ├── contracts/
+│       │       ├── reports/
+│       │       └── views/
+│       └── runs/
+├── runtime/
+├── publish/
+└── overlays/
+```
+
+Important boundary:
+
+- `canonical/`, `contracts/`, and `reports/` are formal runtime-owned surfaces and should normally be maintained by `RedCube AI`, not edited by hand
+- on a brand-new empty directory, the first `source intake` already initializes the base workspace contract, including `redcube.workspace.json`, `topics/<topic>/inputs/`, and `topics/<topic>/canonical/`
+- `deliverable create` then adds `topic.json`, `deliverable.json`, and the deliverable-specific directories
+
+So the recommended startup order for a fresh directory is:
+
+1. `redcube workspace doctor`
+2. `redcube source intake`
+3. `redcube deliverable create`
+4. `redcube deliverable audit`
+5. `redcube deliverable run`
 
 You can give your agent an instruction like this:
 
 > Read the materials in this workspace first. Then decide whether the requested deliverable should be a PPT deck, a Xiaohongshu post, or a knowledge poster. If I already specified the deliverable type, follow that choice. Use RedCube AI (`https://github.com/gaofeng21cn/redcube-ai`) as the visual-deliverable gateway and Domain Harness OS. Make the audience, deliverable goal, information structure, review checkpoints, and export requirements explicit. If the direction is unclear, ask clarifying questions before generating a vague draft.
+
+If you want your agent to start directly from a brand-new directory, you can make the instruction more explicit:
+
+> Treat this directory as the isolated RedCube workspace for this project. If `redcube.workspace.json` is missing, initialize the workspace using RedCube's canonical workspace contract. Model this project as `1 workspace`, `1 topic`, and one or more `deliverables`. Run `workspace doctor` first, then `source intake` to hydrate shared source truth; if the source set is still insufficient, produce a research brief and a missing-material checklist before drafting. Then create the target deliverable and move it through the formal review, rerun, and export stages. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`, instead of mixing the whole series into one deliverable.
 
 ## Current Limits
 

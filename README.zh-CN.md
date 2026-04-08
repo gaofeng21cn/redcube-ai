@@ -55,18 +55,6 @@
 - 产出 `海报`，作为比幻灯片更便于传播、比社交内容更结构化的单页视觉交付物
 - 在同一条受控流程里完成审阅、重跑、导出与交付收口，而不是每次重搭流程
 
-## 工作口径
-
-对终端用户，`RedCube AI` 应统一理解为一条 `5 步` 生产线：
-
-`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`
-
-其中：
-
-- `Deep Research` 属于 `Source Readiness`，在输入材料不足时作为强化模式触发
-- 人可以通过自己的 Agent 在任意大步骤边界介入
-- 交付放行依赖循环式 Review Gate，而不是一次性 review
-
 ## 当前可用的交付物
 
 | 交付物 | 当前状态 | 典型场景 |
@@ -109,12 +97,82 @@
 
 1. 准备一个独立工作区，把材料放进去。
 2. 告诉智能代理这次要做的是 `幻灯片`、`小红书笔记` 还是 `海报`，以及面向谁、最终要达到什么目标。
-3. 如果当前只有主题、关键词或粗略想法，让智能代理先走 `Source Readiness`：先做 `source intake`，再在需要时生成并执行 canonical `source augmentation` / `Deep Research`。
-4. 让智能代理使用 `RedCube AI` 推进这次视觉交付，并由你审核关键节点。
+3. 让智能代理使用 `RedCube AI` 推进这次视觉交付，并由你审核关键节点。
+
+如果你想更快开始，可以直接给智能代理一句话指令。
+
+场景一，你已经准备好了参考材料：
+
+> 请把这个目录当作本次项目的独立 RedCube workspace。先执行 `workspace doctor`，再执行 `source intake` 读取并水合我提供的材料；然后根据任务目标创建 `topic` 与 `deliverable`，并按正式链路推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
+
+场景二，你只有主题，希望它先把事实材料准备好：
+
+> 请把这个目录当作本次项目的独立 RedCube workspace。围绕主题“{{主题}}”先进入 `Source Readiness`：如果现有材料不足，就先生成 research brief、公开来源口径和待补资料清单，不要直接进入成稿；待 shared source truth 足够后，再创建 deliverable 并推进正式交付链路。若是小红书系列，请按一篇笔记一个 deliverable 建模。
+
+这里有一个需要诚实说明的边界：
+
+- 当前正式稳定的是 `source intake + shared source truth`
+- `research` 目前主要是 `xiaohongshu` family 内的 `source_readiness / source augmentation` route
+- 它不能被表述成已经等价于 `MedDeepScientist` 的 `Scout + Idea`
+- 更准确地说，它现在更像“在 source truth 之上的 research brief 整理层”；真正的内容策略和讲述主线，仍然从 `storyline` 开始
+
+当前更适合把 `RedCube AI` 当作“面向一个独立 workspace 的运行时”，而不是把仓库本身当成内容目录。
+当前最适合的组织粒度是：
+
+- `1 个 workspace = 1 个相对独立的内容项目或系列`
+- `1 个 topic = 1 个主题`
+- `1 个 deliverable = 1 个正式交付物`，例如 `1 篇小红书笔记`、`1 套 PPT` 或 `1 张海报`
+
+对于“小红书系列笔记”，推荐理解为：
+
+- `1 个 workspace = 1 个系列项目`
+- `1 个 topic = 1 条系列主线`
+- `1 个 deliverable = 系列中的 1 篇笔记`，例如 `note-01`、`note-02`
+
+当前 canonical workspace contract 建议按下面理解：
+
+```text
+<workspace>/
+├── redcube.workspace.json
+├── topics/
+│   └── <topic-id>/
+│       ├── topic.json
+│       ├── inputs/
+│       ├── canonical/
+│       ├── deliverables/
+│       │   └── <deliverable-id>/
+│       │       ├── deliverable.json
+│       │       ├── artifacts/
+│       │       ├── contracts/
+│       │       ├── reports/
+│       │       └── views/
+│       └── runs/
+├── runtime/
+├── publish/
+└── overlays/
+```
+
+这里要特别注意：
+
+- `canonical/`、`contracts/`、`reports/` 属于正式运行落盘层，建议由 `RedCube AI` 自动维护，不建议手工编辑
+- 当前对一个全新空目录，首次执行 `source intake` 就会自动补 `redcube.workspace.json`、`topics/<topic>/inputs/`、`topics/<topic>/canonical/` 等基础结构
+- 后续执行 `deliverable create` 时，会继续补 `topic.json`、`deliverable.json` 以及对应的 deliverable 目录
+
+因此，针对新目录的推荐调用顺序是：
+
+1. `redcube workspace doctor`
+2. `redcube source intake`
+3. `redcube deliverable create`
+4. `redcube deliverable audit`
+5. `redcube deliverable run`
 
 你可以直接把下面这段话发给智能代理：
 
 > 请先读取我提供的材料，并判断这次交付更适合做成幻灯片、小红书笔记，还是海报。如果我已经明确指定交付物类型，就按该类型执行。然后使用 RedCube AI（`https://github.com/gaofeng21cn/redcube-ai`）作为视觉交付 gateway 与 Domain Harness OS，把这些材料组织成可审阅、可迭代、可导出的正式交付物。请明确目标受众、交付目标、关键信息结构、审阅节点和最终导出要求；如果方向不清楚，请先提出澄清问题，而不是直接生成一版含糊结果。
+
+如果你希望 Agent 在一个全新的目录里直接开工，可以把要求再说得更明确一些：
+
+> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 RedCube 的 canonical workspace contract 初始化；把这次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则先产出 research brief 与待补资料清单，不要直接进入成稿。随后为本次目标创建 deliverable，并按正式阶段推进审阅、重跑与导出。对于小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`，不要把整组系列混成一个 deliverable。
 
 ## 当前待完善的地方
 
