@@ -1,6 +1,15 @@
 {
   "program_id": "redcube-runtime-program",
-  "date_anchor": "2026-04-07",
+  "date_anchor": "2026-04-08",
+  "longrun_goal": {
+    "label": "visual-deliverable domain gateway plus domain harness os longrun mainline",
+    "north_star": [
+      "keep MCP and CLI as the repo-verified formal entry surfaces until any wider entry is implemented, documented, and verifiable",
+      "treat source intake and shared source truth as stable capability surfaces inside Source Readiness rather than as a one-off phase experiment",
+      "continue review, export, gate, and audit hardening on the same mainline instead of defaulting back to manual next-baton pauses after each absorbed tranche",
+      "keep poster knowledge-poster support, future academic-poster support, and future federation work on the same substrate without fragmenting formal control semantics"
+    ]
+  },
   "formal_entry": {
     "repo_verified": [
       "MCP",
@@ -9,6 +18,16 @@
     "controller_repo_verified": false
   },
   "current_state": {
+    "autonomous_longrun_program_mode": {
+      "enabled": true,
+      "meaning": "longrun goal refers to the ideal product shape, not the current phase label or the latest absorbed tranche",
+      "continue_rule": "after a tranche is frozen, verified, and absorbed, same-mainline hardening may continue autonomously when the next capability truth can be frozen without violating hard boundaries",
+      "stop_conditions": [
+        "frozen truth conflict that cannot be resolved inside current contracts",
+        "new product-direction choice is required",
+        "external dependency or credential blocks the next truthful step"
+      ]
+    },
     "phase_id": "Phase2",
     "phase_label": "Phase 2 / source intake + shared source truth baseline",
     "workstream": "phase_2_source_intake_shared_source_truth_baseline",
@@ -59,7 +78,7 @@
     "next_phase": {
       "p1_allowed": false,
       "phase_2_allowed": true,
-      "only_after": "Phase 2 minimum baseline is active on the mainline; future tranches may continue autonomously only after the current tranche is frozen, verified, and absorbed"
+      "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
     },
     "active_baton": {
       "id": "phase_2_source_intake_shared_source_truth_baseline",
@@ -112,7 +131,8 @@
         "suite_result": "pass",
         "findings_recorded": 0,
         "absorbed_to_main": true,
-        "next_tranche_candidate": "phase_2_review_export_gate_audit_hardening"
+        "next_tranche_candidate": "phase_2_review_export_gate_audit_hardening",
+        "next_tranche_kind": "ongoing_hardening_axis"
       }
     },
     "completed_batons": {

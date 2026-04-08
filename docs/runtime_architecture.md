@@ -13,6 +13,12 @@
 当前已验证的 formal entry 是 `MCP`、`CLI`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
 
+这里同样必须区分：
+
+- 长线目标：把 `RedCube AI` 收敛成稳定、可信、可复验的 visual-deliverable `Domain Gateway + Domain Harness OS`
+- 当前 program：当前 repo-tracked mainline 正在覆盖的能力层
+- 历史 freeze / closeout：把当前能力带进主线的 provenance 证据
+
 当前最成熟的两类交付物，加上一条已完成 extension proof 的海报 surface，是：
 
 - `PPT deck`
@@ -184,12 +190,13 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 
 当前 reality：
 
-- `Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线`：CLI / MCP 的 source intake 会把 canonical quartet 写入同一 substrate，`ppt_deck` / `xiaohongshu` 在同一 `gateway -> family -> profile -> pack -> harness execution` 控制链上消费 `shared_source_truth`；`P0 review-closeout` 与 stable deliverable manual hardening 继续保持通过，activation package freeze 已完成并转为已吸收前置冻结件
+- `source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线：CLI / MCP 的 source intake 会把 canonical quartet 写入同一 substrate，`ppt_deck` / `xiaohongshu` 在同一 `gateway -> family -> profile -> pack -> harness execution` 控制链上消费 `shared_source_truth`；`P0 review-closeout` 与 stable deliverable manual hardening 继续保持通过，activation package freeze 已完成并转为已吸收前置冻结件
 - 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
 - `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`
 - `poster_onepager` 已完成第三 family onboarding / extension proof，但当前只应被解释为 knowledge poster
 - `paper_poster / conference_poster` academic poster contract 只保留为后续或历史冻结残留，不构成当前 active mainline
+- `review / export / gate / audit hardening` 仍是当前主线的持续增强方向，而不是默认回到“等待下一棒显式晋升”的停点
 
 当前目标态：
 

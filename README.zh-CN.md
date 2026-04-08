@@ -99,11 +99,11 @@
 当前最主要的待完善项有：
 
 - `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面；`stable deliverable manual-test-driven hardening` 已完成 closeout，并形成了 tracked stable backlog（当前无新增 findings）
-- `Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线`；`CLI / MCP 已可在同一 substrate 上水合 canonical shared source truth`，并由 `ppt_deck` / `xiaohongshu` 通过共享 gateway 主线消费
+- `source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线；`CLI / MCP` 已可在同一 substrate 上水合 canonical shared source truth，并由 `ppt_deck` / `xiaohongshu` 通过共享 gateway 主线消费
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
-- 更大范围的 `Phase 2 review / export / gate / audit hardening` 仍属后续 tranche
+- 更大范围的 `review / export / gate / audit hardening` 仍是同一主线上的后续 hardening
 - 与 OPL 的正式联动还在后续阶段
 
 ## 文档入口
@@ -143,7 +143,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线`，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -151,7 +151,8 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- `Phase 2` 当前只在 minimum baseline scope 激活：source intake 与 shared source truth 已进入主线，但更大范围的 review / export / gate / audit hardening、source plane 扩展与运营面收口仍属后续 tranche。
+- 当前 phase label 仍指向已吸收的 source-intake baseline，但产品长线目标不等于这一个 tranche。
+- 更大范围的 review / export / gate / audit hardening、source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。
 
 ## 当前推荐入口

@@ -25,7 +25,10 @@ This index along with the repository home forms the default GitHub-facing biling
 
 - [Human quickstart](human_quickstart.md)
 - [Deliverable examples](deliverable_examples.md)
-- [Stable deliverable manual test brief](stable_deliverable_manual_test_brief.md)
+- [Stable deliverable manual test brief](stable_deliverable_manual_test_brief.md) (historical program evidence, Chinese only)
+
+### Historical program artifacts
+
 - [Phase 2 activation package freeze](phase_2_source_intake_activation_package_freeze.md) (Chinese only)
 - [Phase 2 source intake + shared source truth baseline](phase_2_source_intake_shared_source_truth_baseline.md) (Chinese only)
 

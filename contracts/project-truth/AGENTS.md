@@ -13,13 +13,21 @@ Do not treat the repository root `AGENTS.md` as the runtime product contract; th
 
 ## Frozen Truth Sources
 
-Read and follow these sources before changing runtime behavior:
+Read and follow these sources before changing runtime behavior.
+
+### Current Stable Truth
 
 - `README.md`
 - `docs/runtime_architecture.md`
 - `docs/domain-harness-os-positioning.md`
 - `docs/policies/runtime_operating_model.md`
 - `contracts/runtime-program/current-program.json`
+
+### Historical Program Provenance
+
+These files remain repo-tracked evidence and provenance for how the current mainline was absorbed.
+They must not be reinterpreted as the whole current product identity by themselves.
+
 - `contracts/runtime-program/p21-operations-evaluation-closeout.json`
 - `contracts/runtime-program/poster-production-hardening-freeze.json`
 - `contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json`
@@ -69,6 +77,8 @@ Never collapse these levels into a vague prompt or hidden heuristic.
 - Harness execution must consume hydrated contract data rather than prompt-only intent
 - Prompt text may assist execution, but prompt semantics are not the control plane
 - External LLM compatibility layers may exist, but they are not the mainline architecture
+- Longrun goal means the ideal product shape, not the current phase label or the latest absorbed tranche.
+- Once a tranche is frozen, verified, and absorbed, follow-on hardening may continue on the same mainline without defaulting back to a manual “next baton” pause, unless a frozen-truth conflict, new product-direction choice, or external dependency blocks progress.
 
 ## Quality Rules
 

@@ -138,7 +138,7 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 
-test('P0 tracked docs keep Phase 2 minimum baseline on the mainline while formal entry remains MCP and CLI only', () => {
+test('P0 tracked docs keep source readiness baseline on the mainline while formal entry remains MCP and CLI only', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
@@ -146,11 +146,11 @@ test('P0 tracked docs keep Phase 2 minimum baseline on the mainline while formal
   const baselineBrief = read(PHASE_2_BASELINE_BRIEF);
 
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
-  assert.equal(readme.includes('Phase 2 minimal baseline for source intake + shared source truth is now on the mainline'), true);
-  assert.equal(readme.includes('CLI` and `MCP` now hydrate canonical shared source truth on the same substrate'), true);
-  assert.equal(readmeZh.includes('Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线'), true);
-  assert.equal(readmeZh.includes('CLI / MCP 已可在同一 substrate 上水合 canonical shared source truth'), true);
-  assert.equal(runtimeArchitecture.includes('Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线'), true);
+  assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
+  assert.equal(readme.includes('`CLI` and `MCP` hydrate canonical shared source truth on the same substrate'), true);
+  assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
+  assert.equal(readmeZh.includes('CLI / MCP` 已可在同一 substrate 上水合 canonical shared source truth') || readmeZh.includes('CLI / MCP 已可在同一 substrate 上水合 canonical shared source truth'), true);
+  assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
   assert.equal(baselineBrief.includes('当前这份文档记录的是已经吸收到主线的最小 baseline'), true);
   assert.equal(baselineBrief.includes('formal entry：仍只有 `MCP / CLI`'), true);
 });

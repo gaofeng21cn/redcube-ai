@@ -59,7 +59,7 @@ test('phase-2 minimum baseline contract freezes canonical quartet, formal entry 
   assert.equal(deliverableRoutes.includes('shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId)'), true);
 });
 
-test('phase-2 minimum baseline brief and docs indexes expose the baseline as active while keeping scope honest', () => {
+test('phase-2 minimum baseline brief and docs indexes expose the baseline as absorbed provenance while keeping scope honest', () => {
   const brief = read(BASELINE_BRIEF);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
@@ -75,11 +75,11 @@ test('phase-2 minimum baseline brief and docs indexes expose the baseline as act
   assert.equal(brief.includes('formal entry：仍只有 `MCP / CLI`'), true);
   assert.equal(brief.includes('它已经不是 activation-package freeze'), true);
   assert.equal(brief.includes('但也不是“整个 Phase 2 都已完成”'), true);
-  assert.equal(readme.includes('Phase 2 minimal baseline for source intake + shared source truth is now on the mainline'), true);
-  assert.equal(readmeZh.includes('Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线'), true);
-  assert.equal(runtimeArchitecture.includes('Phase 2 source intake + shared source truth 的最小 baseline 已进入正式主线'), true);
-  assert.equal(policy.includes('当前 Phase 2 最小 baseline'), true);
-  assert.equal(positioning.includes('当前 Phase 2 最小 baseline 状态'), true);
+  assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
+  assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
+  assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
+  assert.equal(policy.includes('当前正式能力面'), true);
+  assert.equal(positioning.includes('当前主线能力边界'), true);
   assert.equal(docsIndex.includes('phase_2_source_intake_shared_source_truth_baseline.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_source_intake_shared_source_truth_baseline.md'), true);
 });

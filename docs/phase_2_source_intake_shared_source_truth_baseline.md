@@ -10,6 +10,17 @@
 它已经不是 activation-package freeze，
 但也不是“整个 Phase 2 都已完成”。
 
+它现在更准确的角色是：
+
+- 已吸收到 `main` 的 baseline evidence
+- 当前主线能力的 provenance 说明面
+
+它不是：
+
+- `RedCube AI` 全部长期目标的代称
+- 当前 program 的唯一 operator truth
+- 默认要求“停在这里等下一棒人工晋升”的停车令
+
 ## 当前结论
 
 - `Phase 1`：已完成并冻结
@@ -19,6 +30,7 @@
 - 当前 active tranche：`Phase 2 source intake + shared source truth baseline`
 - formal entry：仍只有 `MCP / CLI`
 - `controller`：仍不是 repo-verified formal entry
+- 当前下一方向应理解为同一主线上的持续 hardening，而不是把这份 absorbed baseline 误写成整个项目的终点
 
 ## 这条 baseline 已经把什么纳入正式主线
 
@@ -101,3 +113,8 @@
 ## 当前下一候选 tranche
 
 - `phase_2_review_export_gate_audit_hardening`
+
+在 `autonomous longrun program mode` 下，这个候选 tranche 的意义是：
+
+- 当前主线的持续 hardening 方向
+- 不是把当前主线重新切成“必须人工点名才允许继续”的停车点

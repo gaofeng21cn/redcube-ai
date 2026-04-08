@@ -9,6 +9,16 @@
 它不是 `Phase 2` 实现启动令，
 也不是 source intake runtime build-out 计划执行本身。
 
+截至当前状态，这份文档已经退居为：
+
+- 已吸收 activation freeze 的历史 provenance
+
+它不再是：
+
+- 当前 operator 的默认主读入口
+- 当前主线身份定义文件
+- 默认“下一棒必须显式人工晋升”的唯一依据
+
 ## 当前状态
 
 - 当前 active mainline：`redcube-runtime-program`
@@ -137,3 +147,5 @@ activation package freeze 至少要绑定：
 - 当前不进入：`P1`
 - 当前不进入：`Phase 2 / source intake + shared source truth implementation`
 - 下一停点：`future explicit promotion decision for a dedicated Phase 2 implementation baton`
+
+这段“停点”现在应被理解为历史 freeze closeout 记录，而不是当前 longrun 主线的默认停车规则。
