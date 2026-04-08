@@ -23,5 +23,9 @@ export { loadReferenceSampleFixture, listPromotedReferences, listReferenceSample
 export { buildReferencePromotionReport, buildReferenceQualityReport, buildReferenceReplacementReport, buildRelativeQualityRubric, compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 export { intakeSource } from './source-intake.js';
 export { prepareSourceAugmentation } from './source-augmentation-request.js';
+export {
+  prepareSourceAugmentationResult,
+  writeSourceAugmentationResult,
+} from './source-augmentation-result.js';
 export { executeSourceAugmentation } from './source-augmentation-execution.js';
 export { resolveSourceAugmentationAdapter } from './source-augmentation-executor.js';

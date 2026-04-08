@@ -24,6 +24,8 @@ test('public docs describe Deep Research as Source Readiness enhancement on an a
 
   assert.equal(rootReadme.includes('`Deep Research` belongs to `Source Readiness`'), true);
   assert.equal(rootReadmeZh.includes('`Deep Research` 属于 `Source Readiness`'), true);
+  assert.equal(rootReadme.includes('`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`'), true);
+  assert.equal(rootReadmeZh.includes('`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`'), true);
   assert.equal(quickstart.includes('`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`'), true);
   assert.equal(quickstart.includes('可以在任意大步骤边界介入'), true);
   assert.equal(quickstart.includes('循环式 Review Gate'), true);
@@ -41,6 +43,7 @@ test('operator docs publish workspace structure and source augmentation executor
   assert.equal(quickstart.includes('`redcube.workspace.json`'), true);
   assert.equal(quickstart.includes('`topics/<topic-id>/canonical/`'), true);
   assert.equal(quickstart.includes('`source intake -> source augment -> source execute-augmentation`'), true);
+  assert.equal(quickstart.includes('`source prepare-augmentation-result -> source write-augmentation-result`'), true);
   assert.equal(quickstart.includes('Codex 的一句话启动指令'), true);
 
   assert.equal(docsReadme.includes('source_augmentation_executor_contract.md'), true);
@@ -49,6 +52,8 @@ test('operator docs publish workspace structure and source augmentation executor
   assert.equal(executorContract.includes('`REDCUBE_SOURCE_AUGMENT_CMD`'), true);
   assert.equal(executorContract.includes('`REDCUBE_SOURCE_AUGMENT_RESULT_FILE`'), true);
   assert.equal(executorContract.includes('`result_file`'), true);
+  assert.equal(executorContract.includes('`source prepare-augmentation-result`'), true);
+  assert.equal(executorContract.includes('`source write-augmentation-result`'), true);
   assert.equal(executorContract.includes('`shared_source_readiness_augmentation`'), true);
   assert.equal(executorContract.includes('`shared_source_readiness_augmentation_result`'), true);
   assert.equal(executorContract.includes('request contract invalid'), true);

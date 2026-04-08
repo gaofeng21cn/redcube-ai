@@ -41,6 +41,10 @@ import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJ
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
 import { resolveSourceAugmentationAdapter as resolveSourceAugmentationAdapterJs } from './source-augmentation-executor.js';
 import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
+import {
+  prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
+  writeSourceAugmentationResult as writeSourceAugmentationResultJs,
+} from './source-augmentation-result.js';
 import { intakeSource as intakeSourceJs } from './source-intake.js';
 
 import type {
@@ -64,6 +68,10 @@ import type {
   RuntimeSourceIntakeResponse,
   RuntimeSourceAugmentationRequest,
   RuntimeSourceAugmentationResponse,
+  RuntimeSourceAugmentationResultPreparationRequest,
+  RuntimeSourceAugmentationResultPreparationResponse,
+  RuntimeSourceAugmentationResultWriteRequest,
+  RuntimeSourceAugmentationResultWriteResponse,
   RuntimeSourceAugmentationExecutionRequest,
   RuntimeSourceAugmentationExecutionResponse,
   RuntimeStartRunRequest,
@@ -165,6 +173,24 @@ export async function executeSourceAugmentation(
   return execute(request);
 }
 
+export async function prepareSourceAugmentationResult(
+  request: RuntimeSourceAugmentationResultPreparationRequest,
+): Promise<RuntimeSourceAugmentationResultPreparationResponse> {
+  const prepare = prepareSourceAugmentationResultJs as unknown as (
+    request: RuntimeSourceAugmentationResultPreparationRequest,
+  ) => Promise<RuntimeSourceAugmentationResultPreparationResponse>;
+  return prepare(request);
+}
+
+export async function writeSourceAugmentationResult(
+  request: RuntimeSourceAugmentationResultWriteRequest,
+): Promise<RuntimeSourceAugmentationResultWriteResponse> {
+  const write = writeSourceAugmentationResultJs as unknown as (
+    request: RuntimeSourceAugmentationResultWriteRequest,
+  ) => Promise<RuntimeSourceAugmentationResultWriteResponse>;
+  return write(request);
+}
+
 export type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
@@ -186,6 +212,10 @@ export type {
   RuntimeSourceIntakeResponse,
   RuntimeSourceAugmentationRequest,
   RuntimeSourceAugmentationResponse,
+  RuntimeSourceAugmentationResultPreparationRequest,
+  RuntimeSourceAugmentationResultPreparationResponse,
+  RuntimeSourceAugmentationResultWriteRequest,
+  RuntimeSourceAugmentationResultWriteResponse,
   RuntimeSourceAugmentationExecutionRequest,
   RuntimeSourceAugmentationExecutionResponse,
   RuntimeStartRunRequest,

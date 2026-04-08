@@ -22,7 +22,10 @@ export function buildSourceReadinessPack({
   const blockedReasons = safeArray(sourceAudit?.blocking_reasons).map((reason) => safeText(reason)).filter(Boolean);
   const evidenceGaps = [];
 
-  if (inputMode === 'brief_keywords') evidenceGaps.push('public_evidence_missing');
+  if (inputMode === 'brief_keywords') {
+    evidenceGaps.push('public_evidence_missing');
+    evidenceGaps.push('consumable_material_missing');
+  }
   if (materialIds.length === 0) evidenceGaps.push('consumable_material_missing');
   if (safeText(sourceAudit?.status) !== 'pass') evidenceGaps.push('source_audit_not_passed');
 

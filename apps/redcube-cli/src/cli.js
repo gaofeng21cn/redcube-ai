@@ -12,6 +12,8 @@ import {
   getRun as getGatewayRun,
   intakeSource,
   prepareSourceAugmentation,
+  prepareSourceAugmentationResult,
+  writeSourceAugmentationResult,
   executeSourceAugmentation,
   importLegacyProject,
   listTopics as listTopicsGateway,
@@ -31,6 +33,8 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getRun: getGatewayRun,
   intakeSource,
   prepareSourceAugmentation,
+  prepareSourceAugmentationResult,
+  writeSourceAugmentationResult,
   executeSourceAugmentation,
   importLegacyProject,
   listTopics: listTopicsGateway,
@@ -139,6 +143,14 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube source augment --workspace-root <dir> --topic-id <id>',
       },
       {
+        task: '为 Agent-native Research 路线准备 canonical augmentation result scaffold',
+        command: 'redcube source prepare-augmentation-result --workspace-root <dir> --topic-id <id>',
+      },
+      {
+        task: '把外部 / Agent 产出的 augmentation result payload 正式写回 canonical result surface',
+        command: 'redcube source write-augmentation-result --workspace-root <dir> --topic-id <id> --payload-file <file>',
+      },
+      {
         task: '执行 Source Augmentation / Deep Research 补料并回写 canonical source truth',
         command: 'redcube source execute-augmentation --workspace-root <dir> --topic-id <id>',
       },
@@ -171,7 +183,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
-      source: ['intake', 'augment', 'execute-augmentation'],
+      source: ['intake', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
@@ -192,6 +204,8 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       sourceAugment: 'redcube source augment --workspace-root <dir> --topic-id <id>',
+      sourcePrepareAugmentationResult: 'redcube source prepare-augmentation-result --workspace-root <dir> --topic-id <id>',
+      sourceWriteAugmentationResult: 'redcube source write-augmentation-result --workspace-root <dir> --topic-id <id> --payload-file <file>',
       sourceExecuteAugmentation: 'redcube source execute-augmentation --workspace-root <dir> --topic-id <id>',
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
@@ -283,6 +297,22 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
+    if (subcommand === 'prepare-augmentation-result') {
+      return gateway.prepareSourceAugmentationResult({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        topicId: options.topicId || '',
+      });
+    }
+
+    if (subcommand === 'write-augmentation-result') {
+      return gateway.writeSourceAugmentationResult({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        topicId: options.topicId || '',
+        inputFile: options.inputFile || '',
+        payloadFile: options.payloadFile || '',
+      });
+    }
+
     if (subcommand === 'execute-augmentation') {
       return gateway.executeSourceAugmentation({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
@@ -290,7 +320,7 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('source 命令仅支持 intake|augment|execute-augmentation');
+    throw new Error('source 命令仅支持 intake|augment|prepare-augmentation-result|write-augmentation-result|execute-augmentation');
   }
 
   if (command === 'deliverable') {

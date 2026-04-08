@@ -105,6 +105,12 @@ If you want a faster handoff, you can give your agent a one-line start instructi
 
 `Deep Research` belongs to `Source Readiness` rather than a standalone pre-stage. When the input is too thin, the agent should keep Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
 
+If your agent is taking the `result_file` / agent-native route, Step 1 can be expanded more explicitly as:
+
+`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`
+
+That does not create a new product stage. It only means `RedCube AI` now exposes a formal result scaffold and canonical write surface before execution applies the augmentation back into shared source truth.
+
 Scenario 1, you already prepared reference materials:
 
 > Treat this directory as the isolated RedCube workspace for this project. Run `workspace doctor` first, then `source intake` to read and hydrate the materials I provided; then create the required `topic` and `deliverable`, and move the work through the formal review, rerun, and export chain. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`.

@@ -35,6 +35,18 @@ Step 1 的正式链路固定为：
 
 `source intake -> source augment -> source execute-augmentation`
 
+如果你走的是 `result_file` / Agent-native route，那么在 `source augment` 之后，还可以显式使用两条正式 surface：
+
+- `source prepare-augmentation-result`
+- `source write-augmentation-result`
+
+这两条 surface 的职责是：
+
+- `prepare-augmentation-result`：暴露 canonical `source-augmentation-result.json` 目标路径与 result scaffold
+- `write-augmentation-result`：把外部 / Agent 产出的 research payload 校验后写回 canonical result artifact
+
+随后再执行 `source execute-augmentation`，让 runtime 正式消费这个 canonical result artifact 并回写 shared source truth。
+
 如果你是通过 Codex 驱动：
 
 - 材料足够时，可以只跑 `source intake`
@@ -74,6 +86,19 @@ export REDCUBE_SOURCE_AUGMENT_RESULT_FILE=/absolute/path/to/source-augmentation-
 - 如果配置了 `REDCUBE_SOURCE_AUGMENT_RESULT_FILE`，runtime 会直接读取该 JSON 文件
 - 如果没有配置，runtime 会默认在 request 所在目录寻找同级 `source-augmentation-result.json`
 - 文件不存在时，会显式返回 `source_augmentation_result_file_missing`
+
+如果你不想自己猜 canonical 路径，也不想手工拼完整 contract，可以直接走：
+
+```bash
+redcube source prepare-augmentation-result --workspace-root /ABS/PATH --topic-id topic-a
+redcube source write-augmentation-result --workspace-root /ABS/PATH --topic-id topic-a --payload-file /ABS/PATH/payload.json
+```
+
+其中：
+
+- `prepare-augmentation-result` 会返回 canonical `sourceAugmentationResultFile`
+- `write-augmentation-result` 会把 payload 补成完整 `shared_source_readiness_augmentation_result` contract 后写回 canonical artifact
+- 然后 `source execute-augmentation` 在 `result_file` adapter 下就可以直接消费这个 canonical 文件
 
 调用时，RedCube 会把 canonical request 文件路径作为第一个参数传给这个命令。
 
@@ -167,7 +192,7 @@ export REDCUBE_SOURCE_AUGMENT_RESULT_FILE=/absolute/path/to/source-augmentation-
 - `reference_source_list[*].reference_id` 必须存在且唯一
 - `key_fact_groups[*].reference_id` 必须引用已声明的 `reference_id`
 - `evidence_gap_resolution[*].gap_id` 必须来自 request 的 `trigger.evidence_gaps`
-- request 中出现的每个 evidence gap，都必须在 result 的 `evidence_gap_resolution` 里出现一次
+- `evidence_gap_resolution` 可以只回填本次显式处理到的 gaps，但不能凭空声明 request 之外的 gap
 
 如果 result 不合法，系统会显式返回：
 

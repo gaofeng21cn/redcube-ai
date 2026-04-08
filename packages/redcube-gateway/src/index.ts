@@ -4,6 +4,8 @@ import {
   getOverlayCatalog as getOverlayCatalogJs,
   intakeSource as intakeSourceJs,
   prepareSourceAugmentation as prepareSourceAugmentationJs,
+  prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
+  writeSourceAugmentationResult as writeSourceAugmentationResultJs,
   executeSourceAugmentation as executeSourceAugmentationJs,
   importLegacyProject as importLegacyProjectJs,
   createDeliverable as createDeliverableJs,
@@ -38,6 +40,8 @@ import type {
   RuntimeWatchResponse,
   SourceIntakeResponse,
   SourceAugmentationResponse,
+  SourceAugmentationResultPreparationResponse,
+  SourceAugmentationResultWriteResponse,
   SourceAugmentationExecutionResponse,
   TopicRequest,
   TopicCatalogResponse,
@@ -64,6 +68,18 @@ export function intakeSource(request: Record<string, unknown>): Promise<SourceIn
 
 export function prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse> {
   return prepareSourceAugmentationJs(request) as Promise<SourceAugmentationResponse>;
+}
+
+export function prepareSourceAugmentationResult(
+  request: Record<string, unknown>,
+): Promise<SourceAugmentationResultPreparationResponse> {
+  return prepareSourceAugmentationResultJs(request) as Promise<SourceAugmentationResultPreparationResponse>;
+}
+
+export function writeSourceAugmentationResult(
+  request: Record<string, unknown>,
+): Promise<SourceAugmentationResultWriteResponse> {
+  return writeSourceAugmentationResultJs(request) as Promise<SourceAugmentationResultWriteResponse>;
 }
 
 export function executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse> {
@@ -135,6 +151,8 @@ export type {
   RuntimeWatchResponse,
   SourceIntakeResponse,
   SourceAugmentationResponse,
+  SourceAugmentationResultPreparationResponse,
+  SourceAugmentationResultWriteResponse,
   SourceAugmentationExecutionResponse,
   TopicCatalogResponse,
   TopicRequest,

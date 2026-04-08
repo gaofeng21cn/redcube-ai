@@ -25,6 +25,8 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'get_overlay_catalog',
       'intake_source',
       'prepare_source_augmentation',
+      'prepare_source_augmentation_result',
+      'write_source_augmentation_result',
       'execute_source_augmentation',
       'create_deliverable',
       'get_deliverable',
@@ -120,6 +122,60 @@ test('callGatewayTool delegates source augmentation gateway action', async () =>
   assert.equal(result.topicId, 'topic-a');
   assert.equal(result.augmentation.status, 'required');
   assert.equal(result.augmentation.readiness_target, 'planning_ready');
+});
+
+test('callGatewayTool delegates source augmentation result preparation gateway action', async () => {
+  const result = await callGatewayTool(
+    'prepare_source_augmentation_result',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+    },
+    {
+      prepareSourceAugmentationResult: async (request) => ({
+        ok: true,
+        topicId: request.topicId,
+        artifactFiles: {
+          sourceAugmentationResultFile: '/tmp/redcube-workspace/topics/topic-a/canonical/source-augmentation-result.json',
+        },
+        resultDraft: {
+          topic_id: request.topicId,
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.topicId, 'topic-a');
+  assert.equal(result.resultDraft.topic_id, 'topic-a');
+});
+
+test('callGatewayTool delegates source augmentation result write gateway action', async () => {
+  const result = await callGatewayTool(
+    'write_source_augmentation_result',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      payloadFile: '/tmp/research-result.json',
+    },
+    {
+      writeSourceAugmentationResult: async (request) => ({
+        ok: true,
+        topicId: request.topicId,
+        artifactFiles: {
+          sourceAugmentationResultFile: '/tmp/redcube-workspace/topics/topic-a/canonical/source-augmentation-result.json',
+        },
+        resultContract: {
+          topic_id: request.topicId,
+          status: 'completed',
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.topicId, 'topic-a');
+  assert.equal(result.resultContract.status, 'completed');
 });
 
 test('callGatewayTool delegates source augmentation execution gateway action', async () => {

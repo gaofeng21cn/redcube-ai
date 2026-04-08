@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import path from 'node:path';
 
 import * as runtimeProtocol from '../packages/redcube-runtime-protocol/src/index.js';
 
@@ -97,6 +98,16 @@ test('runtime-protocol exposes source augmentation contract validators', () => {
   getValidator('validateSourceAugmentationResultContract');
 });
 
+test('runtime-protocol exposes canonical source augmentation result artifact path', () => {
+  const getPaths = getValidator('getSourceArtifactPaths');
+  const paths = getPaths('/tmp/redcube-workspace', 'topic-contract');
+
+  assert.equal(
+    paths.sourceAugmentationResultFile,
+    path.join('/tmp/redcube-workspace', 'topics', 'topic-contract', 'canonical', 'source-augmentation-result.json'),
+  );
+});
+
 test('validateSourceAugmentationRequestContract accepts canonical source augmentation request', () => {
   const validate = getValidator('validateSourceAugmentationRequestContract');
   const validation = validate(buildValidRequest());
@@ -115,6 +126,28 @@ test('validateSourceAugmentationResultContract rejects dangling fact reference i
   assert.equal(validation.ok, false);
   assert.equal(
     validation.errors.some((item) => String(item).includes('reference_id')),
+    true,
+  );
+});
+
+test('validateSourceAugmentationResultContract requires every request evidence gap to appear in result', () => {
+  const validate = getValidator('validateSourceAugmentationResultContract');
+  const result = buildValidResult();
+  result.evidence_gap_resolution = [
+    {
+      gap_id: 'public_evidence_missing',
+      status: 'resolved',
+      note: '已补入可追溯公开来源。',
+    },
+  ];
+
+  const validation = validate(result, {
+    requiredEvidenceGaps: ['public_evidence_missing', 'consumable_material_missing'],
+  });
+
+  assert.equal(validation.ok, false);
+  assert.equal(
+    validation.errors.some((item) => String(item).includes('consumable_material_missing')),
     true,
   );
 });

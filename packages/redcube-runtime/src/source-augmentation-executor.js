@@ -39,9 +39,10 @@ function validateExecutorOutput(executorOutput, request) {
   };
 }
 
-function resolveResultFilePath(configuredResultFile, requestFile) {
+function resolveResultFilePath(configuredResultFile, sourceAugmentationResultFile, requestFile) {
   const explicit = safeText(configuredResultFile);
   if (explicit) return path.resolve(explicit);
+  if (safeText(sourceAugmentationResultFile)) return sourceAugmentationResultFile;
   return path.join(path.dirname(requestFile), 'source-augmentation-result.json');
 }
 
@@ -100,8 +101,12 @@ function buildResultFileAdapter(resultFile) {
     adapter: 'result_file',
     execution_surface: 'result_file',
     executor_identity: configuredResultFile || DEFAULT_SOURCE_AUGMENTATION_RESULT_FILE_IDENTITY,
-    run({ requestFile, request }) {
-      const resultFilePath = resolveResultFilePath(configuredResultFile, requestFile);
+    run({ requestFile, request, sourceAugmentationResultFile }) {
+      const resultFilePath = resolveResultFilePath(
+        configuredResultFile,
+        sourceAugmentationResultFile,
+        requestFile,
+      );
       if (!existsSync(resultFilePath)) {
         return {
           ok: false,

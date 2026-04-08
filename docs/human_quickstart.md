@@ -54,6 +54,16 @@
 
 `source intake -> source augment -> source execute-augmentation`
 
+如果你走的是 Agent-native `result_file` route，可以把 `source augment` 和 `source execute-augmentation` 之间再展开成：
+
+`source prepare-augmentation-result -> source write-augmentation-result`
+
+也就是：
+
+`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`
+
+这不改变 Step 1 的产品定位，它仍然属于同一个 `Source Readiness` 阶段；只是现在对 Codex / Agent 来说，已经有正式的 result scaffold 与 canonical write surface，不需要自己猜目录和 contract。
+
 ## 一句话快速开始指令
 
 如果你只是想快速把任务交给 Codex 或其他 Agent，可以直接复制下面两条口径。

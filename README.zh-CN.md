@@ -104,6 +104,12 @@
 
 `Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
 
+如果你走的是 `result_file` / Agent-native route，也可以把 Step 1 更明确地展开成：
+
+`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`
+
+这并不意味着产品从 5 步变成更多步，而是说现在在 `Source Readiness` 内部，已经有正式的 result scaffold 与 canonical write surface，Codex / Agent 不需要自己猜目录和 contract。
+
 场景一，你已经准备好了参考材料：
 
 > 请把这个目录当作本次项目的独立 RedCube workspace。先执行 `workspace doctor`，再执行 `source intake` 读取并水合我提供的材料；然后根据任务目标创建 `topic` 与 `deliverable`，并按正式链路推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。

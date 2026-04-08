@@ -365,6 +365,34 @@ export interface RuntimeSourceAugmentationRequest {
   title?: string;
 }
 
+export interface RuntimeSourceAugmentationResultPreparationResponse {
+  ok: boolean;
+  topicId: string;
+  artifactFiles: Record<string, string>;
+  request: Record<string, unknown>;
+  resultDraft: Record<string, unknown>;
+}
+
+export interface RuntimeSourceAugmentationResultPreparationRequest {
+  workspaceRoot: string;
+  topicId: string;
+}
+
+export interface RuntimeSourceAugmentationResultWriteResponse {
+  ok: boolean;
+  topicId: string;
+  artifactFiles: Record<string, string>;
+  resultContract: Record<string, unknown>;
+}
+
+export interface RuntimeSourceAugmentationResultWriteRequest {
+  workspaceRoot: string;
+  topicId: string;
+  inputFile?: string;
+  payloadFile?: string;
+  result?: Record<string, unknown> | null;
+}
+
 export interface RuntimeSourceAugmentationExecutionResponse {
   ok: boolean;
   topicId: string;

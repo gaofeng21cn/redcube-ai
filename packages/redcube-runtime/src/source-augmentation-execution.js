@@ -370,6 +370,7 @@ export async function executeSourceAugmentation({
   const execution = adapter.run({
     requestFile: sourcePaths.sourceAugmentationRequestFile,
     request,
+    sourceAugmentationResultFile: sourcePaths.sourceAugmentationResultFile,
   });
   if (!execution.ok) {
     const report = buildBlockedReport({

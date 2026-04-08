@@ -15,10 +15,32 @@ import {
 import {
   executeSourceAugmentation,
   intakeSource,
+  prepareSourceAugmentationResult,
+  writeSourceAugmentationResult,
 } from '../packages/redcube-gateway/src/index.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function buildAugmentationResultPayload(overrides = {}) {
+  return {
+    topic_summary: '围绕甲状腺门诊沟通，先解释判断顺序，再解释术语与下一步动作。',
+    reference_source_list: [
+      { reference_id: 'REF-001', label: '国家指南', url: 'https://example.com/guideline' },
+      { reference_id: 'REF-002', label: '系统综述', url: 'https://example.com/review' },
+    ],
+    key_fact_groups: [
+      { fact_id: 'FACT-001', label: 'TSH 异常后需要结合 FT4 判断下一步动作。', reference_id: 'REF-001' },
+      { fact_id: 'FACT-002', label: '门诊沟通里应先解释判断顺序，再解释术语。', reference_id: 'REF-002' },
+    ],
+    source_quality_notes: ['优先使用公开指南与系统综述。'],
+    evidence_gap_resolution: [
+      { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' },
+      { gap_id: 'consumable_material_missing', status: 'resolved', note: '已补入可直接消费的事实材料。' },
+    ],
+    ...overrides,
+  };
 }
 
 test('intakeSource creates canonical source truth from brief and keywords', async () => {
@@ -218,6 +240,113 @@ test('CLI source augment prepares canonical augmentation contract from source re
   assert.equal(typeof parsed.augmentation.focus.topic_summary, 'string');
   assert.equal(Array.isArray(parsed.augmentation.investigation_lanes), true);
   assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationRequestFile), true);
+});
+
+test('prepareSourceAugmentationResult exposes canonical result scaffold for agent-native research route', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-prepare-result-'));
+
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-prepare-result',
+    title: 'prepare augmentation result',
+    brief: '只有主题和关键词，需要准备后续 Deep Research 结果 scaffold。',
+    keywords: ['甲状腺', '门诊'],
+  });
+
+  const prepared = await prepareSourceAugmentationResult({
+    workspaceRoot,
+    topicId: 'topic-prepare-result',
+  });
+
+  assert.equal(prepared.ok, true);
+  assert.equal(prepared.surface_kind, 'source_augmentation_result_preparation');
+  assert.equal(prepared.recommended_action, 'write_source_augmentation_result');
+  assert.equal(prepared.resultDraft.topic_id, 'topic-prepare-result');
+  assert.equal(prepared.resultDraft.request_kind, 'shared_source_readiness_augmentation_result');
+  assert.equal(
+    prepared.artifactFiles.sourceAugmentationResultFile,
+    path.join(workspaceRoot, 'topics', 'topic-prepare-result', 'canonical', 'source-augmentation-result.json'),
+  );
+});
+
+test('writeSourceAugmentationResult stages canonical augmentation result artifact from structured payload', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-write-'));
+
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-write-result',
+    title: 'write augmentation result',
+    brief: '只有主题和关键词，需要先补齐事实材料，再推进 Storyline。',
+    keywords: ['甲状腺', '门诊'],
+  });
+
+  const staged = await writeSourceAugmentationResult({
+    workspaceRoot,
+    topicId: 'topic-write-result',
+    result: buildAugmentationResultPayload(),
+  });
+
+  assert.equal(staged.ok, true);
+  assert.equal(staged.surface_kind, 'source_augmentation_result_write');
+  assert.equal(staged.recommended_action, 'execute_source_augmentation');
+  assert.equal(existsSync(staged.artifactFiles.sourceAugmentationResultFile), true);
+
+  const canonicalResult = readJson(staged.artifactFiles.sourceAugmentationResultFile);
+  assert.equal(canonicalResult.schema_version, 1);
+  assert.equal(canonicalResult.topic_id, 'topic-write-result');
+  assert.equal(canonicalResult.request_kind, 'shared_source_readiness_augmentation_result');
+  assert.equal(canonicalResult.status, 'completed');
+  assert.equal(canonicalResult.readiness_target, 'planning_ready');
+  assert.equal(canonicalResult.evidence_gap_resolution.length, 2);
+});
+
+test('CLI source write-augmentation-result stages canonical result artifact from payload file', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
+  const payloadFile = path.join(workspaceRoot, 'augmentation-result-payload.json');
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'source',
+      'intake',
+      '--workspace-root',
+      workspaceRoot,
+      '--topic-id',
+      'topic-cli-write',
+      '--title',
+      'CLI write augment result',
+      '--brief',
+      '只有主题和关键词，需要先补齐事实材料。',
+      '--keywords',
+      '甲状腺,门诊',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  writeFileSync(payloadFile, JSON.stringify(buildAugmentationResultPayload(), null, 2), 'utf-8');
+
+  const output = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'source',
+      'write-augmentation-result',
+      '--workspace-root',
+      workspaceRoot,
+      '--topic-id',
+      'topic-cli-write',
+      '--payload-file',
+      payloadFile,
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'source_augmentation_result_write');
+  assert.equal(parsed.recommended_action, 'execute_source_augmentation');
+  assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationResultFile), true);
 });
 
 test('executeSourceAugmentation blocks explicitly when augmentation executor is unavailable', async () => {
@@ -490,6 +619,7 @@ test('executeSourceAugmentation can consume built-in result_file adapter and upg
         source_quality_notes: ['优先使用公开指南与系统综述。'],
         evidence_gap_resolution: [
           { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' },
+          { gap_id: 'consumable_material_missing', status: 'resolved', note: '已补入可直接消费的事实材料。' },
         ],
       }, null, 2),
       'utf-8',
@@ -512,6 +642,55 @@ test('executeSourceAugmentation can consume built-in result_file adapter and upg
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
     assert.equal(pack.fact_library.reference_source_list.some((item) => String(item).includes('国家指南')), true);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
+    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
+  }
+});
+
+test('executeSourceAugmentation can consume canonical result file written by writeSourceAugmentationResult with default result_file path', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
+  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+
+  try {
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-result-default-path',
+      title: 'result file adapter default path',
+      brief: '只有主题和关键词，需要联网补料。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    await writeSourceAugmentationResult({
+      workspaceRoot,
+      topicId: 'topic-result-default-path',
+      result: buildAugmentationResultPayload(),
+    });
+
+    const result = await executeSourceAugmentation({
+      workspaceRoot,
+      topicId: 'topic-result-default-path',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.report.status, 'completed');
+    assert.equal(result.report.executor.adapter, 'result_file');
+    assert.equal(result.report.executor.execution_surface, 'result_file');
+    assert.equal(result.report.executor.executor_identity, 'canonical_source_augmentation_result_file');
+    assert.equal(result.report.added_source_count, 2);
+
+    const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-result-default-path', 'canonical', 'source-readiness-pack.json'));
+    assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
+    assert.equal(pack.readiness.deep_research_state, 'completed');
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
@@ -558,7 +737,8 @@ process.stdout.write(JSON.stringify({
   ],
   source_quality_notes: ['优先使用公开指南与系统综述。'],
   evidence_gap_resolution: [
-    { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' }
+    { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' },
+    { gap_id: 'consumable_material_missing', status: 'resolved', note: '已补入可直接消费的事实材料。' }
   ]
 }));`,
     'utf-8',

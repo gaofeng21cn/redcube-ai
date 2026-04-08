@@ -265,6 +265,28 @@ export interface SourceAugmentationResponse extends SurfaceBase<'source_augmenta
   };
 }
 
+export interface SourceAugmentationResultPreparationResponse extends SurfaceBase<'source_augmentation_result_preparation'> {
+  artifactFiles: Record<string, string>;
+  request: Record<string, unknown>;
+  resultDraft: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    readiness_target: string | null;
+    evidence_gap_count: number;
+  };
+}
+
+export interface SourceAugmentationResultWriteResponse extends SurfaceBase<'source_augmentation_result_write'> {
+  artifactFiles: Record<string, string>;
+  resultContract: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    readiness_target: string | null;
+    reference_source_count: number;
+    fact_group_count: number;
+  };
+}
+
 export interface SourceAugmentationExecutionResponse extends SurfaceBase<'source_augmentation_execution'> {
   artifactFiles: Record<string, string>;
   report: Record<string, unknown>;

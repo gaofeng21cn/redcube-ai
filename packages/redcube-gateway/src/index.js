@@ -12,6 +12,14 @@ export async function prepareSourceAugmentation(request) {
   const module = await import('./actions/prepare-source-augmentation.js');
   return module.prepareSourceAugmentation(request);
 }
+export async function prepareSourceAugmentationResult(request) {
+  const module = await import('./actions/prepare-source-augmentation-result.js');
+  return module.prepareSourceAugmentationResult(request);
+}
+export async function writeSourceAugmentationResult(request) {
+  const module = await import('./actions/write-source-augmentation-result.js');
+  return module.writeSourceAugmentationResult(request);
+}
 export async function executeSourceAugmentation(request) {
   const module = await import('./actions/execute-source-augmentation.js');
   return module.executeSourceAugmentation(request);
