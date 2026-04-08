@@ -352,6 +352,26 @@ export interface RuntimeSourceIntakeRequest {
   modeHint?: string;
 }
 
+export interface RuntimeSourceResearchResponse {
+  ok: boolean;
+  topicId: string;
+  stage: string;
+  planningReady: boolean;
+  artifactFiles: Record<string, string>;
+  report: Record<string, unknown>;
+  intake: Record<string, unknown>;
+  augmentation?: Record<string, unknown>;
+  resultPreparation?: Record<string, unknown>;
+  resultWrite?: Record<string, unknown>;
+  execution?: Record<string, unknown>;
+}
+
+export interface RuntimeSourceResearchRequest extends RuntimeSourceIntakeRequest {
+  inputFile?: string;
+  payloadFile?: string;
+  result?: Record<string, unknown> | null;
+}
+
 export interface RuntimeSourceAugmentationResponse {
   ok: boolean;
   topicId: string;

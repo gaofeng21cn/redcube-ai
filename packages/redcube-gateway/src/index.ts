@@ -3,6 +3,7 @@ import {
   listTopics as listTopicsJs,
   getOverlayCatalog as getOverlayCatalogJs,
   intakeSource as intakeSourceJs,
+  researchSource as researchSourceJs,
   prepareSourceAugmentation as prepareSourceAugmentationJs,
   prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
   writeSourceAugmentationResult as writeSourceAugmentationResultJs,
@@ -39,6 +40,7 @@ import type {
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceIntakeResponse,
+  SourceResearchResponse,
   SourceAugmentationResponse,
   SourceAugmentationResultPreparationResponse,
   SourceAugmentationResultWriteResponse,
@@ -64,6 +66,10 @@ export function getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResp
 
 export function intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse> {
   return intakeSourceJs(request) as Promise<SourceIntakeResponse>;
+}
+
+export function researchSource(request: Record<string, unknown>): Promise<SourceResearchResponse> {
+  return researchSourceJs(request) as Promise<SourceResearchResponse>;
 }
 
 export function prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse> {
@@ -150,6 +156,7 @@ export type {
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceIntakeResponse,
+  SourceResearchResponse,
   SourceAugmentationResponse,
   SourceAugmentationResultPreparationResponse,
   SourceAugmentationResultWriteResponse,

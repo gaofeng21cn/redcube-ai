@@ -45,6 +45,7 @@ import {
   prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
   writeSourceAugmentationResult as writeSourceAugmentationResultJs,
 } from './source-augmentation-result.js';
+import { researchSource as researchSourceJs } from './source-research.js';
 import { intakeSource as intakeSourceJs } from './source-intake.js';
 
 import type {
@@ -66,6 +67,8 @@ import type {
   RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
+  RuntimeSourceResearchRequest,
+  RuntimeSourceResearchResponse,
   RuntimeSourceAugmentationRequest,
   RuntimeSourceAugmentationResponse,
   RuntimeSourceAugmentationResultPreparationRequest,
@@ -155,6 +158,13 @@ export async function intakeSource(request: RuntimeSourceIntakeRequest): Promise
   return intake(request);
 }
 
+export async function researchSource(request: RuntimeSourceResearchRequest): Promise<RuntimeSourceResearchResponse> {
+  const research = researchSourceJs as unknown as (
+    request: RuntimeSourceResearchRequest,
+  ) => Promise<RuntimeSourceResearchResponse>;
+  return research(request);
+}
+
 export async function prepareSourceAugmentation(
   request: RuntimeSourceAugmentationRequest,
 ): Promise<RuntimeSourceAugmentationResponse> {
@@ -210,6 +220,8 @@ export type {
   RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
+  RuntimeSourceResearchRequest,
+  RuntimeSourceResearchResponse,
   RuntimeSourceAugmentationRequest,
   RuntimeSourceAugmentationResponse,
   RuntimeSourceAugmentationResultPreparationRequest,

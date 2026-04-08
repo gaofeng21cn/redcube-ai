@@ -105,6 +105,9 @@ If you want a faster handoff, you can give your agent a one-line start instructi
 
 `Deep Research` belongs to `Source Readiness` rather than a standalone pre-stage. When the input is too thin, the agent should keep Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
 
+If you want one formal entry instead of calling each sub-step yourself, start from `source research`.
+It is the shared Step 1 orchestration surface: it runs `source intake` first, then decides whether to stop at canonical result staging or continue into augmentation execution.
+
 If your agent is taking the `result_file` / agent-native route, Step 1 can be expanded more explicitly as:
 
 `source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`

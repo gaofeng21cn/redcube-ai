@@ -11,6 +11,7 @@ import {
   getReviewState,
   getRun as getGatewayRun,
   intakeSource,
+  researchSource,
   prepareSourceAugmentation,
   prepareSourceAugmentationResult,
   writeSourceAugmentationResult,
@@ -32,6 +33,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getReviewState,
   getRun: getGatewayRun,
   intakeSource,
+  researchSource,
   prepareSourceAugmentation,
   prepareSourceAugmentationResult,
   writeSourceAugmentationResult,
@@ -139,6 +141,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       },
       {
+        task: '用一条正式链路把 Step 1 Source Readiness / Deep Research 推进到可交付状态',
+        command: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--payload-file /abs/result.json]',
+      },
+      {
         task: '为材料不足主题生成 Source Augmentation / Deep Research 合同',
         command: 'redcube source augment --workspace-root <dir> --topic-id <id>',
       },
@@ -183,7 +189,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
-      source: ['intake', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
+      source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
@@ -203,6 +209,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       topicsList: 'redcube topics list --workspace-root <dir>',
       importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+      sourceResearch: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--payload-file /abs/result.json]',
       sourceAugment: 'redcube source augment --workspace-root <dir> --topic-id <id>',
       sourcePrepareAugmentationResult: 'redcube source prepare-augmentation-result --workspace-root <dir> --topic-id <id>',
       sourceWriteAugmentationResult: 'redcube source write-augmentation-result --workspace-root <dir> --topic-id <id> --payload-file <file>',
@@ -289,6 +296,18 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
+    if (subcommand === 'research') {
+      return gateway.researchSource({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        topicId: options.topicId || '',
+        title: options.title || '',
+        brief: options.brief || '',
+        keywords: options.keywords || '',
+        sourceFiles: options.sourceFiles || '',
+        payloadFile: options.payloadFile || '',
+      });
+    }
+
     if (subcommand === 'augment') {
       return gateway.prepareSourceAugmentation({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
@@ -320,7 +339,7 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('source 命令仅支持 intake|augment|prepare-augmentation-result|write-augmentation-result|execute-augmentation');
+    throw new Error('source 命令仅支持 intake|research|augment|prepare-augmentation-result|write-augmentation-result|execute-augmentation');
   }
 
   if (command === 'deliverable') {

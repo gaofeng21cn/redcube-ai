@@ -46,6 +46,7 @@ export interface SourceArtifactPaths {
   sourceReadinessPackFile: string;
   sourceAugmentationRequestFile: string;
   sourceAugmentationResultFile: string;
+  sourceResearchReportFile: string;
   sourceAugmentationReportFile: string;
 }
 

@@ -24,6 +24,8 @@ test('public docs describe Deep Research as Source Readiness enhancement on an a
 
   assert.equal(rootReadme.includes('`Deep Research` belongs to `Source Readiness`'), true);
   assert.equal(rootReadmeZh.includes('`Deep Research` 属于 `Source Readiness`'), true);
+  assert.equal(rootReadme.includes('`source research`'), true);
+  assert.equal(rootReadmeZh.includes('`source research`'), true);
   assert.equal(rootReadme.includes('`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`'), true);
   assert.equal(rootReadmeZh.includes('`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`'), true);
   assert.equal(quickstart.includes('`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`'), true);
@@ -42,6 +44,7 @@ test('operator docs publish workspace structure and source augmentation executor
 
   assert.equal(quickstart.includes('`redcube.workspace.json`'), true);
   assert.equal(quickstart.includes('`topics/<topic-id>/canonical/`'), true);
+  assert.equal(quickstart.includes('`source research`'), true);
   assert.equal(quickstart.includes('`source intake -> source augment -> source execute-augmentation`'), true);
   assert.equal(quickstart.includes('`source prepare-augmentation-result -> source write-augmentation-result`'), true);
   assert.equal(quickstart.includes('Codex 的一句话启动指令'), true);

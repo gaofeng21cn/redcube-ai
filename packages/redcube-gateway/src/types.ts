@@ -255,6 +255,40 @@ export interface SourceIntakeResponse extends SurfaceBase<'source_intake'> {
   };
 }
 
+export interface SourceResearchResponse extends SurfaceBase<'source_research'> {
+  artifactFiles: Record<string, string>;
+  stage: string;
+  planningReady: boolean;
+  report: Record<string, unknown>;
+  intake: Record<string, unknown>;
+  augmentation?: Record<string, unknown>;
+  resultPreparation?: Record<string, unknown>;
+  resultWrite?: Record<string, unknown>;
+  execution?: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    stage: string | null;
+    planning_ready: boolean;
+  };
+}
+
+export interface SourceResearchResponse extends SurfaceBase<'source_research'> {
+  stage: string;
+  planningReady: boolean;
+  artifactFiles: Record<string, string>;
+  report: Record<string, unknown>;
+  intake: Record<string, unknown>;
+  augmentation?: Record<string, unknown>;
+  resultPreparation?: Record<string, unknown>;
+  resultWrite?: Record<string, unknown>;
+  execution?: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    stage: string | null;
+    planning_ready: boolean;
+  };
+}
+
 export interface SourceAugmentationResponse extends SurfaceBase<'source_augmentation'> {
   artifactFiles: Record<string, string>;
   augmentation: Record<string, unknown>;

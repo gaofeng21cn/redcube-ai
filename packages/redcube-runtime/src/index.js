@@ -22,6 +22,7 @@ export { applyReviewMutation, getPublicationProjection, getReviewState, isBaseli
 export { loadReferenceSampleFixture, listPromotedReferences, listReferenceSamples, summarizeReferenceCoverage, validateReferenceSampleMeta } from '@redcube/reference-os';
 export { buildReferencePromotionReport, buildReferenceQualityReport, buildReferenceReplacementReport, buildRelativeQualityRubric, compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 export { intakeSource } from './source-intake.js';
+export { researchSource } from './source-research.js';
 export { prepareSourceAugmentation } from './source-augmentation-request.js';
 export {
   prepareSourceAugmentationResult,

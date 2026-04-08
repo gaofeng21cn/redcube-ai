@@ -16,6 +16,7 @@ import {
   executeSourceAugmentation,
   intakeSource,
   prepareSourceAugmentationResult,
+  researchSource,
   writeSourceAugmentationResult,
 } from '../packages/redcube-gateway/src/index.js';
 
@@ -194,6 +195,94 @@ test('CLI source intake proxies gateway action', () => {
   assert.equal(existsSync(parsed.artifactFiles.sourceBriefFile), true);
 });
 
+test('researchSource stops at canonical result scaffold when result_file route needs agent-authored payload', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-'));
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
+  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+
+  try {
+    const result = await researchSource({
+      workspaceRoot,
+      topicId: 'topic-research-awaiting-payload',
+      title: 'research awaiting payload',
+      brief: '只有主题和关键词，需要先进入 Research 准备事实材料。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.surface_kind, 'source_research');
+    assert.equal(result.stage, 'source_augmentation_result_preparation');
+    assert.equal(result.planningReady, false);
+    assert.equal(result.recommended_action, 'write_source_augmentation_result');
+    assert.equal(existsSync(result.artifactFiles.sourceAugmentationRequestFile), true);
+    assert.equal(existsSync(result.artifactFiles.sourceAugmentationResultFile), true);
+    assert.equal(existsSync(result.artifactFiles.sourceResearchReportFile), true);
+
+    const report = readJson(result.artifactFiles.sourceResearchReportFile);
+    assert.equal(report.status, 'awaiting_input');
+    assert.equal(report.stage, 'source_augmentation_result_preparation');
+    assert.equal(report.planning_ready, false);
+    assert.equal(report.recommended_action, 'write_source_augmentation_result');
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
+    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
+  }
+});
+
+test('researchSource can complete Source Readiness end-to-end on result_file route when payload is supplied', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-complete-'));
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
+  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+
+  try {
+    const result = await researchSource({
+      workspaceRoot,
+      topicId: 'topic-research-complete',
+      title: 'research complete',
+      brief: '只有主题和关键词，需要完成完整 Research。',
+      keywords: ['甲状腺', '门诊'],
+      result: buildAugmentationResultPayload(),
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.surface_kind, 'source_research');
+    assert.equal(result.stage, 'source_augmentation_execution');
+    assert.equal(result.planningReady, true);
+    assert.equal(result.recommended_action, 'create_deliverable');
+    assert.equal(result.execution.report.status, 'completed');
+    assert.equal(existsSync(result.artifactFiles.sourceResearchReportFile), true);
+
+    const report = readJson(result.artifactFiles.sourceResearchReportFile);
+    assert.equal(report.status, 'completed');
+    assert.equal(report.stage, 'source_augmentation_execution');
+    assert.equal(report.planning_ready, true);
+    assert.equal(report.recommended_action, 'create_deliverable');
+
+    const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-research-complete', 'canonical', 'source-readiness-pack.json'));
+    assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
+    assert.equal(pack.readiness.deep_research_state, 'completed');
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
+    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
+  }
+});
+
 test('CLI source augment prepares canonical augmentation contract from source readiness', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
 
@@ -240,6 +329,58 @@ test('CLI source augment prepares canonical augmentation contract from source re
   assert.equal(typeof parsed.augmentation.focus.topic_summary, 'string');
   assert.equal(Array.isArray(parsed.augmentation.investigation_lanes), true);
   assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationRequestFile), true);
+});
+
+test('CLI source research can finish Source Readiness end-to-end on result_file route', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-cli-'));
+  const payloadFile = path.join(workspaceRoot, 'research-result-payload.json');
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
+  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+
+  writeFileSync(payloadFile, JSON.stringify(buildAugmentationResultPayload(), null, 2), 'utf-8');
+
+  try {
+    const output = execFileSync(
+      'node',
+      [
+        path.resolve('apps/redcube-cli/src/cli.js'),
+        'source',
+        'research',
+        '--workspace-root',
+        workspaceRoot,
+        '--topic-id',
+        'topic-cli-research',
+        '--title',
+        'CLI research',
+        '--brief',
+        '只有主题和关键词，需要一条命令把 Step 1 跑到 planning_ready。',
+        '--keywords',
+        '甲状腺,门诊',
+        '--payload-file',
+        payloadFile,
+      ],
+      { encoding: 'utf-8', cwd: path.resolve('.') },
+    );
+
+    const parsed = JSON.parse(output);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.surface_kind, 'source_research');
+    assert.equal(parsed.stage, 'source_augmentation_execution');
+    assert.equal(parsed.planningReady, true);
+    assert.equal(parsed.recommended_action, 'create_deliverable');
+    assert.equal(existsSync(parsed.artifactFiles.sourceResearchReportFile), true);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
+    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
+  }
 });
 
 test('prepareSourceAugmentationResult exposes canonical result scaffold for agent-native research route', async () => {

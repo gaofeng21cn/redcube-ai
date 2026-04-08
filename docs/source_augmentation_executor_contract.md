@@ -35,6 +35,12 @@ Step 1 的正式链路固定为：
 
 `source intake -> source augment -> source execute-augmentation`
 
+如果你想从一个共享入口直接驱动 Step 1，而不是手动拆命令，也可以先调用：
+
+`source research`
+
+这个入口会先做 `source intake`，再根据当前 adapter / payload 情况决定是否继续进入 `source augment`、`source prepare-augmentation-result`、`source write-augmentation-result` 和 `source execute-augmentation`。
+
 如果你走的是 `result_file` / Agent-native route，那么在 `source augment` 之后，还可以显式使用两条正式 surface：
 
 - `source prepare-augmentation-result`

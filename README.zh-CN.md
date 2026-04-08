@@ -104,6 +104,9 @@
 
 `Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
 
+如果你想先用一个共享正式入口，而不是自己逐步调用每个子命令，那么可以直接从 `source research` 开始。
+它就是 Step 1 的统一 orchestration surface：先执行 `source intake`，然后根据当前 route 决定是停在 canonical result staging，还是继续执行 augmentation。
+
 如果你走的是 `result_file` / Agent-native route，也可以把 Step 1 更明确地展开成：
 
 `source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`

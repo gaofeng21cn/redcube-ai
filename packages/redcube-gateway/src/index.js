@@ -8,6 +8,10 @@ export async function intakeSource(request) {
   const module = await import('./actions/intake-source.js');
   return module.intakeSource(request);
 }
+export async function researchSource(request) {
+  const module = await import('./actions/source-research.js');
+  return module.researchSource(request);
+}
 export async function prepareSourceAugmentation(request) {
   const module = await import('./actions/prepare-source-augmentation.js');
   return module.prepareSourceAugmentation(request);

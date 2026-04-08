@@ -106,6 +106,10 @@ test('runtime-protocol exposes canonical source augmentation result artifact pat
     paths.sourceAugmentationResultFile,
     path.join('/tmp/redcube-workspace', 'topics', 'topic-contract', 'canonical', 'source-augmentation-result.json'),
   );
+  assert.equal(
+    paths.sourceResearchReportFile,
+    path.join('/tmp/redcube-workspace', 'topics', 'topic-contract', 'canonical', 'source-research-report.json'),
+  );
 });
 
 test('validateSourceAugmentationRequestContract accepts canonical source augmentation request', () => {

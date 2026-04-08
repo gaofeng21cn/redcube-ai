@@ -24,6 +24,7 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'list_topics',
       'get_overlay_catalog',
       'intake_source',
+      'source_research',
       'prepare_source_augmentation',
       'prepare_source_augmentation_result',
       'write_source_augmentation_result',
@@ -97,6 +98,37 @@ test('callGatewayTool delegates source intake gateway action', async () => {
   assert.equal(result.ok, true);
   assert.equal(result.audit.topic_id, 'topic-a');
   assert.equal(result.audit.status, 'pass');
+});
+
+test('callGatewayTool delegates source research gateway action', async () => {
+  const result = await callGatewayTool(
+    'source_research',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      topicId: 'topic-a',
+      title: '共享输入',
+      brief: 'brief',
+      keywords: ['a', 'b'],
+      sourceFiles: [],
+    },
+    {
+      researchSource: async (request) => ({
+        ok: true,
+        topicId: request.topicId,
+        stage: 'source_augmentation_execution',
+        planningReady: true,
+        summary: {
+          topic_id: request.topicId,
+          planning_ready: true,
+        },
+      }),
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.topicId, 'topic-a');
+  assert.equal(result.stage, 'source_augmentation_execution');
+  assert.equal(result.planningReady, true);
 });
 
 test('callGatewayTool delegates source augmentation gateway action', async () => {

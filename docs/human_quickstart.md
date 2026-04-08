@@ -54,6 +54,12 @@
 
 `source intake -> source augment -> source execute-augmentation`
 
+如果你不想手动拆开 Step 1，也可以直接把它理解成一个共享正式入口：
+
+`source research`
+
+它会先执行 `source intake`，然后按当前 route 决定是否继续进入 `source augment`、`source prepare-augmentation-result`、`source write-augmentation-result` 与 `source execute-augmentation`。
+
 如果你走的是 Agent-native `result_file` route，可以把 `source augment` 和 `source execute-augmentation` 之间再展开成：
 
 `source prepare-augmentation-result -> source write-augmentation-result`
