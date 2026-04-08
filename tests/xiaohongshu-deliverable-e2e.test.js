@@ -144,9 +144,14 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
 
   const research = readJson(chain[0].result.artifactFile);
   assert.equal(typeof research.research?.topic_summary, 'string');
+  assert.equal(typeof research.research?.fact_library_summary, 'string');
   assert.equal(Array.isArray(research.research?.reference_source_list), true);
-  assert.equal(typeof research.research?.audience_judgement, 'string');
-  assert.equal(typeof research.research?.why_now, 'string');
+  assert.equal(Array.isArray(research.research?.evidence_gaps), true);
+  assert.equal(typeof research.research?.source_sufficiency_judgement, 'string');
+  assert.equal(research.research?.audience_judgement ?? null, null);
+  assert.equal(research.research?.why_now ?? null, null);
+  assert.equal(research.research?.tension ?? null, null);
+  assert.equal(research.research?.memory_hook ?? null, null);
 
   const plan = readJson(chain[2].result.artifactFile);
   assert.equal(Array.isArray(plan.single_note_plan?.title_options), true);

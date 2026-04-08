@@ -251,6 +251,10 @@ function sourceTruth(contract) {
   return contract?.shared_source_truth || null;
 }
 
+function sourceReadinessPack(contract) {
+  return sourceTruth(contract)?.source_readiness_pack || null;
+}
+
 function sourceMaterials(contract) {
   return safeArray(sourceTruth(contract)?.extracted_materials?.materials);
 }
@@ -280,6 +284,37 @@ function sourceInputMode(contract) {
 
 function sourceConfidence(contract) {
   return safeText(sourceTruth(contract)?.source_brief?.confidence);
+}
+
+function sourceSufficiencyStatus(contract) {
+  return safeText(sourceReadinessPack(contract)?.readiness?.sufficiency_status, sourceMaterials(contract).length > 0 ? 'planning_ready' : 'augmentation_required');
+}
+
+function sourceDeepResearchState(contract) {
+  return safeText(sourceReadinessPack(contract)?.readiness?.deep_research_state, sourceInputMode(contract) === 'brief_keywords' ? 'required' : 'not_required');
+}
+
+function sourceEvidenceGaps(contract) {
+  return safeArray(sourceReadinessPack(contract)?.fact_library?.evidence_gaps);
+}
+
+function sourceTopicSummary(contract) {
+  return safeText(
+    sourceReadinessPack(contract)?.fact_library?.topic_summary,
+    sourceTruth(contract) && sourceSnippet(contract, 0)
+      ? `${contract.title} 的 shared source truth 显示：${sourceSnippet(contract, 0)}`
+      : `${contract.title} 面向患者做可信、可发布的小红书图文`,
+  );
+}
+
+function buildStorylineInputs(contract, research) {
+  return {
+    mode: safeText(research?.research?.mode, 'single'),
+    audience_judgement: sourceTruth(contract) ? deriveAudienceFromSource(contract) : inferAudience(contract),
+    tension: sourceTruth(contract) ? deriveTensionFromSource(contract) : inferTension(contract),
+    why_now: sourceTruth(contract) ? deriveWhyNowFromSource(contract) : inferWhyNow(contract),
+    memory_hook: sourceTruth(contract) ? deriveMemoryHookFromSource(contract) : inferMemoryHook(contract),
+  };
 }
 
 function deriveAudienceFromSource(contract) {
@@ -361,31 +396,29 @@ function buildResearch(contract) {
   const references = sourceTruth(contract)
     ? sourceLabels(contract)
     : safeArray(seed?.research?.reference_source_list).length > 0 ? seed.research.reference_source_list : publicSources();
-  const topicSummary = sourceTruth(contract) && sourceSnippet(contract, 0)
-    ? `${contract.title} 的 shared source truth 显示：${sourceSnippet(contract, 0)}`
-    : safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`);
+  const topicSummary = sourceTopicSummary(contract)
+    || safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`);
   return {
     ...attachCommon('research', contract),
     source_readiness: {
-      research_positioning: 'shared_source_readiness_optional_augmentation',
-      augmentation_triggered: sourceMaterials(contract).length === 0 || sourceInputMode(contract) === 'brief_keywords',
+      research_positioning: 'shared_source_readiness_augmentation',
+      augmentation_triggered: sourceDeepResearchState(contract) === 'required',
       trigger_signals: {
-        source_missing_or_insufficient: sourceMaterials(contract).length === 0,
+        source_missing_or_insufficient: sourceSufficiencyStatus(contract) !== 'planning_ready',
         task_requires_public_evidence: true,
       },
     },
     research: {
       topic_summary: topicSummary,
+      fact_library_summary: topicSummary,
       mode: isSeries(contract) ? 'series' : 'single',
-      audience_judgement: sourceTruth(contract) ? deriveAudienceFromSource(contract) : inferAudience(contract),
-      why_now: sourceTruth(contract) ? deriveWhyNowFromSource(contract) : inferWhyNow(contract),
-      tension: sourceTruth(contract) ? deriveTensionFromSource(contract) : inferTension(contract),
-      memory_hook: sourceTruth(contract) ? deriveMemoryHookFromSource(contract) : inferMemoryHook(contract),
       reference_source_list: references,
       public_sources: references,
+      evidence_gaps: sourceEvidenceGaps(contract),
       forbidden_source_hit_count: Number(seed?.research?.forbidden_source_hit_count || 0),
       input_mode: sourceInputMode(contract) || 'seed_only',
       confidence: sourceConfidence(contract) || 'low',
+      source_sufficiency_judgement: sourceSufficiencyStatus(contract),
       source_truth_material_count: sourceMaterials(contract).length,
       source_truth_material_ids: sourceMaterialIds(contract),
       input_output_state: {
@@ -398,13 +431,7 @@ function buildResearch(contract) {
 
 function buildStoryline(contract, deliverablePaths) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
-  const authoredArtifact = promptArtifact(contract, 'storyline', {
-    mode: safeText(research?.research?.mode, 'single'),
-    audience_judgement: safeText(research?.research?.audience_judgement),
-    tension: safeText(research?.research?.tension),
-    why_now: safeText(research?.research?.why_now),
-    memory_hook: safeText(research?.research?.memory_hook),
-  });
+  const authoredArtifact = promptArtifact(contract, 'storyline', buildStorylineInputs(contract, research));
   const authoredStoryline = authoredArtifact?.storyline;
   if (!authoredStoryline) {
     throw new Error(`Missing xiaohongshu storyline runtime_artifact for profile: ${contract.profile_id}`);

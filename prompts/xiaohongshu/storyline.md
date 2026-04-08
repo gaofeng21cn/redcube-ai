@@ -2,6 +2,7 @@
 
 基于 research 结果生成适合小红书的故事线。
 要求：
+- `audience judgement / tension / why-now / memory hook` 属于 storyline judgement
 - 明确 audience judgement / tension / why-now / memory hook / narrative progression
 - 不允许只给“标题 + 要点”结构骨架
 - 先给认知冲突，再给解释路径，再给收藏理由

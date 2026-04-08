@@ -1,10 +1,12 @@
 # xiaohongshu / research
 
-从输入素材整理事实资产、公开来源口径与模式判定。
+从 shared source truth 生成可供后续消费的 source readiness / fact library artifact。
 要求：
 - 只允许使用本任务输入与白名单来源
 - 明确 `series/single` 判定
-- 输出 reference_source_list 与 forbidden_source_hit_count
+- 不输出 storyline judgement
+- 输出 `topic_summary`、`fact_library_summary`、`reference_source_list`、`evidence_gaps`
+- 输出 `forbidden_source_hit_count`
 
 ## runtime_seed
 ```json
