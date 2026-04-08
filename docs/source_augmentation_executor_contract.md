@@ -47,10 +47,13 @@ Step 1 的正式链路固定为：
 当前 repo 内唯一正式支持的 adapter 是：
 
 - `external_command`
+- `result_file`
 
 如果不显式配置，默认也会落到 `external_command`。
 
 随后，再通过环境变量 `REDCUBE_SOURCE_AUGMENT_CMD` 指向这个 adapter 背后的外部执行器命令。
+
+如果你不想再挂一个外部脚本，而是希望让 Codex / Agent 直接在 workspace 内写出标准 result contract，再由 runtime 正式接收，那么可以改用 `result_file` adapter。
 
 例如：
 
@@ -58,6 +61,19 @@ Step 1 的正式链路固定为：
 export REDCUBE_SOURCE_AUGMENT_ADAPTER=external_command
 export REDCUBE_SOURCE_AUGMENT_CMD=/absolute/path/to/source-augment-executor
 ```
+
+或者：
+
+```bash
+export REDCUBE_SOURCE_AUGMENT_ADAPTER=result_file
+export REDCUBE_SOURCE_AUGMENT_RESULT_FILE=/absolute/path/to/source-augmentation-result.json
+```
+
+对 `result_file` adapter：
+
+- 如果配置了 `REDCUBE_SOURCE_AUGMENT_RESULT_FILE`，runtime 会直接读取该 JSON 文件
+- 如果没有配置，runtime 会默认在 request 所在目录寻找同级 `source-augmentation-result.json`
+- 文件不存在时，会显式返回 `source_augmentation_result_file_missing`
 
 调用时，RedCube 会把 canonical request 文件路径作为第一个参数传给这个命令。
 

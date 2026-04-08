@@ -47,6 +47,8 @@ test('operator docs publish workspace structure and source augmentation executor
   assert.equal(docsReadmeZh.includes('source_augmentation_executor_contract.md'), true);
 
   assert.equal(executorContract.includes('`REDCUBE_SOURCE_AUGMENT_CMD`'), true);
+  assert.equal(executorContract.includes('`REDCUBE_SOURCE_AUGMENT_RESULT_FILE`'), true);
+  assert.equal(executorContract.includes('`result_file`'), true);
   assert.equal(executorContract.includes('`shared_source_readiness_augmentation`'), true);
   assert.equal(executorContract.includes('`shared_source_readiness_augmentation_result`'), true);
   assert.equal(executorContract.includes('request contract invalid'), true);

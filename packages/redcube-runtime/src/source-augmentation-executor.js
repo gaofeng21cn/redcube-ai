@@ -1,9 +1,12 @@
+import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 
 import { validateSourceAugmentationResultContract } from '@redcube/runtime-protocol';
 
 const DEFAULT_SOURCE_AUGMENTATION_ADAPTER = 'external_command';
 const DEFAULT_SOURCE_AUGMENTATION_EXECUTOR_IDENTITY = 'source_augmentation_external_command';
+const DEFAULT_SOURCE_AUGMENTATION_RESULT_FILE_IDENTITY = 'canonical_source_augmentation_result_file';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -34,6 +37,12 @@ function validateExecutorOutput(executorOutput, request) {
   return {
     ok: true,
   };
+}
+
+function resolveResultFilePath(configuredResultFile, requestFile) {
+  const explicit = safeText(configuredResultFile);
+  if (explicit) return path.resolve(explicit);
+  return path.join(path.dirname(requestFile), 'source-augmentation-result.json');
 }
 
 function buildExternalCommandAdapter(command) {
@@ -85,6 +94,45 @@ function buildExternalCommandAdapter(command) {
   };
 }
 
+function buildResultFileAdapter(resultFile) {
+  const configuredResultFile = safeText(resultFile);
+  return {
+    adapter: 'result_file',
+    execution_surface: 'result_file',
+    executor_identity: configuredResultFile || DEFAULT_SOURCE_AUGMENTATION_RESULT_FILE_IDENTITY,
+    run({ requestFile, request }) {
+      const resultFilePath = resolveResultFilePath(configuredResultFile, requestFile);
+      if (!existsSync(resultFilePath)) {
+        return {
+          ok: false,
+          blockingReason: 'source_augmentation_result_file_missing',
+        };
+      }
+
+      let executorOutput;
+      try {
+        executorOutput = JSON.parse(readFileSync(resultFilePath, 'utf-8'));
+      } catch (error) {
+        return {
+          ok: false,
+          blockingReason: error instanceof Error ? error.message : String(error),
+        };
+      }
+
+      const validation = validateExecutorOutput(executorOutput, request);
+      if (!validation.ok) {
+        return validation;
+      }
+
+      return {
+        ok: true,
+        executionSurface: 'result_file',
+        executorOutput,
+      };
+    },
+  };
+}
+
 export function getRequestedSourceAugmentationAdapterId(value = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER) {
   return safeText(value, DEFAULT_SOURCE_AUGMENTATION_ADAPTER);
 }
@@ -92,10 +140,14 @@ export function getRequestedSourceAugmentationAdapterId(value = process.env.REDC
 export function resolveSourceAugmentationAdapter({
   adapter = getRequestedSourceAugmentationAdapterId(),
   command = process.env.REDCUBE_SOURCE_AUGMENT_CMD,
+  resultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE,
 } = {}) {
   const adapterId = safeText(adapter, DEFAULT_SOURCE_AUGMENTATION_ADAPTER);
   if (adapterId === 'external_command') {
     return buildExternalCommandAdapter(command);
+  }
+  if (adapterId === 'result_file') {
+    return buildResultFileAdapter(resultFile);
   }
 
   throw new Error(`Unsupported source augmentation adapter: ${adapterId}`);
