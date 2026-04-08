@@ -56,6 +56,18 @@ The current mainline also freezes one explicit execution-handle and durable-surf
 - Produce single-page `posters` when you need something more shareable than slides and more structured than a social post.
 - Keep review checkpoints, reruns, and exports inside one governed process instead of rebuilding the workflow every time.
 
+## Working Contract
+
+For end users, the product should be understood as one `5-step` line:
+
+`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`
+
+Within that line:
+
+- `Deep Research` belongs to `Source Readiness` when the input is too thin to support later judgement
+- humans can interrupt and review at any stage boundary through their agent
+- delivery is protected by a looped review gate rather than a one-shot review step
+
 ## Current Deliverables
 
 | Deliverable | Current state | Typical use |

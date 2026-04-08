@@ -55,6 +55,18 @@
 - 产出 `海报`，作为比幻灯片更便于传播、比社交内容更结构化的单页视觉交付物
 - 在同一条受控流程里完成审阅、重跑、导出与交付收口，而不是每次重搭流程
 
+## 工作口径
+
+对终端用户，`RedCube AI` 应统一理解为一条 `5 步` 生产线：
+
+`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`
+
+其中：
+
+- `Deep Research` 属于 `Source Readiness`，在输入材料不足时作为强化模式触发
+- 人可以通过自己的 Agent 在任意大步骤边界介入
+- 交付放行依赖循环式 Review Gate，而不是一次性 review
+
 ## 当前可用的交付物
 
 | 交付物 | 当前状态 | 典型场景 |

@@ -6,6 +6,18 @@
 
 如果你想使用 `RedCube AI`，最快的方式不是先学习底层命令，而是先把目标、材料和约束整理清楚，再交给你的 Agent 去推进。
 
+## 先记住统一工作线
+
+对人类用户，`RedCube AI` 应统一按下面这条线理解：
+
+`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`
+
+这里有三条必须明确的口径：
+
+- `Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步
+- 你可以在任意大步骤边界介入，通过 Codex 查看、修改、继续推进
+- 真正阻断放行的是循环式 Review Gate，而不是一次性的 review
+
 ## 你需要先准备什么
 
 建议先准备下面几类材料：
