@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
+  chmodSync,
   existsSync,
   mkdtempSync,
   mkdirSync,
@@ -11,7 +12,10 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-import { intakeSource } from '../packages/redcube-gateway/src/index.js';
+import {
+  executeSourceAugmentation,
+  intakeSource,
+} from '../packages/redcube-gateway/src/index.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -214,4 +218,136 @@ test('CLI source augment prepares canonical augmentation contract from source re
   assert.equal(typeof parsed.augmentation.focus.topic_summary, 'string');
   assert.equal(Array.isArray(parsed.augmentation.investigation_lanes), true);
   assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationRequestFile), true);
+});
+
+test('executeSourceAugmentation blocks explicitly when augmentation executor is unavailable', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+
+  try {
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-augment-blocked',
+      title: 'augment blocked',
+      brief: '只有主题和关键词，需要联网补料。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    const result = await executeSourceAugmentation({
+      workspaceRoot,
+      topicId: 'topic-augment-blocked',
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.surface_kind, 'source_augmentation_execution');
+    assert.equal(result.summary.status, 'blocked');
+    assert.equal(result.recommended_action, 'configure_source_augmentation_executor');
+    assert.equal(existsSync(result.artifactFiles.sourceAugmentationReportFile), true);
+
+    const report = readJson(result.artifactFiles.sourceAugmentationReportFile);
+    assert.equal(report.status, 'blocked');
+    assert.equal(report.blocking_reason, 'source_augmentation_executor_unconfigured');
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+  }
+});
+
+test('CLI source execute-augmentation runs configured executor and upgrades readiness to planning_ready', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
+  const scriptFile = path.join(workspaceRoot, 'mock-source-augment.js');
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+
+  writeFileSync(
+    scriptFile,
+    `#!/usr/bin/env node
+const fs = require('node:fs');
+const request = JSON.parse(fs.readFileSync(process.argv[2], 'utf-8'));
+process.stdout.write(JSON.stringify({
+  status: 'completed',
+  topic_summary: request.focus.topic_summary + '（已补充公开证据）',
+  reference_source_list: [
+    { label: '国家指南', url: 'https://example.com/guideline' },
+    { label: '系统综述', url: 'https://example.com/review' }
+  ],
+  key_fact_groups: [
+    {
+      label: 'TSH 异常后需要结合 FT4 判断下一步动作',
+      source_label: '国家指南',
+      source_url: 'https://example.com/guideline'
+    },
+    {
+      label: '门诊沟通里应先解释判断顺序，再解释术语',
+      source_label: '系统综述',
+      source_url: 'https://example.com/review'
+    }
+  ],
+  resolved_evidence_gaps: ['public_evidence_missing']
+}));`,
+    'utf-8',
+  );
+  chmodSync(scriptFile, 0o755);
+  process.env.REDCUBE_SOURCE_AUGMENT_CMD = scriptFile;
+
+  try {
+    execFileSync(
+      'node',
+      [
+        path.resolve('apps/redcube-cli/src/cli.js'),
+        'source',
+        'intake',
+        '--workspace-root',
+        workspaceRoot,
+        '--topic-id',
+        'topic-cli-execute',
+        '--title',
+        'CLI execute augment',
+        '--brief',
+        '仅有主题和关键词，需要执行后续 Deep Research 补料。',
+        '--keywords',
+        '甲状腺,门诊',
+      ],
+      { encoding: 'utf-8', cwd: path.resolve('.') },
+    );
+
+    const output = execFileSync(
+      'node',
+      [
+        path.resolve('apps/redcube-cli/src/cli.js'),
+        'source',
+        'execute-augmentation',
+        '--workspace-root',
+        workspaceRoot,
+        '--topic-id',
+        'topic-cli-execute',
+      ],
+      { encoding: 'utf-8', cwd: path.resolve('.') },
+    );
+
+    const parsed = JSON.parse(output);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.surface_kind, 'source_augmentation_execution');
+    assert.equal(parsed.summary.status, 'completed');
+    assert.equal(parsed.recommended_action, 'create_deliverable');
+    assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationReportFile), true);
+
+    const report = readJson(parsed.artifactFiles.sourceAugmentationReportFile);
+    assert.equal(report.status, 'completed');
+    assert.equal(report.added_source_count, 2);
+    assert.equal(report.resolved_evidence_gaps.includes('public_evidence_missing'), true);
+
+    const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-cli-execute', 'canonical', 'source-readiness-pack.json'));
+    assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
+    assert.equal(pack.readiness.deep_research_state, 'completed');
+    assert.equal(pack.readiness.confidence, 'medium');
+    assert.equal(pack.fact_library.reference_source_list.some((item) => String(item).includes('国家指南')), true);
+
+    const sourceBrief = readJson(path.join(workspaceRoot, 'topics', 'topic-cli-execute', 'canonical', 'source-brief.json'));
+    assert.equal(sourceBrief.confidence, 'medium');
+    assert.equal(sourceBrief.material_count >= 3, true);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+  }
 });

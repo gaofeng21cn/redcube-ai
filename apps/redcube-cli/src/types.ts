@@ -14,6 +14,7 @@ import type {
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceAugmentationResponse,
+  SourceAugmentationExecutionResponse,
   SourceIntakeResponse,
   TopicCatalogResponse,
   WorkspaceDoctorResponse,
@@ -58,6 +59,7 @@ export interface CliGatewayActions {
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
+  executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse>;
   importLegacyProject(request: Record<string, unknown>): Promise<LegacyImportResponse>;
   createDeliverable(request: CreateDeliverableRequest): Promise<DeliverableCreateResponse>;
   getDeliverable(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<DeliverableRecordResponse>;
@@ -91,6 +93,7 @@ export type CliRunSurface =
   | OverlayCatalogResponse
   | SourceIntakeResponse
   | SourceAugmentationResponse
+  | SourceAugmentationExecutionResponse
   | LegacyImportResponse
   | DeliverableCreateResponse
   | DeliverableRecordResponse

@@ -265,6 +265,16 @@ export interface SourceAugmentationResponse extends SurfaceBase<'source_augmenta
   };
 }
 
+export interface SourceAugmentationExecutionResponse extends SurfaceBase<'source_augmentation_execution'> {
+  artifactFiles: Record<string, string>;
+  report: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    status: string | null;
+    readiness_target: string | null;
+  };
+}
+
 export interface LegacyImportResponse extends SurfaceBase<'legacy_import'> {
   mode: 'legacy_to_workspace';
   project: string;

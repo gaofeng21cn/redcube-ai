@@ -46,7 +46,7 @@
 
 1. 准备一个独立工作区，把素材放进去。
 2. 对你的 Agent 说明交付目标、受众、交付物类型和边界条件。
-3. 如果你目前只有主题、关键词或粗略想法，让 Agent 先走 `Source Readiness`：先做 `source intake`，再在需要时生成 `source augmentation` / `Deep Research` 合同。
+3. 如果你目前只有主题、关键词或粗略想法，让 Agent 先走 `Source Readiness`：先做 `source intake`，再在需要时生成并执行 `source augmentation` / `Deep Research`。
 4. 让 Agent 使用 `RedCube AI` 作为视觉交付运行层推进。
 5. 你只在关键节点审核，不手工操作底层运行细节。
 

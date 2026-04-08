@@ -38,6 +38,7 @@ import {
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
+import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
 import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
 import { intakeSource as intakeSourceJs } from './source-intake.js';
 
@@ -62,6 +63,8 @@ import type {
   RuntimeSourceIntakeResponse,
   RuntimeSourceAugmentationRequest,
   RuntimeSourceAugmentationResponse,
+  RuntimeSourceAugmentationExecutionRequest,
+  RuntimeSourceAugmentationExecutionResponse,
   RuntimeStartRunRequest,
 } from './types.js';
 
@@ -151,6 +154,15 @@ export async function prepareSourceAugmentation(
   return prepare(request);
 }
 
+export async function executeSourceAugmentation(
+  request: RuntimeSourceAugmentationExecutionRequest,
+): Promise<RuntimeSourceAugmentationExecutionResponse> {
+  const execute = executeSourceAugmentationJs as unknown as (
+    request: RuntimeSourceAugmentationExecutionRequest,
+  ) => Promise<RuntimeSourceAugmentationExecutionResponse>;
+  return execute(request);
+}
+
 export type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
@@ -172,5 +184,7 @@ export type {
   RuntimeSourceIntakeResponse,
   RuntimeSourceAugmentationRequest,
   RuntimeSourceAugmentationResponse,
+  RuntimeSourceAugmentationExecutionRequest,
+  RuntimeSourceAugmentationExecutionResponse,
   RuntimeStartRunRequest,
 } from './types.js';

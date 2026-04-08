@@ -12,6 +12,10 @@ export async function prepareSourceAugmentation(request) {
   const module = await import('./actions/prepare-source-augmentation.js');
   return module.prepareSourceAugmentation(request);
 }
+export async function executeSourceAugmentation(request) {
+  const module = await import('./actions/execute-source-augmentation.js');
+  return module.executeSourceAugmentation(request);
+}
 export async function importLegacyProject(request) {
   const module = await import('./actions/import-legacy-project.js');
   return module.importLegacyProject(request);

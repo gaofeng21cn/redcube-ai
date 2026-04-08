@@ -109,7 +109,7 @@
 
 1. 准备一个独立工作区，把材料放进去。
 2. 告诉智能代理这次要做的是 `幻灯片`、`小红书笔记` 还是 `海报`，以及面向谁、最终要达到什么目标。
-3. 如果当前只有主题、关键词或粗略想法，让智能代理先走 `Source Readiness`：先做 `source intake`，再在需要时生成 canonical `source augmentation` / `Deep Research` 合同。
+3. 如果当前只有主题、关键词或粗略想法，让智能代理先走 `Source Readiness`：先做 `source intake`，再在需要时生成并执行 canonical `source augmentation` / `Deep Research`。
 4. 让智能代理使用 `RedCube AI` 推进这次视觉交付，并由你审核关键节点。
 
 你可以直接把下面这段话发给智能代理：

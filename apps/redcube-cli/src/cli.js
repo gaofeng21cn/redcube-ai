@@ -12,6 +12,7 @@ import {
   getRun as getGatewayRun,
   intakeSource,
   prepareSourceAugmentation,
+  executeSourceAugmentation,
   importLegacyProject,
   listTopics as listTopicsGateway,
   runtimeWatch,
@@ -30,6 +31,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getRun: getGatewayRun,
   intakeSource,
   prepareSourceAugmentation,
+  executeSourceAugmentation,
   importLegacyProject,
   listTopics: listTopicsGateway,
   runtimeWatch,
@@ -137,6 +139,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube source augment --workspace-root <dir> --topic-id <id>',
       },
       {
+        task: '执行 Source Augmentation / Deep Research 补料并回写 canonical source truth',
+        command: 'redcube source execute-augmentation --workspace-root <dir> --topic-id <id>',
+      },
+      {
         task: '创建一个新的视觉交付物',
         command: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       },
@@ -165,7 +171,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
-      source: ['intake', 'augment'],
+      source: ['intake', 'augment', 'execute-augmentation'],
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
@@ -186,6 +192,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       sourceAugment: 'redcube source augment --workspace-root <dir> --topic-id <id>',
+      sourceExecuteAugmentation: 'redcube source execute-augmentation --workspace-root <dir> --topic-id <id>',
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
@@ -276,7 +283,14 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('source 命令仅支持 intake|augment');
+    if (subcommand === 'execute-augmentation') {
+      return gateway.executeSourceAugmentation({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        topicId: options.topicId || '',
+      });
+    }
+
+    throw new Error('source 命令仅支持 intake|augment|execute-augmentation');
   }
 
   if (command === 'deliverable') {

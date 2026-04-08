@@ -16,6 +16,7 @@ import {
   getRun,
   intakeSource,
   prepareSourceAugmentation,
+  executeSourceAugmentation,
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -32,6 +33,7 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   getPublicationProjection,
   intakeSource,
   prepareSourceAugmentation,
+  executeSourceAugmentation,
   auditDeliverable,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -86,6 +88,15 @@ export const TOOL_DEFINITIONS = [
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       topicId: z.string().describe('Topic identifier.'),
       title: z.string().optional().describe('Optional topic title override.'),
+    },
+  },
+  {
+    name: 'execute_source_augmentation',
+    description: 'Execute the configured Source Augmentation / Deep Research executor and rewrite canonical source truth.',
+    actionKey: 'executeSourceAugmentation',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
     },
   },
   {

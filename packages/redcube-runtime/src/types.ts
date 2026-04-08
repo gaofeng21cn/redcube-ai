@@ -364,3 +364,15 @@ export interface RuntimeSourceAugmentationRequest {
   topicId: string;
   title?: string;
 }
+
+export interface RuntimeSourceAugmentationExecutionResponse {
+  ok: boolean;
+  topicId: string;
+  artifactFiles: Record<string, string>;
+  report: Record<string, unknown>;
+}
+
+export interface RuntimeSourceAugmentationExecutionRequest {
+  workspaceRoot: string;
+  topicId: string;
+}

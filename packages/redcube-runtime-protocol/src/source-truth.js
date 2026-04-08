@@ -21,6 +21,7 @@ export function getSourceArtifactPaths(workspaceRoot, topicId) {
     sourceBriefFile: path.join(topicPaths.canonicalDir, 'source-brief.json'),
     sourceReadinessPackFile: path.join(topicPaths.canonicalDir, 'source-readiness-pack.json'),
     sourceAugmentationRequestFile: path.join(topicPaths.canonicalDir, 'source-augmentation-request.json'),
+    sourceAugmentationReportFile: path.join(topicPaths.canonicalDir, 'source-augmentation-report.json'),
   };
 }
 
