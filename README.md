@@ -47,6 +47,7 @@ The current mainline also freezes one explicit execution-handle and durable-surf
 - `run_id` is the per-run execution handle for one routed delivery execution.
 - `auditDeliverable` / `runtimeWatch` are the current canonical audit-and-watch surfaces.
 - `getReviewState` / `getPublicationProjection` are the current canonical review-and-projection surfaces.
+- on the same deliverable/topic boundary, `auditDeliverable` and `runtimeWatch` now stay aligned with the canonical `review_state`, topic-level `publication_projection`, and hydrated `delivery_contract`
 
 ## What It Helps You Do
 
@@ -112,6 +113,7 @@ The main unfinished areas are:
 - `stable deliverable manual-test-driven hardening` has completed closeout for `ppt_deck` and `xiaohongshu`, with a tracked stable backlog and no recorded findings
 - `source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface; `CLI` and `MCP` hydrate canonical shared source truth on the same substrate, and `ppt_deck` / `xiaohongshu` consume it through the shared gateway mainline
 - review / export / gate / audit hardening now has an absorbed tranche on the same mainline: `auditDeliverable` and `runtimeWatch` surface canonical source readiness plus export gate summaries across the stable families
+- current behavior convergence keeps `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` aligned on the same deliverable/topic boundary instead of letting audit and projection drift apart
 - family source-truth consumption convergence now has an absorbed tranche on the same mainline: `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager` now converge around one hydrated `source_truth_contract` plus one shared `source_truth_consumption` summary while the authoritative fail-closed source gate stays in `auditDeliverable` / `runtimeWatch`
 - publication projection / delivery contract convergence now has an absorbed tranche on the same mainline: `delivery_contract` is now hydrated across `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`, while `publication-state.json` aligns topic-level projection entries to hydrated delivery contracts plus canonical review state
 - poster support is still incomplete:

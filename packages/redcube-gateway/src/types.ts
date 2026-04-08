@@ -301,8 +301,11 @@ export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
   issues: string[];
   rerun_from_stage: string | null;
   quality_summary: Record<string, unknown>;
+  review_state?: Record<string, unknown> | null;
+  publication_projection?: Record<string, unknown> | null;
   source_readiness_summary?: Record<string, unknown> | null;
   gate_summary?: Record<string, unknown> | null;
+  delivery_contract?: Record<string, unknown> | null;
 }
 
 export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayRequest {

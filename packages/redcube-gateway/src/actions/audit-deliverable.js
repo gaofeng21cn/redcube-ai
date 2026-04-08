@@ -93,6 +93,21 @@ function loadPublicationProjectionEntry({ workspaceRoot, topicId, deliverableId 
   }
 }
 
+function loadPublicationProjection({ workspaceRoot, topicId }) {
+  if (!workspaceRoot || !topicId) {
+    return null;
+  }
+
+  try {
+    return getRuntimePublicationProjection({
+      workspaceRoot,
+      topicId,
+    })?.publication || null;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeList(value) {
   return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : [];
 }
@@ -267,7 +282,8 @@ export async function auditDeliverable(request) {
   const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const contract = loadHydratedContract(request);
   const reviewState = loadReviewState(request);
-  const publicationProjectionEntry = loadPublicationProjectionEntry(request);
+  const publicationProjection = loadPublicationProjection(request);
+  const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
@@ -297,6 +313,8 @@ export async function auditDeliverable(request) {
     surface_kind: 'audit',
     ...mergeAuditReports(reports),
     quality_summary: qualitySummary,
+    review_state: reviewState,
+    publication_projection: publicationProjection,
     source_readiness_summary: sourceReadinessSummary,
     gate_summary: buildGateSummary({
       sourceReadinessSummary,
@@ -304,5 +322,6 @@ export async function auditDeliverable(request) {
       contract,
       publicationProjectionEntry,
     }),
+    delivery_contract: contract?.delivery_contract || null,
   };
 }

@@ -52,6 +52,11 @@
   - `topics/<topic>/deliverables/<deliverable>/contracts/delivery-contract.json`
   - `topics/<topic>/deliverables/<deliverable>/reports/review-state.json`
 
+当前 behavior convergence 继续要求：
+
+- `auditDeliverable` 与 `runtimeWatch` 在同一 deliverable/topic 边界上，不得脱离 canonical `review_state`、topic 级 `publication_projection` 与 hydrated `delivery_contract`
+- `getReviewState` / `getPublicationProjection` 是权威表面；audit / watch 只能围绕它们收口，不能另写一套平行语义
+
 后续即使迁移到 managed web runtime，也只能迁移宿主形态，不能改写这些 execution handle 与 durable surface 语义。
 
 ## 长线目标与当前 program 必须分开理解

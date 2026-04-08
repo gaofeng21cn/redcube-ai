@@ -139,6 +139,11 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 - audit / watch：`auditDeliverable`、`runtimeWatch`
 - review / projection：`getReviewState`、`getPublicationProjection`
 
+当前行为收口要求它们在同一 deliverable/topic 边界上保持一致：
+
+- `auditDeliverable` 不只输出 gate judgement，还要回指同一份 canonical `review_state`、topic 级 `publication_projection` 与 hydrated `delivery_contract`
+- `runtimeWatch` 必须和 `getReviewState` / `getPublicationProjection` 对齐，而不是自成一套 watch-only 状态
+
 这意味着后续如果继续统一三个业务仓，不应再重复发明“这次 run 到底靠什么识别、哪份 artifact 才算正式 durable truth”。
 RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 
