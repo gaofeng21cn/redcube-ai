@@ -48,6 +48,85 @@ export interface SourceArtifactPaths {
   sourceAugmentationReportFile: string;
 }
 
+export interface ValidationResult {
+  ok: boolean;
+  errors: string[];
+}
+
+export interface SourceAugmentationInvestigationLane {
+  lane_id: string;
+  priority: 'required' | 'suggested';
+  objective: string;
+  deliverable_value: string;
+  focus_terms: string[];
+}
+
+export interface SourceAugmentationRequestContract {
+  schema_version: 1;
+  topic_id: string;
+  title: string;
+  request_kind: 'shared_source_readiness_augmentation';
+  status: 'required' | 'recommended' | 'not_required';
+  execution_mode: 'auto_required' | 'operator_optional' | 'not_needed';
+  readiness_target: 'planning_ready';
+  authoritative_inputs: {
+    source_brief: string;
+    source_audit: string;
+    source_readiness_pack: string;
+  };
+  trigger: {
+    input_mode: string;
+    confidence: string;
+    source_audit_status: string;
+    source_sufficiency_status: string;
+    deep_research_state: string;
+    evidence_gaps: string[];
+  };
+  focus: {
+    topic_summary: string;
+    brief_text: string;
+    keywords: string[];
+    required_outputs: string[];
+  };
+  investigation_lanes: SourceAugmentationInvestigationLane[];
+}
+
+export interface SourceAugmentationReferenceSource {
+  reference_id: string;
+  label: string;
+  url: string;
+}
+
+export interface SourceAugmentationFactGroup {
+  fact_id: string;
+  label: string;
+  reference_id: string;
+}
+
+export interface SourceAugmentationEvidenceGapResolution {
+  gap_id: string;
+  status: 'resolved' | 'unresolved';
+  note: string;
+}
+
+export interface SourceAugmentationResultContract {
+  schema_version: 1;
+  topic_id: string;
+  request_kind: 'shared_source_readiness_augmentation_result';
+  status: 'completed';
+  readiness_target: 'planning_ready';
+  topic_summary: string;
+  reference_source_list: SourceAugmentationReferenceSource[];
+  key_fact_groups: SourceAugmentationFactGroup[];
+  source_quality_notes: string[];
+  evidence_gap_resolution: SourceAugmentationEvidenceGapResolution[];
+}
+
+export interface ValidateSourceAugmentationResultOptions {
+  expectedTopicId?: string;
+  requiredEvidenceGaps?: string[];
+}
+
 export interface SourceTruthConsumptionSummary {
   authoritative_source_kind: 'shared_source_truth';
   consumption_role: string;

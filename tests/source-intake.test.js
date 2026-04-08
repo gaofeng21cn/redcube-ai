@@ -254,6 +254,125 @@ test('executeSourceAugmentation blocks explicitly when augmentation executor is 
   }
 });
 
+test('executeSourceAugmentation blocks invalid canonical request before invoking executor', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
+  const scriptFile = path.join(workspaceRoot, 'should-not-run.js');
+  const markerFile = path.join(workspaceRoot, 'executor-invoked.txt');
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+
+  writeFileSync(
+    scriptFile,
+    `#!/usr/bin/env node
+const fs = require('node:fs');
+fs.writeFileSync(${JSON.stringify(markerFile)}, 'invoked', 'utf-8');
+process.stdout.write(JSON.stringify({
+  schema_version: 1,
+  topic_id: 'topic-invalid-request',
+  request_kind: 'shared_source_readiness_augmentation_result',
+  status: 'completed',
+  readiness_target: 'planning_ready',
+  topic_summary: 'unexpected',
+  reference_source_list: [
+    { reference_id: 'REF-001', label: '国家指南', url: 'https://example.com/guideline' }
+  ],
+  key_fact_groups: [
+    { fact_id: 'FACT-001', label: 'unexpected', reference_id: 'REF-001' }
+  ],
+  source_quality_notes: [],
+  evidence_gap_resolution: []
+}));`,
+    'utf-8',
+  );
+  chmodSync(scriptFile, 0o755);
+  process.env.REDCUBE_SOURCE_AUGMENT_CMD = scriptFile;
+
+  try {
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-invalid-request',
+      title: 'invalid request',
+      brief: '只有主题和关键词，需要联网补料。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    const requestFile = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-invalid-request',
+      'canonical',
+      'source-augmentation-request.json',
+    );
+    const request = readJson(requestFile);
+    request.request_kind = 'broken_contract';
+    writeFileSync(requestFile, JSON.stringify(request, null, 2), 'utf-8');
+
+    const result = await executeSourceAugmentation({
+      workspaceRoot,
+      topicId: 'topic-invalid-request',
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.report.status, 'blocked');
+    assert.match(result.report.blocking_reason, /request contract invalid/i);
+    assert.equal(existsSync(markerFile), false);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+  }
+});
+
+test('executeSourceAugmentation blocks explicitly when executor returns invalid result contract', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
+  const scriptFile = path.join(workspaceRoot, 'invalid-source-augment.js');
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+
+  writeFileSync(
+    scriptFile,
+    `#!/usr/bin/env node
+process.stdout.write(JSON.stringify({
+  schema_version: 1,
+  topic_id: 'topic-invalid-result',
+  request_kind: 'shared_source_readiness_augmentation_result',
+  status: 'completed',
+  readiness_target: 'planning_ready',
+  topic_summary: '缺了可追溯 reference_id 的非法结果',
+  reference_source_list: [
+    { label: '国家指南', url: 'https://example.com/guideline' }
+  ],
+  key_fact_groups: [
+    { fact_id: 'FACT-001', label: 'TSH 异常后需要结合 FT4 判断下一步动作', reference_id: 'REF-001' }
+  ],
+  source_quality_notes: [],
+  evidence_gap_resolution: []
+}));`,
+    'utf-8',
+  );
+  chmodSync(scriptFile, 0o755);
+  process.env.REDCUBE_SOURCE_AUGMENT_CMD = scriptFile;
+
+  try {
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-invalid-result',
+      title: 'invalid result',
+      brief: '只有主题和关键词，需要联网补料。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    const result = await executeSourceAugmentation({
+      workspaceRoot,
+      topicId: 'topic-invalid-result',
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.report.status, 'blocked');
+    assert.match(result.report.blocking_reason, /result contract invalid/i);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+  }
+});
+
 test('CLI source execute-augmentation runs configured executor and upgrades readiness to planning_ready', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));
   const scriptFile = path.join(workspaceRoot, 'mock-source-augment.js');
@@ -265,25 +384,32 @@ test('CLI source execute-augmentation runs configured executor and upgrades read
 const fs = require('node:fs');
 const request = JSON.parse(fs.readFileSync(process.argv[2], 'utf-8'));
 process.stdout.write(JSON.stringify({
+  schema_version: 1,
+  topic_id: request.topic_id,
+  request_kind: 'shared_source_readiness_augmentation_result',
   status: 'completed',
+  readiness_target: 'planning_ready',
   topic_summary: request.focus.topic_summary + '（已补充公开证据）',
   reference_source_list: [
-    { label: '国家指南', url: 'https://example.com/guideline' },
-    { label: '系统综述', url: 'https://example.com/review' }
+    { reference_id: 'REF-001', label: '国家指南', url: 'https://example.com/guideline' },
+    { reference_id: 'REF-002', label: '系统综述', url: 'https://example.com/review' }
   ],
   key_fact_groups: [
     {
+      fact_id: 'FACT-001',
       label: 'TSH 异常后需要结合 FT4 判断下一步动作',
-      source_label: '国家指南',
-      source_url: 'https://example.com/guideline'
+      reference_id: 'REF-001'
     },
     {
+      fact_id: 'FACT-002',
       label: '门诊沟通里应先解释判断顺序，再解释术语',
-      source_label: '系统综述',
-      source_url: 'https://example.com/review'
+      reference_id: 'REF-002'
     }
   ],
-  resolved_evidence_gaps: ['public_evidence_missing']
+  source_quality_notes: ['优先使用公开指南与系统综述。'],
+  evidence_gap_resolution: [
+    { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' }
+  ]
 }));`,
     'utf-8',
   );

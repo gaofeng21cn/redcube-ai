@@ -6,6 +6,18 @@
 
 如果你想使用 `RedCube AI`，最快的方式不是先学习底层命令，而是先把目标、材料和约束整理清楚，再交给你的 Agent 去推进。
 
+## 先记住统一工作线
+
+对人类用户，`RedCube AI` 应统一按下面这条线理解：
+
+`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`
+
+这里有三条必须明确的口径：
+
+- `Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步
+- 你可以在任意大步骤边界介入，通过 Codex 查看、修改、继续推进
+- 真正阻断放行的是循环式 Review Gate，而不是一次性的 review
+
 ## 你需要先准备什么
 
 建议先准备下面几类材料：
@@ -34,8 +46,13 @@
 
 1. 准备一个独立工作区，把素材放进去。
 2. 对你的 Agent 说明交付目标、受众、交付物类型和边界条件。
-3. 让 Agent 使用 `RedCube AI` 作为视觉交付运行层推进。
-4. 你只在关键节点审核，不手工操作底层运行细节。
+3. 如果你目前只有主题、关键词或粗略想法，让 Agent 先走 `Source Readiness`：先做 `source intake`，再在需要时生成并执行 `source augmentation` / `Deep Research`。
+4. 让 Agent 使用 `RedCube AI` 作为视觉交付运行层推进。
+5. 你只在关键节点审核，不手工操作底层运行细节。
+
+对 Step 1，可以把它收口成一条稳定链路理解：
+
+`source intake -> source augment -> source execute-augmentation`
 
 ## 一句话快速开始指令
 
@@ -43,11 +60,11 @@
 
 ### 场景一：我已经准备好了参考材料
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。先执行 `workspace doctor`，再执行 `source intake` 读取并水合我提供的材料；然后根据任务目标创建 `topic` 与 `deliverable`，并按正式链路推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
+> 请把这个目录当作本次项目的独立 RedCube workspace。先执行 `workspace doctor`，再执行 `source intake` 读取并水合我提供的材料；如果 canonical source truth 还不够支撑后续判断，就继续执行 `source augment` 和 `source execute-augmentation`。然后根据任务目标创建 `topic` 与 `deliverable`，并按正式链路推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
 
 ### 场景二：我只有主题，让你先把事实材料准备好
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。围绕主题“{{主题}}”先进入 `Source Readiness`：如果现有材料不足，就先生成 research brief、公开来源口径和待补资料清单，不要直接进入成稿；待 shared source truth 足够后，再创建 deliverable 并推进正式交付链路。若是小红书系列，请按一篇笔记一个 deliverable 建模。
+> 请把这个目录当作本次项目的独立 RedCube workspace。围绕主题“{{主题}}”先进入 `Source Readiness`：如果现有材料不足，就强制启动 `source augmentation` / `Deep Research` 去补全事实材料，不要直接进入成稿；待 shared source truth 足够后，再创建 deliverable 并推进正式交付链路。若是小红书系列，请按一篇笔记一个 deliverable 建模。
 
 ## 推荐的 workspace 组织方式
 
@@ -69,6 +86,9 @@
 
 ## 推荐的目录结构
 
+你可以直接拿一个全新目录当 `workspace`，不需要先手工搭完整棵树。
+只要把参考材料放进去，然后让 Codex / Agent 在这个目录下调用 `RedCube AI`，它就应该按 canonical workspace contract 自动把结构水合出来。
+
 当前实现对应的 canonical workspace contract 可以理解为：
 
 ```text
@@ -86,11 +106,17 @@
 │       │       ├── contracts/
 │       │       ├── reports/
 │       │       └── views/
+│       ├── notes/
 │       └── runs/
 ├── runtime/
 ├── publish/
 └── overlays/
 ```
+
+你真正需要先理解的只有两层：
+
+- 工作区根目录会有 `redcube.workspace.json`
+- 每个主题最关键的事实真相面都落在 `topics/<topic-id>/canonical/`
 
 建议这样理解这些目录：
 
@@ -108,6 +134,8 @@
 - `canonical/`、`contracts/`、`reports/` 不建议手工维护，应由 `RedCube AI` 自动落盘
 - 你可以把材料先放进 workspace，也可以让 Agent 在 `source intake` 时把外部材料复制进 canonical 输入面
 - 人类最好只维护原始素材和高层意图，不要把 runtime 真相层当普通笔记目录来改
+
+如果你已经准备好了参考材料，建议直接放到 `topics/<topic-id>/inputs/`，或者让 Agent 通过绝对路径作为 `source-files` 读取。
 
 ## 新目录如何开始
 
@@ -157,9 +185,19 @@
 
 如果你希望后续只告诉 Codex“在这个目录里调用 RedCube AI 开始工作”，建议把要求说成下面这种形式：
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 canonical workspace contract 初始化。把本次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则先产出 research brief 与待补资料清单，不要直接进入成稿。随后为本次目标创建 deliverable，并按正式阶段推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
+> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 canonical workspace contract 初始化。把本次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则继续执行 `source augment` 与 `source execute-augmentation`，把 Step 1 推到 `planning_ready`。随后为本次目标创建 deliverable，并按正式阶段推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
 
 ## 你可以直接发给 Agent 的话
+
+### Codex 的一句话启动指令
+
+#### 场景一：你已经准备好了参考材料
+
+> 请把这个目录当作 RedCube AI 的工作区。先读取这里已有的参考材料，必要时在同一工作区下完成 `Source Readiness`，如果 canonical source truth 还不够支撑后续判断，就继续执行 `source augmentation` / `Deep Research`，然后再推进到 Storyline、Plan、Visual 和 Delivery。
+
+#### 场景二：你只有主题、关键词或粗略想法
+
+> 请把这个目录当作 RedCube AI 的工作区，并围绕这个主题先建立 canonical `Source Readiness`。如果输入材料不足，请强制启动 `source augmentation` / `Deep Research` 去补全事实材料，等 Step 1 达到 `planning_ready` 后，再继续推进后续视觉交付步骤。
 
 ### 场景一：PPT 演示文稿
 

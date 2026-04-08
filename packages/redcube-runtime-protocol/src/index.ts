@@ -11,6 +11,10 @@ import {
   buildSourceTruthConsumptionSummary as buildSourceTruthConsumptionSummaryJs,
   getSourceArtifactPaths as getSourceArtifactPathsJs,
 } from './source-truth.js';
+import {
+  validateSourceAugmentationRequestContract as validateSourceAugmentationRequestContractJs,
+  validateSourceAugmentationResultContract as validateSourceAugmentationResultContractJs,
+} from './source-augmentation-contract.js';
 
 import type {
   BuildSourceTruthConsumptionSummaryOptions,
@@ -23,7 +27,11 @@ import type {
   RunTelemetryEnvelope,
   RuntimeErrorKind,
   SourceArtifactPaths,
+  SourceAugmentationRequestContract,
+  SourceAugmentationResultContract,
   TopicPaths,
+  ValidateSourceAugmentationResultOptions,
+  ValidationResult,
   WorkspaceContract,
 } from './types.js';
 
@@ -58,6 +66,19 @@ export function buildSourceTruthConsumptionSummary(
   return buildSourceTruthConsumptionSummaryJs(sharedSourceTruth, options) as SourceTruthConsumptionSummary;
 }
 
+export function validateSourceAugmentationRequestContract(
+  contract: unknown,
+): ValidationResult {
+  return validateSourceAugmentationRequestContractJs(contract) as ValidationResult;
+}
+
+export function validateSourceAugmentationResultContract(
+  contract: unknown,
+  options: ValidateSourceAugmentationResultOptions = {},
+): ValidationResult {
+  return validateSourceAugmentationResultContractJs(contract, options) as ValidationResult;
+}
+
 export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 };
@@ -73,6 +94,10 @@ export type {
   RunTelemetryEnvelope,
   RuntimeErrorKind,
   SourceArtifactPaths,
+  SourceAugmentationRequestContract,
+  SourceAugmentationResultContract,
   TopicPaths,
+  ValidateSourceAugmentationResultOptions,
+  ValidationResult,
   WorkspaceContract,
 };

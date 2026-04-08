@@ -97,10 +97,13 @@ For most expert users, the fastest path is not to learn low-level commands first
 Typical three-step start:
 
 1. Prepare an isolated workspace and place your source materials in it.
+   This can be a brand-new directory; you do not need to handcraft the full tree first because Codex / your agent can initialize the canonical workspace contract there, including `redcube.workspace.json`, `topics/`, `runtime/`, and `publish/`.
 2. Tell your agent whether you want `slides`, a `Xiaohongshu note`, or a `poster`, who the audience is, and what the final goal is.
 3. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
 
 If you want a faster handoff, you can give your agent a one-line start instruction.
+
+`Deep Research` belongs to `Source Readiness` rather than a standalone pre-stage. When the input is too thin, the agent should keep Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
 
 Scenario 1, you already prepared reference materials:
 

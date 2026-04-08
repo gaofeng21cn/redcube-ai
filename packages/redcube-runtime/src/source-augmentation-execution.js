@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
@@ -7,7 +6,12 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
+import {
+  getSourceArtifactPaths,
+  validateSourceAugmentationRequestContract,
+} from '@redcube/runtime-protocol';
+
+import { executeSourceAugmentationWithCommand } from './source-augmentation-executor.js';
 
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
@@ -32,14 +36,6 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
-function parseExecutorJson(text) {
-  const trimmed = safeText(text);
-  if (!trimmed) {
-    throw new Error('source augmentation executor returned empty stdout');
-  }
-  return JSON.parse(trimmed);
-}
-
 function nextSequence(items, prefix) {
   const values = safeArray(items)
     .map((item) => safeText(item))
@@ -53,39 +49,11 @@ function uniqueStrings(values) {
   return [...new Set(safeArray(values).map((item) => safeText(item)).filter(Boolean))];
 }
 
-function normalizeReferenceSource(item) {
-  if (typeof item === 'string') {
-    return {
-      label: safeText(item),
-      url: '',
-    };
-  }
-  return {
-    label: safeText(item?.label || item?.title || item?.url),
-    url: safeText(item?.url),
-  };
-}
-
 function referenceDisplayLabel(source) {
   const label = safeText(source?.label);
   const url = safeText(source?.url);
   if (label && url) return `${label} | ${url}`;
   return label || url;
-}
-
-function normalizeFact(item, fallbackSource) {
-  if (typeof item === 'string') {
-    return {
-      label: safeText(item),
-      source_label: safeText(fallbackSource?.label),
-      source_url: safeText(fallbackSource?.url),
-    };
-  }
-  return {
-    label: safeText(item?.label || item?.fact || item?.text),
-    source_label: safeText(item?.source_label || item?.source_title || fallbackSource?.label),
-    source_url: safeText(item?.source_url || item?.url || fallbackSource?.url),
-  };
 }
 
 function buildBlockedReport({ topicId, request, blockingReason }) {
@@ -110,18 +78,34 @@ function applyAugmentation({
   sourceAudit,
   sourceReadinessPack,
   executorOutput,
+  executionSurface,
 }) {
-  const references = safeArray(executorOutput?.reference_source_list)
-    .map((item) => normalizeReferenceSource(item))
-    .filter((item) => referenceDisplayLabel(item));
-  const facts = safeArray(executorOutput?.key_fact_groups)
-    .map((item, index) => normalizeFact(item, references[index % Math.max(references.length, 1)] || null))
-    .filter((item) => safeText(item.label));
-  const resolvedEvidenceGaps = uniqueStrings(executorOutput?.resolved_evidence_gaps);
-  const unresolvedEvidenceGaps = uniqueStrings(
-    safeArray(sourceReadinessPack?.fact_library?.evidence_gaps)
-      .filter((item) => !resolvedEvidenceGaps.includes(safeText(item))),
+  const references = safeArray(executorOutput?.reference_source_list).map((item) => ({
+    reference_id: safeText(item?.reference_id),
+    label: safeText(item?.label),
+    url: safeText(item?.url),
+  }));
+  const facts = safeArray(executorOutput?.key_fact_groups).map((item) => ({
+    fact_id: safeText(item?.fact_id),
+    label: safeText(item?.label),
+    reference_id: safeText(item?.reference_id),
+  }));
+  const evidenceGapResolution = safeArray(executorOutput?.evidence_gap_resolution).map((item) => ({
+    gap_id: safeText(item?.gap_id),
+    status: safeText(item?.status),
+    note: safeText(item?.note),
+  }));
+  const resolvedEvidenceGaps = uniqueStrings(
+    evidenceGapResolution
+      .filter((item) => item.status === 'resolved')
+      .map((item) => item.gap_id),
   );
+  const unresolvedEvidenceGaps = uniqueStrings(
+    evidenceGapResolution
+      .filter((item) => item.status === 'unresolved')
+      .map((item) => item.gap_id),
+  );
+  const sourceQualityNotes = uniqueStrings(executorOutput?.source_quality_notes);
 
   const nextSourceSeq = nextSequence(
     safeArray(sourceIndex?.sources).map((item) => item?.source_id),
@@ -134,19 +118,25 @@ function applyAugmentation({
 
   const appendedSources = references.map((source, index) => ({
     source_id: `SRC-AUG-${String(nextSourceSeq + index).padStart(3, '0')}`,
+    reference_id: source.reference_id,
     kind: 'web',
     relative_path: referenceDisplayLabel(source),
     status: 'ready',
     blocking_reason: null,
   }));
+  const appendedSourceByReferenceId = new Map(
+    appendedSources.map((item) => [item.reference_id, item]),
+  );
 
   const appendedMaterials = facts.map((fact, index) => {
-    const matchedSource = appendedSources[index % Math.max(appendedSources.length, 1)] || null;
+    const matchedSource = appendedSourceByReferenceId.get(fact.reference_id) || null;
     return {
       material_id: `MAT-${String(nextMaterialSeq + index).padStart(3, '0')}`,
+      augmentation_fact_id: fact.fact_id,
+      reference_id: fact.reference_id,
       source_id: matchedSource?.source_id || '',
       kind: 'web',
-      relative_path: matchedSource?.relative_path || safeText(fact.source_label || fact.source_url),
+      relative_path: matchedSource?.relative_path || '',
       content_text: fact.label,
       excerpt: fact.label.slice(0, 240),
     };
@@ -195,10 +185,12 @@ function applyAugmentation({
   ]);
   const mergedKeyFactGroups = [
     ...safeArray(sourceReadinessPack?.fact_library?.key_fact_groups),
-    ...appendedMaterials.map((material, index) => ({
+    ...appendedMaterials.map((material) => ({
       fact_id: material.material_id,
+      augmentation_fact_id: material.augmentation_fact_id,
+      reference_id: material.reference_id,
       label: material.excerpt,
-      source_id: material.source_id || appendedSources[index % Math.max(appendedSources.length, 1)]?.source_id || '',
+      source_id: material.source_id,
     })),
   ];
   const readinessStatus = unresolvedEvidenceGaps.length === 0 ? 'planning_ready' : 'augmentation_required';
@@ -223,6 +215,10 @@ function applyAugmentation({
       ),
       reference_source_list: mergedReferenceList,
       key_fact_groups: mergedKeyFactGroups,
+      source_quality_notes: uniqueStrings([
+        ...safeArray(sourceReadinessPack?.fact_library?.source_quality_notes),
+        ...sourceQualityNotes,
+      ]),
       evidence_gaps: unresolvedEvidenceGaps,
     },
   };
@@ -233,14 +229,17 @@ function applyAugmentation({
     request_kind: 'shared_source_readiness_augmentation_execution',
     status: 'completed',
     readiness_target: 'planning_ready',
-    execution_surface: 'external_command',
+    execution_surface: safeText(executionSurface, 'external_command'),
     resolved_evidence_gaps: resolvedEvidenceGaps,
     unresolved_evidence_gaps: unresolvedEvidenceGaps,
     topic_summary: safeText(mergedSourceReadinessPack?.fact_library?.topic_summary),
+    source_quality_notes: sourceQualityNotes,
+    evidence_gap_resolution: evidenceGapResolution,
     added_source_count: appendedSources.length,
     added_material_count: appendedMaterials.length,
     added_sources: appendedSources.map((item) => ({
       source_id: item.source_id,
+      reference_id: item.reference_id,
       public_label: item.relative_path,
     })),
     added_material_ids: appendedMaterials.map((item) => item.material_id),
@@ -282,6 +281,23 @@ export async function executeSourceAugmentation({
   const sourceBrief = readJson(sourcePaths.sourceBriefFile);
   const sourceReadinessPack = readJson(sourcePaths.sourceReadinessPackFile);
   const request = readJson(sourcePaths.sourceAugmentationRequestFile);
+  const requestValidation = validateSourceAugmentationRequestContract(request);
+  if (!requestValidation.ok) {
+    const report = buildBlockedReport({
+      topicId,
+      request,
+      blockingReason: `source augmentation request contract invalid: ${requestValidation.errors.join('; ')}`,
+    });
+    writeJson(sourcePaths.sourceAugmentationReportFile, report);
+    return {
+      ok: false,
+      topicId,
+      artifactFiles: {
+        sourceAugmentationReportFile: sourcePaths.sourceAugmentationReportFile,
+      },
+      report,
+    };
+  }
 
   if (safeText(request?.status) === 'not_required') {
     const report = {
@@ -307,53 +323,16 @@ export async function executeSourceAugmentation({
     };
   }
 
-  const executorCmd = safeText(process.env.REDCUBE_SOURCE_AUGMENT_CMD);
-  if (!executorCmd) {
-    const report = buildBlockedReport({
-      topicId,
-      request,
-      blockingReason: 'source_augmentation_executor_unconfigured',
-    });
-    writeJson(sourcePaths.sourceAugmentationReportFile, report);
-    return {
-      ok: false,
-      topicId,
-      artifactFiles: {
-        sourceAugmentationReportFile: sourcePaths.sourceAugmentationReportFile,
-      },
-      report,
-    };
-  }
-
-  const result = spawnSync(executorCmd, [sourcePaths.sourceAugmentationRequestFile], {
-    encoding: 'utf-8',
-    maxBuffer: 16 * 1024 * 1024,
+  const execution = executeSourceAugmentationWithCommand({
+    command: process.env.REDCUBE_SOURCE_AUGMENT_CMD,
+    requestFile: sourcePaths.sourceAugmentationRequestFile,
+    request,
   });
-  if (result.status !== 0) {
+  if (!execution.ok) {
     const report = buildBlockedReport({
       topicId,
       request,
-      blockingReason: safeText(result.stderr, 'source_augmentation_execution_failed'),
-    });
-    writeJson(sourcePaths.sourceAugmentationReportFile, report);
-    return {
-      ok: false,
-      topicId,
-      artifactFiles: {
-        sourceAugmentationReportFile: sourcePaths.sourceAugmentationReportFile,
-      },
-      report,
-    };
-  }
-
-  let executorOutput;
-  try {
-    executorOutput = parseExecutorJson(result.stdout);
-  } catch (error) {
-    const report = buildBlockedReport({
-      topicId,
-      request,
-      blockingReason: error instanceof Error ? error.message : String(error),
+      blockingReason: execution.blockingReason,
     });
     writeJson(sourcePaths.sourceAugmentationReportFile, report);
     return {
@@ -372,7 +351,8 @@ export async function executeSourceAugmentation({
     sourceBrief,
     sourceAudit,
     sourceReadinessPack,
-    executorOutput,
+    executorOutput: execution.executorOutput,
+    executionSurface: execution.executionSurface,
   });
 
   writeJson(sourcePaths.sourceIndexFile, applied.sourceIndex);

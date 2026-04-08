@@ -28,3 +28,27 @@ test('public docs describe Deep Research as Source Readiness enhancement on an a
   assert.equal(quickstart.includes('可以在任意大步骤边界介入'), true);
   assert.equal(quickstart.includes('循环式 Review Gate'), true);
 });
+
+test('operator docs publish workspace structure and source augmentation executor contract', () => {
+  const quickstart = readFileSync(path.join(repoRoot, 'docs', 'human_quickstart.md'), 'utf-8');
+  const docsReadme = readFileSync(path.join(repoRoot, 'docs', 'README.md'), 'utf-8');
+  const docsReadmeZh = readFileSync(path.join(repoRoot, 'docs', 'README.zh-CN.md'), 'utf-8');
+  const executorContract = readFileSync(
+    path.join(repoRoot, 'docs', 'source_augmentation_executor_contract.md'),
+    'utf-8',
+  );
+
+  assert.equal(quickstart.includes('`redcube.workspace.json`'), true);
+  assert.equal(quickstart.includes('`topics/<topic-id>/canonical/`'), true);
+  assert.equal(quickstart.includes('`source intake -> source augment -> source execute-augmentation`'), true);
+  assert.equal(quickstart.includes('Codex 的一句话启动指令'), true);
+
+  assert.equal(docsReadme.includes('source_augmentation_executor_contract.md'), true);
+  assert.equal(docsReadmeZh.includes('source_augmentation_executor_contract.md'), true);
+
+  assert.equal(executorContract.includes('`REDCUBE_SOURCE_AUGMENT_CMD`'), true);
+  assert.equal(executorContract.includes('`shared_source_readiness_augmentation`'), true);
+  assert.equal(executorContract.includes('`shared_source_readiness_augmentation_result`'), true);
+  assert.equal(executorContract.includes('request contract invalid'), true);
+  assert.equal(executorContract.includes('result contract invalid'), true);
+});

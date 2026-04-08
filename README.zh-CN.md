@@ -96,10 +96,13 @@
 通常只需要三步：
 
 1. 准备一个独立工作区，把材料放进去。
+   这个目录可以直接是一个全新的 workspace；你不需要手工搭完整结构，Codex / Agent 可以在里面按 canonical workspace contract 初始化 `redcube.workspace.json`、`topics/`、`runtime/`、`publish/` 等目录。
 2. 告诉智能代理这次要做的是 `幻灯片`、`小红书笔记` 还是 `海报`，以及面向谁、最终要达到什么目标。
 3. 让智能代理使用 `RedCube AI` 推进这次视觉交付，并由你审核关键节点。
 
 如果你想更快开始，可以直接给智能代理一句话指令。
+
+`Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
 
 场景一，你已经准备好了参考材料：
 

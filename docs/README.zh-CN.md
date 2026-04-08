@@ -39,6 +39,7 @@
 ### 面向技术协作 / Agent 执行者
 
 - [运行架构](runtime_architecture.md)
+- [Source Augmentation / Deep Research 执行器合同](source_augmentation_executor_contract.md)
 - [Domain Harness OS 定位映射](domain-harness-os-positioning.md)
 - [GitHub 公开发布流程](public-github-publish.md)
 - [文档治理规则](documentation-governance.md)

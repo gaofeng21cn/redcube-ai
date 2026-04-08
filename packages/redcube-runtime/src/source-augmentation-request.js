@@ -1,7 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
+import {
+  getSourceArtifactPaths,
+  validateSourceAugmentationRequestContract,
+} from '@redcube/runtime-protocol';
 
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
@@ -172,6 +175,10 @@ export async function prepareSourceAugmentation({
     sourceAudit,
     sourceReadinessPack,
   });
+  const validation = validateSourceAugmentationRequestContract(augmentation);
+  if (!validation.ok) {
+    throw new Error(`source augmentation request contract invalid: ${validation.errors.join('; ')}`);
+  }
 
   writeJson(sourcePaths.sourceAugmentationRequestFile, augmentation);
 
