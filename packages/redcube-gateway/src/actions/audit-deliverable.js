@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { auditDeliverableRequest, getReviewState as getRuntimeReviewState, isBaselineApprovedState } from '@redcube/runtime';
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import { getDeliverablePaths, getSourceArtifactPaths } from '@redcube/runtime-protocol';
 
 function mergeAuditReports(reports) {
   const normalized = reports.filter(Boolean);
@@ -37,6 +37,139 @@ function mergeAuditReports(reports) {
 
 function artifactKey(relativePath) {
   return path.basename(relativePath, '.json').replace(/-/g, '_');
+}
+
+function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
+  if (!workspaceRoot || !topicId || !deliverableId) {
+    return null;
+  }
+
+  try {
+    const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+    const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
+    const contractRef = String(
+      deliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
+    ).trim();
+    return JSON.parse(readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+function loadReviewState({ workspaceRoot, topicId, deliverableId }) {
+  if (!workspaceRoot || !topicId || !deliverableId) {
+    return null;
+  }
+
+  try {
+    return getRuntimeReviewState({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+    }).state;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeList(value) {
+  return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : [];
+}
+
+function loadSourceReadinessSummary({ workspaceRoot, topicId }) {
+  if (!workspaceRoot || !topicId) {
+    return null;
+  }
+
+  const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
+  if (!existsSync(sourcePaths.sourceAuditFile)) {
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: 'missing',
+      completed_stages: [],
+      blocking_reasons: ['source_audit_missing'],
+      checks: {
+        source_audit_written: false,
+      },
+    };
+  }
+
+  try {
+    const sourceAudit = JSON.parse(readFileSync(sourcePaths.sourceAuditFile, 'utf-8'));
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: String(sourceAudit.status || '').trim() || 'unknown',
+      completed_stages: normalizeList(sourceAudit.completed_stages),
+      blocking_reasons: normalizeList(sourceAudit.blocking_reasons),
+      checks: sourceAudit.checks && typeof sourceAudit.checks === 'object' ? sourceAudit.checks : {},
+    };
+  } catch {
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: 'invalid',
+      completed_stages: [],
+      blocking_reasons: ['source_audit_invalid'],
+      checks: {
+        source_audit_written: true,
+      },
+    };
+  }
+}
+
+function buildSourceReadinessReport(summary) {
+  if (!summary) {
+    return {
+      status: 'pass',
+      issues: [],
+      rerun_from_stage: null,
+      recommended_action: 'continue',
+    };
+  }
+
+  if (summary.status === 'missing') {
+    return {
+      status: 'block',
+      issues: ['source_audit_missing'],
+      rerun_from_stage: 'intake',
+      recommended_action: 'run_source_intake',
+    };
+  }
+
+  if (summary.status !== 'pass') {
+    return {
+      status: 'block',
+      issues: summary.status === 'invalid' ? ['source_audit_invalid'] : ['source_audit_not_sufficient'],
+      rerun_from_stage: 'intake',
+      recommended_action: summary.status === 'invalid' ? 'rerun_source_intake' : 'resolve_source_blocks',
+    };
+  }
+
+  return {
+    status: 'pass',
+    issues: [],
+    rerun_from_stage: null,
+    recommended_action: 'continue',
+  };
+}
+
+function buildGateSummary({ sourceReadinessSummary, reviewState, contract }) {
+  return {
+    source_readiness_status: sourceReadinessSummary?.status || null,
+    review_status: String(reviewState?.current_status || '').trim() || null,
+    approval_status: String(reviewState?.approval_state?.status || '').trim() || null,
+    latest_review_stage: String(reviewState?.latest_review_stage || '').trim() || null,
+    export_status: reviewState ? (reviewState.ready_for_export ? 'ready' : 'not_ready') : null,
+    required_export_bundle_id: String(contract?.export_bundle?.bundle_id || '').trim() || null,
+  };
 }
 
 const overlayRegistry = getDefaultOverlayRegistry();
@@ -104,7 +237,10 @@ function auditOverlaySurface({
 }
 
 export async function auditDeliverable(request) {
-  const reports = [auditDeliverableRequest(request)];
+  const sourceReadinessSummary = loadSourceReadinessSummary(request);
+  const contract = loadHydratedContract(request);
+  const reviewState = loadReviewState(request);
+  const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
     promoted_reference_id: null,
@@ -133,5 +269,11 @@ export async function auditDeliverable(request) {
     surface_kind: 'audit',
     ...mergeAuditReports(reports),
     quality_summary: qualitySummary,
+    source_readiness_summary: sourceReadinessSummary,
+    gate_summary: buildGateSummary({
+      sourceReadinessSummary,
+      reviewState,
+      contract,
+    }),
   };
 }

@@ -11,6 +11,8 @@ const PHASE_2_ACTIVATION_CONTRACT = 'contracts/runtime-program/phase-2-source-in
 const PHASE_2_ACTIVATION_BRIEF = 'docs/phase_2_source_intake_activation_package_freeze.md';
 const PHASE_2_BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
 const PHASE_2_BASELINE_BRIEF = 'docs/phase_2_source_intake_shared_source_truth_baseline.md';
+const PHASE_2_HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
+const PHASE_2_HARDENING_BRIEF = 'docs/phase_2_review_export_gate_audit_hardening.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -34,6 +36,7 @@ test('P0 truth surfaces freeze current formal entry to MCP and CLI until control
   assert.equal(projectTruth.includes(MANUAL_TEST_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_ACTIVATION_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_BASELINE_CONTRACT), true);
+  assert.equal(projectTruth.includes(PHASE_2_HARDENING_CONTRACT), true);
   assert.equal(runtimePolicy.includes('当前正式入口优先 `MCP`、`CLI`') || runtimePolicy.includes('当前正式入口是 `MCP`、`CLI`'), true);
 
   for (const file of [
@@ -50,47 +53,48 @@ test('P0 truth surfaces freeze current formal entry to MCP and CLI until control
   }
 });
 
-test('P0 truth remains passed and credible while Phase 2 minimum baseline is the active mainline tranche', () => {
+test('P0 truth remains passed and credible while Phase 2 review/export/gate/audit hardening is the active mainline tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / source intake + shared source truth baseline');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_intake_shared_source_truth_baseline');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / review export gate audit hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_review_export_gate_audit_hardening');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.active_mainline.id, 'redcube-runtime-program');
   assert.equal(
     currentProgram.current_state.active_mainline.label,
-    'redcube-runtime-program / phase 2 source intake + shared source truth baseline',
+    'redcube-runtime-program / phase 2 review export gate audit hardening',
   );
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.green_baseline_credible, true);
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_intake_shared_source_truth_baseline');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_review_export_gate_audit_hardening');
   assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.active_baton.review_status, 'passed');
-  assert.equal(currentProgram.current_state.active_baton.scope.baseline_only, true);
+  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'review_export_gate_audit');
   assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, true);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_intake', 'shared_source_truth']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_audit_surfaces, ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection']);
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.baseline_contract,
-    PHASE_2_BASELINE_CONTRACT,
+    currentProgram.current_state.active_baton.artifacts.tranche_contract,
+    PHASE_2_HARDENING_CONTRACT,
   );
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.baseline_brief,
-    PHASE_2_BASELINE_BRIEF,
+    currentProgram.current_state.active_baton.artifacts.tranche_brief,
+    PHASE_2_HARDENING_BRIEF,
   );
   assert.equal(
     currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening.commit,
     '96dc6c1',
   );
   assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_activation_package_freeze.commit,
-    '3a7fbd6',
+    currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.commit,
+    'a4424d2',
   );
 });
 
@@ -138,21 +142,22 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 
-test('P0 tracked docs keep source readiness baseline on the mainline while formal entry remains MCP and CLI only', () => {
+test('P0 tracked docs keep source readiness baseline on the mainline while review/export/gate/audit hardening advances on the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
   const runtimeArchitecture = read('docs/runtime_architecture.md');
   const baselineBrief = read(PHASE_2_BASELINE_BRIEF);
+  const hardeningBrief = read(PHASE_2_HARDENING_BRIEF);
 
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
-  assert.equal(readme.includes('`CLI` and `MCP` hydrate canonical shared source truth on the same substrate'), true);
+  assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
-  assert.equal(readmeZh.includes('CLI / MCP` 已可在同一 substrate 上水合 canonical shared source truth') || readmeZh.includes('CLI / MCP 已可在同一 substrate 上水合 canonical shared source truth'), true);
+  assert.equal(readmeZh.includes('review / export / gate / audit hardening` 已在同一主线上吸收一条 tranche') || readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
   assert.equal(baselineBrief.includes('当前这份文档记录的是已经吸收到主线的最小 baseline'), true);
-  assert.equal(baselineBrief.includes('formal entry：仍只有 `MCP / CLI`'), true);
+  assert.equal(hardeningBrief.includes('source_readiness_summary'), true);
 });
 
 test('truth-freeze suites do not read ignored local tooling state directly', () => {

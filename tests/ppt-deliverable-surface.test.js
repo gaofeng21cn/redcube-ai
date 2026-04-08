@@ -13,8 +13,19 @@ import {
 import {
   auditDeliverable,
   createDeliverable,
+  intakeSource,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
+
+async function prepareSourceReadiness(workspaceRoot) {
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊科普',
+    brief: '为本科生讲授甲状腺基础知识，覆盖定义、功能、检查与常见误区。',
+    keywords: ['甲状腺', '内分泌', '门诊科普'],
+  });
+}
 
 test('createDeliverable hydrates ppt deck contract surface', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
@@ -97,6 +108,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
 
 test('auditDeliverable blocks when hydrated ppt deck surface is missing', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+  await prepareSourceReadiness(workspaceRoot);
 
   const created = await createDeliverable({
     workspaceRoot,
@@ -128,6 +140,7 @@ test('auditDeliverable blocks when hydrated ppt deck surface is missing', async 
 
 test('auditDeliverable passes when hydrated ppt deck surface exists and baseline is bound', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+  await prepareSourceReadiness(workspaceRoot);
 
   await createDeliverable({
     workspaceRoot,
@@ -176,6 +189,7 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
 
 test('auditDeliverable blocks when hydrated ppt deck surface content is invalid', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+  await prepareSourceReadiness(workspaceRoot);
 
   const created = await createDeliverable({
     workspaceRoot,
@@ -209,6 +223,7 @@ test('auditDeliverable blocks when hydrated ppt deck surface content is invalid'
 
 test('auditDeliverable blocks when prompt pack misses render contract seed', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+  await prepareSourceReadiness(workspaceRoot);
 
   const created = await createDeliverable({
     workspaceRoot,

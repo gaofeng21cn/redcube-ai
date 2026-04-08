@@ -27,10 +27,11 @@ This index along with the repository home forms the default GitHub-facing biling
 - [Deliverable examples](deliverable_examples.md)
 - [Stable deliverable manual test brief](stable_deliverable_manual_test_brief.md) (historical program evidence, Chinese only)
 
-### Historical program artifacts
+### Mainline program artifacts and provenance
 
 - [Phase 2 activation package freeze](phase_2_source_intake_activation_package_freeze.md) (Chinese only)
 - [Phase 2 source intake + shared source truth baseline](phase_2_source_intake_shared_source_truth_baseline.md) (Chinese only)
+- [Phase 2 review / export / gate / audit hardening](phase_2_review_export_gate_audit_hardening.md) (Chinese only)
 
 ### For technical collaborators / agent executors
 

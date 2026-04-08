@@ -67,7 +67,7 @@
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
 - `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
-- 更大范围的 `review / export / gate / audit` hardening 属于同一主线上的持续增强，而不是另一个产品身份
+- `review / export / gate / audit` hardening 已吸收当前 tranche：`auditDeliverable / runtimeWatch` 会暴露 canonical source readiness 与 export gate summary；更深层 hardening 仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 
 ## 5. 未来托管 runtime 形态

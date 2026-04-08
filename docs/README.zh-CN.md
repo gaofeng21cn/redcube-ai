@@ -27,10 +27,11 @@
 - [典型交付示例](deliverable_examples.md)
 - [稳定交付手工测试 brief](stable_deliverable_manual_test_brief.md)（历史 program 证据）
 
-### 历史 program 工件
+### 主线 program 工件与 provenance
 
 - [Phase 2 activation package freeze](phase_2_source_intake_activation_package_freeze.md)
 - [Phase 2 source intake + shared source truth baseline](phase_2_source_intake_shared_source_truth_baseline.md)
+- [Phase 2 review / export / gate / audit hardening](phase_2_review_export_gate_audit_hardening.md)
 
 ### 面向技术协作 / Agent 执行者
 

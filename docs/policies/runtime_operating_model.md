@@ -77,7 +77,7 @@
 - `source intake` 已通过 `CLI` / `MCP` 成为 `Source Readiness` 的正式 baseline surface
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
 - `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`
-- `review / export / gate / audit hardening` 是当前主线的持续增强方向，不应再被误读成“先停在 minimum baseline，等人工点下一棒”
+- `review / export / gate / audit hardening` 已在当前主线上吸收 tranche；`auditDeliverable / runtimeWatch` 应继续围绕 canonical `source-audit` 与 hydrated export contract 输出共享 gate summary。更明确地说，auditDeliverable / runtimeWatch 应继续围绕 canonical source-audit 与 hydrated export contract 输出共享 gate summary。
 - 当前 repo-tracked phase 标签仍可保留为 program pointer，但它不等于长线目标本身
 
 ## 真相源原则

@@ -19,6 +19,8 @@ export async function runtimeWatch(request) {
   };
   return {
     ...response,
+    source_readiness_summary: response?.source_readiness_summary || null,
+    gate_summary: response?.gate_summary || null,
     run_telemetry: buildRunTelemetrySummary(runSource),
     error_taxonomy: buildErrorTaxonomySummary(runSource),
     rerun_analytics: buildRerunAnalyticsSummary(runSource),

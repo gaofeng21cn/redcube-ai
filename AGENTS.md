@@ -1,8 +1,6 @@
-# Redcube Ai Project Entry Contract
+# Redcube Ai Repository Agent Contract
 
-This root `AGENTS.md` is the project entry contract for direct sessions that enter from the project root, including Codex App and plain Codex sessions.
-
-It defines the default execution and collaboration rules at the repository root. It is the entry surface for this project, not the full project-truth contract by itself.
+This root `AGENTS.md` is the repository-native contract for direct sessions that enter from the project root, including Codex App and plain Codex sessions.
 
 If the repository is launched through OMX project-scope installation, OMX-specific orchestration lives in `.codex/AGENTS.md` and augments this file without replacing it.
 
@@ -14,6 +12,7 @@ Apply this file to the repository root and all descendants unless a deeper `AGEN
 
 The authoritative project truth contract lives at `contracts/project-truth/AGENTS.md`.
 Read that file first whenever repository-specific goals, architecture priorities, mutation rules, or domain constraints matter.
+Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.
 
 ## Working Agreements
 
@@ -28,4 +27,3 @@ Read that file first whenever repository-specific goals, architecture priorities
 
 - `.omx/` and `.codex/` are local tooling state and must remain untracked.
 - `.omx/local/AGENTS.local.md` is reserved for machine-specific private overlays.
-- Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.

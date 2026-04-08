@@ -146,6 +146,8 @@ export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
   review_state: Record<string, unknown>;
   quality_summary: Record<string, unknown>;
   publication_projection: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
   resumable: boolean;
   profile_id: string | null;
   required_export_bundle: Record<string, unknown> | null;
@@ -298,6 +300,8 @@ export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
   issues: string[];
   rerun_from_stage: string | null;
   quality_summary: Record<string, unknown>;
+  source_readiness_summary?: Record<string, unknown> | null;
+  gate_summary?: Record<string, unknown> | null;
 }
 
 export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayRequest {

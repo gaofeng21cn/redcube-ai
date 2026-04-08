@@ -7,6 +7,7 @@ const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json
 const ACTIVATION_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json';
 const ACTIVATION_BRIEF = 'docs/phase_2_source_intake_activation_package_freeze.md';
 const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
+const HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
 const DOCS_INDEX = 'docs/README.md';
 const DOCS_INDEX_ZH = 'docs/README.zh-CN.md';
 
@@ -23,8 +24,9 @@ test('phase-2 activation package freeze remains a machine-readable completed pre
   const contract = readJson(ACTIVATION_CONTRACT);
   const completed = currentProgram.current_state.completed_batons.phase_2_activation_package_freeze;
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_intake_shared_source_truth_baseline');
-  assert.equal(currentProgram.current_state.active_baton.artifacts.baseline_contract, BASELINE_CONTRACT);
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_review_export_gate_audit_hardening');
+  assert.equal(currentProgram.current_state.active_baton.artifacts.tranche_contract, HARDENING_CONTRACT);
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
   assert.equal(completed.status, 'closeout_completed');
   assert.equal(completed.review_status, 'passed');
   assert.equal(completed.commit, '3a7fbd6');

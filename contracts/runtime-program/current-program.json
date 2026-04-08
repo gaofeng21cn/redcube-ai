@@ -29,8 +29,8 @@
       ]
     },
     "phase_id": "Phase2",
-    "phase_label": "Phase 2 / source intake + shared source truth baseline",
-    "workstream": "phase_2_source_intake_shared_source_truth_baseline",
+    "phase_label": "Phase 2 / review export gate audit hardening",
+    "workstream": "phase_2_review_export_gate_audit_hardening",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -38,7 +38,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / phase 2 source intake + shared source truth baseline",
+      "label": "redcube-runtime-program / phase 2 review export gate audit hardening",
       "unique": true
     },
     "green_baseline": {
@@ -69,6 +69,14 @@
       "phase_2_activation_package_freeze": {
         "status": "closeout_completed",
         "commit": "3a7fbd6"
+      },
+      "phase_2_source_intake_shared_source_truth_baseline": {
+        "status": "closeout_completed",
+        "commit": "a4424d2"
+      },
+      "source_readiness_mainline_reframe": {
+        "status": "completed",
+        "commit": "24f9f61"
       }
     },
     "team_mode": {
@@ -81,12 +89,12 @@
       "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
     },
     "active_baton": {
-      "id": "phase_2_source_intake_shared_source_truth_baseline",
+      "id": "phase_2_review_export_gate_audit_hardening",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "baseline_only": true,
+        "hardening_axis": "review_export_gate_audit",
         "implementation_in_scope": true,
         "formal_entry": [
           "MCP",
@@ -97,13 +105,30 @@
           "ppt_deck",
           "xiaohongshu"
         ],
+        "guarded_poster_surface": [
+          "poster_onepager"
+        ],
         "runtime_planes": [
           "source_intake",
-          "shared_source_truth"
+          "shared_source_truth",
+          "review",
+          "export",
+          "gate",
+          "audit"
         ],
         "required_review_surfaces": [
           "visual_director_review",
           "screenshot_review"
+        ],
+        "required_audit_surfaces": [
+          "auditDeliverable",
+          "runtimeWatch",
+          "getReviewState",
+          "getPublicationProjection"
+        ],
+        "required_export_surfaces": [
+          "export_pptx",
+          "export_bundle"
         ],
         "excluded_scope": [
           "controller expansion",
@@ -116,22 +141,22 @@
         ]
       },
       "artifacts": {
-        "baseline_contract": "contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json",
-        "baseline_brief": "docs/phase_2_source_intake_shared_source_truth_baseline.md",
-        "baseline_test": "tests/phase-2-source-intake-shared-source-truth-baseline.test.js"
+        "tranche_contract": "contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json",
+        "tranche_brief": "docs/phase_2_review_export_gate_audit_hardening.md",
+        "tranche_test": "tests/phase-2-review-export-gate-audit-hardening.test.js"
       },
       "closeout": {
-        "executed_at": "2026-04-07",
+        "executed_at": "2026-04-08",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/source-intake.test.js tests/import-legacy-project.test.js",
+          "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/deliverable-review-loop.test.js tests/review-platform.test.js tests/ppt-deliverable-surface.test.js tests/harness-completion-audit.test.js",
           "npm test"
         ],
         "suite_result": "pass",
         "findings_recorded": 0,
         "absorbed_to_main": true,
-        "next_tranche_candidate": "phase_2_review_export_gate_audit_hardening",
+        "next_tranche_candidate": "phase_2_family_source_truth_consumption_convergence",
         "next_tranche_kind": "ongoing_hardening_axis"
       }
     },
@@ -201,6 +226,40 @@
           "executed_at": "2026-04-07",
           "suite_result": "pass",
           "findings_recorded": 0
+        }
+      },
+      "phase_2_source_intake_shared_source_truth_baseline": {
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "commit": "a4424d2",
+        "scope": {
+          "baseline_only": true,
+          "implementation_in_scope": true,
+          "formal_entry": [
+            "MCP",
+            "CLI"
+          ],
+          "controller_repo_verified": false,
+          "consumer_families": [
+            "ppt_deck",
+            "xiaohongshu"
+          ],
+          "runtime_planes": [
+            "source_intake",
+            "shared_source_truth"
+          ]
+        },
+        "artifacts": {
+          "baseline_contract": "contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json",
+          "baseline_brief": "docs/phase_2_source_intake_shared_source_truth_baseline.md",
+          "baseline_test": "tests/phase-2-source-intake-shared-source-truth-baseline.test.js"
+        },
+        "closeout": {
+          "executed_at": "2026-04-07",
+          "suite_result": "pass",
+          "findings_recorded": 0,
+          "truth_reframe_commit": "24f9f61",
+          "next_tranche_candidate": "phase_2_review_export_gate_audit_hardening"
         }
       }
     }

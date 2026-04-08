@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import { getDeliverablePaths, getSourceArtifactPaths } from '@redcube/runtime-protocol';
 import { getPublicationProjection as loadPublicationProjection, getReviewState as loadReviewState } from './review-state.js';
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
@@ -17,6 +17,18 @@ function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   return JSON.parse(
     readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'),
   );
+}
+
+function safeReadJson(file) {
+  try {
+    return JSON.parse(readFileSync(file, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+function normalizeList(value) {
+  return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : [];
 }
 
 
@@ -62,6 +74,102 @@ function toFailedIssue(check) {
   return `${check}_failed`;
 }
 
+function loadSourceReadinessSummary({ workspaceRoot, topicId }) {
+  if (!workspaceRoot || !topicId) {
+    return null;
+  }
+
+  const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
+  if (!existsSync(sourcePaths.sourceAuditFile)) {
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: 'missing',
+      completed_stages: [],
+      blocking_reasons: ['source_audit_missing'],
+      checks: {
+        source_audit_written: false,
+      },
+    };
+  }
+
+  const sourceAudit = safeReadJson(sourcePaths.sourceAuditFile);
+  if (!sourceAudit) {
+    return {
+      canonical_source: {
+        kind: 'shared_source_truth.source_audit',
+      },
+      authoritative_artifact: sourcePaths.sourceAuditFile,
+      status: 'invalid',
+      completed_stages: [],
+      blocking_reasons: ['source_audit_invalid'],
+      checks: {
+        source_audit_written: true,
+      },
+    };
+  }
+
+  return {
+    canonical_source: {
+      kind: 'shared_source_truth.source_audit',
+    },
+    authoritative_artifact: sourcePaths.sourceAuditFile,
+    status: String(sourceAudit.status || '').trim() || 'unknown',
+    completed_stages: normalizeList(sourceAudit.completed_stages),
+    blocking_reasons: normalizeList(sourceAudit.blocking_reasons),
+    checks: sourceAudit.checks && typeof sourceAudit.checks === 'object' ? sourceAudit.checks : {},
+  };
+}
+
+function buildSourceReadinessReport(summary) {
+  if (!summary) {
+    return {
+      status: 'pass',
+      issues: [],
+      rerun_from_stage: null,
+      recommended_action: 'continue',
+    };
+  }
+
+  if (summary.status === 'missing') {
+    return {
+      status: 'block',
+      issues: ['source_audit_missing'],
+      rerun_from_stage: 'intake',
+      recommended_action: 'run_source_intake',
+    };
+  }
+
+  if (summary.status !== 'pass') {
+    return {
+      status: 'block',
+      issues: summary.status === 'invalid' ? ['source_audit_invalid'] : ['source_audit_not_sufficient'],
+      rerun_from_stage: 'intake',
+      recommended_action: summary.status === 'invalid' ? 'rerun_source_intake' : 'resolve_source_blocks',
+    };
+  }
+
+  return {
+    status: 'pass',
+    issues: [],
+    rerun_from_stage: null,
+    recommended_action: 'continue',
+  };
+}
+
+function buildGateSummary({ sourceReadinessSummary, reviewState, contract }) {
+  return {
+    source_readiness_status: sourceReadinessSummary?.status || null,
+    review_status: String(reviewState?.current_status || '').trim() || null,
+    approval_status: String(reviewState?.approval_state?.status || '').trim() || null,
+    latest_review_stage: String(reviewState?.latest_review_stage || '').trim() || null,
+    export_status: reviewState ? (reviewState.ready_for_export ? 'ready' : 'not_ready') : null,
+    required_export_bundle_id: String(contract?.export_bundle?.bundle_id || '').trim() || null,
+  };
+}
+
 export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
   if (mode === 'optimize_existing' && !String(baselineDeliverableId || '').trim()) {
     return {
@@ -77,6 +185,59 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
     issues: [],
     rerun_from_stage: null,
     recommended_action: 'continue',
+  };
+}
+
+export async function auditDeliverable(request) {
+  const sourceReadinessSummary = loadSourceReadinessSummary(request);
+  const reviewState = loadPlatformReviewState(request);
+  const contract = loadHydratedContract(request);
+  const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
+  let qualitySummary = {
+    baseline_promotion_state: null,
+    promoted_reference_id: null,
+  };
+  if (request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId) {
+    const baselineState = loadReviewState({
+      workspaceRoot: request.workspaceRoot,
+      topicId: request.topicId,
+      deliverableId: request.baselineDeliverableId,
+    }).state;
+    qualitySummary = {
+      baseline_promotion_state: baselineState?.baseline?.promotion_state || null,
+      promoted_reference_id: baselineState?.baseline?.promoted_reference_id || null,
+    };
+    if (baselineState) {
+      if (baselineState.approval_state?.required) {
+        if (!(baselineState.approval_state.status === 'approved' || baselineState.publish_state?.current === 'published')) {
+          reports.push({
+            status: 'block',
+            issues: ['baseline_not_approved'],
+            rerun_from_stage: 'intake',
+            recommended_action: 'approve_or_publish_baseline',
+          });
+        }
+      } else if (!baselineState.ready_for_export) {
+        reports.push({
+          status: 'block',
+          issues: ['baseline_not_approved'],
+          rerun_from_stage: 'intake',
+          recommended_action: 'approve_or_publish_baseline',
+        });
+      }
+    }
+  }
+  reports.push(auditOverlaySurface(request));
+  return {
+    surface_kind: 'audit',
+    ...mergeAuditReports(reports),
+    quality_summary: qualitySummary,
+    source_readiness_summary: sourceReadinessSummary,
+    gate_summary: buildGateSummary({
+      sourceReadinessSummary,
+      reviewState,
+      contract,
+    }),
   };
 }
 
@@ -153,6 +314,7 @@ export function watchRuntimeReviewLoop(request) {
     : [];
   const contract = loadHydratedContract(request);
   const reviewState = loadPlatformReviewState(request);
+  const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const publicationProjection = request?.workspaceRoot && request?.topicId
     ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
     : null;
@@ -175,6 +337,12 @@ export function watchRuntimeReviewLoop(request) {
       promoted_reference_id: reviewState?.baseline?.promoted_reference_id || null,
     },
     publication_projection: publicationProjection,
+    source_readiness_summary: sourceReadinessSummary,
+    gate_summary: buildGateSummary({
+      sourceReadinessSummary,
+      reviewState,
+      contract,
+    }),
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
     required_export_bundle: contract?.export_bundle || null,

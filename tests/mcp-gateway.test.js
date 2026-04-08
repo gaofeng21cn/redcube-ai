@@ -12,7 +12,7 @@ import {
   callGatewayTool,
   listGatewayTools,
 } from '../apps/redcube-mcp/src/server.js';
-import { createDeliverable } from '../packages/redcube-gateway/src/index.js';
+import { createDeliverable, intakeSource } from '../packages/redcube-gateway/src/index.js';
 
 test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
   const tools = listGatewayTools();
@@ -349,6 +349,13 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
 
 test('stdio MCP server preserves deliverable locator fields for audit_deliverable', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-audit-'));
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊科普素材',
+    brief: '为本科生讲授甲状腺基础知识，需要可审计的 canonical source readiness。',
+    keywords: ['甲状腺', '门诊', '科普'],
+  });
   const created = await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',

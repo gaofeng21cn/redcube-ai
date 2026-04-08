@@ -80,6 +80,8 @@ export interface RuntimeWatchResponse {
   review_state: Record<string, unknown> | null;
   quality_summary: Record<string, unknown>;
   publication_projection: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
   resumable: boolean;
   profile_id: string | null;
   required_export_bundle: Record<string, unknown> | null;

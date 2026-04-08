@@ -8,6 +8,7 @@ import {
   auditDeliverable,
   applyReviewMutation,
   createDeliverable,
+  intakeSource,
   reviewRenderOutput,
   runDeliverableRoute,
   runtimeWatch,
@@ -27,8 +28,77 @@ test('auditDeliverable blocks optimize_existing task without baseline', async ()
   assert.equal(report.recommended_action, 'bind_baseline_deliverable');
 });
 
+test('auditDeliverable blocks when canonical source readiness is missing and exposes source_readiness_summary', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+
+  const report = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    mode: 'draft_new',
+  });
+
+  assert.equal(report.status, 'block');
+  assert.equal(report.issues.includes('source_audit_missing'), true);
+  assert.equal(report.rerun_from_stage, 'intake');
+  assert.equal(report.recommended_action, 'run_source_intake');
+  assert.equal(report.source_readiness_summary?.status, 'missing');
+  assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_audit');
+});
+
+test('auditDeliverable passes with canonical source readiness and returns source_readiness_summary', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊科普',
+    brief: '为本科生准备甲状腺基础知识讲解材料，强调定义、功能、检查与常见误区。',
+    keywords: ['甲状腺', '内分泌', '门诊科普'],
+  });
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+
+  const report = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    mode: 'draft_new',
+  });
+
+  assert.equal(report.status, 'pass');
+  assert.equal(report.source_readiness_summary?.status, 'pass');
+  assert.equal(report.source_readiness_summary?.blocking_reasons?.length, 0);
+});
+
 test('auditDeliverable blocks optimize_existing task when baseline is not approved', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊小红书素材',
+    brief: '为门诊患者准备甲状腺科普图文，需要覆盖检查、误区与就诊建议。',
+    keywords: ['甲状腺', '门诊', '科普'],
+  });
 
   await createDeliverable({
     workspaceRoot,
@@ -68,6 +138,13 @@ test('auditDeliverable blocks optimize_existing task when baseline is not approv
 
 test('auditDeliverable surfaces promoted baseline summary for optimize_existing', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊小红书素材',
+    brief: '为门诊患者准备甲状腺科普图文，需要覆盖检查、误区与就诊建议。',
+    keywords: ['甲状腺', '门诊', '科普'],
+  });
 
   await createDeliverable({
     workspaceRoot,
@@ -149,6 +226,13 @@ test('auditDeliverable surfaces promoted baseline summary for optimize_existing'
 
 test('auditDeliverable blocks missing hydrated surface artifact', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊 deck 素材',
+    brief: '为本科生讲授甲状腺基础知识，需要结构化材料支持。',
+    keywords: ['甲状腺', '教学', '基础知识'],
+  });
 
   await createDeliverable({
     workspaceRoot,
@@ -333,6 +417,46 @@ test('runtimeWatch exposes export bundle obligations from hydrated contract', as
   assert.equal(report.profile_id, 'defense_deck');
   assert.equal(report.required_export_bundle.bundle_id, 'defense_deck_bundle');
   assert.equal(report.required_export_bundle.include_backup_slides, true);
+});
+
+test('runtimeWatch exposes source readiness summary and gate summary from canonical source audit plus export contract', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+
+  await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '正式答辩 deck source',
+    brief: '答辩 deck 需要清晰展示问题、方法、结果与答辩防守要点。',
+    keywords: ['答辩', '结果', '问题'],
+  });
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'defense_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '正式答辩 deck',
+    goal: '用于正式答辩并覆盖潜在质询',
+  });
+
+  const report = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    run: {
+      run_id: 'run-1',
+      current_stage: 'export_pptx',
+      status: 'blocked',
+      pending_reviews: ['backup_qa_ready'],
+      resumable: true,
+    },
+  });
+
+  assert.equal(report.source_readiness_summary?.status, 'pass');
+  assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_audit');
+  assert.equal(report.gate_summary?.source_readiness_status, 'pass');
+  assert.equal(report.gate_summary?.required_export_bundle_id, 'defense_deck_bundle');
+  assert.equal(report.gate_summary?.approval_status, 'not_required');
 });
 
 test('runtimeWatch exposes publication projection separately from canonical review state', async () => {

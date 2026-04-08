@@ -27,7 +27,7 @@
 - `P0`：已完成，`green baseline credible = true`
 - `stable deliverable manual-test-driven hardening`：已完成并吸收到 `main`
 - `Phase 2 activation package freeze`：已完成并吸收到 `main`
-- 当前 active tranche：`Phase 2 source intake + shared source truth baseline`
+- 当前 active tranche：`Phase 2 review / export / gate / audit hardening`
 - formal entry：仍只有 `MCP / CLI`
 - `controller`：仍不是 repo-verified formal entry
 - 当前下一方向应理解为同一主线上的持续 hardening，而不是把这份 absorbed baseline 误写成整个项目的终点
@@ -112,9 +112,9 @@
 
 ## 当前下一候选 tranche
 
-- `phase_2_review_export_gate_audit_hardening`
+- `phase_2_family_source_truth_consumption_convergence`
 
 在 `autonomous longrun program mode` 下，这个候选 tranche 的意义是：
 
-- 当前主线的持续 hardening 方向
+- 当前主线在 family source-truth convergence 上的持续 hardening 方向
 - 不是把当前主线重新切成“必须人工点名才允许继续”的停车点
