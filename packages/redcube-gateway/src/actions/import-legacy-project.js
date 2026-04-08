@@ -178,7 +178,11 @@ export async function importLegacyProject({
   return {
     ok: intake.ok,
     surface_kind: 'legacy_import',
-    recommended_action: intake.audit?.status === 'pass' ? 'create_deliverable' : 'resolve_source_blocks',
+    recommended_action: intake.audit?.status !== 'pass'
+      ? 'resolve_source_blocks'
+      : (intake.augmentation?.status === 'required' || intake.augmentation?.status === 'recommended')
+        ? 'prepare_source_augmentation'
+        : 'create_deliverable',
     summary: {
       project: projectId,
       overlay: overlayId,

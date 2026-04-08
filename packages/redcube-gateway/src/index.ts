@@ -3,6 +3,7 @@ import {
   listTopics as listTopicsJs,
   getOverlayCatalog as getOverlayCatalogJs,
   intakeSource as intakeSourceJs,
+  prepareSourceAugmentation as prepareSourceAugmentationJs,
   importLegacyProject as importLegacyProjectJs,
   createDeliverable as createDeliverableJs,
   getDeliverable as getDeliverableJs,
@@ -35,6 +36,7 @@ import type {
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceIntakeResponse,
+  SourceAugmentationResponse,
   TopicRequest,
   TopicCatalogResponse,
   WorkspaceDoctorResponse,
@@ -56,6 +58,10 @@ export function getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResp
 
 export function intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse> {
   return intakeSourceJs(request) as Promise<SourceIntakeResponse>;
+}
+
+export function prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse> {
+  return prepareSourceAugmentationJs(request) as Promise<SourceAugmentationResponse>;
 }
 
 export function importLegacyProject(request: Record<string, unknown>): Promise<LegacyImportResponse> {
@@ -122,6 +128,7 @@ export type {
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceIntakeResponse,
+  SourceAugmentationResponse,
   TopicCatalogResponse,
   TopicRequest,
   WorkspaceDoctorResponse,

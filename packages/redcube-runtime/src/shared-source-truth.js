@@ -23,11 +23,17 @@ export function loadSharedSourceTruth(workspaceRoot, topicId) {
       source_audit: paths.sourceAuditFile,
       source_brief: paths.sourceBriefFile,
       source_readiness_pack: paths.sourceReadinessPackFile,
+      ...(existsSync(paths.sourceAugmentationRequestFile) ? {
+        source_augmentation_request: paths.sourceAugmentationRequestFile,
+      } : {}),
     },
     source_index: readJson(paths.sourceIndexFile),
     extracted_materials: readJson(paths.extractedMaterialsFile),
     source_audit: readJson(paths.sourceAuditFile),
     source_brief: readJson(paths.sourceBriefFile),
     source_readiness_pack: readJson(paths.sourceReadinessPackFile),
+    ...(existsSync(paths.sourceAugmentationRequestFile) ? {
+      source_augmentation_request: readJson(paths.sourceAugmentationRequestFile),
+    } : {}),
   };
 }

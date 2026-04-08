@@ -339,6 +339,7 @@ export interface RuntimeSourceIntakeResponse {
   topicId: string;
   artifactFiles: Record<string, string>;
   audit: Record<string, unknown>;
+  augmentation: Record<string, unknown>;
 }
 
 export interface RuntimeSourceIntakeRequest {
@@ -349,4 +350,17 @@ export interface RuntimeSourceIntakeRequest {
   keywords?: string[] | string;
   sourceFiles?: string[] | string;
   modeHint?: string;
+}
+
+export interface RuntimeSourceAugmentationResponse {
+  ok: boolean;
+  topicId: string;
+  artifactFiles: Record<string, string>;
+  augmentation: Record<string, unknown>;
+}
+
+export interface RuntimeSourceAugmentationRequest {
+  workspaceRoot: string;
+  topicId: string;
+  title?: string;
 }

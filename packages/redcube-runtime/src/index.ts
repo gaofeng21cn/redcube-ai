@@ -38,6 +38,7 @@ import {
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
+import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
 import { intakeSource as intakeSourceJs } from './source-intake.js';
 
 import type {
@@ -59,6 +60,8 @@ import type {
   RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
+  RuntimeSourceAugmentationRequest,
+  RuntimeSourceAugmentationResponse,
   RuntimeStartRunRequest,
 } from './types.js';
 
@@ -139,6 +142,15 @@ export async function intakeSource(request: RuntimeSourceIntakeRequest): Promise
   return intake(request);
 }
 
+export async function prepareSourceAugmentation(
+  request: RuntimeSourceAugmentationRequest,
+): Promise<RuntimeSourceAugmentationResponse> {
+  const prepare = prepareSourceAugmentationJs as unknown as (
+    request: RuntimeSourceAugmentationRequest,
+  ) => Promise<RuntimeSourceAugmentationResponse>;
+  return prepare(request);
+}
+
 export type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
@@ -158,5 +170,7 @@ export type {
   RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeSourceIntakeRequest,
   RuntimeSourceIntakeResponse,
+  RuntimeSourceAugmentationRequest,
+  RuntimeSourceAugmentationResponse,
   RuntimeStartRunRequest,
 } from './types.js';

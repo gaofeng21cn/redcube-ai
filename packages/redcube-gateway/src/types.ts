@@ -247,10 +247,21 @@ export interface ApprovalThroughputSummary {
 export interface SourceIntakeResponse extends SurfaceBase<'source_intake'> {
   artifactFiles: Record<string, string>;
   audit: Record<string, unknown>;
+  augmentation: Record<string, unknown>;
   summary: {
     topic_id: string;
     audit_status: string | null;
     blocking_reason_count: number;
+  };
+}
+
+export interface SourceAugmentationResponse extends SurfaceBase<'source_augmentation'> {
+  artifactFiles: Record<string, string>;
+  augmentation: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    status: string | null;
+    readiness_target: string | null;
   };
 }
 

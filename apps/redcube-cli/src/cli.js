@@ -11,6 +11,7 @@ import {
   getReviewState,
   getRun as getGatewayRun,
   intakeSource,
+  prepareSourceAugmentation,
   importLegacyProject,
   listTopics as listTopicsGateway,
   runtimeWatch,
@@ -28,6 +29,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getReviewState,
   getRun: getGatewayRun,
   intakeSource,
+  prepareSourceAugmentation,
   importLegacyProject,
   listTopics: listTopicsGateway,
   runtimeWatch,
@@ -131,6 +133,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
       },
       {
+        task: '为材料不足主题生成 Source Augmentation / Deep Research 合同',
+        command: 'redcube source augment --workspace-root <dir> --topic-id <id>',
+      },
+      {
         task: '创建一个新的视觉交付物',
         command: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       },
@@ -159,7 +165,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
-      source: ['intake'],
+      source: ['intake', 'augment'],
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'run'],
       runs: ['get'],
@@ -179,6 +185,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       topicsList: 'redcube topics list --workspace-root <dir>',
       importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+      sourceAugment: 'redcube source augment --workspace-root <dir> --topic-id <id>',
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
@@ -250,18 +257,26 @@ export async function executeCli(argv, deps = {}) {
   }
 
   if (command === 'source') {
-    if (subcommand !== 'intake') {
-      throw new Error('source 命令仅支持 intake');
+    if (subcommand === 'intake') {
+      return gateway.intakeSource({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        topicId: options.topicId || '',
+        title: options.title || '',
+        brief: options.brief || '',
+        keywords: options.keywords || '',
+        sourceFiles: options.sourceFiles || '',
+      });
     }
 
-    return gateway.intakeSource({
-      workspaceRoot: resolveWorkspaceRoot(options, cwd),
-      topicId: options.topicId || '',
-      title: options.title || '',
-      brief: options.brief || '',
-      keywords: options.keywords || '',
-      sourceFiles: options.sourceFiles || '',
-    });
+    if (subcommand === 'augment') {
+      return gateway.prepareSourceAugmentation({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        topicId: options.topicId || '',
+        title: options.title || '',
+      });
+    }
+
+    throw new Error('source 命令仅支持 intake|augment');
   }
 
   if (command === 'deliverable') {

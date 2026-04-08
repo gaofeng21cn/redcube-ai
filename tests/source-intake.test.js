@@ -30,7 +30,7 @@ test('intakeSource creates canonical source truth from brief and keywords', asyn
 
   assert.equal(result.ok, true);
   assert.equal(result.surface_kind, 'source_intake');
-  assert.equal(result.recommended_action, 'create_deliverable');
+  assert.equal(result.recommended_action, 'prepare_source_augmentation');
   assert.equal(result.summary.topic_id, 'topic-a');
   assert.equal(result.summary.audit_status, 'pass');
   assert.equal(result.audit.status, 'pass');
@@ -68,6 +68,7 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
 
   assert.equal(result.ok, true);
   assert.equal(existsSync(result.artifactFiles.sourceReadinessPackFile), true);
+  assert.equal(existsSync(result.artifactFiles.sourceAugmentationRequestFile), true);
 
   const pack = readJson(result.artifactFiles.sourceReadinessPackFile);
   assert.equal(pack.schema_version, 1);
@@ -81,6 +82,20 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
   assert.equal(Array.isArray(pack.fact_library.evidence_gaps), true);
   assert.equal(pack.fact_library.reference_source_list.length > 0, true);
   assert.equal(pack.fact_library.evidence_gaps.includes('public_evidence_missing'), true);
+
+  const augmentation = readJson(result.artifactFiles.sourceAugmentationRequestFile);
+  assert.equal(augmentation.schema_version, 1);
+  assert.equal(augmentation.topic_id, 'topic-pack');
+  assert.equal(augmentation.request_kind, 'shared_source_readiness_augmentation');
+  assert.equal(augmentation.status, 'required');
+  assert.equal(augmentation.execution_mode, 'auto_required');
+  assert.equal(augmentation.readiness_target, 'planning_ready');
+  assert.equal(Array.isArray(augmentation.trigger.evidence_gaps), true);
+  assert.equal(augmentation.trigger.evidence_gaps.includes('public_evidence_missing'), true);
+  assert.equal(Array.isArray(augmentation.investigation_lanes), true);
+  assert.equal(augmentation.investigation_lanes.length > 0, true);
+  assert.equal(Array.isArray(augmentation.focus.required_outputs), true);
+  assert.equal(augmentation.focus.required_outputs.includes('reference_source_list'), true);
 });
 
 test('intakeSource blocks pdf extraction explicitly when mineru is unavailable', async () => {
@@ -148,7 +163,55 @@ test('CLI source intake proxies gateway action', () => {
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'source_intake');
-  assert.equal(parsed.recommended_action, 'create_deliverable');
+  assert.equal(parsed.recommended_action, 'prepare_source_augmentation');
   assert.equal(parsed.audit.status, 'pass');
   assert.equal(existsSync(parsed.artifactFiles.sourceBriefFile), true);
+});
+
+test('CLI source augment prepares canonical augmentation contract from source readiness', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'source',
+      'intake',
+      '--workspace-root',
+      workspaceRoot,
+      '--topic-id',
+      'topic-cli-augment',
+      '--title',
+      'CLI augment',
+      '--brief',
+      '仅有主题和关键词，需要准备后续 Deep Research 补料合同。',
+      '--keywords',
+      '甲状腺,门诊',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const output = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'source',
+      'augment',
+      '--workspace-root',
+      workspaceRoot,
+      '--topic-id',
+      'topic-cli-augment',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'source_augmentation');
+  assert.equal(parsed.summary.topic_id, 'topic-cli-augment');
+  assert.equal(parsed.summary.status, 'required');
+  assert.equal(parsed.summary.readiness_target, 'planning_ready');
+  assert.equal(typeof parsed.augmentation.focus.topic_summary, 'string');
+  assert.equal(Array.isArray(parsed.augmentation.investigation_lanes), true);
+  assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationRequestFile), true);
 });

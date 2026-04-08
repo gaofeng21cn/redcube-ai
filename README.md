@@ -110,7 +110,8 @@ Typical three-step start:
 
 1. Prepare an isolated workspace and place your source materials in it.
 2. Tell your agent whether you want `slides`, a `Xiaohongshu note`, or a `poster`, who the audience is, and what the final goal is.
-3. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
+3. If you only have a topic, keywords, or a rough idea, let the agent enter `Source Readiness` first: run `source intake`, then materialize the canonical `source augmentation` / `Deep Research` contract when needed.
+4. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
 
 You can give your agent an instruction like this:
 

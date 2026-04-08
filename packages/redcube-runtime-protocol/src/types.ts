@@ -44,6 +44,7 @@ export interface SourceArtifactPaths {
   sourceAuditFile: string;
   sourceBriefFile: string;
   sourceReadinessPackFile: string;
+  sourceAugmentationRequestFile: string;
 }
 
 export interface SourceTruthConsumptionSummary {

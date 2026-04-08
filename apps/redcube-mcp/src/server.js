@@ -15,6 +15,7 @@ import {
   getReviewState,
   getRun,
   intakeSource,
+  prepareSourceAugmentation,
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -30,6 +31,7 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   getDeliverable,
   getPublicationProjection,
   intakeSource,
+  prepareSourceAugmentation,
   auditDeliverable,
   reviewRenderOutput,
   runDeliverableRoute,
@@ -74,6 +76,16 @@ export const TOOL_DEFINITIONS = [
       keywords: z.union([z.string(), z.array(z.string())]).optional().describe('Keyword list or comma-separated keywords.'),
       sourceFiles: z.union([z.string(), z.array(z.string())]).optional().describe('Absolute source file paths or comma-separated file list.'),
       modeHint: z.string().optional().describe('Optional intake mode hint such as legacy_import.'),
+    },
+  },
+  {
+    name: 'prepare_source_augmentation',
+    description: 'Build the canonical Source Augmentation / Deep Research contract from current source readiness.',
+    actionKey: 'prepareSourceAugmentation',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      topicId: z.string().describe('Topic identifier.'),
+      title: z.string().optional().describe('Optional topic title override.'),
     },
   },
   {
