@@ -10,7 +10,8 @@
 
 这里的 `Agent-first` 不等于必须走 `external_llm` API。
 在当前 Codex / OMX 语境里，默认本地执行形态是 `Codex-default host-agent runtime`；
-当前已验证的 formal entry 是 `MCP`、`CLI`；
+当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；
+当前已验证的公开正式入口是 `CLI`、`MCP`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
 
 这里同样必须区分：
@@ -31,7 +32,7 @@
 
 ```text
 Agent
-  -> MCP / CLI
+  -> CLI（默认）/ MCP
       -> RedCube Gateway
           -> Overlay / Family / Profile / Pack
               -> RedCube Domain Harness OS
@@ -64,7 +65,9 @@ User / Agent
 
 CLI 与 MCP 共享的唯一正式控制面，负责：
 
-- 承接当前已实现的正式入口 `MCP`、`CLI`
+- 承接当前已实现的公开正式入口 `CLI`、`MCP`
+- `CLI` 是默认 formal entry
+- `MCP` 是支持协议层
 - `controller` 当前未作为独立 public entry 在仓内落地
 - 装载 workspace contract
 - 路由到正确的 family / profile / pack
@@ -112,6 +115,7 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 - `Codex-default host-agent runtime` 是当前默认部署形态，不是 RedCube 本体定义。
 - 未来切到 managed web runtime 时，只要仍在同一 `Unified Harness Engineering Substrate` 上并保持同一 contract，RedCube 的 domain 语义不变。
 - `OPL` 是上层语义系统；RedCube 在其中是视觉交付 domain gateway + Domain Harness OS，不是 `OPL` 本体。
+- 当前仓库主线是 `Auto-only`；未来如需更高判断密度的 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
 
 ## 统一生命周期
 

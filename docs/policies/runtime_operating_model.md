@@ -8,15 +8,16 @@
 
 ## 稳定原则
 
-- 当前正式入口优先 `MCP`、`CLI`
+- 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
 - `Gateway` 是 `CLI / MCP` 共享的唯一正式控制面
-- `controller` 当前不是独立、可验证的仓内正式入口
+- `controller` 当前不是独立、可验证的仓内公开正式入口
 - `Overlay` 负责领域约束与交付质量协议
 - `Harness OS` 只负责执行、记录、重跑与审计
 - 正式主线优先复用宿主 Agent runtime
 - 外部 LLM 兼容层只能是次级 adapter，不得重新主导系统架构
 - 默认本地执行形态是 `Codex-default host-agent runtime`
 - 未来可迁移到同一 substrate 上的 managed web runtime，但不改变 RedCube 的 domain 语义
+- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为兼容 sibling 或 upper-layer product 复用同一 substrate
 
 补充执行原则：
 

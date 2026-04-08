@@ -34,7 +34,9 @@
 它的重点不是“先生成一版”，而是把视觉交付这件事变成正式生产线。
 
 当前默认本地执行形态是 `Codex-default host-agent runtime`。
-当前仓内已实现且可验证的正式入口只有 `MCP` 与 `CLI`；`controller` 目前不是独立、可验证的仓内入口。
+当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
+当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`；`controller` 目前不是独立、可验证的仓内公开正式入口。
+当前仓库主线按 `Auto-only` 理解；如果未来要做 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
 只要保持同一套 substrate 与 contract，后续可以迁移到同一 substrate 上的托管 web runtime，而不改变本项目的 domain 身份。
 
 ## 它能帮你做什么
@@ -122,7 +124,7 @@
 
 ```text
 用户 / 智能代理
-  -> MCP / CLI
+  -> CLI（默认）/ MCP
       -> 网关
           -> 交付物层 / 场景层 / 配置层 / 包层
               -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
@@ -160,8 +162,8 @@
 
 ## 当前推荐入口
 
-1. `MCP`
-2. `CLI`
+1. `CLI`
+2. `MCP`
 
 ## 安装与基础验证
 

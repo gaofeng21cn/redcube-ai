@@ -45,15 +45,18 @@
 
 - `Codex-default host-agent runtime`
 
-当前正式入口优先级：
+当前 formal-entry matrix：
 
-1. `MCP`
-2. `CLI`
+- `default_formal_entry`：`CLI`
+- `supported_protocol_layer`：`MCP`
+- `internal_controller_surface`：`controller`
 
 补充说明：
 
-- `controller` 目前不是 repo-verified independent entry
+- `CLI` 与 `MCP` 当前都已 repo-verified，但 `CLI` 是默认 formal entry
+- `controller` 目前不是 repo-verified independent public entry
 - `Gateway` 是 `CLI / MCP` 背后的共享正式控制面
+- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为兼容 sibling 或 upper-layer product 复用同一 substrate
 
 约束说明：
 

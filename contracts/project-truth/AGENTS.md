@@ -61,7 +61,13 @@ If code and docs disagree, align code to the frozen design instead of inventing 
 
 - Deployment shape and ontology semantics are different layers and must not be collapsed.
 - Current default local runtime shape: `Codex-default host-agent runtime`.
-- Current repo-verified formal entry surfaces: `MCP`, `CLI`. `controller` is not a current independently verifiable entry in this repository.
+- Current formal-entry matrix:
+  - `default_formal_entry`: `CLI`
+  - `supported_protocol_layer`: `MCP`
+  - `internal_controller_surface`: `controller`
+- `MCP` is repo-verified in the current mainline, while `controller` is not a current independently verifiable public formal entry in this repository.
+- The current repository mainline is `Auto-only`.
+- Any future `Human-in-the-loop` product should reuse the same substrate as a compatible sibling or upper-layer product rather than splitting this repository into same-repo dual-mode logic.
 - Future managed web runtime is allowed on the same substrate, but runtime migration does not change RedCube ontology.
 - Do not rewrite ontology based on runtime packaging choices.
 
@@ -80,6 +86,7 @@ Never collapse these levels into a vague prompt or hidden heuristic.
 - Harness execution must consume hydrated contract data rather than prompt-only intent
 - Prompt text may assist execution, but prompt semantics are not the control plane
 - External LLM compatibility layers may exist, but they are not the mainline architecture
+- The current repo-tracked product mainline is `Auto-only`; future higher-judgment `Human-in-the-loop` surfaces belong in substrate-compatible sibling or upper-layer products.
 - Longrun goal means the ideal product shape, not the current phase label or the latest absorbed tranche.
 - Once a tranche is frozen, verified, and absorbed, follow-on hardening may continue on the same mainline without defaulting back to a manual “next baton” pause, unless a frozen-truth conflict, new product-direction choice, or external dependency blocks progress.
 

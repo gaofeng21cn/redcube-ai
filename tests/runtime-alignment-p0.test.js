@@ -26,7 +26,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('P0 truth surfaces freeze current formal entry to MCP and CLI until controller exists', () => {
+test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP protocol layer, and controller internal surface', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = read('apps/redcube-cli/src/cli.js');
   const projectTruth = read('contracts/project-truth/AGENTS.md');
@@ -36,12 +36,15 @@ test('P0 truth surfaces freeze current formal entry to MCP and CLI until control
   assert.equal(Boolean(pkg.scripts.mcp), true);
   assert.equal(Boolean(pkg.scripts.controller), false);
   assert.equal(cli.includes("preferredEntry: ['MCP', 'CLI']"), true);
-  assert.equal(projectTruth.includes('Current repo-verified formal entry surfaces: `MCP`, `CLI`.'), true);
+  assert.equal(projectTruth.includes('`default_formal_entry`: `CLI`'), true);
+  assert.equal(projectTruth.includes('`supported_protocol_layer`: `MCP`'), true);
+  assert.equal(projectTruth.includes('`internal_controller_surface`: `controller`'), true);
+  assert.equal(projectTruth.includes('`MCP` is repo-verified in the current mainline'), true);
   assert.equal(projectTruth.includes(MANUAL_TEST_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_ACTIVATION_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_BASELINE_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_HARDENING_CONTRACT), true);
-  assert.equal(runtimePolicy.includes('当前正式入口优先 `MCP`、`CLI`') || runtimePolicy.includes('当前正式入口是 `MCP`、`CLI`'), true);
+  assert.equal(runtimePolicy.includes('当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
 
   for (const file of [
     'README.md',

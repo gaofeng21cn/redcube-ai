@@ -34,7 +34,9 @@ If your goal is to keep turning structured knowledge into formal visual outputs,
 It is designed for experts who want the speed of agents without losing control over quality.
 
 Today, its default local execution shape is the `Codex-default host-agent runtime`.
-Current repo-verified formal entry surfaces are `MCP` and `CLI`; `controller` is not a repo-verified independent entry in the current mainline.
+Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
+Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` is not a repo-verified independent public formal entry in the current mainline.
+The current repository mainline is `Auto-only`; if a future `Human-in-the-loop` product is built, it should reuse the same substrate as a compatible sibling or upper-layer product rather than split this repository into same-repo dual-mode logic.
 As long as the same substrate and contracts are kept, this line can later move to a managed web runtime without changing the domain identity.
 
 ## What It Helps You Do
@@ -122,7 +124,7 @@ Detailed operator docs remain repo-tracked, but they are not part of the default
 
 ```text
 User / Agent
-  -> MCP / CLI
+  -> CLI (default) / MCP
       -> Gateway
           -> Overlay / Family / Profile / Pack
               -> Domain Harness OS (on Unified Harness Engineering Substrate)
@@ -160,8 +162,8 @@ Current honest limits:
 
 ## Recommended Entry Priority
 
-1. `MCP`
-2. `CLI`
+1. `CLI`
+2. `MCP`
 
 ## Installation And Basic Verification
 

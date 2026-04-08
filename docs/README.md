@@ -3,7 +3,7 @@
 **English** | [中文](./README.zh-CN.md)
 
 This bilingual index is the default public surface for `RedCube AI`.
-It stays aligned with the product truth: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, running via the `Codex-default host-agent runtime` with repo-verified formal entry surfaces `MCP` and `CLI`; `controller` is not a repo-verified independent entry in the current mainline.
+It stays aligned with the product truth: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, running via the `Codex-default host-agent runtime`; its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
 
 ## Unified Documentation Governance
 
