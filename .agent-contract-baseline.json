@@ -1,6 +1,6 @@
 {
   "baseline_name": "omx-project-installer",
-  "baseline_version": "0.5.1",
+  "baseline_version": "0.5.2",
   "contract_layout": "single-project-truth",
   "scope": "project",
   "display_name": "Redcube Ai",
@@ -11,7 +11,7 @@
     "contracts/project-truth/AGENTS.md",
     ".codex/AGENTS.md"
   ],
-  "updated_at": "2026-04-07T05:45:16.087454+00:00",
+  "updated_at": "2026-04-09T02:12:54.999289+00:00",
   "preserved_existing_root": {
     "backed_up": false,
     "backup_path": "",
@@ -25,33 +25,37 @@
   "legacy_cleanup": {
     "removed": []
   },
-  "gitignore_updated": false,
+  "gitignore_updated": true,
   "update_policies": {
     "root_agents": "preserve",
     "project_config": "preserve"
   },
   "root_agents_state": {
     "policy": "preserve",
-    "source": "latest-setup-backup",
-    "sha256": "e10321b9058671a4f7c6c4897dc757dee2e1cb387d2bd9887aee0b6aac9685b1"
+    "source": "pre-setup-snapshot",
+    "sha256": "7fedc5579b58f4a7fb65494ba32d3451001d0119cfb11b4b4f2d23b05940cae2"
   },
   "config_reconcile": {
-    "applied": true,
+    "applied": false,
     "user_config_present": true,
     "project_config_present": true,
-    "keys_synced": [
-      "model_context_window:removed",
-      "model_auto_compact_token_limit:removed"
-    ],
-    "tables_synced": [
-      "mcp_servers.omx_team_run:legacy-removed"
-    ],
+    "keys_synced": [],
+    "tables_synced": [],
+    "managed_keys_synced": [],
+    "managed_tables_synced": [],
     "restore_applied": true,
-    "restore_source": "latest-setup-backup",
+    "restore_source": "pre-setup-snapshot",
     "policy": "preserve"
   },
   "legacy_alias_repair": {
-    "repaired": [],
+    "repaired": [
+      "analyze",
+      "build-fix",
+      "tdd",
+      "ecomode",
+      "ultraqa",
+      "swarm"
+    ],
     "skipped": []
   },
   "continuous_program_scaffold": {
