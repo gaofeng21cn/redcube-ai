@@ -99,6 +99,9 @@ test('topic publication projection converges direct-delivery and human-publicati
   assert.equal(deckEntry.approval_required, false);
   assert.equal(deckEntry.current, 'output_ready');
   assert.equal(deckEntry.delivery_state.current, 'output_ready');
+  assert.equal(deckEntry.lifecycle_stage_summary.stage_model, 'direct_delivery_human_workline');
+  assert.equal(deckEntry.lifecycle_stage_summary.route_to_human_stage.detailed_outline, 'plan');
+  assert.equal(deckEntry.lifecycle_stage_summary.route_to_human_stage.export_pptx, 'delivery');
 
   const noteEntry = projection.publication.deliverables['note-a'];
   assert.equal(noteEntry.required_export_route, 'export_bundle');
@@ -106,6 +109,7 @@ test('topic publication projection converges direct-delivery and human-publicati
   assert.equal(noteEntry.approval_required, true);
   assert.equal(noteEntry.current, 'approval_pending');
   assert.equal(noteEntry.delivery_state.current, 'output_ready');
+  assert.equal(noteEntry.lifecycle_stage_summary ?? null, null);
 
   const posterEntry = projection.publication.deliverables['poster-a'];
   assert.equal(posterEntry.required_export_route, 'export_bundle');
@@ -113,4 +117,7 @@ test('topic publication projection converges direct-delivery and human-publicati
   assert.equal(posterEntry.approval_required, false);
   assert.equal(posterEntry.current, 'output_ready');
   assert.equal(posterEntry.delivery_state.current, 'output_ready');
+  assert.equal(posterEntry.lifecycle_stage_summary.stage_model, 'direct_delivery_human_workline');
+  assert.equal(posterEntry.lifecycle_stage_summary.route_to_human_stage.poster_blueprint, 'plan');
+  assert.equal(posterEntry.lifecycle_stage_summary.route_to_human_stage.export_bundle, 'delivery');
 });

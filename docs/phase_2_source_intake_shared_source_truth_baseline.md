@@ -27,7 +27,7 @@
 - `P0`：已完成，`green baseline credible = true`
 - `stable deliverable manual-test-driven hardening`：已完成并吸收到 `main`
 - `Phase 2 activation package freeze`：已完成并吸收到 `main`
-- 当前 active tranche：`Phase 2 publication projection / delivery contract convergence`
+- 当前 active tranche：`Phase 2 direct-delivery lifecycle stage convergence`
 - formal entry：仍只有 `MCP / CLI`
 - `controller`：仍不是 repo-verified formal entry
 - 当前下一方向应理解为同一主线上的持续 hardening，而不是把这份 absorbed baseline 误写成整个项目的终点
@@ -95,7 +95,7 @@
 ## 当前仍属后续 tranche 的内容
 
 - source readiness 更深层的扩展与强化
-- direct-delivery operator handoff hardening
+- direct-delivery lifecycle stage convergence
 - 新 family / overlay 扩张
 - poster academic contract 主线
 - OPL federation
@@ -112,7 +112,7 @@
 
 ## 当前下一候选 tranche
 
-- `phase_2_direct_delivery_operator_handoff_hardening`
+- `phase_2_direct_delivery_lifecycle_stage_convergence`
 
 在 `autonomous longrun program mode` 下，这个候选 tranche 的意义是：
 

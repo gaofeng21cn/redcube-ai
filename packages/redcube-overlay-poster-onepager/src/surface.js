@@ -2,6 +2,7 @@ export function buildPosterSurfaceBundle({ contract }) {
   return [
     { relativePath: 'contracts/stage-sequence.json', content: contract.stage_sequence },
     { relativePath: 'contracts/stage-requirements.json', content: contract.stage_requirements },
+    { relativePath: 'contracts/lifecycle-stage-contract.json', content: contract.lifecycle_stage_contract },
     { relativePath: 'contracts/prompt-pack.json', content: contract.prompt_pack },
     { relativePath: 'contracts/review-surface.json', content: contract.review_surface },
     { relativePath: 'contracts/layout-rules.json', content: contract.layout_rules },
@@ -17,6 +18,7 @@ export function listPosterSurfaceArtifactPaths() {
   return [
     'contracts/stage-sequence.json',
     'contracts/stage-requirements.json',
+    'contracts/lifecycle-stage-contract.json',
     'contracts/prompt-pack.json',
     'contracts/review-surface.json',
     'contracts/layout-rules.json',
@@ -36,6 +38,17 @@ const SURFACE_VALIDATORS = {
     && content.render_html.requires_artifacts.includes('poster_blueprint')
     && content.render_html.requires_artifacts.includes('visual_direction')
     && content.export_bundle?.requires_review_pass === true,
+  'contracts/lifecycle-stage-contract.json': (content) => content?.stage_model === 'direct_delivery_human_workline'
+    && Array.isArray(content?.human_workline)
+    && content.human_workline.join(',') === 'source_readiness,storyline,plan,visual,delivery'
+    && content?.human_to_macro_stage?.plan === 'story_architecture'
+    && content?.human_to_macro_stage?.visual === 'visual_authorship'
+    && content?.human_to_macro_stage?.delivery === 'delivery_packaging'
+    && content?.review_overlay_within === 'visual'
+    && content?.operator_handoff_within === 'delivery'
+    && content?.closeout_within === 'delivery'
+    && content?.route_to_human_stage?.poster_blueprint === 'plan'
+    && content?.route_to_human_stage?.export_bundle === 'delivery',
   'contracts/prompt-pack.json': (content) => content?.root === 'prompts/poster_onepager'
     && content?.routes?.render_html === 'prompts/poster_onepager/render_html.md'
     && content?.render_contract?.render_strategy === 'prompt_director_first',
@@ -57,6 +70,8 @@ const SURFACE_VALIDATORS = {
     && content?.human_gate?.required === false,
   'contracts/hydrated-deliverable.json': (content) => content?.overlay === 'poster_onepager'
     && content?.prompt_pack?.pack_id === 'poster_onepager_mainline_v1'
+    && content?.lifecycle_stage_contract?.stage_model === 'direct_delivery_human_workline'
+    && content?.lifecycle_stage_contract?.route_to_human_stage?.poster_blueprint === 'plan'
     && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
     && content?.source_truth_contract?.poster_guarded_boundary?.academic_contract_active === false
     && content?.delivery_contract?.required_export_route === 'export_bundle',

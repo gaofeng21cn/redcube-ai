@@ -357,6 +357,44 @@ const FAMILY_LIFECYCLE_MODEL = {
   },
 };
 
+const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
+  stage_model: 'direct_delivery_human_workline',
+  human_workline: [
+    'source_readiness',
+    'storyline',
+    'plan',
+    'visual',
+    'delivery',
+  ],
+  macro_lifecycle: FAMILY_LIFECYCLE_MODEL.macro_lifecycle,
+  human_to_macro_stage: {
+    source_readiness: 'source_readiness',
+    storyline: 'story_architecture',
+    plan: 'story_architecture',
+    visual: 'visual_authorship',
+    delivery: 'delivery_packaging',
+  },
+  review_overlay_within: 'visual',
+  operator_handoff_within: 'delivery',
+  closeout_within: 'delivery',
+  delivery_contains: [
+    'required_export_route',
+    'required_export_bundle_id',
+    'operator_handoff',
+    'closeout',
+  ],
+  route_to_human_stage: {
+    storyline: 'storyline',
+    detailed_outline: 'plan',
+    slide_blueprint: 'plan',
+    visual_direction: 'visual',
+    render_html: 'visual',
+    visual_director_review: 'visual',
+    screenshot_review: 'visual',
+    export_pptx: 'delivery',
+  },
+};
+
 const PPT_DECK_PROFILE_OVERRIDES = {
   lecture_student: {
     review_surface: {
@@ -503,6 +541,7 @@ export function hydratePptDeckContract({
     export_bundle: FAMILY_EXPORT_BUNDLE,
     display_registry: FAMILY_DISPLAY_REGISTRY,
     lifecycle_model: FAMILY_LIFECYCLE_MODEL,
+    lifecycle_stage_contract: DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT,
     source_truth_contract: PPT_SOURCE_TRUTH_CONTRACT,
   };
 

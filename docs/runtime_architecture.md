@@ -234,6 +234,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 - `ppt_deck / xiaohongshu / poster_onepager 已围绕同一 source_truth_contract 与 source_truth_consumption summary 收口消费语义`
 - `publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state；`xiaohongshu` 保持 human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery 语义
 - `direct-delivery operator handoff hardening` 已把 `ppt_deck` / guarded `poster_onepager` 的 `operator_handoff` 收紧到同一 canonical governance path：`delivery_state` ownership 继续留在 required export artifact，而 handoff gate 由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 共同收口
+- `direct-delivery lifecycle stage convergence` 已把 direct-delivery human workline 与当前 macro lifecycle 的 machine-readable bridge 收紧到同一 canonical contract surface：`Storyline + Plan` 继续映射到 `Story Architecture`，`Visual` 继续映射到 `Visual Authorship`，`Delivery` 继续映射到 `Delivery Packaging`，而 `operator_handoff / closeout` 仍留在 `Delivery`
 - `poster_onepager` 继续保持 guarded knowledge-poster 边界，不借此激活 academic poster contract；更深的 source-plane 扩展仍属于同一主线上的持续增强
 
 当前目标态：

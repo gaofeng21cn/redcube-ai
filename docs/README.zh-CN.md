@@ -35,6 +35,8 @@
 - [Phase 2 family source-truth consumption convergence](phase_2_family_source_truth_consumption_convergence.md)
 - [Phase 2 publication projection / delivery contract convergence](phase_2_publication_projection_delivery_contract_convergence.md)
 - [Phase 2 direct-delivery operator handoff hardening](phase_2_direct_delivery_operator_handoff_hardening.md)
+- [Phase 2 direct-delivery lifecycle stage convergence](phase_2_direct_delivery_lifecycle_stage_convergence.md)
+- [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
 
 ### 面向技术协作 / Agent 执行者
 

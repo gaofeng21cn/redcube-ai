@@ -357,6 +357,35 @@ function buildOperatorHandoffSummary({
   };
 }
 
+function normalizeObjectMap(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([key, item]) => [String(key).trim(), safeText(item) || null])
+      .filter(([key, item]) => key && item),
+  );
+}
+
+function buildLifecycleStageSummary(contract) {
+  const lifecycleStageContract = contract?.lifecycle_stage_contract || null;
+  if (!lifecycleStageContract) {
+    return null;
+  }
+
+  return {
+    stage_model: safeText(lifecycleStageContract.stage_model) || null,
+    human_workline: normalizeList(lifecycleStageContract.human_workline),
+    macro_lifecycle: normalizeList(lifecycleStageContract.macro_lifecycle),
+    human_to_macro_stage: normalizeObjectMap(lifecycleStageContract.human_to_macro_stage),
+    review_overlay_within: safeText(lifecycleStageContract.review_overlay_within) || null,
+    operator_handoff_within: safeText(lifecycleStageContract.operator_handoff_within) || null,
+    closeout_within: safeText(lifecycleStageContract.closeout_within) || null,
+    route_to_human_stage: normalizeObjectMap(lifecycleStageContract.route_to_human_stage),
+  };
+}
+
 function toPublicationProjectionEntry({
   reviewState,
   deliverableId,
@@ -367,6 +396,7 @@ function toPublicationProjectionEntry({
   const deliveryContract = contract?.delivery_contract || null;
   const deliveryArtifact = loadDeliveryArtifact({ contract, deliverablePaths });
   const projectionState = buildProjectionState({ reviewState, contract, deliveryArtifact });
+  const lifecycleStageSummary = buildLifecycleStageSummary(contract);
   const entry = {
     deliverable_id: deliverableId,
     overlay: safeText(contract?.overlay) || null,
@@ -385,6 +415,7 @@ function toPublicationProjectionEntry({
       ? stageArtifactPath(contract, deliverablePaths, deliveryContract.required_export_route)
       : null,
     delivery_state: projectionState.delivery_state,
+    lifecycle_stage_summary: lifecycleStageSummary,
     updated_at: safeText(reviewState?.last_updated_at) || null,
   };
   return {
@@ -495,6 +526,7 @@ export function getReviewState(request) {
     state_file: file,
     history_file: reviewHistoryFile(deliverablePaths),
     operator_handoff: publicationProjectionEntry.operator_handoff,
+    lifecycle_stage_summary: publicationProjectionEntry.lifecycle_stage_summary,
   };
 }
 

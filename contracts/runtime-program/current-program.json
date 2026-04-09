@@ -94,7 +94,8 @@
     "required_embedded_summaries": [
       "source_readiness_summary",
       "gate_summary",
-      "operator_handoff"
+      "operator_handoff",
+      "lifecycle_stage_summary"
     ]
   },
   "current_state": {
@@ -111,8 +112,8 @@
       ]
     },
     "phase_id": "Phase2",
-    "phase_label": "Phase 2 / direct-delivery operator handoff hardening",
-    "workstream": "phase_2_direct_delivery_operator_handoff_hardening",
+    "phase_label": "Phase 2 / direct-delivery lifecycle stage convergence",
+    "workstream": "phase_2_direct_delivery_lifecycle_stage_convergence",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -120,7 +121,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / phase 2 direct-delivery operator handoff hardening",
+      "label": "redcube-runtime-program / phase 2 direct-delivery lifecycle stage convergence",
       "unique": true
     },
     "green_baseline": {
@@ -169,6 +170,9 @@
       },
       "phase_2_direct_delivery_operator_handoff_hardening": {
         "status": "closeout_completed"
+      },
+      "phase_2_direct_delivery_lifecycle_stage_convergence": {
+        "status": "closeout_completed"
       }
     },
     "team_mode": {
@@ -181,12 +185,12 @@
       "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
     },
     "active_baton": {
-      "id": "phase_2_direct_delivery_operator_handoff_hardening",
+      "id": "phase_2_direct_delivery_lifecycle_stage_convergence",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "hardening_axis": "direct_delivery_operator_handoff_hardening",
+        "hardening_axis": "direct_delivery_lifecycle_stage_convergence",
         "implementation_in_scope": true,
         "formal_entry": [
           "MCP",
@@ -198,7 +202,8 @@
           "xiaohongshu"
         ],
         "direct_delivery_families": [
-          "ppt_deck"
+          "ppt_deck",
+          "poster_onepager"
         ],
         "human_publication_contrast": [
           "xiaohongshu"
@@ -207,8 +212,11 @@
           "poster_onepager"
         ],
         "runtime_planes": [
+          "source_readiness",
+          "story_architecture",
+          "visual_authorship",
           "delivery_packaging",
-          "direct_delivery_operator_handoff",
+          "direct_delivery_lifecycle_stage_convergence",
           "review",
           "export",
           "gate",
@@ -216,7 +224,8 @@
         ],
         "required_shared_contract_surfaces": [
           "delivery_contract",
-          "operator_handoff"
+          "operator_handoff",
+          "lifecycle_stage_contract"
         ],
         "required_audit_surfaces": [
           "auditDeliverable",
@@ -235,16 +244,16 @@
         ]
       },
       "artifacts": {
-        "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json",
-        "tranche_brief": "docs/phase_2_direct_delivery_operator_handoff_hardening.md",
-        "tranche_test": "tests/phase-2-direct-delivery-operator-handoff-hardening.test.js"
+        "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json",
+        "tranche_brief": "docs/phase_2_direct_delivery_lifecycle_stage_convergence.md",
+        "tranche_test": "tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js"
       },
       "closeout": {
-        "executed_at": "2026-04-08",
+        "executed_at": "2026-04-09",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/phase-2-direct-delivery-operator-handoff-hardening.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
+          "node --test tests/runtime-alignment-p0.test.js tests/direct-delivery-longrun-target.test.js tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/typescript-governance-surfaces.test.js tests/typescript-overlay-surfaces.test.js",
           "npm test"
         ],
         "suite_result": "pass",
@@ -576,6 +585,81 @@
           "next_tranche_kind": "ongoing_hardening_axis"
         },
         "commit": "57c9310"
+      },
+      "phase_2_direct_delivery_operator_handoff_hardening": {
+        "id": "phase_2_direct_delivery_operator_handoff_hardening",
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "program_mode": "autonomous_longrun",
+        "scope": {
+          "hardening_axis": "direct_delivery_operator_handoff_hardening",
+          "implementation_in_scope": true,
+          "formal_entry": [
+            "MCP",
+            "CLI"
+          ],
+          "controller_repo_verified": false,
+          "consumer_families": [
+            "ppt_deck",
+            "xiaohongshu"
+          ],
+          "direct_delivery_families": [
+            "ppt_deck"
+          ],
+          "human_publication_contrast": [
+            "xiaohongshu"
+          ],
+          "guarded_poster_surface": [
+            "poster_onepager"
+          ],
+          "runtime_planes": [
+            "delivery_packaging",
+            "direct_delivery_operator_handoff",
+            "review",
+            "export",
+            "gate",
+            "audit"
+          ],
+          "required_shared_contract_surfaces": [
+            "delivery_contract",
+            "operator_handoff"
+          ],
+          "required_audit_surfaces": [
+            "auditDeliverable",
+            "runtimeWatch",
+            "getReviewState",
+            "getPublicationProjection"
+          ],
+          "excluded_scope": [
+            "controller expansion",
+            "new family or overlay expansion",
+            "paper_poster or conference_poster academic contract advancement",
+            "OPL federation integration",
+            "managed web runtime migration",
+            "hidden fallback chains as main behavior",
+            "prompt patch replacing contract hydration"
+          ]
+        },
+        "artifacts": {
+          "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json",
+          "tranche_brief": "docs/phase_2_direct_delivery_operator_handoff_hardening.md",
+          "tranche_test": "tests/phase-2-direct-delivery-operator-handoff-hardening.test.js"
+        },
+        "closeout": {
+          "executed_at": "2026-04-08",
+          "verification_commands": [
+            "git diff --check",
+            "npm run typecheck",
+            "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/phase-2-direct-delivery-operator-handoff-hardening.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
+            "npm test"
+          ],
+          "suite_result": "pass",
+          "findings_recorded": 0,
+          "absorbed_to_main": true,
+          "next_tranche_candidate": "phase_2_direct_delivery_lifecycle_stage_convergence",
+          "next_tranche_kind": "ongoing_hardening_axis"
+        },
+        "commit": "9b23a0e"
       }
     }
   },

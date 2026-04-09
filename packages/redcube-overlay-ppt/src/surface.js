@@ -30,6 +30,10 @@ export function buildDeckSurfaceBundle({ contract }) {
       content: deriveStageRequirements(contract),
     },
     {
+      relativePath: 'contracts/lifecycle-stage-contract.json',
+      content: contract.lifecycle_stage_contract,
+    },
+    {
       relativePath: 'contracts/prompt-pack.json',
       content: contract.prompt_pack,
     },
@@ -68,6 +72,7 @@ export function listDeckSurfaceArtifactPaths() {
   return [
     'contracts/stage-sequence.json',
     'contracts/stage-requirements.json',
+    'contracts/lifecycle-stage-contract.json',
     'contracts/prompt-pack.json',
     'contracts/review-surface.json',
     'contracts/layout-rules.json',
@@ -92,6 +97,19 @@ const SURFACE_VALIDATORS = {
     && Array.isArray(content?.screenshot_review?.requires_artifacts)
     && content.screenshot_review.requires_artifacts.includes('visual_director_review')
     && content.export_pptx?.requires_review_pass === true,
+  'contracts/lifecycle-stage-contract.json': (content) =>
+    content?.stage_model === 'direct_delivery_human_workline'
+    && Array.isArray(content?.human_workline)
+    && content.human_workline.join(',') === 'source_readiness,storyline,plan,visual,delivery'
+    && content?.human_to_macro_stage?.plan === 'story_architecture'
+    && content?.human_to_macro_stage?.visual === 'visual_authorship'
+    && content?.human_to_macro_stage?.delivery === 'delivery_packaging'
+    && content?.review_overlay_within === 'visual'
+    && content?.operator_handoff_within === 'delivery'
+    && content?.closeout_within === 'delivery'
+    && content?.route_to_human_stage?.detailed_outline === 'plan'
+    && content?.route_to_human_stage?.slide_blueprint === 'plan'
+    && content?.route_to_human_stage?.export_pptx === 'delivery',
   'contracts/prompt-pack.json': (content) =>
     typeof content?.root === 'string'
     && content.root === 'prompts/ppt_deck'
@@ -143,6 +161,8 @@ const SURFACE_VALIDATORS = {
     && content.stage_sequence.stages.length > 0
     && content.stage_sequence.stages.some((stage) => stage?.stage_id === 'visual_director_review')
     && typeof content?.export_bundle?.bundle_id === 'string'
+    && content?.lifecycle_stage_contract?.stage_model === 'direct_delivery_human_workline'
+    && content?.lifecycle_stage_contract?.route_to_human_stage?.detailed_outline === 'plan'
     && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
     && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
     && content?.delivery_contract?.required_export_route === 'export_pptx',

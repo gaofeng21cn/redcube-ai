@@ -222,6 +222,7 @@ export async function auditDeliverable(request) {
   const contract = loadHydratedContract(request);
   const publicationProjectionEntry = loadPublicationProjectionEntry(request);
   const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
+  const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
   let qualitySummary = {
     baseline_promotion_state: null,
@@ -271,6 +272,7 @@ export async function auditDeliverable(request) {
       operatorHandoff,
     }),
     operator_handoff: operatorHandoff,
+    lifecycle_stage_summary: lifecycleStageSummary,
   };
 }
 
@@ -354,6 +356,7 @@ export function watchRuntimeReviewLoop(request) {
     : null;
   const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
   const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
+  const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
   const relativeQuality = reviewState?.baseline?.relative_quality || null;
 
   return {
@@ -382,6 +385,7 @@ export function watchRuntimeReviewLoop(request) {
       operatorHandoff,
     }),
     operator_handoff: operatorHandoff,
+    lifecycle_stage_summary: lifecycleStageSummary,
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
     delivery_contract: contract?.delivery_contract || null,

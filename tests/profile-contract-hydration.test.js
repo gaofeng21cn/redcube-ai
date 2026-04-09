@@ -69,6 +69,13 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.delivery_contract.required_export_route, 'export_pptx');
   assert.equal(contract.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, false);
+  assert.equal(contract.lifecycle_stage_contract.stage_model, 'direct_delivery_human_workline');
+  assert.deepEqual(contract.lifecycle_stage_contract.human_workline, ['source_readiness', 'storyline', 'plan', 'visual', 'delivery']);
+  assert.equal(contract.lifecycle_stage_contract.human_to_macro_stage.plan, 'story_architecture');
+  assert.equal(contract.lifecycle_stage_contract.review_overlay_within, 'visual');
+  assert.equal(contract.lifecycle_stage_contract.operator_handoff_within, 'delivery');
+  assert.equal(contract.lifecycle_stage_contract.route_to_human_stage.detailed_outline, 'plan');
+  assert.equal(contract.lifecycle_stage_contract.route_to_human_stage.export_pptx, 'delivery');
   assert.equal(contract.delivery_contract.operator_handoff.owner_surface, 'required_export_artifact.delivery_state');
   assert.equal(contract.delivery_contract.operator_handoff.handoff_ready_state, 'output_ready');
   assert.deepEqual(
@@ -107,6 +114,7 @@ test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared
   assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
   assert.equal(contract.delivery_contract.required_export_bundle_id, 'xiaohongshu_standard_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, true);
+  assert.equal(Object.hasOwn(contract, 'lifecycle_stage_contract'), false);
   assert.equal(Object.hasOwn(contract.delivery_contract, 'operator_handoff'), false);
 });
 
@@ -151,6 +159,13 @@ test('hydrateDeliverableContract resolves poster_onepager knowledge_poster contr
   assert.equal(contract.export_bundle.bundle_id, 'poster_onepager_bundle');
   assert.equal(contract.source_truth_contract.authoritative_surface, 'shared_source_truth');
   assert.equal(contract.source_truth_contract.poster_guarded_boundary.academic_contract_active, false);
+  assert.equal(contract.lifecycle_stage_contract.stage_model, 'direct_delivery_human_workline');
+  assert.deepEqual(contract.lifecycle_stage_contract.human_workline, ['source_readiness', 'storyline', 'plan', 'visual', 'delivery']);
+  assert.equal(contract.lifecycle_stage_contract.human_to_macro_stage.plan, 'story_architecture');
+  assert.equal(contract.lifecycle_stage_contract.review_overlay_within, 'visual');
+  assert.equal(contract.lifecycle_stage_contract.operator_handoff_within, 'delivery');
+  assert.equal(contract.lifecycle_stage_contract.route_to_human_stage.poster_blueprint, 'plan');
+  assert.equal(contract.lifecycle_stage_contract.route_to_human_stage.export_bundle, 'delivery');
   assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
   assert.equal(contract.delivery_contract.required_export_bundle_id, 'poster_onepager_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, false);

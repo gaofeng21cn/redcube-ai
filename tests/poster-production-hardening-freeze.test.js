@@ -65,15 +65,15 @@ test('poster freeze contract states that future academic poster surface cannot r
   assert.equal(poster.future_academic_poster_constraints.cannot_reuse_formal_mainline_strategy, 'slot_hydration_only');
 });
 
-test('current tracked program truth keeps poster freeze historical while direct-delivery operator handoff hardening stays on the same source-readiness mainline', () => {
+test('current tracked program truth keeps poster freeze historical while direct-delivery lifecycle stage convergence stays on the same source-readiness mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_direct_delivery_operator_handoff_hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_direct_delivery_lifecycle_stage_convergence');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['delivery_packaging', 'direct_delivery_operator_handoff', 'review', 'export', 'gate', 'audit']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'story_architecture', 'visual_authorship', 'delivery_packaging', 'direct_delivery_lifecycle_stage_convergence', 'review', 'export', 'gate', 'audit']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.guarded_poster_surface, ['poster_onepager']);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('poster_onepager'), false);

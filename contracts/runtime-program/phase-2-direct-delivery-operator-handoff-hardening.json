@@ -172,6 +172,6 @@
     "suite_result": "pass",
     "findings_recorded": 0,
     "absorbed_to_main": true,
-    "next_tranche_candidate": null
+    "next_tranche_candidate": "phase_2_direct_delivery_lifecycle_stage_convergence"
   }
 }

@@ -198,6 +198,7 @@
 - family source-truth consumption convergence 已在同一主线上吸收一条 tranche：`ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 已围绕同一份 hydrated `source_truth_contract` 与统一 `source_truth_consumption` summary 收口，同时 authoritative fail-closed source gate 继续留在 `auditDeliverable` / `runtimeWatch`
 - publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche：`ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 现在都通过 hydrated `delivery_contract` 对齐 topic 级 `publication-state.json`，并继续把 canonical review state 作为治理真相面
 - direct-delivery operator handoff hardening 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `operator_handoff`，而 `xiaohongshu` 继续保持显式 human publication
+- direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `lifecycle_stage_contract` 与对齐后的 `lifecycle_stage_summary`，同时 `Storyline + Plan` 继续映射到 `Story Architecture`，`operator_handoff / closeout` 继续留在 `Delivery`
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
@@ -241,7 +242,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence` 与 `publication projection / delivery contract convergence` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 direct-delivery `operator_handoff` 语义压到 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 的同一 deliverable/topic 治理路径上，同时保持 `xiaohongshu` human publication 语义与 `ppt_deck` / `poster_onepager` direct delivery 语义分离。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence`、`publication projection / delivery contract convergence` 与 `direct-delivery operator handoff hardening` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 direct-delivery 五步人类工作线与当前 macro lifecycle 的 machine-readable bridge 压到 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 的同一 deliverable/topic 治理路径上，同时保持 `xiaohongshu` human publication 语义与 `ppt_deck` / `poster_onepager` direct delivery 语义分离。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -249,7 +250,7 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- 当前 active tranche 已切到 `direct-delivery operator handoff hardening`，但产品长线目标仍然大于这一条 absorbed tranche。
+- 当前 active tranche 已切到 `direct-delivery lifecycle stage convergence`，但产品长线目标仍然大于这一条 absorbed tranche。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。
 

@@ -116,6 +116,7 @@
 - `review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance
 - `publication-state.json` 现在必须围绕 hydrated `delivery_contract` 与 canonical `review_state` 输出 topic 级 projection；`xiaohongshu` 保持 explicit human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery semantics
 - `direct-delivery operator handoff hardening` 已在当前主线上吸收：direct-delivery family 现在必须暴露 machine-readable `operator_handoff`，同时保持 `delivery_state` ownership 与 gate semantics 的边界清晰
+- `direct-delivery lifecycle stage convergence` 已在当前主线上吸收：direct-delivery family 现在必须暴露 machine-readable `lifecycle_stage_contract` 与 `lifecycle_stage_summary`，同时保持 `Story Architecture` / `Visual Authorship` / `Delivery Packaging` 的当前命名不被改写
 - 更深层 source-plane 扩展仍属于同一主线上的后续增强，不应被误写成当前已完成的 repo truth
 - 当前 repo-tracked phase 标签仍可保留为 program pointer，但它不等于长线目标本身
 

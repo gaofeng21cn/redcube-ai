@@ -44,6 +44,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   const surfaceFiles = [
     'contracts/stage-sequence.json',
     'contracts/stage-requirements.json',
+    'contracts/lifecycle-stage-contract.json',
     'contracts/prompt-pack.json',
     'contracts/review-surface.json',
     'contracts/layout-rules.json',
@@ -100,6 +101,12 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
       readFileSync(path.join(deliverableDir, 'contracts/stage-requirements.json'), 'utf-8'),
     ).render_html.requires_artifacts,
     ['slide_blueprint', 'visual_direction'],
+  );
+  assert.equal(
+    JSON.parse(
+      readFileSync(path.join(deliverableDir, 'contracts/lifecycle-stage-contract.json'), 'utf-8'),
+    ).route_to_human_stage.detailed_outline,
+    'plan',
   );
   assert.equal(
     hydratedContract.review_surface.required_checks.includes('term_explained_on_first_use'),
