@@ -98,6 +98,12 @@ export function buildSourceAugmentationRequest({
   const evidenceGaps = safeArray(sourceReadinessPack?.fact_library?.evidence_gaps)
     .map((item) => safeText(item))
     .filter(Boolean);
+  const blockingEvidenceGaps = safeArray(sourceReadinessPack?.fact_library?.blocking_evidence_gaps)
+    .map((item) => safeText(item))
+    .filter(Boolean);
+  const residualEvidenceGaps = safeArray(sourceReadinessPack?.fact_library?.residual_evidence_gaps)
+    .map((item) => safeText(item))
+    .filter(Boolean);
   const topicSummary = safeText(
     sourceReadinessPack?.fact_library?.topic_summary,
     safeText(sourceBrief?.brief_text, safeText(title, topicId)),
@@ -123,6 +129,8 @@ export function buildSourceAugmentationRequest({
       source_audit_status: safeText(sourceAudit?.status, 'missing'),
       source_sufficiency_status: safeText(sourceReadinessPack?.readiness?.sufficiency_status, 'augmentation_required'),
       deep_research_state: safeText(sourceReadinessPack?.readiness?.deep_research_state, 'not_required'),
+      blocking_evidence_gaps: blockingEvidenceGaps,
+      residual_evidence_gaps: residualEvidenceGaps,
       evidence_gaps: evidenceGaps,
     },
     focus: {

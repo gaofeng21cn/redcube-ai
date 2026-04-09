@@ -37,6 +37,10 @@ test('direct-delivery longrun target doc stays future-facing and does not rewrit
   assert.equal(doc.includes('## 5.5 Delivery'), true);
   assert.equal(doc.includes('## 6. operator_handoff / closeout boundary'), true);
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_direct_delivery_lifecycle_stage_convergence');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / direct-delivery lifecycle stage convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / source-readiness deep research trigger gate convergence');
+  assert.equal(
+    currentProgram.current_state.completed_batons.phase_2_direct_delivery_lifecycle_stage_convergence.artifacts.tranche_contract,
+    'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json',
+  );
 });

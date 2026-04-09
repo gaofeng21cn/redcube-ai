@@ -9,10 +9,10 @@ import {
   createDeliverable,
   getPublicationProjection,
   getReviewState,
-  intakeSource,
   runDeliverableRoute,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {
   for (const route of routes) {
@@ -23,7 +23,7 @@ async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes)
 
 test('direct-delivery families expose one aligned operator_handoff summary across audit/watch/review/projection surfaces', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-'));
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊源材料',
@@ -124,7 +124,7 @@ test('direct-delivery operator_handoff stays blocked when canonical source readi
 
 test('human-publication family keeps explicit publish gate and does not expose direct-delivery operator_handoff', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-xhs-'));
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊小红书素材',

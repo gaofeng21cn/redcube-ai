@@ -20,8 +20,11 @@ const SOURCE_TRUTH_FIELD_WHITELIST = Object.freeze({
 
 const PPT_SOURCE_TRUTH_CONTRACT = Object.freeze({
   authoritative_surface: 'shared_source_truth',
-  authoritative_gate: 'topics/<topic>/canonical/source-audit.json',
-  authoritative_artifacts: ['source_index', 'extracted_materials', 'source_audit', 'source_brief'],
+  authoritative_gate: 'topics/<topic>/canonical/source-readiness-pack.json',
+  authoritative_gate_inputs: ['source_audit', 'source_readiness_pack'],
+  authoritative_artifacts: ['source_index', 'extracted_materials', 'source_audit', 'source_brief', 'source_readiness_pack'],
+  readiness_target: 'planning_ready',
+  pass_condition: 'source_audit.status=pass && source_readiness_pack.readiness.planning_ready=true',
   route_gate_rule: 'authoritative_fail_closed_in_audit_and_runtime_watch',
   hydration_model: {
     hydrated_contract_surface: 'contracts/hydrated-deliverable.json',

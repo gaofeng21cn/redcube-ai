@@ -11,6 +11,9 @@ export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 } from './source-truth.js';
 export {
+  loadSourceReadinessSummary,
+} from './source-readiness-summary.js';
+export {
   validateSourceAugmentationRequestContract,
   validateSourceAugmentationResultContract,
 } from './source-augmentation-contract.js';

@@ -104,6 +104,7 @@ Typical three-step start:
 If you want a faster handoff, you can give your agent a one-line start instruction.
 
 `Deep Research` belongs to `Source Readiness` rather than a standalone pre-stage. When the input is too thin, the agent should keep Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
+planning_ready must become the formal machine-readable release gate inside Source Readiness.
 
 If you want one formal entry instead of calling each sub-step yourself, start from `source research`.
 It is the shared Step 1 orchestration surface: it runs `source intake` first, then decides whether to stop at canonical result staging or continue into augmentation execution.
@@ -120,14 +121,15 @@ Scenario 1, you already prepared reference materials:
 
 Scenario 2, you only have a topic and want facts prepared first:
 
-> Treat this directory as the isolated RedCube workspace for this project. For the topic "{{topic}}", enter `Source Readiness` first: if materials are still insufficient, produce a research brief, a public-source posture, and a missing-material checklist before drafting; only create the deliverable and continue the formal delivery chain after shared source truth becomes sufficient. For a serialized Xiaohongshu project, model one deliverable per note.
+> Treat this directory as the isolated RedCube workspace for this project. For the topic "{{topic}}", enter `Source Readiness` first: if the input is still insufficient, force `source augmentation` / `Deep Research` until Step 1 reaches `planning_ready`; only create the deliverable and continue the formal delivery chain after the canonical source readiness gate passes. For a serialized Xiaohongshu project, model one deliverable per note.
 
 There is an important boundary to state honestly:
 
 - the current formally stable baseline is `source intake + shared source truth`
-- `research` currently exists mainly as a `source_readiness / source_augmentation` route inside the `xiaohongshu` family
+- `Deep Research` is now a shared `Source Readiness` augmentation capability on the same canonical source substrate consumed by `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`
+- `planning_ready` is the formal machine-readable release gate for Step 1; `source_audit = pass` alone is not sufficient
 - it should not be described as already equivalent to `MedDeepScientist` `Scout + Idea`
-- more accurately, it is currently a research-brief layer on top of source truth; the real content strategy and narrative line still start from `storyline`
+- more accurately, it resolves source insufficiency and evidence gaps before `storyline`; the real content strategy and narrative choice still start from `storyline`
 
 The recommended mental model is to treat `RedCube AI` as a runtime operating on one isolated workspace, not as a content folder embedded inside the repository itself.
 The most practical working granularity today is:
@@ -185,7 +187,7 @@ You can give your agent an instruction like this:
 
 If you want your agent to start directly from a brand-new directory, you can make the instruction more explicit:
 
-> Treat this directory as the isolated RedCube workspace for this project. If `redcube.workspace.json` is missing, initialize the workspace using RedCube's canonical workspace contract. Model this project as `1 workspace`, `1 topic`, and one or more `deliverables`. Run `workspace doctor` first, then `source intake` to hydrate shared source truth; if the source set is still insufficient, produce a research brief and a missing-material checklist before drafting. Then create the target deliverable and move it through the formal review, rerun, and export stages. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`, instead of mixing the whole series into one deliverable.
+> Treat this directory as the isolated RedCube workspace for this project. If `redcube.workspace.json` is missing, initialize the workspace using RedCube's canonical workspace contract. Model this project as `1 workspace`, `1 topic`, and one or more `deliverables`. Run `workspace doctor` first, then `source intake` to hydrate shared source truth; if the source set is still insufficient, continue through `source augment` and `source execute-augmentation` until Step 1 reaches `planning_ready`. Then create the target deliverable and move it through the formal review, rerun, and export stages. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`, instead of mixing the whole series into one deliverable.
 
 ## Current Limits
 
@@ -195,6 +197,7 @@ The main unfinished areas are:
 
 - `stable deliverable manual-test-driven hardening` has completed closeout for `ppt_deck` and `xiaohongshu`, with a tracked stable backlog and no recorded findings
 - `source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface; `CLI` and `MCP` hydrate canonical shared source truth on the same substrate, and `ppt_deck` / `xiaohongshu` consume it through the shared gateway mainline
+- source-readiness deep research trigger + gate convergence now has an absorbed tranche on the same mainline: `Deep Research` is frozen as shared `Source Readiness` augmentation, and `planning_ready` now gates release through canonical `source-readiness-pack.json`, `source-augmentation-request/result/report`, and `source-research-report`
 - review / export / gate / audit hardening now has an absorbed tranche on the same mainline: `auditDeliverable` and `runtimeWatch` surface canonical source readiness plus export gate summaries across the stable families
 - current behavior convergence keeps `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` aligned on the same deliverable/topic boundary instead of letting audit and projection drift apart
 - family source-truth consumption convergence now has an absorbed tranche on the same mainline: `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager` now converge around one hydrated `source_truth_contract` plus one shared `source_truth_consumption` summary while the authoritative fail-closed source gate stays in `auditDeliverable` / `runtimeWatch`
@@ -204,7 +207,7 @@ The main unfinished areas are:
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
-- broader source-plane expansion remains follow-on work on the same mainline
+- further source-plane hardening beyond trigger + gate convergence remains follow-on work on the same mainline
 - OPL federation integration is still a follow-on step
 
 ## Documentation
@@ -244,7 +247,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening` remains absorbed provenance; `family source-truth consumption convergence` remains absorbed provenance; `publication projection / delivery contract convergence` remains absorbed provenance; `direct-delivery operator handoff hardening` remains absorbed provenance; and the current absorbed tranche freezes the direct-delivery machine-readable bridge between the five-step human workline and the current macro lifecycle across `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` while keeping `xiaohongshu` human publication semantics distinct from `ppt_deck` / `poster_onepager` direct delivery.
+- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening`, `family source-truth consumption convergence`, `publication projection / delivery contract convergence`, `direct-delivery operator handoff hardening`, and `direct-delivery lifecycle stage convergence` remain absorbed provenance; and the current absorbed tranche freezes `Deep Research` as shared `Source Readiness` augmentation while converging `planning_ready` onto `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` without rewriting `xiaohongshu` into direct delivery.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -252,7 +255,7 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- the current active tranche is `direct-delivery lifecycle stage convergence`, but the product longrun goal is broader than that one absorbed tranche.
+- the current active tranche is `source-readiness deep research trigger gate convergence`, but the product longrun goal is broader than that one absorbed tranche.
 - further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.
 

@@ -8,11 +8,11 @@ import {
   auditDeliverable,
   applyReviewMutation,
   createDeliverable,
-  intakeSource,
   reviewRenderOutput,
   runDeliverableRoute,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 test('auditDeliverable blocks optimize_existing task without baseline', async () => {
   const report = await auditDeliverable({
@@ -51,16 +51,16 @@ test('auditDeliverable blocks when canonical source readiness is missing and exp
 
   assert.equal(report.status, 'block');
   assert.equal(report.issues.includes('source_audit_missing'), true);
-  assert.equal(report.rerun_from_stage, 'intake');
-  assert.equal(report.recommended_action, 'run_source_intake');
+  assert.equal(report.rerun_from_stage, 'source_readiness');
+  assert.equal(report.recommended_action, 'run_source_research');
   assert.equal(report.source_readiness_summary?.status, 'missing');
-  assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_audit');
+  assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_readiness_gate');
 });
 
 test('auditDeliverable passes with canonical source readiness and returns source_readiness_summary', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
 
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊科普',
@@ -92,7 +92,7 @@ test('auditDeliverable passes with canonical source readiness and returns source
 
 test('auditDeliverable blocks optimize_existing task when baseline is not approved', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊小红书素材',
@@ -138,7 +138,7 @@ test('auditDeliverable blocks optimize_existing task when baseline is not approv
 
 test('auditDeliverable surfaces promoted baseline summary for optimize_existing', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊小红书素材',
@@ -226,7 +226,7 @@ test('auditDeliverable surfaces promoted baseline summary for optimize_existing'
 
 test('auditDeliverable blocks missing hydrated surface artifact', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊 deck 素材',
@@ -424,7 +424,7 @@ test('runtimeWatch exposes export bundle obligations from hydrated contract', as
 test('runtimeWatch exposes source readiness summary and gate summary from canonical source audit plus export contract', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
 
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '正式答辩 deck source',
@@ -455,8 +455,9 @@ test('runtimeWatch exposes source readiness summary and gate summary from canoni
   });
 
   assert.equal(report.source_readiness_summary?.status, 'pass');
-  assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_audit');
+  assert.equal(report.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_readiness_gate');
   assert.equal(report.gate_summary?.source_readiness_status, 'pass');
+  assert.equal(report.gate_summary?.source_planning_ready, true);
   assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
   assert.equal(report.gate_summary?.required_export_bundle_id, 'defense_deck_bundle');
   assert.equal(report.gate_summary?.approval_status, 'not_required');

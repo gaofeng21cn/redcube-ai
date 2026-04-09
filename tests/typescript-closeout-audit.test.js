@@ -53,6 +53,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/index.js',
     'src/runs.js',
     'src/source-augmentation-contract.js',
+    'src/source-readiness-summary.js',
     'src/source-truth.js',
     'src/workspace.js',
   ],

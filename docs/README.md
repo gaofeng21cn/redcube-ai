@@ -36,6 +36,8 @@ This index along with the repository home forms the default GitHub-facing biling
 - [Phase 2 publication projection / delivery contract convergence](phase_2_publication_projection_delivery_contract_convergence.md) (Chinese only)
 - [Phase 2 direct-delivery operator handoff hardening](phase_2_direct_delivery_operator_handoff_hardening.md) (Chinese only)
 - [Phase 2 direct-delivery lifecycle stage convergence](phase_2_direct_delivery_lifecycle_stage_convergence.md) (Chinese only)
+- [Phase 2 source-readiness deep research trigger + gate convergence](phase_2_source_readiness_deep_research_trigger_gate_convergence.md) (Chinese only)
+- [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md) (future-facing design target, Chinese only)
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md) (future-facing design target, Chinese only)
 
 ### For technical collaborators / agent executors

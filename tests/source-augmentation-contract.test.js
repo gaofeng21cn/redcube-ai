@@ -29,6 +29,8 @@ function buildValidRequest() {
       source_audit_status: 'pass',
       source_sufficiency_status: 'augmentation_required',
       deep_research_state: 'required',
+      blocking_evidence_gaps: ['public_evidence_missing', 'consumable_material_missing'],
+      residual_evidence_gaps: [],
       evidence_gaps: ['public_evidence_missing', 'consumable_material_missing'],
     },
     focus: {

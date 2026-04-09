@@ -104,11 +104,17 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
   assert.equal(pack.readiness.input_mode, 'brief_keywords');
   assert.equal(pack.readiness.deep_research_state, 'required');
   assert.equal(pack.readiness.sufficiency_status, 'augmentation_required');
+  assert.equal(pack.readiness.planning_ready, false);
   assert.equal(pack.readiness.material_count >= 1, true);
   assert.equal(Array.isArray(pack.fact_library.reference_source_list), true);
   assert.equal(Array.isArray(pack.fact_library.evidence_gaps), true);
+  assert.equal(Array.isArray(pack.fact_library.blocking_evidence_gaps), true);
+  assert.equal(Array.isArray(pack.fact_library.residual_evidence_gaps), true);
   assert.equal(pack.fact_library.reference_source_list.length > 0, true);
   assert.equal(pack.fact_library.evidence_gaps.includes('public_evidence_missing'), true);
+  assert.equal(pack.fact_library.blocking_evidence_gaps.includes('public_evidence_missing'), true);
+  assert.equal(pack.release_gate.pass, false);
+  assert.equal(pack.release_gate.next_required_surface, 'source_research');
 
   const augmentation = readJson(result.artifactFiles.sourceAugmentationRequestFile);
   assert.equal(augmentation.schema_version, 1);
@@ -117,8 +123,11 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
   assert.equal(augmentation.status, 'required');
   assert.equal(augmentation.execution_mode, 'auto_required');
   assert.equal(augmentation.readiness_target, 'planning_ready');
+  assert.equal(Array.isArray(augmentation.trigger.blocking_evidence_gaps), true);
+  assert.equal(Array.isArray(augmentation.trigger.residual_evidence_gaps), true);
   assert.equal(Array.isArray(augmentation.trigger.evidence_gaps), true);
   assert.equal(augmentation.trigger.evidence_gaps.includes('public_evidence_missing'), true);
+  assert.equal(augmentation.trigger.blocking_evidence_gaps.includes('public_evidence_missing'), true);
   assert.equal(Array.isArray(augmentation.investigation_lanes), true);
   assert.equal(augmentation.investigation_lanes.length > 0, true);
   assert.equal(Array.isArray(augmentation.focus.required_outputs), true);
@@ -226,6 +235,7 @@ test('researchSource stops at canonical result scaffold when result_file route n
     assert.equal(report.status, 'awaiting_input');
     assert.equal(report.stage, 'source_augmentation_result_preparation');
     assert.equal(report.planning_ready, false);
+    assert.equal(report.readiness_target, 'planning_ready');
     assert.equal(report.recommended_action, 'write_source_augmentation_result');
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
@@ -268,11 +278,14 @@ test('researchSource can complete Source Readiness end-to-end on result_file rou
     assert.equal(report.status, 'completed');
     assert.equal(report.stage, 'source_augmentation_execution');
     assert.equal(report.planning_ready, true);
+    assert.equal(report.sufficiency_status, 'planning_ready');
+    assert.equal(report.deep_research_state, 'completed');
     assert.equal(report.recommended_action, 'create_deliverable');
 
     const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-research-complete', 'canonical', 'source-readiness-pack.json'));
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
+    assert.equal(pack.readiness.planning_ready, true);
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
@@ -404,6 +417,7 @@ test('prepareSourceAugmentationResult exposes canonical result scaffold for agen
   assert.equal(prepared.recommended_action, 'write_source_augmentation_result');
   assert.equal(prepared.resultDraft.topic_id, 'topic-prepare-result');
   assert.equal(prepared.resultDraft.request_kind, 'shared_source_readiness_augmentation_result');
+  assert.equal(prepared.resultDraft.evidence_gap_resolution.length >= 1, true);
   assert.equal(
     prepared.artifactFiles.sourceAugmentationResultFile,
     path.join(workspaceRoot, 'topics', 'topic-prepare-result', 'canonical', 'source-augmentation-result.json'),
@@ -523,6 +537,7 @@ test('executeSourceAugmentation blocks explicitly when augmentation executor is 
     assert.equal(report.executor.adapter, 'external_command');
     assert.equal(report.executor.execution_surface, 'external_command');
     assert.equal(report.executor.executor_identity, 'source_augmentation_external_command');
+    assert.equal(report.planning_ready, false);
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
@@ -592,6 +607,7 @@ test('executeSourceAugmentation blocks explicitly when result_file adapter input
     assert.equal(result.report.executor.adapter, 'result_file');
     assert.equal(result.report.executor.execution_surface, 'result_file');
     assert.equal(result.report.executor.executor_identity, process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE);
+    assert.equal(result.report.planning_ready, false);
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
@@ -773,6 +789,7 @@ test('executeSourceAugmentation can consume built-in result_file adapter and upg
 
     assert.equal(result.ok, true);
     assert.equal(result.report.status, 'completed');
+    assert.equal(result.report.planning_ready, true);
     assert.equal(result.report.executor.adapter, 'result_file');
     assert.equal(result.report.executor.execution_surface, 'result_file');
     assert.equal(result.report.executor.executor_identity, resultFile);
@@ -782,6 +799,7 @@ test('executeSourceAugmentation can consume built-in result_file adapter and upg
     const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-result-file', 'canonical', 'source-readiness-pack.json'));
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
+    assert.equal(pack.readiness.planning_ready, true);
     assert.equal(pack.fact_library.reference_source_list.some((item) => String(item).includes('国家指南')), true);
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
@@ -824,6 +842,7 @@ test('executeSourceAugmentation can consume canonical result file written by wri
 
     assert.equal(result.ok, true);
     assert.equal(result.report.status, 'completed');
+    assert.equal(result.report.planning_ready, true);
     assert.equal(result.report.executor.adapter, 'result_file');
     assert.equal(result.report.executor.execution_surface, 'result_file');
     assert.equal(result.report.executor.executor_identity, 'canonical_source_augmentation_result_file');
@@ -832,6 +851,7 @@ test('executeSourceAugmentation can consume canonical result file written by wri
     const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-result-default-path', 'canonical', 'source-readiness-pack.json'));
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
+    assert.equal(pack.readiness.planning_ready, true);
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
@@ -932,6 +952,7 @@ process.stdout.write(JSON.stringify({
 
     const report = readJson(parsed.artifactFiles.sourceAugmentationReportFile);
     assert.equal(report.status, 'completed');
+    assert.equal(report.planning_ready, true);
     assert.equal(report.executor.adapter, 'external_command');
     assert.equal(report.executor.execution_surface, 'external_command');
     assert.equal(report.executor.executor_identity, scriptFile);
@@ -941,6 +962,7 @@ process.stdout.write(JSON.stringify({
     const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-cli-execute', 'canonical', 'source-readiness-pack.json'));
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
+    assert.equal(pack.readiness.planning_ready, true);
     assert.equal(pack.readiness.confidence, 'medium');
     assert.equal(pack.fact_library.reference_source_list.some((item) => String(item).includes('国家指南')), true);
 

@@ -12,6 +12,9 @@ import {
   getSourceArtifactPaths as getSourceArtifactPathsJs,
 } from './source-truth.js';
 import {
+  loadSourceReadinessSummary as loadSourceReadinessSummaryJs,
+} from './source-readiness-summary.js';
+import {
   validateSourceAugmentationRequestContract as validateSourceAugmentationRequestContractJs,
   validateSourceAugmentationResultContract as validateSourceAugmentationResultContractJs,
 } from './source-augmentation-contract.js';
@@ -27,6 +30,7 @@ import type {
   RunTelemetryEnvelope,
   RuntimeErrorKind,
   SourceArtifactPaths,
+  SourceReadinessSummary,
   SourceAugmentationRequestContract,
   SourceAugmentationResultContract,
   TopicPaths,
@@ -66,6 +70,13 @@ export function buildSourceTruthConsumptionSummary(
   return buildSourceTruthConsumptionSummaryJs(sharedSourceTruth, options) as SourceTruthConsumptionSummary;
 }
 
+export function loadSourceReadinessSummary(
+  workspaceRoot: string,
+  topicId: string,
+): SourceReadinessSummary | null {
+  return loadSourceReadinessSummaryJs(workspaceRoot, topicId) as SourceReadinessSummary | null;
+}
+
 export function validateSourceAugmentationRequestContract(
   contract: unknown,
 ): ValidationResult {
@@ -94,6 +105,7 @@ export type {
   RunTelemetryEnvelope,
   RuntimeErrorKind,
   SourceArtifactPaths,
+  SourceReadinessSummary,
   SourceAugmentationRequestContract,
   SourceAugmentationResultContract,
   TopicPaths,

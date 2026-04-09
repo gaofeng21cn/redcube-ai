@@ -97,7 +97,17 @@ export function validateSourceAugmentationRequestContract(contract) {
     if (!['required', 'recommended', 'completed', 'not_required'].includes(String(contract.trigger.deep_research_state || '').trim())) {
       errors.push('trigger.deep_research_state 非法');
     }
+    const blockingEvidenceGaps = pushArrayStringErrors(errors, contract.trigger.blocking_evidence_gaps, 'trigger.blocking_evidence_gaps');
+    const residualEvidenceGaps = pushArrayStringErrors(errors, contract.trigger.residual_evidence_gaps, 'trigger.residual_evidence_gaps');
     pushArrayStringErrors(errors, contract.trigger.evidence_gaps, 'trigger.evidence_gaps');
+    if (String(contract.trigger.source_sufficiency_status || '').trim() === 'planning_ready' && blockingEvidenceGaps.length > 0) {
+      errors.push('planning_ready 时 trigger.blocking_evidence_gaps 必须为空');
+    }
+    for (const gapId of blockingEvidenceGaps) {
+      if (residualEvidenceGaps.includes(gapId)) {
+        errors.push(`同一个 gap 不能同时属于 blocking 与 residual: ${gapId}`);
+      }
+    }
   }
 
   if (!isPlainObject(contract.focus)) {

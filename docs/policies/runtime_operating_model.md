@@ -111,6 +111,8 @@
 
 - `source intake` 已通过 `CLI` / `MCP` 成为 `Source Readiness` 的正式 baseline surface
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
+- canonical readiness / augmentation surfaces 现已固定包括 `source-readiness-pack.json`、`source-augmentation-request.json`、`source-augmentation-result.json`、`source-augmentation-report.json` 与 `source-research-report.json`
+- `source-readiness deep research trigger + gate convergence` 已在当前主线上吸收：`Deep Research` 现在必须作为 shared `Source Readiness` augmentation 把 Step 1 推到 `planning_ready`，而不能把 `source_audit = pass` 误写成已放行
 - `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - authoritative fail-closed source gate 继续留在 auditDeliverable / runtimeWatch，而 family artifact 需输出统一的 source_truth_consumption summary
 - `review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance

@@ -74,10 +74,17 @@ function buildBlockedReport({ topicId, request, blockingReason, executor }) {
     request_kind: 'shared_source_readiness_augmentation_execution',
     status: 'blocked',
     readiness_target: safeText(request?.readiness_target, 'planning_ready'),
+    planning_ready: false,
+    sufficiency_status: safeText(request?.trigger?.source_sufficiency_status, 'augmentation_required'),
+    deep_research_state: safeText(request?.trigger?.deep_research_state, 'not_required'),
     blocking_reason: safeText(blockingReason, 'source_augmentation_execution_failed'),
     executor: buildExecutorSummary(executor),
     resolved_evidence_gaps: [],
-    unresolved_evidence_gaps: safeArray(request?.trigger?.evidence_gaps),
+    unresolved_evidence_gaps: safeArray(request?.trigger?.blocking_evidence_gaps).length > 0
+      ? safeArray(request?.trigger?.blocking_evidence_gaps)
+      : safeArray(request?.trigger?.evidence_gaps),
+    blocking_evidence_gaps: safeArray(request?.trigger?.blocking_evidence_gaps),
+    residual_evidence_gaps: safeArray(request?.trigger?.residual_evidence_gaps),
     added_source_count: 0,
     added_material_count: 0,
   };
@@ -89,6 +96,7 @@ function applyAugmentation({
   sourceBrief,
   sourceAudit,
   sourceReadinessPack,
+  request,
   executorOutput,
   executionSurface,
   executor,
@@ -108,15 +116,18 @@ function applyAugmentation({
     status: safeText(item?.status),
     note: safeText(item?.note),
   }));
+  const requestedBlockingEvidenceGaps = uniqueStrings(
+    safeArray(request?.trigger?.blocking_evidence_gaps).length > 0
+      ? request.trigger.blocking_evidence_gaps
+      : safeArray(request?.trigger?.evidence_gaps),
+  );
   const resolvedEvidenceGaps = uniqueStrings(
     evidenceGapResolution
       .filter((item) => item.status === 'resolved')
       .map((item) => item.gap_id),
   );
   const unresolvedEvidenceGaps = uniqueStrings(
-    evidenceGapResolution
-      .filter((item) => item.status === 'unresolved')
-      .map((item) => item.gap_id),
+    requestedBlockingEvidenceGaps.filter((gapId) => !resolvedEvidenceGaps.includes(gapId)),
   );
   const sourceQualityNotes = uniqueStrings(executorOutput?.source_quality_notes);
 
@@ -206,15 +217,22 @@ function applyAugmentation({
       source_id: material.source_id,
     })),
   ];
-  const readinessStatus = unresolvedEvidenceGaps.length === 0 ? 'planning_ready' : 'augmentation_required';
-  const deepResearchState = unresolvedEvidenceGaps.length === 0 ? 'completed' : 'recommended';
+  const residualEvidenceGaps = uniqueStrings(sourceReadinessPack?.fact_library?.residual_evidence_gaps);
+  const planningReady = unresolvedEvidenceGaps.length === 0 && safeText(mergedSourceAudit?.status, 'pass') === 'pass';
+  const readinessStatus = planningReady ? 'planning_ready' : 'augmentation_required';
+  const deepResearchState = planningReady
+    ? (residualEvidenceGaps.length > 0 ? 'recommended' : 'completed')
+    : 'recommended';
 
   const mergedSourceReadinessPack = {
     ...sourceReadinessPack,
     readiness: {
       ...(sourceReadinessPack?.readiness || {}),
+      target: 'planning_ready',
       confidence: mergedSourceBrief.confidence,
       sufficiency_status: readinessStatus,
+      planning_ready: planningReady,
+      release_blocked: !planningReady,
       deep_research_state: deepResearchState,
       material_count: mergedSourceBrief.material_count,
       material_ids: mergedSourceBrief.material_ids,
@@ -233,6 +251,20 @@ function applyAugmentation({
         ...sourceQualityNotes,
       ]),
       evidence_gaps: unresolvedEvidenceGaps,
+      blocking_evidence_gaps: unresolvedEvidenceGaps,
+      residual_evidence_gaps: residualEvidenceGaps,
+    },
+    release_gate: {
+      target: 'planning_ready',
+      status: planningReady ? 'pass' : 'block',
+      pass: planningReady,
+      blocking_evidence_gaps: unresolvedEvidenceGaps,
+      residual_evidence_gaps: residualEvidenceGaps,
+      blocked_reasons: uniqueStrings([
+        ...safeArray(mergedSourceAudit?.blocking_reasons),
+        ...unresolvedEvidenceGaps,
+      ]),
+      next_required_surface: planningReady ? null : 'source_research',
     },
   };
 
@@ -242,10 +274,15 @@ function applyAugmentation({
     request_kind: 'shared_source_readiness_augmentation_execution',
     status: 'completed',
     readiness_target: 'planning_ready',
+    planning_ready: planningReady,
+    sufficiency_status: readinessStatus,
+    deep_research_state: deepResearchState,
     execution_surface: safeText(executionSurface, 'external_command'),
     executor: buildExecutorSummary(executor),
     resolved_evidence_gaps: resolvedEvidenceGaps,
     unresolved_evidence_gaps: unresolvedEvidenceGaps,
+    blocking_evidence_gaps: unresolvedEvidenceGaps,
+    residual_evidence_gaps: residualEvidenceGaps,
     topic_summary: safeText(mergedSourceReadinessPack?.fact_library?.topic_summary),
     source_quality_notes: sourceQualityNotes,
     evidence_gap_resolution: evidenceGapResolution,
@@ -349,10 +386,15 @@ export async function executeSourceAugmentation({
       request_kind: 'shared_source_readiness_augmentation_execution',
       status: 'skipped',
       readiness_target: safeText(request?.readiness_target, 'planning_ready'),
+      planning_ready: safeText(request?.trigger?.source_sufficiency_status) === 'planning_ready',
+      sufficiency_status: safeText(request?.trigger?.source_sufficiency_status, 'planning_ready'),
+      deep_research_state: safeText(request?.trigger?.deep_research_state, 'not_required'),
       blocking_reason: null,
       executor: buildExecutorSummary(adapter),
       resolved_evidence_gaps: [],
       unresolved_evidence_gaps: [],
+      blocking_evidence_gaps: safeArray(request?.trigger?.blocking_evidence_gaps),
+      residual_evidence_gaps: safeArray(request?.trigger?.residual_evidence_gaps),
       added_source_count: 0,
       added_material_count: 0,
     };
@@ -396,6 +438,7 @@ export async function executeSourceAugmentation({
     sourceBrief,
     sourceAudit,
     sourceReadinessPack,
+    request,
     executorOutput: execution.executorOutput,
     executionSurface: execution.executionSurface,
     executor: adapter,

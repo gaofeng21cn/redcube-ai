@@ -13,12 +13,12 @@ import {
 import {
   auditDeliverable,
   createDeliverable,
-  intakeSource,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 async function prepareSourceReadiness(workspaceRoot) {
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊科普',
@@ -198,8 +198,8 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
   assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
   assert.equal(report.gate_summary?.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(report.gate_summary?.approval_required, false);
-  assert.equal(report.gate_summary?.delivery_projection_current, null);
-  assert.equal(report.gate_summary?.delivery_projection_next, null);
+  assert.equal(report.gate_summary?.delivery_projection_current, 'draft');
+  assert.equal(report.gate_summary?.delivery_projection_next, 'export_ready');
 });
 
 test('auditDeliverable blocks when hydrated ppt deck surface content is invalid', async () => {

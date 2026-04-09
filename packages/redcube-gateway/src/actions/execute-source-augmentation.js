@@ -2,6 +2,7 @@ import { executeSourceAugmentation as runSourceAugmentationExecution } from '@re
 
 function recommendedActionForExecution(result) {
   if (result.report?.status === 'blocked') return 'configure_source_augmentation_executor';
+  if (result.report?.planning_ready !== true) return 'run_source_research';
   return 'create_deliverable';
 }
 

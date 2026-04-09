@@ -40,6 +40,9 @@ export function buildSourceTruthConsumptionSummary(sharedSourceTruth, options = 
   const auditBlockingReasons = safeArray(truth?.source_audit?.blocking_reasons)
     .map((reason) => safeText(reason))
     .filter(Boolean);
+  const sufficiencyStatus = safeText(truth?.source_readiness_pack?.readiness?.sufficiency_status, 'augmentation_required');
+  const planningReady = truth?.source_readiness_pack?.readiness?.planning_ready === true
+    || sufficiencyStatus === 'planning_ready';
 
   return {
     authoritative_source_kind: 'shared_source_truth',
@@ -53,5 +56,10 @@ export function buildSourceTruthConsumptionSummary(sharedSourceTruth, options = 
     source_audit_blocking_reasons: auditBlockingReasons.length > 0
       ? auditBlockingReasons
       : safeArray(options.defaultBlockingReasons),
+    planning_ready: planningReady,
+    sufficiency_status: sufficiencyStatus,
+    deep_research_state: safeText(truth?.source_readiness_pack?.readiness?.deep_research_state, 'not_required'),
+    blocking_evidence_gaps: safeArray(truth?.source_readiness_pack?.fact_library?.blocking_evidence_gaps),
+    residual_evidence_gaps: safeArray(truth?.source_readiness_pack?.fact_library?.residual_evidence_gaps),
   };
 }

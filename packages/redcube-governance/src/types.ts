@@ -49,6 +49,8 @@ export interface ReviewStateResponse {
   quality_summary: Record<string, unknown>;
   state_file: string;
   history_file: string;
+  source_readiness_summary?: Record<string, unknown> | null;
+  gate_summary?: Record<string, unknown> | null;
   operator_handoff?: Record<string, unknown> | null;
   lifecycle_stage_summary?: Record<string, unknown> | null;
 }

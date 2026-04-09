@@ -9,13 +9,13 @@ import {
   createDeliverable,
   getPublicationProjection,
   getReviewState,
-  intakeSource,
   runDeliverableRoute,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 async function buildReviewReadyXiaohongshuWorkspace(workspaceRoot) {
-  await intakeSource({
+  await completeSourceReadiness({
     workspaceRoot,
     topicId: 'topic-a',
     title: '甲状腺门诊小红书素材',

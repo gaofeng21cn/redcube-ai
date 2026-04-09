@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import {
   getSourceArtifactPaths,
+  validateSourceAugmentationRequestContract,
   validateSourceAugmentationResultContract,
 } from '@redcube/runtime-protocol';
 
@@ -43,7 +44,7 @@ function writeJson(file, value) {
 }
 
 function planningReadyFromExecution(execution) {
-  return execution?.ok === true && safeText(execution?.report?.status) === 'completed';
+  return execution?.ok === true && execution?.report?.planning_ready === true;
 }
 
 function hasWriteInput(request) {
@@ -55,6 +56,9 @@ function recommendedActionForResearch(result) {
   if (result.stage === 'source_augmentation_result_preparation') return 'write_source_augmentation_result';
   if (result.ok !== true && result.stage === 'source_augmentation_execution') {
     return 'configure_source_augmentation_executor';
+  }
+  if (result.stage === 'source_augmentation_execution' && result.planningReady !== true) {
+    return 'continue_source_research';
   }
   if (result.planningReady === true) return 'create_deliverable';
   return 'continue';
@@ -74,6 +78,24 @@ function buildSourceResearchReport(result) {
     status,
     stage: safeText(result?.stage),
     planning_ready: result?.planningReady === true,
+    readiness_target: 'planning_ready',
+    sufficiency_status: safeText(
+      result?.execution?.report?.sufficiency_status,
+      result?.augmentation?.augmentation?.trigger?.source_sufficiency_status,
+    ) || null,
+    deep_research_state: safeText(
+      result?.execution?.report?.deep_research_state,
+      result?.augmentation?.augmentation?.trigger?.deep_research_state,
+    ) || null,
+    blocking_evidence_gaps: safeArray(
+      result?.execution?.report?.blocking_evidence_gaps
+        || result?.augmentation?.augmentation?.trigger?.blocking_evidence_gaps
+        || result?.augmentation?.augmentation?.trigger?.evidence_gaps,
+    ),
+    residual_evidence_gaps: safeArray(
+      result?.execution?.report?.residual_evidence_gaps
+        || result?.augmentation?.augmentation?.trigger?.residual_evidence_gaps,
+    ),
     recommended_action: recommendedActionForResearch(result),
   };
 }

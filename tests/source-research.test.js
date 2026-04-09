@@ -5,7 +5,11 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { researchSource } from '../packages/redcube-gateway/src/index.js';
+import {
+  researchSource,
+  writeSourceAugmentationResult,
+} from '../packages/redcube-gateway/src/index.js';
+import { buildResolvedAugmentationPayload } from './helpers/complete-source-readiness.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -107,6 +111,7 @@ process.stdout.write(JSON.stringify({
     const pack = readJson(path.join(workspaceRoot, 'topics', 'topic-research-external', 'canonical', 'source-readiness-pack.json'));
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
+    assert.equal(pack.readiness.planning_ready, true);
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
@@ -151,6 +156,56 @@ test('CLI source research proxies unified Step 1 orchestration surface', () => {
     assert.equal(parsed.stage, 'source_augmentation_result_preparation');
     assert.equal(parsed.recommended_action, 'write_source_augmentation_result');
     assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationResultFile), true);
+  } finally {
+    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
+    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
+    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
+  }
+});
+
+test('researchSource can resume from an existing canonical augmentation result file', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-resume-'));
+  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
+  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
+  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
+  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
+
+  try {
+    const staged = await researchSource({
+      workspaceRoot,
+      topicId: 'topic-research-resume',
+      title: 'resume from canonical result',
+      brief: '只有主题和关键词，但 canonical augmentation result 已经补齐。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    assert.equal(staged.stage, 'source_augmentation_result_preparation');
+    const request = readJson(staged.artifactFiles.sourceAugmentationRequestFile);
+
+    await writeSourceAugmentationResult({
+      workspaceRoot,
+      topicId: 'topic-research-resume',
+      result: buildResolvedAugmentationPayload(request),
+    });
+
+    const resumed = await researchSource({
+      workspaceRoot,
+      topicId: 'topic-research-resume',
+      title: 'resume from canonical result',
+      brief: '只有主题和关键词，但 canonical augmentation result 已经补齐。',
+      keywords: ['甲状腺', '门诊'],
+    });
+
+    assert.equal(resumed.ok, true);
+    assert.equal(resumed.stage, 'source_augmentation_execution');
+    assert.equal(resumed.planningReady, true);
+    assert.equal(resumed.execution.report.planning_ready, true);
+    assert.equal(resumed.recommended_action, 'create_deliverable');
   } finally {
     if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
     else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;

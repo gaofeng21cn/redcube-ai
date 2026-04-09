@@ -298,6 +298,14 @@ function sourceEvidenceGaps(contract) {
   return safeArray(sourceReadinessPack(contract)?.fact_library?.evidence_gaps);
 }
 
+function sourceBlockingEvidenceGaps(contract) {
+  return safeArray(sourceReadinessPack(contract)?.fact_library?.blocking_evidence_gaps);
+}
+
+function sourceResidualEvidenceGaps(contract) {
+  return safeArray(sourceReadinessPack(contract)?.fact_library?.residual_evidence_gaps);
+}
+
 function sourceTopicSummary(contract) {
   return safeText(
     sourceReadinessPack(contract)?.fact_library?.topic_summary,
@@ -403,6 +411,9 @@ function buildResearch(contract) {
     source_readiness: {
       research_positioning: 'shared_source_readiness_augmentation',
       augmentation_triggered: sourceDeepResearchState(contract) === 'required',
+      planning_ready: sourceSufficiencyStatus(contract) === 'planning_ready',
+      blocking_evidence_gaps: sourceBlockingEvidenceGaps(contract),
+      residual_evidence_gaps: sourceResidualEvidenceGaps(contract),
       trigger_signals: {
         source_missing_or_insufficient: sourceSufficiencyStatus(contract) !== 'planning_ready',
         task_requires_public_evidence: true,
@@ -415,6 +426,8 @@ function buildResearch(contract) {
       reference_source_list: references,
       public_sources: references,
       evidence_gaps: sourceEvidenceGaps(contract),
+      blocking_evidence_gaps: sourceBlockingEvidenceGaps(contract),
+      residual_evidence_gaps: sourceResidualEvidenceGaps(contract),
       forbidden_source_hit_count: Number(seed?.research?.forbidden_source_hit_count || 0),
       input_mode: sourceInputMode(contract) || 'seed_only',
       confidence: sourceConfidence(contract) || 'low',

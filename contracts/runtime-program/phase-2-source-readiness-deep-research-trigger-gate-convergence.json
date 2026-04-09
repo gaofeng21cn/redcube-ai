@@ -1,0 +1,169 @@
+{
+  "tranche_id": "phase_2_source_readiness_deep_research_trigger_gate_convergence",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "formal_entry": {
+    "repo_verified": [
+      "MCP",
+      "CLI"
+    ],
+    "controller_repo_verified": false
+  },
+  "foundations": {
+    "phase_2_source_intake_shared_source_truth_baseline": {
+      "status": "closeout_completed",
+      "commit": "a4424d2"
+    },
+    "source_readiness_mainline_reframe": {
+      "status": "completed",
+      "commit": "24f9f61"
+    },
+    "phase_2_family_source_truth_consumption_convergence": {
+      "status": "closeout_completed",
+      "commit": "e894641"
+    },
+    "phase_2_direct_delivery_lifecycle_stage_convergence": {
+      "status": "closeout_completed"
+    }
+  },
+  "object_boundary": {
+    "in_scope": [
+      "freeze Deep Research as shared Source Readiness augmentation rather than Storyline or a floating pre-stage",
+      "make planning_ready a machine-readable release gate backed by canonical source-readiness-pack plus source-audit",
+      "align source readiness trigger, gate, and durable request/result/report/readiness surfaces across CLI, MCP, runtime, governance, and family consumption",
+      "keep ppt_deck, xiaohongshu, and guarded poster_onepager on one shared source substrate while preserving family ontology differences"
+    ],
+    "out_of_scope": [
+      "controller expansion",
+      "xiaohongshu rewrite into direct-delivery",
+      "paper_poster or conference_poster academic contract advancement",
+      "new family or overlay expansion",
+      "managed web runtime migration",
+      "hidden fallback chains as main behavior",
+      "prompt patch replacing contract hydration",
+      "rewriting Deep Research as MedDeepScientist Scout plus Idea",
+      "rewriting Storyline as Research"
+    ]
+  },
+  "trigger_and_gate_surface": {
+    "research_positioning": {
+      "belongs_to": "source_readiness",
+      "not_equal_to": [
+        "storyline",
+        "meddeepscientist_scout_plus_idea",
+        "floating_pre_stage_zero"
+      ],
+      "solves": "source_insufficiency",
+      "must_not_replace": "narrative_choice"
+    },
+    "force_trigger_conditions": [
+      "input only contains topic, keywords, or rough idea",
+      "blocking evidence gaps prevent planning_ready",
+      "canonical source truth cannot support storyline or plan judgement",
+      "source-readiness-pack deep_research_state is required"
+    ],
+    "suggest_trigger_conditions": [
+      "planning_ready already holds but residual evidence gaps remain explicitly carryable",
+      "source quality notes still need strengthening without blocking planning_ready"
+    ],
+    "intake_only_conditions": [
+      "source_audit passes",
+      "source-readiness-pack planning_ready is true",
+      "blocking evidence gaps are empty"
+    ],
+    "direct_storyline_release_conditions": [
+      "planning_ready is true",
+      "blocking evidence gaps are empty",
+      "residual evidence gaps are explicitly marked carryable"
+    ],
+    "pass_condition": "source_audit.status=pass AND source_readiness_pack.readiness.planning_ready=true"
+  },
+  "durable_surface_contract": {
+    "canonical_request_surface": "topics/<topic>/canonical/source-augmentation-request.json",
+    "canonical_result_surface": "topics/<topic>/canonical/source-augmentation-result.json",
+    "canonical_report_surfaces": [
+      "topics/<topic>/canonical/source-augmentation-report.json",
+      "topics/<topic>/canonical/source-research-report.json"
+    ],
+    "canonical_readiness_surface": "topics/<topic>/canonical/source-readiness-pack.json",
+    "topic_level_owner": "canonical shared source truth",
+    "deliverable_level_follow_on_owner": "deliverable artifacts plus delivery/review contracts"
+  },
+  "governance_alignment": {
+    "required_surfaces": [
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "required_summary_fields": [
+      "source_readiness_summary.status",
+      "source_readiness_summary.planning_ready",
+      "source_readiness_summary.sufficiency_status",
+      "source_readiness_summary.deep_research_state",
+      "source_readiness_summary.blocking_evidence_gaps",
+      "gate_summary.source_planning_ready"
+    ],
+    "must_keep_honest": [
+      "source readiness cannot pass when source_audit passes but planning_ready is still false",
+      "research must stay a shared source substrate capability rather than family-specific storyline logic",
+      "xiaohongshu remains explicit human publication",
+      "poster_onepager remains guarded knowledge poster"
+    ]
+  },
+  "family_boundary": {
+    "shared_source_substrate_families": [
+      "ppt_deck",
+      "xiaohongshu",
+      "poster_onepager"
+    ],
+    "human_publication_contrast": [
+      "xiaohongshu"
+    ],
+    "guarded_poster_surface": [
+      "poster_onepager"
+    ]
+  },
+  "minimal_test_surface": {
+    "truth_freeze_tests": [
+      "tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js"
+    ],
+    "behavior_tests": [
+      "tests/source-readiness-deep-research-gate.test.js",
+      "tests/source-intake.test.js",
+      "tests/source-research.test.js",
+      "tests/deliverable-review-loop.test.js",
+      "tests/direct-delivery-operator-handoff.test.js",
+      "tests/direct-delivery-lifecycle-stage-summary.test.js",
+      "tests/phase-2-behavior-convergence.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/source-intake.test.js tests/source-research.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
+      "npm test"
+    ]
+  },
+  "closeout_evidence": {
+    "must_record": [
+      "Deep Research is frozen as shared Source Readiness augmentation instead of Storyline",
+      "planning_ready is exposed as a machine-readable gate backed by canonical source-readiness-pack",
+      "audit/watch/review/projection surfaces converge on the same source_readiness_summary and gate_summary semantics",
+      "ppt_deck, xiaohongshu, and guarded poster_onepager share the source substrate without collapsing family ontology"
+    ],
+    "must_not_claim": [
+      "controller became a formal entry",
+      "xiaohongshu became direct-delivery",
+      "academic poster contract became active",
+      "Deep Research is now MedDeepScientist Scout plus Idea"
+    ]
+  },
+  "closeout": {
+    "executed_at": "2026-04-09",
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "absorbed_to_main": true,
+    "next_tranche_candidate": null
+  }
+}

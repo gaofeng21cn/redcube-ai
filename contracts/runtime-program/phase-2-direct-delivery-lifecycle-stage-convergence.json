@@ -186,6 +186,7 @@
     "suite_result": "pass",
     "findings_recorded": 0,
     "absorbed_to_main": true,
-    "next_tranche_candidate": null
+    "next_tranche_candidate": "phase_2_source_readiness_deep_research_trigger_gate_convergence",
+    "next_tranche_kind": "ongoing_hardening_axis"
   }
 }

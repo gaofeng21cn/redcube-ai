@@ -21,6 +21,8 @@ const PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT = 'contracts/runtime-program/phas
 const PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF = 'docs/phase_2_direct_delivery_operator_handoff_hardening.md';
 const PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json';
 const PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_BRIEF = 'docs/phase_2_direct_delivery_lifecycle_stage_convergence.md';
+const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json';
+const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF = 'docs/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -69,7 +71,7 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   }
 });
 
-test('P0 truth remains passed and credible while Phase 2 direct-delivery lifecycle stage convergence is the active mainline tranche', () => {
+test('P0 truth remains passed and credible while Phase 2 source-readiness deep research trigger gate convergence is the active mainline tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
@@ -93,13 +95,13 @@ test('P0 truth remains passed and credible while Phase 2 direct-delivery lifecyc
   assert.deepEqual(currentProgram.durable_surface_contract.review_and_projection_surfaces, ['getReviewState', 'getPublicationProjection']);
   assert.deepEqual(currentProgram.durable_surface_contract.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary']);
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / direct-delivery lifecycle stage convergence');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_direct_delivery_lifecycle_stage_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / source-readiness deep research trigger gate convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.active_mainline.id, 'redcube-runtime-program');
   assert.equal(
     currentProgram.current_state.active_mainline.label,
-    'redcube-runtime-program / phase 2 direct-delivery lifecycle stage convergence',
+    'redcube-runtime-program / phase 2 source-readiness deep research trigger gate convergence',
   );
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
@@ -111,25 +113,26 @@ test('P0 truth remains passed and credible while Phase 2 direct-delivery lifecyc
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_publication_projection_delivery_contract_convergence.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_direct_delivery_operator_handoff_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_direct_delivery_lifecycle_stage_convergence.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_readiness_deep_research_trigger_gate_convergence.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_direct_delivery_lifecycle_stage_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
   assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.active_baton.review_status, 'passed');
-  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'direct_delivery_lifecycle_stage_convergence');
+  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'source_readiness_deep_research_trigger_gate_convergence');
   assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, true);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.guarded_poster_surface, ['poster_onepager']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'story_architecture', 'visual_authorship', 'delivery_packaging', 'direct_delivery_lifecycle_stage_convergence', 'review', 'export', 'gate', 'audit']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_shared_contract_surfaces, ['delivery_contract', 'operator_handoff', 'lifecycle_stage_contract']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'story_architecture', 'visual_authorship', 'delivery_packaging', 'review', 'export', 'gate', 'audit']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_shared_contract_surfaces, ['source_readiness_pack', 'source_augmentation_request', 'source_augmentation_result', 'source_augmentation_report', 'source_research_report']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.required_audit_surfaces, ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection']);
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_contract,
-    PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_CONTRACT,
+    PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_CONTRACT,
   );
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_brief,
-    PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_BRIEF,
+    PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF,
   );
   assert.equal(
     currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening.commit,
@@ -201,7 +204,7 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 
-test('P0 tracked docs keep source readiness baseline on the mainline while direct-delivery lifecycle stage convergence advances on the same mainline', () => {
+test('P0 tracked docs keep source readiness baseline on the mainline while source-readiness deep research trigger gate convergence advances on the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
@@ -211,14 +214,17 @@ test('P0 tracked docs keep source readiness baseline on the mainline while direc
   const hardeningBrief = read(PHASE_2_HARDENING_BRIEF);
   const handoffBrief = read(PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF);
   const lifecycleBrief = read(PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_BRIEF);
+  const sourceReadinessDeepResearchBrief = read(PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF);
 
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
   assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
+  assert.equal(readme.includes('source-readiness deep research trigger + gate convergence now has an absorbed tranche on the same mainline'), true);
   assert.equal(readme.includes('`program_id` is the active mainline control-plane pointer'), true);
   assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution'), true);
   assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
   assert.equal(readmeZh.includes('review / export / gate / audit hardening` 已在同一主线上吸收一条 tranche') || readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
+  assert.equal(readmeZh.includes('source-readiness deep research trigger + gate convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(readme.includes('direct-delivery operator handoff hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readme.includes('direct-delivery lifecycle stage convergence now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('direct-delivery operator handoff hardening 已在同一主线上吸收一条 tranche'), true);
@@ -226,6 +232,7 @@ test('P0 tracked docs keep source readiness baseline on the mainline while direc
   assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
   assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
+  assert.equal(runtimeArchitecture.includes('`source-readiness deep research trigger + gate convergence` 已把 `Deep Research` 冻结为 shared `Source Readiness` augmentation'), true);
   assert.equal(runtimeArchitecture.includes('`operator_handoff`'), true);
   assert.equal(runtimeArchitecture.includes('`direct-delivery lifecycle stage convergence` 已把 direct-delivery human workline 与当前 macro lifecycle 的 machine-readable bridge 收紧到同一 canonical contract surface'), true);
   assert.equal(runtimeArchitecture.includes('`program_id`'), true);
@@ -235,11 +242,13 @@ test('P0 tracked docs keep source readiness baseline on the mainline while direc
   assert.equal(runtimePolicy.includes('`run_id`'), true);
   assert.equal(runtimePolicy.includes('machine-readable `operator_handoff`'), true);
   assert.equal(runtimePolicy.includes('machine-readable `lifecycle_stage_contract` 与 `lifecycle_stage_summary`'), true);
+  assert.equal(runtimePolicy.includes('`Deep Research` 现在必须作为 shared `Source Readiness` augmentation 把 Step 1 推到 `planning_ready`'), true);
   assert.equal(runtimePolicy.includes('`topics/<topic>/deliverables/<deliverable>/reports/review-state.json`'), true);
   assert.equal(baselineBrief.includes('当前这份文档记录的是已经吸收到主线的最小 baseline'), true);
   assert.equal(hardeningBrief.includes('source_readiness_summary'), true);
   assert.equal(handoffBrief.includes('operator_handoff.owner_surface'), true);
   assert.equal(lifecycleBrief.includes('lifecycle_stage_summary'), true);
+  assert.equal(sourceReadinessDeepResearchBrief.includes('planning_ready 必须成为 machine-readable release gate'), true);
 });
 
 test('truth-freeze suites do not read ignored local tooling state directly', () => {

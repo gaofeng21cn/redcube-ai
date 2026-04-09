@@ -103,6 +103,7 @@
 如果你想更快开始，可以直接给智能代理一句话指令。
 
 `Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
+`planning_ready` 必须成为 `Source Readiness` 内部正式、可机读的放行 gate。
 
 如果你想先用一个共享正式入口，而不是自己逐步调用每个子命令，那么可以直接从 `source research` 开始。
 它就是 Step 1 的统一 orchestration surface：先执行 `source intake`，然后根据当前 route 决定是停在 canonical result staging，还是继续执行 augmentation。
@@ -119,14 +120,15 @@
 
 场景二，你只有主题，希望它先把事实材料准备好：
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。围绕主题“{{主题}}”先进入 `Source Readiness`：如果现有材料不足，就先生成 research brief、公开来源口径和待补资料清单，不要直接进入成稿；待 shared source truth 足够后，再创建 deliverable 并推进正式交付链路。若是小红书系列，请按一篇笔记一个 deliverable 建模。
+> 请把这个目录当作本次项目的独立 RedCube workspace。围绕主题“{{主题}}”先进入 `Source Readiness`：如果现有材料不足，就强制执行 `source augmentation` / `Deep Research`，直到 Step 1 到达 `planning_ready`；只有 canonical source readiness gate 放行后，才创建 deliverable 并推进正式交付链路。若是小红书系列，请按一篇笔记一个 deliverable 建模。
 
 这里有一个需要诚实说明的边界：
 
 - 当前正式稳定的是 `source intake + shared source truth`
-- `research` 目前主要是 `xiaohongshu` family 内的 `source_readiness / source augmentation` route
+- `Deep Research` 现在是共享 canonical source substrate 上的 `Source Readiness` augmentation 能力，供 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 复用
+- `planning_ready` 是 Step 1 的正式、可机读放行 gate；不能只看 `source_audit = pass`
 - 它不能被表述成已经等价于 `MedDeepScientist` 的 `Scout + Idea`
-- 更准确地说，它现在更像“在 source truth 之上的 research brief 整理层”；真正的内容策略和讲述主线，仍然从 `storyline` 开始
+- 更准确地说，它负责解决 source insufficiency 与 evidence gaps；真正的内容策略和讲述主线，仍然从 `storyline` 开始
 
 当前更适合把 `RedCube AI` 当作“面向一个独立 workspace 的运行时”，而不是把仓库本身当成内容目录。
 当前最适合的组织粒度是：
@@ -184,7 +186,7 @@
 
 如果你希望 Agent 在一个全新的目录里直接开工，可以把要求再说得更明确一些：
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 RedCube 的 canonical workspace contract 初始化；把这次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则先产出 research brief 与待补资料清单，不要直接进入成稿。随后为本次目标创建 deliverable，并按正式阶段推进审阅、重跑与导出。对于小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`，不要把整组系列混成一个 deliverable。
+> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 RedCube 的 canonical workspace contract 初始化；把这次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则继续执行 `source augment` 与 `source execute-augmentation`，把 Step 1 推到 `planning_ready`。随后为本次目标创建 deliverable，并按正式阶段推进审阅、重跑与导出。对于小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`，不要把整组系列混成一个 deliverable。
 
 ## 当前待完善的地方
 
@@ -194,6 +196,7 @@
 
 - `ppt_deck` 与 `xiaohongshu` 是当前稳定交付面；`stable deliverable manual-test-driven hardening` 已完成 closeout，并形成了 tracked stable backlog（当前无新增 findings）
 - `source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线；`CLI / MCP` 已可在同一 substrate 上水合 canonical shared source truth，并由 `ppt_deck` / `xiaohongshu` 通过共享 gateway 主线消费
+- source-readiness deep research trigger + gate convergence 已在同一主线上吸收一条 tranche：`Deep Research` 已冻结为共享 `Source Readiness` augmentation，而 `planning_ready` 现在通过 canonical `source-readiness-pack.json`、`source-augmentation-request/result/report` 与 `source-research-report` 共同收口
 - `review / export / gate / audit hardening` 已在同一主线上吸收一条 tranche；换句话说，review / export / gate / audit hardening 已在同一主线上吸收一条 tranche：`auditDeliverable` 与 `runtimeWatch` 已可暴露 canonical source readiness 与 export gate summaries
 - family source-truth consumption convergence 已在同一主线上吸收一条 tranche：`ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 已围绕同一份 hydrated `source_truth_contract` 与统一 `source_truth_consumption` summary 收口，同时 authoritative fail-closed source gate 继续留在 `auditDeliverable` / `runtimeWatch`
 - publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche：`ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 现在都通过 hydrated `delivery_contract` 对齐 topic 级 `publication-state.json`，并继续把 canonical review state 作为治理真相面
@@ -202,7 +205,7 @@
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
-- 更广的 source plane 扩展仍是同一主线上的后续 hardening
+- trigger + gate convergence 之外的 source plane 持续增强仍是同一主线上的后续 hardening
 - 与 OPL 的正式联动还在后续阶段
 
 ## 文档入口
@@ -242,7 +245,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence`、`publication projection / delivery contract convergence` 与 `direct-delivery operator handoff hardening` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 direct-delivery 五步人类工作线与当前 macro lifecycle 的 machine-readable bridge 压到 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 的同一 deliverable/topic 治理路径上，同时保持 `xiaohongshu` human publication 语义与 `ppt_deck` / `poster_onepager` direct delivery 语义分离。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening` 与 `direct-delivery lifecycle stage convergence` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 `Deep Research` 冻结为共享 `Source Readiness` augmentation，并把 `planning_ready` 压到 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 的同一 deliverable/topic 治理路径上，同时保持 `xiaohongshu` human publication 语义不被改写成 direct delivery。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -250,7 +253,7 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- 当前 active tranche 已切到 `direct-delivery lifecycle stage convergence`，但产品长线目标仍然大于这一条 absorbed tranche。
+- 当前 active tranche 已切到 `source-readiness deep research trigger gate convergence`，但产品长线目标仍然大于这一条 absorbed tranche。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。
 

@@ -8,7 +8,7 @@ import {
   getReviewState as getRuntimeReviewState,
   isBaselineApprovedState,
 } from '@redcube/runtime';
-import { getDeliverablePaths, getSourceArtifactPaths } from '@redcube/runtime-protocol';
+import { getDeliverablePaths, loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary } from '@redcube/runtime-protocol';
 
 function mergeAuditReports(reports) {
   const normalized = reports.filter(Boolean);
@@ -108,57 +108,8 @@ function loadPublicationProjection({ workspaceRoot, topicId }) {
   }
 }
 
-function normalizeList(value) {
-  return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : [];
-}
-
 function loadSourceReadinessSummary({ workspaceRoot, topicId }) {
-  if (!workspaceRoot || !topicId) {
-    return null;
-  }
-
-  const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
-  if (!existsSync(sourcePaths.sourceAuditFile)) {
-    return {
-      canonical_source: {
-        kind: 'shared_source_truth.source_audit',
-      },
-      authoritative_artifact: sourcePaths.sourceAuditFile,
-      status: 'missing',
-      completed_stages: [],
-      blocking_reasons: ['source_audit_missing'],
-      checks: {
-        source_audit_written: false,
-      },
-    };
-  }
-
-  try {
-    const sourceAudit = JSON.parse(readFileSync(sourcePaths.sourceAuditFile, 'utf-8'));
-    return {
-      canonical_source: {
-        kind: 'shared_source_truth.source_audit',
-      },
-      authoritative_artifact: sourcePaths.sourceAuditFile,
-      status: String(sourceAudit.status || '').trim() || 'unknown',
-      completed_stages: normalizeList(sourceAudit.completed_stages),
-      blocking_reasons: normalizeList(sourceAudit.blocking_reasons),
-      checks: sourceAudit.checks && typeof sourceAudit.checks === 'object' ? sourceAudit.checks : {},
-    };
-  } catch {
-    return {
-      canonical_source: {
-        kind: 'shared_source_truth.source_audit',
-      },
-      authoritative_artifact: sourcePaths.sourceAuditFile,
-      status: 'invalid',
-      completed_stages: [],
-      blocking_reasons: ['source_audit_invalid'],
-      checks: {
-        source_audit_written: true,
-      },
-    };
-  }
+  return workspaceRoot && topicId ? loadCanonicalSourceReadinessSummary(workspaceRoot, topicId) : null;
 }
 
 function buildSourceReadinessReport(summary) {
@@ -174,18 +125,20 @@ function buildSourceReadinessReport(summary) {
   if (summary.status === 'missing') {
     return {
       status: 'block',
-      issues: ['source_audit_missing'],
-      rerun_from_stage: 'intake',
-      recommended_action: 'run_source_intake',
+      issues: summary.blocking_reasons?.length > 0 ? summary.blocking_reasons : ['source_readiness_missing'],
+      rerun_from_stage: 'source_readiness',
+      recommended_action: 'run_source_research',
     };
   }
 
   if (summary.status !== 'pass') {
     return {
       status: 'block',
-      issues: summary.status === 'invalid' ? ['source_audit_invalid'] : ['source_audit_not_sufficient'],
-      rerun_from_stage: 'intake',
-      recommended_action: summary.status === 'invalid' ? 'rerun_source_intake' : 'resolve_source_blocks',
+      issues: summary.status === 'invalid'
+        ? (summary.blocking_reasons?.length > 0 ? summary.blocking_reasons : ['source_readiness_invalid'])
+        : ['source_readiness_not_planning_ready', ...(summary.blocking_evidence_gaps || [])],
+      rerun_from_stage: 'source_readiness',
+      recommended_action: 'run_source_research',
     };
   }
 
@@ -206,6 +159,13 @@ function buildGateSummary({
 }) {
   return {
     source_readiness_status: sourceReadinessSummary?.status || null,
+    source_planning_ready: sourceReadinessSummary?.planning_ready === true,
+    source_sufficiency_status: String(sourceReadinessSummary?.sufficiency_status || '').trim() || null,
+    source_deep_research_state: String(sourceReadinessSummary?.deep_research_state || '').trim() || null,
+    source_blocking_evidence_gaps: Array.isArray(sourceReadinessSummary?.blocking_evidence_gaps)
+      ? sourceReadinessSummary.blocking_evidence_gaps
+      : [],
+    source_next_required_surface: String(sourceReadinessSummary?.next_required_surface || '').trim() || null,
     review_status: String(reviewState?.current_status || '').trim() || null,
     approval_status: String(reviewState?.approval_state?.status || '').trim() || null,
     latest_review_stage: String(reviewState?.latest_review_stage || '').trim() || null,
@@ -287,9 +247,9 @@ function auditOverlaySurface({
 }
 
 export async function auditDeliverable(request) {
-  const sourceReadinessSummary = loadSourceReadinessSummary(request);
   const contract = loadHydratedContract(request);
   const reviewResponse = loadReviewState(request);
+  const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
   const reviewState = reviewResponse?.state || null;
   const publicationProjection = loadPublicationProjection(request);
   const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
@@ -327,7 +287,7 @@ export async function auditDeliverable(request) {
     review_state: reviewState,
     publication_projection: publicationProjection,
     source_readiness_summary: sourceReadinessSummary,
-    gate_summary: buildGateSummary({
+    gate_summary: reviewResponse?.gate_summary || publicationProjectionEntry?.gate_summary || buildGateSummary({
       sourceReadinessSummary,
       reviewState,
       contract,

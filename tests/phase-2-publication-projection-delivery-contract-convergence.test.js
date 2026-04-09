@@ -16,13 +16,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 publication projection delivery contract convergence stays absorbed provenance while direct-delivery lifecycle stage convergence is the active tranche', () => {
+test('phase-2 publication projection delivery contract convergence stays absorbed provenance while source-readiness deep research trigger gate convergence is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_direct_delivery_lifecycle_stage_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_direct_delivery_lifecycle_stage_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.commit, '57c9310');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.scope.hardening_axis, 'publication_projection_delivery_contract_convergence');
   assert.deepEqual(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.scope.required_shared_contract_surfaces, ['delivery_contract', 'publication_projection']);

@@ -50,6 +50,30 @@ export interface SourceArtifactPaths {
   sourceAugmentationReportFile: string;
 }
 
+export interface SourceReadinessSummary {
+  canonical_source: {
+    kind: string;
+    audit_kind: string;
+    readiness_kind: string;
+  };
+  authoritative_artifacts: {
+    source_audit: string;
+    source_readiness_pack: string;
+  };
+  status: 'pass' | 'block' | 'missing' | 'invalid';
+  readiness_target: 'planning_ready';
+  planning_ready: boolean;
+  audit_status: string;
+  sufficiency_status: string;
+  deep_research_state: string;
+  completed_stages: string[];
+  blocking_evidence_gaps: string[];
+  residual_evidence_gaps: string[];
+  blocking_reasons: string[];
+  checks: Record<string, unknown>;
+  next_required_surface: string | null;
+}
+
 export interface ValidationResult {
   ok: boolean;
   errors: string[];
@@ -82,6 +106,8 @@ export interface SourceAugmentationRequestContract {
     source_audit_status: string;
     source_sufficiency_status: string;
     deep_research_state: string;
+    blocking_evidence_gaps: string[];
+    residual_evidence_gaps: string[];
     evidence_gaps: string[];
   };
   focus: {
@@ -139,6 +165,11 @@ export interface SourceTruthConsumptionSummary {
   source_labels: string[];
   source_audit_status: string;
   source_audit_blocking_reasons: string[];
+  planning_ready: boolean;
+  sufficiency_status: string;
+  deep_research_state: string;
+  blocking_evidence_gaps: string[];
+  residual_evidence_gaps: string[];
 }
 
 export interface BuildSourceTruthConsumptionSummaryOptions {
