@@ -99,9 +99,11 @@ function buildCommonFlows(overlayCatalog) {
     overlayCatalog.overlays.map((overlay) => [
       overlay.overlay_id,
       [
-        `1. redcube deliverable create --overlay ${overlay.overlay_id} --profile-id ${overlay.default_profile_id || '<profile-id>'} ...`,
-        `2. redcube deliverable audit --overlay ${overlay.overlay_id} --mode draft_new ...`,
-        `3. redcube deliverable run --overlay ${overlay.overlay_id} --route <stage> ...`,
+        '1. redcube workspace doctor --workspace-root <dir>',
+        '2. redcube source research --workspace-root <dir> --topic-id <id> ...',
+        `3. redcube deliverable create --workspace-root <dir> --overlay ${overlay.overlay_id} --profile-id ${overlay.default_profile_id || '<profile-id>'} ...`,
+        `4. redcube deliverable audit --workspace-root <dir> --overlay ${overlay.overlay_id} --mode draft_new ...`,
+        `5. redcube deliverable run --workspace-root <dir> --overlay ${overlay.overlay_id} --route <stage> ...`,
       ],
     ]),
   );
@@ -185,6 +187,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       {
         task: '触发一次 supervisor tick 刷新托管监管面',
         command: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
+      },
+      {
+        task: '托管执行整个交付链路并查看 managed 进度',
+        command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] && redcube managed get --workspace-root <dir> --managed-run-id <id>',
       },
       {
         task: '读取交付物当前 review 状态',

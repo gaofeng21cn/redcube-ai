@@ -25,6 +25,20 @@ test('doctorWorkspace reports canonical directories and workspace file presence'
   assert.equal(result.contract.topicsDir, path.join(workspaceRoot, 'topics'));
 });
 
+test('doctorWorkspace sends brand-new workspace bootstrap through source intake instead of a missing init command', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-bootstrap-'));
+
+  const result = await doctorWorkspace({ workspaceRoot });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'workspace_doctor');
+  assert.equal(result.recommended_action, 'run_source_intake');
+  assert.equal(result.summary.workspace_file_exists, false);
+  assert.equal(result.summary.workspace_bootstrap_needed, true);
+  assert.equal(result.summary.bootstrap_via, 'source_intake');
+  assert.equal(result.contract.workspaceFile, path.join(workspaceRoot, 'redcube.workspace.json'));
+});
+
 test('listTopics returns topic metadata from canonical workspace tree', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-'));
   const topicDir = path.join(workspaceRoot, 'topics', 'topic-a');

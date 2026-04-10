@@ -231,6 +231,13 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('source research')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
+  assert.deepEqual(parsed.commonFlows.ppt_deck, [
+    '1. redcube workspace doctor --workspace-root <dir>',
+    '2. redcube source research --workspace-root <dir> --topic-id <id> ...',
+    '3. redcube deliverable create --workspace-root <dir> --overlay ppt_deck --profile-id lecture_student ...',
+    '4. redcube deliverable audit --workspace-root <dir> --overlay ppt_deck --mode draft_new ...',
+    '5. redcube deliverable run --workspace-root <dir> --overlay ppt_deck --route <stage> ...',
+  ]);
   assert.equal(parsed.commandGroups.source.includes('research'), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
   assert.equal(parsed.commandGroups.managed.includes('supervise'), true);

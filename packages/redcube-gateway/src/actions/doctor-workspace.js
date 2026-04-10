@@ -10,9 +10,11 @@ export async function doctorWorkspace({ workspaceRoot }) {
   return {
     ok: true,
     surface_kind: 'workspace_doctor',
-    recommended_action: workspaceFileExists ? 'continue' : 'initialize_workspace_contract',
+    recommended_action: workspaceFileExists ? 'continue' : 'run_source_intake',
     summary: {
       workspace_file_exists: workspaceFileExists,
+      workspace_bootstrap_needed: workspaceFileExists !== true,
+      bootstrap_via: workspaceFileExists ? null : 'source_intake',
       canonical_topics_dir: contract.topicsDir,
       canonical_runs_dir: path.join(contract.runtimeDir, 'runs'),
     },
