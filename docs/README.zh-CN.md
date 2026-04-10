@@ -21,8 +21,8 @@
 
 ## 当前主线状态
 
-当前仓库已吸收的 tranche 是 `Phase 2 / workspace operator quickstart convergence`。
-`source-readiness deep research trigger + gate convergence` 继续作为同一主线上的 absorbed provenance，而 `workspace / operator quickstart convergence` 已不再只是 next-line brief。
+当前仓库已吸收的 tranche 是 `Phase 2 / operator surface consistency hardening`。
+`workspace / operator quickstart convergence` 继续作为同一主线上的 absorbed provenance，而 `operator surface consistency hardening` 已成为当前已吸收 tranche。
 
 ## 仓库跟踪的内部操作文档
 
@@ -44,7 +44,8 @@
 - [Phase 2 source-readiness deep research trigger + gate convergence](phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
 - [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md)（future-facing 目标态文档）
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
-- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md)（当前已吸收 tranche）
+- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md)（已吸收 provenance）
+- [Phase 2 operator surface consistency hardening](phase_2_operator_surface_consistency_hardening.md)（当前已吸收 tranche）
 
 ### 面向技术协作 / Agent 执行者
 

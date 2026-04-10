@@ -25,6 +25,8 @@ const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_CONTRACT =
 const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF = 'docs/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
 const PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json';
 const PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_BRIEF = 'docs/phase_2_workspace_operator_quickstart_convergence.md';
+const PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json';
+const PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_BRIEF = 'docs/phase_2_operator_surface_consistency_hardening.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -57,6 +59,7 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   assert.equal(projectTruth.includes(PHASE_2_BASELINE_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_HARDENING_CONTRACT), true);
   assert.equal(projectTruth.includes(PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT), true);
+  assert.equal(projectTruth.includes(PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_CONTRACT), true);
   assert.equal(runtimePolicy.includes('当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
 
   for (const file of [
@@ -73,7 +76,7 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   }
 });
 
-test('P0 truth remains passed and credible while Phase 2 workspace operator quickstart convergence is the active mainline tranche', () => {
+test('P0 truth remains passed and credible while Phase 2 operator surface consistency hardening is the active mainline tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
@@ -97,13 +100,13 @@ test('P0 truth remains passed and credible while Phase 2 workspace operator quic
   assert.deepEqual(currentProgram.durable_surface_contract.review_and_projection_surfaces, ['getReviewState', 'getPublicationProjection']);
   assert.deepEqual(currentProgram.durable_surface_contract.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary']);
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / workspace operator quickstart convergence');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / operator surface consistency hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.active_mainline.id, 'redcube-runtime-program');
   assert.equal(
     currentProgram.current_state.active_mainline.label,
-    'redcube-runtime-program / phase 2 workspace operator quickstart convergence',
+    'redcube-runtime-program / phase 2 operator surface consistency hardening',
   );
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
@@ -117,26 +120,31 @@ test('P0 truth remains passed and credible while Phase 2 workspace operator quic
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_direct_delivery_lifecycle_stage_convergence.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_readiness_deep_research_trigger_gate_convergence.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_workspace_operator_quickstart_convergence.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_operator_surface_consistency_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
   assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.active_baton.review_status, 'passed');
-  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.active_baton.scope.hardening_axis, 'operator_surface_consistency_hardening');
   assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, true);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.guarded_poster_surface, ['poster_onepager']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'story_architecture', 'visual_authorship', 'delivery_packaging', 'review', 'export', 'gate', 'audit']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_shared_contract_surfaces, ['source_readiness_pack', 'source_augmentation_request', 'source_augmentation_result', 'source_augmentation_report', 'source_research_report']);
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_operator_surfaces, ['workspace doctor', 'source intake', 'source research', 'deliverable create', 'deliverable audit', 'deliverable run']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'review', 'export', 'gate', 'audit']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_operator_surfaces, ['workspace doctor', 'source intake', 'source research', 'deliverable create', 'deliverable audit', 'deliverable run', 'review watch']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.required_audit_surfaces, ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection']);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary']);
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_contract,
-    PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_CONTRACT,
+    PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_CONTRACT,
   );
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_brief,
-    PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_BRIEF,
+    PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_BRIEF,
+  );
+  assert.equal(
+    currentProgram.current_state.active_baton.artifacts.tranche_test,
+    'tests/phase-2-operator-surface-consistency-hardening.test.js',
   );
   assert.equal(
     currentProgram.current_state.completed_batons.phase_2_source_readiness_deep_research_trigger_gate_convergence.artifacts.tranche_contract,
@@ -165,6 +173,14 @@ test('P0 truth remains passed and credible while Phase 2 workspace operator quic
   assert.equal(
     currentProgram.current_state.completed_batons.phase_2_direct_delivery_operator_handoff_hardening.commit,
     '9b23a0e',
+  );
+  assert.equal(
+    currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.commit,
+    'bf2df47',
+  );
+  assert.equal(
+    currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.artifacts.tranche_contract,
+    PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_CONTRACT,
   );
 });
 
@@ -212,41 +228,46 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 
-test('P0 tracked docs keep source readiness baseline on the mainline while source-readiness deep research trigger gate convergence advances on the same mainline', () => {
+test('P0 tracked docs keep absorbed provenance and the current operator-surface tranche aligned on the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
   const runtimeArchitecture = read('docs/runtime_architecture.md');
   const runtimePolicy = read('docs/policies/runtime_operating_model.md');
+  const positioning = read('docs/domain-harness-os-positioning.md');
   const baselineBrief = read(PHASE_2_BASELINE_BRIEF);
   const hardeningBrief = read(PHASE_2_HARDENING_BRIEF);
   const handoffBrief = read(PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF);
   const lifecycleBrief = read(PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_BRIEF);
   const sourceReadinessDeepResearchBrief = read(PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF);
   const workspaceQuickstartBrief = read(PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_BRIEF);
+  const operatorSurfaceBrief = read(PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_BRIEF);
 
   assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
   assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
   assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readme.includes('source-readiness deep research trigger + gate convergence now has an absorbed tranche on the same mainline'), true);
   assert.equal(readme.includes('workspace / operator quickstart convergence now has an absorbed tranche on the same mainline'), true);
+  assert.equal(readme.includes('operator surface consistency hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readme.includes('`program_id` is the active mainline control-plane pointer'), true);
   assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution'), true);
   assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
   assert.equal(readmeZh.includes('review / export / gate / audit hardening` 已在同一主线上吸收一条 tranche') || readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(readmeZh.includes('source-readiness deep research trigger + gate convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(readmeZh.includes('workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche'), true);
+  assert.equal(readmeZh.includes('operator surface consistency hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(readme.includes('direct-delivery operator handoff hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readme.includes('direct-delivery lifecycle stage convergence now has an absorbed tranche on the same mainline'), true);
-  assert.equal(readme.includes('and the current absorbed tranche freezes `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` as one repo-verified operator quickstart route'), true);
+  assert.equal(readme.includes('and the current absorbed tranche closes operator surface consistency hardening across `workspace doctor` bootstrap guidance, command-scoped CLI help, and `CLI review watch` / `MCP runtime_watch` locator truth'), true);
   assert.equal(readmeZh.includes('direct-delivery operator handoff hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(readmeZh.includes('direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche'), true);
-  assert.equal(readmeZh.includes('当前已吸收 tranche 则把 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 冻结为同一条 repo-verified operator quickstart route'), true);
+  assert.equal(readmeZh.includes('当前已吸收 tranche 则把 `workspace doctor` bootstrap guidance、command-scoped CLI help 与 `CLI review watch` / `MCP runtime_watch` locator truth 收紧到同一条 canonical operator route 与 shared governance path'), true);
   assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
   assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
   assert.equal(runtimeArchitecture.includes('`source-readiness deep research trigger + gate convergence` 已把 `Deep Research` 冻结为 shared `Source Readiness` augmentation'), true);
-  assert.equal(runtimeArchitecture.includes('`workspace / operator quickstart convergence` 已把 brand-new / thin workspace bootstrap、CLI help surface 与 canonical operator route 收紧成同一条 repo-verified behavior surface'), true);
+  assert.equal(runtimeArchitecture.includes('`workspace / operator quickstart convergence` 已把 brand-new / thin workspace bootstrap 与 canonical operator route 收紧成同一条 repo-verified behavior surface'), true);
+  assert.equal(runtimeArchitecture.includes('`operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path'), true);
   assert.equal(runtimeArchitecture.includes('`operator_handoff`'), true);
   assert.equal(runtimeArchitecture.includes('`direct-delivery lifecycle stage convergence` 已把 direct-delivery human workline 与当前 macro lifecycle 的 machine-readable bridge 收紧到同一 canonical contract surface'), true);
   assert.equal(runtimeArchitecture.includes('`program_id`'), true);
@@ -258,6 +279,8 @@ test('P0 tracked docs keep source readiness baseline on the mainline while sourc
   assert.equal(runtimePolicy.includes('machine-readable `lifecycle_stage_contract` 与 `lifecycle_stage_summary`'), true);
   assert.equal(runtimePolicy.includes('`Deep Research` 现在必须作为 shared `Source Readiness` augmentation 把 Step 1 推到 `planning_ready`'), true);
   assert.equal(runtimePolicy.includes('`workspace / operator quickstart convergence` 已在当前主线上吸收：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface'), true);
+  assert.equal(runtimePolicy.includes('`operator surface consistency hardening` 已在当前主线上吸收'), true);
+  assert.equal(positioning.includes('当前已吸收 tranche 是 `operator surface consistency hardening`'), true);
   assert.equal(runtimePolicy.includes('`topics/<topic>/deliverables/<deliverable>/reports/review-state.json`'), true);
   assert.equal(baselineBrief.includes('当前这份文档记录的是已经吸收到主线的最小 baseline'), true);
   assert.equal(hardeningBrief.includes('source_readiness_summary'), true);
@@ -265,6 +288,7 @@ test('P0 tracked docs keep source readiness baseline on the mainline while sourc
   assert.equal(lifecycleBrief.includes('lifecycle_stage_summary'), true);
   assert.equal(sourceReadinessDeepResearchBrief.includes('planning_ready 必须成为 machine-readable release gate'), true);
   assert.equal(workspaceQuickstartBrief.includes('closeout 已完成并吸收到当前 mainline'), true);
+  assert.equal(operatorSurfaceBrief.includes('closeout 已完成并吸收到当前 mainline'), true);
 });
 
 test('truth-freeze suites do not read ignored local tooling state directly', () => {
@@ -289,6 +313,7 @@ test('truth-freeze suites do not read ignored local tooling state directly', () 
     'tests/phase-2-family-source-truth-consumption-convergence.test.js',
     'tests/phase-2-publication-projection-delivery-contract-convergence.test.js',
     'tests/phase-2-direct-delivery-operator-handoff-hardening.test.js',
+    'tests/phase-2-operator-surface-consistency-hardening.test.js',
   ]) {
     const text = read(file);
     for (const root of forbiddenRoots) {

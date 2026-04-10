@@ -1,6 +1,6 @@
 {
   "program_id": "redcube-runtime-program",
-  "date_anchor": "2026-04-09",
+  "date_anchor": "2026-04-10",
   "longrun_goal": {
     "label": "visual-deliverable domain gateway plus domain harness os longrun mainline",
     "north_star": [
@@ -112,8 +112,8 @@
       ]
     },
     "phase_id": "Phase2",
-    "phase_label": "Phase 2 / workspace operator quickstart convergence",
-    "workstream": "phase_2_workspace_operator_quickstart_convergence",
+    "phase_label": "Phase 2 / operator surface consistency hardening",
+    "workstream": "phase_2_operator_surface_consistency_hardening",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -121,7 +121,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / phase 2 workspace operator quickstart convergence",
+      "label": "redcube-runtime-program / phase 2 operator surface consistency hardening",
       "unique": true
     },
     "green_baseline": {
@@ -179,6 +179,9 @@
       },
       "phase_2_workspace_operator_quickstart_convergence": {
         "status": "closeout_completed"
+      },
+      "phase_2_operator_surface_consistency_hardening": {
+        "status": "closeout_completed"
       }
     },
     "team_mode": {
@@ -191,12 +194,12 @@
       "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
     },
     "active_baton": {
-      "id": "phase_2_workspace_operator_quickstart_convergence",
+      "id": "phase_2_operator_surface_consistency_hardening",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "hardening_axis": "workspace_operator_quickstart_convergence",
+        "hardening_axis": "operator_surface_consistency_hardening",
         "implementation_in_scope": true,
         "formal_entry": [
           "MCP",
@@ -216,20 +219,10 @@
         ],
         "runtime_planes": [
           "source_readiness",
-          "story_architecture",
-          "visual_authorship",
-          "delivery_packaging",
           "review",
           "export",
           "gate",
           "audit"
-        ],
-        "required_shared_contract_surfaces": [
-          "source_readiness_pack",
-          "source_augmentation_request",
-          "source_augmentation_result",
-          "source_augmentation_report",
-          "source_research_report"
         ],
         "required_operator_surfaces": [
           "workspace doctor",
@@ -237,7 +230,8 @@
           "source research",
           "deliverable create",
           "deliverable audit",
-          "deliverable run"
+          "deliverable run",
+          "review watch"
         ],
         "required_audit_surfaces": [
           "auditDeliverable",
@@ -245,30 +239,34 @@
           "getReviewState",
           "getPublicationProjection"
         ],
+        "required_embedded_summaries": [
+          "source_readiness_summary",
+          "gate_summary",
+          "operator_handoff",
+          "lifecycle_stage_summary"
+        ],
         "excluded_scope": [
           "controller expansion",
           "xiaohongshu rewrite into direct-delivery",
-          "paper_poster or conference_poster academic contract advancement",
+          "paper_poster or conference_poster academic poster advancement",
           "new family or overlay expansion",
           "managed web runtime migration",
           "hidden fallback chains as main behavior",
           "prompt patch replacing contract hydration",
-          "rewriting Deep Research as MedDeepScientist Scout plus Idea",
-          "rewriting Storyline as Research",
           "OPL federation integration"
         ]
       },
       "artifacts": {
-        "tranche_contract": "contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json",
-        "tranche_brief": "docs/phase_2_workspace_operator_quickstart_convergence.md",
-        "tranche_test": "tests/phase-2-workspace-operator-quickstart-convergence.test.js"
+        "tranche_contract": "contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json",
+        "tranche_brief": "docs/phase_2_operator_surface_consistency_hardening.md",
+        "tranche_test": "tests/phase-2-operator-surface-consistency-hardening.test.js"
       },
       "closeout": {
         "executed_at": "2026-04-10",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-alignment-p0.test.js tests/phase-2-workspace-operator-quickstart-convergence.test.js tests/workspace-operator-quickstart.test.js tests/public-docs-surface.test.js tests/source-intake.test.js tests/source-research.test.js tests/cli-v2-smoke.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
+          "node --test tests/runtime-alignment-p0.test.js tests/phase-2-operator-surface-consistency-hardening.test.js tests/workspace-operator-quickstart.test.js tests/cli-v2-smoke.test.js tests/gateway-actions.test.js tests/mcp-gateway.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
           "npm test"
         ],
         "suite_result": "pass",
@@ -833,6 +831,95 @@
           "next_tranche_candidate": "phase_2_workspace_operator_quickstart_convergence",
           "next_tranche_kind": "ongoing_hardening_axis"
         }
+      },
+      "phase_2_workspace_operator_quickstart_convergence": {
+        "id": "phase_2_workspace_operator_quickstart_convergence",
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "program_mode": "autonomous_longrun",
+        "scope": {
+          "hardening_axis": "workspace_operator_quickstart_convergence",
+          "implementation_in_scope": true,
+          "formal_entry": [
+            "MCP",
+            "CLI"
+          ],
+          "controller_repo_verified": false,
+          "consumer_families": [
+            "ppt_deck",
+            "xiaohongshu",
+            "poster_onepager"
+          ],
+          "human_publication_contrast": [
+            "xiaohongshu"
+          ],
+          "guarded_poster_surface": [
+            "poster_onepager"
+          ],
+          "runtime_planes": [
+            "source_readiness",
+            "story_architecture",
+            "visual_authorship",
+            "delivery_packaging",
+            "review",
+            "export",
+            "gate",
+            "audit"
+          ],
+          "required_shared_contract_surfaces": [
+            "source_readiness_pack",
+            "source_augmentation_request",
+            "source_augmentation_result",
+            "source_augmentation_report",
+            "source_research_report"
+          ],
+          "required_operator_surfaces": [
+            "workspace doctor",
+            "source intake",
+            "source research",
+            "deliverable create",
+            "deliverable audit",
+            "deliverable run"
+          ],
+          "required_audit_surfaces": [
+            "auditDeliverable",
+            "runtimeWatch",
+            "getReviewState",
+            "getPublicationProjection"
+          ],
+          "excluded_scope": [
+            "controller expansion",
+            "xiaohongshu rewrite into direct-delivery",
+            "paper_poster or conference_poster academic contract advancement",
+            "new family or overlay expansion",
+            "managed web runtime migration",
+            "hidden fallback chains as main behavior",
+            "prompt patch replacing contract hydration",
+            "rewriting Deep Research as MedDeepScientist Scout plus Idea",
+            "rewriting Storyline as Research",
+            "OPL federation integration"
+          ]
+        },
+        "artifacts": {
+          "tranche_contract": "contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json",
+          "tranche_brief": "docs/phase_2_workspace_operator_quickstart_convergence.md",
+          "tranche_test": "tests/phase-2-workspace-operator-quickstart-convergence.test.js"
+        },
+        "closeout": {
+          "executed_at": "2026-04-10",
+          "verification_commands": [
+            "git diff --check",
+            "npm run typecheck",
+            "node --test tests/runtime-alignment-p0.test.js tests/phase-2-workspace-operator-quickstart-convergence.test.js tests/workspace-operator-quickstart.test.js tests/public-docs-surface.test.js tests/source-intake.test.js tests/source-research.test.js tests/cli-v2-smoke.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
+            "npm test"
+          ],
+          "suite_result": "pass",
+          "findings_recorded": 0,
+          "absorbed_to_main": true,
+          "next_tranche_candidate": "phase_2_operator_surface_consistency_hardening",
+          "next_tranche_kind": "ongoing_hardening_axis"
+        },
+        "commit": "bf2df47"
       }
     }
   },

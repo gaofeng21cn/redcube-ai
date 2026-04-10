@@ -16,13 +16,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 family source-truth consumption convergence stays absorbed provenance while source-readiness deep research trigger gate convergence is the active tranche', () => {
+test('phase-2 family source-truth consumption convergence stays absorbed provenance while operator surface consistency hardening is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.formal_entry.controller_repo_verified, false);

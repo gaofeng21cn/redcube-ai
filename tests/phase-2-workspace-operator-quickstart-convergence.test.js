@@ -16,7 +16,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('workspace operator quickstart convergence becomes the absorbed active tranche without crossing current hard boundaries', () => {
+test('workspace operator quickstart convergence becomes absorbed provenance once operator surface consistency hardening takes the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -25,14 +25,15 @@ test('workspace operator quickstart convergence becomes the absorbed active tran
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / workspace operator quickstart convergence');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('workspace doctor'), true);
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('source research'), true);
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('deliverable run'), true);
-  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('controller expansion'), true);
-  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('xiaohongshu rewrite into direct-delivery'), true);
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / operator surface consistency hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.commit, 'bf2df47');
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('workspace doctor'), true);
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('source research'), true);
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('deliverable run'), true);
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.excluded_scope.includes('controller expansion'), true);
+  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.excluded_scope.includes('xiaohongshu rewrite into direct-delivery'), true);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_readiness_deep_research_trigger_gate_convergence.artifacts.tranche_contract, PREDECESSOR_CONTRACT);
 });
 
@@ -60,8 +61,8 @@ test('workspace operator quickstart convergence freezes brand-new or thin worksp
   assert.equal(quickstart.includes('`redcube deliverable run`'), true);
   assert.equal(readme.includes('workspace / operator quickstart convergence now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche'), true);
-  assert.equal(docsIndex.includes('Phase 2 / workspace operator quickstart convergence'), true);
-  assert.equal(docsIndexZh.includes('Phase 2 / workspace operator quickstart convergence'), true);
+  assert.equal(docsIndex.includes('phase_2_workspace_operator_quickstart_convergence.md'), true);
+  assert.equal(docsIndexZh.includes('phase_2_workspace_operator_quickstart_convergence.md'), true);
   assert.equal(docsIndex.includes('current recommended next-line brief'), false);
   assert.equal(docsIndexZh.includes('当前推荐 next-line brief'), false);
 });

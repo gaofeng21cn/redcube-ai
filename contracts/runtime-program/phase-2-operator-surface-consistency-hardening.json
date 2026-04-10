@@ -1,7 +1,7 @@
 {
   "tranche_id": "phase_2_operator_surface_consistency_hardening",
-  "status": "truth_frozen",
-  "review_status": "pending_verification",
+  "status": "closeout_completed",
+  "review_status": "passed",
   "program_mode": "autonomous_longrun",
   "formal_entry": {
     "repo_verified": [
@@ -110,6 +110,9 @@
       "git diff --check",
       "npm run typecheck",
       "npm test"
+    ],
+    "truth_freeze_tests": [
+      "tests/phase-2-operator-surface-consistency-hardening.test.js"
     ]
   },
   "closeout_evidence": {
@@ -127,10 +130,10 @@
     ]
   },
   "closeout": {
-    "executed_at": null,
-    "suite_result": null,
-    "findings_recorded": null,
-    "absorbed_to_main": false,
+    "executed_at": "2026-04-10",
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "absorbed_to_main": true,
     "next_tranche_candidate": null
   }
 }

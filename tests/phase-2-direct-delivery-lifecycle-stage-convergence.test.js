@@ -25,9 +25,9 @@ test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provena
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.next_tranche_candidate, 'phase_2_direct_delivery_lifecycle_stage_convergence');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / workspace operator quickstart convergence');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / operator surface consistency hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_direct_delivery_lifecycle_stage_convergence.scope.hardening_axis, 'direct_delivery_lifecycle_stage_convergence');
   assert.deepEqual(
     currentProgram.durable_surface_contract.required_embedded_summaries,

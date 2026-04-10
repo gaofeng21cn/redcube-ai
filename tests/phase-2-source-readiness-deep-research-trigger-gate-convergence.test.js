@@ -17,7 +17,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('source-readiness deep research trigger+gate convergence stays absorbed provenance while quickstart becomes the active tranche', () => {
+test('source-readiness deep research trigger+gate convergence stays absorbed provenance while operator surface consistency hardening becomes the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -26,9 +26,9 @@ test('source-readiness deep research trigger+gate convergence stays absorbed pro
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / workspace operator quickstart convergence');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / operator surface consistency hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_readiness_deep_research_trigger_gate_convergence.artifacts.tranche_contract, TRANCHE_CONTRACT);
   assert.equal(currentProgram.current_state.active_baton.scope.runtime_planes.includes('source_readiness'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('xiaohongshu'), true);

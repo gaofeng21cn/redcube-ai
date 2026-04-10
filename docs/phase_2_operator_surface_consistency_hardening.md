@@ -1,14 +1,18 @@
 # Phase 2 Operator Surface Consistency Hardening
 
+## 当前状态
+
+本 tranche closeout 已完成并吸收到当前 mainline。当前仓库正式口径是：`workspace doctor` 继续保持诊断角色，command-scoped CLI help 必须 machine-readable 且 `--help` 不执行真实命令，`CLI review watch` / `MCP runtime_watch` 围绕同一 `runtimeWatch` governance truth 收口。
+
 ## 冻结目的
 
-这条 same-mainline slice 不再讨论“要不要继续做 workspace/operator quickstart”，而是收紧已经吸收的 quickstart surface，修掉当前 repo 里仍可观察到的 operator-facing 漂移：
+这条 same-mainline slice 不再讨论“要不要继续做 workspace/operator quickstart”，而是收紧已经吸收的 quickstart surface，修掉冻结时当前 repo 里仍可观察到的 operator-facing 漂移：
 
 - `workspace doctor` 的 brand-new workspace 推荐动作仍残留过时的 `initialize_workspace_contract` 语义影子，而实际 canonical bootstrap writer 已经是 `source intake / source research`
 - `CLI` 顶层 `help` 已存在，但关键子命令上的 `--help` 仍会直接执行命令并返回运行结果或 usage error，而不是稳定的 machine-readable command help
 - `CLI review watch` 与 `MCP runtime_watch` 仍未完全围绕同一 `workspace/topic/deliverable/run` locator 收口
 
-## 当前冻结结论
+## 吸收结论
 
 - `workspace doctor` 继续只做**诊断**；当 workspace 还是 brand-new 时，它必须把 operator 明确引向 `source intake` 或 `source research`，而不是指向不存在的 init 命令
 - `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 仍是当前 canonical operator route

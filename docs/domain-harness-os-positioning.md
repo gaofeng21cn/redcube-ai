@@ -70,8 +70,9 @@
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
 - `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
-- `review / export / gate / audit` hardening 与 `family source-truth consumption convergence` 均已吸收为前置 provenance；当前 absorbed tranche 则把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state
-- authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；当前 absorbed tranche 已把 direct-delivery `operator_handoff` 收紧到同一 canonical governance path，而更深层 source-plane 扩展仍属于同一主线上的持续增强
+- `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence` 与 `workspace / operator quickstart convergence` 都已吸收为同一主线 provenance
+- 当前已吸收 tranche 是 `operator surface consistency hardening`：`workspace doctor` 对 brand-new workspace 只暴露 `source intake` / `source research` bootstrap guidance；command-scoped CLI help 现在 machine-readable 且 `--help` 不执行真实命令；`CLI review watch` 与 `MCP runtime_watch` 围绕同一 `workspace/topic/deliverable/run` locator 收口到 `runtimeWatch`
+- authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 
 ## 5. 未来托管 runtime 形态
