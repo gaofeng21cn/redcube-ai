@@ -65,6 +65,8 @@ export function createRunRecord(input = {}) {
     scope,
     target,
     overlay,
+    topic_id: toNullableString(input.topicId),
+    deliverable_id: toNullableString(input.deliverableId),
     status: 'running',
     started_at: null,
     finished_at: null,

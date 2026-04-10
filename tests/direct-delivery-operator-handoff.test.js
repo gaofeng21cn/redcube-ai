@@ -59,6 +59,8 @@ test('direct-delivery families expose one aligned operator_handoff summary acros
     deliverableId: 'deck-a',
     run: {
       run_id: 'run-deck-a-001',
+      topic_id: 'topic-a',
+      deliverable_id: 'deck-a',
       overlay: 'ppt_deck',
       current_stage: 'export_pptx',
       status: 'completed',

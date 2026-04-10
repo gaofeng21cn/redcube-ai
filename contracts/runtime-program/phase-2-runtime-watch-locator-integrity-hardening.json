@@ -1,0 +1,108 @@
+{
+  "tranche_id": "phase_2_runtime_watch_locator_integrity_hardening",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "formal_entry": {
+    "repo_verified": [
+      "MCP",
+      "CLI"
+    ],
+    "controller_repo_verified": false
+  },
+  "foundations": {
+    "phase_2_operator_surface_consistency_hardening": {
+      "status": "closeout_completed",
+      "commit": "ee9a7c1"
+    },
+    "phase_2_workspace_operator_quickstart_convergence": {
+      "status": "closeout_completed",
+      "commit": "bf2df47"
+    }
+  },
+  "object_boundary": {
+    "in_scope": [
+      "persist topic_id and deliverable_id on deliverable-scope run records so runtime watch can verify the canonical workspace/topic/deliverable/run quartet instead of trusting an implicit convention",
+      "make runtimeWatch fail closed when a persisted or preloaded run does not match the requested topic_id and deliverable_id",
+      "keep CLI review watch and MCP runtime_watch on the same fail-closed quartet locator truth as the shared runtimeWatch gateway action",
+      "keep auditDeliverable, runtimeWatch, getReviewState, and getPublicationProjection aligned on the same governance summaries while tightening run-boundary identity integrity"
+    ],
+    "out_of_scope": [
+      "controller expansion",
+      "new family or overlay expansion",
+      "xiaohongshu rewrite into direct-delivery",
+      "paper_poster or conference_poster academic poster advancement",
+      "managed web runtime migration",
+      "OPL federation integration",
+      "hidden fallback chains as main behavior",
+      "prompt patch replacing contract hydration"
+    ]
+  },
+  "run_locator_integrity_surface": {
+    "authoritative_surface": "runtimeWatch",
+    "producer_surfaces": [
+      "runDeliverableRoute",
+      "startRun",
+      "createRunRecord"
+    ],
+    "canonical_locator_fields": [
+      "workspaceRoot",
+      "topicId",
+      "deliverableId",
+      "runId"
+    ],
+    "required_run_record_fields": [
+      "topic_id",
+      "deliverable_id"
+    ],
+    "persisted_run_rule": "when workspaceRoot/topicId/deliverableId/runId are supplied, the loaded run must carry matching topic_id and deliverable_id or runtimeWatch fails closed",
+    "preloaded_run_rule": "run remains an explicit in-process input, but when combined with workspaceRoot/topicId/deliverableId it must also carry matching topic_id and deliverable_id",
+    "deliverable_watch_without_run_rule": "when workspaceRoot/topicId/deliverableId are supplied without runId or run, runtimeWatch remains a deliverable-level review watch surface and does not require run identity fields",
+    "cli_surface": "redcube review watch",
+    "mcp_tool": "runtime_watch",
+    "shared_gateway_action": "runtimeWatch"
+  },
+  "minimal_test_surface": {
+    "truth_freeze_tests": [
+      "tests/phase-2-runtime-watch-locator-integrity-hardening.test.js"
+    ],
+    "behavior_tests": [
+      "tests/runtime-protocol-workspace.test.js",
+      "tests/runtime-deliverable-route.test.js",
+      "tests/deliverable-review-loop.test.js",
+      "tests/cli-v2-smoke.test.js",
+      "tests/mcp-gateway.test.js",
+      "tests/phase-2-behavior-convergence.test.js",
+      "tests/source-readiness-deep-research-gate.test.js",
+      "tests/direct-delivery-operator-handoff.test.js",
+      "tests/direct-delivery-lifecycle-stage-summary.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/runtime-protocol-workspace.test.js tests/runtime-deliverable-route.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js tests/mcp-gateway.test.js tests/phase-2-behavior-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js",
+      "npm test"
+    ]
+  },
+  "closeout_evidence": {
+    "must_record": [
+      "deliverable-scope run records now persist topic_id and deliverable_id as durable identity fields",
+      "runtimeWatch fails closed when the requested quartet locator does not match the persisted or preloaded run identity",
+      "CLI review watch and MCP runtime_watch expose the same fail-closed mismatch behavior through runtimeWatch",
+      "audit/watch/review/projection surfaces remain aligned on source_readiness_summary, gate_summary, operator_handoff, and lifecycle_stage_summary while the run-boundary locator becomes machine-verifiable"
+    ],
+    "must_not_claim": [
+      "controller became a public formal entry",
+      "xiaohongshu became direct-delivery",
+      "academic poster contract became active",
+      "managed web runtime migration is now current repo truth"
+    ]
+  },
+  "closeout": {
+    "executed_at": "2026-04-10",
+    "suite_result": "pass",
+    "findings_recorded": 0,
+    "absorbed_to_main": true,
+    "next_tranche_candidate": null
+  }
+}

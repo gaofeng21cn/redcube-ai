@@ -162,6 +162,8 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
   assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
   assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(result.run.topic_id, 'topic-a');
+  assert.equal(result.run.deliverable_id, 'deck-a');
   assert.equal(result.run.status, 'completed');
   assert.equal(result.events.length >= 2, true);
 
@@ -169,6 +171,8 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(stored.surface_kind, 'run_record');
   assert.equal(stored.recommended_action, 'review_runtime_state');
   assert.equal(stored.summary.run_id, result.run.run_id);
+  assert.equal(stored.run.topic_id, 'topic-a');
+  assert.equal(stored.run.deliverable_id, 'deck-a');
   assert.equal(stored.run.executor.adapter, 'host_agent');
   assert.equal(stored.run.executor.execution_surface, 'codex_native_host_agent');
   assert.equal(stored.run.executor.execution_model.mainline_adapter, 'host_agent');

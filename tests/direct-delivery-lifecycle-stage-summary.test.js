@@ -59,6 +59,8 @@ test('direct-delivery families expose one aligned lifecycle_stage_summary across
     deliverableId: 'deck-a',
     run: {
       run_id: 'run-deck-a-001',
+      topic_id: 'topic-a',
+      deliverable_id: 'deck-a',
       overlay: 'ppt_deck',
       current_stage: 'export_pptx',
       status: 'completed',
@@ -118,6 +120,8 @@ test('human-publication family keeps explicit publish gate and does not expose d
     deliverableId: 'note-a',
     run: {
       run_id: 'run-note-a-001',
+      topic_id: 'topic-a',
+      deliverable_id: 'note-a',
       overlay: 'xiaohongshu',
       current_stage: 'export_bundle',
       status: 'completed',

@@ -19,12 +19,12 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 activation package freeze remains a machine-readable completed predecessor after operator surface consistency hardening advanced the same mainline', () => {
+test('phase-2 activation package freeze remains a machine-readable completed predecessor after runtime watch locator integrity hardening advanced the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(ACTIVATION_CONTRACT);
   const completed = currentProgram.current_state.completed_batons.phase_2_activation_package_freeze;
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, HARDENING_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');

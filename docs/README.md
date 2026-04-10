@@ -21,8 +21,8 @@ This index along with the repository home forms the default GitHub-facing biling
 
 ## Current Mainline Status
 
-The current absorbed tranche is `Phase 2 / operator surface consistency hardening`.
-`workspace / operator quickstart convergence` remains absorbed provenance on the same mainline, while `operator surface consistency hardening` is now the current absorbed tranche.
+The current absorbed tranche is `Phase 2 / runtime watch locator integrity hardening`.
+`operator surface consistency hardening` remains absorbed provenance on the same mainline, while `runtime watch locator integrity hardening` is now the current absorbed tranche.
 
 ## Repo-Tracked Internal Operator Docs
 
@@ -45,7 +45,8 @@ The current absorbed tranche is `Phase 2 / operator surface consistency hardenin
 - [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md) (future-facing design target, Chinese only)
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md) (future-facing design target, Chinese only)
 - [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md) (absorbed provenance, Chinese only)
-- [Phase 2 operator surface consistency hardening](phase_2_operator_surface_consistency_hardening.md) (current absorbed tranche, Chinese only)
+- [Phase 2 operator surface consistency hardening](phase_2_operator_surface_consistency_hardening.md) (absorbed provenance, Chinese only)
+- [Phase 2 runtime watch locator integrity hardening](phase_2_runtime_watch_locator_integrity_hardening.md) (current absorbed tranche, Chinese only)
 
 ### For technical collaborators / agent executors
 

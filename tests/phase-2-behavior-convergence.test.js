@@ -69,6 +69,8 @@ test('audit, watch, review, and projection surfaces stay behavior-aligned on the
     deliverableId: 'note-a',
     run: {
       run_id: 'run-note-a-001',
+      topic_id: 'topic-a',
+      deliverable_id: 'note-a',
       overlay: 'xiaohongshu',
       current_stage: 'publish_copy',
       status: 'publish_ready',

@@ -98,6 +98,8 @@ test('planning_ready gate converges across audit/watch/review/projection after s
     deliverableId: 'note-a',
     run: {
       run_id: 'run-note-a-001',
+      topic_id: 'topic-a',
+      deliverable_id: 'note-a',
       overlay: 'xiaohongshu',
       current_stage: 'source_readiness',
       status: 'completed',

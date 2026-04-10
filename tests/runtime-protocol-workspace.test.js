@@ -49,6 +49,8 @@ test('createRunRecord creates a stable minimal run envelope', () => {
     scope: 'topic',
     target: 'topic-a',
     overlay: 'xiaohongshu',
+    topic_id: null,
+    deliverable_id: null,
     status: 'running',
     started_at: null,
     finished_at: null,

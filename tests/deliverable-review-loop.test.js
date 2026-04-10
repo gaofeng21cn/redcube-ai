@@ -430,6 +430,105 @@ test('runtimeWatch can load a persisted run from the canonical workspace/topic/d
   assert.equal(report.run_telemetry.run_id, runResult.run.run_id);
 });
 
+test('runtimeWatch keeps deliverable-level review watch available when no run locator is provided', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-deliverable-only-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '肠癌 AI 讲课 deck',
+    goal: '给学生讲清肠癌 AI 的问题、方法与边界',
+  });
+
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route,
+    });
+    assert.equal(result.ok, true, route);
+  }
+
+  const blocked = await applyReviewMutation({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    mutation: {
+      type: 'request_changes',
+      actor: 'human',
+      review_stage: 'screenshot_review',
+      rerun_from_stage: 'render_html',
+      issues: ['visual_peak_missing'],
+      notes: '关键页视觉峰值不够',
+    },
+  });
+  assert.equal(blocked.state.current_status, 'blocked_for_revision');
+
+  const watch = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+  });
+
+  assert.equal(watch.ok, true);
+  assert.equal(watch.status, 'review_pending');
+  assert.equal(watch.review_state.current_status, 'blocked_for_revision');
+  assert.equal(watch.review_state.rerun_from_stage, 'render_html');
+});
+
+test('runtimeWatch rejects a persisted run when topic locator does not match the run identity', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-mismatch-'));
+
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: 'topic a source',
+    brief: 'topic a',
+    keywords: ['topic-a'],
+  });
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-b',
+    title: 'topic b source',
+    brief: 'topic b',
+    keywords: ['topic-b'],
+  });
+  for (const topicId of ['topic-a', 'topic-b']) {
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'defense_deck',
+      topicId,
+      deliverableId: 'deck-a',
+      title: `deck ${topicId}`,
+      goal: `goal ${topicId}`,
+    });
+  }
+
+  const runResult = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    route: 'storyline',
+  });
+
+  await assert.rejects(
+    () => runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-b',
+      deliverableId: 'deck-a',
+      runId: runResult.run.run_id,
+    }),
+    /runtimeWatch topicId 与 run\.topic_id 不一致/,
+  );
+});
+
 test('runtimeWatch exposes export bundle obligations from hydrated contract', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
 
@@ -449,6 +548,8 @@ test('runtimeWatch exposes export bundle obligations from hydrated contract', as
     deliverableId: 'deck-a',
     run: {
       run_id: 'run-1',
+      topic_id: 'topic-a',
+      deliverable_id: 'deck-a',
       current_stage: 'export_pptx',
       status: 'blocked',
       pending_reviews: ['backup_qa_ready'],
@@ -462,6 +563,77 @@ test('runtimeWatch exposes export bundle obligations from hydrated contract', as
   assert.equal(report.delivery_contract.required_export_bundle_id, 'defense_deck_bundle');
   assert.equal(report.required_export_bundle.bundle_id, 'defense_deck_bundle');
   assert.equal(report.required_export_bundle.include_backup_slides, true);
+});
+
+test('runtimeWatch rejects a preloaded run when deliverable locator does not match the run identity', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-preloaded-mismatch-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'defense_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: 'deck a',
+    goal: 'goal a',
+  });
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'defense_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-b',
+    title: 'deck b',
+    goal: 'goal b',
+  });
+
+  await assert.rejects(
+    () => runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-b',
+      run: {
+        run_id: 'run-1',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+        current_stage: 'export_pptx',
+        status: 'blocked',
+        pending_reviews: ['backup_qa_ready'],
+        resumable: true,
+      },
+    }),
+    /runtimeWatch deliverableId 与 run\.deliverable_id 不一致/,
+  );
+});
+
+test('runtimeWatch rejects a preloaded run without topic and deliverable identity under a workspace locator', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-preloaded-missing-'));
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'defense_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: 'deck a',
+    goal: 'goal a',
+  });
+
+  await assert.rejects(
+    () => runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      run: {
+        run_id: 'run-1',
+        current_stage: 'export_pptx',
+        status: 'blocked',
+        pending_reviews: ['backup_qa_ready'],
+        resumable: true,
+      },
+    }),
+    /runtimeWatch run\.topic_id 与 run\.deliverable_id 不能为空/,
+  );
 });
 
 test('runtimeWatch exposes source readiness summary and gate summary from canonical source audit plus export contract', async () => {
@@ -490,6 +662,8 @@ test('runtimeWatch exposes source readiness summary and gate summary from canoni
     deliverableId: 'deck-a',
     run: {
       run_id: 'run-1',
+      topic_id: 'topic-a',
+      deliverable_id: 'deck-a',
       current_stage: 'export_pptx',
       status: 'blocked',
       pending_reviews: ['backup_qa_ready'],
@@ -536,6 +710,8 @@ test('runtimeWatch exposes publication projection separately from canonical revi
     deliverableId: 'note-a',
     run: {
       run_id: 'run-1',
+      topic_id: 'topic-a',
+      deliverable_id: 'note-a',
       current_stage: 'publish_copy',
       status: 'completed',
       pending_reviews: [],
@@ -571,6 +747,8 @@ test('runtimeWatch exposes poster-specific metric extension surface separately f
     deliverableId: 'poster-a',
     run: {
       run_id: 'run-poster-1',
+      topic_id: 'topic-a',
+      deliverable_id: 'poster-a',
       current_stage: 'visual_direction',
       status: 'running',
       pending_reviews: [],

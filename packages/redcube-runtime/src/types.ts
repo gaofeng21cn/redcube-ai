@@ -11,6 +11,8 @@ export interface RuntimeRunRecord {
   scope: string;
   target: string;
   overlay: string;
+  topic_id: string | null;
+  deliverable_id: string | null;
   status: string;
   started_at: string | null;
   finished_at: string | null;
@@ -315,6 +317,8 @@ export interface RuntimeStartRunRequest {
   overlay: string;
   scope?: string;
   target: string;
+  topicId?: string | null;
+  deliverableId?: string | null;
   managedRunId?: string | null;
   baselineDeliverableId?: string;
   executor: Record<string, unknown>;

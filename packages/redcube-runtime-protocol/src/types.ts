@@ -188,6 +188,8 @@ export interface CreateRunRecordInput {
   scope?: string;
   target?: string;
   overlay?: string;
+  topicId?: string | null;
+  deliverableId?: string | null;
   rerunCount?: number;
   previousRunId?: string | null;
   sourceStage?: string | null;
@@ -235,6 +237,8 @@ export interface RunRecord {
   scope: string;
   target: string;
   overlay: string;
+  topic_id: string | null;
+  deliverable_id: string | null;
   status: 'running' | 'completed' | 'failed';
   started_at: string | null;
   finished_at: string | null;

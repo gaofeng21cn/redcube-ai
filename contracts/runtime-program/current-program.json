@@ -112,8 +112,8 @@
       ]
     },
     "phase_id": "Phase2",
-    "phase_label": "Phase 2 / operator surface consistency hardening",
-    "workstream": "phase_2_operator_surface_consistency_hardening",
+    "phase_label": "Phase 2 / runtime watch locator integrity hardening",
+    "workstream": "phase_2_runtime_watch_locator_integrity_hardening",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -121,7 +121,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / phase 2 operator surface consistency hardening",
+      "label": "redcube-runtime-program / phase 2 runtime watch locator integrity hardening",
       "unique": true
     },
     "green_baseline": {
@@ -182,6 +182,9 @@
       },
       "phase_2_operator_surface_consistency_hardening": {
         "status": "closeout_completed"
+      },
+      "phase_2_runtime_watch_locator_integrity_hardening": {
+        "status": "closeout_completed"
       }
     },
     "team_mode": {
@@ -194,12 +197,12 @@
       "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
     },
     "active_baton": {
-      "id": "phase_2_operator_surface_consistency_hardening",
+      "id": "phase_2_runtime_watch_locator_integrity_hardening",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "hardening_axis": "operator_surface_consistency_hardening",
+        "hardening_axis": "runtime_watch_locator_integrity_hardening",
         "implementation_in_scope": true,
         "formal_entry": [
           "MCP",
@@ -225,13 +228,12 @@
           "audit"
         ],
         "required_operator_surfaces": [
-          "workspace doctor",
-          "source intake",
-          "source research",
-          "deliverable create",
-          "deliverable audit",
           "deliverable run",
-          "review watch"
+          "review watch",
+          "runs get"
+        ],
+        "required_mcp_surfaces": [
+          "runtime_watch"
         ],
         "required_audit_surfaces": [
           "auditDeliverable",
@@ -239,11 +241,15 @@
           "getReviewState",
           "getPublicationProjection"
         ],
-        "required_embedded_summaries": [
-          "source_readiness_summary",
-          "gate_summary",
-          "operator_handoff",
-          "lifecycle_stage_summary"
+        "required_locator_fields": [
+          "workspaceRoot",
+          "topicId",
+          "deliverableId",
+          "runId"
+        ],
+        "required_run_record_fields": [
+          "topic_id",
+          "deliverable_id"
         ],
         "excluded_scope": [
           "controller expansion",
@@ -257,16 +263,16 @@
         ]
       },
       "artifacts": {
-        "tranche_contract": "contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json",
-        "tranche_brief": "docs/phase_2_operator_surface_consistency_hardening.md",
-        "tranche_test": "tests/phase-2-operator-surface-consistency-hardening.test.js"
+        "tranche_contract": "contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json",
+        "tranche_brief": "docs/phase_2_runtime_watch_locator_integrity_hardening.md",
+        "tranche_test": "tests/phase-2-runtime-watch-locator-integrity-hardening.test.js"
       },
       "closeout": {
         "executed_at": "2026-04-10",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-alignment-p0.test.js tests/phase-2-operator-surface-consistency-hardening.test.js tests/workspace-operator-quickstart.test.js tests/cli-v2-smoke.test.js tests/gateway-actions.test.js tests/mcp-gateway.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
+          "node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/runtime-protocol-workspace.test.js tests/runtime-deliverable-route.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js tests/mcp-gateway.test.js tests/phase-2-behavior-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js",
           "npm test"
         ],
         "suite_result": "pass",
@@ -920,6 +926,90 @@
           "next_tranche_kind": "ongoing_hardening_axis"
         },
         "commit": "bf2df47"
+      },
+      "phase_2_operator_surface_consistency_hardening": {
+        "id": "phase_2_operator_surface_consistency_hardening",
+        "status": "closeout_completed",
+        "review_status": "passed",
+        "program_mode": "autonomous_longrun",
+        "scope": {
+          "hardening_axis": "operator_surface_consistency_hardening",
+          "implementation_in_scope": true,
+          "formal_entry": [
+            "MCP",
+            "CLI"
+          ],
+          "controller_repo_verified": false,
+          "consumer_families": [
+            "ppt_deck",
+            "xiaohongshu",
+            "poster_onepager"
+          ],
+          "human_publication_contrast": [
+            "xiaohongshu"
+          ],
+          "guarded_poster_surface": [
+            "poster_onepager"
+          ],
+          "runtime_planes": [
+            "source_readiness",
+            "review",
+            "export",
+            "gate",
+            "audit"
+          ],
+          "required_operator_surfaces": [
+            "workspace doctor",
+            "source intake",
+            "source research",
+            "deliverable create",
+            "deliverable audit",
+            "deliverable run",
+            "review watch"
+          ],
+          "required_audit_surfaces": [
+            "auditDeliverable",
+            "runtimeWatch",
+            "getReviewState",
+            "getPublicationProjection"
+          ],
+          "required_embedded_summaries": [
+            "source_readiness_summary",
+            "gate_summary",
+            "operator_handoff",
+            "lifecycle_stage_summary"
+          ],
+          "excluded_scope": [
+            "controller expansion",
+            "xiaohongshu rewrite into direct-delivery",
+            "paper_poster or conference_poster academic poster advancement",
+            "new family or overlay expansion",
+            "managed web runtime migration",
+            "hidden fallback chains as main behavior",
+            "prompt patch replacing contract hydration",
+            "OPL federation integration"
+          ]
+        },
+        "artifacts": {
+          "tranche_contract": "contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json",
+          "tranche_brief": "docs/phase_2_operator_surface_consistency_hardening.md",
+          "tranche_test": "tests/phase-2-operator-surface-consistency-hardening.test.js"
+        },
+        "closeout": {
+          "executed_at": "2026-04-10",
+          "verification_commands": [
+            "git diff --check",
+            "npm run typecheck",
+            "node --test tests/runtime-alignment-p0.test.js tests/phase-2-operator-surface-consistency-hardening.test.js tests/workspace-operator-quickstart.test.js tests/cli-v2-smoke.test.js tests/gateway-actions.test.js tests/mcp-gateway.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
+            "npm test"
+          ],
+          "suite_result": "pass",
+          "findings_recorded": 0,
+          "absorbed_to_main": true,
+          "next_tranche_candidate": "phase_2_runtime_watch_locator_integrity_hardening",
+          "next_tranche_kind": "ongoing_hardening_axis"
+        },
+        "commit": "ee9a7c1"
       }
     }
   },

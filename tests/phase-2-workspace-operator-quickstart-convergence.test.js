@@ -16,7 +16,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('workspace operator quickstart convergence becomes absorbed provenance once operator surface consistency hardening takes the active tranche', () => {
+test('workspace operator quickstart convergence stays absorbed provenance while runtime watch locator integrity hardening takes the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -25,9 +25,9 @@ test('workspace operator quickstart convergence becomes absorbed provenance once
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / operator surface consistency hardening');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / runtime watch locator integrity hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.commit, 'bf2df47');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('workspace doctor'), true);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('source research'), true);

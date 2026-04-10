@@ -72,6 +72,8 @@ export async function runDeliverableRoute({
     route: safeRoute,
     overlay,
     target: deliverableId,
+    topicId,
+    deliverableId,
     managedRunId,
     executor: {
       adapter: executor.adapter,

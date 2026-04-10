@@ -16,6 +16,7 @@ import {
 import {
   createDeliverable,
   intakeSource,
+  runDeliverableRoute,
   runManagedDeliverable,
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
@@ -665,6 +666,78 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
     assert.equal(result.structuredContent.status, 'review_pending');
     assert.equal(result.structuredContent.current_stage, 'storyline');
     assert.deepEqual(result.structuredContent.pending_reviews, ['render_review']);
+  } finally {
+    await transport.close();
+  }
+});
+
+test('stdio MCP server rejects runtime_watch when the topic locator does not match the persisted run identity', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-watch-mismatch-'));
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: 'topic a source',
+    brief: 'topic a',
+    keywords: ['topic-a'],
+  });
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-b',
+    title: 'topic b source',
+    brief: 'topic b',
+    keywords: ['topic-b'],
+  });
+  for (const topicId of ['topic-a', 'topic-b']) {
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId,
+      deliverableId: 'deck-a',
+      title: `deck ${topicId}`,
+      goal: `goal ${topicId}`,
+    });
+  }
+  const runResult = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    route: 'storyline',
+  });
+
+  const serverPath = fileURLToPath(
+    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+  );
+  const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: repoRoot,
+    stderr: 'pipe',
+  });
+  const client = new Client({
+    name: 'redcube-mcp-test-client',
+    version: '0.1.0',
+  });
+
+  await client.connect(transport);
+
+  try {
+    const result = await client.callTool({
+      name: 'runtime_watch',
+      arguments: {
+        workspaceRoot,
+        topicId: 'topic-b',
+        deliverableId: 'deck-a',
+        runId: runResult.run.run_id,
+      },
+    });
+
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /runtimeWatch topicId 与 run\.topic_id 不一致/);
+    assert.equal(result.structuredContent.ok, false);
+    assert.equal(result.structuredContent.error_kind, 'gateway_tool_error');
   } finally {
     await transport.close();
   }

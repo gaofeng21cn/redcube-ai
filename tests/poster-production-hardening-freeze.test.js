@@ -65,13 +65,13 @@ test('poster freeze contract states that future academic poster surface cannot r
   assert.equal(poster.future_academic_poster_constraints.cannot_reuse_formal_mainline_strategy, 'slot_hydration_only');
 });
 
-test('current tracked program truth keeps poster freeze historical while operator surface consistency hardening stays on the same auto-only mainline', () => {
+test('current tracked program truth keeps poster freeze historical while runtime watch locator integrity hardening stays on the same auto-only mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_operator_surface_consistency_hardening');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'review', 'export', 'gate', 'audit']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);

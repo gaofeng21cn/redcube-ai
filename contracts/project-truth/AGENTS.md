@@ -42,6 +42,7 @@ They must not be reinterpreted as the whole current product identity by themselv
 - `contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json`
 - `contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json`
 - `contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json`
+- `contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json`
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 

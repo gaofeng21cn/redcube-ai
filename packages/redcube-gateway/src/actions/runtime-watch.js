@@ -32,8 +32,38 @@ function resolveRun(request) {
   return {};
 }
 
+function validateResolvedRunLocator(request, resolvedRun) {
+  const workspaceRoot = String(request?.workspaceRoot || '').trim();
+  const topicId = String(request?.topicId || '').trim();
+  const deliverableId = String(request?.deliverableId || '').trim();
+  const hasExplicitRun = Boolean(
+    String(request?.runId || '').trim()
+    || (request?.run && typeof request.run === 'object'),
+  );
+
+  if (!workspaceRoot || !topicId || !deliverableId || !hasExplicitRun) {
+    return;
+  }
+
+  const runTopicId = String(resolvedRun?.topic_id || '').trim();
+  const runDeliverableId = String(resolvedRun?.deliverable_id || '').trim();
+
+  if (!runTopicId || !runDeliverableId) {
+    throw new Error('runtimeWatch run.topic_id 与 run.deliverable_id 不能为空');
+  }
+
+  if (runTopicId !== topicId) {
+    throw new Error('runtimeWatch topicId 与 run.topic_id 不一致');
+  }
+
+  if (runDeliverableId !== deliverableId) {
+    throw new Error('runtimeWatch deliverableId 与 run.deliverable_id 不一致');
+  }
+}
+
 export async function runtimeWatch(request) {
   const resolvedRun = resolveRun(request);
+  validateResolvedRunLocator(request, resolvedRun);
   const response = await watchRuntimeReviewLoop({
     ...request,
     run: resolvedRun,
