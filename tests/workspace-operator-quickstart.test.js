@@ -42,6 +42,7 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
 
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable execute')), true);
+  assert.equal(parsed.commonTasks.filter((item) => item.command.includes('deliverable execute')).length, 1);
   assert.deepEqual(parsed.commonFlows.ppt_deck, [
     '1. redcube workspace doctor --workspace-root <dir>',
     '2. redcube source research --workspace-root <dir> --topic-id <id> ...',
@@ -49,6 +50,29 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
     '4. redcube deliverable audit --workspace-root <dir> --overlay ppt_deck --mode draft_new ...',
     '5. redcube deliverable run --workspace-root <dir> --overlay ppt_deck --route <stage> ...',
   ]);
+  assert.deepEqual(parsed.operatorQuickstart.canonicalRoute, [
+    'workspace doctor',
+    'source intake / source research',
+    'deliverable create',
+    'deliverable audit',
+    'deliverable run',
+  ]);
+  assert.deepEqual(parsed.operatorQuickstart.entryVariants.providedMaterials, [
+    'workspace doctor',
+    'source intake',
+    'deliverable create',
+    'deliverable audit',
+    'deliverable run',
+  ]);
+  assert.deepEqual(parsed.operatorQuickstart.entryVariants.topicOnlyOrThinWorkspace, [
+    'workspace doctor',
+    'source research',
+    'deliverable create',
+    'deliverable audit',
+    'deliverable run',
+  ]);
+  assert.equal(parsed.operatorQuickstart.doctorRole, 'diagnostic_only');
+  assert.equal(parsed.operatorQuickstart.step1Gate, 'planning_ready');
   assert.equal(typeof parsed.usage.deliverableRun, 'string');
   assert.equal(typeof parsed.usage.deliverableExecute, 'string');
 });
@@ -87,9 +111,10 @@ test('brand-new workspace quickstart converges doctor -> source research -> crea
 
   const doctor = runCli(['workspace', 'doctor', '--workspace-root', workspaceRoot]);
   assert.equal(doctor.recommended_action, 'run_source_intake');
+  assert.deepEqual(doctor.recommended_actions, ['run_source_intake', 'run_source_research']);
   assert.equal(doctor.workspaceFileExists, false);
   assert.equal(doctor.summary.workspace_bootstrap_needed, true);
-  assert.equal(doctor.summary.bootstrap_via, 'source_intake');
+  assert.deepEqual(doctor.summary.bootstrap_via, ['source_intake', 'source_research']);
 
   const research = runCli(
     ['source', 'research', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--title', '甲状腺门诊科普', '--brief', '给本科生准备一份可讲授的甲状腺门诊科普材料。', '--keywords', '甲状腺,门诊,科普', '--payload-file', payloadFile],

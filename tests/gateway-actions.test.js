@@ -33,9 +33,10 @@ test('doctorWorkspace sends brand-new workspace bootstrap through source intake 
   assert.equal(result.ok, true);
   assert.equal(result.surface_kind, 'workspace_doctor');
   assert.equal(result.recommended_action, 'run_source_intake');
+  assert.deepEqual(result.recommended_actions, ['run_source_intake', 'run_source_research']);
   assert.equal(result.summary.workspace_file_exists, false);
   assert.equal(result.summary.workspace_bootstrap_needed, true);
-  assert.equal(result.summary.bootstrap_via, 'source_intake');
+  assert.deepEqual(result.summary.bootstrap_via, ['source_intake', 'source_research']);
   assert.equal(result.contract.workspaceFile, path.join(workspaceRoot, 'redcube.workspace.json'));
 });
 

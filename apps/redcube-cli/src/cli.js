@@ -112,6 +112,100 @@ function buildCommonFlows(overlayCatalog) {
   );
 }
 
+function buildOperatorQuickstart() {
+  return {
+    canonicalRoute: [
+      'workspace doctor',
+      'source intake / source research',
+      'deliverable create',
+      'deliverable audit',
+      'deliverable run',
+    ],
+    entryVariants: {
+      providedMaterials: [
+        'workspace doctor',
+        'source intake',
+        'deliverable create',
+        'deliverable audit',
+        'deliverable run',
+      ],
+      topicOnlyOrThinWorkspace: [
+        'workspace doctor',
+        'source research',
+        'deliverable create',
+        'deliverable audit',
+        'deliverable run',
+      ],
+    },
+    doctorRole: 'diagnostic_only',
+    step1Gate: 'planning_ready',
+  };
+}
+
+
+function buildCommandHelp(commandKey) {
+  const operatorQuickstart = buildOperatorQuickstart();
+  const catalog = {
+    'workspace doctor': {
+      summary: '诊断 workspace 合同与 canonical 目录，并把 brand-new workspace 引向 Source Readiness bootstrap writers。',
+      usage: 'redcube workspace doctor --workspace-root <dir>',
+      gateway_action: 'doctorWorkspace',
+      boundary_fields: ['workspaceRoot'],
+    },
+    'source intake': {
+      summary: '把 brief / keywords / source files 水合成 shared source truth。',
+      usage: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+      gateway_action: 'intakeSource',
+      boundary_fields: ['workspaceRoot', 'topicId'],
+    },
+    'source research': {
+      summary: '用一条正式链路把 Step 1 Source Readiness / Deep Research 推进到 planning_ready 或 canonical result staging。',
+      usage: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--payload-file /abs/result.json]',
+      gateway_action: 'researchSource',
+      boundary_fields: ['workspaceRoot', 'topicId'],
+    },
+    'deliverable create': {
+      summary: '在 topic 下创建 canonical deliverable 合同与 surface files。',
+      usage: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
+      gateway_action: 'createDeliverable',
+      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
+    },
+    'deliverable audit': {
+      summary: '在进入更高成本 route 前执行 fail-closed audit gate。',
+      usage: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
+      gateway_action: 'auditDeliverable',
+      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
+    },
+    'deliverable run': {
+      summary: '按 hydrated contract 执行单个 deliverable route。',
+      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+      gateway_action: 'runDeliverableRoute',
+      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
+    },
+    'review watch': {
+      summary: '围绕 workspace/topic/deliverable/run locator 读取 canonical runtime watch surface。',
+      usage: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
+      gateway_action: 'runtimeWatch',
+      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId', 'runId'],
+    },
+  };
+  const entry = catalog[commandKey];
+  if (!entry) {
+    return null;
+  }
+  return {
+    ok: true,
+    surface_kind: 'command_help',
+    command: commandKey,
+    summary: entry.summary,
+    usage: entry.usage,
+    gateway_action: entry.gateway_action,
+    boundary_fields: entry.boundary_fields,
+    canonical_operator_route: operatorQuickstart.canonicalRoute,
+    operator_quickstart: operatorQuickstart,
+  };
+}
+
 export function getCliGatewayActions(overrides = {}) {
   return {
     ...DEFAULT_GATEWAY_ACTIONS,
@@ -205,6 +299,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       },
     ],
     commonFlows: buildCommonFlows(overlayCatalog),
+    operatorQuickstart: buildOperatorQuickstart(),
     commandGroups: {
       workspace: ['doctor'],
       topics: ['list'],
@@ -272,6 +367,13 @@ export async function executeCli(argv, deps = {}) {
 
   if (!command || command === 'help' || command === '--help') {
     return buildHelp(gateway);
+  }
+
+  if (options.help === true) {
+    const commandHelp = buildCommandHelp([command, subcommand].filter(Boolean).join(' '));
+    if (commandHelp) {
+      return commandHelp;
+    }
   }
 
   if (command === 'workspace') {
@@ -461,15 +563,11 @@ export async function executeCli(argv, deps = {}) {
     }
 
     if (subcommand === 'watch') {
-      const runState = await gateway.getRun({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        runId: options.runId || '',
-      });
       return gateway.runtimeWatch({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
-        run: runState.run || {},
+        runId: options.runId || '',
       });
     }
 

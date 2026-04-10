@@ -248,6 +248,76 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.match(parsed.usage.reviewMutate, /promote_baseline/);
 });
 
+
+test('CLI subcommand --help returns machine-readable command help without executing the route', () => {
+  const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+  const expectedRoute = [
+    'workspace doctor',
+    'source intake / source research',
+    'deliverable create',
+    'deliverable audit',
+    'deliverable run',
+  ];
+  const cases = [
+    {
+      args: ['workspace', 'doctor', '--help'],
+      command: 'workspace doctor',
+      gatewayAction: 'doctorWorkspace',
+      usageIncludes: '--workspace-root <dir>',
+    },
+    {
+      args: ['source', 'intake', '--help'],
+      command: 'source intake',
+      gatewayAction: 'intakeSource',
+      usageIncludes: '--topic-id <id>',
+    },
+    {
+      args: ['source', 'research', '--help'],
+      command: 'source research',
+      gatewayAction: 'researchSource',
+      usageIncludes: '--payload-file /abs/result.json',
+    },
+    {
+      args: ['deliverable', 'create', '--help'],
+      command: 'deliverable create',
+      gatewayAction: 'createDeliverable',
+      usageIncludes: '--deliverable-id <id>',
+    },
+    {
+      args: ['deliverable', 'audit', '--help'],
+      command: 'deliverable audit',
+      gatewayAction: 'auditDeliverable',
+      usageIncludes: '--mode <draft_new|optimize_existing>',
+    },
+    {
+      args: ['deliverable', 'run', '--help'],
+      command: 'deliverable run',
+      gatewayAction: 'runDeliverableRoute',
+      usageIncludes: '--route <stage>',
+    },
+    {
+      args: ['review', 'watch', '--help'],
+      command: 'review watch',
+      gatewayAction: 'runtimeWatch',
+      usageIncludes: '--run-id <id>',
+    },
+  ];
+
+  for (const item of cases) {
+    const output = execFileSync('node', [cliPath, ...item.args], {
+      encoding: 'utf-8',
+      cwd: path.resolve('.'),
+    });
+    const parsed = JSON.parse(output);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.surface_kind, 'command_help');
+    assert.equal(parsed.command, item.command);
+    assert.equal(parsed.gateway_action, item.gatewayAction);
+    assert.equal(parsed.usage.includes(item.usageIncludes), true);
+    assert.deepEqual(parsed.canonical_operator_route, expectedRoute);
+  }
+});
+
 test('CLI profile list exposes registry-driven overlay catalog from isolated install', () => {
   const { cliPath, installRoot } = createIsolatedCliInstall();
 

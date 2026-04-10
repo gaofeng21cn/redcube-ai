@@ -10,6 +10,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 import {
   callGatewayTool,
+  getToolDefinitions,
   listGatewayTools,
 } from '../apps/redcube-mcp/src/server.js';
 import {
@@ -49,6 +50,23 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'runtime_watch',
     ],
   );
+});
+
+
+test('MCP tool definitions keep runtime_watch on the same run-boundary locator truth as CLI review watch', () => {
+  const definitions = getToolDefinitions();
+  const watch = definitions.find((tool) => tool.name === 'runtime_watch');
+  const review = definitions.find((tool) => tool.name === 'get_review_state');
+  const projection = definitions.find((tool) => tool.name === 'get_publication_projection');
+  const intake = definitions.find((tool) => tool.name === 'intake_source');
+  const research = definitions.find((tool) => tool.name === 'source_research');
+
+  assert.equal(intake?.description.includes('bootstrap writer'), true);
+  assert.equal(research?.description.includes('planning_ready'), true);
+  assert.equal(review?.description.includes('deliverable boundary'), true);
+  assert.equal(projection?.description.includes('topic boundary'), true);
+  assert.equal(watch?.description.includes('run boundary'), true);
+  assert.equal(Object.hasOwn(watch?.inputSchema || {}, 'runId'), true);
 });
 
 test('callGatewayTool delegates to injected gateway action', async () => {
@@ -828,6 +846,19 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
 
     assert.equal(runState.structuredContent.run.status, 'completed');
     assert.equal(runState.structuredContent.run.current_stage, 'detailed_outline');
+
+    const watch = await client.callTool({
+      name: 'runtime_watch',
+      arguments: {
+        workspaceRoot,
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        runId: runResult.structuredContent.run.run_id,
+      },
+    });
+
+    assert.equal(watch.structuredContent.run_id, runResult.structuredContent.run.run_id);
+    assert.equal(watch.structuredContent.current_stage, 'detailed_outline');
   } finally {
     await transport.close();
   }

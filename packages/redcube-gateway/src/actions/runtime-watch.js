@@ -1,4 +1,4 @@
-import { watchRuntimeReviewLoop } from '@redcube/runtime';
+import { loadRun, watchRuntimeReviewLoop } from '@redcube/runtime';
 import {
   buildApprovalThroughputSummary,
   buildCostSummary,
@@ -9,13 +9,40 @@ import {
   buildRunTelemetrySummary,
 } from './ops-eval-summary.js';
 
+function resolveRun(request) {
+  const providedRun = request?.run && typeof request.run === 'object' ? request.run : null;
+  const providedRunId = String(request?.runId || '').trim();
+  const runRecordId = String(providedRun?.run_id || '').trim();
+
+  if (providedRun && providedRunId && runRecordId && runRecordId !== providedRunId) {
+    throw new Error('runtimeWatch runId 与 run.run_id 不一致');
+  }
+
+  if (providedRun) {
+    return providedRun;
+  }
+
+  if (request?.workspaceRoot && providedRunId) {
+    return loadRun({
+      workspaceRoot: request.workspaceRoot,
+      runId: providedRunId,
+    });
+  }
+
+  return {};
+}
+
 export async function runtimeWatch(request) {
-  const response = await watchRuntimeReviewLoop(request);
+  const resolvedRun = resolveRun(request);
+  const response = await watchRuntimeReviewLoop({
+    ...request,
+    run: resolvedRun,
+  });
   const runSource = {
-    ...(request?.run || {}),
-    telemetry: request?.run?.telemetry || null,
-    error_kind: request?.run?.error_kind ?? null,
-    rerun_linkage: request?.run?.rerun_linkage || null,
+    ...resolvedRun,
+    telemetry: resolvedRun?.telemetry || null,
+    error_kind: resolvedRun?.error_kind ?? null,
+    rerun_linkage: resolvedRun?.rerun_linkage || null,
   };
   return {
     ...response,
@@ -35,7 +62,7 @@ export async function runtimeWatch(request) {
       reviewState: response?.review_state,
     }),
     metric_extensions: buildMetricExtensions({
-      overlay: response?.review_state?.overlay || request?.overlay || request?.run?.overlay || null,
+      overlay: response?.review_state?.overlay || request?.overlay || resolvedRun?.overlay || null,
       profileId: response?.profile_id || null,
     }),
   };

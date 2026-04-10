@@ -58,7 +58,7 @@ export const DEFAULT_GATEWAY_ACTIONS = {
 export const TOOL_DEFINITIONS = [
   {
     name: 'doctor',
-    description: 'Inspect workspace contract and canonical directories.',
+    description: 'Inspect workspace contract and canonical directories on the diagnostic workspace surface.',
     actionKey: 'doctorWorkspace',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
@@ -80,7 +80,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'intake_source',
-    description: 'Hydrate brief / keywords / source files into canonical shared source artifacts.',
+    description: 'Hydrate brief / keywords / source files into canonical shared source artifacts as the direct bootstrap writer.',
     actionKey: 'intakeSource',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
@@ -94,7 +94,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'source_research',
-    description: 'Run the formal Source Readiness / Deep Research orchestration surface from intake through augmentation or canonical result staging.',
+    description: 'Run the formal Source Readiness / Deep Research orchestration surface from intake through augmentation or canonical result staging until planning_ready or explicit staging.',
     actionKey: 'researchSource',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
@@ -174,7 +174,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'get_publication_projection',
-    description: 'Read topic-level publication projection rebuilt from canonical publish truth.',
+    description: 'Read topic boundary publication projection rebuilt from canonical publish truth.',
     actionKey: 'getPublicationProjection',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
@@ -264,7 +264,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'get_review_state',
-    description: 'Read the platform-level review state for one deliverable.',
+    description: 'Read the deliverable boundary review state for one hydrated deliverable.',
     actionKey: 'getReviewState',
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
@@ -285,13 +285,14 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'runtime_watch',
-    description: 'Summarize current runtime review-loop status from a run envelope.',
+    description: 'Summarize the run boundary runtime review-loop status from a canonical workspace/topic/deliverable/run locator or a provided run envelope.',
     actionKey: 'runtimeWatch',
     inputSchema: {
       workspaceRoot: z.string().optional().describe('Absolute workspace root path when loading hydrated contract from disk.'),
       topicId: z.string().optional().describe('Topic identifier when loading hydrated contract from disk.'),
       deliverableId: z.string().optional().describe('Deliverable identifier when loading hydrated contract from disk.'),
-      run: z.object({}).passthrough().describe('Run envelope to inspect.'),
+      runId: z.string().optional().describe('Run identifier on the canonical run boundary.'),
+      run: z.object({}).passthrough().optional().describe('Preloaded run envelope to inspect when already resolved in-process.'),
     },
   },
 ];

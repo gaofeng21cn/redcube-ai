@@ -388,6 +388,48 @@ test('runtimeWatch reports pending review loop state', async () => {
   assert.equal(report.approval_throughput_summary.pending_review_count, 1);
 });
 
+
+test('runtimeWatch can load a persisted run from the canonical workspace/topic/deliverable/run locator', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-'));
+
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '正式答辩 deck source',
+    brief: '答辩 deck 需要清晰展示问题、方法、结果与答辩防守要点。',
+    keywords: ['答辩', '结果', '问题'],
+  });
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'defense_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '正式答辩 deck',
+    goal: '用于正式答辩并覆盖潜在质询',
+  });
+
+  const runResult = await runDeliverableRoute({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    route: 'storyline',
+  });
+
+  const report = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    runId: runResult.run.run_id,
+  });
+
+  assert.equal(report.ok, true);
+  assert.equal(report.run_id, runResult.run.run_id);
+  assert.equal(report.current_stage, 'storyline');
+  assert.equal(report.run_telemetry.run_id, runResult.run.run_id);
+});
+
 test('runtimeWatch exposes export bundle obligations from hydrated contract', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
 
