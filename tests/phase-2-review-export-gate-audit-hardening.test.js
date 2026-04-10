@@ -21,8 +21,8 @@ test('phase-2 review/export/gate/audit hardening stays absorbed provenance while
   const contract = readJson(HARDENING_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');

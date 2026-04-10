@@ -175,10 +175,11 @@
 因此，针对新目录的推荐调用顺序是：
 
 1. `redcube workspace doctor`
-2. `redcube source intake`
-3. `redcube deliverable create`
-4. `redcube deliverable audit`
-5. `redcube deliverable run`
+2. `redcube source intake`（材料已足够时）
+3. `redcube source research`（材料薄或只有主题时）
+4. `redcube deliverable create`
+5. `redcube deliverable audit`
+6. `redcube deliverable run`
 
 你可以直接把下面这段话发给智能代理：
 
@@ -186,7 +187,7 @@
 
 如果你希望 Agent 在一个全新的目录里直接开工，可以把要求再说得更明确一些：
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 RedCube 的 canonical workspace contract 初始化；把这次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则继续执行 `source augment` 与 `source execute-augmentation`，把 Step 1 推到 `planning_ready`。随后为本次目标创建 deliverable，并按正式阶段推进审阅、重跑与导出。对于小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`，不要把整组系列混成一个 deliverable。
+> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先把 `workspace doctor` 当作诊断步骤，再由 `source intake` 或 `source research` 正式写入 canonical workspace contract；把这次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则继续执行 `source augment` 与 `source execute-augmentation`，把 Step 1 推到 `planning_ready`。随后为本次目标创建 deliverable，并按正式阶段推进审阅、重跑与导出。对于小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`，不要把整组系列混成一个 deliverable。
 
 ## 当前待完善的地方
 
@@ -202,6 +203,7 @@
 - publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche：`ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 现在都通过 hydrated `delivery_contract` 对齐 topic 级 `publication-state.json`，并继续把 canonical review state 作为治理真相面
 - direct-delivery operator handoff hardening 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `operator_handoff`，而 `xiaohongshu` 继续保持显式 human publication
 - direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `lifecycle_stage_contract` 与对齐后的 `lifecycle_stage_summary`，同时 `Storyline + Plan` 继续映射到 `Story Architecture`，`operator_handoff / closeout` 继续留在 `Delivery`
+- workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，而不再依赖单独的 workspace-init 产品表面
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
@@ -245,7 +247,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening` 与 `direct-delivery lifecycle stage convergence` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 `Deep Research` 冻结为共享 `Source Readiness` augmentation，并把 `planning_ready` 压到 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 的同一 deliverable/topic 治理路径上，同时保持 `xiaohongshu` human publication 语义不被改写成 direct delivery。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence` 与 `source-readiness deep research trigger + gate convergence` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 冻结为同一条 repo-verified operator quickstart route，并继续保持 `planning_ready` 与共享治理表面对齐，同时不把 `xiaohongshu` 的 human publication 语义改写成 direct delivery。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：

@@ -155,7 +155,7 @@
 
 ## 新目录如何开始
 
-当前虽然没有单独的 `workspace init` 命令，但对一个全新的空目录，第一次执行 `source intake` 时，`RedCube AI` 已经会自动补齐基础结构：
+当前仍没有单独的 `workspace init` 命令。`workspace doctor` 只负责诊断当前 workspace contract 是否存在；当目录是全新或很薄的 workspace 时，应由 `source intake` 或 `source research` 正式补齐 canonical bootstrap。第一次执行这些 Source Readiness surface 时，`RedCube AI` 已经会自动补齐基础结构：
 
 - `redcube.workspace.json`
 - `topics/<topic-id>/inputs/`
@@ -170,10 +170,11 @@
 因此，推荐把新项目的标准调用顺序固定为：
 
 1. `redcube workspace doctor`
-2. `redcube source intake`
-3. `redcube deliverable create`
-4. `redcube deliverable audit`
-5. `redcube deliverable run`
+2. `redcube source intake`（材料已足够时）
+3. `redcube source research`（材料薄或只有主题时）
+4. `redcube deliverable create`
+5. `redcube deliverable audit`
+6. `redcube deliverable run`
 
 ## Research 当前状态
 
@@ -201,7 +202,7 @@
 
 如果你希望后续只告诉 Codex“在这个目录里调用 RedCube AI 开始工作”，建议把要求说成下面这种形式：
 
-> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先按 canonical workspace contract 初始化。把本次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则继续执行 `source augment` 与 `source execute-augmentation`，把 Step 1 推到 `planning_ready`。随后为本次目标创建 deliverable，并按正式阶段推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
+> 请把这个目录当作本次项目的独立 RedCube workspace。若缺少 `redcube.workspace.json`，先把 `workspace doctor` 当作诊断步骤，再由 `source intake` 或 `source research` 正式补齐 canonical workspace contract。把本次项目理解为 `1 个 workspace`、`1 个 topic` 与若干 `deliverable`。请先执行 `workspace doctor`，再执行 `source intake` 水合 shared source truth；若源材料不足，则继续执行 `source augment` 与 `source execute-augmentation`，把 Step 1 推到 `planning_ready`。随后为本次目标创建 deliverable，并按正式阶段推进 review、rerun 与 export。若是小红书系列，请把每篇笔记建成独立 deliverable，例如 `note-01`、`note-02`。
 
 ## 你可以直接发给 Agent 的话
 

@@ -343,7 +343,7 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
       getDeliverable: async () => ({
         ok: true,
         surface_kind: 'deliverable_record',
-        recommended_action: 'run_managed_deliverable',
+        recommended_action: 'audit_deliverable',
         summary: { deliverable_id: 'deck-a' },
         deliverable: { deliverable_id: 'deck-a' },
       }),
@@ -370,7 +370,7 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
   );
 
   assert.equal(deliverable.surface_kind, 'deliverable_record');
-  assert.equal(deliverable.recommended_action, 'run_managed_deliverable');
+  assert.equal(deliverable.recommended_action, 'audit_deliverable');
   assert.equal(routeRun.surface_kind, 'route_run');
   assert.equal(routeRun.summary.route, 'storyline');
 });

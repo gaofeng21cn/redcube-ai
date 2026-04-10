@@ -21,8 +21,8 @@ test('phase-2 family source-truth consumption convergence stays absorbed provena
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.formal_entry.controller_repo_verified, false);

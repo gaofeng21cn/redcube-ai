@@ -194,7 +194,7 @@ test('auditDeliverable passes when hydrated ppt deck surface exists and baseline
   assert.equal(report.status, 'pass');
   assert.deepEqual(report.issues, []);
   assert.equal(report.rerun_from_stage, null);
-  assert.equal(report.recommended_action, 'continue');
+  assert.equal(report.recommended_action, 'run_deliverable_route');
   assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
   assert.equal(report.gate_summary?.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(report.gate_summary?.approval_required, false);

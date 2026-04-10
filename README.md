@@ -176,10 +176,11 @@ Important boundary:
 So the recommended startup order for a fresh directory is:
 
 1. `redcube workspace doctor`
-2. `redcube source intake`
-3. `redcube deliverable create`
-4. `redcube deliverable audit`
-5. `redcube deliverable run`
+2. `redcube source intake` (when the supplied materials are already sufficient)
+3. `redcube source research` (when the workspace is thin or only the topic is known)
+4. `redcube deliverable create`
+5. `redcube deliverable audit`
+6. `redcube deliverable run`
 
 You can give your agent an instruction like this:
 
@@ -187,7 +188,7 @@ You can give your agent an instruction like this:
 
 If you want your agent to start directly from a brand-new directory, you can make the instruction more explicit:
 
-> Treat this directory as the isolated RedCube workspace for this project. If `redcube.workspace.json` is missing, initialize the workspace using RedCube's canonical workspace contract. Model this project as `1 workspace`, `1 topic`, and one or more `deliverables`. Run `workspace doctor` first, then `source intake` to hydrate shared source truth; if the source set is still insufficient, continue through `source augment` and `source execute-augmentation` until Step 1 reaches `planning_ready`. Then create the target deliverable and move it through the formal review, rerun, and export stages. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`, instead of mixing the whole series into one deliverable.
+> Treat this directory as the isolated RedCube workspace for this project. If `redcube.workspace.json` is missing, treat `workspace doctor` as the diagnostic step and let `source intake` or `source research` write the canonical workspace contract. Model this project as `1 workspace`, `1 topic`, and one or more `deliverables`. Run `workspace doctor` first, then `source intake` to hydrate shared source truth; if the source set is still insufficient, continue through `source augment` and `source execute-augmentation` until Step 1 reaches `planning_ready`. Then create the target deliverable and move it through the formal review, rerun, and export stages. For a serialized Xiaohongshu project, create one deliverable per note, for example `note-01`, `note-02`, instead of mixing the whole series into one deliverable.
 
 ## Current Limits
 
@@ -204,6 +205,7 @@ The main unfinished areas are:
 - publication projection / delivery contract convergence now has an absorbed tranche on the same mainline: `delivery_contract` is now hydrated across `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`, while `publication-state.json` aligns topic-level projection entries to hydrated delivery contracts plus canonical review state
 - direct-delivery operator handoff hardening now has an absorbed tranche on the same mainline: `ppt_deck` and guarded `poster_onepager` now expose one machine-readable `operator_handoff` surface while `xiaohongshu` remains explicit human publication
 - direct-delivery lifecycle stage convergence now has an absorbed tranche on the same mainline: `ppt_deck` and guarded `poster_onepager` now expose one machine-readable `lifecycle_stage_contract` plus one aligned `lifecycle_stage_summary`, while `Storyline + Plan` remain mapped to `Story Architecture` and `operator_handoff / closeout` remains inside `Delivery`
+- workspace / operator quickstart convergence now has an absorbed tranche on the same mainline: brand-new or thin workspaces now converge on one repo-verified route from `workspace doctor` through `source intake / source research`, `deliverable create`, `deliverable audit`, and `deliverable run` without inventing a separate workspace-init product surface
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
@@ -247,7 +249,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening`, `family source-truth consumption convergence`, `publication projection / delivery contract convergence`, `direct-delivery operator handoff hardening`, and `direct-delivery lifecycle stage convergence` remain absorbed provenance; and the current absorbed tranche freezes `Deep Research` as shared `Source Readiness` augmentation while converging `planning_ready` onto `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` without rewriting `xiaohongshu` into direct delivery.
+- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening`, `family source-truth consumption convergence`, `publication projection / delivery contract convergence`, `direct-delivery operator handoff hardening`, `direct-delivery lifecycle stage convergence`, and `source-readiness deep research trigger + gate convergence` remain absorbed provenance; and the current absorbed tranche freezes `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` as one repo-verified operator quickstart route while keeping `planning_ready` and the shared governance surfaces aligned without rewriting `xiaohongshu` into direct delivery.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:

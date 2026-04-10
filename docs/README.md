@@ -19,6 +19,11 @@ It stays aligned with the product truth: `RedCube AI` is the visual-deliverable 
 
 This index along with the repository home forms the default GitHub-facing bilingual surface. Any document meant for external readers must land on this surface with mirrored English and Chinese variants.
 
+## Current Mainline Status
+
+The current absorbed tranche is `Phase 2 / workspace operator quickstart convergence`.
+`source-readiness deep research trigger + gate convergence` remains absorbed provenance on the same mainline, while `workspace / operator quickstart convergence` is now the current absorbed quickstart tranche rather than a next-line brief.
+
 ## Repo-Tracked Internal Operator Docs
 
 ### For human operators
@@ -39,7 +44,7 @@ This index along with the repository home forms the default GitHub-facing biling
 - [Phase 2 source-readiness deep research trigger + gate convergence](phase_2_source_readiness_deep_research_trigger_gate_convergence.md) (Chinese only)
 - [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md) (future-facing design target, Chinese only)
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md) (future-facing design target, Chinese only)
-- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md) (current recommended next-line brief, Chinese only)
+- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md) (current absorbed tranche, Chinese only)
 
 ### For technical collaborators / agent executors
 

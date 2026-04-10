@@ -20,7 +20,7 @@ test('phase-2 minimum baseline contract remains absorbed provenance behind the c
   const contract = readJson(BASELINE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');

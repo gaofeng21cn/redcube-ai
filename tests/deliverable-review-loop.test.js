@@ -86,6 +86,7 @@ test('auditDeliverable passes with canonical source readiness and returns source
   });
 
   assert.equal(report.status, 'pass');
+  assert.equal(report.recommended_action, 'run_deliverable_route');
   assert.equal(report.source_readiness_summary?.status, 'pass');
   assert.equal(report.source_readiness_summary?.blocking_reasons?.length, 0);
 });

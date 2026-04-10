@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { existsSync } from 'node:fs';
 
 import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
@@ -13,7 +14,7 @@ export async function doctorWorkspace({ workspaceRoot }) {
     summary: {
       workspace_file_exists: workspaceFileExists,
       canonical_topics_dir: contract.topicsDir,
-      canonical_runs_dir: contract.runsDir,
+      canonical_runs_dir: path.join(contract.runtimeDir, 'runs'),
     },
     workspaceRoot: contract.workspaceRoot,
     workspaceFileExists,

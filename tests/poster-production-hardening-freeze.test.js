@@ -71,7 +71,7 @@ test('current tracked program truth keeps poster freeze historical while source-
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
   assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.workstream, 'phase_2_workspace_operator_quickstart_convergence');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.deepEqual(currentProgram.current_state.active_baton.scope.runtime_planes, ['source_readiness', 'story_architecture', 'visual_authorship', 'delivery_packaging', 'review', 'export', 'gate', 'audit']);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);

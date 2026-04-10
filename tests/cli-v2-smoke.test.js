@@ -230,6 +230,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review projection')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('source research')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
   assert.equal(parsed.commandGroups.source.includes('research'), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
   assert.equal(parsed.commandGroups.managed.includes('supervise'), true);
@@ -383,7 +384,7 @@ test('CLI deliverable get returns operator-facing deliverable record surface', (
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'deliverable_record');
-  assert.equal(parsed.recommended_action, 'run_managed_deliverable');
+  assert.equal(parsed.recommended_action, 'audit_deliverable');
   assert.equal(parsed.summary.deliverable_id, 'deck-a');
 });
 

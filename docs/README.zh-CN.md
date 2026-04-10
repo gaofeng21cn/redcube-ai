@@ -19,6 +19,11 @@
 
 这份索引和仓库首页共同构成默认的 GitHub 双语对外面。任何面向公众的详细文档都应出现在这里，并配套中英文版本。
 
+## 当前主线状态
+
+当前仓库已吸收的 tranche 是 `Phase 2 / workspace operator quickstart convergence`。
+`source-readiness deep research trigger + gate convergence` 继续作为同一主线上的 absorbed provenance，而 `workspace / operator quickstart convergence` 已不再只是 next-line brief。
+
 ## 仓库跟踪的内部操作文档
 
 ### 面向人类操作同事
@@ -39,7 +44,7 @@
 - [Phase 2 source-readiness deep research trigger + gate convergence](phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
 - [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md)（future-facing 目标态文档）
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
-- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md)（当前推荐 next-line brief）
+- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md)（当前已吸收 tranche）
 
 ### 面向技术协作 / Agent 执行者
 

@@ -28,7 +28,7 @@ test('stable deliverable manual-test contract remains the completed foundation b
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
   assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_source_readiness_deep_research_trigger_gate_convergence');
+  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_workspace_operator_quickstart_convergence');
   assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, HARDENING_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
   assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');

@@ -101,7 +101,7 @@ function buildCommonFlows(overlayCatalog) {
       [
         `1. redcube deliverable create --overlay ${overlay.overlay_id} --profile-id ${overlay.default_profile_id || '<profile-id>'} ...`,
         `2. redcube deliverable audit --overlay ${overlay.overlay_id} --mode draft_new ...`,
-        `3. redcube deliverable execute --overlay ${overlay.overlay_id} ...`,
+        `3. redcube deliverable run --overlay ${overlay.overlay_id} --route <stage> ...`,
       ],
     ]),
   );
@@ -173,6 +173,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       {
         task: '审计交付物是否达到进入下一阶段的条件',
         command: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing>',
+      },
+      {
+        task: '按声明的 route 执行当前交付阶段',
+        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       },
       {
         task: '托管执行整个交付链路并查看 managed 进度',

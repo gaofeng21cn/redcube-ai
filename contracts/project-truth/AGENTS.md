@@ -38,6 +38,9 @@ They must not be reinterpreted as the whole current product identity by themselv
 - `contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json`
 - `contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json`
 - `contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json`
+- `contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json`
+- `contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json`
+- `contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json`
 
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 

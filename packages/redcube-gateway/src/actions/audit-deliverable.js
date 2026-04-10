@@ -280,9 +280,12 @@ export async function auditDeliverable(request) {
     }
   }
   reports.push(auditOverlaySurface(request));
+  const mergedReport = mergeAuditReports(reports);
+
   return {
     surface_kind: 'audit',
-    ...mergeAuditReports(reports),
+    ...mergedReport,
+    recommended_action: mergedReport.status === 'pass' ? 'run_deliverable_route' : mergedReport.recommended_action,
     quality_summary: qualitySummary,
     review_state: reviewState,
     publication_projection: publicationProjection,
