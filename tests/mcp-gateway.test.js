@@ -12,7 +12,11 @@ import {
   callGatewayTool,
   listGatewayTools,
 } from '../apps/redcube-mcp/src/server.js';
-import { createDeliverable, intakeSource } from '../packages/redcube-gateway/src/index.js';
+import {
+  createDeliverable,
+  intakeSource,
+  runManagedDeliverable,
+} from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
@@ -35,6 +39,9 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'get_publication_projection',
       'audit_deliverable',
       'review_render_output',
+      'run_managed_deliverable',
+      'get_managed_run',
+      'supervise_managed_run',
       'run_deliverable_route',
       'get_run',
       'get_review_state',
@@ -336,7 +343,7 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
       getDeliverable: async () => ({
         ok: true,
         surface_kind: 'deliverable_record',
-        recommended_action: 'run_deliverable_route',
+        recommended_action: 'run_managed_deliverable',
         summary: { deliverable_id: 'deck-a' },
         deliverable: { deliverable_id: 'deck-a' },
       }),
@@ -363,9 +370,166 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
   );
 
   assert.equal(deliverable.surface_kind, 'deliverable_record');
-  assert.equal(deliverable.recommended_action, 'run_deliverable_route');
+  assert.equal(deliverable.recommended_action, 'run_managed_deliverable');
   assert.equal(routeRun.surface_kind, 'route_run');
   assert.equal(routeRun.summary.route, 'storyline');
+});
+
+test('callGatewayTool delegates managed deliverable execution and managed run lookup', async () => {
+  const managed = await callGatewayTool(
+    'run_managed_deliverable',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '给我一个最终 PPT',
+    },
+    {
+      runManagedDeliverable: async () => ({
+        ok: true,
+        surface_kind: 'managed_run',
+        summary: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+          current_stage: 'export_pptx',
+        },
+        managed_run: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+        },
+        progress_projection: {
+          current_stage: 'export_pptx',
+          latest_events: [],
+        },
+        runtime_supervision: {
+          health_status: 'completed',
+        },
+        escalation_record: {
+          escalation_status: 'none',
+        },
+      }),
+      getManagedRun: async () => ({
+        ok: true,
+        surface_kind: 'managed_run_record',
+        summary: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+          current_stage: 'export_pptx',
+        },
+        managed_run: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+        },
+        progress_projection: {
+          current_stage: 'export_pptx',
+          latest_events: [],
+        },
+        runtime_supervision: {
+          health_status: 'completed',
+        },
+        escalation_record: {
+          escalation_status: 'none',
+        },
+      }),
+      superviseManagedRun: async () => ({
+        ok: true,
+        surface_kind: 'managed_supervision',
+        summary: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+          current_stage: 'export_pptx',
+        },
+        managed_run: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+        },
+        progress_projection: {
+          current_stage: 'export_pptx',
+          latest_events: [],
+        },
+        runtime_supervision: {
+          health_status: 'completed',
+        },
+        escalation_record: {
+          escalation_status: 'none',
+        },
+      }),
+    },
+  );
+
+  const stored = await callGatewayTool(
+    'get_managed_run',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      managedRunId: 'managed-a',
+    },
+    {
+      getManagedRun: async () => ({
+        ok: true,
+        surface_kind: 'managed_run_record',
+        summary: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+          current_stage: 'export_pptx',
+        },
+        managed_run: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+        },
+        progress_projection: {
+          current_stage: 'export_pptx',
+          latest_events: [],
+        },
+        runtime_supervision: {
+          health_status: 'completed',
+        },
+        escalation_record: {
+          escalation_status: 'none',
+        },
+      }),
+    },
+  );
+
+  const supervised = await callGatewayTool(
+    'supervise_managed_run',
+    {
+      workspaceRoot: '/tmp/redcube-workspace',
+      managedRunId: 'managed-a',
+    },
+    {
+      superviseManagedRun: async () => ({
+        ok: true,
+        surface_kind: 'managed_supervision',
+        summary: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+          current_stage: 'export_pptx',
+        },
+        managed_run: {
+          managed_run_id: 'managed-a',
+          status: 'completed',
+        },
+        progress_projection: {
+          current_stage: 'export_pptx',
+          latest_events: [],
+        },
+        runtime_supervision: {
+          health_status: 'completed',
+        },
+        escalation_record: {
+          escalation_status: 'none',
+        },
+      }),
+    },
+  );
+
+  assert.equal(managed.surface_kind, 'managed_run');
+  assert.equal(managed.summary.managed_run_id, 'managed-a');
+  assert.equal(stored.surface_kind, 'managed_run_record');
+  assert.equal(stored.summary.managed_run_id, 'managed-a');
+  assert.equal(supervised.surface_kind, 'managed_supervision');
+  assert.equal(supervised.runtime_supervision.health_status, 'completed');
 });
 
 

@@ -81,7 +81,7 @@ export async function createDeliverable({
   return {
     ok: true,
     surface_kind: 'deliverable_create',
-    recommended_action: 'run_deliverable_route',
+    recommended_action: 'run_managed_deliverable',
     summary: {
       overlay: deliverable.overlay,
       deliverable_id: deliverable.deliverable_id,

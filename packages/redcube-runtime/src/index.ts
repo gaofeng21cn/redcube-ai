@@ -24,6 +24,7 @@ import {
 } from '@redcube/reference-os';
 
 import { appendEvent as appendEventJs, readEvents as readEventsJs } from './event-log.js';
+import { appendManagedEvent as appendManagedEventJs, readManagedEvents as readManagedEventsJs } from './managed-event-log.js';
 import {
   P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT as P19CreativeOwnershipProgramCloseoutJs,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT as P19CreativeOwnershipExecutionContractJs,
@@ -36,8 +37,22 @@ import {
   buildCreativeOwnershipResidueAudit as buildCreativeOwnershipResidueAuditJs,
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
+import {
+  getManagedRun as getManagedRunJs,
+  runManagedDeliverable as runManagedDeliverableJs,
+  superviseManagedRun as superviseManagedRunJs,
+} from './managed-deliverable.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
+import {
+  createManagedRun as createManagedRunJs,
+  loadManagedProgressProjection as loadManagedProgressProjectionJs,
+  loadManagedRun as loadManagedRunJs,
+  managedPromptAuditFile as managedPromptAuditFileJs,
+  managedResultFile as managedResultFileJs,
+  saveManagedProgressProjection as saveManagedProgressProjectionJs,
+  saveManagedRun as saveManagedRunJs,
+} from './managed-run-store.js';
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
 import { resolveSourceAugmentationAdapter as resolveSourceAugmentationAdapterJs } from './source-augmentation-executor.js';
 import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
@@ -52,6 +67,12 @@ import type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
+  RuntimeManagedProgressProjection,
+  RuntimeManagedRunLookupRequest,
+  RuntimeManagedRunRecord,
+  RuntimeManagedRunRequest,
+  RuntimeManagedRunResponse,
+  RuntimeManagedSupervisionRequest,
   RuntimeRunLookupRequest,
   RuntimeRunRecord,
   RuntimeRunRouteRequest,
@@ -110,6 +131,14 @@ export function readEvents(workspaceRoot: string, runId: string): unknown[] {
   return readEventsJs(workspaceRoot, runId) as unknown[];
 }
 
+export function appendManagedEvent(workspaceRoot: string, managedRunId: string, event: RuntimeEventRecord): void {
+  return appendManagedEventJs(workspaceRoot, managedRunId, event);
+}
+
+export function readManagedEvents(workspaceRoot: string, managedRunId: string): unknown[] {
+  return readManagedEventsJs(workspaceRoot, managedRunId) as unknown[];
+}
+
 export const P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT
   = P19CreativeOwnershipProgramCloseoutJs as RuntimeCreativeOwnershipProgramCloseout;
 export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT
@@ -131,7 +160,28 @@ export function buildCreativeOwnershipResidueAudit(): RuntimeCreativeOwnershipAu
 }
 
 export async function runDeliverableRoute(request: RuntimeRunRouteRequest): Promise<RuntimeRunRouteResponse> {
-  return runDeliverableRouteJs(request) as Promise<RuntimeRunRouteResponse>;
+  const runRoute = runDeliverableRouteJs as unknown as (
+    request: RuntimeRunRouteRequest,
+  ) => Promise<RuntimeRunRouteResponse>;
+  return runRoute(request);
+}
+
+export async function runManagedDeliverable(
+  request: RuntimeManagedRunRequest,
+): Promise<RuntimeManagedRunResponse> {
+  return runManagedDeliverableJs(request) as Promise<RuntimeManagedRunResponse>;
+}
+
+export async function getManagedRun(
+  request: RuntimeManagedRunLookupRequest,
+): Promise<RuntimeManagedRunResponse> {
+  return getManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
+}
+
+export async function superviseManagedRun(
+  request: RuntimeManagedSupervisionRequest,
+): Promise<RuntimeManagedRunResponse> {
+  return superviseManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
 }
 
 export const resolveExecutorAdapter = resolveExecutorAdapterJs;
@@ -146,11 +196,62 @@ export function loadRun(request: RuntimeRunLookupRequest): RuntimeRunRecord {
 }
 
 export function startRun(request: RuntimeStartRunRequest): RuntimeRunRecord {
-  return startRunJs(request) as RuntimeRunRecord;
+  const start = startRunJs as unknown as (request: RuntimeStartRunRequest) => RuntimeRunRecord;
+  return start(request);
 }
 
 export function failRun(request: RuntimeFailRunRequest): RuntimeRunRecord {
   return failRunJs(request) as RuntimeRunRecord;
+}
+
+export function createManagedRun(request: RuntimeManagedRunRequest): RuntimeManagedRunRecord {
+  const create = createManagedRunJs as unknown as (
+    request: RuntimeManagedRunRequest,
+  ) => RuntimeManagedRunRecord;
+  return create(request);
+}
+
+export function loadManagedRun(request: RuntimeManagedRunLookupRequest): RuntimeManagedRunRecord {
+  return loadManagedRunJs(request) as RuntimeManagedRunRecord;
+}
+
+export function saveManagedRun(request: {
+  workspaceRoot: string;
+  managedRun: RuntimeManagedRunRecord;
+}): RuntimeManagedRunRecord {
+  return saveManagedRunJs(request) as RuntimeManagedRunRecord;
+}
+
+export function loadManagedProgressProjection(
+  request: RuntimeManagedRunLookupRequest,
+): RuntimeManagedProgressProjection | null {
+  return loadManagedProgressProjectionJs(request) as RuntimeManagedProgressProjection | null;
+}
+
+export function saveManagedProgressProjection(request: {
+  workspaceRoot: string;
+  managedRunId: string;
+  projection: RuntimeManagedProgressProjection;
+}): string {
+  return saveManagedProgressProjectionJs(request) as string;
+}
+
+export function managedPromptAuditFile(request: {
+  workspaceRoot: string;
+  managedRunId: string;
+  stageId: string;
+  attempt: number;
+}): string {
+  return managedPromptAuditFileJs(request) as string;
+}
+
+export function managedResultFile(request: {
+  workspaceRoot: string;
+  managedRunId: string;
+  stageId: string;
+  attempt: number;
+}): string {
+  return managedResultFileJs(request) as string;
 }
 
 export async function intakeSource(request: RuntimeSourceIntakeRequest): Promise<RuntimeSourceIntakeResponse> {
@@ -205,6 +306,12 @@ export type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
+  RuntimeManagedProgressProjection,
+  RuntimeManagedRunLookupRequest,
+  RuntimeManagedRunRecord,
+  RuntimeManagedRunRequest,
+  RuntimeManagedRunResponse,
+  RuntimeManagedSupervisionRequest,
   RuntimeRunLookupRequest,
   RuntimeRunRecord,
   RuntimeRunRouteRequest,

@@ -96,16 +96,35 @@ function buildRunTelemetry(run, executor, status, finishedAt = run.finished_at) 
   };
 }
 
+function normalizeError(error) {
+  if (error && typeof error === 'object') {
+    return {
+      code: String(error.code || '').trim() || null,
+      message: error instanceof Error ? error.message : String(error.message || error),
+      requires_human_confirmation: error.requiresHumanConfirmation === true,
+      requires_external_secret: error.requiresExternalSecret === true,
+    };
+  }
+  return {
+    code: null,
+    message: error instanceof Error ? error.message : String(error),
+    requires_human_confirmation: false,
+    requires_external_secret: false,
+  };
+}
+
 export function startRun({
   workspaceRoot,
+  runId = null,
   route,
   overlay,
   scope = 'deliverable',
   target,
+  managedRunId = null,
   baselineDeliverableId = '',
   executor,
 }) {
-  const runId = `run-${randomUUID()}`;
+  const resolvedRunId = String(runId || '').trim() || `run-${randomUUID()}`;
   const priorRuns = findPriorRuns({
     workspaceRoot,
     route,
@@ -115,7 +134,8 @@ export function startRun({
   });
   const run = {
     ...createRunRecord({
-      runId,
+      runId: resolvedRunId,
+      managedRunId,
       route,
       scope,
       target,
@@ -131,7 +151,7 @@ export function startRun({
   };
   run.telemetry = buildRunTelemetry(run, executor, 'running', null);
 
-  writeFileSync(runFile(workspaceRoot, runId), JSON.stringify(run, null, 2), 'utf-8');
+  writeFileSync(runFile(workspaceRoot, resolvedRunId), JSON.stringify(run, null, 2), 'utf-8');
   return run;
 }
 
@@ -181,9 +201,7 @@ export function failRun({
     current_stage: currentStage,
     error_kind: errorKind,
     executor,
-    error: {
-      message: error instanceof Error ? error.message : String(error),
-    },
+    error: normalizeError(error),
   };
   failedRun.telemetry = buildRunTelemetry(
     failedRun,

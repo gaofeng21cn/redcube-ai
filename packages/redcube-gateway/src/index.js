@@ -51,9 +51,22 @@ export async function getRun(request) {
   return module.getRun(request);
 }
 
+export async function getManagedRun(request) {
+  const module = await import('./actions/get-managed-run.js');
+  return module.getManagedRun(request);
+}
+export async function superviseManagedRun(request) {
+  const module = await import('./actions/supervise-managed-run.js');
+  return module.superviseManagedRun(request);
+}
+
 export async function runDeliverableRoute(request) {
   const module = await import('./actions/run-deliverable-route.js');
   return module.runDeliverableRoute(request);
+}
+export async function runManagedDeliverable(request) {
+  const module = await import('./actions/run-managed-deliverable.js');
+  return module.runManagedDeliverable(request);
 }
 export async function auditDeliverable(request) {
   const module = await import('./actions/audit-deliverable.js');

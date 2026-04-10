@@ -13,7 +13,10 @@ import {
   getDeliverable as getDeliverableJs,
   getPublicationProjection as getPublicationProjectionJs,
   getRun as getRunJs,
+  getManagedRun as getManagedRunJs,
+  superviseManagedRun as superviseManagedRunJs,
   runDeliverableRoute as runDeliverableRouteJs,
+  runManagedDeliverable as runManagedDeliverableJs,
   auditDeliverable as auditDeliverableJs,
   reviewRenderOutput as reviewRenderOutputJs,
   runtimeWatch as runtimeWatchJs,
@@ -29,6 +32,9 @@ import type {
   DeliverableRecordResponse,
   DeliverableRequest,
   LegacyImportResponse,
+  ManagedRunRecordResponse,
+  ManagedRunResponse,
+  ManagedSupervisionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,
@@ -36,8 +42,10 @@ import type {
   ReviewRenderOutputRequest,
   ReviewRenderOutputResponse,
   RouteRunResponse,
+  RunManagedDeliverableRequest,
   RunDeliverableRouteRequest,
   RunRecordResponse,
+  SuperviseManagedRunRequest,
   RuntimeWatchResponse,
   SourceIntakeResponse,
   SourceResearchResponse,
@@ -112,8 +120,20 @@ export function getRun(request: WorkspaceRootRequest & { runId: string }): Promi
   return getRunJs(request) as Promise<RunRecordResponse>;
 }
 
+export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {
+  return getManagedRunJs(request) as Promise<ManagedRunRecordResponse>;
+}
+
+export function superviseManagedRun(request: SuperviseManagedRunRequest): Promise<ManagedSupervisionResponse> {
+  return superviseManagedRunJs(request) as Promise<ManagedSupervisionResponse>;
+}
+
 export function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunResponse> {
   return runDeliverableRouteJs(request) as Promise<RouteRunResponse>;
+}
+
+export function runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<ManagedRunResponse> {
+  return runManagedDeliverableJs(request) as Promise<ManagedRunResponse>;
 }
 
 export function auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse> {
@@ -144,6 +164,9 @@ export type {
   DeliverableRecordResponse,
   DeliverableRequest,
   LegacyImportResponse,
+  ManagedRunRecordResponse,
+  ManagedRunResponse,
+  ManagedSupervisionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,
@@ -152,8 +175,10 @@ export type {
   ReviewRenderOutputResponse,
   ReviewStateResponse,
   RouteRunResponse,
+  RunManagedDeliverableRequest,
   RunDeliverableRouteRequest,
   RunRecordResponse,
+  SuperviseManagedRunRequest,
   RuntimeWatchResponse,
   SourceIntakeResponse,
   SourceResearchResponse,

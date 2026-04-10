@@ -232,6 +232,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('source research')), true);
   assert.equal(parsed.commandGroups.source.includes('research'), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
+  assert.equal(parsed.commandGroups.managed.includes('supervise'), true);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
@@ -382,7 +383,7 @@ test('CLI deliverable get returns operator-facing deliverable record surface', (
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'deliverable_record');
-  assert.equal(parsed.recommended_action, 'run_deliverable_route');
+  assert.equal(parsed.recommended_action, 'run_managed_deliverable');
   assert.equal(parsed.summary.deliverable_id, 'deck-a');
 });
 
@@ -513,6 +514,125 @@ test('CLI deliverable run and runs get proxy the contract-driven runtime mainlin
   assert.equal(getParsed.ok, true);
   assert.equal(getParsed.run.status, 'completed');
   assert.equal(getParsed.run.current_stage, 'detailed_outline');
+});
+
+test('CLI deliverable execute, managed get, and managed supervise proxy the managed execution control plane', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'source',
+      'research',
+      '--workspace-root',
+      workspaceRoot,
+      '--topic-id',
+      'topic-a',
+      '--title',
+      '甲状腺门诊科普',
+      '--brief',
+      '给出一份最终课堂 PPT 所需的公开信息。',
+    ],
+    {
+      encoding: 'utf-8',
+      cwd: path.resolve('.'),
+      env: {
+        ...process.env,
+        REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file',
+      },
+    },
+  );
+
+  execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'create',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'ppt_deck',
+      '--profile-id',
+      'lecture_student',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'deck-a',
+      '--title',
+      '甲状腺门诊科普 deck',
+      '--goal',
+      '为本科生讲授甲状腺基础知识',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const executeOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'deliverable',
+      'execute',
+      '--workspace-root',
+      workspaceRoot,
+      '--overlay',
+      'ppt_deck',
+      '--topic-id',
+      'topic-a',
+      '--deliverable-id',
+      'deck-a',
+      '--user-intent',
+      '给我一个最终 PPT',
+      '--stop-after-stage',
+      'storyline',
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const executeParsed = JSON.parse(executeOutput);
+  assert.equal(executeParsed.ok, true);
+  assert.equal(executeParsed.surface_kind, 'managed_run');
+  assert.equal(executeParsed.summary.status, 'stopped_after_stage');
+
+  const managedGetOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'managed',
+      'get',
+      '--workspace-root',
+      workspaceRoot,
+      '--managed-run-id',
+      executeParsed.summary.managed_run_id,
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const managedParsed = JSON.parse(managedGetOutput);
+  assert.equal(managedParsed.ok, true);
+  assert.equal(managedParsed.surface_kind, 'managed_run_record');
+  assert.equal(managedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
+  assert.equal(managedParsed.runtime_supervision.health_status, 'paused');
+
+  const managedSuperviseOutput = execFileSync(
+    'node',
+    [
+      path.resolve('apps/redcube-cli/src/cli.js'),
+      'managed',
+      'supervise',
+      '--workspace-root',
+      workspaceRoot,
+      '--managed-run-id',
+      executeParsed.summary.managed_run_id,
+    ],
+    { encoding: 'utf-8', cwd: path.resolve('.') },
+  );
+
+  const supervisedParsed = JSON.parse(managedSuperviseOutput);
+  assert.equal(supervisedParsed.ok, true);
+  assert.equal(supervisedParsed.surface_kind, 'managed_supervision');
+  assert.equal(supervisedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
 });
 
 

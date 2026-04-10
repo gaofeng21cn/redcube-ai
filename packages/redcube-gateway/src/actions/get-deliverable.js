@@ -12,7 +12,7 @@ export async function getDeliverable({
   return {
     ok: true,
     surface_kind: 'deliverable_record',
-    recommended_action: 'run_deliverable_route',
+    recommended_action: 'run_managed_deliverable',
     summary: {
       deliverable_id: deliverable.deliverable_id,
       overlay: deliverable.overlay,

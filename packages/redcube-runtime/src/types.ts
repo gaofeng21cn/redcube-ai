@@ -6,6 +6,7 @@ import type {
 
 export interface RuntimeRunRecord {
   run_id: string;
+  managed_run_id?: string | null;
   route: string;
   scope: string;
   target: string;
@@ -286,6 +287,8 @@ export interface RuntimeRunRouteRequest {
   topicId: string;
   deliverableId: string;
   route: string;
+  runId?: string | null;
+  managedRunId?: string | null;
   adapter?: string;
   mode?: string;
   baselineDeliverableId?: string;
@@ -312,6 +315,7 @@ export interface RuntimeStartRunRequest {
   overlay: string;
   scope?: string;
   target: string;
+  managedRunId?: string | null;
   baselineDeliverableId?: string;
   executor: Record<string, unknown>;
 }
@@ -332,6 +336,188 @@ export interface RuntimeFailRunRequest {
   error: unknown;
   errorKind?: RuntimeErrorKind;
   executor: Record<string, unknown>;
+}
+
+export interface RuntimeManagedProgressProjection {
+  current_stage: string | null;
+  latest_events: Array<{
+    at: string;
+    stage_id: string | null;
+    kind: string;
+    summary: string;
+  }>;
+  current_blockers: string[];
+  next_system_action: string | null;
+  needs_user_decision: boolean;
+  final_artifact_refs: string[];
+  content_status: 'running' | 'completed' | 'paused_for_user_request' | 'blocked_by_runtime' | 'blocked_requires_human';
+  completed_stages: string[];
+  remaining_stages: string[];
+  last_completed_stage: string | null;
+  last_completed_at: string | null;
+  human_report: {
+    reported_at: string | null;
+    recent_completion: string;
+    mainline_status: string;
+    runtime_health: string;
+    current_blockers: string;
+    next_system_action: string;
+    needs_human_intervention: boolean;
+  };
+}
+
+export interface RuntimeManagedRuntimeLivenessAudit {
+  status: 'live' | 'none';
+  checked_at: string | null;
+  reason_code: string;
+}
+
+export interface RuntimeManagedRuntimeSupervisionRecord {
+  schema_version: 1;
+  recorded_at: string;
+  managed_run_id: string;
+  overlay: string;
+  topic_id: string;
+  deliverable_id: string;
+  health_status: 'live' | 'recovering' | 'degraded' | 'paused' | 'completed' | 'escalated';
+  runtime_liveness_audit: RuntimeManagedRuntimeLivenessAudit;
+  worker_running: boolean;
+  active_run_id: string | null;
+  current_stage: string | null;
+  content_status: RuntimeManagedProgressProjection['content_status'];
+  current_blockers: string[];
+  needs_human_intervention: boolean;
+  summary: string;
+  next_action: string | null;
+  last_transition: string;
+  recovery_attempt_count: number;
+  consecutive_failure_count: number;
+  refs: {
+    managed_run_path: string;
+    progress_projection_path: string;
+    runtime_supervision_path: string;
+    escalation_record_path: string;
+  };
+}
+
+export interface RuntimeManagedEscalationRecord {
+  schema_version: 1;
+  recorded_at: string;
+  managed_run_id: string;
+  escalation_status: 'none' | 'escalated';
+  reason_code: string | null;
+  severity: 'none' | 'managed_runtime';
+  recommended_actions: string[];
+  evidence_refs: string[];
+  runtime_context_refs: Record<string, string>;
+  requires_human_intervention: boolean;
+}
+
+export interface RuntimeManagedRunRecord {
+  managed_run_id: string;
+  overlay: string;
+  topic_id: string;
+  deliverable_id: string;
+  status: 'running' | 'completed' | 'stopped_after_stage' | 'escalated' | 'needs_user_decision';
+  mode: 'auto_to_terminal' | 'stop_after_stage';
+  stop_after_stage: string | null;
+  user_intent: {
+    request: string | null;
+  };
+  adapter: string | null;
+  requested_adapter: string;
+  active_adapter: string;
+  adapter_switches: Array<{
+    at: string;
+    from_adapter: string;
+    to_adapter: string;
+    reason_code: string;
+    stage_id: string | null;
+  }>;
+  started_at: string | null;
+  finished_at: string | null;
+  current_stage: string | null;
+  active_run_id: string | null;
+  worker_running: boolean;
+  runtime_liveness_audit: RuntimeManagedRuntimeLivenessAudit;
+  runtime_health_status: RuntimeManagedRuntimeSupervisionRecord['health_status'];
+  parking_reason_code: string | null;
+  requires_human_confirmation: boolean;
+  requires_external_secret: boolean;
+  route_runs: Array<{
+    stage_id: string;
+    attempt: number;
+    route_run_id: string | null;
+    status: string;
+    prompt_audit_ref: string;
+    result_ref: string;
+    started_at: string | null;
+    finished_at: string | null;
+  }>;
+  stage_results: Array<{
+    stage_id: string;
+    attempt: number;
+    route_run_id: string | null;
+    status: 'completed' | 'failed' | 'stopped_after_stage';
+    summary: string;
+    artifacts: string[];
+    decision:
+      | 'advance_to_next_stage'
+      | 'complete_managed_run'
+      | 'stop_after_stage'
+      | 'retry_same_stage'
+      | 'switch_to_primary_adapter'
+      | 'escalate_runtime'
+      | 'require_human_confirmation';
+    next_action: string;
+    blocking_reason: string | null;
+    controller_decision: {
+      decision:
+        | 'advance_to_next_stage'
+        | 'complete_managed_run'
+        | 'pause_for_user_request'
+        | 'retry_same_stage'
+        | 'switch_to_primary_adapter'
+        | 'escalate_runtime'
+        | 'require_human_confirmation';
+      reason_code: string;
+      requires_human_confirmation: boolean;
+      requires_external_secret: boolean;
+    } | null;
+    recorded_at: string;
+  }>;
+  latest_events: RuntimeManagedProgressProjection['latest_events'];
+  current_blockers: string[];
+  next_system_action: string | null;
+  needs_user_decision: boolean;
+  final_artifact_refs: string[];
+}
+
+export interface RuntimeManagedRunRequest {
+  workspaceRoot: string;
+  overlay: string;
+  topicId: string;
+  deliverableId: string;
+  adapter?: string;
+  userIntent?: string;
+  stopAfterStage?: string;
+  mode?: string;
+  baselineDeliverableId?: string;
+}
+
+export interface RuntimeManagedRunLookupRequest {
+  workspaceRoot: string;
+  managedRunId: string;
+}
+
+export interface RuntimeManagedSupervisionRequest extends RuntimeManagedRunLookupRequest {}
+
+export interface RuntimeManagedRunResponse {
+  ok: boolean;
+  managed_run: RuntimeManagedRunRecord;
+  progress_projection: RuntimeManagedProgressProjection;
+  runtime_supervision: RuntimeManagedRuntimeSupervisionRecord;
+  escalation_record: RuntimeManagedEscalationRecord;
 }
 
 export interface RuntimeSourceIntakeResponse {

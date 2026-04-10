@@ -5,12 +5,16 @@ import type {
   DeliverableCreateResponse,
   DeliverableRecordResponse,
   LegacyImportResponse,
+  ManagedRunRecordResponse,
+  ManagedRunResponse,
+  ManagedSupervisionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,
   ReviewMutationResponse,
   ReviewStateResponse,
   RouteRunResponse,
+  RunManagedDeliverableRequest,
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceAugmentationResponse,
@@ -18,6 +22,7 @@ import type {
   SourceIntakeResponse,
   TopicCatalogResponse,
   WorkspaceDoctorResponse,
+  SuperviseManagedRunRequest,
 } from '@redcube/gateway';
 
 export interface CliOptions extends Record<string, string | boolean> {}
@@ -66,6 +71,8 @@ export interface CliGatewayActions {
   getPublicationProjection(request: { workspaceRoot: string; topicId: string }): Promise<PublicationProjectionResponse>;
   getReviewState(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<ReviewStateResponse>;
   getRun(request: { workspaceRoot: string; runId: string }): Promise<RunRecordResponse>;
+  getManagedRun(request: { workspaceRoot: string; managedRunId: string }): Promise<ManagedRunRecordResponse>;
+  superviseManagedRun(request: SuperviseManagedRunRequest): Promise<ManagedSupervisionResponse>;
   auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse>;
   runtimeWatch(request: Record<string, unknown>): Promise<RuntimeWatchResponse>;
   applyReviewMutation(request: ReviewMutationRequest): Promise<ReviewMutationResponse>;
@@ -77,6 +84,7 @@ export interface CliGatewayActions {
     route: string;
     adapter?: string;
   }): Promise<RouteRunResponse>;
+  runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<ManagedRunResponse>;
 }
 
 export interface CliDependencies {
@@ -98,6 +106,9 @@ export type CliRunSurface =
   | DeliverableCreateResponse
   | DeliverableRecordResponse
   | DeliverableAuditResponse
+  | ManagedRunResponse
+  | ManagedRunRecordResponse
+  | ManagedSupervisionResponse
   | RouteRunResponse
   | RunRecordResponse
   | PublicationProjectionResponse

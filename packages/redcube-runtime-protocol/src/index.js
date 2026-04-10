@@ -1,4 +1,5 @@
 export { createRunRecord } from './runs.js';
+export { createManagedRunRecord } from './managed-runs.js';
 export {
   getDeliverablePaths,
   getNotePaths,

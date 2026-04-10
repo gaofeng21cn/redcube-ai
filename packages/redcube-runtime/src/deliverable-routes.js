@@ -37,6 +37,8 @@ export async function runDeliverableRoute({
   topicId,
   deliverableId,
   route,
+  runId = null,
+  managedRunId = null,
   adapter = 'host_agent',
   mode = 'draft_new',
   baselineDeliverableId = '',
@@ -66,9 +68,11 @@ export async function runDeliverableRoute({
 
   const run = startRun({
     workspaceRoot,
+    runId,
     route: safeRoute,
     overlay,
     target: deliverableId,
+    managedRunId,
     executor: {
       adapter: executor.adapter,
       primary: executor.primary,

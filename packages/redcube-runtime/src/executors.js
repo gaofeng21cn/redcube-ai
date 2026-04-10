@@ -100,7 +100,11 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
       }
 
       if (adapter === 'external_llm' && route !== 'storyline') {
-        throw new Error(`Unsupported route for adapter external_llm: ${route}`);
+        const error = new Error(`Unsupported route for adapter external_llm: ${route}`);
+        error.code = 'compatibility_adapter_route_unsupported';
+        error.requiresHumanConfirmation = false;
+        error.requiresExternalSecret = false;
+        throw error;
       }
 
       if (adapter === 'host_agent') {

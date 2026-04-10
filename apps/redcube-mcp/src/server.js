@@ -10,6 +10,8 @@ import {
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  getManagedRun,
+  superviseManagedRun,
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
@@ -23,6 +25,7 @@ import {
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
+  runManagedDeliverable,
   runtimeWatch,
 } from '@redcube/gateway';
 import * as z from 'zod/v4';
@@ -42,6 +45,9 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   executeSourceAugmentation,
   auditDeliverable,
   reviewRenderOutput,
+  runManagedDeliverable,
+  getManagedRun,
+  superviseManagedRun,
   runDeliverableRoute,
   getRun,
   runtimeWatch,
@@ -201,6 +207,40 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'run_managed_deliverable',
+    description: 'Run the managed control plane from the current deliverable through the remaining stages.',
+    actionKey: 'runManagedDeliverable',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      overlay: z.string().describe('Overlay id.'),
+      topicId: z.string().describe('Topic identifier.'),
+      deliverableId: z.string().describe('Deliverable identifier.'),
+      adapter: z.string().optional().describe('Executor adapter id.'),
+      userIntent: z.string().optional().describe('User-facing request, for example 给我一个最终 PPT。'),
+      stopAfterStage: z.string().optional().describe('Optional explicit stage boundary to stop after.'),
+      mode: z.string().optional().describe('Execution mode such as draft_new or optimize_existing.'),
+      baselineDeliverableId: z.string().optional().describe('Optional approved baseline deliverable id when optimizing existing outputs.'),
+    },
+  },
+  {
+    name: 'get_managed_run',
+    description: 'Read a persisted managed execution record and controller-owned progress projection.',
+    actionKey: 'getManagedRun',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      managedRunId: z.string().describe('Managed run identifier.'),
+    },
+  },
+  {
+    name: 'supervise_managed_run',
+    description: 'Run one managed supervisor tick and refresh runtime supervision/progress/escalation surfaces.',
+    actionKey: 'superviseManagedRun',
+    inputSchema: {
+      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      managedRunId: z.string().describe('Managed run identifier.'),
+    },
+  },
+  {
     name: 'run_deliverable_route',
     description: 'Run one deliverable route and return the current route execution surface.',
     actionKey: 'runDeliverableRoute',
@@ -222,7 +262,6 @@ export const TOOL_DEFINITIONS = [
       runId: z.string().describe('Run identifier.'),
     },
   },
-
   {
     name: 'get_review_state',
     description: 'Read the platform-level review state for one deliverable.',

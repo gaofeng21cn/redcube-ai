@@ -60,6 +60,7 @@ export function createRunRecord(input = {}) {
 
   return {
     run_id,
+    managed_run_id: toNullableString(input.managedRunId),
     route,
     scope,
     target,

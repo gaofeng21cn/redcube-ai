@@ -10,6 +10,8 @@ import {
   getPublicationProjection,
   getReviewState,
   getRun as getGatewayRun,
+  getManagedRun as getGatewayManagedRun,
+  superviseManagedRun as superviseGatewayManagedRun,
   intakeSource,
   researchSource,
   prepareSourceAugmentation,
@@ -20,6 +22,7 @@ import {
   listTopics as listTopicsGateway,
   runtimeWatch,
   runDeliverableRoute,
+  runManagedDeliverable,
 } from '@redcube/gateway';
 
 const DEFAULT_GATEWAY_ACTIONS = {
@@ -32,6 +35,8 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getPublicationProjection,
   getReviewState,
   getRun: getGatewayRun,
+  getManagedRun: getGatewayManagedRun,
+  superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
   researchSource,
   prepareSourceAugmentation,
@@ -42,6 +47,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   listTopics: listTopicsGateway,
   runtimeWatch,
   runDeliverableRoute,
+  runManagedDeliverable,
 };
 
 export function parseArgs(argv) {
@@ -95,7 +101,7 @@ function buildCommonFlows(overlayCatalog) {
       [
         `1. redcube deliverable create --overlay ${overlay.overlay_id} --profile-id ${overlay.default_profile_id || '<profile-id>'} ...`,
         `2. redcube deliverable audit --overlay ${overlay.overlay_id} --mode draft_new ...`,
-        `3. redcube deliverable run --overlay ${overlay.overlay_id} --route storyline ...`,
+        `3. redcube deliverable execute --overlay ${overlay.overlay_id} ...`,
       ],
     ]),
   );
@@ -118,7 +124,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
   return {
     ok: true,
     whatIsRedCube: 'RedCube AI 是面向专家与 PIs 的视觉交付运行入口，当前重点支持 PPT deck、小红书图文与单页知识海报。',
-    preferredEntry: ['MCP', 'CLI'],
+    preferredEntry: ['CLI', 'MCP'],
     discovery: {
       profileList: 'redcube profile --action list',
     },
@@ -169,8 +175,12 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing>',
       },
       {
-        task: '运行某个正式阶段并查看 run 状态',
-        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> && redcube runs get --workspace-root <dir> --run-id <id>',
+        task: '托管执行整个交付链路并查看 managed 进度',
+        command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] && redcube managed get --workspace-root <dir> --managed-run-id <id>',
+      },
+      {
+        task: '触发一次 supervisor tick 刷新托管监管面',
+        command: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       },
       {
         task: '读取交付物当前 review 状态',
@@ -191,7 +201,8 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       topics: ['list'],
       source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
       import: ['legacy-project'],
-      deliverable: ['create', 'get', 'audit', 'run'],
+      deliverable: ['create', 'get', 'audit', 'execute', 'run'],
+      managed: ['get', 'supervise'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['list', 'bootstrap', 'export', 'install'],
@@ -217,7 +228,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
+      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <host_agent|external_llm>]',
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+      managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
+      managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       profileList: 'redcube profile --action list',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
@@ -385,18 +399,50 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('deliverable 命令仅支持 create|get|audit|run');
+    if (subcommand === 'execute') {
+      return gateway.runManagedDeliverable({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        overlay: options.overlay || '',
+        topicId: options.topicId || '',
+        deliverableId: options.deliverableId || '',
+        adapter: options.adapter || undefined,
+        userIntent: options.userIntent || '',
+        stopAfterStage: options.stopAfterStage || '',
+        mode: options.mode || 'draft_new',
+        baselineDeliverableId: options.baselineDeliverableId || '',
+      });
+    }
+
+    throw new Error('deliverable 命令仅支持 create|get|audit|execute|run');
+  }
+
+  if (command === 'managed') {
+    if (subcommand === 'get') {
+      return gateway.getManagedRun({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        managedRunId: options.managedRunId || '',
+      });
+    }
+
+    if (subcommand === 'supervise') {
+      return gateway.superviseManagedRun({
+        workspaceRoot: resolveWorkspaceRoot(options, cwd),
+        managedRunId: options.managedRunId || '',
+      });
+    }
+
+    throw new Error('managed 命令仅支持 get|supervise');
   }
 
 
   if (command === 'review') {
     if (subcommand === 'get') {
       return gateway.getReviewState({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        topicId: options.topicId || '',
-        deliverableId: options.deliverableId || '',
-      });
-    }
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
+      topicId: options.topicId || '',
+      deliverableId: options.deliverableId || '',
+    });
+  }
 
     if (subcommand === 'projection') {
       return gateway.getPublicationProjection({

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 
 import {
+  createManagedRunRecord,
   createRunRecord,
   getNotePaths,
   getTopicPaths,
@@ -43,6 +44,7 @@ test('createRunRecord creates a stable minimal run envelope', () => {
 
   assert.deepEqual(run, {
     run_id: 'run-001',
+    managed_run_id: null,
     route: 'topic.storyline',
     scope: 'topic',
     target: 'topic-a',
@@ -78,6 +80,54 @@ test('createRunRecord creates a stable minimal run envelope', () => {
       baseline_deliverable_id: null,
     },
     error: null,
+  });
+});
+
+test('createManagedRunRecord creates a fail-closed managed envelope with typed supervision defaults', () => {
+  const managedRun = createManagedRunRecord({
+    managedRunId: 'managed-001',
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    userIntent: '给我一个最终 PPT',
+  });
+
+  assert.deepEqual(managedRun, {
+    managed_run_id: 'managed-001',
+    overlay: 'ppt_deck',
+    topic_id: 'topic-a',
+    deliverable_id: 'deck-a',
+    status: 'running',
+    mode: 'auto_to_terminal',
+    stop_after_stage: null,
+    user_intent: {
+      request: '给我一个最终 PPT',
+    },
+    adapter: null,
+    requested_adapter: 'host_agent',
+    active_adapter: 'host_agent',
+    adapter_switches: [],
+    started_at: null,
+    finished_at: null,
+    current_stage: null,
+    active_run_id: null,
+    worker_running: false,
+    runtime_liveness_audit: {
+      status: 'none',
+      checked_at: null,
+      reason_code: 'managed_run_not_started',
+    },
+    runtime_health_status: 'degraded',
+    parking_reason_code: null,
+    requires_human_confirmation: false,
+    requires_external_secret: false,
+    route_runs: [],
+    stage_results: [],
+    latest_events: [],
+    current_blockers: [],
+    next_system_action: null,
+    needs_user_decision: false,
+    final_artifact_refs: [],
   });
 });
 

@@ -27,7 +27,7 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
 
   assert.equal(created.ok, true);
   assert.equal(created.surface_kind, 'deliverable_create');
-  assert.equal(created.recommended_action, 'run_deliverable_route');
+  assert.equal(created.recommended_action, 'run_managed_deliverable');
   assert.equal(created.summary.deliverable_id, 'deck-a');
   assert.equal(created.summary.overlay, 'ppt_deck');
 
@@ -39,7 +39,7 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
 
   assert.equal(stored.ok, true);
   assert.equal(stored.surface_kind, 'deliverable_record');
-  assert.equal(stored.recommended_action, 'run_deliverable_route');
+  assert.equal(stored.recommended_action, 'run_managed_deliverable');
   assert.equal(stored.summary.deliverable_id, 'deck-a');
   assert.equal(stored.deliverable.overlay, 'ppt_deck');
   assert.equal(stored.deliverable.kind, 'ppt_deck');
@@ -74,7 +74,7 @@ test('createDeliverable supports xiaohongshu on the shared runtime mainline', as
 
   assert.equal(created.ok, true);
   assert.equal(created.surface_kind, 'deliverable_create');
-  assert.equal(created.recommended_action, 'run_deliverable_route');
+  assert.equal(created.recommended_action, 'run_managed_deliverable');
   assert.equal(created.deliverable.overlay, 'xiaohongshu');
   assert.equal(created.deliverable.kind, 'xiaohongshu_note');
   assert.equal(created.deliverable.profile_id, 'standard_note');
@@ -96,7 +96,7 @@ test('createDeliverable supports poster_onepager on the shared runtime mainline'
 
   assert.equal(created.ok, true);
   assert.equal(created.surface_kind, 'deliverable_create');
-  assert.equal(created.recommended_action, 'run_deliverable_route');
+  assert.equal(created.recommended_action, 'run_managed_deliverable');
   assert.equal(created.deliverable.overlay, 'poster_onepager');
   assert.equal(created.deliverable.kind, 'poster_onepager');
   assert.equal(created.deliverable.profile_id, 'knowledge_poster');

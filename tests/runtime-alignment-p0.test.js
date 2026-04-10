@@ -41,7 +41,7 @@ test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP proto
   assert.equal(Boolean(pkg.scripts.redcube), true);
   assert.equal(Boolean(pkg.scripts.mcp), true);
   assert.equal(Boolean(pkg.scripts.controller), false);
-  assert.equal(cli.includes("preferredEntry: ['MCP', 'CLI']"), true);
+  assert.equal(cli.includes("preferredEntry: ['CLI', 'MCP']"), true);
   assert.equal(projectTruth.includes('`default_formal_entry`: `CLI`'), true);
   assert.equal(projectTruth.includes('`supported_protocol_layer`: `MCP`'), true);
   assert.equal(projectTruth.includes('`internal_controller_surface`: `controller`'), true);

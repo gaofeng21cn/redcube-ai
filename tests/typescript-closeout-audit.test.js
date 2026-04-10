@@ -51,6 +51,7 @@ const JS_RESIDUE_ALLOWLIST = {
   'apps/redcube-mcp': ['src/server.js'],
   'packages/redcube-runtime-protocol': [
     'src/index.js',
+    'src/managed-runs.js',
     'src/runs.js',
     'src/source-augmentation-contract.js',
     'src/source-readiness-summary.js',
@@ -74,6 +75,9 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/event-log.js',
     'src/executors.js',
     'src/index.js',
+    'src/managed-deliverable.js',
+    'src/managed-event-log.js',
+    'src/managed-run-store.js',
     'src/ppt-deck-runtime.js',
     'src/ppt-deck.js',
     'src/render-pack-compiler.js',
