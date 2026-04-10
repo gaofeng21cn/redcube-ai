@@ -23,6 +23,7 @@
 
 当前仓库已吸收的 tranche 是 `Phase 2 / runtime watch locator integrity hardening`。
 `operator surface consistency hardening` 继续作为同一主线上的 absorbed provenance，而 `runtime watch locator integrity hardening` 已成为当前已吸收 tranche。
+同一主线的下一段继续面也已预冻结为 `family parity / autopilot continuity`，第一条允许打开的 follow-on tranche 固定是 `phase_2_family_parity_governance_surface_convergence`。
 
 ## 仓库跟踪的内部操作文档
 
@@ -47,6 +48,8 @@
 - [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md)（已吸收 provenance）
 - [Phase 2 operator surface consistency hardening](phase_2_operator_surface_consistency_hardening.md)（已吸收 provenance）
 - [Phase 2 runtime watch locator integrity hardening](phase_2_runtime_watch_locator_integrity_hardening.md)（当前已吸收 tranche）
+- [Phase 2 family parity / autopilot continuation board](phase_2_family_parity_autopilot_continuation_board.md)（已预冻结的 follow-on board）
+- [Phase 2 family parity governance surface convergence](phase_2_family_parity_governance_surface_convergence.md)（第一条已预冻结的 follow-on tranche）
 
 ### 面向技术协作 / Agent 执行者
 

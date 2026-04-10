@@ -23,6 +23,7 @@ This index along with the repository home forms the default GitHub-facing biling
 
 The current absorbed tranche is `Phase 2 / runtime watch locator integrity hardening`.
 `operator surface consistency hardening` remains absorbed provenance on the same mainline, while `runtime watch locator integrity hardening` is now the current absorbed tranche.
+The next same-mainline continuation is now prefrozen as `family parity / autopilot continuity`, with `phase_2_family_parity_governance_surface_convergence` fixed as the first allowed follow-on tranche.
 
 ## Repo-Tracked Internal Operator Docs
 
@@ -47,6 +48,8 @@ The current absorbed tranche is `Phase 2 / runtime watch locator integrity harde
 - [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md) (absorbed provenance, Chinese only)
 - [Phase 2 operator surface consistency hardening](phase_2_operator_surface_consistency_hardening.md) (absorbed provenance, Chinese only)
 - [Phase 2 runtime watch locator integrity hardening](phase_2_runtime_watch_locator_integrity_hardening.md) (current absorbed tranche, Chinese only)
+- [Phase 2 family parity / autopilot continuation board](phase_2_family_parity_autopilot_continuation_board.md) (prefrozen follow-on board, Chinese only)
+- [Phase 2 family parity governance surface convergence](phase_2_family_parity_governance_surface_convergence.md) (first prefrozen follow-on tranche, Chinese only)
 
 ### For technical collaborators / agent executors
 

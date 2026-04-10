@@ -278,8 +278,13 @@
         "suite_result": "pass",
         "findings_recorded": 0,
         "absorbed_to_main": true,
-        "next_tranche_candidate": null,
-        "next_tranche_kind": "not_yet_frozen"
+        "next_tranche_candidate": "phase_2_family_parity_governance_surface_convergence",
+        "next_tranche_kind": "prefrozen_follow_on_board_entry",
+        "prefrozen_follow_on_board": {
+          "board_id": "phase_2_family_parity_autopilot_continuation_board",
+          "board_contract": "contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json",
+          "first_tranche_id": "phase_2_family_parity_governance_surface_convergence"
+        }
       }
     },
     "completed_batons": {

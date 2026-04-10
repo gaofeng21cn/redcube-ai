@@ -44,6 +44,14 @@ They must not be reinterpreted as the whole current product identity by themselv
 - `contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json`
 - `contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json`
 
+### Prefrozen Follow-On Truth
+
+These files freeze the next same-mainline continuation after the current absorbed tranche.
+They are allowed follow-on truth, not the current absorbed runtime state itself.
+
+- `contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json`
+- `contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json`
+
 If code and docs disagree, align code to the frozen design instead of inventing a new contract.
 
 ## Documentation Surface Boundary

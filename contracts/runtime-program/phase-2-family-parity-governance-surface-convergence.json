@@ -1,0 +1,88 @@
+{
+  "tranche_id": "phase_2_family_parity_governance_surface_convergence",
+  "status": "truth_frozen_pending_implementation",
+  "review_status": "not_started",
+  "program_mode": "autonomous_longrun",
+  "parent_board_id": "phase_2_family_parity_autopilot_continuation_board",
+  "predecessor": {
+    "phase_2_runtime_watch_locator_integrity_hardening": {
+      "status": "closeout_completed",
+      "commit": "9cfe58b"
+    }
+  },
+  "scope": {
+    "hardening_axis": "family_parity_governance_surface_convergence",
+    "implementation_in_scope": true,
+    "formal_entry": [
+      "MCP",
+      "CLI"
+    ],
+    "controller_repo_verified": false,
+    "consumer_families": [
+      "ppt_deck",
+      "xiaohongshu",
+      "poster_onepager"
+    ],
+    "shared_governance_surfaces": [
+      "deliverable create",
+      "deliverable audit",
+      "deliverable run",
+      "review watch",
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "required_embedded_summaries": [
+      "source_readiness_summary",
+      "gate_summary",
+      "operator_handoff",
+      "lifecycle_stage_summary"
+    ],
+    "required_family_boundaries": [
+      "ppt_deck remains direct-delivery capable",
+      "poster_onepager remains guarded knowledge-poster scope",
+      "xiaohongshu remains human_publication rather than direct-delivery"
+    ],
+    "excluded_scope": [
+      "controller expansion",
+      "new family or overlay expansion",
+      "xiaohongshu rewrite into direct-delivery",
+      "paper_poster or conference_poster academic poster advancement",
+      "managed web runtime migration",
+      "OPL federation integration",
+      "hidden fallback chains as main behavior",
+      "prompt patch replacing contract hydration"
+    ]
+  },
+  "artifacts": {
+    "tranche_contract": "contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json",
+    "tranche_brief": "docs/phase_2_family_parity_governance_surface_convergence.md",
+    "tranche_test": "tests/phase-2-family-parity-governance-surface-convergence.test.js"
+  },
+  "minimal_test_surface": {
+    "truth_freeze_tests": [
+      "tests/phase-2-family-parity-governance-surface-convergence.test.js"
+    ],
+    "behavior_tests": [
+      "tests/deliverable-review-loop.test.js",
+      "tests/runtime-deliverable-route.test.js",
+      "tests/phase-2-behavior-convergence.test.js",
+      "tests/mcp-gateway.test.js",
+      "tests/cli-v2-smoke.test.js",
+      "tests/ppt-deliverable-e2e.test.js",
+      "tests/xiaohongshu-deliverable-e2e.test.js"
+    ],
+    "required_commands": [
+      "git diff --check",
+      "npm run typecheck",
+      "node --test tests/runtime-alignment-p0.test.js tests/phase-2-family-parity-governance-surface-convergence.test.js tests/deliverable-review-loop.test.js tests/runtime-deliverable-route.test.js tests/phase-2-behavior-convergence.test.js tests/mcp-gateway.test.js tests/cli-v2-smoke.test.js tests/ppt-deliverable-e2e.test.js tests/xiaohongshu-deliverable-e2e.test.js",
+      "npm test"
+    ]
+  },
+  "closeout": {
+    "success_state": "PHASE_2_FAMILY_PARITY_GOVERNANCE_SURFACE_CONVERGENCE_CLOSED_AND_ABSORBED",
+    "next_tranche_candidate": "phase_2_autonomous_stop_reason_convergence",
+    "next_tranche_kind": "prefrozen_follow_on_board_entry"
+  }
+}

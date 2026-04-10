@@ -206,6 +206,7 @@
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，而不再依赖单独的 workspace-init 产品表面
 - operator surface consistency hardening 已在同一主线上吸收一条 tranche：`workspace doctor` 现在把 brand-new workspace bootstrap guidance 收紧到 `source intake` / `source research`，command-scoped `--help` 保持 machine-readable 且不会执行真实命令，而 `CLI review watch` / `MCP runtime_watch` 现在围绕同一 `runtimeWatch` locator truth 与共享治理 summaries 收口
 - runtime watch locator integrity hardening 已在同一主线上吸收一条 tranche：deliverable-scope run record 现在会持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator 指向错误 topic 或 deliverable 的 run 时会 fail-closed
+- 同一主线的下一段继续面也已预冻结为 `family parity / autopilot continuity`，第一条允许打开的 follow-on tranche 固定是 `phase_2_family_parity_governance_surface_convergence`
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善

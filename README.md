@@ -208,6 +208,7 @@ The main unfinished areas are:
 - workspace / operator quickstart convergence now has an absorbed tranche on the same mainline: brand-new or thin workspaces now converge on one repo-verified route from `workspace doctor` through `source intake / source research`, `deliverable create`, `deliverable audit`, and `deliverable run` without inventing a separate workspace-init product surface
 - operator surface consistency hardening now has an absorbed tranche on the same mainline: `workspace doctor` now keeps brand-new workspace bootstrap guidance on `source intake` / `source research`, command-scoped `--help` stays machine-readable and non-executing, and `CLI review watch` / `MCP runtime_watch` now converge on the same `runtimeWatch` locator truth and shared governance summaries
 - runtime watch locator integrity hardening now has an absorbed tranche on the same mainline: deliverable-scope run records now persist `topic_id` / `deliverable_id`, and `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` fail closed when a quartet locator points at a run from another topic or deliverable
+- the next same-mainline continuation is now prefrozen as `family parity / autopilot continuity`, with `phase_2_family_parity_governance_surface_convergence` fixed as the first allowed follow-on tranche
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened

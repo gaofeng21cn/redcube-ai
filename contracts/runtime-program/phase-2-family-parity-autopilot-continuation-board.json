@@ -1,0 +1,48 @@
+{
+  "board_id": "phase_2_family_parity_autopilot_continuation_board",
+  "date_anchor": "2026-04-11",
+  "status": "prefrozen_follow_on_board",
+  "parent_tranche_id": "phase_2_runtime_watch_locator_integrity_hardening",
+  "goal": "freeze the next same-mainline longrun after runtime-watch locator integrity so OMX can continue family parity and autopilot continuity work without inventing a new product line",
+  "ordered_tranches": [
+    {
+      "tranche_id": "phase_2_family_parity_governance_surface_convergence",
+      "goal": "align the current stable families on one shared governance-surface contract while keeping family-specific delivery differences explicit"
+    },
+    {
+      "tranche_id": "phase_2_autonomous_stop_reason_convergence",
+      "goal": "make the current auto-only runtime expose one machine-readable stop/continue/retry reason language across the stable families without widening formal entry"
+    },
+    {
+      "tranche_id": "phase_2_autopilot_closeout_evidence_convergence",
+      "goal": "freeze one continuous closeout-evidence path for the current stable families so longrun auto execution can stop on the same auditable summaries and gates"
+    }
+  ],
+  "hard_boundaries": [
+    "do not expand controller",
+    "do not add a new family or overlay",
+    "do not rewrite xiaohongshu into direct-delivery",
+    "do not activate academic poster contracts",
+    "do not promote managed web runtime into current repo truth",
+    "do not widen formal entry beyond CLI plus MCP",
+    "do not collapse RedCube into OPL federation runtime ownership"
+  ],
+  "required_truth_sources": [
+    "contracts/runtime-program/current-program.json",
+    "contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json",
+    "docs/phase_2_runtime_watch_locator_integrity_hardening.md",
+    "docs/runtime_architecture.md",
+    "docs/policies/runtime_operating_model.md",
+    "docs/domain-harness-os-positioning.md"
+  ],
+  "required_verification": [
+    "git diff --check",
+    "npm run typecheck",
+    "node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/phase-2-family-parity-governance-surface-convergence.test.js tests/deliverable-review-loop.test.js tests/runtime-deliverable-route.test.js tests/phase-2-behavior-convergence.test.js tests/mcp-gateway.test.js tests/cli-v2-smoke.test.js",
+    "npm test"
+  ],
+  "terminal_states": [
+    "PHASE_2_FAMILY_PARITY_AUTOPILOT_CONTINUATION_CLOSED_AND_ABSORBED",
+    "NO_NEW_REDCUBE_SAME_MAINLINE_DELTA_HONEST_STOP"
+  ]
+}
