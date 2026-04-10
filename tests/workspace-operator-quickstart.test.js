@@ -5,6 +5,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
+import { buildHelp, getCliGatewayActions } from '../apps/redcube-cli/src/cli.js';
+import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/src/server.js';
+
 function runCli(args, options = {}) {
   const output = execFileSync(
     'node',
@@ -48,6 +51,33 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
   ]);
   assert.equal(typeof parsed.usage.deliverableRun, 'string');
   assert.equal(typeof parsed.usage.deliverableExecute, 'string');
+});
+
+test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickstart gateway actions', async () => {
+  const help = await buildHelp();
+  const commands = help.commonTasks.map((item) => item.command);
+  const cliActions = getCliGatewayActions();
+  const mcpActions = getMcpGatewayActions();
+  const toolNames = new Set(listGatewayTools().map((tool) => tool.name));
+
+  assert.equal(new Set(commands).size, commands.length);
+  assert.equal(commands.filter((command) => command.includes('deliverable execute')).length, 1);
+
+  for (const [actionKey, toolName] of [
+    ['doctorWorkspace', 'doctor'],
+    ['intakeSource', 'intake_source'],
+    ['researchSource', 'source_research'],
+    ['createDeliverable', 'create_deliverable'],
+    ['auditDeliverable', 'audit_deliverable'],
+    ['runDeliverableRoute', 'run_deliverable_route'],
+    ['getReviewState', 'get_review_state'],
+    ['getPublicationProjection', 'get_publication_projection'],
+    ['runtimeWatch', 'runtime_watch'],
+  ]) {
+    assert.equal(typeof cliActions[actionKey], 'function', `cli:${actionKey}`);
+    assert.equal(typeof mcpActions[actionKey], 'function', `mcp:${actionKey}`);
+    assert.equal(toolNames.has(toolName), true, `tool:${toolName}`);
+  }
 });
 
 test('brand-new workspace quickstart converges doctor -> source research -> create -> audit -> run with aligned governance surfaces', () => {

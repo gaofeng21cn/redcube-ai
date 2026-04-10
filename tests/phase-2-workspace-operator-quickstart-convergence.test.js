@@ -49,10 +49,12 @@ test('workspace operator quickstart convergence freezes brand-new or thin worksp
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.operator_quickstart_surface.canonical_route.join(' -> '), 'workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run');
   assert.equal(contract.workspace_bootstrap_surface.doctor_surface, 'redcube workspace doctor');
+  assert.equal(contract.workspace_bootstrap_surface.doctor_on_brand_new_recommended_action, 'run_source_intake');
   assert.equal(contract.workspace_bootstrap_surface.bootstrap_writers.includes('source research'), true);
   assert.equal(contract.governance_alignment.required_surfaces.includes('getPublicationProjection'), true);
   assert.equal(brief.includes('closeout 已完成并吸收到当前 mainline'), true);
   assert.equal(brief.includes('`workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run`'), true);
+  assert.equal(brief.includes('brand-new workspace 上返回 `run_source_intake`'), true);
   assert.equal(quickstart.includes('`redcube source intake`（材料已足够时）'), true);
   assert.equal(quickstart.includes('`redcube source research`（材料薄或只有主题时）'), true);
   assert.equal(quickstart.includes('`redcube deliverable run`'), true);

@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { realpathSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import {
   auditDeliverable,
   applyReviewMutation,
@@ -187,10 +190,6 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       {
         task: '触发一次 supervisor tick 刷新托管监管面',
         command: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
-      },
-      {
-        task: '托管执行整个交付链路并查看 managed 进度',
-        command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] && redcube managed get --workspace-root <dir> --managed-run-id <id>',
       },
       {
         task: '读取交付物当前 review 状态',
@@ -555,6 +554,22 @@ export async function main(argv = process.argv.slice(2), deps = {}) {
   return runCli(argv, deps);
 }
 
-main().catch((error) => {
-  fail(error instanceof Error ? error.message : String(error));
-});
+function isDirectExecution() {
+  if (!process.argv[1]) {
+    return false;
+  }
+
+  const modulePath = fileURLToPath(import.meta.url);
+
+  try {
+    return realpathSync(modulePath) === realpathSync(process.argv[1]);
+  } catch {
+    return import.meta.url === pathToFileURL(process.argv[1]).href;
+  }
+}
+
+if (isDirectExecution()) {
+  main().catch((error) => {
+    fail(error instanceof Error ? error.message : String(error));
+  });
+}

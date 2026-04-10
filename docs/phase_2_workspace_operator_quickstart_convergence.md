@@ -22,7 +22,7 @@
 
 ## 当前冻结结论
 
-- `workspace doctor` 继续保持**诊断**表面：在 brand-new workspace 上返回 `initialize_workspace_contract`，并显式暴露 canonical topics / runs 目录。
+- `workspace doctor` 继续保持**诊断**表面：在 brand-new workspace 上返回 `run_source_intake`，并显式暴露 canonical topics / runs 目录。
 - `source intake` 与 `source research` 继续是当前 quickstart 的**bootstrap writer**：由它们写入 `redcube.workspace.json`、`topics/<topic>/topic.json` 与 topic 级 canonical source surfaces。
 - `source research` 继续是 Step 1 的 one-shot orchestration surface：它总是先执行 `source intake`，再决定是停在 canonical result staging，还是继续 augmentation execution。
 - `deliverable create`、`deliverable audit`、`deliverable run` 现在与上述 bootstrap / readiness / governance 语义形成同一条 repo-verified operator route。
@@ -33,7 +33,7 @@
 
 ### 1. Workspace bootstrap hardening
 
-- brand-new workspace 上，`workspace doctor` 明确返回 `initialize_workspace_contract`；
+- brand-new workspace 上，`workspace doctor` 明确返回 `run_source_intake`；
 - brand-new / thin workspace 上，`source intake` 与 `source research` 明确写出：
   - `redcube.workspace.json`
   - `topics/<topic>/topic.json`

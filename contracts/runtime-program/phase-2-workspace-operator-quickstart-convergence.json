@@ -43,7 +43,7 @@
   },
   "workspace_bootstrap_surface": {
     "doctor_surface": "redcube workspace doctor",
-    "doctor_on_brand_new_recommended_action": "initialize_workspace_contract",
+    "doctor_on_brand_new_recommended_action": "run_source_intake",
     "doctor_summary_fields": [
       "workspace_file_exists",
       "canonical_topics_dir",
