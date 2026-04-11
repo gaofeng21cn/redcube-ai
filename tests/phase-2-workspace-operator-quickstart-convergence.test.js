@@ -16,7 +16,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('workspace operator quickstart convergence stays absorbed provenance while runtime watch locator integrity hardening takes the active tranche', () => {
+test('workspace operator quickstart convergence stays absorbed provenance while Hermes canonical closure takes the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -25,16 +25,14 @@ test('workspace operator quickstart convergence stays absorbed provenance while 
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / runtime watch locator integrity hardening');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.commit, 'bf2df47');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('workspace doctor'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('source research'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.required_operator_surfaces.includes('deliverable run'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.excluded_scope.includes('controller expansion'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_workspace_operator_quickstart_convergence.scope.excluded_scope.includes('xiaohongshu rewrite into direct-delivery'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_source_readiness_deep_research_trigger_gate_convergence.artifacts.tranche_contract, PREDECESSOR_CONTRACT);
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('deliverable run'), true);
+  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
+  assert.equal(contract.operator_quickstart_surface.canonical_route.includes('workspace doctor'), true);
+  assert.equal(contract.object_boundary.out_of_scope.includes('controller expansion'), true);
+  assert.equal(existsSync(path.resolve(PREDECESSOR_CONTRACT)), true);
 });
 
 test('workspace operator quickstart convergence freezes brand-new or thin workspace bootstrap, docs, and help surface honestly', () => {

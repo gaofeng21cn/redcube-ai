@@ -1,0 +1,53 @@
+{
+  "tranche_id": "hermes_runtime_substrate_activation_package",
+  "date_anchor": "2026-04-11",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "activation_goal": {
+    "label": "freeze Hermes as the product runtime substrate owner",
+    "summary": "RedCube Gateway and Domain Harness OS now run on a repo-tracked Hermes-backed runtime substrate while Codex-local host-agent stays only as a transition deployment host, regression bridge, or development shell."
+  },
+  "topology": {
+    "gateway_role": "visual_deliverable_domain_gateway",
+    "domain_harness_os": "RedCube Domain Harness OS",
+    "runtime_substrate_owner": "Hermes",
+    "runtime_substrate_surface": "hermes_backed_runtime_substrate",
+    "family_pack_boundary": "family_profile_pack_harness_execution",
+    "deployment_host": "codex_default_host_agent_bridge",
+    "deployment_host_status": "transition_only",
+    "product_mode": "auto_only"
+  },
+  "object_boundary": {
+    "in_scope": [
+      "freeze Hermes as the runtime substrate owner for routed deliverable execution",
+      "keep CLI as the default formal entry and MCP as the supported protocol layer",
+      "keep controller as an internal-only surface",
+      "preserve program_id/topic_id/deliverable_id/run_id boundaries and canonical audit/watch/review/projection surfaces",
+      "demote Codex-local host-agent runtime to transition deployment host, regression bridge, or development shell only"
+    ],
+    "excluded_scope": [
+      "controller expansion",
+      "new family or overlay expansion",
+      "paper_poster or conference_poster advancement",
+      "managed web runtime completion claim",
+      "prompt patch replacing contract hydration",
+      "durable identity rewrites"
+    ]
+  },
+  "promotion_invariants": [
+    "RedCube remains the visual-deliverable domain gateway plus Domain Harness OS",
+    "formal entry remains CLI-first",
+    "MCP remains the supported protocol layer",
+    "current repo mainline remains Auto-only",
+    "object model, artifact schema, gate semantics, audit/watch/report surfaces must not drift",
+    "old Codex-local runtime cannot continue as the long-term product runtime owner"
+  ],
+  "required_verification": [
+    "git diff --check",
+    "npm run typecheck",
+    "node --test tests/runtime-deliverable-route.test.js tests/family-parity-governance-surface.test.js tests/managed-deliverable-execution.test.js",
+    "node --test tests/hermes-runtime-canonical-path.test.js",
+    "npm run test:full"
+  ]
+}

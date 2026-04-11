@@ -112,7 +112,7 @@ export interface PosterVisualDirectorReviewArtifact extends PosterRuntimeArtifac
     rewrite_action: string;
     review_summary: string;
     creative_sources: {
-      review_judgement: 'host_agent';
+      review_judgement: 'hermes';
     };
   };
   artifact_refs: string[];

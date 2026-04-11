@@ -81,10 +81,7 @@ export async function createDeliverable({
     surfaceFiles.push(targetFile);
   }
 
-  const publicationProjectionFile = path.join(topicPaths.topicDir, 'publication-state.json');
-  if (existsSync(publicationProjectionFile)) {
-    rebuildTopicPublicationProjection({ workspaceRoot, topicId });
-  }
+  rebuildTopicPublicationProjection({ workspaceRoot, topicId });
 
   return {
     ok: true,

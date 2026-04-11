@@ -17,7 +17,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('source-readiness deep research trigger+gate convergence stays absorbed provenance while runtime watch locator integrity hardening becomes the active tranche', () => {
+test('source-readiness deep research trigger+gate convergence stays absorbed provenance while Hermes canonical closure is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -26,15 +26,15 @@ test('source-readiness deep research trigger+gate convergence stays absorbed pro
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / runtime watch locator integrity hardening');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_source_readiness_deep_research_trigger_gate_convergence.artifacts.tranche_contract, TRANCHE_CONTRACT);
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
   assert.equal(currentProgram.current_state.active_baton.scope.runtime_planes.includes('source_readiness'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('xiaohongshu'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('poster_onepager'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('controller expansion'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_direct_delivery_lifecycle_stage_convergence.artifacts.tranche_contract, PREDECESSOR_CONTRACT);
+  assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PREDECESSOR_CONTRACT)), true);
 });
 
 test('source-readiness deep research trigger+gate convergence freezes trigger logic, planning_ready gate, and future-facing target honestly', () => {

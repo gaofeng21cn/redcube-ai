@@ -9,7 +9,7 @@
 `RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS` 驱动。
 
 这里的 `Agent-first` 不等于必须走 `external_llm` API。
-在当前 Codex-native 语境里，默认本地执行形态是 `Codex-default host-agent runtime`；
+在当前 Codex-native 语境里，当前产品 runtime 已迁到 `Hermes-backed runtime substrate`，而 `Codex-default host-agent runtime` 只保留为 transition deployment host；
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；
 当前已验证的公开正式入口是 `CLI`、`MCP`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
@@ -36,7 +36,8 @@ Agent
       -> RedCube Gateway
           -> Overlay / Family / Profile / Pack
               -> RedCube Domain Harness OS
-                  -> Codex-default host-agent runtime
+                  -> Hermes-backed runtime substrate
+                      -> Codex-default host-agent runtime bridge
 ```
 
 放在 `OPL` 顶层语义里时：
@@ -112,7 +113,8 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 
 ## 部署形态与本体语义分离
 
-- `Codex-default host-agent runtime` 是当前默认部署形态，不是 RedCube 本体定义。
+- `Hermes-backed runtime substrate` 是当前产品 runtime owner，不是可选叙述。
+- `Codex-default host-agent runtime` 现在只是过渡期 deployment host，不再是长期产品 runtime owner。
 - 未来切到 managed web runtime 时，只要仍在同一 `Unified Harness Engineering Substrate` 上并保持同一 contract，RedCube 的 domain 语义不变。
 - `OPL` 是上层语义系统；RedCube 在其中是视觉交付 domain gateway + Domain Harness OS，不是 `OPL` 本体。
 - 当前仓库主线是 `Auto-only`；未来如需更高判断密度的 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
@@ -226,6 +228,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 当前 reality：
 
 - `source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线：CLI / MCP 的 source intake 会把 canonical quartet 写入同一 substrate，`ppt_deck` / `xiaohongshu` 在同一 `gateway -> family -> profile -> pack -> harness execution` 控制链上消费 `shared_source_truth`；`P0 review-closeout` 与 stable deliverable manual hardening 继续保持通过，activation package freeze 已完成并转为已吸收前置冻结件
+- `Hermes-backed runtime substrate` 现已接管 routed run session、event log、executor identity 与 shared runtime topology；`Codex-default host-agent runtime` 只保留为 transition deployment host / regression bridge / development shell
 - 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
 - `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`
@@ -237,6 +240,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 - `workspace / operator quickstart convergence` 已把 brand-new / thin workspace bootstrap 与 canonical operator route 收紧成同一条 repo-verified behavior surface：`workspace doctor` 保持诊断角色，而 `source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 成为当前可验证的 quickstart 路径
 - `operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path
 - `runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope，并让 `runtimeWatch` / `review watch` / `runtime_watch` 在 quartet locator mismatch 时 fail-closed
+- `governance_surface.runtime_topology` 现在在 create / review / audit / watch / projection 上显式暴露 `Hermes` substrate owner 与 `Codex-default host-agent` transition-host truth
 - `publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state；`xiaohongshu` 保持 human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery 语义
 - `direct-delivery operator handoff hardening` 已把 `ppt_deck` / guarded `poster_onepager` 的 `operator_handoff` 收紧到同一 canonical governance path：`delivery_state` ownership 继续留在 required export artifact，而 handoff gate 由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 共同收口
 - `direct-delivery lifecycle stage convergence` 已把 direct-delivery human workline 与当前 macro lifecycle 的 machine-readable bridge 收紧到同一 canonical contract surface：`Storyline + Plan` 继续映射到 `Story Architecture`，`Visual` 继续映射到 `Visual Authorship`，`Delivery` 继续映射到 `Delivery Packaging`，而 `operator_handoff / closeout` 仍留在 `Delivery`

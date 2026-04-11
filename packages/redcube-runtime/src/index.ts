@@ -169,7 +169,10 @@ export async function runDeliverableRoute(request: RuntimeRunRouteRequest): Prom
 export async function runManagedDeliverable(
   request: RuntimeManagedRunRequest,
 ): Promise<RuntimeManagedRunResponse> {
-  return runManagedDeliverableJs(request) as Promise<RuntimeManagedRunResponse>;
+  const runManaged = runManagedDeliverableJs as unknown as (
+    request: RuntimeManagedRunRequest,
+  ) => Promise<RuntimeManagedRunResponse>;
+  return runManaged(request);
 }
 
 export async function getManagedRun(
@@ -188,11 +191,17 @@ export const resolveExecutorAdapter = resolveExecutorAdapterJs;
 export const resolveSourceAugmentationAdapter = resolveSourceAugmentationAdapterJs;
 
 export function completeRun(request: RuntimeCompleteRunRequest): RuntimeRunRecord {
-  return completeRunJs(request) as RuntimeRunRecord;
+  const complete = completeRunJs as unknown as (
+    request: RuntimeCompleteRunRequest,
+  ) => RuntimeRunRecord;
+  return complete(request);
 }
 
 export function loadRun(request: RuntimeRunLookupRequest): RuntimeRunRecord {
-  return loadRunJs(request) as RuntimeRunRecord;
+  const load = loadRunJs as unknown as (
+    request: RuntimeRunLookupRequest,
+  ) => RuntimeRunRecord;
+  return load(request);
 }
 
 export function startRun(request: RuntimeStartRunRequest): RuntimeRunRecord {
@@ -201,7 +210,10 @@ export function startRun(request: RuntimeStartRunRequest): RuntimeRunRecord {
 }
 
 export function failRun(request: RuntimeFailRunRequest): RuntimeRunRecord {
-  return failRunJs(request) as RuntimeRunRecord;
+  const fail = failRunJs as unknown as (
+    request: RuntimeFailRunRequest,
+  ) => RuntimeRunRecord;
+  return fail(request);
 }
 
 export function createManagedRun(request: RuntimeManagedRunRequest): RuntimeManagedRunRecord {

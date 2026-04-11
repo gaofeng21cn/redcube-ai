@@ -23,3 +23,9 @@
 ### 决策：目标 substrate 优先于旧宿主硬化
 
 原因：历史主线与当前基线仍然有验证价值，但一旦新的 runtime substrate 目标已经明确，新增投入就应默认服务目标形态。旧宿主形态只能保留为迁移桥、兼容层或回归对照，而不是继续被当成长线产品方向。
+
+### 决策：产品 runtime 主线迁到 `docs/program/hermes/`
+
+- `Hermes` 成为新的 runtime substrate owner
+- `Codex-default host-agent runtime` 退为 transition deployment host / regression bridge / development shell
+- `docs/program/hermes/*.md` 与对应 machine-readable contract 成对维护

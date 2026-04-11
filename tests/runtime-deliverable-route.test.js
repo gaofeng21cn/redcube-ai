@@ -128,7 +128,7 @@ test('createDeliverable rejects unknown overlay ids', async () => {
   );
 });
 
-test('runDeliverableRoute uses host-agent executor by default', async () => {
+test('runDeliverableRoute uses Hermes-backed executor by default', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
   await createDeliverable({
@@ -153,15 +153,15 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(result.surface_kind, 'route_run');
   assert.equal(result.recommended_action, 'continue');
   assert.equal(result.summary.route, 'storyline');
-  assert.equal(result.run.executor.adapter, 'host_agent');
+  assert.equal(result.run.executor.adapter, 'hermes');
   assert.equal(result.run.executor.primary, true);
-  assert.equal(result.run.executor.execution_surface, 'codex_native_host_agent');
+  assert.equal(result.run.executor.execution_surface, 'hermes_backed_runtime_substrate');
   assert.equal(result.run.executor.creative_execution, 'agent_first_director_first');
   assert.equal(result.run.executor.external_llm_role, 'optional_compatibility_adapter');
-  assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
-  assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
+  assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
+  assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
   assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
-  assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
   assert.equal(result.run.topic_id, 'topic-a');
   assert.equal(result.run.deliverable_id, 'deck-a');
   assert.equal(result.run.status, 'completed');
@@ -173,16 +173,16 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(stored.summary.run_id, result.run.run_id);
   assert.equal(stored.run.topic_id, 'topic-a');
   assert.equal(stored.run.deliverable_id, 'deck-a');
-  assert.equal(stored.run.executor.adapter, 'host_agent');
-  assert.equal(stored.run.executor.execution_surface, 'codex_native_host_agent');
-  assert.equal(stored.run.executor.execution_model.mainline_adapter, 'host_agent');
-  assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(stored.run.executor.adapter, 'hermes');
+  assert.equal(stored.run.executor.execution_surface, 'hermes_backed_runtime_substrate');
+  assert.equal(stored.run.executor.execution_model.mainline_adapter, 'hermes');
+  assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
   assert.equal(stored.run_telemetry.run_id, result.run.run_id);
   assert.equal(stored.run_telemetry.route, 'storyline');
-  assert.equal(stored.run_telemetry.executor_kind, 'host_agent');
+  assert.equal(stored.run_telemetry.executor_kind, 'hermes');
   assert.equal(stored.error_taxonomy.error_kind, null);
   assert.equal(stored.rerun_analytics.rerun_count, 0);
-  assert.equal(stored.cost_summary.executor_identity, 'codex_native_host_agent');
+  assert.equal(stored.cost_summary.executor_identity, 'hermes_backed_runtime_substrate');
   assert.equal(stored.quality_drift_summary.relative_quality_verdict, null);
   assert.equal(stored.approval_throughput_summary.pending_review_count, 0);
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
@@ -190,13 +190,13 @@ test('runDeliverableRoute uses host-agent executor by default', async () => {
   assert.equal(artifact.contract.profile_id, 'lecture_student');
   assert.equal(artifact.contract.goal, '为本科生讲授甲状腺基础知识');
   assert.equal(artifact.stage_contract.stage_id, 'storyline');
-  assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
-  assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
+  assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
+  assert.equal(artifact.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
   assert.equal(artifact.execution_model.external_llm_role, 'optional_compatibility_adapter');
-  assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(artifact.execution_model.freeze_origin_milestone, 'Hermes.A');
 });
 
-test('runDeliverableRoute executes other declared stages through host-agent executor', async () => {
+test('runDeliverableRoute executes other declared stages through Hermes-backed executor', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
   await createDeliverable({
@@ -227,13 +227,13 @@ test('runDeliverableRoute executes other declared stages through host-agent exec
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.run.executor.adapter, 'host_agent');
-  assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
+  assert.equal(result.run.executor.adapter, 'hermes');
+  assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
   assert.equal(result.run.current_stage, 'detailed_outline');
   const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
   assert.equal(artifact.stage_contract.stage_id, 'detailed_outline');
   assert.equal(artifact.contract.profile_id, 'lecture_peer');
-  assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
+  assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
 });
 
 test('getRun rejects unsafe run identifiers', async () => {
@@ -335,7 +335,7 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   assert.equal(result.run.executor.primary, false);
   assert.equal(result.run.executor.execution_surface, 'external_llm_adapter');
   assert.equal(result.run.executor.compatibility_role, 'optional_compatibility_adapter');
-  assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
   assert.equal(
     result.run.error.message,
     'Unsupported route for adapter external_llm: detailed_outline',
@@ -344,7 +344,7 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
   const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
   assert.equal(stored.run.status, 'failed');
   assert.equal(stored.run.executor.execution_surface, 'external_llm_adapter');
-  assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+  assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
   assert.equal(stored.run_telemetry.executor_kind, 'external_llm');
   assert.equal(stored.error_taxonomy.error_kind, 'execution_error');
   assert.equal(stored.approval_throughput_summary.blocked, true);

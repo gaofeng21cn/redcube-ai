@@ -62,6 +62,22 @@ export interface GovernanceSurfaceFormalEntry extends JsonObject {
   controller_repo_verified: false;
 }
 
+export interface GovernanceSurfaceRuntimeTopology extends JsonObject {
+  schema_version: 1;
+  runtime_substrate_owner: 'Hermes';
+  runtime_substrate_surface: 'hermes_backed_runtime_substrate';
+  deployment_host: 'codex_default_host_agent_bridge';
+  deployment_host_status: 'transition_only';
+  gateway_role: 'visual_deliverable_domain_gateway';
+  domain_harness_os: 'RedCube Domain Harness OS';
+  family_pack_boundary: 'family_profile_pack_harness_execution';
+  product_mode: 'auto_only';
+  default_formal_entry: 'CLI';
+  supported_protocol_layer: ['MCP'];
+  internal_controller_surface: 'controller';
+  controller_repo_verified: false;
+}
+
 export interface GovernanceSurfaceContract extends JsonObject {
   schema_version: 1;
   shared_governance_surfaces: string[];
@@ -70,6 +86,7 @@ export interface GovernanceSurfaceContract extends JsonObject {
   authoritative_review_surfaces: string[];
   family_boundary: GovernanceSurfaceFamilyBoundary;
   formal_entry: GovernanceSurfaceFormalEntry;
+  runtime_topology: GovernanceSurfaceRuntimeTopology;
 }
 
 export interface OverlayProfileDefinition {

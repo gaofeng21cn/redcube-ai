@@ -9,7 +9,7 @@
 
 - `contracts/runtime-program/current-program.json` 是当前 active mainline pointer。
 - `contracts/runtime-program/*.json` 是 tranche / board / provenance 的机器可读真相面。
-- `docs/program/phase-2/*.md` 是对应的人类可读 brief，必须与 contracts 和 tests 同步。
+- `docs/program/*/*.md` 是对应的人类可读 brief，必须与 contracts 和 tests 同步。
 
 ## 目标优先级
 

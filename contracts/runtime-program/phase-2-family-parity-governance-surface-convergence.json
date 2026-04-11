@@ -1,7 +1,7 @@
 {
   "tranche_id": "phase_2_family_parity_governance_surface_convergence",
-  "status": "truth_frozen_pending_implementation",
-  "review_status": "not_started",
+  "status": "closeout_completed",
+  "review_status": "passed",
   "program_mode": "autonomous_longrun",
   "parent_board_id": "phase_2_family_parity_autopilot_continuation_board",
   "predecessor": {
@@ -82,7 +82,9 @@
   },
   "closeout": {
     "success_state": "PHASE_2_FAMILY_PARITY_GOVERNANCE_SURFACE_CONVERGENCE_CLOSED_AND_ABSORBED",
-    "next_tranche_candidate": "phase_2_autonomous_stop_reason_convergence",
-    "next_tranche_kind": "prefrozen_follow_on_board_entry"
+    "executed_at": "2026-04-11",
+    "next_tranche_candidate": "hermes_runtime_substrate_activation_package",
+    "next_tranche_kind": "new_mainline_activation_package",
+    "absorbed_to_main": true
   }
 }

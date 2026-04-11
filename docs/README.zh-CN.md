@@ -3,7 +3,7 @@
 [English](./README.md) | **中文**
 
 这里是 `RedCube AI` 的双语文档索引，也是默认对外公开面。
-内容与产品真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的领域承载操作系统（Domain Harness OS），本地执行呈现为 Codex 默认 host-agent runtime；其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
+内容与产品真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的领域承载操作系统（Domain Harness OS），当前产品 runtime 已迁到 `Hermes-backed runtime substrate`；`Codex-default host-agent runtime` 只保留为过渡 deployment host。其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
 
 ## 核心维护工作集
 
@@ -23,9 +23,9 @@
 
 ## 当前主线状态
 
-当前仓库已吸收的 tranche 是 `Phase 2 / runtime watch locator integrity hardening`。
-`operator surface consistency hardening` 继续作为同一主线上的 absorbed provenance，而 `runtime watch locator integrity hardening` 已成为当前已吸收 tranche。
-同一主线的下一段继续面也已预冻结为 `family parity / autopilot continuity`，第一条允许打开的 follow-on tranche 固定是 `phase_2_family_parity_governance_surface_convergence`。
+当前 active tranche 是 `Hermes / runtime substrate canonical closure`。
+Phase 2 的 source-truth、governance、operator-surface 与 runtime-watch 工作继续作为同一主线上的 absorbed provenance 保留。
+当前真实主线不再是“继续打磨 host-agent runtime”，而是“把 Hermes runtime topology、canonical path 与 shared governance surface 收口为 repo truth”。
 
 ## 当前基线、长线目标与任务层级
 
@@ -44,6 +44,9 @@
 
 ### 主线 program 工件与 provenance
 
+- [Hermes runtime substrate activation package](program/hermes/hermes_runtime_substrate_activation_package.md)
+- [Hermes runtime capability extraction map](program/hermes/hermes_runtime_capability_extraction_map.md)
+- [Hermes runtime substrate canonical closure](program/hermes/hermes_runtime_substrate_canonical_closure.md)
 - [Phase 2 activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
 - [Phase 2 source intake + shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
 - [Phase 2 review / export / gate / audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
@@ -56,9 +59,8 @@
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
 - [Phase 2 workspace / operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md)（已吸收 provenance）
 - [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md)（已吸收 provenance）
-- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)（当前已吸收 tranche）
-- [Phase 2 family parity / autopilot continuation board](program/phase-2/phase_2_family_parity_autopilot_continuation_board.md)（已预冻结的 follow-on board）
-- [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md)（第一条已预冻结的 follow-on tranche）
+- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)（已吸收 provenance）
+- [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md)（已吸收 provenance）
 
 ### 面向技术协作 / Agent 执行者
 
@@ -86,7 +88,7 @@
 
 - `README*` 与 `docs/README*`：默认双语对外公开面。
 - `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md`：AI / 维护者核心工作集。
-- `docs/program/phase-2/*.md`：repo-tracked 的 program brief。
+- `docs/program/*/*.md`：repo-tracked 的 program brief。
 - 详细 `docs/*.md`：默认仓库跟踪的内部操作文档，中文为主。
 - `docs/policies/`：稳定内部规则，默认中文维护。
 - `docs/superpowers/`：现有 repo-tracked 设计档案可保留为内部历史材料；新增本地 AI / Superpowers 草稿默认不进入跟踪。

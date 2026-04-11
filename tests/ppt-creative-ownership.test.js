@@ -48,7 +48,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.summary_peak.html')), true);
 });
 
-test('ppt route artifacts record host-agent ownership for Story Architecture, Visual Authorship, and visual_director_review overlay', async () => {
+test('ppt route artifacts record Hermes-backed ownership for Story Architecture, Visual Authorship, and visual_director_review overlay', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-creative-'));
   await createDeliverable({
     workspaceRoot,
@@ -57,7 +57,7 @@ test('ppt route artifacts record host-agent ownership for Story Architecture, Vi
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     title: 'P19 PPT 创作权收口',
-    goal: '验证 PPT 主创作权已从 JS 收回到 host-agent / director-first mainline',
+    goal: '验证 PPT 主创作权已从 JS 收回到 Hermes-backed / director-first mainline',
   });
 
   const routes = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
@@ -75,41 +75,41 @@ test('ppt route artifacts record host-agent ownership for Story Architecture, Vi
   }
 
   const storyline = readJson(results[0].artifactFile);
-  assert.equal(storyline.creative_execution?.owner, 'host_agent');
+  assert.equal(storyline.creative_execution?.owner, 'hermes');
   assert.equal(storyline.creative_execution?.lifecycle_stage, 'story_architecture');
   assert.equal(storyline.storyline.creative_sources?.core_metaphor?.materialized_from, 'prompt_pack_artifact');
   assert.equal(storyline.storyline.creative_sources?.narrative_arc?.materialized_from, 'prompt_pack_artifact');
 
   const outline = readJson(results[1].artifactFile);
-  assert.equal(outline.creative_execution?.owner, 'host_agent');
+  assert.equal(outline.creative_execution?.owner, 'hermes');
   assert.equal(outline.creative_execution?.lifecycle_stage, 'story_architecture');
   assert.equal(
-    outline.detailed_outline.slides.every((slide) => slide.creative_authorship?.major_text?.owner === 'host_agent'),
+    outline.detailed_outline.slides.every((slide) => slide.creative_authorship?.major_text?.owner === 'hermes'),
     true,
   );
 
   const blueprint = readJson(results[2].artifactFile);
-  assert.equal(blueprint.creative_execution?.owner, 'host_agent');
+  assert.equal(blueprint.creative_execution?.owner, 'hermes');
   assert.equal(blueprint.creative_execution?.lifecycle_stage, 'story_architecture');
   assert.equal(
-    blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.page_core_content?.owner === 'host_agent'),
+    blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.page_core_content?.owner === 'hermes'),
     true,
   );
   assert.equal(
-    blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.speaker_notes?.owner === 'host_agent'),
+    blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.speaker_notes?.owner === 'hermes'),
     true,
   );
 
   const visual = readJson(results[3].artifactFile);
-  assert.equal(visual.creative_execution?.owner, 'host_agent');
+  assert.equal(visual.creative_execution?.owner, 'hermes');
   assert.equal(visual.creative_execution?.lifecycle_stage, 'visual_authorship');
-  assert.equal(visual.visual_direction?.creative_authorship?.visual_direction?.owner, 'host_agent');
+  assert.equal(visual.visual_direction?.creative_authorship?.visual_direction?.owner, 'hermes');
 
   const render = readJson(results[4].artifactFile);
-  assert.equal(render.creative_execution?.owner, 'host_agent');
+  assert.equal(render.creative_execution?.owner, 'hermes');
   assert.equal(render.creative_execution?.lifecycle_stage, 'visual_authorship');
   assert.equal(
-    render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.owner === 'host_agent'),
+    render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.owner === 'hermes'),
     true,
   );
   assert.equal(
@@ -118,7 +118,7 @@ test('ppt route artifacts record host-agent ownership for Story Architecture, Vi
   );
 
   const directorReview = readJson(results[5].artifactFile);
-  assert.equal(directorReview.review_execution?.owner, 'host_agent');
+  assert.equal(directorReview.review_execution?.owner, 'hermes');
   assert.equal(directorReview.review_execution?.overlay, 'visual_director_review');
   assert.equal(directorReview.visual_director_review?.review_model, 'director_first_visual_judgement');
 });

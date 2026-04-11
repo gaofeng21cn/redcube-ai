@@ -11,9 +11,9 @@ function hydrateSeedVars(vars, prefix, values, max = 6) {
 
 function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
+    stage_owner: 'hermes_backed_runtime_substrate',
     route,
     lifecycle_stage: lifecycleStage,
     authored_surface: authoredSurface,
@@ -23,8 +23,8 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
 
 function creativeExecution(route, lifecycleStage) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
     route,
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',

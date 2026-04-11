@@ -203,8 +203,8 @@ function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
 
 function creativeExecution(lifecycleStage) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',
   };
@@ -212,9 +212,9 @@ function creativeExecution(lifecycleStage) {
 
 function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
+    stage_owner: 'hermes_backed_runtime_substrate',
     route,
     lifecycle_stage: lifecycleStage,
     authored_surface: authoredSurface,
@@ -225,7 +225,7 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
 function reviewAuthorship(overlay) {
   return {
     overlay,
-    primary_surface: 'codex_native_host_agent',
+    primary_surface: 'hermes_backed_runtime_substrate',
     contract_asset: 'prompt_pack_seed',
   };
 }
@@ -370,7 +370,7 @@ function buildDirectorReview(contract, deliverablePaths) {
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: codex_native_host_agent',
+    '- review_owner: hermes_backed_runtime_substrate',
     `- director_intent_landed: ${checks.director_intent_landed}`,
     `- anti_template_ok: ${checks.anti_template_ok}`,
     `- message_hierarchy_clear: ${checks.message_hierarchy_clear}`,
@@ -399,7 +399,7 @@ function buildDirectorReview(contract, deliverablePaths) {
       rewrite_action: safeText(reviewSeed.rewrite_action, status === 'pass' ? 'none' : 'revise_render_html'),
       review_summary: safeText(reviewSeed.review_summary),
       creative_sources: {
-        review_judgement: 'host_agent',
+        review_judgement: 'hermes',
       },
     },
     artifact_refs: [reviewFile],

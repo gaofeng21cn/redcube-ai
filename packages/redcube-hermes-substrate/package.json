@@ -1,5 +1,5 @@
 {
-  "name": "@redcube/overlay-core",
+  "name": "@redcube/hermes-substrate",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,6 +8,6 @@
     ".": "./src/index.js"
   },
   "dependencies": {
-    "@redcube/hermes-substrate": "0.1.0"
+    "@redcube/runtime-protocol": "0.1.0"
   }
 }

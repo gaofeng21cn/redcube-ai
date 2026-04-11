@@ -17,7 +17,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('family parity follow-on board is prefrozen from the current absorbed runtime-watch tranche', () => {
+test('family parity follow-on board remains tracked as historical provenance from the phase-2 runtime-watch tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
   const board = readJson(BOARD_CONTRACT);
@@ -43,18 +43,11 @@ test('family parity follow-on board is prefrozen from the current absorbed runti
     predecessor.closeout.prefrozen_follow_on_board.board_contract,
     'contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json',
   );
-  assert.equal(
-    currentProgram.current_state.active_baton.closeout.next_tranche_candidate,
-    'phase_2_family_parity_governance_surface_convergence',
-  );
-  assert.equal(
-    currentProgram.current_state.active_baton.closeout.prefrozen_follow_on_board.board_id,
-    board.board_id,
-  );
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_parity_governance_surface_convergence.status, 'closeout_completed');
   assert.equal(tranche.predecessor.phase_2_runtime_watch_locator_integrity_hardening.commit, '9cfe58b');
 });
 
-test('family parity governance activation package stays frozen as the first same-mainline follow-on without widening product boundaries', () => {
+test('family parity governance tranche is now absorbed provenance without widening product boundaries', () => {
   const board = readJson(BOARD_CONTRACT);
   const tranche = readJson(TRANCHE_CONTRACT);
   const brief = read(TRANCHE_BRIEF);
@@ -65,11 +58,11 @@ test('family parity governance activation package stays frozen as the first same
   assert.equal(existsSync(path.resolve(BOARD_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
-  assert.equal(tranche.status, 'truth_frozen_pending_implementation');
+  assert.equal(tranche.status, 'closeout_completed');
   assert.deepEqual(tranche.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);
   assert.equal(tranche.scope.required_family_boundaries.includes('xiaohongshu remains human_publication rather than direct-delivery'), true);
-  assert.equal(tranche.closeout.next_tranche_candidate, 'phase_2_autonomous_stop_reason_convergence');
-  assert.equal(tranche.closeout.next_tranche_kind, 'prefrozen_follow_on_board_entry');
+  assert.equal(tranche.closeout.next_tranche_candidate, 'hermes_runtime_substrate_activation_package');
+  assert.equal(tranche.closeout.next_tranche_kind, 'new_mainline_activation_package');
   assert.equal(
     board.required_verification.includes(
       'node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/phase-2-family-parity-governance-surface-convergence.test.js tests/deliverable-review-loop.test.js tests/runtime-deliverable-route.test.js tests/phase-2-behavior-convergence.test.js tests/mcp-gateway.test.js tests/cli-v2-smoke.test.js',
@@ -77,9 +70,9 @@ test('family parity governance activation package stays frozen as the first same
     true,
   );
   assert.equal(board.required_verification.includes('npm run test:full'), true);
-  assert.equal(brief.includes('truth_frozen_pending_implementation'), true);
-  assert.equal(brief.includes('same-mainline 第一条 tranche'), true);
+  assert.equal(brief.includes('closeout_completed'), true);
+  assert.equal(brief.includes('完成实现并吸收到主线 provenance'), true);
   assert.equal(runtimeWatchBrief.includes('prefrozen follow-on board'), true);
-  assert.equal(runtimePolicy.includes('prefrozen follow-on board'), true);
-  assert.equal(positioning.includes('family parity / autopilot continuity'), true);
+  assert.equal(runtimePolicy.includes('Hermes runtime substrate canonical closure'), true);
+  assert.equal(positioning.includes('Hermes runtime substrate canonical closure'), true);
 });

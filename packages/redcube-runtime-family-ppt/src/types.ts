@@ -172,7 +172,7 @@ export interface PptVisualDirectorReviewArtifact extends PptRuntimeArtifactBase 
     rewrite_action: string;
     review_summary: string;
     creative_sources: {
-      review_judgement: 'host_agent';
+      review_judgement: 'hermes';
     };
   };
   artifact_refs: string[];

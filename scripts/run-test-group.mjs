@@ -85,6 +85,7 @@ const INTEGRATION = [
   'tests/reference-quality-os-reporting.test.js',
   'tests/reference-regression.test.js',
   'tests/review-platform.test.js',
+  'tests/hermes-runtime-canonical-path.test.js',
   'tests/runtime-deliverable-route.test.js',
   'tests/source-intake.test.js',
   'tests/source-readiness-deep-research-gate.test.js',

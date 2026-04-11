@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json';
@@ -16,7 +16,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provenance without rewriting current lifecycle names', () => {
+test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provenance while Hermes canonical closure keeps current lifecycle names intact', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -25,26 +25,19 @@ test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provena
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.next_tranche_candidate, 'phase_2_direct_delivery_lifecycle_stage_convergence');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / runtime watch locator integrity hardening');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_direct_delivery_lifecycle_stage_convergence.scope.hardening_axis, 'direct_delivery_lifecycle_stage_convergence');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
   assert.deepEqual(
     currentProgram.durable_surface_contract.required_embedded_summaries,
     ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary'],
   );
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_direct_delivery_lifecycle_stage_convergence.artifacts.tranche_contract,
-    TRANCHE_CONTRACT,
-  );
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_direct_delivery_operator_handoff_hardening.artifacts.tranche_contract,
-    PREDECESSOR_CONTRACT,
-  );
+  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('managed web runtime completion claim'), true);
+  assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PREDECESSOR_CONTRACT)), true);
   assert.equal(contract.lifecycle_stage_contract_surface.human_to_macro_stage.plan, 'story_architecture');
   assert.equal(contract.lifecycle_stage_contract_surface.operator_handoff_within, 'delivery');
   assert.equal(contract.object_boundary.out_of_scope.includes('xiaohongshu rewrite into direct-delivery'), true);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_direct_delivery_operator_handoff_hardening.commit, '9b23a0e');
 });
 
 test('phase-2 direct-delivery lifecycle stage convergence brief and docs keep future target separate from current truth rewrite', () => {

@@ -41,9 +41,10 @@
 
 ## 4. 当前默认 runtime 形态
 
-当前默认本地执行形态：
+当前产品 runtime 形态：
 
-- `Codex-default host-agent runtime`
+- `Hermes-backed runtime substrate`
+- `Codex-default host-agent runtime`（仅 transition deployment host / regression bridge / development shell）
 
 当前 formal-entry matrix：
 
@@ -70,9 +71,9 @@
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
 - `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
+- `Hermes runtime substrate activation package` 已完成：当前产品 runtime owner 已切到 `Hermes`
 - `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 都已吸收为同一主线 provenance
-- 当前已吸收 tranche 是 `runtime watch locator integrity hardening`：deliverable-scope run record 现在必须持久化 `topic_id` / `deliverable_id`；`runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator mismatch 时必须 fail-closed
-- 当前 same-mainline follow-on 也已预冻结为 `family parity / autopilot continuity`：下一条允许打开的 tranche 固定是 `phase_2_family_parity_governance_surface_convergence`，它只继续收紧共享 governance surface，不改写 `ppt_deck`、`xiaohongshu` 与 `poster_onepager` 的家族边界
+- 当前 active tranche 是 `Hermes runtime substrate canonical closure`：canonical `ppt_deck` deliverable mainline 已通过 Hermes-backed execution 闭环，同时 shared `runtime_topology` 已扩到 stable families 的 governance surface
 - authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 
