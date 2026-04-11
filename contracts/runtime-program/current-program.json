@@ -28,7 +28,7 @@
       "role": "active mainline control-plane pointer",
       "durable_surfaces": [
         "contracts/runtime-program/current-program.json",
-        ".runtime-program/reports/<program_id>/"
+        "$CODEX_HOME/projects/redcube-ai/runtime-state/reports/<program_id>/"
       ],
       "must_not_replace": [
         "topic_id",

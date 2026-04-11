@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
+import { runtimeStateDisplayPath } from '../packages/redcube-runtime/src/runtime-state.js';
+
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const ACTIVATION_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json';
 const ACTIVATION_BRIEF = 'docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md';
@@ -83,7 +85,12 @@ test('phase-2 activation package freeze keeps gate surface, operator flow, minim
     'tests/phase-2-source-intake-activation-package-freeze.test.js',
   ]);
   assert.equal(contract.minimal_test_surface.existing_capability_tests_to_hold.includes('tests/source-intake.test.js'), true);
-  assert.equal(contract.closeout_evidence_requirements.report_surfaces.includes('.runtime-program/context/CURRENT_PROGRAM.md'), true);
+  assert.equal(
+    contract.closeout_evidence_requirements.report_surfaces.includes(
+      runtimeStateDisplayPath('context', 'CURRENT_PROGRAM.md'),
+    ),
+    true,
+  );
   assert.equal(contract.closeout_evidence_requirements.repo_tracked_truth_surfaces.includes(ACTIVATION_BRIEF), true);
   assert.equal(contract.closeout_evidence_requirements.must_not_claim.includes('Phase 2 implementation has started'), true);
 });

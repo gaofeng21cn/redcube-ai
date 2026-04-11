@@ -10,7 +10,9 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-const AUDIT_FILE = path.resolve('.runtime-program/reports/redcube-runtime-program/P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
+import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime-state.js';
+
+const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',
@@ -60,6 +62,7 @@ const JS_RESIDUE_ALLOWLIST = {
   ],
   'packages/redcube-gateway': ['src/index.js'],
   'packages/redcube-governance': [
+    'src/governance-surface.js',
     'src/index.js',
     'src/review-state.js',
     'src/reviews.js',
@@ -82,6 +85,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/ppt-deck.js',
     'src/render-pack-compiler.js',
     'src/run-store.js',
+    'src/runtime-state.js',
     'src/shared-source-truth.js',
     'src/source-augmentation-execution.js',
     'src/source-augmentation-executor.js',

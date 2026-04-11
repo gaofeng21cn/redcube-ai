@@ -6,6 +6,7 @@ import {
   hydrateDeliverableContract,
 } from '@redcube/overlay-core';
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
+import { rebuildTopicPublicationProjection } from '@redcube/runtime';
 import { getDeliverablePaths, getTopicPaths } from '@redcube/runtime-protocol';
 
 function buildTopicRecord({ topicId, title, overlay }) {
@@ -78,6 +79,11 @@ export async function createDeliverable({
     mkdirSync(path.dirname(targetFile), { recursive: true });
     writeFileSync(targetFile, JSON.stringify(artifact.content, null, 2), 'utf-8');
     surfaceFiles.push(targetFile);
+  }
+
+  const publicationProjectionFile = path.join(topicPaths.topicDir, 'publication-state.json');
+  if (existsSync(publicationProjectionFile)) {
+    rebuildTopicPublicationProjection({ workspaceRoot, topicId });
   }
 
   return {

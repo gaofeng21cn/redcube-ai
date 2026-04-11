@@ -8,7 +8,9 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-export const AUDIT_FILE = path.resolve('.runtime-program/reports/redcube-runtime-program/P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
+import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime-state.js';
+
+export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',
@@ -49,12 +51,16 @@ const JS_RESIDUE_ALLOWLIST = {
   'apps/redcube-mcp': ['src/server.js'],
   'packages/redcube-runtime-protocol': [
     'src/index.js',
+    'src/managed-runs.js',
     'src/runs.js',
+    'src/source-augmentation-contract.js',
+    'src/source-readiness-summary.js',
     'src/source-truth.js',
     'src/workspace.js',
   ],
   'packages/redcube-gateway': ['src/index.js'],
   'packages/redcube-governance': [
+    'src/governance-surface.js',
     'src/index.js',
     'src/review-state.js',
     'src/reviews.js',
@@ -70,12 +76,22 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/event-log.js',
     'src/executors.js',
     'src/index.js',
+    'src/managed-deliverable.js',
+    'src/managed-event-log.js',
+    'src/managed-run-store.js',
     'src/ppt-deck-runtime.js',
     'src/ppt-deck.js',
     'src/render-pack-compiler.js',
     'src/run-store.js',
+    'src/runtime-state.js',
     'src/shared-source-truth.js',
+    'src/source-augmentation-execution.js',
+    'src/source-augmentation-executor.js',
+    'src/source-augmentation-request.js',
+    'src/source-augmentation-result.js',
     'src/source-intake.js',
+    'src/source-readiness-pack.js',
+    'src/source-research.js',
     'src/xiaohongshu-runtime.js',
     'src/xiaohongshu.js',
   ],

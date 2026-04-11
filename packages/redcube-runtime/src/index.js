@@ -16,6 +16,13 @@ export {
   P19_UNIFIED_LIFECYCLE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
 } from './creative-ownership.js';
+export {
+  resolveCodexHome,
+  resolveRuntimeStatePath,
+  resolveRuntimeStateRoot,
+  runtimeStateDisplayGlob,
+  runtimeStateDisplayPath,
+} from './runtime-state.js';
 export { runDeliverableRoute } from './deliverable-routes.js';
 export { getManagedRun, runManagedDeliverable, superviseManagedRun } from './managed-deliverable.js';
 export { resolveExecutorAdapter } from './executors.js';

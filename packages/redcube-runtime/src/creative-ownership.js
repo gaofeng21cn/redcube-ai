@@ -2,6 +2,8 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { runtimeStateDisplayGlob, runtimeStateDisplayPath } from './runtime-state.js';
+
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 
@@ -121,8 +123,8 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
     ],
     research_ownership: [
       'packages/redcube-runtime/src/creative-ownership.js',
-      '.runtime-program/plans/spec-redcube-unified-stage-lifecycle-and-family-alignment.md',
-      '.runtime-program/plans/spec-redcube-agent-first-execution-and-creative-ownership-recovery.md',
+      runtimeStateDisplayPath('plans', 'spec-redcube-unified-stage-lifecycle-and-family-alignment.md'),
+      runtimeStateDisplayPath('plans', 'spec-redcube-agent-first-execution-and-creative-ownership-recovery.md'),
     ],
     ppt_visual_director_review_contract: [
       'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
@@ -189,7 +191,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       write_scopes: [
         'tests/review-platform.test.js',
         'tests/reference-regression.test.js',
-        '.runtime-program/reports/redcube-runtime-program/**',
+        runtimeStateDisplayGlob('reports', 'redcube-runtime-program', '**'),
       ],
       verification_commands: [
         'node --test tests/review-platform.test.js',

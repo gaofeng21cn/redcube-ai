@@ -19,3 +19,7 @@
 ### 决策：`contracts/runtime-program/*.json` 与 `docs/program/phase-2/*.md` 成对维护
 
 原因：一个是机器真相，一个是人类可读 brief，不能再各自漂移。
+
+### 决策：目标 substrate 优先于旧宿主硬化
+
+原因：历史主线与当前基线仍然有验证价值，但一旦新的 runtime substrate 目标已经明确，新增投入就应默认服务目标形态。旧宿主形态只能保留为迁移桥、兼容层或回归对照，而不是继续被当成长线产品方向。

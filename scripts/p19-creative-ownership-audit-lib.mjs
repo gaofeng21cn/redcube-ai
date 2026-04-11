@@ -8,10 +8,11 @@ import {
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_TEAM_GATE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
+  resolveRuntimeStatePath,
 } from '../packages/redcube-runtime/src/index.js';
 
-export const AUDIT_FILE = path.resolve('.runtime-program/reports/redcube-runtime-program/P19_CREATIVE_OWNERSHIP_AUDIT.json');
-export const STATUS_FILE = path.resolve('.runtime-program/reports/redcube-runtime-program/P19_CREATIVE_OWNERSHIP_STATUS.json');
+export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P19_CREATIVE_OWNERSHIP_AUDIT.json');
+export const STATUS_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P19_CREATIVE_OWNERSHIP_STATUS.json');
 
 function mapFindings(familyAudit) {
   return familyAudit.violations

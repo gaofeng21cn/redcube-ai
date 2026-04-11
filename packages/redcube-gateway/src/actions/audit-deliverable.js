@@ -235,11 +235,13 @@ function auditOverlaySurface({
 }
 
 export async function auditDeliverable(request) {
-  const contract = loadHydratedContract(request);
-  const reviewResponse = loadReviewState(request);
+  const overlaySurfaceReport = auditOverlaySurface(request);
+  const canLoadGovernanceState = overlaySurfaceReport.status !== 'block';
+  const contract = canLoadGovernanceState ? loadHydratedContract(request) : null;
+  const reviewResponse = canLoadGovernanceState ? loadReviewState(request) : null;
   const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
   const reviewState = reviewResponse?.state || null;
-  const publicationProjection = loadPublicationProjection(request);
+  const publicationProjection = canLoadGovernanceState ? loadPublicationProjection(request) : null;
   const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
   const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
@@ -267,7 +269,7 @@ export async function auditDeliverable(request) {
       });
     }
   }
-  reports.push(auditOverlaySurface(request));
+  reports.push(overlaySurfaceReport);
   const mergedReport = mergeAuditReports(reports);
 
   return {
@@ -278,13 +280,17 @@ export async function auditDeliverable(request) {
     review_state: reviewState,
     publication_projection: publicationProjection,
     source_readiness_summary: sourceReadinessSummary,
-    gate_summary: reviewResponse?.gate_summary || publicationProjectionEntry?.gate_summary || buildGateSummary({
-      sourceReadinessSummary,
-      reviewState,
-      contract,
-      publicationProjectionEntry,
-      operatorHandoff,
-    }),
+    gate_summary: reviewResponse?.gate_summary || publicationProjectionEntry?.gate_summary || (
+      contract
+        ? buildGateSummary({
+            sourceReadinessSummary,
+            reviewState,
+            contract,
+            publicationProjectionEntry,
+            operatorHandoff,
+          })
+        : null
+    ),
     operator_handoff: operatorHandoff,
     lifecycle_stage_summary: lifecycleStageSummary,
     governance_surface: reviewResponse?.governance_surface || null,

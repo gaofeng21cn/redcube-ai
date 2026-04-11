@@ -27,6 +27,13 @@
 `operator surface consistency hardening` 继续作为同一主线上的 absorbed provenance，而 `runtime watch locator integrity hardening` 已成为当前已吸收 tranche。
 同一主线的下一段继续面也已预冻结为 `family parity / autopilot continuity`，第一条允许打开的 follow-on tranche 固定是 `phase_2_family_parity_governance_surface_convergence`。
 
+## 当前基线、长线目标与任务层级
+
+- 当前 repo-verified 基线：`Codex-default host-agent runtime` 仍是今天可验证的本地执行形态。
+- 长线目标：runtime substrate 迁向 `Hermes-backed runtime substrate`，但 `RedCube Gateway -> family / profile / pack -> Domain Harness OS` 的 domain boundary 不变。
+- 下一阶段：先落地一条 `Hermes-backed canonical path`，再把 source readiness、workspace quickstart 与 family parity 收紧到新 runtime 形态上。
+- 历史材料与 future-facing target state 只负责说明方向，不得反向改写当前已吸收主线。
+
 ## 仓库跟踪的内部操作文档
 
 ### 面向人类操作同事
@@ -82,4 +89,4 @@
 - `docs/program/phase-2/*.md`：repo-tracked 的 program brief。
 - 详细 `docs/*.md`：默认仓库跟踪的内部操作文档，中文为主。
 - `docs/policies/`：稳定内部规则，默认中文维护。
-- `docs/superpowers/`：本地 AI / Superpowers 的笔记、计划、草案，保持未跟踪。
+- `docs/superpowers/`：现有 repo-tracked 设计档案可保留为内部历史材料；新增本地 AI / Superpowers 草稿默认不进入跟踪。

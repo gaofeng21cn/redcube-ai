@@ -130,10 +130,10 @@ activation package freeze 至少要绑定：
 - `docs/runtime_architecture.md`
 - `contracts/runtime-program/current-program.json`
 - `contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json`
-- `.runtime-program/context/CURRENT_PROGRAM.md`
-- `.runtime-program/reports/redcube-runtime-program/LATEST_STATUS.md`
-- `.runtime-program/reports/redcube-runtime-program/OPEN_ISSUES.md`
-- `.runtime-program/reports/redcube-runtime-program/ITERATION_LOG.md`
+- `$CODEX_HOME/projects/redcube-ai/runtime-state/context/CURRENT_PROGRAM.md`
+- `$CODEX_HOME/projects/redcube-ai/runtime-state/reports/redcube-runtime-program/LATEST_STATUS.md`
+- `$CODEX_HOME/projects/redcube-ai/runtime-state/reports/redcube-runtime-program/OPEN_ISSUES.md`
+- `$CODEX_HOME/projects/redcube-ai/runtime-state/reports/redcube-runtime-program/ITERATION_LOG.md`
 
 同时必须明确写出：
 

@@ -16,6 +16,7 @@ import {
   buildCreativeOwnershipStatus,
   writeStatusFile,
 } from '../scripts/p19-creative-ownership-audit-lib.mjs';
+import { runtimeStateDisplayGlob } from '../packages/redcube-runtime/src/runtime-state.js';
 
 function writeStatus() {
   const status = buildCreativeOwnershipStatus({ currentMode: 'ralph' });
@@ -134,7 +135,7 @@ test('P19.A freezes lane write scopes by unified lifecycle before any short-live
     [
       'tests/review-platform.test.js',
       'tests/reference-regression.test.js',
-      '.runtime-program/reports/redcube-runtime-program/**',
+      runtimeStateDisplayGlob('reports', 'redcube-runtime-program', '**'),
     ],
   );
   assert.deepEqual(P19_TEAM_GATE_CONTRACT.final_convergence_order, [

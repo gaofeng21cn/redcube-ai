@@ -70,6 +70,7 @@ const INTEGRATION = [
   'tests/deliverable-review-loop.test.js',
   'tests/direct-delivery-lifecycle-stage-summary.test.js',
   'tests/direct-delivery-operator-handoff.test.js',
+  'tests/family-parity-governance-surface.test.js',
   'tests/family-source-truth-consumption.test.js',
   'tests/gateway-actions.test.js',
   'tests/import-legacy-project.test.js',

@@ -9,7 +9,7 @@
 - `AGENTS.md` 只约束工作方式，不承载项目知识细节。
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
 - `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的 visual-deliverable domain gateway 与 `Domain Harness OS`。
-- 当前默认本地执行形态是 `Codex-default host-agent runtime`。
+- 当前 repo-verified 基线仍是 `Codex-default host-agent runtime`，但新增投入默认服务 `Hermes-backed runtime substrate` 目标形态。
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 - 关键 durable surface 继续围绕 `program_id`、`topic_id`、`deliverable_id`、`run_id`，以及 `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 收口。
 
@@ -18,6 +18,7 @@
 - 第一优先级：保持 `gateway -> family -> profile -> pack -> harness execution` 的正式控制链路。
 - 第二优先级：优先 machine-readable contract、显式校验和 hydrated execution，而不是 prompt-only intent。
 - 第三优先级：在不改写 domain 语义的前提下，继续维护同一 mainline 的 absorbed tranche、follow-on board 与 provenance。
+- 一旦新的 runtime substrate 目标已经明确，新增投入默认服务目标形态；旧宿主只允许作为迁移桥、兼容层或回归对照存在。
 - 不做降级处理、兜底补丁、启发式修补或“先糊住再说”式实现。
 
 ## 文档体系
@@ -56,10 +57,12 @@
 
 - 大改动、长链路工作、并行多 AI 开发，默认先从最新 `main` 开独立 worktree，再在 worktree 内实现和验证。
 - 共享根 checkout 只用于轻量阅读、评审、吸收验证后提交、push 和清理，不应长期承担重型实现。
-- 新 lane 开始前先清理陈旧 `.runtime-program/state/sessions/*`、tmux session 与 stale `skill-active` 状态。
+- 新 lane 开始前先清理用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/sessions/*`、tmux session 与 stale `skill-active` 状态。
 - worktree 内实现和验证完成后，应尽快吸收回 `main`，并清理对应 worktree、分支与临时状态。
 
 ## 本地状态
 
-- `.runtime-program/` 与 `.codex/` 都是本地工具状态，必须保持未跟踪。
-- `.runtime-program/local/AGENTS.local.md` 只允许作为机器私有 overlay 存在，不进入 repo-tracked 主线。
+- 项目级 `.codex/` 与 `.omx/` 已退役，不再作为仓库本地状态入口。
+- 项目级 `.runtime-program/` 已退役，不再作为仓库本地控制面。
+- 本地 session、prompt、log、report 与 hook 状态统一迁入用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
+- 任何机器私有 overlay 也只允许放在用户级 runtime-state 根目录下，不进入 repo-tracked 主线。

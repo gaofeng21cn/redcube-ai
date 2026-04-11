@@ -27,6 +27,13 @@ The current absorbed tranche is `Phase 2 / runtime watch locator integrity harde
 `operator surface consistency hardening` remains absorbed provenance on the same mainline, while `runtime watch locator integrity hardening` is now the current absorbed tranche.
 The next same-mainline continuation is now prefrozen as `family parity / autopilot continuity`, with `phase_2_family_parity_governance_surface_convergence` fixed as the first allowed follow-on tranche.
 
+## Current Baseline, Long-Line Target, And Task Ladder
+
+- Current repo-verified baseline: `Codex-default host-agent runtime` is still the executable local runtime shape today.
+- Long-line target: move the runtime substrate toward `Hermes-backed runtime substrate` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
+- Next stage: land one `Hermes-backed canonical path` first, then tighten source readiness, workspace quickstart, and family parity against that new runtime shape.
+- Historical materials and future-facing target-state docs may explain direction, but they must not override the absorbed mainline truth.
+
 ## Repo-Tracked Internal Operator Docs
 
 ### For human operators
@@ -82,4 +89,4 @@ The next same-mainline continuation is now prefrozen as `family parity / autopil
 - `docs/program/phase-2/*.md`: repo-tracked program briefs for absorbed tranche and prefrozen follow-on board.
 - Detailed `docs/*.md`: repository-tracked internal/operator documents unless explicitly promoted.
 - `docs/policies/`: stable internal rules, Chinese by default.
-- `docs/superpowers/`: local AI / Superpowers notes, plans, and drafts; keep them untracked.
+- `docs/superpowers/`: existing repo-tracked design archives may remain as internal history, but new local AI / Superpowers drafts should stay untracked by default.

@@ -39,15 +39,5 @@ docs/superpowers/
 RedCube AI.app/
 .runtime-program/
 .omx/
-
-.tsbuildinfo/
-.codex/*
-!.codex/agents/
-!.codex/agents/**
-!.codex/skills/
-!.codex/skills/**
-.codex/skills/.system/**
-!.codex/prompts/
-!.codex/prompts/**
-
 .codex/
+.tsbuildinfo/
