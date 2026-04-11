@@ -25,9 +25,9 @@ test('operator surface consistency hardening stays absorbed provenance while Her
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_stable_family_closure_truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
   assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
   assert.deepEqual(contract.operator_surface_alignment.runtime_watch_boundary.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary']);
   assert.equal(contract.object_boundary.out_of_scope.includes('controller expansion'), true);
@@ -62,5 +62,5 @@ test('operator surface consistency hardening freezes doctor/help/runtime-watch c
   assert.equal(docsIndexZh.includes('Phase 2 operator surface consistency hardening'), true);
   assert.equal(runtimeArchitecture.includes('`operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path'), true);
   assert.equal(runtimePolicy.includes('`operator surface consistency hardening` 已在当前主线上吸收'), true);
-  assert.equal(positioning.includes('当前 active tranche 是 `Hermes runtime substrate canonical closure`'), true);
+  assert.equal(positioning.includes('当前 active tranche 是 `Hermes stable family closure truth`'), true);
 });

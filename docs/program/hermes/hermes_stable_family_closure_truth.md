@@ -1,0 +1,44 @@
+# Hermes Stable Family Closure Truth
+
+## 当前状态
+
+这一 tranche 已在仓内实现并通过验证。
+它继续保持 `Hermes` 为 runtime substrate owner，但把 shared family runtime output 与第二条 human-publication family closure 的真值也一起收紧到 repo-tracked surface。
+
+## In scope
+
+- `ppt_deck`、`xiaohongshu`、`poster_onepager` stable family runtime output
+- routed artifact 的 quartet envelope parity
+- `xiaohongshu` human-publication closure 的 Hermes-backed audit / watch / review / projection 一致性
+
+## 已落地的事实
+
+- stable family runtime package 现在会直接暴露同一份 `Hermes execution_model`，不再让 family runner 各自留局部旧 execution truth
+- routed family artifact 在落盘前会统一保留 `topic_id`、`deliverable_id`、`contract` 与 `stage_contract`
+- `xiaohongshu` 在 `planning_ready` source readiness 之后，可以沿 `research -> storyline -> single_note_plan -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> publish_copy -> export_bundle` 跑通 Hermes-backed 闭环
+- `xiaohongshu` 继续保持 explicit human publication：`approval_pending -> approved_pending_publish` 语义不被改写成 direct-delivery
+- `ppt_deck` 与 guarded `poster_onepager` 继续保持既有 direct-delivery / knowledge-poster truth，不借此扩张到 academic poster
+
+## 仍保持不变的 truth
+
+- `program_id` / `topic_id` / `deliverable_id` / `run_id`
+- `auditDeliverable` / `runtimeWatch` / `getReviewState` / `getPublicationProjection`
+- `artifact schema`、`gate semantics`、`source_readiness_summary`、`gate_summary`、`operator_handoff`、`lifecycle_stage_summary`
+- `CLI-first`、`MCP supported`、`controller internal-only`
+- 当前仓库主线仍按 `Auto-only` 理解
+
+## 停车边界
+
+- 这里不声称 managed web runtime 已完成
+- 这里不声称新 family 已 onboarding
+- academic `paper_poster / conference_poster` 仍不在当前 tranche
+- 如果要继续推进 managed web runtime control plane 或新的 family/runtime semantics，必须先冻结新的 activation package
+
+## Verification
+
+- `node --test tests/runtime-deliverable-route.test.js`
+- `node --test tests/family-parity-governance-surface.test.js`
+- `node --test tests/hermes-runtime-canonical-path.test.js`
+- `node --test tests/hermes-stable-family-closure-truth.test.js`
+- `npm run test:full`
+- `npm run typecheck`

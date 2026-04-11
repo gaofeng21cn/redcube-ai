@@ -25,9 +25,9 @@ test('runtime watch locator integrity hardening remains absorbed provenance afte
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_stable_family_closure_truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
   assert.deepEqual(contract.run_locator_integrity_surface.required_run_record_fields, ['topic_id', 'deliverable_id']);
   assert.deepEqual(contract.run_locator_integrity_surface.canonical_locator_fields, ['workspaceRoot', 'topicId', 'deliverableId', 'runId']);
@@ -62,5 +62,5 @@ test('runtime watch locator integrity hardening freezes run identity persistence
   assert.equal(docsIndexZh.includes('Phase 2 runtime watch locator integrity hardening'), true);
   assert.equal(runtimeArchitecture.includes('`runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope'), true);
   assert.equal(runtimePolicy.includes('`runtime watch locator integrity hardening` 已在当前主线上吸收'), true);
-  assert.equal(positioning.includes('当前 active tranche 是 `Hermes runtime substrate canonical closure`'), true);
+  assert.equal(positioning.includes('当前 active tranche 是 `Hermes stable family closure truth`'), true);
 });

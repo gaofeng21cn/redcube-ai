@@ -253,7 +253,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；phase-2 的 source-truth、governance、operator-surface 与 runtime-watch hardening 继续作为 absorbed provenance 保留；而当前 active tranche 已切到 `Hermes / runtime substrate canonical closure`，它明确把 Hermes 冻结为 runtime substrate owner，把 `Codex-default host-agent runtime` 降为过渡宿主，并让一条 canonical `ppt_deck` deliverable mainline 在 Hermes-backed execution 上跑通，同时把 shared `runtime_topology` 真相扩展到 stable families，而不改写 `xiaohongshu` 的 human publication 语义。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；phase-2 的 source-truth、governance、operator-surface 与 runtime-watch hardening 继续作为 absorbed provenance 保留；而当前 active tranche 已切到 `Hermes / stable family closure truth`，它继续把 Hermes 冻结为 runtime substrate owner，在保留 canonical `ppt_deck` closure 的同时，把 stable family runtime output 的 execution truth 与 quartet envelope 统一收紧到 repo truth，并把 `xiaohongshu` 的 human-publication mainline 也收成第二条 Hermes-backed family closure，而不把它改写成 direct delivery。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：

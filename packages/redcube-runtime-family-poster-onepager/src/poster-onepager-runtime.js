@@ -7,6 +7,7 @@ import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
 } from '@redcube/runtime-protocol';
+import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
 import {
   buildPosterBlueprint,
   buildPosterRenderArtifact,
@@ -25,6 +26,7 @@ const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYTHON_REVIEW = path.join(MODULE_DIR, '../../redcube-runtime/scripts/ppt_deck_review.py');
 const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
 const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
+const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   poster_blueprint: 'story_architecture',
@@ -239,6 +241,7 @@ function attachCommon(route, contract) {
     prompt_pack: promptMeta(contract, route),
     lifecycle_stage: lifecycleStageForRoute(contract, route),
     review_overlay: reviewOverlayForRoute(contract, route),
+    execution_model: HERMES_EXECUTION_MODEL,
   };
 }
 
