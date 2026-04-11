@@ -238,7 +238,7 @@
         ],
         "suite_result": "pass",
         "findings_recorded": 0,
-        "absorbed_to_main": false
+        "absorbed_to_main": true
       }
     },
     "stop_conditions": [
