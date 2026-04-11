@@ -121,8 +121,8 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
     ],
     research_ownership: [
       'packages/redcube-runtime/src/creative-ownership.js',
-      '.omx/plans/spec-redcube-unified-stage-lifecycle-and-family-alignment.md',
-      '.omx/plans/spec-redcube-agent-first-execution-and-creative-ownership-recovery.md',
+      '.runtime-program/plans/spec-redcube-unified-stage-lifecycle-and-family-alignment.md',
+      '.runtime-program/plans/spec-redcube-agent-first-execution-and-creative-ownership-recovery.md',
     ],
     ppt_visual_director_review_contract: [
       'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
@@ -189,7 +189,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       write_scopes: [
         'tests/review-platform.test.js',
         'tests/reference-regression.test.js',
-        '.omx/reports/redcube-runtime-program/**',
+        '.runtime-program/reports/redcube-runtime-program/**',
       ],
       verification_commands: [
         'node --test tests/review-platform.test.js',

@@ -22,7 +22,7 @@
 补充执行原则：
 
 - `Agent-first` 不等于 `external_llm-only`
-- 在 Codex / OMX 语境里，`Codex-default host-agent runtime` 是当前正式默认执行形态
+- 在当前 Codex-native 语境里，`Codex-default host-agent runtime` 是当前正式默认执行形态
 - code 必须退回 contract、governance、audit、artifact persistence 与 render boundary
 
 ## 执行句柄与 durable surface 原则

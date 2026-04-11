@@ -3,7 +3,7 @@
   "date_anchor": "2026-04-11",
   "status": "prefrozen_follow_on_board",
   "parent_tranche_id": "phase_2_runtime_watch_locator_integrity_hardening",
-  "goal": "freeze the next same-mainline longrun after runtime-watch locator integrity so OMX can continue family parity and autopilot continuity work without inventing a new product line",
+  "goal": "freeze the next same-mainline longrun after runtime-watch locator integrity so the active Codex operator line can continue family parity and autopilot continuity work without inventing a new product line",
   "ordered_tranches": [
     {
       "tranche_id": "phase_2_family_parity_governance_surface_convergence",

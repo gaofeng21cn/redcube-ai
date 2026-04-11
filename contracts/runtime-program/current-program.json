@@ -28,7 +28,7 @@
       "role": "active mainline control-plane pointer",
       "durable_surfaces": [
         "contracts/runtime-program/current-program.json",
-        ".omx/reports/<program_id>/"
+        ".runtime-program/reports/<program_id>/"
       ],
       "must_not_replace": [
         "topic_id",

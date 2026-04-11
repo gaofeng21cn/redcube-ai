@@ -10,7 +10,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-const AUDIT_FILE = path.resolve('.omx/reports/redcube-runtime-program/P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
+const AUDIT_FILE = path.resolve('.runtime-program/reports/redcube-runtime-program/P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',

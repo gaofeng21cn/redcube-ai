@@ -130,10 +130,10 @@ activation package freeze 至少要绑定：
 - `docs/runtime_architecture.md`
 - `contracts/runtime-program/current-program.json`
 - `contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json`
-- `.omx/context/CURRENT_PROGRAM.md`
-- `.omx/reports/redcube-runtime-program/LATEST_STATUS.md`
-- `.omx/reports/redcube-runtime-program/OPEN_ISSUES.md`
-- `.omx/reports/redcube-runtime-program/ITERATION_LOG.md`
+- `.runtime-program/context/CURRENT_PROGRAM.md`
+- `.runtime-program/reports/redcube-runtime-program/LATEST_STATUS.md`
+- `.runtime-program/reports/redcube-runtime-program/OPEN_ISSUES.md`
+- `.runtime-program/reports/redcube-runtime-program/ITERATION_LOG.md`
 
 同时必须明确写出：
 

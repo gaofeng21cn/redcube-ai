@@ -134,7 +134,7 @@ test('P19.A freezes lane write scopes by unified lifecycle before any short-live
     [
       'tests/review-platform.test.js',
       'tests/reference-regression.test.js',
-      '.omx/reports/redcube-runtime-program/**',
+      '.runtime-program/reports/redcube-runtime-program/**',
     ],
   );
   assert.deepEqual(P19_TEAM_GATE_CONTRACT.final_convergence_order, [

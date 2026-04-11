@@ -2,7 +2,7 @@
 
 ## 文档目的
 
-这份 board 不是新的 public mainline，而是把 `runtime watch locator integrity hardening` 之后的 same-mainline 长线继续冻结出来，让 `OMX` 不会在完成当前 tranche 后因为 `next_tranche_candidate = null` 就立刻停车。
+这份 board 不是新的 public mainline，而是把 `runtime watch locator integrity hardening` 之后的 same-mainline 长线继续冻结出来，让当前 Codex operator line 不会在完成当前 tranche 后因为 `next_tranche_candidate = null` 就立刻停车。
 
 它只服务当前已经稳定的 family：
 
@@ -42,7 +42,7 @@
 
 结果就是：
 
-- `OMX` 做完当前 absorbed tranche 的 follow-up 后，容易因为“没有已冻结下一棒”而 honest stop
+- 当前 operator line 做完当前 absorbed tranche 的 follow-up 后，容易因为“没有已冻结下一棒”而 honest stop
 - 但 repo 长线目标其实还没有完成
 
 这块 board 的作用，就是把“family parity / autopilot continuity”收紧成一条仍然诚实、仍然在同一主线内、且不需要另开新产品线的 follow-on board。
@@ -58,7 +58,7 @@
 
 ## 推荐用法
 
-`OMX` 在当前 absorbed tranche 之后，如果仍要继续：
+当前 Codex operator line 在当前 absorbed tranche 之后，如果仍要继续：
 
 1. 先读这块 board
 2. 先跑 `phase_2_family_parity_governance_surface_convergence`

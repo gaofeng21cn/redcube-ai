@@ -141,10 +141,10 @@
       "docs/policies/runtime_operating_model.md"
     ],
     "local_report_surfaces": [
-      ".omx/context/CURRENT_PROGRAM.md",
-      ".omx/reports/redcube-runtime-program/LATEST_STATUS.md",
-      ".omx/reports/redcube-runtime-program/OPEN_ISSUES.md",
-      ".omx/reports/redcube-runtime-program/ITERATION_LOG.md"
+      ".runtime-program/context/CURRENT_PROGRAM.md",
+      ".runtime-program/reports/redcube-runtime-program/LATEST_STATUS.md",
+      ".runtime-program/reports/redcube-runtime-program/OPEN_ISSUES.md",
+      ".runtime-program/reports/redcube-runtime-program/ITERATION_LOG.md"
     ],
     "must_record": [
       "Phase 2 minimal baseline is now on the mainline",

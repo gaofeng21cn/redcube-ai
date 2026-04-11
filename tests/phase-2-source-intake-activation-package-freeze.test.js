@@ -83,7 +83,7 @@ test('phase-2 activation package freeze keeps gate surface, operator flow, minim
     'tests/phase-2-source-intake-activation-package-freeze.test.js',
   ]);
   assert.equal(contract.minimal_test_surface.existing_capability_tests_to_hold.includes('tests/source-intake.test.js'), true);
-  assert.equal(contract.closeout_evidence_requirements.report_surfaces.includes('.omx/context/CURRENT_PROGRAM.md'), true);
+  assert.equal(contract.closeout_evidence_requirements.report_surfaces.includes('.runtime-program/context/CURRENT_PROGRAM.md'), true);
   assert.equal(contract.closeout_evidence_requirements.repo_tracked_truth_surfaces.includes(ACTIVATION_BRIEF), true);
   assert.equal(contract.closeout_evidence_requirements.must_not_claim.includes('Phase 2 implementation has started'), true);
 });

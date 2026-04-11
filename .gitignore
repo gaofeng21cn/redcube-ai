@@ -37,7 +37,7 @@ docs/superpowers/
 # macOS
 .DS_Store
 RedCube AI.app/
-.omx/
+.runtime-program/
 
 .tsbuildinfo/
 .codex/*

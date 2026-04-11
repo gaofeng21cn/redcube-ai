@@ -3,7 +3,7 @@
 ## 当前状态
 
 本 tranche closeout 已完成并吸收到当前 mainline。当前仓库正式口径是：deliverable-scope run record 必须持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch`、`CLI review watch`、`MCP runtime_watch` 在 quartet locator 与 run identity 不一致时必须 fail-closed。
-同一主线的 prefrozen follow-on board 也已经冻结：`phase_2_family_parity_autopilot_continuation_board` 现在明确把下一棒固定为 `phase_2_family_parity_governance_surface_convergence`，因此 `OMX` 不需要在这一 tranche closeout 之后回到 “next tranche 未冻结” 的停车结论。
+同一主线的 prefrozen follow-on board 也已经冻结：`phase_2_family_parity_autopilot_continuation_board` 现在明确把下一棒固定为 `phase_2_family_parity_governance_surface_convergence`，因此当前 Codex operator line 不需要在这一 tranche closeout 之后回到 “next tranche 未冻结” 的停车结论。
 
 ## 冻结目的
 

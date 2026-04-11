@@ -29,7 +29,7 @@
 
 1. 让 `ppt_deck`、`xiaohongshu`、`poster_onepager` 在 shared governance surface 上继续对齐
 2. 让 family 差异继续保留在 family boundary，而不是泄漏成 governance surface 漂移
-3. 让 `OMX` 后续能在不发明新 family、不扩大 formal entry 的情况下继续推进同一主线
+3. 让当前 Codex operator line 后续能在不发明新 family、不扩大 formal entry 的情况下继续推进同一主线
 
 ## In scope
 

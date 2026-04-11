@@ -237,7 +237,7 @@ test('P0 tracked repo truth does not depend on ignored .codex host docs or ignor
     assert.equal(text.includes('contracts/dev-hosts/codex-app.md'), false);
   }
 
-  assert.equal(projectTruth.includes('.omx/plans/'), false);
+  assert.equal(projectTruth.includes('.runtime-program/plans/'), false);
   assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
 });
 

@@ -230,10 +230,10 @@
   },
   "closeout_evidence_requirements": {
     "report_surfaces": [
-      ".omx/context/CURRENT_PROGRAM.md",
-      ".omx/reports/redcube-runtime-program/LATEST_STATUS.md",
-      ".omx/reports/redcube-runtime-program/OPEN_ISSUES.md",
-      ".omx/reports/redcube-runtime-program/ITERATION_LOG.md"
+      ".runtime-program/context/CURRENT_PROGRAM.md",
+      ".runtime-program/reports/redcube-runtime-program/LATEST_STATUS.md",
+      ".runtime-program/reports/redcube-runtime-program/OPEN_ISSUES.md",
+      ".runtime-program/reports/redcube-runtime-program/ITERATION_LOG.md"
     ],
     "repo_tracked_truth_surfaces": [
       "README.md",

@@ -9,7 +9,7 @@
 `RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS` 驱动。
 
 这里的 `Agent-first` 不等于必须走 `external_llm` API。
-在当前 Codex / OMX 语境里，默认本地执行形态是 `Codex-default host-agent runtime`；
+在当前 Codex-native 语境里，默认本地执行形态是 `Codex-default host-agent runtime`；
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；
 当前已验证的公开正式入口是 `CLI`、`MCP`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
