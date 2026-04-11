@@ -1,43 +1,63 @@
-# Redcube Ai Repository Agent Contract
+# RedCube AI 仓库协作规范
 
-This root `AGENTS.md` is the repository-native contract for direct sessions that enter from the project root, including Codex App and plain Codex sessions.
+这个根目录 `AGENTS.md` 是仓库默认入口规范。直接从仓库根启动的开发会话，先遵循这里；更深的 `AGENTS.md` 只负责更窄子树的补充规则。
 
-## Scope
+## 适用范围
 
-Apply this file to the repository root and all descendants unless a deeper `AGENTS.md` overrides it for a narrower subtree.
+适用于仓库根目录及其子目录；如果更深层目录存在 `AGENTS.md`，则以更近者为准。
 
-## Project Truth
+## 项目定位
 
-The authoritative project truth contract lives at `contracts/project-truth/AGENTS.md`.
-Read that file first whenever repository-specific goals, architecture priorities, mutation rules, or domain constraints matter.
-Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.
+- `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的 visual-deliverable domain gateway 与 `Domain Harness OS`，不是通用助手，也不是整个 `OPL` 系统。
+- 当前默认本地执行形态是 `Codex-default host-agent runtime`；当前 repo-tracked 产品主线按 `Auto-only` 理解。
+- 当前 formal-entry matrix 固定为：`CLI` 为默认正式入口、`MCP` 为支持协议层、`controller` 为内部控制面。
+- `Gateway` 是 `CLI / MCP` 共享的唯一正式控制面；`controller` 当前不是可独立验证的仓内公开正式入口。
 
-## Working Agreements
+## 开发优先级
 
-- Keep diffs small, reviewable, and reversible.
-- Prefer deletion over addition when simplification preserves behavior.
-- Reuse existing patterns and utilities before introducing new abstractions.
-- Do not add new dependencies without explicit justification.
-- Run the relevant tests, type checks, and validation commands before claiming completion.
-- Final reports should include what changed and any remaining risks or known gaps.
+- 任何运行时演进都按这条顺序推进：先 contract shape，再 gateway validation，再 harness execution，最后 family-specific review/export 行为。
+- 保持 `gateway -> family -> profile -> pack -> harness execution` 这条正式控制链路，不要把控制逻辑折叠成模糊 prompt 或隐藏分支。
+- 优先使用 hydrated contract 与显式校验，不要用 prompt-only intent、隐藏 fallback chain 或静默 profile 推断冒充正式控制面。
+- 未来即使迁移到 managed web runtime，也只能迁移宿主形态，不能改写 `RedCube AI` 的 domain 语义。
 
-## Worktree Discipline
+## 身份与 Durable Surface 边界
 
-- Heavy long-running work must run in an isolated worktree created from current `main`.
-- Keep the shared root checkout on `main` for light reads, planning, review, absorb-to-`main`, push, and cleanup; do not let it become the long-running owner checkout.
-- Allow at most one active long-running mainline per worktree. If multiple long-running lanes are needed, create multiple worktrees.
-- Before starting a new long-running lane, ensure the owner worktree is clean and free of stale `.runtime-program/state/sessions/*`, lingering tmux sessions, and stale `skill-active` state.
-- After the lane stops, either absorb the verified commits back to `main` or explicitly abandon the lane, then remove its worktree/branch and clear related tmux/session state.
-- Do not rely on session-only isolation to prevent hook interference; use physical worktree isolation.
+- `program_id`、`topic_id`、`deliverable_id`、`run_id` 各自承担不同身份，不能互相替代。
+- 当前 canonical audit / watch surface 是 `auditDeliverable` 与 `runtimeWatch`。
+- 当前 canonical review / projection surface 是 `getReviewState` 与 `getPublicationProjection`。
+- 当前 canonical durable artifacts 继续以 `topics/<topic>/canonical/source-audit.json`、`topics/<topic>/publication-state.json`、`topics/<topic>/deliverables/<deliverable>/contracts/delivery-contract.json`、`topics/<topic>/deliverables/<deliverable>/reports/review-state.json` 为准。
 
-## Test Surface Governance
+## 工作树纪律
 
-- `npm test` and `npm run test:fast` are the default developer smoke slice; do not expand them to include the tracked `meta`, `integration`, or `e2e` suites.
-- The canonical tracked verification ladder is `npm run test:meta`, `npm run test:integration`, `npm run test:e2e`, and `npm run test:full`; keep docs, contracts, and operator instructions aligned with these exact commands.
-- `npm run test:full` is the clean-clone baseline, while CI stays split across `quality`, `integration`, and `render-e2e`; do not collapse them back into an opaque single job.
-- If a repo-tracked file changes test commands, update the README, CI, and command-surface tests in the same change.
+- Heavy 长链路工作必须在基于当前 `main` 创建的独立 worktree 中完成。
+- 共享根 checkout 保持在 `main`，只用于轻量读取、评审、吸收到 `main`、push 和清理，不要让它成为长时间占用的 owner checkout。
+- 如果需要多条长链路主线，就创建多个 worktree，不要指望 session 级隔离防止 hook 或本地状态互相干扰。
+- 新 lane 开始前，确认 owner worktree 干净，且没有陈旧 `.runtime-program/state/sessions/*`、残留 tmux session 和 stale `skill-active` 状态。
+- lane 结束后，要么吸收已验证提交回 `main`，要么明确放弃，并清理 worktree、分支和相关本地运行状态。
 
-## Local State
+## 测试面治理
 
-- `.runtime-program/` and `.codex/` are local tooling state and must remain untracked.
-- `.runtime-program/local/AGENTS.local.md` is reserved for machine-specific private overlays.
+- `npm test` 和 `npm run test:fast` 是默认开发 smoke slice；不要把 `meta`、`integration` 或 `e2e` 悄悄塞回默认路径。
+- canonical tracked verification ladder 固定为 `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:full`。
+- `npm run test:full` 是 clean-clone 基线；CI 继续拆分为 `quality`、`integration` 与 `render-e2e`，不要重新折叠成不可见的大黑箱。
+- 任何 repo-tracked 文件一旦改测试命令，要同步更新 README、CI 和 command-surface tests。
+
+## 文档与附录
+
+- 根文档负责默认协作规则；`contracts/project-truth/AGENTS.md` 是更细的 runtime/product boundary 附录，不再作为默认前置入口。
+- `docs/policies/runtime_operating_model.md` 是当前稳定运行边界的补充真相文档。
+- 根目录只保留与项目本身直接相关的正式入口与公开文档；本地 AI 过程文档放在未跟踪的 `docs/superpowers/`。
+- 中文内部文档优先完整中文叙述；英文只保留给固定术语、路径、命令、schema 与代码标识符。
+
+## 通用协作约束
+
+- 保持 diff 小、可审查、可回退。
+- 能删就别加；能复用现有模式就别新起抽象。
+- 没有明确理由不要新增依赖。
+- 完成前必须运行与改动相匹配的测试、类型检查和验证命令。
+- 最终说明需要交代改了什么，以及仍存在哪些风险或缺口。
+
+## 本地状态
+
+- `.runtime-program/` 与 `.codex/` 是本地工具状态，必须保持未跟踪。
+- `.runtime-program/local/AGENTS.local.md` 预留给机器私有 overlay，不进入 repo-tracked 主线。
