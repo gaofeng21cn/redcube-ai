@@ -76,6 +76,7 @@ test('family parity governance activation package stays frozen as the first same
     ),
     true,
   );
+  assert.equal(board.required_verification.includes('npm run test:full'), true);
   assert.equal(brief.includes('truth_frozen_pending_implementation'), true);
   assert.equal(brief.includes('same-mainline 第一条 tranche'), true);
   assert.equal(runtimeWatchBrief.includes('prefrozen follow-on board'), true);

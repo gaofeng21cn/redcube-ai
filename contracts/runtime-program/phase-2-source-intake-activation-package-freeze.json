@@ -65,7 +65,7 @@
       "git status --short",
       "git diff --check",
       "git diff --stat",
-      "npm test",
+      "npm run test:full",
       "npm run typecheck"
     ],
     "explicit_promotion_required_before_phase_2_implementation": true
@@ -225,7 +225,7 @@
       "git diff --check",
       "npm run typecheck",
       "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/stable-deliverable-manual-test-package.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/source-intake.test.js",
-      "npm test"
+      "npm run test:full"
     ]
   },
   "closeout_evidence_requirements": {
@@ -262,7 +262,7 @@
       "git diff --check",
       "npm run typecheck",
       "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/stable-deliverable-manual-test-package.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/source-intake.test.js",
-      "npm test"
+      "npm run test:full"
     ],
     "suite_result": "pass",
     "findings_recorded": 0,

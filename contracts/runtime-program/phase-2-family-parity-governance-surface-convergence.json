@@ -77,7 +77,7 @@
       "git diff --check",
       "npm run typecheck",
       "node --test tests/runtime-alignment-p0.test.js tests/phase-2-family-parity-governance-surface-convergence.test.js tests/deliverable-review-loop.test.js tests/runtime-deliverable-route.test.js tests/phase-2-behavior-convergence.test.js tests/mcp-gateway.test.js tests/cli-v2-smoke.test.js tests/ppt-deliverable-e2e.test.js tests/xiaohongshu-deliverable-e2e.test.js",
-      "npm test"
+      "npm run test:full"
     ]
   },
   "closeout": {

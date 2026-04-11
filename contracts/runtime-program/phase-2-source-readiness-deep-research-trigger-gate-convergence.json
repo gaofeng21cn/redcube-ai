@@ -142,7 +142,7 @@
       "git diff --check",
       "npm run typecheck",
       "node --test tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/source-intake.test.js tests/source-research.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
-      "npm test"
+      "npm run test:full"
     ]
   },
   "closeout_evidence": {

@@ -81,7 +81,7 @@
       "git diff --check",
       "npm run typecheck",
       "node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/runtime-protocol-workspace.test.js tests/runtime-deliverable-route.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js tests/mcp-gateway.test.js tests/phase-2-behavior-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js",
-      "npm test"
+      "npm run test:full"
     ]
   },
   "closeout_evidence": {

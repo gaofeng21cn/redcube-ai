@@ -271,9 +271,17 @@
 
 ```bash
 npm install
-npm test
+npm run test:full
 npm run typecheck
 ```
+
+本地测试分层：
+
+- `npm test` / `npm run test:fast`：日常开发用的轻量 smoke slice
+- `npm run test:meta`：repo-tracked truth、文档、contract 与 TypeScript 治理检查
+- `npm run test:integration`：不依赖 Python / Playwright 的 runtime 行为测试
+- `npm run test:e2e`：依赖 Python、字体与 Playwright 的 render / export 端到端测试
+- `npm run test:full`：clean-clone 基线使用的完整验证入口
 
 查看 CLI：
 

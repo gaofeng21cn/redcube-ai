@@ -249,7 +249,7 @@ function buildCloseoutAudit() {
         status: 'pending_external_verification',
       },
       full_test_suite: {
-        command: 'rtk npm test -- --test-reporter=dot',
+        command: 'rtk npm run test:full -- --test-reporter=dot',
         status: 'pending_external_verification',
       },
       diagnostics: {

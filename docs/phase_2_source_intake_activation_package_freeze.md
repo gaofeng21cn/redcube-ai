@@ -117,7 +117,7 @@ activation package freeze 至少要绑定：
 
 同时要求：
 
-- `npm test`
+- `npm run test:full`
 - `npm run typecheck`
 - `git diff --check`
 

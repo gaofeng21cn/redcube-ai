@@ -8,7 +8,55 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+      - name: Run fast tests
+        run: npm run test:fast
+
+      - name: Run meta tests
+        run: npm run test:meta
+
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+  render-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -44,5 +92,5 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm test
+      - name: Run e2e tests
+        run: npm run test:e2e

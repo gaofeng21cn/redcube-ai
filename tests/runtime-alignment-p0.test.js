@@ -223,7 +223,7 @@ test('P0 tracked program contract records the required credible green baseline v
     'git status --short',
     'git diff --check',
     'git diff --stat',
-    'npm test',
+    'npm run test:full',
     'npm run typecheck',
   ]);
 });

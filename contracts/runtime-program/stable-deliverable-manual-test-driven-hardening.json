@@ -33,7 +33,7 @@
     ],
     "required_commands": [
       "git diff --check",
-      "npm test",
+      "npm run test:full",
       "npm run typecheck",
       "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/p21-operations-and-evaluation-os.test.js",
       "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/p21-operations-and-evaluation-os.test.js tests/stable-deliverable-manual-test-package.test.js"

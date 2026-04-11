@@ -133,7 +133,7 @@
         "git status --short",
         "git diff --check",
         "git diff --stat",
-        "npm test",
+        "npm run test:full",
         "npm run typecheck"
       ]
     },
@@ -273,7 +273,7 @@
           "git diff --check",
           "npm run typecheck",
           "node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/runtime-protocol-workspace.test.js tests/runtime-deliverable-route.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js tests/mcp-gateway.test.js tests/phase-2-behavior-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js",
-          "npm test"
+          "npm run test:full"
         ],
         "suite_result": "pass",
         "findings_recorded": 0,
@@ -452,7 +452,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/deliverable-review-loop.test.js tests/review-platform.test.js tests/ppt-deliverable-surface.test.js tests/harness-completion-audit.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -527,7 +527,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/profile-contract-hydration.test.js tests/family-source-truth-consumption.test.js tests/deliverable-review-loop.test.js tests/mcp-gateway.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -600,7 +600,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -675,7 +675,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/phase-2-direct-delivery-operator-handoff-hardening.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -755,7 +755,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/direct-delivery-longrun-target.test.js tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/typescript-governance-surfaces.test.js tests/typescript-overlay-surfaces.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -834,7 +834,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/source-intake.test.js tests/source-research.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -922,7 +922,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/phase-2-workspace-operator-quickstart-convergence.test.js tests/workspace-operator-quickstart.test.js tests/public-docs-surface.test.js tests/source-intake.test.js tests/source-research.test.js tests/cli-v2-smoke.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,
@@ -1006,7 +1006,7 @@
             "git diff --check",
             "npm run typecheck",
             "node --test tests/runtime-alignment-p0.test.js tests/phase-2-operator-surface-consistency-hardening.test.js tests/workspace-operator-quickstart.test.js tests/cli-v2-smoke.test.js tests/gateway-actions.test.js tests/mcp-gateway.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm test"
+            "npm run test:full"
           ],
           "suite_result": "pass",
           "findings_recorded": 0,

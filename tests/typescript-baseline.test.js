@@ -20,6 +20,12 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
 
 test('root package exposes formal typecheck entrypoint', () => {
   const pkg = readJson('package.json');
+  assert.equal(pkg.scripts.test, 'node scripts/run-test-group.mjs fast');
+  assert.equal(pkg.scripts['test:fast'], 'node scripts/run-test-group.mjs fast');
+  assert.equal(pkg.scripts['test:meta'], 'node scripts/run-test-group.mjs meta');
+  assert.equal(pkg.scripts['test:integration'], 'node scripts/run-test-group.mjs integration');
+  assert.equal(pkg.scripts['test:e2e'], 'node scripts/run-test-group.mjs e2e');
+  assert.equal(pkg.scripts['test:full'], 'node scripts/run-test-group.mjs full');
   assert.equal(pkg.scripts.typecheck, 'tsc --noEmit --project tsconfig.tests.json --pretty false');
 });
 

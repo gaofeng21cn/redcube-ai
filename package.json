@@ -10,7 +10,12 @@
   "scripts": {
     "redcube": "node apps/redcube-cli/src/cli.js",
     "mcp": "node apps/redcube-mcp/src/server.js",
-    "test": "node --test tests/*.test.js",
+    "test": "node scripts/run-test-group.mjs fast",
+    "test:fast": "node scripts/run-test-group.mjs fast",
+    "test:meta": "node scripts/run-test-group.mjs meta",
+    "test:integration": "node scripts/run-test-group.mjs integration",
+    "test:e2e": "node scripts/run-test-group.mjs e2e",
+    "test:full": "node scripts/run-test-group.mjs full",
     "typecheck": "tsc --noEmit --project tsconfig.tests.json --pretty false",
     "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs"
   },

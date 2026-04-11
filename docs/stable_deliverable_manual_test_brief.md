@@ -18,7 +18,7 @@
 先证明当前基线仍然是 tracked-only / clean-clone 可复现：
 
 1. `git diff --check`
-2. `npm test`
+2. `npm run test:full`
 3. `npm run typecheck`
 4. `node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/p21-operations-and-evaluation-os.test.js`
 5. 在 clean-clone / tracked-only 条件下，至少重放第 4 步

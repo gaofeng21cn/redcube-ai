@@ -141,7 +141,7 @@
       "git diff --check",
       "npm run typecheck",
       "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js",
-      "npm test"
+      "npm run test:full"
     ]
   },
   "closeout_evidence": {

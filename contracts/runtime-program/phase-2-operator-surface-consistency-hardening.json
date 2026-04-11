@@ -109,7 +109,7 @@
     "required_commands_before_absorb": [
       "git diff --check",
       "npm run typecheck",
-      "npm test"
+      "npm run test:full"
     ],
     "truth_freeze_tests": [
       "tests/phase-2-operator-surface-consistency-hardening.test.js"

@@ -72,6 +72,7 @@ test('stable deliverable manual-test contract freezes tracked-only truth-freeze 
     ),
     true,
   );
+  assert.equal(contract.tracked_only_truth_freeze_reproduction.required_commands.includes('npm run test:full'), true);
 });
 
 test('stable deliverable manual-test contract defines ppt_deck and xiaohongshu manual cases with routes, artifacts, sampling, and pass/fail criteria', () => {
