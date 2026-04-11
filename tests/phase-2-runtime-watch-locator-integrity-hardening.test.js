@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
-const TRANCHE_BRIEF = 'docs/phase_2_runtime_watch_locator_integrity_hardening.md';
+const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json';
 
 function read(file) {

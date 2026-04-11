@@ -138,7 +138,7 @@
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json",
       "contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json",
-      "docs/phase_2_family_source_truth_consumption_convergence.md",
+      "docs/program/phase-2/phase_2_family_source_truth_consumption_convergence.md",
       "README.md",
       "README.zh-CN.md",
       "docs/runtime_architecture.md",

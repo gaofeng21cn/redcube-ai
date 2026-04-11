@@ -160,7 +160,7 @@
       },
       {
         "gate_id": "operator_flow_frozen",
-        "surface": "docs/phase_2_source_intake_activation_package_freeze.md",
+        "surface": "docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md",
         "pass_condition": "operators can see explicit activation order, gate surfaces, and stop conditions"
       },
       {
@@ -239,7 +239,7 @@
       "README.md",
       "README.zh-CN.md",
       "docs/runtime_architecture.md",
-      "docs/phase_2_source_intake_activation_package_freeze.md",
+      "docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md",
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json"
     ],

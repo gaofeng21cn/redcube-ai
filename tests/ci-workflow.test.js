@@ -21,7 +21,7 @@ test('CI workflow pins reproducible toolchain and visual review dependencies', (
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
   assert.match(workflow, /quality:\n[\s\S]*?npm run typecheck[\s\S]*?npm run test:fast[\s\S]*?npm run test:meta/);
-  assert.match(workflow, /integration:\n[\s\S]*?npm run test:integration/);
+  assert.match(workflow, /integration:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run test:integration/);
   assert.match(workflow, /render-e2e:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run test:e2e/);
 
   const pythonRequirements = readRepoFile('.github/requirements/ci-python.txt');

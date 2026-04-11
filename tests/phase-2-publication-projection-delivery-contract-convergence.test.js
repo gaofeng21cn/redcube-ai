@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json';
-const TRANCHE_BRIEF = 'docs/phase_2_publication_projection_delivery_contract_convergence.md';
+const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md';
 const FAMILY_TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json';
 
 function read(file) {

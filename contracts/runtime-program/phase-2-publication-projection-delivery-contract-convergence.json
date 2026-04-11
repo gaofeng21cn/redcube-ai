@@ -148,7 +148,7 @@
     "repo_tracked_truth_surfaces": [
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json",
-      "docs/phase_2_publication_projection_delivery_contract_convergence.md",
+      "docs/program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md",
       "README.md",
       "README.zh-CN.md",
       "docs/runtime_architecture.md",

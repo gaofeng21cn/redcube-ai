@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const ACTIVATION_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json';
-const ACTIVATION_BRIEF = 'docs/phase_2_source_intake_activation_package_freeze.md';
+const ACTIVATION_BRIEF = 'docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md';
 const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
 const HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
 const DOCS_INDEX = 'docs/README.md';

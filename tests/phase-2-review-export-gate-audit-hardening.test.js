@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
-const HARDENING_BRIEF = 'docs/phase_2_review_export_gate_audit_hardening.md';
+const HARDENING_BRIEF = 'docs/program/phase-2/phase_2_review_export_gate_audit_hardening.md';
 const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
 
 function read(file) {

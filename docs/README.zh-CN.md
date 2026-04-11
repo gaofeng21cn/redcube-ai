@@ -5,13 +5,15 @@
 这里是 `RedCube AI` 的双语文档索引，也是默认对外公开面。
 内容与产品真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的领域承载操作系统（Domain Harness OS），本地执行呈现为 Codex 默认 host-agent runtime；其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
 
-## 统一文档治理
+## 核心维护工作集
 
-- 所有对外文档都必须同时提供英文 `.md` 与中文 `.zh-CN.md`，并保持同步更新。
-- 内部设计、规划、操作备忘等内容默认使用中文，除非明确提升到公开面再补充英文。
-- 术语可以保留英文，但要避免无意义的中英混写，保证语言连贯。
-- `docs/README*` 的结构与措辞应统一，帮助读者区分公开面与内部内容。
-- 详情可查阅 [文档治理规则](documentation-governance.md)。
+在阅读详细 program brief 之前，先看这里：
+
+- [项目概览](./project.md)
+- [当前状态](./status.md)
+- [架构](./architecture.md)
+- [硬约束](./invariants.md)
+- [关键决策](./decisions.md)
 
 ## 默认对外双语公开面
 
@@ -35,21 +37,21 @@
 
 ### 主线 program 工件与 provenance
 
-- [Phase 2 activation package freeze](phase_2_source_intake_activation_package_freeze.md)
-- [Phase 2 source intake + shared source truth baseline](phase_2_source_intake_shared_source_truth_baseline.md)
-- [Phase 2 review / export / gate / audit hardening](phase_2_review_export_gate_audit_hardening.md)
-- [Phase 2 family source-truth consumption convergence](phase_2_family_source_truth_consumption_convergence.md)
-- [Phase 2 publication projection / delivery contract convergence](phase_2_publication_projection_delivery_contract_convergence.md)
-- [Phase 2 direct-delivery operator handoff hardening](phase_2_direct_delivery_operator_handoff_hardening.md)
-- [Phase 2 direct-delivery lifecycle stage convergence](phase_2_direct_delivery_lifecycle_stage_convergence.md)
-- [Phase 2 source-readiness deep research trigger + gate convergence](phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
+- [Phase 2 activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
+- [Phase 2 source intake + shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
+- [Phase 2 review / export / gate / audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
+- [Phase 2 family source-truth consumption convergence](program/phase-2/phase_2_family_source_truth_consumption_convergence.md)
+- [Phase 2 publication projection / delivery contract convergence](program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md)
+- [Phase 2 direct-delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
+- [Phase 2 direct-delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
+- [Phase 2 source-readiness deep research trigger + gate convergence](program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
 - [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md)（future-facing 目标态文档）
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
-- [Phase 2 workspace / operator quickstart convergence](phase_2_workspace_operator_quickstart_convergence.md)（已吸收 provenance）
-- [Phase 2 operator surface consistency hardening](phase_2_operator_surface_consistency_hardening.md)（已吸收 provenance）
-- [Phase 2 runtime watch locator integrity hardening](phase_2_runtime_watch_locator_integrity_hardening.md)（当前已吸收 tranche）
-- [Phase 2 family parity / autopilot continuation board](phase_2_family_parity_autopilot_continuation_board.md)（已预冻结的 follow-on board）
-- [Phase 2 family parity governance surface convergence](phase_2_family_parity_governance_surface_convergence.md)（第一条已预冻结的 follow-on tranche）
+- [Phase 2 workspace / operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md)（已吸收 provenance）
+- [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md)（已吸收 provenance）
+- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)（当前已吸收 tranche）
+- [Phase 2 family parity / autopilot continuation board](program/phase-2/phase_2_family_parity_autopilot_continuation_board.md)（已预冻结的 follow-on board）
+- [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md)（第一条已预冻结的 follow-on tranche）
 
 ### 面向技术协作 / Agent 执行者
 
@@ -58,7 +60,6 @@
 - [Source Augmentation / Deep Research 执行器合同](source_augmentation_executor_contract.md)
 - [Domain Harness OS 定位映射](domain-harness-os-positioning.md)
 - [GitHub 公开发布流程](public-github-publish.md)
-- [文档治理规则](documentation-governance.md)
 
 ### 私有 / 本地配置文档
 
@@ -77,6 +78,8 @@
 ## 文档边界
 
 - `README*` 与 `docs/README*`：默认双语对外公开面。
+- `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md`：AI / 维护者核心工作集。
+- `docs/program/phase-2/*.md`：repo-tracked 的 program brief。
 - 详细 `docs/*.md`：默认仓库跟踪的内部操作文档，中文为主。
 - `docs/policies/`：稳定内部规则，默认中文维护。
 - `docs/superpowers/`：本地 AI / Superpowers 的笔记、计划、草案，保持未跟踪。

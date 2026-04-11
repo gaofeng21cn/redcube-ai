@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
-const BASELINE_BRIEF = 'docs/phase_2_source_intake_shared_source_truth_baseline.md';
+const BASELINE_BRIEF = 'docs/program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');

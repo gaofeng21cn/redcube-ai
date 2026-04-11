@@ -4,7 +4,7 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json';
-const TRANCHE_BRIEF = 'docs/phase_2_direct_delivery_operator_handoff_hardening.md';
+const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json';
 
 function read(file) {

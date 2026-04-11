@@ -264,7 +264,7 @@
       },
       "artifacts": {
         "tranche_contract": "contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json",
-        "tranche_brief": "docs/phase_2_runtime_watch_locator_integrity_hardening.md",
+        "tranche_brief": "docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md",
         "tranche_test": "tests/phase-2-runtime-watch-locator-integrity-hardening.test.js"
       },
       "closeout": {
@@ -346,7 +346,7 @@
         },
         "artifacts": {
           "activation_package_contract": "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json",
-          "activation_package_brief": "docs/phase_2_source_intake_activation_package_freeze.md",
+          "activation_package_brief": "docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md",
           "activation_package_test": "tests/phase-2-source-intake-activation-package-freeze.test.js"
         },
         "closeout": {
@@ -378,7 +378,7 @@
         },
         "artifacts": {
           "baseline_contract": "contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json",
-          "baseline_brief": "docs/phase_2_source_intake_shared_source_truth_baseline.md",
+          "baseline_brief": "docs/program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md",
           "baseline_test": "tests/phase-2-source-intake-shared-source-truth-baseline.test.js"
         },
         "closeout": {
@@ -443,7 +443,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json",
-          "tranche_brief": "docs/phase_2_review_export_gate_audit_hardening.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_review_export_gate_audit_hardening.md",
           "tranche_test": "tests/phase-2-review-export-gate-audit-hardening.test.js"
         },
         "closeout": {
@@ -518,7 +518,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json",
-          "tranche_brief": "docs/phase_2_family_source_truth_consumption_convergence.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_family_source_truth_consumption_convergence.md",
           "tranche_test": "tests/phase-2-family-source-truth-consumption-convergence.test.js"
         },
         "closeout": {
@@ -591,7 +591,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json",
-          "tranche_brief": "docs/phase_2_publication_projection_delivery_contract_convergence.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md",
           "tranche_test": "tests/phase-2-publication-projection-delivery-contract-convergence.test.js"
         },
         "closeout": {
@@ -666,7 +666,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json",
-          "tranche_brief": "docs/phase_2_direct_delivery_operator_handoff_hardening.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md",
           "tranche_test": "tests/phase-2-direct-delivery-operator-handoff-hardening.test.js"
         },
         "closeout": {
@@ -746,7 +746,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json",
-          "tranche_brief": "docs/phase_2_direct_delivery_lifecycle_stage_convergence.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md",
           "tranche_test": "tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js"
         },
         "closeout": {
@@ -825,7 +825,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json",
-          "tranche_brief": "docs/phase_2_source_readiness_deep_research_trigger_gate_convergence.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md",
           "tranche_test": "tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js"
         },
         "closeout": {
@@ -913,7 +913,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json",
-          "tranche_brief": "docs/phase_2_workspace_operator_quickstart_convergence.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_workspace_operator_quickstart_convergence.md",
           "tranche_test": "tests/phase-2-workspace-operator-quickstart-convergence.test.js"
         },
         "closeout": {
@@ -997,7 +997,7 @@
         },
         "artifacts": {
           "tranche_contract": "contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json",
-          "tranche_brief": "docs/phase_2_operator_surface_consistency_hardening.md",
+          "tranche_brief": "docs/program/phase-2/phase_2_operator_surface_consistency_hardening.md",
           "tranche_test": "tests/phase-2-operator-surface-consistency-hardening.test.js"
         },
         "closeout": {

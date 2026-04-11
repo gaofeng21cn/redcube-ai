@@ -7,7 +7,7 @@ const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
 const BOARD_CONTRACT = 'contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json';
-const TRANCHE_BRIEF = 'docs/phase_2_family_parity_governance_surface_convergence.md';
+const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_family_parity_governance_surface_convergence.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -58,7 +58,7 @@ test('family parity governance activation package stays frozen as the first same
   const board = readJson(BOARD_CONTRACT);
   const tranche = readJson(TRANCHE_CONTRACT);
   const brief = read(TRANCHE_BRIEF);
-  const runtimeWatchBrief = read('docs/phase_2_runtime_watch_locator_integrity_hardening.md');
+  const runtimeWatchBrief = read('docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md');
   const runtimePolicy = read('docs/policies/runtime_operating_model.md');
   const positioning = read('docs/domain-harness-os-positioning.md');
 

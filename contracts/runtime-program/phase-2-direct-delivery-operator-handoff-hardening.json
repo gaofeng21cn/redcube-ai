@@ -147,7 +147,7 @@
     "repo_tracked_truth_surfaces": [
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json",
-      "docs/phase_2_direct_delivery_operator_handoff_hardening.md",
+      "docs/program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md",
       "README.md",
       "README.zh-CN.md",
       "docs/runtime_architecture.md",

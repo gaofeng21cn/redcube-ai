@@ -8,27 +8,27 @@ const POSTER_FREEZE_CONTRACT = 'contracts/runtime-program/poster-production-hard
 const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluation-closeout.json';
 const MANUAL_TEST_CONTRACT = 'contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json';
 const PHASE_2_ACTIVATION_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json';
-const PHASE_2_ACTIVATION_BRIEF = 'docs/phase_2_source_intake_activation_package_freeze.md';
+const PHASE_2_ACTIVATION_BRIEF = 'docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md';
 const PHASE_2_BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
-const PHASE_2_BASELINE_BRIEF = 'docs/phase_2_source_intake_shared_source_truth_baseline.md';
+const PHASE_2_BASELINE_BRIEF = 'docs/program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md';
 const PHASE_2_HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
-const PHASE_2_HARDENING_BRIEF = 'docs/phase_2_review_export_gate_audit_hardening.md';
+const PHASE_2_HARDENING_BRIEF = 'docs/program/phase-2/phase_2_review_export_gate_audit_hardening.md';
 const PHASE_2_FAMILY_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json';
-const PHASE_2_FAMILY_CONVERGENCE_BRIEF = 'docs/phase_2_family_source_truth_consumption_convergence.md';
+const PHASE_2_FAMILY_CONVERGENCE_BRIEF = 'docs/program/phase-2/phase_2_family_source_truth_consumption_convergence.md';
 const PHASE_2_PUBLICATION_PROJECTION_CONTRACT = 'contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json';
-const PHASE_2_PUBLICATION_PROJECTION_BRIEF = 'docs/phase_2_publication_projection_delivery_contract_convergence.md';
+const PHASE_2_PUBLICATION_PROJECTION_BRIEF = 'docs/program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md';
 const PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json';
-const PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF = 'docs/phase_2_direct_delivery_operator_handoff_hardening.md';
+const PHASE_2_DIRECT_DELIVERY_HANDOFF_BRIEF = 'docs/program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md';
 const PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json';
-const PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_BRIEF = 'docs/phase_2_direct_delivery_lifecycle_stage_convergence.md';
+const PHASE_2_DIRECT_DELIVERY_LIFECYCLE_CONVERGENCE_BRIEF = 'docs/program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md';
 const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json';
-const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF = 'docs/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
+const PHASE_2_SOURCE_READINESS_DEEP_RESEARCH_TRIGGER_GATE_CONVERGENCE_BRIEF = 'docs/program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
 const PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_CONTRACT = 'contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json';
-const PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_BRIEF = 'docs/phase_2_workspace_operator_quickstart_convergence.md';
+const PHASE_2_WORKSPACE_OPERATOR_QUICKSTART_CONVERGENCE_BRIEF = 'docs/program/phase-2/phase_2_workspace_operator_quickstart_convergence.md';
 const PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json';
-const PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_BRIEF = 'docs/phase_2_operator_surface_consistency_hardening.md';
+const PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_BRIEF = 'docs/program/phase-2/phase_2_operator_surface_consistency_hardening.md';
 const PHASE_2_RUNTIME_WATCH_LOCATOR_INTEGRITY_HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
-const PHASE_2_RUNTIME_WATCH_LOCATOR_INTEGRITY_HARDENING_BRIEF = 'docs/phase_2_runtime_watch_locator_integrity_hardening.md';
+const PHASE_2_RUNTIME_WATCH_LOCATOR_INTEGRITY_HARDENING_BRIEF = 'docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -38,24 +38,37 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP protocol layer, and controller internal surface', () => {
+test('P0 truth surfaces keep formal-entry and durable-surface truth on repo-tracked docs and contracts instead of AGENTS freeze wording', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = read('apps/redcube-cli/src/cli.js');
   const rootAgents = read('AGENTS.md');
+  const projectDoc = read('docs/project.md');
+  const invariants = read('docs/invariants.md');
   const contractsReadme = read('contracts/README.md');
+  const readme = read('README.md');
+  const readmeZh = read('README.zh-CN.md');
+  const runtimeArchitecture = read('docs/runtime_architecture.md');
   const runtimePolicy = read('docs/policies/runtime_operating_model.md');
 
   assert.equal(Boolean(pkg.scripts.redcube), true);
   assert.equal(Boolean(pkg.scripts.mcp), true);
   assert.equal(Boolean(pkg.scripts.controller), false);
   assert.equal(cli.includes("preferredEntry: ['CLI', 'MCP']"), true);
-  assert.equal(rootAgents.includes('默认正式入口 `CLI`'), true);
-  assert.equal(rootAgents.includes('支持协议层 `MCP`'), true);
-  assert.equal(rootAgents.includes('内部控制面 `controller`'), true);
-  assert.equal(rootAgents.includes('`program_id`'), true);
-  assert.equal(rootAgents.includes('`topic_id`'), true);
-  assert.equal(rootAgents.includes('`deliverable_id`'), true);
-  assert.equal(rootAgents.includes('`run_id`'), true);
+  assert.equal(rootAgents.includes('docs/project.md'), true);
+  assert.equal(rootAgents.includes('docs/invariants.md'), true);
+  assert.equal(rootAgents.includes('docs/status.md'), true);
+  assert.equal(projectDoc.includes('formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
+  assert.equal(invariants.includes('formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
+  assert.equal(readme.includes('`program_id` is the active mainline control-plane pointer.'), true);
+  assert.equal(readme.includes('`topic_id` is the topic aggregate identity for canonical source truth and publication projection.'), true);
+  assert.equal(readme.includes('`deliverable_id` is the durable deliverable identity for review, export, and delivery contracts.'), true);
+  assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution.'), true);
+  assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
+  assert.equal(readmeZh.includes('`topic_id`：canonical source truth 与 publication projection 所属的 topic 聚合根身份'), true);
+  assert.equal(readmeZh.includes('`deliverable_id`：review、export 与 delivery contract 所绑定的持久交付物身份'), true);
+  assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
+  assert.equal(runtimeArchitecture.includes('`auditDeliverable`、`runtimeWatch`'), true);
+  assert.equal(runtimeArchitecture.includes('`getReviewState`、`getPublicationProjection`'), true);
   assert.equal(contractsReadme.includes('runtime-program/current-program.json'), true);
   assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(PHASE_2_ACTIVATION_CONTRACT)), true);

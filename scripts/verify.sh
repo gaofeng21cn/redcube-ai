@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+lane="${1:-smoke}"
+
+case "$lane" in
+  smoke|fast)
+    npm run test:fast
+    ;;
+  meta)
+    npm run test:meta
+    ;;
+  integration)
+    npm run test:integration
+    ;;
+  e2e)
+    npm run test:e2e
+    ;;
+  full)
+    npm run test:full
+    ;;
+  *)
+    echo "Unknown lane: $lane" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|meta|integration|e2e|full]" >&2
+    exit 1
+    ;;
+esac

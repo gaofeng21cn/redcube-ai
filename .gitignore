@@ -38,6 +38,7 @@ docs/superpowers/
 .DS_Store
 RedCube AI.app/
 .runtime-program/
+.omx/
 
 .tsbuildinfo/
 .codex/*

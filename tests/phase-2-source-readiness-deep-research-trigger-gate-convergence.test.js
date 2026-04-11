@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json';
-const TRANCHE_BRIEF = 'docs/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
+const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
 const FUTURE_TARGET = 'docs/source_readiness_deep_research_longrun_target_state.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json';
 
