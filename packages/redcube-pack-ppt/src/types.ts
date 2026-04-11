@@ -144,8 +144,8 @@ export interface PptDetailedOutlineSummary {
   public_sources: string[];
   render_recipe_id: PptRecipeId;
   creative_sources: {
-    major_text: 'host_agent';
-    recipe_selection: 'host_agent';
+    major_text: 'hermes';
+    recipe_selection: 'hermes';
   };
 }
 
@@ -192,11 +192,11 @@ export interface PptBlueprintSlide {
   speaker_seconds: number;
   transition_sentence: string;
   creative_sources: {
-    page_core_content: 'host_agent';
-    speaker_notes: 'host_agent';
-    transition_sentence: 'host_agent';
-    visual_presentation: 'host_agent';
-    recipe_selection: 'host_agent';
+    page_core_content: 'hermes';
+    speaker_notes: 'hermes';
+    transition_sentence: 'hermes';
+    visual_presentation: 'hermes';
+    recipe_selection: 'hermes';
   };
 }
 
@@ -254,10 +254,10 @@ export interface PptVisualDirection {
   baseline_deliverable_id: string | null;
   mode: PptMigrationMode;
   creative_sources?: {
-    visual_manifest: 'host_agent';
-    rhythm_curve: 'host_agent';
-    peak_pages: 'host_agent';
-    page_family_ceiling: 'host_agent';
+    visual_manifest: 'hermes';
+    rhythm_curve: 'hermes';
+    peak_pages: 'hermes';
+    page_family_ceiling: 'hermes';
   };
 }
 
@@ -308,8 +308,8 @@ export interface PptRenderSlide {
   palette: PptPalette;
   total_slides: number;
   creative_sources: {
-    recipe_selection: 'host_agent';
-    final_markup: 'host_agent';
+    recipe_selection: 'hermes';
+    final_markup: 'hermes';
   };
   markup_contract_source: 'prompt_pack_artifact';
   content: string;

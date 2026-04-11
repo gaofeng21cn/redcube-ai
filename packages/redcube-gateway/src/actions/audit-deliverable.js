@@ -66,11 +66,18 @@ function loadReviewState({ workspaceRoot, topicId, deliverableId }) {
     return null;
   }
 
-  return getRuntimeReviewState({
-    workspaceRoot,
-    topicId,
-    deliverableId,
-  });
+  try {
+    return getRuntimeReviewState({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+    });
+  } catch (error) {
+    if (error?.code === 'ENOENT' && String(error?.path || '').endsWith('hydrated-deliverable.json')) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 function loadPublicationProjectionEntry({ workspaceRoot, topicId, deliverableId }) {

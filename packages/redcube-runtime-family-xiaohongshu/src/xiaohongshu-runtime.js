@@ -51,8 +51,8 @@ const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
 });
 
 const HOST_AGENT_EXECUTION_MODEL = Object.freeze({
-  mainline_adapter: 'host_agent',
-  primary_surface: 'codex_native_host_agent',
+  mainline_adapter: 'hermes',
+  primary_surface: 'hermes_backed_runtime_substrate',
   adapter_role: 'primary_creative_executor',
   agent_first_requires_external_llm: false,
   external_llm_role: 'optional_compatibility_adapter',
@@ -66,18 +66,18 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
 
 function hostAgentCreativeSource(contractAsset) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
-    adapter: 'host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
+    stage_owner: 'hermes_backed_runtime_substrate',
+    adapter: 'hermes',
     supporting_contract: safeText(contractAsset, 'prompt_pack_seed'),
   };
 }
 
 function creativeExecution(route) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
     lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
     ownership_model: 'director_first',
   };
@@ -96,7 +96,7 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
 function reviewAuthorship(overlay) {
   return {
     overlay,
-    primary_surface: 'codex_native_host_agent',
+    primary_surface: 'hermes_backed_runtime_substrate',
     contract_asset: 'prompt_pack_seed',
   };
 }
@@ -589,7 +589,7 @@ function buildDirectorReview(contract, deliverablePaths) {
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: codex_native_host_agent',
+    '- review_owner: hermes_backed_runtime_substrate',
     `- director_intent_landed: ${directorIntentLanded}`,
     `- anti_template_ok: ${antiTemplateOk}`,
     `- memory_hook_present: ${memoryHookPresent}`,

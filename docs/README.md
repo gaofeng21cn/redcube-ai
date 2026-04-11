@@ -3,7 +3,7 @@
 **English** | [中文](./README.zh-CN.md)
 
 This bilingual index is the default public surface for `RedCube AI`.
-It stays aligned with the product truth: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, running via the `Codex-default host-agent runtime`; its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
+It stays aligned with the product truth: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, now running on a `Hermes-backed runtime substrate`; `Codex-default host-agent runtime` remains only as a transition deployment host. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
 
 ## Core Maintainer Working Set
 
@@ -23,9 +23,9 @@ This index along with the repository home forms the default GitHub-facing biling
 
 ## Current Mainline Status
 
-The current absorbed tranche is `Phase 2 / runtime watch locator integrity hardening`.
-`operator surface consistency hardening` remains absorbed provenance on the same mainline, while `runtime watch locator integrity hardening` is now the current absorbed tranche.
-The next same-mainline continuation is now prefrozen as `family parity / autopilot continuity`, with `phase_2_family_parity_governance_surface_convergence` fixed as the first allowed follow-on tranche.
+The current active tranche is `Hermes / runtime substrate canonical closure`.
+Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance on the same mainline.
+The current truthful stop boundary is no longer "host-agent hardening"; it is "Hermes-backed runtime substrate with one canonical deliverable closure and shared governance topology".
 
 ## Repo-Tracked Internal Operator Docs
 
@@ -37,6 +37,9 @@ The next same-mainline continuation is now prefrozen as `family parity / autopil
 
 ### Mainline program artifacts and provenance
 
+- [Hermes runtime substrate activation package](program/hermes/hermes_runtime_substrate_activation_package.md) (Chinese only)
+- [Hermes runtime capability extraction map](program/hermes/hermes_runtime_capability_extraction_map.md) (Chinese only)
+- [Hermes runtime substrate canonical closure](program/hermes/hermes_runtime_substrate_canonical_closure.md) (Chinese only)
 - [Phase 2 activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md) (Chinese only)
 - [Phase 2 source intake + shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md) (Chinese only)
 - [Phase 2 review / export / gate / audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md) (Chinese only)
@@ -49,9 +52,8 @@ The next same-mainline continuation is now prefrozen as `family parity / autopil
 - [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md) (future-facing design target, Chinese only)
 - [Phase 2 workspace / operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md) (absorbed provenance, Chinese only)
 - [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md) (absorbed provenance, Chinese only)
-- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md) (current absorbed tranche, Chinese only)
-- [Phase 2 family parity / autopilot continuation board](program/phase-2/phase_2_family_parity_autopilot_continuation_board.md) (prefrozen follow-on board, Chinese only)
-- [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md) (first prefrozen follow-on tranche, Chinese only)
+- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md) (absorbed provenance, Chinese only)
+- [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md) (absorbed provenance, Chinese only)
 
 ### For technical collaborators / agent executors
 
@@ -79,7 +81,7 @@ The next same-mainline continuation is now prefrozen as `family parity / autopil
 
 - `README*` and `docs/README*`: default bilingual public surface.
 - `docs/project.md`, `docs/status.md`, `docs/architecture.md`, `docs/invariants.md`, `docs/decisions.md`: AI / maintainer core working set.
-- `docs/program/phase-2/*.md`: repo-tracked program briefs for absorbed tranche and prefrozen follow-on board.
+- `docs/program/*/*.md`: repo-tracked program briefs for the active mainline, absorbed tranche, and historical/provenance slices.
 - Detailed `docs/*.md`: repository-tracked internal/operator documents unless explicitly promoted.
 - `docs/policies/`: stable internal rules, Chinese by default.
 - `docs/superpowers/`: local AI / Superpowers notes, plans, and drafts; keep them untracked.

@@ -33,7 +33,8 @@
 
 它的重点不是“先生成一版”，而是把视觉交付这件事变成正式生产线。
 
-当前默认本地执行形态是 `Codex-default host-agent runtime`。
+当前产品 runtime 主线已经迁到 `Hermes-backed runtime substrate`。
+`Codex-default host-agent runtime` 只保留为过渡 deployment host、回归对照和开发宿主。
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`；`controller` 目前不是独立、可验证的仓内公开正式入口。
 当前仓库主线按 `Auto-only` 理解；如果未来要做 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
@@ -205,8 +206,9 @@
 - direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `lifecycle_stage_contract` 与对齐后的 `lifecycle_stage_summary`，同时 `Storyline + Plan` 继续映射到 `Story Architecture`，`operator_handoff / closeout` 继续留在 `Delivery`
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，而不再依赖单独的 workspace-init 产品表面
 - operator surface consistency hardening 已在同一主线上吸收一条 tranche：`workspace doctor` 现在把 brand-new workspace bootstrap guidance 收紧到 `source intake` / `source research`，command-scoped `--help` 保持 machine-readable 且不会执行真实命令，而 `CLI review watch` / `MCP runtime_watch` 现在围绕同一 `runtimeWatch` locator truth 与共享治理 summaries 收口
-- runtime watch locator integrity hardening 已在同一主线上吸收一条 tranche：deliverable-scope run record 现在会持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator 指向错误 topic 或 deliverable 的 run 时会 fail-closed
-- 同一主线的下一段继续面也已预冻结为 `family parity / autopilot continuity`，第一条允许打开的 follow-on tranche 固定是 `phase_2_family_parity_governance_surface_convergence`
+- `Hermes-backed runtime substrate` 已成为当前 active runtime owner：routed deliverable execution、run record、managed adapter failover 与 shared runtime topology 不再把 `Codex-default host-agent runtime` 当作长期产品 substrate
+- 当前行为收口还新增了 `governance_surface.runtime_topology`：create / review / audit / watch / projection 现在在同一 deliverable/topic 边界上看到同一份 runtime topology 真相
+- runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance：deliverable-scope run record 仍持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator 指向错误 topic 或 deliverable 的 run 时继续 fail-closed
 - 海报能力还没完全收口：
   - 当前海报主线主要对应 `知识海报`
   - 面向论文或会议的学术海报能力仍在完善
@@ -230,7 +232,8 @@
       -> 网关
           -> 交付物层 / 场景层 / 配置层 / 包层
               -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
-                  -> Codex-default host-agent runtime（当前默认）
+                  -> Hermes-backed runtime substrate（当前产品 runtime）
+                      -> Codex-default host-agent runtime bridge（仅过渡宿主）
                   -> managed web runtime（同一 substrate 上的未来形态）
 ```
 
@@ -250,7 +253,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；`stable deliverable manual-test-driven hardening` 已完成 closeout；`Phase 2 activation package freeze` 已完成并吸收；`source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线，并通过 `CLI` 与 `MCP` 服务 `ppt_deck` / `xiaohongshu`；`review / export / gate / audit hardening`、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 继续作为已吸收 provenance 保留；当前已吸收 tranche 则把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 持久化下来，并让 `runtimeWatch` quartet locator 在 run identity 与 topic/deliverable 不一致时 fail-closed，同时继续保持共享治理表面对齐，并且不把 `xiaohongshu` 的 human publication 语义改写成 direct delivery。
+- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；phase-2 的 source-truth、governance、operator-surface 与 runtime-watch hardening 继续作为 absorbed provenance 保留；而当前 active tranche 已切到 `Hermes / runtime substrate canonical closure`，它明确把 Hermes 冻结为 runtime substrate owner，把 `Codex-default host-agent runtime` 降为过渡宿主，并让一条 canonical `ppt_deck` deliverable mainline 在 Hermes-backed execution 上跑通，同时把 shared `runtime_topology` 真相扩展到 stable families，而不改写 `xiaohongshu` 的 human publication 语义。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -258,7 +261,8 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- 当前已吸收 tranche 是 `Phase 2 / runtime watch locator integrity hardening`，但产品长线目标仍然大于这一条 absorbed tranche。
+- `Codex-default host-agent runtime` 不再是长期产品 runtime owner。
+- managed web runtime 仍是同一 substrate 上的未来形态，不得伪装成已完成。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。
 

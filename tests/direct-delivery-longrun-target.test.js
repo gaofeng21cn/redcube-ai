@@ -37,10 +37,8 @@ test('direct-delivery longrun target doc stays future-facing and does not rewrit
   assert.equal(doc.includes('## 5.5 Delivery'), true);
   assert.equal(doc.includes('## 6. operator_handoff / closeout boundary'), true);
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.phase_label, 'Phase 2 / runtime watch locator integrity hardening');
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_direct_delivery_lifecycle_stage_convergence.artifacts.tranche_contract,
-    'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json',
-  );
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('managed web runtime completion claim'), true);
 });

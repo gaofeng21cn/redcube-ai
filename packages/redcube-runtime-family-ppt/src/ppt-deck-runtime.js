@@ -326,9 +326,9 @@ function deckPreset(profileId) {
 
 function hostAgentCreativeSource(protectedSurface, artifactSource) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
+    stage_owner: 'hermes_backed_runtime_substrate',
     ownership_model: 'director_first',
     authored_surface: protectedSurface,
     materialized_from: artifactSource,
@@ -345,8 +345,8 @@ function reviewOverlayForRoute(contract, route) {
 
 function creativeExecution(routeOrLifecycleStage) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: 'hermes',
+    primary_surface: 'hermes_backed_runtime_substrate',
     lifecycle_stage: routeOrLifecycleStage,
     ownership_model: 'director_first',
   };

@@ -16,30 +16,22 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 publication projection delivery contract convergence stays absorbed provenance while runtime watch locator integrity hardening is the active tranche', () => {
+test('phase-2 publication projection delivery contract convergence stays absorbed provenance while Hermes canonical closure is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.commit, '57c9310');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.scope.hardening_axis, 'publication_projection_delivery_contract_convergence');
-  assert.deepEqual(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.scope.required_shared_contract_surfaces, ['delivery_contract', 'publication_projection']);
+  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
   assert.deepEqual(contract.formal_entry.repo_verified, ['MCP', 'CLI']);
   assert.equal(contract.formal_entry.controller_repo_verified, false);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.artifacts.tranche_contract,
-    FAMILY_TRANCHE_CONTRACT,
-  );
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.artifacts.tranche_contract,
-    TRANCHE_CONTRACT,
-  );
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(currentProgram.current_state.active_baton.scope.required_audit_surfaces.includes('getPublicationProjection'), true);
+  assert.equal(existsSync(path.resolve(FAMILY_TRANCHE_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(contract.foundations.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
   assert.equal(contract.closeout.next_tranche_candidate, 'phase_2_direct_delivery_operator_handoff_hardening');
 });
@@ -94,8 +86,8 @@ test('phase-2 publication projection delivery contract convergence brief and doc
   assert.equal(readmeZh.includes('publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state'), true);
   assert.equal(positioning.includes('`publication projection / delivery contract convergence`'), true);
-  assert.equal(positioning.includes('当前已吸收 tranche 是 `runtime watch locator integrity hardening`'), true);
-  assert.equal(policy.includes('`direct-delivery lifecycle stage convergence` 已在当前主线上吸收'), true);
+  assert.equal(positioning.includes('当前 active tranche 是 `Hermes runtime substrate canonical closure`'), true);
+  assert.equal(policy.includes('`Hermes runtime substrate canonical closure` 现已在当前主线上落地'), true);
   assert.equal(docsIndex.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
 });

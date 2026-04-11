@@ -6,9 +6,9 @@ export type PosterLayoutFamily = 'hero_band' | 'evidence_columns' | 'pathway_str
 export type PosterRecipeId = 'poster.hero_band' | 'poster.evidence_columns' | 'poster.pathway_strip' | 'poster.action_footer';
 
 export interface PosterCreativeSourceStamp {
-  owner: 'host_agent';
-  primary_surface: 'codex_native_host_agent';
-  stage_owner: 'codex_native_host_agent';
+  owner: 'hermes';
+  primary_surface: 'hermes_backed_runtime_substrate';
+  stage_owner: 'hermes_backed_runtime_substrate';
   route: string;
   lifecycle_stage: string;
   authored_surface: string;

@@ -34,7 +34,7 @@
 
 ### 4. Program briefs
 
-- `docs/program/phase-2/*.md`
+- `docs/program/*/*.md`
 
 这层负责与 contracts 对应的人类可读 tranche brief，不是默认公开首页叙事。
 

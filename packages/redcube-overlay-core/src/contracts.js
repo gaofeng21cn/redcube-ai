@@ -1,3 +1,5 @@
+import { buildHermesRuntimeTopology } from '@redcube/hermes-substrate';
+
 export function buildDeliverableRecord({
   topicId,
   deliverableId,
@@ -80,6 +82,7 @@ export function buildGovernanceSurfaceContract(contract = {}) {
       internal_controller_surface: 'controller',
       controller_repo_verified: false,
     },
+    runtime_topology: buildHermesRuntimeTopology(),
   };
 }
 
@@ -114,7 +117,17 @@ export function validateGovernanceSurfaceContract(content) {
     && supportedProtocolLayer.length === 1
     && supportedProtocolLayer[0] === 'MCP'
     && content?.formal_entry?.internal_controller_surface === 'controller'
-    && content?.formal_entry?.controller_repo_verified === false;
+    && content?.formal_entry?.controller_repo_verified === false
+    && content?.runtime_topology?.runtime_substrate_owner === 'Hermes'
+    && content?.runtime_topology?.runtime_substrate_surface === 'hermes_backed_runtime_substrate'
+    && content?.runtime_topology?.deployment_host === 'codex_default_host_agent_bridge'
+    && content?.runtime_topology?.deployment_host_status === 'transition_only'
+    && content?.runtime_topology?.default_formal_entry === 'CLI'
+    && Array.isArray(content?.runtime_topology?.supported_protocol_layer)
+    && content.runtime_topology.supported_protocol_layer.length === 1
+    && content.runtime_topology.supported_protocol_layer[0] === 'MCP'
+    && content?.runtime_topology?.internal_controller_surface === 'controller'
+    && content?.runtime_topology?.controller_repo_verified === false;
 }
 
 function isPlainObject(value) {

@@ -19,7 +19,7 @@
 当前统一口径：
 
 - `Agent-first` 不等于 `external_llm-only`
-- `Codex-default host-agent runtime` 是当前正式默认执行形态
+- `Hermes-backed runtime substrate` 是当前正式默认产品 runtime；`Codex-default host-agent runtime` 只保留为过渡宿主
 - 共享宏观生命周期是：
   - `Source Readiness`
   - `Story Architecture`

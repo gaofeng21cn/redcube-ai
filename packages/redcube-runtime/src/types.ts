@@ -26,6 +26,8 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
+export type RuntimeManagedRunAdapter = 'hermes' | 'external_llm' | 'host_agent';
+
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];
   story_architecture: string[];
@@ -502,7 +504,7 @@ export interface RuntimeManagedRunRequest {
   overlay: string;
   topicId: string;
   deliverableId: string;
-  adapter?: string;
+  adapter?: RuntimeManagedRunAdapter;
   userIntent?: string;
   stopAfterStage?: string;
   mode?: string;

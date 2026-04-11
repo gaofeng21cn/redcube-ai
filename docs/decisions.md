@@ -19,3 +19,9 @@
 ### 决策：`contracts/runtime-program/*.json` 与 `docs/program/phase-2/*.md` 成对维护
 
 原因：一个是机器真相，一个是人类可读 brief，不能再各自漂移。
+
+### 决策：产品 runtime 主线迁到 `docs/program/hermes/`
+
+- `Hermes` 成为新的 runtime substrate owner
+- `Codex-default host-agent runtime` 退为 transition deployment host / regression bridge / development shell
+- `docs/program/hermes/*.md` 与对应 machine-readable contract 成对维护

@@ -1,4 +1,9 @@
 import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
+import {
+  HERMES_COMPATIBILITY_ADAPTER,
+  HERMES_DEFAULT_ADAPTER,
+  buildHermesExecutorDescriptor,
+} from '@redcube/hermes-substrate';
 
 /**
  * @typedef {{
@@ -22,12 +27,15 @@ import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
  *   creative_execution?: string,
  *   external_llm_role?: string,
  *   execution_model?: {
- *     mainline_adapter: "host_agent",
- *     primary_surface: "codex_native_host_agent",
+ *     mainline_adapter: "hermes",
+ *     primary_surface: "hermes_backed_runtime_substrate",
  *     adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
  *     agent_first_requires_external_llm: false,
  *     external_llm_role: "optional_compatibility_adapter",
- *     freeze_origin_milestone: "P19.A",
+ *     runtime_substrate_owner: "Hermes",
+ *     deployment_host: "codex_default_host_agent_bridge",
+ *     deployment_host_status: "transition_only",
+ *     freeze_origin_milestone: "Hermes.A",
  *   },
  *   runRoute(input: ExecutorRouteInput): Promise<{
  *     artifact_refs?: string[],
@@ -43,12 +51,15 @@ import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
  *     topic_id?: string,
  *     deliverable_id?: string,
  *     execution_model?: {
- *       mainline_adapter: "host_agent",
- *       primary_surface: "codex_native_host_agent",
+ *       mainline_adapter: "hermes",
+ *       primary_surface: "hermes_backed_runtime_substrate",
  *       adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
  *       agent_first_requires_external_llm: false,
  *       external_llm_role: "optional_compatibility_adapter",
- *       freeze_origin_milestone: "P19.A",
+ *       runtime_substrate_owner: "Hermes",
+ *       deployment_host: "codex_default_host_agent_bridge",
+ *       deployment_host_status: "transition_only",
+ *       freeze_origin_milestone: "Hermes.A",
  *     },
  *     produced_at?: string,
  *   }>,
@@ -59,28 +70,11 @@ import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
  * @param {{ adapter?: string }} [options]
  * @returns {ExecutorAdapter}
  */
-export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
-  if (adapter !== 'host_agent' && adapter !== 'external_llm') {
-    throw new Error(`Unsupported executor adapter: ${adapter}`);
-  }
-
-  const executionModel = Object.freeze({
-    mainline_adapter: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    adapter_role: adapter === 'host_agent' ? 'primary_creative_executor' : 'optional_compatibility_adapter',
-    agent_first_requires_external_llm: false,
-    external_llm_role: 'optional_compatibility_adapter',
-    freeze_origin_milestone: 'P19.A',
-  });
+export function resolveExecutorAdapter({ adapter = HERMES_DEFAULT_ADAPTER } = {}) {
+  const descriptor = buildHermesExecutorDescriptor({ adapter });
 
   return {
-    adapter,
-    primary: adapter === 'host_agent',
-    execution_surface: adapter === 'host_agent' ? 'codex_native_host_agent' : 'external_llm_adapter',
-    creative_execution: adapter === 'host_agent' ? 'agent_first_director_first' : 'compatibility_adapter_only',
-    external_llm_role: 'optional_compatibility_adapter',
-    compatibility_role: adapter === 'external_llm' ? 'optional_compatibility_adapter' : null,
-    execution_model: executionModel,
+    ...descriptor,
     async runRoute({
       workspaceRoot,
       overlay,
@@ -99,7 +93,7 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         throw new Error(`Stage contract mismatch: expected ${route}, got ${stageContract.stage_id}`);
       }
 
-      if (adapter === 'external_llm' && route !== 'storyline') {
+      if (descriptor.adapter === HERMES_COMPATIBILITY_ADAPTER && route !== 'storyline') {
         const error = new Error(`Unsupported route for adapter external_llm: ${route}`);
         error.code = 'compatibility_adapter_route_unsupported';
         error.requiresHumanConfirmation = false;
@@ -107,7 +101,7 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         throw error;
       }
 
-      if (adapter === 'host_agent') {
+      if (descriptor.adapter === HERMES_DEFAULT_ADAPTER) {
         const familyRunner = await loadRuntimeFamilyRunner(contract);
         const artifact = await familyRunner.runRoute({
           workspaceRoot,
@@ -120,7 +114,7 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         });
         return {
           ...artifact,
-          execution_model: executionModel,
+          execution_model: descriptor.execution_model,
         };
       }
 
@@ -132,13 +126,7 @@ export function resolveExecutorAdapter({ adapter = 'host_agent' } = {}) {
         contract,
         stage_contract: stageContract,
         executor: {
-          adapter,
-          primary: adapter === 'host_agent',
-          execution_surface: adapter === 'host_agent' ? 'codex_native_host_agent' : 'external_llm_adapter',
-          creative_execution: adapter === 'host_agent' ? 'agent_first_director_first' : 'compatibility_adapter_only',
-          external_llm_role: 'optional_compatibility_adapter',
-          compatibility_role: adapter === 'external_llm' ? 'optional_compatibility_adapter' : null,
-          execution_model: executionModel,
+          ...descriptor,
         },
         produced_at: new Date().toISOString(),
       };

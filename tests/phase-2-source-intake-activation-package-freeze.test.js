@@ -19,19 +19,17 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 activation package freeze remains a machine-readable completed predecessor after runtime watch locator integrity hardening advanced the same mainline', () => {
+test('phase-2 activation package freeze remains a machine-readable completed predecessor after Hermes canonical closure advanced the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(ACTIVATION_CONTRACT);
-  const completed = currentProgram.current_state.completed_batons.phase_2_activation_package_freeze;
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, HARDENING_CONTRACT);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
-  assert.equal(completed.status, 'closeout_completed');
-  assert.equal(completed.review_status, 'passed');
-  assert.equal(completed.commit, '3a7fbd6');
-  assert.equal(completed.artifacts.activation_package_contract, ACTIVATION_CONTRACT);
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(existsSync(path.resolve(HARDENING_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(BASELINE_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(ACTIVATION_CONTRACT)), true);
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.activation.owner, 'Codex App');

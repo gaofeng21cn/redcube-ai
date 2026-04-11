@@ -18,27 +18,25 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('stable deliverable manual-test contract remains the completed foundation baton behind the current runtime watch locator integrity hardening tranche', () => {
+test('stable deliverable manual-test contract remains the completed foundation baton behind the current Hermes runtime substrate tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
-  const completed = currentProgram.current_state.completed_batons.stable_deliverable_manual_test_driven_hardening;
 
-  assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.foundation_milestones.p0_truth_surface_and_green_baseline_convergence.review_closeout, 'passed');
+  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
+  assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
-  assert.equal(currentProgram.current_state.next_phase.p1_allowed, false);
-  assert.equal(currentProgram.current_state.next_phase.phase_2_allowed, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, HARDENING_CONTRACT);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract, BASELINE_CONTRACT);
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_publication_projection_delivery_contract_convergence.commit, '57c9310');
-  assert.equal(completed.status, 'closeout_completed');
-  assert.equal(completed.review_status, 'passed');
-  assert.equal(completed.commit, '96dc6c1');
-  assert.equal(completed.artifacts.manual_test_contract, MANUAL_TEST_CONTRACT);
-  assert.equal(completed.artifacts.manual_test_brief, OPERATOR_BRIEF);
-  assert.equal(completed.artifacts.hardening_backlog, HARDENING_BACKLOG);
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.commit, '96dc6c1');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_parity_governance_surface_convergence.status, 'closeout_completed');
+  assert.equal(existsSync(path.resolve(HARDENING_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(BASELINE_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(OPERATOR_BRIEF)), true);
+  assert.equal(existsSync(path.resolve(HARDENING_BACKLOG)), true);
   assert.equal(contract.activation.owner, 'Codex App');
   assert.equal(contract.activation.required, true);
   assert.equal(contract.activation.opens_phase_2, false);

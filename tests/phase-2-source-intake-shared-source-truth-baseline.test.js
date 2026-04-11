@@ -15,15 +15,15 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 minimum baseline contract remains absorbed provenance behind the current runtime watch locator integrity hardening tranche', () => {
+test('phase-2 minimum baseline contract remains absorbed provenance behind the current Hermes runtime substrate tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(BASELINE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract, 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
-  assert.equal(currentProgram.current_state.completed_batons.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -62,7 +62,7 @@ test('phase-2 minimum baseline contract freezes canonical quartet, formal entry 
   assert.equal(deliverableRoutes.includes('shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId)'), true);
 });
 
-test('phase-2 minimum baseline brief and docs indexes expose the baseline as absorbed provenance while keeping scope honest', () => {
+test('phase-2 minimum baseline brief and docs indexes expose the baseline as absorbed provenance while keeping Hermes current scope honest', () => {
   const brief = read(BASELINE_BRIEF);
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');

@@ -16,13 +16,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 review/export/gate/audit hardening stays absorbed provenance while runtime watch locator integrity hardening is the active tranche', () => {
+test('phase-2 review/export/gate/audit hardening stays absorbed provenance while Hermes canonical closure is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(HARDENING_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Phase2');
-  assert.equal(currentProgram.current_state.workstream, 'phase_2_runtime_watch_locator_integrity_hardening');
-  assert.equal(currentProgram.current_state.active_baton.id, 'phase_2_runtime_watch_locator_integrity_hardening');
+  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -30,14 +30,11 @@ test('phase-2 review/export/gate/audit hardening stays absorbed provenance while
   assert.equal(contract.formal_entry.controller_repo_verified, false);
   assert.equal(contract.foundations.phase_2_source_intake_shared_source_truth_baseline.status, 'closeout_completed');
   assert.equal(contract.foundations.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_review_export_gate_audit_hardening.artifacts.tranche_contract,
-    HARDENING_CONTRACT,
-  );
-  assert.equal(
-    currentProgram.current_state.completed_batons.phase_2_source_intake_shared_source_truth_baseline.artifacts.baseline_contract,
-    BASELINE_CONTRACT,
-  );
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.active_baton.scope.required_audit_surfaces.includes('auditDeliverable'), true);
+  assert.equal(existsSync(path.resolve(HARDENING_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(BASELINE_CONTRACT)), true);
 });
 
 test('phase-2 review/export/gate/audit hardening contract freezes canonical audit and runtime-watch surfaces without promoting controller', () => {

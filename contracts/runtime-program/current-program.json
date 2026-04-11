@@ -1,14 +1,14 @@
 {
   "program_id": "redcube-runtime-program",
-  "date_anchor": "2026-04-10",
+  "date_anchor": "2026-04-11",
   "longrun_goal": {
-    "label": "visual-deliverable domain gateway plus domain harness os longrun mainline",
+    "label": "visual-deliverable domain gateway plus Hermes-backed domain harness os mainline",
     "north_star": [
-      "keep CLI as the default formal entry while retaining MCP as the supported protocol layer until any wider entry is implemented, documented, and verifiable",
-      "keep the current repository honestly Auto-only and treat any future human-in-the-loop product as a sibling or upper-layer product on the same substrate rather than as same-repo dual-mode logic",
-      "treat source intake and shared source truth as stable capability surfaces inside Source Readiness rather than as a one-off phase experiment",
-      "continue review, export, gate, and audit hardening on the same mainline instead of defaulting back to manual next-baton pauses after each absorbed tranche",
-      "keep poster knowledge-poster support, future academic-poster support, and future federation work on the same substrate without fragmenting formal control semantics"
+      "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
+      "keep controller as an internal-only surface",
+      "keep the current repository honestly Auto-only",
+      "migrate the product runtime owner from Codex-local host-agent to Hermes-backed runtime substrate",
+      "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
     ]
   },
   "formal_entry": {
@@ -18,8 +18,8 @@
     ],
     "internal_controller_surface": "controller",
     "repo_verified": [
-      "MCP",
-      "CLI"
+      "CLI",
+      "MCP"
     ],
     "controller_repo_verified": false
   },
@@ -100,20 +100,13 @@
   },
   "current_state": {
     "product_mainline_mode": "auto_only",
-    "future_hitl_layering": "sibling_or_upper_layer_product",
-    "autonomous_longrun_program_mode": {
-      "enabled": true,
-      "meaning": "longrun goal refers to the ideal product shape, not the current phase label or the latest absorbed tranche",
-      "continue_rule": "after a tranche is frozen, verified, and absorbed, same-mainline hardening may continue autonomously when the next capability truth can be frozen without violating hard boundaries",
-      "stop_conditions": [
-        "frozen truth conflict that cannot be resolved inside current contracts",
-        "new product-direction choice is required",
-        "external dependency or credential blocks the next truthful step"
-      ]
-    },
-    "phase_id": "Phase2",
-    "phase_label": "Phase 2 / runtime watch locator integrity hardening",
-    "workstream": "phase_2_runtime_watch_locator_integrity_hardening",
+    "runtime_substrate_owner": "Hermes",
+    "deployment_host": "codex_default_host_agent_bridge",
+    "deployment_host_status": "transition_only",
+    "host_agent_longterm_owner": false,
+    "phase_id": "Hermes",
+    "phase_label": "Hermes / runtime substrate canonical closure",
+    "workstream": "hermes_runtime_substrate_canonical_closure",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -121,14 +114,13 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / phase 2 runtime watch locator integrity hardening",
+      "label": "redcube-runtime-program / hermes runtime substrate canonical closure",
       "unique": true
     },
     "green_baseline": {
       "credible": true,
       "clean_clone_required": true,
       "blocked_by": [],
-      "reproduction_mode": "tracked_only_verified",
       "required_verification": [
         "git status --short",
         "git diff --check",
@@ -138,102 +130,65 @@
       ]
     },
     "foundation_milestones": {
-      "phase_1_render_ceiling_upgrade": {
-        "status": "completed"
-      },
-      "p0_truth_surface_and_green_baseline_convergence": {
-        "review_closeout": "passed",
-        "green_baseline_credible": true
-      },
       "stable_deliverable_manual_test_driven_hardening": {
         "status": "closeout_completed",
         "commit": "96dc6c1"
-      },
-      "phase_2_activation_package_freeze": {
-        "status": "closeout_completed",
-        "commit": "3a7fbd6"
       },
       "phase_2_source_intake_shared_source_truth_baseline": {
         "status": "closeout_completed",
         "commit": "a4424d2"
       },
-      "source_readiness_mainline_reframe": {
-        "status": "completed",
-        "commit": "24f9f61"
-      },
       "phase_2_family_source_truth_consumption_convergence": {
         "status": "closeout_completed",
         "commit": "e894641"
       },
-      "phase_2_publication_projection_delivery_contract_convergence": {
-        "status": "closeout_completed"
-      },
-      "phase_2_direct_delivery_operator_handoff_hardening": {
-        "status": "closeout_completed"
-      },
-      "phase_2_direct_delivery_lifecycle_stage_convergence": {
-        "status": "closeout_completed"
-      },
-      "phase_2_source_readiness_deep_research_trigger_gate_convergence": {
-        "status": "closeout_completed"
-      },
-      "phase_2_workspace_operator_quickstart_convergence": {
-        "status": "closeout_completed"
-      },
-      "phase_2_operator_surface_consistency_hardening": {
-        "status": "closeout_completed"
-      },
       "phase_2_runtime_watch_locator_integrity_hardening": {
+        "status": "closeout_completed"
+      },
+      "phase_2_family_parity_governance_surface_convergence": {
+        "status": "closeout_completed"
+      },
+      "hermes_runtime_substrate_activation_package": {
+        "status": "closeout_completed"
+      },
+      "hermes_runtime_capability_extraction_map": {
+        "status": "closeout_completed"
+      },
+      "hermes_runtime_substrate_canonical_closure": {
         "status": "closeout_completed"
       }
     },
-    "team_mode": {
-      "default_enabled": false,
-      "enable_after": "phase_2 review/export/gate/audit tranche write scopes are frozen"
-    },
-    "next_phase": {
-      "p1_allowed": false,
-      "phase_2_allowed": true,
-      "only_after": "The current absorbed tranche stays frozen, verified, and truthful; follow-on hardening may continue autonomously on the same mainline only after the current tranche is frozen, verified, and absorbed"
-    },
     "active_baton": {
-      "id": "phase_2_runtime_watch_locator_integrity_hardening",
+      "id": "hermes_runtime_substrate_canonical_closure",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "hardening_axis": "runtime_watch_locator_integrity_hardening",
+        "hardening_axis": "hermes_runtime_substrate_canonical_closure",
         "implementation_in_scope": true,
-        "formal_entry": [
-          "MCP",
-          "CLI"
-        ],
-        "controller_repo_verified": false,
+        "runtime_substrate_owner": "Hermes",
+        "deployment_host": "codex_default_host_agent_bridge",
         "consumer_families": [
           "ppt_deck",
           "xiaohongshu",
           "poster_onepager"
         ],
-        "human_publication_contrast": [
-          "xiaohongshu"
-        ],
-        "guarded_poster_surface": [
-          "poster_onepager"
-        ],
+        "canonical_family": "ppt_deck",
         "runtime_planes": [
           "source_readiness",
+          "story_architecture",
+          "visual_authorship",
+          "delivery_packaging",
           "review",
           "export",
           "gate",
           "audit"
         ],
         "required_operator_surfaces": [
+          "deliverable create",
           "deliverable run",
           "review watch",
           "runs get"
-        ],
-        "required_mcp_surfaces": [
-          "runtime_watch"
         ],
         "required_audit_surfaces": [
           "auditDeliverable",
@@ -241,782 +196,46 @@
           "getReviewState",
           "getPublicationProjection"
         ],
-        "required_locator_fields": [
-          "workspaceRoot",
-          "topicId",
-          "deliverableId",
-          "runId"
-        ],
-        "required_run_record_fields": [
+        "required_identity_fields": [
+          "program_id",
           "topic_id",
-          "deliverable_id"
+          "deliverable_id",
+          "run_id"
         ],
         "excluded_scope": [
           "controller expansion",
-          "xiaohongshu rewrite into direct-delivery",
-          "paper_poster or conference_poster academic poster advancement",
-          "new family or overlay expansion",
-          "managed web runtime migration",
-          "hidden fallback chains as main behavior",
-          "prompt patch replacing contract hydration",
-          "OPL federation integration"
+          "academic poster advancement",
+          "managed web runtime completion claim",
+          "new family onboarding"
         ]
       },
       "artifacts": {
-        "tranche_contract": "contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json",
-        "tranche_brief": "docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md",
-        "tranche_test": "tests/phase-2-runtime-watch-locator-integrity-hardening.test.js"
+        "activation_package_contract": "contracts/runtime-program/hermes-runtime-substrate-activation-package.json",
+        "activation_package_brief": "docs/program/hermes/hermes_runtime_substrate_activation_package.md",
+        "capability_map_contract": "contracts/runtime-program/hermes-runtime-capability-extraction-map.json",
+        "capability_map_brief": "docs/program/hermes/hermes_runtime_capability_extraction_map.md",
+        "tranche_contract": "contracts/runtime-program/hermes-runtime-substrate-canonical-closure.json",
+        "tranche_brief": "docs/program/hermes/hermes_runtime_substrate_canonical_closure.md",
+        "tranche_test": "tests/hermes-runtime-canonical-path.test.js"
       },
       "closeout": {
-        "executed_at": "2026-04-10",
+        "executed_at": "2026-04-11",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-alignment-p0.test.js tests/phase-2-runtime-watch-locator-integrity-hardening.test.js tests/runtime-protocol-workspace.test.js tests/runtime-deliverable-route.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js tests/mcp-gateway.test.js tests/phase-2-behavior-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js",
+          "node --test tests/runtime-deliverable-route.test.js tests/family-parity-governance-surface.test.js tests/managed-deliverable-execution.test.js tests/hermes-runtime-canonical-path.test.js",
           "npm run test:full"
         ],
         "suite_result": "pass",
         "findings_recorded": 0,
-        "absorbed_to_main": true,
-        "next_tranche_candidate": "phase_2_family_parity_governance_surface_convergence",
-        "next_tranche_kind": "prefrozen_follow_on_board_entry",
-        "prefrozen_follow_on_board": {
-          "board_id": "phase_2_family_parity_autopilot_continuation_board",
-          "board_contract": "contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json",
-          "first_tranche_id": "phase_2_family_parity_governance_surface_convergence"
-        }
+        "absorbed_to_main": false
       }
     },
-    "completed_batons": {
-      "stable_deliverable_manual_test_driven_hardening": {
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "commit": "96dc6c1",
-        "scope": {
-          "deliverables": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false
-        },
-        "artifacts": {
-          "manual_test_contract": "contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json",
-          "manual_test_brief": "docs/stable_deliverable_manual_test_brief.md",
-          "hardening_backlog": "contracts/runtime-program/stable-deliverable-hardening-backlog.json"
-        },
-        "closeout": {
-          "executed_at": "2026-04-07",
-          "suite_result": "pass",
-          "findings_recorded": 0
-        }
-      },
-      "phase_2_activation_package_freeze": {
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "commit": "3a7fbd6",
-        "scope": {
-          "future_phase_label": "Phase 2 / source intake + shared source truth",
-          "freeze_only": true,
-          "implementation_in_scope": false,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families_after_activation": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "future_runtime_planes": [
-            "source_intake",
-            "shared_source_truth"
-          ],
-          "excluded_scope": [
-            "direct source intake runtime build-out",
-            "direct shared source truth implementation build-out",
-            "controller expansion",
-            "new family or overlay expansion",
-            "poster academic contract advancement",
-            "OPL federation integration"
-          ]
-        },
-        "artifacts": {
-          "activation_package_contract": "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json",
-          "activation_package_brief": "docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md",
-          "activation_package_test": "tests/phase-2-source-intake-activation-package-freeze.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-07",
-          "suite_result": "pass",
-          "findings_recorded": 0
-        }
-      },
-      "phase_2_source_intake_shared_source_truth_baseline": {
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "commit": "a4424d2",
-        "scope": {
-          "baseline_only": true,
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "runtime_planes": [
-            "source_intake",
-            "shared_source_truth"
-          ]
-        },
-        "artifacts": {
-          "baseline_contract": "contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json",
-          "baseline_brief": "docs/program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md",
-          "baseline_test": "tests/phase-2-source-intake-shared-source-truth-baseline.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-07",
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "truth_reframe_commit": "24f9f61",
-          "next_tranche_candidate": "phase_2_review_export_gate_audit_hardening"
-        }
-      },
-      "phase_2_review_export_gate_audit_hardening": {
-        "id": "phase_2_review_export_gate_audit_hardening",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "review_export_gate_audit",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "source_intake",
-            "shared_source_truth",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_review_surfaces": [
-            "visual_director_review",
-            "screenshot_review"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "required_export_surfaces": [
-            "export_pptx",
-            "export_bundle"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "new family or overlay expansion",
-            "poster academic contract advancement",
-            "OPL federation integration",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_review_export_gate_audit_hardening.md",
-          "tranche_test": "tests/phase-2-review-export-gate-audit-hardening.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-08",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/deliverable-review-loop.test.js tests/review-platform.test.js tests/ppt-deliverable-surface.test.js tests/harness-completion-audit.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_family_source_truth_consumption_convergence",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        },
-        "commit": "a5b1158"
-      },
-      "phase_2_family_source_truth_consumption_convergence": {
-        "id": "phase_2_family_source_truth_consumption_convergence",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "family_source_truth_consumption_convergence",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "shared_source_truth",
-            "story_architecture",
-            "visual_authorship",
-            "delivery_packaging",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_shared_contract_surfaces": [
-            "source_truth_contract",
-            "source_truth_consumption"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "required_export_surfaces": [
-            "export_pptx",
-            "export_bundle"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "new family or overlay expansion",
-            "paper_poster or conference_poster academic contract advancement",
-            "OPL federation integration",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_family_source_truth_consumption_convergence.md",
-          "tranche_test": "tests/phase-2-family-source-truth-consumption-convergence.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-08",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/profile-contract-hydration.test.js tests/family-source-truth-consumption.test.js tests/deliverable-review-loop.test.js tests/mcp-gateway.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_publication_projection_delivery_contract_convergence",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        },
-        "commit": "e894641"
-      },
-      "phase_2_publication_projection_delivery_contract_convergence": {
-        "id": "phase_2_publication_projection_delivery_contract_convergence",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "publication_projection_delivery_contract_convergence",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "delivery_packaging",
-            "publication_projection",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_shared_contract_surfaces": [
-            "delivery_contract",
-            "publication_projection"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "required_export_surfaces": [
-            "export_pptx",
-            "export_bundle"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "new family or overlay expansion",
-            "paper_poster or conference_poster academic contract advancement",
-            "OPL federation integration",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md",
-          "tranche_test": "tests/phase-2-publication-projection-delivery-contract-convergence.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-08",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/cli-v2-smoke.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_direct_delivery_operator_handoff_hardening",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        },
-        "commit": "57c9310"
-      },
-      "phase_2_direct_delivery_operator_handoff_hardening": {
-        "id": "phase_2_direct_delivery_operator_handoff_hardening",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "direct_delivery_operator_handoff_hardening",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "direct_delivery_families": [
-            "ppt_deck"
-          ],
-          "human_publication_contrast": [
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "delivery_packaging",
-            "direct_delivery_operator_handoff",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_shared_contract_surfaces": [
-            "delivery_contract",
-            "operator_handoff"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "new family or overlay expansion",
-            "paper_poster or conference_poster academic contract advancement",
-            "OPL federation integration",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md",
-          "tranche_test": "tests/phase-2-direct-delivery-operator-handoff-hardening.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-08",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/phase-2-direct-delivery-operator-handoff-hardening.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_direct_delivery_lifecycle_stage_convergence",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        },
-        "commit": "9b23a0e"
-      },
-      "phase_2_direct_delivery_lifecycle_stage_convergence": {
-        "id": "phase_2_direct_delivery_lifecycle_stage_convergence",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "direct_delivery_lifecycle_stage_convergence",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "direct_delivery_families": [
-            "ppt_deck",
-            "poster_onepager"
-          ],
-          "human_publication_contrast": [
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "source_readiness",
-            "story_architecture",
-            "visual_authorship",
-            "delivery_packaging",
-            "direct_delivery_lifecycle_stage_convergence",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_shared_contract_surfaces": [
-            "delivery_contract",
-            "operator_handoff",
-            "lifecycle_stage_contract"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "new family or overlay expansion",
-            "paper_poster or conference_poster academic contract advancement",
-            "OPL federation integration",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md",
-          "tranche_test": "tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-09",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/direct-delivery-longrun-target.test.js tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js tests/profile-contract-hydration.test.js tests/publication-projection-delivery-contract.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/typescript-governance-surfaces.test.js tests/typescript-overlay-surfaces.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": null,
-          "next_tranche_kind": "not_yet_frozen"
-        }
-      },
-      "phase_2_source_readiness_deep_research_trigger_gate_convergence": {
-        "id": "phase_2_source_readiness_deep_research_trigger_gate_convergence",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "source_readiness_deep_research_trigger_gate_convergence",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu",
-            "poster_onepager"
-          ],
-          "human_publication_contrast": [
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "source_readiness",
-            "story_architecture",
-            "visual_authorship",
-            "delivery_packaging",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_shared_contract_surfaces": [
-            "source_readiness_pack",
-            "source_augmentation_request",
-            "source_augmentation_result",
-            "source_augmentation_report",
-            "source_research_report"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "xiaohongshu rewrite into direct-delivery",
-            "paper_poster or conference_poster academic contract advancement",
-            "new family or overlay expansion",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration",
-            "rewriting Deep Research as MedDeepScientist Scout plus Idea",
-            "rewriting Storyline as Research"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md",
-          "tranche_test": "tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-09",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/source-intake.test.js tests/source-research.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_workspace_operator_quickstart_convergence",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        }
-      },
-      "phase_2_workspace_operator_quickstart_convergence": {
-        "id": "phase_2_workspace_operator_quickstart_convergence",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "workspace_operator_quickstart_convergence",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu",
-            "poster_onepager"
-          ],
-          "human_publication_contrast": [
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "source_readiness",
-            "story_architecture",
-            "visual_authorship",
-            "delivery_packaging",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_shared_contract_surfaces": [
-            "source_readiness_pack",
-            "source_augmentation_request",
-            "source_augmentation_result",
-            "source_augmentation_report",
-            "source_research_report"
-          ],
-          "required_operator_surfaces": [
-            "workspace doctor",
-            "source intake",
-            "source research",
-            "deliverable create",
-            "deliverable audit",
-            "deliverable run"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "xiaohongshu rewrite into direct-delivery",
-            "paper_poster or conference_poster academic contract advancement",
-            "new family or overlay expansion",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration",
-            "rewriting Deep Research as MedDeepScientist Scout plus Idea",
-            "rewriting Storyline as Research",
-            "OPL federation integration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_workspace_operator_quickstart_convergence.md",
-          "tranche_test": "tests/phase-2-workspace-operator-quickstart-convergence.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-10",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/phase-2-workspace-operator-quickstart-convergence.test.js tests/workspace-operator-quickstart.test.js tests/public-docs-surface.test.js tests/source-intake.test.js tests/source-research.test.js tests/cli-v2-smoke.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_operator_surface_consistency_hardening",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        },
-        "commit": "bf2df47"
-      },
-      "phase_2_operator_surface_consistency_hardening": {
-        "id": "phase_2_operator_surface_consistency_hardening",
-        "status": "closeout_completed",
-        "review_status": "passed",
-        "program_mode": "autonomous_longrun",
-        "scope": {
-          "hardening_axis": "operator_surface_consistency_hardening",
-          "implementation_in_scope": true,
-          "formal_entry": [
-            "MCP",
-            "CLI"
-          ],
-          "controller_repo_verified": false,
-          "consumer_families": [
-            "ppt_deck",
-            "xiaohongshu",
-            "poster_onepager"
-          ],
-          "human_publication_contrast": [
-            "xiaohongshu"
-          ],
-          "guarded_poster_surface": [
-            "poster_onepager"
-          ],
-          "runtime_planes": [
-            "source_readiness",
-            "review",
-            "export",
-            "gate",
-            "audit"
-          ],
-          "required_operator_surfaces": [
-            "workspace doctor",
-            "source intake",
-            "source research",
-            "deliverable create",
-            "deliverable audit",
-            "deliverable run",
-            "review watch"
-          ],
-          "required_audit_surfaces": [
-            "auditDeliverable",
-            "runtimeWatch",
-            "getReviewState",
-            "getPublicationProjection"
-          ],
-          "required_embedded_summaries": [
-            "source_readiness_summary",
-            "gate_summary",
-            "operator_handoff",
-            "lifecycle_stage_summary"
-          ],
-          "excluded_scope": [
-            "controller expansion",
-            "xiaohongshu rewrite into direct-delivery",
-            "paper_poster or conference_poster academic poster advancement",
-            "new family or overlay expansion",
-            "managed web runtime migration",
-            "hidden fallback chains as main behavior",
-            "prompt patch replacing contract hydration",
-            "OPL federation integration"
-          ]
-        },
-        "artifacts": {
-          "tranche_contract": "contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json",
-          "tranche_brief": "docs/program/phase-2/phase_2_operator_surface_consistency_hardening.md",
-          "tranche_test": "tests/phase-2-operator-surface-consistency-hardening.test.js"
-        },
-        "closeout": {
-          "executed_at": "2026-04-10",
-          "verification_commands": [
-            "git diff --check",
-            "npm run typecheck",
-            "node --test tests/runtime-alignment-p0.test.js tests/phase-2-operator-surface-consistency-hardening.test.js tests/workspace-operator-quickstart.test.js tests/cli-v2-smoke.test.js tests/gateway-actions.test.js tests/mcp-gateway.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
-            "npm run test:full"
-          ],
-          "suite_result": "pass",
-          "findings_recorded": 0,
-          "absorbed_to_main": true,
-          "next_tranche_candidate": "phase_2_runtime_watch_locator_integrity_hardening",
-          "next_tranche_kind": "ongoing_hardening_axis"
-        },
-        "commit": "ee9a7c1"
-      }
-    }
+    "stop_conditions": [
+      "frozen truth conflict that cannot be resolved inside current contracts",
+      "new product-direction choice is required",
+      "managed web runtime semantics need a separate frozen activation package"
+    ]
   },
   "historical_snapshots": {
     "p21_operations_evaluation": {
@@ -1031,12 +250,5 @@
       "status": "inactive_historical_scaffold",
       "is_active_mainline": false
     }
-  },
-  "current_non_goals": [
-    "P1",
-    "controller expansion",
-    "new family or overlay expansion",
-    "poster academic contract advancement",
-    "OPL federation integration"
-  ]
+  }
 }

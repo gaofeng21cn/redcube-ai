@@ -3,20 +3,21 @@
 ## 当前角色
 
 - 仓库角色：visual-deliverable domain gateway 与 `Domain Harness OS`
-- 当前执行口径：`Codex-default host-agent runtime`
+- 当前执行口径：`Hermes-backed runtime substrate`
+- 当前 deployment host：`Codex-default host-agent runtime`（仅 bridge / regression host / development shell）
 - 当前主线：`Auto-only`
 
 ## 当前主线
 
-- 当前 absorbed tranche：`Phase 2 / runtime watch locator integrity hardening`
+- 当前 active tranche：`Hermes / runtime substrate canonical closure`
 - 当前 active mainline pointer：`contracts/runtime-program/current-program.json`
-- 当前 program brief 目录：`docs/program/phase-2/`
+- 当前 program brief 目录：`docs/program/hermes/`
 
 ## 当前优先事项
 
 1. 保持 contracts、program brief、README/docs 入口和 tests 同步。
-2. 继续在同一 mainline 上维护 absorbed provenance 与 prefrozen follow-on board。
-3. 避免 reference-grade 材料和 phase brief 继续挤占 docs 根目录。
+2. 继续把 Hermes runtime topology、canonical path 与 shared governance surface 保持一致。
+3. 只把旧 host-agent 保留为过渡宿主，不再把它写成长期产品 runtime owner。
 
 ## 默认验证
 

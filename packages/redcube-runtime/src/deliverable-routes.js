@@ -2,11 +2,17 @@ import path from 'node:path';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  HERMES_DEFAULT_ADAPTER,
+  appendHermesEvent,
+  completeHermesRun,
+  failHermesRun,
+  readHermesEvents,
+  startHermesRun,
+} from '@redcube/hermes-substrate';
 
-import { appendEvent, readEvents } from './event-log.js';
 import { resolveExecutorAdapter } from './executors.js';
 import { persistReviewStatePatch } from '@redcube/governance';
-import { completeRun, failRun, startRun } from './run-store.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
 
 function requireSafeSegment(name, value) {
@@ -39,7 +45,7 @@ export async function runDeliverableRoute({
   route,
   runId = null,
   managedRunId = null,
-  adapter = 'host_agent',
+  adapter = HERMES_DEFAULT_ADAPTER,
   mode = 'draft_new',
   baselineDeliverableId = '',
 }) {
@@ -66,7 +72,7 @@ export async function runDeliverableRoute({
     throw new Error(`Route ${safeRoute} is not declared by hydrated deliverable contract`);
   }
 
-  const run = startRun({
+  const run = startHermesRun({
     workspaceRoot,
     runId,
     route: safeRoute,
@@ -86,7 +92,7 @@ export async function runDeliverableRoute({
     },
   });
 
-  appendEvent(workspaceRoot, run.run_id, {
+  appendHermesEvent(workspaceRoot, run.run_id, {
     type: 'run_started',
     route: safeRoute,
     overlay,
@@ -139,7 +145,7 @@ export async function runDeliverableRoute({
       ...(Array.isArray(artifact?.artifact_refs) ? artifact.artifact_refs : []),
     ]));
 
-    const completedRun = completeRun({
+    const completedRun = completeHermesRun({
       workspaceRoot,
       runId: run.run_id,
       currentStage: safeRoute,
@@ -156,7 +162,7 @@ export async function runDeliverableRoute({
       },
     });
 
-    appendEvent(workspaceRoot, completedRun.run_id, {
+    appendHermesEvent(workspaceRoot, completedRun.run_id, {
       type: 'run_completed',
       route: safeRoute,
       overlay,
@@ -168,11 +174,11 @@ export async function runDeliverableRoute({
     return {
       ok: true,
       run: completedRun,
-      events: readEvents(workspaceRoot, completedRun.run_id),
+      events: readHermesEvents(workspaceRoot, completedRun.run_id),
       artifactFile,
     };
   } catch (error) {
-    const failedRun = failRun({
+    const failedRun = failHermesRun({
       workspaceRoot,
       runId: run.run_id,
       currentStage: safeRoute,
@@ -188,7 +194,7 @@ export async function runDeliverableRoute({
       },
     });
 
-    appendEvent(workspaceRoot, failedRun.run_id, {
+    appendHermesEvent(workspaceRoot, failedRun.run_id, {
       type: 'run_failed',
       route: safeRoute,
       overlay,
@@ -200,7 +206,7 @@ export async function runDeliverableRoute({
     return {
       ok: false,
       run: failedRun,
-      events: readEvents(workspaceRoot, failedRun.run_id),
+      events: readHermesEvents(workspaceRoot, failedRun.run_id),
       error: failedRun.error,
     };
   }

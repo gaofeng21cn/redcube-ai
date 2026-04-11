@@ -77,8 +77,8 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     result.progress_projection.latest_events.every((event) => !String(event.summary).includes('run-')),
     true,
   );
-  assert.equal(result.managed_run.requested_adapter, 'host_agent');
-  assert.equal(result.managed_run.active_adapter, 'host_agent');
+  assert.equal(result.managed_run.requested_adapter, 'hermes');
+  assert.equal(result.managed_run.active_adapter, 'hermes');
   assert.equal(result.managed_run.active_run_id, null);
   assert.equal(result.managed_run.worker_running, false);
   assert.equal(result.managed_run.runtime_liveness_audit.status, 'none');
@@ -229,12 +229,12 @@ test('managed control plane keeps managed execution by switching back to the pri
   assert.equal(result.ok, true);
   assert.equal(result.summary.status, 'completed');
   assert.equal(result.managed_run.requested_adapter, 'external_llm');
-  assert.equal(result.managed_run.active_adapter, 'host_agent');
+  assert.equal(result.managed_run.active_adapter, 'hermes');
   assert.equal(result.managed_run.adapter_switches.length, 1);
   assert.deepEqual(result.managed_run.adapter_switches[0], {
     at: result.managed_run.adapter_switches[0].at,
     from_adapter: 'external_llm',
-    to_adapter: 'host_agent',
+    to_adapter: 'hermes',
     reason_code: 'compatibility_adapter_route_unsupported',
     stage_id: 'detailed_outline',
   });

@@ -19,7 +19,10 @@ function normalizeMode(value) {
 
 function normalizeAdapter(value) {
   const text = String(value || '').trim();
-  return text || 'host_agent';
+  if (!text || text === 'host_agent' || text === 'hermes') {
+    return 'hermes';
+  }
+  return text;
 }
 
 export function createManagedRunRecord(input = {}) {

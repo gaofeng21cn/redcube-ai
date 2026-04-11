@@ -12,6 +12,7 @@ import {
   runDeliverableRoute,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
+import { getDeliverablePaths } from '../packages/redcube-runtime-protocol/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 const SHARED_GOVERNANCE_SURFACES = [
@@ -104,7 +105,17 @@ test('stable families expose one explicit governance_surface contract on create 
     assert.deepEqual(created.governance_surface.shared_governance_surfaces, SHARED_GOVERNANCE_SURFACES);
     assert.deepEqual(created.governance_surface.required_summaries, REQUIRED_GOVERNANCE_SUMMARIES);
     assert.equal(typeof created.governance_surface.family_boundary.family_kind, 'string');
+    assert.equal(created.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+    assert.equal(created.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(created.governance_surface.runtime_topology.deployment_host, 'codex_default_host_agent_bridge');
   }
+  const posterPaths = getDeliverablePaths(workspaceRoot, 'topic-a', 'poster-a');
+  const posterDirectorReviewMarkdown = readFileSync(
+    path.join(posterPaths.reportsDir, 'poster-a_视觉总监复盘.md'),
+    'utf-8',
+  );
+  assert.match(posterDirectorReviewMarkdown, /- review_owner: hermes_backed_runtime_substrate/);
+  assert.equal(posterDirectorReviewMarkdown.includes('codex_native_host_agent'), false);
 
   const review = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
   const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
@@ -136,6 +147,8 @@ test('stable families expose one explicit governance_surface contract on create 
     projection.publication.deliverables['deck-a'].governance_surface,
     review.governance_surface,
   );
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(review.governance_surface.runtime_topology.product_mode, 'auto_only');
 });
 
 test('canonical publication projection fails closed when required governance summaries drift or go missing', async () => {

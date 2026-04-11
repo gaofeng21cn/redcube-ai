@@ -2,8 +2,8 @@
 
 ## 当前状态
 
-这是一条 **已冻结但尚未实现** 的 same-mainline activation package。
-它在 machine-readable truth 中固定为 `truth_frozen_pending_implementation`。
+这条 same-mainline activation package 已在后续 Hermes 主线迁移前完成实现并吸收到主线 provenance。
+它在 machine-readable truth 中固定为 `closeout_completed`。
 
 它是 `phase_2_family_parity_autopilot_continuation_board` 的 same-mainline 第一条 tranche，用来接在当前 absorbed 的 `runtime watch locator integrity hardening` 之后。
 
@@ -84,8 +84,7 @@ family parity 只收紧 shared governance surface，不会抹平 family ontology
 - `tests/ppt-deliverable-e2e.test.js`
 - `tests/xiaohongshu-deliverable-e2e.test.js`
 
-## 完成后允许的下一棒
+## 完成后真实去向
 
-只有在当前 tranche absorbed 后，且 board 仍未触发 hard boundary honest stop，才允许继续：
-
-- `phase_2_autonomous_stop_reason_convergence`
+这条 tranche absorbed 后，没有继续沿 phase-2 board 打开下一条 follow-on tranche。
+真实的下一棒转入了新的 `Hermes runtime substrate activation package`，因为产品 runtime owner 已从旧 host-agent 形态迁往 Hermes-backed substrate。

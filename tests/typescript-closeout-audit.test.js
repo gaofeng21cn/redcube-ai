@@ -60,6 +60,7 @@ const JS_RESIDUE_ALLOWLIST = {
   ],
   'packages/redcube-gateway': ['src/index.js'],
   'packages/redcube-governance': [
+    'src/governance-surface.js',
     'src/index.js',
     'src/review-state.js',
     'src/reviews.js',

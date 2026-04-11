@@ -33,7 +33,8 @@ If your goal is to keep turning structured knowledge into formal visual outputs,
 
 It is designed for experts who want the speed of agents without losing control over quality.
 
-Today, its default local execution shape is the `Codex-default host-agent runtime`.
+Today, its product runtime mainline is the `Hermes-backed runtime substrate`.
+`Codex-default host-agent runtime` is retained only as a transition deployment host, regression bridge, and development shell.
 Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
 Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` is not a repo-verified independent public formal entry in the current mainline.
 The current repository mainline is `Auto-only`; if a future `Human-in-the-loop` product is built, it should reuse the same substrate as a compatible sibling or upper-layer product rather than split this repository into same-repo dual-mode logic.
@@ -207,8 +208,9 @@ The main unfinished areas are:
 - direct-delivery lifecycle stage convergence now has an absorbed tranche on the same mainline: `ppt_deck` and guarded `poster_onepager` now expose one machine-readable `lifecycle_stage_contract` plus one aligned `lifecycle_stage_summary`, while `Storyline + Plan` remain mapped to `Story Architecture` and `operator_handoff / closeout` remains inside `Delivery`
 - workspace / operator quickstart convergence now has an absorbed tranche on the same mainline: brand-new or thin workspaces now converge on one repo-verified route from `workspace doctor` through `source intake / source research`, `deliverable create`, `deliverable audit`, and `deliverable run` without inventing a separate workspace-init product surface
 - operator surface consistency hardening now has an absorbed tranche on the same mainline: `workspace doctor` now keeps brand-new workspace bootstrap guidance on `source intake` / `source research`, command-scoped `--help` stays machine-readable and non-executing, and `CLI review watch` / `MCP runtime_watch` now converge on the same `runtimeWatch` locator truth and shared governance summaries
-- runtime watch locator integrity hardening now has an absorbed tranche on the same mainline: deliverable-scope run records now persist `topic_id` / `deliverable_id`, and `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` fail closed when a quartet locator points at a run from another topic or deliverable
-- the next same-mainline continuation is now prefrozen as `family parity / autopilot continuity`, with `phase_2_family_parity_governance_surface_convergence` fixed as the first allowed follow-on tranche
+- `Hermes-backed runtime substrate` is now the active runtime owner: routed deliverable execution, run records, managed adapter failover, and shared runtime topology no longer treat `Codex-default host-agent runtime` as the long-term product substrate
+- current behavior convergence now also keeps `governance_surface.runtime_topology` aligned across create / review / audit / watch / projection on the same deliverable/topic boundary
+- phase-2 runtime watch locator integrity hardening remains absorbed provenance on the same mainline: deliverable-scope run records persist `topic_id` / `deliverable_id`, and `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` fail closed when a quartet locator points at a run from another topic or deliverable
 - poster support is still incomplete:
   - the current poster lane is a `knowledge poster`
   - academic `paper poster / conference poster` support is still being hardened
@@ -232,7 +234,8 @@ User / Agent
       -> Gateway
           -> Overlay / Family / Profile / Pack
               -> Domain Harness OS (on Unified Harness Engineering Substrate)
-                  -> Codex-default host-agent runtime (current default)
+                  -> Hermes-backed runtime substrate (current product runtime)
+                      -> Codex-default host-agent runtime bridge (transition host only)
                   -> managed web runtime (future option on same substrate)
 ```
 
@@ -252,7 +255,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; `stable deliverable manual-test-driven hardening` is already closed out; `Phase 2 activation package freeze` is completed and absorbed; `source intake + shared source truth` is already a stable `Source Readiness` capability surface for `ppt_deck` and `xiaohongshu` through `CLI` and `MCP`; `review / export / gate / audit hardening`, `family source-truth consumption convergence`, `publication projection / delivery contract convergence`, `direct-delivery operator handoff hardening`, `direct-delivery lifecycle stage convergence`, `source-readiness deep research trigger + gate convergence`, `workspace / operator quickstart convergence`, and `operator surface consistency hardening` remain absorbed provenance; and the current absorbed tranche closes runtime watch locator integrity by persisting `topic_id` / `deliverable_id` on deliverable-scope run records and making `runtimeWatch` quartet locators fail closed when run identity does not match the requested topic or deliverable while keeping the shared governance surfaces aligned without rewriting `xiaohongshu` into direct delivery.
+- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; phase-2 source-truth, governance, operator-surface, and runtime-watch hardening remain absorbed provenance; and the current active tranche is now `Hermes / runtime substrate canonical closure`, which freezes Hermes as the runtime substrate owner, keeps `Codex-default host-agent runtime` as a transition host only, runs a canonical `ppt_deck` deliverable mainline through Hermes-backed execution, and extends shared `runtime_topology` truth across the stable families without rewriting `xiaohongshu` into direct delivery.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -260,7 +263,8 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- the current absorbed tranche is `Phase 2 / runtime watch locator integrity hardening`, but the product longrun goal is broader than that one absorbed tranche.
+- `Codex-default host-agent runtime` is no longer the long-term product runtime owner.
+- managed web runtime remains future work on the same substrate.
 - further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.
 
