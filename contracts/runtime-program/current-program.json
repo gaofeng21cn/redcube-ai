@@ -105,8 +105,8 @@
     "deployment_host_status": "transition_only",
     "host_agent_longterm_owner": false,
     "phase_id": "Hermes",
-    "phase_label": "Hermes / stable family closure truth",
-    "workstream": "hermes_stable_family_closure_truth",
+    "phase_label": "Hermes / managed family closure truth",
+    "workstream": "hermes_managed_family_closure_truth",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -114,7 +114,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / hermes stable family closure truth",
+      "label": "redcube-runtime-program / hermes managed family closure truth",
       "unique": true
     },
     "green_baseline": {
@@ -165,15 +165,18 @@
       },
       "hermes_stable_family_closure_truth": {
         "status": "closeout_completed"
+      },
+      "hermes_managed_family_closure_truth": {
+        "status": "closeout_completed"
       }
     },
     "active_baton": {
-      "id": "hermes_stable_family_closure_truth",
+      "id": "hermes_managed_family_closure_truth",
       "status": "closeout_completed",
       "review_status": "passed",
       "program_mode": "autonomous_longrun",
       "scope": {
-        "hardening_axis": "hermes_stable_family_closure_truth",
+        "hardening_axis": "hermes_managed_family_closure_truth",
         "implementation_in_scope": true,
         "runtime_substrate_owner": "Hermes",
         "deployment_host": "codex_default_host_agent_bridge",
@@ -206,6 +209,15 @@
           "review watch",
           "runs get"
         ],
+        "managed_surfaces": [
+          "runManagedDeliverable",
+          "getManagedRun",
+          "superviseManagedRun"
+        ],
+        "managed_preflight_fail_closed": [
+          "overlay",
+          "stop_after_stage"
+        ],
         "required_audit_surfaces": [
           "auditDeliverable",
           "runtimeWatch",
@@ -219,6 +231,7 @@
           "run_id"
         ],
         "excluded_scope": [
+          "managed web runtime control plane",
           "controller expansion",
           "academic poster advancement",
           "managed web runtime completion claim",
@@ -230,16 +243,16 @@
         "activation_package_brief": "docs/program/hermes/hermes_runtime_substrate_activation_package.md",
         "capability_map_contract": "contracts/runtime-program/hermes-runtime-capability-extraction-map.json",
         "capability_map_brief": "docs/program/hermes/hermes_runtime_capability_extraction_map.md",
-        "tranche_contract": "contracts/runtime-program/hermes-stable-family-closure-truth.json",
-        "tranche_brief": "docs/program/hermes/hermes_stable_family_closure_truth.md",
-        "tranche_test": "tests/hermes-stable-family-closure-truth.test.js"
+        "tranche_contract": "contracts/runtime-program/hermes-managed-family-closure-truth.json",
+        "tranche_brief": "docs/program/hermes/hermes_managed_family_closure_truth.md",
+        "tranche_test": "tests/hermes-managed-family-closure-truth.test.js"
       },
       "closeout": {
         "executed_at": "2026-04-11",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-deliverable-route.test.js tests/family-parity-governance-surface.test.js tests/hermes-runtime-canonical-path.test.js tests/hermes-stable-family-closure-truth.test.js",
+          "node --test tests/runtime-deliverable-route.test.js tests/managed-deliverable-execution.test.js tests/hermes-managed-family-closure-truth.test.js tests/hermes-stable-family-closure-truth.test.js",
           "npm run test:full"
         ],
         "suite_result": "pass",

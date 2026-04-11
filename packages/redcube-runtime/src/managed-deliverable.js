@@ -97,6 +97,23 @@ function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   };
 }
 
+function assertManagedOverlayMatchesContract({ requestedOverlay, contractOverlay }) {
+  if (requestedOverlay !== contractOverlay) {
+    throw new Error(`overlay mismatch: expected ${contractOverlay}, got ${requestedOverlay}`);
+  }
+}
+
+function assertManagedStopAfterStageDeclared({ stopAfterStage, stages }) {
+  if (!stopAfterStage) {
+    return;
+  }
+  if (!safeArray(stages).some((stage) => safeText(stage?.stage_id) === stopAfterStage)) {
+    throw new Error(
+      `stopAfterStage mismatch: ${stopAfterStage} is not declared by hydrated deliverable contract`,
+    );
+  }
+}
+
 function stageArtifactPath(contract, deliverablePaths, stageId) {
   const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
   return path.join(
@@ -774,14 +791,25 @@ export async function runManagedDeliverable({
     topicId,
     deliverableId,
   });
+  const requestedOverlay = safeText(overlay);
+  const contractOverlay = safeText(contract?.overlay);
   const stages = safeArray(contract?.stage_sequence?.stages);
+  const requestedStopAfterStage = safeText(stopAfterStage);
+  assertManagedOverlayMatchesContract({
+    requestedOverlay,
+    contractOverlay,
+  });
+  assertManagedStopAfterStageDeclared({
+    stopAfterStage: requestedStopAfterStage,
+    stages,
+  });
   const managedRun = createManagedRun({
     workspaceRoot,
-    overlay,
+    overlay: contractOverlay,
     topicId,
     deliverableId,
-    mode: safeText(stopAfterStage) ? 'stop_after_stage' : 'auto_to_terminal',
-    stopAfterStage: safeText(stopAfterStage) || null,
+    mode: requestedStopAfterStage ? 'stop_after_stage' : 'auto_to_terminal',
+    stopAfterStage: requestedStopAfterStage || null,
     userIntent: safeText(userIntent) || safeText(contract.goal),
     adapter,
   });
@@ -829,7 +857,7 @@ export async function runManagedDeliverable({
 
     const routeResult = await runDeliverableRoute({
       workspaceRoot,
-      overlay,
+      overlay: contractOverlay,
       topicId,
       deliverableId,
       route: stageId,

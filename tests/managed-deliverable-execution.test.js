@@ -2,18 +2,37 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync } from 'node:fs';
 
 import {
+  auditDeliverable,
   createDeliverable,
+  getPublicationProjection,
+  getReviewState,
   getManagedRun,
   runManagedDeliverable,
   superviseManagedRun,
+  runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
+import { resolveWorkspaceContract } from '../packages/redcube-runtime-protocol/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function runtimeDirEntries(workspaceRoot, relativeDir) {
+  const runtimeDir = resolveWorkspaceContract({ workspaceRoot }).runtimeDir;
+  const dir = path.join(runtimeDir, relativeDir);
+  return existsSync(dir) ? readdirSync(dir) : [];
+}
+
+function assertNoManagedState(workspaceRoot) {
+  assert.deepEqual(runtimeDirEntries(workspaceRoot, 'managed-runs'), []);
+  assert.deepEqual(runtimeDirEntries(workspaceRoot, 'managed-progress'), []);
+  assert.deepEqual(runtimeDirEntries(workspaceRoot, 'managed-stage-records'), []);
+  assert.deepEqual(runtimeDirEntries(workspaceRoot, 'managed-supervision'), []);
+  assert.deepEqual(runtimeDirEntries(workspaceRoot, 'managed-escalation'), []);
 }
 
 test('managed execution defaults to auto_to_terminal and runs a ppt deliverable to final export with auditable prompt records', async () => {
@@ -269,4 +288,282 @@ test('managed control plane keeps managed execution by switching back to the pri
   assert.equal(result.runtime_supervision.health_status, 'completed');
   assert.equal(result.runtime_supervision.needs_human_intervention, false);
   assert.equal(result.escalation_record.escalation_status, 'none');
+});
+
+test('managed execution keeps xiaohongshu on the Hermes-backed human-publication closure without drifting durable truth', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-xhs-'));
+
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊小红书科普',
+    brief: '验证托管执行在小红书 human-publication 闭环上的真值一致性。',
+    keywords: ['甲状腺', '小红书'],
+  });
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    profileId: 'standard_note',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    title: '甲状腺门诊小红书科普',
+    goal: '为门诊患者生成可发布的科普图文',
+  });
+
+  const result = await runManagedDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    userIntent: '给我一篇最终可发布的小红书图文',
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.status, 'completed');
+  assert.equal(result.managed_run.overlay, 'xiaohongshu');
+  assert.equal(result.managed_run.current_stage, 'export_bundle');
+  assert.deepEqual(
+    result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+    [
+      'research',
+      'storyline',
+      'single_note_plan',
+      'visual_direction',
+      'render_html',
+      'visual_director_review',
+      'screenshot_review',
+      'publish_copy',
+      'export_bundle',
+    ],
+  );
+  assert.equal(result.progress_projection.current_stage, 'export_bundle');
+  assert.equal(result.progress_projection.content_status, 'completed');
+  assert.equal(result.runtime_supervision.health_status, 'completed');
+  assert.equal(result.escalation_record.escalation_status, 'none');
+
+  const review = await getReviewState({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+  });
+  const projection = await getPublicationProjection({
+    workspaceRoot,
+    topicId: 'topic-a',
+  });
+  const audit = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'xiaohongshu',
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    mode: 'draft_new',
+  });
+  const watch = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'note-a',
+    runId: result.managed_run.route_runs.at(-1).route_run_id,
+  });
+
+  assert.equal(review.state.current_status, 'publish_ready');
+  assert.equal(review.state.approval_state.required, true);
+  assert.equal(review.state.approval_state.status, 'pending_human');
+  assert.equal(review.state.publish_state.current, 'approval_pending');
+  assert.equal(review.governance_surface.family_boundary.human_publication, true);
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+
+  const noteProjection = projection.publication.deliverables['note-a'];
+  assert.equal(noteProjection.projection_model, 'human_publication');
+  assert.equal(noteProjection.current, 'approval_pending');
+  assert.equal(noteProjection.next, 'approved_pending_publish');
+  assert.equal(noteProjection.delivery_state.current, 'output_ready');
+  assert.equal(noteProjection.governance_surface.family_boundary.human_publication, true);
+  assert.equal(noteProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+
+  assert.deepEqual(audit.review_state, review.state);
+  assert.deepEqual(audit.publication_projection, projection.publication);
+  assert.equal(audit.gate_summary.approval_required, true);
+  assert.equal(audit.gate_summary.delivery_projection_current, 'approval_pending');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+
+  assert.equal(watch.run_id, result.managed_run.route_runs.at(-1).route_run_id);
+  assert.equal(watch.review_state.current_status, review.state.current_status);
+  assert.equal(
+    watch.publication_projection.deliverables['note-a'].current,
+    noteProjection.current,
+  );
+  assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+});
+
+test('managed execution keeps poster_onepager on the guarded knowledge-poster closure without drifting direct-delivery truth', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-poster-'));
+
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊知识海报',
+    brief: '验证托管执行在 guarded knowledge-poster 闭环上的真值一致性。',
+    keywords: ['甲状腺', '海报'],
+  });
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'poster_onepager',
+    profileId: 'knowledge_poster',
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    title: '甲状腺门诊知识海报',
+    goal: '为门诊患者生成一张知识海报',
+  });
+
+  const result = await runManagedDeliverable({
+    workspaceRoot,
+    overlay: 'poster_onepager',
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    userIntent: '给我一张最终可交付的知识海报',
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.status, 'completed');
+  assert.equal(result.managed_run.overlay, 'poster_onepager');
+  assert.equal(result.managed_run.current_stage, 'export_bundle');
+  assert.deepEqual(
+    result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+    [
+      'storyline',
+      'poster_blueprint',
+      'visual_direction',
+      'render_html',
+      'visual_director_review',
+      'screenshot_review',
+      'export_bundle',
+    ],
+  );
+  assert.equal(result.progress_projection.current_stage, 'export_bundle');
+  assert.equal(result.progress_projection.content_status, 'completed');
+  assert.equal(result.runtime_supervision.health_status, 'completed');
+  assert.equal(result.escalation_record.escalation_status, 'none');
+
+  const review = await getReviewState({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+  });
+  const projection = await getPublicationProjection({
+    workspaceRoot,
+    topicId: 'topic-a',
+  });
+  const audit = await auditDeliverable({
+    workspaceRoot,
+    overlay: 'poster_onepager',
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    mode: 'draft_new',
+  });
+  const watch = await runtimeWatch({
+    workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'poster-a',
+    runId: result.managed_run.route_runs.at(-1).route_run_id,
+  });
+
+  assert.equal(review.state.current_status, 'completed');
+  assert.equal(review.state.approval_state.status, 'not_required');
+  assert.equal(review.state.publish_state.current, 'not_applicable');
+  assert.equal(review.governance_surface.family_boundary.guarded_knowledge_poster, true);
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+
+  const posterProjection = projection.publication.deliverables['poster-a'];
+  assert.equal(posterProjection.projection_model, 'direct_delivery');
+  assert.equal(posterProjection.current, 'output_ready');
+  assert.equal(posterProjection.delivery_state.current, 'output_ready');
+  assert.equal(posterProjection.operator_handoff.gate_status, 'ready');
+  assert.equal(posterProjection.governance_surface.family_boundary.guarded_knowledge_poster, true);
+  assert.equal(posterProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+
+  assert.deepEqual(audit.review_state, review.state);
+  assert.deepEqual(audit.publication_projection, projection.publication);
+  assert.equal(audit.gate_summary.operator_handoff_status, 'ready');
+  assert.equal(audit.gate_summary.delivery_projection_current, 'output_ready');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+
+  assert.equal(watch.run_id, result.managed_run.route_runs.at(-1).route_run_id);
+  assert.equal(watch.review_state.current_status, review.state.current_status);
+  assert.equal(
+    watch.publication_projection.deliverables['poster-a'].current,
+    posterProjection.current,
+  );
+  assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+});
+
+test('managed execution rejects overlay mismatch before creating durable managed state', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-overlay-mismatch-'));
+
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '托管 overlay mismatch',
+    brief: '验证 managed preflight 会在 overlay 漂移时 fail-closed。',
+    keywords: ['托管', 'overlay'],
+  });
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+
+  await assert.rejects(
+    () => runManagedDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '给我一个最终 PPT',
+    }),
+    /overlay mismatch: expected ppt_deck, got xiaohongshu/,
+  );
+
+  assertNoManagedState(workspaceRoot);
+});
+
+test('managed execution rejects undeclared stop_after_stage before creating durable managed state', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-stop-mismatch-'));
+
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId: 'topic-a',
+    title: '托管 stopAfterStage mismatch',
+    brief: '验证 managed preflight 不会忽略未声明的 stopAfterStage。',
+    keywords: ['托管', 'stopAfterStage'],
+  });
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: '甲状腺门诊科普 deck',
+    goal: '为本科生讲授甲状腺基础知识',
+  });
+
+  await assert.rejects(
+    () => runManagedDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '给我一个最终 PPT',
+      stopAfterStage: 'publish_copy',
+    }),
+    /stopAfterStage mismatch: publish_copy is not declared by hydrated deliverable contract/,
+  );
+
+  assertNoManagedState(workspaceRoot);
 });

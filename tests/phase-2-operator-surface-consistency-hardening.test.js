@@ -25,9 +25,9 @@ test('operator surface consistency hardening stays absorbed provenance while Her
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_stable_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
   assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
   assert.deepEqual(contract.operator_surface_alignment.runtime_watch_boundary.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary']);
   assert.equal(contract.object_boundary.out_of_scope.includes('controller expansion'), true);

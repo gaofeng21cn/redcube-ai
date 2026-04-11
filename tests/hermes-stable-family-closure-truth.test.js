@@ -38,7 +38,7 @@ function loadHydratedContract(workspaceRoot, topicId, deliverableId) {
   ));
 }
 
-test('current program points to Hermes stable family closure truth after canonical closure absorption', () => {
+test('stable family closure truth remains absorbed provenance after managed family closure promotion', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -48,15 +48,16 @@ test('current program points to Hermes stable family closure truth after canonic
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.tranche_id, 'hermes_stable_family_closure_truth');
   assert.equal(contract.predecessor_tranche, predecessor.tranche_id);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_stable_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.artifacts.tranche_contract, TRANCHE_CONTRACT);
-  assert.equal(currentProgram.current_state.active_baton.artifacts.tranche_brief, TRANCHE_BRIEF);
-  assert.equal(currentProgram.current_state.active_baton.artifacts.tranche_test, 'tests/hermes-stable-family-closure-truth.test.js');
-  assert.equal(currentProgram.current_state.active_baton.scope.secondary_family, 'xiaohongshu');
   assert.equal(
-    currentProgram.current_state.active_baton.scope.required_artifact_envelope_fields.includes('stage_contract'),
+    currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status,
+    'closeout_completed',
+  );
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(
+    contract.required_behavior.includes(
+      'routed family artifacts persist topic_id, deliverable_id, contract, and stage_contract across stable families',
+    ),
     true,
   );
   assert.equal(brief.includes('第二条 human-publication family closure'), true);

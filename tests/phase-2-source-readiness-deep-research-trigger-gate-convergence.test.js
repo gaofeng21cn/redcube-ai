@@ -26,9 +26,9 @@ test('source-readiness deep research trigger+gate convergence stays absorbed pro
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_stable_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
   assert.equal(currentProgram.current_state.active_baton.scope.runtime_planes.includes('source_readiness'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('xiaohongshu'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('poster_onepager'), true);

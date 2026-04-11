@@ -1,0 +1,50 @@
+{
+  "tranche_id": "hermes_managed_family_closure_truth",
+  "date_anchor": "2026-04-11",
+  "status": "closeout_completed",
+  "review_status": "passed",
+  "program_mode": "autonomous_longrun",
+  "hardening_axis": "hermes_managed_family_closure_truth",
+  "predecessor_tranche": "hermes_stable_family_closure_truth",
+  "canonical_family": "ppt_deck",
+  "secondary_family": "xiaohongshu",
+  "shared_families": [
+    "ppt_deck",
+    "xiaohongshu",
+    "poster_onepager"
+  ],
+  "managed_surfaces": [
+    "runManagedDeliverable",
+    "getManagedRun",
+    "superviseManagedRun"
+  ],
+  "required_runtime_topology": {
+    "runtime_substrate_owner": "Hermes",
+    "runtime_substrate_surface": "hermes_backed_runtime_substrate",
+    "deployment_host": "codex_default_host_agent_bridge",
+    "deployment_host_status": "transition_only"
+  },
+  "required_behavior": [
+    "managed control plane validates requested overlay against the hydrated deliverable contract before durable managed state is created",
+    "managed control plane validates stop_after_stage against hydrated stage_sequence instead of silently ignoring undeclared stages",
+    "ppt_deck, xiaohongshu, and guarded poster_onepager all close one Hermes-backed managed run, progress projection, runtime supervision, and escalation surface on the same substrate",
+    "xiaohongshu managed closure preserves approval_pending to approved_pending_publish human-publication projection instead of drifting into direct delivery",
+    "poster_onepager managed closure preserves guarded knowledge-poster direct-delivery and operator_handoff truth without activating academic poster semantics",
+    "auditDeliverable, runtimeWatch, getReviewState, and getPublicationProjection stay aligned with the final route run from Hermes-backed managed family closures"
+  ],
+  "excluded_scope": [
+    "managed web runtime control plane",
+    "managed web runtime completion claim",
+    "controller expansion",
+    "academic poster advancement",
+    "new family onboarding"
+  ],
+  "required_verification": [
+    "node --test tests/managed-deliverable-execution.test.js",
+    "node --test tests/hermes-managed-family-closure-truth.test.js",
+    "node --test tests/hermes-stable-family-closure-truth.test.js",
+    "node --test tests/runtime-deliverable-route.test.js",
+    "npm run typecheck",
+    "npm run test:full"
+  ]
+}

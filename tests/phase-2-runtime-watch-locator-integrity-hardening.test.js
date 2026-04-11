@@ -25,9 +25,9 @@ test('runtime watch locator integrity hardening remains absorbed provenance afte
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_stable_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
+  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
   assert.deepEqual(contract.run_locator_integrity_surface.required_run_record_fields, ['topic_id', 'deliverable_id']);
   assert.deepEqual(contract.run_locator_integrity_surface.canonical_locator_fields, ['workspaceRoot', 'topicId', 'deliverableId', 'runId']);
