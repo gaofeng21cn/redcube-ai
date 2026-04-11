@@ -2,6 +2,7 @@ import path from 'node:path';
 import { mkdirSync, existsSync, readFileSync, appendFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 import { getDeliverablePaths, loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary } from '@redcube/runtime-protocol';
+import { assertGovernanceParity, buildGovernanceSurface, validatePublicationProjection } from './governance-surface.js';
 
 function loadContractAndPaths({ workspaceRoot, topicId, deliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
@@ -382,6 +383,7 @@ function toPublicationProjectionEntry({
   const deliveryArtifact = loadDeliveryArtifact({ contract, deliverablePaths });
   const projectionState = buildProjectionState({ reviewState, contract, deliveryArtifact });
   const lifecycleStageSummary = buildLifecycleStageSummary(contract);
+  const governanceSurface = buildGovernanceSurface(contract);
   const entry = {
     deliverable_id: deliverableId,
     overlay: safeText(contract?.overlay) || null,
@@ -400,6 +402,7 @@ function toPublicationProjectionEntry({
       ? stageArtifactPath(contract, deliverablePaths, deliveryContract.required_export_route)
       : null,
     delivery_state: projectionState.delivery_state,
+    governance_surface: governanceSurface,
     source_readiness_summary: sourceReadinessSummary,
     lifecycle_stage_summary: lifecycleStageSummary,
     updated_at: safeText(reviewState?.last_updated_at) || null,
@@ -473,7 +476,7 @@ export function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
 
   const orderedEntries = Object.values(entries).sort(sortPublicationEntries);
   const topEntry = orderedEntries[0] || null;
-  writeState(projectionFile, {
+  const publication = {
     schema_version: 2,
     projection_kind: 'topic_delivery_projection',
     topic_id: topicId,
@@ -481,7 +484,9 @@ export function rebuildTopicPublicationProjection({ workspaceRoot, topicId }) {
     next: topEntry?.next || null,
     deliverables: entries,
     updated_at: nowIso(),
-  });
+  };
+  validatePublicationProjection(publication);
+  writeState(projectionFile, publication);
   return projectionFile;
 }
 
@@ -508,6 +513,23 @@ export function getReviewState(request) {
     deliverablePaths,
     sourceReadinessSummary,
   });
+  const projectionFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
+  if (existsSync(projectionFile)) {
+    const publication = safeReadJson(projectionFile);
+    if (!publication) {
+      throw new Error('getReviewState governance summary invalid publication projection file');
+    }
+    validatePublicationProjection(publication);
+    const storedEntry = publication?.deliverables?.[deliverableId] || null;
+    if (!storedEntry) {
+      throw new Error(`getReviewState governance parity missing publication projection entry for ${deliverableId}`);
+    }
+    assertGovernanceParity(
+      `getReviewState.${deliverableId}`,
+      publicationProjectionEntry,
+      storedEntry,
+    );
+  }
   return {
     ok: true,
     surface_kind: 'review_state',
@@ -523,22 +545,20 @@ export function getReviewState(request) {
     gate_summary: publicationProjectionEntry.gate_summary,
     operator_handoff: publicationProjectionEntry.operator_handoff,
     lifecycle_stage_summary: publicationProjectionEntry.lifecycle_stage_summary,
+    governance_surface: publicationProjectionEntry.governance_surface,
   };
 }
 
 export function getPublicationProjection({ workspaceRoot, topicId }) {
   const projectionFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
-  const publication = safeReadJson(projectionFile) || (() => {
+  if (!existsSync(projectionFile)) {
     rebuildTopicPublicationProjection({ workspaceRoot, topicId });
-    return safeReadJson(projectionFile);
-  })() || {
-    schema_version: 2,
-    projection_kind: 'topic_delivery_projection',
-    topic_id: topicId,
-    current: 'input_ready',
-    next: null,
-    deliverables: {},
-  };
+  }
+  const publication = safeReadJson(projectionFile);
+  if (!publication) {
+    throw new Error('getPublicationProjection governance summary invalid publication projection file');
+  }
+  validatePublicationProjection(publication);
   return {
     ok: true,
     surface_kind: 'publication_projection',

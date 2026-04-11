@@ -66,15 +66,11 @@ function loadReviewState({ workspaceRoot, topicId, deliverableId }) {
     return null;
   }
 
-  try {
-    return getRuntimeReviewState({
-      workspaceRoot,
-      topicId,
-      deliverableId,
-    });
-  } catch {
-    return null;
-  }
+  return getRuntimeReviewState({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+  });
 }
 
 function loadPublicationProjectionEntry({ workspaceRoot, topicId, deliverableId }) {
@@ -82,15 +78,11 @@ function loadPublicationProjectionEntry({ workspaceRoot, topicId, deliverableId 
     return null;
   }
 
-  try {
-    const publicationProjection = getRuntimePublicationProjection({
-      workspaceRoot,
-      topicId,
-    });
-    return publicationProjection?.deliverables?.[deliverableId] || null;
-  } catch {
-    return null;
-  }
+  const publicationProjection = getRuntimePublicationProjection({
+    workspaceRoot,
+    topicId,
+  });
+  return publicationProjection?.deliverables?.[deliverableId] || null;
 }
 
 function loadPublicationProjection({ workspaceRoot, topicId }) {
@@ -98,14 +90,10 @@ function loadPublicationProjection({ workspaceRoot, topicId }) {
     return null;
   }
 
-  try {
-    return getRuntimePublicationProjection({
-      workspaceRoot,
-      topicId,
-    })?.publication || null;
-  } catch {
-    return null;
-  }
+  return getRuntimePublicationProjection({
+    workspaceRoot,
+    topicId,
+  })?.publication || null;
 }
 
 function loadSourceReadinessSummary({ workspaceRoot, topicId }) {
@@ -299,6 +287,7 @@ export async function auditDeliverable(request) {
     }),
     operator_handoff: operatorHandoff,
     lifecycle_stage_summary: lifecycleStageSummary,
+    governance_surface: reviewResponse?.governance_surface || null,
     delivery_contract: contract?.delivery_contract || null,
   };
 }

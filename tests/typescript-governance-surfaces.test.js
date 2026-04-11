@@ -15,7 +15,12 @@ test('governance exposes a TypeScript contract entrypoint and typed review surfa
   assert.match(entry, /getReviewState/);
   assert.match(entry, /getPublicationProjection/);
   assert.match(entry, /applyReviewMutation/);
+  assert.match(entry, /buildGovernanceSurface/);
   assert.match(types, /interface ReviewStateResponse/);
   assert.match(types, /interface PublicationProjectionResponse/);
   assert.match(types, /interface RuntimeWatchResponse/);
+  assert.match(types, /interface GovernanceSurfaceContract/);
+  assert.match(types, /governance_surface: GovernanceSurfaceContract/);
+  assert.match(types, /source_readiness_summary: Record<string, unknown> \| null/);
+  assert.match(types, /gate_summary: Record<string, unknown> \| null/);
 });

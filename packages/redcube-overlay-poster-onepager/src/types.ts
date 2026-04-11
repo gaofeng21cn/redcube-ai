@@ -45,6 +45,7 @@ export type PosterSurfaceArtifactPath =
   | 'contracts/baseline-policy.json'
   | 'contracts/export-bundle.json'
   | 'contracts/delivery-contract.json'
+  | 'contracts/governance-surface.json'
   | 'contracts/hydrated-deliverable.json'
   | 'views/display-registry.json';
 

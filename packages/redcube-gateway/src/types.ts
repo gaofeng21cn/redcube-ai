@@ -1,3 +1,4 @@
+import type { GovernanceSurfaceContract } from '@redcube/overlay-core';
 import type { WorkspaceContract } from '@redcube/runtime-protocol';
 
 export interface WorkspaceRootRequest {
@@ -74,6 +75,7 @@ export interface DeliverableCreateResponse extends SurfaceBase<'deliverable_crea
   deliverable: Record<string, unknown>;
   surfaceFiles: string[];
   hydratedContract: Record<string, unknown>;
+  governance_surface: GovernanceSurfaceContract;
   summary: {
     overlay: string;
     deliverable_id: string;
@@ -83,6 +85,7 @@ export interface DeliverableCreateResponse extends SurfaceBase<'deliverable_crea
 
 export interface DeliverableRecordResponse extends SurfaceBase<'deliverable_record'> {
   deliverable: Record<string, unknown>;
+  governance_surface: GovernanceSurfaceContract;
   summary: {
     deliverable_id: string;
     overlay: string;
@@ -122,6 +125,7 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
   artifactFile?: string;
   error?: unknown;
   error_kind: string | null;
+  governance_surface: GovernanceSurfaceContract;
   summary: {
     route: string;
     run_id: string | null;
@@ -237,8 +241,11 @@ export interface ReviewStateResponse extends SurfaceBase<'review_state'> {
     kind: string;
   };
   quality_summary: Record<string, unknown>;
-  operator_handoff?: Record<string, unknown> | null;
-  lifecycle_stage_summary?: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract;
 }
 
 export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
@@ -252,7 +259,8 @@ export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
   source_readiness_summary: Record<string, unknown> | null;
   gate_summary: Record<string, unknown> | null;
   operator_handoff: Record<string, unknown> | null;
-  lifecycle_stage_summary?: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract;
   resumable: boolean;
   profile_id: string | null;
   delivery_contract: Record<string, unknown> | null;
@@ -485,10 +493,11 @@ export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
   quality_summary: Record<string, unknown>;
   review_state?: Record<string, unknown> | null;
   publication_projection?: Record<string, unknown> | null;
-  source_readiness_summary?: Record<string, unknown> | null;
-  gate_summary?: Record<string, unknown> | null;
-  operator_handoff?: Record<string, unknown> | null;
-  lifecycle_stage_summary?: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract | null;
   delivery_contract?: Record<string, unknown> | null;
 }
 

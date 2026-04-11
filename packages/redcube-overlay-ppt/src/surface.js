@@ -1,3 +1,8 @@
+import {
+  buildGovernanceSurfaceContract,
+  validateGovernanceSurfaceContract,
+} from '@redcube/overlay-core';
+
 function deriveStageRequirements(contract) {
   if (contract?.stage_requirements) {
     return contract.stage_requirements;
@@ -58,6 +63,10 @@ export function buildDeckSurfaceBundle({ contract }) {
       content: contract.delivery_contract,
     },
     {
+      relativePath: 'contracts/governance-surface.json',
+      content: buildGovernanceSurfaceContract(contract),
+    },
+    {
       relativePath: 'contracts/hydrated-deliverable.json',
       content: contract,
     },
@@ -79,6 +88,7 @@ export function listDeckSurfaceArtifactPaths() {
     'contracts/baseline-policy.json',
     'contracts/export-bundle.json',
     'contracts/delivery-contract.json',
+    'contracts/governance-surface.json',
     'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
@@ -153,7 +163,18 @@ const SURFACE_VALIDATORS = {
     && typeof content?.required_export_bundle_id === 'string'
     && content.required_export_bundle_id.length > 0
     && content?.projection_model === 'direct_delivery'
-    && content?.human_gate?.required === false,
+    && content?.human_gate?.required === false
+    && content?.operator_handoff?.owner_surface === 'required_export_artifact.delivery_state'
+    && content?.operator_handoff?.handoff_ready_state === 'output_ready'
+    && Array.isArray(content?.operator_handoff?.gate_surfaces)
+    && content.operator_handoff.gate_surfaces.includes('auditDeliverable')
+    && content.operator_handoff.gate_surfaces.includes('runtimeWatch')
+    && content.operator_handoff.reopen_mutation_surface === 'request_changes'
+    && content.operator_handoff.closeout_mutation_surface === 'promote_baseline',
+  'contracts/governance-surface.json': (content) =>
+    validateGovernanceSurfaceContract(content)
+    && content?.family_boundary?.family_kind === 'direct_delivery_capable'
+    && content?.family_boundary?.overlay === 'ppt_deck',
   'contracts/hydrated-deliverable.json': (content) =>
     typeof content?.profile_id === 'string'
     && content.profile_id.length > 0

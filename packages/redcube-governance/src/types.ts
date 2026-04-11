@@ -1,3 +1,7 @@
+import type { GovernanceSurfaceContract as OverlayGovernanceSurfaceContract } from '@redcube/overlay-core';
+
+export interface GovernanceSurfaceContract extends OverlayGovernanceSurfaceContract {}
+
 export interface ReviewSurfaceResult {
   status: string;
   issues?: string[];
@@ -49,10 +53,11 @@ export interface ReviewStateResponse {
   quality_summary: Record<string, unknown>;
   state_file: string;
   history_file: string;
-  source_readiness_summary?: Record<string, unknown> | null;
-  gate_summary?: Record<string, unknown> | null;
-  operator_handoff?: Record<string, unknown> | null;
-  lifecycle_stage_summary?: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract;
 }
 
 export interface PublicationProjectionResponse {
@@ -87,7 +92,8 @@ export interface RuntimeWatchResponse {
   source_readiness_summary: Record<string, unknown> | null;
   gate_summary: Record<string, unknown> | null;
   operator_handoff: Record<string, unknown> | null;
-  lifecycle_stage_summary?: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract;
   resumable: boolean;
   profile_id: string | null;
   delivery_contract: Record<string, unknown> | null;

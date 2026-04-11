@@ -1,4 +1,7 @@
 export {
+  buildGovernanceSurface,
+} from './governance-surface.js';
+export {
   auditDeliverableRequest,
   reviewRenderedDeliverable,
   watchRuntimeReviewLoop,

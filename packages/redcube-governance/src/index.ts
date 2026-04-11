@@ -11,10 +11,12 @@ import {
   persistReviewStatePatch as persistReviewStatePatchJs,
   rebuildTopicPublicationProjection as rebuildTopicPublicationProjectionJs,
 } from './review-state.js';
+import { buildGovernanceSurface as buildGovernanceSurfaceJs } from './governance-surface.js';
 
 import type {
   AuditDeliverableRequest,
   DeliverableReviewRequest,
+  GovernanceSurfaceContract,
   PersistReviewStatePatchRequest,
   PublicationProjectionResponse,
   ReviewMutationRequest,
@@ -60,10 +62,15 @@ export function rebuildTopicPublicationProjection(request: { workspaceRoot: stri
   return rebuildTopicPublicationProjectionJs(request);
 }
 
+export function buildGovernanceSurface(contract: Record<string, unknown>): GovernanceSurfaceContract {
+  return buildGovernanceSurfaceJs(contract) as GovernanceSurfaceContract;
+}
+
 export type {
   AuditDeliverableRequest,
   CanonicalSourceRef,
   DeliverableReviewRequest,
+  GovernanceSurfaceContract,
   PersistReviewStatePatchRequest,
   PublicationProjectionResponse,
   ReviewMutationRequest,

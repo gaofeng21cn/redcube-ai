@@ -8,6 +8,7 @@
     ".": "./src/index.js"
   },
   "dependencies": {
+    "@redcube/overlay-core": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"
   }
 }

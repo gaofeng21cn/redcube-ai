@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 import { getDeliverablePaths, loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary } from '@redcube/runtime-protocol';
 import { getPublicationProjection as loadPublicationProjection, getReviewState as loadReviewState } from './review-state.js';
+import { buildGovernanceSurface } from './governance-surface.js';
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   if (!workspaceRoot || !topicId || !deliverableId) {
@@ -29,25 +30,16 @@ function safeReadJson(file) {
 
 function loadPublicationProjectionEntry(request) {
   if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) return null;
-  try {
-    const projection = loadPublicationProjection({
-      workspaceRoot: request.workspaceRoot,
-      topicId: request.topicId,
-    }).publication;
-    return projection?.deliverables?.[request.deliverableId] || null;
-  } catch {
-    return null;
-  }
+  const projection = loadPublicationProjection({
+    workspaceRoot: request.workspaceRoot,
+    topicId: request.topicId,
+  }).publication;
+  return projection?.deliverables?.[request.deliverableId] || null;
 }
-
 
 function loadPlatformReviewState(request) {
   if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) return null;
-  try {
-    return loadReviewState(request);
-  } catch {
-    return null;
-  }
+  return loadReviewState(request);
 }
 
 function loadReviewArtifact(request, contract) {
@@ -180,6 +172,7 @@ export async function auditDeliverable(request) {
   const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
   const reviewState = reviewResponse?.state || null;
   const contract = loadHydratedContract(request);
+  const governanceSurface = reviewResponse?.governance_surface || (contract ? buildGovernanceSurface(contract) : null);
   const publicationProjectionEntry = loadPublicationProjectionEntry(request);
   const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
@@ -233,6 +226,7 @@ export async function auditDeliverable(request) {
     }),
     operator_handoff: operatorHandoff,
     lifecycle_stage_summary: lifecycleStageSummary,
+    governance_surface: governanceSurface,
   };
 }
 
@@ -310,6 +304,7 @@ export function watchRuntimeReviewLoop(request) {
   const contract = loadHydratedContract(request);
   const reviewResponse = loadPlatformReviewState(request);
   const reviewState = reviewResponse?.state || null;
+  const governanceSurface = reviewResponse?.governance_surface || (contract ? buildGovernanceSurface(contract) : null);
   const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
   const publicationProjection = request?.workspaceRoot && request?.topicId
     ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
@@ -346,6 +341,7 @@ export function watchRuntimeReviewLoop(request) {
     }),
     operator_handoff: operatorHandoff,
     lifecycle_stage_summary: lifecycleStageSummary,
+    governance_surface: governanceSurface,
     resumable: Boolean(run?.resumable),
     profile_id: String(contract?.profile_id || '').trim() || null,
     delivery_contract: contract?.delivery_contract || null,

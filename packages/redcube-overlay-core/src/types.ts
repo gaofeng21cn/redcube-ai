@@ -41,6 +41,37 @@ export interface HydratedDeliverableContract extends JsonObject {
   goal: string;
 }
 
+export type GovernanceSurfaceKind =
+  | 'direct_delivery_capable'
+  | 'guarded_knowledge_poster'
+  | 'human_publication';
+
+export interface GovernanceSurfaceFamilyBoundary extends JsonObject {
+  overlay: string;
+  profile_id: string;
+  family_kind: GovernanceSurfaceKind;
+  direct_delivery_capable: boolean;
+  guarded_knowledge_poster: boolean;
+  human_publication: boolean;
+}
+
+export interface GovernanceSurfaceFormalEntry extends JsonObject {
+  default_formal_entry: 'CLI';
+  supported_protocol_layer: ['MCP'];
+  internal_controller_surface: 'controller';
+  controller_repo_verified: false;
+}
+
+export interface GovernanceSurfaceContract extends JsonObject {
+  schema_version: 1;
+  shared_governance_surfaces: string[];
+  required_summaries: string[];
+  authoritative_audit_surfaces: string[];
+  authoritative_review_surfaces: string[];
+  family_boundary: GovernanceSurfaceFamilyBoundary;
+  formal_entry: GovernanceSurfaceFormalEntry;
+}
+
 export interface OverlayProfileDefinition {
   profile_id: string;
 }

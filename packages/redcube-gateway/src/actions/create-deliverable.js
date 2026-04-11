@@ -2,6 +2,7 @@ import path from 'node:path';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 
 import {
+  buildGovernanceSurfaceContract,
   hydrateDeliverableContract,
 } from '@redcube/overlay-core';
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
@@ -55,6 +56,7 @@ export async function createDeliverable({
     title,
     goal,
   });
+  const governanceSurface = buildGovernanceSurfaceContract(hydratedContract);
   const deliverable = overlayDefinition.buildDeliverableRecord({
     topicId,
     deliverableId,
@@ -91,5 +93,6 @@ export async function createDeliverable({
     deliverable,
     surfaceFiles,
     hydratedContract,
+    governance_surface: governanceSurface,
   };
 }

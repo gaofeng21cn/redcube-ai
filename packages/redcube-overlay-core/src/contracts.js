@@ -29,6 +29,94 @@ export function buildDeliverableRecord({
   };
 }
 
+export const SHARED_GOVERNANCE_SURFACES = [
+  'deliverable create',
+  'deliverable audit',
+  'deliverable run',
+  'review watch',
+  'auditDeliverable',
+  'runtimeWatch',
+  'getReviewState',
+  'getPublicationProjection',
+];
+
+export const REQUIRED_GOVERNANCE_SUMMARIES = [
+  'source_readiness_summary',
+  'gate_summary',
+  'operator_handoff',
+  'lifecycle_stage_summary',
+];
+
+function buildGovernanceFamilyBoundary(contract = {}) {
+  const overlay = String(contract?.overlay || '').trim();
+  const profileId = String(contract?.profile_id || '').trim();
+  const projectionModel = String(contract?.delivery_contract?.projection_model || '').trim();
+  const humanPublication = projectionModel === 'human_publication';
+  const guardedKnowledgePoster = overlay === 'poster_onepager' && profileId === 'knowledge_poster';
+
+  return {
+    overlay,
+    profile_id: profileId,
+    family_kind: guardedKnowledgePoster
+      ? 'guarded_knowledge_poster'
+      : (humanPublication ? 'human_publication' : 'direct_delivery_capable'),
+    direct_delivery_capable: !humanPublication,
+    guarded_knowledge_poster: guardedKnowledgePoster,
+    human_publication: humanPublication,
+  };
+}
+
+export function buildGovernanceSurfaceContract(contract = {}) {
+  return {
+    schema_version: 1,
+    shared_governance_surfaces: [...SHARED_GOVERNANCE_SURFACES],
+    required_summaries: [...REQUIRED_GOVERNANCE_SUMMARIES],
+    authoritative_audit_surfaces: ['auditDeliverable', 'runtimeWatch'],
+    authoritative_review_surfaces: ['getReviewState', 'getPublicationProjection'],
+    family_boundary: buildGovernanceFamilyBoundary(contract),
+    formal_entry: {
+      default_formal_entry: 'CLI',
+      supported_protocol_layer: ['MCP'],
+      internal_controller_surface: 'controller',
+      controller_repo_verified: false,
+    },
+  };
+}
+
+export function validateGovernanceSurfaceContract(content) {
+  const familyBoundary = content?.family_boundary || {};
+  const surfaces = Array.isArray(content?.shared_governance_surfaces)
+    ? content.shared_governance_surfaces
+    : [];
+  const requiredSummaries = Array.isArray(content?.required_summaries)
+    ? content.required_summaries
+    : [];
+  const supportedProtocolLayer = Array.isArray(content?.formal_entry?.supported_protocol_layer)
+    ? content.formal_entry.supported_protocol_layer
+    : [];
+
+  return content?.schema_version === 1
+    && SHARED_GOVERNANCE_SURFACES.every((surface) => surfaces.includes(surface))
+    && REQUIRED_GOVERNANCE_SUMMARIES.every((summary) => requiredSummaries.includes(summary))
+    && Array.isArray(content?.authoritative_audit_surfaces)
+    && content.authoritative_audit_surfaces.includes('auditDeliverable')
+    && content.authoritative_audit_surfaces.includes('runtimeWatch')
+    && Array.isArray(content?.authoritative_review_surfaces)
+    && content.authoritative_review_surfaces.includes('getReviewState')
+    && content.authoritative_review_surfaces.includes('getPublicationProjection')
+    && typeof familyBoundary?.family_kind === 'string'
+    && typeof familyBoundary?.overlay === 'string'
+    && typeof familyBoundary?.profile_id === 'string'
+    && typeof familyBoundary?.direct_delivery_capable === 'boolean'
+    && typeof familyBoundary?.guarded_knowledge_poster === 'boolean'
+    && typeof familyBoundary?.human_publication === 'boolean'
+    && content?.formal_entry?.default_formal_entry === 'CLI'
+    && supportedProtocolLayer.length === 1
+    && supportedProtocolLayer[0] === 'MCP'
+    && content?.formal_entry?.internal_controller_surface === 'controller'
+    && content?.formal_entry?.controller_repo_verified === false;
+}
+
 function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }

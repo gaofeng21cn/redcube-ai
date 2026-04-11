@@ -1,3 +1,8 @@
+import {
+  buildGovernanceSurfaceContract,
+  validateGovernanceSurfaceContract,
+} from '@redcube/overlay-core';
+
 export function buildPosterSurfaceBundle({ contract }) {
   return [
     { relativePath: 'contracts/stage-sequence.json', content: contract.stage_sequence },
@@ -9,6 +14,7 @@ export function buildPosterSurfaceBundle({ contract }) {
     { relativePath: 'contracts/baseline-policy.json', content: contract.baseline_policy },
     { relativePath: 'contracts/export-bundle.json', content: contract.export_bundle },
     { relativePath: 'contracts/delivery-contract.json', content: contract.delivery_contract },
+    { relativePath: 'contracts/governance-surface.json', content: buildGovernanceSurfaceContract(contract) },
     { relativePath: 'contracts/hydrated-deliverable.json', content: contract },
     { relativePath: 'views/display-registry.json', content: contract.display_registry },
   ];
@@ -25,6 +31,7 @@ export function listPosterSurfaceArtifactPaths() {
     'contracts/baseline-policy.json',
     'contracts/export-bundle.json',
     'contracts/delivery-contract.json',
+    'contracts/governance-surface.json',
     'contracts/hydrated-deliverable.json',
     'views/display-registry.json',
   ];
@@ -67,7 +74,17 @@ const SURFACE_VALIDATORS = {
     && content?.required_export_route === 'export_bundle'
     && content?.required_export_bundle_id === 'poster_onepager_bundle'
     && content?.projection_model === 'direct_delivery'
-    && content?.human_gate?.required === false,
+    && content?.human_gate?.required === false
+    && content?.operator_handoff?.owner_surface === 'required_export_artifact.delivery_state'
+    && content?.operator_handoff?.handoff_ready_state === 'output_ready'
+    && Array.isArray(content?.operator_handoff?.gate_surfaces)
+    && content.operator_handoff.gate_surfaces.includes('auditDeliverable')
+    && content.operator_handoff.gate_surfaces.includes('runtimeWatch')
+    && content.operator_handoff.reopen_mutation_surface === 'request_changes'
+    && content.operator_handoff.closeout_mutation_surface === 'promote_baseline',
+  'contracts/governance-surface.json': (content) => validateGovernanceSurfaceContract(content)
+    && content?.family_boundary?.family_kind === 'guarded_knowledge_poster'
+    && content?.family_boundary?.overlay === 'poster_onepager',
   'contracts/hydrated-deliverable.json': (content) => content?.overlay === 'poster_onepager'
     && content?.prompt_pack?.pack_id === 'poster_onepager_mainline_v1'
     && content?.lifecycle_stage_contract?.stage_model === 'direct_delivery_human_workline'
