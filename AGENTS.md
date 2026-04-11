@@ -33,6 +33,7 @@
 - `contracts/runtime-program/*.json`：机器可读主线合同。
 - `docs/policies/*`：稳定规则。
 - `docs/references/*`：定位、背景、审计与非活跃参考。
+- `docs/history/`：历史归档，不作为当前活跃入口。
 
 ## 文档规则
 
@@ -56,9 +57,9 @@
 - 大改动、长链路工作、并行多 AI 开发，默认先从最新 `main` 开独立 worktree，再在 worktree 内实现和验证。
 - 共享根 checkout 只用于轻量阅读、评审、吸收验证后提交、push 和清理，不应长期承担重型实现。
 - 新 lane 开始前先清理陈旧 `.runtime-program/state/sessions/*`、tmux session 与 stale `skill-active` 状态。
+- worktree 内实现和验证完成后，应尽快吸收回 `main`，并清理对应 worktree、分支与临时状态。
 
 ## 本地状态
 
 - `.runtime-program/` 与 `.codex/` 都是本地工具状态，必须保持未跟踪。
 - `.runtime-program/local/AGENTS.local.md` 只允许作为机器私有 overlay 存在，不进入 repo-tracked 主线。
-- `.omx/` 若存在，只能作为未跟踪历史残留，不得再作为当前 workflow 入口。
