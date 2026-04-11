@@ -12,6 +12,7 @@ import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
 } from '@redcube/runtime-protocol';
+import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
 
 import {
   buildPptDetailedOutline,
@@ -77,6 +78,7 @@ const STAGE_REQUIREMENTS = Object.freeze({
 });
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
+const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   detailed_outline: 'story_architecture',
@@ -361,6 +363,7 @@ function attachCommon(route, contract) {
     prompt_pack: promptMeta(route),
     lifecycle_stage: lifecycleStageForRoute(contract, route),
     review_overlay: reviewOverlayForRoute(contract, route),
+    execution_model: HERMES_EXECUTION_MODEL,
   };
 }
 

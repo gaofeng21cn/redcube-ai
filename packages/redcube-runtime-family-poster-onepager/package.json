@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@redcube/governance": "0.1.0",
+    "@redcube/hermes-substrate": "0.1.0",
     "@redcube/overlay-poster-onepager": "0.1.0",
     "@redcube/pack-poster-onepager": "0.1.0",
     "@redcube/pack-runtime": "0.1.0",

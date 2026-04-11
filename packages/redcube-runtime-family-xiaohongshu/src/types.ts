@@ -5,6 +5,7 @@ import type {
   XhsStorylineArtifact,
   XhsVisualDirectionArtifact,
 } from '@redcube/pack-xiaohongshu';
+import type { HermesExecutionModel } from '@redcube/hermes-substrate';
 
 export type XhsRuntimeRoute =
   | 'research'
@@ -163,6 +164,9 @@ export interface XhsRuntimeArtifactBase {
   profile_id: string;
   produced_at: string;
   prompt_pack: XhsRuntimePromptMeta;
+  lifecycle_stage?: string | null;
+  review_overlay?: string | null;
+  execution_model: HermesExecutionModel;
   artifact_refs?: string[];
   review_state_patch?: XhsRuntimeReviewStatePatch;
 }
@@ -285,16 +289,33 @@ export interface XhsExportBundleArtifact extends XhsRuntimeArtifactBase {
   review_state_patch: XhsRuntimeReviewStatePatch;
 }
 
+export type XhsRuntimeStageContract = XhsRuntimeStageDefinition;
+
+export interface XhsRuntimeRouteEnvelope<TRoute extends XhsRuntimeRoute> {
+  overlay: XhsRuntimeContract['overlay'];
+  route: TRoute;
+  topic_id: string;
+  deliverable_id: string;
+  contract: XhsRuntimeContract;
+  stage_contract: XhsRuntimeStageContract | null;
+  execution_model: HermesExecutionModel;
+}
+
+export type XhsRuntimeRouteOutput<
+  TRoute extends XhsRuntimeRoute,
+  TPayload extends { route: TRoute },
+> = XhsRuntimeRouteEnvelope<TRoute> & TPayload;
+
 export type XhsRuntimeRouteResult =
-  | XhsResearchArtifact
-  | XhsStorylineArtifact
-  | XhsPlanArtifact
-  | XhsVisualDirectionArtifact
-  | XhsRenderArtifact
-  | XhsDirectorReviewArtifact
-  | XhsScreenshotReviewArtifact
-  | XhsPublishCopyArtifact
-  | XhsExportBundleArtifact;
+  | XhsRuntimeRouteOutput<'research', XhsResearchArtifact>
+  | XhsRuntimeRouteOutput<'storyline', XhsStorylineArtifact>
+  | XhsRuntimeRouteOutput<'single_note_plan', XhsPlanArtifact>
+  | XhsRuntimeRouteOutput<'visual_direction', XhsVisualDirectionArtifact>
+  | XhsRuntimeRouteOutput<'render_html', XhsRenderArtifact>
+  | XhsRuntimeRouteOutput<'visual_director_review', XhsDirectorReviewArtifact>
+  | XhsRuntimeRouteOutput<'screenshot_review', XhsScreenshotReviewArtifact>
+  | XhsRuntimeRouteOutput<'publish_copy', XhsPublishCopyArtifact>
+  | XhsRuntimeRouteOutput<'export_bundle', XhsExportBundleArtifact>;
 
 export interface XhsRuntimeRunRequest {
   workspaceRoot: string;

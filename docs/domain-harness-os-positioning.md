@@ -73,7 +73,7 @@
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
 - `Hermes runtime substrate activation package` 已完成：当前产品 runtime owner 已切到 `Hermes`
 - `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 都已吸收为同一主线 provenance
-- 当前 active tranche 是 `Hermes runtime substrate canonical closure`：canonical `ppt_deck` deliverable mainline 已通过 Hermes-backed execution 闭环，同时 shared `runtime_topology` 已扩到 stable families 的 governance surface
+- 当前 active tranche 是 `Hermes stable family closure truth`：canonical `ppt_deck` deliverable mainline 继续保持 Hermes-backed closure，而 stable family runtime output 与 `xiaohongshu` human-publication closure 也已一起收口到同一 repo-tracked truth
 - authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 

@@ -113,6 +113,12 @@ export function resolveExecutorAdapter({ adapter = HERMES_DEFAULT_ADAPTER } = {}
           baselineDeliverableId,
         });
         return {
+          overlay,
+          route,
+          topic_id: topicId,
+          deliverable_id: deliverableId,
+          contract,
+          stage_contract: stageContract,
           ...artifact,
           execution_model: descriptor.execution_model,
         };

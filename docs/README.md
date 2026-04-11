@@ -23,15 +23,15 @@ This index along with the repository home forms the default GitHub-facing biling
 
 ## Current Mainline Status
 
-The current active tranche is `Hermes / runtime substrate canonical closure`.
+The current active tranche is `Hermes / stable family closure truth`.
 Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance on the same mainline.
-The current truthful stop boundary is no longer "host-agent hardening"; it is "Hermes-backed runtime substrate with one canonical deliverable closure and shared governance topology".
+The current truthful stop boundary is no longer "host-agent hardening"; it is "Hermes-backed runtime substrate with stable family closure truth and shared governance topology".
 
 ## Current Baseline, Long-Line Target, And Task Ladder
 
 - Current repo-verified baseline: `Codex-default host-agent runtime` is still the executable local runtime shape today.
 - Long-line target: move the runtime substrate toward `Hermes-backed runtime substrate` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
-- Next stage: land one `Hermes-backed canonical path` first, then tighten source readiness, workspace quickstart, and family parity against that new runtime shape.
+- Current stop boundary: stable family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
 - Historical materials and future-facing target-state docs may explain direction, but they must not override the absorbed mainline truth.
 
 ## Repo-Tracked Internal Operator Docs
@@ -47,6 +47,7 @@ The current truthful stop boundary is no longer "host-agent hardening"; it is "H
 - [Hermes runtime substrate activation package](program/hermes/hermes_runtime_substrate_activation_package.md) (Chinese only)
 - [Hermes runtime capability extraction map](program/hermes/hermes_runtime_capability_extraction_map.md) (Chinese only)
 - [Hermes runtime substrate canonical closure](program/hermes/hermes_runtime_substrate_canonical_closure.md) (Chinese only)
+- [Hermes stable family closure truth](program/hermes/hermes_stable_family_closure_truth.md) (Chinese only)
 - [Phase 2 activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md) (Chinese only)
 - [Phase 2 source intake + shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md) (Chinese only)
 - [Phase 2 review / export / gate / audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md) (Chinese only)

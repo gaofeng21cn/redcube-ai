@@ -7,6 +7,7 @@ import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
 } from '@redcube/runtime-protocol';
+import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
 
 import {
   buildXhsRenderHtml,
@@ -50,13 +51,7 @@ const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
   export_bundle: 'delivery_packaging',
 });
 
-const HOST_AGENT_EXECUTION_MODEL = Object.freeze({
-  mainline_adapter: 'hermes',
-  primary_surface: 'hermes_backed_runtime_substrate',
-  adapter_role: 'primary_creative_executor',
-  agent_first_requires_external_llm: false,
-  external_llm_role: 'optional_compatibility_adapter',
-});
+const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   research: 'source_readiness',
   storyline: 'story_architecture',
@@ -358,7 +353,7 @@ function attachCommon(route, contract) {
     profile_id: contract.profile_id,
     produced_at: new Date().toISOString(),
     lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
-    execution_model: HOST_AGENT_EXECUTION_MODEL,
+    execution_model: HERMES_EXECUTION_MODEL,
     prompt_pack: promptMeta(contract, route),
   };
 }
@@ -914,6 +909,7 @@ export function canRunXiaohongshu(contract) {
  */
 export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableId, route, contract, mode = 'draft_new', baselineDeliverableId = '' }) {
   const { deliverablePaths } = ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
+  const stageContract = safeArray(contract?.stage_sequence?.stages).find((stage) => stage?.stage_id === route) || null;
   const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
   const payload = await (async () => {
   switch (route) {
@@ -960,6 +956,12 @@ export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableI
   }
   })();
   return {
+    overlay: contract.overlay,
+    route,
+    topic_id: topicId,
+    deliverable_id: deliverableId,
+    contract,
+    stage_contract: stageContract,
     ...payload,
     ...(sourceTruthConsumptionRole
       ? {

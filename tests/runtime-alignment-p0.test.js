@@ -6,10 +6,10 @@ import { existsSync, readFileSync } from 'node:fs';
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const HERMES_ACTIVATION_CONTRACT = 'contracts/runtime-program/hermes-runtime-substrate-activation-package.json';
 const HERMES_CAPABILITY_MAP_CONTRACT = 'contracts/runtime-program/hermes-runtime-capability-extraction-map.json';
-const HERMES_CLOSURE_CONTRACT = 'contracts/runtime-program/hermes-runtime-substrate-canonical-closure.json';
+const HERMES_CLOSURE_CONTRACT = 'contracts/runtime-program/hermes-stable-family-closure-truth.json';
 const HERMES_ACTIVATION_BRIEF = 'docs/program/hermes/hermes_runtime_substrate_activation_package.md';
 const HERMES_CAPABILITY_MAP_BRIEF = 'docs/program/hermes/hermes_runtime_capability_extraction_map.md';
-const HERMES_CLOSURE_BRIEF = 'docs/program/hermes/hermes_runtime_substrate_canonical_closure.md';
+const HERMES_CLOSURE_BRIEF = 'docs/program/hermes/hermes_stable_family_closure_truth.md';
 const PHASE_2_FAMILY_PARITY_CONTRACT = 'contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json';
 const PHASE_2_RUNTIME_WATCH_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
 const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluation-closeout.json';
@@ -59,11 +59,11 @@ test('repo-tracked docs keep formal-entry and durable-surface truth while naming
   assert.equal(docsReadmeZh.includes('docs/program/*/*.md'), true);
   assert.equal(runtimeArchitecture.includes('Hermes-backed runtime substrate'), true);
   assert.equal(runtimeArchitecture.includes('governance_surface.runtime_topology'), true);
-  assert.equal(runtimePolicy.includes('Hermes runtime substrate canonical closure'), true);
+  assert.equal(runtimePolicy.includes('Hermes stable family closure truth'), true);
   assert.equal(status.includes('docs/program/hermes/'), true);
 });
 
-test('current program points to Hermes activation, capability map, and canonical closure while retaining durable identity boundaries', () => {
+test('current program points to Hermes activation, capability map, and stable family closure truth while retaining durable identity boundaries', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
@@ -88,8 +88,8 @@ test('current program points to Hermes activation, capability map, and canonical
   assert.equal(currentProgram.current_state.runtime_substrate_owner, 'Hermes');
   assert.equal(currentProgram.current_state.deployment_host, 'codex_default_host_agent_bridge');
   assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / runtime substrate canonical closure');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.phase_label, 'Hermes / stable family closure truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.activation_package_contract,
     HERMES_ACTIVATION_CONTRACT,
@@ -116,8 +116,17 @@ test('current program points to Hermes activation, capability map, and canonical
   );
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_test,
-    'tests/hermes-runtime-canonical-path.test.js',
+    'tests/hermes-stable-family-closure-truth.test.js',
   );
+  assert.equal(currentProgram.current_state.foundation_milestones.hermes_runtime_substrate_canonical_closure.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.active_baton.scope.secondary_family, 'xiaohongshu');
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_artifact_envelope_fields, [
+    'topic_id',
+    'deliverable_id',
+    'contract',
+    'stage_contract',
+  ]);
 });
 
 test('phase-2 provenance and historical snapshots remain tracked but are no longer the active mainline tranche', () => {

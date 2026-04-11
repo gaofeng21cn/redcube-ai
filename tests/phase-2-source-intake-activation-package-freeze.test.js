@@ -25,7 +25,7 @@ test('phase-2 activation package freeze remains a machine-readable completed pre
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(ACTIVATION_CONTRACT);
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_runtime_substrate_canonical_closure');
+  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_stable_family_closure_truth');
   assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
