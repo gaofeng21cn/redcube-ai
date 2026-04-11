@@ -54,6 +54,7 @@ The next same-mainline continuation is now prefrozen as `family parity / autopil
 ### For technical collaborators / agent executors
 
 - [Runtime architecture](runtime_architecture.md)
+- [Machine-readable contracts](../contracts/README.md) (Chinese only)
 - [Source Augmentation / Deep Research executor contract](source_augmentation_executor_contract.md) (Chinese only)
 - [Domain Harness OS positioning map](domain-harness-os-positioning.md)
 - [Public GitHub publishing](public-github-publish.md)

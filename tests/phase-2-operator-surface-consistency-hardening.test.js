@@ -38,7 +38,7 @@ test('operator surface consistency hardening stays absorbed provenance while run
 test('operator surface consistency hardening freezes doctor/help/runtime-watch convergence honestly across current truth surfaces', () => {
   const contract = readJson(TRANCHE_CONTRACT);
   const brief = read(TRANCHE_BRIEF);
-  const projectTruth = read('contracts/project-truth/AGENTS.md');
+  const rootAgents = read('AGENTS.md');
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
   const docsIndex = read('docs/README.md');
@@ -55,7 +55,7 @@ test('operator surface consistency hardening freezes doctor/help/runtime-watch c
   assert.equal(contract.operator_surface_alignment.runtime_watch_boundary.required_embedded_summaries.includes('lifecycle_stage_summary'), true);
   assert.equal(brief.includes('closeout 已完成并吸收到当前 mainline'), true);
   assert.equal(brief.includes('`CLI review watch` / `MCP runtime_watch`'), true);
-  assert.equal(projectTruth.includes('contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json'), true);
+  assert.equal(rootAgents.includes('contracts/runtime-program/current-program.json'), true);
   assert.equal(readme.includes('operator surface consistency hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('operator surface consistency hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(docsIndex.includes('Phase 2 operator surface consistency hardening'), true);

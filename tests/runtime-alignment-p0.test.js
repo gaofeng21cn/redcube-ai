@@ -41,27 +41,28 @@ function readJson(file) {
 test('P0 truth surfaces freeze the formal-entry matrix as CLI default, MCP protocol layer, and controller internal surface', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = read('apps/redcube-cli/src/cli.js');
-  const projectTruth = read('contracts/project-truth/AGENTS.md');
+  const rootAgents = read('AGENTS.md');
+  const contractsReadme = read('contracts/README.md');
   const runtimePolicy = read('docs/policies/runtime_operating_model.md');
 
   assert.equal(Boolean(pkg.scripts.redcube), true);
   assert.equal(Boolean(pkg.scripts.mcp), true);
   assert.equal(Boolean(pkg.scripts.controller), false);
   assert.equal(cli.includes("preferredEntry: ['CLI', 'MCP']"), true);
-  assert.equal(projectTruth.includes('`default_formal_entry`: `CLI`'), true);
-  assert.equal(projectTruth.includes('`supported_protocol_layer`: `MCP`'), true);
-  assert.equal(projectTruth.includes('`internal_controller_surface`: `controller`'), true);
-  assert.equal(projectTruth.includes('`MCP` is repo-verified in the current mainline'), true);
-  assert.equal(projectTruth.includes('`program_id` is the control-plane pointer for the active RedCube mainline'), true);
-  assert.equal(projectTruth.includes('`topic_id` is the topic aggregate-root identity'), true);
-  assert.equal(projectTruth.includes('`deliverable_id` is the durable deliverable identity inside a topic'), true);
-  assert.equal(projectTruth.includes('`run_id` is the single route-execution handle'), true);
-  assert.equal(projectTruth.includes(MANUAL_TEST_CONTRACT), true);
-  assert.equal(projectTruth.includes(PHASE_2_ACTIVATION_CONTRACT), true);
-  assert.equal(projectTruth.includes(PHASE_2_BASELINE_CONTRACT), true);
-  assert.equal(projectTruth.includes(PHASE_2_HARDENING_CONTRACT), true);
-  assert.equal(projectTruth.includes(PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT), true);
-  assert.equal(projectTruth.includes(PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_CONTRACT), true);
+  assert.equal(rootAgents.includes('默认正式入口 `CLI`'), true);
+  assert.equal(rootAgents.includes('支持协议层 `MCP`'), true);
+  assert.equal(rootAgents.includes('内部控制面 `controller`'), true);
+  assert.equal(rootAgents.includes('`program_id`'), true);
+  assert.equal(rootAgents.includes('`topic_id`'), true);
+  assert.equal(rootAgents.includes('`deliverable_id`'), true);
+  assert.equal(rootAgents.includes('`run_id`'), true);
+  assert.equal(contractsReadme.includes('runtime-program/current-program.json'), true);
+  assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PHASE_2_ACTIVATION_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PHASE_2_BASELINE_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PHASE_2_HARDENING_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PHASE_2_DIRECT_DELIVERY_HANDOFF_CONTRACT)), true);
+  assert.equal(existsSync(path.resolve(PHASE_2_OPERATOR_SURFACE_CONSISTENCY_HARDENING_CONTRACT)), true);
   assert.equal(runtimePolicy.includes('当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
 
   for (const file of [
@@ -230,15 +231,15 @@ test('P0 tracked program contract records the required credible green baseline v
 
 test('P0 tracked repo truth does not depend on ignored .codex host docs or ignored .omx plan references', () => {
   const rootAgents = read('AGENTS.md');
-  const projectTruth = read('contracts/project-truth/AGENTS.md');
+  const contractsReadme = read('contracts/README.md');
 
-  for (const text of [rootAgents, projectTruth]) {
+  for (const text of [rootAgents, contractsReadme]) {
     assert.equal(text.includes('contracts/dev-hosts/omx-cli.md'), false);
     assert.equal(text.includes('contracts/dev-hosts/codex-app.md'), false);
   }
 
-  assert.equal(projectTruth.includes('.runtime-program/plans/'), false);
-  assert.equal(rootAgents.includes('Canonical host adapter references are maintained by the installed runtime/tooling surface; do not depend on repo-local dev-host docs.'), true);
+  assert.equal(contractsReadme.includes('.runtime-program/plans/'), false);
+  assert.equal(rootAgents.includes('machine-readable contract'), true);
 });
 
 test('P0 tracked docs keep absorbed provenance and the current runtime-watch tranche aligned on the same mainline', () => {

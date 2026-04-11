@@ -37,7 +37,7 @@ test('runtime watch locator integrity hardening becomes the absorbed active tran
 test('runtime watch locator integrity hardening freezes run identity persistence and quartet fail-closed behavior honestly across current truth surfaces', () => {
   const contract = readJson(TRANCHE_CONTRACT);
   const brief = read(TRANCHE_BRIEF);
-  const projectTruth = read('contracts/project-truth/AGENTS.md');
+  const rootAgents = read('AGENTS.md');
   const readme = read('README.md');
   const readmeZh = read('README.zh-CN.md');
   const docsIndex = read('docs/README.md');
@@ -54,7 +54,7 @@ test('runtime watch locator integrity hardening freezes run identity persistence
   assert.equal(brief.includes('`topic_id` / `deliverable_id`'), true);
   assert.equal(brief.includes('quartet locator'), true);
   assert.equal(brief.includes('只给 `workspaceRoot/topicId/deliverableId`、不带 `runId` / `run` 时'), true);
-  assert.equal(projectTruth.includes('contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json'), true);
+  assert.equal(rootAgents.includes('contracts/runtime-program/current-program.json'), true);
   assert.equal(readme.includes('runtime watch locator integrity hardening now has an absorbed tranche on the same mainline'), true);
   assert.equal(readmeZh.includes('runtime watch locator integrity hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(docsIndex.includes('Phase 2 runtime watch locator integrity hardening'), true);
