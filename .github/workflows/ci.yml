@@ -23,6 +23,24 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
 
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install system font dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk
+
+      - name: Install Python test dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r .github/requirements/ci-python.txt
+
+      - name: Install Playwright browser
+        run: python3 -m playwright install --with-deps chromium
+
       - name: Install Node dependencies
         run: npm ci
 

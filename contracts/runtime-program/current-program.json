@@ -121,6 +121,12 @@
       "credible": true,
       "clean_clone_required": true,
       "blocked_by": [],
+      "ci_quality_lane_requires": [
+        "python-3.12",
+        "fonts-noto-cjk",
+        "playwright-chromium"
+      ],
+      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review on the active Hermes stable-family mainline",
       "required_verification": [
         "git status --short",
         "git diff --check",

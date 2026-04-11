@@ -20,7 +20,7 @@ test('CI workflow pins reproducible toolchain and visual review dependencies', (
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?npm run typecheck[\s\S]*?npm run test:fast[\s\S]*?npm run test:meta/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?npm run test:fast[\s\S]*?npm run test:meta/);
   assert.match(workflow, /integration:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run test:integration/);
   assert.match(workflow, /render-e2e:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run test:e2e/);
 
@@ -33,6 +33,7 @@ test('CI workflow pins reproducible toolchain and visual review dependencies', (
 test('render shells prefer a deterministic CJK font before platform fallbacks', () => {
   const xiaohongshuShell = readRepoFile('prompts/xiaohongshu/render_shell.html');
   const pptShell = readRepoFile('prompts/ppt_deck/render_shell.html');
+  const posterShell = readRepoFile('prompts/poster_onepager/render_shell.html');
 
   assert.match(
     xiaohongshuShell,
@@ -40,6 +41,10 @@ test('render shells prefer a deterministic CJK font before platform fallbacks', 
   );
   assert.match(
     pptShell,
+    /font-family:\s*'Noto Sans CJK SC',\s*'Noto Sans SC',\s*-apple-system,\s*BlinkMacSystemFont,\s*'PingFang SC',\s*'Microsoft YaHei',\s*sans-serif;/
+  );
+  assert.match(
+    posterShell,
     /font-family:\s*'Noto Sans CJK SC',\s*'Noto Sans SC',\s*-apple-system,\s*BlinkMacSystemFont,\s*'PingFang SC',\s*'Microsoft YaHei',\s*sans-serif;/
   );
 });

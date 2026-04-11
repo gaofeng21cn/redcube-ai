@@ -283,9 +283,9 @@ npm run typecheck
 
 Local test layers:
 
-- `npm test` / `npm run test:fast`: lightweight developer smoke slice
+- `npm test` / `npm run test:fast`: lightweight developer smoke slice; in clean CI / clone it now needs Python, Noto CJK fonts, and Playwright because the poster runtime smoke path includes governed screenshot review
 - `npm run test:meta`: tracked truth, docs, contract, and TypeScript governance checks
-- `npm run test:integration`: runtime behavior tests without Python / Playwright setup
+- `npm run test:integration`: broader runtime behavior slice on the same Python / fonts / Playwright review stack
 - `npm run test:e2e`: render/export end-to-end tests that need Python, fonts, and Playwright
 - `npm run test:full`: full tracked baseline for clean-clone verification
 
