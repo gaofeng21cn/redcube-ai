@@ -3,7 +3,7 @@
 **English** | [中文](./README.zh-CN.md)
 
 This bilingual index is the default public surface for `RedCube AI`.
-It stays aligned with the product truth: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`, now running on a `Hermes-backed runtime substrate`; `Codex-default host-agent runtime` remains only as a transition deployment host. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
+It stays aligned with the current truth reset: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; the repository already has a usable local runtime baseline, but it has **not** landed a true upstream `Hermes-Agent` integration yet. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
 
 ## Core Maintainer Working Set
 
@@ -23,16 +23,16 @@ This index along with the repository home forms the default GitHub-facing biling
 
 ## Current Mainline Status
 
-The current active tranche is `Hermes / managed family closure truth`.
-Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance on the same mainline.
-The current truthful stop boundary is no longer "host-agent hardening"; it is "Hermes-backed runtime substrate with managed family closure truth and shared governance topology".
+The current deliverable mainline is stable and usable, but the runtime story is still transitional.
+Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance.
+The current truthful stop boundary is: local managed-runtime baseline is landed, upstream `Hermes-Agent` integration is still pending.
 
 ## Current Baseline, Long-Line Target, And Task Ladder
 
-- Current repo-verified baseline: `Codex-default host-agent runtime` is still the executable local runtime shape today.
-- Long-line target: move the runtime substrate toward `Hermes-backed runtime substrate` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
+- Current repo-verified baseline: a repo-local managed runtime plus local operator host is still the executable shape today.
+- Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
-- Historical materials and future-facing target-state docs may explain direction, but they must not override the absorbed mainline truth.
+- Historical `docs/program/hermes/*` materials now serve as local migration artifacts and provenance only; they must not be read as proof that upstream `Hermes-Agent` already owns the runtime.
 
 ## Repo-Tracked Internal Operator Docs
 
@@ -42,11 +42,11 @@ The current truthful stop boundary is no longer "host-agent hardening"; it is "H
 - [Deliverable examples](deliverable_examples.md)
 - [Stable deliverable manual test brief](stable_deliverable_manual_test_brief.md) (historical program evidence, Chinese only)
 
-### Mainline program artifacts and provenance
+### Historical local-runtime migration artifacts and provenance
 
-- [Hermes runtime substrate activation package](program/hermes/hermes_runtime_substrate_activation_package.md) (Chinese only)
-- [Hermes runtime capability extraction map](program/hermes/hermes_runtime_capability_extraction_map.md) (Chinese only)
-- [Hermes runtime substrate canonical closure](program/hermes/hermes_runtime_substrate_canonical_closure.md) (Chinese only)
+- [Historical local migration artifact: Hermes runtime substrate activation package](program/hermes/hermes_runtime_substrate_activation_package.md) (Chinese only)
+- [Historical local migration artifact: Hermes runtime capability extraction map](program/hermes/hermes_runtime_capability_extraction_map.md) (Chinese only)
+- [Historical local migration artifact: Hermes runtime substrate canonical closure](program/hermes/hermes_runtime_substrate_canonical_closure.md) (Chinese only)
 - [Hermes stable family closure truth](program/hermes/hermes_stable_family_closure_truth.md) (Chinese only)
 - [Hermes managed family closure truth](program/hermes/hermes_managed_family_closure_truth.md) (Chinese only)
 - [Phase 2 activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md) (Chinese only)

@@ -20,9 +20,9 @@ test('phase-2 publication projection delivery contract convergence stays absorbe
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
+  assert.equal(currentProgram.current_state.workstream, 'truth_reset_upstream_hermes_agent_pilot_prep');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -86,8 +86,8 @@ test('phase-2 publication projection delivery contract convergence brief and doc
   assert.equal(readmeZh.includes('publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state'), true);
   assert.equal(positioning.includes('`publication projection / delivery contract convergence`'), true);
-  assert.equal(positioning.includes('当前 active tranche 是 `Hermes stable family closure truth`'), true);
-  assert.equal(policy.includes('`Hermes stable family closure truth` 现已在当前主线上落地'), true);
+  assert.equal(positioning.includes('当前 active tranche 应按 `truth reset / upstream Hermes-Agent pilot prep` 理解'), true);
+  assert.equal(policy.includes('repo-local managed runtime pilot'), true);
   assert.equal(docsIndex.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
 });

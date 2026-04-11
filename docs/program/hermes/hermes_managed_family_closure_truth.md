@@ -1,9 +1,11 @@
 # Hermes Managed Family Closure Truth
 
+> 历史说明：这份文档记录的是 repo-local managed migration line 的 closure provenance，不代表当前仓库已经把 runtime owner 交给上游 `Hermes-Agent`。
+
 ## 当前状态
 
 这一 tranche 已把 repo-hosted managed control plane 的 family closure 真值补齐到仓内主线。
-它继续保持 `Hermes` 为 runtime substrate owner，但把 `runManagedDeliverable / getManagedRun / superviseManagedRun` 的 shared family closure 也一起收紧到 repo-tracked surface。
+它记录的是当时以 repo-local `Hermes` migration layer 为 owner 的 managed family closure，并把 `runManagedDeliverable / getManagedRun / superviseManagedRun` 的 shared family closure 一起收紧到 repo-tracked surface。
 
 ## In scope
 

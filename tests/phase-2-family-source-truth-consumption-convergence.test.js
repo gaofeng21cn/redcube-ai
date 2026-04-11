@@ -20,9 +20,9 @@ test('phase-2 family source-truth consumption convergence stays absorbed provena
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
+  assert.equal(currentProgram.current_state.workstream, 'truth_reset_upstream_hermes_agent_pilot_prep');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.formal_entry.controller_repo_verified, false);

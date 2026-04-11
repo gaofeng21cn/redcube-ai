@@ -19,7 +19,7 @@
 当前统一口径：
 
 - `Agent-first` 不等于 `external_llm-only`
-- `Hermes-backed runtime substrate` 是当前正式默认产品 runtime；`Codex-default host-agent runtime` 只保留为过渡宿主
+- `repo-local managed runtime pilot` 是当前正式默认产品 runtime；`Codex` 本地 operator host 是当前过渡宿主；上游 `Hermes-Agent` 仍是目标 substrate
 - 共享宏观生命周期是：
   - `Source Readiness`
   - `Story Architecture`

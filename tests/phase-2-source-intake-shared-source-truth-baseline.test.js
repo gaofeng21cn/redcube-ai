@@ -19,8 +19,8 @@ test('phase-2 minimum baseline contract remains absorbed provenance behind the c
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(BASELINE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');

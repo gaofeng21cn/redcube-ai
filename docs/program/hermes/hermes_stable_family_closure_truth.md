@@ -1,9 +1,11 @@
 # Hermes Stable Family Closure Truth
 
+> 历史说明：这份文档记录的是 repo-local stable-family migration closure 的 provenance，不代表当前仓库已经完成上游 `Hermes-Agent` 集成。
+
 ## 当前状态
 
 这一 tranche 已在仓内实现并通过验证。
-它继续保持 `Hermes` 为 runtime substrate owner，但把 shared family runtime output 与第二条 human-publication family closure 的真值也一起收紧到 repo-tracked surface。
+它记录的是当时以 repo-local `Hermes` migration layer 为 owner 的 stable family runtime closure，并把 shared family runtime output 与第二条 human-publication family closure 的真值一起收紧到 repo-tracked surface。
 
 ## In scope
 

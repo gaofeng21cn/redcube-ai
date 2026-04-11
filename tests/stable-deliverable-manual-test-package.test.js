@@ -22,10 +22,10 @@ test('stable deliverable manual-test contract remains the completed foundation b
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
+  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.commit, '96dc6c1');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');

@@ -25,9 +25,9 @@ test('workspace operator quickstart convergence stays absorbed provenance while 
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Truth Reset / Upstream Hermes-Agent Pilot Prep');
+  assert.equal(currentProgram.current_state.workstream, 'truth_reset_upstream_hermes_agent_pilot_prep');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('deliverable run'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
   assert.equal(contract.operator_quickstart_surface.canonical_route.includes('workspace doctor'), true);

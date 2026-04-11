@@ -25,9 +25,9 @@ test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provena
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.next_tranche_candidate, 'phase_2_direct_delivery_lifecycle_stage_convergence');
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Truth Reset / Upstream Hermes-Agent Pilot Prep');
+  assert.equal(currentProgram.current_state.workstream, 'truth_reset_upstream_hermes_agent_pilot_prep');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.deepEqual(
     currentProgram.durable_surface_contract.required_embedded_summaries,
     ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary'],

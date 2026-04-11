@@ -43,8 +43,9 @@
 
 当前产品 runtime 形态：
 
-- `Hermes-backed runtime substrate`
-- `Codex-default host-agent runtime`（仅 transition deployment host / regression bridge / development shell）
+- `repo-local managed runtime pilot`（当前可执行基线）
+- `Codex` 本地 operator host（当前本地部署宿主）
+- 上游 `Hermes-Agent` runtime substrate（目标形态，尚未落地）
 
 当前 formal-entry matrix：
 
@@ -57,7 +58,7 @@
 - `CLI` 与 `MCP` 当前都已 repo-verified，但 `CLI` 是默认 formal entry
 - `controller` 目前不是 repo-verified independent public entry
 - `Gateway` 是 `CLI / MCP` 背后的共享正式控制面
-- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为兼容 sibling 或 upper-layer product 复用同一 substrate
+- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为兼容 sibling 或 upper-layer product 复用同一 domain contract
 
 约束说明：
 
@@ -71,9 +72,9 @@
 - canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
 - `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
-- `Hermes runtime substrate activation package` 已完成：当前产品 runtime owner 已切到 `Hermes`
+- `docs/program/hermes/*` 相关 activation package 已转为历史本地迁移工件；它们不再代表“上游 `Hermes-Agent` 已接管 runtime”
 - `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 都已吸收为同一主线 provenance
-- 当前 active tranche 是 `Hermes stable family closure truth`：canonical `ppt_deck` deliverable mainline 继续保持 Hermes-backed closure，而 stable family runtime output 与 `xiaohongshu` human-publication closure 也已一起收口到同一 repo-tracked truth
+- 当前 active tranche 应按 `truth reset / upstream Hermes-Agent pilot prep` 理解：canonical `ppt_deck` deliverable mainline 继续保持 repo-local managed closure，而 stable family runtime output 与 `xiaohongshu` human-publication closure 也已一起收口到同一 repo-tracked truth
 - authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 

@@ -29,16 +29,26 @@
 
 ## 产品定位
 
-如果你的目标，是把知识稳定地交付成正式的视觉成果，那么 `RedCube AI` 提供的是一条可治理、可审阅、可重跑的交付主线，而不是一堆一次性提示词、零散脚本或人工补救流程。
+如果你的目标，是把知识稳定地交付成正式的视觉成果，那么 `RedCube AI` 提供的是一条可治理、可审阅、可重跑的交付主线。
 
-它的重点不是“先生成一版”，而是把视觉交付这件事变成正式生产线。
+它的重点是把视觉交付这件事组织成正式生产线。
 
-当前产品 runtime 主线已经迁到 `Hermes-backed runtime substrate`。
-`Codex-default host-agent runtime` 只保留为过渡 deployment host、回归对照和开发宿主。
+当前这条 runtime 叙事仍处在真相重置阶段。
+仓库已经有可用的本地视觉交付主线，但**还没有**真正完成上游 `Hermes-Agent` 集成。
+今天可执行的基线仍然是 repo-owned、local-first 的组合：
+
+- 仓内自带的 repo-local managed runtime pilot
+- 本地 `Codex` operator / development host
+
+因此，当前仓里任何带 `Hermes` 命名的 package、program brief 或 helper，都应被理解为本地迁移工件或 pilot substrate，而不是“上游 `Hermes-Agent` 已经接管 runtime”的证据。
+
+真正的长线目标，是把 session / run / watch / memory / scheduling 这类 substrate 责任交给上游 `Hermes-Agent`，同时让 `RedCube AI` 继续负责视觉 domain logic、audit、review、export 与 deliverable truth。
+
+`Codex-default host-agent runtime` 当前承担本地 operator / development host 的角色。
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
-当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`；`controller` 目前不是独立、可验证的仓内公开正式入口。
-当前仓库主线按 `Auto-only` 理解；如果未来要做 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
-只要保持同一套 substrate 与 contract，后续可以迁移到同一 substrate 上的托管 web runtime，而不改变本项目的 domain 身份。
+当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`；`controller` 继续承担内部控制面角色。
+当前仓库主线按 `Auto-only` 理解；如果未来要做 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate。
+只要保持同一套 substrate contract 与 domain boundary，后续可以迁移到托管 web runtime，而不改变本项目的 domain 身份。
 
 当前主线还冻结了一套明确的执行句柄与持久表面合同：
 
@@ -54,7 +64,7 @@
 - 把课程内容、学术材料、行业知识和专业观点组织成正式的 `幻灯片`
 - 把结构化知识整理成 `小红书笔记`，用于科普传播、知识发布和系列内容输出
 - 产出 `海报`，作为比幻灯片更便于传播、比社交内容更结构化的单页视觉交付物
-- 在同一条受控流程里完成审阅、重跑、导出与交付收口，而不是每次重搭流程
+- 在同一条受控流程里完成审阅、重跑、导出与交付收口
 
 ## 当前可用的交付物
 
@@ -76,8 +86,8 @@
 
 `RedCube AI` 的优先级不一样：
 
-- 先判断这次交付到底要服务谁，而不是先糊一版结果
-- 先把阶段顺序、审阅节点和导出要求明确下来，而不是靠默契补救
+- 先判断这次交付到底要服务谁，再组织最终成果
+- 先把阶段顺序、审阅节点和导出要求明确下来
 - 先保留可审计的中间状态，再谈最后导出的文件
 - 让智能代理承担执行，让人类保留关键接受与否的判断权
 
@@ -87,12 +97,12 @@
 
 - 你已经有原始材料，需要把它们收口成正式视觉交付物
 - 你不想在 PPT、图文发布、导出和审阅之间来回切换多套工具链
-- 你希望交付过程可以复查、可重跑，而不是一次生成之后就只能人工返工
+- 你希望交付过程可以复查、可重跑，并形成稳定的返工与收口机制
 - 你希望智能代理多做执行，但关键质量判断仍由专家自己把关
 
 ## 最快开始方式
 
-如果你是医生、教授、PI、内容负责人或专业团队成员，最快的使用方式不是先研究底层命令，而是把目标、受众、材料和约束清楚地交给你的智能代理，再让它带着 `RedCube AI` 推进。
+如果你是医生、教授、PI、内容负责人或专业团队成员，最快的使用方式是把目标、受众、材料和约束清楚地交给你的智能代理，再让它带着 `RedCube AI` 推进。
 
 通常只需要三步：
 
@@ -103,7 +113,7 @@
 
 如果你想更快开始，可以直接给智能代理一句话指令。
 
-`Deep Research` 属于 `Source Readiness`，不是独立漂在外面的第 0 步。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
+`Deep Research` 属于 `Source Readiness`。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
 `planning_ready` 必须成为 `Source Readiness` 内部正式、可机读的放行 gate。
 
 如果你想先用一个共享正式入口，而不是自己逐步调用每个子命令，那么可以直接从 `source research` 开始。
@@ -113,7 +123,7 @@
 
 `source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`
 
-这并不意味着产品从 5 步变成更多步，而是说现在在 `Source Readiness` 内部，已经有正式的 result scaffold 与 canonical write surface，Codex / Agent 不需要自己猜目录和 contract。
+这保持了同一个产品阶段，只是把 `Source Readiness` 内部的 result scaffold 与 canonical write surface 明确暴露出来，Codex / Agent 不需要自己猜目录和 contract。
 
 场景一，你已经准备好了参考材料：
 
@@ -128,10 +138,10 @@
 - 当前正式稳定的是 `source intake + shared source truth`
 - `Deep Research` 现在是共享 canonical source substrate 上的 `Source Readiness` augmentation 能力，供 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 复用
 - `planning_ready` 是 Step 1 的正式、可机读放行 gate；不能只看 `source_audit = pass`
-- 它不能被表述成已经等价于 `MedDeepScientist` 的 `Scout + Idea`
-- 更准确地说，它负责解决 source insufficiency 与 evidence gaps；真正的内容策略和讲述主线，仍然从 `storyline` 开始
+- 它当前负责解决 source insufficiency 与 evidence gaps
+- 真正的内容策略和讲述主线，仍然从 `storyline` 开始
 
-当前更适合把 `RedCube AI` 当作“面向一个独立 workspace 的运行时”，而不是把仓库本身当成内容目录。
+当前更适合把 `RedCube AI` 当作“面向一个独立 workspace 的运行时”。
 当前最适合的组织粒度是：
 
 - `1 个 workspace = 1 个相对独立的内容项目或系列`
@@ -192,7 +202,7 @@
 
 ## 当前待完善的地方
 
-`RedCube AI` 现在已经可用，但还不是终态。
+`RedCube AI` 现在已经可用，并正朝更完整的长期形态继续推进。
 
 当前最主要的待完善项有：
 
@@ -206,7 +216,7 @@
 - direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `lifecycle_stage_contract` 与对齐后的 `lifecycle_stage_summary`，同时 `Storyline + Plan` 继续映射到 `Story Architecture`，`operator_handoff / closeout` 继续留在 `Delivery`
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，而不再依赖单独的 workspace-init 产品表面
 - operator surface consistency hardening 已在同一主线上吸收一条 tranche：`workspace doctor` 现在把 brand-new workspace bootstrap guidance 收紧到 `source intake` / `source research`，command-scoped `--help` 保持 machine-readable 且不会执行真实命令，而 `CLI review watch` / `MCP runtime_watch` 现在围绕同一 `runtimeWatch` locator truth 与共享治理 summaries 收口
-- `Hermes-backed runtime substrate` 已成为当前 active runtime owner：routed deliverable execution、run record、managed adapter failover 与 shared runtime topology 不再把 `Codex-default host-agent runtime` 当作长期产品 substrate
+- 当前 repo-local managed runtime pilot 已经收口了 routed deliverable execution、run record 与 shared runtime-topology wording，而上游 `Hermes-Agent` 对 runtime 的正式承接仍是下一阶段的 substrate 目标
 - 当前行为收口还新增了 `governance_surface.runtime_topology`：create / review / audit / watch / projection 现在在同一 deliverable/topic 边界上看到同一份 runtime topology 真相
 - runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance：deliverable-scope run record 仍持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator 指向错误 topic 或 deliverable 的 run 时继续 fail-closed
 - 海报能力还没完全收口：
@@ -232,9 +242,10 @@
       -> 网关
           -> 交付物层 / 场景层 / 配置层 / 包层
               -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
-                  -> Hermes-backed runtime substrate（当前产品 runtime）
-                      -> Codex-default host-agent runtime bridge（仅过渡宿主）
-                  -> managed web runtime（同一 substrate 上的未来形态）
+                  -> repo-local managed runtime pilot（当前可执行基线）
+                      -> Codex-local operator / development host
+                  -> 上游 Hermes-Agent runtime substrate（目标形态，尚未落地）
+                  -> managed web runtime（真实 substrate 迁移后的未来选项）
 ```
 
 正式控制链：
@@ -253,7 +264,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前唯一 active mainline 仍是 `redcube-runtime-program`：`P0 review-closeout` 已通过，且 credible clean-clone baseline 已建立；phase-2 的 source-truth、governance、operator-surface 与 runtime-watch hardening 继续作为 absorbed provenance 保留，`Hermes / stable family closure truth` 也继续作为 absorbed provenance 保留；而当前 active tranche 已切到 `Hermes / managed family closure truth`，它继续把 Hermes 冻结为 runtime substrate owner，把 `runManagedDeliverable / getManagedRun / superviseManagedRun` 跨 `ppt_deck`、`xiaohongshu`、guarded `poster_onepager` 收紧到同一条 repo-tracked managed closure，并在 durable managed state 写入前 fail-closed 拦住非法 preflight，同时保持 `xiaohongshu` human-publication 与知识海报 direct-delivery 语义不漂移，更不把 managed web runtime 伪装成已完成。
+- 当前 active mainline 仍是一条 local-only runtime line：`P0 review-closeout` 已通过，phase-2 的 source-truth / governance / operator-surface 工作继续作为 absorbed provenance 保留，仓内也已经形成覆盖 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 的 repo-local managed closure。上游 `Hermes-Agent` 对 runtime owner 的正式承接，继续属于后续 substrate 里程碑。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -261,7 +272,8 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- `Codex-default host-agent runtime` 不再是长期产品 runtime owner。
+- `Codex-default host-agent runtime` 继续只作为本地 operator / development host，而不是长期产品 runtime owner。
+- 上游 `Hermes-Agent` 集成仍待后续真实 pilot。
 - managed web runtime 仍是同一 substrate 上的未来形态，不得伪装成已完成。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。

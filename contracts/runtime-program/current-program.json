@@ -2,12 +2,12 @@
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-11",
   "longrun_goal": {
-    "label": "visual-deliverable domain gateway plus Hermes-backed domain harness os mainline",
+    "label": "visual-deliverable domain gateway plus upstream Hermes-Agent target runtime",
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
-      "migrate the product runtime owner from Codex-local host-agent to Hermes-backed runtime substrate",
+      "move runtime substrate ownership from repo-local pilot to upstream Hermes-Agent",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
     ]
   },
@@ -100,13 +100,13 @@
   },
   "current_state": {
     "product_mainline_mode": "auto_only",
-    "runtime_substrate_owner": "Hermes",
-    "deployment_host": "codex_default_host_agent_bridge",
-    "deployment_host_status": "transition_only",
+    "runtime_substrate_owner": "repo_local_managed_runtime_pilot",
+    "deployment_host": "codex_local_operator_host",
+    "deployment_host_status": "local_only",
     "host_agent_longterm_owner": false,
-    "phase_id": "Hermes",
-    "phase_label": "Hermes / managed family closure truth",
-    "workstream": "hermes_managed_family_closure_truth",
+    "phase_id": "truth_reset",
+    "phase_label": "Truth Reset / Upstream Hermes-Agent Pilot Prep",
+    "workstream": "truth_reset_upstream_hermes_agent_pilot_prep",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -114,7 +114,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / hermes managed family closure truth",
+      "label": "redcube-runtime-program / local managed-runtime baseline with upstream Hermes-Agent pending",
       "unique": true
     },
     "green_baseline": {
@@ -155,31 +155,31 @@
         "status": "closeout_completed"
       },
       "hermes_runtime_substrate_activation_package": {
-        "status": "closeout_completed"
+        "status": "historical_local_migration_artifact"
       },
       "hermes_runtime_capability_extraction_map": {
-        "status": "closeout_completed"
+        "status": "historical_local_migration_artifact"
       },
       "hermes_runtime_substrate_canonical_closure": {
-        "status": "closeout_completed"
+        "status": "historical_local_migration_artifact"
       },
       "hermes_stable_family_closure_truth": {
-        "status": "closeout_completed"
+        "status": "historical_local_migration_artifact"
       },
       "hermes_managed_family_closure_truth": {
-        "status": "closeout_completed"
+        "status": "historical_local_migration_artifact"
       }
     },
     "active_baton": {
-      "id": "hermes_managed_family_closure_truth",
-      "status": "closeout_completed",
-      "review_status": "passed",
-      "program_mode": "autonomous_longrun",
+      "id": "historical_local_runtime_migration_artifact",
+      "status": "historical_local_migration_artifact",
+      "review_status": "archived",
+      "program_mode": "historical_local_runtime_line",
       "scope": {
-        "hardening_axis": "hermes_managed_family_closure_truth",
-        "implementation_in_scope": true,
-        "runtime_substrate_owner": "Hermes",
-        "deployment_host": "codex_default_host_agent_bridge",
+        "hardening_axis": "historical_local_runtime_migration",
+        "implementation_in_scope": false,
+        "runtime_substrate_owner": "repo_local_managed_runtime_pilot",
+        "deployment_host": "codex_local_operator_host",
         "consumer_families": [
           "ppt_deck",
           "xiaohongshu",
@@ -263,7 +263,7 @@
     "stop_conditions": [
       "frozen truth conflict that cannot be resolved inside current contracts",
       "new product-direction choice is required",
-      "managed web runtime semantics need a separate frozen activation package"
+      "real upstream Hermes-Agent integration needs a separate frozen activation package"
     ]
   },
   "historical_snapshots": {

@@ -6,6 +6,9 @@
 
 `gateway -> family -> profile -> pack -> harness execution -> audit / review / publication projection`
 
+当前仓内可执行的 runtime 基线仍是 repo-local managed runtime + 本地 operator host。
+长线目标才是把 session / run / watch / memory / scheduling 这类 substrate 责任迁到真实的上游 `Hermes-Agent`，同时保持上面的 domain chain 不变。
+
 ## 结构角色
 
 ### 1. Public docs

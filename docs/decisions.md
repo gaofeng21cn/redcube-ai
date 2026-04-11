@@ -24,8 +24,13 @@
 
 原因：历史主线与当前基线仍然有验证价值，但一旦新的 runtime substrate 目标已经明确，新增投入就应默认服务目标形态。旧宿主形态只能保留为迁移桥、兼容层或回归对照，而不是继续被当成长线产品方向。
 
-### 决策：产品 runtime 主线迁到 `docs/program/hermes/`
+### 决策：`Hermes-Agent` 只指上游外部 runtime substrate
 
-- `Hermes` 成为新的 runtime substrate owner
-- `Codex-default host-agent runtime` 退为 transition deployment host / regression bridge / development shell
-- `docs/program/hermes/*.md` 与对应 machine-readable contract 成对维护
+- 后续凡是提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务本体。
+- 仓内 `docs/program/hermes/*` 与同名 package 只代表本地迁移工件、pilot substrate 或历史 provenance。
+
+### 决策：`docs/program/hermes/` 退为历史本地迁移材料
+
+- 当前还不能把 `docs/program/hermes/*` 写成上游 `Hermes-Agent` 已接管 runtime 的证据。
+- 这组文档保留为历史 local-runtime migration artifact，用于追溯为何会走到今天这一步。
+- 当前真实主线应回到核心五件套：先完成 truth reset，再推进真实的上游 `Hermes-Agent` pilot。

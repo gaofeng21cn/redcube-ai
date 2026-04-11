@@ -70,8 +70,8 @@ test('current tracked program truth keeps poster freeze historical while Hermes 
   const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'Hermes');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
+  assert.equal(currentProgram.current_state.workstream, 'truth_reset_upstream_hermes_agent_pilot_prep');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.deepEqual(
     currentProgram.current_state.active_baton.scope.runtime_planes,

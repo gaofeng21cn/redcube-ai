@@ -23,7 +23,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('repo-tracked docs keep formal-entry and durable-surface truth while naming Hermes as the current runtime owner', () => {
+test('repo-tracked docs keep formal-entry and durable-surface truth while freezing the truth-reset runtime owner wording', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = read('apps/redcube-cli/src/cli.js');
   const rootAgents = read('AGENTS.md');
@@ -47,20 +47,20 @@ test('repo-tracked docs keep formal-entry and durable-surface truth while naming
   assert.equal(projectDoc.includes('formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
   assert.equal(invariants.includes('`docs/program/*/*.md`'), true);
   assert.equal(contractsReadme.includes('runtime-program/current-program.json'), true);
-  assert.equal(readme.includes('Hermes-backed runtime substrate'), true);
-  assert.equal(readme.includes('transition deployment host'), true);
+  assert.equal(readme.includes('repo-local managed runtime pilot'), true);
+  assert.equal(readme.includes('landed a true upstream `Hermes-Agent` integration yet'), true);
   assert.equal(readme.includes('`program_id` is the active mainline control-plane pointer.'), true);
   assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution.'), true);
-  assert.equal(readmeZh.includes('Hermes-backed runtime substrate'), true);
-  assert.equal(readmeZh.includes('过渡 deployment host'), true);
+  assert.equal(readmeZh.includes('repo-local managed runtime pilot'), true);
+  assert.equal(readmeZh.includes('还没有') && readmeZh.includes('Hermes-Agent'), true);
   assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
   assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
   assert.equal(docsReadme.includes('program/hermes/'), true);
   assert.equal(docsReadmeZh.includes('docs/program/*/*.md'), true);
-  assert.equal(runtimeArchitecture.includes('Hermes-backed runtime substrate'), true);
+  assert.equal(runtimeArchitecture.includes('repo-local managed runtime pilot'), true);
   assert.equal(runtimeArchitecture.includes('governance_surface.runtime_topology'), true);
-  assert.equal(runtimePolicy.includes('Hermes stable family closure truth'), true);
-  assert.equal(status.includes('docs/program/hermes/'), true);
+  assert.equal(runtimePolicy.includes('repo-local managed runtime pilot'), true);
+  assert.equal(status.includes('truth reset / upstream `Hermes-Agent` pilot prep'), true);
 });
 
 test('current program points to Hermes activation, capability map, and managed family closure truth while retaining durable identity boundaries', () => {
@@ -85,11 +85,11 @@ test('current program points to Hermes activation, capability map, and managed f
     'runtimeWatch',
     'ops_eval_summary',
   ]);
-  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'Hermes');
-  assert.equal(currentProgram.current_state.deployment_host, 'codex_default_host_agent_bridge');
+  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'repo_local_managed_runtime_pilot');
+  assert.equal(currentProgram.current_state.deployment_host, 'codex_local_operator_host');
   assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Truth Reset / Upstream Hermes-Agent Pilot Prep');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.activation_package_contract,
     HERMES_ACTIVATION_CONTRACT,
@@ -118,9 +118,9 @@ test('current program points to Hermes activation, capability map, and managed f
     currentProgram.current_state.active_baton.artifacts.tranche_test,
     'tests/hermes-managed-family-closure-truth.test.js',
   );
-  assert.equal(currentProgram.current_state.foundation_milestones.hermes_runtime_substrate_canonical_closure.status, 'closeout_completed');
-  assert.equal(currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status, 'closeout_completed');
-  assert.equal(currentProgram.current_state.foundation_milestones.hermes_managed_family_closure_truth.status, 'closeout_completed');
+  assert.equal(currentProgram.current_state.foundation_milestones.hermes_runtime_substrate_canonical_closure.status, 'historical_local_migration_artifact');
+  assert.equal(currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status, 'historical_local_migration_artifact');
+  assert.equal(currentProgram.current_state.foundation_milestones.hermes_managed_family_closure_truth.status, 'historical_local_migration_artifact');
   assert.equal(currentProgram.current_state.active_baton.scope.secondary_family, 'xiaohongshu');
   assert.deepEqual(currentProgram.current_state.active_baton.scope.required_artifact_envelope_fields, [
     'topic_id',

@@ -33,12 +33,21 @@ If your goal is to keep turning structured knowledge into formal visual outputs,
 
 It is designed for experts who want the speed of agents without losing control over quality.
 
-Today, its product runtime mainline is the `Hermes-backed runtime substrate`.
-`Codex-default host-agent runtime` is retained only as a transition deployment host, regression bridge, and development shell.
+Today, its runtime story is still in a truth-reset phase.
+The repository already has usable local deliverable flows, but it has **not** landed a true upstream `Hermes-Agent` integration yet.
+The executable baseline today is still repo-owned and local-first:
+
+- a repo-local managed-runtime pilot inside this repository
+- a `Codex`-local operator / development host
+
+Any current repo-local package or document that uses `Hermes` naming should be read as a local migration artifact or pilot substrate, not as proof that upstream `Hermes-Agent` already owns the runtime.
+
+The long-line target is to move session / run / watch / memory / scheduling ownership onto upstream `Hermes-Agent` while leaving `RedCube AI` responsible for visual-domain logic, audit, review, export, and deliverable truth.
+
 Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
-Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` is not a repo-verified independent public formal entry in the current mainline.
-The current repository mainline is `Auto-only`; if a future `Human-in-the-loop` product is built, it should reuse the same substrate as a compatible sibling or upper-layer product rather than split this repository into same-repo dual-mode logic.
-As long as the same substrate and contracts are kept, this line can later move to a managed web runtime without changing the domain identity.
+Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains the internal control surface in the current mainline.
+The current repository mainline is `Auto-only`; if a future `Human-in-the-loop` product is built, it should reuse the same substrate as a compatible sibling or upper-layer product.
+As long as the same substrate contracts and domain boundaries are kept, this line can later move to a managed web runtime without changing the domain identity.
 
 The current mainline also freezes one explicit execution-handle and durable-surface contract:
 
@@ -93,7 +102,7 @@ Many content-generation tools are good at producing a draft quickly but weak at 
 
 ## Fast Start Through Your Agent
 
-For most expert users, the fastest path is not to learn low-level commands first. The better entry is to hand your goal, audience, source material, and constraints to your own agent, then let it run `RedCube AI`.
+For most expert users, the fastest path is to hand your goal, audience, source material, and constraints to your own agent, then let it run `RedCube AI`.
 
 Typical three-step start:
 
@@ -104,7 +113,7 @@ Typical three-step start:
 
 If you want a faster handoff, you can give your agent a one-line start instruction.
 
-`Deep Research` belongs to `Source Readiness` rather than a standalone pre-stage. When the input is too thin, the agent should keep Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
+`Deep Research` belongs to `Source Readiness`. When the input is too thin, the agent keeps Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
 planning_ready must become the formal machine-readable release gate inside Source Readiness.
 
 If you want one formal entry instead of calling each sub-step yourself, start from `source research`.
@@ -114,7 +123,7 @@ If your agent is taking the `result_file` / agent-native route, Step 1 can be ex
 
 `source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`
 
-That does not create a new product stage. It only means `RedCube AI` now exposes a formal result scaffold and canonical write surface before execution applies the augmentation back into shared source truth.
+This keeps Step 1 on the same product stage while exposing a formal result scaffold and canonical write surface before execution applies the augmentation back into shared source truth.
 
 Scenario 1, you already prepared reference materials:
 
@@ -128,11 +137,11 @@ There is an important boundary to state honestly:
 
 - the current formally stable baseline is `source intake + shared source truth`
 - `Deep Research` is now a shared `Source Readiness` augmentation capability on the same canonical source substrate consumed by `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`
-- `planning_ready` is the formal machine-readable release gate for Step 1; `source_audit = pass` alone is not sufficient
-- it should not be described as already equivalent to `MedDeepScientist` `Scout + Idea`
-- more accurately, it resolves source insufficiency and evidence gaps before `storyline`; the real content strategy and narrative choice still start from `storyline`
+- `planning_ready` is the formal machine-readable release gate for Step 1, while `source_audit = pass` records source-audit completion on the same lane
+- its current role is to resolve source insufficiency and evidence gaps before `storyline`
+- content strategy and narrative choice still start from `storyline`
 
-The recommended mental model is to treat `RedCube AI` as a runtime operating on one isolated workspace, not as a content folder embedded inside the repository itself.
+The recommended mental model is to treat `RedCube AI` as a runtime operating on one isolated workspace.
 The most practical working granularity today is:
 
 - `1 workspace = 1 relatively independent content project or series`
@@ -193,7 +202,7 @@ If you want your agent to start directly from a brand-new directory, you can mak
 
 ## Current Limits
 
-`RedCube AI` is already usable, but it is not yet the final form.
+`RedCube AI` is already usable and continuing toward its fuller long-term form.
 
 The main unfinished areas are:
 
@@ -208,7 +217,7 @@ The main unfinished areas are:
 - direct-delivery lifecycle stage convergence now has an absorbed tranche on the same mainline: `ppt_deck` and guarded `poster_onepager` now expose one machine-readable `lifecycle_stage_contract` plus one aligned `lifecycle_stage_summary`, while `Storyline + Plan` remain mapped to `Story Architecture` and `operator_handoff / closeout` remains inside `Delivery`
 - workspace / operator quickstart convergence now has an absorbed tranche on the same mainline: brand-new or thin workspaces now converge on one repo-verified route from `workspace doctor` through `source intake / source research`, `deliverable create`, `deliverable audit`, and `deliverable run` without inventing a separate workspace-init product surface
 - operator surface consistency hardening now has an absorbed tranche on the same mainline: `workspace doctor` now keeps brand-new workspace bootstrap guidance on `source intake` / `source research`, command-scoped `--help` stays machine-readable and non-executing, and `CLI review watch` / `MCP runtime_watch` now converge on the same `runtimeWatch` locator truth and shared governance summaries
-- `Hermes-backed runtime substrate` is now the active runtime owner: routed deliverable execution, run records, managed adapter failover, and shared runtime topology no longer treat `Codex-default host-agent runtime` as the long-term product substrate
+- the current repo-local managed-runtime pilot has already absorbed routed deliverable execution, run records, and shared runtime-topology wording, while upstream `Hermes-Agent` ownership of the runtime remains the next substrate milestone
 - current behavior convergence now also keeps `governance_surface.runtime_topology` aligned across create / review / audit / watch / projection on the same deliverable/topic boundary
 - phase-2 runtime watch locator integrity hardening remains absorbed provenance on the same mainline: deliverable-scope run records persist `topic_id` / `deliverable_id`, and `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` fail closed when a quartet locator points at a run from another topic or deliverable
 - poster support is still incomplete:
@@ -234,9 +243,10 @@ User / Agent
       -> Gateway
           -> Overlay / Family / Profile / Pack
               -> Domain Harness OS (on Unified Harness Engineering Substrate)
-                  -> Hermes-backed runtime substrate (current product runtime)
-                      -> Codex-default host-agent runtime bridge (transition host only)
-                  -> managed web runtime (future option on same substrate)
+                  -> repo-local managed runtime pilot (current executable baseline)
+                      -> Codex-local operator / development host
+                  -> upstream Hermes-Agent runtime substrate (target shape, not landed yet)
+                  -> managed web runtime (future option after real substrate migration)
 ```
 
 Formal control chain:
@@ -255,7 +265,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is `redcube-runtime-program`: `P0 review-closeout` is passed with a credible clean-clone baseline; phase-2 source-truth, governance, operator-surface, and runtime-watch hardening remain absorbed provenance; `Hermes / stable family closure truth` remains absorbed provenance; and the current active tranche is now `Hermes / managed family closure truth`, which keeps Hermes frozen as the runtime substrate owner, closes `runManagedDeliverable / getManagedRun / superviseManagedRun` across `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`, fail-closes invalid managed preflight requests before durable state is written, and preserves `xiaohongshu` human-publication plus knowledge-poster direct-delivery semantics without promoting managed web runtime into current repo truth.
+- The current active mainline is still a local-only runtime line: review-closeout is passed, phase-2 source-truth / governance / operator-surface work remains absorbed provenance, and the repository already has a repo-local managed-deliverable closure across `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`. What is **not** true yet is upstream `Hermes-Agent` ownership of that runtime.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -263,7 +273,8 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- `Codex-default host-agent runtime` is no longer the long-term product runtime owner.
+- `Codex-default host-agent runtime` remains a local operator / development host, not the long-term product runtime owner.
+- upstream `Hermes-Agent` integration is still pending.
 - managed web runtime remains future work on the same substrate.
 - further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.
