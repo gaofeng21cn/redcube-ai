@@ -55,3 +55,11 @@ test('typescript migration policy freezes new code defaults and JS compatibility
   assert.match(strategy, /NodeNext/);
   assert.match(strategy, /typecheck 成为正式质量门/);
 });
+
+test('root AGENTS freezes the layered test command surfaces', () => {
+  const agents = readFileSync(path.resolve('AGENTS.md'), 'utf-8');
+  assert.match(agents, /`npm test` and `npm run test:fast` are the default developer smoke slice/);
+  assert.match(agents, /`npm run test:meta`, `npm run test:integration`, `npm run test:e2e`, and `npm run test:full`/);
+  assert.match(agents, /CI stays split across `quality`, `integration`, and `render-e2e`/);
+  assert.match(agents, /update the README, CI, and command-surface tests in the same change/);
+});

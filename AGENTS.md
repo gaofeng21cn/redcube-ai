@@ -30,6 +30,13 @@ Canonical host adapter references are maintained by the installed runtime/toolin
 - After the lane stops, either absorb the verified commits back to `main` or explicitly abandon the lane, then remove its worktree/branch and clear related tmux/session state.
 - Do not rely on session-only isolation to prevent hook interference; use physical worktree isolation.
 
+## Test Surface Governance
+
+- `npm test` and `npm run test:fast` are the default developer smoke slice; do not expand them to include the tracked `meta`, `integration`, or `e2e` suites.
+- The canonical tracked verification ladder is `npm run test:meta`, `npm run test:integration`, `npm run test:e2e`, and `npm run test:full`; keep docs, contracts, and operator instructions aligned with these exact commands.
+- `npm run test:full` is the clean-clone baseline, while CI stays split across `quality`, `integration`, and `render-e2e`; do not collapse them back into an opaque single job.
+- If a repo-tracked file changes test commands, update the README, CI, and command-surface tests in the same change.
+
 ## Local State
 
 - `.runtime-program/` and `.codex/` are local tooling state and must remain untracked.
