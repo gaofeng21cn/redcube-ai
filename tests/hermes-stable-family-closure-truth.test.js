@@ -38,7 +38,7 @@ function loadHydratedContract(workspaceRoot, topicId, deliverableId) {
   ));
 }
 
-test('stable family closure truth remains absorbed provenance after managed family closure promotion', () => {
+test('stable family closure truth remains historical provenance after upstream runtime owner cutover', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -50,10 +50,11 @@ test('stable family closure truth remains absorbed provenance after managed fami
   assert.equal(contract.predecessor_tranche, predecessor.tranche_id);
   assert.equal(
     currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status,
-    'closeout_completed',
+    'historical_local_migration_artifact',
   );
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.active_baton.status, 'historical_local_migration_artifact');
   assert.equal(
     contract.required_behavior.includes(
       'routed family artifacts persist topic_id, deliverable_id, contract, and stage_contract across stable families',

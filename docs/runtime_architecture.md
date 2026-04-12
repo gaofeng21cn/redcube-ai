@@ -51,6 +51,12 @@ User / Agent
               -> RedCube Harness OS
 ```
 
+当前冻结的最终收口链还要再明确一层：
+
+上游 `Hermes-Agent` runtime substrate -> RedCube service-safe domain entry -> visual-domain truth surfaces
+
+也就是说，future `OPL Product Entry` 与 future `RedCube Product Entry` 最终都应把调用收敛到同一个 service-safe domain entry，而成熟的最终用户产品入口仍未落地。
+
 同一 substrate 上的可迁移形态：
 
 ```text
@@ -283,6 +289,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 - `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
 - `xiaohongshu` 共享同一 harness，但不自动等同于 `Presentation Ops`
 - `RedCube AI` 仍然必须保留独立 domain gateway 角色，而不是退化成 OPL 的内部模块
+- final target route 应理解成：`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 ## 更稳定的规则在哪里
 

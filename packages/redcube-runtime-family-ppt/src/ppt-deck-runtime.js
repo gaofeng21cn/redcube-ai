@@ -11,6 +11,7 @@ import {
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
+  resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
 import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
 
@@ -449,15 +450,15 @@ function runPython(script, args) {
   if (!existsSync(script)) {
     throw new Error(`Missing ppt_deck python helper: ${script}`);
   }
-  const probe = spawnSync('python3', ['--version'], { encoding: 'utf-8' });
-  if (probe.status !== 0) {
-    throw new Error(`python3 不可用: ${(probe.stderr || probe.stdout || '').trim()}`);
-  }
-  const result = spawnSync('python3', [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
+  const pythonCommand = resolveRedCubePythonCommand();
+  const result = spawnSync(pythonCommand.command, [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
   if (result.status !== 0) {
     throw new Error((result.stderr || result.stdout || `ppt_deck python helper failed: ${script}`).trim());
   }
-  return JSON.parse(result.stdout);
+  return {
+    command: pythonCommand.command,
+    payload: JSON.parse(result.stdout),
+  };
 }
 
 function computeSlideReview(page, blueprintSlide, maxPrimaryPoints) {
@@ -658,10 +659,11 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
     args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
   }
   const python = runPython(PYTHON_REVIEW, args);
+  const reviewPayload = python.payload;
   const latestChecks = {
     director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed),
     anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok),
-    ...python.checks,
+    ...reviewPayload.checks,
     ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
   };
   const status = Object.values(latestChecks).every((value) => value === true) ? 'pass' : 'block';
@@ -670,10 +672,10 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
     mode,
     status,
     checks: latestChecks,
-    slide_reviews: python.slide_reviews,
-    report_markdown: python.review_markdown || reviewMarkdown,
-    metrics: python.metrics,
-    artifact_refs: [python.review_markdown || reviewMarkdown, ...python.slide_reviews.map((slide) => slide.screenshot_file)],
+    slide_reviews: reviewPayload.slide_reviews,
+    report_markdown: reviewPayload.review_markdown || reviewMarkdown,
+    metrics: reviewPayload.metrics,
+    artifact_refs: [reviewPayload.review_markdown || reviewMarkdown, ...reviewPayload.slide_reviews.map((slide) => slide.screenshot_file)],
     review_state_patch: {
       current_status: status === 'pass' ? 'export_ready' : 'blocked_for_revision',
       ready_for_export: status === 'pass',
@@ -688,19 +690,19 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
       },
     },
   };
-  if (mode === 'optimize_existing' && python.baseline) {
+  if (mode === 'optimize_existing' && reviewPayload.baseline) {
     const relativeQuality = compareFailuresAndDensity({
-      currentFailures: python.baseline.current_failed_slides,
-      baselineFailures: python.baseline.baseline_failed_slides,
-      currentDensity: python.baseline.current_average_density,
-      baselineDensity: python.baseline.baseline_average_density,
+      currentFailures: reviewPayload.baseline.current_failed_slides,
+      baselineFailures: reviewPayload.baseline.baseline_failed_slides,
+      currentDensity: reviewPayload.baseline.current_average_density,
+      baselineDensity: reviewPayload.baseline.baseline_average_density,
       densityTolerance: 0.08,
       densityDigits: 4,
       densityLabel: '平均占用率',
     });
     artifact.baseline_review = {
       baseline_deliverable_id: baselineDeliverableId,
-      ...python.baseline,
+      ...reviewPayload.baseline,
       relative_quality: relativeQuality,
       summary: summarizeRelativeQuality(relativeQuality),
     };
@@ -724,8 +726,9 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
     '--output-pptx', pptxFile,
     '--output-pdf', pdfFile,
   ]);
-  const pptxPath = python.pptx_file || python.pptx_path;
-  const pdfPath = python.pdf_file || python.pdf_path;
+  const exportPayload = python.payload;
+  const pptxPath = exportPayload.pptx_file || exportPayload.pptx_path;
+  const pdfPath = exportPayload.pdf_file || exportPayload.pdf_path;
   return {
     ...attachCommon('export_pptx', contract),
     status: 'completed',
@@ -750,10 +753,10 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
         current: 'output_ready',
         next: null,
       },
-      page_count: python.page_count,
-      page_count_match: python.page_count === renderArtifact.html_bundle.page_count,
+      page_count: exportPayload.page_count,
+      page_count_match: exportPayload.page_count === renderArtifact.html_bundle.page_count,
       real_conversion_invocation: {
-        tool: 'python3',
+        tool: python.command,
         script: 'packages/redcube-runtime/scripts/ppt_deck_export.py',
         command: ['--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile],
       },

@@ -17,6 +17,10 @@
 - 通过同一套 `gateway -> family -> profile -> pack -> harness execution` 控制链运行
 - 通过 family-specific contract 区分交付物，不通过平行系统分叉主线
 
+理想型上，`RedCube AI` 应收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点，而不是把视觉 domain 重新吸回 family-level federation 本体：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
 ## 2. 统一约束（跨 family）
 
 跨 `ppt_deck`、`xiaohongshu`、`poster_onepager` 的统一约束包括：

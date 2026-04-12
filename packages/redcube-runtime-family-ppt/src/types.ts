@@ -256,7 +256,7 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     page_count: number;
     page_count_match: boolean;
     real_conversion_invocation: {
-      tool: 'python3';
+      tool: string;
       script: 'packages/redcube-runtime/scripts/ppt_deck_export.py';
       command: string[];
     };

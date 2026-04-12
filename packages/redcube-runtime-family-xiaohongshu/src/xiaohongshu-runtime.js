@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
+  resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
 import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
 
@@ -513,7 +514,8 @@ function renderContract(contract) {
 
 function runPython(script, args) {
   if (!existsSync(script)) throw new Error(`Missing python helper: ${script}`);
-  const result = spawnSync('python3', [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
+  const pythonCommand = resolveRedCubePythonCommand();
+  const result = spawnSync(pythonCommand.command, [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
   if (result.status !== 0) throw new Error((result.stderr || result.stdout || `python helper failed: ${script}`).trim());
   return JSON.parse(result.stdout);
 }

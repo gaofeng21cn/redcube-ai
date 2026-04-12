@@ -7,6 +7,15 @@
 当前可执行基线已经把 route / managed run surface 切到真实上游 `Hermes-Agent`，同时把 visual-domain truth 继续留在 `RedCube AI`。
 当前入口真相是：`CLI / MCP` 已经构成可验证的 `agent entry`，但真正面向最终用户的轻量 `product entry` 还没有落地。
 当前统一协作模型是：长线由 `Hermes-Agent` 负责 runtime substrate / orchestration，`RedCube AI` 自己继续负责 gateway、family/profile/pack authority 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，不要求被单一 runtime 脑一次性替换。
+当前已冻结的最终目标形态是：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+与之对应的 direct domain 路线则是：
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+这说明 `RedCube AI` 的理想型是一个可被 `OPL` 调用、也可被用户直接进入的 visual-domain 产品 / 服务节点，而不是把仓库继续磨成 repo-local runtime，或把自己写成整个 `OPL`。
 
 ## 项目目标
 

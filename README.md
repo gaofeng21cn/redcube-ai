@@ -47,6 +47,7 @@ The repo-tracked preflight that freezes this truth is `upstream-hermes-agent-act
 The callable service-safe adapter shell for future `OPL Gateway` handoff is `redcube_service_safe_domain_entry`, documented in `contracts/runtime-program/service-safe-domain-entry-adapter.json`.
 If your global `hermes` CLI lags the upstream gateway fix, live verification lanes may set `REDCUBE_HERMES_GATEWAY_COMMAND` to an explicit known-good upstream launch command instead of pretending the repo fixed Hermes locally.
 That override only corrects which upstream checkout launches the gateway; it does not mask upstream run-surface failures such as `/v1/runs/{run_id}/events` closing without a terminal event.
+The same live lanes also freeze `REDCUBE_PYTHON_COMMAND` for screenshot review and export helpers; if it is unset, `scripts/run-test-group.mjs` now probes `python3 -c "import sys; import playwright; print(sys.executable)"` and fails closed when no Playwright-enabled Python can be resolved.
 
 Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
 Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains the internal control surface in the current mainline.
@@ -69,6 +70,19 @@ The target domain-facing shape is:
 Inside the larger `OPL` family, the compatible top-level route is:
 
 `User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
+
+The final target shape we are freezing is one step more explicit:
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+A direct RedCube entry should converge onto the same downstream shape:
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+That target is now frozen in `docs/program/upstream_hermes_agent_final_target_shape.md` and `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`.
+A mature end-user `product entry` is still not landed; today the repo-verified callable precursor is the service-safe domain entry shell plus `CLI` / `MCP`.
+Live `integration` / `e2e` / `full` verification now serializes Node test files with `--test-concurrency=1` so the repo does not overdrive the current upstream Hermes concurrent-run ceiling and then misreport the resulting 429s as domain drift.
+Those same live lanes now also carry one explicit Python-helper contract: screenshot review and export helpers must execute through `REDCUBE_PYTHON_COMMAND` or an auto-resolved Playwright-enabled Python, rather than assuming the upstream Hermes virtualenv already contains Playwright.
 
 That handoff should carry one shared minimum envelope:
 

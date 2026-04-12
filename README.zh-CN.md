@@ -47,6 +47,7 @@
 给 future `OPL Gateway` 调用的 service-safe adapter shell 则冻结为 `redcube_service_safe_domain_entry`，对应合同在 `contracts/runtime-program/service-safe-domain-entry-adapter.json`。
 如果本机全局 `hermes` CLI 仍落后于上游 gateway 启动修复，live verification lane 可以显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream 启动命令，而不是把这个仓误写成已经把 Hermes 本地修好了。
 这条 override 只负责修正“启动的是哪份 upstream checkout”，并不能掩盖 `/v1/runs/{run_id}/events` 这类 upstream run-surface 自身失败。
+同一组 live lane 现在还会冻结 `REDCUBE_PYTHON_COMMAND` 给 screenshot review / export helper 使用；如果没有显式设置，`scripts/run-test-group.mjs` 会先执行 `python3 -c "import sys; import playwright; print(sys.executable)"` 去探测带 Playwright 的 Python，找不到就直接 fail-closed。
 
 `Codex-default host-agent runtime` 当前承担本地 operator / development host 的角色。
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
@@ -69,6 +70,19 @@
 而在 `OPL` 家族级入口里，应兼容下面这条顶层路线：
 
 `User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
+
+当前已经冻结的最终目标形态，还可以再明确一层：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+而 direct `RedCube` 入口最终也应收敛到同一条下游形态：
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+这条目标路线现在已经冻结在 `docs/program/upstream_hermes_agent_final_target_shape.md` 与 `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`。
+成熟的最终用户 `product entry` 仍未落地；当前 repo-verified、可调用的前身只是 service-safe domain entry shell 加上 `CLI` / `MCP`。
+当前 live `integration` / `e2e` / `full` verification 也会用 `--test-concurrency=1` 串行化 Node test files，避免仓库把上游 Hermes 当前的 concurrent-run ceiling 打爆，再把 429 误报成 domain drift。
+同一组 live lane 现在还带着一条显式 Python-helper contract：screenshot review 与 export helper 必须通过 `REDCUBE_PYTHON_COMMAND` 或自动解析出的 Playwright Python 执行，而不是默认假设 upstream Hermes 自己的 virtualenv 已经装好了 Playwright。
 
 这条 handoff 至少应共享一套最小 envelope：
 

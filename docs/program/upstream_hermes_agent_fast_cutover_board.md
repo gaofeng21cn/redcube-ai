@@ -23,6 +23,11 @@
   - `audit / review / export / projection`
   - visual-domain gate semantics
 
+配套冻结件：
+
+- final target brief：`docs/program/upstream_hermes_agent_final_target_shape.md`
+- final target contract：`contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`
+
 ## 一句话目标
 
 把当前 `repo-local managed runtime baseline + Codex local operator host`，切成：

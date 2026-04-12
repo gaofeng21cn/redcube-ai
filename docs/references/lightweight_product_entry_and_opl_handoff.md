@@ -22,6 +22,12 @@
 
 `User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
 
+如果把最终目标形态再写得更贴近当前 cutover 真相，则应理解为：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+这也是当前“最终目标形态”冻结件要表达的主线，详见 `docs/program/upstream_hermes_agent_final_target_shape.md`。
+
 这意味着：
 
 - `OPL` 是 family-level 总入口
@@ -75,3 +81,5 @@
 1. 保持 `CLI / MCP / controller` 的 formal-entry 语义稳定，不让产品入口叙事反向污染当前可验证入口。
 2. 先补 `RedCube Product Entry` 的 contract shell，让 direct entry 与 OPL handoff 进入同一条命令/服务合同。
 3. 在已经冻结的 upstream `Hermes-Agent` substrate 证据之上，把 runtime session、resume、watch、route 接到真实 product entry 壳上。
+
+这里也要继续诚实：最终目标形态已经冻结，但成熟的最终用户产品入口仍未落地。

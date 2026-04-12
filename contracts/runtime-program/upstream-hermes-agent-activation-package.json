@@ -13,6 +13,8 @@
     "adapter_surface": "@redcube/hermes-agent-client",
     "probe_script": "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface",
     "live_gateway_command_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
+    "python_command_env": "REDCUBE_PYTHON_COMMAND",
+    "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
     "required_surfaces": [
       "/v1/health",
       "/v1/models",
@@ -27,6 +29,7 @@
     "fresh_evidence": [
       "hermes gateway run -q",
       "REDCUBE_HERMES_GATEWAY_COMMAND='<known-good upstream gateway launch command>' scripts/verify.sh integration",
+      "python3 -c \"import sys; import playwright; print(sys.executable)\"",
       "curl http://127.0.0.1:8642/v1/health",
       "curl http://127.0.0.1:8642/v1/models",
       "node scripts/probe-upstream-hermes-agent.mjs --json",
@@ -61,7 +64,7 @@
   "known_external_risks": [
     "upstream Hermes currently crashes on `hermes gateway run` without `-q` because `gateway/run.py` references `RedactingFormatter` before definition; RedCube records this as an upstream blocker rather than repo-local proof",
     "verification hosts whose global `hermes` CLI still points at the broken upstream checkout must use `REDCUBE_HERMES_GATEWAY_COMMAND` to launch a known-good upstream gateway command explicitly",
-    "on the 2026-04-12 verification host, the latest upstream launch override still leaves `/v1/runs/{run_id}/events` returning `: stream closed` without a terminal event; live verification therefore remains blocked at the upstream run surface"
+    "verification hosts whose upstream Hermes virtualenv lacks Playwright must set or auto-resolve `REDCUBE_PYTHON_COMMAND` to a Playwright-enabled Python for screenshot_review and export helpers"
   ],
   "excluded_scope": [
     "repo-local Hermes naming repackaged as upstream proof",
@@ -85,7 +88,7 @@
       "upstream run creation",
       "upstream run terminal events"
     ],
-    "suite_result": "pending_current_branch_verification",
+    "suite_result": "fresh_route_and_preflight_proof_passed_on_current_branch",
     "absorbed_to_main": false
   }
 }

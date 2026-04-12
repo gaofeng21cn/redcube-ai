@@ -1,3 +1,15 @@
+import type { spawnSync } from 'node:child_process';
+
+export interface ResolveRedCubePythonCommandOptions {
+  env?: Record<string, string | undefined>;
+  spawnSyncImpl?: typeof spawnSync;
+}
+
+export interface ResolvedRedCubePythonCommand {
+  command: string;
+  source: 'env' | 'python3_with_playwright';
+}
+
 export interface WorkspaceContract {
   workspaceRoot: string;
   workspaceFile: string;

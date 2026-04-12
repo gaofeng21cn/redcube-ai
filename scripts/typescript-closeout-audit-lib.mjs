@@ -52,6 +52,7 @@ const JS_RESIDUE_ALLOWLIST = {
   'packages/redcube-runtime-protocol': [
     'src/index.js',
     'src/managed-runs.js',
+    'src/python-command.js',
     'src/runs.js',
     'src/source-augmentation-contract.js',
     'src/source-readiness-summary.js',

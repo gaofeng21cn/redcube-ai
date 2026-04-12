@@ -37,6 +37,10 @@ test('upstream Hermes-Agent activation package is closed out as the frozen upstr
     'REDCUBE_HERMES_GATEWAY_COMMAND',
   );
   assert.equal(
+    activationPackage.connection_proof.python_command_env,
+    'REDCUBE_PYTHON_COMMAND',
+  );
+  assert.equal(
     activationPackage.verified_preconditions.includes('reachable upstream Hermes-Agent API server'),
     true,
   );
@@ -45,7 +49,19 @@ test('upstream Hermes-Agent activation package is closed out as the frozen upstr
     true,
   );
   assert.equal(activationPackage.connection_proof.fresh_evidence.includes('hermes gateway run -q'), true);
+  assert.equal(
+    activationPackage.connection_proof.fresh_evidence.includes('python3 -c \"import sys; import playwright; print(sys.executable)\"'),
+    true,
+  );
   assert.equal(activationPackage.known_external_risks[0].includes('RedactingFormatter'), true);
+  assert.equal(
+    activationPackage.known_external_risks.some((item) => item.includes('REDCUBE_PYTHON_COMMAND')),
+    true,
+  );
+  assert.equal(
+    activationPackage.closeout.suite_result,
+    'fresh_route_and_preflight_proof_passed_on_current_branch',
+  );
   assert.equal(currentProgram.current_state.foundation_milestones.upstream_hermes_agent_activation_package.status, 'closeout_completed');
   assert.equal(
     currentProgram.current_state.next_activation_package.contract,
@@ -80,6 +96,7 @@ test('public and maintainer docs point the cutover truth to the upstream activat
   assert.equal(status.includes('probe-upstream-hermes-agent.mjs'), true);
   assert.equal(status.includes('RedactingFormatter'), true);
   assert.equal(status.includes('REDCUBE_HERMES_GATEWAY_COMMAND'), true);
+  assert.equal(brief.includes('`REDCUBE_PYTHON_COMMAND`'), true);
   assert.equal(brief.includes('`/v1/health`'), true);
   assert.equal(brief.includes('`/v1/runs/{run_id}/events`'), true);
   assert.equal(brief.includes('`hermes gateway run -q`'), true);

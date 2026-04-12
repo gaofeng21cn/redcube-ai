@@ -18,3 +18,6 @@ export {
   validateSourceAugmentationRequestContract,
   validateSourceAugmentationResultContract,
 } from './source-augmentation-contract.js';
+export {
+  resolveRedCubePythonCommand,
+} from './python-command.js';

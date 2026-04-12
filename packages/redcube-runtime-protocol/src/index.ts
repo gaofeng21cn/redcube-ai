@@ -21,6 +21,9 @@ import {
   validateSourceAugmentationRequestContract as validateSourceAugmentationRequestContractJs,
   validateSourceAugmentationResultContract as validateSourceAugmentationResultContractJs,
 } from './source-augmentation-contract.js';
+import {
+  resolveRedCubePythonCommand as resolveRedCubePythonCommandJs,
+} from './python-command.js';
 
 import type {
   BuildSourceTruthConsumptionSummaryOptions,
@@ -45,6 +48,8 @@ import type {
   SourceTruthConsumptionSummary,
   RunTelemetryEnvelope,
   RuntimeErrorKind,
+  ResolvedRedCubePythonCommand,
+  ResolveRedCubePythonCommandOptions,
   SourceArtifactPaths,
   SourceReadinessSummary,
   SourceAugmentationRequestContract,
@@ -110,6 +115,12 @@ export function validateSourceAugmentationResultContract(
   return validateSourceAugmentationResultContractJs(contract, options) as ValidationResult;
 }
 
+export function resolveRedCubePythonCommand(
+  options: ResolveRedCubePythonCommandOptions = {},
+): ResolvedRedCubePythonCommand {
+  return resolveRedCubePythonCommandJs(options) as ResolvedRedCubePythonCommand;
+}
+
 export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 };
@@ -137,6 +148,8 @@ export type {
   SourceTruthConsumptionSummary,
   RunTelemetryEnvelope,
   RuntimeErrorKind,
+  ResolvedRedCubePythonCommand,
+  ResolveRedCubePythonCommandOptions,
   SourceArtifactPaths,
   SourceReadinessSummary,
   SourceAugmentationRequestContract,

@@ -1,0 +1,103 @@
+{
+  "target_shape_id": "upstream_hermes_agent_final_target_shape",
+  "date_anchor": "2026-04-12",
+  "status": "closeout_completed",
+  "target_goal": {
+    "label": "OPL-callable RedCube visual-domain node on upstream Hermes-Agent runtime substrate",
+    "summary": "Freeze the final target shape in which either a direct RedCube product entry or a future OPL Gateway handoff converges onto the same service-safe RedCube domain entry, while upstream Hermes-Agent owns runtime substrate and RedCube owns visual-domain truth."
+  },
+  "final_target_route": {
+    "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
+    "opl_federated_entry": "User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces"
+  },
+  "runtime_boundary": {
+    "runtime_owner": "upstream_hermes_agent",
+    "redcube_owns": [
+      "gateway -> family -> profile -> pack authority",
+      "visual-domain truth and canonical artifacts",
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "must_not_claim": [
+      "repo-local managed runtime pilot is the long-term runtime owner",
+      "service-safe domain entry already equals a landed end-user product entry",
+      "RedCube AI became the whole OPL"
+    ]
+  },
+  "entry_surface_contract": {
+    "formal_entry": {
+      "default_formal_entry": "CLI",
+      "supported_protocol_layer": [
+        "MCP"
+      ],
+      "internal_controller_surface": "controller",
+      "repo_verified": [
+        "CLI",
+        "MCP"
+      ]
+    },
+    "service_safe_domain_entry": {
+      "entry_contract_id": "redcube_service_safe_domain_entry",
+      "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
+      "callable_surface": "@redcube/gateway invokeDomainEntry"
+    },
+    "future_product_entry": {
+      "status": "not_landed_yet",
+      "must_converge_with": [
+        "service-safe domain entry contract",
+        "OPL handoff envelope"
+      ]
+    },
+    "opl_handoff_contract": {
+      "minimum_fields": [
+        "target_domain_id",
+        "task_intent",
+        "entry_mode",
+        "workspace_locator",
+        "runtime_session_contract",
+        "return_surface_contract"
+      ],
+      "reference_doc": "docs/references/lightweight_product_entry_and_opl_handoff.md"
+    }
+  },
+  "durable_truth_contract": {
+    "durable_ids": [
+      "program_id",
+      "topic_id",
+      "deliverable_id",
+      "run_id"
+    ],
+    "canonical_surfaces": [
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "must_stay_on_redcube_side": [
+      "delivery contract hydration",
+      "review-state truth",
+      "publication projection truth"
+    ]
+  },
+  "current_gap": {
+    "repo_verified_today": [
+      "upstream Hermes-Agent owns route / managed run execution",
+      "RedCube service-safe domain entry is callable",
+      "RedCube still owns visual-domain truth"
+    ],
+    "not_landed_yet": [
+      "mature end-user RedCube product entry",
+      "OPL product-entry handoff running as a repo-verified user-facing route"
+    ],
+    "hard_blockers": []
+  },
+  "excluded_scope": [
+    "chat UI or natural-language shell",
+    "new family onboarding",
+    "controller expansion",
+    "academic poster expansion",
+    "repackaging repo-local Hermes naming as upstream proof"
+  ]
+}

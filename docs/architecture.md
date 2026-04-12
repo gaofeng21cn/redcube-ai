@@ -41,6 +41,22 @@
 
 在这层 envelope 之上，`RedCube AI` 再补充 `deliverable_family`、`topic_id`、`deliverable_id` 这类 domain payload。
 
+## 最终目标形态
+
+当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+与之对应的 direct domain 路线则是：
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+这里的关键约束是：
+
+- future `RedCube Product Entry` 和 future `OPL Gateway` handoff 必须共用同一个 service-safe domain entry contract
+- today repo-verified 的还是 `CLI` / `MCP` 与 `invokeDomainEntry`
+- 成熟的最终用户产品入口仍未落地
+
 ## Hermes Kernel 与 visual executor 的分工
 
 `Hermes Kernel` 在 `RedCube AI` 里的目标职责是：

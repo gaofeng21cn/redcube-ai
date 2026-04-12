@@ -33,6 +33,7 @@ The current truthful stop boundary is: upstream `Hermes-Agent` run ownership is 
 - Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth and operator surfaces.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Product-entry target: grow a lightweight domain `product entry` that can be reached directly or through `OPL` handoff without changing the visual-domain boundary.
+- Frozen final target shape: [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md) (Chinese only)
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)
 - Service-safe domain entry adapter: [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md) (Chinese only)

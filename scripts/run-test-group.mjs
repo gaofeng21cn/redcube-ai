@@ -9,8 +9,11 @@ import {
   readHermesAgentUpstreamConfig,
 } from '../packages/redcube-hermes-agent-client/src/index.js';
 import {
+  buildNodeTestArgs,
   readHermesGatewayLaunchConfig,
   DEFAULT_HERMES_GATEWAY_COMMAND,
+  LIVE_UPSTREAM_GROUP_NAMES,
+  resolveRedCubePythonCommand,
 } from './run-test-group-lib.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
@@ -73,6 +76,7 @@ const META = [
   'tests/typescript-runtime-family-surfaces.test.js',
   'tests/typescript-service-boundaries.test.js',
   'tests/upstream-hermes-agent-activation-package.test.js',
+  'tests/upstream-hermes-agent-final-target-shape.test.js',
   'tests/xiaohongshu-overlay.test.js',
 ];
 
@@ -125,6 +129,7 @@ const FAST = [
   'tests/service-safe-domain-entry.test.js',
   'tests/source-augmentation-provider.test.js',
   'tests/upstream-hermes-agent-activation-package.test.js',
+  'tests/upstream-hermes-agent-final-target-shape.test.js',
   'tests/upstream-hermes-agent-probe.test.js',
 ];
 
@@ -135,8 +140,6 @@ const GROUPS = {
   e2e: E2E,
   full: [...META, ...INTEGRATION, ...E2E],
 };
-const LIVE_UPSTREAM_GROUPS = new Set(['integration', 'e2e', 'full']);
-
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -229,9 +232,12 @@ async function preflightLiveUpstreamRunSurface({ baseUrl, modelName }) {
 }
 
 async function prepareLiveUpstream(groupName) {
-  if (!LIVE_UPSTREAM_GROUPS.has(groupName)) {
+  if (!LIVE_UPSTREAM_GROUP_NAMES.has(groupName)) {
     return null;
   }
+
+  const pythonCommand = resolveRedCubePythonCommand();
+  process.env.REDCUBE_PYTHON_COMMAND = pythonCommand.command;
 
   const handle = startHermesGateway();
   try {
@@ -255,6 +261,7 @@ async function prepareLiveUpstream(groupName) {
   if (handle.launchCommand !== DEFAULT_HERMES_GATEWAY_COMMAND) {
     process.stdout.write(`[run-test-group] live upstream launch override: ${handle.launchCommand}\n`);
   }
+  process.stdout.write(`[run-test-group] live upstream python command: ${pythonCommand.command}\n`);
   process.stdout.write('[run-test-group] live upstream run-surface preflight passed\n');
   process.stdout.write(`[run-test-group] live upstream ready: ${handle.baseUrl}\n`);
   return handle;
@@ -314,10 +321,10 @@ assertTrackedFiles(E2E, 'e2e');
 assertTrackedFiles(FAST, 'fast');
 assertPartition();
 
-const liveUpstreamHandle = await prepareLiveUpstream(groupName);
+  const liveUpstreamHandle = await prepareLiveUpstream(groupName);
 
 try {
-  const result = spawnSync(process.execPath, ['--test', ...forwardedArgs, ...GROUPS[groupName]], {
+  const result = spawnSync(process.execPath, [...buildNodeTestArgs({ groupName, forwardedArgs }), ...GROUPS[groupName]], {
     stdio: 'inherit',
     cwd: repoRoot,
     env: process.env,

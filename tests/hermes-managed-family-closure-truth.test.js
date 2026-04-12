@@ -12,7 +12,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-test('current program points to Hermes managed family closure truth after stable family closure absorption', () => {
+test('managed family closure truth remains historical provenance after upstream runtime owner cutover', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -22,9 +22,14 @@ test('current program points to Hermes managed family closure truth after stable
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.tranche_id, 'hermes_managed_family_closure_truth');
   assert.equal(contract.predecessor_tranche, predecessor.tranche_id);
-  assert.equal(currentProgram.current_state.phase_label, 'Hermes / managed family closure truth');
-  assert.equal(currentProgram.current_state.workstream, 'hermes_managed_family_closure_truth');
-  assert.equal(currentProgram.current_state.active_baton.id, 'hermes_managed_family_closure_truth');
+  assert.equal(
+    currentProgram.current_state.foundation_milestones.hermes_managed_family_closure_truth.status,
+    'historical_local_migration_artifact',
+  );
+  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
+  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
+  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.active_baton.status, 'historical_local_migration_artifact');
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.tranche_contract,
     TRANCHE_CONTRACT,
@@ -49,12 +54,7 @@ test('current program points to Hermes managed family closure truth after stable
     currentProgram.current_state.active_baton.scope.managed_preflight_fail_closed.includes('stop_after_stage'),
     true,
   );
-  assert.equal(
-    currentProgram.current_state.stop_conditions.includes(
-      'managed web runtime semantics need a separate frozen activation package',
-    ),
-    true,
-  );
+  assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, false);
   assert.equal(
     contract.required_behavior.some((item) => item.includes('validates stop_after_stage')),
     true,
