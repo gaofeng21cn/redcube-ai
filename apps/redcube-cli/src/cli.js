@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { realpathSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
@@ -99,6 +100,99 @@ export function resolveWorkspaceRoot(options, cwd = process.cwd) {
   return options.workspaceRoot || options.rootDir || cwd();
 }
 
+function resolveRepoRoot() {
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+}
+
+function loadServiceSafeDomainEntryContract() {
+  return JSON.parse(
+    readFileSync(
+      path.join(resolveRepoRoot(), 'contracts', 'runtime-program', 'service-safe-domain-entry-adapter.json'),
+      'utf-8',
+    ),
+  );
+}
+
+function requireTextField(fieldName, value) {
+  const text = String(value || '').trim();
+  if (!text) {
+    throw new Error(`${fieldName} 不能为空`);
+  }
+  return text;
+}
+
+function requireProductEntryMode(value) {
+  const mode = requireTextField('entry_mode', value);
+  if (mode !== 'direct' && mode !== 'opl-handoff') {
+    throw new Error(`entry_mode 不支持: ${mode}`);
+  }
+  return mode;
+}
+
+function buildProductEntry(options, cwd = process.cwd) {
+  const contract = loadServiceSafeDomainEntryContract();
+  const workspaceRoot = realpathSync(resolveWorkspaceRoot(options, cwd));
+  const taskIntent = requireTextField('task_intent', options.taskIntent);
+  const entryMode = requireProductEntryMode(options.entryMode);
+  const overlay = requireTextField('deliverable_family', options.overlay);
+  const topicId = requireTextField('topic_id', options.topicId);
+  const deliverableId = requireTextField('deliverable_id', options.deliverableId);
+  const expectedSurfaceKind = contract.validation?.task_intent_surface_kind_map?.[taskIntent];
+  if (!expectedSurfaceKind) {
+    throw new Error(`Unsupported task_intent: ${taskIntent}`);
+  }
+
+  const route = String(options.route || '').trim();
+  if (taskIntent === 'run_deliverable_route' && !route) {
+    throw new Error('domain_payload.route 不能为空');
+  }
+
+  const commandBase = `redcube --workspace-root ${workspaceRoot}`;
+  const domainPayload = {
+    deliverable_family: overlay,
+    topic_id: topicId,
+    deliverable_id: deliverableId,
+    route: route || null,
+    adapter: String(options.adapter || '').trim() || null,
+    user_intent: String(options.userIntent || '').trim() || null,
+    stop_after_stage: String(options.stopAfterStage || '').trim() || null,
+    mode: String(options.mode || '').trim() || null,
+    baseline_deliverable_id: String(options.baselineDeliverableId || '').trim() || null,
+  };
+
+  return {
+    ok: true,
+    command: 'product-entry',
+    surface_kind: 'product_entry',
+    product_entry: {
+      entry_kind: 'redcube_product_entry',
+      entry_contract_id: contract.entry_contract_id,
+      target_domain_id: contract.opl_handoff_envelope.target_domain_id,
+      task_intent: taskIntent,
+      entry_mode: entryMode,
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      runtime_session_contract: {
+        ...contract.runtime_session_contract,
+      },
+      return_surface_contract: {
+        surface_kind: expectedSurfaceKind,
+        durable_truth_surfaces: contract.return_surface_contract.durable_truth_surfaces,
+        entry_adapter: contract.owner_surface,
+      },
+      domain_payload: domainPayload,
+      commands: {
+        direct_execute: taskIntent === 'run_managed_deliverable'
+          ? `${commandBase} deliverable execute --overlay ${overlay} --topic-id ${topicId} --deliverable-id ${deliverableId}`
+          : `${commandBase} deliverable run --overlay ${overlay} --topic-id ${topicId} --deliverable-id ${deliverableId} --route ${route}`,
+        workspace_doctor: `${commandBase} workspace doctor`,
+        review_projection: `${commandBase} review projection --topic-id ${topicId}`,
+      },
+    },
+  };
+}
+
 function buildCommonFlows(overlayCatalog) {
   return Object.fromEntries(
     overlayCatalog.overlays.map((overlay) => [
@@ -190,6 +284,12 @@ function buildCommandHelp(commandKey) {
       gateway_action: 'runtimeWatch',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId', 'runId'],
     },
+    'product-entry': {
+      summary: '构建可直接进入或供 OPL handoff 复用的轻量 domain product-entry envelope。',
+      usage: 'redcube product-entry --workspace-root <dir> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> --task-intent <run_managed_deliverable|run_deliverable_route> --entry-mode <direct|opl-handoff> [--route <stage>]',
+      gateway_action: 'buildProductEntry',
+      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId', 'taskIntent', 'entryMode'],
+    },
   };
   const entry = catalog[commandKey];
   if (!entry) {
@@ -280,6 +380,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       },
       {
+        task: '生成 direct / OPL handoff 共用的 lightweight product entry envelope',
+        command: 'redcube product-entry --workspace-root <dir> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> --task-intent <run_managed_deliverable|run_deliverable_route> --entry-mode <direct|opl-handoff>',
+      },
+      {
         task: '托管执行整个交付链路并查看 managed 进度',
         command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] && redcube managed get --workspace-root <dir> --managed-run-id <id>',
       },
@@ -344,6 +448,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
       reviewWatch: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline|approve_publish|promote_publish|promote_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>] [--promoted-reference-id <id>]',
+      productEntry: 'redcube product-entry --workspace-root <dir> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> --task-intent <run_managed_deliverable|run_deliverable_route> --entry-mode <direct|opl-handoff> [--route <stage>]',
       profile: 'redcube profile --action <list|bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };
@@ -527,6 +632,10 @@ export async function executeCli(argv, deps = {}) {
     }
 
     throw new Error('deliverable 命令仅支持 create|get|audit|execute|run');
+  }
+
+  if (command === 'product-entry') {
+    return buildProductEntry(options, cwd);
   }
 
   if (command === 'managed') {

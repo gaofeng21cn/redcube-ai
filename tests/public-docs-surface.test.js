@@ -78,29 +78,35 @@ test('docs freeze lightweight product entry and OPL handoff without overclaiming
 
   assert.equal(rootReadme.includes('`operator entry` and `agent entry`'), true);
   assert.equal(rootReadme.includes('`product entry`: not landed yet'), true);
+  assert.equal(rootReadme.includes('`redcube product-entry`'), true);
   assert.equal(rootReadme.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`'), true);
   assert.equal(rootReadme.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`'), true);
   assert.equal(rootReadme.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`'), false);
   assert.equal(rootReadme.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`'), false);
   assert.equal(rootReadmeZh.includes('`operator entry` 和 `agent entry`'), true);
   assert.equal(rootReadmeZh.includes('`product entry`：真正面向最终用户的 direct entry 还没有成熟落地'), true);
+  assert.equal(rootReadmeZh.includes('`redcube product-entry`'), true);
   assert.equal(rootReadmeZh.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`'), true);
   assert.equal(rootReadmeZh.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`'), true);
   assert.equal(rootReadmeZh.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`'), false);
 
   assert.equal(docsReadme.includes('operator entry'), true);
   assert.equal(docsReadme.includes('lightweight domain `product entry`'), true);
+  assert.equal(docsReadme.includes('redcube product-entry'), true);
   assert.equal(docsReadme.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
   assert.equal(docsReadmeZh.includes('operator entry'), true);
   assert.equal(docsReadmeZh.includes('轻量 domain `product entry`'), true);
+  assert.equal(docsReadmeZh.includes('redcube product-entry'), true);
   assert.equal(docsReadmeZh.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
 
   assert.equal(project.includes('lightweight domain `product entry`'), true);
+  assert.equal(project.includes('redcube product-entry'), true);
   assert.equal(architecture.includes('User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
   assert.equal(architecture.includes('Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), false);
   assert.equal(architecture.includes('target_domain_id'), true);
   assert.equal(architecture.includes('deliverable_family'), true);
   assert.equal(status.includes('operator entry'), true);
+  assert.equal(status.includes('redcube product-entry'), true);
   assert.equal(status.includes('OPL -> RedCube'), true);
 
   assert.equal(handoff.includes('target_domain_id'), true);
@@ -110,6 +116,7 @@ test('docs freeze lightweight product entry and OPL handoff without overclaiming
   assert.equal(handoff.includes('runtime_session_contract'), true);
   assert.equal(handoff.includes('return_surface_contract'), true);
   assert.equal(handoff.includes('deliverable_family'), true);
+  assert.equal(handoff.includes('redcube product-entry'), true);
   assert.equal(handoff.includes('还没有成熟的用户级 `product entry`'), true);
   assert.equal(handoff.includes('当前 route / managed run surface 已切到上游 `Hermes-Agent`'), true);
   assert.equal(handoff.includes('Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), false);

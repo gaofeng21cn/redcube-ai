@@ -7,7 +7,7 @@
 - 当前本地宿主：`Codex` operator / development host
 - 当前主线：`Auto-only`
 - formal-entry matrix：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
-- 当前入口真相：`operator entry` 与 `agent entry` 已存在；成熟的 lightweight `product entry` 仍未落地
+- 当前入口真相：`operator entry` 与 `agent entry` 已存在；`redcube product-entry` 已经把 lightweight direct-entry shell 作为 repo-tracked contract surface 落地，但成熟的最终用户 `product entry` 仍未落地
 - 当前统一协作模型：目标由 `Hermes-Agent` 承担 runtime substrate / orchestration，`RedCube AI` 继续持有 domain authority 与 visual truth，具体 deliverable execution 保持 executor-adapter 可插拔
 - 已冻结的最终目标形态：`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 - direct domain 目标形态：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
@@ -35,17 +35,18 @@
 2. `runDeliverableRoute`、`runManagedDeliverable`、`getManagedRun` 与 `superviseManagedRun` 现在通过上游 `Hermes-Agent` API server 执行 run surface，并在 upstream proof 缺失时 fail-closed。
 3. `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 的 domain truth 仍由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 收口，没有改写 visual-domain boundary。
 4. service-safe `RedCube` domain entry adapter 已冻结为 `redcube_service_safe_domain_entry`，供 future `OPL Gateway` 使用；它仍不是成熟的最终用户产品入口。
-5. `OPL -> RedCube` 的最小 handoff envelope 已冻结，并且 `invokeDomainEntry` 现在会对缺失 `entry_mode`、缺失 `runtime_session_contract.runtime_owner`、缺失 `return_surface_contract.surface_kind` 以及 task-intent / surface-kind 不匹配的请求 fail-closed；但它仍是 future product-entry contract，不是当前成熟的用户入口。
-6. 当前真实 upstream proof 仍以 `hermes gateway run -q` 为默认口径；若验证宿主上的全局 `hermes` CLI 仍落后于上游 `RedactingFormatter` 启动修复，可显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream gateway 启动命令，这属于 honest upstream launch override，不是 repo-local 兜底。
-7. `scripts/run-test-group.mjs` 的 integration / e2e / full live lane 现在会先做 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight；只要 run-event surface 没有 terminal event，就会在套件开始前 fail-closed。
-8. 同一组 live lane 现在还会用 `--test-concurrency=1` 串行化 test files，以尊重当前 upstream Hermes 的 concurrent-run ceiling，而不是把 repo 自己的验证并发误写成 runtime 主线能力。
-9. 同一组 live lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed，而不是继续假设 upstream Hermes 自带 virtualenv 已经满足 screenshot review / export helper 依赖。
-10. 在 `2026-04-12` 的当前验证宿主上，标准 `run-test-group` live launcher 已 fresh 通过 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight，并拿到 terminal `run.completed` event；当前 closeout proof 见 `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`。
-11. “最终目标形态”文档冻结已经完成，但它冻结的是理想型与边界，不是对 mature product entry 已落地的过度宣称。
-12. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
-13. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
-14. `npm run test:e2e` 已在当前宿主 fresh 全绿，覆盖 `ppt_deck` 的 `screenshot_review / export_pptx / optimize_existing` 与 `xiaohongshu` 的 `publish_copy / export_bundle / optimize_existing`；`node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'` 也已 fresh 全绿，补齐 guarded `poster_onepager` 的 live managed proof。
-15. 因此 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb；当前真实 gap 已不再是 live blocker，而是 mature `RedCube Product Entry` 与 repo-verified `OPL Product Entry -> OPL Gateway -> RedCube` 用户前台路线仍未落地。
+5. `redcube product-entry` 已 landed，并且会为 `run_managed_deliverable` / `run_deliverable_route` 输出 direct / `OPL` handoff 共用的 shared envelope；但它仍是 lightweight shell，不是当前成熟的用户入口。
+6. `OPL -> RedCube` 的最小 handoff envelope 已冻结，并且 `invokeDomainEntry` 现在会对缺失 `entry_mode`、缺失 `runtime_session_contract.runtime_owner`、缺失 `return_surface_contract.surface_kind` 以及 task-intent / surface-kind 不匹配的请求 fail-closed；但它仍是 future product-entry contract，不是当前成熟的用户入口。
+7. 当前真实 upstream proof 仍以 `hermes gateway run -q` 为默认口径；若验证宿主上的全局 `hermes` CLI 仍落后于上游 `RedactingFormatter` 启动修复，可显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream gateway 启动命令，这属于 honest upstream launch override，不是 repo-local 兜底。
+8. `scripts/run-test-group.mjs` 的 integration / e2e / full live lane 现在会先做 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight；只要 run-event surface 没有 terminal event，就会在套件开始前 fail-closed。
+9. 同一组 live lane 现在还会用 `--test-concurrency=1` 串行化 test files，以尊重当前 upstream Hermes 的 concurrent-run ceiling，而不是把 repo 自己的验证并发误写成 runtime 主线能力。
+10. 同一组 live lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed，而不是继续假设 upstream Hermes 自带 virtualenv 已经满足 screenshot review / export helper 依赖。
+11. 在 `2026-04-12` 的当前验证宿主上，标准 `run-test-group` live launcher 已 fresh 通过 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight，并拿到 terminal `run.completed` event；当前 closeout proof 见 `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`。
+12. “最终目标形态”文档冻结已经完成，但它冻结的是理想型与边界，不是对 mature product entry 已落地的过度宣称。
+13. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
+14. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
+15. `npm run test:e2e` 已在当前宿主 fresh 全绿，覆盖 `ppt_deck` 的 `screenshot_review / export_pptx / optimize_existing` 与 `xiaohongshu` 的 `publish_copy / export_bundle / optimize_existing`；`node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'` 也已 fresh 全绿，补齐 guarded `poster_onepager` 的 live managed proof。
+16. 因此 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb；当前真实 gap 已不再是 live blocker，而是 mature `RedCube Product Entry` 与 repo-verified `OPL Product Entry -> OPL Gateway -> RedCube` 用户前台路线仍未落地。
 
 ## 默认验证
 

@@ -11,6 +11,16 @@
 
 但它还没有成熟的用户级 `product entry`。
 也就是说，当前用户最顺的路径仍然是“通过自己的 agent 调 `RedCube AI`”，而不是直接进入一个稳定产品前台。
+不过现在仓内已经通过 `redcube product-entry` 落下了一层 repo-tracked lightweight shell：
+
+- `redcube product-entry`
+  - 为 `run_managed_deliverable` 与 `run_deliverable_route` 输出 direct / `OPL` handoff 共用的 shared envelope
+  - 对缺失 `route`、缺失最小字段或不支持的 `entry_mode` 保持 fail-closed
+
+因此当前更准确的表述是：
+
+- 轻量 direct-entry shell 已 landed
+- 成熟的最终用户 `product entry` 仍未 landed
 
 ## 2. 目标形态
 
@@ -75,7 +85,7 @@
 ## 6. 下一步落地方向
 
 1. 保持 `CLI / MCP / controller` 的 formal-entry 语义稳定，不让产品入口叙事反向污染当前可验证入口。
-2. 先补 `RedCube Product Entry` 的 contract shell，让 direct entry 与 OPL handoff 进入同一条命令/服务合同。
-3. 在已经冻结的 upstream `Hermes-Agent` substrate 证据之上，把 runtime session、resume、watch、route 接到真实 product entry 壳上。
+2. 以已 landed 的 `redcube product-entry` contract shell 为基线，让 direct entry 与 `OPL` handoff 继续停留在同一条命令/服务合同上。
+3. 在已经冻结的 upstream `Hermes-Agent` substrate 证据之上，把 runtime session、resume、watch、route 继续接到更完整的 product entry 壳上。
 
 这里也要继续诚实：最终目标形态已经冻结，但成熟的最终用户产品入口仍未落地。

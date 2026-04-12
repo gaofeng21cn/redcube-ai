@@ -63,6 +63,9 @@
 - `agent entry`：由 `Codex` 或其他 host-agent 调用的 `CLI + MCP`
 - `product entry`：真正面向最终用户的 direct entry 还没有成熟落地
 
+现在仓内已经通过 `redcube product-entry` 落下一层 repo-tracked 的 lightweight product-entry shell。
+它已经能够为 `run_managed_deliverable` 与 `run_deliverable_route` 输出 direct / `OPL` handoff 共用的 envelope，但当前仍只是 contract shell，不是成熟的最终用户前台。
+
 这个仓已经冻结的 direct domain 产品入口路线是：
 
 `User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
@@ -86,6 +89,7 @@
 - `return_surface_contract`
 
 在这层共享 envelope 之上，`RedCube AI` 再补充视觉交付特有 payload，例如 `deliverable_family`、`topic_id`、`deliverable_id`。
+这层共享 envelope 现在已经能通过 `redcube product-entry` 做 repo-verified 输出。
 
 内部参考说明见：[轻量产品入口与 OPL Handoff](docs/references/lightweight_product_entry_and_opl_handoff.md)。
 

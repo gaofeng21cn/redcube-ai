@@ -4,7 +4,7 @@
 
 This bilingual index is the default public surface for `RedCube AI`.
 It stays aligned with the current truthful cutover: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; route and managed run surfaces now execute through real upstream `Hermes-Agent`, while visual-domain truth remains local to `RedCube AI`. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
-The current public entry truth is also explicit: `operator entry` and `agent entry` are real today, while a mature domain-level `product entry` is still future work.
+The current public entry truth is also explicit: `operator entry` and `agent entry` are real today, while a mature domain-level `product entry` is still future work. A repo-tracked lightweight shell is now landed through `redcube product-entry`, but it should still be read as a shared-envelope contract surface rather than a mature front desk.
 
 ## Core Maintainer Working Set
 
@@ -33,6 +33,7 @@ The current truthful stop boundary is: upstream `Hermes-Agent` run ownership is 
 - Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth and operator surfaces.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Product-entry target: grow a lightweight domain `product entry` that can be reached directly or through `OPL` handoff without changing the visual-domain boundary.
+- Current landed shell: `redcube product-entry` now emits the shared direct / `OPL` handoff envelope for `run_managed_deliverable` and `run_deliverable_route`.
 - Frozen final target shape: [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md) (Chinese only)
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)
