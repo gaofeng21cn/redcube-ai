@@ -51,6 +51,35 @@
 当前仓库主线按 `Auto-only` 理解；如果未来要做 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate。
 只要保持同一套 substrate contract 与 domain boundary，后续可以迁移到托管 web runtime，而不改变本项目的 domain 身份。
 
+## 入口分层与产品边界
+
+当前仓内最强、最诚实的入口仍然是 `operator entry` 和 `agent entry`，也就是说：
+
+- `operator entry`：给人类操作同事使用的命令、workspace 准备、调试、审阅和导出控制面
+- `agent entry`：由 `Codex` 或其他 host-agent 调用的 `CLI + MCP`
+- `product entry`：真正面向最终用户的 direct entry 还没有成熟落地
+
+这个仓理想中的 domain 级产品入口形态应是：
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
+
+而在 `OPL` 家族级入口里，应兼容下面这条顶层路线：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
+
+这条 handoff 至少应共享一套最小 envelope：
+
+- `target_domain_id`
+- `task_intent`
+- `entry_mode`
+- `workspace_locator`
+- `runtime_session_contract`
+- `return_surface_contract`
+
+在这层共享 envelope 之上，`RedCube AI` 再补充视觉交付特有 payload，例如 `deliverable_family`、`topic_id`、`deliverable_id`。
+
+内部参考说明见：[轻量产品入口与 OPL Handoff](docs/references/lightweight_product_entry_and_opl_handoff.md)。
+
 当前主线还冻结了一套明确的执行句柄与持久表面合同：
 
 - `program_id`：active mainline 的 control-plane 指针

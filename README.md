@@ -50,6 +50,36 @@ Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` re
 The current repository mainline is `Auto-only`; if a future `Human-in-the-loop` product is built, it should reuse the same substrate as a compatible sibling or upper-layer product.
 As long as the same substrate contracts and domain boundaries are kept, this line can later move to a managed web runtime without changing the domain identity.
 
+## Entry Modes And Product Boundary
+
+Today, the strongest repo-verified entry surfaces are still `operator entry` and `agent entry`.
+That means:
+
+- `operator entry`: human/operator commands, workspace preparation, debugging, review, and export control
+- `agent entry`: `CLI` plus `MCP`, called by `Codex` or another host-agent
+- `product entry`: not landed yet as a mature user-facing direct entry
+
+The target domain-facing shape is:
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
+
+Inside the larger `OPL` family, the compatible top-level route is:
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
+
+That handoff should carry one shared minimum envelope:
+
+- `target_domain_id`
+- `task_intent`
+- `entry_mode`
+- `workspace_locator`
+- `runtime_session_contract`
+- `return_surface_contract`
+
+On top of that, `RedCube AI` adds visual-deliverable payload such as `deliverable_family`, `topic_id`, and `deliverable_id`.
+
+For the internal architecture note, see [Lightweight Product Entry And OPL Handoff](docs/references/lightweight_product_entry_and_opl_handoff.md).
+
 The current mainline also freezes one explicit execution-handle and durable-surface contract:
 
 - `program_id` is the active mainline control-plane pointer.

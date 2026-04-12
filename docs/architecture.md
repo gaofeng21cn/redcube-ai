@@ -9,6 +9,38 @@
 当前仓内可执行的 runtime 基线仍是 repo-local managed runtime + 本地 operator host。
 长线目标才是把 session / run / watch / memory / scheduling 这类 substrate 责任迁到真实的上游 `Hermes-Agent`，同时保持上面的 domain chain 不变。
 
+## 入口 taxonomy 与 OPL handoff
+
+当前这条主线需要区分三层入口：
+
+- `operator entry`
+  - 给人类操作同事使用的命令、调试、审阅和导出入口
+- `agent entry`
+  - 给 `Codex`、Claude Code、OpenClaw 这类 host-agent 使用的 `CLI` / `MCP`
+- `product entry`
+  - 给最终用户直接进入的产品入口
+
+当前真实状态是：前两层存在，第三层还没有成熟落地。
+
+目标中的 domain 级链路应是：
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
+
+与 `OPL` 的家族级衔接应是：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
+
+`OPL -> RedCube` 的最小 handoff envelope 至少包括：
+
+- `target_domain_id`
+- `task_intent`
+- `entry_mode`
+- `workspace_locator`
+- `runtime_session_contract`
+- `return_surface_contract`
+
+在这层 envelope 之上，`RedCube AI` 再补充 `deliverable_family`、`topic_id`、`deliverable_id` 这类 domain payload。
+
 ## 结构角色
 
 ### 1. Public docs

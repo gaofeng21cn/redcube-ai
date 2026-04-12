@@ -62,3 +62,49 @@ test('operator docs publish workspace structure and source augmentation executor
   assert.equal(executorContract.includes('request contract invalid'), true);
   assert.equal(executorContract.includes('result contract invalid'), true);
 });
+
+test('docs freeze lightweight product entry and OPL handoff without overclaiming runtime ownership', () => {
+  const rootReadme = readFileSync(path.join(repoRoot, 'README.md'), 'utf-8');
+  const rootReadmeZh = readFileSync(path.join(repoRoot, 'README.zh-CN.md'), 'utf-8');
+  const docsReadme = readFileSync(path.join(repoRoot, 'docs', 'README.md'), 'utf-8');
+  const docsReadmeZh = readFileSync(path.join(repoRoot, 'docs', 'README.zh-CN.md'), 'utf-8');
+  const project = readFileSync(path.join(repoRoot, 'docs', 'project.md'), 'utf-8');
+  const architecture = readFileSync(path.join(repoRoot, 'docs', 'architecture.md'), 'utf-8');
+  const status = readFileSync(path.join(repoRoot, 'docs', 'status.md'), 'utf-8');
+  const handoff = readFileSync(
+    path.join(repoRoot, 'docs', 'references', 'lightweight_product_entry_and_opl_handoff.md'),
+    'utf-8',
+  );
+
+  assert.equal(rootReadme.includes('`operator entry` and `agent entry`'), true);
+  assert.equal(rootReadme.includes('`product entry`: not landed yet'), true);
+  assert.equal(rootReadme.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`'), true);
+  assert.equal(rootReadme.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`'), true);
+  assert.equal(rootReadmeZh.includes('`operator entry` 和 `agent entry`'), true);
+  assert.equal(rootReadmeZh.includes('`product entry`：真正面向最终用户的 direct entry 还没有成熟落地'), true);
+  assert.equal(rootReadmeZh.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`'), true);
+
+  assert.equal(docsReadme.includes('operator entry'), true);
+  assert.equal(docsReadme.includes('lightweight domain `product entry`'), true);
+  assert.equal(docsReadme.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
+  assert.equal(docsReadmeZh.includes('operator entry'), true);
+  assert.equal(docsReadmeZh.includes('轻量 domain `product entry`'), true);
+  assert.equal(docsReadmeZh.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
+
+  assert.equal(project.includes('lightweight domain `product entry`'), true);
+  assert.equal(architecture.includes('User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), true);
+  assert.equal(architecture.includes('target_domain_id'), true);
+  assert.equal(architecture.includes('deliverable_family'), true);
+  assert.equal(status.includes('operator entry'), true);
+  assert.equal(status.includes('OPL -> RedCube'), true);
+
+  assert.equal(handoff.includes('target_domain_id'), true);
+  assert.equal(handoff.includes('task_intent'), true);
+  assert.equal(handoff.includes('entry_mode'), true);
+  assert.equal(handoff.includes('workspace_locator'), true);
+  assert.equal(handoff.includes('runtime_session_contract'), true);
+  assert.equal(handoff.includes('return_surface_contract'), true);
+  assert.equal(handoff.includes('deliverable_family'), true);
+  assert.equal(handoff.includes('还没有成熟的用户级 `product entry`'), true);
+  assert.equal(handoff.includes('当前 runtime substrate 仍未真实切到上游 `Hermes-Agent`'), true);
+});

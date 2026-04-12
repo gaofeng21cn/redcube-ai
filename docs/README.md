@@ -4,6 +4,7 @@
 
 This bilingual index is the default public surface for `RedCube AI`.
 It stays aligned with the current truth reset: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; the repository already has a usable local runtime baseline, but it has **not** landed a true upstream `Hermes-Agent` integration yet. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
+The current public entry truth is also explicit: `operator entry` and `agent entry` are real today, while a mature domain-level `product entry` is still future work.
 
 ## Core Maintainer Working Set
 
@@ -31,6 +32,7 @@ The current truthful stop boundary is: local managed-runtime baseline is landed,
 
 - Current repo-verified baseline: a repo-local managed runtime plus local operator host is still the executable shape today.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
+- Product-entry target: grow a lightweight domain `product entry` that can be reached directly or through `OPL` handoff without changing the visual-domain boundary.
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
@@ -66,6 +68,10 @@ The current truthful stop boundary is: local managed-runtime baseline is landed,
 - [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md) (absorbed provenance, Chinese only)
 - [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md) (absorbed provenance, Chinese only)
 
+### Internal reference notes
+
+- [Lightweight product entry and OPL handoff](references/lightweight_product_entry_and_opl_handoff.md) (Chinese only)
+
 ### For technical collaborators / agent executors
 
 - [Runtime architecture](runtime_architecture.md)
@@ -93,6 +99,7 @@ The current truthful stop boundary is: local managed-runtime baseline is landed,
 - `README*` and `docs/README*`: default bilingual public surface.
 - `docs/project.md`, `docs/status.md`, `docs/architecture.md`, `docs/invariants.md`, `docs/decisions.md`: AI / maintainer core working set.
 - `docs/program/*/*.md`: repo-tracked program briefs for the active mainline, absorbed tranche, and historical/provenance slices.
+- `docs/references/*`: repo-tracked internal reference notes, Chinese by default.
 - Detailed `docs/*.md`: repository-tracked internal/operator documents unless explicitly promoted.
 - `docs/policies/`: stable internal rules, Chinese by default.
 - `docs/superpowers/`: existing repo-tracked design archives may remain as internal history, but new local AI / Superpowers drafts should stay untracked by default.
