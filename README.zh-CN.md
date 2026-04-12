@@ -63,21 +63,13 @@
 - `agent entry`：由 `Codex` 或其他 host-agent 调用的 `CLI + MCP`
 - `product entry`：真正面向最终用户的 direct entry 还没有成熟落地
 
-这个仓理想中的 domain 级产品入口形态应是：
-
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
-
-而在 `OPL` 家族级入口里，应兼容下面这条顶层路线：
-
-`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
-
-当前已经冻结的最终目标形态，还可以再明确一层：
-
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-
-而 direct `RedCube` 入口最终也应收敛到同一条下游形态：
+这个仓已经冻结的 direct domain 产品入口路线是：
 
 `User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+而在 `OPL` 家族级入口里，顶层路线也必须收敛到同一条下游形态：
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 这条目标路线现在已经冻结在 `docs/program/upstream_hermes_agent_final_target_shape.md` 与 `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`。
 成熟的最终用户 `product entry` 仍未落地；当前 repo-verified、可调用的前身只是 service-safe domain entry shell 加上 `CLI` / `MCP`。

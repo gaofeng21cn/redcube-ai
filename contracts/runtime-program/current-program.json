@@ -125,7 +125,9 @@
     "green_baseline": {
       "credible": true,
       "clean_clone_required": true,
-      "blocked_by": [],
+      "blocked_by": [
+        "upstream_hermes_agent_live_verification_blocker"
+      ],
       "live_upstream_verification": {
         "default_gateway_command": "hermes gateway run -q --replace",
         "gateway_command_override_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
@@ -141,13 +143,14 @@
           "/v1/runs",
           "/v1/runs/{run_id}/events"
         ],
-        "current_host_status": "preflight_passed",
-        "current_host_blocking_reason": "none",
-        "current_host_stream_signal": "terminal_event_received",
+        "current_host_status": "focused_live_verification_blocked",
+        "current_host_blocking_reason": "focused ppt_deck live e2e currently fails at screenshot_review on the current host",
+        "current_host_stream_signal": "terminal_event_received_during_explicit_probe",
+        "current_host_blocker_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",
         "current_host_latest_route_proof": [
-          "2026-04-12: live upstream preflight passed on http://127.0.0.1:8642",
-          "2026-04-12: xiaohongshu baseline and optimize_existing chains both passed screenshot_review and publish_copy under live upstream",
-          "2026-04-12: deliverable-review-loop live route proofs advanced beyond screenshot_review without upstream run-surface regression"
+          "2026-04-12: explicit API-server launch passed live upstream probe on http://127.0.0.1:8642 with run.completed terminal event",
+          "2026-04-12: focused ppt_deck live e2e currently fails at screenshot_review under upstream Hermes-Agent",
+          "2026-04-12: scripts/verify.sh e2e also recorded a fail-closed preflight in which /v1/runs/{run_id}/events did not emit a terminal event"
         ]
       },
       "ci_quality_lane_requires": [
@@ -202,7 +205,13 @@
         "status": "closeout_completed",
         "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
         "brief": "docs/program/upstream_hermes_agent_service_safe_domain_entry.md",
-        "gateway_surface": "invokeDomainEntry"
+        "gateway_surface": "invokeDomainEntry",
+        "validation_mode": "fail_closed_on_missing_or_mismatched_opl_handoff_envelope"
+      },
+      "upstream_hermes_agent_live_verification_blocker": {
+        "status": "blocked_external_upstream_or_live_runtime",
+        "contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",
+        "brief": "docs/program/upstream_hermes_agent_live_verification_blocker.md"
       },
       "upstream_hermes_agent_final_target_shape": {
         "status": "closeout_completed",

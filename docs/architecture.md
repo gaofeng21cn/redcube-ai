@@ -22,13 +22,13 @@
 
 当前真实状态是：前两层存在，第三层还没有成熟落地。
 
-目标中的 domain 级链路应是：
+已经冻结的 direct domain 级链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS -> Executor Adapter -> Concrete Executor`
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
-与 `OPL` 的家族级衔接应是：
+与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -57,9 +57,9 @@
 - today repo-verified 的还是 `CLI` / `MCP` 与 `invokeDomainEntry`
 - 成熟的最终用户产品入口仍未落地
 
-## Hermes Kernel 与 visual executor 的分工
+## Hermes runtime substrate 与 visual executor 的分工
 
-`Hermes Kernel` 在 `RedCube AI` 里的目标职责是：
+上游 `Hermes runtime substrate` 在 `RedCube AI` 当前主线里的职责是：
 
 - session / run / watch / memory / scheduling
 - gateway / messaging / interrupt / resume
@@ -75,7 +75,7 @@
 
 更准确的目标是：
 
-- 由 `Hermes` 统一 runtime substrate / orchestration
+- 由上游 `Hermes-Agent` 统一 runtime substrate / orchestration
 - 由 `RedCube AI` 统一 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器，例如 repo-local pipeline、受控 host-agent、渲染 toolchain 或未来的 Hermes-native route
 

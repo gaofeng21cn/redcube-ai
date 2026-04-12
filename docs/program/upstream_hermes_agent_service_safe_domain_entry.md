@@ -44,6 +44,13 @@ RedCube domain payload 继续单独补：
 - `run_managed_deliverable`
 - `run_deliverable_route`
 
+当前 adapter 也按同一份合同 fail-closed：
+
+- 缺少 `entry_mode` 会直接拒绝
+- 缺少 `runtime_session_contract.runtime_owner` 会直接拒绝
+- 缺少 `return_surface_contract.surface_kind` 会直接拒绝
+- `run_managed_deliverable -> managed_run`、`run_deliverable_route -> route_run` 的 surface-kind 对应关系一旦不匹配也会直接拒绝
+
 ## 当前真相
 
 这不是成熟的用户产品入口，也不是聊天壳。

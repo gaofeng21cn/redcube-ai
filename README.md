@@ -63,21 +63,13 @@ That means:
 - `agent entry`: `CLI` plus `MCP`, called by `Codex` or another host-agent
 - `product entry`: not landed yet as a mature user-facing direct entry
 
-The target domain-facing shape is:
-
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
-
-Inside the larger `OPL` family, the compatible top-level route is:
-
-`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
-
-The final target shape we are freezing is one step more explicit:
-
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-
-A direct RedCube entry should converge onto the same downstream shape:
+The frozen domain-facing direct route is:
 
 `User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+Inside the larger `OPL` family, the compatible top-level route converges onto the same downstream shape:
+
+`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 That target is now frozen in `docs/program/upstream_hermes_agent_final_target_shape.md` and `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`.
 A mature end-user `product entry` is still not landed; today the repo-verified callable precursor is the service-safe domain entry shell plus `CLI` / `MCP`.

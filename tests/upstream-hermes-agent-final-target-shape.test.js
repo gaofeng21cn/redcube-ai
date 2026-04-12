@@ -80,7 +80,7 @@ test('canonical docs freeze the final target shape without overclaiming landed p
   assert.equal(docsReadmeZh.includes('upstream_hermes_agent_final_target_shape.md'), true);
   assert.equal(project.includes('OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
   assert.equal(status.includes('最终目标形态'), true);
-  assert.equal(status.includes('live upstream preflight 已能通过'), true);
+  assert.equal(status.includes('显式 API-server 启动的 focused upstream probe 仍可通过'), true);
   assert.equal(architecture.includes('RedCube service-safe domain entry'), true);
   assert.equal(positioning.includes('可调用的 visual-domain 产品 / 服务节点'), true);
   assert.equal(runtimeArchitecture.includes('runtime substrate -> RedCube service-safe domain entry -> visual-domain truth surfaces'), true);

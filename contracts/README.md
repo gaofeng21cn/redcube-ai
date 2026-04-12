@@ -10,6 +10,7 @@
 
 - `runtime-program/current-program.json`：当前 active mainline pointer
 - `runtime-program/upstream-hermes-agent-final-target-shape.json`：当前最终目标形态冻结件
+- `runtime-program/upstream-hermes-agent-live-verification-blocker.json`：当前 F4 live blocker 冻结件
 - `runtime-program/*.json`：absorbed tranche、prefrozen follow-on board 与 provenance contract
 
 这里不再保留 narrative 的 `project-truth/AGENTS.md` 层。

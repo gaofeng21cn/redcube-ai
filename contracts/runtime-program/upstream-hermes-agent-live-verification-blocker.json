@@ -1,0 +1,66 @@
+{
+  "blocker_id": "upstream_hermes_agent_live_verification_blocker",
+  "date_anchor": "2026-04-12",
+  "status": "blocked_external_upstream_or_live_runtime",
+  "scope": {
+    "phase_id": "F4_end_to_end_verification_and_absorb",
+    "board": "docs/program/upstream_hermes_agent_fast_cutover_board.md",
+    "runtime_owner": "upstream_hermes_agent"
+  },
+  "verified_passes": [
+    {
+      "surface": "service_safe_domain_entry_contract",
+      "summary": "service-safe OPL handoff envelope now fails closed on missing or mismatched minimum fields.",
+      "evidence": [
+        "tests/service-safe-domain-entry.test.js",
+        "contracts/runtime-program/service-safe-domain-entry-adapter.json"
+      ]
+    },
+    {
+      "surface": "focused_live_upstream_probe",
+      "summary": "explicit API-server launch on http://127.0.0.1:8642 produced a run.completed terminal event under upstream Hermes-Agent.",
+      "evidence": [
+        "API_SERVER_ENABLED=true API_SERVER_HOST=127.0.0.1 API_SERVER_PORT=8642 API_SERVER_MODEL_NAME=hermes-agent hermes gateway run --replace",
+        "REDCUBE_HERMES_UPSTREAM_BASE_URL=http://127.0.0.1:8642 REDCUBE_HERMES_UPSTREAM_MODEL=hermes-agent node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface"
+      ]
+    }
+  ],
+  "verified_blockers": [
+    {
+      "surface": "run_test_group.e2e_preflight",
+      "kind": "upstream_run_surface_failed",
+      "summary": "scripts/verify.sh e2e failed closed because /v1/runs/{run_id}/events did not emit a terminal event.",
+      "test": "scripts/verify.sh e2e",
+      "detail": "run events endpoint did not emit a terminal event"
+    },
+    {
+      "surface": "ppt_deck.screenshot_review",
+      "kind": "live_e2e_failed",
+      "summary": "focused live ppt_deck e2e currently fails at screenshot_review under upstream Hermes-Agent.",
+      "test": "tests/ppt-deliverable-e2e.test.js",
+      "detail": "AssertionError: screenshot_review false !== true"
+    }
+  ],
+  "current_truth": {
+    "repo_local_changes_validated": [
+      "npm run test:fast",
+      "scripts/verify.sh meta",
+      "npm run typecheck"
+    ],
+    "f4_closeout_completed": false,
+    "why_not": [
+      "focused live e2e is not green on the current host",
+      "continuing to claim end-to-end absorb closeout would cause truth drift"
+    ]
+  },
+  "allowed_next_moves": [
+    "freeze blocker evidence in docs/status/current-program",
+    "retry live verification against an explicitly launched upstream API server",
+    "investigate upstream screenshot_review and run-event stability without repo-local fallback"
+  ],
+  "forbidden_claims": [
+    "F4 end-to-end verification is complete on the current host",
+    "ppt_deck/xiaohongshu/poster_onepager live paths are all green today",
+    "repo-local runtime regained ownership"
+  ]
+}

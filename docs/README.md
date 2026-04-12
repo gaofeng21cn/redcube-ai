@@ -37,6 +37,7 @@ The current truthful stop boundary is: upstream `Hermes-Agent` run ownership is 
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)
 - Service-safe domain entry adapter: [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md) (Chinese only)
+- Current F4 live blocker freeze: [Upstream Hermes-Agent live verification blocker](program/upstream_hermes_agent_live_verification_blocker.md) (Chinese only)
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
 - Historical `docs/program/hermes/*` materials now serve as local migration artifacts and provenance only; they must not be read as proof that upstream `Hermes-Agent` already owns the runtime.
 

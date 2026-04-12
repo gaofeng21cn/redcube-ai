@@ -14,15 +14,11 @@
 
 ## 2. 目标形态
 
-这个仓理想中的 domain 级产品链路应是：
+这个仓已经冻结的 direct domain 级产品链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
-在 `OPL` 家族级入口下，则应兼容：
-
-`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`
-
-如果把最终目标形态再写得更贴近当前 cutover 真相，则应理解为：
+在 `OPL` 家族级入口下，也必须兼容同一条下游形态：
 
 `User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 

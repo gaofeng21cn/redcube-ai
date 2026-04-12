@@ -131,10 +131,12 @@ test('live upstream Python command contract is frozen in current program and pub
     currentProgram.current_state.green_baseline.live_upstream_verification.python_command_requirement,
     /playwright/i,
   );
-  assert.deepEqual(currentProgram.current_state.green_baseline.blocked_by, []);
+  assert.deepEqual(currentProgram.current_state.green_baseline.blocked_by, [
+    'upstream_hermes_agent_live_verification_blocker',
+  ]);
   assert.equal(
     currentProgram.current_state.green_baseline.live_upstream_verification.current_host_status,
-    'preflight_passed',
+    'focused_live_verification_blocked',
   );
   assert.equal(
     currentProgram.current_state.green_baseline.live_upstream_verification.current_host_latest_route_proof.some((item) => item.includes('screenshot_review')),

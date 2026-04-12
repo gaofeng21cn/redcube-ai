@@ -76,6 +76,7 @@ const META = [
   'tests/typescript-runtime-family-surfaces.test.js',
   'tests/typescript-service-boundaries.test.js',
   'tests/upstream-hermes-agent-activation-package.test.js',
+  'tests/upstream-hermes-agent-live-verification-blocker.test.js',
   'tests/upstream-hermes-agent-final-target-shape.test.js',
   'tests/xiaohongshu-overlay.test.js',
 ];
@@ -129,6 +130,7 @@ const FAST = [
   'tests/service-safe-domain-entry.test.js',
   'tests/source-augmentation-provider.test.js',
   'tests/upstream-hermes-agent-activation-package.test.js',
+  'tests/upstream-hermes-agent-live-verification-blocker.test.js',
   'tests/upstream-hermes-agent-final-target-shape.test.js',
   'tests/upstream-hermes-agent-probe.test.js',
 ];

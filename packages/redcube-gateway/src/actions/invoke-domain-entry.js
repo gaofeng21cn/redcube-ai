@@ -2,6 +2,10 @@ import { runDeliverableRoute } from './run-deliverable-route.js';
 import { runManagedDeliverable } from './run-managed-deliverable.js';
 
 const SERVICE_SAFE_DOMAIN_ENTRY_ID = 'redcube_service_safe_domain_entry';
+const TASK_INTENT_SURFACE_KIND = {
+  run_managed_deliverable: 'managed_run',
+  run_deliverable_route: 'route_run',
+};
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -51,6 +55,10 @@ function normalizeTaskIntent(request) {
   return requireField('task_intent', request?.task_intent || request?.taskIntent);
 }
 
+function normalizeEntryMode(request) {
+  return requireField('entry_mode', request?.entry_mode || request?.entryMode);
+}
+
 function normalizeTargetDomainId(request) {
   const targetDomainId = requireField('target_domain_id', request?.target_domain_id || request?.targetDomainId);
   if (targetDomainId !== 'redcube_ai' && targetDomainId !== 'redcube-ai') {
@@ -61,7 +69,10 @@ function normalizeTargetDomainId(request) {
 
 function normalizeRuntimeSessionContract(request) {
   const contract = request?.runtime_session_contract || request?.runtimeSessionContract || {};
-  const runtimeOwner = safeText(contract?.runtime_owner || contract?.runtimeOwner, 'upstream_hermes_agent');
+  const runtimeOwner = requireField(
+    'runtime_session_contract.runtime_owner',
+    contract?.runtime_owner || contract?.runtimeOwner,
+  );
   if (runtimeOwner !== 'upstream_hermes_agent') {
     throw new Error(`runtime_session_contract.runtime_owner 必须为 upstream_hermes_agent，当前收到 ${runtimeOwner}`);
   }
@@ -72,10 +83,29 @@ function normalizeRuntimeSessionContract(request) {
   };
 }
 
-function buildReturnSurfaceContract(request, resultSurface) {
+function normalizeReturnSurfaceContract(request, taskIntent) {
   const requested = request?.return_surface_contract || request?.returnSurfaceContract || {};
+  const requestedSurfaceKind = requireField(
+    'return_surface_contract.surface_kind',
+    requested?.surface_kind || requested?.surfaceKind,
+  );
+  const expectedSurfaceKind = TASK_INTENT_SURFACE_KIND[taskIntent];
+  if (!expectedSurfaceKind) {
+    throw new Error(`Unsupported task_intent: ${taskIntent}`);
+  }
+  if (requestedSurfaceKind !== expectedSurfaceKind) {
+    throw new Error(
+      `return_surface_contract.surface_kind 必须为 ${expectedSurfaceKind}，当前收到 ${requestedSurfaceKind}`,
+    );
+  }
   return {
-    requested_surface_kind: safeText(requested?.surface_kind || requested?.surfaceKind, resultSurface.surface_kind),
+    surface_kind: requestedSurfaceKind,
+  };
+}
+
+function buildReturnSurfaceContract(resultSurface, requestedSurfaceKind) {
+  return {
+    requested_surface_kind: requestedSurfaceKind,
     actual_surface_kind: resultSurface.surface_kind,
     durable_truth_surfaces: [
       'runtimeWatch',
@@ -90,8 +120,9 @@ export async function invokeDomainEntry(request) {
   const targetDomainId = normalizeTargetDomainId(request);
   const taskIntent = normalizeTaskIntent(request);
   const workspaceRoot = normalizeWorkspaceRoot(request);
-  const entryMode = safeText(request?.entry_mode || request?.entryMode, 'service_call');
+  const entryMode = normalizeEntryMode(request);
   const runtimeSessionContract = normalizeRuntimeSessionContract(request);
+  const returnSurfaceRequest = normalizeReturnSurfaceContract(request, taskIntent);
   const domainPayload = normalizeDomainPayload(request);
 
   let resultSurface;
@@ -120,7 +151,10 @@ export async function invokeDomainEntry(request) {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);
   }
 
-  const returnSurfaceContract = buildReturnSurfaceContract(request, resultSurface);
+  const returnSurfaceContract = buildReturnSurfaceContract(
+    resultSurface,
+    returnSurfaceRequest.surface_kind,
+  );
   return {
     ok: resultSurface.ok,
     surface_kind: 'domain_entry',

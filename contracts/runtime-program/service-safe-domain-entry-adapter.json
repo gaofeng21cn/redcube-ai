@@ -18,6 +18,18 @@
     ],
     "target_domain_id": "redcube_ai"
   },
+  "validation": {
+    "mode": "fail_closed",
+    "fail_closed_on_missing_fields": [
+      "entry_mode",
+      "runtime_session_contract.runtime_owner",
+      "return_surface_contract.surface_kind"
+    ],
+    "task_intent_surface_kind_map": {
+      "run_managed_deliverable": "managed_run",
+      "run_deliverable_route": "route_run"
+    }
+  },
   "runtime_session_contract": {
     "runtime_owner": "upstream_hermes_agent",
     "adapter_surface": "@redcube/hermes-agent-client",

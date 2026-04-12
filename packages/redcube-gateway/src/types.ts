@@ -134,24 +134,24 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
 }
 
 export interface DomainEntryRequest extends Record<string, unknown> {
-  target_domain_id?: string;
-  task_intent?: 'run_managed_deliverable' | 'run_deliverable_route' | string;
-  entry_mode?: string;
-  workspace_locator?: {
-    workspace_root?: string;
+  target_domain_id: string;
+  task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode: string;
+  workspace_locator: {
+    workspace_root: string;
   };
-  runtime_session_contract?: {
-    runtime_owner?: string;
+  runtime_session_contract: {
+    runtime_owner: string;
     adapter_surface?: string;
     session_mode?: string;
   };
-  return_surface_contract?: {
-    surface_kind?: string;
+  return_surface_contract: {
+    surface_kind: string;
   };
-  domain_payload?: {
-    deliverable_family?: string;
-    topic_id?: string;
-    deliverable_id?: string;
+  domain_payload: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
     route?: string;
     adapter?: string;
     user_intent?: string;

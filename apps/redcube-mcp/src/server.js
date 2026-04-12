@@ -157,7 +157,7 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       target_domain_id: z.string().describe('Target domain id. Must be redcube_ai.'),
       task_intent: z.string().describe('Task intent such as run_managed_deliverable or run_deliverable_route.'),
-      entry_mode: z.string().optional().describe('Entry mode such as opl_gateway or service_call.'),
+      entry_mode: z.string().describe('Required entry mode such as opl_gateway or service_call.'),
       workspace_locator: z.object({
         workspace_root: z.string().describe('Absolute workspace root path.'),
       }).describe('Machine-readable workspace locator.'),
@@ -167,7 +167,7 @@ export const TOOL_DEFINITIONS = [
         session_mode: z.string().optional().describe('Session mode such as ephemeral_run.'),
       }).describe('Runtime session contract for the upstream Hermes-Agent substrate.'),
       return_surface_contract: z.object({
-        surface_kind: z.string().optional().describe('Requested return surface such as managed_run.'),
+        surface_kind: z.string().describe('Required return surface such as managed_run or route_run.'),
       }).describe('Requested return surface contract.'),
       domain_payload: z.object({
         deliverable_family: z.string().describe('RedCube deliverable family / overlay id.'),
