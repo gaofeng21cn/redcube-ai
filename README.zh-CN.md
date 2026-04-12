@@ -43,6 +43,7 @@
 因此，当前仓里任何带 `Hermes` 命名的 package、program brief 或 helper，都应被理解为本地迁移工件或 pilot substrate，而不是“上游 `Hermes-Agent` 已经接管 runtime”的证据。
 
 真正的长线目标，是把 session / run / watch / memory / scheduling 这类 substrate 责任交给上游 `Hermes-Agent`，同时让 `RedCube AI` 继续负责视觉 domain logic、audit、review、export 与 deliverable truth。
+这一步的仓库级下一道闸门已经冻结成 `upstream-hermes-agent-activation-package`，对应 probe 命令是 `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`。
 
 `Codex-default host-agent runtime` 当前承担本地 operator / development host 的角色。
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
@@ -273,7 +274,7 @@
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
 - `Codex-default host-agent runtime` 继续只作为本地 operator / development host，而不是长期产品 runtime owner。
-- 上游 `Hermes-Agent` 集成仍待后续真实 pilot。
+- 上游 `Hermes-Agent` 集成仍待后续真实 pilot；下一道冻结闸门是 `upstream-hermes-agent-activation-package`，在 probe 通过前不得改写 runtime owner 说法。
 - managed web runtime 仍是同一 substrate 上的未来形态，不得伪装成已完成。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。

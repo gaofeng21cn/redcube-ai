@@ -62,6 +62,7 @@ const META = [
   'tests/typescript-reference-os-surfaces.test.js',
   'tests/typescript-runtime-family-surfaces.test.js',
   'tests/typescript-service-boundaries.test.js',
+  'tests/upstream-hermes-agent-activation-package.test.js',
   'tests/xiaohongshu-overlay.test.js',
 ];
 
@@ -92,6 +93,7 @@ const INTEGRATION = [
   'tests/source-intake.test.js',
   'tests/source-readiness-deep-research-gate.test.js',
   'tests/source-research.test.js',
+  'tests/upstream-hermes-agent-probe.test.js',
   'tests/workspace-operator-quickstart.test.js',
   'tests/xiaohongshu-creative-ownership.test.js',
 ];
@@ -110,6 +112,8 @@ const FAST = [
   'tests/gateway-actions.test.js',
   'tests/runtime-deliverable-route.test.js',
   'tests/source-augmentation-provider.test.js',
+  'tests/upstream-hermes-agent-activation-package.test.js',
+  'tests/upstream-hermes-agent-probe.test.js',
 ];
 
 const GROUPS = {

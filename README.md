@@ -43,6 +43,7 @@ The executable baseline today is still repo-owned and local-first:
 Any current repo-local package or document that uses `Hermes` naming should be read as a local migration artifact or pilot substrate, not as proof that upstream `Hermes-Agent` already owns the runtime.
 
 The long-line target is to move session / run / watch / memory / scheduling ownership onto upstream `Hermes-Agent` while leaving `RedCube AI` responsible for visual-domain logic, audit, review, export, and deliverable truth.
+The repo-tracked next gate for that move is `upstream-hermes-agent-activation-package`, backed by the probe command `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`.
 
 Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
 Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains the internal control surface in the current mainline.
@@ -274,7 +275,7 @@ Current honest limits:
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
 - `Codex-default host-agent runtime` remains a local operator / development host, not the long-term product runtime owner.
-- upstream `Hermes-Agent` integration is still pending.
+- upstream `Hermes-Agent` integration is still pending; the frozen next gate is `upstream-hermes-agent-activation-package`, and its probe must pass before any runtime-owner claim changes.
 - managed web runtime remains future work on the same substrate.
 - further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.

@@ -154,6 +154,11 @@
       "phase_2_family_parity_governance_surface_convergence": {
         "status": "closeout_completed"
       },
+      "upstream_hermes_agent_activation_package": {
+        "status": "activation_frozen_pending_external_runtime",
+        "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",
+        "brief": "docs/program/upstream_hermes_agent_activation_package.md"
+      },
       "hermes_runtime_substrate_activation_package": {
         "status": "historical_local_migration_artifact"
       },
@@ -169,6 +174,14 @@
       "hermes_managed_family_closure_truth": {
         "status": "historical_local_migration_artifact"
       }
+    },
+    "next_activation_package": {
+      "id": "upstream_hermes_agent_activation_package",
+      "status": "activation_frozen_pending_external_runtime",
+      "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",
+      "brief": "docs/program/upstream_hermes_agent_activation_package.md",
+      "adapter_surface": "@redcube/hermes-agent-client",
+      "probe_script": "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface"
     },
     "active_baton": {
       "id": "historical_local_runtime_migration_artifact",
@@ -263,7 +276,7 @@
     "stop_conditions": [
       "frozen truth conflict that cannot be resolved inside current contracts",
       "new product-direction choice is required",
-      "real upstream Hermes-Agent integration needs a separate frozen activation package"
+      "real upstream Hermes-Agent integration remains blocked until upstream_hermes_agent_activation_package preflight passes"
     ]
   },
   "historical_snapshots": {

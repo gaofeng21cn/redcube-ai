@@ -94,3 +94,19 @@ test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and
   assert.match(types, /interface RuntimeFamilyCatalogSurface/);
   assert.match(types, /interface LoadedRuntimeFamilyRunner/);
 });
+
+test('P22.A: hermes-agent-client exposes a TypeScript service entrypoint and typed upstream probe contracts', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-hermes-agent-client/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-hermes-agent-client/src/index.js')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-hermes-agent-client/tsconfig.json')), true);
+
+  const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-hermes-agent-client/package.json'), 'utf-8'));
+  const entry = readFileSync(path.resolve('packages/redcube-hermes-agent-client/src/index.ts'), 'utf-8');
+  const types = readFileSync(path.resolve('packages/redcube-hermes-agent-client/src/index.ts'), 'utf-8');
+
+  assert.equal(pkg.types, './src/index.ts');
+  assert.match(entry, /readHermesAgentUpstreamConfig/);
+  assert.match(entry, /probeHermesAgentUpstream/);
+  assert.match(types, /interface HermesAgentUpstreamConfig/);
+  assert.match(types, /interface HermesAgentProbeResult/);
+});

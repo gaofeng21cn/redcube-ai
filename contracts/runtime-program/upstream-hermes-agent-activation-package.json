@@ -1,0 +1,66 @@
+{
+  "activation_id": "upstream_hermes_agent_activation_package",
+  "date_anchor": "2026-04-12",
+  "status": "activation_frozen_pending_external_runtime",
+  "review_status": "blocked_on_external_runtime_proof",
+  "program_mode": "truth_reset_upstream_cutover",
+  "activation_goal": {
+    "label": "freeze real upstream Hermes-Agent connection proof and service-safe cutover preflight",
+    "summary": "RedCube must stop treating repo-local Hermes naming as runtime ownership proof, freeze one real upstream Hermes-Agent connection contract, and fail closed until a reachable upstream API server plus provider-backed run surface are verifiably live."
+  },
+  "connection_proof": {
+    "required_runtime_owner": "upstream_hermes_agent",
+    "adapter_surface": "@redcube/hermes-agent-client",
+    "probe_script": "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface",
+    "required_surfaces": [
+      "/v1/health",
+      "/v1/models",
+      "/v1/runs",
+      "/v1/runs/{run_id}/events"
+    ],
+    "session_header": "X-Hermes-Session-Id",
+    "run_terminal_events": [
+      "run.completed",
+      "run.failed"
+    ]
+  },
+  "cutover_scope": {
+    "runtime_owner_surfaces": [
+      "runManagedDeliverable",
+      "getManagedRun",
+      "superviseManagedRun"
+    ],
+    "domain_truth_surfaces": [
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "formal_entry": [
+      "CLI",
+      "MCP"
+    ],
+    "service_safe_entry_goal": "OPL Gateway -> RedCube domain adapter -> upstream Hermes-Agent runtime"
+  },
+  "blocking_preconditions": [
+    "reachable upstream Hermes-Agent API server",
+    "provider credentials configured inside upstream Hermes-Agent",
+    "api server exposes /v1/health, /v1/models, /v1/runs, and /v1/runs/{run_id}/events",
+    "RedCube environment exposes REDCUBE_HERMES_UPSTREAM_BASE_URL",
+    "non-loopback upstream hosts also expose REDCUBE_HERMES_UPSTREAM_API_KEY"
+  ],
+  "excluded_scope": [
+    "repo-local Hermes naming repackaged as upstream proof",
+    "new family onboarding",
+    "academic poster contract expansion",
+    "chat UI or natural-language shell work",
+    "managed web runtime completion claim"
+  ],
+  "required_verification": [
+    "node scripts/probe-upstream-hermes-agent.mjs --json",
+    "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface",
+    "node --test tests/upstream-hermes-agent-activation-package.test.js tests/upstream-hermes-agent-probe.test.js",
+    "npm run test:fast",
+    "npm run typecheck"
+  ]
+}

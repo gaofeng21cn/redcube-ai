@@ -23,7 +23,7 @@
 
 1. 当前 repo-verified 主线已经切到 `Hermes / managed family closure truth`，`Hermes / stable family closure truth`、Phase 2 tranches 与 `Hermes / runtime substrate canonical closure` 继续作为 absorbed provenance 保留。
 2. `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 的 repo-local managed closure 已经成立，但这仍是本地实现，不是上游 `Hermes-Agent` 接管。
-3. 下一步应按 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 先冻结真实的上游 `Hermes-Agent` pilot 条件，再去迁移 `runManagedDeliverable / getManagedRun / superviseManagedRun` 这类 runtime substrate 责任。
+3. 下一步应按 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 先冻结真实的上游 `Hermes-Agent` pilot 条件；当前冻结件已经落在 `docs/program/upstream_hermes_agent_activation_package.md`，并通过 `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface` fail-closed 检查 upstream proof。
 4. 在那之前，任何 `docs/program/hermes/*` 都只能作为历史 local-runtime migration artifact 读取。
 5. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
 6. 继续避免 reference-grade 材料和 phase brief 挤占 docs 根目录。
