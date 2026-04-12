@@ -31,6 +31,7 @@ The current truthful stop boundary is: local managed-runtime baseline is landed,
 
 - Current repo-verified baseline: a repo-local managed runtime plus local operator host is still the executable shape today.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
+- Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
 - Historical `docs/program/hermes/*` materials now serve as local migration artifacts and provenance only; they must not be read as proof that upstream `Hermes-Agent` already owns the runtime.
 
