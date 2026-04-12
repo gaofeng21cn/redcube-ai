@@ -1,8 +1,17 @@
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+
+import {
+  probeHermesAgentUpstream,
+  readHermesAgentUpstreamConfig,
+} from '../packages/redcube-hermes-agent-client/src/index.js';
+import {
+  readHermesGatewayLaunchConfig,
+  DEFAULT_HERMES_GATEWAY_COMMAND,
+} from './run-test-group-lib.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
@@ -47,6 +56,7 @@ const META = [
   'tests/runtime-alignment-p0.test.js',
   'tests/runtime-config.test.js',
   'tests/runtime-protocol-workspace.test.js',
+  'tests/run-test-group-live-upstream-command.test.js',
   'tests/source-augmentation-contract.test.js',
   'tests/source-augmentation-provider.test.js',
   'tests/stable-deliverable-manual-fidelity.test.js',
@@ -86,6 +96,7 @@ const INTEGRATION = [
   'tests/reference-quality-os-reporting.test.js',
   'tests/reference-regression.test.js',
   'tests/review-platform.test.js',
+  'tests/service-safe-domain-entry.test.js',
   'tests/hermes-managed-family-closure-truth.test.js',
   'tests/hermes-runtime-canonical-path.test.js',
   'tests/hermes-stable-family-closure-truth.test.js',
@@ -111,6 +122,7 @@ const FAST = [
   'tests/profile-contract-hydration.test.js',
   'tests/gateway-actions.test.js',
   'tests/runtime-deliverable-route.test.js',
+  'tests/service-safe-domain-entry.test.js',
   'tests/source-augmentation-provider.test.js',
   'tests/upstream-hermes-agent-activation-package.test.js',
   'tests/upstream-hermes-agent-probe.test.js',
@@ -123,6 +135,130 @@ const GROUPS = {
   e2e: E2E,
   full: [...META, ...INTEGRATION, ...E2E],
 };
+const LIVE_UPSTREAM_GROUPS = new Set(['integration', 'e2e', 'full']);
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function hermesGatewayBaseUrl() {
+  const host = process.env.API_SERVER_HOST || '127.0.0.1';
+  const port = process.env.API_SERVER_PORT || '8642';
+  return `http://${host}:${port}`;
+}
+
+async function waitForHermesGateway(baseUrl, timeoutMs = 30000) {
+  const startedAt = Date.now();
+  let lastError = null;
+
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const response = await fetch(`${baseUrl}/v1/health`, {
+        signal: AbortSignal.timeout(2000),
+      });
+      if (response.ok) {
+        return;
+      }
+      lastError = new Error(`health endpoint returned ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+    await sleep(500);
+  }
+
+  throw new Error(
+    `等待 Hermes gateway API server 超时: ${lastError instanceof Error ? lastError.message : String(lastError || 'unknown')}`,
+  );
+}
+
+function startHermesGateway() {
+  const launchConfig = readHermesGatewayLaunchConfig(process.env);
+  const gatewayEnv = {
+    ...process.env,
+    API_SERVER_ENABLED: 'true',
+    API_SERVER_HOST: process.env.API_SERVER_HOST || '127.0.0.1',
+    API_SERVER_PORT: process.env.API_SERVER_PORT || '8642',
+    API_SERVER_MODEL_NAME: process.env.API_SERVER_MODEL_NAME || process.env.REDCUBE_HERMES_UPSTREAM_MODEL || 'hermes-agent',
+  };
+  const output = [];
+  const spawnOptions = {
+    cwd: repoRoot,
+    env: gatewayEnv,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  };
+  const gateway = launchConfig.usesShell
+    ? spawn(launchConfig.command, {
+        ...spawnOptions,
+        shell: true,
+      })
+    : spawn('hermes', ['gateway', 'run', '-q', '--replace'], spawnOptions);
+
+  for (const stream of [gateway.stdout, gateway.stderr]) {
+    stream?.on('data', (chunk) => {
+      output.push(String(chunk));
+      if (output.length > 40) {
+        output.shift();
+      }
+    });
+  }
+
+  return {
+    gateway,
+    output,
+    baseUrl: hermesGatewayBaseUrl(),
+    modelName: gatewayEnv.API_SERVER_MODEL_NAME,
+    launchCommand: launchConfig.command,
+  };
+}
+
+async function preflightLiveUpstreamRunSurface({ baseUrl, modelName }) {
+  const config = readHermesAgentUpstreamConfig({
+    ...process.env,
+    REDCUBE_HERMES_UPSTREAM_BASE_URL: baseUrl,
+    REDCUBE_HERMES_UPSTREAM_MODEL: modelName,
+  });
+  const probe = await probeHermesAgentUpstream({
+    config,
+    requireRunSurface: true,
+    timeoutMs: 60000,
+  });
+
+  if (!probe.ok) {
+    throw new Error(JSON.stringify(probe, null, 2));
+  }
+}
+
+async function prepareLiveUpstream(groupName) {
+  if (!LIVE_UPSTREAM_GROUPS.has(groupName)) {
+    return null;
+  }
+
+  const handle = startHermesGateway();
+  try {
+    await waitForHermesGateway(handle.baseUrl);
+    await preflightLiveUpstreamRunSurface({
+      baseUrl: handle.baseUrl,
+      modelName: handle.modelName,
+    });
+  } catch (error) {
+    handle.gateway.kill('SIGTERM');
+    throw new Error([
+      `无法启动 integration live upstream: ${error instanceof Error ? error.message : String(error)}`,
+      `Hermes gateway launch command: ${handle.launchCommand}`,
+      'Hermes gateway recent output:',
+      handle.output.join('').trim() || '<empty>',
+    ].join('\n'));
+  }
+
+  process.env.REDCUBE_HERMES_UPSTREAM_BASE_URL = handle.baseUrl;
+  process.env.REDCUBE_HERMES_UPSTREAM_MODEL = handle.modelName;
+  if (handle.launchCommand !== DEFAULT_HERMES_GATEWAY_COMMAND) {
+    process.stdout.write(`[run-test-group] live upstream launch override: ${handle.launchCommand}\n`);
+  }
+  process.stdout.write('[run-test-group] live upstream run-surface preflight passed\n');
+  process.stdout.write(`[run-test-group] live upstream ready: ${handle.baseUrl}\n`);
+  return handle;
+}
 
 function discoveredRootTests() {
   return readdirSync(path.resolve('tests'))
@@ -178,13 +314,22 @@ assertTrackedFiles(E2E, 'e2e');
 assertTrackedFiles(FAST, 'fast');
 assertPartition();
 
-const result = spawnSync(process.execPath, ['--test', ...forwardedArgs, ...GROUPS[groupName]], {
-  stdio: 'inherit',
-  cwd: repoRoot,
-});
+const liveUpstreamHandle = await prepareLiveUpstream(groupName);
 
-if (result.error) {
-  throw result.error;
+try {
+  const result = spawnSync(process.execPath, ['--test', ...forwardedArgs, ...GROUPS[groupName]], {
+    stdio: 'inherit',
+    cwd: repoRoot,
+    env: process.env,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  process.exit(result.status ?? 1);
+} finally {
+  if (liveUpstreamHandle) {
+    liveUpstreamHandle.gateway.kill('SIGTERM');
+  }
 }
-
-process.exit(result.status ?? 1);

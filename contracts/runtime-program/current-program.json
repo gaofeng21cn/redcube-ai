@@ -1,6 +1,6 @@
 {
   "program_id": "redcube-runtime-program",
-  "date_anchor": "2026-04-11",
+  "date_anchor": "2026-04-12",
   "longrun_goal": {
     "label": "visual-deliverable domain gateway plus upstream Hermes-Agent target runtime",
     "north_star": [
@@ -100,13 +100,13 @@
   },
   "current_state": {
     "product_mainline_mode": "auto_only",
-    "runtime_substrate_owner": "repo_local_managed_runtime_pilot",
+    "runtime_substrate_owner": "upstream_hermes_agent",
     "deployment_host": "codex_local_operator_host",
     "deployment_host_status": "local_only",
     "host_agent_longterm_owner": false,
-    "phase_id": "truth_reset",
-    "phase_label": "Truth Reset / Upstream Hermes-Agent Pilot Prep",
-    "workstream": "truth_reset_upstream_hermes_agent_pilot_prep",
+    "phase_id": "upstream_runtime_owner_cutover",
+    "phase_label": "Upstream Hermes-Agent Runtime Owner Cutover",
+    "workstream": "upstream_hermes_agent_runtime_owner_cutover",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -114,13 +114,29 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / local managed-runtime baseline with upstream Hermes-Agent pending",
+      "label": "redcube-runtime-program / upstream Hermes-Agent run surface plus RedCube visual-domain truth",
       "unique": true
     },
     "green_baseline": {
       "credible": true,
       "clean_clone_required": true,
-      "blocked_by": [],
+      "blocked_by": [
+        "upstream_run_surface_preflight_blocked_on_current_host"
+      ],
+      "live_upstream_verification": {
+        "default_gateway_command": "hermes gateway run -q --replace",
+        "gateway_command_override_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
+        "override_usage": "required_when_global_hermes_cli_lags_known_good_upstream_gateway_fix",
+        "preflight_requires": [
+          "/v1/health",
+          "/v1/models",
+          "/v1/runs",
+          "/v1/runs/{run_id}/events"
+        ],
+        "current_host_status": "blocked_on_run_surface_preflight",
+        "current_host_blocking_reason": "run events endpoint did not emit a terminal event",
+        "current_host_stream_signal": ": stream closed"
+      },
       "ci_quality_lane_requires": [
         "python-3.12",
         "fonts-noto-cjk",
@@ -155,9 +171,25 @@
         "status": "closeout_completed"
       },
       "upstream_hermes_agent_activation_package": {
-        "status": "activation_frozen_pending_external_runtime",
+        "status": "closeout_completed",
         "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",
         "brief": "docs/program/upstream_hermes_agent_activation_package.md"
+      },
+      "upstream_hermes_runtime_owner_cutover": {
+        "status": "closeout_completed",
+        "route_surface": "runDeliverableRoute",
+        "managed_surfaces": [
+          "runManagedDeliverable",
+          "getManagedRun",
+          "superviseManagedRun"
+        ],
+        "adapter_surface": "@redcube/hermes-agent-client"
+      },
+      "service_safe_domain_entry_adapter": {
+        "status": "closeout_completed",
+        "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
+        "brief": "docs/program/upstream_hermes_agent_service_safe_domain_entry.md",
+        "gateway_surface": "invokeDomainEntry"
       },
       "hermes_runtime_substrate_activation_package": {
         "status": "historical_local_migration_artifact"
@@ -177,7 +209,7 @@
     },
     "next_activation_package": {
       "id": "upstream_hermes_agent_activation_package",
-      "status": "activation_frozen_pending_external_runtime",
+      "status": "closeout_completed",
       "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",
       "brief": "docs/program/upstream_hermes_agent_activation_package.md",
       "adapter_surface": "@redcube/hermes-agent-client",
@@ -276,7 +308,8 @@
     "stop_conditions": [
       "frozen truth conflict that cannot be resolved inside current contracts",
       "new product-direction choice is required",
-      "real upstream Hermes-Agent integration remains blocked until upstream_hermes_agent_activation_package preflight passes"
+      "real upstream Hermes-Agent gateway / API server is unavailable",
+      "service-safe domain entry contract drifts away from OPL handoff envelope"
     ]
   },
   "historical_snapshots": {

@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { randomUUID } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
@@ -7,6 +6,7 @@ import {
   HERMES_DEFAULT_ADAPTER,
   HERMES_RUNTIME_SURFACE,
 } from '@redcube/hermes-substrate';
+import { assertUpstreamHermesReady } from './upstream-hermes-bridge.js';
 
 import { runDeliverableRoute } from './deliverable-routes.js';
 import { appendManagedEvent } from './managed-event-log.js';
@@ -356,6 +356,7 @@ function buildRuntimeSupervision(workspaceRoot, managedRun, projection) {
     current_stage: managedRun.current_stage,
     content_status: projection.content_status,
     current_blockers: projection.current_blockers,
+    runtime_owner: safeText(managedRun.runtime_bridge?.owner) || null,
     needs_human_intervention: needsHumanIntervention,
     summary: `${formatClock(recordedAt)} ${projection.human_report.mainline_status} ${projection.human_report.runtime_health}`,
     next_action: safeText(managedRun.next_system_action) || null,
@@ -803,6 +804,7 @@ export async function runManagedDeliverable({
     stopAfterStage: requestedStopAfterStage,
     stages,
   });
+  const upstreamReady = await assertUpstreamHermesReady();
   const managedRun = createManagedRun({
     workspaceRoot,
     overlay: contractOverlay,
@@ -813,6 +815,12 @@ export async function runManagedDeliverable({
     userIntent: safeText(userIntent) || safeText(contract.goal),
     adapter,
   });
+  managedRun.runtime_bridge = {
+    owner: 'upstream_hermes_agent',
+    adapter_surface: '@redcube/hermes-agent-client',
+    base_url: upstreamReady.probe.config.base_url,
+    model_name: upstreamReady.probe.config.model_name,
+  };
 
   pushManagedEvent(workspaceRoot, managedRun, {
     kind: 'managed_started',
@@ -826,7 +834,7 @@ export async function runManagedDeliverable({
     const attempt = safeArray(managedRun.route_runs).filter((item) => item.stage_id === stageId).length + 1;
     managedRun.current_stage = stageId;
     managedRun.worker_running = true;
-    managedRun.active_run_id = `run-${randomUUID()}`;
+    managedRun.active_run_id = null;
     managedRun.runtime_liveness_audit = buildRuntimeLivenessAudit({
       status: 'live',
       reasonCode: 'stage_execution_in_progress',
@@ -861,7 +869,6 @@ export async function runManagedDeliverable({
       topicId,
       deliverableId,
       route: stageId,
-      runId: managedRun.active_run_id,
       adapter: managedRun.active_adapter,
       mode,
       baselineDeliverableId,

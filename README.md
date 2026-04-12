@@ -33,17 +33,20 @@ If your goal is to keep turning structured knowledge into formal visual outputs,
 
 It is designed for experts who want the speed of agents without losing control over quality.
 
-Today, its runtime story is still in a truth-reset phase.
-The repository already has usable local deliverable flows, but it has **not** landed a true upstream `Hermes-Agent` integration yet.
-The executable baseline today is still repo-owned and local-first:
+The runtime story is no longer purely repo-local.
+`RedCube AI` now freezes one real upstream `Hermes-Agent` activation proof and routes `runDeliverableRoute` plus managed execution through the upstream `Hermes-Agent` API server.
+The executable baseline is therefore:
 
-- a repo-local managed-runtime pilot inside this repository
-- a `Codex`-local operator / development host
+- upstream `Hermes-Agent` owns the run surface for route / managed execution
+- `RedCube AI` still owns visual-domain truth, audit, review, export, and deliverable state
+- a reachable upstream gateway / API server remains a hard precondition, and the cutover fails closed when that proof is missing
 
-Any current repo-local package or document that uses `Hermes` naming should be read as a local migration artifact or pilot substrate, not as proof that upstream `Hermes-Agent` already owns the runtime.
+Historical repo-local `Hermes` naming still exists in absorbed artifacts and compatibility material, but it must not be read as separate proof of runtime ownership.
 
-The long-line target is to move session / run / watch / memory / scheduling ownership onto upstream `Hermes-Agent` while leaving `RedCube AI` responsible for visual-domain logic, audit, review, export, and deliverable truth.
-The repo-tracked next gate for that move is `upstream-hermes-agent-activation-package`, backed by the probe command `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`.
+The repo-tracked preflight that freezes this truth is `upstream-hermes-agent-activation-package`, backed by `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`.
+The callable service-safe adapter shell for future `OPL Gateway` handoff is `redcube_service_safe_domain_entry`, documented in `contracts/runtime-program/service-safe-domain-entry-adapter.json`.
+If your global `hermes` CLI lags the upstream gateway fix, live verification lanes may set `REDCUBE_HERMES_GATEWAY_COMMAND` to an explicit known-good upstream launch command instead of pretending the repo fixed Hermes locally.
+That override only corrects which upstream checkout launches the gateway; it does not mask upstream run-surface failures such as `/v1/runs/{run_id}/events` closing without a terminal event.
 
 Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
 Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains the internal control surface in the current mainline.
@@ -274,9 +277,9 @@ User / Agent
       -> Gateway
           -> Overlay / Family / Profile / Pack
               -> Domain Harness OS (on Unified Harness Engineering Substrate)
-                  -> repo-local managed runtime pilot (current executable baseline)
-                      -> Codex-local operator / development host
-                  -> upstream Hermes-Agent runtime substrate (target shape, not landed yet)
+                  -> upstream Hermes-Agent runtime substrate (current route / managed run owner)
+                      -> Codex-local operator / development host / workspace bridge
+                  -> repo-local managed runtime pilot (historical migration artifact / compatibility bridge)
                   -> managed web runtime (future option after real substrate migration)
 ```
 
@@ -296,7 +299,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline is still a local-only runtime line: review-closeout is passed, phase-2 source-truth / governance / operator-surface work remains absorbed provenance, and the repository already has a repo-local managed-deliverable closure across `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager`. What is **not** true yet is upstream `Hermes-Agent` ownership of that runtime.
+- The current active mainline has already cut route / managed run ownership to upstream `Hermes-Agent`: phase-2 source-truth / governance / operator-surface work remains absorbed provenance, and the repository keeps `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager` on the same RedCube visual-domain truth without pretending the historical repo-local runtime is still current owner.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -305,7 +308,10 @@ Current honest limits:
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
 - `Codex-default host-agent runtime` remains a local operator / development host, not the long-term product runtime owner.
-- upstream `Hermes-Agent` integration is still pending; the frozen next gate is `upstream-hermes-agent-activation-package`, and its probe must pass before any runtime-owner claim changes.
+- route and managed execution now fail closed onto real upstream `Hermes-Agent` proof; the frozen activation gate remains `upstream-hermes-agent-activation-package`, and the service-safe domain adapter shell is `redcube_service_safe_domain_entry`.
+- the current fresh proof uses `hermes gateway run -q`; upstream `hermes gateway run` still crashes on its own `RedactingFormatter` bug and must not be misreported as a repo-local fix.
+- when the global `hermes` CLI on the verification host still points at that broken upstream checkout, use `REDCUBE_HERMES_GATEWAY_COMMAND` to point integration / e2e verification at a known-good upstream gateway launch command.
+- current live verification also requires `/v1/runs` plus `/v1/runs/{run_id}/events` to emit a terminal event; on the 2026-04-12 verification host, the latest upstream launch override still blocks there because the events stream closes before any terminal event appears.
 - managed web runtime remains future work on the same substrate.
 - further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.

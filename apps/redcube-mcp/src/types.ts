@@ -23,6 +23,7 @@ export interface GatewayActionMap {
   doctorWorkspace?: (args: Record<string, unknown>) => Promise<unknown>;
   listTopics?: (args: Record<string, unknown>) => Promise<unknown>;
   getOverlayCatalog?: (args?: unknown) => Promise<unknown>;
+  invokeDomainEntry?: (args: Record<string, unknown>) => Promise<unknown>;
   createDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getPublicationProjection?: (args: Record<string, unknown>) => Promise<unknown>;

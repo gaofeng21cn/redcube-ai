@@ -20,12 +20,13 @@ test('runtime no longer exports local reference implementation directly', () => 
 test('runtime no longer exports local governance implementation directly', () => {
   const runtimeIndex = read('packages/redcube-runtime/src/index.js');
   const deliverableRoutes = read('packages/redcube-runtime/src/deliverable-routes.js');
+  const deliverableRouteLocal = read('packages/redcube-runtime/src/deliverable-route-local.js');
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
 
   assert.equal(runtimeIndex.includes("./review-state.js"), false);
   assert.equal(runtimeIndex.includes("./reviews.js"), false);
   assert.equal(runtimeIndex.includes("@redcube/governance"), true);
   assert.equal(deliverableRoutes.includes("./review-state.js"), false);
-  assert.equal(deliverableRoutes.includes("@redcube/governance"), true);
+  assert.equal(deliverableRouteLocal.includes("@redcube/governance"), true);
   assert.equal(runtimePackageJson.dependencies?.['@redcube/governance'], '0.1.0');
 });

@@ -133,6 +133,50 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
   };
 }
 
+export interface DomainEntryRequest extends Record<string, unknown> {
+  target_domain_id?: string;
+  task_intent?: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode?: string;
+  workspace_locator?: {
+    workspace_root?: string;
+  };
+  runtime_session_contract?: {
+    runtime_owner?: string;
+    adapter_surface?: string;
+    session_mode?: string;
+  };
+  return_surface_contract?: {
+    surface_kind?: string;
+  };
+  domain_payload?: {
+    deliverable_family?: string;
+    topic_id?: string;
+    deliverable_id?: string;
+    route?: string;
+    adapter?: string;
+    user_intent?: string;
+    stop_after_stage?: string;
+    mode?: string;
+    baseline_deliverable_id?: string;
+  };
+}
+
+export interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
+  entry_contract_id: string;
+  target_domain_id: string;
+  task_intent: string;
+  entry_mode: string;
+  runtime_session_contract: Record<string, unknown>;
+  return_surface_contract: Record<string, unknown>;
+  domain_payload: Record<string, unknown>;
+  result_surface: ManagedRunResponse | RouteRunResponse;
+  summary: {
+    task_intent: string;
+    actual_surface_kind: string;
+    target_handle: string | null;
+  };
+}
+
 export interface ManagedRunProjection {
   current_stage: string | null;
   latest_events: Array<{

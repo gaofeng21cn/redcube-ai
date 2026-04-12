@@ -3,7 +3,7 @@
 **English** | [中文](./README.zh-CN.md)
 
 This bilingual index is the default public surface for `RedCube AI`.
-It stays aligned with the current truth reset: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; the repository already has a usable local runtime baseline, but it has **not** landed a true upstream `Hermes-Agent` integration yet. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
+It stays aligned with the current truthful cutover: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; route and managed run surfaces now execute through real upstream `Hermes-Agent`, while visual-domain truth remains local to `RedCube AI`. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
 The current public entry truth is also explicit: `operator entry` and `agent entry` are real today, while a mature domain-level `product entry` is still future work.
 
 ## Core Maintainer Working Set
@@ -26,15 +26,16 @@ This index along with the repository home forms the default GitHub-facing biling
 
 The current deliverable mainline is stable and usable, but the runtime story is still transitional.
 Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance.
-The current truthful stop boundary is: local managed-runtime baseline is landed, upstream `Hermes-Agent` integration is still pending.
+The current truthful stop boundary is: upstream `Hermes-Agent` run ownership is landed for route / managed execution, while mature product entry and broader federation still remain follow-on work.
 
 ## Current Baseline, Long-Line Target, And Task Ladder
 
-- Current repo-verified baseline: a repo-local managed runtime plus local operator host is still the executable shape today.
+- Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth and operator surfaces.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Product-entry target: grow a lightweight domain `product entry` that can be reached directly or through `OPL` handoff without changing the visual-domain boundary.
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)
+- Service-safe domain entry adapter: [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md) (Chinese only)
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
 - Historical `docs/program/hermes/*` materials now serve as local migration artifacts and provenance only; they must not be read as proof that upstream `Hermes-Agent` already owns the runtime.
 

@@ -14,61 +14,77 @@ import {
   buildCreativeOwnershipAudit,
   writeAuditFile,
 } from '../scripts/p19-creative-ownership-audit-lib.mjs';
+import {
+  startMockHermesAgentUpstream,
+  withEnv,
+} from './helpers/mock-hermes-agent-upstream.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 test('current runtime defaults to Hermes substrate while external_llm stays optional', async () => {
-  const runtimeExecutor = resolveExecutorAdapter();
-  assert.equal(runtimeExecutor.adapter, 'hermes');
-  assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'hermes');
-  assert.equal(runtimeExecutor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
-  assert.equal(runtimeExecutor.execution_model.adapter_role, 'primary_creative_executor');
-  assert.equal(runtimeExecutor.execution_model.agent_first_requires_external_llm, false);
-  assert.equal(runtimeExecutor.execution_model.external_llm_role, 'optional_compatibility_adapter');
-  assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Hermes');
-  assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_default_host_agent_bridge');
-  assert.equal(runtimeExecutor.execution_model.freeze_origin_milestone, 'Hermes.A');
-
-  const externalLlm = resolveExecutorAdapter({ adapter: 'external_llm' });
-  assert.equal(externalLlm.execution_model.mainline_adapter, 'hermes');
-  assert.equal(externalLlm.execution_model.adapter_role, 'optional_compatibility_adapter');
-  assert.equal(externalLlm.execution_model.agent_first_requires_external_llm, false);
-
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-p19-executor-'));
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'lecture_student',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    title: 'P19 执行模型冻结',
-    goal: '验证 host-agent 为正式主执行器',
+  const upstream = await startMockHermesAgentUpstream();
+  const restoreEnv = withEnv({
+    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
+    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
+    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
   });
 
-  const result = await runDeliverableRoute({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    route: 'storyline',
-  });
+  try {
+    const runtimeExecutor = resolveExecutorAdapter();
+    assert.equal(runtimeExecutor.adapter, 'hermes');
+    assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'hermes');
+    assert.equal(runtimeExecutor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(runtimeExecutor.execution_model.adapter_role, 'primary_creative_executor');
+    assert.equal(runtimeExecutor.execution_model.agent_first_requires_external_llm, false);
+    assert.equal(runtimeExecutor.execution_model.external_llm_role, 'optional_compatibility_adapter');
+    assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Hermes');
+    assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_default_host_agent_bridge');
+    assert.equal(runtimeExecutor.execution_model.freeze_origin_milestone, 'Hermes.A');
 
-  assert.equal(result.ok, true);
-  assert.equal(result.run.executor.adapter, 'hermes');
-  assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
-  assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
-  assert.equal(result.run.executor.execution_model.external_llm_role, 'optional_compatibility_adapter');
-  assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Hermes');
-  assert.equal(result.run.executor.execution_model.deployment_host, 'codex_default_host_agent_bridge');
+    const externalLlm = resolveExecutorAdapter({ adapter: 'external_llm' });
+    assert.equal(externalLlm.execution_model.mainline_adapter, 'hermes');
+    assert.equal(externalLlm.execution_model.adapter_role, 'optional_compatibility_adapter');
+    assert.equal(externalLlm.execution_model.agent_first_requires_external_llm, false);
 
-  const artifact = readJson(result.artifactFile);
-  assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
-  assert.equal(artifact.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
-  assert.equal(artifact.execution_model.agent_first_requires_external_llm, false);
-  assert.equal(artifact.execution_model.runtime_substrate_owner, 'Hermes');
-  assert.equal(artifact.execution_model.freeze_origin_milestone, 'Hermes.A');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-p19-executor-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'P19 执行模型冻结',
+      goal: '验证 host-agent 为正式主执行器',
+    });
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.run.executor.adapter, 'hermes');
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
+    assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(result.run.executor.execution_model.external_llm_role, 'optional_compatibility_adapter');
+    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Hermes');
+    assert.equal(result.run.executor.execution_model.deployment_host, 'codex_default_host_agent_bridge');
+
+    const artifact = readJson(result.artifactFile);
+    assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
+    assert.equal(artifact.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(artifact.execution_model.agent_first_requires_external_llm, false);
+    assert.equal(artifact.execution_model.runtime_substrate_owner, 'Hermes');
+    assert.equal(artifact.execution_model.freeze_origin_milestone, 'Hermes.A');
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
 });
 
 test('P19 audit freezes unified lifecycle, shared review overlay, and current open residue across xiaohongshu + ppt', () => {

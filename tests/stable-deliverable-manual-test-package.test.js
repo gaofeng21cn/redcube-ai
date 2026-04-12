@@ -18,11 +18,11 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('stable deliverable manual-test contract remains the completed foundation baton behind the current Hermes runtime substrate tranche', () => {
+test('stable deliverable manual-test contract remains the completed foundation baton behind the current upstream Hermes cutover tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
+  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
   assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');

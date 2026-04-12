@@ -4,6 +4,8 @@ import type {
   DeliverableAuditResponse,
   DeliverableCreateResponse,
   DeliverableRecordResponse,
+  DomainEntryRequest,
+  DomainEntryResponse,
   LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
@@ -62,6 +64,7 @@ export interface CliGatewayActions {
   doctorWorkspace(request: { workspaceRoot: string }): Promise<WorkspaceDoctorResponse>;
   listTopics(request: { workspaceRoot: string }): Promise<TopicCatalogResponse>;
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
+  invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
   executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse>;
@@ -105,6 +108,7 @@ export type CliRunSurface =
   | LegacyImportResponse
   | DeliverableCreateResponse
   | DeliverableRecordResponse
+  | DomainEntryResponse
   | DeliverableAuditResponse
   | ManagedRunResponse
   | ManagedRunRecordResponse

@@ -15,12 +15,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('upstream Hermes-Agent activation package is frozen as the next truthful cutover gate', () => {
+test('upstream Hermes-Agent activation package is closed out as the frozen upstream proof gate', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const activationPackage = readJson(ACTIVATION_PACKAGE_CONTRACT);
 
   assert.equal(activationPackage.activation_id, 'upstream_hermes_agent_activation_package');
-  assert.equal(activationPackage.status, 'activation_frozen_pending_external_runtime');
+  assert.equal(activationPackage.status, 'closeout_completed');
+  assert.equal(activationPackage.review_status, 'passed');
   assert.equal(activationPackage.connection_proof.required_runtime_owner, 'upstream_hermes_agent');
   assert.equal(activationPackage.connection_proof.probe_script, 'node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface');
   assert.equal(
@@ -32,13 +33,20 @@ test('upstream Hermes-Agent activation package is frozen as the next truthful cu
     true,
   );
   assert.equal(
-    activationPackage.blocking_preconditions.includes('reachable upstream Hermes-Agent API server'),
+    activationPackage.connection_proof.live_gateway_command_env,
+    'REDCUBE_HERMES_GATEWAY_COMMAND',
+  );
+  assert.equal(
+    activationPackage.verified_preconditions.includes('reachable upstream Hermes-Agent API server'),
     true,
   );
   assert.equal(
-    activationPackage.blocking_preconditions.includes('provider credentials configured inside upstream Hermes-Agent'),
+    activationPackage.verified_preconditions.includes('provider credentials configured inside upstream Hermes-Agent'),
     true,
   );
+  assert.equal(activationPackage.connection_proof.fresh_evidence.includes('hermes gateway run -q'), true);
+  assert.equal(activationPackage.known_external_risks[0].includes('RedactingFormatter'), true);
+  assert.equal(currentProgram.current_state.foundation_milestones.upstream_hermes_agent_activation_package.status, 'closeout_completed');
   assert.equal(
     currentProgram.current_state.next_activation_package.contract,
     ACTIVATION_PACKAGE_CONTRACT,
@@ -62,10 +70,18 @@ test('public and maintainer docs point the cutover truth to the upstream activat
 
   assert.equal(readme.includes('upstream-hermes-agent-activation-package'), true);
   assert.equal(readme.includes('probe-upstream-hermes-agent.mjs'), true);
+  assert.equal(readme.includes('hermes gateway run -q'), true);
+  assert.equal(readme.includes('REDCUBE_HERMES_GATEWAY_COMMAND'), true);
   assert.equal(readmeZh.includes('upstream-hermes-agent-activation-package'), true);
   assert.equal(readmeZh.includes('probe-upstream-hermes-agent.mjs'), true);
+  assert.equal(readmeZh.includes('hermes gateway run -q'), true);
+  assert.equal(readmeZh.includes('REDCUBE_HERMES_GATEWAY_COMMAND'), true);
   assert.equal(docsReadme.includes('upstream_hermes_agent_activation_package.md'), true);
   assert.equal(status.includes('probe-upstream-hermes-agent.mjs'), true);
+  assert.equal(status.includes('RedactingFormatter'), true);
+  assert.equal(status.includes('REDCUBE_HERMES_GATEWAY_COMMAND'), true);
   assert.equal(brief.includes('`/v1/health`'), true);
   assert.equal(brief.includes('`/v1/runs/{run_id}/events`'), true);
+  assert.equal(brief.includes('`hermes gateway run -q`'), true);
+  assert.equal(brief.includes('`REDCUBE_HERMES_GATEWAY_COMMAND`'), true);
 });

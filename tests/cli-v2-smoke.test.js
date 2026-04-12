@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
+import { promisify } from 'node:util';
 import {
   cpSync,
   copyFileSync,
@@ -12,6 +13,12 @@ import {
   readFileSync,
   writeFileSync,
 } from 'node:fs';
+import {
+  startMockHermesAgentUpstream,
+  withEnv,
+} from './helpers/mock-hermes-agent-upstream.js';
+
+const execFileAsync = promisify(execFile);
 
 function copyPackageIntoInstall(sourceDir, targetDir) {
   cpSync(sourceDir, targetDir, {
@@ -113,6 +120,18 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'hermes-substrate'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-hermes-agent-client'),
+    path.join(gatewayNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'hermes-agent-client'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('prompts'),
+    path.join(gatewayPackagePath, 'node_modules', 'prompts'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-runtime/scripts'),
+    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'redcube-runtime', 'scripts'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-registry'),
     path.join(gatewayNodeModulesDir, 'overlay-registry'),
   );
@@ -149,6 +168,44 @@ function execCliExpectFailure(cliPath, args, options) {
     assert.equal(error.stderr || '', '');
 
     return JSON.parse(error.stdout);
+  }
+}
+
+async function execCliAsync(cliPath, args, options = {}) {
+  const result = await execFileAsync('node', [cliPath, ...args], {
+    encoding: 'utf-8',
+    ...options,
+  });
+  return JSON.parse(result.stdout);
+}
+
+async function execCliExpectFailureAsync(cliPath, args, options = {}) {
+  try {
+    await execFileAsync('node', [cliPath, ...args], {
+      encoding: 'utf-8',
+      ...options,
+    });
+    assert.fail('expected CLI to exit with non-zero status');
+  } catch (error) {
+    assert.notEqual(error.code, 0);
+    assert.equal(error.stderr || '', '');
+    return JSON.parse(error.stdout);
+  }
+}
+
+async function withMockHermesUpstreamCli(testFn) {
+  const upstream = await startMockHermesAgentUpstream();
+  const restoreEnv = withEnv({
+    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
+    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
+    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+  });
+
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
+    await upstream.close();
   }
 }
 
@@ -503,218 +560,256 @@ test('CLI deliverable create works from isolated install without monorepo siblin
   assert.equal(parsed.deliverable.profile_id, 'standard_note');
 });
 
-test('CLI deliverable run and runs get proxy the contract-driven runtime mainline', () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-run-'));
+test('CLI deliverable run works from isolated install through the upstream Hermes service-entry bridge', async () => {
+  await withMockHermesUpstreamCli(async () => {
+    const { cliPath, installRoot } = createIsolatedCliInstall();
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-isolated-run-'));
 
-  execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'create',
-      '--workspace-root',
-      workspaceRoot,
-      '--overlay',
-      'ppt_deck',
-      '--profile-id',
-      'lecture_peer',
-      '--topic-id',
-      'topic-a',
-      '--deliverable-id',
-      'deck-a',
-      '--title',
-      '同行讲解 deck',
-      '--goal',
-      '向小同行解释问题、方法、证据与边界',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+    const createOutput = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'create',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--profile-id',
+        'lecture_student',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--title',
+        '甲状腺门诊科普 deck',
+        '--goal',
+        '为本科生讲授甲状腺基础知识',
+      ],
+      { cwd: installRoot },
+    );
+    assert.equal(createOutput.ok, true);
 
-  const runOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'run',
-      '--workspace-root',
-      workspaceRoot,
-      '--overlay',
-      'ppt_deck',
-      '--topic-id',
-      'topic-a',
-      '--deliverable-id',
-      'deck-a',
-      '--route',
-      'storyline',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+    const parsed = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'run',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--route',
+        'storyline',
+      ],
+      { cwd: installRoot },
+    );
 
-  const runParsed = JSON.parse(runOutput);
-  assert.equal(runParsed.ok, true);
-  assert.equal(runParsed.run.current_stage, 'storyline');
-
-  const secondRunOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'run',
-      '--workspace-root',
-      workspaceRoot,
-      '--overlay',
-      'ppt_deck',
-      '--topic-id',
-      'topic-a',
-      '--deliverable-id',
-      'deck-a',
-      '--route',
-      'detailed_outline',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const secondRunParsed = JSON.parse(secondRunOutput);
-  assert.equal(secondRunParsed.ok, true);
-  assert.equal(secondRunParsed.run.current_stage, 'detailed_outline');
-
-  const getOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'runs',
-      'get',
-      '--workspace-root',
-      workspaceRoot,
-      '--run-id',
-      secondRunParsed.run.run_id,
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const getParsed = JSON.parse(getOutput);
-  assert.equal(getParsed.ok, true);
-  assert.equal(getParsed.run.status, 'completed');
-  assert.equal(getParsed.run.current_stage, 'detailed_outline');
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.surface_kind, 'route_run');
+    assert.equal(parsed.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
+  });
 });
 
-test('CLI deliverable execute, managed get, and managed supervise proxy the managed execution control plane', () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
+test('CLI deliverable run and runs get proxy the contract-driven runtime mainline', async () => {
+  await withMockHermesUpstreamCli(async () => {
+    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-run-'));
 
-  execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'source',
-      'research',
-      '--workspace-root',
-      workspaceRoot,
-      '--topic-id',
-      'topic-a',
-      '--title',
-      '甲状腺门诊科普',
-      '--brief',
-      '给出一份最终课堂 PPT 所需的公开信息。',
-    ],
-    {
-      encoding: 'utf-8',
-      cwd: path.resolve('.'),
-      env: {
-        ...process.env,
-        REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file',
+    await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'create',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--profile-id',
+        'lecture_peer',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--title',
+        '同行讲解 deck',
+        '--goal',
+        '向小同行解释问题、方法、证据与边界',
+      ],
+      { cwd: path.resolve('.') },
+    );
+
+    const runParsed = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'run',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--route',
+        'storyline',
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(runParsed.ok, true);
+    assert.equal(runParsed.run.current_stage, 'storyline');
+
+    const secondRunParsed = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'run',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--route',
+        'detailed_outline',
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(secondRunParsed.ok, true);
+    assert.equal(secondRunParsed.run.current_stage, 'detailed_outline');
+
+    const getParsed = await execCliAsync(
+      cliPath,
+      [
+        'runs',
+        'get',
+        '--workspace-root',
+        workspaceRoot,
+        '--run-id',
+        secondRunParsed.run.run_id,
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(getParsed.ok, true);
+    assert.equal(getParsed.run.status, 'completed');
+    assert.equal(getParsed.run.current_stage, 'detailed_outline');
+  });
+});
+
+test('CLI deliverable execute, managed get, and managed supervise proxy the managed execution control plane', async () => {
+  await withMockHermesUpstreamCli(async () => {
+    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
+
+    await execCliAsync(
+      cliPath,
+      [
+        'source',
+        'research',
+        '--workspace-root',
+        workspaceRoot,
+        '--topic-id',
+        'topic-a',
+        '--title',
+        '甲状腺门诊科普',
+        '--brief',
+        '给出一份最终课堂 PPT 所需的公开信息。',
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file',
+        },
       },
-    },
-  );
+    );
 
-  execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'create',
-      '--workspace-root',
-      workspaceRoot,
-      '--overlay',
-      'ppt_deck',
-      '--profile-id',
-      'lecture_student',
-      '--topic-id',
-      'topic-a',
-      '--deliverable-id',
-      'deck-a',
-      '--title',
-      '甲状腺门诊科普 deck',
-      '--goal',
-      '为本科生讲授甲状腺基础知识',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+    await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'create',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--profile-id',
+        'lecture_student',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--title',
+        '甲状腺门诊科普 deck',
+        '--goal',
+        '为本科生讲授甲状腺基础知识',
+      ],
+      { cwd: path.resolve('.') },
+    );
 
-  const executeOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'execute',
-      '--workspace-root',
-      workspaceRoot,
-      '--overlay',
-      'ppt_deck',
-      '--topic-id',
-      'topic-a',
-      '--deliverable-id',
-      'deck-a',
-      '--user-intent',
-      '给我一个最终 PPT',
-      '--stop-after-stage',
-      'storyline',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+    const executeParsed = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'execute',
+        '--workspace-root',
+        workspaceRoot,
+        '--overlay',
+        'ppt_deck',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--user-intent',
+        '给我一个最终 PPT',
+        '--stop-after-stage',
+        'storyline',
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(executeParsed.ok, true);
+    assert.equal(executeParsed.surface_kind, 'managed_run');
+    assert.equal(executeParsed.summary.status, 'stopped_after_stage');
 
-  const executeParsed = JSON.parse(executeOutput);
-  assert.equal(executeParsed.ok, true);
-  assert.equal(executeParsed.surface_kind, 'managed_run');
-  assert.equal(executeParsed.summary.status, 'stopped_after_stage');
+    const managedParsed = await execCliAsync(
+      cliPath,
+      [
+        'managed',
+        'get',
+        '--workspace-root',
+        workspaceRoot,
+        '--managed-run-id',
+        executeParsed.summary.managed_run_id,
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(managedParsed.ok, true);
+    assert.equal(managedParsed.surface_kind, 'managed_run_record');
+    assert.equal(managedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
+    assert.equal(managedParsed.runtime_supervision.health_status, 'paused');
 
-  const managedGetOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'managed',
-      'get',
-      '--workspace-root',
-      workspaceRoot,
-      '--managed-run-id',
-      executeParsed.summary.managed_run_id,
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const managedParsed = JSON.parse(managedGetOutput);
-  assert.equal(managedParsed.ok, true);
-  assert.equal(managedParsed.surface_kind, 'managed_run_record');
-  assert.equal(managedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
-  assert.equal(managedParsed.runtime_supervision.health_status, 'paused');
-
-  const managedSuperviseOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'managed',
-      'supervise',
-      '--workspace-root',
-      workspaceRoot,
-      '--managed-run-id',
-      executeParsed.summary.managed_run_id,
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const supervisedParsed = JSON.parse(managedSuperviseOutput);
-  assert.equal(supervisedParsed.ok, true);
-  assert.equal(supervisedParsed.surface_kind, 'managed_supervision');
-  assert.equal(supervisedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
+    const supervisedParsed = await execCliAsync(
+      cliPath,
+      [
+        'managed',
+        'supervise',
+        '--workspace-root',
+        workspaceRoot,
+        '--managed-run-id',
+        executeParsed.summary.managed_run_id,
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(supervisedParsed.ok, true);
+    assert.equal(supervisedParsed.surface_kind, 'managed_supervision');
+    assert.equal(supervisedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
+  });
 });
 
 
@@ -782,177 +877,174 @@ test('CLI review get and mutate proxy review platform actions', () => {
 });
 
 test('CLI review projection proxies topic publication projection read path', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-projection-'));
+  await withMockHermesUpstreamCli(async () => {
+    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-projection-'));
 
-  const createOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'create',
-      '--workspace-root', workspaceRoot,
-      '--overlay', 'xiaohongshu',
-      '--profile-id', 'standard_note',
-      '--topic-id', 'topic-a',
-      '--deliverable-id', 'note-a',
-      '--title', '甲状腺门诊小红书科普',
-      '--goal', '为门诊患者生成可发布的科普图文',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-  assert.equal(JSON.parse(createOutput).ok, true);
-
-  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
-    const output = execFileSync(
-      'node',
+    const createOutput = await execCliAsync(
+      cliPath,
       [
-        path.resolve('apps/redcube-cli/src/cli.js'),
         'deliverable',
-        'run',
+        'create',
         '--workspace-root', workspaceRoot,
         '--overlay', 'xiaohongshu',
+        '--profile-id', 'standard_note',
         '--topic-id', 'topic-a',
         '--deliverable-id', 'note-a',
-        '--route', route,
+        '--title', '甲状腺门诊小红书科普',
+        '--goal', '为门诊患者生成可发布的科普图文',
       ],
-      { encoding: 'utf-8', cwd: path.resolve('.') },
+      { cwd: path.resolve('.') },
     );
-    assert.equal(JSON.parse(output).ok, true, route);
-  }
+    assert.equal(createOutput.ok, true);
 
-  const projectionOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'review',
-      'projection',
-      '--workspace-root', workspaceRoot,
-      '--topic-id', 'topic-a',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+      const output = await execCliAsync(
+        cliPath,
+        [
+          'deliverable',
+          'run',
+          '--workspace-root', workspaceRoot,
+          '--overlay', 'xiaohongshu',
+          '--topic-id', 'topic-a',
+          '--deliverable-id', 'note-a',
+          '--route', route,
+        ],
+        { cwd: path.resolve('.') },
+      );
+      assert.equal(output.ok, true, route);
+    }
 
-  const projection = JSON.parse(projectionOutput);
-  assert.equal(projection.ok, true);
-  assert.equal(projection.surface_kind, 'publication_projection');
-  assert.equal(projection.state_type, 'projection');
-  assert.equal(projection.publication.current, 'approval_pending');
-  assert.equal(projection.canonical_source.kind, 'review_state.delivery_projection');
-});
-
-test('CLI review watch returns operator-facing runtime watch surface for a persisted run', () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-'));
-
-  const createOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'create',
-      '--workspace-root', workspaceRoot,
-      '--overlay', 'ppt_deck',
-      '--profile-id', 'lecture_student',
-      '--topic-id', 'topic-a',
-      '--deliverable-id', 'deck-a',
-      '--title', '甲状腺门诊科普 deck',
-      '--goal', '为本科生讲授甲状腺基础知识',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-  assert.equal(JSON.parse(createOutput).ok, true);
-
-  const runOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'run',
-      '--workspace-root', workspaceRoot,
-      '--overlay', 'ppt_deck',
-      '--topic-id', 'topic-a',
-      '--deliverable-id', 'deck-a',
-      '--route', 'storyline',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-  const runParsed = JSON.parse(runOutput);
-  assert.equal(runParsed.ok, true);
-
-  const watchOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'review',
-      'watch',
-      '--workspace-root', workspaceRoot,
-      '--topic-id', 'topic-a',
-      '--deliverable-id', 'deck-a',
-      '--run-id', runParsed.run.run_id,
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-  const watched = JSON.parse(watchOutput);
-  assert.equal(watched.ok, true);
-  assert.equal(watched.surface_kind, 'runtime_watch');
-  assert.equal(watched.run_id, runParsed.run.run_id);
-});
-
-test('CLI review watch rejects a persisted run when topic locator does not match the run identity', () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-mismatch-'));
-
-  for (const topicId of ['topic-a', 'topic-b']) {
-    const createOutput = execFileSync(
-      'node',
+    const projection = await execCliAsync(
+      cliPath,
       [
-        path.resolve('apps/redcube-cli/src/cli.js'),
+        'review',
+        'projection',
+        '--workspace-root', workspaceRoot,
+        '--topic-id', 'topic-a',
+      ],
+      { cwd: path.resolve('.') },
+    );
+
+    assert.equal(projection.ok, true);
+    assert.equal(projection.surface_kind, 'publication_projection');
+    assert.equal(projection.state_type, 'projection');
+    assert.equal(projection.publication.current, 'approval_pending');
+    assert.equal(projection.canonical_source.kind, 'review_state.delivery_projection');
+  });
+});
+
+test('CLI review watch returns operator-facing runtime watch surface for a persisted run', async () => {
+  await withMockHermesUpstreamCli(async () => {
+    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-'));
+
+    const createOutput = await execCliAsync(
+      cliPath,
+      [
         'deliverable',
         'create',
         '--workspace-root', workspaceRoot,
         '--overlay', 'ppt_deck',
         '--profile-id', 'lecture_student',
-        '--topic-id', topicId,
+        '--topic-id', 'topic-a',
         '--deliverable-id', 'deck-a',
-        '--title', `deck ${topicId}`,
-        '--goal', `goal ${topicId}`,
+        '--title', '甲状腺门诊科普 deck',
+        '--goal', '为本科生讲授甲状腺基础知识',
       ],
-      { encoding: 'utf-8', cwd: path.resolve('.') },
+      { cwd: path.resolve('.') },
     );
-    assert.equal(JSON.parse(createOutput).ok, true);
-  }
+    assert.equal(createOutput.ok, true);
 
-  const runOutput = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/src/cli.js'),
-      'deliverable',
-      'run',
-      '--workspace-root', workspaceRoot,
-      '--overlay', 'ppt_deck',
-      '--topic-id', 'topic-a',
-      '--deliverable-id', 'deck-a',
-      '--route', 'storyline',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-  const runParsed = JSON.parse(runOutput);
-  assert.equal(runParsed.ok, true);
+    const runParsed = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'run',
+        '--workspace-root', workspaceRoot,
+        '--overlay', 'ppt_deck',
+        '--topic-id', 'topic-a',
+        '--deliverable-id', 'deck-a',
+        '--route', 'storyline',
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(runParsed.ok, true);
 
-  const failure = execCliExpectFailure(
-    path.resolve('apps/redcube-cli/src/cli.js'),
-    [
-      'review',
-      'watch',
-      '--workspace-root', workspaceRoot,
-      '--topic-id', 'topic-b',
-      '--deliverable-id', 'deck-a',
-      '--run-id', runParsed.run.run_id,
-    ],
-    { cwd: path.resolve('.') },
-  );
+    const watched = await execCliAsync(
+      cliPath,
+      [
+        'review',
+        'watch',
+        '--workspace-root', workspaceRoot,
+        '--topic-id', 'topic-a',
+        '--deliverable-id', 'deck-a',
+        '--run-id', runParsed.run.run_id,
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(watched.ok, true);
+    assert.equal(watched.surface_kind, 'runtime_watch');
+    assert.equal(watched.run_id, runParsed.run.run_id);
+  });
+});
 
-  assert.equal(failure.ok, false);
-  assert.equal(failure.error_kind, 'cli_usage_error');
-  assert.match(failure.error, /runtimeWatch topicId 与 run\.topic_id 不一致/);
+test('CLI review watch rejects a persisted run when topic locator does not match the run identity', async () => {
+  await withMockHermesUpstreamCli(async () => {
+    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-mismatch-'));
+
+    for (const topicId of ['topic-a', 'topic-b']) {
+      const createOutput = await execCliAsync(
+        cliPath,
+        [
+          'deliverable',
+          'create',
+          '--workspace-root', workspaceRoot,
+          '--overlay', 'ppt_deck',
+          '--profile-id', 'lecture_student',
+          '--topic-id', topicId,
+          '--deliverable-id', 'deck-a',
+          '--title', `deck ${topicId}`,
+          '--goal', `goal ${topicId}`,
+        ],
+        { cwd: path.resolve('.') },
+      );
+      assert.equal(createOutput.ok, true);
+    }
+
+    const runParsed = await execCliAsync(
+      cliPath,
+      [
+        'deliverable',
+        'run',
+        '--workspace-root', workspaceRoot,
+        '--overlay', 'ppt_deck',
+        '--topic-id', 'topic-a',
+        '--deliverable-id', 'deck-a',
+        '--route', 'storyline',
+      ],
+      { cwd: path.resolve('.') },
+    );
+    assert.equal(runParsed.ok, true);
+
+    const failure = await execCliExpectFailureAsync(
+      cliPath,
+      [
+        'review',
+        'watch',
+        '--workspace-root', workspaceRoot,
+        '--topic-id', 'topic-b',
+        '--deliverable-id', 'deck-a',
+        '--run-id', runParsed.run.run_id,
+      ],
+      { cwd: path.resolve('.') },
+    );
+
+    assert.equal(failure.ok, false);
+    assert.equal(failure.error_kind, 'cli_usage_error');
+    assert.match(failure.error, /runtimeWatch topicId 与 run\.topic_id 不一致/);
+  });
 });
 
 test('CLI topics list works from isolated install without monorepo sibling source packages', () => {

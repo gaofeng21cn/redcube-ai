@@ -33,17 +33,20 @@
 
 它的重点是把视觉交付这件事组织成正式生产线。
 
-当前这条 runtime 叙事仍处在真相重置阶段。
-仓库已经有可用的本地视觉交付主线，但**还没有**真正完成上游 `Hermes-Agent` 集成。
-今天可执行的基线仍然是 repo-owned、local-first 的组合：
+当前这条 runtime 叙事已经不再只是 repo-local。
+`RedCube AI` 现在已经冻结了真实上游 `Hermes-Agent` activation proof，并把 `runDeliverableRoute` 与 managed execution 的 run surface 切到上游 `Hermes-Agent` API server。
+今天可执行的基线因此变成：
 
-- 仓内自带的 repo-local managed runtime pilot
-- 本地 `Codex` operator / development host
+- route / managed execution 的 run surface 由上游 `Hermes-Agent` 主责
+- visual-domain truth、audit、review、export 与 deliverable state 继续由 `RedCube AI` 主责
+- reachable upstream gateway / API server 是硬前提；缺失时整条 cutover fail-closed
 
-因此，当前仓里任何带 `Hermes` 命名的 package、program brief 或 helper，都应被理解为本地迁移工件或 pilot substrate，而不是“上游 `Hermes-Agent` 已经接管 runtime”的证据。
+因此，仓里保留的 `Hermes` 历史命名仍然只是 absorbed artifact / compatibility material，不再单独承担 runtime owner 证明。
 
-真正的长线目标，是把 session / run / watch / memory / scheduling 这类 substrate 责任交给上游 `Hermes-Agent`，同时让 `RedCube AI` 继续负责视觉 domain logic、audit、review、export 与 deliverable truth。
-这一步的仓库级下一道闸门已经冻结成 `upstream-hermes-agent-activation-package`，对应 probe 命令是 `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`。
+这一步对应的仓库级 activation gate 仍是 `upstream-hermes-agent-activation-package`，probe 命令是 `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`。
+给 future `OPL Gateway` 调用的 service-safe adapter shell 则冻结为 `redcube_service_safe_domain_entry`，对应合同在 `contracts/runtime-program/service-safe-domain-entry-adapter.json`。
+如果本机全局 `hermes` CLI 仍落后于上游 gateway 启动修复，live verification lane 可以显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream 启动命令，而不是把这个仓误写成已经把 Hermes 本地修好了。
+这条 override 只负责修正“启动的是哪份 upstream checkout”，并不能掩盖 `/v1/runs/{run_id}/events` 这类 upstream run-surface 自身失败。
 
 `Codex-default host-agent runtime` 当前承担本地 operator / development host 的角色。
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
@@ -246,7 +249,7 @@
 - direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `lifecycle_stage_contract` 与对齐后的 `lifecycle_stage_summary`，同时 `Storyline + Plan` 继续映射到 `Story Architecture`，`operator_handoff / closeout` 继续留在 `Delivery`
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，而不再依赖单独的 workspace-init 产品表面
 - operator surface consistency hardening 已在同一主线上吸收一条 tranche：`workspace doctor` 现在把 brand-new workspace bootstrap guidance 收紧到 `source intake` / `source research`，command-scoped `--help` 保持 machine-readable 且不会执行真实命令，而 `CLI review watch` / `MCP runtime_watch` 现在围绕同一 `runtimeWatch` locator truth 与共享治理 summaries 收口
-- 当前 repo-local managed runtime pilot 已经收口了 routed deliverable execution、run record 与 shared runtime-topology wording，而上游 `Hermes-Agent` 对 runtime 的正式承接仍是下一阶段的 substrate 目标
+- route / managed execution 的 run surface 已经由上游 `Hermes-Agent` 主责；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance、兼容桥与回归对照，不再是当前 runtime owner
 - 当前行为收口还新增了 `governance_surface.runtime_topology`：create / review / audit / watch / projection 现在在同一 deliverable/topic 边界上看到同一份 runtime topology 真相
 - runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance：deliverable-scope run record 仍持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator 指向错误 topic 或 deliverable 的 run 时继续 fail-closed
 - 海报能力还没完全收口：
@@ -272,9 +275,9 @@
       -> 网关
           -> 交付物层 / 场景层 / 配置层 / 包层
               -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
-                  -> repo-local managed runtime pilot（当前可执行基线）
-                      -> Codex-local operator / development host
-                  -> 上游 Hermes-Agent runtime substrate（目标形态，尚未落地）
+                  -> 上游 Hermes-Agent runtime substrate（当前 route / managed run owner）
+                      -> Codex-local operator / development host / workspace bridge
+                  -> repo-local managed runtime pilot（历史迁移工件 / 兼容桥）
                   -> managed web runtime（真实 substrate 迁移后的未来选项）
 ```
 
@@ -294,7 +297,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前 active mainline 仍是一条 local-only runtime line：`P0 review-closeout` 已通过，phase-2 的 source-truth / governance / operator-surface 工作继续作为 absorbed provenance 保留，仓内也已经形成覆盖 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 的 repo-local managed closure。上游 `Hermes-Agent` 对 runtime owner 的正式承接，继续属于后续 substrate 里程碑。
+- 当前 active mainline 已经把 route / managed run owner 切到上游 `Hermes-Agent`：phase-2 的 source-truth / governance / operator-surface 工作继续作为 absorbed provenance 保留，而 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 继续在同一 RedCube visual-domain truth 上收口；历史 repo-local runtime 不再是当前 owner。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -303,7 +306,10 @@
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
 - `Codex-default host-agent runtime` 继续只作为本地 operator / development host，而不是长期产品 runtime owner。
-- 上游 `Hermes-Agent` 集成仍待后续真实 pilot；下一道冻结闸门是 `upstream-hermes-agent-activation-package`，在 probe 通过前不得改写 runtime owner 说法。
+- route / managed execution 现在已经 fail-closed 到真实上游 `Hermes-Agent` proof；冻结闸门仍是 `upstream-hermes-agent-activation-package`，service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
+- 当前 fresh proof 使用 `hermes gateway run -q`；默认 `hermes gateway run` 仍会因上游 `RedactingFormatter` bug 崩溃，这不能被误写成仓内已修能力。
+- 如果验证宿主上的全局 `hermes` CLI 仍指向这份有问题的 upstream checkout，请用 `REDCUBE_HERMES_GATEWAY_COMMAND` 把 integration / e2e verification 指到一条已知良好的 upstream gateway 启动命令。
+- 当前 live verification 还要求 `/v1/runs` 与 `/v1/runs/{run_id}/events` 真正发出 terminal event；在 2026-04-12 这台验证宿主上，即使切到最新 upstream launch override，也会因为 events stream 在 terminal event 之前就关闭而被 block。
 - managed web runtime 仍是同一 substrate 上的未来形态，不得伪装成已完成。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。

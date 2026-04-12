@@ -15,11 +15,11 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 minimum baseline contract remains absorbed provenance behind the current Hermes runtime substrate tranche', () => {
+test('phase-2 minimum baseline contract remains absorbed provenance behind the current upstream Hermes cutover tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(BASELINE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'truth_reset');
+  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
   assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
@@ -44,7 +44,7 @@ test('phase-2 minimum baseline contract freezes canonical quartet, formal entry 
   const gatewayIntake = read('packages/redcube-gateway/src/actions/intake-source.js');
   const mcpServer = read('apps/redcube-mcp/src/server.js');
   const sharedSourceTruth = read('packages/redcube-runtime/src/shared-source-truth.js');
-  const deliverableRoutes = read('packages/redcube-runtime/src/deliverable-routes.js');
+  const deliverableRouteLocal = read('packages/redcube-runtime/src/deliverable-route-local.js');
 
   const artifactIds = contract.artifact_schema.canonical_artifacts.map((item) => item.artifact_id);
   assert.deepEqual(artifactIds, ['source_index', 'extracted_materials', 'source_audit', 'source_brief']);
@@ -59,7 +59,7 @@ test('phase-2 minimum baseline contract freezes canonical quartet, formal entry 
   assert.equal(sharedSourceTruth.includes('extracted_materials'), true);
   assert.equal(sharedSourceTruth.includes('source_audit'), true);
   assert.equal(sharedSourceTruth.includes('source_brief'), true);
-  assert.equal(deliverableRoutes.includes('shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId)'), true);
+  assert.equal(deliverableRouteLocal.includes('shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId)'), true);
 });
 
 test('phase-2 minimum baseline brief and docs indexes expose the baseline as absorbed provenance while keeping Hermes current scope honest', () => {

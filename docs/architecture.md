@@ -6,8 +6,8 @@
 
 `gateway -> family -> profile -> pack -> harness execution -> audit / review / publication projection`
 
-当前仓内可执行的 runtime 基线仍是 repo-local managed runtime + 本地 operator host。
-长线目标才是把 session / run / watch / memory / scheduling 这类 substrate 责任迁到真实的上游 `Hermes-Agent`，同时保持上面的 domain chain 不变。
+当前仓内可执行的 runtime 基线已经把 route / managed execution 的 run surface 切到真实的上游 `Hermes-Agent` API server。
+`RedCube AI` 继续只维护 visual-domain truth、本地 canonical artifacts，以及 audit / review / projection surface。
 
 ## 入口 taxonomy 与 OPL handoff
 
@@ -62,6 +62,16 @@
 - 由 `Hermes` 统一 runtime substrate / orchestration
 - 由 `RedCube AI` 统一 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器，例如 repo-local pipeline、受控 host-agent、渲染 toolchain 或未来的 Hermes-native route
+
+## Service-Safe Domain Entry
+
+当前 repo-tracked service-safe adapter shell 是：
+
+- contract: `contracts/runtime-program/service-safe-domain-entry-adapter.json`
+- callable surface: `@redcube/gateway` `invokeDomainEntry`
+- MCP tool: `invoke_domain_entry`
+
+这就是当前 mainline 明确冻结的 service-safe domain entry surface。
 
 ## 结构角色
 

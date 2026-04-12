@@ -74,8 +74,10 @@ const JS_RESIDUE_ALLOWLIST = {
   ],
   'packages/redcube-runtime': [
     'src/creative-ownership.js',
+    'src/deliverable-route-local.js',
     'src/deliverable-routes.js',
     'src/event-log.js',
+    'src/execute-redcube-service-entry.js',
     'src/executors.js',
     'src/index.js',
     'src/managed-deliverable.js',
@@ -94,6 +96,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/source-intake.js',
     'src/source-readiness-pack.js',
     'src/source-research.js',
+    'src/upstream-hermes-bridge.js',
     'src/xiaohongshu-runtime.js',
     'src/xiaohongshu.js',
   ],

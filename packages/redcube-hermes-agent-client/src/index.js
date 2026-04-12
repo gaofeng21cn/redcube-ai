@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 export const DEFAULT_HERMES_AGENT_UPSTREAM_BASE_URL = 'http://127.0.0.1:8642';
 export const DEFAULT_HERMES_AGENT_MODEL_NAME = 'hermes-agent';
+export const UPSTREAM_HERMES_AGENT_RUNTIME_OWNER = 'upstream_hermes_agent';
 
 function normalizeBaseUrl(rawBaseUrl) {
   const text = String(rawBaseUrl || '').trim();
@@ -43,7 +44,7 @@ function buildBlockedResult({
   return {
     ok: false,
     status: 'blocked',
-    runtime_owner: 'upstream_hermes_agent',
+    runtime_owner: UPSTREAM_HERMES_AGENT_RUNTIME_OWNER,
     config: {
       base_url: config.baseUrl,
       model_name: config.modelName,
@@ -53,6 +54,15 @@ function buildBlockedResult({
     error_kind: errorKind,
     blocking_reason: blockingReason,
   };
+}
+
+function parseEventStreamPayload(payload) {
+  return String(payload || '')
+    .split('\n')
+    .filter((line) => line.startsWith('data: '))
+    .map((line) => line.slice('data: '.length).trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
 }
 
 async function readTerminalRunEvent({ fetchImpl, baseUrl, headers, runId, timeoutMs }) {
@@ -310,7 +320,7 @@ export async function probeHermesAgentUpstream({
   return {
     ok: true,
     status: 'ready',
-    runtime_owner: 'upstream_hermes_agent',
+    runtime_owner: UPSTREAM_HERMES_AGENT_RUNTIME_OWNER,
     config: {
       base_url: config.baseUrl,
       model_name: config.modelName,
@@ -319,5 +329,100 @@ export async function probeHermesAgentUpstream({
     steps,
     error_kind: null,
     blocking_reason: null,
+  };
+}
+
+export async function startHermesAgentRun({
+  config = readHermesAgentUpstreamConfig(),
+  fetchImpl = globalThis.fetch,
+  input,
+  instructions = '',
+  sessionId = '',
+  timeoutMs = 15000,
+} = {}) {
+  if (typeof fetchImpl !== 'function') {
+    throw new Error('fetch implementation is required');
+  }
+  const userInput = String(input || '').trim();
+  if (!userInput) {
+    throw new Error('Hermes upstream run input 不能为空');
+  }
+
+  const headers = buildHermesAgentProbeHeaders(config);
+  const response = await fetchImpl(`${config.baseUrl}/v1/runs`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      input: userInput,
+      ...(instructions ? { instructions } : {}),
+      ...(sessionId ? { session_id: sessionId } : {}),
+    }),
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  if (!response.ok) {
+    const detail = await readJsonResponse(response);
+    throw new Error(
+      `upstream Hermes-Agent /v1/runs returned ${response.status}: ${JSON.stringify(detail)}`,
+    );
+  }
+
+  const payload = await readJsonResponse(response);
+  const runId = String(payload?.run_id || '').trim();
+  if (!runId) {
+    throw new Error('upstream Hermes-Agent /v1/runs did not return run_id');
+  }
+
+  return {
+    run_id: runId,
+    status: String(payload?.status || 'started').trim() || 'started',
+    session_id: String(sessionId || runId).trim() || runId,
+  };
+}
+
+export async function readHermesAgentRunEvents({
+  config = readHermesAgentUpstreamConfig(),
+  fetchImpl = globalThis.fetch,
+  runId,
+  timeoutMs = 60000,
+} = {}) {
+  if (typeof fetchImpl !== 'function') {
+    throw new Error('fetch implementation is required');
+  }
+
+  const safeRunId = String(runId || '').trim();
+  if (!safeRunId) {
+    throw new Error('runId 不能为空');
+  }
+
+  const headers = buildHermesAgentProbeHeaders(config);
+  const response = await fetchImpl(`${config.baseUrl}/v1/runs/${safeRunId}/events`, {
+    headers,
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(
+      `upstream Hermes-Agent /v1/runs/${safeRunId}/events returned ${response.status}: ${detail}`,
+    );
+  }
+
+  const payload = await response.text();
+  const events = parseEventStreamPayload(payload);
+  const terminalEvent = events.find(
+    (event) => event?.event === 'run.completed' || event?.event === 'run.failed',
+  ) || null;
+
+  return {
+    run_id: safeRunId,
+    events,
+    terminal_event: terminalEvent?.event || null,
+    ok: terminalEvent?.event === 'run.completed',
+    output: terminalEvent?.output ?? null,
+    error: terminalEvent?.error ?? null,
   };
 }

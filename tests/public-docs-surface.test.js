@@ -106,5 +106,5 @@ test('docs freeze lightweight product entry and OPL handoff without overclaiming
   assert.equal(handoff.includes('return_surface_contract'), true);
   assert.equal(handoff.includes('deliverable_family'), true);
   assert.equal(handoff.includes('还没有成熟的用户级 `product entry`'), true);
-  assert.equal(handoff.includes('当前 runtime substrate 仍未真实切到上游 `Hermes-Agent`'), true);
+  assert.equal(handoff.includes('当前 route / managed run surface 已切到上游 `Hermes-Agent`'), true);
 });
