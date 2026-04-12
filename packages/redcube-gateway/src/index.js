@@ -68,6 +68,10 @@ export async function runManagedDeliverable(request) {
   const module = await import('./actions/run-managed-deliverable.js');
   return module.runManagedDeliverable(request);
 }
+export async function invokeDomainEntry(request) {
+  const module = await import('./actions/invoke-domain-entry.js');
+  return module.invokeDomainEntry(request);
+}
 export async function auditDeliverable(request) {
   const module = await import('./actions/audit-deliverable.js');
   return module.auditDeliverable(request);

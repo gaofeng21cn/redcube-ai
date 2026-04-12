@@ -38,6 +38,7 @@ export interface HermesAgentProbeResult {
 
 export declare const DEFAULT_HERMES_AGENT_UPSTREAM_BASE_URL: 'http://127.0.0.1:8642';
 export declare const DEFAULT_HERMES_AGENT_MODEL_NAME: 'hermes-agent';
+export declare const UPSTREAM_HERMES_AGENT_RUNTIME_OWNER: 'upstream_hermes_agent';
 
 export declare function readHermesAgentUpstreamConfig(
   env?: Record<string, string | undefined>,
@@ -55,3 +56,30 @@ export declare function probeHermesAgentUpstream(options?: {
   sessionId?: string;
   timeoutMs?: number;
 }): Promise<HermesAgentProbeResult>;
+
+export declare function startHermesAgentRun(options?: {
+  config?: HermesAgentUpstreamConfig;
+  fetchImpl?: typeof globalThis.fetch;
+  input: string;
+  instructions?: string;
+  sessionId?: string;
+  timeoutMs?: number;
+}): Promise<{
+  run_id: string;
+  status: string;
+  session_id: string;
+}>;
+
+export declare function readHermesAgentRunEvents(options?: {
+  config?: HermesAgentUpstreamConfig;
+  fetchImpl?: typeof globalThis.fetch;
+  runId: string;
+  timeoutMs?: number;
+}): Promise<{
+  run_id: string;
+  events: Array<Record<string, unknown>>;
+  terminal_event: string | null;
+  ok: boolean;
+  output: string | null;
+  error: string | null;
+}>;

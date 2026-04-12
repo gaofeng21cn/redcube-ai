@@ -13,6 +13,7 @@ import {
   getDeliverable as getDeliverableJs,
   getPublicationProjection as getPublicationProjectionJs,
   getRun as getRunJs,
+  invokeDomainEntry as invokeDomainEntryJs,
   getManagedRun as getManagedRunJs,
   superviseManagedRun as superviseManagedRunJs,
   runDeliverableRoute as runDeliverableRouteJs,
@@ -30,6 +31,8 @@ import type {
   DeliverableAuditResponse,
   DeliverableCreateResponse,
   DeliverableRecordResponse,
+  DomainEntryRequest,
+  DomainEntryResponse,
   DeliverableRequest,
   LegacyImportResponse,
   ManagedRunRecordResponse,
@@ -120,6 +123,10 @@ export function getRun(request: WorkspaceRootRequest & { runId: string }): Promi
   return getRunJs(request) as Promise<RunRecordResponse>;
 }
 
+export function invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse> {
+  return invokeDomainEntryJs(request) as Promise<DomainEntryResponse>;
+}
+
 export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {
   return getManagedRunJs(request) as Promise<ManagedRunRecordResponse>;
 }
@@ -162,6 +169,8 @@ export type {
   DeliverableAuditResponse,
   DeliverableCreateResponse,
   DeliverableRecordResponse,
+  DomainEntryRequest,
+  DomainEntryResponse,
   DeliverableRequest,
   LegacyImportResponse,
   ManagedRunRecordResponse,

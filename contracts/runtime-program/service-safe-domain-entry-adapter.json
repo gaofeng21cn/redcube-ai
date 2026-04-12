@@ -1,0 +1,63 @@
+{
+  "entry_contract_id": "redcube_service_safe_domain_entry",
+  "date_anchor": "2026-04-12",
+  "status": "closeout_completed",
+  "owner_surface": "@redcube/gateway invokeDomainEntry",
+  "entry_goal": {
+    "label": "service-safe RedCube domain entry for future OPL Gateway handoff",
+    "summary": "Freeze one machine-readable RedCube domain adapter surface that can be called by a future OPL Gateway while keeping runtime execution on upstream Hermes-Agent and domain truth on RedCube."
+  },
+  "opl_handoff_envelope": {
+    "minimum_fields": [
+      "target_domain_id",
+      "task_intent",
+      "entry_mode",
+      "workspace_locator",
+      "runtime_session_contract",
+      "return_surface_contract"
+    ],
+    "target_domain_id": "redcube_ai"
+  },
+  "runtime_session_contract": {
+    "runtime_owner": "upstream_hermes_agent",
+    "adapter_surface": "@redcube/hermes-agent-client",
+    "session_mode": "ephemeral_run"
+  },
+  "redcube_domain_payload": {
+    "required_fields": [
+      "deliverable_family",
+      "topic_id",
+      "deliverable_id"
+    ],
+    "optional_fields": [
+      "route",
+      "adapter",
+      "user_intent",
+      "stop_after_stage",
+      "mode",
+      "baseline_deliverable_id"
+    ]
+  },
+  "supported_task_intents": [
+    "run_managed_deliverable",
+    "run_deliverable_route"
+  ],
+  "return_surface_contract": {
+    "supported_surface_kinds": [
+      "managed_run",
+      "route_run"
+    ],
+    "durable_truth_surfaces": [
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection",
+      "auditDeliverable"
+    ]
+  },
+  "excluded_scope": [
+    "chat UI or natural-language shell",
+    "new family onboarding",
+    "controller expansion",
+    "repackaging repo-local Hermes naming as upstream proof"
+  ]
+}

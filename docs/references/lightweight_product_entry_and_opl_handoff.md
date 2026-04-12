@@ -67,11 +67,11 @@
 
 - 当前还不能把 `RedCube Product Entry` 写成已成熟落地
 - 当前也不能把 `OPL -> RedCube` handoff 写成真实线上运行中的用户入口
-- 当前 runtime substrate 仍未真实切到上游 `Hermes-Agent`
+- 当前 route / managed run surface 已切到上游 `Hermes-Agent`
 - 所以这份文档冻结的是目标边界与调用合同，不是已完成的产品形态
 
 ## 6. 下一步落地方向
 
 1. 保持 `CLI / MCP / controller` 的 formal-entry 语义稳定，不让产品入口叙事反向污染当前可验证入口。
 2. 先补 `RedCube Product Entry` 的 contract shell，让 direct entry 与 OPL handoff 进入同一条命令/服务合同。
-3. 在真实上游 `Hermes-Agent` substrate 证据成立后，再把 runtime session、resume、watch、route 接到真实 product entry 壳上。
+3. 在已经冻结的 upstream `Hermes-Agent` substrate 证据之上，把 runtime session、resume、watch、route 接到真实 product entry 壳上。

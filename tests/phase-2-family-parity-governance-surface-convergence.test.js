@@ -73,6 +73,6 @@ test('family parity governance tranche is now absorbed provenance without wideni
   assert.equal(brief.includes('closeout_completed'), true);
   assert.equal(brief.includes('完成实现并吸收到主线 provenance'), true);
   assert.equal(runtimeWatchBrief.includes('prefrozen follow-on board'), true);
-  assert.equal(runtimePolicy.includes('repo-local managed runtime pilot'), true);
-  assert.equal(positioning.includes('truth reset / upstream Hermes-Agent pilot prep'), true);
+  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的上游 `Hermes-Agent`'), true);
+  assert.equal(positioning.includes('upstream Hermes-Agent runtime owner cutover + service-safe domain entry adapter'), true);
 });

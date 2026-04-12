@@ -10,6 +10,7 @@ import {
   createDeliverable,
   doctorWorkspace,
   getDeliverable,
+  invokeDomainEntry,
   getManagedRun,
   superviseManagedRun,
   getOverlayCatalog,
@@ -34,6 +35,7 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   doctorWorkspace,
   listTopics,
   getOverlayCatalog,
+  invokeDomainEntry,
   createDeliverable,
   getDeliverable,
   getPublicationProjection,
@@ -146,6 +148,38 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       workspaceRoot: z.string().describe('Absolute workspace root path.'),
       topicId: z.string().describe('Topic identifier.'),
+    },
+  },
+  {
+    name: 'invoke_domain_entry',
+    description: 'Call the service-safe RedCube domain entry adapter for future OPL Gateway style handoff.',
+    actionKey: 'invokeDomainEntry',
+    inputSchema: {
+      target_domain_id: z.string().describe('Target domain id. Must be redcube_ai.'),
+      task_intent: z.string().describe('Task intent such as run_managed_deliverable or run_deliverable_route.'),
+      entry_mode: z.string().optional().describe('Entry mode such as opl_gateway or service_call.'),
+      workspace_locator: z.object({
+        workspace_root: z.string().describe('Absolute workspace root path.'),
+      }).describe('Machine-readable workspace locator.'),
+      runtime_session_contract: z.object({
+        runtime_owner: z.string().describe('Runtime owner. Must be upstream_hermes_agent.'),
+        adapter_surface: z.string().optional().describe('Adapter surface identifier.'),
+        session_mode: z.string().optional().describe('Session mode such as ephemeral_run.'),
+      }).describe('Runtime session contract for the upstream Hermes-Agent substrate.'),
+      return_surface_contract: z.object({
+        surface_kind: z.string().optional().describe('Requested return surface such as managed_run.'),
+      }).describe('Requested return surface contract.'),
+      domain_payload: z.object({
+        deliverable_family: z.string().describe('RedCube deliverable family / overlay id.'),
+        topic_id: z.string().describe('Topic identifier.'),
+        deliverable_id: z.string().describe('Deliverable identifier.'),
+        route: z.string().optional().describe('Route name when task_intent is run_deliverable_route.'),
+        adapter: z.string().optional().describe('Optional executor adapter id.'),
+        user_intent: z.string().optional().describe('Optional user intent for managed execution.'),
+        stop_after_stage: z.string().optional().describe('Optional explicit stop-after stage for managed execution.'),
+        mode: z.string().optional().describe('Execution mode such as draft_new.'),
+        baseline_deliverable_id: z.string().optional().describe('Optional baseline deliverable id.'),
+      }).describe('RedCube visual-domain payload.'),
     },
   },
   {
