@@ -349,6 +349,8 @@ npm run typecheck
 - `npm run test:e2e`：依赖 Python、字体与 Playwright 的 render / export 端到端测试
 - `npm run test:full`：clean-clone 基线使用的完整验证入口
 
+GitHub Actions CI 默认只跑 quality lane（`npm run typecheck`、`npm run test:fast`、`npm run test:meta`）。live-upstream 的 `integration` / `e2e` / `full` 仍是显式验证 lane，只应在能证明真实 Hermes run surface 的准备好宿主上执行。
+
 查看 CLI：
 
 ```bash

@@ -69,4 +69,5 @@ test('managed family closure truth remains historical provenance after upstream 
   );
   assert.equal(brief.includes('repo-hosted managed control plane'), true);
   assert.equal(brief.includes('这里说的是 repo-hosted managed control plane'), true);
+  assert.equal(brief.includes('历史说明'), true);
 });

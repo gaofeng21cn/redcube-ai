@@ -351,6 +351,8 @@ Local test layers:
 - `npm run test:e2e`: render/export end-to-end tests that need Python, fonts, and Playwright
 - `npm run test:full`: full tracked baseline for clean-clone verification
 
+GitHub Actions CI intentionally stays on the quality lane (`npm run typecheck`, `npm run test:fast`, `npm run test:meta`) on hosted runners. Live-upstream `integration` / `e2e` / `full` verification remains an explicit lane for prepared hosts that can prove the real Hermes run surface.
+
 CLI:
 
 ```bash

@@ -47,6 +47,7 @@ test('stable family closure truth remains historical provenance after upstream r
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.tranche_id, 'hermes_stable_family_closure_truth');
+  assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.predecessor_tranche, predecessor.tranche_id);
   assert.equal(
     currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status,
@@ -63,6 +64,7 @@ test('stable family closure truth remains historical provenance after upstream r
   );
   assert.equal(brief.includes('第二条 human-publication family closure'), true);
   assert.equal(brief.includes('topic_id`、`deliverable_id`、`contract` 与 `stage_contract`'), true);
+  assert.equal(brief.includes('历史说明'), true);
 });
 
 function assertHermesExecutionModel(result, route, topicId, deliverableId) {

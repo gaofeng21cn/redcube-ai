@@ -51,4 +51,5 @@
 - integration 验证：`scripts/verify.sh integration`
 - e2e 验证：`scripts/verify.sh e2e`
 - full 验证：`scripts/verify.sh full`
-- 当前 CI 分层口径：`quality` lane 在跑 `test:fast` 前也必须先 provision Python 3.12、`fonts-noto-cjk` 与 Playwright Chromium，因为 fast lane 已覆盖 poster governed screenshot review
+- 当前 CI 分层口径：GitHub-hosted CI 默认只跑 `quality` lane；它在跑 `test:fast` 前也必须先 provision Python 3.12、`fonts-noto-cjk` 与 Playwright Chromium，因为 fast lane 已覆盖 poster governed screenshot review
+- `integration` / `e2e` / `full` 继续作为 live-upstream 显式验证 lane，只应在能证明真实 Hermes run surface 的准备好宿主上执行
