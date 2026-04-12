@@ -72,6 +72,18 @@ export async function invokeDomainEntry(request) {
   const module = await import('./actions/invoke-domain-entry.js');
   return module.invokeDomainEntry(request);
 }
+export async function invokeProductEntry(request) {
+  const module = await import('./actions/invoke-product-entry.js');
+  return module.invokeProductEntry(request);
+}
+export async function invokeFederatedProductEntry(request) {
+  const module = await import('./actions/invoke-federated-product-entry.js');
+  return module.invokeFederatedProductEntry(request);
+}
+export async function getProductEntrySession(request) {
+  const module = await import('./actions/get-product-entry-session.js');
+  return module.getProductEntrySession(request);
+}
 export async function auditDeliverable(request) {
   const module = await import('./actions/audit-deliverable.js');
   return module.auditDeliverable(request);

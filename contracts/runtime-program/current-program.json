@@ -109,9 +109,9 @@
     "deployment_host": "codex_local_operator_host",
     "deployment_host_status": "local_only",
     "host_agent_longterm_owner": false,
-    "phase_id": "upstream_runtime_owner_cutover",
-    "phase_label": "Upstream Hermes-Agent Runtime Owner Cutover",
-    "workstream": "upstream_hermes_agent_runtime_owner_cutover",
+    "phase_id": "repo_verified_product_entry_and_opl_federation",
+    "phase_label": "Repo-Verified Product Entry And OPL Federation",
+    "workstream": "repo_verified_product_entry_and_opl_federation",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -119,7 +119,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / upstream Hermes-Agent run surface plus RedCube visual-domain truth",
+      "label": "redcube-runtime-program / upstream Hermes-Agent run surface plus repo-verified product entry federation plus RedCube visual-domain truth",
       "unique": true
     },
     "green_baseline": {
@@ -206,6 +206,24 @@
         "gateway_surface": "invokeDomainEntry",
         "validation_mode": "fail_closed_on_missing_or_mismatched_opl_handoff_envelope"
       },
+      "redcube_product_entry_mvp": {
+        "status": "closeout_completed",
+        "contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
+        "brief": "docs/program/redcube_product_entry_mvp.md",
+        "gateway_surface": "invokeProductEntry"
+      },
+      "opl_gateway_federated_product_entry": {
+        "status": "closeout_completed",
+        "contract": "contracts/runtime-program/opl-gateway-federated-product-entry.json",
+        "brief": "docs/program/opl_gateway_federated_product_entry.md",
+        "gateway_surface": "invokeFederatedProductEntry"
+      },
+      "managed_product_entry_hardening": {
+        "status": "closeout_completed",
+        "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+        "brief": "docs/program/managed_product_entry_hardening.md",
+        "gateway_surface": "getProductEntrySession"
+      },
       "upstream_hermes_agent_live_verification_blocker": {
         "status": "historical_blocker_resolved",
         "contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",
@@ -247,52 +265,35 @@
       "probe_script": "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface"
     },
     "active_baton": {
-      "id": "historical_local_runtime_migration_artifact",
-      "status": "historical_local_migration_artifact",
-      "review_status": "archived",
-      "program_mode": "historical_local_runtime_line",
+      "id": "managed_product_entry_hardening",
+      "status": "closeout_completed",
+      "review_status": "verified",
+      "program_mode": "repo_verified_product_entry_service_surface",
       "scope": {
-        "hardening_axis": "historical_local_runtime_migration",
-        "implementation_in_scope": false,
-        "runtime_substrate_owner": "repo_local_managed_runtime_pilot",
+        "hardening_axis": "product_entry_service_surface_and_federation",
+        "implementation_in_scope": true,
+        "runtime_substrate_owner": "upstream_hermes_agent",
         "deployment_host": "codex_local_operator_host",
         "consumer_families": [
           "ppt_deck",
           "xiaohongshu",
           "poster_onepager"
         ],
-        "canonical_family": "ppt_deck",
-        "secondary_family": "xiaohongshu",
-        "runtime_planes": [
-          "source_readiness",
-          "story_architecture",
-          "visual_authorship",
-          "delivery_packaging",
-          "review",
-          "export",
-          "gate",
-          "audit"
+        "entry_surfaces": [
+          "invokeProductEntry",
+          "invokeFederatedProductEntry",
+          "getProductEntrySession",
+          "redcube product invoke",
+          "redcube product federate",
+          "redcube product session",
+          "invoke_product_entry",
+          "invoke_federated_product_entry",
+          "get_product_entry_session"
         ],
-        "required_artifact_envelope_fields": [
-          "topic_id",
-          "deliverable_id",
-          "contract",
-          "stage_contract"
-        ],
-        "required_operator_surfaces": [
-          "deliverable create",
-          "deliverable run",
-          "review watch",
-          "runs get"
-        ],
-        "managed_surfaces": [
+        "required_downstream_domain_surfaces": [
+          "invokeDomainEntry",
           "runManagedDeliverable",
-          "getManagedRun",
-          "superviseManagedRun"
-        ],
-        "managed_preflight_fail_closed": [
-          "overlay",
-          "stop_after_stage"
+          "runDeliverableRoute"
         ],
         "required_audit_surfaces": [
           "auditDeliverable",
@@ -306,30 +307,30 @@
           "deliverable_id",
           "run_id"
         ],
+        "required_session_store_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
         "excluded_scope": [
           "managed web runtime control plane",
           "controller expansion",
           "academic poster advancement",
-          "managed web runtime completion claim",
+          "chat UI",
           "new family onboarding"
         ]
       },
       "artifacts": {
-        "activation_package_contract": "contracts/runtime-program/hermes-runtime-substrate-activation-package.json",
-        "activation_package_brief": "docs/program/hermes/hermes_runtime_substrate_activation_package.md",
-        "capability_map_contract": "contracts/runtime-program/hermes-runtime-capability-extraction-map.json",
-        "capability_map_brief": "docs/program/hermes/hermes_runtime_capability_extraction_map.md",
-        "tranche_contract": "contracts/runtime-program/hermes-managed-family-closure-truth.json",
-        "tranche_brief": "docs/program/hermes/hermes_managed_family_closure_truth.md",
-        "tranche_test": "tests/hermes-managed-family-closure-truth.test.js"
+        "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
+        "federated_product_entry_contract": "contracts/runtime-program/opl-gateway-federated-product-entry.json",
+        "managed_product_entry_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+        "product_entry_brief": "docs/program/redcube_product_entry_mvp.md",
+        "federated_product_entry_brief": "docs/program/opl_gateway_federated_product_entry.md",
+        "managed_product_entry_brief": "docs/program/managed_product_entry_hardening.md"
       },
       "closeout": {
-        "executed_at": "2026-04-11",
+        "executed_at": "2026-04-12",
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/runtime-deliverable-route.test.js tests/managed-deliverable-execution.test.js tests/hermes-managed-family-closure-truth.test.js tests/hermes-stable-family-closure-truth.test.js",
-          "npm run test:full"
+          "node --test tests/product-entry.test.js tests/cli-v2-smoke.test.js tests/mcp-gateway.test.js tests/public-docs-surface.test.js tests/upstream-hermes-agent-final-target-shape.test.js",
+          "npm run test:fast"
         ],
         "suite_result": "pass",
         "findings_recorded": 0,
@@ -340,7 +341,8 @@
       "frozen truth conflict that cannot be resolved inside current contracts",
       "new product-direction choice is required",
       "real upstream Hermes-Agent gateway / API server is unavailable",
-      "service-safe domain entry contract drifts away from OPL handoff envelope"
+      "service-safe domain entry contract drifts away from OPL handoff envelope",
+      "product-entry session continuity drifts away from user-level runtime-state"
     ]
   },
   "historical_snapshots": {

@@ -1,0 +1,49 @@
+{
+  "federated_product_entry_id": "opl_gateway_federated_product_entry",
+  "date_anchor": "2026-04-12",
+  "status": "closeout_completed",
+  "goal": "Land a repo-verified OPL Gateway handoff surface that converges onto the same RedCube product-entry downstream contract.",
+  "callable_surface": {
+    "gateway_action": "invokeFederatedProductEntry",
+    "cli_entry": "redcube product federate",
+    "mcp_tool": "invoke_federated_product_entry"
+  },
+  "federation_contract": {
+    "target_domain_id": "redcube_ai",
+    "required_entry_mode": "opl_gateway",
+    "required_return_surface_kind": "product_entry",
+    "required_runtime_owner": "upstream_hermes_agent",
+    "shared_handoff_envelope": [
+      "target_domain_id",
+      "task_intent",
+      "entry_mode",
+      "workspace_locator",
+      "runtime_session_contract",
+      "return_surface_contract",
+      "entry_session_contract",
+      "delivery_request"
+    ],
+    "shared_downstream_contract": "contracts/runtime-program/redcube-product-entry-mvp.json"
+  },
+  "behavior_contract": {
+    "delegate_to": "@redcube/gateway invokeProductEntry",
+    "preserve_visual_domain_boundary": true,
+    "fail_closed_on": [
+      "unsupported_target_domain_id",
+      "unsupported_entry_mode",
+      "unsupported_runtime_owner",
+      "unsupported_return_surface_kind"
+    ]
+  },
+  "response_contract": {
+    "surface_kind": "federated_product_entry",
+    "must_include": [
+      "federated_product_entry_contract_id",
+      "target_domain_id",
+      "entry_mode",
+      "runtime_session_contract",
+      "return_surface_contract",
+      "product_entry_surface"
+    ]
+  }
+}

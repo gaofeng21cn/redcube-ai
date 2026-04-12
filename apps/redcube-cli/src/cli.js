@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, realpathSync } from 'node:fs';
-import path from 'node:path';
+import { realpathSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
@@ -16,6 +15,9 @@ import {
   getRun as getGatewayRun,
   getManagedRun as getGatewayManagedRun,
   invokeDomainEntry,
+  invokeFederatedProductEntry,
+  invokeProductEntry,
+  getProductEntrySession,
   superviseManagedRun as superviseGatewayManagedRun,
   intakeSource,
   researchSource,
@@ -42,6 +44,9 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getRun: getGatewayRun,
   getManagedRun: getGatewayManagedRun,
   invokeDomainEntry,
+  invokeFederatedProductEntry,
+  invokeProductEntry,
+  getProductEntrySession,
   superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
   researchSource,
@@ -98,99 +103,6 @@ function fail(message, code = 1) {
 
 export function resolveWorkspaceRoot(options, cwd = process.cwd) {
   return options.workspaceRoot || options.rootDir || cwd();
-}
-
-function resolveRepoRoot() {
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-}
-
-function loadServiceSafeDomainEntryContract() {
-  return JSON.parse(
-    readFileSync(
-      path.join(resolveRepoRoot(), 'contracts', 'runtime-program', 'service-safe-domain-entry-adapter.json'),
-      'utf-8',
-    ),
-  );
-}
-
-function requireTextField(fieldName, value) {
-  const text = String(value || '').trim();
-  if (!text) {
-    throw new Error(`${fieldName} 不能为空`);
-  }
-  return text;
-}
-
-function requireProductEntryMode(value) {
-  const mode = requireTextField('entry_mode', value);
-  if (mode !== 'direct' && mode !== 'opl-handoff') {
-    throw new Error(`entry_mode 不支持: ${mode}`);
-  }
-  return mode;
-}
-
-function buildProductEntry(options, cwd = process.cwd) {
-  const contract = loadServiceSafeDomainEntryContract();
-  const workspaceRoot = realpathSync(resolveWorkspaceRoot(options, cwd));
-  const taskIntent = requireTextField('task_intent', options.taskIntent);
-  const entryMode = requireProductEntryMode(options.entryMode);
-  const overlay = requireTextField('deliverable_family', options.overlay);
-  const topicId = requireTextField('topic_id', options.topicId);
-  const deliverableId = requireTextField('deliverable_id', options.deliverableId);
-  const expectedSurfaceKind = contract.validation?.task_intent_surface_kind_map?.[taskIntent];
-  if (!expectedSurfaceKind) {
-    throw new Error(`Unsupported task_intent: ${taskIntent}`);
-  }
-
-  const route = String(options.route || '').trim();
-  if (taskIntent === 'run_deliverable_route' && !route) {
-    throw new Error('domain_payload.route 不能为空');
-  }
-
-  const commandBase = `redcube --workspace-root ${workspaceRoot}`;
-  const domainPayload = {
-    deliverable_family: overlay,
-    topic_id: topicId,
-    deliverable_id: deliverableId,
-    route: route || null,
-    adapter: String(options.adapter || '').trim() || null,
-    user_intent: String(options.userIntent || '').trim() || null,
-    stop_after_stage: String(options.stopAfterStage || '').trim() || null,
-    mode: String(options.mode || '').trim() || null,
-    baseline_deliverable_id: String(options.baselineDeliverableId || '').trim() || null,
-  };
-
-  return {
-    ok: true,
-    command: 'product-entry',
-    surface_kind: 'product_entry',
-    product_entry: {
-      entry_kind: 'redcube_product_entry',
-      entry_contract_id: contract.entry_contract_id,
-      target_domain_id: contract.opl_handoff_envelope.target_domain_id,
-      task_intent: taskIntent,
-      entry_mode: entryMode,
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      runtime_session_contract: {
-        ...contract.runtime_session_contract,
-      },
-      return_surface_contract: {
-        surface_kind: expectedSurfaceKind,
-        durable_truth_surfaces: contract.return_surface_contract.durable_truth_surfaces,
-        entry_adapter: contract.owner_surface,
-      },
-      domain_payload: domainPayload,
-      commands: {
-        direct_execute: taskIntent === 'run_managed_deliverable'
-          ? `${commandBase} deliverable execute --overlay ${overlay} --topic-id ${topicId} --deliverable-id ${deliverableId}`
-          : `${commandBase} deliverable run --overlay ${overlay} --topic-id ${topicId} --deliverable-id ${deliverableId} --route ${route}`,
-        workspace_doctor: `${commandBase} workspace doctor`,
-        review_projection: `${commandBase} review projection --topic-id ${topicId}`,
-      },
-    },
-  };
 }
 
 function buildCommonFlows(overlayCatalog) {
@@ -284,11 +196,23 @@ function buildCommandHelp(commandKey) {
       gateway_action: 'runtimeWatch',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId', 'runId'],
     },
-    'product-entry': {
-      summary: '构建可直接进入或供 OPL handoff 复用的轻量 domain product-entry envelope。',
-      usage: 'redcube product-entry --workspace-root <dir> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> --task-intent <run_managed_deliverable|run_deliverable_route> --entry-mode <direct|opl-handoff> [--route <stage>]',
-      gateway_action: 'buildProductEntry',
-      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId', 'taskIntent', 'entryMode'],
+    'product invoke': {
+      summary: '以 direct RedCube product entry 方式创建或继续同一 deliverable，并下沉到同一个 service-safe domain entry。',
+      usage: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
+      gateway_action: 'invokeProductEntry',
+      boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
+    },
+    'product federate': {
+      summary: '以 OPL Gateway federation 方式把 handoff 收口到同一个 downstream product entry。',
+      usage: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
+      gateway_action: 'invokeFederatedProductEntry',
+      boundary_fields: ['workspaceRoot', 'entrySessionId', 'targetDomainId', 'topicId', 'deliverableId'],
+    },
+    'product session': {
+      summary: '读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。',
+      usage: 'redcube product session --entry-session-id <id>',
+      gateway_action: 'getProductEntrySession',
+      boundary_fields: ['entrySessionId'],
     },
   };
   const entry = catalog[commandKey];
@@ -380,10 +304,6 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       },
       {
-        task: '生成 direct / OPL handoff 共用的 lightweight product entry envelope',
-        command: 'redcube product-entry --workspace-root <dir> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> --task-intent <run_managed_deliverable|run_deliverable_route> --entry-mode <direct|opl-handoff>',
-      },
-      {
         task: '托管执行整个交付链路并查看 managed 进度',
         command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] && redcube managed get --workspace-root <dir> --managed-run-id <id>',
       },
@@ -403,6 +323,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         task: '观察一个 run 的当前 review loop 状态',
         command: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       },
+      {
+        task: '通过 direct product entry 创建或继续同一交付 session',
+        command: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>]',
+      },
     ],
     commonFlows: buildCommonFlows(overlayCatalog),
     operatorQuickstart: buildOperatorQuickstart(),
@@ -413,6 +337,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
+      product: ['invoke', 'federate', 'session'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['list', 'bootstrap', 'export', 'install'],
@@ -442,13 +367,15 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
       managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
+      productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
+      productFederate: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
+      productSession: 'redcube product session --entry-session-id <id>',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       profileList: 'redcube profile --action list',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
       reviewWatch: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline|approve_publish|promote_publish|promote_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>] [--promoted-reference-id <id>]',
-      productEntry: 'redcube product-entry --workspace-root <dir> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> --task-intent <run_managed_deliverable|run_deliverable_route> --entry-mode <direct|opl-handoff> [--route <stage>]',
       profile: 'redcube profile --action <list|bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };
@@ -634,10 +561,6 @@ export async function executeCli(argv, deps = {}) {
     throw new Error('deliverable 命令仅支持 create|get|audit|execute|run');
   }
 
-  if (command === 'product-entry') {
-    return buildProductEntry(options, cwd);
-  }
-
   if (command === 'managed') {
     if (subcommand === 'get') {
       return gateway.getManagedRun({
@@ -654,6 +577,76 @@ export async function executeCli(argv, deps = {}) {
     }
 
     throw new Error('managed 命令仅支持 get|supervise');
+  }
+
+  if (command === 'product') {
+    if (subcommand === 'invoke') {
+      return gateway.invokeProductEntry({
+        workspace_locator: {
+          workspace_root: resolveWorkspaceRoot(options, cwd),
+        },
+        entry_session_contract: {
+          entry_session_id: options.entrySessionId || '',
+        },
+        task_intent: options.taskIntent || '',
+        delivery_request: {
+          deliverable_family: options.overlay || '',
+          topic_id: options.topicId || '',
+          deliverable_id: options.deliverableId || '',
+          profile_id: options.profileId || '',
+          title: options.title || '',
+          goal: options.goal || '',
+          route: options.route || '',
+          adapter: options.adapter || '',
+          user_intent: options.userIntent || '',
+          stop_after_stage: options.stopAfterStage || '',
+          mode: options.mode || 'draft_new',
+          baseline_deliverable_id: options.baselineDeliverableId || '',
+        },
+      });
+    }
+
+    if (subcommand === 'federate') {
+      return gateway.invokeFederatedProductEntry({
+        target_domain_id: options.targetDomainId || 'redcube_ai',
+        task_intent: options.taskIntent || 'run_managed_deliverable',
+        entry_mode: options.entryMode || 'opl_gateway',
+        workspace_locator: {
+          workspace_root: resolveWorkspaceRoot(options, cwd),
+        },
+        runtime_session_contract: {
+          runtime_owner: 'upstream_hermes_agent',
+        },
+        return_surface_contract: {
+          surface_kind: options.returnSurfaceKind || 'product_entry',
+        },
+        entry_session_contract: {
+          entry_session_id: options.entrySessionId || '',
+        },
+        delivery_request: {
+          deliverable_family: options.overlay || '',
+          topic_id: options.topicId || '',
+          deliverable_id: options.deliverableId || '',
+          profile_id: options.profileId || '',
+          title: options.title || '',
+          goal: options.goal || '',
+          route: options.route || '',
+          adapter: options.adapter || '',
+          user_intent: options.userIntent || '',
+          stop_after_stage: options.stopAfterStage || '',
+          mode: options.mode || 'draft_new',
+          baseline_deliverable_id: options.baselineDeliverableId || '',
+        },
+      });
+    }
+
+    if (subcommand === 'session') {
+      return gateway.getProductEntrySession({
+        entry_session_id: options.entrySessionId || '',
+      });
+    }
+
+    throw new Error('product 命令仅支持 invoke|federate|session');
   }
 
 

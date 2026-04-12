@@ -10,6 +10,9 @@
 
 - `runtime-program/current-program.json`：当前 active mainline pointer
 - `runtime-program/upstream-hermes-agent-final-target-shape.json`：当前最终目标形态冻结件
+- `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
+- `runtime-program/opl-gateway-federated-product-entry.json`：当前 OPL federation handoff 冻结件
+- `runtime-program/managed-product-entry-hardening.json`：当前 product-entry session continuity 冻结件
 - `runtime-program/upstream-hermes-agent-live-verification-closeout.json`：当前 F4 live closeout 证明件
 - `runtime-program/upstream-hermes-agent-live-verification-blocker.json`：历史 F4 live blocker 冻结件
 - `runtime-program/*.json`：absorbed tranche、prefrozen follow-on board 与 provenance contract

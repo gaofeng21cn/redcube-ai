@@ -1,0 +1,63 @@
+{
+  "product_entry_id": "redcube_product_entry",
+  "date_anchor": "2026-04-12",
+  "status": "closeout_completed",
+  "goal": "Land a repo-verified RedCube direct product-entry service surface without changing the visual-domain boundary.",
+  "callable_surface": {
+    "gateway_action": "invokeProductEntry",
+    "cli_entry": "redcube product invoke",
+    "mcp_tool": "invoke_product_entry"
+  },
+  "request_contract": {
+    "required_fields": [
+      "workspace_locator.workspace_root",
+      "entry_session_contract.entry_session_id"
+    ],
+    "delivery_identity_fields": [
+      "delivery_request.deliverable_family",
+      "delivery_request.topic_id",
+      "delivery_request.deliverable_id"
+    ],
+    "create_if_missing_requires": [
+      "delivery_request.profile_id",
+      "delivery_request.title",
+      "delivery_request.goal"
+    ],
+    "supported_task_intents": [
+      "run_managed_deliverable",
+      "run_deliverable_route"
+    ],
+    "default_task_intent": "run_managed_deliverable",
+    "shared_runtime_owner": "upstream_hermes_agent",
+    "shared_domain_entry_contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json"
+  },
+  "behavior_contract": {
+    "create_or_continue_same_deliverable": true,
+    "session_store_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "fail_closed_on": [
+      "missing_workspace_root",
+      "missing_entry_session_id",
+      "missing_delivery_identity_without_session_binding",
+      "missing_profile_or_title_or_goal_when_deliverable_creation_is_required",
+      "unsupported_task_intent",
+      "unsupported_target_domain"
+    ]
+  },
+  "response_contract": {
+    "surface_kind": "product_entry",
+    "must_include": [
+      "product_entry_contract_id",
+      "entry_session",
+      "domain_entry_surface",
+      "continuation_snapshot",
+      "review_state",
+      "publication_projection"
+    ],
+    "durable_handles": [
+      "program_id",
+      "topic_id",
+      "deliverable_id",
+      "run_id"
+    ]
+  }
+}

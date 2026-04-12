@@ -4,7 +4,7 @@
 
 This bilingual index is the default public surface for `RedCube AI`.
 It stays aligned with the current truthful cutover: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; route and managed run surfaces now execute through real upstream `Hermes-Agent`, while visual-domain truth remains local to `RedCube AI`. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
-The current public entry truth is also explicit: `operator entry` and `agent entry` are real today, while a mature domain-level `product entry` is still future work. A repo-tracked lightweight shell is now landed through `redcube product-entry`, but it should still be read as a shared-envelope contract surface rather than a mature front desk.
+The current public entry truth is also explicit: `operator entry`, `agent entry`, and a thin repo-verified `product entry` service surface are real today, while a mature end-user product shell is still future work.
 
 ## Core Maintainer Working Set
 
@@ -26,18 +26,20 @@ This index along with the repository home forms the default GitHub-facing biling
 
 The current deliverable mainline is stable and usable, but the runtime story is still transitional.
 Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance.
-The current truthful stop boundary is: upstream `Hermes-Agent` run ownership is landed for route / managed execution, while mature product entry and broader federation still remain follow-on work.
+The current truthful stop boundary is: upstream `Hermes-Agent` run ownership, repo-verified product entry, OPL federation, and managed session continuity are landed, while a mature end-user shell and managed web productization still remain follow-on work.
 
 ## Current Baseline, Long-Line Target, And Task Ladder
 
-- Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth and operator surfaces.
+- Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth, operator surfaces, and a thin product-entry service surface.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
-- Product-entry target: grow a lightweight domain `product entry` that can be reached directly or through `OPL` handoff without changing the visual-domain boundary.
-- Current landed shell: `redcube product-entry` now emits the shared direct / `OPL` handoff envelope for `run_managed_deliverable` and `run_deliverable_route`.
+- Product-entry target: keep the landed lightweight domain `product entry` callable directly or through `OPL` handoff without changing the visual-domain boundary, then harden it toward a mature end-user shell.
 - Frozen final target shape: [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md) (Chinese only)
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)
 - Service-safe domain entry adapter: [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md) (Chinese only)
+- RedCube product entry MVP: [RedCube Product Entry MVP](program/redcube_product_entry_mvp.md) (Chinese only)
+- OPL Gateway federated product entry: [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md) (Chinese only)
+- Managed product-entry hardening: [Managed Product Entry Hardening](program/managed_product_entry_hardening.md) (Chinese only)
 - Current F4 live closeout proof: [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md) (Chinese only)
 - Historical F4 live blocker freeze: [Upstream Hermes-Agent live verification blocker](program/upstream_hermes_agent_live_verification_blocker.md) (Chinese only)
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.

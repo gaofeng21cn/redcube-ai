@@ -6,11 +6,16 @@ import type {
   DeliverableRecordResponse,
   DomainEntryRequest,
   DomainEntryResponse,
+  FederatedProductEntryRequest,
+  FederatedProductEntryResponse,
   LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,
   OverlayCatalogResponse,
+  ProductEntryRequest,
+  ProductEntryResponse,
+  ProductEntrySessionResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,
   ReviewMutationResponse,
@@ -65,6 +70,9 @@ export interface CliGatewayActions {
   listTopics(request: { workspaceRoot: string }): Promise<TopicCatalogResponse>;
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
   invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse>;
+  invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse>;
+  invokeFederatedProductEntry(request: FederatedProductEntryRequest): Promise<FederatedProductEntryResponse>;
+  getProductEntrySession(request: { entry_session_id?: string; entrySessionId?: string }): Promise<ProductEntrySessionResponse>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
   executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse>;
@@ -109,11 +117,14 @@ export type CliRunSurface =
   | DeliverableCreateResponse
   | DeliverableRecordResponse
   | DomainEntryResponse
+  | FederatedProductEntryResponse
   | DeliverableAuditResponse
   | ManagedRunResponse
   | ManagedRunRecordResponse
   | ManagedSupervisionResponse
   | RouteRunResponse
+  | ProductEntryResponse
+  | ProductEntrySessionResponse
   | RunRecordResponse
   | PublicationProjectionResponse
   | ReviewStateResponse

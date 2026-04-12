@@ -177,6 +177,125 @@ export interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
   };
 }
 
+export interface ProductEntryRequest extends Record<string, unknown> {
+  workspace_locator: {
+    workspace_root: string;
+  };
+  entry_session_contract: {
+    entry_session_id: string;
+  };
+  task_intent?: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode?: string;
+  delivery_request: {
+    deliverable_family?: string;
+    topic_id?: string;
+    deliverable_id?: string;
+    profile_id?: string;
+    title?: string;
+    goal?: string;
+    route?: string;
+    adapter?: string;
+    user_intent?: string;
+    stop_after_stage?: string;
+    mode?: string;
+    baseline_deliverable_id?: string;
+  };
+}
+
+export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
+  product_entry_contract_id: string;
+  entry_session: {
+    entry_session_id: string;
+    session_file: string;
+    resumed_from_session: boolean;
+    created_deliverable: boolean;
+    runtime_owner: string;
+  };
+  delivery_identity: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    profile_id: string | null;
+  };
+  domain_entry_surface: DomainEntryResponse;
+  continuation_snapshot: {
+    latest_managed_run_id: string | null;
+    latest_run_id: string | null;
+    managed_progress_projection: ManagedRunProjection | null;
+    runtime_supervision: ManagedRuntimeSupervision | null;
+  };
+  review_state: ReviewStateResponse;
+  publication_projection: PublicationProjectionResponse;
+  summary: {
+    entry_session_id: string;
+    task_intent: string;
+    actual_surface_kind: string | null;
+    target_handle: string | null;
+  };
+}
+
+export interface FederatedProductEntryRequest extends Record<string, unknown> {
+  target_domain_id: string;
+  task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode: string;
+  workspace_locator: {
+    workspace_root: string;
+  };
+  runtime_session_contract: {
+    runtime_owner: string;
+  };
+  return_surface_contract: {
+    surface_kind: string;
+  };
+  entry_session_contract: ProductEntryRequest['entry_session_contract'];
+  delivery_request: ProductEntryRequest['delivery_request'];
+}
+
+export interface FederatedProductEntryResponse extends SurfaceBase<'federated_product_entry'> {
+  federated_product_entry_contract_id: string;
+  target_domain_id: string;
+  entry_mode: string;
+  runtime_session_contract: Record<string, unknown>;
+  return_surface_contract: {
+    requested_surface_kind: string;
+    actual_surface_kind: string;
+  };
+  product_entry_surface: ProductEntryResponse;
+  summary: {
+    entry_session_id: string | null;
+    actual_surface_kind: string;
+    target_handle: string | null;
+  };
+}
+
+export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_session'> {
+  product_entry_contract_id: string;
+  entry_session: {
+    entry_session_id: string;
+    session_file: string;
+    runtime_owner: string;
+  };
+  delivery_identity: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    profile_id: string | null;
+  };
+  continuation_snapshot: {
+    latest_managed_run_id: string | null;
+    latest_run_id: string | null;
+    managed_progress_projection: ManagedRunProjection | null;
+    runtime_supervision: ManagedRuntimeSupervision | null;
+  };
+  review_state: ReviewStateResponse;
+  publication_projection: PublicationProjectionResponse;
+  summary: {
+    entry_session_id: string;
+    deliverable_id: string;
+    latest_handle: string | null;
+  };
+}
+
 export interface ManagedRunProjection {
   current_stage: string | null;
   latest_events: Array<{

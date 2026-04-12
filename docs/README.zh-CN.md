@@ -4,7 +4,7 @@
 
 这里是 `RedCube AI` 的双语文档索引，也是默认对外公开面。
 内容与当前 cutover 真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的 `Domain Harness OS`，route / managed run surface 现在已经通过真实上游 `Hermes-Agent` 执行，而 visual-domain truth 继续留在 `RedCube AI`。其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
-当前公开入口真相也已经明确：现在真实存在的是 `operator entry` 与 `agent entry`，而成熟的 domain-level `product entry` 仍是后续目标。仓内现在也已经通过 `redcube product-entry` 落下一层 repo-tracked 的 lightweight shell，但它仍应被理解为共享 envelope 的 contract surface，而不是成熟前台。
+当前公开入口真相也已经明确：现在真实存在的是 `operator entry`、`agent entry`，以及一层薄的 repo-verified `product entry` service surface；成熟的最终用户前台壳仍是后续目标。
 
 ## 核心维护工作集
 
@@ -26,17 +26,19 @@
 
 当前交付主线已经稳定可用，但 runtime 叙事仍处在过渡期。
 Phase 2 的 source-truth、governance、operator-surface 与 runtime-watch 工作继续作为 absorbed provenance 保留。
-当前最诚实的停车边界是：上游 `Hermes-Agent` 对 route / managed run 的 runtime owner 已经落地，但成熟 product entry 与更大范围 federation 仍是后续工作。
+当前最诚实的停车边界是：上游 `Hermes-Agent` 的 runtime owner、repo-verified product entry、OPL federation 与 managed session continuity 都已落地，但成熟的最终用户前台壳与 managed web productization 仍是后续工作。
 
 ## 当前基线、长线目标与任务层级
 
-- 当前 repo-verified 基线：上游 `Hermes-Agent` 主责 route / managed run execution，`RedCube AI` 保持 domain truth 与 operator surface。
+- 当前 repo-verified 基线：上游 `Hermes-Agent` 主责 route / managed run execution，`RedCube AI` 保持 domain truth、operator surface，以及一层薄的 product-entry service surface。
 - 长线目标：runtime substrate 迁向上游 `Hermes-Agent`，但 `RedCube Gateway -> family / profile / pack -> Domain Harness OS` 的 domain boundary 不变。
-- 产品入口目标：补出一个可以被用户直接进入、也可被 `OPL` handoff 调起的轻量 domain `product entry`，同时不改写视觉 domain boundary。
-- 当前已 landed 的 shell：`redcube product-entry` 现在已经能为 `run_managed_deliverable` 与 `run_deliverable_route` 输出 shared direct / `OPL` handoff envelope。
+- 产品入口目标：维持已经落地的轻量 domain `product entry` 可被用户直达或被 `OPL` handoff 调起，同时继续把它硬化到成熟前台壳，而不改写视觉 domain boundary。
 - 已冻结的最终目标形态：[Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
 - 当前已冻结的下一道闸门：[Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
 - 已冻结的 service-safe domain entry adapter：[Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md)
+- RedCube Product Entry MVP：[RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
+- OPL Gateway Federated Product Entry：[OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
+- Managed Product Entry Hardening：[Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
 - 当前 F4 live closeout 证明件：[Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
 - 历史 F4 live blocker 冻结件：[Upstream Hermes-Agent live verification blocker](program/upstream_hermes_agent_live_verification_blocker.md)
 - 当前停车边界：managed family closure truth 已落地；若要继续推进 managed web runtime control plane、新 family 或 academic poster 语义，必须先冻结新的 activation package。

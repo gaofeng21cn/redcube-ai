@@ -60,7 +60,7 @@ test('repo-tracked docs keep formal-entry and durable-surface truth while freezi
   assert.equal(runtimeArchitecture.includes('route / managed run surface 的当前 runtime owner 已是上游 `Hermes-Agent`'), true);
   assert.equal(runtimeArchitecture.includes('governance_surface.runtime_topology'), true);
   assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的上游 `Hermes-Agent`'), true);
-  assert.equal(status.includes('upstream `Hermes-Agent` runtime owner cutover + service-safe domain entry adapter'), true);
+  assert.equal(status.includes('repo-verified `RedCube Product Entry` + `OPL Gateway Federation` + managed product-entry hardening'), true);
 });
 
 test('current program points to upstream cutover truth while retaining durable identity boundaries and historical local provenance', () => {
@@ -88,37 +88,21 @@ test('current program points to upstream cutover truth while retaining durable i
   assert.equal(currentProgram.current_state.runtime_substrate_owner, 'upstream_hermes_agent');
   assert.equal(currentProgram.current_state.deployment_host, 'codex_local_operator_host');
   assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
-  assert.equal(currentProgram.current_state.active_baton.review_status, 'archived');
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
+  assert.equal(currentProgram.current_state.active_baton.review_status, 'verified');
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.activation_package_contract,
-    HERMES_ACTIVATION_CONTRACT,
+    currentProgram.current_state.active_baton.artifacts.product_entry_contract,
+    'contracts/runtime-program/redcube-product-entry-mvp.json',
   );
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.capability_map_contract,
-    HERMES_CAPABILITY_MAP_CONTRACT,
+    currentProgram.current_state.active_baton.artifacts.federated_product_entry_contract,
+    'contracts/runtime-program/opl-gateway-federated-product-entry.json',
   );
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.tranche_contract,
-    HERMES_CLOSURE_CONTRACT,
-  );
-  assert.equal(
-    currentProgram.current_state.active_baton.artifacts.activation_package_brief,
-    HERMES_ACTIVATION_BRIEF,
-  );
-  assert.equal(
-    currentProgram.current_state.active_baton.artifacts.capability_map_brief,
-    HERMES_CAPABILITY_MAP_BRIEF,
-  );
-  assert.equal(
-    currentProgram.current_state.active_baton.artifacts.tranche_brief,
-    HERMES_CLOSURE_BRIEF,
-  );
-  assert.equal(
-    currentProgram.current_state.active_baton.artifacts.tranche_test,
-    'tests/hermes-managed-family-closure-truth.test.js',
+    currentProgram.current_state.active_baton.artifacts.managed_product_entry_contract,
+    'contracts/runtime-program/managed-product-entry-hardening.json',
   );
   assert.equal(currentProgram.current_state.foundation_milestones.hermes_runtime_substrate_canonical_closure.status, 'historical_local_migration_artifact');
   assert.equal(currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status, 'historical_local_migration_artifact');
@@ -126,12 +110,16 @@ test('current program points to upstream cutover truth while retaining durable i
   assert.equal(currentProgram.current_state.foundation_milestones.upstream_hermes_agent_activation_package.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.upstream_hermes_runtime_owner_cutover.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.service_safe_domain_entry_adapter.status, 'closeout_completed');
-  assert.equal(currentProgram.current_state.active_baton.scope.secondary_family, 'xiaohongshu');
-  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_artifact_envelope_fields, [
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, [
+    'ppt_deck',
+    'xiaohongshu',
+    'poster_onepager',
+  ]);
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_identity_fields, [
+    'program_id',
     'topic_id',
     'deliverable_id',
-    'contract',
-    'stage_contract',
+    'run_id',
   ]);
 });
 

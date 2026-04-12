@@ -292,6 +292,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('source research')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('product invoke')), true);
   assert.deepEqual(parsed.commonFlows.ppt_deck, [
     '1. redcube workspace doctor --workspace-root <dir>',
     '2. redcube source research --workspace-root <dir> --topic-id <id> ...',
@@ -302,6 +303,8 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commandGroups.source.includes('research'), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
   assert.equal(parsed.commandGroups.managed.includes('supervise'), true);
+  assert.equal(parsed.commandGroups.product.includes('invoke'), true);
+  assert.equal(parsed.commandGroups.product.includes('session'), true);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
@@ -809,6 +812,142 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
     assert.equal(supervisedParsed.ok, true);
     assert.equal(supervisedParsed.surface_kind, 'managed_supervision');
     assert.equal(supervisedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
+  });
+});
+
+test('CLI product invoke, product federate, and product session proxy the product-entry service surface', async () => {
+  await withMockHermesUpstreamCli(async () => {
+    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
+    const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-state-'));
+
+    await execCliAsync(
+      cliPath,
+      [
+        'source',
+        'research',
+        '--workspace-root',
+        workspaceRoot,
+        '--topic-id',
+        'topic-a',
+        '--title',
+        '甲状腺门诊科普',
+        '--brief',
+        '验证 product entry 命令组。',
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file',
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+
+    const directParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'invoke',
+        '--workspace-root',
+        workspaceRoot,
+        '--entry-session-id',
+        'session-a',
+        '--overlay',
+        'ppt_deck',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-a',
+        '--profile-id',
+        'lecture_student',
+        '--title',
+        '甲状腺门诊科普 deck',
+        '--goal',
+        '为本科生讲授甲状腺基础知识',
+        '--user-intent',
+        '先给我主线故事',
+        '--stop-after-stage',
+        'storyline',
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(directParsed.ok, true);
+    assert.equal(directParsed.surface_kind, 'product_entry');
+    assert.equal(directParsed.entry_session.entry_session_id, 'session-a');
+
+    const federatedParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'federate',
+        '--workspace-root',
+        workspaceRoot,
+        '--entry-session-id',
+        'session-fed',
+        '--target-domain-id',
+        'redcube_ai',
+        '--task-intent',
+        'run_managed_deliverable',
+        '--entry-mode',
+        'opl_gateway',
+        '--return-surface-kind',
+        'product_entry',
+        '--overlay',
+        'ppt_deck',
+        '--topic-id',
+        'topic-a',
+        '--deliverable-id',
+        'deck-fed',
+        '--profile-id',
+        'lecture_student',
+        '--title',
+        '甲状腺门诊科普 deck federated',
+        '--goal',
+        '验证 OPL federation',
+        '--user-intent',
+        '先给我主线故事',
+        '--stop-after-stage',
+        'storyline',
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(federatedParsed.ok, true);
+    assert.equal(federatedParsed.surface_kind, 'federated_product_entry');
+    assert.equal(federatedParsed.product_entry_surface.entry_session.entry_session_id, 'session-fed');
+
+    const sessionParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'session',
+        '--entry-session-id',
+        'session-a',
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(sessionParsed.ok, true);
+    assert.equal(sessionParsed.surface_kind, 'product_entry_session');
+    assert.equal(sessionParsed.entry_session.entry_session_id, 'session-a');
   });
 });
 

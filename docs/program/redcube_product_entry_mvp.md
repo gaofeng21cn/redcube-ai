@@ -1,0 +1,41 @@
+# RedCube Product Entry MVP
+
+状态锚点：`2026-04-12`
+
+## 一句话结论
+
+`RedCube AI` 现在补上的，不是聊天 UI，也不是新 runtime。
+而是一个 repo-verified 的 direct `product entry` service surface：`invokeProductEntry`。
+
+## 这一步解决什么
+
+它把用户级 direct entry 收口成同一条可调用主线：
+
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+
+并且保持下面几点不变：
+
+- visual-domain boundary 仍在 `RedCube AI`
+- runtime substrate owner 仍是上游 `Hermes-Agent`
+- 下游实际执行仍统一走 `invokeDomainEntry`
+
+## 合同与调用面
+
+- contract：`contracts/runtime-program/redcube-product-entry-mvp.json`
+- gateway action：`invokeProductEntry`
+- CLI：`redcube product invoke`
+- MCP：`invoke_product_entry`
+
+## 最小行为
+
+1. 接收 `workspace_locator.workspace_root` 与 `entry_session_contract.entry_session_id`
+2. 允许 direct entry 创建或继续同一 deliverable
+3. deliverable 缺失时，要求显式提供 `profile_id / title / goal`
+4. 成功后返回 `product_entry` surface，而不是直接暴露 repo-local runtime 细节
+5. 内部继续下沉到 `invokeDomainEntry`
+
+## 明确不做
+
+- 不把这一步写成成熟 end-user UI 已落地
+- 不把 repo-local `Hermes` 包装成 runtime owner
+- 不新开 family，不扩 academic poster，不先做聊天壳

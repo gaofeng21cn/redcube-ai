@@ -20,6 +20,25 @@ import {
   runManagedDeliverable,
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import {
+  startMockHermesAgentUpstream,
+  withEnv,
+} from './helpers/mock-hermes-agent-upstream.js';
+
+async function withMockHermesUpstream(testFn) {
+  const upstream = await startMockHermesAgentUpstream();
+  const restoreEnv = withEnv({
+    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
+    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
+    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
+}
 
 test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
   const tools = listGatewayTools();
@@ -36,6 +55,10 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'prepare_source_augmentation_result',
       'write_source_augmentation_result',
       'execute_source_augmentation',
+      'invoke_domain_entry',
+      'invoke_product_entry',
+      'invoke_federated_product_entry',
+      'get_product_entry_session',
       'create_deliverable',
       'get_deliverable',
       'get_publication_projection',
@@ -61,13 +84,22 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   const projection = definitions.find((tool) => tool.name === 'get_publication_projection');
   const intake = definitions.find((tool) => tool.name === 'intake_source');
   const research = definitions.find((tool) => tool.name === 'source_research');
+  const product = definitions.find((tool) => tool.name === 'invoke_product_entry');
+  const federated = definitions.find((tool) => tool.name === 'invoke_federated_product_entry');
+  const session = definitions.find((tool) => tool.name === 'get_product_entry_session');
 
   assert.equal(intake?.description.includes('bootstrap writer'), true);
   assert.equal(research?.description.includes('planning_ready'), true);
   assert.equal(review?.description.includes('deliverable boundary'), true);
   assert.equal(projection?.description.includes('topic boundary'), true);
   assert.equal(watch?.description.includes('run boundary'), true);
+  assert.equal(product?.description.includes('direct RedCube product-entry surface'), true);
+  assert.equal(federated?.description.includes('OPL Gateway style handoff'), true);
+  assert.equal(session?.description.includes('product-entry session'), true);
   assert.equal(Object.hasOwn(watch?.inputSchema || {}, 'runId'), true);
+  assert.equal(Object.hasOwn(product?.inputSchema || {}, 'entry_session_contract'), true);
+  assert.equal(Object.hasOwn(federated?.inputSchema || {}, 'return_surface_contract'), true);
+  assert.equal(Object.hasOwn(session?.inputSchema || {}, 'entry_session_id'), true);
 });
 
 test('callGatewayTool delegates to injected gateway action', async () => {
@@ -285,6 +317,80 @@ test('callGatewayTool delegates overlay catalog gateway action', async () => {
   assert.equal(result.recommended_action, 'create_deliverable');
   assert.equal(result.summary.total_overlays, 1);
   assert.deepEqual(result.overlays, [{ overlay_id: 'poster', profiles: ['default'] }]);
+});
+
+test('callGatewayTool delegates product-entry gateway actions', async () => {
+  const direct = await callGatewayTool(
+    'invoke_product_entry',
+    {
+      workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
+      entry_session_contract: { entry_session_id: 'session-a' },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+      },
+    },
+    {
+      invokeProductEntry: async (request) => ({
+        ok: true,
+        surface_kind: 'product_entry',
+        product_entry_contract_id: 'redcube_product_entry',
+        entry_session: {
+          entry_session_id: request.entry_session_contract.entry_session_id,
+        },
+      }),
+    },
+  );
+  const federated = await callGatewayTool(
+    'invoke_federated_product_entry',
+    {
+      target_domain_id: 'redcube_ai',
+      task_intent: 'run_managed_deliverable',
+      entry_mode: 'opl_gateway',
+      workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
+      runtime_session_contract: { runtime_owner: 'upstream_hermes_agent' },
+      return_surface_contract: { surface_kind: 'product_entry' },
+      entry_session_contract: { entry_session_id: 'session-a' },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+      },
+    },
+    {
+      invokeFederatedProductEntry: async (request) => ({
+        ok: true,
+        surface_kind: 'federated_product_entry',
+        federated_product_entry_contract_id: 'opl_gateway_federated_product_entry',
+        summary: {
+          entry_session_id: request.entry_session_contract.entry_session_id,
+        },
+      }),
+    },
+  );
+  const session = await callGatewayTool(
+    'get_product_entry_session',
+    {
+      entry_session_id: 'session-a',
+    },
+    {
+      getProductEntrySession: async (request) => ({
+        ok: true,
+        surface_kind: 'product_entry_session',
+        entry_session: {
+          entry_session_id: request.entry_session_id,
+        },
+      }),
+    },
+  );
+
+  assert.equal(direct.surface_kind, 'product_entry');
+  assert.equal(direct.entry_session.entry_session_id, 'session-a');
+  assert.equal(federated.surface_kind, 'federated_product_entry');
+  assert.equal(federated.summary.entry_session_id, 'session-a');
+  assert.equal(session.surface_kind, 'product_entry_session');
+  assert.equal(session.entry_session.entry_session_id, 'session-a');
 });
 
 test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
@@ -634,6 +740,7 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
     command: process.execPath,
     args: [serverPath],
     cwd: repoRoot,
+    env: { ...process.env },
     stderr: 'pipe',
   });
   const client = new Client({
@@ -672,6 +779,7 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
 });
 
 test('stdio MCP server rejects runtime_watch when the topic locator does not match the persisted run identity', async () => {
+  await withMockHermesUpstream(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-watch-mismatch-'));
   await completeSourceReadiness({
     workspaceRoot,
@@ -714,6 +822,7 @@ test('stdio MCP server rejects runtime_watch when the topic locator does not mat
     command: process.execPath,
     args: [serverPath],
     cwd: repoRoot,
+    env: { ...process.env },
     stderr: 'pipe',
   });
   const client = new Client({
@@ -741,6 +850,7 @@ test('stdio MCP server rejects runtime_watch when the topic locator does not mat
   } finally {
     await transport.close();
   }
+  });
 });
 
 test('stdio MCP server preserves deliverable locator fields for audit_deliverable', async () => {
@@ -773,6 +883,7 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
     command: process.execPath,
     args: [serverPath],
     cwd: repoRoot,
+    env: { ...process.env },
     stderr: 'pipe',
   });
   const client = new Client({
@@ -813,6 +924,7 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
     command: process.execPath,
     args: [serverPath],
     cwd: repoRoot,
+    env: { ...process.env },
     stderr: 'pipe',
   });
   const client = new Client({
@@ -847,6 +959,7 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
 });
 
 test('stdio MCP server can create deliverable, run declared route, and fetch run state', async () => {
+  await withMockHermesUpstream(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-run-'));
   const serverPath = fileURLToPath(
     new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
@@ -856,6 +969,7 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
     command: process.execPath,
     args: [serverPath],
     cwd: repoRoot,
+    env: { ...process.env },
     stderr: 'pipe',
   });
   const client = new Client({
@@ -935,9 +1049,11 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
   } finally {
     await transport.close();
   }
+  });
 });
 
 test('stdio MCP server can create and run xiaohongshu deliverable routes on shared runtime', async () => {
+  await withMockHermesUpstream(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-xhs-'));
   const serverPath = fileURLToPath(
     new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
@@ -947,6 +1063,7 @@ test('stdio MCP server can create and run xiaohongshu deliverable routes on shar
     command: process.execPath,
     args: [serverPath],
     cwd: repoRoot,
+    env: { ...process.env },
     stderr: 'pipe',
   });
   const client = new Client({
@@ -1000,4 +1117,5 @@ test('stdio MCP server can create and run xiaohongshu deliverable routes on shar
   } finally {
     await transport.close();
   }
+  });
 });

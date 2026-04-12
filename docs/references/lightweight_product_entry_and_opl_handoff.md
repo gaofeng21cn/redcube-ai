@@ -2,25 +2,17 @@
 
 ## 1. 当前真相
 
-`RedCube AI` 现在已经有可验证的 `operator entry` 和 `agent entry`：
+`RedCube AI` 现在已经有可验证的 `operator entry`、`agent entry`，以及一层薄的 `product entry` service surface：
 
 - `operator entry`
   - 面向人类操作同事的命令、调试、审阅和导出控制面
 - `agent entry`
   - 面向 `Codex` / Claude Code / OpenClaw 等 host-agent 的 `CLI` / `MCP`
+- `product entry`
+  - 面向 direct RedCube entry 与 OPL federation 的 repo-verified service surface
 
-但它还没有成熟的用户级 `product entry`。
-也就是说，当前用户最顺的路径仍然是“通过自己的 agent 调 `RedCube AI`”，而不是直接进入一个稳定产品前台。
-不过现在仓内已经通过 `redcube product-entry` 落下了一层 repo-tracked lightweight shell：
-
-- `redcube product-entry`
-  - 为 `run_managed_deliverable` 与 `run_deliverable_route` 输出 direct / `OPL` handoff 共用的 shared envelope
-  - 对缺失 `route`、缺失最小字段或不支持的 `entry_mode` 保持 fail-closed
-
-因此当前更准确的表述是：
-
-- 轻量 direct-entry shell 已 landed
-- 成熟的最终用户 `product entry` 仍未 landed
+但它仍然没有成熟的最终用户前台壳。
+也就是说，当前已经不是“完全没有 product entry”，而是“已经有可调用服务面，但还不是稳定的 end-user product shell”。
 
 ## 2. 目标形态
 
@@ -53,7 +45,7 @@
 - 顶层与单仓的入口语义会漂移
 - 家族级切 domain 的体验会断裂
 
-所以这里要同时冻结：
+所以这里要同时冻结并落地：
 
 - `RedCube Product Entry`
 - `OPL -> RedCube` handoff envelope
@@ -69,7 +61,13 @@
 - `runtime_session_contract`
 - `return_surface_contract`
 
-在这层公共 envelope 之上，`RedCube AI` 继续补 domain payload：
+在这层公共 envelope 之上，`RedCube AI` 继续补：
+
+- `entry_session_contract`
+- `delivery_request`
+- 以及其中的 domain payload
+
+最小 domain payload 至少包括：
 
 - `deliverable_family`
 - `topic_id`
@@ -77,15 +75,15 @@
 
 ## 5. 当前不应过度宣称的事
 
-- 当前还不能把 `RedCube Product Entry` 写成已成熟落地
-- 当前也不能把 `OPL -> RedCube` handoff 写成真实线上运行中的用户入口
+- 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` federation 写成已落地
+- 但不能把它们写成成熟的最终用户前台壳或真实线上托管产品入口
 - 当前 route / managed run surface 已切到上游 `Hermes-Agent`
-- 所以这份文档冻结的是目标边界与调用合同，不是已完成的产品形态
+- 所以这份文档现在冻结的是目标边界、调用合同与 repo-verified service surface，不是过度宣称“前台产品已经做完”
 
 ## 6. 下一步落地方向
 
 1. 保持 `CLI / MCP / controller` 的 formal-entry 语义稳定，不让产品入口叙事反向污染当前可验证入口。
-2. 以已 landed 的 `redcube product-entry` contract shell 为基线，让 direct entry 与 `OPL` handoff 继续停留在同一条命令/服务合同上。
-3. 在已经冻结的 upstream `Hermes-Agent` substrate 证据之上，把 runtime session、resume、watch、route 继续接到更完整的 product entry 壳上。
+2. 让 direct entry 与 OPL handoff 继续共用同一 downstream service-safe domain entry。
+3. 把 runtime session continuity、managed progress、review state、publication projection 收到用户级 runtime-state。
 
-这里也要继续诚实：最终目标形态已经冻结，但成熟的最终用户产品入口仍未落地。
+这里也要继续诚实：repo-verified product-entry service surface 已落地，但成熟的最终用户产品入口前台壳仍未落地。

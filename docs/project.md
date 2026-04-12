@@ -5,7 +5,7 @@
 `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的 visual-deliverable domain gateway 与 `Domain Harness OS`。
 当前仓库主线按 `Auto-only` 理解，formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 当前可执行基线已经把 route / managed run surface 切到真实上游 `Hermes-Agent`，同时把 visual-domain truth 继续留在 `RedCube AI`。
-当前入口真相是：`CLI / MCP` 已经构成可验证的 `agent entry`，成熟的最终用户 `product entry` 仍未落地；但 `redcube product-entry` 已经把 direct / `OPL` handoff 共用的 lightweight shell 落成 repo-tracked contract surface。
+当前入口真相是：`CLI / MCP` 已经构成可验证的 `agent entry`，同时 repo-verified 的轻量 `product entry` service surface 也已落地；但真正面向最终用户的成熟前台壳仍未落地。
 当前统一协作模型是：长线由 `Hermes-Agent` 负责 runtime substrate / orchestration，`RedCube AI` 自己继续负责 gateway、family/profile/pack authority 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，不要求被单一 runtime 脑一次性替换。
 当前已冻结的最终目标形态是：
 
@@ -22,8 +22,8 @@
 - 稳定 `gateway -> family -> profile -> pack -> harness execution` 的正式控制链路。
 - 用 machine-readable contracts 与显式校验收紧 runtime mainline。
 - 把 repo-local runtime 责任逐步交还给真实的上游 `Hermes-Agent` substrate，同时保留 RedCube 的 visual-domain boundary。
-- 冻结一个可被 future `OPL` handoff 调用的 service-safe domain entry adapter，而不是先做聊天 UI。
-- 在已 landed 的 `redcube product-entry` contract shell 之上，继续补齐可被用户直接进入、也可由 `OPL` handoff 进入的 lightweight domain `product entry`。
+- 冻结一个可被 `OPL` handoff 调用的 service-safe domain entry adapter，而不是先做聊天 UI。
+- 落地可被用户直接进入、也可由 `OPL` handoff 进入的 lightweight domain `product entry` service surface，并把 session continuity 收到用户级 runtime-state。
 - 在不改写 domain 语义的前提下，继续维护 absorbed tranche、follow-on board 与 provenance。
 
 ## 非目标

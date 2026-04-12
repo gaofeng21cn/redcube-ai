@@ -35,7 +35,8 @@ test('upstream Hermes-Agent final target shape is frozen as the OPL-callable Red
     finalTarget.entry_surface_contract.service_safe_domain_entry.contract,
     'contracts/runtime-program/service-safe-domain-entry-adapter.json',
   );
-  assert.equal(finalTarget.entry_surface_contract.future_product_entry.status, 'not_landed_yet');
+  assert.equal(finalTarget.entry_surface_contract.product_entry_service_surface.status, 'repo_verified_service_surface_landed');
+  assert.equal(finalTarget.entry_surface_contract.product_entry_service_surface.ui_shell_status, 'not_landed');
   assert.equal(
     finalTarget.current_gap.hard_blockers.length,
     0,
@@ -73,9 +74,9 @@ test('canonical docs freeze the final target shape without overclaiming landed p
   const brief = read(FINAL_TARGET_BRIEF);
 
   assert.equal(rootReadme.includes('Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
-  assert.equal(rootReadme.includes('mature end-user `product entry` is still not landed'), true);
+  assert.equal(rootReadme.includes('The mature end-user `product entry` shell is still not landed'), true);
   assert.equal(rootReadmeZh.includes('Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
-  assert.equal(rootReadmeZh.includes('成熟的最终用户 `product entry` 仍未落地'), true);
+  assert.equal(rootReadmeZh.includes('成熟的最终用户 `product entry` 前台壳并未落地'), true);
   assert.equal(docsReadme.includes('upstream_hermes_agent_final_target_shape.md'), true);
   assert.equal(docsReadmeZh.includes('upstream_hermes_agent_final_target_shape.md'), true);
   assert.equal(project.includes('OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
@@ -85,8 +86,8 @@ test('canonical docs freeze the final target shape without overclaiming landed p
   assert.equal(positioning.includes('可调用的 visual-domain 产品 / 服务节点'), true);
   assert.equal(runtimeArchitecture.includes('runtime substrate -> RedCube service-safe domain entry -> visual-domain truth surfaces'), true);
   assert.equal(handoff.includes('最终目标形态'), true);
-  assert.equal(contractsReadme.includes('upstream-hermes-agent-final-target-shape.json'), true);
+  assert.equal(contractsReadme.includes('redcube-product-entry-mvp.json'), true);
   assert.equal(brief.includes('最终目标不是让 `RedCube AI` 变成整个 `OPL`'), true);
-  assert.equal(brief.includes('成熟的最终用户产品入口仍未落地'), true);
-  assert.equal(brief.includes('不是旧的 upstream run-surface terminal-event blocker'), true);
+  assert.equal(brief.includes('repo-verified 的 `RedCube Product Entry` service surface 已落地'), true);
+  assert.equal(brief.includes('不是 runtime substrate proof，也不再是 repo-verified product-entry service surface'), true);
 });

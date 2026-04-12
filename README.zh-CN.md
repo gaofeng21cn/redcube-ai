@@ -57,11 +57,11 @@
 
 ## 入口分层与产品边界
 
-当前仓内最强、最诚实的入口仍然是 `operator entry` 和 `agent entry`，也就是说：
+当前仓内已经 repo-verified 的入口包含 `operator entry`、`agent entry`，以及一层薄的 service-level `product entry`，也就是说：
 
 - `operator entry`：给人类操作同事使用的命令、workspace 准备、调试、审阅和导出控制面
 - `agent entry`：由 `Codex` 或其他 host-agent 调用的 `CLI + MCP`
-- `product entry`：真正面向最终用户的 direct entry 还没有成熟落地
+- `product entry`：direct RedCube entry 与 OPL federation 的可调用服务面已经落地，但真正面向最终用户的成熟前台壳仍未落地
 
 现在仓内已经通过 `redcube product-entry` 落下一层 repo-tracked 的 lightweight product-entry shell。
 它已经能够为 `run_managed_deliverable` 与 `run_deliverable_route` 输出 direct / `OPL` handoff 共用的 envelope，但当前仍只是 contract shell，不是成熟的最终用户前台。
@@ -75,7 +75,8 @@
 `User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 这条目标路线现在已经冻结在 `docs/program/upstream_hermes_agent_final_target_shape.md` 与 `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`。
-成熟的最终用户 `product entry` 仍未落地；当前 repo-verified、可调用的前身只是 service-safe domain entry shell 加上 `CLI` / `MCP`。
+当前 repo-verified 的 `product entry` service surface 已经包括 `invokeProductEntry`、`invokeFederatedProductEntry`、`getProductEntrySession` 以及对应的 `CLI` / `MCP` wrapper。
+仍需诚实说明的是：成熟的最终用户 `product entry` 前台壳并未落地；这次落地的是可调用服务面与 session continuity，不是聊天 UI 或托管 Web 前端。
 当前 live `integration` / `e2e` / `full` verification 也会用 `--test-concurrency=1` 串行化 Node test files，避免仓库把上游 Hermes 当前的 concurrent-run ceiling 打爆，再把 429 误报成 domain drift。
 同一组 live lane 现在还带着一条显式 Python-helper contract：screenshot review 与 export helper 必须通过 `REDCUBE_PYTHON_COMMAND` 或自动解析出的 Playwright Python 执行，而不是默认假设 upstream Hermes 自己的 virtualenv 已经装好了 Playwright。
 

@@ -526,6 +526,25 @@ export interface RuntimeManagedRunResponse {
   escalation_record: RuntimeManagedEscalationRecord;
 }
 
+export interface RuntimeProductEntrySessionRecord {
+  schema_version: 1;
+  entry_session_id: string;
+  workspace_root: string;
+  deliverable_family: string;
+  topic_id: string;
+  deliverable_id: string;
+  profile_id: string | null;
+  title: string | null;
+  goal: string | null;
+  runtime_owner: string;
+  last_task_intent: string;
+  last_entry_mode: string;
+  latest_managed_run_id: string | null;
+  latest_run_id: string | null;
+  latest_surface_kind: string | null;
+  updated_at: string;
+}
+
 export interface RuntimeSourceIntakeResponse {
   ok: boolean;
   topicId: string;

@@ -14,6 +14,9 @@ import {
   getPublicationProjection as getPublicationProjectionJs,
   getRun as getRunJs,
   invokeDomainEntry as invokeDomainEntryJs,
+  invokeProductEntry as invokeProductEntryJs,
+  invokeFederatedProductEntry as invokeFederatedProductEntryJs,
+  getProductEntrySession as getProductEntrySessionJs,
   getManagedRun as getManagedRunJs,
   superviseManagedRun as superviseManagedRunJs,
   runDeliverableRoute as runDeliverableRouteJs,
@@ -33,11 +36,16 @@ import type {
   DeliverableRecordResponse,
   DomainEntryRequest,
   DomainEntryResponse,
+  FederatedProductEntryRequest,
+  FederatedProductEntryResponse,
   DeliverableRequest,
   LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,
+  ProductEntryRequest,
+  ProductEntryResponse,
+  ProductEntrySessionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,
@@ -127,6 +135,23 @@ export function invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEn
   return invokeDomainEntryJs(request) as Promise<DomainEntryResponse>;
 }
 
+export function invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse> {
+  return invokeProductEntryJs(request) as Promise<ProductEntryResponse>;
+}
+
+export function invokeFederatedProductEntry(
+  request: FederatedProductEntryRequest,
+): Promise<FederatedProductEntryResponse> {
+  return invokeFederatedProductEntryJs(request) as Promise<FederatedProductEntryResponse>;
+}
+
+export function getProductEntrySession(request: {
+  entry_session_id?: string;
+  entrySessionId?: string;
+}): Promise<ProductEntrySessionResponse> {
+  return getProductEntrySessionJs(request) as Promise<ProductEntrySessionResponse>;
+}
+
 export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {
   return getManagedRunJs(request) as Promise<ManagedRunRecordResponse>;
 }
@@ -171,11 +196,16 @@ export type {
   DeliverableRecordResponse,
   DomainEntryRequest,
   DomainEntryResponse,
+  FederatedProductEntryRequest,
+  FederatedProductEntryResponse,
   DeliverableRequest,
   LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,
+  ProductEntryRequest,
+  ProductEntryResponse,
+  ProductEntrySessionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,

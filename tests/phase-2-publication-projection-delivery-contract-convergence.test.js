@@ -20,9 +20,9 @@ test('phase-2 publication projection delivery contract convergence stays absorbe
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_id, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.program_mode, 'autonomous_longrun');
@@ -86,7 +86,7 @@ test('phase-2 publication projection delivery contract convergence brief and doc
   assert.equal(readmeZh.includes('publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state'), true);
   assert.equal(positioning.includes('`publication projection / delivery contract convergence`'), true);
-  assert.equal(positioning.includes('当前 active tranche 应按 `upstream Hermes-Agent runtime owner cutover + service-safe domain entry adapter` 理解'), true);
+  assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
   assert.equal(policy.includes('当前产品 runtime owner 是 route / managed run surface 上的上游 `Hermes-Agent`'), true);
   assert.equal(docsIndex.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);

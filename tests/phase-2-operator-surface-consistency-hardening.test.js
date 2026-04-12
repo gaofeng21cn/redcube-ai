@@ -25,10 +25,9 @@ test('operator surface consistency hardening stays absorbed provenance while ups
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.deepEqual(contract.operator_surface_alignment.runtime_watch_boundary.required_embedded_summaries, ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary']);
   assert.equal(contract.object_boundary.out_of_scope.includes('controller expansion'), true);
   assert.equal(contract.object_boundary.out_of_scope.includes('xiaohongshu rewrite into direct-delivery'), true);
@@ -62,5 +61,5 @@ test('operator surface consistency hardening freezes doctor/help/runtime-watch c
   assert.equal(docsIndexZh.includes('Phase 2 operator surface consistency hardening'), true);
   assert.equal(runtimeArchitecture.includes('`operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path'), true);
   assert.equal(runtimePolicy.includes('`operator surface consistency hardening` 已在当前主线上吸收'), true);
-  assert.equal(positioning.includes('当前 active tranche 应按 `upstream Hermes-Agent runtime owner cutover + service-safe domain entry adapter` 理解'), true);
+  assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
 });

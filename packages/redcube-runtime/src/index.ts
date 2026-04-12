@@ -42,6 +42,12 @@ import {
   runManagedDeliverable as runManagedDeliverableJs,
   superviseManagedRun as superviseManagedRunJs,
 } from './managed-deliverable.js';
+import {
+  loadProductEntrySession as loadProductEntrySessionJs,
+  productEntrySessionDir as productEntrySessionDirJs,
+  productEntrySessionFile as productEntrySessionFileJs,
+  saveProductEntrySession as saveProductEntrySessionJs,
+} from './product-entry-session-store.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
 import {
@@ -73,6 +79,7 @@ import type {
   RuntimeManagedRunRequest,
   RuntimeManagedRunResponse,
   RuntimeManagedSupervisionRequest,
+  RuntimeProductEntrySessionRecord,
   RuntimeRunLookupRequest,
   RuntimeRunRecord,
   RuntimeRunRouteRequest,
@@ -185,6 +192,32 @@ export async function superviseManagedRun(
   request: RuntimeManagedSupervisionRequest,
 ): Promise<RuntimeManagedRunResponse> {
   return superviseManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
+}
+
+export function productEntrySessionDir(): string {
+  return productEntrySessionDirJs() as string;
+}
+
+export function productEntrySessionFile(entrySessionId: string): string {
+  return productEntrySessionFileJs(entrySessionId) as string;
+}
+
+export function loadProductEntrySession(request: {
+  entrySessionId: string;
+}): RuntimeProductEntrySessionRecord | null {
+  return loadProductEntrySessionJs(request) as RuntimeProductEntrySessionRecord | null;
+}
+
+export function saveProductEntrySession(request: {
+  session: RuntimeProductEntrySessionRecord;
+}): {
+  session: RuntimeProductEntrySessionRecord;
+  file: string;
+} {
+  return saveProductEntrySessionJs(request) as {
+    session: RuntimeProductEntrySessionRecord;
+    file: string;
+  };
 }
 
 export const resolveExecutorAdapter = resolveExecutorAdapterJs;

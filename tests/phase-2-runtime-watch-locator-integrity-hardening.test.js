@@ -25,13 +25,13 @@ test('runtime watch locator integrity hardening remains absorbed provenance afte
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
   assert.deepEqual(contract.run_locator_integrity_surface.required_run_record_fields, ['topic_id', 'deliverable_id']);
   assert.deepEqual(contract.run_locator_integrity_surface.canonical_locator_fields, ['workspaceRoot', 'topicId', 'deliverableId', 'runId']);
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
+  assert.equal(currentProgram.current_state.active_baton.scope.entry_surfaces.includes('redcube product session'), true);
   assert.equal(existsSync(path.resolve(PREDECESSOR_CONTRACT)), true);
 });
 
@@ -62,5 +62,5 @@ test('runtime watch locator integrity hardening freezes run identity persistence
   assert.equal(docsIndexZh.includes('Phase 2 runtime watch locator integrity hardening'), true);
   assert.equal(runtimeArchitecture.includes('`runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope'), true);
   assert.equal(runtimePolicy.includes('`runtime watch locator integrity hardening` 已在当前主线上吸收'), true);
-  assert.equal(positioning.includes('当前 active tranche 应按 `upstream Hermes-Agent runtime owner cutover + service-safe domain entry adapter` 理解'), true);
+  assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
 });

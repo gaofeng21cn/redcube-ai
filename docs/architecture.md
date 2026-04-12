@@ -20,7 +20,7 @@
 - `product entry`
   - 给最终用户直接进入的产品入口
 
-当前真实状态是：前两层存在，第三层还没有成熟落地。
+当前真实状态是：前两层已经存在，第三层已落地为 repo-verified service surface，但成熟的最终用户前台壳仍未落地。
 
 已经冻结的 direct domain 级链路是：
 
@@ -39,7 +39,11 @@
 - `runtime_session_contract`
 - `return_surface_contract`
 
-在这层 envelope 之上，`RedCube AI` 再补充 `deliverable_family`、`topic_id`、`deliverable_id` 这类 domain payload。
+在这层 envelope 之上，`RedCube AI` 再补充：
+
+- `entry_session_contract`
+- `delivery_request`
+- 以及其中的 `deliverable_family`、`topic_id`、`deliverable_id` 这类 domain payload
 
 ## 最终目标形态
 
@@ -53,9 +57,9 @@
 
 这里的关键约束是：
 
-- future `RedCube Product Entry` 和 future `OPL Gateway` handoff 必须共用同一个 service-safe domain entry contract
-- today repo-verified 的还是 `CLI` / `MCP` 与 `invokeDomainEntry`
-- 成熟的最终用户产品入口仍未落地
+- direct `RedCube Product Entry` 和 `OPL Gateway` handoff 必须共用同一个 downstream service-safe domain entry contract
+- today repo-verified 的 product-entry service surface 是 `invokeProductEntry` / `invokeFederatedProductEntry` / `getProductEntrySession`
+- 成熟的最终用户产品入口前台壳仍未落地
 
 ## Hermes runtime substrate 与 visual executor 的分工
 
@@ -88,6 +92,20 @@
 - MCP tool: `invoke_domain_entry`
 
 这就是当前 mainline 明确冻结的 service-safe domain entry surface。
+
+## Product Entry Service Surface
+
+当前 repo-verified 的 product-entry service surface 是：
+
+- contract: `contracts/runtime-program/redcube-product-entry-mvp.json`
+- federated contract: `contracts/runtime-program/opl-gateway-federated-product-entry.json`
+- managed hardening contract: `contracts/runtime-program/managed-product-entry-hardening.json`
+- callable surfaces:
+  - `@redcube/gateway` `invokeProductEntry`
+  - `@redcube/gateway` `invokeFederatedProductEntry`
+  - `@redcube/gateway` `getProductEntrySession`
+
+它们继续把执行下沉到同一个 `invokeDomainEntry`，同时把 session continuity 持久化到用户级 runtime-state，而不是把 product entry 写成 repo-local runtime 自己的新宿主。
 
 ## 结构角色
 

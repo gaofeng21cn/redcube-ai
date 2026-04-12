@@ -4,7 +4,7 @@
   "status": "closeout_completed",
   "target_goal": {
     "label": "OPL-callable RedCube visual-domain node on upstream Hermes-Agent runtime substrate",
-    "summary": "Freeze the final target shape in which either a direct RedCube product entry or a future OPL Gateway handoff converges onto the same service-safe RedCube domain entry, while upstream Hermes-Agent owns runtime substrate and RedCube owns visual-domain truth."
+    "summary": "Freeze the final target shape in which either a direct RedCube product entry or an OPL Gateway handoff converges onto the same service-safe RedCube domain entry, while upstream Hermes-Agent owns runtime substrate and RedCube owns visual-domain truth."
   },
   "final_target_route": {
     "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
@@ -43,12 +43,18 @@
       "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
       "callable_surface": "@redcube/gateway invokeDomainEntry"
     },
-    "future_product_entry": {
-      "status": "not_landed_yet",
+    "product_entry_service_surface": {
+      "status": "repo_verified_service_surface_landed",
+      "contracts": [
+        "contracts/runtime-program/redcube-product-entry-mvp.json",
+        "contracts/runtime-program/opl-gateway-federated-product-entry.json",
+        "contracts/runtime-program/managed-product-entry-hardening.json"
+      ],
       "must_converge_with": [
         "service-safe domain entry contract",
         "OPL handoff envelope"
-      ]
+      ],
+      "ui_shell_status": "not_landed"
     },
     "opl_handoff_contract": {
       "minimum_fields": [
@@ -85,11 +91,13 @@
     "repo_verified_today": [
       "upstream Hermes-Agent owns route / managed run execution",
       "RedCube service-safe domain entry is callable",
+      "RedCube product-entry service surface is callable",
+      "OPL handoff can federate into the same downstream product entry",
       "RedCube still owns visual-domain truth"
     ],
     "not_landed_yet": [
-      "mature end-user RedCube product entry",
-      "OPL product-entry handoff running as a repo-verified user-facing route"
+      "mature end-user RedCube product shell",
+      "managed web product shell on top of the landed service surface"
     ],
     "hard_blockers": []
   },

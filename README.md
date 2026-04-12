@@ -56,12 +56,12 @@ As long as the same substrate contracts and domain boundaries are kept, this lin
 
 ## Entry Modes And Product Boundary
 
-Today, the strongest repo-verified entry surfaces are still `operator entry` and `agent entry`.
+Today, the repo-verified entry surfaces cover `operator entry`, `agent entry`, and one thin service-level `product entry`.
 That means:
 
 - `operator entry`: human/operator commands, workspace preparation, debugging, review, and export control
 - `agent entry`: `CLI` plus `MCP`, called by `Codex` or another host-agent
-- `product entry`: not landed yet as a mature user-facing direct entry
+- `product entry`: landed as a repo-verified service surface for direct RedCube entry and OPL federation, while the mature user-facing shell is still not landed
 
 A repo-tracked lightweight product-entry shell is now landed through `redcube product-entry`.
 It emits the shared direct / `OPL` handoff envelope for `run_managed_deliverable` and `run_deliverable_route`, but it is still a contract shell rather than a mature end-user front desk.
@@ -75,7 +75,8 @@ Inside the larger `OPL` family, the compatible top-level route converges onto th
 `User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 That target is now frozen in `docs/program/upstream_hermes_agent_final_target_shape.md` and `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`.
-A mature end-user `product entry` is still not landed; today the repo-verified callable precursor is the service-safe domain entry shell plus `CLI` / `MCP`.
+The repo-verified product-entry service surface now includes `invokeProductEntry`, `invokeFederatedProductEntry`, and `getProductEntrySession`, plus their `CLI` / `MCP` wrappers.
+The mature end-user `product entry` shell is still not landed; what landed here is the callable service surface and session continuity, not a chat UI or managed web front-end.
 Live `integration` / `e2e` / `full` verification now serializes Node test files with `--test-concurrency=1` so the repo does not overdrive the current upstream Hermes concurrent-run ceiling and then misreport the resulting 429s as domain drift.
 Those same live lanes now also carry one explicit Python-helper contract: screenshot review and export helpers must execute through `REDCUBE_PYTHON_COMMAND` or an auto-resolved Playwright-enabled Python, rather than assuming the upstream Hermes virtualenv already contains Playwright.
 

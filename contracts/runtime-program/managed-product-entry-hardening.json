@@ -1,0 +1,52 @@
+{
+  "managed_product_entry_hardening_id": "managed_product_entry_hardening",
+  "date_anchor": "2026-04-12",
+  "status": "closeout_completed",
+  "goal": "Persist product-entry session continuity under user-level runtime-state and expose a repo-verified continuation surface.",
+  "callable_surface": {
+    "gateway_action": "getProductEntrySession",
+    "cli_entry": "redcube product session",
+    "mcp_tool": "get_product_entry_session"
+  },
+  "session_store_contract": {
+    "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "required_fields": [
+      "entry_session_id",
+      "workspace_root",
+      "deliverable_family",
+      "topic_id",
+      "deliverable_id",
+      "runtime_owner",
+      "last_task_intent",
+      "updated_at"
+    ],
+    "latest_handle_fields": [
+      "latest_managed_run_id",
+      "latest_run_id"
+    ],
+    "continuation_surfaces": [
+      "managed_progress_projection",
+      "runtime_supervision",
+      "review_state",
+      "publication_projection"
+    ]
+  },
+  "behavior_contract": {
+    "session_identity_scope": "one durable deliverable per entry_session_id",
+    "direct_and_federated_entry_share_same_store": true,
+    "fail_closed_on": [
+      "missing_entry_session_id",
+      "session_not_found",
+      "session_runtime_owner_drift"
+    ]
+  },
+  "response_contract": {
+    "surface_kind": "product_entry_session",
+    "must_include": [
+      "entry_session",
+      "continuation_snapshot",
+      "review_state",
+      "publication_projection"
+    ]
+  }
+}

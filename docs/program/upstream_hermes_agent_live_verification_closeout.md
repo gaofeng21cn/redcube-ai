@@ -29,7 +29,8 @@
    - 结果：`32/32 pass`
 4. 同一主线的 shared runtime contract lane 仍然是绿的：
    - 命令：`npm run test:fast`
-   - 结果：`64/64 pass`
+   - 结果：closeout 当次记录为 `64/64 pass`
+   - 备注：若后续 fast lane 吸收新的 active-baton capability tests，计数以 fresh verification 输出为准，不改写这次 F4 closeout 的 completed 结论
 
 ## 对历史 blocker 的诚实处理
 

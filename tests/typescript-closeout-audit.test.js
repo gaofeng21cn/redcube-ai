@@ -86,6 +86,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/managed-run-store.js',
     'src/ppt-deck-runtime.js',
     'src/ppt-deck.js',
+    'src/product-entry-session-store.js',
     'src/render-pack-compiler.js',
     'src/run-store.js',
     'src/runtime-state.js',

@@ -55,7 +55,7 @@ User / Agent
 
 上游 `Hermes-Agent` runtime substrate -> RedCube service-safe domain entry -> visual-domain truth surfaces
 
-也就是说，future `OPL Product Entry` 与 future `RedCube Product Entry` 最终都应把调用收敛到同一个 service-safe domain entry，而成熟的最终用户产品入口仍未落地。
+也就是说，`OPL Product Entry` 与 `RedCube Product Entry` 现在都已经可以把调用收敛到同一个 service-safe domain entry；当前仍未落地的是成熟的最终用户产品入口前台壳。
 
 同一 substrate 上的可迁移形态：
 
