@@ -125,9 +125,7 @@
     "green_baseline": {
       "credible": true,
       "clean_clone_required": true,
-      "blocked_by": [
-        "upstream_hermes_agent_live_verification_blocker"
-      ],
+      "blocked_by": [],
       "live_upstream_verification": {
         "default_gateway_command": "hermes gateway run -q --replace",
         "gateway_command_override_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
@@ -143,14 +141,14 @@
           "/v1/runs",
           "/v1/runs/{run_id}/events"
         ],
-        "current_host_status": "focused_live_verification_blocked",
-        "current_host_blocking_reason": "focused ppt_deck live e2e currently fails at screenshot_review on the current host",
-        "current_host_stream_signal": "terminal_event_received_during_explicit_probe",
-        "current_host_blocker_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",
+        "current_host_status": "fresh_live_verification_passed",
+        "current_host_blocking_reason": null,
+        "current_host_stream_signal": "terminal_event_received_during_standard_live_launcher_preflight",
+        "current_host_closeout_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json",
         "current_host_latest_route_proof": [
-          "2026-04-12: explicit API-server launch passed live upstream probe on http://127.0.0.1:8642 with run.completed terminal event",
-          "2026-04-12: focused ppt_deck live e2e currently fails at screenshot_review under upstream Hermes-Agent",
-          "2026-04-12: scripts/verify.sh e2e also recorded a fail-closed preflight in which /v1/runs/{run_id}/events did not emit a terminal event"
+          "2026-04-12: npm run test:e2e passed live preflight on http://127.0.0.1:8642 and received a terminal run.completed event through the standard run-test-group launcher",
+          "2026-04-12: npm run test:e2e passed 16/16 under upstream Hermes-Agent, including ppt_deck screenshot_review/export_pptx and xiaohongshu publish_copy/export_bundle",
+          "2026-04-12: node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster' passed 32/32, including guarded poster_onepager managed execution on upstream Hermes-Agent"
         ]
       },
       "ci_quality_lane_requires": [
@@ -209,9 +207,15 @@
         "validation_mode": "fail_closed_on_missing_or_mismatched_opl_handoff_envelope"
       },
       "upstream_hermes_agent_live_verification_blocker": {
-        "status": "blocked_external_upstream_or_live_runtime",
+        "status": "historical_blocker_resolved",
         "contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",
-        "brief": "docs/program/upstream_hermes_agent_live_verification_blocker.md"
+        "brief": "docs/program/upstream_hermes_agent_live_verification_blocker.md",
+        "resolved_by": "upstream_hermes_agent_live_verification_closeout"
+      },
+      "upstream_hermes_agent_live_verification_closeout": {
+        "status": "closeout_completed",
+        "contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json",
+        "brief": "docs/program/upstream_hermes_agent_live_verification_closeout.md"
       },
       "upstream_hermes_agent_final_target_shape": {
         "status": "closeout_completed",

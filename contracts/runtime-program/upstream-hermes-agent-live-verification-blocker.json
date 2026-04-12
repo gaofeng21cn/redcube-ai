@@ -1,7 +1,7 @@
 {
   "blocker_id": "upstream_hermes_agent_live_verification_blocker",
   "date_anchor": "2026-04-12",
-  "status": "blocked_external_upstream_or_live_runtime",
+  "status": "historical_blocker_resolved",
   "scope": {
     "phase_id": "F4_end_to_end_verification_and_absorb",
     "board": "docs/program/upstream_hermes_agent_fast_cutover_board.md",
@@ -44,23 +44,34 @@
   "current_truth": {
     "repo_local_changes_validated": [
       "npm run test:fast",
-      "scripts/verify.sh meta",
-      "npm run typecheck"
+      "node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'",
+      "npm run test:e2e"
     ],
-    "f4_closeout_completed": false,
-    "why_not": [
-      "focused live e2e is not green on the current host",
-      "continuing to claim end-to-end absorb closeout would cause truth drift"
+    "f4_closeout_completed": true,
+    "why_not": []
+  },
+  "resolution": {
+    "status": "resolved_after_fresh_live_verification",
+    "resolved_by_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json",
+    "resolved_by_brief": "docs/program/upstream_hermes_agent_live_verification_closeout.md",
+    "fresh_verification": [
+      "npm run test:e2e",
+      "node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'",
+      "npm run test:fast"
+    ],
+    "notes": [
+      "historical ppt_deck screenshot_review failure did not reproduce under the standard run-test-group launcher with REDCUBE_PYTHON_COMMAND auto-resolved to a Playwright-enabled Python",
+      "historical /v1/runs/{run_id}/events terminal-event preflight failure also did not reproduce in the fresh current-host runs"
     ]
   },
   "allowed_next_moves": [
-    "freeze blocker evidence in docs/status/current-program",
-    "retry live verification against an explicitly launched upstream API server",
-    "investigate upstream screenshot_review and run-event stability without repo-local fallback"
+    "keep this blocker contract as historical evidence while moving current-program/status/docs to the closeout proof",
+    "treat mature product entry and OPL product-entry federation as the next truthful gap",
+    "continue future work without reintroducing repo-local runtime fallback"
   ],
   "forbidden_claims": [
-    "F4 end-to-end verification is complete on the current host",
-    "ppt_deck/xiaohongshu/poster_onepager live paths are all green today",
+    "the historical blocker never happened",
+    "mature RedCube Product Entry is already landed",
     "repo-local runtime regained ownership"
   ]
 }

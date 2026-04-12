@@ -15,11 +15,12 @@
 
 ## 当前基线（repo-verified）
 
-- 当前 active tranche：upstream `Hermes-Agent` runtime owner cutover + service-safe domain entry adapter
+- 当前 active tranche：upstream `Hermes-Agent` runtime owner cutover + service-safe domain entry adapter + live verification closeout
 - 当前 active mainline pointer：`contracts/runtime-program/current-program.json`
 - 当前说明边界：核心五件套优先于历史 `docs/program/hermes/` 迁移材料
 - 当前 upstream activation proof：`contracts/runtime-program/upstream-hermes-agent-activation-package.json`
-- 当前 F4 blocker freeze：`contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json`
+- 当前 F4 live closeout proof：`contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`
+- 历史 F4 blocker freeze：`contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json`
 - 当前 probe 命令：`node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`
 
 ## 长线目标（规划层）
@@ -39,12 +40,12 @@
 7. `scripts/run-test-group.mjs` 的 integration / e2e / full live lane 现在会先做 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight；只要 run-event surface 没有 terminal event，就会在套件开始前 fail-closed。
 8. 同一组 live lane 现在还会用 `--test-concurrency=1` 串行化 test files，以尊重当前 upstream Hermes 的 concurrent-run ceiling，而不是把 repo 自己的验证并发误写成 runtime 主线能力。
 9. 同一组 live lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed，而不是继续假设 upstream Hermes 自带 virtualenv 已经满足 screenshot review / export helper 依赖。
-10. 在 `2026-04-12` 的当前验证宿主上，显式 API-server 启动的 focused upstream probe 仍可通过，并拿到 `run.completed` terminal event；但 F4 fresh verification 已出现新的 live blocker，详见 `contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json`。
+10. 在 `2026-04-12` 的当前验证宿主上，标准 `run-test-group` live launcher 已 fresh 通过 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight，并拿到 terminal `run.completed` event；当前 closeout proof 见 `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`。
 11. “最终目标形态”文档冻结已经完成，但它冻结的是理想型与边界，不是对 mature product entry 已落地的过度宣称。
 12. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
 13. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
-14. 当前 `ppt_deck` focused live e2e 目前在 `screenshot_review` 失败，`scripts/verify.sh e2e` 也出现过 `/v1/runs/{run_id}/events` 没有 terminal event 的 fail-closed preflight；因此 F4 closeout 不能继续写成全绿。
-15. 下一棒仍是按 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 收口 F4，但当前必须先解决 `contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json` 记录的外部 upstream/live blocker，再继续 absorb 端到端 closeout 叙事。
+14. `npm run test:e2e` 已在当前宿主 fresh 全绿，覆盖 `ppt_deck` 的 `screenshot_review / export_pptx / optimize_existing` 与 `xiaohongshu` 的 `publish_copy / export_bundle / optimize_existing`；`node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'` 也已 fresh 全绿，补齐 guarded `poster_onepager` 的 live managed proof。
+15. 因此 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb；当前真实 gap 已不再是 live blocker，而是 mature `RedCube Product Entry` 与 repo-verified `OPL Product Entry -> OPL Gateway -> RedCube` 用户前台路线仍未落地。
 
 ## 默认验证
 

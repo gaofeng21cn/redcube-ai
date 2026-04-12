@@ -4,15 +4,15 @@
 
 ## 当前结论
 
-`RedCube AI` 这一棒已经把 service-safe domain entry adapter、公开目标叙事与 machine-readable contract 收紧到新的 truthful mainline，
-但 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 端到端 closeout 还不能诚实写成完成。
+这份文档现在保留的是 `2026-04-12` 同日稍早出现过的历史 blocker 证据。
 
-原因不是 repo-local runtime 回退，也不是文档不同步；
-而是当前验证宿主上的 live upstream proof 出现了新的外部 blocker：
+它曾经真实阻塞过 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 closeout，
+但它现在已经不再是当前 stop boundary。
 
-- focused upstream probe 可以成功拿到 `run.completed` terminal event
-- 但 live `ppt_deck` e2e 目前会在 `screenshot_review` 失败
-- `scripts/verify.sh e2e` 还出现过一次 `/v1/runs/{run_id}/events` 没有 terminal event 的 fail-closed preflight
+当前 fresh closeout 证据已冻结到：
+
+- `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`
+- `docs/program/upstream_hermes_agent_live_verification_closeout.md`
 
 ## 已冻结的通过证据
 
@@ -26,7 +26,7 @@
    - probe：`REDCUBE_HERMES_UPSTREAM_BASE_URL=http://127.0.0.1:8642 REDCUBE_HERMES_UPSTREAM_MODEL=hermes-agent node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`
    - probe 返回：`run.completed`
 
-## 当前 blocker
+## 历史 blocker
 
 1. `scripts/verify.sh e2e` 曾在 live preflight 上 fail-closed：
    - `run events endpoint did not emit a terminal event`
@@ -40,14 +40,22 @@
   - upstream runtime owner cutover 已落地
   - service-safe domain entry adapter 已收紧
   - public docs / contracts / tests 已同步到新的目标链路
-- 本仓当前不能诚实宣称：
-  - F4 端到端验证已在当前宿主全绿
-  - `ppt_deck / xiaohongshu / poster_onepager` 的 live lane 已全部重新收口
+- 本文当前只继续承担：
+  - 历史 blocker freeze
+  - 对“这次问题曾真实发生过”的证据保留
+  - 对“closeout 不是靠改写历史得到的”这件事的约束
+
+## 当前 resolution
+
+1. `npm run test:e2e` 已在当前宿主 fresh 全绿：
+   - `ppt_deck` 通过 `screenshot_review / export_pptx / optimize_existing`
+   - `xiaohongshu` 通过 `publish_copy / export_bundle / optimize_existing`
+2. `node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'` 已在当前宿主 fresh 全绿：
+   - 补齐 guarded `poster_onepager` 的 upstream live proof
+3. 历史 `ppt_deck screenshot_review` 失败与 `/v1/runs/{run_id}/events` terminal-event 缺失，在这一轮标准 launcher + Playwright Python contract 下都没有再次复现
 
 ## 下一步
 
-1. 保留本次文档 / 合同 / adapter tighten 改动。
-2. 继续针对 upstream live lane 排查：
-   - `screenshot_review` 为什么在 `ppt_deck` focused e2e 返回 `ok=false`
-   - `/v1/runs/{run_id}/events` terminal event 偶发缺失是否仍存在
-3. 未拿到 fresh green proof 之前，不把 F4 写成 closeout completed。
+1. 保留这份 blocker 作为历史证据，不把它删除或伪装成从未发生。
+2. 以 `upstream-hermes-agent-live-verification-closeout` 作为当前 F4 closeout 证明件继续推进。
+3. 把后续 truthful gap 明确切换到 mature `product entry` 与 `OPL Gateway` federation，而不是继续停在已解锁的历史 blocker 上。
