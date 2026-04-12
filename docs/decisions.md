@@ -34,3 +34,9 @@
 - 当前还不能把 `docs/program/hermes/*` 写成上游 `Hermes-Agent` 已接管 runtime 的证据。
 - 这组文档保留为历史 local-runtime migration artifact，用于追溯为何会走到今天这一步。
 - 当前真实主线应回到核心五件套：先完成 truth reset，再推进真实的上游 `Hermes-Agent` pilot。
+
+### 决策：统一 runtime substrate，不强制统一 visual executor
+
+- `Hermes-Agent` 在本仓长线中优先承担 runtime substrate / orchestration owner。
+- `RedCube AI` 继续持有 visual deliverable 的 family/profile/pack authority、audit truth 与 executor routing。
+- 具体生成步骤允许继续通过 `Executor Adapter` 选择最合适的执行器；只有在拿到显式 proof 后，才允许把某条 route 迁到新的 executor。

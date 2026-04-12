@@ -24,7 +24,7 @@
 
 目标中的 domain 级链路应是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS -> Executor Adapter -> Concrete Executor`
 
 与 `OPL` 的家族级衔接应是：
 
@@ -40,6 +40,28 @@
 - `return_surface_contract`
 
 在这层 envelope 之上，`RedCube AI` 再补充 `deliverable_family`、`topic_id`、`deliverable_id` 这类 domain payload。
+
+## Hermes Kernel 与 visual executor 的分工
+
+`Hermes Kernel` 在 `RedCube AI` 里的目标职责是：
+
+- session / run / watch / memory / scheduling
+- gateway / messaging / interrupt / resume
+- family 级长期在线 runtime substrate
+
+`RedCube AI` 自己继续持有：
+
+- `gateway -> family -> profile -> pack` 这条 domain 主链
+- visual deliverable 的对象边界、审计、review / publication projection
+- executor routing contract
+
+因此，“接入 Hermes”不等于“所有视觉生成步骤都改成 Hermes 自己执行”。
+
+更准确的目标是：
+
+- 由 `Hermes` 统一 runtime substrate / orchestration
+- 由 `RedCube AI` 统一 visual-domain truth
+- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器，例如 repo-local pipeline、受控 host-agent、渲染 toolchain 或未来的 Hermes-native route
 
 ## 结构角色
 

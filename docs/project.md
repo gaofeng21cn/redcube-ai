@@ -6,6 +6,7 @@
 当前仓库主线按 `Auto-only` 理解，formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 当前可执行基线仍是 repo-local managed runtime + 本地 operator host；上游 `Hermes-Agent` 集成还没有落地。
 当前入口真相是：`CLI / MCP` 已经构成可验证的 `agent entry`，但真正面向最终用户的轻量 `product entry` 还没有落地。
+当前统一协作模型是：长线由 `Hermes-Agent` 负责 runtime substrate / orchestration，`RedCube AI` 自己继续负责 gateway、family/profile/pack authority 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，不要求被单一 runtime 脑一次性替换。
 
 ## 项目目标
 
