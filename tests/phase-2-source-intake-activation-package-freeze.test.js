@@ -21,11 +21,11 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 activation package freeze remains a machine-readable completed predecessor after Hermes canonical closure advanced the same mainline', () => {
+test('phase-2 activation package freeze remains a machine-readable completed predecessor after repo-verified product entry federation advanced the same mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(ACTIVATION_CONTRACT);
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');

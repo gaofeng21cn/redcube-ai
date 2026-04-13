@@ -12,7 +12,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-test('managed family closure truth remains historical provenance after upstream runtime owner cutover', () => {
+test('managed family closure truth remains historical provenance under the repo-verified product-entry mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -26,35 +26,35 @@ test('managed family closure truth remains historical provenance after upstream 
     currentProgram.current_state.foundation_milestones.hermes_managed_family_closure_truth.status,
     'historical_local_migration_artifact',
   );
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
-  assert.equal(currentProgram.current_state.active_baton.status, 'historical_local_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
+  assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.tranche_contract,
-    TRANCHE_CONTRACT,
+    currentProgram.current_state.active_baton.artifacts.managed_product_entry_contract,
+    'contracts/runtime-program/managed-product-entry-hardening.json',
   );
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.tranche_brief,
-    TRANCHE_BRIEF,
+    currentProgram.current_state.active_baton.artifacts.managed_product_entry_brief,
+    'docs/program/managed_product_entry_hardening.md',
   );
   assert.equal(
-    currentProgram.current_state.active_baton.artifacts.tranche_test,
-    'tests/hermes-managed-family-closure-truth.test.js',
+    currentProgram.current_state.active_baton.scope.required_session_store_root,
+    '$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/',
   );
   assert.equal(
-    currentProgram.current_state.active_baton.scope.managed_surfaces.includes('runManagedDeliverable'),
+    currentProgram.current_state.active_baton.scope.required_downstream_domain_surfaces.includes('runManagedDeliverable'),
     true,
   );
   assert.equal(
-    currentProgram.current_state.active_baton.scope.managed_preflight_fail_closed.includes('overlay'),
+    currentProgram.current_state.active_baton.scope.required_audit_surfaces.includes('getReviewState'),
     true,
   );
   assert.equal(
-    currentProgram.current_state.active_baton.scope.managed_preflight_fail_closed.includes('stop_after_stage'),
+    currentProgram.current_state.active_baton.scope.required_audit_surfaces.includes('getPublicationProjection'),
     true,
   );
-  assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, false);
+  assert.equal(currentProgram.current_state.active_baton.scope.implementation_in_scope, true);
   assert.equal(
     contract.required_behavior.some((item) => item.includes('validates stop_after_stage')),
     true,

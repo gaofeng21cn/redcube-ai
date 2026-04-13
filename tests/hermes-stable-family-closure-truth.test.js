@@ -38,7 +38,7 @@ function loadHydratedContract(workspaceRoot, topicId, deliverableId) {
   ));
 }
 
-test('stable family closure truth remains historical provenance after upstream runtime owner cutover', () => {
+test('stable family closure truth remains historical provenance under the repo-verified product-entry mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -53,9 +53,20 @@ test('stable family closure truth remains historical provenance after upstream r
     currentProgram.current_state.foundation_milestones.hermes_stable_family_closure_truth.status,
     'historical_local_migration_artifact',
   );
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
-  assert.equal(currentProgram.current_state.active_baton.status, 'historical_local_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
+  assert.equal(currentProgram.current_state.active_baton.status, 'closeout_completed');
+  assert.deepEqual(currentProgram.current_state.active_baton.scope.required_identity_fields, [
+    'program_id',
+    'topic_id',
+    'deliverable_id',
+    'run_id',
+  ]);
+  assert.equal(
+    currentProgram.current_state.active_baton.scope.required_downstream_domain_surfaces.includes('runDeliverableRoute'),
+    true,
+  );
   assert.equal(
     contract.required_behavior.includes(
       'routed family artifacts persist topic_id, deliverable_id, contract, and stage_contract across stable families',

@@ -15,12 +15,12 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 minimum baseline contract remains absorbed provenance behind the current upstream Hermes cutover tranche', () => {
+test('phase-2 minimum baseline contract remains absorbed provenance behind the current repo-verified product entry tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(BASELINE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_id, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_family_source_truth_consumption_convergence.commit, 'e894641');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');

@@ -65,18 +65,16 @@ test('poster freeze contract states that future academic poster surface cannot r
   assert.equal(poster.future_academic_poster_constraints.cannot_reuse_formal_mainline_strategy, 'slot_hydration_only');
 });
 
-test('current tracked program truth keeps poster freeze historical while upstream Hermes cutover stays on the same auto-only mainline', () => {
+test('current tracked program truth keeps poster freeze historical while repo-verified product entry federation stays on the same auto-only mainline', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const latestP21 = readJson(P21_CLOSEOUT_CONTRACT);
   const poster = readJson(POSTER_FREEZE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
+  assert.equal(currentProgram.current_state.phase_id, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
-  assert.deepEqual(
-    currentProgram.current_state.active_baton.scope.runtime_planes,
-    ['source_readiness', 'story_architecture', 'visual_authorship', 'delivery_packaging', 'review', 'export', 'gate', 'audit'],
-  );
+  assert.equal(currentProgram.current_state.active_baton.scope.entry_surfaces.includes('invokeProductEntry'), true);
+  assert.equal(currentProgram.current_state.active_baton.scope.required_downstream_domain_surfaces.includes('runDeliverableRoute'), true);
   assert.deepEqual(currentProgram.current_state.active_baton.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);
   assert.equal(currentProgram.current_state.active_baton.scope.consumer_families.includes('poster_onepager'), true);
   assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('academic poster advancement'), true);

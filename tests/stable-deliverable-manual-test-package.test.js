@@ -18,14 +18,14 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('stable deliverable manual-test contract remains the completed foundation baton behind the current upstream Hermes cutover tranche', () => {
+test('stable deliverable manual-test contract remains the completed foundation baton behind the current repo-verified product entry tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(MANUAL_TEST_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
+  assert.equal(currentProgram.current_state.phase_id, 'repo_verified_product_entry_and_opl_federation');
   assert.equal(currentProgram.current_state.review_closeout.status, 'passed');
   assert.equal(currentProgram.current_state.green_baseline.credible, true);
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.status, 'closeout_completed');
   assert.equal(currentProgram.current_state.foundation_milestones.stable_deliverable_manual_test_driven_hardening.commit, '96dc6c1');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_source_intake_shared_source_truth_baseline.commit, 'a4424d2');

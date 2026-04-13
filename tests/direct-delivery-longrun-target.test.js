@@ -37,8 +37,8 @@ test('direct-delivery longrun target doc stays future-facing and does not rewrit
   assert.equal(doc.includes('## 5.5 Delivery'), true);
   assert.equal(doc.includes('## 6. operator_handoff / closeout boundary'), true);
 
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
   assert.equal(currentProgram.current_state.foundation_milestones.phase_2_runtime_watch_locator_integrity_hardening.status, 'closeout_completed');
-  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('managed web runtime completion claim'), true);
+  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('managed web runtime control plane'), true);
 });

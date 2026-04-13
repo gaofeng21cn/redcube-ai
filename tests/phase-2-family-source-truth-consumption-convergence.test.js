@@ -16,13 +16,13 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 family source-truth consumption convergence stays absorbed provenance while upstream Hermes cutover is the active tranche', () => {
+test('phase-2 family source-truth consumption convergence stays absorbed provenance while repo-verified product entry federation is the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
 
-  assert.equal(currentProgram.current_state.phase_id, 'upstream_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_id, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(contract.formal_entry.controller_repo_verified, false);

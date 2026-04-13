@@ -16,7 +16,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provenance while upstream Hermes cutover keeps current lifecycle names intact', () => {
+test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provenance while repo-verified product entry federation keeps current lifecycle names intact', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -25,14 +25,14 @@ test('phase-2 direct-delivery lifecycle stage convergence stays absorbed provena
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.next_tranche_candidate, 'phase_2_direct_delivery_lifecycle_stage_convergence');
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
   assert.deepEqual(
     currentProgram.durable_surface_contract.required_embedded_summaries,
     ['source_readiness_summary', 'gate_summary', 'operator_handoff', 'lifecycle_stage_summary'],
   );
-  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('managed web runtime completion claim'), true);
+  assert.equal(currentProgram.current_state.active_baton.scope.excluded_scope.includes('managed web runtime control plane'), true);
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(PREDECESSOR_CONTRACT)), true);
   assert.equal(contract.lifecycle_stage_contract_surface.human_to_macro_stage.plan, 'story_architecture');

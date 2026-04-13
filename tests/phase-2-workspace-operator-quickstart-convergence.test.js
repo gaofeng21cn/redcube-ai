@@ -16,7 +16,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('workspace operator quickstart convergence stays absorbed provenance while upstream Hermes cutover takes the active tranche', () => {
+test('workspace operator quickstart convergence stays absorbed provenance while repo-verified product entry federation takes the active tranche', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
@@ -25,11 +25,11 @@ test('workspace operator quickstart convergence stays absorbed provenance while 
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.review_status, 'passed');
   assert.equal(predecessor.closeout.absorbed_to_main, true);
-  assert.equal(currentProgram.current_state.phase_label, 'Upstream Hermes-Agent Runtime Owner Cutover');
-  assert.equal(currentProgram.current_state.workstream, 'upstream_hermes_agent_runtime_owner_cutover');
-  assert.equal(currentProgram.current_state.active_baton.id, 'historical_local_runtime_migration_artifact');
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('deliverable run'), true);
-  assert.equal(currentProgram.current_state.active_baton.scope.required_operator_surfaces.includes('review watch'), true);
+  assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
+  assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
+  assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');
+  assert.equal(currentProgram.current_state.active_baton.scope.required_downstream_domain_surfaces.includes('runDeliverableRoute'), true);
+  assert.equal(currentProgram.current_state.active_baton.scope.required_audit_surfaces.includes('runtimeWatch'), true);
   assert.equal(contract.operator_quickstart_surface.canonical_route.includes('workspace doctor'), true);
   assert.equal(contract.object_boundary.out_of_scope.includes('controller expansion'), true);
   assert.equal(existsSync(path.resolve(PREDECESSOR_CONTRACT)), true);
