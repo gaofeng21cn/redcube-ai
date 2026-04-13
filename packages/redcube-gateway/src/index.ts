@@ -18,6 +18,7 @@ import {
   invokeFederatedProductEntry as invokeFederatedProductEntryJs,
   getProductEntrySession as getProductEntrySessionJs,
   getProductEntryManifest as getProductEntryManifestJs,
+  getProductPreflight as getProductPreflightJs,
   getManagedRun as getManagedRunJs,
   superviseManagedRun as superviseManagedRunJs,
   runDeliverableRoute as runDeliverableRouteJs,
@@ -51,6 +52,7 @@ import type {
   ProductEntryRequest,
   ProductEntryResponse,
   ProductEntryManifestResponse,
+  ProductPreflightResponse,
   ProductEntrySessionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,
@@ -162,6 +164,10 @@ export function getProductEntryManifest(request: Record<string, unknown>): Promi
   return getProductEntryManifestJs(request) as Promise<ProductEntryManifestResponse>;
 }
 
+export function getProductPreflight(request: Record<string, unknown>): Promise<ProductPreflightResponse> {
+  return getProductPreflightJs(request) as Promise<ProductPreflightResponse>;
+}
+
 export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {
   return getManagedRunJs(request) as Promise<ManagedRunRecordResponse>;
 }
@@ -220,6 +226,7 @@ export type {
   ProductEntryRequest,
   ProductEntryResponse,
   ProductEntryManifestResponse,
+  ProductPreflightResponse,
   ProductEntrySessionResponse,
   OverlayCatalogResponse,
   PublicationProjectionResponse,

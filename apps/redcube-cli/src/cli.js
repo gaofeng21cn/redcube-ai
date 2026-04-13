@@ -19,6 +19,7 @@ import {
   invokeProductEntry,
   getProductFrontdesk,
   getProductEntryManifest,
+  getProductPreflight,
   getProductEntrySession,
   superviseManagedRun as superviseGatewayManagedRun,
   intakeSource,
@@ -50,6 +51,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   invokeProductEntry,
   getProductFrontdesk,
   getProductEntryManifest,
+  getProductPreflight,
   getProductEntrySession,
   superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
@@ -224,6 +226,12 @@ function buildCommandHelp(commandKey) {
       gateway_action: 'getProductFrontdesk',
       boundary_fields: ['workspaceRoot'],
     },
+    'product preflight': {
+      summary: '读取当前 direct product-entry frontdoor 的开机前真实自检面。',
+      usage: 'redcube product preflight --workspace-root <dir>',
+      gateway_action: 'getProductPreflight',
+      boundary_fields: ['workspaceRoot'],
+    },
     'product manifest': {
       summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / federated / session 三个入口面。',
       usage: 'redcube product manifest --workspace-root <dir>',
@@ -344,6 +352,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube product frontdesk --workspace-root <dir>',
       },
       {
+        task: '先做一次 product-entry 开机前自检，确认 workspace 与 runtime-state 已 ready',
+        command: 'redcube product preflight --workspace-root <dir>',
+      },
+      {
         task: '通过 direct product entry 创建或继续同一交付 session',
         command: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>]',
       },
@@ -357,7 +369,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
-      product: ['frontdesk', 'invoke', 'federate', 'session', 'manifest'],
+      product: ['frontdesk', 'preflight', 'invoke', 'federate', 'session', 'manifest'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['list', 'bootstrap', 'export', 'install'],
@@ -388,6 +400,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
       managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       productFrontdesk: 'redcube product frontdesk --workspace-root <dir>',
+      productPreflight: 'redcube product preflight --workspace-root <dir>',
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
       productFederate: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
       productSession: 'redcube product session --entry-session-id <id>',
@@ -608,6 +621,12 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
+    if (subcommand === 'preflight') {
+      return gateway.getProductPreflight({
+        workspace_root: resolveWorkspaceRoot(options, cwd),
+      });
+    }
+
     if (subcommand === 'invoke') {
       return gateway.invokeProductEntry({
         workspace_locator: {
@@ -680,7 +699,7 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('product 命令仅支持 frontdesk|invoke|federate|session|manifest');
+    throw new Error('product 命令仅支持 frontdesk|preflight|invoke|federate|session|manifest');
   }
 
 

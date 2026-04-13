@@ -88,6 +88,10 @@ export async function getProductEntryManifest(request) {
   const module = await import('./actions/get-product-entry-manifest.js');
   return module.getProductEntryManifest(request);
 }
+export async function getProductPreflight(request) {
+  const module = await import('./actions/get-product-preflight.js');
+  return module.getProductPreflight(request);
+}
 export async function getProductFrontdesk(request) {
   const module = await import('./actions/get-product-frontdesk.js');
   return module.getProductFrontdesk(request);

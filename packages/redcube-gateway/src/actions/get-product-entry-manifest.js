@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { productEntrySessionDir } from '@redcube/runtime';
 
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
+import { getProductPreflight } from './get-product-preflight.js';
 
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
@@ -37,6 +38,7 @@ function readCurrentProgramContract() {
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const sessionStoreRoot = productEntrySessionDir();
+  const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
   const currentProgram = readCurrentProgramContract();
   const currentState = currentProgram.current_state || {};
   const activeMainline = currentState.active_mainline || {};
@@ -242,6 +244,15 @@ export async function getProductEntryManifest(request) {
       },
     },
     product_entry_overview: productEntryOverview,
+    product_entry_preflight: {
+      surface_kind: productEntryPreflight.surface_kind,
+      summary: productEntryPreflight.summary,
+      ready_to_try_now: productEntryPreflight.ready_to_try_now,
+      recommended_check_command: productEntryPreflight.recommended_check_command,
+      recommended_start_command: productEntryPreflight.recommended_start_command,
+      blocking_check_ids: productEntryPreflight.blocking_check_ids,
+      checks: productEntryPreflight.checks,
+    },
     product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: buildFamilyOrchestrationCompanion({

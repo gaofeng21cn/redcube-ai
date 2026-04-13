@@ -4,7 +4,7 @@
 
 This bilingual index is the default public surface for `RedCube AI`.
 It stays aligned with the current truthful cutover: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; route and managed run surfaces now execute through real upstream `Hermes-Agent`, while visual-domain truth remains local to `RedCube AI`. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
-The current public entry truth is also explicit: `operator entry`, `agent entry`, and a thin repo-verified `product entry` service surface are real today, while a mature end-user product shell is still future work. The current machine-readable discovery surface for that shell is `redcube product manifest`, mirrored by the MCP tool `get_product_entry_manifest`.
+The current public entry truth is also explicit: `operator entry`, `agent entry`, and a thin repo-verified `product entry` service surface are real today, while a mature end-user product shell is still future work. The current startup self-check surface is `redcube product preflight`, and the current machine-readable discovery surface for that shell is `redcube product manifest`, mirrored by the MCP tool `get_product_entry_manifest`.
 
 ## Core Maintainer Working Set
 
@@ -35,7 +35,8 @@ Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` n
 - Current creative-stage baseline: `pack` remains a domain boundary and pack-id carrier, but no longer acts as a repo-local creative compiler/runtime.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Product-entry target: keep the landed lightweight domain `product entry` callable directly or through `OPL` handoff without changing the visual-domain boundary, then harden it toward a mature end-user shell.
-- Current discovery surface: `redcube product frontdesk`, `redcube product manifest`, and `get_product_entry_manifest` let hosts discover the current `frontdesk_surface` plus direct / federated / session shell without guessing commands or payload shape.
+- Current preflight surface: `redcube product preflight` gives hosts the honest startup checks before opening the current direct frontdoor.
+- Current discovery surface: `redcube product frontdesk`, `redcube product manifest`, and `get_product_entry_manifest` let hosts discover the current `frontdesk_surface` plus direct / federated / session shell without guessing commands or payload shape, and the manifest/frontdesk now also carry the same `product_entry_preflight` companion.
 - Frozen final target shape: [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md) (Chinese only)
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)

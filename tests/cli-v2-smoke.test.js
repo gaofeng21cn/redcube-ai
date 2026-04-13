@@ -873,6 +873,34 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(frontdeskParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
     assert.equal(frontdeskParsed.product_entry_readiness.usable_now, true);
     assert.equal(frontdeskParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
+    assert.equal(frontdeskParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
+    assert.equal(frontdeskParsed.product_entry_preflight.ready_to_try_now, true);
+    assert.equal(
+      frontdeskParsed.product_entry_preflight.recommended_check_command,
+      `redcube workspace doctor --workspace-root ${workspaceRoot}`,
+    );
+
+    const preflightParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'preflight',
+        '--workspace-root',
+        workspaceRoot,
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(preflightParsed.ok, true);
+    assert.equal(preflightParsed.surface_kind, 'product_entry_preflight');
+    assert.equal(preflightParsed.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(preflightParsed.ready_to_try_now, true);
+    assert.equal(preflightParsed.checks.length, 4);
 
     const directParsed = await execCliAsync(
       cliPath,
@@ -1023,6 +1051,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifestParsed.product_entry_readiness.good_to_use_now, false);
     assert.equal(manifestParsed.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
+    assert.equal(manifestParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
+    assert.equal(manifestParsed.product_entry_preflight.ready_to_try_now, true);
   });
 });
 

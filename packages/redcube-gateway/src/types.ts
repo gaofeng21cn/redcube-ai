@@ -285,6 +285,25 @@ export interface ProductEntryReadinessCompanion {
   blocking_gaps: string[];
 }
 
+export interface ProductEntryPreflightCheck {
+  check_id: string;
+  title: string;
+  status: 'pass' | 'warn' | 'fail' | string;
+  blocking: boolean;
+  summary: string;
+  command: string;
+}
+
+export interface ProductEntryPreflightCompanion {
+  surface_kind: 'product_entry_preflight' | string;
+  summary: string;
+  ready_to_try_now: boolean;
+  recommended_check_command: string;
+  recommended_start_command: string;
+  blocking_check_ids: string[];
+  checks: ProductEntryPreflightCheck[];
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -455,6 +474,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     };
   };
   product_entry_overview: ProductEntryOverviewCompanion;
+  product_entry_preflight: ProductEntryPreflightCompanion;
   product_entry_readiness: ProductEntryReadinessCompanion;
   product_entry_quickstart: ProductEntryQuickstartCompanion;
   family_orchestration: FamilyOrchestrationCompanion;
@@ -475,6 +495,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
   operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
   product_entry_overview: ProductEntryManifestResponse['product_entry_overview'];
+  product_entry_preflight: ProductEntryManifestResponse['product_entry_preflight'];
   product_entry_readiness: ProductEntryManifestResponse['product_entry_readiness'];
   product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
   family_orchestration: ProductEntryManifestResponse['family_orchestration'];
@@ -490,6 +511,11 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
     operator_loop_command: string | null;
   };
   notes: string[];
+}
+
+export interface ProductPreflightResponse extends SurfaceBase<'product_entry_preflight'>, ProductEntryPreflightCompanion {
+  target_domain_id: string;
+  workspace_locator: ProductEntryManifestResponse['workspace_locator'];
 }
 
 export interface ManagedRunProjection {
