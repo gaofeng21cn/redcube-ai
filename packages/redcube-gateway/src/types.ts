@@ -318,6 +318,12 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     continuation_shell_key?: 'direct' | 'federated' | 'session' | string;
     continuation_command?: string;
   };
+  operator_loop_actions: Record<string, {
+    command: string;
+    surface_kind: string;
+    summary: string;
+    requires: string[];
+  }>;
   product_entry_status: {
     summary: string;
     next_focus: string[];

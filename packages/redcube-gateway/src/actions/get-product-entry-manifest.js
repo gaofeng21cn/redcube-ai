@@ -69,6 +69,26 @@ export async function getProductEntryManifest(request) {
       continuation_shell_key: 'session',
       continuation_command: 'redcube product session',
     },
+    operator_loop_actions: {
+      start_deliverable: {
+        command: 'redcube product invoke',
+        surface_kind: 'product_entry',
+        summary: '直接进入当前 deliverable 的 primary operator loop。',
+        requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+      },
+      continue_session: {
+        command: 'redcube product session',
+        surface_kind: 'product_entry_session',
+        summary: '在已有 entry_session_id 下继续同一交付。',
+        requires: ['entry_session_id'],
+      },
+      federated_handoff: {
+        command: 'redcube product federate',
+        surface_kind: 'federated_product_entry',
+        summary: '通过 family / OPL gateway 进入同一 downstream product entry。',
+        requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+      },
+    },
     repo_mainline: {
       program_id: safeText(activeMainline.id, 'redcube-runtime-program'),
       phase_id: safeText(currentState.phase_id, 'unknown_phase'),
