@@ -89,10 +89,18 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(renderHtmlPrompt, /foundation \/ substrate \/ base band/);
   assert.match(renderHtmlPrompt, /任何带字元素都必须拥有独立留白/);
   assert.match(renderHtmlPrompt, /同一页面家族重复出现/);
+  assert.match(renderHtmlPrompt, /controller.*唯一主峰/);
+  assert.match(renderHtmlPrompt, /风险支路.*短窄/);
+  assert.match(renderHtmlPrompt, /底部说明.*最多保留 ?2/);
   assert.equal(renderHtmlPrompt.includes('"template_registry"'), false);
   assert.match(directorReviewPrompt, /foundation \/ substrate \/ base band/);
   assert.match(directorReviewPrompt, /所有带字元素是否拥有独立留白/);
   assert.match(directorReviewPrompt, /同一页面家族重复出现/);
+  assert.match(directorReviewPrompt, /controller.*唯一主峰/);
+  assert.match(directorReviewPrompt, /底部说明.*最多保留 ?2/);
+  assert.match(runtime, /controller.*唯一主峰/);
+  assert.match(runtime, /风险支路.*短窄/);
+  assert.match(runtime, /底部说明.*最多保留 ?2/);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/director_review.md')), true);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.hero_signal.html')), true);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.summary_peak.html')), true);
@@ -525,6 +533,89 @@ test('ppt rerun render_html forwards prior director and screenshot review feedba
         route: 'render_html',
       });
       assert.equal(renderResult.ok, true);
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt rerun render_html only regenerates blocked slides and preserves previously passed slides', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-targeted-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    });
+
+    const initialRoutes = await runPptRoutes({
+      workspaceRoot,
+      deliverableId: 'deck-a',
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    });
+    for (const { route, result } of initialRoutes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const artifactsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+    );
+    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+      status: 'block',
+      visual_director_review: {
+        weak_pages: ['S06'],
+        review_summary: 'S06 需要继续压缩风险支路。',
+        rewrite_action: 'revise_render_html',
+      },
+    }, null, 2), 'utf-8');
+    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+      status: 'block',
+      checks: {
+        ai_review_passed: false,
+      },
+      slide_reviews: [
+        {
+          slide_id: 'S06',
+          status: 'block',
+          issues: ['ai_review_failed'],
+          ai_review: {
+            judgement: 'block',
+            visual_findings: ['红色支路过长，底部说明太碎。'],
+            recommended_fix: '只重建 S06，压缩风险支路并减少底部说明。',
+          },
+        },
+      ],
+      ai_review: {
+        weak_pages: ['S06'],
+        review_summary: '当前只需回到 render_html 修 S06。',
+      },
+    }, null, 2), 'utf-8');
+
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
+    });
+    try {
+      const rerender = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'render_html',
+      });
+      assert.equal(rerender.ok, true);
+      const renderArtifact = readJson(rerender.artifactFile);
+      assert.equal(renderArtifact.html_bundle.slides.length >= 8, true);
+      assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S01'), true);
+      assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S06'), true);
     } finally {
       restoreVariant();
     }

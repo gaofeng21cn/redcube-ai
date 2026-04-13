@@ -1586,7 +1586,96 @@ function validateRenderedSlideContent(content, slideId) {
   return html;
 }
 
-function buildRenderHtmlBlueprintSlides(blueprintArtifact) {
+function buildRenderRevisionFocusMap(revisionContext) {
+  const focusBySlideId = new Map();
+  const weakPages = new Set(
+    safeArray(revisionContext?.visual_director_review?.weak_pages)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  );
+  const blockedSlideIds = new Set(
+    safeArray(revisionContext?.screenshot_review?.blocked_slide_ids)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  );
+  const slideFeedbackById = new Map(
+    safeArray(revisionContext?.screenshot_review?.slide_feedback)
+      .map((slide) => [safeText(slide?.slide_id), slide]),
+  );
+  for (const slideId of new Set([
+    ...weakPages,
+    ...blockedSlideIds,
+    ...slideFeedbackById.keys(),
+  ])) {
+    if (!slideId) continue;
+    const slideFeedback = slideFeedbackById.get(slideId) || {};
+    focusBySlideId.set(slideId, {
+      weak_page: weakPages.has(slideId),
+      blocked_for_screenshot_review: blockedSlideIds.has(slideId),
+      blocked_checks: safeArray(slideFeedback?.blocked_checks),
+      ai_findings: safeArray(slideFeedback?.ai_findings),
+      recommended_fix: safeText(slideFeedback?.recommended_fix),
+      director_review_summary: weakPages.has(slideId)
+        ? normalizeInlineText(revisionContext?.visual_director_review?.review_summary, 220)
+        : '',
+      rewrite_priority: 'must_fix_before_new_variation',
+    });
+  }
+  return focusBySlideId;
+}
+
+function loadPriorRenderedSlideHtmlMap(renderArtifact) {
+  return new Map(
+    safeArray(renderArtifact?.html_bundle?.slides)
+      .map((slide) => [safeText(slide?.slide_id), requireText(slide?.content, 'render_html.html_bundle.slides[].content')])
+      .filter(([slideId]) => slideId),
+  );
+}
+
+function planRenderHtmlExecution({ blueprintSlides, revisionContext, priorRenderArtifact }) {
+  const priorRenderedSlides = loadPriorRenderedSlideHtmlMap(priorRenderArtifact);
+  const targetedSlideIds = new Set([
+    ...safeArray(revisionContext?.visual_director_review?.weak_pages),
+    ...safeArray(revisionContext?.screenshot_review?.blocked_slide_ids),
+  ].map((slideId) => safeText(slideId)).filter(Boolean));
+  if (targetedSlideIds.size === 0 || priorRenderedSlides.size === 0) {
+    return {
+      mode: 'full_regeneration',
+      slides_to_render: blueprintSlides,
+      reused_slides: new Map(),
+    };
+  }
+  const slidesToRender = [];
+  const reusedSlides = new Map();
+  for (const slide of blueprintSlides) {
+    const slideId = safeText(slide?.slide_id);
+    if (!slideId) continue;
+    if (targetedSlideIds.has(slideId)) {
+      slidesToRender.push(slide);
+      continue;
+    }
+    const priorHtml = priorRenderedSlides.get(slideId);
+    if (!priorHtml) {
+      return {
+        mode: 'full_regeneration',
+        slides_to_render: blueprintSlides,
+        reused_slides: new Map(),
+      };
+    }
+    reusedSlides.set(slideId, {
+      slide_id: slideId,
+      content_html: priorHtml,
+    });
+  }
+  return {
+    mode: 'targeted_revision_only',
+    slides_to_render: slidesToRender,
+    reused_slides: reusedSlides,
+  };
+}
+
+function buildRenderHtmlBlueprintSlides(blueprintArtifact, revisionContext = null) {
+  const revisionFocusBySlideId = buildRenderRevisionFocusMap(revisionContext);
   return safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => ({
     slide_id: slide.slide_id,
     slide_no: slide.slide_no,
@@ -1600,6 +1689,7 @@ function buildRenderHtmlBlueprintSlides(blueprintArtifact) {
     speaker_seconds: slide.speaker_seconds,
     render_recipe_id: slide.render_recipe_id,
     public_sources: safeArray(slide.evidence_and_sources).map((item) => item.public_label),
+    revision_focus: revisionFocusBySlideId.get(safeText(slide.slide_id)) || null,
   }));
 }
 
@@ -1653,8 +1743,14 @@ function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
 async function generateRenderHtmlDraft(contract, deliverablePaths) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const blueprintSlides = buildRenderHtmlBlueprintSlides(blueprintArtifact);
+  const previousRenderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const sharedRevisionContext = buildRenderRevisionContext(contract, deliverablePaths);
+  const blueprintSlides = buildRenderHtmlBlueprintSlides(blueprintArtifact, sharedRevisionContext);
+  const renderPlan = planRenderHtmlExecution({
+    blueprintSlides,
+    revisionContext: sharedRevisionContext,
+    priorRenderArtifact: previousRenderArtifact,
+  });
   const sharedContext = {
     ...buildAuthoringContext(contract),
     visual_direction: visualArtifact?.visual_direction || null,
@@ -1671,13 +1767,20 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
       'foundation / substrate / base band 只承担结构基座，不得压住正文、说明卡片、讲者信息或封面辅助卡；所有可读内容都必须完整留在页边界内。',
       '任何带字元素都必须拥有独立留白：标签、badge、航线节点、callout、段落、底部说明和图内节点不得彼此遮挡，也不得跨压导航轨道或解释段。',
       '若同一页面家族重复出现，后续页面必须切换首眼信号、构图重心或风险张力，不能只是上一页的弱化复写。',
+      '对 audit_tension / timeline_band 的第二段推进页，controller 必须继续做唯一主峰；红色风险支路必须收成短窄阻断支路，不能膨胀成第二主图。',
+      '若页面同时承载主链说明与风险提示，底部说明区最多保留 2 块；第 3 个观点必须并入主图注释或节点说明，不得再扩成整排说明带。',
+      '若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体。',
+      '风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数。',
+      '若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面，其余通过页应保持原样复用，不要重新发明已通过页面。',
       '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
       '不要使用 renderSlide/layoutByType/cardsGrid/pageType，不要输出 <script>/<style> block，也不要把模板注册表或内部文档写入 HTML。',
       'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
     ],
   };
-  const slideBatches = chunkArray(blueprintSlides, RENDER_HTML_BATCH_SIZE);
-  const renderedSlides = (await Promise.all(slideBatches.map(async (slideBatch, batchIndex) => {
+  const slideBatches = chunkArray(renderPlan.slides_to_render, RENDER_HTML_BATCH_SIZE);
+  const freshlyRenderedSlides = slideBatches.length === 0
+    ? []
+    : (await Promise.all(slideBatches.map(async (slideBatch, batchIndex) => {
     const { data: batchData } = await generateStructuredArtifactViaCodexCli({
       family: 'ppt_deck',
       route: 'render_html',
@@ -1685,6 +1788,7 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
       context: {
         ...sharedContext,
         render_scope: 'slide_batch',
+        rerender_mode: renderPlan.mode,
         render_batch: {
           batch_index: batchIndex + 1,
           total_batches: slideBatches.length,
@@ -1703,6 +1807,13 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
     });
     return safeArray(batchData?.slides).filter((item) => item && typeof item === 'object');
   }))).flat();
+  const freshlyRenderedById = new Map(
+    freshlyRenderedSlides.map((slide) => [safeText(slide?.slide_id), slide]),
+  );
+  const renderedSlides = blueprintSlides.map((slide) => {
+    const slideId = safeText(slide?.slide_id);
+    return freshlyRenderedById.get(slideId) || renderPlan.reused_slides.get(slideId);
+  }).filter(Boolean);
   const { data: summaryData, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'ppt_deck',
     route: 'render_html',
@@ -1710,6 +1821,7 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
     context: {
       ...sharedContext,
       render_scope: 'summary',
+      rerender_mode: renderPlan.mode,
       blueprint: {
         slides: blueprintSlides.map((slide) => ({
           slide_id: slide.slide_id,
@@ -1717,7 +1829,8 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
           layout_family: slide.layout_family,
         })),
       },
-      rendered_slide_ids: renderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      rendered_slide_ids: freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      reused_slide_ids: [...renderPlan.reused_slides.keys()],
       revision_context: sharedRevisionContext,
     },
     outputContract: renderHtmlSummaryOutputContract(),

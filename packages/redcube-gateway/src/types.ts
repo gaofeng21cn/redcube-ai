@@ -33,7 +33,7 @@ export interface SurfaceBase<TKind extends string> {
   ok: boolean;
   surface_kind: TKind;
   recommended_action?: string | null;
-  summary?: SurfaceSummary;
+  summary?: SurfaceSummary | string;
 }
 
 export interface WorkspaceDoctorResponse extends SurfaceBase<'workspace_doctor'> {
@@ -324,8 +324,8 @@ export interface ProductEntryPreflightCheck {
 }
 
 export interface ProductEntryPreflightCompanion {
-  surface_kind: 'product_entry_preflight' | string;
-  summary: string;
+  surface_kind: 'product_entry_preflight';
+  summary?: SurfaceSummary | string;
   ready_to_try_now: boolean;
   recommended_check_command: string;
   recommended_start_command: string;

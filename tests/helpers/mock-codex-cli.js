@@ -405,6 +405,29 @@ function buildMockPptRender(meta) {
           if (!hasDirectorFeedback || !hasScreenshotFeedback) {
             throw new Error(`mock ppt render expected revision_context with director and screenshot review feedback: ${JSON.stringify(revisionContext)}`);
           }
+          const blockedSlideIds = new Set([
+            ...safeArray(revisionContext?.visual_director_review?.weak_pages),
+            ...safeArray(revisionContext?.screenshot_review?.blocked_slide_ids),
+          ].map((item) => safeText(item)).filter(Boolean));
+          if (blockedSlideIds.has(safeText(slide.slide_id))) {
+            const revisionFocus = slide?.revision_focus || {};
+            if (!safeText(revisionFocus?.recommended_fix) || safeArray(revisionFocus?.ai_findings).length === 0) {
+              throw new Error(`mock ppt render expected revision_focus on blocked slide ${slide.slide_id}: ${JSON.stringify(slide)}`);
+            }
+          }
+        }
+        if (variant === 'require_targeted_revision_rerender') {
+          const revisionContext = meta?.context?.revision_context || {};
+          const blockedSlideIds = new Set([
+            ...safeArray(revisionContext?.visual_director_review?.weak_pages),
+            ...safeArray(revisionContext?.screenshot_review?.blocked_slide_ids),
+          ].map((item) => safeText(item)).filter(Boolean));
+          if (blockedSlideIds.size === 0) {
+            throw new Error(`mock ppt render expected blocked slide ids for targeted rerender: ${JSON.stringify(revisionContext)}`);
+          }
+          if (!blockedSlideIds.has(safeText(slide.slide_id))) {
+            throw new Error(`mock ppt render expected only blocked slides during rerender, got ${slide.slide_id}`);
+          }
         }
         const markup = buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id));
         if (variant === 'missing_root_meta') {
