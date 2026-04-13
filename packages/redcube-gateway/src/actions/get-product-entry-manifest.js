@@ -1,6 +1,12 @@
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 
 import { productEntrySessionDir } from '@redcube/runtime';
+
+const CURRENT_PROGRAM_CONTRACT_URL = new URL(
+  '../../../../contracts/runtime-program/current-program.json',
+  import.meta.url,
+);
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -22,9 +28,17 @@ function normalizeWorkspaceRoot(request) {
   );
 }
 
+function readCurrentProgramContract() {
+  return JSON.parse(readFileSync(CURRENT_PROGRAM_CONTRACT_URL, 'utf8'));
+}
+
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const sessionStoreRoot = productEntrySessionDir();
+  const currentProgram = readCurrentProgramContract();
+  const currentState = currentProgram.current_state || {};
+  const activeMainline = currentState.active_mainline || {};
+  const activeBaton = currentState.active_baton || {};
 
   return {
     ok: true,
@@ -44,6 +58,21 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: 'redcube product invoke',
+    repo_mainline: {
+      program_id: safeText(activeMainline.id, 'redcube-runtime-program'),
+      phase_id: safeText(currentState.phase_id, 'unknown_phase'),
+      phase_label: safeText(currentState.phase_label, 'unknown phase'),
+      active_baton_id: safeText(activeBaton.id, 'unknown_baton'),
+      active_baton_status: safeText(activeBaton.status, 'unknown'),
+    },
+    product_entry_status: {
+      summary: 'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      next_focus: [
+        '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
+        '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
+      ],
+      remaining_gaps_count: 2,
+    },
     runtime: {
       runtime_owner: 'upstream_hermes_agent',
       runtime_state_root: path.dirname(sessionStoreRoot),

@@ -237,6 +237,18 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(manifest.recommended_shell, 'direct');
     assert.equal(manifest.recommended_command, 'redcube product invoke');
+    assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
+    assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_federation');
+    assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
+    assert.equal(
+      manifest.product_entry_status.summary,
+      'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    );
+    assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
+    assert.deepEqual(manifest.product_entry_status.next_focus, [
+      '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
+      '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
+    ]);
     assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
