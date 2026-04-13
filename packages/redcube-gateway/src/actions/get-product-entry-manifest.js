@@ -154,6 +154,49 @@ export async function getProductEntryManifest(request) {
         target_domain_id: 'redcube_ai',
       },
     },
+    product_entry_quickstart: {
+      surface_kind: 'product_entry_quickstart',
+      recommended_step_id: 'open_frontdesk',
+      summary: (
+        'Open the RedCube frontdesk first, then continue the same deliverable loop or inspect the current entry session.'
+      ),
+      steps: [
+        {
+          step_id: 'open_frontdesk',
+          title: 'Open RedCube frontdesk',
+          command: `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+          surface_kind: 'product_frontdesk',
+          summary: 'Open the direct RedCube frontdesk for the current workspace.',
+          requires: [],
+        },
+        {
+          step_id: 'continue_current_loop',
+          title: 'Continue current deliverable loop',
+          command: (
+            `redcube product invoke --workspace-root ${workspaceRoot} `
+            + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
+            + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
+          ),
+          surface_kind: 'product_entry',
+          summary: 'Continue the current deliverable loop once identifiers are known.',
+          requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+        },
+        {
+          step_id: 'inspect_current_progress',
+          title: 'Inspect current session progress',
+          command: 'redcube product session --entry-session-id <entry-session-id>',
+          surface_kind: 'product_entry_session',
+          summary: 'Inspect the current session progress for the same deliverable.',
+          requires: ['entry_session_id'],
+        },
+      ],
+      resume_contract: {
+        surface_kind: 'product_entry_session',
+        session_locator_field: 'entry_session_contract.entry_session_id',
+        checkpoint_locator_field: 'checkpoint_lineage_id',
+      },
+      human_gate_ids: ['redcube_operator_review_gate'],
+    },
     family_orchestration: buildFamilyOrchestrationCompanion({
       sessionLocatorField: 'entry_session_contract.entry_session_id',
       gateStatus: 'requested',

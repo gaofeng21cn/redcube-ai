@@ -283,6 +283,22 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.operator_loop_actions.continue_session.command, 'redcube product session');
     assert.deepEqual(manifest.operator_loop_actions.continue_session.requires, ['entry_session_id']);
     assert.equal(manifest.operator_loop_actions.federated_handoff.command, 'redcube product federate');
+    assert.equal(manifest.product_entry_quickstart.surface_kind, 'product_entry_quickstart');
+    assert.equal(manifest.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
+    assert.deepEqual(manifest.product_entry_quickstart.human_gate_ids, ['redcube_operator_review_gate']);
+    assert.deepEqual(
+      manifest.product_entry_quickstart.steps.map((step) => step.step_id),
+      ['open_frontdesk', 'continue_current_loop', 'inspect_current_progress'],
+    );
+    assert.equal(
+      manifest.product_entry_quickstart.steps[0].command,
+      `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+    );
+    assert.equal(
+      manifest.product_entry_quickstart.steps[1].command,
+      `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
+    );
+    assert.deepEqual(manifest.product_entry_quickstart.steps[2].requires, ['entry_session_id']);
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_federation');
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
@@ -312,6 +328,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     });
     assert.equal(frontdesk.ok, true);
     assert.equal(frontdesk.surface_kind, 'product_frontdesk');
+    assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
+    assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
+    assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');
     assertFamilyOrchestrationCompanion(frontdesk, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });

@@ -229,6 +229,24 @@ export interface FamilyOrchestrationCompanion {
   checkpoint_lineage_surface?: FamilyOrchestrationReferenceRef;
 }
 
+export interface ProductEntryQuickstartStep {
+  step_id: string;
+  title?: string;
+  command: string;
+  surface_kind: string;
+  summary?: string;
+  requires?: string[];
+}
+
+export interface ProductEntryQuickstartCompanion {
+  surface_kind: 'product_entry_quickstart' | string;
+  recommended_step_id: string;
+  summary?: string;
+  steps: ProductEntryQuickstartStep[];
+  resume_contract?: FamilyOrchestrationResumeContract;
+  human_gate_ids?: string[];
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -398,6 +416,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       target_domain_id: string;
     };
   };
+  product_entry_quickstart: ProductEntryQuickstartCompanion;
   family_orchestration: FamilyOrchestrationCompanion;
   current_truth: {
     product_entry_contract: string;
@@ -415,6 +434,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   product_entry_status: ProductEntryManifestResponse['product_entry_status'];
   operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
   operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
+  product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
   family_orchestration: ProductEntryManifestResponse['family_orchestration'];
   product_entry_manifest: ProductEntryManifestResponse;
   entry_surfaces: {
