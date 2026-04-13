@@ -76,6 +76,26 @@
 - executor routing contract
 - `pack` 作为 domain boundary / pack-id 载体的语义真相
 
+当前 executor-adapter contract 也已经冻结成统一口径：
+
+- 默认正式执行器是 `host_agent`
+  - 它对应本机 Codex CLI autonomous / host-agent runtime
+- 备选 proof 执行器是 `hermes_native_proof`
+  - 只有 caller 显式传 `adapter = hermes_native_proof` 时才会启用
+  - 当前已经对齐到 `ppt_deck`、`xiaohongshu`、`poster_onepager` 三个 family
+  - 底层不是单轮 chat relay，而是 `@redcube/hermes-substrate -> hermes_native_proof_bridge.py -> run_agent.AIAgent.run_conversation`
+  - 默认 model / reasoning 继承本机 Hermes 默认配置，不在 repo 内 pin 死
+
+这意味着 RedCube 现在的 family runtime 并不是“写死 Codex-only”，而是：
+
+`gateway -> runtime family contract -> executor adapter -> concrete agent runtime`
+
+其中：
+
+- `runtime family contract` 继续定义 route、artifact、review surface 与 visual-domain truth
+- `executor adapter` 只负责把这些 contract 下沉到具体执行器
+- 默认主线仍是 Codex CLI；Hermes-native 先作为 opt-in proof lane 保持可选，不提前替换默认
+
 当前还要额外冻结一个边界：
 
 - `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一走 `runtime-family + Codex CLI structured generation`
@@ -88,7 +108,7 @@
 
 - 由 Codex CLI host-agent runtime 统一 route / managed execution
 - 由 `RedCube AI` 统一 visual-domain truth
-- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器，例如 repo-local pipeline、受控 host-agent、渲染 toolchain 或未来的 Hermes-native route
+- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线是 Codex CLI，`Hermes-native` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
 
 ## Service-Safe Domain Entry
 

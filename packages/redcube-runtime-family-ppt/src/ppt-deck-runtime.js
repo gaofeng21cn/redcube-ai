@@ -18,7 +18,13 @@ import {
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
-import { buildCodexExecutionModel } from '@redcube/hermes-substrate';
+import {
+  CODEX_DEFAULT_ADAPTER,
+  HERMES_NATIVE_PROOF_ADAPTER,
+  buildCodexExecutionModel,
+  buildHermesNativeProofExecutionModel,
+  generateStructuredArtifactViaHermesNativeProof,
+} from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 import {
@@ -84,6 +90,7 @@ const RENDER_HTML_BATCH_SIZE = 3;
 const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
+const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 const MIN_REVIEW_QA_BLOCKS = 2;
 const MIN_REVIEW_PRIMARY_POINTS = 1;
@@ -859,20 +866,64 @@ function deckPreset(profileId) {
   }
 }
 
-function hostAgentCreativeSource(protectedSurface, artifactSource) {
+function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
+  return adapter === HERMES_NATIVE_PROOF_ADAPTER
+    ? HERMES_NATIVE_PROOF_EXECUTION_MODEL
+    : CODEX_EXECUTION_MODEL;
+}
+
+function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  if (safeText(generationRuntime?.creative_owner)) {
+    return safeText(generationRuntime.creative_owner);
+  }
+  return adapter === HERMES_NATIVE_PROOF_ADAPTER ? HERMES_NATIVE_PROOF_ADAPTER : 'host_agent';
+}
+
+function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  if (safeText(generationRuntime?.primary_surface)) {
+    return safeText(generationRuntime.primary_surface);
+  }
+  return adapter === HERMES_NATIVE_PROOF_ADAPTER
+    ? 'hermes_native_full_agent_loop'
+    : 'codex_native_host_agent';
+}
+
+async function generateStructuredArtifact({
+  adapter = CODEX_DEFAULT_ADAPTER,
+  ...input
+}) {
+  if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    return generateStructuredArtifactViaHermesNativeProof(input);
+  }
+  return generateStructuredArtifactViaCodexCli(input);
+}
+
+function runtimeCreativeSource(
+  protectedSurface,
+  artifactSource,
+  generationRuntime = null,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
+    owner: creativeOwner(generationRuntime, adapter),
+    primary_surface: primarySurface(generationRuntime, adapter),
+    stage_owner: primarySurface(generationRuntime, adapter),
     ownership_model: 'director_first',
     authored_surface: protectedSurface,
     materialized_from: artifactSource,
   };
 }
 
-function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
+function creativeSourceStamp({
+  route,
+  lifecycleStage,
+  authoredSurface,
+  materializedFrom = 'prompt_pack_seed',
+  generationRuntime = null,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   return {
-    ...hostAgentCreativeSource(authoredSurface, materializedFrom),
+    ...runtimeCreativeSource(authoredSurface, materializedFrom, generationRuntime, adapter),
     route,
     lifecycle_stage: lifecycleStage,
     authored_surface: authoredSurface,
@@ -888,10 +939,10 @@ function reviewOverlayForRoute(contract, route) {
   return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
 }
 
-function creativeExecution(routeOrLifecycleStage, generationRuntime = null) {
+function creativeExecution(routeOrLifecycleStage, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: creativeOwner(generationRuntime, adapter),
+    primary_surface: primarySurface(generationRuntime, adapter),
     lifecycle_stage: routeOrLifecycleStage,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -902,7 +953,7 @@ function creativeExecution(routeOrLifecycleStage, generationRuntime = null) {
   };
 }
 
-function attachCommon(route, contract) {
+function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   return {
     route,
     overlay: contract.overlay,
@@ -911,7 +962,7 @@ function attachCommon(route, contract) {
     prompt_pack: promptMeta(route),
     lifecycle_stage: lifecycleStageForRoute(contract, route),
     review_overlay: reviewOverlayForRoute(contract, route),
-    execution_model: CODEX_EXECUTION_MODEL,
+    execution_model: generationRuntime?.execution_model || executionModelForAdapter(adapter),
   };
 }
 
@@ -1361,8 +1412,9 @@ function buildAuthoringContext(contract) {
   };
 }
 
-async function generateStorylineDraft(contract) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+async function generateStorylineDraft(contract, adapter) {
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'storyline',
     promptRelativePath: PROMPT_PACK.storyline,
@@ -1398,8 +1450,9 @@ function buildOutlineContext(contract, storylineArtifact) {
   };
 }
 
-async function generateOutlineDraft(contract, storylineArtifact) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+async function generateOutlineDraft(contract, storylineArtifact, adapter) {
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'detailed_outline',
     promptRelativePath: PROMPT_PACK.detailed_outline,
@@ -1433,8 +1486,9 @@ function summarizeOutlineSlides(outlineArtifact) {
   }));
 }
 
-async function generateBlueprintDraft(contract, outlineArtifact) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+async function generateBlueprintDraft(contract, outlineArtifact, adapter) {
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'slide_blueprint',
     promptRelativePath: PROMPT_PACK.slide_blueprint,
@@ -1464,8 +1518,9 @@ function summarizeBlueprintSlides(blueprintArtifact) {
   }));
 }
 
-async function generateVisualDirectionDraft(contract, blueprintArtifact, mode, baselineDeliverableId) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+async function generateVisualDirectionDraft(contract, blueprintArtifact, mode, baselineDeliverableId, adapter) {
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'visual_direction',
     promptRelativePath: PROMPT_PACK.visual_direction,
@@ -1485,12 +1540,12 @@ async function generateVisualDirectionDraft(contract, blueprintArtifact, mode, b
   };
 }
 
-async function buildStoryline(contract) {
-  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract);
+async function buildStoryline(contract, adapter) {
+  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract, adapter);
   return {
-    ...attachCommon('storyline', contract),
+    ...attachCommon('storyline', contract, generationRuntime, adapter),
     creative_execution: {
-      ...creativeExecution('storyline', generationRuntime),
+      ...creativeExecution('storyline', generationRuntime, adapter),
       lifecycle_stage: lifecycleStageForRoute(contract, 'storyline'),
     },
     storyline: {
@@ -1511,8 +1566,8 @@ async function buildStoryline(contract) {
       deep_research_state: sharedSourceDeepResearchState(contract),
       fact_library_summary: sharedFactLibrarySummary(contract),
       creative_sources: {
-        core_metaphor: hostAgentCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM),
-        narrative_arc: hostAgentCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM),
+        core_metaphor: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
+        narrative_arc: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
       },
     },
   };
@@ -1751,7 +1806,7 @@ function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
   };
 }
 
-async function generateRenderHtmlDraft(contract, deliverablePaths) {
+async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const previousRenderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
@@ -1792,7 +1847,8 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
   const freshlyRenderedSlides = slideBatches.length === 0
     ? []
     : (await Promise.all(slideBatches.map(async (slideBatch, batchIndex) => {
-    const { data: batchData } = await generateStructuredArtifactViaCodexCli({
+    const { data: batchData } = await generateStructuredArtifact({
+      adapter,
       family: 'ppt_deck',
       route: 'render_html',
       promptRelativePath: PROMPT_PACK.render_html,
@@ -1825,7 +1881,8 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
     const slideId = safeText(slide?.slide_id);
     return freshlyRenderedById.get(slideId) || renderPlan.reused_slides.get(slideId);
   }).filter(Boolean);
-  const { data: summaryData, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data: summaryData, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'render_html',
     promptRelativePath: PROMPT_PACK.render_html,
@@ -1856,10 +1913,15 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
   };
 }
 
-async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths }) {
+async function buildRenderHtmlArtifact({
+  deliverableId,
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths);
+  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths, adapter);
   const slideHtmlList = safeArray(data?.slides).filter((item) => item && typeof item === 'object');
   if (slideHtmlList.length < 6) {
     throw new Error('upstream ppt render_html must contain at least 6 slides');
@@ -1878,12 +1940,16 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'recipe_selection',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
+      generationRuntime,
+      adapter,
     });
     const finalMarkup = creativeSourceStamp({
       route: 'render_html',
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'final_html_markup',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
+      generationRuntime,
+      adapter,
     });
     const peakPage = safeArray(visualArtifact?.visual_direction?.peak_pages).includes(slide.slide_id);
     const directorRole = safeArray(visualArtifact?.visual_direction?.page_role_table).find((item) => item.slide_id === slide.slide_id)?.page_role
@@ -1977,8 +2043,12 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
     })),
   });
   return {
-    ...attachCommon('render_html', contract),
-    creative_execution: creativeExecution(contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship', generationRuntime),
+    ...attachCommon('render_html', contract, generationRuntime, adapter),
+    creative_execution: creativeExecution(
+      contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
+      generationRuntime,
+      adapter,
+    ),
     lifecycle_stage: contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
     html_bundle: {
       html_file: htmlFile,
@@ -1999,11 +2069,12 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
   };
 }
 
-async function generateDirectorReviewDraft(contract, deliverablePaths) {
+async function generateDirectorReviewDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'visual_director_review',
     promptRelativePath: PROMPT_PACK.visual_director_review,
@@ -2156,11 +2227,11 @@ function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, sli
   };
 }
 
-function buildReviewMarkdown(contract, reviewArtifact) {
+function buildReviewMarkdown(contract, reviewArtifact, reviewOwner) {
   const lines = [
     `# ${contract.title} 视觉质控`,
     '',
-    '- review_owner: codex_native_host_agent',
+    `- review_owner: ${safeText(reviewOwner, 'codex_native_host_agent')}`,
     `- 状态：${reviewArtifact.status}`,
   ];
   if (reviewArtifact.review_capture) {
@@ -2210,7 +2281,14 @@ function buildReviewMarkdown(contract, reviewArtifact) {
   return `${lines.join('\n')}\n`;
 }
 
-async function generateScreenshotReviewDraft(contract, deliverablePaths, slideReviews, reviewPayload, mode) {
+async function generateScreenshotReviewDraft(
+  contract,
+  deliverablePaths,
+  slideReviews,
+  reviewPayload,
+  mode,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
@@ -2240,7 +2318,8 @@ async function generateScreenshotReviewDraft(contract, deliverablePaths, slideRe
   };
   const aiSlideReviews = [];
   aiSlideReviews.push(...(await Promise.all(chunkArray(slideReviews, SCREENSHOT_REVIEW_BATCH_SIZE).map(async (slideBatch) => {
-    const { data: batchData } = await generateStructuredArtifactViaCodexCli({
+    const { data: batchData } = await generateStructuredArtifact({
+      adapter,
       family: 'ppt_deck',
       route: 'screenshot_review',
       promptRelativePath: PROMPT_PACK.screenshot_review,
@@ -2272,7 +2351,8 @@ async function generateScreenshotReviewDraft(contract, deliverablePaths, slideRe
     });
     return normalizePptScreenshotAiSlideReviews(batchData?.slide_reviews, slideBatch);
   }))).flat());
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'ppt_deck',
     route: 'screenshot_review',
     promptRelativePath: PROMPT_PACK.screenshot_review,
@@ -2291,8 +2371,8 @@ async function generateScreenshotReviewDraft(contract, deliverablePaths, slideRe
   };
 }
 
-async function buildDirectorReview(contract, deliverablePaths) {
-  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths);
+async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths, adapter);
   const directorIntentLanded = Boolean(data?.director_intent_landed);
   const antiTemplateOk = Boolean(data?.anti_template_ok);
   const memoryHookPresent = Boolean(data?.memory_hook_present);
@@ -2302,10 +2382,11 @@ async function buildDirectorReview(contract, deliverablePaths) {
   const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
   const status = directorIntentLanded && antiTemplateOk && peakPagesLanded ? 'pass' : 'block';
   const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
+  const reviewOwner = primarySurface(generationRuntime, adapter);
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: codex_native_host_agent',
+    `- review_owner: ${reviewOwner}`,
     `- director_intent_landed: ${directorIntentLanded}`,
     `- anti_template_ok: ${antiTemplateOk}`,
     `- peak_pages_landed: ${peakPagesLanded}`,
@@ -2315,9 +2396,9 @@ async function buildDirectorReview(contract, deliverablePaths) {
     `- review_summary: ${reviewSummary || 'none'}`,
   ].join('\n'));
   return {
-    ...attachCommon('visual_director_review', contract),
+    ...attachCommon('visual_director_review', contract, generationRuntime, adapter),
     review_execution: {
-      ...creativeExecution('visual_director_review', generationRuntime),
+      ...creativeExecution('visual_director_review', generationRuntime, adapter),
       overlay: 'visual_director_review',
     },
     review_overlay: 'visual_director_review',
@@ -2339,6 +2420,8 @@ async function buildDirectorReview(contract, deliverablePaths) {
           lifecycleStage: 'review_overlay',
           authoredSurface: 'visual_director_review_decision',
           materializedFrom: CREATIVE_MATERIALIZED_FROM,
+          generationRuntime,
+          adapter,
         }),
       },
     },
@@ -2363,7 +2446,15 @@ async function buildDirectorReview(contract, deliverablePaths) {
   };
 }
 
-async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId }) {
+async function buildScreenshotReviewArtifact({
+  workspaceRoot,
+  topicId,
+  deliverableId,
+  contract,
+  mode,
+  baselineDeliverableId,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
@@ -2399,6 +2490,7 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
     mechanicalSlideReviews,
     reviewPayload,
     mode,
+    adapter,
   );
   const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
   const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
@@ -2420,9 +2512,9 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
   };
   const status = Object.values(latestChecks).every((value) => value === true) ? 'pass' : 'block';
   const artifact = {
-    ...attachCommon('screenshot_review', contract),
+    ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
     review_execution: {
-      ...creativeExecution('screenshot_review', generationRuntime),
+      ...creativeExecution('screenshot_review', generationRuntime, adapter),
       overlay: 'screenshot_review',
     },
     review_overlay: 'screenshot_review',
@@ -2450,6 +2542,8 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
           lifecycleStage: 'review_overlay',
           authoredSurface: 'screenshot_review_decision',
           materializedFrom: CREATIVE_MATERIALIZED_FROM,
+          generationRuntime,
+          adapter,
         }),
       },
     },
@@ -2496,13 +2590,23 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
       summary: summarizeRelativeQuality(relativeQuality),
     };
   }
-  const renderedReviewMarkdown = buildReviewMarkdown(contract, artifact);
+  const renderedReviewMarkdown = buildReviewMarkdown(
+    contract,
+    artifact,
+    primarySurface(generationRuntime, adapter),
+  );
   writeText(reviewCapture.reviewMarkdownFile, renderedReviewMarkdown);
   writeText(reviewMarkdown, renderedReviewMarkdown);
   return artifact;
 }
 
-function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }) {
+function buildExportArtifact({
+  workspaceRoot,
+  topicId,
+  deliverableId,
+  contract,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
@@ -2528,7 +2632,7 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
   const pptxPath = exportPayload.pptx_file || exportPayload.pptx_path;
   const pdfPath = exportPayload.pdf_file || exportPayload.pdf_path;
   return {
-    ...attachCommon('export_pptx', contract),
+    ...attachCommon('export_pptx', contract, null, adapter),
     status: 'completed',
     review_state_patch: {
       current_status: 'completed',
@@ -2580,18 +2684,27 @@ export function canRunPptDeck(contract) {
  * }} input
  * @returns {Promise<PptRouteArtifact>}
  */
-export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, route, contract, mode = 'draft_new', baselineDeliverableId = '' }) {
+export async function runPptDeckRoute({
+  workspaceRoot,
+  topicId,
+  deliverableId,
+  route,
+  contract,
+  mode = 'draft_new',
+  baselineDeliverableId = '',
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const stageContract = safeArray(contract.stage_sequence?.stages).find((stage) => stage?.stage_id === route) || null;
   let payload;
   switch (route) {
     case 'storyline':
-      payload = await buildStoryline(contract);
+      payload = await buildStoryline(contract, adapter);
       break;
     case 'detailed_outline': {
       const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
-      const { authoredOutline, generationRuntime } = await generateOutlineDraft(contract, storylineArtifact);
+      const { authoredOutline, generationRuntime } = await generateOutlineDraft(contract, storylineArtifact, adapter);
       payload = buildPptDetailedOutlineArtifact({
         contract,
         attachCommon,
@@ -2604,7 +2717,7 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
     }
     case 'slide_blueprint': {
       const outlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
-      const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(contract, outlineArtifact);
+      const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(contract, outlineArtifact, adapter);
       payload = buildPptSlideBlueprintArtifact({
         contract,
         attachCommon,
@@ -2624,6 +2737,7 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
         blueprintArtifact,
         mode,
         baselineDeliverableId,
+        adapter,
       );
       payload = buildPptVisualDirectionArtifact({
         contract,
@@ -2640,16 +2754,24 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
       break;
     }
     case 'render_html':
-      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths });
+      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths, adapter });
       break;
     case 'visual_director_review':
-      payload = await buildDirectorReview(contract, deliverablePaths);
+      payload = await buildDirectorReview(contract, deliverablePaths, adapter);
       break;
     case 'screenshot_review':
-      payload = await buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId });
+      payload = await buildScreenshotReviewArtifact({
+        workspaceRoot,
+        topicId,
+        deliverableId,
+        contract,
+        mode,
+        baselineDeliverableId,
+        adapter,
+      });
       break;
     case 'export_pptx':
-      payload = buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract });
+      payload = buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract, adapter });
       break;
     default:
       throw new Error(`Unsupported ppt_deck route: ${route}`);

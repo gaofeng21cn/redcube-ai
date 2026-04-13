@@ -22,6 +22,9 @@ function normalizeAdapter(value) {
   if (!text || text === 'host_agent' || text === 'hermes') {
     return 'host_agent';
   }
+  if (text === 'hermes_native_proof') {
+    return 'hermes_native_proof';
+  }
   return text;
 }
 

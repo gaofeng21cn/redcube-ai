@@ -5,6 +5,8 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
   CODEX_RUNTIME_SURFACE,
+  HERMES_NATIVE_PROOF_ADAPTER,
+  probeHermesNativeProof,
 } from '@redcube/hermes-substrate';
 import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
 
@@ -56,6 +58,48 @@ function safeText(value, fallback = '') {
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+async function probeRequestedRuntime(adapter, workspaceRoot) {
+  if (safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER) {
+    return probeHermesNativeProof({ cwd: workspaceRoot });
+  }
+
+  const codexContract = readCodexCliContract();
+  const codexReady = await probeCodexCli({
+    contract: codexContract,
+    cwd: workspaceRoot,
+  });
+  return {
+    ...codexReady,
+    contract: codexContract,
+  };
+}
+
+function runtimeBridgeFromProbe(adapter, probeResult) {
+  if (safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER) {
+    const contract = probeResult?.contract || {};
+    return {
+      owner: HERMES_NATIVE_PROOF_ADAPTER,
+      adapter_surface: '@redcube/hermes-substrate',
+      model_selection: contract.model_selection,
+      reasoning_selection: contract.reasoning_selection,
+      model: contract.model,
+      provider: contract.provider,
+      api_mode: contract.api_mode,
+      reasoning_effort: contract.reasoning_effort,
+      entrypoint: contract.entrypoint,
+    };
+  }
+
+  const contract = probeResult?.contract || readCodexCliContract();
+  return {
+    owner: 'codex_cli',
+    adapter_surface: '@redcube/codex-cli-client',
+    model_selection: contract.model_selection,
+    reasoning_selection: contract.reasoning_selection,
+    sandbox: contract.sandbox,
+  };
 }
 
 function uniqueList(items) {
@@ -804,17 +848,13 @@ export async function runManagedDeliverable({
     stopAfterStage: requestedStopAfterStage,
     stages,
   });
-  const codexContract = readCodexCliContract();
-  const codexReady = await probeCodexCli({
-    contract: codexContract,
-    cwd: workspaceRoot,
-  });
-  if (!codexReady.ok) {
+  const runtimeReady = await probeRequestedRuntime(adapter, workspaceRoot);
+  if (!runtimeReady.ok) {
     const error = new Error(
-      `Codex CLI blocked: ${codexReady.blocking_reason || codexReady.error_kind || 'unknown'}`,
+      `${safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER ? 'Hermes-native proof' : 'Codex CLI'} blocked: ${runtimeReady.blocking_reason || runtimeReady.error_kind || 'unknown'}`,
     );
-    error.runtime_owner = codexReady.runtime_owner;
-    error.probe = codexReady;
+    error.runtime_owner = runtimeReady.runtime_owner;
+    error.probe = runtimeReady;
     throw error;
   }
   const managedRun = createManagedRun({
@@ -827,13 +867,7 @@ export async function runManagedDeliverable({
     userIntent: safeText(userIntent) || safeText(contract.goal),
     adapter,
   });
-  managedRun.runtime_bridge = {
-    owner: 'codex_cli',
-    adapter_surface: '@redcube/codex-cli-client',
-    model_selection: codexContract.model_selection,
-    reasoning_selection: codexContract.reasoning_selection,
-    sandbox: codexContract.sandbox,
-  };
+  managedRun.runtime_bridge = runtimeBridgeFromProbe(adapter, runtimeReady);
 
   pushManagedEvent(workspaceRoot, managedRun, {
     kind: 'managed_started',

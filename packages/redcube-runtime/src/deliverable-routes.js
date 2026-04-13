@@ -2,9 +2,11 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 import {
   CODEX_DEFAULT_ADAPTER,
+  HERMES_NATIVE_PROOF_ADAPTER,
   appendHermesEvent,
   completeHermesRun,
   failHermesRun,
+  readHermesNativeProofContract,
   readHermesEvents,
   startHermesRun,
 } from '@redcube/hermes-substrate';
@@ -27,25 +29,59 @@ function requireSafeSegment(name, value) {
   return text;
 }
 
-function buildExecutorDescriptor(executor, codexContract) {
+function buildCodexRuntimeDescriptor(codexContract) {
   return {
-    ...(executor || {}),
-    codex_cli_runtime: {
-      owner: 'codex_cli',
-      adapter_surface: '@redcube/codex-cli-client',
-      model_selection: codexContract.model_selection,
-      reasoning_selection: codexContract.reasoning_selection,
-      sandbox: codexContract.sandbox,
-      command: [...codexContract.command],
-    },
+    owner: 'codex_cli',
+    adapter_surface: '@redcube/codex-cli-client',
+    model_selection: codexContract.model_selection,
+    reasoning_selection: codexContract.reasoning_selection,
+    sandbox: codexContract.sandbox,
+    command: [...codexContract.command],
   };
 }
 
-function patchArtifactExecutionModel(artifactFile, codexRuntime) {
+function buildHermesNativeRuntimeDescriptor(hermesContract) {
+  return {
+    owner: HERMES_NATIVE_PROOF_ADAPTER,
+    adapter_surface: '@redcube/hermes-substrate',
+    model_selection: hermesContract.model_selection,
+    reasoning_selection: hermesContract.reasoning_selection,
+    model: hermesContract.model,
+    provider: hermesContract.provider,
+    base_url: hermesContract.base_url,
+    api_mode: hermesContract.api_mode,
+    reasoning_effort: hermesContract.reasoning_effort,
+    entrypoint: hermesContract.entrypoint,
+  };
+}
+
+function buildExecutorDescriptor(executor, runtimeDescriptor) {
+  if (executor?.adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    return {
+      ...(executor || {}),
+      hermes_native_runtime: runtimeDescriptor,
+    };
+  }
+  return {
+    ...(executor || {}),
+    codex_cli_runtime: runtimeDescriptor,
+  };
+}
+
+function patchArtifactExecutionModel(artifactFile, executor) {
   const artifact = JSON.parse(readFileSync(artifactFile, 'utf-8'));
   artifact.execution_model = {
     ...(artifact.execution_model || {}),
-    codex_cli_runtime: codexRuntime,
+    ...(executor?.codex_cli_runtime
+      ? {
+          codex_cli_runtime: executor.codex_cli_runtime,
+        }
+      : {}),
+    ...(executor?.hermes_native_runtime
+      ? {
+          hermes_native_runtime: executor.hermes_native_runtime,
+        }
+      : {}),
   };
   writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
 }
@@ -70,8 +106,10 @@ export async function runDeliverableRoute({
     deliverableId,
     route: safeRoute,
   });
-  const codexContract = readCodexCliContract();
   const fallbackExecutor = resolveExecutorAdapter({ adapter });
+  const runtimeDescriptor = fallbackExecutor.adapter === HERMES_NATIVE_PROOF_ADAPTER
+    ? buildHermesNativeRuntimeDescriptor(readHermesNativeProofContract({ cwd: workspaceRoot }))
+    : buildCodexRuntimeDescriptor(readCodexCliContract());
   const executor = buildExecutorDescriptor(
     {
       adapter: fallbackExecutor.adapter,
@@ -82,7 +120,7 @@ export async function runDeliverableRoute({
       compatibility_role: fallbackExecutor.compatibility_role,
       execution_model: fallbackExecutor.execution_model,
     },
-    codexContract,
+    runtimeDescriptor,
   );
 
   const run = startHermesRun({
@@ -99,11 +137,22 @@ export async function runDeliverableRoute({
   });
 
   appendHermesEvent(workspaceRoot, run.run_id, {
-    type: 'codex_route_started',
+    type: executor.adapter === HERMES_NATIVE_PROOF_ADAPTER
+      ? 'hermes_native_route_started'
+      : 'codex_route_started',
     route: safeRoute,
     overlay,
     deliverable_id: deliverableId,
-    codex_cli_runtime: executor.codex_cli_runtime,
+    ...(executor.codex_cli_runtime
+      ? {
+          codex_cli_runtime: executor.codex_cli_runtime,
+        }
+      : {}),
+    ...(executor.hermes_native_runtime
+      ? {
+          hermes_native_runtime: executor.hermes_native_runtime,
+        }
+      : {}),
   });
 
   try {
@@ -117,10 +166,7 @@ export async function runDeliverableRoute({
       mode,
       baselineDeliverableId,
     });
-    patchArtifactExecutionModel(
-      routeResult.artifact_file,
-      executor.codex_cli_runtime,
-    );
+    patchArtifactExecutionModel(routeResult.artifact_file, executor);
     const completedRun = completeHermesRun({
       workspaceRoot,
       runId: run.run_id,

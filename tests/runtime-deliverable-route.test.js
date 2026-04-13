@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
@@ -15,6 +16,13 @@ import {
   startMockCodexCli,
   withEnv,
 } from './helpers/mock-codex-cli.js';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([
+  process.execPath,
+  path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.mjs'),
+]);
 
 async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
@@ -26,6 +34,17 @@ async function withMockHermesUpstream(testFn) {
   } finally {
     restoreEnv();
     await upstream.close();
+  }
+}
+
+async function withMockHermesNativeProof(testFn) {
+  const restoreEnv = withEnv({
+    REDCUBE_HERMES_NATIVE_BRIDGE_COMMAND: MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
   }
 }
 
@@ -262,6 +281,144 @@ test('runDeliverableRoute executes other declared stages through Codex-backed ex
     assert.equal(artifact.stage_contract.stage_id, 'detailed_outline');
     assert.equal(artifact.contract.profile_id, 'lecture_peer');
     assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
+  });
+});
+
+test('runDeliverableRoute supports explicit hermes_native_proof adapter without changing the default executor', async () => {
+  await withMockHermesNativeProof(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-hermes-proof-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Hermes-native proof route',
+      goal: '验证 RedCube 可显式走 Hermes-native full agent loop route',
+    });
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+      adapter: 'hermes_native_proof',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.run.executor.adapter, 'hermes_native_proof');
+    assert.equal(result.run.executor.primary, false);
+    assert.equal(result.run.executor.execution_surface, 'hermes_native_full_agent_loop');
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes_native_proof');
+    assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(result.run.executor.hermes_native_runtime?.owner, 'hermes_native_proof');
+    assert.equal(result.run.executor.hermes_native_runtime?.model_selection, 'inherit_local_hermes_default');
+    assert.equal(result.run.executor.hermes_native_runtime?.reasoning_selection, 'inherit_local_hermes_default');
+    assert.equal(result.events.some((event) => event?.type === 'hermes_native_route_started'), true);
+
+    const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
+    assert.equal(stored.run.executor.adapter, 'hermes_native_proof');
+    assert.equal(stored.run.executor.execution_surface, 'hermes_native_full_agent_loop');
+    assert.equal(stored.run.executor.execution_model.mainline_adapter, 'hermes_native_proof');
+    assert.equal(stored.run.executor.hermes_native_runtime?.owner, 'hermes_native_proof');
+    assert.equal(stored.run_telemetry.executor_kind, 'hermes_native_proof');
+    assert.equal(stored.cost_summary.executor_identity, 'hermes_native_full_agent_loop');
+
+    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+    assert.equal(artifact.execution_model.mainline_adapter, 'hermes_native_proof');
+    assert.equal(artifact.execution_model.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(artifact.creative_execution?.owner, 'hermes_native_proof');
+    assert.equal(artifact.creative_execution?.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(artifact.creative_execution?.generation_runtime?.owner, 'hermes_native_proof');
+    assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
+  });
+});
+
+test('runDeliverableRoute supports explicit hermes_native_proof adapter for xiaohongshu storyline', async () => {
+  await withMockHermesNativeProof(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-xhs-hermes-proof-'));
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'Hermes-native xiaohongshu proof route',
+      brief: '验证小红书 family 可以显式走 Hermes-native full agent loop storyline。',
+      keywords: ['小红书', 'Hermes'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: 'Hermes-native 小红书 proof route',
+      goal: '验证 RedCube xiaohongshu family 可显式走 Hermes-native full agent loop route',
+    });
+
+    const research = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route: 'research',
+      adapter: 'hermes_native_proof',
+    });
+    assert.equal(research.ok, true);
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route: 'storyline',
+      adapter: 'hermes_native_proof',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.run.executor.adapter, 'hermes_native_proof');
+    assert.equal(result.run.executor.execution_surface, 'hermes_native_full_agent_loop');
+    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+    assert.equal(artifact.execution_model.mainline_adapter, 'hermes_native_proof');
+    assert.equal(artifact.execution_model.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(artifact.creative_execution?.owner, 'hermes_native_proof');
+    assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
+  });
+});
+
+test('runDeliverableRoute supports explicit hermes_native_proof adapter for poster storyline', async () => {
+  await withMockHermesNativeProof(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-poster-hermes-proof-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      profileId: 'knowledge_poster',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      title: 'Hermes-native 海报 proof route',
+      goal: '验证 RedCube poster family 可显式走 Hermes-native full agent loop route',
+    });
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      route: 'storyline',
+      adapter: 'hermes_native_proof',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.run.executor.adapter, 'hermes_native_proof');
+    assert.equal(result.run.executor.execution_surface, 'hermes_native_full_agent_loop');
+    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
+    assert.equal(artifact.execution_model.mainline_adapter, 'hermes_native_proof');
+    assert.equal(artifact.execution_model.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(artifact.creative_execution?.owner, 'hermes_native_proof');
+    assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
   });
 });
 

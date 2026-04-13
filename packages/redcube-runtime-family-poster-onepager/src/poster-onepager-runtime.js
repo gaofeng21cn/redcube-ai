@@ -9,7 +9,13 @@ import {
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
-import { buildCodexExecutionModel } from '@redcube/hermes-substrate';
+import {
+  CODEX_DEFAULT_ADAPTER,
+  HERMES_NATIVE_PROOF_ADAPTER,
+  buildCodexExecutionModel,
+  buildHermesNativeProofExecutionModel,
+  generateStructuredArtifactViaHermesNativeProof,
+} from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
@@ -24,6 +30,7 @@ const PYTHON_REVIEW = path.join(MODULE_DIR, '../../redcube-runtime/scripts/ppt_d
 const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
 const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
+const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 const MIN_REVIEW_QA_BLOCKS = 2;
 const MIN_REVIEW_PRIMARY_POINTS = 1;
@@ -217,10 +224,46 @@ function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
   }, null);
 }
 
-function creativeExecution(lifecycleStage, generationRuntime = null) {
+function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
+  return adapter === HERMES_NATIVE_PROOF_ADAPTER
+    ? HERMES_NATIVE_PROOF_EXECUTION_MODEL
+    : CODEX_EXECUTION_MODEL;
+}
+
+function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  if (safeText(generationRuntime?.creative_owner)) {
+    return safeText(generationRuntime.creative_owner);
+  }
+  return adapter === HERMES_NATIVE_PROOF_ADAPTER ? HERMES_NATIVE_PROOF_ADAPTER : 'host_agent';
+}
+
+function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  if (safeText(generationRuntime?.primary_surface)) {
+    return safeText(generationRuntime.primary_surface);
+  }
+  return adapter === HERMES_NATIVE_PROOF_ADAPTER
+    ? 'hermes_native_full_agent_loop'
+    : 'codex_native_host_agent';
+}
+
+async function generateStructuredArtifact({
+  adapter = CODEX_DEFAULT_ADAPTER,
+  ...input
+}) {
+  if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    return generateStructuredArtifactViaHermesNativeProof(input);
+  }
+  return generateStructuredArtifactViaCodexCli(input);
+}
+
+function creativeExecution(
+  lifecycleStage,
+  generationRuntime = null,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: creativeOwner(generationRuntime, adapter),
+    primary_surface: primarySurface(generationRuntime, adapter),
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -231,11 +274,18 @@ function creativeExecution(lifecycleStage, generationRuntime = null) {
   };
 }
 
-function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
+function creativeSourceStamp({
+  route,
+  lifecycleStage,
+  authoredSurface,
+  materializedFrom = 'prompt_pack_seed',
+  generationRuntime = null,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
+    owner: creativeOwner(generationRuntime, adapter),
+    primary_surface: primarySurface(generationRuntime, adapter),
+    stage_owner: primarySurface(generationRuntime, adapter),
     route,
     lifecycle_stage: lifecycleStage,
     authored_surface: authoredSurface,
@@ -243,15 +293,15 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
   };
 }
 
-function reviewAuthorship(overlay) {
+function reviewAuthorship(overlay, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   return {
     overlay,
-    primary_surface: 'codex_native_host_agent',
+    primary_surface: primarySurface(generationRuntime, adapter),
     contract_asset: 'prompt_pack_seed',
   };
 }
 
-function attachCommon(route, contract) {
+function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   return {
     route,
     overlay: contract.overlay,
@@ -260,7 +310,7 @@ function attachCommon(route, contract) {
     prompt_pack: promptMeta(contract, route),
     lifecycle_stage: lifecycleStageForRoute(contract, route),
     review_overlay: reviewOverlayForRoute(contract, route),
-    execution_model: CODEX_EXECUTION_MODEL,
+    execution_model: generationRuntime?.execution_model || executionModelForAdapter(adapter),
   };
 }
 
@@ -680,8 +730,9 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   return { deliverablePaths };
 }
 
-async function generateStorylineDraft(contract) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+async function generateStorylineDraft(contract, adapter = CODEX_DEFAULT_ADAPTER) {
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'poster_onepager',
     route: 'storyline',
     promptRelativePath: promptRoute(contract, 'storyline'),
@@ -701,13 +752,14 @@ async function generateStorylineDraft(contract) {
   };
 }
 
-async function buildStoryline(contract) {
-  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract);
+async function buildStoryline(contract, adapter = CODEX_DEFAULT_ADAPTER) {
+  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract, adapter);
   return {
-    ...attachCommon('storyline', contract),
+    ...attachCommon('storyline', contract, generationRuntime, adapter),
     creative_execution: creativeExecution(
       lifecycleStageForRoute(contract, 'storyline') || 'story_architecture',
       generationRuntime,
+      adapter,
     ),
     storyline: {
       ...authoredStoryline,
@@ -718,12 +770,16 @@ async function buildStoryline(contract) {
           lifecycleStage: 'story_architecture',
           authoredSurface: 'headline',
           materializedFrom: CREATIVE_MATERIALIZED_FROM,
+          generationRuntime,
+          adapter,
         }),
         proof_promise: creativeSourceStamp({
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'proof_promise',
           materializedFrom: CREATIVE_MATERIALIZED_FROM,
+          generationRuntime,
+          adapter,
         }),
       },
     },
@@ -744,9 +800,14 @@ function buildPosterBlueprintContext(contract, storylineArtifact) {
   };
 }
 
-async function generatePosterBlueprintDraft(contract, deliverablePaths) {
+async function generatePosterBlueprintDraft(
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'poster_onepager',
     route: 'poster_blueprint',
     promptRelativePath: promptRoute(contract, 'poster_blueprint'),
@@ -766,8 +827,16 @@ async function generatePosterBlueprintDraft(contract, deliverablePaths) {
   };
 }
 
-async function buildPosterBlueprintArtifact(contract, deliverablePaths) {
-  const { storylineArtifact, authoredBlueprint, generationRuntime } = await generatePosterBlueprintDraft(contract, deliverablePaths);
+async function buildPosterBlueprintArtifact(
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
+  const { storylineArtifact, authoredBlueprint, generationRuntime } = await generatePosterBlueprintDraft(
+    contract,
+    deliverablePaths,
+    adapter,
+  );
   const sources = sourceLabels(contract);
   const layoutFamily = safeText(
     authoredBlueprint.panels[1]?.region || authoredBlueprint.panels[0]?.region,
@@ -778,18 +847,23 @@ async function buildPosterBlueprintArtifact(contract, deliverablePaths) {
     lifecycleStage: 'story_architecture',
     authoredSurface: 'major_blueprint_text',
     materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    generationRuntime,
+    adapter,
   });
   const recipeDecision = creativeSourceStamp({
     route: 'poster_blueprint',
     lifecycleStage: 'visual_authorship',
     authoredSurface: 'render_recipe_id',
     materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    generationRuntime,
+    adapter,
   });
   return {
-    ...attachCommon('poster_blueprint', contract),
+    ...attachCommon('poster_blueprint', contract, generationRuntime, adapter),
     creative_execution: creativeExecution(
       lifecycleStageForRoute(contract, 'poster_blueprint') || 'story_architecture',
       generationRuntime,
+      adapter,
     ),
     lifecycle_stage: lifecycleStageForRoute(contract, 'poster_blueprint') || 'story_architecture',
     poster_blueprint: {
@@ -866,10 +940,15 @@ function buildVisualDirectionContext(contract, storylineArtifact, blueprintArtif
   };
 }
 
-async function generateVisualDirectionDraft(contract, deliverablePaths) {
+async function generateVisualDirectionDraft(
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'poster_onepager',
     route: 'visual_direction',
     promptRelativePath: promptRoute(contract, 'visual_direction'),
@@ -917,31 +996,48 @@ async function generateVisualDirectionDraft(contract, deliverablePaths) {
   };
 }
 
-async function buildPosterVisualDirectionArtifact(contract, deliverablePaths, mode, baselineDeliverableId) {
-  const { blueprintArtifact, authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(contract, deliverablePaths);
+async function buildPosterVisualDirectionArtifact(
+  contract,
+  deliverablePaths,
+  mode,
+  baselineDeliverableId,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
+  const { blueprintArtifact, authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(
+    contract,
+    deliverablePaths,
+    adapter,
+  );
   const visualManifest = creativeSourceStamp({
     route: 'visual_direction',
     lifecycleStage: 'visual_authorship',
     authoredSurface: 'visual_manifest',
     materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    generationRuntime,
+    adapter,
   });
   const posterMotif = creativeSourceStamp({
     route: 'visual_direction',
     lifecycleStage: 'visual_authorship',
     authoredSurface: 'poster_motif',
     materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    generationRuntime,
+    adapter,
   });
   const pageFamilyCeiling = creativeSourceStamp({
     route: 'visual_direction',
     lifecycleStage: 'visual_authorship',
     authoredSurface: 'page_family_ceiling',
     materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    generationRuntime,
+    adapter,
   });
   return {
-    ...attachCommon('visual_direction', contract),
+    ...attachCommon('visual_direction', contract, generationRuntime, adapter),
     creative_execution: creativeExecution(
       lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
       generationRuntime,
+      adapter,
     ),
     lifecycle_stage: lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
     mode,
@@ -967,10 +1063,15 @@ function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
 }
 
-async function generateRenderHtmlDraft(contract, deliverablePaths) {
+async function generateRenderHtmlDraft(
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'poster_onepager',
     route: 'render_html',
     promptRelativePath: promptRoute(contract, 'render_html'),
@@ -1017,8 +1118,18 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
   };
 }
 
-async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths }) {
-  const { blueprintArtifact, visualArtifact, data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths);
+async function buildRenderHtmlArtifact({
+  deliverableId,
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
+  const {
+    blueprintArtifact,
+    visualArtifact,
+    data,
+    generationRuntime,
+  } = await generateRenderHtmlDraft(contract, deliverablePaths, adapter);
   const slideHtmlById = new Map(
     requireObjectArray(data?.slides, 'render_html.slides', { min: 1, max: 2 }).map((slide) => [
       safeText(slide.slide_id),
@@ -1039,12 +1150,16 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'recipe_selection',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
+      generationRuntime,
+      adapter,
     });
     const finalMarkup = creativeSourceStamp({
       route: 'render_html',
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'final_html_markup',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
+      generationRuntime,
+      adapter,
     });
     const peakRegion = safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band');
     const content = validateRenderedReviewAnchors(
@@ -1127,10 +1242,11 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
     })),
   });
   return {
-    ...attachCommon('render_html', contract),
+    ...attachCommon('render_html', contract, generationRuntime, adapter),
     creative_execution: creativeExecution(
       lifecycleStageForRoute(contract, 'render_html') || 'visual_authorship',
       generationRuntime,
+      adapter,
     ),
     lifecycle_stage: lifecycleStageForRoute(contract, 'render_html') || 'visual_authorship',
     html_bundle: {
@@ -1163,12 +1279,17 @@ function runPython(script, args) {
   return JSON.parse(result.stdout);
 }
 
-async function generateDirectorReviewDraft(contract, deliverablePaths) {
+async function generateDirectorReviewDraft(
+  contract,
+  deliverablePaths,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
     family: 'poster_onepager',
     route: 'visual_director_review',
     promptRelativePath: promptRoute(contract, 'visual_director_review'),
@@ -1201,8 +1322,8 @@ async function generateDirectorReviewDraft(contract, deliverablePaths) {
   };
 }
 
-async function buildDirectorReview(contract, deliverablePaths) {
-  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths);
+async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths, adapter);
   const checks = {
     director_intent_landed: Boolean(data?.director_intent_landed),
     anti_template_ok: Boolean(data?.anti_template_ok),
@@ -1216,10 +1337,11 @@ async function buildDirectorReview(contract, deliverablePaths) {
   const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
   const status = failedChecks.length === 0 ? 'pass' : 'block';
   const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
+  const reviewOwner = primarySurface(generationRuntime, adapter);
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: codex_native_host_agent',
+    `- review_owner: ${reviewOwner}`,
     `- director_intent_landed: ${checks.director_intent_landed}`,
     `- anti_template_ok: ${checks.anti_template_ok}`,
     `- message_hierarchy_clear: ${checks.message_hierarchy_clear}`,
@@ -1231,11 +1353,11 @@ async function buildDirectorReview(contract, deliverablePaths) {
     ? null
     : rerunStageFromReviewSurface(contract, failedChecks, 'visual_director_review');
   return {
-    ...attachCommon('visual_director_review', contract),
+    ...attachCommon('visual_director_review', contract, generationRuntime, adapter),
     review_overlay: 'visual_director_review',
-    review_authorship: reviewAuthorship('visual_director_review'),
+    review_authorship: reviewAuthorship('visual_director_review', generationRuntime, adapter),
     review_execution: {
-      ...creativeExecution('visual_director_review', generationRuntime),
+      ...creativeExecution('visual_director_review', generationRuntime, adapter),
       overlay: 'visual_director_review',
     },
     status,
@@ -1255,6 +1377,8 @@ async function buildDirectorReview(contract, deliverablePaths) {
           lifecycleStage: 'review_overlay',
           authoredSurface: 'visual_director_review_decision',
           materializedFrom: CREATIVE_MATERIALIZED_FROM,
+          generationRuntime,
+          adapter,
         }),
       },
     },
@@ -1275,11 +1399,11 @@ async function buildDirectorReview(contract, deliverablePaths) {
   };
 }
 
-function buildScreenshotReviewMarkdown(contract, reviewArtifact) {
+function buildScreenshotReviewMarkdown(contract, reviewArtifact, reviewOwner) {
   const lines = [
     `# ${contract.title} 视觉质控`,
     '',
-    '- review_owner: codex_native_host_agent',
+    `- review_owner: ${safeText(reviewOwner, 'codex_native_host_agent')}`,
     `- 状态: ${reviewArtifact.status}`,
     `- director_intent_landed: ${reviewArtifact.checks.director_intent_landed}`,
     `- anti_template_ok: ${reviewArtifact.checks.anti_template_ok}`,
@@ -1309,12 +1433,20 @@ function buildScreenshotReviewMarkdown(contract, reviewArtifact) {
   return `${lines.join('\n')}\n`;
 }
 
-async function generateScreenshotReviewDraft(contract, deliverablePaths, slideReviews, reviewPayload, mode) {
+async function generateScreenshotReviewDraft(
+  contract,
+  deliverablePaths,
+  slideReviews,
+  reviewPayload,
+  mode,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-  return generateStructuredArtifactViaCodexCli({
+  return generateStructuredArtifact({
+    adapter,
     family: 'poster_onepager',
     route: 'screenshot_review',
     promptRelativePath: promptRoute(contract, 'screenshot_review'),
@@ -1393,7 +1525,15 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
   };
 }
 
-async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId) {
+async function buildScreenshotReview(
+  workspaceRoot,
+  topicId,
+  contract,
+  deliverablePaths,
+  mode,
+  baselineDeliverableId,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
@@ -1447,6 +1587,7 @@ async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverab
     mechanicalSlideReviews,
     python,
     mode,
+    adapter,
   );
   const aiWeakRegions = normalizeStringList(data?.weak_regions, 'screenshot_review.weak_regions', { min: 0, max: 4 });
   const aiSlideReviews = normalizePosterScreenshotAiSlideReviews(data?.slide_reviews, mechanicalSlideReviews);
@@ -1474,11 +1615,11 @@ async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverab
     ? null
     : rerunStageFromReviewSurface(contract, failedChecks, 'render_html');
   const artifact = {
-    ...attachCommon('screenshot_review', contract),
+    ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
     review_overlay: 'screenshot_review',
-    review_authorship: reviewAuthorship('screenshot_review'),
+    review_authorship: reviewAuthorship('screenshot_review', generationRuntime, adapter),
     review_execution: {
-      ...creativeExecution('screenshot_review', generationRuntime),
+      ...creativeExecution('screenshot_review', generationRuntime, adapter),
       overlay: 'screenshot_review',
     },
     mode,
@@ -1499,6 +1640,8 @@ async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverab
           lifecycleStage: 'review_overlay',
           authoredSurface: 'screenshot_review_decision',
           materializedFrom: CREATIVE_MATERIALIZED_FROM,
+          generationRuntime,
+          adapter,
         }),
       },
     },
@@ -1541,11 +1684,14 @@ async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverab
       };
     }
   }
-  writeText(reviewMarkdown, buildScreenshotReviewMarkdown(contract, artifact));
+  writeText(
+    reviewMarkdown,
+    buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime, adapter)),
+  );
   return artifact;
 }
 
-function buildExportBundle(contract, deliverablePaths) {
+function buildExportBundle(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
   const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
@@ -1561,7 +1707,7 @@ function buildExportBundle(contract, deliverablePaths) {
   };
   writeJson(manifestFile, exportBundle);
   return {
-    ...attachCommon('export_bundle', contract),
+    ...attachCommon('export_bundle', contract, null, adapter),
     status: 'completed',
     export_bundle: exportBundle,
     artifact_refs: [manifestFile, exportBundle.source_html, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean),
@@ -1596,31 +1742,54 @@ export function canRunPosterOnepager(contract) {
  * @param {PosterRuntimeRunRequest} request
  * @returns {Promise<PosterRuntimeRouteResult>}
  */
-export async function runPosterOnepagerRoute({ workspaceRoot, topicId, deliverableId, route, contract, mode = 'draft_new', baselineDeliverableId = '' }) {
+export async function runPosterOnepagerRoute({
+  workspaceRoot,
+  topicId,
+  deliverableId,
+  route,
+  contract,
+  mode = 'draft_new',
+  baselineDeliverableId = '',
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   const { deliverablePaths } = ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
   const stageContract = safeArray(contract.stage_sequence?.stages).find((stage) => stage?.stage_id === route) || null;
   let payload;
   switch (route) {
     case 'storyline':
-      payload = await buildStoryline(contract);
+      payload = await buildStoryline(contract, adapter);
       break;
     case 'poster_blueprint':
-      payload = await buildPosterBlueprintArtifact(contract, deliverablePaths);
+      payload = await buildPosterBlueprintArtifact(contract, deliverablePaths, adapter);
       break;
     case 'visual_direction':
-      payload = await buildPosterVisualDirectionArtifact(contract, deliverablePaths, mode, baselineDeliverableId);
+      payload = await buildPosterVisualDirectionArtifact(
+        contract,
+        deliverablePaths,
+        mode,
+        baselineDeliverableId,
+        adapter,
+      );
       break;
     case 'render_html':
-      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths });
+      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths, adapter });
       break;
     case 'visual_director_review':
-      payload = await buildDirectorReview(contract, deliverablePaths);
+      payload = await buildDirectorReview(contract, deliverablePaths, adapter);
       break;
     case 'screenshot_review':
-      payload = await buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId);
+      payload = await buildScreenshotReview(
+        workspaceRoot,
+        topicId,
+        contract,
+        deliverablePaths,
+        mode,
+        baselineDeliverableId,
+        adapter,
+      );
       break;
     case 'export_bundle':
-      payload = buildExportBundle(contract, deliverablePaths);
+      payload = buildExportBundle(contract, deliverablePaths, adapter);
       break;
     default:
       throw new Error(`Unsupported poster_onepager route: ${route}`);

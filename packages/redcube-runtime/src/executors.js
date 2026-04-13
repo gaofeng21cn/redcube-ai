@@ -2,7 +2,9 @@ import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 import {
   CODEX_DEFAULT_ADAPTER,
   HERMES_COMPATIBILITY_ADAPTER,
+  HERMES_NATIVE_PROOF_ADAPTER,
   buildCodexExecutorDescriptor,
+  buildHermesNativeProofExecutorDescriptor,
 } from '@redcube/hermes-substrate';
 
 /**
@@ -71,7 +73,9 @@ import {
  * @returns {ExecutorAdapter}
  */
 export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {}) {
-  const descriptor = buildCodexExecutorDescriptor({ adapter });
+  const descriptor = String(adapter || '').trim() === HERMES_NATIVE_PROOF_ADAPTER
+    ? buildHermesNativeProofExecutorDescriptor({ adapter })
+    : buildCodexExecutorDescriptor({ adapter });
 
   return {
     ...descriptor,
@@ -101,7 +105,7 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {})
         throw error;
       }
 
-      if (descriptor.adapter === CODEX_DEFAULT_ADAPTER) {
+      if (descriptor.adapter === CODEX_DEFAULT_ADAPTER || descriptor.adapter === HERMES_NATIVE_PROOF_ADAPTER) {
         const familyRunner = await loadRuntimeFamilyRunner(contract);
         const artifact = await familyRunner.runRoute({
           workspaceRoot,
@@ -111,6 +115,8 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {})
           contract,
           mode,
           baselineDeliverableId,
+          adapter: descriptor.adapter,
+          executor: descriptor,
         });
         return {
           overlay,

@@ -27,6 +27,12 @@
 - 当前 F4 live closeout proof：`contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`
 - 历史 F4 blocker freeze：`contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json`
 - 当前 probe 命令：`codex exec`（通过 `@redcube/codex-cli-client` / `REDCUBE_CODEX_COMMAND`）
+- 当前 executor-adapter contract：
+  - 默认仍是 `host_agent`，也就是本机 Codex CLI autonomous / host-agent runtime
+  - `ppt_deck`、`xiaohongshu`、`poster_onepager` 三个 family 都已并挂同一个显式 opt-in lane：`adapter = hermes_native_proof`
+  - `hermes_native_proof` 不改默认，只在 caller 显式请求时启用
+  - 它走的不是 chat relay，而是 `@redcube/hermes-substrate -> hermes_native_proof_bridge.py -> run_agent.AIAgent.run_conversation` 的 full-agent-loop proof lane
+  - 默认 model / reasoning 不在 repo 内固定，继承本机 Hermes 默认配置；只有显式环境变量 override 才覆盖
 
 ## 长线目标（规划层）
 
@@ -51,9 +57,12 @@
 13. 同一组验证 lane 现在还会用 `--test-concurrency=1` 串行化 test files，避免本地 Codex exec 与浏览器导出链路在同一宿主上被过度并发打爆。
 14. 同一组验证 lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed。
 15. 在 `2026-04-13` 的当前验证宿主上，当前主线的 fresh 口径是 `codex exec + structured generation + runtime-family route execution`；当前 closeout proof 见 `contracts/runtime-program/managed-product-entry-hardening.json` 与 `contracts/runtime-program/current-program.json` 中的 `green_baseline.local_codex_execution`。
-16. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
-17. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
-18. `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb，而 follow-on 的三阶段 product-entry 落地也已经吸收到当前主线：当前真实 gap 不再是 repo-verified service surface，而是成熟 end-user shell 与更上层 managed web productization 仍未落地。
+16. 同一个 executor-adapter contract 现在也已经覆盖到全部三条 visual family：`ppt_deck`、`xiaohongshu`、`poster_onepager` 都支持显式 `hermes_native_proof` opt-in，而默认主线仍然保持 `host_agent` / Codex CLI。
+17. 这条 `hermes_native_proof` lane 当前定位是备选 proof executor，不是默认 cutover：它的职责是证明 RedCube 的 family runtime contract 已经能承接 Hermes-native full agent loop，而不是把现有默认主线偷偷切走。
+18. `hermes_native_proof` 当前会在 route artifact、managed runtime bridge、creative execution、review authorship 等 durable surface 上保留真实执行器身份，避免出现“实际走 Hermes，但落盘仍写 Codex host-agent”的第二真相源。
+19. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
+20. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
+21. `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb，而 follow-on 的三阶段 product-entry 落地也已经吸收到当前主线：当前真实 gap 不再是 repo-verified service surface，而是成熟 end-user shell 与更上层 managed web productization 仍未落地。
 
 ## 默认验证
 

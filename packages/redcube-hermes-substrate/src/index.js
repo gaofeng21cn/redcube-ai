@@ -12,12 +12,19 @@ export const HERMES_DEFAULT_ADAPTER = 'hermes';
 export const HERMES_COMPATIBILITY_ADAPTER = 'external_llm';
 export const HERMES_FREEZE_ORIGIN = 'Hermes.A';
 export const CODEX_DEFAULT_ADAPTER = 'host_agent';
+export const HERMES_NATIVE_PROOF_ADAPTER = 'hermes_native_proof';
 export const CODEX_RUNTIME_SURFACE = 'codex_native_host_agent';
 export const CODEX_DEPLOYMENT_HOST = 'codex_local_operator_host';
 export const CODEX_DEPLOYMENT_STATUS = 'active_primary';
 export const CODEX_DEFAULT_MODEL_SELECTION = 'inherit_local_codex_default';
 export const CODEX_DEFAULT_REASONING_SELECTION = 'inherit_local_codex_default';
 export const CODEX_FREEZE_ORIGIN = 'P19.A';
+export const HERMES_NATIVE_PROOF_RUNTIME_SURFACE = 'hermes_native_full_agent_loop';
+export const HERMES_NATIVE_PROOF_DEPLOYMENT_HOST = 'local_hermes_agent_bridge';
+export const HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS = 'opt_in_available';
+export const HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
+export const HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
+export const HERMES_NATIVE_PROOF_FREEZE_ORIGIN = 'Hermes.Proof.A';
 
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
@@ -41,6 +48,22 @@ const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
   runtime_substrate_surface: CODEX_RUNTIME_SURFACE,
   deployment_host: CODEX_DEPLOYMENT_HOST,
   deployment_host_status: CODEX_DEPLOYMENT_STATUS,
+  gateway_role: 'visual_deliverable_domain_gateway',
+  domain_harness_os: 'RedCube Domain Harness OS',
+  family_pack_boundary: 'family_profile_pack_harness_execution',
+  product_mode: 'auto_only',
+  default_formal_entry: 'CLI',
+  supported_protocol_layer: ['MCP'],
+  internal_controller_surface: 'controller',
+  controller_repo_verified: false,
+});
+
+const HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY = Object.freeze({
+  schema_version: 1,
+  runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
+  runtime_substrate_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+  deployment_host: HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
+  deployment_host_status: HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS,
   gateway_role: 'visual_deliverable_domain_gateway',
   domain_harness_os: 'RedCube Domain Harness OS',
   family_pack_boundary: 'family_profile_pack_harness_execution',
@@ -186,6 +209,13 @@ export function buildCodexRuntimeTopology() {
   };
 }
 
+export function buildHermesNativeProofRuntimeTopology() {
+  return {
+    ...HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY,
+    supported_protocol_layer: [...HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY.supported_protocol_layer],
+  };
+}
+
 export function normalizeCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
   const requested = String(adapter || '').trim();
   if (!requested || requested === CODEX_DEFAULT_ADAPTER || requested === HERMES_DEFAULT_ADAPTER) {
@@ -248,6 +278,27 @@ export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {
   };
 }
 
+export function buildHermesNativeProofExecutionModel({ adapter = HERMES_NATIVE_PROOF_ADAPTER } = {}) {
+  const requestedAdapter = String(adapter || '').trim() || HERMES_NATIVE_PROOF_ADAPTER;
+  if (requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER) {
+    throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
+  }
+  return {
+    mainline_adapter: HERMES_NATIVE_PROOF_ADAPTER,
+    primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+    adapter_role: 'opt_in_proof_executor',
+    agent_first_requires_external_llm: false,
+    external_llm_role: 'optional_compatibility_adapter',
+    runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
+    deployment_host: HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
+    deployment_host_status: HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS,
+    requested_adapter: requestedAdapter,
+    default_model_selection: HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION,
+    default_reasoning_effort: HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION,
+    freeze_origin_milestone: HERMES_NATIVE_PROOF_FREEZE_ORIGIN,
+  };
+}
+
 export function buildHermesExecutorDescriptor({ adapter = HERMES_DEFAULT_ADAPTER } = {}) {
   const requestedAdapter = String(adapter || '').trim() || HERMES_DEFAULT_ADAPTER;
   const normalizedAdapter = normalizeHermesAdapter(requestedAdapter);
@@ -294,6 +345,25 @@ export function buildCodexExecutorDescriptor({ adapter = CODEX_DEFAULT_ADAPTER }
   };
 }
 
+export function buildHermesNativeProofExecutorDescriptor({ adapter = HERMES_NATIVE_PROOF_ADAPTER } = {}) {
+  const requestedAdapter = String(adapter || '').trim() || HERMES_NATIVE_PROOF_ADAPTER;
+  if (requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER) {
+    throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
+  }
+  const executionModel = buildHermesNativeProofExecutionModel({ adapter: requestedAdapter });
+  return {
+    adapter: HERMES_NATIVE_PROOF_ADAPTER,
+    requested_adapter: requestedAdapter,
+    primary: false,
+    execution_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+    creative_execution: 'agent_first_director_first',
+    external_llm_role: 'optional_compatibility_adapter',
+    compatibility_role: null,
+    runtime_topology: buildHermesNativeProofRuntimeTopology(),
+    execution_model: executionModel,
+  };
+}
+
 function resolveRuntimeTopologyForExecutor(executor) {
   const mainlineAdapter = String(
     executor?.execution_model?.mainline_adapter
@@ -303,8 +373,17 @@ function resolveRuntimeTopologyForExecutor(executor) {
   if (mainlineAdapter === CODEX_DEFAULT_ADAPTER) {
     return buildCodexRuntimeTopology();
   }
+  if (mainlineAdapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    return buildHermesNativeProofRuntimeTopology();
+  }
   return buildHermesRuntimeTopology();
 }
+
+export {
+  generateStructuredArtifactViaHermesNativeProof,
+  probeHermesNativeProof,
+  readHermesNativeProofContract,
+} from './hermes-native-proof-client.js';
 
 export function createHermesCreativeSource({
   route = null,

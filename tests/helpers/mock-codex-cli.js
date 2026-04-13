@@ -1024,6 +1024,10 @@ function buildCreativeRunOutput(meta) {
   }
 }
 
+export function buildMockCreativeOutput(meta) {
+  return buildCreativeRunOutput(meta);
+}
+
 function formatCreativeRunOutput(output) {
   return [
     REDCUBE_STAGE_JSON_BEGIN,

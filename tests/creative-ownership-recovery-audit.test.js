@@ -46,6 +46,15 @@ test('current runtime defaults to Codex substrate while external_llm stays optio
     assert.equal(externalLlm.execution_model.adapter_role, 'optional_compatibility_adapter');
     assert.equal(externalLlm.execution_model.agent_first_requires_external_llm, false);
 
+    const hermesNativeProof = resolveExecutorAdapter({ adapter: 'hermes_native_proof' });
+    assert.equal(hermesNativeProof.adapter, 'hermes_native_proof');
+    assert.equal(hermesNativeProof.primary, false);
+    assert.equal(hermesNativeProof.execution_model.mainline_adapter, 'hermes_native_proof');
+    assert.equal(hermesNativeProof.execution_model.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(hermesNativeProof.execution_model.adapter_role, 'opt_in_proof_executor');
+    assert.equal(hermesNativeProof.execution_model.default_model_selection, 'inherit_local_hermes_default');
+    assert.equal(hermesNativeProof.execution_model.default_reasoning_effort, 'inherit_local_hermes_default');
+
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-p19-executor-'));
     await createDeliverable({
       workspaceRoot,

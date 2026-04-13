@@ -7,10 +7,18 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function creativeOwner(generationRuntime = null) {
+  return safeText(generationRuntime?.creative_owner, 'host_agent');
+}
+
+function primarySurface(generationRuntime = null) {
+  return safeText(generationRuntime?.primary_surface, 'codex_native_host_agent');
+}
+
 function creativeExecution(lifecycleStage, generationRuntime = null) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
+    owner: creativeOwner(generationRuntime),
+    primary_surface: primarySurface(generationRuntime),
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -21,11 +29,17 @@ function creativeExecution(lifecycleStage, generationRuntime = null) {
   };
 }
 
-function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom }) {
+function creativeSourceStamp({
+  route,
+  lifecycleStage,
+  authoredSurface,
+  materializedFrom,
+  generationRuntime = null,
+}) {
   return {
-    owner: 'host_agent',
-    primary_surface: 'codex_native_host_agent',
-    stage_owner: 'codex_native_host_agent',
+    owner: creativeOwner(generationRuntime),
+    primary_surface: primarySurface(generationRuntime),
+    stage_owner: primarySurface(generationRuntime),
     ownership_model: 'director_first',
     route,
     lifecycle_stage: lifecycleStage,
@@ -54,7 +68,7 @@ function sourceReferences(slide) {
   }));
 }
 
-function normalizeBlueprintSlide(slide, contract, canvas, materializedFrom) {
+function normalizeBlueprintSlide(slide, contract, canvas, materializedFrom, generationRuntime = null) {
   const preset = deckPreset(contract.profile_id);
   const pageCoreContent = safeArray(slide.page_core_content).map((item) => ({
     label: safeText(item?.label),
@@ -66,6 +80,7 @@ function normalizeBlueprintSlide(slide, contract, canvas, materializedFrom) {
     lifecycleStage: 'story_architecture',
     authoredSurface: 'major_blueprint_text',
     materializedFrom,
+    generationRuntime,
   });
 
   return {
@@ -114,10 +129,11 @@ export function buildPptDetailedOutlineArtifact({
     lifecycleStage,
     authoredSurface,
     materializedFrom,
+    generationRuntime,
   });
 
   return {
-    ...attachCommon('detailed_outline', contract),
+    ...attachCommon('detailed_outline', contract, generationRuntime),
     creative_execution: creativeExecution(lifecycleStage, generationRuntime),
     lifecycle_stage: lifecycleStage,
     detailed_outline: {
@@ -164,7 +180,7 @@ export function buildPptSlideBlueprintArtifact({
   bannedRenderTokens,
 }) {
   return {
-    ...attachCommon('slide_blueprint', contract),
+    ...attachCommon('slide_blueprint', contract, generationRuntime),
     creative_execution: creativeExecution(lifecycleStage, generationRuntime),
     lifecycle_stage: lifecycleStage,
     slide_blueprint: {
@@ -174,6 +190,7 @@ export function buildPptSlideBlueprintArtifact({
         contract,
         canvas,
         materializedFrom,
+        generationRuntime,
       )),
       quality_guards: {
         require_visual_direction_before_html: true,
@@ -203,10 +220,11 @@ export function buildPptVisualDirectionArtifact({
     lifecycleStage,
     authoredSurface,
     materializedFrom,
+    generationRuntime,
   });
 
   return {
-    ...attachCommon('visual_direction', contract),
+    ...attachCommon('visual_direction', contract, generationRuntime),
     creative_execution: creativeExecution(lifecycleStage, generationRuntime),
     lifecycle_stage: lifecycleStage,
     visual_direction: {

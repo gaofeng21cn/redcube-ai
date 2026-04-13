@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   auditDeliverable,
@@ -20,6 +21,12 @@ import {
   startMockCodexCli,
   withEnv,
 } from './helpers/mock-codex-cli.js';
+
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([
+  process.execPath,
+  path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.mjs'),
+]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -49,6 +56,17 @@ async function withMockHermesUpstream(testFn) {
   } finally {
     restoreEnv();
     await upstream.close();
+  }
+}
+
+async function withMockHermesNativeProof(testFn) {
+  const restoreEnv = withEnv({
+    REDCUBE_HERMES_NATIVE_BRIDGE_COMMAND: MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
   }
 }
 
@@ -242,6 +260,63 @@ test('managed execution stops at explicit stop_after_stage instead of auto-runni
     assert.equal(stored.progress_projection.needs_user_decision, true);
     assert.equal(stored.runtime_supervision.health_status, 'paused');
     assert.equal(stored.runtime_supervision.runtime_owner, 'codex_cli');
+  });
+});
+
+test('managed execution accepts explicit hermes_native_proof adapter and keeps it as the active executor', async () => {
+  await withMockHermesNativeProof(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-hermes-proof-'));
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'Hermes proof managed route',
+      brief: '只需要先验证 storyline 阶段的 Hermes-native full agent loop。',
+      keywords: ['Hermes', 'proof'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Hermes proof managed route',
+      goal: '验证托管运行可显式走 Hermes-native proof adapter',
+    });
+
+    const result = await runManagedDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '先只跑 storyline',
+      stopAfterStage: 'storyline',
+      adapter: 'hermes_native_proof',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.summary.status, 'stopped_after_stage');
+    assert.equal(result.managed_run.requested_adapter, 'hermes_native_proof');
+    assert.equal(result.managed_run.active_adapter, 'hermes_native_proof');
+    assert.equal(result.managed_run.adapter_switches.length, 0);
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'hermes_native_proof');
+    assert.equal(result.managed_run.runtime_bridge?.model_selection, 'inherit_local_hermes_default');
+    assert.equal(result.managed_run.runtime_bridge?.reasoning_selection, 'inherit_local_hermes_default');
+    assert.equal(result.managed_run.route_runs.length, 1);
+
+    const stageRun = result.managed_run.route_runs[0];
+    const stageResult = readJson(stageRun.result_ref);
+    assert.equal(stageResult.decision, 'stop_after_stage');
+
+    const stored = await getManagedRun({
+      workspaceRoot,
+      managedRunId: result.managed_run.managed_run_id,
+    });
+    assert.equal(stored.managed_run.requested_adapter, 'hermes_native_proof');
+    assert.equal(stored.managed_run.active_adapter, 'hermes_native_proof');
+    assert.equal(stored.managed_run.runtime_bridge?.owner, 'hermes_native_proof');
+    assert.equal(stored.runtime_supervision.runtime_owner, 'hermes_native_proof');
   });
 });
 
