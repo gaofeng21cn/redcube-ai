@@ -6,6 +6,7 @@ import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   getProductFrontdesk,
+  getProductPreflight,
   invokeFederatedProductEntry,
   invokeProductEntry,
   getProductEntryManifest,
@@ -331,6 +332,34 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     });
     assert.equal(manifest.product_entry_overview.recommended_step_id, 'open_frontdesk');
     assert.deepEqual(manifest.product_entry_overview.human_gate_ids, ['redcube_operator_review_gate']);
+    assert.equal(manifest.product_entry_preflight.surface_kind, 'product_entry_preflight');
+    assert.equal(
+      manifest.product_entry_preflight.summary,
+      'Current product-entry preflight passed; inspect the workspace doctor output and then open the RedCube frontdesk.',
+    );
+    assert.equal(manifest.product_entry_preflight.ready_to_try_now, true);
+    assert.equal(
+      manifest.product_entry_preflight.recommended_check_command,
+      `redcube workspace doctor --workspace-root ${workspaceRoot}`,
+    );
+    assert.equal(
+      manifest.product_entry_preflight.recommended_start_command,
+      `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+    );
+    assert.deepEqual(manifest.product_entry_preflight.blocking_check_ids, []);
+    assert.deepEqual(
+      manifest.product_entry_preflight.checks.map((check) => check.check_id),
+      [
+        'workspace_root_resolved',
+        'workspace_contract_present',
+        'runtime_state_root_ready',
+        'frontdoor_contract_landed',
+      ],
+    );
+    assert.equal(manifest.product_entry_preflight.checks[0].status, 'pass');
+    assert.equal(manifest.product_entry_preflight.checks[1].status, 'pass');
+    assert.equal(manifest.product_entry_preflight.checks[2].status, 'pass');
+    assert.equal(manifest.product_entry_preflight.checks[3].status, 'pass');
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_federation');
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
@@ -342,6 +371,19 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.product_entry_status.next_focus, [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
       '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
+    ]);
+    assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(manifest.product_entry_readiness.usable_now, true);
+    assert.equal(manifest.product_entry_readiness.good_to_use_now, false);
+    assert.equal(manifest.product_entry_readiness.fully_automatic, false);
+    assert.equal(manifest.product_entry_readiness.recommended_start_surface, 'product_frontdesk');
+    assert.equal(manifest.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
+    assert.equal(manifest.product_entry_readiness.recommended_loop_surface, 'product_entry');
+    assert.equal(manifest.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
+    assert.deepEqual(manifest.product_entry_readiness.blocking_gaps, [
+      '成熟的最终用户前台壳仍未 landed。',
+      'managed web productization 仍未 landed。',
     ]);
     assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
@@ -374,11 +416,41 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       frontdesk.product_entry_overview.resume_surface.command,
       'redcube product session --entry-session-id <entry-session-id>',
     );
+    assert.equal(frontdesk.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(frontdesk.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(frontdesk.product_entry_readiness.usable_now, true);
+    assert.equal(frontdesk.product_entry_readiness.good_to_use_now, false);
+    assert.equal(frontdesk.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
+    assert.equal(frontdesk.product_entry_preflight.surface_kind, 'product_entry_preflight');
+    assert.equal(frontdesk.product_entry_preflight.ready_to_try_now, true);
+    assert.equal(
+      frontdesk.product_entry_preflight.recommended_check_command,
+      `redcube workspace doctor --workspace-root ${workspaceRoot}`,
+    );
+    assert.deepEqual(frontdesk.product_entry_preflight, manifest.product_entry_preflight);
     assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');
     assertFamilyOrchestrationCompanion(frontdesk, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });
+
+    const preflight = await getProductPreflight({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(preflight.ok, true);
+    assert.equal(preflight.surface_kind, 'product_entry_preflight');
+    assert.equal(preflight.target_domain_id, 'redcube_ai');
+    assert.equal(preflight.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(preflight.ready_to_try_now, true);
+    assert.equal(
+      preflight.recommended_check_command,
+      `redcube workspace doctor --workspace-root ${workspaceRoot}`,
+    );
+    assert.equal(
+      preflight.recommended_start_command,
+      `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+    );
+    assert.deepEqual(preflight.blocking_check_ids, []);
   });
 });

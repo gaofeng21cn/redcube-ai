@@ -63,7 +63,7 @@
 - `product entry`：direct RedCube entry 与 OPL federation 的可调用服务面已经落地，但真正面向最终用户的成熟前台壳仍未落地
 
 现在仓内已经通过 `redcube product` 这一组命令落下一层 repo-tracked 的 lightweight product-entry shell。
-当前 repo-verified 的公开面包括：`redcube product frontdesk`、`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`；其中 manifest 现在也会带出 family-orchestration companion preview，用来暴露 gate 与 resume 语义。
+当前 repo-verified 的公开面包括：`redcube product preflight`、`redcube product frontdesk`、`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`；其中 manifest 现在也会带出 family-orchestration companion preview 与 `product_entry_preflight` companion，用来暴露 gate、resume 与 startup-check 语义。
 其中 `redcube product manifest` 是当前壳的 machine-readable discovery surface：它会冻结 direct frontdesk 以及 direct / federated / session 这三类入口面，但不会把仓库写成“成熟最终用户前台已经落地”。
 
 这个仓当前的 direct domain 产品入口路线是：

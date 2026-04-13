@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { productEntrySessionDir } from '@redcube/runtime';
 
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
+import { getProductPreflight } from './get-product-preflight.js';
 
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
@@ -37,6 +38,7 @@ function readCurrentProgramContract() {
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const sessionStoreRoot = productEntrySessionDir();
+  const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
   const currentProgram = readCurrentProgramContract();
   const currentState = currentProgram.current_state || {};
   const activeMainline = currentState.active_mainline || {};
@@ -108,6 +110,25 @@ export async function getProductEntryManifest(request) {
     ],
     remaining_gaps_count: 2,
     human_gate_ids: ['redcube_operator_review_gate'],
+  };
+  const productEntryReadiness = {
+    surface_kind: 'product_entry_readiness',
+    verdict: 'service_surface_ready_not_managed_product',
+    usable_now: true,
+    good_to_use_now: false,
+    fully_automatic: false,
+    summary: (
+      '当前可以作为 RedCube 的 direct frontdesk / CLI product-entry 主线使用，'
+      + '但还不是成熟的最终用户前台或托管 Web 产品。'
+    ),
+    recommended_start_surface: 'product_frontdesk',
+    recommended_start_command: 'redcube product frontdesk',
+    recommended_loop_surface: 'product_entry',
+    recommended_loop_command: 'redcube product invoke',
+    blocking_gaps: [
+      '成熟的最终用户前台壳仍未 landed。',
+      'managed web productization 仍未 landed。',
+    ],
   };
 
   return {
@@ -223,6 +244,16 @@ export async function getProductEntryManifest(request) {
       },
     },
     product_entry_overview: productEntryOverview,
+    product_entry_preflight: {
+      surface_kind: productEntryPreflight.surface_kind,
+      summary: productEntryPreflight.summary,
+      ready_to_try_now: productEntryPreflight.ready_to_try_now,
+      recommended_check_command: productEntryPreflight.recommended_check_command,
+      recommended_start_command: productEntryPreflight.recommended_start_command,
+      blocking_check_ids: productEntryPreflight.blocking_check_ids,
+      checks: productEntryPreflight.checks,
+    },
+    product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: buildFamilyOrchestrationCompanion({
       sessionLocatorField: 'entry_session_contract.entry_session_id',
