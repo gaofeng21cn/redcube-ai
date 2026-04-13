@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 
 import { productEntrySessionDir } from '@redcube/runtime';
 
+import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
+
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
   import.meta.url,
@@ -152,23 +154,15 @@ export async function getProductEntryManifest(request) {
         target_domain_id: 'redcube_ai',
       },
     },
-    family_orchestration: {
-      human_gates: [
-        {
-          gate_id: 'deliverable_publish_gate',
-          title: 'Deliverable publish gate',
-        },
-        {
-          gate_id: 'creative_review_gate',
-          title: 'Creative review gate',
-        },
-      ],
-      resume_contract: {
-        surface_kind: 'product_entry_session',
-        session_locator_field: 'entry_session_id',
-        checkpoint_locator_field: 'checkpoint_lineage_id',
+    family_orchestration: buildFamilyOrchestrationCompanion({
+      sessionLocatorField: 'entry_session_contract.entry_session_id',
+      gateStatus: 'requested',
+      reviewSurfaceRef: {
+        ref_kind: 'json_pointer',
+        ref: '/operator_loop_actions/continue_session',
+        label: 'continue session surface',
       },
-    },
+    }),
     current_truth: {
       product_entry_contract: 'contracts/runtime-program/redcube-product-entry-mvp.json',
       federated_product_entry_contract: 'contracts/runtime-program/opl-gateway-federated-product-entry.json',

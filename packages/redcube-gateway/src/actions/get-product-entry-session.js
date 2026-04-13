@@ -1,5 +1,9 @@
 import { loadProductEntrySession, productEntrySessionFile } from '@redcube/runtime';
 
+import {
+  buildFamilyOrchestrationCompanion,
+  resolveHumanGateStatusFromContinuation,
+} from './family-orchestration-companion.js';
 import { getManagedRun } from './get-managed-run.js';
 import { getPublicationProjection } from './get-publication-projection.js';
 import { getReviewState } from './get-review-state.js';
@@ -45,6 +49,31 @@ export async function getProductEntrySession(request) {
       managedRunId: session.latest_managed_run_id,
     })
     : null;
+  const continuationSnapshot = {
+    latest_managed_run_id: session.latest_managed_run_id || null,
+    latest_run_id: session.latest_run_id || null,
+    managed_progress_projection: managedRun?.progress_projection || null,
+    runtime_supervision: managedRun?.runtime_supervision || null,
+  };
+  const familyOrchestration = buildFamilyOrchestrationCompanion({
+    sessionLocatorField: 'entry_session.entry_session_id',
+    gateStatus: resolveHumanGateStatusFromContinuation(continuationSnapshot),
+    reviewSurfaceRef: {
+      ref_kind: 'json_pointer',
+      ref: '/review_state',
+      label: 'current review state surface',
+    },
+    eventEnvelopeSurfaceRef: {
+      ref_kind: 'json_pointer',
+      ref: '/continuation_snapshot/managed_progress_projection/latest_events',
+      label: 'managed run event companion',
+    },
+    checkpointLineageSurfaceRef: {
+      ref_kind: 'json_pointer',
+      ref: '/continuation_snapshot/latest_managed_run_id',
+      label: 'latest managed-run continuation locator',
+    },
+  });
 
   return {
     ok: true,
@@ -64,14 +93,10 @@ export async function getProductEntrySession(request) {
       deliverable_id: session.deliverable_id,
       profile_id: session.profile_id,
     },
-    continuation_snapshot: {
-      latest_managed_run_id: session.latest_managed_run_id || null,
-      latest_run_id: session.latest_run_id || null,
-      managed_progress_projection: managedRun?.progress_projection || null,
-      runtime_supervision: managedRun?.runtime_supervision || null,
-    },
+    continuation_snapshot: continuationSnapshot,
     review_state: reviewState,
     publication_projection: publicationProjection,
+    family_orchestration: familyOrchestration,
     summary: {
       entry_session_id: entrySessionId,
       deliverable_id: session.deliverable_id,

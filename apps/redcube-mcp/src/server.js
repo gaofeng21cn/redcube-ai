@@ -192,7 +192,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'invoke_product_entry',
-    description: 'Call the direct RedCube product-entry surface and converge onto the same downstream domain entry.',
+    description: 'Call the direct RedCube product-entry surface, converge onto the same downstream domain entry, and return family orchestration companion fields.',
     actionKey: 'invokeProductEntry',
     inputSchema: {
       workspace_locator: z.object({
@@ -220,7 +220,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'invoke_federated_product_entry',
-    description: 'Call the OPL Gateway style handoff surface and converge onto the same downstream RedCube product entry.',
+    description: 'Call the OPL Gateway style handoff surface, converge onto the same downstream RedCube product entry, and return family orchestration companion fields.',
     actionKey: 'invokeFederatedProductEntry',
     inputSchema: {
       target_domain_id: z.string().describe('Target domain id. Must be redcube_ai.'),
@@ -256,7 +256,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'get_product_entry_session',
-    description: 'Read one persisted product-entry session with continuation surfaces from user-level runtime-state.',
+    description: 'Read one persisted product-entry session with continuation surfaces and family orchestration companion from user-level runtime-state.',
     actionKey: 'getProductEntrySession',
     inputSchema: {
       entry_session_id: z.string().describe('Durable product-entry session identifier.'),
@@ -264,7 +264,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'get_product_entry_manifest',
-    description: 'Read the current RedCube product-entry manifest so hosts can discover the direct, federated, and session surfaces without guessing.',
+    description: 'Read the current RedCube product-entry manifest so hosts can discover direct/federated/session surfaces plus family orchestration companion without guessing.',
     actionKey: 'getProductEntryManifest',
     inputSchema: {
       workspace_root: z.string().optional().describe('Absolute workspace root path.'),

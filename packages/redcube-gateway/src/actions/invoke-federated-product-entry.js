@@ -84,6 +84,7 @@ export async function invokeFederatedProductEntry(request) {
     entry_mode: entryMode,
     runtime_session_contract: runtimeSessionContract,
     return_surface_contract: returnSurfaceContract,
+    family_orchestration: productEntrySurface.family_orchestration,
     product_entry_surface: productEntrySurface,
     summary: {
       entry_session_id: productEntrySurface.summary?.entry_session_id || null,

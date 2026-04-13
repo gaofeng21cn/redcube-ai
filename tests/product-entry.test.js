@@ -5,6 +5,7 @@ import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
+  getProductFrontdesk,
   invokeFederatedProductEntry,
   invokeProductEntry,
   getProductEntryManifest,
@@ -51,6 +52,20 @@ async function prepareProductEntryWorkspace() {
   return workspaceRoot;
 }
 
+function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
+  assert.equal(surface.family_orchestration.action_graph_ref.ref_kind, 'repo_path');
+  assert.equal(surface.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+  assert.equal(Array.isArray(surface.family_orchestration.human_gates), true);
+  assert.equal(surface.family_orchestration.human_gates.length >= 1, true);
+  assert.equal(surface.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
+  assert.equal(surface.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+  assert.equal(surface.family_orchestration.resume_contract.session_locator_field, sessionLocatorField);
+  assert.equal(
+    surface.family_orchestration.resume_contract.checkpoint_locator_field,
+    'continuation_snapshot.latest_managed_run_id',
+  );
+}
+
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
     const workspaceRoot = await prepareProductEntryWorkspace();
@@ -93,6 +108,9 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.continuation_snapshot.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
     assert.equal(response.review_state.surface_kind, 'review_state');
     assert.equal(response.publication_projection.surface_kind, 'publication_projection');
+    assertFamilyOrchestrationCompanion(response, {
+      sessionLocatorField: 'entry_session.entry_session_id',
+    });
 
     const sessionFile = path.join(runtimeStateRoot, 'product-entry-sessions', 'session-a.json');
     assert.equal(existsSync(sessionFile), true);
@@ -167,6 +185,12 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.equal(session.continuation_snapshot.latest_managed_run_id, continued.continuation_snapshot.latest_managed_run_id);
     assert.equal(session.review_state.surface_kind, 'review_state');
     assert.equal(session.publication_projection.surface_kind, 'publication_projection');
+    assertFamilyOrchestrationCompanion(continued, {
+      sessionLocatorField: 'entry_session.entry_session_id',
+    });
+    assertFamilyOrchestrationCompanion(session, {
+      sessionLocatorField: 'entry_session.entry_session_id',
+    });
   });
 });
 
@@ -215,6 +239,12 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_gateway');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
+    assertFamilyOrchestrationCompanion(response, {
+      sessionLocatorField: 'entry_session.entry_session_id',
+    });
+    assertFamilyOrchestrationCompanion(response.product_entry_surface, {
+      sessionLocatorField: 'entry_session.entry_session_id',
+    });
   });
 });
 
@@ -272,21 +302,18 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
-    assert.deepEqual(manifest.family_orchestration.human_gates, [
-      {
-        gate_id: 'deliverable_publish_gate',
-        title: 'Deliverable publish gate',
-      },
-      {
-        gate_id: 'creative_review_gate',
-        title: 'Creative review gate',
-      },
-    ]);
-    assert.deepEqual(manifest.family_orchestration.resume_contract, {
-      surface_kind: 'product_entry_session',
-      session_locator_field: 'entry_session_id',
-      checkpoint_locator_field: 'checkpoint_lineage_id',
-    });
     assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    assertFamilyOrchestrationCompanion(manifest, {
+      sessionLocatorField: 'entry_session_contract.entry_session_id',
+    });
+
+    const frontdesk = await getProductFrontdesk({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(frontdesk.ok, true);
+    assert.equal(frontdesk.surface_kind, 'product_frontdesk');
+    assertFamilyOrchestrationCompanion(frontdesk, {
+      sessionLocatorField: 'entry_session_contract.entry_session_id',
+    });
   });
 });

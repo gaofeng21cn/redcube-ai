@@ -96,9 +96,13 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(projection?.description.includes('topic boundary'), true);
   assert.equal(watch?.description.includes('run boundary'), true);
   assert.equal(product?.description.includes('direct RedCube product-entry surface'), true);
+  assert.equal(product?.description.includes('family orchestration companion'), true);
   assert.equal(federated?.description.includes('OPL Gateway style handoff'), true);
+  assert.equal(federated?.description.includes('family orchestration companion'), true);
   assert.equal(session?.description.includes('product-entry session'), true);
+  assert.equal(session?.description.includes('family orchestration companion'), true);
   assert.equal(manifest?.description.includes('product-entry manifest'), true);
+  assert.equal(manifest?.description.includes('family orchestration companion'), true);
   assert.equal(Object.hasOwn(watch?.inputSchema || {}, 'runId'), true);
   assert.equal(Object.hasOwn(product?.inputSchema || {}, 'entry_session_contract'), true);
   assert.equal(Object.hasOwn(manifest?.inputSchema || {}, 'workspace_root'), true);
@@ -343,6 +347,17 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         entry_session: {
           entry_session_id: request.entry_session_contract.entry_session_id,
         },
+        family_orchestration: {
+          action_graph_ref: {
+            ref_kind: 'repo_path',
+            ref: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+          },
+          human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
+          resume_contract: {
+            surface_kind: 'product_entry_session',
+            session_locator_field: 'entry_session.entry_session_id',
+          },
+        },
       }),
     },
   );
@@ -367,6 +382,17 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         ok: true,
         surface_kind: 'federated_product_entry',
         federated_product_entry_contract_id: 'opl_gateway_federated_product_entry',
+        family_orchestration: {
+          action_graph_ref: {
+            ref_kind: 'repo_path',
+            ref: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+          },
+          human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
+          resume_contract: {
+            surface_kind: 'product_entry_session',
+            session_locator_field: 'entry_session.entry_session_id',
+          },
+        },
         summary: {
           entry_session_id: request.entry_session_contract.entry_session_id,
         },
@@ -385,16 +411,30 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         entry_session: {
           entry_session_id: request.entry_session_id,
         },
+        family_orchestration: {
+          action_graph_ref: {
+            ref_kind: 'repo_path',
+            ref: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+          },
+          human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
+          resume_contract: {
+            surface_kind: 'product_entry_session',
+            session_locator_field: 'entry_session.entry_session_id',
+          },
+        },
       }),
     },
   );
 
   assert.equal(direct.surface_kind, 'product_entry');
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
+  assert.equal(direct.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
   assert.equal(federated.surface_kind, 'federated_product_entry');
   assert.equal(federated.summary.entry_session_id, 'session-a');
+  assert.equal(federated.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
+  assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
 });
 
 test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {

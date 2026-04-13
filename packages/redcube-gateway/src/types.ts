@@ -202,6 +202,33 @@ export interface ProductEntryRequest extends Record<string, unknown> {
   };
 }
 
+export interface FamilyOrchestrationReferenceRef {
+  ref_kind: 'repo_path' | 'json_pointer' | 'workspace_locator' | 'external_url' | string;
+  ref: string;
+  label?: string;
+}
+
+export interface FamilyOrchestrationGatePreview {
+  gate_id: string;
+  title?: string;
+  status?: 'requested' | 'approved' | 'rejected' | 'changes_requested' | string;
+  review_surface?: FamilyOrchestrationReferenceRef;
+}
+
+export interface FamilyOrchestrationResumeContract {
+  surface_kind: string;
+  session_locator_field: string;
+  checkpoint_locator_field?: string;
+}
+
+export interface FamilyOrchestrationCompanion {
+  action_graph_ref?: FamilyOrchestrationReferenceRef;
+  human_gates: FamilyOrchestrationGatePreview[];
+  resume_contract: FamilyOrchestrationResumeContract;
+  event_envelope_surface?: FamilyOrchestrationReferenceRef;
+  checkpoint_lineage_surface?: FamilyOrchestrationReferenceRef;
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -226,6 +253,7 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   };
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
+  family_orchestration: FamilyOrchestrationCompanion;
   summary: {
     entry_session_id: string;
     task_intent: string;
@@ -260,6 +288,7 @@ export interface FederatedProductEntryResponse extends SurfaceBase<'federated_pr
     requested_surface_kind: string;
     actual_surface_kind: string;
   };
+  family_orchestration: FamilyOrchestrationCompanion;
   product_entry_surface: ProductEntryResponse;
   summary: {
     entry_session_id: string | null;
@@ -289,6 +318,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   };
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
+  family_orchestration: FamilyOrchestrationCompanion;
   summary: {
     entry_session_id: string;
     deliverable_id: string;
@@ -297,7 +327,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
 }
 
 export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry_manifest'> {
-  manifest_version: number;
+  manifest_version: 2 | number;
   manifest_kind: string;
   target_domain_id: string;
   formal_entry: {
@@ -368,18 +398,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       target_domain_id: string;
     };
   };
-  family_orchestration: {
-    human_gates: Array<{
-      gate_id: string;
-      title?: string;
-      status?: 'requested' | 'approved' | 'rejected' | 'changes_requested' | string;
-    }>;
-    resume_contract?: {
-      surface_kind: string;
-      session_locator_field: string;
-      checkpoint_locator_field?: string;
-    };
-  };
+  family_orchestration: FamilyOrchestrationCompanion;
   current_truth: {
     product_entry_contract: string;
     federated_product_entry_contract: string;
