@@ -34,20 +34,18 @@
 它的重点是把视觉交付这件事组织成正式生产线。
 
 当前这条 runtime 叙事已经不再只是 repo-local。
-`RedCube AI` 现在已经冻结了真实上游 `Hermes-Agent` activation proof，并把 `runDeliverableRoute` 与 managed execution 的 run surface 切到上游 `Hermes-Agent` API server。
+`RedCube AI` 现在已经把 `runDeliverableRoute` 与 managed execution 的 run surface 收口到本地 Codex CLI host-agent runtime，并在其上保留同一套 durable domain surfaces。
 今天可执行的基线因此变成：
 
-- route / managed execution 的 run surface 由上游 `Hermes-Agent` 主责
+- route / managed execution 的 run surface 由本地 Codex CLI host-agent runtime 主责
 - visual-domain truth、audit、review、export 与 deliverable state 继续由 `RedCube AI` 主责
-- 受保护的创作 stage 现在统一走 `runtime-family + upstream Hermes structured generation`；仓内不再保留会 author PPT / 小红书 / poster 内容的 repo-local `pack/compiler`
-- reachable upstream gateway / API server 是硬前提；缺失时整条 cutover fail-closed
+- 受保护的创作 stage 现在统一走 `runtime-family + Codex CLI structured generation`；仓内不再保留会 author PPT / 小红书 / poster 内容的 repo-local `pack/compiler`
+- 可用的 `codex exec` surface 是硬前提；缺失时 route / managed execution 整条链路会 fail-closed
 
 因此，仓里保留的 `Hermes` 历史命名仍然只是 absorbed artifact / compatibility material，不再单独承担 runtime owner 证明。
 
-这一步对应的仓库级 activation gate 仍是 `upstream-hermes-agent-activation-package`，probe 命令是 `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`。
+这一步对应的仓库级 preflight 现在是 Codex CLI exec probe，对应实现边界在 `@redcube/codex-cli-client` 与 `REDCUBE_CODEX_COMMAND`。
 给 future `OPL Gateway` 调用的 service-safe adapter shell 则冻结为 `redcube_service_safe_domain_entry`，对应合同在 `contracts/runtime-program/service-safe-domain-entry-adapter.json`。
-如果本机全局 `hermes` CLI 仍落后于上游 gateway 启动修复，live verification lane 可以显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream 启动命令，而不是把这个仓误写成已经把 Hermes 本地修好了。
-这条 override 只负责修正“启动的是哪份 upstream checkout”，并不能掩盖 `/v1/runs/{run_id}/events` 这类 upstream run-surface 自身失败。
 同一组 live lane 现在还会冻结 `REDCUBE_PYTHON_COMMAND` 给 screenshot review / export helper 使用；如果没有显式设置，`scripts/run-test-group.mjs` 会先执行 `python3 -c "import sys; import playwright; print(sys.executable)"` 去探测带 Playwright 的 Python，找不到就直接 fail-closed。
 
 `Codex-default host-agent runtime` 当前承担本地 operator / development host 的角色。
@@ -68,19 +66,19 @@
 当前 repo-verified 的公开面包括：`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`。
 其中 `redcube product manifest` 是当前壳的 machine-readable discovery surface：它会冻结 direct / federated / session 这三类入口面，但不会把仓库写成“成熟最终用户前台已经落地”。
 
-这个仓已经冻结的 direct domain 产品入口路线是：
+这个仓当前的 direct domain 产品入口路线是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 而在 `OPL` 家族级入口里，顶层路线也必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
-这条目标路线现在已经冻结在 `docs/program/upstream_hermes_agent_final_target_shape.md` 与 `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`。
+历史上的 upstream-Hermes 目标冻结件仍保留在 `docs/program/upstream_hermes_agent_final_target_shape.md` 与 `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`。
 当前 repo-verified 的 `product entry` service surface 已经包括 `invokeProductEntry`、`invokeFederatedProductEntry`、`getProductEntrySession` 以及对应的 `CLI` / `MCP` wrapper。
 仍需诚实说明的是：成熟的最终用户 `product entry` 前台壳并未落地；这次落地的是可调用服务面与 session continuity，不是聊天 UI 或托管 Web 前端。
-当前 live `integration` / `e2e` / `full` verification 也会用 `--test-concurrency=1` 串行化 Node test files，避免仓库把上游 Hermes 当前的 concurrent-run ceiling 打爆，再把 429 误报成 domain drift。
-同一组 live lane 现在还带着一条显式 Python-helper contract：screenshot review 与 export helper 必须通过 `REDCUBE_PYTHON_COMMAND` 或自动解析出的 Playwright Python 执行，而不是默认假设 upstream Hermes 自己的 virtualenv 已经装好了 Playwright。
+当前 live `integration` / `e2e` / `full` verification 也会用 `--test-concurrency=1` 串行化 Node test files，避免仓库把当前本地 Codex exec 与浏览器导出链路所在宿主打爆，再把宿主饱和误报成 domain drift。
+同一组验证 lane 现在还带着一条显式 Python-helper contract：screenshot review 与 export helper 必须通过 `REDCUBE_PYTHON_COMMAND` 或自动解析出的 Playwright Python 执行，而不是默认假设某个无关 runtime 环境已经装好了 Playwright。
 
 这条 handoff 至少应共享一套最小 envelope：
 
@@ -262,7 +260,7 @@
 - direct-delivery lifecycle stage convergence 已在同一主线上吸收一条 tranche：`ppt_deck` 与 guarded `poster_onepager` 现在会暴露统一的 machine-readable `lifecycle_stage_contract` 与对齐后的 `lifecycle_stage_summary`，同时 `Storyline + Plan` 继续映射到 `Story Architecture`，`operator_handoff / closeout` 继续留在 `Delivery`
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，而不再依赖单独的 workspace-init 产品表面
 - operator surface consistency hardening 已在同一主线上吸收一条 tranche：`workspace doctor` 现在把 brand-new workspace bootstrap guidance 收紧到 `source intake` / `source research`，command-scoped `--help` 保持 machine-readable 且不会执行真实命令，而 `CLI review watch` / `MCP runtime_watch` 现在围绕同一 `runtimeWatch` locator truth 与共享治理 summaries 收口
-- route / managed execution 的 run surface 已经由上游 `Hermes-Agent` 主责；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance、兼容桥与回归对照，不再是当前 runtime owner
+- route / managed execution 的 run surface 已经由本地 Codex CLI host-agent runtime 主责；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance、兼容桥与回归对照，不再是当前 runtime owner
 - 当前行为收口还新增了 `governance_surface.runtime_topology`：create / review / audit / watch / projection 现在在同一 deliverable/topic 边界上看到同一份 runtime topology 真相
 - runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance：deliverable-scope run record 仍持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` 在 quartet locator 指向错误 topic 或 deliverable 的 run 时继续 fail-closed
 - 海报能力还没完全收口：
@@ -288,7 +286,7 @@
       -> 网关
           -> 交付物层 / 场景层 / 配置层 / 包层
               -> Domain Harness OS（运行在 Unified Harness Engineering Substrate 上）
-                  -> 上游 Hermes-Agent runtime substrate（当前 route / managed run owner）
+                  -> Codex CLI host-agent runtime（当前 route / managed run owner）
                       -> Codex-local operator / development host / workspace bridge
                   -> repo-local managed runtime pilot（历史迁移工件 / 兼容桥）
                   -> managed web runtime（真实 substrate 迁移后的未来选项）
@@ -310,7 +308,7 @@
 - `P19 / 创作主导权修复` 已被视为完成，当前不允许回退。
 - `P20 / 第三类交付物接入证明` 已通过 `poster_onepager` 完成，但其含义仅限 `知识海报` extension proof。
 - `P21 / 运行评估与运营面` 已有仓内 closeout artifact，可视为已完成范围，但不是当前 active mainline。
-- 当前 active mainline 已经把 route / managed run owner 切到上游 `Hermes-Agent`：phase-2 的 source-truth / governance / operator-surface 工作继续作为 absorbed provenance 保留，而 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 继续在同一 RedCube visual-domain truth 上收口；历史 repo-local runtime 不再是当前 owner。
+- 当前 active mainline 已经把 route / managed run owner 切到本地 Codex CLI host-agent runtime：phase-2 的 source-truth / governance / operator-surface 工作继续作为 absorbed provenance 保留，而 `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 继续在同一 RedCube visual-domain truth 上收口；历史 repo-local runtime 不再是当前 owner。
 - 共享 `Gateway`、run/watch、review、audit、artifact persistence 主线已可通过 `CLI` 与 `MCP` 验证。
 
 当前仍需诚实说明的限制：
@@ -318,11 +316,10 @@
 - `controller` 还没有作为独立正式入口在仓内落地。
 - `poster_onepager` 当前只代表 `知识海报`。
 - `paper_poster / conference_poster` 学术海报合同仍是后续阶段，不是当前 active mainline。
-- `Codex-default host-agent runtime` 继续只作为本地 operator / development host，而不是长期产品 runtime owner。
-- route / managed execution 现在已经 fail-closed 到真实上游 `Hermes-Agent` proof；冻结闸门仍是 `upstream-hermes-agent-activation-package`，service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
-- 当前 fresh proof 使用 `hermes gateway run -q`；默认 `hermes gateway run` 仍会因上游 `RedactingFormatter` bug 崩溃，这不能被误写成仓内已修能力。
-- 如果验证宿主上的全局 `hermes` CLI 仍指向这份有问题的 upstream checkout，请用 `REDCUBE_HERMES_GATEWAY_COMMAND` 把 integration / e2e verification 指到一条已知良好的 upstream gateway 启动命令。
-- 当前 live verification 还要求 `/v1/runs` 与 `/v1/runs/{run_id}/events` 真正发出 terminal event；在 2026-04-12 这台验证宿主上，即使切到最新 upstream launch override，也会因为 events stream 在 terminal event 之前就关闭而被 block。
+- `Codex-default host-agent runtime` 现在就是 route / managed execution 的当前产品 runtime owner，而 `RedCube AI` 继续持有 domain boundary。
+- route / managed execution 现在已经 fail-closed 到本地 Codex CLI proof；当前 preflight 是 `probeCodexCli`，service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
+- 当前 fresh proof 使用 `codex exec`；验证宿主必须通过 `REDCUBE_CODEX_COMMAND` 或默认 `codex` 二进制暴露这条能力。
+- 当前验证还会冻结 `REDCUBE_PYTHON_COMMAND`，保证 screenshot review / export helper 运行在带 Playwright 的 Python 解释器上。
 - managed web runtime 仍是同一 substrate 上的未来形态，不得伪装成已完成。
 - source plane 扩展与运营面收口仍属于同一主线上的后续工作。
 - OPL 联动仍属后续工作。

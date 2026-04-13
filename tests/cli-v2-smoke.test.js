@@ -14,9 +14,9 @@ import {
   writeFileSync,
 } from 'node:fs';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -116,12 +116,12 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'hermes-substrate'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-hermes-agent-client'),
-    path.join(gatewayNodeModulesDir, 'hermes-agent-client'),
+    path.resolve('packages/redcube-codex-cli-client'),
+    path.join(gatewayNodeModulesDir, 'codex-cli-client'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-hermes-agent-client'),
-    path.join(gatewayNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'hermes-agent-client'),
+    path.resolve('packages/redcube-codex-cli-client'),
+    path.join(gatewayNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'codex-cli-client'),
   );
   copyPackageIntoInstall(
     path.resolve('prompts'),
@@ -194,11 +194,9 @@ async function execCliExpectFailureAsync(cliPath, args, options = {}) {
 }
 
 async function withMockHermesUpstreamCli(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
 
   try {
@@ -613,7 +611,7 @@ test('CLI deliverable run works from isolated install through the upstream Herme
 
     assert.equal(parsed.ok, true);
     assert.equal(parsed.surface_kind, 'route_run');
-    assert.equal(parsed.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(parsed.run.executor.codex_cli_runtime?.owner, 'codex_cli');
   });
 });
 

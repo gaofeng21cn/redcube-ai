@@ -87,7 +87,7 @@ test('phase-2 publication projection delivery contract convergence brief and doc
   assert.equal(runtimeArchitecture.includes('publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state'), true);
   assert.equal(positioning.includes('`publication projection / delivery contract convergence`'), true);
   assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
-  assert.equal(policy.includes('当前产品 runtime owner 是 route / managed run surface 上的上游 `Hermes-Agent`'), true);
+  assert.equal(policy.includes('当前产品 runtime owner 是 route / managed run surface 上的本地 Codex CLI host-agent runtime'), true);
   assert.equal(docsIndex.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
 });

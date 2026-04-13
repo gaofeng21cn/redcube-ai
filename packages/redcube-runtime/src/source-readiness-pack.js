@@ -9,8 +9,10 @@ function safeArray(value) {
 
 const OPERATOR_ONLY_SOURCE_KINDS = new Set(['brief', 'keywords']);
 
-function isAudienceFacingKind(kind) {
-  return !OPERATOR_ONLY_SOURCE_KINDS.has(safeText(kind));
+function isAudienceFacingItem(item) {
+  const kind = safeText(item?.kind);
+  return safeText(item?.source_role) !== 'operator_context'
+    && !OPERATOR_ONLY_SOURCE_KINDS.has(kind);
 }
 
 function audienceFacingTextLines(value) {
@@ -35,7 +37,7 @@ function extractAudienceFacingSnippet(value, maxLength = 240) {
 
 function audienceFacingMaterials(extractedMaterials) {
   return safeArray(extractedMaterials?.materials)
-    .filter((material) => isAudienceFacingKind(material?.kind));
+    .filter((material) => isAudienceFacingItem(material));
 }
 
 function buildAudienceFacingTopicSummary({ title, extractedMaterials }) {
@@ -55,9 +57,13 @@ export function buildSourceReadinessPack({
 }) {
   const inputMode = safeText(sourceBrief?.input_mode, 'empty');
   const confidence = safeText(sourceBrief?.confidence, 'low');
-  const materialIds = safeArray(sourceBrief?.material_ids);
+  const materialIds = safeArray(
+    Array.isArray(sourceBrief?.consumable_material_ids)
+      ? sourceBrief?.consumable_material_ids
+      : sourceBrief?.material_ids,
+  );
   const readySources = safeArray(sourceIndex?.sources)
-    .filter((source) => source?.status === 'ready' && isAudienceFacingKind(source?.kind));
+    .filter((source) => source?.status === 'ready' && isAudienceFacingItem(source));
   const publicMaterials = audienceFacingMaterials(extractedMaterials);
   const blockedReasons = safeArray(sourceAudit?.blocking_reasons).map((reason) => safeText(reason)).filter(Boolean);
   const blockingEvidenceGaps = [];

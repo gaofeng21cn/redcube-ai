@@ -49,12 +49,33 @@ function normalizeSourceFiles(input) {
     .filter(Boolean);
 }
 
+function normalizeOperatorFiles(input) {
+  if (Array.isArray(input)) {
+    return input.map((item) => safeText(item)).filter(Boolean);
+  }
+  return safeText(input)
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function detectSourceKind(file) {
   const ext = path.extname(file).toLowerCase();
   if (ext === '.md' || ext === '.markdown') return 'markdown';
   if (ext === '.txt') return 'text';
   if (ext === '.pdf') return 'pdf';
   return 'unsupported';
+}
+
+function isOperatorContextSource(source) {
+  const kind = safeText(source?.kind);
+  return safeText(source?.source_role) === 'operator_context'
+    || kind === 'brief'
+    || kind === 'keywords';
+}
+
+function isConsumableSource(source) {
+  return !isOperatorContextSource(source);
 }
 
 function buildTopicRecord(topicId, title) {
@@ -99,7 +120,7 @@ function stageResult(status, extra = {}) {
   };
 }
 
-function copySourceIntoTopic(sourceFile, topicPaths, index) {
+function copySourceIntoTopic(sourceFile, topicPaths, index, sourceLabel = 'source') {
   const absolute = path.resolve(sourceFile);
   if (!existsSync(absolute)) {
     throw new Error(`source file 不存在: ${sourceFile}`);
@@ -111,7 +132,7 @@ function copySourceIntoTopic(sourceFile, topicPaths, index) {
     };
   }
 
-  const fileName = `${String(index + 1).padStart(2, '0')}-${path.basename(absolute)}`;
+  const fileName = `${sourceLabel}-${String(index + 1).padStart(2, '0')}-${path.basename(absolute)}`;
   const target = path.join(materialInboxDir(topicPaths), fileName);
   cpSync(absolute, target);
   return {
@@ -126,6 +147,7 @@ function createBriefSources({ brief, keywords, title }) {
     sources.push({
       source_id: 'SRC-BRIEF',
       kind: 'brief',
+      source_role: 'operator_context',
       relative_path: null,
       absolute_path: null,
       title,
@@ -137,6 +159,7 @@ function createBriefSources({ brief, keywords, title }) {
     sources.push({
       source_id: 'SRC-KEYWORDS',
       kind: 'keywords',
+      source_role: 'operator_context',
       relative_path: null,
       absolute_path: null,
       keywords,
@@ -211,7 +234,14 @@ function extractSourceContent(source) {
 
 function inferInputMode({ modeHint, sources }) {
   if (modeHint === 'legacy_import') return 'legacy_import';
-  const kinds = new Set(sources.map((source) => source.kind));
+  const kinds = new Set(
+    sources
+      .filter((source) => {
+        const kind = safeText(source?.kind);
+        return kind === 'brief' || kind === 'keywords' || isConsumableSource(source);
+      })
+      .map((source) => source.kind),
+  );
   if (kinds.size === 0) return 'empty';
   if ([...kinds].every((kind) => kind === 'brief' || kind === 'keywords')) {
     return 'brief_keywords';
@@ -238,16 +268,29 @@ export async function intakeSource({
   brief = '',
   keywords = [],
   sourceFiles = [],
+  operatorFiles = [],
   modeHint = '',
 }) {
   const normalizedKeywords = normalizeKeywords(keywords);
   const normalizedSourceFiles = normalizeSourceFiles(sourceFiles);
+  const normalizedOperatorFiles = normalizeOperatorFiles(operatorFiles);
   const sourcePaths = ensureWorkspaceAndTopic({ workspaceRoot, topicId, title: safeText(title) });
   const copiedFileSources = normalizedSourceFiles.map((file, index) => {
-    const copied = copySourceIntoTopic(file, sourcePaths.topicPaths, index);
+    const copied = copySourceIntoTopic(file, sourcePaths.topicPaths, index, 'content');
     return {
       source_id: `SRC-FILE-${index + 1}`,
       kind: detectSourceKind(copied.absolute_path),
+      source_role: 'content_source',
+      ...copied,
+      status: 'queued',
+    };
+  });
+  const copiedOperatorSources = normalizedOperatorFiles.map((file, index) => {
+    const copied = copySourceIntoTopic(file, sourcePaths.topicPaths, index, 'operator');
+    return {
+      source_id: `SRC-OP-${index + 1}`,
+      kind: detectSourceKind(copied.absolute_path),
+      source_role: 'operator_context',
       ...copied,
       status: 'queued',
     };
@@ -255,6 +298,7 @@ export async function intakeSource({
   const intakeSources = [
     ...createBriefSources({ brief, keywords: normalizedKeywords, title: safeText(title) || topicId }),
     ...copiedFileSources,
+    ...copiedOperatorSources,
   ];
 
   if (intakeSources.length === 0) {
@@ -277,13 +321,15 @@ export async function intakeSource({
       material_id: `MAT-${String(index + 1).padStart(3, '0')}`,
       source_id: source.source_id,
       kind: source.kind,
+      source_role: safeText(source.source_role),
       relative_path: source.relative_path,
       content_text: source.content_text,
       excerpt: source.content_text.slice(0, 240),
     }));
+  const consumableReadyMaterials = readyMaterials.filter((material) => isConsumableSource(material));
 
   const inputMode = inferInputMode({ modeHint, sources: intakeSources });
-  const confidence = inferConfidence({ inputMode, materials: readyMaterials });
+  const confidence = inferConfidence({ inputMode, materials: consumableReadyMaterials });
   const blockingReasons = extracted
     .filter((source) => source.status === 'blocked')
     .map((source) => source.kind === 'pdf' ? 'pdf_extraction_failed' : source.blocking_reason)
@@ -298,6 +344,7 @@ export async function intakeSource({
     }),
     normalize_source: stageResult(readyMaterials.length > 0 ? 'pass' : 'block', {
       material_count: readyMaterials.length,
+      consumable_material_count: consumableReadyMaterials.length,
       input_mode: inputMode,
       confidence,
     }),
@@ -314,6 +361,7 @@ export async function intakeSource({
     sources: extracted.map((source) => ({
       source_id: source.source_id,
       kind: source.kind,
+      source_role: safeText(source.source_role),
       relative_path: source.relative_path,
       status: source.status,
       blocking_reason: source.blocking_reason || null,
@@ -345,6 +393,8 @@ export async function intakeSource({
     keywords: normalizedKeywords,
     material_count: readyMaterials.length,
     material_ids: readyMaterials.map((material) => material.material_id),
+    consumable_material_count: consumableReadyMaterials.length,
+    consumable_material_ids: consumableReadyMaterials.map((material) => material.material_id),
   };
 
   const sourceAudit = {
@@ -357,7 +407,7 @@ export async function intakeSource({
       source_index_written: true,
       extracted_materials_written: true,
       source_brief_written: true,
-      consumable_materials_present: readyMaterials.length > 0,
+      consumable_materials_present: consumableReadyMaterials.length > 0,
       pdf_extraction_ready: !extracted.some((source) => source.kind === 'pdf' && source.status === 'blocked'),
     },
   };

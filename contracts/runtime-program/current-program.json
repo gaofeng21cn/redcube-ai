@@ -2,7 +2,7 @@
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-12",
   "longrun_goal": {
-    "label": "visual-deliverable domain gateway plus upstream Hermes-Agent target runtime",
+    "label": "visual-deliverable domain gateway plus Codex CLI host-agent runtime",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
@@ -12,7 +12,7 @@
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
-      "move runtime substrate ownership from repo-local pilot to upstream Hermes-Agent",
+      "move runtime substrate ownership onto local Codex CLI host-agent execution",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
     ]
   },
@@ -105,10 +105,10 @@
   },
   "current_state": {
     "product_mainline_mode": "auto_only",
-    "runtime_substrate_owner": "upstream_hermes_agent",
+    "runtime_substrate_owner": "codex_cli",
     "deployment_host": "codex_local_operator_host",
-    "deployment_host_status": "local_only",
-    "host_agent_longterm_owner": false,
+    "deployment_host_status": "active_primary",
+    "host_agent_longterm_owner": true,
     "phase_id": "repo_verified_product_entry_and_opl_federation",
     "phase_label": "Repo-Verified Product Entry And OPL Federation",
     "workstream": "repo_verified_product_entry_and_opl_federation",
@@ -119,11 +119,11 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / upstream Hermes-Agent run surface plus repo-verified product entry federation plus RedCube visual-domain truth",
+      "label": "redcube-runtime-program / Codex CLI run surface plus repo-verified product entry federation plus RedCube visual-domain truth",
       "unique": true
     },
     "creative_stage_mainline": {
-      "owner": "runtime_family_plus_upstream_hermes_structured_generation",
+      "owner": "runtime_family_plus_codex_cli_structured_generation",
       "applies_to": [
         "ppt_deck",
         "xiaohongshu",
@@ -136,29 +136,29 @@
       "credible": true,
       "clean_clone_required": true,
       "blocked_by": [],
-      "live_upstream_verification": {
-        "default_gateway_command": "hermes gateway run -q --replace",
-        "gateway_command_override_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
-        "override_usage": "required_when_global_hermes_cli_lags_known_good_upstream_gateway_fix",
+      "local_codex_execution": {
+        "codex_command_env": "REDCUBE_CODEX_COMMAND",
+        "codex_model_env": "REDCUBE_CODEX_MODEL",
+        "codex_reasoning_env": "REDCUBE_CODEX_REASONING_EFFORT",
+        "codex_default_command": [
+          "codex"
+        ],
         "python_command_env": "REDCUBE_PYTHON_COMMAND",
         "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
         "python_command_requirement": "screenshot review and export helpers must execute on a Python executable with playwright installed",
         "node_test_file_concurrency": 1,
-        "serialization_reason": "respect current upstream concurrent-run ceiling during live integration/e2e/full verification",
         "preflight_requires": [
-          "/v1/health",
-          "/v1/models",
-          "/v1/runs",
-          "/v1/runs/{run_id}/events"
+          "codex exec",
+          "structured generation prompt",
+          "runtime family route execution"
         ],
-        "current_host_status": "fresh_live_verification_passed",
+        "current_host_status": "fresh_codex_smoke_passed",
         "current_host_blocking_reason": null,
-        "current_host_stream_signal": "terminal_event_received_during_standard_live_launcher_preflight",
-        "current_host_closeout_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json",
+        "current_host_stream_signal": "codex_exec_terminal_event_received",
+        "current_host_closeout_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "current_host_latest_route_proof": [
-          "2026-04-12: npm run test:e2e passed live preflight on http://127.0.0.1:8642 and received a terminal run.completed event through the standard run-test-group launcher",
-          "2026-04-12: npm run test:e2e passed 16/16 under upstream Hermes-Agent, including ppt_deck screenshot_review/export_pptx and xiaohongshu publish_copy/export_bundle",
-          "2026-04-12: node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster' passed 32/32, including guarded poster_onepager managed execution on upstream Hermes-Agent"
+          "2026-04-13: local Codex CLI route and managed execution pass repo smoke with structured generation held inside runtime-family.",
+          "2026-04-13: ppt_deck / xiaohongshu / poster_onepager creative stages stay on AI-first Codex structured generation without pack/compiler fallback."
         ]
       },
       "ci_quality_lane_requires": [
@@ -166,7 +166,7 @@
         "fonts-noto-cjk",
         "playwright-chromium"
       ],
-      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review on the active Hermes stable-family mainline",
+      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review on the active Codex stable-family mainline",
       "required_verification": [
         "git status --short",
         "git diff --check",
@@ -207,7 +207,7 @@
           "getManagedRun",
           "superviseManagedRun"
         ],
-        "adapter_surface": "@redcube/hermes-agent-client"
+        "adapter_surface": "@redcube/codex-cli-client"
       },
       "service_safe_domain_entry_adapter": {
         "status": "closeout_completed",
@@ -267,12 +267,12 @@
       }
     },
     "next_activation_package": {
-      "id": "upstream_hermes_agent_activation_package",
+      "id": "managed_product_entry_hardening",
       "status": "closeout_completed",
-      "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",
-      "brief": "docs/program/upstream_hermes_agent_activation_package.md",
-      "adapter_surface": "@redcube/hermes-agent-client",
-      "probe_script": "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface"
+      "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+      "brief": "docs/program/managed_product_entry_hardening.md",
+      "adapter_surface": "@redcube/codex-cli-client",
+      "probe_script": "redcube product invoke"
     },
     "active_baton": {
       "id": "managed_product_entry_hardening",
@@ -282,7 +282,7 @@
       "scope": {
         "hardening_axis": "product_entry_service_surface_and_federation",
         "implementation_in_scope": true,
-        "runtime_substrate_owner": "upstream_hermes_agent",
+        "runtime_substrate_owner": "codex_cli",
         "deployment_host": "codex_local_operator_host",
         "consumer_families": [
           "ppt_deck",
@@ -350,7 +350,7 @@
     "stop_conditions": [
       "frozen truth conflict that cannot be resolved inside current contracts",
       "new product-direction choice is required",
-      "real upstream Hermes-Agent gateway / API server is unavailable",
+      "local Codex CLI executable is unavailable",
       "service-safe domain entry contract drifts away from OPL handoff envelope",
       "product-entry session continuity drifts away from user-level runtime-state"
     ]

@@ -10,16 +10,14 @@ import {
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
   try {
     return await testFn();
@@ -53,7 +51,7 @@ async function prepareDomainEntryWorkspace() {
   return workspaceRoot;
 }
 
-test('invokeDomainEntry runs the service-safe managed deliverable adapter against upstream Hermes-Agent', async () => {
+test('invokeDomainEntry runs the service-safe managed deliverable adapter against Codex CLI', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
@@ -65,8 +63,8 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter agains
         workspace_root: workspaceRoot,
       },
       runtime_session_contract: {
-        runtime_owner: 'upstream_hermes_agent',
-        adapter_surface: '@redcube/hermes-agent-client',
+        runtime_owner: 'codex_cli',
+        adapter_surface: '@redcube/codex-cli-client',
         session_mode: 'ephemeral_run',
       },
       return_surface_contract: {
@@ -86,12 +84,12 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter agains
     assert.equal(response.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.task_intent, 'run_managed_deliverable');
     assert.equal(response.entry_mode, 'opl_gateway');
-    assert.equal(response.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(response.runtime_session_contract.runtime_owner, 'codex_cli');
     assert.equal(response.return_surface_contract.requested_surface_kind, 'managed_run');
     assert.equal(response.return_surface_contract.actual_surface_kind, 'managed_run');
     assert.equal(response.result_surface.surface_kind, 'managed_run');
-    assert.equal(response.result_surface.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
-    assert.equal(response.result_surface.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(response.result_surface.managed_run.runtime_bridge?.owner, 'codex_cli');
+    assert.equal(response.result_surface.runtime_supervision.runtime_owner, 'codex_cli');
   });
 });
 
@@ -101,7 +99,7 @@ test('invokeDomainEntry rejects unsupported target domains', async () => {
       target_domain_id: 'other_domain',
       task_intent: 'run_managed_deliverable',
       workspace_locator: { workspace_root: '/tmp/redcube' },
-      runtime_session_contract: { runtime_owner: 'upstream_hermes_agent' },
+      runtime_session_contract: { runtime_owner: 'codex_cli' },
       return_surface_contract: { surface_kind: 'managed_run' },
       domain_payload: {
         deliverable_family: 'ppt_deck',
@@ -125,8 +123,8 @@ test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL
           workspace_root: workspaceRoot,
         },
         runtime_session_contract: {
-          runtime_owner: 'upstream_hermes_agent',
-          adapter_surface: '@redcube/hermes-agent-client',
+          runtime_owner: 'codex_cli',
+          adapter_surface: '@redcube/codex-cli-client',
           session_mode: 'ephemeral_run',
         },
         return_surface_contract: {
@@ -156,8 +154,8 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
           workspace_root: workspaceRoot,
         },
         runtime_session_contract: {
-          runtime_owner: 'upstream_hermes_agent',
-          adapter_surface: '@redcube/hermes-agent-client',
+          runtime_owner: 'codex_cli',
+          adapter_surface: '@redcube/codex-cli-client',
           session_mode: 'ephemeral_run',
         },
         return_surface_contract: {
@@ -181,7 +179,7 @@ test('service-safe domain entry contract is frozen in contracts and current prog
   const architectureDoc = readFileSync('docs/architecture.md', 'utf-8');
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
-  assert.equal(contract.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
+  assert.equal(contract.runtime_session_contract.runtime_owner, 'codex_cli');
   assert.deepEqual(contract.opl_handoff_envelope.minimum_fields, [
     'target_domain_id',
     'task_intent',

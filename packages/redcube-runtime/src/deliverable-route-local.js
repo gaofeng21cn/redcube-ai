@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { persistReviewStatePatch } from '@redcube/governance';
-import { HERMES_DEFAULT_ADAPTER } from '@redcube/hermes-substrate';
+import { CODEX_DEFAULT_ADAPTER } from '@redcube/hermes-substrate';
 
 import { resolveExecutorAdapter } from './executors.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
@@ -73,7 +73,7 @@ export async function executeDeliverableRouteLocally({
   topicId,
   deliverableId,
   route,
-  adapter = HERMES_DEFAULT_ADAPTER,
+  adapter = CODEX_DEFAULT_ADAPTER,
   mode = 'draft_new',
   baselineDeliverableId = '',
 }) {

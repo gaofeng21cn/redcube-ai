@@ -15,8 +15,8 @@
 - `Harness OS` 只负责执行、记录、重跑与审计
 - 正式主线优先复用宿主 Agent runtime
 - 外部 LLM 兼容层只能是次级 adapter，不得重新主导系统架构
-- 当前产品 runtime owner 是 route / managed run surface 上的上游 `Hermes-Agent`
-- `Codex` 本地 operator host 是当前 deployment host / regression bridge / development shell
+- 当前产品 runtime owner 是 route / managed run surface 上的本地 Codex CLI host-agent runtime
+- `Codex` 本地 operator host 是当前 deployment host / development shell
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance / compatibility bridge，不是当前 owner
 - 未来可迁移到同一 substrate 上的 managed web runtime，但不改变 RedCube 的 domain 语义
 - 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为兼容 sibling 或 upper-layer product 复用同一 substrate
@@ -24,7 +24,7 @@
 补充执行原则：
 
 - `Agent-first` 不等于 `external_llm-only`
-- 在当前 Codex-native 语境里，`Codex` 只承担本地 operator / development host，真实 runtime substrate owner 是上游 `Hermes-Agent`
+- 在当前 Codex-native 语境里，`Codex` 同时承担本地 operator / development host 与当前 route / managed execution 的真实 runtime substrate owner
 - code 必须退回 contract、governance、audit、artifact persistence 与 render boundary
 
 ## 执行句柄与 durable surface 原则
@@ -118,7 +118,7 @@
 - `workspace / operator quickstart convergence` 已在当前主线上吸收：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，同时保持 `workspace doctor` 只做诊断、真正 bootstrap 由 `source intake` / `source research` 落盘
 - `operator surface consistency hardening` 已在当前主线上吸收：`workspace doctor` 对 brand-new workspace 只暴露 `source intake` / `source research` bootstrap guidance；command-scoped CLI help 现在必须 machine-readable 且 `--help` 不执行真正命令；`CLI review watch` 与 `MCP runtime_watch` 围绕同一 `workspace/topic/deliverable/run` locator 收口到 `runtimeWatch`
 - `runtime watch locator integrity hardening` 已在当前主线上吸收：deliverable-scope run record 现在必须持久化 `topic_id` / `deliverable_id`；`runtimeWatch` 在 persisted / preloaded run 两条入口上都必须验证 quartet locator；`CLI review watch` 与 `MCP runtime_watch` 在 mismatch 时共享同一 fail-closed 行为
-- 历史 `Hermes stable family closure truth` 冻结件只保留为本地迁移 provenance；当前 repo-verified 基线是 stable family runtime output 暴露同一份 upstream runtime bridge truth，并由 `Codex` 本地 operator host 承担当前部署宿主角色
+- 历史 `Hermes stable family closure truth` 冻结件只保留为本地迁移 provenance；当前 repo-verified 基线是 stable family runtime output 暴露同一份 Codex-native runtime bridge truth，并由 `Codex` 本地 operator host 承担当前部署宿主角色
 - `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - authoritative fail-closed source gate 继续留在 auditDeliverable / runtimeWatch，而 family artifact 需输出统一的 source_truth_consumption summary
 - `review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance

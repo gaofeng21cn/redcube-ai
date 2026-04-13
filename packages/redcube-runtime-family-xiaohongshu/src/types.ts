@@ -5,7 +5,7 @@ import type {
   XhsStorylineArtifact,
   XhsVisualDirectionArtifact,
 } from '@redcube/pack-xiaohongshu';
-import type { HermesExecutionModel } from '@redcube/hermes-substrate';
+import type { CodexExecutionModel } from '@redcube/hermes-substrate';
 
 export type XhsRuntimeRoute =
   | 'research'
@@ -166,7 +166,7 @@ export interface XhsRuntimeArtifactBase {
   prompt_pack: XhsRuntimePromptMeta;
   lifecycle_stage?: string | null;
   review_overlay?: string | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
   artifact_refs?: string[];
   review_state_patch?: XhsRuntimeReviewStatePatch;
 }
@@ -298,7 +298,7 @@ export interface XhsRuntimeRouteEnvelope<TRoute extends XhsRuntimeRoute> {
   deliverable_id: string;
   contract: XhsRuntimeContract;
   stage_contract: XhsRuntimeStageContract | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
 }
 
 export type XhsRuntimeRouteOutput<

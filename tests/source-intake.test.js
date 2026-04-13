@@ -105,7 +105,7 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
   assert.equal(pack.readiness.deep_research_state, 'required');
   assert.equal(pack.readiness.sufficiency_status, 'augmentation_required');
   assert.equal(pack.readiness.planning_ready, false);
-  assert.equal(pack.readiness.material_count >= 1, true);
+  assert.equal(pack.readiness.material_count, 0);
   assert.equal(Array.isArray(pack.fact_library.reference_source_list), true);
   assert.equal(Array.isArray(pack.fact_library.evidence_gaps), true);
   assert.equal(Array.isArray(pack.fact_library.blocking_evidence_gaps), true);
@@ -159,6 +159,53 @@ test('intakeSource keeps operator brief out of audience-facing fact summary whil
   assert.equal(augmentation.focus.brief_text.includes('重点回答三件事'), true);
 });
 
+test('intakeSource keeps operator files out of audience-facing fact library while preserving them as operator context', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-operator-files-'));
+  const contentFile = path.join(workspaceRoot, 'med-autoscience.md');
+  const operatorFile = path.join(workspaceRoot, 'speaker-rules.md');
+  writeFileSync(contentFile, [
+    '# Med Auto Science',
+    '',
+    'Med Auto Science 是医学 Research Ops gateway，用正式控制链把 source readiness、study execution 与 publication delivery 收口在同一条主线上。',
+  ].join('\n'), 'utf-8');
+  writeFileSync(operatorFile, [
+    '# 讲课工作台规则',
+    '',
+    '封面必须署名；重点回答三件事；先讲什么、后讲什么要清楚；这些都是制作约束，不是听众正文。',
+  ].join('\n'), 'utf-8');
+
+  const result = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-operator-files',
+    title: 'MedAutoScience 讲课',
+    sourceFiles: [contentFile],
+    operatorFiles: [operatorFile],
+  });
+
+  const pack = readJson(result.artifactFiles.sourceReadinessPackFile);
+  const extracted = readJson(result.artifactFiles.extractedMaterialsFile);
+  const index = readJson(result.artifactFiles.sourceIndexFile);
+
+  assert.equal(pack.fact_library.topic_summary.includes('Med Auto Science'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('封面必须署名'), false);
+  assert.equal(
+    pack.fact_library.reference_source_list.some((item) => item.includes('content-01-med-autoscience.md')),
+    true,
+  );
+  assert.equal(
+    pack.fact_library.reference_source_list.some((item) => item.includes('operator-01-speaker-rules.md')),
+    false,
+  );
+  assert.equal(
+    extracted.materials.some((item) => item.source_role === 'operator_context' && item.source_id === 'SRC-OP-1'),
+    true,
+  );
+  assert.equal(
+    index.sources.some((item) => item.source_role === 'operator_context' && item.source_id === 'SRC-OP-1'),
+    true,
+  );
+});
+
 test('intakeSource cleans markdown wrapper noise out of audience-facing fact library', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-markdown-clean-'));
   const markdownFile = path.join(workspaceRoot, 'opl-readme.md');
@@ -187,7 +234,7 @@ test('intakeSource cleans markdown wrapper noise out of audience-facing fact lib
   assert.equal(pack.fact_library.topic_summary.includes('English'), false);
   assert.equal(pack.fact_library.topic_summary.includes('Domain Harness OS'), true);
   assert.deepEqual(pack.fact_library.reference_source_list, [
-    'inputs/raw_materials/source-intake/01-opl-readme.md',
+    'inputs/raw_materials/source-intake/content-01-opl-readme.md',
   ]);
   assert.equal(
     pack.fact_library.key_fact_groups.some((item) => ['SRC-BRIEF', 'SRC-KEYWORDS'].includes(item.source_id)),

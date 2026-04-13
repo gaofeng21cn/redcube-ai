@@ -9,7 +9,7 @@ import type {
   PosterStorylineArtifact,
   PosterVisualDirectionArtifact,
 } from '@redcube/pack-poster-onepager';
-import type { HermesExecutionModel } from '@redcube/hermes-substrate';
+import type { CodexExecutionModel } from '@redcube/hermes-substrate';
 
 export type PosterRuntimeRoute = PosterOnepagerStageId;
 export type PosterRuntimeMode = 'draft_new' | 'optimize_existing';
@@ -97,7 +97,7 @@ export interface PosterRuntimeArtifactBase {
   prompt_pack: PosterRuntimePromptMeta;
   lifecycle_stage?: string | null;
   review_overlay?: string | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
   artifact_refs?: string[];
   review_state_patch?: PosterRuntimeReviewStatePatch;
 }
@@ -114,7 +114,7 @@ export interface PosterVisualDirectorReviewArtifact extends PosterRuntimeArtifac
     rewrite_action: string;
     review_summary: string;
     creative_sources: {
-      review_judgement: 'hermes';
+      review_judgement: 'host_agent';
     };
   };
   artifact_refs: string[];
@@ -195,7 +195,7 @@ export interface PosterRuntimeRouteEnvelope<TRoute extends PosterRuntimeRoute> {
   deliverable_id: string;
   contract: PosterRuntimeContract;
   stage_contract: PosterRuntimeStageContract | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
 }
 
 export type PosterRuntimeRouteOutput<

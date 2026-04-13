@@ -15,7 +15,7 @@ test('ppt family runtime uses upstream structured generation directly and no lon
   assert.equal(runtime.includes('function buildVisualDirection('), false);
   assert.equal(runtime.includes('@redcube/pack-ppt'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtime.includes('generateStructuredArtifactViaUpstreamHermes'), true);
+  assert.equal(runtime.includes('generateStructuredArtifactViaCodexCli'), true);
   assert.equal(runtime.includes('function buildRenderArtifact('), false);
 });
 
@@ -26,7 +26,7 @@ test('xiaohongshu family runtime keeps AI-first generation in runtime-family ins
   assert.equal(runtime.includes('function buildPlanSlides('), false);
   assert.equal(runtime.includes('@redcube/pack-xiaohongshu'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtime.includes('generateStructuredArtifactViaUpstreamHermes'), true);
+  assert.equal(runtime.includes('generateStructuredArtifactViaCodexCli'), true);
 });
 
 test('poster family runtime keeps AI-first generation in runtime-family without cross-package source imports', () => {
@@ -34,5 +34,5 @@ test('poster family runtime keeps AI-first generation in runtime-family without 
 
   assert.equal(runtime.includes('@redcube/pack-poster-onepager'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtime.includes('generateStructuredArtifactViaUpstreamHermes'), true);
+  assert.equal(runtime.includes('generateStructuredArtifactViaCodexCli'), true);
 });

@@ -17,9 +17,9 @@ import {
 import { resolveWorkspaceContract } from '../packages/redcube-runtime-protocol/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -40,11 +40,9 @@ function assertNoManagedState(workspaceRoot) {
 }
 
 async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
   try {
     return await testFn();
@@ -93,15 +91,15 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(result.managed_run.route_runs.length, 8);
     assert.equal(result.managed_run.stage_results.length, 8);
     assert.equal(
-      result.managed_run.route_runs.every((stageRun) => /^run_/.test(stageRun.route_run_id)),
+      result.managed_run.route_runs.every((stageRun) => /^run[-_]/.test(stageRun.route_run_id)),
       true,
     );
     assert.equal(
       result.managed_run.route_runs.every((stageRun) => stageRun.route_run_id !== result.managed_run.managed_run_id),
       true,
     );
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
-    assert.equal(result.managed_run.runtime_bridge?.adapter_surface, '@redcube/hermes-agent-client');
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
+    assert.equal(result.managed_run.runtime_bridge?.adapter_surface, '@redcube/codex-cli-client');
     assert.equal(result.progress_projection.current_stage, 'export_pptx');
     assert.equal(result.progress_projection.needs_user_decision, false);
     assert.equal(result.progress_projection.final_artifact_refs.length > 0, true);
@@ -118,8 +116,8 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
       result.progress_projection.latest_events.every((event) => !String(event.summary).includes('run-')),
       true,
     );
-    assert.equal(result.managed_run.requested_adapter, 'hermes');
-    assert.equal(result.managed_run.active_adapter, 'hermes');
+    assert.equal(result.managed_run.requested_adapter, 'host_agent');
+    assert.equal(result.managed_run.active_adapter, 'host_agent');
     assert.equal(result.managed_run.active_run_id, null);
     assert.equal(result.managed_run.worker_running, false);
     assert.equal(result.managed_run.runtime_liveness_audit.status, 'none');
@@ -128,7 +126,7 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(result.runtime_supervision.worker_running, false);
     assert.equal(result.runtime_supervision.active_run_id, null);
     assert.equal(result.runtime_supervision.needs_human_intervention, false);
-    assert.equal(result.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(result.runtime_supervision.runtime_owner, 'codex_cli');
     assert.equal(result.escalation_record.escalation_status, 'none');
     assert.equal(typeof result.runtime_supervision.refs.runtime_supervision_path, 'string');
     assert.equal(typeof result.runtime_supervision.refs.progress_projection_path, 'string');
@@ -165,8 +163,8 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(stored.ok, true);
     assert.equal(stored.surface_kind, 'managed_run_record');
     assert.equal(stored.summary.managed_run_id, result.managed_run.managed_run_id);
-    assert.equal(stored.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
-    assert.equal(stored.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(stored.managed_run.runtime_bridge?.owner, 'codex_cli');
+    assert.equal(stored.runtime_supervision.runtime_owner, 'codex_cli');
     assert.deepEqual(stored.progress_projection, result.progress_projection);
     assert.deepEqual(stored.runtime_supervision, result.runtime_supervision);
     assert.deepEqual(stored.escalation_record, result.escalation_record);
@@ -179,7 +177,7 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(supervised.surface_kind, 'managed_supervision');
     assert.equal(supervised.summary.managed_run_id, result.managed_run.managed_run_id);
     assert.equal(supervised.runtime_supervision.health_status, 'completed');
-    assert.equal(supervised.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(supervised.runtime_supervision.runtime_owner, 'codex_cli');
   });
 });
 
@@ -219,7 +217,7 @@ test('managed execution stops at explicit stop_after_stage instead of auto-runni
     assert.equal(result.managed_run.mode, 'stop_after_stage');
     assert.equal(result.managed_run.stop_after_stage, 'storyline');
     assert.equal(result.managed_run.current_stage, 'storyline');
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
     assert.equal(result.managed_run.parking_reason_code, 'user_requested_stop_after_stage');
     assert.equal(result.managed_run.requires_human_confirmation, true);
     assert.deepEqual(
@@ -233,7 +231,7 @@ test('managed execution stops at explicit stop_after_stage instead of auto-runni
     assert.equal(result.progress_projection.final_artifact_refs.length, 0);
     assert.equal(result.runtime_supervision.health_status, 'paused');
     assert.equal(result.runtime_supervision.needs_human_intervention, true);
-    assert.equal(result.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(result.runtime_supervision.runtime_owner, 'codex_cli');
     assert.equal(result.escalation_record.escalation_status, 'none');
 
     const stored = await getManagedRun({
@@ -243,7 +241,7 @@ test('managed execution stops at explicit stop_after_stage instead of auto-runni
     assert.equal(stored.managed_run.status, 'stopped_after_stage');
     assert.equal(stored.progress_projection.needs_user_decision, true);
     assert.equal(stored.runtime_supervision.health_status, 'paused');
-    assert.equal(stored.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(stored.runtime_supervision.runtime_owner, 'codex_cli');
   });
 });
 
@@ -281,13 +279,13 @@ test('managed control plane keeps managed execution by switching back to the pri
     assert.equal(result.ok, true);
     assert.equal(result.summary.status, 'completed');
     assert.equal(result.managed_run.requested_adapter, 'external_llm');
-    assert.equal(result.managed_run.active_adapter, 'hermes');
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
+    assert.equal(result.managed_run.active_adapter, 'host_agent');
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
     assert.equal(result.managed_run.adapter_switches.length, 1);
     assert.deepEqual(result.managed_run.adapter_switches[0], {
       at: result.managed_run.adapter_switches[0].at,
       from_adapter: 'external_llm',
-      to_adapter: 'hermes',
+      to_adapter: 'host_agent',
       reason_code: 'compatibility_adapter_route_unsupported',
       stage_id: 'detailed_outline',
     });
@@ -321,12 +319,12 @@ test('managed control plane keeps managed execution by switching back to the pri
     assert.match(result.progress_projection.latest_events.at(-1).summary, /\d{2}:\d{2}/);
     assert.equal(result.runtime_supervision.health_status, 'completed');
     assert.equal(result.runtime_supervision.needs_human_intervention, false);
-    assert.equal(result.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(result.runtime_supervision.runtime_owner, 'codex_cli');
     assert.equal(result.escalation_record.escalation_status, 'none');
   });
 });
 
-test('managed execution keeps xiaohongshu on the Hermes-backed human-publication closure without drifting durable truth', async () => {
+test('managed execution keeps xiaohongshu on the Codex-backed human-publication closure without drifting durable truth', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-xhs-'));
 
@@ -359,7 +357,7 @@ test('managed execution keeps xiaohongshu on the Hermes-backed human-publication
     assert.equal(result.ok, true);
     assert.equal(result.summary.status, 'completed');
     assert.equal(result.managed_run.overlay, 'xiaohongshu');
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
     assert.equal(result.managed_run.current_stage, 'export_bundle');
     assert.deepEqual(
       result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
@@ -378,7 +376,7 @@ test('managed execution keeps xiaohongshu on the Hermes-backed human-publication
     assert.equal(result.progress_projection.current_stage, 'export_bundle');
     assert.equal(result.progress_projection.content_status, 'completed');
     assert.equal(result.runtime_supervision.health_status, 'completed');
-    assert.equal(result.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(result.runtime_supervision.runtime_owner, 'codex_cli');
     assert.equal(result.escalation_record.escalation_status, 'none');
 
     const review = await getReviewState({
@@ -409,7 +407,7 @@ test('managed execution keeps xiaohongshu on the Hermes-backed human-publication
   assert.equal(review.state.approval_state.status, 'pending_human');
   assert.equal(review.state.publish_state.current, 'approval_pending');
   assert.equal(review.governance_surface.family_boundary.human_publication, true);
-  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
 
   const noteProjection = projection.publication.deliverables['note-a'];
   assert.equal(noteProjection.projection_model, 'human_publication');
@@ -417,13 +415,13 @@ test('managed execution keeps xiaohongshu on the Hermes-backed human-publication
   assert.equal(noteProjection.next, 'approved_pending_publish');
   assert.equal(noteProjection.delivery_state.current, 'output_ready');
   assert.equal(noteProjection.governance_surface.family_boundary.human_publication, true);
-  assert.equal(noteProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(noteProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
 
   assert.deepEqual(audit.review_state, review.state);
   assert.deepEqual(audit.publication_projection, projection.publication);
   assert.equal(audit.gate_summary.approval_required, true);
   assert.equal(audit.gate_summary.delivery_projection_current, 'approval_pending');
-  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
 
   assert.equal(watch.run_id, result.managed_run.route_runs.at(-1).route_run_id);
   assert.equal(watch.review_state.current_status, review.state.current_status);
@@ -431,7 +429,7 @@ test('managed execution keeps xiaohongshu on the Hermes-backed human-publication
     watch.publication_projection.deliverables['note-a'].current,
     noteProjection.current,
   );
-    assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+    assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   });
 });
 
@@ -468,7 +466,7 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
     assert.equal(result.ok, true);
     assert.equal(result.summary.status, 'completed');
     assert.equal(result.managed_run.overlay, 'poster_onepager');
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'upstream_hermes_agent');
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
     assert.equal(result.managed_run.current_stage, 'export_bundle');
     assert.deepEqual(
       result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
@@ -485,7 +483,7 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
     assert.equal(result.progress_projection.current_stage, 'export_bundle');
     assert.equal(result.progress_projection.content_status, 'completed');
     assert.equal(result.runtime_supervision.health_status, 'completed');
-    assert.equal(result.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(result.runtime_supervision.runtime_owner, 'codex_cli');
     assert.equal(result.escalation_record.escalation_status, 'none');
 
     const review = await getReviewState({
@@ -515,7 +513,7 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
   assert.equal(review.state.approval_state.status, 'not_required');
   assert.equal(review.state.publish_state.current, 'not_applicable');
   assert.equal(review.governance_surface.family_boundary.guarded_knowledge_poster, true);
-  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
 
   const posterProjection = projection.publication.deliverables['poster-a'];
   assert.equal(posterProjection.projection_model, 'direct_delivery');
@@ -523,13 +521,13 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
   assert.equal(posterProjection.delivery_state.current, 'output_ready');
   assert.equal(posterProjection.operator_handoff.gate_status, 'ready');
   assert.equal(posterProjection.governance_surface.family_boundary.guarded_knowledge_poster, true);
-  assert.equal(posterProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(posterProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
 
   assert.deepEqual(audit.review_state, review.state);
   assert.deepEqual(audit.publication_projection, projection.publication);
   assert.equal(audit.gate_summary.operator_handoff_status, 'ready');
   assert.equal(audit.gate_summary.delivery_projection_current, 'output_ready');
-  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
 
   assert.equal(watch.run_id, result.managed_run.route_runs.at(-1).route_run_id);
   assert.equal(watch.review_state.current_status, review.state.current_status);
@@ -537,11 +535,11 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
     watch.publication_projection.deliverables['poster-a'].current,
     posterProjection.current,
   );
-    assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+    assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   });
 });
 
-test('managed execution fails closed when upstream Hermes-Agent proof is blocked', async () => {
+test('managed execution fails closed when Codex CLI proof is blocked', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-upstream-blocked-'));
   const restoreEnv = withEnv({
     REDCUBE_HERMES_UPSTREAM_BASE_URL: 'http://127.0.0.1:1',
@@ -554,8 +552,8 @@ test('managed execution fails closed when upstream Hermes-Agent proof is blocked
       workspaceRoot,
       topicId: 'topic-a',
       title: '上游阻断验证',
-      brief: '验证 upstream Hermes-Agent 不可达时托管执行会 fail-closed。',
-      keywords: ['Hermes', 'blocked'],
+      brief: '验证 Codex CLI 不可达时托管执行会 fail-closed。',
+      keywords: ['Codex CLI', 'blocked'],
     });
 
     await createDeliverable({
@@ -576,7 +574,7 @@ test('managed execution fails closed when upstream Hermes-Agent proof is blocked
         deliverableId: 'deck-a',
         userIntent: '给我一个最终 PPT',
       }),
-      /upstream Hermes-Agent/i,
+      /Codex CLI/i,
     );
 
     assertNoManagedState(workspaceRoot);

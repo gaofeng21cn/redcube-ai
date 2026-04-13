@@ -3,13 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { generateStructuredArtifactViaUpstreamHermes } from '@redcube/hermes-agent-client';
+import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
-import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
+import { buildCodexExecutionModel } from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
@@ -23,8 +23,8 @@ const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYTHON_REVIEW = path.join(MODULE_DIR, '../../redcube-runtime/scripts/ppt_deck_review.py');
 const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
 const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
-const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
-const CREATIVE_MATERIALIZED_FROM = 'upstream_run_json_output';
+const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
+const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   poster_blueprint: 'story_architecture',
@@ -146,12 +146,25 @@ function promptSeed(contract, route, vars = {}) {
   return promptPackJsonSection(contract, route, 'runtime_seed', vars);
 }
 
+function isOperatorContextMaterial(material) {
+  const kind = safeText(material?.kind);
+  return safeText(material?.source_role) === 'operator_context'
+    || kind === 'brief'
+    || kind === 'keywords';
+}
+
 function sourceTruth(contract) {
   return contract?.shared_source_truth || null;
 }
 
 function sourceMaterials(contract) {
-  return safeArray(sourceTruth(contract)?.extracted_materials?.materials);
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
+    .filter((material) => !isOperatorContextMaterial(material));
+}
+
+function operatorMaterials(contract) {
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
+    .filter((material) => isOperatorContextMaterial(material));
 }
 
 function sourceMaterialIds(contract) {
@@ -168,7 +181,7 @@ function publicSources() {
 
 function sourceLabels(contract) {
   const labels = safeArray(sourceTruth(contract)?.source_index?.sources)
-    .filter((source) => source.status === 'ready')
+    .filter((source) => source.status === 'ready' && !isOperatorContextMaterial(source))
     .map((source) => source.relative_path || source.kind);
   return labels.length > 0 ? labels : publicSources();
 }
@@ -203,8 +216,8 @@ function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
 
 function creativeExecution(lifecycleStage, generationRuntime = null) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -217,9 +230,9 @@ function creativeExecution(lifecycleStage, generationRuntime = null) {
 
 function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
-    stage_owner: 'hermes_backed_runtime_substrate',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
     route,
     lifecycle_stage: lifecycleStage,
     authored_surface: authoredSurface,
@@ -230,7 +243,7 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
 function reviewAuthorship(overlay) {
   return {
     overlay,
-    primary_surface: 'hermes_backed_runtime_substrate',
+    primary_surface: 'codex_native_host_agent',
     contract_asset: 'prompt_pack_seed',
   };
 }
@@ -244,7 +257,7 @@ function attachCommon(route, contract) {
     prompt_pack: promptMeta(contract, route),
     lifecycle_stage: lifecycleStageForRoute(contract, route),
     review_overlay: reviewOverlayForRoute(contract, route),
-    execution_model: HERMES_EXECUTION_MODEL,
+    execution_model: CODEX_EXECUTION_MODEL,
   };
 }
 
@@ -296,8 +309,8 @@ function extractAudienceFacingSnippet(value, maxLength = 220) {
 }
 
 function sourceTopicSummary(contract) {
-  return extractAudienceFacingSnippet(sourceTruth(contract)?.source_brief?.brief_text, 220)
-    || extractAudienceFacingSnippet(sourceMaterials(contract)[0]?.content_text || sourceMaterials(contract)[0]?.excerpt, 220)
+  return extractAudienceFacingSnippet(sourceMaterials(contract)[0]?.content_text || sourceMaterials(contract)[0]?.excerpt, 220)
+    || extractAudienceFacingSnippet(sourceTruth(contract)?.source_brief?.brief_text, 220)
     || safeText(contract.title);
 }
 
@@ -331,9 +344,17 @@ function buildAuthoringContext(contract) {
       confidence: safeText(sourceTruth(contract)?.source_brief?.confidence, 'low'),
       material_ids: sourceMaterialIds(contract),
     },
+    operator_playbook: operatorMaterials(contract)
+      .slice(0, 6)
+      .map((material) => ({
+        source_id: material.source_id,
+        excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
+      }))
+      .filter((item) => item.excerpt),
     authoring_guardrails: [
       'delivery_goal 和制作要求不能原样写进海报 headline、panel 文案或 review_summary。',
       '不要把内部工作流、模板说明、系统指令、隐藏审核口径写进读者可见内容。',
+      'operator_playbook 只作为制作约束，不得被改写成海报 headline、panel 文案、来源标签或审阅总结。',
       '如果共享事实层不足，只能做保守表达，不得编造医学结论、效果承诺或伪来源。',
       '海报必须是 AI 直接创作内容，不得退化成固定模板编译或 slot 填空产物。',
     ],
@@ -513,7 +534,7 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
 }
 
 async function generateStorylineDraft(contract) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'poster_onepager',
     route: 'storyline',
     promptRelativePath: promptRoute(contract, 'storyline'),
@@ -578,7 +599,7 @@ function buildPosterBlueprintContext(contract, storylineArtifact) {
 
 async function generatePosterBlueprintDraft(contract, deliverablePaths) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'poster_onepager',
     route: 'poster_blueprint',
     promptRelativePath: promptRoute(contract, 'poster_blueprint'),
@@ -701,7 +722,7 @@ function buildVisualDirectionContext(contract, storylineArtifact, blueprintArtif
 async function generateVisualDirectionDraft(contract, deliverablePaths) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'poster_onepager',
     route: 'visual_direction',
     promptRelativePath: promptRoute(contract, 'visual_direction'),
@@ -802,7 +823,7 @@ function renderContract(contract) {
 async function generateRenderHtmlDraft(contract, deliverablePaths) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'poster_onepager',
     route: 'render_html',
     promptRelativePath: promptRoute(contract, 'render_html'),
@@ -985,7 +1006,7 @@ async function generateDirectorReviewDraft(contract, deliverablePaths) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'poster_onepager',
     route: 'visual_director_review',
     promptRelativePath: promptRoute(contract, 'visual_director_review'),
@@ -1036,7 +1057,7 @@ async function buildDirectorReview(contract, deliverablePaths) {
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: hermes_backed_runtime_substrate',
+    '- review_owner: codex_native_host_agent',
     `- director_intent_landed: ${checks.director_intent_landed}`,
     `- anti_template_ok: ${checks.anti_template_ok}`,
     `- message_hierarchy_clear: ${checks.message_hierarchy_clear}`,

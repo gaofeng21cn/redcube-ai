@@ -26,7 +26,7 @@ export async function getProductEntrySession(request) {
   if (!session) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
-  if (safeText(session.runtime_owner) !== 'upstream_hermes_agent') {
+  if (safeText(session.runtime_owner) !== 'codex_cli') {
     throw new Error('product entry session runtime_owner 漂移');
   }
 

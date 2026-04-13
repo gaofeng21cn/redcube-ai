@@ -3,13 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { generateStructuredArtifactViaUpstreamHermes } from '@redcube/hermes-agent-client';
+import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
-import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
+import { buildCodexExecutionModel } from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
@@ -46,7 +46,7 @@ const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
   export_bundle: 'delivery_packaging',
 });
 
-const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
+const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   research: 'source_readiness',
   storyline: 'story_architecture',
@@ -56,18 +56,18 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
 
 function hostAgentCreativeSource(contractAsset) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
-    stage_owner: 'hermes_backed_runtime_substrate',
-    adapter: 'hermes',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
+    adapter: 'host_agent',
     supporting_contract: safeText(contractAsset, 'prompt_pack_seed'),
   };
 }
 
 function creativeExecution(route, generationRuntime = null) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
     lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -91,7 +91,7 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
 function reviewAuthorship(overlay) {
   return {
     overlay,
-    primary_surface: 'hermes_backed_runtime_substrate',
+    primary_surface: 'codex_native_host_agent',
     contract_asset: 'prompt_pack_seed',
   };
 }
@@ -222,6 +222,13 @@ function promptSeed(contract, route, vars = {}) {
   return promptPackJsonSection(contract, route, 'runtime_seed', vars);
 }
 
+function isOperatorContextMaterial(material) {
+  const kind = safeText(material?.kind);
+  return safeText(material?.source_role) === 'operator_context'
+    || kind === 'brief'
+    || kind === 'keywords';
+}
+
 function isSeries(contract) {
   return /系列/.test(`${safeText(contract.title)} ${safeText(contract.goal)}`);
 }
@@ -275,7 +282,13 @@ function sourceReadinessPack(contract) {
 }
 
 function sourceMaterials(contract) {
-  return safeArray(sourceTruth(contract)?.extracted_materials?.materials);
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
+    .filter((material) => !isOperatorContextMaterial(material));
+}
+
+function operatorMaterials(contract) {
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
+    .filter((material) => isOperatorContextMaterial(material));
 }
 
 function sourceMaterialIds(contract) {
@@ -285,7 +298,7 @@ function sourceMaterialIds(contract) {
 function sourceLabels(contract) {
   const truth = sourceTruth(contract);
   const labels = safeArray(truth?.source_index?.sources)
-    .filter((source) => source.status === 'ready')
+    .filter((source) => source.status === 'ready' && !isOperatorContextMaterial(source))
     .map((source) => source.relative_path || source.kind);
   return labels.length > 0 ? labels : publicSources();
 }
@@ -345,7 +358,8 @@ function buildStorylineInputs(contract, research) {
 }
 
 function deriveAudienceFromSource(contract) {
-  const corpus = `${safeText(sourceTruth(contract)?.source_brief?.brief_text)} ${sourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ')}`;
+  const materialCorpus = sourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ');
+  const corpus = materialCorpus || safeText(sourceTruth(contract)?.source_brief?.brief_text);
   if (/患者|门诊|家属/.test(corpus)) {
     return '门诊患者和家属：更关心先做什么、怎么避免走弯路，而不是完整术语体系';
   }
@@ -400,9 +414,17 @@ function buildAuthoringContext(contract, research = null) {
       residual_evidence_gaps: sourceResidualEvidenceGaps(contract),
       material_ids: sourceMaterialIds(contract),
     },
+    operator_playbook: operatorMaterials(contract)
+      .slice(0, 6)
+      .map((material) => ({
+        source_id: material.source_id,
+        excerpt: safeText(material.content_text || material.excerpt).replace(/\s+/g, ' ').slice(0, 220),
+      }))
+      .filter((item) => item.excerpt),
     authoring_guardrails: [
       '交付目标和制作要求不能原样进入读者可见正文。',
       '不要把内部资料、来源索引、工作流注释、系统操作说明写成小红书正文。',
+      'operator_playbook 只作为制作约束，不得被改写成标题、正文、评论区文案或来源口径。',
       '来源必须翻译成读者能理解的公开口径，不能直接写内部文件名。',
       '如果共享事实层不足，只能保守表达，不得编造医学结论、效果承诺或平台反馈。',
     ],
@@ -564,7 +586,7 @@ function attachCommon(route, contract) {
     profile_id: contract.profile_id,
     produced_at: new Date().toISOString(),
     lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
-    execution_model: HERMES_EXECUTION_MODEL,
+    execution_model: CODEX_EXECUTION_MODEL,
     prompt_pack: promptMeta(contract, route),
   };
 }
@@ -649,7 +671,7 @@ function buildResearch(contract) {
 }
 
 async function generateStorylineDraft(contract, researchArtifact) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'storyline',
     promptRelativePath: promptRoute(contract, 'storyline'),
@@ -700,13 +722,13 @@ async function buildStoryline(contract, deliverablePaths) {
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'narrative_arc',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         memory_hook: creativeSourceStamp({
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'memory_hook',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -747,19 +769,19 @@ function normalizePlanSlide(slide, index, sources) {
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'page_core_content',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
       visual_presentation: creativeSourceStamp({
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'visual_presentation',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
       render_recipe_id: creativeSourceStamp({
         route: 'single_note_plan',
         lifecycleStage: 'visual_authorship',
         authoredSurface: 'render_recipe_id',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
     },
     creative_authorship: {
@@ -767,20 +789,20 @@ function normalizePlanSlide(slide, index, sources) {
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'page_core_content',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
       visual_presentation: creativeSourceStamp({
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'visual_presentation',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
     },
   };
 }
 
 async function generateSingleNotePlanDraft(contract, researchArtifact, storylineArtifact) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'single_note_plan',
     promptRelativePath: promptRoute(contract, 'single_note_plan'),
@@ -822,7 +844,7 @@ async function buildSingleNotePlan(contract, deliverablePaths) {
 }
 
 async function generateVisualDirectionDraft(contract, researchArtifact, storylineArtifact, planArtifact, mode, baselineDeliverableId) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'visual_direction',
     promptRelativePath: promptRoute(contract, 'visual_direction'),
@@ -901,25 +923,25 @@ async function buildVisualDirection(contract, deliverablePaths, mode, baselineDe
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'director_statement',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         visual_motif: creativeSourceStamp({
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'visual_motif',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         rhythm_curve: creativeSourceStamp({
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'rhythm_curve',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         page_family_ceiling: creativeSourceStamp({
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'page_family_ceiling',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
       creative_authorship: {
@@ -927,7 +949,7 @@ async function buildVisualDirection(contract, deliverablePaths, mode, baselineDe
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'visual_direction',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -1016,7 +1038,7 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  return generateStructuredArtifactViaUpstreamHermes({
+  return generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'render_html',
     promptRelativePath: promptRoute(contract, 'render_html'),
@@ -1059,13 +1081,13 @@ async function buildRenderHtml(contract, deliverablePaths) {
       route: 'render_html',
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'recipe_selection',
-      materializedFrom: 'upstream_run_json_output',
+      materializedFrom: 'codex_cli_json_output',
     });
     const finalMarkup = creativeSourceStamp({
       route: 'render_html',
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'final_html_markup',
-      materializedFrom: 'upstream_run_json_output',
+      materializedFrom: 'codex_cli_json_output',
     });
     return {
       slide_id: slide.slide_id,
@@ -1100,7 +1122,7 @@ async function buildRenderHtml(contract, deliverablePaths) {
         recipe_decision: recipeDecision,
         final_html_markup: finalMarkup,
       },
-      markup_contract_source: 'upstream_run_json_output',
+      markup_contract_source: 'codex_cli_json_output',
       content,
     };
   });
@@ -1109,7 +1131,7 @@ async function buildRenderHtml(contract, deliverablePaths) {
     render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
     shell_file: resolvePromptPackAsset(contract, safeText(contractRender.shell_file, 'render_shell.html')),
     pack_id: safeText(contract?.prompt_pack?.pack_id),
-    authored_markup_surface: 'upstream_run_json_output',
+    authored_markup_surface: 'codex_cli_json_output',
     markup_binding_model: 'slides_data_shell_only',
     director_contract: {
       visual_motif: safeText(visual?.visual_direction?.visual_motif),
@@ -1160,7 +1182,7 @@ async function generateDirectorReviewDraft(contract, deliverablePaths) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
-  return generateStructuredArtifactViaUpstreamHermes({
+  return generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'visual_director_review',
     promptRelativePath: promptRoute(contract, 'visual_director_review'),
@@ -1196,7 +1218,7 @@ async function buildDirectorReview(contract, deliverablePaths) {
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: hermes_backed_runtime_substrate',
+    '- review_owner: codex_native_host_agent',
     `- director_intent_landed: ${directorIntentLanded}`,
     `- anti_template_ok: ${antiTemplateOk}`,
     `- memory_hook_present: ${memoryHookPresent}`,
@@ -1227,7 +1249,7 @@ async function buildDirectorReview(contract, deliverablePaths) {
           route: 'visual_director_review',
           lifecycleStage: 'review_overlay',
           authoredSurface: 'review_judgement',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -1362,7 +1384,7 @@ async function generatePublishCopyDraft(contract, deliverablePaths) {
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
-  return generateStructuredArtifactViaUpstreamHermes({
+  return generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'publish_copy',
     promptRelativePath: promptRoute(contract, 'publish_copy'),
@@ -1425,19 +1447,19 @@ async function buildPublishCopy(contract, deliverablePaths) {
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'titles',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         body: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'body',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         first_comment: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'first_comment',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
       creative_authorship: {
@@ -1445,19 +1467,19 @@ async function buildPublishCopy(contract, deliverablePaths) {
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'titles',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         body: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'body',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         first_comment: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'first_comment',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },

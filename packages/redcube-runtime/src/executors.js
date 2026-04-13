@@ -1,8 +1,8 @@
 import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 import {
+  CODEX_DEFAULT_ADAPTER,
   HERMES_COMPATIBILITY_ADAPTER,
-  HERMES_DEFAULT_ADAPTER,
-  buildHermesExecutorDescriptor,
+  buildCodexExecutorDescriptor,
 } from '@redcube/hermes-substrate';
 
 /**
@@ -27,15 +27,15 @@ import {
  *   creative_execution?: string,
  *   external_llm_role?: string,
  *   execution_model?: {
- *     mainline_adapter: "hermes",
- *     primary_surface: "hermes_backed_runtime_substrate",
+ *     mainline_adapter: "host_agent",
+ *     primary_surface: "codex_native_host_agent",
  *     adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
  *     agent_first_requires_external_llm: false,
  *     external_llm_role: "optional_compatibility_adapter",
- *     runtime_substrate_owner: "Hermes",
- *     deployment_host: "codex_default_host_agent_bridge",
- *     deployment_host_status: "transition_only",
- *     freeze_origin_milestone: "Hermes.A",
+ *     runtime_substrate_owner: "Codex CLI",
+ *     deployment_host: "codex_local_operator_host",
+ *     deployment_host_status: "active_primary",
+ *     freeze_origin_milestone: "P19.A",
  *   },
  *   runRoute(input: ExecutorRouteInput): Promise<{
  *     artifact_refs?: string[],
@@ -51,15 +51,15 @@ import {
  *     topic_id?: string,
  *     deliverable_id?: string,
  *     execution_model?: {
- *       mainline_adapter: "hermes",
- *       primary_surface: "hermes_backed_runtime_substrate",
+ *       mainline_adapter: "host_agent",
+ *       primary_surface: "codex_native_host_agent",
  *       adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
  *       agent_first_requires_external_llm: false,
  *       external_llm_role: "optional_compatibility_adapter",
- *       runtime_substrate_owner: "Hermes",
- *       deployment_host: "codex_default_host_agent_bridge",
- *       deployment_host_status: "transition_only",
- *       freeze_origin_milestone: "Hermes.A",
+ *       runtime_substrate_owner: "Codex CLI",
+ *       deployment_host: "codex_local_operator_host",
+ *       deployment_host_status: "active_primary",
+ *       freeze_origin_milestone: "P19.A",
  *     },
  *     produced_at?: string,
  *   }>,
@@ -70,8 +70,8 @@ import {
  * @param {{ adapter?: string }} [options]
  * @returns {ExecutorAdapter}
  */
-export function resolveExecutorAdapter({ adapter = HERMES_DEFAULT_ADAPTER } = {}) {
-  const descriptor = buildHermesExecutorDescriptor({ adapter });
+export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {}) {
+  const descriptor = buildCodexExecutorDescriptor({ adapter });
 
   return {
     ...descriptor,
@@ -101,7 +101,7 @@ export function resolveExecutorAdapter({ adapter = HERMES_DEFAULT_ADAPTER } = {}
         throw error;
       }
 
-      if (descriptor.adapter === HERMES_DEFAULT_ADAPTER) {
+      if (descriptor.adapter === CODEX_DEFAULT_ADAPTER) {
         const familyRunner = await loadRuntimeFamilyRunner(contract);
         const artifact = await familyRunner.runRoute({
           workspaceRoot,

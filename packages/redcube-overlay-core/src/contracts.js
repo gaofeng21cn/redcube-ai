@@ -1,4 +1,4 @@
-import { buildHermesRuntimeTopology } from '@redcube/hermes-substrate';
+import { buildCodexRuntimeTopology } from '@redcube/hermes-substrate';
 
 export function buildDeliverableRecord({
   topicId,
@@ -82,7 +82,7 @@ export function buildGovernanceSurfaceContract(contract = {}) {
       internal_controller_surface: 'controller',
       controller_repo_verified: false,
     },
-    runtime_topology: buildHermesRuntimeTopology(),
+    runtime_topology: buildCodexRuntimeTopology(),
   };
 }
 
@@ -118,10 +118,10 @@ export function validateGovernanceSurfaceContract(content) {
     && supportedProtocolLayer[0] === 'MCP'
     && content?.formal_entry?.internal_controller_surface === 'controller'
     && content?.formal_entry?.controller_repo_verified === false
-    && content?.runtime_topology?.runtime_substrate_owner === 'Hermes'
-    && content?.runtime_topology?.runtime_substrate_surface === 'hermes_backed_runtime_substrate'
-    && content?.runtime_topology?.deployment_host === 'codex_default_host_agent_bridge'
-    && content?.runtime_topology?.deployment_host_status === 'transition_only'
+    && content?.runtime_topology?.runtime_substrate_owner === 'Codex CLI'
+    && content?.runtime_topology?.runtime_substrate_surface === 'codex_native_host_agent'
+    && content?.runtime_topology?.deployment_host === 'codex_local_operator_host'
+    && content?.runtime_topology?.deployment_host_status === 'active_primary'
     && content?.runtime_topology?.default_formal_entry === 'CLI'
     && Array.isArray(content?.runtime_topology?.supported_protocol_layer)
     && content.runtime_topology.supported_protocol_layer.length === 1

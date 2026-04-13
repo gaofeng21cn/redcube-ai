@@ -37,8 +37,8 @@ function normalizeRuntimeSessionContract(request) {
     'runtime_session_contract.runtime_owner',
     contract?.runtime_owner || contract?.runtimeOwner,
   );
-  if (runtimeOwner !== 'upstream_hermes_agent') {
-    throw new Error(`runtime_session_contract.runtime_owner 必须为 upstream_hermes_agent，当前收到 ${runtimeOwner}`);
+  if (runtimeOwner !== 'codex_cli') {
+    throw new Error(`runtime_session_contract.runtime_owner 必须为 codex_cli，当前收到 ${runtimeOwner}`);
   }
   return {
     runtime_owner: runtimeOwner,

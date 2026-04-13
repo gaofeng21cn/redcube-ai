@@ -56,9 +56,9 @@ test('ppt_deck canonical mainline closes through Hermes-backed runtime without d
       route,
     });
     assert.equal(result.ok, true, route);
-    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes', route);
-    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Hermes', route);
-    assert.equal(result.run.runtime_topology.runtime_substrate_owner, 'Hermes', route);
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent', route);
+    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI', route);
+    assert.equal(result.run.runtime_topology.runtime_substrate_owner, 'Codex CLI', route);
     lastResult = result;
   }
 
@@ -86,13 +86,13 @@ test('ppt_deck canonical mainline closes through Hermes-backed runtime without d
   });
 
   assert.equal(lastResult.run.current_stage, 'export_pptx');
-  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
-  assert.equal(review.governance_surface.runtime_topology.deployment_host, 'codex_default_host_agent_bridge');
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
+  assert.equal(review.governance_surface.runtime_topology.deployment_host, 'codex_local_operator_host');
   assert.deepEqual(audit.review_state, review.state);
   assert.deepEqual(audit.publication_projection, projection.publication);
-  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
   assert.equal(watch.run_id, lastResult.run.run_id);
-  assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(watch.review_state.current_status, review.state.current_status);
   assert.equal(
     watch.publication_projection.deliverables['deck-a'].current,

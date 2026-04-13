@@ -10,7 +10,7 @@ import type {
   PptVisualDirectionArtifact,
 } from '@redcube/pack-ppt';
 import type { RelativeQualityRubric } from '@redcube/reference-os';
-import type { HermesExecutionModel } from '@redcube/hermes-substrate';
+import type { CodexExecutionModel } from '@redcube/hermes-substrate';
 
 export type PptRuntimeRoute = PptDeckStageId;
 export type PptRuntimeMode = 'draft_new' | 'optimize_existing';
@@ -137,7 +137,7 @@ export interface PptRuntimeArtifactBase {
   prompt_pack: PptRuntimePromptMeta;
   lifecycle_stage?: string | null;
   review_overlay?: string | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
   artifact_refs?: string[];
   review_state_patch?: PptRuntimeReviewStatePatch;
 }
@@ -176,7 +176,7 @@ export interface PptVisualDirectorReviewArtifact extends PptRuntimeArtifactBase 
     rewrite_action: string;
     review_summary: string;
     creative_sources: {
-      review_judgement: 'hermes';
+      review_judgement: 'host_agent';
     };
   };
   artifact_refs: string[];
@@ -273,7 +273,7 @@ export interface PptRuntimeRouteEnvelope<TRoute extends PptRuntimeRoute> {
   deliverable_id: string;
   contract: PptRuntimeContract;
   stage_contract: PptRuntimeStageContract | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
 }
 
 export type PptRuntimeRouteOutput<

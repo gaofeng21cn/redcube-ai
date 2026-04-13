@@ -1,50 +1,14 @@
-import http from 'node:http';
-import { once } from 'node:events';
-import { exec as execCallback } from 'node:child_process';
-import { promisify } from 'node:util';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   REDCUBE_CREATIVE_GENERATION_META_BEGIN,
-  REDCUBE_CREATIVE_GENERATION_META_END,
   REDCUBE_STAGE_JSON_BEGIN,
   REDCUBE_STAGE_JSON_END,
-} from '../../packages/redcube-hermes-agent-client/src/index.js';
+  REDCUBE_CREATIVE_GENERATION_META_END,
+} from '../../packages/redcube-codex-cli-client/src/index.js';
 
-const exec = promisify(execCallback);
-
-export const REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN = 'REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN';
-export const REDCUBE_SERVICE_ENTRY_ENVELOPE_END = 'REDCUBE_SERVICE_ENTRY_ENVELOPE_END';
-
-function readJsonBody(request) {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    request.setEncoding('utf8');
-    request.on('data', (chunk) => {
-      body += chunk;
-    });
-    request.on('end', () => {
-      try {
-        resolve(body ? JSON.parse(body) : {});
-      } catch (error) {
-        reject(error);
-      }
-    });
-    request.on('error', reject);
-  });
-}
-
-function parseEnvelope(input) {
-  const text = String(input || '');
-  const start = text.indexOf(REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN);
-  const end = text.indexOf(REDCUBE_SERVICE_ENTRY_ENVELOPE_END);
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error('service entry envelope missing from upstream run input');
-  }
-  const jsonText = text
-    .slice(start + REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN.length, end)
-    .trim();
-  return JSON.parse(jsonText);
-}
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 function parseCreativeGenerationMeta(input) {
   const text = String(input || '');
@@ -903,12 +867,6 @@ function formatCreativeRunOutput(output) {
   ].join('\n');
 }
 
-function toSse(events) {
-  return events
-    .map((event) => `data: ${JSON.stringify(event)}\n\n`)
-    .join('');
-}
-
 export function withEnv(overrides) {
   const backup = {};
   for (const [key, value] of Object.entries(overrides)) {
@@ -930,170 +888,22 @@ export function withEnv(overrides) {
   };
 }
 
-export async function startMockHermesAgentUpstream() {
-  let runCounter = 0;
-  const runs = new Map();
-
-  const server = http.createServer(async (request, response) => {
-    try {
-      if (!request.url) {
-        response.writeHead(500).end();
-        return;
-      }
-
-      if (request.url === '/v1/health') {
-        response.writeHead(200, { 'content-type': 'application/json' });
-        response.end(JSON.stringify({ status: 'ok', platform: 'hermes-agent' }));
-        return;
-      }
-
-      if (request.url === '/v1/models') {
-        response.writeHead(200, { 'content-type': 'application/json' });
-        response.end(JSON.stringify({
-          object: 'list',
-          data: [{ id: 'hermes-agent', object: 'model' }],
-        }));
-        return;
-      }
-
-      if (request.url === '/v1/runs' && request.method === 'POST') {
-        const body = await readJsonBody(request);
-        const runId = `run_mock_${++runCounter}`;
-        const startedAt = Date.now() / 1000;
-        const sessionId = String(body.session_id || runId);
-        const creativeMeta = parseCreativeGenerationMeta(body.input);
-
-        const runPromise = creativeMeta
-          ? (async () => {
-              const output = buildCreativeRunOutput(creativeMeta);
-              return [
-                {
-                  event: 'message.delta',
-                  run_id: runId,
-                  timestamp: startedAt,
-                  delta: 'GENERATING',
-                },
-                {
-                  event: 'run.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  output: formatCreativeRunOutput(output),
-                  usage: {
-                    input_tokens: 0,
-                    output_tokens: 0,
-                    total_tokens: 0,
-                  },
-                },
-              ];
-            })()
-          : (async () => {
-              const envelope = parseEnvelope(body.input);
-              const events = [{
-                event: 'tool.started',
-                run_id: runId,
-                timestamp: startedAt,
-                tool: 'terminal',
-                preview: envelope.command,
-              }];
-
-              try {
-                await exec(envelope.command, {
-                  cwd: envelope.cwd,
-                });
-                events.push({
-                  event: 'tool.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  tool: 'terminal',
-                  duration: 0,
-                  error: false,
-                });
-                events.push({
-                  event: 'message.delta',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  delta: 'DONE',
-                });
-                events.push({
-                  event: 'run.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  output: JSON.stringify({
-                    status: 'completed',
-                    response_file: envelope.response_file,
-                    session_id: sessionId,
-                  }),
-                  usage: {
-                    input_tokens: 0,
-                    output_tokens: 0,
-                    total_tokens: 0,
-                  },
-                });
-                return events;
-              } catch (error) {
-                events.push({
-                  event: 'tool.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  tool: 'terminal',
-                  duration: 0,
-                  error: true,
-                });
-                events.push({
-                  event: 'run.failed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  error: error instanceof Error ? error.message : String(error),
-                });
-                return events;
-              }
-            })();
-
-        runs.set(runId, runPromise);
-        response.writeHead(202, { 'content-type': 'application/json' });
-        response.end(JSON.stringify({ run_id: runId, status: 'started' }));
-        return;
-      }
-
-      if (request.url.startsWith('/v1/runs/') && request.url.endsWith('/events')) {
-        const runId = request.url.slice('/v1/runs/'.length, -'/events'.length);
-        const runPromise = runs.get(runId);
-        if (!runPromise) {
-          response.writeHead(404, { 'content-type': 'application/json' });
-          response.end(JSON.stringify({ error: { message: `run not found: ${runId}` } }));
-          return;
-        }
-
-        const events = await runPromise;
-        response.writeHead(200, { 'content-type': 'text/event-stream' });
-        response.write(toSse(events));
-        response.end(': stream closed\n\n');
-        return;
-      }
-
-      response.writeHead(404).end();
-    } catch (error) {
-      response.writeHead(500, { 'content-type': 'application/json' });
-      response.end(JSON.stringify({
-        error: {
-          message: error instanceof Error ? error.message : String(error),
-        },
-      }));
-    }
-  });
-
-  server.listen(0, '127.0.0.1');
-  await once(server, 'listening');
-  const address = server.address();
-  if (!address || typeof address === 'string') {
-    throw new Error('mock upstream address unavailable');
+export function buildMockCodexLastMessage(prompt) {
+  const text = String(prompt || '');
+  if (/Reply with READY only\./i.test(text)) {
+    return 'READY';
   }
 
+  const creativeMeta = parseCreativeGenerationMeta(text);
+  if (!creativeMeta) {
+    throw new Error('mock codex cli received unsupported prompt');
+  }
+  return formatCreativeRunOutput(buildCreativeRunOutput(creativeMeta));
+}
+
+export async function startMockCodexCli() {
   return {
-    baseUrl: `http://127.0.0.1:${address.port}`,
-    async close() {
-      server.close();
-      await once(server, 'close');
-    },
+    command: JSON.stringify(['node', path.join(MODULE_DIR, 'mock-codex-cli-bin.mjs')]),
+    async close() {},
   };
 }

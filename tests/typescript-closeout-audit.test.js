@@ -28,6 +28,7 @@ const CONTRACT_SURFACES = [
 
 const SERVICE_BOUNDARIES = [
   'packages/redcube-runtime',
+  'packages/redcube-codex-cli-client',
   'packages/redcube-runtime-family-registry',
   'apps/redcube-cli',
   'apps/redcube-mcp',
@@ -77,7 +78,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/deliverable-route-local.js',
     'src/deliverable-routes.js',
     'src/event-log.js',
-    'src/execute-redcube-service-entry.js',
     'src/executors.js',
     'src/index.js',
     'src/managed-deliverable.js',
@@ -96,10 +96,10 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/source-intake.js',
     'src/source-readiness-pack.js',
     'src/source-research.js',
-    'src/upstream-hermes-bridge.js',
     'src/xiaohongshu-runtime.js',
     'src/xiaohongshu.js',
   ],
+  'packages/redcube-codex-cli-client': ['src/index.js'],
   'packages/redcube-runtime-family-registry': ['src/index.js'],
   'packages/redcube-pack-xiaohongshu': ['src/index.js'],
   'packages/redcube-pack-ppt': ['src/index.js'],
