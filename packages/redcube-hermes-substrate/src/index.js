@@ -423,12 +423,12 @@ export function completeHermesRun({
     stage_results: stageResults,
     artifact_refs: artifactRefs,
     error_kind: null,
-    runtime_topology: buildHermesRuntimeTopology(),
-    executor,
+    runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
+    executor: executor || run?.executor,
   };
   completedRun.telemetry = buildRunTelemetry(
     completedRun,
-    executor,
+    executor || run?.executor,
     'completed',
     completedRun.finished_at,
   );
@@ -452,13 +452,13 @@ export function failHermesRun({
     finished_at: new Date().toISOString(),
     current_stage: currentStage,
     error_kind: errorKind,
-    runtime_topology: buildHermesRuntimeTopology(),
-    executor,
+    runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
+    executor: executor || run?.executor,
     error: normalizeError(error),
   };
   failedRun.telemetry = buildRunTelemetry(
     failedRun,
-    executor,
+    executor || run?.executor,
     'failed',
     failedRun.finished_at,
   );

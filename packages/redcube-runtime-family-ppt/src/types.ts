@@ -206,6 +206,12 @@ export interface PptSlideReview {
   checks: PptSlideReviewChecks;
   metrics?: PptSlideReviewMetrics;
   issues: string[];
+  ai_review?: {
+    slide_id: string;
+    judgement: 'pass' | 'block';
+    visual_findings: string[];
+    recommended_fix: string;
+  };
 }
 
 export interface PptBaselineReview {
@@ -224,6 +230,11 @@ export interface PptScreenshotReviewArtifact extends PptRuntimeArtifactBase {
   route: 'screenshot_review';
   mode: PptRuntimeMode;
   status: 'pass' | 'block';
+  review_execution?: {
+    owner?: string;
+    overlay?: string;
+    generation_runtime?: unknown;
+  };
   checks: PptRuntimeLatestChecks & {
     director_intent_landed?: boolean;
     anti_template_ok?: boolean;
@@ -233,6 +244,27 @@ export interface PptScreenshotReviewArtifact extends PptRuntimeArtifactBase {
     speaker_fit_ok: boolean;
   };
   slide_reviews: PptSlideReview[];
+  ai_review?: {
+    review_model: string;
+    director_intent_landed: boolean;
+    anti_template_ok: boolean;
+    weak_pages: string[];
+    review_summary: string;
+    slide_reviews: Array<{
+      slide_id: string;
+      judgement: 'pass' | 'block';
+      visual_findings: string[];
+      recommended_fix: string;
+    }>;
+    creative_sources?: {
+      review_judgement?: unknown;
+    };
+  };
+  mechanical_review?: {
+    review_model: string;
+    checks?: unknown;
+    metrics?: unknown;
+  };
   report_markdown: string;
   metrics: unknown;
   artifact_refs: string[];

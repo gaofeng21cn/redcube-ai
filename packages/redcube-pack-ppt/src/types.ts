@@ -308,10 +308,10 @@ export interface PptRenderSlide {
   palette: PptPalette;
   total_slides: number;
   creative_sources: {
-    recipe_selection: 'hermes';
-    final_markup: 'hermes';
+    recipe_selection: 'codex_cli_json_output';
+    final_markup: 'codex_cli_json_output';
   };
-  markup_contract_source: 'prompt_pack_artifact';
+  markup_contract_source: 'codex_cli_json_output';
   content: string;
 }
 

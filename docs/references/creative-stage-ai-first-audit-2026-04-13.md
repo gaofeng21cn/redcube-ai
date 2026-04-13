@@ -15,7 +15,7 @@
 - `xiaohongshu`：`storyline / single_note_plan / visual_direction / render_html / visual_director_review / publish_copy` 已切到 AI-first。
 - `poster_onepager`：`storyline / poster_blueprint / visual_direction / render_html / visual_director_review` 已切到 AI-first。
 - legacy `pack-runtime` compiler registry 与各 family 的 repo-local `pack/compiler` 创作实现已从 active mainline 清理掉。
-- `screenshot_review` 仍然是 governed review，不是创作阶段。
+- `screenshot_review` 已升级为 AI-first review overlay：Python 只负责截图与几何指标，最终视觉判断由 Codex 直接读图完成。
 - `export_pptx / export_bundle` 仍然是 delivery packaging，不是创作阶段。
 
 ## 创作步骤总表
@@ -30,7 +30,7 @@
 | `visual_direction` | `visual_authorship` | upstream Hermes | 视觉导演稿、节奏峰值、反模板约束 |
 | `render_html` | `visual_authorship` | upstream Hermes | AI 直接写最终 slide HTML |
 | `visual_director_review` | `review_overlay` | upstream Hermes | AI 直接做导演复盘判断 |
-| `screenshot_review` | `review_overlay` | governed review | Python/截图质控，属于审查，不属于创作 |
+| `screenshot_review` | `review_overlay` | Codex + governed metrics | Python 负责截图与机械指标，Codex 直接读图完成最终截图审阅 |
 | `export_pptx` | `delivery_packaging` | packaging | 导出交付物 |
 
 ### xiaohongshu
@@ -43,7 +43,7 @@
 | `visual_direction` | `visual_authorship` | upstream Hermes | 视觉导演稿 |
 | `render_html` | `visual_authorship` | upstream Hermes | AI 直接写卡片 HTML |
 | `visual_director_review` | `review_overlay` | upstream Hermes | AI 导演复盘 |
-| `screenshot_review` | `review_overlay` | governed review | 截图/几何审查 |
+| `screenshot_review` | `review_overlay` | Codex + governed metrics | 截图由脚本生成，最终视觉审稿由 Codex 直接读图完成 |
 | `publish_copy` | `delivery_packaging` | upstream Hermes | 发布正文、首评、标签 |
 | `export_bundle` | `delivery_packaging` | packaging | 打包导出 |
 
@@ -56,7 +56,7 @@
 | `visual_direction` | `visual_authorship` | upstream Hermes | 单页视觉导演稿 |
 | `render_html` | `visual_authorship` | upstream Hermes | AI 直接写最终 poster HTML |
 | `visual_director_review` | `review_overlay` | upstream Hermes | AI 导演复盘 |
-| `screenshot_review` | `review_overlay` | governed review | 截图/布局审查 |
+| `screenshot_review` | `review_overlay` | Codex + governed metrics | 截图由脚本生成，最终海报视觉审稿由 Codex 直接读图完成 |
 | `export_bundle` | `delivery_packaging` | packaging | 打包导出 |
 
 ## 本轮系统性修复
@@ -84,8 +84,8 @@
 这些不是“创作降级”，而是目前故意保留的非创作环节：
 
 - `screenshot_review`
-  - 仍是 Python / 截图 / 几何与布局审查。
-  - 它负责验收，不负责生成 audience-facing 内容。
+  - 现在是 AI-first review overlay。
+  - Python 继续负责截图、溢出、遮挡、密度等机械证据；最终截图判断与审阅结论由 Codex 直接读图完成。
 - `export_pptx / export_bundle`
   - 仍是 delivery packaging。
   - 它负责把已审过的内容导出，不负责创作。

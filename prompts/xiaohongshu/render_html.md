@@ -5,7 +5,10 @@
 - 3:4 画幅，无滚动，无外链图片
 - slidesData 每页独立 content
 - 不允许模板化渲染或历史成品拼装
+- 每页至少提供 2 个语义化 `data-qa-block`，并至少标记 1 个 `data-primary-point="true"`，供截图质控读取
+- 禁止输出 `<script>` / `<style>` block；样式只能写在元素 inline style 上
 - 需要输出 HTML 生成说明与同构门禁留痕
+- 版式与文案必须由 AI 直接创作，shell 只负责装配、审阅与持久化边界
 
 ## runtime_seed
 ```json
@@ -25,7 +28,9 @@
     "shell_guards": [
       "保留 slide-display-area / prev-btn / next-btn / slidesData",
       "输出 render plan 供 review 与审计读取",
-      "在每页根节点写入 recipe_id / peak_page / director_role"
+      "每页必须是 audience-facing 成品页，不得把内部提示、制作流程、模板注册表写进画面",
+      "禁止输出 <script> / <style> block；如需视觉样式，直接写 inline style",
+      "审阅依赖的根节点 metadata 由 runtime 注入，但 AI 仍需交付 review-ready 的 data-qa-block / data-primary-point 结构"
     ]
   }
 }
@@ -35,23 +40,14 @@
 ```json
 {
   "render_markup_artifact": {
-    "artifact_surface": "prompt_pack_artifact",
-    "binding_model": "slot_hydration_only",
-    "authored_markup_registry": {
-      "xhs.hero_note": "render-artifacts/xhs.hero_note.html",
-      "xhs.split_contrast": "render-artifacts/xhs.split_contrast.html",
-      "xhs.staggered_steps": "render-artifacts/xhs.staggered_steps.html",
-      "xhs.track_rail": "render-artifacts/xhs.track_rail.html",
-      "xhs.evidence_bands": "render-artifacts/xhs.evidence_bands.html",
-      "xhs.checklist_close": "render-artifacts/xhs.checklist_close.html",
-      "xhs.annotated_cards": "render-artifacts/xhs.annotated_cards.html"
-    },
-    "allowed_shell_bindings": [
-      "metadata_attrs",
-      "display_gates",
-      "text_slots",
-      "source_slots"
-    ]
+    "artifact_surface": "codex_cli_json_output",
+    "binding_model": "slides_data_shell_only",
+    "required_review_contract": [
+      "slide_root",
+      "data-qa-block",
+      "data-primary-point"
+    ],
+    "creative_authorship": "ai_first"
   }
 }
 ```

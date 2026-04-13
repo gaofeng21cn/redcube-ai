@@ -267,8 +267,8 @@ export interface XhsRenderSlide {
   speaker_seconds: number;
   total_slides: number;
   creative_sources: {
-    recipe_selection: 'prompt_pack_seed';
-    final_markup: 'prompt_pack_artifact';
+    recipe_selection: 'codex_cli_json_output';
+    final_markup: 'codex_cli_json_output';
   };
   content: string;
 }

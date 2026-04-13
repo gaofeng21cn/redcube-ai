@@ -138,6 +138,12 @@ export interface PosterScreenshotReviewSlide {
     overlaps?: unknown[];
   };
   issues: string[];
+  ai_review?: {
+    slide_id: string;
+    judgement: 'pass' | 'block';
+    visual_findings: string[];
+    recommended_fix: string;
+  };
 }
 
 export interface PosterBaselineReview {
@@ -156,12 +162,39 @@ export interface PosterScreenshotReviewArtifact extends PosterRuntimeArtifactBas
   route: 'screenshot_review';
   mode: PosterRuntimeMode;
   status: 'pass' | 'block';
+  review_execution?: {
+    owner?: string;
+    overlay?: string;
+    generation_runtime?: unknown;
+  };
   checks: PosterRuntimeLatestChecks & {
     overflow_free: boolean;
     occlusion_free: boolean;
     visual_density_ok: boolean;
   };
   slide_reviews: PosterScreenshotReviewSlide[];
+  ai_review?: {
+    review_model: string;
+    director_intent_landed: boolean;
+    anti_template_ok: boolean;
+    message_hierarchy_clear: boolean;
+    weak_regions: string[];
+    review_summary: string;
+    slide_reviews: Array<{
+      slide_id: string;
+      judgement: 'pass' | 'block';
+      visual_findings: string[];
+      recommended_fix: string;
+    }>;
+    creative_sources?: {
+      review_judgement?: unknown;
+    };
+  };
+  mechanical_review?: {
+    review_model: string;
+    checks?: unknown;
+    metrics?: unknown;
+  };
   report_markdown: string;
   metrics: unknown;
   artifact_refs: string[];

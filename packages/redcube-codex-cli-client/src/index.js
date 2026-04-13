@@ -21,7 +21,7 @@ const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const DEFAULT_CODEX_COMMAND = Object.freeze(['codex']);
 const DEFAULT_CODEX_SANDBOX = 'workspace-write';
 const DEFAULT_CODEX_PROBE_TIMEOUT_MS = 60000;
-const DEFAULT_CODEX_GENERATION_TIMEOUT_MS = 300000;
+const DEFAULT_CODEX_GENERATION_TIMEOUT_MS = 600000;
 
 function summarizeError(error) {
   if (error instanceof Error) {
@@ -84,11 +84,51 @@ function terminalUsage(events = []) {
   return terminalEvent?.usage || null;
 }
 
-function buildGenerationInstructions(family, route) {
+function normalizeLocalFileInspection(value) {
+  return (Array.isArray(value) ? value : [])
+    .map((entry) => ({
+      label: safeText(entry?.label, 'local-file'),
+      path: safeText(entry?.path),
+      media_type: safeText(entry?.media_type, 'application/octet-stream'),
+      purpose: safeText(entry?.purpose),
+    }))
+    .filter((entry) => entry.path);
+}
+
+function buildLocalFileInspectionSection(localFileInspection = []) {
+  const entries = normalizeLocalFileInspection(localFileInspection);
+  if (entries.length === 0) {
+    return '';
+  }
+  return [
+    '## Provided Local Files',
+    'Only inspect the local files explicitly listed below.',
+    '',
+    ...entries.flatMap((entry, index) => {
+      const block = [
+        `### File ${index + 1}: ${entry.label}`,
+        `- path: ${entry.path}`,
+      ];
+      if (entry.purpose) {
+        block.push(`- purpose: ${entry.purpose}`);
+      }
+      if (entry.media_type.startsWith('image/')) {
+        block.push(`![${entry.label}](<${entry.path}>)`);
+      }
+      block.push('');
+      return block;
+    }),
+  ].join('\n');
+}
+
+function buildGenerationInstructions(family, route, localFileInspection = []) {
+  const localFiles = normalizeLocalFileInspection(localFileInspection);
   return [
     'You are the RedCube AI Codex-native creative generation runtime.',
     `Produce the ${family}:${route} artifact as audience-facing creative output.`,
-    'Do not use tools or browse external sources.',
+    localFiles.length > 0
+      ? 'You may inspect only the provided local files embedded in this prompt. Do not browse external sources or inspect any other files.'
+      : 'Do not use tools or browse external sources.',
     'Work only from the provided guidance, context, and output contract.',
     'Treat operator meta instructions as production constraints, not deck/note/poster copy.',
     'Never quote internal workflow notes, cover instructions, hidden review rules, or process directives into audience-facing fields.',
@@ -96,8 +136,9 @@ function buildGenerationInstructions(family, route) {
   ].join(' ');
 }
 
-function buildGenerationInput({ family, route, promptRelativePath, context, outputContract }) {
+function buildGenerationInput({ family, route, promptRelativePath, context, outputContract, localFileInspection = [] }) {
   const guidance = readPromptGuidance(promptRelativePath);
+  const localFileSection = buildLocalFileInspectionSection(localFileInspection);
   return [
     '# RedCube Structured Generation',
     '',
@@ -124,6 +165,7 @@ function buildGenerationInput({ family, route, promptRelativePath, context, outp
     JSON.stringify(outputContract, null, 2),
     '```',
     '',
+    ...(localFileSection ? [localFileSection, ''] : []),
     '## Output Rule',
     `Return JSON only between ${REDCUBE_STAGE_JSON_BEGIN} and ${REDCUBE_STAGE_JSON_END}.`,
   ].join('\n');
@@ -374,6 +416,7 @@ export async function generateStructuredArtifactViaCodexCli({
   promptRelativePath,
   context,
   outputContract,
+  localFileInspection = [],
   timeoutMs = DEFAULT_CODEX_GENERATION_TIMEOUT_MS,
   cwd = process.cwd(),
 } = {}) {
@@ -393,10 +436,11 @@ export async function generateStructuredArtifactViaCodexCli({
     promptRelativePath: safePromptRelativePath,
     context,
     outputContract,
+    localFileInspection,
   });
   const execution = runCodexPrompt({
     prompt: [
-      buildGenerationInstructions(safeFamily, safeRoute),
+      buildGenerationInstructions(safeFamily, safeRoute, localFileInspection),
       '',
       input,
     ].join('\n'),

@@ -25,6 +25,9 @@ const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
 const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
+const MIN_REVIEW_QA_BLOCKS = 2;
+const MIN_REVIEW_PRIMARY_POINTS = 1;
+const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   poster_blueprint: 'story_architecture',
@@ -280,6 +283,71 @@ function normalizeStringList(value, label, { min = 1, max = 6 } = {}) {
   return list;
 }
 
+function normalizePosterScreenshotAiSlideReviews(value, mechanicalSlideReviews) {
+  const expectedSlideIds = new Set(mechanicalSlideReviews.map((slide) => slide.slide_id));
+  const reviews = safeArray(value).map((item, index) => {
+    const slideId = requireText(item?.slide_id, `screenshot_review.slide_reviews[${index}].slide_id`);
+    if (!expectedSlideIds.has(slideId)) {
+      throw new Error(`Unexpected poster screenshot_review.slide_reviews[${index}].slide_id: ${slideId}`);
+    }
+    const rawJudgement = safeText(item?.judgement, 'pass');
+    const judgement = rawJudgement === 'revise' ? 'block' : rawJudgement;
+    if (!['pass', 'block'].includes(judgement)) {
+      throw new Error(`Invalid poster screenshot_review.slide_reviews[${index}].judgement: ${rawJudgement}`);
+    }
+    return {
+      slide_id: slideId,
+      judgement,
+      visual_findings: normalizeStringList(
+        item?.visual_findings,
+        `screenshot_review.slide_reviews[${index}].visual_findings`,
+        { min: 1, max: 4 },
+      ),
+      recommended_fix: safeText(item?.recommended_fix, judgement === 'pass' ? 'none' : 'revise_render_html'),
+    };
+  });
+  if (reviews.length !== mechanicalSlideReviews.length) {
+    throw new Error('poster screenshot_review.slide_reviews 必须覆盖全部截图页');
+  }
+  const covered = new Set(reviews.map((item) => item.slide_id));
+  for (const slideId of expectedSlideIds) {
+    if (!covered.has(slideId)) {
+      throw new Error(`Missing poster screenshot_review.slide_reviews entry for ${slideId}`);
+    }
+  }
+  return reviews;
+}
+
+function hasAiVisualPass(aiReview) {
+  return safeText(aiReview?.judgement) === 'pass';
+}
+
+function hasAiVisualBlock(aiReview) {
+  return safeText(aiReview?.judgement) === 'block';
+}
+
+function buildAiFirstVisualSlideReview(slide, aiReview) {
+  const mechanicalIssues = safeArray(slide?.issues);
+  const hardMechanicalIssues = mechanicalIssues.filter((issue) => HARD_SCREENSHOT_BLOCKING_ISSUES.has(issue));
+  const aiIssues = hasAiVisualBlock(aiReview) ? ['ai_visual_risk'] : [];
+  return {
+    ...slide,
+    status: hardMechanicalIssues.length === 0 && aiIssues.length === 0 ? 'pass' : 'block',
+    issues: [...hardMechanicalIssues, ...aiIssues],
+    mechanical_issues: mechanicalIssues,
+    ai_review: aiReview || null,
+  };
+}
+
+function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
+  return safeArray(slideReviews).every((slide) => {
+    if (hasAiVisualPass(slide?.ai_review)) {
+      return true;
+    }
+    return Boolean(slide?.checks?.[checkKey]);
+  });
+}
+
 function requireObjectArray(value, label, { min = 1, max = 6 } = {}) {
   const list = safeArray(value)
     .filter((item) => item && typeof item === 'object')
@@ -443,6 +511,24 @@ function directorReviewOutputContract() {
   };
 }
 
+function screenshotReviewOutputContract() {
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    message_hierarchy_clear: true,
+    weak_regions: ['hero_band'],
+    review_summary: '<string>',
+    slide_reviews: [
+      {
+        slide_id: 'P01',
+        judgement: 'pass',
+        visual_findings: ['<string>'],
+        recommended_fix: 'none',
+      },
+    ],
+  };
+}
+
 function normalizePanel(panel, index) {
   return {
     panel_id: requireText(panel?.panel_id, `poster_blueprint.panels[${index}].panel_id`),
@@ -470,12 +556,59 @@ function escapeHtml(text) {
     .replaceAll("'", '&#39;');
 }
 
+function escapeHtmlAttribute(text) {
+  return String(text || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
 function escapeTemplate(text) {
   return String(text || '').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('${', '\\${');
 }
 
+function countMatches(text, pattern) {
+  const matches = String(text || '').match(pattern);
+  return matches ? matches.length : 0;
+}
+
+function upsertHtmlAttribute(tag, name, value) {
+  const attrPattern = new RegExp(`\\s${name}=(["']).*?\\1`, 'i');
+  const serialized = ` ${name}="${escapeHtmlAttribute(value)}"`;
+  if (attrPattern.test(tag)) {
+    return tag.replace(attrPattern, serialized);
+  }
+  return tag.replace(/\/?>$/, (suffix) => `${serialized}${suffix}`);
+}
+
+function hydrateRenderedSlideRootMetadata(html, metadata, slideId) {
+  const rootTagMatch = String(html || '').match(/<[^>]+data-slide-root=(["'])true\1[^>]*>/i);
+  if (!rootTagMatch) {
+    throw new Error(`poster render_html slide missing data-slide-root=true: ${slideId}`);
+  }
+  let rootTag = rootTagMatch[0];
+  for (const [name, value] of Object.entries(metadata || {})) {
+    if (value === undefined || value === null || value === '') continue;
+    rootTag = upsertHtmlAttribute(rootTag, name, value);
+  }
+  return String(html || '').replace(rootTagMatch[0], rootTag);
+}
+
+function validateRenderedReviewAnchors(html, slideId, familyLabel = 'poster') {
+  const qaBlocks = countMatches(html, /data-qa-block=(["'])[^"']+\1/gi);
+  if (qaBlocks < MIN_REVIEW_QA_BLOCKS) {
+    throw new Error(`${familyLabel} render_html slide missing required data-qa-block anchors: ${slideId}`);
+  }
+  const primaryPoints = countMatches(html, /data-primary-point=(["'])true\1/gi);
+  if (primaryPoints < MIN_REVIEW_PRIMARY_POINTS) {
+    throw new Error(`${familyLabel} render_html slide missing required data-primary-point=true anchor: ${slideId}`);
+  }
+  return html;
+}
+
 function buildHtml({ title, slides, renderPlan, renderStrategy, shellText }) {
-  const slidesLiteral = `\n[${slides.map((slide) => `\n  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
+  const slidesLiteral = `\n[${slides.map((slide) => `\n  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: ${JSON.stringify(slide.layout_family)}, recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', speakerSeconds: 45, peakRegion: ${JSON.stringify(slide.director_contract?.peak_region || '')}, directorRole: ${JSON.stringify(slide.director_contract?.peak_region || '')}, content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
   return shellText
     .replaceAll('__REDCUBE_TITLE__', escapeHtml(title))
     .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
@@ -497,6 +630,9 @@ function validateRenderedPosterHtml(content, slideId) {
   }
   if (/<script\b/i.test(html)) {
     throw new Error(`poster render_html slide contains forbidden script tag: ${slideId}`);
+  }
+  if (/<style\b/i.test(html)) {
+    throw new Error(`poster render_html slide contains forbidden style tag: ${slideId}`);
   }
   return html;
 }
@@ -855,7 +991,8 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
       },
       html_guardrails: [
         '输出完整 4:5 单页 HTML，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
-        '不要使用 renderSlide/layoutByType/cardsGrid/pageType，也不要把模板注册表或内部文档写入 HTML。',
+        '至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
+        '不要使用 renderSlide/layoutByType/cardsGrid/pageType，不要输出 <script>/<style> block，也不要把模板注册表或内部文档写入 HTML。',
         'HTML 必须由 AI 直接创作，不得退化成固定模板 compiler 或 slot 填空产物。',
       ],
     },
@@ -882,8 +1019,8 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
     throw new Error('upstream poster render_html requires poster_blueprint slides');
   }
   const slides = blueprintSlides.map((slide) => {
-    const content = slideHtmlById.get(slide.slide_id);
-    if (!content) {
+    const rawContent = slideHtmlById.get(slide.slide_id);
+    if (!rawContent) {
       throw new Error(`upstream poster render_html missing slide: ${slide.slide_id}`);
     }
     const recipeDecision = creativeSourceStamp({
@@ -898,6 +1035,20 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
       authoredSurface: 'final_html_markup',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
     });
+    const peakRegion = safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band');
+    const content = validateRenderedReviewAnchors(
+      hydrateRenderedSlideRootMetadata(rawContent, {
+        'data-title': slide.title,
+        'data-layout-family': slide.layout_family,
+        'data-speaker-seconds': 45,
+        'data-recipe-id': slide.render_recipe_id,
+        'data-template-id': 'upstream_ai_html',
+        'data-peak-region': peakRegion,
+        'data-director-role': peakRegion,
+      }, slide.slide_id),
+      slide.slide_id,
+      'poster',
+    );
     return {
       slide_id: slide.slide_id,
       title: slide.title,
@@ -905,7 +1056,7 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
       recipe_id: slide.render_recipe_id,
       template_id: 'upstream_ai_html',
       director_contract: {
-        peak_region: safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band'),
+        peak_region: peakRegion,
         poster_motif: safeText(visualArtifact?.visual_direction?.poster_motif),
         panel_emphasis: visualArtifact?.visual_direction?.panel_emphasis || {},
         anti_template_constraints: safeArray(visualArtifact?.visual_direction?.anti_template_constraints),
@@ -1113,6 +1264,90 @@ async function buildDirectorReview(contract, deliverablePaths) {
   };
 }
 
+function buildScreenshotReviewMarkdown(contract, reviewArtifact) {
+  const lines = [
+    `# ${contract.title} 视觉质控`,
+    '',
+    '- review_owner: codex_native_host_agent',
+    `- 状态: ${reviewArtifact.status}`,
+    `- director_intent_landed: ${reviewArtifact.checks.director_intent_landed}`,
+    `- anti_template_ok: ${reviewArtifact.checks.anti_template_ok}`,
+    `- message_hierarchy_clear: ${reviewArtifact.checks.message_hierarchy_clear}`,
+    `- overflow_free: ${reviewArtifact.checks.overflow_free}`,
+    `- occlusion_free: ${reviewArtifact.checks.occlusion_free}`,
+    `- visual_density_ok: ${reviewArtifact.checks.visual_density_ok}`,
+    '',
+    '## AI 审阅结论',
+    `- review_model: ${safeText(reviewArtifact.ai_review?.review_model)}`,
+    `- weak_regions: ${safeArray(reviewArtifact.ai_review?.weak_regions).join(', ') || 'none'}`,
+    `- review_summary: ${safeText(reviewArtifact.ai_review?.review_summary)}`,
+    '',
+    '## 分页记录',
+  ];
+  for (const slide of safeArray(reviewArtifact.slide_reviews)) {
+    lines.push(`- ${safeText(slide.slide_id)} / ${safeText(slide.status)} / ${safeText(slide.screenshot_file)}`);
+    if (slide.ai_review) {
+      lines.push(`  - AI judgement: ${safeText(slide.ai_review.judgement)}`);
+      lines.push(`  - AI findings: ${safeArray(slide.ai_review.visual_findings).join('；')}`);
+      lines.push(`  - Recommended fix: ${safeText(slide.ai_review.recommended_fix, 'none')}`);
+    }
+  }
+  if (reviewArtifact.baseline_review?.summary) {
+    lines.push('', '## Baseline Relative Review', safeText(reviewArtifact.baseline_review.summary));
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+async function generateScreenshotReviewDraft(contract, deliverablePaths, slideReviews, reviewPayload, mode) {
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  return generateStructuredArtifactViaCodexCli({
+    family: 'poster_onepager',
+    route: 'screenshot_review',
+    promptRelativePath: promptRoute(contract, 'screenshot_review'),
+    context: {
+      ...buildAuthoringContext(contract),
+      mode,
+      storyline: storylineArtifact?.storyline || null,
+      blueprint: {
+        slides: safeArray(blueprintArtifact?.poster_blueprint?.slides).map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          render_recipe_id: slide.render_recipe_id,
+          panels: summarizePanels(slide),
+        })),
+      },
+      visual_direction: visualArtifact?.visual_direction || null,
+      director_review: directorReviewArtifact?.visual_director_review || null,
+      screenshot_mechanics: {
+        overall_checks: reviewPayload?.checks || null,
+        metrics: reviewPayload?.metrics || null,
+        baseline: reviewPayload?.baseline || null,
+        slides: slideReviews.map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          status: slide.status,
+          issues: slide.issues,
+          occupied_ratio: slide.metrics?.occupied_ratio ?? null,
+          primary_points: slide.metrics?.primary_points ?? null,
+        })),
+      },
+    },
+    outputContract: screenshotReviewOutputContract(),
+    localFileInspection: slideReviews.map((slide, index) => ({
+      label: `${slide.slide_id} ${safeText(slide.title, `Poster ${index + 1}`)}`.trim(),
+      path: slide.screenshot_file,
+      media_type: 'image/png',
+      purpose: `Review rendered poster screenshot for ${slide.slide_id}`,
+    })),
+    cwd: deliverablePaths.deliverableDir,
+  });
+}
+
 function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, slideReviews) {
   const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
   const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -1147,7 +1382,7 @@ function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, sl
   };
 }
 
-function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId) {
+async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId) {
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
@@ -1166,7 +1401,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
     args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
   }
   const python = runPython(PYTHON_REVIEW, args);
-  const slideReviews = safeArray(python.slide_reviews).map((slide) => {
+  const mechanicalSlideReviews = safeArray(python.slide_reviews).map((slide) => {
     const occupiedRatio = Number(slide?.metrics?.occupied_ratio || 0);
     const overlaps = safeArray(slide?.metrics?.overlaps);
     const overflowFree = Boolean(slide?.checks?.overflow_free);
@@ -1195,13 +1430,31 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
       issues,
     };
   });
+  const { data, generationRuntime } = await generateScreenshotReviewDraft(
+    contract,
+    deliverablePaths,
+    mechanicalSlideReviews,
+    python,
+    mode,
+  );
+  const aiWeakRegions = normalizeStringList(data?.weak_regions, 'screenshot_review.weak_regions', { min: 0, max: 4 });
+  const aiSlideReviews = normalizePosterScreenshotAiSlideReviews(data?.slide_reviews, mechanicalSlideReviews);
+  const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
+  const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
+    slide,
+    aiSlideReviewMap.get(slide.slide_id),
+  ));
   const checks = {
-    director_intent_landed: Boolean(directorReview?.visual_director_review?.director_intent_landed),
-    anti_template_ok: Boolean(directorReview?.visual_director_review?.anti_template_ok),
-    message_hierarchy_clear: Boolean(directorReview?.visual_director_review?.message_hierarchy_clear),
+    director_intent_landed: Boolean(directorReview?.visual_director_review?.director_intent_landed)
+      && Boolean(data?.director_intent_landed),
+    anti_template_ok: Boolean(directorReview?.visual_director_review?.anti_template_ok)
+      && Boolean(data?.anti_template_ok),
+    message_hierarchy_clear: Boolean(directorReview?.visual_director_review?.message_hierarchy_clear)
+      && Boolean(data?.message_hierarchy_clear),
+    ai_review_passed: slideReviews.every((slide) => !hasAiVisualBlock(slide?.ai_review)),
     overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
-    occlusion_free: slideReviews.every((slide) => slide.checks.occlusion_free),
-    visual_density_ok: slideReviews.every((slide) => slide.checks.visual_density_ok),
+    occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
+    visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
   };
   const failedChecks = Object.entries(checks)
     .filter(([, value]) => value === false)
@@ -1212,17 +1465,40 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
   const artifact = {
     ...attachCommon('screenshot_review', contract),
     review_overlay: 'screenshot_review',
-    review_authorship: {
-      primary_surface: 'governed_screenshot_review',
-      contract_asset: 'python_review_pipeline',
+    review_authorship: reviewAuthorship('screenshot_review'),
+    review_execution: {
+      ...creativeExecution('screenshot_review', generationRuntime),
+      overlay: 'screenshot_review',
     },
     mode,
     status: failedChecks.length === 0 ? 'pass' : 'block',
     checks,
     slide_reviews: slideReviews,
-    report_markdown: python.review_markdown || reviewMarkdown,
+    ai_review: {
+      review_model: 'screenshot_director_first_visual_judgement',
+      director_intent_landed: Boolean(data?.director_intent_landed),
+      anti_template_ok: Boolean(data?.anti_template_ok),
+      message_hierarchy_clear: Boolean(data?.message_hierarchy_clear),
+      weak_regions: aiWeakRegions,
+      review_summary: requireText(data?.review_summary, 'screenshot_review.review_summary'),
+      slide_reviews: aiSlideReviews,
+      creative_sources: {
+        review_judgement: creativeSourceStamp({
+          route: 'screenshot_review',
+          lifecycleStage: 'review_overlay',
+          authoredSurface: 'screenshot_review_decision',
+          materializedFrom: CREATIVE_MATERIALIZED_FROM,
+        }),
+      },
+    },
+    mechanical_review: {
+      review_model: 'python_screenshot_layout_checks',
+      checks: python.checks,
+      metrics: python.metrics,
+    },
+    report_markdown: reviewMarkdown,
     metrics: python.metrics,
-    artifact_refs: [python.review_markdown || reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)].filter(Boolean),
+    artifact_refs: [reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)].filter(Boolean),
     review_state_patch: {
       current_status: failedChecks.length === 0 ? 'export_ready' : 'blocked_for_revision',
       ready_for_export: failedChecks.length === 0,
@@ -1254,6 +1530,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
       };
     }
   }
+  writeText(reviewMarkdown, buildScreenshotReviewMarkdown(contract, artifact));
   return artifact;
 }
 
@@ -1329,7 +1606,7 @@ export async function runPosterOnepagerRoute({ workspaceRoot, topicId, deliverab
       payload = await buildDirectorReview(contract, deliverablePaths);
       break;
     case 'screenshot_review':
-      payload = buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId);
+      payload = await buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId);
       break;
     case 'export_bundle':
       payload = buildExportBundle(contract, deliverablePaths);

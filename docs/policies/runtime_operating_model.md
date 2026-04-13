@@ -106,7 +106,7 @@
 
 - `research` 属于 shared source readiness / source augmentation，不应继续被理解成小红书专属 creative stage
 - `Story Architecture` 与 `Visual Authorship` 必须以 agent / director 为主要创作责任面
-- `screenshot_review` 允许代码主导技术质控，但 `visual_director_review` 不能继续长期退化成纯 heuristic gate
+- `screenshot_review` 现在采用 AI-first review overlay：代码只负责截图与机械指标，最终截图审稿必须由 Codex 直接读图完成；`visual_director_review` 同样不能退化成纯 heuristic gate
 - 当前优先级是先统一生命周期语义与职责边界，再决定是否收敛 route naming
 
 ## 当前正式能力面

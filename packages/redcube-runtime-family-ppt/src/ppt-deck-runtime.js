@@ -2,6 +2,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -78,9 +79,14 @@ const STAGE_REQUIREMENTS = Object.freeze({
   export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
 });
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
+const RENDER_HTML_BATCH_SIZE = 3;
+const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
+const MIN_REVIEW_QA_BLOCKS = 2;
+const MIN_REVIEW_PRIMARY_POINTS = 1;
+const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   detailed_outline: 'story_architecture',
@@ -139,12 +145,23 @@ const PPT_PAGE_LIBRARY = Object.freeze([
 ]);
 const ALLOWED_RECIPE_IDS = new Set(PPT_PAGE_LIBRARY.map((item) => item.render_recipe_id));
 
-function safeText(value) {
-  return String(value || '').trim();
+function safeText(value, fallback = '') {
+  const text = String(value ?? '').replace(/\uFFFD+/g, '').trim();
+  return text || fallback;
 }
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function chunkArray(items, size) {
+  const source = safeArray(items);
+  const batchSize = Math.max(Number(size) || 1, 1);
+  const batches = [];
+  for (let index = 0; index < source.length; index += batchSize) {
+    batches.push(source.slice(index, index + batchSize));
+  }
+  return batches;
 }
 
 function normalizeInlineText(value, maxLength = 220) {
@@ -158,12 +175,59 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;');
 }
 
+function escapeHtmlAttribute(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function escapeTemplate(text) {
   return String(text || '').replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
 }
 
+function countMatches(text, pattern) {
+  const matches = String(text || '').match(pattern);
+  return matches ? matches.length : 0;
+}
+
+function upsertHtmlAttribute(tag, name, value) {
+  const attrPattern = new RegExp(`\\s${name}=(["']).*?\\1`, 'i');
+  const serialized = ` ${name}="${escapeHtmlAttribute(value)}"`;
+  if (attrPattern.test(tag)) {
+    return tag.replace(attrPattern, serialized);
+  }
+  return tag.replace(/\/?>$/, (suffix) => `${serialized}${suffix}`);
+}
+
+function hydrateRenderedSlideRootMetadata(html, metadata, slideId) {
+  const rootTagMatch = String(html || '').match(/<[^>]+data-slide-root=(["'])true\1[^>]*>/i);
+  if (!rootTagMatch) {
+    throw new Error(`ppt render_html slide missing data-slide-root=true: ${slideId}`);
+  }
+  let rootTag = rootTagMatch[0];
+  for (const [name, value] of Object.entries(metadata || {})) {
+    if (value === undefined || value === null || value === '') continue;
+    rootTag = upsertHtmlAttribute(rootTag, name, value);
+  }
+  return String(html || '').replace(rootTagMatch[0], rootTag);
+}
+
+function validateRenderedReviewAnchors(html, slideId, familyLabel = 'ppt') {
+  const qaBlocks = countMatches(html, /data-qa-block=(["'])[^"']+\1/gi);
+  if (qaBlocks < MIN_REVIEW_QA_BLOCKS) {
+    throw new Error(`${familyLabel} render_html slide missing required data-qa-block anchors: ${slideId}`);
+  }
+  const primaryPoints = countMatches(html, /data-primary-point=(["'])true\1/gi);
+  if (primaryPoints < MIN_REVIEW_PRIMARY_POINTS) {
+    throw new Error(`${familyLabel} render_html slide missing required data-primary-point=true anchor: ${slideId}`);
+  }
+  return html;
+}
+
 function buildDeckHtml({ title, slidesMarkup, renderPlan, renderStrategy, shellText }) {
-  const slidesLiteral = `\n[${slidesMarkup.map((slide) => `\n  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
+  const slidesLiteral = `\n[${slidesMarkup.map((slide) => `\n  { slideId: '${slide.slide_id}', slideNo: ${Number(slide.slide_no || 0)}, title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', speakerSeconds: ${Number(slide.speaker_seconds || 0)}, peakPage: ${slide.director_contract?.peak_page ? 'true' : 'false'}, directorRole: ${JSON.stringify(slide.director_contract?.director_role || '')}, content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
   return shellText
     .replaceAll('__PPT_DECK_TITLE__', escapeHtml(title))
     .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
@@ -188,6 +252,317 @@ function writeText(file, content) {
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function sanitizeWorkbenchSegment(value, fallback = 'deliverable') {
+  const text = safeText(value, fallback)
+    .replace(/[\\/:*?"<>|]/g, ' ')
+    .replace(/[：]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text || fallback;
+}
+
+function workbenchTaskDirCandidates(contract, deliverableId) {
+  return [...new Set([
+    sanitizeWorkbenchSegment(contract?.title, deliverableId),
+    sanitizeWorkbenchSegment(deliverableId, 'deliverable'),
+  ])];
+}
+
+function resolveWorkbenchTaskDir({ workspaceRoot, contract, deliverableId }) {
+  const existing = workbenchTaskDirCandidates(contract, deliverableId)
+    .map((candidate) => path.join(workspaceRoot, candidate))
+    .find((candidate) => existsSync(candidate));
+  return existing || path.join(workspaceRoot, workbenchTaskDirCandidates(contract, deliverableId)[0]);
+}
+
+function getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId }) {
+  const taskDir = resolveWorkbenchTaskDir({ workspaceRoot, contract, deliverableId });
+  const chapterBaseName = sanitizeWorkbenchSegment(contract?.title, deliverableId);
+  return {
+    taskDir,
+    chapterBaseName,
+    storylineFile: path.join(taskDir, '故事主线.md'),
+    detailedOutlineFile: path.join(taskDir, '详细大纲.md'),
+    outlineDir: path.join(taskDir, '大纲'),
+    blueprintFile: path.join(taskDir, '大纲', `${chapterBaseName}.md`),
+    visualDirectionFile: path.join(taskDir, '大纲', `${chapterBaseName}_视觉导演稿.md`),
+    slidesDir: path.join(taskDir, '幻灯片'),
+    htmlFile: path.join(taskDir, '幻灯片', `${chapterBaseName}.html`),
+    screenshotReviewFile: path.join(taskDir, '幻灯片', `${chapterBaseName}_视觉质控.md`),
+    pptxDir: path.join(taskDir, 'pptx'),
+    pptxFile: path.join(taskDir, 'pptx', `${chapterBaseName}.pptx`),
+    pdfFile: path.join(taskDir, 'pptx', `${chapterBaseName}.pdf`),
+    presenterNotesFile: path.join(taskDir, 'pptx', `${chapterBaseName}-presenter-notes.md`),
+    referencesDir: path.join(taskDir, '参考材料'),
+    referenceIndexFile: path.join(taskDir, '参考材料', '来源索引.md'),
+  };
+}
+
+function ensureWorkbenchSurface(paths) {
+  ensureDir(paths.taskDir);
+  ensureDir(paths.outlineDir);
+  ensureDir(paths.slidesDir);
+  ensureDir(paths.pptxDir);
+  ensureDir(paths.referencesDir);
+}
+
+function sourceIndexEntries(contract) {
+  return safeArray(sharedSourceTruth(contract)?.source_index?.sources)
+    .filter((source) => source?.status === 'ready' && !isOperatorContextMaterial(source))
+    .map((source) => ({
+      source_id: safeText(source.source_id),
+      title: safeText(source.title),
+      relative_path: safeText(source.relative_path),
+      kind: safeText(source.kind),
+    }));
+}
+
+function buildWorkbenchReferenceIndex(contract) {
+  const lines = [
+    '# 来源索引',
+    '',
+    `- 讲题：${safeText(contract?.title)}`,
+    `- 交付目标：${safeText(contract?.goal)}`,
+    '',
+  ];
+  const entries = sourceIndexEntries(contract);
+  if (entries.length === 0) {
+    lines.push('- 当前没有 audience-facing 来源文件。');
+    return `${lines.join('\n')}\n`;
+  }
+  lines.push('## Audience-facing 来源');
+  for (const entry of entries) {
+    lines.push(`- ${entry.source_id || entry.kind || 'SRC'}：${entry.title || entry.relative_path || entry.kind}`);
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function markdownList(items = [], ordered = false) {
+  return safeArray(items)
+    .map((item, index) => `${ordered ? `${index + 1}.` : '-'} ${safeText(item)}`)
+    .join('\n');
+}
+
+function buildWorkbenchStorylineMarkdown(contract, artifact) {
+  const storyline = artifact?.storyline || {};
+  const narrative = storyline?.narrative_arc || {};
+  return [
+    `# ${safeText(contract.title)} 故事主线`,
+    '',
+    '## 讲者与课堂契约',
+    `- 讲者：${safeText(storyline.speaker)}`,
+    `- 听众：${safeText(storyline.audience)}`,
+    `- 目标：${safeText(storyline.goal || contract.goal)}`,
+    `- 风格：${safeText(storyline.style)}`,
+    '',
+    '## 核心隐喻',
+    safeText(storyline.core_metaphor),
+    '',
+    '## Hook',
+    markdownList(narrative.hook),
+    '',
+    '## Journey',
+    markdownList(narrative.journey, true),
+    '',
+    '## Resolution',
+    markdownList(narrative.resolution),
+    '',
+    '## 事实锚点',
+    `- 主题摘要：${safeText(storyline.fact_library_summary)}`,
+    `- 来源充分性：${safeText(storyline.source_sufficiency_judgement)}`,
+    `- 深调状态：${safeText(storyline.deep_research_state)}`,
+    '',
+  ].join('\n');
+}
+
+function buildWorkbenchDetailedOutlineMarkdown(contract, artifact) {
+  const outline = artifact?.detailed_outline || {};
+  const slides = safeArray(outline.slides);
+  const lines = [
+    `# ${safeText(contract.title)} 详细大纲`,
+    '',
+    `- 总页数：${safeText(outline?.page_budget?.total_slides, String(slides.length))}`,
+    `- 交付目标：${safeText(contract.goal)}`,
+    '',
+    '## 章节结构',
+  ];
+  for (const chapter of safeArray(outline.chapter_structure)) {
+    lines.push(`- ${safeText(chapter.chapter_id)}｜${safeText(chapter.title)}｜${safeText(chapter.slide_range)}`);
+  }
+  lines.push('', '## 逐页预算');
+  for (const slide of slides) {
+    lines.push(`### 幻灯片 ${safeText(slide.slide_no)} ${safeText(slide.title)}`);
+    lines.push(`- 页面类型：${safeText(slide.page_type)}`);
+    lines.push(`- 本页目标：${safeText(slide.page_goal)}`);
+    lines.push(`- 核心句：${safeText(slide.core_sentence)}`);
+    lines.push('- 证据点：');
+    for (const point of safeArray(slide.evidence_points)) {
+      lines.push(`  - ${safeText(point)}`);
+    }
+    lines.push('- 公开来源：');
+    for (const source of safeArray(slide.public_sources)) {
+      lines.push(`  - ${safeText(source)}`);
+    }
+    lines.push(`- 过渡句：${safeText(slide.transition_sentence)}`);
+    lines.push('');
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function buildWorkbenchBlueprintMarkdown(contract, artifact) {
+  const blueprint = artifact?.slide_blueprint || {};
+  const slides = safeArray(blueprint.slides);
+  const lines = [
+    `# ${safeText(contract.title)}（Slides 01-${String(slides.length).padStart(2, '0')}）`,
+    '',
+    '## 本章目标',
+    `- ${safeText(blueprint.chapter_goal)}`,
+    `- ${safeText(contract.goal)}`,
+    '',
+    '---',
+    '',
+  ];
+  for (const slide of slides) {
+    lines.push(`幻灯片: ${String(slide.slide_no).padStart(2, '0')}`);
+    lines.push(`页面类型: ${safeText(slide.page_type)}`);
+    lines.push(`标题: ${safeText(slide.title)}`);
+    lines.push(`本页目标: ${safeText(slide.page_goal)}`);
+    lines.push('');
+    lines.push('页面核心内容:');
+    safeArray(slide.page_core_content).forEach((item, index) => {
+      lines.push(`- 模块${index + 1}：${safeText(item?.text)}`);
+    });
+    lines.push('');
+    lines.push('视觉呈现方式:');
+    lines.push(`- 布局：${safeText(slide.visual_presentation?.layout_family)}`);
+    lines.push(`- 图表：${safeText(slide.render_recipe_id)}`);
+    lines.push(`- 配色：以视觉导演稿统一冻结，本页先保证 ${safeArray(slide.visual_presentation?.anchor_tracks).join(' / ')}`);
+    lines.push(`- 素材引用方式：${safeArray(slide.evidence_and_sources).map((item) => safeText(item?.public_label)).filter(Boolean).join('；') || '按页放置公开来源芯片'}`);
+    lines.push('');
+    lines.push('角标与标识策略:');
+    lines.push('- 页眉/页码：按页控制；默认右下角页码');
+    lines.push('- 署名：默认封面显示，正文按页判断');
+    lines.push('- 来源文字：仅证据页显示');
+    lines.push('');
+    lines.push('是否需要外部公开证据:');
+    lines.push(`- ${safeArray(slide.evidence_and_sources).length > 0 ? '需要' : '不需要'}`);
+    lines.push(`- 若需要：${safeArray(slide.evidence_and_sources).length > 0 ? '公开论文 / 综述 / 指南 / 项目文档' : 'none'}`);
+    lines.push('');
+    lines.push('证据与图源:');
+    safeArray(slide.evidence_and_sources).forEach((item, index) => {
+      lines.push(`- 来源${index + 1}：${safeText(item?.public_label)}`);
+    });
+    lines.push('');
+    lines.push('讲稿:');
+    lines.push(safeText(slide.speaker_notes));
+    lines.push('');
+    lines.push('过渡句:');
+    lines.push(safeText(slide.transition_sentence));
+    lines.push('', '---', '');
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function buildWorkbenchVisualDirectionMarkdown(contract, artifact) {
+  const visual = artifact?.visual_direction || {};
+  const lines = [
+    `# ${safeText(contract.title)}视觉导演稿`,
+    '',
+    '## 本章视觉宣言',
+    `- 这一章像什么：${safeArray(visual.what_it_is).join(' / ')}`,
+    `- 这一章不像什么：${safeArray(visual.what_it_is_not).join(' / ')}`,
+    `- 目标气质：${safeText(visual.visual_manifest)}`,
+    `- 默认退化风险：${safeArray(visual.forbidden_regressions).join(' / ')}`,
+    '',
+    '## 全章视觉总控',
+    `- 视觉母题：${safeText(visual.visual_manifest)}`,
+    `- 标题色 / 结论色 / 警示色：${safeText(visual.palette?.ink)} / ${safeText(visual.palette?.accent)} / ${safeText(visual.palette?.success)}`,
+    `- 允许元素：${safeArray(visual.what_it_is).join(' / ')}`,
+    `- 禁止元素：${safeArray(visual.what_it_is_not).join(' / ')}`,
+    `- 页间连续性约束：${safeArray(visual.continuity_constraints).join('；')}`,
+    `- 节奏曲线：${safeArray(visual.rhythm_curve).map((item) => `${safeText(item.slide_id)}=${safeText(item.role)}`).join('；')}`,
+    `- 必须破格的关键页：${safeArray(visual.peak_pages).join(' / ')}`,
+    `- 页面家族上限：${Object.entries(visual.page_family_ceiling || {}).map(([key, value]) => `${key}:${value}`).join('；')}`,
+    '',
+    '## 分页视觉角色表',
+    '| 幻灯片 | 页面角色 | 首眼抓取点 | 第二视线 | 禁退化语法 |',
+    '|---|---|---|---|---|',
+  ];
+  for (const row of safeArray(visual.page_role_table)) {
+    lines.push(`| ${safeText(row.slide_id)} | ${safeText(row.page_role)} | ${safeText(row.first_glance)} | ${safeText(row.second_glance)} | ${safeArray(visual.forbidden_regressions).slice(0, 2).join(' / ')} |`);
+  }
+  lines.push('', '## 给 HTML 生成器的最终指令');
+  for (const instruction of safeArray(visual.final_instruction_to_html_generator)) {
+    lines.push(`- ${safeText(instruction)}`);
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function copyWorkbenchFile(source, destination) {
+  if (!safeText(source) || !existsSync(source)) return null;
+  ensureDir(path.dirname(destination));
+  cpSync(source, destination);
+  return destination;
+}
+
+function syncPptWorkbenchSurface({ workspaceRoot, contract, deliverableId, route, payload }) {
+  const paths = getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId });
+  ensureWorkbenchSurface(paths);
+  const refs = [];
+  writeText(paths.referenceIndexFile, buildWorkbenchReferenceIndex(contract));
+  refs.push(paths.referenceIndexFile);
+  switch (route) {
+    case 'storyline':
+      writeText(paths.storylineFile, buildWorkbenchStorylineMarkdown(contract, payload));
+      refs.push(paths.storylineFile);
+      break;
+    case 'detailed_outline':
+      writeText(paths.detailedOutlineFile, buildWorkbenchDetailedOutlineMarkdown(contract, payload));
+      refs.push(paths.detailedOutlineFile);
+      break;
+    case 'slide_blueprint':
+      writeText(paths.blueprintFile, buildWorkbenchBlueprintMarkdown(contract, payload));
+      refs.push(paths.blueprintFile);
+      break;
+    case 'visual_direction':
+      writeText(paths.visualDirectionFile, buildWorkbenchVisualDirectionMarkdown(contract, payload));
+      refs.push(paths.visualDirectionFile);
+      break;
+    case 'render_html': {
+      const htmlRef = copyWorkbenchFile(payload?.html_bundle?.html_file, paths.htmlFile);
+      if (htmlRef) refs.push(htmlRef);
+      break;
+    }
+    case 'screenshot_review': {
+      const reviewRef = copyWorkbenchFile(payload?.report_markdown, paths.screenshotReviewFile);
+      if (reviewRef) refs.push(reviewRef);
+      break;
+    }
+    case 'export_pptx': {
+      const pptxRef = copyWorkbenchFile(payload?.export_bundle?.pptx_file, paths.pptxFile);
+      const pdfRef = copyWorkbenchFile(payload?.export_bundle?.pdf_file, paths.pdfFile);
+      const notesRef = copyWorkbenchFile(payload?.export_bundle?.presenter_notes_file, paths.presenterNotesFile);
+      if (pptxRef) refs.push(pptxRef);
+      if (pdfRef) refs.push(pdfRef);
+      if (notesRef) refs.push(notesRef);
+      break;
+    }
+    default:
+      break;
+  }
+  return refs;
+}
+
+function appendArtifactRefs(payload, extraRefs) {
+  if (safeArray(extraRefs).length === 0) {
+    return payload;
+  }
+  return {
+    ...payload,
+    artifact_refs: [...new Set([...safeArray(payload?.artifact_refs), ...extraRefs])],
+  };
 }
 
 function stageArtifactPath(contract, deliverablePaths, stageId) {
@@ -383,6 +758,26 @@ function sharedSourceAudience(contract, fallback) {
   return safeText(fallback, '专业听众');
 }
 
+function resolveSpeakerIdentity(contract, fallback) {
+  const operatorCorpus = sharedOperatorMaterials(contract)
+    .map((material) => material?.content_text || material?.excerpt || '')
+    .join('\n');
+  const patterns = [
+    /讲者署名[:：]\s*([^\n]+)/i,
+    /署名[:：]\s*([^\n]+)/i,
+    /讲者[:：]\s*([^\n]+)/i,
+    /speaker(?:_identity|_signature|_name)?[:：]\s*([^\n]+)/i,
+  ];
+  for (const pattern of patterns) {
+    const match = operatorCorpus.match(pattern);
+    const candidate = safeText(match?.[1] || '');
+    if (candidate) {
+      return candidate.replace(/\s+/g, ' ').trim();
+    }
+  }
+  return safeText(fallback, '正式讲者');
+}
+
 function extraChecks(contract) {
   const required = safeArray(contract?.review_surface?.required_checks);
   return required.filter((check) => !['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok'].includes(check));
@@ -537,6 +932,71 @@ function normalizeStringList(value, label, { min = 1, max = 6 } = {}) {
     throw new Error(`Missing ${label} in upstream ppt generation output`);
   }
   return list;
+}
+
+function normalizePptScreenshotAiSlideReviews(value, mechanicalSlideReviews) {
+  const expectedSlideIds = new Set(mechanicalSlideReviews.map((slide) => slide.slide_id));
+  const reviews = safeArray(value).map((item, index) => {
+    const slideId = requireText(item?.slide_id, `screenshot_review.slide_reviews[${index}].slide_id`);
+    if (!expectedSlideIds.has(slideId)) {
+      throw new Error(`Unexpected screenshot_review.slide_reviews[${index}].slide_id: ${slideId}`);
+    }
+    const rawJudgement = safeText(item?.judgement, 'pass');
+    const judgement = rawJudgement === 'revise' ? 'block' : rawJudgement;
+    if (!['pass', 'block'].includes(judgement)) {
+      throw new Error(`Invalid screenshot_review.slide_reviews[${index}].judgement: ${rawJudgement}`);
+    }
+    return {
+      slide_id: slideId,
+      judgement,
+      visual_findings: normalizeStringList(
+        item?.visual_findings,
+        `screenshot_review.slide_reviews[${index}].visual_findings`,
+        { min: 1, max: 4 },
+      ),
+      recommended_fix: safeText(item?.recommended_fix, judgement === 'pass' ? 'none' : 'revise_render_html'),
+    };
+  });
+  if (reviews.length !== mechanicalSlideReviews.length) {
+    throw new Error('screenshot_review.slide_reviews 必须覆盖全部截图页');
+  }
+  const covered = new Set(reviews.map((item) => item.slide_id));
+  for (const slideId of expectedSlideIds) {
+    if (!covered.has(slideId)) {
+      throw new Error(`Missing screenshot_review.slide_reviews entry for ${slideId}`);
+    }
+  }
+  return reviews;
+}
+
+function hasAiVisualPass(aiReview) {
+  return safeText(aiReview?.judgement) === 'pass';
+}
+
+function hasAiVisualBlock(aiReview) {
+  return safeText(aiReview?.judgement) === 'block';
+}
+
+function buildAiFirstVisualSlideReview(slide, aiReview) {
+  const mechanicalIssues = safeArray(slide?.issues);
+  const hardMechanicalIssues = mechanicalIssues.filter((issue) => HARD_SCREENSHOT_BLOCKING_ISSUES.has(issue));
+  const aiIssues = hasAiVisualBlock(aiReview) ? ['ai_visual_risk'] : [];
+  return {
+    ...slide,
+    status: hardMechanicalIssues.length === 0 && aiIssues.length === 0 ? 'pass' : 'block',
+    issues: [...hardMechanicalIssues, ...aiIssues],
+    mechanical_issues: mechanicalIssues,
+    ai_review: aiReview || null,
+  };
+}
+
+function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
+  return safeArray(slideReviews).every((slide) => {
+    if (hasAiVisualPass(slide?.ai_review)) {
+      return true;
+    }
+    return Boolean(slide?.checks?.[checkKey]);
+  });
 }
 
 function normalizePageCoreContent(value, label) {
@@ -781,6 +1241,12 @@ function renderHtmlOutputContract() {
   };
 }
 
+function renderHtmlSummaryOutputContract() {
+  return {
+    render_summary: ['<string>', '<string>'],
+  };
+}
+
 function directorReviewOutputContract() {
   return {
     director_intent_landed: true,
@@ -794,13 +1260,47 @@ function directorReviewOutputContract() {
   };
 }
 
+function screenshotReviewOutputContract() {
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: ['S06'],
+    review_summary: '<string>',
+  };
+}
+
+function screenshotReviewSlideBatchOutputContract() {
+  return {
+    slide_reviews: [
+      {
+        slide_id: 'S01',
+        judgement: 'pass',
+        visual_findings: ['<string>'],
+        recommended_fix: 'none',
+      },
+    ],
+  };
+}
+
+function screenshotReviewSummaryOutputContract() {
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: ['S06'],
+    review_summary: '<string>',
+  };
+}
+
 function buildAuthoringContext(contract) {
   const preset = deckPreset(contract.profile_id);
+  const speakerIdentity = resolveSpeakerIdentity(contract, preset.speaker);
   return {
     title: safeText(contract.title),
     delivery_goal: safeText(contract.goal),
     profile_id: contract.profile_id,
-    speaker: preset.speaker,
+    speaker: speakerIdentity,
+    speaker_signature: speakerIdentity,
+    speaker_role: preset.speaker,
     audience: sharedSourceAudience(contract, preset.audience),
     promise: preset.promise,
     page_budget: pageBudget(contract.profile_id),
@@ -830,6 +1330,7 @@ function buildAuthoringContext(contract) {
       }))
       .filter((item) => item.excerpt),
     authoring_guardrails: [
+      '如果 operator_playbook 提供了具名讲者署名，speaker / speaker_signature 必须保留 exact identity，不得泛化成“同行讲者”“正式讲者”等占位标签',
       'delivery_goal 只表示制作目标，不得原样进入 slide 标题、正文、讲稿或视觉宣言',
       '不要把“封面必须署名”“重点回答三件事”“先讲什么后讲什么”等系统操作说明写成 audience-facing 内容',
       'operator_playbook 只作为制作约束，不得被改写成课堂正文、标题、来源或讲稿台词',
@@ -999,6 +1500,64 @@ function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
 }
 
+function summarizeRenderRevisionSlideFeedback(reviewArtifact) {
+  const slideReviews = safeArray(reviewArtifact?.slide_reviews).length > 0
+    ? safeArray(reviewArtifact?.slide_reviews)
+    : safeArray(reviewArtifact?.ai_review?.slide_reviews).map((slide) => ({
+        ...slide,
+        ai_review: slide?.ai_review && typeof slide.ai_review === 'object'
+          ? slide.ai_review
+          : {
+              judgement: safeText(slide?.judgement),
+              visual_findings: safeArray(slide?.visual_findings),
+              recommended_fix: safeText(slide?.recommended_fix),
+            },
+      }));
+  return slideReviews
+    .filter((slide) => safeText(slide?.status) === 'block' || safeText(slide?.ai_review?.judgement) === 'block')
+    .map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      title: safeText(slide?.title),
+      blocked_checks: safeArray(slide?.issues),
+      ai_findings: safeArray(slide?.ai_review?.visual_findings).map((item) => normalizeInlineText(item, 220)),
+      recommended_fix: normalizeInlineText(slide?.ai_review?.recommended_fix, 220),
+    }))
+    .filter((slide) => slide.slide_id);
+}
+
+function buildRenderRevisionContext(contract, deliverablePaths) {
+  const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  const screenshotReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+  const directorSummary = directorReviewArtifact?.visual_director_review
+    ? {
+        status: safeText(directorReviewArtifact.status, 'unknown'),
+        weak_pages: safeArray(directorReviewArtifact.visual_director_review?.weak_pages),
+        review_summary: normalizeInlineText(directorReviewArtifact.visual_director_review?.review_summary, 320),
+        rewrite_action: safeText(directorReviewArtifact.visual_director_review?.rewrite_action, 'none'),
+      }
+    : null;
+  const screenshotSlideFeedback = summarizeRenderRevisionSlideFeedback(screenshotReviewArtifact);
+  const screenshotSummary = screenshotReviewArtifact
+    ? {
+        status: safeText(screenshotReviewArtifact.status, 'unknown'),
+        blocked_checks: Object.entries(screenshotReviewArtifact.checks || {})
+          .filter(([, value]) => value === false)
+          .map(([key]) => key),
+        blocked_slide_ids: screenshotSlideFeedback.map((slide) => slide.slide_id),
+        review_summary: normalizeInlineText(screenshotReviewArtifact.ai_review?.review_summary, 320),
+        slide_feedback: screenshotSlideFeedback,
+      }
+    : null;
+  if (!directorSummary && !screenshotSummary) {
+    return null;
+  }
+  return {
+    has_prior_review_feedback: true,
+    visual_director_review: directorSummary,
+    screenshot_review: screenshotSummary,
+  };
+}
+
 function validateRenderedSlideContent(content, slideId) {
   const html = requireText(content, `render_html.slides[${slideId}].content_html`);
   if (!/data-slide-root=(["'])true\1/.test(html)) {
@@ -1010,51 +1569,149 @@ function validateRenderedSlideContent(content, slideId) {
   if (/<script\b/i.test(html)) {
     throw new Error(`ppt render_html slide contains forbidden script tag: ${slideId}`);
   }
+  if (/<style\b/i.test(html)) {
+    throw new Error(`ppt render_html slide contains forbidden style tag: ${slideId}`);
+  }
   return html;
+}
+
+function buildRenderHtmlBlueprintSlides(blueprintArtifact) {
+  return safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => ({
+    slide_id: slide.slide_id,
+    slide_no: slide.slide_no,
+    page_type: slide.page_type,
+    layout_family: slide.visual_presentation?.layout_family,
+    title: slide.title,
+    page_goal: slide.page_goal,
+    core_sentence: slide.core_sentence,
+    page_core_content: slide.page_core_content,
+    anchor_tracks: slide.visual_presentation?.anchor_tracks,
+    speaker_seconds: slide.speaker_seconds,
+    render_recipe_id: slide.render_recipe_id,
+    public_sources: safeArray(slide.evidence_and_sources).map((item) => item.public_label),
+  }));
+}
+
+function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
+  if (!revisionContext) return null;
+  const allowedSlideIds = new Set(safeArray(slideIds).map((slideId) => safeText(slideId)).filter(Boolean));
+  const directorWeakPages = safeArray(revisionContext?.visual_director_review?.weak_pages)
+    .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
+  const slideFeedback = safeArray(revisionContext?.screenshot_review?.slide_feedback)
+    .filter((slide) => allowedSlideIds.has(safeText(slide?.slide_id)));
+  const blockedSlideIds = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids)
+    .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
+  const globalDirectorWeakPages = safeArray(revisionContext?.visual_director_review?.weak_pages);
+  const globalSlideFeedback = safeArray(revisionContext?.screenshot_review?.slide_feedback);
+  const globalBlockedSlideIds = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids);
+  const batchHasDirectorFocus = directorWeakPages.length > 0;
+  const batchHasScreenshotFocus = slideFeedback.length > 0 || blockedSlideIds.length > 0;
+  const globalHasScreenshotFocus = globalSlideFeedback.length > 0 || globalBlockedSlideIds.length > 0;
+  const globalHasDirectorFocus = globalDirectorWeakPages.length > 0;
+  if ((globalHasDirectorFocus && !batchHasDirectorFocus && !batchHasScreenshotFocus)
+    || (globalHasScreenshotFocus && !batchHasScreenshotFocus)) {
+    return null;
+  }
+  const directorSummary = revisionContext?.visual_director_review
+    ? {
+        ...revisionContext.visual_director_review,
+        weak_pages: directorWeakPages,
+      }
+    : null;
+  const screenshotSummary = revisionContext?.screenshot_review
+    ? {
+        ...revisionContext.screenshot_review,
+        blocked_slide_ids: blockedSlideIds,
+        slide_feedback: slideFeedback,
+      }
+    : null;
+  const hasDirectorFeedback = safeArray(directorSummary?.weak_pages).length > 0
+    || safeText(directorSummary?.review_summary).length > 0;
+  const hasScreenshotFeedback = safeArray(screenshotSummary?.blocked_slide_ids).length > 0
+    || safeArray(screenshotSummary?.slide_feedback).length > 0;
+  if (!hasDirectorFeedback && !hasScreenshotFeedback) {
+    return null;
+  }
+  return {
+    has_prior_review_feedback: true,
+    visual_director_review: directorSummary,
+    screenshot_review: screenshotSummary,
+  };
 }
 
 async function generateRenderHtmlDraft(contract, deliverablePaths) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+  const blueprintSlides = buildRenderHtmlBlueprintSlides(blueprintArtifact);
+  const sharedRevisionContext = buildRenderRevisionContext(contract, deliverablePaths);
+  const sharedContext = {
+    ...buildAuthoringContext(contract),
+    visual_direction: visualArtifact?.visual_direction || null,
+    shell_contract: {
+      ratio: CANVAS.ratio,
+      width: CANVAS.width,
+      height: CANVAS.height,
+      controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+    },
+    html_guardrails: [
+      '每页输出完整 slide root，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
+      '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
+      '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
+      '不要使用 renderSlide/layoutByType/cardsGrid/pageType，不要输出 <script>/<style> block，也不要把模板注册表或内部文档写入 HTML。',
+      'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
+    ],
+  };
+  const slideBatches = chunkArray(blueprintSlides, RENDER_HTML_BATCH_SIZE);
+  const renderedSlides = [];
+  for (const [batchIndex, slideBatch] of slideBatches.entries()) {
+    const { data: batchData } = await generateStructuredArtifactViaCodexCli({
+      family: 'ppt_deck',
+      route: 'render_html',
+      promptRelativePath: PROMPT_PACK.render_html,
+      context: {
+        ...sharedContext,
+        render_scope: 'slide_batch',
+        render_batch: {
+          batch_index: batchIndex + 1,
+          total_batches: slideBatches.length,
+          slide_ids: slideBatch.map((slide) => slide.slide_id),
+        },
+        blueprint: {
+          slides: slideBatch,
+        },
+        revision_context: filterRenderRevisionContextForSlides(
+          sharedRevisionContext,
+          slideBatch.map((slide) => slide.slide_id),
+        ) || sharedRevisionContext,
+      },
+      outputContract: renderHtmlOutputContract(),
+    });
+    renderedSlides.push(...safeArray(batchData?.slides).filter((item) => item && typeof item === 'object'));
+  }
+  const { data: summaryData, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'ppt_deck',
     route: 'render_html',
     promptRelativePath: PROMPT_PACK.render_html,
     context: {
-      ...buildAuthoringContext(contract),
+      ...sharedContext,
+      render_scope: 'summary',
       blueprint: {
-        slides: safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => ({
+        slides: blueprintSlides.map((slide) => ({
           slide_id: slide.slide_id,
-          slide_no: slide.slide_no,
-          page_type: slide.page_type,
-          layout_family: slide.visual_presentation?.layout_family,
           title: slide.title,
-          page_goal: slide.page_goal,
-          core_sentence: slide.core_sentence,
-          page_core_content: slide.page_core_content,
-          anchor_tracks: slide.visual_presentation?.anchor_tracks,
-          speaker_seconds: slide.speaker_seconds,
-          render_recipe_id: slide.render_recipe_id,
-          public_sources: safeArray(slide.evidence_and_sources).map((item) => item.public_label),
+          layout_family: slide.layout_family,
         })),
       },
-      visual_direction: visualArtifact?.visual_direction || null,
-      shell_contract: {
-        ratio: CANVAS.ratio,
-        width: CANVAS.width,
-        height: CANVAS.height,
-        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
-      },
-      html_guardrails: [
-        '每页输出完整 slide root，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
-        '不要使用 renderSlide/layoutByType/cardsGrid/pageType，也不要把模板注册表或内部文档写入 HTML。',
-        'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
-      ],
+      rendered_slide_ids: renderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      revision_context: sharedRevisionContext,
     },
-    outputContract: renderHtmlOutputContract(),
+    outputContract: renderHtmlSummaryOutputContract(),
   });
   return {
-    data,
+    data: {
+      slides: renderedSlides,
+      render_summary: safeArray(summaryData?.render_summary),
+    },
     generationRuntime,
   };
 }
@@ -1072,8 +1729,8 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
     validateRenderedSlideContent(item.content_html, safeText(item.slide_id)),
   ]));
   const slidesMarkup = safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => {
-    const content = slideHtmlById.get(slide.slide_id);
-    if (!content) {
+    const rawContent = slideHtmlById.get(slide.slide_id);
+    if (!rawContent) {
       throw new Error(`upstream ppt render_html missing slide: ${slide.slide_id}`);
     }
     const recipeDecision = creativeSourceStamp({
@@ -1088,6 +1745,21 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
       authoredSurface: 'final_html_markup',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
     });
+    const peakPage = safeArray(visualArtifact?.visual_direction?.peak_pages).includes(slide.slide_id);
+    const directorRole = safeArray(visualArtifact?.visual_direction?.page_role_table).find((item) => item.slide_id === slide.slide_id)?.page_role
+      || slide.visual_presentation.layout_family;
+    const content = validateRenderedReviewAnchors(
+      hydrateRenderedSlideRootMetadata(rawContent, {
+        'data-title': slide.title,
+        'data-layout-family': slide.visual_presentation.layout_family,
+        'data-speaker-seconds': Number(slide.speaker_seconds || 0),
+        'data-recipe-id': slide.render_recipe_id,
+        'data-template-id': 'upstream_ai_html',
+        'data-peak-page': peakPage ? 'true' : 'false',
+        'data-director-role': directorRole,
+      }, slide.slide_id),
+      slide.slide_id,
+    );
     return {
       slide_id: slide.slide_id,
       slide_no: slide.slide_no,
@@ -1101,8 +1773,8 @@ async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePat
       speaker_seconds: slide.speaker_seconds,
       transition_sentence: slide.transition_sentence,
       director_contract: {
-        peak_page: safeArray(visualArtifact?.visual_direction?.peak_pages).includes(slide.slide_id),
-        director_role: safeArray(visualArtifact?.visual_direction?.page_role_table).find((item) => item.slide_id === slide.slide_id)?.page_role || slide.visual_presentation.layout_family,
+        peak_page: peakPage,
+        director_role: directorRole,
         generator_instructions: safeArray(visualArtifact?.visual_direction?.final_instruction_to_html_generator),
         page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
         visual_manifest: safeText(visualArtifact?.visual_direction?.visual_manifest),
@@ -1348,6 +2020,7 @@ function buildReviewMarkdown(contract, reviewArtifact) {
   const lines = [
     `# ${contract.title} 视觉质控`,
     '',
+    '- review_owner: codex_native_host_agent',
     `- 状态：${reviewArtifact.status}`,
     `- director_intent_landed：${reviewArtifact.checks.director_intent_landed}`,
     `- anti_template_ok：${reviewArtifact.checks.anti_template_ok}`,
@@ -1359,14 +2032,106 @@ function buildReviewMarkdown(contract, reviewArtifact) {
   if (Object.hasOwn(reviewArtifact.checks, 'baseline_comparison_passed')) {
     lines.push(`- baseline_comparison_passed：${reviewArtifact.checks.baseline_comparison_passed}`);
   }
+  if (reviewArtifact.ai_review?.review_summary) {
+    lines.push('', '## AI 审阅结论');
+    lines.push(`- review_model：${safeText(reviewArtifact.ai_review.review_model)}`);
+    lines.push(`- weak_pages：${safeArray(reviewArtifact.ai_review.weak_pages).join(', ') || 'none'}`);
+    lines.push(`- review_summary：${reviewArtifact.ai_review.review_summary}`);
+  }
   lines.push('', '## 分页记录');
   for (const slide of reviewArtifact.slide_reviews) {
     lines.push(`- ${slide.slide_id} / ${slide.layout_family} / ${slide.status} / ${slide.screenshot_file}`);
+    if (slide.ai_review) {
+      lines.push(`  - AI judgement: ${slide.ai_review.judgement}`);
+      lines.push(`  - AI findings: ${safeArray(slide.ai_review.visual_findings).join('；')}`);
+      lines.push(`  - Recommended fix: ${safeText(slide.ai_review.recommended_fix, 'none')}`);
+    }
   }
   if (reviewArtifact.baseline_review?.summary) {
     lines.push('', '## Baseline Relative Review', reviewArtifact.baseline_review.summary);
   }
   return `${lines.join('\n')}\n`;
+}
+
+async function generateScreenshotReviewDraft(contract, deliverablePaths, slideReviews, reviewPayload, mode) {
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  const sharedContext = {
+    ...buildAuthoringContext(contract),
+    mode,
+    blueprint: {
+      slides: summarizeBlueprintSlides(blueprintArtifact),
+    },
+    visual_direction: visualArtifact?.visual_direction || null,
+    director_review: directorReviewArtifact?.visual_director_review || null,
+    screenshot_mechanics: {
+      overall_checks: reviewPayload?.checks || null,
+      metrics: reviewPayload?.metrics || null,
+      baseline: reviewPayload?.baseline || null,
+      slides: slideReviews.map((slide) => ({
+        slide_id: slide.slide_id,
+        title: slide.title,
+        layout_family: slide.layout_family,
+        status: slide.status,
+        issues: slide.issues,
+        occupied_ratio: slide.metrics?.occupied_ratio ?? null,
+        primary_points: slide.metrics?.primary_points ?? null,
+        speaker_seconds: slide.metrics?.speaker_seconds ?? null,
+      })),
+    },
+  };
+  const aiSlideReviews = [];
+  for (const slideBatch of chunkArray(slideReviews, SCREENSHOT_REVIEW_BATCH_SIZE)) {
+    const { data: batchData } = await generateStructuredArtifactViaCodexCli({
+      family: 'ppt_deck',
+      route: 'screenshot_review',
+      promptRelativePath: PROMPT_PACK.screenshot_review,
+      context: {
+        ...sharedContext,
+        review_scope: 'slide_batch',
+        screenshot_mechanics: {
+          ...sharedContext.screenshot_mechanics,
+          slides: slideBatch.map((slide) => ({
+            slide_id: slide.slide_id,
+            title: slide.title,
+            layout_family: slide.layout_family,
+            status: slide.status,
+            issues: slide.issues,
+            occupied_ratio: slide.metrics?.occupied_ratio ?? null,
+            primary_points: slide.metrics?.primary_points ?? null,
+            speaker_seconds: slide.metrics?.speaker_seconds ?? null,
+          })),
+        },
+      },
+      outputContract: screenshotReviewSlideBatchOutputContract(),
+      localFileInspection: slideBatch.map((slide, index) => ({
+        label: `${slide.slide_id} ${safeText(slide.title, `Slide ${index + 1}`)}`.trim(),
+        path: slide.screenshot_file,
+        media_type: 'image/png',
+        purpose: `Review rendered lecture slide screenshot for ${slide.slide_id}`,
+      })),
+      cwd: deliverablePaths.deliverableDir,
+    });
+    aiSlideReviews.push(...normalizePptScreenshotAiSlideReviews(batchData?.slide_reviews, slideBatch));
+  }
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
+    family: 'ppt_deck',
+    route: 'screenshot_review',
+    promptRelativePath: PROMPT_PACK.screenshot_review,
+    context: {
+      ...sharedContext,
+      review_scope: 'summary',
+      ai_slide_reviews: aiSlideReviews,
+    },
+    outputContract: screenshotReviewSummaryOutputContract(),
+    cwd: deliverablePaths.deliverableDir,
+  });
+  return {
+    data,
+    aiSlideReviews,
+    generationRuntime,
+  };
 }
 
 async function buildDirectorReview(contract, deliverablePaths) {
@@ -1441,7 +2206,7 @@ async function buildDirectorReview(contract, deliverablePaths) {
   };
 }
 
-function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId }) {
+async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
@@ -1466,22 +2231,71 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
   }
   const python = runPython(PYTHON_REVIEW, args);
   const reviewPayload = python.payload;
+  const mechanicalSlideReviews = safeArray(reviewPayload.slide_reviews).map((slide) => ({
+    ...slide,
+    status: safeArray(slide?.issues).length === 0 ? 'pass' : 'block',
+  }));
+  const { data, aiSlideReviews, generationRuntime } = await generateScreenshotReviewDraft(
+    contract,
+    deliverablePaths,
+    mechanicalSlideReviews,
+    reviewPayload,
+    mode,
+  );
+  const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
+  const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
+  const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
+    slide,
+    aiSlideReviewMap.get(slide.slide_id),
+  ));
   const latestChecks = {
-    director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed),
-    anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok),
-    ...reviewPayload.checks,
+    director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed)
+      && Boolean(data?.director_intent_landed),
+    anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok)
+      && Boolean(data?.anti_template_ok),
+    ai_review_passed: slideReviews.every((slide) => !hasAiVisualBlock(slide?.ai_review)),
+    overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
+    occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
+    visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
+    speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
     ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
   };
   const status = Object.values(latestChecks).every((value) => value === true) ? 'pass' : 'block';
   const artifact = {
     ...attachCommon('screenshot_review', contract),
+    review_execution: {
+      ...creativeExecution('screenshot_review', generationRuntime),
+      overlay: 'screenshot_review',
+    },
+    review_overlay: 'screenshot_review',
     mode,
     status,
     checks: latestChecks,
-    slide_reviews: reviewPayload.slide_reviews,
-    report_markdown: reviewPayload.review_markdown || reviewMarkdown,
+    slide_reviews: slideReviews,
+    ai_review: {
+      review_model: 'screenshot_director_first_visual_judgement',
+      director_intent_landed: Boolean(data?.director_intent_landed),
+      anti_template_ok: Boolean(data?.anti_template_ok),
+      weak_pages: aiWeakPages,
+      review_summary: requireText(data?.review_summary, 'screenshot_review.review_summary'),
+      slide_reviews: aiSlideReviews,
+      creative_sources: {
+        review_judgement: creativeSourceStamp({
+          route: 'screenshot_review',
+          lifecycleStage: 'review_overlay',
+          authoredSurface: 'screenshot_review_decision',
+          materializedFrom: CREATIVE_MATERIALIZED_FROM,
+        }),
+      },
+    },
+    mechanical_review: {
+      review_model: 'python_screenshot_layout_checks',
+      checks: reviewPayload.checks,
+      metrics: reviewPayload.metrics,
+    },
+    report_markdown: reviewMarkdown,
     metrics: reviewPayload.metrics,
-    artifact_refs: [reviewPayload.review_markdown || reviewMarkdown, ...reviewPayload.slide_reviews.map((slide) => slide.screenshot_file)],
+    artifact_refs: [reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
     review_state_patch: {
       current_status: status === 'pass' ? 'export_ready' : 'blocked_for_revision',
       ready_for_export: status === 'pass',
@@ -1513,6 +2327,7 @@ function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, 
       summary: summarizeRelativeQuality(relativeQuality),
     };
   }
+  writeText(reviewMarkdown, buildReviewMarkdown(contract, artifact));
   return artifact;
 }
 
@@ -1653,7 +2468,7 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
       payload = await buildDirectorReview(contract, deliverablePaths);
       break;
     case 'screenshot_review':
-      payload = buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId });
+      payload = await buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId });
       break;
     case 'export_pptx':
       payload = buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract });
@@ -1661,6 +2476,10 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
     default:
       throw new Error(`Unsupported ppt_deck route: ${route}`);
   }
+  payload = appendArtifactRefs(
+    payload,
+    syncPptWorkbenchSurface({ workspaceRoot, contract, deliverableId, route, payload }),
+  );
   const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
   return {
     overlay: contract.overlay,

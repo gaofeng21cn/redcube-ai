@@ -342,10 +342,50 @@ function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
 function buildMockPptRender(meta) {
   const slides = safeArray(meta?.context?.blueprint?.slides);
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
+  const variant = safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT);
+  const renderScope = safeText(meta?.context?.render_scope, 'full_deck');
+  if (variant === 'require_render_batching' && renderScope !== 'summary' && slides.length > 3) {
+    throw new Error('mock ppt render expected slide_batch scope with at most 3 slides');
+  }
+  if (renderScope === 'summary') {
+    return {
+      slides: [],
+      render_summary: [
+        '本轮批量 render_html 已完成，整套 deck 的页面结构与节奏可以继续进入后续审稿。',
+      ],
+    };
+  }
   return {
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
-      content_html: buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id)),
+      content_html: (() => {
+        if (variant === 'require_revision_context') {
+          const revisionContext = meta?.context?.revision_context || {};
+          const hasDirectorFeedback = safeArray(revisionContext?.visual_director_review?.weak_pages).length > 0
+            || safeText(revisionContext?.visual_director_review?.review_summary).length > 0;
+          const hasScreenshotFeedback = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids).length > 0
+            || safeArray(revisionContext?.screenshot_review?.slide_feedback).length > 0;
+          if (!hasDirectorFeedback || !hasScreenshotFeedback) {
+            throw new Error(`mock ppt render expected revision_context with director and screenshot review feedback: ${JSON.stringify(revisionContext)}`);
+          }
+        }
+        const markup = buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id));
+        if (variant === 'missing_root_meta') {
+          return markup
+            .replace(/\sdata-title="[^"]*"/g, '')
+            .replace(/\sdata-speaker-seconds="[^"]*"/g, '')
+            .replace(/\sdata-layout-family="[^"]*"/g, '')
+            .replace(/\sdata-recipe-id="[^"]*"/g, '')
+            .replace(/\sdata-template-id="[^"]*"/g, '')
+            .replace(/\sdata-peak-page="[^"]*"/g, '');
+        }
+        if (variant === 'missing_review_anchors') {
+          return markup
+            .replace(/\sdata-qa-block="[^"]*"/g, '')
+            .replace(/\sdata-primary-point="[^"]*"/g, '');
+        }
+        return markup;
+      })(),
     })),
     render_summary: [
       '每页均由上游 AI 直接写出完整 slide HTML。',
@@ -365,6 +405,22 @@ function buildMockPptDirectorReview(meta) {
     weak_pages: [],
     review_summary: '页面峰值、结构差异和课堂讲授节奏都已经落到成品页上。',
     rewrite_action: 'none',
+  };
+}
+
+function buildMockPptScreenshotReview(meta) {
+  const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: [],
+    review_summary: '截图复核确认封面署名、结构主线与课堂节奏都已经落到最终画面里。',
+    slide_reviews: slides.map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      judgement: 'pass',
+      visual_findings: ['结构清楚，首眼路径稳定，信息密度可讲可看。'],
+      recommended_fix: 'none',
+    })),
   };
 }
 
@@ -564,19 +620,19 @@ function buildXhsSlideMarkup(slide, totalSlides, peakPage = false) {
   const cards = safeArray(slide.page_core_content)
     .slice(0, 3)
     .map((item, index) => `
-      <article data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:12px 14px;border-radius:18px;background:${index === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.8)'};border:1px solid rgba(15,23,42,0.1);font-size:${index === 0 ? '24px' : '18px'};line-height:1.5;color:#0F172A;">${safeText(item)}</article>
+      <article data-qa-block="card-${index + 1}" data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:12px 14px;border-radius:18px;background:${index === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.8)'};border:1px solid rgba(15,23,42,0.1);font-size:${index === 0 ? '24px' : '18px'};line-height:1.5;color:#0F172A;">${safeText(item)}</article>
     `)
     .join('');
   return `
     <div data-slide-root="true" data-slide-id="${safeText(slide.slide_id)}" data-title="${safeText(slide.title)}" data-speaker-seconds="36" data-layout-family="${safeText(slide.layout_family)}" data-recipe-id="${safeText(slide.render_recipe_id)}" data-template-id="upstream_ai_html" data-peak-page="${peakPage}" style="position:relative;width:448px;height:597px;background:#FFFBF0;overflow:hidden;padding:22px 20px 26px;display:grid;grid-template-rows:auto 1fr auto;gap:14px;">
-      <header style="display:grid;gap:8px;">
+      <header data-qa-block="header" style="display:grid;gap:8px;">
         <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:${accent};">${safeText(slide.page_goal)}</div>
         <h2 style="margin:0;font-size:28px;line-height:1.2;color:#0F172A;">${safeText(slide.title)}</h2>
       </header>
       <section style="display:grid;gap:12px;align-content:start;">
         ${cards}
       </section>
-      <footer style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
+      <footer data-qa-block="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
         <div>${safeText(slide.source_language)}</div>
         <div style="font-weight:700;">${slide.slide_no} / ${totalSlides}</div>
       </footer>
@@ -608,6 +664,22 @@ function buildMockXhsDirectorReview() {
     weak_pages: [],
     review_summary: '记忆钩子、峰值页和反模板约束都已落到 HTML 成品上。',
     rewrite_action: 'none',
+  };
+}
+
+function buildMockXhsScreenshotReview(meta) {
+  const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: [],
+    review_summary: '封面抓停、机制推进和结尾动作都已经在最终卡片截图里成立。',
+    slide_reviews: slides.map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      judgement: 'pass',
+      visual_findings: ['首眼信息明确，手机端阅读节奏顺畅，卡片没有退化成统一模板。'],
+      recommended_fix: 'none',
+    })),
   };
 }
 
@@ -804,6 +876,23 @@ function buildMockPosterDirectorReview() {
   };
 }
 
+function buildMockPosterScreenshotReview(meta) {
+  const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    message_hierarchy_clear: true,
+    weak_regions: [],
+    review_summary: '单页海报的 headline、证据栏和动作收束都在最终截图里成立。',
+    slide_reviews: slides.map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      judgement: 'pass',
+      visual_findings: ['主标题抓手明确，证据和动作路径连续。'],
+      recommended_fix: 'none',
+    })),
+  };
+}
+
 function buildCreativeRunOutput(meta) {
   const family = safeText(meta?.family, 'ppt_deck');
   const route = safeText(meta?.route);
@@ -819,6 +908,8 @@ function buildCreativeRunOutput(meta) {
         return buildMockXhsRender(meta);
       case 'visual_director_review':
         return buildMockXhsDirectorReview(meta);
+      case 'screenshot_review':
+        return buildMockXhsScreenshotReview(meta);
       case 'publish_copy':
         return buildMockXhsPublishCopy(meta);
       default:
@@ -837,6 +928,8 @@ function buildCreativeRunOutput(meta) {
         return buildMockPosterRender(meta);
       case 'visual_director_review':
         return buildMockPosterDirectorReview(meta);
+      case 'screenshot_review':
+        return buildMockPosterScreenshotReview(meta);
       default:
         throw new Error(`unsupported poster_onepager creative generation route: ${route}`);
     }
@@ -854,6 +947,8 @@ function buildCreativeRunOutput(meta) {
       return buildMockPptRender(meta);
     case 'visual_director_review':
       return buildMockPptDirectorReview(meta);
+    case 'screenshot_review':
+      return buildMockPptScreenshotReview(meta);
     default:
       throw new Error(`unsupported creative generation route: ${route}`);
   }

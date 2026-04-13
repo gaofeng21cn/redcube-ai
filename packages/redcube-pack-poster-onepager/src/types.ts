@@ -225,7 +225,7 @@ export interface PosterRenderSlide {
     recipe_decision: PosterRenderSlide['creative_sources']['recipe_selection'];
     final_html_markup: PosterRenderSlide['creative_sources']['final_markup'];
   };
-  markup_contract_source: 'prompt_pack_artifact';
+  markup_contract_source: 'codex_cli_json_output';
   content: string;
 }
 

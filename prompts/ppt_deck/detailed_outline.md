@@ -3,6 +3,7 @@
 把故事主线拆成章节与页预算。
 要求：
 - 每页明确 core_sentence / evidence_points / page_objective
+- 若存在具名讲者署名，封面页必须把署名落成 audience-facing cover element，而不是写成“封面必须署名”这类元指令
 - 不得直接跳到 HTML
 - 必须为后续逐页设计保留讲授推进关系与证据落点
 

@@ -133,6 +133,15 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
 
     const screenshotReview = readJson(results[5].artifactFile);
     assert.equal(screenshotReview.review_overlay, 'screenshot_review');
+    assert.equal(screenshotReview.review_execution?.owner, 'host_agent');
+    assert.equal(screenshotReview.review_execution?.overlay, 'screenshot_review');
+    assert.equal(screenshotReview.review_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(screenshotReview.ai_review?.review_model, 'screenshot_director_first_visual_judgement');
+    assert.equal(typeof screenshotReview.ai_review?.review_summary, 'string');
+    assert.equal(
+      screenshotReview.ai_review?.creative_sources?.review_judgement?.materialized_from,
+      'codex_cli_json_output',
+    );
     assert.equal(typeof screenshotReview.checks?.director_intent_landed, 'boolean');
     assert.equal(typeof screenshotReview.checks?.anti_template_ok, 'boolean');
     assert.equal(typeof screenshotReview.checks?.message_hierarchy_clear, 'boolean');

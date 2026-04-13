@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   createDeliverable,
@@ -32,6 +32,21 @@ async function withMockHermesUpstream(testFn) {
     restoreEnv();
     await upstream.close();
   }
+}
+
+async function runPptRoutes({ workspaceRoot, deliverableId, routes }) {
+  const results = [];
+  for (const route of routes) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId,
+      route,
+    });
+    results.push({ route, result });
+  }
+  return results;
 }
 
 test('ppt clears code-authored Story Architecture / Visual Authorship residue and adds explicit visual_director_review', () => {
@@ -160,5 +175,278 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
     assert.equal(directorReview.review_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(directorReview.visual_director_review?.review_model, 'director_first_visual_judgement');
     assert.equal(directorReview.visual_director_review?.creative_sources?.review_judgement?.materialized_from, 'codex_cli_json_output');
+
+    const screenshotReview = readJson(results[6].artifactFile);
+    assert.equal(screenshotReview.review_overlay, 'screenshot_review');
+    assert.equal(screenshotReview.review_execution?.owner, 'host_agent');
+    assert.equal(screenshotReview.review_execution?.overlay, 'screenshot_review');
+    assert.equal(screenshotReview.review_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(screenshotReview.ai_review?.review_model, 'screenshot_director_first_visual_judgement');
+    assert.equal(typeof screenshotReview.ai_review?.review_summary, 'string');
+    assert.equal(
+      screenshotReview.ai_review?.creative_sources?.review_judgement?.materialized_from,
+      'codex_cli_json_output',
+    );
+  });
+});
+
+test('ppt route artifacts materialize lecture workbench files for the staged workflow', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-workbench-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    });
+
+    const routes = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'];
+    const artifacts = [];
+    for (const route of routes) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+      artifacts.push(readJson(result.artifactFile));
+    }
+
+    const storylineFile = artifacts[0].artifact_refs.find((ref) => ref.endsWith('/故事主线.md'));
+    const detailedOutlineFile = artifacts[1].artifact_refs.find((ref) => ref.endsWith('/详细大纲.md'));
+    const blueprintFile = artifacts[2].artifact_refs.find((ref) => ref.includes('/大纲/') && ref.endsWith('.md') && !ref.endsWith('_视觉导演稿.md'));
+    const visualDirectionFile = artifacts[3].artifact_refs.find((ref) => ref.endsWith('_视觉导演稿.md'));
+    const htmlFile = artifacts[4].artifact_refs.find((ref) => ref.includes('/幻灯片/') && ref.endsWith('.html'));
+    const referenceIndexFile = artifacts[4].artifact_refs.find((ref) => ref.endsWith('/参考材料/来源索引.md'));
+
+    assert.equal(existsSync(path.resolve(storylineFile)), true);
+    assert.equal(existsSync(path.resolve(detailedOutlineFile)), true);
+    assert.equal(existsSync(path.resolve(blueprintFile)), true);
+    assert.equal(existsSync(path.resolve(visualDirectionFile)), true);
+    assert.equal(existsSync(path.resolve(htmlFile)), true);
+    assert.equal(existsSync(path.resolve(referenceIndexFile)), true);
+
+    assert.match(read(storylineFile), /## Hook/);
+    assert.match(read(detailedOutlineFile), /## 逐页预算/);
+    assert.match(read(blueprintFile), /幻灯片: 01/);
+    assert.match(read(visualDirectionFile), /## 本章视觉宣言/);
+    assert.match(read(htmlFile), /slidesData/);
+    assert.match(read(referenceIndexFile), /来源索引/);
+  });
+});
+
+test('ppt render_html hydrates review metadata onto slide root when upstream HTML omits those attrs', async () => {
+  await withMockHermesUpstream(async () => {
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'missing_root_meta',
+    });
+    try {
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-meta-'));
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: 'Med Auto Science 同行讲课',
+        goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+      });
+
+      const results = await runPptRoutes({
+        workspaceRoot,
+        deliverableId: 'deck-a',
+        routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      });
+      for (const { route, result } of results) {
+        assert.equal(result.ok, true, route);
+      }
+
+      const render = readJson(results.at(-1).result.artifactFile);
+      assert.equal(
+        render.html_bundle.slides.every((slide) => /data-title="/.test(slide.content)),
+        true,
+      );
+      assert.equal(
+        render.html_bundle.slides.every((slide) => /data-layout-family="/.test(slide.content)),
+        true,
+      );
+      assert.equal(
+        render.html_bundle.slides.every((slide) => /data-speaker-seconds="/.test(slide.content)),
+        true,
+      );
+      assert.equal(
+        render.html_bundle.slides.every((slide) => /data-recipe-id="/.test(slide.content)),
+        true,
+      );
+      assert.equal(
+        render.html_bundle.slides.every((slide) => /data-template-id="/.test(slide.content)),
+        true,
+      );
+      assert.equal(
+        render.html_bundle.slides.every((slide) => /data-peak-page="/.test(slide.content)),
+        true,
+      );
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt render_html fails fast when upstream HTML omits review anchors', async () => {
+  await withMockHermesUpstream(async () => {
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'missing_review_anchors',
+    });
+    try {
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-review-anchors-'));
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: 'Med Auto Science 同行讲课',
+        goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+      });
+
+      const routes = await runPptRoutes({
+        workspaceRoot,
+        deliverableId: 'deck-a',
+        routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      });
+      for (const { route, result } of routes.slice(0, -1)) {
+        assert.equal(result.ok, true, route);
+      }
+      const renderResult = routes.at(-1).result;
+      assert.equal(renderResult.ok, false);
+      assert.match(renderResult.run.error.message, /data-qa-block|data-primary-point/i);
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt render_html batches upstream slide generation instead of sending the whole deck at once', async () => {
+  await withMockHermesUpstream(async () => {
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_render_batching',
+    });
+    try {
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-batching-'));
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: 'Med Auto Science 同行讲课',
+        goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+      });
+
+      const routes = await runPptRoutes({
+        workspaceRoot,
+        deliverableId: 'deck-a',
+        routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      });
+      for (const { route, result } of routes) {
+        assert.equal(result.ok, true, route);
+      }
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt rerun render_html forwards prior director and screenshot review feedback to Codex', async () => {
+  await withMockHermesUpstream(async () => {
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_revision_context',
+    });
+    try {
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-context-'));
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: 'Med Auto Science 同行讲课',
+        goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+      });
+
+      const routes = await runPptRoutes({
+        workspaceRoot,
+        deliverableId: 'deck-a',
+        routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+      });
+      for (const { route, result } of routes) {
+        assert.equal(result.ok, true, route);
+      }
+
+      const artifactsDir = path.join(
+        workspaceRoot,
+        'topics',
+        'topic-a',
+        'deliverables',
+        'deck-a',
+        'artifacts',
+      );
+      writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+        status: 'block',
+        visual_director_review: {
+          weak_pages: ['S06'],
+          review_summary: 'S06 judgement ladder 还不够像真正的判定门，需要增强爬升关系。',
+          rewrite_action: 'revise_render_html',
+        },
+      }, null, 2), 'utf-8');
+      writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+        status: 'block',
+        checks: {
+          occlusion_free: false,
+        },
+        slide_reviews: [
+          {
+            slide_id: 'S02',
+            status: 'block',
+            issues: ['occlusion_detected'],
+            ai_review: {
+              judgement: 'block',
+              visual_findings: ['底部说明带压进主体区域，左栏最后一条内容被截断。'],
+              recommended_fix: '把底部说明带移出主体容器并释放左栏纵向空间。',
+            },
+          },
+          {
+            slide_id: 'S06',
+            status: 'block',
+            issues: ['occlusion_detected'],
+            ai_review: {
+              judgement: 'block',
+              visual_findings: ['判定门更像说明卡叠放，第二、三道门与右侧标签发生遮挡。'],
+              recommended_fix: '重建三阶爬升关系，并给终点框留下独立留白。',
+            },
+          },
+        ],
+        ai_review: {
+          weak_pages: ['S02', 'S06'],
+          review_summary: 'S02 与 S06 存在遮挡，需要回到 render_html 重建布局。',
+        },
+      }, null, 2), 'utf-8');
+
+      const renderResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'render_html',
+      });
+      assert.equal(renderResult.ok, true);
+    } finally {
+      restoreVariant();
+    }
   });
 });
