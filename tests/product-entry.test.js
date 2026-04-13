@@ -299,6 +299,27 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
     );
     assert.deepEqual(manifest.product_entry_quickstart.steps[2].requires, ['entry_session_id']);
+    assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
+    assert.equal(
+      manifest.product_entry_overview.summary,
+      'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    );
+    assert.equal(manifest.product_entry_overview.frontdesk_command, 'redcube product frontdesk');
+    assert.equal(manifest.product_entry_overview.recommended_command, 'redcube product invoke');
+    assert.equal(manifest.product_entry_overview.operator_loop_command, 'redcube product invoke');
+    assert.deepEqual(manifest.product_entry_overview.progress_surface, {
+      surface_kind: 'product_entry_session',
+      command: 'redcube product session --entry-session-id <entry-session-id>',
+      step_id: 'inspect_current_progress',
+    });
+    assert.deepEqual(manifest.product_entry_overview.resume_surface, {
+      surface_kind: 'product_entry_session',
+      command: 'redcube product session --entry-session-id <entry-session-id>',
+      session_locator_field: 'entry_session_contract.entry_session_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+    });
+    assert.equal(manifest.product_entry_overview.recommended_step_id, 'open_frontdesk');
+    assert.deepEqual(manifest.product_entry_overview.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_federation');
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
@@ -328,6 +349,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     });
     assert.equal(frontdesk.ok, true);
     assert.equal(frontdesk.surface_kind, 'product_frontdesk');
+    assert.equal(frontdesk.product_entry_overview.surface_kind, 'product_entry_overview');
+    assert.equal(frontdesk.product_entry_overview.progress_surface.surface_kind, 'product_entry_session');
+    assert.equal(
+      frontdesk.product_entry_overview.resume_surface.command,
+      'redcube product session --entry-session-id <entry-session-id>',
+    );
     assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');
