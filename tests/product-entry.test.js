@@ -237,6 +237,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(manifest.recommended_shell, 'direct');
     assert.equal(manifest.recommended_command, 'redcube product invoke');
+    assert.equal(manifest.operator_loop_surface.shell_key, 'direct');
+    assert.equal(manifest.operator_loop_surface.command, 'redcube product invoke');
+    assert.equal(manifest.operator_loop_surface.surface_kind, 'product_entry');
+    assert.equal(manifest.operator_loop_surface.continuation_shell_key, 'session');
+    assert.equal(manifest.operator_loop_surface.continuation_command, 'redcube product session');
+    assert.match(manifest.operator_loop_surface.summary, /entry_session_id/);
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_federation');
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');

@@ -58,6 +58,17 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: 'redcube product invoke',
+    operator_loop_surface: {
+      shell_key: 'direct',
+      command: 'redcube product invoke',
+      surface_kind: 'product_entry',
+      summary: (
+        '当前 operator loop 仍 anchored on direct product entry；'
+        + '拿到 entry_session_id 后继续通过 session surface 追踪同一交付。'
+      ),
+      continuation_shell_key: 'session',
+      continuation_command: 'redcube product session',
+    },
     repo_mainline: {
       program_id: safeText(activeMainline.id, 'redcube-runtime-program'),
       phase_id: safeText(currentState.phase_id, 'unknown_phase'),

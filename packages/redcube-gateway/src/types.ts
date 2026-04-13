@@ -310,6 +310,19 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     workspace_root: string;
   };
   recommended_shell: 'direct' | 'federated' | 'session' | string;
+  operator_loop_surface: {
+    shell_key: 'direct' | 'federated' | 'session' | string;
+    command: string;
+    surface_kind: string;
+    summary: string;
+    continuation_shell_key?: 'direct' | 'federated' | 'session' | string;
+    continuation_command?: string;
+  };
+  product_entry_status: {
+    summary: string;
+    next_focus: string[];
+    remaining_gaps_count: number;
+  };
   runtime: {
     runtime_owner: string;
     runtime_state_root: string;
