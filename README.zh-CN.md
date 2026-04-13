@@ -14,12 +14,12 @@
       希望把知识稳定交付为视觉成果的专家、PIs 与专业团队
     </td>
     <td width="33%" valign="top">
-      <strong>控制什么</strong><br/>
-      交付质量、审阅节奏、阶段约束，以及从草稿到导出的收口过程
+      <strong>公开角色</strong><br/>
+      面向受控创作、审阅、重跑与导出的视觉交付 domain gateway 与 <code>Domain Harness OS</code>
     </td>
     <td width="33%" valign="top">
-      <strong>最终产出</strong><br/>
-      面向讲授、汇报、传播与发布的高质量视觉交付物
+      <strong>在联邦中的位置</strong><br/>
+      <code>One Person Lab -> Presentation Ops -> RedCube AI</code>；当前已 admitted 的视觉交付 domain 主线，route / managed execution 现运行在本地 <code>Codex CLI</code> host-agent runtime 上
     </td>
   </tr>
 </table>

@@ -16,7 +16,7 @@ Start here before reading detailed program briefs:
 - [Invariants](./invariants.md)
 - [Decisions](./decisions.md)
 
-## External Bilingual Surface
+## Default Public Bilingual Surface
 
 - [Repository home](../README.md)
 
@@ -49,7 +49,7 @@ Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` n
 - Current stop boundary: managed family closure truth is landed; any move into managed web runtime control-plane work, new family onboarding, or academic-poster semantics needs a new activation package first.
 - Historical `docs/program/hermes/*` materials now serve as local migration artifacts and provenance only; they must not be read as proof that upstream `Hermes-Agent` already owns the runtime.
 
-## Repo-Tracked Internal Operator Docs
+## Repo-Tracked Internal Docs
 
 ### For human operators
 

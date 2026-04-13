@@ -14,12 +14,12 @@
       Experts, PIs, and professional teams delivering visual outcomes from structured knowledge.
     </td>
     <td width="33%" valign="top">
-      <strong>What It Controls</strong><br/>
-      Deliverable quality, review cadence, stage gates, and closeout from draft to export.
+      <strong>Public Role</strong><br/>
+      The visual-deliverable domain gateway and <code>Domain Harness OS</code> for governed creation, review, rerun, and export.
     </td>
     <td width="33%" valign="top">
-      <strong>What It Produces</strong><br/>
-      High-quality visual deliverables for teaching, reporting, communication, and publishing.
+      <strong>Position In The Federation</strong><br/>
+      <code>One Person Lab -> Presentation Ops -> RedCube AI</code>; the admitted visual-deliverable domain line whose current route / managed execution runs on local <code>Codex CLI</code> host-agent runtime.
     </td>
   </tr>
 </table>
