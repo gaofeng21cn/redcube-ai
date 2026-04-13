@@ -3,7 +3,7 @@
 [English](./README.md) | **中文**
 
 这里是 `RedCube AI` 的双语文档索引，也是默认对外公开面。
-内容与当前 cutover 真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的 `Domain Harness OS`，route / managed run surface 现在已经通过真实上游 `Hermes-Agent` 执行，而 visual-domain truth 继续留在 `RedCube AI`。其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
+内容与当前主线真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的 `Domain Harness OS`，route / managed run surface 现在已经通过本地 Codex CLI host-agent runtime 执行，而 visual-domain truth 继续留在 `RedCube AI`。其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
 当前公开入口真相也已经明确：现在真实存在的是 `operator entry`、`agent entry`，以及一层薄的 repo-verified `product entry` service surface；成熟的最终用户前台壳仍是后续目标。当前这层壳的 machine-readable discovery surface 是 `redcube product manifest`，并由 MCP 工具 `get_product_entry_manifest` 镜像暴露。
 
 ## 核心维护工作集
@@ -24,16 +24,16 @@
 
 ## 当前主线状态
 
-当前交付主线已经稳定可用，但 runtime 叙事仍处在过渡期。
+当前交付主线已经稳定可用，active runtime 叙事也已经收口到本地 Codex CLI host-agent execution。
 Phase 2 的 source-truth、governance、operator-surface 与 runtime-watch 工作继续作为 absorbed provenance 保留。
-当前最诚实的停车边界是：上游 `Hermes-Agent` 的 runtime owner、repo-verified product entry、OPL federation 与 managed session continuity 都已落地，但成熟的最终用户前台壳与 managed web productization 仍是后续工作。
-`ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一留在 `runtime-family + upstream Hermes structured generation` 主链；repo-local `pack/compiler` 创作路径已从 active mainline 移除。
+当前最诚实的停车边界是：本地 Codex CLI 的 runtime owner、repo-verified product entry、OPL federation 与 managed session continuity 都已落地，但成熟的最终用户前台壳与 managed web productization 仍是后续工作。
+`ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一留在 `runtime-family + Codex CLI structured generation` 主链；repo-local `pack/compiler` 创作路径已从 active mainline 移除。
 
 ## 当前基线、长线目标与任务层级
 
-- 当前 repo-verified 基线：上游 `Hermes-Agent` 主责 route / managed run execution，`RedCube AI` 保持 domain truth、operator surface，以及一层薄的 product-entry service surface。
+- 当前 repo-verified 基线：本地 Codex CLI host-agent runtime 主责 route / managed run execution，`RedCube AI` 保持 domain truth、operator surface，以及一层薄的 product-entry service surface。
 - 当前创作阶段基线：`pack` 继续保留 domain boundary / pack-id 语义，但不再承担 repo-local creative compiler/runtime。
-- 长线目标：runtime substrate 迁向上游 `Hermes-Agent`，但 `RedCube Gateway -> family / profile / pack -> Domain Harness OS` 的 domain boundary 不变。
+- 长线目标：runtime substrate 保持在 Codex-native host-agent execution 上，并为未来托管 web runtime 复用同一 contracts 预留迁移路径，但 `RedCube Gateway -> family / profile / pack -> Domain Harness OS` 的 domain boundary 不变。
 - 产品入口目标：维持已经落地的轻量 domain `product entry` 可被用户直达或被 `OPL` handoff 调起，同时继续把它硬化到成熟前台壳，而不改写视觉 domain boundary。
 - 当前发现面：`redcube product frontdesk`、`redcube product manifest` 与 `get_product_entry_manifest` 会把 `frontdesk_surface` 以及 direct / federated / session 三类壳如实暴露出来，宿主不需要自己猜命令或载荷结构。
 - 已冻结的最终目标形态：[Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)

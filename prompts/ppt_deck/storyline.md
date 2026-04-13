@@ -3,6 +3,7 @@
 从讲者身份、听众画像、讲课目标与事实资产出发，产出故事主线。
 要求：
 - 先界定 speaker / audience / goal / style
+- 若上下文提供具名讲者署名，speaker 必须保留 exact identity，不得泛化成“同行讲者 / 正式讲者”
 - 产出 hook / journey / resolution 三段叙事弧
 - 关键转折必须由事实资产支撑，不做口号堆砌
 - 明确哪些判断必须在后续详细大纲与证据页展开

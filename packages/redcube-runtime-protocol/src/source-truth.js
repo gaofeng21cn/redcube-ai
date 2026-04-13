@@ -11,6 +11,13 @@ function safeText(value, fallback = '') {
   return text || fallback;
 }
 
+function isAudienceFacingItem(item) {
+  const kind = safeText(item?.kind);
+  return safeText(item?.source_role) !== 'operator_context'
+    && kind !== 'brief'
+    && kind !== 'keywords';
+}
+
 export function getSourceArtifactPaths(workspaceRoot, topicId) {
   const topicPaths = getTopicPaths(workspaceRoot, topicId);
   return {
@@ -29,12 +36,13 @@ export function getSourceArtifactPaths(workspaceRoot, topicId) {
 
 export function buildSourceTruthConsumptionSummary(sharedSourceTruth, options = {}) {
   const truth = sharedSourceTruth || null;
-  const materials = safeArray(truth?.extracted_materials?.materials);
+  const materials = safeArray(truth?.extracted_materials?.materials)
+    .filter((material) => isAudienceFacingItem(material));
   const materialIds = materials
     .map((material) => safeText(material?.material_id))
     .filter(Boolean);
   const sourceLabels = safeArray(truth?.source_index?.sources)
-    .filter((source) => source?.status === 'ready')
+    .filter((source) => source?.status === 'ready' && isAudienceFacingItem(source))
     .map((source) => safeText(source?.relative_path || source?.kind))
     .filter(Boolean);
   const auditBlockingReasons = safeArray(truth?.source_audit?.blocking_reasons)

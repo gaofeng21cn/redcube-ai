@@ -135,7 +135,7 @@ function buildSessionRecord({
     profile_id: deliveryIdentity.profileId || null,
     title: deliveryIdentity.title || null,
     goal: deliveryIdentity.goal || null,
-    runtime_owner: 'upstream_hermes_agent',
+    runtime_owner: 'codex_cli',
     last_task_intent: taskIntent,
     last_entry_mode: entryMode,
     latest_managed_run_id: continuationSnapshot.latest_managed_run_id,
@@ -214,8 +214,8 @@ export async function invokeProductEntry(request) {
       workspace_root: workspaceRoot,
     },
     runtime_session_contract: {
-      runtime_owner: 'upstream_hermes_agent',
-      adapter_surface: '@redcube/hermes-agent-client',
+      runtime_owner: 'codex_cli',
+      adapter_surface: '@redcube/codex-cli-client',
       session_mode: 'entry_session',
     },
     return_surface_contract: {
@@ -284,7 +284,7 @@ export async function invokeProductEntry(request) {
       session_file: persisted.file,
       resumed_from_session: existingSession !== null,
       created_deliverable: createdDeliverable,
-      runtime_owner: 'upstream_hermes_agent',
+      runtime_owner: 'codex_cli',
     },
     delivery_identity: {
       deliverable_family: resolvedIdentity.deliverableFamily,

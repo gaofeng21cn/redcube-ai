@@ -71,7 +71,7 @@ function inspectCurrentSlide() {
   return {
     slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
     title: root?.dataset.title || slidesData[currentSlide]?.title || '',
-    layoutFamily: root?.dataset.layoutFamily || '',
+    layoutFamily: root?.dataset.layoutFamily || slidesData[currentSlide]?.layoutFamily || '',
     wrapper: {
       clientWidth: 1080,
       clientHeight: 1350,
@@ -80,7 +80,7 @@ function inspectCurrentSlide() {
     },
     bodyScroll: false,
     primaryPoints: wrapper?.querySelectorAll('[data-primary-point="true"]').length || 0,
-    speakerSeconds: 45,
+    speakerSeconds: Number(root?.dataset.speakerSeconds || slidesData[currentSlide]?.speakerSeconds || 45),
     blocks,
   };
 }

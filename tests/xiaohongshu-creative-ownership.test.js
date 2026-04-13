@@ -9,9 +9,9 @@ import {
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -22,11 +22,9 @@ function readJson(file) {
 }
 
 async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
   try {
     return await testFn();
@@ -36,7 +34,7 @@ async function withMockHermesUpstream(testFn) {
   }
 }
 
-test('xiaohongshu Hermes-backed mainline owns protected creative outputs instead of JS builders', () => {
+test('xiaohongshu Codex-backed mainline owns protected creative outputs instead of JS builders', () => {
   const packEntry = read('packages/redcube-pack-xiaohongshu/src/index.ts');
   const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
   const storylinePrompt = read('prompts/xiaohongshu/storyline.md');
@@ -74,7 +72,7 @@ test('xiaohongshu Hermes-backed mainline owns protected creative outputs instead
   assert.match(directorReviewPrompt, /"visual_director_review": \{/);
 });
 
-test('xiaohongshu route artifacts record Hermes-backed creative ownership for story, visual, review, and publish surfaces', async () => {
+test('xiaohongshu route artifacts record Codex-backed creative ownership for story, visual, review, and publish surfaces', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-creative-'));
     await createDeliverable({
@@ -84,7 +82,7 @@ test('xiaohongshu route artifacts record Hermes-backed creative ownership for st
       topicId: 'topic-a',
       deliverableId: 'note-a',
       title: 'P19 小红书创作权收口',
-      goal: '验证小红书主创作权已从 JS builder 收回到 Hermes-backed / director-first mainline',
+      goal: '验证小红书主创作权已从 JS builder 收回到 Codex-backed / director-first mainline',
     });
 
     const routes = ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'];
@@ -103,45 +101,45 @@ test('xiaohongshu route artifacts record Hermes-backed creative ownership for st
 
     const storyline = readJson(results[1].artifactFile);
     assert.equal(storyline.lifecycle_stage, 'story_architecture');
-    assert.equal(storyline.creative_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
-    assert.equal(storyline.storyline.creative_sources.narrative_arc.owner, 'hermes');
-    assert.equal(storyline.storyline.creative_sources.narrative_arc.primary_surface, 'hermes_backed_runtime_substrate');
-    assert.equal(storyline.storyline.creative_sources.narrative_arc.materialized_from, 'upstream_run_json_output');
+    assert.equal(storyline.creative_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(storyline.storyline.creative_sources.narrative_arc.owner, 'host_agent');
+    assert.equal(storyline.storyline.creative_sources.narrative_arc.primary_surface, 'codex_native_host_agent');
+    assert.equal(storyline.storyline.creative_sources.narrative_arc.materialized_from, 'codex_cli_json_output');
 
     const plan = readJson(results[2].artifactFile);
-    assert.equal(plan.creative_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(plan.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      plan.single_note_plan.slides.every((slide) => slide.creative_sources?.page_core_content?.owner === 'hermes'),
+      plan.single_note_plan.slides.every((slide) => slide.creative_sources?.page_core_content?.owner === 'host_agent'),
       true,
     );
     assert.equal(
-      plan.single_note_plan.slides.every((slide) => slide.creative_sources?.page_core_content?.materialized_from === 'upstream_run_json_output'),
+      plan.single_note_plan.slides.every((slide) => slide.creative_sources?.page_core_content?.materialized_from === 'codex_cli_json_output'),
       true,
     );
     assert.equal(
-      plan.single_note_plan.slides.every((slide) => slide.creative_sources?.visual_presentation?.primary_surface === 'hermes_backed_runtime_substrate'),
+      plan.single_note_plan.slides.every((slide) => slide.creative_sources?.visual_presentation?.primary_surface === 'codex_native_host_agent'),
       true,
     );
 
     const visual = readJson(results[3].artifactFile);
     assert.equal(visual.lifecycle_stage, 'visual_authorship');
-    assert.equal(visual.creative_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
-    assert.equal(visual.visual_direction.creative_sources.director_statement.owner, 'hermes');
-    assert.equal(visual.visual_direction.creative_sources.director_statement.primary_surface, 'hermes_backed_runtime_substrate');
-    assert.equal(visual.visual_direction.creative_sources.director_statement.materialized_from, 'upstream_run_json_output');
+    assert.equal(visual.creative_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(visual.visual_direction.creative_sources.director_statement.owner, 'host_agent');
+    assert.equal(visual.visual_direction.creative_sources.director_statement.primary_surface, 'codex_native_host_agent');
+    assert.equal(visual.visual_direction.creative_sources.director_statement.materialized_from, 'codex_cli_json_output');
 
     const render = readJson(results[4].artifactFile);
-    assert.equal(render.creative_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(render.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      render.html_bundle.slides.every((slide) => slide.creative_sources?.recipe_selection?.owner === 'hermes'),
+      render.html_bundle.slides.every((slide) => slide.creative_sources?.recipe_selection?.owner === 'host_agent'),
       true,
     );
     assert.equal(
-      render.html_bundle.slides.every((slide) => slide.creative_sources?.final_markup?.owner === 'hermes'),
+      render.html_bundle.slides.every((slide) => slide.creative_sources?.final_markup?.owner === 'host_agent'),
       true,
     );
     assert.equal(
-      render.html_bundle.slides.every((slide) => slide.creative_sources?.final_markup?.materialized_from === 'upstream_run_json_output'),
+      render.html_bundle.slides.every((slide) => slide.creative_sources?.final_markup?.materialized_from === 'codex_cli_json_output'),
       true,
     );
     const html = readFileSync(render.html_bundle.html_file, 'utf-8');
@@ -149,25 +147,34 @@ test('xiaohongshu route artifacts record Hermes-backed creative ownership for st
 
     const directorReview = readJson(results[5].artifactFile);
     assert.equal(directorReview.review_overlay, 'visual_director_review');
-    assert.equal(directorReview.review_authorship.primary_surface, 'hermes_backed_runtime_substrate');
-    assert.equal(directorReview.review_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(directorReview.review_authorship.primary_surface, 'codex_native_host_agent');
+    assert.equal(directorReview.review_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(typeof directorReview.visual_director_review?.director_intent_landed, 'boolean');
     assert.equal(typeof directorReview.visual_director_review?.anti_template_ok, 'boolean');
-    assert.equal(directorReview.visual_director_review?.creative_sources?.review_judgement?.materialized_from, 'upstream_run_json_output');
+    assert.equal(directorReview.visual_director_review?.creative_sources?.review_judgement?.materialized_from, 'codex_cli_json_output');
     const directorReviewMarkdown = readFileSync(directorReview.artifact_refs[0], 'utf-8');
-    assert.match(directorReviewMarkdown, /- review_owner: hermes_backed_runtime_substrate/);
-    assert.equal(directorReviewMarkdown.includes('codex_native_host_agent'), false);
+    assert.match(directorReviewMarkdown, /- review_owner: codex_native_host_agent/);
+    assert.equal((directorReviewMarkdown.match(/codex_native_host_agent/g) || []).length, 1);
 
     const screenshotReview = readJson(results[6].artifactFile);
     assert.equal(screenshotReview.review_overlay, 'screenshot_review');
+    assert.equal(screenshotReview.review_execution?.owner, 'host_agent');
+    assert.equal(screenshotReview.review_execution?.overlay, 'screenshot_review');
+    assert.equal(screenshotReview.review_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(screenshotReview.ai_review?.review_model, 'screenshot_director_first_visual_judgement');
+    assert.equal(typeof screenshotReview.ai_review?.review_summary, 'string');
+    assert.equal(
+      screenshotReview.ai_review?.creative_sources?.review_judgement?.materialized_from,
+      'codex_cli_json_output',
+    );
     assert.equal(typeof screenshotReview.checks?.director_intent_landed, 'boolean');
     assert.equal(typeof screenshotReview.checks?.anti_template_ok, 'boolean');
 
     const copy = readJson(results[7].artifactFile);
     assert.equal(copy.lifecycle_stage, 'delivery_packaging');
-    assert.equal(copy.creative_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
-    assert.equal(copy.publish_copy.creative_sources.body.owner, 'hermes');
-    assert.equal(copy.publish_copy.creative_sources.first_comment.primary_surface, 'hermes_backed_runtime_substrate');
-    assert.equal(copy.publish_copy.creative_sources.body.materialized_from, 'upstream_run_json_output');
+    assert.equal(copy.creative_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(copy.publish_copy.creative_sources.body.owner, 'host_agent');
+    assert.equal(copy.publish_copy.creative_sources.first_comment.primary_surface, 'codex_native_host_agent');
+    assert.equal(copy.publish_copy.creative_sources.body.materialized_from, 'codex_cli_json_output');
   });
 });

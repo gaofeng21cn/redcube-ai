@@ -13,21 +13,19 @@ import {
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 async function withMockHermesAndRuntimeState(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
     REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
   });
   try {
@@ -108,7 +106,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.entry_session.entry_session_id, 'session-a');
     assert.equal(response.entry_session.created_deliverable, true);
     assert.equal(response.entry_session.resumed_from_session, false);
-    assert.equal(response.entry_session.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(response.entry_session.runtime_owner, 'codex_cli');
     assert.equal(response.delivery_identity.deliverable_family, 'ppt_deck');
     assert.equal(response.delivery_identity.topic_id, 'topic-a');
     assert.equal(response.delivery_identity.deliverable_id, 'deck-a');
@@ -118,7 +116,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.continuation_snapshot.latest_managed_run_id, response.domain_entry_surface.summary.target_handle);
     assert.equal(response.continuation_snapshot.latest_run_id, null);
     assert.equal(response.continuation_snapshot.managed_progress_projection.current_stage, 'storyline');
-    assert.equal(response.continuation_snapshot.runtime_supervision.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(response.continuation_snapshot.runtime_supervision.runtime_owner, 'codex_cli');
     assert.equal(response.review_state.surface_kind, 'review_state');
     assert.equal(response.publication_projection.surface_kind, 'publication_projection');
     assertFamilyOrchestrationCompanion(response, {
@@ -191,7 +189,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');
     assert.equal(session.entry_session.entry_session_id, 'session-a');
-    assert.equal(session.entry_session.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(session.entry_session.runtime_owner, 'codex_cli');
     assert.equal(session.delivery_identity.deliverable_family, 'ppt_deck');
     assert.equal(session.delivery_identity.topic_id, 'topic-a');
     assert.equal(session.delivery_identity.deliverable_id, 'deck-a');
@@ -219,7 +217,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
         workspace_root: workspaceRoot,
       },
       runtime_session_contract: {
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'codex_cli',
       },
       return_surface_contract: {
         surface_kind: 'product_entry',
@@ -244,7 +242,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.federated_product_entry_contract_id, 'opl_gateway_federated_product_entry');
     assert.equal(response.target_domain_id, 'redcube_ai');
     assert.equal(response.entry_mode, 'opl_gateway');
-    assert.equal(response.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(response.runtime_session_contract.runtime_owner, 'codex_cli');
     assert.equal(response.return_surface_contract.requested_surface_kind, 'product_entry');
     assert.equal(response.return_surface_contract.actual_surface_kind, 'product_entry');
     assert.equal(response.product_entry_surface.surface_kind, 'product_entry');
@@ -345,7 +343,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
       '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
     ]);
-    assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.equal(manifest.product_entry_shell.frontdesk.command, 'redcube product frontdesk');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');

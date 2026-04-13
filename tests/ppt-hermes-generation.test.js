@@ -10,20 +10,18 @@ import {
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
   try {
     return await testFn();
@@ -33,7 +31,7 @@ async function withMockHermesUpstream(testFn) {
   }
 }
 
-test('ppt core authoring stages carry upstream Hermes generation evidence and keep operator meta instructions out of audience-facing content', async () => {
+test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-generation-'));
 
@@ -86,10 +84,10 @@ test('ppt core authoring stages carry upstream Hermes generation evidence and ke
     const blueprint = readJson(blueprintResult.artifactFile);
     const visual = readJson(visualResult.artifactFile);
 
-    assert.match(storyline.creative_execution?.generation_runtime?.run_id || '', /^run_mock_/);
-    assert.equal(storyline.creative_execution?.generation_runtime?.owner, 'upstream_hermes_agent');
-    assert.equal(storyline.storyline?.creative_sources?.core_metaphor?.materialized_from, 'upstream_run_json_output');
-    assert.equal(storyline.storyline?.creative_sources?.narrative_arc?.materialized_from, 'upstream_run_json_output');
+    assert.match(storyline.creative_execution?.generation_runtime?.run_id || '', /^run_(mock|codex)_/);
+    assert.equal(storyline.creative_execution?.generation_runtime?.owner, 'codex_cli');
+    assert.equal(storyline.storyline?.creative_sources?.core_metaphor?.materialized_from, 'codex_cli_json_output');
+    assert.equal(storyline.storyline?.creative_sources?.narrative_arc?.materialized_from, 'codex_cli_json_output');
 
     const audienceFacingText = [
       storyline.storyline?.core_metaphor,

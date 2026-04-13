@@ -72,7 +72,7 @@
         slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
         title: root?.dataset.title || slidesData[currentSlide]?.title || '',
         layoutFamily: root?.dataset.layoutFamily || slidesData[currentSlide]?.layoutFamily || '',
-        speakerSeconds: Number(root?.dataset.speakerSeconds || 0),
+        speakerSeconds: Number(root?.dataset.speakerSeconds || slidesData[currentSlide]?.speakerSeconds || 0),
         primaryPoints: wrapper?.querySelectorAll('[data-primary-point="true"]').length || 0,
         wrapper: {
           clientWidth: wrapper?.clientWidth || 1152,

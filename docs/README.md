@@ -3,7 +3,7 @@
 **English** | [中文](./README.zh-CN.md)
 
 This bilingual index is the default public surface for `RedCube AI`.
-It stays aligned with the current truthful cutover: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; route and managed run surfaces now execute through real upstream `Hermes-Agent`, while visual-domain truth remains local to `RedCube AI`. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
+It stays aligned with the current truthful mainline: `RedCube AI` is the visual-deliverable `Domain Harness OS` on the shared `Unified Harness Engineering Substrate`; route and managed run surfaces now execute through local Codex CLI host-agent runtime, while visual-domain truth remains local to `RedCube AI`. Its formal-entry matrix is `CLI` as default formal entry, `MCP` as supported protocol layer, and `controller` as internal control surface. The current repository mainline is `Auto-only`.
 The current public entry truth is also explicit: `operator entry`, `agent entry`, and a thin repo-verified `product entry` service surface are real today, while a mature end-user product shell is still future work. The current machine-readable discovery surface for that shell is `redcube product manifest`, mirrored by the MCP tool `get_product_entry_manifest`.
 
 ## Core Maintainer Working Set
@@ -24,16 +24,16 @@ This index along with the repository home forms the default GitHub-facing biling
 
 ## Current Mainline Status
 
-The current deliverable mainline is stable and usable, but the runtime story is still transitional.
+The current deliverable mainline is stable and usable, and the active runtime story has converged onto local Codex CLI host-agent execution.
 Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance.
-The current truthful stop boundary is: upstream `Hermes-Agent` run ownership, repo-verified product entry, OPL federation, and managed session continuity are landed, while a mature end-user shell and managed web productization still remain follow-on work.
-Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` now stay on `runtime-family + upstream Hermes structured generation`; repo-local `pack/compiler` authorship has been removed from the active mainline.
+The current truthful stop boundary is: local Codex CLI run ownership, repo-verified product entry, OPL federation, and managed session continuity are landed, while a mature end-user shell and managed web productization still remain follow-on work.
+Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` now stay on `runtime-family + Codex CLI structured generation`; repo-local `pack/compiler` authorship has been removed from the active mainline.
 
 ## Current Baseline, Long-Line Target, And Task Ladder
 
-- Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth, operator surfaces, and a thin product-entry service surface.
+- Current repo-verified baseline: local Codex CLI host-agent runtime owns route / managed run execution, while `RedCube AI` keeps domain truth, operator surfaces, and a thin product-entry service surface.
 - Current creative-stage baseline: `pack` remains a domain boundary and pack-id carrier, but no longer acts as a repo-local creative compiler/runtime.
-- Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
+- Long-line target: keep the runtime substrate on Codex-native host-agent execution without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary, while preserving a future managed-web migration path on the same contracts.
 - Product-entry target: keep the landed lightweight domain `product entry` callable directly or through `OPL` handoff without changing the visual-domain boundary, then harden it toward a mature end-user shell.
 - Current discovery surface: `redcube product frontdesk`, `redcube product manifest`, and `get_product_entry_manifest` let hosts discover the current `frontdesk_surface` plus direct / federated / session shell without guessing commands or payload shape.
 - Frozen final target shape: [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md) (Chinese only)

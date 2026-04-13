@@ -9,8 +9,8 @@ function safeArray(value) {
 
 function creativeExecution(lifecycleStage, generationRuntime = null) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -23,9 +23,9 @@ function creativeExecution(lifecycleStage, generationRuntime = null) {
 
 function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom }) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
-    stage_owner: 'hermes_backed_runtime_substrate',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
     ownership_model: 'director_first',
     route,
     lifecycle_stage: lifecycleStage,

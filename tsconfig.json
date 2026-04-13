@@ -53,6 +53,9 @@
       "path": "./packages/redcube-runtime-family-poster-onepager"
     },
     {
+      "path": "./packages/redcube-codex-cli-client"
+    },
+    {
       "path": "./packages/redcube-runtime-family-registry"
     },
     {

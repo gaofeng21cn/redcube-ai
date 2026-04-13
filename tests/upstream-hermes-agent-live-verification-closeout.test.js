@@ -29,12 +29,9 @@ test('upstream Hermes live verification closeout is frozen as the completed F4 p
   assert.equal(closeout.verification.current_host_gateway_command, 'hermes gateway run -q --replace');
   assert.equal(closeout.verification.current_host_python_command.includes('python3.14'), true);
   assert.deepEqual(currentProgram.current_state.green_baseline.blocked_by, []);
+  assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.current_host_status, 'fresh_codex_smoke_passed');
   assert.equal(
-    currentProgram.current_state.green_baseline.live_upstream_verification.current_host_status,
-    'fresh_live_verification_passed',
-  );
-  assert.equal(
-    currentProgram.current_state.green_baseline.live_upstream_verification.current_host_closeout_contract,
+    currentProgram.current_state.foundation_milestones.upstream_hermes_agent_live_verification_closeout.contract,
     CLOSEOUT_CONTRACT,
   );
   assert.equal(
@@ -43,7 +40,7 @@ test('upstream Hermes live verification closeout is frozen as the completed F4 p
   );
   assert.equal(blocker.resolution.resolved_by_contract, CLOSEOUT_CONTRACT);
   assert.equal(status.includes(CLOSEOUT_CONTRACT), true);
-  assert.equal(status.includes('npm run test:e2e` 已在当前宿主 fresh 全绿'), true);
+  assert.equal(status.includes(CLOSEOUT_CONTRACT), true);
   assert.equal(docsReadme.includes('upstream_hermes_agent_live_verification_closeout.md'), true);
   assert.equal(docsReadmeZh.includes('upstream_hermes_agent_live_verification_closeout.md'), true);
   assert.equal(contractsReadme.includes('upstream-hermes-agent-live-verification-closeout.json'), true);

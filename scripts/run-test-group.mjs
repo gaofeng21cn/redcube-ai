@@ -1,21 +1,19 @@
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import {
-  probeHermesAgentUpstream,
-  readHermesAgentUpstreamConfig,
-} from '../packages/redcube-hermes-agent-client/src/index.js';
-import {
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
-  readHermesGatewayLaunchConfig,
-  DEFAULT_HERMES_GATEWAY_COMMAND,
-  LIVE_UPSTREAM_GROUP_NAMES,
+  SERIALIZED_VERIFICATION_GROUP_NAMES,
   resolveRedCubePythonCommand,
 } from './run-test-group-lib.mjs';
+import {
+  probeCodexCli,
+  readCodexCliContract,
+} from '@redcube/codex-cli-client';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
@@ -27,6 +25,7 @@ const META = [
   'tests/bilingual-home-readme.test.js',
   'tests/ci-workflow.test.js',
   'tests/creative-ownership-recovery-audit.test.js',
+  'tests/codex-cli-client.test.js',
   'tests/direct-delivery-longrun-target.test.js',
   'tests/family-onboarding-standard.test.js',
   'tests/harness-completion-audit.test.js',
@@ -116,8 +115,6 @@ const INTEGRATION = [
   'tests/source-intake.test.js',
   'tests/source-readiness-deep-research-gate.test.js',
   'tests/source-research.test.js',
-  'tests/upstream-hermes-agent-probe.test.js',
-  'tests/upstream-hermes-bridge.test.js',
   'tests/workspace-operator-quickstart.test.js',
   'tests/xiaohongshu-creative-ownership.test.js',
 ];
@@ -135,8 +132,8 @@ const FAST = [
   'tests/profile-contract-hydration.test.js',
   'tests/gateway-actions.test.js',
   'tests/worktree-package-resolution.test.js',
+  'tests/codex-cli-client.test.js',
   'tests/runtime-deliverable-route.test.js',
-  'tests/upstream-hermes-bridge.test.js',
   'tests/ppt-hermes-generation.test.js',
   'tests/service-safe-domain-entry.test.js',
   'tests/product-entry.test.js',
@@ -145,7 +142,6 @@ const FAST = [
   'tests/upstream-hermes-agent-live-verification-blocker.test.js',
   'tests/upstream-hermes-agent-live-verification-closeout.test.js',
   'tests/upstream-hermes-agent-final-target-shape.test.js',
-  'tests/upstream-hermes-agent-probe.test.js',
 ];
 
 const GROUPS = {
@@ -155,131 +151,33 @@ const GROUPS = {
   e2e: E2E,
   full: [...META, ...INTEGRATION, ...E2E],
 };
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function hermesGatewayBaseUrl() {
-  const host = process.env.API_SERVER_HOST || '127.0.0.1';
-  const port = process.env.API_SERVER_PORT || '8642';
-  return `http://${host}:${port}`;
-}
-
-async function waitForHermesGateway(baseUrl, timeoutMs = 30000) {
-  const startedAt = Date.now();
-  let lastError = null;
-
-  while (Date.now() - startedAt < timeoutMs) {
-    try {
-      const response = await fetch(`${baseUrl}/v1/health`, {
-        signal: AbortSignal.timeout(2000),
-      });
-      if (response.ok) {
-        return;
-      }
-      lastError = new Error(`health endpoint returned ${response.status}`);
-    } catch (error) {
-      lastError = error;
-    }
-    await sleep(500);
-  }
-
-  throw new Error(
-    `等待 Hermes gateway API server 超时: ${lastError instanceof Error ? lastError.message : String(lastError || 'unknown')}`,
-  );
-}
-
-function startHermesGateway() {
-  const launchConfig = readHermesGatewayLaunchConfig(process.env);
-  const gatewayEnv = {
-    ...process.env,
-    API_SERVER_ENABLED: 'true',
-    API_SERVER_HOST: process.env.API_SERVER_HOST || '127.0.0.1',
-    API_SERVER_PORT: process.env.API_SERVER_PORT || '8642',
-    API_SERVER_MODEL_NAME: process.env.API_SERVER_MODEL_NAME || process.env.REDCUBE_HERMES_UPSTREAM_MODEL || 'hermes-agent',
-  };
-  const output = [];
-  const spawnOptions = {
-    cwd: repoRoot,
-    env: gatewayEnv,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  };
-  const gateway = launchConfig.usesShell
-    ? spawn(launchConfig.command, {
-        ...spawnOptions,
-        shell: true,
-      })
-    : spawn('hermes', ['gateway', 'run', '-q', '--replace'], spawnOptions);
-
-  for (const stream of [gateway.stdout, gateway.stderr]) {
-    stream?.on('data', (chunk) => {
-      output.push(String(chunk));
-      if (output.length > 40) {
-        output.shift();
-      }
-    });
-  }
-
-  return {
-    gateway,
-    output,
-    baseUrl: hermesGatewayBaseUrl(),
-    modelName: gatewayEnv.API_SERVER_MODEL_NAME,
-    launchCommand: launchConfig.command,
-  };
-}
-
-async function preflightLiveUpstreamRunSurface({ baseUrl, modelName }) {
-  const config = readHermesAgentUpstreamConfig({
-    ...process.env,
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: modelName,
-  });
-  const probe = await probeHermesAgentUpstream({
-    config,
-    requireRunSurface: true,
-    timeoutMs: 60000,
-  });
-
-  if (!probe.ok) {
-    throw new Error(JSON.stringify(probe, null, 2));
-  }
-}
-
-async function prepareLiveUpstream(groupName) {
-  if (!LIVE_UPSTREAM_GROUP_NAMES.has(groupName)) {
+async function prepareSerializedVerification(groupName) {
+  if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
     return null;
   }
 
   const pythonCommand = resolveRedCubePythonCommand();
   process.env.REDCUBE_PYTHON_COMMAND = pythonCommand.command;
 
-  const handle = startHermesGateway();
-  try {
-    await waitForHermesGateway(handle.baseUrl);
-    await preflightLiveUpstreamRunSurface({
-      baseUrl: handle.baseUrl,
-      modelName: handle.modelName,
-    });
-  } catch (error) {
-    handle.gateway.kill('SIGTERM');
+  const codexProbe = await probeCodexCli({
+    contract: readCodexCliContract(process.env),
+    cwd: repoRoot,
+    timeoutMs: 60000,
+  });
+  if (!codexProbe.ok) {
     throw new Error([
-      `无法启动 integration live upstream: ${error instanceof Error ? error.message : String(error)}`,
-      `Hermes gateway launch command: ${handle.launchCommand}`,
-      'Hermes gateway recent output:',
-      handle.output.join('').trim() || '<empty>',
+      '无法完成本地 Codex CLI 预检',
+      JSON.stringify(codexProbe, null, 2),
     ].join('\n'));
   }
 
-  process.env.REDCUBE_HERMES_UPSTREAM_BASE_URL = handle.baseUrl;
-  process.env.REDCUBE_HERMES_UPSTREAM_MODEL = handle.modelName;
-  if (handle.launchCommand !== DEFAULT_HERMES_GATEWAY_COMMAND) {
-    process.stdout.write(`[run-test-group] live upstream launch override: ${handle.launchCommand}\n`);
-  }
-  process.stdout.write(`[run-test-group] live upstream python command: ${pythonCommand.command}\n`);
-  process.stdout.write('[run-test-group] live upstream run-surface preflight passed\n');
-  process.stdout.write(`[run-test-group] live upstream ready: ${handle.baseUrl}\n`);
-  return handle;
+  process.stdout.write(`[run-test-group] local codex command: ${codexProbe.contract.command.join(' ')}\n`);
+  process.stdout.write(`[run-test-group] local codex python command: ${pythonCommand.command}\n`);
+  process.stdout.write('[run-test-group] local codex exec preflight passed\n');
+  return {
+    codexProbe,
+    pythonCommand,
+  };
 }
 
 function discoveredRootTests() {
@@ -336,7 +234,7 @@ assertTrackedFiles(E2E, 'e2e');
 assertTrackedFiles(FAST, 'fast');
 assertPartition();
 
-  const liveUpstreamHandle = await prepareLiveUpstream(groupName);
+const serializedVerificationHandle = await prepareSerializedVerification(groupName);
 
 try {
   const result = spawnSync(process.execPath, [...buildNodeTestArgs({ groupName, forwardedArgs }), ...GROUPS[groupName]], {
@@ -351,7 +249,5 @@ try {
 
   process.exit(result.status ?? 1);
 } finally {
-  if (liveUpstreamHandle) {
-    liveUpstreamHandle.gateway.kill('SIGTERM');
-  }
+  void serializedVerificationHandle;
 }

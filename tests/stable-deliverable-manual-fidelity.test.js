@@ -6,9 +6,9 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 
 import { createDeliverable, runDeliverableRoute } from '../packages/redcube-gateway/src/index.js';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -30,11 +30,9 @@ async function runRoutes({ workspaceRoot, overlay, topicId, deliverableId, route
 }
 
 async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
 
   try {

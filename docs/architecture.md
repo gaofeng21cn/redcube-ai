@@ -6,7 +6,7 @@
 
 `gateway -> family -> profile -> pack -> harness execution -> audit / review / publication projection`
 
-当前仓内可执行的 runtime 基线已经把 route / managed execution 的 run surface 切到真实的上游 `Hermes-Agent` API server。
+当前仓内可执行的 runtime 基线已经把 route / managed execution 的 run surface 收口到本地 Codex CLI host-agent runtime。
 `RedCube AI` 继续只维护 visual-domain truth、本地 canonical artifacts，以及 audit / review / projection surface。
 
 ## 入口 taxonomy 与 OPL handoff
@@ -24,11 +24,11 @@
 
 已经冻结的 direct domain 级链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -49,11 +49,11 @@
 
 当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 与之对应的 direct domain 路线则是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 这里的关键约束是：
 
@@ -61,9 +61,9 @@
 - today repo-verified 的 product-entry service surface 是 `invokeProductEntry` / `invokeFederatedProductEntry` / `getProductEntrySession`
 - 成熟的最终用户产品入口前台壳仍未落地
 
-## Hermes runtime substrate 与 visual executor 的分工
+## Codex CLI host-agent runtime 与 visual executor 的分工
 
-上游 `Hermes runtime substrate` 在 `RedCube AI` 当前主线里的职责是：
+`Codex CLI host-agent runtime` 在 `RedCube AI` 当前主线里的职责是：
 
 - session / run / watch / memory / scheduling
 - gateway / messaging / interrupt / resume
@@ -78,7 +78,7 @@
 
 当前还要额外冻结一个边界：
 
-- `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一走 `runtime-family + upstream Hermes structured generation`
+- `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一走 `runtime-family + Codex CLI structured generation`
 - repo-local `pack/compiler` 不再 author story / blueprint / visual direction / final HTML 这类创作真值
 - `pack` 可以继续存在，但只能作为 typed shell、pack-id carrier 或非创作边界，不能再回退成脚本编译创作路径
 
@@ -86,7 +86,7 @@
 
 更准确的目标是：
 
-- 由上游 `Hermes-Agent` 统一 runtime substrate / orchestration
+- 由 Codex CLI host-agent runtime 统一 route / managed execution
 - 由 `RedCube AI` 统一 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器，例如 repo-local pipeline、受控 host-agent、渲染 toolchain 或未来的 Hermes-native route
 

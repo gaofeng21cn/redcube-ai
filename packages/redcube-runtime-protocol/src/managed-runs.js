@@ -20,7 +20,7 @@ function normalizeMode(value) {
 function normalizeAdapter(value) {
   const text = String(value || '').trim();
   if (!text || text === 'host_agent' || text === 'hermes') {
-    return 'hermes';
+    return 'host_agent';
   }
   return text;
 }

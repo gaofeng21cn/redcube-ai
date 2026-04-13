@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import {
+  CODEX_DEFAULT_ADAPTER,
   appendHermesEvent,
   completeHermesRun,
   failHermesRun,
@@ -8,10 +9,9 @@ import {
   startHermesRun,
 } from '@redcube/hermes-substrate';
 
-import { HERMES_DEFAULT_ADAPTER } from '@redcube/hermes-substrate';
+import { readCodexCliContract } from '@redcube/codex-cli-client';
+import { executeDeliverableRouteLocally, validateDeliverableRouteInput } from './deliverable-route-local.js';
 import { resolveExecutorAdapter } from './executors.js';
-import { validateDeliverableRouteInput } from './deliverable-route-local.js';
-import { executeServiceEntryViaUpstreamHermes } from './upstream-hermes-bridge.js';
 
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
@@ -27,40 +27,27 @@ function requireSafeSegment(name, value) {
   return text;
 }
 
-function buildExecutorDescriptor(executor, upstreamRun, probe) {
+function buildExecutorDescriptor(executor, codexContract) {
   return {
     ...(executor || {}),
-    upstream_runtime: {
-      owner: 'upstream_hermes_agent',
-      adapter_surface: '@redcube/hermes-agent-client',
-      run_id: upstreamRun.run_id,
-      session_id: upstreamRun.session_id,
-      base_url: probe?.config?.base_url || probe?.steps?.health?.url?.replace(/\/v1\/health$/, '') || null,
-      model_name: probe?.config?.model_name || null,
+    codex_cli_runtime: {
+      owner: 'codex_cli',
+      adapter_surface: '@redcube/codex-cli-client',
+      model_selection: codexContract.model_selection,
+      reasoning_selection: codexContract.reasoning_selection,
+      sandbox: codexContract.sandbox,
+      command: [...codexContract.command],
     },
   };
 }
 
-function patchArtifactExecutionModel(artifactFile, upstreamRuntime) {
+function patchArtifactExecutionModel(artifactFile, codexRuntime) {
   const artifact = JSON.parse(readFileSync(artifactFile, 'utf-8'));
   artifact.execution_model = {
     ...(artifact.execution_model || {}),
-    upstream_runtime: upstreamRuntime,
+    codex_cli_runtime: codexRuntime,
   };
   writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
-}
-
-function mirrorUpstreamEvents({ workspaceRoot, runId, route, overlay, deliverableId, upstreamEvents }) {
-  for (const event of upstreamEvents) {
-    appendHermesEvent(workspaceRoot, runId, {
-      type: `upstream_${String(event?.event || 'unknown').replace(/\./g, '_')}`,
-      upstream_event: event?.event || null,
-      route,
-      overlay,
-      deliverable_id: deliverableId,
-      payload: event,
-    });
-  }
 }
 
 export async function runDeliverableRoute({
@@ -71,7 +58,7 @@ export async function runDeliverableRoute({
   route,
   runId = null,
   managedRunId = null,
-  adapter = HERMES_DEFAULT_ADAPTER,
+  adapter = CODEX_DEFAULT_ADAPTER,
   mode = 'draft_new',
   baselineDeliverableId = '',
 }) {
@@ -83,23 +70,10 @@ export async function runDeliverableRoute({
     deliverableId,
     route: safeRoute,
   });
-  const upstreamExecution = await executeServiceEntryViaUpstreamHermes({
-    workspaceRoot,
-    entryKind: 'run_deliverable_route',
-    request: {
-      workspaceRoot,
-      overlay,
-      topicId,
-      deliverableId,
-      route: safeRoute,
-      adapter,
-      mode,
-      baselineDeliverableId,
-    },
-  });
+  const codexContract = readCodexCliContract();
   const fallbackExecutor = resolveExecutorAdapter({ adapter });
   const executor = buildExecutorDescriptor(
-    upstreamExecution.response?.result?.executor || {
+    {
       adapter: fallbackExecutor.adapter,
       primary: fallbackExecutor.primary,
       execution_surface: fallbackExecutor.execution_surface,
@@ -108,13 +82,12 @@ export async function runDeliverableRoute({
       compatibility_role: fallbackExecutor.compatibility_role,
       execution_model: fallbackExecutor.execution_model,
     },
-    upstreamExecution.upstream_run,
-    upstreamExecution.probe,
+    codexContract,
   );
 
   const run = startHermesRun({
     workspaceRoot,
-    runId: String(runId || upstreamExecution.upstream_run.run_id).trim() || upstreamExecution.upstream_run.run_id,
+    runId: String(runId || '').trim() || null,
     route: safeRoute,
     overlay,
     target: deliverableId,
@@ -125,24 +98,28 @@ export async function runDeliverableRoute({
     executor,
   });
 
-  mirrorUpstreamEvents({
-    workspaceRoot,
-    runId: run.run_id,
+  appendHermesEvent(workspaceRoot, run.run_id, {
+    type: 'codex_route_started',
     route: safeRoute,
     overlay,
-    deliverableId,
-    upstreamEvents: upstreamExecution.upstream_run.events,
+    deliverable_id: deliverableId,
+    codex_cli_runtime: executor.codex_cli_runtime,
   });
 
-  const routeResult = upstreamExecution.response?.result || null;
-  const success = upstreamExecution.upstream_run.terminal_event === 'run.completed'
-    && upstreamExecution.response?.ok === true
-    && routeResult;
-
-  if (success) {
+  try {
+    const routeResult = await executeDeliverableRouteLocally({
+      workspaceRoot,
+      overlay,
+      topicId,
+      deliverableId,
+      route: safeRoute,
+      adapter,
+      mode,
+      baselineDeliverableId,
+    });
     patchArtifactExecutionModel(
       routeResult.artifact_file,
-      executor.upstream_runtime,
+      executor.codex_cli_runtime,
     );
     const completedRun = completeHermesRun({
       workspaceRoot,
@@ -168,38 +145,35 @@ export async function runDeliverableRoute({
       events: readHermesEvents(workspaceRoot, completedRun.run_id),
       artifactFile: routeResult.artifact_file,
     };
+  } catch (error) {
+    const failureMessage = String(
+      error instanceof Error ? error.message : error,
+    ).trim() || 'Codex route execution failed';
+    const failure = new Error(failureMessage);
+    failure.code = error?.code || null;
+    failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
+    failure.requiresExternalSecret = error?.requiresExternalSecret === true;
+    const failedRun = failHermesRun({
+      workspaceRoot,
+      runId: run.run_id,
+      currentStage: safeRoute,
+      error: failure,
+      executor,
+    });
+
+    appendHermesEvent(workspaceRoot, failedRun.run_id, {
+      type: 'run_failed',
+      route: safeRoute,
+      overlay,
+      deliverable_id: deliverableId,
+      error: failedRun.error,
+    });
+
+    return {
+      ok: false,
+      run: failedRun,
+      events: readHermesEvents(workspaceRoot, failedRun.run_id),
+      error: failedRun.error,
+    };
   }
-
-  const failureMessage = String(
-    upstreamExecution.response?.error?.message
-    || upstreamExecution.upstream_run.error
-    || 'upstream Hermes-Agent route execution failed',
-  ).trim();
-  const failure = new Error(failureMessage);
-  failure.code = upstreamExecution.response?.error?.code || null;
-  failure.requiresHumanConfirmation = upstreamExecution.response?.error?.requires_human_confirmation === true;
-  failure.requiresExternalSecret = upstreamExecution.response?.error?.requires_external_secret === true;
-  const failedRun = failHermesRun({
-    workspaceRoot,
-    runId: run.run_id,
-    currentStage: safeRoute,
-    error: failure,
-    executor,
-  });
-
-  appendHermesEvent(workspaceRoot, failedRun.run_id, {
-    type: 'run_failed',
-    route: safeRoute,
-    overlay,
-    deliverable_id: deliverableId,
-    profile_id: routeResult?.artifact?.contract?.profile_id || null,
-    error: failedRun.error,
-  });
-
-  return {
-    ok: false,
-    run: failedRun,
-    events: readHermesEvents(workspaceRoot, failedRun.run_id),
-    error: failedRun.error,
-  };
 }

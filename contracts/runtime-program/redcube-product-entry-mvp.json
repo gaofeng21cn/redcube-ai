@@ -28,7 +28,7 @@
       "run_deliverable_route"
     ],
     "default_task_intent": "run_managed_deliverable",
-    "shared_runtime_owner": "upstream_hermes_agent",
+    "shared_runtime_owner": "codex_cli",
     "shared_domain_entry_contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json"
   },
   "behavior_contract": {

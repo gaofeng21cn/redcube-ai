@@ -12,16 +12,14 @@ import {
 } from '../packages/redcube-gateway/src/index.js';
 import { appendEvent } from '@redcube/runtime';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockHermesAgentUpstream();
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
   try {
     return await testFn();
@@ -147,7 +145,7 @@ test('createDeliverable rejects unknown overlay ids', async () => {
   );
 });
 
-test('runDeliverableRoute uses Hermes-backed executor by default', async () => {
+test('runDeliverableRoute uses Codex-backed executor by default', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
@@ -173,22 +171,22 @@ test('runDeliverableRoute uses Hermes-backed executor by default', async () => {
     assert.equal(result.surface_kind, 'route_run');
     assert.equal(result.recommended_action, 'continue');
     assert.equal(result.summary.route, 'storyline');
-    assert.match(result.run.run_id, /^run_/);
-    assert.equal(result.run.executor.adapter, 'hermes');
+    assert.match(result.run.run_id, /^run[-_]/);
+    assert.equal(result.run.executor.adapter, 'host_agent');
     assert.equal(result.run.executor.primary, true);
-    assert.equal(result.run.executor.execution_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(result.run.executor.execution_surface, 'codex_native_host_agent');
     assert.equal(result.run.executor.creative_execution, 'agent_first_director_first');
     assert.equal(result.run.executor.external_llm_role, 'optional_compatibility_adapter');
-    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
-    assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
-    assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
-    assert.equal(result.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
-    assert.equal(result.run.executor.upstream_runtime?.adapter_surface, '@redcube/hermes-agent-client');
+    assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+    assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
+    assert.equal(result.run.executor.codex_cli_runtime?.adapter_surface, '@redcube/codex-cli-client');
     assert.equal(result.run.topic_id, 'topic-a');
     assert.equal(result.run.deliverable_id, 'deck-a');
     assert.equal(result.run.status, 'completed');
-    assert.equal(result.events.some((event) => event?.type === 'upstream_run_completed'), true);
+    assert.equal(result.events.some((event) => event?.type === 'codex_route_started'), true);
 
     const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
     assert.equal(stored.surface_kind, 'run_record');
@@ -196,18 +194,18 @@ test('runDeliverableRoute uses Hermes-backed executor by default', async () => {
     assert.equal(stored.summary.run_id, result.run.run_id);
     assert.equal(stored.run.topic_id, 'topic-a');
     assert.equal(stored.run.deliverable_id, 'deck-a');
-    assert.equal(stored.run.executor.adapter, 'hermes');
-    assert.equal(stored.run.executor.execution_surface, 'hermes_backed_runtime_substrate');
-    assert.equal(stored.run.executor.execution_model.mainline_adapter, 'hermes');
-    assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
-    assert.equal(stored.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
-    assert.equal(stored.run.executor.upstream_runtime?.session_id, result.run.run_id);
+    assert.equal(stored.run.executor.adapter, 'host_agent');
+    assert.equal(stored.run.executor.execution_surface, 'codex_native_host_agent');
+    assert.equal(stored.run.executor.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+    assert.equal(stored.run.executor.codex_cli_runtime?.owner, 'codex_cli');
+    assert.equal(stored.run.executor.codex_cli_runtime?.model_selection, 'inherit_local_codex_default');
     assert.equal(stored.run_telemetry.run_id, result.run.run_id);
     assert.equal(stored.run_telemetry.route, 'storyline');
-    assert.equal(stored.run_telemetry.executor_kind, 'hermes');
+    assert.equal(stored.run_telemetry.executor_kind, 'host_agent');
     assert.equal(stored.error_taxonomy.error_kind, null);
     assert.equal(stored.rerun_analytics.rerun_count, 0);
-    assert.equal(stored.cost_summary.executor_identity, 'hermes_backed_runtime_substrate');
+    assert.equal(stored.cost_summary.executor_identity, 'codex_native_host_agent');
     assert.equal(stored.quality_drift_summary.relative_quality_verdict, null);
     assert.equal(stored.approval_throughput_summary.pending_review_count, 0);
     const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
@@ -215,15 +213,15 @@ test('runDeliverableRoute uses Hermes-backed executor by default', async () => {
     assert.equal(artifact.contract.profile_id, 'lecture_student');
     assert.equal(artifact.contract.goal, '为本科生讲授甲状腺基础知识');
     assert.equal(artifact.stage_contract.stage_id, 'storyline');
-    assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
-    assert.equal(artifact.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(artifact.execution_model.external_llm_role, 'optional_compatibility_adapter');
-    assert.equal(artifact.execution_model.freeze_origin_milestone, 'Hermes.A');
-    assert.equal(artifact.execution_model.upstream_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
+    assert.equal(artifact.execution_model.codex_cli_runtime?.owner, 'codex_cli');
   });
 });
 
-test('runDeliverableRoute executes other declared stages through Hermes-backed executor', async () => {
+test('runDeliverableRoute executes other declared stages through Codex-backed executor', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
@@ -255,15 +253,15 @@ test('runDeliverableRoute executes other declared stages through Hermes-backed e
     });
 
     assert.equal(result.ok, true);
-    assert.match(result.run.run_id, /^run_/);
-    assert.equal(result.run.executor.adapter, 'hermes');
-    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
-    assert.equal(result.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
+    assert.match(result.run.run_id, /^run[-_]/);
+    assert.equal(result.run.executor.adapter, 'host_agent');
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
     assert.equal(result.run.current_stage, 'detailed_outline');
     const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
     assert.equal(artifact.stage_contract.stage_id, 'detailed_outline');
     assert.equal(artifact.contract.profile_id, 'lecture_peer');
-    assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
+    assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
   });
 });
 
@@ -367,8 +365,8 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
     assert.equal(result.run.executor.primary, false);
     assert.equal(result.run.executor.execution_surface, 'external_llm_adapter');
     assert.equal(result.run.executor.compatibility_role, 'optional_compatibility_adapter');
-    assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
-    assert.equal(result.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+    assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
     assert.equal(
       result.run.error.message,
       'Unsupported route for adapter external_llm: detailed_outline',
@@ -377,8 +375,8 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
     const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
     assert.equal(stored.run.status, 'failed');
     assert.equal(stored.run.executor.execution_surface, 'external_llm_adapter');
-    assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'Hermes.A');
-    assert.equal(stored.run.executor.upstream_runtime?.owner, 'upstream_hermes_agent');
+    assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
+    assert.equal(stored.run.executor.codex_cli_runtime?.owner, 'codex_cli');
     assert.equal(stored.run_telemetry.executor_kind, 'external_llm');
     assert.equal(stored.error_taxonomy.error_kind, 'execution_error');
     assert.equal(stored.approval_throughput_summary.blocked, true);

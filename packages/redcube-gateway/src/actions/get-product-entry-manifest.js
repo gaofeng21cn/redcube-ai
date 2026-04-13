@@ -181,7 +181,7 @@ export async function getProductEntryManifest(request) {
       remaining_gaps_count: 2,
     },
     runtime: {
-      runtime_owner: 'upstream_hermes_agent',
+      runtime_owner: 'codex_cli',
       runtime_state_root: path.dirname(sessionStoreRoot),
       session_store_root: sessionStoreRoot,
     },

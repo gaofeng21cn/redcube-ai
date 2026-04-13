@@ -1,50 +1,20 @@
-import http from 'node:http';
-import { once } from 'node:events';
-import { exec as execCallback } from 'node:child_process';
-import { promisify } from 'node:util';
+import path from 'node:path';
+import {
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   REDCUBE_CREATIVE_GENERATION_META_BEGIN,
-  REDCUBE_CREATIVE_GENERATION_META_END,
   REDCUBE_STAGE_JSON_BEGIN,
   REDCUBE_STAGE_JSON_END,
-} from '../../packages/redcube-hermes-agent-client/src/index.js';
+  REDCUBE_CREATIVE_GENERATION_META_END,
+} from '../../packages/redcube-codex-cli-client/src/index.js';
 
-const exec = promisify(execCallback);
-
-export const REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN = 'REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN';
-export const REDCUBE_SERVICE_ENTRY_ENVELOPE_END = 'REDCUBE_SERVICE_ENTRY_ENVELOPE_END';
-
-function readJsonBody(request) {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    request.setEncoding('utf8');
-    request.on('data', (chunk) => {
-      body += chunk;
-    });
-    request.on('end', () => {
-      try {
-        resolve(body ? JSON.parse(body) : {});
-      } catch (error) {
-        reject(error);
-      }
-    });
-    request.on('error', reject);
-  });
-}
-
-function parseEnvelope(input) {
-  const text = String(input || '');
-  const start = text.indexOf(REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN);
-  const end = text.indexOf(REDCUBE_SERVICE_ENTRY_ENVELOPE_END);
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error('service entry envelope missing from upstream run input');
-  }
-  const jsonText = text
-    .slice(start + REDCUBE_SERVICE_ENTRY_ENVELOPE_BEGIN.length, end)
-    .trim();
-  return JSON.parse(jsonText);
-}
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 function parseCreativeGenerationMeta(input) {
   const text = String(input || '');
@@ -65,6 +35,29 @@ function safeText(value) {
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function sleepMs(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Math.max(Number(ms) || 0, 0));
+}
+
+function recordParallelOverlap({ lockDir, overlapFile, batchIndex, prefix }) {
+  if (!lockDir || !overlapFile || !batchIndex) {
+    throw new Error(`mock ${prefix} parallel variant requires lock dir, overlap file, and batch metadata`);
+  }
+  mkdirSync(lockDir, { recursive: true });
+  const markerFile = path.join(lockDir, `${prefix}-${batchIndex}-${process.pid}.lock`);
+  writeFileSync(markerFile, `${process.pid}`, 'utf-8');
+  try {
+    sleepMs(150);
+    const activeMarkers = readdirSync(lockDir).filter((entry) => entry.endsWith('.lock'));
+    if (activeMarkers.length > 1) {
+      writeFileSync(overlapFile, activeMarkers.join('\n'), 'utf-8');
+    }
+    sleepMs(150);
+  } finally {
+    rmSync(markerFile, { force: true });
+  }
 }
 
 function readySources(meta) {
@@ -378,10 +371,58 @@ function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
 function buildMockPptRender(meta) {
   const slides = safeArray(meta?.context?.blueprint?.slides);
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
+  const variant = safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT);
+  const renderScope = safeText(meta?.context?.render_scope, 'full_deck');
+  if (variant === 'require_render_batching' && renderScope !== 'summary' && slides.length > 3) {
+    throw new Error('mock ppt render expected slide_batch scope with at most 3 slides');
+  }
+  if (renderScope === 'summary') {
+    return {
+      slides: [],
+      render_summary: [
+        '本轮批量 render_html 已完成，整套 deck 的页面结构与节奏可以继续进入后续审稿。',
+      ],
+    };
+  }
+  if (variant === 'require_parallel_batches') {
+    recordParallelOverlap({
+      lockDir: safeText(process.env.REDCUBE_MOCK_PPT_RENDER_PARALLEL_LOCK_DIR),
+      overlapFile: safeText(process.env.REDCUBE_MOCK_PPT_RENDER_PARALLEL_OVERLAP_FILE),
+      batchIndex: Number(meta?.context?.render_batch?.batch_index || 0),
+      prefix: 'ppt-render',
+    });
+  }
   return {
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
-      content_html: buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id)),
+      content_html: (() => {
+        if (variant === 'require_revision_context') {
+          const revisionContext = meta?.context?.revision_context || {};
+          const hasDirectorFeedback = safeArray(revisionContext?.visual_director_review?.weak_pages).length > 0
+            || safeText(revisionContext?.visual_director_review?.review_summary).length > 0;
+          const hasScreenshotFeedback = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids).length > 0
+            || safeArray(revisionContext?.screenshot_review?.slide_feedback).length > 0;
+          if (!hasDirectorFeedback || !hasScreenshotFeedback) {
+            throw new Error(`mock ppt render expected revision_context with director and screenshot review feedback: ${JSON.stringify(revisionContext)}`);
+          }
+        }
+        const markup = buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id));
+        if (variant === 'missing_root_meta') {
+          return markup
+            .replace(/\sdata-title="[^"]*"/g, '')
+            .replace(/\sdata-speaker-seconds="[^"]*"/g, '')
+            .replace(/\sdata-layout-family="[^"]*"/g, '')
+            .replace(/\sdata-recipe-id="[^"]*"/g, '')
+            .replace(/\sdata-template-id="[^"]*"/g, '')
+            .replace(/\sdata-peak-page="[^"]*"/g, '');
+        }
+        if (variant === 'missing_review_anchors') {
+          return markup
+            .replace(/\sdata-qa-block="[^"]*"/g, '')
+            .replace(/\sdata-primary-point="[^"]*"/g, '');
+        }
+        return markup;
+      })(),
     })),
     render_summary: [
       '每页均由上游 AI 直接写出完整 slide HTML。',
@@ -401,6 +442,32 @@ function buildMockPptDirectorReview(meta) {
     weak_pages: [],
     review_summary: '页面峰值、结构差异和课堂讲授节奏都已经落到成品页上。',
     rewrite_action: 'none',
+  };
+}
+
+function buildMockPptScreenshotReview(meta) {
+  const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  const reviewScope = safeText(meta?.context?.review_scope, 'summary');
+  const variant = safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT);
+  if (variant === 'require_parallel_batches' && reviewScope !== 'summary') {
+    recordParallelOverlap({
+      lockDir: safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_PARALLEL_LOCK_DIR),
+      overlapFile: safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_PARALLEL_OVERLAP_FILE),
+      batchIndex: Number(meta?.context?.screenshot_mechanics?.slides?.[0]?.slide_id ? slides[0]?.slide_id?.replace(/\D+/g, '') : 0) || slides.length,
+      prefix: 'ppt-screenshot',
+    });
+  }
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: [],
+    review_summary: '截图复核确认封面署名、结构主线与课堂节奏都已经落到最终画面里。',
+    slide_reviews: slides.map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      judgement: 'pass',
+      visual_findings: ['结构清楚，首眼路径稳定，信息密度可讲可看。'],
+      recommended_fix: 'none',
+    })),
   };
 }
 
@@ -600,19 +667,19 @@ function buildXhsSlideMarkup(slide, totalSlides, peakPage = false) {
   const cards = safeArray(slide.page_core_content)
     .slice(0, 3)
     .map((item, index) => `
-      <article data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:12px 14px;border-radius:18px;background:${index === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.8)'};border:1px solid rgba(15,23,42,0.1);font-size:${index === 0 ? '24px' : '18px'};line-height:1.5;color:#0F172A;">${safeText(item)}</article>
+      <article data-qa-block="card-${index + 1}" data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:12px 14px;border-radius:18px;background:${index === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.8)'};border:1px solid rgba(15,23,42,0.1);font-size:${index === 0 ? '24px' : '18px'};line-height:1.5;color:#0F172A;">${safeText(item)}</article>
     `)
     .join('');
   return `
     <div data-slide-root="true" data-slide-id="${safeText(slide.slide_id)}" data-title="${safeText(slide.title)}" data-speaker-seconds="36" data-layout-family="${safeText(slide.layout_family)}" data-recipe-id="${safeText(slide.render_recipe_id)}" data-template-id="upstream_ai_html" data-peak-page="${peakPage}" style="position:relative;width:448px;height:597px;background:#FFFBF0;overflow:hidden;padding:22px 20px 26px;display:grid;grid-template-rows:auto 1fr auto;gap:14px;">
-      <header style="display:grid;gap:8px;">
+      <header data-qa-block="header" style="display:grid;gap:8px;">
         <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:${accent};">${safeText(slide.page_goal)}</div>
         <h2 style="margin:0;font-size:28px;line-height:1.2;color:#0F172A;">${safeText(slide.title)}</h2>
       </header>
       <section style="display:grid;gap:12px;align-content:start;">
         ${cards}
       </section>
-      <footer style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
+      <footer data-qa-block="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
         <div>${safeText(slide.source_language)}</div>
         <div style="font-weight:700;">${slide.slide_no} / ${totalSlides}</div>
       </footer>
@@ -644,6 +711,22 @@ function buildMockXhsDirectorReview() {
     weak_pages: [],
     review_summary: '记忆钩子、峰值页和反模板约束都已落到 HTML 成品上。',
     rewrite_action: 'none',
+  };
+}
+
+function buildMockXhsScreenshotReview(meta) {
+  const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: [],
+    review_summary: '封面抓停、机制推进和结尾动作都已经在最终卡片截图里成立。',
+    slide_reviews: slides.map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      judgement: 'pass',
+      visual_findings: ['首眼信息明确，手机端阅读节奏顺畅，卡片没有退化成统一模板。'],
+      recommended_fix: 'none',
+    })),
   };
 }
 
@@ -840,6 +923,23 @@ function buildMockPosterDirectorReview() {
   };
 }
 
+function buildMockPosterScreenshotReview(meta) {
+  const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    message_hierarchy_clear: true,
+    weak_regions: [],
+    review_summary: '单页海报的 headline、证据栏和动作收束都在最终截图里成立。',
+    slide_reviews: slides.map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      judgement: 'pass',
+      visual_findings: ['主标题抓手明确，证据和动作路径连续。'],
+      recommended_fix: 'none',
+    })),
+  };
+}
+
 function buildCreativeRunOutput(meta) {
   const family = safeText(meta?.family, 'ppt_deck');
   const route = safeText(meta?.route);
@@ -855,6 +955,8 @@ function buildCreativeRunOutput(meta) {
         return buildMockXhsRender(meta);
       case 'visual_director_review':
         return buildMockXhsDirectorReview(meta);
+      case 'screenshot_review':
+        return buildMockXhsScreenshotReview(meta);
       case 'publish_copy':
         return buildMockXhsPublishCopy(meta);
       default:
@@ -873,6 +975,8 @@ function buildCreativeRunOutput(meta) {
         return buildMockPosterRender(meta);
       case 'visual_director_review':
         return buildMockPosterDirectorReview(meta);
+      case 'screenshot_review':
+        return buildMockPosterScreenshotReview(meta);
       default:
         throw new Error(`unsupported poster_onepager creative generation route: ${route}`);
     }
@@ -890,6 +994,8 @@ function buildCreativeRunOutput(meta) {
       return buildMockPptRender(meta);
     case 'visual_director_review':
       return buildMockPptDirectorReview(meta);
+    case 'screenshot_review':
+      return buildMockPptScreenshotReview(meta);
     default:
       throw new Error(`unsupported creative generation route: ${route}`);
   }
@@ -901,12 +1007,6 @@ function formatCreativeRunOutput(output) {
     JSON.stringify(output, null, 2),
     REDCUBE_STAGE_JSON_END,
   ].join('\n');
-}
-
-function toSse(events) {
-  return events
-    .map((event) => `data: ${JSON.stringify(event)}\n\n`)
-    .join('');
 }
 
 export function withEnv(overrides) {
@@ -930,170 +1030,22 @@ export function withEnv(overrides) {
   };
 }
 
-export async function startMockHermesAgentUpstream() {
-  let runCounter = 0;
-  const runs = new Map();
-
-  const server = http.createServer(async (request, response) => {
-    try {
-      if (!request.url) {
-        response.writeHead(500).end();
-        return;
-      }
-
-      if (request.url === '/v1/health') {
-        response.writeHead(200, { 'content-type': 'application/json' });
-        response.end(JSON.stringify({ status: 'ok', platform: 'hermes-agent' }));
-        return;
-      }
-
-      if (request.url === '/v1/models') {
-        response.writeHead(200, { 'content-type': 'application/json' });
-        response.end(JSON.stringify({
-          object: 'list',
-          data: [{ id: 'hermes-agent', object: 'model' }],
-        }));
-        return;
-      }
-
-      if (request.url === '/v1/runs' && request.method === 'POST') {
-        const body = await readJsonBody(request);
-        const runId = `run_mock_${++runCounter}`;
-        const startedAt = Date.now() / 1000;
-        const sessionId = String(body.session_id || runId);
-        const creativeMeta = parseCreativeGenerationMeta(body.input);
-
-        const runPromise = creativeMeta
-          ? (async () => {
-              const output = buildCreativeRunOutput(creativeMeta);
-              return [
-                {
-                  event: 'message.delta',
-                  run_id: runId,
-                  timestamp: startedAt,
-                  delta: 'GENERATING',
-                },
-                {
-                  event: 'run.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  output: formatCreativeRunOutput(output),
-                  usage: {
-                    input_tokens: 0,
-                    output_tokens: 0,
-                    total_tokens: 0,
-                  },
-                },
-              ];
-            })()
-          : (async () => {
-              const envelope = parseEnvelope(body.input);
-              const events = [{
-                event: 'tool.started',
-                run_id: runId,
-                timestamp: startedAt,
-                tool: 'terminal',
-                preview: envelope.command,
-              }];
-
-              try {
-                await exec(envelope.command, {
-                  cwd: envelope.cwd,
-                });
-                events.push({
-                  event: 'tool.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  tool: 'terminal',
-                  duration: 0,
-                  error: false,
-                });
-                events.push({
-                  event: 'message.delta',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  delta: 'DONE',
-                });
-                events.push({
-                  event: 'run.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  output: JSON.stringify({
-                    status: 'completed',
-                    response_file: envelope.response_file,
-                    session_id: sessionId,
-                  }),
-                  usage: {
-                    input_tokens: 0,
-                    output_tokens: 0,
-                    total_tokens: 0,
-                  },
-                });
-                return events;
-              } catch (error) {
-                events.push({
-                  event: 'tool.completed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  tool: 'terminal',
-                  duration: 0,
-                  error: true,
-                });
-                events.push({
-                  event: 'run.failed',
-                  run_id: runId,
-                  timestamp: Date.now() / 1000,
-                  error: error instanceof Error ? error.message : String(error),
-                });
-                return events;
-              }
-            })();
-
-        runs.set(runId, runPromise);
-        response.writeHead(202, { 'content-type': 'application/json' });
-        response.end(JSON.stringify({ run_id: runId, status: 'started' }));
-        return;
-      }
-
-      if (request.url.startsWith('/v1/runs/') && request.url.endsWith('/events')) {
-        const runId = request.url.slice('/v1/runs/'.length, -'/events'.length);
-        const runPromise = runs.get(runId);
-        if (!runPromise) {
-          response.writeHead(404, { 'content-type': 'application/json' });
-          response.end(JSON.stringify({ error: { message: `run not found: ${runId}` } }));
-          return;
-        }
-
-        const events = await runPromise;
-        response.writeHead(200, { 'content-type': 'text/event-stream' });
-        response.write(toSse(events));
-        response.end(': stream closed\n\n');
-        return;
-      }
-
-      response.writeHead(404).end();
-    } catch (error) {
-      response.writeHead(500, { 'content-type': 'application/json' });
-      response.end(JSON.stringify({
-        error: {
-          message: error instanceof Error ? error.message : String(error),
-        },
-      }));
-    }
-  });
-
-  server.listen(0, '127.0.0.1');
-  await once(server, 'listening');
-  const address = server.address();
-  if (!address || typeof address === 'string') {
-    throw new Error('mock upstream address unavailable');
+export function buildMockCodexLastMessage(prompt) {
+  const text = String(prompt || '');
+  if (/Reply with READY only\./i.test(text)) {
+    return 'READY';
   }
 
+  const creativeMeta = parseCreativeGenerationMeta(text);
+  if (!creativeMeta) {
+    throw new Error('mock codex cli received unsupported prompt');
+  }
+  return formatCreativeRunOutput(buildCreativeRunOutput(creativeMeta));
+}
+
+export async function startMockCodexCli() {
   return {
-    baseUrl: `http://127.0.0.1:${address.port}`,
-    async close() {
-      server.close();
-      await once(server, 'close');
-    },
+    command: JSON.stringify(['node', path.join(MODULE_DIR, 'mock-codex-cli-bin.mjs')]),
+    async close() {},
   };
 }

@@ -45,7 +45,7 @@
 
 ### 决策：移除 repo-local pack/compiler 创作路径，保留 pack 的 boundary 语义
 
-- `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 统一改为 `runtime-family + upstream Hermes structured generation`。
+- `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 统一改为 `runtime-family + Codex CLI structured generation`。
 - repo-local `pack/compiler` 不再 author storyline、blueprint、visual_direction、render_html 这类创作真值。
 - `pack` 继续保留为 domain boundary、pack-id carrier 与 typed shell，但不得再回退成脚本填充 / 编译式创作主链。
 - legacy `pack-runtime` compiler registry 从 workspace 与依赖图移除，避免测试或后续修改误把旧路径重新接回 active mainline。

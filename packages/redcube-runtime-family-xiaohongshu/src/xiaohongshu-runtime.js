@@ -3,13 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { generateStructuredArtifactViaUpstreamHermes } from '@redcube/hermes-agent-client';
+import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
-import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
+import { buildCodexExecutionModel } from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
@@ -46,7 +46,10 @@ const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
   export_bundle: 'delivery_packaging',
 });
 
-const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
+const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
+const MIN_REVIEW_QA_BLOCKS = 2;
+const MIN_REVIEW_PRIMARY_POINTS = 1;
+const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   research: 'source_readiness',
   storyline: 'story_architecture',
@@ -56,18 +59,18 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
 
 function hostAgentCreativeSource(contractAsset) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
-    stage_owner: 'hermes_backed_runtime_substrate',
-    adapter: 'hermes',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
+    stage_owner: 'codex_native_host_agent',
+    adapter: 'host_agent',
     supporting_contract: safeText(contractAsset, 'prompt_pack_seed'),
   };
 }
 
 function creativeExecution(route, generationRuntime = null) {
   return {
-    owner: 'hermes',
-    primary_surface: 'hermes_backed_runtime_substrate',
+    owner: 'host_agent',
+    primary_surface: 'codex_native_host_agent',
     lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
     ownership_model: 'director_first',
     ...(generationRuntime
@@ -91,7 +94,7 @@ function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materiali
 function reviewAuthorship(overlay) {
   return {
     overlay,
-    primary_surface: 'hermes_backed_runtime_substrate',
+    primary_surface: 'codex_native_host_agent',
     contract_asset: 'prompt_pack_seed',
   };
 }
@@ -119,6 +122,82 @@ function normalizeStringList(value, field, { min = 0, max = Infinity } = {}) {
     throw new Error(`Invalid xiaohongshu list field: ${field}`);
   }
   return items;
+}
+
+function normalizeXhsScreenshotAiSlideReviews(value, mechanicalSlideReviews) {
+  const expectedSlideIds = new Set(mechanicalSlideReviews.map((slide) => slide.slide_id));
+  const reviews = safeArray(value).map((item, index) => {
+    const slideId = requireText(item?.slide_id, `screenshot_review.slide_reviews[${index}].slide_id`);
+    if (!expectedSlideIds.has(slideId)) {
+      throw new Error(`Unexpected xiaohongshu screenshot_review.slide_reviews[${index}].slide_id: ${slideId}`);
+    }
+    const rawJudgement = safeText(item?.judgement, 'pass');
+    const judgement = normalizeAiVisualJudgement(rawJudgement);
+    if (!['pass', 'block'].includes(judgement)) {
+      throw new Error(`Invalid xiaohongshu screenshot_review.slide_reviews[${index}].judgement: ${rawJudgement}`);
+    }
+    return {
+      slide_id: slideId,
+      judgement,
+      visual_findings: normalizeStringList(
+        item?.visual_findings,
+        `screenshot_review.slide_reviews[${index}].visual_findings`,
+        { min: 1, max: 4 },
+      ),
+      recommended_fix: safeText(item?.recommended_fix, judgement === 'pass' ? 'none' : 'revise_render_html'),
+    };
+  });
+  if (reviews.length !== mechanicalSlideReviews.length) {
+    throw new Error('xiaohongshu screenshot_review.slide_reviews 必须覆盖全部截图页');
+  }
+  const covered = new Set(reviews.map((item) => item.slide_id));
+  for (const slideId of expectedSlideIds) {
+    if (!covered.has(slideId)) {
+      throw new Error(`Missing xiaohongshu screenshot_review.slide_reviews entry for ${slideId}`);
+    }
+  }
+  return reviews;
+}
+
+function hasAiVisualPass(aiReview) {
+  return normalizeAiVisualJudgement(aiReview?.judgement) === 'pass';
+}
+
+function hasAiVisualBlock(aiReview) {
+  return normalizeAiVisualJudgement(aiReview?.judgement) === 'block';
+}
+
+function normalizeAiVisualJudgement(value) {
+  const raw = safeText(value, 'pass').toLowerCase();
+  if (['block', 'revise', 'fail', 'failed', 'reject', 'rejected', 'needs_revision', 'needs_rewrite'].includes(raw)) {
+    return 'block';
+  }
+  if (['pass', 'ok', 'approved', 'approve'].includes(raw)) {
+    return 'pass';
+  }
+  return raw;
+}
+
+function buildAiFirstVisualSlideReview(slide, aiReview) {
+  const mechanicalIssues = safeArray(slide?.issues);
+  const hardMechanicalIssues = mechanicalIssues.filter((issue) => HARD_SCREENSHOT_BLOCKING_ISSUES.has(issue));
+  const aiIssues = hasAiVisualBlock(aiReview) ? ['ai_visual_risk'] : [];
+  return {
+    ...slide,
+    status: hardMechanicalIssues.length === 0 && aiIssues.length === 0 ? 'pass' : 'block',
+    issues: [...hardMechanicalIssues, ...aiIssues],
+    mechanical_issues: mechanicalIssues,
+    ai_review: aiReview || null,
+  };
+}
+
+function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
+  return safeArray(slideReviews).every((slide) => {
+    if (hasAiVisualPass(slide?.ai_review)) {
+      return true;
+    }
+    return Boolean(slide?.checks?.[checkKey]);
+  });
 }
 
 function requireObjectArray(value, field, { min = 0, max = Infinity } = {}) {
@@ -222,6 +301,13 @@ function promptSeed(contract, route, vars = {}) {
   return promptPackJsonSection(contract, route, 'runtime_seed', vars);
 }
 
+function isOperatorContextMaterial(material) {
+  const kind = safeText(material?.kind);
+  return safeText(material?.source_role) === 'operator_context'
+    || kind === 'brief'
+    || kind === 'keywords';
+}
+
 function isSeries(contract) {
   return /系列/.test(`${safeText(contract.title)} ${safeText(contract.goal)}`);
 }
@@ -275,7 +361,13 @@ function sourceReadinessPack(contract) {
 }
 
 function sourceMaterials(contract) {
-  return safeArray(sourceTruth(contract)?.extracted_materials?.materials);
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
+    .filter((material) => !isOperatorContextMaterial(material));
+}
+
+function operatorMaterials(contract) {
+  return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
+    .filter((material) => isOperatorContextMaterial(material));
 }
 
 function sourceMaterialIds(contract) {
@@ -285,7 +377,7 @@ function sourceMaterialIds(contract) {
 function sourceLabels(contract) {
   const truth = sourceTruth(contract);
   const labels = safeArray(truth?.source_index?.sources)
-    .filter((source) => source.status === 'ready')
+    .filter((source) => source.status === 'ready' && !isOperatorContextMaterial(source))
     .map((source) => source.relative_path || source.kind);
   return labels.length > 0 ? labels : publicSources();
 }
@@ -345,7 +437,8 @@ function buildStorylineInputs(contract, research) {
 }
 
 function deriveAudienceFromSource(contract) {
-  const corpus = `${safeText(sourceTruth(contract)?.source_brief?.brief_text)} ${sourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ')}`;
+  const materialCorpus = sourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ');
+  const corpus = materialCorpus || safeText(sourceTruth(contract)?.source_brief?.brief_text);
   if (/患者|门诊|家属/.test(corpus)) {
     return '门诊患者和家属：更关心先做什么、怎么避免走弯路，而不是完整术语体系';
   }
@@ -400,9 +493,17 @@ function buildAuthoringContext(contract, research = null) {
       residual_evidence_gaps: sourceResidualEvidenceGaps(contract),
       material_ids: sourceMaterialIds(contract),
     },
+    operator_playbook: operatorMaterials(contract)
+      .slice(0, 6)
+      .map((material) => ({
+        source_id: material.source_id,
+        excerpt: safeText(material.content_text || material.excerpt).replace(/\s+/g, ' ').slice(0, 220),
+      }))
+      .filter((item) => item.excerpt),
     authoring_guardrails: [
       '交付目标和制作要求不能原样进入读者可见正文。',
       '不要把内部资料、来源索引、工作流注释、系统操作说明写成小红书正文。',
+      'operator_playbook 只作为制作约束，不得被改写成标题、正文、评论区文案或来源口径。',
       '来源必须翻译成读者能理解的公开口径，不能直接写内部文件名。',
       '如果共享事实层不足，只能保守表达，不得编造医学结论、效果承诺或平台反馈。',
     ],
@@ -499,6 +600,23 @@ function directorReviewOutputContract() {
   };
 }
 
+function screenshotReviewOutputContract() {
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    weak_pages: ['N04'],
+    review_summary: '<string>',
+    slide_reviews: [
+      {
+        slide_id: 'N01',
+        judgement: 'pass',
+        visual_findings: ['<string>'],
+        recommended_fix: 'none',
+      },
+    ],
+  };
+}
+
 function publishCopyOutputContract() {
   return {
     body: '<string>',
@@ -544,12 +662,59 @@ function escapeHtml(text) {
     .replaceAll("'", '&#39;');
 }
 
+function escapeHtmlAttribute(text) {
+  return String(text || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
 function escapeTemplate(text) {
   return String(text || '').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('${', '\\${');
 }
 
+function countMatches(text, pattern) {
+  const matches = String(text || '').match(pattern);
+  return matches ? matches.length : 0;
+}
+
+function upsertHtmlAttribute(tag, name, value) {
+  const attrPattern = new RegExp(`\\s${name}=(["']).*?\\1`, 'i');
+  const serialized = ` ${name}="${escapeHtmlAttribute(value)}"`;
+  if (attrPattern.test(tag)) {
+    return tag.replace(attrPattern, serialized);
+  }
+  return tag.replace(/\/?>$/, (suffix) => `${serialized}${suffix}`);
+}
+
+function hydrateRenderedSlideRootMetadata(html, metadata, slideId) {
+  const rootTagMatch = String(html || '').match(/<[^>]+data-slide-root=(["'])true\1[^>]*>/i);
+  if (!rootTagMatch) {
+    throw new Error(`render_html slide missing data-slide-root=true: ${slideId}`);
+  }
+  let rootTag = rootTagMatch[0];
+  for (const [name, value] of Object.entries(metadata || {})) {
+    if (value === undefined || value === null || value === '') continue;
+    rootTag = upsertHtmlAttribute(rootTag, name, value);
+  }
+  return String(html || '').replace(rootTagMatch[0], rootTag);
+}
+
+function validateRenderedReviewAnchors(html, slideId, familyLabel = 'xiaohongshu') {
+  const qaBlocks = countMatches(html, /data-qa-block=(["'])[^"']+\1/gi);
+  if (qaBlocks < MIN_REVIEW_QA_BLOCKS) {
+    throw new Error(`${familyLabel} render_html slide missing required data-qa-block anchors: ${slideId}`);
+  }
+  const primaryPoints = countMatches(html, /data-primary-point=(["'])true\1/gi);
+  if (primaryPoints < MIN_REVIEW_PRIMARY_POINTS) {
+    throw new Error(`${familyLabel} render_html slide missing required data-primary-point=true anchor: ${slideId}`);
+  }
+  return html;
+}
+
 function buildHtml({ title, slides, renderPlan, renderStrategy, shellText }) {
-  const slidesLiteral = `[\n${slides.map((slide) => `  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, recipeId: '${slide.recipe_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
+  const slidesLiteral = `[\n${slides.map((slide) => `  { slideId: '${slide.slide_id}', slideNo: ${Number(slide.slide_no || 0)}, title: ${JSON.stringify(slide.title)}, layoutFamily: ${JSON.stringify(slide.layout_family)}, recipeId: '${slide.recipe_id}', templateId: ${JSON.stringify(slide.template_id || '')}, speakerSeconds: ${Number(slide.speaker_seconds || 0)}, peakPage: ${slide.director_contract?.peak_page ? 'true' : 'false'}, directorRole: ${JSON.stringify(slide.director_contract?.page_role || '')}, content: \`${escapeTemplate(slide.content)}\` }`).join(',\n')}\n]`;
   return shellText
     .replaceAll('__REDCUBE_TITLE__', escapeHtml(title))
     .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
@@ -564,7 +729,7 @@ function attachCommon(route, contract) {
     profile_id: contract.profile_id,
     produced_at: new Date().toISOString(),
     lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[route] || null,
-    execution_model: HERMES_EXECUTION_MODEL,
+    execution_model: CODEX_EXECUTION_MODEL,
     prompt_pack: promptMeta(contract, route),
   };
 }
@@ -649,7 +814,7 @@ function buildResearch(contract) {
 }
 
 async function generateStorylineDraft(contract, researchArtifact) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'storyline',
     promptRelativePath: promptRoute(contract, 'storyline'),
@@ -700,13 +865,13 @@ async function buildStoryline(contract, deliverablePaths) {
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'narrative_arc',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         memory_hook: creativeSourceStamp({
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'memory_hook',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -747,19 +912,19 @@ function normalizePlanSlide(slide, index, sources) {
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'page_core_content',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
       visual_presentation: creativeSourceStamp({
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'visual_presentation',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
       render_recipe_id: creativeSourceStamp({
         route: 'single_note_plan',
         lifecycleStage: 'visual_authorship',
         authoredSurface: 'render_recipe_id',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
     },
     creative_authorship: {
@@ -767,20 +932,20 @@ function normalizePlanSlide(slide, index, sources) {
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'page_core_content',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
       visual_presentation: creativeSourceStamp({
         route: 'single_note_plan',
         lifecycleStage: 'story_architecture',
         authoredSurface: 'visual_presentation',
-        materializedFrom: 'upstream_run_json_output',
+        materializedFrom: 'codex_cli_json_output',
       }),
     },
   };
 }
 
 async function generateSingleNotePlanDraft(contract, researchArtifact, storylineArtifact) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'single_note_plan',
     promptRelativePath: promptRoute(contract, 'single_note_plan'),
@@ -822,7 +987,7 @@ async function buildSingleNotePlan(contract, deliverablePaths) {
 }
 
 async function generateVisualDirectionDraft(contract, researchArtifact, storylineArtifact, planArtifact, mode, baselineDeliverableId) {
-  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+  const { data, generationRuntime } = await generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'visual_direction',
     promptRelativePath: promptRoute(contract, 'visual_direction'),
@@ -901,25 +1066,25 @@ async function buildVisualDirection(contract, deliverablePaths, mode, baselineDe
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'director_statement',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         visual_motif: creativeSourceStamp({
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'visual_motif',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         rhythm_curve: creativeSourceStamp({
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'rhythm_curve',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         page_family_ceiling: creativeSourceStamp({
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'page_family_ceiling',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
       creative_authorship: {
@@ -927,7 +1092,7 @@ async function buildVisualDirection(contract, deliverablePaths, mode, baselineDe
           route: 'visual_direction',
           lifecycleStage: 'visual_authorship',
           authoredSurface: 'visual_direction',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -1005,6 +1170,9 @@ function validateRenderedSlideContent(content, slideId) {
   if (/<script\b/i.test(html)) {
     throw new Error(`render_html slide contains forbidden script tag: ${slideId}`);
   }
+  if (/<style\b/i.test(html)) {
+    throw new Error(`render_html slide contains forbidden style tag: ${slideId}`);
+  }
   if (/<img[^>]+src=(["'])https?:\/\//i.test(html)) {
     throw new Error(`render_html slide contains forbidden external image: ${slideId}`);
   }
@@ -1016,7 +1184,7 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  return generateStructuredArtifactViaUpstreamHermes({
+  return generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'render_html',
     promptRelativePath: promptRoute(contract, 'render_html'),
@@ -1035,7 +1203,8 @@ async function generateRenderHtmlDraft(contract, deliverablePaths) {
       },
       html_guardrails: [
         '每页输出完整 slide root，必须包含 data-slide-root=true 和匹配的 data-slide-id。',
-        '不要外链图片，不要脚本，不要把内部文档或模板注册表写进 HTML。',
+        '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
+        '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或模板注册表写进 HTML。',
         '版式由 AI 直接创作，不能退化成固定卡片模板拼装。',
       ],
     },
@@ -1050,8 +1219,8 @@ async function buildRenderHtml(contract, deliverablePaths) {
   const slideHtmlList = requireObjectArray(data?.slides, 'render_html.slides', { min: 4, max: 8 });
   const slideHtmlById = new Map(slideHtmlList.map((item) => [safeText(item.slide_id), validateRenderedSlideContent(item.content_html, safeText(item.slide_id))]));
   const slides = safeArray(plan?.single_note_plan?.slides).map((slide) => {
-    const content = slideHtmlById.get(slide.slide_id);
-    if (!content) {
+    const rawContent = slideHtmlById.get(slide.slide_id);
+    if (!rawContent) {
       throw new Error(`render_html output missing slide: ${slide.slide_id}`);
     }
     const materialRules = visual?.visual_direction?.material_rules || {};
@@ -1059,14 +1228,30 @@ async function buildRenderHtml(contract, deliverablePaths) {
       route: 'render_html',
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'recipe_selection',
-      materializedFrom: 'upstream_run_json_output',
+      materializedFrom: 'codex_cli_json_output',
     });
     const finalMarkup = creativeSourceStamp({
       route: 'render_html',
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'final_html_markup',
-      materializedFrom: 'upstream_run_json_output',
+      materializedFrom: 'codex_cli_json_output',
     });
+    const speakerSeconds = slide.layout_family === 'process_track' ? 40 : slide.layout_family === 'action_checklist' ? 32 : 36;
+    const peakPage = safeArray(visual?.visual_direction?.peak_pages).includes(slide.slide_id);
+    const pageRole = slide.progression_role;
+    const content = validateRenderedReviewAnchors(
+      hydrateRenderedSlideRootMetadata(rawContent, {
+        'data-title': slide.title,
+        'data-layout-family': slide.layout_family,
+        'data-speaker-seconds': speakerSeconds,
+        'data-recipe-id': slide.render_recipe_id,
+        'data-template-id': 'upstream_ai_html',
+        'data-peak-page': peakPage ? 'true' : 'false',
+        'data-director-role': pageRole,
+      }, slide.slide_id),
+      slide.slide_id,
+      'xiaohongshu',
+    );
     return {
       slide_id: slide.slide_id,
       slide_no: slide.slide_no,
@@ -1081,8 +1266,8 @@ async function buildRenderHtml(contract, deliverablePaths) {
         visual_motif: safeText(visual?.visual_direction?.visual_motif),
         source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
         anti_template_constraints: safeArray(visual?.visual_direction?.anti_template_constraints),
-        peak_page: safeArray(visual?.visual_direction?.peak_pages).includes(slide.slide_id),
-        page_role: slide.progression_role,
+        peak_page: peakPage,
+        page_role: pageRole,
         memory_hook: safeText(visual?.visual_direction?.memory_hook),
         material_rules: {
           paper_base: safeText(materialRules.paper_base, '#FFFBF0'),
@@ -1090,7 +1275,7 @@ async function buildRenderHtml(contract, deliverablePaths) {
           warning_accent: safeText(materialRules.warning_accent, '#DC2626'),
         },
       },
-      speaker_seconds: slide.layout_family === 'process_track' ? 40 : slide.layout_family === 'action_checklist' ? 32 : 36,
+      speaker_seconds: speakerSeconds,
       total_slides: safeArray(plan?.single_note_plan?.slides).length,
       creative_sources: {
         recipe_selection: recipeDecision,
@@ -1100,7 +1285,7 @@ async function buildRenderHtml(contract, deliverablePaths) {
         recipe_decision: recipeDecision,
         final_html_markup: finalMarkup,
       },
-      markup_contract_source: 'upstream_run_json_output',
+      markup_contract_source: 'codex_cli_json_output',
       content,
     };
   });
@@ -1109,7 +1294,7 @@ async function buildRenderHtml(contract, deliverablePaths) {
     render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
     shell_file: resolvePromptPackAsset(contract, safeText(contractRender.shell_file, 'render_shell.html')),
     pack_id: safeText(contract?.prompt_pack?.pack_id),
-    authored_markup_surface: 'upstream_run_json_output',
+    authored_markup_surface: 'codex_cli_json_output',
     markup_binding_model: 'slides_data_shell_only',
     director_contract: {
       visual_motif: safeText(visual?.visual_direction?.visual_motif),
@@ -1160,7 +1345,7 @@ async function generateDirectorReviewDraft(contract, deliverablePaths) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
-  return generateStructuredArtifactViaUpstreamHermes({
+  return generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'visual_director_review',
     promptRelativePath: promptRoute(contract, 'visual_director_review'),
@@ -1196,7 +1381,7 @@ async function buildDirectorReview(contract, deliverablePaths) {
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
-    '- review_owner: hermes_backed_runtime_substrate',
+    '- review_owner: codex_native_host_agent',
     `- director_intent_landed: ${directorIntentLanded}`,
     `- anti_template_ok: ${antiTemplateOk}`,
     `- memory_hook_present: ${memoryHookPresent}`,
@@ -1227,7 +1412,7 @@ async function buildDirectorReview(contract, deliverablePaths) {
           route: 'visual_director_review',
           lifecycleStage: 'review_overlay',
           authoredSurface: 'review_judgement',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -1260,8 +1445,88 @@ async function buildDirectorReview(contract, deliverablePaths) {
   };
 }
 
-function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId) {
+function buildScreenshotReviewMarkdown(contract, reviewArtifact) {
+  const lines = [
+    `# ${contract.title} 视觉质控`,
+    '',
+    '- review_owner: codex_native_host_agent',
+    `- 状态: ${reviewArtifact.status}`,
+    `- director_intent_landed: ${reviewArtifact.checks.director_intent_landed}`,
+    `- anti_template_ok: ${reviewArtifact.checks.anti_template_ok}`,
+    `- overflow_free: ${reviewArtifact.checks.overflow_free}`,
+    `- occlusion_free: ${reviewArtifact.checks.occlusion_free}`,
+    `- visual_density_ok: ${reviewArtifact.checks.visual_density_ok}`,
+    `- cover_density_ok: ${reviewArtifact.checks.cover_density_ok}`,
+    `- memory_hook_present: ${reviewArtifact.checks.memory_hook_present}`,
+    '',
+    '## AI 审阅结论',
+    `- review_model: ${safeText(reviewArtifact.ai_review?.review_model)}`,
+    `- weak_pages: ${safeArray(reviewArtifact.ai_review?.weak_pages).join(', ') || 'none'}`,
+    `- review_summary: ${safeText(reviewArtifact.ai_review?.review_summary)}`,
+    '',
+    '## 分页记录',
+  ];
+  for (const slide of safeArray(reviewArtifact.slide_reviews)) {
+    lines.push(`- ${safeText(slide.slide_id)} / ${safeText(slide.status)} / ${safeText(slide.screenshot_file)}`);
+    if (slide.ai_review) {
+      lines.push(`  - AI judgement: ${safeText(slide.ai_review.judgement)}`);
+      lines.push(`  - AI findings: ${safeArray(slide.ai_review.visual_findings).join('；')}`);
+      lines.push(`  - Recommended fix: ${safeText(slide.ai_review.recommended_fix, 'none')}`);
+    }
+  }
+  if (reviewArtifact.baseline_review?.summary) {
+    lines.push('', '## Baseline Relative Review', safeText(reviewArtifact.baseline_review.summary));
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+async function generateScreenshotReviewDraft(contract, deliverablePaths, slideReviews, reviewPayload, mode, research) {
+  const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
+  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  return generateStructuredArtifactViaCodexCli({
+    family: 'xiaohongshu',
+    route: 'screenshot_review',
+    promptRelativePath: promptRoute(contract, 'screenshot_review'),
+    context: {
+      ...buildAuthoringContext(contract, research),
+      mode,
+      storyline: storyline?.storyline || null,
+      plan: {
+        slides: summarizePlanSlides(plan),
+      },
+      visual_direction: visual?.visual_direction || null,
+      director_review: directorReview?.visual_director_review || null,
+      screenshot_mechanics: {
+        overall_checks: reviewPayload?.checks || null,
+        metrics: reviewPayload?.metrics || null,
+        baseline: reviewPayload?.baseline || null,
+        slides: slideReviews.map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          status: slide.status,
+          issues: slide.issues,
+          occupied_ratio: slide.metrics?.occupied_ratio ?? null,
+          primary_points: slide.metrics?.primary_points ?? null,
+        })),
+      },
+    },
+    outputContract: screenshotReviewOutputContract(),
+    localFileInspection: slideReviews.map((slide, index) => ({
+      label: `${slide.slide_id} ${safeText(slide.title, `Card ${index + 1}`)}`.trim(),
+      path: slide.screenshot_file,
+      media_type: 'image/png',
+      purpose: `Review rendered Xiaohongshu card screenshot for ${slide.slide_id}`,
+    })),
+    cwd: deliverablePaths.deliverableDir,
+  });
+}
+
+async function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId) {
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const research = readStageArtifact(contract, deliverablePaths, 'research');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
   const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
   const args = [
@@ -1278,7 +1543,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
     args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
   }
   const python = runPython(PYTHON_REVIEW, args);
-  const slideReviews = safeArray(python.slide_reviews).map((slide) => {
+  const mechanicalSlideReviews = safeArray(python.slide_reviews).map((slide) => {
     const occupiedRatio = Number(slide?.metrics?.occupied_ratio || 0);
     const overlaps = safeArray(slide?.metrics?.overlaps);
     const overflowFree = occupiedRatio <= 0.88;
@@ -1292,6 +1557,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
     if (!speakerFitOk) issues.push('speaker_fit_out_of_range');
     return {
       ...slide,
+      status: issues.length === 0 ? 'pass' : 'block',
       checks: {
         overflow_free: overflowFree,
         occlusion_free: occlusionFree,
@@ -1301,32 +1567,73 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
       issues,
     };
   });
+  const { data, generationRuntime } = await generateScreenshotReviewDraft(
+    contract,
+    deliverablePaths,
+    mechanicalSlideReviews,
+    python,
+    mode,
+    research,
+  );
+  const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
+  const aiSlideReviews = normalizeXhsScreenshotAiSlideReviews(data?.slide_reviews, mechanicalSlideReviews);
+  const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
+  const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
+    slide,
+    aiSlideReviewMap.get(slide.slide_id),
+  ));
   const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const checks = {
-    director_intent_landed: Boolean(directorReview?.visual_director_review?.director_intent_landed),
+    director_intent_landed: Boolean(directorReview?.visual_director_review?.director_intent_landed)
+      && Boolean(data?.director_intent_landed),
+    ai_review_passed: slideReviews.every((slide) => !hasAiVisualBlock(slide?.ai_review)),
     overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
-    occlusion_free: slideReviews.every((slide) => slide.checks.occlusion_free),
-    visual_density_ok: slideReviews.every((slide) => slide.checks.visual_density_ok),
-    speaker_fit_ok: slideReviews.every((slide) => slide.checks.speaker_fit_ok),
-    cover_density_ok: slideReviews.length > 0 && Number(slideReviews[0]?.metrics?.occupied_ratio || 0) >= 0.22,
-    anti_template_ok: Boolean(directorReview?.visual_director_review?.anti_template_ok),
+    occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
+    visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
+    speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
+    cover_density_ok: slideReviews.length > 0
+      && (hasAiVisualPass(slideReviews[0]?.ai_review) || Number(slideReviews[0]?.metrics?.occupied_ratio || 0) >= 0.22),
+    anti_template_ok: Boolean(directorReview?.visual_director_review?.anti_template_ok)
+      && Boolean(data?.anti_template_ok),
     memory_hook_present: Boolean(directorReview?.visual_director_review?.memory_hook_present),
   };
   const status = Object.values(checks).every((value) => value === true) ? 'pass' : 'block';
   const artifact = {
     ...attachCommon('screenshot_review', contract),
     review_overlay: 'screenshot_review',
-    review_authorship: {
-      primary_surface: 'governed_screenshot_review',
-      contract_asset: 'python_review_pipeline',
+    review_authorship: reviewAuthorship('screenshot_review'),
+    review_execution: {
+      ...creativeExecution('screenshot_review', generationRuntime),
+      overlay: 'screenshot_review',
     },
     mode,
     status,
     checks,
     slide_reviews: slideReviews,
-    report_markdown: python.review_markdown || reviewMarkdown,
+    ai_review: {
+      review_model: 'screenshot_director_first_visual_judgement',
+      director_intent_landed: Boolean(data?.director_intent_landed),
+      anti_template_ok: Boolean(data?.anti_template_ok),
+      weak_pages: aiWeakPages,
+      review_summary: requireText(data?.review_summary, 'screenshot_review.review_summary'),
+      slide_reviews: aiSlideReviews,
+      creative_sources: {
+        review_judgement: creativeSourceStamp({
+          route: 'screenshot_review',
+          lifecycleStage: 'review_overlay',
+          authoredSurface: 'review_judgement',
+          materializedFrom: 'codex_cli_json_output',
+        }),
+      },
+    },
+    mechanical_review: {
+      review_model: 'python_screenshot_layout_checks',
+      checks: python.checks,
+      metrics: python.metrics,
+    },
+    report_markdown: reviewMarkdown,
     metrics: python.metrics,
-    artifact_refs: [python.review_markdown || reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
+    artifact_refs: [reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
     review_state_patch: {
       current_status: status === 'pass' ? 'review_passed' : 'blocked_for_revision',
       ready_for_export: false,
@@ -1354,6 +1661,7 @@ function buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePath
       artifact.review_state_patch.rerun_from_stage = 'visual_direction';
     }
   }
+  writeText(reviewMarkdown, buildScreenshotReviewMarkdown(contract, artifact));
   return artifact;
 }
 
@@ -1362,7 +1670,7 @@ async function generatePublishCopyDraft(contract, deliverablePaths) {
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const render = readStageArtifact(contract, deliverablePaths, 'render_html');
-  return generateStructuredArtifactViaUpstreamHermes({
+  return generateStructuredArtifactViaCodexCli({
     family: 'xiaohongshu',
     route: 'publish_copy',
     promptRelativePath: promptRoute(contract, 'publish_copy'),
@@ -1425,19 +1733,19 @@ async function buildPublishCopy(contract, deliverablePaths) {
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'titles',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         body: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'body',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         first_comment: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'first_comment',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
       creative_authorship: {
@@ -1445,19 +1753,19 @@ async function buildPublishCopy(contract, deliverablePaths) {
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'titles',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         body: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'body',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
         first_comment: creativeSourceStamp({
           route: 'publish_copy',
           lifecycleStage: 'delivery_packaging',
           authoredSurface: 'first_comment',
-          materializedFrom: 'upstream_run_json_output',
+          materializedFrom: 'codex_cli_json_output',
         }),
       },
     },
@@ -1550,7 +1858,7 @@ export async function runXiaohongshuRoute({ workspaceRoot, topicId, deliverableI
     case 'visual_director_review':
       return await buildDirectorReview(contract, deliverablePaths);
     case 'screenshot_review':
-      return buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId);
+      return await buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId);
     case 'publish_copy':
       return await buildPublishCopy(contract, deliverablePaths);
     case 'export_bundle':

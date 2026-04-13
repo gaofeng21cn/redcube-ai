@@ -64,10 +64,10 @@ export interface GovernanceSurfaceFormalEntry extends JsonObject {
 
 export interface GovernanceSurfaceRuntimeTopology extends JsonObject {
   schema_version: 1;
-  runtime_substrate_owner: 'Hermes';
-  runtime_substrate_surface: 'hermes_backed_runtime_substrate';
-  deployment_host: 'codex_default_host_agent_bridge';
-  deployment_host_status: 'transition_only';
+  runtime_substrate_owner: 'Codex CLI';
+  runtime_substrate_surface: 'codex_native_host_agent';
+  deployment_host: 'codex_local_operator_host';
+  deployment_host_status: 'active_primary';
   gateway_role: 'visual_deliverable_domain_gateway';
   domain_harness_os: 'RedCube Domain Harness OS';
   family_pack_boundary: 'family_profile_pack_harness_execution';

@@ -11,6 +11,13 @@ export const HERMES_DEPLOYMENT_STATUS = 'transition_only';
 export const HERMES_DEFAULT_ADAPTER = 'hermes';
 export const HERMES_COMPATIBILITY_ADAPTER = 'external_llm';
 export const HERMES_FREEZE_ORIGIN = 'Hermes.A';
+export const CODEX_DEFAULT_ADAPTER = 'host_agent';
+export const CODEX_RUNTIME_SURFACE = 'codex_native_host_agent';
+export const CODEX_DEPLOYMENT_HOST = 'codex_local_operator_host';
+export const CODEX_DEPLOYMENT_STATUS = 'active_primary';
+export const CODEX_DEFAULT_MODEL_SELECTION = 'inherit_local_codex_default';
+export const CODEX_DEFAULT_REASONING_SELECTION = 'inherit_local_codex_default';
+export const CODEX_FREEZE_ORIGIN = 'P19.A';
 
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
@@ -18,6 +25,22 @@ const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   runtime_substrate_surface: HERMES_RUNTIME_SURFACE,
   deployment_host: HERMES_DEPLOYMENT_HOST,
   deployment_host_status: HERMES_DEPLOYMENT_STATUS,
+  gateway_role: 'visual_deliverable_domain_gateway',
+  domain_harness_os: 'RedCube Domain Harness OS',
+  family_pack_boundary: 'family_profile_pack_harness_execution',
+  product_mode: 'auto_only',
+  default_formal_entry: 'CLI',
+  supported_protocol_layer: ['MCP'],
+  internal_controller_surface: 'controller',
+  controller_repo_verified: false,
+});
+
+const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
+  schema_version: 1,
+  runtime_substrate_owner: 'Codex CLI',
+  runtime_substrate_surface: CODEX_RUNTIME_SURFACE,
+  deployment_host: CODEX_DEPLOYMENT_HOST,
+  deployment_host_status: CODEX_DEPLOYMENT_STATUS,
   gateway_role: 'visual_deliverable_domain_gateway',
   domain_harness_os: 'RedCube Domain Harness OS',
   family_pack_boundary: 'family_profile_pack_harness_execution',
@@ -156,6 +179,24 @@ export function buildHermesRuntimeTopology() {
   };
 }
 
+export function buildCodexRuntimeTopology() {
+  return {
+    ...CODEX_RUNTIME_TOPOLOGY,
+    supported_protocol_layer: [...CODEX_RUNTIME_TOPOLOGY.supported_protocol_layer],
+  };
+}
+
+export function normalizeCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
+  const requested = String(adapter || '').trim();
+  if (!requested || requested === CODEX_DEFAULT_ADAPTER || requested === HERMES_DEFAULT_ADAPTER) {
+    return CODEX_DEFAULT_ADAPTER;
+  }
+  if (requested === HERMES_COMPATIBILITY_ADAPTER) {
+    return HERMES_COMPATIBILITY_ADAPTER;
+  }
+  throw new Error(`Unsupported executor adapter: ${requested}`);
+}
+
 export function normalizeHermesAdapter(adapter = HERMES_DEFAULT_ADAPTER) {
   const requested = String(adapter || '').trim();
   if (!requested || requested === 'host_agent' || requested === HERMES_DEFAULT_ADAPTER) {
@@ -186,6 +227,27 @@ export function buildHermesExecutionModel({ adapter = HERMES_DEFAULT_ADAPTER } =
   };
 }
 
+export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {}) {
+  const requestedAdapter = String(adapter || '').trim() || CODEX_DEFAULT_ADAPTER;
+  const normalizedAdapter = normalizeCodexAdapter(requestedAdapter);
+  return {
+    mainline_adapter: CODEX_DEFAULT_ADAPTER,
+    primary_surface: CODEX_RUNTIME_SURFACE,
+    adapter_role: normalizedAdapter === CODEX_DEFAULT_ADAPTER
+      ? 'primary_creative_executor'
+      : 'optional_compatibility_adapter',
+    agent_first_requires_external_llm: false,
+    external_llm_role: 'optional_compatibility_adapter',
+    runtime_substrate_owner: 'Codex CLI',
+    deployment_host: CODEX_DEPLOYMENT_HOST,
+    deployment_host_status: CODEX_DEPLOYMENT_STATUS,
+    requested_adapter: requestedAdapter || CODEX_DEFAULT_ADAPTER,
+    default_model_selection: CODEX_DEFAULT_MODEL_SELECTION,
+    default_reasoning_effort: CODEX_DEFAULT_REASONING_SELECTION,
+    freeze_origin_milestone: CODEX_FREEZE_ORIGIN,
+  };
+}
+
 export function buildHermesExecutorDescriptor({ adapter = HERMES_DEFAULT_ADAPTER } = {}) {
   const requestedAdapter = String(adapter || '').trim() || HERMES_DEFAULT_ADAPTER;
   const normalizedAdapter = normalizeHermesAdapter(requestedAdapter);
@@ -207,6 +269,41 @@ export function buildHermesExecutorDescriptor({ adapter = HERMES_DEFAULT_ADAPTER
     runtime_topology: buildHermesRuntimeTopology(),
     execution_model: executionModel,
   };
+}
+
+export function buildCodexExecutorDescriptor({ adapter = CODEX_DEFAULT_ADAPTER } = {}) {
+  const requestedAdapter = String(adapter || '').trim() || CODEX_DEFAULT_ADAPTER;
+  const normalizedAdapter = normalizeCodexAdapter(requestedAdapter);
+  const executionModel = buildCodexExecutionModel({ adapter: requestedAdapter });
+  return {
+    adapter: normalizedAdapter,
+    requested_adapter: requestedAdapter,
+    primary: normalizedAdapter === CODEX_DEFAULT_ADAPTER,
+    execution_surface: normalizedAdapter === CODEX_DEFAULT_ADAPTER
+      ? CODEX_RUNTIME_SURFACE
+      : 'external_llm_adapter',
+    creative_execution: normalizedAdapter === CODEX_DEFAULT_ADAPTER
+      ? 'agent_first_director_first'
+      : 'compatibility_adapter_only',
+    external_llm_role: 'optional_compatibility_adapter',
+    compatibility_role: normalizedAdapter === HERMES_COMPATIBILITY_ADAPTER
+      ? 'optional_compatibility_adapter'
+      : null,
+    runtime_topology: buildCodexRuntimeTopology(),
+    execution_model: executionModel,
+  };
+}
+
+function resolveRuntimeTopologyForExecutor(executor) {
+  const mainlineAdapter = String(
+    executor?.execution_model?.mainline_adapter
+    || executor?.adapter
+    || '',
+  ).trim();
+  if (mainlineAdapter === CODEX_DEFAULT_ADAPTER) {
+    return buildCodexRuntimeTopology();
+  }
+  return buildHermesRuntimeTopology();
 }
 
 export function createHermesCreativeSource({
@@ -300,7 +397,7 @@ export function startHermesRun({
     }),
     started_at: new Date().toISOString(),
     current_stage: route,
-    runtime_topology: buildHermesRuntimeTopology(),
+    runtime_topology: resolveRuntimeTopologyForExecutor(executor),
     executor,
   };
   run.telemetry = buildRunTelemetry(run, executor, 'running', null);
@@ -326,12 +423,12 @@ export function completeHermesRun({
     stage_results: stageResults,
     artifact_refs: artifactRefs,
     error_kind: null,
-    runtime_topology: buildHermesRuntimeTopology(),
-    executor,
+    runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
+    executor: executor || run?.executor,
   };
   completedRun.telemetry = buildRunTelemetry(
     completedRun,
-    executor,
+    executor || run?.executor,
     'completed',
     completedRun.finished_at,
   );
@@ -355,13 +452,13 @@ export function failHermesRun({
     finished_at: new Date().toISOString(),
     current_stage: currentStage,
     error_kind: errorKind,
-    runtime_topology: buildHermesRuntimeTopology(),
-    executor,
+    runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
+    executor: executor || run?.executor,
     error: normalizeError(error),
   };
   failedRun.telemetry = buildRunTelemetry(
     failedRun,
-    executor,
+    executor || run?.executor,
     'failed',
     failedRun.finished_at,
   );

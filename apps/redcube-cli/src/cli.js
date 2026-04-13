@@ -166,13 +166,13 @@ function buildCommandHelp(commandKey) {
     },
     'source intake': {
       summary: '把 brief / keywords / source files 水合成 shared source truth。',
-      usage: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+      usage: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md]',
       gateway_action: 'intakeSource',
       boundary_fields: ['workspaceRoot', 'topicId'],
     },
     'source research': {
       summary: '用一条正式链路把 Step 1 Source Readiness / Deep Research 推进到 planning_ready 或 canonical result staging。',
-      usage: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--payload-file /abs/result.json]',
+      usage: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md] [--payload-file /abs/result.json]',
       gateway_action: 'researchSource',
       boundary_fields: ['workspaceRoot', 'topicId'],
     },
@@ -285,11 +285,11 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       },
       {
         task: '把 brief / keywords / source files 水合成 shared source truth',
-        command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
+        command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md]',
       },
       {
         task: '用一条正式链路把 Step 1 Source Readiness / Deep Research 推进到可交付状态',
-        command: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--payload-file /abs/result.json]',
+        command: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md] [--payload-file /abs/result.json]',
       },
       {
         task: '为材料不足主题生成 Source Augmentation / Deep Research 合同',
@@ -374,8 +374,8 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
       importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
-      sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]',
-      sourceResearch: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--payload-file /abs/result.json]',
+      sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md]',
+      sourceResearch: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md] [--payload-file /abs/result.json]',
       sourceAugment: 'redcube source augment --workspace-root <dir> --topic-id <id>',
       sourcePrepareAugmentationResult: 'redcube source prepare-augmentation-result --workspace-root <dir> --topic-id <id>',
       sourceWriteAugmentationResult: 'redcube source write-augmentation-result --workspace-root <dir> --topic-id <id> --payload-file <file>',
@@ -474,6 +474,7 @@ export async function executeCli(argv, deps = {}) {
         brief: options.brief || '',
         keywords: options.keywords || '',
         sourceFiles: options.sourceFiles || '',
+        operatorFiles: options.operatorFiles || '',
       });
     }
 
@@ -485,6 +486,7 @@ export async function executeCli(argv, deps = {}) {
         brief: options.brief || '',
         keywords: options.keywords || '',
         sourceFiles: options.sourceFiles || '',
+        operatorFiles: options.operatorFiles || '',
         payloadFile: options.payloadFile || '',
       });
     }
@@ -643,7 +645,7 @@ export async function executeCli(argv, deps = {}) {
           workspace_root: resolveWorkspaceRoot(options, cwd),
         },
         runtime_session_contract: {
-          runtime_owner: 'upstream_hermes_agent',
+          runtime_owner: 'codex_cli',
         },
         return_surface_contract: {
           surface_kind: options.returnSurfaceKind || 'product_entry',

@@ -12,7 +12,7 @@
     "target_domain_id": "redcube_ai",
     "required_entry_mode": "opl_gateway",
     "required_return_surface_kind": "product_entry",
-    "required_runtime_owner": "upstream_hermes_agent",
+    "required_runtime_owner": "codex_cli",
     "shared_handoff_envelope": [
       "target_domain_id",
       "task_intent",

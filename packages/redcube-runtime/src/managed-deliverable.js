@@ -3,10 +3,10 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import {
-  HERMES_DEFAULT_ADAPTER,
-  HERMES_RUNTIME_SURFACE,
+  CODEX_DEFAULT_ADAPTER,
+  CODEX_RUNTIME_SURFACE,
 } from '@redcube/hermes-substrate';
-import { assertUpstreamHermesReady } from './upstream-hermes-bridge.js';
+import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
 
 import { runDeliverableRoute } from './deliverable-routes.js';
 import { appendManagedEvent } from './managed-event-log.js';
@@ -173,7 +173,7 @@ function buildPromptAudit({
     stage_id: stageContract.stage_id,
     attempt,
     generated_at: new Date().toISOString(),
-    model: HERMES_RUNTIME_SURFACE,
+    model: CODEX_RUNTIME_SURFACE,
     tool_policy: 'managed_control_plane_audit_v1',
     input: {
       user_intent: {
@@ -487,7 +487,7 @@ function buildStageIngestion({
       'route_execution_failed',
     );
     if (errorCode === 'compatibility_adapter_route_unsupported'
-      && safeText(managedRun.active_adapter, HERMES_DEFAULT_ADAPTER) !== HERMES_DEFAULT_ADAPTER) {
+      && safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER) !== CODEX_DEFAULT_ADAPTER) {
       return {
         schema_version: 1,
         managed_run_id: managedRun.managed_run_id,
@@ -716,19 +716,19 @@ function applyStageIngestion({
   }
 
   if (stageResult.decision === 'switch_to_primary_adapter') {
-    const previousAdapter = safeText(managedRun.active_adapter, HERMES_DEFAULT_ADAPTER);
+    const previousAdapter = safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER);
     managedRun.status = 'running';
     managedRun.adapter_switches = [
       ...safeArray(managedRun.adapter_switches),
       {
         at: new Date().toISOString(),
         from_adapter: previousAdapter,
-        to_adapter: HERMES_DEFAULT_ADAPTER,
+        to_adapter: CODEX_DEFAULT_ADAPTER,
         reason_code: safeText(stageResult.controller_decision?.reason_code, 'compatibility_adapter_route_unsupported'),
         stage_id: stageResult.stage_id,
       },
     ];
-    managedRun.active_adapter = HERMES_DEFAULT_ADAPTER;
+    managedRun.active_adapter = CODEX_DEFAULT_ADAPTER;
     managedRun.current_blockers = [];
     managedRun.runtime_health_status = 'recovering';
     managedRun.parking_reason_code = null;
@@ -781,7 +781,7 @@ export async function runManagedDeliverable({
   overlay,
   topicId,
   deliverableId,
-  adapter = HERMES_DEFAULT_ADAPTER,
+  adapter = CODEX_DEFAULT_ADAPTER,
   userIntent = '',
   stopAfterStage = '',
   mode = 'draft_new',
@@ -804,7 +804,19 @@ export async function runManagedDeliverable({
     stopAfterStage: requestedStopAfterStage,
     stages,
   });
-  const upstreamReady = await assertUpstreamHermesReady();
+  const codexContract = readCodexCliContract();
+  const codexReady = await probeCodexCli({
+    contract: codexContract,
+    cwd: workspaceRoot,
+  });
+  if (!codexReady.ok) {
+    const error = new Error(
+      `Codex CLI blocked: ${codexReady.blocking_reason || codexReady.error_kind || 'unknown'}`,
+    );
+    error.runtime_owner = codexReady.runtime_owner;
+    error.probe = codexReady;
+    throw error;
+  }
   const managedRun = createManagedRun({
     workspaceRoot,
     overlay: contractOverlay,
@@ -816,10 +828,11 @@ export async function runManagedDeliverable({
     adapter,
   });
   managedRun.runtime_bridge = {
-    owner: 'upstream_hermes_agent',
-    adapter_surface: '@redcube/hermes-agent-client',
-    base_url: upstreamReady.probe.config.base_url,
-    model_name: upstreamReady.probe.config.model_name,
+    owner: 'codex_cli',
+    adapter_surface: '@redcube/codex-cli-client',
+    model_selection: codexContract.model_selection,
+    reasoning_selection: codexContract.reasoning_selection,
+    sandbox: codexContract.sandbox,
   };
 
   pushManagedEvent(workspaceRoot, managedRun, {

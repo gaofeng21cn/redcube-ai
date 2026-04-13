@@ -83,12 +83,12 @@ function assertHermesExecutionModel(result, route, topicId, deliverableId) {
   assert.equal(result.topic_id, topicId);
   assert.equal(result.deliverable_id, deliverableId);
   assert.equal(result.stage_contract?.stage_id, route);
-  assert.equal(result.execution_model.mainline_adapter, 'hermes');
-  assert.equal(result.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
-  assert.equal(result.execution_model.runtime_substrate_owner, 'Hermes');
-  assert.equal(result.execution_model.deployment_host, 'codex_default_host_agent_bridge');
+  assert.equal(result.execution_model.mainline_adapter, 'host_agent');
+  assert.equal(result.execution_model.primary_surface, 'codex_native_host_agent');
+  assert.equal(result.execution_model.runtime_substrate_owner, 'Codex CLI');
+  assert.equal(result.execution_model.deployment_host, 'codex_local_operator_host');
   assert.equal(result.execution_model.deployment_host_status, 'transition_only');
-  assert.equal(result.execution_model.freeze_origin_milestone, 'Hermes.A');
+  assert.equal(result.execution_model.freeze_origin_milestone, 'P19.A');
 }
 
 test('stable family runtime routes expose one Hermes execution-model truth before gateway wrapping', async () => {
@@ -99,7 +99,7 @@ test('stable family runtime routes expose one Hermes execution-model truth befor
     topicId: 'topic-a',
     title: 'Hermes stable family closure',
     brief: '验证 stable family runtime route output 直接暴露 Hermes execution truth。',
-    keywords: ['Hermes', 'runtime', 'closure'],
+    keywords: ['Codex CLI', 'runtime', 'closure'],
   });
 
   await createDeliverable({
@@ -203,8 +203,8 @@ test('xiaohongshu human-publication closure stays Hermes-backed without drifting
       route,
     });
     assert.equal(result.ok, true, route);
-    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Hermes', route);
-    assert.equal(result.run.runtime_topology.runtime_substrate_owner, 'Hermes', route);
+    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI', route);
+    assert.equal(result.run.runtime_topology.runtime_substrate_owner, 'Codex CLI', route);
     lastResult = result;
   }
 
@@ -237,8 +237,8 @@ test('xiaohongshu human-publication closure stays Hermes-backed without drifting
   assert.equal(artifact.deliverable_id, 'note-a');
   assert.equal(artifact.contract.profile_id, 'standard_note');
   assert.equal(artifact.stage_contract.stage_id, 'export_bundle');
-  assert.equal(artifact.execution_model.runtime_substrate_owner, 'Hermes');
-  assert.equal(artifact.execution_model.freeze_origin_milestone, 'Hermes.A');
+  assert.equal(artifact.execution_model.runtime_substrate_owner, 'Codex CLI');
+  assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
   assert.equal(artifact.export_bundle.delivery_state.current, 'output_ready');
   assert.equal(existsSync(artifact.export_bundle.html_file), true);
   assert.equal(existsSync(artifact.export_bundle.caption_file), true);
@@ -246,7 +246,7 @@ test('xiaohongshu human-publication closure stays Hermes-backed without drifting
   assert.equal(artifact.export_bundle.png_files.length > 0, true);
 
   assert.equal(review.governance_surface.family_boundary.human_publication, true);
-  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(review.state.current_status, 'publish_ready');
   assert.equal(review.state.approval_state.required, true);
   assert.equal(review.state.approval_state.status, 'pending_human');
@@ -257,18 +257,18 @@ test('xiaohongshu human-publication closure stays Hermes-backed without drifting
   assert.equal(noteProjection.current, 'approval_pending');
   assert.equal(noteProjection.next, 'approved_pending_publish');
   assert.equal(noteProjection.delivery_state.current, 'output_ready');
-  assert.equal(noteProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(noteProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(noteProjection.source_readiness_summary.planning_ready, true);
 
   assert.deepEqual(audit.review_state, review.state);
   assert.deepEqual(audit.publication_projection, projection.publication);
-  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'hermes_backed_runtime_substrate');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
   assert.equal(audit.gate_summary.source_planning_ready, true);
   assert.equal(audit.gate_summary.approval_required, true);
   assert.equal(audit.gate_summary.delivery_projection_current, 'approval_pending');
 
   assert.equal(watch.run_id, lastResult.run.run_id);
-  assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Hermes');
+  assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(watch.review_state.current_status, review.state.current_status);
   assert.equal(
     watch.publication_projection.deliverables['note-a'].current,

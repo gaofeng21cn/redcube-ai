@@ -5,7 +5,7 @@
   "owner_surface": "@redcube/gateway invokeDomainEntry",
   "entry_goal": {
     "label": "service-safe RedCube domain entry for future OPL Gateway handoff",
-    "summary": "Freeze one machine-readable RedCube domain adapter surface that can be called by a future OPL Gateway while keeping runtime execution on upstream Hermes-Agent and domain truth on RedCube."
+    "summary": "Freeze one machine-readable RedCube domain adapter surface that can be called by a future OPL Gateway while keeping runtime execution on local Codex CLI and domain truth on RedCube."
   },
   "opl_handoff_envelope": {
     "minimum_fields": [
@@ -31,8 +31,8 @@
     }
   },
   "runtime_session_contract": {
-    "runtime_owner": "upstream_hermes_agent",
-    "adapter_surface": "@redcube/hermes-agent-client",
+    "runtime_owner": "codex_cli",
+    "adapter_surface": "@redcube/codex-cli-client",
     "session_mode": "ephemeral_run"
   },
   "redcube_domain_payload": {
@@ -70,6 +70,6 @@
     "chat UI or natural-language shell",
     "new family onboarding",
     "controller expansion",
-    "repackaging repo-local Hermes naming as upstream proof"
+    "repackaging historical runtime naming as current proof"
   ]
 }

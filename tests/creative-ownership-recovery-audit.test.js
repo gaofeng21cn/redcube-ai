@@ -15,36 +15,34 @@ import {
   writeAuditFile,
 } from '../scripts/p19-creative-ownership-audit-lib.mjs';
 import {
-  startMockHermesAgentUpstream,
+  startMockCodexCli,
   withEnv,
-} from './helpers/mock-hermes-agent-upstream.js';
+} from './helpers/mock-codex-cli.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-test('current runtime defaults to Hermes substrate while external_llm stays optional', async () => {
-  const upstream = await startMockHermesAgentUpstream();
+test('current runtime defaults to Codex substrate while external_llm stays optional', async () => {
+  const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: upstream.baseUrl,
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
 
   try {
     const runtimeExecutor = resolveExecutorAdapter();
-    assert.equal(runtimeExecutor.adapter, 'hermes');
-    assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'hermes');
-    assert.equal(runtimeExecutor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(runtimeExecutor.adapter, 'host_agent');
+    assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(runtimeExecutor.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(runtimeExecutor.execution_model.adapter_role, 'primary_creative_executor');
     assert.equal(runtimeExecutor.execution_model.agent_first_requires_external_llm, false);
     assert.equal(runtimeExecutor.execution_model.external_llm_role, 'optional_compatibility_adapter');
-    assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Hermes');
-    assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_default_host_agent_bridge');
-    assert.equal(runtimeExecutor.execution_model.freeze_origin_milestone, 'Hermes.A');
+    assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Codex CLI');
+    assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_local_operator_host');
+    assert.equal(runtimeExecutor.execution_model.freeze_origin_milestone, 'P19.A');
 
     const externalLlm = resolveExecutorAdapter({ adapter: 'external_llm' });
-    assert.equal(externalLlm.execution_model.mainline_adapter, 'hermes');
+    assert.equal(externalLlm.execution_model.mainline_adapter, 'host_agent');
     assert.equal(externalLlm.execution_model.adapter_role, 'optional_compatibility_adapter');
     assert.equal(externalLlm.execution_model.agent_first_requires_external_llm, false);
 
@@ -68,19 +66,19 @@ test('current runtime defaults to Hermes substrate while external_llm stays opti
     });
 
     assert.equal(result.ok, true);
-    assert.equal(result.run.executor.adapter, 'hermes');
-    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes');
-    assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(result.run.executor.adapter, 'host_agent');
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(result.run.executor.execution_model.external_llm_role, 'optional_compatibility_adapter');
-    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Hermes');
-    assert.equal(result.run.executor.execution_model.deployment_host, 'codex_default_host_agent_bridge');
+    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI');
+    assert.equal(result.run.executor.execution_model.deployment_host, 'codex_local_operator_host');
 
     const artifact = readJson(result.artifactFile);
-    assert.equal(artifact.execution_model.mainline_adapter, 'hermes');
-    assert.equal(artifact.execution_model.primary_surface, 'hermes_backed_runtime_substrate');
+    assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
+    assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(artifact.execution_model.agent_first_requires_external_llm, false);
-    assert.equal(artifact.execution_model.runtime_substrate_owner, 'Hermes');
-    assert.equal(artifact.execution_model.freeze_origin_milestone, 'Hermes.A');
+    assert.equal(artifact.execution_model.runtime_substrate_owner, 'Codex CLI');
+    assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
   } finally {
     restoreEnv();
     await upstream.close();

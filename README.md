@@ -34,20 +34,18 @@ If your goal is to keep turning structured knowledge into formal visual outputs,
 It is designed for experts who want the speed of agents without losing control over quality.
 
 The runtime story is no longer purely repo-local.
-`RedCube AI` now freezes one real upstream `Hermes-Agent` activation proof and routes `runDeliverableRoute` plus managed execution through the upstream `Hermes-Agent` API server.
+`RedCube AI` now routes `runDeliverableRoute` plus managed execution through local Codex CLI host-agent runtime and keeps the same durable domain surfaces on top.
 The executable baseline is therefore:
 
-- upstream `Hermes-Agent` owns the run surface for route / managed execution
+- local Codex CLI host-agent runtime owns the run surface for route / managed execution
 - `RedCube AI` still owns visual-domain truth, audit, review, export, and deliverable state
-- protected creative stages now run through `runtime-family + upstream Hermes structured generation`; repo-local `pack/compiler` no longer authors PPT / Xiaohongshu / poster content
-- a reachable upstream gateway / API server remains a hard precondition, and the cutover fails closed when that proof is missing
+- protected creative stages now run through `runtime-family + Codex CLI structured generation`; repo-local `pack/compiler` no longer authors PPT / Xiaohongshu / poster content
+- a working `codex exec` surface is now the hard precondition, and route / managed execution fail closed when that proof is missing
 
 Historical repo-local `Hermes` naming still exists in absorbed artifacts and compatibility material, but it must not be read as separate proof of runtime ownership.
 
-The repo-tracked preflight that freezes this truth is `upstream-hermes-agent-activation-package`, backed by `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`.
+The repo-tracked preflight that freezes this truth is the Codex CLI exec probe, backed by `@redcube/codex-cli-client` and `REDCUBE_CODEX_COMMAND`.
 The callable service-safe adapter shell for future `OPL Gateway` handoff is `redcube_service_safe_domain_entry`, documented in `contracts/runtime-program/service-safe-domain-entry-adapter.json`.
-If your global `hermes` CLI lags the upstream gateway fix, live verification lanes may set `REDCUBE_HERMES_GATEWAY_COMMAND` to an explicit known-good upstream launch command instead of pretending the repo fixed Hermes locally.
-That override only corrects which upstream checkout launches the gateway; it does not mask upstream run-surface failures such as `/v1/runs/{run_id}/events` closing without a terminal event.
 The same live lanes also freeze `REDCUBE_PYTHON_COMMAND` for screenshot review and export helpers; if it is unset, `scripts/run-test-group.mjs` now probes `python3 -c "import sys; import playwright; print(sys.executable)"` and fails closed when no Playwright-enabled Python can be resolved.
 
 Its formal-entry matrix is now fixed as: default formal entry `CLI`, supported protocol layer `MCP`, internal control surface `controller`.
@@ -68,19 +66,19 @@ A repo-tracked lightweight product-entry shell is now landed through the `redcub
 Its current repo-verified surfaces are `redcube product frontdesk`, `redcube product invoke`, `redcube product federate`, `redcube product session`, and `redcube product manifest`; the manifest now also carries a family-orchestration companion preview for gate and resume semantics.
 The manifest command is the machine-readable discovery surface for the current shell: it freezes the direct frontdesk plus the direct, federated, and session entry surfaces without pretending the mature end-user front desk has landed.
 
-The frozen domain-facing direct route is:
+The current domain-facing direct route is:
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 Inside the larger `OPL` family, the compatible top-level route converges onto the same downstream shape:
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
-That target is now frozen in `docs/program/upstream_hermes_agent_final_target_shape.md` and `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`.
+The historical upstream-Hermes target freeze remains in `docs/program/upstream_hermes_agent_final_target_shape.md` and `contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`.
 The repo-verified product-entry service surface now includes `invokeProductEntry`, `invokeFederatedProductEntry`, and `getProductEntrySession`, plus their `CLI` / `MCP` wrappers.
 The mature end-user `product entry` shell is still not landed; what landed here is the callable service surface and session continuity, not a chat UI or managed web front-end.
-Live `integration` / `e2e` / `full` verification now serializes Node test files with `--test-concurrency=1` so the repo does not overdrive the current upstream Hermes concurrent-run ceiling and then misreport the resulting 429s as domain drift.
-Those same live lanes now also carry one explicit Python-helper contract: screenshot review and export helpers must execute through `REDCUBE_PYTHON_COMMAND` or an auto-resolved Playwright-enabled Python, rather than assuming the upstream Hermes virtualenv already contains Playwright.
+Live `integration` / `e2e` / `full` verification now serializes Node test files with `--test-concurrency=1` so the repo does not overdrive the current local Codex exec plus browser-export host and then misreport host saturation as domain drift.
+Those same verification lanes now also carry one explicit Python-helper contract: screenshot review and export helpers must execute through `REDCUBE_PYTHON_COMMAND` or an auto-resolved Playwright-enabled Python, rather than assuming some unrelated runtime environment already contains Playwright.
 
 That handoff should carry one shared minimum envelope:
 
@@ -264,7 +262,7 @@ The main unfinished areas are:
 - direct-delivery lifecycle stage convergence now has an absorbed tranche on the same mainline: `ppt_deck` and guarded `poster_onepager` now expose one machine-readable `lifecycle_stage_contract` plus one aligned `lifecycle_stage_summary`, while `Storyline + Plan` remain mapped to `Story Architecture` and `operator_handoff / closeout` remains inside `Delivery`
 - workspace / operator quickstart convergence now has an absorbed tranche on the same mainline: brand-new or thin workspaces now converge on one repo-verified route from `workspace doctor` through `source intake / source research`, `deliverable create`, `deliverable audit`, and `deliverable run` without inventing a separate workspace-init product surface
 - operator surface consistency hardening now has an absorbed tranche on the same mainline: `workspace doctor` now keeps brand-new workspace bootstrap guidance on `source intake` / `source research`, command-scoped `--help` stays machine-readable and non-executing, and `CLI review watch` / `MCP runtime_watch` now converge on the same `runtimeWatch` locator truth and shared governance summaries
-- the current repo-local managed-runtime pilot has already absorbed routed deliverable execution, run records, and shared runtime-topology wording, while upstream `Hermes-Agent` ownership of the runtime remains the next substrate milestone
+- the current mainline has already absorbed routed deliverable execution, run records, and shared runtime-topology wording onto local Codex CLI host-agent runtime, while historical upstream `Hermes-Agent` materials remain frozen provenance rather than the next active substrate milestone
 - current behavior convergence now also keeps `governance_surface.runtime_topology` aligned across create / review / audit / watch / projection on the same deliverable/topic boundary
 - phase-2 runtime watch locator integrity hardening remains absorbed provenance on the same mainline: deliverable-scope run records persist `topic_id` / `deliverable_id`, and `runtimeWatch` / `CLI review watch` / `MCP runtime_watch` fail closed when a quartet locator points at a run from another topic or deliverable
 - poster support is still incomplete:
@@ -290,7 +288,7 @@ User / Agent
       -> Gateway
           -> Overlay / Family / Profile / Pack
               -> Domain Harness OS (on Unified Harness Engineering Substrate)
-                  -> upstream Hermes-Agent runtime substrate (current route / managed run owner)
+                  -> Codex CLI host-agent runtime (current route / managed run owner)
                       -> Codex-local operator / development host / workspace bridge
                   -> repo-local managed runtime pilot (historical migration artifact / compatibility bridge)
                   -> managed web runtime (future option after real substrate migration)
@@ -312,7 +310,7 @@ Current repo mainline has these verified runtime surfaces:
 - `P19 / Creative Ownership Recovery And Director-First Mainline` is treated as completed and non-regressing.
 - `P20 / Extension Proof And Third-Family Onboarding` is completed for `poster_onepager` as a `knowledge poster` extension proof.
 - `P21 / Operations And Evaluation OS` has repo-visible closeout artifacts and is treated as completed scope, not the current active mainline.
-- The current active mainline has already cut route / managed run ownership to upstream `Hermes-Agent`: phase-2 source-truth / governance / operator-surface work remains absorbed provenance, and the repository keeps `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager` on the same RedCube visual-domain truth without pretending the historical repo-local runtime is still current owner.
+- The current active mainline has already cut route / managed run ownership to local Codex CLI host-agent runtime: phase-2 source-truth / governance / operator-surface work remains absorbed provenance, and the repository keeps `ppt_deck`, `xiaohongshu`, and guarded `poster_onepager` on the same RedCube visual-domain truth without pretending the historical repo-local runtime is still current owner.
 - shared `Gateway`, run/watch, review, audit, and artifact persistence surfaces are verifiable through `CLI` and `MCP`.
 
 Current honest limits:
@@ -320,11 +318,10 @@ Current honest limits:
 - `controller` has not landed as an independent formal entry in this repository.
 - `poster_onepager` is only the current `knowledge poster` surface.
 - `paper_poster / conference_poster` remains a follow-on academic-poster contract, not the current active mainline.
-- `Codex-default host-agent runtime` remains a local operator / development host, not the long-term product runtime owner.
-- route and managed execution now fail closed onto real upstream `Hermes-Agent` proof; the frozen activation gate remains `upstream-hermes-agent-activation-package`, and the service-safe domain adapter shell is `redcube_service_safe_domain_entry`.
-- the current fresh proof uses `hermes gateway run -q`; upstream `hermes gateway run` still crashes on its own `RedactingFormatter` bug and must not be misreported as a repo-local fix.
-- when the global `hermes` CLI on the verification host still points at that broken upstream checkout, use `REDCUBE_HERMES_GATEWAY_COMMAND` to point integration / e2e verification at a known-good upstream gateway launch command.
-- current live verification also requires `/v1/runs` plus `/v1/runs/{run_id}/events` to emit a terminal event; on the 2026-04-12 verification host, the latest upstream launch override still blocks there because the events stream closes before any terminal event appears.
+- `Codex-default host-agent runtime` is the current product runtime owner for route / managed execution, while `RedCube AI` continues to own the domain boundary.
+- route and managed execution now fail closed onto local Codex CLI proof; the active preflight is `probeCodexCli`, and the service-safe domain adapter shell is `redcube_service_safe_domain_entry`.
+- the current fresh proof uses `codex exec`; verification hosts must expose that through `REDCUBE_CODEX_COMMAND` or the default `codex` binary.
+- current verification also freezes `REDCUBE_PYTHON_COMMAND` when screenshot review / export helpers need a Playwright-enabled Python interpreter.
 - managed web runtime remains future work on the same substrate.
 - further source-plane expansion remains follow-on work on the same mainline.
 - OPL federation remains follow-on work after the current minimum baseline.

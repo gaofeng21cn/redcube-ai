@@ -5,7 +5,7 @@ import type {
   XhsStorylineArtifact,
   XhsVisualDirectionArtifact,
 } from '@redcube/pack-xiaohongshu';
-import type { HermesExecutionModel } from '@redcube/hermes-substrate';
+import type { CodexExecutionModel } from '@redcube/hermes-substrate';
 
 export type XhsRuntimeRoute =
   | 'research'
@@ -166,7 +166,7 @@ export interface XhsRuntimeArtifactBase {
   prompt_pack: XhsRuntimePromptMeta;
   lifecycle_stage?: string | null;
   review_overlay?: string | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
   artifact_refs?: string[];
   review_state_patch?: XhsRuntimeReviewStatePatch;
 }
@@ -194,6 +194,8 @@ export interface XhsSlideReviewChecks {
 }
 
 export interface XhsSlideReview {
+  slide_id?: string;
+  status?: 'pass' | 'block';
   screenshot_file?: string;
   metrics?: {
     occupied_ratio?: number;
@@ -201,6 +203,12 @@ export interface XhsSlideReview {
   };
   checks: XhsSlideReviewChecks;
   issues: string[];
+  ai_review?: {
+    slide_id: string;
+    judgement: 'pass' | 'block';
+    visual_findings: string[];
+    recommended_fix: string;
+  };
 }
 
 export interface XhsBaselineReview {
@@ -218,6 +226,11 @@ export interface XhsScreenshotReviewArtifact extends XhsRuntimeArtifactBase {
   route: 'screenshot_review';
   mode: XhsRuntimeMode;
   status: 'pass' | 'block';
+  review_execution?: {
+    owner?: string;
+    overlay?: string;
+    generation_runtime?: unknown;
+  };
   checks: XhsRuntimeLatestChecks & {
     overflow_free: boolean;
     occlusion_free: boolean;
@@ -228,6 +241,27 @@ export interface XhsScreenshotReviewArtifact extends XhsRuntimeArtifactBase {
     memory_hook_present: boolean;
   };
   slide_reviews: XhsSlideReview[];
+  ai_review?: {
+    review_model: string;
+    director_intent_landed: boolean;
+    anti_template_ok: boolean;
+    weak_pages: string[];
+    review_summary: string;
+    slide_reviews: Array<{
+      slide_id: string;
+      judgement: 'pass' | 'block';
+      visual_findings: string[];
+      recommended_fix: string;
+    }>;
+    creative_sources?: {
+      review_judgement?: unknown;
+    };
+  };
+  mechanical_review?: {
+    review_model: string;
+    checks?: unknown;
+    metrics?: unknown;
+  };
   report_markdown: string;
   metrics: unknown;
   artifact_refs: string[];
@@ -298,7 +332,7 @@ export interface XhsRuntimeRouteEnvelope<TRoute extends XhsRuntimeRoute> {
   deliverable_id: string;
   contract: XhsRuntimeContract;
   stage_contract: XhsRuntimeStageContract | null;
-  execution_model: HermesExecutionModel;
+  execution_model: CodexExecutionModel;
 }
 
 export type XhsRuntimeRouteOutput<

@@ -6,9 +6,9 @@ export type PosterLayoutFamily = 'hero_band' | 'evidence_columns' | 'pathway_str
 export type PosterRecipeId = 'poster.hero_band' | 'poster.evidence_columns' | 'poster.pathway_strip' | 'poster.action_footer';
 
 export interface PosterCreativeSourceStamp {
-  owner: 'hermes';
-  primary_surface: 'hermes_backed_runtime_substrate';
-  stage_owner: 'hermes_backed_runtime_substrate';
+  owner: 'host_agent';
+  primary_surface: 'codex_native_host_agent';
+  stage_owner: 'codex_native_host_agent';
   route: string;
   lifecycle_stage: string;
   authored_surface: string;
@@ -225,7 +225,7 @@ export interface PosterRenderSlide {
     recipe_decision: PosterRenderSlide['creative_sources']['recipe_selection'];
     final_html_markup: PosterRenderSlide['creative_sources']['final_markup'];
   };
-  markup_contract_source: 'prompt_pack_artifact';
+  markup_contract_source: 'codex_cli_json_output';
   content: string;
 }
 
