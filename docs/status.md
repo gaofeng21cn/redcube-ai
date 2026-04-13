@@ -8,6 +8,7 @@
 - 当前主线：`Auto-only`
 - formal-entry matrix：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
 - 当前入口真相：`operator entry` 与 `agent entry` 已存在；repo-verified 的 lightweight `product entry` service surface 也已落地，`redcube product frontdesk` 现在作为 direct frontdesk，`redcube product manifest` 会额外导出 repo mainline 摘要、`product_entry_status` 状态摘要，以及显式的 `frontdesk_surface`、`operator_loop_surface` 与 `operator_loop_actions`。当前 operator loop 诚实收口为 `redcube product invoke`，并把 `start_deliverable / continue_session / federated_handoff` 冻结成当前用户动作面；`redcube product session` 继续作为拿到 `entry_session_id` 之后的同交付续跑 / 观察面；成熟的最终用户前台壳仍未落地
+- 当前家族对齐意义：在三个业务仓里，`RedCube AI` 目前是最早落下显式 `product frontdesk` contract 的参考形态之一；后续 family 其他仓会继续往这层“frontdesk 与 operator loop 分开、但 contract 仍共用同一 truth”靠拢
 - 当前统一协作模型：目标由 `Hermes-Agent` 承担 runtime substrate / orchestration，`RedCube AI` 继续持有 domain authority 与 visual truth，具体 deliverable execution 保持 executor-adapter 可插拔
 - 已冻结的最终目标形态：`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 - direct domain 目标形态：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`

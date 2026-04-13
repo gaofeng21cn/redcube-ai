@@ -65,8 +65,8 @@ That means:
 - `product entry`: landed as a repo-verified service surface for direct RedCube entry and OPL federation, while the mature user-facing shell is still not landed
 
 A repo-tracked lightweight product-entry shell is now landed through the `redcube product` command family.
-Its current repo-verified surfaces are `redcube product invoke`, `redcube product federate`, `redcube product session`, and `redcube product manifest`.
-The manifest command is the machine-readable discovery surface for the current shell: it freezes the direct, federated, and session entry surfaces without pretending the mature end-user front desk has landed.
+Its current repo-verified surfaces are `redcube product frontdesk`, `redcube product invoke`, `redcube product federate`, `redcube product session`, and `redcube product manifest`.
+The manifest command is the machine-readable discovery surface for the current shell: it freezes the direct frontdesk plus the direct, federated, and session entry surfaces without pretending the mature end-user front desk has landed.
 
 The frozen domain-facing direct route is:
 

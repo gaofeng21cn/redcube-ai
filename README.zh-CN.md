@@ -65,8 +65,8 @@
 - `product entry`：direct RedCube entry 与 OPL federation 的可调用服务面已经落地，但真正面向最终用户的成熟前台壳仍未落地
 
 现在仓内已经通过 `redcube product` 这一组命令落下一层 repo-tracked 的 lightweight product-entry shell。
-当前 repo-verified 的公开面包括：`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`。
-其中 `redcube product manifest` 是当前壳的 machine-readable discovery surface：它会冻结 direct / federated / session 这三类入口面，但不会把仓库写成“成熟最终用户前台已经落地”。
+当前 repo-verified 的公开面包括：`redcube product frontdesk`、`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`。
+其中 `redcube product manifest` 是当前壳的 machine-readable discovery surface：它会冻结 direct frontdesk 以及 direct / federated / session 这三类入口面，但不会把仓库写成“成熟最终用户前台已经落地”。
 
 这个仓已经冻结的 direct domain 产品入口路线是：
 
@@ -92,7 +92,7 @@
 - `return_surface_contract`
 
 在这层共享 envelope 之上，`RedCube AI` 再补充视觉交付特有 payload，例如 `deliverable_family`、`topic_id`、`deliverable_id`。
-这层共享 envelope 现在已经能通过 `redcube product` 这组入口做 repo-verified 输出：`redcube product manifest` 负责发现当前壳，`invoke / federate / session` 负责实际调用。
+这层共享 envelope 现在已经能通过 `redcube product` 这组入口做 repo-verified 输出：`redcube product manifest` 负责发现当前壳，`frontdesk / invoke / federate / session` 负责实际调用。
 
 内部参考说明见：[轻量产品入口与 OPL Handoff](docs/references/lightweight_product_entry_and_opl_handoff.md)。
 
