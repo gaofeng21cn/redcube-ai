@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
@@ -248,6 +249,16 @@ function writeJson(file, data) {
 function writeText(file, content) {
   ensureDir(path.dirname(file));
   writeFileSync(file, content, 'utf-8');
+}
+
+function createReviewCapturePaths(deliverablePaths, deliverableId) {
+  const captureId = `capture-${Date.now()}-${randomUUID().slice(0, 8)}`;
+  const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots', captureId));
+  return {
+    captureId,
+    screenshotsDir,
+    reviewMarkdownFile: path.join(screenshotsDir, `${deliverableId}_视觉质控.md`),
+  };
 }
 
 function readJson(file) {
@@ -2151,13 +2162,30 @@ function buildReviewMarkdown(contract, reviewArtifact) {
     '',
     '- review_owner: codex_native_host_agent',
     `- 状态：${reviewArtifact.status}`,
+  ];
+  if (reviewArtifact.review_capture) {
+    lines.push(`- capture_id：${safeText(reviewArtifact.review_capture.capture_id)}`);
+    lines.push(`- capture_screenshots_dir：${safeText(reviewArtifact.review_capture.screenshots_dir)}`);
+    if (reviewArtifact.review_capture.review_markdown_file) {
+      lines.push(`- capture_review_markdown：${safeText(reviewArtifact.review_capture.review_markdown_file)}`);
+    }
+    if (Number.isFinite(Number(reviewArtifact.review_capture.device_scale_factor))) {
+      lines.push(`- device_scale_factor：${Number(reviewArtifact.review_capture.device_scale_factor)}`);
+    }
+    const screenshotWidth = Number(reviewArtifact.review_capture?.screenshot_dimensions?.width || 0);
+    const screenshotHeight = Number(reviewArtifact.review_capture?.screenshot_dimensions?.height || 0);
+    if (screenshotWidth > 0 && screenshotHeight > 0) {
+      lines.push(`- screenshot_dimensions：${screenshotWidth}x${screenshotHeight}`);
+    }
+  }
+  lines.push(
     `- director_intent_landed：${reviewArtifact.checks.director_intent_landed}`,
     `- anti_template_ok：${reviewArtifact.checks.anti_template_ok}`,
     `- overflow_free：${reviewArtifact.checks.overflow_free}`,
     `- occlusion_free：${reviewArtifact.checks.occlusion_free}`,
     `- visual_density_ok：${reviewArtifact.checks.visual_density_ok}`,
     `- speaker_fit_ok：${reviewArtifact.checks.speaker_fit_ok}`,
-  ];
+  );
   if (Object.hasOwn(reviewArtifact.checks, 'baseline_comparison_passed')) {
     lines.push(`- baseline_comparison_passed：${reviewArtifact.checks.baseline_comparison_passed}`);
   }
@@ -2342,12 +2370,13 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
-  const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
+  const reviewCapture = createReviewCapturePaths(deliverablePaths, deliverableId);
   const args = [
     '--html', renderArtifact.html_bundle.html_file,
-    '--output-dir', screenshotsDir,
-    '--review-markdown', reviewMarkdown,
+    '--output-dir', reviewCapture.screenshotsDir,
+    '--review-markdown', reviewCapture.reviewMarkdownFile,
     '--max-primary-points', String(contract.layout_rules?.max_primary_points_per_slide || 5),
+    '--device-scale-factor', '2',
   ];
   if (mode === 'optimize_existing') {
     const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
@@ -2400,6 +2429,13 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
     mode,
     status,
     checks: latestChecks,
+    review_capture: {
+      capture_id: reviewCapture.captureId,
+      screenshots_dir: reviewCapture.screenshotsDir,
+      review_markdown_file: reviewCapture.reviewMarkdownFile,
+      device_scale_factor: Number(reviewPayload.device_scale_factor || 2),
+      screenshot_dimensions: reviewPayload.screenshot_dimensions || null,
+    },
     slide_reviews: slideReviews,
     ai_review: {
       review_model: 'screenshot_director_first_visual_judgement',
@@ -2424,7 +2460,11 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
     },
     report_markdown: reviewMarkdown,
     metrics: reviewPayload.metrics,
-    artifact_refs: [reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
+    artifact_refs: [
+      reviewMarkdown,
+      reviewCapture.reviewMarkdownFile,
+      ...slideReviews.map((slide) => slide.screenshot_file),
+    ].filter(Boolean),
     review_state_patch: {
       current_status: status === 'pass' ? 'export_ready' : 'blocked_for_revision',
       ready_for_export: status === 'pass',
@@ -2456,7 +2496,9 @@ async function buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverab
       summary: summarizeRelativeQuality(relativeQuality),
     };
   }
-  writeText(reviewMarkdown, buildReviewMarkdown(contract, artifact));
+  const renderedReviewMarkdown = buildReviewMarkdown(contract, artifact);
+  writeText(reviewCapture.reviewMarkdownFile, renderedReviewMarkdown);
+  writeText(reviewMarkdown, renderedReviewMarkdown);
   return artifact;
 }
 
@@ -2470,7 +2512,13 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
   const notesFile = path.join(publishDir, `${deliverableId}-presenter-notes.md`);
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   writeText(notesFile, blueprintArtifact.slide_blueprint.slides.map((slide) => `## ${slide.slide_id} ${slide.title}\n\n${slide.speaker_notes}`).join('\n\n'));
-  const screenshotsDir = path.join(deliverablePaths.reportsDir, 'screenshots');
+  const screenshotsDir = safeText(reviewArtifact?.review_capture?.screenshots_dir);
+  if (!screenshotsDir) {
+    throw new Error('Route export_pptx requires screenshot_review immutable capture screenshots; rerun screenshot_review before export');
+  }
+  if (!existsSync(screenshotsDir)) {
+    throw new Error(`Reviewed screenshot capture directory not found: ${screenshotsDir}`);
+  }
   const python = runPython(PYTHON_EXPORT, [
     '--screenshots-dir', screenshotsDir,
     '--output-pptx', pptxFile,
@@ -2499,6 +2547,7 @@ function buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract }
       pptx_file: pptxPath,
       pdf_file: pdfPath,
       presenter_notes_file: notesFile,
+      review_capture: reviewArtifact.review_capture || null,
       delivery_state: {
         current: 'output_ready',
         next: null,

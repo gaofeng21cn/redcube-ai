@@ -214,6 +214,17 @@ export interface PptSlideReview {
   };
 }
 
+export interface PptReviewCapture {
+  capture_id: string;
+  screenshots_dir: string;
+  review_markdown_file?: string;
+  device_scale_factor?: number;
+  screenshot_dimensions?: {
+    width: number;
+    height: number;
+  } | null;
+}
+
 export interface PptBaselineReview {
   baseline_deliverable_id: string;
   baseline_comparison_passed: boolean;
@@ -265,6 +276,7 @@ export interface PptScreenshotReviewArtifact extends PptRuntimeArtifactBase {
     checks?: unknown;
     metrics?: unknown;
   };
+  review_capture?: PptReviewCapture;
   report_markdown: string;
   metrics: unknown;
   artifact_refs: string[];
@@ -281,6 +293,7 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     pptx_file: string;
     pdf_file: string;
     presenter_notes_file: string;
+    review_capture?: PptReviewCapture | null;
     delivery_state: {
       current: 'output_ready';
       next: null;

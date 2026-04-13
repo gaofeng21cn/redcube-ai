@@ -61,6 +61,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const visualPrompt = read('prompts/ppt_deck/visual_direction.md');
   const renderHtmlPrompt = read('prompts/ppt_deck/render_html.md');
   const directorReviewPrompt = read('prompts/ppt_deck/director_review.md');
+  const reviewScript = read('packages/redcube-runtime/scripts/ppt_deck_review.py');
 
   assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);
   assert.equal(runtime.includes("core_metaphor: safeText(seed?.storyline?.core_metaphor)"), false);
@@ -98,6 +99,8 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(directorReviewPrompt, /同一页面家族重复出现/);
   assert.match(directorReviewPrompt, /controller.*唯一主峰/);
   assert.match(directorReviewPrompt, /底部说明.*最多保留 ?2/);
+  assert.match(reviewScript, /device_scale_factor=.*2/);
+  assert.match(reviewScript, /--device-scale-factor/);
   assert.match(runtime, /controller.*唯一主峰/);
   assert.match(runtime, /风险支路.*短窄/);
   assert.match(runtime, /底部说明.*最多保留 ?2/);
@@ -253,6 +256,56 @@ test('ppt route artifacts materialize lecture workbench files for the staged wor
     assert.match(read(visualDirectionFile), /## 本章视觉宣言/);
     assert.match(read(htmlFile), /slidesData/);
     assert.match(read(referenceIndexFile), /来源索引/);
+  });
+});
+
+test('ppt screenshot_review writes immutable capture screenshots and export uses the reviewed capture directory', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-capture-proof-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    });
+
+    const routes = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
+    const results = [];
+    for (const route of routes) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+      results.push(result);
+    }
+
+    const screenshotReview = readJson(results.at(-1).artifactFile);
+    assert.equal(
+      screenshotReview.slide_reviews.every((slide) => /\/reports\/screenshots\/capture-[^/]+\/slide-\d+\.png$/.test(slide.screenshot_file)),
+      true,
+    );
+    assert.match(screenshotReview.review_capture?.screenshots_dir || '', /\/reports\/screenshots\/capture-[^/]+$/);
+
+    const exportResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+    });
+    assert.equal(exportResult.ok, true);
+    const exportArtifact = readJson(exportResult.artifactFile);
+    assert.equal(
+      exportArtifact.export_bundle.real_conversion_invocation.command.includes(screenshotReview.review_capture.screenshots_dir),
+      true,
+    );
   });
 });
 

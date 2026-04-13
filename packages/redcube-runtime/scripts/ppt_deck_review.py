@@ -20,6 +20,7 @@ OVERLAP_PIXELS = 12.0
 OVERLAP_RATIO = 0.08
 MIN_SPEAKER_SECONDS = 20
 MAX_SPEAKER_SECONDS = 120
+DEFAULT_DEVICE_SCALE_FACTOR = 2.0
 
 
 def fail(message: str) -> None:
@@ -80,12 +81,12 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
     primary_points = int(info.get('primaryPoints', 0) or 0)
     visual_density_ok = MIN_DENSITY <= occupied_ratio <= MAX_DENSITY and primary_points <= max_primary_points
     if not visual_density_ok:
-      issues.append('visual_density_out_of_range')
+        issues.append('visual_density_out_of_range')
 
     speaker_seconds = int(info.get('speakerSeconds', 0) or 0)
     speaker_fit_ok = MIN_SPEAKER_SECONDS <= speaker_seconds <= MAX_SPEAKER_SECONDS and primary_points <= max_primary_points + 1
     if not speaker_fit_ok:
-      issues.append('speaker_fit_out_of_range')
+        issues.append('speaker_fit_out_of_range')
 
     return {
         'slide_id': info.get('slideId'),
@@ -226,7 +227,11 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                     break
         if browser is None:
             fail("无法启动浏览器进行截图: " + " | ".join(launch_errors))
-        page = await browser.new_page(viewport={'width': 1440, 'height': 1024})
+        context = await browser.new_context(
+            viewport={'width': 1920, 'height': 1080},
+            device_scale_factor=args.device_scale_factor if args.device_scale_factor else 2.0,
+        )
+        page = await context.new_page()
         try:
             await page.goto(html_file.as_uri(), wait_until='networkidle')
             await page.wait_for_function("() => Boolean(window.redcubeDeckReview)")
@@ -248,8 +253,13 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                 review['screenshot_file'] = str(screenshot_file)
                 slide_reviews.append(review)
         finally:
+            await context.close()
             await browser.close()
 
+    screenshot_dimensions = {
+        'width': int(round(float(args.frame_width) * float(args.device_scale_factor))),
+        'height': int(round(float(args.frame_height) * float(args.device_scale_factor))),
+    }
     checks = summarize_checks(slide_reviews)
     baseline_summary = None
     if args.baseline_review:
@@ -264,6 +274,8 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
             'slide_count': len(slide_reviews),
             'average_density': round(statistics.mean([review['metrics']['occupied_ratio'] for review in slide_reviews]) if slide_reviews else 0.0, 4),
         },
+        'device_scale_factor': float(args.device_scale_factor),
+        'screenshot_dimensions': screenshot_dimensions,
     }
     if baseline_summary is not None:
         result['baseline'] = baseline_summary
@@ -286,6 +298,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--max-primary-points', type=int, default=5)
     parser.add_argument('--frame-width', type=float, default=1152)
     parser.add_argument('--frame-height', type=float, default=648)
+    parser.add_argument('--device-scale-factor', type=float, default=DEFAULT_DEVICE_SCALE_FACTOR)
     return parser.parse_args()
 
 
