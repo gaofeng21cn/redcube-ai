@@ -869,6 +869,10 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(frontdeskParsed.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
     assert.equal(frontdeskParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(frontdeskParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+    assert.equal(frontdeskParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(frontdeskParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(frontdeskParsed.product_entry_readiness.usable_now, true);
+    assert.equal(frontdeskParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
 
     const directParsed = await execCliAsync(
       cliPath,
@@ -1016,6 +1020,9 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
       manifestParsed.family_orchestration.resume_contract.session_locator_field,
       'entry_session_contract.entry_session_id',
     );
+    assert.equal(manifestParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(manifestParsed.product_entry_readiness.good_to_use_now, false);
+    assert.equal(manifestParsed.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
   });
 });
 

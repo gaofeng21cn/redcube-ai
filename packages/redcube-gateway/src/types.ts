@@ -271,6 +271,20 @@ export interface ProductEntryOverviewCompanion {
   human_gate_ids?: string[];
 }
 
+export interface ProductEntryReadinessCompanion {
+  surface_kind: 'product_entry_readiness' | string;
+  verdict: string;
+  usable_now: boolean;
+  good_to_use_now: boolean;
+  fully_automatic: boolean;
+  summary: string;
+  recommended_start_surface: string;
+  recommended_start_command: string;
+  recommended_loop_surface: string;
+  recommended_loop_command: string;
+  blocking_gaps: string[];
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -441,6 +455,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     };
   };
   product_entry_overview: ProductEntryOverviewCompanion;
+  product_entry_readiness: ProductEntryReadinessCompanion;
   product_entry_quickstart: ProductEntryQuickstartCompanion;
   family_orchestration: FamilyOrchestrationCompanion;
   current_truth: {
@@ -460,6 +475,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
   operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
   product_entry_overview: ProductEntryManifestResponse['product_entry_overview'];
+  product_entry_readiness: ProductEntryManifestResponse['product_entry_readiness'];
   product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
   family_orchestration: ProductEntryManifestResponse['family_orchestration'];
   product_entry_manifest: ProductEntryManifestResponse;

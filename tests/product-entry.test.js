@@ -345,6 +345,19 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
       '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
     ]);
+    assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(manifest.product_entry_readiness.usable_now, true);
+    assert.equal(manifest.product_entry_readiness.good_to_use_now, false);
+    assert.equal(manifest.product_entry_readiness.fully_automatic, false);
+    assert.equal(manifest.product_entry_readiness.recommended_start_surface, 'product_frontdesk');
+    assert.equal(manifest.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
+    assert.equal(manifest.product_entry_readiness.recommended_loop_surface, 'product_entry');
+    assert.equal(manifest.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
+    assert.deepEqual(manifest.product_entry_readiness.blocking_gaps, [
+      '成熟的最终用户前台壳仍未 landed。',
+      'managed web productization 仍未 landed。',
+    ]);
     assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.equal(manifest.product_entry_shell.frontdesk.command, 'redcube product frontdesk');
@@ -376,6 +389,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       frontdesk.product_entry_overview.resume_surface.command,
       'redcube product session --entry-session-id <entry-session-id>',
     );
+    assert.equal(frontdesk.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(frontdesk.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(frontdesk.product_entry_readiness.usable_now, true);
+    assert.equal(frontdesk.product_entry_readiness.good_to_use_now, false);
+    assert.equal(frontdesk.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');

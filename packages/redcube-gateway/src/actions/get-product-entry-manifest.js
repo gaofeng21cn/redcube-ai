@@ -109,6 +109,25 @@ export async function getProductEntryManifest(request) {
     remaining_gaps_count: 2,
     human_gate_ids: ['redcube_operator_review_gate'],
   };
+  const productEntryReadiness = {
+    surface_kind: 'product_entry_readiness',
+    verdict: 'service_surface_ready_not_managed_product',
+    usable_now: true,
+    good_to_use_now: false,
+    fully_automatic: false,
+    summary: (
+      '当前可以作为 RedCube 的 direct frontdesk / CLI product-entry 主线使用，'
+      + '但还不是成熟的最终用户前台或托管 Web 产品。'
+    ),
+    recommended_start_surface: 'product_frontdesk',
+    recommended_start_command: 'redcube product frontdesk',
+    recommended_loop_surface: 'product_entry',
+    recommended_loop_command: 'redcube product invoke',
+    blocking_gaps: [
+      '成熟的最终用户前台壳仍未 landed。',
+      'managed web productization 仍未 landed。',
+    ],
+  };
 
   return {
     ok: true,
@@ -223,6 +242,7 @@ export async function getProductEntryManifest(request) {
       },
     },
     product_entry_overview: productEntryOverview,
+    product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: buildFamilyOrchestrationCompanion({
       sessionLocatorField: 'entry_session_contract.entry_session_id',

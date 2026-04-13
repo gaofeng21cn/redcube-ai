@@ -15,6 +15,7 @@ export async function getProductFrontdesk(request) {
     operator_loop_surface: manifest.operator_loop_surface,
     operator_loop_actions: manifest.operator_loop_actions,
     product_entry_overview: manifest.product_entry_overview,
+    product_entry_readiness: manifest.product_entry_readiness,
     product_entry_quickstart: manifest.product_entry_quickstart,
     family_orchestration: manifest.family_orchestration,
     product_entry_manifest: manifest,
