@@ -349,8 +349,11 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         },
         family_orchestration: {
           action_graph_ref: {
-            ref_kind: 'repo_path',
-            ref: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+            ref_kind: 'json_pointer',
+            ref: '/family_orchestration/action_graph',
+          },
+          action_graph: {
+            graph_id: 'redcube_frontdoor_product_entry_graph',
           },
           human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
           resume_contract: {
@@ -384,8 +387,11 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         federated_product_entry_contract_id: 'opl_gateway_federated_product_entry',
         family_orchestration: {
           action_graph_ref: {
-            ref_kind: 'repo_path',
-            ref: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+            ref_kind: 'json_pointer',
+            ref: '/family_orchestration/action_graph',
+          },
+          action_graph: {
+            graph_id: 'redcube_frontdoor_product_entry_graph',
           },
           human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
           resume_contract: {
@@ -413,8 +419,11 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         },
         family_orchestration: {
           action_graph_ref: {
-            ref_kind: 'repo_path',
-            ref: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+            ref_kind: 'json_pointer',
+            ref: '/family_orchestration/action_graph',
+          },
+          action_graph: {
+            graph_id: 'redcube_frontdoor_product_entry_graph',
           },
           human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
           resume_contract: {
@@ -428,7 +437,8 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
 
   assert.equal(direct.surface_kind, 'product_entry');
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
-  assert.equal(direct.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+  assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+  assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
   assert.equal(federated.surface_kind, 'federated_product_entry');
   assert.equal(federated.summary.entry_session_id, 'session-a');
   assert.equal(federated.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');

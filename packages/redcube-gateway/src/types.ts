@@ -223,6 +223,7 @@ export interface FamilyOrchestrationResumeContract {
 
 export interface FamilyOrchestrationCompanion {
   action_graph_ref?: FamilyOrchestrationReferenceRef;
+  action_graph?: Record<string, unknown>;
   human_gates: FamilyOrchestrationGatePreview[];
   resume_contract: FamilyOrchestrationResumeContract;
   event_envelope_surface?: FamilyOrchestrationReferenceRef;

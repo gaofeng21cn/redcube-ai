@@ -53,8 +53,21 @@ async function prepareProductEntryWorkspace() {
 }
 
 function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
-  assert.equal(surface.family_orchestration.action_graph_ref.ref_kind, 'repo_path');
-  assert.equal(surface.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+  assert.equal(surface.family_orchestration.action_graph_ref.ref_kind, 'json_pointer');
+  assert.equal(surface.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+  assert.equal(surface.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
+  assert.equal(surface.family_orchestration.action_graph.target_domain_id, 'redcube_ai');
+  assert.deepEqual(
+    surface.family_orchestration.action_graph.nodes.map((node) => node.node_id),
+    [
+      'step:open_frontdesk',
+      'step:continue_current_loop',
+      'step:federated_handoff',
+      'step:inspect_current_progress',
+    ],
+  );
+  assert.deepEqual(surface.family_orchestration.action_graph.entry_nodes, ['step:open_frontdesk']);
+  assert.deepEqual(surface.family_orchestration.action_graph.exit_nodes, ['step:inspect_current_progress']);
   assert.equal(Array.isArray(surface.family_orchestration.human_gates), true);
   assert.equal(surface.family_orchestration.human_gates.length >= 1, true);
   assert.equal(surface.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
@@ -343,6 +356,14 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assertFamilyOrchestrationCompanion(manifest, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });
+    assert.equal(manifest.family_orchestration.action_graph.edges.length, 4);
+    assert.deepEqual(manifest.family_orchestration.action_graph.human_gates, [
+      {
+        gate_id: 'redcube_operator_review_gate',
+        trigger_nodes: ['step:inspect_current_progress'],
+        blocking: true,
+      },
+    ]);
 
     const frontdesk = await getProductFrontdesk({
       workspace_root: workspaceRoot,

@@ -865,7 +865,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(frontdeskParsed.surface_kind, 'product_frontdesk');
     assert.equal(frontdeskParsed.frontdesk_surface.command, 'redcube product frontdesk');
     assert.equal(frontdeskParsed.product_entry_manifest.frontdesk_surface.command, 'redcube product frontdesk');
-    assert.equal(frontdeskParsed.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    assert.equal(frontdeskParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(frontdeskParsed.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
     assert.equal(frontdeskParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(frontdeskParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
 
@@ -906,7 +907,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(directParsed.ok, true);
     assert.equal(directParsed.surface_kind, 'product_entry');
     assert.equal(directParsed.entry_session.entry_session_id, 'session-a');
-    assert.equal(directParsed.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    assert.equal(directParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(directParsed.family_orchestration.action_graph.nodes.length, 4);
     assert.equal(directParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(directParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
 
@@ -955,7 +957,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(federatedParsed.ok, true);
     assert.equal(federatedParsed.surface_kind, 'federated_product_entry');
     assert.equal(federatedParsed.product_entry_surface.entry_session.entry_session_id, 'session-fed');
-    assert.equal(federatedParsed.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    assert.equal(federatedParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(federatedParsed.family_orchestration.action_graph.edges.length, 4);
     assert.equal(federatedParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(federatedParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
 
@@ -978,7 +981,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(sessionParsed.ok, true);
     assert.equal(sessionParsed.surface_kind, 'product_entry_session');
     assert.equal(sessionParsed.entry_session.entry_session_id, 'session-a');
-    assert.equal(sessionParsed.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    assert.equal(sessionParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(sessionParsed.family_orchestration.action_graph.exit_nodes[0], 'step:inspect_current_progress');
     assert.equal(sessionParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(sessionParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
 
@@ -1005,7 +1009,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(manifestParsed.frontdesk_surface.command, 'redcube product frontdesk');
     assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
-    assert.equal(manifestParsed.family_orchestration.action_graph_ref.ref, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    assert.equal(manifestParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(manifestParsed.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
     assert.equal(manifestParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(
       manifestParsed.family_orchestration.resume_contract.session_locator_field,
