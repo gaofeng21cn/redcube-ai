@@ -228,7 +228,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 
     assert.equal(manifest.ok, true);
     assert.equal(manifest.surface_kind, 'product_entry_manifest');
-    assert.equal(manifest.manifest_version, 1);
+    assert.equal(manifest.manifest_version, 2);
     assert.equal(manifest.manifest_kind, 'redcube_product_entry_manifest');
     assert.equal(manifest.target_domain_id, 'redcube_ai');
     assert.equal(manifest.formal_entry.default, 'CLI');
@@ -272,6 +272,21 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
+    assert.deepEqual(manifest.family_orchestration.human_gates, [
+      {
+        gate_id: 'deliverable_publish_gate',
+        title: 'Deliverable publish gate',
+      },
+      {
+        gate_id: 'creative_review_gate',
+        title: 'Creative review gate',
+      },
+    ]);
+    assert.deepEqual(manifest.family_orchestration.resume_contract, {
+      surface_kind: 'product_entry_session',
+      session_locator_field: 'entry_session_id',
+      checkpoint_locator_field: 'checkpoint_lineage_id',
+    });
     assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
   });
 });

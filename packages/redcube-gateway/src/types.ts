@@ -368,6 +368,18 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       target_domain_id: string;
     };
   };
+  family_orchestration: {
+    human_gates: Array<{
+      gate_id: string;
+      title?: string;
+      status?: 'requested' | 'approved' | 'rejected' | 'changes_requested' | string;
+    }>;
+    resume_contract?: {
+      surface_kind: string;
+      session_locator_field: string;
+      checkpoint_locator_field?: string;
+    };
+  };
   current_truth: {
     product_entry_contract: string;
     federated_product_entry_contract: string;
@@ -384,6 +396,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   product_entry_status: ProductEntryManifestResponse['product_entry_status'];
   operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
   operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
+  family_orchestration: ProductEntryManifestResponse['family_orchestration'];
   product_entry_manifest: ProductEntryManifestResponse;
   entry_surfaces: {
     direct: ProductEntryManifestResponse['product_entry_shell']['direct'];

@@ -43,7 +43,7 @@ export async function getProductEntryManifest(request) {
   return {
     ok: true,
     surface_kind: 'product_entry_manifest',
-    manifest_version: 1,
+    manifest_version: 2,
     recommended_action: 'invoke_product_entry',
     manifest_kind: 'redcube_product_entry_manifest',
     target_domain_id: 'redcube_ai',
@@ -150,6 +150,23 @@ export async function getProductEntryManifest(request) {
       opl_return_surface: {
         surface_kind: 'product_entry',
         target_domain_id: 'redcube_ai',
+      },
+    },
+    family_orchestration: {
+      human_gates: [
+        {
+          gate_id: 'deliverable_publish_gate',
+          title: 'Deliverable publish gate',
+        },
+        {
+          gate_id: 'creative_review_gate',
+          title: 'Creative review gate',
+        },
+      ],
+      resume_contract: {
+        surface_kind: 'product_entry_session',
+        session_locator_field: 'entry_session_id',
+        checkpoint_locator_field: 'checkpoint_lineage_id',
       },
     },
     current_truth: {
