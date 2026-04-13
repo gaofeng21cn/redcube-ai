@@ -59,6 +59,7 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
       'invoke_product_entry',
       'invoke_federated_product_entry',
       'get_product_entry_session',
+      'get_product_entry_manifest',
       'create_deliverable',
       'get_deliverable',
       'get_publication_projection',
@@ -87,6 +88,7 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   const product = definitions.find((tool) => tool.name === 'invoke_product_entry');
   const federated = definitions.find((tool) => tool.name === 'invoke_federated_product_entry');
   const session = definitions.find((tool) => tool.name === 'get_product_entry_session');
+  const manifest = definitions.find((tool) => tool.name === 'get_product_entry_manifest');
 
   assert.equal(intake?.description.includes('bootstrap writer'), true);
   assert.equal(research?.description.includes('planning_ready'), true);
@@ -96,8 +98,10 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(product?.description.includes('direct RedCube product-entry surface'), true);
   assert.equal(federated?.description.includes('OPL Gateway style handoff'), true);
   assert.equal(session?.description.includes('product-entry session'), true);
+  assert.equal(manifest?.description.includes('product-entry manifest'), true);
   assert.equal(Object.hasOwn(watch?.inputSchema || {}, 'runId'), true);
   assert.equal(Object.hasOwn(product?.inputSchema || {}, 'entry_session_contract'), true);
+  assert.equal(Object.hasOwn(manifest?.inputSchema || {}, 'workspace_root'), true);
   assert.equal(Object.hasOwn(federated?.inputSchema || {}, 'return_surface_contract'), true);
   assert.equal(Object.hasOwn(session?.inputSchema || {}, 'entry_session_id'), true);
 });

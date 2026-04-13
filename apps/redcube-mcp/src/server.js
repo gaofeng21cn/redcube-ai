@@ -13,6 +13,7 @@ import {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductEntryManifest,
   getProductEntrySession,
   getManagedRun,
   superviseManagedRun,
@@ -41,6 +42,7 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductEntryManifest,
   getProductEntrySession,
   createDeliverable,
   getDeliverable,
@@ -258,6 +260,18 @@ export const TOOL_DEFINITIONS = [
     actionKey: 'getProductEntrySession',
     inputSchema: {
       entry_session_id: z.string().describe('Durable product-entry session identifier.'),
+    },
+  },
+  {
+    name: 'get_product_entry_manifest',
+    description: 'Read the current RedCube product-entry manifest so hosts can discover the direct, federated, and session surfaces without guessing.',
+    actionKey: 'getProductEntryManifest',
+    inputSchema: {
+      workspace_root: z.string().optional().describe('Absolute workspace root path.'),
+      workspaceRoot: z.string().optional().describe('Absolute workspace root path.'),
+      workspace_locator: z.object({
+        workspace_root: z.string().describe('Absolute workspace root path.'),
+      }).optional().describe('Machine-readable workspace locator.'),
     },
   },
   {

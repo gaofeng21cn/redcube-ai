@@ -17,6 +17,7 @@ import {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductEntryManifest,
   getProductEntrySession,
   superviseManagedRun as superviseGatewayManagedRun,
   intakeSource,
@@ -46,6 +47,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductEntryManifest,
   getProductEntrySession,
   superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
@@ -214,6 +216,12 @@ function buildCommandHelp(commandKey) {
       gateway_action: 'getProductEntrySession',
       boundary_fields: ['entrySessionId'],
     },
+    'product manifest': {
+      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / federated / session 三个入口面。',
+      usage: 'redcube product manifest --workspace-root <dir>',
+      gateway_action: 'getProductEntryManifest',
+      boundary_fields: ['workspaceRoot'],
+    },
   };
   const entry = catalog[commandKey];
   if (!entry) {
@@ -370,6 +378,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
       productFederate: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
       productSession: 'redcube product session --entry-session-id <id>',
+      productManifest: 'redcube product manifest --workspace-root <dir>',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       profileList: 'redcube profile --action list',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
@@ -646,7 +655,13 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('product 命令仅支持 invoke|federate|session');
+    if (subcommand === 'manifest') {
+      return gateway.getProductEntryManifest({
+        workspace_root: resolveWorkspaceRoot(options, cwd),
+      });
+    }
+
+    throw new Error('product 命令仅支持 invoke|federate|session|manifest');
   }
 
 

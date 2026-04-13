@@ -63,8 +63,9 @@ That means:
 - `agent entry`: `CLI` plus `MCP`, called by `Codex` or another host-agent
 - `product entry`: landed as a repo-verified service surface for direct RedCube entry and OPL federation, while the mature user-facing shell is still not landed
 
-A repo-tracked lightweight product-entry shell is now landed through `redcube product-entry`.
-It emits the shared direct / `OPL` handoff envelope for `run_managed_deliverable` and `run_deliverable_route`, but it is still a contract shell rather than a mature end-user front desk.
+A repo-tracked lightweight product-entry shell is now landed through the `redcube product` command family.
+Its current repo-verified surfaces are `redcube product invoke`, `redcube product federate`, `redcube product session`, and `redcube product manifest`.
+The manifest command is the machine-readable discovery surface for the current shell: it freezes the direct, federated, and session entry surfaces without pretending the mature end-user front desk has landed.
 
 The frozen domain-facing direct route is:
 
@@ -90,7 +91,7 @@ That handoff should carry one shared minimum envelope:
 - `return_surface_contract`
 
 On top of that, `RedCube AI` adds visual-deliverable payload such as `deliverable_family`, `topic_id`, and `deliverable_id`.
-That shared envelope is now repo-verified through `redcube product-entry`.
+That shared envelope is now repo-verified through the `redcube product` shell, with `redcube product manifest` as the discovery surface and `redcube product invoke` / `federate` / `session` as the callable entry surfaces.
 
 For the internal architecture note, see [Lightweight Product Entry And OPL Handoff](docs/references/lightweight_product_entry_and_opl_handoff.md).
 

@@ -296,6 +296,53 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   };
 }
 
+export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry_manifest'> {
+  manifest_kind: string;
+  target_domain_id: string;
+  formal_entry: {
+    default: 'CLI' | string;
+    supported_protocols: string[];
+    internal_surface: string;
+  };
+  workspace_locator: {
+    workspace_root: string;
+  };
+  runtime: {
+    runtime_owner: string;
+    runtime_state_root: string;
+    session_store_root: string;
+  };
+  product_entry_shell: {
+    direct: {
+      command: string;
+      command_template: string;
+      surface_kind: 'product_entry';
+    };
+    federated: {
+      command: string;
+      command_template: string;
+      surface_kind: 'federated_product_entry';
+    };
+    session: {
+      command: string;
+      command_template: string;
+      surface_kind: 'product_entry_session';
+    };
+  };
+  shared_handoff: {
+    opl_return_surface: {
+      surface_kind: 'product_entry';
+      target_domain_id: string;
+    };
+  };
+  current_truth: {
+    product_entry_contract: string;
+    federated_product_entry_contract: string;
+    managed_product_entry_contract: string;
+  };
+  notes: string[];
+}
+
 export interface ManagedRunProjection {
   current_stage: string | null;
   latest_events: Array<{

@@ -84,6 +84,10 @@ export async function getProductEntrySession(request) {
   const module = await import('./actions/get-product-entry-session.js');
   return module.getProductEntrySession(request);
 }
+export async function getProductEntryManifest(request) {
+  const module = await import('./actions/get-product-entry-manifest.js');
+  return module.getProductEntryManifest(request);
+}
 export async function auditDeliverable(request) {
   const module = await import('./actions/audit-deliverable.js');
   return module.auditDeliverable(request);

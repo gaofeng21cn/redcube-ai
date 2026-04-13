@@ -41,14 +41,15 @@
 5. `RedCube Product Entry` 现在已经 repo-verified：`invokeProductEntry`、`redcube product invoke` 与 `invoke_product_entry` 会在需要时创建 deliverable、继续同一 `entry_session_id`，再统一下沉到 `invokeDomainEntry`。
 6. `OPL -> RedCube` 的最小 handoff envelope 现在也已 repo-verified：`invokeFederatedProductEntry`、`redcube product federate` 与 `invoke_federated_product_entry` 会对 `target_domain_id`、`entry_mode`、`runtime_session_contract.runtime_owner`、`return_surface_contract.surface_kind` 继续 fail-closed，然后转进同一个 downstream `product entry`。
 7. product-entry session continuity 现在已经落到用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/`；`getProductEntrySession`、`redcube product session` 与 `get_product_entry_session` 会读回 latest managed progress、review state 与 publication projection。
-8. 当前真实 upstream proof 仍以 `hermes gateway run -q` 为默认口径；若验证宿主上的全局 `hermes` CLI 仍落后于上游 `RedactingFormatter` 启动修复，可显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream gateway 启动命令，这属于 honest upstream launch override，不是 repo-local 兜底。
-9. `scripts/run-test-group.mjs` 的 integration / e2e / full live lane 现在会先做 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight；只要 run-event surface 没有 terminal event，就会在套件开始前 fail-closed。
-10. 同一组 live lane 现在还会用 `--test-concurrency=1` 串行化 test files，以尊重当前 upstream Hermes 的 concurrent-run ceiling，而不是把 repo 自己的验证并发误写成 runtime 主线能力。
-11. 同一组 live lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed，而不是继续假设 upstream Hermes 自带 virtualenv 已经满足 screenshot review / export helper 依赖。
-12. 在 `2026-04-12` 的当前验证宿主上，`npm run test:e2e` 已在当前宿主 fresh 全绿；标准 `run-test-group` live launcher 已 fresh 通过 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight，并拿到 terminal `run.completed` event；当前 closeout proof 见 `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`。
-13. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
-14. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
-15. `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb，而 follow-on 的三阶段 product-entry 落地也已经吸收到当前主线：当前真实 gap 不再是 repo-verified service surface，而是成熟 end-user shell 与更上层 managed web productization 仍未落地。
+8. product-entry discovery surface 现在也已经 repo-verified：`redcube product manifest` 与 `get_product_entry_manifest` 会把 direct / federated / session 三类入口冻结成 machine-readable manifest，避免 `OPL` 或其他 host 自己猜入口命令与载荷结构。
+9. 当前真实 upstream proof 仍以 `hermes gateway run -q` 为默认口径；若验证宿主上的全局 `hermes` CLI 仍落后于上游 `RedactingFormatter` 启动修复，可显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream gateway 启动命令，这属于 honest upstream launch override，不是 repo-local 兜底。
+10. `scripts/run-test-group.mjs` 的 integration / e2e / full live lane 现在会先做 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight；只要 run-event surface 没有 terminal event，就会在套件开始前 fail-closed。
+11. 同一组 live lane 现在还会用 `--test-concurrency=1` 串行化 test files，以尊重当前 upstream Hermes 的 concurrent-run ceiling，而不是把 repo 自己的验证并发误写成 runtime 主线能力。
+12. 同一组 live lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed，而不是继续假设 upstream Hermes 自带 virtualenv 已经满足 screenshot review / export helper 依赖。
+13. 在 `2026-04-12` 的当前验证宿主上，`npm run test:e2e` 已在当前宿主 fresh 全绿；标准 `run-test-group` live launcher 已 fresh 通过 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight，并拿到 terminal `run.completed` event；当前 closeout proof 见 `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`。
+14. `docs/program/hermes/*` 继续只作为历史 local-runtime migration artifact 读取。
+15. 项目级 `.runtime-program/` 已退役；本地 runtime state 统一下沉到 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
+16. `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 已完成 absorb，而 follow-on 的三阶段 product-entry 落地也已经吸收到当前主线：当前真实 gap 不再是 repo-verified service surface，而是成熟 end-user shell 与更上层 managed web productization 仍未落地。
 
 ## 默认验证
 

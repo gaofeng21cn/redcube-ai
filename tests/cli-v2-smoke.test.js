@@ -948,6 +948,28 @@ test('CLI product invoke, product federate, and product session proxy the produc
     assert.equal(sessionParsed.ok, true);
     assert.equal(sessionParsed.surface_kind, 'product_entry_session');
     assert.equal(sessionParsed.entry_session.entry_session_id, 'session-a');
+
+    const manifestParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'manifest',
+        '--workspace-root',
+        workspaceRoot,
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(manifestParsed.ok, true);
+    assert.equal(manifestParsed.surface_kind, 'product_entry_manifest');
+    assert.equal(manifestParsed.manifest_kind, 'redcube_product_entry_manifest');
+    assert.equal(manifestParsed.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
   });
 });
 

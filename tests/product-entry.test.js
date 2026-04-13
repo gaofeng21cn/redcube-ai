@@ -7,6 +7,7 @@ import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import {
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductEntryManifest,
   getProductEntrySession,
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
@@ -214,5 +215,30 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_gateway');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
+  });
+});
+
+test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', async () => {
+  await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const manifest = await getProductEntryManifest({
+      workspace_root: workspaceRoot,
+    });
+
+    assert.equal(manifest.ok, true);
+    assert.equal(manifest.surface_kind, 'product_entry_manifest');
+    assert.equal(manifest.manifest_kind, 'redcube_product_entry_manifest');
+    assert.equal(manifest.target_domain_id, 'redcube_ai');
+    assert.equal(manifest.formal_entry.default, 'CLI');
+    assert.deepEqual(manifest.formal_entry.supported_protocols, ['MCP']);
+    assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
+    assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
+    assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
+    assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
+    assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
+    assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
   });
 });

@@ -26,6 +26,7 @@ export interface GatewayActionMap {
   invokeDomainEntry?: (args: Record<string, unknown>) => Promise<unknown>;
   invokeProductEntry?: (args: Record<string, unknown>) => Promise<unknown>;
   invokeFederatedProductEntry?: (args: Record<string, unknown>) => Promise<unknown>;
+  getProductEntryManifest?: (args: Record<string, unknown>) => Promise<unknown>;
   getProductEntrySession?: (args: Record<string, unknown>) => Promise<unknown>;
   createDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
