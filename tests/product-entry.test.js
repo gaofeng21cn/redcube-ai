@@ -6,6 +6,7 @@ import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   getProductFrontdesk,
+  getProductStart,
   getProductPreflight,
   invokeFederatedProductEntry,
   invokeProductEntry,
@@ -332,6 +333,29 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     });
     assert.equal(manifest.product_entry_overview.recommended_step_id, 'open_frontdesk');
     assert.deepEqual(manifest.product_entry_overview.human_gate_ids, ['redcube_operator_review_gate']);
+    assert.equal(manifest.product_entry_start.surface_kind, 'product_entry_start');
+    assert.equal(manifest.product_entry_start.recommended_mode_id, 'open_frontdesk');
+    assert.deepEqual(
+      manifest.product_entry_start.modes.map((mode) => mode.mode_id),
+      ['open_frontdesk', 'start_direct_session', 'federated_handoff', 'resume_session'],
+    );
+    assert.equal(
+      manifest.product_entry_start.modes[0].command,
+      `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+    );
+    assert.deepEqual(
+      manifest.product_entry_start.modes[1].requires,
+      ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+    );
+    assert.equal(manifest.product_entry_start.modes[2].surface_kind, 'federated_product_entry');
+    assert.equal(manifest.product_entry_start.modes[3].surface_kind, 'product_entry_session');
+    assert.deepEqual(manifest.product_entry_start.resume_surface, {
+      surface_kind: 'product_entry_session',
+      command: 'redcube product session --entry-session-id <entry-session-id>',
+      session_locator_field: 'entry_session_contract.entry_session_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+    });
+    assert.deepEqual(manifest.product_entry_start.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(
       manifest.product_entry_preflight.summary,
@@ -412,6 +436,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(frontdesk.surface_kind, 'product_frontdesk');
     assert.equal(frontdesk.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(frontdesk.product_entry_overview.progress_surface.surface_kind, 'product_entry_session');
+    assert.equal(frontdesk.product_entry_start.surface_kind, 'product_entry_start');
+    assert.equal(frontdesk.product_entry_start.recommended_mode_id, 'open_frontdesk');
+    assert.equal(frontdesk.product_entry_start.modes[2].mode_id, 'federated_handoff');
+    assert.equal(frontdesk.product_entry_start.modes[3].mode_id, 'resume_session');
+    assert.deepEqual(frontdesk.product_entry_start, manifest.product_entry_start);
     assert.equal(
       frontdesk.product_entry_overview.resume_surface.command,
       'redcube product session --entry-session-id <entry-session-id>',
@@ -452,5 +481,29 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube product frontdesk --workspace-root ${workspaceRoot}`,
     );
     assert.deepEqual(preflight.blocking_check_ids, []);
+  });
+});
+
+test('getProductStart exposes the same direct-entry start companion as the manifest', async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const start = await getProductStart({
+      workspace_root: workspaceRoot,
+    });
+
+    assert.equal(start.ok, true);
+    assert.equal(start.surface_kind, 'product_entry_start');
+    assert.equal(start.recommended_mode_id, 'open_frontdesk');
+    assert.deepEqual(
+      start.modes.map((mode) => mode.mode_id),
+      ['open_frontdesk', 'start_direct_session', 'federated_handoff', 'resume_session'],
+    );
+    assert.equal(
+      start.modes[0].command,
+      `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+    );
+    assert.equal(start.resume_surface.surface_kind, 'product_entry_session');
+    assert.deepEqual(start.human_gate_ids, ['redcube_operator_review_gate']);
   });
 });

@@ -63,8 +63,8 @@
 - `product entry`：direct RedCube entry 与 OPL federation 的可调用服务面已经落地，但真正面向最终用户的成熟前台壳仍未落地
 
 现在仓内已经通过 `redcube product` 这一组命令落下一层 repo-tracked 的 lightweight product-entry shell。
-当前 repo-verified 的公开面包括：`redcube product preflight`、`redcube product frontdesk`、`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`；其中 manifest 现在也会带出 family-orchestration companion preview 与 `product_entry_preflight` companion，用来暴露 gate、resume 与 startup-check 语义。
-其中 `redcube product manifest` 是当前壳的 machine-readable discovery surface：它会冻结 direct frontdesk 以及 direct / federated / session 这三类入口面，但不会把仓库写成“成熟最终用户前台已经落地”。
+当前 repo-verified 的公开面包括：`redcube product preflight`、`redcube product start`、`redcube product frontdesk`、`redcube product invoke`、`redcube product federate`、`redcube product session` 与 `redcube product manifest`；其中 manifest 现在也会带出 family-orchestration companion preview 与 `product_entry_preflight` companion，用来暴露 gate、resume 与 startup-check 语义。
+其中 `redcube product manifest` 与 `redcube product start` 现在分别冻结 discovery surface 与推荐启动面：前者告诉你当前壳有哪些入口，后者告诉你应该优先从哪种模式进入；它们都不会把仓库写成“成熟最终用户前台已经落地”。
 
 这个仓当前的 direct domain 产品入口路线是：
 
@@ -156,6 +156,10 @@
 3. 让智能代理使用 `RedCube AI` 推进这次视觉交付，并由你审核关键节点。
 
 如果你想更快开始，可以直接给智能代理一句话指令。
+
+如果你想先拿到统一的 machine-readable 启动面，再决定走 direct / federated / resume 哪条入口，可以先执行：
+
+`redcube product start --workspace-root <dir>`
 
 `Deep Research` 属于 `Source Readiness`。输入材料太薄时，Agent 应先把 Step 1 固定在 canonical `source intake -> source augment -> source execute-augmentation` 这条链路上，再进入后续交付步骤。
 `planning_ready` 必须成为 `Source Readiness` 内部正式、可机读的放行 gate。

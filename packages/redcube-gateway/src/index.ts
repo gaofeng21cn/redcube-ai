@@ -18,6 +18,7 @@ import {
   invokeFederatedProductEntry as invokeFederatedProductEntryJs,
   getProductEntrySession as getProductEntrySessionJs,
   getProductEntryManifest as getProductEntryManifestJs,
+  getProductStart as getProductStartJs,
   getProductPreflight as getProductPreflightJs,
   getManagedRun as getManagedRunJs,
   superviseManagedRun as superviseManagedRunJs,
@@ -52,6 +53,7 @@ import type {
   ProductEntryRequest,
   ProductEntryResponse,
   ProductEntryManifestResponse,
+  ProductEntryStartCompanion,
   ProductPreflightResponse,
   ProductEntrySessionResponse,
   OverlayCatalogResponse,
@@ -164,6 +166,10 @@ export function getProductEntryManifest(request: Record<string, unknown>): Promi
   return getProductEntryManifestJs(request) as Promise<ProductEntryManifestResponse>;
 }
 
+export function getProductStart(request: Record<string, unknown>): Promise<ProductEntryStartCompanion> {
+  return getProductStartJs(request) as Promise<ProductEntryStartCompanion>;
+}
+
 export function getProductPreflight(request: Record<string, unknown>): Promise<ProductPreflightResponse> {
   return getProductPreflightJs(request) as Promise<ProductPreflightResponse>;
 }
@@ -226,6 +232,7 @@ export type {
   ProductEntryRequest,
   ProductEntryResponse,
   ProductEntryManifestResponse,
+  ProductEntryStartCompanion,
   ProductPreflightResponse,
   ProductEntrySessionResponse,
   OverlayCatalogResponse,

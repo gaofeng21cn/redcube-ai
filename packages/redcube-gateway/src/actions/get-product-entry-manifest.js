@@ -111,6 +111,64 @@ export async function getProductEntryManifest(request) {
     remaining_gaps_count: 2,
     human_gate_ids: ['redcube_operator_review_gate'],
   };
+  const productEntryStart = {
+    surface_kind: 'product_entry_start',
+    summary: (
+      '先打开 RedCube frontdesk；需要直接起一个新会话就走 direct session，'
+      + '需要走顶层联邦入口时使用 federated handoff，已有 session 则直接恢复。'
+    ),
+    recommended_mode_id: 'open_frontdesk',
+    modes: [
+      {
+        mode_id: 'open_frontdesk',
+        title: 'Open RedCube frontdesk',
+        command: `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+        surface_kind: 'product_frontdesk',
+        summary: 'Open the direct RedCube frontdesk for the current workspace.',
+        requires: [],
+      },
+      {
+        mode_id: 'start_direct_session',
+        title: 'Start direct session',
+        command: (
+          `redcube product invoke --workspace-root ${workspaceRoot} `
+          + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
+          + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
+        ),
+        surface_kind: 'product_entry',
+        summary: 'Start or continue a direct RedCube product-entry session for one deliverable.',
+        requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+      },
+      {
+        mode_id: 'federated_handoff',
+        title: 'Federated handoff',
+        command: (
+          `redcube product federate --workspace-root ${workspaceRoot} `
+          + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
+          + '--entry-mode opl_gateway --return-surface-kind product_entry '
+          + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
+        ),
+        surface_kind: 'federated_product_entry',
+        summary: 'Enter the same downstream product entry through OPL / family federation.',
+        requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+      },
+      {
+        mode_id: 'resume_session',
+        title: 'Resume session',
+        command: 'redcube product session --entry-session-id <entry-session-id>',
+        surface_kind: 'product_entry_session',
+        summary: 'Resume an existing RedCube product-entry session by entry_session_id.',
+        requires: ['entry_session_id'],
+      },
+    ],
+    resume_surface: {
+      surface_kind: 'product_entry_session',
+      command: 'redcube product session --entry-session-id <entry-session-id>',
+      session_locator_field: 'entry_session_contract.entry_session_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+    },
+    human_gate_ids: ['redcube_operator_review_gate'],
+  };
   const productEntryReadiness = {
     surface_kind: 'product_entry_readiness',
     verdict: 'service_surface_ready_not_managed_product',
@@ -243,6 +301,7 @@ export async function getProductEntryManifest(request) {
         target_domain_id: 'redcube_ai',
       },
     },
+    product_entry_start: productEntryStart,
     product_entry_overview: productEntryOverview,
     product_entry_preflight: {
       surface_kind: productEntryPreflight.surface_kind,

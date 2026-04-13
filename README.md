@@ -63,8 +63,8 @@ That means:
 - `product entry`: landed as a repo-verified service surface for direct RedCube entry and OPL federation, while the mature user-facing shell is still not landed
 
 A repo-tracked lightweight product-entry shell is now landed through the `redcube product` command family.
-Its current repo-verified surfaces are `redcube product preflight`, `redcube product frontdesk`, `redcube product invoke`, `redcube product federate`, `redcube product session`, and `redcube product manifest`; the manifest now also carries a family-orchestration companion preview plus the `product_entry_preflight` companion for gate, resume, and startup-check semantics.
-The manifest command is the machine-readable discovery surface for the current shell: it freezes the direct frontdesk plus the direct, federated, and session entry surfaces without pretending the mature end-user front desk has landed.
+Its current repo-verified surfaces are `redcube product preflight`, `redcube product start`, `redcube product frontdesk`, `redcube product invoke`, `redcube product federate`, `redcube product session`, and `redcube product manifest`; the manifest now also carries a family-orchestration companion preview plus the `product_entry_preflight` companion for gate, resume, and startup-check semantics.
+The manifest and start commands now freeze the machine-readable discovery surface plus the recommended start surface for the current shell without pretending the mature end-user front desk has landed.
 
 The current domain-facing direct route is:
 
@@ -157,6 +157,10 @@ Typical three-step start:
 3. Ask your agent to use `RedCube AI` as the visual-deliverable gateway and keep the work reviewable end to end.
 
 If you want a faster handoff, you can give your agent a one-line start instruction.
+
+If you want one machine-readable start surface before choosing direct, federated, or resume entry, run:
+
+`redcube product start --workspace-root <dir>`
 
 `Deep Research` belongs to `Source Readiness`. When the input is too thin, the agent keeps Step 1 on the canonical `source intake -> source augment -> source execute-augmentation` line before moving on.
 planning_ready must become the formal machine-readable release gate inside Source Readiness.

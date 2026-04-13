@@ -19,6 +19,7 @@ import {
   invokeProductEntry,
   getProductFrontdesk,
   getProductEntryManifest,
+  getProductStart,
   getProductPreflight,
   getProductEntrySession,
   superviseManagedRun as superviseGatewayManagedRun,
@@ -51,6 +52,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   invokeProductEntry,
   getProductFrontdesk,
   getProductEntryManifest,
+  getProductStart,
   getProductPreflight,
   getProductEntrySession,
   superviseManagedRun: superviseGatewayManagedRun,
@@ -226,6 +228,12 @@ function buildCommandHelp(commandKey) {
       gateway_action: 'getProductFrontdesk',
       boundary_fields: ['workspaceRoot'],
     },
+    'product start': {
+      summary: '读取统一的 product-entry start surface，直接查看 frontdesk / direct / federated / resume 四类启动方式。',
+      usage: 'redcube product start --workspace-root <dir>',
+      gateway_action: 'getProductStart',
+      boundary_fields: ['workspaceRoot'],
+    },
     'product preflight': {
       summary: '读取当前 direct product-entry frontdoor 的开机前真实自检面。',
       usage: 'redcube product preflight --workspace-root <dir>',
@@ -352,6 +360,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube product frontdesk --workspace-root <dir>',
       },
       {
+        task: '读取统一的 product-entry start surface，决定 frontdesk / direct / federated / resume 从哪条入口启动',
+        command: 'redcube product start --workspace-root <dir>',
+      },
+      {
         task: '先做一次 product-entry 开机前自检，确认 workspace 与 runtime-state 已 ready',
         command: 'redcube product preflight --workspace-root <dir>',
       },
@@ -369,7 +381,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
-      product: ['frontdesk', 'preflight', 'invoke', 'federate', 'session', 'manifest'],
+      product: ['frontdesk', 'start', 'preflight', 'invoke', 'federate', 'session', 'manifest'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['list', 'bootstrap', 'export', 'install'],
@@ -400,6 +412,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
       managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       productFrontdesk: 'redcube product frontdesk --workspace-root <dir>',
+      productStart: 'redcube product start --workspace-root <dir>',
       productPreflight: 'redcube product preflight --workspace-root <dir>',
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
       productFederate: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
@@ -623,6 +636,12 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
+    if (subcommand === 'start') {
+      return gateway.getProductStart({
+        workspace_root: resolveWorkspaceRoot(options, cwd),
+      });
+    }
+
     if (subcommand === 'preflight') {
       return gateway.getProductPreflight({
         workspace_root: resolveWorkspaceRoot(options, cwd),
@@ -701,7 +720,7 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('product 命令仅支持 frontdesk|preflight|invoke|federate|session|manifest');
+    throw new Error('product 命令仅支持 frontdesk|start|preflight|invoke|federate|session|manifest');
   }
 
 

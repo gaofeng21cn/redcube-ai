@@ -1049,8 +1049,34 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifestParsed.product_entry_readiness.good_to_use_now, false);
     assert.equal(manifestParsed.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
+    assert.equal(manifestParsed.product_entry_start.surface_kind, 'product_entry_start');
+    assert.equal(manifestParsed.product_entry_start.recommended_mode_id, 'open_frontdesk');
+    assert.equal(manifestParsed.product_entry_start.modes[1].mode_id, 'start_direct_session');
+    assert.equal(manifestParsed.product_entry_start.modes[2].mode_id, 'federated_handoff');
+    assert.equal(manifestParsed.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.equal(manifestParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(manifestParsed.product_entry_preflight.ready_to_try_now, true);
+
+    const startParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'start',
+        '--workspace-root',
+        workspaceRoot,
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(startParsed.ok, true);
+    assert.equal(startParsed.surface_kind, 'product_entry_start');
+    assert.equal(startParsed.recommended_mode_id, 'open_frontdesk');
+    assert.equal(startParsed.modes[0].command, `redcube product frontdesk --workspace-root ${workspaceRoot}`);
   });
 });
 

@@ -248,6 +248,35 @@ export interface ProductEntryQuickstartCompanion {
   human_gate_ids?: string[];
 }
 
+export interface ProductEntryStartMode {
+  mode_id: string;
+  title?: string;
+  command: string;
+  surface_kind: string;
+  summary?: string;
+  requires?: string[];
+}
+
+export interface ProductEntryStartCompanion {
+  ok: boolean;
+  surface_kind: 'product_entry_start' | string;
+  target_domain_id?: string;
+  workspace_locator?: {
+    workspace_surface_kind: string;
+    workspace_root: string;
+  };
+  summary: string;
+  recommended_mode_id: string;
+  modes: ProductEntryStartMode[];
+  resume_surface: {
+    surface_kind: string;
+    command: string;
+    session_locator_field?: string;
+    checkpoint_locator_field?: string;
+  };
+  human_gate_ids: string[];
+}
+
 export interface ProductEntryOverviewCompanion {
   surface_kind: 'product_entry_overview' | string;
   summary: string;
@@ -473,6 +502,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       target_domain_id: string;
     };
   };
+  product_entry_start: ProductEntryStartCompanion;
   product_entry_overview: ProductEntryOverviewCompanion;
   product_entry_preflight: ProductEntryPreflightCompanion;
   product_entry_readiness: ProductEntryReadinessCompanion;
@@ -494,6 +524,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   product_entry_status: ProductEntryManifestResponse['product_entry_status'];
   operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
   operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
+  product_entry_start: ProductEntryManifestResponse['product_entry_start'];
   product_entry_overview: ProductEntryManifestResponse['product_entry_overview'];
   product_entry_preflight: ProductEntryManifestResponse['product_entry_preflight'];
   product_entry_readiness: ProductEntryManifestResponse['product_entry_readiness'];
