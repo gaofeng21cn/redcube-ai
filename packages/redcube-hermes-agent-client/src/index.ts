@@ -36,9 +36,28 @@ export interface HermesAgentProbeResult {
   blocking_reason: string | null;
 }
 
+export interface StructuredArtifactGenerationRuntime {
+  owner: 'upstream_hermes_agent';
+  adapter_surface: '@redcube/hermes-agent-client';
+  run_id: string;
+  session_id: string;
+  model_name: string;
+  prompt_pack_file: string;
+  usage: Record<string, unknown> | null;
+}
+
+export interface StructuredArtifactGenerationResult {
+  data: Record<string, unknown>;
+  generationRuntime: StructuredArtifactGenerationRuntime;
+}
+
 export declare const DEFAULT_HERMES_AGENT_UPSTREAM_BASE_URL: 'http://127.0.0.1:8642';
 export declare const DEFAULT_HERMES_AGENT_MODEL_NAME: 'hermes-agent';
 export declare const UPSTREAM_HERMES_AGENT_RUNTIME_OWNER: 'upstream_hermes_agent';
+export declare const REDCUBE_CREATIVE_GENERATION_META_BEGIN: 'REDCUBE_CREATIVE_GENERATION_META_BEGIN';
+export declare const REDCUBE_CREATIVE_GENERATION_META_END: 'REDCUBE_CREATIVE_GENERATION_META_END';
+export declare const REDCUBE_STAGE_JSON_BEGIN: 'REDCUBE_STAGE_JSON_BEGIN';
+export declare const REDCUBE_STAGE_JSON_END: 'REDCUBE_STAGE_JSON_END';
 
 export declare function readHermesAgentUpstreamConfig(
   env?: Record<string, string | undefined>,
@@ -83,3 +102,12 @@ export declare function readHermesAgentRunEvents(options?: {
   output: string | null;
   error: string | null;
 }>;
+
+export declare function generateStructuredArtifactViaUpstreamHermes(options?: {
+  family?: string;
+  route: string;
+  promptRelativePath: string;
+  context?: Record<string, unknown>;
+  outputContract?: Record<string, unknown>;
+  timeoutMs?: number;
+}): Promise<StructuredArtifactGenerationResult>;

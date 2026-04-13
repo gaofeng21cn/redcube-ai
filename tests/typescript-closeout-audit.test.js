@@ -28,7 +28,6 @@ const CONTRACT_SURFACES = [
 
 const SERVICE_BOUNDARIES = [
   'packages/redcube-runtime',
-  'packages/redcube-pack-runtime',
   'packages/redcube-runtime-family-registry',
   'apps/redcube-cli',
   'apps/redcube-mcp',
@@ -87,7 +86,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/ppt-deck-runtime.js',
     'src/ppt-deck.js',
     'src/product-entry-session-store.js',
-    'src/render-pack-compiler.js',
     'src/run-store.js',
     'src/runtime-state.js',
     'src/shared-source-truth.js',
@@ -102,17 +100,9 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/xiaohongshu-runtime.js',
     'src/xiaohongshu.js',
   ],
-  'packages/redcube-pack-runtime': ['src/index.js'],
   'packages/redcube-runtime-family-registry': ['src/index.js'],
-  'packages/redcube-pack-xiaohongshu': [
-    'src/index.js',
-    'src/planning.js',
-    'src/render-compiler.js',
-  ],
-  'packages/redcube-pack-ppt': [
-    'src/index.js',
-    'src/render-compiler.js',
-  ],
+  'packages/redcube-pack-xiaohongshu': ['src/index.js'],
+  'packages/redcube-pack-ppt': ['src/index.js'],
   'packages/redcube-overlay-core': [
     'src/contracts.js',
     'src/index.js',
@@ -145,15 +135,13 @@ const JS_RESIDUE_ALLOWLIST = {
   'packages/redcube-runtime-family-ppt': [
     'src/index.js',
     'src/ppt-deck-runtime.js',
+    'src/ppt-structured-artifact-builders.js',
   ],
   'packages/redcube-runtime-family-poster-onepager': [
     'src/index.js',
     'src/poster-onepager-runtime.js',
   ],
-  'packages/redcube-pack-poster-onepager': [
-    'src/index.js',
-    'src/render-compiler.js',
-  ],
+  'packages/redcube-pack-poster-onepager': ['src/index.js'],
 };
 
 function readJson(file) {

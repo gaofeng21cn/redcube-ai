@@ -122,6 +122,16 @@
       "label": "redcube-runtime-program / upstream Hermes-Agent run surface plus repo-verified product entry federation plus RedCube visual-domain truth",
       "unique": true
     },
+    "creative_stage_mainline": {
+      "owner": "runtime_family_plus_upstream_hermes_structured_generation",
+      "applies_to": [
+        "ppt_deck",
+        "xiaohongshu",
+        "poster_onepager"
+      ],
+      "pack_semantics": "domain_boundary_and_pack_id_only",
+      "repo_local_pack_compiler_status": "removed_from_active_mainline"
+    },
     "green_baseline": {
       "credible": true,
       "clean_clone_required": true,

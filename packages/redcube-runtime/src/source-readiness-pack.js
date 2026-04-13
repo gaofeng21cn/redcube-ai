@@ -7,6 +7,44 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+const OPERATOR_ONLY_SOURCE_KINDS = new Set(['brief', 'keywords']);
+
+function isAudienceFacingKind(kind) {
+  return !OPERATOR_ONLY_SOURCE_KINDS.has(safeText(kind));
+}
+
+function audienceFacingTextLines(value) {
+  return String(value || '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+    .replace(/<img[^>]*>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/`+/g, ' ')
+    .replace(/^\s*#+\s*/gm, '')
+    .replace(/^\s*[-*]\s+/gm, '')
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\|/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+
+function extractAudienceFacingSnippet(value, maxLength = 240) {
+  const lines = audienceFacingTextLines(value);
+  const informative = lines.find((line) => line.length >= 20) || lines[0] || '';
+  return informative.slice(0, maxLength);
+}
+
+function audienceFacingMaterials(extractedMaterials) {
+  return safeArray(extractedMaterials?.materials)
+    .filter((material) => isAudienceFacingKind(material?.kind));
+}
+
+function buildAudienceFacingTopicSummary({ title, extractedMaterials }) {
+  const summary = audienceFacingMaterials(extractedMaterials)
+    .map((material) => extractAudienceFacingSnippet(material?.content_text || material?.excerpt))
+    .find(Boolean);
+  return summary || title;
+}
+
 export function buildSourceReadinessPack({
   topicId,
   title,
@@ -18,7 +56,9 @@ export function buildSourceReadinessPack({
   const inputMode = safeText(sourceBrief?.input_mode, 'empty');
   const confidence = safeText(sourceBrief?.confidence, 'low');
   const materialIds = safeArray(sourceBrief?.material_ids);
-  const readySources = safeArray(sourceIndex?.sources).filter((source) => source?.status === 'ready');
+  const readySources = safeArray(sourceIndex?.sources)
+    .filter((source) => source?.status === 'ready' && isAudienceFacingKind(source?.kind));
+  const publicMaterials = audienceFacingMaterials(extractedMaterials);
   const blockedReasons = safeArray(sourceAudit?.blocking_reasons).map((reason) => safeText(reason)).filter(Boolean);
   const blockingEvidenceGaps = [];
   const residualEvidenceGaps = [];
@@ -62,15 +102,21 @@ export function buildSourceReadinessPack({
       audit_blocking_reasons: blockedReasons,
     },
     fact_library: {
-      topic_summary: safeText(sourceBrief?.brief_text, title),
+      topic_summary: buildAudienceFacingTopicSummary({
+        title,
+        extractedMaterials,
+      }),
       reference_source_list: readySources
         .map((source) => safeText(source.relative_path || source.kind))
         .filter(Boolean),
-      key_fact_groups: safeArray(extractedMaterials?.materials).slice(0, 8).map((material) => ({
-        fact_id: material.material_id,
-        label: safeText(material.excerpt).slice(0, 80),
-        source_id: material.source_id,
-      })),
+      key_fact_groups: publicMaterials
+        .slice(0, 8)
+        .map((material) => ({
+          fact_id: material.material_id,
+          label: extractAudienceFacingSnippet(material.content_text || material.excerpt, 80),
+          source_id: material.source_id,
+        }))
+        .filter((material) => material.label),
       evidence_gaps: allEvidenceGaps,
       blocking_evidence_gaps: uniqueBlockingEvidenceGaps,
       residual_evidence_gaps: uniqueResidualEvidenceGaps,

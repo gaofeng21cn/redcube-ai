@@ -1,123 +1,110 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
-test('runtime no longer owns xiaohongshu slide recipe compiler branches', () => {
-  const runtime = read('packages/redcube-runtime/src/xiaohongshu-runtime.js');
-  const pack = read('packages/redcube-pack-xiaohongshu/src/render-compiler.js');
+test('pack shells no longer export xiaohongshu creative builders or compilers', () => {
+  const packEntry = read('packages/redcube-pack-xiaohongshu/src/index.ts');
   const renderPrompt = read('prompts/xiaohongshu/render_html.md');
 
-  assert.equal(runtime.includes('function compileXhsRenderSlide('), false);
-  assert.equal(runtime.includes("if (slide.recipe_id === 'xhs.hero_note')"), false);
-  assert.equal(pack.includes('export function compileXhsRenderSlides'), true);
-  assert.equal(pack.includes("if (slide.recipe_id === 'xhs.hero_note')"), false);
-  assert.equal(pack.includes("materializedFrom: 'prompt_pack_template'"), false);
-  assert.equal(pack.includes('renderTemplate(templateText'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/planning.js')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/render-compiler.js')), false);
+  assert.equal(packEntry.includes('buildXhsPlanSlides'), false);
+  assert.equal(packEntry.includes('buildXhsVisualDirection'), false);
+  assert.equal(packEntry.includes('buildXhsRenderHtml'), false);
+  assert.equal(packEntry.includes('compileXhsRenderSlides'), false);
   assert.equal(renderPrompt.includes('authored_markup_registry'), true);
 });
 
-test('runtime no longer owns ppt slide recipe compiler branches', () => {
-  const runtime = read('packages/redcube-runtime/src/ppt-deck-runtime.js');
-  const pack = read('packages/redcube-pack-ppt/src/render-compiler.js');
+test('ppt pack shell no longer exports creative builders or compilers', () => {
+  const packEntry = read('packages/redcube-pack-ppt/src/index.ts');
   const renderPrompt = read('prompts/ppt_deck/render_html.md');
 
-  assert.equal(runtime.includes('function compilePptRenderSlide('), false);
-  assert.equal(runtime.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), false);
-  assert.equal(pack.includes('export function compilePptRenderSlides'), true);
-  assert.equal(pack.includes("if (slide.recipe_id === 'ppt.timeline_rail')"), false);
-  assert.equal(pack.includes('renderContract?.template_registry?.[recipeId]'), false);
-  assert.equal(pack.includes('renderTemplate(templateText'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/src/render-compiler.js')), false);
+  assert.equal(packEntry.includes('buildPptDetailedOutline'), false);
+  assert.equal(packEntry.includes('buildPptSlideBlueprint'), false);
+  assert.equal(packEntry.includes('buildPptVisualDirection'), false);
+  assert.equal(packEntry.includes('buildPptRenderArtifact'), false);
+  assert.equal(packEntry.includes('compilePptRenderSlides'), false);
   assert.equal(renderPrompt.includes('authored_markup_registry'), true);
 });
 
-test('overlay render contracts use package-native compiler registry instead of render_pack.js path strings', () => {
+test('poster pack shell no longer exports creative builders or compilers', () => {
+  const packEntry = read('packages/redcube-pack-poster-onepager/src/index.ts');
+
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/render-compiler.js')), false);
+  assert.equal(packEntry.includes('buildPosterBlueprint'), false);
+  assert.equal(packEntry.includes('buildPosterVisualDirection'), false);
+  assert.equal(packEntry.includes('buildPosterRenderArtifact'), false);
+  assert.equal(packEntry.includes('compilePosterRenderSlides'), false);
+});
+
+test('overlay render contracts keep pack ids but no longer declare compiler registry wiring', () => {
   const pptOverlay = read('packages/redcube-overlay-ppt/src/profiles.js');
   const xhsOverlay = read('packages/redcube-overlay-xiaohongshu/src/contracts.js');
-  const packRuntime = read('packages/redcube-pack-runtime/src/index.js');
+  const posterOverlay = read('packages/redcube-overlay-poster-onepager/src/contracts.js');
 
   assert.equal(pptOverlay.includes("compiler_module:"), false);
   assert.equal(pptOverlay.includes("compiler_export:"), false);
   assert.equal(xhsOverlay.includes("compiler_module:"), false);
   assert.equal(xhsOverlay.includes("compiler_export:"), false);
-  assert.equal(xhsOverlay.includes('template_registry:'), false);
-  assert.equal(packRuntime.includes('render_pack.js'), false);
-  assert.equal(packRuntime.includes('defaultPackCompilerModules'), true);
-  assert.equal(packRuntime.includes('prompt_pack?.pack_id'), true);
+  assert.equal(posterOverlay.includes("compiler_module:"), false);
+  assert.equal(posterOverlay.includes("compiler_export:"), false);
+  assert.equal(pptOverlay.includes("pack: '@redcube/pack-ppt'"), true);
+  assert.equal(xhsOverlay.includes("pack: '@redcube/pack-xiaohongshu'"), true);
+  assert.equal(posterOverlay.includes("pack: '@redcube/pack-poster-onepager'"), true);
 });
 
-test('runtime executor no longer imports local family runtime files directly', () => {
+test('runtime executor remains registry-driven instead of hardcoding family runtime imports', () => {
   const executors = read('packages/redcube-runtime/src/executors.js');
 
-  assert.equal(executors.includes("./ppt-deck-runtime.js"), false);
-  assert.equal(executors.includes("./xiaohongshu-runtime.js"), false);
-  assert.equal(executors.includes("@redcube/runtime-family-registry"), true);
-  assert.equal(executors.includes("@redcube/runtime-family-ppt"), false);
-  assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), false);
+  assert.equal(executors.includes('./ppt-deck-runtime.js'), false);
+  assert.equal(executors.includes('./xiaohongshu-runtime.js'), false);
+  assert.equal(executors.includes('@redcube/runtime-family-registry'), true);
+  assert.equal(executors.includes('@redcube/runtime-family-ppt'), false);
+  assert.equal(executors.includes('@redcube/runtime-family-xiaohongshu'), false);
 });
 
-test('@redcube/runtime manifest declares runtime-family-registry dependency explicitly', () => {
+test('runtime and family manifests no longer depend on legacy pack-runtime compiler registry', () => {
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
-  const runtimeFamilyRegistryPackageJson = JSON.parse(read('packages/redcube-runtime-family-registry/package.json'));
+  const pptFamilyPackageJson = JSON.parse(read('packages/redcube-runtime-family-ppt/package.json'));
+  const xhsFamilyPackageJson = JSON.parse(read('packages/redcube-runtime-family-xiaohongshu/package.json'));
+  const posterFamilyPackageJson = JSON.parse(read('packages/redcube-runtime-family-poster-onepager/package.json'));
 
-  assert.equal(runtimePackageJson.dependencies?.['@redcube/runtime-family-registry'], '0.1.0');
-  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt']), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu']), false);
-  assert.equal(runtimeFamilyRegistryPackageJson.dependencies?.['@redcube/runtime-family-ppt'], '0.1.0');
-  assert.equal(runtimeFamilyRegistryPackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu'], '0.1.0');
+  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/pack-runtime']), false);
+  assert.equal(Boolean(pptFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
+  assert.equal(Boolean(xhsFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
+  assert.equal(Boolean(posterFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
 });
 
-test('pack-runtime manifest reserves poster_onepager compiler slot through registry truth', () => {
-  const packRuntimePackageJson = JSON.parse(read('packages/redcube-pack-runtime/package.json'));
-
-  assert.deepEqual(
-    packRuntimePackageJson.redcube?.defaultPackCompilerModules,
-    [
-      {
-        packId: 'ppt_deck_mainline_v1',
-        module: '@redcube/pack-ppt',
-        exportName: 'compilePptRenderSlides',
-      },
-      {
-        packId: 'xiaohongshu_mainline_v1',
-        module: '@redcube/pack-xiaohongshu',
-        exportName: 'compileXhsRenderSlides',
-      },
-      {
-        packId: 'poster_onepager_mainline_v1',
-        module: '@redcube/pack-poster-onepager',
-        exportName: 'compilePosterRenderSlides',
-      },
-    ],
-  );
+test('legacy pack-runtime compiler registry is removed from the workspace', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/render-pack-compiler.js')), false);
 });
 
-test('runtime manifest declares pack-runtime dependency explicitly', () => {
-  const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
-
-  assert.equal(runtimePackageJson.dependencies?.['@redcube/pack-runtime'], '0.1.0');
-});
-
-test('family runtime packages no longer import render-pack loader from runtime internals', () => {
+test('family runtimes no longer import pack-runtime or pack-local creative builders', () => {
   const pptFamily = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
   const xhsFamily = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const posterFamily = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js');
 
-  assert.equal(pptFamily.includes("../../redcube-runtime/src/render-pack-compiler.js"), false);
-  assert.equal(xhsFamily.includes("../../redcube-runtime/src/render-pack-compiler.js"), false);
-  assert.equal(pptFamily.includes("@redcube/pack-runtime"), true);
-  assert.equal(xhsFamily.includes("@redcube/pack-runtime"), true);
+  assert.equal(pptFamily.includes('@redcube/pack-runtime'), false);
+  assert.equal(xhsFamily.includes('@redcube/pack-runtime'), false);
+  assert.equal(posterFamily.includes('@redcube/pack-runtime'), false);
+  assert.equal(pptFamily.includes('@redcube/pack-ppt'), false);
+  assert.equal(xhsFamily.includes('@redcube/pack-xiaohongshu'), false);
+  assert.equal(posterFamily.includes('@redcube/pack-poster-onepager'), false);
 });
 
-test('poster_onepager onboarding reads prompt-pack and rerun policy from hydrated contract instead of family-local fallback', () => {
+test('poster_onepager onboarding still reads prompt-pack and rerun policy from hydrated contract', () => {
   const posterPack = read('packages/redcube-pack-poster-onepager/src/index.js');
   const posterRuntime = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js');
 
-  assert.equal(posterPack.includes("prompts/poster_onepager"), false);
-  assert.equal(posterRuntime.includes("prompts/poster_onepager"), false);
+  assert.equal(posterPack.includes('prompts/poster_onepager'), false);
+  assert.equal(posterRuntime.includes('prompts/poster_onepager'), false);
   assert.equal(posterRuntime.includes('DEFAULT_PROMPT_PACK'), false);
   assert.equal(posterRuntime.includes('review_surface?.rerun_from_stage'), true);
 });

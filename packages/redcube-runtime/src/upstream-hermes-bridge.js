@@ -3,7 +3,11 @@ import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
+import {
+  REDCUBE_PYTHON_COMMAND_ENV,
+  resolveRedCubePythonCommand,
+  resolveWorkspaceContract,
+} from '@redcube/runtime-protocol';
 import {
   probeHermesAgentUpstream,
   readHermesAgentRunEvents,
@@ -47,8 +51,16 @@ function buildServiceEntryFiles({ workspaceRoot, entryKind }) {
   };
 }
 
-function buildServiceEntryCommand({ requestFile, responseFile }) {
-  return `node ${shellEscape(serviceEntryScriptFile())} --request-file ${shellEscape(requestFile)} --response-file ${shellEscape(responseFile)}`;
+function buildEnvPrefix(envAssignments = {}) {
+  const entries = Object.entries(envAssignments)
+    .map(([key, value]) => [String(key || '').trim(), String(value || '').trim()])
+    .filter(([key, value]) => key && value);
+  if (entries.length === 0) return '';
+  return `env ${entries.map(([key, value]) => `${key}=${shellEscape(value)}`).join(' ')} `;
+}
+
+export function buildServiceEntryCommand({ requestFile, responseFile, envAssignments = {} }) {
+  return `${buildEnvPrefix(envAssignments)}node ${shellEscape(serviceEntryScriptFile())} --request-file ${shellEscape(requestFile)} --response-file ${shellEscape(responseFile)}`;
 }
 
 function buildServiceEntryEnvelope({ entryKind, requestFile, responseFile, cwd, command }) {
@@ -83,6 +95,22 @@ function buildHermesRunInstructions() {
     'If the command succeeds, answer with only the response_file path.',
     'If the command fails, stop and let the run fail instead of guessing.',
   ].join(' ');
+}
+
+function routeRequiresPythonEnvironment(entryKind, request) {
+  if (entryKind !== 'run_deliverable_route') return false;
+  const route = String(request?.route || '').trim();
+  return route === 'screenshot_review' || route === 'export_pptx';
+}
+
+function buildServiceEntryEnvAssignments({ entryKind, request }) {
+  if (!routeRequiresPythonEnvironment(entryKind, request)) {
+    return {};
+  }
+
+  return {
+    [REDCUBE_PYTHON_COMMAND_ENV]: resolveRedCubePythonCommand().command,
+  };
 }
 
 export async function assertUpstreamHermesReady({ timeoutMs = 15000 } = {}) {
@@ -124,7 +152,11 @@ export async function executeServiceEntryViaUpstreamHermes({
     request,
   });
 
-  const command = buildServiceEntryCommand({ requestFile, responseFile });
+  const command = buildServiceEntryCommand({
+    requestFile,
+    responseFile,
+    envAssignments: buildServiceEntryEnvAssignments({ entryKind, request }),
+  });
   const envelope = buildServiceEntryEnvelope({
     entryKind,
     requestFile,

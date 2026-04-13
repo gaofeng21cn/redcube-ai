@@ -38,7 +38,6 @@ test('workspace packages and apps participate in package-level tsconfig layering
     'packages/redcube-reference-os/tsconfig.json',
     'packages/redcube-runtime-protocol/tsconfig.json',
     'packages/redcube-runtime/tsconfig.json',
-    'packages/redcube-pack-runtime/tsconfig.json',
   ];
 
   for (const file of paths) {

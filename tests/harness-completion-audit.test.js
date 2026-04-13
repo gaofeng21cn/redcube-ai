@@ -17,7 +17,7 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   assert.equal(runtimeIndex.includes("@redcube/reference-os"), true);
   assert.equal(runtimePackageJson.dependencies['@redcube/governance'], '0.1.0');
   assert.equal(runtimePackageJson.dependencies['@redcube/reference-os'], '0.1.0');
-  assert.equal(runtimePackageJson.dependencies['@redcube/pack-runtime'], '0.1.0');
+  assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/pack-runtime']), false);
   assert.equal(runtimePackageJson.dependencies['@redcube/runtime-family-registry'], '0.1.0');
   assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-ppt']), false);
   assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-xiaohongshu']), false);
@@ -108,7 +108,6 @@ test('harness audit: gateway product surface is stable across success and failur
 
 test('harness audit: extension proof shows onboarding is registry-driven instead of trunk hardcoded', () => {
   const overlayRegistryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
-  const packRuntimePackage = JSON.parse(read('packages/redcube-pack-runtime/package.json'));
   const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.js');
   const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.js');
   const importLegacyProject = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
@@ -118,8 +117,12 @@ test('harness audit: extension proof shows onboarding is registry-driven instead
     ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.deepEqual(
-    packRuntimePackage.redcube.defaultPackCompilerModules.map((item) => item.packId),
-    ['ppt_deck_mainline_v1', 'xiaohongshu_mainline_v1', 'poster_onepager_mainline_v1'],
+    [
+      read('packages/redcube-overlay-ppt/src/profiles.js').includes("pack_id: 'ppt_deck_mainline_v1'"),
+      read('packages/redcube-overlay-xiaohongshu/src/contracts.js').includes("pack_id: 'xiaohongshu_mainline_v1'"),
+      read('packages/redcube-overlay-poster-onepager/src/contracts.js').includes("pack_id: 'poster_onepager_mainline_v1'"),
+    ],
+    [true, true, true],
   );
   assert.equal(createDeliverable.includes('@redcube/overlay-ppt'), false);
   assert.equal(createDeliverable.includes('@redcube/overlay-xiaohongshu'), false);

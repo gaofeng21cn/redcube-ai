@@ -80,10 +80,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'reference-os'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-pack-runtime'),
-    path.join(gatewayNodeModulesDir, 'pack-runtime'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-ppt'),
     path.join(gatewayNodeModulesDir, 'pack-ppt'),
   );
@@ -118,6 +114,10 @@ function createIsolatedCliInstall() {
   copyPackageIntoInstall(
     path.resolve('packages/redcube-hermes-substrate'),
     path.join(gatewayNodeModulesDir, 'hermes-substrate'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('packages/redcube-hermes-agent-client'),
+    path.join(gatewayNodeModulesDir, 'hermes-agent-client'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-hermes-agent-client'),

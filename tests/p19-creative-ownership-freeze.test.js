@@ -112,8 +112,7 @@ test('P19.A freezes lane write scopes by unified lifecycle before any short-live
     P19_TEAM_GATE_CONTRACT.candidate_lanes[1].write_scopes,
     [
       'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
-      'packages/redcube-pack-xiaohongshu/src/planning.js',
-      'packages/redcube-pack-xiaohongshu/src/render-compiler.js',
+      'packages/redcube-pack-xiaohongshu/src/index.ts',
       'prompts/xiaohongshu/**',
       'tests/xiaohongshu-creative-ownership.test.js',
       'tests/xiaohongshu-deliverable-e2e.test.js',
@@ -123,8 +122,8 @@ test('P19.A freezes lane write scopes by unified lifecycle before any short-live
     P19_TEAM_GATE_CONTRACT.candidate_lanes[2].write_scopes,
     [
       'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
-      'packages/redcube-pack-ppt/src/index.js',
-      'packages/redcube-pack-ppt/src/render-compiler.js',
+      'packages/redcube-runtime-family-ppt/src/ppt-structured-artifact-builders.js',
+      'packages/redcube-pack-ppt/src/index.ts',
       'prompts/ppt_deck/**',
       'tests/ppt-creative-ownership.test.js',
       'tests/ppt-deliverable-e2e.test.js',

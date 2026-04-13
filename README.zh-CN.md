@@ -39,6 +39,7 @@
 
 - route / managed execution 的 run surface 由上游 `Hermes-Agent` 主责
 - visual-domain truth、audit、review、export 与 deliverable state 继续由 `RedCube AI` 主责
+- 受保护的创作 stage 现在统一走 `runtime-family + upstream Hermes structured generation`；仓内不再保留会 author PPT / 小红书 / poster 内容的 repo-local `pack/compiler`
 - reachable upstream gateway / API server 是硬前提；缺失时整条 cutover fail-closed
 
 因此，仓里保留的 `Hermes` 历史命名仍然只是 absorbed artifact / compatibility material，不再单独承担 runtime owner 证明。

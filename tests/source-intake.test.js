@@ -110,7 +110,8 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
   assert.equal(Array.isArray(pack.fact_library.evidence_gaps), true);
   assert.equal(Array.isArray(pack.fact_library.blocking_evidence_gaps), true);
   assert.equal(Array.isArray(pack.fact_library.residual_evidence_gaps), true);
-  assert.equal(pack.fact_library.reference_source_list.length > 0, true);
+  assert.deepEqual(pack.fact_library.reference_source_list, []);
+  assert.deepEqual(pack.fact_library.key_fact_groups, []);
   assert.equal(pack.fact_library.evidence_gaps.includes('public_evidence_missing'), true);
   assert.equal(pack.fact_library.blocking_evidence_gaps.includes('public_evidence_missing'), true);
   assert.equal(pack.release_gate.pass, false);
@@ -132,6 +133,66 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
   assert.equal(augmentation.investigation_lanes.length > 0, true);
   assert.equal(Array.isArray(augmentation.focus.required_outputs), true);
   assert.equal(augmentation.focus.required_outputs.includes('reference_source_list'), true);
+});
+
+test('intakeSource keeps operator brief out of audience-facing fact summary while preserving it in augmentation focus', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-brief-split-'));
+
+  const result = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-brief-split',
+    title: 'MedAutoScience 系统介绍',
+    brief: '封面必须署名；重点回答三件事；先讲什么、后讲什么要清楚；这些都是给制作系统的操作要求，不是给听众直接看的正文。',
+    keywords: ['MedAutoScience', '自动科研', '医学人工智能'],
+  });
+
+  const pack = readJson(result.artifactFiles.sourceReadinessPackFile);
+  const augmentation = readJson(result.artifactFiles.sourceAugmentationRequestFile);
+
+  assert.equal(pack.fact_library.topic_summary, 'MedAutoScience 系统介绍');
+  assert.equal(pack.fact_library.topic_summary.includes('封面必须署名'), false);
+  assert.equal(pack.fact_library.topic_summary.includes('重点回答三件事'), false);
+  assert.deepEqual(pack.fact_library.reference_source_list, []);
+  assert.deepEqual(pack.fact_library.key_fact_groups, []);
+  assert.equal(augmentation.focus.topic_summary, 'MedAutoScience 系统介绍');
+  assert.equal(augmentation.focus.brief_text.includes('封面必须署名'), true);
+  assert.equal(augmentation.focus.brief_text.includes('重点回答三件事'), true);
+});
+
+test('intakeSource cleans markdown wrapper noise out of audience-facing fact library', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-markdown-clean-'));
+  const markdownFile = path.join(workspaceRoot, 'opl-readme.md');
+  writeFileSync(markdownFile, [
+    '<p align="center"><img src="assets/branding/opl-banner.svg" alt="One Person Lab banner" width="100%" /></p>',
+    '',
+    '<p align="center"><a href="./README.md">English</a> | <a href="./README.zh-CN.md"><strong>中文</strong></a></p>',
+    '',
+    '# 项目概览',
+    '',
+    '`Med Auto Science` 是共享 `Unified Harness Engineering Substrate` 之上的医学 `Research Ops` gateway 与 `Domain Harness OS`。',
+  ].join('\n'), 'utf-8');
+
+  const result = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-markdown-clean',
+    title: 'MedAutoScience 系统介绍',
+    brief: '给医学人工智能同行介绍系统设计。',
+    keywords: ['MedAutoScience', '自动科研'],
+    sourceFiles: [markdownFile],
+  });
+
+  const pack = readJson(result.artifactFiles.sourceReadinessPackFile);
+
+  assert.equal(pack.fact_library.topic_summary.includes('<p align'), false);
+  assert.equal(pack.fact_library.topic_summary.includes('English'), false);
+  assert.equal(pack.fact_library.topic_summary.includes('Domain Harness OS'), true);
+  assert.deepEqual(pack.fact_library.reference_source_list, [
+    'inputs/raw_materials/source-intake/01-opl-readme.md',
+  ]);
+  assert.equal(
+    pack.fact_library.key_fact_groups.some((item) => ['SRC-BRIEF', 'SRC-KEYWORDS'].includes(item.source_id)),
+    false,
+  );
 });
 
 test('intakeSource blocks pdf extraction explicitly when mineru is unavailable', async () => {

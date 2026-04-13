@@ -3,17 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
+import { generateStructuredArtifactViaUpstreamHermes } from '@redcube/hermes-agent-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
 import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
-import {
-  buildPosterBlueprint,
-  buildPosterRenderArtifact,
-  buildPosterVisualDirection,
-} from '@redcube/pack-poster-onepager';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
@@ -28,6 +24,7 @@ const PYTHON_REVIEW = path.join(MODULE_DIR, '../../redcube-runtime/scripts/ppt_d
 const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
 const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
 const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
+const CREATIVE_MATERIALIZED_FROM = 'upstream_run_json_output';
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   poster_blueprint: 'story_architecture',
@@ -204,12 +201,17 @@ function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
   }, null);
 }
 
-function creativeExecution(lifecycleStage) {
+function creativeExecution(lifecycleStage, generationRuntime = null) {
   return {
     owner: 'hermes',
     primary_surface: 'hermes_backed_runtime_substrate',
     lifecycle_stage: lifecycleStage,
     ownership_model: 'director_first',
+    ...(generationRuntime
+      ? {
+          generation_runtime: generationRuntime,
+        }
+      : {}),
   };
 }
 
@@ -246,6 +248,238 @@ function attachCommon(route, contract) {
   };
 }
 
+function requireText(value, label) {
+  const text = safeText(value);
+  if (!text) {
+    throw new Error(`Missing ${label} in upstream poster generation output`);
+  }
+  return text;
+}
+
+function normalizeStringList(value, label, { min = 1, max = 6 } = {}) {
+  const list = safeArray(value)
+    .map((item) => safeText(item))
+    .filter(Boolean)
+    .slice(0, max);
+  if (list.length < min) {
+    throw new Error(`Missing ${label} in upstream poster generation output`);
+  }
+  return list;
+}
+
+function requireObjectArray(value, label, { min = 1, max = 6 } = {}) {
+  const list = safeArray(value)
+    .filter((item) => item && typeof item === 'object')
+    .slice(0, max);
+  if (list.length < min) {
+    throw new Error(`Missing ${label} in upstream poster generation output`);
+  }
+  return list;
+}
+
+function audienceFacingLines(value) {
+  return String(value || '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+    .replace(/<img[^>]*>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/`+/g, ' ')
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+
+function extractAudienceFacingSnippet(value, maxLength = 220) {
+  const lines = audienceFacingLines(value);
+  const informative = lines.find((line) => line.length >= 16) || lines[0] || '';
+  return informative.slice(0, maxLength);
+}
+
+function sourceTopicSummary(contract) {
+  return extractAudienceFacingSnippet(sourceTruth(contract)?.source_brief?.brief_text, 220)
+    || extractAudienceFacingSnippet(sourceMaterials(contract)[0]?.content_text || sourceMaterials(contract)[0]?.excerpt, 220)
+    || safeText(contract.title);
+}
+
+function summarizePanels(slide) {
+  return safeArray(slide?.panels).map((panel) => ({
+    panel_id: safeText(panel?.panel_id),
+    region: safeText(panel?.region),
+    label: safeText(panel?.label),
+    text: safeText(panel?.text),
+    support_points: safeArray(panel?.support_points),
+  }));
+}
+
+function buildAuthoringContext(contract) {
+  return {
+    title: safeText(contract.title),
+    delivery_goal: safeText(contract.goal),
+    profile_id: contract.profile_id,
+    topic_summary: sourceTopicSummary(contract),
+    ready_sources: sourceLabels(contract),
+    evidence_excerpts: sourceMaterials(contract)
+      .slice(0, 4)
+      .map((material) => ({
+        material_id: material.material_id,
+        source_id: material.source_id,
+        excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
+      }))
+      .filter((item) => item.excerpt),
+    source_truth: {
+      input_mode: safeText(sourceTruth(contract)?.source_brief?.input_mode, 'seed_only'),
+      confidence: safeText(sourceTruth(contract)?.source_brief?.confidence, 'low'),
+      material_ids: sourceMaterialIds(contract),
+    },
+    authoring_guardrails: [
+      'delivery_goal 和制作要求不能原样写进海报 headline、panel 文案或 review_summary。',
+      '不要把内部工作流、模板说明、系统指令、隐藏审核口径写进读者可见内容。',
+      '如果共享事实层不足，只能做保守表达，不得编造医学结论、效果承诺或伪来源。',
+      '海报必须是 AI 直接创作内容，不得退化成固定模板编译或 slot 填空产物。',
+    ],
+  };
+}
+
+function storylineOutputContract() {
+  return {
+    headline: '<string>',
+    subheadline: '<string>',
+    audience_judgement: '<string>',
+    why_now: '<string>',
+    proof_promise: '<string>',
+    call_to_action: '<string>',
+  };
+}
+
+function posterBlueprintOutputContract() {
+  return {
+    render_recipe_id: 'poster.evidence_columns',
+    headline: '<string>',
+    subheadline: '<string>',
+    anchor_tracks: ['<string>', '<string>', '<string>'],
+    panels: [
+      {
+        panel_id: 'hero',
+        region: 'hero_band',
+        label: '<string>',
+        text: '<string>',
+        support_points: ['<string>', '<string>'],
+      },
+    ],
+  };
+}
+
+function visualDirectionOutputContract() {
+  return {
+    visual_manifest: '<string>',
+    poster_motif: '<string>',
+    peak_region: 'hero_band',
+    panel_emphasis: {
+      hero_band: '<string>',
+      evidence_columns: '<string>',
+      pathway_strip: '<string>',
+      action_footer: '<string>',
+    },
+    page_family_ceiling: {
+      hero_band: 1,
+      evidence_columns: 1,
+      pathway_strip: 1,
+      action_footer: 1,
+    },
+    anti_template_constraints: ['<string>', '<string>'],
+    forbidden_regressions: ['<string>', '<string>'],
+    final_instruction_to_html_generator: ['<string>', '<string>'],
+    palette: {
+      paper: '#FFF9F1',
+      ink: '#0F172A',
+      accent: '#1D4ED8',
+      highlight: '#F97316',
+    },
+  };
+}
+
+function renderHtmlOutputContract() {
+  return {
+    slides: [
+      {
+        slide_id: 'P01',
+        content_html: '<section data-slide-root=\"true\" data-slide-id=\"P01\">...</section>',
+      },
+    ],
+    render_summary: ['<string>', '<string>'],
+  };
+}
+
+function directorReviewOutputContract() {
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    message_hierarchy_clear: true,
+    evidence_trace_clear: true,
+    weak_regions: ['hero_band'],
+    rewrite_action: 'none | revise_render_html',
+    review_summary: '<string>',
+  };
+}
+
+function normalizePanel(panel, index) {
+  return {
+    panel_id: requireText(panel?.panel_id, `poster_blueprint.panels[${index}].panel_id`),
+    region: requireText(panel?.region, `poster_blueprint.panels[${index}].region`),
+    label: requireText(panel?.label, `poster_blueprint.panels[${index}].label`),
+    text: requireText(panel?.text, `poster_blueprint.panels[${index}].text`),
+    support_points: normalizeStringList(
+      panel?.support_points,
+      `poster_blueprint.panels[${index}].support_points`,
+      { min: 1, max: 4 },
+    ),
+  };
+}
+
+function normalizeInlineText(value, maxLength = 220) {
+  return safeText(value).replace(/\s+/g, ' ').slice(0, maxLength);
+}
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function escapeTemplate(text) {
+  return String(text || '').replaceAll('\\', '\\\\').replaceAll('`', '\\`').replaceAll('${', '\\${');
+}
+
+function buildHtml({ title, slides, renderPlan, renderStrategy, shellText }) {
+  const slidesLiteral = `\n[${slides.map((slide) => `\n  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
+  return shellText
+    .replaceAll('__REDCUBE_TITLE__', escapeHtml(title))
+    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
+    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
+    .replaceAll('__REDCUBE_SLIDES_DATA__', slidesLiteral);
+}
+
+function stripHtml(value) {
+  return String(value || '').replace(/<[^>]+>/g, ' ');
+}
+
+function validateRenderedPosterHtml(content, slideId) {
+  const html = requireText(content, `render_html.slides[${slideId}].content_html`);
+  if (!/data-slide-root=(["'])true\1/.test(html)) {
+    throw new Error(`poster render_html slide missing data-slide-root=true: ${slideId}`);
+  }
+  if (!new RegExp(`data-slide-id=(["'])${slideId}\\1`).test(html)) {
+    throw new Error(`poster render_html slide missing matching data-slide-id: ${slideId}`);
+  }
+  if (/<script\b/i.test(html)) {
+    throw new Error(`poster render_html slide contains forbidden script tag: ${slideId}`);
+  }
+  return html;
+}
+
 function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const storedContract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -278,69 +512,462 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   return { deliverablePaths };
 }
 
-function buildStoryline(contract) {
-  const authoredArtifact = promptArtifact(contract, 'storyline', {
-    title: safeText(contract.title),
-    goal: safeText(contract.goal),
+async function generateStorylineDraft(contract) {
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'poster_onepager',
+    route: 'storyline',
+    promptRelativePath: promptRoute(contract, 'storyline'),
+    context: buildAuthoringContext(contract),
+    outputContract: storylineOutputContract(),
   });
-  const storyline = authoredArtifact?.storyline;
-  if (!storyline) {
-    throw new Error(`Missing poster_onepager storyline runtime_artifact for profile: ${contract.profile_id}`);
-  }
+  return {
+    authoredStoryline: {
+      headline: requireText(data?.headline, 'storyline.headline'),
+      subheadline: requireText(data?.subheadline, 'storyline.subheadline'),
+      audience_judgement: requireText(data?.audience_judgement, 'storyline.audience_judgement'),
+      why_now: requireText(data?.why_now, 'storyline.why_now'),
+      proof_promise: requireText(data?.proof_promise, 'storyline.proof_promise'),
+      call_to_action: requireText(data?.call_to_action, 'storyline.call_to_action'),
+    },
+    generationRuntime,
+  };
+}
+
+async function buildStoryline(contract) {
+  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract);
   return {
     ...attachCommon('storyline', contract),
-    creative_execution: creativeExecution(lifecycleStageForRoute(contract, 'storyline') || 'story_architecture'),
+    creative_execution: creativeExecution(
+      lifecycleStageForRoute(contract, 'storyline') || 'story_architecture',
+      generationRuntime,
+    ),
     storyline: {
-      headline: safeText(storyline.headline, contract.title),
-      subheadline: safeText(storyline.subheadline, contract.goal),
-      audience_judgement: safeText(storyline.audience_judgement),
-      why_now: safeText(storyline.why_now),
-      proof_promise: safeText(storyline.proof_promise),
-      call_to_action: safeText(storyline.call_to_action),
+      ...authoredStoryline,
       source_truth_material_ids: sourceMaterialIds(contract),
       creative_sources: {
         headline: creativeSourceStamp({
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'headline',
-          materializedFrom: 'prompt_pack_artifact',
+          materializedFrom: CREATIVE_MATERIALIZED_FROM,
         }),
         proof_promise: creativeSourceStamp({
           route: 'storyline',
           lifecycleStage: 'story_architecture',
           authoredSurface: 'proof_promise',
-          materializedFrom: 'prompt_pack_artifact',
+          materializedFrom: CREATIVE_MATERIALIZED_FROM,
         }),
       },
     },
   };
 }
 
-function buildPosterBlueprintArtifact(contract, deliverablePaths) {
-  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
-  return buildPosterBlueprint(contract, storylineArtifact, {
-    safeText,
-    safeArray,
-    promptSeed,
-    attachCommon,
-    CANVAS,
-    BANNED_RENDER_TOKENS,
-    sourceLabels,
-  });
+function buildPosterBlueprintContext(contract, storylineArtifact) {
+  return {
+    ...buildAuthoringContext(contract),
+    storyline: {
+      headline: safeText(storylineArtifact?.storyline?.headline),
+      subheadline: safeText(storylineArtifact?.storyline?.subheadline),
+      audience_judgement: safeText(storylineArtifact?.storyline?.audience_judgement),
+      why_now: safeText(storylineArtifact?.storyline?.why_now),
+      proof_promise: safeText(storylineArtifact?.storyline?.proof_promise),
+      call_to_action: safeText(storylineArtifact?.storyline?.call_to_action),
+    },
+  };
 }
 
-function buildPosterVisualDirectionArtifact(contract, deliverablePaths, mode, baselineDeliverableId) {
-  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
-  return buildPosterVisualDirection(contract, blueprintArtifact, mode, baselineDeliverableId, {
-    safeText,
-    safeArray,
-    promptSeed,
-    attachCommon,
+async function generatePosterBlueprintDraft(contract, deliverablePaths) {
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'poster_onepager',
+    route: 'poster_blueprint',
+    promptRelativePath: promptRoute(contract, 'poster_blueprint'),
+    context: buildPosterBlueprintContext(contract, storylineArtifact),
+    outputContract: posterBlueprintOutputContract(),
   });
+  return {
+    storylineArtifact,
+    authoredBlueprint: {
+      render_recipe_id: requireText(data?.render_recipe_id, 'poster_blueprint.render_recipe_id'),
+      headline: requireText(data?.headline, 'poster_blueprint.headline'),
+      subheadline: requireText(data?.subheadline, 'poster_blueprint.subheadline'),
+      anchor_tracks: normalizeStringList(data?.anchor_tracks, 'poster_blueprint.anchor_tracks', { min: 3, max: 6 }),
+      panels: requireObjectArray(data?.panels, 'poster_blueprint.panels', { min: 4, max: 6 }).map(normalizePanel),
+    },
+    generationRuntime,
+  };
+}
+
+async function buildPosterBlueprintArtifact(contract, deliverablePaths) {
+  const { storylineArtifact, authoredBlueprint, generationRuntime } = await generatePosterBlueprintDraft(contract, deliverablePaths);
+  const sources = sourceLabels(contract);
+  const layoutFamily = safeText(
+    authoredBlueprint.panels[1]?.region || authoredBlueprint.panels[0]?.region,
+    'evidence_columns',
+  );
+  const majorBlueprintText = creativeSourceStamp({
+    route: 'poster_blueprint',
+    lifecycleStage: 'story_architecture',
+    authoredSurface: 'major_blueprint_text',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+  });
+  const recipeDecision = creativeSourceStamp({
+    route: 'poster_blueprint',
+    lifecycleStage: 'visual_authorship',
+    authoredSurface: 'render_recipe_id',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+  });
+  return {
+    ...attachCommon('poster_blueprint', contract),
+    creative_execution: creativeExecution(
+      lifecycleStageForRoute(contract, 'poster_blueprint') || 'story_architecture',
+      generationRuntime,
+    ),
+    lifecycle_stage: lifecycleStageForRoute(contract, 'poster_blueprint') || 'story_architecture',
+    poster_blueprint: {
+      headline: authoredBlueprint.headline,
+      subheadline: authoredBlueprint.subheadline,
+      render_recipe_id: authoredBlueprint.render_recipe_id,
+      slides: [
+        {
+          slide_id: 'P01',
+          slide_no: 1,
+          title: authoredBlueprint.headline,
+          layout_family: layoutFamily,
+          render_recipe_id: authoredBlueprint.render_recipe_id,
+          page_goal: safeText(contract.goal),
+          headline: authoredBlueprint.headline,
+          subheadline: authoredBlueprint.subheadline,
+          audience_judgement: safeText(storylineArtifact?.storyline?.audience_judgement),
+          why_now: safeText(storylineArtifact?.storyline?.why_now),
+          proof_promise: safeText(storylineArtifact?.storyline?.proof_promise),
+          call_to_action: safeText(storylineArtifact?.storyline?.call_to_action),
+          panels: authoredBlueprint.panels,
+          evidence_and_sources: sources.slice(0, 2).map((source, sourceIndex) => ({
+            source_id: `SRC-${sourceIndex + 1}`,
+            public_label: source,
+          })),
+          visual_presentation: {
+            layout_family: layoutFamily,
+            anchor_tracks: authoredBlueprint.anchor_tracks,
+            canvas: CANVAS,
+          },
+          creative_sources: {
+            major_blueprint_text: majorBlueprintText,
+            render_recipe_id: recipeDecision,
+          },
+          creative_authorship: {
+            major_blueprint_text: majorBlueprintText,
+            render_recipe_id: recipeDecision,
+          },
+        },
+      ],
+      quality_guards: {
+        require_visual_direction_before_html: true,
+        forbid_template_route_tokens: BANNED_RENDER_TOKENS,
+        canvas: CANVAS,
+      },
+    },
+  };
+}
+
+function buildVisualDirectionContext(contract, storylineArtifact, blueprintArtifact) {
+  return {
+    ...buildAuthoringContext(contract),
+    storyline: {
+      headline: safeText(storylineArtifact?.storyline?.headline),
+      subheadline: safeText(storylineArtifact?.storyline?.subheadline),
+      audience_judgement: safeText(storylineArtifact?.storyline?.audience_judgement),
+      why_now: safeText(storylineArtifact?.storyline?.why_now),
+      proof_promise: safeText(storylineArtifact?.storyline?.proof_promise),
+      call_to_action: safeText(storylineArtifact?.storyline?.call_to_action),
+    },
+    blueprint: {
+      headline: safeText(blueprintArtifact?.poster_blueprint?.headline),
+      subheadline: safeText(blueprintArtifact?.poster_blueprint?.subheadline),
+      render_recipe_id: safeText(blueprintArtifact?.poster_blueprint?.render_recipe_id),
+      slides: safeArray(blueprintArtifact?.poster_blueprint?.slides).map((slide) => ({
+        slide_id: slide.slide_id,
+        title: slide.title,
+        layout_family: slide.layout_family,
+        render_recipe_id: slide.render_recipe_id,
+        anchor_tracks: safeArray(slide?.visual_presentation?.anchor_tracks),
+        panels: summarizePanels(slide),
+      })),
+    },
+  };
+}
+
+async function generateVisualDirectionDraft(contract, deliverablePaths) {
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'poster_onepager',
+    route: 'visual_direction',
+    promptRelativePath: promptRoute(contract, 'visual_direction'),
+    context: buildVisualDirectionContext(contract, storylineArtifact, blueprintArtifact),
+    outputContract: visualDirectionOutputContract(),
+  });
+  return {
+    blueprintArtifact,
+    authoredVisualDirection: {
+      visual_manifest: requireText(data?.visual_manifest, 'visual_direction.visual_manifest'),
+      poster_motif: requireText(data?.poster_motif, 'visual_direction.poster_motif'),
+      peak_region: requireText(data?.peak_region, 'visual_direction.peak_region'),
+      panel_emphasis: data?.panel_emphasis && typeof data.panel_emphasis === 'object'
+        ? data.panel_emphasis
+        : (() => {
+            throw new Error('Missing visual_direction.panel_emphasis in upstream poster generation output');
+          })(),
+      page_family_ceiling: data?.page_family_ceiling && typeof data.page_family_ceiling === 'object'
+        ? data.page_family_ceiling
+        : (() => {
+            throw new Error('Missing visual_direction.page_family_ceiling in upstream poster generation output');
+          })(),
+      anti_template_constraints: normalizeStringList(
+        data?.anti_template_constraints,
+        'visual_direction.anti_template_constraints',
+        { min: 2, max: 6 },
+      ),
+      forbidden_regressions: normalizeStringList(
+        data?.forbidden_regressions,
+        'visual_direction.forbidden_regressions',
+        { min: 2, max: 6 },
+      ),
+      final_instruction_to_html_generator: normalizeStringList(
+        data?.final_instruction_to_html_generator,
+        'visual_direction.final_instruction_to_html_generator',
+        { min: 2, max: 6 },
+      ),
+      palette: data?.palette && typeof data.palette === 'object'
+        ? data.palette
+        : (() => {
+            throw new Error('Missing visual_direction.palette in upstream poster generation output');
+          })(),
+    },
+    generationRuntime,
+  };
+}
+
+async function buildPosterVisualDirectionArtifact(contract, deliverablePaths, mode, baselineDeliverableId) {
+  const { blueprintArtifact, authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(contract, deliverablePaths);
+  const visualManifest = creativeSourceStamp({
+    route: 'visual_direction',
+    lifecycleStage: 'visual_authorship',
+    authoredSurface: 'visual_manifest',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+  });
+  const posterMotif = creativeSourceStamp({
+    route: 'visual_direction',
+    lifecycleStage: 'visual_authorship',
+    authoredSurface: 'poster_motif',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+  });
+  const pageFamilyCeiling = creativeSourceStamp({
+    route: 'visual_direction',
+    lifecycleStage: 'visual_authorship',
+    authoredSurface: 'page_family_ceiling',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+  });
+  return {
+    ...attachCommon('visual_direction', contract),
+    creative_execution: creativeExecution(
+      lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
+      generationRuntime,
+    ),
+    lifecycle_stage: lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
+    mode,
+    visual_direction: {
+      ...authoredVisualDirection,
+      baseline_deliverable_id: mode === 'optimize_existing' ? safeText(baselineDeliverableId) || null : null,
+      creative_sources: {
+        visual_manifest: visualManifest,
+        poster_motif: posterMotif,
+        page_family_ceiling: pageFamilyCeiling,
+      },
+      creative_authorship: {
+        visual_manifest: visualManifest,
+        poster_motif: posterMotif,
+        page_family_ceiling: pageFamilyCeiling,
+      },
+      blueprint_slide_count: safeArray(blueprintArtifact?.poster_blueprint?.slides).length,
+    },
+  };
 }
 
 function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
+}
+
+async function generateRenderHtmlDraft(contract, deliverablePaths) {
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'poster_onepager',
+    route: 'render_html',
+    promptRelativePath: promptRoute(contract, 'render_html'),
+    context: {
+      ...buildAuthoringContext(contract),
+      blueprint: {
+        slides: safeArray(blueprintArtifact?.poster_blueprint?.slides).map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          render_recipe_id: slide.render_recipe_id,
+          headline: slide.headline,
+          subheadline: slide.subheadline,
+          audience_judgement: slide.audience_judgement,
+          why_now: slide.why_now,
+          proof_promise: slide.proof_promise,
+          call_to_action: slide.call_to_action,
+          panels: summarizePanels(slide),
+          public_sources: safeArray(slide.evidence_and_sources).map((item) => item.public_label),
+          anchor_tracks: safeArray(slide?.visual_presentation?.anchor_tracks),
+        })),
+      },
+      visual_direction: visualArtifact?.visual_direction || null,
+      shell_contract: {
+        ratio: CANVAS.ratio,
+        width: CANVAS.width,
+        height: CANVAS.height,
+        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+      },
+      html_guardrails: [
+        '输出完整 4:5 单页 HTML，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
+        '不要使用 renderSlide/layoutByType/cardsGrid/pageType，也不要把模板注册表或内部文档写入 HTML。',
+        'HTML 必须由 AI 直接创作，不得退化成固定模板 compiler 或 slot 填空产物。',
+      ],
+    },
+    outputContract: renderHtmlOutputContract(),
+  });
+  return {
+    blueprintArtifact,
+    visualArtifact,
+    data,
+    generationRuntime,
+  };
+}
+
+async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths }) {
+  const { blueprintArtifact, visualArtifact, data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths);
+  const slideHtmlById = new Map(
+    requireObjectArray(data?.slides, 'render_html.slides', { min: 1, max: 2 }).map((slide) => [
+      safeText(slide.slide_id),
+      validateRenderedPosterHtml(slide.content_html, safeText(slide.slide_id)),
+    ]),
+  );
+  const blueprintSlides = safeArray(blueprintArtifact?.poster_blueprint?.slides);
+  if (blueprintSlides.length === 0) {
+    throw new Error('upstream poster render_html requires poster_blueprint slides');
+  }
+  const slides = blueprintSlides.map((slide) => {
+    const content = slideHtmlById.get(slide.slide_id);
+    if (!content) {
+      throw new Error(`upstream poster render_html missing slide: ${slide.slide_id}`);
+    }
+    const recipeDecision = creativeSourceStamp({
+      route: 'render_html',
+      lifecycleStage: 'visual_authorship',
+      authoredSurface: 'recipe_selection',
+      materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    });
+    const finalMarkup = creativeSourceStamp({
+      route: 'render_html',
+      lifecycleStage: 'visual_authorship',
+      authoredSurface: 'final_html_markup',
+      materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    });
+    return {
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.render_recipe_id,
+      template_id: 'upstream_ai_html',
+      director_contract: {
+        peak_region: safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band'),
+        poster_motif: safeText(visualArtifact?.visual_direction?.poster_motif),
+        panel_emphasis: visualArtifact?.visual_direction?.panel_emphasis || {},
+        anti_template_constraints: safeArray(visualArtifact?.visual_direction?.anti_template_constraints),
+        final_instruction_to_html_generator: safeArray(visualArtifact?.visual_direction?.final_instruction_to_html_generator),
+      },
+      palette: visualArtifact?.visual_direction?.palette || {
+        paper: '#FFF9F1',
+        ink: '#0F172A',
+        accent: '#1D4ED8',
+        highlight: '#F97316',
+      },
+      creative_sources: {
+        recipe_selection: recipeDecision,
+        final_markup: finalMarkup,
+      },
+      creative_authorship: {
+        recipe_selection: recipeDecision,
+        final_html_markup: finalMarkup,
+      },
+      markup_contract_source: CREATIVE_MATERIALIZED_FROM,
+      content,
+    };
+  });
+  const contractRender = renderContract(contract);
+  const renderPlan = {
+    render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
+    shell_file: resolvePromptPackAsset(contract, safeText(contractRender.shell_file, 'render_shell.html')),
+    pack_id: safeText(contract?.prompt_pack?.pack_id),
+    authored_markup_surface: CREATIVE_MATERIALIZED_FROM,
+    markup_binding_model: 'slides_data_shell_only',
+    peak_region: safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band'),
+    slides: slides.map((slide) => ({
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.recipe_id,
+      template_id: slide.template_id,
+    })),
+  };
+  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
+  const slidesFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
+  const shellText = readPromptPackText(renderPlan.shell_file);
+  writeText(htmlFile, buildHtml({
+    title: contract.title,
+    slides,
+    renderPlan,
+    renderStrategy: renderPlan.render_strategy,
+    shellText,
+  }));
+  writeJson(slidesFile, {
+    title: contract.title,
+    slides: slides.map((slide) => ({
+      slideId: slide.slide_id,
+      title: slide.title,
+      recipeId: slide.recipe_id,
+      content: slide.content,
+    })),
+  });
+  return {
+    ...attachCommon('render_html', contract),
+    creative_execution: creativeExecution(
+      lifecycleStageForRoute(contract, 'render_html') || 'visual_authorship',
+      generationRuntime,
+    ),
+    lifecycle_stage: lifecycleStageForRoute(contract, 'render_html') || 'visual_authorship',
+    html_bundle: {
+      html_file: htmlFile,
+      slides_file: slidesFile,
+      page_count: slides.length,
+      shell_contract: CANVAS,
+      render_strategy: renderPlan.render_strategy,
+      director_contract: {
+        poster_motif: safeText(visualArtifact?.visual_direction?.poster_motif),
+        peak_region: safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band'),
+        page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
+        anti_template_constraints: safeArray(visualArtifact?.visual_direction?.anti_template_constraints),
+      },
+      render_summary: normalizeStringList(data?.render_summary, 'render_html.render_summary', { min: 1, max: 4 }),
+      slides,
+      render_plan: renderPlan,
+    },
+    artifact_refs: [htmlFile, slidesFile],
+  };
 }
 
 function runPython(script, args) {
@@ -353,23 +980,57 @@ function runPython(script, args) {
   return JSON.parse(result.stdout);
 }
 
-function buildDirectorReview(contract, deliverablePaths) {
+async function generateDirectorReviewDraft(contract, deliverablePaths) {
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
-  const seed = promptSeed(contract, 'visual_director_review', {
-    headline: safeText(storylineArtifact?.storyline?.headline),
-    proof_promise: safeText(storylineArtifact?.storyline?.proof_promise),
-    call_to_action: safeText(storylineArtifact?.storyline?.call_to_action),
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'poster_onepager',
+    route: 'visual_director_review',
+    promptRelativePath: promptRoute(contract, 'visual_director_review'),
+    context: {
+      ...buildAuthoringContext(contract),
+      storyline: storylineArtifact?.storyline || null,
+      blueprint: {
+        slides: safeArray(blueprintArtifact?.poster_blueprint?.slides).map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          render_recipe_id: slide.render_recipe_id,
+          panels: summarizePanels(slide),
+        })),
+      },
+      visual_direction: visualArtifact?.visual_direction || null,
+      render_summary: safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
+        slide_id: slide.slide_id,
+        title: slide.title,
+        layout_family: slide.layout_family,
+        peak_region: slide.director_contract?.peak_region,
+        text_excerpt: normalizeInlineText(stripHtml(slide.content), 220),
+      })),
+    },
+    outputContract: directorReviewOutputContract(),
   });
-  const reviewSeed = seed?.visual_director_review || {};
+  return {
+    data,
+    generationRuntime,
+  };
+}
+
+async function buildDirectorReview(contract, deliverablePaths) {
+  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths);
   const checks = {
-    director_intent_landed: Boolean(reviewSeed.director_intent_landed),
-    anti_template_ok: Boolean(reviewSeed.anti_template_ok),
-    message_hierarchy_clear: Boolean(reviewSeed.message_hierarchy_clear),
-    evidence_trace_clear: Boolean(reviewSeed.evidence_trace_clear),
+    director_intent_landed: Boolean(data?.director_intent_landed),
+    anti_template_ok: Boolean(data?.anti_template_ok),
+    message_hierarchy_clear: Boolean(data?.message_hierarchy_clear),
+    evidence_trace_clear: Boolean(data?.evidence_trace_clear),
   };
   const failedChecks = Object.entries(checks)
     .filter(([, value]) => value === false)
     .map(([key]) => key);
+  const weakRegions = normalizeStringList(data?.weak_regions, 'visual_director_review.weak_regions', { min: 0, max: 4 });
+  const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
   const status = failedChecks.length === 0 ? 'pass' : 'block';
   const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
   writeText(reviewFile, [
@@ -380,8 +1041,8 @@ function buildDirectorReview(contract, deliverablePaths) {
     `- anti_template_ok: ${checks.anti_template_ok}`,
     `- message_hierarchy_clear: ${checks.message_hierarchy_clear}`,
     `- evidence_trace_clear: ${checks.evidence_trace_clear}`,
-    `- weak_regions: ${safeArray(reviewSeed.weak_regions).join(', ') || 'none'}`,
-    `- review_summary: ${safeText(reviewSeed.review_summary, 'none')}`,
+    `- weak_regions: ${weakRegions.join(', ') || 'none'}`,
+    `- review_summary: ${reviewSummary}`,
   ].join('\n'));
   const rerunFromStage = status === 'pass'
     ? null
@@ -391,20 +1052,27 @@ function buildDirectorReview(contract, deliverablePaths) {
     review_overlay: 'visual_director_review',
     review_authorship: reviewAuthorship('visual_director_review'),
     review_execution: {
-      ...creativeExecution('review_overlay'),
+      ...creativeExecution('visual_director_review', generationRuntime),
       overlay: 'visual_director_review',
     },
     status,
     visual_director_review: {
+      review_model: 'director_first_visual_judgement',
       director_intent_landed: checks.director_intent_landed,
       anti_template_ok: checks.anti_template_ok,
       message_hierarchy_clear: checks.message_hierarchy_clear,
       evidence_trace_clear: checks.evidence_trace_clear,
-      weak_regions: safeArray(reviewSeed.weak_regions),
-      rewrite_action: safeText(reviewSeed.rewrite_action, status === 'pass' ? 'none' : 'revise_render_html'),
-      review_summary: safeText(reviewSeed.review_summary),
+      weak_regions: weakRegions,
+      rewrite_action: safeText(data?.rewrite_action, status === 'pass' ? 'none' : 'revise_render_html'),
+      review_summary: reviewSummary,
+      overlay_handoff: 'screenshot_review',
       creative_sources: {
-        review_judgement: 'hermes',
+        review_judgement: creativeSourceStamp({
+          route: 'visual_director_review',
+          lifecycleStage: 'review_overlay',
+          authoredSurface: 'visual_director_review_decision',
+          materializedFrom: CREATIVE_MATERIALIZED_FROM,
+        }),
       },
     },
     artifact_refs: [reviewFile],
@@ -625,32 +1293,19 @@ export async function runPosterOnepagerRoute({ workspaceRoot, topicId, deliverab
   let payload;
   switch (route) {
     case 'storyline':
-      payload = buildStoryline(contract);
+      payload = await buildStoryline(contract);
       break;
     case 'poster_blueprint':
-      payload = buildPosterBlueprintArtifact(contract, deliverablePaths);
+      payload = await buildPosterBlueprintArtifact(contract, deliverablePaths);
       break;
     case 'visual_direction':
-      payload = buildPosterVisualDirectionArtifact(contract, deliverablePaths, mode, baselineDeliverableId);
+      payload = await buildPosterVisualDirectionArtifact(contract, deliverablePaths, mode, baselineDeliverableId);
       break;
     case 'render_html':
-      payload = await buildPosterRenderArtifact({ workspaceRoot, topicId, deliverableId, contract, deliverablePaths }, {
-        readStageArtifact,
-        renderContract,
-        promptArtifact,
-        safeText,
-        safeArray,
-        attachCommon,
-        CANVAS,
-        path,
-        readPromptPackText,
-        resolvePromptPackAsset,
-        writeText,
-        writeJson,
-      });
+      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths });
       break;
     case 'visual_director_review':
-      payload = buildDirectorReview(contract, deliverablePaths);
+      payload = await buildDirectorReview(contract, deliverablePaths);
       break;
     case 'screenshot_review':
       payload = buildScreenshotReview(workspaceRoot, topicId, contract, deliverablePaths, mode, baselineDeliverableId);

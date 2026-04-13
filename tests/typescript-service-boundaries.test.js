@@ -22,19 +22,13 @@ test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed bou
   assert.match(types, /interface RuntimeCreativeOwnershipProgramCloseout/);
 });
 
-test('P16 slice 2: pack-runtime exposes a TypeScript service entrypoint and typed registry contracts', () => {
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime/src/index.ts')), true);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime/src/types.ts')), true);
-
-  const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-pack-runtime/package.json'), 'utf-8'));
-  const entry = readFileSync(path.resolve('packages/redcube-pack-runtime/src/index.ts'), 'utf-8');
-  const types = readFileSync(path.resolve('packages/redcube-pack-runtime/src/types.ts'), 'utf-8');
-
-  assert.equal(pkg.types, './src/index.ts');
-  assert.match(entry, /resolveRenderCompilerModule/);
-  assert.match(entry, /loadRenderPackCompiler/);
-  assert.match(types, /interface PackCompilerRegistryEntry/);
-  assert.match(types, /interface ResolvedRenderCompilerModule/);
+test('P16 slice 2: legacy pack-runtime compiler registry service boundary is removed', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime')), false);
+  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
+  assert.equal(
+    rootTsconfig.references.some((entry) => entry.path === './packages/redcube-pack-runtime'),
+    false,
+  );
 });
 
 test('P16 slice 3: CLI exposes a TypeScript service entrypoint and typed command contracts', () => {
@@ -107,6 +101,8 @@ test('P22.A: hermes-agent-client exposes a TypeScript service entrypoint and typ
   assert.equal(pkg.types, './src/index.ts');
   assert.match(entry, /readHermesAgentUpstreamConfig/);
   assert.match(entry, /probeHermesAgentUpstream/);
+  assert.match(entry, /generateStructuredArtifactViaUpstreamHermes/);
   assert.match(types, /interface HermesAgentUpstreamConfig/);
   assert.match(types, /interface HermesAgentProbeResult/);
+  assert.match(types, /interface StructuredArtifactGenerationResult/);
 });

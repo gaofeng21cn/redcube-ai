@@ -35,9 +35,6 @@
       "path": "./packages/redcube-runtime-protocol"
     },
     {
-      "path": "./packages/redcube-pack-runtime"
-    },
-    {
       "path": "./packages/redcube-pack-ppt"
     },
     {

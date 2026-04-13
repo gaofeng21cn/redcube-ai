@@ -22,6 +22,7 @@ import {
   validateSourceAugmentationResultContract as validateSourceAugmentationResultContractJs,
 } from './source-augmentation-contract.js';
 import {
+  REDCUBE_PYTHON_COMMAND_ENV as REDCUBE_PYTHON_COMMAND_ENV_JS,
   resolveRedCubePythonCommand as resolveRedCubePythonCommandJs,
 } from './python-command.js';
 
@@ -114,6 +115,8 @@ export function validateSourceAugmentationResultContract(
 ): ValidationResult {
   return validateSourceAugmentationResultContractJs(contract, options) as ValidationResult;
 }
+
+export const REDCUBE_PYTHON_COMMAND_ENV = REDCUBE_PYTHON_COMMAND_ENV_JS;
 
 export function resolveRedCubePythonCommand(
   options: ResolveRedCubePythonCommandOptions = {},

@@ -74,6 +74,13 @@
 - `gateway -> family -> profile -> pack` 这条 domain 主链
 - visual deliverable 的对象边界、审计、review / publication projection
 - executor routing contract
+- `pack` 作为 domain boundary / pack-id 载体的语义真相
+
+当前还要额外冻结一个边界：
+
+- `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一走 `runtime-family + upstream Hermes structured generation`
+- repo-local `pack/compiler` 不再 author story / blueprint / visual direction / final HTML 这类创作真值
+- `pack` 可以继续存在，但只能作为 typed shell、pack-id carrier 或非创作边界，不能再回退成脚本编译创作路径
 
 因此，“接入 Hermes”不等于“所有视觉生成步骤都改成 Hermes 自己执行”。
 

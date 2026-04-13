@@ -48,8 +48,9 @@ export async function loadRuntimeFamilyRunner(contract) {
   let loaded;
   try {
     loaded = await import(moduleRef.module_name);
-  } catch {
-    throw new Error(`Missing runtime family package: ${moduleRef.module_name}`);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to load runtime family package ${moduleRef.module_name}: ${detail}`, { cause: error });
   }
 
   const runRoute = loaded?.[moduleRef.export_name];

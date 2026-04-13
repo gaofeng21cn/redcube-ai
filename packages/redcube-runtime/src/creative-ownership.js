@@ -158,8 +158,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'delivery_packaging'],
       write_scopes: [
         'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
-        'packages/redcube-pack-xiaohongshu/src/planning.js',
-        'packages/redcube-pack-xiaohongshu/src/render-compiler.js',
+        'packages/redcube-pack-xiaohongshu/src/index.ts',
         'prompts/xiaohongshu/**',
         'tests/xiaohongshu-creative-ownership.test.js',
         'tests/xiaohongshu-deliverable-e2e.test.js',
@@ -174,8 +173,8 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'review_overlay'],
       write_scopes: [
         'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
-        'packages/redcube-pack-ppt/src/index.js',
-        'packages/redcube-pack-ppt/src/render-compiler.js',
+        'packages/redcube-runtime-family-ppt/src/ppt-structured-artifact-builders.js',
+        'packages/redcube-pack-ppt/src/index.ts',
         'prompts/ppt_deck/**',
         'tests/ppt-creative-ownership.test.js',
         'tests/ppt-deliverable-e2e.test.js',
@@ -305,15 +304,25 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS = Object.freeze([
     why_blocked: 'storyline 仍由 prompt_pack_seed 直接物化主叙事表达。',
   },
   {
+    violation_id: 'xhs.single_note_plan.pack_shell_authorship',
+    stage: 'story_architecture',
+    protected_surface: 'page_core_content',
+    file: 'packages/redcube-pack-xiaohongshu/src/index.ts',
+    evidence_patterns: [
+      'buildXhsPlanSlides',
+      'buildXhsVisualDirection',
+    ],
+    why_blocked: 'single_note_plan / visual_direction 仍由 pack shell 暴露 creative builder。',
+  },
+  {
     violation_id: 'xhs.render_html.template_authorship',
     stage: 'visual_authorship',
     protected_surface: 'final_html_markup',
-    file: 'packages/redcube-pack-xiaohongshu/src/render-compiler.js',
+    file: 'packages/redcube-pack-xiaohongshu/src/index.ts',
     evidence_patterns: [
-      "materializedFrom: 'prompt_pack_template'",
-      'compiled.content = renderTemplate(',
+      'compileXhsRenderSlides',
     ],
-    why_blocked: 'render_html 仍由 template compiler 直接 author final markup。',
+    why_blocked: 'render_html 仍由 pack shell 暴露 compiler 出口。',
   },
   {
     violation_id: 'xhs.publish_copy.seed_authorship',
@@ -344,23 +353,23 @@ const PPT_RESIDUE_DEFINITIONS = Object.freeze([
     violation_id: 'ppt.slide_blueprint.shaping_authorship',
     stage: 'story_architecture',
     protected_surface: 'blueprint_major_text',
-    file: 'packages/redcube-pack-ppt/src/index.js',
+    file: 'packages/redcube-pack-ppt/src/index.ts',
     evidence_patterns: [
-      'function toBlueprintContent(slide, deps) {',
-      "speaker_seconds: preset.speaker_seconds + (slide.layout_family === 'judgement_ladder' ? 10 : 0),",
+      'buildPptDetailedOutline',
+      'buildPptSlideBlueprint',
+      'buildPptVisualDirection',
     ],
-    why_blocked: 'slide_blueprint 仍由 deterministic JS 对 major text 与讲述节奏做塑形。',
+    why_blocked: 'detailed_outline / slide_blueprint / visual_direction 仍由 pack shell 暴露 creative builder。',
   },
   {
     violation_id: 'ppt.render_html.template_authorship',
     stage: 'visual_authorship',
     protected_surface: 'final_html_markup',
-    file: 'packages/redcube-pack-ppt/src/render-compiler.js',
+    file: 'packages/redcube-pack-ppt/src/index.ts',
     evidence_patterns: [
-      "materializedFrom: 'prompt_runtime_template'",
-      'compiled.content = renderTemplate(templateText, buildTemplateState(compiled, canvas));',
+      'compilePptRenderSlides',
     ],
-    why_blocked: 'render_html 仍由 template compiler 直接 author final slide markup。',
+    why_blocked: 'render_html 仍由 pack shell 暴露 compiler 出口。',
   },
 ]);
 

@@ -27,10 +27,12 @@
 当前交付主线已经稳定可用，但 runtime 叙事仍处在过渡期。
 Phase 2 的 source-truth、governance、operator-surface 与 runtime-watch 工作继续作为 absorbed provenance 保留。
 当前最诚实的停车边界是：上游 `Hermes-Agent` 的 runtime owner、repo-verified product entry、OPL federation 与 managed session continuity 都已落地，但成熟的最终用户前台壳与 managed web productization 仍是后续工作。
+`ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一留在 `runtime-family + upstream Hermes structured generation` 主链；repo-local `pack/compiler` 创作路径已从 active mainline 移除。
 
 ## 当前基线、长线目标与任务层级
 
 - 当前 repo-verified 基线：上游 `Hermes-Agent` 主责 route / managed run execution，`RedCube AI` 保持 domain truth、operator surface，以及一层薄的 product-entry service surface。
+- 当前创作阶段基线：`pack` 继续保留 domain boundary / pack-id 语义，但不再承担 repo-local creative compiler/runtime。
 - 长线目标：runtime substrate 迁向上游 `Hermes-Agent`，但 `RedCube Gateway -> family / profile / pack -> Domain Harness OS` 的 domain boundary 不变。
 - 产品入口目标：维持已经落地的轻量 domain `product entry` 可被用户直达或被 `OPL` handoff 调起，同时继续把它硬化到成熟前台壳，而不改写视觉 domain boundary。
 - 当前发现面：`redcube product manifest` 与 `get_product_entry_manifest` 会把 direct / federated / session 三类壳如实暴露出来，宿主不需要自己猜命令或载荷结构。

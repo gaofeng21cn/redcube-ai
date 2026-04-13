@@ -106,7 +106,7 @@ export function buildSourceAugmentationRequest({
     .filter(Boolean);
   const topicSummary = safeText(
     sourceReadinessPack?.fact_library?.topic_summary,
-    safeText(sourceBrief?.brief_text, safeText(title, topicId)),
+    safeText(title, topicId),
   );
   const keywords = safeArray(sourceBrief?.keywords).map((item) => safeText(item)).filter(Boolean);
 

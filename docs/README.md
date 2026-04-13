@@ -27,10 +27,12 @@ This index along with the repository home forms the default GitHub-facing biling
 The current deliverable mainline is stable and usable, but the runtime story is still transitional.
 Phase 2 source-truth, governance, operator-surface, and runtime-watch work remain absorbed provenance.
 The current truthful stop boundary is: upstream `Hermes-Agent` run ownership, repo-verified product entry, OPL federation, and managed session continuity are landed, while a mature end-user shell and managed web productization still remain follow-on work.
+Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` now stay on `runtime-family + upstream Hermes structured generation`; repo-local `pack/compiler` authorship has been removed from the active mainline.
 
 ## Current Baseline, Long-Line Target, And Task Ladder
 
 - Current repo-verified baseline: upstream `Hermes-Agent` owns route / managed run execution, while `RedCube AI` keeps domain truth, operator surfaces, and a thin product-entry service surface.
+- Current creative-stage baseline: `pack` remains a domain boundary and pack-id carrier, but no longer acts as a repo-local creative compiler/runtime.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Product-entry target: keep the landed lightweight domain `product entry` callable directly or through `OPL` handoff without changing the visual-domain boundary, then harden it toward a mature end-user shell.
 - Current discovery surface: `redcube product manifest` and `get_product_entry_manifest` let hosts discover the current direct / federated / session shell without guessing commands or payload shape.

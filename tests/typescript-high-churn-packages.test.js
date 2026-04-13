@@ -7,7 +7,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
-test('P17 slice 1: pack-xiaohongshu exposes a TypeScript pack entrypoint and typed high-churn contracts', () => {
+test('P17 slice 1: pack-xiaohongshu remains a typed pack shell without creative builder exports', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/tsconfig.json')), true);
@@ -25,10 +25,11 @@ test('P17 slice 1: pack-xiaohongshu exposes a TypeScript pack entrypoint and typ
     true,
   );
 
-  assert.match(entry, /buildXhsPlanSlides/);
-  assert.match(entry, /buildXhsVisualDirection/);
-  assert.match(entry, /buildXhsRenderHtml/);
-  assert.match(entry, /compileXhsRenderSlides/);
+  assert.match(entry, /export type \{/);
+  assert.doesNotMatch(entry, /buildXhsPlanSlides/);
+  assert.doesNotMatch(entry, /buildXhsVisualDirection/);
+  assert.doesNotMatch(entry, /buildXhsRenderHtml/);
+  assert.doesNotMatch(entry, /compileXhsRenderSlides/);
 
   assert.match(types, /interface XhsPlanSlide/);
   assert.match(types, /interface XhsVisualDirectionArtifact/);
@@ -36,7 +37,7 @@ test('P17 slice 1: pack-xiaohongshu exposes a TypeScript pack entrypoint and typ
   assert.doesNotMatch(types, /\bany\b/);
 });
 
-test('P17 slice 2: pack-ppt exposes a TypeScript pack entrypoint and typed high-churn contracts', () => {
+test('P17 slice 2: pack-ppt remains a typed pack shell without creative builder exports', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/tsconfig.json')), true);
@@ -54,12 +55,13 @@ test('P17 slice 2: pack-ppt exposes a TypeScript pack entrypoint and typed high-
     true,
   );
 
-  assert.match(entry, /buildPptOutlineSlides/);
-  assert.match(entry, /buildPptDetailedOutline/);
-  assert.match(entry, /buildPptSlideBlueprint/);
-  assert.match(entry, /buildPptVisualDirection/);
-  assert.match(entry, /buildPptRenderArtifact/);
-  assert.match(entry, /compilePptRenderSlides/);
+  assert.match(entry, /export type \{/);
+  assert.doesNotMatch(entry, /buildPptOutlineSlides/);
+  assert.doesNotMatch(entry, /buildPptDetailedOutline/);
+  assert.doesNotMatch(entry, /buildPptSlideBlueprint/);
+  assert.doesNotMatch(entry, /buildPptVisualDirection/);
+  assert.doesNotMatch(entry, /buildPptRenderArtifact/);
+  assert.doesNotMatch(entry, /compilePptRenderSlides/);
 
   assert.match(types, /interface PptOutlineSlide/);
   assert.match(types, /interface PptBlueprintArtifact/);
@@ -68,7 +70,7 @@ test('P17 slice 2: pack-ppt exposes a TypeScript pack entrypoint and typed high-
   assert.doesNotMatch(types, /\bany\b/);
 });
 
-test('P20.C: pack-poster-onepager exposes a TypeScript pack entrypoint and typed onboarding contracts', () => {
+test('P20.C: pack-poster-onepager remains a typed pack shell without creative builder exports', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/tsconfig.json')), true);
@@ -86,10 +88,11 @@ test('P20.C: pack-poster-onepager exposes a TypeScript pack entrypoint and typed
     true,
   );
 
-  assert.match(entry, /buildPosterBlueprint/);
-  assert.match(entry, /buildPosterVisualDirection/);
-  assert.match(entry, /buildPosterRenderArtifact/);
-  assert.match(entry, /compilePosterRenderSlides/);
+  assert.match(entry, /export type \{/);
+  assert.doesNotMatch(entry, /buildPosterBlueprint/);
+  assert.doesNotMatch(entry, /buildPosterVisualDirection/);
+  assert.doesNotMatch(entry, /buildPosterRenderArtifact/);
+  assert.doesNotMatch(entry, /compilePosterRenderSlides/);
 
   assert.match(types, /interface PosterBlueprintArtifact/);
   assert.match(types, /interface PosterVisualDirectionArtifact/);

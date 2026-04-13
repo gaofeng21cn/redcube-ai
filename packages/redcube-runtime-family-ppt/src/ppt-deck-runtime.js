@@ -9,21 +9,21 @@ import {
 } from 'node:fs';
 
 import {
+  generateStructuredArtifactViaUpstreamHermes,
+} from '@redcube/hermes-agent-client';
+import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
 } from '@redcube/runtime-protocol';
 import { buildHermesExecutionModel } from '@redcube/hermes-substrate';
-
-import {
-  buildPptDetailedOutline,
-  buildPptRenderArtifact,
-  buildPptSlideBlueprint,
-  buildPptVisualDirection,
-} from '@redcube/pack-ppt';
-import { loadRenderPackCompiler } from '@redcube/pack-runtime';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
+import {
+  buildPptDetailedOutlineArtifact,
+  buildPptSlideBlueprintArtifact,
+  buildPptVisualDirectionArtifact,
+} from './ppt-structured-artifact-builders.js';
 
 /**
  * @typedef {{
@@ -80,12 +80,64 @@ const STAGE_REQUIREMENTS = Object.freeze({
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
 const HERMES_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
+const CREATIVE_MATERIALIZED_FROM = 'upstream_run_json_output';
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   detailed_outline: 'story_architecture',
   slide_blueprint: 'story_architecture',
   visual_direction: 'visual_authorship',
 });
+const PPT_PAGE_LIBRARY = Object.freeze([
+  {
+    page_type: 'cover_signal',
+    layout_family: 'cover_signal',
+    render_recipe_id: 'ppt.hero_signal',
+    use_when: '封面页与讲课契约页',
+  },
+  {
+    page_type: 'stakes_window',
+    layout_family: 'multi_zone_compare',
+    render_recipe_id: 'ppt.compare_zones',
+    use_when: '讲为什么值得现在讲清',
+  },
+  {
+    page_type: 'myth_fact_split',
+    layout_family: 'multi_zone_compare',
+    render_recipe_id: 'ppt.compare_zones',
+    use_when: '讲常见误区与纠偏',
+  },
+  {
+    page_type: 'mechanism_track',
+    layout_family: 'timeline_band',
+    render_recipe_id: 'ppt.timeline_rail',
+    use_when: '讲步骤链路或机制主线',
+  },
+  {
+    page_type: 'decision_gate',
+    layout_family: 'judgement_ladder',
+    render_recipe_id: 'ppt.judgement_ladder',
+    use_when: '讲判断边界、停顿点与下一步动作',
+  },
+  {
+    page_type: 'public_evidence',
+    layout_family: 'multi_zone_compare',
+    render_recipe_id: 'ppt.compare_zones',
+    use_when: '讲公开证据与来源口径',
+  },
+  {
+    page_type: 'ring_cross',
+    layout_family: 'ring_cross',
+    render_recipe_id: 'ppt.ring_cross',
+    use_when: '讲四象限或四步动作框架',
+  },
+  {
+    page_type: 'closure_peak',
+    layout_family: 'summary_peak',
+    render_recipe_id: 'ppt.summary_peak',
+    use_when: '讲结尾带走点与收束页',
+  },
+]);
+const ALLOWED_RECIPE_IDS = new Set(PPT_PAGE_LIBRARY.map((item) => item.render_recipe_id));
 
 function safeText(value) {
   return String(value || '').trim();
@@ -93,6 +145,30 @@ function safeText(value) {
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function normalizeInlineText(value, maxLength = 220) {
+  return safeText(value).replace(/\s+/g, ' ').slice(0, maxLength);
+}
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeTemplate(text) {
+  return String(text || '').replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+}
+
+function buildDeckHtml({ title, slidesMarkup, renderPlan, renderStrategy, shellText }) {
+  const slidesLiteral = `\n[${slidesMarkup.map((slide) => `\n  { slideId: '${slide.slide_id}', title: ${JSON.stringify(slide.title)}, layoutFamily: '${slide.layout_family}', recipeId: '${slide.recipe_id}', templateId: '${slide.template_id}', content: \`${escapeTemplate(slide.content)}\` }`).join(',')}\n]`;
+  return shellText
+    .replaceAll('__PPT_DECK_TITLE__', escapeHtml(title))
+    .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
+    .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
+    .replaceAll('__PPT_DECK_SLIDES_DATA__', slidesLiteral);
 }
 
 function ensureDir(dir) {
@@ -136,6 +212,15 @@ function promptMeta(route) {
     relative_path: relativePath,
     source: existsSync(absolutePath) ? 'repo' : 'embedded',
   };
+}
+
+function resolvePromptPackAsset(contract, relativePath) {
+  const assetPath = safeText(relativePath);
+  if (!assetPath) return '';
+  if (path.isAbsolute(assetPath)) return assetPath;
+  if (assetPath.startsWith('prompts/')) return assetPath;
+  const root = safeText(contract?.prompt_pack?.root, 'prompts/ppt_deck');
+  return assetPath.startsWith(`${root}/`) ? assetPath : path.posix.join(root, assetPath);
 }
 
 function readPromptPackText(relativePath) {
@@ -199,13 +284,38 @@ function sharedSourceMaterials(contract) {
   return safeArray(sharedSourceTruth(contract)?.extracted_materials?.materials);
 }
 
+function audienceFacingMaterials(contract) {
+  return sharedSourceMaterials(contract)
+    .filter((material) => !['brief', 'keywords'].includes(safeText(material?.kind)));
+}
+
+function audienceFacingTextLines(value) {
+  return String(value || '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+    .replace(/<img[^>]*>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/`+/g, ' ')
+    .replace(/^\s*#+\s*/gm, '')
+    .replace(/^\s*[-*]\s+/gm, '')
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\|/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+
+function extractAudienceFacingSnippet(value, maxLength = 240) {
+  const lines = audienceFacingTextLines(value);
+  const informative = lines.find((line) => line.length >= 20) || lines[0] || '';
+  return informative.slice(0, maxLength);
+}
+
 function sharedSourceMaterialIds(contract) {
   return sharedSourceMaterials(contract).map((material) => material.material_id);
 }
 
 function sharedSourceLabels(contract) {
   const labels = safeArray(sharedSourceTruth(contract)?.source_index?.sources)
-    .filter((source) => source.status === 'ready')
+    .filter((source) => source.status === 'ready' && !['brief', 'keywords'].includes(safeText(source?.kind)))
     .map((source) => source.relative_path || source.kind);
   return labels.length > 0 ? labels : [
     '公开来源：临床指南 / 系统综述 / 监管原则',
@@ -215,10 +325,10 @@ function sharedSourceLabels(contract) {
 }
 
 function sharedSourceSnippet(contract, index = 0) {
-  const materials = sharedSourceMaterials(contract);
+  const materials = audienceFacingMaterials(contract);
   if (materials.length === 0) return '';
   const material = materials[index % materials.length];
-  return safeText(material?.excerpt || material?.content_text).replace(/\s+/g, ' ').slice(0, 80);
+  return extractAudienceFacingSnippet(material?.content_text || material?.excerpt, 80);
 }
 
 function sharedSourceInputMode(contract) {
@@ -241,20 +351,23 @@ function sharedSourceDeepResearchState(contract) {
 
 function sharedFactLibrarySummary(contract) {
   if (!sharedSourceTruth(contract)) {
-    return safeText(contract.goal) || safeText(contract.title);
+    return safeText(contract.title);
   }
-  return safeText(
+  return extractAudienceFacingSnippet(
     sharedSourceReadinessPack(contract)?.fact_library?.topic_summary,
-    sharedSourceSnippet(contract, 0) || safeText(contract.goal) || safeText(contract.title),
-  );
+    240,
+  ) || sharedSourceSnippet(contract, 0) || safeText(contract.title);
 }
 
 function sharedSourceAudience(contract, fallback) {
-  const corpus = `${safeText(sharedSourceTruth(contract)?.source_brief?.brief_text)} ${sharedSourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ')}`;
-  if (/学生|课堂|讲课/.test(corpus)) return '医学生与住院学员';
-  if (/同行|临床|科研/.test(corpus)) return '临床科研同行';
+  const corpus = [
+    safeText(sharedSourceTruth(contract)?.source_brief?.brief_text),
+    ...sharedSourceMaterials(contract).map((material) => extractAudienceFacingSnippet(material.content_text, 240)),
+  ].join(' ');
+  if (/同行|同仁|peer|科研/.test(corpus)) return '临床科研同行';
   if (/管理|决策/.test(corpus)) return '医院管理层';
-  return fallback;
+  if (/学生|本科|住院|学员/.test(corpus)) return '医学生与住院学员';
+  return safeText(fallback, '专业听众');
 }
 
 function extraChecks(contract) {
@@ -338,6 +451,16 @@ function hostAgentCreativeSource(protectedSurface, artifactSource) {
   };
 }
 
+function creativeSourceStamp({ route, lifecycleStage, authoredSurface, materializedFrom = 'prompt_pack_seed' }) {
+  return {
+    ...hostAgentCreativeSource(authoredSurface, materializedFrom),
+    route,
+    lifecycle_stage: lifecycleStage,
+    authored_surface: authoredSurface,
+    materialized_from: materializedFrom,
+  };
+}
+
 function lifecycleStageForRoute(contract, route) {
   return contract?.lifecycle_model?.route_to_stage?.[route] || null;
 }
@@ -346,12 +469,17 @@ function reviewOverlayForRoute(contract, route) {
   return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
 }
 
-function creativeExecution(routeOrLifecycleStage) {
+function creativeExecution(routeOrLifecycleStage, generationRuntime = null) {
   return {
     owner: 'hermes',
     primary_surface: 'hermes_backed_runtime_substrate',
     lifecycle_stage: routeOrLifecycleStage,
     ownership_model: 'director_first',
+    ...(generationRuntime
+      ? {
+          generation_runtime: generationRuntime,
+        }
+      : {}),
   };
 }
 
@@ -368,24 +496,457 @@ function attachCommon(route, contract) {
   };
 }
 
-function buildStoryline(contract) {
+function pageBudget(profileId) {
+  switch (profileId) {
+    case 'executive_briefing':
+      return { min_slides: 6, max_slides: 8 };
+    case 'defense_deck':
+      return { min_slides: 8, max_slides: 12 };
+    default:
+      return { min_slides: 8, max_slides: 10 };
+  }
+}
+
+function requireText(value, label) {
+  const text = safeText(value);
+  if (!text) {
+    throw new Error(`Missing ${label} in upstream ppt generation output`);
+  }
+  return text;
+}
+
+function normalizeStringList(value, label, { min = 1, max = 6 } = {}) {
+  const list = safeArray(value)
+    .map((item) => safeText(item))
+    .filter(Boolean)
+    .slice(0, max);
+  if (list.length < min) {
+    throw new Error(`Missing ${label} in upstream ppt generation output`);
+  }
+  return list;
+}
+
+function normalizePageCoreContent(value, label) {
+  const items = safeArray(value)
+    .map((item) => (item && typeof item === 'object'
+      ? {
+          label: safeText(item.label),
+          text: safeText(item.text),
+        }
+      : {
+          label: '',
+          text: safeText(item),
+        }))
+    .filter((item) => item.text);
+  if (items.length === 0) {
+    throw new Error(`Missing ${label} in upstream ppt generation output`);
+  }
+  return items;
+}
+
+function normalizeOutlineSlide(slide, index, defaultPublicSources) {
+  const slideNo = Number(slide?.slide_no || index + 1);
+  const renderRecipeId = requireText(slide?.render_recipe_id, `slides[${index}].render_recipe_id`);
+  if (!ALLOWED_RECIPE_IDS.has(renderRecipeId)) {
+    throw new Error(`Unsupported render_recipe_id in upstream ppt generation output: ${renderRecipeId}`);
+  }
+
+  return {
+    slide_id: requireText(slide?.slide_id, `slides[${index}].slide_id`),
+    slide_no: Number.isFinite(slideNo) ? slideNo : index + 1,
+    chapter_id: safeText(slide?.chapter_id) || `C${Math.min(Math.floor(index / 3) + 1, 3)}`,
+    page_type: requireText(slide?.page_type, `slides[${index}].page_type`),
+    layout_family: requireText(slide?.layout_family, `slides[${index}].layout_family`),
+    title: requireText(slide?.title, `slides[${index}].title`),
+    page_goal: requireText(slide?.page_goal, `slides[${index}].page_goal`),
+    page_objective: requireText(slide?.page_objective, `slides[${index}].page_objective`),
+    core_sentence: requireText(slide?.core_sentence, `slides[${index}].core_sentence`),
+    evidence_points: normalizeStringList(slide?.evidence_points, `slides[${index}].evidence_points`, { min: 2, max: 5 }),
+    public_sources: normalizeStringList(
+      slide?.public_sources,
+      `slides[${index}].public_sources`,
+      { min: 1, max: 4 },
+    ),
+    page_core_content: normalizePageCoreContent(slide?.page_core_content, `slides[${index}].page_core_content`),
+    visual_anchor_tracks: normalizeStringList(
+      slide?.visual_anchor_tracks,
+      `slides[${index}].visual_anchor_tracks`,
+      { min: 2, max: 6 },
+    ),
+    speaker_notes: requireText(slide?.speaker_notes, `slides[${index}].speaker_notes`),
+    transition_sentence: requireText(slide?.transition_sentence, `slides[${index}].transition_sentence`),
+    render_recipe_id: renderRecipeId,
+    ...(safeArray(slide?.public_sources).length === 0
+      ? { public_sources: defaultPublicSources.slice(0, 3) }
+      : {}),
+  };
+}
+
+function deriveChapterStructure(slides) {
+  const groups = new Map();
+  for (const slide of slides) {
+    if (!groups.has(slide.chapter_id)) {
+      groups.set(slide.chapter_id, []);
+    }
+    groups.get(slide.chapter_id).push(slide.slide_no);
+  }
+  return [...groups.entries()].map(([chapterId, slideNos], index) => ({
+    chapter_id: chapterId,
+    title: `第 ${index + 1} 章`,
+    slide_range: `${String(Math.min(...slideNos)).padStart(2, '0')}-${String(Math.max(...slideNos)).padStart(2, '0')}`,
+  }));
+}
+
+function normalizeChapterStructure(chapterStructure, slides) {
+  const normalized = safeArray(chapterStructure)
+    .map((chapter, index) => ({
+      chapter_id: safeText(chapter?.chapter_id) || `C${index + 1}`,
+      title: requireText(chapter?.title, `chapter_structure[${index}].title`),
+      slide_range: requireText(chapter?.slide_range, `chapter_structure[${index}].slide_range`),
+    }))
+    .filter((chapter) => chapter.title);
+  return normalized.length > 0 ? normalized : deriveChapterStructure(slides);
+}
+
+function normalizeOutlineDraft(data, contract) {
+  const defaultPublicSources = sharedSourceLabels(contract);
+  const slides = safeArray(data?.slides).map((slide, index) => normalizeOutlineSlide(slide, index, defaultPublicSources));
+  if (slides.length < 6) {
+    throw new Error('upstream ppt detailed_outline must contain at least 6 slides');
+  }
+  return {
+    chapter_structure: normalizeChapterStructure(data?.chapter_structure, slides),
+    slides,
+  };
+}
+
+function normalizeBlueprintDraft(data, contract) {
+  const defaultPublicSources = sharedSourceLabels(contract);
+  const slides = safeArray(data?.slides).map((slide, index) => normalizeOutlineSlide(slide, index, defaultPublicSources));
+  if (slides.length < 6) {
+    throw new Error('upstream ppt slide_blueprint must contain at least 6 slides');
+  }
+  return {
+    chapter_goal: requireText(data?.chapter_goal, 'slide_blueprint.chapter_goal'),
+    slides,
+  };
+}
+
+function normalizeRhythmCurve(value, slides) {
+  const normalized = safeArray(value)
+    .map((item) => ({
+      slide_id: safeText(item?.slide_id),
+      role: safeText(item?.role),
+    }))
+    .filter((item) => item.slide_id && item.role);
+  if (normalized.length > 0) return normalized;
+  return slides.map((slide, index) => ({
+    slide_id: slide.slide_id,
+    role: index === 0 ? 'opening_peak' : (index === slides.length - 1 ? 'closing_peak' : 'progression'),
+  }));
+}
+
+function normalizeVisualDirectionDraft(data, slides) {
+  return {
+    visual_manifest: requireText(data?.visual_manifest, 'visual_direction.visual_manifest'),
+    what_it_is: normalizeStringList(data?.what_it_is, 'visual_direction.what_it_is', { min: 2, max: 5 }),
+    what_it_is_not: normalizeStringList(data?.what_it_is_not, 'visual_direction.what_it_is_not', { min: 2, max: 5 }),
+    palette: data?.palette && typeof data.palette === 'object'
+      ? data.palette
+      : (() => {
+          throw new Error('Missing visual_direction.palette in upstream ppt generation output');
+        })(),
+    continuity_constraints: normalizeStringList(
+      data?.continuity_constraints,
+      'visual_direction.continuity_constraints',
+      { min: 2, max: 6 },
+    ),
+    rhythm_curve: normalizeRhythmCurve(data?.rhythm_curve, slides),
+    peak_pages: normalizeStringList(data?.peak_pages, 'visual_direction.peak_pages', { min: 2, max: 6 }),
+    page_family_ceiling: data?.page_family_ceiling && typeof data.page_family_ceiling === 'object'
+      ? data.page_family_ceiling
+      : (() => {
+          throw new Error('Missing visual_direction.page_family_ceiling in upstream ppt generation output');
+        })(),
+    forbidden_regressions: normalizeStringList(
+      data?.forbidden_regressions,
+      'visual_direction.forbidden_regressions',
+      { min: 2, max: 6 },
+    ),
+    final_instruction_to_html_generator: normalizeStringList(
+      data?.final_instruction_to_html_generator,
+      'visual_direction.final_instruction_to_html_generator',
+      { min: 2, max: 6 },
+    ),
+  };
+}
+
+function storylineOutputContract() {
+  return {
+    speaker: '<string>',
+    audience: '<string>',
+    style: '<string>',
+    core_metaphor: '<string>',
+    hook: ['<string>'],
+    journey: ['<string>', '<string>', '<string>'],
+    resolution: ['<string>'],
+  };
+}
+
+function detailedOutlineOutputContract() {
+  return {
+    chapter_structure: [
+      { chapter_id: 'C1', title: '<string>', slide_range: '01-03' },
+    ],
+    slides: [
+      {
+        slide_id: 'S01',
+        slide_no: 1,
+        chapter_id: 'C1',
+        page_type: 'cover_signal',
+        layout_family: 'cover_signal',
+        title: '<string>',
+        page_goal: '<string>',
+        page_objective: '<string>',
+        core_sentence: '<string>',
+        evidence_points: ['<string>', '<string>'],
+        public_sources: ['<string>'],
+        page_core_content: ['<string>', '<string>'],
+        visual_anchor_tracks: ['<string>', '<string>'],
+        speaker_notes: '<string>',
+        transition_sentence: '<string>',
+        render_recipe_id: 'ppt.hero_signal',
+      },
+    ],
+  };
+}
+
+function slideBlueprintOutputContract() {
+  return {
+    chapter_goal: '<string>',
+    slides: detailedOutlineOutputContract().slides,
+  };
+}
+
+function visualDirectionOutputContract() {
+  return {
+    visual_manifest: '<string>',
+    what_it_is: ['<string>', '<string>'],
+    what_it_is_not: ['<string>', '<string>'],
+    palette: {
+      canvas: '#F7F8FC',
+      ink: '#0F172A',
+      accent: '#2563EB',
+      accentSoft: '#DBEAFE',
+      success: '#0F766E',
+    },
+    continuity_constraints: ['<string>', '<string>'],
+    rhythm_curve: [{ slide_id: 'S01', role: 'opening_peak' }],
+    peak_pages: ['S01', 'S04'],
+    page_family_ceiling: {
+      cover_signal: 1,
+      multi_zone_compare: 2,
+      timeline_band: 1,
+      judgement_ladder: 1,
+      ring_cross: 1,
+      summary_peak: 1,
+    },
+    forbidden_regressions: ['<string>', '<string>'],
+    final_instruction_to_html_generator: ['<string>', '<string>'],
+  };
+}
+
+function renderHtmlOutputContract() {
+  return {
+    slides: [
+      {
+        slide_id: 'S01',
+        content_html: '<div data-slide-root="true" data-slide-id="S01">...</div>',
+      },
+    ],
+    render_summary: ['<string>', '<string>'],
+  };
+}
+
+function directorReviewOutputContract() {
+  return {
+    director_intent_landed: true,
+    anti_template_ok: true,
+    peak_pages_landed: true,
+    memory_hook_present: true,
+    homogeneous_layout_risk: 0.22,
+    weak_pages: ['S06'],
+    review_summary: '<string>',
+    rewrite_action: 'none | revise_render_html',
+  };
+}
+
+function buildAuthoringContext(contract) {
   const preset = deckPreset(contract.profile_id);
-  const authoredArtifact = promptArtifact('storyline', {
+  return {
     title: safeText(contract.title),
+    delivery_goal: safeText(contract.goal),
+    profile_id: contract.profile_id,
     speaker: preset.speaker,
     audience: sharedSourceAudience(contract, preset.audience),
-    goal: safeText(contract.goal),
     promise: preset.promise,
-    source_claim_1: sharedSourceSnippet(contract, 0) || safeText(contract.goal),
+    page_budget: pageBudget(contract.profile_id),
+    page_library: PPT_PAGE_LIBRARY,
+    source_fact_summary: sharedFactLibrarySummary(contract),
+    ready_sources: sharedSourceLabels(contract),
+    evidence_excerpts: audienceFacingMaterials(contract)
+      .slice(0, 6)
+      .map((material) => ({
+        material_id: material.material_id,
+        source_id: material.source_id,
+        excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
+      }))
+      .filter((material) => material.excerpt),
+    source_truth: {
+      input_mode: sharedSourceInputMode(contract) || 'seed_only',
+      confidence: sharedSourceConfidence(contract) || 'low',
+      sufficiency_status: sharedSourceSufficiencyStatus(contract),
+      deep_research_state: sharedSourceDeepResearchState(contract),
+      material_ids: sharedSourceMaterialIds(contract),
+    },
+    authoring_guardrails: [
+      'delivery_goal 只表示制作目标，不得原样进入 slide 标题、正文、讲稿或视觉宣言',
+      '不要把“封面必须署名”“重点回答三件事”“先讲什么后讲什么”等系统操作说明写成 audience-facing 内容',
+      '如果共享事实材料不足，只能做保守抽象，不要发明内部流程细节或伪来源',
+    ],
+  };
+}
+
+async function generateStorylineDraft(contract) {
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'ppt_deck',
+    route: 'storyline',
+    promptRelativePath: PROMPT_PACK.storyline,
+    context: buildAuthoringContext(contract),
+    outputContract: storylineOutputContract(),
   });
-  const authoredStoryline = authoredArtifact?.storyline;
-  if (!authoredStoryline) {
-    throw new Error(`Missing ppt_deck storyline runtime_artifact for profile: ${contract.profile_id}`);
-  }
+  return {
+    authoredStoryline: {
+      speaker: requireText(data?.speaker, 'storyline.speaker'),
+      audience: requireText(data?.audience, 'storyline.audience'),
+      style: requireText(data?.style, 'storyline.style'),
+      core_metaphor: requireText(data?.core_metaphor, 'storyline.core_metaphor'),
+      hook: normalizeStringList(data?.hook, 'storyline.hook', { min: 1, max: 3 }),
+      journey: normalizeStringList(data?.journey, 'storyline.journey', { min: 3, max: 5 }),
+      resolution: normalizeStringList(data?.resolution, 'storyline.resolution', { min: 1, max: 3 }),
+    },
+    generationRuntime,
+  };
+}
+
+function buildOutlineContext(contract, storylineArtifact) {
+  return {
+    ...buildAuthoringContext(contract),
+    storyline: {
+      speaker: safeText(storylineArtifact?.storyline?.speaker),
+      audience: safeText(storylineArtifact?.storyline?.audience),
+      style: safeText(storylineArtifact?.storyline?.style),
+      core_metaphor: safeText(storylineArtifact?.storyline?.core_metaphor),
+      hook: safeArray(storylineArtifact?.storyline?.narrative_arc?.hook),
+      journey: safeArray(storylineArtifact?.storyline?.narrative_arc?.journey),
+      resolution: safeArray(storylineArtifact?.storyline?.narrative_arc?.resolution),
+    },
+  };
+}
+
+async function generateOutlineDraft(contract, storylineArtifact) {
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'ppt_deck',
+    route: 'detailed_outline',
+    promptRelativePath: PROMPT_PACK.detailed_outline,
+    context: buildOutlineContext(contract, storylineArtifact),
+    outputContract: detailedOutlineOutputContract(),
+  });
+  return {
+    authoredOutline: normalizeOutlineDraft(data, contract),
+    generationRuntime,
+  };
+}
+
+function summarizeOutlineSlides(outlineArtifact) {
+  return safeArray(outlineArtifact?.detailed_outline?.slides).map((slide) => ({
+    slide_id: slide.slide_id,
+    slide_no: slide.slide_no,
+    chapter_id: slide.chapter_id,
+    page_type: slide.page_type,
+    layout_family: slide.layout_family,
+    title: slide.title,
+    page_goal: slide.page_goal,
+    page_objective: slide.page_objective,
+    core_sentence: slide.core_sentence,
+    evidence_points: slide.evidence_points,
+    public_sources: slide.public_sources,
+    page_core_content: slide.page_core_content,
+    visual_anchor_tracks: slide.visual_anchor_tracks,
+    speaker_notes: slide.speaker_notes,
+    transition_sentence: slide.transition_sentence,
+    render_recipe_id: slide.render_recipe_id,
+  }));
+}
+
+async function generateBlueprintDraft(contract, outlineArtifact) {
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'ppt_deck',
+    route: 'slide_blueprint',
+    promptRelativePath: PROMPT_PACK.slide_blueprint,
+    context: {
+      ...buildAuthoringContext(contract),
+      outline: {
+        chapter_structure: safeArray(outlineArtifact?.detailed_outline?.chapter_structure),
+        slides: summarizeOutlineSlides(outlineArtifact),
+      },
+    },
+    outputContract: slideBlueprintOutputContract(),
+  });
+  return {
+    authoredBlueprint: normalizeBlueprintDraft(data, contract),
+    generationRuntime,
+  };
+}
+
+function summarizeBlueprintSlides(blueprintArtifact) {
+  return safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => ({
+    slide_id: slide.slide_id,
+    title: slide.title,
+    page_type: slide.page_type,
+    layout_family: slide.visual_presentation?.layout_family,
+    page_goal: slide.page_goal,
+    anchor_tracks: slide.visual_presentation?.anchor_tracks,
+  }));
+}
+
+async function generateVisualDirectionDraft(contract, blueprintArtifact, mode, baselineDeliverableId) {
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'ppt_deck',
+    route: 'visual_direction',
+    promptRelativePath: PROMPT_PACK.visual_direction,
+    context: {
+      ...buildAuthoringContext(contract),
+      mode,
+      baseline_deliverable_id: safeText(baselineDeliverableId) || null,
+      blueprint: {
+        slides: summarizeBlueprintSlides(blueprintArtifact),
+      },
+    },
+    outputContract: visualDirectionOutputContract(),
+  });
+  return {
+    authoredVisualDirection: normalizeVisualDirectionDraft(data, blueprintArtifact.slide_blueprint.slides),
+    generationRuntime,
+  };
+}
+
+async function buildStoryline(contract) {
+  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract);
   return {
     ...attachCommon('storyline', contract),
     creative_execution: {
-      ...creativeExecution('storyline'),
+      ...creativeExecution('storyline', generationRuntime),
       lifecycle_stage: lifecycleStageForRoute(contract, 'storyline'),
     },
     storyline: {
@@ -406,8 +967,8 @@ function buildStoryline(contract) {
       deep_research_state: sharedSourceDeepResearchState(contract),
       fact_library_summary: sharedFactLibrarySummary(contract),
       creative_sources: {
-        core_metaphor: hostAgentCreativeSource('outline_major_text', 'prompt_pack_artifact'),
-        narrative_arc: hostAgentCreativeSource('outline_major_text', 'prompt_pack_artifact'),
+        core_metaphor: hostAgentCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM),
+        narrative_arc: hostAgentCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM),
       },
     },
   };
@@ -415,6 +976,224 @@ function buildStoryline(contract) {
 
 function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
+}
+
+function validateRenderedSlideContent(content, slideId) {
+  const html = requireText(content, `render_html.slides[${slideId}].content_html`);
+  if (!/data-slide-root=(["'])true\1/.test(html)) {
+    throw new Error(`ppt render_html slide missing data-slide-root=true: ${slideId}`);
+  }
+  if (!new RegExp(`data-slide-id=(["'])${slideId}\\1`).test(html)) {
+    throw new Error(`ppt render_html slide missing matching data-slide-id: ${slideId}`);
+  }
+  if (/<script\b/i.test(html)) {
+    throw new Error(`ppt render_html slide contains forbidden script tag: ${slideId}`);
+  }
+  return html;
+}
+
+async function generateRenderHtmlDraft(contract, deliverablePaths) {
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'ppt_deck',
+    route: 'render_html',
+    promptRelativePath: PROMPT_PACK.render_html,
+    context: {
+      ...buildAuthoringContext(contract),
+      blueprint: {
+        slides: safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => ({
+          slide_id: slide.slide_id,
+          slide_no: slide.slide_no,
+          page_type: slide.page_type,
+          layout_family: slide.visual_presentation?.layout_family,
+          title: slide.title,
+          page_goal: slide.page_goal,
+          core_sentence: slide.core_sentence,
+          page_core_content: slide.page_core_content,
+          anchor_tracks: slide.visual_presentation?.anchor_tracks,
+          speaker_seconds: slide.speaker_seconds,
+          render_recipe_id: slide.render_recipe_id,
+          public_sources: safeArray(slide.evidence_and_sources).map((item) => item.public_label),
+        })),
+      },
+      visual_direction: visualArtifact?.visual_direction || null,
+      shell_contract: {
+        ratio: CANVAS.ratio,
+        width: CANVAS.width,
+        height: CANVAS.height,
+        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+      },
+      html_guardrails: [
+        '每页输出完整 slide root，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
+        '不要使用 renderSlide/layoutByType/cardsGrid/pageType，也不要把模板注册表或内部文档写入 HTML。',
+        'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
+      ],
+    },
+    outputContract: renderHtmlOutputContract(),
+  });
+  return {
+    data,
+    generationRuntime,
+  };
+}
+
+async function buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths }) {
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths);
+  const slideHtmlList = safeArray(data?.slides).filter((item) => item && typeof item === 'object');
+  if (slideHtmlList.length < 6) {
+    throw new Error('upstream ppt render_html must contain at least 6 slides');
+  }
+  const slideHtmlById = new Map(slideHtmlList.map((item) => [
+    safeText(item.slide_id),
+    validateRenderedSlideContent(item.content_html, safeText(item.slide_id)),
+  ]));
+  const slidesMarkup = safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => {
+    const content = slideHtmlById.get(slide.slide_id);
+    if (!content) {
+      throw new Error(`upstream ppt render_html missing slide: ${slide.slide_id}`);
+    }
+    const recipeDecision = creativeSourceStamp({
+      route: 'render_html',
+      lifecycleStage: 'visual_authorship',
+      authoredSurface: 'recipe_selection',
+      materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    });
+    const finalMarkup = creativeSourceStamp({
+      route: 'render_html',
+      lifecycleStage: 'visual_authorship',
+      authoredSurface: 'final_html_markup',
+      materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    });
+    return {
+      slide_id: slide.slide_id,
+      slide_no: slide.slide_no,
+      title: slide.title,
+      layout_family: slide.visual_presentation.layout_family,
+      recipe_id: slide.render_recipe_id,
+      template_id: 'upstream_ai_html',
+      page_goal: slide.page_goal,
+      page_core_content: safeArray(slide.page_core_content),
+      evidence_and_sources: safeArray(slide.evidence_and_sources),
+      speaker_seconds: slide.speaker_seconds,
+      transition_sentence: slide.transition_sentence,
+      director_contract: {
+        peak_page: safeArray(visualArtifact?.visual_direction?.peak_pages).includes(slide.slide_id),
+        director_role: safeArray(visualArtifact?.visual_direction?.page_role_table).find((item) => item.slide_id === slide.slide_id)?.page_role || slide.visual_presentation.layout_family,
+        generator_instructions: safeArray(visualArtifact?.visual_direction?.final_instruction_to_html_generator),
+        page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
+        visual_manifest: safeText(visualArtifact?.visual_direction?.visual_manifest),
+      },
+      palette: visualArtifact?.visual_direction?.palette || {
+        canvas: '#F7F8FC',
+        ink: '#0F172A',
+        accent: '#2563EB',
+      },
+      total_slides: safeArray(blueprintArtifact?.slide_blueprint?.slides).length,
+      creative_sources: {
+        recipe_selection: recipeDecision,
+        final_markup: finalMarkup,
+      },
+      creative_authorship: {
+        recipe_decision: recipeDecision,
+        final_html_markup: finalMarkup,
+      },
+      markup_contract_source: CREATIVE_MATERIALIZED_FROM,
+      content,
+    };
+  });
+  const contractRender = renderContract(contract);
+  const renderPlan = {
+    render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
+    shell_file: resolvePromptPackAsset(contract, safeText(contractRender.shell_file, 'render_shell.html'), { safeText }),
+    pack_id: safeText(contract?.prompt_pack?.pack_id),
+    authored_markup_surface: CREATIVE_MATERIALIZED_FROM,
+    markup_binding_model: 'slides_data_shell_only',
+    generator_instructions: safeArray(visualArtifact?.visual_direction?.final_instruction_to_html_generator),
+    peak_pages: safeArray(visualArtifact?.visual_direction?.peak_pages),
+    page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
+    slides: slidesMarkup.map((slide) => ({
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.recipe_id,
+      template_id: slide.template_id,
+      peak_page: slide.director_contract.peak_page,
+      director_role: slide.director_contract.director_role,
+    })),
+  };
+  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
+  const slidesFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
+  const shellText = readPromptPackText(renderPlan.shell_file);
+  writeText(htmlFile, buildDeckHtml({
+    title: contract.title,
+    slidesMarkup,
+    renderPlan,
+    renderStrategy: renderPlan.render_strategy,
+    shellText,
+  }));
+  writeJson(slidesFile, {
+    title: contract.title,
+    slides: slidesMarkup.map((slide) => ({
+      slideId: slide.slide_id,
+      title: slide.title,
+      recipeId: slide.recipe_id,
+      content: slide.content,
+    })),
+  });
+  return {
+    ...attachCommon('render_html', contract),
+    creative_execution: creativeExecution(contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship', generationRuntime),
+    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
+    html_bundle: {
+      html_file: htmlFile,
+      slides_file: slidesFile,
+      page_count: slidesMarkup.length,
+      render_strategy: renderPlan.render_strategy,
+      generator_instructions: renderPlan.generator_instructions,
+      render_summary: normalizeStringList(data?.render_summary, 'render_html.render_summary', { min: 1, max: 4 }),
+      shell_contract: {
+        ratio: CANVAS.ratio,
+        width: CANVAS.width,
+        height: CANVAS.height,
+        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+      },
+      slides: slidesMarkup,
+    },
+    artifact_refs: [htmlFile, slidesFile],
+  };
+}
+
+async function generateDirectorReviewDraft(contract, deliverablePaths) {
+  const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const { data, generationRuntime } = await generateStructuredArtifactViaUpstreamHermes({
+    family: 'ppt_deck',
+    route: 'visual_director_review',
+    promptRelativePath: PROMPT_PACK.visual_director_review,
+    context: {
+      ...buildAuthoringContext(contract),
+      blueprint: {
+        slides: summarizeBlueprintSlides(blueprintArtifact),
+      },
+      visual_direction: visualArtifact?.visual_direction || null,
+      render_summary: safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
+        slide_id: slide.slide_id,
+        title: slide.title,
+        layout_family: slide.layout_family,
+        peak_page: slide.director_contract?.peak_page,
+        text_excerpt: normalizeInlineText(String(slide.content || '').replace(/<[^>]+>/g, ' '), 220),
+      })),
+    },
+    outputContract: directorReviewOutputContract(),
+  });
+  return {
+    data,
+    generationRuntime,
+  };
 }
 
 function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
@@ -569,20 +1348,21 @@ function buildReviewMarkdown(contract, reviewArtifact) {
   return `${lines.join('\n')}\n`;
 }
 
-function buildDirectorReview(contract, deliverablePaths) {
-  const seed = promptSeed('visual_director_review')?.visual_director_review || {};
-  const directorIntentLanded = Boolean(seed.director_intent_landed);
-  const antiTemplateOk = Boolean(seed.anti_template_ok);
-  const memoryHookPresent = Boolean(seed.memory_hook_present);
-  const peakPagesLanded = Boolean(seed.peak_pages_landed ?? true);
-  const weakPages = safeArray(seed.weak_pages);
-  const homogeneousLayoutRisk = Number(seed.homogeneous_layout_risk || 0);
-  const reviewSummary = safeText(seed.review_summary);
+async function buildDirectorReview(contract, deliverablePaths) {
+  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths);
+  const directorIntentLanded = Boolean(data?.director_intent_landed);
+  const antiTemplateOk = Boolean(data?.anti_template_ok);
+  const memoryHookPresent = Boolean(data?.memory_hook_present);
+  const peakPagesLanded = Boolean(data?.peak_pages_landed ?? true);
+  const weakPages = normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', { min: 0, max: 4 });
+  const homogeneousLayoutRisk = Number(data?.homogeneous_layout_risk || 0);
+  const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
   const status = directorIntentLanded && antiTemplateOk && peakPagesLanded ? 'pass' : 'block';
   const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
   writeText(reviewFile, [
     '# 视觉总监复盘',
     '',
+    '- review_owner: hermes_backed_runtime_substrate',
     `- director_intent_landed: ${directorIntentLanded}`,
     `- anti_template_ok: ${antiTemplateOk}`,
     `- peak_pages_landed: ${peakPagesLanded}`,
@@ -594,7 +1374,7 @@ function buildDirectorReview(contract, deliverablePaths) {
   return {
     ...attachCommon('visual_director_review', contract),
     review_execution: {
-      ...creativeExecution('visual_director_review'),
+      ...creativeExecution('visual_director_review', generationRuntime),
       overlay: 'visual_director_review',
     },
     review_overlay: 'visual_director_review',
@@ -608,10 +1388,15 @@ function buildDirectorReview(contract, deliverablePaths) {
       weak_pages: weakPages,
       homogeneous_layout_risk: homogeneousLayoutRisk,
       review_summary: reviewSummary,
-      rewrite_action: safeText(seed.rewrite_action) || (status === 'pass' ? 'none' : 'revise_render_html'),
+      rewrite_action: safeText(data?.rewrite_action) || (status === 'pass' ? 'none' : 'revise_render_html'),
       overlay_handoff: 'screenshot_review',
       creative_sources: {
-        review_judgement: hostAgentCreativeSource('visual_director_review_decision', 'director_review_contract'),
+        review_judgement: creativeSourceStamp({
+          route: 'visual_director_review',
+          lifecycleStage: 'review_overlay',
+          authoredSurface: 'visual_director_review_decision',
+          materializedFrom: CREATIVE_MATERIALIZED_FROM,
+        }),
       },
     },
     artifact_refs: [reviewFile],
@@ -788,64 +1573,63 @@ export async function runPptDeckRoute({ workspaceRoot, topicId, deliverableId, r
   let payload;
   switch (route) {
     case 'storyline':
-      payload = buildStoryline(contract);
+      payload = await buildStoryline(contract);
       break;
-    case 'detailed_outline':
-      payload = buildPptDetailedOutline(contract, {
-        safeText,
-        safeArray,
-        promptSeed,
-        sharedSourceLabels,
-        sharedSourceMaterials,
-        attachCommon,
-        CANVAS,
-        BANNED_RENDER_TOKENS,
-      });
-      break;
-    case 'slide_blueprint':
-      payload = buildPptSlideBlueprint(contract, {
-        safeText,
-        safeArray,
-        promptSeed,
-        sharedSourceLabels,
-        sharedSourceMaterials,
-        attachCommon,
-        CANVAS,
-        BANNED_RENDER_TOKENS,
-      });
-      break;
-    case 'visual_direction':
-      payload = buildPptVisualDirection(
+    case 'detailed_outline': {
+      const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+      const { authoredOutline, generationRuntime } = await generateOutlineDraft(contract, storylineArtifact);
+      payload = buildPptDetailedOutlineArtifact({
         contract,
-        readStageArtifact(contract, deliverablePaths, 'slide_blueprint'),
+        attachCommon,
+        authoredOutline,
+        generationRuntime,
+        lifecycleStage: lifecycleStageForRoute(contract, 'detailed_outline') || 'story_architecture',
+        materializedFrom: CREATIVE_MATERIALIZED_FROM,
+      });
+      break;
+    }
+    case 'slide_blueprint': {
+      const outlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
+      const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(contract, outlineArtifact);
+      payload = buildPptSlideBlueprintArtifact({
+        contract,
+        attachCommon,
+        authoredBlueprint,
+        generationRuntime,
+        lifecycleStage: lifecycleStageForRoute(contract, 'slide_blueprint') || 'story_architecture',
+        materializedFrom: CREATIVE_MATERIALIZED_FROM,
+        canvas: CANVAS,
+        bannedRenderTokens: BANNED_RENDER_TOKENS,
+      });
+      break;
+    }
+    case 'visual_direction': {
+      const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+      const { authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(
+        contract,
+        blueprintArtifact,
         mode,
         baselineDeliverableId,
-        {
-          safeText,
-          safeArray,
-          promptSeed,
-          attachCommon,
-          sharedSourceConfidence,
-        },
       );
-      break;
-    case 'render_html':
-      payload = await buildPptRenderArtifact({ workspaceRoot, topicId, deliverableId, contract, deliverablePaths }, {
-        readStageArtifact,
-        renderContract,
-        promptArtifact,
-        safeText,
-        safeArray,
+      payload = buildPptVisualDirectionArtifact({
+        contract,
+        blueprintArtifact,
+        authoredVisualDirection,
         attachCommon,
-        CANVAS,
-        path,
-        readPromptPackText,
-        writeText,
-        writeJson,
+        generationRuntime,
+        lifecycleStage: lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
+        materializedFrom: CREATIVE_MATERIALIZED_FROM,
+        baselineDeliverableId,
+        mode,
+        sharedSourceConfidence: sharedSourceConfidence(contract),
       });
       break;
+    }
+    case 'render_html':
+      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths });
+      break;
     case 'visual_director_review':
-      payload = buildDirectorReview(contract, deliverablePaths);
+      payload = await buildDirectorReview(contract, deliverablePaths);
       break;
     case 'screenshot_review':
       payload = buildScreenshotReviewArtifact({ workspaceRoot, topicId, deliverableId, contract, mode, baselineDeliverableId });

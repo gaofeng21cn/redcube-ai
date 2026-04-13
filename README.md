@@ -39,6 +39,7 @@ The executable baseline is therefore:
 
 - upstream `Hermes-Agent` owns the run surface for route / managed execution
 - `RedCube AI` still owns visual-domain truth, audit, review, export, and deliverable state
+- protected creative stages now run through `runtime-family + upstream Hermes structured generation`; repo-local `pack/compiler` no longer authors PPT / Xiaohongshu / poster content
 - a reachable upstream gateway / API server remains a hard precondition, and the cutover fails closed when that proof is missing
 
 Historical repo-local `Hermes` naming still exists in absorbed artifacts and compatibility material, but it must not be read as separate proof of runtime ownership.

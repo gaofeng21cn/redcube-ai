@@ -6,8 +6,5 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.js"
-  },
-  "dependencies": {
-    "@redcube/pack-runtime": "0.1.0"
   }
 }

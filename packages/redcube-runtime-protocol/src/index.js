@@ -19,5 +19,6 @@ export {
   validateSourceAugmentationResultContract,
 } from './source-augmentation-contract.js';
 export {
+  REDCUBE_PYTHON_COMMAND_ENV,
   resolveRedCubePythonCommand,
 } from './python-command.js';
