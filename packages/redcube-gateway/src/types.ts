@@ -297,6 +297,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
 }
 
 export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry_manifest'> {
+  manifest_version: number;
   manifest_kind: string;
   target_domain_id: string;
   formal_entry: {
@@ -305,8 +306,10 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     internal_surface: string;
   };
   workspace_locator: {
+    workspace_surface_kind: string;
     workspace_root: string;
   };
+  recommended_shell: 'direct' | 'federated' | 'session' | string;
   runtime: {
     runtime_owner: string;
     runtime_state_root: string;

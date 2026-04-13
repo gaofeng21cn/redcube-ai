@@ -228,11 +228,14 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 
     assert.equal(manifest.ok, true);
     assert.equal(manifest.surface_kind, 'product_entry_manifest');
+    assert.equal(manifest.manifest_version, 1);
     assert.equal(manifest.manifest_kind, 'redcube_product_entry_manifest');
     assert.equal(manifest.target_domain_id, 'redcube_ai');
     assert.equal(manifest.formal_entry.default, 'CLI');
     assert.deepEqual(manifest.formal_entry.supported_protocols, ['MCP']);
+    assert.equal(manifest.workspace_locator.workspace_surface_kind, 'redcube_workspace');
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(manifest.recommended_shell, 'direct');
     assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');

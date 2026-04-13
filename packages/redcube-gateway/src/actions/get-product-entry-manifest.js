@@ -29,6 +29,7 @@ export async function getProductEntryManifest(request) {
   return {
     ok: true,
     surface_kind: 'product_entry_manifest',
+    manifest_version: 1,
     recommended_action: 'invoke_product_entry',
     manifest_kind: 'redcube_product_entry_manifest',
     target_domain_id: 'redcube_ai',
@@ -38,8 +39,10 @@ export async function getProductEntryManifest(request) {
       internal_surface: 'gateway',
     },
     workspace_locator: {
+      workspace_surface_kind: 'redcube_workspace',
       workspace_root: workspaceRoot,
     },
+    recommended_shell: 'direct',
     runtime: {
       runtime_owner: 'upstream_hermes_agent',
       runtime_state_root: path.dirname(sessionStoreRoot),
