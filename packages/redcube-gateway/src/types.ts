@@ -310,6 +310,12 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     workspace_root: string;
   };
   recommended_shell: 'direct' | 'federated' | 'session' | string;
+  frontdesk_surface: {
+    shell_key: 'frontdesk' | string;
+    command: string;
+    surface_kind: string;
+    summary: string;
+  };
   operator_loop_surface: {
     shell_key: 'direct' | 'federated' | 'session' | string;
     command: string;
@@ -335,6 +341,11 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     session_store_root: string;
   };
   product_entry_shell: {
+    frontdesk: {
+      command: string;
+      command_template: string;
+      surface_kind: 'product_frontdesk' | string;
+    };
     direct: {
       command: string;
       command_template: string;
@@ -361,6 +372,28 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     product_entry_contract: string;
     federated_product_entry_contract: string;
     managed_product_entry_contract: string;
+  };
+  notes: string[];
+}
+
+export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk'> {
+  target_domain_id: string;
+  frontdesk_surface: ProductEntryManifestResponse['frontdesk_surface'];
+  workspace_locator: ProductEntryManifestResponse['workspace_locator'];
+  runtime: ProductEntryManifestResponse['runtime'];
+  product_entry_status: ProductEntryManifestResponse['product_entry_status'];
+  operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
+  operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
+  product_entry_manifest: ProductEntryManifestResponse;
+  entry_surfaces: {
+    direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
+    federated: ProductEntryManifestResponse['product_entry_shell']['federated'];
+    session: ProductEntryManifestResponse['product_entry_shell']['session'];
+  };
+  summary: {
+    frontdesk_command: string | null;
+    recommended_command: string;
+    operator_loop_command: string | null;
   };
   notes: string[];
 }

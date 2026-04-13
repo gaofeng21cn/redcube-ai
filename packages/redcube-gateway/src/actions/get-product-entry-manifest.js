@@ -58,6 +58,12 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: 'redcube product invoke',
+    frontdesk_surface: {
+      shell_key: 'frontdesk',
+      command: 'redcube product frontdesk',
+      surface_kind: 'product_frontdesk',
+      summary: '当前 direct RedCube frontdesk，先暴露 direct / federated / session 三种 operator-facing 入口。',
+    },
     operator_loop_surface: {
       shell_key: 'direct',
       command: 'redcube product invoke',
@@ -110,6 +116,11 @@ export async function getProductEntryManifest(request) {
       session_store_root: sessionStoreRoot,
     },
     product_entry_shell: {
+      frontdesk: {
+        command: 'redcube product frontdesk',
+        command_template: `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+        surface_kind: 'product_frontdesk',
+      },
       direct: {
         command: 'redcube product invoke',
         command_template: (

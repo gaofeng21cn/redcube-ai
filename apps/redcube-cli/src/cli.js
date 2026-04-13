@@ -17,6 +17,7 @@ import {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductFrontdesk,
   getProductEntryManifest,
   getProductEntrySession,
   superviseManagedRun as superviseGatewayManagedRun,
@@ -47,6 +48,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
+  getProductFrontdesk,
   getProductEntryManifest,
   getProductEntrySession,
   superviseManagedRun: superviseGatewayManagedRun,
@@ -216,6 +218,12 @@ function buildCommandHelp(commandKey) {
       gateway_action: 'getProductEntrySession',
       boundary_fields: ['entrySessionId'],
     },
+    'product frontdesk': {
+      summary: '读取 RedCube 轻量 direct frontdesk，先查看 direct / federated / session 三类入口与当前主线状态。',
+      usage: 'redcube product frontdesk --workspace-root <dir>',
+      gateway_action: 'getProductFrontdesk',
+      boundary_fields: ['workspaceRoot'],
+    },
     'product manifest': {
       summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / federated / session 三个入口面。',
       usage: 'redcube product manifest --workspace-root <dir>',
@@ -332,6 +340,10 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       },
       {
+        task: '先打开 RedCube 轻量前台，查看当前 product-entry 入口和继续方式',
+        command: 'redcube product frontdesk --workspace-root <dir>',
+      },
+      {
         task: '通过 direct product entry 创建或继续同一交付 session',
         command: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>]',
       },
@@ -345,7 +357,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
-      product: ['invoke', 'federate', 'session'],
+      product: ['frontdesk', 'invoke', 'federate', 'session', 'manifest'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['list', 'bootstrap', 'export', 'install'],
@@ -375,6 +387,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
       managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
       managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
+      productFrontdesk: 'redcube product frontdesk --workspace-root <dir>',
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
       productFederate: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
       productSession: 'redcube product session --entry-session-id <id>',
@@ -589,6 +602,12 @@ export async function executeCli(argv, deps = {}) {
   }
 
   if (command === 'product') {
+    if (subcommand === 'frontdesk') {
+      return gateway.getProductFrontdesk({
+        workspace_root: resolveWorkspaceRoot(options, cwd),
+      });
+    }
+
     if (subcommand === 'invoke') {
       return gateway.invokeProductEntry({
         workspace_locator: {
@@ -661,7 +680,7 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('product 命令仅支持 invoke|federate|session|manifest');
+    throw new Error('product 命令仅支持 frontdesk|invoke|federate|session|manifest');
   }
 
 

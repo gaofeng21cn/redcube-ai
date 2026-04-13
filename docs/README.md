@@ -35,7 +35,7 @@ Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` n
 - Current creative-stage baseline: `pack` remains a domain boundary and pack-id carrier, but no longer acts as a repo-local creative compiler/runtime.
 - Long-line target: move the runtime substrate toward upstream `Hermes-Agent` without changing the `RedCube Gateway -> family / profile / pack -> Domain Harness OS` boundary.
 - Product-entry target: keep the landed lightweight domain `product entry` callable directly or through `OPL` handoff without changing the visual-domain boundary, then harden it toward a mature end-user shell.
-- Current discovery surface: `redcube product manifest` and `get_product_entry_manifest` let hosts discover the current direct / federated / session shell without guessing commands or payload shape.
+- Current discovery surface: `redcube product frontdesk`, `redcube product manifest`, and `get_product_entry_manifest` let hosts discover the current `frontdesk_surface` plus direct / federated / session shell without guessing commands or payload shape.
 - Frozen final target shape: [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md) (Chinese only)
 - Fastest cutover board: [Upstream Hermes-Agent fast cutover board](program/upstream_hermes_agent_fast_cutover_board.md) (Chinese only)
 - Frozen next gate: [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md) (Chinese only)

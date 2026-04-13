@@ -237,6 +237,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(manifest.recommended_shell, 'direct');
     assert.equal(manifest.recommended_command, 'redcube product invoke');
+    assert.equal(manifest.frontdesk_surface.shell_key, 'frontdesk');
+    assert.equal(manifest.frontdesk_surface.command, 'redcube product frontdesk');
+    assert.equal(manifest.frontdesk_surface.surface_kind, 'product_frontdesk');
+    assert.match(manifest.frontdesk_surface.summary, /frontdesk/i);
     assert.equal(manifest.operator_loop_surface.shell_key, 'direct');
     assert.equal(manifest.operator_loop_surface.command, 'redcube product invoke');
     assert.equal(manifest.operator_loop_surface.surface_kind, 'product_entry');
@@ -263,6 +267,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     ]);
     assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
+    assert.equal(manifest.product_entry_shell.frontdesk.command, 'redcube product frontdesk');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');

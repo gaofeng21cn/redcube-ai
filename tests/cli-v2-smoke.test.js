@@ -815,7 +815,7 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
   });
 });
 
-test('CLI product invoke, product federate, and product session proxy the product-entry service surface', async () => {
+test('CLI product frontdesk, product invoke, product federate, and product session proxy the product-entry service surface', async () => {
   await withMockHermesUpstreamCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
@@ -844,6 +844,27 @@ test('CLI product invoke, product federate, and product session proxy the produc
         },
       },
     );
+
+    const frontdeskParsed = await execCliAsync(
+      cliPath,
+      [
+        'product',
+        'frontdesk',
+        '--workspace-root',
+        workspaceRoot,
+      ],
+      {
+        cwd: path.resolve('.'),
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    );
+    assert.equal(frontdeskParsed.ok, true);
+    assert.equal(frontdeskParsed.surface_kind, 'product_frontdesk');
+    assert.equal(frontdeskParsed.frontdesk_surface.command, 'redcube product frontdesk');
+    assert.equal(frontdeskParsed.product_entry_manifest.frontdesk_surface.command, 'redcube product frontdesk');
 
     const directParsed = await execCliAsync(
       cliPath,
@@ -969,6 +990,7 @@ test('CLI product invoke, product federate, and product session proxy the produc
     assert.equal(manifestParsed.surface_kind, 'product_entry_manifest');
     assert.equal(manifestParsed.manifest_kind, 'redcube_product_entry_manifest');
     assert.equal(manifestParsed.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(manifestParsed.frontdesk_surface.command, 'redcube product frontdesk');
     assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
   });
 });
