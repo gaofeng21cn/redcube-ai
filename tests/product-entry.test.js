@@ -236,6 +236,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.workspace_locator.workspace_surface_kind, 'redcube_workspace');
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(manifest.recommended_shell, 'direct');
+    assert.equal(manifest.recommended_command, 'redcube product invoke');
     assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');

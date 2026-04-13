@@ -9,6 +9,7 @@ import {
   readHermesAgentUpstreamConfig,
 } from '../packages/redcube-hermes-agent-client/src/index.js';
 import {
+  assertWorkspacePackageResolution,
   buildNodeTestArgs,
   readHermesGatewayLaunchConfig,
   DEFAULT_HERMES_GATEWAY_COMMAND,
@@ -20,6 +21,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
+assertWorkspacePackageResolution({ repoRoot });
 
 const META = [
   'tests/bilingual-home-readme.test.js',
@@ -79,6 +81,7 @@ const META = [
   'tests/upstream-hermes-agent-live-verification-blocker.test.js',
   'tests/upstream-hermes-agent-live-verification-closeout.test.js',
   'tests/upstream-hermes-agent-final-target-shape.test.js',
+  'tests/worktree-package-resolution.test.js',
   'tests/xiaohongshu-overlay.test.js',
 ];
 
@@ -128,6 +131,7 @@ const FAST = [
   'tests/overlay-registry.test.js',
   'tests/profile-contract-hydration.test.js',
   'tests/gateway-actions.test.js',
+  'tests/worktree-package-resolution.test.js',
   'tests/runtime-deliverable-route.test.js',
   'tests/service-safe-domain-entry.test.js',
   'tests/product-entry.test.js',

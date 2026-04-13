@@ -41,7 +41,7 @@
 5. `RedCube Product Entry` 现在已经 repo-verified：`invokeProductEntry`、`redcube product invoke` 与 `invoke_product_entry` 会在需要时创建 deliverable、继续同一 `entry_session_id`，再统一下沉到 `invokeDomainEntry`。
 6. `OPL -> RedCube` 的最小 handoff envelope 现在也已 repo-verified：`invokeFederatedProductEntry`、`redcube product federate` 与 `invoke_federated_product_entry` 会对 `target_domain_id`、`entry_mode`、`runtime_session_contract.runtime_owner`、`return_surface_contract.surface_kind` 继续 fail-closed，然后转进同一个 downstream `product entry`。
 7. product-entry session continuity 现在已经落到用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/`；`getProductEntrySession`、`redcube product session` 与 `get_product_entry_session` 会读回 latest managed progress、review state 与 publication projection。
-8. product-entry discovery surface 现在也已经 repo-verified：`redcube product manifest` 与 `get_product_entry_manifest` 会把 direct / federated / session 三类入口冻结成 machine-readable manifest，避免 `OPL` 或其他 host 自己猜入口命令与载荷结构。
+8. product-entry discovery surface 现在也已经 repo-verified：`redcube product manifest` 与 `get_product_entry_manifest` 会把 direct / federated / session 三类入口，以及显式的 `recommended_shell / recommended_command` 冻结成 machine-readable manifest，避免 `OPL` 或其他 host 自己猜入口命令与载荷结构。
 9. 当前真实 upstream proof 仍以 `hermes gateway run -q` 为默认口径；若验证宿主上的全局 `hermes` CLI 仍落后于上游 `RedactingFormatter` 启动修复，可显式设置 `REDCUBE_HERMES_GATEWAY_COMMAND` 指向已知良好的 upstream gateway 启动命令，这属于 honest upstream launch override，不是 repo-local 兜底。
 10. `scripts/run-test-group.mjs` 的 integration / e2e / full live lane 现在会先做 `/v1/health + /v1/models + /v1/runs + /v1/runs/{run_id}/events` preflight；只要 run-event surface 没有 terminal event，就会在套件开始前 fail-closed。
 11. 同一组 live lane 现在还会用 `--test-concurrency=1` 串行化 test files，以尊重当前 upstream Hermes 的 concurrent-run ceiling，而不是把 repo 自己的验证并发误写成 runtime 主线能力。
@@ -58,5 +58,6 @@
 - integration 验证：`scripts/verify.sh integration`
 - e2e 验证：`scripts/verify.sh e2e`
 - full 验证：`scripts/verify.sh full`
+- linked worktree 下先在当前 worktree 执行一次 `npm install`；`run-test-group` 现在会对 workspace package resolution 做 fail-closed 检查，避免验证静默吃到 root checkout 或其他 sibling checkout 的本地改动
 - 当前 CI 分层口径：GitHub-hosted CI 默认只跑 `quality` lane；它在跑 `test:fast` 前也必须先 provision Python 3.12、`fonts-noto-cjk` 与 Playwright Chromium，因为 fast lane 已覆盖 poster governed screenshot review
 - `integration` / `e2e` / `full` 继续作为 live-upstream 显式验证 lane，只应在能证明真实 Hermes run surface 的准备好宿主上执行

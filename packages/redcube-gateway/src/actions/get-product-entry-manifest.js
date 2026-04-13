@@ -43,6 +43,7 @@ export async function getProductEntryManifest(request) {
       workspace_root: workspaceRoot,
     },
     recommended_shell: 'direct',
+    recommended_command: 'redcube product invoke',
     runtime: {
       runtime_owner: 'upstream_hermes_agent',
       runtime_state_root: path.dirname(sessionStoreRoot),
