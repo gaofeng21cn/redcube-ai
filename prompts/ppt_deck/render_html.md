@@ -79,6 +79,15 @@
   "render_markup_artifact": {
     "artifact_surface": "codex_cli_json_output",
     "binding_model": "slides_data_shell_only",
+    "authored_markup_registry": {
+      "ppt.hero_signal": "slidesData[*].content",
+      "ppt.compare_zones": "slidesData[*].content",
+      "ppt.timeline_rail": "slidesData[*].content",
+      "ppt.judgement_ladder": "slidesData[*].content",
+      "ppt.ring_cross": "slidesData[*].content",
+      "ppt.central_axis": "slidesData[*].content",
+      "ppt.summary_peak": "slidesData[*].content"
+    },
     "required_review_contract": [
       "slide_root",
       "data-qa-block",

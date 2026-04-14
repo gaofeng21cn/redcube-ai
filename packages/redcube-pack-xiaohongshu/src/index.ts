@@ -1,14 +1,11 @@
 export type {
-  CompileXhsRenderSlidesInput,
   PackDeliverablePaths,
   XhsHydratedContract,
   XhsPlanArtifact,
   XhsPlanSlide,
-  XhsPlanningDependencies,
   XhsPromptRoute,
   XhsResearchArtifact,
   XhsRenderArtifact,
-  XhsRenderArtifactDependencies,
   XhsRenderContract,
   XhsRenderSlide,
   XhsSourceReference,
@@ -16,5 +13,4 @@ export type {
   XhsStorylineArtifact,
   XhsVisualDirection,
   XhsVisualDirectionArtifact,
-  XhsVisualDirectionDependencies,
 } from './types.js';

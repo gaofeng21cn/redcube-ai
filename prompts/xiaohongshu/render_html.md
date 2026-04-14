@@ -42,6 +42,15 @@
   "render_markup_artifact": {
     "artifact_surface": "codex_cli_json_output",
     "binding_model": "slides_data_shell_only",
+    "authored_markup_registry": {
+      "xhs.hero_note": "slidesData[*].content",
+      "xhs.split_contrast": "slidesData[*].content",
+      "xhs.staggered_steps": "slidesData[*].content",
+      "xhs.track_rail": "slidesData[*].content",
+      "xhs.evidence_bands": "slidesData[*].content",
+      "xhs.checklist_close": "slidesData[*].content",
+      "xhs.annotated_cards": "slidesData[*].content"
+    },
     "required_review_contract": [
       "slide_root",
       "data-qa-block",
