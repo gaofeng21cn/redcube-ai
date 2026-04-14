@@ -29,7 +29,7 @@
 - `docs/references/**` 承担内部参考说明；默认中文维护。
 - `docs/policies/**` 承担稳定内部规则。
 - 详细 `docs/*.md` 继续作为 repo-tracked 的内部 operator / collaborator 文档，不自动升格为公开面。
-- 长期规则要冻结进核心文档、program brief、reference 或 policy，而不继续只靠 `AGENTS.md` 口头维持。
+- 长期规则要冻结进核心文档、program brief、reference 或 policy；不要把 `AGENTS.md` 继续当第二真相源。
 
 ## 四、系列一致性检查
 

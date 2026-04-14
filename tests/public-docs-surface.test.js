@@ -128,6 +128,21 @@ test('docs indexes link the series doc governance checklist and keep the four-re
     path.join(repoRoot, 'docs', 'references', 'series-doc-governance-checklist.md'),
     'utf-8',
   );
+  let previousIndex = -1;
+
+  for (const heading of [
+    '## 目标',
+    '## 一、默认入口',
+    '## 二、核心五件套',
+    '## 三、公开层与内部层',
+    '## 四、系列一致性检查',
+    '## 五、默认验证',
+  ]) {
+    const currentIndex = checklist.indexOf(heading);
+    assert.equal(currentIndex >= 0, true);
+    assert.equal(currentIndex > previousIndex, true);
+    previousIndex = currentIndex;
+  }
 
   assert.equal(docsReadme.includes('series-doc-governance-checklist.md'), true);
   assert.equal(docsReadmeZh.includes('series-doc-governance-checklist.md'), true);
@@ -144,6 +159,9 @@ test('docs indexes link the series doc governance checklist and keep the four-re
   assert.equal(checklist.includes('docs/program/**'), true);
   assert.equal(checklist.includes('docs/references/**'), true);
   assert.equal(checklist.includes('docs/policies/**'), true);
+  assert.equal(checklist.includes('Hermes-Agent'), true);
+  assert.equal(checklist.includes('AGENTS.md'), true);
+  assert.equal(checklist.includes('第二真相源'), true);
   assert.equal(checklist.includes('scripts/verify.sh meta'), true);
   assert.equal(checklist.includes('npm run test:meta'), true);
 });
