@@ -2,116 +2,110 @@
 
 [English](./README.md) | **中文**
 
-这里是 `RedCube AI` 的双语文档索引，也是默认对外公开面。
-内容与当前主线真相保持一致：该项目在共享 `Unified Harness Engineering Substrate` 上承载视觉交付的 `Domain Harness OS`，route / managed run surface 现在已经通过本地 Codex CLI host-agent runtime 执行，而 visual-domain truth 继续留在 `RedCube AI`。其 formal-entry matrix 固定为默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`，当前仓库主线按 `Auto-only` 理解。
-当前公开入口真相也已经明确：现在真实存在的是 `operator entry`、`agent entry`，以及一层薄的 repo-verified `product entry` service surface；成熟的最终用户前台壳仍是后续目标。当前这层壳的 startup self-check surface 是 `redcube product preflight`，而 machine-readable discovery surface 是 `redcube product manifest`，并由 MCP 工具 `get_product_entry_manifest` 镜像暴露。
+这个目录是 `RedCube AI` 的第二层技术阅读面。
+仓库首页应优先写给专家、潜在用户和非技术协作者。
+而这里负责承接其后的 program、references、policies 和技术真相材料。
 
-## 核心维护工作集
+## 按读者类型进入
 
-在阅读详细 program brief 之前，先看这里：
+| 读者 | 建议起点 | 目的 |
+| --- | --- | --- |
+| 潜在用户与领域专家 | [仓库首页](../README.zh-CN.md) | 先理解这条视觉交付主线是干什么的，再决定是否进入技术细节 |
+| 技术规划者、架构读者、方向同步读者 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md)、[合同说明](../contracts/README.md) | 快速抓住当前真相、边界和主线方向 |
+| 开发者与维护者 | `docs/program/`、`docs/references/`、`docs/policies/`、`docs/history/` | 查看当前技术记录、支持性参考、规则和历史材料 |
+
+## 当前基线
+
+- `RedCube AI` 是 `OPL` 家族中当前已 admitted 的视觉交付 domain 主线。
+- 当前最诚实的执行主线，是通过本地 `Codex CLI` host-agent runtime 承接 managed execution，同时把 visual-domain truth 保留在 `RedCube AI` 内部。
+- 当前 repo-verified 的 lightweight product-entry service surface 已落地，但成熟 end-user web 壳仍是后续工作。
+- 当前受保护创作 stage 统一收口在 `runtime-family + Codex CLI structured generation`，repo-local `pack/compiler` 作者化路径已不再是 active mainline。
+- `Deep Research` 继续属于 `Source Readiness`，而公开入口 wording 仍要把 `operator entry`、`agent entry` 和那层薄的 product-entry service surface 分开写清。
+
+## 技术工作集
+
+开始改仓库状态前，先读这些文件：
 
 - [项目概览](./project.md)
 - [当前状态](./status.md)
 - [架构](./architecture.md)
 - [硬约束](./invariants.md)
 - [关键决策](./decisions.md)
+- [合同说明](../contracts/README.md)
 
-## 默认对外双语公开面
+## 默认公开入口
 
 - [仓库首页](../README.zh-CN.md)
 
-这份索引和仓库首页共同构成默认的 GitHub 双语对外面。任何面向公众的详细文档都应出现在这里，并配套中英文版本。
+仓库首页和这份索引共同构成默认公开入口。
+对外文档应在适用时保持中英双语镜像。
 
-## 当前主线状态
+## 仓库跟踪的技术文档
 
-当前交付主线已经稳定可用，active runtime 叙事也已经收口到本地 Codex CLI host-agent execution。
-Phase 2 的 source-truth、governance、operator-surface 与 runtime-watch 工作继续作为 absorbed provenance 保留。
-当前最诚实的停车边界是：本地 Codex CLI 的 runtime owner、repo-verified product entry、OPL federation 与 managed session continuity 都已落地，但成熟的最终用户前台壳与 managed web productization 仍是后续工作。
-`ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一留在 `runtime-family + Codex CLI structured generation` 主链；repo-local `pack/compiler` 创作路径已从 active mainline 移除。
+### Program 与主线记录
 
-## 当前基线、长线目标与任务层级
+- [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
+- [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
+- [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md)
+- [RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
+- [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
+- [Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
+- [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
 
-- 当前 repo-verified 基线：本地 Codex CLI host-agent runtime 主责 route / managed run execution，`RedCube AI` 保持 domain truth、operator surface，以及一层薄的 product-entry service surface。
-- 当前创作阶段基线：`pack` 继续保留 domain boundary / pack-id 语义，但不再承担 repo-local creative compiler/runtime。
-- 长线目标：runtime substrate 保持在 Codex-native host-agent execution 上，并为未来托管 web runtime 复用同一 contracts 预留迁移路径，但 `RedCube Gateway -> family / profile / pack -> Domain Harness OS` 的 domain boundary 不变。
-- 产品入口目标：维持已经落地的轻量 domain `product entry` 可被用户直达或被 `OPL` handoff 调起，同时继续把它硬化到成熟前台壳，而不改写视觉 domain boundary。
-- 当前 preflight 面：`redcube product preflight` 会先暴露当前 direct frontdoor 的诚实开机前检查。
-- 当前发现面：`redcube product frontdesk`、`redcube product manifest` 与 `get_product_entry_manifest` 会把 `frontdesk_surface` 以及 direct / federated / session 三类壳如实暴露出来，宿主不需要自己猜命令或载荷结构；manifest/frontdesk 现在也会带出同一份 `product_entry_preflight` companion。
-- 已冻结的最终目标形态：[Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
-- 当前已冻结的下一道闸门：[Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
-- 已冻结的 service-safe domain entry adapter：[Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md)
-- RedCube Product Entry MVP：[RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
-- OPL Gateway Federated Product Entry：[OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
-- Managed Product Entry Hardening：[Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
-- 当前 F4 live closeout 证明件：[Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
-- 历史 F4 live blocker 冻结件：[Upstream Hermes-Agent live verification blocker](program/upstream_hermes_agent_live_verification_blocker.md)
-- 当前停车边界：managed family closure truth 已落地；若要继续推进 managed web runtime control plane、新 family 或 academic poster 语义，必须先冻结新的 activation package。
-- `docs/program/hermes/*` 这组历史材料现在只作为本地迁移工件与 provenance，不得再被读成“上游 `Hermes-Agent` 已经接管 runtime”。
+当前公开入口真相仍从 `operator entry`、`agent entry` 和一层薄的 service-level `product entry` 开始。
 
-## 仓库跟踪的内部文档
+### Source Readiness 与已吸收的 Phase 2 provenance
 
-### 面向人类操作同事
-
-- [人类快速上手](human_quickstart.md)
-- [典型交付示例](deliverable_examples.md)
-- [稳定交付手工测试 brief](stable_deliverable_manual_test_brief.md)（历史 program 证据）
-
-### 本地 runtime 迁移工件与 provenance
-
-- [历史本地迁移工件：Hermes runtime substrate activation package](program/hermes/hermes_runtime_substrate_activation_package.md)
-- [历史本地迁移工件：Hermes runtime capability extraction map](program/hermes/hermes_runtime_capability_extraction_map.md)
-- [历史本地迁移工件：Hermes runtime substrate canonical closure](program/hermes/hermes_runtime_substrate_canonical_closure.md)
-- [Hermes stable family closure truth](program/hermes/hermes_stable_family_closure_truth.md)
-- [Hermes managed family closure truth](program/hermes/hermes_managed_family_closure_truth.md)
-- [Phase 2 activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
-- [Phase 2 source intake + shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
-- [Phase 2 review / export / gate / audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
+- [Source augmentation executor contract](source_augmentation_executor_contract.md)
+- [Phase 2 source intake activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
+- [Phase 2 source intake shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
+- [Phase 2 review export gate audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
 - [Phase 2 family source-truth consumption convergence](program/phase-2/phase_2_family_source_truth_consumption_convergence.md)
-- [Phase 2 publication projection / delivery contract convergence](program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md)
-- [Phase 2 direct-delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
-- [Phase 2 direct-delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
-- [Phase 2 source-readiness deep research trigger + gate convergence](program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
-- [Source-readiness deep research longrun target state](source_readiness_deep_research_longrun_target_state.md)（future-facing 目标态文档）
-- [Direct-delivery longrun target state](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
-- [Phase 2 workspace / operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md)（已吸收 provenance）
-- [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md)（已吸收 provenance）
-- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)（已吸收 provenance）
-- [Phase 2 family parity governance surface convergence](program/phase-2/phase_2_family_parity_governance_surface_convergence.md)（已吸收 provenance）
+- [Phase 2 direct delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
+- [Phase 2 direct delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
+- [Phase 2 source readiness deep research trigger gate convergence](program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
+- [Phase 2 workspace operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md)
+- [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md)
+- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)
 
-### 内部参考说明
+### future-facing 目标态文档
+
+- [Source Readiness Deep Research Longrun Target State](source_readiness_deep_research_longrun_target_state.md)（future-facing 目标态文档）
+- [Direct Delivery Longrun Target State](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
+
+### 参考资料
 
 - [轻量产品入口与 OPL Handoff](references/lightweight_product_entry_and_opl_handoff.md)
 - [系列项目文档治理清单](references/series-doc-governance-checklist.md)
-
-### 面向技术协作 / Agent 执行者
-
 - [运行架构](runtime_architecture.md)
-- [机器可读合同说明](../contracts/README.md)
-- [Source Augmentation / Deep Research 执行器合同](source_augmentation_executor_contract.md)
 - [Domain Harness OS 定位映射](domain-harness-os-positioning.md)
 - [GitHub 公开发布流程](public-github-publish.md)
 
-### 私有 / 本地配置文档
-
-- [私有作者信息与 prompts 配置](private-profile-setup.md)
-
-## 稳定内部规则
+### 内部规则
 
 - [内部规则索引](policies/README.md)
 - [运行模型规则](policies/runtime_operating_model.md)
 - [交付合同模型规则](policies/deliverable_contract_model.md)
 
-## 仓库历史
+### 历史材料
 
 - [更新日志](../CHANGELOG.md)
+- `docs/history/`
+- `program/hermes/`
+- `docs/program/*/*.md`
 
-## 文档边界
+## 文档规则
 
-- `README*` 与 `docs/README*`：默认双语对外公开面。
-- `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md`：AI / 维护者核心工作集。
-- `docs/program/*/*.md`：repo-tracked 的 program brief。
-- `docs/references/*`：仓库跟踪的内部参考文档，默认中文维护。
-- 详细 `docs/*.md`：默认仓库跟踪的内部操作文档，中文为主。
-- `docs/policies/`：稳定内部规则，默认中文维护。
-- `docs/superpowers/`：现有 repo-tracked 设计档案可保留为内部历史材料；新增本地 AI / Superpowers 草稿默认不进入跟踪。
-- `docs/references/series-doc-governance-checklist.md`：当前仓与四仓系列项目保持一致时使用的 repo-scope 文档巡检清单。
+- 继续把 [仓库首页](../README.zh-CN.md) 保持成专家和非技术协作者可读的入口。
+- 继续把默认公开文档在适用时保持成中英双语镜像。
+- program 和 reference 材料可以技术化，但不能再取代公开首页。
+- 历史材料可以保留，但不能再写成当前默认 workflow。
+
+## 治理说明
+
+- 文档治理统一冻结在 [系列项目文档治理清单](references/series-doc-governance-checklist.md)、技术工作集和仓库跟踪的 contract/doc surface 中，而不再只写在 `AGENTS.md`。
+- `README*` 与 `docs/README*` 是默认公开入口。
+- `docs/program/*` 承载 repo-tracked mainline 与 tranche 记录。
+- `docs/references/*` 承载支持性技术参考。
+- `docs/policies/*` 承载稳定内部规则。
+- `docs/history/*` 继续只作历史材料。
