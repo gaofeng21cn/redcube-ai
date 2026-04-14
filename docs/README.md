@@ -82,6 +82,7 @@ Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` n
 ### Internal reference notes
 
 - [Lightweight product entry and OPL handoff](references/lightweight_product_entry_and_opl_handoff.md) (Chinese only)
+- [Series doc governance checklist](references/series-doc-governance-checklist.md) (Chinese only)
 
 ### For technical collaborators / agent executors
 
@@ -114,3 +115,4 @@ Protected creative stages for `ppt_deck`, `xiaohongshu`, and `poster_onepager` n
 - Detailed `docs/*.md`: repository-tracked internal/operator documents unless explicitly promoted.
 - `docs/policies/`: stable internal rules, Chinese by default.
 - `docs/superpowers/`: existing repo-tracked design archives may remain as internal history, but new local AI / Superpowers drafts should stay untracked by default.
+- `docs/references/series-doc-governance-checklist.md`: repo-scoped checklist for keeping this repository aligned with the four-repo series.

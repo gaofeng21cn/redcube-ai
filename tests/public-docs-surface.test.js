@@ -120,3 +120,30 @@ test('docs freeze lightweight product entry and OPL handoff without overclaiming
   assert.equal(handoff.includes('Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), false);
   assert.equal(handoff.includes('User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
 });
+
+test('docs indexes link the series doc governance checklist and keep the four-repo frame explicit', () => {
+  const docsReadme = readFileSync(path.join(repoRoot, 'docs', 'README.md'), 'utf-8');
+  const docsReadmeZh = readFileSync(path.join(repoRoot, 'docs', 'README.zh-CN.md'), 'utf-8');
+  const checklist = readFileSync(
+    path.join(repoRoot, 'docs', 'references', 'series-doc-governance-checklist.md'),
+    'utf-8',
+  );
+
+  assert.equal(docsReadme.includes('series-doc-governance-checklist.md'), true);
+  assert.equal(docsReadmeZh.includes('series-doc-governance-checklist.md'), true);
+
+  for (const label of ['One Person Lab', 'Med Auto Science', 'Med Auto Grant', 'RedCube AI']) {
+    assert.equal(checklist.includes(label), true);
+  }
+
+  assert.equal(checklist.includes('project.md'), true);
+  assert.equal(checklist.includes('status.md'), true);
+  assert.equal(checklist.includes('architecture.md'), true);
+  assert.equal(checklist.includes('invariants.md'), true);
+  assert.equal(checklist.includes('decisions.md'), true);
+  assert.equal(checklist.includes('docs/program/**'), true);
+  assert.equal(checklist.includes('docs/references/**'), true);
+  assert.equal(checklist.includes('docs/policies/**'), true);
+  assert.equal(checklist.includes('scripts/verify.sh meta'), true);
+  assert.equal(checklist.includes('npm run test:meta'), true);
+});
