@@ -9,6 +9,7 @@
 - 禁止输出 `<script>` / `<style>` block；样式只能写在元素 inline style 上
 - 需要输出 HTML 生成说明与同构门禁留痕
 - 版式与文案必须由 AI 直接创作，shell 只负责装配、审阅与持久化边界
+- 生成的 audience-facing HTML 必须被视为当前 `authored_markup_registry` 的唯一合法来源；不得把 registry、模板名或内部制作痕迹写进画面
 
 ## runtime_seed
 ```json
@@ -29,6 +30,7 @@
       "保留 slide-display-area / prev-btn / next-btn / slidesData",
       "输出 render plan 供 review 与审计读取",
       "每页必须是 audience-facing 成品页，不得把内部提示、制作流程、模板注册表写进画面",
+      "最终 audience-facing HTML 是当前 authored_markup_registry 的唯一合法来源；不得把 registry 名称、模板名或内部制作痕迹写进画面",
       "禁止输出 <script> / <style> block；如需视觉样式，直接写 inline style",
       "审阅依赖的根节点 metadata 由 runtime 注入，但 AI 仍需交付 review-ready 的 data-qa-block / data-primary-point 结构"
     ]

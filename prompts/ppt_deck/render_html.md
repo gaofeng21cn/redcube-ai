@@ -36,6 +36,7 @@
 - 若上下文提供 `revision_context`，必须优先修复其中点名的 blocked slides、遮挡/裁切与最弱页问题；不要无视上一轮审稿意见原样重画
 - 若封面页 blueprint 已给出具名讲者署名，要把它当成正式封面信息排版，而不是系统注释
 - final HTML markup 必须由 AI 直接创作；runtime 只负责 shell 边界、审阅契约与持久化，不得退回模板编译
+- 生成的 audience-facing HTML 必须被视为当前 `authored_markup_registry` 的唯一合法来源；不得把 registry、模板名或内部制作痕迹写进画面
 
 ## runtime_seed
 ```json
@@ -57,6 +58,7 @@
       "保留 slide-display-area / prev-btn / next-btn / slidesData",
       "输出 render plan 供 review 与审计读取",
       "每页必须是 audience-facing 成品页，不得把内部提示、制作流程、模板注册表写进画面",
+      "最终 audience-facing HTML 是当前 authored_markup_registry 的唯一合法来源；不得把 registry 名称、模板名或内部制作痕迹写进画面",
       "标题区与导语区必须形成独立安全带；主体结构不得侵入 header 入口",
       "foundation / substrate / base band 只承担结构基座，不得压住正文或辅助卡；所有可读内容都必须完整留在页边界内",
       "任何带字元素都必须拥有独立留白，不得彼此遮挡，也不得跨压导航轨道或解释段",
