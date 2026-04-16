@@ -38,39 +38,31 @@ async function withMockHermesUpstream(testFn) {
   }
 }
 
+function withAction(action, args = {}) {
+  return {
+    action,
+    ...args,
+  };
+}
+
+function withOperation(operation, args = {}) {
+  return {
+    operation,
+    ...args,
+  };
+}
+
 test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
   const tools = listGatewayTools();
 
   assert.deepEqual(
     tools.map((tool) => tool.name),
     [
-      'doctor',
-      'list_topics',
-      'get_overlay_catalog',
-      'intake_source',
-      'source_research',
-      'prepare_source_augmentation',
-      'prepare_source_augmentation_result',
-      'write_source_augmentation_result',
-      'execute_source_augmentation',
-      'invoke_domain_entry',
-      'invoke_product_entry',
-      'invoke_federated_product_entry',
-      'get_product_entry_session',
-      'get_product_entry_manifest',
-      'create_deliverable',
-      'get_deliverable',
-      'get_publication_projection',
-      'audit_deliverable',
-      'review_render_output',
-      'run_managed_deliverable',
-      'get_managed_run',
-      'supervise_managed_run',
-      'run_deliverable_route',
-      'get_run',
-      'get_review_state',
-      'apply_review_mutation',
-      'runtime_watch',
+      'redcube_workspace',
+      'redcube_sources',
+      'redcube_deliverable',
+      'redcube_review',
+      'redcube_product_entry',
     ],
   );
 });
@@ -78,40 +70,31 @@ test('listGatewayTools exposes deliverable-centric gateway actions in stable ord
 
 test('MCP tool definitions keep runtime_watch on the same run-boundary locator truth as CLI review watch', () => {
   const definitions = getToolDefinitions();
-  const watch = definitions.find((tool) => tool.name === 'runtime_watch');
-  const review = definitions.find((tool) => tool.name === 'get_review_state');
-  const projection = definitions.find((tool) => tool.name === 'get_publication_projection');
-  const intake = definitions.find((tool) => tool.name === 'intake_source');
-  const research = definitions.find((tool) => tool.name === 'source_research');
-  const product = definitions.find((tool) => tool.name === 'invoke_product_entry');
-  const federated = definitions.find((tool) => tool.name === 'invoke_federated_product_entry');
-  const session = definitions.find((tool) => tool.name === 'get_product_entry_session');
-  const manifest = definitions.find((tool) => tool.name === 'get_product_entry_manifest');
+  const workspace = definitions.find((tool) => tool.name === 'redcube_workspace');
+  const sources = definitions.find((tool) => tool.name === 'redcube_sources');
+  const deliverable = definitions.find((tool) => tool.name === 'redcube_deliverable');
+  const review = definitions.find((tool) => tool.name === 'redcube_review');
+  const productEntry = definitions.find((tool) => tool.name === 'redcube_product_entry');
 
-  assert.equal(intake?.description.includes('bootstrap writer'), true);
-  assert.equal(research?.description.includes('planning_ready'), true);
+  assert.equal(workspace?.description.includes('workspace/topic discovery'), true);
+  assert.equal(sources?.description.includes('source intake/research'), true);
+  assert.equal(deliverable?.description.includes('deliverable lifecycle execution'), true);
   assert.equal(review?.description.includes('deliverable boundary'), true);
-  assert.equal(projection?.description.includes('topic boundary'), true);
-  assert.equal(watch?.description.includes('run boundary'), true);
-  assert.equal(product?.description.includes('direct RedCube product-entry surface'), true);
-  assert.equal(product?.description.includes('family orchestration companion'), true);
-  assert.equal(federated?.description.includes('OPL Gateway style handoff'), true);
-  assert.equal(federated?.description.includes('family orchestration companion'), true);
-  assert.equal(session?.description.includes('product-entry session'), true);
-  assert.equal(session?.description.includes('family orchestration companion'), true);
-  assert.equal(manifest?.description.includes('product-entry manifest'), true);
-  assert.equal(manifest?.description.includes('family orchestration companion'), true);
-  assert.equal(Object.hasOwn(watch?.inputSchema || {}, 'runId'), true);
-  assert.equal(Object.hasOwn(product?.inputSchema || {}, 'entry_session_contract'), true);
-  assert.equal(Object.hasOwn(manifest?.inputSchema || {}, 'workspace_root'), true);
-  assert.equal(Object.hasOwn(federated?.inputSchema || {}, 'return_surface_contract'), true);
-  assert.equal(Object.hasOwn(session?.inputSchema || {}, 'entry_session_id'), true);
+  assert.equal(review?.description.includes('runtime watch'), true);
+  assert.equal(productEntry?.description.includes('product-entry'), true);
+  assert.equal(Object.hasOwn(review?.inputSchema || {}, 'runId'), true);
+  assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'entry_session_contract'), true);
+  assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'workspace_root'), true);
+  assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'return_surface_contract'), true);
+  assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'entry_session_id'), true);
+  assert.equal(Object.hasOwn(workspace?.inputSchema || {}, 'action'), true);
+  assert.equal(Object.hasOwn(sources?.inputSchema || {}, 'operation'), true);
 });
 
 test('callGatewayTool delegates to injected gateway action', async () => {
   const result = await callGatewayTool(
-    'create_deliverable',
-    {
+    'redcube_deliverable',
+    withAction('create_deliverable', {
       workspaceRoot: '/tmp/redcube-workspace',
       overlay: 'ppt_deck',
       profileId: 'lecture_student',
@@ -119,7 +102,7 @@ test('callGatewayTool delegates to injected gateway action', async () => {
       deliverableId: 'deck-a',
       title: '甲状腺门诊科普 deck',
       goal: '为本科生讲授甲状腺基础知识',
-    },
+    }),
     {
       createDeliverable: async (request) => ({
         ok: true,
@@ -140,15 +123,15 @@ test('callGatewayTool delegates to injected gateway action', async () => {
 
 test('callGatewayTool delegates source intake gateway action', async () => {
   const result = await callGatewayTool(
-    'intake_source',
-    {
+    'redcube_sources',
+    withOperation('intake_source', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
       title: '共享输入',
       brief: 'brief',
       keywords: ['a', 'b'],
       sourceFiles: [],
-    },
+    }),
     {
       intakeSource: async (request) => ({
         ok: true,
@@ -167,15 +150,15 @@ test('callGatewayTool delegates source intake gateway action', async () => {
 
 test('callGatewayTool delegates source research gateway action', async () => {
   const result = await callGatewayTool(
-    'source_research',
-    {
+    'redcube_sources',
+    withOperation('source_research', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
       title: '共享输入',
       brief: 'brief',
       keywords: ['a', 'b'],
       sourceFiles: [],
-    },
+    }),
     {
       researchSource: async (request) => ({
         ok: true,
@@ -198,11 +181,11 @@ test('callGatewayTool delegates source research gateway action', async () => {
 
 test('callGatewayTool delegates source augmentation gateway action', async () => {
   const result = await callGatewayTool(
-    'prepare_source_augmentation',
-    {
+    'redcube_sources',
+    withOperation('prepare_source_augmentation', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
-    },
+    }),
     {
       prepareSourceAugmentation: async (request) => ({
         ok: true,
@@ -223,11 +206,11 @@ test('callGatewayTool delegates source augmentation gateway action', async () =>
 
 test('callGatewayTool delegates source augmentation result preparation gateway action', async () => {
   const result = await callGatewayTool(
-    'prepare_source_augmentation_result',
-    {
+    'redcube_sources',
+    withOperation('prepare_source_augmentation_result', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
-    },
+    }),
     {
       prepareSourceAugmentationResult: async (request) => ({
         ok: true,
@@ -249,12 +232,12 @@ test('callGatewayTool delegates source augmentation result preparation gateway a
 
 test('callGatewayTool delegates source augmentation result write gateway action', async () => {
   const result = await callGatewayTool(
-    'write_source_augmentation_result',
-    {
+    'redcube_sources',
+    withOperation('write_source_augmentation_result', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
       payloadFile: '/tmp/research-result.json',
-    },
+    }),
     {
       writeSourceAugmentationResult: async (request) => ({
         ok: true,
@@ -277,11 +260,11 @@ test('callGatewayTool delegates source augmentation result write gateway action'
 
 test('callGatewayTool delegates source augmentation execution gateway action', async () => {
   const result = await callGatewayTool(
-    'execute_source_augmentation',
-    {
+    'redcube_sources',
+    withOperation('execute_source_augmentation', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
-    },
+    }),
     {
       executeSourceAugmentation: async (request) => ({
         ok: true,
@@ -302,8 +285,8 @@ test('callGatewayTool delegates source augmentation execution gateway action', a
 
 test('callGatewayTool delegates overlay catalog gateway action', async () => {
   const result = await callGatewayTool(
-    'get_overlay_catalog',
-    {},
+    'redcube_workspace',
+    withAction('get_overlay_catalog'),
     {
       getOverlayCatalog: async () => ({
         ok: true,
@@ -327,8 +310,8 @@ test('callGatewayTool delegates overlay catalog gateway action', async () => {
 
 test('callGatewayTool delegates product-entry gateway actions', async () => {
   const direct = await callGatewayTool(
-    'invoke_product_entry',
-    {
+    'redcube_product_entry',
+    withAction('invoke_product_entry', {
       workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
       entry_session_contract: { entry_session_id: 'session-a' },
       delivery_request: {
@@ -336,7 +319,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         topic_id: 'topic-a',
         deliverable_id: 'deck-a',
       },
-    },
+    }),
     {
       invokeProductEntry: async (request) => ({
         ok: true,
@@ -363,8 +346,8 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
     },
   );
   const federated = await callGatewayTool(
-    'invoke_federated_product_entry',
-    {
+    'redcube_product_entry',
+    withAction('invoke_federated_product_entry', {
       target_domain_id: 'redcube_ai',
       task_intent: 'run_managed_deliverable',
       entry_mode: 'opl_gateway',
@@ -377,7 +360,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
         topic_id: 'topic-a',
         deliverable_id: 'deck-a',
       },
-    },
+    }),
     {
       invokeFederatedProductEntry: async (request) => ({
         ok: true,
@@ -404,10 +387,10 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
     },
   );
   const session = await callGatewayTool(
-    'get_product_entry_session',
-    {
+    'redcube_product_entry',
+    withAction('get_product_entry_session', {
       entry_session_id: 'session-a',
-    },
+    }),
     {
       getProductEntrySession: async (request) => ({
         ok: true,
@@ -447,8 +430,8 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
 
 test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
   const doctor = await callGatewayTool(
-    'doctor',
-    { workspaceRoot: '/tmp/redcube-workspace' },
+    'redcube_workspace',
+    withAction('doctor_workspace', { workspaceRoot: '/tmp/redcube-workspace' }),
     {
       doctorWorkspace: async () => ({
         ok: true,
@@ -461,8 +444,8 @@ test('callGatewayTool can return normalized discovery surfaces for doctor and to
     },
   );
   const topics = await callGatewayTool(
-    'list_topics',
-    { workspaceRoot: '/tmp/redcube-workspace' },
+    'redcube_workspace',
+    withAction('list_topics', { workspaceRoot: '/tmp/redcube-workspace' }),
     {
       listTopics: async () => ({
         ok: true,
@@ -485,11 +468,11 @@ test('callGatewayTool can return normalized discovery surfaces for doctor and to
 
 test('callGatewayTool delegates publication projection gateway action', async () => {
   const result = await callGatewayTool(
-    'get_publication_projection',
-    {
+    'redcube_review',
+    withAction('get_publication_projection', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
-    },
+    }),
     {
       getPublicationProjection: async (request) => ({
         ok: true,
@@ -510,12 +493,12 @@ test('callGatewayTool delegates publication projection gateway action', async ()
 
 test('callGatewayTool can return operator-facing deliverable and route-run surfaces', async () => {
   const deliverable = await callGatewayTool(
-    'get_deliverable',
-    {
+    'redcube_deliverable',
+    withAction('get_deliverable', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-    },
+    }),
     {
       getDeliverable: async () => ({
         ok: true,
@@ -527,14 +510,14 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
     },
   );
   const routeRun = await callGatewayTool(
-    'run_deliverable_route',
-    {
+    'redcube_deliverable',
+    withAction('run_deliverable_route', {
       workspaceRoot: '/tmp/redcube-workspace',
       overlay: 'ppt_deck',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       route: 'storyline',
-    },
+    }),
     {
       runDeliverableRoute: async () => ({
         ok: true,
@@ -554,14 +537,14 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
 
 test('callGatewayTool delegates managed deliverable execution and managed run lookup', async () => {
   const managed = await callGatewayTool(
-    'run_managed_deliverable',
-    {
+    'redcube_deliverable',
+    withAction('run_managed_deliverable', {
       workspaceRoot: '/tmp/redcube-workspace',
       overlay: 'ppt_deck',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       userIntent: '给我一个最终 PPT',
-    },
+    }),
     {
       runManagedDeliverable: async () => ({
         ok: true,
@@ -636,11 +619,11 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
   );
 
   const stored = await callGatewayTool(
-    'get_managed_run',
-    {
+    'redcube_deliverable',
+    withAction('get_managed_run', {
       workspaceRoot: '/tmp/redcube-workspace',
       managedRunId: 'managed-a',
-    },
+    }),
     {
       getManagedRun: async () => ({
         ok: true,
@@ -669,11 +652,11 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
   );
 
   const supervised = await callGatewayTool(
-    'supervise_managed_run',
-    {
+    'redcube_deliverable',
+    withAction('supervise_managed_run', {
       workspaceRoot: '/tmp/redcube-workspace',
       managedRunId: 'managed-a',
-    },
+    }),
     {
       superviseManagedRun: async () => ({
         ok: true,
@@ -713,13 +696,13 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
 
 test('callGatewayTool delegates review mutation gateway action', async () => {
   const result = await callGatewayTool(
-    'apply_review_mutation',
-    {
+    'redcube_review',
+    withAction('apply_review_mutation', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       mutation: { type: 'request_changes' },
-    },
+    }),
     {
       applyReviewMutation: async (request) => ({
         ok: true,
@@ -739,12 +722,12 @@ test('callGatewayTool delegates review mutation gateway action', async () => {
 
 test('callGatewayTool can return operator-facing quality summary surfaces', async () => {
   const result = await callGatewayTool(
-    'get_review_state',
-    {
+    'redcube_review',
+    withAction('get_review_state', {
       workspaceRoot: '/tmp/redcube-workspace',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-    },
+    }),
     {
       getReviewState: async () => ({
         ok: true,
@@ -765,15 +748,18 @@ test('callGatewayTool can return operator-facing quality summary surfaces', asyn
 
 test('listGatewayTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {
   const tools = listGatewayTools();
-  const reviewMutation = tools.find((tool) => tool.name === 'apply_review_mutation');
-  const runtimeWatch = tools.find((tool) => tool.name === 'runtime_watch');
-  const getDeliverableTool = tools.find((tool) => tool.name === 'get_deliverable');
-  const runRouteTool = tools.find((tool) => tool.name === 'run_deliverable_route');
+  const reviewTool = tools.find((tool) => tool.name === 'redcube_review');
+  const deliverableTool = tools.find((tool) => tool.name === 'redcube_deliverable');
+  const sourcesTool = tools.find((tool) => tool.name === 'redcube_sources');
+  const workspaceTool = tools.find((tool) => tool.name === 'redcube_workspace');
+  const productEntryTool = tools.find((tool) => tool.name === 'redcube_product_entry');
 
-  assert.match(reviewMutation.description, /mutation/i);
-  assert.match(runtimeWatch.description, /review-loop status/i);
-  assert.doesNotMatch(getDeliverableTool.description, /from disk/i);
-  assert.doesNotMatch(runRouteTool.description, /host-agent runtime adapter/i);
+  assert.match(reviewTool.description, /mutation/i);
+  assert.match(reviewTool.description, /runtime watch/i);
+  assert.match(deliverableTool.description, /route/i);
+  assert.match(sourcesTool.description, /augmentation/i);
+  assert.match(workspaceTool.description, /topic/i);
+  assert.match(productEntryTool.description, /federated/i);
 });
 
 test('callGatewayTool rejects unknown tool names', async () => {
@@ -805,12 +791,12 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
   try {
     const tools = await client.listTools();
     assert.ok(
-      tools.tools.some((tool) => tool.name === 'runtime_watch'),
+      tools.tools.some((tool) => tool.name === 'redcube_review'),
     );
 
     const result = await client.callTool({
-      name: 'runtime_watch',
-      arguments: {
+      name: 'redcube_review',
+      arguments: withAction('runtime_watch', {
         run: {
           run_id: 'run-a',
           current_stage: 'storyline',
@@ -818,7 +804,7 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
           pending_reviews: ['render_review'],
           resumable: true,
         },
-      },
+      }),
     });
 
     assert.equal(result.isError, undefined);
@@ -886,13 +872,13 @@ test('stdio MCP server rejects runtime_watch when the topic locator does not mat
 
   try {
     const result = await client.callTool({
-      name: 'runtime_watch',
-      arguments: {
+      name: 'redcube_review',
+      arguments: withAction('runtime_watch', {
         workspaceRoot,
         topicId: 'topic-b',
         deliverableId: 'deck-a',
         runId: runResult.run.run_id,
-      },
+      }),
     });
 
     assert.equal(result.isError, true);
@@ -947,14 +933,14 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
 
   try {
     const result = await client.callTool({
-      name: 'audit_deliverable',
-      arguments: {
+      name: 'redcube_review',
+      arguments: withAction('audit_deliverable', {
         workspaceRoot,
         overlay: 'ppt_deck',
         topicId: 'topic-a',
         deliverableId: 'deck-a',
         mode: 'draft_new',
-      },
+      }),
     });
 
     assert.equal(result.structuredContent.status, 'block');
@@ -988,8 +974,8 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
 
   try {
     const result = await client.callTool({
-      name: 'create_deliverable',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('create_deliverable', {
         workspaceRoot: '/tmp/redcube-workspace',
         overlay: 'poster',
         profileId: 'default',
@@ -997,7 +983,7 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
         deliverableId: 'poster-a',
         title: '未知交付物',
         goal: '测试失败面',
-      },
+      }),
     });
 
     assert.equal(result.isError, true);
@@ -1033,8 +1019,8 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
 
   try {
     const created = await client.callTool({
-      name: 'create_deliverable',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('create_deliverable', {
         workspaceRoot,
         overlay: 'ppt_deck',
         profileId: 'lecture_peer',
@@ -1042,58 +1028,58 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
         deliverableId: 'deck-a',
         title: '同行讲解 deck',
         goal: '向小同行解释问题、方法、证据与边界',
-      },
+      }),
     });
 
     assert.equal(created.structuredContent.deliverable.profile_id, 'lecture_peer');
 
     const preflight = await client.callTool({
-      name: 'run_deliverable_route',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('run_deliverable_route', {
         workspaceRoot,
         overlay: 'ppt_deck',
         topicId: 'topic-a',
         deliverableId: 'deck-a',
         route: 'storyline',
-      },
+      }),
     });
 
     assert.equal(preflight.structuredContent.ok, true);
     assert.equal(preflight.structuredContent.run.current_stage, 'storyline');
 
     const runResult = await client.callTool({
-      name: 'run_deliverable_route',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('run_deliverable_route', {
         workspaceRoot,
         overlay: 'ppt_deck',
         topicId: 'topic-a',
         deliverableId: 'deck-a',
         route: 'detailed_outline',
-      },
+      }),
     });
 
     assert.equal(runResult.structuredContent.ok, true);
     assert.equal(runResult.structuredContent.run.current_stage, 'detailed_outline');
 
     const runState = await client.callTool({
-      name: 'get_run',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('get_run', {
         workspaceRoot,
         runId: runResult.structuredContent.run.run_id,
-      },
+      }),
     });
 
     assert.equal(runState.structuredContent.run.status, 'completed');
     assert.equal(runState.structuredContent.run.current_stage, 'detailed_outline');
 
     const watch = await client.callTool({
-      name: 'runtime_watch',
-      arguments: {
+      name: 'redcube_review',
+      arguments: withAction('runtime_watch', {
         workspaceRoot,
         topicId: 'topic-a',
         deliverableId: 'deck-a',
         runId: runResult.structuredContent.run.run_id,
-      },
+      }),
     });
 
     assert.equal(watch.structuredContent.run_id, runResult.structuredContent.run.run_id);
@@ -1127,8 +1113,8 @@ test('stdio MCP server can create and run xiaohongshu deliverable routes on shar
 
   try {
     const created = await client.callTool({
-      name: 'create_deliverable',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('create_deliverable', {
         workspaceRoot,
         overlay: 'xiaohongshu',
         profileId: 'standard_note',
@@ -1136,32 +1122,32 @@ test('stdio MCP server can create and run xiaohongshu deliverable routes on shar
         deliverableId: 'note-a',
         title: '甲状腺门诊小红书科普',
         goal: '为门诊患者生成可发布的科普图文',
-      },
+      }),
     });
 
     assert.equal(created.structuredContent.deliverable.overlay, 'xiaohongshu');
     assert.equal(created.structuredContent.deliverable.profile_id, 'standard_note');
 
     const runResult = await client.callTool({
-      name: 'run_deliverable_route',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('run_deliverable_route', {
         workspaceRoot,
         overlay: 'xiaohongshu',
         topicId: 'topic-a',
         deliverableId: 'note-a',
         route: 'research',
-      },
+      }),
     });
 
     assert.equal(runResult.structuredContent.ok, true);
     assert.equal(runResult.structuredContent.run.current_stage, 'research');
 
     const runState = await client.callTool({
-      name: 'get_run',
-      arguments: {
+      name: 'redcube_deliverable',
+      arguments: withAction('get_run', {
         workspaceRoot,
         runId: runResult.structuredContent.run.run_id,
-      },
+      }),
     });
 
     assert.equal(runState.structuredContent.run.status, 'completed');
