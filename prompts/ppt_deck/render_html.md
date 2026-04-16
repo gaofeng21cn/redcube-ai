@@ -5,6 +5,7 @@
 作用域规则：
 - 若 `context.render_scope = "slide_batch"`，只输出当前 batch 对应的 slides，不要补写其他页面
 - 若 `context.render_scope = "summary"`，只输出 `render_summary`，不要重复生成整页 HTML
+- 若 `context.reference_slides` 非空，把这些已成形页面当成同一 deck 的连续风格锚点；后续页面必须继承它们的字体级差、卡片尺度、留白语法与标题节奏，不要整体突然放大或缩小
 
 必须保留：
 - #slide-display-area
@@ -35,6 +36,11 @@
 - 每个独立可读的主卡片、判断块、总结卡或底部带走点，优先单独挂 `data-qa-block`，让截图审计能直接检查其留白与贴边风险
 - 风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数
 - 若已有上一轮通过的 `render_html` 产物，且 `revision_context` 只点名部分 blocked slides，则只重画这些页面；其余通过页应原样复用，不要为了“顺手统一”重新发明
+- 必须遵守 `context.deck_style_reference.typography_plan` 这套整 deck 字号梯度；封面可单独更大，但 S02-S09 的标题、卡片标题、卡片正文、标签、页码都要落在同一档位体系里
+- 若标题或短句在当前字号梯度下本来可以单行成立，就禁止为了造型主动插入 `<br/>`；无必要的两行标题、短词组硬断开都算失败
+- 短中文词组必须在自然语义处换行；像“推进中 / 被偷换”“正式主链 / 不靠聪明捷径”这种本可单行或应整体保留的短句，不要人为拆断
+- 对 `ring_cross` / 四向围绕中心的骨架页，中心与上下左右卡片的距离必须近似等距；禁止出现上方明显更贴、中间明显偏移的失衡构图
+- 对 `judgement_ladder` / `timeline_band`，若卡片内容放不下，优先减字、扩卡或重排，不要靠手插 `<br/>` 把句子拆坏
 - 禁止输出 `<script>` / `<style>` block；样式只能写在元素 inline style 上
 - 禁止 renderSlide / layoutByType / cardsGrid / pageType
 - 必须落实视觉导演稿中的节奏曲线、峰值页、页面家族上限、禁退化语法
@@ -74,6 +80,10 @@
       "若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体",
       "风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数",
       "若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面；其余通过页应原样复用，不要为了顺手统一重新发明",
+      "若 context.reference_slides 提供了前面几页的 source_html，后续页面必须把它们当成 deck 风格锚点，继承同一套字体级差、卡片尺度与留白语法，不要让某一页整体突然更大或更小",
+      "必须遵守 context.deck_style_reference.typography_plan；正文页标题、卡片标题、正文、标签与页码都沿用同一套字号梯度，除封面外不要漂移",
+      "若标题或短句在当前字号梯度下可单行成立，禁止主动插入 <br/>；短中文词组只能在自然语义处换行",
+      "ring_cross / 四向围绕中心的骨架页必须保持近似等距与近似对称，不能让上方卡片明显贴近中心而其他方向疏远",
       "禁止输出 <script> / <style> block；如需视觉样式，直接写 inline style",
       "审阅依赖的根节点 metadata 由 runtime 注入，但 AI 仍需交付 review-ready 的 data-qa-block / data-primary-point 结构"
     ]

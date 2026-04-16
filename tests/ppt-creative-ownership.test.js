@@ -96,11 +96,15 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(storylinePrompt, /## runtime_artifact/);
   assert.match(outlinePrompt, /"render_recipe_id": "ppt\./);
   assert.match(visualPrompt, /"peak_pages": \[/);
+  assert.match(visualPrompt, /"typography_plan": \{/);
   assert.match(renderHtmlPrompt, /## runtime_artifact/);
   assert.match(renderHtmlPrompt, /header safe zone/);
   assert.match(renderHtmlPrompt, /foundation \/ substrate \/ base band/);
   assert.match(renderHtmlPrompt, /任何带字元素都必须拥有独立留白/);
   assert.match(renderHtmlPrompt, /同一页面家族重复出现/);
+  assert.match(renderHtmlPrompt, /reference_slides/);
+  assert.match(renderHtmlPrompt, /typography_plan/);
+  assert.match(renderHtmlPrompt, /单行成立.*<br\/>/);
   assert.match(renderHtmlPrompt, /controller.*唯一主峰/);
   assert.match(renderHtmlPrompt, /风险支路.*短窄/);
   assert.match(renderHtmlPrompt, /底部说明.*最多保留 ?2/);
@@ -126,6 +130,8 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(runtime, /controller.*唯一主峰/);
   assert.match(runtime, /风险支路.*短窄/);
   assert.match(runtime, /底部说明.*最多保留 ?2/);
+  assert.match(runtime, /reference_window/);
+  assert.match(runtime, /typography_plan/);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/director_review.md')), true);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.hero_signal.html')), true);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/render-artifacts/ppt.summary_peak.html')), true);
@@ -934,17 +940,13 @@ test('ppt render_html batches upstream slide generation instead of sending the w
   });
 });
 
-test('ppt render_html runs slide batches in parallel once Codex exec is async', async () => {
+test('ppt render_html forwards recent slide HTML to later batches to preserve deck continuity', async () => {
   await withMockHermesUpstream(async () => {
-    const lockDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-parallel-'));
-    const overlapFile = path.join(lockDir, 'overlap.txt');
     const restoreVariant = withEnv({
-      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_parallel_batches',
-      REDCUBE_MOCK_PPT_RENDER_PARALLEL_LOCK_DIR: lockDir,
-      REDCUBE_MOCK_PPT_RENDER_PARALLEL_OVERLAP_FILE: overlapFile,
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_reference_window',
     });
     try {
-      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-parallel-workspace-'));
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-reference-window-'));
       await createDeliverable({
         workspaceRoot,
         overlay: 'ppt_deck',
@@ -963,7 +965,8 @@ test('ppt render_html runs slide batches in parallel once Codex exec is async', 
       for (const { route, result } of routes) {
         assert.equal(result.ok, true, route);
       }
-      assert.equal(existsSync(overlapFile), true);
+      const renderArtifact = readJson(routes.at(-1).result.artifactFile);
+      assert.equal(renderArtifact.render_execution?.reference_window, 3);
     } finally {
       restoreVariant();
     }

@@ -232,6 +232,7 @@ export function buildPptVisualDirectionArtifact({
       what_it_is: safeArray(authoredVisualDirection?.what_it_is),
       what_it_is_not: safeArray(authoredVisualDirection?.what_it_is_not),
       palette: authoredVisualDirection?.palette || {},
+      typography_plan: authoredVisualDirection?.typography_plan || {},
       continuity_constraints: safeArray(authoredVisualDirection?.continuity_constraints),
       rhythm_curve: safeArray(authoredVisualDirection?.rhythm_curve),
       peak_pages: safeArray(authoredVisualDirection?.peak_pages),

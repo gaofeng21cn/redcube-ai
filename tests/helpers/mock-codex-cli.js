@@ -312,6 +312,15 @@ function buildMockVisualDirection(meta) {
       accentSoft: '#DBEAFE',
       success: '#0F766E',
     },
+    typography_plan: {
+      cover_title: { font_size: 56, line_height: 1.08, font_weight: 800 },
+      body_title: { font_size: 44, line_height: 1.12, font_weight: 780 },
+      section_lead: { font_size: 24, line_height: 1.4, font_weight: 650 },
+      card_title: { font_size: 21, line_height: 1.18, font_weight: 720 },
+      card_body: { font_size: 16.5, line_height: 1.45, font_weight: 600 },
+      meta_label: { font_size: 12.5, line_height: 1.1, font_weight: 600 },
+      page_no: { font_size: 18, line_height: 1.0, font_weight: 600 },
+    },
     continuity_constraints: [
       '关键页必须与相邻页形成明显差异',
       '复杂结构页必须显式输出锚点与轨道',
@@ -392,6 +401,25 @@ function buildMockPptRender(meta) {
       batchIndex: Number(meta?.context?.render_batch?.batch_index || 0),
       prefix: 'ppt-render',
     });
+  }
+  if (variant === 'require_reference_window' && renderScope !== 'summary') {
+    const batchIndex = Number(meta?.context?.render_batch?.batch_index || 0);
+    const references = safeArray(meta?.context?.reference_slides);
+    const typographyPlan = meta?.context?.deck_style_reference?.typography_plan || {};
+    if (!Number(meta?.context?.deck_style_reference?.reference_window) || !typographyPlan?.body_title) {
+      throw new Error(`mock ppt render expected deck_style_reference: ${JSON.stringify(meta?.context?.deck_style_reference)}`);
+    }
+    if (batchIndex > 1) {
+      if (references.length === 0 || references.length > 3) {
+        throw new Error(`mock ppt render expected 1-3 reference slides for later batch, got ${JSON.stringify(references)}`);
+      }
+      for (const reference of references) {
+        const sourceHtml = safeText(reference?.source_html);
+        if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(safeText(reference?.slide_id))) {
+          throw new Error(`mock ppt render expected valid reference source_html: ${JSON.stringify(reference)}`);
+        }
+      }
+    }
   }
   return {
     slides: slides.map((slide) => ({

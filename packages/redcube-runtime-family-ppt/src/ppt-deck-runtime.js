@@ -95,6 +95,7 @@ const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
 const RENDER_HTML_BATCH_SIZE = 3;
 const TARGETED_RENDER_HTML_BATCH_SIZE = 1;
 const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
+const RENDER_REFERENCE_SLIDE_WINDOW = 3;
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
 const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
@@ -124,6 +125,15 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   slide_blueprint: 'story_architecture',
   visual_direction: 'visual_authorship',
   fix_html: 'visual_authorship',
+});
+const DEFAULT_TYPOGRAPHY_PLAN = Object.freeze({
+  cover_title: Object.freeze({ font_size: 56, line_height: 1.08, font_weight: 800 }),
+  body_title: Object.freeze({ font_size: 44, line_height: 1.12, font_weight: 780 }),
+  section_lead: Object.freeze({ font_size: 24, line_height: 1.4, font_weight: 650 }),
+  card_title: Object.freeze({ font_size: 21, line_height: 1.18, font_weight: 720 }),
+  card_body: Object.freeze({ font_size: 16.5, line_height: 1.45, font_weight: 600 }),
+  meta_label: Object.freeze({ font_size: 12.5, line_height: 1.1, font_weight: 600 }),
+  page_no: Object.freeze({ font_size: 18, line_height: 1.0, font_weight: 600 }),
 });
 const PPT_PAGE_LIBRARY = Object.freeze([
   {
@@ -523,6 +533,7 @@ function buildWorkbenchBlueprintMarkdown(contract, artifact) {
 
 function buildWorkbenchVisualDirectionMarkdown(contract, artifact) {
   const visual = artifact?.visual_direction || {};
+  const typographyPlan = visual.typography_plan || {};
   const lines = [
     `# ${safeText(contract.title)}视觉导演稿`,
     '',
@@ -537,6 +548,7 @@ function buildWorkbenchVisualDirectionMarkdown(contract, artifact) {
     `- 标题色 / 结论色 / 警示色：${safeText(visual.palette?.ink)} / ${safeText(visual.palette?.accent)} / ${safeText(visual.palette?.success)}`,
     `- 允许元素：${safeArray(visual.what_it_is).join(' / ')}`,
     `- 禁止元素：${safeArray(visual.what_it_is_not).join(' / ')}`,
+    `- 字号梯度：cover ${safeText(typographyPlan.cover_title?.font_size)} / body ${safeText(typographyPlan.body_title?.font_size)} / card-title ${safeText(typographyPlan.card_title?.font_size)} / card-body ${safeText(typographyPlan.card_body?.font_size)} / meta ${safeText(typographyPlan.meta_label?.font_size)} / page-no ${safeText(typographyPlan.page_no?.font_size)}`,
     `- 页间连续性约束：${safeArray(visual.continuity_constraints).join('；')}`,
     `- 节奏曲线：${safeArray(visual.rhythm_curve).map((item) => `${safeText(item.slide_id)}=${safeText(item.role)}`).join('；')}`,
     `- 必须破格的关键页：${safeArray(visual.peak_pages).join(' / ')}`,
@@ -1699,6 +1711,31 @@ function normalizeRhythmCurve(value, slides) {
   }));
 }
 
+function normalizeTypographyTier(value, fallback) {
+  const tier = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  const fontSize = Number(tier.font_size);
+  const lineHeight = Number(tier.line_height);
+  const fontWeight = Number(tier.font_weight);
+  return {
+    font_size: Number.isFinite(fontSize) && fontSize > 0 ? fontSize : fallback.font_size,
+    line_height: Number.isFinite(lineHeight) && lineHeight > 0 ? lineHeight : fallback.line_height,
+    font_weight: Number.isFinite(fontWeight) && fontWeight > 0 ? fontWeight : fallback.font_weight,
+  };
+}
+
+function normalizeTypographyPlan(value) {
+  const plan = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  return {
+    cover_title: normalizeTypographyTier(plan.cover_title, DEFAULT_TYPOGRAPHY_PLAN.cover_title),
+    body_title: normalizeTypographyTier(plan.body_title, DEFAULT_TYPOGRAPHY_PLAN.body_title),
+    section_lead: normalizeTypographyTier(plan.section_lead, DEFAULT_TYPOGRAPHY_PLAN.section_lead),
+    card_title: normalizeTypographyTier(plan.card_title, DEFAULT_TYPOGRAPHY_PLAN.card_title),
+    card_body: normalizeTypographyTier(plan.card_body, DEFAULT_TYPOGRAPHY_PLAN.card_body),
+    meta_label: normalizeTypographyTier(plan.meta_label, DEFAULT_TYPOGRAPHY_PLAN.meta_label),
+    page_no: normalizeTypographyTier(plan.page_no, DEFAULT_TYPOGRAPHY_PLAN.page_no),
+  };
+}
+
 function normalizeVisualDirectionDraft(data, slides) {
   return {
     visual_manifest: requireText(data?.visual_manifest, 'visual_direction.visual_manifest'),
@@ -1709,6 +1746,7 @@ function normalizeVisualDirectionDraft(data, slides) {
       : (() => {
           throw new Error('Missing visual_direction.palette in upstream ppt generation output');
         })(),
+    typography_plan: normalizeTypographyPlan(data?.typography_plan),
     continuity_constraints: normalizeStringList(
       data?.continuity_constraints,
       'visual_direction.continuity_constraints',
@@ -1792,6 +1830,15 @@ function visualDirectionOutputContract() {
       accent: '#2563EB',
       accentSoft: '#DBEAFE',
       success: '#0F766E',
+    },
+    typography_plan: {
+      cover_title: { font_size: 56, line_height: 1.08, font_weight: 800 },
+      body_title: { font_size: 44, line_height: 1.12, font_weight: 780 },
+      section_lead: { font_size: 24, line_height: 1.4, font_weight: 650 },
+      card_title: { font_size: 21, line_height: 1.18, font_weight: 720 },
+      card_body: { font_size: 16.5, line_height: 1.45, font_weight: 600 },
+      meta_label: { font_size: 12.5, line_height: 1.1, font_weight: 600 },
+      page_no: { font_size: 18, line_height: 1.0, font_weight: 600 },
     },
     continuity_constraints: ['<string>', '<string>'],
     rhythm_curve: [{ slide_id: 'S01', role: 'opening_peak' }],
@@ -2494,6 +2541,33 @@ function buildRenderRevisionLocalFileInspection({ deliverablePaths, slideBatch, 
   return entries;
 }
 
+function buildRenderBatchReferenceSlides({
+  blueprintSlides,
+  slideBatch,
+  renderedSlideHtmlById,
+  limit = RENDER_REFERENCE_SLIDE_WINDOW,
+}) {
+  const firstSlideId = safeText(safeArray(slideBatch)[0]?.slide_id);
+  if (!firstSlideId) return [];
+  const firstIndex = safeArray(blueprintSlides).findIndex((slide) => safeText(slide?.slide_id) === firstSlideId);
+  if (firstIndex <= 0) return [];
+  const references = [];
+  for (let index = Math.max(0, firstIndex - limit); index < firstIndex; index += 1) {
+    const slide = blueprintSlides[index];
+    const slideId = safeText(slide?.slide_id);
+    const sourceHtml = safeText(renderedSlideHtmlById.get(slideId));
+    if (!slideId || !sourceHtml) continue;
+    references.push({
+      slide_id: slideId,
+      slide_no: slide?.slide_no ?? index + 1,
+      title: safeText(slide?.title),
+      layout_family: safeText(slide?.layout_family),
+      source_html: sourceHtml,
+    });
+  }
+  return references;
+}
+
 async function generateRenderHtmlDraft({
   workspaceRoot,
   deliverableId,
@@ -2526,9 +2600,22 @@ async function generateRenderHtmlDraft({
   const renderBatchSize = renderPlan.mode === 'targeted_revision_only'
     ? TARGETED_RENDER_HTML_BATCH_SIZE
     : RENDER_HTML_BATCH_SIZE;
+  const typographyPlan = normalizeTypographyPlan(visualArtifact?.visual_direction?.typography_plan);
   const sharedContext = {
     ...buildAuthoringContext(contract),
-    visual_direction: visualArtifact?.visual_direction || null,
+    visual_direction: {
+      ...(visualArtifact?.visual_direction || {}),
+      typography_plan: typographyPlan,
+    },
+    deck_style_reference: {
+      typography_plan: typographyPlan,
+      reference_window: RENDER_REFERENCE_SLIDE_WINDOW,
+      continuity_rules: [
+        '整套 deck 使用同一套标题、卡片标题、正文、标签与页码字号梯度；除封面外，不允许某页整体突然变大或缩小。',
+        '若按 batch 生成，后续批次必须参考前面最多三页已成形 HTML，继承同一套留白与排版语法。',
+        '若标题或短句在当前字号梯度下能单行成立，就不要主动插入换行。',
+      ],
+    },
     shell_contract: {
       ratio: CANVAS.ratio,
       width: CANVAS.width,
@@ -2546,9 +2633,13 @@ async function generateRenderHtmlDraft({
       '若页面同时承载主链说明与风险提示，底部说明区最多保留 2 块；第 3 个观点必须并入主图注释或节点说明，不得再扩成整排说明带。',
       '若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体。',
       '正文页主标题字号需要在整套 deck 中保持一致，除封面外不要突然缩小；如果空间不足，优先压缩卡片正文、减少说明字数或重排结构，不要先牺牲标题一致性。',
+      '整套 deck 的标题、卡片标题、正文、标签与页码必须遵守同一套 typography_plan；不要让某一页整体更大或更小。',
+      '若批次上下文提供 reference_slides，必须把它们当成连续风格锚点来对齐字号梯度、卡片尺度与留白语法。',
       '连接线、时间线、轨道线必须退到节点徽标和数字圆点下层；不允许线条压在数字、badge 或关键词前景上。',
       '中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义夹杂英文，术语若出现也要尽量配中文语义。',
       '所有正文、标签、节点和卡片文案都要在自然语义处分行，优先减少字数和调整容器，不要把中英文硬挤到同一行直到溢出。',
+      '若标题或短句在当前字号梯度下本可单行成立，就不要主动插入 <br/>；短中文词组只能在自然语义处换行。',
+      'ring_cross 四向骨架页必须保持中心与上下左右卡片近似等距，不能出现单方向明显贴近中心的失衡。',
       '风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数。',
       '若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面，其余通过页应保持原样复用，不要重新发明已通过页面。',
       '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
@@ -2557,9 +2648,16 @@ async function generateRenderHtmlDraft({
     ],
   };
   const slideBatches = chunkArray(renderPlan.slides_to_render, renderBatchSize);
-  const freshlyRenderedSlides = slideBatches.length === 0
-    ? []
-    : (await Promise.all(slideBatches.map(async (slideBatch, batchIndex) => {
+  const availableReferenceSlides = renderPlan.mode === 'targeted_revision_only'
+    ? new Map(priorRenderedSlides)
+    : new Map();
+  const freshlyRenderedSlides = [];
+  for (const [batchIndex, slideBatch] of slideBatches.entries()) {
+    const referenceSlides = buildRenderBatchReferenceSlides({
+      blueprintSlides,
+      slideBatch,
+      renderedSlideHtmlById: availableReferenceSlides,
+    });
     const promptSlides = slideBatch.map((slide) => ({
       ...slide,
       current_content_html: priorRenderedSlides.get(safeText(slide?.slide_id)) || null,
@@ -2578,6 +2676,7 @@ async function generateRenderHtmlDraft({
           total_batches: slideBatches.length,
           slide_ids: promptSlides.map((slide) => slide.slide_id),
         },
+        reference_slides: referenceSlides,
         blueprint: {
           slides: promptSlides,
         },
@@ -2594,8 +2693,15 @@ async function generateRenderHtmlDraft({
         revisionContext: sharedRevisionContext,
       }),
     });
-    return safeArray(batchData?.slides).filter((item) => item && typeof item === 'object');
-  }))).flat();
+    const batchSlides = safeArray(batchData?.slides).filter((item) => item && typeof item === 'object');
+    freshlyRenderedSlides.push(...batchSlides);
+    for (const slide of batchSlides) {
+      const slideId = safeText(slide?.slide_id);
+      const contentHtml = safeText(slide?.content_html);
+      if (!slideId || !contentHtml) continue;
+      availableReferenceSlides.set(slideId, contentHtml);
+    }
+  }
   const freshlyRenderedById = new Map(
     freshlyRenderedSlides.map((slide) => [safeText(slide?.slide_id), slide]),
   );
@@ -2637,6 +2743,7 @@ async function generateRenderHtmlDraft({
       mode: renderPlan.mode,
       batch_size: renderBatchSize,
       batch_count: slideBatches.length,
+      reference_window: RENDER_REFERENCE_SLIDE_WINDOW,
       targeted_slide_ids: renderPlan.slides_to_render.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
       freshly_rendered_slide_ids: freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
       reused_slide_ids: [...renderPlan.reused_slides.keys()],
