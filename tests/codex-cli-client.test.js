@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 import {
   probeCodexCli,
@@ -62,4 +62,12 @@ test('probeCodexCli proves the local exec surface with a mock spawn implementati
   assert.equal(result.contract.reasoning_selection, 'xhigh');
   assert.equal(result.steps.exec_surface.ok, true);
   assert.equal(result.steps.exec_surface.terminal_event, 'run.completed');
+});
+
+test('codex-cli client keeps async codex exec attached while preserving timeout cleanup', () => {
+  const source = readFileSync(new URL('../packages/redcube-codex-cli-client/src/index.js', import.meta.url), 'utf-8');
+
+  assert.match(source, /detached:\s*false/);
+  assert.match(source, /process\.kill\(-pid,\s*'SIGKILL'\)/);
+  assert.match(source, /child\.kill\('SIGKILL'\)/);
 });

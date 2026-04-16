@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, statSync } from 'node:fs';
 
 import {
   createDeliverable,
@@ -176,5 +176,129 @@ test('xiaohongshu route artifacts record Codex-backed creative ownership for sto
     assert.equal(copy.publish_copy.creative_sources.body.owner, 'host_agent');
     assert.equal(copy.publish_copy.creative_sources.first_comment.primary_surface, 'codex_native_host_agent');
     assert.equal(copy.publish_copy.creative_sources.body.materialized_from, 'codex_cli_json_output');
+  });
+});
+
+test('xiaohongshu screenshot_review forwards current slide source_html alongside screenshots', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-screenshot-source-html-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: 'P19 小红书截图质控源码对照',
+      goal: '验证截图质控会同时参考当前卡片 HTML 源码',
+    });
+
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT: 'require_source_html',
+    });
+    try {
+      const routes = ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
+      for (const route of routes) {
+        const result = await runDeliverableRoute({
+          workspaceRoot,
+          overlay: 'xiaohongshu',
+          topicId: 'topic-a',
+          deliverableId: 'note-a',
+          route,
+        });
+        assert.equal(result.ok, true, route);
+      }
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('xiaohongshu rerender keeps stable views untouched and writes candidate draft separately', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-stable-views-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: 'P19 小红书稳定视图验证',
+      goal: '验证小红书候选稿不会覆盖稳定视图，且稳定截图入口与通过 capture 对齐',
+    });
+
+    const routes = ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
+    const results = [];
+    for (const route of routes) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+      results.push(result);
+    }
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'note-a');
+    const stableViewHtmlFile = path.join(deliverableDir, 'views', 'note-a.html');
+    const draftViewHtmlFile = path.join(deliverableDir, 'views', 'note-a.draft.html');
+
+    const stableViewHtmlContent = readFileSync(stableViewHtmlFile, 'utf-8');
+    const stableViewHtmlStat = statSync(stableViewHtmlFile).mtimeMs;
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    const rerender = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route: 'render_html',
+    });
+    assert.equal(rerender.ok, true);
+
+    assert.equal(statSync(stableViewHtmlFile).mtimeMs, stableViewHtmlStat);
+    assert.equal(readFileSync(stableViewHtmlFile, 'utf-8'), stableViewHtmlContent);
+    assert.equal(existsSync(draftViewHtmlFile), true);
+  });
+});
+
+test('xiaohongshu export_bundle records the stable reviewed HTML instead of the latest draft candidate', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-export-stable-html-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: 'P19 小红书稳定导出 HTML',
+      goal: '验证 export_bundle 记录的 html_file 指向稳定通过版',
+    });
+
+    for (const route of [
+      'research',
+      'storyline',
+      'single_note_plan',
+      'visual_direction',
+      'render_html',
+      'visual_director_review',
+      'screenshot_review',
+      'publish_copy',
+      'export_bundle',
+    ]) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'note-a');
+    const exportArtifact = readJson(path.join(deliverableDir, 'artifacts', 'publish_bundle.json'));
+    assert.equal(exportArtifact.export_bundle.html_file, path.join(deliverableDir, 'views', 'note-a.html'));
   });
 });

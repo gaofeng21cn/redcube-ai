@@ -7,7 +7,7 @@ export interface ResolveRedCubePythonCommandOptions {
 
 export interface ResolvedRedCubePythonCommand {
   command: string;
-  source: 'env' | 'python3_with_playwright';
+  source: 'env' | 'python3_with_playwright' | 'managed_python_runtime';
 }
 
 export interface WorkspaceContract {

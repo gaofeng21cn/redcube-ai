@@ -18,6 +18,7 @@ export type XhsRuntimeRoute =
   | 'single_note_plan'
   | 'visual_direction'
   | 'render_html'
+  | 'fix_html'
   | 'visual_director_review'
   | 'screenshot_review'
   | 'publish_copy'
@@ -49,6 +50,7 @@ export interface XhsRuntimeStageRequirements {
   single_note_plan?: XhsRuntimeStageRequirement;
   visual_direction?: XhsRuntimeStageRequirement;
   render_html?: XhsRuntimeStageRequirement;
+  fix_html?: XhsRuntimeStageRequirement;
   visual_director_review?: XhsRuntimeStageRequirement;
   screenshot_review?: XhsRuntimeStageRequirement;
   publish_copy?: XhsRuntimeStageRequirement;
@@ -61,6 +63,7 @@ export interface XhsRuntimePromptRoutes {
   single_note_plan?: string;
   visual_direction?: string;
   render_html?: string;
+  fix_html?: string;
   visual_director_review?: string;
   screenshot_review?: string;
   publish_copy?: string;
@@ -351,6 +354,7 @@ export type XhsRuntimeRouteResult =
   | XhsRuntimeRouteOutput<'single_note_plan', XhsPlanArtifact>
   | XhsRuntimeRouteOutput<'visual_direction', XhsVisualDirectionArtifact>
   | XhsRuntimeRouteOutput<'render_html', XhsRenderArtifact>
+  | XhsRuntimeRouteOutput<'fix_html', XhsRenderArtifact>
   | XhsRuntimeRouteOutput<'visual_director_review', XhsDirectorReviewArtifact>
   | XhsRuntimeRouteOutput<'screenshot_review', XhsScreenshotReviewArtifact>
   | XhsRuntimeRouteOutput<'publish_copy', XhsPublishCopyArtifact>

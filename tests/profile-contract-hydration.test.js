@@ -51,6 +51,7 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
       'render_html',
       'visual_director_review',
       'screenshot_review',
+      'fix_html',
       'export_pptx',
     ],
   );
@@ -105,7 +106,7 @@ test('hydrateDeliverableContract resolves xiaohongshu standard profile on shared
   assert.equal(contract.deliverable_kind, 'xiaohongshu_note');
   assert.deepEqual(
     contract.stage_sequence.stages.map((stage) => stage.stage_id),
-    ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
+    ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle'],
   );
   assert.equal(contract.review_surface.required_checks.includes('platform_copy_complete'), true);
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');

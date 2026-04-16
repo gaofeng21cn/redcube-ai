@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
@@ -34,6 +34,7 @@ const DEFAULT_PROMPT_PACK = {
   single_note_plan: 'prompts/xiaohongshu/single_note_plan.md',
   visual_direction: 'prompts/xiaohongshu/visual_direction.md',
   render_html: 'prompts/xiaohongshu/render_html.md',
+  fix_html: 'prompts/xiaohongshu/fix_html.md',
   visual_director_review: 'prompts/xiaohongshu/director_review.md',
   screenshot_review: 'prompts/xiaohongshu/screenshot_review.md',
   publish_copy: 'prompts/xiaohongshu/publish_copy.md',
@@ -46,6 +47,7 @@ const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
   single_note_plan: 'story_architecture',
   visual_direction: 'visual_authorship',
   render_html: 'visual_authorship',
+  fix_html: 'visual_authorship',
   visual_director_review: 'review_overlay',
   screenshot_review: 'review_overlay',
   publish_copy: 'delivery_packaging',
@@ -58,11 +60,27 @@ const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 const MIN_REVIEW_QA_BLOCKS = 2;
 const MIN_REVIEW_PRIMARY_POINTS = 1;
 const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
+const PAGE_FIX_ROUTE = 'fix_html';
+const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
+  'overflow_detected',
+  'occlusion_detected',
+  'visual_density_out_of_range',
+  'speaker_fit_out_of_range',
+]);
+const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
+  'ai_review_passed',
+  'overflow_free',
+  'occlusion_free',
+  'visual_density_ok',
+  'speaker_fit_ok',
+  'cover_density_ok',
+]);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   research: 'source_readiness',
   storyline: 'story_architecture',
   single_note_plan: 'story_architecture',
   visual_direction: 'visual_authorship',
+  fix_html: 'visual_authorship',
 });
 
 function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
@@ -239,12 +257,7 @@ function buildAiFirstVisualSlideReview(slide, aiReview) {
 }
 
 function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
-  return safeArray(slideReviews).every((slide) => {
-    if (hasAiVisualPass(slide?.ai_review)) {
-      return true;
-    }
-    return Boolean(slide?.checks?.[checkKey]);
-  });
+  return safeArray(slideReviews).every((slide) => Boolean(slide?.checks?.[checkKey]));
 }
 
 function requireObjectArray(value, field, { min = 0, max = Infinity } = {}) {
@@ -258,6 +271,34 @@ function requireObjectArray(value, field, { min = 0, max = Infinity } = {}) {
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
   return dir;
+}
+
+function copySurfaceFile(source, destination) {
+  const sourceFile = safeText(source);
+  const destinationFile = safeText(destination);
+  if (!sourceFile || !destinationFile || !existsSync(sourceFile)) return null;
+  ensureDir(path.dirname(destinationFile));
+  writeFileSync(destinationFile, readFileSync(sourceFile));
+  return destinationFile;
+}
+
+function getDeliverableViewSurfacePaths(deliverablePaths) {
+  const baseName = safeText(deliverablePaths?.deliverableId, 'deliverable');
+  return {
+    stableHtmlFile: path.join(deliverablePaths.viewsDir, `${baseName}.html`),
+    draftHtmlFile: path.join(deliverablePaths.viewsDir, `${baseName}.draft.html`),
+  };
+}
+
+function seedStableHtmlIfMissing(paths, htmlFile) {
+  if (existsSync(paths.stableHtmlFile)) return [];
+  const ref = copySurfaceFile(htmlFile, paths.stableHtmlFile);
+  return ref ? [ref] : [];
+}
+
+function promoteStableHtml(paths, htmlFile) {
+  const ref = copySurfaceFile(htmlFile, paths.stableHtmlFile);
+  return ref ? [ref] : [];
 }
 
 function writeJson(file, value) {
@@ -282,6 +323,27 @@ function stageArtifactPath(contract, deliverablePaths, stageId) {
 function readStageArtifact(contract, deliverablePaths, stageId) {
   const file = stageArtifactPath(contract, deliverablePaths, stageId);
   return existsSync(file) ? readJson(file) : null;
+}
+
+function safeFileMtimeMs(file) {
+  if (!safeText(file) || !existsSync(file)) return 0;
+  try {
+    return Number(statSync(file).mtimeMs || 0);
+  } catch {
+    return 0;
+  }
+}
+
+function currentHtmlStageId(contract, deliverablePaths) {
+  const renderArtifactFile = stageArtifactPath(contract, deliverablePaths, 'render_html');
+  const fixArtifactFile = stageArtifactPath(contract, deliverablePaths, PAGE_FIX_ROUTE);
+  return safeFileMtimeMs(fixArtifactFile) > safeFileMtimeMs(renderArtifactFile)
+    ? PAGE_FIX_ROUTE
+    : 'render_html';
+}
+
+function readCurrentHtmlArtifact(contract, deliverablePaths) {
+  return readStageArtifact(contract, deliverablePaths, currentHtmlStageId(contract, deliverablePaths));
 }
 
 function promptPackRoot(contract) {
@@ -346,6 +408,56 @@ function promptArtifact(contract, route, vars = {}) {
 
 function promptSeed(contract, route, vars = {}) {
   return promptPackJsonSection(contract, route, 'runtime_seed', vars);
+}
+
+function stageOrder(contract, stageId) {
+  return safeArray(contract?.stage_sequence?.stages).findIndex((stage) => stage?.stage_id === stageId);
+}
+
+function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
+  const rerunMap = contract?.review_surface?.rerun_from_stage || {};
+  const candidates = safeArray(failedChecks)
+    .map((checkId) => safeText(rerunMap?.[checkId], fallbackStage))
+    .filter(Boolean);
+  if (candidates.length === 0) return null;
+  return candidates.reduce((earliest, candidate) => {
+    if (!earliest) return candidate;
+    const earliestOrder = stageOrder(contract, earliest);
+    const candidateOrder = stageOrder(contract, candidate);
+    if (candidateOrder === -1) return earliest;
+    if (earliestOrder === -1 || candidateOrder < earliestOrder) return candidate;
+    return earliest;
+  }, null);
+}
+
+function slideNeedsTargetedRevision(slide) {
+  if (!slide || typeof slide !== 'object') return false;
+  if (safeText(slide?.status) === 'block') return true;
+  if (hasAiVisualBlock(slide?.ai_review)) return true;
+  const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
+    ? safeArray(slide?.mechanical_issues)
+    : safeArray(slide?.issues);
+  return mechanicalIssues.some((issue) => TARGETED_SCREENSHOT_MECHANICAL_ISSUES.has(safeText(issue)));
+}
+
+function collectSlidesNeedingTargetedRevision(slideReviews) {
+  return safeArray(slideReviews)
+    .filter((slide) => slideNeedsTargetedRevision(slide))
+    .filter((slide) => safeText(slide?.slide_id));
+}
+
+function deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews) {
+  const normalizedFailedChecks = safeArray(failedChecks).map((check) => safeText(check)).filter(Boolean);
+  if (normalizedFailedChecks.length === 0) return null;
+  const targetedSlides = collectSlidesNeedingTargetedRevision(slideReviews);
+  if (normalizedFailedChecks.includes('cover_density_ok') && safeArray(slideReviews).length > 0) {
+    return PAGE_FIX_ROUTE;
+  }
+  const onlyPageLevelFailures = normalizedFailedChecks.every((check) => TARGETED_SCREENSHOT_RERUN_CHECKS.has(check));
+  if (onlyPageLevelFailures && targetedSlides.length > 0) {
+    return PAGE_FIX_ROUTE;
+  }
+  return rerunStageFromReviewSurface(contract, normalizedFailedChecks, 'render_html');
 }
 
 function isOperatorContextMaterial(material) {
@@ -635,6 +747,79 @@ function renderHtmlOutputContract() {
   };
 }
 
+function buildFixHtmlRevisionContext(contract, deliverablePaths) {
+  const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  const screenshotReview = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+  if (!directorReview && !screenshotReview) {
+    return null;
+  }
+  return {
+    visual_director_review: directorReview?.visual_director_review
+      ? {
+          weak_pages: safeArray(directorReview.visual_director_review.weak_pages),
+          review_summary: safeText(directorReview.visual_director_review.review_summary),
+        }
+      : null,
+    screenshot_review: screenshotReview
+      ? {
+          failed_checks: Object.entries(screenshotReview.checks || {})
+            .filter(([, value]) => value === false)
+            .map(([key]) => key),
+          weak_pages: safeArray(screenshotReview.ai_review?.weak_pages),
+          review_summary: safeText(screenshotReview.ai_review?.review_summary),
+          slide_feedback: safeArray(screenshotReview.slide_reviews).map((slide) => ({
+            slide_id: safeText(slide?.slide_id),
+            screenshot_file: safeText(slide?.screenshot_file),
+            blocked_checks: safeArray(slide?.mechanical_issues).length > 0
+              ? safeArray(slide?.mechanical_issues)
+              : safeArray(slide?.issues),
+            ai_findings: safeArray(slide?.ai_review?.visual_findings),
+            recommended_fix: safeText(slide?.ai_review?.recommended_fix),
+          })),
+        }
+      : null,
+  };
+}
+
+function selectFixHtmlSlideIds(planArtifact, screenshotReviewArtifact) {
+  const slideReviews = safeArray(screenshotReviewArtifact?.slide_reviews);
+  const targetedSlideIds = new Set(
+    collectSlidesNeedingTargetedRevision(slideReviews)
+      .map((slide) => safeText(slide?.slide_id))
+      .filter(Boolean),
+  );
+  const failedChecks = Object.entries(screenshotReviewArtifact?.checks || {})
+    .filter(([, value]) => value === false)
+    .map(([key]) => key);
+  if (failedChecks.includes('cover_density_ok')) {
+    const coverSlideId = safeText(safeArray(planArtifact?.single_note_plan?.slides)[0]?.slide_id);
+    if (coverSlideId) {
+      targetedSlideIds.add(coverSlideId);
+    }
+  }
+  return [...targetedSlideIds];
+}
+
+function loadPriorRenderedXhsSlideHtmlMap(renderArtifact) {
+  return new Map(
+    safeArray(renderArtifact?.html_bundle?.slides)
+      .map((slide) => [safeText(slide?.slide_id), requireText(slide?.content, 'html_bundle.slides[].content')])
+      .filter(([slideId]) => slideId),
+  );
+}
+
+function buildFixHtmlLocalInspection(screenshotReviewArtifact, targetSlideIds) {
+  const targetSet = new Set(safeArray(targetSlideIds).map((slideId) => safeText(slideId)).filter(Boolean));
+  return safeArray(screenshotReviewArtifact?.slide_reviews)
+    .filter((slide) => targetSet.has(safeText(slide?.slide_id)) && safeText(slide?.screenshot_file))
+    .map((slide, index) => ({
+      label: `${safeText(slide?.slide_id)} ${safeText(slide?.title, `Card ${index + 1}`)}`.trim(),
+      path: safeText(slide?.screenshot_file),
+      media_type: 'image/png',
+      purpose: `${safeText(slide?.slide_id)} 当前被拦下的卡片截图；局部修复遮挡、溢出、换行和层级问题，不要顺手重画其他页。`,
+    }));
+}
+
 function directorReviewOutputContract() {
   return {
     director_intent_landed: true,
@@ -795,10 +980,22 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
       throw new Error(`Route ${route} requires screenshot_review to pass before export`);
     }
   }
+  const currentHtmlStage = currentHtmlStageId(contract, deliverablePaths);
+  const currentHtmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, currentHtmlStage));
+  if (route === PAGE_FIX_ROUTE) {
+    const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+    if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
+      throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
+    }
+  }
   if (route === 'screenshot_review') {
     const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     if (!directorReviewArtifact || directorReviewArtifact.status !== 'pass') {
       throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
+    }
+    const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
+    if (directorReviewMtimeMs < currentHtmlMtimeMs) {
+      throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest HTML changes');
     }
   }
   if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {
@@ -812,6 +1009,19 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
     }).state;
     if (!isBaselineApprovedState(baselineState)) {
       throw new Error(`Baseline deliverable is not approved: ${baselineDeliverableId}`);
+    }
+  }
+  if (route === 'publish_copy' || route === 'export_bundle') {
+    const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+    if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
+      throw new Error(`Route ${route} requires screenshot_review to be rerun after the latest HTML changes`);
+    }
+  }
+  if (route === 'export_bundle') {
+    const publishCopyMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'publish_copy'));
+    const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+    if (publishCopyMtimeMs < screenshotReviewMtimeMs) {
+      throw new Error('Route export_bundle requires publish_copy to be rerun after the latest screenshot_review');
     }
   }
   return { deliverablePaths, contract };
@@ -1318,20 +1528,23 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
   });
 }
 
-async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-  const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths, adapter);
-  const slideHtmlList = requireObjectArray(data?.slides, 'render_html.slides', { min: 4, max: 8 });
-  const slideHtmlById = new Map(slideHtmlList.map((item) => [safeText(item.slide_id), validateRenderedSlideContent(item.content_html, safeText(item.slide_id))]));
-  const slides = safeArray(plan?.single_note_plan?.slides).map((slide) => {
+function materializeRenderedXhsSlides({
+  planArtifact,
+  visualArtifact,
+  slideHtmlById,
+  generationRuntime,
+  route,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
+  const planSlides = safeArray(planArtifact?.single_note_plan?.slides);
+  return planSlides.map((slide) => {
     const rawContent = slideHtmlById.get(slide.slide_id);
     if (!rawContent) {
-      throw new Error(`render_html output missing slide: ${slide.slide_id}`);
+      throw new Error(`${route} output missing slide: ${slide.slide_id}`);
     }
-    const materialRules = visual?.visual_direction?.material_rules || {};
+    const materialRules = visualArtifact?.visual_direction?.material_rules || {};
     const recipeDecision = creativeSourceStamp({
-      route: 'render_html',
+      route,
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'recipe_selection',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
@@ -1339,7 +1552,7 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       adapter,
     });
     const finalMarkup = creativeSourceStamp({
-      route: 'render_html',
+      route,
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'final_html_markup',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
@@ -1347,7 +1560,7 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       adapter,
     });
     const speakerSeconds = slide.layout_family === 'process_track' ? 40 : slide.layout_family === 'action_checklist' ? 32 : 36;
-    const peakPage = safeArray(visual?.visual_direction?.peak_pages).includes(slide.slide_id);
+    const peakPage = safeArray(visualArtifact?.visual_direction?.peak_pages).includes(slide.slide_id);
     const pageRole = slide.progression_role;
     const content = validateRenderedReviewAnchors(
       hydrateRenderedSlideRootMetadata(rawContent, {
@@ -1373,12 +1586,12 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       page_core_content: safeArray(slide.page_core_content),
       evidence_and_sources: safeArray(slide.evidence_and_sources),
       director_contract: {
-        visual_motif: safeText(visual?.visual_direction?.visual_motif),
-        source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
-        anti_template_constraints: safeArray(visual?.visual_direction?.anti_template_constraints),
+        visual_motif: safeText(visualArtifact?.visual_direction?.visual_motif),
+        source_language_discipline: safeText(visualArtifact?.visual_direction?.source_language_discipline),
+        anti_template_constraints: safeArray(visualArtifact?.visual_direction?.anti_template_constraints),
         peak_page: peakPage,
         page_role: pageRole,
-        memory_hook: safeText(visual?.visual_direction?.memory_hook),
+        memory_hook: safeText(visualArtifact?.visual_direction?.memory_hook),
         material_rules: {
           paper_base: safeText(materialRules.paper_base, '#FFFBF0'),
           main_accent: safeText(materialRules.main_accent, '#2563EB'),
@@ -1386,7 +1599,7 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
         },
       },
       speaker_seconds: speakerSeconds,
-      total_slides: safeArray(plan?.single_note_plan?.slides).length,
+      total_slides: planSlides.length,
       creative_sources: {
         recipe_selection: recipeDecision,
         final_markup: finalMarkup,
@@ -1398,6 +1611,22 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       markup_contract_source: CREATIVE_MATERIALIZED_FROM,
       content,
     };
+  });
+}
+
+async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
+  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths, adapter);
+  const slideHtmlList = requireObjectArray(data?.slides, 'render_html.slides', { min: 4, max: 8 });
+  const slideHtmlById = new Map(slideHtmlList.map((item) => [safeText(item.slide_id), validateRenderedSlideContent(item.content_html, safeText(item.slide_id))]));
+  const slides = materializeRenderedXhsSlides({
+    planArtifact: plan,
+    visualArtifact: visual,
+    slideHtmlById,
+    generationRuntime,
+    route: 'render_html',
+    adapter,
   });
   const contractRender = renderContract(contract);
   const renderPlan = {
@@ -1423,7 +1652,8 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       director_role: slide.director_contract.page_role,
     })),
   };
-  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverablePaths.deliverableId}.html`);
+  const viewSurfacePaths = getDeliverableViewSurfacePaths(deliverablePaths);
+  const htmlFile = viewSurfacePaths.draftHtmlFile;
   const shellText = readPromptPackText(renderPlan.shell_file);
   writeText(htmlFile, buildHtml({
     title: contract.title,
@@ -1445,7 +1675,148 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       slides,
       render_summary: normalizeStringList(data?.render_summary, 'render_html.render_summary', { min: 1, max: 4 }),
     },
-    artifact_refs: [htmlFile],
+    artifact_refs: [htmlFile, ...seedStableHtmlIfMissing(viewSurfacePaths, htmlFile)],
+  };
+}
+
+async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
+  const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+  const currentRender = readCurrentHtmlArtifact(contract, deliverablePaths);
+  const screenshotReview = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+  const revisionContext = buildFixHtmlRevisionContext(contract, deliverablePaths);
+  const targetSlideIds = selectFixHtmlSlideIds(plan, screenshotReview);
+  if (targetSlideIds.length === 0) {
+    throw new Error('fix_html requires screenshot_review blocked pages or failed cover density checks');
+  }
+  const priorSlideHtmlById = loadPriorRenderedXhsSlideHtmlMap(currentRender);
+  const targetSet = new Set(targetSlideIds);
+  const promptSlides = summarizePlanSlides(plan)
+    .filter((slide) => targetSet.has(safeText(slide?.slide_id)))
+    .map((slide) => ({
+      ...slide,
+      current_content_html: priorSlideHtmlById.get(safeText(slide?.slide_id)) || null,
+    }));
+  const { data, generationRuntime } = await generateStructuredArtifact({
+    adapter,
+    family: 'xiaohongshu',
+    route: PAGE_FIX_ROUTE,
+    promptRelativePath: promptRoute(contract, PAGE_FIX_ROUTE),
+    context: {
+      ...buildAuthoringContext(contract, readStageArtifact(contract, deliverablePaths, 'research')),
+      storyline: readStageArtifact(contract, deliverablePaths, 'storyline')?.storyline || null,
+      plan: {
+        slides: promptSlides,
+      },
+      visual_direction: visual?.visual_direction || null,
+      current_html_stage: currentHtmlStageId(contract, deliverablePaths),
+      revision_context: revisionContext,
+      repair_scope: {
+        target_slide_ids: targetSlideIds,
+        preserved_slide_ids: safeArray(plan?.single_note_plan?.slides)
+          .map((slide) => safeText(slide?.slide_id))
+          .filter((slideId) => slideId && !targetSet.has(slideId)),
+      },
+      shell_contract: {
+        ratio: CANVAS.ratio,
+        width: CANVAS.width,
+        height: CANVAS.height,
+        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+      },
+      html_guardrails: [
+        '只修当前点名卡片，未点名页面必须保持现有结构与视觉家族，不要整套重画。',
+        '若当前卡片已有可用结构，优先局部修复遮挡、溢出、换行、层级和留白，不要换成另一套版式。',
+        '必须保留 data-slide-root=true、匹配的 data-slide-id、至少 2 个 data-qa-block 和 1 个 data-primary-point=true。',
+        '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或制作流程写进画面。',
+      ],
+    },
+    outputContract: renderHtmlOutputContract(),
+    localFileInspection: buildFixHtmlLocalInspection(screenshotReview, targetSlideIds),
+    cwd: deliverablePaths.deliverableDir,
+  });
+  const freshSlideHtmlList = requireObjectArray(data?.slides, 'fix_html.slides', { min: 1, max: targetSlideIds.length });
+  const freshSlideHtmlById = new Map(freshSlideHtmlList.map((item) => [
+    safeText(item.slide_id),
+    validateRenderedSlideContent(item.content_html, safeText(item.slide_id)),
+  ]));
+  const mergedSlideHtmlById = new Map(priorSlideHtmlById);
+  for (const [slideId, html] of freshSlideHtmlById.entries()) {
+    mergedSlideHtmlById.set(slideId, html);
+  }
+  const slides = materializeRenderedXhsSlides({
+    planArtifact: plan,
+    visualArtifact: visual,
+    slideHtmlById: mergedSlideHtmlById,
+    generationRuntime,
+    route: PAGE_FIX_ROUTE,
+    adapter,
+  });
+  const contractRender = renderContract(contract);
+  const renderPlan = {
+    render_strategy: safeText(contractRender.render_strategy, 'upstream_structured_ai_html'),
+    shell_file: resolvePromptPackAsset(contract, safeText(contractRender.shell_file, 'render_shell.html')),
+    pack_id: safeText(contract?.prompt_pack?.pack_id),
+    authored_markup_surface: CREATIVE_MATERIALIZED_FROM,
+    markup_binding_model: 'slides_data_shell_only',
+    repair_scope: {
+      target_slide_ids: targetSlideIds,
+      current_html_stage: currentHtmlStageId(contract, deliverablePaths),
+    },
+    director_contract: {
+      visual_motif: safeText(visual?.visual_direction?.visual_motif),
+      peak_pages: safeArray(visual?.visual_direction?.peak_pages),
+      page_family_ceiling: visual?.visual_direction?.page_family_ceiling || {},
+      anti_template_constraints: safeArray(visual?.visual_direction?.anti_template_constraints),
+      source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
+    },
+    slides: slides.map((slide) => ({
+      slide_id: slide.slide_id,
+      title: slide.title,
+      layout_family: slide.layout_family,
+      recipe_id: slide.recipe_id,
+      template_id: slide.template_id,
+      peak_page: slide.director_contract.peak_page,
+      director_role: slide.director_contract.page_role,
+    })),
+  };
+  const viewSurfacePaths = getDeliverableViewSurfacePaths(deliverablePaths);
+  const htmlFile = viewSurfacePaths.draftHtmlFile;
+  const shellText = readPromptPackText(renderPlan.shell_file);
+  writeText(htmlFile, buildHtml({
+    title: contract.title,
+    slides,
+    renderPlan,
+    renderStrategy: renderPlan.render_strategy,
+    shellText,
+  }));
+  return {
+    ...attachCommon(PAGE_FIX_ROUTE, contract, generationRuntime, adapter),
+    creative_execution: creativeExecution(PAGE_FIX_ROUTE, generationRuntime, adapter),
+    lifecycle_stage: LIFECYCLE_STAGE_BY_ROUTE[PAGE_FIX_ROUTE] || 'visual_authorship',
+    html_bundle: {
+      html_file: htmlFile,
+      page_count: slides.length,
+      shell_contract: CANVAS,
+      render_strategy: renderPlan.render_strategy,
+      director_contract: renderPlan.director_contract,
+      repair_scope: renderPlan.repair_scope,
+      slides,
+      render_summary: normalizeStringList(data?.render_summary, 'fix_html.render_summary', { min: 1, max: 4 }),
+    },
+    artifact_refs: [htmlFile, ...seedStableHtmlIfMissing(viewSurfacePaths, htmlFile)],
+    review_state_patch: {
+      current_status: 'draft',
+      ready_for_export: false,
+      latest_review_stage: PAGE_FIX_ROUTE,
+      latest_checks: {},
+      pending_reviews: [],
+      blocking_reasons: [],
+      rerun_from_stage: null,
+      rerun_policy: {
+        status: 'idle',
+        rerun_from_stage: null,
+      },
+    },
   };
 }
 
@@ -1454,7 +1825,7 @@ async function generateDirectorReviewDraft(contract, deliverablePaths, adapter =
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const render = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const render = readCurrentHtmlArtifact(contract, deliverablePaths);
   return generateStructuredArtifact({
     adapter,
     family: 'xiaohongshu',
@@ -1597,6 +1968,7 @@ function buildScreenshotReviewMarkdown(contract, reviewArtifact, reviewOwner) {
 async function generateScreenshotReviewDraft(
   contract,
   deliverablePaths,
+  renderArtifact,
   slideReviews,
   reviewPayload,
   mode,
@@ -1607,6 +1979,7 @@ async function generateScreenshotReviewDraft(
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  const renderedSlideHtmlById = loadPriorRenderedXhsSlideHtmlMap(renderArtifact);
   return generateStructuredArtifact({
     adapter,
     family: 'xiaohongshu',
@@ -1622,6 +1995,7 @@ async function generateScreenshotReviewDraft(
       visual_direction: visual?.visual_direction || null,
       director_review: directorReview?.visual_director_review || null,
       screenshot_mechanics: {
+        source_html_file: safeText(renderArtifact?.html_bundle?.html_file) || null,
         overall_checks: reviewPayload?.checks || null,
         metrics: reviewPayload?.metrics || null,
         baseline: reviewPayload?.baseline || null,
@@ -1633,6 +2007,7 @@ async function generateScreenshotReviewDraft(
           issues: slide.issues,
           occupied_ratio: slide.metrics?.occupied_ratio ?? null,
           primary_points: slide.metrics?.primary_points ?? null,
+          source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
         })),
       },
     },
@@ -1656,7 +2031,7 @@ async function buildScreenshotReview(
   baselineDeliverableId,
   adapter = CODEX_DEFAULT_ADAPTER,
 ) {
-  const render = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const render = readCurrentHtmlArtifact(contract, deliverablePaths);
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
   const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
@@ -1701,6 +2076,7 @@ async function buildScreenshotReview(
   const { data, generationRuntime } = await generateScreenshotReviewDraft(
     contract,
     deliverablePaths,
+    render,
     mechanicalSlideReviews,
     python,
     mode,
@@ -1729,7 +2105,13 @@ async function buildScreenshotReview(
       && Boolean(data?.anti_template_ok),
     memory_hook_present: Boolean(directorReview?.visual_director_review?.memory_hook_present),
   };
-  const status = Object.values(checks).every((value) => value === true) ? 'pass' : 'block';
+  const failedChecks = Object.entries(checks)
+    .filter(([, value]) => value === false)
+    .map(([key]) => key);
+  const status = failedChecks.length === 0 ? 'pass' : 'block';
+  const rerunFromStage = status === 'pass'
+    ? null
+    : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
   const artifact = {
     ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
     review_overlay: 'screenshot_review',
@@ -1773,12 +2155,12 @@ async function buildScreenshotReview(
       ready_for_export: false,
       latest_review_stage: 'screenshot_review',
       latest_checks: checks,
-      pending_reviews: status === 'pass' ? [] : Object.entries(checks).filter(([, value]) => value === false).map(([key]) => key),
-      blocking_reasons: status === 'pass' ? [] : Object.entries(checks).filter(([, value]) => value === false).map(([key]) => key),
-      rerun_from_stage: status === 'pass' ? null : 'render_html',
+      pending_reviews: failedChecks,
+      blocking_reasons: failedChecks,
+      rerun_from_stage: rerunFromStage,
       rerun_policy: {
         status: status === 'pass' ? 'idle' : 'rerun_required',
-        rerun_from_stage: status === 'pass' ? null : 'render_html',
+        rerun_from_stage: rerunFromStage,
       },
     },
   };
@@ -1799,6 +2181,14 @@ async function buildScreenshotReview(
     reviewMarkdown,
     buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime, adapter)),
   );
+  if (artifact.status === 'pass') {
+    artifact.artifact_refs = [
+      ...new Set([
+        ...safeArray(artifact.artifact_refs),
+        ...promoteStableHtml(getDeliverableViewSurfacePaths(deliverablePaths), render.html_bundle.html_file),
+      ]),
+    ];
+  }
   return artifact;
 }
 
@@ -1806,7 +2196,7 @@ async function generatePublishCopyDraft(contract, deliverablePaths, adapter = CO
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-  const render = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const render = readCurrentHtmlArtifact(contract, deliverablePaths);
   return generateStructuredArtifact({
     adapter,
     family: 'xiaohongshu',
@@ -1829,7 +2219,7 @@ async function generatePublishCopyDraft(contract, deliverablePaths, adapter = CO
 
 async function buildPublishCopy(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-  const render = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const render = readCurrentHtmlArtifact(contract, deliverablePaths);
   const titles = safeArray(plan?.single_note_plan?.title_options).slice(0, 3);
   const { data, generationRuntime } = await generatePublishCopyDraft(contract, deliverablePaths, adapter);
   const hydratedTitles = titles;
@@ -1946,13 +2336,16 @@ function buildExportBundle(
   deliverablePaths,
   adapter = CODEX_DEFAULT_ADAPTER,
 ) {
-  const render = readStageArtifact(contract, deliverablePaths, 'render_html');
   const review = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
   const copy = readStageArtifact(contract, deliverablePaths, 'publish_copy');
+  const stableHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths).stableHtmlFile;
+  if (!existsSync(stableHtmlFile)) {
+    throw new Error(`Route export_bundle requires reviewed stable HTML surface before export: ${stableHtmlFile}`);
+  }
   const pngFiles = safeArray(review?.slide_reviews).map((slide) => slide.screenshot_file);
   const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
   const exportBundle = {
-    html_file: render.html_bundle.html_file,
+    html_file: stableHtmlFile,
     png_files: pngFiles,
     caption_file: copy.publish_copy.caption_file,
     publish_manifest_file: manifestFile,
@@ -1967,7 +2360,7 @@ function buildExportBundle(
     status: 'completed',
     export_bundle: exportBundle,
     series_surfaces: computeSeriesSurfaces(contract, deliverablePaths, exportBundle),
-    artifact_refs: [manifestFile, render.html_bundle.html_file, copy.publish_copy.caption_file, ...pngFiles].filter(Boolean),
+    artifact_refs: [manifestFile, stableHtmlFile, copy.publish_copy.caption_file, ...pngFiles].filter(Boolean),
     review_state_patch: {
       current_status: 'publish_ready',
       ready_for_export: true,
@@ -2020,6 +2413,8 @@ export async function runXiaohongshuRoute({
       return await buildVisualDirection(contract, deliverablePaths, mode, baselineDeliverableId, adapter);
     case 'render_html':
       return await buildRenderHtml(contract, deliverablePaths, adapter);
+    case 'fix_html':
+      return await buildFixHtml(contract, deliverablePaths, adapter);
     case 'visual_director_review':
       return await buildDirectorReview(contract, deliverablePaths, adapter);
     case 'screenshot_review':

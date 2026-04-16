@@ -1,5 +1,13 @@
 import path from 'node:path';
-import { mkdirSync, existsSync, readFileSync, appendFileSync, writeFileSync, readdirSync } from 'node:fs';
+import {
+  mkdirSync,
+  existsSync,
+  readFileSync,
+  appendFileSync,
+  writeFileSync,
+  readdirSync,
+  statSync,
+} from 'node:fs';
 
 import { getDeliverablePaths, loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary } from '@redcube/runtime-protocol';
 import { assertGovernanceParity, buildGovernanceSurface, validatePublicationProjection } from './governance-surface.js';
@@ -105,6 +113,92 @@ function stageArtifactPath(contract, deliverablePaths, stageId) {
     : null;
   const artifactName = safeText(stage?.output_artifact, `${stageId}.json`);
   return path.join(deliverablePaths.artifactsDir, artifactName);
+}
+
+function stageSequence(contract) {
+  return Array.isArray(contract?.stage_sequence?.stages)
+    ? contract.stage_sequence.stages
+      .map((stage) => safeText(stage?.stage_id))
+      .filter(Boolean)
+    : [];
+}
+
+function stageIndex(contract, stageId) {
+  const sequence = stageSequence(contract);
+  return sequence.indexOf(safeText(stageId));
+}
+
+function safeMtimeMs(file) {
+  if (!safeText(file) || !existsSync(file)) {
+    return 0;
+  }
+  try {
+    return Number(statSync(file).mtimeMs || 0);
+  } catch {
+    return 0;
+  }
+}
+
+function derivePreExportReviewFreshness({ contract, deliverablePaths, reviewState }) {
+  const requiredExportRoute = safeText(contract?.delivery_contract?.required_export_route);
+  if (!requiredExportRoute) {
+    return {
+      export_artifact_file: null,
+      export_artifact_mtime_ms: 0,
+      stale: true,
+      stale_reasons: ['missing_required_export_route'],
+    };
+  }
+
+  const exportArtifactFile = stageArtifactPath(contract, deliverablePaths, requiredExportRoute);
+  const exportArtifactMtimeMs = safeMtimeMs(exportArtifactFile);
+  if (!exportArtifactMtimeMs) {
+    return {
+      export_artifact_file: exportArtifactFile,
+      export_artifact_mtime_ms: 0,
+      stale: true,
+      stale_reasons: ['missing_export_artifact'],
+    };
+  }
+
+  const exportRouteIndex = stageIndex(contract, requiredExportRoute);
+  const latestReviewStage = safeText(reviewState?.latest_review_stage);
+  const latestReviewStageIndex = stageIndex(contract, latestReviewStage);
+  const staleReasons = [];
+
+  if (!reviewState?.ready_for_export) {
+    staleReasons.push('review_state_not_ready_for_export');
+  }
+  if (safeText(reviewState?.current_status) === 'blocked_for_revision') {
+    staleReasons.push('review_state_blocked_for_revision');
+  }
+  if (latestReviewStage && latestReviewStageIndex !== -1 && latestReviewStageIndex < exportRouteIndex) {
+    staleReasons.push(`latest_review_stage_before_${requiredExportRoute}`);
+  }
+
+  let newestUpstreamStage = null;
+  let newestUpstreamMtimeMs = 0;
+  for (const stageId of stageSequence(contract)) {
+    const stageOrder = stageIndex(contract, stageId);
+    if (stageOrder === -1 || stageOrder >= exportRouteIndex) continue;
+    const artifactMtimeMs = safeMtimeMs(stageArtifactPath(contract, deliverablePaths, stageId));
+    if (artifactMtimeMs > newestUpstreamMtimeMs) {
+      newestUpstreamMtimeMs = artifactMtimeMs;
+      newestUpstreamStage = stageId;
+    }
+  }
+  if (newestUpstreamMtimeMs > exportArtifactMtimeMs) {
+    staleReasons.push(`upstream_stage_newer_than_${requiredExportRoute}:${newestUpstreamStage}`);
+  }
+
+  return {
+    export_artifact_file: exportArtifactFile,
+    export_artifact_mtime_ms: exportArtifactMtimeMs,
+    newest_upstream_stage: newestUpstreamStage,
+    newest_upstream_mtime_ms: newestUpstreamMtimeMs,
+    stale: staleReasons.length > 0,
+    stale_reasons: staleReasons,
+  };
 }
 
 function loadDeliveryArtifact({ contract, deliverablePaths }) {
@@ -248,20 +342,21 @@ function toDirectDeliveryNext(current) {
   return null;
 }
 
-function buildProjectionState({ reviewState, contract, deliveryArtifact }) {
+function buildProjectionState({ reviewState, contract, deliveryArtifact, deliverablePaths }) {
   const deliveryContract = contract?.delivery_contract || null;
   const projectionModel = safeText(deliveryContract?.projection_model);
   const artifactDeliveryState = deliveryArtifact?.export_bundle?.delivery_state || null;
+  const exportFreshness = derivePreExportReviewFreshness({ contract, deliverablePaths, reviewState });
   if (projectionModel === 'human_publication') {
     const current = safeText(reviewState?.publish_state?.current, 'draft');
     return {
       current,
       next: derivePublishNext(current),
-      delivery_state: artifactDeliveryState,
+      delivery_state: exportFreshness.stale ? null : artifactDeliveryState,
     };
   }
 
-  if (artifactDeliveryState?.current) {
+  if (!exportFreshness.stale && artifactDeliveryState?.current) {
     return {
       current: safeText(artifactDeliveryState.current),
       next: safeText(artifactDeliveryState.next) || null,
@@ -381,7 +476,12 @@ function toPublicationProjectionEntry({
 }) {
   const deliveryContract = contract?.delivery_contract || null;
   const deliveryArtifact = loadDeliveryArtifact({ contract, deliverablePaths });
-  const projectionState = buildProjectionState({ reviewState, contract, deliveryArtifact });
+  const projectionState = buildProjectionState({
+    reviewState,
+    contract,
+    deliveryArtifact,
+    deliverablePaths,
+  });
   const lifecycleStageSummary = buildLifecycleStageSummary(contract);
   const governanceSurface = buildGovernanceSurface(contract);
   const entry = {
@@ -513,23 +613,21 @@ export function getReviewState(request) {
     deliverablePaths,
     sourceReadinessSummary,
   });
-  const projectionFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
-  if (existsSync(projectionFile)) {
-    const publication = safeReadJson(projectionFile);
-    if (!publication) {
-      throw new Error('getReviewState governance summary invalid publication projection file');
-    }
-    validatePublicationProjection(publication);
-    const storedEntry = publication?.deliverables?.[deliverableId] || null;
-    if (!storedEntry) {
-      throw new Error(`getReviewState governance parity missing publication projection entry for ${deliverableId}`);
-    }
-    assertGovernanceParity(
-      `getReviewState.${deliverableId}`,
-      publicationProjectionEntry,
-      storedEntry,
-    );
+  const projectionFile = rebuildTopicPublicationProjection({ workspaceRoot, topicId });
+  const publication = safeReadJson(projectionFile);
+  if (!publication) {
+    throw new Error('getReviewState governance summary invalid publication projection file');
   }
+  validatePublicationProjection(publication);
+  const storedEntry = publication?.deliverables?.[deliverableId] || null;
+  if (!storedEntry) {
+    throw new Error(`getReviewState governance parity missing publication projection entry for ${deliverableId}`);
+  }
+  assertGovernanceParity(
+    `getReviewState.${deliverableId}`,
+    publicationProjectionEntry,
+    storedEntry,
+  );
   return {
     ok: true,
     surface_kind: 'review_state',
@@ -550,10 +648,7 @@ export function getReviewState(request) {
 }
 
 export function getPublicationProjection({ workspaceRoot, topicId }) {
-  const projectionFile = path.join(workspaceRoot, 'topics', topicId, 'publication-state.json');
-  if (!existsSync(projectionFile)) {
-    rebuildTopicPublicationProjection({ workspaceRoot, topicId });
-  }
+  const projectionFile = rebuildTopicPublicationProjection({ workspaceRoot, topicId });
   const publication = safeReadJson(projectionFile);
   if (!publication) {
     throw new Error('getPublicationProjection governance summary invalid publication projection file');
@@ -590,7 +685,7 @@ export function persistReviewStatePatch({ workspaceRoot, topicId, deliverableId,
     pending_reviews: patch.pending_reviews !== undefined ? normalizeList(patch.pending_reviews) : previous.pending_reviews,
     blocking_reasons: patch.blocking_reasons !== undefined ? normalizeList(patch.blocking_reasons) : previous.blocking_reasons,
     rerun_from_stage: Object.hasOwn(patch, 'rerun_from_stage') ? patch.rerun_from_stage : previous.rerun_from_stage,
-    latest_checks: patch.latest_checks ? { ...previous.latest_checks, ...patch.latest_checks } : previous.latest_checks,
+    latest_checks: patch.latest_checks ? { ...patch.latest_checks } : previous.latest_checks,
     baseline: patch.baseline ? { ...(previous.baseline || {}), ...patch.baseline } : previous.baseline,
     rerun_policy: patch.rerun_policy ? { ...(previous.rerun_policy || {}), ...patch.rerun_policy } : previous.rerun_policy,
     approval_state: patch.approval_state

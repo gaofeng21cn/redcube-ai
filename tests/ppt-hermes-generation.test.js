@@ -164,3 +164,64 @@ test('ppt authoring context keeps lecture_peer audience and public source labels
     assert.equal(storyline.storyline?.fact_library_summary.includes('English'), false);
   });
 });
+
+test('ppt screenshot review escalates speaker fit failures back to slide_blueprint instead of staying at render_html', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-stage-'));
+
+    const created = await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'MedAutoScience 系统介绍',
+      goal: '面向医学人工智能小同行正式讲课，讲清系统设计、推进路径与模块复用。',
+    });
+
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const renderArtifact = readJson(path.join(path.dirname(created.deliverableFile), 'artifacts', 'render_bundle.json'));
+    const htmlFile = renderArtifact.html_bundle?.html_file;
+    const originalHtml = readFileSync(htmlFile, 'utf-8');
+    writeFileSync(
+      htmlFile,
+      originalHtml.replace(/data-speaker-seconds="65"/g, 'data-speaker-seconds="5"'),
+      'utf-8',
+    );
+
+    const directorReviewResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorReviewResult.ok, true);
+
+    const screenshotReviewResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'screenshot_review',
+    });
+    assert.equal(screenshotReviewResult.ok, false);
+    assert.match(screenshotReviewResult.run?.error?.message || '', /Route screenshot_review blocked/);
+
+    const reviewArtifact = readJson(path.join(path.dirname(created.deliverableFile), 'artifacts', 'quality_gate.json'));
+    assert.equal(reviewArtifact.status, 'block');
+    assert.equal(reviewArtifact.checks?.speaker_fit_ok, false);
+    assert.equal(reviewArtifact.review_state_patch?.rerun_from_stage, 'slide_blueprint');
+    assert.equal(reviewArtifact.review_state_patch?.rerun_policy?.rerun_from_stage, 'slide_blueprint');
+  });
+});

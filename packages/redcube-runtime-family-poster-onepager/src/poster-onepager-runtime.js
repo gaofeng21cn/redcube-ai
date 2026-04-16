@@ -55,6 +55,46 @@ function ensureDir(dir) {
   return dir;
 }
 
+function copySurfaceFile(source, destination) {
+  const sourceFile = safeText(source);
+  const destinationFile = safeText(destination);
+  if (!sourceFile || !destinationFile || !existsSync(sourceFile)) return null;
+  ensureDir(path.dirname(destinationFile));
+  writeFileSync(destinationFile, readFileSync(sourceFile));
+  return destinationFile;
+}
+
+function getDeliverableViewSurfacePaths(deliverablePaths, deliverableId) {
+  return {
+    stableHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.html`),
+    stableSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`),
+    draftHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.html`),
+    draftSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.slides.json`),
+  };
+}
+
+function seedStableViewIfMissing(paths, htmlFile, slidesFile) {
+  const refs = [];
+  if (!existsSync(paths.stableHtmlFile)) {
+    const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
+    if (stableHtmlRef) refs.push(stableHtmlRef);
+  }
+  if (!existsSync(paths.stableSlidesFile)) {
+    const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
+    if (stableSlidesRef) refs.push(stableSlidesRef);
+  }
+  return refs;
+}
+
+function promoteStableView(paths, htmlFile, slidesFile) {
+  const refs = [];
+  const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
+  if (stableHtmlRef) refs.push(stableHtmlRef);
+  const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
+  if (stableSlidesRef) refs.push(stableSlidesRef);
+  return refs;
+}
+
 function writeJson(file, value) {
   ensureDir(path.dirname(file));
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
@@ -401,12 +441,7 @@ function buildAiFirstVisualSlideReview(slide, aiReview) {
 }
 
 function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
-  return safeArray(slideReviews).every((slide) => {
-    if (hasAiVisualPass(slide?.ai_review)) {
-      return true;
-    }
-    return Boolean(slide?.checks?.[checkKey]);
-  });
+  return safeArray(slideReviews).every((slide) => Boolean(slide?.checks?.[checkKey]));
 }
 
 function requireObjectArray(value, label, { min = 1, max = 6 } = {}) {
@@ -696,6 +731,14 @@ function validateRenderedPosterHtml(content, slideId) {
     throw new Error(`poster render_html slide contains forbidden style tag: ${slideId}`);
   }
   return html;
+}
+
+function loadRenderedPosterSlideHtmlMap(renderArtifact) {
+  return new Map(
+    safeArray(renderArtifact?.html_bundle?.slides)
+      .map((slide) => [safeText(slide?.slide_id), requireText(slide?.content, 'render_html.html_bundle.slides[].content')])
+      .filter(([slideId]) => slideId),
+  );
 }
 
 function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
@@ -1222,8 +1265,9 @@ async function buildRenderHtmlArtifact({
       template_id: slide.template_id,
     })),
   };
-  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
-  const slidesFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
+  const viewSurfacePaths = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId);
+  const htmlFile = viewSurfacePaths.draftHtmlFile;
+  const slidesFile = viewSurfacePaths.draftSlidesFile;
   const shellText = readPromptPackText(renderPlan.shell_file);
   writeText(htmlFile, buildHtml({
     title: contract.title,
@@ -1265,7 +1309,7 @@ async function buildRenderHtmlArtifact({
       slides,
       render_plan: renderPlan,
     },
-    artifact_refs: [htmlFile, slidesFile],
+    artifact_refs: [htmlFile, slidesFile, ...seedStableViewIfMissing(viewSurfacePaths, htmlFile, slidesFile)],
   };
 }
 
@@ -1436,6 +1480,7 @@ function buildScreenshotReviewMarkdown(contract, reviewArtifact, reviewOwner) {
 async function generateScreenshotReviewDraft(
   contract,
   deliverablePaths,
+  renderArtifact,
   slideReviews,
   reviewPayload,
   mode,
@@ -1445,6 +1490,7 @@ async function generateScreenshotReviewDraft(
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'poster_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  const renderedSlideHtmlById = loadRenderedPosterSlideHtmlMap(renderArtifact);
   return generateStructuredArtifact({
     adapter,
     family: 'poster_onepager',
@@ -1466,6 +1512,7 @@ async function generateScreenshotReviewDraft(
       visual_direction: visualArtifact?.visual_direction || null,
       director_review: directorReviewArtifact?.visual_director_review || null,
       screenshot_mechanics: {
+        source_html_file: safeText(renderArtifact?.html_bundle?.html_file) || null,
         overall_checks: reviewPayload?.checks || null,
         metrics: reviewPayload?.metrics || null,
         baseline: reviewPayload?.baseline || null,
@@ -1477,6 +1524,7 @@ async function generateScreenshotReviewDraft(
           issues: slide.issues,
           occupied_ratio: slide.metrics?.occupied_ratio ?? null,
           primary_points: slide.metrics?.primary_points ?? null,
+          source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
         })),
       },
     },
@@ -1584,6 +1632,7 @@ async function buildScreenshotReview(
   const { data, generationRuntime } = await generateScreenshotReviewDraft(
     contract,
     deliverablePaths,
+    renderArtifact,
     mechanicalSlideReviews,
     python,
     mode,
@@ -1688,15 +1737,33 @@ async function buildScreenshotReview(
     reviewMarkdown,
     buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime, adapter)),
   );
+  if (artifact.status === 'pass') {
+    artifact.artifact_refs = [
+      ...new Set([
+        ...safeArray(artifact.artifact_refs),
+        ...promoteStableView(
+          getDeliverableViewSurfacePaths(deliverablePaths, deliverablePaths.deliverableId),
+          renderArtifact.html_bundle.html_file,
+          renderArtifact.html_bundle.slides_file,
+        ),
+      ]),
+    ];
+  }
   return artifact;
 }
 
 function buildExportBundle(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-  const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
   const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+  const stableViewHtmlFile = getDeliverableViewSurfacePaths(
+    deliverablePaths,
+    deliverablePaths.deliverableId,
+  ).stableHtmlFile;
+  if (!existsSync(stableViewHtmlFile)) {
+    throw new Error(`Route export_bundle requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
+  }
   const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
   const exportBundle = {
-    source_html: renderArtifact.html_bundle.html_file,
+    source_html: stableViewHtmlFile,
     png_files: safeArray(reviewArtifact.slide_reviews).map((slide) => slide.screenshot_file).filter(Boolean),
     review_markdown: safeText(reviewArtifact.report_markdown),
     publish_manifest_file: manifestFile,
@@ -1710,7 +1777,7 @@ function buildExportBundle(contract, deliverablePaths, adapter = CODEX_DEFAULT_A
     ...attachCommon('export_bundle', contract, null, adapter),
     status: 'completed',
     export_bundle: exportBundle,
-    artifact_refs: [manifestFile, exportBundle.source_html, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean),
+    artifact_refs: [manifestFile, stableViewHtmlFile, exportBundle.review_markdown, ...exportBundle.png_files].filter(Boolean),
     review_state_patch: {
       current_status: 'completed',
       ready_for_export: true,

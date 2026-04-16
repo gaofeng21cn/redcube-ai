@@ -16,6 +16,7 @@ export type PptDeckStageId =
   | 'slide_blueprint'
   | 'visual_direction'
   | 'render_html'
+  | 'fix_html'
   | 'visual_director_review'
   | 'screenshot_review'
   | 'export_pptx';
@@ -25,6 +26,7 @@ export type PptDeckPromptFile =
   | 'slide_blueprint.md'
   | 'visual_direction.md'
   | 'render_html.md'
+  | 'fix_html.md'
   | 'director_review.md'
   | 'screenshot_review.md'
   | 'export_pptx.md';
@@ -34,6 +36,7 @@ export type PptDeckOutputArtifactFile =
   | 'slide_blueprint.json'
   | 'visual_direction.json'
   | 'render_bundle.json'
+  | 'fix_bundle.json'
   | 'director_review.json'
   | 'quality_gate.json'
   | 'publish_bundle.json';
@@ -42,6 +45,8 @@ export type PptDeckReviewCheck =
   | 'occlusion_free'
   | 'visual_density_ok'
   | 'speaker_fit_ok'
+  | 'edge_clearance_ok'
+  | 'title_typography_ok'
   | 'director_intent_landed'
   | 'anti_template_ok'
   | 'baseline_comparison_passed'
@@ -112,6 +117,7 @@ export interface PptDeckStageRequirements {
   slide_blueprint: PptDeckStageRequirement;
   visual_direction: PptDeckStageRequirement;
   render_html: PptDeckStageRequirement;
+  fix_html: PptDeckStageRequirement;
   visual_director_review: PptDeckStageRequirement;
   screenshot_review: PptDeckStageRequirement;
   export_pptx: PptDeckStageRequirement;
@@ -122,10 +128,12 @@ export interface PptDeckReviewConditionalChecks {
 }
 
 export interface PptDeckReviewRerunMap {
-  overflow_free: 'render_html';
-  occlusion_free: 'render_html';
+  overflow_free: 'fix_html';
+  occlusion_free: 'fix_html';
   visual_density_ok: 'visual_direction';
   speaker_fit_ok: 'slide_blueprint';
+  edge_clearance_ok: 'fix_html';
+  title_typography_ok: 'fix_html';
   director_intent_landed: 'visual_director_review';
   anti_template_ok: 'visual_director_review';
   baseline_comparison_passed: 'visual_direction';
@@ -199,6 +207,7 @@ export interface PptDeckPromptRoutes {
   slide_blueprint: string;
   visual_direction: string;
   render_html: string;
+  fix_html: string;
   visual_director_review: string;
   screenshot_review: string;
   export_pptx: string;
@@ -214,6 +223,7 @@ export interface PptDeckPromptStages {
   slide_blueprint: PptDeckPromptStageFile;
   visual_direction: PptDeckPromptStageFile;
   render_html: PptDeckPromptStageFile;
+  fix_html: PptDeckPromptStageFile;
   visual_director_review: PptDeckPromptStageFile;
   screenshot_review: PptDeckPromptStageFile;
   export_pptx: PptDeckPromptStageFile;

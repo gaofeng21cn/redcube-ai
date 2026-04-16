@@ -21,6 +21,12 @@ OVERLAP_RATIO = 0.08
 MIN_SPEAKER_SECONDS = 20
 MAX_SPEAKER_SECONDS = 120
 DEFAULT_DEVICE_SCALE_FACTOR = 2.0
+MIN_BLOCK_EDGE_CLEARANCE = 24.0
+MIN_LARGE_BLOCK_BOTTOM_CLEARANCE = 32.0
+MIN_CONTENT_PADDING = 8.0
+TITLE_FONT_SIZE_TOLERANCE = 2.5
+EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
+INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
 
 
 def fail(message: str) -> None:
@@ -45,9 +51,115 @@ def overlap_details(block_a: Dict[str, Any], block_b: Dict[str, Any]) -> Tuple[f
     return overlap_w, overlap_h, overlap_area
 
 
+def is_decorative_surface_container(block: Dict[str, Any]) -> bool:
+    return bool(block.get('hasSurfaceFrame')) and int(block.get('textNodeCount', 0) or 0) == 0
+
+
+def should_ignore_overlap(block_a: Dict[str, Any], block_b: Dict[str, Any], ratio: float) -> bool:
+    if ratio < 0.98:
+        return False
+    return is_decorative_surface_container(block_a) != is_decorative_surface_container(block_b)
+
+
+def is_clearance_relevant_block(block: Dict[str, Any]) -> bool:
+    block_id = str(block.get('id') or '').lower()
+    if any(token in block_id for token in EDGE_CLEARANCE_IGNORED_IDS):
+        return False
+    return float(block.get('area', 0) or 0) >= 3000.0 and float(block.get('height', 0) or 0) >= 60.0
+
+
+def is_internal_padding_relevant(block: Dict[str, Any]) -> bool:
+    block_id = str(block.get('id') or '').lower()
+    if any(token in block_id for token in EDGE_CLEARANCE_IGNORED_IDS):
+        return False
+    if float(block.get('height', 0) or 0) < 72.0:
+        return False
+    return bool(block.get('hasSurfaceFrame')) or any(token in block_id for token in INTERNAL_PADDING_ROLE_HINTS)
+
+
+def clearance_failures(block: Dict[str, Any]) -> List[Dict[str, Any]]:
+    failures: List[Dict[str, Any]] = []
+    if not is_clearance_relevant_block(block):
+        return failures
+    edge_clearance = block.get('edgeClearance', {}) or {}
+    internal_padding = block.get('internalPadding', {}) or {}
+    block_height = float(block.get('height', 0) or 0)
+    side_thresholds = {
+        'left': MIN_BLOCK_EDGE_CLEARANCE,
+        'top': MIN_BLOCK_EDGE_CLEARANCE,
+        'right': MIN_BLOCK_EDGE_CLEARANCE,
+        'bottom': MIN_LARGE_BLOCK_BOTTOM_CLEARANCE if block_height >= 120.0 else MIN_BLOCK_EDGE_CLEARANCE,
+    }
+    for side, threshold in side_thresholds.items():
+        value = float(edge_clearance.get(side, 9999) or 0)
+        if value < threshold:
+            failures.append({
+                'block_id': block.get('id'),
+                'scope': 'wrapper_edge',
+                'side': side,
+                'value': round(value, 2),
+                'threshold': round(threshold, 2),
+            })
+    if internal_padding and is_internal_padding_relevant(block):
+        for side in ('left', 'top', 'right', 'bottom'):
+            value = float(internal_padding.get(side, 9999) or 0)
+            if value < MIN_CONTENT_PADDING:
+                failures.append({
+                    'block_id': block.get('id'),
+                    'scope': 'block_padding',
+                    'side': side,
+                    'value': round(value, 2),
+                    'threshold': round(MIN_CONTENT_PADDING, 2),
+                })
+    return failures
+
+
+def title_consistency_exempt(review: Dict[str, Any]) -> bool:
+    slide_id = str(review.get('slide_id') or '')
+    layout_family = str(review.get('layout_family') or '')
+    return slide_id == 'S01' or layout_family == 'cover_signal'
+
+
+def apply_title_typography_consistency(slide_reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
+    body_sizes = [
+        float(review.get('metrics', {}).get('title_font_size') or 0)
+        for review in slide_reviews
+        if not title_consistency_exempt(review) and float(review.get('metrics', {}).get('title_font_size') or 0) > 0
+    ]
+    reference = statistics.median(body_sizes) if body_sizes else 0.0
+    for review in slide_reviews:
+        checks = review.setdefault('checks', {})
+        metrics = review.setdefault('metrics', {})
+        if title_consistency_exempt(review):
+            checks['title_typography_ok'] = True
+            metrics['title_font_reference'] = round(reference, 2) if reference else None
+            metrics['title_font_delta'] = 0.0
+            continue
+        font_size = float(metrics.get('title_font_size') or 0)
+        if reference <= 0 or font_size <= 0:
+            checks['title_typography_ok'] = False
+            metrics['title_font_reference'] = round(reference, 2) if reference else None
+            metrics['title_font_delta'] = None
+            if 'title_typography_inconsistent' not in review['issues']:
+                review['issues'].append('title_typography_inconsistent')
+            continue
+        delta = abs(font_size - reference)
+        checks['title_typography_ok'] = delta <= TITLE_FONT_SIZE_TOLERANCE
+        metrics['title_font_reference'] = round(reference, 2)
+        metrics['title_font_delta'] = round(delta, 2)
+        if not checks['title_typography_ok'] and 'title_typography_inconsistent' not in review['issues']:
+            review['issues'].append('title_typography_inconsistent')
+    return {
+        'reference_font_size': round(reference, 2) if reference else None,
+        'body_slide_count': len(body_sizes),
+    }
+
+
 def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
     wrapper = info.get('wrapper', {}) or {}
     blocks = info.get('blocks', []) or []
+    audit_blocks = info.get('auditBlocks', []) or []
+    title_meta = info.get('titleMeta', {}) or {}
     issues: List[str] = []
     overflow_free = (
         float(wrapper.get('scrollWidth', 0)) <= float(wrapper.get('clientWidth', 0)) + 1
@@ -66,6 +178,8 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
                 smaller_area = max(1.0, min(float(block.get('area', 0)), float(other.get('area', 0))))
                 ratio = overlap_area / smaller_area
                 if ratio >= OVERLAP_RATIO:
+                    if should_ignore_overlap(block, other, ratio):
+                        continue
                     overlaps.append({
                         'a': block.get('id'),
                         'b': other.get('id'),
@@ -88,6 +202,13 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
     if not speaker_fit_ok:
         issues.append('speaker_fit_out_of_range')
 
+    edge_failures = []
+    for block in audit_blocks:
+        edge_failures.extend(clearance_failures(block))
+    edge_clearance_ok = len(edge_failures) == 0
+    if not edge_clearance_ok:
+        issues.append('edge_clearance_out_of_range')
+
     return {
         'slide_id': info.get('slideId'),
         'title': info.get('title'),
@@ -97,19 +218,25 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'occlusion_free': occlusion_free,
             'visual_density_ok': visual_density_ok,
             'speaker_fit_ok': speaker_fit_ok,
+            'edge_clearance_ok': edge_clearance_ok,
+            'title_typography_ok': True,
         },
         'metrics': {
             'occupied_ratio': round(occupied_ratio, 4),
             'primary_points': primary_points,
             'speaker_seconds': speaker_seconds,
             'overlaps': overlaps,
+            'edge_clearance_failures': edge_failures,
+            'title_font_size': round(float(title_meta.get('titleFontSize', 0) or 0), 2),
+            'title_line_count': int(title_meta.get('titleLineCount', 0) or 0),
+            'title_block_id': title_meta.get('titleBlockId'),
         },
         'issues': issues,
     }
 
 
 def summarize_checks(slide_reviews: List[Dict[str, Any]]) -> Dict[str, bool]:
-    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok']
+    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok', 'edge_clearance_ok', 'title_typography_ok']
     return {
         key: all(bool(review.get('checks', {}).get(key)) for review in slide_reviews)
         for key in keys
@@ -256,6 +383,7 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
             await context.close()
             await browser.close()
 
+    title_metrics = apply_title_typography_consistency(slide_reviews)
     screenshot_dimensions = {
         'width': int(round(float(args.frame_width) * float(args.device_scale_factor))),
         'height': int(round(float(args.frame_height) * float(args.device_scale_factor))),
@@ -273,6 +401,7 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
         'metrics': {
             'slide_count': len(slide_reviews),
             'average_density': round(statistics.mean([review['metrics']['occupied_ratio'] for review in slide_reviews]) if slide_reviews else 0.0, 4),
+            'title_typography_reference': title_metrics['reference_font_size'],
         },
         'device_scale_factor': float(args.device_scale_factor),
         'screenshot_dimensions': screenshot_dimensions,

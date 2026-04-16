@@ -12,6 +12,7 @@ export type XiaohongshuStageId =
   | 'single_note_plan'
   | 'visual_direction'
   | 'render_html'
+  | 'fix_html'
   | 'visual_director_review'
   | 'screenshot_review'
   | 'publish_copy'
@@ -22,6 +23,7 @@ export type XiaohongshuPromptFile =
   | 'single_note_plan.md'
   | 'visual_direction.md'
   | 'render_html.md'
+  | 'fix_html.md'
   | 'director_review.md'
   | 'screenshot_review.md'
   | 'publish_copy.md'
@@ -32,6 +34,7 @@ export type XiaohongshuOutputArtifactFile =
   | 'single_note_plan.json'
   | 'visual_direction.json'
   | 'render_bundle.json'
+  | 'fix_bundle.json'
   | 'director_review.json'
   | 'quality_gate.json'
   | 'publish_copy.json'
@@ -65,6 +68,7 @@ export type XiaohongshuDisplaySurfaceId =
   | 'single_note_plan'
   | 'visual_direction'
   | 'render_html'
+  | 'fix_html'
   | 'visual_director_review'
   | 'screenshot_review'
   | 'publish_copy'
@@ -139,6 +143,7 @@ export interface XiaohongshuStageRequirements {
   single_note_plan: XiaohongshuStageRequirement;
   visual_direction: XiaohongshuStageRequirement;
   render_html: XiaohongshuStageRequirement;
+  fix_html: XiaohongshuStageRequirement;
   visual_director_review: XiaohongshuStageRequirement;
   screenshot_review: XiaohongshuStageRequirement;
   publish_copy: XiaohongshuStageRequirement;
@@ -204,6 +209,7 @@ export interface XiaohongshuPromptPack {
     single_note_plan: 'prompts/xiaohongshu/single_note_plan.md';
     visual_direction: 'prompts/xiaohongshu/visual_direction.md';
     render_html: 'prompts/xiaohongshu/render_html.md';
+    fix_html: 'prompts/xiaohongshu/fix_html.md';
     visual_director_review: 'prompts/xiaohongshu/director_review.md';
     screenshot_review: 'prompts/xiaohongshu/screenshot_review.md';
     publish_copy: 'prompts/xiaohongshu/publish_copy.md';
@@ -215,6 +221,7 @@ export interface XiaohongshuPromptPack {
     single_note_plan: { file: 'single_note_plan.md' };
     visual_direction: { file: 'visual_direction.md' };
     render_html: { file: 'render_html.md' };
+    fix_html: { file: 'fix_html.md' };
     visual_director_review: { file: 'director_review.md' };
     screenshot_review: { file: 'screenshot_review.md' };
     publish_copy: { file: 'publish_copy.md' };

@@ -88,6 +88,7 @@ test('stable deliverable manual-test contract defines ppt_deck and xiaohongshu m
     'render_html',
     'visual_director_review',
     'screenshot_review',
+    'fix_html',
     'export_pptx',
   ]);
   assert.equal(ppt.expected_artifacts.includes('ppt export bundle or explicit hard block'), true);
@@ -105,6 +106,7 @@ test('stable deliverable manual-test contract defines ppt_deck and xiaohongshu m
     'render_html',
     'visual_director_review',
     'screenshot_review',
+    'fix_html',
     'publish_copy',
     'export_bundle',
   ]);

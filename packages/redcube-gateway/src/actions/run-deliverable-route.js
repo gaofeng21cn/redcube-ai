@@ -11,12 +11,12 @@ export async function runDeliverableRoute(request) {
     request.topicId,
     request.deliverableId,
   );
+  const result = await runHostedDeliverableRoute(request);
   const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
   const contractRef = String(deliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
   const hydratedContract = JSON.parse(
     readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'),
   );
-  const result = await runHostedDeliverableRoute(request);
   return {
     ...result,
     surface_kind: 'route_run',

@@ -61,6 +61,7 @@
         "render_html",
         "visual_director_review",
         "screenshot_review",
+        "fix_html",
         "export_pptx"
       ],
       "expected_artifacts": [
@@ -113,6 +114,7 @@
         "render_html",
         "visual_director_review",
         "screenshot_review",
+        "fix_html",
         "publish_copy",
         "export_bundle"
       ],

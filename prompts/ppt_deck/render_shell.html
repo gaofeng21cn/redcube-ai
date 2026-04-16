@@ -51,23 +51,191 @@
       prevBtn.disabled = currentSlide === 0;
       nextBtn.disabled = currentSlide === slidesData.length - 1;
     }
+    function roundMetric(value) {
+      return Math.round((Number(value) || 0) * 100) / 100;
+    }
+    function normalizeText(value) {
+      return String(value || '')
+        .replace(/\s+/g, '')
+        .replace(/[：:]/g, '')
+        .trim();
+    }
+    function isVisibleElement(node) {
+      if (!(node instanceof Element)) return false;
+      const style = window.getComputedStyle(node);
+      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) === 0) {
+        return false;
+      }
+      const rect = node.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    }
+    function rectRelativeToBounds(rect, bounds) {
+      const left = rect.left - bounds.left;
+      const top = rect.top - bounds.top;
+      const width = rect.width;
+      const height = rect.height;
+      return {
+        left: roundMetric(left),
+        top: roundMetric(top),
+        width: roundMetric(width),
+        height: roundMetric(height),
+        right: roundMetric(left + width),
+        bottom: roundMetric(top + height),
+        area: roundMetric(width * height),
+      };
+    }
+    function buildEdgeClearance(rect, bounds) {
+      return {
+        left: roundMetric(rect.left - bounds.left),
+        top: roundMetric(rect.top - bounds.top),
+        right: roundMetric(bounds.right - rect.right),
+        bottom: roundMetric(bounds.bottom - rect.bottom),
+      };
+    }
+    function hasDecorativeSurface(node, style, rect) {
+      if (rect.width < 12 || rect.height < 12) return false;
+      const backgroundColor = style.backgroundColor || '';
+      const hasBackground = !['rgba(0, 0, 0, 0)', 'transparent'].includes(backgroundColor);
+      const hasBorder = ['Top', 'Right', 'Bottom', 'Left'].some((side) => Number.parseFloat(style[`border${side}Width`] || '0') > 0);
+      const hasShadow = style.boxShadow && style.boxShadow !== 'none';
+      const hasRadius = Number.parseFloat(style.borderTopLeftRadius || '0') > 0;
+      return hasBackground || hasBorder || hasShadow || hasRadius;
+    }
+    function hasOwnReadableText(node) {
+      return Array.from(node.childNodes || [])
+        .filter((child) => child.nodeType === Node.TEXT_NODE)
+        .some((child) => normalizeText(child.textContent || '').length > 0);
+    }
+    function collectMeaningfulDescendants(node, blockNode) {
+      return Array.from(node.querySelectorAll('*'))
+        .filter((child) => child !== blockNode && isVisibleElement(child))
+        .filter((child) => child.getAttribute('aria-hidden') !== 'true')
+        .filter((child) => {
+          const rect = child.getBoundingClientRect();
+          const style = window.getComputedStyle(child);
+          const carriesOwnText = hasOwnReadableText(child);
+          const carriesTextAndSurface = normalizeText(child.textContent || '').length > 0 && hasDecorativeSurface(child, style, rect);
+          return carriesOwnText || carriesTextAndSurface;
+        });
+    }
+    function unionRelativeRect(nodes, bounds) {
+      const rects = nodes
+        .map((node) => rectRelativeToBounds(node.getBoundingClientRect(), bounds))
+        .filter((rect) => rect.width > 0 && rect.height > 0);
+      if (rects.length === 0) return null;
+      const left = Math.min(...rects.map((rect) => rect.left));
+      const top = Math.min(...rects.map((rect) => rect.top));
+      const right = Math.max(...rects.map((rect) => rect.right));
+      const bottom = Math.max(...rects.map((rect) => rect.bottom));
+      return {
+        left: roundMetric(left),
+        top: roundMetric(top),
+        width: roundMetric(right - left),
+        height: roundMetric(bottom - top),
+        right: roundMetric(right),
+        bottom: roundMetric(bottom),
+      };
+    }
+    function inspectQaBlock(node, index, bounds) {
+      const rect = node.getBoundingClientRect();
+      const blockRect = rectRelativeToBounds(rect, bounds);
+      const blockStyle = window.getComputedStyle(node);
+      const meaningfulDescendants = collectMeaningfulDescendants(node, node);
+      const contentRect = unionRelativeRect(meaningfulDescendants, bounds);
+      return {
+        id: node.getAttribute('data-qa-block') || ('block-' + (index + 1)),
+        left: blockRect.left,
+        top: blockRect.top,
+        width: blockRect.width,
+        height: blockRect.height,
+        right: blockRect.right,
+        bottom: blockRect.bottom,
+        area: blockRect.area,
+        isLeaf: !node.querySelector('[data-qa-block]'),
+        hasSurfaceFrame: hasDecorativeSurface(node, blockStyle, rect),
+        edgeClearance: buildEdgeClearance(rect, bounds),
+        contentRect,
+        internalPadding: contentRect ? {
+          left: roundMetric(contentRect.left - blockRect.left),
+          top: roundMetric(contentRect.top - blockRect.top),
+          right: roundMetric(blockRect.right - contentRect.right),
+          bottom: roundMetric(blockRect.bottom - contentRect.bottom),
+        } : null,
+        textNodeCount: meaningfulDescendants.length,
+      };
+    }
+    function estimateLineCount(node, rect) {
+      const style = window.getComputedStyle(node);
+      const fontSize = Number.parseFloat(style.fontSize || '0') || 0;
+      const lineHeight = style.lineHeight === 'normal'
+        ? fontSize * 1.2
+        : (Number.parseFloat(style.lineHeight || '0') || fontSize * 1.2);
+      if (!lineHeight || !rect.height) return 1;
+      return Math.max(1, Math.round(rect.height / lineHeight));
+    }
+    function resolveTitleMeta(root, wrapper, bounds) {
+      const normalizedTitle = normalizeText(root?.dataset.title || slidesData[currentSlide]?.title || '');
+      const candidates = Array.from(root?.querySelectorAll('h1, h2, h3, h4, div, p, span') || [])
+        .filter((node) => isVisibleElement(node))
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+          const style = window.getComputedStyle(node);
+          const normalizedText = normalizeText(node.textContent || '');
+          return {
+            node,
+            rect,
+            normalizedText,
+            fontSize: Number.parseFloat(style.fontSize || '0') || 0,
+          };
+        })
+        .filter((item) => item.normalizedText.length > 0 && item.rect.top - bounds.top < wrapper.clientHeight * 0.42);
+      const exactMatch = candidates
+        .filter((item) => item.normalizedText === normalizedTitle)
+        .sort((a, b) => {
+          if (b.fontSize !== a.fontSize) return b.fontSize - a.fontSize;
+          return a.rect.top - b.rect.top;
+        })[0];
+      const closeMatch = candidates
+        .filter((item) => normalizedTitle && (item.normalizedText.includes(normalizedTitle) || normalizedTitle.includes(item.normalizedText)))
+        .sort((a, b) => {
+          if (b.fontSize !== a.fontSize) return b.fontSize - a.fontSize;
+          return a.rect.top - b.rect.top;
+        })[0];
+      const fallback = candidates
+        .filter((item) => item.fontSize >= 24)
+        .sort((a, b) => {
+          if (a.rect.top !== b.rect.top) return a.rect.top - b.rect.top;
+          return b.fontSize - a.fontSize;
+        })[0];
+      const chosen = exactMatch || closeMatch || fallback || null;
+      if (!chosen) {
+        return {
+          titleText: root?.dataset.title || slidesData[currentSlide]?.title || '',
+          titleRect: null,
+          titleFontSize: 0,
+          titleLineCount: 0,
+          titleBlockId: null,
+          headerRect: null,
+        };
+      }
+      const titleBlock = chosen.node.closest('[data-qa-block]');
+      return {
+        titleText: root?.dataset.title || slidesData[currentSlide]?.title || '',
+        titleRect: rectRelativeToBounds(chosen.rect, bounds),
+        titleFontSize: roundMetric(chosen.fontSize),
+        titleLineCount: estimateLineCount(chosen.node, chosen.rect),
+        titleBlockId: titleBlock?.getAttribute('data-qa-block') || null,
+        headerRect: titleBlock ? rectRelativeToBounds(titleBlock.getBoundingClientRect(), bounds) : null,
+      };
+    }
     function inspectCurrentSlide() {
       const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
       const root = wrapper?.querySelector('[data-slide-root]');
       const bounds = wrapper?.getBoundingClientRect();
-      const blocks = Array.from(wrapper?.querySelectorAll('[data-qa-block]') || [])
-        .filter((node) => !node.querySelector('[data-qa-block]'))
-        .map((node, index) => {
-          const rect = node.getBoundingClientRect();
-          return {
-            id: node.getAttribute('data-qa-block') || ('block-' + (index + 1)),
-            left: rect.left - bounds.left,
-            top: rect.top - bounds.top,
-            width: rect.width,
-            height: rect.height,
-            area: rect.width * rect.height,
-          };
-        });
+      const auditBlocks = Array.from(wrapper?.querySelectorAll('[data-qa-block]') || [])
+        .map((node, index) => inspectQaBlock(node, index, bounds));
+      const blocks = auditBlocks.filter((block) => block.isLeaf);
+      const titleMeta = resolveTitleMeta(root, wrapper, bounds);
       return {
         slideId: root?.dataset.slideId || slidesData[currentSlide]?.slideId || '',
         title: root?.dataset.title || slidesData[currentSlide]?.title || '',
@@ -82,6 +250,8 @@
         },
         bodyScroll: false,
         blocks,
+        auditBlocks,
+        titleMeta,
       };
     }
     prevBtn.addEventListener('click', () => { if (currentSlide > 0) { currentSlide -= 1; updateView(); } });

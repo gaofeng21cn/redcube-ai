@@ -22,6 +22,7 @@ const DEFAULT_CODEX_COMMAND = Object.freeze(['codex']);
 const DEFAULT_CODEX_SANDBOX = 'workspace-write';
 const DEFAULT_CODEX_PROBE_TIMEOUT_MS = 60000;
 const DEFAULT_CODEX_GENERATION_TIMEOUT_MS = 600000;
+const DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS = 1800000;
 
 function summarizeError(error) {
   if (error instanceof Error) {
@@ -136,6 +137,15 @@ function buildGenerationInstructions(family, route, localFileInspection = []) {
   ].join(' ');
 }
 
+function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = []) {
+  if (Number.isFinite(Number(timeoutMs)) && Number(timeoutMs) > 0) {
+    return Number(timeoutMs);
+  }
+  const hasImageInspection = normalizeLocalFileInspection(localFileInspection)
+    .some((entry) => safeText(entry?.media_type).startsWith('image/'));
+  return hasImageInspection ? DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS : DEFAULT_CODEX_GENERATION_TIMEOUT_MS;
+}
+
 function buildGenerationInput({ family, route, promptRelativePath, context, outputContract, localFileInspection = [] }) {
   const guidance = readPromptGuidance(promptRelativePath);
   const localFileSection = buildLocalFileInspectionSection(localFileInspection);
@@ -180,6 +190,24 @@ function ensureTempDir() {
 function optionalText(value) {
   const text = String(value || '').trim();
   return text || null;
+}
+
+function killCodexChildProcessTree(child) {
+  if (!child) return;
+  const pid = Number(child.pid || 0);
+  if (process.platform !== 'win32' && pid > 0) {
+    try {
+      process.kill(-pid, 'SIGKILL');
+      return;
+    } catch {
+      // Fall through to direct child kill when process-group kill is unavailable.
+    }
+  }
+  try {
+    child.kill('SIGKILL');
+  } catch {
+    // Ignore best-effort cleanup failures.
+  }
 }
 
 function parseCodexCommand(value) {
@@ -336,6 +364,7 @@ async function runCodexPrompt({
         {
           cwd: resolvedCwd,
           env: process.env,
+          detached: false,
           stdio: ['pipe', 'pipe', 'pipe'],
         },
       );
@@ -346,7 +375,7 @@ async function runCodexPrompt({
         ? setTimeout(() => {
             if (settled) return;
             settled = true;
-            child.kill('SIGKILL');
+            killCodexChildProcessTree(child);
             const error = new Error(`Codex CLI execution timed out after ${timeoutMs}ms`);
             error.code = 'ETIMEDOUT';
             reject(error);
@@ -477,7 +506,7 @@ export async function generateStructuredArtifactViaCodexCli({
   context,
   outputContract,
   localFileInspection = [],
-  timeoutMs = DEFAULT_CODEX_GENERATION_TIMEOUT_MS,
+  timeoutMs,
   cwd = process.cwd(),
 } = {}) {
   const safeFamily = safeText(family, 'redcube');
@@ -505,7 +534,7 @@ export async function generateStructuredArtifactViaCodexCli({
       input,
     ].join('\n'),
     cwd,
-    timeoutMs,
+    timeoutMs: resolveGenerationTimeoutMs(timeoutMs, localFileInspection),
   });
 
   if (execution.codexRun.terminal_event !== 'run.completed') {

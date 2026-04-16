@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   buildNodeTestArgs,
@@ -68,20 +70,107 @@ test('run-test-group resolves an explicit Python command for screenshot review a
     resolveRedCubePythonCommand({
       env: {},
       spawnSyncImpl(command, args) {
-        assert.equal(command, 'python3');
-        assert.deepEqual(args, ['-c', 'import sys; import playwright; print(sys.executable)']);
+        if (command === 'python3') {
+          assert.deepEqual(args, ['-c', 'import sys; import playwright; print(sys.executable)']);
+          return { status: 0, stdout: '/opt/homebrew/bin/python3.12\n', stderr: '' };
+        }
+        assert.equal(command, '/opt/homebrew/bin/python3.12');
+        assert.equal(args[0], '-c');
+        assert.equal(String(args[1]).includes('sys.version_info'), true);
         return {
           status: 0,
-          stdout: '/opt/homebrew/bin/python3.14\n',
+          stdout: JSON.stringify({
+            executable: '/opt/homebrew/bin/python3.12',
+            version: '3.12.13',
+            major: 3,
+            minor: 12,
+          }),
           stderr: '',
         };
       },
     }),
     {
-      command: '/opt/homebrew/bin/python3.14',
+      command: '/opt/homebrew/bin/python3.12',
       source: 'python3_with_playwright',
     },
   );
+});
+
+test('run-test-group bootstraps a managed Python runtime when host python resolves to unstable 3.14', () => {
+  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-python-'));
+  const managedPython = path.join(runtimeStateRoot, 'python', 'stable-playwright', 'venv', 'bin', 'python');
+
+  const resolved = resolveRedCubePythonCommand({
+    env: {
+      REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+    },
+    spawnSyncImpl(command, args) {
+      if (command === 'python3') {
+        assert.deepEqual(args, ['-c', 'import sys; import playwright; print(sys.executable)']);
+        return { status: 0, stdout: '/opt/homebrew/bin/python3.14\n', stderr: '' };
+      }
+      if (command === '/opt/homebrew/bin/python3.14') {
+        assert.equal(args[0], '-c');
+        assert.equal(String(args[1]).includes('sys.version_info'), true);
+        return {
+          status: 0,
+          stdout: JSON.stringify({
+            executable: '/opt/homebrew/bin/python3.14',
+            version: '3.14.3',
+            major: 3,
+            minor: 14,
+          }),
+          stderr: '',
+        };
+      }
+      if (command === 'python3.12') {
+        assert.equal(args[0], '-c');
+        return {
+          status: 0,
+          stdout: JSON.stringify({
+            executable: '/Users/test/python3.12',
+            version: '3.12.13',
+            major: 3,
+            minor: 12,
+          }),
+          stderr: '',
+        };
+      }
+      if (command === '/Users/test/python3.12' && args[0] === '-m' && args[1] === 'venv') {
+        mkdirSync(path.dirname(managedPython), { recursive: true });
+        writeFileSync(managedPython, '#!/usr/bin/env python3\n', 'utf-8');
+        return { status: 0, stdout: '', stderr: '' };
+      }
+      if (command === managedPython && args[0] === '-m' && args[1] === 'pip') {
+        return { status: 0, stdout: '', stderr: '' };
+      }
+      if (command === managedPython && args[0] === '-m' && args[1] === 'playwright') {
+        return { status: 0, stdout: '', stderr: '' };
+      }
+      if (command === managedPython && args[0] === '-c') {
+        const script = String(args[1] || '');
+        if (script.includes('import sys; import playwright; print(sys.executable)')) {
+          return { status: 0, stdout: `${managedPython}\n`, stderr: '' };
+        }
+        if (script.includes('sys.version_info')) {
+          return {
+            status: 0,
+            stdout: JSON.stringify({
+              executable: managedPython,
+              version: '3.12.13',
+              major: 3,
+              minor: 12,
+            }),
+            stderr: '',
+          };
+        }
+      }
+      throw new Error(`unexpected spawnSync call: ${command} ${args.join(' ')}`);
+    },
+  });
+
+  assert.equal(resolved.command, managedPython);
+  assert.equal(resolved.source, 'managed_python_runtime');
 });
 
 test('run-test-group fails fast when no Python with playwright can be resolved', () => {

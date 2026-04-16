@@ -4,6 +4,8 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { persistReviewStatePatch } from '@redcube/governance';
 import { CODEX_DEFAULT_ADAPTER } from '@redcube/hermes-substrate';
+import { hydrateDeliverableContract } from '@redcube/overlay-core';
+import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 
 import { resolveExecutorAdapter } from './executors.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
@@ -27,7 +29,77 @@ function loadHydratedContract(deliverablePaths, storedDeliverable) {
     storedDeliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
   ).trim();
   const contractFile = path.join(deliverablePaths.deliverableDir, contractRef);
-  return JSON.parse(readFileSync(contractFile, 'utf-8'));
+  return {
+    contractFile,
+    contract: JSON.parse(readFileSync(contractFile, 'utf-8')),
+  };
+}
+
+const overlayRegistry = getDefaultOverlayRegistry();
+
+function writeDeliverableSurfaceBundle({ deliverablePaths, hydratedContract, overlay }) {
+  const overlayDefinition = overlayRegistry.getOverlay(overlay);
+  if (typeof overlayDefinition?.buildSurfaceBundle !== 'function') {
+    return;
+  }
+  for (const artifact of overlayDefinition.buildSurfaceBundle({ contract: hydratedContract })) {
+    const targetFile = path.join(deliverablePaths.deliverableDir, artifact.relativePath);
+    mkdirSync(path.dirname(targetFile), { recursive: true });
+    writeFileSync(targetFile, JSON.stringify(artifact.content, null, 2), 'utf-8');
+  }
+}
+
+function maybeRehydrateContractForRoute({
+  deliverablePaths,
+  storedDeliverable,
+  overlay,
+  topicId,
+  deliverableId,
+  route,
+  baseContract,
+}) {
+  const hasRoute = baseContract?.stage_sequence?.stages?.some((stage) => stage?.stage_id === route);
+  if (hasRoute) return baseContract;
+
+  const hydratedContract = hydrateDeliverableContract(overlayRegistry, {
+    overlay,
+    profileId: String(storedDeliverable?.profile_id || '').trim(),
+    topicId,
+    deliverableId,
+    title: String(storedDeliverable?.title || '').trim(),
+    goal: String(storedDeliverable?.goal || '').trim(),
+  });
+  const hydratedHasRoute = hydratedContract?.stage_sequence?.stages?.some((stage) => stage?.stage_id === route);
+  if (!hydratedHasRoute) {
+    return baseContract;
+  }
+  writeDeliverableSurfaceBundle({ deliverablePaths, hydratedContract, overlay });
+  return hydratedContract;
+}
+
+function loadRouteReadyContract({
+  deliverablePaths,
+  storedDeliverable,
+  overlay,
+  topicId,
+  deliverableId,
+  route,
+  workspaceRoot,
+}) {
+  const { contract: storedContract } = loadHydratedContract(deliverablePaths, storedDeliverable);
+  const routeReadyContract = maybeRehydrateContractForRoute({
+    deliverablePaths,
+    storedDeliverable,
+    overlay,
+    topicId,
+    deliverableId,
+    route,
+    baseContract: storedContract,
+  });
+  return {
+    ...routeReadyContract,
+    shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId),
+  };
 }
 
 export function validateDeliverableRouteInput({
@@ -49,11 +121,15 @@ export function validateDeliverableRouteInput({
     );
   }
 
-  const baseContract = loadHydratedContract(deliverablePaths, storedDeliverable);
-  const contract = {
-    ...baseContract,
-    shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId),
-  };
+  const contract = loadRouteReadyContract({
+    deliverablePaths,
+    storedDeliverable,
+    overlay,
+    topicId,
+    deliverableId,
+    route: safeRoute,
+    workspaceRoot,
+  });
   const stageContract = contract.stage_sequence?.stages?.find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
@@ -89,11 +165,15 @@ export async function executeDeliverableRouteLocally({
   const storedDeliverable = JSON.parse(
     readFileSync(deliverablePaths.deliverableFile, 'utf-8'),
   );
-  const baseContract = loadHydratedContract(deliverablePaths, storedDeliverable);
-  const contract = {
-    ...baseContract,
-    shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId),
-  };
+  const contract = loadRouteReadyContract({
+    deliverablePaths,
+    storedDeliverable,
+    overlay,
+    topicId,
+    deliverableId,
+    route: safeRoute,
+    workspaceRoot,
+  });
   const stageContract = contract.stage_sequence?.stages?.find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;

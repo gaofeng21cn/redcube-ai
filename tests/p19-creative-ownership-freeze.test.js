@@ -33,7 +33,7 @@ test('P19.A freezes Codex-native host-agent as the formal primary creative execu
   assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.adapter_roles.external_llm, 'optional_compatibility_adapter');
   assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.optional_compatibility_adapters, ['external_llm']);
   assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.xiaohongshu.story_architecture, ['storyline', 'single_note_plan']);
-  assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.ppt_deck.visual_authorship, ['visual_direction', 'render_html']);
+  assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.ppt_deck.visual_authorship, ['visual_direction', 'render_html', 'fix_html']);
 });
 
 test('P19.A freezes unified lifecycle alignment, review overlay, and research ownership semantics', () => {

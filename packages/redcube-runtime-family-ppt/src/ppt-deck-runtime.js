@@ -6,7 +6,11 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
   writeFileSync,
 } from 'node:fs';
 
@@ -71,6 +75,7 @@ const PROMPT_PACK = Object.freeze({
   slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
   visual_direction: 'prompts/ppt_deck/visual_direction.md',
   render_html: 'prompts/ppt_deck/render_html.md',
+  fix_html: 'prompts/ppt_deck/fix_html.md',
   visual_director_review: 'prompts/ppt_deck/director_review.md',
   screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
   export_pptx: 'prompts/ppt_deck/export_pptx.md',
@@ -81,12 +86,14 @@ const STAGE_REQUIREMENTS = Object.freeze({
   slide_blueprint: { requires_artifacts: ['detailed_outline'] },
   visual_direction: { requires_artifacts: ['slide_blueprint'] },
   render_html: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
+  fix_html: { requires_artifacts: ['render_html', 'screenshot_review'] },
   visual_director_review: { requires_artifacts: ['render_html'] },
   screenshot_review: { requires_artifacts: ['visual_director_review'] },
   export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
 });
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
 const RENDER_HTML_BATCH_SIZE = 3;
+const TARGETED_RENDER_HTML_BATCH_SIZE = 1;
 const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
 const BANNED_RENDER_TOKENS = ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'];
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
@@ -95,11 +102,28 @@ const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 const MIN_REVIEW_QA_BLOCKS = 2;
 const MIN_REVIEW_PRIMARY_POINTS = 1;
 const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
+const PAGE_FIX_ROUTE = 'fix_html';
+const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
+  'overflow_detected',
+  'occlusion_detected',
+  'visual_density_out_of_range',
+  'edge_clearance_out_of_range',
+  'title_typography_inconsistent',
+]);
+const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
+  'ai_review_passed',
+  'overflow_free',
+  'occlusion_free',
+  'visual_density_ok',
+  'edge_clearance_ok',
+  'title_typography_ok',
+]);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   detailed_outline: 'story_architecture',
   slide_blueprint: 'story_architecture',
   visual_direction: 'visual_authorship',
+  fix_html: 'visual_authorship',
 });
 const PPT_PAGE_LIBRARY = Object.freeze([
   {
@@ -307,14 +331,28 @@ function getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId }) {
     blueprintFile: path.join(taskDir, '大纲', `${chapterBaseName}.md`),
     visualDirectionFile: path.join(taskDir, '大纲', `${chapterBaseName}_视觉导演稿.md`),
     slidesDir: path.join(taskDir, '幻灯片'),
+    slidesReadmeFile: path.join(taskDir, '幻灯片', 'README.md'),
+    revisionBriefFile: path.join(taskDir, '幻灯片', '当前返修要求.md'),
     htmlFile: path.join(taskDir, '幻灯片', `${chapterBaseName}.html`),
+    draftHtmlFile: path.join(taskDir, '幻灯片', `${chapterBaseName}_当前草稿.html`),
     screenshotReviewFile: path.join(taskDir, '幻灯片', `${chapterBaseName}_视觉质控.md`),
     pptxDir: path.join(taskDir, 'pptx'),
+    pptxReadmeFile: path.join(taskDir, 'pptx', 'README.md'),
+    pptxArchiveDir: path.join(taskDir, 'pptx', 'archive'),
     pptxFile: path.join(taskDir, 'pptx', `${chapterBaseName}.pptx`),
     pdfFile: path.join(taskDir, 'pptx', `${chapterBaseName}.pdf`),
     presenterNotesFile: path.join(taskDir, 'pptx', `${chapterBaseName}-presenter-notes.md`),
     referencesDir: path.join(taskDir, '参考材料'),
     referenceIndexFile: path.join(taskDir, '参考材料', '来源索引.md'),
+  };
+}
+
+function getDeliverableViewSurfacePaths(deliverablePaths, deliverableId) {
+  return {
+    stableHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.html`),
+    stableSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`),
+    draftHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.html`),
+    draftSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.slides.json`),
   };
 }
 
@@ -525,8 +563,347 @@ function copyWorkbenchFile(source, destination) {
   return destination;
 }
 
-function syncPptWorkbenchSurface({ workspaceRoot, contract, deliverableId, route, payload }) {
+function safeReadJsonIfExists(file) {
+  if (!safeText(file) || !existsSync(file)) return null;
+  try {
+    return readJson(file);
+  } catch {
+    return null;
+  }
+}
+
+function extractFirstJsonCodeBlock(markdown) {
+  const match = String(markdown || '').match(/```json\s*([\s\S]*?)\s*```/i);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeOperatorRevisionBrief(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const slideFeedback = safeArray(value.slide_feedback)
+    .map((item) => ({
+      slide_id: safeText(item?.slide_id),
+      issues: safeArray(item?.issues).map((issue) => safeText(issue)).filter(Boolean),
+      keep: safeArray(item?.keep).map((entry) => safeText(entry)).filter(Boolean),
+      avoid: safeArray(item?.avoid).map((entry) => safeText(entry)).filter(Boolean),
+    }))
+    .filter((item) => item.slide_id);
+  const targetSlideIds = [...new Set([
+    ...safeArray(value.target_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+    ...slideFeedback.map((item) => item.slide_id),
+  ])];
+  const globalRequirements = safeArray(value.global_requirements)
+    .map((item) => safeText(item))
+    .filter(Boolean);
+  if (targetSlideIds.length === 0 && globalRequirements.length === 0) {
+    return null;
+  }
+  return {
+    target_slide_ids: targetSlideIds,
+    global_requirements: globalRequirements,
+    slide_feedback: slideFeedback,
+  };
+}
+
+function loadWorkbenchOperatorRevisionBrief({ workspaceRoot, contract, deliverableId }) {
   const paths = getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId });
+  if (!existsSync(paths.revisionBriefFile)) return null;
+  const parsed = extractFirstJsonCodeBlock(readFileSync(paths.revisionBriefFile, 'utf-8'));
+  return normalizeOperatorRevisionBrief(parsed);
+}
+
+function safeFileMtimeMs(file) {
+  if (!safeText(file) || !existsSync(file)) return 0;
+  try {
+    return Number(statSync(file).mtimeMs || 0);
+  } catch {
+    return 0;
+  }
+}
+
+function formatTimestamp(ms) {
+  return ms ? new Date(ms).toISOString() : '无';
+}
+
+function derivePptStageArtifactFreshness({ contract, deliverablePaths }) {
+  const requiredExportRoute = safeText(contract?.delivery_contract?.required_export_route, 'export_pptx');
+  const exportArtifactFile = stageArtifactPath(contract, deliverablePaths, requiredExportRoute);
+  const exportArtifactMtimeMs = safeFileMtimeMs(exportArtifactFile);
+  return {
+    requiredExportRoute,
+    exportArtifactFile,
+    exportArtifactMtimeMs,
+    exportArtifact: safeReadJsonIfExists(exportArtifactFile),
+  };
+}
+
+function archiveWorkbenchExportFiles(paths) {
+  const files = [paths.pptxFile, paths.pdfFile, paths.presenterNotesFile].filter((file) => existsSync(file));
+  if (files.length === 0) return [];
+  ensureDir(paths.pptxArchiveDir);
+  const archiveTag = `stale-${Date.now()}`;
+  return files.map((file) => {
+    const ext = path.extname(file);
+    const baseName = path.basename(file, ext);
+    const destination = path.join(paths.pptxArchiveDir, `${baseName}--${archiveTag}${ext}`);
+    renameSync(file, destination);
+    return destination;
+  });
+}
+
+function currentHtmlSourceFile(contract, deliverablePaths) {
+  const artifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+  return safeText(artifact?.html_bundle?.html_file);
+}
+
+function currentSlidesSourceFile(contract, deliverablePaths) {
+  const artifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+  return safeText(artifact?.html_bundle?.slides_file);
+}
+
+function syncDeliverableViewDraft(paths, htmlFile, slidesFile) {
+  const refs = [];
+  const draftHtmlRef = copyWorkbenchFile(htmlFile, paths.draftHtmlFile);
+  if (draftHtmlRef) refs.push(draftHtmlRef);
+  const draftSlidesRef = copyWorkbenchFile(slidesFile, paths.draftSlidesFile);
+  if (draftSlidesRef) refs.push(draftSlidesRef);
+  return refs;
+}
+
+function seedDeliverableStableViews(paths, htmlFile, slidesFile) {
+  const refs = [];
+  if (!existsSync(paths.stableHtmlFile)) {
+    const stableHtmlRef = copyWorkbenchFile(htmlFile, paths.stableHtmlFile);
+    if (stableHtmlRef) refs.push(stableHtmlRef);
+  }
+  if (!existsSync(paths.stableSlidesFile)) {
+    const stableSlidesRef = copyWorkbenchFile(slidesFile, paths.stableSlidesFile);
+    if (stableSlidesRef) refs.push(stableSlidesRef);
+  }
+  return refs;
+}
+
+function promoteDeliverableStableViews(paths, htmlFile, slidesFile) {
+  const refs = [];
+  const stableHtmlRef = copyWorkbenchFile(htmlFile, paths.stableHtmlFile);
+  if (stableHtmlRef) refs.push(stableHtmlRef);
+  const stableSlidesRef = copyWorkbenchFile(slidesFile, paths.stableSlidesFile);
+  if (stableSlidesRef) refs.push(stableSlidesRef);
+  return refs;
+}
+
+function listStableRootScreenshotFiles(stableScreenshotsDir) {
+  if (!existsSync(stableScreenshotsDir)) return [];
+  return readdirSync(stableScreenshotsDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && /^slide-\d+\.(png|jpe?g)$/i.test(entry.name))
+    .map((entry) => path.join(stableScreenshotsDir, entry.name));
+}
+
+function stableLatestCaptureFile(deliverablePaths) {
+  return path.join(deliverablePaths.reportsDir, 'screenshots', 'latest-capture.json');
+}
+
+function writeStableLatestCapturePointer(deliverablePaths, reviewCapture, slideCount) {
+  if (!reviewCapture || typeof reviewCapture !== 'object') return null;
+  const captureId = safeText(reviewCapture.capture_id);
+  const reviewMarkdownFile = safeText(reviewCapture.review_markdown_file);
+  if (!captureId || !reviewMarkdownFile) return null;
+  const latestCaptureFile = stableLatestCaptureFile(deliverablePaths);
+  writeJson(latestCaptureFile, {
+    capture_id: captureId,
+    review_markdown_file: reviewMarkdownFile,
+    slide_count: Number(slideCount || 0),
+  });
+  return latestCaptureFile;
+}
+
+function syncStableScreenshotSurface(deliverablePaths, captureScreenshotsDir, { promote = false, seedIfMissing = false } = {}) {
+  const sourceDir = safeText(captureScreenshotsDir);
+  if (!sourceDir || !existsSync(sourceDir)) return [];
+  const stableScreenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
+  const sourceFiles = readdirSync(sourceDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && /^slide-\d+\.(png|jpe?g)$/i.test(entry.name))
+    .map((entry) => path.join(sourceDir, entry.name));
+  if (sourceFiles.length === 0) return [];
+  const stableFiles = listStableRootScreenshotFiles(stableScreenshotsDir);
+  const shouldSync = promote || (seedIfMissing && stableFiles.length === 0);
+  if (!shouldSync) return [];
+  for (const file of stableFiles) {
+    rmSync(file, { force: true });
+  }
+  return sourceFiles
+    .map((file) => copyWorkbenchFile(file, path.join(stableScreenshotsDir, path.basename(file))))
+    .filter(Boolean);
+}
+
+function buildWorkbenchSlidesSurfaceState({ contract, deliverablePaths, paths, latestReviewStatusOverride = '' }) {
+  const screenshotReviewArtifact = safeReadJsonIfExists(
+    stageArtifactPath(contract, deliverablePaths, 'screenshot_review'),
+  );
+  return {
+    reviewed_html_ready: existsSync(paths.htmlFile),
+    has_pending_draft: existsSync(paths.draftHtmlFile),
+    latest_review_status: safeText(latestReviewStatusOverride, safeText(screenshotReviewArtifact?.status, 'none')),
+  };
+}
+
+function buildWorkbenchSlidesReadmeMarkdown(contract, slidesState, paths) {
+  return [
+    '# 幻灯片目录说明',
+    '',
+    `- 讲题：${safeText(contract?.title)}`,
+    `- 默认 HTML：${path.basename(paths.htmlFile)}`,
+    `- 草稿 HTML：${slidesState?.has_pending_draft ? path.basename(paths.draftHtmlFile) : 'none'}`,
+    `- 最近一次截图质控：${safeText(slidesState?.latest_review_status, 'none')}`,
+    '',
+    '规则：',
+    '- 只有当 `screenshot_review` 通过时，最新候选 HTML 才能替换默认 `.html`。',
+    '- 如果 `screenshot_review` 被 block，当前候选会继续保留在 `*_当前草稿.html`，默认 `.html` 不会被失败版本覆盖。',
+    '- 在还没有任何通过版之前，默认 `.html` 只是当前预览基线，不代表已经通过截图质控。',
+    '- `*_当前草稿.html` 只表示 `render_html / fix_html` 之后、下一轮 `screenshot_review` 之前的待审稿，不应直接当作已质控成品。',
+    '- 这里保留 audience-facing HTML 与视觉质控文稿，不应放内部备课提示或流程说明。',
+    '',
+  ].join('\n');
+}
+
+function buildWorkbenchPptxReadmeMarkdown(contract, exportState) {
+  if (exportState.currentExportReady) {
+    return [
+      '# PPTX 目录说明',
+      '',
+      `- 讲题：${safeText(contract?.title)}`,
+      '- 当前导出状态：current_export_ready',
+      `- 最近一次 export artifact：${formatTimestamp(exportState.exportArtifactMtimeMs)}`,
+      '',
+      '规则：',
+      '- 当前目录中的 `.pptx / .pdf / presenter-notes` 就是当前可交付版本。',
+      '- `archive/` 下如果存在历史文件，仅作留痕，不代表当前有效交付。',
+      '',
+    ].join('\n');
+  }
+
+  if (exportState.hasWorkbenchExportFiles) {
+    return [
+      '# PPTX 目录说明',
+      '',
+      `- 讲题：${safeText(contract?.title)}`,
+      '- 当前导出状态：last_export_available',
+      `- 最近一次 export artifact：${formatTimestamp(exportState.exportArtifactMtimeMs)}`,
+      '',
+      '规则：',
+      '- 最近一次导出的 `.pptx / .pdf / presenter-notes` 仍保留在当前目录，便于继续审阅、对照和补修。',
+      '- 这些文件可能落后于最新 HTML 与截图质控；是否仍可直接交付，以 topic 的 `publication-state.json` 与 deliverable 的 `review-state.json` 为准。',
+      '- `archive/` 只在真正写入更新导出件时保留旧版留痕。',
+      '',
+    ].join('\n');
+  }
+
+  return [
+    '# PPTX 目录说明',
+    '',
+    `- 讲题：${safeText(contract?.title)}`,
+    '- 当前导出状态：no_current_export',
+    `- 最近一次 export artifact：${formatTimestamp(exportState.exportArtifactMtimeMs)}`,
+    '',
+    '规则：',
+    '- 当前没有可交付 PPTX；如果你看到 `archive/` 下的旧文件，那只是历史导出留痕。',
+    '- 上游 stage 一旦重跑，旧导出会从当前目录退场，直到新的 `export_pptx` 完成。',
+    '',
+  ].join('\n');
+}
+
+function buildMachinePublishReadmeMarkdown(contract, exportState) {
+  return [
+    '# publish 目录说明',
+    '',
+    `- 讲题：${safeText(contract?.title)}`,
+    `- 最近一次 export artifact：${formatTimestamp(exportState.exportArtifactMtimeMs)}`,
+    `- 当前投影状态：${exportState.currentExportReady ? 'output_ready' : 'draft_or_export_ready'}`,
+    '',
+    '规则：',
+    '- `publish/` 是机器导出表面，文件存在不等于当前仍可交付。',
+    '- 当前是否有效，必须以 topic 的 `publication-state.json` 与 deliverable 的 `review-state.json` 为准。',
+    '',
+  ].join('\n');
+}
+
+function buildWorkbenchExportSurfaceState({ route, contract, deliverablePaths, payload }) {
+  const freshness = derivePptStageArtifactFreshness({ contract, deliverablePaths });
+  const currentExportReady = route === freshness.requiredExportRoute;
+  const routeExportMtimeMs = currentExportReady
+    ? Math.max(
+      safeFileMtimeMs(payload?.export_bundle?.pptx_file),
+      safeFileMtimeMs(payload?.export_bundle?.pdf_file),
+      safeFileMtimeMs(payload?.export_bundle?.presenter_notes_file),
+    )
+    : 0;
+  return {
+    ...freshness,
+    currentExportReady,
+    hasWorkbenchExportFiles: false,
+    exportArtifactMtimeMs: routeExportMtimeMs || freshness.exportArtifactMtimeMs,
+  };
+}
+
+function removeWorkbenchDraftHtml(paths) {
+  rmSync(paths.draftHtmlFile, { force: true });
+}
+
+function syncWorkbenchHtmlDraft(paths, sourceHtmlFile) {
+  return copyWorkbenchFile(sourceHtmlFile, paths.draftHtmlFile);
+}
+
+function promoteWorkbenchReviewedHtml(paths, sourceHtmlFile) {
+  const reviewedRef = copyWorkbenchFile(sourceHtmlFile, paths.htmlFile);
+  removeWorkbenchDraftHtml(paths);
+  return reviewedRef;
+}
+
+function syncWorkbenchBlockedHtmlDraft(paths, sourceHtmlFile) {
+  const refs = [];
+  const draftRef = syncWorkbenchHtmlDraft(paths, sourceHtmlFile);
+  if (draftRef) refs.push(draftRef);
+  if (!existsSync(paths.htmlFile)) {
+    const previewRef = copyWorkbenchFile(sourceHtmlFile, paths.htmlFile);
+    if (previewRef) refs.push(previewRef);
+  }
+  return refs;
+}
+
+function latestKnownExportBundle({ route, contract, deliverablePaths, payload }) {
+  if (route === safeText(contract?.delivery_contract?.required_export_route, 'export_pptx')) {
+    return payload?.export_bundle || null;
+  }
+  return readStageArtifact(contract, deliverablePaths, safeText(contract?.delivery_contract?.required_export_route, 'export_pptx'))?.export_bundle || null;
+}
+
+function syncWorkbenchExportFiles(paths, exportBundle, { archiveCurrent = false, restoreMissingOnly = false } = {}) {
+  if (!exportBundle || typeof exportBundle !== 'object') return [];
+  const refs = [];
+  if (archiveCurrent) {
+    refs.push(...archiveWorkbenchExportFiles(paths));
+  }
+  const copies = [
+    [exportBundle.pptx_file, paths.pptxFile],
+    [exportBundle.pdf_file, paths.pdfFile],
+    [exportBundle.presenter_notes_file, paths.presenterNotesFile],
+  ];
+  for (const [source, destination] of copies) {
+    if (restoreMissingOnly && existsSync(destination)) continue;
+    const ref = copyWorkbenchFile(source, destination);
+    if (ref) refs.push(ref);
+  }
+  return refs;
+}
+
+function syncPptWorkbenchSurface({ workspaceRoot, topicId, contract, deliverableId, route, payload }) {
+  const paths = getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId });
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const viewSurfacePaths = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId);
   ensureWorkbenchSurface(paths);
   const refs = [];
   writeText(paths.referenceIndexFile, buildWorkbenchReferenceIndex(contract));
@@ -548,28 +925,64 @@ function syncPptWorkbenchSurface({ workspaceRoot, contract, deliverableId, route
       writeText(paths.visualDirectionFile, buildWorkbenchVisualDirectionMarkdown(contract, payload));
       refs.push(paths.visualDirectionFile);
       break;
-    case 'render_html': {
-      const htmlRef = copyWorkbenchFile(payload?.html_bundle?.html_file, paths.htmlFile);
-      if (htmlRef) refs.push(htmlRef);
+    case 'render_html':
+    case 'fix_html': {
+      const draftRef = syncWorkbenchHtmlDraft(paths, payload?.html_bundle?.html_file);
+      if (draftRef) refs.push(draftRef);
+      if (!existsSync(paths.htmlFile)) {
+        const previewRef = copyWorkbenchFile(payload?.html_bundle?.html_file, paths.htmlFile);
+        if (previewRef) refs.push(previewRef);
+      }
       break;
     }
     case 'screenshot_review': {
+      const sourceHtmlFile = currentHtmlSourceFile(contract, deliverablePaths);
+      const sourceSlidesFile = currentSlidesSourceFile(contract, deliverablePaths);
+      const captureScreenshotsDir = safeText(payload?.review_capture?.screenshots_dir);
+      if (safeText(payload?.status) === 'pass') {
+        refs.push(...promoteDeliverableStableViews(viewSurfacePaths, sourceHtmlFile, sourceSlidesFile));
+        const reviewedHtmlRef = promoteWorkbenchReviewedHtml(paths, sourceHtmlFile);
+        if (reviewedHtmlRef) refs.push(reviewedHtmlRef);
+        refs.push(...syncStableScreenshotSurface(deliverablePaths, captureScreenshotsDir, { promote: true, seedIfMissing: true }));
+        const latestCaptureRef = writeStableLatestCapturePointer(
+          deliverablePaths,
+          payload?.review_capture,
+          safeArray(payload?.slide_reviews).length,
+        );
+        if (latestCaptureRef) refs.push(latestCaptureRef);
+      } else {
+        refs.push(...syncWorkbenchBlockedHtmlDraft(paths, sourceHtmlFile));
+        refs.push(...syncStableScreenshotSurface(deliverablePaths, captureScreenshotsDir, { seedIfMissing: true }));
+      }
       const reviewRef = copyWorkbenchFile(payload?.report_markdown, paths.screenshotReviewFile);
       if (reviewRef) refs.push(reviewRef);
       break;
     }
     case 'export_pptx': {
-      const pptxRef = copyWorkbenchFile(payload?.export_bundle?.pptx_file, paths.pptxFile);
-      const pdfRef = copyWorkbenchFile(payload?.export_bundle?.pdf_file, paths.pdfFile);
-      const notesRef = copyWorkbenchFile(payload?.export_bundle?.presenter_notes_file, paths.presenterNotesFile);
-      if (pptxRef) refs.push(pptxRef);
-      if (pdfRef) refs.push(pdfRef);
-      if (notesRef) refs.push(notesRef);
+      refs.push(...syncWorkbenchExportFiles(paths, payload?.export_bundle, { archiveCurrent: true }));
       break;
     }
     default:
       break;
   }
+  if (route !== safeText(contract?.delivery_contract?.required_export_route, 'export_pptx')) {
+    refs.push(...syncWorkbenchExportFiles(paths, latestKnownExportBundle({ route, contract, deliverablePaths, payload }), { restoreMissingOnly: true }));
+  }
+  const exportState = buildWorkbenchExportSurfaceState({ route, contract, deliverablePaths, payload });
+  exportState.hasWorkbenchExportFiles = [paths.pptxFile, paths.pdfFile, paths.presenterNotesFile].some((file) => existsSync(file));
+  const slidesState = buildWorkbenchSlidesSurfaceState({
+    contract,
+    deliverablePaths,
+    paths,
+    latestReviewStatusOverride: route === 'screenshot_review' ? safeText(payload?.status) : '',
+  });
+  writeText(paths.slidesReadmeFile, buildWorkbenchSlidesReadmeMarkdown(contract, slidesState, paths));
+  refs.push(paths.slidesReadmeFile);
+  writeText(paths.pptxReadmeFile, buildWorkbenchPptxReadmeMarkdown(contract, exportState));
+  refs.push(paths.pptxReadmeFile);
+  const machinePublishReadmeFile = path.join(deliverablePaths.deliverableDir, 'publish', 'README.md');
+  writeText(machinePublishReadmeFile, buildMachinePublishReadmeMarkdown(contract, exportState));
+  refs.push(machinePublishReadmeFile);
   return refs;
 }
 
@@ -580,6 +993,36 @@ function appendArtifactRefs(payload, extraRefs) {
   return {
     ...payload,
     artifact_refs: [...new Set([...safeArray(payload?.artifact_refs), ...extraRefs])],
+  };
+}
+
+function invalidateDownstreamReviewPatch(route) {
+  if (!['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'fix_html'].includes(route)) {
+    return null;
+  }
+  return {
+    current_status: 'draft',
+    ready_for_export: false,
+    latest_review_stage: route,
+    pending_reviews: [],
+    blocking_reasons: [],
+    rerun_from_stage: null,
+    rerun_policy: {
+      status: 'idle',
+      rerun_from_stage: null,
+    },
+  };
+}
+
+function attachRouteReviewReset(payload, route) {
+  const reviewStatePatch = invalidateDownstreamReviewPatch(route);
+  if (!reviewStatePatch) return payload;
+  return {
+    ...payload,
+    review_state_patch: {
+      ...reviewStatePatch,
+      ...(payload?.review_state_patch || {}),
+    },
   };
 }
 
@@ -594,6 +1037,21 @@ function stageArtifactPath(contract, deliverablePaths, stageId) {
 function readStageArtifact(contract, deliverablePaths, stageId) {
   const file = stageArtifactPath(contract, deliverablePaths, stageId);
   return existsSync(file) ? readJson(file) : null;
+}
+
+function currentHtmlStageId(contract, deliverablePaths) {
+  const renderArtifactFile = stageArtifactPath(contract, deliverablePaths, 'render_html');
+  const fixArtifactFile = stageArtifactPath(contract, deliverablePaths, PAGE_FIX_ROUTE);
+  const renderMtimeMs = safeFileMtimeMs(renderArtifactFile);
+  const fixMtimeMs = safeFileMtimeMs(fixArtifactFile);
+  if (fixMtimeMs > renderMtimeMs) {
+    return PAGE_FIX_ROUTE;
+  }
+  return 'render_html';
+}
+
+function readCurrentHtmlArtifact(contract, deliverablePaths) {
+  return readStageArtifact(contract, deliverablePaths, currentHtmlStageId(contract, deliverablePaths));
 }
 
 function promptMeta(route) {
@@ -798,7 +1256,14 @@ function resolveSpeakerIdentity(contract, fallback) {
 
 function extraChecks(contract) {
   const required = safeArray(contract?.review_surface?.required_checks);
-  return required.filter((check) => !['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok'].includes(check));
+  return required.filter((check) => ![
+    'overflow_free',
+    'occlusion_free',
+    'visual_density_ok',
+    'speaker_fit_ok',
+    'edge_clearance_ok',
+    'title_typography_ok',
+  ].includes(check));
 }
 
 function deriveProfileChecks(contract, blueprintArtifact, storylineArtifact) {
@@ -935,6 +1400,53 @@ function lifecycleStageForRoute(contract, route) {
   return contract?.lifecycle_model?.route_to_stage?.[route] || null;
 }
 
+function stageOrder(contract, stageId) {
+  return safeArray(contract?.stage_sequence?.stages).findIndex((stage) => stage?.stage_id === stageId);
+}
+
+function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
+  const rerunMap = contract?.review_surface?.rerun_from_stage || {};
+  const candidates = safeArray(failedChecks)
+    .map((checkId) => safeText(rerunMap?.[checkId], fallbackStage))
+    .filter(Boolean);
+  if (candidates.length === 0) return null;
+  return candidates.reduce((earliest, candidate) => {
+    if (!earliest) return candidate;
+    const earliestOrder = stageOrder(contract, earliest);
+    const candidateOrder = stageOrder(contract, candidate);
+    if (candidateOrder === -1) return earliest;
+    if (earliestOrder === -1 || candidateOrder < earliestOrder) return candidate;
+    return earliest;
+  }, null);
+}
+
+function slideNeedsTargetedRevision(slide) {
+  if (!slide || typeof slide !== 'object') return false;
+  if (safeText(slide?.status) === 'block') return true;
+  if (hasAiVisualBlock(slide?.ai_review)) return true;
+  const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
+    ? safeArray(slide?.mechanical_issues)
+    : safeArray(slide?.issues);
+  return mechanicalIssues.some((issue) => TARGETED_SCREENSHOT_MECHANICAL_ISSUES.has(safeText(issue)));
+}
+
+function collectSlidesNeedingTargetedRevision(slideReviews) {
+  return safeArray(slideReviews)
+    .filter((slide) => slideNeedsTargetedRevision(slide))
+    .filter((slide) => safeText(slide?.slide_id));
+}
+
+function deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews) {
+  const normalizedFailedChecks = safeArray(failedChecks).map((check) => safeText(check)).filter(Boolean);
+  if (normalizedFailedChecks.length === 0) return null;
+  const targetedSlides = collectSlidesNeedingTargetedRevision(slideReviews);
+  const onlyPageLevelFailures = normalizedFailedChecks.every((check) => TARGETED_SCREENSHOT_RERUN_CHECKS.has(check));
+  if (onlyPageLevelFailures && targetedSlides.length > 0) {
+    return PAGE_FIX_ROUTE;
+  }
+  return rerunStageFromReviewSurface(contract, normalizedFailedChecks, 'render_html');
+}
+
 function reviewOverlayForRoute(contract, route) {
   return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
 }
@@ -1064,12 +1576,7 @@ function buildAiFirstVisualSlideReview(slide, aiReview) {
 }
 
 function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
-  return safeArray(slideReviews).every((slide) => {
-    if (hasAiVisualPass(slide?.ai_review)) {
-      return true;
-    }
-    return Boolean(slide?.checks?.[checkKey]);
-  });
+  return safeArray(slideReviews).every((slide) => Boolean(slide?.checks?.[checkKey]));
 }
 
 function normalizePageCoreContent(value, label) {
@@ -1577,6 +2084,39 @@ function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
 }
 
+const SCREENSHOT_MECHANICAL_ISSUE_LABELS = Object.freeze({
+  overflow_detected: '存在溢出或裁切',
+  occlusion_detected: '存在遮挡或重叠',
+  visual_density_out_of_range: '信息密度偏高',
+  edge_clearance_out_of_range: '卡片或内容贴边',
+  title_typography_inconsistent: '标题字号与正文页统一档位不一致',
+});
+
+function failureScopeLabel(scope) {
+  return scope === 'wrapper_edge' ? '外缘安全距' : '内边距';
+}
+
+function failureSideLabel(side) {
+  return ({
+    left: '左侧',
+    top: '顶部',
+    right: '右侧',
+    bottom: '底部',
+  })[safeText(side)] || safeText(side);
+}
+
+function summarizeMechanicalFinding(slide, failure) {
+  const blockId = safeText(failure?.block_id, 'unknown-block');
+  const scopeLabel = failureScopeLabel(safeText(failure?.scope));
+  const sideLabel = failureSideLabel(failure?.side);
+  const value = Number.isFinite(Number(failure?.value)) ? Number(failure.value) : null;
+  const threshold = Number.isFinite(Number(failure?.threshold)) ? Number(failure.threshold) : null;
+  return normalizeInlineText(
+    `机械审计：${safeText(slide?.slide_id)} 的 ${blockId} ${sideLabel}${scopeLabel}为 ${value ?? 'unknown'}，低于阈值 ${threshold ?? 'unknown'}`,
+    220,
+  );
+}
+
 function summarizeRenderRevisionSlideFeedback(reviewArtifact) {
   const slideReviews = safeArray(reviewArtifact?.slide_reviews).length > 0
     ? safeArray(reviewArtifact?.slide_reviews)
@@ -1590,21 +2130,29 @@ function summarizeRenderRevisionSlideFeedback(reviewArtifact) {
               recommended_fix: safeText(slide?.recommended_fix),
             },
       }));
-  return slideReviews
-    .filter((slide) => safeText(slide?.status) === 'block' || safeText(slide?.ai_review?.judgement) === 'block')
+  return collectSlidesNeedingTargetedRevision(slideReviews)
     .map((slide) => ({
       slide_id: safeText(slide?.slide_id),
       title: safeText(slide?.title),
+      screenshot_file: safeText(slide?.screenshot_file),
       blocked_checks: safeArray(slide?.issues),
+      mechanical_findings: [
+        ...safeArray(slide?.mechanical_issues).map((issue) => normalizeInlineText(
+          `机械审计：${SCREENSHOT_MECHANICAL_ISSUE_LABELS[safeText(issue)] || safeText(issue)}`,
+          220,
+        )),
+        ...safeArray(slide?.metrics?.edge_clearance_failures).map((failure) => summarizeMechanicalFinding(slide, failure)),
+      ].filter(Boolean),
       ai_findings: safeArray(slide?.ai_review?.visual_findings).map((item) => normalizeInlineText(item, 220)),
       recommended_fix: normalizeInlineText(slide?.ai_review?.recommended_fix, 220),
     }))
     .filter((slide) => slide.slide_id);
 }
 
-function buildRenderRevisionContext(contract, deliverablePaths) {
+function buildRenderRevisionContext({ workspaceRoot, contract, deliverablePaths, deliverableId }) {
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const screenshotReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+  const operatorRevisionBrief = loadWorkbenchOperatorRevisionBrief({ workspaceRoot, contract, deliverableId });
   const directorSummary = directorReviewArtifact?.visual_director_review
     ? {
         status: safeText(directorReviewArtifact.status, 'unknown'),
@@ -1625,13 +2173,14 @@ function buildRenderRevisionContext(contract, deliverablePaths) {
         slide_feedback: screenshotSlideFeedback,
       }
     : null;
-  if (!directorSummary && !screenshotSummary) {
+  if (!directorSummary && !screenshotSummary && !operatorRevisionBrief) {
     return null;
   }
   return {
     has_prior_review_feedback: true,
     visual_director_review: directorSummary,
     screenshot_review: screenshotSummary,
+    operator_revision_brief: operatorRevisionBrief,
   };
 }
 
@@ -1664,23 +2213,52 @@ function buildRenderRevisionFocusMap(revisionContext) {
       .map((slideId) => safeText(slideId))
       .filter(Boolean),
   );
+  const selectedTargetSlideIds = selectRenderTargetSlideIds(revisionContext);
   const slideFeedbackById = new Map(
     safeArray(revisionContext?.screenshot_review?.slide_feedback)
       .map((slide) => [safeText(slide?.slide_id), slide]),
   );
+  const operatorSlideFeedbackById = new Map(
+    safeArray(revisionContext?.operator_revision_brief?.slide_feedback)
+      .map((slide) => [safeText(slide?.slide_id), slide]),
+  );
+  const operatorTargetSlideIds = new Set(
+    safeArray(revisionContext?.operator_revision_brief?.target_slide_ids)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  );
   for (const slideId of new Set([
-    ...weakPages,
-    ...blockedSlideIds,
+    ...selectedTargetSlideIds,
     ...slideFeedbackById.keys(),
+    ...operatorSlideFeedbackById.keys(),
   ])) {
     if (!slideId) continue;
     const slideFeedback = slideFeedbackById.get(slideId) || {};
+    const operatorFeedback = operatorSlideFeedbackById.get(slideId) || {};
+    const operatorIssues = safeArray(operatorFeedback?.issues).map((item) => normalizeInlineText(item, 220));
+    const operatorKeep = safeArray(operatorFeedback?.keep).map((item) => normalizeInlineText(item, 220));
+    const operatorAvoid = safeArray(operatorFeedback?.avoid).map((item) => normalizeInlineText(item, 220));
+    const aiFindings = [
+      ...safeArray(slideFeedback?.mechanical_findings),
+      ...safeArray(slideFeedback?.ai_findings),
+      ...operatorIssues,
+      ...operatorKeep.map((item) => `keep: ${item}`),
+      ...operatorAvoid.map((item) => `avoid: ${item}`),
+    ].filter(Boolean);
+    const recommendedFixParts = [
+      safeText(slideFeedback?.recommended_fix),
+      ...safeArray(slideFeedback?.mechanical_findings).map((item) => `机械约束：${item}`),
+      ...operatorIssues,
+      ...operatorKeep.map((item) => `保留：${item}`),
+      ...operatorAvoid.map((item) => `避免：${item}`),
+    ].filter(Boolean);
     focusBySlideId.set(slideId, {
       weak_page: weakPages.has(slideId),
       blocked_for_screenshot_review: blockedSlideIds.has(slideId),
+      operator_requested_revision: operatorTargetSlideIds.has(slideId),
       blocked_checks: safeArray(slideFeedback?.blocked_checks),
-      ai_findings: safeArray(slideFeedback?.ai_findings),
-      recommended_fix: safeText(slideFeedback?.recommended_fix),
+      ai_findings: aiFindings,
+      recommended_fix: recommendedFixParts.join('；'),
       director_review_summary: weakPages.has(slideId)
         ? normalizeInlineText(revisionContext?.visual_director_review?.review_summary, 220)
         : '',
@@ -1688,6 +2266,37 @@ function buildRenderRevisionFocusMap(revisionContext) {
     });
   }
   return focusBySlideId;
+}
+
+function selectRenderTargetSlideIds(revisionContext) {
+  const weakPages = new Set(
+    safeArray(revisionContext?.visual_director_review?.weak_pages)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  );
+  const blockedSlideIds = new Set(
+    safeArray(revisionContext?.screenshot_review?.blocked_slide_ids)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  );
+  const operatorTargetSlideIds = new Set(
+    safeArray(revisionContext?.operator_revision_brief?.target_slide_ids)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  );
+  if (blockedSlideIds.size > 0) {
+    return new Set([
+      ...blockedSlideIds,
+      ...operatorTargetSlideIds,
+    ]);
+  }
+  if (operatorTargetSlideIds.size > 0) {
+    return new Set([
+      ...operatorTargetSlideIds,
+      ...weakPages,
+    ]);
+  }
+  return weakPages;
 }
 
 function loadPriorRenderedSlideHtmlMap(renderArtifact) {
@@ -1700,10 +2309,7 @@ function loadPriorRenderedSlideHtmlMap(renderArtifact) {
 
 function planRenderHtmlExecution({ blueprintSlides, revisionContext, priorRenderArtifact }) {
   const priorRenderedSlides = loadPriorRenderedSlideHtmlMap(priorRenderArtifact);
-  const targetedSlideIds = new Set([
-    ...safeArray(revisionContext?.visual_director_review?.weak_pages),
-    ...safeArray(revisionContext?.screenshot_review?.blocked_slide_ids),
-  ].map((slideId) => safeText(slideId)).filter(Boolean));
+  const targetedSlideIds = selectRenderTargetSlideIds(revisionContext);
   if (targetedSlideIds.size === 0 || priorRenderedSlides.size === 0) {
     return {
       mode: 'full_regeneration',
@@ -1768,15 +2374,24 @@ function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
     .filter((slide) => allowedSlideIds.has(safeText(slide?.slide_id)));
   const blockedSlideIds = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids)
     .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
+  const operatorTargetSlideIds = safeArray(revisionContext?.operator_revision_brief?.target_slide_ids)
+    .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
+  const operatorSlideFeedback = safeArray(revisionContext?.operator_revision_brief?.slide_feedback)
+    .filter((slide) => allowedSlideIds.has(safeText(slide?.slide_id)));
   const globalDirectorWeakPages = safeArray(revisionContext?.visual_director_review?.weak_pages);
   const globalSlideFeedback = safeArray(revisionContext?.screenshot_review?.slide_feedback);
   const globalBlockedSlideIds = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids);
+  const globalOperatorTargetSlideIds = safeArray(revisionContext?.operator_revision_brief?.target_slide_ids);
+  const globalOperatorSlideFeedback = safeArray(revisionContext?.operator_revision_brief?.slide_feedback);
   const batchHasDirectorFocus = directorWeakPages.length > 0;
   const batchHasScreenshotFocus = slideFeedback.length > 0 || blockedSlideIds.length > 0;
+  const batchHasOperatorFocus = operatorTargetSlideIds.length > 0 || operatorSlideFeedback.length > 0;
   const globalHasScreenshotFocus = globalSlideFeedback.length > 0 || globalBlockedSlideIds.length > 0;
   const globalHasDirectorFocus = globalDirectorWeakPages.length > 0;
+  const globalHasOperatorFocus = globalOperatorTargetSlideIds.length > 0 || globalOperatorSlideFeedback.length > 0;
   if ((globalHasDirectorFocus && !batchHasDirectorFocus && !batchHasScreenshotFocus)
-    || (globalHasScreenshotFocus && !batchHasScreenshotFocus)) {
+    || (globalHasScreenshotFocus && !batchHasScreenshotFocus)
+    || (globalHasOperatorFocus && !batchHasOperatorFocus && !batchHasScreenshotFocus && !batchHasDirectorFocus)) {
     return null;
   }
   const directorSummary = revisionContext?.visual_director_review
@@ -1792,31 +2407,125 @@ function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
         slide_feedback: slideFeedback,
       }
     : null;
+  const operatorBrief = revisionContext?.operator_revision_brief
+    ? {
+        ...revisionContext.operator_revision_brief,
+        target_slide_ids: operatorTargetSlideIds,
+        slide_feedback: operatorSlideFeedback,
+      }
+    : null;
   const hasDirectorFeedback = safeArray(directorSummary?.weak_pages).length > 0
     || safeText(directorSummary?.review_summary).length > 0;
   const hasScreenshotFeedback = safeArray(screenshotSummary?.blocked_slide_ids).length > 0
     || safeArray(screenshotSummary?.slide_feedback).length > 0;
-  if (!hasDirectorFeedback && !hasScreenshotFeedback) {
+  const hasOperatorFeedback = safeArray(operatorBrief?.target_slide_ids).length > 0
+    || safeArray(operatorBrief?.slide_feedback).length > 0
+    || safeArray(operatorBrief?.global_requirements).length > 0;
+  if (!hasDirectorFeedback && !hasScreenshotFeedback && !hasOperatorFeedback) {
     return null;
   }
   return {
     has_prior_review_feedback: true,
     visual_director_review: directorSummary,
     screenshot_review: screenshotSummary,
+    operator_revision_brief: operatorBrief,
   };
 }
 
-async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+function slideScreenshotFileName(slideId) {
+  const digits = safeText(slideId).replace(/\D+/g, '');
+  if (!digits) return '';
+  return `slide-${digits.padStart(2, '0')}.png`;
+}
+
+function listScreenshotCaptureDirs(deliverablePaths) {
+  const screenshotsDir = path.join(deliverablePaths.reportsDir, 'screenshots');
+  if (!existsSync(screenshotsDir)) return [];
+  return readdirSync(screenshotsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(screenshotsDir, entry.name))
+    .sort((left, right) => safeFileMtimeMs(right) - safeFileMtimeMs(left));
+}
+
+function collectHistoricalSlideScreenshots(deliverablePaths, slideId, currentScreenshotFile = '', limit = 2) {
+  const screenshotName = slideScreenshotFileName(slideId);
+  if (!screenshotName) return [];
+  const currentResolved = safeText(currentScreenshotFile) ? path.resolve(currentScreenshotFile) : '';
+  const results = [];
+  for (const captureDir of listScreenshotCaptureDirs(deliverablePaths)) {
+    const candidate = path.join(captureDir, screenshotName);
+    if (!existsSync(candidate)) continue;
+    if (currentResolved && path.resolve(candidate) === currentResolved) continue;
+    results.push(candidate);
+    if (results.length >= limit) break;
+  }
+  return results;
+}
+
+function buildRenderRevisionLocalFileInspection({ deliverablePaths, slideBatch, revisionContext }) {
+  const slideFeedbackById = new Map(
+    safeArray(revisionContext?.screenshot_review?.slide_feedback)
+      .map((slide) => [safeText(slide?.slide_id), slide]),
+  );
+  const targetedSlideIds = selectRenderTargetSlideIds(revisionContext);
+  const entries = [];
+  for (const slide of safeArray(slideBatch)) {
+    const slideId = safeText(slide?.slide_id);
+    if (!slideId || !targetedSlideIds.has(slideId)) continue;
+    const currentScreenshotFile = safeText(slideFeedbackById.get(slideId)?.screenshot_file)
+      || path.join(deliverablePaths.reportsDir, 'screenshots', slideScreenshotFileName(slideId));
+    if (existsSync(currentScreenshotFile)) {
+      entries.push({
+        label: `${slideId} current blocked screenshot`,
+        path: currentScreenshotFile,
+        media_type: 'image/png',
+        purpose: `${slideId} 当前被拦下的截图，先修掉这里的遮挡、溢出、错误换行或层级问题。`,
+      });
+    }
+    for (const [index, file] of collectHistoricalSlideScreenshots(deliverablePaths, slideId, currentScreenshotFile, 2).entries()) {
+      entries.push({
+        label: `${slideId} historical reference ${index + 1}`,
+        path: file,
+        media_type: 'image/png',
+        purpose: `${slideId} 最近一轮历史版本截图；如果其中有更好的构图、字号或换行，可以借鉴，但不要把旧问题一起带回。`,
+      });
+    }
+  }
+  return entries;
+}
+
+async function generateRenderHtmlDraft({
+  workspaceRoot,
+  deliverableId,
+  contract,
+  deliverablePaths,
+  route = 'render_html',
+  requireTargetedRevision = false,
+  adapter = CODEX_DEFAULT_ADAPTER,
+}) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const previousRenderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
-  const sharedRevisionContext = buildRenderRevisionContext(contract, deliverablePaths);
+  const previousRenderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+  const sharedRevisionContext = buildRenderRevisionContext({
+    workspaceRoot,
+    contract,
+    deliverablePaths,
+    deliverableId,
+  });
+  const priorRenderedSlides = loadPriorRenderedSlideHtmlMap(previousRenderArtifact);
   const blueprintSlides = buildRenderHtmlBlueprintSlides(blueprintArtifact, sharedRevisionContext);
   const renderPlan = planRenderHtmlExecution({
     blueprintSlides,
     revisionContext: sharedRevisionContext,
     priorRenderArtifact: previousRenderArtifact,
   });
+  if (requireTargetedRevision && renderPlan.mode !== 'targeted_revision_only') {
+    throw new Error(`Route ${route} requires targeted revision context and a prior current HTML artifact`);
+  }
+  const promptRelativePath = PROMPT_PACK[route] || PROMPT_PACK.render_html;
+  const renderBatchSize = renderPlan.mode === 'targeted_revision_only'
+    ? TARGETED_RENDER_HTML_BATCH_SIZE
+    : RENDER_HTML_BATCH_SIZE;
   const sharedContext = {
     ...buildAuthoringContext(contract),
     visual_direction: visualArtifact?.visual_direction || null,
@@ -1836,6 +2545,10 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
       '对 audit_tension / timeline_band 的第二段推进页，controller 必须继续做唯一主峰；红色风险支路必须收成短窄阻断支路，不能膨胀成第二主图。',
       '若页面同时承载主链说明与风险提示，底部说明区最多保留 2 块；第 3 个观点必须并入主图注释或节点说明，不得再扩成整排说明带。',
       '若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体。',
+      '正文页主标题字号需要在整套 deck 中保持一致，除封面外不要突然缩小；如果空间不足，优先压缩卡片正文、减少说明字数或重排结构，不要先牺牲标题一致性。',
+      '连接线、时间线、轨道线必须退到节点徽标和数字圆点下层；不允许线条压在数字、badge 或关键词前景上。',
+      '中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义夹杂英文，术语若出现也要尽量配中文语义。',
+      '所有正文、标签、节点和卡片文案都要在自然语义处分行，优先减少字数和调整容器，不要把中英文硬挤到同一行直到溢出。',
       '风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数。',
       '若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面，其余通过页应保持原样复用，不要重新发明已通过页面。',
       '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
@@ -1843,15 +2556,19 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
       'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
     ],
   };
-  const slideBatches = chunkArray(renderPlan.slides_to_render, RENDER_HTML_BATCH_SIZE);
+  const slideBatches = chunkArray(renderPlan.slides_to_render, renderBatchSize);
   const freshlyRenderedSlides = slideBatches.length === 0
     ? []
     : (await Promise.all(slideBatches.map(async (slideBatch, batchIndex) => {
+    const promptSlides = slideBatch.map((slide) => ({
+      ...slide,
+      current_content_html: priorRenderedSlides.get(safeText(slide?.slide_id)) || null,
+    }));
     const { data: batchData } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
-      route: 'render_html',
-      promptRelativePath: PROMPT_PACK.render_html,
+      route,
+      promptRelativePath,
       context: {
         ...sharedContext,
         render_scope: 'slide_batch',
@@ -1859,18 +2576,23 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
         render_batch: {
           batch_index: batchIndex + 1,
           total_batches: slideBatches.length,
-          slide_ids: slideBatch.map((slide) => slide.slide_id),
+          slide_ids: promptSlides.map((slide) => slide.slide_id),
         },
         blueprint: {
-          slides: slideBatch,
+          slides: promptSlides,
         },
         revision_context: filterRenderRevisionContextForSlides(
           sharedRevisionContext,
-          slideBatch.map((slide) => slide.slide_id),
+          promptSlides.map((slide) => slide.slide_id),
         ) || sharedRevisionContext,
       },
       outputContract: renderHtmlOutputContract(),
       cwd: deliverablePaths.deliverableDir,
+      localFileInspection: buildRenderRevisionLocalFileInspection({
+        deliverablePaths,
+        slideBatch,
+        revisionContext: sharedRevisionContext,
+      }),
     });
     return safeArray(batchData?.slides).filter((item) => item && typeof item === 'object');
   }))).flat();
@@ -1884,8 +2606,8 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
   const { data: summaryData, generationRuntime } = await generateStructuredArtifact({
     adapter,
     family: 'ppt_deck',
-    route: 'render_html',
-    promptRelativePath: PROMPT_PACK.render_html,
+    route,
+    promptRelativePath,
     context: {
       ...sharedContext,
       render_scope: 'summary',
@@ -1910,21 +2632,40 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
       render_summary: safeArray(summaryData?.render_summary),
     },
     generationRuntime,
+    renderExecution: {
+      route,
+      mode: renderPlan.mode,
+      batch_size: renderBatchSize,
+      batch_count: slideBatches.length,
+      targeted_slide_ids: renderPlan.slides_to_render.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      freshly_rendered_slide_ids: freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      reused_slide_ids: [...renderPlan.reused_slides.keys()],
+    },
   };
 }
 
 async function buildRenderHtmlArtifact({
+  workspaceRoot,
   deliverableId,
   contract,
   deliverablePaths,
+  route = 'render_html',
   adapter = CODEX_DEFAULT_ADAPTER,
 }) {
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths, adapter);
+  const { data, generationRuntime, renderExecution } = await generateRenderHtmlDraft({
+    workspaceRoot,
+    deliverableId,
+    contract,
+    deliverablePaths,
+    route,
+    requireTargetedRevision: route === PAGE_FIX_ROUTE,
+    adapter,
+  });
   const slideHtmlList = safeArray(data?.slides).filter((item) => item && typeof item === 'object');
   if (slideHtmlList.length < 6) {
-    throw new Error('upstream ppt render_html must contain at least 6 slides');
+    throw new Error(`upstream ppt ${route} must contain at least 6 slides`);
   }
   const slideHtmlById = new Map(slideHtmlList.map((item) => [
     safeText(item.slide_id),
@@ -1933,10 +2674,10 @@ async function buildRenderHtmlArtifact({
   const slidesMarkup = safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => {
     const rawContent = slideHtmlById.get(slide.slide_id);
     if (!rawContent) {
-      throw new Error(`upstream ppt render_html missing slide: ${slide.slide_id}`);
+      throw new Error(`upstream ppt ${route} missing slide: ${slide.slide_id}`);
     }
     const recipeDecision = creativeSourceStamp({
-      route: 'render_html',
+      route,
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'recipe_selection',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
@@ -1944,7 +2685,7 @@ async function buildRenderHtmlArtifact({
       adapter,
     });
     const finalMarkup = creativeSourceStamp({
-      route: 'render_html',
+      route,
       lifecycleStage: 'visual_authorship',
       authoredSurface: 'final_html_markup',
       materializedFrom: CREATIVE_MATERIALIZED_FROM,
@@ -2013,6 +2754,8 @@ async function buildRenderHtmlArtifact({
     generator_instructions: safeArray(visualArtifact?.visual_direction?.final_instruction_to_html_generator),
     peak_pages: safeArray(visualArtifact?.visual_direction?.peak_pages),
     page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
+    rerender_mode: safeText(renderExecution?.mode, 'full_regeneration'),
+    render_execution: renderExecution || null,
     slides: slidesMarkup.map((slide) => ({
       slide_id: slide.slide_id,
       title: slide.title,
@@ -2023,8 +2766,9 @@ async function buildRenderHtmlArtifact({
       director_role: slide.director_contract.director_role,
     })),
   };
-  const htmlFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.html`);
-  const slidesFile = path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`);
+  const viewSurfacePaths = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId);
+  const htmlFile = viewSurfacePaths.draftHtmlFile;
+  const slidesFile = viewSurfacePaths.draftSlidesFile;
   const shellText = readPromptPackText(renderPlan.shell_file);
   writeText(htmlFile, buildDeckHtml({
     title: contract.title,
@@ -2042,21 +2786,24 @@ async function buildRenderHtmlArtifact({
       content: slide.content,
     })),
   });
+  const stableViewRefs = seedDeliverableStableViews(viewSurfacePaths, htmlFile, slidesFile);
   return {
-    ...attachCommon('render_html', contract, generationRuntime, adapter),
+    ...attachCommon(route, contract, generationRuntime, adapter),
     creative_execution: creativeExecution(
-      contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
+      contract.lifecycle_model?.route_to_stage?.[route] || contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
       generationRuntime,
       adapter,
     ),
-    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
+    render_execution: renderExecution || null,
+    lifecycle_stage: contract.lifecycle_model?.route_to_stage?.[route] || contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
     html_bundle: {
       html_file: htmlFile,
       slides_file: slidesFile,
       page_count: slidesMarkup.length,
       render_strategy: renderPlan.render_strategy,
       generator_instructions: renderPlan.generator_instructions,
-      render_summary: normalizeStringList(data?.render_summary, 'render_html.render_summary', { min: 1, max: 4 }),
+      render_summary: normalizeStringList(data?.render_summary, `${route}.render_summary`, { min: 1, max: 4 }),
+      render_execution: renderExecution || null,
       shell_contract: {
         ratio: CANVAS.ratio,
         width: CANVAS.width,
@@ -2065,12 +2812,12 @@ async function buildRenderHtmlArtifact({
       },
       slides: slidesMarkup,
     },
-    artifact_refs: [htmlFile, slidesFile],
+    artifact_refs: [htmlFile, slidesFile, ...stableViewRefs],
   };
 }
 
 async function generateDirectorReviewDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-  const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const { data, generationRuntime } = await generateStructuredArtifact({
@@ -2121,10 +2868,32 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
       throw new Error(`Baseline deliverable is not approved: ${baselineDeliverableId}`);
     }
   }
+  const currentHtmlStage = currentHtmlStageId(contract, deliverablePaths);
+  const currentHtmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, currentHtmlStage));
+  if (route === PAGE_FIX_ROUTE) {
+    const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+    if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
+      throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
+    }
+  }
+  if (route === 'screenshot_review') {
+    const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+    if (!directorReviewArtifact || directorReviewArtifact.status !== 'pass') {
+      throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
+    }
+    const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
+    if (directorReviewMtimeMs < currentHtmlMtimeMs) {
+      throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest HTML changes');
+    }
+  }
   if (route === 'export_pptx') {
     const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     if (!reviewArtifact || reviewArtifact.status !== 'pass') {
       throw new Error('Route export_pptx requires screenshot_review to pass before export');
+    }
+    const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+    if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
+      throw new Error('Route export_pptx requires screenshot_review to be rerun after the latest HTML changes');
     }
   }
 }
@@ -2256,6 +3025,8 @@ function buildReviewMarkdown(contract, reviewArtifact, reviewOwner) {
     `- occlusion_free：${reviewArtifact.checks.occlusion_free}`,
     `- visual_density_ok：${reviewArtifact.checks.visual_density_ok}`,
     `- speaker_fit_ok：${reviewArtifact.checks.speaker_fit_ok}`,
+    `- edge_clearance_ok：${reviewArtifact.checks.edge_clearance_ok}`,
+    `- title_typography_ok：${reviewArtifact.checks.title_typography_ok}`,
   );
   if (Object.hasOwn(reviewArtifact.checks, 'baseline_comparison_passed')) {
     lines.push(`- baseline_comparison_passed：${reviewArtifact.checks.baseline_comparison_passed}`);
@@ -2284,6 +3055,7 @@ function buildReviewMarkdown(contract, reviewArtifact, reviewOwner) {
 async function generateScreenshotReviewDraft(
   contract,
   deliverablePaths,
+  renderArtifact,
   slideReviews,
   reviewPayload,
   mode,
@@ -2292,6 +3064,7 @@ async function generateScreenshotReviewDraft(
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+  const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
   const sharedContext = {
     ...buildAuthoringContext(contract),
     mode,
@@ -2301,6 +3074,7 @@ async function generateScreenshotReviewDraft(
     visual_direction: visualArtifact?.visual_direction || null,
     director_review: directorReviewArtifact?.visual_director_review || null,
     screenshot_mechanics: {
+      source_html_file: safeText(renderArtifact?.html_bundle?.html_file) || null,
       overall_checks: reviewPayload?.checks || null,
       metrics: reviewPayload?.metrics || null,
       baseline: reviewPayload?.baseline || null,
@@ -2313,6 +3087,11 @@ async function generateScreenshotReviewDraft(
         occupied_ratio: slide.metrics?.occupied_ratio ?? null,
         primary_points: slide.metrics?.primary_points ?? null,
         speaker_seconds: slide.metrics?.speaker_seconds ?? null,
+        edge_clearance_failures: slide.metrics?.edge_clearance_failures ?? [],
+        title_font_size: slide.metrics?.title_font_size ?? null,
+        title_font_reference: slide.metrics?.title_font_reference ?? null,
+        title_font_delta: slide.metrics?.title_font_delta ?? null,
+        source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
       })),
     },
   };
@@ -2337,6 +3116,11 @@ async function generateScreenshotReviewDraft(
             occupied_ratio: slide.metrics?.occupied_ratio ?? null,
             primary_points: slide.metrics?.primary_points ?? null,
             speaker_seconds: slide.metrics?.speaker_seconds ?? null,
+            edge_clearance_failures: slide.metrics?.edge_clearance_failures ?? [],
+            title_font_size: slide.metrics?.title_font_size ?? null,
+            title_font_reference: slide.metrics?.title_font_reference ?? null,
+            title_font_delta: slide.metrics?.title_font_delta ?? null,
+            source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
           })),
         },
       },
@@ -2456,7 +3240,7 @@ async function buildScreenshotReviewArtifact({
   adapter = CODEX_DEFAULT_ADAPTER,
 }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
@@ -2487,6 +3271,7 @@ async function buildScreenshotReviewArtifact({
   const { data, aiSlideReviews, generationRuntime } = await generateScreenshotReviewDraft(
     contract,
     deliverablePaths,
+    renderArtifact,
     mechanicalSlideReviews,
     reviewPayload,
     mode,
@@ -2508,9 +3293,17 @@ async function buildScreenshotReviewArtifact({
     occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
     visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
     speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
+    edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
+    title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
     ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
   };
-  const status = Object.values(latestChecks).every((value) => value === true) ? 'pass' : 'block';
+  const failedChecks = Object.entries(latestChecks)
+    .filter(([, value]) => value === false)
+    .map(([key]) => key);
+  const status = failedChecks.length === 0 ? 'pass' : 'block';
+  const rerunFromStage = status === 'pass'
+    ? null
+    : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
   const artifact = {
     ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
     review_execution: {
@@ -2564,12 +3357,12 @@ async function buildScreenshotReviewArtifact({
       ready_for_export: status === 'pass',
       latest_review_stage: 'screenshot_review',
       latest_checks: latestChecks,
-      pending_reviews: status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
-      blocking_reasons: status === 'pass' ? [] : Object.entries(latestChecks).filter(([, value]) => value === false).map(([key]) => key),
-      rerun_from_stage: status === 'pass' ? null : 'render_html',
+      pending_reviews: failedChecks,
+      blocking_reasons: failedChecks,
+      rerun_from_stage: rerunFromStage,
       rerun_policy: {
         status: status === 'pass' ? 'idle' : 'rerun_required',
-        rerun_from_stage: status === 'pass' ? null : 'render_html',
+        rerun_from_stage: rerunFromStage,
       },
     },
   };
@@ -2609,7 +3402,7 @@ function buildExportArtifact({
 }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-  const renderArtifact = readStageArtifact(contract, deliverablePaths, 'render_html');
+  const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
   const publishDir = ensureDir(path.join(deliverablePaths.deliverableDir, 'publish'));
   const pptxFile = path.join(publishDir, `${deliverableId}.pptx`);
   const pdfFile = path.join(publishDir, `${deliverableId}.pdf`);
@@ -2631,6 +3424,10 @@ function buildExportArtifact({
   const exportPayload = python.payload;
   const pptxPath = exportPayload.pptx_file || exportPayload.pptx_path;
   const pdfPath = exportPayload.pdf_file || exportPayload.pdf_path;
+  const stableViewHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
+  if (!existsSync(stableViewHtmlFile)) {
+    throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
+  }
   return {
     ...attachCommon('export_pptx', contract, null, adapter),
     status: 'completed',
@@ -2647,7 +3444,7 @@ function buildExportArtifact({
       },
     },
     export_bundle: {
-      source_html: renderArtifact.html_bundle.html_file,
+      source_html: stableViewHtmlFile,
       pptx_file: pptxPath,
       pdf_file: pdfPath,
       presenter_notes_file: notesFile,
@@ -2664,7 +3461,7 @@ function buildExportArtifact({
         command: ['--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile],
       },
     },
-    artifact_refs: [pptxPath, pdfPath, notesFile].filter(Boolean),
+    artifact_refs: [stableViewHtmlFile, pptxPath, pdfPath, notesFile].filter(Boolean),
   };
 }
 
@@ -2754,7 +3551,17 @@ export async function runPptDeckRoute({
       break;
     }
     case 'render_html':
-      payload = await buildRenderHtmlArtifact({ deliverableId, contract, deliverablePaths, adapter });
+      payload = await buildRenderHtmlArtifact({ workspaceRoot, deliverableId, contract, deliverablePaths, adapter });
+      break;
+    case 'fix_html':
+      payload = await buildRenderHtmlArtifact({
+        workspaceRoot,
+        deliverableId,
+        contract,
+        deliverablePaths,
+        route: PAGE_FIX_ROUTE,
+        adapter,
+      });
       break;
     case 'visual_director_review':
       payload = await buildDirectorReview(contract, deliverablePaths, adapter);
@@ -2776,9 +3583,10 @@ export async function runPptDeckRoute({
     default:
       throw new Error(`Unsupported ppt_deck route: ${route}`);
   }
+  payload = attachRouteReviewReset(payload, route);
   payload = appendArtifactRefs(
     payload,
-    syncPptWorkbenchSurface({ workspaceRoot, contract, deliverableId, route, payload }),
+    syncPptWorkbenchSurface({ workspaceRoot, topicId, contract, deliverableId, route, payload }),
   );
   const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
   return {

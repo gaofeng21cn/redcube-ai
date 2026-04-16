@@ -38,6 +38,7 @@ const PPT_SOURCE_TRUTH_CONTRACT = Object.freeze({
     detailed_outline: 'story_architecture',
     slide_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
+    fix_html: 'visual_authorship',
   },
   required_hydrated_export_surface: 'export_pptx',
 });
@@ -112,6 +113,12 @@ const FAMILY_STAGE_SEQUENCE = {
       requires_stages: ['visual_director_review'],
     },
     {
+      stage_id: 'fix_html',
+      prompt_file: 'fix_html.md',
+      output_artifact: 'fix_bundle.json',
+      requires_stages: ['render_html', 'screenshot_review'],
+    },
+    {
       stage_id: 'export_pptx',
       prompt_file: 'export_pptx.md',
       output_artifact: 'publish_bundle.json',
@@ -130,6 +137,11 @@ const FAMILY_STAGE_SEQUENCE = {
       rerun_from_stage: 'visual_director_review',
     },
     {
+      stage_id: 'fix_html',
+      requires_stage_outputs: ['render_html', 'screenshot_review'],
+      rerun_from_stage: 'screenshot_review',
+    },
+    {
       stage_id: 'export_pptx',
       requires_review: ['screenshot_review'],
       rerun_from_stage: 'screenshot_review',
@@ -143,6 +155,8 @@ const FAMILY_REVIEW_SURFACE = {
     'occlusion_free',
     'visual_density_ok',
     'speaker_fit_ok',
+    'edge_clearance_ok',
+    'title_typography_ok',
     'director_intent_landed',
     'anti_template_ok',
   ],
@@ -152,10 +166,12 @@ const FAMILY_REVIEW_SURFACE = {
     optimize_existing: ['baseline_comparison_passed'],
   },
   rerun_from_stage: {
-    overflow_free: 'render_html',
-    occlusion_free: 'render_html',
+    overflow_free: 'fix_html',
+    occlusion_free: 'fix_html',
     visual_density_ok: 'visual_direction',
     speaker_fit_ok: 'slide_blueprint',
+    edge_clearance_ok: 'fix_html',
+    title_typography_ok: 'fix_html',
     director_intent_landed: 'visual_director_review',
     anti_template_ok: 'visual_director_review',
     baseline_comparison_passed: 'visual_direction',
@@ -220,6 +236,9 @@ const FAMILY_STAGE_REQUIREMENTS = {
   render_html: {
     requires_artifacts: ['slide_blueprint', 'visual_direction'],
   },
+  fix_html: {
+    requires_artifacts: ['render_html', 'screenshot_review'],
+  },
   visual_director_review: {
     requires_artifacts: ['render_html'],
   },
@@ -241,6 +260,7 @@ const FAMILY_PROMPT_PACK = {
     slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
     visual_direction: 'prompts/ppt_deck/visual_direction.md',
     render_html: 'prompts/ppt_deck/render_html.md',
+    fix_html: 'prompts/ppt_deck/fix_html.md',
     visual_director_review: 'prompts/ppt_deck/director_review.md',
     screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
     export_pptx: 'prompts/ppt_deck/export_pptx.md',
@@ -251,6 +271,7 @@ const FAMILY_PROMPT_PACK = {
     slide_blueprint: { file: 'slide_blueprint.md' },
     visual_direction: { file: 'visual_direction.md' },
     render_html: { file: 'render_html.md' },
+    fix_html: { file: 'fix_html.md' },
     visual_director_review: { file: 'director_review.md' },
     screenshot_review: { file: 'screenshot_review.md' },
     export_pptx: { file: 'export_pptx.md' },
@@ -343,6 +364,7 @@ const FAMILY_LIFECYCLE_MODEL = {
     slide_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
     render_html: 'visual_authorship',
+    fix_html: 'visual_authorship',
     export_pptx: 'delivery_packaging',
   },
   review_overlay_routes: {
@@ -392,6 +414,7 @@ const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
     slide_blueprint: 'plan',
     visual_direction: 'visual',
     render_html: 'visual',
+    fix_html: 'visual',
     visual_director_review: 'visual',
     screenshot_review: 'visual',
     export_pptx: 'delivery',

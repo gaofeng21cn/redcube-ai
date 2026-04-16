@@ -89,7 +89,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       overlay_id: 'ppt_deck',
       default_profile_id: 'lecture_student',
       profiles: ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
-      route_sequence: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'export_pptx'],
+      route_sequence: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'export_pptx'],
       deliverable_kind: 'ppt_deck',
       prompt_pack_id: 'ppt_deck_mainline_v1',
       packages: {
@@ -105,7 +105,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       overlay_id: 'xiaohongshu',
       default_profile_id: 'standard_note',
       profiles: ['standard_note'],
-      route_sequence: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'],
+      route_sequence: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle'],
       deliverable_kind: 'xiaohongshu_note',
       prompt_pack_id: 'xiaohongshu_mainline_v1',
       packages: {

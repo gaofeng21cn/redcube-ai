@@ -373,6 +373,7 @@ function buildMockPptRender(meta) {
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
   const variant = safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT);
   const renderScope = safeText(meta?.context?.render_scope, 'full_deck');
+  const rawPrompt = safeText(meta?.__raw_prompt);
   if (variant === 'require_render_batching' && renderScope !== 'summary' && slides.length > 3) {
     throw new Error('mock ppt render expected slide_batch scope with at most 3 slides');
   }
@@ -408,11 +409,15 @@ function buildMockPptRender(meta) {
           const blockedSlideIds = new Set([
             ...safeArray(revisionContext?.visual_director_review?.weak_pages),
             ...safeArray(revisionContext?.screenshot_review?.blocked_slide_ids),
+            ...safeArray(revisionContext?.operator_revision_brief?.target_slide_ids),
           ].map((item) => safeText(item)).filter(Boolean));
           if (blockedSlideIds.has(safeText(slide.slide_id))) {
             const revisionFocus = slide?.revision_focus || {};
             if (!safeText(revisionFocus?.recommended_fix) || safeArray(revisionFocus?.ai_findings).length === 0) {
               throw new Error(`mock ppt render expected revision_focus on blocked slide ${slide.slide_id}: ${JSON.stringify(slide)}`);
+            }
+            if (!/## Provided Local Files/.test(rawPrompt) || !rawPrompt.includes(safeText(slide.slide_id))) {
+              throw new Error(`mock ppt render expected local visual references for blocked slide ${slide.slide_id}`);
             }
           }
         }
@@ -421,12 +426,32 @@ function buildMockPptRender(meta) {
           const blockedSlideIds = new Set([
             ...safeArray(revisionContext?.visual_director_review?.weak_pages),
             ...safeArray(revisionContext?.screenshot_review?.blocked_slide_ids),
+            ...safeArray(revisionContext?.operator_revision_brief?.target_slide_ids),
           ].map((item) => safeText(item)).filter(Boolean));
           if (blockedSlideIds.size === 0) {
             throw new Error(`mock ppt render expected blocked slide ids for targeted rerender: ${JSON.stringify(revisionContext)}`);
           }
           if (!blockedSlideIds.has(safeText(slide.slide_id))) {
             throw new Error(`mock ppt render expected only blocked slides during rerender, got ${slide.slide_id}`);
+          }
+        }
+        if (variant === 'require_mechanical_feedback') {
+          const revisionContext = meta?.context?.revision_context || {};
+          const slideFeedback = safeArray(revisionContext?.screenshot_review?.slide_feedback)
+            .find((item) => safeText(item?.slide_id) === safeText(slide.slide_id));
+          if (!slideFeedback) {
+            throw new Error(`mock ppt render expected screenshot slide feedback for ${slide.slide_id}`);
+          }
+          if (safeArray(slideFeedback?.blocked_checks).includes('edge_clearance_out_of_range')
+            || safeArray(slideFeedback?.blocked_checks).includes('occlusion_detected')
+            || safeArray(slideFeedback?.blocked_checks).includes('visual_density_out_of_range')) {
+            const revisionFocus = slide?.revision_focus || {};
+            if (!safeArray(slideFeedback?.mechanical_findings).length) {
+              throw new Error(`mock ppt render expected mechanical_findings for ${slide.slide_id}: ${JSON.stringify(slideFeedback)}`);
+            }
+            if (!safeArray(revisionFocus?.ai_findings).some((item) => /机械审计|贴边|遮挡|密度/.test(safeText(item)))) {
+              throw new Error(`mock ppt render expected mechanical findings in revision_focus for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+            }
           }
         }
         const markup = buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id));
@@ -471,8 +496,13 @@ function buildMockPptDirectorReview(meta) {
 function buildMockPptScreenshotReview(meta) {
   const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
   const reviewScope = safeText(meta?.context?.review_scope, 'summary');
-  const variant = safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT);
-  if (variant === 'require_parallel_batches' && reviewScope !== 'summary') {
+  const variants = new Set(
+    safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
+  if (variants.has('require_parallel_batches') && reviewScope !== 'summary') {
     recordParallelOverlap({
       lockDir: safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_PARALLEL_LOCK_DIR),
       overlapFile: safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_PARALLEL_OVERLAP_FILE),
@@ -480,16 +510,33 @@ function buildMockPptScreenshotReview(meta) {
       prefix: 'ppt-screenshot',
     });
   }
+  if (variants.has('require_source_html') && reviewScope !== 'summary') {
+    for (const slide of slides) {
+      const sourceHtml = safeText(slide?.source_html);
+      if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(safeText(slide?.slide_id))) {
+        throw new Error(`mock ppt screenshot review expected source_html for ${safeText(slide?.slide_id)}`);
+      }
+    }
+  }
+  const forcedBlockSlideId = variants.has('force_block')
+    ? safeText(slides.find((slide) => safeText(slide?.slide_id) === 'S02')?.slide_id, safeText(slides[0]?.slide_id))
+    : '';
   return {
     director_intent_landed: true,
     anti_template_ok: true,
-    weak_pages: [],
-    review_summary: '截图复核确认封面署名、结构主线与课堂节奏都已经落到最终画面里。',
+    weak_pages: forcedBlockSlideId ? [forcedBlockSlideId] : [],
+    review_summary: forcedBlockSlideId
+      ? `${forcedBlockSlideId} 仍有可见压边，当前不能放行导出。`
+      : '截图复核确认封面署名、结构主线与课堂节奏都已经落到最终画面里。',
     slide_reviews: slides.map((slide) => ({
       slide_id: safeText(slide?.slide_id),
-      judgement: 'pass',
-      visual_findings: ['结构清楚，首眼路径稳定，信息密度可讲可看。'],
-      recommended_fix: 'none',
+      judgement: safeText(slide?.slide_id) === forcedBlockSlideId ? 'block' : 'pass',
+      visual_findings: safeText(slide?.slide_id) === forcedBlockSlideId
+        ? ['底部说明贴边，卡片内最后一行可见压边，仍需局部修页。']
+        : ['结构清楚，首眼路径稳定，信息密度可讲可看。'],
+      recommended_fix: safeText(slide?.slide_id) === forcedBlockSlideId
+        ? '上移并压缩底部文案，恢复卡内底部留白。'
+        : 'none',
     })),
   };
 }
@@ -739,6 +786,20 @@ function buildMockXhsDirectorReview() {
 
 function buildMockXhsScreenshotReview(meta) {
   const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  const variants = new Set(
+    safeText(process.env.REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
+  if (variants.has('require_source_html')) {
+    for (const slide of slides) {
+      const sourceHtml = safeText(slide?.source_html);
+      if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(safeText(slide?.slide_id))) {
+        throw new Error(`mock xhs screenshot review expected source_html for ${safeText(slide?.slide_id)}`);
+      }
+    }
+  }
   return {
     director_intent_landed: true,
     anti_template_ok: true,
@@ -948,6 +1009,20 @@ function buildMockPosterDirectorReview() {
 
 function buildMockPosterScreenshotReview(meta) {
   const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
+  const variants = new Set(
+    safeText(process.env.REDCUBE_MOCK_POSTER_SCREENSHOT_REVIEW_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
+  if (variants.has('require_source_html')) {
+    for (const slide of slides) {
+      const sourceHtml = safeText(slide?.source_html);
+      if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(safeText(slide?.slide_id))) {
+        throw new Error(`mock poster screenshot review expected source_html for ${safeText(slide?.slide_id)}`);
+      }
+    }
+  }
   return {
     director_intent_landed: true,
     anti_template_ok: true,
@@ -975,6 +1050,7 @@ function buildCreativeRunOutput(meta) {
       case 'visual_direction':
         return buildMockXhsVisualDirection(meta);
       case 'render_html':
+      case 'fix_html':
         return buildMockXhsRender(meta);
       case 'visual_director_review':
         return buildMockXhsDirectorReview(meta);
@@ -1014,6 +1090,7 @@ function buildCreativeRunOutput(meta) {
     case 'visual_direction':
       return buildMockVisualDirection(meta);
     case 'render_html':
+    case 'fix_html':
       return buildMockPptRender(meta);
     case 'visual_director_review':
       return buildMockPptDirectorReview(meta);
@@ -1067,6 +1144,7 @@ export function buildMockCodexLastMessage(prompt) {
   if (!creativeMeta) {
     throw new Error('mock codex cli received unsupported prompt');
   }
+  creativeMeta.__raw_prompt = text;
   return formatCreativeRunOutput(buildCreativeRunOutput(creativeMeta));
 }
 

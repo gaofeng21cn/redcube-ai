@@ -12,6 +12,7 @@
 硬约束：
 - 这是 export 前硬闸门，不是软建议
 - 必须逐页读取最终截图，而不是只复述上游结构化摘要
+- 如果同时提供截图与对应页 `source_html`，截图是主裁决依据；`source_html` 只用于确认层级意图、元素归属与隐藏遮挡，不得拿源码为可见缺陷开脱
 - judgment 主语必须是 host-agent / director-first，不允许 Python 几何脚本冒充视觉审稿人
 - 脚本给出的 overflow / occlusion / density / speaker metrics 只是辅助证据，不是最终审稿文案
 - 必须保存逐页截图与 review 记录

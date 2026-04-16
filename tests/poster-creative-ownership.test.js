@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, statSync } from 'node:fs';
 
 import {
   createDeliverable,
@@ -145,5 +145,127 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
     assert.equal(typeof screenshotReview.checks?.director_intent_landed, 'boolean');
     assert.equal(typeof screenshotReview.checks?.anti_template_ok, 'boolean');
     assert.equal(typeof screenshotReview.checks?.message_hierarchy_clear, 'boolean');
+  });
+});
+
+test('poster_onepager screenshot_review forwards current source_html alongside screenshots', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-screenshot-source-html-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      profileId: 'knowledge_poster',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      title: 'P19 海报截图质控源码对照',
+      goal: '验证海报截图质控会同时参考当前 HTML 源码',
+    });
+
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_POSTER_SCREENSHOT_REVIEW_VARIANT: 'require_source_html',
+    });
+    try {
+      const routes = ['storyline', 'poster_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
+      for (const route of routes) {
+        const result = await runDeliverableRoute({
+          workspaceRoot,
+          overlay: 'poster_onepager',
+          topicId: 'topic-a',
+          deliverableId: 'poster-a',
+          route,
+        });
+        assert.equal(result.ok, true, route);
+      }
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('poster_onepager rerender keeps stable views untouched and writes candidate draft separately', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-stable-views-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      profileId: 'knowledge_poster',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      title: 'P19 海报稳定视图验证',
+      goal: '验证海报候选稿不会覆盖稳定视图，且稳定截图入口与通过 capture 对齐',
+    });
+
+    const routes = ['storyline', 'poster_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
+    const results = [];
+    for (const route of routes) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'poster_onepager',
+        topicId: 'topic-a',
+        deliverableId: 'poster-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+      results.push(result);
+    }
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'poster-a');
+    const stableViewHtmlFile = path.join(deliverableDir, 'views', 'poster-a.html');
+    const draftViewHtmlFile = path.join(deliverableDir, 'views', 'poster-a.draft.html');
+
+    const stableViewHtmlContent = readFileSync(stableViewHtmlFile, 'utf-8');
+    const stableViewHtmlStat = statSync(stableViewHtmlFile).mtimeMs;
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    const rerender = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      route: 'render_html',
+    });
+    assert.equal(rerender.ok, true);
+
+    assert.equal(statSync(stableViewHtmlFile).mtimeMs, stableViewHtmlStat);
+    assert.equal(readFileSync(stableViewHtmlFile, 'utf-8'), stableViewHtmlContent);
+    assert.equal(existsSync(draftViewHtmlFile), true);
+  });
+});
+
+test('poster_onepager export_bundle records the stable reviewed HTML instead of the latest draft candidate', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-export-stable-html-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      profileId: 'knowledge_poster',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      title: 'P19 海报稳定导出 HTML',
+      goal: '验证 export_bundle 记录的 source_html 指向稳定通过版',
+    });
+
+    for (const route of [
+      'storyline',
+      'poster_blueprint',
+      'visual_direction',
+      'render_html',
+      'visual_director_review',
+      'screenshot_review',
+      'export_bundle',
+    ]) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'poster_onepager',
+        topicId: 'topic-a',
+        deliverableId: 'poster-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'poster-a');
+    const exportArtifact = readJson(path.join(deliverableDir, 'artifacts', 'publish_bundle.json'));
+    assert.equal(exportArtifact.export_bundle.source_html, path.join(deliverableDir, 'views', 'poster-a.html'));
   });
 });

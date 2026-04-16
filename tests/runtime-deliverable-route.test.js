@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -91,6 +91,7 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
     'render_html',
     'visual_director_review',
     'screenshot_review',
+    'fix_html',
     'export_pptx',
   ]);
 });
@@ -114,7 +115,7 @@ test('createDeliverable supports xiaohongshu on the shared runtime mainline', as
   assert.equal(created.deliverable.overlay, 'xiaohongshu');
   assert.equal(created.deliverable.kind, 'xiaohongshu_note');
   assert.equal(created.deliverable.profile_id, 'standard_note');
-  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle']);
+  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle']);
 });
 
 test('createDeliverable supports poster_onepager on the shared runtime mainline', async () => {
@@ -563,6 +564,56 @@ test('runDeliverableRoute rejects route not declared by hydrated deliverable con
     }),
     /Route publish_live is not declared by hydrated deliverable contract/,
   );
+});
+
+test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the current overlay contract declares the requested route', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-rehydrate-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '甲状腺门诊科普 deck',
+      goal: '为本科生讲授甲状腺基础知识',
+    });
+
+    const contractFile = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'contracts',
+      'hydrated-deliverable.json',
+    );
+    const contract = JSON.parse(readFileSync(contractFile, 'utf-8'));
+    contract.stage_sequence.stages = contract.stage_sequence.stages.filter((stage) => stage.stage_id !== 'fix_html');
+    delete contract.stage_requirements.fix_html;
+    delete contract.prompt_pack.routes.fix_html;
+    delete contract.prompt_pack.stages.fix_html;
+    writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'fix_html',
+    });
+
+    assert.equal(result.ok, false);
+    assert.match(result.run.error.message, /requires completed stage artifacts|requires screenshot_review/i);
+
+    const refreshedContract = JSON.parse(readFileSync(contractFile, 'utf-8'));
+    assert.equal(
+      refreshedContract.stage_sequence.stages.some((stage) => stage?.stage_id === 'fix_html'),
+      true,
+    );
+    assert.equal(result.governance_surface?.family_boundary?.overlay, 'ppt_deck');
+  });
 });
 
 test('runDeliverableRoute supports xiaohongshu routes on shared runtime', async () => {

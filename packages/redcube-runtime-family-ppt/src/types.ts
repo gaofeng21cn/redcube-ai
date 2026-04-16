@@ -112,6 +112,8 @@ export interface PptRuntimeLatestChecks {
   occlusion_free?: boolean;
   visual_density_ok?: boolean;
   speaker_fit_ok?: boolean;
+  edge_clearance_ok?: boolean;
+  title_typography_ok?: boolean;
   baseline_comparison_passed?: boolean;
   term_explained_on_first_use?: boolean;
   teaching_progression_clear?: boolean;
@@ -337,6 +339,7 @@ export type PptRuntimeRouteResult =
   | PptRuntimeRouteOutput<'slide_blueprint', PptBlueprintArtifact>
   | PptRuntimeRouteOutput<'visual_direction', PptVisualDirectionArtifact>
   | PptRuntimeRouteOutput<'render_html', PptRenderArtifact>
+  | PptRuntimeRouteOutput<'fix_html', PptRenderArtifact>
   | PptRuntimeRouteOutput<'visual_director_review', PptVisualDirectorReviewArtifact>
   | PptRuntimeRouteOutput<'screenshot_review', PptScreenshotReviewArtifact>
   | PptRuntimeRouteOutput<'export_pptx', PptExportBundleArtifact>;
