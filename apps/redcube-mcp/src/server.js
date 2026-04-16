@@ -65,118 +65,160 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   applyReviewMutation,
 };
 
+const ACTION_STRING = z.string().describe('Grouped task action selector.');
+const OPERATION_STRING = z.string().describe('Grouped source operation selector.');
+const WORKSPACE_ROOT = z.string().describe('Absolute workspace root path.');
+const OPTIONAL_WORKSPACE_ROOT = z.string().optional().describe('Absolute workspace root path.');
+const TOPIC_ID = z.string().describe('Topic identifier.');
+const OPTIONAL_TOPIC_ID = z.string().optional().describe('Topic identifier.');
+const DELIVERABLE_ID = z.string().describe('Deliverable identifier.');
+const OPTIONAL_DELIVERABLE_ID = z.string().optional().describe('Deliverable identifier.');
+const OVERLAY_ID = z.string().describe('Overlay id.');
+const OPTIONAL_OVERLAY_ID = z.string().optional().describe('Overlay id.');
+const STRING_ARRAY_OR_CSV = z.union([z.string(), z.array(z.string())]);
+const PASSTHROUGH_OBJECT = z.object({}).passthrough();
+
+const TOOL_ROUTE_DEFINITIONS = {
+  redcube_workspace: {
+    selector: 'action',
+    routes: {
+      doctor_workspace: 'doctorWorkspace',
+      list_topics: 'listTopics',
+      get_overlay_catalog: 'getOverlayCatalog',
+    },
+  },
+  redcube_sources: {
+    selector: 'operation',
+    routes: {
+      intake_source: 'intakeSource',
+      source_research: 'researchSource',
+      prepare_source_augmentation: 'prepareSourceAugmentation',
+      prepare_source_augmentation_result: 'prepareSourceAugmentationResult',
+      write_source_augmentation_result: 'writeSourceAugmentationResult',
+      execute_source_augmentation: 'executeSourceAugmentation',
+    },
+  },
+  redcube_deliverable: {
+    selector: 'action',
+    routes: {
+      create_deliverable: 'createDeliverable',
+      get_deliverable: 'getDeliverable',
+      run_managed_deliverable: 'runManagedDeliverable',
+      get_managed_run: 'getManagedRun',
+      supervise_managed_run: 'superviseManagedRun',
+      run_deliverable_route: 'runDeliverableRoute',
+      get_run: 'getRun',
+    },
+  },
+  redcube_review: {
+    selector: 'action',
+    routes: {
+      get_publication_projection: 'getPublicationProjection',
+      audit_deliverable: 'auditDeliverable',
+      review_render_output: 'reviewRenderOutput',
+      get_review_state: 'getReviewState',
+      apply_review_mutation: 'applyReviewMutation',
+      runtime_watch: 'runtimeWatch',
+    },
+  },
+  redcube_product_entry: {
+    selector: 'action',
+    routes: {
+      invoke_domain_entry: 'invokeDomainEntry',
+      invoke_product_entry: 'invokeProductEntry',
+      invoke_federated_product_entry: 'invokeFederatedProductEntry',
+      get_product_entry_session: 'getProductEntrySession',
+      get_product_entry_manifest: 'getProductEntryManifest',
+    },
+  },
+};
+
 export const TOOL_DEFINITIONS = [
   {
-    name: 'doctor',
-    description: 'Inspect workspace contract and canonical directories on the diagnostic workspace surface.',
-    actionKey: 'doctorWorkspace',
+    name: 'redcube_workspace',
+    description: 'Grouped workspace/topic discovery surface for workspace doctor, topic catalog, and overlay catalog actions.',
     inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
+      action: ACTION_STRING,
+      workspaceRoot: WORKSPACE_ROOT.optional(),
     },
   },
   {
-    name: 'list_topics',
-    description: 'List canonical topic records from the workspace.',
-    actionKey: 'listTopics',
+    name: 'redcube_sources',
+    description: 'Grouped source intake/research and augmentation surface for canonical source readiness and augmentation orchestration.',
     inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-    },
-  },
-  {
-    name: 'get_overlay_catalog',
-    description: 'Read registry-driven overlay/profile discovery surface for onboarding.',
-    actionKey: 'getOverlayCatalog',
-    inputSchema: {},
-  },
-  {
-    name: 'intake_source',
-    description: 'Hydrate brief / keywords / source files into canonical shared source artifacts as the direct bootstrap writer.',
-    actionKey: 'intakeSource',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
+      operation: OPERATION_STRING,
+      workspaceRoot: WORKSPACE_ROOT.optional(),
+      topicId: TOPIC_ID.optional(),
       title: z.string().optional().describe('Topic title.'),
       brief: z.string().optional().describe('Short textual brief.'),
-      keywords: z.union([z.string(), z.array(z.string())]).optional().describe('Keyword list or comma-separated keywords.'),
-      sourceFiles: z.union([z.string(), z.array(z.string())]).optional().describe('Absolute source file paths or comma-separated file list.'),
+      keywords: STRING_ARRAY_OR_CSV.optional().describe('Keyword list or comma-separated keywords.'),
+      sourceFiles: STRING_ARRAY_OR_CSV.optional().describe('Absolute source file paths or comma-separated file list.'),
       modeHint: z.string().optional().describe('Optional intake mode hint such as legacy_import.'),
-    },
-  },
-  {
-    name: 'source_research',
-    description: 'Run the formal Source Readiness / Deep Research orchestration surface from intake through augmentation or canonical result staging until planning_ready or explicit staging.',
-    actionKey: 'researchSource',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-      title: z.string().optional().describe('Topic title.'),
-      brief: z.string().optional().describe('Short textual brief.'),
-      keywords: z.union([z.string(), z.array(z.string())]).optional().describe('Keyword list or comma-separated keywords.'),
-      sourceFiles: z.union([z.string(), z.array(z.string())]).optional().describe('Absolute source file paths or comma-separated file list.'),
-      modeHint: z.string().optional().describe('Optional intake mode hint such as legacy_import.'),
-      payloadFile: z.string().optional().describe('Optional payload JSON file for result_file route.'),
-      result: z.object({}).passthrough().optional().describe('Optional structured payload object for result_file route.'),
-    },
-  },
-  {
-    name: 'prepare_source_augmentation',
-    description: 'Build the canonical Source Augmentation / Deep Research contract from current source readiness.',
-    actionKey: 'prepareSourceAugmentation',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-      title: z.string().optional().describe('Optional topic title override.'),
-    },
-  },
-  {
-    name: 'prepare_source_augmentation_result',
-    description: 'Prepare the canonical result scaffold and target artifact path for an agent-native Source Augmentation / Deep Research route.',
-    actionKey: 'prepareSourceAugmentationResult',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-    },
-  },
-  {
-    name: 'write_source_augmentation_result',
-    description: 'Validate and write a Source Augmentation / Deep Research payload onto the canonical result artifact surface.',
-    actionKey: 'writeSourceAugmentationResult',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
       inputFile: z.string().optional().describe('Absolute payload JSON file path.'),
       payloadFile: z.string().optional().describe('Absolute payload JSON file path.'),
-      result: z.object({}).passthrough().optional().describe('Structured payload object when not using payloadFile.'),
+      result: PASSTHROUGH_OBJECT.optional().describe('Optional structured payload object.'),
     },
   },
   {
-    name: 'execute_source_augmentation',
-    description: 'Execute the configured Source Augmentation / Deep Research executor and rewrite canonical source truth.',
-    actionKey: 'executeSourceAugmentation',
+    name: 'redcube_deliverable',
+    description: 'Grouped deliverable lifecycle execution surface for create/get/run/managed route actions across one deliverable boundary.',
     inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
+      action: ACTION_STRING,
+      workspaceRoot: WORKSPACE_ROOT.optional(),
+      overlay: OVERLAY_ID.optional(),
+      profileId: z.string().optional().describe('Overlay profile id.'),
+      topicId: TOPIC_ID.optional(),
+      deliverableId: DELIVERABLE_ID.optional(),
+      title: z.string().optional().describe('Deliverable title.'),
+      goal: z.string().optional().describe('Deliverable goal.'),
+      route: z.string().optional().describe('Route name.'),
+      adapter: z.string().optional().describe('Executor adapter id.'),
+      userIntent: z.string().optional().describe('User-facing request.'),
+      stopAfterStage: z.string().optional().describe('Optional explicit stage boundary to stop after.'),
+      mode: z.string().optional().describe('Execution mode such as draft_new or optimize_existing.'),
+      baselineDeliverableId: z.string().optional().describe('Optional approved baseline deliverable id.'),
+      managedRunId: z.string().optional().describe('Managed run identifier.'),
+      runId: z.string().optional().describe('Run identifier.'),
     },
   },
   {
-    name: 'invoke_domain_entry',
-    description: 'Call the service-safe RedCube domain entry adapter for future OPL Gateway style handoff.',
-    actionKey: 'invokeDomainEntry',
+    name: 'redcube_review',
+    description: 'Grouped deliverable boundary review surface for publication projection, audit, review mutation, and runtime watch actions.',
     inputSchema: {
-      target_domain_id: z.string().describe('Target domain id. Must be redcube_ai.'),
-      task_intent: z.string().describe('Task intent such as run_managed_deliverable or run_deliverable_route.'),
-      entry_mode: z.string().describe('Required entry mode such as opl_gateway or service_call.'),
+      action: ACTION_STRING,
+      workspaceRoot: OPTIONAL_WORKSPACE_ROOT,
+      overlay: OPTIONAL_OVERLAY_ID,
+      topicId: OPTIONAL_TOPIC_ID,
+      deliverableId: OPTIONAL_DELIVERABLE_ID,
+      mode: z.string().optional().describe('Audit mode such as optimize_existing or draft_new.'),
+      baselineDeliverableId: z.string().optional().describe('Approved baseline deliverable id when optimizing existing outputs.'),
+      checks: z.record(z.string(), z.unknown()).optional().describe('Structured render review checks.'),
+      mutation: PASSTHROUGH_OBJECT.optional().describe('Structured review mutation payload.'),
+      runId: z.string().optional().describe('Run identifier on the canonical run boundary.'),
+      run: PASSTHROUGH_OBJECT.optional().describe('Preloaded run envelope to inspect when already resolved in-process.'),
+    },
+  },
+  {
+    name: 'redcube_product_entry',
+    description: 'Grouped product-entry surface for direct, federated, session, manifest, and domain-entry actions with federated handoff support.',
+    inputSchema: {
+      action: ACTION_STRING,
+      target_domain_id: z.string().optional().describe('Target domain id. Must be redcube_ai.'),
+      task_intent: z.string().optional().describe('Task intent such as run_managed_deliverable or run_deliverable_route.'),
+      entry_mode: z.string().optional().describe('Required entry mode such as opl_gateway or service_call.'),
+      workspace_root: z.string().optional().describe('Absolute workspace root path.'),
+      workspaceRoot: z.string().optional().describe('Absolute workspace root path.'),
       workspace_locator: z.object({
         workspace_root: z.string().describe('Absolute workspace root path.'),
-      }).describe('Machine-readable workspace locator.'),
+      }).optional().describe('Machine-readable workspace locator.'),
       runtime_session_contract: z.object({
-        runtime_owner: z.string().describe('Runtime owner. Must be upstream_hermes_agent.'),
+        runtime_owner: z.string().describe('Runtime owner.'),
         adapter_surface: z.string().optional().describe('Adapter surface identifier.'),
         session_mode: z.string().optional().describe('Session mode such as ephemeral_run.'),
-      }).describe('Runtime session contract for the upstream Hermes-Agent substrate.'),
+      }).optional().describe('Runtime session contract.'),
       return_surface_contract: z.object({
-        surface_kind: z.string().describe('Required return surface such as managed_run or route_run.'),
-      }).describe('Requested return surface contract.'),
+        surface_kind: z.string().describe('Required return surface.'),
+      }).optional().describe('Requested return surface contract.'),
       domain_payload: z.object({
         deliverable_family: z.string().describe('RedCube deliverable family / overlay id.'),
         topic_id: z.string().describe('Topic identifier.'),
@@ -184,24 +226,14 @@ export const TOOL_DEFINITIONS = [
         route: z.string().optional().describe('Route name when task_intent is run_deliverable_route.'),
         adapter: z.string().optional().describe('Optional executor adapter id.'),
         user_intent: z.string().optional().describe('Optional user intent for managed execution.'),
-        stop_after_stage: z.string().optional().describe('Optional explicit stop-after stage for managed execution.'),
+        stop_after_stage: z.string().optional().describe('Optional explicit stop-after stage.'),
         mode: z.string().optional().describe('Execution mode such as draft_new.'),
         baseline_deliverable_id: z.string().optional().describe('Optional baseline deliverable id.'),
-      }).describe('RedCube visual-domain payload.'),
-    },
-  },
-  {
-    name: 'invoke_product_entry',
-    description: 'Call the direct RedCube product-entry surface, converge onto the same downstream domain entry, and return family orchestration companion fields.',
-    actionKey: 'invokeProductEntry',
-    inputSchema: {
-      workspace_locator: z.object({
-        workspace_root: z.string().describe('Absolute workspace root path.'),
-      }).describe('Machine-readable workspace locator.'),
+      }).optional().describe('RedCube visual-domain payload.'),
       entry_session_contract: z.object({
         entry_session_id: z.string().describe('Durable product-entry session identifier.'),
-      }).describe('Product-entry session contract.'),
-      task_intent: z.string().optional().describe('Optional task intent; defaults to run_managed_deliverable.'),
+      }).optional().describe('Product-entry session contract.'),
+      entry_session_id: z.string().optional().describe('Durable product-entry session identifier.'),
       delivery_request: z.object({
         deliverable_family: z.string().optional().describe('RedCube deliverable family / overlay id.'),
         topic_id: z.string().optional().describe('Topic identifier.'),
@@ -215,210 +247,7 @@ export const TOOL_DEFINITIONS = [
         stop_after_stage: z.string().optional().describe('Optional explicit stop-after stage.'),
         mode: z.string().optional().describe('Execution mode such as draft_new.'),
         baseline_deliverable_id: z.string().optional().describe('Optional baseline deliverable id when optimizing existing outputs.'),
-      }).describe('Product-entry delivery request.'),
-    },
-  },
-  {
-    name: 'invoke_federated_product_entry',
-    description: 'Call the OPL Gateway style handoff surface, converge onto the same downstream RedCube product entry, and return family orchestration companion fields.',
-    actionKey: 'invokeFederatedProductEntry',
-    inputSchema: {
-      target_domain_id: z.string().describe('Target domain id. Must be redcube_ai.'),
-      task_intent: z.string().describe('Task intent such as run_managed_deliverable or run_deliverable_route.'),
-      entry_mode: z.string().describe('Required entry mode. Must be opl_gateway.'),
-      workspace_locator: z.object({
-        workspace_root: z.string().describe('Absolute workspace root path.'),
-      }).describe('Machine-readable workspace locator.'),
-      runtime_session_contract: z.object({
-        runtime_owner: z.string().describe('Runtime owner. Must be upstream_hermes_agent.'),
-      }).describe('Runtime session contract for the upstream Hermes-Agent substrate.'),
-      return_surface_contract: z.object({
-        surface_kind: z.string().describe('Required return surface. Must be product_entry.'),
-      }).describe('Requested product-entry return surface.'),
-      entry_session_contract: z.object({
-        entry_session_id: z.string().describe('Durable product-entry session identifier.'),
-      }).describe('Product-entry session contract.'),
-      delivery_request: z.object({
-        deliverable_family: z.string().optional().describe('RedCube deliverable family / overlay id.'),
-        topic_id: z.string().optional().describe('Topic identifier.'),
-        deliverable_id: z.string().optional().describe('Deliverable identifier.'),
-        profile_id: z.string().optional().describe('Profile id when deliverable creation is required.'),
-        title: z.string().optional().describe('Deliverable title when deliverable creation is required.'),
-        goal: z.string().optional().describe('Deliverable goal when deliverable creation is required.'),
-        route: z.string().optional().describe('Route name when task_intent is run_deliverable_route.'),
-        adapter: z.string().optional().describe('Optional executor adapter id.'),
-        user_intent: z.string().optional().describe('Optional user request for managed execution.'),
-        stop_after_stage: z.string().optional().describe('Optional explicit stop-after stage.'),
-        mode: z.string().optional().describe('Execution mode such as draft_new.'),
-        baseline_deliverable_id: z.string().optional().describe('Optional baseline deliverable id when optimizing existing outputs.'),
-      }).describe('Product-entry delivery request.'),
-    },
-  },
-  {
-    name: 'get_product_entry_session',
-    description: 'Read one persisted product-entry session with continuation surfaces and family orchestration companion from user-level runtime-state.',
-    actionKey: 'getProductEntrySession',
-    inputSchema: {
-      entry_session_id: z.string().describe('Durable product-entry session identifier.'),
-    },
-  },
-  {
-    name: 'get_product_entry_manifest',
-    description: 'Read the current RedCube product-entry manifest so hosts can discover direct/federated/session surfaces plus family orchestration companion without guessing.',
-    actionKey: 'getProductEntryManifest',
-    inputSchema: {
-      workspace_root: z.string().optional().describe('Absolute workspace root path.'),
-      workspaceRoot: z.string().optional().describe('Absolute workspace root path.'),
-      workspace_locator: z.object({
-        workspace_root: z.string().describe('Absolute workspace root path.'),
-      }).optional().describe('Machine-readable workspace locator.'),
-    },
-  },
-  {
-    name: 'create_deliverable',
-    description: 'Create a canonical deliverable record under a topic.',
-    actionKey: 'createDeliverable',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      overlay: z.string().describe('Overlay id, for example ppt_deck.'),
-      profileId: z.string().describe('Overlay profile id, for example lecture_student.'),
-      topicId: z.string().describe('Topic identifier.'),
-      deliverableId: z.string().describe('Deliverable identifier.'),
-      title: z.string().describe('Deliverable title.'),
-      goal: z.string().describe('Deliverable goal expressed in business/task terms.'),
-    },
-  },
-  {
-    name: 'get_deliverable',
-    description: 'Read one visual deliverable record with product-facing metadata.',
-    actionKey: 'getDeliverable',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-      deliverableId: z.string().describe('Deliverable identifier.'),
-    },
-  },
-  {
-    name: 'get_publication_projection',
-    description: 'Read topic boundary publication projection rebuilt from canonical publish truth.',
-    actionKey: 'getPublicationProjection',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-    },
-  },
-  {
-    name: 'audit_deliverable',
-    description: 'Run preflight audit gates before higher-cost routes.',
-    actionKey: 'auditDeliverable',
-    inputSchema: {
-      workspaceRoot: z.string().optional().describe('Absolute workspace root path when auditing a concrete deliverable surface.'),
-      overlay: z.string().describe('Overlay id.'),
-      topicId: z.string().optional().describe('Topic identifier when auditing a concrete deliverable surface.'),
-      deliverableId: z.string().optional().describe('Deliverable identifier when auditing a concrete deliverable surface.'),
-      mode: z.string().describe('Audit mode such as optimize_existing or draft_new.'),
-      baselineDeliverableId: z.string().optional().describe('Approved baseline deliverable id when optimizing existing outputs.'),
-    },
-  },
-  {
-    name: 'review_render_output',
-    description: 'Review rendered deliverable checks and decide rerun stage.',
-    actionKey: 'reviewRenderOutput',
-    inputSchema: {
-      workspaceRoot: z.string().optional().describe('Absolute workspace root path when loading hydrated contract from disk.'),
-      overlay: z.string().describe('Overlay id.'),
-      topicId: z.string().optional().describe('Topic identifier when loading hydrated contract from disk.'),
-      deliverableId: z.string().optional().describe('Deliverable identifier when loading hydrated contract from disk.'),
-      checks: z.record(z.string(), z.unknown()).describe('Structured render review checks.'),
-    },
-  },
-  {
-    name: 'run_managed_deliverable',
-    description: 'Run the managed control plane from the current deliverable through the remaining stages.',
-    actionKey: 'runManagedDeliverable',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      overlay: z.string().describe('Overlay id.'),
-      topicId: z.string().describe('Topic identifier.'),
-      deliverableId: z.string().describe('Deliverable identifier.'),
-      adapter: z.string().optional().describe('Executor adapter id.'),
-      userIntent: z.string().optional().describe('User-facing request, for example 给我一个最终 PPT。'),
-      stopAfterStage: z.string().optional().describe('Optional explicit stage boundary to stop after.'),
-      mode: z.string().optional().describe('Execution mode such as draft_new or optimize_existing.'),
-      baselineDeliverableId: z.string().optional().describe('Optional approved baseline deliverable id when optimizing existing outputs.'),
-    },
-  },
-  {
-    name: 'get_managed_run',
-    description: 'Read a persisted managed execution record and controller-owned progress projection.',
-    actionKey: 'getManagedRun',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      managedRunId: z.string().describe('Managed run identifier.'),
-    },
-  },
-  {
-    name: 'supervise_managed_run',
-    description: 'Run one managed supervisor tick and refresh runtime supervision/progress/escalation surfaces.',
-    actionKey: 'superviseManagedRun',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      managedRunId: z.string().describe('Managed run identifier.'),
-    },
-  },
-  {
-    name: 'run_deliverable_route',
-    description: 'Run one deliverable route and return the current route execution surface.',
-    actionKey: 'runDeliverableRoute',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      overlay: z.string().describe('Overlay id.'),
-      topicId: z.string().describe('Topic identifier.'),
-      deliverableId: z.string().describe('Deliverable identifier.'),
-      route: z.string().describe('Route name, for example storyline.'),
-      adapter: z.string().optional().describe('Executor adapter id.'),
-    },
-  },
-  {
-    name: 'get_run',
-    description: 'Read a persisted runtime run record.',
-    actionKey: 'getRun',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      runId: z.string().describe('Run identifier.'),
-    },
-  },
-  {
-    name: 'get_review_state',
-    description: 'Read the deliverable boundary review state for one hydrated deliverable.',
-    actionKey: 'getReviewState',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-      deliverableId: z.string().describe('Deliverable identifier.'),
-    },
-  },
-  {
-    name: 'apply_review_mutation',
-    description: 'Apply a platform-level review mutation such as request_changes or bind_baseline.',
-    actionKey: 'applyReviewMutation',
-    inputSchema: {
-      workspaceRoot: z.string().describe('Absolute workspace root path.'),
-      topicId: z.string().describe('Topic identifier.'),
-      deliverableId: z.string().describe('Deliverable identifier.'),
-      mutation: z.object({}).passthrough().describe('Structured review mutation payload.'),
-    },
-  },
-  {
-    name: 'runtime_watch',
-    description: 'Summarize the run boundary runtime review-loop status from a canonical workspace/topic/deliverable/run locator or a provided run envelope.',
-    actionKey: 'runtimeWatch',
-    inputSchema: {
-      workspaceRoot: z.string().optional().describe('Absolute workspace root path when loading hydrated contract from disk.'),
-      topicId: z.string().optional().describe('Topic identifier when loading hydrated contract from disk.'),
-      deliverableId: z.string().optional().describe('Deliverable identifier when loading hydrated contract from disk.'),
-      runId: z.string().optional().describe('Run identifier on the canonical run boundary.'),
-      run: z.object({}).passthrough().optional().describe('Preloaded run envelope to inspect when already resolved in-process.'),
+      }).optional().describe('Product-entry delivery request.'),
     },
   },
 ];
@@ -482,13 +311,33 @@ export async function callGatewayTool(name, args, deps = {}) {
     throw new Error(`Unknown tool: ${name}`);
   }
 
-  const actions = getGatewayActions(deps);
-  const action = actions[definition.actionKey];
-  if (typeof action !== 'function') {
-    throw new Error(`Gateway action not configured: ${definition.actionKey}`);
+  const routeDefinition = TOOL_ROUTE_DEFINITIONS[name];
+  if (!routeDefinition) {
+    throw new Error(`Tool routing not configured: ${name}`);
   }
 
-  return action(args);
+  const selectorValue = args?.[routeDefinition.selector];
+  if (typeof selectorValue !== 'string') {
+    throw new Error(`${name} requires ${routeDefinition.selector}.`);
+  }
+
+  const actionKey = routeDefinition.routes[selectorValue];
+  if (!actionKey) {
+    throw new Error(`Unsupported ${name} ${routeDefinition.selector}: ${selectorValue}`);
+  }
+
+  const forwardedArgs = {
+    ...args,
+  };
+  delete forwardedArgs[routeDefinition.selector];
+
+  const actions = getGatewayActions(deps);
+  const action = actions[actionKey];
+  if (typeof action !== 'function') {
+    throw new Error(`Gateway action not configured: ${actionKey}`);
+  }
+
+  return action(forwardedArgs);
 }
 
 export function createMcpServer(deps = {}) {
