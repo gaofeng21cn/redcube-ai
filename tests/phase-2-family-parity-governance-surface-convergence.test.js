@@ -73,6 +73,6 @@ test('family parity governance tranche is now absorbed provenance without wideni
   assert.equal(brief.includes('closeout_completed'), true);
   assert.equal(brief.includes('完成实现并吸收到主线 provenance'), true);
   assert.equal(runtimeWatchBrief.includes('prefrozen follow-on board'), true);
-  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的本地 Codex CLI host-agent runtime'), true);
+  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime'), true);
   assert.equal(positioning.includes('repo-verified product entry + OPL Gateway federation + managed product-entry hardening'), true);
 });
