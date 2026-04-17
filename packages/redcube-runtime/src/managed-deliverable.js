@@ -343,7 +343,11 @@ function buildContentStatus(managedRun) {
 function buildManagedProgressProjection(workspaceRoot, managedRun) {
   const stageSequence = loadManagedStageSequence(workspaceRoot, managedRun);
   const completedStageResults = safeArray(managedRun.stage_results)
-    .filter((stageResult) => stageResult?.status === 'completed' || stageResult?.status === 'stopped_after_stage');
+    .filter((stageResult) => (
+      stageResult?.status === 'completed'
+      || stageResult?.status === 'stopped_after_stage'
+      || stageResult?.status === 'skipped'
+    ));
   const completedStages = uniqueList(completedStageResults.map((stageResult) => stageResult.stage_id));
   const remainingStages = stageSequence.filter((stageId) => !completedStages.includes(stageId));
   const lastCompletedStageResult = completedStageResults.at(-1) || null;
@@ -540,6 +544,64 @@ function nextStageId(stages, currentStageId) {
   return stages[index + 1]?.stage_id || null;
 }
 
+function buildSkippedStageResult({
+  managedRun,
+  stageId,
+  stages,
+}) {
+  const nextStage = nextStageId(stages, stageId);
+  return {
+    schema_version: 1,
+    managed_run_id: managedRun.managed_run_id,
+    stage_id: stageId,
+    attempt: 0,
+    route_run_id: null,
+    status: 'skipped',
+    summary: nextStage
+      ? `${stageLabel(stageId)}当前不需要执行，系统直接继续推进到${stageLabel(nextStage)}。`
+      : `${stageLabel(stageId)}当前不需要执行，系统直接完成托管主线。`,
+    artifacts: [],
+    decision: nextStage ? 'skip_stage' : 'complete_managed_run',
+    next_action: nextStage ? `run_${nextStage}` : 'finalize_delivery',
+    blocking_reason: null,
+    controller_decision: {
+      decision: 'skip_stage',
+      reason_code: 'stage_not_required_for_current_review_state',
+      requires_human_confirmation: false,
+      requires_external_secret: false,
+    },
+    recorded_at: new Date().toISOString(),
+  };
+}
+
+function shouldSkipManagedStage({
+  contract,
+  deliverablePaths,
+  managedRun,
+  stageId,
+}) {
+  if (managedRun?.mode !== 'auto_to_terminal') {
+    return false;
+  }
+  if (stageId !== 'fix_html') {
+    return false;
+  }
+  const reviewStageId = safeText(contract?.review_surface?.artifact_stage, 'screenshot_review');
+  if (!reviewStageId) {
+    return false;
+  }
+  const reviewArtifactPath = stageArtifactPath(contract, deliverablePaths, reviewStageId);
+  if (!existsSync(reviewArtifactPath)) {
+    return false;
+  }
+  const reviewArtifact = readJson(reviewArtifactPath);
+  const rerunPolicy = reviewArtifact?.review_state_patch?.rerun_policy || null;
+  return !(
+    safeText(rerunPolicy?.status) === 'rerun_required'
+    && safeText(rerunPolicy?.rerun_from_stage) === stageId
+  );
+}
+
 function buildStageIngestion({
   managedRun,
   routeResult,
@@ -718,10 +780,29 @@ function applyStageIngestion({
 }) {
   managedRun.current_stage = stageResult.stage_id;
   managedRun.stage_results = [...safeArray(managedRun.stage_results), stageResult];
-  managedRun.route_runs = [
-    ...safeArray(managedRun.route_runs).filter((item) => !(item.stage_id === routeRunLink.stage_id && item.attempt === routeRunLink.attempt)),
-    routeRunLink,
-  ];
+  if (routeRunLink) {
+    managedRun.route_runs = [
+      ...safeArray(managedRun.route_runs).filter((item) => !(item.stage_id === routeRunLink.stage_id && item.attempt === routeRunLink.attempt)),
+      routeRunLink,
+    ];
+  }
+
+  if (stageResult.decision === 'skip_stage') {
+    managedRun.status = 'running';
+    managedRun.current_blockers = [];
+    managedRun.runtime_health_status = 'degraded';
+    managedRun.parking_reason_code = null;
+    managedRun.requires_human_confirmation = false;
+    managedRun.requires_external_secret = false;
+    managedRun.next_system_action = `系统将继续执行${stageLabel(stageResult.next_action.replace(/^run_/, ''))}`;
+    managedRun.needs_user_decision = false;
+    pushManagedEvent(workspaceRoot, managedRun, {
+      kind: 'stage_skipped',
+      stageId: stageResult.stage_id,
+      summary: stageResult.summary,
+    });
+    return { done: false, ok: true };
+  }
 
   if (stageResult.decision === 'advance_to_next_stage') {
     managedRun.status = 'running';
@@ -914,24 +995,33 @@ export async function runManagedDeliverable({
   for (let stageIndex = 0; stageIndex < stages.length; ) {
     const stageContract = stages[stageIndex];
     const stageId = safeText(stageContract?.stage_id);
-    if (shouldSkipAutoToTerminalStage({
+    if (shouldSkipManagedStage({
       contract,
       deliverablePaths,
       managedRun,
       stageId,
     })) {
-      const nextStage = nextStageId(stages, stageId);
-      managedRun.next_system_action = nextStage
-        ? `系统将直接继续执行${stageLabel(nextStage)}`
-        : '交付已完成，可直接查看最终产物。';
-      pushManagedEvent(workspaceRoot, managedRun, {
-        kind: 'stage_skipped',
+      const skippedStageResult = buildSkippedStageResult({
+        managedRun,
         stageId,
-        summary: nextStage
-          ? `${stageLabel(stageId)}当前没有待执行的返修请求，系统直接继续推进到${stageLabel(nextStage)}。`
-          : `${stageLabel(stageId)}当前没有待执行的返修请求，系统直接结束托管执行。`,
+        stages,
+      });
+      const applied = applyStageIngestion({
+        workspaceRoot,
+        managedRun,
+        stageResult: skippedStageResult,
+        routeRunLink: null,
       });
       managedState = persistManagedState(workspaceRoot, managedRun);
+      if (applied.done) {
+        return {
+          ok: applied.ok,
+          managed_run: managedRun,
+          progress_projection: managedState.projection,
+          runtime_supervision: managedState.runtimeSupervision,
+          escalation_record: managedState.escalationRecord,
+        };
+      }
       stageIndex += 1;
       continue;
     }

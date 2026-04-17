@@ -474,6 +474,25 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     runtime_state_root: string;
     session_store_root: string;
   };
+  managed_runtime_contract: {
+    shared_contract_ref: string;
+    runtime_owner: string;
+    domain_owner: string;
+    executor_owner: string;
+    supervision_status_surface: {
+      surface_kind: string;
+      owner: string;
+    };
+    attention_queue_surface: {
+      surface_kind: string;
+      owner: string;
+    };
+    recovery_contract_surface: {
+      surface_kind: string;
+      owner: string;
+    };
+    fail_closed_rules: string[];
+  };
   product_entry_shell: {
     frontdesk: {
       command: string;

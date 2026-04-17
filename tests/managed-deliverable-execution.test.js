@@ -27,9 +27,21 @@ const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([
   process.execPath,
   path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.mjs'),
 ]);
+const MOCK_REDCUBE_PYTHON_COMMAND = path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.mjs');
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function withoutUpdatedAt(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return payload;
+  }
+  const clone = JSON.parse(JSON.stringify(payload));
+  if (clone && typeof clone === 'object' && 'updated_at' in clone) {
+    delete clone.updated_at;
+  }
+  return clone;
 }
 
 function runtimeDirEntries(workspaceRoot, relativeDir) {
@@ -50,6 +62,7 @@ async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
   });
   try {
     return await testFn();
@@ -107,7 +120,15 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(result.managed_run.stop_after_stage, null);
     assert.equal(result.managed_run.current_stage, 'export_pptx');
     assert.equal(result.managed_run.route_runs.length, 8);
-    assert.equal(result.managed_run.stage_results.length, 8);
+    assert.equal(result.managed_run.stage_results.length, 9);
+    assert.equal(
+      result.managed_run.route_runs.some((stageRun) => stageRun.stage_id === 'fix_html'),
+      false,
+    );
+    assert.equal(
+      result.managed_run.stage_results.some((stageResult) => stageResult.stage_id === 'fix_html' && stageResult.status === 'skipped'),
+      true,
+    );
     assert.equal(
       result.managed_run.route_runs.every((stageRun) => /^run[-_]/.test(stageRun.route_run_id)),
       true,
@@ -253,8 +274,15 @@ test('managed auto_to_terminal skips fix_html when screenshot_review does not re
         'render_html',
         'visual_director_review',
         'screenshot_review',
+        'fix_html',
         'export_pptx',
       ],
+    );
+    assert.equal(
+      result.managed_run.stage_results.some(
+        (stageResult) => stageResult.stage_id === 'fix_html' && stageResult.status === 'skipped',
+      ),
+      true,
     );
     assert.deepEqual(result.progress_projection.remaining_stages, []);
   });
@@ -554,7 +582,7 @@ test('managed execution keeps xiaohongshu on the Codex-backed human-publication 
   assert.equal(noteProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
 
   assert.deepEqual(audit.review_state, review.state);
-  assert.deepEqual(audit.publication_projection, projection.publication);
+  assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
   assert.equal(audit.gate_summary.approval_required, true);
   assert.equal(audit.gate_summary.delivery_projection_current, 'approval_pending');
   assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
@@ -660,7 +688,7 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
   assert.equal(posterProjection.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
 
   assert.deepEqual(audit.review_state, review.state);
-  assert.deepEqual(audit.publication_projection, projection.publication);
+  assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
   assert.equal(audit.gate_summary.operator_handoff_status, 'ready');
   assert.equal(audit.gate_summary.delivery_projection_current, 'output_ready');
   assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');

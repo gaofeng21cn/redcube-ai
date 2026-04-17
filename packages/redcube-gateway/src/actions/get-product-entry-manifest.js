@@ -12,6 +12,12 @@ const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
   import.meta.url,
 );
+const MANAGED_RUNTIME_CONTRACT_REF = 'contracts/opl-gateway/managed-runtime-three-layer-contract.json';
+const MANAGED_RUNTIME_FAIL_CLOSED_RULES = [
+  'domain_supervision_cannot_bypass_runtime',
+  'executor_cannot_declare_global_gate_clear',
+  'runtime_cannot_invent_domain_publishability_truth',
+];
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -35,6 +41,28 @@ function normalizeWorkspaceRoot(request) {
 
 function readCurrentProgramContract() {
   return JSON.parse(readFileSync(CURRENT_PROGRAM_CONTRACT_URL, 'utf8'));
+}
+
+function buildManagedRuntimeContract() {
+  return {
+    shared_contract_ref: MANAGED_RUNTIME_CONTRACT_REF,
+    runtime_owner: 'upstream_hermes_agent',
+    domain_owner: 'redcube_ai',
+    executor_owner: 'codex_cli',
+    supervision_status_surface: {
+      surface_kind: 'product_entry_session',
+      owner: 'redcube_ai',
+    },
+    attention_queue_surface: {
+      surface_kind: 'product_frontdesk',
+      owner: 'redcube_ai',
+    },
+    recovery_contract_surface: {
+      surface_kind: 'product_entry_session',
+      owner: 'redcube_ai',
+    },
+    fail_closed_rules: [...MANAGED_RUNTIME_FAIL_CLOSED_RULES],
+  };
 }
 
 export async function getProductEntryManifest(request) {
@@ -266,6 +294,7 @@ export async function getProductEntryManifest(request) {
       runtime_state_root: path.dirname(sessionStoreRoot),
       session_store_root: sessionStoreRoot,
     },
+    managed_runtime_contract: buildManagedRuntimeContract(),
     product_entry_shell: {
       frontdesk: {
         command: 'redcube product frontdesk',

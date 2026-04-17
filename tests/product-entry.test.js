@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   getProductFrontdesk,
@@ -23,11 +24,16 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
+const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
+  new URL('./helpers/mock-redcube-python-with-playwright.mjs', import.meta.url),
+);
+
 async function withMockHermesAndRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
     REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
   });
   try {
@@ -79,7 +85,9 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   );
 }
 
-test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', async () => {
+const SERIAL_ENV_TEST = { concurrency: false };
+
+test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -136,7 +144,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
   });
 });
 
-test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', async () => {
+test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -207,7 +215,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
   });
 });
 
-test('invokeFederatedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', async () => {
+test('invokeFederatedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -261,7 +269,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
   });
 });
 
-test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', async () => {
+test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -411,6 +419,29 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     ]);
     assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
+    assert.deepEqual(manifest.managed_runtime_contract, {
+      shared_contract_ref: 'contracts/opl-gateway/managed-runtime-three-layer-contract.json',
+      runtime_owner: 'upstream_hermes_agent',
+      domain_owner: 'redcube_ai',
+      executor_owner: 'codex_cli',
+      supervision_status_surface: {
+        surface_kind: 'product_entry_session',
+        owner: 'redcube_ai',
+      },
+      attention_queue_surface: {
+        surface_kind: 'product_frontdesk',
+        owner: 'redcube_ai',
+      },
+      recovery_contract_surface: {
+        surface_kind: 'product_entry_session',
+        owner: 'redcube_ai',
+      },
+      fail_closed_rules: [
+        'domain_supervision_cannot_bypass_runtime',
+        'executor_cannot_declare_global_gate_clear',
+        'runtime_cannot_invent_domain_publishability_truth',
+      ],
+    });
     assert.equal(manifest.product_entry_shell.frontdesk.command, 'redcube product frontdesk');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
@@ -484,7 +515,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
   });
 });
 
-test('getProductStart exposes the same direct-entry start companion as the manifest', async () => {
+test('getProductStart exposes the same direct-entry start companion as the manifest', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
