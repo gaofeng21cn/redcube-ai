@@ -380,10 +380,15 @@ function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
 function buildMockPptRender(meta) {
   const slides = safeArray(meta?.context?.blueprint?.slides);
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
-  const variant = safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT);
+  const variants = new Set(
+    safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
   const renderScope = safeText(meta?.context?.render_scope, 'full_deck');
   const rawPrompt = safeText(meta?.__raw_prompt);
-  if (variant === 'require_render_batching' && renderScope !== 'summary' && slides.length > 3) {
+  if (variants.has('require_render_batching') && renderScope !== 'summary' && slides.length > 3) {
     throw new Error('mock ppt render expected slide_batch scope with at most 3 slides');
   }
   if (renderScope === 'summary') {
@@ -394,7 +399,7 @@ function buildMockPptRender(meta) {
       ],
     };
   }
-  if (variant === 'require_parallel_batches') {
+  if (variants.has('require_parallel_batches')) {
     recordParallelOverlap({
       lockDir: safeText(process.env.REDCUBE_MOCK_PPT_RENDER_PARALLEL_LOCK_DIR),
       overlapFile: safeText(process.env.REDCUBE_MOCK_PPT_RENDER_PARALLEL_OVERLAP_FILE),
@@ -402,7 +407,7 @@ function buildMockPptRender(meta) {
       prefix: 'ppt-render',
     });
   }
-  if (variant === 'require_reference_window' && renderScope !== 'summary') {
+  if (variants.has('require_reference_window') && renderScope !== 'summary') {
     const batchIndex = Number(meta?.context?.render_batch?.batch_index || 0);
     const references = safeArray(meta?.context?.reference_slides);
     const typographyPlan = meta?.context?.deck_style_reference?.typography_plan || {};
@@ -425,7 +430,7 @@ function buildMockPptRender(meta) {
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
       content_html: (() => {
-        if (variant === 'require_revision_context') {
+        if (variants.has('require_revision_context')) {
           const revisionContext = meta?.context?.revision_context || {};
           const hasDirectorFeedback = safeArray(revisionContext?.visual_director_review?.weak_pages).length > 0
             || safeText(revisionContext?.visual_director_review?.review_summary).length > 0;
@@ -449,7 +454,7 @@ function buildMockPptRender(meta) {
             }
           }
         }
-        if (variant === 'require_targeted_revision_rerender') {
+        if (variants.has('require_targeted_revision_rerender')) {
           const revisionContext = meta?.context?.revision_context || {};
           const blockedSlideIds = new Set([
             ...safeArray(revisionContext?.visual_director_review?.weak_pages),
@@ -463,7 +468,7 @@ function buildMockPptRender(meta) {
             throw new Error(`mock ppt render expected only blocked slides during rerender, got ${slide.slide_id}`);
           }
         }
-        if (variant === 'require_mechanical_feedback') {
+        if (variants.has('require_mechanical_feedback')) {
           const revisionContext = meta?.context?.revision_context || {};
           const slideFeedback = safeArray(revisionContext?.screenshot_review?.slide_feedback)
             .find((item) => safeText(item?.slide_id) === safeText(slide.slide_id));
@@ -482,8 +487,34 @@ function buildMockPptRender(meta) {
             }
           }
         }
+        if (variants.has('require_scoped_revision_context')) {
+          const revisionContext = meta?.context?.revision_context || {};
+          const currentSlideId = safeText(slide.slide_id);
+          const weakPages = safeArray(revisionContext?.visual_director_review?.weak_pages)
+            .map((item) => safeText(item))
+            .filter(Boolean);
+          const blockedSlideIds = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids)
+            .map((item) => safeText(item))
+            .filter(Boolean);
+          const screenshotFeedbackIds = safeArray(revisionContext?.screenshot_review?.slide_feedback)
+            .map((item) => safeText(item?.slide_id))
+            .filter(Boolean);
+          const operatorTargetSlideIds = safeArray(revisionContext?.operator_revision_brief?.target_slide_ids)
+            .map((item) => safeText(item))
+            .filter(Boolean);
+          const operatorFeedbackIds = safeArray(revisionContext?.operator_revision_brief?.slide_feedback)
+            .map((item) => safeText(item?.slide_id))
+            .filter(Boolean);
+          if (weakPages.some((slideId) => slideId && slideId !== currentSlideId)
+            || blockedSlideIds.some((slideId) => slideId && slideId !== currentSlideId)
+            || screenshotFeedbackIds.some((slideId) => slideId && slideId !== currentSlideId)
+            || operatorTargetSlideIds.some((slideId) => slideId && slideId !== currentSlideId)
+            || operatorFeedbackIds.some((slideId) => slideId && slideId !== currentSlideId)) {
+            throw new Error(`mock ppt render expected scoped revision_context for ${currentSlideId}: ${JSON.stringify(revisionContext)}`);
+          }
+        }
         const markup = buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id));
-        if (variant === 'missing_root_meta') {
+        if (variants.has('missing_root_meta')) {
           return markup
             .replace(/\sdata-title="[^"]*"/g, '')
             .replace(/\sdata-speaker-seconds="[^"]*"/g, '')
@@ -492,7 +523,7 @@ function buildMockPptRender(meta) {
             .replace(/\sdata-template-id="[^"]*"/g, '')
             .replace(/\sdata-peak-page="[^"]*"/g, '');
         }
-        if (variant === 'missing_review_anchors') {
+        if (variants.has('missing_review_anchors')) {
           return markup
             .replace(/\sdata-qa-block="[^"]*"/g, '')
             .replace(/\sdata-primary-point="[^"]*"/g, '');

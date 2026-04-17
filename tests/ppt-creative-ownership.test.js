@@ -69,6 +69,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const outlinePrompt = read('prompts/ppt_deck/detailed_outline.md');
   const visualPrompt = read('prompts/ppt_deck/visual_direction.md');
   const renderHtmlPrompt = read('prompts/ppt_deck/render_html.md');
+  const fixHtmlPrompt = read('prompts/ppt_deck/fix_html.md');
   const renderShell = read('prompts/ppt_deck/render_shell.html');
   const directorReviewPrompt = read('prompts/ppt_deck/director_review.md');
   const reviewScript = read('packages/redcube-runtime/scripts/ppt_deck_review.py');
@@ -97,6 +98,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(outlinePrompt, /"render_recipe_id": "ppt\./);
   assert.match(visualPrompt, /"peak_pages": \[/);
   assert.match(visualPrompt, /"typography_plan": \{/);
+  assert.match(visualPrompt, /纵向信息分布/);
   assert.match(renderHtmlPrompt, /## runtime_artifact/);
   assert.match(renderHtmlPrompt, /header safe zone/);
   assert.match(renderHtmlPrompt, /foundation \/ substrate \/ base band/);
@@ -108,14 +110,23 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(renderHtmlPrompt, /controller.*唯一主峰/);
   assert.match(renderHtmlPrompt, /风险支路.*短窄/);
   assert.match(renderHtmlPrompt, /底部说明.*最多保留 ?2/);
+  assert.match(renderHtmlPrompt, /纵向信息分布/);
+  assert.match(renderHtmlPrompt, /左拆右并/);
+  assert.match(renderHtmlPrompt, /页码语法/);
   assert.match(renderHtmlPrompt, /正文页主标题字号必须在整套 deck 中保持一致/);
   assert.match(renderHtmlPrompt, /连接线.*放在节点徽标.*下层/);
+  assert.match(fixHtmlPrompt, /纵向信息分布/);
+  assert.match(fixHtmlPrompt, /左拆右并/);
+  assert.match(fixHtmlPrompt, /页码/);
   assert.equal(renderHtmlPrompt.includes('"template_registry"'), false);
   assert.match(renderShell, /titleFontSize/);
   assert.match(renderShell, /headerRect/);
   assert.match(renderShell, /edgeClearance/);
   assert.match(directorReviewPrompt, /foundation \/ substrate \/ base band/);
   assert.match(directorReviewPrompt, /所有带字元素是否拥有独立留白/);
+  assert.match(directorReviewPrompt, /纵向信息分布/);
+  assert.match(directorReviewPrompt, /左拆右并/);
+  assert.match(directorReviewPrompt, /页码语法/);
   assert.match(directorReviewPrompt, /同一页面家族重复出现/);
   assert.match(directorReviewPrompt, /controller.*唯一主峰/);
   assert.match(directorReviewPrompt, /底部说明.*最多保留 ?2/);
@@ -130,6 +141,9 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(runtime, /controller.*唯一主峰/);
   assert.match(runtime, /风险支路.*短窄/);
   assert.match(runtime, /底部说明.*最多保留 ?2/);
+  assert.match(runtime, /纵向信息分布/);
+  assert.match(runtime, /左拆右并/);
+  assert.match(runtime, /页码语法/);
   assert.match(runtime, /reference_window/);
   assert.match(runtime, /typography_plan/);
   assert.equal(existsSync(path.resolve('prompts/ppt_deck/director_review.md')), true);
@@ -1636,6 +1650,104 @@ test('ppt fix_html honors operator revision brief slide ids in targeted rerender
       assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S02'), true);
       assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S05'), true);
       assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S06'), true);
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt fix_html scopes targeted rerender to operator-requested slides when only advisory weak pages remain', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-operator-only-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '验证 operator 定点返修不会把其他 advisory weak pages 一起带入 fix_html',
+    });
+
+    const initialRoutes = await runPptRoutes({
+      workspaceRoot,
+      deliverableId: 'deck-a',
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    });
+    for (const { route, result } of initialRoutes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const artifactsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+    );
+    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+      status: 'pass',
+      visual_director_review: {
+        weak_pages: ['S06'],
+        review_summary: 'S06 仍是本轮最弱通过页，但不挡导出。',
+        rewrite_action: 'revise_render_html',
+      },
+    }, null, 2), 'utf-8');
+    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+      status: 'pass',
+      checks: {
+        ai_review_passed: true,
+      },
+      slide_reviews: [],
+      ai_review: {
+        weak_pages: [],
+        review_summary: '截图质控已通过；本轮只有讲者定点修页要求。',
+      },
+    }, null, 2), 'utf-8');
+
+    const operatorBriefFile = path.join(
+      workspaceRoot,
+      'Med Auto Science 同行讲课',
+      '幻灯片',
+      '当前返修要求.md',
+    );
+    writeFileSync(operatorBriefFile, [
+      '# 当前返修要求',
+      '',
+      '```json',
+      JSON.stringify({
+        target_slide_ids: ['S02'],
+        global_requirements: [
+          '本轮只修 S02，不要顺手带上其他已通过页面。',
+        ],
+        slide_feedback: [
+          {
+            slide_id: 'S02',
+            issues: ['拉开纵向信息分布，让底部也承担结构收束，不要让信息继续挤在中段。'],
+          },
+        ],
+      }, null, 2),
+      '```',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,require_scoped_revision_context',
+    });
+    try {
+      const rerender = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'fix_html',
+      });
+      assert.equal(rerender.ok, true);
+      const renderArtifact = readJson(rerender.artifactFile);
+      assert.equal(renderArtifact.render_execution?.mode, 'targeted_revision_only');
+      assert.deepEqual(renderArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
+      assert.equal(renderArtifact.render_execution?.reused_slide_ids.includes('S06'), true);
     } finally {
       restoreVariant();
     }

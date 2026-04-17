@@ -2386,10 +2386,7 @@ function selectRenderTargetSlideIds(revisionContext) {
     ]);
   }
   if (operatorTargetSlideIds.size > 0) {
-    return new Set([
-      ...operatorTargetSlideIds,
-      ...weakPages,
-    ]);
+    return new Set(operatorTargetSlideIds);
   }
   return weakPages;
 }
@@ -2496,8 +2493,8 @@ function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
   const globalHasScreenshotFocus = globalSlideFeedback.length > 0 || globalBlockedSlideIds.length > 0;
   const globalHasDirectorFocus = globalDirectorWeakPages.length > 0;
   const globalHasOperatorFocus = globalOperatorTargetSlideIds.length > 0 || globalOperatorSlideFeedback.length > 0;
-  if ((globalHasDirectorFocus && !batchHasDirectorFocus && !batchHasScreenshotFocus)
-    || (globalHasScreenshotFocus && !batchHasScreenshotFocus)
+  if ((globalHasDirectorFocus && !batchHasDirectorFocus && !batchHasScreenshotFocus && !batchHasOperatorFocus)
+    || (globalHasScreenshotFocus && !batchHasScreenshotFocus && !batchHasOperatorFocus && !batchHasDirectorFocus)
     || (globalHasOperatorFocus && !batchHasOperatorFocus && !batchHasScreenshotFocus && !batchHasDirectorFocus)) {
     return null;
   }
@@ -2677,6 +2674,8 @@ async function generateRenderHtmlDraft({
         '整套 deck 使用同一套标题、卡片标题、正文、标签与页码字号梯度；除封面外，不允许某页整体突然变大或缩小。',
         '若按 batch 生成，后续批次必须参考前面最多三页已成形 HTML，继承同一套留白与排版语法。',
         '若标题或短句在当前字号梯度下能单行成立，就不要主动插入换行。',
+        '页面纵向信息分布必须均衡：不要把大部分文字和主结构都压在中段，底部也要承担信息收束或结构支撑，避免出现上重中挤下空的大块死白。',
+        '整套 deck 的页码语法必须一致：要么统一用两位纯页码，要么统一用当前页/总页数，不允许个别页单独换一套样式。',
       ],
     },
     shell_contract: {
@@ -2702,6 +2701,11 @@ async function generateRenderHtmlDraft({
       '中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义夹杂英文，术语若出现也要尽量配中文语义。',
       '所有正文、标签、节点和卡片文案都要在自然语义处分行，优先减少字数和调整容器，不要把中英文硬挤到同一行直到溢出。',
       '若标题或短句在当前字号梯度下本可单行成立，就不要主动插入 <br/>；短中文词组只能在自然语义处换行。',
+      '页面纵向质量分布必须均衡：不能把主要文字信息只堆在 40%-70% 的中段高度；底部必须参与结构承载、总结收束或留白平衡，避免底部只剩装饰条而上中段过挤。',
+      '若双区对照页的主峰卡、节点链和说明条都集中在中段，必须通过下移、扩底部承载区或重分配信息层次来拉开纵向分布，不要让页面下五分之一长期空置。',
+      '对 multi_zone_compare 的“左拆右并”页面，左侧辅助区必须明显窄于且轻于右侧主峰区；不要把左区做成接近等权的大面板，导致整页读成保守双栏。',
+      '多区页面里，主峰区宽度与视觉权重都必须显著高于辅助区；如果辅助区已经承担三张以上卡片，优先缩短它、压轻它，而不是继续加宽。',
+      '页码的位置、语法、字重和灰度必须在整套 deck 中保持一致，不允许某页突然从两位页码切成“当前页 / 总页数”或相反。',
       'ring_cross 四向骨架页必须保持中心与上下左右卡片近似等距，不能出现单方向明显贴近中心的失衡。',
       '风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数。',
       '若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面，其余通过页应保持原样复用，不要重新发明已通过页面。',
