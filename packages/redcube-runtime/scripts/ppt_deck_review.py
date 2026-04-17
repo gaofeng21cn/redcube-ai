@@ -74,7 +74,7 @@ def is_internal_padding_relevant(block: Dict[str, Any]) -> bool:
         return False
     if float(block.get('height', 0) or 0) < 72.0:
         return False
-    return bool(block.get('hasSurfaceFrame')) or any(token in block_id for token in INTERNAL_PADDING_ROLE_HINTS)
+    return bool(block.get('hasSurfaceFrame'))
 
 
 def clearance_failures(block: Dict[str, Any]) -> List[Dict[str, Any]]:

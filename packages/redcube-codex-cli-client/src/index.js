@@ -137,9 +137,12 @@ function buildGenerationInstructions(family, route, localFileInspection = []) {
   ].join(' ');
 }
 
-function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = []) {
+function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = [], options = {}) {
   if (Number.isFinite(Number(timeoutMs)) && Number(timeoutMs) > 0) {
     return Number(timeoutMs);
+  }
+  if (safeText(options?.route) === 'render_html') {
+    return DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS;
   }
   const hasImageInspection = normalizeLocalFileInspection(localFileInspection)
     .some((entry) => safeText(entry?.media_type).startsWith('image/'));
@@ -534,7 +537,10 @@ export async function generateStructuredArtifactViaCodexCli({
       input,
     ].join('\n'),
     cwd,
-    timeoutMs: resolveGenerationTimeoutMs(timeoutMs, localFileInspection),
+    timeoutMs: resolveGenerationTimeoutMs(timeoutMs, localFileInspection, {
+      family: safeFamily,
+      route: safeRoute,
+    }),
   });
 
   if (execution.codexRun.terminal_event !== 'run.completed') {

@@ -34,3 +34,32 @@ test('codex cli grants longer default timeout to image-backed review prompts whi
     { path: '/tmp/slide-01.png', media_type: 'image/png', label: 'slide-01' },
   ]), 123456);
 });
+
+test('codex cli grants render_html routes the same longer default timeout as image-backed review prompts', () => {
+  const source = readFileSync('packages/redcube-codex-cli-client/src/index.js', 'utf-8');
+  const helperCode = [
+    extractFunction(source, 'safeText'),
+    extractFunction(source, 'normalizeLocalFileInspection'),
+    extractFunction(source, 'resolveGenerationTimeoutMs'),
+  ].join('\n\n');
+
+  const helpers = new Function(`
+    const DEFAULT_CODEX_GENERATION_TIMEOUT_MS = 600000;
+    const DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS = 1800000;
+    ${helperCode}
+    return { resolveGenerationTimeoutMs };
+  `)();
+
+  assert.equal(
+    helpers.resolveGenerationTimeoutMs(undefined, [], { family: 'ppt_deck', route: 'render_html' }),
+    1800000,
+  );
+  assert.equal(
+    helpers.resolveGenerationTimeoutMs(undefined, [], { family: 'xiaohongshu', route: 'render_html' }),
+    1800000,
+  );
+  assert.equal(
+    helpers.resolveGenerationTimeoutMs(undefined, [], { family: 'ppt_deck', route: 'storyline' }),
+    600000,
+  );
+});

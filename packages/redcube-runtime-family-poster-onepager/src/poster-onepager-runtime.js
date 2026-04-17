@@ -421,7 +421,7 @@ function normalizeAiVisualJudgement(value) {
   if (['block', 'revise', 'fail', 'failed', 'reject', 'rejected', 'needs_revision', 'needs_rewrite'].includes(raw)) {
     return 'block';
   }
-  if (['pass', 'ok', 'approved', 'approve'].includes(raw)) {
+  if (['pass', 'ok', 'approved', 'approve', 'weak', 'minor', 'advisory', 'warn', 'warning', 'soft_pass'].includes(raw)) {
     return 'pass';
   }
   return raw;

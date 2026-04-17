@@ -221,6 +221,9 @@ test('ppt review script ignores decorative foundation blocks that only serve as 
   writeFileSync(htmlFile, `<!doctype html>
 <html>
 <body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:1152px;height:648px;overflow:hidden;position:relative;background:#fff;"></div>
+  </div>
   <script>
     const inspection = ${JSON.stringify(inspection)};
     window.redcubeDeckReview = {
@@ -254,6 +257,116 @@ test('ppt review script ignores decorative foundation blocks that only serve as 
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.slide_reviews[0].checks.occlusion_free, true);
   assert.deepEqual(payload.slide_reviews[0].metrics.overlaps, []);
+});
+
+test('ppt review script ignores stack-like grouping containers without their own surfaced frame when checking internal padding', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-review-padding-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+  const inspection = {
+    slideId: 'S08',
+    title: '骨架可以复用，医学语义与研究判断不能外包',
+    layoutFamily: 'multi_zone_compare',
+    speakerSeconds: 60,
+    primaryPoints: 1,
+    wrapper: {
+      clientWidth: 1152,
+      clientHeight: 648,
+      scrollWidth: 1152,
+      scrollHeight: 648,
+    },
+    bodyScroll: false,
+    blocks: [
+      {
+        id: 'reuse-rail',
+        left: 92,
+        top: 226,
+        width: 252,
+        height: 302,
+        right: 344,
+        bottom: 528,
+        area: 76104,
+        textNodeCount: 4,
+        hasSurfaceFrame: true,
+      },
+    ],
+    auditBlocks: [
+      {
+        id: 'reuse-rail',
+        left: 92,
+        top: 226,
+        width: 252,
+        height: 302,
+        right: 344,
+        bottom: 528,
+        area: 76104,
+        textNodeCount: 4,
+        hasSurfaceFrame: true,
+        edgeClearance: { left: 92, top: 226, right: 808, bottom: 120 },
+        internalPadding: { left: 16, top: 24, right: 16, bottom: 24 },
+      },
+      {
+        id: 'reuse-stack',
+        left: 108,
+        top: 268,
+        width: 220,
+        height: 204,
+        right: 328,
+        bottom: 472,
+        area: 44880,
+        textNodeCount: 3,
+        hasSurfaceFrame: false,
+        edgeClearance: { left: 108, top: 268, right: 824, bottom: 176 },
+        internalPadding: { left: 0, top: 0, right: 0, bottom: 0 },
+      },
+    ],
+    titleMeta: {
+      titleFontSize: 44,
+      titleLineCount: 1,
+      titleBlockId: 'header',
+    },
+  };
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:1152px;height:648px;overflow:hidden;position:relative;background:#fff;"></div>
+  </div>
+  <script>
+    const inspection = ${JSON.stringify(inspection)};
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() { return inspection; },
+      inspectCurrentSlide() { return inspection; }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '5',
+      '--frame-width',
+      '1152',
+      '--frame-height',
+      '648',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.slide_reviews[0].checks.edge_clearance_ok, true);
+  assert.deepEqual(payload.slide_reviews[0].metrics.edge_clearance_failures, []);
 });
 
 test('ppt route artifacts record Codex-backed ownership for Story Architecture, Visual Authorship, and visual_director_review overlay', async () => {
@@ -973,6 +1086,35 @@ test('ppt render_html forwards recent slide HTML to later batches to preserve de
   });
 });
 
+test('ppt render_html uses single-slide batches for full regeneration to keep cross-page continuity stable', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-single-slide-batch-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '验证 full render_html 会按逐页批次生成，并参考最近页面保持整套一致性',
+    });
+
+    const routes = await runPptRoutes({
+      workspaceRoot,
+      deliverableId: 'deck-a',
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    });
+    for (const { route, result } of routes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const renderArtifact = readJson(routes.at(-1).result.artifactFile);
+    assert.equal(renderArtifact.render_execution?.mode, 'full_regeneration');
+    assert.equal(renderArtifact.render_execution?.batch_size, 1);
+    assert.equal(renderArtifact.render_execution?.batch_count >= 8, true);
+  });
+});
+
 test('ppt screenshot_review runs slide review batches in parallel once Codex exec is async', async () => {
   await withMockHermesUpstream(async () => {
     const lockDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-parallel-'));
@@ -1494,6 +1636,253 @@ test('ppt fix_html honors operator revision brief slide ids in targeted rerender
       assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S02'), true);
       assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S05'), true);
       assert.equal(renderArtifact.html_bundle.slides.some((slide) => slide.slide_id === 'S06'), true);
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt render_html ignores stale targeted revision context after visual_direction refresh', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-stale-targeted-context-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '验证 visual_direction 更新后，render_html 不会继续吃旧的定点返修上下文',
+    });
+
+    const initialRoutes = await runPptRoutes({
+      workspaceRoot,
+      deliverableId: 'deck-a',
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    });
+    for (const { route, result } of initialRoutes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const artifactsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+    );
+    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+      status: 'pass',
+      visual_director_review: {
+        weak_pages: ['S08'],
+        review_summary: '旧导演审阅认为 S08 还是最弱通过页。',
+        rewrite_action: 'revise_render_html',
+      },
+    }, null, 2), 'utf-8');
+    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+      status: 'pass',
+      checks: {
+        ai_review_passed: true,
+      },
+      slide_reviews: [],
+      ai_review: {
+        weak_pages: [],
+        review_summary: '旧截图质控已通过。',
+      },
+    }, null, 2), 'utf-8');
+
+    const operatorBriefFile = path.join(
+      workspaceRoot,
+      'Med Auto Science 同行讲课',
+      '幻灯片',
+      '当前返修要求.md',
+    );
+    writeFileSync(operatorBriefFile, [
+      '# 当前返修要求',
+      '',
+      '```json',
+      JSON.stringify({
+        target_slide_ids: ['S04'],
+        global_requirements: [
+          '本轮只修 S04，不要顺手改动其他页。',
+        ],
+        slide_feedback: [
+          {
+            slide_id: 'S04',
+            issues: ['旧返修要求：只压 S04 中段正式主链的节点拥挤。'],
+          },
+        ],
+      }, null, 2),
+      '```',
+      '',
+    ].join('\n'), 'utf-8');
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    const refreshedVisual = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_direction',
+    });
+    assert.equal(refreshedVisual.ok, true);
+
+    const rerender = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'render_html',
+    });
+    assert.equal(rerender.ok, true);
+
+    const renderArtifact = readJson(rerender.artifactFile);
+    assert.equal(renderArtifact.render_execution?.mode, 'full_regeneration');
+    assert.deepEqual(renderArtifact.render_execution?.reused_slide_ids, []);
+    assert.equal(renderArtifact.render_execution?.freshly_rendered_slide_ids.length >= 8, true);
+    assert.equal(renderArtifact.render_execution?.freshly_rendered_slide_ids.includes('S04'), true);
+    assert.equal(renderArtifact.render_execution?.freshly_rendered_slide_ids.includes('S08'), true);
+  });
+});
+
+test('ppt fix_html still allows targeted revision after visual_direction refresh when review and operator brief are fresh for the current HTML', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-fix-after-visual-refresh-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '验证 visual_direction 更新后，fix_html 仍能针对当前 HTML 做定点返修',
+    });
+
+    const initialRoutes = await runPptRoutes({
+      workspaceRoot,
+      deliverableId: 'deck-a',
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    });
+    for (const { route, result } of initialRoutes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    const refreshedVisual = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_direction',
+    });
+    assert.equal(refreshedVisual.ok, true);
+
+    const artifactsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+    );
+    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+      status: 'pass',
+      visual_director_review: {
+        weak_pages: ['S08'],
+        review_summary: '当前 HTML 只需针对定点页面继续修整。',
+        rewrite_action: 'revise_render_html',
+      },
+    }, null, 2), 'utf-8');
+    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+      status: 'block',
+      checks: {
+        ai_review_passed: false,
+      },
+      slide_reviews: [
+        {
+          slide_id: 'S04',
+          status: 'block',
+          issues: ['ai_visual_risk'],
+          screenshot_file: path.join(
+            workspaceRoot,
+            'topics',
+            'topic-a',
+            'deliverables',
+            'deck-a',
+            'reports',
+            'screenshots',
+            'slide-04.png',
+          ),
+          ai_review: {
+            judgement: 'block',
+            visual_findings: ['S04 入口卡与底部长条过近，需要回到 fix_html 上移并恢复底部留白。'],
+            recommended_fix: '只修当前 HTML 的 S04，不要触发整套重画。',
+          },
+        },
+      ],
+      ai_review: {
+        weak_pages: ['S04'],
+        review_summary: '当前 HTML 只需做定点返修。',
+      },
+    }, null, 2), 'utf-8');
+    const screenshotsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'reports',
+      'screenshots',
+    );
+    mkdirSync(screenshotsDir, { recursive: true });
+    writeFileSync(path.join(screenshotsDir, 'slide-04.png'), TINY_PNG);
+
+    const operatorBriefFile = path.join(
+      workspaceRoot,
+      'Med Auto Science 同行讲课',
+      '幻灯片',
+      '当前返修要求.md',
+    );
+    writeFileSync(operatorBriefFile, [
+      '# 当前返修要求',
+      '',
+      '```json',
+      JSON.stringify({
+        target_slide_ids: ['S04', 'S09'],
+        global_requirements: [
+          '只对当前 HTML 做定点返修，不要触发整套重画。',
+        ],
+        slide_feedback: [
+          {
+            slide_id: 'S04',
+            issues: ['恢复 S04 入口卡和节点的底部安全距。'],
+          },
+          {
+            slide_id: 'S09',
+            issues: ['把标题收回单行。'],
+          },
+        ],
+      }, null, 2),
+      '```',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
+    });
+    try {
+      const rerender = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'fix_html',
+      });
+      assert.equal(rerender.ok, true);
+      const renderArtifact = readJson(rerender.artifactFile);
+      assert.equal(renderArtifact.render_execution?.mode, 'targeted_revision_only');
+      assert.equal(renderArtifact.render_execution?.freshly_rendered_slide_ids.includes('S04'), true);
     } finally {
       restoreVariant();
     }

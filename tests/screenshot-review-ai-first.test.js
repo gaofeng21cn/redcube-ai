@@ -58,6 +58,7 @@ function loadHelpers(file, extraNames = []) {
     const TARGETED_SCREENSHOT_RERUN_CHECKS = ${extractConstExpression('TARGETED_SCREENSHOT_RERUN_CHECKS', "new Set(['ai_review_passed', 'overflow_free', 'occlusion_free', 'visual_density_ok'])")};
     ${functionCode}
     return {
+      normalizeAiVisualJudgement,
       buildAiFirstVisualSlideReview,
       aiFirstMechanicalCheckValue,
       ${extraNames.includes('deriveScreenshotReviewRerunStage') ? 'deriveScreenshotReviewRerunStage,' : ''}
@@ -157,6 +158,12 @@ for (const family of FAMILY_FILES) {
 
     assert.equal(reviewed.status, 'block');
     assert.deepEqual(reviewed.issues, ['ai_visual_risk']);
+  });
+
+  test(`${family.label} screenshot_review treats weak judgements as advisory pass`, () => {
+    const helpers = loadHelpers(family.file);
+    assert.equal(helpers.normalizeAiVisualJudgement('weak'), 'pass');
+    assert.equal(helpers.normalizeAiVisualJudgement('minor'), 'pass');
   });
 
   if (family.label === 'ppt') {

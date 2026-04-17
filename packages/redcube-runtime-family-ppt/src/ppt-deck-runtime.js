@@ -92,7 +92,7 @@ const STAGE_REQUIREMENTS = Object.freeze({
   export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
 });
 const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
-const RENDER_HTML_BATCH_SIZE = 3;
+const RENDER_HTML_BATCH_SIZE = 1;
 const TARGETED_RENDER_HTML_BATCH_SIZE = 1;
 const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
 const RENDER_REFERENCE_SLIDE_WINDOW = 3;
@@ -621,9 +621,17 @@ function normalizeOperatorRevisionBrief(value) {
   };
 }
 
-function loadWorkbenchOperatorRevisionBrief({ workspaceRoot, contract, deliverableId }) {
+function loadWorkbenchOperatorRevisionBrief({
+  workspaceRoot,
+  contract,
+  deliverableId,
+  minimumMtimeMs = 0,
+}) {
   const paths = getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId });
   if (!existsSync(paths.revisionBriefFile)) return null;
+  if (safeFileMtimeMs(paths.revisionBriefFile) < Number(minimumMtimeMs || 0)) {
+    return null;
+  }
   const parsed = extractFirstJsonCodeBlock(readFileSync(paths.revisionBriefFile, 'utf-8'));
   return normalizeOperatorRevisionBrief(parsed);
 }
@@ -1568,7 +1576,7 @@ function normalizeAiVisualJudgement(value) {
   if (['block', 'revise', 'fail', 'failed', 'reject', 'rejected', 'needs_revision', 'needs_rewrite'].includes(raw)) {
     return 'block';
   }
-  if (['pass', 'ok', 'approved', 'approve'].includes(raw)) {
+  if (['pass', 'ok', 'approved', 'approve', 'weak', 'minor', 'advisory', 'warn', 'warning', 'soft_pass'].includes(raw)) {
     return 'pass';
   }
   return raw;
@@ -2196,10 +2204,50 @@ function summarizeRenderRevisionSlideFeedback(reviewArtifact) {
     .filter((slide) => slide.slide_id);
 }
 
-function buildRenderRevisionContext({ workspaceRoot, contract, deliverablePaths, deliverableId }) {
-  const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-  const screenshotReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-  const operatorRevisionBrief = loadWorkbenchOperatorRevisionBrief({ workspaceRoot, contract, deliverableId });
+function computeRenderRevisionFreshness(contract, deliverablePaths, route = 'render_html') {
+  const currentHtmlArtifactMtimeMs = safeFileMtimeMs(
+    stageArtifactPath(contract, deliverablePaths, currentHtmlStageId(contract, deliverablePaths)),
+  );
+  const upstreamPlanningMtimeMs = Math.max(
+    safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'slide_blueprint')),
+    safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_direction')),
+  );
+  const isTargetedFixRoute = safeText(route) === PAGE_FIX_ROUTE;
+  return {
+    current_html_mtime_ms: currentHtmlArtifactMtimeMs,
+    upstream_planning_mtime_ms: upstreamPlanningMtimeMs,
+    revision_floor_mtime_ms: isTargetedFixRoute
+      ? currentHtmlArtifactMtimeMs
+      : Math.max(currentHtmlArtifactMtimeMs, upstreamPlanningMtimeMs),
+    force_full_regeneration: !isTargetedFixRoute
+      && currentHtmlArtifactMtimeMs > 0
+      && upstreamPlanningMtimeMs > currentHtmlArtifactMtimeMs,
+  };
+}
+
+function buildRenderRevisionContext({
+  workspaceRoot,
+  contract,
+  deliverablePaths,
+  deliverableId,
+  minimumMtimeMs = 0,
+}) {
+  const directorReviewArtifact = safeFileMtimeMs(
+    stageArtifactPath(contract, deliverablePaths, 'visual_director_review'),
+  ) >= Number(minimumMtimeMs || 0)
+    ? readStageArtifact(contract, deliverablePaths, 'visual_director_review')
+    : null;
+  const screenshotReviewArtifact = safeFileMtimeMs(
+    stageArtifactPath(contract, deliverablePaths, 'screenshot_review'),
+  ) >= Number(minimumMtimeMs || 0)
+    ? readStageArtifact(contract, deliverablePaths, 'screenshot_review')
+    : null;
+  const operatorRevisionBrief = loadWorkbenchOperatorRevisionBrief({
+    workspaceRoot,
+    contract,
+    deliverableId,
+    minimumMtimeMs,
+  });
   const directorSummary = directorReviewArtifact?.visual_director_review
     ? {
         status: safeText(directorReviewArtifact.status, 'unknown'),
@@ -2354,7 +2402,19 @@ function loadPriorRenderedSlideHtmlMap(renderArtifact) {
   );
 }
 
-function planRenderHtmlExecution({ blueprintSlides, revisionContext, priorRenderArtifact }) {
+function planRenderHtmlExecution({
+  blueprintSlides,
+  revisionContext,
+  priorRenderArtifact,
+  forceFullRegeneration = false,
+}) {
+  if (forceFullRegeneration) {
+    return {
+      mode: 'full_regeneration',
+      slides_to_render: blueprintSlides,
+      reused_slides: new Map(),
+    };
+  }
   const priorRenderedSlides = loadPriorRenderedSlideHtmlMap(priorRenderArtifact);
   const targetedSlideIds = selectRenderTargetSlideIds(revisionContext);
   if (targetedSlideIds.size === 0 || priorRenderedSlides.size === 0) {
@@ -2580,11 +2640,13 @@ async function generateRenderHtmlDraft({
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const previousRenderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+  const revisionFreshness = computeRenderRevisionFreshness(contract, deliverablePaths, route);
   const sharedRevisionContext = buildRenderRevisionContext({
     workspaceRoot,
     contract,
     deliverablePaths,
     deliverableId,
+    minimumMtimeMs: revisionFreshness.revision_floor_mtime_ms,
   });
   const priorRenderedSlides = loadPriorRenderedSlideHtmlMap(previousRenderArtifact);
   const blueprintSlides = buildRenderHtmlBlueprintSlides(blueprintArtifact, sharedRevisionContext);
@@ -2592,6 +2654,7 @@ async function generateRenderHtmlDraft({
     blueprintSlides,
     revisionContext: sharedRevisionContext,
     priorRenderArtifact: previousRenderArtifact,
+    forceFullRegeneration: revisionFreshness.force_full_regeneration,
   });
   if (requireTargetedRevision && renderPlan.mode !== 'targeted_revision_only') {
     throw new Error(`Route ${route} requires targeted revision context and a prior current HTML artifact`);
@@ -2741,6 +2804,7 @@ async function generateRenderHtmlDraft({
     renderExecution: {
       route,
       mode: renderPlan.mode,
+      force_full_regeneration: revisionFreshness.force_full_regeneration,
       batch_size: renderBatchSize,
       batch_count: slideBatches.length,
       reference_window: RENDER_REFERENCE_SLIDE_WINDOW,
