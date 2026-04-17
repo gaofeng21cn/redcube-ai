@@ -17,7 +17,7 @@
 ## 当前基线
 
 - `RedCube AI` 是 `OPL` 家族中当前已 admitted 的视觉交付 domain 主线。
-- 当前最诚实的执行主线，是通过本地 `Codex CLI` host-agent runtime 承接 managed execution，同时把 visual-domain truth 保留在 `RedCube AI` 内部。
+- 当前最诚实的执行主线，已经按三层 contract 理解：`Hermes-Agent` 持有长期托管与 managed-runtime owner，`RedCube AI` 持有 visual-domain governance / truth，而默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
 - 当前 repo-verified 的 lightweight product-entry service surface 已落地，但成熟 end-user web 壳仍是后续工作。
 - 当前受保护创作 stage 统一收口在 `runtime-family + Codex CLI structured generation`，repo-local `pack/compiler` 作者化路径已不再是 active mainline。
 - `Deep Research` 继续属于 `Source Readiness`，而公开入口 wording 仍要把 `operator entry`、`agent entry` 和那层薄的 product-entry service surface 分开写清。
@@ -60,6 +60,7 @@
 - [Phase 2 source intake activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
 - [Phase 2 source intake shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
 - [Phase 2 review export gate audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
+- [Phase 2 publication projection delivery contract convergence](program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md)
 - [Phase 2 family source-truth consumption convergence](program/phase-2/phase_2_family_source_truth_consumption_convergence.md)
 - [Phase 2 direct delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
 - [Phase 2 direct delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
@@ -76,6 +77,7 @@
 ### 参考资料
 
 - [轻量产品入口与 OPL Handoff](references/lightweight_product_entry_and_opl_handoff.md)
+- [OPL 托管运行时三层合同](references/opl_managed_runtime_three_layer_contract.md)
 - [系列项目文档治理清单](references/series-doc-governance-checklist.md)
 - [运行架构](runtime_architecture.md)
 - [Domain Harness OS 定位映射](domain-harness-os-positioning.md)

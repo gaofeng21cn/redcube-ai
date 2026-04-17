@@ -2,7 +2,7 @@
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-12",
   "longrun_goal": {
-    "label": "visual-deliverable domain gateway plus Codex CLI host-agent runtime",
+    "label": "visual-deliverable domain gateway plus Hermes-Agent managed runtime plus default Codex CLI concrete executor",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
@@ -105,10 +105,10 @@
   },
   "current_state": {
     "product_mainline_mode": "auto_only",
-    "runtime_substrate_owner": "codex_cli",
+    "runtime_substrate_owner": "upstream_hermes_agent",
     "deployment_host": "codex_local_operator_host",
     "deployment_host_status": "active_primary",
-    "host_agent_longterm_owner": true,
+    "host_agent_longterm_owner": false,
     "phase_id": "repo_verified_product_entry_and_opl_federation",
     "phase_label": "Repo-Verified Product Entry And OPL Federation",
     "workstream": "repo_verified_product_entry_and_opl_federation",
@@ -119,7 +119,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / Codex CLI run surface plus repo-verified product entry federation plus RedCube visual-domain truth",
+      "label": "redcube-runtime-program / Hermes-Agent managed runtime plus repo-verified product entry federation plus RedCube visual-domain truth",
       "unique": true
     },
     "creative_stage_mainline": {
@@ -282,7 +282,7 @@
       "scope": {
         "hardening_axis": "product_entry_service_surface_and_federation",
         "implementation_in_scope": true,
-        "runtime_substrate_owner": "codex_cli",
+        "runtime_substrate_owner": "upstream_hermes_agent",
         "deployment_host": "codex_local_operator_host",
         "consumer_families": [
           "ppt_deck",

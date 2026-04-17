@@ -4,16 +4,16 @@
 
 `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的 visual-deliverable domain gateway 与 `Domain Harness OS`。
 当前仓库主线按 `Auto-only` 理解，formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
-当前可执行基线已经把 route / managed run surface 收口到本地 Codex CLI host-agent runtime，同时把 visual-domain truth 继续留在 `RedCube AI`。
+当前可执行基线已经按三层 owner 收口：`Hermes-Agent` 持有长期运行与托管能力，`RedCube AI` 继续持有 visual-domain truth，而默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
 当前入口真相是：`CLI / MCP` 已经构成可验证的 `agent entry`，同时 repo-verified 的轻量 `product entry` service surface 也已落地；但真正面向最终用户的成熟前台壳仍未落地。
-当前统一协作模型是：当前 route / managed execution 由 Codex CLI host-agent runtime 负责，`RedCube AI` 自己继续负责 gateway、family/profile/pack authority 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，但受保护创作 stage 必须回到 AI-first 主线。
+当前统一协作模型是：`Hermes-Agent` 负责 route / managed runtime 的长期托管与 hosting，`RedCube AI` 自己继续负责 gateway、family/profile/pack authority、review / publication projection 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，但受保护创作 stage 必须回到 AI-first 主线。
 当前已冻结的最终目标形态是：
 
-`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 与之对应的 direct domain 路线则是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 这说明 `RedCube AI` 的理想型是一个可被 `OPL` 调用、也可被用户直接进入的 visual-domain 产品 / 服务节点，而不是把仓库继续磨成 repo-local runtime，或把自己写成整个 `OPL`。
 
@@ -21,7 +21,7 @@
 
 - 稳定 `gateway -> family -> profile -> pack -> harness execution` 的正式控制链路。
 - 用 machine-readable contracts 与显式校验收紧 runtime mainline。
-- 把当前 route / managed execution 责任稳定收口到系统 Codex CLI，同时保留 RedCube 的 visual-domain boundary，并为未来同 contracts 的托管 runtime 迁移留出空间。
+- 把长期 route / managed runtime owner 稳定收口到 `Hermes-Agent`，同时保留 RedCube 的 visual-domain boundary，并让默认 `Codex CLI` concrete executor 继续通过同一 executor-adapter contract 工作。
 - 冻结一个可被 `OPL` handoff 调用的 service-safe domain entry adapter，而不是先做聊天 UI。
 - 落地可被用户直接进入、也可由 `OPL` handoff 进入的 lightweight domain `product entry` service surface，并把 session continuity 收到用户级 runtime-state。
 - 在不改写 domain 语义的前提下，继续维护 absorbed tranche、follow-on board 与 provenance。

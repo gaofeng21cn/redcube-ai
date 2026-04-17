@@ -15,7 +15,7 @@
 - `Harness OS` 只负责执行、记录、重跑与审计
 - 正式主线优先复用宿主 Agent runtime
 - 外部 LLM 兼容层只能是次级 adapter，不得重新主导系统架构
-- 当前产品 runtime owner 是 route / managed run surface 上的本地 Codex CLI host-agent runtime
+- 当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime
 - `Codex` 本地 operator host 是当前 deployment host / development shell
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance / compatibility bridge，不是当前 owner
 - 未来可迁移到同一 substrate 上的 managed web runtime，但不改变 RedCube 的 domain 语义
@@ -24,7 +24,7 @@
 补充执行原则：
 
 - `Agent-first` 不等于 `external_llm-only`
-- 在当前 Codex-native 语境里，`Codex` 同时承担本地 operator / development host 与当前 route / managed execution 的真实 runtime substrate owner
+- 在当前 Codex-native 语境里，`Codex` 继续承担本地 operator / development host 与默认 concrete executor，而不是长期 managed-runtime owner
 - code 必须退回 contract、governance、audit、artifact persistence 与 render boundary
 
 ## 执行句柄与 durable surface 原则

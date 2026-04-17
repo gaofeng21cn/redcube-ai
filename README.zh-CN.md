@@ -83,9 +83,10 @@ User / Agent
 <details>
   <summary><strong>面向技术读者的运行时真相说明</strong></summary>
 
-当前最诚实的主线，是通过本地 `Codex CLI` host-agent runtime 承接 managed execution，同时把 visual-domain truth 保留在 `RedCube AI` 内部。
+当前最诚实的主线，已经按三层 contract 理解：`Hermes-Agent` 持有长期托管与 managed-runtime owner，`RedCube AI` 持有 visual-domain truth，而默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
 当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`。
-route / managed execution 的 run surface 由本地 Codex CLI host-agent runtime 主责。
+route / managed execution 的长期 run surface 由 `Hermes-Agent` 主责。
+默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
 service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
 `program_id`：active mainline 的 control-plane 指针。
 `run_id`：单次 routed delivery execution 的 per-run 执行句柄。
@@ -98,8 +99,8 @@ service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
 - `operator entry`、`agent entry`
 - repo-verified entry surfaces cover `operator entry`, `agent entry`, and one thin service-level `product entry`
 - repo-verified 的 `product entry` service surface 已经包括 `invokeProductEntry`、`invokeFederatedProductEntry`、`getProductEntrySession`
-- `User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- `User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+- `User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 - 成熟的最终用户 `product entry` 前台壳并未落地
 
 当前 repo-verified 的 lightweight product-entry shell 已包括：
@@ -126,6 +127,7 @@ service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
 
 - family source-truth consumption convergence 已在同一主线上吸收一条 tranche
 - operator surface consistency hardening 已在同一主线上吸收一条 tranche
+- review / export / gate / audit hardening 已在同一主线上吸收一条 tranche
 - publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche
 - runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche

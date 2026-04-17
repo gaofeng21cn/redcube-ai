@@ -3,16 +3,16 @@
 ## 当前角色
 
 - 仓库角色：visual-deliverable domain gateway 与 `Domain Harness OS`
-- 当前执行口径：本地 Codex CLI host-agent run surface + RedCube visual-domain truth
+- 当前执行口径：`Hermes-Agent` managed-runtime owner + `RedCube AI` visual-domain truth + default `Codex CLI` concrete executor
 - 当前本地宿主：`Codex` operator / development host
 - 当前主线：`Auto-only`
 - formal-entry matrix：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
 - 当前入口真相：`operator entry` 与 `agent entry` 已存在；repo-verified 的 lightweight `product entry` service surface 也已落地，`redcube product frontdesk` 现在作为 direct frontdesk，`redcube product manifest` 会额外导出 repo mainline 摘要、`product_entry_status` 状态摘要，以及显式的 `frontdesk_surface`、`operator_loop_surface` 与 `operator_loop_actions`。当前 operator loop 诚实收口为 `redcube product invoke`，并把 `start_deliverable / continue_session / federated_handoff` 冻结成当前用户动作面；当前 manifest 也已经带出 `family_orchestration` companion、`product_entry_quickstart` companion 与 `product_entry_overview` companion，用来暴露 creative / publish gate、session resume、repo-tracked `family action graph`，以及当前 workspace 下的启动 / 续跑 / 进度读取动作面；`redcube product session` 继续作为拿到 `entry_session_id` 之后的同交付续跑 / 观察面；成熟的最终用户前台壳仍未落地
 - 当前入口真相：`operator entry` 与 `agent entry` 已存在；repo-verified 的 lightweight `product entry` service surface 也已落地，`redcube product frontdesk` 现在作为 direct frontdesk，`redcube product manifest` 会额外导出 repo mainline 摘要、`product_entry_status` 状态摘要，以及显式的 `frontdesk_surface`、`operator_loop_surface` 与 `operator_loop_actions`。当前 operator loop 诚实收口为 `redcube product invoke`，并把 `start_deliverable / continue_session / federated_handoff` 冻结成当前用户动作面；当前 manifest 也已经带出 `family_orchestration` companion、`product_entry_quickstart` companion、`product_entry_overview` companion 与轻量 `product_entry_readiness` companion，用来暴露 creative / publish gate、session resume、repo-tracked `family action graph`，以及当前 workspace 下的启动 / 续跑 / 进度读取动作面，并额外回答“现在能不能直接用以及还差什么”；`redcube product session` 继续作为拿到 `entry_session_id` 之后的同交付续跑 / 观察面；成熟的最终用户前台壳仍未落地
 - 当前家族对齐意义：在三个业务仓里，`RedCube AI` 目前是最早落下显式 `product frontdesk` contract 的参考形态之一；后续 family 其他仓会继续往这层“frontdesk 与 operator loop 分开、但 contract 仍共用同一 truth”靠拢
-- 当前统一协作模型：当前 route / managed execution 由本地 Codex CLI host-agent runtime 承担，`RedCube AI` 继续持有 domain authority 与 visual truth，具体 deliverable execution 保持 executor-adapter 可插拔
-- 已冻结的最终目标形态：`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- direct domain 目标形态：`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- 当前统一协作模型：`Hermes-Agent` 承担长期运行、托管 session/run/watch/resume，`RedCube AI` 继续持有 domain authority、review / publication projection 与 visual truth，具体 deliverable execution 保持 executor-adapter 可插拔；当前默认 concrete executor 仍是 `host_agent` / `Codex CLI`
+- 已冻结的最终目标形态：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+- direct domain 目标形态：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 - 当前 truthful gap：成熟的最终用户 `product entry` 前台壳与 managed web productization 仍未落地
 
 ## 当前基线（repo-verified）
@@ -42,8 +42,8 @@
 
 ## 当前阶段与下一阶段
 
-1. 当前 repo-verified 主线已经切到 Codex CLI host-agent runtime owner cutover；`upstream Hermes-Agent` cutover、`Hermes / managed family closure truth`、`Hermes / stable family closure truth`、Phase 2 tranches 与 `Hermes / runtime substrate canonical closure` 继续只作为 absorbed provenance 保留。
-2. `runDeliverableRoute`、`runManagedDeliverable`、`getManagedRun` 与 `superviseManagedRun` 现在通过本地 Codex CLI host-agent runtime 执行 run surface，并在 Codex exec proof 缺失时 fail-closed。
+1. 当前 repo-verified 主线已经把长期 managed-runtime owner 收口到 `Hermes-Agent`；`Codex CLI host-agent runtime` 在这条主线上继续作为默认 concrete executor，而 `Hermes / managed family closure truth`、`Hermes / stable family closure truth`、Phase 2 tranches 与 `Hermes / runtime substrate canonical closure` 只作为 absorbed provenance 保留。
+2. `runDeliverableRoute`、`runManagedDeliverable`、`getManagedRun` 与 `superviseManagedRun` 现在共同服务于同一条 `Hermes-Agent -> RedCube service-safe domain entry -> executor adapter` run surface，并在当前默认 `Codex exec` proof 缺失时 fail-closed。
 3. `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 的 domain truth 仍由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 收口，没有改写 visual-domain boundary。
 4. `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现已统一切到 `runtime-family + Codex CLI structured generation`；repo-local `pack/compiler` 创作路径已从 active mainline 删除，`pack` 只保留 domain boundary / pack-id 语义。
 5. legacy `pack-runtime` compiler registry 已从 workspace 与依赖图移除，避免测试或后续改动再次把创作真值拉回脚本层。
@@ -56,7 +56,7 @@
 12. 当前真实 exec preflight 已切到本地 `codex exec`；`scripts/run-test-group.mjs` 会在 integration / e2e / full lane 开始前先做 Codex CLI probe，并在 `REDCUBE_CODEX_COMMAND` 或本机 `codex` 不可用时 fail-closed。
 13. 同一组验证 lane 现在还会用 `--test-concurrency=1` 串行化 test files，避免本地 Codex exec 与浏览器导出链路在同一宿主上被过度并发打爆。
 14. 同一组验证 lane 现在还会在套件开始前冻结 `REDCUBE_PYTHON_COMMAND`；若未显式提供，会先用 `python3 -c "import sys; import playwright; print(sys.executable)"` 探测带 Playwright 的 Python，并在缺失时 fail-closed。
-15. 在 `2026-04-13` 的当前验证宿主上，当前主线的 fresh 口径是 `codex exec + structured generation + runtime-family route execution`；当前 closeout proof 见 `contracts/runtime-program/managed-product-entry-hardening.json` 与 `contracts/runtime-program/current-program.json` 中的 `green_baseline.local_codex_execution`。
+15. 在 `2026-04-13` 的当前验证宿主上，当前主线的 fresh 口径是 `Hermes-managed runtime ownership + codex exec default concrete executor + runtime-family route execution`；当前 closeout proof 见 `contracts/runtime-program/managed-product-entry-hardening.json` 与 `contracts/runtime-program/current-program.json` 中的 `green_baseline.local_codex_execution`。
 16. 同一个 executor-adapter contract 现在也已经覆盖到全部三条 visual family：`ppt_deck`、`xiaohongshu`、`poster_onepager` 都支持显式 `hermes_native_proof` opt-in，而默认主线仍然保持 `host_agent` / Codex CLI。
 17. 这条 `hermes_native_proof` lane 当前定位是备选 proof executor，不是默认 cutover：它的职责是证明 RedCube 的 family runtime contract 已经能承接 Hermes-native full agent loop，而不是把现有默认主线偷偷切走。
 18. `hermes_native_proof` 当前会在 route artifact、managed runtime bridge、creative execution、review authorship 等 durable surface 上保留真实执行器身份，避免出现“实际走 Hermes，但落盘仍写 Codex host-agent”的第二真相源。

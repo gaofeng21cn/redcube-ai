@@ -83,9 +83,10 @@ In plain language:
 <details>
   <summary><strong>Technical Notes And Current Runtime Truth</strong></summary>
 
-The current truthful mainline routes managed execution through local `Codex CLI` host-agent runtime while keeping visual-domain truth inside `RedCube AI`.
+The current truthful mainline is now read as a three-layer contract: `Hermes-Agent` owns long-running managed-runtime hosting, `RedCube AI` owns visual-domain truth, and the default concrete executor remains local `Codex CLI` host-agent runtime.
 Current repo-verified public entry surfaces are `CLI` and `MCP`.
-local Codex CLI host-agent runtime owns the run surface for route / managed execution.
+`Hermes-Agent` owns the long-running run surface for route / managed execution.
+The default concrete executor remains local `Codex CLI` host-agent runtime.
 service-safe domain adapter shell is `redcube_service_safe_domain_entry`.
 `program_id` is the active mainline control-plane pointer.
 `run_id` is the per-run execution handle for one routed delivery execution.
@@ -98,8 +99,8 @@ Current entry wording remains:
 - `operator entry`, `agent entry`
 - repo-verified entry surfaces cover `operator entry`, `agent entry`, and one thin service-level `product entry`
 - the repo-verified `product entry` service surface already includes `invokeProductEntry`, `invokeFederatedProductEntry`, and `getProductEntrySession`
-- `User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- `User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+- `User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 - The mature end-user `product entry` shell is still not landed
 
 The repo-verified lightweight product-entry shell now includes:
@@ -127,6 +128,7 @@ Absorbed provenance that still stays on the same mainline:
 
 - family source-truth consumption convergence now has an absorbed tranche on the same mainline
 - operator surface consistency hardening now has an absorbed tranche on the same mainline
+- review / export / gate / audit hardening now has an absorbed tranche on the same mainline
 - publication projection / delivery contract convergence now has an absorbed tranche on the same mainline
 - phase-2 runtime watch locator integrity hardening remains absorbed provenance on the same mainline
 - workspace / operator quickstart convergence now has an absorbed tranche on the same mainline

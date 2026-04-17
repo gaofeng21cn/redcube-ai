@@ -23,7 +23,7 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
-test('repo-tracked docs keep formal-entry and durable-surface truth while aligning current runtime wording to the Codex mainline', () => {
+test('repo-tracked docs keep formal-entry and durable-surface truth while aligning current runtime wording to the Hermes-managed three-layer mainline', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = read('apps/redcube-cli/src/cli.js');
   const rootAgents = read('AGENTS.md');
@@ -47,23 +47,25 @@ test('repo-tracked docs keep formal-entry and durable-surface truth while aligni
   assert.equal(projectDoc.includes('formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
   assert.equal(invariants.includes('`docs/program/*/*.md`'), true);
   assert.equal(contractsReadme.includes('runtime-program/current-program.json'), true);
-  assert.equal(readme.includes('local Codex CLI host-agent runtime owns the run surface for route / managed execution'), true);
+  assert.equal(readme.includes('`Hermes-Agent` owns the long-running run surface for route / managed execution.'), true);
+  assert.equal(readme.includes('The default concrete executor remains local `Codex CLI` host-agent runtime.'), true);
   assert.equal(readme.includes('service-safe domain adapter shell is `redcube_service_safe_domain_entry`'), true);
   assert.equal(readme.includes('`program_id` is the active mainline control-plane pointer.'), true);
   assert.equal(readme.includes('`run_id` is the per-run execution handle for one routed delivery execution.'), true);
-  assert.equal(readmeZh.includes('route / managed execution 的 run surface 由本地 Codex CLI host-agent runtime 主责'), true);
+  assert.equal(readmeZh.includes('route / managed execution 的长期 run surface 由 `Hermes-Agent` 主责。'), true);
+  assert.equal(readmeZh.includes('默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。'), true);
   assert.equal(readmeZh.includes('service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`'), true);
   assert.equal(readmeZh.includes('`program_id`：active mainline 的 control-plane 指针'), true);
   assert.equal(readmeZh.includes('`run_id`：单次 routed delivery execution 的 per-run 执行句柄'), true);
   assert.equal(docsReadme.includes('program/hermes/'), true);
   assert.equal(docsReadmeZh.includes('docs/program/*/*.md'), true);
-  assert.equal(runtimeArchitecture.includes('route / managed run surface 的当前 runtime owner 已是本地 Codex CLI host-agent runtime'), true);
+  assert.equal(runtimeArchitecture.includes('route / managed run surface 已按三层 owner 理解'), true);
   assert.equal(runtimeArchitecture.includes('governance_surface.runtime_topology'), true);
-  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的本地 Codex CLI host-agent runtime'), true);
+  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime'), true);
   assert.equal(status.includes('repo-verified `RedCube Product Entry` + `OPL Gateway Federation` + managed product-entry hardening'), true);
 });
 
-test('current program points to the Codex mainline while retaining durable identity boundaries and historical local provenance', () => {
+test('current program points to the Hermes-managed mainline while retaining durable identity boundaries and historical local provenance', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
@@ -85,9 +87,9 @@ test('current program points to the Codex mainline while retaining durable ident
     'runtimeWatch',
     'ops_eval_summary',
   ]);
-  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'codex_cli');
+  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'upstream_hermes_agent');
   assert.equal(currentProgram.current_state.deployment_host, 'codex_local_operator_host');
-  assert.equal(currentProgram.current_state.host_agent_longterm_owner, true);
+  assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);
   assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');
   assert.equal(currentProgram.current_state.workstream, 'repo_verified_product_entry_and_opl_federation');
   assert.equal(currentProgram.current_state.active_baton.id, 'managed_product_entry_hardening');

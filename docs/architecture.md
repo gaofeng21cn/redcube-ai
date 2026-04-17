@@ -6,8 +6,11 @@
 
 `gateway -> family -> profile -> pack -> harness execution -> audit / review / publication projection`
 
-当前仓内可执行的 runtime 基线已经把 route / managed execution 的 run surface 收口到本地 Codex CLI host-agent runtime。
-`RedCube AI` 继续只维护 visual-domain truth、本地 canonical artifacts，以及 audit / review / projection surface。
+当前仓内可执行的 runtime 基线已经按三层 owner 收口：
+
+- `Hermes-Agent` 持有长期运行、托管 session/run/watch/resume 这层 managed-runtime owner
+- `RedCube AI` 继续只维护 visual-domain truth、本地 canonical artifacts，以及 audit / review / projection surface
+- 默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime，并通过统一 executor-adapter contract 被选择
 
 ## 入口 taxonomy 与 OPL handoff
 
@@ -24,11 +27,11 @@
 
 已经冻结的 direct domain 级链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -61,13 +64,19 @@
 - today repo-verified 的 product-entry service surface 是 `invokeProductEntry` / `invokeFederatedProductEntry` / `getProductEntrySession`
 - 成熟的最终用户产品入口前台壳仍未落地
 
-## Codex CLI host-agent runtime 与 visual executor 的分工
+## Hermes-Agent、RedCube AI 与 concrete executor 的分工
 
-`Codex CLI host-agent runtime` 在 `RedCube AI` 当前主线里的职责是：
+`Hermes-Agent` 在 `RedCube AI` 当前主线里的职责是：
 
 - session / run / watch / memory / scheduling
 - gateway / messaging / interrupt / resume
 - family 级长期在线 runtime substrate
+
+当前默认 concrete executor 仍是 `Codex CLI host-agent runtime`，它负责：
+
+- 默认 agent execution lane
+- 受保护创作 stage 的结构化生成执行
+- 作为 `host_agent` adapter 的 concrete runtime
 
 `RedCube AI` 自己继续持有：
 
@@ -106,9 +115,9 @@
 
 更准确的目标是：
 
-- 由 Codex CLI host-agent runtime 统一 route / managed execution
+- 由 `Hermes-Agent` 统一长期 route / managed-runtime ownership
 - 由 `RedCube AI` 统一 visual-domain truth
-- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线是 Codex CLI，`Hermes-native` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
+- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-native` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
 
 ## Service-Safe Domain Entry
 

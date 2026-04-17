@@ -73,18 +73,18 @@ test('canonical docs freeze the final target shape without overclaiming landed p
   const contractsReadme = read('contracts/README.md');
   const brief = read(FINAL_TARGET_BRIEF);
 
-  assert.equal(rootReadme.includes('Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
+  assert.equal(rootReadme.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces'), true);
   assert.equal(rootReadme.includes('The mature end-user `product entry` shell is still not landed'), true);
-  assert.equal(rootReadmeZh.includes('Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
+  assert.equal(rootReadmeZh.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces'), true);
   assert.equal(rootReadmeZh.includes('成熟的最终用户 `product entry` 前台壳并未落地'), true);
   assert.equal(docsReadme.includes('upstream_hermes_agent_final_target_shape.md'), true);
   assert.equal(docsReadmeZh.includes('upstream_hermes_agent_final_target_shape.md'), true);
-  assert.equal(project.includes('OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
+  assert.equal(project.includes('OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces'), true);
   assert.equal(status.includes('最终目标形态'), true);
   assert.equal(status.includes('`green_baseline.local_codex_execution`'), true);
   assert.equal(architecture.includes('RedCube service-safe domain entry'), true);
   assert.equal(positioning.includes('可调用的 visual-domain 产品 / 服务节点'), true);
-  assert.equal(runtimeArchitecture.includes('Codex CLI host-agent runtime -> RedCube service-safe domain entry -> visual-domain truth surfaces'), true);
+  assert.equal(runtimeArchitecture.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> visual-domain truth surfaces'), true);
   assert.equal(handoff.includes('最终目标形态'), true);
   assert.equal(contractsReadme.includes('redcube-product-entry-mvp.json'), true);
   assert.equal(brief.includes('最终目标不是让 `RedCube AI` 变成整个 `OPL`'), true);

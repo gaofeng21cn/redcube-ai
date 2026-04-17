@@ -17,7 +17,7 @@ This guide is for readers who need the repo-tracked program, references, policie
 ## Current Baseline
 
 - `RedCube AI` is the admitted visual-deliverable domain line in the broader `OPL` family.
-- The truthful execution line now routes managed execution through local `Codex CLI` host-agent runtime while keeping visual-domain truth inside `RedCube AI`.
+- The truthful execution line now reads as a three-layer contract: `Hermes-Agent` owns long-running managed-runtime hosting, `RedCube AI` owns visual-domain governance/truth, and the default concrete executor remains local `Codex CLI` host-agent runtime.
 - The repo-verified lightweight product-entry service surfaces are landed, while a mature end-user web shell is still future work.
 - Protected creative stages now stay on `runtime-family + Codex CLI structured generation`; repo-local `pack/compiler` authorship is no longer the active mainline.
 - `Deep Research` remains inside `Source Readiness`, and the public entry wording still has to keep `operator entry`, `agent entry`, and the thin product-entry surface separate.
@@ -61,6 +61,7 @@ That program set still includes the RedCube product entry MVP before the managed
 - [Phase 2 source intake activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
 - [Phase 2 source intake shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
 - [Phase 2 review export gate audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
+- [Phase 2 publication projection delivery contract convergence](program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md)
 - [Phase 2 family source-truth consumption convergence](program/phase-2/phase_2_family_source_truth_consumption_convergence.md)
 - [Phase 2 direct delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
 - [Phase 2 direct delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
@@ -77,6 +78,7 @@ That program set still includes the RedCube product entry MVP before the managed
 ### References
 
 - [Lightweight product entry and OPL handoff](references/lightweight_product_entry_and_opl_handoff.md)
+- [OPL managed runtime three-layer contract](references/opl_managed_runtime_three_layer_contract.md)
 - [Series doc governance checklist](references/series-doc-governance-checklist.md)
 - [Runtime architecture](runtime_architecture.md)
 - [Domain Harness OS positioning map](domain-harness-os-positioning.md)
