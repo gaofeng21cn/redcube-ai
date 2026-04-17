@@ -97,6 +97,7 @@ function buildPassReviewPayload(args) {
         visual_density_ok: true,
         speaker_fit_ok: true,
         edge_clearance_ok: true,
+        block_content_fit_ok: true,
         title_typography_ok: true,
       },
       metrics: {
@@ -127,6 +128,7 @@ function buildPassReviewPayload(args) {
       visual_density_ok: true,
       speaker_fit_ok: true,
       edge_clearance_ok: true,
+      block_content_fit_ok: true,
       title_typography_ok: true,
     },
     metrics: {
