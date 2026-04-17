@@ -86,6 +86,7 @@ const META = [
 ];
 
 const INTEGRATION = [
+  'tests/block-content-fit-review.test.js',
   'tests/cli-v2-smoke.test.js',
   'tests/deliverable-review-loop.test.js',
   'tests/direct-delivery-lifecycle-stage-summary.test.js',
