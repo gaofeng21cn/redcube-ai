@@ -816,7 +816,7 @@ function buildWorkbenchPptxReadmeMarkdown(contract, exportState) {
       '',
       '规则：',
       '- 最近一次导出的 `.pptx / .pdf / presenter-notes` 仍保留在当前目录，便于继续审阅、对照和补修。',
-      '- 这些文件可能落后于最新 HTML 与截图质控；是否仍可直接交付，以 topic 的 `publication-state.json` 与 deliverable 的 `review-state.json` 为准。',
+      '- 这些文件可能落后于最新 HTML 与截图质控；是否仍可直接交付，以 topic 的 publication projection surface 与 deliverable 的 `review-state.json` 为准。',
       '- `archive/` 只在真正写入更新导出件时保留旧版留痕。',
       '',
     ].join('\n');
@@ -846,7 +846,7 @@ function buildMachinePublishReadmeMarkdown(contract, exportState) {
     '',
     '规则：',
     '- `publish/` 是机器导出表面，文件存在不等于当前仍可交付。',
-    '- 当前是否有效，必须以 topic 的 `publication-state.json` 与 deliverable 的 `review-state.json` 为准。',
+    '- 当前是否有效，必须以 topic 的 publication projection surface 与 deliverable 的 `review-state.json` 为准。',
     '',
   ].join('\n');
 }

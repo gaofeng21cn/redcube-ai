@@ -42,6 +42,7 @@ test('buildDeckRecord emits canonical ppt deck metadata', () => {
     'render_html',
     'visual_director_review',
     'screenshot_review',
+    'fix_html',
     'export_pptx',
   ]);
 });

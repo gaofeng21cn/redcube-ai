@@ -8,6 +8,8 @@ import { getManagedRun } from './get-managed-run.js';
 import { getPublicationProjection } from './get-publication-projection.js';
 import { getReviewState } from './get-review-state.js';
 
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -30,7 +32,7 @@ export async function getProductEntrySession(request) {
   if (!session) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
-  if (safeText(session.runtime_owner) !== 'codex_cli') {
+  if (safeText(session.runtime_owner) !== MANAGED_RUNTIME_OWNER) {
     throw new Error('product entry session runtime_owner 漂移');
   }
 

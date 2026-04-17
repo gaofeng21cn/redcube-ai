@@ -49,12 +49,13 @@ test('phase-2 minimum baseline contract freezes canonical quartet, formal entry 
   const artifactIds = contract.artifact_schema.canonical_artifacts.map((item) => item.artifact_id);
   assert.deepEqual(artifactIds, ['source_index', 'extracted_materials', 'source_audit', 'source_brief']);
   assert.equal(contract.artifact_schema.integration_contracts.gateway_actions.includes('intakeSource'), true);
-  assert.equal(contract.artifact_schema.integration_contracts.mcp_tools.includes('intake_source'), true);
+  assert.equal(contract.artifact_schema.integration_contracts.mcp_tools.includes('redcube_sources'), true);
   assert.equal(contract.artifact_schema.integration_contracts.cli_commands.some((item) => item.includes('redcube source intake')), true);
   assert.deepEqual(contract.artifact_schema.integration_contracts.consumer_families.ppt_deck, ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']);
   assert.deepEqual(contract.artifact_schema.integration_contracts.consumer_families.xiaohongshu, ['research', 'storyline', 'single_note_plan', 'visual_direction']);
   assert.equal(gatewayIntake.includes("surface_kind: 'source_intake'"), true);
-  assert.equal(mcpServer.includes("name: 'intake_source'"), true);
+  assert.equal(mcpServer.includes("name: 'redcube_sources'"), true);
+  assert.equal(mcpServer.includes("intake_source: 'intakeSource'"), true);
   assert.equal(sharedSourceTruth.includes('source_index'), true);
   assert.equal(sharedSourceTruth.includes('extracted_materials'), true);
   assert.equal(sharedSourceTruth.includes('source_audit'), true);

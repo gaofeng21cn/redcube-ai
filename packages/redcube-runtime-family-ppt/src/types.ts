@@ -333,13 +333,17 @@ export type PptRuntimeRouteOutput<
   TPayload extends { route: TRoute },
 > = PptRuntimeRouteEnvelope<TRoute> & TPayload;
 
+export type PptFixHtmlArtifact = Omit<PptRenderArtifact, 'route'> & {
+  route: 'fix_html';
+};
+
 export type PptRuntimeRouteResult =
   | PptRuntimeRouteOutput<'storyline', PptStorylineArtifact>
   | PptRuntimeRouteOutput<'detailed_outline', PptDetailedOutlineArtifact>
   | PptRuntimeRouteOutput<'slide_blueprint', PptBlueprintArtifact>
   | PptRuntimeRouteOutput<'visual_direction', PptVisualDirectionArtifact>
   | PptRuntimeRouteOutput<'render_html', PptRenderArtifact>
-  | PptRuntimeRouteOutput<'fix_html', PptRenderArtifact>
+  | PptRuntimeRouteOutput<'fix_html', PptFixHtmlArtifact>
   | PptRuntimeRouteOutput<'visual_director_review', PptVisualDirectorReviewArtifact>
   | PptRuntimeRouteOutput<'screenshot_review', PptScreenshotReviewArtifact>
   | PptRuntimeRouteOutput<'export_pptx', PptExportBundleArtifact>;

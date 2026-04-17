@@ -1,7 +1,6 @@
 export interface GatewayToolDefinition {
   name: string;
   description: string;
-  actionKey: string;
   inputSchema: Record<string, unknown>;
 }
 

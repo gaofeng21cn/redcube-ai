@@ -14,6 +14,8 @@ import { getReviewState } from './get-review-state.js';
 import { invokeDomainEntry } from './invoke-domain-entry.js';
 
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const SUPPORTED_TASK_INTENTS = new Set(['run_managed_deliverable', 'run_deliverable_route']);
 
 function safeText(value, fallback = '') {
@@ -135,7 +137,7 @@ function buildSessionRecord({
     profile_id: deliveryIdentity.profileId || null,
     title: deliveryIdentity.title || null,
     goal: deliveryIdentity.goal || null,
-    runtime_owner: 'codex_cli',
+    runtime_owner: MANAGED_RUNTIME_OWNER,
     last_task_intent: taskIntent,
     last_entry_mode: entryMode,
     latest_managed_run_id: continuationSnapshot.latest_managed_run_id,
@@ -214,8 +216,8 @@ export async function invokeProductEntry(request) {
       workspace_root: workspaceRoot,
     },
     runtime_session_contract: {
-      runtime_owner: 'codex_cli',
-      adapter_surface: '@redcube/codex-cli-client',
+      runtime_owner: MANAGED_RUNTIME_OWNER,
+      adapter_surface: DEFAULT_EXECUTOR_ADAPTER_SURFACE,
       session_mode: 'entry_session',
     },
     return_surface_contract: {
@@ -284,7 +286,7 @@ export async function invokeProductEntry(request) {
       session_file: persisted.file,
       resumed_from_session: existingSession !== null,
       created_deliverable: createdDeliverable,
-      runtime_owner: 'codex_cli',
+      runtime_owner: MANAGED_RUNTIME_OWNER,
     },
     delivery_identity: {
       deliverable_family: resolvedIdentity.deliverableFamily,

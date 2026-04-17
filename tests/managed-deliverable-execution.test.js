@@ -199,6 +199,67 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
   });
 });
 
+test('managed auto_to_terminal skips fix_html when screenshot_review does not request a rerun', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-skip-fix-html-'));
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: '甲状腺门诊科普',
+      brief: '验证 happy path 不会无条件进入 fix_html。',
+      keywords: ['甲状腺', 'PPT'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '甲状腺门诊科普 deck',
+      goal: '为本科生讲授甲状腺基础知识',
+    });
+
+    const result = await runManagedDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '给我一个最终 PPT',
+    });
+
+    assert.equal(result.ok, true);
+    assert.deepEqual(
+      result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+      [
+        'storyline',
+        'detailed_outline',
+        'slide_blueprint',
+        'visual_direction',
+        'render_html',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
+    );
+    assert.deepEqual(
+      result.managed_run.stage_results.map((stageResult) => stageResult.stage_id),
+      [
+        'storyline',
+        'detailed_outline',
+        'slide_blueprint',
+        'visual_direction',
+        'render_html',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
+    );
+    assert.deepEqual(result.progress_projection.remaining_stages, []);
+  });
+});
+
 test('managed execution stops at explicit stop_after_stage instead of auto-running to terminal', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-stop-'));

@@ -6,6 +6,8 @@ import { productEntrySessionDir } from '@redcube/runtime';
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
 
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
   import.meta.url,
@@ -260,7 +262,7 @@ export async function getProductEntryManifest(request) {
       remaining_gaps_count: 2,
     },
     runtime: {
-      runtime_owner: 'codex_cli',
+      runtime_owner: MANAGED_RUNTIME_OWNER,
       runtime_state_root: path.dirname(sessionStoreRoot),
       session_store_root: sessionStoreRoot,
     },

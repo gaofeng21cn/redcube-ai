@@ -122,6 +122,13 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
+function readJsonIfExists(file) {
+  if (!existsSync(file)) {
+    return null;
+  }
+  return readJson(file);
+}
+
 function writeJson(file, value) {
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
 }
@@ -163,6 +170,29 @@ function stageArtifactPath(contract, deliverablePaths, stageId) {
   return path.join(
     deliverablePaths.artifactsDir,
     safeText(stage?.output_artifact, `${stageId}.json`),
+  );
+}
+
+function shouldSkipAutoToTerminalStage({
+  contract,
+  deliverablePaths,
+  managedRun,
+  stageId,
+}) {
+  if (managedRun?.mode !== 'auto_to_terminal') {
+    return false;
+  }
+  if (stageId !== 'fix_html') {
+    return false;
+  }
+  const reviewStageId = safeText(contract?.review_surface?.artifact_stage, 'screenshot_review');
+  const reviewArtifact = readJsonIfExists(
+    stageArtifactPath(contract, deliverablePaths, reviewStageId),
+  );
+  const rerunPolicy = reviewArtifact?.review_state_patch?.rerun_policy || null;
+  return !(
+    safeText(rerunPolicy?.status) === 'rerun_required'
+    && safeText(rerunPolicy?.rerun_from_stage) === stageId
   );
 }
 
@@ -258,14 +288,20 @@ function buildPromptAudit({
 
 function loadManagedStageSequence(workspaceRoot, managedRun) {
   try {
-    const { contract } = loadHydratedContract({
+    const { contract, deliverablePaths } = loadHydratedContract({
       workspaceRoot,
       topicId: managedRun.topic_id,
       deliverableId: managedRun.deliverable_id,
     });
     return safeArray(contract?.stage_sequence?.stages)
       .map((stage) => safeText(stage?.stage_id))
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((stageId) => !shouldSkipAutoToTerminalStage({
+        contract,
+        deliverablePaths,
+        managedRun,
+        stageId,
+      }));
   } catch {
     return uniqueList(safeArray(managedRun.stage_results).map((stage) => stage?.stage_id));
   }
@@ -878,6 +914,27 @@ export async function runManagedDeliverable({
   for (let stageIndex = 0; stageIndex < stages.length; ) {
     const stageContract = stages[stageIndex];
     const stageId = safeText(stageContract?.stage_id);
+    if (shouldSkipAutoToTerminalStage({
+      contract,
+      deliverablePaths,
+      managedRun,
+      stageId,
+    })) {
+      const nextStage = nextStageId(stages, stageId);
+      managedRun.next_system_action = nextStage
+        ? `系统将直接继续执行${stageLabel(nextStage)}`
+        : '交付已完成，可直接查看最终产物。';
+      pushManagedEvent(workspaceRoot, managedRun, {
+        kind: 'stage_skipped',
+        stageId,
+        summary: nextStage
+          ? `${stageLabel(stageId)}当前没有待执行的返修请求，系统直接继续推进到${stageLabel(nextStage)}。`
+          : `${stageLabel(stageId)}当前没有待执行的返修请求，系统直接结束托管执行。`,
+      });
+      managedState = persistManagedState(workspaceRoot, managedRun);
+      stageIndex += 1;
+      continue;
+    }
     const attempt = safeArray(managedRun.route_runs).filter((item) => item.stage_id === stageId).length + 1;
     managedRun.current_stage = stageId;
     managedRun.worker_running = true;

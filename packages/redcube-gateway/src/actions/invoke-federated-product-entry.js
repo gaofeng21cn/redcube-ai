@@ -1,6 +1,7 @@
 import { invokeProductEntry } from './invoke-product-entry.js';
 
 const FEDERATED_PRODUCT_ENTRY_ID = 'opl_gateway_federated_product_entry';
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -37,8 +38,10 @@ function normalizeRuntimeSessionContract(request) {
     'runtime_session_contract.runtime_owner',
     contract?.runtime_owner || contract?.runtimeOwner,
   );
-  if (runtimeOwner !== 'codex_cli') {
-    throw new Error(`runtime_session_contract.runtime_owner 必须为 codex_cli，当前收到 ${runtimeOwner}`);
+  if (runtimeOwner !== MANAGED_RUNTIME_OWNER) {
+    throw new Error(
+      `runtime_session_contract.runtime_owner 必须为 ${MANAGED_RUNTIME_OWNER}，当前收到 ${runtimeOwner}`,
+    );
   }
   return {
     runtime_owner: runtimeOwner,

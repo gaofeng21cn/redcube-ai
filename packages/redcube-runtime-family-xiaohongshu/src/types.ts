@@ -348,13 +348,17 @@ export type XhsRuntimeRouteOutput<
   TPayload extends { route: TRoute },
 > = XhsRuntimeRouteEnvelope<TRoute> & TPayload;
 
+export type XhsFixHtmlArtifact = Omit<XhsRenderArtifact, 'route'> & {
+  route: 'fix_html';
+};
+
 export type XhsRuntimeRouteResult =
   | XhsRuntimeRouteOutput<'research', XhsResearchArtifact>
   | XhsRuntimeRouteOutput<'storyline', XhsStorylineArtifact>
   | XhsRuntimeRouteOutput<'single_note_plan', XhsPlanArtifact>
   | XhsRuntimeRouteOutput<'visual_direction', XhsVisualDirectionArtifact>
   | XhsRuntimeRouteOutput<'render_html', XhsRenderArtifact>
-  | XhsRuntimeRouteOutput<'fix_html', XhsRenderArtifact>
+  | XhsRuntimeRouteOutput<'fix_html', XhsFixHtmlArtifact>
   | XhsRuntimeRouteOutput<'visual_director_review', XhsDirectorReviewArtifact>
   | XhsRuntimeRouteOutput<'screenshot_review', XhsScreenshotReviewArtifact>
   | XhsRuntimeRouteOutput<'publish_copy', XhsPublishCopyArtifact>

@@ -67,7 +67,7 @@
     ],
     "integration_contracts": {
       "gateway_actions": ["intakeSource", "createDeliverable", "runDeliverableRoute", "auditDeliverable", "runtimeWatch"],
-      "mcp_tools": ["intake_source", "create_deliverable", "run_deliverable_route", "audit_deliverable", "runtime_watch"],
+      "mcp_tools": ["redcube_sources", "redcube_deliverable", "redcube_review"],
       "cli_commands": [
         "redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md]",
         "redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>"

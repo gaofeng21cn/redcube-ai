@@ -2,6 +2,8 @@ import { runDeliverableRoute } from './run-deliverable-route.js';
 import { runManagedDeliverable } from './run-managed-deliverable.js';
 
 const SERVICE_SAFE_DOMAIN_ENTRY_ID = 'redcube_service_safe_domain_entry';
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const TASK_INTENT_SURFACE_KIND = {
   run_managed_deliverable: 'managed_run',
   run_deliverable_route: 'route_run',
@@ -73,12 +75,17 @@ function normalizeRuntimeSessionContract(request) {
     'runtime_session_contract.runtime_owner',
     contract?.runtime_owner || contract?.runtimeOwner,
   );
-  if (runtimeOwner !== 'codex_cli') {
-    throw new Error(`runtime_session_contract.runtime_owner 必须为 codex_cli，当前收到 ${runtimeOwner}`);
+  if (runtimeOwner !== MANAGED_RUNTIME_OWNER) {
+    throw new Error(
+      `runtime_session_contract.runtime_owner 必须为 ${MANAGED_RUNTIME_OWNER}，当前收到 ${runtimeOwner}`,
+    );
   }
   return {
     runtime_owner: runtimeOwner,
-    adapter_surface: safeText(contract?.adapter_surface || contract?.adapterSurface, '@redcube/codex-cli-client'),
+    adapter_surface: safeText(
+      contract?.adapter_surface || contract?.adapterSurface,
+      DEFAULT_EXECUTOR_ADAPTER_SURFACE,
+    ),
     session_mode: safeText(contract?.session_mode || contract?.sessionMode, 'ephemeral_run'),
   };
 }
