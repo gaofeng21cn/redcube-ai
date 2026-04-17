@@ -5,6 +5,7 @@
 - 逐页读取最终截图，判断封面抓停、信息节奏与反模板化是否真正成立
 - 如果同时提供截图与对应页 `source_html`，截图是主裁决依据；`source_html` 只用于确认层级、元素归属与隐藏遮挡，不得替可见缺陷洗白
 - 脚本输出的 overflow / occlusion / visual density / cover density 只是辅助证据
+- 若卡片、步骤行或证据条里的正文已经挤出自身容器，或靠坏断句才勉强塞下，也必须明确指出并判 block
 - judgement 主语必须是 host-agent / director-first，不允许 deterministic script 代替视觉审稿
 - optimize_existing 时输出 baseline_comparison_passed
 - 阻断问题未清零前不得进入 publish_copy / export_bundle

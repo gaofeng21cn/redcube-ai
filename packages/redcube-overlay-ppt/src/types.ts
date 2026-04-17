@@ -46,6 +46,7 @@ export type PptDeckReviewCheck =
   | 'visual_density_ok'
   | 'speaker_fit_ok'
   | 'edge_clearance_ok'
+  | 'block_content_fit_ok'
   | 'title_typography_ok'
   | 'director_intent_landed'
   | 'anti_template_ok'
@@ -133,6 +134,7 @@ export interface PptDeckReviewRerunMap {
   visual_density_ok: 'visual_direction';
   speaker_fit_ok: 'slide_blueprint';
   edge_clearance_ok: 'fix_html';
+  block_content_fit_ok: 'fix_html';
   title_typography_ok: 'fix_html';
   director_intent_landed: 'visual_director_review';
   anti_template_ok: 'visual_director_review';

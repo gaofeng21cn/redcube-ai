@@ -19,6 +19,7 @@
 - 若标题或短句在截图里明明可以单行成立，却被人为拆成两行，必须明确指出；必要时判 block
 - 对 `ring_cross` / 四向围绕中心的骨架页，若某一方向卡片明显比其他方向更贴近中心，必须指出布局失衡；必要时判 block
 - 若 `judgement_ladder` / `timeline_band` 的卡片内容通过不自然换行才勉强塞下，也必须指出这不是合格成品
+- 若卡片、标签或节点容器里的正文已经挤出自身边界，或靠坏断句才勉强塞下，也必须明确指出并判 block；不能因为整页没有滚动条就放过
 - 必须保存逐页截图与 review 记录
 - optimize_existing 必须做 baseline relative review，输出 baseline_comparison_passed
 

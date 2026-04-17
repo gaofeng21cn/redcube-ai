@@ -27,6 +27,7 @@ MIN_CONTENT_PADDING = 8.0
 TITLE_FONT_SIZE_TOLERANCE = 2.5
 EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
 INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
+BLOCK_CONTENT_OVERFLOW_TOLERANCE = 1.5
 
 
 def fail(message: str) -> None:
@@ -160,6 +161,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
     blocks = info.get('blocks', []) or []
     audit_blocks = info.get('auditBlocks', []) or []
     title_meta = info.get('titleMeta', {}) or {}
+    block_content_audit = info.get('blockContentAudit', {}) or {}
     issues: List[str] = []
     overflow_free = (
         float(wrapper.get('scrollWidth', 0)) <= float(wrapper.get('clientWidth', 0)) + 1
@@ -209,6 +211,11 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
     if not edge_clearance_ok:
         issues.append('edge_clearance_out_of_range')
 
+    block_content_failures = block_content_audit.get('failures', []) or []
+    block_content_fit_ok = len(block_content_failures) == 0
+    if not block_content_fit_ok:
+        issues.append('block_content_overflow_detected')
+
     return {
         'slide_id': info.get('slideId'),
         'title': info.get('title'),
@@ -219,6 +226,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'visual_density_ok': visual_density_ok,
             'speaker_fit_ok': speaker_fit_ok,
             'edge_clearance_ok': edge_clearance_ok,
+            'block_content_fit_ok': block_content_fit_ok,
             'title_typography_ok': True,
         },
         'metrics': {
@@ -227,6 +235,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'speaker_seconds': speaker_seconds,
             'overlaps': overlaps,
             'edge_clearance_failures': edge_failures,
+            'block_content_failures': block_content_failures,
             'title_font_size': round(float(title_meta.get('titleFontSize', 0) or 0), 2),
             'title_line_count': int(title_meta.get('titleLineCount', 0) or 0),
             'title_block_id': title_meta.get('titleBlockId'),
@@ -236,7 +245,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
 
 
 def summarize_checks(slide_reviews: List[Dict[str, Any]]) -> Dict[str, bool]:
-    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok', 'edge_clearance_ok', 'title_typography_ok']
+    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok', 'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok']
     return {
         key: all(bool(review.get('checks', {}).get(key)) for review in slide_reviews)
         for key in keys
@@ -373,7 +382,133 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
             for index in range(total):
                 await page.evaluate('(slideIndex) => window.redcubeDeckReview.showSlide(slideIndex)', index)
                 await page.wait_for_timeout(120)
-                info = await page.evaluate('() => window.redcubeDeckReview.inspectCurrentSlide()')
+                info = await page.evaluate(
+                    f"""
+                    () => {{
+                      const base = window.redcubeDeckReview.inspectCurrentSlide();
+                      const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
+                      const tolerance = {BLOCK_CONTENT_OVERFLOW_TOLERANCE};
+                      const round = (value) => Math.round((Number(value) || 0) * 100) / 100;
+                      const normalizeText = (value) => String(value || '').replace(/\\s+/g, '').trim();
+                      const isVisibleElement = (node) => {{
+                        if (!(node instanceof Element)) return false;
+                        const style = window.getComputedStyle(node);
+                        if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) === 0) {{
+                          return false;
+                        }}
+                        const rect = node.getBoundingClientRect();
+                        return rect.width > 0 && rect.height > 0;
+                      }};
+                      const rectRelativeToBounds = (rect, bounds) => {{
+                        const left = rect.left - bounds.left;
+                        const top = rect.top - bounds.top;
+                        const width = rect.width;
+                        const height = rect.height;
+                        return {{
+                          left: round(left),
+                          top: round(top),
+                          width: round(width),
+                          height: round(height),
+                          right: round(left + width),
+                          bottom: round(top + height),
+                        }};
+                      }};
+                      const hasDecorativeSurface = (node) => {{
+                        if (!(node instanceof Element)) return false;
+                        const rect = node.getBoundingClientRect();
+                        if (rect.width < 12 || rect.height < 12) return false;
+                        const style = window.getComputedStyle(node);
+                        const backgroundColor = style.backgroundColor || '';
+                        const hasBackground = !['rgba(0, 0, 0, 0)', 'transparent'].includes(backgroundColor);
+                        const hasBorder = ['Top', 'Right', 'Bottom', 'Left']
+                          .some((side) => Number.parseFloat(style[`border${{side}}Width`] || '0') > 0);
+                        const hasShadow = style.boxShadow && style.boxShadow !== 'none';
+                        const hasRadius = Number.parseFloat(style.borderTopLeftRadius || '0') > 0;
+                        return hasBackground || hasBorder || hasShadow || hasRadius;
+                      }};
+                      const isSurfaceTextTarget = (node) => {{
+                        if (!(node instanceof Element) || !isVisibleElement(node)) return false;
+                        if (!normalizeText(node.textContent || '')) return false;
+                        return hasDecorativeSurface(node);
+                      }};
+                      const collectAuditTargets = (blockNode) => {{
+                        if (!(blockNode instanceof Element) || !isVisibleElement(blockNode)) return [];
+                        const targets = [];
+                        if (isSurfaceTextTarget(blockNode)) {{
+                          targets.push(blockNode);
+                        }}
+                        for (const node of Array.from(blockNode.querySelectorAll('*'))) {{
+                          if (isSurfaceTextTarget(node)) {{
+                            targets.push(node);
+                          }}
+                        }}
+                        return targets;
+                      }};
+                      if (!(wrapper instanceof Element)) {{
+                        return {{
+                          ...base,
+                          blockContentAudit: {{ failures: [] }},
+                        }};
+                      }}
+                      const bounds = wrapper.getBoundingClientRect();
+                      const leafBlocks = Array.from(wrapper.querySelectorAll('[data-qa-block]'))
+                        .filter((node) => !node.querySelector('[data-qa-block]'))
+                        .filter((node) => isVisibleElement(node));
+                      const failures = leafBlocks.flatMap((node, index) => {{
+                        const blockId = node.getAttribute('data-qa-block') || `block-${{index + 1}}`;
+                        return collectAuditTargets(node).map((target) => {{
+                          const targetRect = target.getBoundingClientRect();
+                          const targetRelative = rectRelativeToBounds(targetRect, bounds);
+                          const textRects = [];
+                          const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT, {{
+                            acceptNode(textNode) {{
+                              if (!(textNode instanceof Text)) return NodeFilter.FILTER_REJECT;
+                              if (!textNode.parentElement || !target.contains(textNode.parentElement)) return NodeFilter.FILTER_REJECT;
+                              if (!isVisibleElement(textNode.parentElement)) return NodeFilter.FILTER_REJECT;
+                              if (!normalizeText(textNode.textContent || '')) return NodeFilter.FILTER_REJECT;
+                              return NodeFilter.FILTER_ACCEPT;
+                            }},
+                          }});
+                          while (walker.nextNode()) {{
+                            const textNode = walker.currentNode;
+                            const range = document.createRange();
+                            range.selectNodeContents(textNode);
+                            for (const rect of Array.from(range.getClientRects())) {{
+                              if (rect.width <= 0 || rect.height <= 0) continue;
+                              textRects.push(rectRelativeToBounds(rect, bounds));
+                            }}
+                          }}
+                          if (textRects.length === 0) return null;
+                          const overflowSides = [];
+                          if (textRects.some((rect) => rect.left < targetRelative.left - tolerance)) overflowSides.push('left');
+                          if (textRects.some((rect) => rect.top < targetRelative.top - tolerance)) overflowSides.push('top');
+                          if (textRects.some((rect) => rect.right > targetRelative.right + tolerance)) overflowSides.push('right');
+                          if (textRects.some((rect) => rect.bottom > targetRelative.bottom + tolerance)) overflowSides.push('bottom');
+                          const scrollOverflowX = (target.scrollWidth || 0) > (target.clientWidth || 0) + 1;
+                          const scrollOverflowY = (target.scrollHeight || 0) > (target.clientHeight || 0) + 1;
+                          if (overflowSides.length === 0 && !scrollOverflowX && !scrollOverflowY) {{
+                            return null;
+                          }}
+                          return {{
+                            block_id: blockId,
+                            target_tag: target.tagName.toLowerCase(),
+                            overflow_sides: Array.from(new Set(overflowSides)),
+                            scroll_overflow_x: scrollOverflowX,
+                            scroll_overflow_y: scrollOverflowY,
+                            block_rect: targetRelative,
+                            text_rect_count: textRects.length,
+                            max_text_right: round(Math.max(...textRects.map((rect) => rect.right))),
+                            max_text_bottom: round(Math.max(...textRects.map((rect) => rect.bottom))),
+                          }};
+                        }}).filter(Boolean);
+                      }});
+                      return {{
+                        ...base,
+                        blockContentAudit: {{ failures }},
+                      }};
+                    }}
+                    """
+                )
                 screenshot_file = output_dir / f'slide-{index + 1:02d}.png'
                 await page.locator('.slide.visible .slide-content-wrapper').screenshot(path=str(screenshot_file))
                 review = review_slide(info, args.max_primary_points)

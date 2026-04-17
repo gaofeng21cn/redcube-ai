@@ -43,6 +43,7 @@ export type XiaohongshuReviewCheck =
   | 'overflow_free'
   | 'occlusion_free'
   | 'visual_density_ok'
+  | 'block_content_fit_ok'
   | 'cover_density_ok'
   | 'director_intent_landed'
   | 'anti_template_ok'
@@ -161,6 +162,7 @@ export interface XiaohongshuReviewSurface {
     overflow_free: XiaohongshuStageId;
     occlusion_free: XiaohongshuStageId;
     visual_density_ok: XiaohongshuStageId;
+    block_content_fit_ok: XiaohongshuStageId;
     cover_density_ok: XiaohongshuStageId;
     director_intent_landed: XiaohongshuStageId;
     anti_template_ok: XiaohongshuStageId;

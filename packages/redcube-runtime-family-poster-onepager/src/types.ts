@@ -80,6 +80,7 @@ export interface PosterRuntimeLatestChecks {
   overflow_free?: boolean;
   occlusion_free?: boolean;
   visual_density_ok?: boolean;
+  block_content_fit_ok?: boolean;
   baseline_comparison_passed?: boolean;
 }
 
@@ -136,6 +137,7 @@ export interface PosterScreenshotReviewSlide {
     overflow_free: boolean;
     occlusion_free: boolean;
     visual_density_ok: boolean;
+    block_content_fit_ok?: boolean;
   };
   metrics?: {
     occupied_ratio?: number;
@@ -176,6 +178,7 @@ export interface PosterScreenshotReviewArtifact extends PosterRuntimeArtifactBas
     overflow_free: boolean;
     occlusion_free: boolean;
     visual_density_ok: boolean;
+    block_content_fit_ok: boolean;
   };
   slide_reviews: PosterScreenshotReviewSlide[];
   ai_review?: {

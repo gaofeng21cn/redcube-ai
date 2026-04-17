@@ -109,6 +109,7 @@ const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
   'occlusion_detected',
   'visual_density_out_of_range',
   'edge_clearance_out_of_range',
+  'block_content_overflow_detected',
   'title_typography_inconsistent',
 ]);
 const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
@@ -117,6 +118,7 @@ const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
   'occlusion_free',
   'visual_density_ok',
   'edge_clearance_ok',
+  'block_content_fit_ok',
   'title_typography_ok',
 ]);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
@@ -1282,6 +1284,7 @@ function extraChecks(contract) {
     'visual_density_ok',
     'speaker_fit_ok',
     'edge_clearance_ok',
+    'block_content_fit_ok',
     'title_typography_ok',
   ].includes(check));
 }
@@ -3201,6 +3204,7 @@ function buildReviewMarkdown(contract, reviewArtifact, reviewOwner) {
     `- visual_density_ok：${reviewArtifact.checks.visual_density_ok}`,
     `- speaker_fit_ok：${reviewArtifact.checks.speaker_fit_ok}`,
     `- edge_clearance_ok：${reviewArtifact.checks.edge_clearance_ok}`,
+    `- block_content_fit_ok：${reviewArtifact.checks.block_content_fit_ok}`,
     `- title_typography_ok：${reviewArtifact.checks.title_typography_ok}`,
   );
   if (Object.hasOwn(reviewArtifact.checks, 'baseline_comparison_passed')) {
@@ -3469,6 +3473,7 @@ async function buildScreenshotReviewArtifact({
     visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
     speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
     edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
+    block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
     title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
     ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
   };

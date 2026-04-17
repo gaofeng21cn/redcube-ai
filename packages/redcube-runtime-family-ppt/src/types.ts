@@ -113,6 +113,7 @@ export interface PptRuntimeLatestChecks {
   visual_density_ok?: boolean;
   speaker_fit_ok?: boolean;
   edge_clearance_ok?: boolean;
+  block_content_fit_ok?: boolean;
   title_typography_ok?: boolean;
   baseline_comparison_passed?: boolean;
   term_explained_on_first_use?: boolean;
@@ -195,6 +196,9 @@ export interface PptSlideReviewChecks {
   occlusion_free: boolean;
   visual_density_ok: boolean;
   speaker_fit_ok: boolean;
+  edge_clearance_ok?: boolean;
+  block_content_fit_ok?: boolean;
+  title_typography_ok?: boolean;
 }
 
 export interface PptSlideReviewMetrics {
@@ -202,6 +206,7 @@ export interface PptSlideReviewMetrics {
   block_count?: number;
   overlap_pairs?: number;
   occupied_ratio?: number;
+  block_content_failures?: Array<Record<string, unknown>>;
 }
 
 export interface PptSlideReview {
@@ -260,6 +265,7 @@ export interface PptScreenshotReviewArtifact extends PptRuntimeArtifactBase {
     occlusion_free: boolean;
     visual_density_ok: boolean;
     speaker_fit_ok: boolean;
+    block_content_fit_ok: boolean;
   };
   slide_reviews: PptSlideReview[];
   ai_review?: {

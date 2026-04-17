@@ -133,10 +133,13 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(reviewScript, /device_scale_factor=.*2/);
   assert.match(reviewScript, /--device-scale-factor/);
   assert.match(reviewScript, /edge_clearance_out_of_range/);
+  assert.match(reviewScript, /block_content_overflow_detected/);
   assert.match(reviewScript, /title_typography_inconsistent/);
   assert.match(reviewScript, /edge_clearance_ok/);
+  assert.match(reviewScript, /block_content_fit_ok/);
   assert.match(reviewScript, /title_typography_ok/);
   assert.match(overlayProfiles, /edge_clearance_ok/);
+  assert.match(overlayProfiles, /block_content_fit_ok/);
   assert.match(overlayProfiles, /title_typography_ok/);
   assert.match(runtime, /controller.*唯一主峰/);
   assert.match(runtime, /风险支路.*短窄/);

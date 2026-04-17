@@ -61,6 +61,7 @@ function loadHelpers(file, extraNames = []) {
       normalizeAiVisualJudgement,
       buildAiFirstVisualSlideReview,
       aiFirstMechanicalCheckValue,
+      ${extraNames.includes('slideNeedsTargetedRevision') ? 'slideNeedsTargetedRevision,' : ''}
       ${extraNames.includes('deriveScreenshotReviewRerunStage') ? 'deriveScreenshotReviewRerunStage,' : ''}
     };
   `)();
@@ -164,6 +165,20 @@ for (const family of FAMILY_FILES) {
     const helpers = loadHelpers(family.file);
     assert.equal(helpers.normalizeAiVisualJudgement('weak'), 'pass');
     assert.equal(helpers.normalizeAiVisualJudgement('minor'), 'pass');
+  });
+
+  test(`${family.label} screenshot_review treats surfaced block content overflow as targeted page repair`, () => {
+    const helpers = loadHelpers(family.file, ['slideNeedsTargetedRevision']);
+    assert.equal(
+      helpers.slideNeedsTargetedRevision({
+        slide_id: family.label === 'xiaohongshu' ? 'N03' : 'S03',
+        status: 'pass',
+        issues: [],
+        mechanical_issues: ['block_content_overflow_detected'],
+        ai_review: { judgement: 'pass' },
+      }),
+      true,
+    );
   });
 
   if (family.label === 'ppt') {

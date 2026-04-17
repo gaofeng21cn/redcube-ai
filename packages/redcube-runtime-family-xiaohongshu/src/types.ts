@@ -149,6 +149,7 @@ export interface XhsRuntimeLatestChecks {
   overflow_free?: boolean;
   occlusion_free?: boolean;
   visual_density_ok?: boolean;
+  block_content_fit_ok?: boolean;
   speaker_fit_ok?: boolean;
   baseline_comparison_passed?: boolean;
   platform_copy_complete?: boolean;
@@ -198,6 +199,7 @@ export interface XhsSlideReviewChecks {
   overflow_free: boolean;
   occlusion_free: boolean;
   visual_density_ok: boolean;
+  block_content_fit_ok?: boolean;
   speaker_fit_ok: boolean;
 }
 
@@ -243,6 +245,7 @@ export interface XhsScreenshotReviewArtifact extends XhsRuntimeArtifactBase {
     overflow_free: boolean;
     occlusion_free: boolean;
     visual_density_ok: boolean;
+    block_content_fit_ok: boolean;
     speaker_fit_ok: boolean;
     cover_density_ok: boolean;
     anti_template_ok: boolean;

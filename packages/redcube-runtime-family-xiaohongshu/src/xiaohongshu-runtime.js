@@ -65,6 +65,7 @@ const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
   'overflow_detected',
   'occlusion_detected',
   'visual_density_out_of_range',
+  'block_content_overflow_detected',
   'speaker_fit_out_of_range',
 ]);
 const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
@@ -72,6 +73,7 @@ const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
   'overflow_free',
   'occlusion_free',
   'visual_density_ok',
+  'block_content_fit_ok',
   'speaker_fit_ok',
   'cover_density_ok',
 ]);
@@ -1941,6 +1943,7 @@ function buildScreenshotReviewMarkdown(contract, reviewArtifact, reviewOwner) {
     `- overflow_free: ${reviewArtifact.checks.overflow_free}`,
     `- occlusion_free: ${reviewArtifact.checks.occlusion_free}`,
     `- visual_density_ok: ${reviewArtifact.checks.visual_density_ok}`,
+    `- block_content_fit_ok: ${reviewArtifact.checks.block_content_fit_ok}`,
     `- cover_density_ok: ${reviewArtifact.checks.cover_density_ok}`,
     `- memory_hook_present: ${reviewArtifact.checks.memory_hook_present}`,
     '',
@@ -2055,11 +2058,13 @@ async function buildScreenshotReview(
     const overflowFree = occupiedRatio <= 0.88;
     const occlusionFree = overlaps.length === 0;
     const visualDensityOk = occupiedRatio >= 0.18 && occupiedRatio <= 0.88;
+    const blockContentFitOk = slide?.checks?.block_content_fit_ok !== false;
     const speakerFitOk = slide?.checks?.speaker_fit_ok !== false;
     const issues = [];
     if (!overflowFree) issues.push('overflow_detected');
     if (!occlusionFree) issues.push('occlusion_detected');
     if (!visualDensityOk) issues.push('visual_density_out_of_range');
+    if (!blockContentFitOk) issues.push('block_content_overflow_detected');
     if (!speakerFitOk) issues.push('speaker_fit_out_of_range');
     return {
       ...slide,
@@ -2068,6 +2073,7 @@ async function buildScreenshotReview(
         overflow_free: overflowFree,
         occlusion_free: occlusionFree,
         visual_density_ok: visualDensityOk,
+        block_content_fit_ok: blockContentFitOk,
         speaker_fit_ok: speakerFitOk,
       },
       issues,
@@ -2098,6 +2104,7 @@ async function buildScreenshotReview(
     overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
     occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
     visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
+    block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
     speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
     cover_density_ok: slideReviews.length > 0
       && (hasAiVisualPass(slideReviews[0]?.ai_review) || Number(slideReviews[0]?.metrics?.occupied_ratio || 0) >= 0.22),

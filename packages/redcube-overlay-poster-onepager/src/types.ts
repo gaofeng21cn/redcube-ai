@@ -31,6 +31,7 @@ export type PosterOnepagerReviewCheck =
   | 'overflow_free'
   | 'occlusion_free'
   | 'visual_density_ok'
+  | 'block_content_fit_ok'
   | 'director_intent_landed'
   | 'anti_template_ok'
   | 'message_hierarchy_clear'

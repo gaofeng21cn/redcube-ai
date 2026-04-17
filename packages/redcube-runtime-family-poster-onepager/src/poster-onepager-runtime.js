@@ -35,6 +35,12 @@ const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 const MIN_REVIEW_QA_BLOCKS = 2;
 const MIN_REVIEW_PRIMARY_POINTS = 1;
 const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
+const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
+  'overflow_detected',
+  'occlusion_detected',
+  'visual_density_out_of_range',
+  'block_content_overflow_detected',
+]);
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   poster_blueprint: 'story_architecture',
@@ -442,6 +448,16 @@ function buildAiFirstVisualSlideReview(slide, aiReview) {
 
 function aiFirstMechanicalCheckValue(slideReviews, checkKey) {
   return safeArray(slideReviews).every((slide) => Boolean(slide?.checks?.[checkKey]));
+}
+
+function slideNeedsTargetedRevision(slide) {
+  if (!slide || typeof slide !== 'object') return false;
+  if (safeText(slide?.status) === 'block') return true;
+  if (hasAiVisualBlock(slide?.ai_review)) return true;
+  const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
+    ? safeArray(slide?.mechanical_issues)
+    : safeArray(slide?.issues);
+  return mechanicalIssues.some((issue) => TARGETED_SCREENSHOT_MECHANICAL_ISSUES.has(safeText(issue)));
 }
 
 function requireObjectArray(value, label, { min = 1, max = 6 } = {}) {
@@ -1455,6 +1471,7 @@ function buildScreenshotReviewMarkdown(contract, reviewArtifact, reviewOwner) {
     `- overflow_free: ${reviewArtifact.checks.overflow_free}`,
     `- occlusion_free: ${reviewArtifact.checks.occlusion_free}`,
     `- visual_density_ok: ${reviewArtifact.checks.visual_density_ok}`,
+    `- block_content_fit_ok: ${reviewArtifact.checks.block_content_fit_ok}`,
     '',
     '## AI 审阅结论',
     `- review_model: ${safeText(reviewArtifact.ai_review?.review_model)}`,
@@ -1606,10 +1623,12 @@ async function buildScreenshotReview(
     const overflowFree = Boolean(slide?.checks?.overflow_free);
     const occlusionFree = overlaps.length === 0;
     const visualDensityOk = occupiedRatio >= 0.18 && occupiedRatio <= 0.82;
+    const blockContentFitOk = slide?.checks?.block_content_fit_ok !== false;
     const issues = [];
     if (!overflowFree) issues.push('overflow_detected');
     if (!occlusionFree) issues.push('occlusion_detected');
     if (!visualDensityOk) issues.push('visual_density_out_of_range');
+    if (!blockContentFitOk) issues.push('block_content_overflow_detected');
     return {
       slide_id: slide.slide_id,
       title: slide.title,
@@ -1620,6 +1639,7 @@ async function buildScreenshotReview(
         overflow_free: overflowFree,
         occlusion_free: occlusionFree,
         visual_density_ok: visualDensityOk,
+        block_content_fit_ok: blockContentFitOk,
       },
       metrics: {
         occupied_ratio: Number(occupiedRatio.toFixed(4)),
@@ -1656,6 +1676,7 @@ async function buildScreenshotReview(
     overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
     occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
     visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
+    block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
   };
   const failedChecks = Object.entries(checks)
     .filter(([, value]) => value === false)
