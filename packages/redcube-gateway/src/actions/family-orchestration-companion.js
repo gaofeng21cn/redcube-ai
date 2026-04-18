@@ -1,3 +1,5 @@
+import { buildFamilyOrchestrationTemplate } from 'opl-readonly-gateway/family-orchestration';
+
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -119,7 +121,7 @@ export function buildFamilyOrchestrationCompanion({
   const eventEnvelopeSurface = cloneReference(eventEnvelopeSurfaceRef);
   const checkpointLineageSurface = cloneReference(checkpointLineageSurfaceRef);
 
-  return {
+  return buildFamilyOrchestrationTemplate({
     action_graph_ref: {
       ...PRODUCT_ENTRY_ACTION_GRAPH_REF,
     },
@@ -132,12 +134,10 @@ export function buildFamilyOrchestrationCompanion({
         ...(reviewSurface ? { review_surface: reviewSurface } : {}),
       },
     ],
-    resume_contract: {
-      surface_kind: 'product_entry_session',
-      session_locator_field: sessionField,
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
-    },
+    resume_surface_kind: 'product_entry_session',
+    session_locator_field: sessionField,
+    checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
     ...(eventEnvelopeSurface ? { event_envelope_surface: eventEnvelopeSurface } : {}),
     ...(checkpointLineageSurface ? { checkpoint_lineage_surface: checkpointLineageSurface } : {}),
-  };
+  });
 }
