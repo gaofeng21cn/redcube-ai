@@ -69,6 +69,10 @@ test('current program points to the Hermes-managed mainline while retaining dura
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
+  assert.equal(
+    currentProgram.longrun_goal.north_star.includes('move runtime substrate ownership onto upstream Hermes-Agent managed runtime'),
+    true,
+  );
   assert.equal(currentProgram.formal_entry.default_formal_entry, 'CLI');
   assert.deepEqual(currentProgram.formal_entry.supported_protocol_layer, ['MCP']);
   assert.equal(currentProgram.execution_handle_contract.program_id.role, 'active mainline control-plane pointer');

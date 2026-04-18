@@ -12,7 +12,7 @@
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
-      "move runtime substrate ownership onto local Codex CLI host-agent execution",
+      "move runtime substrate ownership onto upstream Hermes-Agent managed runtime",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
     ]
   },
