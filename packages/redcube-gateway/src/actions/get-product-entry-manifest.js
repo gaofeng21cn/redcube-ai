@@ -9,6 +9,11 @@ import {
   buildTaskLifecycle,
 } from 'opl-gateway-shared/runtime-task-companions';
 import {
+  buildDomainEntryCommandContract,
+  buildFamilyDomainEntryContract,
+  buildGatewayInteractionContract,
+} from 'opl-gateway-shared/family-entry-contracts';
+import {
   buildSkillCatalog,
   buildSkillDescriptor,
 } from 'opl-gateway-shared/skill-catalog';
@@ -30,6 +35,19 @@ import { buildFamilyOrchestrationCompanion } from './family-orchestration-compan
 import { getProductPreflight } from './get-product-preflight.js';
 
 const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
+const PRODUCT_FRONTDESK_COMMAND = 'redcube product frontdesk';
+const PRODUCT_START_COMMAND = 'redcube product start';
+const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
+const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
+const PRODUCT_SESSION_COMMAND = 'redcube product session';
+const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
+const REDCUBE_DOMAIN_ENTRY_SURFACE_KIND = 'domain_entry';
+const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
+const PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/redcube-product-entry-mvp.json';
+const FEDERATED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-gateway-federated-product-entry.json';
+const MANAGED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/managed-product-entry-hardening.json';
+const SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF = 'contracts/runtime-program/service-safe-domain-entry-adapter.json';
 
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
@@ -59,15 +77,127 @@ function readCurrentProgramContract() {
   return JSON.parse(readFileSync(CURRENT_PROGRAM_CONTRACT_URL, 'utf8'));
 }
 
+function buildRedCubeDomainEntryContract() {
+  return buildFamilyDomainEntryContract({
+    entry_adapter: REDCUBE_DOMAIN_ENTRY_ADAPTER,
+    service_safe_surface_kind: REDCUBE_DOMAIN_ENTRY_SURFACE_KIND,
+    product_entry_builder_command: PRODUCT_MANIFEST_COMMAND,
+    product_entry_kind: PRODUCT_ENTRY_KIND,
+    supported_entry_modes: ['direct', 'opl_gateway', 'session'],
+    supported_commands: [
+      PRODUCT_MANIFEST_COMMAND,
+      PRODUCT_FRONTDESK_COMMAND,
+      PRODUCT_START_COMMAND,
+      PRODUCT_INVOKE_COMMAND,
+      PRODUCT_FEDERATE_COMMAND,
+      PRODUCT_SESSION_COMMAND,
+    ],
+    command_contracts: [
+      buildDomainEntryCommandContract({
+        command: PRODUCT_MANIFEST_COMMAND,
+        required_fields: ['workspace_root'],
+        extra_payload: {
+          gateway_action: 'getProductEntryManifest',
+          target_surface_kind: 'product_entry_manifest',
+        },
+      }),
+      buildDomainEntryCommandContract({
+        command: PRODUCT_FRONTDESK_COMMAND,
+        required_fields: ['workspace_root'],
+        extra_payload: {
+          gateway_action: 'getProductFrontdesk',
+          target_surface_kind: 'product_frontdesk',
+        },
+      }),
+      buildDomainEntryCommandContract({
+        command: PRODUCT_START_COMMAND,
+        required_fields: ['workspace_root'],
+        extra_payload: {
+          gateway_action: 'getProductStart',
+          target_surface_kind: 'product_entry_start',
+        },
+      }),
+      buildDomainEntryCommandContract({
+        command: PRODUCT_INVOKE_COMMAND,
+        required_fields: ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+        optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
+        extra_payload: {
+          gateway_action: 'invokeProductEntry',
+          target_surface_kind: 'product_entry',
+        },
+      }),
+      buildDomainEntryCommandContract({
+        command: PRODUCT_FEDERATE_COMMAND,
+        required_fields: [
+          'workspace_root',
+          'entry_session_id',
+          'target_domain_id',
+          'entry_mode',
+          'return_surface_kind',
+          'overlay',
+          'topic_id',
+          'deliverable_id',
+        ],
+        optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
+        extra_payload: {
+          gateway_action: 'invokeFederatedProductEntry',
+          target_surface_kind: 'federated_product_entry',
+        },
+      }),
+      buildDomainEntryCommandContract({
+        command: PRODUCT_SESSION_COMMAND,
+        required_fields: ['entry_session_id'],
+        extra_payload: {
+          gateway_action: 'getProductEntrySession',
+          target_surface_kind: 'product_entry_session',
+        },
+      }),
+    ],
+    extra_payload: {
+      service_safe_contract_ref: SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
+      direct_product_entry_contract_ref: PRODUCT_ENTRY_CONTRACT_REF,
+      federated_product_entry_contract_ref: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+      managed_session_contract_ref: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
+    },
+  });
+}
+
+function buildRedCubeGatewayInteractionContract() {
+  return buildGatewayInteractionContract({
+    frontdoor_owner: 'opl_gateway_or_domain_gui',
+    user_interaction_mode: 'natural_language_frontdoor',
+    user_commands_required: false,
+    command_surfaces_for_agent_consumption_only: true,
+    shared_downstream_entry: REDCUBE_DOMAIN_ENTRY_ADAPTER,
+    shared_handoff_envelope: [
+      'target_domain_id',
+      'task_intent',
+      'entry_mode',
+      'workspace_locator',
+      'runtime_session_contract',
+      'return_surface_contract',
+      'entry_session_contract',
+      'delivery_request',
+    ],
+    extra_payload: {
+      direct_frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
+      manifest_command: PRODUCT_MANIFEST_COMMAND,
+      federated_contract_ref: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+    },
+  });
+}
+
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const sessionStoreRoot = productEntrySessionDir();
-  const productEntrySessionCommand = 'redcube product session --entry-session-id <entry-session-id>';
+  const productEntrySessionCommand = `${PRODUCT_SESSION_COMMAND} --entry-session-id <entry-session-id>`;
   const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
   const currentProgram = readCurrentProgramContract();
   const currentState = currentProgram.current_state || {};
   const activeMainline = currentState.active_mainline || {};
   const activeBaton = currentState.active_baton || {};
+  const domainEntryContract = buildRedCubeDomainEntryContract();
+  const gatewayInteractionContract = buildRedCubeGatewayInteractionContract();
   const familyOrchestration = buildFamilyOrchestrationCompanion({
     sessionLocatorField: 'entry_session_contract.entry_session_id',
     gateStatus: 'requested',
@@ -87,7 +217,7 @@ export async function getProductEntryManifest(request) {
       {
         step_id: 'open_frontdesk',
         title: 'Open RedCube frontdesk',
-        command: `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+        command: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_frontdesk',
         summary: 'Open the direct RedCube frontdesk for the current workspace.',
         requires: [],
@@ -96,7 +226,7 @@ export async function getProductEntryManifest(request) {
         step_id: 'continue_current_loop',
         title: 'Continue current deliverable loop',
         command: (
-          `redcube product invoke --workspace-root ${workspaceRoot} `
+          `${PRODUCT_INVOKE_COMMAND} --workspace-root ${workspaceRoot} `
           + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
@@ -118,9 +248,9 @@ export async function getProductEntryManifest(request) {
   });
   const productEntryOverview = buildProductEntryOverview({
     summary: 'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
-    frontdesk_command: 'redcube product frontdesk',
-    recommended_command: 'redcube product invoke',
-    operator_loop_command: 'redcube product invoke',
+    frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
+    recommended_command: PRODUCT_INVOKE_COMMAND,
+    operator_loop_command: PRODUCT_INVOKE_COMMAND,
     progress_surface: {
       surface_kind: 'product_entry_session',
       command: productEntrySessionCommand,
@@ -148,7 +278,7 @@ export async function getProductEntryManifest(request) {
       {
         mode_id: 'open_frontdesk',
         title: 'Open RedCube frontdesk',
-        command: `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+        command: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_frontdesk',
         summary: 'Open the direct RedCube frontdesk for the current workspace.',
         requires: [],
@@ -157,7 +287,7 @@ export async function getProductEntryManifest(request) {
         mode_id: 'start_direct_session',
         title: 'Start direct session',
         command: (
-          `redcube product invoke --workspace-root ${workspaceRoot} `
+          `${PRODUCT_INVOKE_COMMAND} --workspace-root ${workspaceRoot} `
           + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
@@ -169,7 +299,7 @@ export async function getProductEntryManifest(request) {
         mode_id: 'opl_bridge_handoff',
         title: 'Internal OPL bridge handoff',
         command: (
-          `redcube product federate --workspace-root ${workspaceRoot} `
+          `${PRODUCT_FEDERATE_COMMAND} --workspace-root ${workspaceRoot} `
           + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
           + '--entry-mode opl_gateway --return-surface-kind product_entry '
           + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
@@ -204,9 +334,9 @@ export async function getProductEntryManifest(request) {
       + '但还不是成熟的最终用户前台或托管 Web 产品。'
     ),
     recommended_start_surface: 'product_frontdesk',
-    recommended_start_command: 'redcube product frontdesk',
+    recommended_start_command: PRODUCT_FRONTDESK_COMMAND,
     recommended_loop_surface: 'product_entry',
-    recommended_loop_command: 'redcube product invoke',
+    recommended_loop_command: PRODUCT_INVOKE_COMMAND,
     blocking_gaps: [
       '成熟的最终用户前台壳仍未 landed。',
       'managed web productization 仍未 landed。',
@@ -313,7 +443,7 @@ export async function getProductEntryManifest(request) {
         distribution_mode: 'repo_tracked',
         surface_kind: 'product_frontdesk',
         description: 'Open the canonical product frontdesk shell for this workspace.',
-        command: 'redcube product frontdesk',
+        command: PRODUCT_FRONTDESK_COMMAND,
         readiness: 'landed',
         tags: ['frontdesk', 'product-entry', 'workspace'],
       }),
@@ -324,7 +454,7 @@ export async function getProductEntryManifest(request) {
         distribution_mode: 'repo_tracked',
         surface_kind: 'product_entry',
         description: 'Run the direct same-session deliverable loop through product entry.',
-        command: 'redcube product invoke',
+        command: PRODUCT_INVOKE_COMMAND,
         readiness: 'landed',
         tags: ['direct', 'deliverable', 'operator-loop'],
       }),
@@ -335,29 +465,29 @@ export async function getProductEntryManifest(request) {
         distribution_mode: 'repo_tracked',
         surface_kind: 'product_entry_session',
         description: 'Inspect and continue the same deliverable loop by entry_session_id.',
-        command: 'redcube product session',
+        command: PRODUCT_SESSION_COMMAND,
         readiness: 'landed',
         tags: ['session', 'continuation', 'runtime'],
       }),
     ],
     supported_commands: [
-      'redcube product frontdesk',
-      'redcube product invoke',
-      'redcube product session',
+      PRODUCT_FRONTDESK_COMMAND,
+      PRODUCT_INVOKE_COMMAND,
+      PRODUCT_SESSION_COMMAND,
     ],
     command_contracts: [
       {
-        command: 'redcube product frontdesk',
+        command: PRODUCT_FRONTDESK_COMMAND,
         shell_key: 'frontdesk',
         target_surface_kind: 'product_frontdesk',
       },
       {
-        command: 'redcube product invoke',
+        command: PRODUCT_INVOKE_COMMAND,
         shell_key: 'direct',
         target_surface_kind: 'product_entry',
       },
       {
-        command: 'redcube product session',
+        command: PRODUCT_SESSION_COMMAND,
         shell_key: 'session',
         target_surface_kind: 'product_entry_session',
       },
@@ -424,39 +554,39 @@ export async function getProductEntryManifest(request) {
       workspace_root: workspaceRoot,
     },
     recommended_shell: 'direct',
-    recommended_command: 'redcube product invoke',
+    recommended_command: PRODUCT_INVOKE_COMMAND,
     frontdesk_surface: {
       shell_key: 'frontdesk',
-      command: 'redcube product frontdesk',
+      command: PRODUCT_FRONTDESK_COMMAND,
       surface_kind: 'product_frontdesk',
       summary: '当前 direct RedCube frontdesk，先暴露 direct / session 入口，并把 internal OPL bridge 保持在单独的 bridge contract。',
     },
     operator_loop_surface: {
       shell_key: 'direct',
-      command: 'redcube product invoke',
+      command: PRODUCT_INVOKE_COMMAND,
       surface_kind: 'product_entry',
       summary: (
         '当前 operator loop 仍 anchored on direct product entry；'
         + '拿到 entry_session_id 后继续通过 session surface 追踪同一交付。'
       ),
       continuation_shell_key: 'session',
-      continuation_command: 'redcube product session',
+      continuation_command: PRODUCT_SESSION_COMMAND,
     },
     operator_loop_actions: {
       start_deliverable: {
-        command: 'redcube product invoke',
+        command: PRODUCT_INVOKE_COMMAND,
         surface_kind: 'product_entry',
         summary: '直接进入当前 deliverable 的 primary operator loop。',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       continue_session: {
-        command: 'redcube product session',
+        command: PRODUCT_SESSION_COMMAND,
         surface_kind: 'product_entry_session',
         summary: '在已有 entry_session_id 下继续同一交付。',
         requires: ['entry_session_id'],
       },
       opl_bridge_handoff: {
-        command: 'redcube product federate',
+        command: PRODUCT_FEDERATE_COMMAND,
         surface_kind: 'federated_product_entry',
         summary: '通过 internal OPL bridge 进入同一 downstream product entry；这条命令保留给外层 shell / compatibility bridge。',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
@@ -485,23 +615,23 @@ export async function getProductEntryManifest(request) {
     automation,
     product_entry_shell: {
       frontdesk: {
-        command: 'redcube product frontdesk',
-        command_template: `redcube product frontdesk --workspace-root ${workspaceRoot}`,
+        command: PRODUCT_FRONTDESK_COMMAND,
+        command_template: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_frontdesk',
       },
       direct: {
-        command: 'redcube product invoke',
+        command: PRODUCT_INVOKE_COMMAND,
         command_template: (
-          `redcube product invoke --workspace-root ${workspaceRoot} `
+          `${PRODUCT_INVOKE_COMMAND} --workspace-root ${workspaceRoot} `
           + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
         surface_kind: 'product_entry',
       },
       opl_bridge: {
-        command: 'redcube product federate',
+        command: PRODUCT_FEDERATE_COMMAND,
         command_template: (
-          `redcube product federate --workspace-root ${workspaceRoot} `
+          `${PRODUCT_FEDERATE_COMMAND} --workspace-root ${workspaceRoot} `
           + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
           + '--entry-mode opl_gateway --return-surface-kind product_entry '
           + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
@@ -509,7 +639,7 @@ export async function getProductEntryManifest(request) {
         surface_kind: 'federated_product_entry',
       },
       session: {
-        command: 'redcube product session',
+        command: PRODUCT_SESSION_COMMAND,
         command_template: productEntrySessionCommand,
         surface_kind: 'product_entry_session',
       },
@@ -542,10 +672,12 @@ export async function getProductEntryManifest(request) {
     extra_payload: {
       ok: true,
       recommended_action: 'invoke_product_entry',
+      domain_entry_contract: domainEntryContract,
+      gateway_interaction_contract: gatewayInteractionContract,
       current_truth: {
-        product_entry_contract: 'contracts/runtime-program/redcube-product-entry-mvp.json',
-        federated_product_entry_contract: 'contracts/runtime-program/opl-gateway-federated-product-entry.json',
-        managed_product_entry_contract: 'contracts/runtime-program/managed-product-entry-hardening.json',
+        product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
+        federated_product_entry_contract: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+        managed_product_entry_contract: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
       },
     },
   });

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   getProductFrontdesk,
@@ -30,6 +30,16 @@ const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
 const GATEWAY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-gateway/package.json', import.meta.url),
 );
+const GATEWAY_SHARED_DIST_ROOT = path.join(
+  path.dirname(GATEWAY_PACKAGE_JSON),
+  'node_modules',
+  'opl-gateway-shared',
+  'dist',
+);
+
+async function importGatewaySharedDistModule(moduleName) {
+  return import(pathToFileURL(path.join(GATEWAY_SHARED_DIST_ROOT, moduleName)).href);
+}
 
 async function withMockHermesAndRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
@@ -274,6 +284,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
 
 test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
+    const sharedCompanions = await importGatewaySharedDistModule('product-entry-companions.js');
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const manifest = await getProductEntryManifest({
@@ -496,7 +507,62 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.opl_bridge.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
+    assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
+    assert.equal(manifest.domain_entry_contract.service_safe_surface_kind, 'domain_entry');
+    assert.equal(manifest.domain_entry_contract.product_entry_builder_command, 'redcube product manifest');
+    assert.deepEqual(manifest.domain_entry_contract.supported_entry_modes, ['direct', 'opl_gateway', 'session']);
+    assert.deepEqual(manifest.domain_entry_contract.supported_commands, [
+      'redcube product manifest',
+      'redcube product frontdesk',
+      'redcube product start',
+      'redcube product invoke',
+      'redcube product federate',
+      'redcube product session',
+    ]);
+    assert.equal(manifest.domain_entry_contract.command_contracts.length, 6);
+    assert.equal(manifest.domain_entry_contract.command_contracts[0].command, 'redcube product manifest');
+    assert.deepEqual(manifest.domain_entry_contract.command_contracts[0].required_fields, ['workspace_root']);
+    assert.equal(manifest.domain_entry_contract.command_contracts[3].command, 'redcube product invoke');
+    assert.deepEqual(manifest.domain_entry_contract.command_contracts[3].required_fields, [
+      'workspace_root',
+      'entry_session_id',
+      'overlay',
+      'topic_id',
+      'deliverable_id',
+    ]);
+    assert.equal(manifest.domain_entry_contract.command_contracts[4].command, 'redcube product federate');
+    assert.deepEqual(manifest.domain_entry_contract.command_contracts[4].required_fields, [
+      'workspace_root',
+      'entry_session_id',
+      'target_domain_id',
+      'entry_mode',
+      'return_surface_kind',
+      'overlay',
+      'topic_id',
+      'deliverable_id',
+    ]);
+    assert.equal(manifest.gateway_interaction_contract.surface_kind, 'gateway_interaction_contract');
+    assert.equal(manifest.gateway_interaction_contract.frontdoor_owner, 'opl_gateway_or_domain_gui');
+    assert.equal(manifest.gateway_interaction_contract.user_interaction_mode, 'natural_language_frontdoor');
+    assert.equal(manifest.gateway_interaction_contract.user_commands_required, false);
+    assert.equal(manifest.gateway_interaction_contract.command_surfaces_for_agent_consumption_only, true);
+    assert.equal(manifest.gateway_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
+    assert.deepEqual(manifest.gateway_interaction_contract.shared_handoff_envelope, [
+      'target_domain_id',
+      'task_intent',
+      'entry_mode',
+      'workspace_locator',
+      'runtime_session_contract',
+      'return_surface_contract',
+      'entry_session_contract',
+      'delivery_request',
+    ]);
     assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+    const validatedManifest = sharedCompanions.validateFamilyProductEntryManifest(manifest, {
+      requireRuntimeCompanions: true,
+    });
+    assert.equal(validatedManifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
+    assert.equal(validatedManifest.gateway_interaction_contract.frontdoor_owner, 'opl_gateway_or_domain_gui');
     assertFamilyOrchestrationCompanion(manifest, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });
@@ -540,6 +606,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');
+    assert.deepEqual(frontdesk.domain_entry_contract, manifest.domain_entry_contract);
+    assert.deepEqual(frontdesk.gateway_interaction_contract, manifest.gateway_interaction_contract);
+    const validatedFrontdesk = sharedCompanions.validateFamilyProductFrontdesk(frontdesk);
+    assert.equal(validatedFrontdesk.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
+    assert.equal(validatedFrontdesk.gateway_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
     assertFamilyOrchestrationCompanion(frontdesk, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });
@@ -594,7 +665,7 @@ test('product preflight consumes OPL shared program builders from the pinned own
     gatewayPackage.dependencies['opl-gateway-shared'],
     /^git\+https:\/\/github\.com\/gaofeng21cn\/one-person-lab\.git#[0-9a-f]{40}$/,
   );
-  const companions = await import('opl-gateway-shared/product-entry-program-companions');
+  const companions = await importGatewaySharedDistModule('product-entry-program-companions.js');
   assert.equal(typeof companions.buildProductEntryPreflight, 'function');
   assert.equal(typeof companions.buildProgramCheck, 'function');
 });

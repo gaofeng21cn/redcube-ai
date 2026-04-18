@@ -521,6 +521,8 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       target_domain_id: string;
     };
   };
+  domain_entry_contract: Record<string, unknown>;
+  gateway_interaction_contract: Record<string, unknown>;
   product_entry_start: ProductEntryStartCompanion;
   product_entry_overview: ProductEntryOverviewCompanion;
   product_entry_preflight: ProductEntryPreflightCompanion;
@@ -555,6 +557,8 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
     opl_bridge: ProductEntryManifestResponse['product_entry_shell']['opl_bridge'];
     session: ProductEntryManifestResponse['product_entry_shell']['session'];
   };
+  domain_entry_contract: ProductEntryManifestResponse['domain_entry_contract'];
+  gateway_interaction_contract: ProductEntryManifestResponse['gateway_interaction_contract'];
   summary: {
     frontdesk_command: string | null;
     recommended_command: string;

@@ -20,6 +20,8 @@ export async function getProductFrontdesk(request) {
     ],
     extra_payload: {
       ok: true,
+      domain_entry_contract: manifest.domain_entry_contract,
+      gateway_interaction_contract: manifest.gateway_interaction_contract,
     },
   });
 }
