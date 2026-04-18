@@ -26,6 +26,7 @@
 - 当前 RedCube domain-agent entry contract：`contracts/runtime-program/redcube-product-entry-mvp.json`
 - 当前 OPL bridge contract：`contracts/runtime-program/opl-gateway-federated-product-entry.json`
 - 当前 domain-agent hardening contract：`contracts/runtime-program/managed-product-entry-hardening.json`
+- 当前冻结的 downstream execution seam：`RedCube service-safe domain entry`
 - 当前 F4 live closeout proof：`contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`
 - 历史 F4 blocker freeze：`contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json`
 - 当前 probe 命令：`codex exec`（通过 `@redcube/codex-cli-client` / `REDCUBE_CODEX_COMMAND`）

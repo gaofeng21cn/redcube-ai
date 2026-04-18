@@ -1,5 +1,18 @@
 import type { GovernanceSurfaceContract } from '@redcube/overlay-core';
 import type { WorkspaceContract } from '@redcube/runtime-protocol';
+import type {
+  FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
+  FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
+  FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
+  FamilyProductEntryManifestSurface as SharedFamilyProductEntryManifestSurface,
+  FamilyProductFrontdeskSurface as SharedFamilyProductFrontdeskSurface,
+  ProductEntryOverviewSurface as SharedProductEntryOverviewSurface,
+  ProductEntryPreflightSurface as SharedProductEntryPreflightSurface,
+  ProductEntryQuickstartSurface as SharedProductEntryQuickstartSurface,
+  ProductEntryReadinessSurface as SharedProductEntryReadinessSurface,
+  ProductEntryResumeContract as SharedProductEntryResumeContract,
+  ProductEntryStartSurface as SharedProductEntryStartSurface,
+} from 'opl-readonly-gateway/product-entry-companions';
 
 export interface WorkspaceRootRequest {
   workspaceRoot: string;
@@ -202,117 +215,33 @@ export interface ProductEntryRequest extends Record<string, unknown> {
   };
 }
 
-export interface FamilyOrchestrationReferenceRef {
-  ref_kind: 'repo_path' | 'json_pointer' | 'workspace_locator' | 'external_url' | string;
-  ref: string;
-  label?: string;
-}
+export type FamilyOrchestrationReferenceRef = SharedFamilyOrchestrationReferenceRef;
 
-export interface FamilyOrchestrationGatePreview {
-  gate_id: string;
-  title?: string;
-  status?: 'requested' | 'approved' | 'rejected' | 'changes_requested' | string;
-  review_surface?: FamilyOrchestrationReferenceRef;
-}
+export type FamilyOrchestrationGatePreview = SharedFamilyOrchestrationGatePreview;
 
-export interface FamilyOrchestrationResumeContract {
-  surface_kind: string;
-  session_locator_field: string;
-  checkpoint_locator_field?: string;
-}
+export type FamilyOrchestrationResumeContract = SharedProductEntryResumeContract;
 
-export interface FamilyOrchestrationCompanion {
-  action_graph_ref?: FamilyOrchestrationReferenceRef;
-  action_graph?: Record<string, unknown>;
-  human_gates: FamilyOrchestrationGatePreview[];
-  resume_contract: FamilyOrchestrationResumeContract;
-  event_envelope_surface?: FamilyOrchestrationReferenceRef;
-  checkpoint_lineage_surface?: FamilyOrchestrationReferenceRef;
-}
+export type FamilyOrchestrationCompanion = SharedFamilyOrchestrationCompanion;
 
-export interface ProductEntryQuickstartStep {
-  step_id: string;
-  title?: string;
-  command: string;
-  surface_kind: string;
-  summary?: string;
-  requires?: string[];
-}
+export type ProductEntryQuickstartStep = SharedProductEntryQuickstartSurface['steps'][number];
 
-export interface ProductEntryQuickstartCompanion {
-  surface_kind: 'product_entry_quickstart' | string;
-  recommended_step_id: string;
-  summary?: string;
-  steps: ProductEntryQuickstartStep[];
-  resume_contract?: FamilyOrchestrationResumeContract;
-  human_gate_ids?: string[];
-}
+export type ProductEntryQuickstartCompanion = SharedProductEntryQuickstartSurface;
 
-export interface ProductEntryStartMode {
-  mode_id: string;
-  title?: string;
-  command: string;
-  surface_kind: string;
-  summary?: string;
-  requires?: string[];
-}
+export type ProductEntryStartMode = SharedProductEntryStartSurface['modes'][number];
 
-export interface ProductEntryStartCompanion {
-  ok: boolean;
-  surface_kind: 'product_entry_start' | string;
-  target_domain_id?: string;
-  workspace_locator?: {
-    workspace_surface_kind: string;
-    workspace_root: string;
+export type ProductEntryStartCompanion = SurfaceBase<'product_entry_start'> &
+  SharedProductEntryStartSurface & {
+    ok: boolean;
+    target_domain_id?: string;
+    workspace_locator?: {
+      workspace_surface_kind: string;
+      workspace_root: string;
+    };
   };
-  summary: string;
-  recommended_mode_id: string;
-  modes: ProductEntryStartMode[];
-  resume_surface: {
-    surface_kind: string;
-    command: string;
-    session_locator_field?: string;
-    checkpoint_locator_field?: string;
-  };
-  human_gate_ids: string[];
-}
 
-export interface ProductEntryOverviewCompanion {
-  surface_kind: 'product_entry_overview' | string;
-  summary: string;
-  frontdesk_command: string;
-  recommended_command: string;
-  operator_loop_command: string;
-  progress_surface?: {
-    surface_kind: string;
-    command: string;
-    step_id?: string;
-  };
-  resume_surface?: {
-    surface_kind: string;
-    command: string;
-    session_locator_field?: string;
-    checkpoint_locator_field?: string;
-  };
-  recommended_step_id?: string;
-  next_focus: string[];
-  remaining_gaps_count: number;
-  human_gate_ids?: string[];
-}
+export type ProductEntryOverviewCompanion = SharedProductEntryOverviewSurface;
 
-export interface ProductEntryReadinessCompanion {
-  surface_kind: 'product_entry_readiness' | string;
-  verdict: string;
-  usable_now: boolean;
-  good_to_use_now: boolean;
-  fully_automatic: boolean;
-  summary: string;
-  recommended_start_surface: string;
-  recommended_start_command: string;
-  recommended_loop_surface: string;
-  recommended_loop_command: string;
-  blocking_gaps: string[];
-}
+export type ProductEntryReadinessCompanion = SharedProductEntryReadinessSurface;
 
 export interface ProductEntryPreflightCheck {
   check_id: string;
@@ -323,15 +252,9 @@ export interface ProductEntryPreflightCheck {
   command: string;
 }
 
-export interface ProductEntryPreflightCompanion {
-  surface_kind: 'product_entry_preflight';
-  summary?: SurfaceSummary | string;
-  ready_to_try_now: boolean;
-  recommended_check_command: string;
-  recommended_start_command: string;
-  blocking_check_ids: string[];
+export type ProductEntryPreflightCompanion = Omit<SharedProductEntryPreflightSurface, 'checks'> & {
   checks: ProductEntryPreflightCheck[];
-}
+};
 
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
@@ -430,138 +353,128 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   };
 }
 
-export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry_manifest'> {
-  manifest_version: 2 | number;
-  manifest_kind: string;
-  target_domain_id: string;
-  formal_entry: {
-    default: 'CLI' | string;
-    supported_protocols: string[];
-    internal_surface: string;
-  };
-  workspace_locator: {
-    workspace_surface_kind: string;
-    workspace_root: string;
-  };
-  recommended_shell: 'direct' | 'federated' | 'session' | string;
-  frontdesk_surface: {
-    shell_key: 'frontdesk' | string;
-    command: string;
-    surface_kind: string;
-    summary: string;
-  };
-  operator_loop_surface: {
-    shell_key: 'direct' | 'federated' | 'session' | string;
-    command: string;
-    surface_kind: string;
-    summary: string;
-    continuation_shell_key?: 'direct' | 'federated' | 'session' | string;
-    continuation_command?: string;
-  };
-  operator_loop_actions: Record<string, {
-    command: string;
-    surface_kind: string;
-    summary: string;
-    requires: string[];
-  }>;
-  product_entry_status: {
-    summary: string;
-    next_focus: string[];
-    remaining_gaps_count: number;
-  };
-  runtime: {
-    runtime_owner: string;
-    runtime_state_root: string;
-    session_store_root: string;
-  };
-  managed_runtime_contract: {
-    shared_contract_ref: string;
-    runtime_owner: string;
-    domain_owner: string;
-    executor_owner: string;
-    supervision_status_surface: {
+export type ProductEntryManifestResponse = SurfaceBase<'product_entry_manifest'> &
+  SharedFamilyProductEntryManifestSurface & {
+    recommended_shell: 'direct' | 'federated' | 'session' | string;
+    frontdesk_surface: {
+      shell_key: 'frontdesk' | string;
+      command: string;
       surface_kind: string;
-      owner: string;
+      summary: string;
     };
-    attention_queue_surface: {
+    operator_loop_surface: {
+      shell_key: 'direct' | 'federated' | 'session' | string;
+      command: string;
       surface_kind: string;
-      owner: string;
+      summary: string;
+      continuation_shell_key?: 'direct' | 'federated' | 'session' | string;
+      continuation_command?: string;
     };
-    recovery_contract_surface: {
+    operator_loop_actions: Record<string, {
+      command: string;
       surface_kind: string;
-      owner: string;
+      summary: string;
+      requires: string[];
+    }>;
+    product_entry_status: {
+      summary: string;
+      next_focus: string[];
+      remaining_gaps_count: number;
     };
-    fail_closed_rules: string[];
+    runtime: {
+      runtime_owner: string;
+      runtime_state_root: string;
+      session_store_root: string;
+    };
+    managed_runtime_contract: {
+      shared_contract_ref: string;
+      runtime_owner: string;
+      domain_owner: string;
+      executor_owner: string;
+      supervision_status_surface: {
+        surface_kind: string;
+        owner: string;
+      };
+      attention_queue_surface: {
+        surface_kind: string;
+        owner: string;
+      };
+      recovery_contract_surface: {
+        surface_kind: string;
+        owner: string;
+      };
+      fail_closed_rules: string[];
+    };
+    product_entry_shell: {
+      frontdesk: {
+        command: string;
+        command_template: string;
+        surface_kind: 'product_frontdesk' | string;
+      };
+      direct: {
+        command: string;
+        command_template: string;
+        surface_kind: 'product_entry';
+      };
+      federated: {
+        command: string;
+        command_template: string;
+        surface_kind: 'federated_product_entry';
+      };
+      session: {
+        command: string;
+        command_template: string;
+        surface_kind: 'product_entry_session';
+      };
+    };
+    shared_handoff: {
+      opl_return_surface: {
+        surface_kind: 'product_entry';
+        target_domain_id: string;
+      };
+    };
+    product_entry_start: ProductEntryStartCompanion;
+    product_entry_overview: ProductEntryOverviewCompanion;
+    product_entry_preflight: ProductEntryPreflightCompanion;
+    product_entry_readiness: ProductEntryReadinessCompanion;
+    product_entry_quickstart: ProductEntryQuickstartCompanion;
+    family_orchestration: FamilyOrchestrationCompanion;
+    current_truth: {
+      product_entry_contract: string;
+      federated_product_entry_contract: string;
+      managed_product_entry_contract: string;
+    };
+    notes: string[];
   };
-  product_entry_shell: {
-    frontdesk: {
-      command: string;
-      command_template: string;
-      surface_kind: 'product_frontdesk' | string;
-    };
-    direct: {
-      command: string;
-      command_template: string;
-      surface_kind: 'product_entry';
-    };
-    federated: {
-      command: string;
-      command_template: string;
-      surface_kind: 'federated_product_entry';
-    };
-    session: {
-      command: string;
-      command_template: string;
-      surface_kind: 'product_entry_session';
-    };
-  };
-  shared_handoff: {
-    opl_return_surface: {
-      surface_kind: 'product_entry';
-      target_domain_id: string;
-    };
-  };
-  product_entry_start: ProductEntryStartCompanion;
-  product_entry_overview: ProductEntryOverviewCompanion;
-  product_entry_preflight: ProductEntryPreflightCompanion;
-  product_entry_readiness: ProductEntryReadinessCompanion;
-  product_entry_quickstart: ProductEntryQuickstartCompanion;
-  family_orchestration: FamilyOrchestrationCompanion;
-  current_truth: {
-    product_entry_contract: string;
-    federated_product_entry_contract: string;
-    managed_product_entry_contract: string;
-  };
-  notes: string[];
-}
 
-export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk'> {
-  target_domain_id: string;
-  frontdesk_surface: ProductEntryManifestResponse['frontdesk_surface'];
-  workspace_locator: ProductEntryManifestResponse['workspace_locator'];
-  runtime: ProductEntryManifestResponse['runtime'];
-  product_entry_status: ProductEntryManifestResponse['product_entry_status'];
-  operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
-  operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
-  product_entry_start: ProductEntryManifestResponse['product_entry_start'];
-  product_entry_overview: ProductEntryManifestResponse['product_entry_overview'];
-  product_entry_preflight: ProductEntryManifestResponse['product_entry_preflight'];
-  product_entry_readiness: ProductEntryManifestResponse['product_entry_readiness'];
-  product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
-  family_orchestration: ProductEntryManifestResponse['family_orchestration'];
-  product_entry_manifest: ProductEntryManifestResponse;
-  entry_surfaces: {
-    direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
-    federated: ProductEntryManifestResponse['product_entry_shell']['federated'];
-    session: ProductEntryManifestResponse['product_entry_shell']['session'];
+export type ProductFrontdeskResponse = SurfaceBase<'product_frontdesk'> &
+  SharedFamilyProductFrontdeskSurface & {
+    target_domain_id: string;
+    frontdesk_surface: ProductEntryManifestResponse['frontdesk_surface'];
+    workspace_locator: ProductEntryManifestResponse['workspace_locator'];
+    runtime: ProductEntryManifestResponse['runtime'];
+    product_entry_status: ProductEntryManifestResponse['product_entry_status'];
+    operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
+    operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
+    product_entry_start: ProductEntryManifestResponse['product_entry_start'];
+    product_entry_overview: ProductEntryManifestResponse['product_entry_overview'];
+    product_entry_preflight: ProductEntryManifestResponse['product_entry_preflight'];
+    product_entry_readiness: ProductEntryManifestResponse['product_entry_readiness'];
+    product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
+    family_orchestration: ProductEntryManifestResponse['family_orchestration'];
+    product_entry_manifest: ProductEntryManifestResponse;
+    entry_surfaces: {
+      direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
+      federated: ProductEntryManifestResponse['product_entry_shell']['federated'];
+      session: ProductEntryManifestResponse['product_entry_shell']['session'];
+    };
+    summary: {
+      frontdesk_command: string | null;
+      recommended_command: string;
+      operator_loop_command: string | null;
+    };
+    notes: string[];
   };
-  summary: {
-    frontdesk_command: string | null;
-    recommended_command: string;
-    operator_loop_command: string | null;
-  };
-  notes: string[];
-}
 
 export interface ProductPreflightResponse extends SurfaceBase<'product_entry_preflight'>, ProductEntryPreflightCompanion {
   target_domain_id: string;
