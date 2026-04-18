@@ -1,6 +1,6 @@
 import {
   buildFamilyProductEntryOrchestration,
-} from 'opl-readonly-gateway/family-orchestration';
+} from 'opl-gateway-shared/family-orchestration';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -50,9 +50,9 @@ export function buildFamilyOrchestrationCompanion({
         produces_checkpoint: true,
       },
       {
-        node_id: 'step:federated_handoff',
+        node_id: 'step:opl_bridge_handoff',
         node_kind: 'federated_entry',
-        title: 'Enter the same loop through OPL handoff',
+        title: 'Enter the same loop through internal OPL bridge',
         surface_kind: 'federated_product_entry',
         produces_checkpoint: true,
       },
@@ -72,8 +72,8 @@ export function buildFamilyOrchestrationCompanion({
       },
       {
         from: 'step:open_frontdesk',
-        to: 'step:federated_handoff',
-        on: 'enter_via_opl',
+        to: 'step:opl_bridge_handoff',
+        on: 'enter_via_opl_bridge',
       },
       {
         from: 'step:continue_current_loop',
@@ -81,7 +81,7 @@ export function buildFamilyOrchestrationCompanion({
         on: 'session_started',
       },
       {
-        from: 'step:federated_handoff',
+        from: 'step:opl_bridge_handoff',
         to: 'step:inspect_current_progress',
         on: 'handoff_completed',
       },
@@ -97,7 +97,7 @@ export function buildFamilyOrchestrationCompanion({
     ],
     checkpoint_nodes: [
       'step:continue_current_loop',
-      'step:federated_handoff',
+      'step:opl_bridge_handoff',
       'step:inspect_current_progress',
     ],
     human_gate_previews: [

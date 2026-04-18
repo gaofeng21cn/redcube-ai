@@ -78,12 +78,12 @@ test('docs keep public shell wording separate from internal OPL bridge and runti
 
   assert.equal(rootReadme.includes('The first-level RCA / RedCube visual-deliverable domain agent under the `OPL` shell'), true);
   assert.equal(rootReadme.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
-  assert.equal(rootReadme.includes('`redcube product federate`'), true);
+  assert.equal(rootReadme.includes('`redcube product federate`'), false);
   assert.equal(rootReadme.includes('`operator entry`, `agent entry`'), false);
   assert.equal(rootReadme.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
   assert.equal(rootReadmeZh.includes('`OPL` 壳下的一级 RCA / RedCube 视觉交付 domain agent'), true);
   assert.equal(rootReadmeZh.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
-  assert.equal(rootReadmeZh.includes('`redcube product federate`'), true);
+  assert.equal(rootReadmeZh.includes('`redcube product federate`'), false);
   assert.equal(rootReadmeZh.includes('`operator entry`、`agent entry`'), false);
   assert.equal(rootReadmeZh.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
 
@@ -95,13 +95,13 @@ test('docs keep public shell wording separate from internal OPL bridge and runti
   assert.equal(docsReadmeZh.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
 
   assert.equal(project.includes('repo-verified 的轻量 `product entry` service surface 也已落地'), true);
-  assert.equal(architecture.includes('User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
+  assert.equal(architecture.includes('User -> OPL shell -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube direct domain entry -> RedCube visual-domain truth surfaces'), true);
   assert.equal(architecture.includes('invokeFederatedProductEntry'), true);
   assert.equal(architecture.includes('Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), false);
   assert.equal(architecture.includes('target_domain_id'), true);
   assert.equal(architecture.includes('deliverable_family'), true);
   assert.equal(status.includes('当前用户认知入口：`OPL GUI / management shell -> RCA / RedCube domain agent -> governed visual-deliverable workflow`'), true);
-  assert.equal(status.includes('当前 OPL bridge：`redcube product federate`'), true);
+  assert.equal(status.includes('当前 internal OPL bridge：`invokeFederatedProductEntry`、`invoke_federated_product_entry` 与 `redcube product federate` 只保留给外层 OPL shell / compatibility bridge'), true);
   assert.equal(status.includes('已冻结的最终目标形态：`User -> OPL shell -> RCA / RedCube domain agent -> Codex default execution -> RedCube visual-domain truth surfaces`'), true);
 
   assert.equal(handoff.includes('target_domain_id'), true);

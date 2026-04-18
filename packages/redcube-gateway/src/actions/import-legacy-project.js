@@ -172,12 +172,12 @@ export async function importLegacyProject({
     title: projectId,
     brief: canonicalArtifacts.intakeBrief,
     sourceFiles,
-    modeHint: 'legacy_import',
+    modeHint: 'historical_intake_import',
   });
 
   return {
     ok: intake.ok,
-    surface_kind: 'legacy_import',
+    surface_kind: 'historical_intake_import',
     recommended_action: intake.audit?.status !== 'pass'
       ? 'resolve_source_blocks'
       : (intake.augmentation?.status === 'required' || intake.augmentation?.status === 'recommended')
@@ -188,7 +188,7 @@ export async function importLegacyProject({
       overlay: overlayId,
       audit_status: intake.audit?.status || null,
     },
-    mode: 'legacy_to_workspace',
+    mode: 'historical_project_to_workspace',
     project: projectId,
     topicFile: topicPaths.topicFile,
     importedInputsDir: topicPaths.inputsDir,

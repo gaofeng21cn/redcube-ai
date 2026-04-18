@@ -43,11 +43,11 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.surface_kind, 'legacy_import');
+  assert.equal(result.surface_kind, 'historical_intake_import');
   assert.equal(result.recommended_action, 'create_deliverable');
   assert.equal(result.summary.project, 'topic-a');
   assert.equal(result.summary.audit_status, 'pass');
-  assert.equal(result.mode, 'legacy_to_workspace');
+  assert.equal(result.mode, 'historical_project_to_workspace');
   assert.equal(result.project, 'topic-a');
   assert.equal(
     existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'inputs', 'raw_materials', 'source.md')),
@@ -117,7 +117,7 @@ test('importLegacyProject is one-way and does not mutate legacy project tree', a
   const sourceBrief = JSON.parse(
     readFileSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-brief.json'), 'utf-8'),
   );
-  assert.equal(sourceBrief.input_mode, 'legacy_import');
+  assert.equal(sourceBrief.input_mode, 'historical_intake_import');
 });
 
 test('importLegacyProject rejects missing legacy project inputs', async () => {
@@ -190,9 +190,9 @@ test('CLI import legacy-project proxies gateway importer', () => {
 
   const parsed = JSON.parse(output);
   assert.equal(parsed.ok, true);
-  assert.equal(parsed.surface_kind, 'legacy_import');
+  assert.equal(parsed.surface_kind, 'historical_intake_import');
   assert.equal(parsed.recommended_action, 'create_deliverable');
-  assert.equal(parsed.mode, 'legacy_to_workspace');
+  assert.equal(parsed.mode, 'historical_project_to_workspace');
   assert.equal(parsed.project, 'topic-a');
 });
 

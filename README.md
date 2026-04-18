@@ -110,9 +110,9 @@ Current RedCube domain-agent surfaces include:
 
 Internal OPL bridge surface:
 
-- `redcube product federate`
+Repo-tracked internal OPL bridge contracts stay available in the technical records and machine-readable surfaces.
 
-That bridge surface belongs in integration references and OPL shell wiring records. First-read user material should keep the simpler model: `OPL shell -> RedCube domain agent -> Codex default execution`, with `Hermes-Agent` available for backup and long-running online work.
+Those bridge surfaces belong in integration references and OPL shell wiring records. First-read user material should keep the simpler model: `OPL shell -> RedCube domain agent -> Codex default execution`, with `Hermes-Agent` available for backup and long-running online work.
 
 Source Readiness wording remains frozen as:
 

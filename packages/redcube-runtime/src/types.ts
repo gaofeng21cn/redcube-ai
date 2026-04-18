@@ -69,9 +69,9 @@ export interface RuntimeCreativeOwnershipExecutionContract {
   };
   adapter_roles: {
     host_agent: 'formal_primary_executor';
-    external_llm: 'optional_compatibility_adapter';
+    external_llm: 'secondary_proof_adapter';
   };
-  optional_compatibility_adapters: string[];
+  secondary_proof_adapters: string[];
   protected_creative_routes: {
     xiaohongshu: RuntimeCreativeOwnershipLifecycleFamilyMapping;
     ppt_deck: RuntimeCreativeOwnershipLifecycleFamilyMapping;
@@ -137,7 +137,7 @@ export interface RuntimeCreativeOwnershipAudit {
   shared_execution_contract: {
     primary_adapter: 'host_agent';
     primary_runtime: 'codex_native_host_agent';
-    external_llm_status: 'optional_compatibility_adapter';
+    external_llm_status: 'secondary_proof_adapter';
     freeze_origin_milestone: 'P19.A';
     mainline_topology: string[];
   };
@@ -199,7 +199,7 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
     primary_surface: 'codex_native_host_agent';
     adapter_role: 'primary_creative_executor';
     agent_first_requires_external_llm: false;
-    external_llm_role: 'optional_compatibility_adapter';
+    external_llm_role: 'secondary_proof_adapter';
     freeze_origin_milestone: 'P19.A';
   };
   unified_lifecycle: {

@@ -154,7 +154,7 @@ function buildHermesNativeExecutionModel(requestedAdapter = HERMES_NATIVE_PROOF_
     primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
     adapter_role: 'opt_in_proof_executor',
     agent_first_requires_external_llm: false,
-    external_llm_role: 'optional_compatibility_adapter',
+    external_llm_role: 'secondary_proof_adapter',
     runtime_substrate_owner: 'Hermes',
     deployment_host: 'local_hermes_agent_bridge',
     deployment_host_status: 'opt_in_available',

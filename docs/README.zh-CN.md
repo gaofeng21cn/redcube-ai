@@ -60,7 +60,7 @@ hardening tranche 继续作为当前 Codex-default execution 与 readiness close
 - [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
 - [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
 
-这些记录承载 OPL bridge wiring、upstream Hermes proof 与早期 service-boundary 术语。
+这些记录承载 internal OPL bridge wiring、upstream Hermes proof 与早期 service-boundary 术语。
 它们服务维护者和 shell integration，公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`。
 
 ### Source Readiness 与已吸收的 Phase 2 provenance

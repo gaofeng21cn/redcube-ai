@@ -211,7 +211,7 @@ function buildCommandHelp(commandKey) {
       boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
     },
     'product federate': {
-      summary: '以 OPL Gateway federation 方式把 handoff 收口到同一个 downstream product entry。',
+      summary: '通过 internal OPL bridge 把 handoff 收口到同一个 downstream product entry；这条命令保留给外层 shell / compatibility bridge。',
       usage: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
       gateway_action: 'invokeFederatedProductEntry',
       boundary_fields: ['workspaceRoot', 'entrySessionId', 'targetDomainId', 'topicId', 'deliverableId'],
@@ -223,13 +223,13 @@ function buildCommandHelp(commandKey) {
       boundary_fields: ['entrySessionId'],
     },
     'product frontdesk': {
-      summary: '读取 RedCube 轻量 direct frontdesk，先查看 direct / federated / session 三类入口与当前主线状态。',
+      summary: '读取 RedCube 轻量 direct frontdesk，先查看 direct / session 入口和当前主线状态，并了解 internal OPL bridge 合同。',
       usage: 'redcube product frontdesk --workspace-root <dir>',
       gateway_action: 'getProductFrontdesk',
       boundary_fields: ['workspaceRoot'],
     },
     'product start': {
-      summary: '读取统一的 product-entry start surface，直接查看 frontdesk / direct / federated / resume 四类启动方式。',
+      summary: '读取统一的 product-entry start surface，直接查看 frontdesk / direct / internal OPL bridge / resume 四类启动方式。',
       usage: 'redcube product start --workspace-root <dir>',
       gateway_action: 'getProductStart',
       boundary_fields: ['workspaceRoot'],
@@ -241,7 +241,7 @@ function buildCommandHelp(commandKey) {
       boundary_fields: ['workspaceRoot'],
     },
     'product manifest': {
-      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / federated / session 三个入口面。',
+      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / internal OPL bridge / session 三个入口面。',
       usage: 'redcube product manifest --workspace-root <dir>',
       gateway_action: 'getProductEntryManifest',
       boundary_fields: ['workspaceRoot'],
@@ -296,7 +296,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube topics list --workspace-root <dir>',
       },
       {
-        task: '从旧 projects 目录单向迁入 canonical workspace',
+        task: '从历史 projects 目录单向迁入 canonical workspace',
         command: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       },
       {
@@ -360,7 +360,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube product frontdesk --workspace-root <dir>',
       },
       {
-        task: '读取统一的 product-entry start surface，决定 frontdesk / direct / federated / resume 从哪条入口启动',
+        task: '读取统一的 product-entry start surface，决定 frontdesk / direct / internal OPL bridge / resume 从哪条入口启动',
         command: 'redcube product start --workspace-root <dir>',
       },
       {
@@ -381,7 +381,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
-      product: ['frontdesk', 'start', 'preflight', 'invoke', 'federate', 'session', 'manifest'],
+      product: ['frontdesk', 'start', 'preflight', 'invoke', 'session', 'manifest'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       profile: ['list', 'bootstrap', 'export', 'install'],
@@ -415,7 +415,6 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       productStart: 'redcube product start --workspace-root <dir>',
       productPreflight: 'redcube product preflight --workspace-root <dir>',
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--stop-after-stage <stage>]',
-      productFederate: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
       productSession: 'redcube product session --entry-session-id <id>',
       productManifest: 'redcube product manifest --workspace-root <dir>',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',

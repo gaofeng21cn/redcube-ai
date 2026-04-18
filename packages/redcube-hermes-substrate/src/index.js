@@ -246,9 +246,9 @@ export function buildHermesExecutionModel({ adapter = HERMES_DEFAULT_ADAPTER } =
     primary_surface: HERMES_RUNTIME_SURFACE,
     adapter_role: normalizedAdapter === HERMES_DEFAULT_ADAPTER
       ? 'primary_creative_executor'
-      : 'optional_compatibility_adapter',
+      : 'secondary_proof_adapter',
     agent_first_requires_external_llm: false,
-    external_llm_role: 'optional_compatibility_adapter',
+    external_llm_role: 'secondary_proof_adapter',
     runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
     deployment_host: HERMES_DEPLOYMENT_HOST,
     deployment_host_status: HERMES_DEPLOYMENT_STATUS,
@@ -265,9 +265,9 @@ export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {
     primary_surface: CODEX_RUNTIME_SURFACE,
     adapter_role: normalizedAdapter === CODEX_DEFAULT_ADAPTER
       ? 'primary_creative_executor'
-      : 'optional_compatibility_adapter',
+      : 'secondary_proof_adapter',
     agent_first_requires_external_llm: false,
-    external_llm_role: 'optional_compatibility_adapter',
+    external_llm_role: 'secondary_proof_adapter',
     runtime_substrate_owner: 'Codex CLI',
     deployment_host: CODEX_DEPLOYMENT_HOST,
     deployment_host_status: CODEX_DEPLOYMENT_STATUS,
@@ -288,7 +288,7 @@ export function buildHermesNativeProofExecutionModel({ adapter = HERMES_NATIVE_P
     primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
     adapter_role: 'opt_in_proof_executor',
     agent_first_requires_external_llm: false,
-    external_llm_role: 'optional_compatibility_adapter',
+    external_llm_role: 'secondary_proof_adapter',
     runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
     deployment_host: HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
     deployment_host_status: HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS,
@@ -312,10 +312,10 @@ export function buildHermesExecutorDescriptor({ adapter = HERMES_DEFAULT_ADAPTER
       : 'external_llm_adapter',
     creative_execution: normalizedAdapter === HERMES_DEFAULT_ADAPTER
       ? 'agent_first_director_first'
-      : 'compatibility_adapter_only',
-    external_llm_role: 'optional_compatibility_adapter',
-    compatibility_role: normalizedAdapter === HERMES_COMPATIBILITY_ADAPTER
-      ? 'optional_compatibility_adapter'
+      : 'secondary_proof_adapter_only',
+    external_llm_role: 'secondary_proof_adapter',
+    secondary_proof_role: normalizedAdapter === HERMES_COMPATIBILITY_ADAPTER
+      ? 'secondary_proof_adapter'
       : null,
     runtime_topology: buildHermesRuntimeTopology(),
     execution_model: executionModel,
@@ -335,10 +335,10 @@ export function buildCodexExecutorDescriptor({ adapter = CODEX_DEFAULT_ADAPTER }
       : 'external_llm_adapter',
     creative_execution: normalizedAdapter === CODEX_DEFAULT_ADAPTER
       ? 'agent_first_director_first'
-      : 'compatibility_adapter_only',
-    external_llm_role: 'optional_compatibility_adapter',
-    compatibility_role: normalizedAdapter === HERMES_COMPATIBILITY_ADAPTER
-      ? 'optional_compatibility_adapter'
+      : 'secondary_proof_adapter_only',
+    external_llm_role: 'secondary_proof_adapter',
+    secondary_proof_role: normalizedAdapter === HERMES_COMPATIBILITY_ADAPTER
+      ? 'secondary_proof_adapter'
       : null,
     runtime_topology: buildCodexRuntimeTopology(),
     execution_model: executionModel,
@@ -357,8 +357,8 @@ export function buildHermesNativeProofExecutorDescriptor({ adapter = HERMES_NATI
     primary: false,
     execution_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
     creative_execution: 'agent_first_director_first',
-    external_llm_role: 'optional_compatibility_adapter',
-    compatibility_role: null,
+    external_llm_role: 'secondary_proof_adapter',
+    secondary_proof_role: null,
     runtime_topology: buildHermesNativeProofRuntimeTopology(),
     execution_model: executionModel,
   };

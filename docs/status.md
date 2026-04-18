@@ -9,7 +9,7 @@
 - 当前主线：`Auto-only`
 - formal-entry matrix：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
 - 当前入口真相：首读模型是 `OPL shell -> RedCube domain agent`；仓内 repo-verified direct surfaces 是 `redcube product frontdesk / start / preflight / invoke / session / manifest`，并继续通过 manifest 暴露 creative / publish gate、session resume、repo-tracked `family action graph`、启动 / 续跑 / 进度读取动作面与 readiness 摘要
-- 当前 OPL bridge：`redcube product federate`、`invokeFederatedProductEntry` 与 `invoke_federated_product_entry` 保留为外层 OPL shell 的内部集成路径；公开用户叙事围绕 RedCube domain agent 与 Codex 默认执行
+- 当前 internal OPL bridge：`invokeFederatedProductEntry`、`invoke_federated_product_entry` 与 `redcube product federate` 只保留给外层 OPL shell / compatibility bridge；公开用户叙事围绕 RedCube direct frontdesk / invoke / session 与 Codex 默认执行
 - 当前家族对齐意义：在三个业务仓里，`RedCube AI` 目前是最早落下显式 frontdesk / manifest / session contract 的参考形态之一；后续 family 其他仓会继续往“外层 OPL 壳读取 domain manifest、domain repo 保持自身 truth”的模型靠拢
 - 当前 family-shared substrate 复用真相：从 `2026-04-18` 起，`redcube product manifest` 里的 shared contract builder、`family product-entry manifest` 公共壳、`product_entry_quickstart / product_entry_overview / product_entry_readiness / product_entry_start / product_frontdesk` 的公共 payload helper，以及 `family_orchestration` preview shell 的共享 template builder，都直接复用 `one-person-lab` Node 包导出的 shared helper；`RedCube AI` 本仓继续持有 visual-domain 语义与 frontdesk / session / publication truth
 - 当前统一协作模型：`OPL` 持有用户可见的顶层管理面；`RedCube AI` 持有 domain authority、review / publication projection 与 visual truth；`Codex` 承担默认交互和执行；`Hermes-Agent` 承担显式备用模式与长期在线 gateway
@@ -50,8 +50,8 @@
 3. `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 的 domain truth 仍由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 收口，没有改写 visual-domain boundary。
 4. `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现已统一切到 `runtime-family + Codex CLI structured generation`；repo-local `pack/compiler` 创作路径已从 active mainline 删除，`pack` 只保留 domain boundary / pack-id 语义。
 5. legacy `pack-runtime` compiler registry 已从 workspace 与依赖图移除，避免测试或后续改动再次把创作真值拉回脚本层。
-6. RedCube domain-agent entry 已经 repo-verified：`invokeProductEntry`、`redcube product invoke` 与 `invoke_product_entry` 会在需要时创建 deliverable、继续同一 `entry_session_id`，再进入同一个 domain execution path。
-7. `OPL -> RedCube` bridge 也已 repo-verified：`invokeFederatedProductEntry`、`redcube product federate` 与 `invoke_federated_product_entry` 继续作为外层 shell 集成面，并共享 downstream RedCube domain-agent session contract。
+6. RedCube domain-agent entry 已经 repo-verified：`invokeProductEntry`、`redcube product invoke` 与 `invoke_product_entry` 会在需要时创建 deliverable、继续同一 `entry_session_id`，再进入同一个 service-safe domain entry execution path。
+7. `OPL -> RedCube` bridge 也已 repo-verified：`invokeFederatedProductEntry`、`redcube product federate` 与 `invoke_federated_product_entry` 继续作为 internal OPL bridge 集成面，并共享 downstream RedCube domain-agent session contract。
 8. product-entry session continuity 现在已经落到用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/`；`getProductEntrySession`、`redcube product session` 与 `get_product_entry_session` 会读回 latest managed progress、review state 与 publication projection。
 9. domain-agent discovery surface 现在也已经 repo-verified：`redcube product frontdesk` 作为 direct frontdesk，`redcube product manifest` 与 `get_product_entry_manifest` 会把 `frontdesk_surface`、`operator_loop_surface`、`operator_loop_actions`、direct / bridge / session 三类入口，以及显式的 `recommended_shell / recommended_command` 一起冻结成 machine-readable manifest，供 `OPL` 或其他 host 读取入口命令与载荷结构。
 10. 同轮也已把 manifest 提升到 family product-entry manifest companion 层：当前会额外带出 `family_orchestration.action_graph / human_gates / resume_contract`、`product_entry_quickstart` 与 `product_entry_overview`，方便顶层 `OPL` 或其他 caller 看懂 RedCube 当前的 frontdoor graph、gate、续跑边界与 operator loop。

@@ -450,7 +450,7 @@ test('managed control plane keeps managed execution by switching back to the pri
       at: result.managed_run.adapter_switches[0].at,
       from_adapter: 'external_llm',
       to_adapter: 'host_agent',
-      reason_code: 'compatibility_adapter_route_unsupported',
+      reason_code: 'secondary_proof_adapter_route_unavailable',
       stage_id: 'detailed_outline',
     });
     assert.equal(
@@ -475,7 +475,7 @@ test('managed control plane keeps managed execution by switching back to the pri
     assert.equal(initialDetailedOutline.decision, 'switch_to_primary_adapter');
     assert.equal(
       initialDetailedOutline.controller_decision.reason_code,
-      'compatibility_adapter_route_unsupported',
+      'secondary_proof_adapter_route_unavailable',
     );
     assert.equal(retriedDetailedOutline.decision, 'advance_to_next_stage');
     assert.equal(result.progress_projection.current_blockers.length, 0);

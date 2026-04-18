@@ -759,7 +759,7 @@ test('listGatewayTools descriptions mention quality-facing runtime watch and rev
   assert.match(deliverableTool.description, /route/i);
   assert.match(sourcesTool.description, /augmentation/i);
   assert.match(workspaceTool.description, /topic/i);
-  assert.match(productEntryTool.description, /federated/i);
+  assert.match(productEntryTool.description, /OPL bridge/i);
 });
 
 test('callGatewayTool rejects unknown tool names', async () => {

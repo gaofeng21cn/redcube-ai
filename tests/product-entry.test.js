@@ -54,7 +54,7 @@ async function prepareProductEntryWorkspace() {
     workspaceRoot,
     topicId: 'topic-a',
     title: 'Product entry proof',
-    brief: '验证 direct / federated product entry 与 session continuity。',
+    brief: '验证 direct product entry、internal OPL bridge 与 session continuity。',
     keywords: ['product-entry', 'opl'],
   });
 
@@ -71,7 +71,7 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
     [
       'step:open_frontdesk',
       'step:continue_current_loop',
-      'step:federated_handoff',
+      'step:opl_bridge_handoff',
       'step:inspect_current_progress',
     ],
   );
@@ -306,7 +306,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.operator_loop_actions.start_deliverable.requires, ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id']);
     assert.equal(manifest.operator_loop_actions.continue_session.command, 'redcube product session');
     assert.deepEqual(manifest.operator_loop_actions.continue_session.requires, ['entry_session_id']);
-    assert.equal(manifest.operator_loop_actions.federated_handoff.command, 'redcube product federate');
+    assert.equal(manifest.operator_loop_actions.opl_bridge_handoff.command, 'redcube product federate');
     assert.equal(manifest.product_entry_quickstart.surface_kind, 'product_entry_quickstart');
     assert.equal(manifest.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.deepEqual(manifest.product_entry_quickstart.human_gate_ids, ['redcube_operator_review_gate']);
@@ -348,7 +348,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_start.recommended_mode_id, 'open_frontdesk');
     assert.deepEqual(
       manifest.product_entry_start.modes.map((mode) => mode.mode_id),
-      ['open_frontdesk', 'start_direct_session', 'federated_handoff', 'resume_session'],
+      ['open_frontdesk', 'start_direct_session', 'opl_bridge_handoff', 'resume_session'],
     );
     assert.equal(
       manifest.product_entry_start.modes[0].command,
@@ -405,7 +405,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
     assert.deepEqual(manifest.product_entry_status.next_focus, [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
-      '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
+      '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
     ]);
     assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
@@ -471,18 +471,16 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.task_lifecycle.checkpoint_summary.status, 'operator_review_required');
     assert.deepEqual(manifest.task_lifecycle.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
-    assert.equal(manifest.skill_catalog.skills.length, 4);
+    assert.equal(manifest.skill_catalog.skills.length, 3);
     assert.deepEqual(manifest.skill_catalog.supported_commands, [
       'redcube product frontdesk',
       'redcube product invoke',
-      'redcube product federate',
       'redcube product session',
     ]);
-    assert.equal(manifest.skill_catalog.command_contracts.length, 4);
+    assert.equal(manifest.skill_catalog.command_contracts.length, 3);
     assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube_product_frontdesk');
     assert.equal(manifest.skill_catalog.skills[1].skill_id, 'redcube_product_entry_direct');
-    assert.equal(manifest.skill_catalog.skills[2].skill_id, 'redcube_product_entry_federated');
-    assert.equal(manifest.skill_catalog.skills[3].skill_id, 'redcube_product_entry_session');
+    assert.equal(manifest.skill_catalog.skills[2].skill_id, 'redcube_product_entry_session');
     assert.equal(manifest.automation.surface_kind, 'automation');
     assert.equal(manifest.automation.automations.length, 2);
     assert.equal(manifest.automation.automations[0].automation_id, 'redcube_autopilot_continuation_board');
@@ -495,7 +493,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.automation.automations[1].gate_policy, 'human_gate_required');
     assert.equal(manifest.product_entry_shell.frontdesk.command, 'redcube product frontdesk');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
-    assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
+    assert.equal(manifest.product_entry_shell.opl_bridge.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
     assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
@@ -520,7 +518,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(frontdesk.product_entry_overview.progress_surface.surface_kind, 'product_entry_session');
     assert.equal(frontdesk.product_entry_start.surface_kind, 'product_entry_start');
     assert.equal(frontdesk.product_entry_start.recommended_mode_id, 'open_frontdesk');
-    assert.equal(frontdesk.product_entry_start.modes[2].mode_id, 'federated_handoff');
+    assert.equal(frontdesk.product_entry_start.modes[2].mode_id, 'opl_bridge_handoff');
     assert.equal(frontdesk.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.deepEqual(frontdesk.product_entry_start, manifest.product_entry_start);
     assert.equal(
@@ -579,7 +577,7 @@ test('getProductStart exposes the same direct-entry start companion as the manif
     assert.equal(start.recommended_mode_id, 'open_frontdesk');
     assert.deepEqual(
       start.modes.map((mode) => mode.mode_id),
-      ['open_frontdesk', 'start_direct_session', 'federated_handoff', 'resume_session'],
+      ['open_frontdesk', 'start_direct_session', 'opl_bridge_handoff', 'resume_session'],
     );
     assert.equal(
       start.modes[0].command,
@@ -593,10 +591,10 @@ test('getProductStart exposes the same direct-entry start companion as the manif
 test('product preflight consumes OPL shared program builders from the pinned owner commit', async () => {
   const gatewayPackage = readJson(GATEWAY_PACKAGE_JSON);
   assert.match(
-    gatewayPackage.dependencies['opl-readonly-gateway'],
+    gatewayPackage.dependencies['opl-gateway-shared'],
     /^git\+https:\/\/github\.com\/gaofeng21cn\/one-person-lab\.git#[0-9a-f]{40}$/,
   );
-  const companions = await import('opl-readonly-gateway/product-entry-program-companions');
+  const companions = await import('opl-gateway-shared/product-entry-program-companions');
   assert.equal(typeof companions.buildProductEntryPreflight, 'function');
   assert.equal(typeof companions.buildProgramCheck, 'function');
 });

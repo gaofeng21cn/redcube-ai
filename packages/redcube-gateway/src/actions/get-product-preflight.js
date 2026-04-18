@@ -5,7 +5,7 @@ import { productEntrySessionDir } from '@redcube/runtime';
 import {
   buildProductEntryPreflight,
   buildProgramCheck,
-} from 'opl-readonly-gateway/product-entry-program-companions';
+} from 'opl-gateway-shared/product-entry-program-companions';
 
 import { doctorWorkspace } from './doctor-workspace.js';
 

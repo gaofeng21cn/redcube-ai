@@ -677,7 +677,7 @@ function buildStageIngestion({
       deliverableId,
       stageId,
     });
-    if (errorCode === 'compatibility_adapter_route_unsupported'
+    if (errorCode === 'secondary_proof_adapter_route_unavailable'
       && safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER) !== CODEX_DEFAULT_ADAPTER) {
       return {
         schema_version: 1,
@@ -686,14 +686,14 @@ function buildStageIngestion({
         attempt,
         route_run_id: safeText(routeResult?.run?.run_id) || null,
         status: 'failed',
-        summary: `${stageLabel(stageId)}当前 compatibility adapter 不支持，系统切回主执行器继续推进。`,
+        summary: `${stageLabel(stageId)}当前 secondary proof adapter 无法承接，系统切回主执行器继续推进。`,
         artifacts: artifactRefs,
         decision: 'switch_to_primary_adapter',
         next_action: `retry_${stageId}`,
         blocking_reason: blockingReason,
         controller_decision: {
           decision: 'switch_to_primary_adapter',
-          reason_code: 'compatibility_adapter_route_unsupported',
+          reason_code: 'secondary_proof_adapter_route_unavailable',
           requires_human_confirmation: false,
           requires_external_secret: false,
         },
@@ -974,7 +974,7 @@ function applyStageIngestion({
         at: new Date().toISOString(),
         from_adapter: previousAdapter,
         to_adapter: CODEX_DEFAULT_ADAPTER,
-        reason_code: safeText(stageResult.controller_decision?.reason_code, 'compatibility_adapter_route_unsupported'),
+        reason_code: safeText(stageResult.controller_decision?.reason_code, 'secondary_proof_adapter_route_unavailable'),
         stage_id: stageResult.stage_id,
       },
     ];

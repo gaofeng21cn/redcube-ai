@@ -49,9 +49,9 @@ export interface HermesNativeProofRuntimeTopology {
 export interface HermesExecutionModel {
   mainline_adapter: 'hermes';
   primary_surface: 'hermes_backed_runtime_substrate';
-  adapter_role: 'primary_creative_executor' | 'optional_compatibility_adapter';
+  adapter_role: 'primary_creative_executor' | 'secondary_proof_adapter';
   agent_first_requires_external_llm: false;
-  external_llm_role: 'optional_compatibility_adapter';
+  external_llm_role: 'secondary_proof_adapter';
   runtime_substrate_owner: 'Hermes';
   deployment_host: 'codex_default_host_agent_bridge';
   deployment_host_status: 'transition_only';
@@ -64,9 +64,9 @@ export interface HermesExecutorDescriptor {
   requested_adapter: string;
   primary: boolean;
   execution_surface: 'hermes_backed_runtime_substrate' | 'external_llm_adapter';
-  creative_execution: 'agent_first_director_first' | 'compatibility_adapter_only';
-  external_llm_role: 'optional_compatibility_adapter';
-  compatibility_role: null | 'optional_compatibility_adapter';
+  creative_execution: 'agent_first_director_first' | 'secondary_proof_adapter_only';
+  external_llm_role: 'secondary_proof_adapter';
+  secondary_proof_role: null | 'secondary_proof_adapter';
   runtime_topology: HermesRuntimeTopology;
   execution_model: HermesExecutionModel;
 }
@@ -74,9 +74,9 @@ export interface HermesExecutorDescriptor {
 export interface CodexExecutionModel {
   mainline_adapter: 'host_agent';
   primary_surface: 'codex_native_host_agent';
-  adapter_role: 'primary_creative_executor' | 'optional_compatibility_adapter';
+  adapter_role: 'primary_creative_executor' | 'secondary_proof_adapter';
   agent_first_requires_external_llm: false;
-  external_llm_role: 'optional_compatibility_adapter';
+  external_llm_role: 'secondary_proof_adapter';
   runtime_substrate_owner: 'Codex CLI';
   deployment_host: 'codex_local_operator_host';
   deployment_host_status: 'active_primary';
@@ -91,7 +91,7 @@ export interface HermesNativeProofExecutionModel {
   primary_surface: 'hermes_native_full_agent_loop';
   adapter_role: 'opt_in_proof_executor';
   agent_first_requires_external_llm: false;
-  external_llm_role: 'optional_compatibility_adapter';
+  external_llm_role: 'secondary_proof_adapter';
   runtime_substrate_owner: 'Hermes';
   deployment_host: 'local_hermes_agent_bridge';
   deployment_host_status: 'opt_in_available';
@@ -106,9 +106,9 @@ export interface CodexExecutorDescriptor {
   requested_adapter: string;
   primary: boolean;
   execution_surface: 'codex_native_host_agent' | 'external_llm_adapter';
-  creative_execution: 'agent_first_director_first' | 'compatibility_adapter_only';
-  external_llm_role: 'optional_compatibility_adapter';
-  compatibility_role: null | 'optional_compatibility_adapter';
+  creative_execution: 'agent_first_director_first' | 'secondary_proof_adapter_only';
+  external_llm_role: 'secondary_proof_adapter';
+  secondary_proof_role: null | 'secondary_proof_adapter';
   runtime_topology: CodexRuntimeTopology;
   execution_model: CodexExecutionModel;
 }
@@ -119,8 +119,8 @@ export interface HermesNativeProofExecutorDescriptor {
   primary: false;
   execution_surface: 'hermes_native_full_agent_loop';
   creative_execution: 'agent_first_director_first';
-  external_llm_role: 'optional_compatibility_adapter';
-  compatibility_role: null;
+  external_llm_role: 'secondary_proof_adapter';
+  secondary_proof_role: null;
   runtime_topology: HermesNativeProofRuntimeTopology;
   execution_model: HermesNativeProofExecutionModel;
 }

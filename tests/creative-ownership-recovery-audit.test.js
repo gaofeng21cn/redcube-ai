@@ -36,14 +36,14 @@ test('current runtime defaults to Codex substrate while external_llm stays optio
     assert.equal(runtimeExecutor.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(runtimeExecutor.execution_model.adapter_role, 'primary_creative_executor');
     assert.equal(runtimeExecutor.execution_model.agent_first_requires_external_llm, false);
-    assert.equal(runtimeExecutor.execution_model.external_llm_role, 'optional_compatibility_adapter');
+    assert.equal(runtimeExecutor.execution_model.external_llm_role, 'secondary_proof_adapter');
     assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_local_operator_host');
     assert.equal(runtimeExecutor.execution_model.freeze_origin_milestone, 'P19.A');
 
     const externalLlm = resolveExecutorAdapter({ adapter: 'external_llm' });
     assert.equal(externalLlm.execution_model.mainline_adapter, 'host_agent');
-    assert.equal(externalLlm.execution_model.adapter_role, 'optional_compatibility_adapter');
+    assert.equal(externalLlm.execution_model.adapter_role, 'secondary_proof_adapter');
     assert.equal(externalLlm.execution_model.agent_first_requires_external_llm, false);
 
     const hermesNativeProof = resolveExecutorAdapter({ adapter: 'hermes_native_proof' });
@@ -78,7 +78,7 @@ test('current runtime defaults to Codex substrate while external_llm stays optio
     assert.equal(result.run.executor.adapter, 'host_agent');
     assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
     assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
-    assert.equal(result.run.executor.execution_model.external_llm_role, 'optional_compatibility_adapter');
+    assert.equal(result.run.executor.execution_model.external_llm_role, 'secondary_proof_adapter');
     assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(result.run.executor.execution_model.deployment_host, 'codex_local_operator_host');
 

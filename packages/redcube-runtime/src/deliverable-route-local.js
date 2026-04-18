@@ -236,7 +236,7 @@ export async function executeDeliverableRouteLocally({
       execution_surface: executor.execution_surface,
       creative_execution: executor.creative_execution,
       external_llm_role: executor.external_llm_role,
-      compatibility_role: executor.compatibility_role,
+      secondary_proof_role: executor.secondary_proof_role,
       execution_model: executor.execution_model,
     },
   };

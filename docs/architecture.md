@@ -16,22 +16,22 @@
 
 当前这条主线需要区分三层入口：
 
-- `operator entry`
-  - 给人类操作同事使用的命令、调试、审阅和导出入口
-- `agent entry`
-  - 给 `Codex`、Claude Code、OpenClaw 这类 host-agent 使用的 `CLI` / `MCP`
-- `product entry`
-  - 给最终用户直接进入的产品入口
+- `public domain entry`
+  - 给人类与 host-agent 共用的 `CLI` / `MCP`、frontdesk、session 续跑入口
+- `internal OPL bridge`
+  - 给 `OPL` 外层壳与 compatibility bridge 使用的 handoff contract
+- `managed product shell`
+  - 给成熟最终用户前台壳预留的未来产品层
 
-当前真实状态是：前两层已经存在，第三层已落地为 repo-verified service surface，但成熟的最终用户前台壳仍未落地。
+当前真实状态是：前两层已经存在，第三层仍在继续硬化。
 
 已经冻结的 direct domain 级链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> RedCube direct domain entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL shell -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube direct domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -52,16 +52,17 @@
 
 当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点：
 
-`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL shell -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube direct domain entry -> RedCube visual-domain truth surfaces`
 
 与之对应的 direct domain 路线则是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube direct domain entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube visual-domain truth surfaces`
 
 这里的关键约束是：
 
-- direct `RedCube Product Entry` 和 `OPL Gateway` handoff 必须共用同一个 downstream service-safe domain entry contract
-- today repo-verified 的 product-entry service surface 是 `invokeProductEntry` / `invokeFederatedProductEntry` / `getProductEntrySession`
+- direct `RedCube` domain entry 和 internal `OPL Gateway` bridge 必须共用同一个 downstream service-safe domain entry contract
+- today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
+- `invokeFederatedProductEntry` 继续作为 internal OPL bridge contract
 - 成熟的最终用户产品入口前台壳仍未落地
 
 ## Hermes-Agent、RedCube AI 与 concrete executor 的分工

@@ -2,7 +2,7 @@
   "federated_product_entry_id": "opl_gateway_federated_product_entry",
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
-  "goal": "Land a repo-verified OPL Gateway handoff surface that converges onto the same RedCube product-entry downstream contract.",
+  "goal": "Land a repo-verified internal OPL bridge surface that converges onto the same RedCube product-entry downstream contract.",
   "callable_surface": {
     "gateway_action": "invokeFederatedProductEntry",
     "cli_entry": "redcube product federate",

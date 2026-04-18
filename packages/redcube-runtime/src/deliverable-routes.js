@@ -117,7 +117,7 @@ export async function runDeliverableRoute({
       execution_surface: fallbackExecutor.execution_surface,
       creative_execution: fallbackExecutor.creative_execution,
       external_llm_role: fallbackExecutor.external_llm_role,
-      compatibility_role: fallbackExecutor.compatibility_role,
+      secondary_proof_role: fallbackExecutor.secondary_proof_role,
       execution_model: fallbackExecutor.execution_model,
     },
     runtimeDescriptor,

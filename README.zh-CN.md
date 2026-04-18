@@ -110,9 +110,9 @@ User / Agent
 
 内部 OPL bridge surface：
 
-- `redcube product federate`
+repo-tracked 的 internal OPL bridge contract 保留在技术记录和 machine-readable surface 里。
 
-这条 bridge surface 应放在 integration reference 与 OPL shell wiring 记录中。首读用户材料保持更简单的模型：`OPL shell -> RedCube domain agent -> Codex default execution`，并把 `Hermes-Agent` 作为备用模式与长期在线工作入口。
+这些 bridge surface 应放在 integration reference 与 OPL shell wiring 记录中。首读用户材料保持更简单的模型：`OPL shell -> RedCube domain agent -> Codex default execution`，并把 `Hermes-Agent` 作为备用模式与长期在线工作入口。
 
 当前 `Source Readiness` 的 wording 继续冻结为：
 

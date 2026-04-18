@@ -2,20 +2,20 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 
 import { productEntrySessionDir } from '@redcube/runtime';
-import { buildManagedRuntimeContract } from 'opl-readonly-gateway/managed-runtime-contract';
+import { buildManagedRuntimeContract } from 'opl-gateway-shared/managed-runtime-contract';
 import {
   buildCheckpointSummary,
   buildRuntimeInventory,
   buildTaskLifecycle,
-} from 'opl-readonly-gateway/runtime-task-companions';
+} from 'opl-gateway-shared/runtime-task-companions';
 import {
   buildSkillCatalog,
   buildSkillDescriptor,
-} from 'opl-readonly-gateway/skill-catalog';
+} from 'opl-gateway-shared/skill-catalog';
 import {
   buildAutomationCatalog,
   buildAutomationDescriptor,
-} from 'opl-readonly-gateway/automation-companions';
+} from 'opl-gateway-shared/automation-companions';
 import {
   buildFamilyProductEntryManifest,
   buildProductEntryStart,
@@ -24,7 +24,7 @@ import {
   buildProductEntryReadiness,
   buildProductEntryResumeSurface,
   collectFamilyHumanGateIds,
-} from 'opl-readonly-gateway/product-entry-companions';
+} from 'opl-gateway-shared/product-entry-companions';
 
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
@@ -133,7 +133,7 @@ export async function getProductEntryManifest(request) {
     recommended_step_id: productEntryQuickstart.recommended_step_id,
     next_focus: [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
-      '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
+      '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
     ],
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,
@@ -141,7 +141,7 @@ export async function getProductEntryManifest(request) {
   const productEntryStart = buildProductEntryStart({
     summary: (
       '先打开 RedCube frontdesk；需要直接起一个新会话就走 direct session，'
-      + '需要走顶层联邦入口时使用 federated handoff，已有 session 则直接恢复。'
+      + '需要给外层 OPL shell 走 bridge contract 时使用 internal OPL bridge handoff，已有 session 则直接恢复。'
     ),
     recommended_mode_id: 'open_frontdesk',
     modes: [
@@ -166,8 +166,8 @@ export async function getProductEntryManifest(request) {
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
-        mode_id: 'federated_handoff',
-        title: 'Federated handoff',
+        mode_id: 'opl_bridge_handoff',
+        title: 'Internal OPL bridge handoff',
         command: (
           `redcube product federate --workspace-root ${workspaceRoot} `
           + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
@@ -175,7 +175,7 @@ export async function getProductEntryManifest(request) {
           + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
         surface_kind: 'federated_product_entry',
-        summary: 'Enter the same downstream product entry through OPL / family federation.',
+        summary: 'Reserved for OPL shell / compatibility bridge callers while preserving the same downstream product entry contract.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
@@ -200,6 +200,7 @@ export async function getProductEntryManifest(request) {
     fully_automatic: false,
     summary: (
       '当前可以作为 RedCube 的 direct frontdesk / CLI product-entry 主线使用，'
+      + 'internal OPL bridge contract 也已冻结给外层壳读取，'
       + '但还不是成熟的最终用户前台或托管 Web 产品。'
     ),
     recommended_start_surface: 'product_frontdesk',
@@ -303,7 +304,7 @@ export async function getProductEntryManifest(request) {
     },
   });
   const skillCatalog = buildSkillCatalog({
-    summary: 'RedCube product-entry skill catalog spans frontdesk, direct invoke, federated handoff, and session continuity shells.',
+    summary: 'RedCube product-entry skill catalog spans frontdesk, direct invoke, and session continuity shells; the internal OPL bridge stays in separately tracked integration records.',
     skills: [
       buildSkillDescriptor({
         skill_id: 'redcube_product_frontdesk',
@@ -328,17 +329,6 @@ export async function getProductEntryManifest(request) {
         tags: ['direct', 'deliverable', 'operator-loop'],
       }),
       buildSkillDescriptor({
-        skill_id: 'redcube_product_entry_federated',
-        title: 'RedCube product entry federated handoff',
-        owner: 'redcube_ai',
-        distribution_mode: 'repo_tracked',
-        surface_kind: 'federated_product_entry',
-        description: 'Use OPL/family federation while preserving the same downstream product entry contract.',
-        command: 'redcube product federate',
-        readiness: 'landed',
-        tags: ['federated', 'opl', 'handoff'],
-      }),
-      buildSkillDescriptor({
         skill_id: 'redcube_product_entry_session',
         title: 'RedCube product entry session continuation',
         owner: 'redcube_ai',
@@ -353,7 +343,6 @@ export async function getProductEntryManifest(request) {
     supported_commands: [
       'redcube product frontdesk',
       'redcube product invoke',
-      'redcube product federate',
       'redcube product session',
     ],
     command_contracts: [
@@ -366,11 +355,6 @@ export async function getProductEntryManifest(request) {
         command: 'redcube product invoke',
         shell_key: 'direct',
         target_surface_kind: 'product_entry',
-      },
-      {
-        command: 'redcube product federate',
-        shell_key: 'federated',
-        target_surface_kind: 'federated_product_entry',
       },
       {
         command: 'redcube product session',
@@ -445,7 +429,7 @@ export async function getProductEntryManifest(request) {
       shell_key: 'frontdesk',
       command: 'redcube product frontdesk',
       surface_kind: 'product_frontdesk',
-      summary: '当前 direct RedCube frontdesk，先暴露 direct / federated / session 三种 operator-facing 入口。',
+      summary: '当前 direct RedCube frontdesk，先暴露 direct / session 入口，并把 internal OPL bridge 保持在单独的 bridge contract。',
     },
     operator_loop_surface: {
       shell_key: 'direct',
@@ -471,10 +455,10 @@ export async function getProductEntryManifest(request) {
         summary: '在已有 entry_session_id 下继续同一交付。',
         requires: ['entry_session_id'],
       },
-      federated_handoff: {
+      opl_bridge_handoff: {
         command: 'redcube product federate',
         surface_kind: 'federated_product_entry',
-        summary: '通过 family / OPL gateway 进入同一 downstream product entry。',
+        summary: '通过 internal OPL bridge 进入同一 downstream product entry；这条命令保留给外层 shell / compatibility bridge。',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
     },
@@ -489,7 +473,7 @@ export async function getProductEntryManifest(request) {
       summary: 'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
       next_focus: [
         '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
-        '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
+        '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
       ],
       remaining_gaps_count: 2,
     },
@@ -514,7 +498,7 @@ export async function getProductEntryManifest(request) {
         ),
         surface_kind: 'product_entry',
       },
-      federated: {
+      opl_bridge: {
         command: 'redcube product federate',
         command_template: (
           `redcube product federate --workspace-root ${workspaceRoot} `
@@ -552,6 +536,7 @@ export async function getProductEntryManifest(request) {
     family_orchestration: familyOrchestration,
     notes: [
       'This manifest freezes the current repo-verified RedCube product-entry service surface.',
+      'The OPL bridge stays available as an internal integration contract instead of a first-read user entry shell.',
       'It does not claim that a mature end-user shell or managed web productization is already landed.',
     ],
     extra_payload: {

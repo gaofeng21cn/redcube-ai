@@ -31,9 +31,9 @@ import {
  *   execution_model?: {
  *     mainline_adapter: "host_agent",
  *     primary_surface: "codex_native_host_agent",
- *     adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
+ *     adapter_role: "primary_creative_executor" | "secondary_proof_adapter",
  *     agent_first_requires_external_llm: false,
- *     external_llm_role: "optional_compatibility_adapter",
+ *     external_llm_role: "secondary_proof_adapter",
  *     runtime_substrate_owner: "Codex CLI",
  *     deployment_host: "codex_local_operator_host",
  *     deployment_host_status: "active_primary",
@@ -55,9 +55,9 @@ import {
  *     execution_model?: {
  *       mainline_adapter: "host_agent",
  *       primary_surface: "codex_native_host_agent",
- *       adapter_role: "primary_creative_executor" | "optional_compatibility_adapter",
+ *       adapter_role: "primary_creative_executor" | "secondary_proof_adapter",
  *       agent_first_requires_external_llm: false,
- *       external_llm_role: "optional_compatibility_adapter",
+ *       external_llm_role: "secondary_proof_adapter",
  *       runtime_substrate_owner: "Codex CLI",
  *       deployment_host: "codex_local_operator_host",
  *       deployment_host_status: "active_primary",
@@ -99,7 +99,7 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {})
 
       if (descriptor.adapter === HERMES_COMPATIBILITY_ADAPTER && route !== 'storyline') {
         const error = new Error(`Unsupported route for adapter external_llm: ${route}`);
-        error.code = 'compatibility_adapter_route_unsupported';
+        error.code = 'secondary_proof_adapter_route_unavailable';
         error.requiresHumanConfirmation = false;
         error.requiresExternalSecret = false;
         throw error;

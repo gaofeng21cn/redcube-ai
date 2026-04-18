@@ -5,8 +5,8 @@
     "label": "visual-deliverable domain gateway plus Hermes-Agent managed runtime plus default Codex CLI concrete executor",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
-      "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
-      "opl_federated_entry": "User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces"
+      "redcube_direct_entry": "User -> RedCube direct domain entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube visual-domain truth surfaces",
+      "opl_federated_entry": "User -> OPL shell -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube direct domain entry -> RedCube visual-domain truth surfaces"
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",

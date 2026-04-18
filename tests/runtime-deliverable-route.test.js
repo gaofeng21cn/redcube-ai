@@ -196,7 +196,7 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
     assert.equal(result.run.executor.primary, true);
     assert.equal(result.run.executor.execution_surface, 'codex_native_host_agent');
     assert.equal(result.run.executor.creative_execution, 'agent_first_director_first');
-    assert.equal(result.run.executor.external_llm_role, 'optional_compatibility_adapter');
+    assert.equal(result.run.executor.external_llm_role, 'secondary_proof_adapter');
     assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
     assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
@@ -235,7 +235,7 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
     assert.equal(artifact.stage_contract.stage_id, 'storyline');
     assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
     assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
-    assert.equal(artifact.execution_model.external_llm_role, 'optional_compatibility_adapter');
+    assert.equal(artifact.execution_model.external_llm_role, 'secondary_proof_adapter');
     assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
     assert.equal(artifact.execution_model.codex_cli_runtime?.owner, 'codex_cli');
   });
@@ -522,7 +522,7 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
     assert.equal(result.run.executor.adapter, 'external_llm');
     assert.equal(result.run.executor.primary, false);
     assert.equal(result.run.executor.execution_surface, 'external_llm_adapter');
-    assert.equal(result.run.executor.compatibility_role, 'optional_compatibility_adapter');
+    assert.equal(result.run.executor.secondary_proof_role, 'secondary_proof_adapter');
     assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
     assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
     assert.equal(

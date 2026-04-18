@@ -218,9 +218,9 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   },
   adapter_roles: {
     host_agent: 'formal_primary_executor',
-    external_llm: 'optional_compatibility_adapter',
+    external_llm: 'secondary_proof_adapter',
   },
-  optional_compatibility_adapters: ['external_llm'],
+  secondary_proof_adapters: ['external_llm'],
   protected_creative_routes: P19_UNIFIED_LIFECYCLE_CONTRACT.family_mapping,
   primary_creative_routes: {
     xiaohongshu: ['storyline', 'single_note_plan', 'visual_direction', 'render_html', 'fix_html', 'publish_copy'],

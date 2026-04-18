@@ -32,13 +32,13 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   );
 });
 
-test('harness audit: source truth remains canonical and legacy import feeds the same source intake path', () => {
+test('harness audit: source truth remains canonical and historical intake import feeds the same source intake path', () => {
   const intakeAction = read('packages/redcube-gateway/src/actions/intake-source.js');
   const legacyImport = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
   const sharedSourceTruth = read('packages/redcube-runtime/src/shared-source-truth.js');
 
   assert.equal(intakeAction.includes("surface_kind: 'source_intake'"), true);
-  assert.equal(legacyImport.includes("modeHint: 'legacy_import'"), true);
+  assert.equal(legacyImport.includes("modeHint: 'historical_intake_import'"), true);
   assert.equal(legacyImport.includes('canonicalArtifacts'), true);
   assert.equal(sharedSourceTruth.includes('source_index'), true);
   assert.equal(sharedSourceTruth.includes('extracted_materials'), true);

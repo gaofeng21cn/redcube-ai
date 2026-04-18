@@ -153,7 +153,7 @@ export const TOOL_DEFINITIONS = [
       brief: z.string().optional().describe('Short textual brief.'),
       keywords: STRING_ARRAY_OR_CSV.optional().describe('Keyword list or comma-separated keywords.'),
       sourceFiles: STRING_ARRAY_OR_CSV.optional().describe('Absolute source file paths or comma-separated file list.'),
-      modeHint: z.string().optional().describe('Optional intake mode hint such as legacy_import.'),
+      modeHint: z.string().optional().describe('Optional intake mode hint such as historical_intake_import.'),
       inputFile: z.string().optional().describe('Absolute payload JSON file path.'),
       payloadFile: z.string().optional().describe('Absolute payload JSON file path.'),
       result: PASSTHROUGH_OBJECT.optional().describe('Optional structured payload object.'),
@@ -200,7 +200,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'redcube_product_entry',
-    description: 'Grouped product-entry surface for direct, federated, session, manifest, and domain-entry actions with federated handoff support.',
+    description: 'Grouped product-entry surface for direct, session, manifest, and domain-entry actions, with an internal OPL bridge handoff kept for shell integration.',
     inputSchema: {
       action: ACTION_STRING,
       target_domain_id: z.string().optional().describe('Target domain id. Must be redcube_ai.'),
