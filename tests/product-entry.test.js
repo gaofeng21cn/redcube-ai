@@ -27,6 +27,10 @@ function readJson(file) {
 const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
   new URL('./helpers/mock-redcube-python-with-playwright.mjs', import.meta.url),
 );
+const GATEWAY_PACKAGE_JSON = fileURLToPath(
+  new URL('../packages/redcube-gateway/package.json', import.meta.url),
+);
+const OPL_SHARED_OWNER_COMMIT = '5b104e33ae9ca3270fde83d0194618926f9b58e8';
 
 async function withMockHermesAndRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
@@ -585,4 +589,15 @@ test('getProductStart exposes the same direct-entry start companion as the manif
     assert.equal(start.resume_surface.surface_kind, 'product_entry_session');
     assert.deepEqual(start.human_gate_ids, ['redcube_operator_review_gate']);
   });
+});
+
+test('product preflight consumes OPL shared program builders from the pinned owner commit', async () => {
+  const gatewayPackage = readJson(GATEWAY_PACKAGE_JSON);
+  assert.equal(
+    gatewayPackage.dependencies['opl-readonly-gateway'],
+    `git+https://github.com/gaofeng21cn/one-person-lab.git#${OPL_SHARED_OWNER_COMMIT}`,
+  );
+  const companions = await import('opl-readonly-gateway/product-entry-program-companions');
+  assert.equal(typeof companions.buildProductEntryPreflight, 'function');
+  assert.equal(typeof companions.buildProgramCheck, 'function');
 });
