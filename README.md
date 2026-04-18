@@ -19,7 +19,7 @@
     </td>
     <td width="33%" valign="top">
       <strong>Public Role</strong><br/>
-      The admitted visual-deliverable domain line in the broader `OPL` family
+      The first-level RCA / RedCube visual-deliverable domain agent under the `OPL` shell
     </td>
   </tr>
 </table>
@@ -57,63 +57,62 @@
 
 ## Plain-Language Boundary
 
-`RedCube AI` is not the whole top-level family and it is not just a prompt wrapper around a runtime.
+`OPL` is the top-level GUI and management shell for the family.
+`RedCube AI` / `RCA` is the first-level visual-deliverable domain module and agent under that shell.
 Its job is to own visual-domain truth and governed delivery.
 
 ```text
 User / Agent
-  -> OPL Gateway (optional)
-      -> RedCube AI
-          -> Runtime Surface
-              -> Visual-Domain Truth
+  -> OPL GUI / management shell
+      -> RCA / RedCube domain agent
+          -> Codex default interaction and execution
+              -> RedCube visual-domain truth
+          -> Hermes-Agent backup / long-running gateway
 ```
 
 In plain language:
 
-- `OPL` can sit above this repository, but it does not replace it.
+- `OPL` coordinates RedCube as one domain agent in the broader family.
 - `RedCube AI` owns the deliverable workflow, review logic, and visual-domain truth.
-- The runtime surface is an execution layer, not the same thing as the public product identity.
+- `Codex` is the default interaction and execution host for local operator work and structured generation.
+- `Hermes-Agent` stays available for explicit backup execution and long-running online gateway needs.
 
-## What This Repository Is Not
+## Current Public Status
 
-- It is not a claim that a mature managed web frontend has already landed.
-- It is not a reason to blur runtime ownership and visual-domain truth into one layer.
-- It is not a promise that every poster lane is already publication-grade.
+- The public product identity is the RedCube visual-deliverable domain agent under `OPL`.
+- Verified entry surfaces are `CLI` and `MCP`; `controller` remains the internal control plane.
+- OPL-facing product/frontdesk payloads are machine-readable integration surfaces for the outer shell.
+- Academic paper / conference poster lanes are still being hardened.
 
 <details>
-  <summary><strong>Technical Notes And Current Runtime Truth</strong></summary>
+  <summary><strong>Technical Notes And Current Execution Truth</strong></summary>
 
-The current truthful mainline is now read as a three-layer contract: `Hermes-Agent` owns long-running managed-runtime hosting, `RedCube AI` owns visual-domain truth, and the default concrete executor remains local `Codex CLI` host-agent runtime.
-Current repo-verified public entry surfaces are `CLI` and `MCP`.
-`Hermes-Agent` owns the long-running run surface for route / managed execution.
-The default concrete executor remains local `Codex CLI` host-agent runtime.
-service-safe domain adapter shell is `redcube_service_safe_domain_entry`.
+Current operating model:
+
+- `OPL shell`: top-level GUI, management surface, and family coordinator.
+- `RCA / RedCube`: first-level visual-deliverable domain module and agent.
+- `Codex`: default interaction host, concrete executor, and structured-generation path.
+- `Hermes-Agent`: explicit backup mode and long-running online gateway for session / run / watch / resume needs.
+
+Current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains internal.
 `program_id` is the active mainline control-plane pointer.
 `run_id` is the per-run execution handle for one routed delivery execution.
-
-The formal-entry matrix remains `CLI`, `MCP`, and `controller`.
 The repository mainline remains `Auto-only`.
 
-Current entry wording remains:
-
-- `operator entry`, `agent entry`
-- repo-verified entry surfaces cover `operator entry`, `agent entry`, and one thin service-level `product entry`
-- the repo-verified `product entry` service surface already includes `invokeProductEntry`, `invokeFederatedProductEntry`, and `getProductEntrySession`
-- `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
-- `User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
-- The mature end-user `product entry` shell is still not landed
-
-The repo-verified lightweight product-entry shell now includes:
+Current RedCube domain-agent surfaces include:
 
 - `redcube product preflight`
 - `redcube product start`
 - `redcube product frontdesk`
 - `redcube product invoke`
-- `redcube product federate`
 - `redcube product session`
 - `redcube product manifest`
 
-These surfaces make direct and federated entry more honest and machine-readable, but they do not mean a mature end-user web product has landed.
+Internal OPL bridge surface:
+
+- `redcube product federate`
+
+That bridge surface belongs in integration references and OPL shell wiring records. First-read user material should keep the simpler model: `OPL shell -> RedCube domain agent -> Codex default execution`, with `Hermes-Agent` available for backup and long-running online work.
 
 Source Readiness wording remains frozen as:
 
@@ -133,7 +132,7 @@ Absorbed provenance that still stays on the same mainline:
 - phase-2 runtime watch locator integrity hardening remains absorbed provenance on the same mainline
 - workspace / operator quickstart convergence now has an absorbed tranche on the same mainline
 
-Historical `Hermes` materials remain absorbed provenance and must not be read as current runtime ownership proof.
+Historical `Hermes` materials remain absorbed provenance and advanced integration references.
 </details>
 
 ## Development Verification

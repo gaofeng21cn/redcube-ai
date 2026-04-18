@@ -63,7 +63,7 @@ test('operator docs publish workspace structure and source augmentation executor
   assert.equal(executorContract.includes('result contract invalid'), true);
 });
 
-test('docs freeze lightweight product entry and OPL handoff without overclaiming runtime ownership', () => {
+test('docs keep public shell wording separate from internal OPL bridge and runtime records', () => {
   const rootReadme = readFileSync(path.join(repoRoot, 'README.md'), 'utf-8');
   const rootReadmeZh = readFileSync(path.join(repoRoot, 'README.zh-CN.md'), 'utf-8');
   const docsReadme = readFileSync(path.join(repoRoot, 'docs', 'README.md'), 'utf-8');
@@ -76,37 +76,33 @@ test('docs freeze lightweight product entry and OPL handoff without overclaiming
     'utf-8',
   );
 
-  assert.equal(rootReadme.includes('`operator entry`, `agent entry`'), true);
-  assert.equal(rootReadme.includes('repo-verified entry surfaces cover `operator entry`, `agent entry`, and one thin service-level `product entry`'), true);
-  assert.equal(rootReadme.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`'), true);
-  assert.equal(rootReadme.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`'), true);
-  assert.equal(rootReadme.includes('`invokeProductEntry`, `invokeFederatedProductEntry`, and `getProductEntrySession`'), true);
-  assert.equal(rootReadme.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes Kernel -> Domain Harness OS`'), false);
-  assert.equal(rootReadme.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`'), false);
-  assert.equal(rootReadmeZh.includes('`operator entry`、`agent entry`'), true);
-  assert.equal(rootReadmeZh.includes('repo-verified 的 `product entry` service surface 已经包括 `invokeProductEntry`、`invokeFederatedProductEntry`、`getProductEntrySession`'), true);
-  assert.equal(rootReadmeZh.includes('`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`'), true);
-  assert.equal(rootReadmeZh.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`'), true);
-  assert.equal(rootReadmeZh.includes('`User -> OPL Product Entry -> OPL Gateway -> Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway`'), false);
+  assert.equal(rootReadme.includes('The first-level RCA / RedCube visual-deliverable domain agent under the `OPL` shell'), true);
+  assert.equal(rootReadme.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
+  assert.equal(rootReadme.includes('`redcube product federate`'), true);
+  assert.equal(rootReadme.includes('`operator entry`, `agent entry`'), false);
+  assert.equal(rootReadme.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
+  assert.equal(rootReadmeZh.includes('`OPL` 壳下的一级 RCA / RedCube 视觉交付 domain agent'), true);
+  assert.equal(rootReadmeZh.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
+  assert.equal(rootReadmeZh.includes('`redcube product federate`'), true);
+  assert.equal(rootReadmeZh.includes('`operator entry`、`agent entry`'), false);
+  assert.equal(rootReadmeZh.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
 
-  assert.equal(docsReadme.includes('operator entry'), true);
   assert.equal(docsReadme.includes('RedCube product entry MVP'), true);
+  assert.equal(docsReadme.includes('public entry model stays `OPL shell -> RedCube domain agent -> Codex default execution`'), true);
   assert.equal(docsReadme.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
-  assert.equal(docsReadmeZh.includes('operator entry'), true);
   assert.equal(docsReadmeZh.includes('Managed Product Entry Hardening'), true);
+  assert.equal(docsReadmeZh.includes('公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`'), true);
   assert.equal(docsReadmeZh.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
 
   assert.equal(project.includes('repo-verified 的轻量 `product entry` service surface 也已落地'), true);
   assert.equal(architecture.includes('User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
-  assert.equal(architecture.includes('invokeProductEntry'), true);
   assert.equal(architecture.includes('invokeFederatedProductEntry'), true);
-  assert.equal(architecture.includes('getProductEntrySession'), true);
   assert.equal(architecture.includes('Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), false);
   assert.equal(architecture.includes('target_domain_id'), true);
   assert.equal(architecture.includes('deliverable_family'), true);
-  assert.equal(status.includes('operator entry'), true);
-  assert.equal(status.includes('OPL -> RedCube'), true);
-  assert.equal(status.includes('repo-verified `RedCube Product Entry`'), true);
+  assert.equal(status.includes('当前用户认知入口：`OPL GUI / management shell -> RCA / RedCube domain agent -> governed visual-deliverable workflow`'), true);
+  assert.equal(status.includes('当前 OPL bridge：`redcube product federate`'), true);
+  assert.equal(status.includes('已冻结的最终目标形态：`User -> OPL shell -> RCA / RedCube domain agent -> Codex default execution -> RedCube visual-domain truth surfaces`'), true);
 
   assert.equal(handoff.includes('target_domain_id'), true);
   assert.equal(handoff.includes('task_intent'), true);

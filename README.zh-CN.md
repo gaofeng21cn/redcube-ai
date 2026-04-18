@@ -19,7 +19,7 @@
     </td>
     <td width="33%" valign="top">
       <strong>公开角色</strong><br/>
-      `OPL` 家族中当前已 admitted 的视觉交付 domain 主线
+      `OPL` 壳下的一级 RCA / RedCube 视觉交付 domain agent
     </td>
   </tr>
 </table>
@@ -57,63 +57,62 @@
 
 ## 用人话解释它的边界
 
-`RedCube AI` 不是整个顶层家族，也不是对某个 runtime 的薄包装。
+`OPL` 是整个家族的顶层 GUI 与管理壳。
+`RedCube AI` / `RCA` 是这个壳下面的一级视觉交付 domain module / agent。
 它的职责，是对视觉交付 truth 和受控交付流程负责。
 
 ```text
 User / Agent
-  -> OPL Gateway（可选）
-      -> RedCube AI
-          -> Runtime Surface
-              -> Visual-Domain Truth
+  -> OPL GUI / management shell
+      -> RCA / RedCube domain agent
+          -> Codex default interaction and execution
+              -> RedCube visual-domain truth
+          -> Hermes-Agent backup / long-running gateway
 ```
 
 更直白地说：
 
-- `OPL` 可以在这个仓之上，但不会取代它。
+- `OPL` 负责把 RedCube 作为家族内的一个 domain agent 打开和编排。
 - `RedCube AI` 负责交付 workflow、审阅逻辑和 visual-domain truth。
-- runtime surface 是执行层，不等于公开产品身份本身。
+- `Codex` 是默认交互宿主、默认执行器和结构化生成路径。
+- `Hermes-Agent` 作为显式备用执行模式与长期在线 gateway 保留。
 
-## 这个仓库不是什么
+## 当前公开状态
 
-- 它不是“成熟 managed web 前台已经落地”的宣传口径。
-- 它不是把 runtime ownership 和 visual-domain truth 混成一层的理由。
-- 它不是“所有海报能力都已经达到发表级别”的承诺。
+- 公开产品身份是 `OPL` 下的 RedCube 视觉交付 domain agent。
+- 已验证正式入口是 `CLI` 与 `MCP`；`controller` 保持为内部控制面。
+- 面向 OPL 的 product / frontdesk payload 是给外层壳读取的机器可读集成面。
+- 学术论文 / 会议海报路线仍在硬化。
 
 <details>
-  <summary><strong>面向技术读者的运行时真相说明</strong></summary>
+  <summary><strong>面向技术读者的执行真相说明</strong></summary>
 
-当前最诚实的主线，已经按三层 contract 理解：`Hermes-Agent` 持有长期托管与 managed-runtime owner，`RedCube AI` 持有 visual-domain truth，而默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
-当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`。
-route / managed execution 的长期 run surface 由 `Hermes-Agent` 主责。
-默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
-service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
+当前协作模型：
+
+- `OPL shell`：顶层 GUI、管理面和 family coordinator。
+- `RCA / RedCube`：一级视觉交付 domain module / agent。
+- `Codex`：默认交互宿主、具体执行器和结构化生成路径。
+- `Hermes-Agent`：显式备用模式，以及 session / run / watch / resume 这类长期在线需求的 gateway。
+
+当前仓内已实现且可验证的公开正式入口是 `CLI` 与 `MCP`；`controller` 保持为内部控制面。
 `program_id`：active mainline 的 control-plane 指针。
 `run_id`：单次 routed delivery execution 的 per-run 执行句柄。
-
-当前 formal-entry matrix 仍是 `CLI`、`MCP` 和 `controller`。
 仓库主线仍按 `Auto-only` 理解。
 
-当前入口 wording 继续保持：
-
-- `operator entry`、`agent entry`
-- repo-verified entry surfaces cover `operator entry`, `agent entry`, and one thin service-level `product entry`
-- repo-verified 的 `product entry` service surface 已经包括 `invokeProductEntry`、`invokeFederatedProductEntry`、`getProductEntrySession`
-- `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
-- `User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
-- 成熟的最终用户 `product entry` 前台壳并未落地
-
-当前 repo-verified 的 lightweight product-entry shell 已包括：
+当前 RedCube domain-agent surface 包括：
 
 - `redcube product preflight`
 - `redcube product start`
 - `redcube product frontdesk`
 - `redcube product invoke`
-- `redcube product federate`
 - `redcube product session`
 - `redcube product manifest`
 
-这些表面已经让 direct / federated entry 更诚实、更机器可读，但并不等于成熟 end-user web 产品已经落地。
+内部 OPL bridge surface：
+
+- `redcube product federate`
+
+这条 bridge surface 应放在 integration reference 与 OPL shell wiring 记录中。首读用户材料保持更简单的模型：`OPL shell -> RedCube domain agent -> Codex default execution`，并把 `Hermes-Agent` 作为备用模式与长期在线工作入口。
 
 当前 `Source Readiness` 的 wording 继续冻结为：
 
@@ -132,7 +131,7 @@ service-safe domain adapter shell 是 `redcube_service_safe_domain_entry`。
 - runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance
 - workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche
 
-历史 `Hermes` 材料继续只是 absorbed provenance，不能被读成当前 runtime ownership 证明。
+历史 `Hermes` 材料继续作为 absorbed provenance 与 advanced integration reference 保留。
 </details>
 
 ## 开发验证

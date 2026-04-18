@@ -16,11 +16,13 @@ This guide is for readers who need the repo-tracked program, references, policie
 
 ## Current Baseline
 
-- `RedCube AI` is the admitted visual-deliverable domain line in the broader `OPL` family.
-- The truthful execution line now reads as a three-layer contract: `Hermes-Agent` owns long-running managed-runtime hosting, `RedCube AI` owns visual-domain governance/truth, and the default concrete executor remains local `Codex CLI` host-agent runtime.
-- The repo-verified lightweight product-entry service surfaces are landed, while a mature end-user web shell is still future work.
+- `OPL` is the top-level GUI and management shell for the family.
+- `RedCube AI` / `RCA` is the first-level visual-deliverable domain module and agent under that shell.
+- `Codex` is the default interaction host and concrete execution path for local operator work.
+- `Hermes-Agent` remains the explicit backup mode and long-running online gateway for session / run / watch / resume needs.
+- The repo-verified RedCube product entry MVP, frontdesk, manifest, invoke, and session surfaces are landed as machine-readable domain-agent integration surfaces.
 - Protected creative stages now stay on `runtime-family + Codex CLI structured generation`; repo-local `pack/compiler` authorship is no longer the active mainline.
-- `Deep Research` remains inside `Source Readiness`, and the public entry wording still has to keep `operator entry`, `agent entry`, and the thin product-entry surface separate.
+- `Deep Research` remains inside `Source Readiness`, while first-read public wording starts from the OPL shell and RedCube domain agent.
 
 ## Technical Working Set
 
@@ -42,18 +44,24 @@ Public-facing material should stay mirrored in English and Chinese where applica
 
 ## Repo-Tracked Technical Docs
 
-### Program and mainline records
+### Current domain-agent records
+
+- [RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
+- [Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
+
+The RedCube product entry MVP remains a technical record for the domain-agent frontdesk, invoke, manifest, and session surfaces.
+The hardening tranche remains the current Codex-default execution and readiness closeout record.
+
+### Internal integration and historical proof records
 
 - [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
 - [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
-- [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md)
-- [RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
+- [Upstream Hermes-Agent service-boundary proof](program/upstream_hermes_agent_service_safe_domain_entry.md)
 - [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
-- [Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
 - [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
 
-Current public entry truth still starts from `operator entry`, `agent entry`, and one thin service-level `product entry`.
-That program set still includes the RedCube product entry MVP before the managed hardening tranche.
+These records document OPL bridge wiring, upstream Hermes proof, and earlier service-boundary terminology.
+They are technical provenance for maintainers and shell integration, while the public entry model stays `OPL shell -> RedCube domain agent -> Codex default execution`.
 
 ### Source Readiness and absorbed phase-2 provenance
 
@@ -77,11 +85,11 @@ That program set still includes the RedCube product entry MVP before the managed
 
 ### References
 
-- [Lightweight product entry and OPL handoff](references/lightweight_product_entry_and_opl_handoff.md)
-- [OPL managed runtime three-layer contract](references/opl_managed_runtime_three_layer_contract.md)
+- [Lightweight product entry and OPL bridge](references/lightweight_product_entry_and_opl_handoff.md) (internal OPL bridge reference)
+- [OPL long-running gateway contract](references/opl_managed_runtime_three_layer_contract.md) (historical / advanced integration reference)
 - [Series doc governance checklist](references/series-doc-governance-checklist.md)
 - [Runtime architecture](runtime_architecture.md)
-- [Domain Harness OS positioning map](domain-harness-os-positioning.md)
+- [Historical domain positioning map](domain-harness-os-positioning.md)
 - [Public GitHub publishing](public-github-publish.md)
 
 ### Policies

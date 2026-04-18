@@ -16,11 +16,13 @@
 
 ## 当前基线
 
-- `RedCube AI` 是 `OPL` 家族中当前已 admitted 的视觉交付 domain 主线。
-- 当前最诚实的执行主线，已经按三层 contract 理解：`Hermes-Agent` 持有长期托管与 managed-runtime owner，`RedCube AI` 持有 visual-domain governance / truth，而默认 concrete executor 仍是本地 `Codex CLI` host-agent runtime。
-- 当前 repo-verified 的 lightweight product-entry service surface 已落地，但成熟 end-user web 壳仍是后续工作。
+- `OPL` 是整个 family 的顶层 GUI 与管理壳。
+- `RedCube AI` / `RCA` 是这个壳下面的一级视觉交付 domain module / agent。
+- `Codex` 是本地 operator 工作的默认交互宿主和具体执行路径。
+- `Hermes-Agent` 保留为显式备用模式，以及 session / run / watch / resume 这类长期在线需求的 gateway。
+- 当前 repo-verified 的 RedCube product entry MVP、frontdesk、manifest、invoke、session surface 已作为机器可读 domain-agent 集成面落地。
 - 当前受保护创作 stage 统一收口在 `runtime-family + Codex CLI structured generation`，repo-local `pack/compiler` 作者化路径已不再是 active mainline。
-- `Deep Research` 继续属于 `Source Readiness`，而公开入口 wording 仍要把 `operator entry`、`agent entry` 和那层薄的 product-entry service surface 分开写清。
+- `Deep Research` 继续属于 `Source Readiness`，首读公开 wording 从 OPL 壳和 RedCube domain agent 开始。
 
 ## 技术工作集
 
@@ -42,17 +44,24 @@
 
 ## 仓库跟踪的技术文档
 
-### Program 与主线记录
+### 当前 domain-agent 记录
+
+- [RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
+- [Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
+
+RedCube product entry MVP 继续作为 domain-agent frontdesk、invoke、manifest、session surface 的技术记录。
+hardening tranche 继续作为当前 Codex-default execution 与 readiness closeout 记录。
+
+### 内部集成与历史 proof 记录
 
 - [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
 - [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
-- [Upstream Hermes-Agent service-safe domain entry](program/upstream_hermes_agent_service_safe_domain_entry.md)
-- [RedCube Product Entry MVP](program/redcube_product_entry_mvp.md)
+- [Upstream Hermes-Agent service-boundary proof](program/upstream_hermes_agent_service_safe_domain_entry.md)
 - [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
-- [Managed Product Entry Hardening](program/managed_product_entry_hardening.md)
 - [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
 
-当前公开入口真相仍从 `operator entry`、`agent entry` 和一层薄的 service-level `product entry` 开始。
+这些记录承载 OPL bridge wiring、upstream Hermes proof 与早期 service-boundary 术语。
+它们服务维护者和 shell integration，公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`。
 
 ### Source Readiness 与已吸收的 Phase 2 provenance
 
@@ -76,11 +85,11 @@
 
 ### 参考资料
 
-- [轻量产品入口与 OPL Handoff](references/lightweight_product_entry_and_opl_handoff.md)
-- [OPL 托管运行时三层合同](references/opl_managed_runtime_three_layer_contract.md)
+- [轻量产品入口与 OPL bridge](references/lightweight_product_entry_and_opl_handoff.md)（内部 OPL bridge reference）
+- [OPL 长期在线 gateway contract](references/opl_managed_runtime_three_layer_contract.md)（历史 / advanced integration reference）
 - [系列项目文档治理清单](references/series-doc-governance-checklist.md)
 - [运行架构](runtime_architecture.md)
-- [Domain Harness OS 定位映射](domain-harness-os-positioning.md)
+- [历史 domain 定位映射](domain-harness-os-positioning.md)
 - [GitHub 公开发布流程](public-github-publish.md)
 
 ### 内部规则
