@@ -442,6 +442,54 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'runtime_cannot_invent_domain_publishability_truth',
       ],
     });
+    assert.equal(manifest.runtime_inventory.surface_kind, 'runtime_inventory');
+    assert.equal(manifest.runtime_inventory.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(manifest.runtime_inventory.domain_owner, 'redcube_ai');
+    assert.equal(manifest.runtime_inventory.executor_owner, 'codex_cli');
+    assert.equal(manifest.runtime_inventory.status_surface.ref, '/product_entry_preflight');
+    assert.equal(manifest.runtime_inventory.attention_surface.ref, '/frontdesk_surface');
+    assert.equal(manifest.runtime_inventory.recovery_surface.ref, '/operator_loop_actions/continue_session');
+    assert.equal(manifest.runtime_inventory.workspace_binding.workspace_root, workspaceRoot);
+    assert.equal(manifest.runtime_inventory.workspace_binding.runtime_state_root, runtimeStateRoot);
+    assert.equal(manifest.runtime_inventory.workspace_binding.session_store_root, manifest.runtime.session_store_root);
+    assert.equal(manifest.task_lifecycle.surface_kind, 'task_lifecycle');
+    assert.equal(manifest.task_lifecycle.task_kind, 'visual_deliverable_loop');
+    assert.equal(manifest.task_lifecycle.task_id, 'managed_product_entry_hardening');
+    assert.equal(manifest.task_lifecycle.status, 'resumable');
+    assert.equal(
+      manifest.task_lifecycle.progress_surface.command,
+      'redcube product session --entry-session-id <entry-session-id>',
+    );
+    assert.equal(
+      manifest.task_lifecycle.resume_surface.command,
+      'redcube product session --entry-session-id <entry-session-id>',
+    );
+    assert.equal(manifest.task_lifecycle.checkpoint_summary.surface_kind, 'checkpoint_summary');
+    assert.equal(manifest.task_lifecycle.checkpoint_summary.status, 'operator_review_required');
+    assert.deepEqual(manifest.task_lifecycle.human_gate_ids, ['redcube_operator_review_gate']);
+    assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
+    assert.equal(manifest.skill_catalog.skills.length, 4);
+    assert.deepEqual(manifest.skill_catalog.supported_commands, [
+      'redcube product frontdesk',
+      'redcube product invoke',
+      'redcube product federate',
+      'redcube product session',
+    ]);
+    assert.equal(manifest.skill_catalog.command_contracts.length, 4);
+    assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube_product_frontdesk');
+    assert.equal(manifest.skill_catalog.skills[1].skill_id, 'redcube_product_entry_direct');
+    assert.equal(manifest.skill_catalog.skills[2].skill_id, 'redcube_product_entry_federated');
+    assert.equal(manifest.skill_catalog.skills[3].skill_id, 'redcube_product_entry_session');
+    assert.equal(manifest.automation.surface_kind, 'automation');
+    assert.equal(manifest.automation.automations.length, 2);
+    assert.equal(manifest.automation.automations[0].automation_id, 'redcube_autopilot_continuation_board');
+    assert.equal(manifest.automation.automations[0].trigger_kind, 'continuation_board');
+    assert.equal(manifest.automation.automations[0].readiness_status, 'tracked_follow_on');
+    assert.equal(manifest.automation.automations[0].gate_policy, 'operator_review_gated');
+    assert.equal(manifest.automation.automations[1].automation_id, 'redcube_operator_review_gate');
+    assert.equal(manifest.automation.automations[1].trigger_kind, 'operator_review_gate');
+    assert.equal(manifest.automation.automations[1].readiness_status, 'repo_tracked');
+    assert.equal(manifest.automation.automations[1].gate_policy, 'human_gate_required');
     assert.equal(manifest.product_entry_shell.frontdesk.command, 'redcube product frontdesk');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.federated.command, 'redcube product federate');
