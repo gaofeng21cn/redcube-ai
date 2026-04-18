@@ -719,7 +719,7 @@ export async function executeCli(argv, deps = {}) {
       });
     }
 
-    throw new Error('product 命令仅支持 frontdesk|start|preflight|invoke|federate|session|manifest');
+    throw new Error('product 命令支持 frontdesk|start|preflight|invoke|session|manifest；internal OPL bridge 由外层 shell 调用');
   }
 
 

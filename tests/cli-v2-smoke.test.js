@@ -269,6 +269,21 @@ test('CLI isolated install returns CLI JSON for unknown commands', () => {
   });
 });
 
+test('CLI product invalid subcommand keeps the internal OPL bridge out of public usage hints', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+
+  const parsed = execCliExpectFailure(
+    cliPath,
+    ['product', 'bad-subcommand'],
+    { cwd: installRoot },
+  );
+
+  assert.equal(parsed.ok, false);
+  assert.equal(parsed.error_kind, 'cli_usage_error');
+  assert.match(parsed.error, /frontdesk\|start\|preflight\|invoke\|session\|manifest/);
+  assert.equal(parsed.error.includes('federate'), false);
+});
+
 test('CLI help exposes task-oriented onboarding surface', () => {
   const output = execFileSync(
     'node',
