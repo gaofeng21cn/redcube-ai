@@ -5,7 +5,22 @@
 
 ## 推荐结构
 
-优先把私有层放在：
+优先把作者档案放在当前 workspace 的 `.redcube/`。这样每个项目都能直接声明“这是谁的账号、这套图文该用什么人设”，也更适合 agent 在同一工作区内维护。
+
+```text
+<workspace>/.redcube/
+  runtime.json
+  identity.json
+  README.md
+  prompts/
+    aligned/
+      自动小红书/
+        作者档案库.md
+```
+
+`source intake` / `source research` 第一次 bootstrap brand-new workspace 时，已经会自动生成一套通用模板，默认作者占位是 `RedCube AI`。后续把这几个文件改成当前项目真正要用的署名与品牌即可。
+
+如果你希望跨多个 workspace 复用同一套私有层，再放到用户级：
 
 ```text
 ~/.config/redcube/
@@ -25,9 +40,9 @@
 
 这样做的好处：
 
+- workspace 级作者身份与项目绑定更清楚
 - 仓库保持公开干净
-- 私有素材不依赖当前项目目录
-- 跨机器迁移更简单
+- 用户级私有层仍可做跨机器复用
 
 ## runtime.json 示例
 
@@ -41,8 +56,8 @@
 
 说明：
 
-- `rootDir` 和 `workspaceRoot` 指向你真实使用的外部工作区
-- `promptsDir` 配合 `~/.config/redcube/prompts/` 使用
+- workspace 级配置里，`promptsDir` 推荐写成 `./prompts`
+- 用户级配置里，`promptsDir` 继续配合 `~/.config/redcube/prompts/` 使用
 
 ## identity.json 示例
 
@@ -76,7 +91,7 @@ node apps/redcube-cli/src/cli.js profile \
   --source-dir "/absolute/path/to/your-private-prompts/system/自动小红书"
 ```
 
-这会把当前可识别的私有层迁移到 `~/.config/redcube/`。
+这会把当前可识别的私有层迁移到 `~/.config/redcube/`。如果你更希望当前项目独立持有作者档案，也可以把迁移结果复制到 `<workspace>/.redcube/`。
 
 ## 导出私有层备份
 

@@ -6,6 +6,7 @@
 - 如果同时提供截图与对应页 `source_html`，截图是主裁决依据；`source_html` 只用于确认层级意图、元素归属与隐藏遮挡，不得替可见缺陷开脱
 - Python 的 overflow / occlusion / visual_density 只是辅助证据，不能代替视觉结论
 - 若卡片、证据栏或 action footer 里的正文已经挤出自身容器，或靠坏断句才勉强塞下，也必须明确指出并判 block
+- 若相邻读者可见 `data-qa-block`、headline、证据栏、路径条或 action footer 之间视觉贴住，即使文字尚未溢出，也必须明确指出并判 block
 - judgement 主语必须是 host-agent / director-first
 - visual_director_review 未通过前不得继续
 - 通过后才能进入 export_bundle

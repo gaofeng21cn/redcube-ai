@@ -5,3 +5,4 @@
 - 汇总 HTML / PNG / 发布文案 / manifest
 - 输出 machine-readable publish_state
 - series 模式额外落盘发布节奏、目录索引、交付总览
+- 交付时必须落成 `publish/` 人类可用目录，至少包含 HTML、caption、screenshots、manifest 和 README

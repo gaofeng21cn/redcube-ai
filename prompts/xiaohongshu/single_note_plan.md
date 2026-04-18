@@ -6,6 +6,11 @@
 - 每页必须给到 page_goal / page_core_content / visual_presentation / source_language / progression_role / transition
 - 不能把视觉导演稿并入附注
 - 不能只给粗粒度 outline
+- 如果 `context.author_branding` 存在，封面或结尾必须预留 audience-facing 署名位；署名显示与副标要像内容品牌，而不是后台备注
+- 每页都要提前规划视觉锚点与版心分布；小红书优先使用 Font Awesome Free，emoji 只做补充
+- 每页从策划阶段就要规划相邻读者可见文字块、主卡、底部收束条之间的安全间距；副标题贴主卡、收藏条压正文、卡片互相贴住都属于版心失败
+- 封面与结尾页都要有清楚的 audience-facing 视觉抓手；禁止把孤立单字贴纸、内部标签或无语义装饰当成锚点
+- 标题和核心短句按自然语义组织；能单行成立的短句不要为了造型主动拆行
 
 ## runtime_seed
 ```json

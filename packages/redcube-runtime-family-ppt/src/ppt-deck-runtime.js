@@ -8,7 +8,6 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
-  renameSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -308,7 +307,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-function sanitizeWorkbenchSegment(value, fallback = 'deliverable') {
+function sanitizeSurfaceSegment(value, fallback = 'deliverable') {
   const text = safeText(value, fallback)
     .replace(/[\\/:*?"<>|]/g, ' ')
     .replace(/[：]/g, ' ')
@@ -317,45 +316,27 @@ function sanitizeWorkbenchSegment(value, fallback = 'deliverable') {
   return text || fallback;
 }
 
-function workbenchTaskDirCandidates(contract, deliverableId) {
-  return [...new Set([
-    sanitizeWorkbenchSegment(contract?.title, deliverableId),
-    sanitizeWorkbenchSegment(deliverableId, 'deliverable'),
-  ])];
-}
-
-function resolveWorkbenchTaskDir({ workspaceRoot, contract, deliverableId }) {
-  const existing = workbenchTaskDirCandidates(contract, deliverableId)
-    .map((candidate) => path.join(workspaceRoot, candidate))
-    .find((candidate) => existsSync(candidate));
-  return existing || path.join(workspaceRoot, workbenchTaskDirCandidates(contract, deliverableId)[0]);
-}
-
-function getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId }) {
-  const taskDir = resolveWorkbenchTaskDir({ workspaceRoot, contract, deliverableId });
-  const chapterBaseName = sanitizeWorkbenchSegment(contract?.title, deliverableId);
+function getPptOperatorViewPaths({ deliverablePaths, contract, deliverableId }) {
+  const operatorDir = path.join(deliverablePaths.viewsDir, 'operator');
+  const chapterBaseName = sanitizeSurfaceSegment(contract?.title, deliverableId);
   return {
-    taskDir,
+    operatorDir,
     chapterBaseName,
-    storylineFile: path.join(taskDir, '故事主线.md'),
-    detailedOutlineFile: path.join(taskDir, '详细大纲.md'),
-    outlineDir: path.join(taskDir, '大纲'),
-    blueprintFile: path.join(taskDir, '大纲', `${chapterBaseName}.md`),
-    visualDirectionFile: path.join(taskDir, '大纲', `${chapterBaseName}_视觉导演稿.md`),
-    slidesDir: path.join(taskDir, '幻灯片'),
-    slidesReadmeFile: path.join(taskDir, '幻灯片', 'README.md'),
-    revisionBriefFile: path.join(taskDir, '幻灯片', '当前返修要求.md'),
-    htmlFile: path.join(taskDir, '幻灯片', `${chapterBaseName}.html`),
-    draftHtmlFile: path.join(taskDir, '幻灯片', `${chapterBaseName}_当前草稿.html`),
-    screenshotReviewFile: path.join(taskDir, '幻灯片', `${chapterBaseName}_视觉质控.md`),
-    pptxDir: path.join(taskDir, 'pptx'),
-    pptxReadmeFile: path.join(taskDir, 'pptx', 'README.md'),
-    pptxArchiveDir: path.join(taskDir, 'pptx', 'archive'),
-    pptxFile: path.join(taskDir, 'pptx', `${chapterBaseName}.pptx`),
-    pdfFile: path.join(taskDir, 'pptx', `${chapterBaseName}.pdf`),
-    presenterNotesFile: path.join(taskDir, 'pptx', `${chapterBaseName}-presenter-notes.md`),
-    referencesDir: path.join(taskDir, '参考材料'),
-    referenceIndexFile: path.join(taskDir, '参考材料', '来源索引.md'),
+    storylineFile: path.join(operatorDir, '故事主线.md'),
+    detailedOutlineFile: path.join(operatorDir, '详细大纲.md'),
+    outlineDir: path.join(operatorDir, '大纲'),
+    blueprintFile: path.join(operatorDir, '大纲', `${chapterBaseName}.md`),
+    visualDirectionFile: path.join(operatorDir, '大纲', `${chapterBaseName}_视觉导演稿.md`),
+    slidesDir: path.join(operatorDir, '幻灯片'),
+    slidesReadmeFile: path.join(operatorDir, '幻灯片', 'README.md'),
+    revisionBriefFile: path.join(operatorDir, '幻灯片', '当前返修要求.md'),
+    referencesDir: path.join(operatorDir, '参考材料'),
+    referenceIndexFile: path.join(operatorDir, '参考材料', '来源索引.md'),
+    publishDir: path.join(deliverablePaths.deliverableDir, 'publish'),
+    publishReadmeFile: path.join(deliverablePaths.deliverableDir, 'publish', 'README.md'),
+    pptxFile: path.join(deliverablePaths.deliverableDir, 'publish', `${deliverableId}.pptx`),
+    pdfFile: path.join(deliverablePaths.deliverableDir, 'publish', `${deliverableId}.pdf`),
+    presenterNotesFile: path.join(deliverablePaths.deliverableDir, 'publish', `${deliverableId}-presenter-notes.md`),
   };
 }
 
@@ -368,12 +349,12 @@ function getDeliverableViewSurfacePaths(deliverablePaths, deliverableId) {
   };
 }
 
-function ensureWorkbenchSurface(paths) {
-  ensureDir(paths.taskDir);
+function ensurePptOperatorViewSurface(paths) {
+  ensureDir(paths.operatorDir);
   ensureDir(paths.outlineDir);
   ensureDir(paths.slidesDir);
-  ensureDir(paths.pptxDir);
   ensureDir(paths.referencesDir);
+  ensureDir(paths.publishDir);
 }
 
 function sourceIndexEntries(contract) {
@@ -387,7 +368,7 @@ function sourceIndexEntries(contract) {
     }));
 }
 
-function buildWorkbenchReferenceIndex(contract) {
+function buildOperatorReferenceIndex(contract) {
   const lines = [
     '# 来源索引',
     '',
@@ -413,7 +394,7 @@ function markdownList(items = [], ordered = false) {
     .join('\n');
 }
 
-function buildWorkbenchStorylineMarkdown(contract, artifact) {
+function buildOperatorStorylineMarkdown(contract, artifact) {
   const storyline = artifact?.storyline || {};
   const narrative = storyline?.narrative_arc || {};
   return [
@@ -445,7 +426,7 @@ function buildWorkbenchStorylineMarkdown(contract, artifact) {
   ].join('\n');
 }
 
-function buildWorkbenchDetailedOutlineMarkdown(contract, artifact) {
+function buildOperatorDetailedOutlineMarkdown(contract, artifact) {
   const outline = artifact?.detailed_outline || {};
   const slides = safeArray(outline.slides);
   const lines = [
@@ -479,7 +460,7 @@ function buildWorkbenchDetailedOutlineMarkdown(contract, artifact) {
   return `${lines.join('\n')}\n`;
 }
 
-function buildWorkbenchBlueprintMarkdown(contract, artifact) {
+function buildOperatorBlueprintMarkdown(contract, artifact) {
   const blueprint = artifact?.slide_blueprint || {};
   const slides = safeArray(blueprint.slides);
   const lines = [
@@ -533,7 +514,7 @@ function buildWorkbenchBlueprintMarkdown(contract, artifact) {
   return `${lines.join('\n')}\n`;
 }
 
-function buildWorkbenchVisualDirectionMarkdown(contract, artifact) {
+function buildOperatorVisualDirectionMarkdown(contract, artifact) {
   const visual = artifact?.visual_direction || {};
   const typographyPlan = visual.typography_plan || {};
   const lines = [
@@ -570,9 +551,10 @@ function buildWorkbenchVisualDirectionMarkdown(contract, artifact) {
   return `${lines.join('\n')}\n`;
 }
 
-function copyWorkbenchFile(source, destination) {
+function copySurfaceFile(source, destination) {
   if (!safeText(source) || !existsSync(source)) return null;
   ensureDir(path.dirname(destination));
+  if (path.resolve(source) === path.resolve(destination)) return destination;
   cpSync(source, destination);
   return destination;
 }
@@ -623,13 +605,16 @@ function normalizeOperatorRevisionBrief(value) {
   };
 }
 
-function loadWorkbenchOperatorRevisionBrief({
-  workspaceRoot,
+function loadOperatorRevisionBrief({
+  deliverablePaths,
   contract,
-  deliverableId,
   minimumMtimeMs = 0,
 }) {
-  const paths = getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId });
+  const paths = getPptOperatorViewPaths({
+    deliverablePaths,
+    contract,
+    deliverableId: deliverablePaths.deliverableId,
+  });
   if (!existsSync(paths.revisionBriefFile)) return null;
   if (safeFileMtimeMs(paths.revisionBriefFile) < Number(minimumMtimeMs || 0)) {
     return null;
@@ -663,20 +648,6 @@ function derivePptStageArtifactFreshness({ contract, deliverablePaths }) {
   };
 }
 
-function archiveWorkbenchExportFiles(paths) {
-  const files = [paths.pptxFile, paths.pdfFile, paths.presenterNotesFile].filter((file) => existsSync(file));
-  if (files.length === 0) return [];
-  ensureDir(paths.pptxArchiveDir);
-  const archiveTag = `stale-${Date.now()}`;
-  return files.map((file) => {
-    const ext = path.extname(file);
-    const baseName = path.basename(file, ext);
-    const destination = path.join(paths.pptxArchiveDir, `${baseName}--${archiveTag}${ext}`);
-    renameSync(file, destination);
-    return destination;
-  });
-}
-
 function currentHtmlSourceFile(contract, deliverablePaths) {
   const artifact = readCurrentHtmlArtifact(contract, deliverablePaths);
   return safeText(artifact?.html_bundle?.html_file);
@@ -689,9 +660,9 @@ function currentSlidesSourceFile(contract, deliverablePaths) {
 
 function syncDeliverableViewDraft(paths, htmlFile, slidesFile) {
   const refs = [];
-  const draftHtmlRef = copyWorkbenchFile(htmlFile, paths.draftHtmlFile);
+  const draftHtmlRef = copySurfaceFile(htmlFile, paths.draftHtmlFile);
   if (draftHtmlRef) refs.push(draftHtmlRef);
-  const draftSlidesRef = copyWorkbenchFile(slidesFile, paths.draftSlidesFile);
+  const draftSlidesRef = copySurfaceFile(slidesFile, paths.draftSlidesFile);
   if (draftSlidesRef) refs.push(draftSlidesRef);
   return refs;
 }
@@ -699,11 +670,11 @@ function syncDeliverableViewDraft(paths, htmlFile, slidesFile) {
 function seedDeliverableStableViews(paths, htmlFile, slidesFile) {
   const refs = [];
   if (!existsSync(paths.stableHtmlFile)) {
-    const stableHtmlRef = copyWorkbenchFile(htmlFile, paths.stableHtmlFile);
+    const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
     if (stableHtmlRef) refs.push(stableHtmlRef);
   }
   if (!existsSync(paths.stableSlidesFile)) {
-    const stableSlidesRef = copyWorkbenchFile(slidesFile, paths.stableSlidesFile);
+    const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
     if (stableSlidesRef) refs.push(stableSlidesRef);
   }
   return refs;
@@ -711,9 +682,9 @@ function seedDeliverableStableViews(paths, htmlFile, slidesFile) {
 
 function promoteDeliverableStableViews(paths, htmlFile, slidesFile) {
   const refs = [];
-  const stableHtmlRef = copyWorkbenchFile(htmlFile, paths.stableHtmlFile);
+  const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
   if (stableHtmlRef) refs.push(stableHtmlRef);
-  const stableSlidesRef = copyWorkbenchFile(slidesFile, paths.stableSlidesFile);
+  const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
   if (stableSlidesRef) refs.push(stableSlidesRef);
   return refs;
 }
@@ -758,44 +729,46 @@ function syncStableScreenshotSurface(deliverablePaths, captureScreenshotsDir, { 
     rmSync(file, { force: true });
   }
   return sourceFiles
-    .map((file) => copyWorkbenchFile(file, path.join(stableScreenshotsDir, path.basename(file))))
+    .map((file) => copySurfaceFile(file, path.join(stableScreenshotsDir, path.basename(file))))
     .filter(Boolean);
 }
 
-function buildWorkbenchSlidesSurfaceState({ contract, deliverablePaths, paths, latestReviewStatusOverride = '' }) {
+function buildOperatorSlidesSurfaceState({ contract, deliverablePaths, viewSurfacePaths, latestReviewStatusOverride = '' }) {
   const screenshotReviewArtifact = safeReadJsonIfExists(
     stageArtifactPath(contract, deliverablePaths, 'screenshot_review'),
   );
   return {
-    reviewed_html_ready: existsSync(paths.htmlFile),
-    has_pending_draft: existsSync(paths.draftHtmlFile),
+    reviewed_html_ready: existsSync(viewSurfacePaths.stableHtmlFile),
+    has_pending_draft: existsSync(viewSurfacePaths.draftHtmlFile),
     latest_review_status: safeText(latestReviewStatusOverride, safeText(screenshotReviewArtifact?.status, 'none')),
+    stable_html_name: path.basename(viewSurfacePaths.stableHtmlFile),
+    draft_html_name: path.basename(viewSurfacePaths.draftHtmlFile),
   };
 }
 
-function buildWorkbenchSlidesReadmeMarkdown(contract, slidesState, paths) {
+function buildOperatorSlidesReadmeMarkdown(contract, slidesState) {
   return [
     '# 幻灯片目录说明',
     '',
     `- 讲题：${safeText(contract?.title)}`,
-    `- 默认 HTML：${path.basename(paths.htmlFile)}`,
-    `- 草稿 HTML：${slidesState?.has_pending_draft ? path.basename(paths.draftHtmlFile) : 'none'}`,
+    `- 默认 HTML：${safeText(slidesState?.stable_html_name, 'none')}`,
+    `- 草稿 HTML：${slidesState?.has_pending_draft ? safeText(slidesState?.draft_html_name, 'none') : 'none'}`,
     `- 最近一次截图质控：${safeText(slidesState?.latest_review_status, 'none')}`,
     '',
     '规则：',
     '- 只有当 `screenshot_review` 通过时，最新候选 HTML 才能替换默认 `.html`。',
-    '- 如果 `screenshot_review` 被 block，当前候选会继续保留在 `*_当前草稿.html`，默认 `.html` 不会被失败版本覆盖。',
+    '- 如果 `screenshot_review` 被 block，当前候选会继续保留在 `.draft.html`，默认 `.html` 不会被失败版本覆盖。',
     '- 在还没有任何通过版之前，默认 `.html` 只是当前预览基线，不代表已经通过截图质控。',
-    '- `*_当前草稿.html` 只表示 `render_html / fix_html` 之后、下一轮 `screenshot_review` 之前的待审稿，不应直接当作已质控成品。',
+    '- `.draft.html` 只表示 `render_html / fix_html` 之后、下一轮 `screenshot_review` 之前的待审稿，不应直接当作已质控成品。',
     '- 这里保留 audience-facing HTML 与视觉质控文稿，不应放内部备课提示或流程说明。',
     '',
   ].join('\n');
 }
 
-function buildWorkbenchPptxReadmeMarkdown(contract, exportState) {
-  if (exportState.currentExportReady) {
+function buildPublishReadmeMarkdown(contract, exportState) {
+  if (exportState.currentExportReady && exportState.hasCurrentExportFiles) {
     return [
-      '# PPTX 目录说明',
+      '# publish 目录说明',
       '',
       `- 讲题：${safeText(contract?.title)}`,
       '- 当前导出状态：current_export_ready',
@@ -803,14 +776,14 @@ function buildWorkbenchPptxReadmeMarkdown(contract, exportState) {
       '',
       '规则：',
       '- 当前目录中的 `.pptx / .pdf / presenter-notes` 就是当前可交付版本。',
-      '- `archive/` 下如果存在历史文件，仅作留痕，不代表当前有效交付。',
+      '- 当前是否仍可直接交付，以 topic 的 publication projection surface 与 deliverable 的 `review-state.json` 为准。',
       '',
     ].join('\n');
   }
 
-  if (exportState.hasWorkbenchExportFiles) {
+  if (exportState.hasAnyExportFiles) {
     return [
-      '# PPTX 目录说明',
+      '# publish 目录说明',
       '',
       `- 讲题：${safeText(contract?.title)}`,
       '- 当前导出状态：last_export_available',
@@ -819,13 +792,12 @@ function buildWorkbenchPptxReadmeMarkdown(contract, exportState) {
       '规则：',
       '- 最近一次导出的 `.pptx / .pdf / presenter-notes` 仍保留在当前目录，便于继续审阅、对照和补修。',
       '- 这些文件可能落后于最新 HTML 与截图质控；是否仍可直接交付，以 topic 的 publication projection surface 与 deliverable 的 `review-state.json` 为准。',
-      '- `archive/` 只在真正写入更新导出件时保留旧版留痕。',
       '',
     ].join('\n');
   }
 
   return [
-    '# PPTX 目录说明',
+    '# publish 目录说明',
     '',
     `- 讲题：${safeText(contract?.title)}`,
     '- 当前导出状态：no_current_export',
@@ -834,26 +806,11 @@ function buildWorkbenchPptxReadmeMarkdown(contract, exportState) {
     '规则：',
     '- 当前没有可交付 PPTX；如果你看到 `archive/` 下的旧文件，那只是历史导出留痕。',
     '- 上游 stage 一旦重跑，旧导出会从当前目录退场，直到新的 `export_pptx` 完成。',
-    '',
-  ].join('\n');
+      '',
+    ].join('\n');
 }
 
-function buildMachinePublishReadmeMarkdown(contract, exportState) {
-  return [
-    '# publish 目录说明',
-    '',
-    `- 讲题：${safeText(contract?.title)}`,
-    `- 最近一次 export artifact：${formatTimestamp(exportState.exportArtifactMtimeMs)}`,
-    `- 当前投影状态：${exportState.currentExportReady ? 'output_ready' : 'draft_or_export_ready'}`,
-    '',
-    '规则：',
-    '- `publish/` 是机器导出表面，文件存在不等于当前仍可交付。',
-    '- 当前是否有效，必须以 topic 的 publication projection surface 与 deliverable 的 `review-state.json` 为准。',
-    '',
-  ].join('\n');
-}
-
-function buildWorkbenchExportSurfaceState({ route, contract, deliverablePaths, payload }) {
+function buildPublishSurfaceState({ route, contract, deliverablePaths, publishPaths, payload }) {
   const freshness = derivePptStageArtifactFreshness({ contract, deliverablePaths });
   const currentExportReady = route === freshness.requiredExportRoute;
   const routeExportMtimeMs = currentExportReady
@@ -866,105 +823,45 @@ function buildWorkbenchExportSurfaceState({ route, contract, deliverablePaths, p
   return {
     ...freshness,
     currentExportReady,
-    hasWorkbenchExportFiles: false,
+    hasCurrentExportFiles: [publishPaths.pptxFile, publishPaths.pdfFile, publishPaths.presenterNotesFile]
+      .every((file) => existsSync(file)),
+    hasAnyExportFiles: [publishPaths.pptxFile, publishPaths.pdfFile, publishPaths.presenterNotesFile]
+      .some((file) => existsSync(file)),
     exportArtifactMtimeMs: routeExportMtimeMs || freshness.exportArtifactMtimeMs,
   };
 }
 
-function removeWorkbenchDraftHtml(paths) {
-  rmSync(paths.draftHtmlFile, { force: true });
-}
-
-function syncWorkbenchHtmlDraft(paths, sourceHtmlFile) {
-  return copyWorkbenchFile(sourceHtmlFile, paths.draftHtmlFile);
-}
-
-function promoteWorkbenchReviewedHtml(paths, sourceHtmlFile) {
-  const reviewedRef = copyWorkbenchFile(sourceHtmlFile, paths.htmlFile);
-  removeWorkbenchDraftHtml(paths);
-  return reviewedRef;
-}
-
-function syncWorkbenchBlockedHtmlDraft(paths, sourceHtmlFile) {
-  const refs = [];
-  const draftRef = syncWorkbenchHtmlDraft(paths, sourceHtmlFile);
-  if (draftRef) refs.push(draftRef);
-  if (!existsSync(paths.htmlFile)) {
-    const previewRef = copyWorkbenchFile(sourceHtmlFile, paths.htmlFile);
-    if (previewRef) refs.push(previewRef);
-  }
-  return refs;
-}
-
-function latestKnownExportBundle({ route, contract, deliverablePaths, payload }) {
-  if (route === safeText(contract?.delivery_contract?.required_export_route, 'export_pptx')) {
-    return payload?.export_bundle || null;
-  }
-  return readStageArtifact(contract, deliverablePaths, safeText(contract?.delivery_contract?.required_export_route, 'export_pptx'))?.export_bundle || null;
-}
-
-function syncWorkbenchExportFiles(paths, exportBundle, { archiveCurrent = false, restoreMissingOnly = false } = {}) {
-  if (!exportBundle || typeof exportBundle !== 'object') return [];
-  const refs = [];
-  if (archiveCurrent) {
-    refs.push(...archiveWorkbenchExportFiles(paths));
-  }
-  const copies = [
-    [exportBundle.pptx_file, paths.pptxFile],
-    [exportBundle.pdf_file, paths.pdfFile],
-    [exportBundle.presenter_notes_file, paths.presenterNotesFile],
-  ];
-  for (const [source, destination] of copies) {
-    if (restoreMissingOnly && existsSync(destination)) continue;
-    const ref = copyWorkbenchFile(source, destination);
-    if (ref) refs.push(ref);
-  }
-  return refs;
-}
-
-function syncPptWorkbenchSurface({ workspaceRoot, topicId, contract, deliverableId, route, payload }) {
-  const paths = getWorkbenchSurfacePaths({ workspaceRoot, contract, deliverableId });
+function syncPptCanonicalSurface({ workspaceRoot, topicId, contract, deliverableId, route, payload }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const operatorPaths = getPptOperatorViewPaths({ deliverablePaths, contract, deliverableId });
   const viewSurfacePaths = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId);
-  ensureWorkbenchSurface(paths);
+  ensurePptOperatorViewSurface(operatorPaths);
   const refs = [];
-  writeText(paths.referenceIndexFile, buildWorkbenchReferenceIndex(contract));
-  refs.push(paths.referenceIndexFile);
+  writeText(operatorPaths.referenceIndexFile, buildOperatorReferenceIndex(contract));
+  refs.push(operatorPaths.referenceIndexFile);
   switch (route) {
     case 'storyline':
-      writeText(paths.storylineFile, buildWorkbenchStorylineMarkdown(contract, payload));
-      refs.push(paths.storylineFile);
+      writeText(operatorPaths.storylineFile, buildOperatorStorylineMarkdown(contract, payload));
+      refs.push(operatorPaths.storylineFile);
       break;
     case 'detailed_outline':
-      writeText(paths.detailedOutlineFile, buildWorkbenchDetailedOutlineMarkdown(contract, payload));
-      refs.push(paths.detailedOutlineFile);
+      writeText(operatorPaths.detailedOutlineFile, buildOperatorDetailedOutlineMarkdown(contract, payload));
+      refs.push(operatorPaths.detailedOutlineFile);
       break;
     case 'slide_blueprint':
-      writeText(paths.blueprintFile, buildWorkbenchBlueprintMarkdown(contract, payload));
-      refs.push(paths.blueprintFile);
+      writeText(operatorPaths.blueprintFile, buildOperatorBlueprintMarkdown(contract, payload));
+      refs.push(operatorPaths.blueprintFile);
       break;
     case 'visual_direction':
-      writeText(paths.visualDirectionFile, buildWorkbenchVisualDirectionMarkdown(contract, payload));
-      refs.push(paths.visualDirectionFile);
+      writeText(operatorPaths.visualDirectionFile, buildOperatorVisualDirectionMarkdown(contract, payload));
+      refs.push(operatorPaths.visualDirectionFile);
       break;
-    case 'render_html':
-    case 'fix_html': {
-      const draftRef = syncWorkbenchHtmlDraft(paths, payload?.html_bundle?.html_file);
-      if (draftRef) refs.push(draftRef);
-      if (!existsSync(paths.htmlFile)) {
-        const previewRef = copyWorkbenchFile(payload?.html_bundle?.html_file, paths.htmlFile);
-        if (previewRef) refs.push(previewRef);
-      }
-      break;
-    }
     case 'screenshot_review': {
       const sourceHtmlFile = currentHtmlSourceFile(contract, deliverablePaths);
       const sourceSlidesFile = currentSlidesSourceFile(contract, deliverablePaths);
       const captureScreenshotsDir = safeText(payload?.review_capture?.screenshots_dir);
       if (safeText(payload?.status) === 'pass') {
         refs.push(...promoteDeliverableStableViews(viewSurfacePaths, sourceHtmlFile, sourceSlidesFile));
-        const reviewedHtmlRef = promoteWorkbenchReviewedHtml(paths, sourceHtmlFile);
-        if (reviewedHtmlRef) refs.push(reviewedHtmlRef);
         refs.push(...syncStableScreenshotSurface(deliverablePaths, captureScreenshotsDir, { promote: true, seedIfMissing: true }));
         const latestCaptureRef = writeStableLatestCapturePointer(
           deliverablePaths,
@@ -973,38 +870,31 @@ function syncPptWorkbenchSurface({ workspaceRoot, topicId, contract, deliverable
         );
         if (latestCaptureRef) refs.push(latestCaptureRef);
       } else {
-        refs.push(...syncWorkbenchBlockedHtmlDraft(paths, sourceHtmlFile));
+        refs.push(...syncDeliverableViewDraft(viewSurfacePaths, sourceHtmlFile, sourceSlidesFile));
         refs.push(...syncStableScreenshotSurface(deliverablePaths, captureScreenshotsDir, { seedIfMissing: true }));
       }
-      const reviewRef = copyWorkbenchFile(payload?.report_markdown, paths.screenshotReviewFile);
-      if (reviewRef) refs.push(reviewRef);
-      break;
-    }
-    case 'export_pptx': {
-      refs.push(...syncWorkbenchExportFiles(paths, payload?.export_bundle, { archiveCurrent: true }));
       break;
     }
     default:
       break;
   }
-  if (route !== safeText(contract?.delivery_contract?.required_export_route, 'export_pptx')) {
-    refs.push(...syncWorkbenchExportFiles(paths, latestKnownExportBundle({ route, contract, deliverablePaths, payload }), { restoreMissingOnly: true }));
-  }
-  const exportState = buildWorkbenchExportSurfaceState({ route, contract, deliverablePaths, payload });
-  exportState.hasWorkbenchExportFiles = [paths.pptxFile, paths.pdfFile, paths.presenterNotesFile].some((file) => existsSync(file));
-  const slidesState = buildWorkbenchSlidesSurfaceState({
+  const slidesState = buildOperatorSlidesSurfaceState({
     contract,
     deliverablePaths,
-    paths,
+    viewSurfacePaths,
     latestReviewStatusOverride: route === 'screenshot_review' ? safeText(payload?.status) : '',
   });
-  writeText(paths.slidesReadmeFile, buildWorkbenchSlidesReadmeMarkdown(contract, slidesState, paths));
-  refs.push(paths.slidesReadmeFile);
-  writeText(paths.pptxReadmeFile, buildWorkbenchPptxReadmeMarkdown(contract, exportState));
-  refs.push(paths.pptxReadmeFile);
-  const machinePublishReadmeFile = path.join(deliverablePaths.deliverableDir, 'publish', 'README.md');
-  writeText(machinePublishReadmeFile, buildMachinePublishReadmeMarkdown(contract, exportState));
-  refs.push(machinePublishReadmeFile);
+  writeText(operatorPaths.slidesReadmeFile, buildOperatorSlidesReadmeMarkdown(contract, slidesState));
+  refs.push(operatorPaths.slidesReadmeFile);
+  const publishState = buildPublishSurfaceState({
+    route,
+    contract,
+    deliverablePaths,
+    publishPaths: operatorPaths,
+    payload,
+  });
+  writeText(operatorPaths.publishReadmeFile, buildPublishReadmeMarkdown(contract, publishState));
+  refs.push(operatorPaths.publishReadmeFile);
   return refs;
 }
 
@@ -2245,10 +2135,9 @@ function buildRenderRevisionContext({
   ) >= Number(minimumMtimeMs || 0)
     ? readStageArtifact(contract, deliverablePaths, 'screenshot_review')
     : null;
-  const operatorRevisionBrief = loadWorkbenchOperatorRevisionBrief({
-    workspaceRoot,
+  const operatorRevisionBrief = loadOperatorRevisionBrief({
+    deliverablePaths,
     contract,
-    deliverableId,
     minimumMtimeMs,
   });
   const directorSummary = directorReviewArtifact?.visual_director_review
@@ -3766,7 +3655,7 @@ export async function runPptDeckRoute({
   payload = attachRouteReviewReset(payload, route);
   payload = appendArtifactRefs(
     payload,
-    syncPptWorkbenchSurface({ workspaceRoot, topicId, contract, deliverableId, route, payload }),
+    syncPptCanonicalSurface({ workspaceRoot, topicId, contract, deliverableId, route, payload }),
   );
   const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
   return {

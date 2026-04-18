@@ -23,6 +23,9 @@ function readText(file) {
 }
 
 test('legacy redcube-agent/workbench runtime path is removed from active code and tests', () => {
+  const rootPackage = JSON.parse(readText(path.join(repoRoot, 'package.json')));
+
+  assert.equal(rootPackage.name, 'redcube-ai-mono');
   assert.equal(existsSync(path.join(repoRoot, 'tests', 'agent-workflow.test.js')), false);
   assert.equal(existsSync(path.join(repoRoot, 'tests', 'production-path-cutover.test.js')), false);
   assert.equal(existsSync(path.join(repoRoot, 'packages', 'redcube-agent')), false);
@@ -48,6 +51,7 @@ test('legacy redcube-agent/workbench runtime path is removed from active code an
     const content = readText(file);
     assert.equal(content.includes('packages/redcube-agent'), false, file);
     assert.equal(content.includes('workbench-models.js'), false, file);
+    assert.equal(content.includes('workbench'), false, file);
     assert.equal(content.includes('.redcube_pi/workbench'), false, file);
     assert.equal(content.includes("'.redcube_pi', 'workbench'"), false, file);
     assert.equal(content.includes('runWorkflow no longer mirrors outputs into workbench truth directories'), false, file);

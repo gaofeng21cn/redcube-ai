@@ -41,7 +41,9 @@ test('poster_onepager creative mainline no longer lets runtime artifacts, seeds,
   const blueprintPrompt = read('prompts/poster_onepager/poster_blueprint.md');
   const visualPrompt = read('prompts/poster_onepager/visual_direction.md');
   const renderHtmlPrompt = read('prompts/poster_onepager/render_html.md');
+  const renderShell = read('prompts/poster_onepager/render_shell.html');
   const directorReviewPrompt = read('prompts/poster_onepager/director_review.md');
+  const screenshotReviewPrompt = read('prompts/poster_onepager/screenshot_review.md');
 
   assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/render-compiler.js')), false);
   assert.equal(packEntry.includes('buildPosterBlueprint'), false);
@@ -58,8 +60,12 @@ test('poster_onepager creative mainline no longer lets runtime artifacts, seeds,
   assert.match(storylinePrompt, /## runtime_artifact/);
   assert.match(blueprintPrompt, /## runtime_seed/);
   assert.match(visualPrompt, /## runtime_seed/);
+  assert.match(visualPrompt, /相邻可读块安全间距/);
   assert.match(renderHtmlPrompt, /## runtime_seed/);
+  assert.match(renderHtmlPrompt, /相邻读者可见.*安全间距/);
+  assert.match(renderShell, /font-awesome\/6\.5\.1/);
   assert.match(directorReviewPrompt, /## runtime_seed/);
+  assert.match(screenshotReviewPrompt, /相邻读者可见.*视觉贴住/);
   assert.equal(runtime.includes("family: 'poster_onepager'"), true);
 });
 

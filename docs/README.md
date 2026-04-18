@@ -93,7 +93,7 @@ That program set still includes the RedCube product entry MVP before the managed
 ### History
 
 - [Changelog](../CHANGELOG.md)
-- `docs/history/`
+- [History index](history/README.md)
 - `program/hermes/`
 - `docs/program/*/*.md`
 

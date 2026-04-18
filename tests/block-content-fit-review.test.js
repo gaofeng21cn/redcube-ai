@@ -253,6 +253,340 @@ function runReviewWithUnframedHeader() {
   return JSON.parse(result.stdout);
 }
 
+function runReviewWithOverflowingChildGroup() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-group-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+
+  const inspection = {
+    slideId: 'N06',
+    title: '复用模块这件事，它切得很干净',
+    layoutFamily: 'evidence_strip',
+    speakerSeconds: 36,
+    primaryPoints: 1,
+    wrapper: {
+      clientWidth: 448,
+      clientHeight: 597,
+      scrollWidth: 448,
+      scrollHeight: 597,
+    },
+    bodyScroll: false,
+    blocks: [
+      {
+        id: 'title',
+        left: 30,
+        top: 34,
+        width: 374,
+        height: 82,
+        right: 404,
+        bottom: 116,
+        area: 30668,
+      },
+      {
+        id: 'foundation-card',
+        left: 58,
+        top: 194,
+        width: 320,
+        height: 82,
+        right: 378,
+        bottom: 276,
+        area: 26240,
+      },
+      {
+        id: 'mainline-card',
+        left: 70,
+        top: 304,
+        width: 308,
+        height: 92,
+        right: 378,
+        bottom: 396,
+        area: 28336,
+      },
+      {
+        id: 'execution-card',
+        left: 82,
+        top: 418,
+        width: 296,
+        height: 96,
+        right: 378,
+        bottom: 514,
+        area: 28416,
+      },
+    ],
+    auditBlocks: [],
+    titleMeta: {
+      titleFontSize: 32,
+      titleLineCount: 2,
+      titleBlockId: 'title',
+    },
+  };
+
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:448px;height:597px;overflow:hidden;position:relative;background:#F8F4EA;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="N06" data-title="复用模块这件事，它切得很干净" data-layout-family="evidence_strip" data-speaker-seconds="36" style="position:relative;width:448px;height:597px;overflow:hidden;background:#F8F4EA;">
+        <div data-qa-block="title" style="position:absolute;left:30px;top:34px;width:374px;">
+          <div style="font-size:13px;line-height:1.2;font-weight:800;color:#2563EB;">模块复用决定扩展性</div>
+          <div style="margin-top:8px;font-size:32px;line-height:1.18;font-weight:800;color:#132238;">复用模块这件事，<br />它切得很干净</div>
+        </div>
+        <section data-qa-block="module-stack" data-primary-point="true" style="position:absolute;left:46px;top:170px;width:338px;height:316px;border:2px dashed rgba(37,99,235,0.24);border-radius:28px;background:rgba(255,255,255,0.28);">
+          <article data-qa-block="foundation-card" style="position:absolute;left:12px;top:24px;width:320px;height:82px;padding:14px 18px;border-radius:22px;background:#FFFFFF;border:1px solid rgba(18,34,56,0.1);box-shadow:0 10px 22px rgba(15,23,42,0.06);">
+            <div style="font-size:18px;line-height:1.2;font-weight:800;color:#132238;">共享工程底座</div>
+            <div style="margin-top:8px;font-size:14px;line-height:1.44;color:#475569;">供给通用运行能力，让医学主线持续复用成熟基础设施。</div>
+          </article>
+          <article data-qa-block="mainline-card" style="position:absolute;left:24px;top:134px;width:308px;height:92px;padding:16px 18px;border-radius:24px;background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.18);box-shadow:0 12px 24px rgba(37,99,235,0.08);">
+            <div style="font-size:18px;line-height:1.2;font-weight:800;color:#1E3A8A;">Med Auto Science</div>
+            <div style="margin-top:8px;font-size:14px;line-height:1.44;color:#334155;">把 gateway、controller、overlay、adapter 串成正式控制链。</div>
+          </article>
+          <article data-qa-block="execution-card" style="position:absolute;left:36px;top:248px;width:296px;height:96px;padding:14px 18px;border-radius:22px;background:#FFFFFF;border:1px solid rgba(18,34,56,0.1);box-shadow:0 10px 22px rgba(15,23,42,0.06);">
+            <div style="font-size:18px;line-height:1.2;font-weight:800;color:#132238;">执行面</div>
+            <div style="margin-top:8px;font-size:14px;line-height:1.44;color:#475569;">把具体研究任务真正跑透，分层越清楚，长期扩展越轻盈。</div>
+          </article>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script>
+    const inspection = ${JSON.stringify(inspection)};
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() { return inspection; },
+      inspectCurrentSlide() { return inspection; }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '4',
+      '--frame-width',
+      '448',
+      '--frame-height',
+      '597',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
+function runReviewWithUntaggedTakeawayText() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-untagged-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+
+  const inspection = {
+    slideId: 'N03',
+    title: 'Med Auto Science 先把自己的位置站稳了',
+    layoutFamily: 'sequence_stack',
+    speakerSeconds: 36,
+    primaryPoints: 1,
+    wrapper: {
+      clientWidth: 448,
+      clientHeight: 597,
+      scrollWidth: 448,
+      scrollHeight: 597,
+    },
+    bodyScroll: false,
+    blocks: [
+      {
+        id: 'title',
+        left: 30,
+        top: 34,
+        width: 366,
+        height: 92,
+        right: 396,
+        bottom: 126,
+        area: 33672,
+      },
+      {
+        id: 'stack-bottom',
+        left: 60,
+        top: 430,
+        width: 332,
+        height: 122,
+        right: 392,
+        bottom: 552,
+        area: 40504,
+      },
+    ],
+    auditBlocks: [],
+    titleMeta: {
+      titleFontSize: 34,
+      titleLineCount: 2,
+      titleBlockId: 'title',
+    },
+  };
+
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:448px;height:597px;overflow:hidden;position:relative;background:#F8F4EA;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="N03" data-title="Med Auto Science 先把自己的位置站稳了" data-layout-family="sequence_stack" data-speaker-seconds="36" style="position:relative;width:448px;height:597px;overflow:hidden;background:#F8F4EA;">
+        <div data-qa-block="title" data-primary-point="true" style="position:absolute;left:30px;top:34px;width:366px;">
+          <div style="font-size:13px;line-height:1.2;font-weight:800;color:#2563EB;">系统定位先站稳</div>
+          <div style="margin-top:8px;font-size:34px;line-height:1.2;font-weight:800;">Med Auto Science<br />先把自己的位置站稳了</div>
+        </div>
+        <div data-qa-block="stack-bottom" style="position:absolute;left:60px;top:430px;width:332px;padding:18px 20px;background:#FFFFFF;border:1px solid rgba(18,34,56,0.1);border-radius:22px;box-shadow:0 10px 22px rgba(15,23,42,0.06);">
+          <div style="font-size:17px;line-height:1.2;font-weight:800;color:#132238;">执行面协作层</div>
+          <div style="margin-top:10px;font-size:16px;line-height:1.55;color:#475569;">具体研究任务在这里真正展开，分工清楚，整条链更稳也更好协作。</div>
+        </div>
+        <div style="position:absolute;left:30px;bottom:22px;font-size:14px;line-height:1.2;font-weight:700;color:#64748B;">位置一旦站稳，整条自动科研主线就能稳定前进。</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const inspection = ${JSON.stringify(inspection)};
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() { return inspection; },
+      inspectCurrentSlide() { return inspection; }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '4',
+      '--frame-width',
+      '448',
+      '--frame-height',
+      '597',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
+function runReviewWithAdjacentReadableBlocksTooClose() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-adjacent-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+
+  const inspection = {
+    slideId: 'N01',
+    title: '医学自动科研真正拉开差距的是主链',
+    layoutFamily: 'cover_note',
+    speakerSeconds: 42,
+    primaryPoints: 1,
+    wrapper: {
+      clientWidth: 448,
+      clientHeight: 597,
+      scrollWidth: 448,
+      scrollHeight: 597,
+    },
+    bodyScroll: false,
+    blocks: [
+      {
+        id: 'hero_statement',
+        left: 31,
+        top: 95,
+        width: 286,
+        height: 180,
+        right: 317,
+        bottom: 275,
+        area: 51480,
+      },
+      {
+        id: 'chain_strip',
+        left: 31,
+        top: 277,
+        width: 288,
+        height: 136,
+        right: 319,
+        bottom: 413,
+        area: 39168,
+      },
+    ],
+    auditBlocks: [],
+    titleMeta: {
+      titleFontSize: 30,
+      titleLineCount: 2,
+      titleBlockId: 'hero_statement',
+    },
+  };
+
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:448px;height:597px;overflow:hidden;position:relative;background:#F8F4EA;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="N01" data-title="医学自动科研真正拉开差距的是主链" data-layout-family="cover_note" data-speaker-seconds="42" style="position:relative;width:448px;height:597px;overflow:hidden;background:#F8F4EA;">
+        <section data-qa-block="hero_statement" data-primary-point="true" style="position:absolute;left:31px;top:95px;width:286px;height:180px;padding:20px 22px;border-radius:28px;background:#FFFFFF;border:1px solid rgba(18,34,56,0.1);box-sizing:border-box;">
+          <div style="font-size:30px;line-height:1.2;font-weight:800;color:#132238;">医学自动科研<br />真正拉开差距的是主链</div>
+          <div style="margin-top:14px;font-size:16px;line-height:1.48;color:#475569;">把研究真相稳稳钉进正式链路，系统才有资格承接论文级产出。</div>
+        </section>
+        <section data-qa-block="chain_strip" style="position:absolute;left:31px;top:277px;width:288px;height:136px;padding:18px 20px;border-radius:24px;background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.18);box-sizing:border-box;">
+          <div style="font-size:17px;line-height:1.2;font-weight:800;color:#1E3A8A;">主链先定推进顺序</div>
+          <div style="margin-top:10px;font-size:14px;line-height:1.5;color:#334155;">policy → controller → overlay → adapter，研究入口、控制链和能力接入沿同一轨道向前推。</div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script>
+    const inspection = ${JSON.stringify(inspection)};
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() { return inspection; },
+      inspectCurrentSlide() { return inspection; }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '4',
+      '--frame-width',
+      '448',
+      '--frame-height',
+      '597',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
 test('shared screenshot review blocks surfaced block content that spills out of its card', () => {
   const payload = runReviewWithOverflowingBlock();
   assert.equal(payload.status, 'block');
@@ -270,4 +604,41 @@ test('shared screenshot review does not treat unframed header groups as block co
   assert.equal(payload.slide_reviews[0].checks.block_content_fit_ok, true);
   assert.equal(payload.slide_reviews[0].issues.includes('block_content_overflow_detected'), false);
   assert.deepEqual(payload.slide_reviews[0].metrics.block_content_failures, []);
+});
+
+test('shared screenshot review blocks surfaced parent groups whose child cards spill outside the group frame', () => {
+  const payload = runReviewWithOverflowingChildGroup();
+  assert.equal(payload.status, 'block');
+  assert.equal(payload.checks.block_content_fit_ok, false);
+  assert.equal(payload.slide_reviews[0].checks.block_content_fit_ok, false);
+  assert.equal(payload.slide_reviews[0].issues.includes('block_content_overflow_detected'), true);
+  assert.equal(Array.isArray(payload.slide_reviews[0].metrics.block_content_failures), true);
+  assert.equal(payload.slide_reviews[0].metrics.block_content_failures.length > 0, true);
+});
+
+test('shared screenshot review blocks visible audience-facing text that is not covered by a qa block', () => {
+  const payload = runReviewWithUntaggedTakeawayText();
+  assert.equal(payload.status, 'block');
+  assert.equal(payload.checks.block_content_fit_ok, false);
+  assert.equal(payload.slide_reviews[0].checks.block_content_fit_ok, false);
+  assert.equal(payload.slide_reviews[0].issues.includes('block_content_overflow_detected'), true);
+  assert.equal(Array.isArray(payload.slide_reviews[0].metrics.block_content_failures), true);
+  assert.equal(
+    payload.slide_reviews[0].metrics.block_content_failures.some((failure) => failure.overflow_reason === 'untagged_text_block'),
+    true,
+  );
+});
+
+test('shared screenshot review blocks adjacent readable qa blocks with unsafe clearance', () => {
+  const payload = runReviewWithAdjacentReadableBlocksTooClose();
+  assert.equal(payload.status, 'block');
+  assert.equal(payload.checks.block_content_fit_ok, false);
+  assert.equal(payload.slide_reviews[0].checks.block_content_fit_ok, false);
+  assert.equal(payload.slide_reviews[0].issues.includes('block_content_overflow_detected'), true);
+  assert.equal(
+    payload.slide_reviews[0].metrics.block_content_failures.some(
+      (failure) => failure.overflow_reason === 'adjacent_readable_blocks_too_close',
+    ),
+    true,
+  );
 });

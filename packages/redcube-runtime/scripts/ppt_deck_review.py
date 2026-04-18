@@ -24,6 +24,9 @@ DEFAULT_DEVICE_SCALE_FACTOR = 2.0
 MIN_BLOCK_EDGE_CLEARANCE = 24.0
 MIN_LARGE_BLOCK_BOTTOM_CLEARANCE = 32.0
 MIN_CONTENT_PADDING = 8.0
+MIN_ADJACENT_READABLE_BLOCK_GAP = 6.0
+MIN_ADJACENT_READABLE_BLOCK_OVERLAP_PIXELS = 48.0
+MIN_ADJACENT_READABLE_BLOCK_OVERLAP_RATIO = 0.25
 TITLE_FONT_SIZE_TOLERANCE = 2.5
 EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
 INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
@@ -388,6 +391,10 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                       const base = window.redcubeDeckReview.inspectCurrentSlide();
                       const wrapper = document.querySelector('.slide.visible .slide-content-wrapper');
                       const tolerance = {BLOCK_CONTENT_OVERFLOW_TOLERANCE};
+                      const minAdjacentReadableBlockGap = {MIN_ADJACENT_READABLE_BLOCK_GAP};
+                      const minAdjacentReadableBlockOverlapPixels = {MIN_ADJACENT_READABLE_BLOCK_OVERLAP_PIXELS};
+                      const minAdjacentReadableBlockOverlapRatio = {MIN_ADJACENT_READABLE_BLOCK_OVERLAP_RATIO};
+                      const adjacentReadableBlockIgnoreIdTokens = {json.dumps(EDGE_CLEARANCE_IGNORED_IDS)};
                       const round = (value) => Math.round((Number(value) || 0) * 100) / 100;
                       const normalizeText = (value) => String(value || '').replace(/\\s+/g, '').trim();
                       const isVisibleElement = (node) => {{
@@ -444,6 +451,168 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                         }}
                         return targets;
                       }};
+                      const buildRelativeRectFromNodes = (nodes) => {{
+                        const rects = nodes
+                          .map((node) => {{
+                            if (!(node instanceof Element) || !isVisibleElement(node)) return null;
+                            return rectRelativeToBounds(node.getBoundingClientRect(), bounds);
+                          }})
+                          .filter(Boolean);
+                        if (rects.length === 0) return null;
+                        const left = Math.min(...rects.map((rect) => rect.left));
+                        const top = Math.min(...rects.map((rect) => rect.top));
+                        const right = Math.max(...rects.map((rect) => rect.right));
+                        const bottom = Math.max(...rects.map((rect) => rect.bottom));
+                        return {{
+                          left: round(left),
+                          top: round(top),
+                          right: round(right),
+                          bottom: round(bottom),
+                          width: round(right - left),
+                          height: round(bottom - top),
+                        }};
+                      }};
+                      const overflowSidesForRects = (innerRect, outerRect) => {{
+                        if (!innerRect || !outerRect) return [];
+                        const overflowSides = [];
+                        if (innerRect.left < outerRect.left - tolerance) overflowSides.push('left');
+                        if (innerRect.top < outerRect.top - tolerance) overflowSides.push('top');
+                        if (innerRect.right > outerRect.right + tolerance) overflowSides.push('right');
+                        if (innerRect.bottom > outerRect.bottom + tolerance) overflowSides.push('bottom');
+                        return Array.from(new Set(overflowSides));
+                      }};
+                      const collectUncoveredTextFailures = () => {{
+                        const failures = [];
+                        const walker = document.createTreeWalker(wrapper, NodeFilter.SHOW_TEXT, {{
+                          acceptNode(textNode) {{
+                            if (!(textNode instanceof Text)) return NodeFilter.FILTER_REJECT;
+                            if (!normalizeText(textNode.textContent || '')) return NodeFilter.FILTER_REJECT;
+                            const parent = textNode.parentElement;
+                            if (!parent || !wrapper.contains(parent)) return NodeFilter.FILTER_REJECT;
+                            if (parent.closest('[data-qa-block]')) return NodeFilter.FILTER_REJECT;
+                            if (parent.closest('script, style, [aria-hidden="true"]')) return NodeFilter.FILTER_REJECT;
+                            if (!isVisibleElement(parent)) return NodeFilter.FILTER_REJECT;
+                            return NodeFilter.FILTER_ACCEPT;
+                          }},
+                        }});
+                        let index = 0;
+                        while (walker.nextNode()) {{
+                          const textNode = walker.currentNode;
+                          const range = document.createRange();
+                          range.selectNodeContents(textNode);
+                          const textRects = Array.from(range.getClientRects())
+                            .filter((rect) => rect.width > 0 && rect.height > 0)
+                            .map((rect) => rectRelativeToBounds(rect, bounds));
+                          if (textRects.length === 0) continue;
+                          const contentRect = buildRelativeRectFromNodes([textNode.parentElement]) || {{
+                            left: round(Math.min(...textRects.map((rect) => rect.left))),
+                            top: round(Math.min(...textRects.map((rect) => rect.top))),
+                            right: round(Math.max(...textRects.map((rect) => rect.right))),
+                            bottom: round(Math.max(...textRects.map((rect) => rect.bottom))),
+                          }};
+                          index += 1;
+                          failures.push({{
+                            block_id: `untagged-text-${{index}}`,
+                            target_tag: textNode.parentElement.tagName.toLowerCase(),
+                            overflow_sides: [],
+                            scroll_overflow_x: false,
+                            scroll_overflow_y: false,
+                            block_rect: contentRect,
+                            overflow_reason: 'untagged_text_block',
+                            text_rect_count: textRects.length,
+                          }});
+                        }}
+                        return failures;
+                      }};
+                      const collectAdjacentReadableBlockFailures = (readableBlockNodes) => {{
+                        const readableBlocks = readableBlockNodes
+                          .filter((node) => node instanceof Element)
+                          .filter((node) => {{
+                            const blockId = String(node.getAttribute('data-qa-block') || '').toLowerCase();
+                            if (adjacentReadableBlockIgnoreIdTokens.some((token) => blockId.includes(token))) return false;
+                            return normalizeText(node.textContent || '').length > 0 && isVisibleElement(node);
+                          }})
+                          .map((node, index) => {{
+                            const rect = rectRelativeToBounds(node.getBoundingClientRect(), bounds);
+                            return {{
+                              node,
+                              id: node.getAttribute('data-qa-block') || `readable-block-${{index + 1}}`,
+                              tag: node.tagName.toLowerCase(),
+                              rect,
+                            }};
+                          }})
+                          .filter((item) => item.rect.width > 0 && item.rect.height > 0);
+                        const failures = [];
+                        const horizontalOverlap = (left, right) => Math.max(
+                          0,
+                          Math.min(left.rect.right, right.rect.right) - Math.max(left.rect.left, right.rect.left),
+                        );
+                        const verticalOverlap = (left, right) => Math.max(
+                          0,
+                          Math.min(left.rect.bottom, right.rect.bottom) - Math.max(left.rect.top, right.rect.top),
+                        );
+                        const hasEnoughHorizontalOverlap = (left, right) => {{
+                          const overlap = horizontalOverlap(left, right);
+                          const threshold = Math.max(
+                            minAdjacentReadableBlockOverlapPixels,
+                            Math.min(left.rect.width, right.rect.width) * minAdjacentReadableBlockOverlapRatio,
+                          );
+                          return overlap >= threshold;
+                        }};
+                        const hasEnoughVerticalOverlap = (left, right) => {{
+                          const overlap = verticalOverlap(left, right);
+                          const threshold = Math.max(
+                            minAdjacentReadableBlockOverlapPixels,
+                            Math.min(left.rect.height, right.rect.height) * minAdjacentReadableBlockOverlapRatio,
+                          );
+                          return overlap >= threshold;
+                        }};
+                        const pushFailure = (primary, adjacent, axis, gap, overlap) => {{
+                          failures.push({{
+                            block_id: primary.id,
+                            adjacent_block_id: adjacent.id,
+                            target_tag: primary.tag,
+                            overflow_sides: [],
+                            scroll_overflow_x: false,
+                            scroll_overflow_y: false,
+                            block_rect: primary.rect,
+                            adjacent_block_rect: adjacent.rect,
+                            overflow_reason: 'adjacent_readable_blocks_too_close',
+                            clearance_axis: axis,
+                            gap: round(gap),
+                            threshold: round(minAdjacentReadableBlockGap),
+                            overlap: round(overlap),
+                          }});
+                        }};
+                        for (let index = 0; index < readableBlocks.length; index += 1) {{
+                          const current = readableBlocks[index];
+                          for (const other of readableBlocks.slice(index + 1)) {{
+                            if (current.node.contains(other.node) || other.node.contains(current.node)) continue;
+                            const upper = current.rect.top <= other.rect.top ? current : other;
+                            const lower = upper === current ? other : current;
+                            const verticalGap = lower.rect.top - upper.rect.bottom;
+                            if (
+                              verticalGap >= -tolerance
+                              && verticalGap < minAdjacentReadableBlockGap
+                              && hasEnoughHorizontalOverlap(upper, lower)
+                            ) {{
+                              pushFailure(upper, lower, 'vertical', verticalGap, horizontalOverlap(upper, lower));
+                              continue;
+                            }}
+                            const left = current.rect.left <= other.rect.left ? current : other;
+                            const right = left === current ? other : current;
+                            const horizontalGap = right.rect.left - left.rect.right;
+                            if (
+                              horizontalGap >= -tolerance
+                              && horizontalGap < minAdjacentReadableBlockGap
+                              && hasEnoughVerticalOverlap(left, right)
+                            ) {{
+                              pushFailure(left, right, 'horizontal', horizontalGap, verticalOverlap(left, right));
+                            }}
+                          }}
+                        }}
+                        return failures;
+                      }};
                       if (!(wrapper instanceof Element)) {{
                         return {{
                           ...base,
@@ -451,10 +620,20 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                         }};
                       }}
                       const bounds = wrapper.getBoundingClientRect();
-                      const leafBlocks = Array.from(wrapper.querySelectorAll('[data-qa-block]'))
+                      const qaBlocks = Array.from(wrapper.querySelectorAll('[data-qa-block]'))
+                        .filter((node) => isVisibleElement(node));
+                      const leafBlocks = qaBlocks
                         .filter((node) => !node.querySelector('[data-qa-block]'))
                         .filter((node) => isVisibleElement(node));
-                      const failures = leafBlocks.flatMap((node, index) => {{
+                      const parentGroups = qaBlocks.filter((node) => {{
+                        if (!node.querySelector('[data-qa-block]')) return false;
+                        const style = window.getComputedStyle(node);
+                        const hasExplicitFrame = ['Top', 'Right', 'Bottom', 'Left']
+                          .some((side) => Number.parseFloat(style[`border${{side}}Width`] || '0') > 0);
+                        return hasExplicitFrame && hasDecorativeSurface(node);
+                      }});
+                      const adjacentReadableBlockFailures = collectAdjacentReadableBlockFailures(leafBlocks);
+                      const leafFailures = leafBlocks.flatMap((node, index) => {{
                         const blockId = node.getAttribute('data-qa-block') || `block-${{index + 1}}`;
                         return collectAuditTargets(node).map((target) => {{
                           const targetRect = target.getBoundingClientRect();
@@ -502,6 +681,32 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                           }};
                         }}).filter(Boolean);
                       }});
+                      const groupFailures = parentGroups.flatMap((node, index) => {{
+                        const groupId = node.getAttribute('data-qa-block') || `group-${{index + 1}}`;
+                        const groupRect = rectRelativeToBounds(node.getBoundingClientRect(), bounds);
+                        const descendantBlocks = Array.from(node.querySelectorAll('[data-qa-block]'))
+                          .filter((child) => child !== node && isVisibleElement(child));
+                        const contentRect = buildRelativeRectFromNodes(descendantBlocks);
+                        const overflowSides = overflowSidesForRects(contentRect, groupRect);
+                        if (overflowSides.length === 0) return [];
+                        return [{{
+                          block_id: groupId,
+                          target_tag: node.tagName.toLowerCase(),
+                          overflow_sides: overflowSides,
+                          scroll_overflow_x: false,
+                          scroll_overflow_y: false,
+                          block_rect: groupRect,
+                          content_rect: contentRect,
+                          overflow_reason: 'parent_group_frame_overflow',
+                          child_block_count: descendantBlocks.length,
+                        }}];
+                      }});
+                      const failures = [
+                        ...leafFailures,
+                        ...groupFailures,
+                        ...collectUncoveredTextFailures(),
+                        ...adjacentReadableBlockFailures,
+                      ];
                       return {{
                         ...base,
                         blockContentAudit: {{ failures }},

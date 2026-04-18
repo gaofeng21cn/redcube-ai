@@ -167,6 +167,15 @@
 - `deliverables/<deliverable-id>/deliverable.json`
 - 该 deliverable 对应的 `artifacts/`、`contracts/`、`reports/`、`views/`
 
+如果 workspace 里后续要做小红书图文，bootstrap 现在还会补一套 workspace 级作者模板：
+
+- `.redcube/runtime.json`
+- `.redcube/identity.json`
+- `.redcube/prompts/aligned/自动小红书/作者档案库.md`
+- `.redcube/README.md`
+
+这套模板默认是通用 `RedCube AI` 作者占位。当前项目真正的作者署名、品牌副标与叙事风格，直接在这里改。
+
 因此，推荐把新项目的标准调用顺序固定为：
 
 1. `redcube workspace doctor`

@@ -9,6 +9,7 @@ import {
   probeHermesNativeProof,
 } from '@redcube/hermes-substrate';
 import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
+import { getReviewState } from '@redcube/governance';
 
 import { runDeliverableRoute } from './deliverable-routes.js';
 import { appendManagedEvent } from './managed-event-log.js';
@@ -131,6 +132,31 @@ function readJsonIfExists(file) {
 
 function writeJson(file, value) {
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
+}
+
+function loadRouteReviewRerunPolicy({ workspaceRoot, topicId, deliverableId, stageId }) {
+  try {
+    const reviewState = getReviewState({ workspaceRoot, topicId, deliverableId }).state || null;
+    const rerunPolicy = reviewState?.rerun_policy || null;
+    if (safeText(reviewState?.latest_review_stage) !== safeText(stageId)) {
+      return null;
+    }
+    if (safeText(rerunPolicy?.status) !== 'rerun_required') {
+      return null;
+    }
+    const rerunFromStage = safeText(rerunPolicy?.rerun_from_stage);
+    if (!rerunFromStage) {
+      return null;
+    }
+    return {
+      currentStatus: safeText(reviewState?.current_status),
+      rerunFromStage,
+      rerunPolicy,
+      reviewState,
+    };
+  } catch {
+    return null;
+  }
 }
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
@@ -544,6 +570,16 @@ function nextStageId(stages, currentStageId) {
   return stages[index + 1]?.stage_id || null;
 }
 
+function reviewRerunStageAfterFixHtml(contract) {
+  const reviewStageId = safeText(contract?.review_surface?.artifact_stage);
+  if (!reviewStageId) {
+    return null;
+  }
+  const reviewHardStop = safeArray(contract?.stage_sequence?.hard_stops)
+    .find((entry) => safeText(entry?.stage_id) === reviewStageId);
+  return safeText(reviewHardStop?.rerun_from_stage, reviewStageId) || null;
+}
+
 function buildSkippedStageResult({
   managedRun,
   stageId,
@@ -603,6 +639,10 @@ function shouldSkipManagedStage({
 }
 
 function buildStageIngestion({
+  workspaceRoot,
+  topicId,
+  deliverableId,
+  contract,
   managedRun,
   routeResult,
   stageId,
@@ -613,7 +653,10 @@ function buildStageIngestion({
     routeResult?.artifactFile,
     ...safeArray(routeResult?.run?.artifact_refs),
   ]);
-  const nextStage = nextStageId(stages, stageId);
+  const forcedNextStage = managedRun?.mode === 'auto_to_terminal' && stageId === 'fix_html'
+    ? reviewRerunStageAfterFixHtml(contract)
+    : null;
+  const nextStage = forcedNextStage || nextStageId(stages, stageId);
 
   if (routeResult?.ok !== true) {
     const errorCode = safeText(
@@ -628,6 +671,12 @@ function buildStageIngestion({
       routeResult?.error?.message || routeResult?.run?.error?.message || routeResult?.error,
       'route_execution_failed',
     );
+    const reviewRerunPolicy = loadRouteReviewRerunPolicy({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+      stageId,
+    });
     if (errorCode === 'compatibility_adapter_route_unsupported'
       && safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER) !== CODEX_DEFAULT_ADAPTER) {
       return {
@@ -645,6 +694,28 @@ function buildStageIngestion({
         controller_decision: {
           decision: 'switch_to_primary_adapter',
           reason_code: 'compatibility_adapter_route_unsupported',
+          requires_human_confirmation: false,
+          requires_external_secret: false,
+        },
+        recorded_at: new Date().toISOString(),
+      };
+    }
+    if (reviewRerunPolicy) {
+      return {
+        schema_version: 1,
+        managed_run_id: managedRun.managed_run_id,
+        stage_id: stageId,
+        attempt,
+        route_run_id: safeText(routeResult?.run?.run_id) || null,
+        status: 'failed',
+        summary: `${stageLabel(stageId)}要求回到${stageLabel(reviewRerunPolicy.rerunFromStage)}继续修复，系统已自动切回返修阶段。`,
+        artifacts: artifactRefs,
+        decision: 'rerun_from_review_stage',
+        next_action: `run_${reviewRerunPolicy.rerunFromStage}`,
+        blocking_reason: blockingReason,
+        controller_decision: {
+          decision: 'rerun_from_review_stage',
+          reason_code: 'review_rerun_required',
           requires_human_confirmation: false,
           requires_external_secret: false,
         },
@@ -876,6 +947,24 @@ function applyStageIngestion({
     return { done: false, ok: true, retry: true };
   }
 
+  if (stageResult.decision === 'rerun_from_review_stage') {
+    const targetStageId = safeText(stageResult.next_action).replace(/^run_/, '');
+    managedRun.status = 'running';
+    managedRun.current_blockers = [stageResult.blocking_reason].filter(Boolean);
+    managedRun.runtime_health_status = 'recovering';
+    managedRun.parking_reason_code = safeText(stageResult.controller_decision?.reason_code) || null;
+    managedRun.requires_human_confirmation = false;
+    managedRun.requires_external_secret = false;
+    managedRun.next_system_action = `系统将回到${stageLabel(targetStageId)}继续修复。`;
+    managedRun.needs_user_decision = false;
+    pushManagedEvent(workspaceRoot, managedRun, {
+      kind: 'stage_rerun_requested',
+      stageId: stageResult.stage_id,
+      summary: stageResult.summary,
+    });
+    return { done: false, ok: true, jumpToStageId: targetStageId };
+  }
+
   if (stageResult.decision === 'switch_to_primary_adapter') {
     const previousAdapter = safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER);
     managedRun.status = 'running';
@@ -1082,6 +1171,10 @@ export async function runManagedDeliverable({
     writeJson(promptAuditRef, promptAudit);
 
     const stageResult = buildStageIngestion({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+      contract,
       managedRun,
       routeResult,
       stageId,
@@ -1119,6 +1212,17 @@ export async function runManagedDeliverable({
       continue;
     }
 
+    if (safeText(applied.jumpToStageId)) {
+      const jumpIndex = stages.findIndex(
+        (stage) => safeText(stage?.stage_id) === safeText(applied.jumpToStageId),
+      );
+      if (jumpIndex === -1) {
+        throw new Error(`Managed rerun stage not declared by contract: ${applied.jumpToStageId}`);
+      }
+      stageIndex = jumpIndex;
+      continue;
+    }
+
     if (applied.done) {
       return {
         ok: applied.ok,
@@ -1127,6 +1231,17 @@ export async function runManagedDeliverable({
         runtime_supervision: managedState.runtimeSupervision,
         escalation_record: managedState.escalationRecord,
       };
+    }
+
+    const scheduledStageId = safeText(stageResult.next_action).replace(/^run_/, '');
+    if (scheduledStageId) {
+      const scheduledIndex = stages.findIndex(
+        (stage) => safeText(stage?.stage_id) === scheduledStageId,
+      );
+      if (scheduledIndex !== -1) {
+        stageIndex = scheduledIndex;
+        continue;
+      }
     }
 
     stageIndex += 1;

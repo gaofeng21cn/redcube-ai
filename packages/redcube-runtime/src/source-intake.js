@@ -12,6 +12,7 @@ import {
   getSourceArtifactPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
+import { ensureWorkspaceXiaohongshuAuthorTemplate } from '../../redcube-config/src/xiaohongshu-author-profile.js';
 import { buildSourceReadinessPack } from './source-readiness-pack.js';
 import { buildSourceAugmentationRequest } from './source-augmentation-request.js';
 
@@ -97,6 +98,9 @@ function ensureWorkspaceAndTopic({ workspaceRoot, topicId, title }) {
       mode: 'agent_first_runtime',
     });
   }
+  ensureWorkspaceXiaohongshuAuthorTemplate({
+    workspaceRoot: contract.workspaceRoot,
+  });
 
   ensureDir(sourcePaths.topicPaths.topicDir);
   ensureDir(sourcePaths.topicPaths.inputsDir);

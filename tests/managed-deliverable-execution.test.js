@@ -597,6 +597,68 @@ test('managed execution keeps xiaohongshu on the Codex-backed human-publication 
   });
 });
 
+test('managed xiaohongshu follows review rerun_from_stage and finishes after fix_html instead of stopping on screenshot block', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-xhs-rerun-'));
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: '托管小红书回修主线',
+      brief: '验证 managed 遇到 screenshot_review block 时会自动回到 fix_html 而不是停住。',
+      keywords: ['小红书', 'fix_html', 'managed'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: '托管小红书回修主线',
+      goal: '验证 review block 的 auto rerun 行为',
+    });
+
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_XHS_RENDER_VARIANT: 'repair_marker',
+      REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT: 'block_until_fix_html',
+    });
+    try {
+      const result = await runManagedDeliverable({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        userIntent: '给我一篇最终可发布的小红书图文',
+      });
+
+      assert.equal(result.ok, true);
+      assert.equal(result.summary.status, 'completed');
+      assert.deepEqual(
+        result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+        [
+          'research',
+          'storyline',
+          'single_note_plan',
+          'visual_direction',
+          'render_html',
+          'visual_director_review',
+          'screenshot_review',
+          'fix_html',
+          'visual_director_review',
+          'screenshot_review',
+          'publish_copy',
+          'export_bundle',
+        ],
+      );
+      assert.equal(result.runtime_supervision.health_status, 'completed');
+      assert.equal(result.progress_projection.content_status, 'completed');
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
 test('managed execution keeps poster_onepager on the guarded knowledge-poster closure without drifting direct-delivery truth', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-poster-'));

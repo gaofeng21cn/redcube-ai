@@ -82,6 +82,51 @@ test('intakeSource creates canonical source truth from brief and keywords', asyn
   assert.equal(materials.materials.some((item) => item.kind === 'brief'), true);
 });
 
+test('intakeSource scaffolds workspace-level xiaohongshu author template with generic RedCube defaults', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-workspace-template-'));
+
+  const result = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-template',
+    title: '通用知识主题',
+    brief: '验证 brand-new workspace 会自动生成可修改的作者模板。',
+    keywords: ['通用', '作者模板'],
+  });
+
+  assert.equal(result.ok, true);
+
+  const runtimeFile = path.join(workspaceRoot, '.redcube', 'runtime.json');
+  const identityFile = path.join(workspaceRoot, '.redcube', 'identity.json');
+  const readmeFile = path.join(workspaceRoot, '.redcube', 'README.md');
+  const authorLibraryFile = path.join(
+    workspaceRoot,
+    '.redcube',
+    'prompts',
+    'aligned',
+    '自动小红书',
+    '作者档案库.md',
+  );
+
+  assert.equal(existsSync(runtimeFile), true);
+  assert.equal(existsSync(identityFile), true);
+  assert.equal(existsSync(readmeFile), true);
+  assert.equal(existsSync(authorLibraryFile), true);
+
+  const runtime = readJson(runtimeFile);
+  const identity = readJson(identityFile);
+  const authorLibrary = readFileSync(authorLibraryFile, 'utf-8');
+  const readme = readFileSync(readmeFile, 'utf-8');
+
+  assert.equal(runtime.promptsDir, './prompts');
+  assert.equal(identity.defaultProfileId, 'redcube_author');
+  assert.equal(identity.routing.medicalProfileId, 'redcube_author');
+  assert.equal(identity.profiles.redcube_author.signatureDisplay, 'RedCube AI');
+  assert.equal(identity.profiles.redcube_author.signatureSubtitle, '请改成你的署名与品牌');
+  assert.match(authorLibrary, /## profile_id: redcube_author/);
+  assert.match(authorLibrary, /署名显示：RedCube AI/);
+  assert.match(readme, /workspace 级作者配置模板/);
+});
+
 test('intakeSource writes canonical source readiness pack for downstream planning', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-pack-'));
 

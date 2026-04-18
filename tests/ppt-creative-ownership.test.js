@@ -58,6 +58,28 @@ async function runPptRoutes({ workspaceRoot, deliverableId, routes }) {
   return results;
 }
 
+function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliverableId = 'deck-a') {
+  const deliverableDir = path.join(
+    workspaceRoot,
+    'topics',
+    topicId,
+    'deliverables',
+    deliverableId,
+  );
+  const viewsDir = path.join(deliverableDir, 'views');
+  const operatorDir = path.join(viewsDir, 'operator');
+  return {
+    deliverableDir,
+    viewsDir,
+    operatorDir,
+    operatorOutlineDir: path.join(operatorDir, '大纲'),
+    operatorSlidesDir: path.join(operatorDir, '幻灯片'),
+    operatorReferencesDir: path.join(operatorDir, '参考材料'),
+    reportsDir: path.join(deliverableDir, 'reports'),
+    publishDir: path.join(deliverableDir, 'publish'),
+  };
+}
+
 test('ppt clears code-authored Story Architecture / Visual Authorship residue and adds explicit visual_director_review', () => {
   const pack = read('packages/redcube-pack-ppt/src/index.js');
   const packTypes = read('packages/redcube-pack-ppt/src/index.ts');
@@ -72,6 +94,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const fixHtmlPrompt = read('prompts/ppt_deck/fix_html.md');
   const renderShell = read('prompts/ppt_deck/render_shell.html');
   const directorReviewPrompt = read('prompts/ppt_deck/director_review.md');
+  const screenshotReviewPrompt = read('prompts/ppt_deck/screenshot_review.md');
   const reviewScript = read('packages/redcube-runtime/scripts/ppt_deck_review.py');
   const overlayProfiles = read('packages/redcube-overlay-ppt/src/profiles.js');
 
@@ -98,11 +121,17 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(outlinePrompt, /"render_recipe_id": "ppt\./);
   assert.match(visualPrompt, /"peak_pages": \[/);
   assert.match(visualPrompt, /"typography_plan": \{/);
+  assert.match(visualPrompt, /Font Awesome Free/);
   assert.match(visualPrompt, /纵向信息分布/);
+  assert.match(visualPrompt, /相邻可读块安全间距/);
   assert.match(renderHtmlPrompt, /## runtime_artifact/);
+  assert.match(renderHtmlPrompt, /Font Awesome Free/);
+  assert.match(renderHtmlPrompt, /孤立单字贴纸/);
   assert.match(renderHtmlPrompt, /header safe zone/);
   assert.match(renderHtmlPrompt, /foundation \/ substrate \/ base band/);
   assert.match(renderHtmlPrompt, /任何带字元素都必须拥有独立留白/);
+  assert.match(renderHtmlPrompt, /父容器|成组容器|群组容器/);
+  assert.match(renderHtmlPrompt, /读者可见文字.*data-qa-block/);
   assert.match(renderHtmlPrompt, /同一页面家族重复出现/);
   assert.match(renderHtmlPrompt, /reference_slides/);
   assert.match(renderHtmlPrompt, /typography_plan/);
@@ -115,10 +144,17 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(renderHtmlPrompt, /页码语法/);
   assert.match(renderHtmlPrompt, /正文页主标题字号必须在整套 deck 中保持一致/);
   assert.match(renderHtmlPrompt, /连接线.*放在节点徽标.*下层/);
+  assert.match(renderHtmlPrompt, /相邻读者可见.*安全间距/);
   assert.match(fixHtmlPrompt, /纵向信息分布/);
+  assert.match(fixHtmlPrompt, /Font Awesome Free/);
+  assert.match(fixHtmlPrompt, /孤立单字贴纸/);
+  assert.match(fixHtmlPrompt, /父容器|成组容器|群组容器/);
+  assert.match(fixHtmlPrompt, /读者可见文字.*data-qa-block/);
   assert.match(fixHtmlPrompt, /左拆右并/);
   assert.match(fixHtmlPrompt, /页码/);
+  assert.match(fixHtmlPrompt, /相邻读者可见.*安全间距/);
   assert.equal(renderHtmlPrompt.includes('"template_registry"'), false);
+  assert.match(renderShell, /font-awesome\/6\.5\.1/);
   assert.match(renderShell, /titleFontSize/);
   assert.match(renderShell, /headerRect/);
   assert.match(renderShell, /edgeClearance/);
@@ -130,14 +166,18 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.match(directorReviewPrompt, /同一页面家族重复出现/);
   assert.match(directorReviewPrompt, /controller.*唯一主峰/);
   assert.match(directorReviewPrompt, /底部说明.*最多保留 ?2/);
+  assert.match(reviewScript, /group frame|group_frame|parent group|parent_frame/i);
   assert.match(reviewScript, /device_scale_factor=.*2/);
   assert.match(reviewScript, /--device-scale-factor/);
   assert.match(reviewScript, /edge_clearance_out_of_range/);
   assert.match(reviewScript, /block_content_overflow_detected/);
+  assert.match(reviewScript, /adjacent_readable_blocks_too_close/);
   assert.match(reviewScript, /title_typography_inconsistent/);
   assert.match(reviewScript, /edge_clearance_ok/);
   assert.match(reviewScript, /block_content_fit_ok/);
   assert.match(reviewScript, /title_typography_ok/);
+  assert.match(screenshotReviewPrompt, /读者可见文字.*data-qa-block/);
+  assert.match(screenshotReviewPrompt, /相邻读者可见.*视觉贴住/);
   assert.match(overlayProfiles, /edge_clearance_ok/);
   assert.match(overlayProfiles, /block_content_fit_ok/);
   assert.match(overlayProfiles, /title_typography_ok/);
@@ -486,9 +526,9 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
   });
 });
 
-test('ppt route artifacts materialize lecture workbench files for the staged workflow', async () => {
+test('ppt route artifacts materialize lecture operator view files inside the canonical deliverable surface', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-workbench-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-operator-surface-'));
     await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
@@ -513,12 +553,13 @@ test('ppt route artifacts materialize lecture workbench files for the staged wor
       artifacts.push(readJson(result.artifactFile));
     }
 
-    const storylineFile = artifacts[0].artifact_refs.find((ref) => ref.endsWith('/故事主线.md'));
-    const detailedOutlineFile = artifacts[1].artifact_refs.find((ref) => ref.endsWith('/详细大纲.md'));
-    const blueprintFile = artifacts[2].artifact_refs.find((ref) => ref.includes('/大纲/') && ref.endsWith('.md') && !ref.endsWith('_视觉导演稿.md'));
-    const visualDirectionFile = artifacts[3].artifact_refs.find((ref) => ref.endsWith('_视觉导演稿.md'));
-    const htmlFile = artifacts[4].artifact_refs.find((ref) => ref.includes('/幻灯片/') && ref.endsWith('.html'));
-    const referenceIndexFile = artifacts[4].artifact_refs.find((ref) => ref.endsWith('/参考材料/来源索引.md'));
+    const surfacePaths = getPptDeliverableSurfacePaths(workspaceRoot);
+    const storylineFile = artifacts[0].artifact_refs.find((ref) => ref.endsWith('/views/operator/故事主线.md'));
+    const detailedOutlineFile = artifacts[1].artifact_refs.find((ref) => ref.endsWith('/views/operator/详细大纲.md'));
+    const blueprintFile = artifacts[2].artifact_refs.find((ref) => ref.includes('/views/operator/大纲/') && ref.endsWith('.md') && !ref.endsWith('_视觉导演稿.md'));
+    const visualDirectionFile = artifacts[3].artifact_refs.find((ref) => ref.endsWith('/views/operator/大纲/Med Auto Science 同行讲课_视觉导演稿.md'));
+    const htmlFile = artifacts[4].artifact_refs.find((ref) => ref.endsWith('/views/deck-a.draft.html'));
+    const referenceIndexFile = artifacts[4].artifact_refs.find((ref) => ref.endsWith('/views/operator/参考材料/来源索引.md'));
 
     assert.equal(existsSync(path.resolve(storylineFile)), true);
     assert.equal(existsSync(path.resolve(detailedOutlineFile)), true);
@@ -533,6 +574,9 @@ test('ppt route artifacts materialize lecture workbench files for the staged wor
     assert.match(read(visualDirectionFile), /## 本章视觉宣言/);
     assert.match(read(htmlFile), /slidesData/);
     assert.match(read(referenceIndexFile), /来源索引/);
+    assert.equal(path.dirname(storylineFile), surfacePaths.operatorDir);
+    assert.equal(path.dirname(detailedOutlineFile), surfacePaths.operatorDir);
+    assert.equal(path.dirname(referenceIndexFile), surfacePaths.operatorReferencesDir);
   });
 });
 
@@ -586,7 +630,7 @@ test('ppt screenshot_review writes immutable capture screenshots and export uses
   });
 });
 
-test('ppt rerunning upstream HTML keeps the last exported workbench PPTX visible while publication projection falls back to draft', async () => {
+test('ppt rerunning upstream HTML keeps the last exported publish bundle visible while publication projection falls back to draft', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-stale-export-'));
     await createDeliverable({
@@ -620,11 +664,11 @@ test('ppt rerunning upstream HTML keeps the last exported workbench PPTX visible
       assert.equal(result.ok, true, route);
     }
 
-    const workbenchPptxDir = path.join(workspaceRoot, 'Med Auto Science 同行讲课', 'pptx');
-    const workbenchPptxFile = path.join(workbenchPptxDir, 'Med Auto Science 同行讲课.pptx');
-    const archiveDir = path.join(workbenchPptxDir, 'archive');
-    const readmeFile = path.join(workbenchPptxDir, 'README.md');
-    assert.equal(existsSync(workbenchPptxFile), true);
+    const surfacePaths = getPptDeliverableSurfacePaths(workspaceRoot);
+    const publishPptxFile = path.join(surfacePaths.publishDir, 'deck-a.pptx');
+    const archiveDir = path.join(surfacePaths.publishDir, 'archive');
+    const readmeFile = path.join(surfacePaths.publishDir, 'README.md');
+    assert.equal(existsSync(publishPptxFile), true);
 
     const rerender = await runDeliverableRoute({
       workspaceRoot,
@@ -642,7 +686,7 @@ test('ppt rerunning upstream HTML keeps the last exported workbench PPTX visible
     assert.equal(projection.current, 'draft');
     assert.equal(projection.deliverables['deck-a']?.current, 'draft');
     assert.equal(projection.deliverables['deck-a']?.delivery_state, null);
-    assert.equal(existsSync(workbenchPptxFile), true);
+    assert.equal(existsSync(publishPptxFile), true);
     assert.equal(existsSync(archiveDir), false);
     assert.match(read(readmeFile), /当前导出状态：last_export_available/);
     assert.match(read(readmeFile), /最近一次导出的 .* 仍保留在当前目录/);
@@ -650,7 +694,7 @@ test('ppt rerunning upstream HTML keeps the last exported workbench PPTX visible
   });
 });
 
-test('ppt rerender restores the last exported workbench PPTX when only the workbench surface copy is missing', async () => {
+test('ppt rerender keeps a missing canonical publish bundle missing until a new export recreates it', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-export-restore-'));
     await createDeliverable({
@@ -684,10 +728,11 @@ test('ppt rerender restores the last exported workbench PPTX when only the workb
       assert.equal(result.ok, true, route);
     }
 
-    const workbenchPptxFile = path.join(workspaceRoot, 'Med Auto Science 同行讲课', 'pptx', 'Med Auto Science 同行讲课.pptx');
-    assert.equal(existsSync(workbenchPptxFile), true);
-    rmSync(workbenchPptxFile, { force: true });
-    assert.equal(existsSync(workbenchPptxFile), false);
+    const surfacePaths = getPptDeliverableSurfacePaths(workspaceRoot);
+    const publishPptxFile = path.join(surfacePaths.publishDir, 'deck-a.pptx');
+    assert.equal(existsSync(publishPptxFile), true);
+    rmSync(publishPptxFile, { force: true });
+    assert.equal(existsSync(publishPptxFile), false);
 
     const rerender = await runDeliverableRoute({
       workspaceRoot,
@@ -697,7 +742,7 @@ test('ppt rerender restores the last exported workbench PPTX when only the workb
       route: 'render_html',
     });
     assert.equal(rerender.ok, true);
-    assert.equal(existsSync(workbenchPptxFile), true);
+    assert.equal(existsSync(publishPptxFile), false);
   });
 });
 
@@ -734,16 +779,13 @@ test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a
       assert.equal(result.ok, true, route);
     }
 
-    const workbenchSlidesDir = path.join(workspaceRoot, 'Med Auto Science 同行讲课', '幻灯片');
-    const reviewedHtmlFile = path.join(workbenchSlidesDir, 'Med Auto Science 同行讲课.html');
-    const draftHtmlFile = path.join(workbenchSlidesDir, 'Med Auto Science 同行讲课_当前草稿.html');
-    const reviewMarkdownFile = path.join(workbenchSlidesDir, 'Med Auto Science 同行讲课_视觉质控.md');
-    const deliverableViewsDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-a', 'views');
-    const stableViewHtmlFile = path.join(deliverableViewsDir, 'deck-a.html');
-    const draftViewHtmlFile = path.join(deliverableViewsDir, 'deck-a.draft.html');
-    const stableViewSlidesFile = path.join(deliverableViewsDir, 'deck-a.slides.json');
-    const draftViewSlidesFile = path.join(deliverableViewsDir, 'deck-a.draft.slides.json');
-    const reviewedHtmlMtimeMs = statSync(reviewedHtmlFile).mtimeMs;
+    const surfacePaths = getPptDeliverableSurfacePaths(workspaceRoot);
+    const reviewMarkdownFile = path.join(surfacePaths.reportsDir, 'deck-a_视觉质控.md');
+    const stableViewHtmlFile = path.join(surfacePaths.viewsDir, 'deck-a.html');
+    const draftViewHtmlFile = path.join(surfacePaths.viewsDir, 'deck-a.draft.html');
+    const stableViewSlidesFile = path.join(surfacePaths.viewsDir, 'deck-a.slides.json');
+    const draftViewSlidesFile = path.join(surfacePaths.viewsDir, 'deck-a.draft.slides.json');
+    const reviewedHtmlMtimeMs = statSync(stableViewHtmlFile).mtimeMs;
     const reviewMarkdownMtimeMs = statSync(reviewMarkdownFile).mtimeMs;
     const stableViewHtmlMtimeMs = statSync(stableViewHtmlFile).mtimeMs;
     const stableViewHtmlContent = read(stableViewHtmlFile);
@@ -759,10 +801,10 @@ test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a
     });
     assert.equal(rerender.ok, true);
 
-    assert.equal(statSync(reviewedHtmlFile).mtimeMs, reviewedHtmlMtimeMs);
+    assert.equal(statSync(stableViewHtmlFile).mtimeMs, reviewedHtmlMtimeMs);
     assert.equal(statSync(reviewMarkdownFile).mtimeMs, reviewMarkdownMtimeMs);
-    assert.equal(existsSync(draftHtmlFile), true);
-    assert.equal(statSync(draftHtmlFile).mtimeMs >= reviewedHtmlMtimeMs, true);
+    assert.equal(existsSync(draftViewHtmlFile), true);
+    assert.equal(statSync(draftViewHtmlFile).mtimeMs >= reviewedHtmlMtimeMs, true);
     assert.equal(statSync(stableViewHtmlFile).mtimeMs, stableViewHtmlMtimeMs);
     assert.equal(read(stableViewHtmlFile), stableViewHtmlContent);
     assert.equal(read(stableViewSlidesFile), stableViewSlidesContent);
@@ -787,9 +829,8 @@ test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a
     });
     assert.equal(screenshotReview.ok, true);
 
-    assert.equal(statSync(reviewedHtmlFile).mtimeMs > reviewedHtmlMtimeMs, true);
+    assert.equal(statSync(stableViewHtmlFile).mtimeMs > reviewedHtmlMtimeMs, true);
     assert.equal(statSync(reviewMarkdownFile).mtimeMs > reviewMarkdownMtimeMs, true);
-    assert.equal(existsSync(draftHtmlFile), false);
     assert.equal(statSync(stableViewHtmlFile).mtimeMs > stableViewHtmlMtimeMs, true);
     assert.equal(existsSync(draftViewHtmlFile), true);
     assert.equal(existsSync(draftViewSlidesFile), true);
@@ -829,16 +870,15 @@ test('ppt blocked screenshot_review keeps the prior default HTML and preserves t
       assert.equal(result.ok, true, route);
     }
 
-    const workbenchSlidesDir = path.join(workspaceRoot, 'Med Auto Science 同行讲课', '幻灯片');
-    const reviewedHtmlFile = path.join(workbenchSlidesDir, 'Med Auto Science 同行讲课.html');
-    const draftHtmlFile = path.join(workbenchSlidesDir, 'Med Auto Science 同行讲课_当前草稿.html');
-    const reviewMarkdownFile = path.join(workbenchSlidesDir, 'Med Auto Science 同行讲课_视觉质控.md');
-    const slidesReadmeFile = path.join(workbenchSlidesDir, 'README.md');
-    const deliverableViewsDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-a', 'views');
-    const stableViewHtmlFile = path.join(deliverableViewsDir, 'deck-a.html');
-    const draftViewHtmlFile = path.join(deliverableViewsDir, 'deck-a.draft.html');
-    const stableViewSlidesFile = path.join(deliverableViewsDir, 'deck-a.slides.json');
-    const draftViewSlidesFile = path.join(deliverableViewsDir, 'deck-a.draft.slides.json');
+    const surfacePaths = getPptDeliverableSurfacePaths(workspaceRoot);
+    const reviewedHtmlFile = path.join(surfacePaths.viewsDir, 'deck-a.html');
+    const draftHtmlFile = path.join(surfacePaths.viewsDir, 'deck-a.draft.html');
+    const reviewMarkdownFile = path.join(surfacePaths.reportsDir, 'deck-a_视觉质控.md');
+    const slidesReadmeFile = path.join(surfacePaths.operatorSlidesDir, 'README.md');
+    const stableViewHtmlFile = path.join(surfacePaths.viewsDir, 'deck-a.html');
+    const draftViewHtmlFile = path.join(surfacePaths.viewsDir, 'deck-a.draft.html');
+    const stableViewSlidesFile = path.join(surfacePaths.viewsDir, 'deck-a.slides.json');
+    const draftViewSlidesFile = path.join(surfacePaths.viewsDir, 'deck-a.draft.slides.json');
     const qualityGateFile = path.join(
       workspaceRoot,
       'topics',
@@ -896,7 +936,7 @@ test('ppt blocked screenshot_review keeps the prior default HTML and preserves t
     assert.equal(read(reviewedHtmlFile), reviewedHtmlContent);
     assert.equal(statSync(reviewMarkdownFile).mtimeMs > reviewMarkdownMtimeMs, true);
     assert.equal(existsSync(draftHtmlFile), true);
-    assert.match(read(slidesReadmeFile), /草稿 HTML：Med Auto Science 同行讲课_当前草稿\.html/);
+    assert.match(read(slidesReadmeFile), /草稿 HTML：deck-a\.draft\.html/);
     assert.match(read(slidesReadmeFile), /最近一次截图质控：block/);
     assert.equal(statSync(stableViewHtmlFile).mtimeMs, stableViewHtmlMtimeMs);
     assert.equal(read(stableViewHtmlFile), stableViewHtmlContent);
@@ -1606,9 +1646,7 @@ test('ppt fix_html honors operator revision brief slide ids in targeted rerender
     }, null, 2), 'utf-8');
 
     const operatorBriefFile = path.join(
-      workspaceRoot,
-      'Med Auto Science 同行讲课',
-      '幻灯片',
+      getPptDeliverableSurfacePaths(workspaceRoot).operatorSlidesDir,
       '当前返修要求.md',
     );
     writeFileSync(operatorBriefFile, [
@@ -1710,9 +1748,7 @@ test('ppt fix_html scopes targeted rerender to operator-requested slides when on
     }, null, 2), 'utf-8');
 
     const operatorBriefFile = path.join(
-      workspaceRoot,
-      'Med Auto Science 同行讲课',
-      '幻灯片',
+      getPptDeliverableSurfacePaths(workspaceRoot).operatorSlidesDir,
       '当前返修要求.md',
     );
     writeFileSync(operatorBriefFile, [
@@ -1808,9 +1844,7 @@ test('ppt render_html ignores stale targeted revision context after visual_direc
     }, null, 2), 'utf-8');
 
     const operatorBriefFile = path.join(
-      workspaceRoot,
-      'Med Auto Science 同行讲课',
-      '幻灯片',
+      getPptDeliverableSurfacePaths(workspaceRoot).operatorSlidesDir,
       '当前返修要求.md',
     );
     writeFileSync(operatorBriefFile, [
@@ -1954,9 +1988,7 @@ test('ppt fix_html still allows targeted revision after visual_direction refresh
     writeFileSync(path.join(screenshotsDir, 'slide-04.png'), TINY_PNG);
 
     const operatorBriefFile = path.join(
-      workspaceRoot,
-      'Med Auto Science 同行讲课',
-      '幻灯片',
+      getPptDeliverableSurfacePaths(workspaceRoot).operatorSlidesDir,
       '当前返修要求.md',
     );
     writeFileSync(operatorBriefFile, [

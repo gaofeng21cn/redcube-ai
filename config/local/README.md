@@ -16,5 +16,6 @@
 推荐做法：
 
 - 公开仓库只保留 `config/defaults/*.json`
-- 个人环境把真实目录、品牌、人设写到 `config/local/*.json`
-- 如果需要跨机器同步，再放到 `~/.config/redcube/*.json` 或 `<workspace>/.redcube/*.json`
+- 当前项目自己的作者、人设与品牌优先写到 `<workspace>/.redcube/*.json`
+- `config/local/*.json` 适合本机临时覆盖
+- 如果需要跨机器同步，再放到 `~/.config/redcube/*.json`

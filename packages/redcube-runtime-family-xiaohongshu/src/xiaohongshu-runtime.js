@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { spawnSync } from 'node:child_process';
 
 import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
+import { resolveWorkspaceXiaohongshuAuthorProfile } from '../../redcube-config/src/xiaohongshu-author-profile.js';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
@@ -69,6 +70,7 @@ const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
   'speaker_fit_out_of_range',
 ]);
 const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
+  'director_intent_landed',
   'ai_review_passed',
   'overflow_free',
   'occlusion_free',
@@ -77,6 +79,15 @@ const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
   'speaker_fit_ok',
   'cover_density_ok',
 ]);
+const XHS_REVIEW_CHECK_LABELS = Object.freeze({
+  ai_review_passed: '首眼语义与视觉锚点',
+  overflow_free: '页面溢出',
+  occlusion_free: '遮挡与叠压',
+  visual_density_ok: '信息密度与版心分布',
+  block_content_fit_ok: '卡片内容贴边或断裂',
+  speaker_fit_ok: '讲述节奏',
+  cover_density_ok: '封面抓停与呼吸',
+});
 const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   research: 'source_readiness',
   storyline: 'story_architecture',
@@ -270,6 +281,40 @@ function requireObjectArray(value, field, { min = 0, max = Infinity } = {}) {
   return items;
 }
 
+function joinHumanList(items) {
+  return safeArray(items).map((item) => safeText(item)).filter(Boolean).join('、');
+}
+
+function summarizeXhsFailedChecks(failedChecks) {
+  return [...new Set(
+    safeArray(failedChecks)
+      .map((checkId) => safeText(XHS_REVIEW_CHECK_LABELS[safeText(checkId)]))
+      .filter(Boolean),
+  )];
+}
+
+function buildDeterministicFixHtmlSummary({ targetSlideIds, revisionContext }) {
+  const targetSummary = joinHumanList(targetSlideIds);
+  const weakPages = [...new Set(
+    safeArray(revisionContext?.screenshot_review?.weak_pages)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean),
+  )];
+  const failedChecks = summarizeXhsFailedChecks(revisionContext?.screenshot_review?.failed_checks);
+  const summary = [
+    `本轮 fix_html 定向修复 ${targetSummary}，未点名页面继续锁定，保持同一套研究纸面、作者署名和页面家族。`,
+  ];
+  if (failedChecks.length > 0) {
+    summary.push(`优先处理 ${joinHumanList(failedChecks)}，把封面、副标、节点卡和页脚关系拉回可发布间距。`);
+  } else {
+    summary.push('优先处理截图质检点名的遮挡、贴边、坏断句和底部收束问题。');
+  }
+  if (weakPages.length > 0) {
+    summary.push(`同轮纳入 ${joinHumanList(weakPages)} 的弱页，避免只修硬阻断页后继续留下风格漂移。`);
+  }
+  return summary.slice(0, 3);
+}
+
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
   return dir;
@@ -284,23 +329,187 @@ function copySurfaceFile(source, destination) {
   return destinationFile;
 }
 
+function extractFirstJsonCodeBlock(markdown) {
+  const match = String(markdown || '').match(/```json\s*([\s\S]*?)\s*```/i);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeOperatorRevisionBrief(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const slideFeedback = safeArray(value.slide_feedback)
+    .map((item) => ({
+      slide_id: safeText(item?.slide_id),
+      issues: safeArray(item?.issues).map((issue) => safeText(issue)).filter(Boolean),
+      keep: safeArray(item?.keep).map((entry) => safeText(entry)).filter(Boolean),
+      avoid: safeArray(item?.avoid).map((entry) => safeText(entry)).filter(Boolean),
+    }))
+    .filter((item) => item.slide_id);
+  const targetSlideIds = [...new Set([
+    ...safeArray(value.target_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+    ...slideFeedback.map((item) => item.slide_id),
+  ])];
+  const globalRequirements = safeArray(value.global_requirements)
+    .map((item) => safeText(item))
+    .filter(Boolean);
+  if (targetSlideIds.length === 0 && globalRequirements.length === 0) {
+    return null;
+  }
+  return {
+    target_slide_ids: targetSlideIds,
+    global_requirements: globalRequirements,
+    slide_feedback: slideFeedback,
+  };
+}
+
 function getDeliverableViewSurfacePaths(deliverablePaths) {
   const baseName = safeText(deliverablePaths?.deliverableId, 'deliverable');
   return {
     stableHtmlFile: path.join(deliverablePaths.viewsDir, `${baseName}.html`),
     draftHtmlFile: path.join(deliverablePaths.viewsDir, `${baseName}.draft.html`),
+    currentHtmlFile: path.join(deliverablePaths.viewsDir, `${baseName}.current.html`),
+    viewsReadmeFile: path.join(deliverablePaths.viewsDir, 'README.md'),
+    operatorDir: path.join(deliverablePaths.viewsDir, 'operator'),
+    revisionBriefFile: path.join(deliverablePaths.viewsDir, 'operator', '当前返修要求.md'),
   };
 }
 
-function seedStableHtmlIfMissing(paths, htmlFile) {
-  if (existsSync(paths.stableHtmlFile)) return [];
-  const ref = copySurfaceFile(htmlFile, paths.stableHtmlFile);
-  return ref ? [ref] : [];
+function getDeliverablePublishSurfacePaths(deliverablePaths) {
+  const baseName = safeText(deliverablePaths?.deliverableId, 'deliverable');
+  const publishDir = path.join(deliverablePaths.deliverableDir, 'publish');
+  return {
+    publishDir,
+    publishScreenshotsDir: path.join(publishDir, 'screenshots'),
+    publishHtmlFile: path.join(publishDir, `${baseName}.html`),
+    publishCaptionFile: path.join(publishDir, `${baseName}-caption.txt`),
+    publishManifestFile: path.join(publishDir, 'manifest.json'),
+    publishReadmeFile: path.join(publishDir, 'README.md'),
+  };
+}
+
+function buildViewSurfaceReadme(paths) {
+  return [
+    '# views 目录说明',
+    '',
+    `- 稳定交付 HTML：${path.basename(paths.stableHtmlFile)}`,
+    `- 当前候选 HTML：${path.basename(paths.currentHtmlFile)}`,
+    `- 草稿别名 HTML：${path.basename(paths.draftHtmlFile)}`,
+    `- 定点返修要求：${path.relative(path.dirname(paths.viewsReadmeFile), paths.revisionBriefFile)}`,
+    '',
+    '规则：',
+    '- 当前候选 HTML 与草稿别名表示最近一轮 render_html / fix_html 的待审稿。',
+    '- 默认 .html 只有在 screenshot_review 通过后才会写入，代表当前可交付版。',
+    '- 如果当前候选仍在返修，稳定交付 HTML 会继续保留上一轮通过版本。',
+    '- 如需定点返修，可在 operator/当前返修要求.md 里写 JSON code block 点名 slide_id 和问题。',
+    '',
+  ].join('\n');
+}
+
+function loadOperatorRevisionBrief({
+  deliverablePaths,
+  minimumMtimeMs = 0,
+}) {
+  const paths = getDeliverableViewSurfacePaths(deliverablePaths);
+  if (!existsSync(paths.revisionBriefFile)) return null;
+  if (safeFileMtimeMs(paths.revisionBriefFile) < Number(minimumMtimeMs || 0)) {
+    return null;
+  }
+  return normalizeOperatorRevisionBrief(extractFirstJsonCodeBlock(readFileSync(paths.revisionBriefFile, 'utf-8')));
 }
 
 function promoteStableHtml(paths, htmlFile) {
   const ref = copySurfaceFile(htmlFile, paths.stableHtmlFile);
-  return ref ? [ref] : [];
+  const refs = ref ? [ref] : [];
+  writeText(paths.viewsReadmeFile, buildViewSurfaceReadme(paths));
+  refs.push(paths.viewsReadmeFile);
+  return refs;
+}
+
+function syncCandidateHtml(paths, htmlFile) {
+  const refs = [];
+  if (safeText(htmlFile)) {
+    refs.push(htmlFile);
+  }
+  const currentRef = copySurfaceFile(htmlFile, paths.currentHtmlFile);
+  if (currentRef) {
+    refs.push(currentRef);
+  }
+  writeText(paths.viewsReadmeFile, buildViewSurfaceReadme(paths));
+  refs.push(paths.viewsReadmeFile);
+  return [...new Set(refs.filter(Boolean))];
+}
+
+function buildPublishBundleReadme({
+  publishDir,
+  publishHtmlFile,
+  publishCaptionFile,
+  publishScreenshotsDir,
+  authorSignature = null,
+  deliveryState = null,
+}) {
+  const lines = [
+    '# publish 交付包',
+    '',
+    `- 当前 publish 包状态：${safeText(deliveryState?.current, 'output_ready')}`,
+    `- HTML：${path.basename(publishHtmlFile)}`,
+    `- Caption：${path.basename(publishCaptionFile)}`,
+    `- Screenshots：${path.relative(publishDir, publishScreenshotsDir)}`,
+    `- 署名：${safeText(authorSignature?.signature_display)}`,
+    `- 品牌：${safeText(authorSignature?.signature_subtitle)}`,
+  ];
+  if (safeText(deliveryState?.current) === 'stale_previous_output') {
+    lines.push(
+      '',
+      '## 最新候选',
+      '',
+      `- 最新候选 HTML：${path.relative(publishDir, safeText(deliveryState.latest_candidate_html_file))}`,
+      `- 最新审稿截图：${path.relative(publishDir, safeText(deliveryState.latest_review_screenshots_dir))}`,
+      `- 最新质控状态：${safeText(deliveryState.latest_candidate_status)}`,
+      `- 阻断项：${joinHumanList(deliveryState.blocking_reasons)}`,
+    );
+  }
+  return lines.join('\n');
+}
+
+function markPublishBundleStaleAfterBlockedReview(contract, deliverablePaths, reviewArtifact) {
+  const publishPaths = getDeliverablePublishSurfacePaths(deliverablePaths);
+  if (!existsSync(publishPaths.publishManifestFile) && !existsSync(publishPaths.publishReadmeFile)) {
+    return [];
+  }
+  const existingManifest = existsSync(publishPaths.publishManifestFile)
+    ? readJson(publishPaths.publishManifestFile)
+    : {};
+  const viewPaths = getDeliverableViewSurfacePaths(deliverablePaths);
+  const previousDeliveryState = existingManifest.delivery_state || {};
+  const deliveryState = {
+    ...previousDeliveryState,
+    previous_current: safeText(previousDeliveryState.current, 'output_ready'),
+    current: 'stale_previous_output',
+    latest_candidate_status: 'blocked_for_revision',
+    latest_candidate_html_file: viewPaths.currentHtmlFile,
+    latest_review_screenshots_dir: path.join(deliverablePaths.reportsDir, 'screenshots'),
+    latest_review_artifact_file: stageArtifactPath(contract, deliverablePaths, 'screenshot_review'),
+    blocking_reasons: safeArray(reviewArtifact?.review_state_patch?.blocking_reasons),
+    rerun_from_stage: safeText(reviewArtifact?.review_state_patch?.rerun_from_stage),
+  };
+  const staleManifest = {
+    ...existingManifest,
+    delivery_state: deliveryState,
+  };
+  writeJson(publishPaths.publishManifestFile, staleManifest);
+  writeText(publishPaths.publishReadmeFile, buildPublishBundleReadme({
+    publishDir: publishPaths.publishDir,
+    publishHtmlFile: safeText(existingManifest.publish_html_file, publishPaths.publishHtmlFile),
+    publishCaptionFile: safeText(existingManifest.publish_caption_file, publishPaths.publishCaptionFile),
+    publishScreenshotsDir: publishPaths.publishScreenshotsDir,
+    authorSignature: existingManifest.author_signature || null,
+    deliveryState,
+  }));
+  return [publishPaths.publishManifestFile, publishPaths.publishReadmeFile];
 }
 
 function writeJson(file, value) {
@@ -513,6 +722,51 @@ function inferMemoryHook(contract) {
   return '先别急着记概念，先抓最值钱的判断句';
 }
 
+function buildVisualAnchorSystem() {
+  return {
+    preferred_library: 'Font Awesome Free',
+    secondary_library_for_xiaohongshu: 'emoji',
+    consistency_rule: '同一页、同一组锚点保持统一语法，优先完整语义图标；短词 badge 只能做辅助标签',
+    required_peak_page_anchor: '封面、机制峰值页和结尾页至少提供一个语义明确的 Font Awesome Free 图标锚点；emoji 只做补充',
+    forbidden_patterns: [
+      '孤立单字贴纸',
+      '单个汉字或字母被当作唯一视觉锚点',
+      '和正文无关的随机装饰符号',
+      '把内部标签伪装成视觉锚点',
+      '图标、编号或 badge 压住标题、正文或署名',
+    ],
+  };
+}
+
+function buildSignatureExposureGrammar() {
+  return {
+    cover_note: '封面署名固定在底部稳定角标区，远离主标题与主链卡，不把署名伪装成流程备注。',
+    closing_page: '结尾页把署名显示与品牌副标压在页脚稳定区，和收藏条、行动卡保持独立间距。',
+    continuity_rule: '同一 deliverable 的署名显示、副标和品牌语气保持完全一致，图文与发布文案共用同一套作者身份。',
+  };
+}
+
+function normalizeVisualAnchorSystem(value, field = 'visual_direction.visual_anchor_system') {
+  return {
+    preferred_library: requireText(value?.preferred_library, `${field}.preferred_library`),
+    secondary_library_for_xiaohongshu: requireText(
+      value?.secondary_library_for_xiaohongshu,
+      `${field}.secondary_library_for_xiaohongshu`,
+    ),
+    consistency_rule: requireText(value?.consistency_rule, `${field}.consistency_rule`),
+    required_peak_page_anchor: requireText(value?.required_peak_page_anchor, `${field}.required_peak_page_anchor`),
+    forbidden_patterns: normalizeStringList(value?.forbidden_patterns, `${field}.forbidden_patterns`, { min: 3, max: 6 }),
+  };
+}
+
+function normalizeSignatureExposureGrammar(value, field = 'visual_direction.signature_exposure_grammar') {
+  return {
+    cover_note: requireText(value?.cover_note, `${field}.cover_note`),
+    closing_page: requireText(value?.closing_page, `${field}.closing_page`),
+    continuity_rule: requireText(value?.continuity_rule, `${field}.continuity_rule`),
+  };
+}
+
 function sourceTruth(contract) {
   return contract?.shared_source_truth || null;
 }
@@ -624,7 +878,76 @@ function deriveMemoryHookFromSource(contract) {
   return snippet ? `先记住这句：${snippet}` : inferMemoryHook(contract);
 }
 
-function buildAuthoringContext(contract, research = null) {
+function resolveAuthorBranding(workspaceRoot, contract) {
+  return resolveWorkspaceXiaohongshuAuthorProfile({
+    workspaceRoot,
+    taskTitle: contract?.title,
+    projectTitle: contract?.goal,
+    promptFile: 'xiaohongshu',
+    configCwd: REPO_ROOT,
+  });
+}
+
+function buildLayoutFamilyGuardrails() {
+  return {
+    cover_note: {
+      visual_intent: '封面像成熟作者的观点卡，先读标题，再读副句，再看到清楚的视觉锚点与底部署名。',
+      blocking_failures: [
+        '副标题或主判断句被主卡、轨道或装饰层压住。',
+        '视觉锚点只是孤立单字、莫名贴纸或和主题无关的装饰。',
+        '底部署名和副标被主内容挤压，失去稳定的封口感。',
+      ],
+      layout_rules: [
+        '封面必须有一个语义明确的视觉锚点，优先 Font Awesome Free 图标，emoji 只做补充。',
+        '视觉锚点不得遮挡标题、副标题或主链卡；它服务阅读，不抢主文案。',
+        '作者署名与副标固定在底部稳定区，和主内容之间保持清楚呼吸。',
+      ],
+    },
+    evidence_strip: {
+      visual_intent: '证据条页要像研究判断条带，编号、图标与正文各就各位，底部继续承担收束句。',
+      blocking_failures: [
+        '编号圆点、短线或图标压到标题或正文上方。',
+        '三条证据都堆在中上区，下方只剩明显空白带。',
+        '底部收束句退化成贴边薄条，不能承担记忆封口。',
+      ],
+      layout_rules: [
+        '条带内容覆盖上中下区，底部继续承担结论或带走点。',
+        '任何点标、编号或图标都要退到文字下层，并与正文保持独立留白。',
+        '如果条带放不下，优先减字、扩卡和重排，不用坏断句硬塞。',
+      ],
+    },
+    process_track: {
+      visual_intent: '机制峰值页，读者首眼要看到一条在推进的主线，而不是一堆挤在顶部的小卡片。',
+      blocking_failures: [
+        '圆点或连线压住标题、正文或关键词。',
+        '三张站牌卡全部挤在上半区，导致下方出现明显大空白。',
+        '卡片宽度太窄，标题与正文被迫切成坏断句。',
+      ],
+      layout_rules: [
+        '轨道节点、连接线和正文必须分层，节点与连线都要避开文本。',
+        '三张站牌卡需要覆盖上中下三个垂直带，页面重心要延展到中下区。',
+        '标题优先保证自然的 1 到 2 行，正文保持完整语义块，避免碎裂换行。',
+        '底部总结条与轨道区之间保留稳定呼吸，不出现明显五分之一空白带。',
+      ],
+    },
+    action_checklist: {
+      visual_intent: '结尾页像一张可收藏判断卡，三问向下压紧，收藏条与署名页脚形成稳定双层封口。',
+      blocking_failures: [
+        '第三问卡片和收藏条、署名页脚互相挤压。',
+        '结尾标题被无意义换行拆坏，形成单字挂行。',
+        '下方署名或副标贴边，像后台备注而不是内容品牌。',
+      ],
+      layout_rules: [
+        '结尾标题优先保持自然单行或双行，短句不主动拆成坏断句。',
+        '第三问、收藏条、署名页脚必须分别保有独立底边与间距。',
+        '署名和品牌副标要像内容品牌露出，固定在底部稳定区。',
+      ],
+    },
+  };
+}
+
+function buildAuthoringContext({ workspaceRoot, contract, research = null }) {
+  const authorBranding = resolveAuthorBranding(workspaceRoot, contract);
   return {
     title: safeText(contract.title),
     delivery_goal: safeText(contract.goal),
@@ -661,12 +984,20 @@ function buildAuthoringContext(contract, research = null) {
         excerpt: safeText(material.content_text || material.excerpt).replace(/\s+/g, ' ').slice(0, 220),
       }))
       .filter((item) => item.excerpt),
+    author_branding: authorBranding,
+    visual_anchor_system: buildVisualAnchorSystem(),
+    signature_exposure_grammar: buildSignatureExposureGrammar(),
+    layout_family_guardrails: buildLayoutFamilyGuardrails(),
     authoring_guardrails: [
       '交付目标和制作要求不能原样进入读者可见正文。',
       '不要把内部资料、来源索引、工作流注释、系统操作说明写成小红书正文。',
       'operator_playbook 只作为制作约束，不得被改写成标题、正文、评论区文案或来源口径。',
       '来源必须翻译成读者能理解的公开口径，不能直接写内部文件名。',
       '如果共享事实层不足，只能保守表达，不得编造医学结论、效果承诺或平台反馈。',
+      '如果存在 author_branding，封面或结尾至少一处要有 audience-facing 署名露出，且图文与发布文案保持同一署名。',
+      '小红书视觉锚点优先使用 Font Awesome Free，emoji 只做补充；同一页锚点风格保持统一。',
+      '禁止用孤立单字贴纸、随机装饰符号或疑似内部标签充当视觉锚点。',
+      '标题、正文和标签都必须在自然语义处换行；若单行成立，就不要为了造型强塞 <br/>。',
     ],
   };
 }
@@ -733,6 +1064,18 @@ function visualDirectionOutputContract() {
     },
     anti_template_constraints: ['<string>', '<string>'],
     source_language_discipline: '<string>',
+    visual_anchor_system: {
+      preferred_library: 'Font Awesome Free',
+      secondary_library_for_xiaohongshu: 'emoji',
+      consistency_rule: '<string>',
+      required_peak_page_anchor: '<string>',
+      forbidden_patterns: ['<string>', '<string>', '<string>'],
+    },
+    signature_exposure_grammar: {
+      cover_note: '<string>',
+      closing_page: '<string>',
+      continuity_rule: '<string>',
+    },
     forbidden_regressions: ['<string>', '<string>'],
   };
 }
@@ -749,10 +1092,21 @@ function renderHtmlOutputContract() {
   };
 }
 
-function buildFixHtmlRevisionContext(contract, deliverablePaths) {
+function fixHtmlOutputContract() {
+  return {
+    slides: [
+      {
+        slide_id: 'N01',
+        content_html: '<div data-slide-root="true" data-slide-id="N01">...</div>',
+      },
+    ],
+  };
+}
+
+function buildFixHtmlRevisionContext(contract, deliverablePaths, operatorRevisionBrief = null) {
   const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
   const screenshotReview = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-  if (!directorReview && !screenshotReview) {
+  if (!directorReview && !screenshotReview && !operatorRevisionBrief) {
     return null;
   }
   return {
@@ -780,16 +1134,25 @@ function buildFixHtmlRevisionContext(contract, deliverablePaths) {
           })),
         }
       : null,
+    operator_revision_brief: operatorRevisionBrief,
   };
 }
 
-function selectFixHtmlSlideIds(planArtifact, screenshotReviewArtifact) {
+function selectFixHtmlSlideIds(planArtifact, screenshotReviewArtifact, operatorRevisionBrief = null) {
   const slideReviews = safeArray(screenshotReviewArtifact?.slide_reviews);
   const targetedSlideIds = new Set(
     collectSlidesNeedingTargetedRevision(slideReviews)
       .map((slide) => safeText(slide?.slide_id))
       .filter(Boolean),
   );
+  safeArray(operatorRevisionBrief?.target_slide_ids)
+    .map((slideId) => safeText(slideId))
+    .filter(Boolean)
+    .forEach((slideId) => targetedSlideIds.add(slideId));
+  safeArray(screenshotReviewArtifact?.ai_review?.weak_pages)
+    .map((slideId) => safeText(slideId))
+    .filter(Boolean)
+    .forEach((slideId) => targetedSlideIds.add(slideId));
   const failedChecks = Object.entries(screenshotReviewArtifact?.checks || {})
     .filter(([, value]) => value === false)
     .map(([key]) => key);
@@ -1072,14 +1435,19 @@ function buildResearch(contract, adapter = CODEX_DEFAULT_ADAPTER) {
   };
 }
 
-async function generateStorylineDraft(contract, researchArtifact, adapter = CODEX_DEFAULT_ADAPTER) {
+async function generateStorylineDraft(
+  workspaceRoot,
+  contract,
+  researchArtifact,
+  adapter = CODEX_DEFAULT_ADAPTER,
+) {
   const { data, generationRuntime } = await generateStructuredArtifact({
     adapter,
     family: 'xiaohongshu',
     route: 'storyline',
     promptRelativePath: promptRoute(contract, 'storyline'),
     context: {
-      ...buildAuthoringContext(contract, researchArtifact),
+      ...buildAuthoringContext({ workspaceRoot, contract, research: researchArtifact }),
       research: researchArtifact?.research || null,
       framing: buildStorylineInputs(contract, researchArtifact),
     },
@@ -1101,9 +1469,14 @@ async function generateStorylineDraft(contract, researchArtifact, adapter = CODE
   };
 }
 
-async function buildStoryline(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function buildStoryline(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
-  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(contract, research, adapter);
+  const { authoredStoryline, generationRuntime } = await generateStorylineDraft(
+    workspaceRoot,
+    contract,
+    research,
+    adapter,
+  );
   return {
     ...attachCommon('storyline', contract, generationRuntime, adapter),
     creative_execution: creativeExecution('storyline', generationRuntime, adapter),
@@ -1225,6 +1598,7 @@ function normalizePlanSlide(
 }
 
 async function generateSingleNotePlanDraft(
+  workspaceRoot,
   contract,
   researchArtifact,
   storylineArtifact,
@@ -1236,7 +1610,7 @@ async function generateSingleNotePlanDraft(
     route: 'single_note_plan',
     promptRelativePath: promptRoute(contract, 'single_note_plan'),
     context: {
-      ...buildAuthoringContext(contract, researchArtifact),
+      ...buildAuthoringContext({ workspaceRoot, contract, research: researchArtifact }),
       research: researchArtifact?.research || null,
       storyline: storylineArtifact?.storyline || null,
     },
@@ -1255,10 +1629,11 @@ async function generateSingleNotePlanDraft(
   };
 }
 
-async function buildSingleNotePlan(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function buildSingleNotePlan(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const { authoredPlan, generationRuntime } = await generateSingleNotePlanDraft(
+    workspaceRoot,
     contract,
     research,
     storyline,
@@ -1278,6 +1653,7 @@ async function buildSingleNotePlan(contract, deliverablePaths, adapter = CODEX_D
 }
 
 async function generateVisualDirectionDraft(
+  workspaceRoot,
   contract,
   researchArtifact,
   storylineArtifact,
@@ -1292,7 +1668,7 @@ async function generateVisualDirectionDraft(
     route: 'visual_direction',
     promptRelativePath: promptRoute(contract, 'visual_direction'),
     context: {
-      ...buildAuthoringContext(contract, researchArtifact),
+      ...buildAuthoringContext({ workspaceRoot, contract, research: researchArtifact }),
       mode,
       baseline_deliverable_id: safeText(baselineDeliverableId) || null,
       storyline: storylineArtifact?.storyline || null,
@@ -1316,6 +1692,8 @@ async function generateVisualDirectionDraft(
       page_family_ceiling: data?.page_family_ceiling || {},
       anti_template_constraints: normalizeStringList(data?.anti_template_constraints, 'visual_direction.anti_template_constraints', { min: 2, max: 6 }),
       source_language_discipline: requireText(data?.source_language_discipline, 'visual_direction.source_language_discipline'),
+      visual_anchor_system: normalizeVisualAnchorSystem(data?.visual_anchor_system),
+      signature_exposure_grammar: normalizeSignatureExposureGrammar(data?.signature_exposure_grammar),
       forbidden_regressions: normalizeStringList(data?.forbidden_regressions, 'visual_direction.forbidden_regressions', { min: 2, max: 6 }),
     },
     generationRuntime,
@@ -1323,6 +1701,7 @@ async function generateVisualDirectionDraft(
 }
 
 async function buildVisualDirection(
+  workspaceRoot,
   contract,
   deliverablePaths,
   mode,
@@ -1333,6 +1712,7 @@ async function buildVisualDirection(
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const { authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(
+    workspaceRoot,
     contract,
     research,
     storyline,
@@ -1363,6 +1743,8 @@ async function buildVisualDirection(
       page_family_ceiling: authoredVisualDirection.page_family_ceiling,
       anti_template_constraints: authoredVisualDirection.anti_template_constraints,
       source_language_discipline: authoredVisualDirection.source_language_discipline,
+      visual_anchor_system: authoredVisualDirection.visual_anchor_system,
+      signature_exposure_grammar: authoredVisualDirection.signature_exposure_grammar,
       source_truth_confidence: sourceConfidence(contract) || safeText(storyline?.storyline?.source_truth_confidence),
       page_role_table: pageRoleTable,
       forbidden_regressions: authoredVisualDirection.forbidden_regressions,
@@ -1418,6 +1800,13 @@ async function buildVisualDirection(
 
 function renderContract(contract) {
   return contract?.prompt_pack?.render_contract || {};
+}
+
+function syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths) {
+  const currentArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+  const candidateHtmlFile = safeText(currentArtifact?.html_bundle?.html_file);
+  if (!candidateHtmlFile) return [];
+  return syncCandidateHtml(getDeliverableViewSurfacePaths(deliverablePaths), candidateHtmlFile);
 }
 
 function runPython(script, args) {
@@ -1496,7 +1885,7 @@ function validateRenderedSlideContent(content, slideId) {
   return html;
 }
 
-async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function generateRenderHtmlDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
@@ -1507,7 +1896,7 @@ async function generateRenderHtmlDraft(contract, deliverablePaths, adapter = COD
     route: 'render_html',
     promptRelativePath: promptRoute(contract, 'render_html'),
     context: {
-      ...buildAuthoringContext(contract, research),
+      ...buildAuthoringContext({ workspaceRoot, contract, research }),
       storyline: storyline?.storyline || null,
       plan: {
         slides: summarizePlanSlides(plan),
@@ -1616,10 +2005,15 @@ function materializeRenderedXhsSlides({
   });
 }
 
-async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function buildRenderHtml(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-  const { data, generationRuntime } = await generateRenderHtmlDraft(contract, deliverablePaths, adapter);
+  const { data, generationRuntime } = await generateRenderHtmlDraft(
+    workspaceRoot,
+    contract,
+    deliverablePaths,
+    adapter,
+  );
   const slideHtmlList = requireObjectArray(data?.slides, 'render_html.slides', { min: 4, max: 8 });
   const slideHtmlById = new Map(slideHtmlList.map((item) => [safeText(item.slide_id), validateRenderedSlideContent(item.content_html, safeText(item.slide_id))]));
   const slides = materializeRenderedXhsSlides({
@@ -1643,6 +2037,8 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       page_family_ceiling: visual?.visual_direction?.page_family_ceiling || {},
       anti_template_constraints: safeArray(visual?.visual_direction?.anti_template_constraints),
       source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
+      visual_anchor_system: visual?.visual_direction?.visual_anchor_system || buildVisualAnchorSystem(),
+      signature_exposure_grammar: visual?.visual_direction?.signature_exposure_grammar || buildSignatureExposureGrammar(),
     },
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
@@ -1677,19 +2073,23 @@ async function buildRenderHtml(contract, deliverablePaths, adapter = CODEX_DEFAU
       slides,
       render_summary: normalizeStringList(data?.render_summary, 'render_html.render_summary', { min: 1, max: 4 }),
     },
-    artifact_refs: [htmlFile, ...seedStableHtmlIfMissing(viewSurfacePaths, htmlFile)],
+    artifact_refs: syncCandidateHtml(viewSurfacePaths, htmlFile),
   };
 }
 
-async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function buildFixHtml(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
   const currentRender = readCurrentHtmlArtifact(contract, deliverablePaths);
   const screenshotReview = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-  const revisionContext = buildFixHtmlRevisionContext(contract, deliverablePaths);
-  const targetSlideIds = selectFixHtmlSlideIds(plan, screenshotReview);
+  const operatorRevisionBrief = loadOperatorRevisionBrief({
+    deliverablePaths,
+    minimumMtimeMs: safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review')),
+  });
+  const revisionContext = buildFixHtmlRevisionContext(contract, deliverablePaths, operatorRevisionBrief);
+  const targetSlideIds = selectFixHtmlSlideIds(plan, screenshotReview, operatorRevisionBrief);
   if (targetSlideIds.length === 0) {
-    throw new Error('fix_html requires screenshot_review blocked pages or failed cover density checks');
+    throw new Error('fix_html requires screenshot_review blocked pages, failed cover density checks, or operator-targeted slide ids');
   }
   const priorSlideHtmlById = loadPriorRenderedXhsSlideHtmlMap(currentRender);
   const targetSet = new Set(targetSlideIds);
@@ -1705,7 +2105,11 @@ async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_
     route: PAGE_FIX_ROUTE,
     promptRelativePath: promptRoute(contract, PAGE_FIX_ROUTE),
     context: {
-      ...buildAuthoringContext(contract, readStageArtifact(contract, deliverablePaths, 'research')),
+      ...buildAuthoringContext({
+        workspaceRoot,
+        contract,
+        research: readStageArtifact(contract, deliverablePaths, 'research'),
+      }),
       storyline: readStageArtifact(contract, deliverablePaths, 'storyline')?.storyline || null,
       plan: {
         slides: promptSlides,
@@ -1732,7 +2136,7 @@ async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_
         '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或制作流程写进画面。',
       ],
     },
-    outputContract: renderHtmlOutputContract(),
+    outputContract: fixHtmlOutputContract(),
     localFileInspection: buildFixHtmlLocalInspection(screenshotReview, targetSlideIds),
     cwd: deliverablePaths.deliverableDir,
   });
@@ -1770,6 +2174,8 @@ async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_
       page_family_ceiling: visual?.visual_direction?.page_family_ceiling || {},
       anti_template_constraints: safeArray(visual?.visual_direction?.anti_template_constraints),
       source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
+      visual_anchor_system: visual?.visual_direction?.visual_anchor_system || buildVisualAnchorSystem(),
+      signature_exposure_grammar: visual?.visual_direction?.signature_exposure_grammar || buildSignatureExposureGrammar(),
     },
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
@@ -1803,9 +2209,12 @@ async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_
       director_contract: renderPlan.director_contract,
       repair_scope: renderPlan.repair_scope,
       slides,
-      render_summary: normalizeStringList(data?.render_summary, 'fix_html.render_summary', { min: 1, max: 4 }),
+      render_summary: buildDeterministicFixHtmlSummary({
+        targetSlideIds,
+        revisionContext,
+      }),
     },
-    artifact_refs: [htmlFile, ...seedStableHtmlIfMissing(viewSurfacePaths, htmlFile)],
+    artifact_refs: syncCandidateHtml(viewSurfacePaths, htmlFile),
     review_state_patch: {
       current_status: 'draft',
       ready_for_export: false,
@@ -1822,7 +2231,7 @@ async function buildFixHtml(contract, deliverablePaths, adapter = CODEX_DEFAULT_
   };
 }
 
-async function generateDirectorReviewDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function generateDirectorReviewDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
@@ -1834,7 +2243,7 @@ async function generateDirectorReviewDraft(contract, deliverablePaths, adapter =
     route: 'visual_director_review',
     promptRelativePath: promptRoute(contract, 'visual_director_review'),
     context: {
-      ...buildAuthoringContext(contract, research),
+      ...buildAuthoringContext({ workspaceRoot, contract, research }),
       storyline: storyline?.storyline || null,
       plan: {
         slides: summarizePlanSlides(plan),
@@ -1852,12 +2261,22 @@ async function generateDirectorReviewDraft(contract, deliverablePaths, adapter =
   });
 }
 
-async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-  const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths, adapter);
+async function buildDirectorReview(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
+  const { data, generationRuntime } = await generateDirectorReviewDraft(
+    workspaceRoot,
+    contract,
+    deliverablePaths,
+    adapter,
+  );
   const directorIntentLanded = Boolean(data?.director_intent_landed);
   const antiTemplateOk = Boolean(data?.anti_template_ok);
   const memoryHookPresent = Boolean(data?.memory_hook_present);
-  const weakPages = normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', { min: 0, max: 4 });
+  const renderedSlides = safeArray(readCurrentHtmlArtifact(contract, deliverablePaths)?.html_bundle?.slides);
+  const weakPages = normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', {
+    min: 0,
+    max: renderedSlides.length,
+  });
   const homogeneousLayoutRisk = Number(data?.homogeneous_layout_risk || 0);
   const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
   const status = directorIntentLanded && antiTemplateOk && memoryHookPresent ? 'pass' : 'block';
@@ -1903,7 +2322,7 @@ async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_D
         }),
       },
     },
-    artifact_refs: [reviewFile],
+    artifact_refs: [...candidateSurfaceRefs, reviewFile],
     review_state_patch: {
       current_status: status === 'pass' ? 'director_review_passed' : 'blocked_for_revision',
       ready_for_export: false,
@@ -1969,6 +2388,7 @@ function buildScreenshotReviewMarkdown(contract, reviewArtifact, reviewOwner) {
 }
 
 async function generateScreenshotReviewDraft(
+  workspaceRoot,
   contract,
   deliverablePaths,
   renderArtifact,
@@ -1989,7 +2409,7 @@ async function generateScreenshotReviewDraft(
     route: 'screenshot_review',
     promptRelativePath: promptRoute(contract, 'screenshot_review'),
     context: {
-      ...buildAuthoringContext(contract, research),
+      ...buildAuthoringContext({ workspaceRoot, contract, research }),
       mode,
       storyline: storyline?.storyline || null,
       plan: {
@@ -2034,6 +2454,7 @@ async function buildScreenshotReview(
   baselineDeliverableId,
   adapter = CODEX_DEFAULT_ADAPTER,
 ) {
+  const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
   const render = readCurrentHtmlArtifact(contract, deliverablePaths);
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
@@ -2080,6 +2501,7 @@ async function buildScreenshotReview(
     };
   });
   const { data, generationRuntime } = await generateScreenshotReviewDraft(
+    workspaceRoot,
     contract,
     deliverablePaths,
     render,
@@ -2089,7 +2511,10 @@ async function buildScreenshotReview(
     research,
     adapter,
   );
-  const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
+  const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', {
+    min: 0,
+    max: mechanicalSlideReviews.length,
+  });
   const aiSlideReviews = normalizeXhsScreenshotAiSlideReviews(data?.slide_reviews, mechanicalSlideReviews);
   const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
   const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
@@ -2156,7 +2581,7 @@ async function buildScreenshotReview(
     },
     report_markdown: reviewMarkdown,
     metrics: python.metrics,
-    artifact_refs: [reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
+    artifact_refs: [...candidateSurfaceRefs, reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
     review_state_patch: {
       current_status: status === 'pass' ? 'review_passed' : 'blocked_for_revision',
       ready_for_export: false,
@@ -2195,11 +2620,18 @@ async function buildScreenshotReview(
         ...promoteStableHtml(getDeliverableViewSurfacePaths(deliverablePaths), render.html_bundle.html_file),
       ]),
     ];
+  } else {
+    artifact.artifact_refs = [
+      ...new Set([
+        ...safeArray(artifact.artifact_refs),
+        ...markPublishBundleStaleAfterBlockedReview(contract, deliverablePaths, artifact),
+      ]),
+    ];
   }
   return artifact;
 }
 
-async function generatePublishCopyDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function generatePublishCopyDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
   const research = readStageArtifact(contract, deliverablePaths, 'research');
   const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
@@ -2210,7 +2642,7 @@ async function generatePublishCopyDraft(contract, deliverablePaths, adapter = CO
     route: 'publish_copy',
     promptRelativePath: promptRoute(contract, 'publish_copy'),
     context: {
-      ...buildAuthoringContext(contract, research),
+      ...buildAuthoringContext({ workspaceRoot, contract, research }),
       storyline: storyline?.storyline || null,
       title_options: safeArray(plan?.single_note_plan?.title_options).slice(0, 3),
       cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
@@ -2224,11 +2656,18 @@ async function generatePublishCopyDraft(contract, deliverablePaths, adapter = CO
   });
 }
 
-async function buildPublishCopy(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+async function buildPublishCopy(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
   const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
   const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+  const authorBranding = resolveAuthorBranding(workspaceRoot, contract);
   const titles = safeArray(plan?.single_note_plan?.title_options).slice(0, 3);
-  const { data, generationRuntime } = await generatePublishCopyDraft(contract, deliverablePaths, adapter);
+  const { data, generationRuntime } = await generatePublishCopyDraft(
+    workspaceRoot,
+    contract,
+    deliverablePaths,
+    adapter,
+  );
   const hydratedTitles = titles;
   const body = requireText(data?.body, 'publish_copy.body');
   const interactionQuestions = normalizeStringList(data?.interaction_questions, 'publish_copy.interaction_questions', { min: 1, max: 3 });
@@ -2246,7 +2685,17 @@ async function buildPublishCopy(contract, deliverablePaths, adapter = CODEX_DEFA
     gate_pass: hydratedTitles.length >= 3 && body.length >= 80 && body.length <= 420,
   };
   const captionFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-copy.txt`);
-  writeText(captionFile, [`标题候选：${hydratedTitles.join(' / ')}`, '', body, '', hashtags.join(' ')].join('\n'));
+  writeText(captionFile, [
+    `标题候选：${hydratedTitles.join(' / ')}`,
+    `署名：${authorBranding.signature_display}`,
+    `品牌：${authorBranding.signature_subtitle}`,
+    '',
+    body,
+    '',
+    `首评引导：${firstComment}`,
+    '',
+    hashtags.join(' '),
+  ].join('\n'));
   return {
     ...attachCommon('publish_copy', contract, generationRuntime, adapter),
     creative_execution: creativeExecution('publish_copy', generationRuntime, adapter),
@@ -2260,6 +2709,12 @@ async function buildPublishCopy(contract, deliverablePaths, adapter = CODEX_DEFA
       publish_suggestion: {
         cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
         recommended_time: requireText(data?.publish_suggestion?.recommended_time, 'publish_copy.publish_suggestion.recommended_time'),
+      },
+      author_signature: {
+        profile_id: authorBranding.profile_id,
+        signature_display: authorBranding.signature_display,
+        signature_subtitle: authorBranding.signature_subtitle,
+        config_scope: authorBranding.config_scope,
       },
       quality_gate,
       caption_file: captionFile,
@@ -2316,7 +2771,7 @@ async function buildPublishCopy(contract, deliverablePaths, adapter = CODEX_DEFA
         }),
       },
     },
-    artifact_refs: [captionFile],
+    artifact_refs: [...candidateSurfaceRefs, captionFile],
     review_state_patch: {
       current_status: quality_gate.gate_pass ? 'publish_ready' : 'blocked_for_revision',
       ready_for_export: quality_gate.gate_pass,
@@ -2349,25 +2804,61 @@ function buildExportBundle(
   if (!existsSync(stableHtmlFile)) {
     throw new Error(`Route export_bundle requires reviewed stable HTML surface before export: ${stableHtmlFile}`);
   }
+  const publishPaths = getDeliverablePublishSurfacePaths(deliverablePaths);
+  const publishDir = ensureDir(publishPaths.publishDir);
+  const publishScreenshotsDir = ensureDir(publishPaths.publishScreenshotsDir);
+  const publishHtmlFile = publishPaths.publishHtmlFile;
+  const publishCaptionFile = publishPaths.publishCaptionFile;
+  const publishManifestFile = publishPaths.publishManifestFile;
+  const publishReadmeFile = publishPaths.publishReadmeFile;
   const pngFiles = safeArray(review?.slide_reviews).map((slide) => slide.screenshot_file);
   const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
+  const publishPngFiles = pngFiles
+    .map((file) => copySurfaceFile(file, path.join(publishScreenshotsDir, path.basename(file))))
+    .filter(Boolean);
+  copySurfaceFile(stableHtmlFile, publishHtmlFile);
+  copySurfaceFile(copy.publish_copy.caption_file, publishCaptionFile);
   const exportBundle = {
     html_file: stableHtmlFile,
     png_files: pngFiles,
     caption_file: copy.publish_copy.caption_file,
     publish_manifest_file: manifestFile,
+    publish_dir: publishDir,
+    publish_html_file: publishHtmlFile,
+    publish_caption_file: publishCaptionFile,
+    publish_png_files: publishPngFiles,
+    author_signature: copy.publish_copy.author_signature || null,
     delivery_state: {
       current: 'output_ready',
       next: 'published_pending_human',
     },
   };
   writeJson(manifestFile, exportBundle);
+  writeJson(publishManifestFile, exportBundle);
+  writeText(publishReadmeFile, buildPublishBundleReadme({
+    publishDir,
+    publishHtmlFile,
+    publishCaptionFile,
+    publishScreenshotsDir,
+    authorSignature: copy.publish_copy.author_signature || null,
+    deliveryState: exportBundle.delivery_state,
+  }));
   return {
     ...attachCommon('export_bundle', contract, null, adapter),
     status: 'completed',
     export_bundle: exportBundle,
     series_surfaces: computeSeriesSurfaces(contract, deliverablePaths, exportBundle),
-    artifact_refs: [manifestFile, stableHtmlFile, copy.publish_copy.caption_file, ...pngFiles].filter(Boolean),
+    artifact_refs: [
+      manifestFile,
+      publishManifestFile,
+      publishReadmeFile,
+      stableHtmlFile,
+      publishHtmlFile,
+      copy.publish_copy.caption_file,
+      publishCaptionFile,
+      ...pngFiles,
+      ...publishPngFiles,
+    ].filter(Boolean),
     review_state_patch: {
       current_status: 'publish_ready',
       ready_for_export: true,
@@ -2413,17 +2904,24 @@ export async function runXiaohongshuRoute({
     case 'research':
       return buildResearch(contract, adapter);
     case 'storyline':
-      return await buildStoryline(contract, deliverablePaths, adapter);
+      return await buildStoryline(workspaceRoot, contract, deliverablePaths, adapter);
     case 'single_note_plan':
-      return await buildSingleNotePlan(contract, deliverablePaths, adapter);
+      return await buildSingleNotePlan(workspaceRoot, contract, deliverablePaths, adapter);
     case 'visual_direction':
-      return await buildVisualDirection(contract, deliverablePaths, mode, baselineDeliverableId, adapter);
+      return await buildVisualDirection(
+        workspaceRoot,
+        contract,
+        deliverablePaths,
+        mode,
+        baselineDeliverableId,
+        adapter,
+      );
     case 'render_html':
-      return await buildRenderHtml(contract, deliverablePaths, adapter);
+      return await buildRenderHtml(workspaceRoot, contract, deliverablePaths, adapter);
     case 'fix_html':
-      return await buildFixHtml(contract, deliverablePaths, adapter);
+      return await buildFixHtml(workspaceRoot, contract, deliverablePaths, adapter);
     case 'visual_director_review':
-      return await buildDirectorReview(contract, deliverablePaths, adapter);
+      return await buildDirectorReview(workspaceRoot, contract, deliverablePaths, adapter);
     case 'screenshot_review':
       return await buildScreenshotReview(
         workspaceRoot,
@@ -2435,7 +2933,7 @@ export async function runXiaohongshuRoute({
         adapter,
       );
     case 'publish_copy':
-      return await buildPublishCopy(contract, deliverablePaths, adapter);
+      return await buildPublishCopy(workspaceRoot, contract, deliverablePaths, adapter);
     case 'export_bundle':
       return buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths, adapter);
     default:

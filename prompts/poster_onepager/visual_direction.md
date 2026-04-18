@@ -5,6 +5,7 @@
 - 必须显式包含 visual_manifest / poster_motif / peak_region / panel_emphasis / anti_template_constraints
 - 不允许退化成统一营销海报模板
 - 不允许把来源和行动按钮藏成脚注
+- 必须定义 headline、证据栏、路径条和 action footer 之间的相邻可读块安全间距；视觉贴住按失败处理
 
 ## runtime_seed
 ```json
@@ -39,7 +40,8 @@
     "final_instruction_to_html_generator": [
       "保持 4:5 单页画幅，不允许滚动",
       "headline、证据、动作三段必须形成显式层级",
-      "来源标签与行动句必须同屏可见"
+      "来源标签与行动句必须同屏可见",
+      "headline、证据栏、路径条和 action footer 之间必须保留清楚安全间距，视觉贴住按失败处理"
     ],
     "palette": {
       "paper": "#FFF9F1",
