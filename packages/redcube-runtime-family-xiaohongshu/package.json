@@ -12,6 +12,7 @@
     "@redcube/codex-cli-client": "0.1.0",
     "@redcube/hermes-substrate": "0.1.0",
     "@redcube/pack-xiaohongshu": "0.1.0",
+    "@redcube/redcube-config": "0.1.0",
     "@redcube/reference-os": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"
   }

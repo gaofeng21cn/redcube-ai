@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { spawnSync } from 'node:child_process';
 
 import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
-import { resolveWorkspaceXiaohongshuAuthorProfile } from '../../redcube-config/src/xiaohongshu-author-profile.js';
+import { resolveWorkspaceXiaohongshuAuthorProfile } from '@redcube/redcube-config/xiaohongshu-author-profile';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,

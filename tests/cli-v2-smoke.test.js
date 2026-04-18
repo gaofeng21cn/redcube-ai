@@ -72,6 +72,10 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'runtime'),
   );
   copyPackageIntoInstall(
+    path.resolve('packages/redcube-config'),
+    path.join(gatewayNodeModulesDir, 'redcube-config'),
+  );
+  copyPackageIntoInstall(
     path.resolve('packages/redcube-governance'),
     path.join(gatewayNodeModulesDir, 'governance'),
   );

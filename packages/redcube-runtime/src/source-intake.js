@@ -12,7 +12,7 @@ import {
   getSourceArtifactPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
-import { ensureWorkspaceXiaohongshuAuthorTemplate } from '../../redcube-config/src/xiaohongshu-author-profile.js';
+import { ensureWorkspaceXiaohongshuAuthorTemplate } from '@redcube/redcube-config/xiaohongshu-author-profile';
 import { buildSourceReadinessPack } from './source-readiness-pack.js';
 import { buildSourceAugmentationRequest } from './source-augmentation-request.js';
 

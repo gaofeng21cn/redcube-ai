@@ -5,7 +5,8 @@
   "type": "module",
   "types": "./src/index.ts",
   "dependencies": {
-    "@redcube/gateway": "0.1.0"
+    "@redcube/gateway": "0.1.0",
+    "@redcube/redcube-config": "0.1.0"
   },
   "bin": {
     "redcube": "src/cli.js"

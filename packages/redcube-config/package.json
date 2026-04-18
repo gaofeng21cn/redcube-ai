@@ -1,0 +1,12 @@
+{
+  "name": "@redcube/redcube-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./private-profile": "./src/private-profile.js",
+    "./xiaohongshu-author-profile": "./src/xiaohongshu-author-profile.js"
+  }
+}

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync, statSync, copyFileSync } from 'node:fs';
-import { loadRuntimeConfig } from '../../redcube-config/src/index.js';
+import { loadRuntimeConfig } from '@redcube/redcube-config';
 
 const PLACEHOLDER_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5vN7sAAAAASUVORK5CYII=';

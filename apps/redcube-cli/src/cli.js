@@ -433,7 +433,7 @@ let privateProfileModulePromise;
 
 async function loadPrivateProfileModule() {
   if (!privateProfileModulePromise) {
-    privateProfileModulePromise = import('../../../packages/redcube-config/src/private-profile.js');
+    privateProfileModulePromise = import('@redcube/redcube-config/private-profile');
   }
 
   return privateProfileModulePromise;

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { loadRuntimeConfig } from '../../redcube-config/src/index.js';
+import { loadRuntimeConfig } from '@redcube/redcube-config';
 
 function cleanText(text) {
   return String(text || '').replace(/\s+/g, ' ').trim();
