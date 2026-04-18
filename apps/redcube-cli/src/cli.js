@@ -683,7 +683,7 @@ export async function executeCli(argv, deps = {}) {
           workspace_root: resolveWorkspaceRoot(options, cwd),
         },
         runtime_session_contract: {
-          runtime_owner: 'codex_cli',
+          runtime_owner: 'upstream_hermes_agent',
         },
         return_surface_contract: {
           surface_kind: options.returnSurfaceKind || 'product_entry',

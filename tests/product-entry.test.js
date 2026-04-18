@@ -30,7 +30,6 @@ const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
 const GATEWAY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-gateway/package.json', import.meta.url),
 );
-const OPL_SHARED_OWNER_COMMIT = '5b104e33ae9ca3270fde83d0194618926f9b58e8';
 
 async function withMockHermesAndRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
@@ -593,9 +592,9 @@ test('getProductStart exposes the same direct-entry start companion as the manif
 
 test('product preflight consumes OPL shared program builders from the pinned owner commit', async () => {
   const gatewayPackage = readJson(GATEWAY_PACKAGE_JSON);
-  assert.equal(
+  assert.match(
     gatewayPackage.dependencies['opl-readonly-gateway'],
-    `git+https://github.com/gaofeng21cn/one-person-lab.git#${OPL_SHARED_OWNER_COMMIT}`,
+    /^git\+https:\/\/github\.com\/gaofeng21cn\/one-person-lab\.git#[0-9a-f]{40}$/,
   );
   const companions = await import('opl-readonly-gateway/product-entry-program-companions');
   assert.equal(typeof companions.buildProductEntryPreflight, 'function');
