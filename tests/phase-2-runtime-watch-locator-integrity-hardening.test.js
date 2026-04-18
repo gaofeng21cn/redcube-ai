@@ -39,8 +39,6 @@ test('runtime watch locator integrity hardening freezes run identity persistence
   const contract = readJson(TRANCHE_CONTRACT);
   const brief = read(TRANCHE_BRIEF);
   const rootAgents = read('AGENTS.md');
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
   const docsIndex = read('docs/README.md');
   const docsIndexZh = read('docs/README.zh-CN.md');
   const runtimeArchitecture = read('docs/runtime_architecture.md');
@@ -56,8 +54,6 @@ test('runtime watch locator integrity hardening freezes run identity persistence
   assert.equal(brief.includes('quartet locator'), true);
   assert.equal(brief.includes('只给 `workspaceRoot/topicId/deliverableId`、不带 `runId` / `run` 时'), true);
   assert.equal(rootAgents.includes('contracts/runtime-program/current-program.json'), true);
-  assert.equal(readme.includes('phase-2 runtime watch locator integrity hardening remains absorbed provenance on the same mainline'), true);
-  assert.equal(readmeZh.includes('runtime watch locator integrity hardening 继续作为同一主线上的 absorbed provenance'), true);
   assert.equal(docsIndex.includes('Phase 2 runtime watch locator integrity hardening'), true);
   assert.equal(docsIndexZh.includes('Phase 2 runtime watch locator integrity hardening'), true);
   assert.equal(runtimeArchitecture.includes('`runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope'), true);

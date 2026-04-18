@@ -17,17 +17,13 @@ test('public docs surface does not retain a root guides entrypoint', () => {
   assert.equal(docsReadme.includes('](./guides/'), false);
 });
 
-test('public docs describe Deep Research as Source Readiness enhancement on an auto-first 5-step line', () => {
-  const rootReadme = readFileSync(path.join(repoRoot, 'README.md'), 'utf-8');
-  const rootReadmeZh = readFileSync(path.join(repoRoot, 'README.zh-CN.md'), 'utf-8');
+test('operator docs describe Deep Research as Source Readiness enhancement on an auto-first 5-step line', () => {
+  const docsReadme = readFileSync(path.join(repoRoot, 'docs', 'README.md'), 'utf-8');
+  const docsReadmeZh = readFileSync(path.join(repoRoot, 'docs', 'README.zh-CN.md'), 'utf-8');
   const quickstart = readFileSync(path.join(repoRoot, 'docs', 'human_quickstart.md'), 'utf-8');
 
-  assert.equal(rootReadme.includes('`Deep Research` belongs to `Source Readiness`'), true);
-  assert.equal(rootReadmeZh.includes('`Deep Research` 属于 `Source Readiness`'), true);
-  assert.equal(rootReadme.includes('`source research`'), true);
-  assert.equal(rootReadmeZh.includes('`source research`'), true);
-  assert.equal(rootReadme.includes('`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`'), true);
-  assert.equal(rootReadmeZh.includes('`source intake -> source augment -> source prepare-augmentation-result -> source write-augmentation-result -> source execute-augmentation`'), true);
+  assert.equal(docsReadme.includes('`Deep Research` remains inside `Source Readiness`'), true);
+  assert.equal(docsReadmeZh.includes('`Deep Research` 继续属于 `Source Readiness`'), true);
   assert.equal(quickstart.includes('`Source Readiness -> Storyline -> Plan -> Visual -> Delivery`'), true);
   assert.equal(quickstart.includes('可以在任意大步骤边界介入'), true);
   assert.equal(quickstart.includes('循环式 Review Gate'), true);
@@ -76,13 +72,19 @@ test('docs keep public shell wording separate from internal OPL bridge and runti
     'utf-8',
   );
 
-  assert.equal(rootReadme.includes('The first-level RCA / RedCube visual-deliverable domain agent under the `OPL` shell'), true);
-  assert.equal(rootReadme.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
+  assert.equal(rootReadme.includes('## One-Sentence Quick Start'), true);
+  assert.equal(rootReadme.includes('## What It Helps With'), true);
+  assert.equal(rootReadme.includes('## Current Delivery Focus'), true);
+  assert.equal(rootReadme.includes('## How It Works'), true);
+  assert.equal(rootReadme.includes('## Current Boundary'), true);
   assert.equal(rootReadme.includes('`redcube product federate`'), false);
   assert.equal(rootReadme.includes('`operator entry`, `agent entry`'), false);
   assert.equal(rootReadme.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
-  assert.equal(rootReadmeZh.includes('`OPL` 壳下的一级 RCA / RedCube 视觉交付 domain agent'), true);
-  assert.equal(rootReadmeZh.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
+  assert.equal(rootReadmeZh.includes('## 一句话快速启动'), true);
+  assert.equal(rootReadmeZh.includes('## 适合处理的工作'), true);
+  assert.equal(rootReadmeZh.includes('## 当前交付重点'), true);
+  assert.equal(rootReadmeZh.includes('## 工作方式'), true);
+  assert.equal(rootReadmeZh.includes('## 当前边界'), true);
   assert.equal(rootReadmeZh.includes('`redcube product federate`'), false);
   assert.equal(rootReadmeZh.includes('`operator entry`、`agent entry`'), false);
   assert.equal(rootReadmeZh.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
@@ -95,13 +97,13 @@ test('docs keep public shell wording separate from internal OPL bridge and runti
   assert.equal(docsReadmeZh.includes('references/lightweight_product_entry_and_opl_handoff.md'), true);
 
   assert.equal(project.includes('repo-verified 的轻量 `product entry` service surface 也已落地'), true);
-  assert.equal(architecture.includes('User -> OPL shell -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube direct domain entry -> RedCube visual-domain truth surfaces'), true);
+  assert.equal(architecture.includes('User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces'), true);
   assert.equal(architecture.includes('invokeFederatedProductEntry'), true);
   assert.equal(architecture.includes('Hermes Kernel -> Domain Handoff -> RedCube Product Entry / RedCube Gateway'), false);
   assert.equal(architecture.includes('target_domain_id'), true);
   assert.equal(architecture.includes('deliverable_family'), true);
   assert.equal(status.includes('当前用户认知入口：`OPL GUI / management shell -> RCA / RedCube domain agent -> governed visual-deliverable workflow`'), true);
-  assert.equal(status.includes('当前 internal OPL bridge：`invokeFederatedProductEntry`、`invoke_federated_product_entry` 与 `redcube product federate` 只保留给外层 OPL shell / compatibility bridge'), true);
+  assert.equal(status.includes('当前 OPL bridge：`redcube product federate`'), true);
   assert.equal(status.includes('已冻结的最终目标形态：`User -> OPL shell -> RCA / RedCube domain agent -> Codex default execution -> RedCube visual-domain truth surfaces`'), true);
 
   assert.equal(handoff.includes('target_domain_id'), true);

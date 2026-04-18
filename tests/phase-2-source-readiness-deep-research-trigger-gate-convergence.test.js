@@ -44,8 +44,6 @@ test('source-readiness deep research trigger+gate convergence freezes trigger lo
   const runtimeArchitecture = read('docs/runtime_architecture.md');
   const runtimePolicy = read('docs/policies/runtime_operating_model.md');
   const quickstart = read('docs/human_quickstart.md');
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
   const docsIndex = read('docs/README.md');
   const docsIndexZh = read('docs/README.zh-CN.md');
 
@@ -62,8 +60,6 @@ test('source-readiness deep research trigger+gate convergence freezes trigger lo
   assert.equal(runtimeArchitecture.includes('source-plane 更深层的扩展仍属于同一主线上的持续增强'), true);
   assert.equal(runtimePolicy.includes('更深层 source-plane 扩展仍属于同一主线上的后续增强'), true);
   assert.equal(quickstart.includes('等 Step 1 达到 `planning_ready` 后，再继续推进后续视觉交付步骤'), true);
-  assert.equal(readme.includes('planning_ready must become the formal machine-readable release gate inside Source Readiness'), true);
-  assert.equal(readmeZh.includes('`planning_ready` 必须成为 `Source Readiness` 内部正式、可机读的放行 gate'), true);
   assert.equal(docsIndex.includes('source_readiness_deep_research_longrun_target_state.md'), true);
   assert.equal(docsIndexZh.includes('source_readiness_deep_research_longrun_target_state.md'), true);
   assert.equal(docsIndex.includes('phase_2_source_readiness_deep_research_trigger_gate_convergence.md'), true);

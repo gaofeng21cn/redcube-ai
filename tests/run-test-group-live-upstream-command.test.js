@@ -36,8 +36,6 @@ test('run-test-group serializes node test files for Codex-backed verification gr
 
 test('serialized verification rule is documented in current program and public docs', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
-  const readme = readFileSync('README.md', 'utf-8');
-  const readmeZh = readFileSync('README.zh-CN.md', 'utf-8');
   const status = readFileSync('docs/status.md', 'utf-8');
 
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency, 1);
@@ -45,8 +43,6 @@ test('serialized verification rule is documented in current program and public d
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /poster governed screenshot review/i,
   );
-  assert.equal(readme.includes('--test-concurrency=1'), true);
-  assert.equal(readmeZh.includes('--test-concurrency=1'), true);
   assert.equal(status.includes('--test-concurrency=1'), true);
 });
 
@@ -191,8 +187,6 @@ test('run-test-group fails fast when no Python with playwright can be resolved',
 
 test('Codex-backed verification Python command contract is frozen in current program and public docs', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
-  const readme = readFileSync('README.md', 'utf-8');
-  const readmeZh = readFileSync('README.zh-CN.md', 'utf-8');
   const status = readFileSync('docs/status.md', 'utf-8');
 
   assert.equal(
@@ -216,7 +210,5 @@ test('Codex-backed verification Python command contract is frozen in current pro
     currentProgram.current_state.green_baseline.local_codex_execution.current_host_latest_route_proof.some((item) => item.includes('local Codex CLI route and managed execution pass repo smoke')),
     true,
   );
-  assert.equal(readme.includes('REDCUBE_PYTHON_COMMAND'), true);
-  assert.equal(readmeZh.includes('REDCUBE_PYTHON_COMMAND'), true);
   assert.equal(status.includes('REDCUBE_PYTHON_COMMAND'), true);
 });

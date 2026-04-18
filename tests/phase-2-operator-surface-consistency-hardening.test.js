@@ -55,8 +55,6 @@ test('operator surface consistency hardening freezes doctor/help/runtime-watch c
   assert.equal(brief.includes('closeout 已完成并吸收到当前 mainline'), true);
   assert.equal(brief.includes('`CLI review watch` / `MCP runtime_watch`'), true);
   assert.equal(rootAgents.includes('contracts/runtime-program/current-program.json'), true);
-  assert.equal(readme.includes('operator surface consistency hardening now has an absorbed tranche on the same mainline'), true);
-  assert.equal(readmeZh.includes('operator surface consistency hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(docsIndex.includes('Phase 2 operator surface consistency hardening'), true);
   assert.equal(docsIndexZh.includes('Phase 2 operator surface consistency hardening'), true);
   assert.equal(runtimeArchitecture.includes('`operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path'), true);

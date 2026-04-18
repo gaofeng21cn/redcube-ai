@@ -80,8 +80,6 @@ test('phase-2 minimum baseline brief and docs indexes expose the baseline as abs
   assert.equal(brief.includes('它已经不是 activation-package freeze'), true);
   assert.equal(brief.includes('但也不是“整个 Phase 2 都已完成”'), true);
   assert.equal(brief.includes('phase_2_direct_delivery_lifecycle_stage_convergence'), true);
-  assert.equal(readme.includes('source intake + shared source truth` is now on the mainline as part of the stable `Source Readiness` capability surface'), true);
-  assert.equal(readmeZh.includes('source intake + shared source truth` 已作为稳定 `Source Readiness` 能力面进入正式主线'), true);
   assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
   assert.equal(policy.includes('当前正式能力面'), true);
   assert.equal(positioning.includes('当前主线能力边界'), true);

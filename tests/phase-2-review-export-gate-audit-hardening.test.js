@@ -57,8 +57,6 @@ test('phase-2 review/export/gate/audit hardening contract freezes canonical audi
 
 test('phase-2 review/export/gate/audit hardening brief and public docs keep the absorbed tranche honest', () => {
   const brief = read(HARDENING_BRIEF);
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
   const runtimeArchitecture = read('docs/runtime_architecture.md');
   const policy = read('docs/policies/runtime_operating_model.md');
   const docsIndex = read('docs/README.md');
@@ -69,8 +67,6 @@ test('phase-2 review/export/gate/audit hardening brief and public docs keep the 
   assert.equal(brief.includes('review / export / gate / audit hardening'), true);
   assert.equal(brief.includes('source_readiness_summary'), true);
   assert.equal(brief.includes('gate_summary'), true);
-  assert.equal(readme.includes('review / export / gate / audit hardening now has an absorbed tranche on the same mainline'), true);
-  assert.equal(readmeZh.includes('review / export / gate / audit hardening 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('review / export / gate / audit hardening` 已吸收为前置 provenance'), true);
   assert.equal(
     policy.includes('review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance'),

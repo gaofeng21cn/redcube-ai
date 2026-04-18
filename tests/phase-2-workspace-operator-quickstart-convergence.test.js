@@ -38,8 +38,6 @@ test('workspace operator quickstart convergence stays absorbed provenance while 
 test('workspace operator quickstart convergence freezes brand-new or thin workspace bootstrap, docs, and help surface honestly', () => {
   const contract = readJson(TRANCHE_CONTRACT);
   const brief = read(TRANCHE_BRIEF);
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
   const docsIndex = read('docs/README.md');
   const docsIndexZh = read('docs/README.zh-CN.md');
   const quickstart = read('docs/human_quickstart.md');
@@ -57,8 +55,6 @@ test('workspace operator quickstart convergence freezes brand-new or thin worksp
   assert.equal(quickstart.includes('`redcube source intake`（材料已足够时）'), true);
   assert.equal(quickstart.includes('`redcube source research`（材料薄或只有主题时）'), true);
   assert.equal(quickstart.includes('`redcube deliverable run`'), true);
-  assert.equal(readme.includes('workspace / operator quickstart convergence now has an absorbed tranche on the same mainline'), true);
-  assert.equal(readmeZh.includes('workspace / operator quickstart convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(docsIndex.includes('phase_2_workspace_operator_quickstart_convergence.md'), true);
   assert.equal(docsIndexZh.includes('phase_2_workspace_operator_quickstart_convergence.md'), true);
   assert.equal(docsIndex.includes('current recommended next-line brief'), false);

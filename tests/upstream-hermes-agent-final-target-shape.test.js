@@ -73,10 +73,14 @@ test('canonical docs keep the public shell-first story while preserving final-ta
   const contractsReadme = read('contracts/README.md');
   const brief = read(FINAL_TARGET_BRIEF);
 
-  assert.equal(rootReadme.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
-  assert.equal(rootReadme.includes('`Hermes-Agent` stays available for explicit backup execution and long-running online gateway needs.'), true);
-  assert.equal(rootReadmeZh.includes('`OPL shell -> RedCube domain agent -> Codex default execution`'), true);
-  assert.equal(rootReadmeZh.includes('`Hermes-Agent` 作为显式备用执行模式与长期在线 gateway 保留。'), true);
+  assert.equal(rootReadme.includes('## One-Sentence Quick Start'), true);
+  assert.equal(rootReadme.includes('## How It Works'), true);
+  assert.equal(rootReadme.includes('## Current Boundary'), true);
+  assert.equal(rootReadme.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
+  assert.equal(rootReadmeZh.includes('## 一句话快速启动'), true);
+  assert.equal(rootReadmeZh.includes('## 工作方式'), true);
+  assert.equal(rootReadmeZh.includes('## 当前边界'), true);
+  assert.equal(rootReadmeZh.includes('Hermes-Agent managed runtime -> RedCube service-safe domain entry'), false);
   assert.equal(docsReadme.includes('upstream_hermes_agent_final_target_shape.md'), true);
   assert.equal(docsReadmeZh.includes('upstream_hermes_agent_final_target_shape.md'), true);
   assert.equal(project.includes('OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces'), true);

@@ -68,8 +68,6 @@ test('phase-2 family source-truth consumption convergence brief and public docs 
   assert.equal(brief.includes('family source-truth consumption convergence'), true);
   assert.equal(brief.includes('source_truth_contract'), true);
   assert.equal(brief.includes('source_truth_consumption'), true);
-  assert.equal(readme.includes('family source-truth consumption convergence now has an absorbed tranche on the same mainline'), true);
-  assert.equal(readmeZh.includes('family source-truth consumption convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('ppt_deck / xiaohongshu / poster_onepager 已围绕同一 source_truth_contract 与 source_truth_consumption summary 收口消费语义'), true);
   assert.equal(policy.includes('authoritative fail-closed source gate 继续留在 auditDeliverable / runtimeWatch，而 family artifact 需输出统一的 source_truth_consumption summary'), true);
   assert.equal(docsIndex.includes('phase_2_family_source_truth_consumption_convergence.md'), true);

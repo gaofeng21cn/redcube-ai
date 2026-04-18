@@ -68,8 +68,6 @@ test('phase-2 publication projection delivery contract convergence freezes one h
 
 test('phase-2 publication projection delivery contract convergence brief and docs keep the tranche honest', () => {
   const brief = read(TRANCHE_BRIEF);
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
   const runtimeArchitecture = read('docs/runtime_architecture.md');
   const positioning = read('docs/domain-harness-os-positioning.md');
   const policy = read('docs/policies/runtime_operating_model.md');
@@ -82,8 +80,6 @@ test('phase-2 publication projection delivery contract convergence brief and doc
   assert.equal(brief.includes('delivery_contract'), true);
   assert.equal(brief.includes('publication-state.json'), true);
   assert.equal(brief.includes('phase_2_direct_delivery_operator_handoff_hardening'), true);
-  assert.equal(readme.includes('publication projection / delivery contract convergence now has an absorbed tranche on the same mainline'), true);
-  assert.equal(readmeZh.includes('publication projection / delivery contract convergence 已在同一主线上吸收一条 tranche'), true);
   assert.equal(runtimeArchitecture.includes('publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state'), true);
   assert.equal(positioning.includes('`publication projection / delivery contract convergence`'), true);
   assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);

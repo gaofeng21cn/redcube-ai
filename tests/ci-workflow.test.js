@@ -63,7 +63,7 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(pythonRequirements, /^python-pptx==1\.0\.2$/m);
   assert.match(pythonRequirements, /^Pillow==12\.1\.1$/m);
   assert.match(readme, /GitHub Actions CI intentionally stays on the quality lane/);
-  assert.match(readmeZh, /GitHub Actions CI 默认只跑 quality lane/);
+  assert.match(readmeZh, /GitHub Actions 的持续集成默认执行质量验证流程/);
   assert.match(status, /GitHub-hosted CI 默认只跑 `?quality`? lane/);
 });
 
