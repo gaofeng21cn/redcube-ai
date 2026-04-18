@@ -3,6 +3,13 @@ import { readFileSync } from 'node:fs';
 
 import { productEntrySessionDir } from '@redcube/runtime';
 import { buildManagedRuntimeContract } from 'opl-readonly-gateway/managed-runtime-contract';
+import {
+  buildProductEntryOverview,
+  buildProductEntryQuickstart,
+  buildProductEntryReadiness,
+  buildProductEntryResumeSurface,
+  collectFamilyHumanGateIds,
+} from 'opl-readonly-gateway/product-entry-companions';
 
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
@@ -40,17 +47,27 @@ function readCurrentProgramContract() {
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const sessionStoreRoot = productEntrySessionDir();
+  const productEntrySessionCommand = 'redcube product session --entry-session-id <entry-session-id>';
   const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
   const currentProgram = readCurrentProgramContract();
   const currentState = currentProgram.current_state || {};
   const activeMainline = currentState.active_mainline || {};
   const activeBaton = currentState.active_baton || {};
-  const productEntryQuickstart = {
-    surface_kind: 'product_entry_quickstart',
-    recommended_step_id: 'open_frontdesk',
+  const familyOrchestration = buildFamilyOrchestrationCompanion({
+    sessionLocatorField: 'entry_session_contract.entry_session_id',
+    gateStatus: 'requested',
+    reviewSurfaceRef: {
+      ref_kind: 'json_pointer',
+      ref: '/operator_loop_actions/continue_session',
+      label: 'continue session surface',
+    },
+  });
+  const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
+  const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
       'Open the RedCube frontdesk first, then continue the same deliverable loop or inspect the current entry session.'
     ),
+    recommended_step_id: 'open_frontdesk',
     steps: [
       {
         step_id: 'open_frontdesk',
@@ -75,44 +92,37 @@ export async function getProductEntryManifest(request) {
       {
         step_id: 'inspect_current_progress',
         title: 'Inspect current session progress',
-        command: 'redcube product session --entry-session-id <entry-session-id>',
+        command: productEntrySessionCommand,
         surface_kind: 'product_entry_session',
         summary: 'Inspect the current session progress for the same deliverable.',
         requires: ['entry_session_id'],
       },
     ],
-    resume_contract: {
-      surface_kind: 'product_entry_session',
-      session_locator_field: 'entry_session_contract.entry_session_id',
-      checkpoint_locator_field: 'checkpoint_lineage_id',
-    },
-    human_gate_ids: ['redcube_operator_review_gate'],
-  };
-  const productEntryOverview = {
-    surface_kind: 'product_entry_overview',
+    resume_contract: familyOrchestration.resume_contract,
+    human_gate_ids: humanGateIds,
+  });
+  const productEntryOverview = buildProductEntryOverview({
     summary: 'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
     frontdesk_command: 'redcube product frontdesk',
     recommended_command: 'redcube product invoke',
     operator_loop_command: 'redcube product invoke',
     progress_surface: {
       surface_kind: 'product_entry_session',
-      command: 'redcube product session --entry-session-id <entry-session-id>',
+      command: productEntrySessionCommand,
       step_id: 'inspect_current_progress',
     },
-    resume_surface: {
-      surface_kind: 'product_entry_session',
-      command: 'redcube product session --entry-session-id <entry-session-id>',
-      session_locator_field: 'entry_session_contract.entry_session_id',
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
-    },
-    recommended_step_id: 'open_frontdesk',
+    resume_surface: buildProductEntryResumeSurface(
+      productEntrySessionCommand,
+      familyOrchestration.resume_contract,
+    ),
+    recommended_step_id: productEntryQuickstart.recommended_step_id,
     next_focus: [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
       '继续把 OPL federated handoff 与同一 downstream product-entry contract 对齐。',
     ],
     remaining_gaps_count: 2,
-    human_gate_ids: ['redcube_operator_review_gate'],
-  };
+    human_gate_ids: humanGateIds,
+  });
   const productEntryStart = {
     surface_kind: 'product_entry_start',
     summary: (
@@ -157,22 +167,19 @@ export async function getProductEntryManifest(request) {
       {
         mode_id: 'resume_session',
         title: 'Resume session',
-        command: 'redcube product session --entry-session-id <entry-session-id>',
-        surface_kind: 'product_entry_session',
-        summary: 'Resume an existing RedCube product-entry session by entry_session_id.',
-        requires: ['entry_session_id'],
+      command: productEntrySessionCommand,
+      surface_kind: 'product_entry_session',
+      summary: 'Resume an existing RedCube product-entry session by entry_session_id.',
+      requires: ['entry_session_id'],
       },
     ],
-    resume_surface: {
-      surface_kind: 'product_entry_session',
-      command: 'redcube product session --entry-session-id <entry-session-id>',
-      session_locator_field: 'entry_session_contract.entry_session_id',
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
-    },
-    human_gate_ids: ['redcube_operator_review_gate'],
+    resume_surface: buildProductEntryResumeSurface(
+      productEntrySessionCommand,
+      familyOrchestration.resume_contract,
+    ),
+    human_gate_ids: humanGateIds,
   };
-  const productEntryReadiness = {
-    surface_kind: 'product_entry_readiness',
+  const productEntryReadiness = buildProductEntryReadiness({
     verdict: 'service_surface_ready_not_managed_product',
     usable_now: true,
     good_to_use_now: false,
@@ -189,7 +196,7 @@ export async function getProductEntryManifest(request) {
       '成熟的最终用户前台壳仍未 landed。',
       'managed web productization 仍未 landed。',
     ],
-  };
+  });
 
   return {
     ok: true,
@@ -300,7 +307,7 @@ export async function getProductEntryManifest(request) {
       },
       session: {
         command: 'redcube product session',
-        command_template: 'redcube product session --entry-session-id <entry-session-id>',
+        command_template: productEntrySessionCommand,
         surface_kind: 'product_entry_session',
       },
     },
@@ -323,15 +330,7 @@ export async function getProductEntryManifest(request) {
     },
     product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
-    family_orchestration: buildFamilyOrchestrationCompanion({
-      sessionLocatorField: 'entry_session_contract.entry_session_id',
-      gateStatus: 'requested',
-      reviewSurfaceRef: {
-        ref_kind: 'json_pointer',
-        ref: '/operator_loop_actions/continue_session',
-        label: 'continue session surface',
-      },
-    }),
+    family_orchestration: familyOrchestration,
     current_truth: {
       product_entry_contract: 'contracts/runtime-program/redcube-product-entry-mvp.json',
       federated_product_entry_contract: 'contracts/runtime-program/opl-gateway-federated-product-entry.json',
