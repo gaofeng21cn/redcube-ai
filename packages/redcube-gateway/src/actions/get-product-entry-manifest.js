@@ -17,6 +17,7 @@ import {
   buildAutomationDescriptor,
 } from 'opl-readonly-gateway/automation-companions';
 import {
+  buildFamilyProductEntryManifest,
   buildProductEntryStart,
   buildProductEntryOverview,
   buildProductEntryQuickstart,
@@ -426,11 +427,7 @@ export async function getProductEntryManifest(request) {
     ),
   });
 
-  return {
-    ok: true,
-    surface_kind: 'product_entry_manifest',
-    manifest_version: 2,
-    recommended_action: 'invoke_product_entry',
+  return buildFamilyProductEntryManifest({
     manifest_kind: 'redcube_product_entry_manifest',
     target_domain_id: 'redcube_ai',
     formal_entry: {
@@ -553,14 +550,18 @@ export async function getProductEntryManifest(request) {
     product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: familyOrchestration,
-    current_truth: {
-      product_entry_contract: 'contracts/runtime-program/redcube-product-entry-mvp.json',
-      federated_product_entry_contract: 'contracts/runtime-program/opl-gateway-federated-product-entry.json',
-      managed_product_entry_contract: 'contracts/runtime-program/managed-product-entry-hardening.json',
-    },
     notes: [
       'This manifest freezes the current repo-verified RedCube product-entry service surface.',
       'It does not claim that a mature end-user shell or managed web productization is already landed.',
     ],
-  };
+    extra_payload: {
+      ok: true,
+      recommended_action: 'invoke_product_entry',
+      current_truth: {
+        product_entry_contract: 'contracts/runtime-program/redcube-product-entry-mvp.json',
+        federated_product_entry_contract: 'contracts/runtime-program/opl-gateway-federated-product-entry.json',
+        managed_product_entry_contract: 'contracts/runtime-program/managed-product-entry-hardening.json',
+      },
+    },
+  });
 }
