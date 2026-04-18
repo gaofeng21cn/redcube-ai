@@ -17,6 +17,7 @@ import {
   buildAutomationDescriptor,
 } from 'opl-readonly-gateway/automation-companions';
 import {
+  buildProductEntryStart,
   buildProductEntryOverview,
   buildProductEntryQuickstart,
   buildProductEntryReadiness,
@@ -136,8 +137,7 @@ export async function getProductEntryManifest(request) {
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,
   });
-  const productEntryStart = {
-    surface_kind: 'product_entry_start',
+  const productEntryStart = buildProductEntryStart({
     summary: (
       '先打开 RedCube frontdesk；需要直接起一个新会话就走 direct session，'
       + '需要走顶层联邦入口时使用 federated handoff，已有 session 则直接恢复。'
@@ -180,10 +180,10 @@ export async function getProductEntryManifest(request) {
       {
         mode_id: 'resume_session',
         title: 'Resume session',
-      command: productEntrySessionCommand,
-      surface_kind: 'product_entry_session',
-      summary: 'Resume an existing RedCube product-entry session by entry_session_id.',
-      requires: ['entry_session_id'],
+        command: productEntrySessionCommand,
+        surface_kind: 'product_entry_session',
+        summary: 'Resume an existing RedCube product-entry session by entry_session_id.',
+        requires: ['entry_session_id'],
       },
     ],
     resume_surface: buildProductEntryResumeSurface(
@@ -191,7 +191,7 @@ export async function getProductEntryManifest(request) {
       familyOrchestration.resume_contract,
     ),
     human_gate_ids: humanGateIds,
-  };
+  });
   const productEntryReadiness = buildProductEntryReadiness({
     verdict: 'service_surface_ready_not_managed_product',
     usable_now: true,
