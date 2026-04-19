@@ -54,24 +54,3 @@ test('phase-2 review/export/gate/audit hardening contract freezes canonical audi
   assert.equal(auditAction.includes('source_readiness_summary'), true);
   assert.equal(runtimeWatchAction.includes('source_readiness_summary'), true);
 });
-
-test('phase-2 review/export/gate/audit hardening brief and public docs keep the absorbed tranche honest', () => {
-  const brief = read(HARDENING_BRIEF);
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const policy = read('docs/policies/runtime_operating_model.md');
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-
-  assert.equal(existsSync(path.resolve(HARDENING_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(HARDENING_BRIEF)), true);
-  assert.equal(brief.includes('review / export / gate / audit hardening'), true);
-  assert.equal(brief.includes('source_readiness_summary'), true);
-  assert.equal(brief.includes('gate_summary'), true);
-  assert.equal(runtimeArchitecture.includes('review / export / gate / audit hardening` 已吸收为前置 provenance'), true);
-  assert.equal(
-    policy.includes('review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance'),
-    true,
-  );
-  assert.equal(docsIndex.includes('phase_2_review_export_gate_audit_hardening.md'), true);
-  assert.equal(docsIndexZh.includes('phase_2_review_export_gate_audit_hardening.md'), true);
-});

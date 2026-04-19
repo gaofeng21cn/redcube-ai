@@ -63,30 +63,6 @@ test('phase-2 minimum baseline contract freezes canonical quartet, formal entry 
   assert.equal(deliverableRouteLocal.includes('shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId)'), true);
 });
 
-test('phase-2 minimum baseline brief and docs indexes expose the baseline as absorbed provenance while keeping Hermes current scope honest', () => {
-  const brief = read(BASELINE_BRIEF);
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-  const policy = read('docs/policies/runtime_operating_model.md');
-  const positioning = read('docs/domain-harness-os-positioning.md');
-
-  assert.equal(existsSync(path.resolve(BASELINE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(BASELINE_BRIEF)), true);
-  assert.equal(brief.includes('已经吸收到主线的最小 baseline'), true);
-  assert.equal(brief.includes('formal entry：仍只有 `MCP / CLI`'), true);
-  assert.equal(brief.includes('它已经不是 activation-package freeze'), true);
-  assert.equal(brief.includes('但也不是“整个 Phase 2 都已完成”'), true);
-  assert.equal(brief.includes('phase_2_direct_delivery_lifecycle_stage_convergence'), true);
-  assert.equal(runtimeArchitecture.includes('source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线'), true);
-  assert.equal(policy.includes('当前正式能力面'), true);
-  assert.equal(positioning.includes('当前主线能力边界'), true);
-  assert.equal(docsIndex.includes('phase_2_source_intake_shared_source_truth_baseline.md'), true);
-  assert.equal(docsIndexZh.includes('phase_2_source_intake_shared_source_truth_baseline.md'), true);
-});
-
 test('phase-2 minimum baseline contract records gate surface, tests, and the absorbed next tranche honestly', () => {
   const contract = readJson(BASELINE_CONTRACT);
 

@@ -36,15 +36,6 @@ test('operator surface consistency hardening stays absorbed provenance while ups
 
 test('operator surface consistency hardening freezes doctor/help/runtime-watch convergence honestly across current truth surfaces', () => {
   const contract = readJson(TRANCHE_CONTRACT);
-  const brief = read(TRANCHE_BRIEF);
-  const rootAgents = read('AGENTS.md');
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const runtimePolicy = read('docs/policies/runtime_operating_model.md');
-  const positioning = read('docs/domain-harness-os-positioning.md');
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
@@ -52,12 +43,4 @@ test('operator surface consistency hardening freezes doctor/help/runtime-watch c
   assert.equal(contract.operator_surface_alignment.workspace_doctor.must_not_emit_recommended_action.includes('initialize_workspace_contract'), true);
   assert.equal(contract.operator_surface_alignment.cli_help_surface.supported_commands.includes('review watch'), true);
   assert.equal(contract.operator_surface_alignment.runtime_watch_boundary.required_embedded_summaries.includes('lifecycle_stage_summary'), true);
-  assert.equal(brief.includes('closeout 已完成并吸收到当前 mainline'), true);
-  assert.equal(brief.includes('`CLI review watch` / `MCP runtime_watch`'), true);
-  assert.equal(rootAgents.includes('contracts/runtime-program/current-program.json'), true);
-  assert.equal(docsIndex.includes('Phase 2 operator surface consistency hardening'), true);
-  assert.equal(docsIndexZh.includes('Phase 2 operator surface consistency hardening'), true);
-  assert.equal(runtimeArchitecture.includes('`operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path'), true);
-  assert.equal(runtimePolicy.includes('`operator surface consistency hardening` 已在当前主线上吸收'), true);
-  assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
 });

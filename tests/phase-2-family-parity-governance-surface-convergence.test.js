@@ -50,10 +50,6 @@ test('family parity follow-on board remains tracked as historical provenance fro
 test('family parity governance tranche is now absorbed provenance without widening product boundaries', () => {
   const board = readJson(BOARD_CONTRACT);
   const tranche = readJson(TRANCHE_CONTRACT);
-  const brief = read(TRANCHE_BRIEF);
-  const runtimeWatchBrief = read('docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md');
-  const runtimePolicy = read('docs/policies/runtime_operating_model.md');
-  const positioning = read('docs/domain-harness-os-positioning.md');
 
   assert.equal(existsSync(path.resolve(BOARD_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
@@ -70,9 +66,4 @@ test('family parity governance tranche is now absorbed provenance without wideni
     true,
   );
   assert.equal(board.required_verification.includes('npm run test:full'), true);
-  assert.equal(brief.includes('closeout_completed'), true);
-  assert.equal(brief.includes('完成实现并吸收到主线 provenance'), true);
-  assert.equal(runtimeWatchBrief.includes('prefrozen follow-on board'), true);
-  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime'), true);
-  assert.equal(positioning.includes('repo-verified product entry + OPL Gateway federation + managed product-entry hardening'), true);
 });

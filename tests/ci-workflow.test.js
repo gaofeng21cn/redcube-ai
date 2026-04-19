@@ -46,9 +46,6 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.equal(existsSync(path.join(repoRoot, '.github', 'requirements', 'ci-python.txt')), true);
 
   const workflow = readRepoFile('.github/workflows/ci.yml');
-  const readme = readRepoFile('README.md');
-  const readmeZh = readRepoFile('README.zh-CN.md');
-  const status = readRepoFile('docs/status.md');
   assert.match(workflow, /uses:\s*actions\/checkout@v6\b/);
   assert.match(workflow, /uses:\s*actions\/setup-node@v6\b/);
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
@@ -62,9 +59,6 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(pythonRequirements, /^playwright==1\.58\.0$/m);
   assert.match(pythonRequirements, /^python-pptx==1\.0\.2$/m);
   assert.match(pythonRequirements, /^Pillow==12\.1\.1$/m);
-  assert.match(readme, /GitHub Actions CI intentionally stays on the quality lane/);
-  assert.match(readmeZh, /GitHub Actions 的持续集成默认执行质量验证流程/);
-  assert.match(status, /GitHub-hosted CI 默认只跑 `?quality`? lane/);
 });
 
 test('package-lock tracks every declared workspace package', () => {

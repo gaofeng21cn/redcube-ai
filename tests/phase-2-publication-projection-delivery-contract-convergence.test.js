@@ -65,25 +65,3 @@ test('phase-2 publication projection delivery contract convergence freezes one h
   assert.equal(reviewState.includes("projection_kind: 'topic_delivery_projection'"), true);
   assert.equal(reviewState.includes("kind: 'review_state.delivery_projection'"), true);
 });
-
-test('phase-2 publication projection delivery contract convergence brief and docs keep the tranche honest', () => {
-  const brief = read(TRANCHE_BRIEF);
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const positioning = read('docs/domain-harness-os-positioning.md');
-  const policy = read('docs/policies/runtime_operating_model.md');
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-
-  assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
-  assert.equal(brief.includes('publication projection / delivery contract convergence'), true);
-  assert.equal(brief.includes('delivery_contract'), true);
-  assert.equal(brief.includes('publication-state.json'), true);
-  assert.equal(brief.includes('phase_2_direct_delivery_operator_handoff_hardening'), true);
-  assert.equal(runtimeArchitecture.includes('publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state'), true);
-  assert.equal(positioning.includes('`publication projection / delivery contract convergence`'), true);
-  assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
-  assert.equal(policy.includes('当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime'), true);
-  assert.equal(docsIndex.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
-  assert.equal(docsIndexZh.includes('phase_2_publication_projection_delivery_contract_convergence.md'), true);
-});

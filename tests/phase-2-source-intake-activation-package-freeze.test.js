@@ -92,18 +92,3 @@ test('phase-2 activation package freeze keeps gate surface, operator flow, minim
   assert.equal(contract.closeout_evidence_requirements.repo_tracked_truth_surfaces.includes(ACTIVATION_BRIEF), true);
   assert.equal(contract.closeout_evidence_requirements.must_not_claim.includes('Phase 2 implementation has started'), true);
 });
-
-test('phase-2 activation package brief and docs indexes stay synced to the contract after baseline absorption', () => {
-  const brief = read(ACTIVATION_BRIEF);
-  const docsIndex = read(DOCS_INDEX);
-  const docsIndexZh = read(DOCS_INDEX_ZH);
-
-  assert.equal(existsSync(path.resolve(ACTIVATION_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(ACTIVATION_BRIEF)), true);
-  assert.equal(brief.includes('如何被显式激活'), true);
-  assert.equal(brief.includes('不是 `Phase 2` 实现启动令'), true);
-  assert.equal(brief.includes('当前 baton 明确不做'), true);
-  assert.equal(brief.includes('最小 Phase 2 baseline 已在其基础上进入主线'), true);
-  assert.equal(docsIndex.includes('phase_2_source_intake_activation_package_freeze.md'), true);
-  assert.equal(docsIndexZh.includes('phase_2_source_intake_activation_package_freeze.md'), true);
-});

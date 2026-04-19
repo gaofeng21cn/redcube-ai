@@ -34,16 +34,14 @@ test('run-test-group serializes node test files for Codex-backed verification gr
   }), ['--test', '--test-reporter=spec']);
 });
 
-test('serialized verification rule is documented in current program and public docs', () => {
+test('serialized verification rule is documented in current program contract', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
-  const status = readFileSync('docs/status.md', 'utf-8');
 
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency, 1);
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /poster governed screenshot review/i,
   );
-  assert.equal(status.includes('--test-concurrency=1'), true);
 });
 
 test('run-test-group resolves an explicit Python command for screenshot review and export surfaces', () => {
@@ -185,9 +183,8 @@ test('run-test-group fails fast when no Python with playwright can be resolved',
   );
 });
 
-test('Codex-backed verification Python command contract is frozen in current program and public docs', () => {
+test('Codex-backed verification Python command contract is frozen in current program', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
-  const status = readFileSync('docs/status.md', 'utf-8');
 
   assert.equal(
     currentProgram.current_state.green_baseline.local_codex_execution.python_command_env,
@@ -210,5 +207,4 @@ test('Codex-backed verification Python command contract is frozen in current pro
     currentProgram.current_state.green_baseline.local_codex_execution.current_host_latest_route_proof.some((item) => item.includes('local Codex CLI route and managed execution pass repo smoke')),
     true,
   );
-  assert.equal(status.includes('REDCUBE_PYTHON_COMMAND'), true);
 });

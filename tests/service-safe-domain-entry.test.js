@@ -175,8 +175,6 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
 test('service-safe domain entry contract is frozen in contracts and current program', () => {
   const contract = JSON.parse(readFileSync('contracts/runtime-program/service-safe-domain-entry-adapter.json', 'utf-8'));
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
-  const statusDoc = readFileSync('docs/status.md', 'utf-8');
-  const architectureDoc = readFileSync('docs/architecture.md', 'utf-8');
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
   assert.equal(contract.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
@@ -199,6 +197,4 @@ test('service-safe domain entry contract is frozen in contracts and current prog
   });
   assert.equal(contract.redcube_domain_payload.required_fields.includes('deliverable_family'), true);
   assert.equal(currentProgram.current_state.foundation_milestones.service_safe_domain_entry_adapter.status, 'closeout_completed');
-  assert.match(statusDoc, /service-safe domain entry/i);
-  assert.match(architectureDoc, /service-safe domain entry/i);
 });

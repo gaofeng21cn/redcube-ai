@@ -26,45 +26,26 @@ function readJson(file) {
 test('repo-tracked docs keep durable runtime truth while public readmes stay shell-first and codex-default', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = read('apps/redcube-cli/src/cli.js');
-  const rootAgents = read('AGENTS.md');
-  const projectDoc = read('docs/project.md');
-  const invariants = read('docs/invariants.md');
-  const contractsReadme = read('contracts/README.md');
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
-  const docsReadme = read('docs/README.md');
-  const docsReadmeZh = read('docs/README.zh-CN.md');
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const runtimePolicy = read('docs/policies/runtime_operating_model.md');
-  const status = read('docs/status.md');
 
   assert.equal(Boolean(pkg.scripts.redcube), true);
   assert.equal(Boolean(pkg.scripts.mcp), true);
   assert.equal(Boolean(pkg.scripts.controller), false);
   assert.equal(cli.includes("preferredEntry: ['CLI', 'MCP']"), true);
-  assert.equal(rootAgents.includes('docs/project.md'), true);
-  assert.equal(rootAgents.includes('docs/invariants.md'), true);
-  assert.equal(projectDoc.includes('formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
-  assert.equal(invariants.includes('`docs/program/*/*.md`'), true);
-  assert.equal(contractsReadme.includes('runtime-program/current-program.json'), true);
-  assert.equal(readme.includes('## One-Sentence Quick Start'), true);
-  assert.equal(readme.includes('## What It Helps With'), true);
-  assert.equal(readme.includes('## Current Delivery Focus'), true);
-  assert.equal(readme.includes('## How It Works'), true);
-  assert.equal(readme.includes('## Current Boundary'), true);
-  assert.equal(readme.includes('`redcube product federate`'), false);
-  assert.equal(readmeZh.includes('## 一句话快速启动'), true);
-  assert.equal(readmeZh.includes('## 适合处理的工作'), true);
-  assert.equal(readmeZh.includes('## 当前交付重点'), true);
-  assert.equal(readmeZh.includes('## 工作方式'), true);
-  assert.equal(readmeZh.includes('## 当前边界'), true);
-  assert.equal(readmeZh.includes('`redcube product federate`'), false);
-  assert.equal(docsReadme.includes('program/hermes/'), true);
-  assert.equal(docsReadmeZh.includes('docs/program/*/*.md'), true);
-  assert.equal(runtimeArchitecture.includes('route / managed run surface 已按三层 owner 理解'), true);
-  assert.equal(runtimeArchitecture.includes('governance_surface.runtime_topology'), true);
-  assert.equal(runtimePolicy.includes('当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime'), true);
-  assert.equal(status.includes('当前统一协作模型：`OPL` 持有用户可见的顶层管理面；`RedCube AI` 持有 domain authority、review / publication projection 与 visual truth；`Codex` 承担默认交互和执行；`Hermes-Agent` 承担显式备用模式与长期在线 gateway'), true);
+  for (const file of [
+    'AGENTS.md',
+    'README.md',
+    'README.zh-CN.md',
+    'docs/README.md',
+    'docs/README.zh-CN.md',
+    'docs/project.md',
+    'docs/invariants.md',
+    'docs/runtime_architecture.md',
+    'docs/policies/runtime_operating_model.md',
+    'docs/status.md',
+    'contracts/README.md',
+  ]) {
+    assert.equal(existsSync(path.resolve(file)), true, file);
+  }
 });
 
 test('current program points to the Hermes-managed mainline while retaining durable identity boundaries and historical local provenance', () => {

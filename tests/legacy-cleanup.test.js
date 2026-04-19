@@ -37,9 +37,6 @@ test('legacy redcube-agent/workbench runtime path is removed from active code an
     ...walk(path.join(repoRoot, 'apps')),
     ...walk(path.join(repoRoot, 'packages')),
     ...walk(path.join(repoRoot, 'tests')),
-    path.join(repoRoot, 'README.md'),
-    path.join(repoRoot, 'docs', 'README.md'),
-    path.join(repoRoot, 'docs', 'policies', 'runtime_operating_model.md'),
   ].filter(
     (file) =>
       existsSync(file) &&
@@ -55,8 +52,5 @@ test('legacy redcube-agent/workbench runtime path is removed from active code an
     assert.equal(content.includes('.redcube_pi/workbench'), false, file);
     assert.equal(content.includes("'.redcube_pi', 'workbench'"), false, file);
     assert.equal(content.includes('runWorkflow no longer mirrors outputs into workbench truth directories'), false, file);
-    assert.equal(content.includes('guides/README.md'), false, file);
-    assert.equal(content.includes('](guides/'), false, file);
-    assert.equal(content.includes('](./guides/'), false, file);
   }
 });

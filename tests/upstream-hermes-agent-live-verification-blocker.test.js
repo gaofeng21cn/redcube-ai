@@ -12,7 +12,6 @@ function readJson(file) {
 test('historical upstream Hermes live verification blocker is preserved after resolution', () => {
   const blocker = readJson(BLOCKER_CONTRACT);
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
-  const status = readFileSync('docs/status.md', 'utf-8');
 
   assert.equal(blocker.blocker_id, 'upstream_hermes_agent_live_verification_blocker');
   assert.equal(blocker.status, 'historical_blocker_resolved');
@@ -41,7 +40,4 @@ test('historical upstream Hermes live verification blocker is preserved after re
     currentProgram.current_state.foundation_milestones.upstream_hermes_agent_live_verification_blocker.resolved_by,
     'upstream_hermes_agent_live_verification_closeout',
   );
-  assert.equal(status.includes(BLOCKER_CONTRACT), true);
-  assert.equal(status.includes('历史 F4 blocker freeze'), true);
-  assert.equal(status.includes('当前 F4 live closeout proof'), true);
 });

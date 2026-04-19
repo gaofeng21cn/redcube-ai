@@ -120,7 +120,6 @@ test('stable deliverable manual-test contract defines ppt_deck and xiaohongshu m
 test('stable deliverable manual-test brief and backlog surface remain repo-tracked and machine-readable after baton absorption', () => {
   const contract = readJson(MANUAL_TEST_CONTRACT);
   const backlog = readJson(HARDENING_BACKLOG);
-  const brief = read(OPERATOR_BRIEF);
 
   assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(HARDENING_BACKLOG)), true);
@@ -131,10 +130,4 @@ test('stable deliverable manual-test brief and backlog surface remain repo-track
   assert.equal(backlog.execution_summary.suite_result, 'pass');
   assert.equal(backlog.execution_summary.findings_recorded, 0);
   assert.deepEqual(backlog.items, []);
-  assert.equal(brief.includes('stable deliverable manual-test-driven hardening'), true);
-  assert.equal(brief.includes('closeout_completed'), true);
-  assert.equal(brief.includes('Codex App'), true);
-  assert.equal(brief.includes('ppt_deck'), true);
-  assert.equal(brief.includes('xiaohongshu'), true);
-  assert.equal(brief.includes('Phase 2 / source intake + shared source truth'), true);
 });

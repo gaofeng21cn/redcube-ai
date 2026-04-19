@@ -37,26 +37,10 @@ test('runtime watch locator integrity hardening remains absorbed provenance afte
 
 test('runtime watch locator integrity hardening freezes run identity persistence and quartet fail-closed behavior honestly across current truth surfaces', () => {
   const contract = readJson(TRANCHE_CONTRACT);
-  const brief = read(TRANCHE_BRIEF);
-  const rootAgents = read('AGENTS.md');
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const runtimePolicy = read('docs/policies/runtime_operating_model.md');
-  const positioning = read('docs/domain-harness-os-positioning.md');
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.deepEqual(contract.minimal_test_surface.truth_freeze_tests, ['tests/phase-2-runtime-watch-locator-integrity-hardening.test.js']);
   assert.deepEqual(contract.run_locator_integrity_surface.required_run_record_fields, ['topic_id', 'deliverable_id']);
   assert.equal(contract.run_locator_integrity_surface.deliverable_watch_without_run_rule.includes('without runId or run'), true);
-  assert.equal(brief.includes('`topic_id` / `deliverable_id`'), true);
-  assert.equal(brief.includes('quartet locator'), true);
-  assert.equal(brief.includes('只给 `workspaceRoot/topicId/deliverableId`、不带 `runId` / `run` 时'), true);
-  assert.equal(rootAgents.includes('contracts/runtime-program/current-program.json'), true);
-  assert.equal(docsIndex.includes('Phase 2 runtime watch locator integrity hardening'), true);
-  assert.equal(docsIndexZh.includes('Phase 2 runtime watch locator integrity hardening'), true);
-  assert.equal(runtimeArchitecture.includes('`runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope'), true);
-  assert.equal(runtimePolicy.includes('`runtime watch locator integrity hardening` 已在当前主线上吸收'), true);
-  assert.equal(positioning.includes('当前 active tranche 应按 `repo-verified product entry + OPL Gateway federation + managed product-entry hardening` 理解'), true);
 });

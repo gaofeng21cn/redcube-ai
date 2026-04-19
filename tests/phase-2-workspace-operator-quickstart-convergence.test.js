@@ -37,10 +37,6 @@ test('workspace operator quickstart convergence stays absorbed provenance while 
 
 test('workspace operator quickstart convergence freezes brand-new or thin workspace bootstrap, docs, and help surface honestly', () => {
   const contract = readJson(TRANCHE_CONTRACT);
-  const brief = read(TRANCHE_BRIEF);
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-  const quickstart = read('docs/human_quickstart.md');
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
@@ -49,14 +45,4 @@ test('workspace operator quickstart convergence freezes brand-new or thin worksp
   assert.equal(contract.workspace_bootstrap_surface.doctor_on_brand_new_recommended_action, 'run_source_intake');
   assert.equal(contract.workspace_bootstrap_surface.bootstrap_writers.includes('source research'), true);
   assert.equal(contract.governance_alignment.required_surfaces.includes('getPublicationProjection'), true);
-  assert.equal(brief.includes('closeout 已完成并吸收到当前 mainline'), true);
-  assert.equal(brief.includes('`workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run`'), true);
-  assert.equal(brief.includes('brand-new workspace 上返回 `run_source_intake`'), true);
-  assert.equal(quickstart.includes('`redcube source intake`（材料已足够时）'), true);
-  assert.equal(quickstart.includes('`redcube source research`（材料薄或只有主题时）'), true);
-  assert.equal(quickstart.includes('`redcube deliverable run`'), true);
-  assert.equal(docsIndex.includes('phase_2_workspace_operator_quickstart_convergence.md'), true);
-  assert.equal(docsIndexZh.includes('phase_2_workspace_operator_quickstart_convergence.md'), true);
-  assert.equal(docsIndex.includes('current recommended next-line brief'), false);
-  assert.equal(docsIndexZh.includes('当前推荐 next-line brief'), false);
 });

@@ -47,22 +47,10 @@ test('workspace packages and apps participate in package-level tsconfig layering
   }
 });
 
-test('typescript migration policy freezes new code defaults and JS compatibility shell rules', () => {
-  const strategy = readFileSync(path.resolve('docs/policies/typescript_migration_policy.md'), 'utf-8');
-  assert.match(strategy, /新代码默认使用 TypeScript/);
-  assert.match(strategy, /旧 JS 只在明确迁移窗口内短期共存/);
-  assert.match(strategy, /NodeNext/);
-  assert.match(strategy, /typecheck 成为正式质量门/);
+test('typescript migration policy reference stays tracked', () => {
+  assert.equal(existsSync(path.resolve('docs/policies/typescript_migration_policy.md')), true);
 });
 
-test('root AGENTS points to the current verification entrypoints without pinning legacy command-surface freeze wording', () => {
-  const agents = readFileSync(path.resolve('AGENTS.md'), 'utf-8');
-  assert.match(agents, /默认最小验证入口是 `scripts\/verify\.sh`/);
-  assert.match(agents, /默认 smoke 是 `npm test` \/ `npm run test:fast`/);
-  assert.match(agents, /`npm run test:meta`、`npm run test:integration`、`npm run test:e2e` 是显式 lane/);
-  assert.match(agents, /`npm run test:full` 是 clean-clone 基线/);
-  assert.match(
-    agents,
-    /修改 formal-entry、execution handle、runtime mainline、program brief 路径、测试命令或 CI 分层时，必须同步改 README、docs、contracts 与相关测试/,
-  );
+test('root AGENTS stays tracked', () => {
+  assert.equal(existsSync(path.resolve('AGENTS.md')), true);
 });

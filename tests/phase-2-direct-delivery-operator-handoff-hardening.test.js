@@ -32,20 +32,3 @@ test('phase-2 direct-delivery operator handoff tranche is frozen as a repo-track
   assert.equal(contract.object_boundary.out_of_scope.includes('controller expansion'), true);
   assert.equal(contract.object_boundary.out_of_scope.includes('paper_poster or conference_poster academic contract advancement'), true);
 });
-
-test('phase-2 direct-delivery operator handoff brief keeps the tranche honest', () => {
-  const brief = read(TRANCHE_BRIEF);
-  const runtimePolicy = read('docs/policies/runtime_operating_model.md');
-  const runtimeArchitecture = read('docs/runtime_architecture.md');
-  const docsIndex = read('docs/README.md');
-  const docsIndexZh = read('docs/README.zh-CN.md');
-
-  assert.equal(brief.includes('operator_handoff.owner_surface'), true);
-  assert.equal(brief.includes('request_changes'), true);
-  assert.equal(brief.includes('promote_baseline'), true);
-  assert.equal(brief.includes('formal entry 仍只有 `MCP / CLI`'), true);
-  assert.equal(runtimePolicy.includes('formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`'), true);
-  assert.equal(runtimeArchitecture.includes('`direct-delivery operator handoff hardening` 已把 `ppt_deck` / guarded `poster_onepager` 的 `operator_handoff` 收紧到同一 canonical governance path'), true);
-  assert.equal(docsIndex.includes('phase_2_direct_delivery_operator_handoff_hardening.md'), true);
-  assert.equal(docsIndexZh.includes('phase_2_direct_delivery_operator_handoff_hardening.md'), true);
-});

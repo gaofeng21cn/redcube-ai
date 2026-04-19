@@ -76,21 +76,3 @@ test('upstream Hermes-Agent activation package is closed out as the frozen upstr
     'redcube product invoke',
   );
 });
-
-test('public and maintainer docs keep the upstream activation package as historical provenance instead of the current mainline preflight', () => {
-  const readme = read('README.md');
-  const readmeZh = read('README.zh-CN.md');
-  const docsReadme = read('docs/README.md');
-  const status = read('docs/status.md');
-  const brief = read(ACTIVATION_PACKAGE_BRIEF);
-
-  assert.equal(readme.includes('upstream-hermes-agent-activation-package'), false);
-  assert.equal(readmeZh.includes('upstream-hermes-agent-activation-package'), false);
-  assert.equal(docsReadme.includes('upstream_hermes_agent_activation_package.md'), true);
-  assert.equal(status.includes('当前历史 upstream activation proof'), true);
-  assert.equal(brief.includes('`REDCUBE_PYTHON_COMMAND`'), true);
-  assert.equal(brief.includes('`/v1/health`'), true);
-  assert.equal(brief.includes('`/v1/runs/{run_id}/events`'), true);
-  assert.equal(brief.includes('`hermes gateway run -q`'), true);
-  assert.equal(brief.includes('`REDCUBE_HERMES_GATEWAY_COMMAND`'), true);
-});

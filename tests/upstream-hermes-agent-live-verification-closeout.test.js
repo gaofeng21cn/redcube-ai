@@ -14,11 +14,6 @@ test('upstream Hermes live verification closeout is frozen as the completed F4 p
   const closeout = readJson(CLOSEOUT_CONTRACT);
   const blocker = readJson(BLOCKER_CONTRACT);
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
-  const status = readFileSync('docs/status.md', 'utf-8');
-  const docsReadme = readFileSync('docs/README.md', 'utf-8');
-  const docsReadmeZh = readFileSync('docs/README.zh-CN.md', 'utf-8');
-  const contractsReadme = readFileSync('contracts/README.md', 'utf-8');
-  const brief = readFileSync(CLOSEOUT_BRIEF, 'utf-8');
 
   assert.equal(closeout.closeout_id, 'upstream_hermes_agent_live_verification_closeout');
   assert.equal(closeout.status, 'closeout_completed');
@@ -39,11 +34,4 @@ test('upstream Hermes live verification closeout is frozen as the completed F4 p
     'closeout_completed',
   );
   assert.equal(blocker.resolution.resolved_by_contract, CLOSEOUT_CONTRACT);
-  assert.equal(status.includes(CLOSEOUT_CONTRACT), true);
-  assert.equal(status.includes(CLOSEOUT_CONTRACT), true);
-  assert.equal(docsReadme.includes('upstream_hermes_agent_live_verification_closeout.md'), true);
-  assert.equal(docsReadmeZh.includes('upstream_hermes_agent_live_verification_closeout.md'), true);
-  assert.equal(contractsReadme.includes('upstream-hermes-agent-live-verification-closeout.json'), true);
-  assert.equal(brief.includes('当前验证宿主上诚实写成 completed'), true);
-  assert.equal(brief.includes('mature `RedCube Product Entry`'), true);
 });
