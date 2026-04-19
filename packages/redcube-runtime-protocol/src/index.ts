@@ -29,7 +29,6 @@ import {
 import type {
   BuildSourceTruthConsumptionSummaryOptions,
   CreateManagedRunRecordInput,
-  ManagedAdapterSwitchRecord,
   ManagedControllerDecisionRecord,
   ManagedEscalationRecord,
   CreateRunRecordInput,
@@ -131,7 +130,6 @@ export {
 export type {
   BuildSourceTruthConsumptionSummaryOptions,
   CreateManagedRunRecordInput,
-  ManagedAdapterSwitchRecord,
   ManagedControllerDecisionRecord,
   ManagedEscalationRecord,
   CreateRunRecordInput,
