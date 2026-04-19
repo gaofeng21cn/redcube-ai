@@ -65,32 +65,7 @@ You can start with prompts like:
 
 1. Potential users should start here, then continue to the [Docs Guide](./docs/README.md).
 2. Technical readers and planners should read [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
-3. Developers and maintainers should continue into `docs/program/`, `docs/references/`, `docs/policies/`, and `docs/history/`.
-
-## Technical Notes For Maintainers
-
-The repository home stays user-facing on purpose.
-Runtime topology, product-entry records, phase documents, and bridge references live in the technical docs:
-
-- [Docs Guide](./docs/README.md)
-- [Project](./docs/project.md)
-- [Status](./docs/status.md)
-- [Contracts Overview](./contracts/README.md)
-- `docs/program/`
-- `docs/references/`
-
-## Development Verification
-
-GitHub Actions CI intentionally stays on the quality lane.
-
-- `npm run test:fast`
-- `npm run test:meta`
-- `npm run test:integration`
-- `npm run test:e2e`
-- `npm run test:historical`
-- `npm run test:full`
-- Serialized Node verification for the heavier Codex-backed groups uses `--test-concurrency=1`.
-- If screenshot review or export checks need a Playwright-capable interpreter, point `REDCUBE_PYTHON_COMMAND` at that Python executable.
+3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/program/`, `docs/references/`, `docs/policies/`, and `docs/history/`.
 
 ## Further Reading
 

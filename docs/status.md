@@ -1,17 +1,18 @@
 # RedCube AI 当前状态
 
-## 默认入口链路
+## 默认入口口径
 
-- 默认用户入口链路：`OPL shell -> RCA / RedCube domain agent -> Codex default execution`
-- `RCA / RedCube` 负责 visual-deliverable domain truth：source intake、deliverable creation、review loop、export
-- `Codex` 负责默认本地执行与 operator loop
-- `Hermes-Agent` 负责显式长期在线 gateway lane（session / run / watch / resume）
+- formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
+- repo-verified direct route：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- repo-verified federated route：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- runtime owner split：`Hermes-Agent` 持有 managed runtime，`RedCube AI` 持有 visual-domain truth，`Codex CLI` 继续作为 executor adapter 选中的默认 concrete executor
 
 ## 当前执行口径
 
-- formal-entry matrix：`CLI`（默认正式入口）、`MCP`（协议层）、`controller`（内部控制面）
+- product-entry service surface：`invokeProductEntry`、`getProductEntrySession`、`redcube product invoke`、`redcube product session`
+- federated OPL handoff surface：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
+- shared service-safe domain entry：`invokeDomainEntry`、`invoke_domain_entry`
 - direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
-- OPL bridge surfaces：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
 ## 默认验证入口
@@ -35,6 +36,6 @@
 
 ## 当前收口重点
 
-- 保持默认入口叙事稳定：`OPL shell -> RCA domain agent -> Codex default execution`
+- 保持 direct route 与 federated route 共用同一条 service-safe domain entry 下游
+- 保持 upstream Hermes runtime owner、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持默认验证轻量，历史 provenance 通过 `historical` lane 独立追溯
-- 保持 public docs、contracts、tests 的入口口径一致

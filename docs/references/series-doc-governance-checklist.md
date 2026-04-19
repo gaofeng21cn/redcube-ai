@@ -33,9 +33,9 @@
 
 ## 四、系列一致性检查
 
-- 文档必须把 `RedCube AI` 写成 visual-deliverable domain gateway 与 `Domain Harness OS`，而不是 `OPL` 顶层 gateway，也不是已经切到上游 `Hermes-Agent` runtime owner 的既成事实。
+- 文档必须把 `RedCube AI` 写成 visual-deliverable domain gateway 与 `Domain Harness OS`，并把默认 direct route、federated `OPL` route、`Hermes-Agent managed runtime`、`RedCube service-safe domain entry` 写成同一条 repo-verified 链路。
 - 系列项目名称与角色要与四仓当前真相同步：`One Person Lab` 是顶层 gateway，`Med Auto Science` 是 `Research Ops`，`Med Auto Grant` 是 author-side `Grant Ops`。
-- 若提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内 runtime package、pilot、shim、compatibility material 都不能被写成“已接入 Hermes-Agent”。
+- 若提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内 runtime package、pilot、shim、compatibility material 都只能写成 repo-side adapter 或 service-safe consumption surface。
 - 默认公开入口、program brief、内部参考、稳定规则、typed boundary audit 与历史 provenance 必须继续分层，不把 reference/history 重新挤进公开默认入口。
 - 修改 docs skeleton、公开入口、product-entry truth、program pointer、typed boundary 或 contract surface 时，必须同步更新相关测试。
 

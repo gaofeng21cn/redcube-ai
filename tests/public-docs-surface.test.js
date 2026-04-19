@@ -39,15 +39,42 @@ test('public docs surface keeps the governance references tracked', () => {
 });
 
 test('public docs surface keeps the default entry chain and isolates historical program wording', () => {
+  const readme = readText('README.md');
+  const readmeZh = readText('README.zh-CN.md');
   const docsReadme = readText(path.join('docs', 'README.md'));
   const docsReadmeZh = readText(path.join('docs', 'README.zh-CN.md'));
   const docsStatus = readText(path.join('docs', 'status.md'));
+  const docsArchitecture = readText(path.join('docs', 'architecture.md'));
+  const currentProgram = JSON.parse(readText(path.join('contracts', 'runtime-program', 'current-program.json')));
 
-  assert.match(docsReadme, /OPL shell -> RCA domain agent -> Codex default execution/);
-  assert.match(docsReadmeZh, /OPL shell -> RCA domain agent -> Codex default execution/);
-  assert.match(docsStatus, /OPL shell -> RCA \/ RedCube domain agent -> Codex default execution/);
+  assert.match(docsReadme, /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/);
+  assert.match(docsReadme, /OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime/);
+  assert.match(docsReadmeZh, /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/);
+  assert.match(docsReadmeZh, /OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime/);
+  assert.match(docsStatus, /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/);
+  assert.match(docsStatus, /invokeProductEntry/);
+  assert.match(docsStatus, /invokeFederatedProductEntry/);
+  assert.match(docsStatus, /invokeDomainEntry/);
+  assert.match(docsArchitecture, /Hermes-Agent managed runtime/);
+  assert.match(docsArchitecture, /invokeProductEntry/);
+  assert.match(docsArchitecture, /invokeFederatedProductEntry/);
+  assert.match(docsArchitecture, /invokeDomainEntry/);
+  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'upstream_hermes_agent');
+  assert.match(
+    currentProgram.longrun_goal.final_target_route.redcube_direct_entry,
+    /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/,
+  );
+  assert.match(
+    currentProgram.longrun_goal.final_target_route.opl_federated_entry,
+    /OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime/,
+  );
 
   assert.doesNotMatch(docsReadme, /repo-tracked program|current truth|active tranche|current-program\.json/i);
   assert.doesNotMatch(docsReadmeZh, /repo-tracked program|当前真相|活跃 tranche|current-program\.json/i);
   assert.doesNotMatch(docsStatus, /active mainline pointer|current-program\.json/i);
+  assert.doesNotMatch(readme, /Development Verification|Technical Notes For Maintainers|test:historical|REDCUBE_PYTHON_COMMAND/);
+  assert.doesNotMatch(readmeZh, /开发验证|给维护者的技术入口|test:historical|REDCUBE_PYTHON_COMMAND/);
+  assert.doesNotMatch(docsReadme, /OPL shell -> RCA domain agent -> Codex default execution/);
+  assert.doesNotMatch(docsReadmeZh, /OPL shell -> RCA domain agent -> Codex default execution/);
+  assert.doesNotMatch(docsStatus, /OPL shell -> RCA \/ RedCube domain agent -> Codex default execution/);
 });

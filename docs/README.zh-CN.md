@@ -3,8 +3,10 @@
 [English](./README.md) | **中文**
 
 这个目录是 `RedCube AI` 的技术阅读层。
-默认公开叙事固定为：
-`OPL shell -> RCA domain agent -> Codex default execution`。
+当前公开阅读路径围绕两条 repo-verified 路线展开：
+
+- direct route：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- federated route：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 ## 按读者类型进入
 
@@ -16,10 +18,10 @@
 
 ## 当前基线
 
-- `OPL` 是顶层壳层入口。
-- `RCA / RedCube AI` 是壳层下的视觉交付 domain agent。
-- `Codex` 是本地 operator 工作流的默认执行宿主。
-- `Hermes-Agent` 是 session/run/watch/resume 场景下的显式长期在线 gateway lane。
+- `Hermes-Agent` 是 session、run、watch、resume 这层的上游 managed runtime owner。
+- `RedCube AI` 持有 visual-domain truth、`invokeDomainEntry`，以及 repo-verified 的 product-entry service surface。
+- `Codex CLI` 继续作为 executor-adapter 合同后面的默认 concrete executor，服务本地 operator 工作流。
+- `OPL` 在需要 family-level routing 时通过 federated handoff surface 进入。
 
 ## 技术工作集
 
@@ -50,6 +52,6 @@
 
 ## 文档规则
 
-- `README*` 与 `docs/README*` 统一围绕默认入口链路叙事。
+- `README*` 与 `docs/README*` 统一围绕 repo-verified direct route、federated OPL route 与 service-safe domain entry surface 叙事。
 - 对外文档在适用时保持中英双语镜像。
 - 历史材料继续沉淀在 program/history/reference 层。

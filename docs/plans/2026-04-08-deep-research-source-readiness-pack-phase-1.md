@@ -1,12 +1,12 @@
-# Deep Research Source Readiness Pack Phase 1 Implementation Plan
+# Historical Deep Research Source Readiness Pack Phase 1 Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> 历史规划工件，冻结于 `2026-04-08`。它保留当时的 source-readiness 第一阶段实现设想。当前 direct route、federated route 和活跃运行口径以 `docs/status.md`、`docs/architecture.md`、`docs/README.md` 和 `contracts/runtime-program/current-program.json` 为准。
 
-**Goal:** 把第 1 步 `Source Readiness` 升格为正式可消费能力面，先落一版共享 `Source Readiness Pack`，并让 `xiaohongshu` 率先消费它，完成 `Deep Research` 的第一阶段落地。
+**Historical goal:** 把第 1 步 `Source Readiness` 升格为正式可消费能力面，先落一版共享 `Source Readiness Pack`，并让 `xiaohongshu` 率先消费它，完成 `Deep Research` 的第一阶段落地。
 
-**Architecture:** 保留现有 canonical quartet 作为底层真相面，在同一 `topics/<topic>/canonical/` 下新增一个衍生但正式的 `source-readiness-pack.json`。`xiaohongshu research` 从“混入 storyline 判断”的薄 brief，收紧成“基于 shared source truth 的事实库 / readiness artifact”；`storyline` 再从 source truth / readiness pack 中生成受众、why-now、tension、memory hook。这样不需要先让 `ppt_deck` 长出显式 `research` route，也不会破坏现有 shared runtime 主线。
+**Historical architecture:** 保留现有 canonical quartet 作为底层真相面，在同一 `topics/<topic>/canonical/` 下新增一个衍生但正式的 `source-readiness-pack.json`。`xiaohongshu research` 从“混入 storyline 判断”的薄 brief，收紧成“基于 shared source truth 的事实库 / readiness artifact”；`storyline` 再从 source truth / readiness pack 中生成受众、why-now、tension、memory hook。这样不需要先让 `ppt_deck` 长出显式 `research` route，也不会破坏现有 shared runtime 主线。
 
-**Tech Stack:** Node.js ESM、repo 内置 `node:test`、`@redcube/runtime-protocol`、`@redcube/runtime`、`@redcube/gateway`、`xiaohongshu` family runtime/prompts、CLI/文档 surface。
+**Historical tech stack:** Node.js ESM、repo 内置 `node:test`、`@redcube/runtime-protocol`、`@redcube/runtime`、`@redcube/gateway`、`xiaohongshu` family runtime/prompts、CLI/文档 surface。
 
 ---
 

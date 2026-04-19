@@ -65,32 +65,7 @@
 
 1. 潜在用户先读当前首页，再继续看 [文档索引](./docs/README.zh-CN.md)。
 2. 技术规划、架构判断和方向同步，继续读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 以及 [合同说明](./contracts/README.md)。
-3. 开发者和维护者再进入 `docs/program/`、`docs/references/`、`docs/policies/` 与 `docs/history/`。
-
-## 给维护者的技术入口
-
-首页会故意保持成用户入口。
-运行时拓扑、产品入口记录、阶段文档和桥接参考都放在下面这些技术文档里：
-
-- [文档索引](./docs/README.zh-CN.md)
-- [项目概览](./docs/project.md)
-- [当前状态](./docs/status.md)
-- [合同说明](./contracts/README.md)
-- `docs/program/`
-- `docs/references/`
-
-## 开发验证
-
-GitHub Actions 的持续集成默认执行质量验证流程。
-
-- `npm run test:fast`
-- `npm run test:meta`
-- `npm run test:integration`
-- `npm run test:e2e`
-- `npm run test:historical`
-- `npm run test:full`
-- 对较重的 Codex-backed 验证组，Node 侧串行执行会显式使用 `--test-concurrency=1`。
-- 如果截图审阅或导出检查需要带 Playwright 的 Python，请把 `REDCUBE_PYTHON_COMMAND` 指向对应解释器。
+3. 开发者和维护者继续从 [文档索引](./docs/README.zh-CN.md) 进入 `docs/program/`、`docs/references/`、`docs/policies/` 与 `docs/history/`。
 
 ## 延伸阅读
 

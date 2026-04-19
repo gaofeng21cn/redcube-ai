@@ -3,8 +3,10 @@
 **English** | [中文](./README.zh-CN.md)
 
 This directory is the technical reading layer for `RedCube AI`.
-The default public narrative is fixed to:
-`OPL shell -> RCA domain agent -> Codex default execution`.
+The current public reading path is anchored on two repo-verified routes:
+
+- direct route: `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- federated route: `User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 ## Start Here By Audience
 
@@ -16,10 +18,10 @@ The default public narrative is fixed to:
 
 ## Current Baseline
 
-- `OPL` is the top-level shell.
-- `RCA / RedCube AI` is the visual-deliverable domain agent under that shell.
-- `Codex` is the default execution host for local operator workflows.
-- `Hermes-Agent` is an explicit long-running gateway lane for session/run/watch/resume scenarios.
+- `Hermes-Agent` is the upstream managed runtime owner for session, run, watch, and resume.
+- `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, and the repo-verified product-entry service surface.
+- `Codex CLI` remains the default concrete executor selected behind the executor-adapter contract for local operator workflows.
+- `OPL` joins through the federated handoff surface when family-level routing is needed.
 
 ## Technical Working Set
 
@@ -50,6 +52,6 @@ The default public narrative is fixed to:
 
 ## Documentation Rules
 
-- Keep `README*` and `docs/README*` aligned with the default entry chain.
+- Keep `README*` and `docs/README*` aligned with the repo-verified direct route, federated OPL route, and service-safe domain entry surface.
 - Keep English and Chinese public docs mirrored where applicable.
 - Keep historical materials available in program/history/reference layers.
