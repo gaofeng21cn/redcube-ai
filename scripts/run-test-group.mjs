@@ -29,7 +29,6 @@ const META = [
   'tests/creative-ownership-recovery-audit.test.js',
   'tests/codex-cli-client.test.js',
   'tests/codex-cli-timeout.test.js',
-  'tests/direct-delivery-longrun-target.test.js',
   'tests/family-onboarding-standard.test.js',
   'tests/harness-completion-audit.test.js',
   'tests/kernel-split-extraction.test.js',
@@ -56,7 +55,6 @@ const META = [
   'tests/poster-production-hardening-freeze.test.js',
   'tests/ppt-overlay.test.js',
   'tests/profile-contract-hydration.test.js',
-  'tests/public-docs-surface.test.js',
   'tests/publish-governance-single-owner.test.js',
   'tests/reference-quality-os.test.js',
   'tests/render-ceiling-deepening.test.js',
@@ -108,6 +106,7 @@ const INTEGRATION = [
   'tests/private-profile.test.js',
   'tests/product-entry.test.js',
   'tests/publication-projection-delivery-contract.test.js',
+  'tests/public-docs-surface.test.js',
   'tests/reference-quality-os-replacement.test.js',
   'tests/reference-quality-os-reporting.test.js',
   'tests/reference-regression.test.js',
@@ -124,6 +123,7 @@ const INTEGRATION = [
   'tests/source-readiness-deep-research-gate.test.js',
   'tests/source-research.test.js',
   'tests/workspace-operator-quickstart.test.js',
+  'tests/direct-delivery-longrun-target.test.js',
   'tests/xiaohongshu-creative-ownership.test.js',
 ];
 

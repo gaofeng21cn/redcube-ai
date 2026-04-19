@@ -52,19 +52,14 @@
 RedCube product entry MVP 继续作为 domain-agent frontdesk、invoke、manifest、session surface 的技术记录。
 hardening tranche 继续作为当前 Codex-default execution 与 readiness closeout 记录。
 
-### 技术追溯与已吸收记录
+### 技术追溯
 
 - [`docs/program/`](program/)
 - [`docs/history/`](history/)
 - [Source augmentation executor contract](source_augmentation_executor_contract.md)
 
-这些目录承载 internal OPL bridge wiring、upstream Hermes proof、已吸收的 Phase 2 provenance 与早期 service-boundary 术语。
-它们服务维护者和 shell integration，公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`。
-
-### future-facing 目标态文档
-
-- [Source Readiness Deep Research Longrun Target State](source_readiness_deep_research_longrun_target_state.md)（future-facing 目标态文档）
-- [Direct Delivery Longrun Target State](direct_delivery_longrun_target_state.md)（future-facing 目标态文档）
+这些目录承载仓库跟踪的 program 记录、历史材料和支持性技术参考，服务维护者和 shell integration。
+公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`。
 
 ### 参考资料
 

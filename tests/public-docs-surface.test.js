@@ -1,9 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const repoRoot = process.cwd();
+
+function readText(file) {
+  return readFileSync(path.join(repoRoot, file), 'utf-8');
+}
 
 test('public docs surface keeps the tracked entry files in place', () => {
   assert.equal(existsSync(path.join(repoRoot, 'guides', 'README.md')), false);
@@ -32,4 +36,12 @@ test('public docs surface keeps the governance references tracked', () => {
   ]) {
     assert.equal(existsSync(path.join(repoRoot, ...file)), true, file.join('/'));
   }
+});
+
+test('public docs surface keeps absorbed phase-2 provenance and longrun target wording out of the default docs index', () => {
+  const docsReadme = readText(path.join('docs', 'README.md'));
+  const docsReadmeZh = readText(path.join('docs', 'README.zh-CN.md'));
+
+  assert.doesNotMatch(docsReadme, /absorbed phase-2 provenance|future-facing design target|Direct Delivery Longrun Target State/);
+  assert.doesNotMatch(docsReadmeZh, /已吸收的 Phase 2 provenance|future-facing 目标态文档|Direct Delivery Longrun Target State/);
 });

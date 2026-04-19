@@ -52,19 +52,14 @@ Public-facing material should stay mirrored in English and Chinese where applica
 The RedCube product entry MVP remains a technical record for the domain-agent frontdesk, invoke, manifest, and session surfaces.
 The hardening tranche remains the current Codex-default execution and readiness closeout record.
 
-### Technical provenance and absorbed records
+### Technical traceability
 
 - [`docs/program/`](program/)
 - [`docs/history/`](history/)
 - [Source augmentation executor contract](source_augmentation_executor_contract.md)
 
-These directories carry internal OPL bridge wiring, upstream Hermes proof, absorbed phase-2 provenance, and older service-boundary terminology.
-They remain technical traceability for maintainers and shell integration, while the public entry model stays `OPL shell -> RedCube domain agent -> Codex default execution`.
-
-### Future-facing design target
-
-- [Source Readiness Deep Research Longrun Target State](source_readiness_deep_research_longrun_target_state.md) (future-facing design target)
-- [Direct Delivery Longrun Target State](direct_delivery_longrun_target_state.md) (future-facing design target)
+These directories carry repo-tracked program records, historical material, and supporting technical references for maintainers and shell integration.
+The public entry model stays `OPL shell -> RedCube domain agent -> Codex default execution`.
 
 ### References
 

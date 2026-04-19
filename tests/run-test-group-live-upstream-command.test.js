@@ -10,6 +10,12 @@ import {
   SERIALIZED_VERIFICATION_GROUP_NAMES,
 } from '../scripts/run-test-group-lib.mjs';
 
+function readGroupList(script, groupName) {
+  const match = script.match(new RegExp(`const ${groupName} = \\[(.*?)\\];`, 's'));
+  assert.ok(match, `missing ${groupName} group`);
+  return [...match[1].matchAll(/'([^']+\.test\.js)'/g)].map((entry) => entry[1]);
+}
+
 test('run-test-group serializes the heavy verification groups on the active Codex mainline', () => {
   assert.deepEqual(
     [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
@@ -32,6 +38,17 @@ test('run-test-group serializes node test files for Codex-backed verification gr
     groupName: 'meta',
     forwardedArgs: ['--test-reporter=spec'],
   }), ['--test', '--test-reporter=spec']);
+});
+
+test('default meta leaves docs-surface and longrun-target tests in integration', () => {
+  const script = readFileSync('scripts/run-test-group.mjs', 'utf-8');
+  const meta = readGroupList(script, 'META');
+  const integration = readGroupList(script, 'INTEGRATION');
+
+  assert.equal(meta.includes('tests/public-docs-surface.test.js'), false);
+  assert.equal(meta.includes('tests/direct-delivery-longrun-target.test.js'), false);
+  assert.equal(integration.includes('tests/public-docs-surface.test.js'), true);
+  assert.equal(integration.includes('tests/direct-delivery-longrun-target.test.js'), true);
 });
 
 test('serialized verification rule is documented in current program contract', () => {
