@@ -30,6 +30,7 @@
 - Hermes migration/history records：`docs/program/hermes/`
 - 历史归档入口：`docs/history/`
 - 支持性技术参考：`docs/references/`
+- direct-delivery future target reference：`docs/references/direct_delivery_longrun_target_state.md`
 
 ## 当前收口重点
 

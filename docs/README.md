@@ -45,6 +45,7 @@ The default public narrative is fixed to:
 - `docs/history/`: archive index
 - `docs/references/`: supporting technical references
 - `docs/policies/`: stable governance and operating rules
+- [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
 
 ## Documentation Rules
 

@@ -2,7 +2,7 @@
 
 日期锚点：`2026-04-09`
 
-这份文档定义的是 **future-facing** 的 direct-delivery longrun target。
+这份参考文档定义的是 **future-facing** 的 direct-delivery longrun target。
 
 这份 future-facing 目标态文档不是当前 repo truth 的改写。
 
