@@ -13,7 +13,7 @@ The current public reading path is anchored on two repo-verified routes:
 | Audience | Start here | Why |
 | --- | --- | --- |
 | Potential users and domain experts | [Repository home](../README.md) | Understand what RedCube delivers before opening technical files |
-| Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and verification surface |
+| Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and active governance surface |
 | Developers and maintainers | `docs/program/`, `docs/references/`, `docs/policies/`, `docs/history/` | Track implementation records, references, governance, and archives |
 
 ## Current Baseline
@@ -32,14 +32,10 @@ The current public reading path is anchored on two repo-verified routes:
 - [Decisions](./decisions.md)
 - [Contracts Overview](../contracts/README.md)
 
-## Verification Surface
+## Maintainer Governance Surface
 
-- `npm test` / `npm run test:fast`
-- `npm run test:meta`
-- `npm run test:integration`
-- `npm run test:e2e`
-- `npm run test:full`
-- provenance and historical audit entry: `docs/references/series-doc-governance-checklist.md`
+- Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
+- Historical and provenance audits stay in the same reference layer instead of the default public entry path.
 
 ## Historical and Reference Layers
 

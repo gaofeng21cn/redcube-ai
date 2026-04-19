@@ -15,16 +15,6 @@
 - direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
-## 默认验证入口
-
-- 默认最小验证：`scripts/verify.sh` 或 `npm test`
-- fast：`scripts/verify.sh fast` / `npm run test:fast`
-- meta：`scripts/verify.sh meta` / `npm run test:meta`
-- integration：`scripts/verify.sh integration` / `npm run test:integration`
-- e2e：`scripts/verify.sh e2e` / `npm run test:e2e`
-- full：`scripts/verify.sh full` / `npm run test:full`
-- historical provenance audit：`docs/references/series-doc-governance-checklist.md`
-
 ## 历史记录与追溯层
 
 - absorbed milestones 与 phase-2 records：`docs/program/phase-2/`
@@ -33,9 +23,10 @@
 - 支持性技术参考：`docs/references/`
 - direct-delivery future target reference：`docs/references/direct_delivery_longrun_target_state.md`
 - source-readiness future target reference：`docs/references/source_readiness_deep_research_longrun_target_state.md`
+- 维护者验证与文档治理：`docs/references/series-doc-governance-checklist.md`
 
 ## 当前收口重点
 
 - 保持 direct route 与 federated route 共用同一条 service-safe domain entry 下游
 - 保持 upstream Hermes runtime owner、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
-- 保持默认验证轻量，历史 provenance 通过 reference 层独立追溯
+- 保持维护者验证与历史 provenance 停留在 reference / policy 层

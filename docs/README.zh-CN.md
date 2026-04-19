@@ -13,7 +13,7 @@
 | 读者 | 建议起点 | 目的 |
 | --- | --- | --- |
 | 潜在用户与领域专家 | [仓库首页](../README.zh-CN.md) | 先理解 RedCube 交付什么，再进入技术细节 |
-| 技术规划与架构读者 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md)、[合同说明](../contracts/README.md) | 读取当前边界、执行模型和验证面 |
+| 技术规划与架构读者 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md)、[合同说明](../contracts/README.md) | 读取当前边界、执行模型和当前治理面 |
 | 开发者与维护者 | `docs/program/`、`docs/references/`、`docs/policies/`、`docs/history/` | 追踪实现记录、参考资料、治理规则与归档 |
 
 ## 当前基线
@@ -32,14 +32,10 @@
 - [关键决策](./decisions.md)
 - [合同说明](../contracts/README.md)
 
-## 验证入口
+## 维护者治理入口
 
-- `npm test` / `npm run test:fast`
-- `npm run test:meta`
-- `npm run test:integration`
-- `npm run test:e2e`
-- `npm run test:full`
-- provenance / historical 审计入口：`docs/references/series-doc-governance-checklist.md`
+- 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
+- 历史与 provenance 审计继续留在同一 reference 层，不再占据默认公开入口。
 
 ## 历史与参考层
 
