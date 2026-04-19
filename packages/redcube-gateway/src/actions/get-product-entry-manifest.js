@@ -9,11 +9,6 @@ import {
   buildTaskLifecycle,
 } from 'opl-gateway-shared/runtime-task-companions';
 import {
-  buildDomainEntryCommandContract,
-  buildFamilyDomainEntryContract,
-  buildGatewayInteractionContract,
-} from 'opl-gateway-shared/family-entry-contracts';
-import {
   buildSkillCatalog,
   buildSkillDescriptor,
 } from 'opl-gateway-shared/skill-catalog';
@@ -31,6 +26,11 @@ import {
   collectFamilyHumanGateIds,
 } from 'opl-gateway-shared/product-entry-companions';
 
+import {
+  buildRedCubeDomainEntryContract,
+  buildRedCubeGatewayInteractionContract,
+  buildRedCubeSharedHandoff,
+} from './domain-entry-contract.js';
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
 
@@ -41,9 +41,6 @@ const PRODUCT_START_COMMAND = 'redcube product start';
 const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
 const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
 const PRODUCT_SESSION_COMMAND = 'redcube product session';
-const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
-const REDCUBE_DOMAIN_ENTRY_SURFACE_KIND = 'domain_entry';
-const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
 const PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/redcube-product-entry-mvp.json';
 const FEDERATED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-gateway-federated-product-entry.json';
 const MANAGED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/managed-product-entry-hardening.json';
@@ -77,116 +74,6 @@ function readCurrentProgramContract() {
   return JSON.parse(readFileSync(CURRENT_PROGRAM_CONTRACT_URL, 'utf8'));
 }
 
-function buildRedCubeDomainEntryContract() {
-  return buildFamilyDomainEntryContract({
-    entry_adapter: REDCUBE_DOMAIN_ENTRY_ADAPTER,
-    service_safe_surface_kind: REDCUBE_DOMAIN_ENTRY_SURFACE_KIND,
-    product_entry_builder_command: PRODUCT_MANIFEST_COMMAND,
-    product_entry_kind: PRODUCT_ENTRY_KIND,
-    supported_entry_modes: ['direct', 'opl_gateway', 'session'],
-    supported_commands: [
-      PRODUCT_MANIFEST_COMMAND,
-      PRODUCT_FRONTDESK_COMMAND,
-      PRODUCT_START_COMMAND,
-      PRODUCT_INVOKE_COMMAND,
-      PRODUCT_FEDERATE_COMMAND,
-      PRODUCT_SESSION_COMMAND,
-    ],
-    command_contracts: [
-      buildDomainEntryCommandContract({
-        command: PRODUCT_MANIFEST_COMMAND,
-        required_fields: ['workspace_root'],
-        extra_payload: {
-          gateway_action: 'getProductEntryManifest',
-          target_surface_kind: 'product_entry_manifest',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: PRODUCT_FRONTDESK_COMMAND,
-        required_fields: ['workspace_root'],
-        extra_payload: {
-          gateway_action: 'getProductFrontdesk',
-          target_surface_kind: 'product_frontdesk',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: PRODUCT_START_COMMAND,
-        required_fields: ['workspace_root'],
-        extra_payload: {
-          gateway_action: 'getProductStart',
-          target_surface_kind: 'product_entry_start',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: PRODUCT_INVOKE_COMMAND,
-        required_fields: ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
-        optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
-        extra_payload: {
-          gateway_action: 'invokeProductEntry',
-          target_surface_kind: 'product_entry',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: PRODUCT_FEDERATE_COMMAND,
-        required_fields: [
-          'workspace_root',
-          'entry_session_id',
-          'target_domain_id',
-          'entry_mode',
-          'return_surface_kind',
-          'overlay',
-          'topic_id',
-          'deliverable_id',
-        ],
-        optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
-        extra_payload: {
-          gateway_action: 'invokeFederatedProductEntry',
-          target_surface_kind: 'federated_product_entry',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: PRODUCT_SESSION_COMMAND,
-        required_fields: ['entry_session_id'],
-        extra_payload: {
-          gateway_action: 'getProductEntrySession',
-          target_surface_kind: 'product_entry_session',
-        },
-      }),
-    ],
-    extra_payload: {
-      service_safe_contract_ref: SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
-      direct_product_entry_contract_ref: PRODUCT_ENTRY_CONTRACT_REF,
-      federated_product_entry_contract_ref: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
-      managed_session_contract_ref: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
-    },
-  });
-}
-
-function buildRedCubeGatewayInteractionContract() {
-  return buildGatewayInteractionContract({
-    frontdoor_owner: 'opl_gateway_or_domain_gui',
-    user_interaction_mode: 'natural_language_frontdoor',
-    user_commands_required: false,
-    command_surfaces_for_agent_consumption_only: true,
-    shared_downstream_entry: REDCUBE_DOMAIN_ENTRY_ADAPTER,
-    shared_handoff_envelope: [
-      'target_domain_id',
-      'task_intent',
-      'entry_mode',
-      'workspace_locator',
-      'runtime_session_contract',
-      'return_surface_contract',
-      'entry_session_contract',
-      'delivery_request',
-    ],
-    extra_payload: {
-      direct_frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
-      manifest_command: PRODUCT_MANIFEST_COMMAND,
-      federated_contract_ref: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
-    },
-  });
-}
-
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const sessionStoreRoot = productEntrySessionDir();
@@ -196,8 +83,23 @@ export async function getProductEntryManifest(request) {
   const currentState = currentProgram.current_state || {};
   const activeMainline = currentState.active_mainline || {};
   const activeBaton = currentState.active_baton || {};
-  const domainEntryContract = buildRedCubeDomainEntryContract();
-  const gatewayInteractionContract = buildRedCubeGatewayInteractionContract();
+  const domainEntryContract = buildRedCubeDomainEntryContract({
+    productManifestCommand: PRODUCT_MANIFEST_COMMAND,
+    productFrontdeskCommand: PRODUCT_FRONTDESK_COMMAND,
+    productStartCommand: PRODUCT_START_COMMAND,
+    productInvokeCommand: PRODUCT_INVOKE_COMMAND,
+    productFederateCommand: PRODUCT_FEDERATE_COMMAND,
+    productSessionCommand: PRODUCT_SESSION_COMMAND,
+    serviceSafeDomainEntryContractRef: SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
+    productEntryContractRef: PRODUCT_ENTRY_CONTRACT_REF,
+    federatedProductEntryContractRef: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+    managedProductEntryContractRef: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
+  });
+  const gatewayInteractionContract = buildRedCubeGatewayInteractionContract({
+    productFrontdeskCommand: PRODUCT_FRONTDESK_COMMAND,
+    productManifestCommand: PRODUCT_MANIFEST_COMMAND,
+    federatedProductEntryContractRef: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+  });
   const familyOrchestration = buildFamilyOrchestrationCompanion({
     sessionLocatorField: 'entry_session_contract.entry_session_id',
     gateStatus: 'requested',
@@ -644,12 +546,7 @@ export async function getProductEntryManifest(request) {
         surface_kind: 'product_entry_session',
       },
     },
-    shared_handoff: {
-      opl_return_surface: {
-        surface_kind: 'product_entry',
-        target_domain_id: 'redcube_ai',
-      },
-    },
+    shared_handoff: buildRedCubeSharedHandoff(),
     product_entry_start: productEntryStart,
     product_entry_overview: productEntryOverview,
     product_entry_preflight: {
@@ -669,11 +566,11 @@ export async function getProductEntryManifest(request) {
       'The OPL bridge stays available as an internal integration contract instead of a first-read user entry shell.',
       'It does not claim that a mature end-user shell or managed web productization is already landed.',
     ],
+    domain_entry_contract: domainEntryContract,
+    gateway_interaction_contract: gatewayInteractionContract,
     extra_payload: {
       ok: true,
       recommended_action: 'invoke_product_entry',
-      domain_entry_contract: domainEntryContract,
-      gateway_interaction_contract: gatewayInteractionContract,
       current_truth: {
         product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
         federated_product_entry_contract: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
