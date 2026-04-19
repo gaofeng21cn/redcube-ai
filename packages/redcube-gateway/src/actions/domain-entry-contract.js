@@ -1,5 +1,5 @@
 import {
-  buildDomainEntryCommandContract,
+  buildDomainEntryCommandCatalog,
   buildFamilyDomainEntryContract,
   buildFamilyGatewayInteractionContract,
   buildSharedHandoff,
@@ -21,81 +21,76 @@ export function buildRedCubeDomainEntryContract({
   federatedProductEntryContractRef,
   managedProductEntryContractRef,
 }) {
+  const commandCatalog = buildDomainEntryCommandCatalog([
+    {
+      command: productManifestCommand,
+      required_fields: ['workspace_root'],
+      extra_payload: {
+        gateway_action: 'getProductEntryManifest',
+        target_surface_kind: 'product_entry_manifest',
+      },
+    },
+    {
+      command: productFrontdeskCommand,
+      required_fields: ['workspace_root'],
+      extra_payload: {
+        gateway_action: 'getProductFrontdesk',
+        target_surface_kind: 'product_frontdesk',
+      },
+    },
+    {
+      command: productStartCommand,
+      required_fields: ['workspace_root'],
+      extra_payload: {
+        gateway_action: 'getProductStart',
+        target_surface_kind: 'product_entry_start',
+      },
+    },
+    {
+      command: productInvokeCommand,
+      required_fields: ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+      optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
+      extra_payload: {
+        gateway_action: 'invokeProductEntry',
+        target_surface_kind: 'product_entry',
+      },
+    },
+    {
+      command: productFederateCommand,
+      required_fields: [
+        'workspace_root',
+        'entry_session_id',
+        'target_domain_id',
+        'entry_mode',
+        'return_surface_kind',
+        'overlay',
+        'topic_id',
+        'deliverable_id',
+      ],
+      optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
+      extra_payload: {
+        gateway_action: 'invokeFederatedProductEntry',
+        target_surface_kind: 'federated_product_entry',
+      },
+    },
+    {
+      command: productSessionCommand,
+      required_fields: ['entry_session_id'],
+      extra_payload: {
+        gateway_action: 'getProductEntrySession',
+        target_surface_kind: 'product_entry_session',
+      },
+    },
+  ]);
+
   return buildFamilyDomainEntryContract({
     entry_adapter: REDCUBE_DOMAIN_ENTRY_ADAPTER,
     service_safe_surface_kind: 'domain_entry',
     product_entry_builder_command: productManifestCommand,
     product_entry_kind: PRODUCT_ENTRY_KIND,
     supported_entry_modes: ['direct', 'opl_gateway', 'session'],
-    supported_commands: [
-      productManifestCommand,
-      productFrontdeskCommand,
-      productStartCommand,
-      productInvokeCommand,
-      productFederateCommand,
-      productSessionCommand,
-    ],
-    command_contracts: [
-      buildDomainEntryCommandContract({
-        command: productManifestCommand,
-        required_fields: ['workspace_root'],
-        extra_payload: {
-          gateway_action: 'getProductEntryManifest',
-          target_surface_kind: 'product_entry_manifest',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: productFrontdeskCommand,
-        required_fields: ['workspace_root'],
-        extra_payload: {
-          gateway_action: 'getProductFrontdesk',
-          target_surface_kind: 'product_frontdesk',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: productStartCommand,
-        required_fields: ['workspace_root'],
-        extra_payload: {
-          gateway_action: 'getProductStart',
-          target_surface_kind: 'product_entry_start',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: productInvokeCommand,
-        required_fields: ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
-        optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
-        extra_payload: {
-          gateway_action: 'invokeProductEntry',
-          target_surface_kind: 'product_entry',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: productFederateCommand,
-        required_fields: [
-          'workspace_root',
-          'entry_session_id',
-          'target_domain_id',
-          'entry_mode',
-          'return_surface_kind',
-          'overlay',
-          'topic_id',
-          'deliverable_id',
-        ],
-        optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
-        extra_payload: {
-          gateway_action: 'invokeFederatedProductEntry',
-          target_surface_kind: 'federated_product_entry',
-        },
-      }),
-      buildDomainEntryCommandContract({
-        command: productSessionCommand,
-        required_fields: ['entry_session_id'],
-        extra_payload: {
-          gateway_action: 'getProductEntrySession',
-          target_surface_kind: 'product_entry_session',
-        },
-      }),
-    ],
+    supported_commands: commandCatalog.supported_commands,
+    command_contracts: commandCatalog.command_contracts,
     extra_payload: {
       service_safe_contract_ref: serviceSafeDomainEntryContractRef,
       direct_product_entry_contract_ref: productEntryContractRef,
