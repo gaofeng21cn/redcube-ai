@@ -4,7 +4,7 @@
 
 > **future-facing 目标态文档**
 >
-> 这份文档用于冻结 source-plane 的未来目标边界，帮助后续 tranche 在不改写当前 repo truth 的前提下持续收敛。
+> 这份参考文档用于冻结 source-plane 的未来目标边界，帮助后续 tranche 在不改写当前 repo truth 的前提下持续收敛。
 > 它本身**不会**自动改写 `contracts/runtime-program/current-program.json`，也**不是**已经 absorbed 的当前真相声明。
 
 ## 1. 目标定位

@@ -46,6 +46,7 @@ The default public narrative is fixed to:
 - `docs/references/`: supporting technical references
 - `docs/policies/`: stable governance and operating rules
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
+- [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md): source-plane future target kept in the same reference layer
 
 ## Documentation Rules
 

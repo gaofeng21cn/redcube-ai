@@ -31,6 +31,7 @@
 - 历史归档入口：`docs/history/`
 - 支持性技术参考：`docs/references/`
 - direct-delivery future target reference：`docs/references/direct_delivery_longrun_target_state.md`
+- source-readiness future target reference：`docs/references/source_readiness_deep_research_longrun_target_state.md`
 
 ## 当前收口重点
 
