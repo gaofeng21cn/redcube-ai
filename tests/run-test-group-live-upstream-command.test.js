@@ -43,9 +43,12 @@ test('run-test-group serializes node test files for Codex-backed verification gr
 test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
   const script = readFileSync('scripts/run-test-group.mjs', 'utf-8');
   const meta = readGroupList(script, 'META');
+  const family = readGroupList(script, 'FAMILY');
   const integration = readGroupList(script, 'INTEGRATION');
   const historical = readGroupList(script, 'HISTORICAL');
 
+  assert.deepEqual(family, ['tests/family-shared-release.test.js']);
+  assert.equal(meta.includes('tests/family-shared-release.test.js'), false);
   assert.equal(meta.includes('tests/public-docs-surface.test.js'), false);
   assert.equal(meta.includes('tests/direct-delivery-longrun-target.test.js'), false);
   assert.equal(meta.includes('tests/phase-2-behavior-convergence.test.js'), false);
@@ -53,6 +56,15 @@ test('default meta keeps docs-surface in integration and phase-2/longrun in hist
   assert.equal(integration.includes('tests/direct-delivery-longrun-target.test.js'), false);
   assert.equal(historical.includes('tests/direct-delivery-longrun-target.test.js'), true);
   assert.equal(historical.includes('tests/phase-2-behavior-convergence.test.js'), true);
+});
+
+test('run-test-group usage and verify shim include the family verification lane', () => {
+  const script = readFileSync('scripts/run-test-group.mjs', 'utf-8');
+  const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
+
+  assert.match(script, /<fast\|meta\|family\|integration\|e2e\|historical\|full>/);
+  assert.match(verifyScript, /family\)/);
+  assert.match(verifyScript, /\[smoke\|fast\|meta\|family\|integration\|e2e\|historical\|full\]/);
 });
 
 test('serialized verification rule is documented in current program contract', () => {

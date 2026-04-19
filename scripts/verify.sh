@@ -10,6 +10,9 @@ case "$lane" in
   meta)
     npm run test:meta
     ;;
+  family)
+    npm run test:family
+    ;;
   integration)
     npm run test:integration
     ;;
@@ -24,7 +27,7 @@ case "$lane" in
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|meta|integration|e2e|historical|full]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|meta|family|integration|e2e|historical|full]" >&2
     exit 1
     ;;
 esac

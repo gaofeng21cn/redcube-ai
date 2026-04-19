@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { createRequire } from 'node:module';
 
+import { inspectCurrentRepoFamilySharedAlignment } from 'opl-gateway-shared/family-shared-release';
+
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'e2e', 'full']);
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 
@@ -20,6 +22,10 @@ export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
   },
   {
     specifier: 'opl-gateway-shared/product-entry-program-companions',
+    resolve_from: 'packages/redcube-gateway/package.json',
+  },
+  {
+    specifier: 'opl-gateway-shared/family-shared-release',
     resolve_from: 'packages/redcube-gateway/package.json',
   },
 ]);
@@ -117,6 +123,34 @@ export function assertRequiredRuntimeSharedResolution(options = {}) {
       .join('\n');
     throw new Error(
       `${inspection.message}\nCurrent repo root: ${inspection.repo_root}\n${missing}`,
+    );
+  }
+  return inspection;
+}
+
+export function inspectCurrentRepoSharedPinAlignment({
+  repoRoot,
+  consumerRepoId = 'redcube',
+} = {}) {
+  return inspectCurrentRepoFamilySharedAlignment({
+    repoRoot,
+    consumerRepoId,
+  });
+}
+
+export function assertCurrentRepoSharedPinAlignment(options = {}) {
+  const inspection = inspectCurrentRepoSharedPinAlignment(options);
+  if (inspection.status !== 'aligned') {
+    const findings = inspection.findings
+      .map((entry) => `${entry.file ?? '(repo)'} [${entry.kind}] -> ${entry.status}${entry.pins.length > 0 ? ` (${entry.pins.join(', ')})` : ''}`)
+      .join('\n');
+    throw new Error(
+      [
+        'current checkout is not aligned with the live OPL family shared release contract',
+        `expected owner commit: ${inspection.owner_commit}`,
+        `repo root: ${inspection.repo_root}`,
+        findings,
+      ].join('\n'),
     );
   }
   return inspection;

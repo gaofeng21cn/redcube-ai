@@ -13,6 +13,7 @@
     "test": "node scripts/run-test-group.mjs fast",
     "test:fast": "node scripts/run-test-group.mjs fast",
     "test:meta": "node scripts/run-test-group.mjs meta",
+    "test:family": "node scripts/run-test-group.mjs family",
     "test:integration": "node scripts/run-test-group.mjs integration",
     "test:e2e": "node scripts/run-test-group.mjs e2e",
     "test:historical": "node scripts/run-test-group.mjs historical",

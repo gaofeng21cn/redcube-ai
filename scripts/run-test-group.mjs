@@ -5,6 +5,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import {
+  assertCurrentRepoSharedPinAlignment,
   assertRequiredRuntimeSharedResolution,
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
@@ -22,6 +23,7 @@ const repoRoot = path.resolve(scriptDir, '..');
 process.chdir(repoRoot);
 assertWorkspacePackageResolution({ repoRoot });
 assertRequiredRuntimeSharedResolution({ repoRoot });
+assertCurrentRepoSharedPinAlignment({ repoRoot });
 
 const META = [
   'tests/bilingual-home-readme.test.js',
@@ -60,6 +62,10 @@ const META = [
   'tests/typescript-service-boundaries.test.js',
   'tests/worktree-package-resolution.test.js',
   'tests/xiaohongshu-overlay.test.js',
+];
+
+const FAMILY = [
+  'tests/family-shared-release.test.js',
 ];
 
 const INTEGRATION = [
@@ -155,10 +161,11 @@ const FAST = [
 const GROUPS = {
   fast: FAST,
   meta: META,
+  family: FAMILY,
   integration: INTEGRATION,
   e2e: E2E,
   historical: HISTORICAL,
-  full: [...META, ...INTEGRATION, ...E2E, ...HISTORICAL],
+  full: [...META, ...FAMILY, ...INTEGRATION, ...E2E, ...HISTORICAL],
 };
 async function prepareSerializedVerification(groupName) {
   if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
@@ -206,15 +213,15 @@ function assertTrackedFiles(files, groupName) {
 
 function assertPartition() {
   const discovered = discoveredRootTests();
-  const base = [...META, ...INTEGRATION, ...E2E, ...HISTORICAL];
+  const base = [...META, ...FAMILY, ...INTEGRATION, ...E2E, ...HISTORICAL];
   const duplicates = base.filter((file, index) => base.indexOf(file) !== index);
   if (duplicates.length > 0) {
-    throw new Error(`meta/integration/e2e/historical 分组存在重复项: ${[...new Set(duplicates)].join(', ')}`);
+    throw new Error(`meta/family/integration/e2e/historical 分组存在重复项: ${[...new Set(duplicates)].join(', ')}`);
   }
 
   const missing = discovered.filter((file) => !base.includes(file));
   if (missing.length > 0) {
-    throw new Error(`未被纳入 meta/integration/e2e/historical 的测试文件: ${missing.join(', ')}`);
+    throw new Error(`未被纳入 meta/family/integration/e2e/historical 的测试文件: ${missing.join(', ')}`);
   }
 
   const unexpected = base.filter((file) => !discovered.includes(file));
@@ -225,7 +232,7 @@ function assertPartition() {
 
 function printUsage() {
   process.stdout.write([
-    '用法: node scripts/run-test-group.mjs <fast|meta|integration|e2e|historical|full> [node --test 参数]',
+    '用法: node scripts/run-test-group.mjs <fast|meta|family|integration|e2e|historical|full> [node --test 参数]',
     '示例: node scripts/run-test-group.mjs full --test-reporter=dot',
   ].join('\n'));
 }
@@ -238,6 +245,7 @@ if (!groupName || !Object.hasOwn(GROUPS, groupName)) {
 }
 
 assertTrackedFiles(META, 'meta');
+assertTrackedFiles(FAMILY, 'family');
 assertTrackedFiles(INTEGRATION, 'integration');
 assertTrackedFiles(E2E, 'e2e');
 assertTrackedFiles(HISTORICAL, 'historical');

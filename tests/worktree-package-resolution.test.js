@@ -49,6 +49,10 @@ test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared spe
         specifier: 'opl-gateway-shared/product-entry-companions',
         resolve_from: 'packages/redcube-gateway/package.json',
       },
+      {
+        specifier: 'opl-gateway-shared/family-shared-release',
+        resolve_from: 'packages/redcube-gateway/package.json',
+      },
     ],
     resolve(specifier) {
       return path.join(repoRoot, 'node_modules', specifier, 'index.js');
@@ -72,9 +76,16 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
         specifier: 'opl-gateway-shared/product-entry-program-companions',
         resolve_from: 'packages/redcube-gateway/package.json',
       },
+      {
+        specifier: 'opl-gateway-shared/family-shared-release',
+        resolve_from: 'packages/redcube-gateway/package.json',
+      },
     ],
     resolve(specifier) {
-      if (specifier === 'opl-gateway-shared/product-entry-program-companions') {
+      if (
+        specifier === 'opl-gateway-shared/product-entry-program-companions'
+        || specifier === 'opl-gateway-shared/family-shared-release'
+      ) {
         const error = new Error('Cannot find module');
         error.code = 'ERR_MODULE_NOT_FOUND';
         throw error;
@@ -84,7 +95,13 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
   });
 
   assert.equal(result.ok, false);
-  assert.equal(result.missing_specifiers.length, 1);
-  assert.equal(result.missing_specifiers[0].specifier, 'opl-gateway-shared/product-entry-program-companions');
+  assert.equal(result.missing_specifiers.length, 2);
+  assert.deepEqual(
+    result.missing_specifiers.map((entry) => entry.specifier).sort(),
+    [
+      'opl-gateway-shared/family-shared-release',
+      'opl-gateway-shared/product-entry-program-companions',
+    ],
+  );
   assert.match(result.message, /npm install/);
 });
