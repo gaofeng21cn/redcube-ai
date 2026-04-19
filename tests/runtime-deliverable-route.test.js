@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -196,10 +196,8 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
     assert.equal(result.run.executor.primary, true);
     assert.equal(result.run.executor.execution_surface, 'codex_native_host_agent');
     assert.equal(result.run.executor.creative_execution, 'agent_first_director_first');
-    assert.equal(result.run.executor.external_llm_role, 'secondary_proof_adapter');
     assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
     assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
-    assert.equal(result.run.executor.execution_model.agent_first_requires_external_llm, false);
     assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
     assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
     assert.equal(result.run.executor.codex_cli_runtime?.adapter_surface, '@redcube/codex-cli-client');
@@ -235,7 +233,6 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
     assert.equal(artifact.stage_contract.stage_id, 'storyline');
     assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
     assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
-    assert.equal(artifact.execution_model.external_llm_role, 'secondary_proof_adapter');
     assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
     assert.equal(artifact.execution_model.codex_cli_runtime?.owner, 'codex_cli');
   });
@@ -491,7 +488,7 @@ test('runDeliverableRoute rejects overlay mismatch against stored deliverable', 
   );
 });
 
-test('runDeliverableRoute records failed run when secondary adapter cannot run declared route', async () => {
+test('runDeliverableRoute rejects retired external_llm adapter before creating durable run state', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
@@ -505,39 +502,20 @@ test('runDeliverableRoute records failed run when secondary adapter cannot run d
       goal: '为本科生讲授甲状腺基础知识',
     });
 
-    const result = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route: 'detailed_outline',
-      adapter: 'external_llm',
-    });
-
-    assert.equal(result.ok, false);
-    assert.equal(result.surface_kind, 'route_run');
-    assert.equal(result.error_kind, 'route_failure');
-    assert.equal(result.recommended_action, 'inspect_run_failure');
-    assert.equal(result.run.status, 'failed');
-    assert.equal(result.run.executor.adapter, 'external_llm');
-    assert.equal(result.run.executor.primary, false);
-    assert.equal(result.run.executor.execution_surface, 'external_llm_adapter');
-    assert.equal(result.run.executor.secondary_proof_role, 'secondary_proof_adapter');
-    assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
-    assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
-    assert.equal(
-      result.run.error.message,
-      'Unsupported route for adapter external_llm: detailed_outline',
+    await assert.rejects(
+      () => runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'detailed_outline',
+        adapter: 'external_llm',
+      }),
+      /Unsupported executor adapter: external_llm/,
     );
 
-    const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
-    assert.equal(stored.run.status, 'failed');
-    assert.equal(stored.run.executor.execution_surface, 'external_llm_adapter');
-    assert.equal(stored.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
-    assert.equal(stored.run.executor.codex_cli_runtime?.owner, 'codex_cli');
-    assert.equal(stored.run_telemetry.executor_kind, 'external_llm');
-    assert.equal(stored.error_taxonomy.error_kind, 'execution_error');
-    assert.equal(stored.approval_throughput_summary.blocked, true);
+    assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
+    assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
   });
 });
 

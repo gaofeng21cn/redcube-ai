@@ -26,7 +26,7 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
-export type RuntimeManagedRunAdapter = 'hermes' | 'external_llm' | 'host_agent' | 'hermes_native_proof';
+export type RuntimeManagedRunAdapter = 'hermes' | 'host_agent' | 'hermes_native_proof';
 
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];
@@ -69,9 +69,12 @@ export interface RuntimeCreativeOwnershipExecutionContract {
   };
   adapter_roles: {
     host_agent: 'formal_primary_executor';
-    external_llm: 'secondary_proof_adapter';
   };
-  secondary_proof_adapters: string[];
+  proof_executor: {
+    adapter: 'hermes_native_proof';
+    runtime: 'hermes_native_full_agent_loop';
+    status: 'opt_in_proof_executor';
+  };
   protected_creative_routes: {
     xiaohongshu: RuntimeCreativeOwnershipLifecycleFamilyMapping;
     ppt_deck: RuntimeCreativeOwnershipLifecycleFamilyMapping;
@@ -137,7 +140,8 @@ export interface RuntimeCreativeOwnershipAudit {
   shared_execution_contract: {
     primary_adapter: 'host_agent';
     primary_runtime: 'codex_native_host_agent';
-    external_llm_status: 'secondary_proof_adapter';
+    proof_executor: 'hermes_native_proof';
+    proof_runtime: 'hermes_native_full_agent_loop';
     freeze_origin_milestone: 'P19.A';
     mainline_topology: string[];
   };
@@ -198,8 +202,7 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
     mainline_adapter: 'host_agent';
     primary_surface: 'codex_native_host_agent';
     adapter_role: 'primary_creative_executor';
-    agent_first_requires_external_llm: false;
-    external_llm_role: 'secondary_proof_adapter';
+    proof_executor: 'hermes_native_proof';
     freeze_origin_milestone: 'P19.A';
   };
   unified_lifecycle: {
@@ -433,13 +436,6 @@ export interface RuntimeManagedRunRecord {
   adapter: string | null;
   requested_adapter: string;
   active_adapter: string;
-  adapter_switches: Array<{
-    at: string;
-    from_adapter: string;
-    to_adapter: string;
-    reason_code: string;
-    stage_id: string | null;
-  }>;
   started_at: string | null;
   finished_at: string | null;
   current_stage: string | null;
@@ -472,7 +468,6 @@ export interface RuntimeManagedRunRecord {
       | 'complete_managed_run'
       | 'stop_after_stage'
       | 'retry_same_stage'
-      | 'switch_to_primary_adapter'
       | 'escalate_runtime'
       | 'require_human_confirmation';
     next_action: string;
@@ -483,7 +478,6 @@ export interface RuntimeManagedRunRecord {
         | 'complete_managed_run'
         | 'pause_for_user_request'
         | 'retry_same_stage'
-        | 'switch_to_primary_adapter'
         | 'escalate_runtime'
         | 'require_human_confirmation';
       reason_code: string;

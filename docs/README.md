@@ -52,31 +52,14 @@ Public-facing material should stay mirrored in English and Chinese where applica
 The RedCube product entry MVP remains a technical record for the domain-agent frontdesk, invoke, manifest, and session surfaces.
 The hardening tranche remains the current Codex-default execution and readiness closeout record.
 
-### Internal integration and historical proof records
+### Technical provenance and absorbed records
 
-- [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
-- [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
-- [Upstream Hermes-Agent service-boundary proof](program/upstream_hermes_agent_service_safe_domain_entry.md)
-- [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
-- [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
-
-These records document internal OPL bridge wiring, upstream Hermes proof, and earlier service-boundary terminology.
-They are technical provenance for maintainers and shell integration, while the public entry model stays `OPL shell -> RedCube domain agent -> Codex default execution`.
-
-### Source Readiness and absorbed phase-2 provenance
-
+- [`docs/program/`](program/)
+- [`docs/history/`](history/)
 - [Source augmentation executor contract](source_augmentation_executor_contract.md)
-- [Phase 2 source intake activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
-- [Phase 2 source intake shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
-- [Phase 2 review export gate audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
-- [Phase 2 publication projection delivery contract convergence](program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md)
-- [Phase 2 family source-truth consumption convergence](program/phase-2/phase_2_family_source_truth_consumption_convergence.md)
-- [Phase 2 direct delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
-- [Phase 2 direct delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
-- [Phase 2 source readiness deep research trigger gate convergence](program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
-- [Phase 2 workspace operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md)
-- [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md)
-- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)
+
+These directories carry internal OPL bridge wiring, upstream Hermes proof, absorbed phase-2 provenance, and older service-boundary terminology.
+They remain technical traceability for maintainers and shell integration, while the public entry model stays `OPL shell -> RedCube domain agent -> Codex default execution`.
 
 ### Future-facing design target
 

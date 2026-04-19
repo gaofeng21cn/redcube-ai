@@ -1,7 +1,6 @@
 import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 import {
   CODEX_DEFAULT_ADAPTER,
-  HERMES_COMPATIBILITY_ADAPTER,
   HERMES_NATIVE_PROOF_ADAPTER,
   buildCodexExecutorDescriptor,
   buildHermesNativeProofExecutorDescriptor,
@@ -27,13 +26,10 @@ import {
  *   primary?: boolean,
  *   execution_surface?: string,
  *   creative_execution?: string,
- *   external_llm_role?: string,
  *   execution_model?: {
  *     mainline_adapter: "host_agent",
  *     primary_surface: "codex_native_host_agent",
- *     adapter_role: "primary_creative_executor" | "secondary_proof_adapter",
- *     agent_first_requires_external_llm: false,
- *     external_llm_role: "secondary_proof_adapter",
+ *     adapter_role: "primary_creative_executor",
  *     runtime_substrate_owner: "Codex CLI",
  *     deployment_host: "codex_local_operator_host",
  *     deployment_host_status: "active_primary",
@@ -55,9 +51,7 @@ import {
  *     execution_model?: {
  *       mainline_adapter: "host_agent",
  *       primary_surface: "codex_native_host_agent",
- *       adapter_role: "primary_creative_executor" | "secondary_proof_adapter",
- *       agent_first_requires_external_llm: false,
- *       external_llm_role: "secondary_proof_adapter",
+ *       adapter_role: "primary_creative_executor",
  *       runtime_substrate_owner: "Codex CLI",
  *       deployment_host: "codex_local_operator_host",
  *       deployment_host_status: "active_primary",
@@ -97,39 +91,18 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {})
         throw new Error(`Stage contract mismatch: expected ${route}, got ${stageContract.stage_id}`);
       }
 
-      if (descriptor.adapter === HERMES_COMPATIBILITY_ADAPTER && route !== 'storyline') {
-        const error = new Error(`Unsupported route for adapter external_llm: ${route}`);
-        error.code = 'secondary_proof_adapter_route_unavailable';
-        error.requiresHumanConfirmation = false;
-        error.requiresExternalSecret = false;
-        throw error;
-      }
-
-      if (descriptor.adapter === CODEX_DEFAULT_ADAPTER || descriptor.adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-        const familyRunner = await loadRuntimeFamilyRunner(contract);
-        const artifact = await familyRunner.runRoute({
-          workspaceRoot,
-          route,
-          topicId,
-          deliverableId,
-          contract,
-          mode,
-          baselineDeliverableId,
-          adapter: descriptor.adapter,
-          executor: descriptor,
-        });
-        return {
-          overlay,
-          route,
-          topic_id: topicId,
-          deliverable_id: deliverableId,
-          contract,
-          stage_contract: stageContract,
-          ...artifact,
-          execution_model: descriptor.execution_model,
-        };
-      }
-
+      const familyRunner = await loadRuntimeFamilyRunner(contract);
+      const artifact = await familyRunner.runRoute({
+        workspaceRoot,
+        route,
+        topicId,
+        deliverableId,
+        contract,
+        mode,
+        baselineDeliverableId,
+        adapter: descriptor.adapter,
+        executor: descriptor,
+      });
       return {
         overlay,
         route,
@@ -137,10 +110,8 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER } = {})
         deliverable_id: deliverableId,
         contract,
         stage_contract: stageContract,
-        executor: {
-          ...descriptor,
-        },
-        produced_at: new Date().toISOString(),
+        ...artifact,
+        execution_model: descriptor.execution_model,
       };
     },
   };

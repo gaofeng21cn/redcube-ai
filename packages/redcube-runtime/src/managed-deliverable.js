@@ -61,6 +61,17 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function assertSupportedManagedAdapter(adapter) {
+  const requestedAdapter = safeText(adapter);
+  if (!requestedAdapter || requestedAdapter === CODEX_DEFAULT_ADAPTER || requestedAdapter === 'hermes') {
+    return CODEX_DEFAULT_ADAPTER;
+  }
+  if (requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    return HERMES_NATIVE_PROOF_ADAPTER;
+  }
+  throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
+}
+
 async function probeRequestedRuntime(adapter, workspaceRoot) {
   if (safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER) {
     return probeHermesNativeProof({ cwd: workspaceRoot });
@@ -677,29 +688,6 @@ function buildStageIngestion({
       deliverableId,
       stageId,
     });
-    if (errorCode === 'secondary_proof_adapter_route_unavailable'
-      && safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER) !== CODEX_DEFAULT_ADAPTER) {
-      return {
-        schema_version: 1,
-        managed_run_id: managedRun.managed_run_id,
-        stage_id: stageId,
-        attempt,
-        route_run_id: safeText(routeResult?.run?.run_id) || null,
-        status: 'failed',
-        summary: `${stageLabel(stageId)}当前 secondary proof adapter 无法承接，系统切回主执行器继续推进。`,
-        artifacts: artifactRefs,
-        decision: 'switch_to_primary_adapter',
-        next_action: `retry_${stageId}`,
-        blocking_reason: blockingReason,
-        controller_decision: {
-          decision: 'switch_to_primary_adapter',
-          reason_code: 'secondary_proof_adapter_route_unavailable',
-          requires_human_confirmation: false,
-          requires_external_secret: false,
-        },
-        recorded_at: new Date().toISOString(),
-      };
-    }
     if (reviewRerunPolicy) {
       return {
         schema_version: 1,
@@ -965,35 +953,6 @@ function applyStageIngestion({
     return { done: false, ok: true, jumpToStageId: targetStageId };
   }
 
-  if (stageResult.decision === 'switch_to_primary_adapter') {
-    const previousAdapter = safeText(managedRun.active_adapter, CODEX_DEFAULT_ADAPTER);
-    managedRun.status = 'running';
-    managedRun.adapter_switches = [
-      ...safeArray(managedRun.adapter_switches),
-      {
-        at: new Date().toISOString(),
-        from_adapter: previousAdapter,
-        to_adapter: CODEX_DEFAULT_ADAPTER,
-        reason_code: safeText(stageResult.controller_decision?.reason_code, 'secondary_proof_adapter_route_unavailable'),
-        stage_id: stageResult.stage_id,
-      },
-    ];
-    managedRun.active_adapter = CODEX_DEFAULT_ADAPTER;
-    managedRun.current_blockers = [];
-    managedRun.runtime_health_status = 'recovering';
-    managedRun.parking_reason_code = null;
-    managedRun.requires_human_confirmation = false;
-    managedRun.requires_external_secret = false;
-    managedRun.next_system_action = `系统已切换到主执行器，将继续重试${stageLabel(stageResult.stage_id)}。`;
-    managedRun.needs_user_decision = false;
-    pushManagedEvent(workspaceRoot, managedRun, {
-      kind: 'adapter_switched',
-      stageId: stageResult.stage_id,
-      summary: stageResult.summary,
-    });
-    return { done: false, ok: true, retry: true };
-  }
-
   managedRun.finished_at = new Date().toISOString();
   managedRun.current_blockers = [stageResult.blocking_reason].filter(Boolean);
   managedRun.parking_reason_code = safeText(stageResult.controller_decision?.reason_code) || null;
@@ -1046,6 +1005,7 @@ export async function runManagedDeliverable({
   const contractOverlay = safeText(contract?.overlay);
   const stages = safeArray(contract?.stage_sequence?.stages);
   const requestedStopAfterStage = safeText(stopAfterStage);
+  const normalizedAdapter = assertSupportedManagedAdapter(adapter);
   assertManagedOverlayMatchesContract({
     requestedOverlay,
     contractOverlay,
@@ -1054,10 +1014,10 @@ export async function runManagedDeliverable({
     stopAfterStage: requestedStopAfterStage,
     stages,
   });
-  const runtimeReady = await probeRequestedRuntime(adapter, workspaceRoot);
+  const runtimeReady = await probeRequestedRuntime(normalizedAdapter, workspaceRoot);
   if (!runtimeReady.ok) {
     const error = new Error(
-      `${safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER ? 'Hermes-native proof' : 'Codex CLI'} blocked: ${runtimeReady.blocking_reason || runtimeReady.error_kind || 'unknown'}`,
+      `${normalizedAdapter === HERMES_NATIVE_PROOF_ADAPTER ? 'Hermes-native proof' : 'Codex CLI'} blocked: ${runtimeReady.blocking_reason || runtimeReady.error_kind || 'unknown'}`,
     );
     error.runtime_owner = runtimeReady.runtime_owner;
     error.probe = runtimeReady;
@@ -1071,9 +1031,9 @@ export async function runManagedDeliverable({
     mode: requestedStopAfterStage ? 'stop_after_stage' : 'auto_to_terminal',
     stopAfterStage: requestedStopAfterStage || null,
     userIntent: safeText(userIntent) || safeText(contract.goal),
-    adapter,
+    adapter: normalizedAdapter,
   });
-  managedRun.runtime_bridge = runtimeBridgeFromProbe(adapter, runtimeReady);
+  managedRun.runtime_bridge = runtimeBridgeFromProbe(normalizedAdapter, runtimeReady);
 
   pushManagedEvent(workspaceRoot, managedRun, {
     kind: 'managed_started',

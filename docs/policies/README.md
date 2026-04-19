@@ -18,7 +18,7 @@
 
 当前统一口径：
 
-- `Agent-first` 不等于 `external_llm-only`
+- `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_native_proof` proof lane 共同成立
 - route / managed run surface 的当前正式 runtime owner 是上游 `Hermes-Agent`；`Codex` 本地 operator host 是当前过渡宿主；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance
 - 共享宏观生命周期是：
   - `Source Readiness`

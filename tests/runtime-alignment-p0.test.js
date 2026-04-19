@@ -52,11 +52,11 @@ test('CLI help exposes the current deliverable adapter set, including the explic
   const cli = read('apps/redcube-cli/src/cli.js');
 
   assert.equal(
-    cli.includes('[--adapter <host_agent|hermes_native_proof|external_llm>]'),
+    cli.includes('[--adapter <host_agent|hermes_native_proof>]'),
     true,
   );
   assert.equal(
-    cli.includes('[--adapter <host_agent|external_llm>]'),
+    cli.includes('external_llm'),
     false,
   );
 });

@@ -30,8 +30,9 @@ test('P19.A freezes Codex-native host-agent as the formal primary creative execu
   assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.adapter, 'host_agent');
   assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.runtime, 'codex_native_host_agent');
   assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.adapter_roles.host_agent, 'formal_primary_executor');
-  assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.adapter_roles.external_llm, 'secondary_proof_adapter');
-  assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.secondary_proof_adapters, ['external_llm']);
+  assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.adapter, 'hermes_native_proof');
+  assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.runtime, 'hermes_native_full_agent_loop');
+  assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.status, 'opt_in_proof_executor');
   assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.xiaohongshu.story_architecture, ['storyline', 'single_note_plan']);
   assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.ppt_deck.visual_authorship, ['visual_direction', 'render_html', 'fix_html']);
 });
@@ -153,7 +154,8 @@ test('P19.D machine-readable audit records lifecycle residue and shared closeout
   assert.deepEqual(audit.completed_milestones, P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT.completed_milestones);
   assert.equal(audit.closeout_ready, true);
   assert.equal(audit.shared_execution_contract.primary_adapter, 'host_agent');
-  assert.equal(audit.shared_execution_contract.external_llm_status, 'secondary_proof_adapter');
+  assert.equal(audit.shared_execution_contract.proof_executor, 'hermes_native_proof');
+  assert.equal(audit.shared_execution_contract.proof_runtime, 'hermes_native_full_agent_loop');
   assert.equal(audit.shared_execution_contract.freeze_origin_milestone, 'P19.A');
   assert.deepEqual(audit.unified_lifecycle.review_overlay, ['visual_director_review', 'screenshot_review']);
   assert.deepEqual(audit.shared_closeout.remaining_shared_closeout, []);

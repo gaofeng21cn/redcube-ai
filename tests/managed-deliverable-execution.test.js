@@ -388,7 +388,6 @@ test('managed execution accepts explicit hermes_native_proof adapter and keeps i
     assert.equal(result.summary.status, 'stopped_after_stage');
     assert.equal(result.managed_run.requested_adapter, 'hermes_native_proof');
     assert.equal(result.managed_run.active_adapter, 'hermes_native_proof');
-    assert.equal(result.managed_run.adapter_switches.length, 0);
     assert.equal(result.managed_run.runtime_bridge?.owner, 'hermes_native_proof');
     assert.equal(result.managed_run.runtime_bridge?.model_selection, 'inherit_local_hermes_default');
     assert.equal(result.managed_run.runtime_bridge?.reasoning_selection, 'inherit_local_hermes_default');
@@ -409,7 +408,7 @@ test('managed execution accepts explicit hermes_native_proof adapter and keeps i
   });
 });
 
-test('managed control plane keeps managed execution by switching back to the primary adapter when compatibility routing stops downstream progress', async () => {
+test('managed control plane rejects retired external_llm adapter before creating durable managed state', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-failure-'));
 
@@ -431,60 +430,19 @@ test('managed control plane keeps managed execution by switching back to the pri
       goal: '为本科生讲授甲状腺基础知识',
     });
 
-    const result = await runManagedDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      userIntent: '给我一个最终 PPT',
-      adapter: 'external_llm',
-    });
+    await assert.rejects(
+      () => runManagedDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        userIntent: '给我一个最终 PPT',
+        adapter: 'external_llm',
+      }),
+      /Unsupported executor adapter: external_llm/,
+    );
 
-    assert.equal(result.ok, true);
-    assert.equal(result.summary.status, 'completed');
-    assert.equal(result.managed_run.requested_adapter, 'external_llm');
-    assert.equal(result.managed_run.active_adapter, 'host_agent');
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
-    assert.equal(result.managed_run.adapter_switches.length, 1);
-    assert.deepEqual(result.managed_run.adapter_switches[0], {
-      at: result.managed_run.adapter_switches[0].at,
-      from_adapter: 'external_llm',
-      to_adapter: 'host_agent',
-      reason_code: 'secondary_proof_adapter_route_unavailable',
-      stage_id: 'detailed_outline',
-    });
-    assert.equal(
-      result.managed_run.adapter_switches[0].from_adapter,
-      result.managed_run.requested_adapter,
-    );
-    assert.notEqual(
-      result.managed_run.adapter_switches[0].from_adapter,
-      result.managed_run.active_adapter,
-    );
-    assert.equal(
-      result.managed_run.adapter_switches[0].to_adapter,
-      result.managed_run.active_adapter,
-    );
-    assert.equal(result.managed_run.current_stage, 'export_pptx');
-    const detailedOutlineRuns = result.managed_run.route_runs.filter(
-      (stageRun) => stageRun.stage_id === 'detailed_outline',
-    );
-    assert.equal(detailedOutlineRuns.length, 2);
-    const initialDetailedOutline = readJson(detailedOutlineRuns[0].result_ref);
-    const retriedDetailedOutline = readJson(detailedOutlineRuns[1].result_ref);
-    assert.equal(initialDetailedOutline.decision, 'switch_to_primary_adapter');
-    assert.equal(
-      initialDetailedOutline.controller_decision.reason_code,
-      'secondary_proof_adapter_route_unavailable',
-    );
-    assert.equal(retriedDetailedOutline.decision, 'advance_to_next_stage');
-    assert.equal(result.progress_projection.current_blockers.length, 0);
-    assert.equal(result.progress_projection.needs_user_decision, false);
-    assert.match(result.progress_projection.latest_events.at(-1).summary, /\d{2}:\d{2}/);
-    assert.equal(result.runtime_supervision.health_status, 'completed');
-    assert.equal(result.runtime_supervision.needs_human_intervention, false);
-    assert.equal(result.runtime_supervision.runtime_owner, 'codex_cli');
-    assert.equal(result.escalation_record.escalation_status, 'none');
+    assertNoManagedState(workspaceRoot);
   });
 });
 
@@ -768,9 +726,7 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
 test('managed execution fails closed when Codex CLI proof is blocked', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-upstream-blocked-'));
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_UPSTREAM_BASE_URL: 'http://127.0.0.1:1',
-    REDCUBE_HERMES_UPSTREAM_MODEL: 'hermes-agent',
-    REDCUBE_HERMES_UPSTREAM_API_KEY: undefined,
+    REDCUBE_CODEX_COMMAND: JSON.stringify([process.execPath, '-e', 'process.exit(2)']),
   });
 
   try {

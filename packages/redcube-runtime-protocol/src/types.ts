@@ -285,21 +285,12 @@ export interface ManagedRuntimeLivenessAudit {
   reason_code: string;
 }
 
-export interface ManagedAdapterSwitchRecord {
-  at: string;
-  from_adapter: string;
-  to_adapter: string;
-  reason_code: string;
-  stage_id: string | null;
-}
-
 export interface ManagedControllerDecisionRecord {
   decision:
     | 'advance_to_next_stage'
     | 'complete_managed_run'
     | 'pause_for_user_request'
     | 'retry_same_stage'
-    | 'switch_to_primary_adapter'
     | 'escalate_runtime'
     | 'require_human_confirmation';
   reason_code: string;
@@ -319,7 +310,6 @@ export interface ManagedStageResultRecord {
     | 'complete_managed_run'
     | 'stop_after_stage'
     | 'retry_same_stage'
-    | 'switch_to_primary_adapter'
     | 'escalate_runtime'
     | 'require_human_confirmation';
   next_action: string;
@@ -428,7 +418,6 @@ export interface ManagedRunRecord {
   adapter: string | null;
   requested_adapter: string;
   active_adapter: string;
-  adapter_switches: ManagedAdapterSwitchRecord[];
   started_at: string | null;
   finished_at: string | null;
   current_stage: string | null;

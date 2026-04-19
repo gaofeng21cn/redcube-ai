@@ -14,7 +14,7 @@
 - `Overlay` 负责领域约束与交付质量协议
 - `Harness OS` 只负责执行、记录、重跑与审计
 - 正式主线优先复用宿主 Agent runtime
-- 外部 LLM 兼容层只能是次级 adapter，不得重新主导系统架构
+- 显式 proof lane 固定为 `hermes_native_proof`
 - 当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime
 - `Codex` 本地 operator host 是当前 deployment host / development shell
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance / compatibility bridge，不是当前 owner
@@ -23,7 +23,7 @@
 
 补充执行原则：
 
-- `Agent-first` 不等于 `external_llm-only`
+- `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_native_proof` proof lane 共同成立
 - 在当前 Codex-native 语境里，`Codex` 继续承担本地 operator / development host 与默认 concrete executor，而不是长期 managed-runtime owner
 - code 必须退回 contract、governance、audit、artifact persistence 与 render boundary
 

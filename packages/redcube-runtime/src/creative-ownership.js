@@ -218,9 +218,12 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   },
   adapter_roles: {
     host_agent: 'formal_primary_executor',
-    external_llm: 'secondary_proof_adapter',
   },
-  secondary_proof_adapters: ['external_llm'],
+  proof_executor: {
+    adapter: 'hermes_native_proof',
+    runtime: 'hermes_native_full_agent_loop',
+    status: 'opt_in_proof_executor',
+  },
   protected_creative_routes: P19_UNIFIED_LIFECYCLE_CONTRACT.family_mapping,
   primary_creative_routes: {
     xiaohongshu: ['storyline', 'single_note_plan', 'visual_direction', 'render_html', 'fix_html', 'publish_copy'],
@@ -411,7 +414,8 @@ export function buildCreativeOwnershipResidueAudit() {
     shared_execution_contract: {
       primary_adapter: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.adapter,
       primary_runtime: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.runtime,
-      external_llm_status: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.adapter_roles.external_llm,
+      proof_executor: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.adapter,
+      proof_runtime: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.runtime,
       freeze_origin_milestone: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.milestone,
       mainline_topology: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.mainline_topology,
     },

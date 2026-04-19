@@ -108,7 +108,6 @@ test('createManagedRunRecord creates a fail-closed managed envelope with typed s
     adapter: null,
     requested_adapter: 'host_agent',
     active_adapter: 'host_agent',
-    adapter_switches: [],
     started_at: null,
     finished_at: null,
     current_stage: null,
@@ -131,6 +130,20 @@ test('createManagedRunRecord creates a fail-closed managed envelope with typed s
     needs_user_decision: false,
     final_artifact_refs: [],
   });
+});
+
+test('createManagedRunRecord rejects retired executor adapters', () => {
+  assert.throws(
+    () => createManagedRunRecord({
+      managedRunId: 'managed-002',
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '给我一个最终 PPT',
+      adapter: 'external_llm',
+    }),
+    /Unsupported executor adapter: external_llm/,
+  );
 });
 
 test('getTopicPaths rejects unsafe topic ids', () => {

@@ -67,8 +67,8 @@
 
 约束说明：
 
-- `Agent-first` 不等于 `external_llm-only`
-- `external_llm` 仅作为兼容层能力，不是并列主线
+- `Agent-first` 由默认 `Codex CLI host-agent runtime` 与显式 `hermes_native_proof` proof lane 共同成立
+- proof lane 固定为 `hermes_native_proof`
 - Domain contract 决定控制面，prompt 仅作为辅助信息
 
 ## 4.1 当前主线能力边界
@@ -98,7 +98,7 @@
 
 ## 6. 避免的错误表述
 
-- 不把 `external_llm` 提升为并列主线
+- 保持 `host_agent` 默认主线与 `hermes_native_proof` 显式 proof lane 的双层执行结构
 - 不把部署形态变化写成本体变化
 - 不把 `OPL` 写成 `RedCube` 的替代定义
 - 不把 prompt patch 当作 contract hydration 的替代

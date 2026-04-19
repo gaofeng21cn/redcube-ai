@@ -23,7 +23,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-test('current runtime defaults to Codex substrate while external_llm stays optional', async () => {
+test('current runtime defaults to Codex substrate while Hermes proof stays opt-in', async () => {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -35,16 +35,14 @@ test('current runtime defaults to Codex substrate while external_llm stays optio
     assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'host_agent');
     assert.equal(runtimeExecutor.execution_model.primary_surface, 'codex_native_host_agent');
     assert.equal(runtimeExecutor.execution_model.adapter_role, 'primary_creative_executor');
-    assert.equal(runtimeExecutor.execution_model.agent_first_requires_external_llm, false);
-    assert.equal(runtimeExecutor.execution_model.external_llm_role, 'secondary_proof_adapter');
     assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_local_operator_host');
     assert.equal(runtimeExecutor.execution_model.freeze_origin_milestone, 'P19.A');
 
-    const externalLlm = resolveExecutorAdapter({ adapter: 'external_llm' });
-    assert.equal(externalLlm.execution_model.mainline_adapter, 'host_agent');
-    assert.equal(externalLlm.execution_model.adapter_role, 'secondary_proof_adapter');
-    assert.equal(externalLlm.execution_model.agent_first_requires_external_llm, false);
+    assert.throws(
+      () => resolveExecutorAdapter({ adapter: 'external_llm' }),
+      /Unsupported executor adapter: external_llm/,
+    );
 
     const hermesNativeProof = resolveExecutorAdapter({ adapter: 'hermes_native_proof' });
     assert.equal(hermesNativeProof.adapter, 'hermes_native_proof');
@@ -78,14 +76,12 @@ test('current runtime defaults to Codex substrate while external_llm stays optio
     assert.equal(result.run.executor.adapter, 'host_agent');
     assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
     assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
-    assert.equal(result.run.executor.execution_model.external_llm_role, 'secondary_proof_adapter');
     assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(result.run.executor.execution_model.deployment_host, 'codex_local_operator_host');
 
     const artifact = readJson(result.artifactFile);
     assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
     assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
-    assert.equal(artifact.execution_model.agent_first_requires_external_llm, false);
     assert.equal(artifact.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
   } finally {
@@ -103,7 +99,7 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
   assert.equal(audit.closeout_ready, true);
   assert.equal(audit.execution_model.mainline_adapter, 'host_agent');
   assert.equal(audit.execution_model.primary_surface, 'codex_native_host_agent');
-  assert.equal(audit.execution_model.agent_first_requires_external_llm, false);
+  assert.equal(audit.execution_model.proof_executor, 'hermes_native_proof');
   assert.equal(audit.execution_model.freeze_origin_milestone, 'P19.A');
   assert.deepEqual(audit.unified_lifecycle.stages, [
     'source_readiness',
@@ -163,6 +159,7 @@ test('P19 audit emits a machine-readable closeout report artifact', () => {
   assert.equal(stored.milestone, 'P19.D');
   assert.equal(stored.phase, 'shared_execution_and_audit_closeout');
   assert.equal(stored.closeout_ready, true);
+  assert.equal(stored.execution_model.proof_executor, 'hermes_native_proof');
   assert.equal(stored.residue.xiaohongshu.status, 'cleared');
   assert.equal(stored.residue.ppt_deck.status, 'cleared');
   assert.equal(stored.review_overlay.ppt_deck.status, 'active');

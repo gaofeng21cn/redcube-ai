@@ -9,7 +9,7 @@
 
 `RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS` 驱动。
 
-这里的 `Agent-first` 不等于必须走 `external_llm` API。
+这里的 `Agent-first` 通过默认 `Codex CLI host-agent runtime` 与显式 `hermes_native_proof` proof lane 共同成立。
 在当前 Codex-native 语境里，route / managed run surface 已按三层 owner 理解：`Hermes-Agent` 持有长期运行与托管能力，`RedCube AI` 持有 visual-domain governance / audit / projection truth，而默认 concrete executor 仍是本地 Codex CLI host-agent runtime；`Codex` 本地 operator host 继续承担当前部署宿主与 workspace bridge，而历史 `repo-local managed runtime pilot` 只保留为迁移 provenance / compatibility bridge；
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；
 当前已验证的公开正式入口是 `CLI`、`MCP`；

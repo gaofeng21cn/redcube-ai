@@ -52,31 +52,14 @@
 RedCube product entry MVP 继续作为 domain-agent frontdesk、invoke、manifest、session surface 的技术记录。
 hardening tranche 继续作为当前 Codex-default execution 与 readiness closeout 记录。
 
-### 内部集成与历史 proof 记录
+### 技术追溯与已吸收记录
 
-- [Upstream Hermes-Agent final target shape](program/upstream_hermes_agent_final_target_shape.md)
-- [Upstream Hermes-Agent activation package](program/upstream_hermes_agent_activation_package.md)
-- [Upstream Hermes-Agent service-boundary proof](program/upstream_hermes_agent_service_safe_domain_entry.md)
-- [OPL Gateway Federated Product Entry](program/opl_gateway_federated_product_entry.md)
-- [Upstream Hermes-Agent live verification closeout](program/upstream_hermes_agent_live_verification_closeout.md)
-
-这些记录承载 internal OPL bridge wiring、upstream Hermes proof 与早期 service-boundary 术语。
-它们服务维护者和 shell integration，公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`。
-
-### Source Readiness 与已吸收的 Phase 2 provenance
-
+- [`docs/program/`](program/)
+- [`docs/history/`](history/)
 - [Source augmentation executor contract](source_augmentation_executor_contract.md)
-- [Phase 2 source intake activation package freeze](program/phase-2/phase_2_source_intake_activation_package_freeze.md)
-- [Phase 2 source intake shared source truth baseline](program/phase-2/phase_2_source_intake_shared_source_truth_baseline.md)
-- [Phase 2 review export gate audit hardening](program/phase-2/phase_2_review_export_gate_audit_hardening.md)
-- [Phase 2 publication projection delivery contract convergence](program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md)
-- [Phase 2 family source-truth consumption convergence](program/phase-2/phase_2_family_source_truth_consumption_convergence.md)
-- [Phase 2 direct delivery operator handoff hardening](program/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md)
-- [Phase 2 direct delivery lifecycle stage convergence](program/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md)
-- [Phase 2 source readiness deep research trigger gate convergence](program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md)
-- [Phase 2 workspace operator quickstart convergence](program/phase-2/phase_2_workspace_operator_quickstart_convergence.md)
-- [Phase 2 operator surface consistency hardening](program/phase-2/phase_2_operator_surface_consistency_hardening.md)
-- [Phase 2 runtime watch locator integrity hardening](program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md)
+
+这些目录承载 internal OPL bridge wiring、upstream Hermes proof、已吸收的 Phase 2 provenance 与早期 service-boundary 术语。
+它们服务维护者和 shell integration，公开入口模型保持 `OPL shell -> RedCube domain agent -> Codex default execution`。
 
 ### future-facing 目标态文档
 

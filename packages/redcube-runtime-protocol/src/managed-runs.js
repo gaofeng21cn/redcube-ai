@@ -25,7 +25,7 @@ function normalizeAdapter(value) {
   if (text === 'hermes_native_proof') {
     return 'hermes_native_proof';
   }
-  return text;
+  throw new Error(`Unsupported executor adapter: ${text}`);
 }
 
 export function createManagedRunRecord(input = {}) {
@@ -52,7 +52,6 @@ export function createManagedRunRecord(input = {}) {
     adapter: toNullableString(input.adapter),
     requested_adapter,
     active_adapter: requested_adapter,
-    adapter_switches: [],
     started_at: null,
     finished_at: null,
     current_stage: null,

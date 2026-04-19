@@ -49,9 +49,7 @@ export interface HermesNativeProofRuntimeTopology {
 export interface HermesExecutionModel {
   mainline_adapter: 'hermes';
   primary_surface: 'hermes_backed_runtime_substrate';
-  adapter_role: 'primary_creative_executor' | 'secondary_proof_adapter';
-  agent_first_requires_external_llm: false;
-  external_llm_role: 'secondary_proof_adapter';
+  adapter_role: 'primary_creative_executor';
   runtime_substrate_owner: 'Hermes';
   deployment_host: 'codex_default_host_agent_bridge';
   deployment_host_status: 'transition_only';
@@ -60,13 +58,11 @@ export interface HermesExecutionModel {
 }
 
 export interface HermesExecutorDescriptor {
-  adapter: 'hermes' | 'external_llm';
+  adapter: 'hermes';
   requested_adapter: string;
-  primary: boolean;
-  execution_surface: 'hermes_backed_runtime_substrate' | 'external_llm_adapter';
-  creative_execution: 'agent_first_director_first' | 'secondary_proof_adapter_only';
-  external_llm_role: 'secondary_proof_adapter';
-  secondary_proof_role: null | 'secondary_proof_adapter';
+  primary: true;
+  execution_surface: 'hermes_backed_runtime_substrate';
+  creative_execution: 'agent_first_director_first';
   runtime_topology: HermesRuntimeTopology;
   execution_model: HermesExecutionModel;
 }
@@ -74,9 +70,7 @@ export interface HermesExecutorDescriptor {
 export interface CodexExecutionModel {
   mainline_adapter: 'host_agent';
   primary_surface: 'codex_native_host_agent';
-  adapter_role: 'primary_creative_executor' | 'secondary_proof_adapter';
-  agent_first_requires_external_llm: false;
-  external_llm_role: 'secondary_proof_adapter';
+  adapter_role: 'primary_creative_executor';
   runtime_substrate_owner: 'Codex CLI';
   deployment_host: 'codex_local_operator_host';
   deployment_host_status: 'active_primary';
@@ -90,8 +84,6 @@ export interface HermesNativeProofExecutionModel {
   mainline_adapter: 'hermes_native_proof';
   primary_surface: 'hermes_native_full_agent_loop';
   adapter_role: 'opt_in_proof_executor';
-  agent_first_requires_external_llm: false;
-  external_llm_role: 'secondary_proof_adapter';
   runtime_substrate_owner: 'Hermes';
   deployment_host: 'local_hermes_agent_bridge';
   deployment_host_status: 'opt_in_available';
@@ -102,13 +94,11 @@ export interface HermesNativeProofExecutionModel {
 }
 
 export interface CodexExecutorDescriptor {
-  adapter: 'host_agent' | 'external_llm';
+  adapter: 'host_agent';
   requested_adapter: string;
-  primary: boolean;
-  execution_surface: 'codex_native_host_agent' | 'external_llm_adapter';
-  creative_execution: 'agent_first_director_first' | 'secondary_proof_adapter_only';
-  external_llm_role: 'secondary_proof_adapter';
-  secondary_proof_role: null | 'secondary_proof_adapter';
+  primary: true;
+  execution_surface: 'codex_native_host_agent';
+  creative_execution: 'agent_first_director_first';
   runtime_topology: CodexRuntimeTopology;
   execution_model: CodexExecutionModel;
 }
@@ -119,8 +109,6 @@ export interface HermesNativeProofExecutorDescriptor {
   primary: false;
   execution_surface: 'hermes_native_full_agent_loop';
   creative_execution: 'agent_first_director_first';
-  external_llm_role: 'secondary_proof_adapter';
-  secondary_proof_role: null;
   runtime_topology: HermesNativeProofRuntimeTopology;
   execution_model: HermesNativeProofExecutionModel;
 }
@@ -130,7 +118,6 @@ export declare const HERMES_RUNTIME_SURFACE: 'hermes_backed_runtime_substrate';
 export declare const HERMES_DEPLOYMENT_HOST: 'codex_default_host_agent_bridge';
 export declare const HERMES_DEPLOYMENT_STATUS: 'transition_only';
 export declare const HERMES_DEFAULT_ADAPTER: 'hermes';
-export declare const HERMES_COMPATIBILITY_ADAPTER: 'external_llm';
 export declare const HERMES_FREEZE_ORIGIN: 'Hermes.A';
 export declare const CODEX_DEFAULT_ADAPTER: 'host_agent';
 export declare const HERMES_NATIVE_PROOF_ADAPTER: 'hermes_native_proof';
@@ -150,8 +137,8 @@ export declare const HERMES_NATIVE_PROOF_FREEZE_ORIGIN: 'Hermes.Proof.A';
 export declare function buildHermesRuntimeTopology(): HermesRuntimeTopology;
 export declare function buildCodexRuntimeTopology(): CodexRuntimeTopology;
 export declare function buildHermesNativeProofRuntimeTopology(): HermesNativeProofRuntimeTopology;
-export declare function normalizeCodexAdapter(adapter?: string): 'host_agent' | 'external_llm';
-export declare function normalizeHermesAdapter(adapter?: string): 'hermes' | 'external_llm';
+export declare function normalizeCodexAdapter(adapter?: string): 'host_agent';
+export declare function normalizeHermesAdapter(adapter?: string): 'hermes';
 export declare function buildHermesExecutionModel(options?: { adapter?: string }): HermesExecutionModel;
 export declare function buildCodexExecutionModel(options?: { adapter?: string }): CodexExecutionModel;
 export declare function buildHermesNativeProofExecutionModel(options?: { adapter?: string }): HermesNativeProofExecutionModel;
