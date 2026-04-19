@@ -5,7 +5,13 @@ import type {
   FamilySharedHandoffSurface,
   GatewayInteractionContractSurface,
 } from 'opl-gateway-shared/family-entry-contracts';
-import type { FamilyFrontdeskEntrySurfaces } from 'opl-gateway-shared/product-entry-companions';
+import type {
+  FamilyFrontdeskEntrySurfaces,
+  FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
+  FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
+  FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
+  ProductEntryResumeContract as SharedProductEntryResumeContract,
+} from 'opl-gateway-shared/product-entry-companions';
 
 export interface WorkspaceRootRequest {
   workspaceRoot: string;
@@ -208,33 +214,13 @@ export interface ProductEntryRequest extends Record<string, unknown> {
   };
 }
 
-export interface FamilyOrchestrationReferenceRef {
-  ref_kind: 'repo_path' | 'json_pointer' | 'workspace_locator' | 'external_url' | string;
-  ref: string;
-  label?: string;
-}
+export type FamilyOrchestrationReferenceRef = SharedFamilyOrchestrationReferenceRef;
 
-export interface FamilyOrchestrationGatePreview {
-  gate_id: string;
-  title?: string;
-  status?: 'requested' | 'approved' | 'rejected' | 'changes_requested' | string;
-  review_surface?: FamilyOrchestrationReferenceRef;
-}
+export type FamilyOrchestrationGatePreview = SharedFamilyOrchestrationGatePreview;
 
-export interface FamilyOrchestrationResumeContract {
-  surface_kind: string;
-  session_locator_field: string;
-  checkpoint_locator_field?: string;
-}
+export type FamilyOrchestrationResumeContract = SharedProductEntryResumeContract;
 
-export interface FamilyOrchestrationCompanion {
-  action_graph_ref?: FamilyOrchestrationReferenceRef;
-  action_graph?: Record<string, unknown>;
-  human_gates: FamilyOrchestrationGatePreview[];
-  resume_contract: FamilyOrchestrationResumeContract;
-  event_envelope_surface?: FamilyOrchestrationReferenceRef;
-  checkpoint_lineage_surface?: FamilyOrchestrationReferenceRef;
-}
+export type FamilyOrchestrationCompanion = SharedFamilyOrchestrationCompanion;
 
 export interface ProductEntryQuickstartStep {
   step_id: string;
