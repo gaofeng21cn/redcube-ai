@@ -9,6 +9,20 @@ export const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
   '@redcube/runtime-protocol',
   '@redcube/gateway',
 ]);
+export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
+  {
+    specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
+    resolve_from: 'packages/redcube-runtime/package.json',
+  },
+  {
+    specifier: 'opl-gateway-shared/product-entry-companions',
+    resolve_from: 'packages/redcube-gateway/package.json',
+  },
+  {
+    specifier: 'opl-gateway-shared/product-entry-program-companions',
+    resolve_from: 'packages/redcube-gateway/package.json',
+  },
+]);
 
 function isWithinRepoRoot(repoRoot, resolvedPath) {
   const relative = path.relative(repoRoot, resolvedPath);
@@ -49,6 +63,60 @@ export function assertWorkspacePackageResolution(options = {}) {
       .join('\n');
     throw new Error(
       `${inspection.message}\nCurrent repo root: ${inspection.repo_root}\n${leaked}`,
+    );
+  }
+  return inspection;
+}
+
+export function inspectRequiredRuntimeSharedResolution({
+  repoRoot,
+  checks = REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS,
+  resolve,
+} = {}) {
+  const resolvedRepoRoot = path.resolve(String(repoRoot || process.cwd()));
+  const resolvedSpecifiers = [];
+  const missingSpecifiers = [];
+
+  for (const check of checks) {
+    const specifier = check.specifier;
+    const resolveFrom = check.resolve_from || 'package.json';
+    try {
+      const resolver = resolve
+        ? (targetSpecifier) => resolve(targetSpecifier, check)
+        : createRequire(path.join(resolvedRepoRoot, resolveFrom)).resolve;
+      resolvedSpecifiers.push({
+        specifier,
+        resolve_from: resolveFrom,
+        resolved_path: path.resolve(resolver(specifier)),
+      });
+    } catch (error) {
+      missingSpecifiers.push({
+        specifier,
+        resolve_from: resolveFrom,
+        error_code: error?.code || 'ERR_MODULE_NOT_FOUND',
+      });
+    }
+  }
+
+  return {
+    ok: missingSpecifiers.length === 0,
+    repo_root: resolvedRepoRoot,
+    resolved_specifiers: resolvedSpecifiers,
+    missing_specifiers: missingSpecifiers,
+    message: missingSpecifiers.length === 0
+      ? 'required runtime/shared package resolution is ready in this checkout'
+      : 'required runtime/shared package resolution is missing in this checkout; run `npm install` in this checkout before verifying',
+  };
+}
+
+export function assertRequiredRuntimeSharedResolution(options = {}) {
+  const inspection = inspectRequiredRuntimeSharedResolution(options);
+  if (!inspection.ok) {
+    const missing = inspection.missing_specifiers
+      .map((entry) => `${entry.specifier} (from ${entry.resolve_from}) -> ${entry.error_code}`)
+      .join('\n');
+    throw new Error(
+      `${inspection.message}\nCurrent repo root: ${inspection.repo_root}\n${missing}`,
     );
   }
   return inspection;

@@ -5,6 +5,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import {
+  assertRequiredRuntimeSharedResolution,
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
@@ -20,6 +21,7 @@ const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
 assertWorkspacePackageResolution({ repoRoot });
+assertRequiredRuntimeSharedResolution({ repoRoot });
 
 const META = [
   'tests/bilingual-home-readme.test.js',

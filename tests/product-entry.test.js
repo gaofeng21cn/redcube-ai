@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
@@ -30,15 +31,12 @@ const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
 const GATEWAY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-gateway/package.json', import.meta.url),
 );
-const GATEWAY_SHARED_DIST_ROOT = path.join(
-  path.dirname(GATEWAY_PACKAGE_JSON),
-  'node_modules',
-  'opl-gateway-shared',
-  'dist',
-);
+const gatewayRequire = createRequire(GATEWAY_PACKAGE_JSON);
+const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-gateway-shared/product-entry-companions';
+const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-gateway-shared/product-entry-program-companions';
 
-async function importGatewaySharedDistModule(moduleName) {
-  return import(pathToFileURL(path.join(GATEWAY_SHARED_DIST_ROOT, moduleName)).href);
+async function importGatewaySharedModule(moduleSpecifier) {
+  return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
 }
 
 async function withMockHermesAndRuntimeState(testFn) {
@@ -284,7 +282,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
 
 test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
-    const sharedCompanions = await importGatewaySharedDistModule('product-entry-companions.js');
+    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const manifest = await getProductEntryManifest({
@@ -667,7 +665,7 @@ test('product preflight consumes OPL shared program builders from the pinned own
     gatewayPackage.dependencies['opl-gateway-shared'],
     /^git\+https:\/\/github\.com\/gaofeng21cn\/one-person-lab\.git#[0-9a-f]{40}$/,
   );
-  const companions = await importGatewaySharedDistModule('product-entry-program-companions.js');
+  const companions = await importGatewaySharedModule(PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER);
   assert.equal(typeof companions.buildProductEntryPreflight, 'function');
   assert.equal(typeof companions.buildProgramCheck, 'function');
 });
