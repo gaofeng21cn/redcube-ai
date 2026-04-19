@@ -38,8 +38,8 @@ The current public reading path is anchored on two repo-verified routes:
 - `npm run test:meta`
 - `npm run test:integration`
 - `npm run test:e2e`
-- `npm run test:historical`
 - `npm run test:full`
+- provenance and historical audit entry: `docs/references/series-doc-governance-checklist.md`
 
 ## Historical and Reference Layers
 

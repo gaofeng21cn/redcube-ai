@@ -38,8 +38,8 @@
 - `npm run test:meta`
 - `npm run test:integration`
 - `npm run test:e2e`
-- `npm run test:historical`
 - `npm run test:full`
+- provenance / historical 审计入口：`docs/references/series-doc-governance-checklist.md`
 
 ## 历史与参考层
 

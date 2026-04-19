@@ -22,8 +22,8 @@
 - meta：`scripts/verify.sh meta` / `npm run test:meta`
 - integration：`scripts/verify.sh integration` / `npm run test:integration`
 - e2e：`scripts/verify.sh e2e` / `npm run test:e2e`
-- historical：`scripts/verify.sh historical` / `npm run test:historical`
 - full：`scripts/verify.sh full` / `npm run test:full`
+- historical provenance audit：`docs/references/series-doc-governance-checklist.md`
 
 ## 历史记录与追溯层
 
@@ -38,4 +38,4 @@
 
 - 保持 direct route 与 federated route 共用同一条 service-safe domain entry 下游
 - 保持 upstream Hermes runtime owner、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
-- 保持默认验证轻量，历史 provenance 通过 `historical` lane 独立追溯
+- 保持默认验证轻量，历史 provenance 通过 reference 层独立追溯
