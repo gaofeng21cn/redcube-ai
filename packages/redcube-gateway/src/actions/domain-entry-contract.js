@@ -2,6 +2,7 @@ import {
   buildDomainEntryCommandContract,
   buildFamilyDomainEntryContract,
   buildGatewayInteractionContract,
+  buildSharedHandoff,
   buildSharedHandoffReturnSurface,
 } from 'opl-gateway-shared/family-entry-contracts';
 
@@ -138,11 +139,11 @@ export function buildRedCubeSharedHandoff({
   returnSurfaceKind = 'product_entry',
   extraPayload,
 } = {}) {
-  return {
+  return buildSharedHandoff({
     opl_return_surface: buildSharedHandoffReturnSurface({
       surface_kind: returnSurfaceKind,
       target_domain_id: targetDomainId,
       extra_payload: extraPayload,
     }),
-  };
+  });
 }

@@ -1,5 +1,11 @@
 import type { GovernanceSurfaceContract } from '@redcube/overlay-core';
 import type { WorkspaceContract } from '@redcube/runtime-protocol';
+import type {
+  FamilyDomainEntryContractSurface,
+  FamilySharedHandoffSurface,
+  GatewayInteractionContractSurface,
+} from 'opl-gateway-shared/family-entry-contracts';
+import type { FamilyFrontdeskEntrySurfaces } from 'opl-gateway-shared/product-entry-companions';
 
 export interface WorkspaceRootRequest {
   workspaceRoot: string;
@@ -515,14 +521,14 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       surface_kind: 'product_entry_session';
     };
   };
-  shared_handoff: {
+  shared_handoff: FamilySharedHandoffSurface & {
     opl_return_surface: {
       surface_kind: 'product_entry';
       target_domain_id: string;
     };
   };
-  domain_entry_contract: Record<string, unknown>;
-  gateway_interaction_contract: Record<string, unknown>;
+  domain_entry_contract: FamilyDomainEntryContractSurface;
+  gateway_interaction_contract: GatewayInteractionContractSurface;
   product_entry_start: ProductEntryStartCompanion;
   product_entry_overview: ProductEntryOverviewCompanion;
   product_entry_preflight: ProductEntryPreflightCompanion;
@@ -552,7 +558,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
   family_orchestration: ProductEntryManifestResponse['family_orchestration'];
   product_entry_manifest: ProductEntryManifestResponse;
-  entry_surfaces: {
+  entry_surfaces: FamilyFrontdeskEntrySurfaces & {
     direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
     opl_bridge: ProductEntryManifestResponse['product_entry_shell']['opl_bridge'];
     session: ProductEntryManifestResponse['product_entry_shell']['session'];
