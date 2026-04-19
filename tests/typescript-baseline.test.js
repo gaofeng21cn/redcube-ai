@@ -25,6 +25,7 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:meta'], 'node scripts/run-test-group.mjs meta');
   assert.equal(pkg.scripts['test:integration'], 'node scripts/run-test-group.mjs integration');
   assert.equal(pkg.scripts['test:e2e'], 'node scripts/run-test-group.mjs e2e');
+  assert.equal(pkg.scripts['test:historical'], 'node scripts/run-test-group.mjs historical');
   assert.equal(pkg.scripts['test:full'], 'node scripts/run-test-group.mjs full');
   assert.equal(pkg.scripts.typecheck, 'tsc --noEmit --project tsconfig.tests.json --pretty false');
 });

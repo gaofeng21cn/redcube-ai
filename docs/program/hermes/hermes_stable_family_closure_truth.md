@@ -5,7 +5,7 @@
 ## 当前状态
 
 这一 tranche 已在仓内实现并通过验证。
-它记录的是当时以 repo-local `Hermes` migration layer 为 owner 的 stable family runtime closure，并把 shared family runtime output 与第二条 human-publication family closure 的真值一起收紧到 repo-tracked surface。
+它记录的是当时以 repo-local `Hermes` migration layer 为 owner 的 stable family runtime closure，并把 shared family runtime output 与第二条 human-publication family closure 的真值一起收紧到 repo-tracked surface。当前 repo-verified mainline 里的默认 concrete executor 已按 `Codex CLI host-agent runtime` 理解。
 
 ## In scope
 
@@ -15,9 +15,9 @@
 
 ## 已落地的事实
 
-- stable family runtime package 现在会直接暴露同一份 `Hermes execution_model`，不再让 family runner 各自留局部旧 execution truth
+- stable family runtime package 现在会直接暴露同一份当前 execution_model truth，并由当前 `Codex CLI host-agent runtime` concrete executor 对齐 `deployment_host` 与 `deployment_host_status`
 - routed family artifact 在落盘前会统一保留 `topic_id`、`deliverable_id`、`contract` 与 `stage_contract`
-- `xiaohongshu` 在 `planning_ready` source readiness 之后，可以沿 `research -> storyline -> single_note_plan -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> publish_copy -> export_bundle` 跑通 Hermes-backed 闭环
+- `xiaohongshu` 在 `planning_ready` source readiness 之后，可以沿 `research -> storyline -> single_note_plan -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> publish_copy -> export_bundle` 跑通同一条 human-publication closure，并保持当前 `Codex CLI host-agent runtime` concrete executor truth
 - `xiaohongshu` 继续保持 explicit human publication：`approval_pending -> approved_pending_publish` 语义不被改写成 direct-delivery
 - `ppt_deck` 与 guarded `poster_onepager` 继续保持既有 direct-delivery / knowledge-poster truth，不借此扩张到 academic poster
 

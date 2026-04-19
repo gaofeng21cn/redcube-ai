@@ -13,6 +13,34 @@ import {
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import {
+  startMockCodexCli,
+  withEnv,
+} from './helpers/mock-codex-cli.js';
+
+function withoutUpdatedAt(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return payload;
+  }
+  const clone = JSON.parse(JSON.stringify(payload));
+  if (clone && typeof clone === 'object' && 'updated_at' in clone) {
+    delete clone.updated_at;
+  }
+  return clone;
+}
+
+async function withMockCodexHostAgent(testFn) {
+  const upstream = await startMockCodexCli();
+  const restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
+}
 
 async function buildReviewReadyXiaohongshuWorkspace(workspaceRoot) {
   await completeSourceReadiness({
@@ -44,47 +72,49 @@ async function buildReviewReadyXiaohongshuWorkspace(workspaceRoot) {
 }
 
 test('audit, watch, review, and projection surfaces stay behavior-aligned on the same deliverable', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-phase2-behavior-'));
-  await buildReviewReadyXiaohongshuWorkspace(workspaceRoot);
+  await withMockCodexHostAgent(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-phase2-behavior-'));
+    await buildReviewReadyXiaohongshuWorkspace(workspaceRoot);
 
-  const audit = await auditDeliverable({
-    workspaceRoot,
-    overlay: 'xiaohongshu',
-    topicId: 'topic-a',
-    deliverableId: 'note-a',
-    mode: 'draft_new',
-  });
-  const review = await getReviewState({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'note-a',
-  });
-  const projection = await getPublicationProjection({
-    workspaceRoot,
-    topicId: 'topic-a',
-  });
-  const watch = await runtimeWatch({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'note-a',
-    run: {
-      run_id: 'run-note-a-001',
-      topic_id: 'topic-a',
-      deliverable_id: 'note-a',
+    const audit = await auditDeliverable({
+      workspaceRoot,
       overlay: 'xiaohongshu',
-      current_stage: 'publish_copy',
-      status: 'publish_ready',
-    },
-  });
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      mode: 'draft_new',
+    });
+    const review = await getReviewState({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+    });
+    const projection = await getPublicationProjection({
+      workspaceRoot,
+      topicId: 'topic-a',
+    });
+    const watch = await runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      run: {
+        run_id: 'run-note-a-001',
+        topic_id: 'topic-a',
+        deliverable_id: 'note-a',
+        overlay: 'xiaohongshu',
+        current_stage: 'publish_copy',
+        status: 'publish_ready',
+      },
+    });
 
-  assert.equal(audit.status, 'pass');
-  assert.deepEqual(audit.review_state, review.state);
-  assert.deepEqual(audit.publication_projection, projection.publication);
-  assert.deepEqual(audit.delivery_contract, watch.delivery_contract);
-  assert.equal(audit.gate_summary?.delivery_projection_current, 'approval_pending');
-  assert.equal(watch.gate_summary?.delivery_projection_current, 'approval_pending');
-  assert.equal(audit.gate_summary?.delivery_projection_current, projection.publication.deliverables['note-a'].current);
-  assert.equal(watch.review_state?.current_status, review.state.current_status);
-  assert.equal(watch.publication_projection?.deliverables?.['note-a']?.current, projection.publication.deliverables['note-a'].current);
-  assert.equal(watch.run_id, 'run-note-a-001');
+    assert.equal(audit.status, 'pass');
+    assert.deepEqual(audit.review_state, review.state);
+    assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
+    assert.deepEqual(audit.delivery_contract, watch.delivery_contract);
+    assert.equal(audit.gate_summary?.delivery_projection_current, 'approval_pending');
+    assert.equal(watch.gate_summary?.delivery_projection_current, 'approval_pending');
+    assert.equal(audit.gate_summary?.delivery_projection_current, projection.publication.deliverables['note-a'].current);
+    assert.equal(watch.review_state?.current_status, review.state.current_status);
+    assert.equal(watch.publication_projection?.deliverables?.['note-a']?.current, projection.publication.deliverables['note-a'].current);
+    assert.equal(watch.run_id, 'run-note-a-001');
+  });
 });

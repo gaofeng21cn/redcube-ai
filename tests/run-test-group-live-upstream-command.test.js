@@ -40,15 +40,19 @@ test('run-test-group serializes node test files for Codex-backed verification gr
   }), ['--test', '--test-reporter=spec']);
 });
 
-test('default meta leaves docs-surface and longrun-target tests in integration', () => {
+test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
   const script = readFileSync('scripts/run-test-group.mjs', 'utf-8');
   const meta = readGroupList(script, 'META');
   const integration = readGroupList(script, 'INTEGRATION');
+  const historical = readGroupList(script, 'HISTORICAL');
 
   assert.equal(meta.includes('tests/public-docs-surface.test.js'), false);
   assert.equal(meta.includes('tests/direct-delivery-longrun-target.test.js'), false);
+  assert.equal(meta.includes('tests/phase-2-behavior-convergence.test.js'), false);
   assert.equal(integration.includes('tests/public-docs-surface.test.js'), true);
-  assert.equal(integration.includes('tests/direct-delivery-longrun-target.test.js'), true);
+  assert.equal(integration.includes('tests/direct-delivery-longrun-target.test.js'), false);
+  assert.equal(historical.includes('tests/direct-delivery-longrun-target.test.js'), true);
+  assert.equal(historical.includes('tests/phase-2-behavior-convergence.test.js'), true);
 });
 
 test('serialized verification rule is documented in current program contract', () => {

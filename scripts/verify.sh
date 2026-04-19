@@ -16,12 +16,15 @@ case "$lane" in
   e2e)
     npm run test:e2e
     ;;
+  historical)
+    npm run test:historical
+    ;;
   full)
     npm run test:full
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|meta|integration|e2e|full]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|meta|integration|e2e|historical|full]" >&2
     exit 1
     ;;
 esac

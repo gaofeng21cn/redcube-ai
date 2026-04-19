@@ -15,6 +15,7 @@
     "test:meta": "node scripts/run-test-group.mjs meta",
     "test:integration": "node scripts/run-test-group.mjs integration",
     "test:e2e": "node scripts/run-test-group.mjs e2e",
+    "test:historical": "node scripts/run-test-group.mjs historical",
     "test:full": "node scripts/run-test-group.mjs full",
     "typecheck": "tsc --noEmit --project tsconfig.tests.json --pretty false",
     "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs"

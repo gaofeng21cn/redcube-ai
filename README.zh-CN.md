@@ -87,6 +87,7 @@ GitHub Actions 的持续集成默认执行质量验证流程。
 - `npm run test:meta`
 - `npm run test:integration`
 - `npm run test:e2e`
+- `npm run test:historical`
 - `npm run test:full`
 - 对较重的 Codex-backed 验证组，Node 侧串行执行会显式使用 `--test-concurrency=1`。
 - 如果截图审阅或导出检查需要带 Playwright 的 Python，请把 `REDCUBE_PYTHON_COMMAND` 指向对应解释器。

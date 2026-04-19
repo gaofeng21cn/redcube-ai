@@ -87,6 +87,7 @@ GitHub Actions CI intentionally stays on the quality lane.
 - `npm run test:meta`
 - `npm run test:integration`
 - `npm run test:e2e`
+- `npm run test:historical`
 - `npm run test:full`
 - Serialized Node verification for the heavier Codex-backed groups uses `--test-concurrency=1`.
 - If screenshot review or export checks need a Playwright-capable interpreter, point `REDCUBE_PYTHON_COMMAND` at that Python executable.

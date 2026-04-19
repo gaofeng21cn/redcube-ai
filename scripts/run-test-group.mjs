@@ -36,36 +36,17 @@ const META = [
   'tests/llm-prompts.test.js',
   'tests/llm-runtime-config.test.js',
   'tests/overlay-registry.test.js',
-  'tests/p19-creative-ownership-freeze.test.js',
-  'tests/p20-extension-proof-and-third-family-onboarding.test.js',
-  'tests/p21-operations-and-evaluation-os.test.js',
   'tests/pack-first-completion.test.js',
-  'tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js',
-  'tests/phase-2-direct-delivery-operator-handoff-hardening.test.js',
-  'tests/phase-2-family-parity-governance-surface-convergence.test.js',
-  'tests/phase-2-family-source-truth-consumption-convergence.test.js',
-  'tests/phase-2-operator-surface-consistency-hardening.test.js',
-  'tests/phase-2-publication-projection-delivery-contract-convergence.test.js',
-  'tests/phase-2-review-export-gate-audit-hardening.test.js',
-  'tests/phase-2-runtime-watch-locator-integrity-hardening.test.js',
-  'tests/phase-2-source-intake-activation-package-freeze.test.js',
-  'tests/phase-2-source-intake-shared-source-truth-baseline.test.js',
-  'tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js',
-  'tests/phase-2-workspace-operator-quickstart-convergence.test.js',
-  'tests/poster-production-hardening-freeze.test.js',
   'tests/ppt-overlay.test.js',
   'tests/profile-contract-hydration.test.js',
   'tests/publish-governance-single-owner.test.js',
   'tests/reference-quality-os.test.js',
   'tests/render-ceiling-deepening.test.js',
-  'tests/runtime-alignment-p0.test.js',
   'tests/runtime-config.test.js',
   'tests/runtime-protocol-workspace.test.js',
   'tests/run-test-group-live-upstream-command.test.js',
   'tests/source-augmentation-contract.test.js',
   'tests/source-augmentation-provider.test.js',
-  'tests/stable-deliverable-manual-fidelity.test.js',
-  'tests/stable-deliverable-manual-test-package.test.js',
   'tests/toc-parser.test.js',
   'tests/typescript-baseline.test.js',
   'tests/typescript-closeout-audit.test.js',
@@ -77,10 +58,6 @@ const META = [
   'tests/typescript-reference-os-surfaces.test.js',
   'tests/typescript-runtime-family-surfaces.test.js',
   'tests/typescript-service-boundaries.test.js',
-  'tests/upstream-hermes-agent-activation-package.test.js',
-  'tests/upstream-hermes-agent-live-verification-blocker.test.js',
-  'tests/upstream-hermes-agent-live-verification-closeout.test.js',
-  'tests/upstream-hermes-agent-final-target-shape.test.js',
   'tests/worktree-package-resolution.test.js',
   'tests/xiaohongshu-overlay.test.js',
 ];
@@ -95,10 +72,10 @@ const INTEGRATION = [
   'tests/family-source-truth-consumption.test.js',
   'tests/gateway-actions.test.js',
   'tests/hermes-run-topology-regression.test.js',
+  'tests/hermes-runtime-canonical-path.test.js',
   'tests/import-legacy-project.test.js',
   'tests/managed-deliverable-execution.test.js',
   'tests/mcp-gateway.test.js',
-  'tests/phase-2-behavior-convergence.test.js',
   'tests/poster-creative-ownership.test.js',
   'tests/ppt-creative-ownership.test.js',
   'tests/ppt-deliverable-surface.test.js',
@@ -113,17 +90,13 @@ const INTEGRATION = [
   'tests/render-html-guardrails.test.js',
   'tests/review-state-latest-checks.test.js',
   'tests/review-platform.test.js',
+  'tests/runtime-deliverable-route.test.js',
   'tests/screenshot-review-ai-first.test.js',
   'tests/service-safe-domain-entry.test.js',
-  'tests/hermes-managed-family-closure-truth.test.js',
-  'tests/hermes-runtime-canonical-path.test.js',
-  'tests/hermes-stable-family-closure-truth.test.js',
-  'tests/runtime-deliverable-route.test.js',
   'tests/source-intake.test.js',
   'tests/source-readiness-deep-research-gate.test.js',
   'tests/source-research.test.js',
   'tests/workspace-operator-quickstart.test.js',
-  'tests/direct-delivery-longrun-target.test.js',
   'tests/xiaohongshu-creative-ownership.test.js',
 ];
 
@@ -132,8 +105,37 @@ const E2E = [
   'tests/xiaohongshu-deliverable-e2e.test.js',
 ];
 
-const FAST = [
+const HISTORICAL = [
+  'tests/direct-delivery-longrun-target.test.js',
+  'tests/hermes-managed-family-closure-truth.test.js',
+  'tests/hermes-stable-family-closure-truth.test.js',
+  'tests/p19-creative-ownership-freeze.test.js',
+  'tests/p20-extension-proof-and-third-family-onboarding.test.js',
+  'tests/p21-operations-and-evaluation-os.test.js',
+  'tests/phase-2-behavior-convergence.test.js',
+  'tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js',
+  'tests/phase-2-direct-delivery-operator-handoff-hardening.test.js',
+  'tests/phase-2-family-parity-governance-surface-convergence.test.js',
+  'tests/phase-2-family-source-truth-consumption-convergence.test.js',
+  'tests/phase-2-operator-surface-consistency-hardening.test.js',
+  'tests/phase-2-publication-projection-delivery-contract-convergence.test.js',
+  'tests/phase-2-review-export-gate-audit-hardening.test.js',
+  'tests/phase-2-runtime-watch-locator-integrity-hardening.test.js',
+  'tests/phase-2-source-intake-activation-package-freeze.test.js',
+  'tests/phase-2-source-intake-shared-source-truth-baseline.test.js',
+  'tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js',
+  'tests/phase-2-workspace-operator-quickstart-convergence.test.js',
+  'tests/poster-production-hardening-freeze.test.js',
   'tests/runtime-alignment-p0.test.js',
+  'tests/stable-deliverable-manual-fidelity.test.js',
+  'tests/stable-deliverable-manual-test-package.test.js',
+  'tests/upstream-hermes-agent-activation-package.test.js',
+  'tests/upstream-hermes-agent-final-target-shape.test.js',
+  'tests/upstream-hermes-agent-live-verification-blocker.test.js',
+  'tests/upstream-hermes-agent-live-verification-closeout.test.js',
+];
+
+const FAST = [
   'tests/typescript-baseline.test.js',
   'tests/runtime-protocol-workspace.test.js',
   'tests/overlay-registry.test.js',
@@ -141,15 +143,13 @@ const FAST = [
   'tests/gateway-actions.test.js',
   'tests/worktree-package-resolution.test.js',
   'tests/codex-cli-client.test.js',
+  'tests/codex-cli-timeout.test.js',
   'tests/runtime-deliverable-route.test.js',
+  'tests/public-docs-surface.test.js',
   'tests/ppt-hermes-generation.test.js',
   'tests/service-safe-domain-entry.test.js',
   'tests/product-entry.test.js',
   'tests/source-augmentation-provider.test.js',
-  'tests/upstream-hermes-agent-activation-package.test.js',
-  'tests/upstream-hermes-agent-live-verification-blocker.test.js',
-  'tests/upstream-hermes-agent-live-verification-closeout.test.js',
-  'tests/upstream-hermes-agent-final-target-shape.test.js',
 ];
 
 const GROUPS = {
@@ -157,7 +157,8 @@ const GROUPS = {
   meta: META,
   integration: INTEGRATION,
   e2e: E2E,
-  full: [...META, ...INTEGRATION, ...E2E],
+  historical: HISTORICAL,
+  full: [...META, ...INTEGRATION, ...E2E, ...HISTORICAL],
 };
 async function prepareSerializedVerification(groupName) {
   if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
@@ -205,15 +206,15 @@ function assertTrackedFiles(files, groupName) {
 
 function assertPartition() {
   const discovered = discoveredRootTests();
-  const base = [...META, ...INTEGRATION, ...E2E];
+  const base = [...META, ...INTEGRATION, ...E2E, ...HISTORICAL];
   const duplicates = base.filter((file, index) => base.indexOf(file) !== index);
   if (duplicates.length > 0) {
-    throw new Error(`meta/integration/e2e 分组存在重复项: ${[...new Set(duplicates)].join(', ')}`);
+    throw new Error(`meta/integration/e2e/historical 分组存在重复项: ${[...new Set(duplicates)].join(', ')}`);
   }
 
   const missing = discovered.filter((file) => !base.includes(file));
   if (missing.length > 0) {
-    throw new Error(`未被纳入 meta/integration/e2e 的测试文件: ${missing.join(', ')}`);
+    throw new Error(`未被纳入 meta/integration/e2e/historical 的测试文件: ${missing.join(', ')}`);
   }
 
   const unexpected = base.filter((file) => !discovered.includes(file));
@@ -224,7 +225,7 @@ function assertPartition() {
 
 function printUsage() {
   process.stdout.write([
-    '用法: node scripts/run-test-group.mjs <fast|meta|integration|e2e|full> [node --test 参数]',
+    '用法: node scripts/run-test-group.mjs <fast|meta|integration|e2e|historical|full> [node --test 参数]',
     '示例: node scripts/run-test-group.mjs full --test-reporter=dot',
   ].join('\n'));
 }
@@ -239,6 +240,7 @@ if (!groupName || !Object.hasOwn(GROUPS, groupName)) {
 assertTrackedFiles(META, 'meta');
 assertTrackedFiles(INTEGRATION, 'integration');
 assertTrackedFiles(E2E, 'e2e');
+assertTrackedFiles(HISTORICAL, 'historical');
 assertTrackedFiles(FAST, 'fast');
 assertPartition();
 

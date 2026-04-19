@@ -38,10 +38,16 @@ test('public docs surface keeps the governance references tracked', () => {
   }
 });
 
-test('public docs surface keeps absorbed phase-2 provenance and longrun target wording out of the default docs index', () => {
+test('public docs surface keeps the default entry chain and isolates historical program wording', () => {
   const docsReadme = readText(path.join('docs', 'README.md'));
   const docsReadmeZh = readText(path.join('docs', 'README.zh-CN.md'));
+  const docsStatus = readText(path.join('docs', 'status.md'));
 
-  assert.doesNotMatch(docsReadme, /absorbed phase-2 provenance|future-facing design target|Direct Delivery Longrun Target State/);
-  assert.doesNotMatch(docsReadmeZh, /已吸收的 Phase 2 provenance|future-facing 目标态文档|Direct Delivery Longrun Target State/);
+  assert.match(docsReadme, /OPL shell -> RCA domain agent -> Codex default execution/);
+  assert.match(docsReadmeZh, /OPL shell -> RCA domain agent -> Codex default execution/);
+  assert.match(docsStatus, /OPL shell -> RCA \/ RedCube domain agent -> Codex default execution/);
+
+  assert.doesNotMatch(docsReadme, /repo-tracked program|current truth|active tranche|current-program\.json/i);
+  assert.doesNotMatch(docsReadmeZh, /repo-tracked program|当前真相|活跃 tranche|current-program\.json/i);
+  assert.doesNotMatch(docsStatus, /active mainline pointer|current-program\.json/i);
 });

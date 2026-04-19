@@ -28,7 +28,7 @@
 - `docs/architecture.md`：核心链路与结构边界。
 - `docs/invariants.md`：硬约束与不能破坏的边界。
 - `docs/decisions.md`：仍有效的关键决策与取舍。
-- `docs/status.md`：当前主线、活跃 tranche、下一步与验证口径。
+- `docs/status.md`：当前默认入口链路、执行口径、验证口径与历史索引。
 - `docs/program/phase-2/`：Phase 2 absorbed tranche、prefrozen follow-on board 与 provenance brief。
 - `contracts/runtime-program/current-program.json`：当前机器可读主线合同与 active baton 指针。
 - `contracts/runtime-program/*.json`：机器可读主线合同。
@@ -50,7 +50,7 @@
 - 修改 formal-entry、execution handle、runtime mainline、program brief 路径、测试命令或 CI 分层时，必须同步改 README、docs、contracts 与相关测试。
 - 默认最小验证入口是 `scripts/verify.sh`。
 - 默认 smoke 是 `npm test` / `npm run test:fast`。
-- `npm run test:meta`、`npm run test:integration`、`npm run test:e2e` 是显式 lane。
+- `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:historical` 是显式 lane。
 - `npm run test:full` 是 clean-clone 基线。
 
 ## 并行开发与工作树
