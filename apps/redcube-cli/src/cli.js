@@ -194,7 +194,7 @@ function buildCommandHelp(commandKey) {
     },
     'deliverable run': {
       summary: '按 hydrated contract 执行单个 deliverable route。',
-      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|hermes_native_proof|external_llm>]',
       gateway_action: 'runDeliverableRoute',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
@@ -333,7 +333,7 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       },
       {
         task: '按声明的 route 执行当前交付阶段',
-        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|hermes_native_proof|external_llm>]',
       },
       {
         task: '托管执行整个交付链路并查看 managed 进度',
@@ -407,8 +407,8 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
-      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <host_agent|external_llm>]',
-      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|external_llm>]',
+      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <host_agent|hermes_native_proof|external_llm>]',
+      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|hermes_native_proof|external_llm>]',
       managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
       managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       productFrontdesk: 'redcube product frontdesk --workspace-root <dir>',

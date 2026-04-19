@@ -48,6 +48,19 @@ test('repo-tracked docs keep durable runtime truth while public readmes stay she
   }
 });
 
+test('CLI help exposes the current deliverable adapter set, including the explicit Hermes proof lane', () => {
+  const cli = read('apps/redcube-cli/src/cli.js');
+
+  assert.equal(
+    cli.includes('[--adapter <host_agent|hermes_native_proof|external_llm>]'),
+    true,
+  );
+  assert.equal(
+    cli.includes('[--adapter <host_agent|external_llm>]'),
+    false,
+  );
+});
+
 test('current program points to the Hermes-managed mainline while retaining durable identity boundaries and historical local provenance', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
