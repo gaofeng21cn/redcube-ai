@@ -1,7 +1,7 @@
 import {
   buildDomainEntryCommandContract,
   buildFamilyDomainEntryContract,
-  buildGatewayInteractionContract,
+  buildFamilyGatewayInteractionContract,
   buildSharedHandoff,
   buildSharedHandoffReturnSurface,
 } from 'opl-gateway-shared/family-entry-contracts';
@@ -110,19 +110,9 @@ export function buildRedCubeGatewayInteractionContract({
   productManifestCommand,
   federatedProductEntryContractRef,
 }) {
-  return buildGatewayInteractionContract({
-    frontdoor_owner: 'opl_gateway_or_domain_gui',
-    user_interaction_mode: 'natural_language_frontdoor',
-    user_commands_required: false,
-    command_surfaces_for_agent_consumption_only: true,
+  return buildFamilyGatewayInteractionContract({
     shared_downstream_entry: REDCUBE_DOMAIN_ENTRY_ADAPTER,
-    shared_handoff_envelope: [
-      'target_domain_id',
-      'task_intent',
-      'entry_mode',
-      'workspace_locator',
-      'runtime_session_contract',
-      'return_surface_contract',
+    extra_shared_handoff_envelope: [
       'entry_session_contract',
       'delivery_request',
     ],
