@@ -4,8 +4,7 @@ import { getProductEntryManifest } from './get-product-entry-manifest.js';
 
 export async function getProductFrontdesk(request) {
   const manifest = await getProductEntryManifest(request);
-
-  return buildFamilyProductFrontdesk({
+  const frontdesk = buildFamilyProductFrontdesk({
     recommended_action: 'inspect_or_start_product_entry',
     product_entry_manifest: manifest,
     entry_surfaces: {
@@ -20,8 +19,13 @@ export async function getProductFrontdesk(request) {
     ],
     extra_payload: {
       ok: true,
-      domain_entry_contract: manifest.domain_entry_contract,
-      gateway_interaction_contract: manifest.gateway_interaction_contract,
     },
   });
+
+  return {
+    ...frontdesk,
+    schema_ref: manifest.schema_ref,
+    domain_entry_contract: manifest.domain_entry_contract,
+    gateway_interaction_contract: manifest.gateway_interaction_contract,
+  };
 }
