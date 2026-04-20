@@ -513,6 +513,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.opl_bridge.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
+    assert.match(manifest.product_entry_shell.frontdesk.purpose, /frontdesk/i);
+    assert.match(manifest.product_entry_shell.direct.purpose, /deliverable loop/i);
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
     assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
     assert.equal(manifest.domain_entry_contract.service_safe_surface_kind, 'domain_entry');

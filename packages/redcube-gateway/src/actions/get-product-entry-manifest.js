@@ -18,11 +18,14 @@ import {
 } from 'opl-gateway-shared/automation-companions';
 import {
   buildFamilyProductEntryManifest,
+  buildOperatorLoopActionCatalog,
   buildProductEntryStart,
   buildProductEntryOverview,
   buildProductEntryQuickstart,
   buildProductEntryReadiness,
   buildProductEntryResumeSurface,
+  buildProductEntryShellCatalog,
+  buildProductEntryShellLinkedSurface,
   collectFamilyHumanGateIds,
 } from 'opl-gateway-shared/product-entry-companions';
 
@@ -442,6 +445,81 @@ export async function getProductEntryManifest(request) {
       'Autopilot continuation stays tracked_follow_on while operator review gate remains repo_tracked and active.'
     ),
   });
+  const productEntryShell = buildProductEntryShellCatalog({
+    frontdesk: {
+      command: PRODUCT_FRONTDESK_COMMAND,
+      command_template: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
+      surface_kind: 'product_frontdesk',
+      purpose: (
+        '当前 direct RedCube frontdesk，先暴露 direct / session 入口，'
+        + '并把 internal OPL bridge 保持在单独的 bridge contract。'
+      ),
+    },
+    direct: {
+      command: PRODUCT_INVOKE_COMMAND,
+      command_template: (
+        `${PRODUCT_INVOKE_COMMAND} --workspace-root ${workspaceRoot} `
+        + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
+        + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
+      ),
+      surface_kind: 'product_entry',
+      purpose: '直接进入当前 deliverable loop 的 primary operator surface。',
+    },
+    opl_bridge: {
+      command: PRODUCT_FEDERATE_COMMAND,
+      command_template: (
+        `${PRODUCT_FEDERATE_COMMAND} --workspace-root ${workspaceRoot} `
+        + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
+        + '--entry-mode opl_gateway --return-surface-kind product_entry '
+        + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
+      ),
+      surface_kind: 'federated_product_entry',
+      purpose: '通过 internal OPL bridge 进入同一 downstream product entry，保留给外层 shell / compatibility bridge。',
+    },
+    session: {
+      command: PRODUCT_SESSION_COMMAND,
+      command_template: productEntrySessionCommand,
+      surface_kind: 'product_entry_session',
+      purpose: '在已有 entry_session_id 下继续同一交付并检查当前 session 进度。',
+    },
+  });
+  const frontdeskSurface = buildProductEntryShellLinkedSurface({
+    shell_key: 'frontdesk',
+    shell_surface: productEntryShell.frontdesk,
+    summary: productEntryShell.frontdesk.purpose,
+  });
+  const operatorLoopSurface = buildProductEntryShellLinkedSurface({
+    shell_key: 'direct',
+    shell_surface: productEntryShell.direct,
+    summary: (
+      '当前 operator loop 仍 anchored on direct product entry；'
+      + '拿到 entry_session_id 后继续通过 session surface 追踪同一交付。'
+    ),
+    extra_payload: {
+      continuation_shell_key: 'session',
+      continuation_command: productEntryShell.session.command,
+    },
+  });
+  const operatorLoopActions = buildOperatorLoopActionCatalog({
+    start_deliverable: {
+      command: productEntryShell.direct.command,
+      surface_kind: productEntryShell.direct.surface_kind,
+      summary: productEntryShell.direct.purpose,
+      requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+    },
+    continue_session: {
+      command: productEntryShell.session.command,
+      surface_kind: productEntryShell.session.surface_kind,
+      summary: productEntryShell.session.purpose,
+      requires: ['entry_session_id'],
+    },
+    opl_bridge_handoff: {
+      command: productEntryShell.opl_bridge.command,
+      surface_kind: productEntryShell.opl_bridge.surface_kind,
+      summary: productEntryShell.opl_bridge.purpose,
+      requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+    },
+  });
 
   return buildFamilyProductEntryManifest({
     manifest_kind: 'redcube_product_entry_manifest',
@@ -457,43 +535,9 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: PRODUCT_INVOKE_COMMAND,
-    frontdesk_surface: {
-      shell_key: 'frontdesk',
-      command: PRODUCT_FRONTDESK_COMMAND,
-      surface_kind: 'product_frontdesk',
-      summary: '当前 direct RedCube frontdesk，先暴露 direct / session 入口，并把 internal OPL bridge 保持在单独的 bridge contract。',
-    },
-    operator_loop_surface: {
-      shell_key: 'direct',
-      command: PRODUCT_INVOKE_COMMAND,
-      surface_kind: 'product_entry',
-      summary: (
-        '当前 operator loop 仍 anchored on direct product entry；'
-        + '拿到 entry_session_id 后继续通过 session surface 追踪同一交付。'
-      ),
-      continuation_shell_key: 'session',
-      continuation_command: PRODUCT_SESSION_COMMAND,
-    },
-    operator_loop_actions: {
-      start_deliverable: {
-        command: PRODUCT_INVOKE_COMMAND,
-        surface_kind: 'product_entry',
-        summary: '直接进入当前 deliverable 的 primary operator loop。',
-        requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
-      },
-      continue_session: {
-        command: PRODUCT_SESSION_COMMAND,
-        surface_kind: 'product_entry_session',
-        summary: '在已有 entry_session_id 下继续同一交付。',
-        requires: ['entry_session_id'],
-      },
-      opl_bridge_handoff: {
-        command: PRODUCT_FEDERATE_COMMAND,
-        surface_kind: 'federated_product_entry',
-        summary: '通过 internal OPL bridge 进入同一 downstream product entry；这条命令保留给外层 shell / compatibility bridge。',
-        requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
-      },
-    },
+    frontdesk_surface: frontdeskSurface,
+    operator_loop_surface: operatorLoopSurface,
+    operator_loop_actions: operatorLoopActions,
     repo_mainline: {
       program_id: safeText(activeMainline.id, 'redcube-runtime-program'),
       phase_id: safeText(currentState.phase_id, 'unknown_phase'),
@@ -515,37 +559,7 @@ export async function getProductEntryManifest(request) {
     task_lifecycle: taskLifecycle,
     skill_catalog: skillCatalog,
     automation,
-    product_entry_shell: {
-      frontdesk: {
-        command: PRODUCT_FRONTDESK_COMMAND,
-        command_template: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
-        surface_kind: 'product_frontdesk',
-      },
-      direct: {
-        command: PRODUCT_INVOKE_COMMAND,
-        command_template: (
-          `${PRODUCT_INVOKE_COMMAND} --workspace-root ${workspaceRoot} `
-          + '--entry-session-id <entry-session-id> --overlay <overlay-id> '
-          + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
-        ),
-        surface_kind: 'product_entry',
-      },
-      opl_bridge: {
-        command: PRODUCT_FEDERATE_COMMAND,
-        command_template: (
-          `${PRODUCT_FEDERATE_COMMAND} --workspace-root ${workspaceRoot} `
-          + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
-          + '--entry-mode opl_gateway --return-surface-kind product_entry '
-          + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
-        ),
-        surface_kind: 'federated_product_entry',
-      },
-      session: {
-        command: PRODUCT_SESSION_COMMAND,
-        command_template: productEntrySessionCommand,
-        surface_kind: 'product_entry_session',
-      },
-    },
+    product_entry_shell: productEntryShell,
     shared_handoff: buildRedCubeSharedHandoff(),
     product_entry_start: productEntryStart,
     product_entry_overview: productEntryOverview,
