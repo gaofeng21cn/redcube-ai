@@ -48,6 +48,50 @@ test('gateway shared family orchestration surface exposes the frontdesk product-
   );
 });
 
+test('session continuation family orchestration companion uses the shared continuation refs', async () => {
+  const companionModule = await import('../packages/redcube-gateway/src/actions/family-orchestration-companion.js');
+  const buildSessionContinuationFamilyOrchestration = companionModule.buildSessionContinuationFamilyOrchestration;
+  assert.equal(typeof buildSessionContinuationFamilyOrchestration, 'function');
+
+  const requested = buildSessionContinuationFamilyOrchestration({
+    continuationSnapshot: {
+      managed_progress_projection: {
+        needs_user_decision: true,
+      },
+    },
+  });
+  assert.equal(requested.human_gates[0].status, 'requested');
+  assert.deepEqual(requested.human_gates[0].review_surface, {
+    ref_kind: 'json_pointer',
+    ref: '/review_state',
+    label: 'current review state surface',
+  });
+  assert.deepEqual(requested.event_envelope_surface, {
+    ref_kind: 'json_pointer',
+    ref: '/continuation_snapshot/managed_progress_projection/latest_events',
+    label: 'managed run event companion',
+  });
+  assert.deepEqual(requested.checkpoint_lineage_surface, {
+    ref_kind: 'json_pointer',
+    ref: '/continuation_snapshot/latest_managed_run_id',
+    label: 'latest managed-run continuation locator',
+  });
+
+  const approved = buildSessionContinuationFamilyOrchestration({
+    continuationSnapshot: {
+      managed_progress_projection: {
+        needs_user_decision: false,
+      },
+    },
+    sessionLocatorField: 'entry_session_contract.entry_session_id',
+  });
+  assert.equal(approved.human_gates[0].status, 'approved');
+  assert.equal(
+    approved.resume_contract.session_locator_field,
+    'entry_session_contract.entry_session_id',
+  );
+});
+
 async function withMockHermesAndRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));

@@ -10,8 +10,7 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { createDeliverable } from './create-deliverable.js';
 import {
-  buildFamilyOrchestrationCompanion,
-  resolveHumanGateStatusFromContinuation,
+  buildSessionContinuationFamilyOrchestration,
 } from './family-orchestration-companion.js';
 import { getDeliverable } from './get-deliverable.js';
 import { getPublicationProjection } from './get-publication-projection.js';
@@ -261,24 +260,8 @@ export async function invokeProductEntry(request) {
     workspaceRoot,
     topicId,
   });
-  const familyOrchestration = buildFamilyOrchestrationCompanion({
-    sessionLocatorField: 'entry_session.entry_session_id',
-    gateStatus: resolveHumanGateStatusFromContinuation(continuationSnapshot),
-    reviewSurfaceRef: {
-      ref_kind: 'json_pointer',
-      ref: '/review_state',
-      label: 'current review state surface',
-    },
-    eventEnvelopeSurfaceRef: {
-      ref_kind: 'json_pointer',
-      ref: '/continuation_snapshot/managed_progress_projection/latest_events',
-      label: 'managed run event companion',
-    },
-    checkpointLineageSurfaceRef: {
-      ref_kind: 'json_pointer',
-      ref: '/continuation_snapshot/latest_managed_run_id',
-      label: 'latest managed-run continuation locator',
-    },
+  const familyOrchestration = buildSessionContinuationFamilyOrchestration({
+    continuationSnapshot,
   });
 
   return {

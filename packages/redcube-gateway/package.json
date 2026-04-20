@@ -8,7 +8,7 @@
     ".": "./src/index.js"
   },
   "dependencies": {
-    "opl-gateway-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#bc20e23c7fd9088a33db31c87d1e3075dac3144b",
+    "opl-gateway-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#b8737549a920de030212605094499e26f40489e5",
     "@redcube/overlay-core": "0.1.0",
     "@redcube/overlay-registry": "0.1.0",
     "@redcube/runtime": "0.1.0",

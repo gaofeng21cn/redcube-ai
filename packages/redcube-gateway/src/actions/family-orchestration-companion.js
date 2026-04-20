@@ -32,9 +32,40 @@ const PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC = Object.freeze({
   checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
 });
 
+const SESSION_CONTINUATION_REVIEW_SURFACE_REF = Object.freeze({
+  ref_kind: 'json_pointer',
+  ref: '/review_state',
+  label: 'current review state surface',
+});
+
+const SESSION_CONTINUATION_EVENT_ENVELOPE_SURFACE_REF = Object.freeze({
+  ref_kind: 'json_pointer',
+  ref: '/continuation_snapshot/managed_progress_projection/latest_events',
+  label: 'managed run event companion',
+});
+
+const SESSION_CONTINUATION_CHECKPOINT_LINEAGE_SURFACE_REF = Object.freeze({
+  ref_kind: 'json_pointer',
+  ref: '/continuation_snapshot/latest_managed_run_id',
+  label: 'latest managed-run continuation locator',
+});
+
 export function resolveHumanGateStatusFromContinuation(continuationSnapshot) {
   const needsUserDecision = Boolean(continuationSnapshot?.managed_progress_projection?.needs_user_decision);
   return needsUserDecision ? 'requested' : 'approved';
+}
+
+export function buildSessionContinuationFamilyOrchestration({
+  continuationSnapshot,
+  sessionLocatorField = 'entry_session.entry_session_id',
+}) {
+  return buildFamilyOrchestrationCompanion({
+    sessionLocatorField,
+    gateStatus: resolveHumanGateStatusFromContinuation(continuationSnapshot),
+    reviewSurfaceRef: SESSION_CONTINUATION_REVIEW_SURFACE_REF,
+    eventEnvelopeSurfaceRef: SESSION_CONTINUATION_EVENT_ENVELOPE_SURFACE_REF,
+    checkpointLineageSurfaceRef: SESSION_CONTINUATION_CHECKPOINT_LINEAGE_SURFACE_REF,
+  });
 }
 
 export function buildFamilyOrchestrationCompanion({
