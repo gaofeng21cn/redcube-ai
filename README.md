@@ -67,6 +67,18 @@ You can start with prompts like:
 2. Technical readers and planners should read [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
 3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/program/`, `docs/references/`, `docs/policies/`, and `docs/history/`.
 
+## Agent And Operator Quick Start
+
+<details>
+  <summary><strong>Start here if you are handing this repo to Codex or another agent</strong></summary>
+
+- Read the [Docs Guide](./docs/README.md) first. It explains the direct route, the OPL-federated route, and the current technical baseline.
+- Then read [Contracts Overview](./contracts/README.md) plus [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md) before changing entry wording or integration language.
+- The current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains the internal control plane. `Codex CLI` is still the default local concrete executor behind the executor-adapter contract.
+- Use `docs/program/` for absorbed mainline milestones and `docs/references/` for bridge or provenance material, instead of reconstructing execution truth from scattered implementation files.
+
+</details>
+
 ## Further Reading
 
 - [Docs Guide](./docs/README.md)
