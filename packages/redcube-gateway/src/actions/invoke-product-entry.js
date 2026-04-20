@@ -1,5 +1,10 @@
 import { existsSync } from 'node:fs';
 
+import {
+  buildDeliveryIdentitySurface,
+  buildEntrySessionSurface,
+  buildProductEntryContinuationSnapshot,
+} from 'opl-gateway-shared/product-entry-companions';
 import { loadProductEntrySession, productEntrySessionFile, saveProductEntrySession } from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
@@ -111,12 +116,12 @@ function buildContinuationSnapshot(domainEntrySurface) {
     || resultSurface?.run?.run_id
     || null;
 
-  return {
+  return buildProductEntryContinuationSnapshot({
     latest_managed_run_id: latestManagedRunId,
     latest_run_id: latestRunId,
     managed_progress_projection: resultSurface?.progress_projection || null,
     runtime_supervision: resultSurface?.runtime_supervision || null,
-  };
+  });
 }
 
 function buildSessionRecord({
@@ -281,19 +286,24 @@ export async function invokeProductEntry(request) {
     surface_kind: 'product_entry',
     recommended_action: domainEntrySurface.recommended_action || 'review_product_entry',
     product_entry_contract_id: PRODUCT_ENTRY_ID,
-    entry_session: {
+    entry_session: buildEntrySessionSurface({
       entry_session_id: entrySession.entrySessionId,
       session_file: persisted.file,
       resumed_from_session: existingSession !== null,
       created_deliverable: createdDeliverable,
       runtime_owner: MANAGED_RUNTIME_OWNER,
-    },
-    delivery_identity: {
+    }),
+    delivery_identity: buildDeliveryIdentitySurface({
       deliverable_family: resolvedIdentity.deliverableFamily,
       topic_id: resolvedIdentity.topicId,
       deliverable_id: resolvedIdentity.deliverableId,
-      profile_id: resolvedIdentity.profileId || null,
-    },
+      profile_id: resolvedIdentity.profileId || undefined,
+      extra_payload: resolvedIdentity.profileId
+        ? undefined
+        : {
+          profile_id: null,
+        },
+    }),
     domain_entry_surface: domainEntrySurface,
     continuation_snapshot: continuationSnapshot,
     review_state: reviewState,

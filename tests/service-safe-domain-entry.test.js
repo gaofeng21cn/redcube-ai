@@ -13,6 +13,17 @@ import {
   startMockCodexCli,
   withEnv,
 } from './helpers/mock-codex-cli.js';
+import { createRequire } from 'node:module';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const GATEWAY_PACKAGE_JSON = fileURLToPath(
+  new URL('../packages/redcube-gateway/package.json', import.meta.url),
+);
+const gatewayRequire = createRequire(GATEWAY_PACKAGE_JSON);
+
+async function importGatewaySharedModule(moduleSpecifier) {
+  return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
+}
 
 async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
@@ -53,6 +64,7 @@ async function prepareDomainEntryWorkspace() {
 
 test('invokeDomainEntry runs the service-safe managed deliverable adapter under the Hermes-managed runtime contract', async () => {
   await withMockHermesUpstream(async () => {
+    const sharedCompanions = await importGatewaySharedModule('opl-gateway-shared/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
     const response = await invokeDomainEntry({
@@ -84,9 +96,29 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
     assert.equal(response.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.task_intent, 'run_managed_deliverable');
     assert.equal(response.entry_mode, 'opl_gateway');
-    assert.equal(response.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
-    assert.equal(response.return_surface_contract.requested_surface_kind, 'managed_run');
-    assert.equal(response.return_surface_contract.actual_surface_kind, 'managed_run');
+    assert.deepEqual(
+      response.runtime_session_contract,
+      sharedCompanions.buildRuntimeSessionContract({
+        runtime_owner: 'upstream_hermes_agent',
+        expected_runtime_owner: 'upstream_hermes_agent',
+        adapter_surface: '@redcube/codex-cli-client',
+        session_mode: 'ephemeral_run',
+      }),
+    );
+    assert.deepEqual(
+      response.return_surface_contract,
+      sharedCompanions.buildReturnSurfaceContract({
+        requested_surface_kind: 'managed_run',
+        expected_surface_kind: 'managed_run',
+        actual_surface_kind: 'managed_run',
+        durable_truth_surfaces: [
+          'runtimeWatch',
+          'getReviewState',
+          'getPublicationProjection',
+          'auditDeliverable',
+        ],
+      }),
+    );
     assert.equal(response.result_surface.surface_kind, 'managed_run');
     assert.equal(response.result_surface.managed_run.runtime_bridge?.owner, 'codex_cli');
     assert.equal(response.result_surface.runtime_supervision.runtime_owner, 'codex_cli');
@@ -161,13 +193,13 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
         return_surface_contract: {
           surface_kind: 'route_run',
         },
-        domain_payload: {
-          deliverable_family: 'ppt_deck',
-          topic_id: 'topic-a',
-          deliverable_id: 'deck-a',
-        },
-      }),
-      /return_surface_contract\.surface_kind 必须为 managed_run/,
+      domain_payload: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+      },
+    }),
+      /product entry companion requested_surface_kind 必须是 managed_run/,
     );
   });
 });

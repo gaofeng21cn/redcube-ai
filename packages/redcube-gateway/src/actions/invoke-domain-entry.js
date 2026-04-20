@@ -1,3 +1,8 @@
+import {
+  buildReturnSurfaceContract,
+  buildRuntimeSessionContract,
+} from 'opl-gateway-shared/product-entry-companions';
+
 import { runDeliverableRoute } from './run-deliverable-route.js';
 import { runManagedDeliverable } from './run-managed-deliverable.js';
 
@@ -71,56 +76,33 @@ function normalizeTargetDomainId(request) {
 
 function normalizeRuntimeSessionContract(request) {
   const contract = request?.runtime_session_contract || request?.runtimeSessionContract || {};
-  const runtimeOwner = requireField(
-    'runtime_session_contract.runtime_owner',
-    contract?.runtime_owner || contract?.runtimeOwner,
-  );
-  if (runtimeOwner !== MANAGED_RUNTIME_OWNER) {
-    throw new Error(
-      `runtime_session_contract.runtime_owner 必须为 ${MANAGED_RUNTIME_OWNER}，当前收到 ${runtimeOwner}`,
-    );
-  }
-  return {
-    runtime_owner: runtimeOwner,
+  return buildRuntimeSessionContract({
+    runtime_owner: requireField(
+      'runtime_session_contract.runtime_owner',
+      contract?.runtime_owner || contract?.runtimeOwner,
+    ),
+    expected_runtime_owner: MANAGED_RUNTIME_OWNER,
     adapter_surface: safeText(
       contract?.adapter_surface || contract?.adapterSurface,
       DEFAULT_EXECUTOR_ADAPTER_SURFACE,
     ),
     session_mode: safeText(contract?.session_mode || contract?.sessionMode, 'ephemeral_run'),
-  };
+  });
 }
 
 function normalizeReturnSurfaceContract(request, taskIntent) {
   const requested = request?.return_surface_contract || request?.returnSurfaceContract || {};
-  const requestedSurfaceKind = requireField(
-    'return_surface_contract.surface_kind',
-    requested?.surface_kind || requested?.surfaceKind,
-  );
   const expectedSurfaceKind = TASK_INTENT_SURFACE_KIND[taskIntent];
   if (!expectedSurfaceKind) {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);
   }
-  if (requestedSurfaceKind !== expectedSurfaceKind) {
-    throw new Error(
-      `return_surface_contract.surface_kind 必须为 ${expectedSurfaceKind}，当前收到 ${requestedSurfaceKind}`,
-    );
-  }
-  return {
-    surface_kind: requestedSurfaceKind,
-  };
-}
-
-function buildReturnSurfaceContract(resultSurface, requestedSurfaceKind) {
-  return {
-    requested_surface_kind: requestedSurfaceKind,
-    actual_surface_kind: resultSurface.surface_kind,
-    durable_truth_surfaces: [
-      'runtimeWatch',
-      'getReviewState',
-      'getPublicationProjection',
-      'auditDeliverable',
-    ],
-  };
+  return buildReturnSurfaceContract({
+    requested_surface_kind: requireField(
+      'return_surface_contract.surface_kind',
+      requested?.surface_kind || requested?.surfaceKind,
+    ),
+    expected_surface_kind: expectedSurfaceKind,
+  });
 }
 
 export async function invokeDomainEntry(request) {
@@ -159,8 +141,16 @@ export async function invokeDomainEntry(request) {
   }
 
   const returnSurfaceContract = buildReturnSurfaceContract(
-    resultSurface,
-    returnSurfaceRequest.surface_kind,
+    {
+      requested_surface_kind: returnSurfaceRequest.requested_surface_kind,
+      actual_surface_kind: resultSurface.surface_kind,
+      durable_truth_surfaces: [
+        'runtimeWatch',
+        'getReviewState',
+        'getPublicationProjection',
+        'auditDeliverable',
+      ],
+    },
   );
   return {
     ok: resultSurface.ok,

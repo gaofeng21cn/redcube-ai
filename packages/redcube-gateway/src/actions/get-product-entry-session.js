@@ -1,4 +1,9 @@
 import { loadProductEntrySession, productEntrySessionFile } from '@redcube/runtime';
+import {
+  buildDeliveryIdentitySurface,
+  buildEntrySessionSurface,
+  buildProductEntryContinuationSnapshot,
+} from 'opl-gateway-shared/product-entry-companions';
 
 import {
   buildFamilyOrchestrationCompanion,
@@ -51,12 +56,12 @@ export async function getProductEntrySession(request) {
       managedRunId: session.latest_managed_run_id,
     })
     : null;
-  const continuationSnapshot = {
+  const continuationSnapshot = buildProductEntryContinuationSnapshot({
     latest_managed_run_id: session.latest_managed_run_id || null,
     latest_run_id: session.latest_run_id || null,
     managed_progress_projection: managedRun?.progress_projection || null,
     runtime_supervision: managedRun?.runtime_supervision || null,
-  };
+  });
   const familyOrchestration = buildFamilyOrchestrationCompanion({
     sessionLocatorField: 'entry_session.entry_session_id',
     gateStatus: resolveHumanGateStatusFromContinuation(continuationSnapshot),
@@ -84,17 +89,22 @@ export async function getProductEntrySession(request) {
       ? 'decide_product_next_step'
       : 'continue_product_entry',
     product_entry_contract_id: 'managed_product_entry_hardening',
-    entry_session: {
+    entry_session: buildEntrySessionSurface({
       entry_session_id: entrySessionId,
       session_file: productEntrySessionFile(entrySessionId),
       runtime_owner: session.runtime_owner,
-    },
-    delivery_identity: {
+    }),
+    delivery_identity: buildDeliveryIdentitySurface({
       deliverable_family: session.deliverable_family,
       topic_id: session.topic_id,
       deliverable_id: session.deliverable_id,
-      profile_id: session.profile_id,
-    },
+      profile_id: session.profile_id || undefined,
+      extra_payload: session.profile_id
+        ? undefined
+        : {
+          profile_id: null,
+        },
+    }),
     continuation_snapshot: continuationSnapshot,
     review_state: reviewState,
     publication_projection: publicationProjection,

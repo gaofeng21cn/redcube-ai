@@ -109,6 +109,7 @@ const SERIAL_ENV_TEST = { concurrency: false };
 
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
+    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const response = await invokeProductEntry({
@@ -133,20 +134,60 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.ok, true);
     assert.equal(response.surface_kind, 'product_entry');
     assert.equal(response.product_entry_contract_id, 'redcube_product_entry');
-    assert.equal(response.entry_session.entry_session_id, 'session-a');
-    assert.equal(response.entry_session.created_deliverable, true);
-    assert.equal(response.entry_session.resumed_from_session, false);
-    assert.equal(response.entry_session.runtime_owner, 'upstream_hermes_agent');
-    assert.equal(response.delivery_identity.deliverable_family, 'ppt_deck');
-    assert.equal(response.delivery_identity.topic_id, 'topic-a');
-    assert.equal(response.delivery_identity.deliverable_id, 'deck-a');
+    assert.deepEqual(
+      response.entry_session,
+      sharedCompanions.buildEntrySessionSurface({
+        entry_session_id: 'session-a',
+        session_file: path.join(runtimeStateRoot, 'product-entry-sessions', 'session-a.json'),
+        runtime_owner: 'upstream_hermes_agent',
+        resumed_from_session: false,
+        created_deliverable: true,
+      }),
+    );
+    assert.deepEqual(
+      response.delivery_identity,
+      sharedCompanions.buildDeliveryIdentitySurface({
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+        profile_id: 'lecture_student',
+      }),
+    );
     assert.equal(response.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.domain_entry_surface.entry_mode, 'redcube_product_entry');
     assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'managed_run');
-    assert.equal(response.continuation_snapshot.latest_managed_run_id, response.domain_entry_surface.summary.target_handle);
-    assert.equal(response.continuation_snapshot.latest_run_id, null);
-    assert.equal(response.continuation_snapshot.managed_progress_projection.current_stage, 'storyline');
-    assert.equal(response.continuation_snapshot.runtime_supervision.runtime_owner, 'codex_cli');
+    assert.deepEqual(
+      response.continuation_snapshot,
+      sharedCompanions.buildProductEntryContinuationSnapshot({
+        latest_managed_run_id: response.domain_entry_surface.summary.target_handle,
+        latest_run_id: null,
+        managed_progress_projection: response.continuation_snapshot.managed_progress_projection,
+        runtime_supervision: response.continuation_snapshot.runtime_supervision,
+      }),
+    );
+    assert.deepEqual(
+      response.domain_entry_surface.runtime_session_contract,
+      sharedCompanions.buildRuntimeSessionContract({
+        runtime_owner: 'upstream_hermes_agent',
+        expected_runtime_owner: 'upstream_hermes_agent',
+        adapter_surface: '@redcube/codex-cli-client',
+        session_mode: 'entry_session',
+      }),
+    );
+    assert.deepEqual(
+      response.domain_entry_surface.return_surface_contract,
+      sharedCompanions.buildReturnSurfaceContract({
+        requested_surface_kind: 'managed_run',
+        expected_surface_kind: 'managed_run',
+        actual_surface_kind: 'managed_run',
+        durable_truth_surfaces: [
+          'runtimeWatch',
+          'getReviewState',
+          'getPublicationProjection',
+          'auditDeliverable',
+        ],
+      }),
+    );
     assert.equal(response.review_state.surface_kind, 'review_state');
     assert.equal(response.publication_projection.surface_kind, 'publication_projection');
     assertFamilyOrchestrationCompanion(response, {
@@ -166,6 +207,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
 
 test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
+    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const first = await invokeProductEntry({
@@ -202,12 +244,25 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.equal(first.ok, true);
     assert.equal(continued.ok, true);
     assert.equal(continued.surface_kind, 'product_entry');
-    assert.equal(continued.entry_session.entry_session_id, 'session-a');
-    assert.equal(continued.entry_session.created_deliverable, false);
-    assert.equal(continued.entry_session.resumed_from_session, true);
-    assert.equal(continued.delivery_identity.deliverable_family, 'ppt_deck');
-    assert.equal(continued.delivery_identity.topic_id, 'topic-a');
-    assert.equal(continued.delivery_identity.deliverable_id, 'deck-a');
+    assert.deepEqual(
+      continued.entry_session,
+      sharedCompanions.buildEntrySessionSurface({
+        entry_session_id: 'session-a',
+        session_file: continued.entry_session.session_file,
+        runtime_owner: 'upstream_hermes_agent',
+        resumed_from_session: true,
+        created_deliverable: false,
+      }),
+    );
+    assert.deepEqual(
+      continued.delivery_identity,
+      sharedCompanions.buildDeliveryIdentitySurface({
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+        profile_id: 'lecture_student',
+      }),
+    );
     assert.equal(continued.domain_entry_surface.entry_mode, 'redcube_product_entry');
     assert.equal(continued.domain_entry_surface.result_surface.surface_kind, 'managed_run');
     assert.equal(continued.continuation_snapshot.latest_managed_run_id !== first.continuation_snapshot.latest_managed_run_id, true);
@@ -218,12 +273,32 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
 
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');
-    assert.equal(session.entry_session.entry_session_id, 'session-a');
-    assert.equal(session.entry_session.runtime_owner, 'upstream_hermes_agent');
-    assert.equal(session.delivery_identity.deliverable_family, 'ppt_deck');
-    assert.equal(session.delivery_identity.topic_id, 'topic-a');
-    assert.equal(session.delivery_identity.deliverable_id, 'deck-a');
-    assert.equal(session.continuation_snapshot.latest_managed_run_id, continued.continuation_snapshot.latest_managed_run_id);
+    assert.deepEqual(
+      session.entry_session,
+      sharedCompanions.buildEntrySessionSurface({
+        entry_session_id: 'session-a',
+        session_file: session.entry_session.session_file,
+        runtime_owner: 'upstream_hermes_agent',
+      }),
+    );
+    assert.deepEqual(
+      session.delivery_identity,
+      sharedCompanions.buildDeliveryIdentitySurface({
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+        profile_id: 'lecture_student',
+      }),
+    );
+    assert.deepEqual(
+      session.continuation_snapshot,
+      sharedCompanions.buildProductEntryContinuationSnapshot({
+        latest_managed_run_id: continued.continuation_snapshot.latest_managed_run_id,
+        latest_run_id: continued.continuation_snapshot.latest_run_id,
+        managed_progress_projection: session.continuation_snapshot.managed_progress_projection,
+        runtime_supervision: session.continuation_snapshot.runtime_supervision,
+      }),
+    );
     assert.equal(session.review_state.surface_kind, 'review_state');
     assert.equal(session.publication_projection.surface_kind, 'publication_projection');
     assertFamilyOrchestrationCompanion(continued, {
@@ -237,6 +312,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
 
 test('invokeFederatedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
+    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const response = await invokeFederatedProductEntry({
@@ -272,9 +348,21 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.federated_product_entry_contract_id, 'opl_gateway_federated_product_entry');
     assert.equal(response.target_domain_id, 'redcube_ai');
     assert.equal(response.entry_mode, 'opl_gateway');
-    assert.equal(response.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
-    assert.equal(response.return_surface_contract.requested_surface_kind, 'product_entry');
-    assert.equal(response.return_surface_contract.actual_surface_kind, 'product_entry');
+    assert.deepEqual(
+      response.runtime_session_contract,
+      sharedCompanions.buildRuntimeSessionContract({
+        runtime_owner: 'upstream_hermes_agent',
+        expected_runtime_owner: 'upstream_hermes_agent',
+      }),
+    );
+    assert.deepEqual(
+      response.return_surface_contract,
+      sharedCompanions.buildReturnSurfaceContract({
+        requested_surface_kind: 'product_entry',
+        expected_surface_kind: 'product_entry',
+        actual_surface_kind: 'product_entry',
+      }),
+    );
     assert.equal(response.product_entry_surface.surface_kind, 'product_entry');
     assert.equal(response.product_entry_surface.entry_session.entry_session_id, 'session-federated');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_gateway');
