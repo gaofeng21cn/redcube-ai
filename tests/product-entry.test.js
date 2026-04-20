@@ -39,6 +39,15 @@ async function importGatewaySharedModule(moduleSpecifier) {
   return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
 }
 
+test('gateway shared family orchestration surface exposes the frontdesk product-entry preset builder', async () => {
+  const familyOrchestration = await importGatewaySharedModule('opl-gateway-shared/family-orchestration');
+
+  assert.equal(
+    typeof familyOrchestration.buildFamilyFrontdeskProductEntryOrchestration,
+    'function',
+  );
+});
+
 async function withMockHermesAndRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));

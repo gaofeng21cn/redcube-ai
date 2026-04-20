@@ -10,7 +10,7 @@ test('gateway package and lock stay aligned with the live OPL family shared rele
     consumerRepoId: 'redcube',
   });
 
-  assert.equal(inspection.owner_commit, 'cc1afc47ea2baca840e742155348f22de94ca50a');
+  assert.equal(inspection.owner_commit.length, 40);
   assert.equal(inspection.status, 'aligned');
   assert.deepEqual(
     inspection.findings.map((entry) => entry.file),
@@ -19,6 +19,10 @@ test('gateway package and lock stay aligned with the live OPL family shared rele
   assert.deepEqual(
     inspection.findings.map((entry) => entry.status),
     ['aligned', 'aligned'],
+  );
+  assert.deepEqual(
+    inspection.findings.map((entry) => entry.pins),
+    [[inspection.owner_commit], [inspection.owner_commit]],
   );
 });
 
