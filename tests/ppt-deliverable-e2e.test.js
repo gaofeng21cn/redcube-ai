@@ -53,6 +53,68 @@ async function runChain({ workspaceRoot, deliverableId, mode = 'draft_new', base
   return results;
 }
 
+let sharedOptimizeExportContextPromise;
+
+async function buildSharedOptimizeExportContext() {
+  return withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-baseline',
+      title: '肠癌 AI 讲课 baseline',
+      goal: '旧版认可稿',
+    });
+    const baselineChain = await runChain({ workspaceRoot, deliverableId: 'deck-baseline' });
+    const baselineState = await getReviewState({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-baseline',
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-next',
+      title: '肠癌 AI 讲课优化版',
+      goal: '在保留旧版优点的前提下提升可教性与视觉峰值',
+    });
+    const optimizeChain = await runChain({
+      workspaceRoot,
+      deliverableId: 'deck-next',
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'deck-baseline',
+    });
+
+    const exportResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-baseline',
+      route: 'export_pptx',
+    });
+
+    return {
+      baselineChain,
+      baselineState,
+      optimizeChain,
+      exportResult,
+    };
+  });
+}
+
+async function getSharedOptimizeExportContext() {
+  if (!sharedOptimizeExportContextPromise) {
+    sharedOptimizeExportContextPromise = buildSharedOptimizeExportContext();
+  }
+  return sharedOptimizeExportContextPromise;
+}
+
 test('ppt_deck ships dedicated prompt pack instead of xiaohongshu prompt semantics', () => {
   const promptFiles = [
     'storyline.md',
@@ -273,86 +335,30 @@ test('ppt_deck manual thyroid case keeps topic fidelity instead of falling back 
 });
 
 test('optimize_existing screenshot review binds baseline and emits relative review', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
+  const { baselineChain, baselineState, optimizeChain } = await getSharedOptimizeExportContext();
+  assert.equal(baselineChain.at(-1).result.ok, true);
+  assert.equal(baselineState.state.ready_for_export, true);
+  assert.equal(optimizeChain.at(-1).result.ok, true);
 
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_student',
-      topicId: 'topic-a',
-      deliverableId: 'deck-baseline',
-      title: '肠癌 AI 讲课 baseline',
-      goal: '旧版认可稿',
-    });
-    const baselineChain = await runChain({ workspaceRoot, deliverableId: 'deck-baseline' });
-    assert.equal(baselineChain.at(-1).result.ok, true);
-    const baselineState = await getReviewState({
-      workspaceRoot,
-      topicId: 'topic-a',
-      deliverableId: 'deck-baseline',
-    });
-    assert.equal(baselineState.state.ready_for_export, true);
-
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_student',
-      topicId: 'topic-a',
-      deliverableId: 'deck-next',
-      title: '肠癌 AI 讲课优化版',
-      goal: '在保留旧版优点的前提下提升可教性与视觉峰值',
-    });
-    const optimizeChain = await runChain({
-      workspaceRoot,
-      deliverableId: 'deck-next',
-      mode: 'optimize_existing',
-      baselineDeliverableId: 'deck-baseline',
-    });
-    assert.equal(optimizeChain.at(-1).result.ok, true);
-
-    const reviewBundle = readJson(optimizeChain.at(-1).result.artifactFile);
-    assert.equal(reviewBundle.baseline_review?.baseline_deliverable_id, 'deck-baseline');
-    assert.equal(reviewBundle.baseline_review?.baseline_comparison_passed, true);
-  });
+  const reviewBundle = readJson(optimizeChain.at(-1).result.artifactFile);
+  assert.equal(reviewBundle.baseline_review?.baseline_deliverable_id, 'deck-baseline');
+  assert.equal(reviewBundle.baseline_review?.baseline_comparison_passed, true);
 });
 
 test('export_pptx performs real delivery or explicit hard block', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
+  const { baselineChain, exportResult } = await getSharedOptimizeExportContext();
+  assert.equal(baselineChain.at(-1).result.ok, true);
 
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_student',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: '肠癌 AI 讲课 deck',
-      goal: '给学生讲清肠癌 AI 的问题、方法与边界',
-    });
-
-    const chain = await runChain({ workspaceRoot, deliverableId: 'deck-a' });
-    assert.equal(chain.at(-1).result.ok, true);
-
-    const exportResult = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route: 'export_pptx',
-    });
-
-    if (hasPythonPptPipeline()) {
-      assert.equal(exportResult.ok, true);
-      const bundle = readJson(exportResult.artifactFile);
-      assert.equal(existsSync(bundle.export_bundle?.pptx_file), true);
-      assert.equal(bundle.export_bundle?.page_count_match, true);
-      assert.equal(typeof bundle.export_bundle?.real_conversion_invocation?.tool, 'string');
-    } else {
-      assert.equal(exportResult.ok, false);
-      assert.match(exportResult.run.error.message, /python|playwright|pptx/i);
-    }
-  });
+  if (hasPythonPptPipeline()) {
+    assert.equal(exportResult.ok, true);
+    const bundle = readJson(exportResult.artifactFile);
+    assert.equal(existsSync(bundle.export_bundle?.pptx_file), true);
+    assert.equal(bundle.export_bundle?.page_count_match, true);
+    assert.equal(typeof bundle.export_bundle?.real_conversion_invocation?.tool, 'string');
+  } else {
+    assert.equal(exportResult.ok, false);
+    assert.match(exportResult.run.error.message, /python|playwright|pptx/i);
+  }
 });
 
 test('ppt_deck storyline/outline/blueprint/visual_direction consume shared source truth', async () => {
