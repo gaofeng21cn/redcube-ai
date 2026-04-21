@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 
 import {
   createDeliverable,
@@ -29,6 +29,17 @@ const TINY_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wn7ytcAAAAASUVORK5CYII=',
   'base64',
 );
+const DEFAULT_PPT_CREATIVE_METADATA = {
+  profileId: 'lecture_peer',
+  topicId: 'topic-a',
+  deliverableId: 'deck-a',
+  title: 'Med Auto Science 同行讲课',
+  goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+};
+const PPT_ROUTES_TO_RENDER_HTML = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'];
+const PPT_ROUTES_TO_SCREENSHOT_REVIEW = [...PPT_ROUTES_TO_RENDER_HTML, 'visual_director_review', 'screenshot_review'];
+const PPT_ROUTES_TO_EXPORT_PPTX = [...PPT_ROUTES_TO_SCREENSHOT_REVIEW, 'export_pptx'];
+const preparedPptWorkspaceCache = new Map();
 
 async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
@@ -56,6 +67,81 @@ async function runPptRoutes({ workspaceRoot, deliverableId, routes }) {
     results.push({ route, result });
   }
   return results;
+}
+
+async function getPreparedPptWorkspaceSnapshot({
+  profileId = DEFAULT_PPT_CREATIVE_METADATA.profileId,
+  topicId = DEFAULT_PPT_CREATIVE_METADATA.topicId,
+  deliverableId = DEFAULT_PPT_CREATIVE_METADATA.deliverableId,
+  title = DEFAULT_PPT_CREATIVE_METADATA.title,
+  goal = DEFAULT_PPT_CREATIVE_METADATA.goal,
+  routes,
+}) {
+  const cacheKey = JSON.stringify({ profileId, topicId, deliverableId, title, goal, routes });
+  if (!preparedPptWorkspaceCache.has(cacheKey)) {
+    preparedPptWorkspaceCache.set(cacheKey, (async () => {
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-prepared-'));
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId,
+        topicId,
+        deliverableId,
+        title,
+        goal,
+      });
+      const routeResults = await runPptRoutes({
+        workspaceRoot,
+        deliverableId,
+        routes,
+      });
+      for (const { route, result } of routeResults) {
+        assert.equal(result.ok, true, route);
+      }
+      return {
+        workspaceRoot,
+        routeArtifacts: routeResults.map(({ route, result }) => ({
+          route,
+          artifactRelativePath: path.relative(workspaceRoot, result.artifactFile),
+        })),
+      };
+    })());
+  }
+  return preparedPptWorkspaceCache.get(cacheKey);
+}
+
+async function clonePreparedPptWorkspace({
+  clonePrefix,
+  profileId,
+  topicId,
+  deliverableId,
+  title,
+  goal,
+  routes,
+}) {
+  const prepared = await getPreparedPptWorkspaceSnapshot({
+    profileId,
+    topicId,
+    deliverableId,
+    title,
+    goal,
+    routes,
+  });
+  const workspaceRoot = path.join(
+    mkdtempSync(path.join(os.tmpdir(), clonePrefix || 'redcube-ppt-clone-')),
+    'workspace',
+  );
+  cpSync(prepared.workspaceRoot, workspaceRoot, { recursive: true });
+  return {
+    workspaceRoot,
+    routeResults: prepared.routeArtifacts.map(({ route, artifactRelativePath }) => ({
+      route,
+      result: {
+        ok: true,
+        artifactFile: path.join(workspaceRoot, artifactRelativePath),
+      },
+    })),
+  };
 }
 
 function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliverableId = 'deck-a') {
@@ -582,32 +668,15 @@ test('ppt route artifacts materialize lecture operator view files inside the can
 
 test('ppt screenshot_review writes immutable capture screenshots and export uses the reviewed capture directory', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-capture-proof-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-capture-proof-',
+      routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
     });
-
-    const routes = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'];
-    const results = [];
-    for (const route of routes) {
-      const result = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route,
-      });
+    for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
-      results.push(result);
     }
 
-    const screenshotReview = readJson(results.at(-1).artifactFile);
+    const screenshotReview = readJson(routeResults.at(-1).result.artifactFile);
     assert.equal(
       screenshotReview.slide_reviews.every((slide) => /\/reports\/screenshots\/capture-[^/]+\/slide-\d+\.png$/.test(slide.screenshot_file)),
       true,
@@ -632,35 +701,11 @@ test('ppt screenshot_review writes immutable capture screenshots and export uses
 
 test('ppt rerunning upstream HTML keeps the last exported publish bundle visible while publication projection falls back to draft', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-stale-export-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-stale-export-',
+      routes: PPT_ROUTES_TO_EXPORT_PPTX,
     });
-
-    const initialRoutes = [
-      'storyline',
-      'detailed_outline',
-      'slide_blueprint',
-      'visual_direction',
-      'render_html',
-      'visual_director_review',
-      'screenshot_review',
-      'export_pptx',
-    ];
-    for (const route of initialRoutes) {
-      const result = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route,
-      });
+    for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
     }
 
@@ -696,35 +741,11 @@ test('ppt rerunning upstream HTML keeps the last exported publish bundle visible
 
 test('ppt rerender keeps a missing canonical publish bundle missing until a new export recreates it', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-export-restore-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-export-restore-',
+      routes: PPT_ROUTES_TO_EXPORT_PPTX,
     });
-
-    const initialRoutes = [
-      'storyline',
-      'detailed_outline',
-      'slide_blueprint',
-      'visual_direction',
-      'render_html',
-      'visual_director_review',
-      'screenshot_review',
-      'export_pptx',
-    ];
-    for (const route of initialRoutes) {
-      const result = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route,
-      });
+    for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
     }
 
@@ -748,34 +769,11 @@ test('ppt rerender keeps a missing canonical publish bundle missing until a new 
 
 test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a draft file until screenshot_review catches up', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-reviewed-html-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-reviewed-html-',
+      routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
     });
-
-    const initialRoutes = [
-      'storyline',
-      'detailed_outline',
-      'slide_blueprint',
-      'visual_direction',
-      'render_html',
-      'visual_director_review',
-      'screenshot_review',
-    ];
-    for (const route of initialRoutes) {
-      const result = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route,
-      });
+    for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
     }
 
@@ -839,34 +837,11 @@ test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a
 
 test('ppt blocked screenshot_review keeps the prior default HTML and preserves the failed candidate as draft', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-blocked-html-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-blocked-html-',
+      routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
     });
-
-    const initialRoutes = [
-      'storyline',
-      'detailed_outline',
-      'slide_blueprint',
-      'visual_direction',
-      'render_html',
-      'visual_director_review',
-      'screenshot_review',
-    ];
-    for (const route of initialRoutes) {
-      const result = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route,
-      });
+    for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
     }
 
@@ -948,21 +923,9 @@ test('ppt blocked screenshot_review keeps the prior default HTML and preserves t
 
 test('ppt screenshot_review publishes stable root screenshots from the approved capture', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-stable-screenshots-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
-    });
-
-    const routes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'],
+    const { workspaceRoot, routeResults: routes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-stable-screenshots-',
+      routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
     });
     for (const { route, result } of routes) {
       assert.equal(result.ok, true, route);
@@ -1210,21 +1173,9 @@ test('ppt screenshot_review runs slide review batches in parallel once Codex exe
 
 test('ppt fix_html forwards prior director and screenshot review feedback to Codex', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-context-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
-    });
-
-    const routes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    const { workspaceRoot, routeResults: routes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-context-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of routes) {
       assert.equal(result.ok, true, route);
@@ -1311,21 +1262,9 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
 
 test('ppt fix_html only regenerates blocked slides and preserves previously passed slides', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-targeted-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-targeted-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -1397,21 +1336,9 @@ test('ppt fix_html only regenerates blocked slides and preserves previously pass
 
 test('ppt fix_html targets slides blocked only by mechanical screenshot checks', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-mechanical-only-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-mechanical-only-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -1493,21 +1420,9 @@ test('ppt fix_html targets slides blocked only by mechanical screenshot checks',
 
 test('ppt fix_html prioritizes screenshot-blocked slides over advisory weak pages', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-blocked-over-weak-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-blocked-over-weak-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -1576,21 +1491,9 @@ test('ppt fix_html prioritizes screenshot-blocked slides over advisory weak page
 
 test('ppt fix_html honors operator revision brief slide ids in targeted rerender', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-operator-brief-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '向医学人工智能小同行讲清自动科研为什么成立、怎么做、模块如何复用',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-operator-brief-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -1699,21 +1602,10 @@ test('ppt fix_html honors operator revision brief slide ids in targeted rerender
 
 test('ppt fix_html scopes targeted rerender to operator-requested slides when only advisory weak pages remain', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-operator-only-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-operator-only-',
       goal: '验证 operator 定点返修不会把其他 advisory weak pages 一起带入 fix_html',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -1795,21 +1687,10 @@ test('ppt fix_html scopes targeted rerender to operator-requested slides when on
 
 test('ppt render_html ignores stale targeted revision context after visual_direction refresh', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-stale-targeted-context-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-stale-targeted-context-',
       goal: '验证 visual_direction 更新后，render_html 不会继续吃旧的定点返修上下文',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -1897,21 +1778,10 @@ test('ppt render_html ignores stale targeted revision context after visual_direc
 
 test('ppt fix_html still allows targeted revision after visual_direction refresh when review and operator brief are fresh for the current HTML', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-fix-after-visual-refresh-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-fix-after-visual-refresh-',
       goal: '验证 visual_direction 更新后，fix_html 仍能针对当前 HTML 做定点返修',
-    });
-
-    const initialRoutes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      routes: PPT_ROUTES_TO_RENDER_HTML,
     });
     for (const { route, result } of initialRoutes) {
       assert.equal(result.ok, true, route);
@@ -2072,33 +1942,12 @@ test('ppt screenshot_review forwards current slide source_html alongside screens
 
 test('ppt screenshot_review pass refreshes latest-capture pointer and export_pptx records the stable reviewed HTML', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-latest-capture-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-latest-capture-',
       goal: '验证 PPT 通过版截图指针和导出 source_html 都锚定稳定表面',
+      routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
     });
-
-    for (const route of [
-      'storyline',
-      'detailed_outline',
-      'slide_blueprint',
-      'visual_direction',
-      'render_html',
-      'visual_director_review',
-      'screenshot_review',
-    ]) {
-      const result = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route,
-      });
+    for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
     }
 
