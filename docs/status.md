@@ -19,6 +19,7 @@
 
 - hosted quality lane：`npm run typecheck -> npm run test:fast -> npm run test:family -> npm run test:meta`
 - family shared pin 审计统一经由 `scripts/run-test-group-lib.mjs`，必须在 clean-clone 环境下可运行
+- 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发
 
 ## 历史记录与追溯层
 

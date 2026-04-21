@@ -146,7 +146,10 @@
         "python_command_env": "REDCUBE_PYTHON_COMMAND",
         "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
         "python_command_requirement": "screenshot review and export helpers must execute on a Python executable with playwright installed",
-        "node_test_file_concurrency": 1,
+        "node_test_file_concurrency": {
+          "light_files": "runner_default",
+          "route_heavy_files": 1
+        },
         "preflight_requires": [
           "codex exec",
           "structured generation prompt",
@@ -166,7 +169,7 @@
         "fonts-noto-cjk",
         "playwright-chromium"
       ],
-      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review and test:family keeps the family shared pin contract clean-clone safe on the active Codex stable-family mainline",
+      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review, test:family keeps the family shared pin contract clean-clone safe, and only route-heavy Codex/browser verification files stay serialized on the active Codex stable-family mainline",
       "required_verification": [
         "git status --short",
         "git diff --check",

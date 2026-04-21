@@ -9,6 +9,7 @@ import {
   assertRequiredRuntimeSharedResolution,
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
+  partitionTestFilesForExecution,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
   resolveRedCubePythonCommand,
 } from './run-test-group-lib.mjs';
@@ -251,9 +252,22 @@ assertTrackedFiles(FAST, 'fast');
 assertPartition();
 
 const serializedVerificationHandle = await prepareSerializedVerification(groupName);
+const executionPlan = partitionTestFilesForExecution({
+  groupName,
+  files: GROUPS[groupName],
+});
 
-try {
-  const result = spawnSync(process.execPath, [...buildNodeTestArgs({ groupName, forwardedArgs }), ...GROUPS[groupName]], {
+function runNodeTestBatch({ label, files, serialized }) {
+  if (files.length === 0) {
+    return 0;
+  }
+
+  process.stdout.write([
+    `[run-test-group] ${groupName} ${label}: ${files.length} files`,
+    serialized ? '(file concurrency = 1)' : '(runner default concurrency)',
+  ].join(' ') + '\n');
+
+  const result = spawnSync(process.execPath, [...buildNodeTestArgs({ forwardedArgs, serialized }), ...files], {
     stdio: 'inherit',
     cwd: repoRoot,
     env: process.env,
@@ -263,7 +277,25 @@ try {
     throw result.error;
   }
 
-  process.exit(result.status ?? 1);
+  return result.status ?? 1;
+}
+
+try {
+  const parallelStatus = runNodeTestBatch({
+    label: 'parallel batch',
+    files: executionPlan.parallel_files,
+    serialized: false,
+  });
+  if (parallelStatus !== 0) {
+    process.exit(parallelStatus);
+  }
+
+  const serializedStatus = runNodeTestBatch({
+    label: 'serialized route-heavy batch',
+    files: executionPlan.serialized_files,
+    serialized: true,
+  });
+  process.exit(serializedStatus);
 } finally {
   void serializedVerificationHandle;
 }

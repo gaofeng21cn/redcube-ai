@@ -6,7 +6,9 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   buildNodeTestArgs,
+  partitionTestFilesForExecution,
   resolveRedCubePythonCommand,
+  SERIALIZED_ROUTE_HEAVY_TEST_FILES,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
 } from '../scripts/run-test-group-lib.mjs';
 
@@ -16,28 +18,61 @@ function readGroupList(script, groupName) {
   return [...match[1].matchAll(/'([^']+\.test\.js)'/g)].map((entry) => entry[1]);
 }
 
-test('run-test-group serializes the heavy verification groups on the active Codex mainline', () => {
+test('run-test-group keeps local codex preflight on integration/e2e/full groups', () => {
   assert.deepEqual(
     [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
     ['e2e', 'full', 'integration'],
   );
 });
 
-test('run-test-group serializes node test files for Codex-backed verification groups', () => {
+test('run-test-group only adds file-level serialization to explicit route-heavy batches', () => {
   assert.deepEqual(buildNodeTestArgs({
-    groupName: 'integration',
     forwardedArgs: ['--test-reporter=spec'],
+    serialized: true,
   }), ['--test', '--test-concurrency=1', '--test-reporter=spec']);
 
   assert.deepEqual(buildNodeTestArgs({
-    groupName: 'e2e',
     forwardedArgs: [],
+    serialized: true,
   }), ['--test', '--test-concurrency=1']);
 
   assert.deepEqual(buildNodeTestArgs({
-    groupName: 'meta',
     forwardedArgs: ['--test-reporter=spec'],
+    serialized: false,
   }), ['--test', '--test-reporter=spec']);
+});
+
+test('run-test-group partitions route-heavy files away from the default parallel batch', () => {
+  assert.deepEqual(
+    partitionTestFilesForExecution({
+      groupName: 'integration',
+      files: [
+        'tests/runtime-deliverable-route.test.js',
+        'tests/review-platform.test.js',
+        'tests/source-intake.test.js',
+      ],
+    }),
+    {
+      parallel_files: [
+        'tests/runtime-deliverable-route.test.js',
+        'tests/source-intake.test.js',
+      ],
+      serialized_files: [
+        'tests/review-platform.test.js',
+      ],
+    },
+  );
+
+  assert.deepEqual(
+    partitionTestFilesForExecution({
+      groupName: 'meta',
+      files: ['tests/codex-cli-client.test.js'],
+    }),
+    {
+      parallel_files: ['tests/codex-cli-client.test.js'],
+      serialized_files: [],
+    },
+  );
 });
 
 test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
@@ -76,19 +111,7 @@ test('deliverable review loop integration stays on the mock codex upstream inste
 });
 
 test('serialized route-heavy verification files stay on the mock codex upstream instead of the live CLI', () => {
-  for (const file of [
-    'tests/direct-delivery-operator-handoff.test.js',
-    'tests/family-parity-governance-surface.test.js',
-    'tests/family-source-truth-consumption.test.js',
-    'tests/ppt-deliverable-e2e.test.js',
-    'tests/ppt-deliverable-surface.test.js',
-    'tests/publication-projection-delivery-contract.test.js',
-    'tests/reference-quality-os-replacement.test.js',
-    'tests/reference-regression.test.js',
-    'tests/review-platform.test.js',
-    'tests/workspace-operator-quickstart.test.js',
-    'tests/xiaohongshu-deliverable-e2e.test.js',
-  ]) {
+  for (const file of [...SERIALIZED_ROUTE_HEAVY_TEST_FILES].sort()) {
     const content = readFileSync(file, 'utf-8');
     assert.match(content, /withMockHermesUpstream|REDCUBE_CODEX_COMMAND/);
   }
@@ -97,10 +120,11 @@ test('serialized route-heavy verification files stay on the mock codex upstream 
 test('serialized verification rule is documented in current program contract', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
 
-  assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency, 1);
+  assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.light_files, 'runner_default');
+  assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_files, 1);
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
-    /poster governed screenshot review/i,
+    /route-heavy codex\/browser verification files stay serialized/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,

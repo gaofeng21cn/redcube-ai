@@ -11,6 +11,23 @@ import {
 } from 'opl-gateway-shared/family-shared-release';
 
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'e2e', 'full']);
+export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
+  'tests/deliverable-review-loop.test.js',
+  'tests/direct-delivery-operator-handoff.test.js',
+  'tests/family-parity-governance-surface.test.js',
+  'tests/family-source-truth-consumption.test.js',
+  'tests/poster-creative-ownership.test.js',
+  'tests/ppt-creative-ownership.test.js',
+  'tests/ppt-deliverable-e2e.test.js',
+  'tests/ppt-deliverable-surface.test.js',
+  'tests/publication-projection-delivery-contract.test.js',
+  'tests/reference-quality-os-replacement.test.js',
+  'tests/reference-regression.test.js',
+  'tests/review-platform.test.js',
+  'tests/workspace-operator-quickstart.test.js',
+  'tests/xiaohongshu-creative-ownership.test.js',
+  'tests/xiaohongshu-deliverable-e2e.test.js',
+]);
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 
 export const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
@@ -263,11 +280,26 @@ export function assertCurrentRepoSharedPinAlignment(options = {}) {
   return inspection;
 }
 
-export function buildNodeTestArgs({ groupName, forwardedArgs = [] }) {
+export function partitionTestFilesForExecution({ groupName, files = [] }) {
+  const plannedFiles = [...files];
+  if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
+    return {
+      parallel_files: plannedFiles,
+      serialized_files: [],
+    };
+  }
+
+  return {
+    parallel_files: plannedFiles.filter((file) => !SERIALIZED_ROUTE_HEAVY_TEST_FILES.has(file)),
+    serialized_files: plannedFiles.filter((file) => SERIALIZED_ROUTE_HEAVY_TEST_FILES.has(file)),
+  };
+}
+
+export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {
   const args = ['--test'];
-  if (SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
-    // Codex-backed verification fans out many local exec / browser-heavy steps;
-    // keep file-level execution serialized to avoid overscheduling the host.
+  if (serialized) {
+    // Browser / screenshot / local-exec heavy files can still oversubscribe the host;
+    // keep only that explicit subset at file-level concurrency 1.
     args.push('--test-concurrency=1');
   }
   return [...args, ...forwardedArgs];

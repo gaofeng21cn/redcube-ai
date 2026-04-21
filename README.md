@@ -76,6 +76,7 @@ You can start with prompts like:
 - Then read [Contracts Overview](./contracts/README.md) plus [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md) before changing entry wording or integration language.
 - The current repo-verified public entry surfaces are `CLI` and `MCP`; `controller` remains the internal control plane. `Codex CLI` is still the default local concrete executor behind the executor-adapter contract.
 - The hosted quality lane runs `npm run typecheck`, `npm run test:fast`, `npm run test:family`, and `npm run test:meta`; family shared pin checks must stay clean-clone safe through `scripts/run-test-group-lib.mjs`.
+- Local `npm run test:integration`, `npm run test:e2e`, and `npm run test:full` still keep the Codex/Python preflight, but only explicit route-heavy files stay serialized; the remaining files use the Node test runner's default concurrency.
 - Use `docs/program/` for absorbed mainline milestones and `docs/references/` for bridge or provenance material, instead of reconstructing execution truth from scattered implementation files.
 
 </details>
