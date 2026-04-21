@@ -154,7 +154,7 @@ test('stable families expose one explicit governance_surface contract on create 
   });
 });
 
-test('canonical publication projection rebuilds required governance summaries when stored projection drift is detected', async () => {
+test('canonical publication projection, audit, and watch rebuild governance summaries after stored drift is detected', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
     await buildReviewReadyWorkspace({
@@ -166,23 +166,6 @@ test('canonical publication projection rebuilds required governance summaries wh
       goal: '为门诊患者生成可发布的科普图文',
       routes: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'],
     });
-
-    const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
-    const projectionFile = projection.projection_file;
-    const corrupted = readJson(projectionFile);
-    delete corrupted.deliverables['note-a'].gate_summary;
-    delete corrupted.deliverables['note-a'].governance_surface;
-    writeFileSync(projectionFile, JSON.stringify(corrupted, null, 2), 'utf-8');
-
-    const rebuilt = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
-    assert.equal(typeof rebuilt.publication.deliverables['note-a'].gate_summary?.source_planning_ready, 'boolean');
-    assert.equal(rebuilt.publication.deliverables['note-a'].governance_surface?.runtime_topology?.runtime_substrate_owner, 'Codex CLI');
-  });
-});
-
-test('audit and watch keep governance summaries available after stored projection drift is repaired', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
     await buildReviewReadyWorkspace({
       workspaceRoot,
       overlay: 'poster_onepager',
@@ -196,11 +179,15 @@ test('audit and watch keep governance summaries available after stored projectio
     const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
     const projectionFile = projection.projection_file;
     const corrupted = readJson(projectionFile);
+    delete corrupted.deliverables['note-a'].gate_summary;
+    delete corrupted.deliverables['note-a'].governance_surface;
     corrupted.deliverables['poster-a'].operator_handoff = null;
     delete corrupted.deliverables['poster-a'].lifecycle_stage_summary;
     writeFileSync(projectionFile, JSON.stringify(corrupted, null, 2), 'utf-8');
 
     const rebuilt = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+    assert.equal(typeof rebuilt.publication.deliverables['note-a'].gate_summary?.source_planning_ready, 'boolean');
+    assert.equal(rebuilt.publication.deliverables['note-a'].governance_surface?.runtime_topology?.runtime_substrate_owner, 'Codex CLI');
     const audit = await auditDeliverable({
       workspaceRoot,
       overlay: 'poster_onepager',
