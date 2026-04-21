@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
@@ -11,9 +11,17 @@ import {
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
 import {
+  buildReferencePromotionReport,
   buildReferenceReplacementReport,
 } from '../packages/redcube-runtime/src/index.js';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
+import {
+  startMockCodexCli,
+  withEnv,
+} from './helpers/mock-codex-cli.js';
+
+let promotedCatalogWorkspaceRoot = '';
+let restoreEnv = () => {};
+let upstream = null;
 
 async function promoteReference({ workspaceRoot, deliverableId, promotedReferenceId, baselineDeliverableId = '' }) {
   await createDeliverable({
@@ -95,41 +103,70 @@ async function createBaselineDeliverable({ workspaceRoot, deliverableId }) {
   });
 }
 
-test('reference-os exposes machine-readable replacement report for superseded promoted references', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-replacement-'));
-    await intakeSource({
-      workspaceRoot,
-      topicId: 'topic-a',
-      title: '甲状腺门诊小红书科普',
-      brief: '用于 reference replacement report 的样本',
-      keywords: ['甲状腺', '门诊'],
-    });
-
-    await createBaselineDeliverable({
-      workspaceRoot,
-      deliverableId: 'baseline-a',
-    });
-    await promoteReference({
-      workspaceRoot,
-      deliverableId: 'candidate-b',
-      promotedReferenceId: 'xhs-standard-note-v2',
-      baselineDeliverableId: 'baseline-a',
-    });
-    await promoteReference({
-      workspaceRoot,
-      deliverableId: 'candidate-c',
-      promotedReferenceId: 'xhs-standard-note-v3',
-      baselineDeliverableId: 'candidate-b',
-    });
-
-    const report = buildReferenceReplacementReport({ workspaceRoot });
-    assert.equal(report.surface_kind, 'reference_replacement_report');
-    assert.equal(Array.isArray(report.replacements), true);
-    assert.equal(report.replacements.length, 1);
-    assert.equal(report.replacements[0].superseded_reference_id, 'xhs-standard-note-v2');
-    assert.equal(report.replacements[0].replacement_reference_id, 'xhs-standard-note-v3');
-    assert.equal(report.replacements[0].overlay, 'xiaohongshu');
-    assert.equal(report.replacements[0].profile_id, 'standard_note');
+before(async () => {
+  upstream = await startMockCodexCli();
+  restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
   });
+
+  promotedCatalogWorkspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-replacement-'));
+  await intakeSource({
+    workspaceRoot: promotedCatalogWorkspaceRoot,
+    topicId: 'topic-a',
+    title: '甲状腺门诊小红书科普',
+    brief: '用于 reference promotion/replacement report 的样本',
+    keywords: ['甲状腺', '门诊'],
+  });
+
+  await createBaselineDeliverable({
+    workspaceRoot: promotedCatalogWorkspaceRoot,
+    deliverableId: 'baseline-a',
+  });
+  await promoteReference({
+    workspaceRoot: promotedCatalogWorkspaceRoot,
+    deliverableId: 'candidate-b',
+    promotedReferenceId: 'xhs-standard-note-v2',
+    baselineDeliverableId: 'baseline-a',
+  });
+  await promoteReference({
+    workspaceRoot: promotedCatalogWorkspaceRoot,
+    deliverableId: 'candidate-c',
+    promotedReferenceId: 'xhs-standard-note-v3',
+    baselineDeliverableId: 'candidate-b',
+  });
+});
+
+after(async () => {
+  restoreEnv();
+  if (upstream) {
+    await upstream.close();
+  }
+});
+
+test('reference-os exposes promoted reference reporting surface for the current catalog', () => {
+  const report = buildReferencePromotionReport({ workspaceRoot: promotedCatalogWorkspaceRoot });
+
+  assert.equal(report.surface_kind, 'reference_promotion_report');
+  assert.equal(Array.isArray(report.promoted_references), true);
+  assert.deepEqual(
+    report.promoted_references.map((item) => item.promoted_reference_id).sort(),
+    ['xhs-standard-note-v2', 'xhs-standard-note-v3'],
+  );
+  assert.deepEqual(
+    report.promoted_references.map((item) => item.deliverable_id).sort(),
+    ['candidate-b', 'candidate-c'],
+  );
+  assert.equal(report.promoted_references.every((item) => item.overlay === 'xiaohongshu'), true);
+  assert.equal(report.promoted_references.every((item) => item.profile_id === 'standard_note'), true);
+});
+
+test('reference-os exposes machine-readable replacement report for superseded promoted references', () => {
+  const report = buildReferenceReplacementReport({ workspaceRoot: promotedCatalogWorkspaceRoot });
+  assert.equal(report.surface_kind, 'reference_replacement_report');
+  assert.equal(Array.isArray(report.replacements), true);
+  assert.equal(report.replacements.length, 1);
+  assert.equal(report.replacements[0].superseded_reference_id, 'xhs-standard-note-v2');
+  assert.equal(report.replacements[0].replacement_reference_id, 'xhs-standard-note-v3');
+  assert.equal(report.replacements[0].overlay, 'xiaohongshu');
+  assert.equal(report.replacements[0].profile_id, 'standard_note');
 });

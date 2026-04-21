@@ -77,7 +77,6 @@ test('deliverable review loop integration stays on the mock codex upstream inste
 
 test('serialized route-heavy verification files stay on the mock codex upstream instead of the live CLI', () => {
   for (const file of [
-    'tests/direct-delivery-lifecycle-stage-summary.test.js',
     'tests/direct-delivery-operator-handoff.test.js',
     'tests/family-parity-governance-surface.test.js',
     'tests/family-source-truth-consumption.test.js',
@@ -85,7 +84,6 @@ test('serialized route-heavy verification files stay on the mock codex upstream 
     'tests/ppt-deliverable-surface.test.js',
     'tests/publication-projection-delivery-contract.test.js',
     'tests/reference-quality-os-replacement.test.js',
-    'tests/reference-quality-os-reporting.test.js',
     'tests/reference-regression.test.js',
     'tests/review-platform.test.js',
     'tests/workspace-operator-quickstart.test.js',

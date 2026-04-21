@@ -85,7 +85,13 @@ test('direct-delivery families expose one aligned operator_handoff summary acros
     assert.equal(review.operator_handoff.reopen_mutation_surface, 'request_changes');
     assert.equal(review.operator_handoff.closeout_mutation_surface, 'promote_baseline');
     assert.equal(review.lifecycle_stage_summary.stage_model, 'direct_delivery_human_workline');
+    assert.deepEqual(review.lifecycle_stage_summary.human_workline, ['source_readiness', 'storyline', 'plan', 'visual', 'delivery']);
+    assert.equal(review.lifecycle_stage_summary.human_to_macro_stage.plan, 'story_architecture');
+    assert.equal(review.lifecycle_stage_summary.review_overlay_within, 'visual');
     assert.equal(review.lifecycle_stage_summary.operator_handoff_within, 'delivery');
+    assert.equal(review.lifecycle_stage_summary.closeout_within, 'delivery');
+    assert.equal(review.lifecycle_stage_summary.route_to_human_stage.detailed_outline, 'plan');
+    assert.equal(review.lifecycle_stage_summary.route_to_human_stage.export_pptx, 'delivery');
     assert.equal(audit.gate_summary.operator_handoff_status, 'ready');
     assert.equal(watch.gate_summary.operator_handoff_status, 'ready');
     assert.equal(audit.gate_summary.delivery_state_owner, 'required_export_artifact.delivery_state');
@@ -129,7 +135,7 @@ test('direct-delivery operator_handoff stays blocked when canonical source readi
   });
 });
 
-test('human-publication family keeps explicit publish gate and does not expose direct-delivery operator_handoff', async () => {
+test('human-publication family keeps explicit publish gate and does not expose direct-delivery lifecycle_stage_summary or operator_handoff', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-xhs-'));
     await completeSourceReadiness({
@@ -163,6 +169,19 @@ test('human-publication family keeps explicit publish gate and does not expose d
     const review = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'note-a' });
     const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
     const audit = await auditDeliverable({ workspaceRoot, overlay: 'xiaohongshu', topicId: 'topic-a', deliverableId: 'note-a', mode: 'draft_new' });
+    const watch = await runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      run: {
+        run_id: 'run-note-a-001',
+        topic_id: 'topic-a',
+        deliverable_id: 'note-a',
+        overlay: 'xiaohongshu',
+        current_stage: 'export_bundle',
+        status: 'completed',
+      },
+    });
 
     assert.equal(review.operator_handoff ?? null, null);
     assert.equal(review.lifecycle_stage_summary ?? null, null);
@@ -170,6 +189,8 @@ test('human-publication family keeps explicit publish gate and does not expose d
     assert.equal(projection.publication.deliverables['note-a'].lifecycle_stage_summary ?? null, null);
     assert.equal(audit.operator_handoff ?? null, null);
     assert.equal(audit.lifecycle_stage_summary ?? null, null);
+    assert.equal(watch.operator_handoff ?? null, null);
+    assert.equal(watch.lifecycle_stage_summary ?? null, null);
     assert.equal(projection.publication.deliverables['note-a'].current, 'approval_pending');
   });
 });

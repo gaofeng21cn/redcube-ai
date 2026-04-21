@@ -59,7 +59,6 @@
 - `tests/phase-2-behavior-convergence.test.js`
 - `tests/source-readiness-deep-research-gate.test.js`
 - `tests/direct-delivery-operator-handoff.test.js`
-- `tests/direct-delivery-lifecycle-stage-summary.test.js`
 
 ## 吸收门槛
 

@@ -94,7 +94,6 @@ direct-delivery family 需要在 hydrated contract 中冻结：
 - `contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json`
 - `tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js`
 - `tests/profile-contract-hydration.test.js`
-- `tests/direct-delivery-lifecycle-stage-summary.test.js`
 - `tests/direct-delivery-operator-handoff.test.js`
 
 ## 吸收门槛

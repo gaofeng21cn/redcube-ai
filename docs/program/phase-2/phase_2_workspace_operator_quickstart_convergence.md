@@ -86,11 +86,10 @@
   - `tests/public-docs-surface.test.js`
   - `tests/source-intake.test.js`
   - `tests/source-research.test.js`
-  - `tests/cli-v2-smoke.test.js`
-  - `tests/deliverable-review-loop.test.js`
-  - `tests/direct-delivery-operator-handoff.test.js`
-  - `tests/direct-delivery-lifecycle-stage-summary.test.js`
-  - `tests/phase-2-behavior-convergence.test.js`
+- `tests/cli-v2-smoke.test.js`
+- `tests/deliverable-review-loop.test.js`
+- `tests/direct-delivery-operator-handoff.test.js`
+- `tests/phase-2-behavior-convergence.test.js`
 
 ## Closeout evidence
 

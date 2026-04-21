@@ -157,13 +157,12 @@
     ],
     "behavior_tests": [
       "tests/profile-contract-hydration.test.js",
-      "tests/direct-delivery-lifecycle-stage-summary.test.js",
       "tests/direct-delivery-operator-handoff.test.js"
     ],
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/direct-delivery-longrun-target.test.js tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-lifecycle-stage-summary.test.js tests/direct-delivery-operator-handoff.test.js",
+      "node --test tests/direct-delivery-longrun-target.test.js tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js",
       "npm run test:full"
     ]
   },

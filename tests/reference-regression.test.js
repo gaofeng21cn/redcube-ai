@@ -142,7 +142,7 @@ test('reference coverage matrix fully covers active family/profile combinations'
   assert.deepEqual(coverage.missingProfiles, []);
 });
 
-test('xiaohongshu approved sample supports relative regression review', async () => {
+test('xiaohongshu optimize_existing blocks unapproved baseline until approval, then supports relative regression review', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
     const fixture = loadFixture('xiaohongshu', 'approved-note');
@@ -150,13 +150,24 @@ test('xiaohongshu approved sample supports relative regression review', async ()
     const baseline = await createReferenceDeliverable({
       workspaceRoot,
       fixture,
-      deliverableId: 'baseline-approved',
+      deliverableId: 'baseline-a',
     });
     assert.equal(baseline.at(-1).ok, true);
+
+    const blockedCandidate = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: 'candidate-blocked',
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'baseline-a',
+    });
+    assert.equal(blockedCandidate[6].ok, false);
+    assert.match(blockedCandidate[6].run.error.message, /not approved/i);
+
     const approved = await applyReviewMutation({
       workspaceRoot,
       topicId: fixture.meta.topicId,
-      deliverableId: 'baseline-approved',
+      deliverableId: 'baseline-a',
       mutation: {
         type: 'approve_publish',
         actor: 'human',
@@ -168,68 +179,19 @@ test('xiaohongshu approved sample supports relative regression review', async ()
     const candidate = await createReferenceDeliverable({
       workspaceRoot,
       fixture,
-      deliverableId: 'candidate-next',
+      deliverableId: 'candidate-approved',
       mode: 'optimize_existing',
-      baselineDeliverableId: 'baseline-approved',
+      baselineDeliverableId: 'baseline-a',
     });
     const review = readJson(candidate[6].artifactFile);
-    assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
-    assert.equal(review.baseline_review?.baseline_comparison_passed, true);
-  });
-});
-
-test('xiaohongshu optimize_existing blocks unapproved baseline sample', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
-    const fixture = loadFixture('xiaohongshu', 'approved-note');
-
-    const baseline = await createReferenceDeliverable({
-      workspaceRoot,
-      fixture,
-      deliverableId: 'baseline-unapproved',
-    });
-    assert.equal(baseline.at(-1).ok, true);
-
-    const candidate = await createReferenceDeliverable({
-      workspaceRoot,
-      fixture,
-      deliverableId: 'candidate-blocked',
-      mode: 'optimize_existing',
-      baselineDeliverableId: 'baseline-unapproved',
-    });
-    assert.equal(candidate[6].ok, false);
-    assert.match(candidate[6].run.error.message, /not approved/i);
-  });
-});
-
-test('ppt_deck approved sample supports relative regression review', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-ppt-'));
-    const fixture = loadFixture('ppt_deck', 'approved-deck');
-
-    const baseline = await createReferenceDeliverable({
-      workspaceRoot,
-      fixture,
-      deliverableId: 'baseline-approved',
-    });
-    assert.equal(baseline.at(-1).ok, true);
-
-    const candidate = await createReferenceDeliverable({
-      workspaceRoot,
-      fixture,
-      deliverableId: 'candidate-next',
-      mode: 'optimize_existing',
-      baselineDeliverableId: 'baseline-approved',
-    });
-    const review = readJson(candidate.at(-1).artifactFile);
-    assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
+    assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-a');
     assert.equal(review.baseline_review?.baseline_comparison_passed, true);
   });
 });
 
 test('ppt_deck active profiles all have approved samples that support relative regression review', async () => {
   await withMockHermesUpstream(async () => {
-    for (const sampleId of ['approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {
+    for (const sampleId of ['approved-deck', 'approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {
       const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), `redcube-reference-${sampleId}-`));
       const fixture = loadFixture('ppt_deck', sampleId);
 
