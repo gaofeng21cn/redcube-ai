@@ -5,6 +5,7 @@
 ## 一句话结论
 
 `RedCube AI` 的最终目标，不是继续打磨 repo-local runtime，也不是把自己写成整个 `OPL`。
+对外第一身份是独立 visual-deliverable domain agent，`gateway / harness` 只作为内部边界语言。
 这条主线已经冻结的理想型是：
 
 `User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
@@ -21,6 +22,7 @@
 - 让上游 `Hermes-Agent` 真正承担 session / run / watch / resume / scheduling 这层 runtime substrate
 - 让 `RedCube AI` 继续承担 `gateway -> family -> profile -> pack` authority 与 visual-domain truth
 - 让 direct `RedCube Product Entry` 与 `OPL Gateway` handoff 收敛到同一个 service-safe domain entry contract
+- 让 `Codex CLI` 继续作为 executor adapter 背后的默认 concrete executor，不改写 default executor owner
 
 最终目标不是让 `RedCube AI` 变成整个 `OPL`，也不是把 repo-local `Hermes` 命名重新包装成“长期 runtime owner”。
 
@@ -47,6 +49,7 @@
 - route / managed run surface 已切到真实上游 `Hermes-Agent`
 - `redcube_service_safe_domain_entry` 已冻结为 machine-readable domain adapter
 - `CLI` / `MCP` 仍是 repo-verified public entry
+- repo-verified direct route 与 federated route 已对齐为同一 downstream domain-agent entry
 - visual-domain truth 仍由 `RedCube AI` 收口，没有被 runtime cutover 冲散
 
 ## 当前还没有落地的部分

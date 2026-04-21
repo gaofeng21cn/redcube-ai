@@ -49,3 +49,22 @@
 - repo-local `pack/compiler` 不再 author storyline、blueprint、visual_direction、render_html 这类创作真值。
 - `pack` 继续保留为 domain boundary、pack-id carrier 与 typed shell，但不得再回退成脚本填充 / 编译式创作主链。
 - legacy `pack-runtime` compiler registry 从 workspace 与依赖图移除，避免测试或后续修改误把旧路径重新接回 active mainline。
+
+## 2026-04-21
+
+### 决策：RCA 对外第一身份收口为独立 visual-deliverable domain agent
+
+- `RedCube AI` 对外主语固定为独立 domain agent，可被 `Codex`、`OPL` 或其他通用 agent 直接调用。
+- `gateway / harness` 继续保留为内部架构边界语言，不再作为仓库对外第一身份。
+- repo-verified direct route 与 OPL federated route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
+
+### 决策：保持 honest owner split，不改 default executor owner
+
+- `Hermes-Agent` 继续作为 managed runtime owner。
+- `RedCube AI` 继续持有 visual-domain truth 与 domain durable surfaces。
+- `Codex CLI` 继续是 executor adapter 选中的默认 concrete executor，除非拿到显式 proof，不改默认 owner split。
+
+### 决策：OPL 角色收口到 family-level federation
+
+- `OPL` 在这条主线中只保留 family-level session/runtime/projection 编排与 shared modules/contracts/indexes。
+- `RedCube AI` 不被表达为 `OPL` 内部 workflow，而是独立 domain-agent 节点；federated 调用与 direct 调用只是入口差异，不是 domain ownership 差异。

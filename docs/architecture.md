@@ -1,5 +1,7 @@
 # RedCube AI 架构
 
+对外主语：`RedCube AI` 是独立 visual-deliverable domain agent；`gateway / harness` 仅保留为内部架构边界语言。
+
 ## 主链路
 
 当前 repo-verified 的两条主链路已经收口到同一条下游 service-safe surface：
@@ -24,7 +26,7 @@
 - `direct product entry`
   - 给人类与 host-agent 共用的 `CLI` / `MCP`、frontdesk、session 续跑入口
 - `federated OPL handoff`
-  - 给 `OPL Gateway` 与 family-level caller 使用的 handoff contract
+  - 给 `OPL Gateway` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes
 - `future managed product shell`
   - 给成熟最终用户前台壳预留的未来产品层
 
@@ -65,7 +67,7 @@
 
 这里的关键约束是：
 
-- direct `RedCube` product entry 和 `OPL Gateway` handoff 必须共用同一个 downstream service-safe domain entry contract
+- direct `RedCube` product entry 和 `OPL Gateway` handoff 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
 - today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
 - `invokeFederatedProductEntry` 继续作为 internal OPL bridge contract
 - 成熟的最终用户产品入口前台壳仍未落地

@@ -2,10 +2,12 @@
 
 ## 默认入口口径
 
+- 对外定位：`RedCube AI` 是独立 visual-deliverable domain agent，可 direct 调用，也可被 `OPL` 或其他通用 agent federated 调用
 - formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
 - repo-verified direct route：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 - repo-verified federated route：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 - runtime owner split：`Hermes-Agent` 持有 managed runtime，`RedCube AI` 持有 visual-domain truth，`Codex CLI` 继续作为 executor adapter 选中的默认 concrete executor
+- OPL boundary：`OPL` 只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 
 ## 当前执行口径
 
@@ -33,6 +35,6 @@
 
 ## 当前收口重点
 
-- 保持 direct route 与 federated route 共用同一条 service-safe domain entry 下游
+- 保持 direct route 与 federated route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 upstream Hermes runtime owner、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

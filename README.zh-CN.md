@@ -56,8 +56,10 @@
 
 ## 当前边界
 
-- `RedCube AI` 是更大 `OPL` 工作区里的视觉交付工作线。
+- `RedCube AI` 是独立的 visual-deliverable domain agent，可被 `Codex`、`OPL` 或其他通用 agent 直接调用。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。
+- repo-verified 的 direct route 与 OPL federated route 都收敛到同一个下游 RedCube domain-agent entry（`invokeDomainEntry` service-safe surface）。
+- `OPL` 只保留 family-level 的 session/runtime/projection 编排与 shared modules/contracts/indexes，不替代 RedCube 的 domain truth ownership。
 - 内容界定、受众适配和最终采用由专家把关。
 - 外部发布、上传和最终对外交付由人工监督完成。
 

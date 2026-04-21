@@ -2,7 +2,7 @@
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-12",
   "longrun_goal": {
-    "label": "visual-deliverable domain gateway plus upstream Hermes-Agent managed runtime plus repo-verified product-entry and service-safe domain entry",
+    "label": "independent visual-deliverable domain agent plus upstream Hermes-Agent managed runtime plus repo-verified direct/federated entry converging to one service-safe domain entry",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
@@ -12,6 +12,7 @@
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
+      "keep RedCube as an independent domain agent callable through both direct and OPL-federated entry routes",
       "move runtime substrate ownership onto upstream Hermes-Agent managed runtime",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
     ]
@@ -119,7 +120,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / upstream Hermes runtime owner plus repo-verified product-entry and service-safe domain entry plus RedCube visual-domain truth",
+      "label": "redcube-runtime-program / independent RedCube domain-agent truth plus upstream Hermes runtime owner plus repo-verified direct/federated entry converging on service-safe domain entry",
       "unique": true
     },
     "creative_stage_mainline": {

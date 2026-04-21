@@ -56,8 +56,10 @@ You can start with prompts like:
 
 ## Current Boundary
 
-- `RedCube AI` is the visual-deliverable workflow inside the broader `OPL` workspace.
+- `RedCube AI` is an independent visual-deliverable domain agent that can be called directly by `Codex`, `OPL`, or other general agents.
 - It covers source intake, deliverable creation, review loops, export, and file-oriented delivery.
+- The repo-verified direct route and OPL-federated route converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
+- `OPL` stays at family-level session/runtime/projection orchestration plus shared modules/contracts/indexes, and does not replace RedCube's domain truth ownership.
 - Content framing, audience fit, and final acceptance stay with experts.
 - External publishing and upload steps stay under human supervision.
 

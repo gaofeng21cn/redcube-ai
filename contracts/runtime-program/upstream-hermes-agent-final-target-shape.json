@@ -3,8 +3,8 @@
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
   "target_goal": {
-    "label": "OPL-callable RedCube visual-domain node on upstream Hermes-Agent runtime substrate",
-    "summary": "Freeze the final target shape in which either a direct RedCube product entry or an OPL Gateway handoff converges onto the same service-safe RedCube domain entry, while upstream Hermes-Agent owns runtime substrate and RedCube owns visual-domain truth."
+    "label": "independent RedCube visual-deliverable domain agent on upstream Hermes-Agent runtime substrate",
+    "summary": "Freeze the final target shape in which both direct RedCube entry and OPL-federated entry converge onto the same service-safe RedCube domain-agent entry, while upstream Hermes-Agent owns runtime substrate, RedCube owns visual-domain truth, and Codex CLI remains the default concrete executor."
   },
   "final_target_route": {
     "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
@@ -13,7 +13,7 @@
   "runtime_boundary": {
     "runtime_owner": "upstream_hermes_agent",
     "redcube_owns": [
-      "gateway -> family -> profile -> pack authority",
+      "domain-agent authority across gateway -> family -> profile -> pack boundaries",
       "visual-domain truth and canonical artifacts",
       "auditDeliverable",
       "runtimeWatch",
@@ -23,7 +23,8 @@
     "must_not_claim": [
       "repo-local managed runtime pilot is the long-term runtime owner",
       "service-safe domain entry already equals a landed end-user product entry",
-      "RedCube AI became the whole OPL"
+      "RedCube AI became the whole OPL",
+      "RedCube AI is an OPL-internal workflow"
     ]
   },
   "entry_surface_contract": {
@@ -93,7 +94,9 @@
       "RedCube service-safe domain entry is callable",
       "RedCube product-entry service surface is callable",
       "OPL handoff can federate into the same downstream product entry",
-      "RedCube still owns visual-domain truth"
+      "direct and federated entries converge to the same downstream domain-agent entry",
+      "RedCube still owns visual-domain truth",
+      "Codex CLI remains the default concrete executor behind executor adapter"
     ],
     "not_landed_yet": [
       "mature end-user RedCube product shell",

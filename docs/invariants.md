@@ -4,6 +4,7 @@
 
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 - 不得把 `controller` 误写成公开产品入口。
+- `Codex CLI` 作为 executor adapter 选中的默认 concrete executor 不得被隐式改写。
 
 ## Mainline truth
 
@@ -11,6 +12,9 @@
 - `contracts/runtime-program/*.json` 是 tranche / board / provenance 的机器可读真相面。
 - `docs/program/*/*.md` 是对应的人类可读 brief，必须与 contracts 和 tests 同步。
 - `Hermes-Agent` 一词只允许指上游外部 runtime 项目 / 服务；仓内自写 package、pilot、shim 或 scaffold 不得写成“已接入 Hermes-Agent”。
+- 对外主语固定为“独立 visual-deliverable domain agent”；`gateway / harness` 只作为内部架构边界语言。
+- repo-verified direct route 与 OPL federated route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
+- `OPL` 在 RCA 主线中只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes。
 
 ## 目标优先级
 

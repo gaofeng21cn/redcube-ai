@@ -18,18 +18,18 @@
 
 这个仓已经冻结的 direct domain 级产品链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 在 `OPL` 家族级入口下，也必须兼容同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Codex CLI host-agent runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 这也是当前“最终目标形态”冻结件要表达的主线，详见 `docs/program/upstream_hermes_agent_final_target_shape.md`。
 
 这意味着：
 
-- `OPL` 是 family-level 总入口
-- `RedCube AI` 是 visual domain 自己的 lightweight direct entry
+- `OPL` 只保留 family-level session/runtime/projection 编排与 shared modules/contracts/indexes
+- `RedCube AI` 是独立 visual domain agent，提供自己的 lightweight direct entry
 - 两者都存在，但作用域不同
 
 ## 3. 为什么需要两层入口
@@ -77,7 +77,8 @@
 
 - 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` federation 写成已落地
 - 但不能把它们写成成熟的最终用户前台壳或真实线上托管产品入口
-- 当前 route / managed run surface 已切到本地 Codex CLI host-agent runtime
+- 当前 route / managed run surface 已切到上游 `Hermes-Agent` managed runtime
+- 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行
 - 所以这份文档现在冻结的是目标边界、调用合同与 repo-verified service surface，不是过度宣称“前台产品已经做完”
 
 ## 6. 下一步落地方向
