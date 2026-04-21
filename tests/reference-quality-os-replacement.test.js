@@ -15,8 +15,6 @@ import {
 } from '../packages/redcube-runtime/src/index.js';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
-withMockHermesUpstreamSuite();
-
 async function promoteReference({ workspaceRoot, deliverableId, promotedReferenceId, baselineDeliverableId = '' }) {
   await createDeliverable({
     workspaceRoot,

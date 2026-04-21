@@ -83,6 +83,7 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
     assert.equal(watchBlocked.review_state.rerun_from_stage, 'render_html');
 
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: 'topic-a', deliverableId: 'deck-a', route: 'render_html' })).ok, true);
+    assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: 'topic-a', deliverableId: 'deck-a', route: 'visual_director_review' })).ok, true);
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: 'topic-a', deliverableId: 'deck-a', route: 'screenshot_review' })).ok, true);
 
     const rerunState = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });

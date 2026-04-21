@@ -99,7 +99,7 @@ test('ppt_deck render_html blocks until slide_blueprint and visual_direction exi
   });
 });
 
-test('ppt_deck render_html fails when pack registry entry in prompt_pack contract is invalid', async () => {
+test('ppt_deck render_html fails when prompt pack shell asset is missing', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
@@ -115,7 +115,7 @@ test('ppt_deck render_html fails when pack registry entry in prompt_pack contrac
 
     const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
     const contract = readJson(contractFile);
-    contract.prompt_pack.pack_id = 'missing_pack_id';
+    contract.prompt_pack.render_contract.shell_file = 'missing-shell.html';
     writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
 
     for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
@@ -138,7 +138,7 @@ test('ppt_deck render_html fails when pack registry entry in prompt_pack contrac
     });
 
     assert.equal(result.ok, false);
-    assert.match(result.run.error.message, /render pack registry 未配置/i);
+    assert.match(result.run.error.message, /Missing prompt pack asset/i);
   });
 });
 
@@ -312,8 +312,8 @@ test('optimize_existing screenshot review binds baseline and emits relative revi
     assert.equal(optimizeChain.at(-1).result.ok, true);
 
     const reviewBundle = readJson(optimizeChain.at(-1).result.artifactFile);
-    assert.equal(typeof reviewBundle.checks?.baseline_comparison_passed, 'boolean');
     assert.equal(reviewBundle.baseline_review?.baseline_deliverable_id, 'deck-baseline');
+    assert.equal(reviewBundle.baseline_review?.baseline_comparison_passed, true);
   });
 });
 
@@ -430,13 +430,13 @@ test('ppt_deck storyline/outline/blueprint/visual_direction consume shared sourc
 
     const richOutline = readJson(richResults[1].artifactFile);
     assert.equal(
-      richOutline.detailed_outline.slides.some((slide) => slide.public_sources.includes('inputs/raw_materials/source-intake/01-rich-outline.md')),
+      richOutline.detailed_outline.slides.some((slide) => slide.public_sources.includes('inputs/raw_materials/source-intake/content-01-rich-outline.md')),
       true,
     );
 
     const richBlueprint = readJson(richResults[2].artifactFile);
     assert.equal(
-      richBlueprint.slide_blueprint.slides.some((slide) => slide.evidence_and_sources.some((item) => item.public_label.includes('inputs/raw_materials/source-intake/01-rich-outline.md'))),
+      richBlueprint.slide_blueprint.slides.some((slide) => slide.evidence_and_sources.some((item) => item.public_label.includes('inputs/raw_materials/source-intake/content-01-rich-outline.md'))),
       true,
     );
 

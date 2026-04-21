@@ -88,7 +88,7 @@ test('xiaohongshu render_html blocks until single_note_plan and visual_direction
   });
 });
 
-test('xiaohongshu render_html fails when pack registry entry in prompt_pack contract is invalid', async () => {
+test('xiaohongshu render_html fails when prompt pack shell asset is missing', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
     const created = await createDeliverable({
@@ -103,7 +103,7 @@ test('xiaohongshu render_html fails when pack registry entry in prompt_pack cont
 
     const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
     const contract = readJson(contractFile);
-    contract.prompt_pack.pack_id = 'missing_pack_id';
+    contract.prompt_pack.render_contract.shell_file = 'missing-shell.html';
     writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
 
     for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
@@ -126,7 +126,7 @@ test('xiaohongshu render_html fails when pack registry entry in prompt_pack cont
     });
 
     assert.equal(result.ok, false);
-    assert.match(result.run.error.message, /render pack registry 未配置/i);
+    assert.match(result.run.error.message, /Missing prompt pack asset/i);
   });
 });
 
@@ -216,6 +216,10 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
       overlay: 'xiaohongshu',
       topicId: 'topic-a',
       deliverableId: 'note-a',
+      checks: {
+        ...review.checks,
+        ...copy.review_state_patch?.latest_checks,
+      },
     });
     assert.equal(report.status, 'pass');
   });

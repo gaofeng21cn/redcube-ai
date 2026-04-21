@@ -101,8 +101,18 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
   ]) {
     assert.equal(typeof cliActions[actionKey], 'function', `cli:${actionKey}`);
     assert.equal(typeof mcpActions[actionKey], 'function', `mcp:${actionKey}`);
-    assert.equal(toolNames.has(toolName), true, `tool:${toolName}`);
   }
+
+  assert.deepEqual(
+    [...toolNames].sort(),
+    [
+      'redcube_deliverable',
+      'redcube_product_entry',
+      'redcube_review',
+      'redcube_sources',
+      'redcube_workspace',
+    ],
+  );
 });
 
 test('brand-new workspace quickstart converges doctor -> source research -> create -> audit -> run with aligned governance surfaces', async () => {

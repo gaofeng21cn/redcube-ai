@@ -117,7 +117,7 @@ test('stable families expose one explicit governance_surface contract on create 
       'utf-8',
     );
     assert.match(posterDirectorReviewMarkdown, /- review_owner: codex_native_host_agent/);
-    assert.equal(posterDirectorReviewMarkdown.includes('codex_native_host_agent'), false);
+    assert.equal((posterDirectorReviewMarkdown.match(/codex_native_host_agent/g) || []).length, 1);
 
     const review = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
     const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
@@ -154,7 +154,7 @@ test('stable families expose one explicit governance_surface contract on create 
   });
 });
 
-test('canonical publication projection fails closed when required governance summaries drift or go missing', async () => {
+test('canonical publication projection rebuilds required governance summaries when stored projection drift is detected', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
     await buildReviewReadyWorkspace({
@@ -174,14 +174,13 @@ test('canonical publication projection fails closed when required governance sum
     delete corrupted.deliverables['note-a'].governance_surface;
     writeFileSync(projectionFile, JSON.stringify(corrupted, null, 2), 'utf-8');
 
-    await assert.rejects(
-      () => getPublicationProjection({ workspaceRoot, topicId: 'topic-a' }),
-      /governance.*gate_summary|governance.*governance_surface/i,
-    );
+    const rebuilt = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+    assert.equal(typeof rebuilt.publication.deliverables['note-a'].gate_summary?.source_planning_ready, 'boolean');
+    assert.equal(rebuilt.publication.deliverables['note-a'].governance_surface?.runtime_topology?.runtime_substrate_owner, 'Codex CLI');
   });
 });
 
-test('audit and watch fail closed instead of silently rebuilding a corrupted governance summary path', async () => {
+test('audit and watch keep governance summaries available after stored projection drift is repaired', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
     await buildReviewReadyWorkspace({
@@ -201,32 +200,32 @@ test('audit and watch fail closed instead of silently rebuilding a corrupted gov
     delete corrupted.deliverables['poster-a'].lifecycle_stage_summary;
     writeFileSync(projectionFile, JSON.stringify(corrupted, null, 2), 'utf-8');
 
-    await assert.rejects(
-      () => auditDeliverable({
-        workspaceRoot,
+    const rebuilt = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });
+    const audit = await auditDeliverable({
+      workspaceRoot,
+      overlay: 'poster_onepager',
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      mode: 'draft_new',
+    });
+    const watch = await runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'poster-a',
+      run: {
+        run_id: 'run-poster-a-001',
+        topic_id: 'topic-a',
+        deliverable_id: 'poster-a',
         overlay: 'poster_onepager',
-        topicId: 'topic-a',
-        deliverableId: 'poster-a',
-        mode: 'draft_new',
-      }),
-      /governance.*operator_handoff|governance.*lifecycle_stage_summary/i,
-    );
-
-    await assert.rejects(
-      () => runtimeWatch({
-        workspaceRoot,
-        topicId: 'topic-a',
-        deliverableId: 'poster-a',
-        run: {
-          run_id: 'run-poster-a-001',
-          topic_id: 'topic-a',
-          deliverable_id: 'poster-a',
-          overlay: 'poster_onepager',
-          current_stage: 'export_bundle',
-          status: 'completed',
-        },
-      }),
-      /governance.*operator_handoff|governance.*lifecycle_stage_summary/i,
-    );
+        current_stage: 'export_bundle',
+        status: 'completed',
+      },
+    });
+    assert.equal(rebuilt.publication.deliverables['poster-a'].operator_handoff?.gate_status, 'ready');
+    assert.equal(audit.operator_handoff?.gate_status, 'ready');
+    assert.equal(watch.operator_handoff?.gate_status, 'ready');
+    assert.equal(rebuilt.publication.deliverables['poster-a'].lifecycle_stage_summary?.stage_model, 'direct_delivery_human_workline');
+    assert.equal(audit.lifecycle_stage_summary?.stage_model, 'direct_delivery_human_workline');
+    assert.equal(watch.lifecycle_stage_summary?.stage_model, 'direct_delivery_human_workline');
   });
 });

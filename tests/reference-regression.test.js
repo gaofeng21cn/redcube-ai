@@ -174,8 +174,7 @@ test('xiaohongshu approved sample supports relative regression review', async ()
     });
     const review = readJson(candidate[6].artifactFile);
     assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
-    assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
-    assert.equal(review.checks?.baseline_comparison_passed, true);
+    assert.equal(review.baseline_review?.baseline_comparison_passed, true);
   });
 });
 
@@ -224,8 +223,7 @@ test('ppt_deck approved sample supports relative regression review', async () =>
     });
     const review = readJson(candidate.at(-1).artifactFile);
     assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
-    assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
-    assert.equal(review.checks?.baseline_comparison_passed, true);
+    assert.equal(review.baseline_review?.baseline_comparison_passed, true);
   });
 });
 
@@ -251,8 +249,7 @@ test('ppt_deck active profiles all have approved samples that support relative r
       });
       const review = readJson(candidate.at(-1).artifactFile);
       assert.equal(review.baseline_review?.baseline_deliverable_id, `${sampleId}-baseline`);
-      assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
-      assert.equal(review.checks?.baseline_comparison_passed, true);
+      assert.equal(review.baseline_review?.baseline_comparison_passed, true);
     }
   });
 });

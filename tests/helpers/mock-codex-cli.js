@@ -70,6 +70,13 @@ function readySources(meta) {
   return padded;
 }
 
+function topicFocus(meta) {
+  const title = safeText(meta?.context?.title) || '当前主题';
+  return title
+    .replace(/\s+(deck|baseline|优化版|科普|知识海报|讲课 deck)$/gi, '')
+    .trim() || title;
+}
+
 function buildMockStoryline(meta) {
   const title = safeText(meta?.context?.title) || '未命名课件';
   const audience = safeText(meta?.context?.audience) || '专业听众';
@@ -91,6 +98,7 @@ function buildMockStoryline(meta) {
 
 function buildMockOutline(meta) {
   const title = safeText(meta?.context?.title) || '未命名课件';
+  const topic = topicFocus(meta);
   const sources = readySources(meta);
   return {
     chapter_structure: [
@@ -126,19 +134,19 @@ function buildMockOutline(meta) {
         chapter_id: 'C1',
         page_type: 'stakes_window',
         layout_family: 'multi_zone_compare',
-        title: '为什么自动科研现在值得系统化',
+        title: `为什么 ${topic} 需要按顺序讲清`,
         page_goal: '建立问题紧迫性',
-        page_objective: '让听众看到传统科研链条的摩擦成本',
-        core_sentence: '真正的瓶颈不是模型能不能写，而是科研任务链能不能被稳定拆解和执行。',
-        evidence_points: [sources[0], '任务定义、证据准备与交付审核往往断在不同环节'],
+        page_objective: `让听众看到 ${topic} 最容易被误讲的断点`,
+        core_sentence: `真正的难点不是记更多概念，而是把 ${topic} 的判断顺序讲清。`,
+        evidence_points: [sources[0], `${topic} 一旦先后顺序讲反，听众就会在错误位置停留`],
         public_sources: [sources[0], sources[1]],
         page_core_content: [
-          '左侧讲传统科研链的断点：任务切换多、信息口径散、审核回路长',
-          '右侧讲自动化收益：结构化推进、状态可追踪、交付物可复盘',
+          `左侧讲 ${topic} 常见误区：先背碎片、后看顺序，结果越学越乱`,
+          `右侧讲正确收益：先把 ${topic} 的判断轨道讲清，后面的概念才有位置`,
         ],
         visual_anchor_tracks: ['left-risk-zone', 'right-value-zone', 'bottom-bridge'],
-        speaker_notes: '把问题压力建起来：要系统化，不是要单点炫技。',
-        transition_sentence: '知道为什么要系统化之后，先拆最常见的认知误区。',
+        speaker_notes: `把 ${topic} 的学习压力建起来：不是信息不够，而是顺序没讲清。`,
+        transition_sentence: `知道 ${topic} 为什么容易讲乱之后，先拆最常见的认知误区。`,
         render_recipe_id: 'ppt.compare_zones',
       },
       {
@@ -147,16 +155,16 @@ function buildMockOutline(meta) {
         chapter_id: 'C1',
         page_type: 'myth_fact_split',
         layout_family: 'multi_zone_compare',
-        title: '先拆三个最容易混淆的认知',
+        title: `先拆 ${topic} 最容易混淆的三件事`,
         page_goal: '清误区',
-        page_objective: '把自动生成、自动执行、自动签收三件事分开',
-        core_sentence: '不把能力边界讲清，后面的自动化主线就会被误解。',
-        evidence_points: ['把生成能力与责任归属分开', '把流程自动化与结果认可分开'],
+        page_objective: `把 ${topic} 的定义、判断与动作分开`,
+        core_sentence: `不把 ${topic} 的能力边界讲清，后面的判断顺序就会被误解。`,
+        evidence_points: [`把 ${topic} 的定义和动作分开`, `把 ${topic} 的证据与解释分开`],
         public_sources: [sources[1]],
         page_core_content: [
-          '混淆一：把单步生成误当成整条科研链自动化',
-          '混淆二：把好看的结果误当成可信的证据',
-          '混淆三：把自动执行误当成可以跳过人工把关',
+          `混淆一：把 ${topic} 的名词解释误当成判断顺序`,
+          `混淆二：把 ${topic} 的单条结论误当成完整证据`,
+          `混淆三：把 ${topic} 的动作建议误当成所有人都一样`,
         ],
         visual_anchor_tracks: ['left-myth-column', 'right-correction-column', 'bottom-coach-note'],
         speaker_notes: '这一页先纠偏，让后面的系统主线能被正确理解。',
@@ -169,17 +177,17 @@ function buildMockOutline(meta) {
         chapter_id: 'C2',
         page_type: 'mechanism_track',
         layout_family: 'timeline_band',
-        title: '全自动科研主链是如何一步步推进的',
+        title: `${topic} 的判断轨道是如何一步步推进的`,
         page_goal: '建立主链结构',
-        page_objective: '把自动科研拆成显式阶段',
-        core_sentence: '只有把问题定义、事实准备、执行链和审阅链打通，自动科研才成立。',
-        evidence_points: ['问题界定', '事实准备', '执行编排', '审阅与发布'],
+        page_objective: `把 ${topic} 拆成显式阶段`,
+        core_sentence: `只有把 ${topic} 的问题定义、事实准备和动作判断打通，讲解才成立。`,
+        evidence_points: [`${topic} 的问题界定`, `${topic} 的事实准备`, `${topic} 的动作建议`],
         public_sources: [sources[0], sources[1]],
         page_core_content: [
-          '先把 topic / deliverable / run 等 durable surface 定清',
-          '再做 source readiness，把后续创作要消费的事实层补齐',
-          '然后走 family -> profile -> pack -> execution 的正式主链',
-          '最后由 review / export 口径收口成可交付物',
+          `先把 ${topic} 的核心问题翻译成人能听懂的话`,
+          `再把 ${topic} 要消费的事实层补齐`,
+          `然后按“定义 -> 证据 -> 动作”的正式主链推进`,
+          `最后把 ${topic} 收口成可复述的结论`,
         ],
         visual_anchor_tracks: ['top-title', 'center-horizontal-track', 'bottom-source-rail'],
         speaker_notes: '这是全场的机制峰值页，要把主链讲成一条可复述轨道。',
@@ -192,15 +200,15 @@ function buildMockOutline(meta) {
         chapter_id: 'C2',
         page_type: 'decision_gate',
         layout_family: 'judgement_ladder',
-        title: '哪些节点可以自动，哪些节点必须人工签收',
+        title: `${topic} 里哪些节点可以自动，哪些必须人工签收`,
         page_goal: '建立判断边界',
-        page_objective: '让听众看到自动化与人工把关的分工',
-        core_sentence: '系统越自动，越要把停顿点与签收点写得清楚。',
-        evidence_points: ['事实层必须可追溯', '审阅层必须可回到具体 artifact'],
+        page_objective: `让听众看到 ${topic} 的自动化与人工把关分工`,
+        core_sentence: `${topic} 越想讲得清楚，越要把停顿点与签收点写清楚。`,
+        evidence_points: [`${topic} 的事实层必须可追溯`, `${topic} 的结论层必须可回到具体证据`],
         public_sources: [sources[1], sources[2]],
         page_core_content: [
-          '能自动的：结构化推进、阶段物化、状态追踪、重复性整理',
-          '必须人工签收的：研究判断、风险确认、对外结论、最终发布',
+          `能自动的：${topic} 的结构化推进、阶段物化与重复整理`,
+          `必须人工签收的：${topic} 的研究判断、风险确认与最终结论`,
         ],
         visual_anchor_tracks: ['left-questions', 'right-actions', 'bottom-transition'],
         speaker_notes: '把系统边界讲清，避免听众把自动化想成无人监管。',
@@ -213,16 +221,16 @@ function buildMockOutline(meta) {
         chapter_id: 'C2',
         page_type: 'public_evidence',
         layout_family: 'multi_zone_compare',
-        title: '为什么复用模块能支撑全自动科研',
+        title: `为什么复用模块能支撑 ${topic} 的稳定讲解`,
         page_goal: '建立模块视角',
-        page_objective: '解释模块复用与正式主链的关系',
-        core_sentence: '全自动不是每次重造流程，而是用稳定模块反复装配任务链。',
-        evidence_points: ['gateway 负责路由', 'family/profile/pack 负责语义与执行契约', 'review/export 负责交付收口'],
+        page_objective: `解释 ${topic} 与正式主链的关系`,
+        core_sentence: `${topic} 不是每次重造流程，而是用稳定模块反复装配判断链。`,
+        evidence_points: [`${topic} 的路由`, `${topic} 的语义与执行契约`, `${topic} 的交付收口`],
         public_sources: [sources[0], sources[1], sources[2]],
         page_core_content: [
-          '复用的不是某一个 prompt，而是正式控制链和 stage contract',
-          '同一套 shared source truth 能被不同 deliverable family 继续消费',
-          '模块职责清楚，质量问题才知道该在哪一层修',
+          `复用的不是某一句 prompt，而是 ${topic} 的正式控制链`,
+          `同一套 shared source truth 能继续支撑 ${topic} 的不同讲法`,
+          `模块职责清楚，${topic} 的质量问题才知道该在哪一层修`,
         ],
         visual_anchor_tracks: ['top-claim-band', 'center-three-zone-evidence', 'bottom-source-rail'],
         speaker_notes: '这一页把“为什么不是一次性脚本拼装”讲透。',
@@ -235,8 +243,8 @@ function buildMockOutline(meta) {
         chapter_id: 'C3',
         page_type: 'ring_cross',
         layout_family: 'ring_cross',
-        title: '小同行带走的四个动作',
-        page_goal: '形成可复用框架',
+        title: `小同行带走的四个 ${topic} 动作`,
+        page_goal: '形成可复用动作框架',
         page_objective: '把系统理解压缩成下一次能复用的动作',
         core_sentence: '真正带得走的，不是名词，而是下一次做自动科研时的动作顺序。',
         evidence_points: ['先定义任务', '再补事实层', '再跑正式主链', '最后审阅与发布'],
@@ -253,7 +261,7 @@ function buildMockOutline(meta) {
         chapter_id: 'C3',
         page_type: 'closure_peak',
         layout_family: 'summary_peak',
-        title: '最后收束三条真正该带走的结论',
+        title: `最后收束三条 ${topic} 真正该带走的结论`,
         page_goal: '回收主线',
         page_objective: '留下记忆点与行动句',
         core_sentence: '一场好课的结尾，是把整条系统主线压成可回忆的判断句。',

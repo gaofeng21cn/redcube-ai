@@ -15,8 +15,6 @@ import {
 } from '../packages/redcube-runtime/src/index.js';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
-withMockHermesUpstreamSuite();
-
 async function createPromotedReferenceWorkspace() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-report-'));
   await intakeSource({
