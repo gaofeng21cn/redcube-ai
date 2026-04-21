@@ -7,6 +7,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildHelp, getCliGatewayActions } from '../apps/redcube-cli/src/cli.js';
 import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/src/server.js';
+import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
 function runCli(args, options = {}) {
   const output = execFileSync(
@@ -104,53 +105,55 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
   }
 });
 
-test('brand-new workspace quickstart converges doctor -> source research -> create -> audit -> run with aligned governance surfaces', () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-quickstart-brand-new-'));
-  const payloadFile = path.join(workspaceRoot, 'research-result.json');
-  writeResearchPayload(payloadFile);
+test('brand-new workspace quickstart converges doctor -> source research -> create -> audit -> run with aligned governance surfaces', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-quickstart-brand-new-'));
+    const payloadFile = path.join(workspaceRoot, 'research-result.json');
+    writeResearchPayload(payloadFile);
 
-  const doctor = runCli(['workspace', 'doctor', '--workspace-root', workspaceRoot]);
-  assert.equal(doctor.recommended_action, 'run_source_intake');
-  assert.deepEqual(doctor.recommended_actions, ['run_source_intake', 'run_source_research']);
-  assert.equal(doctor.workspaceFileExists, false);
-  assert.equal(doctor.summary.workspace_bootstrap_needed, true);
-  assert.deepEqual(doctor.summary.bootstrap_via, ['source_intake', 'source_research']);
+    const doctor = runCli(['workspace', 'doctor', '--workspace-root', workspaceRoot]);
+    assert.equal(doctor.recommended_action, 'run_source_intake');
+    assert.deepEqual(doctor.recommended_actions, ['run_source_intake', 'run_source_research']);
+    assert.equal(doctor.workspaceFileExists, false);
+    assert.equal(doctor.summary.workspace_bootstrap_needed, true);
+    assert.deepEqual(doctor.summary.bootstrap_via, ['source_intake', 'source_research']);
 
-  const research = runCli(
-    ['source', 'research', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--title', '甲状腺门诊科普', '--brief', '给本科生准备一份可讲授的甲状腺门诊科普材料。', '--keywords', '甲状腺,门诊,科普', '--payload-file', payloadFile],
-    { env: { ...process.env, REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file' } },
-  );
-  assert.equal(research.ok, true);
-  assert.equal(research.stage, 'source_augmentation_execution');
-  assert.equal(research.planningReady, true);
-  assert.equal(research.recommended_action, 'create_deliverable');
-  assert.equal(existsSync(path.join(workspaceRoot, 'redcube.workspace.json')), true);
-  assert.equal(existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-readiness-pack.json')), true);
+    const research = runCli(
+      ['source', 'research', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--title', '甲状腺门诊科普', '--brief', '给本科生准备一份可讲授的甲状腺门诊科普材料。', '--keywords', '甲状腺,门诊,科普', '--payload-file', payloadFile],
+      { env: { ...process.env, REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file' } },
+    );
+    assert.equal(research.ok, true);
+    assert.equal(research.stage, 'source_augmentation_execution');
+    assert.equal(research.planningReady, true);
+    assert.equal(research.recommended_action, 'create_deliverable');
+    assert.equal(existsSync(path.join(workspaceRoot, 'redcube.workspace.json')), true);
+    assert.equal(existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'canonical', 'source-readiness-pack.json')), true);
 
-  const created = runCli(['deliverable', 'create', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--profile-id', 'lecture_student', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--title', '甲状腺门诊科普 deck', '--goal', '为本科生讲授甲状腺基础知识']);
-  assert.equal(created.ok, true);
-  assert.equal(created.surface_kind, 'deliverable_create');
+    const created = runCli(['deliverable', 'create', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--profile-id', 'lecture_student', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--title', '甲状腺门诊科普 deck', '--goal', '为本科生讲授甲状腺基础知识']);
+    assert.equal(created.ok, true);
+    assert.equal(created.surface_kind, 'deliverable_create');
 
-  const audit = runCli(['deliverable', 'audit', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--mode', 'draft_new']);
-  assert.equal(audit.status, 'pass');
-  assert.equal(audit.source_readiness_summary?.planning_ready, true);
-  assert.equal(audit.gate_summary?.source_planning_ready, true);
+    const audit = runCli(['deliverable', 'audit', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--mode', 'draft_new']);
+    assert.equal(audit.status, 'pass');
+    assert.equal(audit.source_readiness_summary?.planning_ready, true);
+    assert.equal(audit.gate_summary?.source_planning_ready, true);
 
-  const run = runCli(['deliverable', 'run', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--route', 'storyline']);
-  assert.equal(run.ok, true);
-  assert.equal(run.run.status, 'completed');
-  assert.equal(run.run.current_stage, 'storyline');
+    const run = runCli(['deliverable', 'run', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--route', 'storyline']);
+    assert.equal(run.ok, true);
+    assert.equal(run.run.status, 'completed');
+    assert.equal(run.run.current_stage, 'storyline');
 
-  const review = runCli(['review', 'get', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a']);
-  const projection = runCli(['review', 'projection', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a']);
-  const watch = runCli(['review', 'watch', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', run.run.run_id]);
+    const review = runCli(['review', 'get', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a']);
+    const projection = runCli(['review', 'projection', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a']);
+    const watch = runCli(['review', 'watch', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', run.run.run_id]);
 
-  assert.equal(review.source_readiness_summary?.planning_ready, true);
-  assert.equal(review.gate_summary?.source_planning_ready, true);
-  assert.equal(projection.publication.deliverables['deck-a'].source_readiness_summary.planning_ready, true);
-  assert.equal(projection.publication.deliverables['deck-a'].gate_summary.source_planning_ready, true);
-  assert.equal(watch.source_readiness_summary?.planning_ready, true);
-  assert.equal(watch.gate_summary?.source_planning_ready, true);
+    assert.equal(review.source_readiness_summary?.planning_ready, true);
+    assert.equal(review.gate_summary?.source_planning_ready, true);
+    assert.equal(projection.publication.deliverables['deck-a'].source_readiness_summary.planning_ready, true);
+    assert.equal(projection.publication.deliverables['deck-a'].gate_summary.source_planning_ready, true);
+    assert.equal(watch.source_readiness_summary?.planning_ready, true);
+    assert.equal(watch.gate_summary?.source_planning_ready, true);
+  });
 });
 
 test('thin workspace source intake bootstraps topic truth but keeps audit blocked until planning_ready', () => {

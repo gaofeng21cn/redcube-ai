@@ -18,6 +18,7 @@ import {
 import { createOverlayRegistry } from '../packages/redcube-overlay-core/src/index.js';
 import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
 import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
+import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -142,108 +143,116 @@ test('reference coverage matrix fully covers active family/profile combinations'
 });
 
 test('xiaohongshu approved sample supports relative regression review', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
-  const fixture = loadFixture('xiaohongshu', 'approved-note');
-
-  const baseline = await createReferenceDeliverable({
-    workspaceRoot,
-    fixture,
-    deliverableId: 'baseline-approved',
-  });
-  assert.equal(baseline.at(-1).ok, true);
-  const approved = await applyReviewMutation({
-    workspaceRoot,
-    topicId: fixture.meta.topicId,
-    deliverableId: 'baseline-approved',
-    mutation: {
-      type: 'approve_publish',
-      actor: 'human',
-      notes: 'reference approved sample',
-    },
-  });
-  assert.equal(approved.state.approval_state.status, 'approved');
-
-  const candidate = await createReferenceDeliverable({
-    workspaceRoot,
-    fixture,
-    deliverableId: 'candidate-next',
-    mode: 'optimize_existing',
-    baselineDeliverableId: 'baseline-approved',
-  });
-  const review = readJson(candidate[6].artifactFile);
-  assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
-  assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
-  assert.equal(review.checks?.baseline_comparison_passed, true);
-});
-
-test('xiaohongshu optimize_existing blocks unapproved baseline sample', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
-  const fixture = loadFixture('xiaohongshu', 'approved-note');
-
-  const baseline = await createReferenceDeliverable({
-    workspaceRoot,
-    fixture,
-    deliverableId: 'baseline-unapproved',
-  });
-  assert.equal(baseline.at(-1).ok, true);
-
-  const candidate = await createReferenceDeliverable({
-    workspaceRoot,
-    fixture,
-    deliverableId: 'candidate-blocked',
-    mode: 'optimize_existing',
-    baselineDeliverableId: 'baseline-unapproved',
-  });
-  assert.equal(candidate[6].ok, false);
-  assert.match(candidate[6].run.error.message, /not approved/i);
-});
-
-test('ppt_deck approved sample supports relative regression review', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-ppt-'));
-  const fixture = loadFixture('ppt_deck', 'approved-deck');
-
-  const baseline = await createReferenceDeliverable({
-    workspaceRoot,
-    fixture,
-    deliverableId: 'baseline-approved',
-  });
-  assert.equal(baseline.at(-1).ok, true);
-
-  const candidate = await createReferenceDeliverable({
-    workspaceRoot,
-    fixture,
-    deliverableId: 'candidate-next',
-    mode: 'optimize_existing',
-    baselineDeliverableId: 'baseline-approved',
-  });
-  const review = readJson(candidate.at(-1).artifactFile);
-  assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
-  assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
-  assert.equal(review.checks?.baseline_comparison_passed, true);
-});
-
-test('ppt_deck active profiles all have approved samples that support relative regression review', async () => {
-  for (const sampleId of ['approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), `redcube-reference-${sampleId}-`));
-    const fixture = loadFixture('ppt_deck', sampleId);
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
+    const fixture = loadFixture('xiaohongshu', 'approved-note');
 
     const baseline = await createReferenceDeliverable({
       workspaceRoot,
       fixture,
-      deliverableId: `${sampleId}-baseline`,
+      deliverableId: 'baseline-approved',
     });
-    assert.equal(baseline.at(-1).ok, true, sampleId);
+    assert.equal(baseline.at(-1).ok, true);
+    const approved = await applyReviewMutation({
+      workspaceRoot,
+      topicId: fixture.meta.topicId,
+      deliverableId: 'baseline-approved',
+      mutation: {
+        type: 'approve_publish',
+        actor: 'human',
+        notes: 'reference approved sample',
+      },
+    });
+    assert.equal(approved.state.approval_state.status, 'approved');
 
     const candidate = await createReferenceDeliverable({
       workspaceRoot,
       fixture,
-      deliverableId: `${sampleId}-candidate`,
+      deliverableId: 'candidate-next',
       mode: 'optimize_existing',
-      baselineDeliverableId: `${sampleId}-baseline`,
+      baselineDeliverableId: 'baseline-approved',
     });
-    const review = readJson(candidate.at(-1).artifactFile);
-    assert.equal(review.baseline_review?.baseline_deliverable_id, `${sampleId}-baseline`);
+    const review = readJson(candidate[6].artifactFile);
+    assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
     assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
     assert.equal(review.checks?.baseline_comparison_passed, true);
-  }
+  });
+});
+
+test('xiaohongshu optimize_existing blocks unapproved baseline sample', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
+    const fixture = loadFixture('xiaohongshu', 'approved-note');
+
+    const baseline = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: 'baseline-unapproved',
+    });
+    assert.equal(baseline.at(-1).ok, true);
+
+    const candidate = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: 'candidate-blocked',
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'baseline-unapproved',
+    });
+    assert.equal(candidate[6].ok, false);
+    assert.match(candidate[6].run.error.message, /not approved/i);
+  });
+});
+
+test('ppt_deck approved sample supports relative regression review', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-ppt-'));
+    const fixture = loadFixture('ppt_deck', 'approved-deck');
+
+    const baseline = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: 'baseline-approved',
+    });
+    assert.equal(baseline.at(-1).ok, true);
+
+    const candidate = await createReferenceDeliverable({
+      workspaceRoot,
+      fixture,
+      deliverableId: 'candidate-next',
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'baseline-approved',
+    });
+    const review = readJson(candidate.at(-1).artifactFile);
+    assert.equal(review.baseline_review?.baseline_deliverable_id, 'baseline-approved');
+    assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
+    assert.equal(review.checks?.baseline_comparison_passed, true);
+  });
+});
+
+test('ppt_deck active profiles all have approved samples that support relative regression review', async () => {
+  await withMockHermesUpstream(async () => {
+    for (const sampleId of ['approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {
+      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), `redcube-reference-${sampleId}-`));
+      const fixture = loadFixture('ppt_deck', sampleId);
+
+      const baseline = await createReferenceDeliverable({
+        workspaceRoot,
+        fixture,
+        deliverableId: `${sampleId}-baseline`,
+      });
+      assert.equal(baseline.at(-1).ok, true, sampleId);
+
+      const candidate = await createReferenceDeliverable({
+        workspaceRoot,
+        fixture,
+        deliverableId: `${sampleId}-candidate`,
+        mode: 'optimize_existing',
+        baselineDeliverableId: `${sampleId}-baseline`,
+      });
+      const review = readJson(candidate.at(-1).artifactFile);
+      assert.equal(review.baseline_review?.baseline_deliverable_id, `${sampleId}-baseline`);
+      assert.equal(typeof review.checks?.baseline_comparison_passed, 'boolean');
+      assert.equal(review.checks?.baseline_comparison_passed, true);
+    }
+  });
 });

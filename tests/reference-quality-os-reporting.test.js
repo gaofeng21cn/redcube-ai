@@ -13,6 +13,9 @@ import {
 import {
   buildReferencePromotionReport,
 } from '../packages/redcube-runtime/src/index.js';
+import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
+
+withMockHermesUpstreamSuite();
 
 async function createPromotedReferenceWorkspace() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-report-'));
@@ -98,13 +101,15 @@ async function createPromotedReferenceWorkspace() {
 }
 
 test('reference-os exposes promoted reference reporting surface', async () => {
-  const workspaceRoot = await createPromotedReferenceWorkspace();
-  const report = buildReferencePromotionReport({ workspaceRoot });
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = await createPromotedReferenceWorkspace();
+    const report = buildReferencePromotionReport({ workspaceRoot });
 
-  assert.equal(report.surface_kind, 'reference_promotion_report');
-  assert.equal(Array.isArray(report.promoted_references), true);
-  assert.equal(report.promoted_references.length, 1);
-  assert.equal(report.promoted_references[0].promoted_reference_id, 'xhs-standard-note-v3');
-  assert.equal(report.promoted_references[0].deliverable_id, 'candidate-a');
-  assert.equal(report.promoted_references[0].overlay, 'xiaohongshu');
+    assert.equal(report.surface_kind, 'reference_promotion_report');
+    assert.equal(Array.isArray(report.promoted_references), true);
+    assert.equal(report.promoted_references.length, 1);
+    assert.equal(report.promoted_references[0].promoted_reference_id, 'xhs-standard-note-v3');
+    assert.equal(report.promoted_references[0].deliverable_id, 'candidate-a');
+    assert.equal(report.promoted_references[0].overlay, 'xiaohongshu');
+  });
 });

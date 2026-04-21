@@ -67,6 +67,35 @@ test('run-test-group usage and verify shim include the family verification lane'
   assert.match(verifyScript, /\[smoke\|fast\|meta\|family\|integration\|e2e\|historical\|full\]/);
 });
 
+test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {
+  const reviewLoop = readFileSync('tests/deliverable-review-loop.test.js', 'utf-8');
+
+  assert.match(reviewLoop, /startMockCodexCli/);
+  assert.match(reviewLoop, /withMockHermesUpstream/);
+  assert.match(reviewLoop, /REDCUBE_CODEX_COMMAND/);
+});
+
+test('serialized route-heavy verification files stay on the mock codex upstream instead of the live CLI', () => {
+  for (const file of [
+    'tests/direct-delivery-lifecycle-stage-summary.test.js',
+    'tests/direct-delivery-operator-handoff.test.js',
+    'tests/family-parity-governance-surface.test.js',
+    'tests/family-source-truth-consumption.test.js',
+    'tests/ppt-deliverable-e2e.test.js',
+    'tests/ppt-deliverable-surface.test.js',
+    'tests/publication-projection-delivery-contract.test.js',
+    'tests/reference-quality-os-replacement.test.js',
+    'tests/reference-quality-os-reporting.test.js',
+    'tests/reference-regression.test.js',
+    'tests/review-platform.test.js',
+    'tests/workspace-operator-quickstart.test.js',
+    'tests/xiaohongshu-deliverable-e2e.test.js',
+  ]) {
+    const content = readFileSync(file, 'utf-8');
+    assert.match(content, /withMockHermesUpstream|REDCUBE_CODEX_COMMAND/);
+  }
+});
+
 test('serialized verification rule is documented in current program contract', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
 

@@ -13,6 +13,9 @@ import {
 import {
   buildReferenceReplacementReport,
 } from '../packages/redcube-runtime/src/index.js';
+import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
+
+withMockHermesUpstreamSuite();
 
 async function promoteReference({ workspaceRoot, deliverableId, promotedReferenceId, baselineDeliverableId = '' }) {
   await createDeliverable({
@@ -95,38 +98,40 @@ async function createBaselineDeliverable({ workspaceRoot, deliverableId }) {
 }
 
 test('reference-os exposes machine-readable replacement report for superseded promoted references', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-replacement-'));
-  await intakeSource({
-    workspaceRoot,
-    topicId: 'topic-a',
-    title: '甲状腺门诊小红书科普',
-    brief: '用于 reference replacement report 的样本',
-    keywords: ['甲状腺', '门诊'],
-  });
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-replacement-'));
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: '甲状腺门诊小红书科普',
+      brief: '用于 reference replacement report 的样本',
+      keywords: ['甲状腺', '门诊'],
+    });
 
-  await createBaselineDeliverable({
-    workspaceRoot,
-    deliverableId: 'baseline-a',
-  });
-  await promoteReference({
-    workspaceRoot,
-    deliverableId: 'candidate-b',
-    promotedReferenceId: 'xhs-standard-note-v2',
-    baselineDeliverableId: 'baseline-a',
-  });
-  await promoteReference({
-    workspaceRoot,
-    deliverableId: 'candidate-c',
-    promotedReferenceId: 'xhs-standard-note-v3',
-    baselineDeliverableId: 'candidate-b',
-  });
+    await createBaselineDeliverable({
+      workspaceRoot,
+      deliverableId: 'baseline-a',
+    });
+    await promoteReference({
+      workspaceRoot,
+      deliverableId: 'candidate-b',
+      promotedReferenceId: 'xhs-standard-note-v2',
+      baselineDeliverableId: 'baseline-a',
+    });
+    await promoteReference({
+      workspaceRoot,
+      deliverableId: 'candidate-c',
+      promotedReferenceId: 'xhs-standard-note-v3',
+      baselineDeliverableId: 'candidate-b',
+    });
 
-  const report = buildReferenceReplacementReport({ workspaceRoot });
-  assert.equal(report.surface_kind, 'reference_replacement_report');
-  assert.equal(Array.isArray(report.replacements), true);
-  assert.equal(report.replacements.length, 1);
-  assert.equal(report.replacements[0].superseded_reference_id, 'xhs-standard-note-v2');
-  assert.equal(report.replacements[0].replacement_reference_id, 'xhs-standard-note-v3');
-  assert.equal(report.replacements[0].overlay, 'xiaohongshu');
-  assert.equal(report.replacements[0].profile_id, 'standard_note');
+    const report = buildReferenceReplacementReport({ workspaceRoot });
+    assert.equal(report.surface_kind, 'reference_replacement_report');
+    assert.equal(Array.isArray(report.replacements), true);
+    assert.equal(report.replacements.length, 1);
+    assert.equal(report.replacements[0].superseded_reference_id, 'xhs-standard-note-v2');
+    assert.equal(report.replacements[0].replacement_reference_id, 'xhs-standard-note-v3');
+    assert.equal(report.replacements[0].overlay, 'xiaohongshu');
+    assert.equal(report.replacements[0].profile_id, 'standard_note');
+  });
 });

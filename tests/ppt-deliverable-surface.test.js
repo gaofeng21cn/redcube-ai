@@ -16,6 +16,7 @@ import {
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
 async function prepareSourceReadiness(workspaceRoot) {
   await completeSourceReadiness({
@@ -149,57 +150,59 @@ test('auditDeliverable blocks when hydrated ppt deck surface is missing', async 
 });
 
 test('auditDeliverable passes when hydrated ppt deck surface exists and baseline is bound', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
-  await prepareSourceReadiness(workspaceRoot);
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
+    await prepareSourceReadiness(workspaceRoot);
 
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'lecture_student',
-    topicId: 'topic-a',
-    deliverableId: 'deck-approved-v1',
-    title: '甲状腺门诊科普 baseline',
-    goal: '已认可基线',
-  });
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
-    const result = await runDeliverableRoute({
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-approved-v1',
+      title: '甲状腺门诊科普 baseline',
+      goal: '已认可基线',
+    });
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-approved-v1',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '甲状腺门诊科普 deck',
+      goal: '为本科生讲授甲状腺基础知识',
+    });
+
+    const report = await auditDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
       topicId: 'topic-a',
-      deliverableId: 'deck-approved-v1',
-      route,
+      deliverableId: 'deck-a',
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'deck-approved-v1',
     });
-    assert.equal(result.ok, true, route);
-  }
 
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'lecture_student',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    title: '甲状腺门诊科普 deck',
-    goal: '为本科生讲授甲状腺基础知识',
+    assert.equal(report.status, 'pass');
+    assert.deepEqual(report.issues, []);
+    assert.equal(report.rerun_from_stage, null);
+    assert.equal(report.recommended_action, 'run_deliverable_route');
+    assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
+    assert.equal(report.gate_summary?.required_export_bundle_id, 'lecture_student_bundle');
+    assert.equal(report.gate_summary?.approval_required, false);
+    assert.equal(report.gate_summary?.delivery_projection_current, 'draft');
+    assert.equal(report.gate_summary?.delivery_projection_next, 'export_ready');
   });
-
-  const report = await auditDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    mode: 'optimize_existing',
-    baselineDeliverableId: 'deck-approved-v1',
-  });
-
-  assert.equal(report.status, 'pass');
-  assert.deepEqual(report.issues, []);
-  assert.equal(report.rerun_from_stage, null);
-  assert.equal(report.recommended_action, 'run_deliverable_route');
-  assert.equal(report.gate_summary?.required_export_route, 'export_pptx');
-  assert.equal(report.gate_summary?.required_export_bundle_id, 'lecture_student_bundle');
-  assert.equal(report.gate_summary?.approval_required, false);
-  assert.equal(report.gate_summary?.delivery_projection_current, 'draft');
-  assert.equal(report.gate_summary?.delivery_projection_next, 'export_ready');
 });
 
 test('auditDeliverable blocks when hydrated ppt deck surface content is invalid', async () => {

@@ -13,6 +13,23 @@ import {
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import {
+  startMockCodexCli,
+  withEnv,
+} from './helpers/mock-codex-cli.js';
+
+async function withMockHermesUpstream(testFn) {
+  const upstream = await startMockCodexCli();
+  const restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
+}
 
 test('auditDeliverable blocks optimize_existing task without baseline', async () => {
   const report = await auditDeliverable({
@@ -138,91 +155,93 @@ test('auditDeliverable blocks optimize_existing task when baseline is not approv
 });
 
 test('auditDeliverable surfaces promoted baseline summary for optimize_existing', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
-  await completeSourceReadiness({
-    workspaceRoot,
-    topicId: 'topic-a',
-    title: '甲状腺门诊小红书素材',
-    brief: '为门诊患者准备甲状腺科普图文，需要覆盖检查、误区与就诊建议。',
-    keywords: ['甲状腺', '门诊', '科普'],
-  });
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: '甲状腺门诊小红书素材',
+      brief: '为门诊患者准备甲状腺科普图文，需要覆盖检查、误区与就诊建议。',
+      keywords: ['甲状腺', '门诊', '科普'],
+    });
 
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'xiaohongshu',
-    profileId: 'standard_note',
-    topicId: 'topic-a',
-    deliverableId: 'baseline-a',
-    title: '甲状腺门诊小红书 baseline',
-    goal: '旧版认可稿',
-  });
-  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
-    const result = await runDeliverableRoute({
+    await createDeliverable({
       workspaceRoot,
       overlay: 'xiaohongshu',
+      profileId: 'standard_note',
       topicId: 'topic-a',
       deliverableId: 'baseline-a',
-      route,
+      title: '甲状腺门诊小红书 baseline',
+      goal: '旧版认可稿',
     });
-    assert.equal(result.ok, true, route);
-  }
-  await applyReviewMutation({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'baseline-a',
-    mutation: { type: 'approve_publish', actor: 'human', notes: 'approve baseline' },
-  });
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'xiaohongshu',
-    profileId: 'standard_note',
-    topicId: 'topic-a',
-    deliverableId: 'candidate-a',
-    title: '甲状腺门诊小红书优化版',
-    goal: '在 baseline 基础上优化可读性',
-  });
-  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
-    const result = await runDeliverableRoute({
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'baseline-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+    await applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'baseline-a',
+      mutation: { type: 'approve_publish', actor: 'human', notes: 'approve baseline' },
+    });
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'candidate-a',
+      title: '甲状腺门诊小红书优化版',
+      goal: '在 baseline 基础上优化可读性',
+    });
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'candidate-a',
+        route,
+        mode: 'optimize_existing',
+        baselineDeliverableId: 'baseline-a',
+      });
+      assert.equal(result.ok, true, route);
+    }
+    await applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'candidate-a',
+      mutation: { type: 'approve_publish', actor: 'human', notes: 'approve optimized baseline' },
+    });
+    await applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'candidate-a',
+      mutation: {
+        type: 'promote_baseline',
+        actor: 'human',
+        promoted_reference_id: 'xhs-note-v1',
+        notes: 'promote baseline into reference',
+      },
+    });
+
+    const report = await auditDeliverable({
       workspaceRoot,
       overlay: 'xiaohongshu',
       topicId: 'topic-a',
       deliverableId: 'candidate-a',
-      route,
       mode: 'optimize_existing',
-      baselineDeliverableId: 'baseline-a',
+      baselineDeliverableId: 'candidate-a',
     });
-    assert.equal(result.ok, true, route);
-  }
-  await applyReviewMutation({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'candidate-a',
-    mutation: { type: 'approve_publish', actor: 'human', notes: 'approve optimized baseline' },
-  });
-  await applyReviewMutation({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'candidate-a',
-    mutation: {
-      type: 'promote_baseline',
-      actor: 'human',
-      promoted_reference_id: 'xhs-note-v1',
-      notes: 'promote baseline into reference',
-    },
-  });
 
-  const report = await auditDeliverable({
-    workspaceRoot,
-    overlay: 'xiaohongshu',
-    topicId: 'topic-a',
-    deliverableId: 'candidate-a',
-    mode: 'optimize_existing',
-    baselineDeliverableId: 'candidate-a',
+    assert.equal(report.status, 'pass');
+    assert.equal(report.quality_summary?.baseline_promotion_state, 'promoted');
+    assert.equal(report.quality_summary?.promoted_reference_id, 'xhs-note-v1');
   });
-
-  assert.equal(report.status, 'pass');
-  assert.equal(report.quality_summary?.baseline_promotion_state, 'promoted');
-  assert.equal(report.quality_summary?.promoted_reference_id, 'xhs-note-v1');
 });
 
 test('auditDeliverable blocks missing hydrated surface artifact', async () => {
@@ -315,6 +334,9 @@ test('reviewRenderOutput loads lecture_student profile checks from hydrated cont
       occlusion_free: true,
       visual_density_ok: true,
       speaker_fit_ok: true,
+      edge_clearance_ok: true,
+      block_content_fit_ok: true,
+      title_typography_ok: true,
       teaching_progression_clear: true,
     },
   });
@@ -350,6 +372,9 @@ test('reviewRenderOutput loads executive_briefing profile checks from hydrated c
       occlusion_free: true,
       visual_density_ok: true,
       speaker_fit_ok: true,
+      edge_clearance_ok: true,
+      block_content_fit_ok: true,
+      title_typography_ok: true,
       decision_implication_clear: false,
       conclusion_up_front: true,
     },
@@ -390,143 +415,149 @@ test('runtimeWatch reports pending review loop state', async () => {
 
 
 test('runtimeWatch can load a persisted run from the canonical workspace/topic/deliverable/run locator', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-'));
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-'));
 
-  await completeSourceReadiness({
-    workspaceRoot,
-    topicId: 'topic-a',
-    title: '正式答辩 deck source',
-    brief: '答辩 deck 需要清晰展示问题、方法、结果与答辩防守要点。',
-    keywords: ['答辩', '结果', '问题'],
-  });
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'defense_deck',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    title: '正式答辩 deck',
-    goal: '用于正式答辩并覆盖潜在质询',
-  });
-
-  const runResult = await runDeliverableRoute({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    route: 'storyline',
-  });
-
-  const report = await runtimeWatch({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    runId: runResult.run.run_id,
-  });
-
-  assert.equal(report.ok, true);
-  assert.equal(report.run_id, runResult.run.run_id);
-  assert.equal(report.current_stage, 'storyline');
-  assert.equal(report.run_telemetry.run_id, runResult.run.run_id);
-});
-
-test('runtimeWatch keeps deliverable-level review watch available when no run locator is provided', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-deliverable-only-'));
-
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'lecture_student',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    title: '肠癌 AI 讲课 deck',
-    goal: '给学生讲清肠癌 AI 的问题、方法与边界',
-  });
-
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
-    const result = await runDeliverableRoute({
+    await completeSourceReadiness({
       workspaceRoot,
-      overlay: 'ppt_deck',
       topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route,
+      title: '正式答辩 deck source',
+      brief: '答辩 deck 需要清晰展示问题、方法、结果与答辩防守要点。',
+      keywords: ['答辩', '结果', '问题'],
     });
-    assert.equal(result.ok, true, route);
-  }
-
-  const blocked = await applyReviewMutation({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    mutation: {
-      type: 'request_changes',
-      actor: 'human',
-      review_stage: 'screenshot_review',
-      rerun_from_stage: 'render_html',
-      issues: ['visual_peak_missing'],
-      notes: '关键页视觉峰值不够',
-    },
-  });
-  assert.equal(blocked.state.current_status, 'blocked_for_revision');
-
-  const watch = await runtimeWatch({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-  });
-
-  assert.equal(watch.ok, true);
-  assert.equal(watch.status, 'review_pending');
-  assert.equal(watch.review_state.current_status, 'blocked_for_revision');
-  assert.equal(watch.review_state.rerun_from_stage, 'render_html');
-});
-
-test('runtimeWatch rejects a persisted run when topic locator does not match the run identity', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-mismatch-'));
-
-  await completeSourceReadiness({
-    workspaceRoot,
-    topicId: 'topic-a',
-    title: 'topic a source',
-    brief: 'topic a',
-    keywords: ['topic-a'],
-  });
-  await completeSourceReadiness({
-    workspaceRoot,
-    topicId: 'topic-b',
-    title: 'topic b source',
-    brief: 'topic b',
-    keywords: ['topic-b'],
-  });
-  for (const topicId of ['topic-a', 'topic-b']) {
     await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
       profileId: 'defense_deck',
-      topicId,
+      topicId: 'topic-a',
       deliverableId: 'deck-a',
-      title: `deck ${topicId}`,
-      goal: `goal ${topicId}`,
+      title: '正式答辩 deck',
+      goal: '用于正式答辩并覆盖潜在质询',
     });
-  }
 
-  const runResult = await runDeliverableRoute({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    route: 'storyline',
-  });
-
-  await assert.rejects(
-    () => runtimeWatch({
+    const runResult = await runDeliverableRoute({
       workspaceRoot,
-      topicId: 'topic-b',
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+
+    const report = await runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
       deliverableId: 'deck-a',
       runId: runResult.run.run_id,
-    }),
-    /runtimeWatch topicId 与 run\.topic_id 不一致/,
-  );
+    });
+
+    assert.equal(report.ok, true);
+    assert.equal(report.run_id, runResult.run.run_id);
+    assert.equal(report.current_stage, 'storyline');
+    assert.equal(report.run_telemetry.run_id, runResult.run.run_id);
+  });
+});
+
+test('runtimeWatch keeps deliverable-level review watch available when no run locator is provided', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-deliverable-only-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '肠癌 AI 讲课 deck',
+      goal: '给学生讲清肠癌 AI 的问题、方法与边界',
+    });
+
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const blocked = await applyReviewMutation({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      mutation: {
+        type: 'request_changes',
+        actor: 'human',
+        review_stage: 'screenshot_review',
+        rerun_from_stage: 'render_html',
+        issues: ['visual_peak_missing'],
+        notes: '关键页视觉峰值不够',
+      },
+    });
+    assert.equal(blocked.state.current_status, 'blocked_for_revision');
+
+    const watch = await runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+    });
+
+    assert.equal(watch.ok, true);
+    assert.equal(watch.status, 'review_pending');
+    assert.equal(watch.review_state.current_status, 'blocked_for_revision');
+    assert.equal(watch.review_state.rerun_from_stage, 'render_html');
+  });
+});
+
+test('runtimeWatch rejects a persisted run when topic locator does not match the run identity', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-mismatch-'));
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'topic a source',
+      brief: 'topic a',
+      keywords: ['topic-a'],
+    });
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-b',
+      title: 'topic b source',
+      brief: 'topic b',
+      keywords: ['topic-b'],
+    });
+    for (const topicId of ['topic-a', 'topic-b']) {
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'defense_deck',
+        topicId,
+        deliverableId: 'deck-a',
+        title: `deck ${topicId}`,
+        goal: `goal ${topicId}`,
+      });
+    }
+
+    const runResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+
+    await assert.rejects(
+      () => runtimeWatch({
+        workspaceRoot,
+        topicId: 'topic-b',
+        deliverableId: 'deck-a',
+        runId: runResult.run.run_id,
+      }),
+      /runtimeWatch topicId 与 run\.topic_id 不一致/,
+    );
+  });
 });
 
 test('runtimeWatch exposes export bundle obligations from hydrated contract', async () => {
@@ -681,51 +712,53 @@ test('runtimeWatch exposes source readiness summary and gate summary from canoni
 });
 
 test('runtimeWatch exposes publication projection separately from canonical review state', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
 
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'xiaohongshu',
-    profileId: 'standard_note',
-    topicId: 'topic-a',
-    deliverableId: 'note-a',
-    title: '甲状腺门诊小红书科普',
-    goal: '为门诊患者生成可发布的科普图文',
-  });
-
-  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
-    const result = await runDeliverableRoute({
+    await createDeliverable({
       workspaceRoot,
       overlay: 'xiaohongshu',
+      profileId: 'standard_note',
       topicId: 'topic-a',
       deliverableId: 'note-a',
-      route,
+      title: '甲状腺门诊小红书科普',
+      goal: '为门诊患者生成可发布的科普图文',
     });
-    assert.equal(result.ok, true, route);
-  }
 
-  const report = await runtimeWatch({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'note-a',
-    run: {
-      run_id: 'run-1',
-      topic_id: 'topic-a',
-      deliverable_id: 'note-a',
-      current_stage: 'publish_copy',
-      status: 'completed',
-      pending_reviews: [],
-      resumable: false,
-    },
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const report = await runtimeWatch({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      run: {
+        run_id: 'run-1',
+        topic_id: 'topic-a',
+        deliverable_id: 'note-a',
+        current_stage: 'publish_copy',
+        status: 'completed',
+        pending_reviews: [],
+        resumable: false,
+      },
+    });
+
+    assert.equal(report.surface_kind, 'runtime_watch');
+    assert.equal(report.review_state.publish_state.current, 'approval_pending');
+    assert.equal(report.publication_projection.current, 'approval_pending');
+    assert.equal(report.quality_summary?.relative_quality_verdict, null);
+    assert.equal(report.quality_summary?.baseline_promotion_state, null);
+    assert.equal(report.approval_throughput_summary.publish_state, 'approval_pending');
+    assert.equal(report.approval_throughput_summary.pending_review_count, 0);
   });
-
-  assert.equal(report.surface_kind, 'runtime_watch');
-  assert.equal(report.review_state.publish_state.current, 'approval_pending');
-  assert.equal(report.publication_projection.current, 'approval_pending');
-  assert.equal(report.quality_summary?.relative_quality_verdict, null);
-  assert.equal(report.quality_summary?.baseline_promotion_state, null);
-  assert.equal(report.approval_throughput_summary.publish_state, 'approval_pending');
-  assert.equal(report.approval_throughput_summary.pending_review_count, 0);
 });
 
 test('runtimeWatch exposes poster-specific metric extension surface separately from generic ops-eval base', async () => {

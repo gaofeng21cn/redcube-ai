@@ -1366,3 +1366,16 @@ export async function startMockCodexCli() {
     async close() {},
   };
 }
+
+export async function withMockHermesUpstream(testFn) {
+  const upstream = await startMockCodexCli();
+  const restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
+}
