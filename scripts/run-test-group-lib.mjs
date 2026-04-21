@@ -1,7 +1,14 @@
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-import { inspectCurrentRepoFamilySharedAlignment } from 'opl-gateway-shared/family-shared-release';
+import {
+  SHARED_OWNER_RELEASE_CONTRACT_PATH,
+  extractTrackedPins,
+  inspectCurrentRepoFamilySharedAlignment,
+  inspectFamilySharedConsumerAlignment,
+  resolveOwnerRepoRoot,
+} from 'opl-gateway-shared/family-shared-release';
 
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'e2e', 'full']);
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
@@ -29,6 +36,28 @@ export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
     resolve_from: 'packages/redcube-gateway/package.json',
   },
 ]);
+const REPO_LOCAL_SHARED_PIN_FALLBACKS = Object.freeze({
+  redcube: Object.freeze({
+    owner_repo: 'one-person-lab',
+    package_name: 'opl-gateway-shared',
+    git_locator_prefix: 'git+https://github.com/gaofeng21cn/one-person-lab.git#',
+    consumer: Object.freeze({
+      repo_id: 'redcube',
+      repo_dir: 'redcube-ai',
+      verify_command: 'scripts/verify.sh family',
+      targets: Object.freeze([
+        Object.freeze({
+          file: 'packages/redcube-gateway/package.json',
+          kind: 'js_dependency',
+        }),
+        Object.freeze({
+          file: 'package-lock.json',
+          kind: 'js_lock',
+        }),
+      ]),
+    }),
+  }),
+});
 
 function isWithinRepoRoot(repoRoot, resolvedPath) {
   const relative = path.relative(repoRoot, resolvedPath);
@@ -128,14 +157,92 @@ export function assertRequiredRuntimeSharedResolution(options = {}) {
   return inspection;
 }
 
+function isMissingSharedOwnerReleaseContract(error, {
+  repoRoot = process.cwd(),
+  ownerRepoRoot,
+  ownerRepo = 'one-person-lab',
+} = {}) {
+  if (error?.code !== 'ENOENT' || !error?.path) {
+    return false;
+  }
+
+  const expectedContractPath = path.join(
+    resolveOwnerRepoRoot({ repoRoot, ownerRepoRoot, ownerRepo }),
+    SHARED_OWNER_RELEASE_CONTRACT_PATH,
+  );
+  return path.resolve(error.path) === path.resolve(expectedContractPath);
+}
+
+function buildRepoLocalSharedPinFallbackContract({
+  repoRoot = process.cwd(),
+  consumerRepoId,
+} = {}) {
+  const fallback = REPO_LOCAL_SHARED_PIN_FALLBACKS[consumerRepoId];
+  if (!fallback) {
+    return null;
+  }
+
+  const dependencyTarget = fallback.consumer.targets.find((target) => target.kind === 'js_dependency');
+  const dependencyFile = path.join(path.resolve(String(repoRoot)), dependencyTarget.file);
+  const pins = extractTrackedPins(readFileSync(dependencyFile, 'utf8'), dependencyTarget.kind);
+
+  if (pins.length !== 1) {
+    throw new Error(
+      `expected exactly one tracked shared pin in ${dependencyTarget.file}; found ${pins.length}`,
+    );
+  }
+
+  const ownerCommit = pins[0];
+  return {
+    contract_kind: 'family_shared_owner_release.v1',
+    owner_repo: fallback.owner_repo,
+    owner_commit: ownerCommit,
+    packages: {
+      js: {
+        package_name: fallback.package_name,
+        git_locator: `${fallback.git_locator_prefix}${ownerCommit}`,
+      },
+    },
+    consumers: [fallback.consumer],
+  };
+}
+
 export function inspectCurrentRepoSharedPinAlignment({
   repoRoot,
   consumerRepoId = 'redcube',
+  ownerRepoRoot,
+  ownerRepo = 'one-person-lab',
 } = {}) {
-  return inspectCurrentRepoFamilySharedAlignment({
-    repoRoot,
-    consumerRepoId,
-  });
+  try {
+    return inspectCurrentRepoFamilySharedAlignment({
+      repoRoot,
+      consumerRepoId,
+      ownerRepoRoot,
+      ownerRepo,
+    });
+  } catch (error) {
+    if (!isMissingSharedOwnerReleaseContract(error, {
+      repoRoot,
+      ownerRepoRoot,
+      ownerRepo,
+    })) {
+      throw error;
+    }
+
+    const fallbackContract = buildRepoLocalSharedPinFallbackContract({
+      repoRoot,
+      consumerRepoId,
+    });
+    if (!fallbackContract) {
+      throw error;
+    }
+
+    return inspectFamilySharedConsumerAlignment({
+      contract: fallbackContract,
+      consumerRepoId,
+      repoRoot,
+    });
+  }
 }
 
 export function assertCurrentRepoSharedPinAlignment(options = {}) {
@@ -146,7 +253,7 @@ export function assertCurrentRepoSharedPinAlignment(options = {}) {
       .join('\n');
     throw new Error(
       [
-        'current checkout is not aligned with the live OPL family shared release contract',
+        'current checkout is not aligned with the OPL family shared release pin contract',
         `expected owner commit: ${inspection.owner_commit}`,
         `repo root: ${inspection.repo_root}`,
         findings,

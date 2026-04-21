@@ -75,6 +75,10 @@ test('serialized verification rule is documented in current program contract', (
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /poster governed screenshot review/i,
   );
+  assert.match(
+    currentProgram.current_state.green_baseline.ci_quality_lane_reason,
+    /family shared pin contract.*clean-clone/i,
+  );
 });
 
 test('run-test-group resolves an explicit Python command for screenshot review and export surfaces', () => {

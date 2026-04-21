@@ -40,6 +40,22 @@ function listWorkspacePackageDirs() {
   return workspaceDirs.sort();
 }
 
+function listRepoFiles(relativeDir) {
+  const absoluteDir = path.join(repoRoot, relativeDir);
+  const results = [];
+
+  for (const entry of readdirSync(absoluteDir, { withFileTypes: true })) {
+    const relativePath = path.join(relativeDir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...listRepoFiles(relativePath));
+      continue;
+    }
+    results.push(relativePath);
+  }
+
+  return results.sort();
+}
+
 test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest quality lane', () => {
   assert.equal(existsSync(path.join(repoRoot, '.nvmrc')), true);
   assert.equal(existsSync(path.join(repoRoot, 'package-lock.json')), true);
@@ -51,7 +67,7 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?npm run test:fast[\s\S]*?npm run test:meta/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?npm run test:fast[\s\S]*?npm run test:family[\s\S]*?npm run test:meta/);
   assert.doesNotMatch(workflow, /\n\s{2}integration:\n/);
   assert.doesNotMatch(workflow, /\n\s{2}render-e2e:\n/);
 
@@ -59,6 +75,29 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(pythonRequirements, /^playwright==1\.58\.0$/m);
   assert.match(pythonRequirements, /^python-pptx==1\.0\.2$/m);
   assert.match(pythonRequirements, /^Pillow==12\.1\.1$/m);
+});
+
+test('repo-local family pin wrapper is the only allowed direct upstream family helper entrypoint', () => {
+  const allowedFiles = new Set(['scripts/run-test-group-lib.mjs']);
+  const disallowedDirectImports = [];
+  const upstreamFamilyHelperImportPattern = /\bfrom\s+['"]opl-gateway-shared\/family-shared-release['"]|\bimport\s*\(\s*['"]opl-gateway-shared\/family-shared-release['"]\s*\)/;
+  const sharedOwnerContractPathPattern = /['"]contracts\/family-release\/shared-owner-release\.json['"]/;
+
+  for (const file of [...listRepoFiles('scripts'), ...listRepoFiles('tests')]) {
+    if (!/\.(?:js|mjs)$/.test(file) || allowedFiles.has(file)) {
+      continue;
+    }
+
+    const text = readRepoFile(file);
+    if (
+      upstreamFamilyHelperImportPattern.test(text)
+      || sharedOwnerContractPathPattern.test(text)
+    ) {
+      disallowedDirectImports.push(file);
+    }
+  }
+
+  assert.deepEqual(disallowedDirectImports, []);
 });
 
 test('package-lock tracks every declared workspace package', () => {

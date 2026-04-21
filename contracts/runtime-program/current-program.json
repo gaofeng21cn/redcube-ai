@@ -166,7 +166,7 @@
         "fonts-noto-cjk",
         "playwright-chromium"
       ],
-      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review on the active Codex stable-family mainline",
+      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review and test:family keeps the family shared pin contract clean-clone safe on the active Codex stable-family mainline",
       "required_verification": [
         "git status --short",
         "git diff --check",

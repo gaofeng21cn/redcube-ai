@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { inspectCurrentRepoFamilySharedAlignment } from 'opl-gateway-shared/family-shared-release';
+import { inspectCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.mjs';
 
-test('gateway package and lock stay aligned with the live OPL family shared release contract', () => {
-  const inspection = inspectCurrentRepoFamilySharedAlignment({
+test('gateway package and lock stay aligned with the current OPL family shared release pin contract', () => {
+  const inspection = inspectCurrentRepoSharedPinAlignment({
     repoRoot: process.cwd(),
     consumerRepoId: 'redcube',
   });

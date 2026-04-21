@@ -50,5 +50,8 @@ jobs:
       - name: Run fast tests
         run: npm run test:fast
 
+      - name: Run family tests
+        run: npm run test:family
+
       - name: Run meta tests
         run: npm run test:meta

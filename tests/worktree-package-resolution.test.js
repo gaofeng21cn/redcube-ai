@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import {
+  inspectCurrentRepoSharedPinAlignment,
   inspectRequiredRuntimeSharedResolution,
   inspectWorkspacePackageResolution,
 } from '../scripts/run-test-group-lib.mjs';
@@ -104,4 +107,89 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
     ],
   );
   assert.match(result.message, /npm install/);
+});
+
+function withTempRedcubeRepo(buildFiles, run) {
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-shared-pin-'));
+  const repoRoot = path.join(tempRoot, 'redcube-ai');
+  mkdirSync(repoRoot, { recursive: true });
+
+  const writeJson = (relativePath, value) => {
+    const absolutePath = path.join(repoRoot, relativePath);
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, JSON.stringify(value, null, 2));
+  };
+
+  buildFiles({ repoRoot, writeJson });
+  try {
+    return run(repoRoot);
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
+test('inspectCurrentRepoSharedPinAlignment falls back to the consumer pin when the owner repo contract is unavailable', () => {
+  const ownerCommit = '0123456789abcdef0123456789abcdef01234567';
+  const result = withTempRedcubeRepo(({ writeJson }) => {
+    writeJson('packages/redcube-gateway/package.json', {
+      dependencies: {
+        'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
+      },
+    });
+    writeJson('package-lock.json', {
+      packages: {
+        'packages/redcube-gateway': {
+          dependencies: {
+            'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
+          },
+        },
+      },
+    });
+  }, (repoRoot) => inspectCurrentRepoSharedPinAlignment({
+    repoRoot,
+    ownerRepoRoot: path.join(repoRoot, '..', 'one-person-lab'),
+  }));
+
+  assert.equal(result.status, 'aligned');
+  assert.equal(result.owner_commit, ownerCommit);
+  assert.deepEqual(
+    result.findings.map((entry) => entry.file),
+    ['packages/redcube-gateway/package.json', 'package-lock.json'],
+  );
+  assert.deepEqual(
+    result.findings.map((entry) => entry.status),
+    ['aligned', 'aligned'],
+  );
+});
+
+test('inspectCurrentRepoSharedPinAlignment fallback still reports stale package-lock drift', () => {
+  const ownerCommit = '89abcdef0123456789abcdef0123456789abcdef';
+  const staleCommit = 'fedcba9876543210fedcba9876543210fedcba98';
+  const result = withTempRedcubeRepo(({ writeJson }) => {
+    writeJson('packages/redcube-gateway/package.json', {
+      dependencies: {
+        'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
+      },
+    });
+    writeJson('package-lock.json', {
+      packages: {
+        'packages/redcube-gateway': {
+          dependencies: {
+            'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${staleCommit}`,
+          },
+        },
+      },
+    });
+  }, (repoRoot) => inspectCurrentRepoSharedPinAlignment({
+    repoRoot,
+    ownerRepoRoot: path.join(repoRoot, '..', 'one-person-lab'),
+  }));
+
+  assert.equal(result.status, 'stale');
+  assert.equal(result.owner_commit, ownerCommit);
+  assert.deepEqual(
+    result.findings.map((entry) => entry.status),
+    ['aligned', 'stale_pin'],
+  );
+  assert.deepEqual(result.findings[1]?.pins, [staleCommit]);
 });

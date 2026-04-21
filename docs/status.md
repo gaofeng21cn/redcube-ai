@@ -15,6 +15,11 @@
 - direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
+## 当前验证口径
+
+- hosted quality lane：`npm run typecheck -> npm run test:fast -> npm run test:family -> npm run test:meta`
+- family shared pin 审计统一经由 `scripts/run-test-group-lib.mjs`，必须在 clean-clone 环境下可运行
+
 ## 历史记录与追溯层
 
 - absorbed milestones 与 phase-2 records：`docs/program/phase-2/`
