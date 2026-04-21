@@ -76,6 +76,33 @@ async function createReferenceDeliverable({ workspaceRoot, fixture, deliverableI
   return results;
 }
 
+async function assertReferenceRelativeRegression({
+  workspaceRoot,
+  fixture,
+  baselineDeliverableId,
+  candidateDeliverableId,
+  reviewRouteIndex = -1,
+  message,
+}) {
+  const baseline = await createReferenceDeliverable({
+    workspaceRoot,
+    fixture,
+    deliverableId: baselineDeliverableId,
+  });
+  assert.equal(baseline.at(-1).ok, true, message);
+
+  const candidate = await createReferenceDeliverable({
+    workspaceRoot,
+    fixture,
+    deliverableId: candidateDeliverableId,
+    mode: 'optimize_existing',
+    baselineDeliverableId,
+  });
+  const review = readJson(candidate.at(reviewRouteIndex).artifactFile);
+  assert.equal(review.baseline_review?.baseline_deliverable_id, baselineDeliverableId, message);
+  assert.equal(review.baseline_review?.baseline_comparison_passed, true, message);
+}
+
 test('reference samples declare provenance metadata and runtime mode explicitly', () => {
   for (const [relativeDir, name] of [['ppt_deck', 'approved-deck'], ['xiaohongshu', 'approved-note']]) {
     const fixture = loadFixture(relativeDir, name);
@@ -191,27 +218,16 @@ test('xiaohongshu optimize_existing blocks unapproved baseline until approval, t
 
 test('ppt_deck active profiles all have approved samples that support relative regression review', async () => {
   await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-ppt-'));
     for (const sampleId of ['approved-deck', 'approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {
-      const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), `redcube-reference-${sampleId}-`));
       const fixture = loadFixture('ppt_deck', sampleId);
-
-      const baseline = await createReferenceDeliverable({
+      await assertReferenceRelativeRegression({
         workspaceRoot,
         fixture,
-        deliverableId: `${sampleId}-baseline`,
-      });
-      assert.equal(baseline.at(-1).ok, true, sampleId);
-
-      const candidate = await createReferenceDeliverable({
-        workspaceRoot,
-        fixture,
-        deliverableId: `${sampleId}-candidate`,
-        mode: 'optimize_existing',
         baselineDeliverableId: `${sampleId}-baseline`,
+        candidateDeliverableId: `${sampleId}-candidate`,
+        message: sampleId,
       });
-      const review = readJson(candidate.at(-1).artifactFile);
-      assert.equal(review.baseline_review?.baseline_deliverable_id, `${sampleId}-baseline`);
-      assert.equal(review.baseline_review?.baseline_comparison_passed, true);
     }
   });
 });
