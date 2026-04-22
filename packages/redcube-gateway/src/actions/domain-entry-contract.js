@@ -8,6 +8,26 @@ import {
 
 export const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
 export const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
+export const RCA_DOMAIN_AGENT_ENTRY_SPEC_V1 = {
+  surface_kind: 'domain_agent_entry_spec',
+  agent_id: 'rca',
+  title: 'RedCube Agent Entry (RCA)',
+  description: (
+    'RCA domain agent entry spec for RedCube visual deliverable loops, '
+    + 'with Codex as the default concrete executor.'
+  ),
+  default_engine: 'codex',
+  workspace_requirement: 'required',
+  locator_schema: {
+    required_fields: ['workspace_root'],
+    optional_fields: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+  },
+  codex_entry_strategy: 'domain_agent_entry',
+  artifact_conventions: 'deck_and_visual_delivery',
+  progress_conventions: 'deliverable_build_narration',
+  entry_command: 'redcube product frontdesk',
+  manifest_command: 'redcube product manifest',
+};
 
 export function buildRedCubeDomainEntryContract({
   productManifestCommand,
@@ -96,6 +116,7 @@ export function buildRedCubeDomainEntryContract({
       direct_product_entry_contract_ref: productEntryContractRef,
       federated_product_entry_contract_ref: federatedProductEntryContractRef,
       managed_session_contract_ref: managedProductEntryContractRef,
+      domain_agent_entry_spec: RCA_DOMAIN_AGENT_ENTRY_SPEC_V1,
     },
   });
 }

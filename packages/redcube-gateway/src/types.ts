@@ -48,6 +48,28 @@ export interface SurfaceBase<TKind extends string> {
   summary?: SurfaceSummary | string;
 }
 
+export interface DomainAgentEntrySpec {
+  surface_kind: 'domain_agent_entry_spec' | string;
+  agent_id: string;
+  title: string;
+  description: string;
+  default_engine: string;
+  workspace_requirement: 'required' | string;
+  locator_schema: {
+    required_fields: string[];
+    optional_fields: string[];
+  };
+  codex_entry_strategy: 'domain_agent_entry' | string;
+  artifact_conventions: string;
+  progress_conventions: string;
+  entry_command: string;
+  manifest_command: string;
+}
+
+export type DomainEntryContractSurface = FamilyDomainEntryContractSurface & {
+  domain_agent_entry_spec?: DomainAgentEntrySpec;
+};
+
 export interface WorkspaceDoctorResponse extends SurfaceBase<'workspace_doctor'> {
   workspaceRoot: string;
   workspaceFileExists: boolean;
@@ -513,7 +535,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       target_domain_id: string;
     };
   };
-  domain_entry_contract: FamilyDomainEntryContractSurface;
+  domain_entry_contract: DomainEntryContractSurface;
   gateway_interaction_contract: GatewayInteractionContractSurface;
   product_entry_start: ProductEntryStartCompanion;
   product_entry_overview: ProductEntryOverviewCompanion;

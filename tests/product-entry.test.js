@@ -682,6 +682,49 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'topic_id',
       'deliverable_id',
     ]);
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.surface_kind,
+      'domain_agent_entry_spec',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.agent_id,
+      'rca',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.default_engine,
+      'codex',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.workspace_requirement,
+      'required',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.codex_entry_strategy,
+      'domain_agent_entry',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.artifact_conventions,
+      'deck_and_visual_delivery',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.progress_conventions,
+      'deliverable_build_narration',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.entry_command,
+      'redcube product frontdesk',
+    );
+    assert.equal(
+      manifest.domain_entry_contract.domain_agent_entry_spec.manifest_command,
+      'redcube product manifest',
+    );
+    assert.deepEqual(
+      manifest.domain_entry_contract.domain_agent_entry_spec.locator_schema,
+      {
+        required_fields: ['workspace_root'],
+        optional_fields: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
+      },
+    );
     assert.equal(manifest.gateway_interaction_contract.surface_kind, 'gateway_interaction_contract');
     assert.equal(manifest.gateway_interaction_contract.frontdoor_owner, 'opl_gateway_or_domain_gui');
     assert.equal(manifest.gateway_interaction_contract.user_interaction_mode, 'natural_language_frontdoor');
