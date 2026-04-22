@@ -19,6 +19,7 @@ import { invokeDomainEntry } from './invoke-domain-entry.js';
 import {
   buildArtifactInventorySurface,
   buildProgressProjectionSurface,
+  buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
 } from './product-entry-continuity-surfaces.js';
 
@@ -274,6 +275,19 @@ export async function invokeProductEntry(request) {
     sessionFile: persisted.file,
     continuationSnapshot,
   });
+  const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
+    entrySessionId: entrySession.entrySessionId,
+    sessionFile: persisted.file,
+    runtimeOwner: MANAGED_RUNTIME_OWNER,
+    deliveryIdentity: {
+      deliverable_family: resolvedIdentity.deliverableFamily,
+      topic_id: resolvedIdentity.topicId,
+      deliverable_id: resolvedIdentity.deliverableId,
+    },
+    continuationSnapshot,
+    source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
+    entryMode,
+  });
   const reviewState = await getReviewState({
     workspaceRoot,
     topicId,
@@ -315,6 +329,7 @@ export async function invokeProductEntry(request) {
     session_continuity: sessionContinuity,
     progress_projection: progressProjection,
     artifact_inventory: artifactInventory,
+    runtime_loop_closure: runtimeLoopClosure,
     review_state: reviewState,
     publication_projection: publicationProjection,
     family_orchestration: familyOrchestration,

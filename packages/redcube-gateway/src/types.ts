@@ -396,6 +396,59 @@ export interface ArtifactInventorySurface {
   };
 }
 
+export interface RuntimeLoopClosureSurface {
+  surface_kind: 'runtime_loop_closure';
+  loop_owner: {
+    runtime_owner: string;
+    domain_owner: string;
+    product_entry_owner: string;
+  };
+  resume_point: {
+    entry_session_id: string | null;
+    session_file: string | null;
+    latest_managed_run_id: string | null;
+    latest_run_id: string | null;
+    latest_handle: string | null;
+    resume_command_template: string;
+    checkpoint_locator_field: string;
+  };
+  progress_cursor: {
+    surface_kind: 'progress_projection';
+    surface_ref: string;
+    managed_run_id: string | null;
+    current_stage: string | null;
+    content_status: ManagedRunProjection['content_status'] | null;
+    needs_user_decision: boolean;
+  };
+  artifact_pickup: {
+    surface_kind: 'artifact_inventory';
+    surface_ref: string;
+    deliverable_family: string | null;
+    topic_id: string | null;
+    deliverable_id: string | null;
+    artifact_refs: string[];
+    artifact_ref_count: number;
+  };
+  control_policy: {
+    approval_gate_id: string;
+    approval_required: boolean;
+    interrupt_policy: string;
+    continue_action: {
+      command: string;
+      surface_kind: 'product_entry_session';
+    };
+    human_gate_ids: string[];
+  };
+  source_linkage: {
+    current_source: string;
+    entry_mode: string | null;
+    direct_surface_kind: 'product_entry';
+    federated_surface_kind: 'federated_product_entry';
+    session_surface_kind: 'product_entry_session';
+    downstream_entry_surface_kind: 'domain_entry';
+  };
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -421,6 +474,7 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   session_continuity: SessionContinuitySurface;
   progress_projection: ProgressProjectionSurface | null;
   artifact_inventory: ArtifactInventorySurface;
+  runtime_loop_closure: RuntimeLoopClosureSurface;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
   family_orchestration: FamilyOrchestrationCompanion;
@@ -460,6 +514,7 @@ export interface FederatedProductEntryResponse extends SurfaceBase<'federated_pr
   };
   family_orchestration: FamilyOrchestrationCompanion;
   product_entry_surface: ProductEntryResponse;
+  runtime_loop_closure: RuntimeLoopClosureSurface;
   summary: {
     entry_session_id: string | null;
     actual_surface_kind: string;
@@ -489,6 +544,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   session_continuity: SessionContinuitySurface;
   progress_projection: ProgressProjectionSurface | null;
   artifact_inventory: ArtifactInventorySurface;
+  runtime_loop_closure: RuntimeLoopClosureSurface;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
   family_orchestration: FamilyOrchestrationCompanion;
@@ -716,6 +772,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       label?: string;
     }>;
   };
+  runtime_loop_closure: RuntimeLoopClosureSurface;
   notes: string[];
 }
 

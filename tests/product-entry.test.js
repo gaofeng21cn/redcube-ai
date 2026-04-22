@@ -149,6 +149,30 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   );
 }
 
+function assertRuntimeLoopClosureShape(surface, { source, entryMode }) {
+  assert.equal(surface.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+  assert.equal(surface.runtime_loop_closure.loop_owner.runtime_owner, 'upstream_hermes_agent');
+  assert.equal(surface.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
+  assert.equal(surface.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
+  assert.equal(surface.runtime_loop_closure.resume_point.entry_session_id, surface.entry_session?.entry_session_id ?? null);
+  assert.equal(
+    surface.runtime_loop_closure.resume_point.latest_handle,
+    surface.summary?.target_handle ?? surface.summary?.latest_handle ?? null,
+  );
+  assert.equal(surface.runtime_loop_closure.progress_cursor.surface_kind, 'progress_projection');
+  assert.equal(surface.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
+  assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_kind, 'artifact_inventory');
+  assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
+  assert.equal(surface.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
+  assert.equal(surface.runtime_loop_closure.control_policy.continue_action.surface_kind, 'product_entry_session');
+  assert.equal(surface.runtime_loop_closure.source_linkage.current_source, source);
+  assert.equal(surface.runtime_loop_closure.source_linkage.entry_mode, entryMode);
+  assert.equal(surface.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
+  assert.equal(surface.runtime_loop_closure.source_linkage.federated_surface_kind, 'federated_product_entry');
+  assert.equal(surface.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
+  assert.equal(surface.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
+}
+
 const SERIAL_ENV_TEST = { concurrency: false };
 
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
@@ -258,6 +282,10 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     );
     assert.equal(response.review_state.surface_kind, 'review_state');
     assert.equal(response.publication_projection.surface_kind, 'publication_projection');
+    assertRuntimeLoopClosureShape(response, {
+      source: 'direct',
+      entryMode: 'redcube_product_entry',
+    });
     assertFamilyOrchestrationCompanion(response, {
       sessionLocatorField: 'entry_session.entry_session_id',
     });
@@ -388,6 +416,14 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     }
     assert.equal(session.review_state.surface_kind, 'review_state');
     assert.equal(session.publication_projection.surface_kind, 'publication_projection');
+    assertRuntimeLoopClosureShape(continued, {
+      source: 'direct',
+      entryMode: 'redcube_product_entry',
+    });
+    assertRuntimeLoopClosureShape(session, {
+      source: 'session',
+      entryMode: 'redcube_product_entry',
+    });
     assertFamilyOrchestrationCompanion(continued, {
       sessionLocatorField: 'entry_session.entry_session_id',
     });
@@ -457,6 +493,17 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
     assert.equal(response.product_entry_surface.session_continuity.entry_session_id, 'session-federated');
     assert.equal(response.product_entry_surface.session_continuity.restore_point.latest_handle, response.summary.target_handle);
+    assertRuntimeLoopClosureShape(response.product_entry_surface, {
+      source: 'federated',
+      entryMode: 'opl_gateway',
+    });
+    assert.equal(response.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(response.runtime_loop_closure.source_linkage.current_source, 'federated');
+    assert.equal(response.runtime_loop_closure.source_linkage.entry_mode, 'opl_gateway');
+    assert.deepEqual(
+      response.runtime_loop_closure.loop_owner,
+      response.product_entry_surface.runtime_loop_closure.loop_owner,
+    );
     assertFamilyOrchestrationCompanion(response, {
       sessionLocatorField: 'entry_session.entry_session_id',
     });
@@ -811,6 +858,23 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	      manifest.artifact_inventory.artifact_refs_fallback_ref.ref,
 	      '/continuation_snapshot/managed_progress_projection/final_artifact_refs',
 	    );
+      assert.equal(manifest.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+      assert.equal(manifest.runtime_loop_closure.loop_owner.runtime_owner, 'upstream_hermes_agent');
+      assert.equal(manifest.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
+      assert.equal(manifest.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
+      assert.equal(
+        manifest.runtime_loop_closure.resume_point.resume_command_template,
+        'redcube product session --entry-session-id <entry-session-id>',
+      );
+      assert.equal(manifest.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
+      assert.equal(manifest.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
+      assert.equal(manifest.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.current_source, 'manifest');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.entry_mode, 'manifest_projection');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.federated_surface_kind, 'federated_product_entry');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
 	    const validatedManifest = sharedCompanions.validateFamilyProductEntryManifest(manifest, {
 	      requireRuntimeCompanions: true,
 	    });

@@ -14,6 +14,7 @@ import { getReviewState } from './get-review-state.js';
 import {
   buildArtifactInventorySurface,
   buildProgressProjectionSurface,
+  buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
 } from './product-entry-continuity-surfaces.js';
 
@@ -87,6 +88,19 @@ export async function getProductEntrySession(request) {
     sessionFile: productEntrySessionFile(entrySessionId),
     continuationSnapshot,
   });
+  const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
+    entrySessionId,
+    sessionFile: productEntrySessionFile(entrySessionId),
+    runtimeOwner: session.runtime_owner,
+    deliveryIdentity: {
+      deliverable_family: session.deliverable_family,
+      topic_id: session.topic_id,
+      deliverable_id: session.deliverable_id,
+    },
+    continuationSnapshot,
+    source: 'session',
+    entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
+  });
 
   return {
     ok: true,
@@ -115,6 +129,7 @@ export async function getProductEntrySession(request) {
     session_continuity: sessionContinuity,
     progress_projection: progressProjection,
     artifact_inventory: artifactInventory,
+    runtime_loop_closure: runtimeLoopClosure,
     review_state: reviewState,
     publication_projection: publicationProjection,
     family_orchestration: familyOrchestration,

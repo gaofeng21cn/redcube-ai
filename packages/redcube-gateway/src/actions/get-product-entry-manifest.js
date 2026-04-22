@@ -36,6 +36,7 @@ import {
 } from './domain-entry-contract.js';
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
+import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
 
 const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
 const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
@@ -727,6 +728,9 @@ export async function getProductEntryManifest(request) {
 	          },
 	        ],
 	      },
+      runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
+        runtimeOwner: MANAGED_RUNTIME_OWNER,
+      }),
 	      continuity_descriptor: {
 	        session_continuity: {
 	          surface_kind: 'session_continuity',
