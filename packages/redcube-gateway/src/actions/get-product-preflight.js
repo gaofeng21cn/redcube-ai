@@ -8,6 +8,9 @@ import {
 } from 'opl-gateway-shared/product-entry-program-companions';
 
 import { doctorWorkspace } from './doctor-workspace.js';
+import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
+
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -94,6 +97,11 @@ export async function getProductPreflight(request) {
       workspace_surface_kind: 'redcube_workspace',
       workspace_root: doctor.workspaceRoot,
     },
+    runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
+      runtimeOwner: MANAGED_RUNTIME_OWNER,
+      source: 'preflight',
+      entryMode: 'preflight_projection',
+    }),
     ...productEntryPreflight,
   };
 }

@@ -886,6 +886,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(frontdeskParsed.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
     assert.equal(frontdeskParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(frontdeskParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+    assert.equal(frontdeskParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(frontdeskParsed.runtime_loop_closure.source_linkage.current_source, 'frontdesk');
     assert.equal(frontdeskParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(frontdeskParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
     assert.equal(frontdeskParsed.product_entry_readiness.usable_now, true);
@@ -918,6 +920,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(preflightParsed.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(preflightParsed.ready_to_try_now, true);
     assert.equal(preflightParsed.checks.length, 4);
+    assert.equal(preflightParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(preflightParsed.runtime_loop_closure.source_linkage.current_source, 'preflight');
 
     const directParsed = await execCliAsync(
       cliPath,
@@ -960,6 +964,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(directParsed.family_orchestration.action_graph.nodes.length, 4);
     assert.equal(directParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(directParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
+    assert.equal(directParsed.summary.latest_handle, directParsed.summary.target_handle);
 
     const federatedParsed = await execCliAsync(
       cliPath,
@@ -1010,6 +1015,10 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(federatedParsed.family_orchestration.action_graph.edges.length, 4);
     assert.equal(federatedParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(federatedParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+    assert.equal(federatedParsed.summary.latest_handle, federatedParsed.summary.target_handle);
+    assert.deepEqual(federatedParsed.session_continuity, federatedParsed.product_entry_surface.session_continuity);
+    assert.deepEqual(federatedParsed.progress_projection, federatedParsed.product_entry_surface.progress_projection);
+    assert.deepEqual(federatedParsed.artifact_inventory, federatedParsed.product_entry_surface.artifact_inventory);
 
     const sessionParsed = await execCliAsync(
       cliPath,
@@ -1034,6 +1043,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(sessionParsed.family_orchestration.action_graph.exit_nodes[0], 'step:inspect_current_progress');
     assert.equal(sessionParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(sessionParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
+    assert.equal(sessionParsed.summary.target_handle, sessionParsed.summary.latest_handle);
 
     const manifestParsed = await execCliAsync(
       cliPath,
@@ -1075,6 +1085,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.equal(manifestParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(manifestParsed.product_entry_preflight.ready_to_try_now, true);
+    assert.equal(manifestParsed.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
 
     const startParsed = await execCliAsync(
       cliPath,
@@ -1096,6 +1107,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(startParsed.surface_kind, 'product_entry_start');
     assert.equal(startParsed.recommended_mode_id, 'open_frontdesk');
     assert.equal(startParsed.modes[0].command, `redcube product frontdesk --workspace-root ${workspaceRoot}`);
+    assert.equal(startParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(startParsed.runtime_loop_closure.source_linkage.current_source, 'start');
   });
 });
 

@@ -5,6 +5,7 @@ function safeText(value, fallback = '') {
 
 const PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE = 'redcube product session --entry-session-id <entry-session-id>';
 const REDCUBE_LOOP_OWNER = 'redcube_ai';
+const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
 
 function buildRestorePoint({ continuationSnapshot }) {
   const latestManagedRunId = continuationSnapshot?.latest_managed_run_id || null;
@@ -110,6 +111,7 @@ export function buildRuntimeLoopClosureSurface({
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
     ? projection.final_artifact_refs
     : [];
+  const gateStatus = Boolean(projection?.needs_user_decision) ? 'requested' : 'approved';
 
   return {
     surface_kind: 'runtime_loop_closure',
@@ -122,6 +124,12 @@ export function buildRuntimeLoopClosureSurface({
       latest_handle: restorePoint.latest_handle,
       resume_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
       checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+    },
+    continuity_cursor: {
+      surface_kind: 'session_continuity',
+      surface_ref: '/session_continuity',
+      entry_session_id: safeText(entrySessionId) || null,
+      latest_handle: restorePoint.latest_handle,
     },
     progress_cursor: {
       surface_kind: 'progress_projection',
@@ -141,14 +149,15 @@ export function buildRuntimeLoopClosureSurface({
       artifact_ref_count: artifactRefs.length,
     },
     control_policy: {
-      approval_gate_id: 'redcube_operator_review_gate',
+      approval_gate_id: REDCUBE_OPERATOR_REVIEW_GATE_ID,
       approval_required: Boolean(projection?.needs_user_decision),
+      gate_status: gateStatus,
       interrupt_policy: 'human_gate_required_before_continuation',
       continue_action: {
         command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
         surface_kind: 'product_entry_session',
       },
-      human_gate_ids: ['redcube_operator_review_gate'],
+      human_gate_ids: [REDCUBE_OPERATOR_REVIEW_GATE_ID],
     },
     source_linkage: {
       current_source: safeText(source),
@@ -163,6 +172,8 @@ export function buildRuntimeLoopClosureSurface({
 
 export function buildRuntimeLoopClosureManifestSurface({
   runtimeOwner,
+  source = 'manifest',
+  entryMode = 'manifest_projection',
 }) {
   return {
     surface_kind: 'runtime_loop_closure',
@@ -175,6 +186,12 @@ export function buildRuntimeLoopClosureManifestSurface({
       latest_handle: null,
       resume_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
       checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+    },
+    continuity_cursor: {
+      surface_kind: 'session_continuity',
+      surface_ref: '/session_continuity',
+      entry_session_id: null,
+      latest_handle: null,
     },
     progress_cursor: {
       surface_kind: 'progress_projection',
@@ -194,18 +211,19 @@ export function buildRuntimeLoopClosureManifestSurface({
       artifact_ref_count: 0,
     },
     control_policy: {
-      approval_gate_id: 'redcube_operator_review_gate',
+      approval_gate_id: REDCUBE_OPERATOR_REVIEW_GATE_ID,
       approval_required: true,
+      gate_status: 'requested',
       interrupt_policy: 'human_gate_required_before_continuation',
       continue_action: {
         command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
         surface_kind: 'product_entry_session',
       },
-      human_gate_ids: ['redcube_operator_review_gate'],
+      human_gate_ids: [REDCUBE_OPERATOR_REVIEW_GATE_ID],
     },
     source_linkage: {
-      current_source: 'manifest',
-      entry_mode: 'manifest_projection',
+      current_source: safeText(source, 'manifest'),
+      entry_mode: safeText(entryMode, 'manifest_projection'),
       direct_surface_kind: 'product_entry',
       federated_surface_kind: 'federated_product_entry',
       session_surface_kind: 'product_entry_session',

@@ -338,6 +338,7 @@ export async function invokeProductEntry(request) {
       task_intent: taskIntent,
       actual_surface_kind: domainEntrySurface.result_surface?.surface_kind || null,
       target_handle: continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null,
+      latest_handle: continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null,
     },
   };
 }

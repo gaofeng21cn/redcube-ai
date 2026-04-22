@@ -3,10 +3,13 @@ import {
 } from 'opl-gateway-shared/product-entry-companions';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
+import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
+
+const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
 
 export async function getProductFrontdesk(request) {
   const manifest = await getProductEntryManifest(request);
-  return buildFamilyProductFrontdeskFromManifest({
+  const frontdeskSurface = buildFamilyProductFrontdeskFromManifest({
     recommended_action: 'inspect_or_start_product_entry',
     product_entry_manifest: manifest,
     shell_aliases: {
@@ -24,4 +27,13 @@ export async function getProductFrontdesk(request) {
       ok: true,
     },
   });
+
+  return {
+    ...frontdeskSurface,
+    runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
+      runtimeOwner: manifest?.runtime?.runtime_owner || MANAGED_RUNTIME_OWNER,
+      source: 'frontdesk',
+      entryMode: 'frontdesk_projection',
+    }),
+  };
 }

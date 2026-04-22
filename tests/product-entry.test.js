@@ -159,11 +159,21 @@ function assertRuntimeLoopClosureShape(surface, { source, entryMode }) {
     surface.runtime_loop_closure.resume_point.latest_handle,
     surface.summary?.target_handle ?? surface.summary?.latest_handle ?? null,
   );
+  assert.equal(surface.runtime_loop_closure.continuity_cursor.surface_kind, 'session_continuity');
+  assert.equal(surface.runtime_loop_closure.continuity_cursor.surface_ref, '/session_continuity');
+  assert.equal(
+    surface.runtime_loop_closure.continuity_cursor.entry_session_id,
+    surface.entry_session?.entry_session_id ?? null,
+  );
   assert.equal(surface.runtime_loop_closure.progress_cursor.surface_kind, 'progress_projection');
   assert.equal(surface.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
   assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_kind, 'artifact_inventory');
   assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
   assert.equal(surface.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
+  assert.equal(
+    surface.runtime_loop_closure.control_policy.gate_status,
+    surface.runtime_loop_closure.control_policy.approval_required ? 'requested' : 'approved',
+  );
   assert.equal(surface.runtime_loop_closure.control_policy.continue_action.surface_kind, 'product_entry_session');
   assert.equal(surface.runtime_loop_closure.source_linkage.current_source, source);
   assert.equal(surface.runtime_loop_closure.source_linkage.entry_mode, entryMode);
@@ -235,6 +245,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     );
     assert.equal(response.session_continuity.surface_kind, 'session_continuity');
     assert.equal(response.session_continuity.entry_session_id, 'session-a');
+    assert.equal(response.summary.latest_handle, response.summary.target_handle);
     assert.equal(response.session_continuity.restore_point.latest_handle, response.summary.target_handle);
     assert.equal(
       response.session_continuity.restore_point.latest_managed_run_id,
@@ -397,6 +408,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     );
     assert.equal(session.session_continuity.surface_kind, 'session_continuity');
     assert.equal(session.session_continuity.entry_session_id, 'session-a');
+    assert.equal(session.summary.target_handle, session.summary.latest_handle);
     assert.equal(session.session_continuity.restore_point.latest_handle, continued.summary.target_handle);
     assert.equal(session.session_continuity.restore_point.latest_managed_run_id, continued.summary.target_handle);
     assert.deepEqual(session.artifact_inventory.restore_point, session.session_continuity.restore_point);
@@ -490,7 +502,12 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.product_entry_surface.entry_session.entry_session_id, 'session-federated');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_gateway');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
+    assert.equal(response.summary.latest_handle, response.summary.target_handle);
     assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
+    assert.equal(response.session_continuity.entry_session_id, 'session-federated');
+    assert.deepEqual(response.session_continuity, response.product_entry_surface.session_continuity);
+    assert.deepEqual(response.progress_projection, response.product_entry_surface.progress_projection);
+    assert.deepEqual(response.artifact_inventory, response.product_entry_surface.artifact_inventory);
     assert.equal(response.product_entry_surface.session_continuity.entry_session_id, 'session-federated');
     assert.equal(response.product_entry_surface.session_continuity.restore_point.latest_handle, response.summary.target_handle);
     assertRuntimeLoopClosureShape(response.product_entry_surface, {
@@ -866,9 +883,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         manifest.runtime_loop_closure.resume_point.resume_command_template,
         'redcube product session --entry-session-id <entry-session-id>',
       );
+      assert.equal(manifest.runtime_loop_closure.continuity_cursor.surface_ref, '/session_continuity');
       assert.equal(manifest.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
       assert.equal(manifest.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
       assert.equal(manifest.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
+      assert.equal(manifest.runtime_loop_closure.control_policy.gate_status, 'requested');
       assert.equal(manifest.runtime_loop_closure.source_linkage.current_source, 'manifest');
       assert.equal(manifest.runtime_loop_closure.source_linkage.entry_mode, 'manifest_projection');
       assert.equal(manifest.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
@@ -904,6 +923,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(frontdesk.product_entry_start.modes[2].mode_id, 'opl_bridge_handoff');
     assert.equal(frontdesk.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.deepEqual(frontdesk.product_entry_start, manifest.product_entry_start);
+    assert.equal(frontdesk.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(frontdesk.runtime_loop_closure.source_linkage.current_source, 'frontdesk');
+    assert.equal(frontdesk.runtime_loop_closure.source_linkage.entry_mode, 'frontdesk_projection');
     assert.equal(
       frontdesk.product_entry_overview.resume_surface.command,
       'redcube product session --entry-session-id <entry-session-id>',
@@ -942,6 +964,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(preflight.target_domain_id, 'redcube_ai');
     assert.equal(preflight.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(preflight.ready_to_try_now, true);
+    assert.equal(preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
+    assert.equal(preflight.runtime_loop_closure.source_linkage.entry_mode, 'preflight_projection');
     assert.equal(
       preflight.recommended_check_command,
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
@@ -951,6 +976,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube product frontdesk --workspace-root ${workspaceRoot}`,
     );
     assert.deepEqual(preflight.blocking_check_ids, []);
+    assert.equal(manifest.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(manifest.product_entry_preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
   });
 });
 
@@ -973,6 +1000,9 @@ test('getProductStart exposes the same direct-entry start companion as the manif
       start.modes[0].command,
       `redcube product frontdesk --workspace-root ${workspaceRoot}`,
     );
+    assert.equal(start.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(start.runtime_loop_closure.source_linkage.current_source, 'start');
+    assert.equal(start.runtime_loop_closure.source_linkage.entry_mode, 'start_projection');
     assert.equal(start.resume_surface.surface_kind, 'product_entry_session');
     assert.deepEqual(start.human_gate_ids, ['redcube_operator_review_gate']);
   });

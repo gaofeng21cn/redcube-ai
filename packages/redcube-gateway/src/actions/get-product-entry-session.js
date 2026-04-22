@@ -137,6 +137,7 @@ export async function getProductEntrySession(request) {
       entry_session_id: entrySessionId,
       deliverable_id: session.deliverable_id,
       latest_handle: session.latest_managed_run_id || session.latest_run_id || null,
+      target_handle: session.latest_managed_run_id || session.latest_run_id || null,
     },
   };
 }

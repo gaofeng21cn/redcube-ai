@@ -572,6 +572,7 @@ export async function getProductEntryManifest(request) {
       recommended_start_command: productEntryPreflight.recommended_start_command,
       blocking_check_ids: productEntryPreflight.blocking_check_ids,
       checks: productEntryPreflight.checks,
+      runtime_loop_closure: productEntryPreflight.runtime_loop_closure,
     },
     product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,

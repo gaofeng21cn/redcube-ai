@@ -94,11 +94,15 @@ export async function invokeFederatedProductEntry(request) {
     return_surface_contract: returnSurfaceContract,
     family_orchestration: productEntrySurface.family_orchestration,
     product_entry_surface: productEntrySurface,
+    session_continuity: productEntrySurface.session_continuity,
+    progress_projection: productEntrySurface.progress_projection,
+    artifact_inventory: productEntrySurface.artifact_inventory,
     runtime_loop_closure: productEntrySurface.runtime_loop_closure,
     summary: {
       entry_session_id: productEntrySurface.summary?.entry_session_id || null,
       actual_surface_kind: productEntrySurface.surface_kind,
       target_handle: productEntrySurface.summary?.target_handle || null,
+      latest_handle: productEntrySurface.summary?.latest_handle || productEntrySurface.summary?.target_handle || null,
     },
   };
 }
