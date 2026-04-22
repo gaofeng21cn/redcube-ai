@@ -11,6 +11,11 @@ import {
 import { getManagedRun } from './get-managed-run.js';
 import { getPublicationProjection } from './get-publication-projection.js';
 import { getReviewState } from './get-review-state.js';
+import {
+  buildArtifactInventorySurface,
+  buildProgressProjectionSurface,
+  buildSessionContinuitySurface,
+} from './product-entry-continuity-surfaces.js';
 
 const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
 
@@ -64,6 +69,24 @@ export async function getProductEntrySession(request) {
   const familyOrchestration = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot,
   });
+  const sessionContinuity = buildSessionContinuitySurface({
+    entrySessionId,
+    sessionFile: productEntrySessionFile(entrySessionId),
+    runtimeOwner: session.runtime_owner,
+    deliveryIdentity: {
+      deliverable_family: session.deliverable_family,
+      topic_id: session.topic_id,
+      deliverable_id: session.deliverable_id,
+      profile_id: session.profile_id || null,
+    },
+    continuationSnapshot,
+  });
+  const progressProjection = buildProgressProjectionSurface({ continuationSnapshot });
+  const artifactInventory = buildArtifactInventorySurface({
+    entrySessionId,
+    sessionFile: productEntrySessionFile(entrySessionId),
+    continuationSnapshot,
+  });
 
   return {
     ok: true,
@@ -89,6 +112,9 @@ export async function getProductEntrySession(request) {
         },
     }),
     continuation_snapshot: continuationSnapshot,
+    session_continuity: sessionContinuity,
+    progress_projection: progressProjection,
+    artifact_inventory: artifactInventory,
     review_state: reviewState,
     publication_projection: publicationProjection,
     family_orchestration: familyOrchestration,

@@ -16,6 +16,11 @@ import { getDeliverable } from './get-deliverable.js';
 import { getPublicationProjection } from './get-publication-projection.js';
 import { getReviewState } from './get-review-state.js';
 import { invokeDomainEntry } from './invoke-domain-entry.js';
+import {
+  buildArtifactInventorySurface,
+  buildProgressProjectionSurface,
+  buildSessionContinuitySurface,
+} from './product-entry-continuity-surfaces.js';
 
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
@@ -251,6 +256,24 @@ export async function invokeProductEntry(request) {
       continuationSnapshot,
     }),
   });
+  const sessionContinuity = buildSessionContinuitySurface({
+    entrySessionId: entrySession.entrySessionId,
+    sessionFile: persisted.file,
+    runtimeOwner: MANAGED_RUNTIME_OWNER,
+    deliveryIdentity: {
+      deliverable_family: resolvedIdentity.deliverableFamily,
+      topic_id: resolvedIdentity.topicId,
+      deliverable_id: resolvedIdentity.deliverableId,
+      profile_id: resolvedIdentity.profileId || null,
+    },
+    continuationSnapshot,
+  });
+  const progressProjection = buildProgressProjectionSurface({ continuationSnapshot });
+  const artifactInventory = buildArtifactInventorySurface({
+    entrySessionId: entrySession.entrySessionId,
+    sessionFile: persisted.file,
+    continuationSnapshot,
+  });
   const reviewState = await getReviewState({
     workspaceRoot,
     topicId,
@@ -272,7 +295,7 @@ export async function invokeProductEntry(request) {
     entry_session: buildEntrySessionSurface({
       entry_session_id: entrySession.entrySessionId,
       session_file: persisted.file,
-      resumed_from_session: existingSession !== null,
+      resumed_from_session: existingSession != null,
       created_deliverable: createdDeliverable,
       runtime_owner: MANAGED_RUNTIME_OWNER,
     }),
@@ -289,6 +312,9 @@ export async function invokeProductEntry(request) {
     }),
     domain_entry_surface: domainEntrySurface,
     continuation_snapshot: continuationSnapshot,
+    session_continuity: sessionContinuity,
+    progress_projection: progressProjection,
+    artifact_inventory: artifactInventory,
     review_state: reviewState,
     publication_projection: publicationProjection,
     family_orchestration: familyOrchestration,

@@ -39,22 +39,30 @@ function normalizeEntryMode(request) {
 
 function normalizeRuntimeSessionContract(request) {
   const contract = request?.runtime_session_contract || request?.runtimeSessionContract || {};
+  const runtimeOwner = requireField(
+    'runtime_session_contract.runtime_owner',
+    contract?.runtime_owner || contract?.runtimeOwner,
+  );
+  if (runtimeOwner !== MANAGED_RUNTIME_OWNER) {
+    throw new Error(`runtime_session_contract.runtime_owner 必须为 ${MANAGED_RUNTIME_OWNER}`);
+  }
   return buildRuntimeSessionContract({
-    runtime_owner: requireField(
-      'runtime_session_contract.runtime_owner',
-      contract?.runtime_owner || contract?.runtimeOwner,
-    ),
+    runtime_owner: runtimeOwner,
     expected_runtime_owner: MANAGED_RUNTIME_OWNER,
   });
 }
 
 function normalizeReturnSurfaceContract(request) {
   const contract = request?.return_surface_contract || request?.returnSurfaceContract || {};
+  const requestedSurfaceKind = requireField(
+    'return_surface_contract.surface_kind',
+    contract?.surface_kind || contract?.surfaceKind,
+  );
+  if (requestedSurfaceKind !== 'product_entry') {
+    throw new Error('return_surface_contract.surface_kind 必须为 product_entry');
+  }
   return buildReturnSurfaceContract({
-    requested_surface_kind: requireField(
-      'return_surface_contract.surface_kind',
-      contract?.surface_kind || contract?.surfaceKind,
-    ),
+    requested_surface_kind: requestedSurfaceKind,
     expected_surface_kind: 'product_entry',
     actual_surface_kind: 'product_entry',
   });

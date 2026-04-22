@@ -347,6 +347,55 @@ export interface ProductEntryPreflightCompanion {
   checks: ProductEntryPreflightCheck[];
 }
 
+export interface ProductEntryRestorePoint {
+  latest_handle: string | null;
+  latest_managed_run_id: string | null;
+  latest_run_id: string | null;
+}
+
+export interface SessionContinuitySurface {
+  surface_kind: 'session_continuity';
+  entry_session_id: string;
+  session_file: string;
+  runtime_owner: string;
+  delivery_identity: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    profile_id: string | null;
+  };
+  restore_point: ProductEntryRestorePoint;
+  summary: {
+    entry_session_id: string;
+    latest_handle: string | null;
+  };
+}
+
+export interface ProgressProjectionSurface {
+  surface_kind: 'progress_projection';
+  managed_run_id: string | null;
+  projection: ManagedRunProjection;
+  refs: ManagedRuntimeSupervision['refs'] | null;
+  summary: {
+    current_stage: string | null;
+    content_status: ManagedRunProjection['content_status'] | null;
+    needs_user_decision: boolean;
+  };
+}
+
+export interface ArtifactInventorySurface {
+  surface_kind: 'artifact_inventory';
+  entry_session_id: string;
+  session_file: string;
+  restore_point: ProductEntryRestorePoint;
+  artifact_refs: string[];
+  refs: ManagedRuntimeSupervision['refs'] | null;
+  summary: {
+    latest_handle: string | null;
+    artifact_ref_count: number;
+  };
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -369,6 +418,9 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
     managed_progress_projection: ManagedRunProjection | null;
     runtime_supervision: ManagedRuntimeSupervision | null;
   };
+  session_continuity: SessionContinuitySurface;
+  progress_projection: ProgressProjectionSurface | null;
+  artifact_inventory: ArtifactInventorySurface;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
   family_orchestration: FamilyOrchestrationCompanion;
@@ -434,6 +486,9 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
     managed_progress_projection: ManagedRunProjection | null;
     runtime_supervision: ManagedRuntimeSupervision | null;
   };
+  session_continuity: SessionContinuitySurface;
+  progress_projection: ProgressProjectionSurface | null;
+  artifact_inventory: ArtifactInventorySurface;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
   family_orchestration: FamilyOrchestrationCompanion;
@@ -547,6 +602,119 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     product_entry_contract: string;
     federated_product_entry_contract: string;
     managed_product_entry_contract: string;
+  };
+  session_continuity: {
+    surface_kind: 'session_continuity';
+    owner: string;
+    status: string;
+    summary: string;
+    progress_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    artifact_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_field_refs: Array<{
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+    session_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    session_file_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    session_command_template: string;
+    truth_surfaces: Array<{
+      surface_kind: string;
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+  };
+  progress_projection: {
+    surface_kind: 'progress_projection';
+    owner: string;
+    status: string;
+    summary: string;
+    projection_field_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    runtime_refs_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    fallback_projection_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    fallback_runtime_refs_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    truth_surfaces: Array<{
+      surface_kind: string;
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+  };
+  artifact_inventory: {
+    surface_kind: 'artifact_inventory';
+    owner: string;
+    status: string;
+    summary: string;
+    artifact_refs_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    artifact_ref_count_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    artifact_refs_fallback_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_field_refs: Array<{
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+    session_command_template: string;
+    truth_surfaces: Array<{
+      surface_kind: string;
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
   };
   notes: string[];
 }

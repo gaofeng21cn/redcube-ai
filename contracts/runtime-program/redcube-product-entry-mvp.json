@@ -43,18 +43,21 @@
       "unsupported_target_domain"
     ]
   },
-  "response_contract": {
-    "surface_kind": "product_entry",
-    "must_include": [
-      "product_entry_contract_id",
-      "entry_session",
-      "domain_entry_surface",
-      "continuation_snapshot",
-      "review_state",
-      "publication_projection"
-    ],
-    "durable_handles": [
-      "program_id",
+    "response_contract": {
+        "surface_kind": "product_entry",
+        "must_include": [
+            "product_entry_contract_id",
+            "entry_session",
+            "domain_entry_surface",
+            "continuation_snapshot",
+            "session_continuity",
+            "progress_projection",
+            "artifact_inventory",
+            "review_state",
+            "publication_projection"
+        ],
+        "durable_handles": [
+            "program_id",
       "topic_id",
       "deliverable_id",
       "run_id"

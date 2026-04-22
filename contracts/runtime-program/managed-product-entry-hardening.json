@@ -8,29 +8,44 @@
     "cli_entry": "redcube product session",
     "mcp_tool": "get_product_entry_session"
   },
-  "session_store_contract": {
-    "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
-    "required_fields": [
-      "entry_session_id",
-      "workspace_root",
-      "deliverable_family",
-      "topic_id",
-      "deliverable_id",
-      "runtime_owner",
-      "last_task_intent",
-      "updated_at"
-    ],
-    "latest_handle_fields": [
-      "latest_managed_run_id",
-      "latest_run_id"
-    ],
-    "continuation_surfaces": [
-      "managed_progress_projection",
-      "runtime_supervision",
-      "review_state",
-      "publication_projection"
-    ]
-  },
+    "session_store_contract": {
+        "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+        "required_fields": [
+            "entry_session_id",
+            "workspace_root",
+            "deliverable_family",
+            "topic_id",
+            "deliverable_id",
+            "runtime_owner",
+            "last_task_intent",
+            "updated_at"
+        ],
+        "latest_handle_fields": [
+            "latest_managed_run_id",
+            "latest_run_id"
+        ],
+        "continuation_surfaces": [
+            "session_continuity",
+            "progress_projection",
+            "artifact_inventory",
+            "managed_progress_projection",
+            "runtime_supervision",
+            "review_state",
+            "publication_projection"
+        ],
+        "continuity_truth": {
+            "restore_point_fields": [
+                "continuation_snapshot.latest_managed_run_id",
+                "continuation_snapshot.latest_run_id",
+                "session_continuity.restore_point.latest_handle"
+            ],
+            "artifact_ref_fields": [
+                "continuation_snapshot.managed_progress_projection.final_artifact_refs",
+                "artifact_inventory.artifact_refs"
+            ],
+            "session_file_field": "entry_session.session_file"
+        }
+    },
   "behavior_contract": {
     "session_identity_scope": "one durable deliverable per entry_session_id",
     "direct_and_federated_entry_share_same_store": true,
@@ -40,13 +55,16 @@
       "session_runtime_owner_drift"
     ]
   },
-  "response_contract": {
-    "surface_kind": "product_entry_session",
-    "must_include": [
-      "entry_session",
-      "continuation_snapshot",
-      "review_state",
-      "publication_projection"
-    ]
-  }
+    "response_contract": {
+        "surface_kind": "product_entry_session",
+        "must_include": [
+            "entry_session",
+            "continuation_snapshot",
+            "session_continuity",
+            "progress_projection",
+            "artifact_inventory",
+            "review_state",
+            "publication_projection"
+        ]
+    }
 }
