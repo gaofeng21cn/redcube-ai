@@ -246,6 +246,26 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.session_continuity.surface_kind, 'session_continuity');
     assert.equal(response.session_continuity.entry_session_id, 'session-a');
     assert.equal(response.summary.latest_handle, response.summary.target_handle);
+    assert.equal(
+      response.summary.approval_required,
+      response.runtime_loop_closure.control_policy.approval_required,
+    );
+    assert.equal(
+      response.summary.gate_status,
+      response.runtime_loop_closure.control_policy.gate_status,
+    );
+    assert.equal(
+      response.summary.resume_command,
+      response.runtime_loop_closure.control_policy.continue_action.command,
+    );
+    assert.equal(
+      response.summary.session_locator_field,
+      response.family_orchestration.resume_contract.session_locator_field,
+    );
+    assert.equal(
+      response.summary.checkpoint_locator_field,
+      response.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
     assert.equal(response.session_continuity.restore_point.latest_handle, response.summary.target_handle);
     assert.equal(
       response.session_continuity.restore_point.latest_managed_run_id,
@@ -409,6 +429,26 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.equal(session.session_continuity.surface_kind, 'session_continuity');
     assert.equal(session.session_continuity.entry_session_id, 'session-a');
     assert.equal(session.summary.target_handle, session.summary.latest_handle);
+    assert.equal(
+      session.summary.approval_required,
+      session.runtime_loop_closure.control_policy.approval_required,
+    );
+    assert.equal(
+      session.summary.gate_status,
+      session.runtime_loop_closure.control_policy.gate_status,
+    );
+    assert.equal(
+      session.summary.resume_command,
+      session.runtime_loop_closure.control_policy.continue_action.command,
+    );
+    assert.equal(
+      session.summary.session_locator_field,
+      session.family_orchestration.resume_contract.session_locator_field,
+    );
+    assert.equal(
+      session.summary.checkpoint_locator_field,
+      session.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
     assert.equal(session.session_continuity.restore_point.latest_handle, continued.summary.target_handle);
     assert.equal(session.session_continuity.restore_point.latest_managed_run_id, continued.summary.target_handle);
     assert.deepEqual(session.artifact_inventory.restore_point, session.session_continuity.restore_point);
@@ -500,9 +540,34 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     );
     assert.equal(response.product_entry_surface.surface_kind, 'product_entry');
     assert.equal(response.product_entry_surface.entry_session.entry_session_id, 'session-federated');
+    assert.deepEqual(response.entry_session, response.product_entry_surface.entry_session);
+    assert.deepEqual(response.delivery_identity, response.product_entry_surface.delivery_identity);
+    assert.deepEqual(response.continuation_snapshot, response.product_entry_surface.continuation_snapshot);
+    assert.deepEqual(response.review_state, response.product_entry_surface.review_state);
+    assert.deepEqual(response.publication_projection, response.product_entry_surface.publication_projection);
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_gateway');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.summary.latest_handle, response.summary.target_handle);
+    assert.equal(
+      response.summary.approval_required,
+      response.runtime_loop_closure.control_policy.approval_required,
+    );
+    assert.equal(
+      response.summary.gate_status,
+      response.runtime_loop_closure.control_policy.gate_status,
+    );
+    assert.equal(
+      response.summary.resume_command,
+      response.runtime_loop_closure.control_policy.continue_action.command,
+    );
+    assert.equal(
+      response.summary.session_locator_field,
+      response.family_orchestration.resume_contract.session_locator_field,
+    );
+    assert.equal(
+      response.summary.checkpoint_locator_field,
+      response.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
     assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
     assert.equal(response.session_continuity.entry_session_id, 'session-federated');
     assert.deepEqual(response.session_continuity, response.product_entry_surface.session_continuity);

@@ -339,6 +339,11 @@ export async function invokeProductEntry(request) {
       actual_surface_kind: domainEntrySurface.result_surface?.surface_kind || null,
       target_handle: continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null,
       latest_handle: continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null,
+      approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
+      gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
+      resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,
+      session_locator_field: familyOrchestration?.resume_contract?.session_locator_field || null,
+      checkpoint_locator_field: familyOrchestration?.resume_contract?.checkpoint_locator_field || null,
     },
   };
 }

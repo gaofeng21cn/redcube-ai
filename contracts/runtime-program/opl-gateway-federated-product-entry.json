@@ -43,6 +43,16 @@
       "entry_mode",
       "runtime_session_contract",
       "return_surface_contract",
+      "entry_session",
+      "delivery_identity",
+      "continuation_snapshot",
+      "session_continuity",
+      "progress_projection",
+      "artifact_inventory",
+      "review_state",
+      "publication_projection",
+      "runtime_loop_closure",
+      "summary",
       "product_entry_surface"
     ]
   }

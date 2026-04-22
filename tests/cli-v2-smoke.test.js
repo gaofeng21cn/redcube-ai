@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { execFile, execFileSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import {
@@ -19,6 +20,7 @@ import {
 } from './helpers/mock-codex-cli.js';
 
 const execFileAsync = promisify(execFile);
+const gatewayResolve = createRequire(path.resolve('packages/redcube-gateway/package.json'));
 
 function copyPackageIntoInstall(sourceDir, targetDir) {
   cpSync(sourceDir, targetDir, {
@@ -150,6 +152,16 @@ function createIsolatedCliInstall() {
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-poster-onepager'),
     path.join(gatewayNodeModulesDir, 'overlay-poster-onepager'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('contracts'),
+    path.join(installRoot, 'node_modules', 'contracts'),
+  );
+  const oplGatewaySharedDist = gatewayResolve.resolve('opl-gateway-shared/family-orchestration');
+  const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
+  copyPackageIntoInstall(
+    oplGatewaySharedPackageRoot,
+    path.join(gatewayPackagePath, 'node_modules', 'opl-gateway-shared'),
   );
 
   return {
@@ -834,7 +846,7 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
 
 test('CLI product frontdesk, product invoke, product federate, and product session proxy the product-entry service surface', async () => {
   await withMockHermesUpstreamCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
     const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-state-'));
 
@@ -853,7 +865,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         '验证 product entry 命令组。',
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file',
@@ -871,7 +883,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         workspaceRoot,
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
@@ -908,7 +920,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         workspaceRoot,
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
@@ -950,7 +962,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         'storyline',
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
@@ -965,6 +977,20 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(directParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(directParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
     assert.equal(directParsed.summary.latest_handle, directParsed.summary.target_handle);
+    assert.equal(directParsed.summary.approval_required, directParsed.runtime_loop_closure.control_policy.approval_required);
+    assert.equal(directParsed.summary.gate_status, directParsed.runtime_loop_closure.control_policy.gate_status);
+    assert.equal(
+      directParsed.summary.resume_command,
+      directParsed.runtime_loop_closure.control_policy.continue_action.command,
+    );
+    assert.equal(
+      directParsed.summary.session_locator_field,
+      directParsed.family_orchestration.resume_contract.session_locator_field,
+    );
+    assert.equal(
+      directParsed.summary.checkpoint_locator_field,
+      directParsed.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
 
     const federatedParsed = await execCliAsync(
       cliPath,
@@ -1001,7 +1027,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         'storyline',
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
@@ -1016,6 +1042,28 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(federatedParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(federatedParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
     assert.equal(federatedParsed.summary.latest_handle, federatedParsed.summary.target_handle);
+    assert.deepEqual(federatedParsed.entry_session, federatedParsed.product_entry_surface.entry_session);
+    assert.deepEqual(federatedParsed.delivery_identity, federatedParsed.product_entry_surface.delivery_identity);
+    assert.deepEqual(federatedParsed.continuation_snapshot, federatedParsed.product_entry_surface.continuation_snapshot);
+    assert.deepEqual(federatedParsed.review_state, federatedParsed.product_entry_surface.review_state);
+    assert.deepEqual(federatedParsed.publication_projection, federatedParsed.product_entry_surface.publication_projection);
+    assert.equal(
+      federatedParsed.summary.approval_required,
+      federatedParsed.runtime_loop_closure.control_policy.approval_required,
+    );
+    assert.equal(federatedParsed.summary.gate_status, federatedParsed.runtime_loop_closure.control_policy.gate_status);
+    assert.equal(
+      federatedParsed.summary.resume_command,
+      federatedParsed.runtime_loop_closure.control_policy.continue_action.command,
+    );
+    assert.equal(
+      federatedParsed.summary.session_locator_field,
+      federatedParsed.family_orchestration.resume_contract.session_locator_field,
+    );
+    assert.equal(
+      federatedParsed.summary.checkpoint_locator_field,
+      federatedParsed.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
     assert.deepEqual(federatedParsed.session_continuity, federatedParsed.product_entry_surface.session_continuity);
     assert.deepEqual(federatedParsed.progress_projection, federatedParsed.product_entry_surface.progress_projection);
     assert.deepEqual(federatedParsed.artifact_inventory, federatedParsed.product_entry_surface.artifact_inventory);
@@ -1029,7 +1077,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         'session-a',
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
@@ -1044,6 +1092,20 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(sessionParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(sessionParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
     assert.equal(sessionParsed.summary.target_handle, sessionParsed.summary.latest_handle);
+    assert.equal(sessionParsed.summary.approval_required, sessionParsed.runtime_loop_closure.control_policy.approval_required);
+    assert.equal(sessionParsed.summary.gate_status, sessionParsed.runtime_loop_closure.control_policy.gate_status);
+    assert.equal(
+      sessionParsed.summary.resume_command,
+      sessionParsed.runtime_loop_closure.control_policy.continue_action.command,
+    );
+    assert.equal(
+      sessionParsed.summary.session_locator_field,
+      sessionParsed.family_orchestration.resume_contract.session_locator_field,
+    );
+    assert.equal(
+      sessionParsed.summary.checkpoint_locator_field,
+      sessionParsed.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
 
     const manifestParsed = await execCliAsync(
       cliPath,
@@ -1054,7 +1116,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         workspaceRoot,
       ],
       {
-        cwd: path.resolve('.'),
+        cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,

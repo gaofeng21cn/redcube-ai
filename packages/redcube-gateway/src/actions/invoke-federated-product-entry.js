@@ -93,16 +93,35 @@ export async function invokeFederatedProductEntry(request) {
     runtime_session_contract: runtimeSessionContract,
     return_surface_contract: returnSurfaceContract,
     family_orchestration: productEntrySurface.family_orchestration,
+    entry_session: productEntrySurface.entry_session,
+    delivery_identity: productEntrySurface.delivery_identity,
     product_entry_surface: productEntrySurface,
+    continuation_snapshot: productEntrySurface.continuation_snapshot,
     session_continuity: productEntrySurface.session_continuity,
     progress_projection: productEntrySurface.progress_projection,
     artifact_inventory: productEntrySurface.artifact_inventory,
     runtime_loop_closure: productEntrySurface.runtime_loop_closure,
+    review_state: productEntrySurface.review_state,
+    publication_projection: productEntrySurface.publication_projection,
     summary: {
       entry_session_id: productEntrySurface.summary?.entry_session_id || null,
       actual_surface_kind: productEntrySurface.surface_kind,
       target_handle: productEntrySurface.summary?.target_handle || null,
       latest_handle: productEntrySurface.summary?.latest_handle || productEntrySurface.summary?.target_handle || null,
+      approval_required: productEntrySurface.summary?.approval_required
+        ?? Boolean(productEntrySurface.runtime_loop_closure?.control_policy?.approval_required),
+      gate_status: productEntrySurface.summary?.gate_status
+        || productEntrySurface.runtime_loop_closure?.control_policy?.gate_status
+        || null,
+      resume_command: productEntrySurface.summary?.resume_command
+        || productEntrySurface.runtime_loop_closure?.control_policy?.continue_action?.command
+        || null,
+      session_locator_field: productEntrySurface.summary?.session_locator_field
+        || productEntrySurface.family_orchestration?.resume_contract?.session_locator_field
+        || null,
+      checkpoint_locator_field: productEntrySurface.summary?.checkpoint_locator_field
+        || productEntrySurface.family_orchestration?.resume_contract?.checkpoint_locator_field
+        || null,
     },
   };
 }
