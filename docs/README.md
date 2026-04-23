@@ -5,8 +5,8 @@
 This directory is the technical reading layer for `RedCube AI`.
 The current public reading path is anchored on two repo-verified routes:
 
-- direct route: `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- federated route: `User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- direct route: `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- federated route: `User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## Start Here By Audience
 
@@ -18,9 +18,9 @@ The current public reading path is anchored on two repo-verified routes:
 
 ## Current Baseline
 
-- `Hermes-Agent` is the upstream managed runtime owner for session, run, watch, and resume.
-- `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, and the repo-verified product-entry service surface.
+- `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the repo-verified product-entry service surface, and the stable callable surface built from `CLI`, `MCP`, local scripts, and repo-tracked contracts.
 - `Codex CLI` remains the default concrete executor selected behind the executor-adapter contract for local operator workflows.
+- Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.
 - `OPL` joins through the federated handoff surface when family-level routing is needed.
 
 ## Technical Working Set

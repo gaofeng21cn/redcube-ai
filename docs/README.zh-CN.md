@@ -5,8 +5,8 @@
 这个目录是 `RedCube AI` 的技术阅读层。
 当前公开阅读路径围绕两条 repo-verified 路线展开：
 
-- direct route：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- federated route：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- federated route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## 按读者类型进入
 
@@ -18,9 +18,9 @@
 
 ## 当前基线
 
-- `Hermes-Agent` 是 session、run、watch、resume 这层的上游 managed runtime owner。
-- `RedCube AI` 持有 visual-domain truth、`invokeDomainEntry`，以及 repo-verified 的 product-entry service surface。
+- `RedCube AI` 持有 visual-domain truth、`invokeDomainEntry`、repo-verified 的 product-entry service surface，以及由 `CLI`、`MCP`、本地脚本与 repo-tracked contract 组成的稳定可调用面。
 - `Codex CLI` 继续作为 executor-adapter 合同后面的默认 concrete executor，服务本地 operator 工作流。
+- `Hermes-Agent` 这类 hosted runtime carrier 只保留在显式 opt-in backend/proof lane 或技术参考层，不改写默认公开合同。
 - `OPL` 在需要 family-level routing 时通过 federated handoff surface 进入。
 
 ## 技术工作集

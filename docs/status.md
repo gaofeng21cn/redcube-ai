@@ -4,9 +4,9 @@
 
 - 对外定位：`RedCube AI` 是独立 visual-deliverable domain agent，可 direct 调用，也可被 `OPL` 或其他通用 agent federated 调用
 - formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
-- repo-verified direct route：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- repo-verified federated route：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- runtime owner split：`Hermes-Agent` 持有 managed runtime，`RedCube AI` 持有 visual-domain truth，`Codex CLI` 继续作为 executor adapter 选中的默认 concrete executor
+- repo-verified direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- repo-verified federated route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- 默认公开能力面：`RedCube AI` 持有稳定 capability surface 与 visual-domain truth，`Codex CLI` 继续作为 executor adapter 选中的默认 concrete executor；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现
 - OPL boundary：`OPL` 只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 
 ## 当前执行口径
@@ -15,6 +15,7 @@
 - federated OPL handoff surface：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
 - shared service-safe domain entry：`invokeDomainEntry`、`invoke_domain_entry`
 - direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
+- 稳定可调用面：`CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本，以及这些 surface 对应的 repo-tracked contracts
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
 ## 当前验证口径

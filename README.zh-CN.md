@@ -57,6 +57,7 @@
 ## 当前边界
 
 - `RedCube AI` 是独立的 visual-deliverable domain agent，可被 `Codex`、`OPL` 或其他通用 agent 直接调用。
+- 它对外稳定暴露的 callable surface 是本地 CLI、MCP/product-entry commands、本地脚本与 repo-tracked contract，方便 `Codex` 或 `OPL` skill activation 直接调用。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。
 - repo-verified 的 direct route 与 OPL federated route 都收敛到同一个下游 RedCube domain-agent entry（`invokeDomainEntry` service-safe surface）。
 - `OPL` 只保留 family-level 的 session/runtime/projection 编排与 shared modules/contracts/indexes，不替代 RedCube 的 domain truth ownership。
@@ -74,9 +75,9 @@
 <details>
   <summary><strong>如果你准备把这个仓直接交给 Codex 或其他 Agent，先看这里</strong></summary>
 
-- 先读 [文档索引](./docs/README.zh-CN.md)。这里已经说明 direct route、OPL federated route，以及当前技术基线。
+- 先读 [文档索引](./docs/README.zh-CN.md)。这里已经说明 direct route、OPL federated route、稳定 capability surface，以及当前技术基线。
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
-- 当前 repo-verified public entry surfaces 是 `CLI` 和 `MCP`，`controller` 继续只是内部控制面；本地默认 concrete executor 仍是 `Codex CLI`。
+- 当前 repo-verified public entry surfaces 是 `CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contract，就构成了稳定可调用面。本地默认 concrete executor 仍是 `Codex CLI`，hosted/proof backend 继续只在显式 opt-in lane 中出现。
 - hosted quality lane 固定跑 `npm run typecheck`、`npm run test:fast`、`npm run test:family` 和 `npm run test:meta`；family shared pin 检查必须继续通过 `scripts/run-test-group-lib.mjs` 保持 clean-clone 可运行。
 - 本地 `npm run test:integration`、`npm run test:e2e` 和 `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发。
 - `docs/program/` 用来读已经吸收进主线的阶段里程碑，`docs/references/` 用来读 bridge 和 provenance 材料；Agent 不需要先从零散实现文件里反推当前执行真相。

@@ -1,5 +1,13 @@
 # RedCube AI 关键决策
 
+## 2026-04-23
+
+### 决策：默认公开能力面收口为稳定 capability surface
+
+- `RedCube AI` 对外默认合同优先冻结为 `CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contracts 这一组稳定 callable surface。
+- `Codex CLI` 继续作为默认 concrete executor。
+- `Hermes-Agent` 相关路径只保留为显式 hosted/proof backend 或技术参考，不改写默认公开合同。
+
 ## 2026-04-11
 
 ### 决策：采用核心五件套文档骨架

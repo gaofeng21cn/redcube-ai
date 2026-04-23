@@ -19,8 +19,8 @@
 ## 目标优先级
 
 - 一旦新的 runtime substrate 目标已经明确，新增投入默认服务目标形态，而不是继续深磨已放弃的旧宿主路线。
-- 当前可运行的 `Codex-default host-agent runtime` 是 repo-verified baseline，但它只能作为迁移桥、兼容层或回归基线存在，不应再被误写为长期产品终态。
-- 历史 `repo-local managed runtime pilot` 也是本地迁移形态，不得被误写成当前 runtime owner；当前 route / managed run owner 已是上游 `Hermes-Agent`。
+- 当前默认公开 capability contract 固定为 `CLI / MCP / product-entry/service-safe-domain-entry surface + Codex-default execution`；hosted runtime carrier 只允许作为显式可选 backend/proof lane。
+- 历史 `repo-local managed runtime pilot` 也是本地迁移形态，不得被误写成当前 runtime owner；`Hermes-Agent` 相关路径也不得被误写成默认公开合同。
 - 如果当前基线与长线目标并存，必须在 `docs/status.md` 与 `docs/README*` 中显式拆开。
 
 ## 文档治理

@@ -6,8 +6,8 @@
 
 当前 repo-verified 的两条主链路已经收口到同一条下游 service-safe surface：
 
-- direct route：`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
-- federated route：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+- direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- federated route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 两条路线在进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
 
@@ -15,9 +15,9 @@
 
 当前仓内可执行的 runtime 基线按三层 owner 收口：
 
-- `Hermes-Agent` 持有长期运行、托管 session/run/watch/resume 这层 managed runtime owner
-- `RedCube AI` 维护 visual-domain truth、本地 canonical artifacts，以及 audit / review / projection surface
+- `RedCube AI` 维护 visual-domain truth、本地 canonical artifacts、稳定 capability surface，以及 audit / review / projection surface
 - 默认 concrete executor 继续由 `Codex CLI` 通过统一 executor-adapter contract 被选择
+- `Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现
 
 ## 入口 taxonomy 与 OPL handoff
 
@@ -34,11 +34,11 @@
 
 已经冻结的 direct domain 级链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -59,11 +59,11 @@
 
 当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 与之对应的 direct domain 路线则是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 这里的关键约束是：
 
@@ -74,7 +74,7 @@
 
 ## Hermes-Agent、RedCube AI 与 concrete executor 的分工
 
-`Hermes-Agent` 在 `RedCube AI` 当前主线里的职责是：
+`Hermes-Agent` 在 `RedCube AI` 当前主线里只作为显式 hosted/proof backend 或技术参考载体；启用时可承担：
 
 - session / run / watch / memory / scheduling
 - gateway / messaging / interrupt / resume
@@ -123,8 +123,7 @@
 
 更准确的目标是：
 
-- 由 `Hermes-Agent` 统一长期 route / managed-runtime ownership
-- 由 `RedCube AI` 统一 visual-domain truth
+- 由 `RedCube AI` 统一稳定 capability surface 与 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-native` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
 
 ## Service-Safe Domain Entry

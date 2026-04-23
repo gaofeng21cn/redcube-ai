@@ -9,7 +9,7 @@
 当前保留的 repo-tracked machine-readable mainline truth：
 
 - `runtime-program/current-program.json`：当前 active mainline pointer
-- `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 最终目标形态冻结件（direct/federated 共用同一下游 domain entry）
+- `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct/federated 共用同一下游 domain entry）
 - `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
 - `runtime-program/opl-gateway-federated-product-entry.json`：当前 OPL federation handoff 冻结件
 - `runtime-program/managed-product-entry-hardening.json`：当前 product-entry session continuity 冻结件
