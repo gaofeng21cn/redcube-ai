@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { planManagedDeliverableDag } from '../packages/redcube-runtime/src/index.js';
+import { planManagedDeliverableDag, executeManagedDagLayers } from '../packages/redcube-runtime/src/index.js';
 
 test('managed DAG scheduler exposes dependency layers for a single deliverable without relaxing stage order', () => {
   const plan = planManagedDeliverableDag({
@@ -85,4 +85,36 @@ test('managed DAG scheduler rejects missing dependencies instead of silently dro
     }),
     /Missing DAG dependency/,
   );
+});
+
+test('managed DAG layer executor runs same-layer tasks concurrently and preserves dependency order', async () => {
+  const plan = planManagedDeliverableDag({
+    sourcePackId: 'topic-a/source-pack',
+    deliverables: [
+      { overlay: 'ppt_deck', topicId: 'topic-a', deliverableId: 'deck-a', stages: [{ stage_id: 'storyline' }] },
+      { overlay: 'xiaohongshu', topicId: 'topic-a', deliverableId: 'note-a', stages: [{ stage_id: 'storyline' }] },
+    ],
+  });
+  const timeline = [];
+  const result = await executeManagedDagLayers({
+    plan,
+    executeTask: async (task) => {
+      timeline.push(`start:${task.task_id}`);
+      if (task.task_kind === 'deliverable_route') {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+      timeline.push(`end:${task.task_id}`);
+      return { ok: true, task_id: task.task_id };
+    },
+  });
+
+  assert.equal(result.execution_kind, 'managed_dag_layer_execution');
+  assert.equal(result.layer_results.length, 2);
+  assert.deepEqual(result.layer_results[1].task_results.map((item) => item.task_id).sort(), [
+    'ppt_deck:deck-a:storyline',
+    'xiaohongshu:note-a:storyline',
+  ]);
+  assert.equal(timeline.indexOf('end:source_pack:topic-a/source-pack') < timeline.indexOf('start:ppt_deck:deck-a:storyline'), true);
+  assert.equal(timeline.indexOf('start:ppt_deck:deck-a:storyline') < timeline.indexOf('end:xiaohongshu:note-a:storyline'), true);
+  assert.equal(timeline.indexOf('start:xiaohongshu:note-a:storyline') < timeline.indexOf('end:ppt_deck:deck-a:storyline'), true);
 });

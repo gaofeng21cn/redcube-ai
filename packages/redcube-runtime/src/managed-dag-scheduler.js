@@ -115,3 +115,43 @@ export function planManagedDeliverableDag({
     },
   };
 }
+
+export async function executeManagedDagLayers({
+  plan,
+  executeTask,
+} = {}) {
+  if (typeof executeTask !== 'function') {
+    throw new Error('executeManagedDagLayers requires executeTask');
+  }
+  const layerResults = [];
+  for (const layer of safeArray(plan?.layers)) {
+    const taskResults = await Promise.all(safeArray(layer.tasks).map(async (task) => {
+      const result = await executeTask(task);
+      return {
+        task_id: task.task_id,
+        task_kind: task.task_kind,
+        ok: result?.ok !== false,
+        result,
+      };
+    }));
+    layerResults.push({
+      layer_index: layer.layer_index,
+      task_results: taskResults,
+      ok: taskResults.every((result) => result.ok),
+    });
+    if (!layerResults.at(-1).ok) {
+      return {
+        execution_kind: 'managed_dag_layer_execution',
+        ok: false,
+        layer_results: layerResults,
+        failed_layer_index: layer.layer_index,
+      };
+    }
+  }
+  return {
+    execution_kind: 'managed_dag_layer_execution',
+    ok: true,
+    layer_results: layerResults,
+    failed_layer_index: null,
+  };
+}
