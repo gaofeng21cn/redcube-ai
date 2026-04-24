@@ -1,5 +1,6 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 
 export function createXiaohongshuDeliveryParts(deps) {
   const {
@@ -223,6 +224,56 @@ export function createXiaohongshuDeliveryParts(deps) {
     };
   }
 
+  function hashFileIfPresent(hash, file) {
+    const resolvedFile = safeText(file);
+    hash.update(resolvedFile);
+    hash.update('\n');
+    if (resolvedFile && existsSync(resolvedFile)) {
+      hash.update(readFileSync(resolvedFile));
+    }
+    hash.update('\n');
+  }
+
+  function hashExportPreviewInput({ stableHtmlFile, review }) {
+    const hash = createHash('sha256');
+    hash.update('xiaohongshu_export_preview:v1\n');
+    hashFileIfPresent(hash, stableHtmlFile);
+    hash.update('pages\n');
+    for (const slide of safeArray(review?.slide_reviews)) {
+      hash.update(safeText(slide?.slide_id));
+      hash.update('\n');
+      hashFileIfPresent(hash, slide?.screenshot_file);
+      hash.update(JSON.stringify(slide?.metrics || {}));
+      hash.update('\n');
+    }
+    return hash.digest('hex');
+  }
+
+  function exportPreviewCacheMetadata(cacheStatus, hash) {
+    return {
+      cache_status: cacheStatus,
+      hash,
+      freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
+    };
+  }
+
+  function exportPreviewMetricsFromReview(review) {
+    const pageReviews = safeArray(review?.slide_reviews);
+    return {
+      page_count: pageReviews.length,
+      reviewed_page_count: pageReviews.length,
+      occupied_ratio_avg: Number((pageReviews.reduce((sum, slide) => sum + Number(slide?.metrics?.occupied_ratio || 0), 0) / Math.max(pageReviews.length, 1)).toFixed(4)),
+      checks: review?.checks || {},
+    };
+  }
+
+  function cachedExportPreview(priorArtifact, hash) {
+    if (safeText(priorArtifact?.export_bundle?.preview_cache?.hash) !== hash) return null;
+    const metrics = priorArtifact?.export_bundle?.preview_metrics;
+    if (!metrics || typeof metrics !== 'object') return null;
+    return metrics;
+  }
+
   function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const review = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     const copy = readStageArtifact(contract, deliverablePaths, 'publish_copy');
@@ -239,6 +290,10 @@ export function createXiaohongshuDeliveryParts(deps) {
     const publishReadmeFile = publishPaths.publishReadmeFile;
     const pngFiles = safeArray(review?.slide_reviews).map((slide) => slide.screenshot_file);
     const manifestFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}-publish-manifest.json`);
+    const previewHash = hashExportPreviewInput({ stableHtmlFile, review });
+    const cachedPreviewMetrics = cachedExportPreview(readStageArtifact(contract, deliverablePaths, 'export_bundle'), previewHash);
+    const previewCacheStatus = cachedPreviewMetrics ? 'hit' : 'miss';
+    const previewMetrics = cachedPreviewMetrics || exportPreviewMetricsFromReview(review);
     const publishPngFiles = pngFiles
       .map((file) => copySurfaceFile(file, path.join(publishScreenshotsDir, path.basename(file))))
       .filter(Boolean);
@@ -254,6 +309,8 @@ export function createXiaohongshuDeliveryParts(deps) {
       publish_caption_file: publishCaptionFile,
       publish_png_files: publishPngFiles,
       author_signature: copy.publish_copy.author_signature || null,
+      preview_cache: exportPreviewCacheMetadata(previewCacheStatus, previewHash),
+      preview_metrics: previewMetrics,
       delivery_state: {
         current: 'output_ready',
         next: 'published_pending_human',

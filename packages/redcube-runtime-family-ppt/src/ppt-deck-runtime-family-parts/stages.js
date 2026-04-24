@@ -220,6 +220,63 @@ export function createPptDeckStageParts(deps) {
     };
   }
 
+  function hashFileIfPresent(hash, file) {
+    const resolvedFile = safeText(file);
+    hash.update(resolvedFile);
+    hash.update('\n');
+    if (resolvedFile && (mainExistsSync || existsSync)(resolvedFile)) {
+      hash.update(readFileSync(resolvedFile));
+    }
+    hash.update('\n');
+  }
+
+  function hashExportPreviewInput({ stableViewHtmlFile, reviewArtifact }) {
+    const hash = createHash('sha256');
+    hash.update('ppt_deck_export_preview:v1\n');
+    hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
+    hashFileIfPresent(hash, stableViewHtmlFile);
+    hash.update('screenshots\n');
+    for (const slide of safeArray(reviewArtifact?.slide_reviews)) {
+      hash.update(safeText(slide?.slide_id));
+      hash.update('\n');
+      hashFileIfPresent(hash, slide?.screenshot_file);
+      hash.update(JSON.stringify(slide?.metrics || {}));
+      hash.update('\n');
+    }
+    return hash.digest('hex');
+  }
+
+  function exportPreviewCacheMetadata(cacheStatus, hash) {
+    return {
+      cache_status: cacheStatus,
+      hash,
+      freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
+    };
+  }
+
+  function exportPreviewMetricsFromPayload({ exportPayload, renderArtifact, reviewArtifact }) {
+    return {
+      page_count: Number(exportPayload?.page_count || 0),
+      render_page_count: Number(renderArtifact?.html_bundle?.page_count || 0),
+      reviewed_page_count: safeArray(reviewArtifact?.slide_reviews).length,
+      page_count_match: Number(exportPayload?.page_count || 0) === Number(renderArtifact?.html_bundle?.page_count || 0),
+    };
+  }
+
+  function cachedExportPreview(priorArtifact, hash) {
+    if (safeText(priorArtifact?.export_bundle?.preview_cache?.hash) !== hash) return null;
+    const pptxFile = safeText(priorArtifact?.export_bundle?.pptx_file);
+    const pdfFile = safeText(priorArtifact?.export_bundle?.pdf_file);
+    if (!pptxFile || !(mainExistsSync || existsSync)(pptxFile)) return null;
+    if (pdfFile && !(mainExistsSync || existsSync)(pdfFile)) return null;
+    const metrics = priorArtifact?.export_bundle?.preview_metrics;
+    if (!metrics || typeof metrics !== 'object') return null;
+    return {
+      page_count: Number(metrics.page_count || 0),
+      metrics,
+    };
+  }
+
   function computeSlideReview(page, blueprintSlide, maxPrimaryPoints) {
     const metrics = {
       text_char_count: Number(page.text_chars || page.metrics?.text_char_count || 0),
@@ -829,18 +886,23 @@ export function createPptDeckStageParts(deps) {
     if (!(mainExistsSync || existsSync)(screenshotsDir)) {
       throw new Error(`Reviewed screenshot capture directory not found: ${screenshotsDir}`);
     }
-    const python = runPython(PYTHON_EXPORT, [
+    const stableViewHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
+    if (!(mainExistsSync || existsSync)(stableViewHtmlFile)) {
+      throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
+    }
+    const previewHash = hashExportPreviewInput({ stableViewHtmlFile, reviewArtifact });
+    const priorExportArtifact = readStageArtifact(contract, deliverablePaths, 'export_pptx');
+    const cachedPreview = cachedExportPreview(priorExportArtifact, previewHash);
+    const previewCacheStatus = cachedPreview ? 'hit' : 'miss';
+    const python = cachedPreview ? { command: 'cache', payload: cachedPreview } : runPython(PYTHON_EXPORT, [
       '--screenshots-dir', screenshotsDir,
       '--output-pptx', pptxFile,
       '--output-pdf', pdfFile,
     ]);
     const exportPayload = python.payload;
-    const pptxPath = exportPayload.pptx_file || exportPayload.pptx_path;
-    const pdfPath = exportPayload.pdf_file || exportPayload.pdf_path;
-    const stableViewHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
-    if (!(mainExistsSync || existsSync)(stableViewHtmlFile)) {
-      throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
-    }
+    const pptxPath = cachedPreview ? (priorExportArtifact.export_bundle.pptx_file || pptxFile) : (exportPayload.pptx_file || exportPayload.pptx_path);
+    const pdfPath = cachedPreview ? (priorExportArtifact.export_bundle.pdf_file || pdfFile) : (exportPayload.pdf_file || exportPayload.pdf_path);
+    const previewMetrics = cachedPreview?.metrics || exportPreviewMetricsFromPayload({ exportPayload, renderArtifact, reviewArtifact });
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       status: 'completed',
@@ -867,7 +929,9 @@ export function createPptDeckStageParts(deps) {
           next: null,
         },
         page_count: exportPayload.page_count,
-        page_count_match: exportPayload.page_count === renderArtifact.html_bundle.page_count,
+        page_count_match: previewMetrics.page_count_match,
+        preview_cache: exportPreviewCacheMetadata(previewCacheStatus, previewHash),
+        preview_metrics: previewMetrics,
         real_conversion_invocation: {
           tool: python.command,
           script: 'packages/redcube-runtime/scripts/ppt_deck_export.py',

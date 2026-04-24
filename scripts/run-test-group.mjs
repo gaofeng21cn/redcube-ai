@@ -78,6 +78,7 @@ const INTEGRATION = [
   'tests/cli-v2-smoke.test.js',
   'tests/deliverable-review-loop.test.js',
   'tests/direct-delivery-operator-handoff.test.js',
+  'tests/export-preview-cache.test.js',
   'tests/family-parity-governance-surface.test.js',
   'tests/family-source-truth-consumption.test.js',
   'tests/gateway-actions.test.js',
