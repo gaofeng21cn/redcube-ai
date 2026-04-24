@@ -18,6 +18,8 @@
 - 第一优先级：保持 `gateway -> family -> profile -> pack -> harness execution` 的正式控制链路。
 - 第二优先级：优先 machine-readable contract、显式校验和 hydrated execution，而不是 prompt-only intent。
 - 第三优先级：在不改写 domain 语义的前提下，继续维护同一 mainline 的 absorbed tranche、follow-on board 与 provenance。
+- repo-tracked 源码与测试默认都应保持文件边界清晰，优先控制在 `1000` 行以内；超过 `1500` 行应视为明确的拆分信号，而不是继续堆叠实现。
+- 新增能力或继续重构时，优先采用稳定薄入口加 `parts/`、`cases/`、`modules/` 等子模块拆分；不要把新逻辑继续堆回单个超长文件。
 - 一旦新的 runtime substrate 目标已经明确，新增投入默认服务目标形态；旧宿主只允许作为迁移桥、兼容层或回归对照存在。
 - 不做降级处理、兜底补丁、启发式修补或“先糊住再说”式实现。
 
