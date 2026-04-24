@@ -19,6 +19,16 @@ test('ppt family runtime uses upstream structured generation directly and no lon
   assert.equal(runtime.includes('function buildRenderArtifact('), false);
 });
 
+test('ppt family runtime keeps the public route entry while heavy stage builders move into family parts', () => {
+  const runtime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
+
+  assert.equal(runtime.includes("from './ppt-deck-runtime-family-parts/index.js'"), true);
+  assert.equal(runtime.includes('export async function runPptDeckRoute('), true);
+  assert.equal(runtime.includes('async function buildRenderHtmlArtifact('), false);
+  assert.equal(runtime.includes('async function buildDirectorReview('), false);
+  assert.equal(runtime.includes('function buildExportArtifact('), false);
+});
+
 test('xiaohongshu family runtime keeps AI-first generation in runtime-family instead of pack imports', () => {
   const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
 
