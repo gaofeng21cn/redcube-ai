@@ -19,7 +19,8 @@
     "test:historical": "node scripts/run-test-group.mjs historical",
     "test:full": "node scripts/run-test-group.mjs full",
     "typecheck": "tsc --noEmit --project tsconfig.tests.json --pretty false",
-    "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs"
+    "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs",
+    "line-budget": "node scripts/line-budget.mjs"
   },
   "optionalDependencies": {
     "@mariozechner/pi-ai": "^0.54.2",

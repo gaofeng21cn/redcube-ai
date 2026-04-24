@@ -1,9 +1,9 @@
 ---
-name: redcube-ai
+name: rca
 description: Use when Codex should operate RedCube AI through its product-entry gateway, deliverable runtime, and same-session continuation contracts instead of ad-hoc repo scripting.
 ---
 
-# RedCube AI Plugin
+# RCA App Skill
 
 当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。
 

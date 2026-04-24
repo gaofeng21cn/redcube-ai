@@ -1,5 +1,5 @@
 {
-  "name": "redcube-ai",
+  "name": "rca",
   "version": "0.1.0",
   "description": "Codex plugin shell for the RedCube AI visual deliverable domain app.",
   "author": {
@@ -17,7 +17,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "RedCube AI",
+    "displayName": "RCA",
     "shortDescription": "Agent-first visual deliverable domain app for Codex.",
     "longDescription": "Adds a thin Codex plugin entry for RedCube AI while preserving the existing CLI, gateway contracts, and same-session deliverable loop surfaces.",
     "developerName": "Gao Feng",

@@ -4,10 +4,11 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
-const PLUGIN_NAME = 'redcube-ai';
-const MARKETPLACE_NAME = 'redcube-ai-local';
-const MARKETPLACE_DISPLAY_NAME = 'RedCube AI Local';
+const PLUGIN_NAME = 'rca';
+const MARKETPLACE_NAME = 'rca-local';
+const MARKETPLACE_DISPLAY_NAME = 'RCA Local';
 const PLUGIN_CATEGORY = 'Creative';
+const LEGACY_PLUGIN_NAMES = ['redcube-ai'];
 
 function resolveDefaultRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -81,6 +82,18 @@ function ensureExpectedSymlink({ linkPath, targetPath }) {
   fs.symlinkSync(targetPath, linkPath);
 }
 
+function removeLegacySymlink(targetPath) {
+  let stat;
+  try {
+    stat = fs.lstatSync(targetPath);
+  } catch {
+    return;
+  }
+  if (stat.isSymbolicLink()) {
+    fs.unlinkSync(targetPath);
+  }
+}
+
 function upsertMarketplace(marketplacePath) {
   const payload = loadJson(marketplacePath);
   const existingPlugins = Array.isArray(payload.plugins) ? payload.plugins.filter((item) => item && typeof item === 'object') : [];
@@ -99,12 +112,15 @@ function upsertMarketplace(marketplacePath) {
 
   let replaced = false;
   const plugins = existingPlugins.map((item) => {
+    if (LEGACY_PLUGIN_NAMES.includes(item.name)) {
+      return null;
+    }
     if (item.name === PLUGIN_NAME) {
       replaced = true;
       return pluginEntry;
     }
     return item;
-  });
+  }).filter(Boolean);
   if (!replaced) {
     plugins.push(pluginEntry);
   }
@@ -134,6 +150,11 @@ function installCodexPlugin({ repoRoot, home }) {
   const userPluginRoot = path.join(resolvedHome, 'plugins', PLUGIN_NAME);
   const userSkillRoot = path.join(resolvedHome, '.agents', 'skills', PLUGIN_NAME);
   const marketplacePath = path.join(resolvedHome, '.agents', 'plugins', 'marketplace.json');
+
+  for (const legacyName of LEGACY_PLUGIN_NAMES) {
+    removeLegacySymlink(path.join(resolvedHome, 'plugins', legacyName));
+    removeLegacySymlink(path.join(resolvedHome, '.agents', 'skills', legacyName));
+  }
 
   ensureExpectedSymlink({ linkPath: userPluginRoot, targetPath: repoPluginRoot });
   ensureExpectedSymlink({ linkPath: userSkillRoot, targetPath: repoSkillRoot });

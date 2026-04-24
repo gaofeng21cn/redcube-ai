@@ -37,6 +37,7 @@ const META = [
   'tests/harness-completion-audit.test.js',
   'tests/kernel-split-extraction.test.js',
   'tests/legacy-cleanup.test.js',
+  'tests/line-budget.test.js',
   'tests/llm-prompts.test.js',
   'tests/llm-runtime-config.test.js',
   'tests/overlay-registry.test.js',
