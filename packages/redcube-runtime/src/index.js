@@ -5,7 +5,7 @@ export {
 } from '@redcube/governance';
 export { appendEvent, readEvents } from './event-log.js';
 export { appendManagedEvent, readManagedEvents } from './managed-event-log.js';
-export { planCandidateRace, selectCandidateRaceWinner } from './candidate-racing.js';
+export { planCandidateRace, runCandidateRaceRoute, selectCandidateRaceWinner } from './candidate-racing.js';
 export {
   P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,

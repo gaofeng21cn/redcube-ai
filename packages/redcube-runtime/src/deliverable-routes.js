@@ -12,6 +12,7 @@ import {
 } from '@redcube/hermes-substrate';
 
 import { readCodexCliContract } from '@redcube/codex-cli-client';
+import { runCandidateRaceRoute } from './candidate-racing.js';
 import { executeDeliverableRouteLocally, validateDeliverableRouteInput } from './deliverable-route-local.js';
 import { resolveExecutorAdapter } from './executors.js';
 
@@ -86,6 +87,14 @@ function patchArtifactExecutionModel(artifactFile, executor) {
   writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
 }
 
+function candidateCountForRoute({ route, candidateCount }) {
+  const count = Number(candidateCount || 0);
+  if (Number.isInteger(count) && count > 0) return count;
+  return route === 'visual_direction' && process.env.REDCUBE_VISUAL_DIRECTION_CANDIDATES
+    ? Math.max(1, Number(process.env.REDCUBE_VISUAL_DIRECTION_CANDIDATES) || 1)
+    : 1;
+}
+
 export async function runDeliverableRoute({
   workspaceRoot,
   overlay,
@@ -97,6 +106,7 @@ export async function runDeliverableRoute({
   adapter = CODEX_DEFAULT_ADAPTER,
   mode = 'draft_new',
   baselineDeliverableId = '',
+  candidateCount = 1,
 }) {
   const safeRoute = requireSafeSegment('route', route);
   validateDeliverableRouteInput({
@@ -154,16 +164,33 @@ export async function runDeliverableRoute({
   });
 
   try {
-    const routeResult = await executeDeliverableRouteLocally({
-      workspaceRoot,
-      overlay,
-      topicId,
-      deliverableId,
+    const routeCandidateCount = candidateCountForRoute({ route: safeRoute, candidateCount });
+    const raced = await runCandidateRaceRoute({
+      family: overlay,
       route: safeRoute,
-      adapter,
-      mode,
-      baselineDeliverableId,
+      candidateCount: routeCandidateCount,
+      qualityGate: 'structured_contract_validation',
+      runCandidate: async () => executeDeliverableRouteLocally({
+        workspaceRoot,
+        overlay,
+        topicId,
+        deliverableId,
+        route: safeRoute,
+        adapter,
+        mode,
+        baselineDeliverableId,
+      }),
+      scoreCandidate: (candidate) => Number(candidate?.artifact?.visual_direction?.rhythm_curve?.length || 1),
     });
+    const routeResult = raced.artifact;
+    routeResult.artifact = {
+      ...(routeResult.artifact || {}),
+      candidate_race: raced.race,
+    };
+    writeFileSync(routeResult.artifact_file, JSON.stringify(routeResult.artifact, null, 2), 'utf-8');
+    routeResult.artifact_refs = Array.from(new Set([
+      ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
+    ]));
     patchArtifactExecutionModel(routeResult.artifact_file, executor);
     const completedRun = completeHermesRun({
       workspaceRoot,

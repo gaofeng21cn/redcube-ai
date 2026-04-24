@@ -27,6 +27,7 @@ import { appendEvent as appendEventJs, readEvents as readEventsJs } from './even
 import { appendManagedEvent as appendManagedEventJs, readManagedEvents as readManagedEventsJs } from './managed-event-log.js';
 import {
   planCandidateRace as planCandidateRaceJs,
+  runCandidateRaceRoute as runCandidateRaceRouteJs,
   selectCandidateRaceWinner as selectCandidateRaceWinnerJs,
 } from './candidate-racing.js';
 import {
@@ -160,6 +161,10 @@ export function planCandidateRace(request: Record<string, unknown>): Record<stri
 
 export function selectCandidateRaceWinner(request: Record<string, unknown>): Record<string, unknown> {
   return selectCandidateRaceWinnerJs(request) as Record<string, unknown>;
+}
+
+export async function runCandidateRaceRoute(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return runCandidateRaceRouteJs(request) as Promise<Record<string, unknown>>;
 }
 
 export const P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT

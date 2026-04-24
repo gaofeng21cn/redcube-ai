@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { planCandidateRace, selectCandidateRaceWinner } from '../packages/redcube-runtime/src/index.js';
+import { planCandidateRace, runCandidateRaceRoute, selectCandidateRaceWinner } from '../packages/redcube-runtime/src/index.js';
 
 test('candidate racing planner records parallel candidates without claiming quality gate bypass', () => {
   const plan = planCandidateRace({
@@ -45,4 +45,44 @@ test('candidate racing selector rejects all-blocked candidate sets', () => {
     }),
     /No passing candidate/,
   );
+});
+
+test('candidate racing route executes candidates in parallel and only returns a passing winner', async () => {
+  const started = [];
+  const race = await runCandidateRaceRoute({
+    family: 'xiaohongshu',
+    route: 'visual_direction',
+    candidateCount: 2,
+    qualityGate: 'structured_contract_validation',
+    async runCandidate({ candidateId }) {
+      started.push(candidateId);
+      if (candidateId.endsWith('-1')) {
+        return { status: 'block', visual_direction: { director_statement: 'blocked' } };
+      }
+      return { status: 'pass', visual_direction: { director_statement: 'stronger' } };
+    },
+    scoreCandidate(artifact) {
+      return artifact.visual_direction.director_statement === 'stronger' ? 2 : 9;
+    },
+  });
+
+  assert.equal(race.artifact.visual_direction.director_statement, 'stronger');
+  assert.equal(race.race.status, 'selected_passing_candidate');
+  assert.equal(race.race.selection.winner.candidate_id, 'visual_direction-candidate-2');
+  assert.deepEqual(started.sort(), ['visual_direction-candidate-1', 'visual_direction-candidate-2']);
+});
+
+test('candidate racing route preserves single candidate behavior without claiming reuse', async () => {
+  const race = await runCandidateRaceRoute({
+    family: 'ppt_deck',
+    route: 'visual_direction',
+    candidateCount: 1,
+    async runCandidate() {
+      return { status: 'pass', visual_direction: { director_statement: 'only candidate' } };
+    },
+  });
+
+  assert.equal(race.artifact.visual_direction.director_statement, 'only candidate');
+  assert.equal(race.race.status, 'single_candidate_passthrough');
+  assert.equal(race.race.reuse_claimed, false);
 });

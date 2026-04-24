@@ -38,9 +38,9 @@ async function runXhsChain({ workspaceRoot, deliverableId, mode = 'draft_new', b
   ];
   const results = [];
   for (const route of routes) {
-    const result = await runDeliverableRoute({ ...common, route });
-    results.push({ route, result });
-  }
+      const result = await runDeliverableRoute({ ...common, route });
+      results.push({ route, result });
+    }
   return results;
 }
 
@@ -171,6 +171,8 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
     assert.equal(plan.single_note_plan.slides.every((slide) => typeof slide.transition === 'string' && slide.transition.length > 0), true);
 
     const visual = readJson(chain[3].result.artifactFile);
+    assert.equal(visual.candidate_race.status, 'single_candidate_passthrough');
+    assert.equal(visual.candidate_race.reuse_claimed, false);
     assert.equal(typeof visual.visual_direction?.director_statement, 'string');
     assert.equal(typeof visual.visual_direction?.visual_motif, 'string');
     assert.equal(Array.isArray(visual.visual_direction?.rhythm_curve), true);

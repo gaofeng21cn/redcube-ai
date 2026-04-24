@@ -63,3 +63,62 @@ export function selectCandidateRaceWinner({ candidates = [] } = {}) {
     quality_gate_policy: 'blocked_candidates_never_win',
   };
 }
+
+export async function runCandidateRaceRoute({
+  family,
+  route,
+  candidateCount = 1,
+  qualityGate = 'structured_contract_validation',
+  runCandidate,
+  scoreCandidate = () => 1,
+} = {}) {
+  if (typeof runCandidate !== 'function') {
+    throw new Error('runCandidateRaceRoute requires runCandidate');
+  }
+  const plan = planCandidateRace({ family, route, candidateCount, qualityGate });
+  if (plan.candidate_count === 1) {
+    const artifact = await runCandidate({ candidateId: plan.candidates[0].candidate_id, candidateIndex: 0, plan });
+    return {
+      artifact,
+      race: {
+        ...plan,
+        status: 'single_candidate_passthrough',
+        selection: null,
+      },
+    };
+  }
+  const candidateResults = await Promise.all(plan.candidates.map(async (candidate, index) => {
+    try {
+      const artifact = await runCandidate({ candidateId: candidate.candidate_id, candidateIndex: index, plan });
+      return {
+        candidate_id: candidate.candidate_id,
+        gate_status: safeText(artifact?.status, 'pass') === 'block' ? 'block' : 'pass',
+        score: Number(scoreCandidate(artifact, { candidateId: candidate.candidate_id, candidateIndex: index, plan }) || 0),
+        artifact,
+      };
+    } catch (error) {
+      return {
+        candidate_id: candidate.candidate_id,
+        gate_status: 'block',
+        score: 0,
+        error: String(error instanceof Error ? error.message : error),
+      };
+    }
+  }));
+  const selection = selectCandidateRaceWinner({ candidates: candidateResults });
+  const winner = candidateResults.find((candidate) => candidate.candidate_id === selection.winner.candidate_id);
+  return {
+    artifact: winner.artifact,
+    race: {
+      ...plan,
+      status: 'selected_passing_candidate',
+      candidates: candidateResults.map((candidate) => ({
+        candidate_id: candidate.candidate_id,
+        gate_status: candidate.gate_status,
+        score: candidate.score,
+        error: candidate.error || null,
+      })),
+      selection,
+    },
+  };
+}
