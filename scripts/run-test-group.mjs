@@ -90,6 +90,7 @@ const INTEGRATION = [
   'tests/ppt-creative-ownership.test.js',
   'tests/ppt-deliverable-surface.test.js',
   'tests/ppt-hermes-generation.test.js',
+  'tests/preflight-gates.test.js',
   'tests/private-profile.test.js',
   'tests/product-entry.test.js',
   'tests/publication-projection-delivery-contract.test.js',

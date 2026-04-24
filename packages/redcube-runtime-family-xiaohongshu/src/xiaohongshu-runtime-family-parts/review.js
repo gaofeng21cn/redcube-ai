@@ -121,6 +121,71 @@ export function createXiaohongshuReviewParts(deps) {
     };
   }
 
+  function countMatches(text, pattern) {
+    return [...String(text || '').matchAll(pattern)].length;
+  }
+
+  function buildPreflightGateArtifact(contract, render) {
+    const failures = [];
+    for (const slide of safeArray(render?.html_bundle?.slides)) {
+      const slideId = safeText(slide?.slide_id);
+      const html = safeText(slide?.content);
+      const missingAnchors = [];
+      if (!/data-slide-root=(['"])true\1/.test(html)) missingAnchors.push('data-slide-root');
+      if (slideId && !new RegExp(`data-slide-id=(['"])${slideId}\\1`).test(html)) missingAnchors.push('data-slide-id');
+      if (countMatches(html, /data-qa-block=(['"])[^'"]+\1/g) < 2) missingAnchors.push('data-qa-block');
+      if (countMatches(html, /data-primary-point=(['"])true\1/g) < 1) missingAnchors.push('data-primary-point');
+      if (missingAnchors.length > 0) {
+        failures.push({
+          slide_id: slideId,
+          status: 'block',
+          missing_anchors: missingAnchors,
+          recommended_fix: 'rerun fix_html before screenshot AI review',
+        });
+      }
+    }
+    if (failures.length === 0) return null;
+    const targetSlideIds = failures.map((failure) => safeText(failure.slide_id)).filter(Boolean);
+    const checks = {
+      html_review_anchors_ok: false,
+      ai_review_passed: false,
+    };
+    return {
+      ...attachCommon('screenshot_review', contract, null, CODEX_DEFAULT_ADAPTER),
+      review_overlay: 'screenshot_review',
+      mode: 'preflight',
+      status: 'block',
+      issues: ['preflight_gate_failed'],
+      checks,
+      preflight_gate: {
+        status: 'block',
+        gate_model: 'deterministic_html_review_anchor_preflight',
+        ai_review_skipped: true,
+        target_slide_ids: targetSlideIds,
+        failures,
+      },
+      slide_reviews: failures,
+      artifact_refs: [safeText(render?.html_bundle?.html_file)].filter(Boolean),
+      review_state_patch: {
+        current_status: 'blocked_for_revision',
+        ready_for_export: false,
+        latest_review_stage: 'screenshot_review',
+        latest_checks: checks,
+        pending_reviews: ['html_review_anchors_ok'],
+        blocking_reasons: ['html_review_anchors_ok'],
+        rerun_from_stage: 'fix_html',
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: 'fix_html',
+          default_route: 'fix_html',
+          scope: 'page',
+          target_slide_ids: targetSlideIds,
+          source_review_stage: 'preflight_gate',
+        },
+      },
+    };
+  }
+
   async function generateDirectorReviewDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const research = readStageArtifact(contract, deliverablePaths, 'research');
     const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
@@ -314,6 +379,10 @@ export function createXiaohongshuReviewParts(deps) {
   ) {
     const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
     const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const preflightArtifact = buildPreflightGateArtifact(contract, render);
+    if (preflightArtifact) {
+      return preflightArtifact;
+    }
     const research = readStageArtifact(contract, deliverablePaths, 'research');
     const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
     const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
