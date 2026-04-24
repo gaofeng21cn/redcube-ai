@@ -552,6 +552,8 @@ export function createPptDeckStageParts(deps) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
     const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+    const preflightArtifact = buildScreenshotReviewPreflightArtifact(contract, renderArtifact, adapter);
+    if (preflightArtifact) return preflightArtifact;
     const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
     const reviewCapture = createReviewCapturePaths(deliverablePaths, deliverableId);
     const args = [
@@ -712,6 +714,96 @@ export function createPptDeckStageParts(deps) {
     writeText(reviewCapture.reviewMarkdownFile, renderedReviewMarkdown);
     writeText(reviewMarkdown, renderedReviewMarkdown);
     return artifact;
+  }
+
+  function countHtmlMatches(html, pattern) {
+    return safeText(html).match(pattern)?.length || 0;
+  }
+
+  function hasHtmlAttribute(html, name) {
+    return new RegExp(`\\s${name}=(['"]).+?\\1`, 'i').test(safeText(html));
+  }
+
+  function buildScreenshotReviewPreflightArtifact(contract, renderArtifact, adapter) {
+    const failures = [];
+    for (const slide of safeArray(renderArtifact?.html_bundle?.slides)) {
+      const slideId = safeText(slide?.slide_id);
+      const html = safeText(slide?.content);
+      const missingAnchors = [];
+      const missingSlideMetadata = [];
+      if (!/data-slide-root=(['"])true\1/i.test(html)) missingAnchors.push('data-slide-root');
+      if (slideId && !new RegExp(`data-slide-id=(['"])${slideId}\\1`, 'i').test(html)) missingAnchors.push('data-slide-id');
+      if (countHtmlMatches(html, /data-qa-block=(['"])[^'"]+\1/gi) < 2) missingAnchors.push('data-qa-block');
+      if (countHtmlMatches(html, /data-primary-point=(['"])true\1/gi) < 1) missingAnchors.push('data-primary-point');
+      for (const metadataName of [
+        'data-title',
+        'data-layout-family',
+        'data-speaker-seconds',
+        'data-recipe-id',
+        'data-template-id',
+        'data-peak-page',
+        'data-director-role',
+      ]) {
+        if (!hasHtmlAttribute(html, metadataName)) missingSlideMetadata.push(metadataName);
+      }
+      const sourceTraceMissing = safeArray(slide?.evidence_and_sources).length === 0;
+      if (missingAnchors.length > 0 || missingSlideMetadata.length > 0 || sourceTraceMissing) {
+        failures.push({
+          slide_id: slideId,
+          title: safeText(slide?.title),
+          status: 'block',
+          missing_anchors: missingAnchors,
+          missing_slide_metadata: missingSlideMetadata,
+          source_trace_missing: sourceTraceMissing,
+          recommended_fix: 'rerun fix_html before screenshot AI review',
+        });
+      }
+    }
+    if (failures.length === 0) return null;
+    const targetSlideIds = failures.map((failure) => safeText(failure.slide_id)).filter(Boolean);
+    const checks = {
+      html_review_anchors_ok: failures.every((failure) => safeArray(failure.missing_anchors).length === 0),
+      slide_metadata_ok: failures.every((failure) => safeArray(failure.missing_slide_metadata).length === 0),
+      source_trace_ok: failures.every((failure) => !failure.source_trace_missing),
+      ai_review_passed: false,
+    };
+    const failedChecks = Object.entries(checks)
+      .filter(([, value]) => value === false)
+      .map(([key]) => key);
+    return {
+      ...attachCommon('screenshot_review', contract, null, adapter),
+      review_overlay: 'screenshot_review',
+      mode: 'preflight',
+      status: 'block',
+      issues: ['preflight_gate_failed'],
+      checks,
+      preflight_gate: {
+        status: 'block',
+        gate_model: 'deterministic_ppt_screenshot_review_preflight',
+        ai_review_skipped: true,
+        target_slide_ids: targetSlideIds,
+        failures,
+      },
+      slide_reviews: failures,
+      artifact_refs: [safeText(renderArtifact?.html_bundle?.html_file)].filter(Boolean),
+      review_state_patch: {
+        current_status: 'blocked_for_revision',
+        ready_for_export: false,
+        latest_review_stage: 'screenshot_review',
+        latest_checks: checks,
+        pending_reviews: failedChecks,
+        blocking_reasons: failedChecks,
+        rerun_from_stage: PAGE_FIX_ROUTE,
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: PAGE_FIX_ROUTE,
+          default_route: PAGE_FIX_ROUTE,
+          scope: 'slide',
+          target_slide_ids: targetSlideIds,
+          source_review_stage: 'preflight_gate',
+        },
+      },
+    };
   }
 
   function buildExportArtifact({
