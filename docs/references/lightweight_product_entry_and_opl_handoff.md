@@ -1,4 +1,4 @@
-# RedCube AI 轻量产品入口与 OPL Handoff
+# RedCube AI 轻量产品入口与 OPL 内部 Handoff
 
 ## 1. 当前真相
 
@@ -9,7 +9,7 @@
 - `agent entry`
   - 面向 `Codex` / Claude Code / OpenClaw 等 host-agent 的 `CLI` / `MCP`
 - `product entry`
-  - 面向 direct RedCube entry 与 OPL federation 的 repo-verified service surface
+  - 面向 direct RedCube entry 与 OPL internal bridge 的 repo-verified service surface
 
 但它仍然没有成熟的最终用户前台壳。
 也就是说，当前已经不是“完全没有 product entry”，而是“已经有可调用服务面，但还不是稳定的 end-user product shell”。
@@ -20,9 +20,9 @@
 
 `User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
-在 `OPL` 家族级入口下，也必须兼容同一条下游形态：
+在 `OPL` 家族级入口下，也必须兼容同一条下游形态，但这条路径在这里仅作为 internal bridge / reference surface：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 这也是当前“最终目标形态”冻结件要表达的主线，详见 `docs/program/upstream_hermes_agent_final_target_shape.md`。
 
@@ -48,7 +48,7 @@
 所以这里要同时冻结并落地：
 
 - `RedCube Product Entry`
-- `OPL -> RedCube` handoff envelope
+- `OPL -> RedCube` internal handoff envelope
 
 ## 4. 共享 handoff envelope
 
@@ -75,7 +75,7 @@
 
 ## 5. 当前不应过度宣称的事
 
-- 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` federation 写成已落地
+- 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` internal federation/bridge 写成已落地
 - 但不能把它们写成成熟的最终用户前台壳或真实线上托管产品入口
 - 当前 route / managed run surface 已切到上游 `Hermes-Agent` managed runtime
 - 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行
@@ -84,7 +84,7 @@
 ## 6. 下一步落地方向
 
 1. 保持 `CLI / MCP / controller` 的 formal-entry 语义稳定，不让产品入口叙事反向污染当前可验证入口。
-2. 让 direct entry 与 OPL handoff 继续共用同一 downstream service-safe domain entry。
+2. 让 direct entry 与 OPL internal handoff 继续共用同一 downstream service-safe domain entry。
 3. 把 runtime session continuity、managed progress、review state、publication projection 收到用户级 runtime-state。
 
 这里也要继续诚实：repo-verified product-entry service surface 已落地，但成熟的最终用户产品入口前台壳仍未落地。

@@ -1,4 +1,4 @@
-# OPL Gateway Federated Product Entry
+# OPL Gateway Internal Product Entry Bridge
 
 状态锚点：`2026-04-12`
 
@@ -10,7 +10,7 @@
 
 它把上层 handoff 收口成：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
 
 关键不变量是：
 

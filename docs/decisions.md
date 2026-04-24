@@ -64,7 +64,8 @@
 
 - `RedCube AI` 对外主语固定为独立 domain agent，可被 `Codex`、`OPL` 或其他通用 agent 直接调用。
 - `gateway / harness` 继续保留为内部架构边界语言，不再作为仓库对外第一身份。
-- repo-verified direct route 与 OPL federated route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
+- repo-verified direct route 与 internal OPL bridge route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
+- 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeFederatedProductEntry` 只保留为内部 bridge / integration surface。
 
 ### 决策：保持 honest owner split，不改 default executor owner
 

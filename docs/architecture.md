@@ -4,10 +4,10 @@
 
 ## 主链路
 
-当前 repo-verified 的两条主链路已经收口到同一条下游 service-safe surface：
+当前对外主链路以 direct route 为第一主语，OPL 路线保留为 internal bridge / integration surface：
 
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- federated route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- internal OPL bridge route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 两条路线在进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
 
@@ -24,9 +24,9 @@
 当前这条主线需要区分三层入口：
 
 - `direct product entry`
-  - 给人类与 host-agent 共用的 `CLI` / `MCP`、frontdesk、session 续跑入口
-- `federated OPL handoff`
-  - 给 `OPL Gateway` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes
+  - 给人类与 host-agent 共用的 `CLI` / `MCP`、frontdesk、session 续跑入口，也是第一公开主语
+- `internal OPL handoff`
+  - 给 `OPL Gateway` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 internal bridge / integration surface
 - `future managed product shell`
   - 给成熟最终用户前台壳预留的未来产品层
 
@@ -57,7 +57,7 @@
 
 ## 最终目标形态
 
-当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点：
+当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个可直接进入、也可被 `OPL` 内部桥接调用的 visual-domain 产品 / 服务节点：
 
 `User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
@@ -67,7 +67,7 @@
 
 这里的关键约束是：
 
-- direct `RedCube` product entry 和 `OPL Gateway` handoff 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
+- direct `RedCube` product entry 和 `OPL Gateway` internal handoff 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
 - today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
 - `invokeFederatedProductEntry` 继续作为 internal OPL bridge contract
 - 成熟的最终用户产品入口前台壳仍未落地
@@ -141,11 +141,11 @@
 当前 repo-verified 的 product-entry service surface 是：
 
 - contract: `contracts/runtime-program/redcube-product-entry-mvp.json`
-- federated contract: `contracts/runtime-program/opl-gateway-federated-product-entry.json`
+- internal bridge contract: `contracts/runtime-program/opl-gateway-federated-product-entry.json`
 - managed hardening contract: `contracts/runtime-program/managed-product-entry-hardening.json`
 - callable surfaces:
   - `@redcube/gateway` `invokeProductEntry`
-  - `@redcube/gateway` `invokeFederatedProductEntry`
+  - `@redcube/gateway` `invokeFederatedProductEntry`（internal bridge）
   - `@redcube/gateway` `getProductEntrySession`
 
 它们继续把执行下沉到同一个 `invokeDomainEntry`，同时把 session continuity 持久化到用户级 runtime-state，而不是把 product entry 写成 repo-local runtime 自己的新宿主。

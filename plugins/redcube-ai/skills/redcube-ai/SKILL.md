@@ -9,7 +9,7 @@ description: Use when Codex should operate RedCube AI through its product-entry 
 
 ## 这个 plugin 是什么
 
-- `RedCube AI` 面向 Codex 的薄入口层
+- `RedCube AI` 面向 Codex 的单一 app skill 薄入口层
 - 建立在现有 CLI、gateway、runtime contract 与 deliverable loop 之上
 - 不替代 `redcube` CLI、gateway contract，也不替代 repo 内其他自动化入口
 
@@ -20,7 +20,7 @@ description: Use when Codex should operate RedCube AI through its product-entry 
 - `redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `redcube product session --entry-session-id <entry-session-id>`
 
-默认先开 frontdesk，再根据已知标识走 direct invoke 或 session continuation。
+默认先开 frontdesk，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
 
 ## 操作约束
 

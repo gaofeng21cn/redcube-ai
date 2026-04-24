@@ -2,20 +2,20 @@
 
 ## 默认入口口径
 
-- 对外定位：`RedCube AI` 是独立 visual-deliverable domain agent，可 direct 调用，也可被 `OPL` 或其他通用 agent federated 调用
+- 对外定位：`RedCube AI` 是独立 visual-deliverable domain agent，第一公开主语是单一 `redcube-ai` app skill 与 direct 调用入口；`OPL` 通过 internal bridge / integration surface 进入
 - formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
 - repo-verified direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- repo-verified federated route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- 默认公开能力面：`RedCube AI` 持有稳定 capability surface 与 visual-domain truth，`Codex CLI` 继续作为 executor adapter 选中的默认 concrete executor；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现
+- internal OPL bridge route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- 默认公开能力面：`RedCube AI` 持有稳定 capability surface 与 visual-domain truth，`redcube-ai` app skill / `Codex CLI` 继续作为主要可见 surface 与默认 concrete executor；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现
 - OPL boundary：`OPL` 只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 
 ## 当前执行口径
 
 - product-entry service surface：`invokeProductEntry`、`getProductEntrySession`、`redcube product invoke`、`redcube product session`
-- federated OPL handoff surface：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
+- internal OPL bridge surface：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
 - shared service-safe domain entry：`invokeDomainEntry`、`invoke_domain_entry`
 - direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
-- 稳定可调用面：`CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本，以及这些 surface 对应的 repo-tracked contracts
+- 稳定可调用面：`redcube-ai` app skill、`CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本，以及这些 surface 对应的 repo-tracked contracts
 - `skill_catalog` 现在对外收口为单一 `redcube-ai` app skill；`frontdesk`、`invoke`、`session` 继续作为这个 skill 底下的 machine-readable command contracts
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
@@ -37,6 +37,6 @@
 
 ## 当前收口重点
 
-- 保持 direct route 与 federated route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
+- 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 upstream Hermes runtime owner、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

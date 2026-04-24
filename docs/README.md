@@ -3,10 +3,10 @@
 **English** | [中文](./README.zh-CN.md)
 
 This directory is the technical reading layer for `RedCube AI`.
-The current public reading path is anchored on two repo-verified routes:
+The current public reading path is anchored on the direct route, with the OPL bridge kept as an internal integration/reference surface:
 
 - direct route: `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- federated route: `User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- internal OPL bridge: `User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## Start Here By Audience
 
@@ -18,10 +18,10 @@ The current public reading path is anchored on two repo-verified routes:
 
 ## Current Baseline
 
-- `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the repo-verified product-entry service surface, and the stable callable surface built from `CLI`, `MCP`, local scripts, and repo-tracked contracts.
+- `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the direct repo-verified product-entry service surface, and the stable callable surface built from the single `redcube-ai` app skill, `CLI`, `MCP`, local scripts, and repo-tracked contracts.
 - `Codex CLI` remains the default concrete executor selected behind the executor-adapter contract for local operator workflows.
 - Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.
-- `OPL` joins through the federated handoff surface when family-level routing is needed.
+- `OPL` joins through the internal bridge surface when family-level routing is needed.
 
 ## Technical Working Set
 
@@ -48,6 +48,6 @@ The current public reading path is anchored on two repo-verified routes:
 
 ## Documentation Rules
 
-- Keep `README*` and `docs/README*` aligned with the repo-verified direct route, federated OPL route, and service-safe domain entry surface.
+- Keep `README*` and `docs/README*` aligned with the repo-verified direct route, the internal OPL bridge/reference surface, and the service-safe domain entry surface.
 - Keep English and Chinese public docs mirrored where applicable.
 - Keep historical materials available in program/history/reference layers.
