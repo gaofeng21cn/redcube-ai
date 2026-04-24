@@ -587,17 +587,30 @@ function normalizeSessionPoolDescriptor(sessionPool = {}) {
   };
 }
 
+function stageIdForBatchStage(stage, index) {
+  if (typeof stage === 'function') {
+    return safeText(stage.stage_id, `stage_${index + 1}`);
+  }
+  return safeText(stage?.stage_id, `stage_${index + 1}`);
+}
+
 function normalizeBatchStages(stages) {
   if (!Array.isArray(stages) || stages.length === 0) {
     throw new Error('stages 必须是非空数组');
   }
   const seen = new Set();
   return stages.map((stage, index) => {
-    const stageId = safeText(stage?.stage_id, `stage_${index + 1}`);
+    const stageId = stageIdForBatchStage(stage, index);
     if (seen.has(stageId)) {
       throw new Error(`stage_id 必须唯一: ${stageId}`);
     }
     seen.add(stageId);
+    if (typeof stage === 'function') {
+      return {
+        buildStage: stage,
+        stage_id: stageId,
+      };
+    }
     return {
       ...stage,
       stage_id: stageId,
@@ -617,20 +630,29 @@ export async function generateStructuredArtifactBatchViaCodexCli({
   const data = [];
 
   for (const stage of normalizedStages) {
+    const stageInput = typeof stage.buildStage === 'function'
+      ? {
+          ...await stage.buildStage({
+            previousResults: data,
+            stage_id: stage.stage_id,
+          }),
+          stage_id: stage.stage_id,
+        }
+      : stage;
     const result = await generateStructuredArtifactViaCodexCli({
-      family: stage.family,
-      route: stage.route,
-      promptRelativePath: stage.promptRelativePath,
-      context: stage.context,
-      outputContract: stage.outputContract,
-      localFileInspection: stage.localFileInspection,
-      timeoutMs: stage.timeoutMs,
-      cwd: stage.cwd || cwd,
+      family: stageInput.family,
+      route: stageInput.route,
+      promptRelativePath: stageInput.promptRelativePath,
+      context: stageInput.context,
+      outputContract: stageInput.outputContract,
+      localFileInspection: stageInput.localFileInspection,
+      timeoutMs: stageInput.timeoutMs,
+      cwd: stageInput.cwd || cwd,
       contract,
       spawnSyncImpl,
     });
     data.push({
-      stage_id: stage.stage_id,
+      stage_id: stageInput.stage_id,
       data: result.data,
       generationRuntime: result.generationRuntime,
     });

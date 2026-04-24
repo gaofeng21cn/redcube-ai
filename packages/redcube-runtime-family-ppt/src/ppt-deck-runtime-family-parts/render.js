@@ -33,6 +33,7 @@ export function createPptDeckRenderStageParts(deps) {
     existsSync: mainExistsSync,
     extraChecks,
     generateStructuredArtifact,
+    generateStructuredArtifactBatch,
     getDeliverablePaths,
     getDeliverableViewSurfacePaths,
     getReviewState,
@@ -633,48 +634,102 @@ export function createPptDeckRenderStageParts(deps) {
     const availableReferenceSlides = renderPlan.mode === 'targeted_revision_only'
       ? new Map(priorRenderedSlides)
       : new Map();
-    const freshlyRenderedSlides = [];
+    const renderBatchStages = [];
     for (const [batchIndex, slideBatch] of slideBatches.entries()) {
-      const referenceSlides = buildRenderBatchReferenceSlides({
-        blueprintSlides,
-        slideBatch,
-        renderedSlideHtmlById: availableReferenceSlides,
-      });
       const promptSlides = slideBatch.map((slide) => ({
         ...slide,
         current_content_html: priorRenderedSlides.get(safeText(slide?.slide_id)) || null,
       }));
-      const { data: batchData } = await generateStructuredArtifact({
-        adapter,
-        family: 'ppt_deck',
-        route,
-        promptRelativePath,
-        context: {
-          ...sharedContext,
-          render_scope: 'slide_batch',
-          rerender_mode: renderPlan.mode,
-          render_batch: {
-            batch_index: batchIndex + 1,
-            total_batches: slideBatches.length,
-            slide_ids: promptSlides.map((slide) => slide.slide_id),
-          },
-          reference_slides: referenceSlides,
-          blueprint: {
-            slides: promptSlides,
-          },
-          revision_context: filterRenderRevisionContextForSlides(
-            sharedRevisionContext,
-            promptSlides.map((slide) => slide.slide_id),
-          ) || sharedRevisionContext,
-        },
-        outputContract: renderHtmlOutputContract(),
-        cwd: deliverablePaths.deliverableDir,
-        localFileInspection: buildRenderRevisionLocalFileInspection({
-          deliverablePaths,
+      const buildRenderBatchStage = ({ previousResults = [] } = {}) => {
+        const renderedSlideHtmlById = new Map(availableReferenceSlides);
+        for (const result of safeArray(previousResults)) {
+          for (const slide of safeArray(result?.data?.slides)) {
+            const slideId = safeText(slide?.slide_id);
+            const contentHtml = safeText(slide?.content_html);
+            if (slideId && contentHtml) {
+              renderedSlideHtmlById.set(slideId, contentHtml);
+            }
+          }
+        }
+        const referenceSlides = buildRenderBatchReferenceSlides({
+          blueprintSlides,
           slideBatch,
-          revisionContext: sharedRevisionContext,
-        }),
-      });
+          renderedSlideHtmlById,
+        });
+        return {
+          family: 'ppt_deck',
+          route,
+          promptRelativePath,
+          context: {
+            ...sharedContext,
+            render_scope: 'slide_batch',
+            rerender_mode: renderPlan.mode,
+            render_batch: {
+              batch_index: batchIndex + 1,
+              total_batches: slideBatches.length,
+              slide_ids: promptSlides.map((slide) => slide.slide_id),
+            },
+            reference_slides: referenceSlides,
+            blueprint: {
+              slides: promptSlides,
+            },
+            revision_context: filterRenderRevisionContextForSlides(
+              sharedRevisionContext,
+              promptSlides.map((slide) => slide.slide_id),
+            ) || sharedRevisionContext,
+          },
+          outputContract: renderHtmlOutputContract(),
+          cwd: deliverablePaths.deliverableDir,
+          localFileInspection: buildRenderRevisionLocalFileInspection({
+            deliverablePaths,
+            slideBatch,
+            revisionContext: sharedRevisionContext,
+          }),
+        };
+      };
+      buildRenderBatchStage.stage_id = `${route}_batch_${batchIndex + 1}`;
+      renderBatchStages.push(buildRenderBatchStage);
+    }
+    const renderBatchResult = await (generateStructuredArtifactBatch || (async ({ stages }) => {
+      const data = [];
+      for (const stage of stages) {
+        const stageInput = typeof stage === 'function'
+          ? {
+              ...stage({ previousResults: data, stage_id: stage.stage_id }),
+              stage_id: stage.stage_id,
+            }
+          : stage;
+        const result = await generateStructuredArtifact({ adapter, ...stageInput });
+        data.push({
+          stage_id: stageInput.stage_id,
+          data: result.data,
+          generationRuntime: result.generationRuntime,
+        });
+      }
+      return {
+        data,
+        batchRuntime: {
+          owner: safeText(data[0]?.generationRuntime?.owner),
+          session_pool: {
+            reuse_supported: false,
+            reuse_claimed: false,
+            reuse_status: 'wrapper_fallback_without_reuse',
+            invocation_count: data.length,
+          },
+        },
+      };
+    }))({
+      adapter,
+      stages: renderBatchStages,
+      cwd: deliverablePaths.deliverableDir,
+      sessionPool: {
+        descriptor_id: `ppt_deck_${route}_${safeText(deliverableId, 'deliverable')}`,
+        reuse_strategy: 'same_session_if_supported',
+      },
+    });
+    const freshlyRenderedSlides = [];
+    for (const stageResult of safeArray(renderBatchResult?.data)) {
+      const batchData = stageResult?.data || {};
       const batchSlides = safeArray(batchData?.slides).filter((item) => item && typeof item === 'object');
       freshlyRenderedSlides.push(...batchSlides);
       for (const slide of batchSlides) {
@@ -726,6 +781,7 @@ export function createPptDeckRenderStageParts(deps) {
         force_full_regeneration: revisionFreshness.force_full_regeneration,
         batch_size: renderBatchSize,
         batch_count: slideBatches.length,
+        codex_batch_runtime: renderBatchResult?.batchRuntime || null,
         reference_window: RENDER_REFERENCE_SLIDE_WINDOW,
         targeted_slide_ids: renderPlan.slides_to_render.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
         freshly_rendered_slide_ids: freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),

@@ -9,6 +9,7 @@ import {
 } from 'node:fs';
 
 import {
+  generateStructuredArtifactBatchViaCodexCli,
   generateStructuredArtifactViaCodexCli,
 } from '@redcube/codex-cli-client';
 import {
@@ -388,6 +389,37 @@ export function createPptDeckRuntimeCore() {
     }
     return generateStructuredArtifactViaCodexCli(input);
   }
+
+  async function generateStructuredArtifactBatch({
+    adapter = CODEX_DEFAULT_ADAPTER,
+    stages = [],
+    ...input
+  }) {
+    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+      const data = [];
+      for (const stage of stages) {
+        const result = await generateStructuredArtifactViaHermesNativeProof(stage);
+        data.push({
+          stage_id: safeText(stage?.stage_id),
+          data: result.data,
+          generationRuntime: result.generationRuntime,
+        });
+      }
+      return {
+        data,
+        batchRuntime: {
+          owner: HERMES_NATIVE_PROOF_ADAPTER,
+          session_pool: {
+            reuse_supported: false,
+            reuse_claimed: false,
+            reuse_status: 'unsupported_by_adapter',
+            invocation_count: data.length,
+          },
+        },
+      };
+    }
+    return generateStructuredArtifactBatchViaCodexCli({ stages, ...input });
+  }
   
   function runtimeCreativeSource(
     protectedSurface,
@@ -684,6 +716,7 @@ export function createPptDeckRuntimeCore() {
     existsSync,
     extraChecks,
     generateStructuredArtifact,
+    generateStructuredArtifactBatch,
     getDeliverablePaths,
     getDeliverableViewSurfacePaths,
     getReviewState,
