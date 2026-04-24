@@ -47,26 +47,26 @@ test('public docs surface keeps the default entry chain and isolates historical 
   const docsArchitecture = readText(path.join('docs', 'architecture.md'));
   const currentProgram = JSON.parse(readText(path.join('contracts', 'runtime-program', 'current-program.json')));
 
-  assert.match(docsReadme, /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/);
-  assert.match(docsReadme, /OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime/);
-  assert.match(docsReadmeZh, /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/);
-  assert.match(docsReadmeZh, /OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime/);
-  assert.match(docsStatus, /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/);
+  assert.match(docsReadme, /RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/);
+  assert.match(docsReadme, /OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/);
+  assert.match(docsReadmeZh, /RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/);
+  assert.match(docsReadmeZh, /OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/);
+  assert.match(docsStatus, /RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/);
   assert.match(docsStatus, /invokeProductEntry/);
   assert.match(docsStatus, /invokeFederatedProductEntry/);
   assert.match(docsStatus, /invokeDomainEntry/);
-  assert.match(docsArchitecture, /Hermes-Agent managed runtime/);
+  assert.match(docsArchitecture, /RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces/);
   assert.match(docsArchitecture, /invokeProductEntry/);
   assert.match(docsArchitecture, /invokeFederatedProductEntry/);
   assert.match(docsArchitecture, /invokeDomainEntry/);
-  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'upstream_hermes_agent');
+  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'optional_hosted_runtime_carrier');
   assert.match(
     currentProgram.longrun_goal.final_target_route.redcube_direct_entry,
-    /RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime/,
+    /RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/,
   );
   assert.match(
     currentProgram.longrun_goal.final_target_route.opl_federated_entry,
-    /OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime/,
+    /OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/,
   );
 
   assert.doesNotMatch(docsReadme, /repo-tracked program|current truth|active tranche|current-program\.json/i);
