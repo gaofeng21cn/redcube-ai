@@ -46,21 +46,23 @@ export async function getProductEntrySession(request) {
     throw new Error('product entry session runtime_owner 漂移');
   }
 
-  const reviewState = await getReviewState({
-    workspaceRoot: session.workspace_root,
-    topicId: session.topic_id,
-    deliverableId: session.deliverable_id,
-  });
-  const publicationProjection = await getPublicationProjection({
-    workspaceRoot: session.workspace_root,
-    topicId: session.topic_id,
-  });
-  const managedRun = session.latest_managed_run_id
-    ? await getManagedRun({
+  const [reviewState, publicationProjection, managedRun] = await Promise.all([
+    getReviewState({
       workspaceRoot: session.workspace_root,
-      managedRunId: session.latest_managed_run_id,
-    })
-    : null;
+      topicId: session.topic_id,
+      deliverableId: session.deliverable_id,
+    }),
+    getPublicationProjection({
+      workspaceRoot: session.workspace_root,
+      topicId: session.topic_id,
+    }),
+    session.latest_managed_run_id
+      ? getManagedRun({
+        workspaceRoot: session.workspace_root,
+        managedRunId: session.latest_managed_run_id,
+      })
+      : Promise.resolve(null),
+  ]);
   const continuationSnapshot = buildProductEntryContinuationSnapshot({
     latest_managed_run_id: session.latest_managed_run_id || null,
     latest_run_id: session.latest_run_id || null,

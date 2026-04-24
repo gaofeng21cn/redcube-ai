@@ -288,15 +288,17 @@ export async function invokeProductEntry(request) {
     source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
     entryMode,
   });
-  const reviewState = await getReviewState({
-    workspaceRoot,
-    topicId,
-    deliverableId,
-  });
-  const publicationProjection = await getPublicationProjection({
-    workspaceRoot,
-    topicId,
-  });
+  const [reviewState, publicationProjection] = await Promise.all([
+    getReviewState({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+    }),
+    getPublicationProjection({
+      workspaceRoot,
+      topicId,
+    }),
+  ]);
   const familyOrchestration = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot,
   });
