@@ -83,6 +83,7 @@ const INTEGRATION = [
   'tests/hermes-runtime-canonical-path.test.js',
   'tests/import-legacy-project.test.js',
   'tests/managed-deliverable-execution.test.js',
+  'tests/managed-dag-scheduler.test.js',
   'tests/mcp-gateway.test.js',
   'tests/poster-creative-ownership.test.js',
   'tests/ppt-creative-ownership.test.js',

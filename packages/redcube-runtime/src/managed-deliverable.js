@@ -12,6 +12,7 @@ import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
 import { getReviewState } from '@redcube/governance';
 
 import { runDeliverableRoute } from './deliverable-routes.js';
+import { planManagedDeliverableDag } from './managed-dag-scheduler.js';
 import { appendManagedEvent } from './managed-event-log.js';
 import {
   createManagedRun,
@@ -1034,6 +1035,17 @@ export async function runManagedDeliverable({
     adapter: normalizedAdapter,
   });
   managedRun.runtime_bridge = runtimeBridgeFromProbe(normalizedAdapter, runtimeReady);
+  managedRun.execution_plan = planManagedDeliverableDag({
+    sourcePackId: contract?.shared_source_truth?.source_readiness_pack?.pack_id
+      || contract?.shared_source_truth?.source_brief?.topic_id
+      || '',
+    deliverables: [{
+      overlay: contractOverlay,
+      topicId,
+      deliverableId,
+      stages,
+    }],
+  });
 
   pushManagedEvent(workspaceRoot, managedRun, {
     kind: 'managed_started',

@@ -42,6 +42,7 @@ import {
   runManagedDeliverable as runManagedDeliverableJs,
   superviseManagedRun as superviseManagedRunJs,
 } from './managed-deliverable.js';
+import { planManagedDeliverableDag as planManagedDeliverableDagJs } from './managed-dag-scheduler.js';
 import {
   loadProductEntrySession as loadProductEntrySessionJs,
   productEntrySessionDir as productEntrySessionDirJs,
@@ -192,6 +193,10 @@ export async function superviseManagedRun(
   request: RuntimeManagedSupervisionRequest,
 ): Promise<RuntimeManagedRunResponse> {
   return superviseManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
+}
+
+export function planManagedDeliverableDag(request: Record<string, unknown>): Record<string, unknown> {
+  return planManagedDeliverableDagJs(request) as Record<string, unknown>;
 }
 
 export function productEntrySessionDir(): string {

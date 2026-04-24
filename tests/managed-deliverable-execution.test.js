@@ -139,6 +139,9 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     );
     assert.equal(result.managed_run.runtime_bridge?.owner, 'codex_cli');
     assert.equal(result.managed_run.runtime_bridge?.adapter_surface, '@redcube/codex-cli-client');
+    assert.equal(result.managed_run.execution_plan.scheduler_kind, 'managed_deliverable_dag');
+    assert.equal(result.managed_run.execution_plan.optimization.quality_gate_policy, 'preserve_stage_dependencies_and_review_hard_stops');
+    assert.equal(result.managed_run.execution_plan.max_parallel_width >= 1, true);
     assert.equal(result.progress_projection.current_stage, 'export_pptx');
     assert.equal(result.progress_projection.needs_user_decision, false);
     assert.equal(result.progress_projection.final_artifact_refs.length > 0, true);

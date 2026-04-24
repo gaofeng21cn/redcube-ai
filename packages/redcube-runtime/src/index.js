@@ -25,6 +25,7 @@ export {
 } from './runtime-state.js';
 export { runDeliverableRoute } from './deliverable-routes.js';
 export { getManagedRun, runManagedDeliverable, superviseManagedRun } from './managed-deliverable.js';
+export { planManagedDeliverableDag } from './managed-dag-scheduler.js';
 export { loadProductEntrySession, productEntrySessionDir, productEntrySessionFile, saveProductEntrySession } from './product-entry-session-store.js';
 export { resolveExecutorAdapter } from './executors.js';
 export { completeRun, loadRun, startRun } from './run-store.js';
