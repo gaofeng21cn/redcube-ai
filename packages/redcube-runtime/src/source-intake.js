@@ -250,6 +250,59 @@ function unchangedSourcePackReuseDecision({ previousManifest, intakeSources }) {
   };
 }
 
+function sourceArtifactFiles(sourcePaths) {
+  return {
+    sourceIndexFile: sourcePaths.sourceIndexFile,
+    extractedMaterialsFile: sourcePaths.extractedMaterialsFile,
+    sourceAuditFile: sourcePaths.sourceAuditFile,
+    sourceBriefFile: sourcePaths.sourceBriefFile,
+    sourceReadinessPackFile: sourcePaths.sourceReadinessPackFile,
+    sourcePackManifestFile: sourcePaths.sourcePackManifestFile,
+    sourcePackFederationFile: sourcePaths.sourcePackFederationFile,
+    sourceAugmentationRequestFile: sourcePaths.sourceAugmentationRequestFile,
+  };
+}
+
+function buildSourceIntakeResponse({ sourcePaths, audit, augmentation, cacheStatus = 'miss' }) {
+  return {
+    ok: audit?.status === 'pass',
+    topicId: sourcePaths.topicPaths.topicId,
+    artifactFiles: sourceArtifactFiles(sourcePaths),
+    audit,
+    augmentation,
+    cache_status: cacheStatus,
+  };
+}
+
+function reuseFrozenSourcePackIfAvailable({ sourcePaths, previousManifest, intakeSources }) {
+  const reuseDecision = unchangedSourcePackReuseDecision({ previousManifest, intakeSources });
+  if (!reuseDecision.canReuseFrozenPack) return null;
+  const sourceAudit = readJsonIfExists(sourcePaths.sourceAuditFile);
+  const sourceAugmentationRequest = readJsonIfExists(sourcePaths.sourceAugmentationRequestFile);
+  const existingFiles = sourceArtifactFiles(sourcePaths);
+  if (!sourceAudit || !sourceAugmentationRequest || !Object.values(existingFiles).every((file) => existsSync(file))) {
+    return null;
+  }
+  const nextManifest = {
+    ...previousManifest,
+    reuse: {
+      ...(previousManifest.reuse || {}),
+      previous_manifest_available: true,
+      frozen_source_pack_reused: true,
+      skip_reason: reuseDecision.reason,
+      reused_source_count: intakeSources.length,
+      changed_source_count: 0,
+    },
+  };
+  writeJson(sourcePaths.sourcePackManifestFile, nextManifest);
+  return buildSourceIntakeResponse({
+    sourcePaths,
+    audit: sourceAudit,
+    augmentation: sourceAugmentationRequest,
+    cacheStatus: 'hit',
+  });
+}
+
 function extractPdfSource(source) {
   const mineruToken = safeText(process.env.MINERU_TOKEN);
   const extractorCmd = safeText(process.env.MINERU_EXTRACTOR_CMD);
@@ -390,6 +443,10 @@ export async function intakeSource({
 
   const previousManifest = readJsonIfExists(sourcePaths.sourcePackManifestFile);
   const previousExtractedMaterials = readJsonIfExists(sourcePaths.extractedMaterialsFile);
+  const frozenPackResponse = reuseFrozenSourcePackIfAvailable({ sourcePaths, previousManifest, intakeSources });
+  if (frozenPackResponse) {
+    return frozenPackResponse;
+  }
   const frozenPackReuse = unchangedSourcePackReuseDecision({ previousManifest, intakeSources });
   const priorSourcesByHash = previousSourceByHash(previousManifest);
   const priorMaterialsByHash = previousMaterialBySourceHash(previousManifest, previousExtractedMaterials);
@@ -602,20 +659,10 @@ export async function intakeSource({
   writeJson(sourcePaths.sourcePackFederationFile, sourcePackFederation);
   writeJson(sourcePaths.sourceAugmentationRequestFile, sourceAugmentationRequest);
 
-  return {
-    ok: auditStatus === 'pass',
-    topicId: sourcePaths.topicPaths.topicId,
-    artifactFiles: {
-      sourceIndexFile: sourcePaths.sourceIndexFile,
-      extractedMaterialsFile: sourcePaths.extractedMaterialsFile,
-      sourceAuditFile: sourcePaths.sourceAuditFile,
-      sourceBriefFile: sourcePaths.sourceBriefFile,
-      sourceReadinessPackFile: sourcePaths.sourceReadinessPackFile,
-      sourcePackManifestFile: sourcePaths.sourcePackManifestFile,
-      sourcePackFederationFile: sourcePaths.sourcePackFederationFile,
-      sourceAugmentationRequestFile: sourcePaths.sourceAugmentationRequestFile,
-    },
+  return buildSourceIntakeResponse({
+    sourcePaths,
     audit: sourceAudit,
     augmentation: sourceAugmentationRequest,
-  };
+    cacheStatus: 'miss',
+  });
 }

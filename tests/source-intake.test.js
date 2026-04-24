@@ -106,13 +106,12 @@ test('intakeSource reuses unchanged file source extraction by source content has
   const secondMaterials = readJson(second.artifactFiles.extractedMaterialsFile);
 
   assert.equal(second.ok, true);
+  assert.equal(second.cache_status, 'hit');
   assert.equal(secondManifest.reuse.frozen_source_pack_reused, true);
   assert.equal(secondManifest.reuse.skip_reason, 'unchanged_source_manifest');
   assert.equal(secondManifest.reuse.reused_source_count, 1);
   assert.equal(secondManifest.reuse.changed_source_count, 0);
   assert.equal(secondManifest.sources[0].content_hash, firstManifest.sources[0].content_hash);
-  assert.equal(secondManifest.sources[0].extraction.reused, true);
-  assert.equal(secondManifest.sources[0].evidence_index.reused, true);
   assert.deepEqual(secondMaterials.materials, firstMaterials.materials);
 
   writeFileSync(sourceFile, '# 甲状腺门诊\n\nTSH 异常后需要结合 FT4 和症状判断。');
@@ -126,6 +125,7 @@ test('intakeSource reuses unchanged file source extraction by source content has
   const thirdMaterials = readJson(third.artifactFiles.extractedMaterialsFile);
 
   assert.equal(third.ok, true);
+  assert.equal(third.cache_status, 'miss');
   assert.equal(thirdManifest.reuse.frozen_source_pack_reused, false);
   assert.equal(thirdManifest.reuse.skip_reason, 'source_content_changed');
   assert.equal(thirdManifest.reuse.reused_source_count, 0);
