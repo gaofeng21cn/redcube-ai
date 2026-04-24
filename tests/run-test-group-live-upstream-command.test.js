@@ -99,7 +99,7 @@ test('run-test-group usage and verify shim include the family verification lane'
 
   assert.match(script, /<fast\|meta\|family\|integration\|e2e\|historical\|full>/);
   assert.match(verifyScript, /family\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|meta\|family\|integration\|e2e\|historical\|full\]/);
+  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|meta\|family\|integration\|e2e\|historical\|full\]/);
 });
 
 test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {
@@ -112,10 +112,17 @@ test('deliverable review loop integration stays on the mock codex upstream inste
 
 test('serialized route-heavy verification files stay on the mock codex upstream instead of the live CLI', () => {
   for (const file of [...SERIALIZED_ROUTE_HEAVY_TEST_FILES].sort()) {
-    const content = readFileSync(file, 'utf-8');
+    const content = readSerializedTestFileWithImportedCases(file);
     assert.match(content, /withMockHermesUpstream|REDCUBE_CODEX_COMMAND/);
   }
 });
+
+function readSerializedTestFileWithImportedCases(file) {
+  const content = readFileSync(file, 'utf-8');
+  const importedCaseFiles = [...content.matchAll(/await import\(['"](.+?)['"]\);/g)]
+    .map((match) => path.join(path.dirname(file), match[1]));
+  return [content, ...importedCaseFiles.map((importedFile) => readFileSync(importedFile, 'utf-8'))].join('\n');
+}
 
 test('serialized verification rule is documented in current program contract', () => {
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));

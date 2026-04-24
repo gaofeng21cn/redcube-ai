@@ -9,20 +9,21 @@ function read(file) {
 
 test('ppt family runtime uses upstream structured generation directly and no longer imports pack builders', () => {
   const runtime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
+  const runtimeCore = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js');
 
   assert.equal(runtime.includes('function buildOutlineSlides('), false);
   assert.equal(runtime.includes('function buildSlideBlueprint('), false);
   assert.equal(runtime.includes('function buildVisualDirection('), false);
   assert.equal(runtime.includes('@redcube/pack-ppt'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtime.includes('generateStructuredArtifactViaCodexCli'), true);
+  assert.equal(runtimeCore.includes('generateStructuredArtifactViaCodexCli'), true);
   assert.equal(runtime.includes('function buildRenderArtifact('), false);
 });
 
 test('ppt family runtime keeps the public route entry while heavy stage builders move into family parts', () => {
   const runtime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
 
-  assert.equal(runtime.includes("from './ppt-deck-runtime-family-parts/index.js'"), true);
+  assert.equal(runtime.includes("from './ppt-deck-runtime-family-parts/core.js'"), true);
   assert.equal(runtime.includes('export async function runPptDeckRoute('), true);
   assert.equal(runtime.includes('async function buildRenderHtmlArtifact('), false);
   assert.equal(runtime.includes('async function buildDirectorReview('), false);
@@ -54,8 +55,9 @@ test('xiaohongshu family runtime keeps the public route entry while heavy stage 
 
 test('poster family runtime keeps AI-first generation in runtime-family without cross-package source imports', () => {
   const runtime = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js');
+  const runtimeCore = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js');
 
   assert.equal(runtime.includes('@redcube/pack-poster-onepager'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtime.includes('generateStructuredArtifactViaCodexCli'), true);
+  assert.equal(runtimeCore.includes('generateStructuredArtifactViaCodexCli'), true);
 });
