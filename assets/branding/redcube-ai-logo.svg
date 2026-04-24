@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="RedCube AI logo">
+  <title>RedCube AI</title>
+  <defs>
+    <linearGradient id="bg" x1="28" y1="20" x2="292" y2="300" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F4FFFD"/><stop offset="1" stop-color="#E6F8FF"/></linearGradient>
+    <linearGradient id="panel" x1="74" y1="54" x2="246" y2="266" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9FBF9"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="10" stdDeviation="13" flood-color="#238E88" flood-opacity="0.17"/></filter>
+  </defs>
+  <rect x="16" y="16" width="288" height="288" rx="64" fill="url(#bg)" stroke="#9FDAD6" stroke-width="2.5"/>
+  <g filter="url(#shadow)">
+    <rect x="66" y="62" width="188" height="196" rx="40" fill="url(#panel)" stroke="#27958E" stroke-width="3"/>
+    <rect x="98" y="96" width="124" height="78" rx="20" fill="#27958E"/>
+    <path d="M120 150L148 124L168 144L190 116L212 150" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="98" y="194" width="54" height="36" rx="12" fill="#2A6F9E" fill-opacity="0.18" stroke="#2A6F9E" stroke-width="3"/>
+    <rect x="168" y="194" width="54" height="36" rx="12" fill="#F3B44B" fill-opacity="0.20" stroke="#F3B44B" stroke-width="3"/>
+    <path d="M126 212H194" stroke="#27958E" stroke-width="8" stroke-linecap="round" opacity="0.32"/>
+  </g>
+  <circle cx="68" cy="82" r="10" fill="#27958E" fill-opacity="0.18"/>
+  <circle cx="254" cy="246" r="12" fill="#7CA7FF" fill-opacity="0.22"/>
+</svg>

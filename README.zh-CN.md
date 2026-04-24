@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/branding/redcube-ai-logo.svg" alt="RedCube AI Logo" width="132" />
+</p>
+
 # RedCube AI
 
 <p align="center">
