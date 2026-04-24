@@ -26,6 +26,10 @@ import {
 import { appendEvent as appendEventJs, readEvents as readEventsJs } from './event-log.js';
 import { appendManagedEvent as appendManagedEventJs, readManagedEvents as readManagedEventsJs } from './managed-event-log.js';
 import {
+  planCandidateRace as planCandidateRaceJs,
+  selectCandidateRaceWinner as selectCandidateRaceWinnerJs,
+} from './candidate-racing.js';
+import {
   P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT as P19CreativeOwnershipProgramCloseoutJs,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT as P19CreativeOwnershipExecutionContractJs,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT as P19CreativeOwnershipLifecycleContractJs,
@@ -145,6 +149,14 @@ export function appendManagedEvent(workspaceRoot: string, managedRunId: string, 
 
 export function readManagedEvents(workspaceRoot: string, managedRunId: string): unknown[] {
   return readManagedEventsJs(workspaceRoot, managedRunId) as unknown[];
+}
+
+export function planCandidateRace(request: Record<string, unknown>): Record<string, unknown> {
+  return planCandidateRaceJs(request) as Record<string, unknown>;
+}
+
+export function selectCandidateRaceWinner(request: Record<string, unknown>): Record<string, unknown> {
+  return selectCandidateRaceWinnerJs(request) as Record<string, unknown>;
 }
 
 export const P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT
