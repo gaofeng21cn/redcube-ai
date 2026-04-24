@@ -27,7 +27,7 @@ const FAMILY_FILES = [
   },
   {
     label: 'xiaohongshu',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
+    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/shared.js',
   },
   {
     label: 'poster_onepager',
@@ -40,7 +40,11 @@ function extractFunction(source, name) {
   if (start === -1) {
     throw new Error(`Missing function ${name}`);
   }
-  const next = source.indexOf('\nfunction ', start + 1);
+  const nextFunction = source.indexOf('\nfunction ', start + 1);
+  const nextExportedFunction = source.indexOf('\nexport function ', start + 1);
+  const next = [nextFunction, nextExportedFunction]
+    .filter((index) => index !== -1)
+    .sort((left, right) => left - right)[0] ?? -1;
   return source.slice(start, next === -1 ? undefined : next);
 }
 

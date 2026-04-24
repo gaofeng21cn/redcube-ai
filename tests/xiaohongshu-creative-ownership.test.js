@@ -173,6 +173,12 @@ test('xiaohongshu Codex-backed mainline owns protected creative outputs instead 
   assert.equal(packEntry.includes('buildXhsVisualDirection'), false);
   assert.equal(packEntry.includes('buildXhsRenderHtml'), false);
   assert.equal(packEntry.includes('compileXhsRenderSlides'), false);
+  assert.match(runtime, /from '\.\/xiaohongshu-runtime-family-parts\/index\.js'/);
+  assert.match(runtime, /export async function runXiaohongshuRoute\(/);
+  assert.equal(runtime.includes('async function buildStoryline('), false);
+  assert.equal(runtime.includes('async function buildRenderHtml('), false);
+  assert.equal(runtime.includes('async function buildScreenshotReview('), false);
+  assert.equal(runtime.includes('function buildExportBundle('), false);
   assert.equal(runtime.includes("const seed = promptSeed(contract, 'storyline');"), false);
   assert.equal(runtime.includes("audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement)"), false);
   assert.equal(runtime.includes("const authoredArtifact = promptArtifact(contract, 'storyline', buildStorylineInputs(contract, research));"), false);
