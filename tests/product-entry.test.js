@@ -806,6 +806,39 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
     assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product frontdesk');
     assert.deepEqual(manifest.skill_catalog.skills[0].tags, ['domain-app', 'product-entry', 'visual-deliverables']);
+    assert.deepEqual(
+      manifest.skill_catalog.skills[0].domain_projection.runtime_continuity,
+      {
+        surface_kind: 'skill_runtime_continuity',
+        runtime_owner: 'upstream_hermes_agent',
+        domain_owner: 'redcube_ai',
+        executor_owner: 'codex_cli',
+        session_locator_field: 'entry_session_contract.entry_session_id',
+        session_surface_ref: {
+          ref_kind: 'json_pointer',
+          ref: '/entry_session',
+          label: 'entry session surface',
+        },
+        progress_surface_ref: {
+          ref_kind: 'json_pointer',
+          ref: '/progress_projection',
+          label: 'progress projection surface',
+        },
+        artifact_surface_ref: {
+          ref_kind: 'json_pointer',
+          ref: '/artifact_inventory',
+          label: 'artifact inventory surface',
+        },
+        restore_point_surface_ref: {
+          ref_kind: 'json_pointer',
+          ref: '/session_continuity/restore_point',
+          label: 'restore point surface',
+        },
+        recommended_resume_command: 'redcube product session --entry-session-id <entry-session-id>',
+        recommended_progress_command: 'redcube product session --entry-session-id <entry-session-id>',
+        recommended_artifact_command: 'redcube product session --entry-session-id <entry-session-id>',
+      },
+    );
     assert.equal(manifest.automation.surface_kind, 'automation');
     assert.equal(manifest.automation.automations.length, 2);
     assert.equal(manifest.automation.automations[0].automation_id, 'redcube_autopilot_continuation_board');

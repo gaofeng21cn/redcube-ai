@@ -339,6 +339,36 @@ export async function getProductEntryManifest(request) {
       continuation_surface_kind: 'product_entry_session',
     },
   });
+  const runtimeContinuityEnvelope = {
+    surface_kind: 'skill_runtime_continuity',
+    runtime_owner: runtime.runtime_owner,
+    domain_owner: managedRuntimeContract.domain_owner,
+    executor_owner: managedRuntimeContract.executor_owner,
+    session_locator_field: familyOrchestration.resume_contract.session_locator_field,
+    session_surface_ref: {
+      ref_kind: 'json_pointer',
+      ref: '/entry_session',
+      label: 'entry session surface',
+    },
+    progress_surface_ref: {
+      ref_kind: 'json_pointer',
+      ref: '/progress_projection',
+      label: 'progress projection surface',
+    },
+    artifact_surface_ref: {
+      ref_kind: 'json_pointer',
+      ref: '/artifact_inventory',
+      label: 'artifact inventory surface',
+    },
+    restore_point_surface_ref: {
+      ref_kind: 'json_pointer',
+      ref: '/session_continuity/restore_point',
+      label: 'restore point surface',
+    },
+    recommended_resume_command: productEntrySessionCommand,
+    recommended_progress_command: productEntrySessionCommand,
+    recommended_artifact_command: productEntrySessionCommand,
+  };
   const skillCatalog = buildSkillCatalog({
     summary: 'RedCube AI is exposed as one domain app skill; frontdesk, direct invoke, and session continuity commands remain internal product-entry contracts for OPL and operator tooling.',
     skills: [
@@ -352,6 +382,9 @@ export async function getProductEntryManifest(request) {
         command: PRODUCT_FRONTDESK_COMMAND,
         readiness: 'landed',
         tags: ['domain-app', 'product-entry', 'visual-deliverables'],
+        domain_projection: {
+          runtime_continuity: runtimeContinuityEnvelope,
+        },
       }),
     ],
     supported_commands: [
