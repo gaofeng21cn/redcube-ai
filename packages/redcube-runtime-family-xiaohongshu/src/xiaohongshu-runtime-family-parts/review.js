@@ -318,7 +318,7 @@ export function createXiaohongshuReviewParts(deps) {
         issues,
       };
     });
-    const { data, generationRuntime } = await generateScreenshotReviewDraft(
+    const aiReviewPromise = generateScreenshotReviewDraft(
       workspaceRoot,
       contract,
       deliverablePaths,
@@ -329,6 +329,13 @@ export function createXiaohongshuReviewParts(deps) {
       research,
       adapter,
     );
+    const baselineReviewPromise = mode === 'optimize_existing'
+      ? Promise.resolve(computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, mechanicalSlideReviews))
+      : Promise.resolve(null);
+    const [
+      { data, generationRuntime },
+      baselineReview,
+    ] = await Promise.all([aiReviewPromise, baselineReviewPromise]);
     const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', {
       min: 0,
       max: mechanicalSlideReviews.length,
@@ -354,6 +361,9 @@ export function createXiaohongshuReviewParts(deps) {
       anti_template_ok: Boolean(directorReview?.visual_director_review?.anti_template_ok)
         && Boolean(data?.anti_template_ok),
       memory_hook_present: Boolean(directorReview?.visual_director_review?.memory_hook_present),
+      ...(baselineReview
+        ? { baseline_comparison_passed: baselineReview.baseline_comparison_passed }
+        : {}),
     };
     const failedChecks = Object.entries(checks)
       .filter(([, value]) => value === false)
@@ -428,16 +438,11 @@ export function createXiaohongshuReviewParts(deps) {
         },
       },
     };
-    if (mode === 'optimize_existing') {
-      const baselineReview = computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, slideReviews);
+    if (baselineReview) {
       artifact.baseline_review = baselineReview;
-      artifact.checks.baseline_comparison_passed = baselineReview.baseline_comparison_passed;
-      artifact.review_state_patch.latest_checks.baseline_comparison_passed = baselineReview.baseline_comparison_passed;
       if (!baselineReview.baseline_comparison_passed) {
         artifact.status = 'block';
         artifact.review_state_patch.current_status = 'blocked_for_revision';
-        artifact.review_state_patch.pending_reviews.push('baseline_comparison_passed');
-        artifact.review_state_patch.blocking_reasons.push('baseline_comparison_passed');
         artifact.review_state_patch.rerun_from_stage = 'visual_direction';
       }
     }

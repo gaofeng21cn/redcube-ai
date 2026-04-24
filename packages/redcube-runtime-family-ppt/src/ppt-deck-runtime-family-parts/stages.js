@@ -228,7 +228,7 @@ export function createPptDeckStageParts(deps) {
     return base;
   }
 
-  function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, slideReviews }) {
+  async function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, slideReviews }) {
     const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
     const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
     const baselineArtifact = readStageArtifact(baselineContract, baselinePaths, 'screenshot_review');
@@ -239,7 +239,7 @@ export function createPptDeckStageParts(deps) {
     const baselineFailures = safeArray(baselineArtifact.slide_reviews).filter((slide) => safeArray(slide.issues).length > 0).length;
     const currentDensity = slideReviews.reduce((sum, slide) => sum + Number(slide.metrics.text_char_count || 0), 0) / Math.max(slideReviews.length, 1);
     const baselineDensity = safeArray(baselineArtifact.slide_reviews).reduce((sum, slide) => sum + Number(slide.metrics?.text_char_count || 0), 0) / Math.max(safeArray(baselineArtifact.slide_reviews).length, 1);
-    const relativeQuality = compareFailuresAndDensity({
+    const relativeQuality = await compareFailuresAndDensity({
       currentFailures,
       baselineFailures,
       currentDensity,
@@ -534,7 +534,7 @@ export function createPptDeckStageParts(deps) {
       ...slide,
       status: safeArray(slide?.issues).length === 0 ? 'pass' : 'block',
     }));
-    const { data, aiSlideReviews, generationRuntime } = await generateScreenshotReviewDraft(
+    const aiReviewPromise = generateScreenshotReviewDraft(
       contract,
       deliverablePaths,
       renderArtifact,
@@ -543,6 +543,18 @@ export function createPptDeckStageParts(deps) {
       mode,
       adapter,
     );
+    const baselineReviewPromise = mode === 'optimize_existing'
+      ? Promise.resolve(baselineComparison({
+          workspaceRoot,
+          topicId,
+          baselineDeliverableId,
+          slideReviews: mechanicalSlideReviews,
+        }))
+      : Promise.resolve(null);
+    const [
+      { data, aiSlideReviews, generationRuntime },
+      baselineReview,
+    ] = await Promise.all([aiReviewPromise, baselineReviewPromise]);
     const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
     const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
     const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
@@ -562,6 +574,9 @@ export function createPptDeckStageParts(deps) {
       edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
       block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
       title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
+      ...(baselineReview
+        ? { baseline_comparison_passed: baselineReview.passed }
+        : {}),
       ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
     };
     const failedChecks = Object.entries(latestChecks)
@@ -633,21 +648,10 @@ export function createPptDeckStageParts(deps) {
         },
       },
     };
-    if (mode === 'optimize_existing' && reviewPayload.baseline) {
-      const relativeQuality = compareFailuresAndDensity({
-        currentFailures: reviewPayload.baseline.current_failed_slides,
-        baselineFailures: reviewPayload.baseline.baseline_failed_slides,
-        currentDensity: reviewPayload.baseline.current_average_density,
-        baselineDensity: reviewPayload.baseline.baseline_average_density,
-        densityTolerance: 0.08,
-        densityDigits: 4,
-        densityLabel: '平均占用率',
-      });
+    if (baselineReview) {
       artifact.baseline_review = {
-        baseline_deliverable_id: baselineDeliverableId,
-        ...reviewPayload.baseline,
-        relative_quality: relativeQuality,
-        summary: summarizeRelativeQuality(relativeQuality),
+        ...baselineReview,
+        baseline_comparison_passed: baselineReview.passed,
       };
     }
     const renderedReviewMarkdown = buildReviewMarkdown(

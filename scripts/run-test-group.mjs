@@ -97,6 +97,7 @@ const INTEGRATION = [
   'tests/render-html-guardrails.test.js',
   'tests/review-state-latest-checks.test.js',
   'tests/review-platform.test.js',
+  'tests/review-stage-concurrency.test.js',
   'tests/runtime-deliverable-route.test.js',
   'tests/screenshot-review-ai-first.test.js',
   'tests/service-safe-domain-entry.test.js',
