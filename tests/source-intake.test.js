@@ -82,6 +82,56 @@ test('intakeSource creates canonical source truth from brief and keywords', asyn
   assert.equal(materials.materials.some((item) => item.kind === 'brief'), true);
 });
 
+test('intakeSource reuses unchanged file source extraction by source content hash', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-incremental-'));
+  const sourceFile = path.join(workspaceRoot, 'source.md');
+  writeFileSync(sourceFile, '# 甲状腺门诊\n\nTSH 异常后需要结合 FT4 判断。');
+
+  const first = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-incremental',
+    title: '甲状腺门诊沟通',
+    sourceFiles: [sourceFile],
+  });
+  const firstManifest = readJson(first.artifactFiles.sourcePackManifestFile);
+  const firstMaterials = readJson(first.artifactFiles.extractedMaterialsFile);
+
+  const second = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-incremental',
+    title: '甲状腺门诊沟通',
+    sourceFiles: [sourceFile],
+  });
+  const secondManifest = readJson(second.artifactFiles.sourcePackManifestFile);
+  const secondMaterials = readJson(second.artifactFiles.extractedMaterialsFile);
+
+  assert.equal(second.ok, true);
+  assert.equal(secondManifest.reuse.reused_source_count, 1);
+  assert.equal(secondManifest.reuse.changed_source_count, 0);
+  assert.equal(secondManifest.sources[0].content_hash, firstManifest.sources[0].content_hash);
+  assert.equal(secondManifest.sources[0].extraction.reused, true);
+  assert.equal(secondManifest.sources[0].evidence_index.reused, true);
+  assert.deepEqual(secondMaterials.materials, firstMaterials.materials);
+
+  writeFileSync(sourceFile, '# 甲状腺门诊\n\nTSH 异常后需要结合 FT4 和症状判断。');
+  const third = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-incremental',
+    title: '甲状腺门诊沟通',
+    sourceFiles: [sourceFile],
+  });
+  const thirdManifest = readJson(third.artifactFiles.sourcePackManifestFile);
+  const thirdMaterials = readJson(third.artifactFiles.extractedMaterialsFile);
+
+  assert.equal(third.ok, true);
+  assert.equal(thirdManifest.reuse.reused_source_count, 0);
+  assert.equal(thirdManifest.reuse.changed_source_count, 1);
+  assert.notEqual(thirdManifest.sources[0].content_hash, firstManifest.sources[0].content_hash);
+  assert.equal(thirdManifest.sources[0].extraction.reused, false);
+  assert.equal(thirdManifest.sources[0].evidence_index.reused, false);
+  assert.match(thirdMaterials.materials[0].content_text, /症状判断/);
+});
+
 test('intakeSource scaffolds workspace-level xiaohongshu author template with generic RedCube defaults', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-workspace-template-'));
 

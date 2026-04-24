@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   cpSync,
   existsSync,
@@ -25,6 +26,15 @@ function ensureDir(dir) {
 function writeJson(file, value) {
   ensureDir(path.dirname(file));
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
+}
+
+function readJsonIfExists(file) {
+  if (!existsSync(file)) return null;
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function sha256Text(value) {
+  return createHash('sha256').update(String(value || ''), 'utf-8').digest('hex');
 }
 
 function safeText(value) {
@@ -174,6 +184,45 @@ function createBriefSources({ brief, keywords, title }) {
   return sources;
 }
 
+function sourceContentHashInput(source) {
+  if (source.kind === 'brief') return `brief\n${safeText(source.brief_text)}`;
+  if (source.kind === 'keywords') return `keywords\n${source.keywords.join('\n')}`;
+  if (source.kind === 'markdown' || source.kind === 'text' || source.kind === 'pdf') {
+    return readFileSync(source.absolute_path);
+  }
+  return `${source.kind}\n${safeText(source.relative_path)}`;
+}
+
+function enrichSourceFingerprint(source) {
+  const content = sourceContentHashInput(source);
+  const contentHash = createHash('sha256').update(content).digest('hex');
+  return {
+    ...source,
+    content_hash: contentHash,
+  };
+}
+
+function previousSourceByHash(previousManifest) {
+  return new Map(
+    (Array.isArray(previousManifest?.sources) ? previousManifest.sources : [])
+      .filter((source) => safeText(source?.content_hash))
+      .map((source) => [source.content_hash, source]),
+  );
+}
+
+function previousMaterialBySourceHash(previousManifest, previousMaterials) {
+  const materialById = new Map(
+    (Array.isArray(previousMaterials?.materials) ? previousMaterials.materials : [])
+      .filter((material) => safeText(material?.material_id))
+      .map((material) => [material.material_id, material]),
+  );
+  return new Map(
+    (Array.isArray(previousManifest?.sources) ? previousManifest.sources : [])
+      .map((source) => [safeText(source?.content_hash), materialById.get(safeText(source?.material_id))])
+      .filter(([contentHash, material]) => contentHash && material),
+  );
+}
+
 function extractPdfSource(source) {
   const mineruToken = safeText(process.env.MINERU_TOKEN);
   const extractorCmd = safeText(process.env.MINERU_EXTRACTOR_CMD);
@@ -306,33 +355,63 @@ export async function intakeSource({
     ...createBriefSources({ brief, keywords: normalizedKeywords, title: safeText(title) || topicId }),
     ...copiedFileSources,
     ...copiedOperatorSources,
-  ];
+  ].map((source) => enrichSourceFingerprint(source));
 
   if (intakeSources.length === 0) {
     throw new Error('source intake 至少需要 brief、keywords 或 sourceFiles 之一');
   }
 
+  const previousManifest = readJsonIfExists(sourcePaths.sourcePackManifestFile);
+  const previousExtractedMaterials = readJsonIfExists(sourcePaths.extractedMaterialsFile);
+  const priorSourcesByHash = previousSourceByHash(previousManifest);
+  const priorMaterialsByHash = previousMaterialBySourceHash(previousManifest, previousExtractedMaterials);
+
   const extracted = intakeSources.map((source) => {
+    const priorSource = priorSourcesByHash.get(source.content_hash);
+    const priorMaterial = priorMaterialsByHash.get(source.content_hash);
+    if (priorSource?.extraction?.status === 'ready' && priorMaterial) {
+      return {
+        ...source,
+        status: 'ready',
+        blocking_reason: '',
+        content_text: priorMaterial.content_text || '',
+        reused: true,
+        reused_material: priorMaterial,
+        previous_source_id: safeText(priorSource.source_id),
+      };
+    }
     const extraction = extractSourceContent(source);
     return {
       ...source,
       status: extraction.status,
       blocking_reason: extraction.blocking_reason || '',
       content_text: extraction.content_text || '',
+      reused: false,
     };
   });
 
   const readyMaterials = extracted
     .filter((source) => source.status === 'ready')
-    .map((source, index) => ({
-      material_id: `MAT-${String(index + 1).padStart(3, '0')}`,
-      source_id: source.source_id,
-      kind: source.kind,
-      source_role: safeText(source.source_role),
-      relative_path: source.relative_path,
-      content_text: source.content_text,
-      excerpt: source.content_text.slice(0, 240),
-    }));
+    .map((source, index) => {
+      const materialId = `MAT-${String(index + 1).padStart(3, '0')}`;
+      if (source.reused && source.reused_material) {
+        return {
+          ...source.reused_material,
+          material_id: materialId,
+          source_id: source.source_id,
+          relative_path: source.relative_path,
+        };
+      }
+      return {
+        material_id: materialId,
+        source_id: source.source_id,
+        kind: source.kind,
+        source_role: safeText(source.source_role),
+        relative_path: source.relative_path,
+        content_text: source.content_text,
+        excerpt: source.content_text.slice(0, 240),
+      };
+    });
   const consumableReadyMaterials = readyMaterials.filter((material) => isConsumableSource(material));
 
   const inputMode = inferInputMode({ modeHint, sources: intakeSources });
@@ -370,6 +449,7 @@ export async function intakeSource({
       kind: source.kind,
       source_role: safeText(source.source_role),
       relative_path: source.relative_path,
+      content_hash: source.content_hash,
       status: source.status,
       blocking_reason: source.blocking_reason || null,
     })),
@@ -443,12 +523,52 @@ export async function intakeSource({
     sourceAudit,
     sourceReadinessPack,
   });
+  const materialIdBySourceId = new Map(readyMaterials.map((material) => [material.source_id, material.material_id]));
+  const sourcePackManifest = {
+    schema_version: 1,
+    artifact_kind: 'source_pack_manifest',
+    topic_id: sourcePaths.topicPaths.topicId,
+    hash_algorithm: 'sha256',
+    input_mode: inputMode,
+    readiness: {
+      audit_status: sourceAudit.status,
+      sufficiency_status: sourceReadinessPack.readiness.sufficiency_status,
+      planning_ready: sourceReadinessPack.readiness.planning_ready,
+      release_blocked: sourceReadinessPack.readiness.release_blocked,
+    },
+    reuse: {
+      previous_manifest_available: previousManifest !== null,
+      reused_source_count: extracted.filter((source) => source.reused === true).length,
+      changed_source_count: extracted.filter((source) => source.reused !== true).length,
+    },
+    sources: extracted.map((source) => ({
+      source_id: source.source_id,
+      previous_source_id: source.previous_source_id || null,
+      kind: source.kind,
+      source_role: safeText(source.source_role),
+      relative_path: source.relative_path,
+      content_hash: source.content_hash,
+      status: source.status,
+      material_id: materialIdBySourceId.get(source.source_id) || null,
+      extraction: {
+        status: source.status,
+        reused: source.reused === true,
+        blocking_reason: source.blocking_reason || null,
+      },
+      evidence_index: {
+        reused: source.reused === true,
+        content_hash: sha256Text(`${source.content_hash}\n${safeText(source.content_text)}`),
+        material_id: materialIdBySourceId.get(source.source_id) || null,
+      },
+    })),
+  };
 
   writeJson(sourcePaths.sourceIndexFile, sourceIndex);
   writeJson(sourcePaths.extractedMaterialsFile, extractedMaterials);
   writeJson(sourcePaths.sourceBriefFile, sourceBrief);
   writeJson(sourcePaths.sourceAuditFile, sourceAudit);
   writeJson(sourcePaths.sourceReadinessPackFile, sourceReadinessPack);
+  writeJson(sourcePaths.sourcePackManifestFile, sourcePackManifest);
   writeJson(sourcePaths.sourcePackFederationFile, sourcePackFederation);
   writeJson(sourcePaths.sourceAugmentationRequestFile, sourceAugmentationRequest);
 
@@ -461,6 +581,7 @@ export async function intakeSource({
       sourceAuditFile: sourcePaths.sourceAuditFile,
       sourceBriefFile: sourcePaths.sourceBriefFile,
       sourceReadinessPackFile: sourcePaths.sourceReadinessPackFile,
+      sourcePackManifestFile: sourcePaths.sourcePackManifestFile,
       sourcePackFederationFile: sourcePaths.sourcePackFederationFile,
       sourceAugmentationRequestFile: sourcePaths.sourceAugmentationRequestFile,
     },

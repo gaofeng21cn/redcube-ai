@@ -153,6 +153,7 @@ test('ppt_deck and xiaohongshu share a machine-readable source_pack federation f
     assert.equal(createdNote.sourcePackFederationFile, intake.artifactFiles.sourcePackFederationFile);
     assert.equal(federation.source_pack.artifact_files.source_readiness_pack, 'canonical/source-readiness-pack.json');
     assert.equal(federation.source_pack.artifact_files.source_index, 'canonical/source-index.json');
+    assert.equal(federation.source_pack.artifact_files.source_pack_manifest, 'canonical/source-pack-manifest.json');
     assert.deepEqual(
       federation.consumer_families.map((consumer) => consumer.family_id),
       ['ppt_deck', 'xiaohongshu'],

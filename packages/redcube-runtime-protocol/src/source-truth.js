@@ -27,6 +27,7 @@ export function getSourceArtifactPaths(workspaceRoot, topicId) {
     sourceAuditFile: path.join(topicPaths.canonicalDir, 'source-audit.json'),
     sourceBriefFile: path.join(topicPaths.canonicalDir, 'source-brief.json'),
     sourceReadinessPackFile: path.join(topicPaths.canonicalDir, 'source-readiness-pack.json'),
+    sourcePackManifestFile: path.join(topicPaths.canonicalDir, 'source-pack-manifest.json'),
     sourcePackFederationFile: path.join(topicPaths.canonicalDir, 'source-pack-federation.json'),
     sourceAugmentationRequestFile: path.join(topicPaths.canonicalDir, 'source-augmentation-request.json'),
     sourceAugmentationResultFile: path.join(topicPaths.canonicalDir, 'source-augmentation-result.json'),
@@ -94,6 +95,7 @@ export function buildSourcePackFederationArtifact({
         source_audit: relativeTopicPath(topicPaths, paths.sourceAuditFile),
         source_brief: relativeTopicPath(topicPaths, paths.sourceBriefFile),
         source_readiness_pack: relativeTopicPath(topicPaths, paths.sourceReadinessPackFile),
+        source_pack_manifest: relativeTopicPath(topicPaths, paths.sourcePackManifestFile),
       },
       readiness: {
         target: safeText(sourceReadinessPack?.readiness?.target, 'planning_ready'),

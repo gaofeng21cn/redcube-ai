@@ -23,6 +23,9 @@ export function loadSharedSourceTruth(workspaceRoot, topicId) {
       source_audit: paths.sourceAuditFile,
       source_brief: paths.sourceBriefFile,
       source_readiness_pack: paths.sourceReadinessPackFile,
+      ...(existsSync(paths.sourcePackManifestFile) ? {
+        source_pack_manifest: paths.sourcePackManifestFile,
+      } : {}),
       ...(existsSync(paths.sourceAugmentationRequestFile) ? {
         source_augmentation_request: paths.sourceAugmentationRequestFile,
       } : {}),
@@ -35,6 +38,9 @@ export function loadSharedSourceTruth(workspaceRoot, topicId) {
     source_audit: readJson(paths.sourceAuditFile),
     source_brief: readJson(paths.sourceBriefFile),
     source_readiness_pack: readJson(paths.sourceReadinessPackFile),
+    ...(existsSync(paths.sourcePackManifestFile) ? {
+      source_pack_manifest: readJson(paths.sourcePackManifestFile),
+    } : {}),
     ...(existsSync(paths.sourceAugmentationRequestFile) ? {
       source_augmentation_request: readJson(paths.sourceAugmentationRequestFile),
     } : {}),
