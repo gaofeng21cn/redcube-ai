@@ -877,6 +877,18 @@ export function createPptDeckRenderStageParts(deps) {
       })),
     });
     const stableViewRefs = seedDeliverableStableViews(viewSurfacePaths, htmlFile, slidesFile);
+    const targetedSlideIds = renderExecution?.mode === 'targeted_revision_only'
+      ? safeArray(renderExecution?.targeted_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean)
+      : [];
+    const targetedRerun = targetedSlideIds.length > 0
+      ? {
+          default_route: PAGE_FIX_ROUTE,
+          scope: 'slide',
+          target_slide_ids: targetedSlideIds,
+          reused_slide_ids: safeArray(renderExecution?.reused_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+          source_review_stages: ['visual_director_review', 'screenshot_review'],
+        }
+      : null;
     return {
       ...attachCommon(route, contract, generationRuntime, adapter),
       creative_execution: creativeExecution(
@@ -885,6 +897,7 @@ export function createPptDeckRenderStageParts(deps) {
         adapter,
       ),
       render_execution: renderExecution || null,
+      ...(targetedRerun ? { targeted_rerun: targetedRerun } : {}),
       lifecycle_stage: contract.lifecycle_model?.route_to_stage?.[route] || contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
       html_bundle: {
         html_file: htmlFile,

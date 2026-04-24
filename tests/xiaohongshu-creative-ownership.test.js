@@ -668,6 +668,14 @@ test('xiaohongshu screenshot_review keeps local visual blocks on fix_html even w
       const reviewState = readJson(path.join(deliverableDir, 'reports', 'review-state.json'));
       assert.equal(reviewState.latest_checks.director_intent_landed, false);
       assert.equal(reviewState.rerun_from_stage, 'fix_html');
+      assert.deepEqual(reviewState.rerun_policy, {
+        status: 'rerun_required',
+        rerun_from_stage: 'fix_html',
+        default_route: 'fix_html',
+        scope: 'page',
+        target_slide_ids: ['N04'],
+        source_review_stage: 'screenshot_review',
+      });
     } finally {
       restoreVariant();
     }

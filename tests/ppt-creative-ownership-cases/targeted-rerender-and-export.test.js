@@ -234,6 +234,13 @@ test('ppt fix_html only regenerates blocked slides and preserves previously pass
       assert.equal(renderArtifact.render_execution?.mode, 'targeted_revision_only');
       assert.deepEqual(renderArtifact.render_execution?.freshly_rendered_slide_ids, ['S06']);
       assert.equal(renderArtifact.render_execution?.reused_slide_ids.includes('S01'), true);
+      assert.deepEqual(renderArtifact.targeted_rerun, {
+        default_route: 'fix_html',
+        scope: 'slide',
+        target_slide_ids: ['S06'],
+        reused_slide_ids: renderArtifact.render_execution.reused_slide_ids,
+        source_review_stages: ['visual_director_review', 'screenshot_review'],
+      });
     } finally {
       restoreVariant();
     }

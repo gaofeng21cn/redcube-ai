@@ -11,6 +11,7 @@ export function createXiaohongshuReviewParts(deps) {
     buildAiFirstVisualSlideReview,
     buildAuthoringContext,
     computeBaselineReview,
+    collectSlidesNeedingTargetedRevision,
     creativeExecution,
     creativeSourceStamp,
     deriveScreenshotReviewRerunStage,
@@ -361,6 +362,19 @@ export function createXiaohongshuReviewParts(deps) {
     const rerunFromStage = status === 'pass'
       ? null
       : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
+    const targetedSlideIds = status === 'pass' || rerunFromStage !== 'fix_html'
+      ? []
+      : collectSlidesNeedingTargetedRevision(slideReviews)
+          .map((slide) => safeText(slide?.slide_id))
+          .filter(Boolean);
+    const targetedRerunPolicy = targetedSlideIds.length > 0
+      ? {
+          default_route: 'fix_html',
+          scope: 'page',
+          target_slide_ids: targetedSlideIds,
+          source_review_stage: 'screenshot_review',
+        }
+      : {};
     const artifact = {
       ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
       review_overlay: 'screenshot_review',
@@ -410,6 +424,7 @@ export function createXiaohongshuReviewParts(deps) {
         rerun_policy: {
           status: status === 'pass' ? 'idle' : 'rerun_required',
           rerun_from_stage: rerunFromStage,
+          ...targetedRerunPolicy,
         },
       },
     };
