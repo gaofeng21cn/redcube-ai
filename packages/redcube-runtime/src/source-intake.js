@@ -223,6 +223,33 @@ function previousMaterialBySourceHash(previousManifest, previousMaterials) {
   );
 }
 
+function unchangedSourcePackReuseDecision({ previousManifest, intakeSources }) {
+  if (!previousManifest || safeText(previousManifest.artifact_kind) !== 'source_pack_manifest') {
+    return {
+      canReuseFrozenPack: false,
+      reason: 'previous_manifest_missing',
+    };
+  }
+  const previousSources = Array.isArray(previousManifest.sources) ? previousManifest.sources : [];
+  if (previousSources.length !== intakeSources.length) {
+    return {
+      canReuseFrozenPack: false,
+      reason: 'source_count_changed',
+    };
+  }
+  const previousKeys = previousSources
+    .map((source) => `${safeText(source.source_role)}:${safeText(source.kind)}:${safeText(source.content_hash)}`)
+    .sort();
+  const currentKeys = intakeSources
+    .map((source) => `${safeText(source.source_role)}:${safeText(source.kind)}:${safeText(source.content_hash)}`)
+    .sort();
+  const unchanged = previousKeys.every((key, index) => key === currentKeys[index]);
+  return {
+    canReuseFrozenPack: unchanged,
+    reason: unchanged ? 'unchanged_source_manifest' : 'source_content_changed',
+  };
+}
+
 function extractPdfSource(source) {
   const mineruToken = safeText(process.env.MINERU_TOKEN);
   const extractorCmd = safeText(process.env.MINERU_EXTRACTOR_CMD);
@@ -363,6 +390,7 @@ export async function intakeSource({
 
   const previousManifest = readJsonIfExists(sourcePaths.sourcePackManifestFile);
   const previousExtractedMaterials = readJsonIfExists(sourcePaths.extractedMaterialsFile);
+  const frozenPackReuse = unchangedSourcePackReuseDecision({ previousManifest, intakeSources });
   const priorSourcesByHash = previousSourceByHash(previousManifest);
   const priorMaterialsByHash = previousMaterialBySourceHash(previousManifest, previousExtractedMaterials);
 
@@ -538,6 +566,8 @@ export async function intakeSource({
     },
     reuse: {
       previous_manifest_available: previousManifest !== null,
+      frozen_source_pack_reused: frozenPackReuse.canReuseFrozenPack,
+      skip_reason: frozenPackReuse.reason,
       reused_source_count: extracted.filter((source) => source.reused === true).length,
       changed_source_count: extracted.filter((source) => source.reused !== true).length,
     },
