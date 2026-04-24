@@ -158,7 +158,7 @@ function makeXhsReviewParts() {
   const htmlFile = path.join(workspaceRoot, 'note.html');
   const screenshotFile = path.join(reportsDir, 'screenshots', 'note-01.png');
   mkdirSync(path.dirname(screenshotFile), { recursive: true });
-  writeFileSync(htmlFile, '<html><body><section data-slide-id="N01">same html</section></body></html>');
+  writeFileSync(htmlFile, '<html><body><section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section></body></html>');
   writeFileSync(screenshotFile, 'png');
   const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'note-a' };
   const contract = { title: 'XHS cache', layout_rules: { max_primary_points_per_slide: 4 } };
@@ -192,14 +192,14 @@ function makeXhsReviewParts() {
     getDeliverableViewSurfacePaths: () => ({ stableHtmlFile: htmlFile }),
     hasAiVisualBlock: (review) => review?.judgement === 'block',
     hasAiVisualPass: (review) => review?.judgement === 'pass',
-    loadPriorRenderedXhsSlideHtmlMap: () => new Map([['N01', '<section>same html</section>']]),
+    loadPriorRenderedXhsSlideHtmlMap: () => new Map([['N01', '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>']]),
     markPublishBundleStaleAfterBlockedReview: () => [],
     normalizeStringList: (value) => safeArray(value),
     normalizeXhsScreenshotAiSlideReviews: (value) => value,
     primarySurface: () => 'test-surface',
     promoteStableHtml: () => ['stable.html'],
     promptRoute: () => 'prompt.md',
-    readCurrentHtmlArtifact: () => ({ html_bundle: { html_file: htmlFile, slides: [{ slide_id: 'N01', title: '第一页', content: '<p>same html</p>' }] } }),
+    readCurrentHtmlArtifact: () => ({ html_bundle: { html_file: htmlFile, slides: [{ slide_id: 'N01', title: '第一页', content: '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>' }] } }),
     readJson: () => ({}),
     readStageArtifact: (_contract, _paths, stage) => {
       if (stage === 'screenshot_review') return artifacts.get('screenshot_review') || null;
