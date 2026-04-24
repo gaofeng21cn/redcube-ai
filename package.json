@@ -18,6 +18,7 @@
     "test:e2e": "node scripts/run-test-group.mjs e2e",
     "test:historical": "node scripts/run-test-group.mjs historical",
     "test:full": "node scripts/run-test-group.mjs full",
+    "test:line-budget": "node scripts/check-line-budget.mjs",
     "typecheck": "tsc --noEmit --project tsconfig.tests.json --pretty false",
     "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs",
     "line-budget": "node scripts/line-budget.mjs"

@@ -36,7 +36,11 @@ async function withMockHermesUpstream(testFn) {
 
 test('poster_onepager creative mainline no longer lets runtime artifacts, seeds, or pack compilers author content', () => {
   const packEntry = read('packages/redcube-pack-poster-onepager/src/index.ts');
-  const runtime = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js');
+  const runtime = [
+    read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js'),
+    read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/authoring.js'),
+    read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js'),
+  ].join('\n');
   const storylinePrompt = read('prompts/poster_onepager/storyline.md');
   const blueprintPrompt = read('prompts/poster_onepager/poster_blueprint.md');
   const visualPrompt = read('prompts/poster_onepager/visual_direction.md');

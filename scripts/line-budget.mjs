@@ -8,14 +8,12 @@ process.chdir(repoRoot);
 const DEFAULT_LIMIT = 1000;
 const BASELINE = new Map(Object.entries({
   "packages/redcube-gateway/src/types.ts": 1198,
-  "packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js": 1903,
-  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js": 1760,
+  "packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js": 1302,
+  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js": 1033,
   "packages/redcube-runtime/src/managed-deliverable.js": 1258,
   "packages/redcube-tools/src/index.js": 1031,
-  "tests/cli-v2-smoke.test.js": 1599,
   "tests/helpers/mock-codex-cli.js": 1389,
   "tests/mcp-gateway.test.js": 1159,
-  "tests/ppt-creative-ownership.test.js": 1978,
   "tests/product-entry.test.js": 1184,
   "tests/source-intake.test.js": 1131,
 }));

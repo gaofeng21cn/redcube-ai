@@ -7,7 +7,11 @@ node scripts/line-budget.mjs
 
 case "$lane" in
   smoke|fast)
+    npm run test:line-budget
     npm run test:fast
+    ;;
+  line-budget)
+    npm run test:line-budget
     ;;
   meta)
     npm run test:meta
@@ -29,7 +33,7 @@ case "$lane" in
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|meta|family|integration|e2e|historical|full]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|meta|family|integration|e2e|historical|full]" >&2
     exit 1
     ;;
 esac

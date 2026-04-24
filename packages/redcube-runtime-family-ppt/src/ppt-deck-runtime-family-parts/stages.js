@@ -48,7 +48,7 @@ export function createPptDeckStageParts(deps) {
     normalizeStringList,
     normalizeTypographyPlan,
     primarySurface,
-    readCurrentHtmlArtifact,
+    readCurrentHtmlArtifact: providedReadCurrentHtmlArtifact,
     readJson,
     readPromptPackText,
     readStageArtifact,
@@ -72,7 +72,13 @@ export function createPptDeckStageParts(deps) {
     writeText,
   } = deps;
 
-  const renderParts = createPptDeckRenderStageParts(deps);
+  const readCurrentHtmlArtifact = providedReadCurrentHtmlArtifact || ((contract, deliverablePaths) => (
+    readStageArtifact(contract, deliverablePaths, currentHtmlStageId(contract, deliverablePaths))
+  ));
+  const renderParts = createPptDeckRenderStageParts({
+    ...deps,
+    readCurrentHtmlArtifact,
+  });
   const { loadPriorRenderedSlideHtmlMap } = renderParts;
 
   async function generateDirectorReviewDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {

@@ -460,7 +460,7 @@ export function createPptDeckRenderStageParts(deps) {
   function listScreenshotCaptureDirs(deliverablePaths) {
     const screenshotsDir = path.join(deliverablePaths.reportsDir, 'screenshots');
     if (!(mainExistsSync || existsSync)(screenshotsDir)) return [];
-    return readdirSync(screenshotsDir, { withFileTypes: true })
+    return (deps.readdirSync || readdirSync)(screenshotsDir, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => path.join(screenshotsDir, entry.name))
       .sort((left, right) => safeFileMtimeMs(right) - safeFileMtimeMs(left));
