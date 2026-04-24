@@ -29,6 +29,7 @@ assertCurrentRepoSharedPinAlignment({ repoRoot });
 const META = [
   'tests/bilingual-home-readme.test.js',
   'tests/ci-workflow.test.js',
+  'tests/codex-plugin.test.js',
   'tests/creative-ownership-recovery-audit.test.js',
   'tests/codex-cli-client.test.js',
   'tests/codex-cli-timeout.test.js',

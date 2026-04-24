@@ -795,16 +795,17 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.task_lifecycle.checkpoint_summary.status, 'operator_review_required');
     assert.deepEqual(manifest.task_lifecycle.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
-    assert.equal(manifest.skill_catalog.skills.length, 3);
+    assert.equal(manifest.skill_catalog.skills.length, 1);
     assert.deepEqual(manifest.skill_catalog.supported_commands, [
       'redcube product frontdesk',
       'redcube product invoke',
       'redcube product session',
     ]);
     assert.equal(manifest.skill_catalog.command_contracts.length, 3);
-    assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube_product_frontdesk');
-    assert.equal(manifest.skill_catalog.skills[1].skill_id, 'redcube_product_entry_direct');
-    assert.equal(manifest.skill_catalog.skills[2].skill_id, 'redcube_product_entry_session');
+    assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube-ai');
+    assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
+    assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product frontdesk');
+    assert.deepEqual(manifest.skill_catalog.skills[0].tags, ['domain-app', 'product-entry', 'visual-deliverables']);
     assert.equal(manifest.automation.surface_kind, 'automation');
     assert.equal(manifest.automation.automations.length, 2);
     assert.equal(manifest.automation.automations[0].automation_id, 'redcube_autopilot_continuation_board');

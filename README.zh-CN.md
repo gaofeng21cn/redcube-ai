@@ -78,6 +78,7 @@
 - 先读 [文档索引](./docs/README.zh-CN.md)。这里已经说明 direct route、OPL federated route、稳定 capability surface，以及当前技术基线。
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
 - 当前 repo-verified public entry surfaces 是 `CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contract，就构成了稳定可调用面。本地默认 concrete executor 仍是 `Codex CLI`，hosted/proof backend 继续只在显式 opt-in lane 中出现。
+- 如果外部 agent 或 OPL 需要直接读取 repo-tracked skill surface，使用单一 `redcube-ai` app skill 即可；`frontdesk` / `invoke` / `session` 继续作为这个 skill 底下的 machine-readable command contracts。
 - hosted quality lane 固定跑 `npm run typecheck`、`npm run test:fast`、`npm run test:family` 和 `npm run test:meta`；family shared pin 检查必须继续通过 `scripts/run-test-group-lib.mjs` 保持 clean-clone 可运行。
 - 本地 `npm run test:integration`、`npm run test:e2e` 和 `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发。
 - `docs/program/` 用来读已经吸收进主线的阶段里程碑，`docs/references/` 用来读 bridge 和 provenance 材料；Agent 不需要先从零散实现文件里反推当前执行真相。

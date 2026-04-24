@@ -1,0 +1,37 @@
+{
+  "name": "redcube-ai",
+  "version": "0.1.0",
+  "description": "Codex plugin shell for the RedCube AI visual deliverable domain app.",
+  "author": {
+    "name": "Gao Feng",
+    "url": "https://github.com/gaofeng21cn"
+  },
+  "homepage": "https://github.com/gaofeng21cn/redcube-ai",
+  "repository": "https://github.com/gaofeng21cn/redcube-ai",
+  "license": "UNLICENSED",
+  "keywords": [
+    "redcube",
+    "codex",
+    "visual-deliverables",
+    "gateway"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "RedCube AI",
+    "shortDescription": "Agent-first visual deliverable domain app for Codex.",
+    "longDescription": "Adds a thin Codex plugin entry for RedCube AI while preserving the existing CLI, gateway contracts, and same-session deliverable loop surfaces.",
+    "developerName": "Gao Feng",
+    "category": "Creative",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/gaofeng21cn/redcube-ai",
+    "defaultPrompt": [
+      "Open the RedCube AI frontdesk for this workspace.",
+      "Inspect the current RedCube product-entry manifest.",
+      "Continue the active RedCube deliverable loop in the same entry session."
+    ],
+    "brandColor": "#C65D2E"
+  }
+}
