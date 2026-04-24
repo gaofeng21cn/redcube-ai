@@ -328,7 +328,50 @@
           "academic poster advancement",
           "chat UI",
           "new family onboarding"
-        ]
+        ],
+        "route_equivalence": {
+          "status": "repo_tracked_manifest_contract",
+          "routes": [
+            "product_frontdesk",
+            "product_invoke",
+            "session_continuation",
+            "internal_opl_bridge"
+          ],
+          "shared_truth_surfaces": [
+            "domain_entry_surface",
+            "session_continuity",
+            "progress_projection",
+            "artifact_inventory",
+            "runtime_loop_closure",
+            "review_state",
+            "publication_projection"
+          ],
+          "public_skill_policy": {
+            "canonical_skill_id": "redcube-ai",
+            "second_public_skill_allowed": false
+          },
+          "runtime_semantics_policy": {
+            "second_runtime_semantics_allowed": false,
+            "downstream_entry_surface_kind": "domain_entry"
+          }
+        },
+        "deliverable_facade": {
+          "status": "repo_tracked_manifest_contract",
+          "covered_families": [
+            "ppt_deck",
+            "xiaohongshu"
+          ],
+          "truth_surfaces": [
+            "createDeliverable",
+            "runManagedDeliverable",
+            "runDeliverableRoute",
+            "auditDeliverable",
+            "runtimeWatch",
+            "getReviewState",
+            "getPublicationProjection"
+          ],
+          "core_generation_logic_changed": false
+        }
       },
       "artifacts": {
         "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
@@ -336,7 +379,9 @@
         "managed_product_entry_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "product_entry_brief": "docs/program/redcube_product_entry_mvp.md",
         "federated_product_entry_brief": "docs/program/opl_gateway_federated_product_entry.md",
-        "managed_product_entry_brief": "docs/program/managed_product_entry_hardening.md"
+        "managed_product_entry_brief": "docs/program/managed_product_entry_hardening.md",
+        "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
+        "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade"
       },
       "closeout": {
         "executed_at": "2026-04-12",

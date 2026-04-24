@@ -48,6 +48,24 @@ const PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/redcube-product-en
 const FEDERATED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-gateway-federated-product-entry.json';
 const MANAGED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/managed-product-entry-hardening.json';
 const SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF = 'contracts/runtime-program/service-safe-domain-entry-adapter.json';
+const ROUTE_EQUIVALENCE_SHARED_TRUTH_SURFACES = [
+  'domain_entry_surface',
+  'session_continuity',
+  'progress_projection',
+  'artifact_inventory',
+  'runtime_loop_closure',
+  'review_state',
+  'publication_projection',
+];
+const DELIVERABLE_FACADE_TRUTH_SURFACES = [
+  'createDeliverable',
+  'runManagedDeliverable',
+  'runDeliverableRoute',
+  'auditDeliverable',
+  'runtimeWatch',
+  'getReviewState',
+  'getPublicationProjection',
+];
 
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
@@ -75,6 +93,91 @@ function normalizeWorkspaceRoot(request) {
 
 function readCurrentProgramContract() {
   return JSON.parse(readFileSync(CURRENT_PROGRAM_CONTRACT_URL, 'utf8'));
+}
+
+function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) {
+  return {
+    surface_kind: 'route_equivalence_contract',
+    owner: 'redcube_ai',
+    status: 'repo_tracked',
+    summary: 'RCA frontdesk, direct invoke, same-session continuation, and the internal OPL bridge converge on the same downstream deliverable runtime truth.',
+    public_skill_policy: {
+      skill_count: 1,
+      skill_ids: ['redcube-ai'],
+      canonical_skill_id: 'redcube-ai',
+      second_public_skill_allowed: false,
+    },
+    equivalent_routes: [
+      {
+        route_id: 'product_frontdesk',
+        command: PRODUCT_FRONTDESK_COMMAND,
+        surface_kind: 'product_frontdesk',
+        role: 'canonical_public_frontdesk',
+      },
+      {
+        route_id: 'product_invoke',
+        command: PRODUCT_INVOKE_COMMAND,
+        surface_kind: 'product_entry',
+        role: 'direct_product_invoke',
+      },
+      {
+        route_id: 'session_continuation',
+        command: PRODUCT_SESSION_COMMAND,
+        command_template: productEntrySessionCommand,
+        surface_kind: 'product_entry_session',
+        role: 'same_session_continuation',
+      },
+      {
+        route_id: 'internal_opl_bridge',
+        command: PRODUCT_FEDERATE_COMMAND,
+        surface_kind: 'federated_product_entry',
+        role: 'internal_bridge_only',
+      },
+    ],
+    shared_truth_surfaces: ROUTE_EQUIVALENCE_SHARED_TRUTH_SURFACES,
+    downstream_runtime_truth: {
+      entry_surface_kind: 'domain_entry',
+      entry_adapter: 'RedCubeDomainEntry',
+      runtime_owner: runtime.runtime_owner,
+      session_store_root: runtime.session_store_root,
+      executor_owner: 'codex_cli',
+    },
+    guardrails: [
+      'do_not_create_second_public_skill',
+      'do_not_create_second_runtime_semantics',
+      'do_not_bypass_service_safe_domain_entry',
+      'do_not_fork_deliverable_truth_by_route',
+    ],
+  };
+}
+
+function buildDeliverableFacadeContract() {
+  return {
+    surface_kind: 'deliverable_facade_contract',
+    owner: 'redcube_ai',
+    status: 'repo_tracked',
+    summary: 'The product-entry facade covers current ppt_deck and xiaohongshu deliverable surfaces through the existing runtime and audit truth.',
+    covered_families: ['ppt_deck', 'xiaohongshu'],
+    facade_truth_surfaces: DELIVERABLE_FACADE_TRUTH_SURFACES,
+    runtime_identity_fields: ['program_id', 'topic_id', 'deliverable_id', 'run_id'],
+    public_entry_policy: {
+      canonical_skill_id: 'redcube-ai',
+      new_public_entry_allowed: false,
+      internal_bridge_surface: 'invokeFederatedProductEntry',
+    },
+    family_route_policy: {
+      ppt_deck: {
+        deliverable_family: 'ppt_deck',
+        route_surface: 'runManagedDeliverable',
+        route_fallback_surface: 'runDeliverableRoute',
+      },
+      xiaohongshu: {
+        deliverable_family: 'xiaohongshu',
+        route_surface: 'runDeliverableRoute',
+        route_fallback_surface: 'runManagedDeliverable',
+      },
+    },
+  };
 }
 
 export async function getProductEntryManifest(request) {
@@ -252,6 +355,11 @@ export async function getProductEntryManifest(request) {
     runtime_state_root: path.dirname(sessionStoreRoot),
     session_store_root: sessionStoreRoot,
   };
+  const routeEquivalence = buildRouteEquivalenceContract({
+    runtime,
+    productEntrySessionCommand,
+  });
+  const deliverableFacade = buildDeliverableFacadeContract();
   const managedRuntimeContract = buildManagedRuntimeContract({
     domain_owner: 'redcube_ai',
     executor_owner: 'codex_cli',
@@ -619,6 +727,8 @@ export async function getProductEntryManifest(request) {
 	    extra_payload: {
 	      ok: true,
 	      recommended_action: 'invoke_product_entry',
+	      route_equivalence: routeEquivalence,
+	      deliverable_facade: deliverableFacade,
 	      current_truth: {
 	        product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
 	        federated_product_entry_contract: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,

@@ -880,6 +880,46 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.match(manifest.product_entry_shell.frontdesk.purpose, /frontdesk/i);
     assert.match(manifest.product_entry_shell.direct.purpose, /deliverable loop/i);
+    assert.equal(manifest.route_equivalence.surface_kind, 'route_equivalence_contract');
+    assert.equal(manifest.route_equivalence.public_skill_policy.skill_count, 1);
+    assert.deepEqual(manifest.route_equivalence.public_skill_policy.skill_ids, ['redcube-ai']);
+    assert.deepEqual(
+      manifest.route_equivalence.equivalent_routes.map((route) => route.route_id),
+      ['product_frontdesk', 'product_invoke', 'session_continuation', 'internal_opl_bridge'],
+    );
+    assert.deepEqual(
+      manifest.route_equivalence.shared_truth_surfaces,
+      [
+        'domain_entry_surface',
+        'session_continuity',
+        'progress_projection',
+        'artifact_inventory',
+        'runtime_loop_closure',
+        'review_state',
+        'publication_projection',
+      ],
+    );
+    assert.equal(
+      manifest.route_equivalence.downstream_runtime_truth.entry_surface_kind,
+      'domain_entry',
+    );
+    assert.equal(
+      manifest.route_equivalence.downstream_runtime_truth.runtime_owner,
+      'upstream_hermes_agent',
+    );
+    assert.equal(manifest.deliverable_facade.surface_kind, 'deliverable_facade_contract');
+    assert.deepEqual(manifest.deliverable_facade.covered_families, ['ppt_deck', 'xiaohongshu']);
+    assert.deepEqual(manifest.deliverable_facade.facade_truth_surfaces, [
+      'createDeliverable',
+      'runManagedDeliverable',
+      'runDeliverableRoute',
+      'auditDeliverable',
+      'runtimeWatch',
+      'getReviewState',
+      'getPublicationProjection',
+    ]);
+    assert.equal(manifest.deliverable_facade.public_entry_policy.new_public_entry_allowed, false);
+    assert.equal(manifest.deliverable_facade.public_entry_policy.canonical_skill_id, 'redcube-ai');
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
     assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
     assert.equal(manifest.domain_entry_contract.service_safe_surface_kind, 'domain_entry');
