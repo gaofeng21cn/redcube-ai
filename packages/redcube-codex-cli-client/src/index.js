@@ -511,6 +511,8 @@ export async function generateStructuredArtifactViaCodexCli({
   localFileInspection = [],
   timeoutMs,
   cwd = process.cwd(),
+  contract = readCodexCliContract(),
+  spawnSyncImpl = null,
 } = {}) {
   const safeFamily = safeText(family, 'redcube');
   const safeRoute = safeText(route);
@@ -531,6 +533,7 @@ export async function generateStructuredArtifactViaCodexCli({
     localFileInspection,
   });
   const execution = await runCodexPrompt({
+    contract,
     prompt: [
       buildGenerationInstructions(safeFamily, safeRoute, localFileInspection),
       '',
@@ -541,6 +544,7 @@ export async function generateStructuredArtifactViaCodexCli({
       family: safeFamily,
       route: safeRoute,
     }),
+    spawnSyncImpl,
   });
 
   if (execution.codexRun.terminal_event !== 'run.completed') {
@@ -566,6 +570,90 @@ export async function generateStructuredArtifactViaCodexCli({
       sandbox: execution.contract.sandbox,
       prompt_pack_file: safePromptRelativePath,
       usage: terminalUsage(execution.codexRun.events),
+    },
+  };
+}
+
+function normalizeSessionPoolDescriptor(sessionPool = {}) {
+  const descriptorId = safeText(sessionPool?.descriptor_id, `codex_batch_${randomUUID()}`);
+  const reuseStrategy = safeText(sessionPool?.reuse_strategy, 'same_session_if_supported');
+  return {
+    descriptor_id: descriptorId,
+    reuse_strategy: reuseStrategy,
+    reuse_supported: false,
+    reuse_claimed: false,
+    reuse_status: 'unsupported_by_exec_surface',
+    invocation_surface: 'codex_exec_ephemeral_per_stage',
+  };
+}
+
+function normalizeBatchStages(stages) {
+  if (!Array.isArray(stages) || stages.length === 0) {
+    throw new Error('stages 必须是非空数组');
+  }
+  const seen = new Set();
+  return stages.map((stage, index) => {
+    const stageId = safeText(stage?.stage_id, `stage_${index + 1}`);
+    if (seen.has(stageId)) {
+      throw new Error(`stage_id 必须唯一: ${stageId}`);
+    }
+    seen.add(stageId);
+    return {
+      ...stage,
+      stage_id: stageId,
+    };
+  });
+}
+
+export async function generateStructuredArtifactBatchViaCodexCli({
+  stages,
+  sessionPool = {},
+  contract = readCodexCliContract(),
+  cwd = process.cwd(),
+  spawnSyncImpl = null,
+} = {}) {
+  const normalizedStages = normalizeBatchStages(stages);
+  const normalizedSessionPool = normalizeSessionPoolDescriptor(sessionPool);
+  const data = [];
+
+  for (const stage of normalizedStages) {
+    const result = await generateStructuredArtifactViaCodexCli({
+      family: stage.family,
+      route: stage.route,
+      promptRelativePath: stage.promptRelativePath,
+      context: stage.context,
+      outputContract: stage.outputContract,
+      localFileInspection: stage.localFileInspection,
+      timeoutMs: stage.timeoutMs,
+      cwd: stage.cwd || cwd,
+      contract,
+      spawnSyncImpl,
+    });
+    data.push({
+      stage_id: stage.stage_id,
+      data: result.data,
+      generationRuntime: result.generationRuntime,
+    });
+  }
+
+  return {
+    data,
+    batchRuntime: {
+      owner: REDCUBE_CODEX_RUNTIME_OWNER,
+      adapter_surface: '@redcube/codex-cli-client',
+      batch_descriptor: {
+        kind: 'codex_cli_batch_descriptor',
+        stage_count: normalizedStages.length,
+        stage_ids: normalizedStages.map((stage) => stage.stage_id),
+        timeout_policy: 'per_stage',
+        json_contract_policy: 'per_stage',
+        cleanup_policy: 'per_invocation_timeout_cleanup',
+      },
+      session_pool: {
+        ...normalizedSessionPool,
+        invocation_count: data.length,
+        stage_session_ids: data.map((stage) => stage.generationRuntime.session_id),
+      },
     },
   };
 }

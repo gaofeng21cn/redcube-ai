@@ -50,6 +50,53 @@ export interface StructuredArtifactGenerationResult {
   generationRuntime: StructuredArtifactGenerationRuntime;
 }
 
+export interface CodexCliBatchStageOptions {
+  stage_id?: string;
+  family?: string;
+  route: string;
+  promptRelativePath: string;
+  context?: Record<string, unknown>;
+  outputContract?: Record<string, unknown>;
+  localFileInspection?: Array<Record<string, unknown>>;
+  timeoutMs?: number;
+  cwd?: string;
+}
+
+export interface CodexCliBatchSessionPoolDescriptor {
+  descriptor_id?: string;
+  reuse_strategy?: string;
+}
+
+export interface StructuredArtifactBatchGenerationResult {
+  data: Array<{
+    stage_id: string;
+    data: Record<string, unknown>;
+    generationRuntime: StructuredArtifactGenerationRuntime;
+  }>;
+  batchRuntime: {
+    owner: 'codex_cli';
+    adapter_surface: '@redcube/codex-cli-client';
+    batch_descriptor: {
+      kind: 'codex_cli_batch_descriptor';
+      stage_count: number;
+      stage_ids: string[];
+      timeout_policy: 'per_stage';
+      json_contract_policy: 'per_stage';
+      cleanup_policy: 'per_invocation_timeout_cleanup';
+    };
+    session_pool: {
+      descriptor_id: string;
+      reuse_strategy: string;
+      reuse_supported: false;
+      reuse_claimed: false;
+      reuse_status: 'unsupported_by_exec_surface';
+      invocation_surface: 'codex_exec_ephemeral_per_stage';
+      invocation_count: number;
+      stage_session_ids: string[];
+    };
+  };
+}
+
 export declare const REDCUBE_CODEX_RUNTIME_OWNER: 'codex_cli';
 export declare const REDCUBE_CREATIVE_GENERATION_META_BEGIN: 'REDCUBE_CREATIVE_GENERATION_META_BEGIN';
 export declare const REDCUBE_CREATIVE_GENERATION_META_END: 'REDCUBE_CREATIVE_GENERATION_META_END';
@@ -75,4 +122,12 @@ export declare function generateStructuredArtifactViaCodexCli(options?: {
   outputContract?: Record<string, unknown>;
   timeoutMs?: number;
   cwd?: string;
+  contract?: CodexCliContract;
 }): Promise<StructuredArtifactGenerationResult>;
+
+export declare function generateStructuredArtifactBatchViaCodexCli(options?: {
+  stages: CodexCliBatchStageOptions[];
+  sessionPool?: CodexCliBatchSessionPoolDescriptor;
+  contract?: CodexCliContract;
+  cwd?: string;
+}): Promise<StructuredArtifactBatchGenerationResult>;
