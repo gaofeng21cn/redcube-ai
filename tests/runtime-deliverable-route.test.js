@@ -624,6 +624,45 @@ test('runDeliverableRoute supports xiaohongshu routes on shared runtime', async 
   });
 });
 
+test('runDeliverableRoute reuses a fresh gated stage artifact when the route cache key is unchanged', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-cache-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '甲状腺门诊科普 deck',
+      goal: '为本科生讲授甲状腺基础知识',
+    });
+
+    const first = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+    assert.equal(first.ok, true);
+    assert.equal(first.summary.cache_status, 'miss');
+
+    const second = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+
+    assert.equal(second.ok, true);
+    assert.equal(second.summary.cache_status, 'hit');
+    assert.equal(second.artifact?.route_cache?.cache_status, 'hit');
+    assert.equal(second.artifact?.route_cache?.cache_key, first.artifact?.route_cache?.cache_key);
+    assert.equal(second.run.stage_results[0].status, 'cached');
+  });
+});
+
 test('runDeliverableRoute supports poster_onepager routes on shared runtime', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));

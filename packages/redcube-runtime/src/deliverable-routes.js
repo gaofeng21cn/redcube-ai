@@ -169,7 +169,10 @@ export async function runDeliverableRoute({
       workspaceRoot,
       runId: run.run_id,
       currentStage: safeRoute,
-      stageResults: [{ stage: safeRoute, status: 'completed' }],
+      stageResults: [{
+        stage: safeRoute,
+        status: routeResult.cache_status === 'hit' ? 'cached' : 'completed',
+      }],
       artifactRefs: routeResult.artifact_refs,
       executor,
     });
@@ -181,6 +184,7 @@ export async function runDeliverableRoute({
       deliverable_id: deliverableId,
       profile_id: routeResult.artifact?.contract?.profile_id || null,
       artifact_file: routeResult.artifact_file,
+      cache_status: routeResult.cache_status || 'miss',
     });
 
     return {
@@ -188,6 +192,8 @@ export async function runDeliverableRoute({
       run: completedRun,
       events: readHermesEvents(workspaceRoot, completedRun.run_id),
       artifactFile: routeResult.artifact_file,
+      artifact: routeResult.artifact,
+      cache_status: routeResult.cache_status || 'miss',
     };
   } catch (error) {
     const failureMessage = String(

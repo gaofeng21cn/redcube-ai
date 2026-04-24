@@ -26,7 +26,9 @@ export async function runDeliverableRoute(request) {
       route: request.route,
       run_id: result.run?.run_id || null,
       status: result.run?.status || null,
+      cache_status: result.cache_status || 'miss',
     },
+    artifact: result.artifact || null,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),
   };
 }
