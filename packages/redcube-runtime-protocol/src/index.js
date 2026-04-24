@@ -7,6 +7,7 @@ export {
   resolveWorkspaceContract,
 } from './workspace.js';
 export {
+  buildSourcePackFederationArtifact,
   buildSourceTruthConsumptionSummary,
   getSourceArtifactPaths,
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,

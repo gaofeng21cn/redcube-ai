@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   buildGovernanceSurfaceContract,
@@ -7,7 +7,12 @@ import {
 } from '@redcube/overlay-core';
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { rebuildTopicPublicationProjection } from '@redcube/runtime';
-import { getDeliverablePaths, getTopicPaths } from '@redcube/runtime-protocol';
+import {
+  buildSourcePackFederationArtifact,
+  getDeliverablePaths,
+  getSourceArtifactPaths,
+  getTopicPaths,
+} from '@redcube/runtime-protocol';
 
 function buildTopicRecord({ topicId, title, overlay }) {
   return {
@@ -19,6 +24,68 @@ function buildTopicRecord({ topicId, title, overlay }) {
 }
 
 const overlayRegistry = getDefaultOverlayRegistry();
+
+function readJsonIfExists(file) {
+  if (!existsSync(file)) return null;
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function upsertConsumerFamily(federation, deliverable) {
+  const families = Array.isArray(federation.consumer_families)
+    ? federation.consumer_families
+    : [];
+  const familyId = String(deliverable.overlay || '').trim();
+  const family = families.find((item) => item?.family_id === familyId);
+  const deliverableEntry = {
+    deliverable_id: String(deliverable.deliverable_id || '').trim(),
+    profile_id: String(deliverable.profile_id || '').trim(),
+    title: String(deliverable.title || '').trim(),
+    goal: String(deliverable.goal || '').trim(),
+  };
+
+  if (family) {
+    const deliverables = Array.isArray(family.deliverables) ? family.deliverables : [];
+    if (!deliverables.some((item) => item?.deliverable_id === deliverableEntry.deliverable_id)) {
+      family.deliverables = [...deliverables, deliverableEntry];
+    }
+    return families;
+  }
+
+  return [
+    ...families,
+    {
+      family_id: familyId,
+      deliverables: [deliverableEntry],
+    },
+  ];
+}
+
+function updateSourcePackFederation({ workspaceRoot, topicId, deliverable }) {
+  const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
+  const sourceIndex = readJsonIfExists(sourcePaths.sourceIndexFile);
+  const extractedMaterials = readJsonIfExists(sourcePaths.extractedMaterialsFile);
+  const sourceAudit = readJsonIfExists(sourcePaths.sourceAuditFile);
+  const sourceBrief = readJsonIfExists(sourcePaths.sourceBriefFile);
+  const sourceReadinessPack = readJsonIfExists(sourcePaths.sourceReadinessPackFile);
+  if (!sourceIndex || !extractedMaterials || !sourceAudit || !sourceBrief || !sourceReadinessPack) {
+    return null;
+  }
+
+  const previousFederation = readJsonIfExists(sourcePaths.sourcePackFederationFile) || {};
+  const consumerFamilies = upsertConsumerFamily(previousFederation, deliverable);
+  const nextFederation = buildSourcePackFederationArtifact({
+    workspaceRoot,
+    topicId,
+    sourceIndex,
+    extractedMaterials,
+    sourceAudit,
+    sourceBrief,
+    sourceReadinessPack,
+    consumerFamilies,
+  });
+  writeFileSync(sourcePaths.sourcePackFederationFile, JSON.stringify(nextFederation, null, 2), 'utf-8');
+  return sourcePaths.sourcePackFederationFile;
+}
 
 export async function createDeliverable({
   workspaceRoot,
@@ -81,6 +148,12 @@ export async function createDeliverable({
     surfaceFiles.push(targetFile);
   }
 
+  const sourcePackFederationFile = updateSourcePackFederation({
+    workspaceRoot,
+    topicId,
+    deliverable,
+  });
+
   rebuildTopicPublicationProjection({ workspaceRoot, topicId });
 
   return {
@@ -95,6 +168,7 @@ export async function createDeliverable({
     deliverableFile: deliverablePaths.deliverableFile,
     deliverable,
     surfaceFiles,
+    sourcePackFederationFile,
     hydratedContract,
     governance_surface: governanceSurface,
   };

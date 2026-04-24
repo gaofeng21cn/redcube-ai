@@ -9,6 +9,7 @@ import {
 } from 'node:fs';
 
 import {
+  buildSourcePackFederationArtifact,
   getSourceArtifactPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
@@ -433,12 +434,22 @@ export async function intakeSource({
     sourceAudit,
     sourceReadinessPack,
   });
+  const sourcePackFederation = buildSourcePackFederationArtifact({
+    workspaceRoot,
+    topicId: sourcePaths.topicPaths.topicId,
+    sourceIndex,
+    extractedMaterials,
+    sourceBrief,
+    sourceAudit,
+    sourceReadinessPack,
+  });
 
   writeJson(sourcePaths.sourceIndexFile, sourceIndex);
   writeJson(sourcePaths.extractedMaterialsFile, extractedMaterials);
   writeJson(sourcePaths.sourceBriefFile, sourceBrief);
   writeJson(sourcePaths.sourceAuditFile, sourceAudit);
   writeJson(sourcePaths.sourceReadinessPackFile, sourceReadinessPack);
+  writeJson(sourcePaths.sourcePackFederationFile, sourcePackFederation);
   writeJson(sourcePaths.sourceAugmentationRequestFile, sourceAugmentationRequest);
 
   return {
@@ -450,6 +461,7 @@ export async function intakeSource({
       sourceAuditFile: sourcePaths.sourceAuditFile,
       sourceBriefFile: sourcePaths.sourceBriefFile,
       sourceReadinessPackFile: sourcePaths.sourceReadinessPackFile,
+      sourcePackFederationFile: sourcePaths.sourcePackFederationFile,
       sourceAugmentationRequestFile: sourcePaths.sourceAugmentationRequestFile,
     },
     audit: sourceAudit,

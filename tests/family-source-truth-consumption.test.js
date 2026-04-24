@@ -111,6 +111,60 @@ test('xiaohongshu emits shared source_truth_consumption across source/story/visu
   });
 });
 
+test('ppt_deck and xiaohongshu share a machine-readable source_pack federation for the same topic', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-pack-federation-'));
+    const intake = await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-federated',
+      title: '甲状腺门诊跨 family 科普',
+      brief: '同一个 topic 的冻结素材需要同时支撑 PPT 与小红书产出，且后续 family 可以继续并行消费。',
+      keywords: ['甲状腺', 'PPT', '小红书'],
+    });
+
+    assert.equal(intake.artifactFiles.sourcePackFederationFile.endsWith('canonical/source-pack-federation.json'), true);
+    const intakeFederation = readJson(intake.artifactFiles.sourcePackFederationFile);
+    assert.equal(intakeFederation.artifact_kind, 'cross_family_source_pack_federation');
+    assert.equal(intakeFederation.topic_id, 'topic-federated');
+    assert.equal(intakeFederation.source_pack.authoritative_source_kind, 'shared_source_truth');
+    assert.equal(intakeFederation.source_pack.readiness.sufficiency_status, intake.augmentation.trigger.source_sufficiency_status);
+    assert.deepEqual(intakeFederation.consumer_families, []);
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-federated',
+      deliverableId: 'deck-federated',
+      title: '甲状腺门诊跨 family PPT',
+      goal: '生成可授课 PPT',
+    });
+    const createdNote = await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-federated',
+      deliverableId: 'note-federated',
+      title: '甲状腺门诊跨 family 小红书',
+      goal: '生成可发布小红书图文',
+    });
+
+    const federation = readJson(intake.artifactFiles.sourcePackFederationFile);
+    assert.equal(createdNote.sourcePackFederationFile, intake.artifactFiles.sourcePackFederationFile);
+    assert.equal(federation.source_pack.artifact_files.source_readiness_pack, 'canonical/source-readiness-pack.json');
+    assert.equal(federation.source_pack.artifact_files.source_index, 'canonical/source-index.json');
+    assert.deepEqual(
+      federation.consumer_families.map((consumer) => consumer.family_id),
+      ['ppt_deck', 'xiaohongshu'],
+    );
+    assert.deepEqual(
+      federation.consumer_families.map((consumer) => consumer.deliverables[0].deliverable_id),
+      ['deck-federated', 'note-federated'],
+    );
+    assert.equal(federation.parallel_family_ready, true);
+  });
+});
+
 test('poster_onepager keeps guarded knowledge-poster boundary while emitting shared source_truth_consumption', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-family-source-truth-'));
