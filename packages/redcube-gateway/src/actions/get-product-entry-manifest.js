@@ -10,7 +10,6 @@ import {
 } from 'opl-gateway-shared/runtime-task-companions';
 import {
   buildSkillCatalog,
-  buildSkillDescriptor,
 } from 'opl-gateway-shared/skill-catalog';
 import {
   buildAutomationCatalog,
@@ -369,23 +368,45 @@ export async function getProductEntryManifest(request) {
     recommended_progress_command: productEntrySessionCommand,
     recommended_artifact_command: productEntrySessionCommand,
   };
+  const skillActivationHints = {
+    plugin_name: 'redcube-ai',
+    skill_semantics: 'single_domain_app_skill',
+    entry_shell_key: 'frontdesk',
+    entry_command: PRODUCT_FRONTDESK_COMMAND,
+    supporting_shell_keys: ['direct', 'session'],
+    shell_commands: {
+      frontdesk: {
+        command: PRODUCT_FRONTDESK_COMMAND,
+        target_surface_kind: 'product_frontdesk',
+      },
+      direct: {
+        command: PRODUCT_INVOKE_COMMAND,
+        target_surface_kind: 'product_entry',
+      },
+      session: {
+        command: PRODUCT_SESSION_COMMAND,
+        target_surface_kind: 'product_entry_session',
+      },
+    },
+  };
   const skillCatalog = buildSkillCatalog({
     summary: 'RedCube AI is exposed as one domain app skill; frontdesk, direct invoke, and session continuity commands remain internal product-entry contracts for OPL and operator tooling.',
     skills: [
-      buildSkillDescriptor({
+      {
         skill_id: 'redcube-ai',
         title: 'RedCube AI',
         owner: 'redcube_ai',
         distribution_mode: 'repo_tracked',
-        surface_kind: 'domain_app_skill',
+        surface_kind: 'product_frontdesk',
         description: 'Operate the RedCube AI domain app through the canonical frontdesk entry while preserving the same direct and session contracts underneath.',
         command: PRODUCT_FRONTDESK_COMMAND,
         readiness: 'landed',
         tags: ['domain-app', 'product-entry', 'visual-deliverables'],
         domain_projection: {
+          skill_activation: skillActivationHints,
           runtime_continuity: runtimeContinuityEnvelope,
         },
-      }),
+      },
     ],
     supported_commands: [
       PRODUCT_FRONTDESK_COMMAND,

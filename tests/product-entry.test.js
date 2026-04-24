@@ -805,7 +805,32 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube-ai');
     assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
     assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product frontdesk');
+    assert.equal(manifest.skill_catalog.skills[0].target_surface_kind, 'product_frontdesk');
     assert.deepEqual(manifest.skill_catalog.skills[0].tags, ['domain-app', 'product-entry', 'visual-deliverables']);
+    assert.deepEqual(
+      manifest.skill_catalog.skills[0].domain_projection.skill_activation,
+      {
+        plugin_name: 'redcube-ai',
+        skill_semantics: 'single_domain_app_skill',
+        entry_shell_key: 'frontdesk',
+        entry_command: 'redcube product frontdesk',
+        supporting_shell_keys: ['direct', 'session'],
+        shell_commands: {
+          frontdesk: {
+            command: 'redcube product frontdesk',
+            target_surface_kind: 'product_frontdesk',
+          },
+          direct: {
+            command: 'redcube product invoke',
+            target_surface_kind: 'product_entry',
+          },
+          session: {
+            command: 'redcube product session',
+            target_surface_kind: 'product_entry_session',
+          },
+        },
+      },
+    );
     assert.deepEqual(
       manifest.skill_catalog.skills[0].domain_projection.runtime_continuity,
       {
