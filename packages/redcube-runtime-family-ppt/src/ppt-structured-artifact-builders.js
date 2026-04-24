@@ -8,7 +8,8 @@ function safeArray(value) {
 }
 
 function creativeOwner(generationRuntime = null) {
-  return safeText(generationRuntime?.creative_owner, 'host_agent');
+  const owner = safeText(generationRuntime?.creative_owner, 'host_agent');
+  return owner === 'codex_cli' ? 'host_agent' : owner;
 }
 
 function primarySurface(generationRuntime = null) {
