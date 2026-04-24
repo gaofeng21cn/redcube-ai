@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 import { createPptDeckRenderStageParts } from './render.js';
 
@@ -175,6 +176,47 @@ export function createPptDeckStageParts(deps) {
     return {
       command: pythonCommand.command,
       payload: JSON.parse(result.stdout),
+    };
+  }
+
+  function hashReviewInput(renderArtifact) {
+    const htmlFile = safeText(renderArtifact?.html_bundle?.html_file);
+    const hash = createHash('sha256');
+    hash.update('ppt_deck_screenshot_mechanics:v1\n');
+    hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
+    hash.update(htmlFile);
+    hash.update('\n');
+    if (htmlFile && (mainExistsSync || existsSync)(htmlFile)) {
+      hash.update(readFileSync(htmlFile));
+    }
+    hash.update('\nslides\n');
+    hash.update(JSON.stringify(safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      title: safeText(slide?.title),
+      html: safeText(slide?.html || slide?.content_html || slide?.content),
+    }))));
+    return hash.digest('hex');
+  }
+
+  function cachedMechanicalReview(priorArtifact, hash) {
+    if (safeText(priorArtifact?.mechanical_review?.hash) !== hash) return null;
+    const slideReviews = safeArray(priorArtifact?.mechanical_review?.slide_reviews);
+    if (slideReviews.length === 0) return null;
+    return {
+      checks: priorArtifact.mechanical_review.checks || {},
+      metrics: priorArtifact.mechanical_review.metrics || {},
+      baseline: priorArtifact.mechanical_review.baseline || null,
+      device_scale_factor: priorArtifact.review_capture?.device_scale_factor || 2,
+      screenshot_dimensions: priorArtifact.review_capture?.screenshot_dimensions || null,
+      slide_reviews: slideReviews,
+    };
+  }
+
+  function mechanicalCacheMetadata(cacheStatus, hash) {
+    return {
+      cache_status: cacheStatus,
+      hash,
+      freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
     };
   }
 
@@ -528,7 +570,11 @@ export function createPptDeckStageParts(deps) {
       }
       args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
     }
-    const python = runPython(PYTHON_REVIEW, args);
+    const reviewHash = hashReviewInput(renderArtifact);
+    const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+    const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
+    const cacheStatus = cachedPayload ? 'hit' : 'miss';
+    const python = cachedPayload ? { command: 'cache', payload: cachedPayload } : runPython(PYTHON_REVIEW, args);
     const reviewPayload = python.payload;
     const mechanicalSlideReviews = safeArray(reviewPayload.slide_reviews).map((slide) => ({
       ...slide,
@@ -595,6 +641,7 @@ export function createPptDeckStageParts(deps) {
       review_overlay: 'screenshot_review',
       mode,
       status,
+      mechanical_cache: mechanicalCacheMetadata(cacheStatus, reviewHash),
       checks: latestChecks,
       review_capture: {
         capture_id: reviewCapture.captureId,
@@ -624,8 +671,11 @@ export function createPptDeckStageParts(deps) {
       },
       mechanical_review: {
         review_model: 'python_screenshot_layout_checks',
+        ...mechanicalCacheMetadata(cacheStatus, reviewHash),
         checks: reviewPayload.checks,
         metrics: reviewPayload.metrics,
+        baseline: reviewPayload.baseline || null,
+        slide_reviews: mechanicalSlideReviews,
       },
       report_markdown: reviewMarkdown,
       metrics: reviewPayload.metrics,

@@ -1,4 +1,6 @@
 import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 
 export function createXiaohongshuReviewParts(deps) {
   const {
@@ -79,6 +81,44 @@ export function createXiaohongshuReviewParts(deps) {
       lines.push('', '## Baseline Relative Review', safeText(reviewArtifact.baseline_review.summary));
     }
     return `${lines.join('\n')}\n`;
+  }
+
+  function hashReviewInput(render) {
+    const htmlFile = safeText(render?.html_bundle?.html_file);
+    const hash = createHash('sha256');
+    hash.update('xiaohongshu_screenshot_mechanics:v1\n');
+    hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
+    hash.update(htmlFile);
+    hash.update('\n');
+    if (htmlFile && existsSync(htmlFile)) {
+      hash.update(readFileSync(htmlFile));
+    }
+    hash.update('\nslides\n');
+    hash.update(JSON.stringify(safeArray(render?.html_bundle?.slides).map((slide) => ({
+      slide_id: safeText(slide?.slide_id),
+      title: safeText(slide?.title),
+      html: safeText(slide?.html || slide?.content_html || slide?.content),
+    }))));
+    return hash.digest('hex');
+  }
+
+  function cachedMechanicalReview(priorArtifact, hash) {
+    if (safeText(priorArtifact?.mechanical_review?.hash) !== hash) return null;
+    const slideReviews = safeArray(priorArtifact?.mechanical_review?.slide_reviews);
+    if (slideReviews.length === 0) return null;
+    return {
+      checks: priorArtifact.mechanical_review.checks || {},
+      metrics: priorArtifact.mechanical_review.metrics || {},
+      slide_reviews: slideReviews,
+    };
+  }
+
+  function mechanicalCacheMetadata(cacheStatus, hash) {
+    return {
+      cache_status: cacheStatus,
+      hash,
+      freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
+    };
   }
 
   async function generateDirectorReviewDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
@@ -290,7 +330,11 @@ export function createXiaohongshuReviewParts(deps) {
       const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
       args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
     }
-    const python = runPython(PYTHON_REVIEW, args);
+    const reviewHash = hashReviewInput(render);
+    const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+    const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
+    const cacheStatus = cachedPayload ? 'hit' : 'miss';
+    const python = cachedPayload || runPython(PYTHON_REVIEW, args);
     const mechanicalSlideReviews = safeArray(python.slide_reviews).map((slide) => {
       const occupiedRatio = Number(slide?.metrics?.occupied_ratio || 0);
       const overlaps = safeArray(slide?.metrics?.overlaps);
@@ -395,6 +439,7 @@ export function createXiaohongshuReviewParts(deps) {
       },
       mode,
       status,
+      mechanical_cache: mechanicalCacheMetadata(cacheStatus, reviewHash),
       checks,
       slide_reviews: slideReviews,
       ai_review: {
@@ -417,8 +462,10 @@ export function createXiaohongshuReviewParts(deps) {
       },
       mechanical_review: {
         review_model: 'python_screenshot_layout_checks',
+        ...mechanicalCacheMetadata(cacheStatus, reviewHash),
         checks: python.checks,
         metrics: python.metrics,
+        slide_reviews: mechanicalSlideReviews,
       },
       report_markdown: reviewMarkdown,
       metrics: python.metrics,
