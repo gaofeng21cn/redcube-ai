@@ -209,3 +209,31 @@ test('ppt render_html batches same-route slide chunks through durable per-batch 
   assert.equal(artifact.render_execution.codex_batch_runtime.session_pool.reuse_status, 'durable_render_batch_cache');
   assert.equal(artifact.html_bundle.page_count, 6);
 });
+
+test('ppt render_html reference slides expose style metadata without forwarding source html', async () => {
+  const stageCalls = [];
+  const { stageParts, workspaceRoot, contract, deliverablePaths } = makePptRenderParts({ stageCalls });
+
+  await stageParts.buildRenderHtmlArtifact({
+    workspaceRoot,
+    deliverableId: 'deck-a',
+    contract,
+    deliverablePaths,
+    route: 'render_html',
+    adapter: 'codex_cli',
+  });
+
+  const laterBatchReferences = stageCalls[1].context.reference_slides;
+  assert.deepEqual(laterBatchReferences.map((slide) => slide.slide_id), ['S01', 'S02']);
+  for (const reference of laterBatchReferences) {
+    assert.equal(
+      Object.hasOwn(reference, 'source_html'),
+      false,
+      `reference ${reference.slide_id} must not forward full source_html`,
+    );
+    assert.equal(typeof reference.source_html_hash, 'string');
+    assert.equal(reference.source_html_hash.length, 64);
+    assert.equal(typeof reference.visual_summary, 'object');
+    assert.equal(typeof reference.slide_identity, 'object');
+  }
+});

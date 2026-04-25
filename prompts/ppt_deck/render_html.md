@@ -5,7 +5,7 @@
 作用域规则：
 - 若 `context.render_scope = "slide_batch"`，只输出当前 batch 对应的 slides，不要补写其他页面
 - 若 `context.render_scope = "summary"`，只输出 `render_summary`，不要重复生成整页 HTML
-- 若 `context.reference_slides` 非空，把这些已成形页面当成同一 deck 的连续风格锚点；后续页面必须继承它们的字体级差、卡片尺度、留白语法与标题节奏，不要整体突然放大或缩小
+- 若 `context.reference_slides` 非空，只把其中的 `slide_identity`、`source_html_hash` 与 `visual_summary` 当成同一 deck 的连续风格锚点；后续页面只能继承 style tokens、typography、palette、spacing、卡片尺度与标题节奏，不得继承参考页布局结构
 
 必须保留：
 - #slide-display-area
@@ -90,7 +90,7 @@
       "若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体",
       "风险支路只允许一个紧凑 warning badge 与一段短 stub；禁止横向长红线穿越主链中轴，绿色判断词若保留则计入底部说明总数",
       "若已有上一轮通过的 render_html 产物，且 revision_context 只点名部分 blocked slides，则只重画这些页面；其余通过页应原样复用，不要为了顺手统一重新发明",
-      "若 context.reference_slides 提供了前面几页的 source_html，后续页面必须把它们当成 deck 风格锚点，继承同一套字体级差、卡片尺度与留白语法，不要让某一页整体突然更大或更小",
+      "若 context.reference_slides 提供了前面几页的 slide_identity、source_html_hash 与 visual_summary，后续页面只能把它们当成 deck 风格锚点，继承 style tokens、typography、palette、spacing、卡片尺度与留白语法，不得继承参考页布局结构，也不要让某一页整体突然更大或更小",
       "必须遵守 context.deck_style_reference.typography_plan；正文页标题、卡片标题、正文、标签与页码都沿用同一套字号梯度，除封面外不要漂移",
       "若标题或短句在当前字号梯度下可单行成立，禁止主动插入 <br/>；短中文词组只能在自然语义处换行",
       "页面纵向信息分布必须均衡；若主信息集中在中段，就要把底部变成有效承载区或视觉收束区，不能留下大块无意义空白",

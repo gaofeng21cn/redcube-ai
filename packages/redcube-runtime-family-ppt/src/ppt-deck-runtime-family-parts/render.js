@@ -604,7 +604,9 @@ export function createPptDeckRenderStageParts(deps) {
       prompt_slides: promptSlides,
       reference_slides: referenceSlides.map((slide) => ({
         slide_id: safeText(slide?.slide_id),
-        source_html_hash: stableHash(safeText(slide?.source_html)),
+        source_html_hash: safeText(slide?.source_html_hash),
+        visual_summary: slide?.visual_summary || {},
+        slide_identity: slide?.slide_identity || {},
       })),
       visual_direction_hash: stableHash(visualArtifact?.visual_direction || {}),
     });
@@ -749,10 +751,25 @@ export function createPptDeckRenderStageParts(deps) {
       if (!slideId || !sourceHtml) continue;
       references.push({
         slide_id: slideId,
-        slide_no: slide?.slide_no ?? index + 1,
-        title: safeText(slide?.title),
-        layout_family: safeText(slide?.layout_family),
-        source_html: sourceHtml,
+        source_html_hash: stableHash(sourceHtml),
+        slide_identity: {
+          slide_id: slideId,
+          slide_no: slide?.slide_no ?? index + 1,
+          title: safeText(slide?.title),
+          page_type: safeText(slide?.page_type),
+          chapter_id: safeText(slide?.chapter_id),
+          chapter_title: safeText(slide?.chapter_title),
+          render_recipe_id: safeText(slide?.render_recipe_id),
+        },
+        visual_summary: {
+          layout_family: safeText(slide?.layout_family),
+          anchor_tracks: safeArray(slide?.anchor_tracks).map((item) => safeText(item)).filter(Boolean),
+          title: safeText(slide?.title),
+          core_sentence: normalizeInlineText(slide?.core_sentence, 160),
+          qa_block_count: (sourceHtml.match(/data-qa-block=/g) || []).length,
+          primary_point_count: (sourceHtml.match(/data-primary-point=/g) || []).length,
+          html_character_count: sourceHtml.length,
+        },
       });
     }
     return references;
@@ -810,7 +827,7 @@ export function createPptDeckRenderStageParts(deps) {
         reference_window: RENDER_REFERENCE_SLIDE_WINDOW,
         continuity_rules: [
           '整套 deck 使用同一套标题、卡片标题、正文、标签与页码字号梯度；除封面外，不允许某页整体突然变大或缩小。',
-          '若按 batch 生成，后续批次必须参考前面最多三页已成形 HTML，继承同一套留白与排版语法。',
+          '若按 batch 生成，后续批次只能参考前面最多三页的 style tokens、typography、palette、spacing 与 visual summary，不得继承其布局结构。',
           '若标题或短句在当前字号梯度下能单行成立，就不要主动插入换行。',
           '页面纵向信息分布必须均衡：不要把大部分文字和主结构都压在中段，底部也要承担信息收束或结构支撑，避免出现上重中挤下空的大块死白。',
           '整套 deck 的页码语法必须一致：要么统一用两位纯页码，要么统一用当前页/总页数，不允许个别页单独换一套样式。',
@@ -834,7 +851,7 @@ export function createPptDeckRenderStageParts(deps) {
         '若某页 blueprint 附带 revision_focus，必须把它当作该页的硬重画 brief；recommended_fix 提到删减、收短、并入、合并的元素时，必须字面落实，不能保留同样抢眼的等价变体。',
         '正文页主标题字号需要在整套 deck 中保持一致，除封面外不要突然缩小；如果空间不足，优先压缩卡片正文、减少说明字数或重排结构，不要先牺牲标题一致性。',
         '整套 deck 的标题、卡片标题、正文、标签与页码必须遵守同一套 typography_plan；不要让某一页整体更大或更小。',
-        '若批次上下文提供 reference_slides，必须把它们当成连续风格锚点来对齐字号梯度、卡片尺度与留白语法。',
+        '若批次上下文提供 reference_slides，只能把 slide_identity、source_html_hash 与 visual_summary 当成连续风格锚点，用于对齐 style tokens、typography、palette、spacing 与卡片尺度；不得复制、继承或改写参考页的布局结构。',
         '连接线、时间线、轨道线必须退到节点徽标和数字圆点下层；不允许线条压在数字、badge 或关键词前景上。',
         '中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义夹杂英文，术语若出现也要尽量配中文语义。',
         '所有正文、标签、节点和卡片文案都要在自然语义处分行，优先减少字数和调整容器，不要把中英文硬挤到同一行直到溢出。',
