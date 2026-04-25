@@ -63,6 +63,7 @@ import {
   createManagedRun as createManagedRunJs,
   loadManagedProgressProjection as loadManagedProgressProjectionJs,
   loadManagedRun as loadManagedRunJs,
+  loadRuntimeSupervisionLatest as loadRuntimeSupervisionLatestJs,
   managedPromptAuditFile as managedPromptAuditFileJs,
   managedResultFile as managedResultFileJs,
   saveManagedProgressProjection as saveManagedProgressProjectionJs,
@@ -207,6 +208,12 @@ export async function getManagedRun(
   request: RuntimeManagedRunLookupRequest,
 ): Promise<RuntimeManagedRunResponse> {
   return getManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
+}
+
+export function loadRuntimeSupervisionLatest(request: {
+  workspaceRoot: string;
+}): Record<string, unknown> | null {
+  return loadRuntimeSupervisionLatestJs(request) as Record<string, unknown> | null;
 }
 
 export async function superviseManagedRun(

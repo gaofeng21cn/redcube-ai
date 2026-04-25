@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
@@ -527,6 +527,77 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assertFamilyOrchestrationCompanion(session, {
       sessionLocatorField: 'entry_session.entry_session_id',
     });
+  });
+});
+
+test('getProductEntrySession reconciles a stale session checkpoint with the workspace latest managed run', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const first = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-stale-checkpoint',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-stale-checkpoint',
+        profile_id: 'lecture_student',
+        title: 'Product entry stale checkpoint proof',
+        goal: '验证 product session 能吸收 workspace latest managed run',
+        user_intent: '先做到故事主线',
+        stop_after_stage: 'storyline',
+      },
+    });
+
+    const continued = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-stale-checkpoint',
+      },
+      delivery_request: {
+        user_intent: '继续推进',
+      },
+    });
+
+    assert.notEqual(
+      continued.continuation_snapshot.latest_managed_run_id,
+      first.continuation_snapshot.latest_managed_run_id,
+    );
+
+    const sessionFile = continued.entry_session.session_file;
+    const storedSession = readJson(sessionFile);
+    writeFileSync(
+      sessionFile,
+      JSON.stringify({
+        ...storedSession,
+        latest_managed_run_id: first.continuation_snapshot.latest_managed_run_id,
+        latest_surface_kind: 'managed_run',
+      }, null, 2),
+      'utf-8',
+    );
+
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-stale-checkpoint',
+    });
+
+    assert.equal(
+      session.continuation_snapshot.latest_managed_run_id,
+      continued.continuation_snapshot.latest_managed_run_id,
+    );
+    assert.equal(
+      session.session_continuity.restore_point.latest_managed_run_id,
+      continued.continuation_snapshot.latest_managed_run_id,
+    );
+    assert.equal(
+      readJson(sessionFile).latest_managed_run_id,
+      continued.continuation_snapshot.latest_managed_run_id,
+    );
   });
 });
 

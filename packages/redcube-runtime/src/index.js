@@ -34,6 +34,7 @@ export {
   createManagedRun,
   loadManagedProgressProjection,
   loadManagedRun,
+  loadRuntimeSupervisionLatest,
   managedPromptAuditFile,
   managedResultFile,
   saveManagedProgressProjection,

@@ -1,4 +1,9 @@
-import { loadProductEntrySession, productEntrySessionFile } from '@redcube/runtime';
+import {
+  loadProductEntrySession,
+  loadRuntimeSupervisionLatest,
+  productEntrySessionFile,
+  saveProductEntrySession,
+} from '@redcube/runtime';
 import {
   buildDeliveryIdentitySurface,
   buildEntrySessionSurface,
@@ -45,15 +50,47 @@ function requireField(name, value) {
   return text;
 }
 
+function latestManagedRunMatchesSession(runtimeSupervision, session) {
+  if (!runtimeSupervision?.managed_run_id) return false;
+  return safeText(runtimeSupervision.topic_id) === safeText(session.topic_id)
+    && safeText(runtimeSupervision.deliverable_id) === safeText(session.deliverable_id);
+}
+
+function reconcileSessionCheckpointWithWorkspaceLatest(session) {
+  const runtimeSupervision = loadRuntimeSupervisionLatest({
+    workspaceRoot: session.workspace_root,
+  });
+  if (!latestManagedRunMatchesSession(runtimeSupervision, session)) {
+    return session;
+  }
+
+  const latestManagedRunId = safeText(runtimeSupervision.managed_run_id);
+  if (!latestManagedRunId || latestManagedRunId === safeText(session.latest_managed_run_id)) {
+    return session;
+  }
+
+  return saveProductEntrySession({
+    session: {
+      ...session,
+      latest_managed_run_id: latestManagedRunId,
+      latest_run_id: null,
+      latest_surface_kind: 'managed_run',
+      checkpoint_reconciled_at: new Date().toISOString(),
+      checkpoint_reconciliation_source: 'workspace_latest_runtime_supervision',
+    },
+  }).session;
+}
+
 export async function getProductEntrySession(request) {
   const entrySessionId = requireField(
     'entry_session_id',
     request?.entry_session_id || request?.entrySessionId,
   );
-  const session = loadProductEntrySession({ entrySessionId });
-  if (!session) {
+  const storedSession = loadProductEntrySession({ entrySessionId });
+  if (!storedSession) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
+  const session = reconcileSessionCheckpointWithWorkspaceLatest(storedSession);
   if (safeText(session.runtime_owner) !== MANAGED_RUNTIME_OWNER) {
     throw new Error('product entry session runtime_owner 漂移');
   }
