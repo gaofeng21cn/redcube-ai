@@ -4,20 +4,21 @@
 它属于仓库跟踪的操作文档层，不属于默认对外双语公开正文面。
 如果未来要把它提升到默认公开面，必须同步补齐英文 `.md` 与中文 `.zh-CN.md` 镜像。
 其中凡是历史 `docs/program/hermes/*` 冻结件，当前都只能读成 repo-local migration provenance，而不是上游 `Hermes-Agent` 已接管 runtime 的证据。
+当前公开第一身份是独立 visual-deliverable domain agent；`gateway / harness` 只作为仓内边界层与执行层语言保留。
 
 ## 一句话理解
 
-`RedCube AI` 不是 GUI 工具集合，而是一个面向 Agent 的 `Visual Deliverable Gateway`，并由共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS` 驱动。
+`RedCube AI` 不是 GUI 工具集合，而是面向 agent 的独立 visual-deliverable domain agent，提供 direct product entry、service-safe domain entry 与 visual-domain truth surfaces。
 
 这里的 `Agent-first` 通过默认 `Codex CLI host-agent runtime` 与显式 `hermes_native_proof` proof lane 共同成立。
-在当前 Codex-native 语境里，route / managed run surface 已按三层 owner 理解：`Hermes-Agent` 持有长期运行与托管能力，`RedCube AI` 持有 visual-domain governance / audit / projection truth，而默认 concrete executor 仍是本地 Codex CLI host-agent runtime；`Codex` 本地 operator host 继续承担当前部署宿主与 workspace bridge，而历史 `repo-local managed runtime pilot` 只保留为迁移 provenance / compatibility bridge；
+在当前 Codex-native 语境里，`RedCube AI` 持有 visual-domain governance / audit / projection truth，默认 concrete executor 是本地 Codex CLI host-agent runtime；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance / compatibility bridge；
 当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；
 当前已验证的公开正式入口是 `CLI`、`MCP`；
 代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
 
 这里同样必须区分：
 
-- 长线目标：把 `RedCube AI` 收敛成稳定、可信、可复验的 visual-deliverable `Domain Gateway + Domain Harness OS`
+- 长线目标：把 `RedCube AI` 收敛成稳定、可信、可复验的 visual-domain 产品 / 服务节点
 - 当前 program：当前 repo-tracked mainline 正在覆盖的能力层
 - 历史 freeze / closeout：把当前能力带进主线的 provenance 证据
 
@@ -33,29 +34,27 @@
 
 ```text
 Agent
-  -> CLI（默认）/ MCP
-      -> RedCube Gateway
-          -> Overlay / Family / Profile / Pack
-              -> RedCube Domain Harness OS
-                  -> Hermes-Agent managed runtime
-                      -> RedCube service-safe domain entry
-                          -> executor adapter
-                              -> concrete executor (default Codex CLI host-agent runtime)
+  -> RedCube Product Entry / CLI（默认）/ MCP
+      -> RedCube service-safe domain entry
+          -> executor adapter
+              -> concrete executor (default Codex CLI host-agent runtime)
+                  -> RedCube visual-domain truth surfaces
 ```
 
 放在 `OPL` 顶层语义里时：
 
 ```text
 User / Agent
-  -> OPL Gateway
-      -> RedCube Gateway
-          -> Overlay / Family / Profile / Pack
-              -> RedCube Harness OS
+  -> OPL Product Entry
+      -> OPL Gateway
+          -> RedCube service-safe domain entry
+              -> executor adapter
+                  -> RedCube visual-domain truth surfaces
 ```
 
 当前冻结的最终收口链还要再明确一层：
 
-Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> visual-domain truth surfaces
+RedCube service-safe domain entry -> executor adapter -> concrete executor -> visual-domain truth surfaces
 
 也就是说，`OPL Product Entry` 与 `RedCube Product Entry` 现在都已经可以把调用收敛到同一个 service-safe domain entry；当前仍未落地的是成熟的最终用户产品入口前台壳。
 
@@ -65,7 +64,7 @@ Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor ad
 User / Agent
   -> managed web runtime
       -> Gateway
-          -> Domain Harness OS
+          -> domain execution surface
               -> Governance / Audit / Artifact persistence
 ```
 
@@ -122,12 +121,12 @@ CLI 与 MCP 共享的唯一正式控制面，负责：
 
 ## 部署形态与本体语义分离
 
-- route / managed run surface 的长期 owner 是 `Hermes-Agent` managed runtime。
-- 默认 concrete executor 仍是本地 `Codex CLI host-agent runtime`。
+- 默认 concrete executor 是本地 `Codex CLI host-agent runtime`。
+- `Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留。
 - `Codex` 本地 operator host 是当前 deployment host / development shell。
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance、兼容桥与回归对照保留。
 - 未来切到 managed web runtime 时，只要仍在同一 `Unified Harness Engineering Substrate` 上并保持同一 contract，RedCube 的 domain 语义不变。
-- `OPL` 是上层语义系统；RedCube 在其中是视觉交付 domain gateway + Domain Harness OS，不是 `OPL` 本体。
+- `OPL` 是上层语义系统；RedCube 在其中是独立 visual-deliverable domain agent，不是 `OPL` 本体。
 - 当前仓库主线是 `Auto-only`；未来如需更高判断密度的 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
 
 ## 执行句柄与持久表面
@@ -238,8 +237,8 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 
 当前 reality：
 
-- `source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线：CLI / MCP 的 source intake 会把 canonical quartet 写入同一 substrate，`ppt_deck` / `xiaohongshu` 在同一 `gateway -> family -> profile -> pack -> harness execution` 控制链上消费 `shared_source_truth`；`P0 review-closeout` 与 stable deliverable manual hardening 继续保持通过，activation package freeze 已完成并转为已吸收前置冻结件
-- `Hermes-Agent` 当前承担长期 hosted session/run/watch/resume 这层 managed-runtime owner；默认 concrete executor 仍是 `Codex CLI host-agent runtime`。`Codex` 本地 operator host 同时作为当前部署宿主、workspace bridge 与 development shell，而历史 `repo-local managed runtime pilot` 只保留为 provenance / compatibility material
+- `source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线：CLI / MCP 的 source intake 会把 canonical quartet 写入同一 substrate，`ppt_deck` / `xiaohongshu` 在同一 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 控制链上消费 `shared_source_truth`；`P0 review-closeout` 与 stable deliverable manual hardening 继续保持通过，activation package freeze 已完成并转为已吸收前置冻结件
+- 默认 concrete executor 仍是 `Codex CLI host-agent runtime`。`Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留；`Codex` 本地 operator host 同时作为当前部署宿主、workspace bridge 与 development shell，而历史 `repo-local managed runtime pilot` 只保留为 provenance / compatibility material
 - 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
 - `xiaohongshu` 已有 `visual_director_review + screenshot_review`
 - `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`
@@ -251,10 +250,10 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 - `workspace / operator quickstart convergence` 已把 brand-new / thin workspace bootstrap 与 canonical operator route 收紧成同一条 repo-verified behavior surface：`workspace doctor` 保持诊断角色，而 `source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 成为当前可验证的 quickstart 路径
 - `operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path
 - `runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope，并让 `runtimeWatch` / `review watch` / `runtime_watch` 在 quartet locator mismatch 时 fail-closed
-- `governance_surface.runtime_topology` 现在在 create / review / audit / watch / projection 上显式暴露当前 upstream runtime owner、当前 deployment host，以及历史 local migration provenance
-- stable family runtime output 现在会直接暴露同一份 upstream runtime bridge truth，而 routed artifact 在落盘前也会统一保留 `topic_id` / `deliverable_id` / `contract` / `stage_contract`
+- `governance_surface.runtime_topology` 现在在 create / review / audit / watch / projection 上显式暴露当前默认 concrete executor、可选 hosted/proof backend、当前 deployment host，以及历史 local migration provenance
+- stable family runtime output 现在会直接暴露同一份 executor / backend bridge truth，而 routed artifact 在落盘前也会统一保留 `topic_id` / `deliverable_id` / `contract` / `stage_contract`
 - repo-hosted managed control plane 现在也已收口到同一 substrate：`runManagedDeliverable / getManagedRun / superviseManagedRun` 可以在 `ppt_deck`、`xiaohongshu`、guarded `poster_onepager` 上共享同一套 managed run / progress projection / runtime supervision / escalation truth，并会在 durable state 创建前 fail-closed 校验 `overlay` 与 `stop_after_stage`
-- service-safe domain entry adapter 也已冻结：`invokeDomainEntry` 通过同一条 `Hermes-Agent managed runtime -> executor adapter -> concrete executor` 链驱动 `runManagedDeliverable / runDeliverableRoute`，同时把 `runtimeWatch / getReviewState / getPublicationProjection / auditDeliverable` 继续留在 RedCube 侧收口
+- service-safe domain entry adapter 也已冻结：`invokeDomainEntry` 通过同一条 `executor adapter -> concrete executor` 链驱动 `runManagedDeliverable / runDeliverableRoute`，同时把 `runtimeWatch / getReviewState / getPublicationProjection / auditDeliverable` 继续留在 RedCube 侧收口
 - `publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state；`xiaohongshu` 保持 human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery 语义
 - `xiaohongshu` 现已形成第二条 repo-local managed family closure：`planning_ready` source readiness 之后的 `research -> export_bundle` 闭环继续保持 human-publication 语义，而不会漂移成 direct delivery
 - `direct-delivery operator handoff hardening` 已把 `ppt_deck` / guarded `poster_onepager` 的 `operator_handoff` 收紧到同一 canonical governance path：`delivery_state` ownership 继续留在 required export artifact，而 handoff gate 由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 共同收口
@@ -291,8 +290,8 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 
 - `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
 - `xiaohongshu` 共享同一 harness，但不自动等同于 `Presentation Ops`
-- `RedCube AI` 仍然必须保留独立 domain gateway 角色，而不是退化成 OPL 的内部模块
-- final target route 应理解成：`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+- `RedCube AI` 仍然必须保留独立 domain-agent 角色，而不是退化成 OPL 的内部模块
+- final target route 应理解成：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 ## 更稳定的规则在哪里
 

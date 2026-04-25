@@ -2,24 +2,25 @@
 
 这份文档用于统一 `RedCube AI` 在 `Unified Harness Engineering Substrate` 中的位置与边界。
 它是仓库跟踪的内部技术口径文档，不属于默认对外双语公开正文面。
+当前公开第一身份是独立 visual-deliverable domain agent 与单一 `redcube-ai` app skill；本文的 `Domain Gateway` / `Domain Harness OS` 词汇只按内部边界层与执行层语言理解。
 
 ## 1. 项目在统一基座中的位置
 
 `RedCube AI` 在统一基座中的角色是：
 
-- 对外：视觉交付 `Domain Gateway`
-- 对内：视觉交付 `Domain Harness OS`
+- 对外：独立 visual-deliverable domain agent
+- 对内：视觉交付 gateway / harness 边界层
 - 上下游关系：可被独立调用，也可挂接在更高层系统（如 `OPL`）之下
 
 这里的关键约束是：
 
 - 共享同一 `Unified Harness Engineering Substrate`
-- 通过同一套 `gateway -> family -> profile -> pack -> harness execution` 控制链运行
+- 通过同一套 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 控制链运行
 - 通过 family-specific contract 区分交付物，不通过平行系统分叉主线
 
 理想型上，`RedCube AI` 应收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点，而不是把视觉 domain 重新吸回 family-level federation 本体：
 
-`User -> OPL Product Entry -> OPL Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 ## 2. 统一约束（跨 family）
 
@@ -93,7 +94,7 @@
 
 迁移后不改变的内容：
 
-- `RedCube AI` 仍是视觉交付 domain gateway + Domain Harness OS
+- `RedCube AI` 仍是独立 visual-deliverable domain agent，内部继续保留 gateway / harness 边界层
 - `RedCube AI` 仍不是 `OPL` 本体
 
 ## 6. 避免的错误表述

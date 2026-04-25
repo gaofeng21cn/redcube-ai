@@ -20,7 +20,7 @@
 
 ## 项目目标
 
-- 稳定独立 domain-agent 的 formal-entry、service-safe entry 与执行链路，并保持内部 `gateway -> family -> profile -> pack -> harness execution` 边界可维护。
+- 稳定独立 domain-agent 的 formal-entry、service-safe entry 与执行链路，并保持内部 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 边界可维护。
 - 用 machine-readable contracts 与显式校验收紧 runtime mainline。
 - 保持稳定 capability surface、默认 `Codex CLI` concrete executor 与 visual-domain boundary 一起对齐；hosted runtime carrier 只作为显式可选 backend，不改写默认公开合同。
 - 冻结一个可被 `OPL` handoff 调用的 service-safe domain entry adapter，而不是先做聊天 UI。

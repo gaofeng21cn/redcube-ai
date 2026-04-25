@@ -4,18 +4,19 @@
 
 ## 项目定位
 
-`RedCube AI` 对外是面向 Agent 的 `Visual Deliverable Gateway`，对内是共享 `Unified Harness Engineering Substrate` 上的视觉交付 `Domain Harness OS`；它不再是面向人类点击操作的 Web / Workbench 产品。
+`RedCube AI` 对外是独立 visual-deliverable domain agent，第一公开主语是 `redcube-ai` app skill、direct product entry 与 service-safe domain entry；`gateway / harness` 只作为仓内边界层与执行层语言保留。它不再是面向人类点击操作的 Web / Workbench 产品。
 
 ## 稳定原则
 
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
-- `Gateway` 是 `CLI / MCP` 共享的唯一正式控制面
+- `domain-agent entry` 是 `CLI / MCP` 共享的唯一正式控制面
 - `controller` 当前不是独立、可验证的仓内公开正式入口
 - `Overlay` 负责领域约束与交付质量协议
 - `Harness OS` 只负责执行、记录、重跑与审计
 - 正式主线优先复用宿主 Agent runtime
 - 显式 proof lane 固定为 `hermes_native_proof`
-- 当前产品 runtime owner 是 route / managed run surface 上的 `Hermes-Agent` managed runtime
+- 默认 concrete executor 是本地 `Codex CLI host-agent runtime`
+- `Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留
 - `Codex` 本地 operator host 是当前 deployment host / development shell
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance / compatibility bridge，不是当前 owner
 - 未来可迁移到同一 substrate 上的 managed web runtime，但不改变 RedCube 的 domain 语义
@@ -151,6 +152,6 @@
 - 新交付物类型应通过 overlay 扩展，而不是重新引入独立主线
 - 新入口应挂在 Gateway 之上，而不是在外面包一层平行系统
 - 新的质量规则应进入 contract / gate / policy，而不是依赖 prompt 补救
-- 在 `OPL` 顶层语义里，`RedCube AI` 是视觉交付 domain gateway，不是 `OPL` 顶层 gateway 的替代物
+- 在 `OPL` 顶层语义里，`RedCube AI` 是独立 visual-deliverable domain agent，不是 `OPL` 顶层 gateway 的替代物
 - 不允许把 deterministic code authorship 重新包装成 `pack-first` 或 `typed` 进展
 - 不允许把部署形态（host-agent / managed web）改写成本体语义变化

@@ -8,14 +8,14 @@
 
 - `AGENTS.md` 只约束工作方式，不承载项目知识细节。
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
-- `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的 visual-deliverable domain gateway 与 `Domain Harness OS`。
+- `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的独立 visual-deliverable domain agent；`gateway / harness` 只作为仓内边界层与执行层语言保留，不作为对外第一身份。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 - 关键 durable surface 继续围绕 `program_id`、`topic_id`、`deliverable_id`、`run_id`，以及 `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 收口。
 
 ## 开发原则
 
-- 第一优先级：保持 `gateway -> family -> profile -> pack -> harness execution` 的正式控制链路。
+- 第一优先级：保持 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 的正式控制链路。
 - 第二优先级：优先 machine-readable contract、显式校验和 hydrated execution，而不是 prompt-only intent。
 - 第三优先级：在不改写 domain 语义的前提下，继续维护同一 mainline 的 absorbed tranche、follow-on board 与 provenance。
 - repo-tracked 源码与测试默认都应保持文件边界清晰，优先控制在 `1000` 行以内；超过 `1500` 行应视为明确的拆分信号，而不是继续堆叠实现。
