@@ -314,11 +314,25 @@ export interface PptNativePptRepairLog {
   repair_log_file: string;
 }
 
+export interface PptNativePptEngineContract {
+  kind: 'redcube_native_ppt_python_engine';
+  language: 'python';
+  contract_version: 1;
+  owned_routes: Array<'author_pptx_native' | 'repair_pptx_native'>;
+  input_boundary: 'slide_blueprint_plus_visual_direction_json';
+  review_boundary: 'rendered_pptx_screenshots';
+}
+
 export interface PptNativePptBundleArtifact extends PptRuntimeArtifactBase {
   route: 'author_pptx_native';
   status: 'completed';
   native_ppt_bundle: {
     source_visual_route: 'author_pptx_native';
+    builder?: {
+      kind?: string;
+    };
+    engine_contract: PptNativePptEngineContract;
+    shape_manifest_schema_version: number;
     editable_artifact: true;
     pptx_file: string;
     pdf_file: string;
