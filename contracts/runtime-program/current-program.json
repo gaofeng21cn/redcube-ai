@@ -154,6 +154,24 @@
       "pack_semantics": "domain_boundary_and_pack_id_only",
       "repo_local_pack_compiler_status": "removed_from_active_mainline"
     },
+    "exploration_lanes": {
+      "ppt_native_authoring_proof_lane": {
+        "status": "opt_in_proof_lane",
+        "contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
+        "brief": "docs/program/phase-2/phase_2_ppt_native_authoring_proof_lane.md",
+        "default_mainline_changed": false,
+        "default_visual_route": "render_html",
+        "replaces_routes": [
+          "render_html",
+          "fix_html"
+        ],
+        "preserved_gate_routes": [
+          "visual_director_review",
+          "screenshot_review",
+          "export_pptx"
+        ]
+      }
+    },
     "green_baseline": {
       "credible": true,
       "clean_clone_required": true,

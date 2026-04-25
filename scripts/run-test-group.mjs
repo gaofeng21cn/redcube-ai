@@ -95,6 +95,7 @@ const INTEGRATION = [
   'tests/ppt-hermes-generation.test.js',
   'tests/preflight-gates.test.js',
   'tests/private-profile.test.js',
+  'tests/product-entry-native-ppt-proof-lane.test.js',
   'tests/product-entry.test.js',
   'tests/publication-projection-delivery-contract.test.js',
   'tests/public-docs-surface.test.js',
@@ -166,6 +167,7 @@ const FAST = [
   'tests/ppt-hermes-generation.test.js',
   'tests/ppt-render-batch-generation.test.js',
   'tests/service-safe-domain-entry.test.js',
+  'tests/product-entry-native-ppt-proof-lane.test.js',
   'tests/product-entry.test.js',
   'tests/source-augmentation-provider.test.js',
 ];

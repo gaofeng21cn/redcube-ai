@@ -91,6 +91,16 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   assert.equal(lectureStudent.export_bundle.bundle_id, 'lecture_student_bundle');
   assert.equal(lectureStudent.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(lectureStudent.delivery_contract.required_export_route, 'export_pptx');
+  assert.equal(lectureStudent.prompt_pack.render_contract.default_visual_route, 'render_html');
+  assert.equal(lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.status, 'opt_in_proof_lane');
+  assert.deepEqual(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
+    ['render_html', 'fix_html'],
+  );
+  assert.deepEqual(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.preserved_gates,
+    ['visual_director_review', 'screenshot_review', 'export_pptx'],
+  );
 
   assert.equal(
     executiveBriefing.review_surface.required_checks.includes('decision_implication_clear'),

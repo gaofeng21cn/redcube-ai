@@ -211,6 +211,9 @@ function buildDeliverableFacadeContract() {
   const pptDeckSequence = typeof pptDeckOverlay?.describeOverlay === 'function'
     ? pptDeckOverlay.describeOverlay().route_sequence || []
     : [];
+  const pptDeckVisualPolicy = typeof pptDeckOverlay?.describeOverlay === 'function'
+    ? pptDeckOverlay.describeOverlay().visual_authoring_policy || {}
+    : {};
   return {
     surface_kind: 'deliverable_facade_contract',
     owner: 'redcube_ai',
@@ -231,6 +234,7 @@ function buildDeliverableFacadeContract() {
         route_fallback_surface: 'runDeliverableRoute',
         protected_stage_sequence: pptDeckSequence,
         default_visual_route: 'render_html',
+        native_ppt_proof_lane: pptDeckVisualPolicy.native_ppt_proof_lane || null,
         route_gate_policy: 'fail_closed_against_overlay_stage_sequence',
         default_run_mode: 'auto_to_terminal',
         stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',

@@ -1,0 +1,63 @@
+{
+  "contract_id": "ppt-native-authoring-proof-lane",
+  "date_anchor": "2026-04-25",
+  "status": "exploration_ready",
+  "owner": "redcube_ai",
+  "deliverable_family": "ppt_deck",
+  "scope": {
+    "goal": "Evaluate direct native PPTX authoring and repair as an opt-in replacement for the HTML authoring stages.",
+    "default_mainline_changed": false,
+    "default_visual_route": "render_html",
+    "replaces_routes": [
+      "render_html",
+      "fix_html"
+    ],
+    "preserved_upstream_routes": [
+      "storyline",
+      "detailed_outline",
+      "slide_blueprint",
+      "visual_direction"
+    ],
+    "preserved_gate_routes": [
+      "visual_director_review",
+      "screenshot_review",
+      "export_pptx"
+    ],
+    "out_of_scope": [
+      "new public skill",
+      "new product-entry semantics",
+      "bypassing RedCube review/export gates",
+      "replacing source truth, storyline, blueprint, or visual direction"
+    ]
+  },
+  "candidate_route_model": {
+    "lane_id": "ppt_deck_native_ppt_authoring_v0",
+    "status": "opt_in_proof_lane",
+    "default_enabled": false,
+    "author_route": "author_pptx_native",
+    "repair_route": "repair_pptx_native",
+    "author_route_replaces": "render_html",
+    "repair_route_replaces": "fix_html",
+    "authoring_artifact": "native_pptx_file",
+    "editable_artifact_required": true,
+    "review_input_surface": "rendered_pptx_screenshots",
+    "required_export_fields": [
+      "export_bundle.source_pptx",
+      "export_bundle.native_ppt_shape_manifest",
+      "export_bundle.native_ppt_repair_log"
+    ]
+  },
+  "promotion_gates": [
+    "same topic/profile can run through HTML mainline and native-PPT proof lane without identity drift",
+    "native PPTX produces editable slides rather than screenshot-only wrappers",
+    "screenshot_review judges rendered PPTX screenshots as the final visible artifact",
+    "repair route consumes review feedback and updates only the blocked PPTX pages when possible",
+    "getReviewState and getPublicationProjection remain authoritative",
+    "runManagedDeliverable and product-entry route gates remain fail-closed"
+  ],
+  "rollback_policy": {
+    "default_mainline_impact": "none",
+    "disable_action": "do not select the native PPT proof lane",
+    "html_mainline_required_to_remain_green": true
+  }
+}

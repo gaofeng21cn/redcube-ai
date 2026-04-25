@@ -132,6 +132,14 @@ const SURFACE_VALIDATORS = {
     && typeof content?.stages?.visual_director_review?.file === 'string'
     && content.stages.visual_director_review.file === 'director_review.md'
     && content?.render_contract?.render_strategy === 'prompt_director_first'
+    && content.render_contract.default_visual_route === 'render_html'
+    && content.render_contract.native_ppt_proof_lane?.status === 'opt_in_proof_lane'
+    && content.render_contract.native_ppt_proof_lane?.default_enabled === false
+    && Array.isArray(content.render_contract.native_ppt_proof_lane?.replaces_routes)
+    && content.render_contract.native_ppt_proof_lane.replaces_routes.join(',') === 'render_html,fix_html'
+    && Array.isArray(content.render_contract.native_ppt_proof_lane?.preserved_gates)
+    && content.render_contract.native_ppt_proof_lane.preserved_gates.join(',') === 'visual_director_review,screenshot_review,export_pptx'
+    && content.render_contract.native_ppt_proof_lane?.review_input_surface === 'rendered_pptx_screenshots'
     && content?.render_contract?.shell_file === 'render_shell.html'
     && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content) =>

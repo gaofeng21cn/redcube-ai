@@ -242,8 +242,27 @@ export interface PptDeckRecipeRegistry {
   default: string;
 }
 
+export interface PptDeckNativePptProofLane {
+  lane_id: 'ppt_deck_native_ppt_authoring_v0';
+  status: 'opt_in_proof_lane';
+  default_enabled: false;
+  replaces_routes: ReadonlyArray<'render_html' | 'fix_html'>;
+  preserved_upstream_routes: ReadonlyArray<'storyline' | 'detailed_outline' | 'slide_blueprint' | 'visual_direction'>;
+  preserved_gates: ReadonlyArray<'visual_director_review' | 'screenshot_review' | 'export_pptx'>;
+  authoring_artifact: 'native_pptx_file';
+  editable_artifact_required: true;
+  review_input_surface: 'rendered_pptx_screenshots';
+  export_contract_delta: {
+    source_artifact_field: 'export_bundle.source_pptx';
+    shape_manifest_field: 'export_bundle.native_ppt_shape_manifest';
+    repair_log_field: 'export_bundle.native_ppt_repair_log';
+  };
+}
+
 export interface PptDeckRenderContract {
   render_strategy: 'prompt_director_first';
+  default_visual_route: 'render_html';
+  native_ppt_proof_lane: PptDeckNativePptProofLane;
   shell_file: 'render_shell.html';
   recipe_registry: PptDeckRecipeRegistry;
 }
@@ -335,6 +354,7 @@ export interface PptDeckSourceTruthContract {
     detailed_outline: 'story_architecture';
     slide_blueprint: 'story_architecture';
     visual_direction: 'visual_authorship';
+    fix_html: 'visual_authorship';
   };
   required_hydrated_export_surface: 'export_pptx';
 }
@@ -508,6 +528,10 @@ export interface PptDeckOverlayCatalogEntry extends OverlayCatalogEntry {
   route_sequence: PptDeckStageId[];
   deliverable_kind: PptDeckDeliverableKind;
   prompt_pack_id: 'ppt_deck_mainline_v1';
+  visual_authoring_policy: {
+    default_visual_route: 'render_html';
+    native_ppt_proof_lane: PptDeckNativePptProofLane;
+  };
   packages: {
     overlay: '@redcube/overlay-ppt';
     runtime_family: '@redcube/runtime-family-ppt';

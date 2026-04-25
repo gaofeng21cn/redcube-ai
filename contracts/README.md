@@ -13,6 +13,7 @@
 - `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
 - `runtime-program/opl-gateway-federated-product-entry.json`：当前 internal OPL bridge / integration 冻结件
 - `runtime-program/managed-product-entry-hardening.json`：当前 product-entry session continuity 冻结件
+- `runtime-program/ppt-native-authoring-proof-lane.json`：`ppt_deck` native PPT authoring / repair 显式探索线冻结件，不改变默认 HTML visual route
 - `runtime-program/upstream-hermes-agent-live-verification-closeout.json`：当前 F4 live closeout 证明件
 - `runtime-program/upstream-hermes-agent-live-verification-blocker.json`：历史 F4 live blocker 冻结件
 - `runtime-program/*.json`：absorbed tranche、prefrozen follow-on board 与 provenance contract

@@ -67,6 +67,23 @@ const PPT_DELIVERY_CONTRACT_BASE = Object.freeze({
   },
 });
 
+const NATIVE_PPT_PROOF_LANE = Object.freeze({
+  lane_id: 'ppt_deck_native_ppt_authoring_v0',
+  status: 'opt_in_proof_lane',
+  default_enabled: false,
+  replaces_routes: ['render_html', 'fix_html'],
+  preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+  preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+  authoring_artifact: 'native_pptx_file',
+  editable_artifact_required: true,
+  review_input_surface: 'rendered_pptx_screenshots',
+  export_contract_delta: {
+    source_artifact_field: 'export_bundle.source_pptx',
+    shape_manifest_field: 'export_bundle.native_ppt_shape_manifest',
+    repair_log_field: 'export_bundle.native_ppt_repair_log',
+  },
+});
+
 const FAMILY_STAGE_SEQUENCE = {
   flow_id: 'ppt_deck_standard_flow',
   stages: [
@@ -280,6 +297,8 @@ const FAMILY_PROMPT_PACK = {
   },
   render_contract: {
     render_strategy: 'prompt_director_first',
+    default_visual_route: 'render_html',
+    native_ppt_proof_lane: NATIVE_PPT_PROOF_LANE,
     shell_file: 'render_shell.html',
     recipe_registry: {
       cover_hero: 'ppt.hero_signal',
@@ -529,6 +548,10 @@ export function describePptDeckOverlay() {
     deliverable_kind: 'ppt_deck',
     prompt_pack_id: FAMILY_PROMPT_PACK.pack_id,
     route_sequence: FAMILY_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
+    visual_authoring_policy: {
+      default_visual_route: FAMILY_PROMPT_PACK.render_contract.default_visual_route,
+      native_ppt_proof_lane: FAMILY_PROMPT_PACK.render_contract.native_ppt_proof_lane,
+    },
     packages: {
       overlay: '@redcube/overlay-ppt',
       runtime_family: '@redcube/runtime-family-ppt',
