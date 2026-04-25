@@ -166,6 +166,18 @@ function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliv
   };
 }
 
+function rewriteRenderSlideContent(renderArtifact, slideId, rewriteContent) {
+  return {
+    ...renderArtifact,
+    html_bundle: {
+      ...renderArtifact.html_bundle,
+      slides: renderArtifact.html_bundle.slides.map((slide) => (
+        slide.slide_id === slideId ? { ...slide, content: rewriteContent(slide.content) } : slide
+      )),
+    },
+  };
+}
+
 test('ppt screenshot_review writes immutable capture screenshots and export uses the reviewed capture directory', async () => {
   await withMockHermesUpstream(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
@@ -332,6 +344,97 @@ test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a
     assert.equal(statSync(stableViewHtmlFile).mtimeMs > stableViewHtmlMtimeMs, true);
     assert.equal(existsSync(draftViewHtmlFile), true);
     assert.equal(existsSync(draftViewSlidesFile), true);
+  });
+});
+
+test('ppt visual_director_review blocks audience-facing operator metadata leaked into rendered HTML', async () => {
+  await withMockHermesUpstream(async () => {
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-director-metadata-leak-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
+    });
+    for (const { route, result } of routeResults) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const renderResult = routeResults.at(-1).result;
+    const renderArtifact = readJson(renderResult.artifactFile);
+    const poisonedRenderArtifact = rewriteRenderSlideContent(renderArtifact, 'S02', (content) => content.replace(
+      '</section>',
+      `<aside data-qa-block="operator-leak" style="font-size:22px;color:#0F172A;">
+        当前节点：2/8，下一步进入 visual_director_review。
+        制作目标：按 prompt 输出 operator internal review。
+      </aside></section>`,
+    ));
+    writeFileSync(renderResult.artifactFile, JSON.stringify(poisonedRenderArtifact, null, 2), 'utf-8');
+
+    const directorReview = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorReview.ok, false);
+    const directorArtifact = readJson(path.join(getPptDeliverableSurfacePaths(workspaceRoot).deliverableDir, 'artifacts', 'director_review.json'));
+    assert.equal(directorArtifact.status, 'block');
+    assert.equal(directorArtifact.visual_director_review?.anti_template_ok, false);
+    assert.equal(directorArtifact.review_state_patch?.current_status, 'blocked_for_revision');
+    assert.match(directorArtifact.visual_director_review?.review_summary || '', /metadata|operator|制作目标|当前节点/);
+  });
+});
+
+test('ppt visual_director_review blocks consecutive homogeneous dense white-card slides', async () => {
+  await withMockHermesUpstream(async () => {
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-director-card-density-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
+    });
+    for (const { route, result } of routeResults) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const renderResult = routeResults.at(-1).result;
+    const renderArtifact = readJson(renderResult.artifactFile);
+    const denseWhitePanel = (slideId) => `
+      <div data-slide-root="true" data-slide-id="${slideId}" style="position:relative;width:1152px;height:648px;background:#F8FAFC;padding:48px;">
+        <header data-qa-block="header"><h2>同构白卡页面</h2></header>
+        <section data-qa-block="dense-card-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <article data-qa-block="card-1" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:18px;padding:20px;">白色父面板一</article>
+          <article data-qa-block="card-2" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:18px;padding:20px;">白色父面板二</article>
+          <article data-qa-block="card-3" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:18px;padding:20px;">白色父面板三</article>
+          <article data-qa-block="card-4" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:18px;padding:20px;">白色父面板四</article>
+        </section>
+        <footer data-qa-block="footer">${slideId}</footer>
+      </div>
+    `;
+    const denseSlideIds = new Set(['S02', 'S03', 'S04', 'S05']);
+    const poisonedRenderArtifact = {
+      ...renderArtifact,
+      html_bundle: {
+        ...renderArtifact.html_bundle,
+        slides: renderArtifact.html_bundle.slides.map((slide) => (
+          denseSlideIds.has(slide.slide_id)
+            ? { ...slide, layout_family: 'dense_white_card_grid', content: denseWhitePanel(slide.slide_id) }
+            : slide
+        )),
+      },
+    };
+    writeFileSync(renderResult.artifactFile, JSON.stringify(poisonedRenderArtifact, null, 2), 'utf-8');
+
+    const directorReview = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorReview.ok, false);
+    const directorArtifact = readJson(path.join(getPptDeliverableSurfacePaths(workspaceRoot).deliverableDir, 'artifacts', 'director_review.json'));
+    assert.equal(directorArtifact.status, 'block');
+    assert.equal(directorArtifact.visual_director_review?.anti_template_ok, false);
+    assert.equal(directorArtifact.review_state_patch?.current_status, 'blocked_for_revision');
+    assert.match(directorArtifact.visual_director_review?.review_summary || '', /homogeneous|white-card|同构|白色/);
   });
 });
 

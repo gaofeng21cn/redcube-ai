@@ -113,6 +113,40 @@ export function createPptDeckStageParts(deps) {
     };
   }
 
+  function visibleAudienceText(html) {
+    return normalizeInlineText(safeText(html).replace(/<script\b[\s\S]*?<\/script>/gi, ' ').replace(/<style\b[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&(nbsp|amp|lt|gt|quot|#39);/g, ' '), 1200);
+  }
+
+  function directorHtmlPreflight(renderArtifact) {
+    const slides = safeArray(renderArtifact?.html_bundle?.slides);
+    const weakPages = new Set();
+    const findings = [];
+    for (const slide of slides) {
+      const slideId = safeText(slide?.slide_id);
+      const visibleText = visibleAudienceText(slide?.content || slide?.content_html || slide?.html);
+      const leaked = [/当前节点\s*[：:]\s*\d+\s*\/\s*\d+/i, /下一步\s*(进入|是|为|[:：])/i, /制作目标\s*[：:]/i, /\b(operator|internal|prompt)\b/i, /(制作者|内部)(流程|节点|提示|文案|审查|复盘)/i].some((pattern) => pattern.test(visibleText));
+      if (leaked) { weakPages.add(slideId); findings.push(`${slideId}: audience-facing metadata leak`); }
+    }
+    let currentRun = [];
+    let longestRun = [];
+    for (const slide of slides) {
+      const html = safeText(slide?.content || slide?.content_html || slide?.html);
+      const qaCardBlocks = (html.match(/data-qa-block="[^"]*(card|panel|grid)[^"]*"/gi) || []).length;
+      const roundedBlocks = (html.match(/border-radius\s*:/gi) || []).length;
+      const borderedBlocks = (html.match(/border\s*:\s*\d+px\s+solid/gi) || []).length;
+      const whitePanels = (html.match(/background(?:-color)?\s*:\s*(#fff(fff)?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))/gi) || []).length
+        + (visibleAudienceText(html).match(/白色父面板/g) || []).length;
+      const cardDensity = qaCardBlocks >= 3 || roundedBlocks >= 12 || borderedBlocks >= 8;
+      const denseWhiteCard = cardDensity && whitePanels >= 3;
+      currentRun = denseWhiteCard ? [...currentRun, slide] : [];
+      if (currentRun.length > longestRun.length) longestRun = currentRun;
+    }
+    if (longestRun.length >= 4) for (const slide of longestRun) weakPages.add(safeText(slide?.slide_id));
+    if (longestRun.length >= 4) findings.push(`homogeneous white-card run: ${longestRun.map((slide) => safeText(slide?.slide_id)).join(',')}`);
+    const homogeneousLayoutRisk = longestRun.length >= 4 ? Math.min(0.95, 0.35 + (longestRun.length / Math.max(slides.length, 1))) : 0;
+    return { antiTemplateOk: findings.length === 0, weakPages: [...weakPages].filter(Boolean), homogeneousLayoutRisk, findings };
+  }
+
   function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const contract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -521,14 +555,22 @@ export function createPptDeckStageParts(deps) {
   }
 
   async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const preflight = directorHtmlPreflight(renderArtifact);
     const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths, adapter);
     const directorIntentLanded = Boolean(data?.director_intent_landed);
-    const antiTemplateOk = Boolean(data?.anti_template_ok);
+    const antiTemplateOk = Boolean(data?.anti_template_ok) && preflight.antiTemplateOk;
     const memoryHookPresent = Boolean(data?.memory_hook_present);
     const peakPagesLanded = Boolean(data?.peak_pages_landed ?? true);
-    const weakPages = normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', { min: 0, max: 4 });
-    const homogeneousLayoutRisk = Number(data?.homogeneous_layout_risk || 0);
-    const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
+    const weakPages = [...new Set([
+      ...normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', { min: 0, max: 4 }),
+      ...preflight.weakPages,
+    ])];
+    const homogeneousLayoutRisk = Math.max(Number(data?.homogeneous_layout_risk || 0), preflight.homogeneousLayoutRisk);
+    const reviewSummary = [
+      requireText(data?.review_summary, 'visual_director_review.review_summary'),
+      ...preflight.findings.map((finding) => `deterministic preflight blocked ${finding}`),
+    ].join(' ');
     const status = directorIntentLanded && antiTemplateOk && peakPagesLanded ? 'pass' : 'block';
     const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
     const reviewOwner = primarySurface(generationRuntime, adapter);
@@ -561,6 +603,12 @@ export function createPptDeckStageParts(deps) {
         weak_pages: weakPages,
         homogeneous_layout_risk: homogeneousLayoutRisk,
         review_summary: reviewSummary,
+        deterministic_preflight: {
+          gate_model: 'deterministic_ppt_director_review_preflight',
+          anti_template_ok: preflight.antiTemplateOk,
+          weak_pages: preflight.weakPages,
+          findings: preflight.findings,
+        },
         rewrite_action: safeText(data?.rewrite_action) || (status === 'pass' ? 'none' : 'revise_render_html'),
         overlay_handoff: 'screenshot_review',
         creative_sources: {
