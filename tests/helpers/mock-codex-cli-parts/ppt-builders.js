@@ -422,9 +422,11 @@ export function buildMockPptRender(meta) {
         throw new Error(`mock ppt render expected 1-3 reference slides for later batch, got ${JSON.stringify(references)}`);
       }
       for (const reference of references) {
-        const sourceHtml = safeText(reference?.source_html);
-        if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(safeText(reference?.slide_id))) {
-          throw new Error(`mock ppt render expected valid reference source_html: ${JSON.stringify(reference)}`);
+        const sourceHtmlHash = safeText(reference?.source_html_hash);
+        const visualSummary = reference?.visual_summary || {};
+        const slideIdentity = reference?.slide_identity || {};
+        if (Object.hasOwn(reference, 'source_html') || sourceHtmlHash.length !== 64 || !safeText(slideIdentity?.slide_id) || !safeText(visualSummary?.layout_family)) {
+          throw new Error(`mock ppt render expected reference style metadata without source_html: ${JSON.stringify(reference)}`);
         }
       }
     }

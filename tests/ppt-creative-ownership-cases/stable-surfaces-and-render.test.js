@@ -676,7 +676,7 @@ test('ppt render_html batches upstream slide generation instead of sending the w
   });
 });
 
-test('ppt render_html forwards recent slide HTML to later batches to preserve deck continuity', async () => {
+test('ppt render_html forwards recent slide style metadata to later batches to preserve deck continuity', async () => {
   await withMockHermesUpstream(async () => {
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_reference_window',
