@@ -185,6 +185,13 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
 
     const render = readJson(chain[4].result.artifactFile);
     assert.equal(existsSync(render.html_bundle?.html_file), true);
+    assert.equal(render.render_execution?.route, 'render_html');
+    assert.equal(render.render_execution?.batch_count, render.html_bundle.slides.length);
+    assert.equal(render.render_execution?.codex_batch_runtime?.session_pool?.reuse_claimed, false);
+    assert.deepEqual(
+      render.render_execution?.freshly_rendered_slide_ids,
+      render.html_bundle.slides.map((slide) => slide.slide_id),
+    );
     assert.equal(render.html_bundle?.render_strategy, 'prompt_director_first');
     assert.deepEqual(render.html_bundle?.director_contract?.peak_pages, visual.visual_direction?.peak_pages);
     assert.deepEqual(render.html_bundle?.director_contract?.page_family_ceiling, visual.visual_direction?.page_family_ceiling);

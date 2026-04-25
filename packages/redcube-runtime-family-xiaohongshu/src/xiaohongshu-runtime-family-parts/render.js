@@ -16,6 +16,7 @@ export function createXiaohongshuRenderParts(deps) {
     creativeSourceStamp,
     currentHtmlStageId,
     generateStructuredArtifact,
+    generateStructuredArtifactBatch,
     getDeliverableViewSurfacePaths,
     hydrateRenderedSlideRootMetadata,
     loadOperatorRevisionBrief,
@@ -40,38 +41,146 @@ export function createXiaohongshuRenderParts(deps) {
     validateRenderedSlideContent,
   } = deps;
 
+  function chunkArray(items, size) {
+    const source = safeArray(items);
+    const batchSize = Math.max(Number(size) || 1, 1);
+    const batches = [];
+    for (let index = 0; index < source.length; index += batchSize) {
+      batches.push(source.slice(index, index + batchSize));
+    }
+    return batches;
+  }
+
   async function generateRenderHtmlDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const research = readStageArtifact(contract, deliverablePaths, 'research');
     const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
     const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
     const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-    return generateStructuredArtifact({
+    const sharedContext = {
+      ...buildAuthoringContext({ workspaceRoot, contract, research }),
+      storyline: storyline?.storyline || null,
+      visual_direction: visual?.visual_direction || null,
+      shell_contract: {
+        ratio: CANVAS.ratio,
+        width: CANVAS.width,
+        height: CANVAS.height,
+        controls: ['slide-display-area', 'prev-btn', 'next-btn'],
+      },
+      html_guardrails: [
+        '每页输出完整 slide root，必须包含 data-slide-root=true 和匹配的 data-slide-id。',
+        '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
+        '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或模板注册表写进 HTML。',
+        '版式由 AI 直接创作，不能退化成固定卡片模板拼装。',
+      ],
+    };
+    const planSlides = summarizePlanSlides(plan);
+    const renderBatchStages = chunkArray(planSlides, 1).map((slideBatch, batchIndex) => {
+      const buildRenderBatchStage = ({ previousResults = [] } = {}) => ({
+        family: 'xiaohongshu',
+        route: 'render_html',
+        promptRelativePath: promptRoute(contract, 'render_html'),
+        context: {
+          ...sharedContext,
+          render_scope: 'page_batch',
+          render_batch: {
+            batch_index: batchIndex + 1,
+            total_batches: planSlides.length,
+            slide_ids: slideBatch.map((slide) => slide.slide_id),
+          },
+          reference_pages: safeArray(previousResults)
+            .flatMap((result) => safeArray(result?.data?.slides))
+            .map((slide) => ({
+              slide_id: safeText(slide?.slide_id),
+              content_html: safeText(slide?.content_html),
+            }))
+            .filter((slide) => slide.slide_id && slide.content_html)
+            .slice(-2),
+          plan: {
+            slides: slideBatch,
+          },
+        },
+        outputContract: renderHtmlOutputContract(),
+        cwd: deliverablePaths.deliverableDir,
+      });
+      buildRenderBatchStage.stage_id = `render_html_batch_${batchIndex + 1}`;
+      return buildRenderBatchStage;
+    });
+    const renderBatchResult = await (generateStructuredArtifactBatch || (async ({ stages }) => {
+      const data = [];
+      for (const stage of stages) {
+        const stageInput = typeof stage === 'function'
+          ? {
+              ...stage({ previousResults: data, stage_id: stage.stage_id }),
+              stage_id: stage.stage_id,
+            }
+          : stage;
+        const result = await generateStructuredArtifact({ adapter, ...stageInput });
+        data.push({
+          stage_id: stageInput.stage_id,
+          data: result.data,
+          generationRuntime: result.generationRuntime,
+        });
+      }
+      return {
+        data,
+        batchRuntime: {
+          owner: safeText(data[0]?.generationRuntime?.owner),
+          session_pool: {
+            reuse_supported: false,
+            reuse_claimed: false,
+            reuse_status: 'wrapper_fallback_without_reuse',
+            invocation_count: data.length,
+          },
+        },
+      };
+    }))({
+      adapter,
+      stages: renderBatchStages,
+      cwd: deliverablePaths.deliverableDir,
+      sessionPool: {
+        descriptor_id: `xiaohongshu_render_html_${safeText(contract.deliverable_id || contract.title, 'deliverable')}`,
+        reuse_strategy: 'same_session_if_supported',
+      },
+    });
+    const batchSlides = safeArray(renderBatchResult?.data)
+      .flatMap((result) => safeArray(result?.data?.slides));
+    const { data: summaryData, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'xiaohongshu',
       route: 'render_html',
       promptRelativePath: promptRoute(contract, 'render_html'),
       context: {
-        ...buildAuthoringContext({ workspaceRoot, contract, research }),
-        storyline: storyline?.storyline || null,
+        ...sharedContext,
+        render_scope: 'summary',
         plan: {
-          slides: summarizePlanSlides(plan),
+          slides: planSlides.map((slide) => ({
+            slide_id: slide.slide_id,
+            title: slide.title,
+            layout_family: slide.layout_family,
+          })),
         },
-        visual_direction: visual?.visual_direction || null,
-        shell_contract: {
-          ratio: CANVAS.ratio,
-          width: CANVAS.width,
-          height: CANVAS.height,
-          controls: ['slide-display-area', 'prev-btn', 'next-btn'],
-        },
-        html_guardrails: [
-          '每页输出完整 slide root，必须包含 data-slide-root=true 和匹配的 data-slide-id。',
-          '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
-          '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或模板注册表写进 HTML。',
-          '版式由 AI 直接创作，不能退化成固定卡片模板拼装。',
-        ],
+        rendered_slide_ids: batchSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
       },
       outputContract: renderHtmlOutputContract(),
+      cwd: deliverablePaths.deliverableDir,
     });
+    return {
+      data: {
+        slides: batchSlides,
+        render_summary: safeArray(summaryData?.render_summary),
+      },
+      generationRuntime,
+      renderExecution: {
+        route: 'render_html',
+        mode: 'full_generation',
+        batch_size: 1,
+        batch_count: renderBatchStages.length,
+        codex_batch_runtime: renderBatchResult?.batchRuntime || null,
+        reference_window: 2,
+        freshly_rendered_slide_ids: batchSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+        reused_slide_ids: [],
+      },
+    };
   }
 
   function materializeRenderedXhsSlides({
@@ -163,7 +272,7 @@ export function createXiaohongshuRenderParts(deps) {
   async function buildRenderHtml(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
     const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-    const { data, generationRuntime } = await generateRenderHtmlDraft(
+    const { data, generationRuntime, renderExecution } = await generateRenderHtmlDraft(
       workspaceRoot,
       contract,
       deliverablePaths,
@@ -218,6 +327,7 @@ export function createXiaohongshuRenderParts(deps) {
     return {
       ...attachCommon('render_html', contract, generationRuntime, adapter),
       creative_execution: creativeExecution('render_html', generationRuntime, adapter),
+      render_execution: renderExecution,
       lifecycle_stage: 'visual_authorship',
       html_bundle: {
         html_file: htmlFile,

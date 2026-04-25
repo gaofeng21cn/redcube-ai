@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
+import {
+  generateStructuredArtifactBatchViaCodexCli,
+  generateStructuredArtifactViaCodexCli,
+} from '@redcube/codex-cli-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
@@ -85,6 +88,42 @@ async function generateStructuredArtifact({
     return generateStructuredArtifactViaHermesNativeProof(input);
   }
   return generateStructuredArtifactViaCodexCli(input);
+}
+
+async function generateStructuredArtifactBatch({
+  adapter = CODEX_DEFAULT_ADAPTER,
+  ...input
+}) {
+  if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    const data = [];
+    for (const stage of shared.safeArray(input.stages)) {
+      const stageInput = typeof stage === 'function'
+        ? {
+            ...await stage({ previousResults: data, stage_id: stage.stage_id }),
+            stage_id: stage.stage_id,
+          }
+        : stage;
+      const result = await generateStructuredArtifactViaHermesNativeProof(stageInput);
+      data.push({
+        stage_id: stageInput.stage_id,
+        data: result.data,
+        generationRuntime: result.generationRuntime,
+      });
+    }
+    return {
+      data,
+      batchRuntime: {
+        owner: shared.safeText(data[0]?.generationRuntime?.owner),
+        session_pool: {
+          reuse_supported: false,
+          reuse_claimed: false,
+          reuse_status: 'hermes_native_sequential_batch_fallback',
+          invocation_count: data.length,
+        },
+      },
+    };
+  }
+  return generateStructuredArtifactBatchViaCodexCli(input);
 }
 
 function runtimeCreativeSource(contractAsset, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
@@ -281,6 +320,7 @@ const runtimeDeps = {
   creativeExecution,
   creativeSourceStamp,
   generateStructuredArtifact,
+  generateStructuredArtifactBatch,
   getDeliverablePaths,
   primarySurface,
   reviewAuthorship,
