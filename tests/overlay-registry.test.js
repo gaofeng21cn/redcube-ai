@@ -98,6 +98,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
           lane_id: 'ppt_deck_native_ppt_authoring_v0',
           status: 'opt_in_proof_lane',
           default_enabled: false,
+          runnable_routes: ['author_pptx_native', 'repair_pptx_native'],
           replaces_routes: ['render_html', 'fix_html'],
           preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
           preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],

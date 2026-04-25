@@ -297,12 +297,59 @@ export interface PptScreenshotReviewArtifact extends PptRuntimeArtifactBase {
   baseline_review?: PptBaselineReview;
 }
 
+export interface PptNativePptSlideManifest {
+  slide_id: string;
+  title: string;
+  layout_family?: string;
+  shape_count: number;
+  text_box_count: number;
+  preview_screenshot_file: string;
+  repaired?: boolean;
+}
+
+export interface PptNativePptRepairLog {
+  consumed_review_stage?: 'screenshot_review' | null;
+  target_slide_ids: string[];
+  feedback_count?: number;
+  repair_log_file: string;
+}
+
+export interface PptNativePptBundleArtifact extends PptRuntimeArtifactBase {
+  route: 'author_pptx_native';
+  status: 'completed';
+  native_ppt_bundle: {
+    source_visual_route: 'author_pptx_native';
+    editable_artifact: true;
+    pptx_file: string;
+    pdf_file: string;
+    shape_manifest_file: string;
+    repair_log_file: string;
+    page_count: number;
+    preview_screenshots: string[];
+    slides: PptNativePptSlideManifest[];
+  };
+  native_ppt_repair_log: PptNativePptRepairLog;
+  artifact_refs: string[];
+  review_state_patch: PptRuntimeReviewStatePatch;
+}
+
+export interface PptNativePptRepairArtifact extends Omit<PptNativePptBundleArtifact, 'route' | 'native_ppt_bundle'> {
+  route: 'repair_pptx_native';
+  native_ppt_bundle: PptNativePptBundleArtifact['native_ppt_bundle'] & {
+    source_visual_route: 'repair_pptx_native';
+  };
+}
+
 export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
   route: 'export_pptx';
   status: 'completed';
   review_state_patch: PptRuntimeReviewStatePatch;
   export_bundle: {
-    source_html: string;
+    source_visual_route?: 'author_pptx_native' | 'repair_pptx_native';
+    source_html: string | null;
+    source_pptx?: string;
+    native_ppt_shape_manifest?: string;
+    native_ppt_repair_log?: string;
     pptx_file: string;
     pdf_file: string;
     presenter_notes_file: string;
@@ -315,7 +362,7 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     page_count_match: boolean;
     real_conversion_invocation: {
       tool: string;
-      script: 'packages/redcube-runtime/scripts/ppt_deck_export.py';
+      script: 'packages/redcube-runtime/scripts/ppt_deck_export.py' | 'packages/redcube-runtime/scripts/ppt_deck_native.py';
       command: string[];
     };
   };
@@ -349,7 +396,9 @@ export type PptRuntimeRouteResult =
   | PptRuntimeRouteOutput<'slide_blueprint', PptBlueprintArtifact>
   | PptRuntimeRouteOutput<'visual_direction', PptVisualDirectionArtifact>
   | PptRuntimeRouteOutput<'render_html', PptRenderArtifact>
+  | PptRuntimeRouteOutput<'author_pptx_native', PptNativePptBundleArtifact>
   | PptRuntimeRouteOutput<'fix_html', PptFixHtmlArtifact>
+  | PptRuntimeRouteOutput<'repair_pptx_native', PptNativePptRepairArtifact>
   | PptRuntimeRouteOutput<'visual_director_review', PptVisualDirectorReviewArtifact>
   | PptRuntimeRouteOutput<'screenshot_review', PptScreenshotReviewArtifact>
   | PptRuntimeRouteOutput<'export_pptx', PptExportBundleArtifact>;

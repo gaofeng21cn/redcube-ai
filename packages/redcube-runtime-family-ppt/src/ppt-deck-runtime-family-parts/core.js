@@ -68,13 +68,16 @@ export function createPptDeckRuntimeCore() {
   const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
   const PYTHON_REVIEW = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_review.py');
   const PYTHON_EXPORT = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_export.py');
+  const PYTHON_NATIVE = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_native.py');
   const PROMPT_PACK = Object.freeze({
     storyline: 'prompts/ppt_deck/storyline.md',
     detailed_outline: 'prompts/ppt_deck/detailed_outline.md',
     slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
     visual_direction: 'prompts/ppt_deck/visual_direction.md',
     render_html: 'prompts/ppt_deck/render_html.md',
+    author_pptx_native: 'prompts/ppt_deck/author_pptx_native.md',
     fix_html: 'prompts/ppt_deck/fix_html.md',
+    repair_pptx_native: 'prompts/ppt_deck/repair_pptx_native.md',
     visual_director_review: 'prompts/ppt_deck/director_review.md',
     screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
     export_pptx: 'prompts/ppt_deck/export_pptx.md',
@@ -85,8 +88,10 @@ export function createPptDeckRuntimeCore() {
     slide_blueprint: { requires_artifacts: ['detailed_outline'] },
     visual_direction: { requires_artifacts: ['slide_blueprint'] },
     render_html: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
+    author_pptx_native: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
     fix_html: { requires_artifacts: ['render_html', 'screenshot_review'] },
-    visual_director_review: { requires_artifacts: ['render_html'] },
+    repair_pptx_native: { requires_artifacts: ['author_pptx_native', 'screenshot_review'] },
+    visual_director_review: { requires_artifacts: [] },
     screenshot_review: { requires_artifacts: ['visual_director_review'] },
     export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
   });
@@ -125,7 +130,9 @@ export function createPptDeckRuntimeCore() {
     detailed_outline: 'story_architecture',
     slide_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
+    author_pptx_native: 'visual_authorship',
     fix_html: 'visual_authorship',
+    repair_pptx_native: 'visual_authorship',
   });
   const DEFAULT_TYPOGRAPHY_PLAN = Object.freeze({
     cover_title: Object.freeze({ font_size: 56, line_height: 1.08, font_weight: 800 }),
@@ -459,7 +466,11 @@ export function createPptDeckRuntimeCore() {
   }
   
   function stageOrder(contract, stageId) {
-    return safeArray(contract?.stage_sequence?.stages).findIndex((stage) => stage?.stage_id === stageId);
+    const stages = [
+      ...safeArray(contract?.stage_sequence?.stages),
+      ...safeArray(contract?.stage_sequence?.alternate_stages),
+    ];
+    return stages.findIndex((stage) => stage?.stage_id === stageId);
   }
   
   function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {
@@ -693,6 +704,7 @@ export function createPptDeckRuntimeCore() {
     PAGE_FIX_ROUTE,
     PROMPT_PACK,
     PYTHON_EXPORT,
+    PYTHON_NATIVE,
     PYTHON_REVIEW,
     RENDER_HTML_BATCH_SIZE,
     RENDER_REFERENCE_SLIDE_WINDOW,

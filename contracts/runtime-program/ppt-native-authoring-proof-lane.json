@@ -1,7 +1,7 @@
 {
   "contract_id": "ppt-native-authoring-proof-lane",
   "date_anchor": "2026-04-25",
-  "status": "exploration_ready",
+  "status": "runtime_proof_landed",
   "owner": "redcube_ai",
   "deliverable_family": "ppt_deck",
   "scope": {
@@ -34,6 +34,10 @@
     "lane_id": "ppt_deck_native_ppt_authoring_v0",
     "status": "opt_in_proof_lane",
     "default_enabled": false,
+    "runnable_routes": [
+      "author_pptx_native",
+      "repair_pptx_native"
+    ],
     "author_route": "author_pptx_native",
     "repair_route": "repair_pptx_native",
     "author_route_replaces": "render_html",
@@ -41,6 +45,14 @@
     "authoring_artifact": "native_pptx_file",
     "editable_artifact_required": true,
     "review_input_surface": "rendered_pptx_screenshots",
+    "runtime_executor_proof": {
+      "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.js",
+      "native_writer": "packages/redcube-runtime/scripts/ppt_deck_native.py",
+      "route_surface": "runDeliverableRoute",
+      "stage_sequence_model": "alternate_stages",
+      "default_stage_sequence_changed": false,
+      "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX"
+    },
     "required_export_fields": [
       "export_bundle.source_pptx",
       "export_bundle.native_ppt_shape_manifest",

@@ -620,7 +620,7 @@ export function createPptDeckSurfaceParts(deps) {
   }
   
   function invalidateDownstreamReviewPatch(route) {
-    if (!['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'fix_html'].includes(route)) {
+    if (!['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'author_pptx_native', 'fix_html', 'repair_pptx_native'].includes(route)) {
       return null;
     }
     return {

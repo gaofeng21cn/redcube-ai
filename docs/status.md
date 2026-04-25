@@ -19,7 +19,7 @@
 - `skill_catalog` 现在对外收口为单一 `redcube-ai` app skill；`frontdesk`、`invoke`、`session` 继续作为这个 skill 底下的 machine-readable command contracts，并在同一 skill descriptor 的 `domain_projection.runtime_continuity` 输出可直接消费的 same-session runtime continuity envelope
 - `route_equivalence` 已作为 manifest 合同面冻结：`frontdesk`、`invoke`、`session` 与 internal `OPL bridge` 都只指向同一 downstream `domain_entry`、同一 session continuity / progress / artifact / review / publication truth，不新增第二公开 skill 或第二运行语义
 - `deliverable_facade` 已覆盖当前 `ppt_deck` 与 `xiaohongshu` surface：facade 只声明现有 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`，不改核心生成逻辑
-- `ppt_deck` native PPT authoring / repair 已作为显式 opt-in proof lane 暴露在 hydrated contract 与 product-entry manifest；默认 visual route 仍是 `render_html`，探索线只允许替换 `render_html` / `fix_html` 两段
+- `ppt_deck` native PPT authoring / repair 已作为显式 opt-in proof lane 落到可运行 executor：`author_pptx_native` 生成可编辑 PPTX 与 shape manifest，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
 ## 当前验证口径
@@ -42,5 +42,5 @@
 
 - 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 upstream Hermes runtime owner、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
-- 保持 native PPT proof lane 显式可选、默认关闭，并让截图审查与 export/readout surface 继续作为晋级门槛
+- 保持 native PPT proof lane 显式可选、默认关闭；HTML 主线与 native PPT 路线都继续经过 `visual_director_review`、`screenshot_review` 与 `export_pptx`
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

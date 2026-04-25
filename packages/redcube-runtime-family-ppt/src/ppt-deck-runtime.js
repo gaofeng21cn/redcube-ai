@@ -63,6 +63,7 @@ const {
 const {
   buildDirectorReview,
   buildExportArtifact,
+  buildNativePptArtifact,
   buildRenderHtmlArtifact,
   buildScreenshotReviewArtifact,
   ensurePrerequisites,
@@ -96,7 +97,10 @@ export async function runPptDeckRoute({
 }) {
   ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  const stageContract = safeArray(contract.stage_sequence?.stages).find((stage) => stage?.stage_id === route) || null;
+  const stageContract = [
+    ...safeArray(contract.stage_sequence?.stages),
+    ...safeArray(contract.stage_sequence?.alternate_stages),
+  ].find((stage) => stage?.stage_id === route) || null;
   let payload;
   switch (route) {
     case 'storyline':
@@ -156,6 +160,9 @@ export async function runPptDeckRoute({
     case 'render_html':
       payload = await buildRenderHtmlArtifact({ workspaceRoot, deliverableId, contract, deliverablePaths, adapter });
       break;
+    case 'author_pptx_native':
+      payload = buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
+      break;
     case 'fix_html':
       payload = await buildRenderHtmlArtifact({
         workspaceRoot,
@@ -165,6 +172,9 @@ export async function runPptDeckRoute({
         route: PAGE_FIX_ROUTE,
         adapter,
       });
+      break;
+    case 'repair_pptx_native':
+      payload = buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
       break;
     case 'visual_director_review':
       payload = await buildDirectorReview(contract, deliverablePaths, adapter);

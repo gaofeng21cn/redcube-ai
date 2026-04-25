@@ -38,6 +38,13 @@ function loadHydratedContract(deliverablePaths, storedDeliverable) {
 
 const overlayRegistry = getDefaultOverlayRegistry();
 
+function routeStageDefinitions(contract) {
+  return [
+    ...(Array.isArray(contract?.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract?.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ];
+}
+
 function writeDeliverableSurfaceBundle({ deliverablePaths, hydratedContract, overlay }) {
   const overlayDefinition = overlayRegistry.getOverlay(overlay);
   if (typeof overlayDefinition?.buildSurfaceBundle !== 'function') {
@@ -59,7 +66,7 @@ function maybeRehydrateContractForRoute({
   route,
   baseContract,
 }) {
-  const hasRoute = baseContract?.stage_sequence?.stages?.some((stage) => stage?.stage_id === route);
+  const hasRoute = routeStageDefinitions(baseContract).some((stage) => stage?.stage_id === route);
   if (hasRoute) return baseContract;
 
   const hydratedContract = hydrateDeliverableContract(overlayRegistry, {
@@ -70,7 +77,7 @@ function maybeRehydrateContractForRoute({
     title: String(storedDeliverable?.title || '').trim(),
     goal: String(storedDeliverable?.goal || '').trim(),
   });
-  const hydratedHasRoute = hydratedContract?.stage_sequence?.stages?.some((stage) => stage?.stage_id === route);
+  const hydratedHasRoute = routeStageDefinitions(hydratedContract).some((stage) => stage?.stage_id === route);
   if (!hydratedHasRoute) {
     return baseContract;
   }
@@ -125,7 +132,7 @@ function routeRequiresArtifacts(contract, route) {
 }
 
 function stageArtifactFile(deliverablePaths, contract, stageId) {
-  const stage = contract?.stage_sequence?.stages?.find((item) => item?.stage_id === stageId);
+  const stage = routeStageDefinitions(contract).find((item) => item?.stage_id === stageId);
   return path.join(deliverablePaths.artifactsDir, String(stage?.output_artifact || `${stageId}.json`).trim());
 }
 
@@ -226,7 +233,7 @@ export function validateDeliverableRouteInput({
     route: safeRoute,
     workspaceRoot,
   });
-  const stageContract = contract.stage_sequence?.stages?.find(
+  const stageContract = routeStageDefinitions(contract).find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
 
@@ -270,7 +277,7 @@ export async function executeDeliverableRouteLocally({
     route: safeRoute,
     workspaceRoot,
   });
-  const stageContract = contract.stage_sequence?.stages?.find(
+  const stageContract = routeStageDefinitions(contract).find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
   const artifactFile = path.join(

@@ -1,9 +1,10 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 import { createPptDeckRenderStageParts } from './render.js';
+import { createPptDeckNativePptStageParts } from './native-ppt.js';
+import { createPptDeckExportStageParts } from './export.js';
 
 export function createPptDeckStageParts(deps) {
   const {
@@ -13,6 +14,7 @@ export function createPptDeckStageParts(deps) {
     PAGE_FIX_ROUTE,
     PROMPT_PACK,
     PYTHON_EXPORT,
+    PYTHON_NATIVE,
     PYTHON_REVIEW,
     RENDER_HTML_BATCH_SIZE,
     RENDER_REFERENCE_SLIDE_WINDOW,
@@ -81,11 +83,50 @@ export function createPptDeckStageParts(deps) {
     readCurrentHtmlArtifact,
   });
   const { loadPriorRenderedSlideHtmlMap } = renderParts;
+  const nativePptParts = createPptDeckNativePptStageParts({
+    ...deps,
+    PYTHON_NATIVE,
+    readCurrentHtmlArtifact,
+  });
+  const {
+    buildNativePptArtifact,
+    currentVisualStageId,
+    isNativePptArtifact,
+    nativeMechanicalReviewPayload,
+    readCurrentVisualArtifact,
+    summarizeNativeSlides,
+    visualArtifactMtimeMs,
+  } = nativePptParts;
+  const exportParts = createPptDeckExportStageParts({
+    ...deps,
+    PYTHON_EXPORT,
+    isNativePptArtifact,
+    readCurrentVisualArtifact,
+  });
+  const {
+    buildExportArtifact,
+    hashReviewInput,
+  } = exportParts;
 
   async function generateDirectorReviewDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+    const renderSummary = isNativePptArtifact(renderArtifact)
+      ? summarizeNativeSlides(renderArtifact).map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          peak_page: false,
+          text_excerpt: `native editable PPTX: ${slide.shape_count} shapes, ${slide.text_box_count} text boxes`,
+        }))
+      : safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          peak_page: slide.director_contract?.peak_page,
+          text_excerpt: normalizeInlineText(String(slide.content || '').replace(/<[^>]+>/g, ' '), 220),
+        }));
     const { data, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
@@ -97,13 +138,8 @@ export function createPptDeckStageParts(deps) {
           slides: summarizeBlueprintSlides(blueprintArtifact),
         },
         visual_direction: visualArtifact?.visual_direction || null,
-        render_summary: safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
-          slide_id: slide.slide_id,
-          title: slide.title,
-          layout_family: slide.layout_family,
-          peak_page: slide.director_contract?.peak_page,
-          text_excerpt: normalizeInlineText(String(slide.content || '').replace(/<[^>]+>/g, ' '), 220),
-        })),
+        render_summary: renderSummary,
+        source_surface_kind: isNativePptArtifact(renderArtifact) ? 'native_pptx' : 'html',
       },
       outputContract: directorReviewOutputContract(),
     });
@@ -147,6 +183,28 @@ export function createPptDeckStageParts(deps) {
     return { antiTemplateOk: findings.length === 0, weakPages: [...weakPages].filter(Boolean), homogeneousLayoutRisk, findings };
   }
 
+  function directorNativePptPreflight(nativeArtifact) {
+    const slides = summarizeNativeSlides(nativeArtifact);
+    const weakPages = [];
+    const findings = [];
+    for (const slide of slides) {
+      if (Number(slide.shape_count || 0) < 3 || Number(slide.text_box_count || 0) < 2) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native PPT shape manifest too thin`);
+      }
+      if (!safeText(slide.preview_screenshot_file) || !(mainExistsSync || existsSync)(slide.preview_screenshot_file)) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native PPT preview screenshot missing`);
+      }
+    }
+    return {
+      antiTemplateOk: findings.length === 0,
+      weakPages: [...new Set(weakPages)].filter(Boolean),
+      homogeneousLayoutRisk: 0.12,
+      findings,
+    };
+  }
+
   function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const contract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -170,11 +228,23 @@ export function createPptDeckStageParts(deps) {
     }
     const currentHtmlStage = currentHtmlStageId(contract, deliverablePaths);
     const currentHtmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, currentHtmlStage));
+    const currentVisualStage = currentVisualStageId(contract, deliverablePaths);
+    const currentVisualMtimeMs = visualArtifactMtimeMs(contract, deliverablePaths);
     if (route === PAGE_FIX_ROUTE) {
       const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
       if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
         throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
       }
+    }
+    if (route === 'repair_pptx_native') {
+      const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+      const authorMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'author_pptx_native'));
+      if (screenshotReviewMtimeMs < authorMtimeMs) {
+        throw new Error('Route repair_pptx_native requires screenshot_review based on the current native PPTX; rerun screenshot_review first');
+      }
+    }
+    if (route === 'visual_director_review' && !currentVisualStage) {
+      throw new Error('Route visual_director_review requires render_html or author_pptx_native before review');
     }
     if (route === 'screenshot_review') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
@@ -182,8 +252,8 @@ export function createPptDeckStageParts(deps) {
         throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
       }
       const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
-      if (directorReviewMtimeMs < currentHtmlMtimeMs) {
-        throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest HTML changes');
+      if (directorReviewMtimeMs < currentVisualMtimeMs) {
+        throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest visual changes');
       }
     }
     if (route === 'export_pptx') {
@@ -192,8 +262,8 @@ export function createPptDeckStageParts(deps) {
         throw new Error('Route export_pptx requires screenshot_review to pass before export');
       }
       const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
-      if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
-        throw new Error('Route export_pptx requires screenshot_review to be rerun after the latest HTML changes');
+      if (screenshotReviewMtimeMs < currentVisualMtimeMs) {
+        throw new Error('Route export_pptx requires screenshot_review to be rerun after the latest visual changes');
       }
     }
   }
@@ -211,25 +281,6 @@ export function createPptDeckStageParts(deps) {
       command: pythonCommand.command,
       payload: JSON.parse(result.stdout),
     };
-  }
-
-  function hashReviewInput(renderArtifact) {
-    const htmlFile = safeText(renderArtifact?.html_bundle?.html_file);
-    const hash = createHash('sha256');
-    hash.update('ppt_deck_screenshot_mechanics:v1\n');
-    hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
-    hash.update(htmlFile);
-    hash.update('\n');
-    if (htmlFile && (mainExistsSync || existsSync)(htmlFile)) {
-      hash.update(readFileSync(htmlFile));
-    }
-    hash.update('\nslides\n');
-    hash.update(JSON.stringify(safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
-      slide_id: safeText(slide?.slide_id),
-      title: safeText(slide?.title),
-      html: safeText(slide?.html || slide?.content_html || slide?.content),
-    }))));
-    return hash.digest('hex');
   }
 
   function cachedMechanicalReview(priorArtifact, hash) {
@@ -251,63 +302,6 @@ export function createPptDeckStageParts(deps) {
       cache_status: cacheStatus,
       hash,
       freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
-    };
-  }
-
-  function hashFileIfPresent(hash, file) {
-    const resolvedFile = safeText(file);
-    hash.update(resolvedFile);
-    hash.update('\n');
-    if (resolvedFile && (mainExistsSync || existsSync)(resolvedFile)) {
-      hash.update(readFileSync(resolvedFile));
-    }
-    hash.update('\n');
-  }
-
-  function hashExportPreviewInput({ stableViewHtmlFile, reviewArtifact }) {
-    const hash = createHash('sha256');
-    hash.update('ppt_deck_export_preview:v1\n');
-    hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
-    hashFileIfPresent(hash, stableViewHtmlFile);
-    hash.update('screenshots\n');
-    for (const slide of safeArray(reviewArtifact?.slide_reviews)) {
-      hash.update(safeText(slide?.slide_id));
-      hash.update('\n');
-      hashFileIfPresent(hash, slide?.screenshot_file);
-      hash.update(JSON.stringify(slide?.metrics || {}));
-      hash.update('\n');
-    }
-    return hash.digest('hex');
-  }
-
-  function exportPreviewCacheMetadata(cacheStatus, hash) {
-    return {
-      cache_status: cacheStatus,
-      hash,
-      freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
-    };
-  }
-
-  function exportPreviewMetricsFromPayload({ exportPayload, renderArtifact, reviewArtifact }) {
-    return {
-      page_count: Number(exportPayload?.page_count || 0),
-      render_page_count: Number(renderArtifact?.html_bundle?.page_count || 0),
-      reviewed_page_count: safeArray(reviewArtifact?.slide_reviews).length,
-      page_count_match: Number(exportPayload?.page_count || 0) === Number(renderArtifact?.html_bundle?.page_count || 0),
-    };
-  }
-
-  function cachedExportPreview(priorArtifact, hash) {
-    if (safeText(priorArtifact?.export_bundle?.preview_cache?.hash) !== hash) return null;
-    const pptxFile = safeText(priorArtifact?.export_bundle?.pptx_file);
-    const pdfFile = safeText(priorArtifact?.export_bundle?.pdf_file);
-    if (!pptxFile || !(mainExistsSync || existsSync)(pptxFile)) return null;
-    if (pdfFile && !(mainExistsSync || existsSync)(pdfFile)) return null;
-    const metrics = priorArtifact?.export_bundle?.preview_metrics;
-    if (!metrics || typeof metrics !== 'object') return null;
-    return {
-      page_count: Number(metrics.page_count || 0),
-      metrics,
     };
   }
 
@@ -555,8 +549,10 @@ export function createPptDeckStageParts(deps) {
   }
 
   async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
-    const preflight = directorHtmlPreflight(renderArtifact);
+    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const preflight = isNativePptArtifact(renderArtifact)
+      ? directorNativePptPreflight(renderArtifact)
+      : directorHtmlPreflight(renderArtifact);
     const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths, adapter);
     const directorIntentLanded = Boolean(data?.director_intent_landed);
     const antiTemplateOk = Boolean(data?.anti_template_ok) && preflight.antiTemplateOk;
@@ -653,21 +649,24 @@ export function createPptDeckStageParts(deps) {
     adapter = CODEX_DEFAULT_ADAPTER,
   }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const nativeReviewInput = isNativePptArtifact(renderArtifact);
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
     const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-    const preflightArtifact = buildScreenshotReviewPreflightArtifact(contract, renderArtifact, adapter);
+    const preflightArtifact = nativeReviewInput ? null : buildScreenshotReviewPreflightArtifact(contract, renderArtifact, adapter);
     if (preflightArtifact) return preflightArtifact;
     const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
     const reviewCapture = createReviewCapturePaths(deliverablePaths, deliverableId);
-    const args = [
-      '--html', renderArtifact.html_bundle.html_file,
-      '--output-dir', reviewCapture.screenshotsDir,
-      '--review-markdown', reviewCapture.reviewMarkdownFile,
-      '--max-primary-points', String(contract.layout_rules?.max_primary_points_per_slide || 5),
-      '--device-scale-factor', '2',
-    ];
+    const args = nativeReviewInput
+      ? []
+      : [
+          '--html', renderArtifact.html_bundle.html_file,
+          '--output-dir', reviewCapture.screenshotsDir,
+          '--review-markdown', reviewCapture.reviewMarkdownFile,
+          '--max-primary-points', String(contract.layout_rules?.max_primary_points_per_slide || 5),
+          '--device-scale-factor', '2',
+        ];
     if (mode === 'optimize_existing') {
       const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
       const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -681,7 +680,11 @@ export function createPptDeckStageParts(deps) {
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
     const cacheStatus = cachedPayload ? 'hit' : 'miss';
-    const python = cachedPayload ? { command: 'cache', payload: cachedPayload } : runPython(PYTHON_REVIEW, args);
+    const python = cachedPayload
+      ? { command: 'cache', payload: cachedPayload }
+      : (nativeReviewInput
+          ? { command: 'native_ppt_shape_manifest', payload: nativeMechanicalReviewPayload(renderArtifact) }
+          : runPython(PYTHON_REVIEW, args));
     const reviewPayload = python.payload;
     const mechanicalSlideReviews = safeArray(reviewPayload.slide_reviews).map((slide) => ({
       ...slide,
@@ -752,7 +755,9 @@ export function createPptDeckStageParts(deps) {
       checks: latestChecks,
       review_capture: {
         capture_id: reviewCapture.captureId,
-        screenshots_dir: reviewCapture.screenshotsDir,
+        screenshots_dir: nativeReviewInput
+          ? path.dirname(safeText(safeArray(renderArtifact?.native_ppt_bundle?.preview_screenshots)[0], reviewCapture.screenshotsDir))
+          : reviewCapture.screenshotsDir,
         review_markdown_file: reviewCapture.reviewMarkdownFile,
         device_scale_factor: Number(reviewPayload.device_scale_factor || 2),
         screenshot_dimensions: reviewPayload.screenshot_dimensions || null,
@@ -911,87 +916,9 @@ export function createPptDeckStageParts(deps) {
     };
   }
 
-  function buildExportArtifact({
-    workspaceRoot,
-    topicId,
-    deliverableId,
-    contract,
-    adapter = CODEX_DEFAULT_ADAPTER,
-  }) {
-    const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-    const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
-    const publishDir = ensureDir(path.join(deliverablePaths.deliverableDir, 'publish'));
-    const pptxFile = path.join(publishDir, `${deliverableId}.pptx`);
-    const pdfFile = path.join(publishDir, `${deliverableId}.pdf`);
-    const notesFile = path.join(publishDir, `${deliverableId}-presenter-notes.md`);
-    const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
-    writeText(notesFile, blueprintArtifact.slide_blueprint.slides.map((slide) => `## ${slide.slide_id} ${slide.title}\n\n${slide.speaker_notes}`).join('\n\n'));
-    const screenshotsDir = safeText(reviewArtifact?.review_capture?.screenshots_dir);
-    if (!screenshotsDir) {
-      throw new Error('Route export_pptx requires screenshot_review immutable capture screenshots; rerun screenshot_review before export');
-    }
-    if (!(mainExistsSync || existsSync)(screenshotsDir)) {
-      throw new Error(`Reviewed screenshot capture directory not found: ${screenshotsDir}`);
-    }
-    const stableViewHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
-    if (!(mainExistsSync || existsSync)(stableViewHtmlFile)) {
-      throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
-    }
-    const previewHash = hashExportPreviewInput({ stableViewHtmlFile, reviewArtifact });
-    const priorExportArtifact = readStageArtifact(contract, deliverablePaths, 'export_pptx');
-    const cachedPreview = cachedExportPreview(priorExportArtifact, previewHash);
-    const previewCacheStatus = cachedPreview ? 'hit' : 'miss';
-    const python = cachedPreview ? { command: 'cache', payload: cachedPreview } : runPython(PYTHON_EXPORT, [
-      '--screenshots-dir', screenshotsDir,
-      '--output-pptx', pptxFile,
-      '--output-pdf', pdfFile,
-    ]);
-    const exportPayload = python.payload;
-    const pptxPath = cachedPreview ? (priorExportArtifact.export_bundle.pptx_file || pptxFile) : (exportPayload.pptx_file || exportPayload.pptx_path);
-    const pdfPath = cachedPreview ? (priorExportArtifact.export_bundle.pdf_file || pdfFile) : (exportPayload.pdf_file || exportPayload.pdf_path);
-    const previewMetrics = cachedPreview?.metrics || exportPreviewMetricsFromPayload({ exportPayload, renderArtifact, reviewArtifact });
-    return {
-      ...attachCommon('export_pptx', contract, null, adapter),
-      status: 'completed',
-      review_state_patch: {
-        current_status: 'completed',
-        ready_for_export: true,
-        latest_review_stage: 'export_pptx',
-        pending_reviews: [],
-        blocking_reasons: [],
-        rerun_from_stage: null,
-        rerun_policy: {
-          status: 'idle',
-          rerun_from_stage: null,
-        },
-      },
-      export_bundle: {
-        source_html: stableViewHtmlFile,
-        pptx_file: pptxPath,
-        pdf_file: pdfPath,
-        presenter_notes_file: notesFile,
-        review_capture: reviewArtifact.review_capture || null,
-        delivery_state: {
-          current: 'output_ready',
-          next: null,
-        },
-        page_count: exportPayload.page_count,
-        page_count_match: previewMetrics.page_count_match,
-        preview_cache: exportPreviewCacheMetadata(previewCacheStatus, previewHash),
-        preview_metrics: previewMetrics,
-        real_conversion_invocation: {
-          tool: python.command,
-          script: 'packages/redcube-runtime/scripts/ppt_deck_export.py',
-          command: ['--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile],
-        },
-      },
-      artifact_refs: [stableViewHtmlFile, pptxPath, pdfPath, notesFile].filter(Boolean),
-    };
-  }
-
   return {
     ...renderParts,
+    ...nativePptParts,
     buildDirectorReview,
     buildExportArtifact,
     buildScreenshotReviewArtifact,

@@ -34,6 +34,14 @@ hydrated `ppt_deck` contract 现在暴露：
 
 product-entry manifest 同步投影同一 proof lane，但不把它加入默认 protected stage sequence。
 
+当前 runtime proof 已落地：
+
+- hydrated contract 通过 `stage_sequence.alternate_stages` 暴露 `author_pptx_native` / `repair_pptx_native`，默认 `stage_sequence.stages` 不变
+- `runDeliverableRoute` 可直接执行 `author_pptx_native`，产出 editable `.pptx`、shape manifest、preview screenshots 与 preview PDF
+- `visual_director_review` / `screenshot_review` 会在最新 visual artifact 为 native PPTX 时读取 native preview/shape manifest，而不是要求 HTML
+- `export_pptx` 在 native 路线通过审查后复制 editable source PPTX，并在 export bundle 记录 `source_pptx`、`native_ppt_shape_manifest`、`native_ppt_repair_log`
+- `repair_pptx_native` 消费 `screenshot_review.slide_reviews` 的阻断页反馈，并把 target slide ids 写入 repair log
+
 ## 晋级门槛
 
 native PPT proof lane 只有同时满足以下条件，才允许进入下一阶段实现或 profile-level 默认化评估：

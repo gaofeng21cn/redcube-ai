@@ -147,11 +147,14 @@ function buildContinuationSnapshot(domainEntrySurface) {
 }
 
 function stageIdsFromDeliverableRecord(deliverableRecord) {
-  const stages = deliverableRecord?.hydrated_contract?.stage_sequence?.stages
-    || deliverableRecord?.governance_surface?.stage_sequence?.stages;
-  return Array.isArray(stages)
-    ? stages.map((stage) => safeText(stage?.stage_id)).filter(Boolean)
-    : [];
+  const stageSequence = deliverableRecord?.hydrated_contract?.stage_sequence
+    || deliverableRecord?.governance_surface?.stage_sequence
+    || {};
+  const stages = [
+    ...(Array.isArray(stageSequence?.stages) ? stageSequence.stages : []),
+    ...(Array.isArray(stageSequence?.alternate_stages) ? stageSequence.alternate_stages : []),
+  ];
+  return stages.map((stage) => safeText(stage?.stage_id)).filter(Boolean);
 }
 
 function assertRequestedStagesAllowed({ deliverableRecord, delivery }) {

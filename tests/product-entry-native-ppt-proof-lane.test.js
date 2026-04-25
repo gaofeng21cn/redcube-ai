@@ -32,6 +32,7 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
   );
   assert.equal(pptPolicy.native_ppt_proof_lane.status, 'opt_in_proof_lane');
   assert.equal(pptPolicy.native_ppt_proof_lane.default_enabled, false);
+  assert.deepEqual(pptPolicy.native_ppt_proof_lane.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
   assert.deepEqual(pptPolicy.native_ppt_proof_lane.replaces_routes, ['render_html', 'fix_html']);
   assert.deepEqual(
     pptPolicy.native_ppt_proof_lane.preserved_gates,

@@ -38,7 +38,9 @@ const PPT_SOURCE_TRUTH_CONTRACT = Object.freeze({
     detailed_outline: 'story_architecture',
     slide_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
+    author_pptx_native: 'visual_authorship',
     fix_html: 'visual_authorship',
+    repair_pptx_native: 'visual_authorship',
   },
   required_hydrated_export_surface: 'export_pptx',
 });
@@ -71,6 +73,7 @@ const NATIVE_PPT_PROOF_LANE = Object.freeze({
   lane_id: 'ppt_deck_native_ppt_authoring_v0',
   status: 'opt_in_proof_lane',
   default_enabled: false,
+  runnable_routes: ['author_pptx_native', 'repair_pptx_native'],
   replaces_routes: ['render_html', 'fix_html'],
   preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
   preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
@@ -142,6 +145,24 @@ const FAMILY_STAGE_SEQUENCE = {
       requires_stages: ['screenshot_review'],
     },
   ],
+  alternate_stages: [
+    {
+      stage_id: 'author_pptx_native',
+      prompt_file: 'author_pptx_native.md',
+      output_artifact: 'native_ppt_bundle.json',
+      requires_stages: ['slide_blueprint', 'visual_direction'],
+      lane_id: NATIVE_PPT_PROOF_LANE.lane_id,
+      replaces_stage: 'render_html',
+    },
+    {
+      stage_id: 'repair_pptx_native',
+      prompt_file: 'repair_pptx_native.md',
+      output_artifact: 'native_ppt_repair_bundle.json',
+      requires_stages: ['author_pptx_native', 'screenshot_review'],
+      lane_id: NATIVE_PPT_PROOF_LANE.lane_id,
+      replaces_stage: 'fix_html',
+    },
+  ],
   hard_stops: [
     {
       stage_id: 'render_html',
@@ -161,6 +182,16 @@ const FAMILY_STAGE_SEQUENCE = {
     {
       stage_id: 'export_pptx',
       requires_review: ['screenshot_review'],
+      rerun_from_stage: 'screenshot_review',
+    },
+    {
+      stage_id: 'author_pptx_native',
+      requires_stage_outputs: ['slide_blueprint', 'visual_direction'],
+      rerun_from_stage: 'slide_blueprint',
+    },
+    {
+      stage_id: 'repair_pptx_native',
+      requires_stage_outputs: ['author_pptx_native', 'screenshot_review'],
       rerun_from_stage: 'screenshot_review',
     },
   ],
@@ -255,8 +286,14 @@ const FAMILY_STAGE_REQUIREMENTS = {
   render_html: {
     requires_artifacts: ['slide_blueprint', 'visual_direction'],
   },
+  author_pptx_native: {
+    requires_artifacts: ['slide_blueprint', 'visual_direction'],
+  },
   fix_html: {
     requires_artifacts: ['render_html', 'screenshot_review'],
+  },
+  repair_pptx_native: {
+    requires_artifacts: ['author_pptx_native', 'screenshot_review'],
   },
   visual_director_review: {
     requires_artifacts: ['render_html'],
@@ -279,7 +316,9 @@ const FAMILY_PROMPT_PACK = {
     slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
     visual_direction: 'prompts/ppt_deck/visual_direction.md',
     render_html: 'prompts/ppt_deck/render_html.md',
+    author_pptx_native: 'prompts/ppt_deck/author_pptx_native.md',
     fix_html: 'prompts/ppt_deck/fix_html.md',
+    repair_pptx_native: 'prompts/ppt_deck/repair_pptx_native.md',
     visual_director_review: 'prompts/ppt_deck/director_review.md',
     screenshot_review: 'prompts/ppt_deck/screenshot_review.md',
     export_pptx: 'prompts/ppt_deck/export_pptx.md',
@@ -290,7 +329,9 @@ const FAMILY_PROMPT_PACK = {
     slide_blueprint: { file: 'slide_blueprint.md' },
     visual_direction: { file: 'visual_direction.md' },
     render_html: { file: 'render_html.md' },
+    author_pptx_native: { file: 'author_pptx_native.md' },
     fix_html: { file: 'fix_html.md' },
+    repair_pptx_native: { file: 'repair_pptx_native.md' },
     visual_director_review: { file: 'director_review.md' },
     screenshot_review: { file: 'screenshot_review.md' },
     export_pptx: { file: 'export_pptx.md' },
@@ -385,7 +426,9 @@ const FAMILY_LIFECYCLE_MODEL = {
     slide_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
     render_html: 'visual_authorship',
+    author_pptx_native: 'visual_authorship',
     fix_html: 'visual_authorship',
+    repair_pptx_native: 'visual_authorship',
     export_pptx: 'delivery_packaging',
   },
   review_overlay_routes: {
@@ -435,7 +478,9 @@ const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
     slide_blueprint: 'plan',
     visual_direction: 'visual',
     render_html: 'visual',
+    author_pptx_native: 'visual',
     fix_html: 'visual',
+    repair_pptx_native: 'visual',
     visual_director_review: 'visual',
     screenshot_review: 'visual',
     export_pptx: 'delivery',

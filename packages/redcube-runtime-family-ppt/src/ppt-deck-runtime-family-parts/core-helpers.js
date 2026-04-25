@@ -133,8 +133,15 @@ export function createPptDeckCoreHelpers({
     return ms ? new Date(ms).toISOString() : '无';
   }
 
+  function routeStageDefinitions(contract) {
+    return [
+      ...safeArray(contract?.stage_sequence?.stages),
+      ...safeArray(contract?.stage_sequence?.alternate_stages),
+    ];
+  }
+
   function stageArtifactPath(contract, deliverablePaths, stageId) {
-    const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
+    const stage = routeStageDefinitions(contract).find((item) => item?.stage_id === stageId);
     return path.join(
       deliverablePaths.artifactsDir,
       safeText(stage?.output_artifact) || `${stageId}.json`,
