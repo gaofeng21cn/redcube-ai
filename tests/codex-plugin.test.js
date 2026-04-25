@@ -23,7 +23,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(manifest.name, 'rca');
   assert.equal(manifest.version, packageJson.version);
   assert.equal(manifest.skills, './skills/');
-  assert.equal(manifest.interface.displayName, 'RCA');
+  assert.equal(manifest.interface.displayName, 'RedCube AI');
   assert.equal(manifest.interface.category, 'Creative');
   assert.match(manifest.description, /Codex plugin/i);
   assert.match(skillText, /redcube product frontdesk/i);
