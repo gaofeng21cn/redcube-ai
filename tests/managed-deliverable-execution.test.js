@@ -142,6 +142,9 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(result.managed_run.execution_plan.scheduler_kind, 'managed_deliverable_dag');
     assert.equal(result.managed_run.execution_plan.optimization.quality_gate_policy, 'preserve_stage_dependencies_and_review_hard_stops');
     assert.equal(result.managed_run.execution_plan.max_parallel_width >= 1, true);
+    assert.equal(result.managed_run.execution_result.execution_kind, 'managed_dag_layer_execution');
+    assert.equal(result.managed_run.execution_result.ok, true);
+    assert.equal(result.managed_run.execution_result.layer_results.length, result.managed_run.execution_plan.layers.length);
     assert.equal(result.progress_projection.current_stage, 'export_pptx');
     assert.equal(result.progress_projection.needs_user_decision, false);
     assert.equal(result.progress_projection.final_artifact_refs.length > 0, true);
@@ -334,6 +337,10 @@ test('managed execution stops at explicit stop_after_stage instead of auto-runni
       result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
       ['storyline'],
     );
+    assert.equal(result.managed_run.execution_result.execution_kind, 'managed_dag_layer_execution');
+    assert.equal(result.managed_run.execution_result.ok, true);
+    assert.equal(result.managed_run.execution_result.stopped_layer_index, 0);
+    assert.equal(result.managed_run.execution_result.layer_results.length, 1);
     assert.equal(result.progress_projection.current_stage, 'storyline');
     assert.equal(result.progress_projection.needs_user_decision, true);
     assert.match(result.progress_projection.next_system_action, /等待.*决定是否继续/i);
@@ -409,6 +416,67 @@ test('managed execution accepts explicit hermes_native_proof adapter and keeps i
     assert.equal(stored.managed_run.runtime_bridge?.owner, 'hermes_native_proof');
     assert.equal(stored.runtime_supervision.runtime_owner, 'hermes_native_proof');
   });
+});
+
+test('managed DAG execution fails closed and does not advance dependent stages after route failure', async () => {
+  const upstream = await startMockCodexCli();
+  const restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
+    REDCUBE_MOCK_FAIL_ROUTE: 'detailed_outline',
+  });
+  try {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-dag-fail-'));
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'DAG fail-closed 验证',
+      brief: '验证 DAG 执行不会越过失败阶段继续跑依赖阶段。',
+      keywords: ['DAG', 'fail-closed'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'DAG fail-closed deck',
+      goal: '验证 managed DAG route failure stop semantics',
+    });
+
+    const result = await runManagedDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      userIntent: '给我一个最终 PPT',
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.managed_run.status, 'escalated');
+    assert.equal(result.managed_run.execution_result.execution_kind, 'managed_dag_layer_execution');
+    assert.equal(result.managed_run.execution_result.ok, false);
+    assert.equal(result.managed_run.execution_result.failed_layer_index, 1);
+    assert.equal(
+      result.managed_run.execution_result.layer_results.at(-1).task_results[0].task_id,
+      'ppt_deck:deck-a:detailed_outline',
+    );
+    assert.deepEqual(
+      result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+      ['storyline', 'detailed_outline', 'detailed_outline'],
+    );
+    assert.equal(
+      result.managed_run.route_runs.some((stageRun) => stageRun.stage_id === 'slide_blueprint'),
+      false,
+    );
+    assert.equal(result.runtime_supervision.health_status, 'escalated');
+    assert.equal(result.escalation_record.escalation_status, 'escalated');
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
 });
 
 test('managed control plane rejects retired external_llm adapter before creating durable managed state', async () => {

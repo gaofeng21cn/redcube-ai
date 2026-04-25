@@ -37,6 +37,9 @@ import {
 export function buildCreativeRunOutput(meta) {
   const family = safeText(meta?.family, 'ppt_deck');
   const route = safeText(meta?.route);
+  if (safeText(process.env.REDCUBE_MOCK_FAIL_ROUTE) === route) {
+    throw new Error(`mock forced route failure: ${route}`);
+  }
   if (family === 'xiaohongshu') {
     switch (route) {
       case 'storyline':

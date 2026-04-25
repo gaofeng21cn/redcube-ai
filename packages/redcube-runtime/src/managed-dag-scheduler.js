@@ -147,11 +147,21 @@ export async function executeManagedDagLayers({
         failed_layer_index: layer.layer_index,
       };
     }
+    if (taskResults.some((taskResult) => taskResult.result?.done === true)) {
+      return {
+        execution_kind: 'managed_dag_layer_execution',
+        ok: true,
+        layer_results: layerResults,
+        failed_layer_index: null,
+        stopped_layer_index: layer.layer_index,
+      };
+    }
   }
   return {
     execution_kind: 'managed_dag_layer_execution',
     ok: true,
     layer_results: layerResults,
     failed_layer_index: null,
+    stopped_layer_index: null,
   };
 }

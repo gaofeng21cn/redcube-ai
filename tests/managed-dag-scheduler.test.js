@@ -118,3 +118,31 @@ test('managed DAG layer executor runs same-layer tasks concurrently and preserve
   assert.equal(timeline.indexOf('start:ppt_deck:deck-a:storyline') < timeline.indexOf('end:xiaohongshu:note-a:storyline'), true);
   assert.equal(timeline.indexOf('start:xiaohongshu:note-a:storyline') < timeline.indexOf('end:ppt_deck:deck-a:storyline'), true);
 });
+
+test('managed DAG layer executor stops after a completed hard boundary without running later layers', async () => {
+  const plan = planManagedDeliverableDag({
+    deliverables: [
+      {
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        stages: [
+          { stage_id: 'storyline' },
+          { stage_id: 'detailed_outline', requires_stages: ['storyline'] },
+        ],
+      },
+    ],
+  });
+  const executed = [];
+  const result = await executeManagedDagLayers({
+    plan,
+    executeTask: async (task) => {
+      executed.push(task.task_id);
+      return { ok: true, done: task.stage_id === 'storyline' };
+    },
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.stopped_layer_index, 0);
+  assert.deepEqual(executed, ['ppt_deck:deck-a:storyline']);
+});
