@@ -1193,6 +1193,44 @@ export interface RunManagedDeliverableRequest extends DeliverableRequest, Overla
   baselineDeliverableId?: string;
 }
 
+export interface SourceFirstFanoutDeliverableRequest extends OverlayRequest {
+  deliverableId: string;
+  profileId: string;
+  title: string;
+  goal: string;
+  userIntent?: string;
+  adapter?: string;
+  stopAfterStage?: string;
+  mode?: string;
+  baselineDeliverableId?: string;
+}
+
+export interface RunSourceFirstFanoutRequest extends TopicRequest {
+  title?: string;
+  brief?: string;
+  keywords?: string[];
+  sourceFiles?: string[];
+  operatorFiles?: string[];
+  deliverables: SourceFirstFanoutDeliverableRequest[];
+}
+
+export interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fanout'> {
+  source_barrier: SourceResearchResponse;
+  source_pack_federation?: Record<string, unknown>;
+  source_pack_manifest?: Record<string, unknown>;
+  planner?: Record<string, unknown>;
+  created_deliverables?: DeliverableCreateResponse[];
+  managed_runs?: ManagedRunResponse[];
+  summary: {
+    topic_id: string;
+    source_barrier_status: string;
+    deliverable_count: number;
+    managed_run_count: number;
+    parallel_family_ready?: boolean;
+    max_parallel_width?: number;
+  };
+}
+
 export interface SuperviseManagedRunRequest extends WorkspaceRootRequest {
   managedRunId: string;
 }

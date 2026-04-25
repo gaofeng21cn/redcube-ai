@@ -24,6 +24,7 @@ import {
   superviseManagedRun as superviseManagedRunJs,
   runDeliverableRoute as runDeliverableRouteJs,
   runManagedDeliverable as runManagedDeliverableJs,
+  runSourceFirstFanout as runSourceFirstFanoutJs,
   auditDeliverable as auditDeliverableJs,
   reviewRenderOutput as reviewRenderOutputJs,
   runtimeWatch as runtimeWatchJs,
@@ -64,6 +65,8 @@ import type {
   ReviewRenderOutputResponse,
   RouteRunResponse,
   RunManagedDeliverableRequest,
+  RunSourceFirstFanoutRequest,
+  SourceFirstFanoutResponse,
   RunDeliverableRouteRequest,
   RunRecordResponse,
   SuperviseManagedRunRequest,
@@ -190,6 +193,10 @@ export function runManagedDeliverable(request: RunManagedDeliverableRequest): Pr
   return runManagedDeliverableJs(request) as Promise<ManagedRunResponse>;
 }
 
+export function runSourceFirstFanout(request: RunSourceFirstFanoutRequest): Promise<SourceFirstFanoutResponse> {
+  return runSourceFirstFanoutJs(request) as Promise<SourceFirstFanoutResponse>;
+}
+
 export function auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse> {
   return auditDeliverableJs(request) as Promise<DeliverableAuditResponse>;
 }
@@ -244,6 +251,8 @@ export type {
   ReviewStateResponse,
   RouteRunResponse,
   RunManagedDeliverableRequest,
+  RunSourceFirstFanoutRequest,
+  SourceFirstFanoutResponse,
   RunDeliverableRouteRequest,
   RunRecordResponse,
   SuperviseManagedRunRequest,

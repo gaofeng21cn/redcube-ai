@@ -108,6 +108,7 @@ const INTEGRATION = [
   'tests/runtime-deliverable-route.test.js',
   'tests/screenshot-review-ai-first.test.js',
   'tests/service-safe-domain-entry.test.js',
+  'tests/source-first-fanout.test.js',
   'tests/source-intake.test.js',
   'tests/source-readiness-deep-research-gate.test.js',
   'tests/source-research.test.js',
