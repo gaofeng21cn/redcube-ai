@@ -606,32 +606,44 @@ test('ppt render_html forwards recent slide HTML to later batches to preserve de
   });
 });
 
-test('ppt render_html uses single-slide batches for full regeneration to keep cross-page continuity stable', async () => {
+test('ppt render_html uses section batches for full regeneration while keeping cross-page continuity stable', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-single-slide-batch-'));
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_peer',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Med Auto Science 同行讲课',
-      goal: '验证 full render_html 会按逐页批次生成，并参考最近页面保持整套一致性',
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_section_batches',
     });
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-section-batch-'));
+    try {
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        title: 'Med Auto Science 同行讲课',
+        goal: '验证 full render_html 会按章节批次生成，并参考最近章节页面保持整套一致性',
+      });
 
-    const routes = await runPptRoutes({
-      workspaceRoot,
-      deliverableId: 'deck-a',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
-    });
-    for (const { route, result } of routes) {
-      assert.equal(result.ok, true, route);
+      const routes = await runPptRoutes({
+        workspaceRoot,
+        deliverableId: 'deck-a',
+        routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'],
+      });
+      for (const { route, result } of routes) {
+        assert.equal(result.ok, true, route);
+      }
+
+      const renderArtifact = readJson(routes.at(-1).result.artifactFile);
+      assert.equal(renderArtifact.render_execution?.mode, 'full_regeneration');
+      assert.equal(renderArtifact.render_execution?.batch_size, 6);
+      assert.equal(renderArtifact.render_execution?.batch_count, 3);
+      assert.equal(
+        renderArtifact.render_execution?.codex_batch_runtime?.durable_cache?.stage_cache_status
+          ?.every((stage) => stage.cache_status === 'fresh'),
+        true,
+      );
+    } finally {
+      restoreVariant();
     }
-
-    const renderArtifact = readJson(routes.at(-1).result.artifactFile);
-    assert.equal(renderArtifact.render_execution?.mode, 'full_regeneration');
-    assert.equal(renderArtifact.render_execution?.batch_size, 1);
-    assert.equal(renderArtifact.render_execution?.batch_count >= 8, true);
   });
 });
 

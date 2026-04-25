@@ -366,11 +366,29 @@ export function createPptDeckRenderStageParts(deps) {
     };
   }
 
-  function buildRenderHtmlBlueprintSlides(blueprintArtifact, revisionContext = null) {
+  function buildOutlineSlideChapterMap(detailedOutlineArtifact) {
+    const outlineSlides = safeArray(detailedOutlineArtifact?.detailed_outline?.slides).length > 0
+      ? safeArray(detailedOutlineArtifact?.detailed_outline?.slides)
+      : safeArray(detailedOutlineArtifact?.slides);
+    return new Map(outlineSlides
+      .map((slide) => [
+        safeText(slide?.slide_id),
+        {
+          chapter_id: safeText(slide?.chapter_id),
+          chapter_title: safeText(slide?.chapter_title || slide?.chapter_name),
+        },
+      ])
+      .filter(([slideId, chapter]) => slideId && chapter.chapter_id));
+  }
+
+  function buildRenderHtmlBlueprintSlides(blueprintArtifact, revisionContext = null, detailedOutlineArtifact = null) {
     const revisionFocusBySlideId = buildRenderRevisionFocusMap(revisionContext);
+    const chapterBySlideId = buildOutlineSlideChapterMap(detailedOutlineArtifact);
     return safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => ({
       slide_id: slide.slide_id,
       slide_no: slide.slide_no,
+      chapter_id: safeText(slide.chapter_id) || chapterBySlideId.get(safeText(slide.slide_id))?.chapter_id || null,
+      chapter_title: safeText(slide.chapter_title) || chapterBySlideId.get(safeText(slide.slide_id))?.chapter_title || null,
       page_type: slide.page_type,
       layout_family: slide.visual_presentation?.layout_family,
       title: slide.title,
@@ -383,6 +401,38 @@ export function createPptDeckRenderStageParts(deps) {
       public_sources: safeArray(slide.evidence_and_sources).map((item) => item.public_label),
       revision_focus: revisionFocusBySlideId.get(safeText(slide.slide_id)) || null,
     }));
+  }
+
+  function buildRenderHtmlSectionBatches(slidesToRender, renderBatchSize) {
+    const slides = safeArray(slidesToRender);
+    if (slides.length === 0) return [];
+    const chapterBatches = [];
+    for (const slide of slides) {
+      const chapterId = safeText(slide?.chapter_id);
+      const current = chapterBatches.at(-1);
+      if (chapterId && current && current.chapter_id === chapterId && current.slides.length < renderBatchSize) {
+        current.slides.push(slide);
+        continue;
+      }
+      if (chapterId) {
+        chapterBatches.push({ chapter_id: chapterId, slides: [slide] });
+        continue;
+      }
+      if (current && !current.chapter_id && current.slides.length < renderBatchSize) {
+        current.slides.push(slide);
+      } else {
+        chapterBatches.push({ chapter_id: '', slides: [slide] });
+      }
+    }
+    const batches = [];
+    for (const batch of chapterBatches) {
+      if (batch.chapter_id && batch.slides.length <= renderBatchSize) {
+        batches.push(batch.slides);
+        continue;
+      }
+      batches.push(...chunkArray(batch.slides, renderBatchSize));
+    }
+    return batches;
   }
 
   function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
@@ -718,6 +768,7 @@ export function createPptDeckRenderStageParts(deps) {
     adapter = CODEX_DEFAULT_ADAPTER,
   }) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+    const detailedOutlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
     const previousRenderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
     const revisionFreshness = computeRenderRevisionFreshness(contract, deliverablePaths, route);
@@ -729,7 +780,11 @@ export function createPptDeckRenderStageParts(deps) {
       minimumMtimeMs: revisionFreshness.revision_floor_mtime_ms,
     });
     const priorRenderedSlides = loadPriorRenderedSlideHtmlMap(previousRenderArtifact);
-    const blueprintSlides = buildRenderHtmlBlueprintSlides(blueprintArtifact, sharedRevisionContext);
+    const blueprintSlides = buildRenderHtmlBlueprintSlides(
+      blueprintArtifact,
+      sharedRevisionContext,
+      detailedOutlineArtifact,
+    );
     const renderPlan = planRenderHtmlExecution({
       blueprintSlides,
       revisionContext: sharedRevisionContext,
@@ -797,7 +852,9 @@ export function createPptDeckRenderStageParts(deps) {
         'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
       ],
     };
-    const slideBatches = chunkArray(renderPlan.slides_to_render, renderBatchSize);
+    const slideBatches = renderPlan.mode === 'targeted_revision_only'
+      ? chunkArray(renderPlan.slides_to_render, renderBatchSize)
+      : buildRenderHtmlSectionBatches(renderPlan.slides_to_render, renderBatchSize);
     const availableReferenceSlides = renderPlan.mode === 'targeted_revision_only'
       ? new Map(priorRenderedSlides)
       : new Map();
@@ -843,6 +900,8 @@ export function createPptDeckRenderStageParts(deps) {
             render_batch: {
               batch_index: batchIndex + 1,
               total_batches: slideBatches.length,
+              batch_mode: renderPlan.mode === 'targeted_revision_only' ? 'targeted_revision_batch' : 'section_batch',
+              chapter_id: safeText(promptSlides[0]?.chapter_id),
               slide_ids: promptSlides.map((slide) => slide.slide_id),
             },
             reference_slides: referenceSlides,

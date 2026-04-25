@@ -367,8 +367,26 @@ export function buildMockPptRender(meta) {
   );
   const renderScope = safeText(meta?.context?.render_scope, 'full_deck');
   const rawPrompt = safeText(meta?.__raw_prompt);
-  if (variants.has('require_render_batching') && renderScope !== 'summary' && slides.length > 3) {
-    throw new Error('mock ppt render expected slide_batch scope with at most 3 slides');
+  if (variants.has('require_render_batching') && renderScope !== 'summary' && slides.length > 6) {
+    throw new Error('mock ppt render expected bounded section batches, not whole-deck HTML generation');
+  }
+  if (variants.has('require_section_batches') && renderScope !== 'summary') {
+    const batch = meta?.context?.render_batch || {};
+    if (safeText(meta?.context?.rerender_mode) !== 'full_regeneration') {
+      return {
+        slides: slides.map((slide) => ({
+          slide_id: slide.slide_id,
+          content_html: buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id)),
+        })),
+        render_summary: ['targeted revision keeps its own small-batch contract'],
+      };
+    }
+    if (safeText(batch?.batch_mode) !== 'section_batch') {
+      throw new Error(`mock ppt render expected section_batch mode: ${JSON.stringify(batch)}`);
+    }
+    if (slides.length > 6) {
+      throw new Error(`mock ppt render expected bounded section batch size: ${JSON.stringify(batch)}`);
+    }
   }
   if (variants.has('fail_after_first_render_batch') && renderScope !== 'summary') {
     const batchIndex = Number(meta?.context?.render_batch?.batch_index || 0);

@@ -91,7 +91,7 @@ export function createPptDeckRuntimeCore() {
     export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
   });
   const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
-  const RENDER_HTML_BATCH_SIZE = 1;
+  const RENDER_HTML_BATCH_SIZE = 6;
   const TARGETED_RENDER_HTML_BATCH_SIZE = 1;
   const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
   const RENDER_REFERENCE_SLIDE_WINDOW = 3;

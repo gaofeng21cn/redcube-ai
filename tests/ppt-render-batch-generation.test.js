@@ -118,6 +118,14 @@ function makePptRenderParts({ stageCalls }) {
     readPromptPackText: () => '<html><body>{{slides}}</body></html>',
     readStageArtifact: (_contract, _paths, stageId) => {
       if (stageId === 'slide_blueprint') return { slide_blueprint: { slides } };
+      if (stageId === 'detailed_outline') return {
+        detailed_outline: {
+          slides: slides.map((slide) => ({
+            slide_id: slide.slide_id,
+            chapter_id: Number(slide.slide_no) <= 3 ? 'C1' : 'C2',
+          })),
+        },
+      };
       if (stageId === 'visual_direction') return { visual_direction: { typography_plan: {}, peak_pages: [], page_role_table: [] } };
       return null;
     },
@@ -172,22 +180,31 @@ test('ppt render_html batches same-route slide chunks through durable per-batch 
     adapter: 'codex_cli',
   });
 
-  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_index), [1, 2, 3]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_index), [1, 2, 3, 4]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_mode), [
+    'section_batch',
+    'section_batch',
+    'section_batch',
+    'section_batch',
+  ]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.chapter_id), ['C1', 'C1', 'C2', 'C2']);
   assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.slide_ids.join(',')), [
     'S01,S02',
-    'S03,S04',
-    'S05,S06',
+    'S03',
+    'S04,S05',
+    'S06',
   ]);
   assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_index).map((index) => `render_html_batch_${index}`), [
     'render_html_batch_1',
     'render_html_batch_2',
     'render_html_batch_3',
+    'render_html_batch_4',
   ]);
   assert.deepEqual(stageCalls[1].context.reference_slides.map((slide) => slide.slide_id), ['S01', 'S02']);
   assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_1.json')), true);
   assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_1', 'S01.html')), true);
-  assert.equal(artifact.render_execution.batch_count, 3);
-  assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.generated_batch_count, 3);
+  assert.equal(artifact.render_execution.batch_count, 4);
+  assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.generated_batch_count, 4);
   assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.reused_batch_count, 0);
   assert.equal(artifact.render_execution.codex_batch_runtime.session_pool.reuse_status, 'durable_render_batch_cache');
   assert.equal(artifact.html_bundle.page_count, 6);
