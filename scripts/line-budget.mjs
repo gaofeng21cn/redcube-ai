@@ -16,6 +16,7 @@ const BASELINE = new Map(Object.entries({
   "tests/helpers/mock-codex-cli.js": 1389,
   "tests/mcp-gateway.test.js": 1159,
   "tests/product-entry.test.js": 1388,
+  "tests/ppt-creative-ownership-cases/targeted-rerender-and-export.test.js": 1185,
   "tests/source-intake.test.js": 1225,
 }));
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.py', '.sh', '.bash', '.zsh', '.rs', '.go']);

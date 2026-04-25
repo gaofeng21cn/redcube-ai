@@ -179,6 +179,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/ppt-deck-runtime-family-parts/export.js',
     'src/ppt-deck-runtime-family-parts/index.js',
     'src/ppt-deck-runtime-family-parts/native-ppt.js',
+    'src/ppt-deck-runtime-family-parts/render-batch-cache.js',
     'src/ppt-deck-runtime-family-parts/render.js',
     'src/ppt-deck-runtime-family-parts/stages.js',
     'src/ppt-deck-runtime-family-parts/surface.js',
