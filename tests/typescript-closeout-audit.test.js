@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import path from 'node:path';
 
 import {
   AUDIT_FILE,
@@ -52,6 +59,30 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
       residue.expected_js_files,
       residue.directory,
     );
+    assert.equal(typeof residue.exception_registration?.owner, 'string');
+    assert.equal(typeof residue.exception_registration?.reason, 'string');
+    assert.equal(typeof residue.exception_registration?.migration_window, 'string');
+  }
+});
+
+test('P18 closeout audit fails closed when nested JS appears without an explicit migration exception', () => {
+  const residueDirectory = 'packages/redcube-runtime';
+  const unexpectedFile = 'src/__closeout-audit-test__/unregistered.js';
+  const unexpectedPath = path.join(residueDirectory, unexpectedFile);
+
+  mkdirSync(path.dirname(unexpectedPath), { recursive: true });
+  writeFileSync(unexpectedPath, 'export const unregistered = true;\n', 'utf-8');
+
+  try {
+    const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+    const residue = audit.evidence.js_residue_inventory.find((entry) => entry.directory === residueDirectory);
+
+    assert.equal(audit.criteria.js_residue_explicitly_closed_out, false);
+    assert.equal(audit.criteria.closeout_ready, false);
+    assert.ok(residue, residueDirectory);
+    assert.deepEqual(residue.unexpected_js_files, [unexpectedFile]);
+  } finally {
+    rmSync(path.dirname(unexpectedPath), { recursive: true, force: true });
   }
 });
 

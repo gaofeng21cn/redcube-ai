@@ -5,9 +5,17 @@
 ## 稳定原则
 
 - 新代码默认使用 TypeScript
+- 新增实现默认走 TypeScript；新增 JS 必须登记为显式例外
 - 不做一次性全仓重写
 - 旧 JS 只在明确迁移窗口内短期共存
 - 不允许把迁移做成“后缀变了，但导出 surface 仍然是 `any`”
+
+## JS 例外登记 / JS Exception Registration
+
+- Existing JS residue remains allowed only when it is listed in the TypeScript closeout audit inventory.
+- New `.js` files under `apps/*/src/**` or `packages/*/src/**` must be registered before merge.
+- Each registered JS exception must identify an owner, the reason it cannot land as TypeScript immediately, and a migration window.
+- Unregistered JS residue makes `criteria.js_residue_explicitly_closed_out` fail closed.
 
 ## 编译与模块策略
 
