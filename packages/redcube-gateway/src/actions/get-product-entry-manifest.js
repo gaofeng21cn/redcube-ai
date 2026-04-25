@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 
 import { productEntrySessionDir } from '@redcube/runtime';
+import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { buildManagedRuntimeContract } from 'opl-gateway-shared/managed-runtime-contract';
 import {
   buildCheckpointSummary,
@@ -123,6 +124,7 @@ const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../contracts/runtime-program/current-program.json',
   import.meta.url,
 );
+const overlayRegistry = getDefaultOverlayRegistry();
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -204,6 +206,10 @@ function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) 
 }
 
 function buildDeliverableFacadeContract() {
+  const pptDeckOverlay = overlayRegistry.getOverlay('ppt_deck');
+  const pptDeckSequence = typeof pptDeckOverlay?.describeOverlay === 'function'
+    ? pptDeckOverlay.describeOverlay().route_sequence || []
+    : [];
   return {
     surface_kind: 'deliverable_facade_contract',
     owner: 'redcube_ai',
@@ -222,6 +228,12 @@ function buildDeliverableFacadeContract() {
         deliverable_family: 'ppt_deck',
         route_surface: 'runManagedDeliverable',
         route_fallback_surface: 'runDeliverableRoute',
+        protected_stage_sequence: pptDeckSequence,
+        default_visual_route: 'render_html',
+        route_gate_policy: 'fail_closed_against_overlay_stage_sequence',
+        export_route: 'export_pptx',
+        review_routes: ['visual_director_review', 'screenshot_review'],
+        bypass_policy: 'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_requests_exploration',
       },
       xiaohongshu: {
         deliverable_family: 'xiaohongshu',

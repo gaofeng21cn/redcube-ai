@@ -25,6 +25,7 @@ export async function getDeliverable({
       profile_id: deliverable.profile_id,
     },
     deliverable,
+    hydrated_contract: hydratedContract,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),
   };
 }

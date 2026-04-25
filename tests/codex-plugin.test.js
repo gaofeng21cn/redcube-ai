@@ -28,6 +28,9 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(manifest.description, /Codex plugin/i);
   assert.match(skillText, /redcube product frontdesk/i);
   assert.match(skillText, /redcube product invoke/i);
+  assert.match(skillText, /storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx/i);
+  assert.match(skillText, /不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或直接编辑文件来替代 RedCube/i);
+  assert.match(skillText, /render_html` 是默认视觉实现路线/i);
 });
 
 test('codex plugin installer keeps plugin and skill paths repo-local with machine-readable output', () => {

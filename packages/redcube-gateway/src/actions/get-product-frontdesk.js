@@ -30,6 +30,8 @@ export async function getProductFrontdesk(request) {
 
   return {
     ...frontdeskSurface,
+    deliverable_facade: manifest.deliverable_facade,
+    overlay_stage_sequences: manifest.deliverable_facade?.family_route_policy || {},
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
       runtimeOwner: manifest?.runtime?.runtime_owner || MANAGED_RUNTIME_OWNER,
       source: 'frontdesk',

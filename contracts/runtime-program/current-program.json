@@ -15,7 +15,28 @@
       "keep RedCube as an independent domain agent callable through both direct and OPL-federated entry routes",
       "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
-    ]
+    ],
+    "ad_hoc_bypass_policy": {
+      "policy_id": "forbid_generic_visual_deliverable_bypass",
+      "scope": [
+        "ppt_deck",
+        "xiaohongshu",
+        "poster_onepager"
+      ],
+      "rule": "When a task is in a RedCube visual-deliverable family, callers must use RedCube product-entry, hydrated overlay stage_sequence, and review/export gates; generic presentation/document/image tooling may only be used when the user explicitly requests an alternative technical exploration outside the RedCube runtime.",
+      "ppt_deck_default_sequence": [
+        "storyline",
+        "detailed_outline",
+        "slide_blueprint",
+        "visual_direction",
+        "render_html",
+        "visual_director_review",
+        "screenshot_review",
+        "fix_html",
+        "export_pptx"
+      ],
+      "ppt_deck_default_visual_route": "render_html"
+    }
   },
   "formal_entry": {
     "default_formal_entry": "CLI",

@@ -129,6 +129,30 @@ function buildContinuationSnapshot(domainEntrySurface) {
   });
 }
 
+function stageIdsFromDeliverableRecord(deliverableRecord) {
+  const stages = deliverableRecord?.hydrated_contract?.stage_sequence?.stages
+    || deliverableRecord?.governance_surface?.stage_sequence?.stages;
+  return Array.isArray(stages)
+    ? stages.map((stage) => safeText(stage?.stage_id)).filter(Boolean)
+    : [];
+}
+
+function assertRequestedStagesAllowed({ deliverableRecord, delivery }) {
+  const allowedStages = stageIdsFromDeliverableRecord(deliverableRecord);
+  if (allowedStages.length === 0) return;
+
+  for (const [fieldName, requestedStage] of [
+    ['delivery_request.route', delivery.route],
+    ['delivery_request.stop_after_stage', delivery.stopAfterStage],
+  ]) {
+    if (requestedStage && !allowedStages.includes(requestedStage)) {
+      throw new Error(
+        `${fieldName}=${requestedStage} is not allowed by the hydrated overlay stage_sequence; allowed stages: ${allowedStages.join(', ')}`,
+      );
+    }
+  }
+}
+
 function buildSessionRecord({
   entrySessionId,
   workspaceRoot,
@@ -209,6 +233,7 @@ export async function invokeProductEntry(request) {
     topicId,
     deliverableId,
   });
+  assertRequestedStagesAllowed({ deliverableRecord, delivery });
   const resolvedIdentity = {
     deliverableFamily,
     topicId,

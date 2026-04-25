@@ -11,7 +11,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - `RedCube AI` 面向 Codex 的单一 app skill 薄入口层
 - 建立在现有 CLI、gateway、runtime contract 与 deliverable loop 之上
-- 不替代 `redcube` CLI、gateway contract，也不替代 repo 内其他自动化入口
+- 不替代 `redcube` CLI、gateway contract，也不替代 repo 内其他自动化入口；这些入口只能作为 RedCube runtime 的受控 surface，不能成为绕开 runtime 的替代执行路径
 
 ## 核心入口
 
@@ -21,6 +21,22 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - `redcube product session --entry-session-id <entry-session-id>`
 
 默认先开 frontdesk，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
+
+## Domain runtime 护栏
+
+- 用户点名 `RCA` / `RedCube AI` 或任务属于 slide deck、视觉交付、讲稿、海报、小红书等 RedCube 覆盖范围时，必须通过 RedCube product-entry / deliverable runtime 推进。
+- 不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或直接编辑文件来替代 RedCube 的默认创作与审阅链路，除非用户明确要求“探索替代技术路线”或“绕开 RedCube runtime”。
+- 直接产出 HTML、截图、PPTX、PDF 或其他文件前，必须先确认当前 overlay 的 stage sequence，并把产物落在同一 `topic_id` / `deliverable_id` / `entry_session_id` 的 deliverable loop 中。
+- 如果本机没有全局 `redcube` 命令，应使用 repo-local `npm run redcube -- ...` 或等价安装入口继续走同一 product-entry contract；不得因此改走通用工具路径。
+
+## PPT deck 默认路线
+
+当 overlay / deliverable kind 是 `ppt_deck` 时，默认且受保护的路线是：
+
+`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx`
+
+- `render_html` 是默认视觉实现路线；原生 PowerPoint 对象、artifact-tool editable deck 或 `python-pptx` 只能作为显式探索路线，不能替代默认 `render_html -> screenshot_review -> export_pptx`。
+- 截图质控未通过时，必须从明确 stage rerun 或 `fix_html` 回修，不能跳过 review gate 直接交付。
 
 ## PPT 长任务入口规则
 

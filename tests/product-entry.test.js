@@ -920,6 +920,25 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     ]);
     assert.equal(manifest.deliverable_facade.public_entry_policy.new_public_entry_allowed, false);
     assert.equal(manifest.deliverable_facade.public_entry_policy.canonical_skill_id, 'redcube-ai');
+    assert.deepEqual(
+      manifest.deliverable_facade.family_route_policy.ppt_deck.protected_stage_sequence,
+      [
+        'storyline',
+        'detailed_outline',
+        'slide_blueprint',
+        'visual_direction',
+        'render_html',
+        'visual_director_review',
+        'screenshot_review',
+        'fix_html',
+        'export_pptx',
+      ],
+    );
+    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route, 'render_html');
+    assert.equal(
+      manifest.deliverable_facade.family_route_policy.ppt_deck.bypass_policy,
+      'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_requests_exploration',
+    );
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
     assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
     assert.equal(manifest.domain_entry_contract.service_safe_surface_kind, 'domain_entry');
@@ -1142,6 +1161,60 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(preflight.blocking_check_ids, []);
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
+  });
+});
+
+test('product frontdesk exposes overlay stage sequence for ppt_deck callers', async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+    const frontdesk = await getProductFrontdesk({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+    });
+
+    assert.deepEqual(
+      frontdesk.overlay_stage_sequences.ppt_deck.protected_stage_sequence,
+      [
+        'storyline',
+        'detailed_outline',
+        'slide_blueprint',
+        'visual_direction',
+        'render_html',
+        'visual_director_review',
+        'screenshot_review',
+        'fix_html',
+        'export_pptx',
+      ],
+    );
+    assert.equal(frontdesk.overlay_stage_sequences.ppt_deck.route_gate_policy, 'fail_closed_against_overlay_stage_sequence');
+  });
+});
+
+test('invokeProductEntry rejects route and stop_after_stage outside hydrated stage sequence', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    await assert.rejects(
+      () => invokeProductEntry({
+        workspace_locator: {
+          workspace_root: workspaceRoot,
+        },
+        entry_session_contract: {
+          entry_session_id: 'session-invalid-stage',
+        },
+        delivery_request: {
+          deliverable_family: 'ppt_deck',
+          topic_id: 'topic-invalid-stage',
+          deliverable_id: 'deck-invalid-stage',
+          profile_id: 'lecture_student',
+          title: 'Invalid stage proof',
+          goal: '校验 product-entry fail closed',
+          stop_after_stage: 'native_pptx',
+        },
+      }),
+      /delivery_request\.stop_after_stage=native_pptx is not allowed by the hydrated overlay stage_sequence/,
+    );
   });
 });
 
