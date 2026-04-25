@@ -15,6 +15,14 @@ from pptx.util import Inches, Pt
 CANVAS_PX = (1152, 648)
 SLIDE_W = Inches(16)
 SLIDE_H = Inches(9)
+ENGINE_CONTRACT = {
+    'kind': 'redcube_native_ppt_python_engine',
+    'language': 'python',
+    'contract_version': 1,
+    'owned_routes': ['author_pptx_native', 'repair_pptx_native'],
+    'input_boundary': 'slide_blueprint_plus_visual_direction_json',
+    'review_boundary': 'rendered_pptx_screenshots',
+}
 
 
 def fail(message: str) -> None:
@@ -284,6 +292,7 @@ def main() -> None:
     manifest = {
         'schema_version': 1,
         'artifact_kind': 'ppt_deck_native_shape_manifest',
+        'engine_contract': ENGINE_CONTRACT,
         'mode': args.mode,
         'editable_artifact': True,
         'pptx_file': str(output_pptx),
@@ -299,6 +308,8 @@ def main() -> None:
     result = {
         'status': 'completed',
         'builder': {'kind': 'python_pptx_native_shapes'},
+        'engine_contract': ENGINE_CONTRACT,
+        'shape_manifest_schema_version': manifest['schema_version'],
         'mode': args.mode,
         'page_count': len(slides),
         'pptx_file': str(output_pptx),

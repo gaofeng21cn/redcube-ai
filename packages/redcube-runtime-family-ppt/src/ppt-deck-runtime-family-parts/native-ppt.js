@@ -111,6 +111,29 @@ export function createPptDeckNativePptStageParts(deps) {
       .filter((slide) => slide.slide_id);
   }
 
+  function requireNativeEngineContract(payload) {
+    const contract = payload?.engine_contract || {};
+    const ownedRoutes = safeArray(contract?.owned_routes).map((route) => safeText(route)).filter(Boolean);
+    const expectedRoutes = ['author_pptx_native', 'repair_pptx_native'];
+    const valid = safeText(contract?.kind) === 'redcube_native_ppt_python_engine'
+      && safeText(contract?.language) === 'python'
+      && Number(contract?.contract_version || 0) === 1
+      && expectedRoutes.every((route) => ownedRoutes.includes(route))
+      && safeText(contract?.input_boundary) === 'slide_blueprint_plus_visual_direction_json'
+      && safeText(contract?.review_boundary) === 'rendered_pptx_screenshots';
+    if (!valid) {
+      throw new Error('Native PPT route requires python engine contract v1');
+    }
+    return {
+      kind: 'redcube_native_ppt_python_engine',
+      language: 'python',
+      contract_version: 1,
+      owned_routes: expectedRoutes,
+      input_boundary: 'slide_blueprint_plus_visual_direction_json',
+      review_boundary: 'rendered_pptx_screenshots',
+    };
+  }
+
   function nativeMechanicalReviewPayload(nativeArtifact) {
     const bundle = nativeArtifact?.native_ppt_bundle || {};
     const slideReviews = safeArray(bundle?.slides).map((slide) => ({
@@ -211,6 +234,10 @@ export function createPptDeckNativePptStageParts(deps) {
       '--repair-log', paths.repairLogFile,
     ]);
     const payload = python.payload;
+    const engineContract = requireNativeEngineContract(payload);
+    if (Number(payload.shape_manifest_schema_version || 0) !== 1) {
+      throw new Error('Native PPT route requires shape manifest schema_version 1');
+    }
     const repairLog = payload.repair_log || {
       target_slide_ids: repairFeedback.map((slide) => slide.slide_id),
       consumed_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : null,
@@ -226,6 +253,8 @@ export function createPptDeckNativePptStageParts(deps) {
       native_ppt_bundle: {
         source_visual_route: route,
         builder: payload.builder || { kind: 'python_pptx_native_shapes' },
+        engine_contract: engineContract,
+        shape_manifest_schema_version: Number(payload.shape_manifest_schema_version || 0),
         editable_artifact: true,
         pptx_file: safeText(payload.pptx_file, paths.pptxFile),
         pdf_file: safeText(payload.pdf_file, paths.pdfFile),

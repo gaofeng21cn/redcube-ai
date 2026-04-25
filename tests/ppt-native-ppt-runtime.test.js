@@ -56,8 +56,21 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(authorResult.ok, true);
     const authored = readJson(authorResult.artifactFile);
     assert.equal(authored.native_ppt_bundle?.editable_artifact, true);
+    const expectedEngineContract = {
+      kind: 'redcube_native_ppt_python_engine',
+      language: 'python',
+      contract_version: 1,
+      owned_routes: ['author_pptx_native', 'repair_pptx_native'],
+      input_boundary: 'slide_blueprint_plus_visual_direction_json',
+      review_boundary: 'rendered_pptx_screenshots',
+    };
+    assert.deepEqual(authored.native_ppt_bundle?.engine_contract, expectedEngineContract);
+    assert.equal(authored.native_ppt_bundle?.shape_manifest_schema_version, 1);
     assert.equal(existsSync(authored.native_ppt_bundle?.pptx_file), true);
     assert.equal(existsSync(authored.native_ppt_bundle?.shape_manifest_file), true);
+    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
+    assert.equal(shapeManifest.schema_version, 1);
+    assert.deepEqual(shapeManifest.engine_contract, expectedEngineContract);
     assert.equal(authored.native_ppt_bundle?.source_visual_route, 'author_pptx_native');
     assert.equal(authored.native_ppt_bundle?.slides.length >= 6, true);
     assert.equal(
