@@ -101,6 +101,41 @@ export function createPptDeckAuthoringParts(deps) {
     }));
   }
 
+  function extractApprovedSlidePlan(contract) {
+    const operatorCorpus = sharedOperatorMaterials(contract)
+      .map((material) => safeText(material?.content_text || material?.excerpt))
+      .filter(Boolean)
+      .join('\n\n');
+    const matches = [...operatorCorpus.matchAll(/^##\s+Slide\s+(\d+)\s*[：:.-]?\s*(.*)$/gim)];
+    if (matches.length === 0) return null;
+
+    const slides = matches.map((match, index) => ({
+      slide_no: Number(match[1]) || index + 1,
+      title: safeText(match[2]),
+    }));
+    return {
+      total_slides: slides.length,
+      slides,
+    };
+  }
+
+  function assertApprovedSlidePlan(slides, contract, label) {
+    const approvedPlan = extractApprovedSlidePlan(contract);
+    if (!approvedPlan) return;
+
+    if (slides.length !== approvedPlan.total_slides) {
+      throw new Error(`${label} must preserve approved slide plan: expected ${approvedPlan.total_slides} slides, got ${slides.length}`);
+    }
+
+    for (let index = 0; index < approvedPlan.slides.length; index += 1) {
+      const expected = approvedPlan.slides[index];
+      const actual = slides[index];
+      if (actual.slide_no !== expected.slide_no) {
+        throw new Error(`${label} must preserve approved slide order at index ${index + 1}: expected Slide ${expected.slide_no}, got Slide ${actual.slide_no}`);
+      }
+    }
+  }
+
   function normalizeChapterStructure(chapterStructure, slides) {
     const normalized = safeArray(chapterStructure)
       .map((chapter, index) => ({
@@ -118,6 +153,7 @@ export function createPptDeckAuthoringParts(deps) {
     if (slides.length < 6) {
       throw new Error('upstream ppt detailed_outline must contain at least 6 slides');
     }
+    assertApprovedSlidePlan(slides, contract, 'upstream ppt detailed_outline');
     return {
       chapter_structure: normalizeChapterStructure(data?.chapter_structure, slides),
       slides,
@@ -130,6 +166,7 @@ export function createPptDeckAuthoringParts(deps) {
     if (slides.length < 6) {
       throw new Error('upstream ppt slide_blueprint must contain at least 6 slides');
     }
+    assertApprovedSlidePlan(slides, contract, 'upstream ppt slide_blueprint');
     return {
       chapter_goal: requireText(data?.chapter_goal, 'slide_blueprint.chapter_goal'),
       slides,
@@ -379,6 +416,7 @@ export function createPptDeckAuthoringParts(deps) {
         deep_research_state: sharedSourceDeepResearchState(contract),
         material_ids: sharedSourceMaterialIds(contract),
       },
+      approved_slide_plan: extractApprovedSlidePlan(contract),
       operator_playbook: sharedOperatorMaterials(contract)
         .slice(0, 6)
         .map((material) => ({

@@ -196,6 +196,40 @@ function assertRuntimeLoopClosureShape(surface, { source, entryMode }) {
 
 const SERIAL_ENV_TEST = { concurrency: false };
 
+
+test('invokeProductEntry converts review-first deck intent into a stop-after-outline lifecycle gate', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const response = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-review-first',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-review-first',
+        profile_id: 'lecture_student',
+        title: 'OPL 系列项目介绍',
+        goal: '介绍 OPL 系列项目和 Med Auto Science 自动科研，面向医生专家，20 分钟以上',
+        user_intent: '不要一次性生成，先做到故事主线给我看看，我审阅之后再继续往下做',
+        lifecycle_policy: 'operator_review_after_plan',
+      },
+    });
+
+    assert.equal(response.ok, true);
+    assert.equal(response.domain_entry_surface.result_surface.managed_run.mode, 'stop_after_stage');
+    assert.equal(response.domain_entry_surface.result_surface.managed_run.stop_after_stage, 'detailed_outline');
+    assert.equal(response.domain_entry_surface.result_surface.managed_run.status, 'stopped_after_stage');
+    assert.equal(response.domain_entry_surface.result_surface.managed_run.current_stage, 'detailed_outline');
+    assert.equal(response.runtime_loop_closure.control_policy.approval_required, true);
+    assert.equal(response.summary.approval_required, true);
+  });
+});
+
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
@@ -1149,8 +1183,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
     );
     assert.deepEqual(frontdesk.product_entry_preflight, manifest.product_entry_preflight);
-    assert.match(frontdesk.product_entry_quickstart.summary, /auto_to_terminal/);
-    assert.match(frontdesk.product_entry_quickstart.steps[1].summary, /autonomously to terminal export/);
+    assert.match(frontdesk.product_entry_quickstart.summary, /operator_review_after_plan/);
+    assert.match(frontdesk.product_entry_quickstart.steps[1].summary, /operator_review_after_plan/);
     assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');

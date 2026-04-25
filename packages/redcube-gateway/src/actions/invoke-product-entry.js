@@ -73,10 +73,27 @@ function normalizeDeliveryRequest(request) {
     adapter: safeText(delivery?.adapter),
     userIntent: safeText(delivery?.user_intent || delivery?.userIntent),
     stopAfterStage: safeText(delivery?.stop_after_stage || delivery?.stopAfterStage),
+    lifecyclePolicy: safeText(delivery?.lifecycle_policy || delivery?.lifecyclePolicy),
     mode: safeText(delivery?.mode),
     baselineDeliverableId: safeText(delivery?.baseline_deliverable_id || delivery?.baselineDeliverableId),
     taskIntent: safeText(delivery?.task_intent || delivery?.taskIntent),
   };
+}
+
+function resolveLifecycleStopAfterStage({ delivery, taskIntent, existingSession }) {
+  if (delivery.stopAfterStage || delivery.route || taskIntent !== 'run_managed_deliverable' || existingSession) {
+    return delivery.stopAfterStage;
+  }
+
+  if (delivery.lifecyclePolicy === 'operator_review_after_plan') {
+    return 'detailed_outline';
+  }
+
+  if (delivery.lifecyclePolicy && delivery.lifecyclePolicy !== 'auto_to_terminal') {
+    throw new Error(`Unsupported delivery_request.lifecycle_policy: ${delivery.lifecyclePolicy}`);
+  }
+
+  return delivery.stopAfterStage;
 }
 
 function resolveTaskIntent(request, delivery) {
@@ -197,6 +214,11 @@ export async function invokeProductEntry(request) {
     delivery,
     session: existingSession,
   });
+  delivery.stopAfterStage = resolveLifecycleStopAfterStage({
+    delivery,
+    taskIntent,
+    existingSession,
+  });
   const deliverableFamily = requireField(
     'delivery_request.deliverable_family',
     deliveryIdentity.deliverableFamily,
@@ -266,6 +288,7 @@ export async function invokeProductEntry(request) {
       adapter: delivery.adapter || undefined,
       user_intent: delivery.userIntent || undefined,
       stop_after_stage: delivery.stopAfterStage || undefined,
+      lifecycle_policy: delivery.lifecyclePolicy || undefined,
       mode: delivery.mode || undefined,
       baseline_deliverable_id: delivery.baselineDeliverableId || undefined,
     },

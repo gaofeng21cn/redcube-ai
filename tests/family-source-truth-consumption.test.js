@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   createDeliverable,
@@ -205,5 +205,65 @@ test('poster_onepager keeps guarded knowledge-poster boundary while emitting sha
       const artifact = readJson(result.artifactFile);
       expectSharedSummary(artifact.source_truth_consumption, role);
     }
+  });
+});
+
+
+test('ppt_deck preserves approved operator slide plan instead of compressing long deck', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-approved-slide-plan-'));
+    const approvedOutline = Array.from({ length: 32 }, (_, index) => `## Slide ${index + 1}: 批准页 ${index + 1}`).join('\n\n');
+    const approvedOutlineFile = path.join(workspaceRoot, 'approved-outline.md');
+    writeFileSync(approvedOutlineFile, approvedOutline, 'utf-8');
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-approved-plan',
+      title: 'OPL 系列项目介绍',
+      brief: '介绍 OPL 系列项目和 Med Auto Science 自动科研，面向医生专家，20 分钟以上。',
+      operatorFiles: [approvedOutlineFile],
+    });
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-approved-plan',
+      deliverableId: 'deck-approved-plan',
+      title: 'OPL 系列项目介绍',
+      goal: '按用户批准的 32 页故事线继续生成完整讲座 deck',
+    });
+
+    const storylineResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-approved-plan',
+      deliverableId: 'deck-approved-plan',
+      route: 'storyline',
+    });
+    assert.equal(storylineResult.ok, true);
+
+    const outlineResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-approved-plan',
+      deliverableId: 'deck-approved-plan',
+      route: 'detailed_outline',
+    });
+    assert.equal(outlineResult.ok, true);
+    const outline = readJson(outlineResult.artifactFile);
+    assert.equal(outline.detailed_outline.slides.length, 32);
+    assert.equal(Number(outline.detailed_outline.slides[0].slide_no), 1);
+    assert.equal(Number(outline.detailed_outline.slides.at(-1).slide_no), 32);
+
+    const blueprintResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-approved-plan',
+      deliverableId: 'deck-approved-plan',
+      route: 'slide_blueprint',
+    });
+    assert.equal(blueprintResult.ok, true);
+    const blueprint = readJson(blueprintResult.artifactFile);
+    assert.equal(blueprint.slide_blueprint.slides.length, 32);
+    assert.equal(Number(blueprint.slide_blueprint.slides.at(-1).slide_no), 32);
   });
 });

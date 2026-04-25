@@ -1,5 +1,32 @@
 import { recordParallelOverlap, readySources, safeArray, safeText, topicFocus } from './shared.js';
 
+function approvedPlanSlides(meta) {
+  const approvedSlides = safeArray(meta?.context?.approved_slide_plan?.slides);
+  if (approvedSlides.length === 0) return [];
+  const sources = readySources(meta);
+  return approvedSlides.map((approved, index) => ({
+    slide_id: `S${String(approved.slide_no || index + 1).padStart(2, '0')}`,
+    slide_no: Number(approved.slide_no) || index + 1,
+    chapter_id: `C${Math.min(Math.floor(index / 6) + 1, 6)}`,
+    page_type: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'closure_peak' : 'public_evidence'),
+    layout_family: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'summary_peak' : 'multi_zone_compare'),
+    title: safeText(approved.title) || `Slide ${approved.slide_no || index + 1}`,
+    page_goal: '保留批准主线',
+    page_objective: '按用户已审阅的逐页故事线继续展开',
+    core_sentence: `本页延续已批准故事线第 ${approved.slide_no || index + 1} 页，不压缩、不合并。`,
+    evidence_points: ['批准故事线', '逐页展开'],
+    public_sources: [sources[index % sources.length] || sources[0]],
+    page_core_content: [
+      `保留第 ${approved.slide_no || index + 1} 页标题与叙事位置`,
+      '在后续视觉阶段扩写内容，而不是改变页数合同',
+    ],
+    visual_anchor_tracks: ['top-title', 'center-content', 'bottom-source-rail'],
+    speaker_notes: '这一页按批准主线继续讲，不合并到其他页面。',
+    transition_sentence: index === approvedSlides.length - 1 ? '完。' : '下一页继续沿批准主线推进。',
+    render_recipe_id: index === 0 ? 'ppt.hero_signal' : (index === approvedSlides.length - 1 ? 'ppt.summary_peak' : 'ppt.compare_zones'),
+  }));
+}
+
 export function buildMockStoryline(meta) {
   const title = safeText(meta?.context?.title) || '未命名课件';
   const audience = safeText(meta?.context?.audience) || '专业听众';
@@ -20,6 +47,16 @@ export function buildMockStoryline(meta) {
 }
 
 export function buildMockOutline(meta) {
+  const planSlides = approvedPlanSlides(meta);
+  if (planSlides.length > 0) {
+    return {
+      chapter_structure: [
+        { chapter_id: 'C1', title: '批准故事线', slide_range: `01-${String(planSlides.length).padStart(2, '0')}` },
+      ],
+      slides: planSlides,
+    };
+  }
+
   const title = safeText(meta?.context?.title) || '未命名课件';
   const topic = topicFocus(meta);
   const sources = readySources(meta);

@@ -189,6 +189,7 @@ export interface DomainEntryRequest extends Record<string, unknown> {
     route?: string;
     adapter?: string;
     user_intent?: string;
+    lifecycle_policy?: string;
     stop_after_stage?: string;
     mode?: string;
     baseline_deliverable_id?: string;
@@ -230,6 +231,7 @@ export interface ProductEntryRequest extends Record<string, unknown> {
     route?: string;
     adapter?: string;
     user_intent?: string;
+    lifecycle_policy?: string;
     stop_after_stage?: string;
     mode?: string;
     baseline_deliverable_id?: string;

@@ -40,6 +40,9 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## PPT 长任务入口规则
 
+- 如果用户原始需求包含“不要一次性生成”“先给我看看”“审阅之后再继续”“先做故事主线/大纲/蓝图”等人工审阅语义，必须在 product-entry delivery request 中显式设置 `stop_after_stage`，默认停在可审阅的 plan stage；不得省略 stop policy 直接 auto-to-terminal。
+- 用户审阅通过的故事主线、详细大纲或逐页蓝图进入后续阶段时，必须作为批准合同继续沿用；后续 stage 只能扩写和视觉化，不能重新压缩为短 deck。
+
 当用户要求 RCA / RedCube AI 制作较长 PPT、资料较多的 deck、或任何容易超过单轮 prompt 的 visual deliverable 时，不要把完整任务压成一个巨大 prompt 直接生成。默认采用同一 `entry_session_id` 下的可恢复阶段流：
 
 1. `source/material intake`：用 frontdesk / manifest 读取 workspace、资料包、缺口与交付目标，冻结 source package 和 missing materials。

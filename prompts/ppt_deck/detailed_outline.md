@@ -1,5 +1,12 @@
 # ppt_deck detailed_outline
 
+## 审阅与批准合同
+
+- 如果 product-entry / operator_playbook / source_truth 中出现用户已审阅批准的故事主线、详细大纲或逐页蓝图，必须保留其页数、顺序、标题与叙事层级。
+- 不得把已批准的长讲座压缩成短课件、课堂摘要或少页版本。
+- 如果用户要求“先给我审阅、审阅后再继续”，本 stage 是人工审阅停靠点，输出必须足够支持后续完整 deck，而不是终稿压缩版。
+
+
 把故事主线拆成章节与页预算。
 要求：
 - 每页明确 core_sentence / evidence_points / page_objective

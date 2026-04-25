@@ -285,7 +285,7 @@ export async function getProductEntryManifest(request) {
   const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
   const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
-      'Open the RedCube frontdesk first; direct invoke defaults to auto_to_terminal and only stops for explicit stop_after_stage or a runtime review gate.'
+      'Open the RedCube frontdesk first; if the user requested plan/storyline review, invoke with lifecycle_policy=operator_review_after_plan; otherwise direct invoke runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.'
     ),
     recommended_step_id: 'open_frontdesk',
     steps: [
@@ -306,7 +306,7 @@ export async function getProductEntryManifest(request) {
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
         surface_kind: 'product_entry',
-        summary: 'Run the current deliverable loop autonomously to terminal export unless an explicit stop_after_stage or runtime review gate stops it.',
+        summary: 'Run the current deliverable loop; use lifecycle_policy=operator_review_after_plan for review-first deck tasks, otherwise it runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
@@ -367,7 +367,7 @@ export async function getProductEntryManifest(request) {
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
         surface_kind: 'product_entry',
-        summary: 'Start or continue a direct RedCube product-entry session; omit stop_after_stage for autonomous terminal export.',
+        summary: 'Start or continue a direct RedCube product-entry session; set lifecycle_policy=operator_review_after_plan for review-first planning, or omit stop_after_stage for autonomous terminal export.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
