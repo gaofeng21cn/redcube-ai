@@ -157,10 +157,19 @@ export function createPptDeckStageParts(deps) {
     const slides = safeArray(renderArtifact?.html_bundle?.slides);
     const weakPages = new Set();
     const findings = [];
+    const metadataLeakPatterns = [
+      /当前节点\s*[：:]\s*\d+\s*\/\s*\d+/i,
+      /下一步\s*(进入|是|为|[:：])/i,
+      /制作目标\s*[：:]/i,
+      /\b(operator|internal)\b/i,
+      /\bprompt\s*(pack|file|artifact|seed|contract|context|output)\b/i,
+      /prompt\s*(输出|生成|写入|文案|指令|上下文)/i,
+      /(制作者|内部)(流程|节点|提示|文案|审查|复盘)/i,
+    ];
     for (const slide of slides) {
       const slideId = safeText(slide?.slide_id);
       const visibleText = visibleAudienceText(slide?.content || slide?.content_html || slide?.html);
-      const leaked = [/当前节点\s*[：:]\s*\d+\s*\/\s*\d+/i, /下一步\s*(进入|是|为|[:：])/i, /制作目标\s*[：:]/i, /\b(operator|internal|prompt)\b/i, /(制作者|内部)(流程|节点|提示|文案|审查|复盘)/i].some((pattern) => pattern.test(visibleText));
+      const leaked = metadataLeakPatterns.some((pattern) => pattern.test(visibleText));
       if (leaked) { weakPages.add(slideId); findings.push(`${slideId}: audience-facing metadata leak`); }
     }
     let currentRun = [];

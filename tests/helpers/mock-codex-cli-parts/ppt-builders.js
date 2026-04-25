@@ -492,6 +492,18 @@ export function buildMockPptRender(meta) {
             }
           }
         }
+        if (variants.has('require_repeat_block_escalation')) {
+          const revisionFocus = slide?.revision_focus || {};
+          if (revisionFocus?.repeat_block_after_fix !== true) {
+            throw new Error(`mock ppt render expected repeat_block_after_fix escalation for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+          }
+          if (!/重复阻塞|结构级|删减|重排|扩大/.test(safeText(revisionFocus?.recommended_fix))) {
+            throw new Error(`mock ppt render expected structural escalation text for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+          }
+          if (!safeArray(revisionFocus?.ai_findings).some((item) => /重复阻塞|微调不足/.test(safeText(item)))) {
+            throw new Error(`mock ppt render expected repeat-block finding for ${slide.slide_id}: ${JSON.stringify(revisionFocus)}`);
+          }
+        }
         if (variants.has('require_scoped_revision_context')) {
           const revisionContext = meta?.context?.revision_context || {};
           const currentSlideId = safeText(slide.slide_id);
@@ -594,7 +606,9 @@ export function buildMockPptScreenshotReview(meta) {
       : '截图复核确认封面署名、结构主线与课堂节奏都已经落到最终画面里。',
     slide_reviews: slides.map((slide) => ({
       slide_id: safeText(slide?.slide_id),
-      judgement: safeText(slide?.slide_id) === forcedBlockSlideId ? 'block' : 'pass',
+      judgement: safeText(slide?.slide_id) === forcedBlockSlideId
+        ? 'block'
+        : (variants.has('pass_with_minor_watch') ? 'pass_with_minor_watch' : 'pass'),
       visual_findings: safeText(slide?.slide_id) === forcedBlockSlideId
         ? ['底部说明贴边，卡片内最后一行可见压边，仍需局部修页。']
         : ['结构清楚，首眼路径稳定，信息密度可讲可看。'],

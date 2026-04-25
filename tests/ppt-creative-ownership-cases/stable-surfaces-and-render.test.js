@@ -384,6 +384,37 @@ test('ppt visual_director_review blocks audience-facing operator metadata leaked
   });
 });
 
+test('ppt visual_director_review allows public Prompt Engineering concept copy', async () => {
+  await withMockHermesUpstream(async () => {
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-director-public-prompt-copy-',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
+    });
+    for (const { route, result } of routeResults) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const renderResult = routeResults.at(-1).result;
+    const renderArtifact = readJson(renderResult.artifactFile);
+    const publicPromptRenderArtifact = rewriteRenderSlideContent(renderArtifact, 'S02', (content) => content.replace(
+      '</section>',
+      `<aside data-qa-block="public-ai-concept" style="font-size:22px;color:#0F172A;">
+        Prompt Engineering 是面向听众解释 AI 能力边界的公开概念。
+      </aside></section>`,
+    ));
+    writeFileSync(renderResult.artifactFile, JSON.stringify(publicPromptRenderArtifact, null, 2), 'utf-8');
+
+    const directorReview = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorReview.ok, true);
+  });
+});
+
 test('ppt visual_director_review blocks consecutive homogeneous dense white-card slides', async () => {
   await withMockHermesUpstream(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
@@ -799,8 +830,9 @@ test('ppt render_html persists durable batch artifacts and resumes from complete
       'render_batches',
       'render_html',
     );
-    const firstBatchFile = path.join(batchRoot, 'render_html_batch_1.json');
-    const firstSlideFile = path.join(batchRoot, 'render_html_batch_1', 'S01.html');
+    const firstBatchStageId = 'render_html_batch_01_S01_S02_S03_S04_S05_S06';
+    const firstBatchFile = path.join(batchRoot, `${firstBatchStageId}.json`);
+    const firstSlideFile = path.join(batchRoot, firstBatchStageId, 'S01.html');
     assert.equal(existsSync(firstBatchFile), true);
     assert.equal(existsSync(firstSlideFile), true);
     const firstBatchMtimeMs = statSync(firstBatchFile).mtimeMs;

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, rmSync } from 'node:fs';
 
 export function createPptDeckRenderStageParts(deps) {
   const {
@@ -166,6 +166,13 @@ export function createPptDeckRenderStageParts(deps) {
     deliverableId,
     minimumMtimeMs = 0,
   }) {
+    const currentHtmlStage = currentHtmlStageId(contract, deliverablePaths);
+    const currentHtmlArtifactMtimeMs = safeFileMtimeMs(
+      stageArtifactPath(contract, deliverablePaths, currentHtmlStage),
+    );
+    const screenshotReviewMtimeMs = safeFileMtimeMs(
+      stageArtifactPath(contract, deliverablePaths, 'screenshot_review'),
+    );
     const directorReviewArtifact = safeFileMtimeMs(
       stageArtifactPath(contract, deliverablePaths, 'visual_director_review'),
     ) >= Number(minimumMtimeMs || 0)
@@ -187,9 +194,29 @@ export function createPptDeckRenderStageParts(deps) {
           weak_pages: safeArray(directorReviewArtifact.visual_director_review?.weak_pages),
           review_summary: normalizeInlineText(directorReviewArtifact.visual_director_review?.review_summary, 320),
           rewrite_action: safeText(directorReviewArtifact.visual_director_review?.rewrite_action, 'none'),
-        }
+      }
       : null;
     const screenshotSlideFeedback = summarizeRenderRevisionSlideFeedback(screenshotReviewArtifact);
+    const previousFixArtifact = currentHtmlStage === PAGE_FIX_ROUTE
+      ? readStageArtifact(contract, deliverablePaths, PAGE_FIX_ROUTE)
+      : null;
+    const previousFixSlideIds = new Set([
+      ...safeArray(previousFixArtifact?.render_execution?.freshly_rendered_slide_ids),
+      ...safeArray(previousFixArtifact?.targeted_rerun?.target_slide_ids),
+    ].map((slideId) => safeText(slideId)).filter(Boolean));
+    const repeatBlockedSlideIds = screenshotReviewMtimeMs >= currentHtmlArtifactMtimeMs
+      ? screenshotSlideFeedback
+        .map((slide) => safeText(slide?.slide_id))
+        .filter((slideId) => slideId && previousFixSlideIds.has(slideId))
+      : [];
+    const repairAttemptSummary = repeatBlockedSlideIds.length > 0
+      ? {
+          previous_route: PAGE_FIX_ROUTE,
+          previous_target_slide_ids: Array.from(previousFixSlideIds),
+          repeat_blocked_slide_ids: repeatBlockedSlideIds,
+          escalation_rule: '上一轮 fix_html 后仍被 screenshot_review 拦下的页面必须结构级简化、重排或扩大容器；不得继续只做 padding、line-height 或微缩字号调整。',
+        }
+      : null;
     const screenshotSummary = screenshotReviewArtifact
       ? {
           status: safeText(screenshotReviewArtifact.status, 'unknown'),
@@ -201,7 +228,7 @@ export function createPptDeckRenderStageParts(deps) {
           slide_feedback: screenshotSlideFeedback,
         }
       : null;
-    if (!directorSummary && !screenshotSummary && !operatorRevisionBrief) {
+    if (!directorSummary && !screenshotSummary && !operatorRevisionBrief && !repairAttemptSummary) {
       return null;
     }
     return {
@@ -209,6 +236,7 @@ export function createPptDeckRenderStageParts(deps) {
       visual_director_review: directorSummary,
       screenshot_review: screenshotSummary,
       operator_revision_brief: operatorRevisionBrief,
+      repair_attempt: repairAttemptSummary,
     };
   }
 
@@ -238,6 +266,11 @@ export function createPptDeckRenderStageParts(deps) {
         .map((slideId) => safeText(slideId))
         .filter(Boolean),
     );
+    const repeatBlockedSlideIds = new Set(
+      safeArray(revisionContext?.repair_attempt?.repeat_blocked_slide_ids)
+        .map((slideId) => safeText(slideId))
+        .filter(Boolean),
+    );
     for (const slideId of new Set([
       ...selectedTargetSlideIds,
       ...slideFeedbackById.keys(),
@@ -249,12 +282,16 @@ export function createPptDeckRenderStageParts(deps) {
       const operatorIssues = safeArray(operatorFeedback?.issues).map((item) => normalizeInlineText(item, 220));
       const operatorKeep = safeArray(operatorFeedback?.keep).map((item) => normalizeInlineText(item, 220));
       const operatorAvoid = safeArray(operatorFeedback?.avoid).map((item) => normalizeInlineText(item, 220));
+      const repeatBlockAfterFix = repeatBlockedSlideIds.has(slideId);
       const aiFindings = [
         ...safeArray(slideFeedback?.mechanical_findings),
         ...safeArray(slideFeedback?.ai_findings),
         ...operatorIssues,
         ...operatorKeep.map((item) => `keep: ${item}`),
         ...operatorAvoid.map((item) => `avoid: ${item}`),
+        ...(repeatBlockAfterFix
+          ? ['重复阻塞：上一轮 fix_html 后本页仍被 screenshot_review 拦下，说明微调不足。']
+          : []),
       ].filter(Boolean);
       const recommendedFixParts = [
         safeText(slideFeedback?.recommended_fix),
@@ -262,18 +299,24 @@ export function createPptDeckRenderStageParts(deps) {
         ...operatorIssues,
         ...operatorKeep.map((item) => `保留：${item}`),
         ...operatorAvoid.map((item) => `避免：${item}`),
+        ...(repeatBlockAfterFix
+          ? ['重复阻塞强制规则：必须明显删减至少一个次级元素、重排结构或扩大主要容器，不得仅调整 padding、line-height 或微缩字号。']
+          : []),
       ].filter(Boolean);
       focusBySlideId.set(slideId, {
         weak_page: weakPages.has(slideId),
         blocked_for_screenshot_review: blockedSlideIds.has(slideId),
         operator_requested_revision: operatorTargetSlideIds.has(slideId),
+        repeat_block_after_fix: repeatBlockAfterFix,
         blocked_checks: safeArray(slideFeedback?.blocked_checks),
         ai_findings: aiFindings,
         recommended_fix: recommendedFixParts.join('；'),
         director_review_summary: weakPages.has(slideId)
           ? normalizeInlineText(revisionContext?.visual_director_review?.review_summary, 220)
           : '',
-        rewrite_priority: 'must_fix_before_new_variation',
+        rewrite_priority: repeatBlockAfterFix
+          ? 'repeat_block_requires_structural_simplification'
+          : 'must_fix_before_new_variation',
       });
     }
     return focusBySlideId;
@@ -295,16 +338,24 @@ export function createPptDeckRenderStageParts(deps) {
         .map((slideId) => safeText(slideId))
         .filter(Boolean),
     );
+    const operatorExcludedSlideIds = new Set(
+      safeArray(revisionContext?.operator_revision_brief?.excluded_slide_ids)
+        .map((slideId) => safeText(slideId))
+        .filter(Boolean),
+    );
+    const applyOperatorExclusions = (slideIds) => new Set(
+      [...slideIds].filter((slideId) => !operatorExcludedSlideIds.has(slideId)),
+    );
     if (blockedSlideIds.size > 0) {
-      return new Set([
+      return applyOperatorExclusions([
         ...blockedSlideIds,
         ...operatorTargetSlideIds,
       ]);
     }
     if (operatorTargetSlideIds.size > 0) {
-      return new Set(operatorTargetSlideIds);
+      return applyOperatorExclusions(operatorTargetSlideIds);
     }
-    return weakPages;
+    return applyOperatorExclusions(weakPages);
   }
 
   function loadPriorRenderedSlideHtmlMap(renderArtifact) {
@@ -448,11 +499,15 @@ export function createPptDeckRenderStageParts(deps) {
       .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
     const operatorSlideFeedback = safeArray(revisionContext?.operator_revision_brief?.slide_feedback)
       .filter((slide) => allowedSlideIds.has(safeText(slide?.slide_id)));
+    const operatorExcludedSlideIds = safeArray(revisionContext?.operator_revision_brief?.excluded_slide_ids)
+      .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
     const globalDirectorWeakPages = safeArray(revisionContext?.visual_director_review?.weak_pages);
     const globalSlideFeedback = safeArray(revisionContext?.screenshot_review?.slide_feedback);
     const globalBlockedSlideIds = safeArray(revisionContext?.screenshot_review?.blocked_slide_ids);
     const globalOperatorTargetSlideIds = safeArray(revisionContext?.operator_revision_brief?.target_slide_ids);
     const globalOperatorSlideFeedback = safeArray(revisionContext?.operator_revision_brief?.slide_feedback);
+    const repairRepeatBlockedSlideIds = safeArray(revisionContext?.repair_attempt?.repeat_blocked_slide_ids)
+      .filter((slideId) => allowedSlideIds.has(safeText(slideId)));
     const batchHasDirectorFocus = directorWeakPages.length > 0;
     const batchHasScreenshotFocus = slideFeedback.length > 0 || blockedSlideIds.length > 0;
     const batchHasOperatorFocus = operatorTargetSlideIds.length > 0 || operatorSlideFeedback.length > 0;
@@ -481,7 +536,15 @@ export function createPptDeckRenderStageParts(deps) {
       ? {
           ...revisionContext.operator_revision_brief,
           target_slide_ids: operatorTargetSlideIds,
+          excluded_slide_ids: operatorExcludedSlideIds,
           slide_feedback: operatorSlideFeedback,
+        }
+      : null;
+    const repairAttempt = revisionContext?.repair_attempt
+      ? {
+          ...revisionContext.repair_attempt,
+          repeat_blocked_slide_ids: repairRepeatBlockedSlideIds,
+          repeat_block_after_fix: repairRepeatBlockedSlideIds.length > 0,
         }
       : null;
     const hasDirectorFeedback = safeArray(directorSummary?.weak_pages).length > 0
@@ -490,8 +553,10 @@ export function createPptDeckRenderStageParts(deps) {
       || safeArray(screenshotSummary?.slide_feedback).length > 0;
     const hasOperatorFeedback = safeArray(operatorBrief?.target_slide_ids).length > 0
       || safeArray(operatorBrief?.slide_feedback).length > 0
+      || safeArray(operatorBrief?.excluded_slide_ids).length > 0
       || safeArray(operatorBrief?.global_requirements).length > 0;
-    if (!hasDirectorFeedback && !hasScreenshotFeedback && !hasOperatorFeedback) {
+    const hasRepairAttemptFeedback = safeArray(repairAttempt?.repeat_blocked_slide_ids).length > 0;
+    if (!hasDirectorFeedback && !hasScreenshotFeedback && !hasOperatorFeedback && !hasRepairAttemptFeedback) {
       return null;
     }
     return {
@@ -499,6 +564,7 @@ export function createPptDeckRenderStageParts(deps) {
       visual_director_review: directorSummary,
       screenshot_review: screenshotSummary,
       operator_revision_brief: operatorBrief,
+      repair_attempt: hasRepairAttemptFeedback ? repairAttempt : null,
     };
   }
 
@@ -584,6 +650,24 @@ export function createPptDeckRenderStageParts(deps) {
     return path.join(renderBatchCacheRoot(deliverablePaths, route), stageId, `${slideId}.html`);
   }
 
+  function buildRenderBatchStageId(route, batchIndex, slideBatch) {
+    const indexLabel = String(Number(batchIndex) + 1).padStart(2, '0');
+    const slideLabel = safeArray(slideBatch)
+      .map((slide) => safeText(slide?.slide_id).replace(/[^A-Za-z0-9_-]/g, ''))
+      .filter(Boolean)
+      .join('_');
+    return `${route}_batch_${indexLabel}${slideLabel ? `_${slideLabel}` : ''}`;
+  }
+
+  function cleanRenderBatchSlideDir(deliverablePaths, route, stageId) {
+    const stageDir = path.join(renderBatchCacheRoot(deliverablePaths, route), stageId);
+    if (!(mainExistsSync || existsSync)(stageDir)) return;
+    for (const entry of readdirSync(stageDir, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+      rmSync(path.join(stageDir, entry.name), { force: true });
+    }
+  }
+
   function buildRenderBatchCacheKey({
     route,
     renderPlan,
@@ -650,6 +734,7 @@ export function createPptDeckRenderStageParts(deps) {
     };
     ensureDir(path.dirname(file));
     writeJson(file, payload);
+    cleanRenderBatchSlideDir(deliverablePaths, route, stageId);
     for (const slide of safeArray(payload.data?.slides)) {
       const slideId = safeText(slide?.slide_id);
       const contentHtml = safeText(slide?.content_html);
@@ -829,6 +914,7 @@ export function createPptDeckRenderStageParts(deps) {
           '整套 deck 使用同一套标题、卡片标题、正文、标签与页码字号梯度；除封面外，不允许某页整体突然变大或缩小。',
           '若按 batch 生成，后续批次只能参考前面最多三页的 style tokens、typography、palette、spacing 与 visual summary，不得继承其布局结构。',
           '若标题或短句在当前字号梯度下能单行成立，就不要主动插入换行。',
+          '中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”等词拆成单字尾行。',
           '页面纵向信息分布必须均衡：不要把大部分文字和主结构都压在中段，底部也要承担信息收束或结构支撑，避免出现上重中挤下空的大块死白。',
           '整套 deck 的页码语法必须一致：要么统一用两位纯页码，要么统一用当前页/总页数，不允许个别页单独换一套样式。',
         ],
@@ -856,6 +942,7 @@ export function createPptDeckRenderStageParts(deps) {
         '中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义夹杂英文，术语若出现也要尽量配中文语义。',
         '所有正文、标签、节点和卡片文案都要在自然语义处分行，优先减少字数和调整容器，不要把中英文硬挤到同一行直到溢出。',
         '若标题或短句在当前字号梯度下本可单行成立，就不要主动插入 <br/>；短中文词组只能在自然语义处换行。',
+        '中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”等词拆成单字尾行。空间不足时用更短文案、更宽容器、语义换行，或用 inline-block/word-break: keep-all 保护短词。',
         '页面纵向质量分布必须均衡：不能把主要文字信息只堆在 40%-70% 的中段高度；底部必须参与结构承载、总结收束或留白平衡，避免底部只剩装饰条而上中段过挤。',
         '若双区对照页的主峰卡、节点链和说明条都集中在中段，必须通过下移、扩底部承载区或重分配信息层次来拉开纵向分布，不要让页面下五分之一长期空置。',
         '对 multi_zone_compare 的“左拆右并”页面，左侧辅助区必须明显窄于且轻于右侧主峰区；不要把左区做成接近等权的大面板，导致整页读成保守双栏。',
@@ -943,7 +1030,7 @@ export function createPptDeckRenderStageParts(deps) {
           referenceSlides,
         };
       };
-      buildRenderBatchStage.stage_id = `${route}_batch_${batchIndex + 1}`;
+      buildRenderBatchStage.stage_id = buildRenderBatchStageId(route, batchIndex, slideBatch);
       renderBatchStages.push(buildRenderBatchStage);
     }
     const renderBatchResult = await executeRenderBatchStagesDurably({

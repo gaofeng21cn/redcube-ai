@@ -136,6 +136,37 @@ function stageArtifactFile(deliverablePaths, contract, stageId) {
   return path.join(deliverablePaths.artifactsDir, String(stage?.output_artifact || `${stageId}.json`).trim());
 }
 
+function pptDraftViewFiles(deliverablePaths, deliverableId) {
+  const safeDeliverableId = String(deliverableId || '').trim();
+  if (!safeDeliverableId) return [];
+  return [
+    path.join(deliverablePaths.viewsDir, `${safeDeliverableId}.draft.html`),
+    path.join(deliverablePaths.viewsDir, `${safeDeliverableId}.draft.slides.json`),
+  ];
+}
+
+function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract, deliverableId }) {
+  const files = routeRequiresArtifacts(contract, route)
+    .map((stageId) => stageArtifactFile(deliverablePaths, contract, stageId));
+  if (overlay === 'ppt_deck') {
+    if (['render_html', 'fix_html'].includes(route)) {
+      files.push(
+        stageArtifactFile(deliverablePaths, contract, 'visual_director_review'),
+        stageArtifactFile(deliverablePaths, contract, 'screenshot_review'),
+        path.join(deliverablePaths.viewsDir, 'operator', '幻灯片', '当前返修要求.md'),
+      );
+    }
+    if (['visual_director_review', 'screenshot_review', 'export_pptx'].includes(route)) {
+      files.push(
+        stageArtifactFile(deliverablePaths, contract, 'render_html'),
+        stageArtifactFile(deliverablePaths, contract, 'fix_html'),
+        ...pptDraftViewFiles(deliverablePaths, deliverableId),
+      );
+    }
+  }
+  return Array.from(new Set(files));
+}
+
 function buildRouteCacheKey({
   overlay,
   route,
@@ -284,8 +315,13 @@ export async function executeDeliverableRouteLocally({
     deliverablePaths.artifactsDir,
     String(stageContract.output_artifact || `${safeRoute}.json`).trim(),
   );
-  const requiredArtifactFiles = routeRequiresArtifacts(contract, safeRoute)
-    .map((stageId) => stageArtifactFile(deliverablePaths, contract, stageId));
+  const requiredArtifactFiles = routeCacheDependencyFiles({
+    overlay,
+    route: safeRoute,
+    deliverablePaths,
+    contract,
+    deliverableId,
+  });
   const routeCacheKey = buildRouteCacheKey({
     overlay,
     route: safeRoute,

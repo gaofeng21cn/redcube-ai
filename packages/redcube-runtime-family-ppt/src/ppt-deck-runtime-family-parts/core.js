@@ -625,7 +625,7 @@ export function createPptDeckRuntimeCore() {
     if (['block', 'revise', 'fail', 'failed', 'reject', 'rejected', 'needs_revision', 'needs_rewrite'].includes(raw)) {
       return 'block';
     }
-    if (['pass', 'ok', 'approved', 'approve', 'weak', 'minor', 'advisory', 'warn', 'warning', 'soft_pass'].includes(raw)) {
+    if (['pass', 'ok', 'approved', 'approve', 'weak', 'minor', 'advisory', 'warn', 'warning', 'soft_pass', 'pass_with_minor_watch', 'pass_with_warnings', 'minor_watch'].includes(raw)) {
       return 'pass';
     }
     return raw;

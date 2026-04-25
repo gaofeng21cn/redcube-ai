@@ -170,6 +170,15 @@ function makePptRenderParts({ stageCalls }) {
 test('ppt render_html batches same-route slide chunks through durable per-batch artifacts', async () => {
   const stageCalls = [];
   const { stageParts, workspaceRoot, contract, deliverablePaths } = makePptRenderParts({ stageCalls });
+  const staleBatchDir = path.join(
+    deliverablePaths.deliverableDir,
+    'artifacts',
+    'render_batches',
+    'render_html',
+    'render_html_batch_04_S06',
+  );
+  mkdirSync(staleBatchDir, { recursive: true });
+  writeFileSync(path.join(staleBatchDir, 'S25.html'), '<div data-slide-id="S25">stale</div>');
 
   const artifact = await stageParts.buildRenderHtmlArtifact({
     workspaceRoot,
@@ -194,15 +203,17 @@ test('ppt render_html batches same-route slide chunks through durable per-batch 
     'S04,S05',
     'S06',
   ]);
-  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_index).map((index) => `render_html_batch_${index}`), [
-    'render_html_batch_1',
-    'render_html_batch_2',
-    'render_html_batch_3',
-    'render_html_batch_4',
+  assert.deepEqual(artifact.render_execution.codex_batch_runtime.durable_cache.stage_cache_status.map((stage) => stage.stage_id), [
+    'render_html_batch_01_S01_S02',
+    'render_html_batch_02_S03',
+    'render_html_batch_03_S04_S05',
+    'render_html_batch_04_S06',
   ]);
   assert.deepEqual(stageCalls[1].context.reference_slides.map((slide) => slide.slide_id), ['S01', 'S02']);
-  assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_1.json')), true);
-  assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_1', 'S01.html')), true);
+  assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_01_S01_S02.json')), true);
+  assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_01_S01_S02', 'S01.html')), true);
+  assert.equal(existsSync(path.join(staleBatchDir, 'S25.html')), false);
+  assert.equal(existsSync(path.join(staleBatchDir, 'S06.html')), true);
   assert.equal(artifact.render_execution.batch_count, 4);
   assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.generated_batch_count, 4);
   assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.reused_batch_count, 0);

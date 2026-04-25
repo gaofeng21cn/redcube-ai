@@ -315,14 +315,21 @@ export function createPptDeckSurfaceParts(deps) {
       ...safeArray(value.target_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
       ...slideFeedback.map((item) => item.slide_id),
     ])];
+    const excludedSlideIds = [...new Set([
+      ...safeArray(value.exclude_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+      ...safeArray(value.excluded_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+      ...safeArray(value.false_positive_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+      ...safeArray(value.verified_false_positive_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
+    ])];
     const globalRequirements = safeArray(value.global_requirements)
       .map((item) => safeText(item))
       .filter(Boolean);
-    if (targetSlideIds.length === 0 && globalRequirements.length === 0) {
+    if (targetSlideIds.length === 0 && excludedSlideIds.length === 0 && globalRequirements.length === 0) {
       return null;
     }
     return {
       target_slide_ids: targetSlideIds,
+      excluded_slide_ids: excludedSlideIds,
       global_requirements: globalRequirements,
       slide_feedback: slideFeedback,
     };
