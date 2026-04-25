@@ -202,11 +202,15 @@ function enrichSourceFingerprint(source) {
   };
 }
 
+function sourceReuseKey(source) {
+  return `${safeText(source?.source_role)}:${safeText(source?.content_hash)}`;
+}
+
 function previousSourceByHash(previousManifest) {
   return new Map(
     (Array.isArray(previousManifest?.sources) ? previousManifest.sources : [])
       .filter((source) => safeText(source?.content_hash))
-      .map((source) => [source.content_hash, source]),
+      .map((source) => [sourceReuseKey(source), source]),
   );
 }
 
@@ -218,8 +222,8 @@ function previousMaterialBySourceHash(previousManifest, previousMaterials) {
   );
   return new Map(
     (Array.isArray(previousManifest?.sources) ? previousManifest.sources : [])
-      .map((source) => [safeText(source?.content_hash), materialById.get(safeText(source?.material_id))])
-      .filter(([contentHash, material]) => contentHash && material),
+      .map((source) => [sourceReuseKey(source), materialById.get(safeText(source?.material_id))])
+      .filter(([reuseKey, material]) => reuseKey && material),
   );
 }
 
@@ -452,8 +456,8 @@ export async function intakeSource({
   const priorMaterialsByHash = previousMaterialBySourceHash(previousManifest, previousExtractedMaterials);
 
   const extracted = intakeSources.map((source) => {
-    const priorSource = priorSourcesByHash.get(source.content_hash);
-    const priorMaterial = priorMaterialsByHash.get(source.content_hash);
+    const priorSource = priorSourcesByHash.get(sourceReuseKey(source));
+    const priorMaterial = priorMaterialsByHash.get(sourceReuseKey(source));
     if (priorSource?.extraction?.status === 'ready' && priorMaterial) {
       return {
         ...source,
@@ -484,6 +488,8 @@ export async function intakeSource({
           ...source.reused_material,
           material_id: materialId,
           source_id: source.source_id,
+          source_role: safeText(source.source_role),
+          kind: source.kind,
           relative_path: source.relative_path,
         };
       }

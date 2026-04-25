@@ -305,6 +305,46 @@ test('intakeSource keeps operator files out of audience-facing fact library whil
   );
 });
 
+test('intakeSource preserves current source_role when reusing duplicate content hashes', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-role-reuse-'));
+  const approvedFile = path.join(workspaceRoot, 'approved-outline.md');
+  writeFileSync(approvedFile, [
+    '# Approved outline',
+    '',
+    '## Slide 1: 开场',
+    '',
+    '## Slide 32: 收束',
+  ].join('\n'), 'utf-8');
+
+  const first = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-role-reuse',
+    title: 'OPL 介绍',
+    operatorFiles: [approvedFile],
+  });
+  const firstExtracted = readJson(first.artifactFiles.extractedMaterialsFile);
+  assert.equal(firstExtracted.materials.some((item) => item.source_role === 'operator_context'), true);
+
+  const second = await intakeSource({
+    workspaceRoot,
+    topicId: 'topic-role-reuse',
+    title: 'OPL 介绍',
+    sourceFiles: [approvedFile],
+    operatorFiles: [approvedFile],
+  });
+  const secondExtracted = readJson(second.artifactFiles.extractedMaterialsFile);
+  assert.equal(
+    secondExtracted.materials.some((item) => item.source_id === 'SRC-FILE-1' && item.source_role === 'content_source'),
+    true,
+  );
+  assert.equal(
+    secondExtracted.materials.some((item) => item.source_id === 'SRC-OP-1' && item.source_role === 'operator_context'),
+    true,
+  );
+  const secondBrief = readJson(second.artifactFiles.sourceBriefFile);
+  assert.equal(secondBrief.consumable_material_count >= 1, true);
+});
+
 test('intakeSource cleans markdown wrapper noise out of audience-facing fact library', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-markdown-clean-'));
   const markdownFile = path.join(workspaceRoot, 'opl-readme.md');
