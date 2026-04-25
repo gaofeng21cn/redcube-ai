@@ -220,7 +220,7 @@ test('ppt_deck preserves approved operator slide plan instead of compressing lon
       topicId: 'topic-approved-plan',
       title: 'OPL 系列项目介绍',
       brief: '介绍 OPL 系列项目和 Med Auto Science 自动科研，面向医生专家，20 分钟以上。',
-      operatorFiles: [approvedOutlineFile],
+      operatorFiles: [approvedOutlineFile, approvedOutlineFile],
     });
     await createDeliverable({
       workspaceRoot,

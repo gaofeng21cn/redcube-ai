@@ -109,10 +109,16 @@ export function createPptDeckAuthoringParts(deps) {
     const matches = [...operatorCorpus.matchAll(/^##\s+Slide\s+(\d+)\s*[：:.-]?\s*(.*)$/gim)];
     if (matches.length === 0) return null;
 
-    const slides = matches.map((match, index) => ({
-      slide_no: Number(match[1]) || index + 1,
-      title: safeText(match[2]),
-    }));
+    const bySlideNo = new Map();
+    for (const match of matches) {
+      const slideNo = Number(match[1]);
+      if (!Number.isFinite(slideNo) || slideNo <= 0 || bySlideNo.has(slideNo)) continue;
+      bySlideNo.set(slideNo, {
+        slide_no: slideNo,
+        title: safeText(match[2]),
+      });
+    }
+    const slides = [...bySlideNo.values()].sort((a, b) => a.slide_no - b.slide_no);
     return {
       total_slides: slides.length,
       slides,
