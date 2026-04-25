@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js';
 
@@ -27,7 +27,7 @@ function makeSlide(slideNo) {
   };
 }
 
-function makePptRenderParts({ batchCalls }) {
+function makePptRenderParts({ stageCalls }) {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-batch-'));
   const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-a');
   const reportsDir = path.join(deliverableDir, 'reports');
@@ -82,40 +82,19 @@ function makePptRenderParts({ batchCalls }) {
     },
     extraChecks: () => ({}),
     generateStructuredArtifact: async (input) => ({
-      data: { render_summary: ['summary'] },
-      generationRuntime: { owner: 'codex_cli', adapter_surface: 'single' },
-      input,
-    }),
-    generateStructuredArtifactBatch: async ({ stages, sessionPool }) => {
-      batchCalls.push({ stages, sessionPool });
-      const results = [];
-      for (const stage of stages) {
-        const stageInput = stage({ previousResults: results, stage_id: stage.stage_id });
-        results.push({
-          stage_id: stage.stage_id,
-          data: {
-            slides: stageInput.context.blueprint.slides.map((slide) => ({
+      data: input.context?.render_scope === 'slide_batch'
+        ? {
+            slides: input.context.blueprint.slides.map((slide) => ({
               slide_id: slide.slide_id,
               content_html: `<section data-slide-root="true" data-slide-id="${slide.slide_id}"><div data-qa-block="title" data-primary-point="true">${slide.title}</div><div data-qa-block="body">正文</div></section>`,
             })),
-          },
-          generationRuntime: { owner: 'codex_cli', session_id: `${stage.stage_id}-session` },
-          input: stageInput,
-        });
-      }
-      return {
-        data: results,
-        batchRuntime: {
-          owner: 'codex_cli',
-          session_pool: {
-            descriptor_id: sessionPool.descriptor_id,
-            reuse_supported: false,
-            reuse_claimed: false,
-            reuse_status: 'unsupported_by_exec_surface',
-            invocation_count: stages.length,
-          },
-        },
-      };
+          }
+        : { render_summary: ['summary'] },
+      generationRuntime: { owner: 'codex_cli', adapter_surface: 'single' },
+      input,
+    }),
+    generateStructuredArtifactBatch: async () => {
+      throw new Error('render_html should use durable per-batch execution');
     },
     getDeliverablePaths: () => deliverablePaths,
     getDeliverableViewSurfacePaths: () => ({
@@ -161,15 +140,28 @@ function makePptRenderParts({ batchCalls }) {
     summarizeRelativeQuality: () => ({}),
     validateRenderedReviewAnchors: (html) => html,
     validateRenderedSlideContent: (html) => html,
-    writeJson: (file, data) => writeFileSync(file, JSON.stringify(data, null, 2)),
-    writeText: (file, text) => writeFileSync(file, text),
+    writeJson: (file, data) => {
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(file, JSON.stringify(data, null, 2));
+    },
+    writeText: (file, text) => {
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(file, text);
+    },
+  };
+  const originalGenerateStructuredArtifact = deps.generateStructuredArtifact;
+  deps.generateStructuredArtifact = async (input) => {
+    if (input.context?.render_scope === 'slide_batch') {
+      stageCalls.push(input);
+    }
+    return originalGenerateStructuredArtifact(input);
   };
   return { stageParts: createPptDeckStageParts(deps), workspaceRoot, contract, deliverablePaths };
 }
 
-test('ppt render_html batches same-route slide chunks through Codex batch surface with honest reuse metadata', async () => {
-  const batchCalls = [];
-  const { stageParts, workspaceRoot, contract, deliverablePaths } = makePptRenderParts({ batchCalls });
+test('ppt render_html batches same-route slide chunks through durable per-batch artifacts', async () => {
+  const stageCalls = [];
+  const { stageParts, workspaceRoot, contract, deliverablePaths } = makePptRenderParts({ stageCalls });
 
   const artifact = await stageParts.buildRenderHtmlArtifact({
     workspaceRoot,
@@ -180,20 +172,23 @@ test('ppt render_html batches same-route slide chunks through Codex batch surfac
     adapter: 'codex_cli',
   });
 
-  assert.equal(batchCalls.length, 1);
-  assert.deepEqual(batchCalls[0].stages.map((stage) => stage.stage_id), [
+  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_index), [1, 2, 3]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.slide_ids.join(',')), [
+    'S01,S02',
+    'S03,S04',
+    'S05,S06',
+  ]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.render_batch.batch_index).map((index) => `render_html_batch_${index}`), [
     'render_html_batch_1',
     'render_html_batch_2',
     'render_html_batch_3',
   ]);
-  const secondStageInput = batchCalls[0].stages[1]({
-    previousResults: [{ data: { slides: [{ slide_id: 'S01', content_html: '<section>S01</section>' }] } }],
-  });
-  assert.equal(secondStageInput.route, 'render_html');
-  assert.deepEqual(secondStageInput.context.reference_slides.map((slide) => slide.slide_id), ['S01', 'S02']);
-  assert.equal(batchCalls[0].sessionPool.reuse_strategy, 'same_session_if_supported');
+  assert.deepEqual(stageCalls[1].context.reference_slides.map((slide) => slide.slide_id), ['S01', 'S02']);
+  assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_1.json')), true);
+  assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_1', 'S01.html')), true);
   assert.equal(artifact.render_execution.batch_count, 3);
-  assert.equal(artifact.render_execution.codex_batch_runtime.session_pool.reuse_supported, false);
-  assert.equal(artifact.render_execution.codex_batch_runtime.session_pool.reuse_claimed, false);
+  assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.generated_batch_count, 3);
+  assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.reused_batch_count, 0);
+  assert.equal(artifact.render_execution.codex_batch_runtime.session_pool.reuse_status, 'durable_render_batch_cache');
   assert.equal(artifact.html_bundle.page_count, 6);
 });

@@ -370,6 +370,12 @@ export function buildMockPptRender(meta) {
   if (variants.has('require_render_batching') && renderScope !== 'summary' && slides.length > 3) {
     throw new Error('mock ppt render expected slide_batch scope with at most 3 slides');
   }
+  if (variants.has('fail_after_first_render_batch') && renderScope !== 'summary') {
+    const batchIndex = Number(meta?.context?.render_batch?.batch_index || 0);
+    if (batchIndex > 1) {
+      throw new Error('mock ppt render forced interruption after first durable batch');
+    }
+  }
   if (renderScope === 'summary') {
     return {
       slides: [],
@@ -578,4 +584,3 @@ export function buildMockPptScreenshotReview(meta) {
     })),
   };
 }
-

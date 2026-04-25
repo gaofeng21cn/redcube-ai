@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync } from 'node:fs';
 
 export function createPptDeckRenderStageParts(deps) {
@@ -33,7 +34,6 @@ export function createPptDeckRenderStageParts(deps) {
     existsSync: mainExistsSync,
     extraChecks,
     generateStructuredArtifact,
-    generateStructuredArtifactBatch,
     getDeliverablePaths,
     getDeliverableViewSurfacePaths,
     getReviewState,
@@ -514,6 +514,173 @@ export function createPptDeckRenderStageParts(deps) {
     return entries;
   }
 
+  function stableHash(value) {
+    return createHash('sha256')
+      .update(JSON.stringify(value))
+      .digest('hex');
+  }
+
+  function renderBatchCacheRoot(deliverablePaths, route) {
+    const artifactsDir = safeText(deliverablePaths?.artifactsDir)
+      || path.join(deliverablePaths.deliverableDir, 'artifacts');
+    return path.join(artifactsDir, 'render_batches', route);
+  }
+
+  function renderBatchCacheFile(deliverablePaths, route, stageId) {
+    return path.join(renderBatchCacheRoot(deliverablePaths, route), `${stageId}.json`);
+  }
+
+  function renderBatchSlideFile(deliverablePaths, route, stageId, slideId) {
+    return path.join(renderBatchCacheRoot(deliverablePaths, route), stageId, `${slideId}.html`);
+  }
+
+  function buildRenderBatchCacheKey({
+    route,
+    renderPlan,
+    revisionFreshness,
+    visualArtifact,
+    promptSlides,
+    referenceSlides,
+    promptRelativePath,
+  }) {
+    return stableHash({
+      version: 1,
+      route,
+      promptRelativePath,
+      rerender_mode: renderPlan.mode,
+      force_full_regeneration: revisionFreshness.force_full_regeneration,
+      revision_floor_mtime_ms: revisionFreshness.revision_floor_mtime_ms,
+      slide_ids: promptSlides.map((slide) => safeText(slide?.slide_id)),
+      prompt_slides: promptSlides,
+      reference_slides: referenceSlides.map((slide) => ({
+        slide_id: safeText(slide?.slide_id),
+        source_html_hash: stableHash(safeText(slide?.source_html)),
+      })),
+      visual_direction_hash: stableHash(visualArtifact?.visual_direction || {}),
+    });
+  }
+
+  function loadRenderBatchCache(file, expectedCacheKey) {
+    if (!safeText(file) || !(mainExistsSync || existsSync)(file)) return null;
+    try {
+      const cached = readJson(file);
+      if (safeText(cached?.cache_key) !== expectedCacheKey) return null;
+      const slides = safeArray(cached?.data?.slides).filter((slide) => slide && typeof slide === 'object');
+      if (slides.length === 0) return null;
+      return cached;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeRenderBatchCache({
+    deliverablePaths,
+    route,
+    stageId,
+    cacheKey,
+    promptSlides,
+    referenceSlides,
+    result,
+  }) {
+    const file = renderBatchCacheFile(deliverablePaths, route, stageId);
+    const payload = {
+      kind: 'ppt_render_html_batch_artifact',
+      version: 1,
+      route,
+      stage_id: stageId,
+      cache_key: cacheKey,
+      cache_status: 'fresh',
+      written_at: new Date().toISOString(),
+      slide_ids: promptSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      reference_slide_ids: referenceSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      data: result?.data || {},
+      generationRuntime: result?.generationRuntime || null,
+    };
+    ensureDir(path.dirname(file));
+    writeJson(file, payload);
+    for (const slide of safeArray(payload.data?.slides)) {
+      const slideId = safeText(slide?.slide_id);
+      const contentHtml = safeText(slide?.content_html);
+      if (!slideId || !contentHtml) continue;
+      ensureDir(path.dirname(renderBatchSlideFile(deliverablePaths, route, stageId, slideId)));
+      writeText(renderBatchSlideFile(deliverablePaths, route, stageId, slideId), contentHtml);
+    }
+    return payload;
+  }
+
+  async function executeRenderBatchStagesDurably({
+    adapter,
+    deliverablePaths,
+    route,
+    stages,
+  }) {
+    const data = [];
+    const stageCacheStatus = [];
+    let reusedBatchCount = 0;
+    let generatedBatchCount = 0;
+    for (const stage of stages) {
+      const stageInput = await stage({ previousResults: data, stage_id: stage.stage_id });
+      const cached = loadRenderBatchCache(stageInput.cache_file, stageInput.cache_key);
+      if (cached) {
+        reusedBatchCount += 1;
+        data.push({
+          stage_id: stage.stage_id,
+          data: cached.data,
+          generationRuntime: cached.generationRuntime,
+          cache_status: 'reused',
+        });
+        stageCacheStatus.push({ stage_id: stage.stage_id, cache_status: 'reused' });
+        continue;
+      }
+      const result = await generateStructuredArtifact({
+        adapter,
+        family: stageInput.family,
+        route: stageInput.route,
+        promptRelativePath: stageInput.promptRelativePath,
+        context: stageInput.context,
+        outputContract: stageInput.outputContract,
+        localFileInspection: stageInput.localFileInspection,
+        timeoutMs: stageInput.timeoutMs,
+        cwd: stageInput.cwd || deliverablePaths.deliverableDir,
+      });
+      generatedBatchCount += 1;
+      const persisted = writeRenderBatchCache({
+        deliverablePaths,
+        route,
+        stageId: stage.stage_id,
+        cacheKey: stageInput.cache_key,
+        promptSlides: stageInput.promptSlides,
+        referenceSlides: stageInput.referenceSlides,
+        result,
+      });
+      data.push({
+        stage_id: stage.stage_id,
+        data: persisted.data,
+        generationRuntime: persisted.generationRuntime,
+        cache_status: 'fresh',
+      });
+      stageCacheStatus.push({ stage_id: stage.stage_id, cache_status: 'fresh' });
+    }
+    return {
+      data,
+      batchRuntime: {
+        owner: safeText(data.find((stage) => stage?.generationRuntime)?.generationRuntime?.owner),
+        durable_cache: {
+          root: renderBatchCacheRoot(deliverablePaths, route),
+          reused_batch_count: reusedBatchCount,
+          generated_batch_count: generatedBatchCount,
+          stage_cache_status: stageCacheStatus,
+        },
+        session_pool: {
+          reuse_supported: false,
+          reuse_claimed: false,
+          reuse_status: 'durable_render_batch_cache',
+          invocation_count: generatedBatchCount,
+        },
+      },
+    };
+  }
+
   function buildRenderBatchReferenceSlides({
     blueprintSlides,
     slideBatch,
@@ -656,6 +823,15 @@ export function createPptDeckRenderStageParts(deps) {
           slideBatch,
           renderedSlideHtmlById,
         });
+        const cacheKey = buildRenderBatchCacheKey({
+          route,
+          renderPlan,
+          revisionFreshness,
+          visualArtifact,
+          promptSlides,
+          referenceSlides,
+          promptRelativePath,
+        });
         return {
           family: 'ppt_deck',
           route,
@@ -685,47 +861,20 @@ export function createPptDeckRenderStageParts(deps) {
             slideBatch,
             revisionContext: sharedRevisionContext,
           }),
+          cache_key: cacheKey,
+          cache_file: renderBatchCacheFile(deliverablePaths, route, buildRenderBatchStage.stage_id),
+          promptSlides,
+          referenceSlides,
         };
       };
       buildRenderBatchStage.stage_id = `${route}_batch_${batchIndex + 1}`;
       renderBatchStages.push(buildRenderBatchStage);
     }
-    const renderBatchResult = await (generateStructuredArtifactBatch || (async ({ stages }) => {
-      const data = [];
-      for (const stage of stages) {
-        const stageInput = typeof stage === 'function'
-          ? {
-              ...stage({ previousResults: data, stage_id: stage.stage_id }),
-              stage_id: stage.stage_id,
-            }
-          : stage;
-        const result = await generateStructuredArtifact({ adapter, ...stageInput });
-        data.push({
-          stage_id: stageInput.stage_id,
-          data: result.data,
-          generationRuntime: result.generationRuntime,
-        });
-      }
-      return {
-        data,
-        batchRuntime: {
-          owner: safeText(data[0]?.generationRuntime?.owner),
-          session_pool: {
-            reuse_supported: false,
-            reuse_claimed: false,
-            reuse_status: 'wrapper_fallback_without_reuse',
-            invocation_count: data.length,
-          },
-        },
-      };
-    }))({
+    const renderBatchResult = await executeRenderBatchStagesDurably({
       adapter,
+      deliverablePaths,
+      route,
       stages: renderBatchStages,
-      cwd: deliverablePaths.deliverableDir,
-      sessionPool: {
-        descriptor_id: `ppt_deck_${route}_${safeText(deliverableId, 'deliverable')}`,
-        reuse_strategy: 'same_session_if_supported',
-      },
     });
     const freshlyRenderedSlides = [];
     for (const stageResult of safeArray(renderBatchResult?.data)) {

@@ -635,6 +635,77 @@ test('ppt render_html uses single-slide batches for full regeneration to keep cr
   });
 });
 
+test('ppt render_html persists durable batch artifacts and resumes from completed batches', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-durable-batches-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Med Auto Science 同行讲课',
+      goal: '验证 render_html 中断后能复用已完成批次继续生成',
+    });
+
+    const setupRoutes = await runPptRoutes({
+      workspaceRoot,
+      deliverableId: 'deck-a',
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+    });
+    for (const { route, result } of setupRoutes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const restoreFailAfterFirst = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'fail_after_first_render_batch',
+    });
+    try {
+      const interrupted = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'render_html',
+      });
+      assert.equal(interrupted.ok, false);
+      assert.match(interrupted.run.error.message, /forced interruption/);
+    } finally {
+      restoreFailAfterFirst();
+    }
+
+    const batchRoot = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+      'render_batches',
+      'render_html',
+    );
+    const firstBatchFile = path.join(batchRoot, 'render_html_batch_1.json');
+    const firstSlideFile = path.join(batchRoot, 'render_html_batch_1', 'S01.html');
+    assert.equal(existsSync(firstBatchFile), true);
+    assert.equal(existsSync(firstSlideFile), true);
+    const firstBatchMtimeMs = statSync(firstBatchFile).mtimeMs;
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    const resumed = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'render_html',
+    });
+    assert.equal(resumed.ok, true);
+    const renderArtifact = readJson(resumed.artifactFile);
+    assert.equal(renderArtifact.render_execution?.codex_batch_runtime?.durable_cache?.reused_batch_count >= 1, true);
+    assert.equal(renderArtifact.render_execution?.codex_batch_runtime?.durable_cache?.generated_batch_count >= 1, true);
+    assert.equal(statSync(firstBatchFile).mtimeMs, firstBatchMtimeMs);
+  });
+});
+
 test('ppt screenshot_review runs slide review batches in parallel once Codex exec is async', async () => {
   await withMockHermesUpstream(async () => {
     const lockDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-parallel-'));
@@ -759,4 +830,3 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
     }
   });
 });
-
