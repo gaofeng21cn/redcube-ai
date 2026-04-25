@@ -1109,7 +1109,7 @@ async function executeManagedStageTask({
   const routeRunLink = {
     stage_id: stageId,
     attempt,
-    route_run_id: safeText(routeResult?.run?.run_id) || null,
+    route_run_id: safeText(routeResult?.run?.run_id) || `${managedRun.managed_run_id}:${stageId}:attempt-${attempt}`,
     status: routeResult?.run?.status || (routeResult?.ok ? 'completed' : 'failed'),
     prompt_audit_ref: promptAuditRef,
     result_ref: resultRef,

@@ -467,6 +467,12 @@ test('managed DAG execution fails closed and does not advance dependent stages a
       result.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
       ['storyline', 'detailed_outline', 'detailed_outline'],
     );
+    assert.deepEqual(
+      result.managed_run.route_runs
+        .filter((stageRun) => stageRun.stage_id === 'detailed_outline')
+        .map((stageRun) => stageRun.attempt),
+      [1, 2],
+    );
     assert.equal(
       result.managed_run.route_runs.some((stageRun) => stageRun.stage_id === 'slide_blueprint'),
       false,
