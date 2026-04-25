@@ -6,6 +6,31 @@ function safeText(value, fallback = '') {
 const PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE = 'redcube product session --entry-session-id <entry-session-id>';
 const REDCUBE_LOOP_OWNER = 'redcube_ai';
 const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
+const DEFAULT_INTERRUPT_POLICY = 'continue_autonomously_until_runtime_gate';
+const REVIEW_INTERRUPT_POLICY = 'human_gate_required_before_continuation';
+
+function buildControlPolicy({ projection, manifestProjection = false }) {
+  const needsUserDecision = Boolean(projection?.needs_user_decision);
+  const contentStatus = safeText(projection?.content_status);
+  const completed = contentStatus === 'completed';
+  const gateStatus = needsUserDecision ? 'requested' : 'approved';
+  return {
+    approval_gate_id: REDCUBE_OPERATOR_REVIEW_GATE_ID,
+    approval_required: needsUserDecision,
+    gate_status: gateStatus,
+    default_run_mode: 'auto_to_terminal',
+    stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
+    interrupt_policy: needsUserDecision ? REVIEW_INTERRUPT_POLICY : DEFAULT_INTERRUPT_POLICY,
+    recommended_action: needsUserDecision
+      ? 'resolve_review_gate'
+      : (completed ? 'pick_up_artifacts' : 'continue_autonomous_run'),
+    continue_action: {
+      command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
+      surface_kind: 'product_entry_session',
+    },
+    human_gate_ids: manifestProjection || needsUserDecision ? [REDCUBE_OPERATOR_REVIEW_GATE_ID] : [],
+  };
+}
 
 function buildRestorePoint({ continuationSnapshot }) {
   const latestManagedRunId = continuationSnapshot?.latest_managed_run_id || null;
@@ -111,8 +136,6 @@ export function buildRuntimeLoopClosureSurface({
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
     ? projection.final_artifact_refs
     : [];
-  const gateStatus = Boolean(projection?.needs_user_decision) ? 'requested' : 'approved';
-
   return {
     surface_kind: 'runtime_loop_closure',
     loop_owner: buildLoopOwner(runtimeOwner),
@@ -148,17 +171,7 @@ export function buildRuntimeLoopClosureSurface({
       artifact_refs: artifactRefs,
       artifact_ref_count: artifactRefs.length,
     },
-    control_policy: {
-      approval_gate_id: REDCUBE_OPERATOR_REVIEW_GATE_ID,
-      approval_required: Boolean(projection?.needs_user_decision),
-      gate_status: gateStatus,
-      interrupt_policy: 'human_gate_required_before_continuation',
-      continue_action: {
-        command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
-        surface_kind: 'product_entry_session',
-      },
-      human_gate_ids: [REDCUBE_OPERATOR_REVIEW_GATE_ID],
-    },
+    control_policy: buildControlPolicy({ projection }),
     source_linkage: {
       current_source: safeText(source),
       entry_mode: safeText(entryMode) || null,
@@ -211,15 +224,10 @@ export function buildRuntimeLoopClosureManifestSurface({
       artifact_ref_count: 0,
     },
     control_policy: {
-      approval_gate_id: REDCUBE_OPERATOR_REVIEW_GATE_ID,
-      approval_required: true,
-      gate_status: 'requested',
-      interrupt_policy: 'human_gate_required_before_continuation',
-      continue_action: {
-        command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
-        surface_kind: 'product_entry_session',
-      },
-      human_gate_ids: [REDCUBE_OPERATOR_REVIEW_GATE_ID],
+      ...buildControlPolicy({ projection: null, manifestProjection: true }),
+      approval_required: false,
+      gate_status: 'approved',
+      recommended_action: 'invoke_product_entry_auto_to_terminal',
     },
     source_linkage: {
       current_source: safeText(source, 'manifest'),

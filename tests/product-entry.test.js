@@ -170,9 +170,20 @@ function assertRuntimeLoopClosureShape(surface, { source, entryMode }) {
   assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_kind, 'artifact_inventory');
   assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
   assert.equal(surface.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
+  assert.equal(surface.runtime_loop_closure.control_policy.default_run_mode, 'auto_to_terminal');
+  assert.equal(
+    surface.runtime_loop_closure.control_policy.stop_policy,
+    'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
+  );
   assert.equal(
     surface.runtime_loop_closure.control_policy.gate_status,
     surface.runtime_loop_closure.control_policy.approval_required ? 'requested' : 'approved',
+  );
+  assert.equal(
+    surface.runtime_loop_closure.control_policy.interrupt_policy,
+    surface.runtime_loop_closure.control_policy.approval_required
+      ? 'human_gate_required_before_continuation'
+      : 'continue_autonomously_until_runtime_gate',
   );
   assert.equal(surface.runtime_loop_closure.control_policy.continue_action.surface_kind, 'product_entry_session');
   assert.equal(surface.runtime_loop_closure.source_linkage.current_source, source);
@@ -650,7 +661,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(
       manifest.product_entry_overview.summary,
-      'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      'Repo-verified product-entry service surface 已 landed；direct invoke 默认 auto_to_terminal，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     );
     assert.equal(manifest.product_entry_overview.frontdesk_command, 'redcube product frontdesk');
     assert.equal(manifest.product_entry_overview.recommended_command, 'redcube product invoke');
@@ -724,7 +735,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
     assert.equal(
       manifest.product_entry_status.summary,
-      'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      'Repo-verified product-entry service surface 已 landed；direct invoke 默认 auto_to_terminal，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     );
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
     assert.deepEqual(manifest.product_entry_status.next_focus, [
@@ -935,6 +946,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       ],
     );
     assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route, 'render_html');
+    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_run_mode, 'auto_to_terminal');
+    assert.equal(
+      manifest.deliverable_facade.family_route_policy.ppt_deck.stop_policy,
+      'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
+    );
     assert.equal(
       manifest.deliverable_facade.family_route_policy.ppt_deck.bypass_policy,
       'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_requests_exploration',
@@ -1070,7 +1086,15 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
       assert.equal(manifest.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
       assert.equal(manifest.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
-      assert.equal(manifest.runtime_loop_closure.control_policy.gate_status, 'requested');
+      assert.equal(manifest.runtime_loop_closure.control_policy.default_run_mode, 'auto_to_terminal');
+      assert.equal(
+        manifest.runtime_loop_closure.control_policy.stop_policy,
+        'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
+      );
+      assert.equal(manifest.runtime_loop_closure.control_policy.approval_required, false);
+      assert.equal(manifest.runtime_loop_closure.control_policy.gate_status, 'approved');
+      assert.equal(manifest.runtime_loop_closure.control_policy.interrupt_policy, 'continue_autonomously_until_runtime_gate');
+      assert.equal(manifest.runtime_loop_closure.control_policy.recommended_action, 'invoke_product_entry_auto_to_terminal');
       assert.equal(manifest.runtime_loop_closure.source_linkage.current_source, 'manifest');
       assert.equal(manifest.runtime_loop_closure.source_linkage.entry_mode, 'manifest_projection');
       assert.equal(manifest.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
@@ -1125,6 +1149,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
     );
     assert.deepEqual(frontdesk.product_entry_preflight, manifest.product_entry_preflight);
+    assert.match(frontdesk.product_entry_quickstart.summary, /auto_to_terminal/);
+    assert.match(frontdesk.product_entry_quickstart.steps[1].summary, /autonomously to terminal export/);
     assert.equal(frontdesk.product_entry_quickstart.recommended_step_id, 'open_frontdesk');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].step_id, 'inspect_current_progress');
     assert.equal(frontdesk.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');

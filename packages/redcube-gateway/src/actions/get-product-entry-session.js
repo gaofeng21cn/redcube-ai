@@ -25,6 +25,18 @@ function safeText(value, fallback = '') {
   return text || fallback;
 }
 
+
+function buildRecommendedAction({ managedRun, runtimeLoopClosure }) {
+  const projection = managedRun?.progress_projection || null;
+  if (projection?.needs_user_decision) {
+    return 'decide_product_next_step';
+  }
+  if (projection?.content_status === 'completed') {
+    return 'pick_up_artifacts';
+  }
+  return runtimeLoopClosure?.control_policy?.recommended_action || 'continue_product_entry';
+}
+
 function requireField(name, value) {
   const text = safeText(value);
   if (!text) {
@@ -107,9 +119,7 @@ export async function getProductEntrySession(request) {
   return {
     ok: true,
     surface_kind: 'product_entry_session',
-    recommended_action: managedRun?.progress_projection?.needs_user_decision
-      ? 'decide_product_next_step'
-      : 'continue_product_entry',
+    recommended_action: buildRecommendedAction({ managedRun, runtimeLoopClosure }),
     product_entry_contract_id: 'managed_product_entry_hardening',
     entry_session: buildEntrySessionSurface({
       entry_session_id: entrySessionId,

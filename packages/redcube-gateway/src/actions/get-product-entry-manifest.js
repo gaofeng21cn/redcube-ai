@@ -116,7 +116,8 @@ const LONG_TASK_STAGE_POLICY = {
   operator_rule: (
     'For long PPT tasks, do not compress the whole request into one prompt. '
     + 'Start from frontdesk/source intake, create or reuse an entry_session_id, checkpoint each stage, '
-    + 'and resume through product session before moving to the next stage.'
+    + 'and resume through product session before moving to the next stage. '
+    + 'When no stop_after_stage is requested, product invoke continues autonomously to terminal export unless a runtime review gate blocks it.'
   ),
 };
 
@@ -231,6 +232,8 @@ function buildDeliverableFacadeContract() {
         protected_stage_sequence: pptDeckSequence,
         default_visual_route: 'render_html',
         route_gate_policy: 'fail_closed_against_overlay_stage_sequence',
+        default_run_mode: 'auto_to_terminal',
+        stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
         export_route: 'export_pptx',
         review_routes: ['visual_director_review', 'screenshot_review'],
         bypass_policy: 'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_requests_exploration',
@@ -282,7 +285,7 @@ export async function getProductEntryManifest(request) {
   const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
   const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
-      'Open the RedCube frontdesk first, then continue the same deliverable loop or inspect the current entry session.'
+      'Open the RedCube frontdesk first; direct invoke defaults to auto_to_terminal and only stops for explicit stop_after_stage or a runtime review gate.'
     ),
     recommended_step_id: 'open_frontdesk',
     steps: [
@@ -303,7 +306,7 @@ export async function getProductEntryManifest(request) {
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
         surface_kind: 'product_entry',
-        summary: 'Continue the current deliverable loop once identifiers are known.',
+        summary: 'Run the current deliverable loop autonomously to terminal export unless an explicit stop_after_stage or runtime review gate stops it.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
@@ -319,7 +322,7 @@ export async function getProductEntryManifest(request) {
     human_gate_ids: humanGateIds,
   });
   const productEntryOverview = buildProductEntryOverview({
-    summary: 'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    summary: 'Repo-verified product-entry service surface 已 landed；direct invoke 默认 auto_to_terminal，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
@@ -342,7 +345,7 @@ export async function getProductEntryManifest(request) {
   });
   const productEntryStart = buildProductEntryStart({
     summary: (
-      '先打开 RedCube frontdesk；需要直接起一个新会话就走 direct session，'
+      '先打开 RedCube frontdesk；direct session 默认自动推进到终态，'
       + '需要给外层 OPL shell 走 bridge contract 时使用 internal OPL bridge handoff，已有 session 则直接恢复。'
     ),
     recommended_mode_id: 'open_frontdesk',
@@ -364,7 +367,7 @@ export async function getProductEntryManifest(request) {
           + '--topic-id <topic-id> --deliverable-id <deliverable-id>'
         ),
         surface_kind: 'product_entry',
-        summary: 'Start or continue a direct RedCube product-entry session for one deliverable.',
+        summary: 'Start or continue a direct RedCube product-entry session; omit stop_after_stage for autonomous terminal export.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
@@ -752,7 +755,7 @@ export async function getProductEntryManifest(request) {
       active_baton_status: safeText(activeBaton.status, 'unknown'),
     },
     product_entry_status: {
-      summary: 'Repo-verified product-entry service surface 已 landed，但成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      summary: 'Repo-verified product-entry service surface 已 landed；direct invoke 默认 auto_to_terminal，成熟终端用户前台壳与 managed web productization 仍未 landed。',
       next_focus: [
         '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
         '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
