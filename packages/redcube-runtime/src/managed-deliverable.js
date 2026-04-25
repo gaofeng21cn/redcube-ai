@@ -1050,24 +1050,37 @@ async function executeManagedStageTask({
   });
   persistManagedState(workspaceRoot, managedRun);
 
-  const routeResult = await runDeliverableRoute({
-    workspaceRoot,
-    overlay: managedRun.overlay,
-    topicId: managedRun.topic_id,
-    deliverableId: managedRun.deliverable_id,
-    route: stageId,
-    adapter: managedRun.active_adapter,
-    mode,
-    baselineDeliverableId,
-    managedRunId: managedRun.managed_run_id,
-  });
+  let routeResult;
+  try {
+    routeResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: managedRun.overlay,
+      topicId: managedRun.topic_id,
+      deliverableId: managedRun.deliverable_id,
+      route: stageId,
+      adapter: managedRun.active_adapter,
+      mode,
+      baselineDeliverableId,
+      managedRunId: managedRun.managed_run_id,
+    });
+  } catch (error) {
+    routeResult = {
+      ok: false,
+      run: null,
+      artifactFile: null,
+      error: {
+        code: error?.code || 'stage_execution_exception',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
   managedRun.worker_running = false;
   managedRun.active_run_id = null;
   managedRun.runtime_liveness_audit = buildRuntimeLivenessAudit({
     status: 'none',
     reasonCode: routeResult?.ok ? 'stage_execution_finished' : 'stage_execution_failed',
   });
-  managedRun.runtime_health_status = 'degraded';
+  managedRun.runtime_health_status = routeResult?.ok ? 'degraded' : 'escalated';
   promptAudit.output_refs = uniqueList([
     routeResult?.artifactFile,
     ...safeArray(routeResult?.run?.artifact_refs),

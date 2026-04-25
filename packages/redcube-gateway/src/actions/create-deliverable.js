@@ -25,6 +25,42 @@ function buildTopicRecord({ topicId, title, overlay }) {
 
 const overlayRegistry = getDefaultOverlayRegistry();
 
+const WORKSPACE_AGENTS_TEMPLATE = `# RedCube AI 交付工作区约束
+
+## 适用范围
+
+本文件适用于当前 RedCube AI 交付工作区及其所有子目录。
+
+## 默认入口
+
+- 当前工作区的视觉交付任务必须从 RedCube AI / RCA product-entry 入口开始：\`redcube product frontdesk\`、\`redcube product invoke\`、\`redcube product session\`。
+- PPT deck 默认路线是 \`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx\`。
+- HTML-first 是默认视觉实现路线；不得用通用 PowerPoint 模板、\`python-pptx\`、artifact-tool 原生 deck、手写脚本或直接编辑文件替代 RCA runtime。
+
+## 防偏航规则
+
+- 修改或生成交付物前，先读取当前 workspace 的 RedCube manifest/frontdesk/session surface。
+- 长 PPT 或多资料任务必须保留同一 \`entry_session_id\`、\`topic_id\`、\`deliverable_id\`，通过 session surface 恢复，不重新开 prompt-only 任务。
+- 截图质控或 visual director review 未通过时，从明确 stage rerun 或 fix_html 回修；不要跳过 review gate 直接交付。
+- 除非用户明确要求探索替代技术路线，否则不要绕开 RCA product-entry/runtime。
+
+## 听众与表达
+
+- 面向非 AI 专家时，优先讲临床价值、流程、边界和可审阅性，避免暴露不必要的底层技术细节。
+- 视觉质量以 director-first、recipe_id、peak page、anti-template 为准，避免通用卡片栅格和模板化排版。
+`;
+
+function ensureWorkspaceAgentsFile({ workspaceRoot }) {
+  const agentsFile = path.join(workspaceRoot, 'AGENTS.md');
+  if (existsSync(agentsFile)) {
+    return null;
+  }
+  mkdirSync(workspaceRoot, { recursive: true });
+  writeFileSync(agentsFile, WORKSPACE_AGENTS_TEMPLATE, 'utf-8');
+  return agentsFile;
+}
+
+
 function readJsonIfExists(file) {
   if (!existsSync(file)) return null;
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -96,6 +132,7 @@ export async function createDeliverable({
   title,
   goal,
 }) {
+  const workspaceAgentsFile = ensureWorkspaceAgentsFile({ workspaceRoot });
   const overlayDefinition = overlayRegistry.getOverlay(overlay);
   if (typeof overlayDefinition.buildDeliverableRecord !== 'function') {
     throw new Error(`Overlay ${overlay} cannot create deliverables`);
@@ -169,6 +206,7 @@ export async function createDeliverable({
     deliverable,
     surfaceFiles,
     sourcePackFederationFile,
+    workspaceAgentsFile,
     hydratedContract,
     governance_surface: governanceSurface,
   };

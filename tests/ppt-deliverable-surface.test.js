@@ -28,6 +28,41 @@ async function prepareSourceReadiness(workspaceRoot) {
   });
 }
 
+test('createDeliverable initializes workspace AGENTS guardrails without overwriting existing files', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-agents-'));
+
+  const created = await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    title: 'RCA guardrail deck',
+    goal: '验证交付工作区 AGENTS 防偏航约束',
+  });
+
+  const agentsFile = path.join(workspaceRoot, 'AGENTS.md');
+  assert.equal(created.workspaceAgentsFile, agentsFile);
+  assert.equal(existsSync(agentsFile), true);
+  const agentsText = readFileSync(agentsFile, 'utf-8');
+  assert.match(agentsText, /RedCube AI \/ RCA product-entry/);
+  assert.match(agentsText, /render_html -> visual_director_review -> screenshot_review -> export_pptx/);
+  assert.match(agentsText, /不得用通用 PowerPoint 模板/);
+
+  writeFileSync(agentsFile, '# Custom workspace rule\n', 'utf-8');
+  const second = await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId: 'lecture_student',
+    topicId: 'topic-b',
+    deliverableId: 'deck-b',
+    title: 'RCA custom guardrail deck',
+    goal: '验证不覆盖已有 AGENTS',
+  });
+  assert.equal(second.workspaceAgentsFile, null);
+  assert.equal(readFileSync(agentsFile, 'utf-8'), '# Custom workspace rule\n');
+});
+
 test('createDeliverable hydrates ppt deck contract surface', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
 

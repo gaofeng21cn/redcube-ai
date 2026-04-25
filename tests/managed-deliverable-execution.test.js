@@ -473,6 +473,14 @@ test('managed DAG execution fails closed and does not advance dependent stages a
     );
     assert.equal(result.runtime_supervision.health_status, 'escalated');
     assert.equal(result.escalation_record.escalation_status, 'escalated');
+    const stored = await getManagedRun({
+      workspaceRoot,
+      managedRunId: result.managed_run.managed_run_id,
+    });
+    assert.equal(stored.managed_run.status, 'escalated');
+    assert.equal(stored.progress_projection.content_status, 'blocked_by_runtime');
+    assert.equal(stored.runtime_supervision.health_status, 'escalated');
+    assert.equal(stored.escalation_record.escalation_status, 'escalated');
   } finally {
     restoreEnv();
     await upstream.close();
