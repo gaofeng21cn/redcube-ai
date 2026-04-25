@@ -94,6 +94,10 @@ function removeLegacySymlink(targetPath) {
   }
 }
 
+function repoMarketplacePath(repoRoot) {
+  return path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
+}
+
 function upsertMarketplace(marketplacePath) {
   const payload = loadJson(marketplacePath);
   const existingPlugins = Array.isArray(payload.plugins) ? payload.plugins.filter((item) => item && typeof item === 'object') : [];
@@ -149,15 +153,16 @@ function installCodexPlugin({ repoRoot, home }) {
 
   const userPluginRoot = path.join(resolvedHome, 'plugins', PLUGIN_NAME);
   const userSkillRoot = path.join(resolvedHome, '.agents', 'skills', PLUGIN_NAME);
-  const marketplacePath = path.join(resolvedHome, '.agents', 'plugins', 'marketplace.json');
+  const marketplacePath = repoMarketplacePath(resolvedRepoRoot);
 
   for (const legacyName of LEGACY_PLUGIN_NAMES) {
     removeLegacySymlink(path.join(resolvedHome, 'plugins', legacyName));
     removeLegacySymlink(path.join(resolvedHome, '.agents', 'skills', legacyName));
   }
 
-  ensureExpectedSymlink({ linkPath: userPluginRoot, targetPath: repoPluginRoot });
-  ensureExpectedSymlink({ linkPath: userSkillRoot, targetPath: repoSkillRoot });
+  removeLegacySymlink(userPluginRoot);
+  removeLegacySymlink(userSkillRoot);
+
   upsertMarketplace(marketplacePath);
 
   return {
@@ -165,8 +170,8 @@ function installCodexPlugin({ repoRoot, home }) {
     plugin_name: PLUGIN_NAME,
     repo_root: resolvedRepoRoot,
     home: resolvedHome,
-    plugin_root: userPluginRoot,
-    skill_root: userSkillRoot,
+    plugin_root: repoPluginRoot,
+    skill_root: repoSkillRoot,
     marketplace_path: marketplacePath,
   };
 }

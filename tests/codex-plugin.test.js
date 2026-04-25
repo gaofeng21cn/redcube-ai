@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
@@ -30,7 +30,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /redcube product invoke/i);
 });
 
-test('codex plugin installer creates user-level plugin and skill links with machine-readable output', () => {
+test('codex plugin installer keeps plugin and skill paths repo-local with machine-readable output', () => {
   const homeDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-home-'));
   const legacyTarget = path.join(homeDir, 'legacy-target');
   const legacyPluginRoot = path.join(homeDir, 'plugins', 'redcube-ai');
@@ -40,9 +40,7 @@ test('codex plugin installer creates user-level plugin and skill links with mach
   mkdirSync(path.dirname(legacySkillRoot), { recursive: true });
   symlinkSync(legacyTarget, legacyPluginRoot);
   symlinkSync(legacyTarget, legacySkillRoot);
-  const marketplacePath = path.join(homeDir, '.agents', 'plugins', 'marketplace.json');
-  mkdirSync(path.dirname(marketplacePath), { recursive: true });
-  writeFileSync(marketplacePath, JSON.stringify({ plugins: [{ name: 'redcube-ai' }] }), 'utf-8');
+  const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 
   const output = execFileSync(
     'node',
@@ -59,13 +57,15 @@ test('codex plugin installer creates user-level plugin and skill links with mach
   assert.equal(result.plugin_name, 'rca');
   assert.equal(result.repo_root, repoRoot);
   assert.equal(result.home, homeDir);
-  assert.equal(existsSync(installedPluginRoot), true);
-  assert.equal(existsSync(installedSkillRoot), true);
+  assert.equal(existsSync(installedPluginRoot), false);
+  assert.equal(existsSync(installedSkillRoot), false);
   assert.equal(existsSync(legacyPluginRoot), false);
   assert.equal(existsSync(legacySkillRoot), false);
   assert.equal(marketplace.plugins.some((item) => item.name === 'redcube-ai'), false);
-  assert.equal(realpathSync(installedPluginRoot), realpathSync(pluginRoot));
-  assert.equal(realpathSync(installedSkillRoot), realpathSync(path.dirname(pluginSkillPath)));
+  assert.equal(result.plugin_root, pluginRoot);
+  assert.equal(result.skill_root, path.dirname(pluginSkillPath));
+  assert.equal(existsSync(path.join(homeDir, '.codex', 'skills', 'rca')), false);
+  assert.equal(existsSync(path.join(homeDir, '.agents', 'plugins', 'marketplace.json')), false);
   assert.deepEqual(pluginEntry, {
     name: 'rca',
     source: {

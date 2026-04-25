@@ -1,0 +1,20 @@
+{
+  "name": "rca-local",
+  "interface": {
+    "displayName": "RCA Local"
+  },
+  "plugins": [
+    {
+      "name": "rca",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rca"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Creative"
+    }
+  ]
+}
