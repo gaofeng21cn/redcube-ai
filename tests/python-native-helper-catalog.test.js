@@ -39,6 +39,17 @@ function helperById(catalog) {
   return Object.fromEntries(catalog.helpers.map((helper) => [helper.helper_id, helper]));
 }
 
+function runPythonModule(module, args = []) {
+  return spawnSync('python3', ['-m', module, ...args], {
+    cwd: path.resolve('.'),
+    encoding: 'utf-8',
+    env: {
+      ...process.env,
+      PYTHONPATH: path.resolve('python'),
+    },
+  });
+}
+
 function readPyprojectScripts() {
   const result = spawnSync(
     'python3',
@@ -70,6 +81,17 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
     source_root: 'python',
     import_root: 'redcube_ai',
     pyproject: 'pyproject.toml',
+    diagnostics: {
+      surface_kind: 'python_native_helper_doctor',
+      package_module: 'redcube_ai.native_helpers.doctor',
+      console_script: 'redcube-native-helper-doctor',
+      module_command: 'python -m redcube_ai.native_helpers.doctor',
+      output_format: 'fixed_json',
+      executes_generation: false,
+      executes_review_export_gates: false,
+      route_authority: 'diagnostic_only',
+      bypass_product_entry_allowed: false,
+    },
   });
   assert.equal(existsSync(path.resolve(catalog.package.pyproject)), true);
   assert.deepEqual(catalog.invocation_policy, {
@@ -85,6 +107,21 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
     currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.native_helper_catalog,
     CATALOG_FILE,
   );
+});
+
+test('Python native helper catalog records doctor as diagnostics, not an execution helper route', () => {
+  const catalog = readJson(CATALOG_FILE);
+  const scripts = readPyprojectScripts();
+
+  assert.equal(catalog.package.diagnostics.surface_kind, 'python_native_helper_doctor');
+  assert.equal(catalog.package.diagnostics.package_module, 'redcube_ai.native_helpers.doctor');
+  assert.equal(catalog.package.diagnostics.module_command, 'python -m redcube_ai.native_helpers.doctor');
+  assert.equal(catalog.package.diagnostics.executes_generation, false);
+  assert.equal(catalog.package.diagnostics.executes_review_export_gates, false);
+  assert.equal(catalog.package.diagnostics.route_authority, 'diagnostic_only');
+  assert.equal(catalog.package.diagnostics.bypass_product_entry_allowed, false);
+  assert.equal(scripts[catalog.package.diagnostics.console_script], 'redcube_ai.native_helpers.doctor:main');
+  assert.equal(catalog.helpers.some((helper) => helper.package_module === catalog.package.diagnostics.package_module), false);
 });
 
 test('Python native helper catalog only points at tracked Python helper scripts', () => {
@@ -167,6 +204,49 @@ test('Python helper modules are discoverable through python -m help without runn
 
     assert.equal(result.status, 0, `${helper.helper_id}: ${result.stderr || result.stdout}`);
   }
+});
+
+test('Python native helper doctor runs as a package module and emits fixed JSON diagnostics', () => {
+  const catalog = readJson(CATALOG_FILE);
+  const result = runPythonModule(catalog.package.diagnostics.package_module);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.surface_kind, 'python_native_helper_doctor');
+  assert.equal(report.status, 'ok');
+  assert.deepEqual(report.package, {
+    name: 'redcube-ai',
+    version: '0.1.0',
+    import_root: 'redcube_ai',
+    source_root: 'python',
+  });
+  assert.deepEqual(report.catalog, {
+    path: CATALOG_FILE,
+    contract_id: 'python-native-helper-catalog',
+  });
+  assert.equal(report.helper_count, catalog.helpers.length);
+  assert.deepEqual(report.bypass_policy, catalog.bypass_policy);
+  assert.deepEqual(report.required_gates, ['visual_director_review', 'screenshot_review', 'export_pptx']);
+  assert.equal(report.helpers.length, catalog.helpers.length);
+
+  for (const helper of report.helpers) {
+    assert.equal(helper.importability.module_spec_found, true, helper.helper_id);
+    assert.equal(helper.entrypoint.matches_pyproject, true, helper.helper_id);
+    assert.equal(Array.isArray(helper.optional_dependencies.summary), true, helper.helper_id);
+  }
+});
+
+test('Python native helper doctor does not create a bypass around review/export gates', () => {
+  const result = runPythonModule('redcube_ai.native_helpers.doctor');
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const report = JSON.parse(result.stdout);
+  const nativeHelper = report.helpers.find((helper) => helper.helper_id === 'ppt_deck_native');
+
+  assert.deepEqual(report.required_gates, ['visual_director_review', 'screenshot_review', 'export_pptx']);
+  assert.equal(report.bypass_policy.generic_bypass_allowed, false);
+  assert.equal(report.bypass_policy.required_entry_surface, 'RedCube product-entry or runtime-family route');
+  assert.deepEqual(nativeHelper.routes, ['author_pptx_native', 'repair_pptx_native']);
+  assert.deepEqual(nativeHelper.gates, ['visual_director_review', 'screenshot_review', 'export_pptx']);
 });
 
 test('Compatibility wrapper scripts remain thin package entrypoints', () => {

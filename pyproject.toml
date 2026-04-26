@@ -14,6 +14,7 @@ review = ["playwright"]
 native = ["Pillow", "python-pptx", "playwright"]
 
 [project.scripts]
+redcube-native-helper-doctor = "redcube_ai.native_helpers.doctor:main"
 redcube-ppt-deck-review = "redcube_ai.native_helpers.ppt_deck.review:main"
 redcube-ppt-deck-export = "redcube_ai.native_helpers.ppt_deck.export:main"
 redcube-ppt-deck-native = "redcube_ai.native_helpers.ppt_deck.native:main"

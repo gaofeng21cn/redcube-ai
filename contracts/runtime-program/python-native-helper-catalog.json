@@ -7,7 +7,18 @@
     "name": "redcube-ai",
     "source_root": "python",
     "import_root": "redcube_ai",
-    "pyproject": "pyproject.toml"
+    "pyproject": "pyproject.toml",
+    "diagnostics": {
+      "surface_kind": "python_native_helper_doctor",
+      "package_module": "redcube_ai.native_helpers.doctor",
+      "console_script": "redcube-native-helper-doctor",
+      "module_command": "python -m redcube_ai.native_helpers.doctor",
+      "output_format": "fixed_json",
+      "executes_generation": false,
+      "executes_review_export_gates": false,
+      "route_authority": "diagnostic_only",
+      "bypass_product_entry_allowed": false
+    }
   },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
   "typescript_boundary": "TypeScript owns product entry, CLI/MCP, gateway contracts, runtime-family route orchestration, and review/export gate wiring.",
