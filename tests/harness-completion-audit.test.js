@@ -72,8 +72,8 @@ test('harness audit: publish governance is single-owner and family runtimes no l
 test('harness audit: reference quality is a formal operating surface, not only test fixtures', () => {
   const referenceOsIndex = read('packages/redcube-reference-os/src/index.ts');
   const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
-  const referenceSamples = read('packages/redcube-reference-os/src/reference-samples.js');
-  const relativeQuality = read('packages/redcube-reference-os/src/relative-quality.js');
+  const referenceSamples = readImplementation('packages/redcube-reference-os/src/reference-samples.js');
+  const relativeQuality = readImplementation('packages/redcube-reference-os/src/relative-quality.js');
 
   assert.equal(referenceOsIndex.includes('listReferenceSamples'), true);
   assert.equal(referenceOsIndex.includes('buildReferenceQualityReport'), true);
