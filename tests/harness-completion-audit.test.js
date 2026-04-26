@@ -14,7 +14,7 @@ function readImplementation(file) {
 }
 
 test('harness audit: runtime/kernel no longer owns family render branches and core capability planes are package-scoped', () => {
-  const runtimeIndex = read('packages/redcube-runtime/src/index.js');
+  const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
   const executors = readImplementation('packages/redcube-runtime/src/executors.js');
   const runtimeFamilyRegistryPackageJson = JSON.parse(read('packages/redcube-runtime-family-registry/package.json'));
@@ -74,7 +74,7 @@ test('harness audit: publish governance is single-owner and family runtimes no l
 
 test('harness audit: reference quality is a formal operating surface, not only test fixtures', () => {
   const referenceOsIndex = read('packages/redcube-reference-os/src/index.ts');
-  const runtimeIndex = read('packages/redcube-runtime/src/index.js');
+  const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
   const referenceSamples = read('packages/redcube-reference-os/src/reference-samples.js');
   const relativeQuality = read('packages/redcube-reference-os/src/relative-quality.js');
 

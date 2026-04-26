@@ -7,6 +7,12 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 test('family runtimes no longer directly author canonical publish owner fields', () => {
   const pptRuntime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
   const xhsRuntime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
@@ -28,7 +34,7 @@ test('family runtimes no longer directly author publication projection file hint
 });
 
 test('@redcube/governance remains the canonical publish truth owner surface', () => {
-  const runtimeIndex = read('packages/redcube-runtime/src/index.js');
+  const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
   const governanceReviewState = read('packages/redcube-governance/src/review-state.js');
 
   assert.equal(runtimeIndex.includes("from '@redcube/governance'"), true);

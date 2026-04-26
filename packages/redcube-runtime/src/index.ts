@@ -80,6 +80,13 @@ import {
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
 import { resolveSourceAugmentationAdapter as resolveSourceAugmentationAdapterJs } from './source-augmentation-executor.js';
 import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
+export {
+  resolveCodexHome,
+  resolveRuntimeStatePath,
+  resolveRuntimeStateRoot,
+  runtimeStateDisplayGlob,
+  runtimeStateDisplayPath,
+} from './runtime-state.js';
 import {
   prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
   writeSourceAugmentationResult as writeSourceAugmentationResultJs,

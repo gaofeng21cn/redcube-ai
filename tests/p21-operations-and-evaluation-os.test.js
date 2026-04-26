@@ -9,14 +9,20 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 function readJson(file) {
   return JSON.parse(read(file));
 }
 
 test('P21.A red: run record contract must freeze telemetry, error taxonomy, and rerun lineage surfaces', () => {
   const runtimeProtocolTypes = read('packages/redcube-runtime-protocol/src/types.ts');
-  const runRecordFactory = read('packages/redcube-runtime-protocol/src/runs.js');
-  const runtimeIndex = read('packages/redcube-runtime/src/index.js');
+  const runRecordFactory = readImplementation('packages/redcube-runtime-protocol/src/runs.js');
+  const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
   const hermesSubstrate = read('packages/redcube-hermes-substrate/src/index.js');
 
   assert.equal(runtimeProtocolTypes.includes('export interface RunTelemetryEnvelope'), true);
@@ -28,8 +34,10 @@ test('P21.A red: run record contract must freeze telemetry, error taxonomy, and 
   assert.equal(runRecordFactory.includes('telemetry:'), true);
   assert.equal(runRecordFactory.includes('error_kind:'), true);
   assert.equal(runRecordFactory.includes('rerun_linkage:'), true);
-  assert.equal(runtimeIndex.includes('completeHermesRun as completeRun'), true);
-  assert.equal(runtimeIndex.includes('appendHermesEvent as appendEvent'), true);
+  assert.equal(runtimeIndex.includes('completeHermesRun as completeRunJs'), true);
+  assert.equal(runtimeIndex.includes('export function completeRun'), true);
+  assert.equal(runtimeIndex.includes('appendHermesEvent as appendEventJs'), true);
+  assert.equal(runtimeIndex.includes('export function appendEvent'), true);
   assert.equal(hermesSubstrate.includes('error_kind:'), true);
   assert.equal(hermesSubstrate.includes('createRunRecord({'), true);
 });
