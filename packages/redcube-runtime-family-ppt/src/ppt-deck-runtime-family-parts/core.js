@@ -31,7 +31,8 @@ import {
   buildPptSlideBlueprintArtifact,
   buildPptVisualDirectionArtifact,
 } from '../ppt-structured-artifact-builders.js';
-import { createPptDeckAuthoringParts, createPptDeckStageParts } from './index.js';
+import { createPptDeckAuthoringParts } from './authoring.js';
+import { createPptDeckStageParts } from './stages.js';
 import { createPptDeckSurfaceParts } from './surface.js';
 import { createPptDeckCoreHelpers } from './core-helpers.js';
 
