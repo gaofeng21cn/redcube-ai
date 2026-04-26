@@ -60,6 +60,22 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(authorResult.ok, true);
     const authored = readJson(authorResult.artifactFile);
     assert.equal(authored.native_ppt_bundle?.editable_artifact, true);
+    assert.deepEqual(authored.ai_first_editing_contract, {
+      contract_id: 'ppt_native_ai_first_editing_contract_v1',
+      creative_owner: 'llm_agent',
+      editable_shape_plan_required: true,
+      editable_shape_manifest_required: true,
+      python_helper_role: 'execute_validate_export_only',
+      template_substitution_allowed: false,
+      preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+    });
+    assert.equal(authored.unit_repair_scope?.scope, 'deck');
+    assert.equal(authored.native_ppt_bundle?.ai_first_editing_contract?.creative_owner, 'llm_agent');
+    assert.equal(existsSync(authored.native_ppt_bundle?.editable_shape_plan_file), true);
+    const editableShapePlan = readJson(authored.native_ppt_bundle.editable_shape_plan_file);
+    assert.equal(editableShapePlan.contract_kind, 'redcube_ai_first_native_ppt_shape_plan');
+    assert.equal(editableShapePlan.slides.length, authored.native_ppt_bundle?.slides.length);
+    assert.equal(editableShapePlan.slides.every((slide) => Array.isArray(slide.native_shapes) && slide.native_shapes.length >= 2), true);
     const expectedEngineContract = nativeEngineContract();
     assert.deepEqual(authored.native_ppt_bundle?.engine_contract, expectedEngineContract);
     assert.equal(
@@ -73,6 +89,8 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(shapeManifest.schema_version, 1);
     assert.deepEqual(shapeManifest.engine_contract, expectedEngineContract);
     assert.equal(shapeManifest.engine_contract_file, authored.native_ppt_bundle.engine_contract_file);
+    assert.deepEqual(shapeManifest.ai_first_editing_contract, authored.ai_first_editing_contract);
+    assert.equal(shapeManifest.editable_shape_plan_file, authored.native_ppt_bundle.editable_shape_plan_file);
     assert.equal(authored.native_ppt_bundle?.source_visual_route, 'author_pptx_native');
     assert.equal(authored.native_ppt_bundle?.slides.length >= 6, true);
     assert.equal(
@@ -120,6 +138,13 @@ test('native PPT proof lane records the Python engine contract as the single own
 
   assert.equal(engineContract.language, 'python');
   assert.deepEqual(engineContract.owned_routes, ['author_pptx_native', 'repair_pptx_native']);
+  assert.deepEqual(engineContract.ai_first_boundary, {
+    creative_owner: 'llm_agent',
+    helper_role: 'execute_validate_export_only',
+    template_substitution_allowed: false,
+    editable_shape_plan_required: true,
+    editable_shape_manifest_required: true,
+  });
   assert.equal(
     proofLane.candidate_route_model.runtime_executor_proof.engine_contract,
     'contracts/runtime-program/ppt-native-python-engine-contract.json',
@@ -144,43 +169,66 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
     });
     assert.equal(authorResult.ok, true);
 
+    for (const route of ['visual_director_review', 'screenshot_review']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-repair',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
     const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-repair');
     const screenshotReviewFile = path.join(deliverableDir, 'artifacts', 'quality_gate.json');
-    writeJson(screenshotReviewFile, {
-      route: 'screenshot_review',
+    const priorReview = readJson(screenshotReviewFile);
+    const blockedReview = {
+      ...priorReview,
       status: 'block',
       checks: {
+        ...priorReview.checks,
         overflow_free: false,
-        occlusion_free: true,
-        visual_density_ok: true,
-        speaker_fit_ok: true,
         edge_clearance_ok: false,
-        block_content_fit_ok: true,
-        title_typography_ok: true,
+        ai_review_passed: false,
       },
-      slide_reviews: [
-        {
-          slide_id: 'S02',
-          title: '阻断页',
-          layout_family: 'multi_zone_compare',
-          screenshot_file: '',
-          status: 'block',
-          checks: {
-            overflow_free: false,
-            occlusion_free: true,
-            visual_density_ok: true,
-            speaker_fit_ok: true,
-          },
-          metrics: {},
-          issues: ['overflow_detected', 'edge_clearance_out_of_range'],
-          ai_review: {
-            judgement: 'block',
-            visual_findings: ['S02 底部说明贴边，需要直接修 PPTX 页面。'],
-            recommended_fix: '上移并压缩底部文案，恢复卡内底部留白。',
-          },
+      slide_reviews: priorReview.slide_reviews.map((slide) => (
+        slide.slide_id === 'S02'
+          ? {
+              ...slide,
+              status: 'block',
+              checks: {
+                ...slide.checks,
+                overflow_free: false,
+                edge_clearance_ok: false,
+              },
+              issues: ['overflow_detected', 'edge_clearance_out_of_range'],
+              ai_review: {
+                judgement: 'block',
+                visual_findings: ['S02 底部说明贴边，需要直接修 PPTX 页面。'],
+                recommended_fix: '上移并压缩底部文案，恢复卡内底部留白。',
+              },
+            }
+          : slide
+      )),
+      review_state_patch: {
+        ...priorReview.review_state_patch,
+        current_status: 'blocked_for_revision',
+        ready_for_export: false,
+        pending_reviews: ['overflow_free', 'edge_clearance_ok', 'ai_review_passed'],
+        blocking_reasons: ['overflow_free', 'edge_clearance_ok', 'ai_review_passed'],
+        rerun_from_stage: 'repair_pptx_native',
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: 'repair_pptx_native',
+          default_route: 'repair_pptx_native',
+          scope: 'page',
+          target_slide_ids: ['S02'],
+          source_review_stage: 'screenshot_review',
         },
-      ],
-    });
+      },
+    };
+    writeJson(screenshotReviewFile, blockedReview);
 
     const repairResult = await runDeliverableRoute({
       workspaceRoot,
@@ -194,8 +242,38 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
     assert.equal(repaired.native_ppt_bundle?.source_visual_route, 'repair_pptx_native');
     assert.equal(existsSync(repaired.native_ppt_bundle?.pptx_file), true);
     assert.deepEqual(repaired.native_ppt_repair_log?.target_slide_ids, ['S02']);
+    assert.deepEqual(repaired.unit_repair_scope?.target_slide_ids, ['S02']);
+    assert.equal(repaired.unit_repair_scope?.scope, 'page');
+    assert.equal(repaired.ai_first_editing_contract?.python_helper_role, 'execute_validate_export_only');
     assert.equal(repaired.native_ppt_repair_log?.consumed_review_stage, 'screenshot_review');
     assert.equal(repaired.native_ppt_bundle?.repair_log_file, repaired.native_ppt_repair_log?.repair_log_file);
     assert.equal(existsSync(repaired.native_ppt_repair_log?.repair_log_file), true);
+
+    const directorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-repair',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorResult.ok, true);
+    const directorReview = readJson(directorResult.artifactFile);
+    assert.equal(directorReview.review_execution?.review_scope, 'incremental_page_review');
+    assert.deepEqual(directorReview.review_execution?.reviewed_slide_ids, ['S02']);
+    assert.equal(directorReview.review_execution?.reused_slide_ids.includes('S01'), true);
+
+    const screenshotResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-repair',
+      route: 'screenshot_review',
+    });
+    assert.equal(screenshotResult.ok, true);
+    const screenshotReview = readJson(screenshotResult.artifactFile);
+    assert.equal(screenshotReview.review_execution?.review_scope, 'incremental_page_review');
+    assert.deepEqual(screenshotReview.review_execution?.reviewed_slide_ids, ['S02']);
+    assert.equal(screenshotReview.review_execution?.reused_slide_ids.includes('S01'), true);
+    assert.deepEqual(screenshotReview.mechanical_review?.incremental_review?.reviewed_slide_ids, ['S02']);
   });
 });

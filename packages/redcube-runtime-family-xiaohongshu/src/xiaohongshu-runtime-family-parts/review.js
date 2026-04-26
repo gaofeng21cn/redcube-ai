@@ -124,6 +124,73 @@ export function createXiaohongshuReviewParts(deps) {
     };
   }
 
+  function slideIdSet(slideIds) {
+    return new Set(safeArray(slideIds).map((slideId) => safeText(slideId)).filter(Boolean));
+  }
+
+  function collectIncrementalScreenshotReviewTargetSlideIds(renderArtifact, priorReviewArtifact) {
+    if (safeText(renderArtifact?.route) !== 'fix_html') return [];
+    if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
+    return [...new Set(
+      safeArray(renderArtifact?.html_bundle?.repair_scope?.target_slide_ids)
+        .map((slideId) => safeText(slideId))
+        .filter(Boolean),
+    )];
+  }
+
+  function collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact) {
+    if (safeText(renderArtifact?.route) !== 'fix_html') return [];
+    if (!priorReviewArtifact?.visual_director_review) return [];
+    return [...new Set([
+      ...safeArray(renderArtifact?.unit_repair_scope?.target_slide_ids),
+      ...safeArray(renderArtifact?.html_bundle?.repair_scope?.target_slide_ids),
+    ].map((slideId) => safeText(slideId)).filter(Boolean))];
+  }
+
+  function filterSlideScopedArray(items, slideIds) {
+    const targetIds = slideIdSet(slideIds);
+    if (targetIds.size === 0) return safeArray(items);
+    return safeArray(items).filter((item) => targetIds.has(safeText(item?.slide_id)));
+  }
+
+  function mergeSlideReviewList(previousSlideReviews, freshSlideReviews, targetSlideIds) {
+    const targetIds = slideIdSet(targetSlideIds);
+    const freshById = new Map(
+      safeArray(freshSlideReviews)
+        .map((slide) => [safeText(slide?.slide_id), slide])
+        .filter(([slideId]) => slideId),
+    );
+    const merged = safeArray(previousSlideReviews)
+      .map((slide) => {
+        const slideId = safeText(slide?.slide_id);
+        return targetIds.has(slideId) && freshById.has(slideId)
+          ? freshById.get(slideId)
+          : slide;
+      })
+      .filter(Boolean);
+    const existingIds = slideIdSet(merged.map((slide) => slide?.slide_id));
+    for (const [slideId, fresh] of freshById.entries()) {
+      if (!existingIds.has(slideId)) {
+        merged.push(fresh);
+      }
+    }
+    return merged;
+  }
+
+  function summarizeMechanicalChecksFromSlides(slideReviews) {
+    const keys = [
+      'overflow_free',
+      'occlusion_free',
+      'visual_density_ok',
+      'block_content_fit_ok',
+      'speaker_fit_ok',
+    ];
+    return Object.fromEntries(keys.map((key) => [
+      key,
+      safeArray(slideReviews).every((slide) => slide?.checks?.[key] !== false),
+    ]));
+  }
+
   function countMatches(text, pattern) {
     return [...String(text || '').matchAll(pattern)].length;
   }
@@ -189,12 +256,16 @@ export function createXiaohongshuReviewParts(deps) {
     };
   }
 
-  async function generateDirectorReviewDraft(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  async function generateDirectorReviewDraft(workspaceRoot, contract, deliverablePaths, incrementalTargetSlideIds = [], adapter = CODEX_DEFAULT_ADAPTER) {
     const research = readStageArtifact(contract, deliverablePaths, 'research');
     const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
     const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
     const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
     const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const incrementalReview = safeArray(incrementalTargetSlideIds).length > 0;
+    const renderedSlides = incrementalReview
+      ? filterSlideScopedArray(render?.html_bundle?.slides, incrementalTargetSlideIds)
+      : safeArray(render?.html_bundle?.slides);
     return generateStructuredArtifact({
       adapter,
       family: 'xiaohongshu',
@@ -203,11 +274,14 @@ export function createXiaohongshuReviewParts(deps) {
       context: {
         ...buildAuthoringContext({ workspaceRoot, contract, research }),
         storyline: storyline?.storyline || null,
+        review_scope: incrementalReview ? 'incremental_page_review' : 'full_note_review',
         plan: {
-          slides: summarizePlanSlides(plan),
+          slides: incrementalReview
+            ? filterSlideScopedArray(summarizePlanSlides(plan), incrementalTargetSlideIds)
+            : summarizePlanSlides(plan),
         },
         visual_direction: visual?.visual_direction || null,
-        render_summary: safeArray(render?.html_bundle?.slides).map((slide) => ({
+        render_summary: renderedSlides.map((slide) => ({
           slide_id: slide.slide_id,
           title: slide.title,
           layout_family: slide.layout_family,
@@ -221,10 +295,15 @@ export function createXiaohongshuReviewParts(deps) {
 
   async function buildDirectorReview(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
+    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+    const incrementalTargetSlideIds = collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact);
+    const incrementalReview = incrementalTargetSlideIds.length > 0;
     const { data, generationRuntime } = await generateDirectorReviewDraft(
       workspaceRoot,
       contract,
       deliverablePaths,
+      incrementalTargetSlideIds,
       adapter,
     );
     const directorIntentLanded = Boolean(data?.director_intent_landed);
@@ -258,6 +337,15 @@ export function createXiaohongshuReviewParts(deps) {
       review_execution: {
         ...creativeExecution('visual_director_review', generationRuntime, adapter),
         overlay: 'visual_director_review',
+        review_scope: incrementalReview ? 'incremental_page_review' : 'full_note_review',
+        reviewed_slide_ids: incrementalReview
+          ? incrementalTargetSlideIds
+          : renderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+        reused_slide_ids: incrementalReview
+          ? renderedSlides
+              .map((slide) => safeText(slide?.slide_id))
+              .filter((slideId) => slideId && !slideIdSet(incrementalTargetSlideIds).has(slideId))
+          : [],
       },
       status,
       visual_director_review: {
@@ -404,10 +492,15 @@ export function createXiaohongshuReviewParts(deps) {
     }
     const reviewHash = hashReviewInput(render);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+    const incrementalTargetSlideIds = collectIncrementalScreenshotReviewTargetSlideIds(render, priorReviewArtifact);
+    const incrementalReview = incrementalTargetSlideIds.length > 0;
+    if (incrementalReview) {
+      args.push('--slide-ids', incrementalTargetSlideIds.join(','));
+    }
     const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
-    const cacheStatus = cachedPayload ? 'hit' : 'miss';
-    const python = cachedPayload || runPython(PYTHON_REVIEW, args);
-    const mechanicalSlideReviews = safeArray(python.slide_reviews).map((slide) => {
+    const cacheStatus = cachedPayload && !incrementalReview ? 'hit' : 'miss';
+    const python = cacheStatus === 'hit' ? cachedPayload : runPython(PYTHON_REVIEW, args);
+    const freshMechanicalSlideReviews = safeArray(python.slide_reviews).map((slide) => {
       const occupiedRatio = Number(slide?.metrics?.occupied_ratio || 0);
       const overlaps = safeArray(slide?.metrics?.overlaps);
       const overflowFree = occupiedRatio <= 0.88;
@@ -434,6 +527,13 @@ export function createXiaohongshuReviewParts(deps) {
         issues,
       };
     });
+    const mechanicalSlideReviews = incrementalReview
+      ? mergeSlideReviewList(
+          priorReviewArtifact?.mechanical_review?.slide_reviews || priorReviewArtifact?.slide_reviews,
+          freshMechanicalSlideReviews,
+          incrementalTargetSlideIds,
+        )
+      : freshMechanicalSlideReviews;
     const captureManifest = materializeScreenshotCaptureStore({
       reportsDir: deliverablePaths.reportsDir,
       captureId: 'current',
@@ -452,12 +552,15 @@ export function createXiaohongshuReviewParts(deps) {
         ? { ...slide, screenshot_file: capture.current_path }
         : slide;
     });
+    const mechanicalSlideReviewsForAi = incrementalReview
+      ? capturedMechanicalSlideReviews.filter((slide) => slideIdSet(incrementalTargetSlideIds).has(safeText(slide?.slide_id)))
+      : capturedMechanicalSlideReviews;
     const aiReviewPromise = generateScreenshotReviewDraft(
       workspaceRoot,
       contract,
       deliverablePaths,
       render,
-      capturedMechanicalSlideReviews,
+      mechanicalSlideReviewsForAi,
       python,
       mode,
       research,
@@ -474,12 +577,24 @@ export function createXiaohongshuReviewParts(deps) {
       min: 0,
       max: capturedMechanicalSlideReviews.length,
     });
-    const aiSlideReviews = normalizeXhsScreenshotAiSlideReviews(data?.slide_reviews, capturedMechanicalSlideReviews);
+    const aiSlideReviews = normalizeXhsScreenshotAiSlideReviews(data?.slide_reviews, mechanicalSlideReviewsForAi);
     const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
-    const slideReviews = capturedMechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
+    const freshSlideReviews = mechanicalSlideReviewsForAi.map((slide) => buildAiFirstVisualSlideReview(
       slide,
       aiSlideReviewMap.get(slide.slide_id),
     ));
+    const mergedSlideReviews = incrementalReview
+      ? mergeSlideReviewList(priorReviewArtifact?.slide_reviews, freshSlideReviews, incrementalTargetSlideIds)
+      : freshSlideReviews;
+    const slideReviews = mergedSlideReviews.map((slide) => {
+      const capture = captureBySlideId.get(safeText(slide?.slide_id));
+      return capture?.current_path
+        ? { ...slide, screenshot_file: capture.current_path }
+        : slide;
+    });
+    const mergedAiSlideReviews = slideReviews
+      .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
+      .filter(Boolean);
     const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     const checks = {
       director_intent_landed: Boolean(directorReview?.visual_director_review?.director_intent_landed)
@@ -526,6 +641,15 @@ export function createXiaohongshuReviewParts(deps) {
       review_execution: {
         ...creativeExecution('screenshot_review', generationRuntime, adapter),
         overlay: 'screenshot_review',
+        review_scope: incrementalReview ? 'incremental_page_review' : 'full_note_review',
+        reviewed_slide_ids: incrementalReview
+          ? incrementalTargetSlideIds
+          : slideReviews.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+        reused_slide_ids: incrementalReview
+          ? slideReviews
+              .map((slide) => safeText(slide?.slide_id))
+              .filter((slideId) => slideId && !slideIdSet(incrementalTargetSlideIds).has(slideId))
+          : [],
       },
       mode,
       status,
@@ -544,7 +668,7 @@ export function createXiaohongshuReviewParts(deps) {
         anti_template_ok: Boolean(data?.anti_template_ok),
         weak_pages: aiWeakPages,
         review_summary: requireText(data?.review_summary, 'screenshot_review.review_summary'),
-        slide_reviews: aiSlideReviews,
+        slide_reviews: mergedAiSlideReviews,
         creative_sources: {
           review_judgement: creativeSourceStamp({
             route: 'screenshot_review',
@@ -559,12 +683,21 @@ export function createXiaohongshuReviewParts(deps) {
       mechanical_review: {
         review_model: 'python_screenshot_layout_checks',
         ...mechanicalCacheMetadata(cacheStatus, reviewHash),
-        checks: python.checks,
+        checks: summarizeMechanicalChecksFromSlides(capturedMechanicalSlideReviews),
         metrics: {
           ...(python.metrics || {}),
           slide_count: capturedMechanicalSlideReviews.length,
+          reviewed_slide_count: mechanicalSlideReviewsForAi.length,
         },
         slide_reviews: capturedMechanicalSlideReviews,
+        incremental_review: incrementalReview
+          ? {
+              reviewed_slide_ids: incrementalTargetSlideIds,
+              reused_slide_ids: slideReviews
+                .map((slide) => safeText(slide?.slide_id))
+                .filter((slideId) => slideId && !slideIdSet(incrementalTargetSlideIds).has(slideId)),
+            }
+          : null,
       },
       report_markdown: reviewMarkdown,
       metrics: python.metrics,

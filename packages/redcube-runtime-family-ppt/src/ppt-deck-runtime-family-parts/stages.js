@@ -109,9 +109,15 @@ export function createPptDeckStageParts(deps) {
   } = exportParts;
 
   function collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact, currentVisualStage) {
+    if (!priorReviewArtifact?.visual_director_review) return [];
+    if (safeText(currentVisualStage) === 'repair_pptx_native') {
+      return [...new Set([
+        ...safeArray(renderArtifact?.unit_repair_scope?.target_slide_ids),
+        ...safeArray(renderArtifact?.native_ppt_repair_log?.target_slide_ids),
+      ].map((slideId) => safeText(slideId)).filter(Boolean))];
+    }
     if (safeText(currentVisualStage) !== PAGE_FIX_ROUTE) return [];
     if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
-    if (!priorReviewArtifact?.visual_director_review) return [];
     return [...new Set([
       ...safeArray(renderArtifact?.render_execution?.freshly_rendered_slide_ids),
       ...safeArray(renderArtifact?.targeted_rerun?.target_slide_ids),
@@ -692,6 +698,13 @@ export function createPptDeckStageParts(deps) {
   }
 
   function collectIncrementalScreenshotReviewTargetSlideIds(renderArtifact, priorReviewArtifact) {
+    if (safeText(renderArtifact?.route) === 'repair_pptx_native') {
+      if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
+      return [...new Set([
+        ...safeArray(renderArtifact?.unit_repair_scope?.target_slide_ids),
+        ...safeArray(renderArtifact?.native_ppt_repair_log?.target_slide_ids),
+      ].map((slideId) => safeText(slideId)).filter(Boolean))];
+    }
     if (safeText(renderArtifact?.route) !== PAGE_FIX_ROUTE) return [];
     if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
     if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];

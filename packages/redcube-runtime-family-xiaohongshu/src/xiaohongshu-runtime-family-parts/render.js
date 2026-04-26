@@ -358,6 +358,9 @@ export function createXiaohongshuRenderParts(deps) {
     }
     const priorSlideHtmlById = loadPriorRenderedXhsSlideHtmlMap(currentRender);
     const targetSet = new Set(targetSlideIds);
+    const preservedSlideIds = safeArray(plan?.single_note_plan?.slides)
+      .map((slide) => safeText(slide?.slide_id))
+      .filter((slideId) => slideId && !targetSet.has(slideId));
     const promptSlides = summarizePlanSlides(plan)
       .filter((slide) => targetSet.has(safeText(slide?.slide_id)))
       .map((slide) => ({
@@ -384,9 +387,7 @@ export function createXiaohongshuRenderParts(deps) {
         revision_context: revisionContext,
         repair_scope: {
           target_slide_ids: targetSlideIds,
-          preserved_slide_ids: safeArray(plan?.single_note_plan?.slides)
-            .map((slide) => safeText(slide?.slide_id))
-            .filter((slideId) => slideId && !targetSet.has(slideId)),
+          preserved_slide_ids: preservedSlideIds,
         },
         shell_contract: {
           ratio: CANVAS.ratio,
@@ -478,6 +479,17 @@ export function createXiaohongshuRenderParts(deps) {
           targetSlideIds,
           revisionContext,
         }),
+      },
+      unit_repair_scope: {
+        family: 'xiaohongshu',
+        route: PAGE_FIX_ROUTE,
+        scope: 'page',
+        target_slide_ids: targetSlideIds,
+        preserved_slide_ids: preservedSlideIds,
+        source_review_stage: screenshotReview ? 'screenshot_review' : 'operator_revision_brief',
+        input_boundary: 'target_page_plan_current_html_screenshot_feedback',
+        output_boundary: 'target_page_html_array_only',
+        screenshot_review_reuse: true,
       },
       artifact_refs: syncCandidateHtml(viewSurfacePaths, htmlFile),
       review_state_patch: {

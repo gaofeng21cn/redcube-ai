@@ -193,9 +193,17 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
       files.push(
         stageArtifactFile(deliverablePaths, contract, 'render_html'),
         stageArtifactFile(deliverablePaths, contract, 'fix_html'),
+        stageArtifactFile(deliverablePaths, contract, 'author_pptx_native'),
+        stageArtifactFile(deliverablePaths, contract, 'repair_pptx_native'),
         ...pptDraftViewFiles(deliverablePaths, deliverableId),
       );
     }
+  }
+  if (overlay === 'xiaohongshu' && ['visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'].includes(route)) {
+    files.push(
+      stageArtifactFile(deliverablePaths, contract, 'render_html'),
+      stageArtifactFile(deliverablePaths, contract, 'fix_html'),
+    );
   }
   return Array.from(new Set(files));
 }

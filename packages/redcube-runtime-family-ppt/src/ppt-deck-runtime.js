@@ -161,7 +161,7 @@ export async function runPptDeckRoute({
       payload = await buildRenderHtmlArtifact({ workspaceRoot, deliverableId, contract, deliverablePaths, adapter });
       break;
     case 'author_pptx_native':
-      payload = buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
+      payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
       break;
     case 'fix_html':
       payload = await buildRenderHtmlArtifact({
@@ -174,7 +174,7 @@ export async function runPptDeckRoute({
       });
       break;
     case 'repair_pptx_native':
-      payload = buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
+      payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
       break;
     case 'visual_director_review':
       payload = await buildDirectorReview(contract, deliverablePaths, adapter);

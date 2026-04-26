@@ -38,4 +38,20 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
     pptPolicy.native_ppt_proof_lane.preserved_gates,
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
   );
+  assert.deepEqual(pptPolicy.native_ppt_proof_lane.ai_first_editing_contract, {
+    contract_id: 'ppt_native_ai_first_editing_contract_v1',
+    creative_owner: 'llm_agent',
+    editable_shape_plan_required: true,
+    editable_shape_manifest_required: true,
+    python_helper_role: 'execute_validate_export_only',
+    template_substitution_allowed: false,
+    preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+  });
+  assert.deepEqual(pptPolicy.native_ppt_proof_lane.unit_repair_scope, {
+    repair_route: 'repair_pptx_native',
+    scope: 'page',
+    target_source: 'screenshot_review.blocked_slide_ids',
+    passed_slides_reused: true,
+    preserved_slide_policy: 'do_not_reauthor_passed_slides',
+  });
 });

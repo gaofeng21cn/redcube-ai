@@ -591,6 +591,70 @@ test('xiaohongshu fix_html uses runtime-owned repair summary when model omits re
   });
 });
 
+test('xiaohongshu screenshot_review after fix_html reviews only repaired pages and reuses prior passed pages', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = await getPreparedWorkspaceClone({
+      cacheKey: 'xhs-through-visual-review-repair-marker-page-local-review',
+      workspacePrefix: 'redcube-xhs-page-local-review-fixture-',
+      clonePrefix: 'redcube-xhs-page-local-review-',
+      title: 'P21 小红书页级复核',
+      goal: '验证 fix_html 后 screenshot_review 只复核被修卡片并复用已通过页面',
+      routes: XHS_ROUTES_THROUGH_VISUAL_REVIEW,
+      env: {
+        REDCUBE_MOCK_XHS_RENDER_VARIANT: 'repair_marker',
+      },
+    });
+
+    let restoreVariant = withEnv({
+      REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT: 'block_until_fix_html',
+    });
+    try {
+      const reviewResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: XHS_OVERLAY,
+        topicId: XHS_TOPIC_ID,
+        deliverableId: XHS_DELIVERABLE_ID,
+        route: 'screenshot_review',
+      });
+      assert.equal(reviewResult.ok, false);
+    } finally {
+      restoreVariant();
+    }
+
+    const fixResult = await runXhsRoute(workspaceRoot, 'fix_html');
+    const fixArtifact = readJson(fixResult.artifactFile);
+    assert.deepEqual(fixArtifact.html_bundle.repair_scope.target_slide_ids, ['N02']);
+    assert.deepEqual(fixArtifact.unit_repair_scope?.target_slide_ids, ['N02']);
+
+    restoreVariant = withEnv({
+      REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT: 'require_incremental_single_N02',
+    });
+    try {
+      const directorResult = await runXhsRoute(workspaceRoot, 'visual_director_review');
+      const directorArtifact = readJson(directorResult.artifactFile);
+      assert.equal(directorArtifact.review_execution?.review_scope, 'incremental_page_review');
+      assert.deepEqual(directorArtifact.review_execution?.reviewed_slide_ids, ['N02']);
+      assert.equal(directorArtifact.review_execution?.reused_slide_ids.includes('N01'), true);
+
+      const reviewResult = await runXhsRoute(workspaceRoot, 'screenshot_review');
+      const reviewArtifact = readJson(reviewResult.artifactFile);
+      assert.equal(reviewArtifact.status, 'pass');
+      assert.equal(reviewArtifact.review_execution?.review_scope, 'incremental_page_review');
+      assert.deepEqual(reviewArtifact.review_execution?.reviewed_slide_ids, ['N02']);
+      assert.deepEqual(reviewArtifact.mechanical_review?.incremental_review?.reviewed_slide_ids, ['N02']);
+      assert.equal(reviewArtifact.review_execution?.reused_slide_ids.includes('N01'), true);
+      assert.equal(reviewArtifact.review_execution?.reused_slide_ids.includes('N06'), true);
+      assert.equal(reviewArtifact.ai_review.slide_reviews.length, 6);
+      assert.equal(
+        reviewArtifact.ai_review.slide_reviews.find((slide) => slide.slide_id === 'N02')?.judgement,
+        'pass',
+      );
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
 test('xiaohongshu fix_html honors operator-targeted slide revision briefs even when screenshot_review already passes', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({

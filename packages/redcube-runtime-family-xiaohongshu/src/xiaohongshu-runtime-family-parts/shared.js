@@ -409,7 +409,9 @@ export function safeFileMtimeMs(file) {
 export function currentHtmlStageId(contract, deliverablePaths) {
   const renderArtifactFile = stageArtifactPath(contract, deliverablePaths, 'render_html');
   const fixArtifactFile = stageArtifactPath(contract, deliverablePaths, PAGE_FIX_ROUTE);
-  return safeFileMtimeMs(fixArtifactFile) > safeFileMtimeMs(renderArtifactFile)
+  const fixMtimeMs = safeFileMtimeMs(fixArtifactFile);
+  const renderMtimeMs = safeFileMtimeMs(renderArtifactFile);
+  return fixMtimeMs > 0 && fixMtimeMs >= renderMtimeMs
     ? PAGE_FIX_ROUTE
     : 'render_html';
 }

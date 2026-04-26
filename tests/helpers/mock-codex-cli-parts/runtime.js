@@ -11,6 +11,7 @@ import {
   buildMockBlueprint,
   buildMockOutline,
   buildMockPptDirectorReview,
+  buildMockPptNativeShapePlan,
   buildMockPptRender,
   buildMockPptScreenshotReview,
   buildMockStoryline,
@@ -91,6 +92,9 @@ export function buildCreativeRunOutput(meta) {
     case 'render_html':
     case 'fix_html':
       return buildMockPptRender(meta);
+    case 'author_pptx_native':
+    case 'repair_pptx_native':
+      return buildMockPptNativeShapePlan(meta);
     case 'visual_director_review':
       return buildMockPptDirectorReview(meta);
     case 'screenshot_review':

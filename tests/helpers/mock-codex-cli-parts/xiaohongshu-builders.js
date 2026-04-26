@@ -336,6 +336,30 @@ export function buildMockXhsScreenshotReview(meta) {
       }
     }
   }
+  if (variants.has('require_incremental_single_N02')) {
+    const slideIds = slides.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
+    if (slideIds.length !== 1 || slideIds[0] !== 'N02') {
+      throw new Error(`mock xhs screenshot review expected page-local review for N02 only: ${JSON.stringify(slideIds)}`);
+    }
+    const sourceHtml = safeText(slides[0]?.source_html);
+    if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes('data-slide-id="N02"')) {
+      throw new Error(`mock xhs screenshot review expected local source_html for N02: ${sourceHtml.slice(0, 160)}`);
+    }
+    return {
+      director_intent_landed: true,
+      anti_template_ok: true,
+      weak_pages: [],
+      review_summary: 'N02 局部复核已通过，其余卡片沿用上一轮通过结果。',
+      slide_reviews: [
+        {
+          slide_id: 'N02',
+          judgement: 'pass',
+          visual_findings: ['N02 的截图与本页 HTML 已局部对齐。'],
+          recommended_fix: 'none',
+        },
+      ],
+    };
+  }
   if (variants.has('block_until_fix_html')) {
     const blockedSlideId = safeText(
       slides.find((slide) => safeText(slide?.source_html).includes('data-mock-fit="blocked"'))?.slide_id,
@@ -431,4 +455,3 @@ export function buildMockXhsPublishCopy(meta) {
     },
   };
 }
-
