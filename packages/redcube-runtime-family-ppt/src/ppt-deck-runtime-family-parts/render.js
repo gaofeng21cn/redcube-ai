@@ -495,6 +495,35 @@ export function createPptDeckRenderStageParts(deps) {
     return batches;
   }
 
+  function filterSlideScopedArray(value, slideIds) {
+    const allowedSlideIds = new Set(safeArray(slideIds).map((slideId) => safeText(slideId)).filter(Boolean));
+    return safeArray(value).filter((item) => {
+      const itemSlideId = safeText(typeof item === 'string' ? item : item?.slide_id);
+      return itemSlideId && allowedSlideIds.has(itemSlideId);
+    });
+  }
+
+  function buildRenderVisualDirectionContext(visualDirection, slideIds, route) {
+    const normalizedVisualDirection = visualDirection || {};
+    if (safeText(route) !== PAGE_FIX_ROUTE) {
+      return normalizedVisualDirection;
+    }
+    return {
+      mode: normalizedVisualDirection.mode,
+      what_it_is: normalizedVisualDirection.what_it_is,
+      what_it_is_not: normalizedVisualDirection.what_it_is_not,
+      visual_manifest: normalizedVisualDirection.visual_manifest,
+      palette: normalizedVisualDirection.palette,
+      typography_plan: normalizedVisualDirection.typography_plan,
+      page_family_ceiling: normalizedVisualDirection.page_family_ceiling || {},
+      final_instruction_to_html_generator: safeArray(normalizedVisualDirection.final_instruction_to_html_generator),
+      forbidden_regressions: safeArray(normalizedVisualDirection.forbidden_regressions),
+      peak_pages: filterSlideScopedArray(normalizedVisualDirection.peak_pages, slideIds),
+      page_role_table: filterSlideScopedArray(normalizedVisualDirection.page_role_table, slideIds),
+      rhythm_curve: filterSlideScopedArray(normalizedVisualDirection.rhythm_curve, slideIds),
+    };
+  }
+
   function filterRenderRevisionContextForSlides(revisionContext, slideIds = []) {
     if (!revisionContext) return null;
     const allowedSlideIds = new Set(safeArray(slideIds).map((slideId) => safeText(slideId)).filter(Boolean));
@@ -680,12 +709,12 @@ export function createPptDeckRenderStageParts(deps) {
       ? TARGETED_RENDER_HTML_BATCH_SIZE
       : RENDER_HTML_BATCH_SIZE;
     const typographyPlan = normalizeTypographyPlan(visualArtifact?.visual_direction?.typography_plan);
+    const fullVisualDirection = {
+      ...(visualArtifact?.visual_direction || {}),
+      typography_plan: typographyPlan,
+    };
     const sharedContext = {
       ...buildAuthoringContext(contract),
-      visual_direction: {
-        ...(visualArtifact?.visual_direction || {}),
-        typography_plan: typographyPlan,
-      },
       deck_style_reference: {
         typography_plan: typographyPlan,
         reference_window: RENDER_REFERENCE_SLIDE_WINDOW,
@@ -758,11 +787,13 @@ export function createPptDeckRenderStageParts(deps) {
             }
           }
         }
-        const referenceSlides = buildRenderBatchReferenceSlides({
-          blueprintSlides,
-          slideBatch,
-          renderedSlideHtmlById,
-        });
+        const referenceSlides = route === PAGE_FIX_ROUTE
+          ? []
+          : buildRenderBatchReferenceSlides({
+              blueprintSlides,
+              slideBatch,
+              renderedSlideHtmlById,
+            });
         const cacheKey = buildRenderBatchCacheKey({
           route,
           renderPlan,
@@ -778,6 +809,11 @@ export function createPptDeckRenderStageParts(deps) {
           promptRelativePath,
           context: {
             ...sharedContext,
+            visual_direction: buildRenderVisualDirectionContext(
+              fullVisualDirection,
+              promptSlides.map((slide) => slide.slide_id),
+              route,
+            ),
             render_scope: 'slide_batch',
             rerender_mode: renderPlan.mode,
             render_batch: {
@@ -817,6 +853,7 @@ export function createPptDeckRenderStageParts(deps) {
       deliverablePaths,
       route,
       stages: renderBatchStages,
+      parallel: route === PAGE_FIX_ROUTE,
     });
     const freshlyRenderedSlides = [];
     for (const stageResult of safeArray(renderBatchResult?.data)) {
@@ -844,6 +881,11 @@ export function createPptDeckRenderStageParts(deps) {
       promptRelativePath,
       context: {
         ...sharedContext,
+        visual_direction: buildRenderVisualDirectionContext(
+          fullVisualDirection,
+          freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+          route,
+        ),
         render_scope: 'summary',
         rerender_mode: renderPlan.mode,
         blueprint: {

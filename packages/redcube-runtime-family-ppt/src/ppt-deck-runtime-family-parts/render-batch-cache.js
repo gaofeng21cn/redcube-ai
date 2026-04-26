@@ -153,11 +153,95 @@ export function createPptDeckRenderBatchCacheParts(deps) {
     deliverablePaths,
     route,
     stages,
+    parallel = false,
   }) {
     const data = [];
     const stageCacheStatus = [];
     let reusedBatchCount = 0;
     let generatedBatchCount = 0;
+    if (parallel) {
+      const preparedStages = await Promise.all(stages.map(async (stage) => {
+        const stageInput = await stage({ previousResults: [], stage_id: stage.stage_id });
+        const cached = loadRenderBatchCache(stageInput.cache_file, stageInput.cache_key);
+        return { stage, stageInput, cached };
+      }));
+      const stageResults = await Promise.all(preparedStages.map(async ({ stage, stageInput, cached }) => {
+        if (cached) {
+          return {
+            stage_id: stage.stage_id,
+            data: cached.data,
+            generationRuntime: cached.generationRuntime,
+            cache_status: 'reused',
+          };
+        }
+        const result = await generateStructuredArtifact({
+          adapter,
+          family: stageInput.family,
+          route: stageInput.route,
+          promptRelativePath: stageInput.promptRelativePath,
+          context: stageInput.context,
+          outputContract: stageInput.outputContract,
+          localFileInspection: stageInput.localFileInspection,
+          timeoutMs: stageInput.timeoutMs,
+          cwd: stageInput.cwd || deliverablePaths.deliverableDir,
+        });
+        const persisted = writeRenderBatchCache({
+          deliverablePaths,
+          route,
+          stageId: stage.stage_id,
+          cacheKey: stageInput.cache_key,
+          promptSlides: stageInput.promptSlides,
+          referenceSlides: stageInput.referenceSlides,
+          result,
+        });
+        return {
+          stage_id: stage.stage_id,
+          data: persisted.data,
+          generationRuntime: persisted.generationRuntime,
+          cache_status: 'fresh',
+        };
+      }));
+      for (const stageResult of stageResults) {
+        data.push({
+          stage_id: stageResult.stage_id,
+          data: stageResult.data,
+          generationRuntime: stageResult.generationRuntime,
+          cache_status: stageResult.cache_status,
+        });
+        if (stageResult.cache_status === 'reused') {
+          reusedBatchCount += 1;
+        } else {
+          generatedBatchCount += 1;
+        }
+        stageCacheStatus.push({
+          stage_id: stageResult.stage_id,
+          cache_status: stageResult.cache_status,
+        });
+      }
+      pruneInactiveRenderBatchArtifacts(
+        deliverablePaths,
+        route,
+        stages.map((stage) => stage.stage_id),
+      );
+      return {
+        data,
+        batchRuntime: {
+          owner: safeText(data.find((stage) => stage?.generationRuntime)?.generationRuntime?.owner),
+          durable_cache: {
+            root: renderBatchCacheRoot(deliverablePaths, route),
+            reused_batch_count: reusedBatchCount,
+            generated_batch_count: generatedBatchCount,
+            stage_cache_status: stageCacheStatus,
+          },
+          session_pool: {
+            reuse_supported: false,
+            reuse_claimed: false,
+            reuse_status: 'durable_render_batch_cache',
+            invocation_count: generatedBatchCount,
+          },
+        },
+      };
+    }
     for (const stage of stages) {
       const stageInput = await stage({ previousResults: data, stage_id: stage.stage_id });
       const cached = loadRenderBatchCache(stageInput.cache_file, stageInput.cache_key);

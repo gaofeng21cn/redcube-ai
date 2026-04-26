@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   createDeliverable,
@@ -346,6 +346,97 @@ test('ppt fix_html scopes targeted rerender to operator-requested slides when on
       assert.equal(renderArtifact.render_execution?.mode, 'targeted_revision_only');
       assert.deepEqual(renderArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
       assert.equal(renderArtifact.render_execution?.reused_slide_ids.includes('S06'), true);
+    } finally {
+      restoreVariant();
+    }
+  });
+});
+
+test('ppt fix_html runs page-local repair units in parallel for independent targeted slides', async () => {
+  await withMockHermesUpstream(async () => {
+    const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-rerun-page-local-parallel-',
+      goal: '验证 fix_html 每页只携带单页上下文，并发返修互不依赖的问题页。',
+      routes: PPT_ROUTES_TO_RENDER_HTML,
+    });
+    for (const { route, result } of initialRoutes) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const artifactsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+    );
+    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+      status: 'pass',
+      visual_director_review: {
+        weak_pages: [],
+        review_summary: '导演层通过，本轮只处理讲者点名的两个页面。',
+        rewrite_action: 'none',
+      },
+    }, null, 2), 'utf-8');
+    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+      status: 'pass',
+      checks: {
+        ai_review_passed: true,
+      },
+      slide_reviews: [],
+      ai_review: {
+        weak_pages: [],
+        review_summary: '截图质控已通过；本轮只有讲者定点修页要求。',
+      },
+    }, null, 2), 'utf-8');
+
+    const operatorBriefFile = path.join(
+      getPptDeliverableSurfacePaths(workspaceRoot).operatorSlidesDir,
+      '当前返修要求.md',
+    );
+    writeFileSync(operatorBriefFile, [
+      '# 当前返修要求',
+      '',
+      '```json',
+      JSON.stringify({
+        target_slide_ids: ['S02', 'S05'],
+        global_requirements: [
+          '本轮只修 S02 和 S05，其他页面保持不动。',
+        ],
+        slide_feedback: [
+          {
+            slide_id: 'S02',
+            issues: ['右侧节点连线压到数字前景，只修本页 HTML。'],
+          },
+          {
+            slide_id: 'S05',
+            issues: ['右上卡片文字溢出，只修本页 HTML。'],
+          },
+        ],
+      }, null, 2),
+      '```',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const lockDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-fix-html-parallel-'));
+    const overlapFile = path.join(lockDir, 'overlap.txt');
+    const restoreVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,require_scoped_revision_context,require_page_local_fix_context,require_parallel_batches',
+      REDCUBE_MOCK_PPT_RENDER_PARALLEL_LOCK_DIR: lockDir,
+      REDCUBE_MOCK_PPT_RENDER_PARALLEL_OVERLAP_FILE: overlapFile,
+    });
+    try {
+      const rerender = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'fix_html',
+      });
+      assert.equal(rerender.ok, true);
+      assert.deepEqual(rerender.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02', 'S05']);
+      assert.equal(existsSync(overlapFile), true);
     } finally {
       restoreVariant();
     }

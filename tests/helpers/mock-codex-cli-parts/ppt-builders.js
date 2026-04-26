@@ -431,6 +431,28 @@ export function buildMockPptRender(meta) {
       }
     }
   }
+  if (variants.has('require_page_local_fix_context') && renderScope === 'slide_batch') {
+    const references = safeArray(meta?.context?.reference_slides);
+    if (references.length > 0) {
+      throw new Error(`mock ppt fix_html expected no reference slides for page-local repair: ${JSON.stringify(references)}`);
+    }
+    if (slides.length !== 1) {
+      throw new Error(`mock ppt fix_html expected one slide per repair unit: ${JSON.stringify(slides.map((slide) => slide.slide_id))}`);
+    }
+    const currentSlideId = safeText(slides[0]?.slide_id);
+    if (!safeText(slides[0]?.current_content_html)) {
+      throw new Error(`mock ppt fix_html expected current_content_html for ${currentSlideId}`);
+    }
+    const visualDirection = meta?.context?.visual_direction || {};
+    const pageRoleTable = safeArray(visualDirection?.page_role_table);
+    const rhythmCurve = safeArray(visualDirection?.rhythm_curve);
+    const peakPages = safeArray(visualDirection?.peak_pages);
+    if (pageRoleTable.some((item) => safeText(item?.slide_id) !== currentSlideId)
+      || rhythmCurve.some((item) => safeText(item?.slide_id) !== currentSlideId)
+      || peakPages.some((slideId) => safeText(slideId) !== currentSlideId)) {
+      throw new Error(`mock ppt fix_html expected page-local visual direction for ${currentSlideId}: ${JSON.stringify(visualDirection)}`);
+    }
+  }
   return {
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
