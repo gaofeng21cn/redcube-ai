@@ -97,6 +97,7 @@ const INTEGRATION = [
   'tests/preflight-gates.test.js',
   'tests/private-profile.test.js',
   'tests/product-entry-native-ppt-proof-lane.test.js',
+  'tests/product-entry-runtime-manager-registration.test.js',
   'tests/product-entry.test.js',
   'tests/publication-projection-delivery-contract.test.js',
   'tests/public-docs-surface.test.js',

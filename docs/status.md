@@ -19,6 +19,7 @@
 - direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
 - 稳定可调用面：`redcube-ai` app skill、`CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本，以及这些 surface 对应的 repo-tracked contracts
 - `skill_catalog` 现在对外收口为单一 `redcube-ai` app skill；`frontdesk`、`invoke`、`session` 继续作为这个 skill 底下的 machine-readable command contracts，并在同一 skill descriptor 的 `domain_projection.runtime_continuity` 输出可直接消费的 same-session runtime continuity envelope
+- 同一 `domain_projection` 现已暴露 `opl_runtime_manager_registration` v1：OPL Runtime Manager 可索引 RCA 的 product-entry registration、internal OPL bridge、session continuity、artifact inventory、runtime health 与 review/publication projection refs，但不拥有 RedCube visual truth 或 canonical artifacts
 - `route_equivalence` 已作为 manifest 合同面冻结：`frontdesk`、`invoke`、`session` 与 internal `OPL bridge` 都只指向同一 downstream `domain_entry`、同一 session continuity / progress / artifact / review / publication truth，不新增第二公开 skill 或第二运行语义
 - `deliverable_facade` 已覆盖当前 `ppt_deck` 与 `xiaohongshu` surface：facade 只声明现有 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`，不改核心生成逻辑
 - `ppt_deck` native PPT authoring / repair 已作为显式 opt-in proof lane 落到可运行 executor：`author_pptx_native` 生成可编辑 PPTX 与 shape manifest，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`

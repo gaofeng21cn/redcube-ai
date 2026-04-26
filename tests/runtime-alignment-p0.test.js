@@ -78,6 +78,12 @@ test('current program points to the current mainline while retaining durable ide
     true,
   );
   assert.equal(currentProgram.longrun_goal.runtime_manager_boundary.manager, 'OPL Runtime Manager');
+  assert.equal(
+    currentProgram.longrun_goal.runtime_manager_boundary.consumes_redcube_surfaces.includes(
+      'skill_catalog.domain_projection.opl_runtime_manager_registration',
+    ),
+    true,
+  );
   assert.equal(currentProgram.longrun_goal.runtime_manager_boundary.does_not_own.includes('visual-domain truth'), true);
   assert.match(currentProgram.longrun_goal.final_target_route.opl_federated_entry, /OPL Runtime Manager -> external Hermes-Agent runtime substrate/);
   assert.match(currentProgram.longrun_goal.language_target.typescript_owner, /product entry/);
@@ -102,6 +108,10 @@ test('current program points to the current mainline while retaining durable ide
   ]);
   assert.equal(currentProgram.current_state.runtime_substrate_owner, 'optional_hosted_runtime_carrier');
   assert.equal(currentProgram.current_state.runtime_manager_status.target_layer, 'OPL Runtime Manager');
+  assert.equal(
+    currentProgram.current_state.runtime_manager_status.registration_surface,
+    'skill_catalog.domain_projection.opl_runtime_manager_registration',
+  );
   assert.equal(currentProgram.current_state.runtime_manager_status.full_sidecar_enabled_now, false);
   assert.equal(currentProgram.current_state.deployment_host, 'codex_local_operator_host');
   assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);

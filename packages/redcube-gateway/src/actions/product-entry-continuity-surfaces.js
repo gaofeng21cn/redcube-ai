@@ -239,3 +239,69 @@ export function buildRuntimeLoopClosureManifestSurface({
     },
   };
 }
+
+const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
+const PRODUCT_FRONTDESK_COMMAND = 'redcube product frontdesk';
+const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
+
+export function buildOplRuntimeManagerRegistration({
+  runtimeContinuityEnvelope,
+  productEntrySessionCommand,
+}) {
+  return {
+    surface_kind: 'opl_runtime_manager_domain_registration',
+    version: 'v1',
+    registration_id: 'rca.opl_runtime_manager.registration.v1',
+    manager_surface_id: 'opl_runtime_manager',
+    domain_id: 'redcube',
+    domain_owner: 'redcube_ai',
+    runtime_owner: runtimeContinuityEnvelope.runtime_owner,
+    executor_owner: runtimeContinuityEnvelope.executor_owner,
+    domain_entry_surface: {
+      surface_kind: 'product_frontdesk',
+      command: PRODUCT_FRONTDESK_COMMAND,
+      manifest_command: PRODUCT_MANIFEST_COMMAND,
+    },
+    registration_surface: {
+      surface_kind: 'skill_catalog',
+      ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration',
+      command: PRODUCT_MANIFEST_COMMAND,
+    },
+    consumable_projection_refs: [
+      '/skill_catalog/skills/0/domain_projection/runtime_continuity',
+      '/product_entry_shell/opl_bridge',
+      '/artifact_inventory',
+      '/review_state',
+      '/publication_projection',
+    ],
+    state_index_inputs: {
+      workspace_registry_index: '/workspace_locator',
+      managed_session_ledger_index: '/session_continuity',
+      artifact_projection_index: '/artifact_inventory',
+      attention_queue_index: '/automation/automations/0',
+      runtime_health_snapshot_index: '/runtime_inventory',
+    },
+    resume_contract: {
+      session_locator_field: runtimeContinuityEnvelope.session_locator_field,
+      recommended_resume_command: runtimeContinuityEnvelope.recommended_resume_command,
+      recommended_progress_command: runtimeContinuityEnvelope.recommended_progress_command,
+      session_command_template: productEntrySessionCommand,
+    },
+    federated_handoff_surface: {
+      surface_kind: 'federated_product_entry',
+      command: PRODUCT_FEDERATE_COMMAND,
+      ref: '/product_entry_shell/opl_bridge',
+    },
+    review_publication_truth: {
+      review_state_ref: '/review_state',
+      publication_projection_ref: '/publication_projection',
+      route_rule: 'must_use_redcube_product_entry_and_review_export_gates',
+    },
+    non_goals: [
+      'not_a_visual_domain_truth_owner',
+      'not_a_canonical_artifact_owner',
+      'not_a_review_or_publication_projection_owner',
+      'not_a_concrete_executor',
+    ],
+  };
+}

@@ -13,6 +13,7 @@
       "layer_role": "product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
       "consumes_redcube_surfaces": [
         "redcube product-entry registration",
+        "skill_catalog.domain_projection.opl_runtime_manager_registration",
         "invokeFederatedProductEntry",
         "getProductEntrySession",
         "runtimeWatch",
@@ -157,10 +158,11 @@
   "current_state": {
     "product_mainline_mode": "auto_only",
     "runtime_substrate_owner": "optional_hosted_runtime_carrier",
-    "runtime_manager_status": {
-      "target_layer": "OPL Runtime Manager",
-      "status": "target_contract_alignment",
-      "redcube_default_entry_unchanged": true,
+      "runtime_manager_status": {
+        "target_layer": "OPL Runtime Manager",
+        "status": "target_contract_alignment",
+        "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
+        "redcube_default_entry_unchanged": true,
       "full_sidecar_enabled_now": false,
       "native_helper_scope": [
         "artifact indexing",
