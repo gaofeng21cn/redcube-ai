@@ -37,6 +37,10 @@
 - 若是 `ring_cross` / 四向骨架页，修页时要恢复中心与四侧卡片近似等距；不能只修溢出却留下明显失衡
 - 若是 `judgement_ladder` / `timeline_band`，遇到卡片内放不下时，优先减字、扩卡和重排，不要靠手插 `<br/>` 继续制造断句
 - 相邻读者可见 `data-qa-block`、导语、主卡、步骤卡、总结卡和底部说明之间必须恢复至少 6px 可见安全间距；标题区贴主面板、导语贴卡片、底部说明贴组块都要修
+- 如果 `mechanical_findings` / `metrics.block_content_failures` 出现 `adjacent_readable_blocks_too_close`，必须在两个相邻 `data-qa-block` 之间用可测量 CSS 产生间距：优先把 slide root 或局部 wrapper 改为 `display:grid` / `display:flex; flex-direction:column` 并设置 `gap`，或给前一块 `margin-bottom` / 后一块 `margin-top`；不得只改固定 `height` 后让后一块继续紧贴前一块。修完后目标间距必须高于阈值至少 2px（通常 ≥8px）。
+- 如果 `edge_clearance_failures` 指向父容器 `block_padding` 为负值，说明子内容实际超出父容器内边距；必须降低该父容器内部网格行高、字号、padding、gap 或减少可见字数，使所有子行总高小于父容器内容高度，并保留至少 8px 底部内边距。不要依靠 `overflow:hidden`、把页脚/底条下移，或只扩大外层高度掩盖内部越界。
+- 如果 `page_number_consistency_failed` 指向位置失败，必须按 `page_number_audit.reference` 恢复页码：保持两位数字、18px、右下角、灰度一致，并把 `right_gap` / `bottom_gap` 调回参考值附近；不得让页码跟随底部说明条向下漂移。
+- 如果同一页同时有 `visual_density_out_of_range` 和底部/父容器留白失败，优先重排和压缩次级文字，让信息区域更紧凑但留白达标；不要为了“填满页面”增加无证据装饰或新增结论。
 
 ## runtime_artifact
 ```json
