@@ -46,6 +46,7 @@ const META = [
   'tests/pack-first-completion.test.js',
   'tests/ppt-overlay.test.js',
   'tests/profile-contract-hydration.test.js',
+  'tests/python-native-helper-catalog.test.js',
   'tests/publish-governance-single-owner.test.js',
   'tests/reference-quality-os.test.js',
   'tests/render-ceiling-deepening.test.js',
@@ -171,6 +172,7 @@ const FAST = [
   'tests/ppt-render-batch-generation.test.js',
   'tests/service-safe-domain-entry.test.js',
   'tests/product-entry-native-ppt-proof-lane.test.js',
+  'tests/python-native-helper-catalog.test.js',
   'tests/product-entry.test.js',
   'tests/source-augmentation-provider.test.js',
 ];

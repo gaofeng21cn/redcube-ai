@@ -33,6 +33,7 @@
     "language_target": {
       "typescript_owner": "product entry, CLI/MCP surfaces, contracts, gateway, runtime-family shell, and typed service boundaries",
       "python_owner": "native Office/PPT manipulation, screenshot/export helpers, document/PPT repair loops, and MAS/MAG shared automation ecosystem",
+      "python_native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
       "legacy_javascript_policy": "staged retirement behind existing TypeScript service boundaries; no new creative/runtime truth should be added to legacy JS paths",
       "ppt_deck_direction": "keep render_html as the default visual route today while using Python-backed native PPT authoring/repair as the explicit proof lane for future editable-PPT workflows"
     },
@@ -162,6 +163,7 @@
         "target_layer": "OPL Runtime Manager",
         "status": "target_contract_alignment",
         "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
+        "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
         "redcube_default_entry_unchanged": true,
       "full_sidecar_enabled_now": false,
       "native_helper_scope": [
@@ -201,6 +203,7 @@
         "status": "opt_in_proof_lane",
         "contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
+        "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
         "brief": "docs/program/phase-2/phase_2_ppt_native_authoring_proof_lane.md",
         "default_mainline_changed": false,
         "default_visual_route": "render_html",

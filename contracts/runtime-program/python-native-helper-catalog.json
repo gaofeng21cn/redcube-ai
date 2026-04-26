@@ -1,0 +1,100 @@
+{
+  "contract_id": "python-native-helper-catalog",
+  "date_anchor": "2026-04-26",
+  "owner": "redcube_ai",
+  "language": "python",
+  "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
+  "typescript_boundary": "TypeScript owns product entry, CLI/MCP, gateway contracts, runtime-family route orchestration, and review/export gate wiring.",
+  "bypass_policy": {
+    "generic_bypass_allowed": false,
+    "required_entry_surface": "RedCube product-entry or runtime-family route",
+    "required_review_export_gates": [
+      "visual_director_review",
+      "screenshot_review",
+      "export_pptx"
+    ]
+  },
+  "helpers": [
+    {
+      "helper_id": "ppt_deck_review",
+      "script": "packages/redcube-runtime/scripts/ppt_deck_review.py",
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "screenshot_review",
+      "routes": [],
+      "gates": [
+        "screenshot_review"
+      ],
+      "purpose": "Rendered HTML or native PPT screenshot mechanical review.",
+      "requires": [
+        "playwright"
+      ],
+      "outputs": [
+        "quality_gate.json"
+      ],
+      "contract_refs": [
+        "contracts/runtime-program/current-program.json",
+        "contracts/runtime-program/ppt-native-authoring-proof-lane.json"
+      ]
+    },
+    {
+      "helper_id": "ppt_deck_export",
+      "script": "packages/redcube-runtime/scripts/ppt_deck_export.py",
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "export_pptx",
+      "routes": [
+        "export_pptx"
+      ],
+      "gates": [
+        "export_pptx"
+      ],
+      "purpose": "Screenshot bundle export into PPTX/PDF publish artifacts.",
+      "requires": [
+        "Pillow",
+        "python-pptx"
+      ],
+      "outputs": [
+        "publish_bundle.pptx",
+        "publish_bundle.pdf"
+      ],
+      "contract_refs": [
+        "contracts/runtime-program/current-program.json"
+      ]
+    },
+    {
+      "helper_id": "ppt_deck_native",
+      "script": "packages/redcube-runtime/scripts/ppt_deck_native.py",
+      "owner": "python_native_helper",
+      "deliverable_family": "ppt_deck",
+      "runtime_surface": "native_ppt_authoring_repair",
+      "routes": [
+        "author_pptx_native",
+        "repair_pptx_native"
+      ],
+      "gates": [
+        "visual_director_review",
+        "screenshot_review",
+        "export_pptx"
+      ],
+      "purpose": "Editable native PPTX authoring and screenshot-feedback repair.",
+      "requires": [
+        "Pillow",
+        "python-pptx"
+      ],
+      "outputs": [
+        "native_pptx_file",
+        "shape_manifest.json",
+        "preview_screenshots",
+        "repair_log.json"
+      ],
+      "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
+      "proof_lane_contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
+      "contract_refs": [
+        "contracts/runtime-program/current-program.json",
+        "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
+        "contracts/runtime-program/ppt-native-python-engine-contract.json"
+      ]
+    }
+  ]
+}

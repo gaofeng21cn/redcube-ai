@@ -138,7 +138,7 @@
 RCA 的长线实现语言目标是 `TypeScript + Python`：
 
 - `TypeScript` 继续承担 product entry、CLI/MCP、contracts、gateway、runtime-family shell、typed service boundaries 与测试主干。
-- `Python` 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，以及可与 MAS/MAG 共享的自动化工具链。
+- `Python` 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，以及可与 MAS/MAG 共享的自动化工具链；当前 repo-tracked helper catalog 是 `contracts/runtime-program/python-native-helper-catalog.json`。
 - `ppt_deck` 当前默认 visual route 仍是 `render_html`；native PPT authoring / repair 是显式 proof lane。后续迁移必须保留 `visual_director_review`、`screenshot_review`、`export_pptx` 等 RedCube review/export gate，不能用通用 Python/PPT 脚本绕过 domain truth。
 
 ## Service-Safe Domain Entry
