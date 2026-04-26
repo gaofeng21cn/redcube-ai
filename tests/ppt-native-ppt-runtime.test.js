@@ -87,6 +87,11 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(existsSync(authored.native_ppt_bundle?.shape_manifest_file), true);
     const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
     assert.equal(shapeManifest.schema_version, 1);
+    assert.equal(shapeManifest.native_quality_model, 'shape_manifest_layout_metrics_v1');
+    assert.equal(
+      shapeManifest.native_quality_surface.required_per_slide_metrics.includes('occupied_ratio'),
+      true,
+    );
     assert.deepEqual(shapeManifest.engine_contract, expectedEngineContract);
     assert.equal(shapeManifest.engine_contract_file, authored.native_ppt_bundle.engine_contract_file);
     assert.deepEqual(shapeManifest.ai_first_editing_contract, authored.ai_first_editing_contract);
@@ -102,6 +107,7 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       true,
     );
 
+    let screenshotReviewArtifact = null;
     for (const route of ['visual_director_review', 'screenshot_review', 'export_pptx']) {
       const result = await runDeliverableRoute({
         workspaceRoot,
@@ -111,7 +117,16 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
         route,
       });
       assert.equal(result.ok, true, route);
+      if (route === 'screenshot_review') {
+        screenshotReviewArtifact = readJson(result.artifactFile);
+      }
     }
+    const nativeMechanicalSlide = screenshotReviewArtifact.mechanical_review.slide_reviews[0];
+    const nativeManifestSlide = shapeManifest.slides.find((slide) => slide.slide_id === nativeMechanicalSlide.slide_id);
+    assert.equal(nativeMechanicalSlide.metrics.native_quality_source, 'shape_manifest');
+    assert.equal(nativeMechanicalSlide.metrics.occupied_ratio, nativeManifestSlide.metrics.occupied_ratio);
+    assert.equal(nativeMechanicalSlide.metrics.text_char_count, nativeManifestSlide.metrics.text_char_count);
+    assert.equal(nativeMechanicalSlide.metrics.edge_clearance.bottom, nativeManifestSlide.metrics.edge_clearance.bottom);
 
     const exportArtifactFile = path.join(
       workspaceRoot,
@@ -128,6 +143,84 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(exported.export_bundle?.native_ppt_shape_manifest, authored.native_ppt_bundle.shape_manifest_file);
     assert.equal(existsSync(exported.export_bundle?.pptx_file), true);
     assert.equal(existsSync(exported.export_bundle?.pdf_file), true);
+  });
+});
+
+test('native PPT screenshot review blocks from shape-manifest quality metrics instead of fixed pass values', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-quality-'));
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-quality' });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-quality',
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+    const authored = readJson(authorResult.artifactFile);
+    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
+    shapeManifest.slides[0] = {
+      ...shapeManifest.slides[0],
+      checks: {
+        ...shapeManifest.slides[0].checks,
+        edge_clearance_ok: false,
+        block_content_fit_ok: false,
+      },
+      metrics: {
+        ...shapeManifest.slides[0].metrics,
+        edge_clearance: {
+          ...shapeManifest.slides[0].metrics.edge_clearance,
+          bottom: 2,
+        },
+        block_content_failures: [{
+          shape_id: `${shapeManifest.slides[0].slide_id}-point-1-text`,
+          overflow_reason: 'native_text_capacity_exceeded',
+        }],
+      },
+      issues: ['edge_clearance_out_of_range', 'block_content_overflow_detected'],
+    };
+    writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
+
+    const directorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-quality',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorResult.ok, true);
+
+    const screenshotResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-quality',
+      route: 'screenshot_review',
+    });
+    assert.equal(screenshotResult.ok, false);
+    const screenshotReview = readJson(path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-quality',
+      'artifacts',
+      'quality_gate.json',
+    ));
+    assert.equal(screenshotReview.status, 'block');
+    assert.equal(screenshotReview.checks.edge_clearance_ok, false);
+    assert.equal(screenshotReview.checks.block_content_fit_ok, false);
+    assert.equal(screenshotReview.review_state_patch.rerun_from_stage, 'repair_pptx_native');
+    assert.equal(
+      screenshotReview.slide_reviews[0].mechanical_issues.includes('block_content_overflow_detected'),
+      true,
+    );
+    assert.equal(
+      screenshotReview.mechanical_review.slide_reviews[0].metrics.block_content_failures[0].overflow_reason,
+      'native_text_capacity_exceeded',
+    );
   });
 });
 
@@ -149,6 +242,11 @@ test('native PPT proof lane records the Python engine contract as the single own
     proofLane.candidate_route_model.runtime_executor_proof.engine_contract,
     'contracts/runtime-program/ppt-native-python-engine-contract.json',
   );
+  assert.equal(
+    proofLane.candidate_route_model.native_ppt_quality_surface.quality_model,
+    'shape_manifest_layout_metrics_v1',
+  );
+  assert.equal(engineContract.native_ppt_quality_surface.fail_closed_when_missing, true);
   assert.equal(
     currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.engine_contract,
     'contracts/runtime-program/ppt-native-python-engine-contract.json',

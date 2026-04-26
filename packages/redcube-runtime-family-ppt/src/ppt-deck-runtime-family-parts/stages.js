@@ -1081,7 +1081,7 @@ export function createPptDeckStageParts(deps) {
     const status = failedChecks.length === 0 ? 'pass' : 'block';
     const rerunFromStage = status === 'pass'
       ? null
-      : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
+      : nativeReviewInput ? 'repair_pptx_native' : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
     const artifact = {
       ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
       review_execution: {

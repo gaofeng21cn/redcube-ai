@@ -89,6 +89,7 @@ const LEAF_TS_MIGRATION_LOCKS = {
   'packages/redcube-runtime/src/source-augmentation-request.js': 1,
   'packages/redcube-runtime/src/source-augmentation-result.js': 1,
   'packages/redcube-runtime/src/source-readiness-pack.js': 1,
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.js': 1,
 };
 
 test('P18 closeout audit proves structural TypeScript coverage across baseline, contracts, service boundaries, and high-churn lanes', () => {

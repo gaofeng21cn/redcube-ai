@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+import hashlib
 import json
+import math
 import sys
 import textwrap
 from pathlib import Path
@@ -15,6 +17,13 @@ from pptx.util import Inches, Pt
 CANVAS_PX = (1152, 648)
 SLIDE_W = Inches(16)
 SLIDE_H = Inches(9)
+EMU_PER_INCH = 914400
+PX_PER_INCH = CANVAS_PX[0] / 16
+FRAME_AREA = float(CANVAS_PX[0] * CANVAS_PX[1])
+MIN_NATIVE_DENSITY = 0.18
+MAX_NATIVE_DENSITY = 0.82
+MIN_NATIVE_EDGE_CLEARANCE = 24.0
+MAX_NATIVE_PRIMARY_POINTS = 5
 DEFAULT_ENGINE_CONTRACT_FILE = (
     Path(__file__).resolve().parents[4]
     / 'contracts'
@@ -35,6 +44,137 @@ def safe_text(value, fallback: str = '') -> str:
 
 def safe_list(value):
     return value if isinstance(value, list) else []
+
+
+def clamp(value: float, lower: float, upper: float) -> float:
+    return max(lower, min(upper, value))
+
+
+def emu_to_px(value) -> float:
+    return float(value) / EMU_PER_INCH * PX_PER_INCH
+
+
+def shape_rect(left, top, width, height) -> dict:
+    x = emu_to_px(left)
+    y = emu_to_px(top)
+    w = emu_to_px(width)
+    h = emu_to_px(height)
+    return {
+        'left': round(x, 2),
+        'top': round(y, 2),
+        'width': round(w, 2),
+        'height': round(h, 2),
+        'right': round(x + w, 2),
+        'bottom': round(y + h, 2),
+    }
+
+
+def rect_overlap_area(rect_a: dict, rect_b: dict) -> float:
+    overlap_w = max(0.0, min(rect_a['right'], rect_b['right']) - max(rect_a['left'], rect_b['left']))
+    overlap_h = max(0.0, min(rect_a['bottom'], rect_b['bottom']) - max(rect_a['top'], rect_b['top']))
+    return overlap_w * overlap_h
+
+
+def file_sha256(file: Path) -> str:
+    if not file.exists():
+        return ''
+    digest = hashlib.sha256()
+    with file.open('rb') as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def text_capacity_failure(shape: dict) -> dict | None:
+    text = safe_text(shape.get('text'))
+    if not text:
+        return None
+    rect = shape.get('bounds') or {}
+    width = float(rect.get('width') or 0)
+    height = float(rect.get('height') or 0)
+    font_size = float(shape.get('font_size') or 14)
+    chars_per_line = max(8, int(width / max(font_size * 0.52, 1)))
+    estimated_lines = max(1, math.ceil(len(text) / chars_per_line))
+    max_lines = max(1, int(height / max(font_size * 1.05, 1))) + 2
+    if estimated_lines <= max_lines:
+        return None
+    return {
+        'shape_id': shape.get('shape_id'),
+        'overflow_reason': 'native_text_capacity_exceeded',
+        'text_char_count': len(text),
+        'estimated_lines': estimated_lines,
+        'max_lines': max_lines,
+    }
+
+
+def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
+    content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
+    overlap_shapes = [shape for shape in content_shapes if shape.get('kind') == 'text_box']
+    occupied_area = sum(float(shape['bounds']['width']) * float(shape['bounds']['height']) for shape in content_shapes)
+    occupied_ratio = clamp(occupied_area / FRAME_AREA, 0.0, 1.0)
+    if content_shapes:
+        edge_clearance = {
+            'left': min(float(shape['bounds']['left']) for shape in content_shapes),
+            'top': min(float(shape['bounds']['top']) for shape in content_shapes),
+            'right': min(CANVAS_PX[0] - float(shape['bounds']['right']) for shape in content_shapes),
+            'bottom': min(CANVAS_PX[1] - float(shape['bounds']['bottom']) for shape in content_shapes),
+        }
+    else:
+        edge_clearance = {'left': 0.0, 'top': 0.0, 'right': 0.0, 'bottom': 0.0}
+    overlap_pairs = []
+    for left_index, shape_a in enumerate(overlap_shapes):
+        for shape_b in overlap_shapes[left_index + 1:]:
+            overlap_area = rect_overlap_area(shape_a['bounds'], shape_b['bounds'])
+            if overlap_area > 12.0:
+                overlap_pairs.append({
+                    'a': shape_a.get('shape_id'),
+                    'b': shape_b.get('shape_id'),
+                    'overlap_area': round(overlap_area, 2),
+                })
+    block_content_failures = [
+        failure for failure in (text_capacity_failure(shape) for shape in content_shapes)
+        if failure
+    ]
+    text_char_count = sum(len(safe_text(shape.get('text'))) for shape in content_shapes)
+    clipped_nodes = len(block_content_failures)
+    checks = {
+        'overflow_free': clipped_nodes == 0,
+        'occlusion_free': len(overlap_pairs) == 0,
+        'visual_density_ok': MIN_NATIVE_DENSITY <= occupied_ratio <= MAX_NATIVE_DENSITY and primary_points <= MAX_NATIVE_PRIMARY_POINTS,
+        'speaker_fit_ok': text_char_count <= 950,
+        'edge_clearance_ok': min(edge_clearance.values()) >= MIN_NATIVE_EDGE_CLEARANCE,
+        'block_content_fit_ok': clipped_nodes == 0,
+        'title_typography_ok': True,
+        'page_number_consistency_ok': True,
+    }
+    issues = []
+    if not checks['visual_density_ok']:
+        issues.append('visual_density_out_of_range')
+    if not checks['edge_clearance_ok']:
+        issues.append('edge_clearance_out_of_range')
+    if not checks['occlusion_free']:
+        issues.append('occlusion_detected')
+    if not checks['block_content_fit_ok']:
+        issues.append('block_content_overflow_detected')
+    if not checks['speaker_fit_ok']:
+        issues.append('speaker_fit_exceeded')
+    return {
+        'checks': checks,
+        'issues': issues,
+        'metrics': {
+            'title_font_size': 32,
+            'text_char_count': text_char_count,
+            'block_count': len(content_shapes),
+            'shape_count': len(native_shapes),
+            'overlap_pairs': len(overlap_pairs),
+            'overlaps': overlap_pairs,
+            'clipped_nodes': clipped_nodes,
+            'occupied_ratio': round(occupied_ratio, 4),
+            'primary_points': primary_points,
+            'edge_clearance': {key: round(value, 2) for key, value in edge_clearance.items()},
+            'block_content_failures': block_content_failures,
+        },
+    }
 
 
 def load_engine_contract(contract_file: Path) -> dict:
@@ -172,14 +312,30 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
         palette = PALETTES[(index - 1) % len(PALETTES)]
         slide = prs.slides.add_slide(blank_layout)
         repaired = safe_text(slide_data.get('slide_id')) in repaired_slide_ids
+        slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
+        native_shapes = []
+
+        def record_shape(shape_id, kind, left, top, width, height, role, text='', font_size=0, quality_role='content'):
+            native_shapes.append({
+                'shape_id': shape_id,
+                'kind': kind,
+                'role': role,
+                'quality_role': quality_role,
+                'bounds': shape_rect(left, top, width, height),
+                'text': safe_text(text),
+                'font_size': font_size,
+            })
+
         bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, SLIDE_W, SLIDE_H)
         bg.fill.solid()
         bg.fill.fore_color.rgb = rgb(palette['bg'])
         bg.line.color.rgb = rgb(palette['bg'])
+        record_shape(f'{slide_id}-background', 'shape', 0, 0, SLIDE_W, SLIDE_H, 'background', quality_role='decorative')
         bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(0.5), SLIDE_H)
         bar.fill.solid()
         bar.fill.fore_color.rgb = rgb(palette['accent'])
         bar.line.color.rgb = rgb(palette['accent'])
+        record_shape(f'{slide_id}-accent-bar', 'shape', 0, 0, Inches(0.5), SLIDE_H, 'accent_bar', quality_role='decorative')
         add_textbox(
             slide,
             Inches(1.15),
@@ -191,6 +347,17 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             rgb(palette['ink']),
             bold=True,
         )
+        record_shape(
+            f'{slide_id}-title',
+            'text_box',
+            Inches(1.15),
+            Inches(0.55),
+            Inches(13.3),
+            Inches(0.92),
+            'title',
+            safe_text(slide_data.get('title'), f'Slide {index}'),
+            32,
+        )
         add_textbox(
             slide,
             Inches(1.15),
@@ -201,9 +368,31 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             18,
             rgb(palette['muted']),
         )
+        record_shape(
+            f'{slide_id}-core-sentence',
+            'text_box',
+            Inches(1.15),
+            Inches(1.62),
+            Inches(13.3),
+            Inches(0.72),
+            'core_sentence',
+            safe_text(slide_data.get('core_sentence')),
+            18,
+        )
         top = Inches(3.05)
-        for point_index, point in enumerate(slide_points(slide_data)[:4], 1):
+        points = slide_points(slide_data)[:4]
+        for point_index, point in enumerate(points, 1):
             panel = add_panel(slide, Inches(1.25), top, Inches(13.3), Inches(0.78), rgb(palette['panel']))
+            record_shape(
+                f'{slide_id}-point-{point_index}-panel',
+                'shape',
+                Inches(1.25),
+                top,
+                Inches(13.3),
+                Inches(0.78),
+                'content_panel',
+                quality_role='decorative',
+            )
             add_textbox(
                 slide,
                 Inches(1.45),
@@ -215,6 +404,17 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
                 rgb(palette['accent']),
                 bold=True,
             )
+            record_shape(
+                f'{slide_id}-point-{point_index}-index',
+                'text_box',
+                Inches(1.45),
+                top + Inches(0.13),
+                Inches(0.45),
+                Inches(0.34),
+                'point_index',
+                str(point_index),
+                18,
+            )
             add_textbox(
                 slide,
                 Inches(2.1),
@@ -225,28 +425,58 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
                 15,
                 rgb(palette['ink']),
             )
+            record_shape(
+                f'{slide_id}-point-{point_index}-text',
+                'text_box',
+                Inches(2.1),
+                top + Inches(0.11),
+                Inches(11.8),
+                Inches(0.42),
+                'point_text',
+                point,
+                15,
+            )
             top += Inches(0.96)
+        footer_text = f'{slide_id} / {index} of {len(slides)}'
         add_textbox(
             slide,
             Inches(1.15),
             Inches(8.25),
             Inches(13.3),
             Inches(0.3),
-            f'{safe_text(slide_data.get("slide_id"), f"S{index:02d}")} / {index} of {len(slides)}',
+            footer_text,
             10,
             rgb(palette['muted']),
         )
-        preview_file = preview_dir / f'{index:02d}-{safe_text(slide_data.get("slide_id"), f"S{index:02d}")}.png'
+        record_shape(
+            f'{slide_id}-footer',
+            'text_box',
+            Inches(1.15),
+            Inches(8.25),
+            Inches(13.3),
+            Inches(0.3),
+            'page_number',
+            footer_text,
+            10,
+        )
+        preview_file = preview_dir / f'{index:02d}-{slide_id}.png'
         render_preview(slide_data, index, len(slides), preview_file, palette, repaired)
         preview_files.append(str(preview_file))
+        quality = evaluate_native_slide_quality(native_shapes, len(points))
         manifest_slides.append({
-            'slide_id': safe_text(slide_data.get('slide_id'), f'S{index:02d}'),
+            'slide_id': slide_id,
             'title': safe_text(slide_data.get('title'), f'Slide {index}'),
             'layout_family': safe_text(slide_data.get('layout_family')),
             'title_font_size': 32,
             'shape_count': len(slide.shapes),
             'text_box_count': sum(1 for shape in slide.shapes if getattr(shape, 'has_text_frame', False)),
             'preview_screenshot_file': str(preview_file),
+            'preview_screenshot_sha256': file_sha256(preview_file),
+            'preview_screenshot_dimensions': {'width': CANVAS_PX[0], 'height': CANVAS_PX[1]},
+            'native_shapes': native_shapes,
+            'checks': quality['checks'],
+            'metrics': quality['metrics'],
+            'issues': quality['issues'],
             'repaired': repaired,
         })
     output_pptx.parent.mkdir(parents=True, exist_ok=True)
@@ -316,6 +546,22 @@ def main() -> None:
         'artifact_kind': 'ppt_deck_native_shape_manifest',
         'engine_contract': engine_contract,
         'engine_contract_file': str(engine_contract_file),
+        'native_quality_model': 'shape_manifest_layout_metrics_v1',
+        'native_quality_surface': {
+            'quality_model': 'shape_manifest_layout_metrics_v1',
+            'source_surface_kind': 'native_pptx',
+            'required_per_slide_metrics': [
+                'bounds',
+                'text_char_count',
+                'primary_points',
+                'occupied_ratio',
+                'edge_clearance',
+                'overlap_pairs',
+                'preview_screenshot_sha256',
+                'preview_screenshot_dimensions',
+            ],
+            'fail_closed_when_missing': True,
+        },
         'mode': args.mode,
         'editable_artifact': True,
         'pptx_file': str(output_pptx),
@@ -339,6 +585,8 @@ def main() -> None:
         'pptx_file': str(output_pptx),
         'pdf_file': str(output_pdf) if output_pdf else None,
         'shape_manifest_file': str(shape_manifest),
+        'native_quality_model': manifest['native_quality_model'],
+        'native_quality_surface': manifest['native_quality_surface'],
         'preview_screenshots': preview_files,
         'screenshot_dimensions': manifest['screenshot_dimensions'],
         'slides': manifest_slides,
