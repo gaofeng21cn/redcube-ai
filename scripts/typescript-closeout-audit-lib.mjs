@@ -145,8 +145,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/managed-deliverable.js',
     'src/managed-event-log.js',
     'src/managed-run-store.js',
-    'src/ppt-deck-runtime.js',
-    'src/ppt-deck.js',
     'src/product-entry-session-store.js',
     'src/run-store.js',
     'src/runtime-state.js',
@@ -158,8 +156,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/source-intake.js',
     'src/source-readiness-pack.js',
     'src/source-research.js',
-    'src/xiaohongshu-runtime.js',
-    'src/xiaohongshu.js',
   ],
   'packages/redcube-runtime-family-poster-onepager': [
     'src/index.js',

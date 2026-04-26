@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -21,6 +21,10 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   assert.equal(runtimePackageJson.dependencies['@redcube/runtime-family-registry'], '0.1.0');
   assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-ppt']), false);
   assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-xiaohongshu']), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/ppt-deck.js')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/ppt-deck-runtime.js')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/xiaohongshu.js')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/xiaohongshu-runtime.js')), false);
   assert.equal(executors.includes("@redcube/runtime-family-registry"), true);
   assert.equal(executors.includes("@redcube/runtime-family-ppt"), false);
   assert.equal(executors.includes("@redcube/runtime-family-xiaohongshu"), false);
