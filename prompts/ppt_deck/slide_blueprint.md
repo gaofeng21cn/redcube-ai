@@ -2,7 +2,8 @@
 
 ## 批准蓝图合同
 
-- 如果 detailed_outline 或 operator_playbook 中存在用户已审阅批准的逐页故事线，必须逐页展开为同一页数、同一顺序、同一标题覆盖的 slide_blueprint。
+- 如果 detailed_outline、operator_playbook 或 source_materials_full_text 中存在用户已审阅批准或资料包明确给出的逐页故事线，必须逐页展开为同一页数、同一顺序、同一标题覆盖的 slide_blueprint。
+- 如果上下文提供 `approved_slide_plan`，slide_blueprint 必须逐页保留，不得合并、删减或压缩。
 - 不得合并、删减、压缩或重排已批准页面；长讲座只能在视觉表达上优化，不能改写成交付范围更小的短 deck。
 - 如果批准稿是 20 分钟以上的完整讲座，slide_blueprint 必须继续服务完整讲座节奏，而不是转成 6-9 页概览。
 

@@ -145,6 +145,65 @@ test('ppt manuscript sync blocks abstract outlines without visible paper evidenc
   });
 });
 
+test('ppt authoring preserves numbered source slide plans as approved outline contracts', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-numbered-plan-'));
+    const sourceFile = path.join(workspaceRoot, 'numbered-plan.md');
+    const slidePlan = Array.from({ length: 21 }, (_, index) => {
+      const pageNo = index + 1;
+      return `${pageNo}. 第${pageNo}页：研究同步逐页结构，覆盖封面、背景、方法、结果、边界或结束。`;
+    }).join('\n');
+    writeFileSync(sourceFile, `# 科室研究同步资料\n\n## 推荐逐页内容\n\n${slidePlan}\n`, 'utf-8');
+
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-plan',
+      title: '研究同步逐页计划',
+      brief: '按资料包逐页计划生成正式PPT，不超过30页。',
+      keywords: ['研究同步', '逐页计划'],
+      sourceFiles: [sourceFile],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-plan',
+      deliverableId: 'deck-plan',
+      title: '研究同步逐页计划',
+      goal: '按资料包中的21页逐页结构展开，不超过30页。',
+    });
+
+    assert.equal((await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-plan',
+      deliverableId: 'deck-plan',
+      route: 'storyline',
+    })).ok, true);
+
+    const outlineResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-plan',
+      deliverableId: 'deck-plan',
+      route: 'detailed_outline',
+    });
+    assert.equal(outlineResult.ok, true);
+    const outlineArtifact = readJson(path.join(
+      workspaceRoot,
+      'topics',
+      'topic-plan',
+      'deliverables',
+      'deck-plan',
+      'artifacts',
+      'detailed_outline.json',
+    ));
+    assert.equal(outlineArtifact.detailed_outline.slides.length, 21);
+    assert.equal(outlineArtifact.detailed_outline.slides[20].slide_no, '21');
+  });
+});
+
 test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-generation-'));

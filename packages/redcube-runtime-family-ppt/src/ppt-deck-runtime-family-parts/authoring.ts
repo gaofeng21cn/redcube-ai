@@ -104,13 +104,14 @@ export function createPptDeckAuthoringParts(deps) {
   }
 
   function extractApprovedSlidePlan(contract) {
-    const operatorCorpus = sharedOperatorMaterials(contract)
+    const corpus = [
+      ...sharedOperatorMaterials(contract),
+      ...audienceFacingMaterials(contract),
+    ]
       .map((material) => safeText(material?.content_text || material?.excerpt))
       .filter(Boolean)
       .join('\n\n');
-    const matches = [...operatorCorpus.matchAll(/^##\s+Slide\s+(\d+)\s*[：:.-]?\s*(.*)$/gim)];
-    if (matches.length === 0) return null;
-
+    const matches = [...corpus.matchAll(/^##\s+Slide\s+(\d+)\s*[：:.-]?\s*(.*)$/gim)];
     const bySlideNo = new Map();
     for (const match of matches) {
       const slideNo = Number(match[1]);
@@ -120,6 +121,45 @@ export function createPptDeckAuthoringParts(deps) {
         title: safeText(match[2]),
       });
     }
+    if (bySlideNo.size === 0) {
+      const lines = corpus.split(/\r?\n/);
+      const groups = [];
+      let current = [];
+      const flush = () => {
+        if (current.length > 0) {
+          groups.push(current);
+          current = [];
+        }
+      };
+      for (const line of lines) {
+        const match = line.match(/^\s*(\d{1,3})[.、)、)]\s*(\S[\s\S]*)$/);
+        const slideNo = match ? Number(match[1]) : null;
+        const rawTitle = match ? safeText(match[2]) : '';
+        const slideLike = /页|封面|结束|总览|目录|论文|研究|结果|边界|问题|模型|评分|队列|方法|证据|slide|PPT|汇报|总结|引言|结论|临床|终点/i.test(rawTitle);
+        if (!Number.isFinite(slideNo) || slideNo <= 0 || !slideLike) {
+          flush();
+          continue;
+        }
+        const previous = current[current.length - 1];
+        if (current.length === 0 || slideNo === previous.slide_no + 1) {
+          current.push({
+            slide_no: slideNo,
+            title: rawTitle.replace(new RegExp(`^第\\s*${slideNo}\\s*页\\s*[：:.-]?\\s*`), '').trim() || rawTitle,
+          });
+        } else {
+          flush();
+          current.push({ slide_no: slideNo, title: rawTitle });
+        }
+      }
+      flush();
+      const numberedSlides = groups
+        .filter((group) => group.length >= 6 && (group[0].slide_no === 1 || group.length >= 10))
+        .sort((a, b) => b.length - a.length)[0] || [];
+      for (const slide of numberedSlides) {
+        if (!bySlideNo.has(slide.slide_no)) bySlideNo.set(slide.slide_no, slide);
+      }
+    }
+    if (bySlideNo.size === 0) return null;
     const slides = [...bySlideNo.values()].sort((a, b) => a.slide_no - b.slide_no);
     return {
       total_slides: slides.length,
@@ -141,6 +181,14 @@ export function createPptDeckAuthoringParts(deps) {
       if (actual.slide_no !== expected.slide_no) {
         throw new Error(`${label} must preserve approved slide order at index ${index + 1}: expected Slide ${expected.slide_no}, got Slide ${actual.slide_no}`);
       }
+    }
+  }
+
+  function assertPageBudget(slides, contract, label) {
+    const budget = pageBudget(contract.profile_id, contract);
+    const slideCount = safeArray(slides).length;
+    if (slideCount < Number(budget.min_slides) || slideCount > Number(budget.max_slides)) {
+      throw new Error(`${label} must honor page_budget ${budget.min_slides}-${budget.max_slides} from ${budget.source}: got ${slideCount} slides`);
     }
   }
 
@@ -324,6 +372,7 @@ export function createPptDeckAuthoringParts(deps) {
     if (slides.length < 6) {
       throw new Error('upstream ppt detailed_outline must contain at least 6 slides');
     }
+    assertPageBudget(slides, contract, 'upstream ppt detailed_outline');
     assertApprovedSlidePlan(slides, contract, 'upstream ppt detailed_outline');
     assertManuscriptEvidenceDensity(slides, contract, 'upstream ppt detailed_outline');
     return {
@@ -338,6 +387,7 @@ export function createPptDeckAuthoringParts(deps) {
     if (slides.length < 6) {
       throw new Error('upstream ppt slide_blueprint must contain at least 6 slides');
     }
+    assertPageBudget(slides, contract, 'upstream ppt slide_blueprint');
     assertApprovedSlidePlan(slides, contract, 'upstream ppt slide_blueprint');
     assertManuscriptEvidenceDensity(slides, contract, 'upstream ppt slide_blueprint');
     return {

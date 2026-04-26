@@ -2,7 +2,8 @@
 
 ## 审阅与批准合同
 
-- 如果 product-entry / operator_playbook / source_truth 中出现用户已审阅批准的故事主线、详细大纲或逐页蓝图，必须保留其页数、顺序、标题与叙事层级。
+- 如果 product-entry / operator_playbook / source_truth / source_materials_full_text 中出现用户已审阅批准或资料包明确给出的故事主线、详细大纲或逐页蓝图，必须保留其页数、顺序、标题与叙事层级。
+- 如果上下文提供 `approved_slide_plan`，输出页数、顺序和标题覆盖必须与它一致；不得把 21 页逐页计划压缩成 12 页概览。
 - 不得把已批准的长讲座压缩成短课件、课堂摘要或少页版本。
 - 如果用户要求“先给我审阅、审阅后再继续”，本 stage 是人工审阅停靠点，输出必须足够支持后续完整 deck，而不是终稿压缩版。
 
