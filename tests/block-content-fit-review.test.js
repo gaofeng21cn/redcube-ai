@@ -149,6 +149,139 @@ function runReviewWithOverflowingBlock() {
   return JSON.parse(result.stdout);
 }
 
+function runReviewWithDecorativeGroundOverlap() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-decorative-ground-review-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+
+  const inspection = {
+    slideId: 'S05',
+    title: '2026 年 AI 能力跃迁',
+    layoutFamily: 'multi_zone_compare',
+    speakerSeconds: 65,
+    primaryPoints: 1,
+    wrapper: {
+      clientWidth: 1152,
+      clientHeight: 648,
+      scrollWidth: 1152,
+      scrollHeight: 648,
+    },
+    bodyScroll: false,
+    blocks: [
+      {
+        id: 'visual-ground',
+        left: 24,
+        top: 24,
+        width: 1104,
+        height: 592,
+        right: 1128,
+        bottom: 616,
+        area: 653568,
+        textNodeCount: 0,
+        hasSurfaceFrame: true,
+      },
+      {
+        id: 'header',
+        left: 54,
+        top: 34,
+        width: 1044,
+        height: 118,
+        right: 1098,
+        bottom: 152,
+        area: 123192,
+        textNodeCount: 2,
+        hasSurfaceFrame: false,
+      },
+      {
+        id: 'main-card',
+        left: 64,
+        top: 178,
+        width: 1012,
+        height: 244,
+        right: 1076,
+        bottom: 422,
+        area: 246928,
+        textNodeCount: 2,
+        hasSurfaceFrame: true,
+      },
+      {
+        id: 'footer',
+        left: 54,
+        top: 590,
+        width: 1044,
+        height: 28,
+        right: 1098,
+        bottom: 618,
+        area: 29232,
+        textNodeCount: 1,
+        hasSurfaceFrame: false,
+      },
+    ],
+    auditBlocks: [],
+    titleMeta: {
+      titleFontSize: 44,
+      titleLineCount: 1,
+      titleBlockId: 'header',
+    },
+  };
+
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:1152px;height:648px;overflow:hidden;position:relative;background:#F7F8FC;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="S05" data-title="2026 年 AI 能力跃迁" data-layout-family="multi_zone_compare" data-speaker-seconds="65" style="position:relative;width:1152px;height:648px;">
+        <div data-qa-block="visual-ground" style="position:absolute;left:24px;top:24px;width:1104px;height:592px;border-radius:30px;background:linear-gradient(135deg,rgba(37,99,235,0.05),rgba(20,184,166,0.05));"></div>
+        <div data-qa-block="header" style="position:absolute;left:54px;top:34px;width:1044px;height:118px;">
+          <div style="font-size:44px;line-height:1.12;font-weight:780;">2026 年 AI 能力跃迁</div>
+          <div style="font-size:24px;line-height:1.4;font-weight:650;color:#475569;margin-top:8px;">AI 正在组织多步工作。</div>
+        </div>
+        <div data-qa-block="main-card" data-primary-point="true" style="position:absolute;left:64px;top:178px;width:1012px;height:244px;border-radius:30px;background:#FFFFFF;border:1px solid #CBD5E1;padding:28px;box-sizing:border-box;">
+          <div style="font-size:21px;line-height:1.18;font-weight:720;">回答 → 协作 → 工作流</div>
+          <div style="font-size:16.5px;line-height:1.45;font-weight:600;color:#475569;margin-top:16px;">质量控制与医生监督进入同一条主线。</div>
+        </div>
+        <div data-qa-block="footer" style="position:absolute;left:54px;top:590px;width:1044px;height:28px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:#475569;border-top:1px solid #CBD5E1;">
+          <div>OPL 系列项目介绍</div><div>05</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const inspection = ${JSON.stringify(inspection)};
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() { return inspection; },
+      inspectCurrentSlide() { return inspection; }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '5',
+      '--frame-width',
+      '1152',
+      '--frame-height',
+      '648',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
 function runReviewWithUnframedHeader() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-header-'));
   const htmlFile = path.join(workspaceRoot, 'deck.html');
@@ -595,6 +728,15 @@ test('shared screenshot review blocks surfaced block content that spills out of 
   assert.equal(payload.slide_reviews[0].issues.includes('block_content_overflow_detected'), true);
   assert.equal(Array.isArray(payload.slide_reviews[0].metrics.block_content_failures), true);
   assert.equal(payload.slide_reviews[0].metrics.block_content_failures.length > 0, true);
+});
+
+test('shared screenshot review ignores decorative ground containers for occlusion and density', () => {
+  const payload = runReviewWithDecorativeGroundOverlap();
+  assert.equal(payload.status, 'pass');
+  assert.equal(payload.slide_reviews[0].checks.occlusion_free, true);
+  assert.equal(payload.slide_reviews[0].checks.visual_density_ok, true);
+  assert.deepEqual(payload.slide_reviews[0].metrics.overlaps, []);
+  assert.equal(payload.slide_reviews[0].metrics.occupied_ratio < 0.82, true);
 });
 
 test('shared screenshot review does not treat unframed header groups as block content overflow', () => {
