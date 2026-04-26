@@ -29,6 +29,7 @@ assertRequiredRuntimeSharedResolution({ repoRoot });
 assertCurrentRepoSharedPinAlignment({ repoRoot });
 
 const META = [
+  'tests/ai-first-authoring-boundary.test.js',
   'tests/bilingual-home-readme.test.js',
   'tests/ci-workflow.test.js',
   'tests/candidate-racing.test.js',
@@ -155,6 +156,7 @@ const HISTORICAL = [
 ];
 
 const FAST = [
+  'tests/ai-first-authoring-boundary.test.js',
   'tests/typescript-baseline.test.js',
   'tests/typescript-closeout-audit.test.js',
   'tests/runtime-protocol-workspace.test.js',

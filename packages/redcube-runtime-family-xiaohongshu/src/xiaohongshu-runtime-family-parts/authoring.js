@@ -13,7 +13,6 @@ export function createXiaohongshuAuthoringParts(deps) {
     normalizeStringList,
     normalizeVisualAnchorSystem,
     promptRoute,
-    promptSeed,
     publicSources,
     readStageArtifact,
     requireObjectArray,
@@ -38,12 +37,11 @@ export function createXiaohongshuAuthoringParts(deps) {
   } = deps;
 
   function buildResearch(contract, adapter = CODEX_DEFAULT_ADAPTER) {
-    const seed = promptSeed(contract, 'research', { title: contract.title });
     const references = sourceTruth(contract)
       ? sourceLabels(contract)
-      : safeArray(seed?.research?.reference_source_list).length > 0 ? seed.research.reference_source_list : publicSources();
+      : publicSources();
     const topicSummary = sourceTopicSummary(contract)
-      || safeText(seed?.research?.topic_summary, `${contract.title} 面向患者做可信、可发布的小红书图文`);
+      || `${safeText(contract.title, '本主题')} 需要根据任务目标和可用资料生成可信、可发布的小红书图文`;
     return {
       ...attachCommon('research', contract, null, adapter),
       source_readiness: {
@@ -66,7 +64,7 @@ export function createXiaohongshuAuthoringParts(deps) {
         evidence_gaps: sourceEvidenceGaps(contract),
         blocking_evidence_gaps: sourceBlockingEvidenceGaps(contract),
         residual_evidence_gaps: sourceResidualEvidenceGaps(contract),
-        forbidden_source_hit_count: Number(seed?.research?.forbidden_source_hit_count || 0),
+        forbidden_source_hit_count: 0,
         input_mode: sourceInputMode(contract) || 'seed_only',
         confidence: sourceConfidence(contract) || 'low',
         source_sufficiency_judgement: sourceSufficiencyStatus(contract),
@@ -263,7 +261,7 @@ export function createXiaohongshuAuthoringParts(deps) {
     });
     const titleOptions = normalizeStringList(data?.title_options, 'single_note_plan.title_options', { min: 3, max: 5 });
     const sources = sourceLabels(contract).slice(0, 3);
-    const slides = requireObjectArray(data?.slides, 'single_note_plan.slides', { min: 4, max: 8 })
+    const slides = requireObjectArray(data?.slides, 'single_note_plan.slides', { min: 1 })
       .map((slide, index) => normalizePlanSlide(slide, index, sources, generationRuntime, adapter));
     return {
       authoredPlan: {
@@ -332,8 +330,8 @@ export function createXiaohongshuAuthoringParts(deps) {
           main_accent: requireText(data?.material_rules?.main_accent, 'visual_direction.material_rules.main_accent'),
           warning_accent: requireText(data?.material_rules?.warning_accent, 'visual_direction.material_rules.warning_accent'),
         },
-        rhythm_curve: requireObjectArray(data?.rhythm_curve, 'visual_direction.rhythm_curve', { min: 4, max: 8 }),
-        peak_pages: normalizeStringList(data?.peak_pages, 'visual_direction.peak_pages', { min: 1, max: 4 }),
+        rhythm_curve: requireObjectArray(data?.rhythm_curve, 'visual_direction.rhythm_curve', { min: 1 }),
+        peak_pages: normalizeStringList(data?.peak_pages, 'visual_direction.peak_pages', { min: 1 }),
         page_family_ceiling: data?.page_family_ceiling || {},
         anti_template_constraints: normalizeStringList(data?.anti_template_constraints, 'visual_direction.anti_template_constraints', { min: 2, max: 6 }),
         source_language_discipline: requireText(data?.source_language_discipline, 'visual_direction.source_language_discipline'),

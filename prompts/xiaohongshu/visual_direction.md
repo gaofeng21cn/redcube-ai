@@ -1,6 +1,14 @@
 # xiaohongshu / visual_direction
 
 视觉导演稿是 HTML 前硬前置。
+## AI-first 视觉导演合同
+
+- 必须基于当前 `single_note_plan.slides` 的真实页数、真实 `slide_id` 与页面内容生成视觉导演稿。
+- `rhythm_curve` 必须覆盖当前 plan 的每一页；不得照抄 N01-N06 示例，也不得把内容强行压成固定 6 页。
+- `peak_pages` 必须从当前 plan 的真实 `slide_id` 中选择，数量由内容峰值决定。
+- `page_family_ceiling` 由 AI 根据当前 note 的页面数量、layout family 分布与同构风险自行设定；它是视觉多样性约束，不是页数预算。
+- 不得把 `runtime_seed` 或输出 schema 中的占位值当成默认视觉方向。
+
 要求：
 - 必须显式包含 visual motif / rhythm curve / peak pages / page family ceiling / forbidden regressions / anti-template constraints / source language discipline / visual anchor system / signature exposure grammar
 - 不是“风格描述 + 颜色建议”
@@ -10,45 +18,34 @@
 - 必须显式定义相邻可读块安全间距：副标题、主卡、步骤条、底部收束、署名之间要有清楚呼吸；视觉贴住按失败处理
 
 ## runtime_seed
+
+下列 JSON 只说明字段形状，不提供默认 6 页节奏、固定峰值页或固定页面家族配额。
+
 ```json
 {
   "visual_direction": {
-    "director_statement": "像一个认真做过整理的人，把复杂内容画成可收藏的笔记",
-    "visual_motif": "米白纸面 + 蓝色高亮 + 红色纠偏批注 + 便签式收束",
+    "director_statement": "<AI-authored director statement for the current single_note_plan>",
+    "visual_motif": "<AI-authored visual motif>",
     "material_rules": {
-      "paper_base": "米白纸 + 轻网格",
+      "paper_base": "<AI-authored paper/base material>",
       "main_accent": "#2563EB",
       "warning_accent": "#DC2626"
     },
     "rhythm_curve": [
-      {"slide_id":"N01","role":"hook_peak"},
-      {"slide_id":"N02","role":"tension"},
-      {"slide_id":"N03","role":"clarify"},
-      {"slide_id":"N04","role":"mechanism_peak"},
-      {"slide_id":"N05","role":"evidence_peak"},
-      {"slide_id":"N06","role":"memory_close"}
+      {"slide_id":"<slide_id from current single_note_plan>","role":"<AI-authored visual role>"}
     ],
-    "peak_pages": ["N01", "N04", "N05"],
+    "peak_pages": ["<slide_id from current single_note_plan>"],
     "page_family_ceiling": {
-      "cover_note": 1,
-      "myth_compare": 1,
-      "sequence_stack": 1,
-      "process_track": 1,
-      "evidence_strip": 1,
-      "action_checklist": 1
+      "<layout_family from current single_note_plan>": "<AI-authored reuse ceiling for this note>"
     },
     "anti_template_constraints": [
-      "禁止连续两页退化成同构白底卡片堆叠",
-      "封面、机制页、证据页必须首眼差异明显",
-      "不能把所有页面压成同一标题+三卡骨架",
-      "相邻可读文字块、卡片与底部收束条之间必须保留安全间距，视觉贴住按失败处理"
+      "<AI-authored anti-template constraint>",
+      "<AI-authored anti-template constraint>"
     ],
-    "source_language_discipline": "来源必须翻译成读者能理解的公开口径，不允许内部资料/来源索引/内部文件名",
+    "source_language_discipline": "<AI-authored source-language discipline>",
     "forbidden_regressions": [
-      "白底卡片网格页",
-      "统一安全科技卡片页",
-      "历史成品拼装",
-      "有高亮无结构、像装饰页"
+      "<AI-authored forbidden regression>",
+      "<AI-authored forbidden regression>"
     ]
   }
 }

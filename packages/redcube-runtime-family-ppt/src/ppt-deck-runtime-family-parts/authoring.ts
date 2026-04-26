@@ -103,7 +103,7 @@ export function createPptDeckAuthoringParts(deps) {
     }));
   }
 
-  function extractApprovedSlidePlan(contract) {
+  function extractSourceSlidePlanSuggestions(contract) {
     const corpus = [
       ...sharedOperatorMaterials(contract),
       ...audienceFacingMaterials(contract),
@@ -175,33 +175,28 @@ export function createPptDeckAuthoringParts(deps) {
     if (bySlideNo.size === 0) return null;
     const slides = [...bySlideNo.values()].sort((a, b) => a.slide_no - b.slide_no);
     return {
+      binding: 'suggestion_only',
+      policy: 'Source slide plans are planning suggestions for the AI authoring stage. They are not approved contracts and must not be used by validators to force page count, order, or title coverage.',
       total_slides: slides.length,
       slides,
     };
   }
 
-  function assertApprovedSlidePlan(slides, contract, label) {
-    const approvedPlan = extractApprovedSlidePlan(contract);
-    if (!approvedPlan) return;
-
-    if (slides.length !== approvedPlan.total_slides) {
-      throw new Error(`${label} must preserve approved slide plan: expected ${approvedPlan.total_slides} slides, got ${slides.length}`);
-    }
-
-    for (let index = 0; index < approvedPlan.slides.length; index += 1) {
-      const expected = approvedPlan.slides[index];
-      const actual = slides[index];
-      if (actual.slide_no !== expected.slide_no) {
-        throw new Error(`${label} must preserve approved slide order at index ${index + 1}: expected Slide ${expected.slide_no}, got Slide ${actual.slide_no}`);
-      }
-    }
-  }
-
-  function assertPageBudget(slides, contract, label) {
+  function assertPageConstraints(slides, contract, label) {
     const budget = pageBudget(contract.profile_id, contract);
     const slideCount = safeArray(slides).length;
-    if (slideCount < Number(budget.min_slides) || slideCount > Number(budget.max_slides)) {
-      throw new Error(`${label} must honor page_budget ${budget.min_slides}-${budget.max_slides} from ${budget.source}: got ${slideCount} slides`);
+    const constraints = budget?.hard_constraints || {};
+    const exactSlides = Number(constraints.exact_slides);
+    if (Number.isFinite(exactSlides) && exactSlides > 0 && slideCount !== exactSlides) {
+      throw new Error(`${label} must honor hard exact slide count ${exactSlides}: got ${slideCount} slides`);
+    }
+    const minSlides = Number(constraints.min_slides);
+    if (Number.isFinite(minSlides) && minSlides > 0 && slideCount < minSlides) {
+      throw new Error(`${label} must honor hard minimum slide count ${minSlides}: got ${slideCount} slides`);
+    }
+    const maxSlides = Number(constraints.max_slides);
+    if (Number.isFinite(maxSlides) && maxSlides > 0 && slideCount > maxSlides) {
+      throw new Error(`${label} must honor hard maximum slide count ${maxSlides}: got ${slideCount} slides`);
     }
   }
 
@@ -382,11 +377,10 @@ export function createPptDeckAuthoringParts(deps) {
   function normalizeOutlineDraft(data, contract) {
     const defaultPublicSources = sharedSourceLabels(contract);
     const slides = safeArray(data?.slides).map((slide, index) => normalizeOutlineSlide(slide, index, defaultPublicSources));
-    if (slides.length < 6) {
-      throw new Error('upstream ppt detailed_outline must contain at least 6 slides');
+    if (slides.length === 0) {
+      throw new Error('upstream ppt detailed_outline must contain at least one slide');
     }
-    assertPageBudget(slides, contract, 'upstream ppt detailed_outline');
-    assertApprovedSlidePlan(slides, contract, 'upstream ppt detailed_outline');
+    assertPageConstraints(slides, contract, 'upstream ppt detailed_outline');
     assertManuscriptEvidenceDensity(slides, contract, 'upstream ppt detailed_outline');
     return {
       chapter_structure: normalizeChapterStructure(data?.chapter_structure, slides),
@@ -397,11 +391,10 @@ export function createPptDeckAuthoringParts(deps) {
   function normalizeBlueprintDraft(data, contract) {
     const defaultPublicSources = sharedSourceLabels(contract);
     const slides = safeArray(data?.slides).map((slide, index) => normalizeOutlineSlide(slide, index, defaultPublicSources));
-    if (slides.length < 6) {
-      throw new Error('upstream ppt slide_blueprint must contain at least 6 slides');
+    if (slides.length === 0) {
+      throw new Error('upstream ppt slide_blueprint must contain at least one slide');
     }
-    assertPageBudget(slides, contract, 'upstream ppt slide_blueprint');
-    assertApprovedSlidePlan(slides, contract, 'upstream ppt slide_blueprint');
+    assertPageConstraints(slides, contract, 'upstream ppt slide_blueprint');
     assertManuscriptEvidenceDensity(slides, contract, 'upstream ppt slide_blueprint');
     return {
       chapter_goal: requireText(data?.chapter_goal, 'slide_blueprint.chapter_goal'),
@@ -465,7 +458,7 @@ export function createPptDeckAuthoringParts(deps) {
         { min: 2, max: 6 },
       ),
       rhythm_curve: normalizeRhythmCurve(data?.rhythm_curve, slides),
-      peak_pages: normalizeStringList(data?.peak_pages, 'visual_direction.peak_pages', { min: 2, max: 6 }),
+      peak_pages: normalizeStringList(data?.peak_pages, 'visual_direction.peak_pages', { min: 1, max: 12 }),
       page_family_ceiling: data?.page_family_ceiling && typeof data.page_family_ceiling === 'object'
         ? data.page_family_ceiling
         : (() => {
@@ -564,15 +557,10 @@ export function createPptDeckAuthoringParts(deps) {
         page_no: { font_size: 18, line_height: 1.0, font_weight: 600 },
       },
       continuity_constraints: ['<string>', '<string>'],
-      rhythm_curve: [{ slide_id: 'S01', role: 'opening_peak' }],
-      peak_pages: ['S01', 'S04'],
+      rhythm_curve: [{ slide_id: '<slide_id from current slide_blueprint>', role: '<visual role>' }],
+      peak_pages: ['<slide_id from current slide_blueprint>'],
       page_family_ceiling: {
-        cover_signal: 1,
-        multi_zone_compare: 2,
-        timeline_band: 1,
-        judgement_ladder: 1,
-        ring_cross: 1,
-        summary_peak: 1,
+        '<layout_family from current slide_blueprint>': '<AI-authored reuse ceiling>',
       },
       forbidden_regressions: ['<string>', '<string>'],
       final_instruction_to_html_generator: ['<string>', '<string>'],
@@ -635,6 +623,7 @@ export function createPptDeckAuthoringParts(deps) {
   function buildAuthoringContext(contract) {
     const preset = deckPreset(contract.profile_id);
     const speakerIdentity = resolveSpeakerIdentity(contract, preset.speaker);
+    const pagePlanningContract = pageBudget(contract.profile_id, contract);
     return {
       title: safeText(contract.title),
       delivery_goal: safeText(contract.goal),
@@ -644,7 +633,8 @@ export function createPptDeckAuthoringParts(deps) {
       speaker_role: preset.speaker,
       audience: sharedSourceAudience(contract, preset.audience),
       promise: preset.promise,
-      page_budget: pageBudget(contract.profile_id, contract),
+      page_budget: pagePlanningContract,
+      page_planning_contract: pagePlanningContract,
       page_library: PPT_PAGE_LIBRARY,
       source_fact_summary: sharedFactLibrarySummary(contract),
       ready_sources: sharedSourceLabels(contract),
@@ -675,6 +665,7 @@ export function createPptDeckAuthoringParts(deps) {
           'page_objective',
           'visual_anchor_tracks',
           'operator_playbook',
+          'operator_playbook_full_text',
           'revision_context',
           'source_id',
           'material_id',
@@ -707,7 +698,7 @@ export function createPptDeckAuthoringParts(deps) {
           '发表表达边界',
         ],
       },
-      approved_slide_plan: extractApprovedSlidePlan(contract),
+      source_slide_plan_suggestions: extractSourceSlidePlanSuggestions(contract),
       operator_playbook_full_text: fullOperatorMaterials(contract),
       authoring_guardrails: [
         '如果 operator_playbook_full_text 提供了具名讲者署名，speaker / speaker_signature 必须保留 exact identity，不得泛化成“同行讲者”“正式讲者”等占位标签',
@@ -720,6 +711,7 @@ export function createPptDeckAuthoringParts(deps) {
         '如果 content_density_contract.purpose 是 manuscript_submission_sync，页面主语必须是论文故事、结论和数字证据；不要改写成应用价值、管理建议或科室价值宣传',
         '如果 source_evidence_extraction_contract 存在，storyline 必须先从 source_materials_full_text 全文产出 manuscript_evidence_table；outline、blueprint 和 render 后续阶段必须沿用这张结构化证据表',
         'source_materials_full_text 是完整资料，不是摘要；storyline、detailed_outline、slide_blueprint 必须通读全文后选择论文故事、结论与证据，不能只依赖开头、标题或 source_fact_summary',
+        'source_slide_plan_suggestions、page_budget.planning_signals 和 source_fact_summary 只是 AI 规划参考；页数和故事结构由 AI 基于全文资料与 hard_constraints 决定，不得把建议逐页内容当作批准合同',
       ],
     };
   }

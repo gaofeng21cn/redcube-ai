@@ -132,20 +132,28 @@ test('ppt manuscript sync blocks abstract outlines without visible paper evidenc
       /357|57\/357|16\.0|AUROC|Brier/,
     );
 
-    const outlineResult = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route: 'detailed_outline',
+    const restoreOutlineVariant = withEnv({
+      REDCUBE_MOCK_PPT_OUTLINE_VARIANT: 'abstract_manuscript',
     });
+    let outlineResult;
+    try {
+      outlineResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'detailed_outline',
+      });
+    } finally {
+      restoreOutlineVariant();
+    }
 
     assert.equal(outlineResult.ok, false);
     assert.match(outlineResult.run?.error?.message || '', /manuscript sync requires/);
   });
 });
 
-test('ppt authoring preserves numbered source slide plans as approved outline contracts', async () => {
+test('ppt authoring treats numbered source slide plans as suggestions, not approved outline contracts', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-numbered-plan-'));
     const sourceFile = path.join(workspaceRoot, 'numbered-plan.md');
@@ -159,7 +167,7 @@ test('ppt authoring preserves numbered source slide plans as approved outline co
       workspaceRoot,
       topicId: 'topic-plan',
       title: '研究同步逐页计划',
-      brief: '按资料包逐页计划生成正式PPT，不超过30页。',
+      brief: '资料包逐页计划只作为参考，生成正式PPT不超过30页。',
       keywords: ['研究同步', '逐页计划'],
       sourceFiles: [sourceFile],
     });
@@ -171,7 +179,7 @@ test('ppt authoring preserves numbered source slide plans as approved outline co
       topicId: 'topic-plan',
       deliverableId: 'deck-plan',
       title: '研究同步逐页计划',
-      goal: '按资料包中的21页逐页结构展开，不超过30页。',
+      goal: '资料包中的21页逐页结构只作为参考，不超过30页。',
     });
 
     assert.equal((await runDeliverableRoute({
@@ -199,8 +207,8 @@ test('ppt authoring preserves numbered source slide plans as approved outline co
       'artifacts',
       'detailed_outline.json',
     ));
-    assert.equal(outlineArtifact.detailed_outline.slides.length, 21);
-    assert.equal(outlineArtifact.detailed_outline.slides[20].slide_no, '21');
+    assert.notEqual(outlineArtifact.detailed_outline.slides.length, 21);
+    assert.equal(outlineArtifact.detailed_outline.slides.length <= 30, true);
   });
 });
 

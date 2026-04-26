@@ -211,17 +211,7 @@ export function createPptDeckCoreHelpers({
   }
 
   function promptSeed(route, vars = {}) {
-    const rendered = promptPackJsonSection(route, 'runtime_seed', vars);
-    if (!rendered) return null;
-    const profileId = safeText(vars.profile_id);
-    if (profileId && rendered?.profile_variants?.[profileId] && typeof rendered.profile_variants[profileId] === 'object') {
-      const { profile_variants, ...base } = rendered;
-      return {
-        ...base,
-        ...rendered.profile_variants[profileId],
-      };
-    }
-    return rendered;
+    return promptPackJsonSection(route, 'runtime_seed', vars);
   }
 
   function promptPackJsonSection(route, section, vars = {}) {
@@ -339,7 +329,7 @@ export function createPptDeckCoreHelpers({
 
   function sharedSourceAudience(contract, fallback) {
     const materialCorpus = sharedSourceMaterials(contract)
-      .map((material) => extractAudienceFacingSnippet(material.content_text, 240))
+      .map((material) => safeText(material.content_text))
       .filter(Boolean)
       .join(' ');
     const corpus = materialCorpus || safeText(sharedSourceTruth(contract)?.source_brief?.brief_text);

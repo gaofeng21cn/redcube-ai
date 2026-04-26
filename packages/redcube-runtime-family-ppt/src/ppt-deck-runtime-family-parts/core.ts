@@ -463,7 +463,7 @@ export function createPptDeckRuntimeCore() {
   
   function pageBudget(profileId, contract = null) {
     void profileId;
-    const textFields = [
+    const directTextFields = [
       safeText(contract?.title),
       safeText(contract?.goal),
       safeText(contract?.user_intent),
@@ -471,10 +471,12 @@ export function createPptDeckRuntimeCore() {
       safeText(contract?.delivery_request?.goal),
       safeText(contract?.delivery_request?.user_intent),
       safeText(contract?.delivery_request?.userIntent),
-      safeText(contract?.shared_source_truth?.source_brief?.brief_text),
-      safeText(contract?.source_truth?.source_brief?.brief_text),
       safeText(contract?.operator_playbook?.brief_text),
       safeText(contract?.operator_playbook?.user_intent),
+    ];
+    const sourceTextFields = [
+      safeText(contract?.shared_source_truth?.source_brief?.brief_text),
+      safeText(contract?.source_truth?.source_brief?.brief_text),
       ...safeArray(contract?.shared_source_truth?.extracted_materials?.materials)
         .flatMap((material) => [
           safeText(material?.title),
@@ -497,9 +499,9 @@ export function createPptDeckRuntimeCore() {
           safeText(material?.excerpt),
         ]),
     ];
-    const corpus = [
-      ...textFields,
-    ].filter(Boolean).join('\n');
+    const directCorpus = directTextFields.filter(Boolean).join('\n');
+    const sourceCorpus = sourceTextFields.filter(Boolean).join('\n');
+    const corpus = [directCorpus, sourceCorpus].filter(Boolean).join('\n');
     const numberValue = (value) => {
       const number = Number(value);
       return Number.isFinite(number) && number > 0 ? Math.floor(number) : null;
@@ -528,39 +530,49 @@ export function createPptDeckRuntimeCore() {
       }
       return digits[raw] || null;
     };
-    const upperBoundMatch = [...corpus.matchAll(/(?:不超过|最多|上限|不多于|至多|<=|≤)\s*(\d{1,3})\s*(?:页|张|slides?)/gi)]
+
+    const hardConstraints = {};
+    const planningSignals = [];
+    const addSignal = (signal) => {
+      const key = JSON.stringify(signal);
+      if (planningSignals.some((item) => JSON.stringify(item) === key)) return;
+      planningSignals.push(signal);
+    };
+    const firstHardUpperBound = [...directCorpus.matchAll(/(?:不超过|最多|上限|不多于|至多|<=|≤)\s*(\d{1,3})\s*(?:页|张|slides?)/gi)]
       .map((match) => numberValue(match[1]))
       .find((value) => value !== null);
-    const clampBudget = (minSlides, maxSlides, source, options = {}) => {
-      let min = numberValue(minSlides);
-      let max = numberValue(maxSlides);
-      if (min === null || max === null) return null;
-      if (min > max) {
-        [min, max] = [max, min];
-      }
-      const ceiling = upperBoundMatch ?? (options.defaultCeiling ? 30 : null);
-      if (ceiling !== null) {
-        max = Math.min(max, ceiling);
-        min = Math.min(min, max);
-      }
-      if (min < 1 || max < 1 || min > max) return null;
-      return { min_slides: min, max_slides: max, source };
-    };
-    const firstRangeMatch = [...corpus.matchAll(/(?:建议|目标|期望|控制在|页数|幻灯片|deck|slides?)?[^\d\n]{0,10}(\d{1,3})\s*(?:[-–—~至到])\s*(\d{1,3})\s*(?:页|张|slides?)/gi)]
-      .map((match) => clampBudget(match[1], match[2], 'explicit_request_range'))
-      .find(Boolean);
-    if (firstRangeMatch) {
-      return firstRangeMatch;
+    if (firstHardUpperBound !== undefined) {
+      hardConstraints.max_slides = firstHardUpperBound;
     }
-    const firstExactMatch = [
-      ...corpus.matchAll(/(?:生成|制作|做成|总页数|目标页数|幻灯片(?:页数)?|deck|slides?|共|合计|需要|请做|控制在)\s*(\d{1,3})\s*(?:页|张|slides?)(?!\s*(?:以内|以下|内))/gi),
-      ...corpus.matchAll(/(?:^|[，。；,;\s])(\d{1,3})\s*(?:页|张)\s*(?:PPT|幻灯片|deck)/gi),
+    const firstHardLowerBound = [...directCorpus.matchAll(/(?:不少于|至少|下限|不低于|>=|≥)\s*(\d{1,3})\s*(?:页|张|slides?)/gi)]
+      .filter((match) => !/(?:每(?:一)?(?:篇|个|项|部分|研究)|per\s+(?:paper|item|section))\s*$/i.test(directCorpus.slice(Math.max(0, match.index - 12), match.index)))
+      .map((match) => numberValue(match[1]))
+      .find((value) => value !== null);
+    if (firstHardLowerBound !== undefined) {
+      hardConstraints.min_slides = firstHardLowerBound;
+    }
+    const firstHardExact = [
+      ...directCorpus.matchAll(/(?:必须|固定|正好|恰好|严格|总页数)\s*(?:做成|生成|制作|控制为|为|=)?\s*(\d{1,3})\s*(?:页|张|slides?)(?!\s*(?:以内|以下|内))/gi),
+      ...directCorpus.matchAll(/(?:做成|生成|制作)\s*(\d{1,3})\s*(?:页|张|slides?)\s*(?:整|固定|版本)?/gi),
     ]
-      .filter((match) => !/(?:不超过|最多|上限|不多于|至多|<=|≤)\s*$/i.test(corpus.slice(Math.max(0, match.index - 8), match.index)))
-      .map((match) => clampBudget(match[1], match[1], 'explicit_request_count'))
-      .find(Boolean);
-    if (firstExactMatch) {
-      return firstExactMatch;
+      .filter((match) => !/(?:不超过|最多|上限|不多于|至多|<=|≤|建议|推荐)\s*$/i.test(directCorpus.slice(Math.max(0, match.index - 10), match.index)))
+      .map((match) => numberValue(match[1]))
+      .find((value) => value !== null);
+    if (firstHardExact !== undefined) {
+      hardConstraints.exact_slides = firstHardExact;
+    }
+
+    for (const match of corpus.matchAll(/(?:建议|推荐|目标|期望|控制在|页数|幻灯片|deck|slides?)?[^\d\n]{0,10}(\d{1,3})\s*(?:[-–—~至到])\s*(\d{1,3})\s*(?:页|张|slides?)/gi)) {
+      let min = numberValue(match[1]);
+      let max = numberValue(match[2]);
+      if (min === null || max === null) continue;
+      if (min > max) [min, max] = [max, min];
+      addSignal({
+        kind: 'suggested_range',
+        min_slides: min,
+        max_slides: max,
+        binding: 'suggestion_only',
+      });
     }
     const countExplicitSlidePlanItems = () => {
       const countConsecutive = (numbers) => {
@@ -633,11 +645,12 @@ export function createPptDeckRuntimeCore() {
       return Math.max(slideHeadingCount, numberedListCount);
     };
     const slidePlanCount = countExplicitSlidePlanItems();
-    const slidePlanBudget = slidePlanCount > 0
-      ? clampBudget(slidePlanCount, slidePlanCount, 'source_slide_plan_count')
-      : null;
-    if (slidePlanBudget) {
-      return slidePlanBudget;
+    if (slidePlanCount > 0) {
+      addSignal({
+        kind: 'source_slide_plan_suggestion',
+        total_slides: slidePlanCount,
+        binding: 'suggestion_only',
+      });
     }
     const countNamedItems = () => {
       const ordinals = new Set(
@@ -662,35 +675,19 @@ export function createPptDeckRuntimeCore() {
       .sort((a, b) => b - a)[0] || 0;
     const namedItemCount = countNamedItems();
     if (perItemMinimum > 0 && namedItemCount > 0) {
-      const framingSlides = namedItemCount > 1 ? 4 : 2;
-      const minSlides = namedItemCount * perItemMinimum + framingSlides;
-      const maxSlides = minSlides + Math.min(4, namedItemCount + 1);
-      const perItemBudget = clampBudget(minSlides, maxSlides, 'per_item_minimum_request', { defaultCeiling: true });
-      if (perItemBudget) {
-        return perItemBudget;
-      }
+      addSignal({
+        kind: 'per_item_coverage_guidance',
+        named_item_count: namedItemCount,
+        per_item_minimum_slides: perItemMinimum,
+        binding: 'suggestion_only',
+      });
     }
-    const lines = corpus.split(/\r?\n/);
-    const sectionCount = lines.filter((line) => /^\s{0,3}#{1,4}\s+\S/.test(line)).length;
-    const bulletCount = lines.filter((line) => /^\s*(?:[-*•]|\d{1,2}[.、)])\s+\S/.test(line)).length;
-    const contentLength = corpus.replace(/\s+/g, '').length;
-    const contentUnits = Math.max(
-      sectionCount,
-      Math.ceil(bulletCount / 3),
-      Math.ceil(contentLength / 900),
-    );
-    if (contentUnits >= 4) {
-      const minSlides = Math.max(6, Math.min(24, contentUnits + 2));
-      const maxSlides = Math.max(minSlides, Math.min(30, minSlides + Math.ceil(contentUnits / 3) + 2));
-      const contentUnitBudget = clampBudget(minSlides, maxSlides, 'content_unit_count', { defaultCeiling: true });
-      if (contentUnitBudget) {
-        return contentUnitBudget;
-      }
-    }
-    const volumeMin = contentLength >= 2400 ? 10 : contentLength >= 1200 ? 8 : 6;
-    const volumeMax = volumeMin + (contentLength >= 1200 ? 6 : 4);
-    return clampBudget(volumeMin, volumeMax, contentLength > 0 ? 'content_volume' : 'minimal_content', { defaultCeiling: true })
-      || { min_slides: 6, max_slides: 10, source: 'minimal_content' };
+    return {
+      contract_id: 'ppt_deck_ai_first_page_constraints_v1',
+      policy: 'Program only carries explicit hard page constraints. Suggested ranges, source slide plans, and per-item coverage hints are context for the AI authoring stage, not validator-owned slide budgets. The full source text is provided so AI decides page count and structure directly.',
+      hard_constraints: hardConstraints,
+      planning_signals: planningSignals,
+    };
   }
   
   function requireText(value, label) {

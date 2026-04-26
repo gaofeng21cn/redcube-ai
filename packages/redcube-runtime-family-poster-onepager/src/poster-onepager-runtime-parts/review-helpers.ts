@@ -183,9 +183,8 @@ export function createPosterOnepagerReviewHelpers({
   }
 
   function sourceTopicSummary(contract: PosterContractSummary): string {
-    return extractAudienceFacingSnippet(sourceMaterials(contract)[0]?.content_text || sourceMaterials(contract)[0]?.excerpt, 220)
-      || extractAudienceFacingSnippet(sourceTruth(contract)?.source_brief?.brief_text, 220)
-      || safeText(contract.title);
+    return safeText(contract.title)
+      || safeText(sourceTruth(contract)?.source_brief?.brief_text);
   }
 
 

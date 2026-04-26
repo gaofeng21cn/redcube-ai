@@ -111,7 +111,7 @@ function sourceMaterialsFullText(contract: JsonRecord): JsonRecord[] {
     .filter((material) => material.content_text);
 }
 
-function extractApprovedSlidePlanFromMaterials(materials: JsonRecord[]): JsonRecord | null {
+function extractSourceSlidePlanSuggestionsFromMaterials(materials: JsonRecord[]): JsonRecord | null {
   const corpus = materials
     .map((material) => safeText(material.content_text || material.excerpt))
     .filter(Boolean)
@@ -180,7 +180,12 @@ function extractApprovedSlidePlanFromMaterials(materials: JsonRecord[]): JsonRec
   }
   if (bySlideNo.size === 0) return null;
   const slides = [...bySlideNo.values()].sort((a, b) => Number(a.slide_no) - Number(b.slide_no));
-  return { total_slides: slides.length, slides };
+  return {
+    binding: 'suggestion_only',
+    policy: 'Source slide plans are authoring suggestions for AI context, not approved slide contracts.',
+    total_slides: slides.length,
+    slides,
+  };
 }
 
 function manuscriptEvidenceTableForAudit(contract: JsonRecord, deliverablePaths: JsonRecord): unknown[] {
@@ -227,7 +232,7 @@ export function buildSourceAuthoringContext({
       content_bytes: materials.reduce((sum, material) => sum + Buffer.byteLength(safeText(material.content_text), 'utf-8'), 0),
     },
     source_materials_full_text: materials,
-    approved_slide_plan: extractApprovedSlidePlanFromMaterials(materials),
+    source_slide_plan_suggestions: extractSourceSlidePlanSuggestionsFromMaterials(materials),
     manuscript_evidence_table: manuscriptEvidenceTableForAudit(contract, deliverablePaths),
   };
 }

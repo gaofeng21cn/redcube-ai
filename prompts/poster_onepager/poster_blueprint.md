@@ -1,66 +1,40 @@
 # poster_onepager / poster_blueprint
 
 单页海报 blueprint 是正式 Story Architecture stage。
-要求：
-- 明确 headline / subheadline / render_recipe_id / panels / anchor_tracks
-- 每个 panel 必须给出 region / label / text / support_points
-- 不允许只留模糊区块名，不允许把 visual_direction 混进同一段描述
+
+## AI-first 蓝图合同
+
+- 明确 `headline` / `subheadline` / `render_recipe_id` / `panels` / `anchor_tracks`。
+- 每个 panel 必须给出 `region` / `label` / `text` / `support_points`。
+- 不允许只留模糊区块名，不允许把 visual_direction 混进同一段描述。
+- 必须根据 storyline、`source_materials_full_text` 和海报目标自行组织 panel；不得复制本 prompt 的占位语言或固定 hero/proof/pathway/cta 文案。
 
 ## runtime_seed
+
+下列 JSON 只说明字段形状，不提供固定四段故事、固定行动清单或默认运营话术。
+
 ```json
 {
   "poster_blueprint": {
-    "render_recipe_id": "poster.evidence_columns",
-    "headline": "{{headline}}",
-    "subheadline": "{{subheadline}}",
+    "render_recipe_id": "poster.<allowed_recipe_id>",
+    "headline": "<AI-authored headline from storyline>",
+    "subheadline": "<AI-authored subheadline from storyline>",
     "panels": [
       {
-        "panel_id": "hero",
-        "region": "hero_band",
-        "label": "先看这句",
-        "text": "{{headline}}",
+        "panel_id": "<stable panel id>",
+        "region": "<hero_band | evidence_columns | pathway_strip | action_footer | AI-authored region>",
+        "label": "<audience-facing panel label>",
+        "text": "<audience-facing panel text grounded in source_materials_full_text>",
         "support_points": [
-          "{{why_now}}",
-          "读者真正要判断的是：{{audience_judgement}}"
-        ]
-      },
-      {
-        "panel_id": "proof",
-        "region": "evidence_columns",
-        "label": "为什么可信",
-        "text": "{{proof_promise}}",
-        "support_points": [
-          "公开来源 1：{{source_label_1}}",
-          "公开来源 2：{{source_label_2}}"
-        ]
-      },
-      {
-        "panel_id": "pathway",
-        "region": "pathway_strip",
-        "label": "怎么照着做",
-        "text": "先读 headline，再看证据，再执行动作。",
-        "support_points": [
-          "动作 1：先确认当前问题是不是这张海报要解决的事",
-          "动作 2：再看公开来源给出的边界",
-          "动作 3：最后执行一个最小动作"
-        ]
-      },
-      {
-        "panel_id": "cta",
-        "region": "action_footer",
-        "label": "带走的动作",
-        "text": "{{call_to_action}}",
-        "support_points": [
-          "把这张图保存下来",
-          "需要时按同一顺序复核"
+          "<source-backed support point>",
+          "<source-backed support point>"
         ]
       }
     ],
     "anchor_tracks": [
-      "hero-band",
-      "evidence-columns",
-      "pathway-strip",
-      "action-footer"
+      "<visual anchor track>",
+      "<visual anchor track>",
+      "<visual anchor track>"
     ]
   }
 }

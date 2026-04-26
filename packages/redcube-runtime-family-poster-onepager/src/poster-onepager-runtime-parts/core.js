@@ -545,6 +545,7 @@ export function createPosterOnepagerRuntimeCore() {
     if (blueprintSlides.length === 0) {
       throw new Error('upstream poster render_html requires poster_blueprint slides');
     }
+    const peakRegion = safeText(visualArtifact?.visual_direction?.peak_region) || (() => { throw new Error('poster render_html requires visual_direction.peak_region from AI-authored visual direction'); })();
     const slides = blueprintSlides.map((slide) => {
       const rawContent = slideHtmlById.get(slide.slide_id);
       if (!rawContent) {
@@ -566,7 +567,6 @@ export function createPosterOnepagerRuntimeCore() {
         generationRuntime,
         adapter,
       });
-      const peakRegion = safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band');
       const content = authoringValidateRenderedReviewAnchors(
         hydrateRenderedSlideRootMetadata(rawContent, {
           'data-title': slide.title,
@@ -618,7 +618,7 @@ export function createPosterOnepagerRuntimeCore() {
       pack_id: safeText(contract?.prompt_pack?.pack_id),
       authored_markup_surface: CREATIVE_MATERIALIZED_FROM,
       markup_binding_model: 'slides_data_shell_only',
-      peak_region: safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band'),
+      peak_region: peakRegion,
       slides: slides.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
@@ -663,7 +663,7 @@ export function createPosterOnepagerRuntimeCore() {
         render_strategy: renderPlan.render_strategy,
         director_contract: {
           poster_motif: safeText(visualArtifact?.visual_direction?.poster_motif),
-          peak_region: safeText(visualArtifact?.visual_direction?.peak_region, 'hero_band'),
+          peak_region: peakRegion,
           page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
           anti_template_constraints: safeArray(visualArtifact?.visual_direction?.anti_template_constraints),
         },

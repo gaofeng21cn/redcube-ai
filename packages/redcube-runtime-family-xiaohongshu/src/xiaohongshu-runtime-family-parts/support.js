@@ -116,37 +116,6 @@ export function publicSources() {
   ];
 }
 
-function inferAudience(contract) {
-  const joined = `${safeText(contract.title)} ${safeText(contract.goal)}`;
-  if (/门诊|患者|科普/.test(joined)) {
-    return '门诊患者和家属：更关心先做什么、怎么避免走弯路，而不是完整术语体系';
-  }
-  if (/医生|临床/.test(joined)) {
-    return '临床一线读者：更关心判断顺序、误区成本与可执行动作';
-  }
-  return '泛知识读者：更关心先理解冲突，再拿走一个能立刻复用的动作';
-}
-
-function inferWhyNow(contract) {
-  const joined = `${safeText(contract.title)} ${safeText(contract.goal)}`;
-  if (/AI|工具/.test(joined)) {
-    return '因为工具和信息都变多了，越是看起来容易，越需要先把判断顺序讲清，不然最容易被表面答案带偏';
-  }
-  return '因为现在信息源更多、判断压力更大，越需要先给读者一条最短的判断路径';
-}
-
-function inferTension() {
-  return '旧习惯看起来省事，但会把判断顺序做反，最后把时间花在错误动作上';
-}
-
-function inferMemoryHook(contract) {
-  const joined = `${safeText(contract.title)} ${safeText(contract.goal)}`;
-  if (/AI|工具/.test(joined)) {
-    return '先别急着上工具，先把顺序做对';
-  }
-  return '先别急着记概念，先抓最值钱的判断句';
-}
-
 export function buildVisualAnchorSystem() {
   return {
     preferred_library: 'Font Awesome Free',
@@ -222,13 +191,6 @@ export function sourceLabels(contract) {
   return labels.length > 0 ? labels : publicSources();
 }
 
-function sourceSnippet(contract, index = 0) {
-  const materials = sourceMaterials(contract);
-  if (materials.length === 0) return '';
-  const material = materials[index % materials.length];
-  return safeText(material?.excerpt || material?.content_text).replace(/\s+/g, ' ').slice(0, 64);
-}
-
 export function sourceInputMode(contract) {
   return safeText(sourceTruth(contract)?.source_brief?.input_mode);
 }
@@ -260,47 +222,28 @@ export function sourceResidualEvidenceGaps(contract) {
 export function sourceTopicSummary(contract) {
   return safeText(
     sourceReadinessPack(contract)?.fact_library?.topic_summary,
-    sourceTruth(contract) && sourceSnippet(contract, 0)
-      ? `${contract.title} 的 shared source truth 显示：${sourceSnippet(contract, 0)}`
-      : `${contract.title} 面向患者做可信、可发布的小红书图文`,
+    sourceTruth(contract)
+      ? `${safeText(contract.title, '本主题')} 已有 shared source truth；后续 stage 必须通读 source_materials_full_text 后自行概括主题、受众、冲突与记忆点。`
+      : `${safeText(contract.title, '本主题')} 需要根据任务目标和可用资料生成可信、可发布的小红书图文。`,
   );
 }
 
 export function buildStorylineInputs(contract, research) {
   return {
+    contract_id: 'xiaohongshu_ai_first_storyline_framing_v1',
+    source_input: 'source_materials_full_text',
+    binding: 'ai_authored_required',
     mode: safeText(research?.research?.mode, 'single'),
-    audience_judgement: sourceTruth(contract) ? deriveAudienceFromSource(contract) : inferAudience(contract),
-    tension: sourceTruth(contract) ? deriveTensionFromSource(contract) : inferTension(contract),
-    why_now: sourceTruth(contract) ? deriveWhyNowFromSource(contract) : inferWhyNow(contract),
-    memory_hook: sourceTruth(contract) ? deriveMemoryHookFromSource(contract) : inferMemoryHook(contract),
+    topic_summary: safeText(research?.research?.topic_summary, sourceTopicSummary(contract)),
+    ai_authored_fields: ['audience_judgement', 'tension', 'why_now', 'memory_hook'],
+    planning_signals: {
+      series_candidate: isSeries(contract),
+      source_material_count: sourceMaterials(contract).length,
+      operator_context_material_count: operatorMaterials(contract).length,
+      source_sufficiency_status: sourceSufficiencyStatus(contract),
+    },
+    policy: 'Do not copy or derive storyline judgement from programmatic snippets. Read source_materials_full_text and author audience_judgement, tension, why_now, and memory_hook directly.',
   };
-}
-
-function deriveAudienceFromSource(contract) {
-  const materialCorpus = sourceMaterials(contract).map((material) => safeText(material.content_text)).join(' ');
-  const corpus = materialCorpus || safeText(sourceTruth(contract)?.source_brief?.brief_text);
-  if (/患者|门诊|家属/.test(corpus)) {
-    return '门诊患者和家属：更关心先做什么、怎么避免走弯路，而不是完整术语体系';
-  }
-  if (/医生|临床|同行/.test(corpus)) {
-    return '临床一线读者：更关心判断顺序、误区成本与可执行动作';
-  }
-  return inferAudience(contract);
-}
-
-function deriveWhyNowFromSource(contract) {
-  const snippet = sourceSnippet(contract, 0);
-  return snippet ? `当前输入材料反复指向的现实问题是：${snippet}` : inferWhyNow(contract);
-}
-
-function deriveTensionFromSource(contract) {
-  const snippet = sourceSnippet(contract, 1) || sourceSnippet(contract, 0);
-  return snippet ? `输入材料里的核心冲突是：${snippet}` : inferTension(contract);
-}
-
-function deriveMemoryHookFromSource(contract) {
-  const snippet = sourceSnippet(contract, 0);
-  return snippet ? `先记住这句：${snippet}` : inferMemoryHook(contract);
 }
 
 export function resolveAuthorBranding(workspaceRoot, contract) {
@@ -378,20 +321,15 @@ export function buildAuthoringContext({ workspaceRoot, contract, research = null
     delivery_goal: safeText(contract.goal),
     profile_id: contract.profile_id,
     topic_summary: safeText(research?.research?.topic_summary, sourceTopicSummary(contract)),
-    audience_seed: sourceTruth(contract) ? deriveAudienceFromSource(contract) : inferAudience(contract),
-    tension_seed: sourceTruth(contract) ? deriveTensionFromSource(contract) : inferTension(contract),
-    why_now_seed: sourceTruth(contract) ? deriveWhyNowFromSource(contract) : inferWhyNow(contract),
-    memory_hook_seed: sourceTruth(contract) ? deriveMemoryHookFromSource(contract) : inferMemoryHook(contract),
     mode: safeText(research?.research?.mode, isSeries(contract) ? 'series' : 'single'),
     ready_sources: sourceLabels(contract),
-    evidence_excerpts: sourceMaterials(contract)
-      .slice(0, 6)
+    source_materials_full_text: sourceMaterials(contract)
       .map((material) => ({
-        material_id: material.material_id,
-        source_id: material.source_id,
-        excerpt: safeText(material.content_text || material.excerpt).replace(/\s+/g, ' ').slice(0, 220),
+        material_ref: safeText(material.material_id),
+        source_ref: safeText(material.source_id),
+        content_text: safeText(material.content_text || material.excerpt),
       }))
-      .filter((item) => item.excerpt),
+      .filter((item) => item.content_text),
     source_truth: {
       input_mode: sourceInputMode(contract) || 'seed_only',
       confidence: sourceConfidence(contract) || 'low',
@@ -402,13 +340,14 @@ export function buildAuthoringContext({ workspaceRoot, contract, research = null
       residual_evidence_gaps: sourceResidualEvidenceGaps(contract),
       material_ids: sourceMaterialIds(contract),
     },
-    operator_playbook: operatorMaterials(contract)
-      .slice(0, 6)
+    operator_playbook_full_text: operatorMaterials(contract)
       .map((material) => ({
-        source_id: material.source_id,
-        excerpt: safeText(material.content_text || material.excerpt).replace(/\s+/g, ' ').slice(0, 220),
+        material_ref: safeText(material.material_id),
+        source_ref: safeText(material.source_id),
+        content_text: safeText(material.content_text || material.excerpt),
       }))
-      .filter((item) => item.excerpt),
+      .filter((item) => item.content_text),
+    ai_first_framing_contract: buildStorylineInputs(contract, research),
     author_branding: authorBranding,
     visual_anchor_system: buildVisualAnchorSystem(),
     signature_exposure_grammar: buildSignatureExposureGrammar(),
@@ -416,7 +355,8 @@ export function buildAuthoringContext({ workspaceRoot, contract, research = null
     authoring_guardrails: [
       '交付目标和制作要求不能原样进入读者可见正文。',
       '不要把内部资料、来源索引、工作流注释、系统操作说明写成小红书正文。',
-      'operator_playbook 只作为制作约束，不得被改写成标题、正文、评论区文案或来源口径。',
+      'source_materials_full_text 是完整资料输入，不得只依据 topic_summary、ready_sources 或截断 excerpt 做内容判断。',
+      'operator_playbook_full_text 只作为制作约束，不得被改写成标题、正文、评论区文案或来源口径。',
       '来源必须翻译成读者能理解的公开口径，不能直接写内部文件名。',
       '如果共享事实层不足，只能保守表达，不得编造医学结论、效果承诺或平台反馈。',
       '如果存在 author_branding，封面或结尾至少一处要有 audience-facing 署名露出，且图文与发布文案保持同一署名。',
@@ -446,7 +386,7 @@ export function singleNotePlanOutputContract() {
     title_options: ['<string>', '<string>', '<string>'],
     slides: [
       {
-        slide_id: 'N01',
+        slide_id: '<stable slide id, e.g. N01>',
         title: '<string>',
         layout_family: 'cover_note | myth_compare | sequence_stack | process_track | evidence_strip | action_checklist',
         render_recipe_id: 'xhs.hero_note',
@@ -477,15 +417,10 @@ export function visualDirectionOutputContract() {
       main_accent: '#2563EB',
       warning_accent: '#DC2626',
     },
-    rhythm_curve: [{ slide_id: 'N01', role: 'hook_peak' }],
-    peak_pages: ['N01'],
+    rhythm_curve: [{ slide_id: '<slide_id from current single_note_plan>', role: '<visual role>' }],
+    peak_pages: ['<slide_id from current single_note_plan>'],
     page_family_ceiling: {
-      cover_note: 1,
-      myth_compare: 1,
-      sequence_stack: 1,
-      process_track: 1,
-      evidence_strip: 1,
-      action_checklist: 1,
+      '<layout_family from current single_note_plan>': '<AI-authored reuse ceiling>',
     },
     anti_template_constraints: ['<string>', '<string>'],
     source_language_discipline: '<string>',

@@ -130,7 +130,7 @@ test('ppt render_html rejects internal paper IDs and talk-track meta-language', 
   );
 });
 
-test('ppt authoring page budget honors explicit source page ranges', () => {
+test('ppt authoring page budget keeps source page ranges as AI planning signals', () => {
   const pageBudget = loadFunction(
     'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
     'pageBudget',
@@ -148,14 +148,21 @@ test('ppt authoring page budget honors explicit source page ranges', () => {
     },
   };
 
-  assert.deepEqual(pageBudget('lecture_peer', contract), {
-    min_slides: 16,
-    max_slides: 22,
-    source: 'explicit_request_range',
-  });
+  const budget = pageBudget('lecture_peer', contract);
+  assert.equal(budget.contract_id, 'ppt_deck_ai_first_page_constraints_v1');
+  assert.deepEqual(budget.hard_constraints, { max_slides: 30 });
+  assert.equal(budget.min_slides, undefined);
+  assert.equal(budget.max_slides, undefined);
+  assert.equal(
+    budget.planning_signals.some((signal) => signal.kind === 'suggested_range'
+      && signal.min_slides === 16
+      && signal.max_slides === 22
+      && signal.binding === 'suggestion_only'),
+    true,
+  );
 });
 
-test('ppt authoring page budget derives from explicit slide plans independent of profile', () => {
+test('ppt authoring page budget treats source slide plans as suggestions only', () => {
   const pageBudget = loadFunction(
     'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
     'pageBudget',
@@ -193,15 +200,20 @@ test('ppt authoring page budget derives from explicit slide plans independent of
   };
 
   const peerBudget = pageBudget('lecture_peer', contract);
-  assert.deepEqual(peerBudget, {
-    min_slides: 21,
-    max_slides: 21,
-    source: 'source_slide_plan_count',
-  });
+  assert.deepEqual(peerBudget.hard_constraints, { max_slides: 30 });
+  assert.equal(peerBudget.min_slides, undefined);
+  assert.equal(peerBudget.max_slides, undefined);
+  assert.equal(peerBudget.exact_slides, undefined);
+  assert.equal(
+    peerBudget.planning_signals.some((signal) => signal.kind === 'source_slide_plan_suggestion'
+      && signal.total_slides === 21
+      && signal.binding === 'suggestion_only'),
+    true,
+  );
   assert.deepEqual(pageBudget('executive_briefing', contract), peerBudget);
 });
 
-test('ppt authoring page budget derives per-paper minimums from task evidence', () => {
+test('ppt authoring page budget does not derive hard budgets from per-paper guidance', () => {
   const pageBudget = loadFunction(
     'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
     'pageBudget',
@@ -219,9 +231,16 @@ test('ppt authoring page budget derives per-paper minimums from task evidence', 
     },
   };
 
-  assert.deepEqual(pageBudget('lecture_peer', contract), {
-    min_slides: 16,
-    max_slides: 20,
-    source: 'per_item_minimum_request',
-  });
+  const budget = pageBudget('lecture_peer', contract);
+  assert.deepEqual(budget.hard_constraints, { max_slides: 30 });
+  assert.equal(budget.min_slides, undefined);
+  assert.equal(budget.max_slides, undefined);
+  assert.equal(budget.hard_constraints.min_slides, undefined);
+  assert.equal(
+    budget.planning_signals.some((signal) => signal.kind === 'per_item_coverage_guidance'
+      && signal.per_item_minimum_slides === 4
+      && signal.named_item_count === 3
+      && signal.binding === 'suggestion_only'),
+    true,
+  );
 });

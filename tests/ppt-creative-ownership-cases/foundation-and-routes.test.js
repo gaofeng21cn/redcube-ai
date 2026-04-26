@@ -193,7 +193,10 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const renderShell = read('prompts/ppt_deck/render_shell.html');
   const directorReviewPrompt = read('prompts/ppt_deck/director_review.md');
   const screenshotReviewPrompt = read('prompts/ppt_deck/screenshot_review.md');
-  const reviewScript = read('packages/redcube-runtime/scripts/ppt_deck_review.py');
+  const reviewScript = [
+    read('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+    read('python/redcube_ai/native_helpers/ppt_deck/review.py'),
+  ].join('\n');
   const overlayProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
 
   assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);

@@ -38,7 +38,7 @@ async function withMockHermesAndRuntimeState(testFn) {
   }
 }
 
-test('invokeProductEntry managed ppt deck preserves full manuscript source evidence and approved slide plan', SERIAL_ENV_TEST, async () => {
+test('invokeProductEntry managed ppt deck preserves full manuscript evidence without enforcing source slide suggestions', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-manuscript-source-'));
     const sourceFile = path.join(workspaceRoot, 'nfpitnet-three-papers.md');
@@ -110,8 +110,8 @@ test('invokeProductEntry managed ppt deck preserves full manuscript source evide
         deliverable_id: 'nfpitnet-deck',
         profile_id: 'lecture_peer',
         title: 'NF-PitNET 三篇待投稿论文科室同步',
-        goal: '给科室主任和同事同步三篇准备投稿的 NF-PitNET 论文。按资料包中的21页逐页结构展开，不超过30页。只讲第一篇、第二篇、第三篇的论文故事、研究问题、队列终点、方法主线、主要数字结果、结论边界和投稿口径。',
-        user_intent: '先跑到详细大纲，必须保留资料包21页计划，且所有论文结论必须有数字证据。',
+        goal: '给科室主任和同事同步三篇准备投稿的 NF-PitNET 论文，不超过30页。只讲第一篇、第二篇、第三篇的论文故事、研究问题、队列终点、方法主线、主要数字结果、结论边界和投稿口径。',
+        user_intent: '先跑到详细大纲。资料包中的推荐逐页内容只作为参考，页数和结构由 AI 基于完整材料与硬约束决定，且所有论文结论必须有数字证据。',
         stop_after_stage: 'detailed_outline',
       },
     });
@@ -138,8 +138,8 @@ test('invokeProductEntry managed ppt deck preserves full manuscript source evide
       storyline.storyline.manuscript_evidence_table[0].key_numeric_results.join('\n'),
       /57\/357|16\.0|AUROC|Brier|1\.04/,
     );
-    assert.equal(outline.detailed_outline.slides.length, 21);
-    assert.equal(Number(outline.detailed_outline.slides.at(-1).slide_no), 21);
+    assert.notEqual(outline.detailed_outline.slides.length, 21);
+    assert.equal(outline.detailed_outline.slides.length <= 30, true);
 
     const storylineAudit = readJson(managedRun.route_runs[0].prompt_audit_ref);
     const outlineAudit = readJson(managedRun.route_runs[1].prompt_audit_ref);
@@ -147,7 +147,9 @@ test('invokeProductEntry managed ppt deck preserves full manuscript source evide
       storylineAudit.input.source_authoring_context.source_materials_full_text[0].content_text.includes('Knosp+直径non-GTR AUROC 0.800'),
       true,
     );
-    assert.equal(storylineAudit.input.source_authoring_context.approved_slide_plan.total_slides, 21);
+    assert.equal(storylineAudit.input.source_authoring_context.approved_slide_plan, undefined);
+    assert.equal(storylineAudit.input.source_authoring_context.source_slide_plan_suggestions.total_slides, 21);
+    assert.equal(storylineAudit.input.source_authoring_context.source_slide_plan_suggestions.binding, 'suggestion_only');
     assert.equal(outlineAudit.input.source_authoring_context.manuscript_evidence_table.length, 3);
     assert.equal(
       outlineAudit.input.source_authoring_context.source_materials_full_text[0].content_text.length > quietOpening.length,

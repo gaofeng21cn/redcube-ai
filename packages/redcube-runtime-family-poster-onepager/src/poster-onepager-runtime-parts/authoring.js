@@ -9,7 +9,6 @@ export function createPosterOnepagerAuthoringParts(deps) {
     attachCommon,
     creativeExecution,
     creativeSourceStamp,
-    extractAudienceFacingSnippet,
     generateStructuredArtifact,
     lifecycleStageForRoute,
     normalizeInlineText: providedNormalizeInlineText,
@@ -31,9 +30,8 @@ export function createPosterOnepagerAuthoringParts(deps) {
   } = deps;
 
   function sourceTopicSummary(contract) {
-    return extractAudienceFacingSnippet(sourceMaterials(contract)[0]?.content_text || sourceMaterials(contract)[0]?.excerpt, 220)
-      || extractAudienceFacingSnippet(sourceTruth(contract)?.source_brief?.brief_text, 220)
-      || safeText(contract.title);
+    return safeText(contract.title)
+      || safeText(sourceTruth(contract)?.source_brief?.brief_text);
   }
 
   function summarizePanels(slide) {
@@ -53,30 +51,31 @@ export function createPosterOnepagerAuthoringParts(deps) {
         profile_id: contract.profile_id,
         topic_summary: sourceTopicSummary(contract),
         ready_sources: sourceLabels(contract),
-        evidence_excerpts: sourceMaterials(contract)
-          .slice(0, 4)
+        source_materials_full_text: sourceMaterials(contract)
           .map((material) => ({
-            material_id: material.material_id,
-            source_id: material.source_id,
-            excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
+            material_ref: safeText(material.material_id),
+            source_ref: safeText(material.source_id),
+            title: safeText(material.title) || safeText(material.relative_path),
+            content_text: safeText(material.content_text || material.excerpt),
           }))
-          .filter((item) => item.excerpt),
+          .filter((item) => item.content_text),
         source_truth: {
           input_mode: safeText(sourceTruth(contract)?.source_brief?.input_mode, 'seed_only'),
           confidence: safeText(sourceTruth(contract)?.source_brief?.confidence, 'low'),
           material_ids: sourceMaterialIds(contract),
         },
-        operator_playbook: operatorMaterials(contract)
-          .slice(0, 6)
+        operator_playbook_full_text: operatorMaterials(contract)
           .map((material) => ({
-            source_id: material.source_id,
-            excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
+            material_ref: safeText(material.material_id),
+            source_ref: safeText(material.source_id),
+            content_text: safeText(material.content_text || material.excerpt),
           }))
-          .filter((item) => item.excerpt),
+          .filter((item) => item.content_text),
         authoring_guardrails: [
           'delivery_goal 和制作要求不能原样写进海报 headline、panel 文案或 review_summary。',
           '不要把内部工作流、模板说明、系统指令、隐藏审核口径写进读者可见内容。',
-          'operator_playbook 只作为制作约束，不得被改写成海报 headline、panel 文案、来源标签或审阅总结。',
+          'source_materials_full_text 是完整资料输入，不得只依据 topic_summary、ready_sources 或截断 excerpt 做内容判断。',
+          'operator_playbook_full_text 只作为制作约束，不得被改写成海报 headline、panel 文案、来源标签或审阅总结。',
           '如果共享事实层不足，只能做保守表达，不得编造医学结论、效果承诺或伪来源。',
           '海报必须是 AI 直接创作内容，不得退化成固定模板编译或 slot 填空产物。',
         ],
@@ -116,18 +115,12 @@ export function createPosterOnepagerAuthoringParts(deps) {
       return {
         visual_manifest: '<string>',
         poster_motif: '<string>',
-        peak_region: 'hero_band',
+        peak_region: '<region from current poster_blueprint.panels>',
         panel_emphasis: {
-          hero_band: '<string>',
-          evidence_columns: '<string>',
-          pathway_strip: '<string>',
-          action_footer: '<string>',
+          '<region from current poster_blueprint.panels>': '<AI-authored emphasis>',
         },
         page_family_ceiling: {
-          hero_band: 1,
-          evidence_columns: 1,
-          pathway_strip: 1,
-          action_footer: 1,
+          '<region from current poster_blueprint.panels>': '<AI-authored reuse ceiling>',
         },
         anti_template_constraints: ['<string>', '<string>'],
         forbidden_regressions: ['<string>', '<string>'],

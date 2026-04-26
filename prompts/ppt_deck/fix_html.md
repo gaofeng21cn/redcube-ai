@@ -18,7 +18,7 @@
 - 修复后的所有读者可见文字都必须被最近的语义化 `data-qa-block` 覆盖；裸露的底部说明、图注、讲者信息、badge、节点说明和图标旁短句都要收进可审计块
 - 不得输出 `<script>` / `<style>` block；样式只能写在元素 inline style 上
 - 不得把内部流程、revision_context、模板名、registry、审稿话术写进 audience-facing HTML
-- 必须继续遵守 `audience_visibility_contract`：`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`operator_playbook`、`source_id`、`material_id` 都是作者/系统工作面，不得在修页时被补进标题、正文、页脚、badge、图注或卡片
+- 必须继续遵守 `audience_visibility_contract`：`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`operator_playbook`、`operator_playbook_full_text`、`source_id`、`material_id` 都是作者/系统工作面，不得在修页时被补进标题、正文、页脚、badge、图注或卡片
 - 如果 blocked 页里有内部管理编号、项目编号、source/material ID 或“讲稿/备忘录/建议怎么讲”式文案，修页必须把这些内容从听众可见 HTML 中移除，并按用户对外口径改写为正式论文顺序、研究结论或边界说明
 - 正文页标题字号必须与整套 deck 的统一档位保持一致；不要靠临时缩字逃避布局
 - 必须遵守 `context.deck_style_reference.typography_plan`；正文页标题、卡片标题、正文、标签、页码要回到整套 deck 的统一字号梯度

@@ -251,7 +251,7 @@ function buildEffectivePrompt({ contract, stageContract, userIntent, upstreamSta
     `交付目标: ${safeText(contract.title)} / ${safeText(contract.goal)}`,
     `交付合同: overlay=${safeText(contract.overlay)}, profile=${safeText(contract.profile_id)}, kind=${safeText(contract.deliverable_kind)}`,
     `当前阶段: ${stageLabel(stageContract.stage_id)}`,
-    `AI资料输入: ${sourceAuthoringContext ? `source_materials_full_text=${sourceAuthoringContext.source_truth.material_count} materials, ${sourceAuthoringContext.source_truth.content_bytes} bytes; approved_slide_plan=${sourceAuthoringContext.approved_slide_plan?.total_slides || 'none'}` : 'none'}`,
+    `AI资料输入: ${sourceAuthoringContext ? `source_materials_full_text=${sourceAuthoringContext.source_truth.material_count} materials, ${sourceAuthoringContext.source_truth.content_bytes} bytes; source_slide_plan_suggestions=${sourceAuthoringContext.source_slide_plan_suggestions?.total_slides || 'none'} suggestion_only` : 'none'}`,
     `上游阶段输出: ${upstreamStageOutputs.length > 0 ? upstreamStageOutputs.map((item) => `${stageLabel(item.stage_id)}=${item.exists ? 'ready' : 'missing'}`).join(', ') : 'none'}`,
     `已有产物: ${existingArtifacts.length > 0 ? existingArtifacts.map((file) => path.basename(file)).join(', ') : 'none'}`,
     `阶段策略: prompt_file=${safeText(stageContract.prompt_file)}, output_artifact=${safeText(stageContract.output_artifact)}, requires=${safeArray(stageContract.requires_stages).join(', ') || 'none'}`,

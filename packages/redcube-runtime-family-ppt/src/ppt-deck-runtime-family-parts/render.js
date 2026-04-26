@@ -947,8 +947,8 @@ export function createPptDeckRenderStageParts(deps) {
       adapter,
     });
     const slideHtmlList = safeArray(data?.slides).filter((item) => item && typeof item === 'object');
-    if (slideHtmlList.length < 6) {
-      throw new Error(`upstream ppt ${route} must contain at least 6 slides`);
+    if (slideHtmlList.length === 0) {
+      throw new Error(`upstream ppt ${route} must contain at least one slide`);
     }
     const slideHtmlById = new Map(slideHtmlList.map((item) => [
       safeText(item.slide_id),

@@ -1,13 +1,38 @@
 import { recordParallelOverlap, readySources, safeArray, safeText, topicFocus } from './shared.js';
 
+function sourceMaterialClaim(meta) {
+  const text = safeArray(meta?.context?.source_materials_full_text)
+    .map((material) => safeText(material?.content_text))
+    .filter(Boolean)
+    .join('\n');
+  const line = text
+    .split(/\n+/)
+    .map((item) => safeText(item))
+    .find((item) => item.length > 0 && !item.startsWith('#'));
+  return line || '';
+}
+
 export function buildMockXhsStoryline(meta) {
   const context = meta?.context || {};
+  if (process.env.REDCUBE_MOCK_XHS_REQUIRE_AI_FIRST_FRAMING === '1') {
+    const forbiddenSeeds = ['audience_seed', 'tension_seed', 'why_now_seed', 'memory_hook_seed']
+      .filter((key) => Object.hasOwn(context, key));
+    if (forbiddenSeeds.length > 0) {
+      throw new Error(`mock xhs expected AI-first framing without programmatic seeds: ${forbiddenSeeds.join(', ')}`);
+    }
+    const framing = context.ai_first_framing_contract || context.framing || {};
+    if (safeText(framing.source_input) !== 'source_materials_full_text'
+      || safeText(framing.binding) !== 'ai_authored_required') {
+      throw new Error(`mock xhs expected AI-first framing contract: ${JSON.stringify(framing)}`);
+    }
+  }
+  const sourceClaim = sourceMaterialClaim(meta);
   return {
     mode: safeText(context.mode, 'single'),
-    audience_judgement: safeText(context.audience_seed, '临床读者：更关心顺序与动作'),
-    tension: safeText(context.tension_seed, '很多人一开始就抓错重点'),
-    why_now: safeText(context.why_now_seed, '信息变多，越需要先把顺序讲清'),
-    memory_hook: safeText(context.memory_hook_seed, '先别急着上工具，先把顺序做对'),
+    audience_judgement: sourceClaim || 'AI 基于完整资料判断读者最关心的顺序与动作',
+    tension: sourceClaim ? `这份材料的核心冲突是：${sourceClaim}` : 'AI 基于完整资料提炼当前最需要解释的认知冲突',
+    why_now: sourceClaim ? `现在要先讲清：${sourceClaim}` : 'AI 基于完整资料判断为什么现在需要讲清',
+    memory_hook: sourceClaim || '先读完整资料，再压成一句能带走的判断',
     hook: '先打破旧认知，再给动作收益',
     narrative_progression: [
       '先用反直觉句把读者拉停',
@@ -28,6 +53,7 @@ export function buildMockXhsPlan(meta) {
   const title = safeText(meta?.context?.title) || '未命名笔记';
   const memoryHook = safeText(meta?.context?.storyline?.memory_hook, '先别急着上工具，先把顺序做对');
   const whyNow = safeText(meta?.context?.storyline?.why_now, '信息越多，越要先做判断顺序');
+  const sourceClaim = sourceMaterialClaim(meta);
   return {
     title_options: [
       `${title}为什么很多人总抓不住重点`,
@@ -42,7 +68,7 @@ export function buildMockXhsPlan(meta) {
         render_recipe_id: 'xhs.hero_note',
         page_goal: '建立封面钩子',
         progression_role: 'hook',
-        page_core_content: ['很多人其实不是不知道，而是一开始就抓错重点', `记忆钩子：${memoryHook}`, `这篇要帮你讲清：${title} 的正确顺序`],
+        page_core_content: [sourceClaim || '很多人其实不是不知道，而是一开始就抓错重点', `记忆钩子：${memoryHook}`, `这篇要帮你讲清：${title} 的正确顺序`],
         visual_presentation: {
           layout_family: 'cover_note',
           main_visual_action: '大标题钩子 + 记忆条',

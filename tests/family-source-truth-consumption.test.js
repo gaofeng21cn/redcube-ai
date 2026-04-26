@@ -209,18 +209,18 @@ test('poster_onepager keeps guarded knowledge-poster boundary while emitting sha
 });
 
 
-test('ppt_deck preserves approved operator slide plan instead of compressing long deck', async () => {
+test('ppt_deck treats operator slide plans as suggestions unless they are approved session artifacts', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-approved-slide-plan-'));
-    const approvedOutline = Array.from({ length: 32 }, (_, index) => `## Slide ${index + 1}: 批准页 ${index + 1}`).join('\n\n');
-    const approvedOutlineFile = path.join(workspaceRoot, 'approved-outline.md');
-    writeFileSync(approvedOutlineFile, approvedOutline, 'utf-8');
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-slide-plan-suggestion-'));
+    const sourceOutline = Array.from({ length: 32 }, (_, index) => `## Slide ${index + 1}: 来源资料建议页 ${index + 1}`).join('\n\n');
+    const sourceOutlineFile = path.join(workspaceRoot, 'source-outline.md');
+    writeFileSync(sourceOutlineFile, sourceOutline, 'utf-8');
     await intakeSource({
       workspaceRoot,
       topicId: 'topic-approved-plan',
       title: 'OPL 系列项目介绍',
       brief: '介绍 OPL 系列项目和 Med Auto Science 自动科研，面向医生专家，20 分钟以上。',
-      operatorFiles: [approvedOutlineFile, approvedOutlineFile],
+      sourceFiles: [sourceOutlineFile],
     });
     await createDeliverable({
       workspaceRoot,
@@ -229,7 +229,7 @@ test('ppt_deck preserves approved operator slide plan instead of compressing lon
       topicId: 'topic-approved-plan',
       deliverableId: 'deck-approved-plan',
       title: 'OPL 系列项目介绍',
-      goal: '按用户批准的 32 页故事线继续生成完整讲座 deck',
+      goal: '来源资料里有 32 页逐页建议，但本轮没有人工批准逐页计划；AI 应基于完整资料自行规划。',
     });
 
     const storylineResult = await runDeliverableRoute({
@@ -250,9 +250,9 @@ test('ppt_deck preserves approved operator slide plan instead of compressing lon
     });
     assert.equal(outlineResult.ok, true);
     const outline = readJson(outlineResult.artifactFile);
-    assert.equal(outline.detailed_outline.slides.length, 32);
+    assert.notEqual(outline.detailed_outline.slides.length, 32);
     assert.equal(Number(outline.detailed_outline.slides[0].slide_no), 1);
-    assert.equal(Number(outline.detailed_outline.slides.at(-1).slide_no), 32);
+    assert.equal(outline.detailed_outline.slides.length >= 6, true);
 
     const blueprintResult = await runDeliverableRoute({
       workspaceRoot,
@@ -263,7 +263,7 @@ test('ppt_deck preserves approved operator slide plan instead of compressing lon
     });
     assert.equal(blueprintResult.ok, true);
     const blueprint = readJson(blueprintResult.artifactFile);
-    assert.equal(blueprint.slide_blueprint.slides.length, 32);
-    assert.equal(Number(blueprint.slide_blueprint.slides.at(-1).slide_no), 32);
+    assert.notEqual(blueprint.slide_blueprint.slides.length, 32);
+    assert.equal(blueprint.slide_blueprint.slides.length, outline.detailed_outline.slides.length);
   });
 });

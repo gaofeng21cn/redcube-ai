@@ -1,21 +1,27 @@
 # poster_onepager / storyline
 
 单页知识海报的故事主线必须先冻结导演判断，再进入 blueprint。
-要求：
-- 给出 headline / subheadline / audience_judgement / why_now / proof_promise / call_to_action
-- headline 必须能独立成立，不依赖正文补解释
-- 不允许把海报退化成信息堆叠或模板口号
+
+## AI-first 主线合同
+
+- 给出 `headline` / `subheadline` / `audience_judgement` / `why_now` / `proof_promise` / `call_to_action`。
+- `headline` 必须能独立成立，不依赖正文补解释。
+- 不允许把海报退化成信息堆叠或模板口号。
+- 必须基于 `source_materials_full_text` 和任务目标自行判断海报主张、受众、证据承诺与行动句；不得复制本 prompt 的占位结构为成稿。
 
 ## runtime_artifact
+
+下列 JSON 只说明字段形状，不提供默认 headline、默认受众或默认行动句。
+
 ```json
 {
   "storyline": {
-    "headline": "{{title}}：先抓住最值钱的判断句",
-    "subheadline": "给门诊患者一张能看完、带走、转给家人的单页海报",
-    "audience_judgement": "先看什么、为什么现在要看、看完后该怎么做",
-    "why_now": "信息很多，但真正能帮读者马上做对判断的内容太少",
-    "proof_promise": "每一块内容都要能对应公开来源或明确行动理由",
-    "call_to_action": "看完这一页后，先按海报给出的顺序执行，再去扩展阅读"
+    "headline": "<AI-authored poster headline>",
+    "subheadline": "<AI-authored poster subheadline>",
+    "audience_judgement": "<AI-authored audience judgement>",
+    "why_now": "<AI-authored why-now judgement>",
+    "proof_promise": "<AI-authored proof promise grounded in source_materials_full_text>",
+    "call_to_action": "<AI-authored call to action>"
   }
 }
 ```

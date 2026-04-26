@@ -1,6 +1,14 @@
 # ppt_deck visual_direction
 
 视觉导演稿必须在 HTML 之前完成。
+## AI-first 视觉导演合同
+
+- 必须基于当前 `slide_blueprint.slides` 的真实页数、真实 `slide_id` 与页面内容生成视觉导演稿。
+- `rhythm_curve` 必须覆盖当前 blueprint 中的每一页；不得照抄示例 slide_id，也不得把长 deck 压成固定 8 页节奏。
+- `peak_pages` 必须从当前 blueprint 的真实 `slide_id` 中选择，数量由内容峰值决定；不要默认使用 S01/S04/S06/S08。
+- `page_family_ceiling` 由 AI 根据当前 deck 的页面数量、layout family 分布与叙事重复风险自行设定；它是视觉多样性约束，不是页数预算。
+- 不得把 `runtime_seed` 或输出 schema 中的占位值当成默认视觉方向。
+
 要求：
 - 定义 visual_manifest / rhythm_curve / peak_pages / page_family_ceiling
 - 定义整套 deck 共用的 `typography_plan`，明确封面标题、正文页标题、卡片标题、正文、标签、页码等字号梯度
@@ -13,31 +21,26 @@
 - optimize_existing 时必须补 keep_old_strengths / forbidden_regressions
 
 ## runtime_seed
+
+下列 JSON 只说明字段形状，不提供默认 8 页节奏、固定峰值页或固定页面家族配额。
+
 ```json
 {
   "visual_direction": {
-    "visual_manifest": "{{title}} 采用浅底高对比、结构显式、峰值页拉节奏的成熟讲台感",
+    "visual_manifest": "<AI-authored visual thesis for the current slide_blueprint>",
     "what_it_is": [
-      "讲授型工作台",
-      "结构先行",
-      "证据与动作并重"
+      "<AI-authored visual identity>",
+      "<AI-authored visual identity>"
     ],
     "what_it_is_not": [
-      "统一安全模板页",
-      "内部占位来源页",
-      "脚本拼卡片"
+      "<forbidden visual regression>",
+      "<forbidden visual regression>"
     ],
     "allowed_elements": [
-      "结构轨道",
-      "判断梯",
-      "来源芯片",
-      "显式锚点",
-      "章节峰值页"
+      "<AI-authored allowed element>"
     ],
     "forbidden_elements": [
-      "内部资料来源",
-      "统一模板卡片墙",
-      "无锚点复杂结构"
+      "<AI-authored forbidden element>"
     ],
     "palette": {
       "canvas": "#F7F8FC",
@@ -56,75 +59,28 @@
       "page_no": { "font_size": 18, "line_height": 1.0, "font_weight": 600 }
     },
     "continuity_constraints": [
-      "关键页必须与相邻页形成明显差异",
-      "来源与页码按页控制",
-      "复杂结构页必须显式写出锚点/轨道/网格",
-      "整套 deck 必须沿用同一套字号梯度，不允许后页整体变大或变小",
-      "每页纵向信息分布要均衡，不能把主信息长期压在中段；底部要承担总结、承托或留白平衡，避免大片下空",
-      "相邻可读文字块、卡片、导语和底部说明之间必须保留安全间距，视觉贴住按失败处理"
+      "<AI-authored continuity rule for this deck>",
+      "<AI-authored continuity rule for this deck>"
     ],
     "rhythm_curve": [
       {
-        "slide_id": "S01",
-        "role": "opening_peak"
-      },
-      {
-        "slide_id": "S02",
-        "role": "stakes_rise"
-      },
-      {
-        "slide_id": "S03",
-        "role": "clarify_buffer"
-      },
-      {
-        "slide_id": "S04",
-        "role": "mechanism_peak"
-      },
-      {
-        "slide_id": "S05",
-        "role": "decision_bridge"
-      },
-      {
-        "slide_id": "S06",
-        "role": "evidence_peak"
-      },
-      {
-        "slide_id": "S07",
-        "role": "practice_bridge"
-      },
-      {
-        "slide_id": "S08",
-        "role": "closing_peak"
+        "slide_id": "<slide_id from current slide_blueprint>",
+        "role": "<AI-authored visual role for that slide>"
       }
     ],
     "peak_pages": [
-      "S01",
-      "S04",
-      "S06",
-      "S08"
+      "<slide_id from current slide_blueprint>"
     ],
     "page_family_ceiling": {
-      "cover_hero": 1,
-      "central_axis": 1,
-      "multi_zone_compare": 2,
-      "timeline_band": 1,
-      "judgement_ladder": 1,
-      "ring_cross": 1,
-      "summary_peak": 1
+      "<layout_family from current slide_blueprint>": "<AI-authored reuse ceiling for this deck>"
     },
     "forbidden_regressions": [
-      "退化成统一安全模板页",
-      "更单调",
-      "更挤",
-      "更像脚本拼卡片"
+      "<AI-authored forbidden regression>",
+      "<AI-authored forbidden regression>"
     ],
     "final_instruction_to_html_generator": [
-      "每页在 slidesData 中独立 content",
-      "复杂结构页必须显式输出锚点与轨道",
-      "关键页必须保留视觉峰值，不允许连续同构",
-      "正文页标题、卡片标题、卡片正文、标签与页码都要遵守 typography_plan 的统一级差",
-      "如果页面主信息已经集中在中上段，必须主动把底部变成有效承载区或视觉收束区，不要留下大块无意义空白",
-      "相邻读者可见块之间必须有清楚呼吸；标题区贴主面板、导语贴卡片、底部说明贴组块都要在 HTML 阶段主动避开"
+      "<AI-authored instruction for render_html>",
+      "<AI-authored instruction for render_html>"
     ]
   }
 }

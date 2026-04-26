@@ -278,7 +278,7 @@ export function createXiaohongshuRenderParts(deps) {
       deliverablePaths,
       adapter,
     );
-    const slideHtmlList = requireObjectArray(data?.slides, 'render_html.slides', { min: 4, max: 8 });
+    const slideHtmlList = requireObjectArray(data?.slides, 'render_html.slides', { min: 1 });
     const slideHtmlById = new Map(slideHtmlList.map((item) => [safeText(item.slide_id), validateRenderedSlideContent(item.content_html, safeText(item.slide_id))]));
     const slides = materializeRenderedXhsSlides({
       planArtifact: plan,

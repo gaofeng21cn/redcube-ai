@@ -1,47 +1,145 @@
 import { recordParallelOverlap, readySources, safeArray, safeText, topicFocus } from './shared.js';
 
-function approvedPlanSlides(meta) {
-  const approvedSlides = safeArray(meta?.context?.approved_slide_plan?.slides);
-  if (approvedSlides.length === 0) return [];
-  const sources = readySources(meta);
+function manuscriptOutlineSlides(meta) {
   const manuscriptEvidence = safeArray(meta?.context?.manuscript_evidence_table);
-  const evidenceForSlide = (approved, index) => {
-    const title = safeText(approved?.title);
-    const row = manuscriptEvidence.find((item) => title.includes(safeText(item?.manuscript_label)))
-      || manuscriptEvidence[index % Math.max(1, manuscriptEvidence.length)]
-      || null;
+  if (manuscriptEvidence.length === 0) return [];
+  const sources = readySources(meta);
+  const title = safeText(meta?.context?.title) || '论文同步';
+  const slides = [
+    {
+      slide_id: 'S01',
+      slide_no: 1,
+      chapter_id: 'C1',
+      page_type: 'cover_signal',
+      layout_family: 'cover_signal',
+      title,
+      page_goal: '建立论文同步范围',
+      page_objective: '说明本次只同步待投稿论文的研究故事、结论、证据和边界',
+      core_sentence: `${title} 只讲论文，不提前包装成临床应用或科室价值。`,
+      evidence_points: ['第一篇、第二篇、第三篇逐篇同步', '每篇都落到研究问题、主要终点、关键数字和边界'],
+      public_sources: [sources[0]],
+      page_core_content: ['本次同步对象是三篇准备投稿的论文', '页数由完整证据密度决定，并遵守硬性上限'],
+      visual_anchor_tracks: ['cover-title', 'speaker-identity', 'scope-strip'],
+      speaker_notes: '开场只界定论文同步范围，不讲内部管理编号。',
+      transition_sentence: '先看三篇论文之间的关系。',
+      render_recipe_id: 'ppt.hero_signal',
+    },
+    {
+      slide_id: 'S02',
+      slide_no: 2,
+      chapter_id: 'C1',
+      page_type: 'public_evidence',
+      layout_family: 'multi_zone_compare',
+      title: '三篇论文各自回答的问题不同',
+      page_goal: '建立三篇论文总览',
+      page_objective: '让听众先看到三条论文主线',
+      core_sentence: '三篇论文共享同一数据基础，但各自回答不同的投稿问题。',
+      evidence_points: manuscriptEvidence.map((row) => `${safeText(row?.manuscript_label)}：${safeText(row?.research_question)}`).slice(0, 4),
+      public_sources: [sources[0], sources[1]],
+      page_core_content: manuscriptEvidence.map((row) => `${safeText(row?.manuscript_label)}：${safeText(row?.main_conclusion)}`).slice(0, 4),
+      visual_anchor_tracks: ['three-paper-grid', 'shared-cohort-band', 'boundary-rail'],
+      speaker_notes: '先把三篇论文区分清楚。',
+      transition_sentence: '下面逐篇进入数字证据。',
+      render_recipe_id: 'ppt.compare_zones',
+    },
+  ];
+  manuscriptEvidence.forEach((row, rowIndex) => {
+    const label = safeText(row?.manuscript_label) || `第${rowIndex + 1}篇`;
     const numeric = safeArray(row?.key_numeric_results).map((item) => safeText(item)).filter(Boolean);
-    return {
-      label: safeText(row?.manuscript_label),
-      points: numeric.length > 0 ? numeric.slice(0, 2) : ['批准故事线', '逐页展开'],
-    };
-  };
-  return approvedSlides.map((approved, index) => {
-    const evidence = evidenceForSlide(approved, index);
-    return {
-      slide_id: `S${String(approved.slide_no || index + 1).padStart(2, '0')}`,
-      slide_no: Number(approved.slide_no) || index + 1,
-      chapter_id: `C${Math.min(Math.floor(index / 6) + 1, 6)}`,
-      page_type: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'closure_peak' : 'public_evidence'),
-      layout_family: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'summary_peak' : 'multi_zone_compare'),
-      title: safeText(approved.title) || `Slide ${approved.slide_no || index + 1}`,
-      page_goal: '保留批准主线',
-      page_objective: '按用户已审阅的逐页故事线继续展开',
-      core_sentence: evidence.label
-        ? `本页延续已批准故事线第 ${approved.slide_no || index + 1} 页，并保留${evidence.label}的数字证据。`
-        : `本页延续已批准故事线第 ${approved.slide_no || index + 1} 页，不压缩、不合并。`,
-      evidence_points: evidence.points,
-      public_sources: [sources[index % sources.length] || sources[0]],
-      page_core_content: [
-        `保留第 ${approved.slide_no || index + 1} 页标题与叙事位置`,
-        evidence.points[0] || '在后续视觉阶段扩写内容，而不是改变页数合同',
-      ],
-      visual_anchor_tracks: ['top-title', 'center-content', 'bottom-source-rail'],
-      speaker_notes: '这一页按批准主线继续讲，不合并到其他页面。',
-      transition_sentence: index === approvedSlides.length - 1 ? '完。' : '下一页继续沿批准主线推进。',
-      render_recipe_id: index === 0 ? 'ppt.hero_signal' : (index === approvedSlides.length - 1 ? 'ppt.summary_peak' : 'ppt.compare_zones'),
-    };
+    const firstNumeric = numeric[0] || `${label}关键数字结果`;
+    const secondNumeric = numeric[1] || firstNumeric;
+    const thirdNumeric = numeric[2] || secondNumeric;
+    const baseNo = 3 + rowIndex * 3;
+    slides.push(
+      {
+        slide_id: `S${String(baseNo).padStart(2, '0')}`,
+        slide_no: baseNo,
+        chapter_id: `C${rowIndex + 2}`,
+        page_type: 'public_evidence',
+        layout_family: 'multi_zone_compare',
+        title: `${label}：研究问题与主要终点`,
+        page_goal: `${label}问题定义`,
+        page_objective: `说明${label}回答什么问题，以及主要终点是什么`,
+        core_sentence: `${label}聚焦${safeText(row?.research_question)}，主要终点是${safeText(row?.primary_endpoint)}。`,
+        evidence_points: [firstNumeric, secondNumeric],
+        public_sources: [sources[rowIndex % sources.length] || sources[0]],
+        page_core_content: [
+          `${label}研究问题：${safeText(row?.research_question)}`,
+          `${label}主要终点：${safeText(row?.primary_endpoint)}`,
+        ],
+        visual_anchor_tracks: ['question-card', 'endpoint-card', 'source-rail'],
+        speaker_notes: `${label}先讲问题和终点。`,
+        transition_sentence: '再看方法或模型主线。',
+        render_recipe_id: 'ppt.compare_zones',
+      },
+      {
+        slide_id: `S${String(baseNo + 1).padStart(2, '0')}`,
+        slide_no: baseNo + 1,
+        chapter_id: `C${rowIndex + 2}`,
+        page_type: 'mechanism_track',
+        layout_family: 'timeline_band',
+        title: `${label}：方法主线如何支撑结论`,
+        page_goal: `${label}方法主线`,
+        page_objective: `解释${label}的方法、模型或分析策略`,
+        core_sentence: `${label}的方法主线是${safeText(row?.method_or_model)}。`,
+        evidence_points: [secondNumeric, thirdNumeric],
+        public_sources: [sources[(rowIndex + 1) % sources.length] || sources[0]],
+        page_core_content: [
+          `${label}方法或模型：${safeText(row?.method_or_model)}`,
+          `${label}结论边界：${safeText(row?.boundary)}`,
+        ],
+        visual_anchor_tracks: ['method-track', 'metric-node', 'boundary-node'],
+        speaker_notes: `${label}这里讲方法，不提前讲应用。`,
+        transition_sentence: '最后落到关键数字和投稿结论。',
+        render_recipe_id: 'ppt.timeline_rail',
+      },
+      {
+        slide_id: `S${String(baseNo + 2).padStart(2, '0')}`,
+        slide_no: baseNo + 2,
+        chapter_id: `C${rowIndex + 2}`,
+        page_type: 'public_evidence',
+        layout_family: 'multi_zone_compare',
+        title: `${label}：关键数字支持的投稿结论`,
+        page_goal: `${label}关键结果`,
+        page_objective: `把${label}的主要数字结果和结论边界讲清楚`,
+        core_sentence: `${label}的结论是${safeText(row?.main_conclusion)}。`,
+        evidence_points: [firstNumeric, secondNumeric, thirdNumeric],
+        public_sources: [sources[(rowIndex + 2) % sources.length] || sources[0]],
+        page_core_content: [
+          firstNumeric,
+          secondNumeric,
+          `边界：${safeText(row?.boundary)}`,
+        ],
+        visual_anchor_tracks: ['metric-cards', 'conclusion-band', 'boundary-strip'],
+        speaker_notes: `${label}主要数字必须听众可见。`,
+        transition_sentence: rowIndex === manuscriptEvidence.length - 1 ? '三篇论文逐篇讲完后，回到投稿口径。' : '下一篇继续同样结构。',
+        render_recipe_id: 'ppt.compare_zones',
+      },
+    );
   });
+  slides.push({
+    slide_id: `S${String(slides.length + 1).padStart(2, '0')}`,
+    slide_no: slides.length + 1,
+    chapter_id: 'C5',
+    page_type: 'closure_peak',
+    layout_family: 'summary_peak',
+    title: '最后只收束三篇论文的投稿口径',
+    page_goal: '同步投稿边界',
+    page_objective: '把三篇论文的结论和边界留给主任与同事形成共同认识',
+    core_sentence: '这次同步的目标是让大家知道三篇论文各自写了什么、证据在哪里、边界在哪里。',
+    evidence_points: manuscriptEvidence.map((row) => `${safeText(row?.manuscript_label)}：${safeText(row?.main_conclusion)}`).slice(0, 4),
+    public_sources: [sources[0], sources[1]],
+    page_core_content: ['不使用内部管理编号', '不把论文包装成已落地应用', '投稿前同步的是故事、结论、证据和边界'],
+    visual_anchor_tracks: ['summary-three-columns', 'boundary-footer'],
+    speaker_notes: '结尾只回收到三篇论文。',
+    transition_sentence: '完。',
+    render_recipe_id: 'ppt.summary_peak',
+  });
+  return slides.map((slide, index) => ({
+    ...slide,
+    slide_no: index + 1,
+    slide_id: `S${String(index + 1).padStart(2, '0')}`,
+  }));
 }
 
 function manuscriptLabels(meta) {
@@ -111,13 +209,20 @@ export function buildMockStoryline(meta) {
 }
 
 export function buildMockOutline(meta) {
-  const planSlides = approvedPlanSlides(meta);
-  if (planSlides.length > 0) {
+  const outlineVariant = safeText(process.env.REDCUBE_MOCK_PPT_OUTLINE_VARIANT);
+  const manuscriptSlides = outlineVariant === 'abstract_manuscript' ? [] : manuscriptOutlineSlides(meta);
+  if (manuscriptSlides.length > 0) {
     return {
       chapter_structure: [
-        { chapter_id: 'C1', title: '批准故事线', slide_range: `01-${String(planSlides.length).padStart(2, '0')}` },
+        { chapter_id: 'C1', title: '同步范围', slide_range: '01-02' },
+        ...safeArray(meta?.context?.manuscript_evidence_table).map((row, index) => ({
+          chapter_id: `C${index + 2}`,
+          title: safeText(row?.manuscript_label),
+          slide_range: `${String(3 + index * 3).padStart(2, '0')}-${String(5 + index * 3).padStart(2, '0')}`,
+        })),
+        { chapter_id: 'C5', title: '投稿口径', slide_range: `${String(manuscriptSlides.length).padStart(2, '0')}-${String(manuscriptSlides.length).padStart(2, '0')}` },
       ],
-      slides: planSlides,
+      slides: manuscriptSlides,
     };
   }
 

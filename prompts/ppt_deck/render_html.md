@@ -62,7 +62,7 @@
 - 如果 `content_density_contract.purpose = manuscript_submission_sync`，每篇论文的结果页必须可见呈现对应 `manuscript_evidence_table` / `evidence_points` 中的关键数字；不能把 AUROC、Brier、校准、事件率、风险梯度、Knosp 分布等退化成抽象描述
 - final HTML markup 必须由 AI 直接创作；runtime 只负责 shell 边界、审阅契约与持久化，不得退回模板编译
 - 生成的 audience-facing HTML 必须被视为当前 `authored_markup_registry` 的唯一合法来源；不得把 registry、模板名或内部制作痕迹写进画面
-- 必须遵守 `audience_visibility_contract`：`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`operator_playbook`、`revision_context`、`source_id`、`material_id` 都是作者/系统工作面，不得出现在任何听众可见标题、正文、页脚、badge、图注或卡片中
+- 必须遵守 `audience_visibility_contract`：`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`operator_playbook`、`operator_playbook_full_text`、`revision_context`、`source_id`、`material_id` 都是作者/系统工作面，不得出现在任何听众可见标题、正文、页脚、badge、图注或卡片中
 - 若源材料或 contract title/goal 中带有内部管理编号、项目编号或 source/material ID，但用户给出了对外汇报口径，HTML 只能使用对外标签；内部编号不能作为页面标题、页内 badge 或正文说明
 - 不要把“建议怎么讲”“可发表表达”“待确认的写作口径”“讲稿备忘录”渲染成给听众看的正文；这些内容只允许作为讲者备注或被改写为明确的研究边界/团队确认项
 
@@ -107,7 +107,7 @@
       "禁止输出 <script> / <style> block；如需视觉样式，直接写 inline style",
       "审阅依赖的根节点 metadata 由 runtime 注入，但 AI 仍需交付 review-ready 的 data-qa-block / data-primary-point 结构",
       "相邻读者可见 data-qa-block、导语、主卡、步骤卡、总结卡和底部说明之间必须保留至少 6px 可见安全间距；视觉贴住按失败处理",
-      "speaker_notes、transition_sentence、page_goal、page_objective、visual_anchor_tracks、operator_playbook、revision_context、source_id、material_id 不得成为听众可见 HTML 文案",
+      "speaker_notes、transition_sentence、page_goal、page_objective、visual_anchor_tracks、operator_playbook、operator_playbook_full_text、revision_context、source_id、material_id 不得成为听众可见 HTML 文案",
       "内部管理编号和项目编号必须服从用户给出的对外标签；不能把管理编号写成页面中的论文名称"
     ]
   }
