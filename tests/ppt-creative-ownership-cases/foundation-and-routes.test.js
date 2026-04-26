@@ -21,6 +21,12 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
@@ -188,7 +194,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const directorReviewPrompt = read('prompts/ppt_deck/director_review.md');
   const screenshotReviewPrompt = read('prompts/ppt_deck/screenshot_review.md');
   const reviewScript = read('packages/redcube-runtime/scripts/ppt_deck_review.py');
-  const overlayProfiles = read('packages/redcube-overlay-ppt/src/profiles.js');
+  const overlayProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
 
   assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);
   assert.equal(runtime.includes("core_metaphor: safeText(seed?.storyline?.core_metaphor)"), false);

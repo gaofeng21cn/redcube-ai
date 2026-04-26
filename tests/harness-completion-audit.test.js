@@ -124,9 +124,9 @@ test('harness audit: extension proof shows onboarding is registry-driven instead
   );
   assert.deepEqual(
     [
-      read('packages/redcube-overlay-ppt/src/profiles.js').includes("pack_id: 'ppt_deck_mainline_v1'"),
-      read('packages/redcube-overlay-xiaohongshu/src/contracts.js').includes("pack_id: 'xiaohongshu_mainline_v1'"),
-      read('packages/redcube-overlay-poster-onepager/src/contracts.js').includes("pack_id: 'poster_onepager_mainline_v1'"),
+      readImplementation('packages/redcube-overlay-ppt/src/profiles.js').includes("pack_id: 'ppt_deck_mainline_v1'"),
+      readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.js').includes("pack_id: 'xiaohongshu_mainline_v1'"),
+      readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.js').includes("pack_id: 'poster_onepager_mainline_v1'"),
     ],
     [true, true, true],
   );
