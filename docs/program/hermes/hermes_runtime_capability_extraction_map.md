@@ -8,7 +8,7 @@
 
 ### 1. Route run session envelope
 
-- 代码面：`packages/redcube-runtime/src/deliverable-routes.js`、`packages/redcube-runtime/src/run-store.js`、`packages/redcube-runtime/src/event-log.js`
+- 代码面：`packages/redcube-runtime/src/deliverable-routes.js`、`packages/redcube-runtime/src/index.js`、`packages/redcube-hermes-substrate/src/index.js`
 - Hermes 负责：run start / complete / fail、event append / read、runtime topology 落盘、run telemetry identity
 - 必须保持：`run_id` 不变；`topic_id` / `deliverable_id` 不丢；fail-closed 行为不退化
 

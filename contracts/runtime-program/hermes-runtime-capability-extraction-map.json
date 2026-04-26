@@ -7,8 +7,8 @@
       "capability": "route_run_session_envelope",
       "current_surfaces": [
         "packages/redcube-runtime/src/deliverable-routes.js",
-        "packages/redcube-runtime/src/run-store.js",
-        "packages/redcube-runtime/src/event-log.js"
+        "packages/redcube-runtime/src/index.js",
+        "packages/redcube-hermes-substrate/src/index.js"
       ],
       "required_truth": "start/complete/fail a routed run with preserved run_id/topic_id/deliverable_id and shared runtime topology"
     },

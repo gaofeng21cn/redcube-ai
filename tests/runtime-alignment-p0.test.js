@@ -61,12 +61,16 @@ test('CLI help exposes the current deliverable adapter set, including the explic
   );
 });
 
-test('current program points to the Hermes-managed mainline while retaining durable identity boundaries and historical local provenance', () => {
+test('current program points to the current mainline while retaining durable identity boundaries and historical local provenance', () => {
   const currentProgram = readJson(CURRENT_PROGRAM_CONTRACT);
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
   assert.equal(
-    currentProgram.longrun_goal.north_star.includes('move runtime substrate ownership onto upstream Hermes-Agent managed runtime'),
+    currentProgram.longrun_goal.north_star.includes('keep CLI as the default formal entry while retaining MCP as the supported protocol layer'),
+    true,
+  );
+  assert.equal(
+    currentProgram.longrun_goal.north_star.includes('preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate'),
     true,
   );
   assert.equal(currentProgram.formal_entry.default_formal_entry, 'CLI');
@@ -87,7 +91,7 @@ test('current program points to the Hermes-managed mainline while retaining dura
     'runtimeWatch',
     'ops_eval_summary',
   ]);
-  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'upstream_hermes_agent');
+  assert.equal(currentProgram.current_state.runtime_substrate_owner, 'optional_hosted_runtime_carrier');
   assert.equal(currentProgram.current_state.deployment_host, 'codex_local_operator_host');
   assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);
   assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');

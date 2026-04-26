@@ -23,7 +23,10 @@ import {
   summarizeRelativeQuality as summarizeRelativeQualityJs,
 } from '@redcube/reference-os';
 
-import { appendEvent as appendEventJs, readEvents as readEventsJs } from './event-log.js';
+import {
+  appendHermesEvent as appendEventJs,
+  readHermesEvents as readEventsJs,
+} from '@redcube/hermes-substrate';
 import { appendManagedEvent as appendManagedEventJs, readManagedEvents as readManagedEventsJs } from './managed-event-log.js';
 import {
   planCandidateRace as planCandidateRaceJs,
@@ -58,7 +61,12 @@ import {
   saveProductEntrySession as saveProductEntrySessionJs,
 } from './product-entry-session-store.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
-import { completeRun as completeRunJs, failRun as failRunJs, loadRun as loadRunJs, startRun as startRunJs } from './run-store.js';
+import {
+  completeHermesRun as completeRunJs,
+  failHermesRun as failRunJs,
+  loadHermesRun as loadRunJs,
+  startHermesRun as startRunJs,
+} from '@redcube/hermes-substrate';
 import {
   createManagedRun as createManagedRunJs,
   loadManagedProgressProjection as loadManagedProgressProjectionJs,

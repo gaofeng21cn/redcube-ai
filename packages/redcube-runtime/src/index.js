@@ -3,7 +3,10 @@ export {
   reviewRenderedDeliverable,
   watchRuntimeReviewLoop,
 } from '@redcube/governance';
-export { appendEvent, readEvents } from './event-log.js';
+export {
+  appendHermesEvent as appendEvent,
+  readHermesEvents as readEvents,
+} from '@redcube/hermes-substrate';
 export { appendManagedEvent, readManagedEvents } from './managed-event-log.js';
 export { planCandidateRace, runCandidateRaceRoute, selectCandidateRaceWinner } from './candidate-racing.js';
 export {
@@ -29,7 +32,11 @@ export { getManagedRun, runManagedDeliverable, superviseManagedRun } from './man
 export { executeManagedDagLayers, planManagedDeliverableDag } from './managed-dag-scheduler.js';
 export { loadProductEntrySession, productEntrySessionDir, productEntrySessionFile, saveProductEntrySession } from './product-entry-session-store.js';
 export { resolveExecutorAdapter } from './executors.js';
-export { completeRun, loadRun, startRun } from './run-store.js';
+export {
+  completeHermesRun as completeRun,
+  loadHermesRun as loadRun,
+  startHermesRun as startRun,
+} from '@redcube/hermes-substrate';
 export {
   createManagedRun,
   loadManagedProgressProjection,
