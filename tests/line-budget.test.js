@@ -19,7 +19,7 @@ test('test:meta runs the line budget guard before meta tests', () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
 
   assert.equal(packageJson.scripts['line-budget'], 'node scripts/line-budget.mjs');
-  assert.equal(packageJson.scripts['test:meta'], 'node scripts/run-test-group.mjs meta');
+  assert.equal(packageJson.scripts['test:meta'], 'npm run --silent build && node scripts/run-test-group.mjs meta');
 });
 
 test('verify runs the line budget guard before lane dispatch', () => {

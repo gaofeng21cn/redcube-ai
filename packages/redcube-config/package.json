@@ -3,19 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./private-profile": {
-      "types": "./src/private-profile.ts",
-      "default": "./src/private-profile.js"
+      "types": "./dist/private-profile.d.ts",
+      "default": "./dist/private-profile.js"
     },
     "./xiaohongshu-author-profile": {
-      "types": "./src/xiaohongshu-author-profile.ts",
-      "default": "./src/xiaohongshu-author-profile.js"
+      "types": "./dist/xiaohongshu-author-profile.d.ts",
+      "default": "./dist/xiaohongshu-author-profile.js"
     }
   }
 }

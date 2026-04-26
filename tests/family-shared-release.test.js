@@ -29,5 +29,5 @@ test('gateway package and lock stay aligned with the current OPL family shared r
 test('package scripts expose a dedicated family verify lane', () => {
   const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 
-  assert.equal(packageJson.scripts?.['test:family'], 'node scripts/run-test-group.mjs family');
+  assert.equal(packageJson.scripts?.['test:family'], 'npm run --silent build && node scripts/run-test-group.mjs family');
 });

@@ -46,6 +46,30 @@ function runtimeSourceJsExports(exportsValue) {
   });
 }
 
+function compiledDistRuntimeExports(exportsValue) {
+  if (!exportsValue) return [];
+
+  if (typeof exportsValue === 'string') {
+    return exportsValue.startsWith('./dist/') && exportsValue.endsWith('.js')
+      ? [{ subpath: '.', target: exportsValue }]
+      : [];
+  }
+
+  return Object.entries(exportsValue).flatMap(([subpath, value]) => {
+    if (typeof value === 'string') {
+      return value.startsWith('./dist/') && value.endsWith('.js')
+        ? [{ subpath, target: value }]
+        : [];
+    }
+
+    if (!value || typeof value !== 'object') return [];
+
+    return Object.entries(value)
+      .filter(([, target]) => typeof target === 'string' && target.startsWith('./dist/') && target.endsWith('.js'))
+      .map(([condition, target]) => ({ subpath, condition, target }));
+  });
+}
+
 test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () => {
   assert.equal(existsSync(path.resolve('tsconfig.base.json')), true);
   assert.equal(existsSync(path.resolve('tsconfig.json')), true);
@@ -72,15 +96,18 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
 
 test('root package exposes formal typecheck entrypoint', () => {
   const pkg = readJson('package.json');
-  assert.equal(pkg.scripts.test, 'node scripts/run-test-group.mjs fast');
-  assert.equal(pkg.scripts['test:fast'], 'node scripts/run-test-group.mjs fast');
-  assert.equal(pkg.scripts['test:meta'], 'node scripts/run-test-group.mjs meta');
-  assert.equal(pkg.scripts['test:integration'], 'node scripts/run-test-group.mjs integration');
-  assert.equal(pkg.scripts['test:e2e'], 'node scripts/run-test-group.mjs e2e');
-  assert.equal(pkg.scripts['test:historical'], 'node scripts/run-test-group.mjs historical');
-  assert.equal(pkg.scripts['test:full'], 'node scripts/run-test-group.mjs full');
+  assert.equal(pkg.scripts.test, 'npm run --silent build && node scripts/run-test-group.mjs fast');
+  assert.equal(pkg.scripts['test:fast'], 'npm run --silent build && node scripts/run-test-group.mjs fast');
+  assert.equal(pkg.scripts['test:meta'], 'npm run --silent build && node scripts/run-test-group.mjs meta');
+  assert.equal(pkg.scripts['test:integration'], 'npm run --silent build && node scripts/run-test-group.mjs integration');
+  assert.equal(pkg.scripts['test:e2e'], 'npm run --silent build && node scripts/run-test-group.mjs e2e');
+  assert.equal(pkg.scripts['test:historical'], 'npm run --silent build && node scripts/run-test-group.mjs historical');
+  assert.equal(pkg.scripts['test:full'], 'npm run --silent build && node scripts/run-test-group.mjs full');
   assert.equal(pkg.scripts.typecheck, 'tsc --noEmit --project tsconfig.typecheck.json --pretty false');
-  assert.equal(pkg.scripts.build, 'tsc --build tsconfig.json --pretty false');
+  assert.equal(
+    pkg.scripts.build,
+    'tsc --build tsconfig.json --pretty false --force && node --experimental-strip-types scripts/sync-package-runtime-exports.ts',
+  );
 });
 
 test('workspace packages and apps participate in package-level tsconfig layering', () => {
@@ -97,7 +124,7 @@ test('workspace packages and apps participate in package-level tsconfig layering
   for (const file of paths) {
     assert.equal(existsSync(path.resolve(file)), true, file);
     const config = readJson(file);
-    assert.equal(config.extends, '../../tsconfig.base.json');
+    assert.equal(config.extends, '../../tsconfig.package-build.json');
   }
 });
 
@@ -105,7 +132,7 @@ test('typescript migration policy reference stays tracked', () => {
   assert.equal(existsSync(path.resolve('docs/policies/typescript_migration_policy.md')), true);
 });
 
-test('typescript package build contract freezes legacy source JS exports while targeting compiled dist exports', () => {
+test('typescript package build contract requires runtime exports to resolve through compiled dist artifacts', () => {
   const contractFile = 'contracts/runtime-program/typescript-package-build-contract.json';
   const contract = readJson(contractFile);
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
@@ -117,15 +144,16 @@ test('typescript package build contract freezes legacy source JS exports while t
     contractFile,
   );
   assert.equal(contract.current_transition_model.source_types_entry, './src/index.ts');
-  assert.equal(contract.current_transition_model.legacy_runtime_export_kind, 'legacy_source_js_runtime_export');
-  assert.equal(contract.current_transition_model.future_runtime_export_kind, 'compiled_dist_runtime_export');
+  assert.equal(contract.current_transition_model.runtime_export_kind, 'compiled_dist_runtime_export');
   assert.equal(contract.current_transition_model.compiled_runtime_target, './dist/index.js');
+  assert.equal(contract.current_transition_model.compiled_types_target, './dist/index.d.ts');
   assert.equal(contract.transition_policy.new_packages_must_use_typescript_source, true);
   assert.equal(contract.transition_policy.new_runtime_js_exports_forbidden_without_contract, true);
   assert.equal(contract.quality_gates.typecheck, 'npm run typecheck');
   assert.equal(contract.quality_gates.build, 'npm run build');
+  assert.equal(contract.legacy_source_js_runtime_exports.length, 0);
 
-  const actualLegacyExports = workspacePackageFiles().flatMap((file) => {
+  const actualSourceJsExports = workspacePackageFiles().flatMap((file) => {
     const pkg = readJson(file);
     const exports = runtimeSourceJsExports(pkg.exports);
     if (exports.length === 0) return [];
@@ -136,13 +164,26 @@ test('typescript package build contract freezes legacy source JS exports while t
     }];
   });
 
-  assert.deepEqual(actualLegacyExports, contract.legacy_source_js_runtime_exports);
+  assert.deepEqual(actualSourceJsExports, []);
+
+  const actualDistExports = workspacePackageFiles().flatMap((file) => {
+    const pkg = readJson(file);
+    const exports = compiledDistRuntimeExports(pkg.exports);
+    if (exports.length === 0) return [];
+    return [{
+      directory: path.dirname(file).split(path.sep).join('/'),
+      package_name: pkg.name,
+      exports,
+    }];
+  });
+
+  assert.deepEqual(actualDistExports, contract.compiled_dist_runtime_exports);
 });
 
-test('workspace packages with active source roots expose TypeScript source contracts before runtime JS migration', () => {
+test('workspace packages with active runtime exports expose compiled dist contracts', () => {
   const contract = readJson('contracts/runtime-program/typescript-package-build-contract.json');
-  const legacyExportDirectories = new Set(
-    contract.legacy_source_js_runtime_exports.map((entry) => entry.directory),
+  const compiledExportDirectories = new Set(
+    contract.compiled_dist_runtime_exports.map((entry) => entry.directory),
   );
 
   for (const file of workspacePackageFiles()) {
@@ -151,17 +192,63 @@ test('workspace packages with active source roots expose TypeScript source contr
     if (!existsSync(path.resolve(srcDirectory))) continue;
 
     const pkg = readJson(file);
-    assert.equal(pkg.types, './src/index.ts', directory);
     assert.equal(existsSync(path.resolve(directory, 'tsconfig.json')), true, directory);
     assert.equal(existsSync(path.resolve(directory, 'src/index.ts')), true, directory);
     assert.equal(pkg.main ?? null, null, `${directory} must not add a source JS main entry`);
 
-    const sourceJsExports = runtimeSourceJsExports(pkg.exports);
-    if (sourceJsExports.length > 0) {
+    if (compiledExportDirectories.has(directory)) {
+      assert.equal(pkg.types, './dist/index.d.ts', directory);
+      assert.equal(existsSync(path.resolve(directory, 'dist/index.js')), true, `${directory} must build dist/index.js`);
+      assert.equal(existsSync(path.resolve(directory, 'dist/index.d.ts')), true, `${directory} must build dist/index.d.ts`);
+    }
+  }
+});
+
+test('compiled dist runtime entrypoints preserve package runtime exports', async () => {
+  const contract = readJson('contracts/runtime-program/typescript-package-build-contract.json');
+
+  for (const entry of contract.compiled_dist_runtime_exports) {
+    for (const exportTarget of entry.exports) {
+      if (!exportTarget.target.startsWith('./dist/') || !exportTarget.target.endsWith('.js')) {
+        continue;
+      }
+      const distFile = path.resolve(entry.directory, exportTarget.target);
+      const distModule = readFileSync(distFile, 'utf-8');
+      const basename = path.basename(exportTarget.target);
       assert.equal(
-        legacyExportDirectories.has(directory),
+        distModule.includes(`from './${basename}'`),
+        false,
+        `${entry.directory} ${exportTarget.target} must not self-import its package entrypoint`,
+      );
+    }
+  }
+
+  const runtimeExpectations = [
+    {
+      packageName: '@redcube/hermes-substrate',
+      exports: ['CODEX_DEFAULT_MODEL_SELECTION', 'buildCodexRuntimeTopology'],
+    },
+    {
+      packageName: '@redcube/codex-cli-client',
+      exports: ['probeCodexCli', 'generateStructuredArtifactViaCodexCli'],
+    },
+    {
+      packageName: '@redcube/gateway',
+      exports: ['getProductFrontdesk', 'runDeliverableRoute'],
+    },
+    {
+      packageName: '@redcube/runtime-protocol',
+      exports: ['buildSourcePackFederationArtifact', 'resolveWorkspaceContract'],
+    },
+  ];
+
+  for (const expectation of runtimeExpectations) {
+    const runtimeModule = await import(expectation.packageName);
+    for (const exportName of expectation.exports) {
+      assert.equal(
+        exportName in runtimeModule,
         true,
-        `${directory} has unregistered source JS runtime exports`,
+        `${expectation.packageName} must expose ${exportName} from dist runtime export`,
       );
     }
   }

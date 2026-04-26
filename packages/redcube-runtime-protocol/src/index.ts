@@ -13,6 +13,7 @@ import {
   resolveWorkspaceContract as resolveWorkspaceContractJs,
 } from './workspace.js';
 import {
+  buildSourcePackFederationArtifact as buildSourcePackFederationArtifactJs,
   buildSourceTruthConsumptionSummary as buildSourceTruthConsumptionSummaryJs,
   getSourceArtifactPaths as getSourceArtifactPathsJs,
 } from './source-truth.js';
@@ -97,6 +98,21 @@ export function getNotePaths(workspaceRoot: string, topicId: string, noteId: str
 
 export function getSourceArtifactPaths(workspaceRoot: string, topicId: string): SourceArtifactPaths {
   return getSourceArtifactPathsJs(workspaceRoot, topicId) as SourceArtifactPaths;
+}
+
+export function buildSourcePackFederationArtifact(request: {
+  workspaceRoot: string;
+  topicId: string;
+  sourceIndex?: unknown;
+  extractedMaterials?: unknown;
+  sourceAudit?: unknown;
+  sourceBrief?: unknown;
+  sourceReadinessPack?: unknown;
+  consumerFamilies?: unknown[];
+}): Record<string, unknown> {
+  return buildSourcePackFederationArtifactJs(
+    request as Parameters<typeof buildSourcePackFederationArtifactJs>[0],
+  ) as Record<string, unknown>;
 }
 
 export function buildSourceTruthConsumptionSummary(

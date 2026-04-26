@@ -6,8 +6,7 @@
   "scope": "Machine-readable package build and export transition contract for the RedCube AI TypeScript migration.",
   "current_transition_model": {
     "source_types_entry": "./src/index.ts",
-    "legacy_runtime_export_kind": "legacy_source_js_runtime_export",
-    "future_runtime_export_kind": "compiled_dist_runtime_export",
+    "runtime_export_kind": "compiled_dist_runtime_export",
     "compiled_runtime_target": "./dist/index.js",
     "compiled_types_target": "./dist/index.d.ts"
   },
@@ -28,14 +27,15 @@
     "build": "npm run build",
     "package_contract_test": "node --test tests/typescript-baseline.test.js"
   },
-  "legacy_source_js_runtime_exports": [
+  "legacy_source_js_runtime_exports": [],
+  "compiled_dist_runtime_exports": [
     {
       "directory": "packages/redcube-codex-cli-client",
       "package_name": "@redcube/codex-cli-client",
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -46,17 +46,17 @@
         {
           "subpath": ".",
           "condition": "default",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         },
         {
           "subpath": "./private-profile",
           "condition": "default",
-          "target": "./src/private-profile.js"
+          "target": "./dist/private-profile.js"
         },
         {
           "subpath": "./xiaohongshu-author-profile",
           "condition": "default",
-          "target": "./src/xiaohongshu-author-profile.js"
+          "target": "./dist/xiaohongshu-author-profile.js"
         }
       ]
     },
@@ -66,7 +66,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -76,7 +76,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -86,7 +86,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -96,7 +96,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -106,7 +106,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -116,7 +116,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -126,7 +126,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -136,7 +136,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -146,7 +146,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -156,7 +156,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -166,7 +166,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -176,7 +176,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -186,7 +186,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -196,7 +196,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     },
@@ -206,7 +206,7 @@
       "exports": [
         {
           "subpath": ".",
-          "target": "./src/index.js"
+          "target": "./dist/index.js"
         }
       ]
     }

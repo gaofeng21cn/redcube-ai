@@ -422,11 +422,12 @@ function packageAudit(directory, rootTsconfig) {
   return {
     directory,
     package_name: pkg.name,
-    types_entry: pkg.types === './src/index.ts',
+    types_entry: pkg.types === './src/index.ts' || pkg.types === './dist/index.d.ts',
     has_index_ts: existsSync(path.resolve(directory, 'src/index.ts')),
     has_types_ts: existsSync(path.resolve(directory, 'src/types.ts')),
     has_tsconfig: existsSync(path.resolve(directory, 'tsconfig.json')),
-    extends_root_tsconfig: tsconfig.extends === '../../tsconfig.base.json',
+    extends_root_tsconfig: tsconfig.extends === '../../tsconfig.base.json'
+      || tsconfig.extends === '../../tsconfig.package-build.json',
     in_root_type_graph: rootTsconfig.references.some((entry) => entry.path === expectedReference),
   };
 }

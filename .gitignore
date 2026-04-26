@@ -28,6 +28,7 @@ __pycache__/
 
 # Node
 node_modules/
+dist/
 coverage/
 *.log
 
