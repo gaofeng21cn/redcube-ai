@@ -5,7 +5,13 @@ import {
   buildEntrySessionSurface,
   buildProductEntryContinuationSnapshot,
 } from 'opl-gateway-shared/product-entry-companions';
-import { loadProductEntrySession, productEntrySessionFile, saveProductEntrySession } from '@redcube/runtime';
+import {
+  getPublicationProjection,
+  getReviewState,
+  loadProductEntrySession,
+  productEntrySessionFile,
+  saveProductEntrySession,
+} from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { createDeliverable } from './create-deliverable.js';
@@ -13,8 +19,6 @@ import {
   buildSessionContinuationFamilyOrchestration,
 } from './family-orchestration-companion.js';
 import { getDeliverable } from './get-deliverable.js';
-import { getPublicationProjection } from './get-publication-projection.js';
-import { getReviewState } from './get-review-state.js';
 import { invokeDomainEntry } from './invoke-domain-entry.js';
 import {
   buildArtifactInventorySurface,

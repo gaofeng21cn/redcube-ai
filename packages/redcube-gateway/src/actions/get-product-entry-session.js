@@ -1,4 +1,6 @@
 import {
+  getPublicationProjection,
+  getReviewState,
   loadProductEntrySession,
   loadRuntimeSupervisionLatest,
   productEntrySessionFile,
@@ -14,8 +16,6 @@ import {
   buildSessionContinuationFamilyOrchestration,
 } from './family-orchestration-companion.js';
 import { getManagedRun } from './get-managed-run.js';
-import { getPublicationProjection } from './get-publication-projection.js';
-import { getReviewState } from './get-review-state.js';
 import {
   buildArtifactInventorySurface,
   buildProgressProjectionSurface,
