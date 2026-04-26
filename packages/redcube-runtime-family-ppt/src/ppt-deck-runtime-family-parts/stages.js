@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { copyFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
-import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { materializeScreenshotCaptureStore, runRedCubePythonHelper } from '@redcube/runtime-protocol';
 
 import { createPptDeckRenderStageParts } from './render.js';
 import { createPptDeckNativePptStageParts } from './native-ppt.js';
@@ -461,6 +461,12 @@ export function createPptDeckStageParts(deps) {
       if (reviewArtifact.review_capture.review_markdown_file) {
         lines.push(`- capture_review_markdown：${safeText(reviewArtifact.review_capture.review_markdown_file)}`);
       }
+      if (reviewArtifact.review_capture.manifest_file) {
+        lines.push(`- capture_manifest：${safeText(reviewArtifact.review_capture.manifest_file)}`);
+      }
+      if (reviewArtifact.review_capture.store_dir) {
+        lines.push(`- capture_store_dir：${safeText(reviewArtifact.review_capture.store_dir)}`);
+      }
       if (Number.isFinite(Number(reviewArtifact.review_capture.device_scale_factor))) {
         lines.push(`- device_scale_factor：${Number(reviewArtifact.review_capture.device_scale_factor)}`);
       }
@@ -695,23 +701,28 @@ export function createPptDeckStageParts(deps) {
     ].map((slideId) => safeText(slideId)).filter(Boolean))];
   }
 
-  function copyReusedScreenshotsIntoCapture(slideReviews, targetSlideIds, screenshotsDir) {
-    const targetIds = slideIdSet(targetSlideIds);
-    return safeArray(slideReviews).map((slide) => {
-      const slideId = safeText(slide?.slide_id);
-      const source = safeText(slide?.screenshot_file);
-      if (!slideId || targetIds.has(slideId) || !source || !(mainExistsSync || existsSync)(source)) {
-        return slide;
-      }
-      const destination = path.join(screenshotsDir, path.basename(source));
-      if (path.resolve(source) !== path.resolve(destination)) {
-        copyFileSync(source, destination);
-      }
-      return {
-        ...slide,
-        screenshot_file: destination,
-      };
+  function materializeCaptureSlideReviews(deliverablePaths, reviewCapture, slideReviews) {
+    const manifest = materializeScreenshotCaptureStore({
+      reportsDir: deliverablePaths.reportsDir,
+      captureId: reviewCapture.captureId,
+      screenshotsDir: reviewCapture.screenshotsDir,
+      slideReviews,
+      currentViewMode: 'hardlink',
     });
+    const captureBySlideId = new Map(
+      safeArray(manifest.slides)
+        .map((slide) => [safeText(slide?.slide_id), slide])
+        .filter(([slideId]) => slideId),
+    );
+    return {
+      manifest,
+      slideReviews: safeArray(slideReviews).map((slide) => {
+        const capture = captureBySlideId.get(safeText(slide?.slide_id));
+        return capture?.capture_path
+          ? { ...slide, screenshot_file: capture.capture_path }
+          : slide;
+      }),
+    };
   }
 
   function summarizeMechanicalChecksFromSlides(slideReviews) {
@@ -1057,13 +1068,26 @@ export function createPptDeckStageParts(deps) {
       slide,
       aiSlideReviewMap.get(slide.slide_id),
     ));
-    const slideReviews = applyMergedMechanicalConsistency(copyReusedScreenshotsIntoCapture(
+    const candidateSlideReviews = applyMergedMechanicalConsistency(
       incrementalReview
         ? mergeSlideReviewList(priorReviewArtifact?.slide_reviews, freshSlideReviews, incrementalTargetSlideIds)
         : freshSlideReviews,
-      incrementalTargetSlideIds,
-      reviewCapture.screenshotsDir,
-    ));
+    );
+    const {
+      manifest: captureManifest,
+      slideReviews,
+    } = materializeCaptureSlideReviews(deliverablePaths, reviewCapture, candidateSlideReviews);
+    const captureBySlideId = new Map(
+      safeArray(captureManifest.slides)
+        .map((slide) => [safeText(slide?.slide_id), slide])
+        .filter(([slideId]) => slideId),
+    );
+    const capturedMechanicalSlideReviews = mechanicalSlideReviews.map((slide) => {
+      const capture = captureBySlideId.get(safeText(slide?.slide_id));
+      return capture?.capture_path
+        ? { ...slide, screenshot_file: capture.capture_path }
+        : slide;
+    });
     const mergedAiSlideReviews = slideReviews
       .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
       .filter(Boolean);
@@ -1119,6 +1143,8 @@ export function createPptDeckStageParts(deps) {
           ? path.dirname(safeText(safeArray(renderArtifact?.native_ppt_bundle?.preview_screenshots)[0], reviewCapture.screenshotsDir))
           : reviewCapture.screenshotsDir,
         review_markdown_file: reviewCapture.reviewMarkdownFile,
+        manifest_file: captureManifest.manifest_file,
+        store_dir: captureManifest.store_dir,
         device_scale_factor: Number(reviewPayload.device_scale_factor || 2),
         screenshot_dimensions: reviewPayload.screenshot_dimensions || null,
       },
@@ -1154,11 +1180,11 @@ export function createPptDeckStageParts(deps) {
         checks: summarizeMechanicalChecksFromSlides(mechanicalSlideReviews),
         metrics: {
           ...(reviewPayload.metrics || {}),
-          slide_count: mechanicalSlideReviews.length,
+          slide_count: capturedMechanicalSlideReviews.length,
           reviewed_slide_count: mechanicalSlideReviewsForAi.length,
         },
         baseline: reviewPayload.baseline || null,
-        slide_reviews: mechanicalSlideReviews,
+        slide_reviews: capturedMechanicalSlideReviews,
         incremental_review: incrementalReview
           ? {
               reviewed_slide_ids: incrementalTargetSlideIds,
@@ -1173,6 +1199,7 @@ export function createPptDeckStageParts(deps) {
       artifact_refs: [
         reviewMarkdown,
         reviewCapture.reviewMarkdownFile,
+        captureManifest.manifest_file,
         ...slideReviews.map((slide) => slide.screenshot_file),
       ].filter(Boolean),
       review_state_patch: {

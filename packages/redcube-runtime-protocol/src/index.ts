@@ -29,6 +29,9 @@ import {
   resolveRedCubePythonCommand as resolveRedCubePythonCommandJs,
 } from './python-command.js';
 import {
+  materializeScreenshotCaptureStore as materializeScreenshotCaptureStoreJs,
+} from './screenshot-capture-store.js';
+import {
   buildPythonHelperEnv as buildPythonHelperEnvTs,
   pythonHelperReference as pythonHelperReferenceTs,
   resolvePythonHelperInvocation as resolvePythonHelperInvocationTs,
@@ -197,6 +200,10 @@ export function runRedCubePythonHelper(
   options: RunRedCubePythonHelperOptions = {},
 ): RedCubePythonHelperRunResult {
   return runRedCubePythonHelperTs(helper, args, options);
+}
+
+export function materializeScreenshotCaptureStore(input: Record<string, unknown> = {}): Record<string, unknown> {
+  return materializeScreenshotCaptureStoreJs(input) as Record<string, unknown>;
 }
 
 export {

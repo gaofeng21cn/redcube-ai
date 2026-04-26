@@ -2,17 +2,66 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 
+import { materializeScreenshotCaptureStore } from '../packages/redcube-runtime-protocol/src/screenshot-capture-store.js';
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/review.js';
 
 const safeArray = (value) => Array.isArray(value) ? value : [];
 const safeText = (value, fallback = '') => value == null || value === '' ? fallback : String(value);
+const ONE_BY_ONE_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+  'base64',
+);
 
 function readCount(file) {
   return existsSync(file) ? Number(readFileSync(file, 'utf-8')) : 0;
 }
+
+test('screenshot capture store deduplicates same slide content while preserving capture paths and manifest', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-screenshot-cas-'));
+  const reportsDir = path.join(workspaceRoot, 'reports');
+  const firstCaptureDir = path.join(reportsDir, 'screenshots', 'capture-a');
+  const secondCaptureDir = path.join(reportsDir, 'screenshots', 'capture-b');
+  mkdirSync(firstCaptureDir, { recursive: true });
+  mkdirSync(secondCaptureDir, { recursive: true });
+  const firstSlide = path.join(firstCaptureDir, 'slide-01.png');
+  const secondSlide = path.join(secondCaptureDir, 'slide-01.png');
+  writeFileSync(firstSlide, ONE_BY_ONE_PNG);
+  writeFileSync(secondSlide, ONE_BY_ONE_PNG);
+
+  const first = materializeScreenshotCaptureStore({
+    reportsDir,
+    captureId: 'capture-a',
+    screenshotsDir: firstCaptureDir,
+    slideReviews: [{ slide_id: 'S01', screenshot_file: firstSlide }],
+  });
+  const second = materializeScreenshotCaptureStore({
+    reportsDir,
+    captureId: 'capture-b',
+    screenshotsDir: secondCaptureDir,
+    slideReviews: [{ slide_id: 'S01', screenshot_file: secondSlide }],
+  });
+
+  const storeDir = path.join(reportsDir, 'screenshots', '_store', 'sha256');
+  const storeFiles = readdirSync(storeDir, { recursive: true })
+    .filter((entry) => String(entry).endsWith('.png'));
+  assert.equal(storeFiles.length, 1);
+  assert.equal(first.slides[0].sha256, second.slides[0].sha256);
+  assert.equal(first.slides[0].store_path, second.slides[0].store_path);
+  assert.equal(first.slides[0].store_status, 'copied');
+  assert.equal(second.slides[0].store_status, 'reused');
+  assert.equal(first.slides[0].capture_path, firstSlide);
+  assert.equal(second.slides[0].capture_path, secondSlide);
+  assert.equal(existsSync(firstSlide), true);
+  assert.equal(existsSync(secondSlide), true);
+  assert.equal(statSync(firstSlide).ino, statSync(first.slides[0].store_path).ino);
+  assert.equal(statSync(secondSlide).ino, statSync(second.slides[0].store_path).ino);
+  assert.deepEqual(first.slides[0].dimensions, { width: 1, height: 1 });
+  assert.equal(first.manifest_file, path.join(firstCaptureDir, 'capture-manifest.json'));
+  assert.equal(JSON.parse(readFileSync(first.manifest_file, 'utf-8')).slides[0].store_path, first.slides[0].store_path);
+});
 
 function makePptStageParts() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-cache-'));
@@ -23,7 +72,8 @@ function makePptStageParts() {
   const screenshotFile = path.join(screenshotsDir, 'slide-01.png');
   const reviewScript = path.join(workspaceRoot, 'review-helper.mjs');
   const callCountFile = path.join(workspaceRoot, 'python-count.txt');
-  writeFileSync(htmlFile, '<html><body><section data-slide-id="S01">same html</section></body></html>');
+  const slideHtml = '<section data-slide-root="true" data-slide-id="S01" data-qa-block="root" data-primary-point="true" data-title="第一页" data-layout-family="hero" data-speaker-seconds="30" data-recipe-id="hero_metric" data-template-id="none" data-peak-page="true" data-director-role="anchor"><div data-qa-block="body">same html</div></section>';
+  writeFileSync(htmlFile, `<html><body>${slideHtml}</body></html>`);
   writeFileSync(screenshotFile, 'png');
   writeFileSync(reviewScript, `import { existsSync, readFileSync, writeFileSync } from 'node:fs';\nconst countFile = ${JSON.stringify(callCountFile)};\nconst count = existsSync(countFile) ? Number(readFileSync(countFile, 'utf-8')) : 0;\nwriteFileSync(countFile, String(count + 1));\nconsole.log(JSON.stringify({ slide_reviews: [{ slide_id: 'S01', title: '第一页', layout_family: 'hero', screenshot_file: ${JSON.stringify(screenshotFile)}, checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true }, issues: [], metrics: { occupied_ratio: 0.5 } }], checks: { overflow_free: true }, metrics: { page_count: 1 }, baseline: {} }));\n`);
   const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'deck-a' };
@@ -88,7 +138,7 @@ function makePptStageParts() {
     normalizeStringList: (value) => safeArray(value),
     normalizeTypographyPlan: (value) => value,
     primarySurface: () => 'test-surface',
-    readCurrentHtmlArtifact: () => ({ html_bundle: { html_file: htmlFile, page_count: 1, slides: [{ slide_id: 'S01', title: '第一页', content_html: '<section>same html</section>' }] } }),
+    readCurrentHtmlArtifact: () => ({ html_bundle: { html_file: htmlFile, page_count: 1, slides: [{ slide_id: 'S01', title: '第一页', content: slideHtml, content_html: slideHtml, evidence_and_sources: [{ public_label: 'source' }] }] } }),
     readJson: () => ({}),
     readPromptPackText: () => '',
     readStageArtifact: (_contract, _paths, stage) => {
@@ -104,7 +154,7 @@ function makePptStageParts() {
     resolvePromptPackAsset: () => '',
     resolveRedCubePythonCommand: () => ({ command: 'node' }),
     safeArray,
-    safeFileMtimeMs: () => 0,
+    safeFileMtimeMs: () => 1,
     safeText,
     screenshotReviewSlideBatchOutputContract: () => ({}),
     screenshotReviewSummaryOutputContract: () => ({}),
@@ -125,23 +175,35 @@ function makePptStageParts() {
 
 test('ppt screenshot_review reuses mechanical cache for identical HTML while still running AI visual gate', async () => {
   const fixture = makePptStageParts();
-  const first = await fixture.stageParts.buildScreenshotReviewArtifact({
-    workspaceRoot: fixture.workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    contract: fixture.contract,
-    mode: 'create_new',
-    adapter: 'test-adapter',
-  });
-  fixture.remember(first);
-  const second = await fixture.stageParts.buildScreenshotReviewArtifact({
-    workspaceRoot: fixture.workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    contract: fixture.contract,
-    mode: 'create_new',
-    adapter: 'test-adapter',
-  });
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  let first;
+  let second;
+  try {
+    first = await fixture.stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract: fixture.contract,
+      mode: 'create_new',
+      adapter: 'test-adapter',
+    });
+    fixture.remember(first);
+    second = await fixture.stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract: fixture.contract,
+      mode: 'create_new',
+      adapter: 'test-adapter',
+    });
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+  }
 
   assert.equal(fixture.counts().python, 1);
   assert.equal(fixture.counts().aiBatchCalls, 2);

@@ -25,3 +25,6 @@ export {
   REDCUBE_PYTHON_COMMAND_ENV,
   resolveRedCubePythonCommand,
 } from './python-command.js';
+export {
+  materializeScreenshotCaptureStore,
+} from './screenshot-capture-store.js';

@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
+import { materializeScreenshotCaptureStore } from '@redcube/runtime-protocol';
 
 export function createXiaohongshuReviewParts(deps) {
   const {
@@ -53,6 +54,8 @@ export function createXiaohongshuReviewParts(deps) {
       '',
       `- review_owner: ${safeText(reviewOwner, 'codex_native_host_agent')}`,
       `- 状态: ${reviewArtifact.status}`,
+      `- capture_manifest: ${safeText(reviewArtifact.review_capture?.manifest_file, 'none')}`,
+      `- capture_store_dir: ${safeText(reviewArtifact.review_capture?.store_dir, 'none')}`,
       `- director_intent_landed: ${reviewArtifact.checks.director_intent_landed}`,
       `- anti_template_ok: ${reviewArtifact.checks.anti_template_ok}`,
       `- overflow_free: ${reviewArtifact.checks.overflow_free}`,
@@ -431,19 +434,37 @@ export function createXiaohongshuReviewParts(deps) {
         issues,
       };
     });
+    const captureManifest = materializeScreenshotCaptureStore({
+      reportsDir: deliverablePaths.reportsDir,
+      captureId: 'current',
+      screenshotsDir,
+      slideReviews: mechanicalSlideReviews,
+      currentViewMode: 'source',
+    });
+    const captureBySlideId = new Map(
+      safeArray(captureManifest.slides)
+        .map((slide) => [safeText(slide?.slide_id), slide])
+        .filter(([slideId]) => slideId),
+    );
+    const capturedMechanicalSlideReviews = mechanicalSlideReviews.map((slide) => {
+      const capture = captureBySlideId.get(safeText(slide?.slide_id));
+      return capture?.current_path
+        ? { ...slide, screenshot_file: capture.current_path }
+        : slide;
+    });
     const aiReviewPromise = generateScreenshotReviewDraft(
       workspaceRoot,
       contract,
       deliverablePaths,
       render,
-      mechanicalSlideReviews,
+      capturedMechanicalSlideReviews,
       python,
       mode,
       research,
       adapter,
     );
     const baselineReviewPromise = mode === 'optimize_existing'
-      ? Promise.resolve(computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, mechanicalSlideReviews))
+      ? Promise.resolve(computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, capturedMechanicalSlideReviews))
       : Promise.resolve(null);
     const [
       { data, generationRuntime },
@@ -451,11 +472,11 @@ export function createXiaohongshuReviewParts(deps) {
     ] = await Promise.all([aiReviewPromise, baselineReviewPromise]);
     const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', {
       min: 0,
-      max: mechanicalSlideReviews.length,
+      max: capturedMechanicalSlideReviews.length,
     });
-    const aiSlideReviews = normalizeXhsScreenshotAiSlideReviews(data?.slide_reviews, mechanicalSlideReviews);
+    const aiSlideReviews = normalizeXhsScreenshotAiSlideReviews(data?.slide_reviews, capturedMechanicalSlideReviews);
     const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
-    const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
+    const slideReviews = capturedMechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
       slide,
       aiSlideReviewMap.get(slide.slide_id),
     ));
@@ -509,6 +530,12 @@ export function createXiaohongshuReviewParts(deps) {
       mode,
       status,
       mechanical_cache: mechanicalCacheMetadata(cacheStatus, reviewHash),
+      review_capture: {
+        capture_id: captureManifest.capture_id,
+        screenshots_dir: captureManifest.screenshots_dir,
+        manifest_file: captureManifest.manifest_file,
+        store_dir: captureManifest.store_dir,
+      },
       checks,
       slide_reviews: slideReviews,
       ai_review: {
@@ -533,12 +560,15 @@ export function createXiaohongshuReviewParts(deps) {
         review_model: 'python_screenshot_layout_checks',
         ...mechanicalCacheMetadata(cacheStatus, reviewHash),
         checks: python.checks,
-        metrics: python.metrics,
-        slide_reviews: mechanicalSlideReviews,
+        metrics: {
+          ...(python.metrics || {}),
+          slide_count: capturedMechanicalSlideReviews.length,
+        },
+        slide_reviews: capturedMechanicalSlideReviews,
       },
       report_markdown: reviewMarkdown,
       metrics: python.metrics,
-      artifact_refs: [...candidateSurfaceRefs, reviewMarkdown, ...slideReviews.map((slide) => slide.screenshot_file)],
+      artifact_refs: [...candidateSurfaceRefs, reviewMarkdown, captureManifest.manifest_file, ...slideReviews.map((slide) => slide.screenshot_file)],
       review_state_patch: {
         current_status: status === 'pass' ? 'review_passed' : 'blocked_for_revision',
         ready_for_export: false,
