@@ -736,6 +736,9 @@ export function createPptDeckRenderStageParts(deps) {
       html_guardrails: [
         '每页输出完整 slide root，必须包含 data-slide-root=true 与匹配的 data-slide-id。',
         '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
+        '严格遵守 audience_visibility_contract：speaker_notes、transition_sentence、page_goal、page_objective、visual_anchor_tracks、operator_playbook、revision_context、source_id、material_id 都是作者/系统工作面，不得被写入任何听众可见标题、正文、页脚、badge 或卡片。',
+        '若 source 或 title 中存在内部管理编号、项目编号或 material/source ID，而用户给出了对外汇报口径，听众可见文本必须使用对外标签；内部编号只允许留在 provenance 和 artifact 元数据。',
+        '不要把“建议怎么讲”“可发表表达”“待确认的写作口径”“讲稿备忘录”做成投影片正文；这些内容只能影响讲者备注或被压成听众可理解的研究结论/边界。',
         '标题区与导语区必须形成独立安全带；主体白板、轨道、横带、标签和大型结构不得侵入 header 的首屏阅读入口。',
         'foundation / substrate / base band 只承担结构基座，不得压住正文、说明卡片、讲者信息或封面辅助卡；所有可读内容都必须完整留在页边界内。',
         '任何带字元素都必须拥有独立留白：标签、badge、航线节点、callout、段落、底部说明和图内节点不得彼此遮挡，也不得跨压导航轨道或解释段。',

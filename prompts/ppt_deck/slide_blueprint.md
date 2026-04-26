@@ -17,6 +17,12 @@
 - transition_sentence
 - explicit anchor / grid / track for complex structure pages
 
+听众可见边界：
+- `title`、`page_core_content`、关键图示标签和底部边界条是听众可见面，只能写研究内容、证据结果、边界和团队需要知道的决策信息
+- `speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`evidence_and_sources.source_id`、`material_id` 是作者/系统工作面，不得被复制、改写或压成页面正文
+- 若用户区分了内部管理编号和对外论文顺序，蓝图标题和正文必须使用对外顺序标签，例如“第一篇 / 第二篇 / 第三篇”，内部编号只保留在来源/provenance
+- 不要把“建议怎么讲”“可发表表达”“讲稿备忘录”“待确认的写作口径”做成投影片主内容；需要讨论的事项必须改写成听众能直接理解的研究边界或团队确认项
+
 ## runtime_seed
 ```json
 {

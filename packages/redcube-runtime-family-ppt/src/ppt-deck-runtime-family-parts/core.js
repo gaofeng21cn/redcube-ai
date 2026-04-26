@@ -679,6 +679,33 @@ export function createPptDeckRuntimeCore() {
     if (/<style\b/i.test(html)) {
       throw new Error(`ppt render_html slide contains forbidden style tag: ${slideId}`);
     }
+    const visibleText = html
+      .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const leakedMarker = [
+      /\bspeaker_notes\b/i,
+      /\btransition_sentence\b/i,
+      /\bpage_goal\b/i,
+      /\bpage_objective\b/i,
+      /\bvisual_anchor_tracks\b/i,
+      /\bsource_id\b/i,
+      /\bmaterial_id\b/i,
+      /\bPaper\s*00[1-4]\b/i,
+      /\b00[1-4]\b/,
+      /\bSRC-(?:FILE|OP|BRIEF|KEYWORDS|AUG)?-?\d*\b/i,
+      /\bMAT-\d+\b/i,
+      /建议怎么讲|建议表达|来源口径|可发表表达|发表表达边界|待确认的写作口径|写作口径/,
+      /讲稿\s*备忘录|讲者备注|演讲备注|讲稿备注|提醒讲者|怎么讲这一页/,
+      /讲稿备忘录/,
+      /内部管理编号/,
+      /制作目标\s*[：:]/,
+    ].find((pattern) => pattern.test(visibleText));
+    if (leakedMarker) {
+      throw new Error(`ppt render_html slide contains audience-visible authoring metadata: ${slideId}`);
+    }
     return html;
   }
   

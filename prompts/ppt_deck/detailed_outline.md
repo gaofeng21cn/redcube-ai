@@ -11,6 +11,8 @@
 要求：
 - 每页明确 core_sentence / evidence_points / page_objective
 - 若存在具名讲者署名，封面页必须把署名落成 audience-facing cover element，而不是写成“封面必须署名”这类元指令
+- 听众可见字段只允许承载标题、结论、证据摘要、边界和必要数字；`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks` 是讲者/作者工作面，不得复制或改写成页面正文
+- 如果源材料、题目或管理上下文里存在内部编号、项目编号、source_id、material_id，且用户给出了对外称呼或序号，所有听众可见标题和正文必须使用对外称呼；内部编号只留在 provenance 或 notes，不作为论文标题
 - 不得直接跳到 HTML
 - 必须为后续逐页设计保留讲授推进关系与证据落点
 
