@@ -615,7 +615,7 @@ export function buildCloseoutAudit(options = {}) {
       new_code_defaults_to_typescript:
         baseTsconfig.compilerOptions.module === 'NodeNext'
         && baseTsconfig.compilerOptions.moduleResolution === 'NodeNext'
-        && rootPackage.scripts.typecheck === 'tsc --noEmit --project tsconfig.typecheck.json --pretty false'
+        && rootPackage.scripts.typecheck === 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false'
         && /新代码默认使用 TypeScript/.test(migrationPolicy)
         && /typecheck 成为正式质量门/.test(migrationPolicy),
       core_contract_surfaces_typed: contractSurfaces.every((entry) => entry.typed_boundary_ready),

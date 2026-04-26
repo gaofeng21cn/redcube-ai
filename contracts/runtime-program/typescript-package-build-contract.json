@@ -24,6 +24,7 @@
   },
   "quality_gates": {
     "typecheck": "npm run typecheck",
+    "typecheck_model": "build_compiled_exports_then_no_emit",
     "build": "npm run build",
     "package_contract_test": "node --test tests/typescript-baseline.test.js"
   },

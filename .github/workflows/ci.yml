@@ -44,14 +44,14 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Run typecheck
+      - name: Run build and typecheck
         run: npm run typecheck
 
       - name: Run fast tests
-        run: npm run test:fast
+        run: node scripts/run-test-group.mjs fast
 
       - name: Run family tests
-        run: npm run test:family
+        run: node scripts/run-test-group.mjs family
 
       - name: Run meta tests
-        run: npm run test:meta
+        run: node scripts/run-test-group.mjs meta

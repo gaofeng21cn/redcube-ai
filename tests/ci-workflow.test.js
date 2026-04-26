@@ -67,7 +67,7 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?npm run test:fast[\s\S]*?npm run test:family[\s\S]*?npm run test:meta/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node scripts\/run-test-group\.mjs fast[\s\S]*?node scripts\/run-test-group\.mjs family[\s\S]*?node scripts\/run-test-group\.mjs meta/);
   assert.doesNotMatch(workflow, /\n\s{2}integration:\n/);
   assert.doesNotMatch(workflow, /\n\s{2}render-e2e:\n/);
 

@@ -29,5 +29,5 @@
 
 ## 质量门
 
-- typecheck 成为正式质量门
+- typecheck 成为正式质量门，并且必须先生成 compiled package exports，再执行全仓 `tsc --noEmit`
 - 新增核心边界必须优先提供可检查的类型 contract
