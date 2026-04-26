@@ -227,6 +227,10 @@
         "codex_command_env": "REDCUBE_CODEX_COMMAND",
         "codex_model_env": "REDCUBE_CODEX_MODEL",
         "codex_reasoning_env": "REDCUBE_CODEX_REASONING_EFFORT",
+        "codex_default_command_strategy": "prefer $HOME/bin/codex-canonical when executable, otherwise use PATH codex",
+        "codex_managed_canonical_command": [
+          "$HOME/bin/codex-canonical"
+        ],
         "codex_default_command": [
           "codex"
         ],

@@ -2,13 +2,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { accessSync, constants as fsConstants, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import {
-  CODEX_DEFAULT_MODEL_SELECTION,
-  CODEX_DEFAULT_REASONING_SELECTION,
-} from '@redcube/hermes-substrate';
+import { CODEX_DEFAULT_MODEL_SELECTION, CODEX_DEFAULT_REASONING_SELECTION } from '@redcube/hermes-substrate';
 
 export const REDCUBE_CODEX_RUNTIME_OWNER = 'codex_cli';
 export const REDCUBE_CREATIVE_GENERATION_META_BEGIN = 'REDCUBE_CREATIVE_GENERATION_META_BEGIN';
@@ -213,9 +210,11 @@ function killCodexChildProcessTree(child) {
   }
 }
 
-function parseCodexCommand(value) {
+function parseCodexCommand(value, env = process.env) {
   const raw = String(value || '').trim();
   if (!raw) {
+    const canonicalCommand = path.join(optionalText(env.HOME) || os.homedir(), 'bin', 'codex-canonical');
+    try { accessSync(canonicalCommand, fsConstants.X_OK); if (statSync(canonicalCommand).isFile()) return [canonicalCommand]; } catch {}
     return [...DEFAULT_CODEX_COMMAND];
   }
   if (raw.startsWith('[')) {
@@ -258,7 +257,7 @@ export function readCodexCliContract(env = process.env) {
   const model = optionalText(env.REDCUBE_CODEX_MODEL);
   const reasoningEffort = optionalText(env.REDCUBE_CODEX_REASONING_EFFORT);
   return {
-    command: parseCodexCommand(env.REDCUBE_CODEX_COMMAND),
+    command: parseCodexCommand(env.REDCUBE_CODEX_COMMAND, env),
     sandbox: optionalText(env.REDCUBE_CODEX_SANDBOX) || DEFAULT_CODEX_SANDBOX,
     model,
     reasoning_effort: reasoningEffort,

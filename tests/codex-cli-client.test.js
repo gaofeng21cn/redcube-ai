@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 import {
   probeCodexCli,
@@ -8,14 +10,33 @@ import {
 } from '../packages/redcube-codex-cli-client/src/index.js';
 
 test('readCodexCliContract falls back to local Codex defaults', () => {
-  const contract = readCodexCliContract({});
+  const homeRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-home-'));
+  const contract = readCodexCliContract({ HOME: homeRoot });
 
-  assert.deepEqual(contract.command, ['codex']);
-  assert.equal(contract.sandbox, 'workspace-write');
-  assert.equal(contract.model, null);
-  assert.equal(contract.reasoning_effort, null);
-  assert.equal(contract.model_selection, 'inherit_local_codex_default');
-  assert.equal(contract.reasoning_selection, 'inherit_local_codex_default');
+  try {
+    assert.deepEqual(contract.command, ['codex']);
+    assert.equal(contract.sandbox, 'workspace-write');
+    assert.equal(contract.model, null);
+    assert.equal(contract.reasoning_effort, null);
+    assert.equal(contract.model_selection, 'inherit_local_codex_default');
+    assert.equal(contract.reasoning_selection, 'inherit_local_codex_default');
+  } finally {
+    rmSync(homeRoot, { recursive: true, force: true });
+  }
+});
+
+test('readCodexCliContract prefers the OPL-managed canonical Codex shim when present', () => {
+  const homeRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-canonical-home-'));
+  const canonicalBin = path.join(homeRoot, 'bin', 'codex-canonical');
+  mkdirSync(path.dirname(canonicalBin), { recursive: true });
+  writeFileSync(canonicalBin, '#!/usr/bin/env bash\nexit 0\n', { mode: 0o755 });
+
+  try {
+    const contract = readCodexCliContract({ HOME: homeRoot });
+    assert.deepEqual(contract.command, [canonicalBin]);
+  } finally {
+    rmSync(homeRoot, { recursive: true, force: true });
+  }
 });
 
 test('readCodexCliContract accepts JSON-array command and explicit model controls', () => {
