@@ -48,7 +48,6 @@ test('P20.C red: poster_onepager onboarding packages and prompt surface must exi
     'packages/redcube-runtime-family-poster-onepager/src/index.js',
     'packages/redcube-runtime-family-poster-onepager/src/index.ts',
     'packages/redcube-pack-poster-onepager/package.json',
-    'packages/redcube-pack-poster-onepager/src/index.js',
     'packages/redcube-pack-poster-onepager/src/index.ts',
     'prompts/poster_onepager/storyline.md',
     'prompts/poster_onepager/poster_blueprint.md',

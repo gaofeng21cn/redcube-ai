@@ -100,7 +100,7 @@ test('family runtimes no longer import pack-runtime or pack-local creative build
 });
 
 test('poster_onepager onboarding still reads prompt-pack and rerun policy from hydrated contract', () => {
-  const posterPack = read('packages/redcube-pack-poster-onepager/src/index.js');
+  const posterPack = read('packages/redcube-pack-poster-onepager/src/index.ts');
   const posterRuntimeCore = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js');
 
   assert.equal(posterPack.includes('prompts/poster_onepager'), false);

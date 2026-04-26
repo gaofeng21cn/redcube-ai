@@ -167,7 +167,6 @@ function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliv
 }
 
 test('ppt clears code-authored Story Architecture / Visual Authorship residue and adds explicit visual_director_review', () => {
-  const pack = read('packages/redcube-pack-ppt/src/index.js');
   const packTypes = read('packages/redcube-pack-ppt/src/index.ts');
   const runtime = [
     read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js'),
@@ -200,8 +199,6 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.equal(renderCompiler.includes("materializedFrom: 'prompt_runtime_template'"), false);
   assert.equal(renderCompiler.includes('compiled.content = renderTemplate(templateText, buildTemplateState(compiled, canvas));'), false);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/src/render-compiler.js')), false);
-  assert.equal(pack.includes('function toBlueprintContent('), false);
-  assert.equal(pack.includes("speaker_seconds: preset.speaker_seconds + (slide.layout_family === 'judgement_ladder' ? 10 : 0),"), false);
   assert.equal(packTypes.includes('buildPptDetailedOutline'), false);
   assert.equal(packTypes.includes('buildPptSlideBlueprint'), false);
   assert.equal(packTypes.includes('buildPptVisualDirection'), false);

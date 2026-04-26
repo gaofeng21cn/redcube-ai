@@ -128,9 +128,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/index.js',
     'src/surface.js',
   ],
-  'packages/redcube-pack-poster-onepager': ['src/index.js'],
-  'packages/redcube-pack-ppt': ['src/index.js'],
-  'packages/redcube-pack-xiaohongshu': ['src/index.js'],
   'packages/redcube-reference-os': [
     'src/index.js',
     'src/reference-samples.js',
