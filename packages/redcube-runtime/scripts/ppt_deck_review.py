@@ -76,6 +76,8 @@ def is_internal_padding_relevant(block: Dict[str, Any]) -> bool:
     block_id = str(block.get('id') or '').lower()
     if any(token in block_id for token in EDGE_CLEARANCE_IGNORED_IDS):
         return False
+    if int(block.get('textNodeCount', 0) or 0) == 0:
+        return False
     if float(block.get('height', 0) or 0) < 72.0:
         return False
     return bool(block.get('hasSurfaceFrame'))
@@ -161,7 +163,10 @@ def apply_title_typography_consistency(slide_reviews: List[Dict[str, Any]]) -> D
 
 def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
     wrapper = info.get('wrapper', {}) or {}
-    blocks = info.get('blocks', []) or []
+    blocks = [
+        block for block in (info.get('blocks', []) or [])
+        if not is_decorative_surface_container(block)
+    ]
     audit_blocks = info.get('auditBlocks', []) or []
     title_meta = info.get('titleMeta', {}) or {}
     block_content_audit = info.get('blockContentAudit', {}) or {}
@@ -663,17 +668,15 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                           if (textRects.some((rect) => rect.top < targetRelative.top - tolerance)) overflowSides.push('top');
                           if (textRects.some((rect) => rect.right > targetRelative.right + tolerance)) overflowSides.push('right');
                           if (textRects.some((rect) => rect.bottom > targetRelative.bottom + tolerance)) overflowSides.push('bottom');
-                          const scrollOverflowX = (target.scrollWidth || 0) > (target.clientWidth || 0) + 1;
-                          const scrollOverflowY = (target.scrollHeight || 0) > (target.clientHeight || 0) + 1;
-                          if (overflowSides.length === 0 && !scrollOverflowX && !scrollOverflowY) {{
+                          if (overflowSides.length === 0) {{
                             return null;
                           }}
                           return {{
                             block_id: blockId,
                             target_tag: target.tagName.toLowerCase(),
                             overflow_sides: Array.from(new Set(overflowSides)),
-                            scroll_overflow_x: scrollOverflowX,
-                            scroll_overflow_y: scrollOverflowY,
+                            scroll_overflow_x: (target.scrollWidth || 0) > (target.clientWidth || 0) + 1,
+                            scroll_overflow_y: (target.scrollHeight || 0) > (target.clientHeight || 0) + 1,
                             block_rect: targetRelative,
                             text_rect_count: textRects.length,
                             max_text_right: round(Math.max(...textRects.map((rect) => rect.right))),
