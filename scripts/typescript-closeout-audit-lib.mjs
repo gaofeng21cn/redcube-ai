@@ -490,6 +490,8 @@ function residueLineLockAudit(residueInventory = residueAudit()) {
   return {
     contract_file: JS_RESIDUE_LINE_LOCK_FILE,
     policy: lock.policy,
+    max_legacy_allowlisted_js_file_count: lock.max_legacy_allowlisted_js_file_count ?? null,
+    max_actual_js_line_count: lock.max_actual_js_line_count ?? null,
     entries,
   };
 }
@@ -531,6 +533,25 @@ function residueSummary(residueInventory, residueLineLock) {
       actual_js_line_count: byDirectory.reduce((sum, entry) => sum + entry.actual_js_line_count, 0),
     },
     by_directory: byDirectory,
+  };
+}
+
+function residueRetirementBudgetAudit({ jsResidueSummary, residueLineLock }) {
+  const maxLegacyFiles = residueLineLock.max_legacy_allowlisted_js_file_count;
+  const maxActualLines = residueLineLock.max_actual_js_line_count;
+  const legacyFileCount = jsResidueSummary.totals.legacy_allowlisted_js_file_count;
+  const actualLineCount = jsResidueSummary.totals.actual_js_line_count;
+
+  return {
+    policy: 'Legacy JavaScript residue may shrink, but allowlisted file count and total JS line budget may not grow.',
+    max_legacy_allowlisted_js_file_count: maxLegacyFiles,
+    actual_legacy_allowlisted_js_file_count: legacyFileCount,
+    legacy_allowlisted_js_file_count_within_budget:
+      typeof maxLegacyFiles === 'number' && legacyFileCount <= maxLegacyFiles,
+    max_actual_js_line_count: maxActualLines,
+    actual_js_line_count: actualLineCount,
+    actual_js_line_count_within_budget:
+      typeof maxActualLines === 'number' && actualLineCount <= maxActualLines,
   };
 }
 
@@ -583,6 +604,10 @@ export function buildCloseoutAudit(options = {}) {
   const residueInventory = residueAudit();
   const residueLineLock = residueLineLockAudit(residueInventory);
   const jsResidueSummary = residueSummary(residueInventory, residueLineLock);
+  const jsResidueRetirementBudget = residueRetirementBudgetAudit({
+    jsResidueSummary,
+    residueLineLock,
+  });
   const testAndScriptLanguagePolicy = languageSurfaceAudit();
 
   const audit = {
@@ -603,6 +628,9 @@ export function buildCloseoutAudit(options = {}) {
       high_churn_paths_typed: highChurnPackages.every((entry) => entry.typed_boundary_ready),
       js_residue_explicitly_closed_out: residueInventory.every((entry) => entry.explicit_residue_only),
       new_unregistered_js_blocked: jsResidueSummary.totals.unregistered_js_file_count === 0,
+      js_residue_file_count_locked:
+        jsResidueRetirementBudget.legacy_allowlisted_js_file_count_within_budget
+        && jsResidueRetirementBudget.actual_js_line_count_within_budget,
       js_residue_line_growth_locked: residueLineLock.entries.every((entry) => entry.within_lock),
       test_and_script_language_policy_closed: testAndScriptLanguagePolicy.status === 'closed',
       quality_gates_green: Object.values(qualityGates).every((gate) => gate.status === 'pass' && gate.exit_code === 0),
@@ -614,6 +642,7 @@ export function buildCloseoutAudit(options = {}) {
       high_churn_packages: highChurnPackages,
       js_residue_inventory: residueInventory,
       js_residue_line_lock: residueLineLock,
+      js_residue_retirement_budget: jsResidueRetirementBudget,
       js_residue_summary: jsResidueSummary,
       test_and_script_language_policy: testAndScriptLanguagePolicy,
     },

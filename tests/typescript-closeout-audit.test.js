@@ -90,6 +90,7 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
 
   assert.equal(audit.criteria.js_residue_explicitly_closed_out, true);
   assert.equal(audit.criteria.new_unregistered_js_blocked, true);
+  assert.equal(audit.criteria.js_residue_file_count_locked, true);
   assert.equal(audit.criteria.test_and_script_language_policy_closed, true);
   assert.deepEqual(audit.language_target.primary_implementation_languages, ['TypeScript', 'Python']);
   assert.equal(audit.language_target.javascript_policy, 'legacy_allowlisted_residue_only');
@@ -97,6 +98,12 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
   assert.equal(audit.language_target.script_language_policy, 'new_scripts_default_to_typescript');
   assert.equal(audit.evidence.js_residue_summary.totals.unregistered_js_file_count, 0);
   assert.equal(audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count > 100, true);
+  assert.equal(
+    audit.evidence.js_residue_retirement_budget.actual_legacy_allowlisted_js_file_count,
+    audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count,
+  );
+  assert.equal(audit.evidence.js_residue_retirement_budget.legacy_allowlisted_js_file_count_within_budget, true);
+  assert.equal(audit.evidence.js_residue_retirement_budget.actual_js_line_count_within_budget, true);
   assert.equal(audit.evidence.js_residue_summary.by_directory.length > 10, true);
   for (const residue of audit.evidence.js_residue_inventory) {
     assert.deepEqual(
@@ -250,6 +257,27 @@ test('P18 closeout audit fails closed when a new JS script appears without regis
     assert.deepEqual(scriptsPolicy.unregistered_js_files, [unexpectedPath]);
   } finally {
     rmSync(unexpectedPath, { force: true });
+  }
+});
+
+test('P18 closeout audit fails closed when the registered JS residue budget grows', () => {
+  const previousContent = readFileSync(JS_RESIDUE_LINE_LOCK_FILE, 'utf-8');
+  const previousContract = JSON.parse(previousContent);
+  const tightenedContract = {
+    ...previousContract,
+    max_legacy_allowlisted_js_file_count: previousContract.max_legacy_allowlisted_js_file_count - 1,
+  };
+
+  writeFileSync(JS_RESIDUE_LINE_LOCK_FILE, `${JSON.stringify(tightenedContract, null, 2)}\n`, 'utf-8');
+
+  try {
+    const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+
+    assert.equal(audit.criteria.js_residue_file_count_locked, false);
+    assert.equal(audit.criteria.closeout_ready, false);
+    assert.equal(audit.evidence.js_residue_retirement_budget.legacy_allowlisted_js_file_count_within_budget, false);
+  } finally {
+    writeFileSync(JS_RESIDUE_LINE_LOCK_FILE, previousContent, 'utf-8');
   }
 });
 
