@@ -687,6 +687,58 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
   });
 });
 
+test('runDeliverableRoute includes operator user intent in route authoring context and cache key', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-intent-'));
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'Route user intent proof',
+      brief: '验证 direct route 保留操作者本轮具体意图。',
+      keywords: ['ppt', 'route', 'user-intent'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Route user intent proof',
+      goal: '验证 route authoring context',
+    });
+
+    const first = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+      userIntent: '第一轮：只生成同步主线',
+    });
+    assert.equal(first.ok, true);
+    assert.equal(first.summary.cache_status, 'miss');
+    assert.equal(first.artifact.contract.user_intent, '第一轮：只生成同步主线');
+    assert.equal(first.artifact.contract.delivery_request.user_intent, '第一轮：只生成同步主线');
+
+    const second = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+      userIntent: '第二轮：改为定点说明主任关心的问题',
+    });
+    assert.equal(second.ok, true);
+    assert.equal(second.summary.cache_status, 'miss');
+    assert.equal(second.artifact.contract.user_intent, '第二轮：改为定点说明主任关心的问题');
+    assert.notEqual(
+      second.artifact.route_cache.cache_key,
+      first.artifact.route_cache.cache_key,
+    );
+  });
+});
+
 test('runDeliverableRoute supports xiaohongshu routes on shared runtime', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));

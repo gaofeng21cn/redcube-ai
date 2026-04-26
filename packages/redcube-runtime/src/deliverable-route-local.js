@@ -1,16 +1,13 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { persistReviewStatePatch } from '@redcube/governance';
 import { CODEX_DEFAULT_ADAPTER } from '@redcube/hermes-substrate';
 import { hydrateDeliverableContract } from '@redcube/overlay-core';
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
-
 import { resolveExecutorAdapter } from './executors.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
-
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
   if (!text) {
@@ -24,7 +21,6 @@ function requireSafeSegment(name, value) {
   }
   return text;
 }
-
 function loadHydratedContract(deliverablePaths, storedDeliverable) {
   const contractRef = String(
     storedDeliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
@@ -35,7 +31,6 @@ function loadHydratedContract(deliverablePaths, storedDeliverable) {
     contract: JSON.parse(readFileSync(contractFile, 'utf-8')),
   };
 }
-
 const overlayRegistry = getDefaultOverlayRegistry();
 const REPEATED_BLOCK_FAIL_FAST_ROUTES = new Set([
   'render_html',
@@ -44,7 +39,6 @@ const REPEATED_BLOCK_FAIL_FAST_ROUTES = new Set([
   'screenshot_review',
 ]);
 const REPEATED_BLOCK_FAIL_FAST_OVERLAYS = new Set(['ppt_deck', 'xiaohongshu']);
-
 function routeStageDefinitions(contract) {
   return [
     ...(Array.isArray(contract?.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
@@ -215,6 +209,7 @@ function buildRouteCacheKey({
   deliverableId,
   contract,
   stageContract,
+  userIntent,
   mode,
   baselineDeliverableId,
   adapter,
@@ -232,6 +227,7 @@ function buildRouteCacheKey({
     prompt_pack: contract?.prompt_pack || null,
     review_surface: contract?.review_surface || null,
     delivery_contract: contract?.delivery_contract || null,
+    route_user_intent: safeText(userIntent),
     required_artifacts: routeRequiresArtifacts(contract, route),
     mode,
     baselineDeliverableId,
@@ -455,13 +451,16 @@ export function validateDeliverableRouteInput({
   };
 }
 
+function objectRecord(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+function attachRouteUserIntent(contract, userIntent) { const intent = safeText(userIntent); return intent ? { ...contract, user_intent: intent, userIntent: intent, delivery_request: { ...objectRecord(contract?.delivery_request), user_intent: intent, userIntent: intent }, route_request: { ...objectRecord(contract?.route_request), user_intent: intent } } : contract; }
+
 export async function executeDeliverableRouteLocally({
   workspaceRoot,
   overlay,
   topicId,
   deliverableId,
   route,
-  adapter = CODEX_DEFAULT_ADAPTER,
+  adapter = CODEX_DEFAULT_ADAPTER, userIntent = '',
   mode = 'draft_new',
   baselineDeliverableId = '',
 }) {
@@ -477,7 +476,7 @@ export async function executeDeliverableRouteLocally({
   const storedDeliverable = JSON.parse(
     readFileSync(deliverablePaths.deliverableFile, 'utf-8'),
   );
-  const contract = loadRouteReadyContract({
+  const contract = attachRouteUserIntent(loadRouteReadyContract({
     deliverablePaths,
     storedDeliverable,
     overlay,
@@ -485,7 +484,7 @@ export async function executeDeliverableRouteLocally({
     deliverableId,
     route: safeRoute,
     workspaceRoot,
-  });
+  }), userIntent);
   const stageContract = routeStageDefinitions(contract).find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
@@ -507,6 +506,7 @@ export async function executeDeliverableRouteLocally({
     deliverableId,
     contract,
     stageContract,
+    userIntent,
     mode,
     baselineDeliverableId,
     adapter: executor.adapter,

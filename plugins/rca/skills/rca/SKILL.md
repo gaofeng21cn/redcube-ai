@@ -29,6 +29,12 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 默认先开 frontdesk，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
 
+默认交付运行方式：
+
+- 对于不需要人工中途审阅的新交付，使用一次 `redcube product invoke`，不指定 `route`、不指定 `stop_after_stage`，让 RCA managed runtime 按 `auto_to_terminal` 自主推进到 review/export gate。
+- 只有在用户明确要求先审阅计划、批准后继续、定点回修、重跑某个 stage，或 runtime gate 已给出明确 `rerun_from_stage` 时，才使用 route-level invoke，例如 `--route fix_html`。
+- `redcube product session` 是恢复、检查进度和拾取产物的控制面，不应被当成外层 Codex 逐 stage 手工创作的替代品。
+
 ## Domain runtime 护栏
 
 - 用户点名 `RCA` / `RedCube AI` 或任务属于 slide deck、视觉交付、讲稿、海报、小红书等 RedCube 覆盖范围时，必须通过 RedCube product-entry / deliverable runtime 推进。
@@ -58,6 +64,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 4. `review`：通过 review state、publication projection 与 operator review gate 判断是否需要从明确 stage rerun。
 
 每一阶段都要保留 `entry_session_id`、`topic_id`、`deliverable_id`，并优先用 `redcube product session --entry-session-id <entry-session-id>` 恢复、检查进度和拾取 artifact。
+这套可恢复阶段流是 RCA runtime 的断点与治理模型；如果没有显式人工审阅或 runtime 阻塞，外层操作者应让 `product invoke` 一次性跑到终态，而不是逐个调用 `storyline`、`detailed_outline`、`render_html` 等内部 stage。
 
 ## 操作约束
 

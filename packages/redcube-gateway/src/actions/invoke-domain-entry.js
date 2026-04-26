@@ -134,7 +134,7 @@ export async function invokeDomainEntry(request) {
       topicId: domainPayload.topicId,
       deliverableId: domainPayload.deliverableId,
       route: requireField('domain_payload.route', domainPayload.route),
-      adapter: domainPayload.adapter || undefined,
+      adapter: domainPayload.adapter || undefined, userIntent: domainPayload.userIntent || undefined,
     });
   } else {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);

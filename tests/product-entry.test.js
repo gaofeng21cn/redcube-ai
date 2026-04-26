@@ -640,6 +640,14 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale m
     assert.equal(routeRun.domain_entry_surface.result_surface.surface_kind, 'route_run');
     assert.equal(Boolean(routeRun.continuation_snapshot.latest_run_id), true);
     assert.equal(routeRun.continuation_snapshot.latest_managed_run_id, null);
+    assert.equal(
+      routeRun.domain_entry_surface.result_surface.artifact.contract.user_intent,
+      '直接重跑故事主线',
+    );
+    assert.equal(
+      routeRun.domain_entry_surface.result_surface.artifact.contract.delivery_request.user_intent,
+      '直接重跑故事主线',
+    );
 
     const sessionFile = routeRun.entry_session.session_file;
     assert.equal(readJson(sessionFile).latest_surface_kind, 'route_run');

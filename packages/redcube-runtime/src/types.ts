@@ -297,6 +297,7 @@ export interface RuntimeRunRouteRequest {
   runId?: string | null;
   managedRunId?: string | null;
   adapter?: string;
+  userIntent?: string;
   mode?: string;
   baselineDeliverableId?: string;
 }

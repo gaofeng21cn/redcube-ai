@@ -1170,6 +1170,7 @@ export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
 export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayRequest {
   route: string;
   adapter?: string;
+  userIntent?: string;
   managedRunId?: string | null;
 }
 

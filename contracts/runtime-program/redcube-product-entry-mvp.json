@@ -27,6 +27,15 @@
       "run_managed_deliverable",
       "run_deliverable_route"
     ],
+    "optional_delivery_fields": [
+      "delivery_request.route",
+      "delivery_request.adapter",
+      "delivery_request.user_intent",
+      "delivery_request.stop_after_stage",
+      "delivery_request.lifecycle_policy",
+      "delivery_request.mode",
+      "delivery_request.baseline_deliverable_id"
+    ],
     "default_task_intent": "run_managed_deliverable",
     "shared_runtime_owner": "upstream_hermes_agent",
     "shared_domain_entry_contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json"
