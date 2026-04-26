@@ -11,6 +11,7 @@ import {
 
 import {
   buildSourcePackFederationArtifact,
+  ensureWorkspaceGitBoundary,
   getSourceArtifactPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
@@ -103,6 +104,7 @@ function ensureWorkspaceAndTopic({ workspaceRoot, topicId, title }) {
   const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
 
   ensureDir(contract.workspaceRoot);
+  ensureWorkspaceGitBoundary({ workspaceRoot: contract.workspaceRoot });
   if (!existsSync(contract.workspaceFile)) {
     writeJson(contract.workspaceFile, {
       workspace_version: 1,

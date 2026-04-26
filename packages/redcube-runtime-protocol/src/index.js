@@ -4,6 +4,8 @@ export {
   getDeliverablePaths,
   getNotePaths,
   getTopicPaths,
+  ensureWorkspaceGitBoundary,
+  renderWorkspaceGitignore,
   resolveWorkspaceContract,
 } from './workspace.js';
 export {

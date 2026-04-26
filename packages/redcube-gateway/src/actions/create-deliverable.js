@@ -9,6 +9,7 @@ import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { rebuildTopicPublicationProjection } from '@redcube/runtime';
 import {
   buildSourcePackFederationArtifact,
+  ensureWorkspaceGitBoundary,
   getDeliverablePaths,
   getSourceArtifactPaths,
   getTopicPaths,
@@ -132,6 +133,7 @@ export async function createDeliverable({
   title,
   goal,
 }) {
+  ensureWorkspaceGitBoundary({ workspaceRoot });
   const workspaceAgentsFile = ensureWorkspaceAgentsFile({ workspaceRoot });
   const overlayDefinition = overlayRegistry.getOverlay(overlay);
   if (typeof overlayDefinition.buildDeliverableRecord !== 'function') {

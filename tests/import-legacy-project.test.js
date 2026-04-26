@@ -49,6 +49,12 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
   assert.equal(result.summary.audit_status, 'pass');
   assert.equal(result.mode, 'historical_project_to_workspace');
   assert.equal(result.project, 'topic-a');
+  assert.equal(existsSync(path.join(workspaceRoot, '.git')), true);
+  assert.match(readFileSync(path.join(workspaceRoot, '.gitignore'), 'utf-8'), /^runtime\/$/m);
+  assert.equal(
+    execFileSync('git', ['-C', workspaceRoot, 'check-ignore', 'runtime/probe.json'], { encoding: 'utf-8' }).trim(),
+    'runtime/probe.json',
+  );
   assert.equal(
     existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'inputs', 'raw_materials', 'source.md')),
     true,

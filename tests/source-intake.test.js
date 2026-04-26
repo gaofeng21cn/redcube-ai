@@ -65,6 +65,13 @@ test('intakeSource creates canonical source truth from brief and keywords', asyn
   assert.equal(existsSync(result.artifactFiles.extractedMaterialsFile), true);
   assert.equal(existsSync(result.artifactFiles.sourceAuditFile), true);
   assert.equal(existsSync(result.artifactFiles.sourceBriefFile), true);
+  assert.equal(existsSync(path.join(workspaceRoot, '.git')), true);
+  assert.equal(existsSync(path.join(workspaceRoot, '.gitignore')), true);
+  assert.match(readFileSync(path.join(workspaceRoot, '.gitignore'), 'utf-8'), /^runtime\/$/m);
+  assert.equal(
+    execFileSync('git', ['-C', workspaceRoot, 'check-ignore', 'runtime/probe.json'], { encoding: 'utf-8' }).trim(),
+    'runtime/probe.json',
+  );
 
   const sourceBrief = readJson(result.artifactFiles.sourceBriefFile);
   assert.equal(sourceBrief.input_mode, 'brief_keywords');

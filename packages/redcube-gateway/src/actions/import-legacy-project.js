@@ -11,6 +11,7 @@ import {
 
 import { getDefaultOverlayCatalog } from '@redcube/overlay-registry';
 import {
+  ensureWorkspaceGitBoundary,
   getTopicPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
@@ -19,6 +20,7 @@ import { intakeSource } from '@redcube/runtime';
 function ensureWorkspaceContract(workspaceRoot) {
   const contract = resolveWorkspaceContract({ workspaceRoot });
   mkdirSync(contract.workspaceRoot, { recursive: true });
+  ensureWorkspaceGitBoundary({ workspaceRoot: contract.workspaceRoot });
 
   if (!existsSync(contract.workspaceFile)) {
     writeFileSync(

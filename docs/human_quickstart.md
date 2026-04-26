@@ -109,6 +109,8 @@
 
 ```text
 <workspace>/
+├── .git/
+├── .gitignore
 ├── redcube.workspace.json
 ├── topics/
 │   └── <topic-id>/
@@ -132,6 +134,7 @@
 你真正需要先理解的只有两层：
 
 - 工作区根目录会有 `redcube.workspace.json`
+- 工作区根目录会有轻量 Git 边界，`runtime/` 会被根级 `.gitignore` 排除
 - 每个主题最关键的事实真相面都落在 `topics/<topic-id>/canonical/`
 
 建议这样理解这些目录：
@@ -150,6 +153,7 @@
 - `canonical/`、`contracts/`、`reports/` 不建议手工维护，应由 `RedCube AI` 自动落盘
 - 你可以把材料先放进 workspace，也可以让 Agent 在 `source intake` 时把外部材料复制进 canonical 输入面
 - 人类最好只维护原始素材和高层意图，不要把 runtime 真相层当普通笔记目录来改
+- 外层 Git 用于让 Codex / Agent 快速识别 workspace truth；运行态继续留在 `runtime/`，不进入外层 Git 跟踪范围
 
 如果你已经准备好了参考材料，建议直接放到 `topics/<topic-id>/inputs/`，或者让 Agent 通过绝对路径作为 `source-files` 读取。
 
@@ -158,6 +162,7 @@
 当前仍没有单独的 `workspace init` 命令。`workspace doctor` 只负责诊断当前 workspace contract 是否存在；当目录是全新或很薄的 workspace 时，应由 `source intake` 或 `source research` 正式补齐 canonical bootstrap。第一次执行这些 Source Readiness surface 时，`RedCube AI` 已经会自动补齐基础结构：
 
 - `redcube.workspace.json`
+- `.git/` 与根级 `.gitignore`
 - `topics/<topic-id>/inputs/`
 - `topics/<topic-id>/canonical/`
 - `topics/<topic-id>/topic.json`

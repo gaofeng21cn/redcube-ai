@@ -19,6 +19,13 @@ export interface WorkspaceContract {
   overlaysDir: string;
 }
 
+export interface WorkspaceGitBoundary {
+  initialized: boolean;
+  already_initialized: boolean;
+  git_dir: string;
+  gitignore_path: string;
+}
+
 export interface TopicPaths {
   topicId: string;
   topicDir: string;

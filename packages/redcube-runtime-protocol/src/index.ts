@@ -8,6 +8,8 @@ import {
   getDeliverablePaths as getDeliverablePathsJs,
   getNotePaths as getNotePathsJs,
   getTopicPaths as getTopicPathsJs,
+  ensureWorkspaceGitBoundary as ensureWorkspaceGitBoundaryJs,
+  renderWorkspaceGitignore as renderWorkspaceGitignoreJs,
   resolveWorkspaceContract as resolveWorkspaceContractJs,
 } from './workspace.js';
 import {
@@ -58,6 +60,7 @@ import type {
   ValidateSourceAugmentationResultOptions,
   ValidationResult,
   WorkspaceContract,
+  WorkspaceGitBoundary,
 } from './types.js';
 
 export function createRunRecord(input: CreateRunRecordInput = {}): RunRecord {
@@ -70,6 +73,14 @@ export function createManagedRunRecord(input: CreateManagedRunRecordInput = {}):
 
 export function resolveWorkspaceContract(input: { workspaceRoot: string }): WorkspaceContract {
   return resolveWorkspaceContractJs(input) as WorkspaceContract;
+}
+
+export function renderWorkspaceGitignore(): string {
+  return renderWorkspaceGitignoreJs() as string;
+}
+
+export function ensureWorkspaceGitBoundary(input: { workspaceRoot: string }): WorkspaceGitBoundary {
+  return ensureWorkspaceGitBoundaryJs(input) as WorkspaceGitBoundary;
 }
 
 export function getTopicPaths(workspaceRoot: string, topicId: string): TopicPaths {
@@ -159,4 +170,5 @@ export type {
   ValidateSourceAugmentationResultOptions,
   ValidationResult,
   WorkspaceContract,
+  WorkspaceGitBoundary,
 };
