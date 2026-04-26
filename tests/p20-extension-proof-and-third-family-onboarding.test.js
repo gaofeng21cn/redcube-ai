@@ -12,7 +12,7 @@ function readJson(file) {
 }
 
 test('P20.B: runtime executor resolves host-agent family runners through runtime-family-registry', () => {
-  const executors = read('packages/redcube-runtime/src/executors.js');
+  const executors = read('packages/redcube-runtime/src/executors.ts');
   const runtimePackage = readJson('packages/redcube-runtime/package.json');
 
   assert.equal(executors.includes("@redcube/runtime-family-ppt"), false);
