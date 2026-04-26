@@ -426,7 +426,7 @@ test('CLI source intake proxies gateway action', () => {
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'source',
       'intake',
       '--workspace-root',
@@ -549,7 +549,7 @@ test('CLI source augment prepares canonical augmentation contract from source re
   execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'source',
       'intake',
       '--workspace-root',
@@ -569,7 +569,7 @@ test('CLI source augment prepares canonical augmentation contract from source re
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'source',
       'augment',
       '--workspace-root',
@@ -607,7 +607,7 @@ test('CLI source research can finish Source Readiness end-to-end on result_file 
     const output = execFileSync(
       'node',
       [
-        path.resolve('apps/redcube-cli/src/cli.js'),
+        path.resolve('apps/redcube-cli/dist/cli.js'),
         'source',
         'research',
         '--workspace-root',
@@ -709,7 +709,7 @@ test('CLI source write-augmentation-result stages canonical result artifact from
   execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'source',
       'intake',
       '--workspace-root',
@@ -731,7 +731,7 @@ test('CLI source write-augmentation-result stages canonical result artifact from
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'source',
       'write-augmentation-result',
       '--workspace-root',
@@ -1159,7 +1159,7 @@ process.stdout.write(JSON.stringify({
     execFileSync(
       'node',
       [
-        path.resolve('apps/redcube-cli/src/cli.js'),
+        path.resolve('apps/redcube-cli/dist/cli.js'),
         'source',
         'intake',
         '--workspace-root',
@@ -1179,7 +1179,7 @@ process.stdout.write(JSON.stringify({
     const output = execFileSync(
       'node',
       [
-        path.resolve('apps/redcube-cli/src/cli.js'),
+        path.resolve('apps/redcube-cli/dist/cli.js'),
         'source',
         'execute-augmentation',
         '--workspace-root',

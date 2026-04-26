@@ -45,7 +45,7 @@ function createIsolatedCliInstall() {
   );
 
   copyFileSync(
-    path.resolve('apps/redcube-cli/src/cli.js'),
+    path.resolve('apps/redcube-cli/dist/cli.js'),
     path.join(cliDir, 'cli.js'),
   );
   copyFileSync(
@@ -245,7 +245,7 @@ test('CLI workspace doctor proxies gateway doctorWorkspace', () => {
 
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'workspace', 'doctor', '--workspace-root', workspaceRoot],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'workspace', 'doctor', '--workspace-root', workspaceRoot],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
 
@@ -315,7 +315,7 @@ test('CLI product invalid subcommand keeps the internal OPL bridge out of public
 test('CLI help exposes task-oriented onboarding surface', () => {
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'help'],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'help'],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
 
@@ -359,7 +359,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
 
 
 test('CLI subcommand --help returns machine-readable command help without executing the route', () => {
-  const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+  const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
   const expectedRoute = [
     'workspace doctor',
     'source intake / source research',
@@ -488,7 +488,7 @@ test('CLI topics list proxies gateway listTopics', () => {
 
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'topics', 'list', '--workspace-root', workspaceRoot],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'topics', 'list', '--workspace-root', workspaceRoot],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
 
@@ -507,7 +507,7 @@ test('CLI deliverable create proxies gateway createDeliverable', () => {
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'deliverable',
       'create',
       '--workspace-root',
@@ -541,7 +541,7 @@ test('CLI deliverable get returns operator-facing deliverable record surface', (
   execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'deliverable',
       'create',
       '--workspace-root', workspaceRoot,
@@ -558,7 +558,7 @@ test('CLI deliverable get returns operator-facing deliverable record surface', (
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'deliverable',
       'get',
       '--workspace-root', workspaceRoot,
@@ -664,7 +664,7 @@ test('CLI deliverable run works from isolated install through the upstream Herme
 
 test('CLI deliverable run and runs get proxy the contract-driven runtime mainline', async () => {
   await withMockHermesUpstreamCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-run-'));
 
     await execCliAsync(

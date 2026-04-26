@@ -8,8 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "redcube": "node apps/redcube-cli/src/cli.js",
-    "mcp": "node apps/redcube-mcp/src/server.js",
+    "redcube": "node apps/redcube-cli/dist/cli.js",
+    "mcp": "node apps/redcube-mcp/dist/server.js",
     "test": "npm run --silent build && node scripts/run-test-group.mjs fast",
     "test:fast": "npm run --silent build && node scripts/run-test-group.mjs fast",
     "test:meta": "npm run --silent build && node scripts/run-test-group.mjs meta",

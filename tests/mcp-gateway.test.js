@@ -12,7 +12,7 @@ import {
   callGatewayTool,
   getToolDefinitions,
   listGatewayTools,
-} from '../apps/redcube-mcp/src/server.js';
+} from '../apps/redcube-mcp/dist/server.js';
 import {
   createDeliverable,
   intakeSource,
@@ -771,7 +771,7 @@ test('callGatewayTool rejects unknown tool names', async () => {
 
 test('stdio MCP server exposes tools and can execute runtime_watch', async () => {
   const serverPath = fileURLToPath(
-    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+    new URL('../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const transport = new StdioClientTransport({
@@ -853,7 +853,7 @@ test('stdio MCP server rejects runtime_watch when the topic locator does not mat
   });
 
   const serverPath = fileURLToPath(
-    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+    new URL('../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const transport = new StdioClientTransport({
@@ -914,7 +914,7 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
   );
 
   const serverPath = fileURLToPath(
-    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+    new URL('../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const transport = new StdioClientTransport({
@@ -955,7 +955,7 @@ test('stdio MCP server preserves deliverable locator fields for audit_deliverabl
 
 test('stdio MCP server returns operator-facing error metadata for failing tools', async () => {
   const serverPath = fileURLToPath(
-    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+    new URL('../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const transport = new StdioClientTransport({
@@ -1000,7 +1000,7 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
   await withMockHermesUpstream(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-run-'));
   const serverPath = fileURLToPath(
-    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+    new URL('../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const transport = new StdioClientTransport({
@@ -1094,7 +1094,7 @@ test('stdio MCP server can create and run xiaohongshu deliverable routes on shar
   await withMockHermesUpstream(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-xhs-'));
   const serverPath = fileURLToPath(
-    new URL('../apps/redcube-mcp/src/server.js', import.meta.url),
+    new URL('../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
   const transport = new StdioClientTransport({

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "bin": {
-    "redcube-mcp": "./src/server.js"
+    "redcube-mcp": "./dist/server.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",

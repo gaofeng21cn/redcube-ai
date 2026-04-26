@@ -86,7 +86,7 @@
 如果你已经有一套外部 prompts，可执行：
 
 ```bash
-node apps/redcube-cli/src/cli.js profile \
+node apps/redcube-cli/dist/cli.js profile \
   --action bootstrap \
   --source-dir "/absolute/path/to/your-private-prompts/system/自动小红书"
 ```
@@ -96,7 +96,7 @@ node apps/redcube-cli/src/cli.js profile \
 ## 导出私有层备份
 
 ```bash
-node apps/redcube-cli/src/cli.js profile \
+node apps/redcube-cli/dist/cli.js profile \
   --action export \
   --bundle "~/Downloads/redcube-private-profile.tgz"
 ```
@@ -110,7 +110,7 @@ node apps/redcube-cli/src/cli.js profile \
 ## 在另一台机器安装
 
 ```bash
-node apps/redcube-cli/src/cli.js profile \
+node apps/redcube-cli/dist/cli.js profile \
   --action install \
   --bundle "~/Downloads/redcube-private-profile.tgz"
 ```

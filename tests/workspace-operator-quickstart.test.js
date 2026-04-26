@@ -5,14 +5,14 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { buildHelp, getCliGatewayActions } from '../apps/redcube-cli/src/cli.js';
-import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/src/server.js';
+import { buildHelp, getCliGatewayActions } from '../apps/redcube-cli/dist/cli.js';
+import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
 function runCli(args, options = {}) {
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), ...args],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), ...args],
     { encoding: 'utf-8', cwd: path.resolve('.'), ...options },
   );
 

@@ -133,7 +133,7 @@ test('CLI source research proxies unified Step 1 orchestration surface', () => {
     const output = execFileSync(
       'node',
       [
-        path.resolve('apps/redcube-cli/src/cli.js'),
+        path.resolve('apps/redcube-cli/dist/cli.js'),
         'source',
         'research',
         '--workspace-root',

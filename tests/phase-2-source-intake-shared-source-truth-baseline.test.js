@@ -48,7 +48,7 @@ test('phase-2 minimum baseline contract remains absorbed provenance behind the c
 test('phase-2 minimum baseline contract freezes canonical quartet, formal entry surfaces, and family consumption expectations', () => {
   const contract = readJson(BASELINE_CONTRACT);
   const gatewayIntake = readImplementation('packages/redcube-gateway/src/actions/intake-source.js');
-  const mcpServer = read('apps/redcube-mcp/src/server.js');
+  const mcpServer = read('apps/redcube-mcp/dist/server.js');
   const sharedSourceTruth = readImplementation('packages/redcube-runtime/src/shared-source-truth.js');
   const deliverableRouteLocal = readImplementation('packages/redcube-runtime/src/deliverable-route-local.js');
 

@@ -2,11 +2,9 @@
   "contract_id": "js-residue-line-lock",
   "date_anchor": "2026-04-26",
   "policy": "Existing JS residue may shrink or move behind typed boundaries, but it may not grow. New implementation belongs in TypeScript or Python-owned helpers.",
-  "max_legacy_allowlisted_js_file_count": 120,
-  "max_actual_js_line_count": 19646,
+  "max_legacy_allowlisted_js_file_count": 118,
+  "max_actual_js_line_count": 19598,
   "line_counts": {
-    "apps/redcube-cli/src/cli.js": 27,
-    "apps/redcube-mcp/src/server.js": 21,
     "packages/redcube-codex-cli-client/src/index.js": 800,
     "packages/redcube-config/src/index.js": 1,
     "packages/redcube-config/src/private-profile.js": 1,

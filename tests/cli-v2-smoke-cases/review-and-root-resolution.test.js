@@ -45,7 +45,7 @@ function createIsolatedCliInstall() {
   );
 
   copyFileSync(
-    path.resolve('apps/redcube-cli/src/cli.js'),
+    path.resolve('apps/redcube-cli/dist/cli.js'),
     path.join(cliDir, 'cli.js'),
   );
   copyFileSync(
@@ -241,7 +241,7 @@ async function withMockHermesUpstreamCli(testFn) {
 
 test('CLI review watch returns operator-facing runtime watch surface for a persisted run', async () => {
   await withMockHermesUpstreamCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-'));
 
     const createOutput = await execCliAsync(
@@ -296,7 +296,7 @@ test('CLI review watch returns operator-facing runtime watch surface for a persi
 
 test('CLI review watch rejects a persisted run when topic locator does not match the run identity', async () => {
   await withMockHermesUpstreamCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-mismatch-'));
 
     for (const topicId of ['topic-a', 'topic-b']) {
@@ -398,7 +398,7 @@ test('CLI topics list resolves root by priority: --workspace-root over --root-di
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'topics',
       'list',
       '--workspace-root',
@@ -428,7 +428,7 @@ test('CLI topics list falls back to --root-dir when --workspace-root is absent',
 
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'topics', 'list', '--root-dir', workspaceRoot],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'topics', 'list', '--root-dir', workspaceRoot],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
 
@@ -456,7 +456,7 @@ test('CLI topics list falls back to process.cwd() when root flags are absent', (
 
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'topics', 'list'],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'topics', 'list'],
     { encoding: 'utf-8', cwd: workspaceRoot },
   );
 
@@ -476,7 +476,7 @@ test('CLI workspace doctor resolves root by priority: --workspace-root over --ro
   const output = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'workspace',
       'doctor',
       '--workspace-root',
@@ -498,7 +498,7 @@ test('CLI workspace doctor falls back to --root-dir when --workspace-root is abs
 
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'workspace', 'doctor', '--root-dir', workspaceRoot],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'workspace', 'doctor', '--root-dir', workspaceRoot],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
 
@@ -518,7 +518,7 @@ test('CLI workspace doctor falls back to process.cwd() when root flags are absen
 
   const output = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'workspace', 'doctor'],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'workspace', 'doctor'],
     { encoding: 'utf-8', cwd: workspaceRoot },
   );
 

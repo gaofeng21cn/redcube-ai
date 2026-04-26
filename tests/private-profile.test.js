@@ -108,7 +108,7 @@ test('CLI profile command supports bootstrap export and install', () => {
 
   const bootstrapOutput = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'profile', '--action', 'bootstrap', '--source-dir', sourceDir, '--config-home', configHome],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'profile', '--action', 'bootstrap', '--source-dir', sourceDir, '--config-home', configHome],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
   const bootstrapResult = JSON.parse(bootstrapOutput);
@@ -116,7 +116,7 @@ test('CLI profile command supports bootstrap export and install', () => {
 
   const exportOutput = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'profile', '--action', 'export', '--bundle', bundleFile, '--config-home', configHome],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'profile', '--action', 'export', '--bundle', bundleFile, '--config-home', configHome],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
   const exportResult = JSON.parse(exportOutput);
@@ -124,7 +124,7 @@ test('CLI profile command supports bootstrap export and install', () => {
 
   const installOutput = execFileSync(
     'node',
-    [path.resolve('apps/redcube-cli/src/cli.js'), 'profile', '--action', 'install', '--bundle', bundleFile, '--config-home', installedHome],
+    [path.resolve('apps/redcube-cli/dist/cli.js'), 'profile', '--action', 'install', '--bundle', bundleFile, '--config-home', installedHome],
     { encoding: 'utf-8', cwd: path.resolve('.') },
   );
   const installResult = JSON.parse(installOutput);

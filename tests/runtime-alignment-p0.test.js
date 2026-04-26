@@ -25,7 +25,7 @@ function readJson(file) {
 
 test('repo-tracked docs keep durable runtime truth while public readmes stay shell-first and codex-default', () => {
   const pkg = JSON.parse(read('package.json'));
-  const cli = read('apps/redcube-cli/src/cli.js');
+  const cli = read('apps/redcube-cli/src/cli.ts');
 
   assert.equal(Boolean(pkg.scripts.redcube), true);
   assert.equal(Boolean(pkg.scripts.mcp), true);
@@ -49,7 +49,7 @@ test('repo-tracked docs keep durable runtime truth while public readmes stay she
 });
 
 test('CLI help exposes the current deliverable adapter set, including the explicit Hermes proof lane', () => {
-  const cli = read('apps/redcube-cli/src/cli.js');
+  const cli = read('apps/redcube-cli/src/cli.ts');
 
   assert.equal(
     cli.includes('[--adapter <host_agent|hermes_native_proof>]'),
@@ -206,8 +206,12 @@ test('truth-freeze suites do not read ignored local tooling state directly', () 
 });
 
 test('P0 truth surfaces keep CLI and MCP implemented while controller surface is absent', () => {
-  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.js')), true);
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), true);
+  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.ts')), true);
+  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.ts')), true);
+  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.js')), false);
+  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), false);
+  assert.equal(existsSync(path.resolve('apps/redcube-cli/dist/cli.js')), true);
+  assert.equal(existsSync(path.resolve('apps/redcube-mcp/dist/server.js')), true);
   assert.equal(existsSync(path.resolve('apps/redcube-controller/src/index.js')), false);
   assert.equal(existsSync(path.resolve('packages/redcube-controller/package.json')), false);
 });

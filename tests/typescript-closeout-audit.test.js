@@ -41,8 +41,6 @@ function passingQualityGates() {
 }
 
 const LEAF_TS_MIGRATION_LOCKS = {
-  'apps/redcube-cli/src/cli.js': 27,
-  'apps/redcube-mcp/src/server.js': 21,
   'packages/redcube-config/src/index.js': 1,
   'packages/redcube-config/src/private-profile.js': 1,
   'packages/redcube-config/src/xiaohongshu-author-profile.js': 1,
@@ -335,9 +333,11 @@ test('P18 closeout audit fails closed when a new JS script appears without regis
 test('P18 closeout audit fails closed when the registered JS residue budget grows', () => {
   const previousContent = readFileSync(JS_RESIDUE_LINE_LOCK_FILE, 'utf-8');
   const previousContract = JSON.parse(previousContent);
+  const baselineAudit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
   const tightenedContract = {
     ...previousContract,
-    max_legacy_allowlisted_js_file_count: previousContract.max_legacy_allowlisted_js_file_count - 1,
+    max_legacy_allowlisted_js_file_count:
+      baselineAudit.evidence.js_residue_retirement_budget.actual_legacy_allowlisted_js_file_count - 1,
   };
 
   writeFileSync(JS_RESIDUE_LINE_LOCK_FILE, `${JSON.stringify(tightenedContract, null, 2)}\n`, 'utf-8');

@@ -45,7 +45,7 @@ function createIsolatedCliInstall() {
   );
 
   copyFileSync(
-    path.resolve('apps/redcube-cli/src/cli.js'),
+    path.resolve('apps/redcube-cli/dist/cli.js'),
     path.join(cliDir, 'cli.js'),
   );
   copyFileSync(
@@ -241,7 +241,7 @@ async function withMockHermesUpstreamCli(testFn) {
 
 test('CLI deliverable execute, managed get, and managed supervise proxy the managed execution control plane', async () => {
   await withMockHermesUpstreamCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
 
     await execCliAsync(
@@ -687,7 +687,7 @@ test('CLI review get and mutate proxy review platform actions', () => {
   execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'deliverable',
       'create',
       '--workspace-root', workspaceRoot,
@@ -704,7 +704,7 @@ test('CLI review get and mutate proxy review platform actions', () => {
   const getOutput = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'review',
       'get',
       '--workspace-root', workspaceRoot,
@@ -725,7 +725,7 @@ test('CLI review get and mutate proxy review platform actions', () => {
   const mutateOutput = execFileSync(
     'node',
     [
-      path.resolve('apps/redcube-cli/src/cli.js'),
+      path.resolve('apps/redcube-cli/dist/cli.js'),
       'review',
       'mutate',
       '--workspace-root', workspaceRoot,
@@ -745,7 +745,7 @@ test('CLI review get and mutate proxy review platform actions', () => {
 
 test('CLI review projection proxies topic publication projection read path', async () => {
   await withMockHermesUpstreamCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/src/cli.js');
+    const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-projection-'));
 
     const createOutput = await execCliAsync(

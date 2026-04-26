@@ -50,8 +50,6 @@ const HIGH_CHURN_PACKAGES = [
 ];
 
 const JS_RESIDUE_ALLOWLIST = {
-  'apps/redcube-cli': ['src/cli.js'],
-  'apps/redcube-mcp': ['src/server.js'],
   'packages/redcube-codex-cli-client': ['src/index.js'],
   'packages/redcube-config': [
     'src/index.js',
