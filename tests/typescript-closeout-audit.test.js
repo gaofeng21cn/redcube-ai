@@ -64,16 +64,45 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
   const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
 
   assert.equal(audit.criteria.js_residue_explicitly_closed_out, true);
+  assert.equal(audit.criteria.new_unregistered_js_blocked, true);
+  assert.deepEqual(audit.language_target.primary_implementation_languages, ['TypeScript', 'Python']);
+  assert.equal(audit.language_target.javascript_policy, 'legacy_allowlisted_residue_only');
+  assert.equal(audit.evidence.js_residue_summary.totals.unregistered_js_file_count, 0);
+  assert.equal(audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count > 100, true);
+  assert.equal(audit.evidence.js_residue_summary.by_directory.length > 10, true);
   for (const residue of audit.evidence.js_residue_inventory) {
     assert.deepEqual(
       residue.actual_js_files,
       residue.expected_js_files,
       residue.directory,
     );
+    assert.deepEqual(residue.unregistered_js_files, []);
     assert.equal(typeof residue.exception_registration?.owner, 'string');
     assert.equal(typeof residue.exception_registration?.reason, 'string');
     assert.equal(typeof residue.exception_registration?.migration_window, 'string');
   }
+});
+
+test('P18 closeout audit classifies legacy allowlisted JS separately from unregistered JS residue', () => {
+  const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+  const runtimeResidue = audit.evidence.js_residue_inventory.find((entry) => entry.directory === 'packages/redcube-runtime');
+
+  assert.ok(runtimeResidue, 'packages/redcube-runtime residue inventory');
+  assert.equal(runtimeResidue.legacy_allowlisted_js_files.includes('src/runtime-state.js'), true);
+  assert.equal(
+    runtimeResidue.residue_classification.some((entry) => (
+      entry.file === 'src/runtime-state.js' && entry.status === 'legacy_allowlisted'
+    )),
+    true,
+  );
+  assert.equal(
+    audit.evidence.js_residue_summary.by_directory.some((entry) => (
+      entry.directory === 'packages/redcube-runtime'
+      && entry.legacy_allowlisted_js_file_count > 0
+      && entry.unregistered_js_file_count === 0
+    )),
+    true,
+  );
 });
 
 test('P18 closeout audit line-locks existing JS residue so it cannot keep absorbing new implementation', () => {
@@ -119,13 +148,48 @@ test('P18 closeout audit fails closed when nested JS appears without an explicit
   try {
     const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
     const residue = audit.evidence.js_residue_inventory.find((entry) => entry.directory === residueDirectory);
+    const summary = audit.evidence.js_residue_summary.by_directory.find((entry) => entry.directory === residueDirectory);
 
     assert.equal(audit.criteria.js_residue_explicitly_closed_out, false);
+    assert.equal(audit.criteria.new_unregistered_js_blocked, false);
     assert.equal(audit.criteria.closeout_ready, false);
     assert.ok(residue, residueDirectory);
+    assert.ok(summary, residueDirectory);
     assert.deepEqual(residue.unexpected_js_files, [unexpectedFile]);
+    assert.deepEqual(residue.unregistered_js_files, [unexpectedFile]);
+    assert.equal(
+      residue.residue_classification.some((entry) => (
+        entry.file === unexpectedFile && entry.status === 'unregistered_js_residue'
+      )),
+      true,
+    );
+    assert.equal(summary.unregistered_js_file_count, 1);
   } finally {
     rmSync(path.dirname(unexpectedPath), { recursive: true, force: true });
+  }
+});
+
+test('P18 closeout audit fails closed when a new package adds JS without registration', () => {
+  const residueDirectory = 'packages/__closeout-new-js-package__';
+  const unexpectedFile = 'src/unregistered.js';
+  const unexpectedPath = path.join(residueDirectory, unexpectedFile);
+
+  mkdirSync(path.dirname(unexpectedPath), { recursive: true });
+  writeFileSync(unexpectedPath, 'export const unregistered = true;\n', 'utf-8');
+
+  try {
+    const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+    const residue = audit.evidence.js_residue_inventory.find((entry) => entry.directory === residueDirectory);
+
+    assert.equal(audit.criteria.js_residue_explicitly_closed_out, false);
+    assert.equal(audit.criteria.new_unregistered_js_blocked, false);
+    assert.equal(audit.criteria.closeout_ready, false);
+    assert.ok(residue, residueDirectory);
+    assert.equal(residue.package_name, null);
+    assert.deepEqual(residue.expected_js_files, []);
+    assert.deepEqual(residue.unregistered_js_files, [unexpectedFile]);
+  } finally {
+    rmSync(residueDirectory, { recursive: true, force: true });
   }
 });
 

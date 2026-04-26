@@ -157,6 +157,7 @@ const HISTORICAL = [
 
 const FAST = [
   'tests/typescript-baseline.test.js',
+  'tests/typescript-closeout-audit.test.js',
   'tests/runtime-protocol-workspace.test.js',
   'tests/overlay-registry.test.js',
   'tests/profile-contract-hydration.test.js',
