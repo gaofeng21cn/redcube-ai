@@ -106,3 +106,64 @@ test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed 
   assert.match(types, /interface CodexCliProbeResult/);
   assert.match(types, /interface StructuredArtifactGenerationResult/);
 });
+
+test('P23.A: utility packages expose TypeScript service entrypoints without changing runtime JS exports', () => {
+  const packages = [
+    {
+      directory: 'packages/redcube-config',
+      publicEntrypoints: [
+        'src/index.ts',
+        'src/private-profile.ts',
+        'src/xiaohongshu-author-profile.ts',
+      ],
+      expectedTypes: [
+        /interface RedcubeRuntimeConfig/,
+        /interface RedcubeWorkspaceAuthorProfile/,
+      ],
+    },
+    {
+      directory: 'packages/redcube-tools',
+      publicEntrypoints: ['src/index.ts'],
+      expectedTypes: [
+        /interface RedcubeProjectBundle/,
+        /interface RedcubeGeneratedTasks/,
+      ],
+    },
+    {
+      directory: 'packages/redcube-llm',
+      publicEntrypoints: ['src/index.ts'],
+      expectedTypes: [
+        /interface RedcubeNoteDraftRequest/,
+        /interface RedcubeStorylineRequest/,
+      ],
+    },
+  ];
+  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
+
+  for (const pkgSpec of packages) {
+    const pkg = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'package.json'), 'utf-8'));
+    const packageTsconfig = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'tsconfig.json'), 'utf-8'));
+    const types = readFileSync(path.resolve(pkgSpec.directory, 'src/types.ts'), 'utf-8');
+
+    assert.equal(pkg.types, './src/index.ts', pkgSpec.directory);
+    assert.equal(packageTsconfig.extends, '../../tsconfig.base.json', pkgSpec.directory);
+    assert.equal(
+      rootTsconfig.references.some((entrypoint) => entrypoint.path === `./${pkgSpec.directory}`),
+      true,
+      pkgSpec.directory,
+    );
+
+    for (const entrypoint of pkgSpec.publicEntrypoints) {
+      assert.equal(existsSync(path.resolve(pkgSpec.directory, entrypoint)), true, entrypoint);
+    }
+    for (const expectedType of pkgSpec.expectedTypes) {
+      assert.match(types, expectedType, pkgSpec.directory);
+    }
+  }
+
+  const redcubeConfigPkg = JSON.parse(readFileSync(path.resolve('packages/redcube-config/package.json'), 'utf-8'));
+  assert.equal(redcubeConfigPkg.exports['.'].default, './src/index.js');
+  assert.equal(redcubeConfigPkg.exports['./private-profile'].default, './src/private-profile.js');
+  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].default, './src/xiaohongshu-author-profile.js');
+  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].types, './src/xiaohongshu-author-profile.ts');
+});

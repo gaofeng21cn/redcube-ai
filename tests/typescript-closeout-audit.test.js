@@ -45,8 +45,17 @@ test('P18 closeout audit proves structural TypeScript coverage across baseline, 
   assert.equal(audit.criteria.new_code_defaults_to_typescript, true);
   assert.equal(audit.criteria.core_contract_surfaces_typed, true);
   assert.equal(audit.criteria.service_boundaries_typed, true);
+  assert.equal(audit.criteria.utility_boundaries_typed, true);
   assert.equal(audit.criteria.high_churn_paths_typed, true);
   assert.equal(audit.criteria.quality_gates_green, true);
+  assert.deepEqual(
+    audit.evidence.utility_boundaries.map((entry) => entry.directory),
+    [
+      'packages/redcube-config',
+      'packages/redcube-tools',
+      'packages/redcube-llm',
+    ],
+  );
 });
 
 test('P18 closeout audit keeps JS residue explicit instead of silently drifting', () => {

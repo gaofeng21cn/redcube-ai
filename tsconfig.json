@@ -32,6 +32,15 @@
       "path": "./packages/redcube-reference-os"
     },
     {
+      "path": "./packages/redcube-config"
+    },
+    {
+      "path": "./packages/redcube-tools"
+    },
+    {
+      "path": "./packages/redcube-llm"
+    },
+    {
       "path": "./packages/redcube-runtime-protocol"
     },
     {

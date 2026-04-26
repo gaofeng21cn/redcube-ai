@@ -30,6 +30,12 @@ const SERVICE_BOUNDARIES = [
   'apps/redcube-mcp',
 ];
 
+const UTILITY_BOUNDARIES = [
+  'packages/redcube-config',
+  'packages/redcube-tools',
+  'packages/redcube-llm',
+];
+
 const HIGH_CHURN_PACKAGES = [
   'packages/redcube-pack-xiaohongshu',
   'packages/redcube-pack-ppt',
@@ -331,6 +337,7 @@ export function buildCloseoutAudit(options = {}) {
 
   const contractSurfaces = categoryAudit(CONTRACT_SURFACES, rootTsconfig);
   const serviceBoundaries = categoryAudit(SERVICE_BOUNDARIES, rootTsconfig);
+  const utilityBoundaries = categoryAudit(UTILITY_BOUNDARIES, rootTsconfig);
   const highChurnPackages = categoryAudit(HIGH_CHURN_PACKAGES, rootTsconfig);
   const residueInventory = residueAudit();
 
@@ -347,6 +354,7 @@ export function buildCloseoutAudit(options = {}) {
         && /typecheck 成为正式质量门/.test(migrationPolicy),
       core_contract_surfaces_typed: contractSurfaces.every((entry) => entry.typed_boundary_ready),
       service_boundaries_typed: serviceBoundaries.every((entry) => entry.typed_boundary_ready),
+      utility_boundaries_typed: utilityBoundaries.every((entry) => entry.typed_boundary_ready),
       high_churn_paths_typed: highChurnPackages.every((entry) => entry.typed_boundary_ready),
       js_residue_explicitly_closed_out: residueInventory.every((entry) => entry.explicit_residue_only),
       quality_gates_green: Object.values(qualityGates).every((gate) => gate.status === 'pass' && gate.exit_code === 0),
@@ -354,6 +362,7 @@ export function buildCloseoutAudit(options = {}) {
     evidence: {
       contract_surfaces: contractSurfaces,
       service_boundaries: serviceBoundaries,
+      utility_boundaries: utilityBoundaries,
       high_churn_packages: highChurnPackages,
       js_residue_inventory: residueInventory,
     },
