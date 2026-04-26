@@ -7,8 +7,18 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
+function readText(file) {
+  return readFileSync(path.resolve(file), 'utf-8');
+}
+
+function assertTsBackedCompatShell(file, target) {
+  assert.equal(readText(file).trim(), `export * from '${target}';`);
+}
+
 test('P17 slice 3: overlay-core exposes a TypeScript entrypoint and typed registry contracts', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-core/src/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-core/src/contracts.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-core/src/registry.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-core/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-core/tsconfig.json')), true);
 
@@ -29,6 +39,10 @@ test('P17 slice 3: overlay-core exposes a TypeScript entrypoint and typed regist
   assert.match(entry, /mergeContractLayers/);
   assert.match(entry, /hydrateDeliverableContract/);
   assert.match(entry, /createOverlayRegistry/);
+  assert.doesNotMatch(entry, /\bJs\b/);
+  assertTsBackedCompatShell('packages/redcube-overlay-core/src/index.js', './index.ts');
+  assertTsBackedCompatShell('packages/redcube-overlay-core/src/contracts.js', './contracts.ts');
+  assertTsBackedCompatShell('packages/redcube-overlay-core/src/registry.js', './registry.ts');
 
   assert.match(types, /interface OverlayDefinition/);
   assert.match(types, /interface OverlayRegistry/);
@@ -56,6 +70,9 @@ test('P17 slice 3: overlay-registry exposes a TypeScript entrypoint and typed de
 
   assert.match(entry, /getDefaultOverlayRegistry/);
   assert.match(entry, /getDefaultOverlayCatalog/);
+  assert.match(entry, /loadDefaultOverlayEntries/);
+  assert.doesNotMatch(entry, /from '\.\/index\.js'/);
+  assertTsBackedCompatShell('packages/redcube-overlay-registry/src/index.js', './index.ts');
 
   assert.match(types, /interface DefaultOverlayModuleSpec/);
   assert.match(types, /interface OverlayCatalogSurface/);

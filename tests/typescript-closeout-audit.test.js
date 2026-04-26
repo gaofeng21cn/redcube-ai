@@ -40,6 +40,15 @@ function passingQualityGates() {
   };
 }
 
+const LEAF_TS_MIGRATION_LOCKS = {
+  'packages/redcube-overlay-core/src/contracts.js': 1,
+  'packages/redcube-overlay-core/src/index.js': 1,
+  'packages/redcube-overlay-core/src/registry.js': 1,
+  'packages/redcube-overlay-registry/src/index.js': 1,
+  'packages/redcube-reference-os/src/index.js': 1,
+  'packages/redcube-runtime-family-registry/src/index.js': 1,
+};
+
 test('P18 closeout audit proves structural TypeScript coverage across baseline, contracts, service boundaries, and high-churn lanes', () => {
   const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
 
@@ -58,6 +67,22 @@ test('P18 closeout audit proves structural TypeScript coverage across baseline, 
       'packages/redcube-llm',
     ],
   );
+});
+
+test('P24 leaf TypeScript migration shrinks low-coupling JS residue line locks', () => {
+  const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+  const entriesByFile = Object.fromEntries(
+    audit.evidence.js_residue_line_lock.entries.map((entry) => [entry.file, entry]),
+  );
+
+  for (const [file, expectedLineCount] of Object.entries(LEAF_TS_MIGRATION_LOCKS)) {
+    const entry = entriesByFile[file];
+    assert.ok(entry, file);
+    assert.equal(entry.locked_line_count, expectedLineCount, file);
+    assert.equal(entry.actual_line_count, expectedLineCount, file);
+    assert.equal(entry.line_growth, 0, file);
+    assert.equal(entry.within_lock, true, file);
+  }
 });
 
 test('P18 closeout audit keeps JS residue explicit instead of silently drifting', () => {

@@ -70,6 +70,7 @@ test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and
   const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
   const packageTsconfig = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json'), 'utf-8'));
   const entry = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts'), 'utf-8');
+  const runtimeEntry = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/index.js'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './src/index.ts');
@@ -83,6 +84,9 @@ test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and
   assert.match(entry, /getDefaultRuntimeFamilyCatalog/);
   assert.match(entry, /resolveRuntimeFamilyModule/);
   assert.match(entry, /loadRuntimeFamilyRunner/);
+  assert.match(entry, /buildCatalogEntry/);
+  assert.doesNotMatch(entry, /from '\.\/index\.js'/);
+  assert.equal(runtimeEntry.trim(), "export * from './index.ts';");
 
   assert.match(types, /interface RuntimeFamilyModuleSpec/);
   assert.match(types, /interface RuntimeFamilyCatalogSurface/);
