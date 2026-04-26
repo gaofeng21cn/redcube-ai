@@ -3,7 +3,11 @@ import { runManagedDeliverable as runHostedManagedDeliverable } from '@redcube/r
 import type { ManagedRunResponse, RunManagedDeliverableRequest } from '../types.js';
 import type { RuntimeManagedRunRequest } from '@redcube/runtime';
 
-export async function runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<ManagedRunResponse> {
+type RuntimeManagedRunResponse = Omit<ManagedRunResponse, 'managed_run'> & {
+  managed_run: Awaited<ReturnType<typeof runHostedManagedDeliverable>>['managed_run'];
+};
+
+export async function runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<RuntimeManagedRunResponse> {
   const result = await runHostedManagedDeliverable(request as unknown as RuntimeManagedRunRequest);
   return {
     ...result,

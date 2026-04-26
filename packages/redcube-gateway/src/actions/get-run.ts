@@ -49,7 +49,7 @@ export async function getRun({
       status: run.status,
       current_stage: run.current_stage,
     },
-    run,
+    run: run as unknown as Record<string, unknown>,
     run_telemetry: summarizeRunTelemetry(run),
     error_taxonomy: summarizeErrorTaxonomy(run),
     rerun_analytics: summarizeRerunAnalytics(run),

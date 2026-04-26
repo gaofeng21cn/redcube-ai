@@ -1,8 +1,4 @@
 import type { GovernanceSurfaceContract } from '@redcube/overlay-core';
-import type {
-  RuntimeManagedRunRecord,
-  RuntimeRunRecord,
-} from '@redcube/runtime';
 import type { WorkspaceContract } from '@redcube/runtime-protocol';
 import type {
   FamilyDomainEntryContractSurface,
@@ -78,11 +74,8 @@ export interface WorkspaceDoctorResponse extends SurfaceBase<'workspace_doctor'>
   workspaceRoot: string;
   workspaceFileExists: boolean;
   contract: WorkspaceContract;
-  recommended_actions?: string[];
   summary: {
     workspace_file_exists: boolean;
-    workspace_bootstrap_needed: boolean;
-    bootstrap_via: string[] | null;
     canonical_topics_dir: string;
     canonical_runs_dir: string;
   };
@@ -126,11 +119,10 @@ export interface DeliverableCreateResponse extends SurfaceBase<'deliverable_crea
 
 export interface DeliverableRecordResponse extends SurfaceBase<'deliverable_record'> {
   deliverable: Record<string, unknown>;
-  hydrated_contract: Record<string, unknown>;
   governance_surface: GovernanceSurfaceContract;
   summary: {
-    deliverable_id?: string;
-    overlay?: string;
+    deliverable_id: string;
+    overlay: string;
     profile_id?: string;
   };
 }
@@ -146,7 +138,7 @@ export interface PublicationProjectionResponse extends SurfaceBase<'publication_
 }
 
 export interface RunRecordResponse extends SurfaceBase<'run_record'> {
-  run: RuntimeRunRecord;
+  run: Record<string, unknown>;
   run_telemetry: RunTelemetrySummary;
   error_taxonomy: ErrorTaxonomySummary;
   rerun_analytics: RerunAnalyticsSummary;
@@ -162,10 +154,9 @@ export interface RunRecordResponse extends SurfaceBase<'run_record'> {
 }
 
 export interface RouteRunResponse extends SurfaceBase<'route_run'> {
-  run: RuntimeRunRecord;
+  run: Record<string, unknown>;
   events: unknown[];
   artifactFile?: string;
-  artifact?: unknown;
   error?: unknown;
   error_kind: string | null;
   governance_surface: GovernanceSurfaceContract;
@@ -173,7 +164,6 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
     route: string;
     run_id: string | null;
     status: string | null;
-    cache_status: string;
   };
 }
 
@@ -897,7 +887,7 @@ export interface ManagedEscalationRecord {
 }
 
 export interface ManagedRunResponse extends SurfaceBase<'managed_run'> {
-  managed_run: RuntimeManagedRunRecord;
+  managed_run: Record<string, unknown>;
   progress_projection: ManagedRunProjection;
   runtime_supervision: ManagedRuntimeSupervision;
   escalation_record: ManagedEscalationRecord;

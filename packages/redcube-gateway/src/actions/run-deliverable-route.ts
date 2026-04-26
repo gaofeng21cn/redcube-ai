@@ -14,11 +14,19 @@ type RuntimeRouteResult = RuntimeRunRouteResponse & {
   cache_status?: unknown;
 };
 
+type RouteRunGatewayResponse = Omit<RouteRunResponse, 'run' | 'summary'> & {
+  run: RuntimeRunRouteResponse['run'];
+  artifact?: unknown;
+  summary: RouteRunResponse['summary'] & {
+    cache_status: string;
+  };
+};
+
 function readJsonRecord(file: string): JsonObject {
   return JSON.parse(readFileSync(file, 'utf-8')) as JsonObject;
 }
 
-export async function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunResponse> {
+export async function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunGatewayResponse> {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
     request.topicId,

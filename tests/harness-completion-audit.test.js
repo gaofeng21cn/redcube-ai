@@ -7,10 +7,16 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 test('harness audit: runtime/kernel no longer owns family render branches and core capability planes are package-scoped', () => {
   const runtimeIndex = read('packages/redcube-runtime/src/index.js');
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
-  const executors = read('packages/redcube-runtime/src/executors.js');
+  const executors = readImplementation('packages/redcube-runtime/src/executors.js');
   const runtimeFamilyRegistryPackageJson = JSON.parse(read('packages/redcube-runtime-family-registry/package.json'));
 
   assert.equal(runtimeIndex.includes("@redcube/governance"), true);
@@ -37,9 +43,9 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
 });
 
 test('harness audit: source truth remains canonical and historical intake import feeds the same source intake path', () => {
-  const intakeAction = read('packages/redcube-gateway/src/actions/intake-source.js');
+  const intakeAction = readImplementation('packages/redcube-gateway/src/actions/intake-source.js');
   const legacyImport = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
-  const sharedSourceTruth = read('packages/redcube-runtime/src/shared-source-truth.js');
+  const sharedSourceTruth = readImplementation('packages/redcube-runtime/src/shared-source-truth.js');
 
   assert.equal(intakeAction.includes("surface_kind: 'source_intake'"), true);
   assert.equal(legacyImport.includes("modeHint: 'historical_intake_import'"), true);
@@ -88,9 +94,9 @@ test('harness audit: reference quality is a formal operating surface, not only t
 test('harness audit: gateway product surface is stable across success and failure paths', () => {
   const cli = read('apps/redcube-cli/src/cli.js');
   const mcp = read('apps/redcube-mcp/src/server.js');
-  const getDeliverable = read('packages/redcube-gateway/src/actions/get-deliverable.js');
-  const runRoute = read('packages/redcube-gateway/src/actions/run-deliverable-route.js');
-  const doctor = read('packages/redcube-gateway/src/actions/doctor-workspace.js');
+  const getDeliverable = readImplementation('packages/redcube-gateway/src/actions/get-deliverable.js');
+  const runRoute = readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.js');
+  const doctor = readImplementation('packages/redcube-gateway/src/actions/doctor-workspace.js');
   const listTopics = read('packages/redcube-gateway/src/actions/list-topics.js');
   const gatewayIndex = read('packages/redcube-gateway/src/index.js');
 

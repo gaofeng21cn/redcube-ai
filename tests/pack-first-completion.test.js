@@ -7,6 +7,12 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 test('pack shells no longer export xiaohongshu creative builders or compilers', () => {
   const packEntry = read('packages/redcube-pack-xiaohongshu/src/index.ts');
   const renderPrompt = read('prompts/xiaohongshu/render_html.md');
@@ -60,7 +66,7 @@ test('overlay render contracts keep pack ids but no longer declare compiler regi
 });
 
 test('runtime executor remains registry-driven instead of hardcoding family runtime imports', () => {
-  const executors = read('packages/redcube-runtime/src/executors.js');
+  const executors = readImplementation('packages/redcube-runtime/src/executors.js');
 
   assert.equal(executors.includes('./ppt-deck-runtime.js'), false);
   assert.equal(executors.includes('./xiaohongshu-runtime.js'), false);

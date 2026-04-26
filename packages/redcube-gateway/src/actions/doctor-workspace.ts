@@ -5,7 +5,15 @@ import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 
 import type { WorkspaceDoctorResponse, WorkspaceRootRequest } from '../types.js';
 
-export async function doctorWorkspace({ workspaceRoot }: WorkspaceRootRequest): Promise<WorkspaceDoctorResponse> {
+type WorkspaceDoctorGatewayResponse = Omit<WorkspaceDoctorResponse, 'summary'> & {
+  recommended_actions?: string[];
+  summary: WorkspaceDoctorResponse['summary'] & {
+    workspace_bootstrap_needed: boolean;
+    bootstrap_via: string[] | null;
+  };
+};
+
+export async function doctorWorkspace({ workspaceRoot }: WorkspaceRootRequest): Promise<WorkspaceDoctorGatewayResponse> {
   const contract = resolveWorkspaceContract({ workspaceRoot });
   const workspaceFileExists = existsSync(contract.workspaceFile);
 

@@ -2,10 +2,14 @@ import { getManagedRun as loadManagedRun } from '@redcube/runtime';
 
 import type { ManagedRunRecordResponse, SuperviseManagedRunRequest } from '../types.js';
 
+type RuntimeManagedRunRecordResponse = Omit<ManagedRunRecordResponse, 'managed_run'> & {
+  managed_run: Awaited<ReturnType<typeof loadManagedRun>>['managed_run'];
+};
+
 export async function getManagedRun({
   workspaceRoot,
   managedRunId,
-}: SuperviseManagedRunRequest): Promise<ManagedRunRecordResponse> {
+}: SuperviseManagedRunRequest): Promise<RuntimeManagedRunRecordResponse> {
   const result = await loadManagedRun({ workspaceRoot, managedRunId });
 
   return {
