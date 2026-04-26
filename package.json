@@ -21,7 +21,7 @@
     "test:line-budget": "node scripts/check-line-budget.mjs",
     "typecheck": "tsc --noEmit --project tsconfig.typecheck.json --pretty false",
     "build": "tsc --build tsconfig.json --pretty false --force && node --experimental-strip-types scripts/sync-package-runtime-exports.ts",
-    "audit:typescript-closeout": "node scripts/run-typescript-closeout-audit.mjs",
+    "audit:typescript-closeout": "node --experimental-strip-types scripts/run-typescript-closeout-audit.mjs",
     "line-budget": "node scripts/line-budget.mjs"
   },
   "optionalDependencies": {
