@@ -8,7 +8,7 @@
 
 当前保留的 repo-tracked machine-readable mainline truth：
 
-- `runtime-program/current-program.json`：当前 active mainline pointer
+- `runtime-program/current-program.json`：当前 active mainline pointer，包含 `OPL Runtime Manager` 薄管理层边界与 `TypeScript + Python` 实现目标
 - `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct route 与 internal bridge 共用同一下游 domain entry）
 - `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
 - `runtime-program/opl-gateway-federated-product-entry.json`：当前 internal OPL bridge / integration 冻结件

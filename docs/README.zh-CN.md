@@ -3,10 +3,10 @@
 [English](./README.md) | **中文**
 
 这个目录是 `RedCube AI` 的技术阅读层。
-当前公开阅读路径以 direct route 为主，OPL bridge 作为内部集成 / 参考层保留：
+当前公开阅读路径以 direct route 为主，OPL Runtime Manager bridge 作为内部集成 / 参考层保留：
 
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- internal OPL bridge：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- internal OPL bridge：`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## 按读者类型进入
 
@@ -20,8 +20,10 @@
 
 - `RedCube AI` 持有 visual-domain truth、`invokeDomainEntry`、direct repo-verified 的 product-entry service surface，以及由单一 `redcube-ai` app skill、`CLI`、`MCP`、本地脚本与 repo-tracked contract 组成的稳定可调用面。
 - `Codex CLI` 继续作为 executor-adapter 合同后面的默认 concrete executor，服务本地 operator 工作流。
+- `OPL Runtime Manager` 是目标形态中的 federated 薄管理层，位于外部 `Hermes-Agent` substrate 之上；它可以索引 product-entry registration、session continuity、runtimeWatch、artifact、review/publication projection，但不持有 RedCube visual truth。
 - `Hermes-Agent` 这类 hosted runtime carrier 只保留在显式 opt-in backend/proof lane 或技术参考层，不改写默认公开合同。
 - `OPL` 在需要 family-level routing 时通过内部 bridge surface 进入。
+- 实现语言目标是 `TypeScript + Python`：TypeScript 持有 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
 
 ## 技术工作集
 
@@ -48,6 +50,6 @@
 
 ## 文档规则
 
-- `README*` 与 `docs/README*` 统一围绕 repo-verified direct route、内部 OPL bridge/reference surface 与 service-safe domain entry surface 叙事。
+- `README*` 与 `docs/README*` 统一围绕 repo-verified direct route、内部 OPL Runtime Manager bridge/reference surface 与 service-safe domain entry surface 叙事。
 - 对外文档在适用时保持中英双语镜像。
 - 历史材料继续沉淀在 program/history/reference 层。

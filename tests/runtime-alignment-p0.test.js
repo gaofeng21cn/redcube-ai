@@ -73,6 +73,15 @@ test('current program points to the current mainline while retaining durable ide
     currentProgram.longrun_goal.north_star.includes('preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate'),
     true,
   );
+  assert.equal(
+    currentProgram.longrun_goal.north_star.includes('keep OPL Runtime Manager as a thin federated runtime manager over external Hermes-Agent rather than a RedCube truth owner'),
+    true,
+  );
+  assert.equal(currentProgram.longrun_goal.runtime_manager_boundary.manager, 'OPL Runtime Manager');
+  assert.equal(currentProgram.longrun_goal.runtime_manager_boundary.does_not_own.includes('visual-domain truth'), true);
+  assert.match(currentProgram.longrun_goal.final_target_route.opl_federated_entry, /OPL Runtime Manager -> external Hermes-Agent runtime substrate/);
+  assert.match(currentProgram.longrun_goal.language_target.typescript_owner, /product entry/);
+  assert.match(currentProgram.longrun_goal.language_target.python_owner, /native Office\/PPT/);
   assert.equal(currentProgram.formal_entry.default_formal_entry, 'CLI');
   assert.deepEqual(currentProgram.formal_entry.supported_protocol_layer, ['MCP']);
   assert.equal(currentProgram.execution_handle_contract.program_id.role, 'active mainline control-plane pointer');
@@ -92,6 +101,8 @@ test('current program points to the current mainline while retaining durable ide
     'ops_eval_summary',
   ]);
   assert.equal(currentProgram.current_state.runtime_substrate_owner, 'optional_hosted_runtime_carrier');
+  assert.equal(currentProgram.current_state.runtime_manager_status.target_layer, 'OPL Runtime Manager');
+  assert.equal(currentProgram.current_state.runtime_manager_status.full_sidecar_enabled_now, false);
   assert.equal(currentProgram.current_state.deployment_host, 'codex_local_operator_host');
   assert.equal(currentProgram.current_state.host_agent_longterm_owner, false);
   assert.equal(currentProgram.current_state.phase_label, 'Repo-Verified Product Entry And OPL Federation');

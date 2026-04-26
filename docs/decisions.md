@@ -1,5 +1,14 @@
 # RedCube AI 关键决策
 
+## 2026-04-26
+
+### 决策：RCA 对齐 OPL Runtime Manager 与 TS/Python 目标形态
+
+- OPL federated route 的目标形态改为 `OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry`。
+- `OPL Runtime Manager` 只负责 OPL 侧 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引，不持有 RedCube visual-domain truth、canonical artifacts、review/publication projection truth 或 concrete executor。
+- RCA 的实现语言目标固定为 `TypeScript + Python`：TypeScript 管 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries；Python 管 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态。
+- 自有 OPL sidecar 当前不启用；只有当外部 `Hermes-Agent` 无法表达 task/wakeup/approval/audit/product isolation contract 时，才从 Runtime Manager 的 adapter/projection 边界进入 promotion 评估。
+
 ## 2026-04-23
 
 ### 决策：默认公开能力面收口为稳定 capability surface

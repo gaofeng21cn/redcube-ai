@@ -15,12 +15,14 @@
 - 对外主语固定为“独立 visual-deliverable domain agent”；`gateway / harness` 只作为内部架构边界语言。
 - repo-verified direct route 与 OPL federated route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
 - `OPL` 在 RCA 主线中只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes。
+- `OPL Runtime Manager` 只允许作为 OPL 侧 thin adapter/projection layer over external `Hermes-Agent` substrate；不得成为 RedCube visual-domain truth owner、canonical artifact owner、review/publication projection owner、scheduler kernel、session store、memory store、concrete executor 或 private Hermes fork。
 
 ## 目标优先级
 
 - 一旦新的 runtime substrate 目标已经明确，新增投入默认服务目标形态，而不是继续深磨已放弃的旧宿主路线。
 - 当前默认公开 capability contract 固定为 `CLI / MCP / product-entry/service-safe-domain-entry surface + Codex-default execution`；hosted runtime carrier 只允许作为显式可选 backend/proof lane。
 - 历史 `repo-local managed runtime pilot` 也是本地迁移形态，不得被误写成当前 runtime owner；`Hermes-Agent` 相关路径也不得被误写成默认公开合同。
+- `TypeScript + Python` 是实现目标，不是绕过 runtime-family 的许可。Python native PPT/Office helper 必须挂在 RedCube product-entry、route/proof lane、review/export gate 与 repo-tracked contract 下。
 - 如果当前基线与长线目标并存，必须在 `docs/status.md` 与 `docs/README*` 中显式拆开。
 
 ## 文档治理

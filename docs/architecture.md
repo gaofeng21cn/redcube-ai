@@ -7,7 +7,7 @@
 当前对外主链路以 direct route 为第一主语，OPL 路线保留为 internal bridge / integration surface：
 
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- internal OPL bridge route：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- internal OPL bridge route：`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 两条路线在进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
 
@@ -21,7 +21,8 @@
 
 - `RedCube AI` 维护 visual-domain truth、本地 canonical artifacts、稳定 capability surface，以及 audit / review / projection surface
 - 默认 concrete executor 继续由 `Codex CLI` 通过统一 executor-adapter contract 被选择
-- `Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现
+- `OPL Runtime Manager` 只作为 OPL 侧 product-managed adapter/projection layer 管理 external `Hermes-Agent` substrate、registration/status 索引、doctor/repair/resume 与 native helper catalog
+- `Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层作为外部 runtime substrate 出现
 
 ## 入口 taxonomy 与 OPL handoff
 
@@ -30,7 +31,7 @@
 - `direct product entry`
   - 给人类与 host-agent 共用的 `CLI` / `MCP`、frontdesk、session 续跑入口，也是第一公开主语
 - `internal OPL handoff`
-  - 给 `OPL Gateway` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 internal bridge / integration surface
+  - 给 `OPL Runtime Manager` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 internal bridge / integration surface
 - `future managed product shell`
   - 给成熟最终用户前台壳预留的未来产品层
 
@@ -42,7 +43,7 @@
 
 与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -63,7 +64,7 @@
 
 当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个可直接进入、也可被 `OPL` 内部桥接调用的 visual-domain 产品 / 服务节点：
 
-`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 与之对应的 direct domain 路线则是：
 
@@ -72,6 +73,7 @@
 这里的关键约束是：
 
 - direct `RedCube` product entry 和 `OPL Gateway` internal handoff 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
+- `OPL Runtime Manager` 只消费 product-entry registration、federated invocation、session continuity、runtimeWatch、artifact inventory、review/publication projection，不创建第二套 RedCube truth
 - today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
 - `invokeFederatedProductEntry` 继续作为 internal OPL bridge contract
 - 成熟的最终用户产品入口前台壳仍未落地
@@ -129,6 +131,15 @@
 
 - 由 `RedCube AI` 统一稳定 capability surface 与 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-native` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
+- 由 `OPL Runtime Manager` 统一 federated 长期托管、状态索引、doctor/repair/resume 与 native helper catalog；未来自有 sidecar 只有在外部 `Hermes-Agent` 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
+
+## Language Target
+
+RCA 的长线实现语言目标是 `TypeScript + Python`：
+
+- `TypeScript` 继续承担 product entry、CLI/MCP、contracts、gateway、runtime-family shell、typed service boundaries 与测试主干。
+- `Python` 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，以及可与 MAS/MAG 共享的自动化工具链。
+- `ppt_deck` 当前默认 visual route 仍是 `render_html`；native PPT authoring / repair 是显式 proof lane。后续迁移必须保留 `visual_director_review`、`screenshot_review`、`export_pptx` 等 RedCube review/export gate，不能用通用 Python/PPT 脚本绕过 domain truth。
 
 ## Service-Safe Domain Entry
 
