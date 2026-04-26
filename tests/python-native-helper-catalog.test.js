@@ -29,6 +29,12 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
+function readImplementation(file) {
+  const source = readFileSync(path.resolve(file), 'utf-8');
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? readFileSync(path.resolve(path.dirname(file), shell[1]), 'utf-8') : source;
+}
+
 function helperById(catalog) {
   return Object.fromEntries(catalog.helpers.map((helper) => [helper.helper_id, helper]));
 }
@@ -175,7 +181,7 @@ test('Compatibility wrapper scripts remain thin package entrypoints', () => {
 
 test('Runtime Python helper callers prefer package module invocation over wrapper script paths', () => {
   const combinedSource = RUNTIME_PYTHON_CALLER_FILES
-    .map((file) => readFileSync(path.resolve(file), 'utf-8'))
+    .map((file) => readImplementation(file))
     .join('\n');
 
   assert.doesNotMatch(
