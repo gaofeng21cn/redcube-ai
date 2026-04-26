@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 const PLUGIN_NAME = 'rca';
 const MARKETPLACE_NAME = 'rca-local';
-const MARKETPLACE_DISPLAY_NAME = 'RCA Local';
+const MARKETPLACE_DISPLAY_NAME = 'RedCube AI Local';
+const LEGACY_MARKETPLACE_DISPLAY_NAMES = ['RCA Local'];
 const PLUGIN_CATEGORY = 'Creative';
 const LEGACY_PLUGIN_NAMES = ['redcube-ai'];
 
@@ -129,11 +130,16 @@ function upsertMarketplace(marketplacePath) {
     plugins.push(pluginEntry);
   }
 
+  const interfaceConfig = payload.interface && typeof payload.interface === 'object' && !Array.isArray(payload.interface)
+    ? payload.interface
+    : {};
+  if (!interfaceConfig.displayName || LEGACY_MARKETPLACE_DISPLAY_NAMES.includes(interfaceConfig.displayName)) {
+    interfaceConfig.displayName = MARKETPLACE_DISPLAY_NAME;
+  }
+
   writeJson(marketplacePath, {
     name: typeof payload.name === 'string' && payload.name.trim() ? payload.name : MARKETPLACE_NAME,
-    interface: payload.interface && typeof payload.interface === 'object' && !Array.isArray(payload.interface)
-      ? payload.interface
-      : { displayName: MARKETPLACE_DISPLAY_NAME },
+    interface: interfaceConfig,
     plugins,
   });
 }

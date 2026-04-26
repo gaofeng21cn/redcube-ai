@@ -9,6 +9,7 @@ const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'rca', 'SKILL.md');
+const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'rca', 'agents', 'openai.yaml');
 const installerPath = path.join(repoRoot, 'scripts', 'install-codex-plugin.mjs');
 
 function readJson(filePath) {
@@ -19,6 +20,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
   const manifest = readJson(pluginManifestPath);
   const skillText = readFileSync(pluginSkillPath, 'utf-8');
+  const metadataText = readFileSync(pluginSkillUiMetadataPath, 'utf-8');
 
   assert.equal(manifest.name, 'rca');
   assert.equal(manifest.version, packageJson.version);
@@ -26,6 +28,8 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(manifest.interface.displayName, 'RedCube AI');
   assert.equal(manifest.interface.category, 'Creative');
   assert.match(manifest.description, /Codex plugin/i);
+  assert.match(metadataText, /display_name: "RedCube AI"/);
+  assert.match(metadataText, /default_prompt: "Use \$rca/);
   assert.match(skillText, /redcube product frontdesk/i);
   assert.match(skillText, /redcube product invoke/i);
   assert.match(skillText, /storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx/i);
@@ -69,6 +73,7 @@ test('codex plugin installer keeps plugin and skill paths repo-local with machin
   assert.equal(result.skill_root, path.dirname(pluginSkillPath));
   assert.equal(existsSync(path.join(homeDir, '.codex', 'skills', 'rca')), false);
   assert.equal(existsSync(path.join(homeDir, '.agents', 'plugins', 'marketplace.json')), false);
+  assert.equal(marketplace.interface.displayName, 'RedCube AI Local');
   assert.deepEqual(pluginEntry, {
     name: 'rca',
     source: {

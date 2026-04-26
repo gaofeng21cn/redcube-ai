@@ -1,7 +1,7 @@
 {
   "name": "rca-local",
   "interface": {
-    "displayName": "RCA Local"
+    "displayName": "RedCube AI Local"
   },
   "plugins": [
     {
