@@ -1,0 +1,214 @@
+{
+  "contract_id": "typescript-package-build-contract",
+  "date_anchor": "2026-04-26",
+  "owner": "redcube_ai",
+  "language": "typescript",
+  "scope": "Machine-readable package build and export transition contract for the RedCube AI TypeScript migration.",
+  "current_transition_model": {
+    "source_types_entry": "./src/index.ts",
+    "legacy_runtime_export_kind": "legacy_source_js_runtime_export",
+    "future_runtime_export_kind": "compiled_dist_runtime_export",
+    "compiled_runtime_target": "./dist/index.js",
+    "compiled_types_target": "./dist/index.d.ts"
+  },
+  "transition_policy": {
+    "new_packages_must_use_typescript_source": true,
+    "new_runtime_js_exports_forbidden_without_contract": true,
+    "source_js_exports_allowlisted_only": true,
+    "package_build_migration_order": [
+      "leaf utility packages",
+      "contract/governance/overlay packages",
+      "CLI/MCP entry packages",
+      "runtime-family packages",
+      "gateway actions"
+    ]
+  },
+  "quality_gates": {
+    "typecheck": "npm run typecheck",
+    "build": "npm run build",
+    "package_contract_test": "node --test tests/typescript-baseline.test.js"
+  },
+  "legacy_source_js_runtime_exports": [
+    {
+      "directory": "packages/redcube-codex-cli-client",
+      "package_name": "@redcube/codex-cli-client",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-config",
+      "package_name": "@redcube/redcube-config",
+      "exports": [
+        {
+          "subpath": ".",
+          "condition": "default",
+          "target": "./src/index.js"
+        },
+        {
+          "subpath": "./private-profile",
+          "condition": "default",
+          "target": "./src/private-profile.js"
+        },
+        {
+          "subpath": "./xiaohongshu-author-profile",
+          "condition": "default",
+          "target": "./src/xiaohongshu-author-profile.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-gateway",
+      "package_name": "@redcube/gateway",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-governance",
+      "package_name": "@redcube/governance",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-hermes-substrate",
+      "package_name": "@redcube/hermes-substrate",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-overlay-core",
+      "package_name": "@redcube/overlay-core",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-overlay-poster-onepager",
+      "package_name": "@redcube/overlay-poster-onepager",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-overlay-ppt",
+      "package_name": "@redcube/overlay-ppt",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-overlay-registry",
+      "package_name": "@redcube/overlay-registry",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-overlay-xiaohongshu",
+      "package_name": "@redcube/overlay-xiaohongshu",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-reference-os",
+      "package_name": "@redcube/reference-os",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-runtime-family-poster-onepager",
+      "package_name": "@redcube/runtime-family-poster-onepager",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-runtime-family-ppt",
+      "package_name": "@redcube/runtime-family-ppt",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-runtime-family-registry",
+      "package_name": "@redcube/runtime-family-registry",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-runtime-family-xiaohongshu",
+      "package_name": "@redcube/runtime-family-xiaohongshu",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-runtime-protocol",
+      "package_name": "@redcube/runtime-protocol",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    },
+    {
+      "directory": "packages/redcube-runtime",
+      "package_name": "@redcube/runtime",
+      "exports": [
+        {
+          "subpath": ".",
+          "target": "./src/index.js"
+        }
+      ]
+    }
+  ]
+}
