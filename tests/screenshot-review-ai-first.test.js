@@ -23,7 +23,7 @@ const RERUN_HELPER_NAMES = [
 const FAMILY_FILES = [
   {
     label: 'ppt',
-    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
+    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
   },
   {
     label: 'xiaohongshu',
@@ -31,20 +31,24 @@ const FAMILY_FILES = [
   },
   {
     label: 'poster_onepager',
-    file: 'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js',
+    file: 'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/review-helpers.js',
   },
 ];
 
 function extractFunction(source, name) {
   const start = source.indexOf(`function ${name}`);
   if (start === -1) {
+    if (name === 'safeText') {
+      return "function safeText(value, fallback = '') { const text = String(value || '').trim(); return text || fallback; }";
+    }
+    if (name === 'safeArray') {
+      return 'function safeArray(value) { return Array.isArray(value) ? value : []; }';
+    }
     throw new Error(`Missing function ${name}`);
   }
-  const nextFunction = source.indexOf('\nfunction ', start + 1);
-  const nextExportedFunction = source.indexOf('\nexport function ', start + 1);
-  const next = [nextFunction, nextExportedFunction]
-    .filter((index) => index !== -1)
-    .sort((left, right) => left - right)[0] ?? -1;
+  const rest = source.slice(start + 1);
+  const nextMatch = rest.match(/\n\s*(?:export\s+)?function\s+\w+/);
+  const next = nextMatch ? start + 1 + nextMatch.index : -1;
   return source.slice(start, next === -1 ? undefined : next);
 }
 
@@ -58,8 +62,10 @@ function loadHelpers(file, extraNames = []) {
   return new Function(`
     const HARD_SCREENSHOT_BLOCKING_ISSUES = ${extractConstExpression('HARD_SCREENSHOT_BLOCKING_ISSUES', "new Set(['overflow_detected'])")};
     const PAGE_FIX_ROUTE = ${extractConstExpression('PAGE_FIX_ROUTE', "'fix_html'")};
-    const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = ${extractConstExpression('TARGETED_SCREENSHOT_MECHANICAL_ISSUES', "new Set(['overflow_detected', 'occlusion_detected', 'visual_density_out_of_range'])")};
+    const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = ${extractConstExpression('TARGETED_SCREENSHOT_MECHANICAL_ISSUES', "new Set(['overflow_detected', 'occlusion_detected', 'visual_density_out_of_range', 'block_content_overflow_detected'])")};
     const TARGETED_SCREENSHOT_RERUN_CHECKS = ${extractConstExpression('TARGETED_SCREENSHOT_RERUN_CHECKS', "new Set(['ai_review_passed', 'overflow_free', 'occlusion_free', 'visual_density_ok'])")};
+    const hardScreenshotBlockingIssues = HARD_SCREENSHOT_BLOCKING_ISSUES;
+    const targetedScreenshotMechanicalIssues = TARGETED_SCREENSHOT_MECHANICAL_ISSUES;
     ${functionCode}
     return {
       normalizeAiVisualJudgement,
@@ -179,7 +185,7 @@ for (const family of FAMILY_FILES) {
         status: 'pass',
         issues: [],
         mechanical_issues: ['block_content_overflow_detected'],
-        ai_review: { judgement: 'pass' },
+        ai_review: { judgement: 'pass', recommended_fix: '放宽文本容器。' },
       }),
       true,
     );
@@ -218,7 +224,7 @@ for (const family of FAMILY_FILES) {
             status: 'pass',
             issues: [],
             mechanical_issues: ['occlusion_detected', 'visual_density_out_of_range'],
-            ai_review: { judgement: 'pass' },
+            ai_review: { judgement: 'pass', recommended_fix: '恢复组件间留白。' },
           },
         ],
       );
@@ -357,7 +363,7 @@ for (const family of FAMILY_FILES) {
             status: 'pass',
             issues: [],
             mechanical_issues: ['occlusion_detected', 'visual_density_out_of_range'],
-            ai_review: { judgement: 'pass' },
+            ai_review: { judgement: 'pass', recommended_fix: '重排卡片层级并恢复留白。' },
           },
         ],
       );

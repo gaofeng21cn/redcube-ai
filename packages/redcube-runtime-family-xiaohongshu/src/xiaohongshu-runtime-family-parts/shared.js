@@ -442,6 +442,15 @@ export function slideNeedsTargetedRevision(slide) {
   if (!slide || typeof slide !== 'object') return false;
   if (safeText(slide?.status) === 'block') return true;
   if (hasAiVisualBlock(slide?.ai_review)) return true;
+  const aiJudgement = normalizeAiVisualJudgement(slide?.ai_review?.judgement);
+  const recommendedFix = safeText(slide?.ai_review?.recommended_fix).toLowerCase();
+  if (
+    safeText(slide?.status) === 'pass'
+    && aiJudgement === 'pass'
+    && (!recommendedFix || recommendedFix === 'none')
+  ) {
+    return false;
+  }
   const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
     ? safeArray(slide?.mechanical_issues)
     : safeArray(slide?.issues);

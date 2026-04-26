@@ -81,7 +81,7 @@ export function createPosterOnepagerReviewHelpers({
 
   function buildAiFirstVisualSlideReview(slide, aiReview) {
     const mechanicalIssues = safeArray(slide?.issues);
-    const hardMechanicalIssues = mechanicalIssues.filter((issue) => HARD_SCREENSHOT_BLOCKING_ISSUES.has(issue));
+    const hardMechanicalIssues = mechanicalIssues.filter((issue) => hardScreenshotBlockingIssues.has(issue));
     const aiIssues = hasAiVisualBlock(aiReview) ? ['ai_visual_risk'] : [];
     return {
       ...slide,
@@ -100,10 +100,19 @@ export function createPosterOnepagerReviewHelpers({
     if (!slide || typeof slide !== 'object') return false;
     if (safeText(slide?.status) === 'block') return true;
     if (hasAiVisualBlock(slide?.ai_review)) return true;
+    const aiJudgement = normalizeAiVisualJudgement(slide?.ai_review?.judgement);
+    const recommendedFix = safeText(slide?.ai_review?.recommended_fix).toLowerCase();
+    if (
+      safeText(slide?.status) === 'pass'
+      && aiJudgement === 'pass'
+      && (!recommendedFix || recommendedFix === 'none')
+    ) {
+      return false;
+    }
     const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
       ? safeArray(slide?.mechanical_issues)
       : safeArray(slide?.issues);
-    return mechanicalIssues.some((issue) => TARGETED_SCREENSHOT_MECHANICAL_ISSUES.has(safeText(issue)));
+    return mechanicalIssues.some((issue) => targetedScreenshotMechanicalIssues.has(safeText(issue)));
   }
 
   function requireObjectArray(value, label, { min = 1, max = 6 } = {}) {
