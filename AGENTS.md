@@ -36,7 +36,6 @@
 - `contracts/runtime-program/*.json`：机器可读主线合同。
 - `docs/policies/*`：稳定规则。
 - `docs/references/*`：定位、背景、审计与非活跃参考。
-- `docs/history/`：历史归档，不作为当前活跃入口。
 
 ## 文档规则
 

@@ -106,8 +106,6 @@ test('P18 closeout audit proves structural TypeScript coverage across baseline, 
     audit.evidence.utility_boundaries.map((entry) => entry.directory),
     [
       'packages/redcube-config',
-      'packages/redcube-tools',
-      'packages/redcube-llm',
     ],
   );
 });

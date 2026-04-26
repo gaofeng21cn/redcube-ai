@@ -373,9 +373,6 @@ function extractSourceContent(source) {
 }
 
 function inferInputMode({ modeHint, sources }) {
-  if (modeHint === 'historical_intake_import' || modeHint === 'legacy_import') {
-    return 'historical_intake_import';
-  }
   const kinds = new Set(
     sources
       .filter((source) => {
@@ -399,7 +396,6 @@ function inferInputMode({ modeHint, sources }) {
 
 function inferConfidence({ inputMode, materials }) {
   if (inputMode === 'brief_keywords') return 'low';
-  if (inputMode === 'historical_intake_import') return materials.length > 0 ? 'medium' : 'low';
   return materials.length > 0 ? 'medium' : 'low';
 }
 

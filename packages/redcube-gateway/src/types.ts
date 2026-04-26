@@ -1122,20 +1122,6 @@ export interface SourceAugmentationExecutionResponse extends SurfaceBase<'source
   };
 }
 
-export interface LegacyImportResponse extends SurfaceBase<'historical_intake_import'> {
-  mode: 'historical_project_to_workspace';
-  project: string;
-  topicFile: string;
-  importedInputsDir: string;
-  artifactFiles: Record<string, string>;
-  audit: Record<string, unknown>;
-  summary: {
-    project: string;
-    overlay: string;
-    audit_status: string | null;
-  };
-}
-
 export interface ReviewMutationRequest extends DeliverableRequest {
   mutation: Record<string, unknown>;
 }

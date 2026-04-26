@@ -8,7 +8,6 @@ import {
   prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
   writeSourceAugmentationResult as writeSourceAugmentationResultJs,
   executeSourceAugmentation as executeSourceAugmentationJs,
-  importLegacyProject as importLegacyProjectJs,
   createDeliverable as createDeliverableJs,
   getDeliverable as getDeliverableJs,
   getPublicationProjection as getPublicationProjectionJs,
@@ -48,7 +47,6 @@ import type {
   FederatedProductEntryRequest,
   FederatedProductEntryResponse,
   DeliverableRequest,
-  LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,
@@ -124,10 +122,6 @@ export function writeSourceAugmentationResult(
 
 export function executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse> {
   return executeSourceAugmentationJs(request) as Promise<SourceAugmentationExecutionResponse>;
-}
-
-export function importLegacyProject(request: Record<string, unknown>): Promise<LegacyImportResponse> {
-  return importLegacyProjectJs(request) as Promise<LegacyImportResponse>;
 }
 
 export function createDeliverable(request: CreateDeliverableRequest): Promise<DeliverableCreateResponse> {
@@ -238,7 +232,6 @@ export type {
   FederatedProductEntryRequest,
   FederatedProductEntryResponse,
   DeliverableRequest,
-  LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,

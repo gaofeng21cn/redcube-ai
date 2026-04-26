@@ -10,16 +10,13 @@ function read(file) {
 test('gateway actions no longer hardcode overlay family packages directly', () => {
   const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.js');
   const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.js');
-  const importLegacyProject = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
 
   assert.equal(createDeliverable.includes("@redcube/overlay-ppt"), false);
   assert.equal(createDeliverable.includes("@redcube/overlay-xiaohongshu"), false);
   assert.equal(auditDeliverable.includes("@redcube/overlay-ppt"), false);
   assert.equal(auditDeliverable.includes("@redcube/overlay-xiaohongshu"), false);
-  assert.equal(importLegacyProject.includes("@redcube/overlay-xiaohongshu"), false);
   assert.equal(createDeliverable.includes('@redcube/overlay-registry'), true);
   assert.equal(auditDeliverable.includes('@redcube/overlay-registry'), true);
-  assert.equal(importLegacyProject.includes('@redcube/overlay-registry'), true);
 });
 
 test('overlay registry package exports default registry entrypoint', () => {

@@ -29,7 +29,6 @@ import {
   prepareSourceAugmentationResult,
   writeSourceAugmentationResult,
   executeSourceAugmentation,
-  importLegacyProject,
   listTopics as listTopicsGateway,
   runtimeWatch,
   runDeliverableRoute,
@@ -62,7 +61,6 @@ const DEFAULT_GATEWAY_ACTIONS = {
   prepareSourceAugmentationResult,
   writeSourceAugmentationResult,
   executeSourceAugmentation,
-  importLegacyProject,
   listTopics: listTopicsGateway,
   runtimeWatch,
   runDeliverableRoute,
@@ -435,10 +433,6 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
         command: 'redcube topics list --workspace-root <dir>',
       },
       {
-        task: '从历史 projects 目录单向迁入 canonical workspace',
-        command: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
-      },
-      {
         task: '把 brief / keywords / source files 水合成 shared source truth',
         command: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md]',
       },
@@ -517,7 +511,6 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
       workspace: ['doctor'],
       topics: ['list'],
       source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
-      import: ['legacy-project'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
       product: ['frontdesk', 'start', 'preflight', 'invoke', 'session', 'manifest'],
@@ -536,7 +529,6 @@ export async function buildHelp(gatewayActions = getCliGatewayActions()) {
     usage: {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
-      importLegacyProject: 'redcube import legacy-project --project <name> --overlay <overlay-id> --root-dir <dir> --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md]',
       sourceResearch: 'redcube source research --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md] [--payload-file /abs/result.json]',
       sourceAugment: 'redcube source augment --workspace-root <dir> --topic-id <id>',
@@ -613,19 +605,6 @@ export async function executeCli(argv, deps = {}) {
 
     return gateway.listTopics({
       workspaceRoot: resolveWorkspaceRoot(options, cwd),
-    });
-  }
-
-  if (command === 'import') {
-    if (subcommand !== 'legacy-project') {
-      throw new Error('import 命令仅支持 legacy-project');
-    }
-
-    return gateway.importLegacyProject({
-      rootDir: options.rootDir || '',
-      workspaceRoot: resolveWorkspaceRoot(options, cwd),
-      project: options.project || '',
-      overlay: options.overlay || '',
     });
   }
 

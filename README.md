@@ -75,7 +75,7 @@ You can start with prompts like:
 
 1. Potential users should start here, then continue to the [Docs Guide](./docs/README.md).
 2. Technical readers and planners should read [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
-3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/program/`, `docs/references/`, `docs/policies/`, and `docs/history/`.
+3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/program/`, `docs/references/`, and `docs/policies/`.
 
 ## Agent And Operator Quick Start
 

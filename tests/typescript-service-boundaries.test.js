@@ -111,7 +111,11 @@ test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed 
   assert.match(types, /interface StructuredArtifactGenerationResult/);
 });
 
-test('P23.A: utility packages expose TypeScript service entrypoints without changing runtime JS exports', () => {
+test('P23.A: current utility package exposes TypeScript service entrypoints without legacy utility packages', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-tools')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-llm')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-paper-poster')), false);
+
   const packages = [
     {
       directory: 'packages/redcube-config',
@@ -124,24 +128,6 @@ test('P23.A: utility packages expose TypeScript service entrypoints without chan
       expectedTypes: [
         /interface RedcubeRuntimeConfig/,
         /interface RedcubeWorkspaceAuthorProfile/,
-      ],
-    },
-    {
-      directory: 'packages/redcube-tools',
-      expectedTypesEntry: './src/index.ts',
-      publicEntrypoints: ['src/index.ts'],
-      expectedTypes: [
-        /interface RedcubeProjectBundle/,
-        /interface RedcubeGeneratedTasks/,
-      ],
-    },
-    {
-      directory: 'packages/redcube-llm',
-      expectedTypesEntry: './src/index.ts',
-      publicEntrypoints: ['src/index.ts'],
-      expectedTypes: [
-        /interface RedcubeNoteDraftRequest/,
-        /interface RedcubeStorylineRequest/,
       ],
     },
   ];

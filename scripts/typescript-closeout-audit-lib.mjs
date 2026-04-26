@@ -33,8 +33,6 @@ const SERVICE_BOUNDARIES = [
 
 const UTILITY_BOUNDARIES = [
   'packages/redcube-config',
-  'packages/redcube-tools',
-  'packages/redcube-llm',
 ];
 
 const HIGH_CHURN_PACKAGES = [
@@ -75,7 +73,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/actions/get-product-preflight.js',
     'src/actions/get-product-start.js',
     'src/actions/get-run.js',
-    'src/actions/import-legacy-project.js',
     'src/actions/intake-source.js',
     'src/actions/invoke-domain-entry.js',
     'src/actions/invoke-federated-product-entry.js',
@@ -104,7 +101,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/hermes-native-proof-client.js',
     'src/index.js',
   ],
-  'packages/redcube-llm': ['src/index.js'],
   'packages/redcube-overlay-core': [
     'src/contracts.js',
     'src/index.js',
@@ -202,7 +198,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/source-truth.js',
     'src/workspace.js',
   ],
-  'packages/redcube-tools': ['src/index.js'],
 };
 
 const JS_RESIDUE_SCAN_ROOTS = ['apps', 'packages'];

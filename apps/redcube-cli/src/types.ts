@@ -8,7 +8,6 @@ import type {
   DomainEntryResponse,
   FederatedProductEntryRequest,
   FederatedProductEntryResponse,
-  LegacyImportResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,
@@ -76,7 +75,6 @@ export interface CliGatewayActions {
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
   executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse>;
-  importLegacyProject(request: Record<string, unknown>): Promise<LegacyImportResponse>;
   createDeliverable(request: CreateDeliverableRequest): Promise<DeliverableCreateResponse>;
   getDeliverable(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<DeliverableRecordResponse>;
   getPublicationProjection(request: { workspaceRoot: string; topicId: string }): Promise<PublicationProjectionResponse>;
@@ -113,7 +111,6 @@ export type CliRunSurface =
   | SourceIntakeResponse
   | SourceAugmentationResponse
   | SourceAugmentationExecutionResponse
-  | LegacyImportResponse
   | DeliverableCreateResponse
   | DeliverableRecordResponse
   | DomainEntryResponse

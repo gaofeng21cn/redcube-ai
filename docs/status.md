@@ -37,7 +37,6 @@
 
 - absorbed milestones 与 phase-2 records：`docs/program/phase-2/`
 - Hermes migration/history records：`docs/program/hermes/`
-- 历史归档入口：`docs/history/`
 - 支持性技术参考：`docs/references/`
 - direct-delivery future target reference：`docs/references/direct_delivery_longrun_target_state.md`
 - source-readiness future target reference：`docs/references/source_readiness_deep_research_longrun_target_state.md`

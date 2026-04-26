@@ -28,7 +28,6 @@
       "shared source truth baseline on shared substrate",
       "canonical quartet persistence",
       "CLI and MCP source-intake formal entry surfaces",
-      "legacy import feeding the same canonical intake path",
       "ppt_deck and xiaohongshu consuming shared source truth",
       "review, audit, and gate surfaces aligned to hydrated source truth"
     ],
@@ -114,7 +113,6 @@
     ],
     "baseline_capability_tests": [
       "tests/source-intake.test.js",
-      "tests/import-legacy-project.test.js",
       "tests/mcp-gateway.test.js",
       "tests/ppt-deliverable-e2e.test.js",
       "tests/xiaohongshu-deliverable-e2e.test.js",
@@ -123,7 +121,7 @@
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/source-intake.test.js tests/import-legacy-project.test.js",
+      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/source-intake.test.js",
       "npm run test:full"
     ]
   },

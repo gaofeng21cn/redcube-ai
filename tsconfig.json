@@ -32,13 +32,7 @@
       "path": "./packages/redcube-config"
     },
     {
-      "path": "./packages/redcube-tools"
-    },
-    {
-      "path": "./packages/redcube-llm"
-    },
-    {
-      "path": "./packages/redcube-runtime"
+      "path": "./packages/redcube-codex-cli-client"
     },
     {
       "path": "./packages/redcube-pack-ppt"
@@ -59,10 +53,10 @@
       "path": "./packages/redcube-runtime-family-poster-onepager"
     },
     {
-      "path": "./packages/redcube-codex-cli-client"
+      "path": "./packages/redcube-runtime-family-registry"
     },
     {
-      "path": "./packages/redcube-runtime-family-registry"
+      "path": "./packages/redcube-runtime"
     },
     {
       "path": "./packages/redcube-gateway"

@@ -42,14 +42,11 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   );
 });
 
-test('harness audit: source truth remains canonical and historical intake import feeds the same source intake path', () => {
+test('harness audit: source truth remains canonical through the current source intake path', () => {
   const intakeAction = readImplementation('packages/redcube-gateway/src/actions/intake-source.js');
-  const legacyImport = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
   const sharedSourceTruth = readImplementation('packages/redcube-runtime/src/shared-source-truth.js');
 
   assert.equal(intakeAction.includes("surface_kind: 'source_intake'"), true);
-  assert.equal(legacyImport.includes("modeHint: 'historical_intake_import'"), true);
-  assert.equal(legacyImport.includes('canonicalArtifacts'), true);
   assert.equal(sharedSourceTruth.includes('source_index'), true);
   assert.equal(sharedSourceTruth.includes('extracted_materials'), true);
   assert.equal(sharedSourceTruth.includes('source_audit'), true);
@@ -120,7 +117,6 @@ test('harness audit: extension proof shows onboarding is registry-driven instead
   const overlayRegistryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
   const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.js');
   const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.js');
-  const importLegacyProject = read('packages/redcube-gateway/src/actions/import-legacy-project.js');
 
   assert.deepEqual(
     overlayRegistryPackage.redcube.defaultOverlayModules.map((item) => item.overlayId),
@@ -138,5 +134,4 @@ test('harness audit: extension proof shows onboarding is registry-driven instead
   assert.equal(createDeliverable.includes('@redcube/overlay-xiaohongshu'), false);
   assert.equal(auditDeliverable.includes('@redcube/overlay-ppt'), false);
   assert.equal(auditDeliverable.includes('@redcube/overlay-xiaohongshu'), false);
-  assert.equal(importLegacyProject.includes('@redcube/overlay-xiaohongshu'), false);
 });

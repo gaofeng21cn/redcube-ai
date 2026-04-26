@@ -75,7 +75,7 @@
 
 1. 潜在用户先读当前首页，再继续看 [文档索引](./docs/README.zh-CN.md)。
 2. 技术规划、架构判断和方向同步，继续读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 以及 [合同说明](./contracts/README.md)。
-3. 开发者和维护者继续从 [文档索引](./docs/README.zh-CN.md) 进入 `docs/program/`、`docs/references/`、`docs/policies/` 与 `docs/history/`。
+3. 开发者和维护者继续从 [文档索引](./docs/README.zh-CN.md) 进入 `docs/program/`、`docs/references/` 与 `docs/policies/`。
 
 ## 给 Agent 和技术操作者的快速入口
 

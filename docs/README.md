@@ -14,7 +14,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 | --- | --- | --- |
 | Potential users and domain experts | [Repository home](../README.md) | Understand what RedCube delivers before opening technical files |
 | Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and active governance surface |
-| Developers and maintainers | `docs/program/`, `docs/references/`, `docs/policies/`, `docs/history/` | Track implementation records, references, governance, and archives |
+| Developers and maintainers | `docs/program/`, `docs/references/`, `docs/policies/` | Track implementation records, references, and governance |
 
 ## Current Baseline
 
@@ -39,10 +39,9 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
 - Historical and provenance audits stay in the same reference layer instead of the default public entry path.
 
-## Historical and Reference Layers
+## Reference Layers
 
 - `docs/program/`: tracked program records, including absorbed milestones
-- `docs/history/`: archive index
 - `docs/references/`: supporting technical references
 - `docs/policies/`: stable governance and operating rules
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
@@ -52,4 +51,4 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 
 - Keep `README*` and `docs/README*` aligned with the repo-verified direct route, the internal OPL Runtime Manager bridge/reference surface, and the service-safe domain entry surface.
 - Keep English and Chinese public docs mirrored where applicable.
-- Keep historical materials available in program/history/reference layers.
+- Keep reference materials only when they still support current contracts.

@@ -24,10 +24,6 @@
     "audit:typescript-closeout": "node --experimental-strip-types scripts/run-typescript-closeout-audit.mjs",
     "line-budget": "node scripts/line-budget.mjs"
   },
-  "optionalDependencies": {
-    "@mariozechner/pi-ai": "^0.54.2",
-    "@mariozechner/pi-agent-core": "^0.54.2"
-  },
   "devDependencies": {
     "typescript": "^5.9.2",
     "@types/node": "^24.7.0"

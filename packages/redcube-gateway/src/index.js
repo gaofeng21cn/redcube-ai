@@ -37,10 +37,6 @@ export async function executeSourceAugmentation(request) {
   const module = await import('./actions/execute-source-augmentation.js');
   return module.executeSourceAugmentation(request);
 }
-export async function importLegacyProject(request) {
-  const module = await import('./actions/import-legacy-project.js');
-  return module.importLegacyProject(request);
-}
 export async function createDeliverable(request) {
   const module = await import('./actions/create-deliverable.js');
   return module.createDeliverable(request);

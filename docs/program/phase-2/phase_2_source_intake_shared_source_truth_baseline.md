@@ -40,9 +40,8 @@
    - `extracted-materials.json`
    - `source-audit.json`
    - `source-brief.json`
-3. `legacy import` 与普通 intake 走同一 canonical path
-4. `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`
-5. review / audit / gate surface 继续围绕 hydrated truth，而不是 prompt patch
+3. `ppt_deck` / `xiaohongshu` 在同一 substrate 上通过 hydrated contract 消费 `shared_source_truth`
+4. review / audit / gate surface 继续围绕 hydrated truth，而不是 prompt patch
 
 ## Formal Entry / Review / Audit / Gate Surface
 
@@ -106,7 +105,6 @@
 - `contracts/runtime-program/current-program.json`
 - `tests/phase-2-source-intake-shared-source-truth-baseline.test.js`
 - `tests/source-intake.test.js`
-- `tests/import-legacy-project.test.js`
 - `tests/ppt-deliverable-e2e.test.js`
 - `tests/xiaohongshu-deliverable-e2e.test.js`
 

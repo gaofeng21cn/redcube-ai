@@ -11,6 +11,12 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 function readJson(file) {
   return JSON.parse(read(file));
 }
@@ -41,10 +47,10 @@ test('phase-2 minimum baseline contract remains absorbed provenance behind the c
 
 test('phase-2 minimum baseline contract freezes canonical quartet, formal entry surfaces, and family consumption expectations', () => {
   const contract = readJson(BASELINE_CONTRACT);
-  const gatewayIntake = read('packages/redcube-gateway/src/actions/intake-source.js');
+  const gatewayIntake = readImplementation('packages/redcube-gateway/src/actions/intake-source.js');
   const mcpServer = read('apps/redcube-mcp/src/server.js');
-  const sharedSourceTruth = read('packages/redcube-runtime/src/shared-source-truth.js');
-  const deliverableRouteLocal = read('packages/redcube-runtime/src/deliverable-route-local.js');
+  const sharedSourceTruth = readImplementation('packages/redcube-runtime/src/shared-source-truth.js');
+  const deliverableRouteLocal = readImplementation('packages/redcube-runtime/src/deliverable-route-local.js');
 
   const artifactIds = contract.artifact_schema.canonical_artifacts.map((item) => item.artifact_id);
   assert.deepEqual(artifactIds, ['source_index', 'extracted_materials', 'source_audit', 'source_brief']);
@@ -72,7 +78,6 @@ test('phase-2 minimum baseline contract records gate surface, tests, and the abs
   assert.equal(contract.gate_surface.audit_and_review_surfaces.includes('runtimeWatch'), true);
   assert.equal(contract.minimal_test_surface.truth_freeze_tests.includes('tests/phase-2-source-intake-shared-source-truth-baseline.test.js'), true);
   assert.equal(contract.minimal_test_surface.baseline_capability_tests.includes('tests/source-intake.test.js'), true);
-  assert.equal(contract.minimal_test_surface.baseline_capability_tests.includes('tests/import-legacy-project.test.js'), true);
   assert.equal(contract.minimal_test_surface.baseline_capability_tests.includes('tests/mcp-gateway.test.js'), true);
   assert.equal(contract.closeout_evidence.must_record.includes('Phase 2 minimal baseline is now on the mainline'), true);
   assert.equal(contract.closeout_evidence.must_not_claim.includes('controller became a formal entry'), true);
