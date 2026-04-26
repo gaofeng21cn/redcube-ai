@@ -87,11 +87,11 @@
 ## 最小 closeout evidence
 
 - `contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json`
-- `tests/phase-2-review-export-gate-audit-hardening.test.js`
-- `tests/deliverable-review-loop.test.js`
-- `tests/review-platform.test.js`
-- `tests/ppt-deliverable-surface.test.js`
-- `tests/harness-completion-audit.test.js`
+- `tests/phase-2-review-export-gate-audit-hardening.test.ts`
+- `tests/deliverable-review-loop.test.ts`
+- `tests/review-platform.test.ts`
+- `tests/ppt-deliverable-surface.test.ts`
+- `tests/harness-completion-audit.test.ts`
 
 ## 下一候选 tranche
 

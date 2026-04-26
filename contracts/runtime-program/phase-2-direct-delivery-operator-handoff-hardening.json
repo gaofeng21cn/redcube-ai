@@ -124,22 +124,22 @@
   },
   "minimal_test_surface": {
     "truth_freeze_tests": [
-      "tests/runtime-alignment-p0.test.js",
-      "tests/poster-production-hardening-freeze.test.js",
-      "tests/phase-2-publication-projection-delivery-contract-convergence.test.js",
-      "tests/phase-2-direct-delivery-operator-handoff-hardening.test.js"
+      "tests/runtime-alignment-p0.test.ts",
+      "tests/poster-production-hardening-freeze.test.ts",
+      "tests/phase-2-publication-projection-delivery-contract-convergence.test.ts",
+      "tests/phase-2-direct-delivery-operator-handoff-hardening.test.ts"
     ],
     "behavior_tests": [
-      "tests/profile-contract-hydration.test.js",
-      "tests/direct-delivery-operator-handoff.test.js",
-      "tests/review-platform.test.js",
-      "tests/deliverable-review-loop.test.js",
-      "tests/phase-2-behavior-convergence.test.js"
+      "tests/profile-contract-hydration.test.ts",
+      "tests/direct-delivery-operator-handoff.test.ts",
+      "tests/review-platform.test.ts",
+      "tests/deliverable-review-loop.test.ts",
+      "tests/phase-2-behavior-convergence.test.ts"
     ],
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-publication-projection-delivery-contract-convergence.test.js tests/phase-2-direct-delivery-operator-handoff-hardening.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js tests/review-platform.test.js tests/deliverable-review-loop.test.js tests/phase-2-behavior-convergence.test.js",
+      "node --test tests/runtime-alignment-p0.test.ts tests/poster-production-hardening-freeze.test.ts tests/phase-2-publication-projection-delivery-contract-convergence.test.ts tests/phase-2-direct-delivery-operator-handoff-hardening.test.ts tests/profile-contract-hydration.test.ts tests/direct-delivery-operator-handoff.test.ts tests/review-platform.test.ts tests/deliverable-review-loop.test.ts tests/phase-2-behavior-convergence.test.ts",
       "npm run test:full"
     ]
   },

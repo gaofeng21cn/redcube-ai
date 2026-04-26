@@ -33,9 +33,9 @@
 
 ## Verification
 
-- `node --test tests/runtime-deliverable-route.test.js`
-- `node --test tests/family-parity-governance-surface.test.js`
-- `node --test tests/managed-deliverable-execution.test.js`
-- `node --test tests/hermes-runtime-canonical-path.test.js`
+- `node --test tests/runtime-deliverable-route.test.ts`
+- `node --test tests/family-parity-governance-surface.test.ts`
+- `node --test tests/managed-deliverable-execution.test.ts`
+- `node --test tests/hermes-runtime-canonical-path.test.ts`
 - `npm run test:full`
 - `npm run typecheck`

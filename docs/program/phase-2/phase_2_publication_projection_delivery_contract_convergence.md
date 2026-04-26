@@ -81,10 +81,10 @@
 ## 最小 closeout evidence
 
 - `contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json`
-- `tests/phase-2-publication-projection-delivery-contract-convergence.test.js`
-- `tests/publication-projection-delivery-contract.test.js`
-- `tests/review-platform.test.js`
-- `tests/deliverable-review-loop.test.js`
+- `tests/phase-2-publication-projection-delivery-contract-convergence.test.ts`
+- `tests/publication-projection-delivery-contract.test.ts`
+- `tests/review-platform.test.ts`
+- `tests/deliverable-review-loop.test.ts`
 
 ## 下一候选 tranche
 

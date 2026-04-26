@@ -15,7 +15,7 @@
 
 1. live preflight 已通过标准 launcher 重放：
    - 命令：`npm run test:e2e`
-   - launcher：`scripts/run-test-group.mjs -> hermes gateway run -q --replace`
+   - launcher：`scripts/run-test-group.ts -> hermes gateway run -q --replace`
    - Python helper：`REDCUBE_PYTHON_COMMAND=/opt/homebrew/opt/python@3.14/bin/python3.14`
    - 结果：`/v1/health`、`/v1/models`、`/v1/runs`、`/v1/runs/{run_id}/events` preflight 通过，并拿到 terminal `run.completed`
 2. `ppt_deck` 与 `xiaohongshu` live e2e 已 fresh 全绿：
@@ -24,7 +24,7 @@
    - `xiaohongshu` 证明面：`publish_copy`、`export_bundle`、`optimize_existing relative review`、shared source-truth proof
    - 结果：`16/16 pass`
 3. guarded `poster_onepager` 已补齐 fresh upstream proof：
-   - 命令：`node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'`
+   - 命令：`node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'`
    - 证明面：guarded knowledge-poster managed execution、shared source-truth consumption、shared runtime route/review/export
    - 结果：`32/32 pass`
 4. 同一主线的 shared runtime contract lane 仍然是绿的：

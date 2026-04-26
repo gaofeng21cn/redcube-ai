@@ -79,9 +79,9 @@ family-specific export surface 仍按 hydrated contract 区分：
 ## 最小 closeout evidence
 
 - `contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json`
-- `tests/phase-2-family-source-truth-consumption-convergence.test.js`
-- `tests/family-source-truth-consumption.test.js`
-- `tests/profile-contract-hydration.test.js`
+- `tests/phase-2-family-source-truth-consumption-convergence.test.ts`
+- `tests/family-source-truth-consumption.test.ts`
+- `tests/profile-contract-hydration.test.ts`
 
 ## 下一候选 tranche
 

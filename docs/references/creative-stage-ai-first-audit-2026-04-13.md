@@ -74,7 +74,7 @@
 
 ### 3. 回归测试
 
-- 新增 `tests/poster-creative-ownership.test.js`。
+- 新增 `tests/poster-creative-ownership.test.ts`。
 - 扩展 `tests/helpers/mock-hermes-agent-upstream.js`，让 poster 的 story / blueprint / visual / render / director review 都能走 mock upstream。
 - 现有 `ppt` 与 `xiaohongshu` creative ownership 测试已一起复测通过。
 - `pack/compiler` legacy 真值相关的测试、审计与文档断言已同步改成 “pack 只保留 boundary / pack-id，不再承担创作”。
@@ -118,8 +118,8 @@
 
 已执行：
 
-- `node --test tests/ppt-creative-ownership.test.js tests/xiaohongshu-creative-ownership.test.js tests/poster-creative-ownership.test.js`
-- `node --test tests/ppt-hermes-generation.test.js`
+- `node --test tests/ppt-creative-ownership.test.ts tests/xiaohongshu-creative-ownership.test.ts tests/poster-creative-ownership.test.ts`
+- `node --test tests/ppt-hermes-generation.test.ts`
 
 结果：
 

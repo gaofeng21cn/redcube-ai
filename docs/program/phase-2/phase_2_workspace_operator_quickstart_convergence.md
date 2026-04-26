@@ -80,16 +80,16 @@
 
 - truth freeze：
   - `contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json`
-  - `tests/phase-2-workspace-operator-quickstart-convergence.test.js`
+  - `tests/phase-2-workspace-operator-quickstart-convergence.test.ts`
 - quickstart behavior：
-  - `tests/workspace-operator-quickstart.test.js`
-  - `tests/public-docs-surface.test.js`
-  - `tests/source-intake.test.js`
-  - `tests/source-research.test.js`
-- `tests/cli-v2-smoke.test.js`
-- `tests/deliverable-review-loop.test.js`
-- `tests/direct-delivery-operator-handoff.test.js`
-- `tests/phase-2-behavior-convergence.test.js`
+  - `tests/workspace-operator-quickstart.test.ts`
+  - `tests/public-docs-surface.test.ts`
+  - `tests/source-intake.test.ts`
+  - `tests/source-research.test.ts`
+- `tests/cli-v2-smoke.test.ts`
+- `tests/deliverable-review-loop.test.ts`
+- `tests/direct-delivery-operator-handoff.test.ts`
+- `tests/phase-2-behavior-convergence.test.ts`
 
 ## Closeout evidence
 

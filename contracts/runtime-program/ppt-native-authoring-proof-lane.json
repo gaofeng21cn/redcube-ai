@@ -82,7 +82,7 @@
       "review_behavior": "screenshot_review consumes native shape manifest metrics and blocks on missing or failing quality checks"
     },
     "runtime_executor_proof": {
-      "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.js",
+      "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
       "native_writer": "packages/redcube-runtime/scripts/ppt_deck_native.py",
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
       "route_surface": "runDeliverableRoute",

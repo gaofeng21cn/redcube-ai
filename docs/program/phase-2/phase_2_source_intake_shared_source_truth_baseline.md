@@ -103,10 +103,10 @@
 
 - `contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json`
 - `contracts/runtime-program/current-program.json`
-- `tests/phase-2-source-intake-shared-source-truth-baseline.test.js`
-- `tests/source-intake.test.js`
-- `tests/ppt-deliverable-e2e.test.js`
-- `tests/xiaohongshu-deliverable-e2e.test.js`
+- `tests/phase-2-source-intake-shared-source-truth-baseline.test.ts`
+- `tests/source-intake.test.ts`
+- `tests/ppt-deliverable-e2e.test.ts`
+- `tests/xiaohongshu-deliverable-e2e.test.ts`
 
 ## 当前下一候选 tranche
 

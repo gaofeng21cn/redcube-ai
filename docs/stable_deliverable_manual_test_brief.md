@@ -22,7 +22,7 @@
 1. `git diff --check`
 2. `npm run test:full`
 3. `npm run typecheck`
-4. `node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/p21-operations-and-evaluation-os.test.js`
+4. `node --test tests/runtime-alignment-p0.test.ts tests/poster-production-hardening-freeze.test.ts tests/p21-operations-and-evaluation-os.test.ts`
 5. 在 clean-clone / tracked-only 条件下，至少重放第 4 步
 
 若第 4 或第 5 步失败，本轮不进入 manual test，先回到 P0 closeout truth surface 修复。

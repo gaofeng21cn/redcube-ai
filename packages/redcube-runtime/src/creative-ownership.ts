@@ -134,89 +134,89 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
   ],
   frozen_contracts: {
     shared_contract: [
-      'packages/redcube-runtime/src/executors.js',
-      'packages/redcube-runtime/src/deliverable-routes.js',
-      'packages/redcube-runtime/src/creative-ownership.js',
+      'packages/redcube-runtime/src/executors.ts',
+      'packages/redcube-runtime/src/deliverable-routes.ts',
+      'packages/redcube-runtime/src/creative-ownership.ts',
     ],
     shared_lifecycle_contract: [
-      'packages/redcube-runtime/src/creative-ownership.js',
-      'tests/p19-creative-ownership-freeze.test.js',
-      'tests/creative-ownership-recovery-audit.test.js',
+      'packages/redcube-runtime/src/creative-ownership.ts',
+      'tests/p19-creative-ownership-freeze.test.ts',
+      'tests/creative-ownership-recovery-audit.test.ts',
     ],
     research_ownership: [
-      'packages/redcube-runtime/src/creative-ownership.js',
+      'packages/redcube-runtime/src/creative-ownership.ts',
       runtimeStateDisplayPath('plans', 'spec-redcube-unified-stage-lifecycle-and-family-alignment.md'),
       runtimeStateDisplayPath('plans', 'spec-redcube-agent-first-execution-and-creative-ownership-recovery.md'),
     ],
     ppt_visual_director_review_contract: [
-      'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
+      'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts',
       'packages/redcube-overlay-ppt/src/profiles.ts',
-      'tests/ppt-creative-ownership.test.js',
+      'tests/ppt-creative-ownership.test.ts',
     ],
   },
   lifecycle_alignment_red_tests: [
-    'tests/p19-creative-ownership-freeze.test.js',
-    'tests/creative-ownership-recovery-audit.test.js',
-    'tests/xiaohongshu-creative-ownership.test.js',
-    'tests/ppt-creative-ownership.test.js',
+    'tests/p19-creative-ownership-freeze.test.ts',
+    'tests/creative-ownership-recovery-audit.test.ts',
+    'tests/xiaohongshu-creative-ownership.test.ts',
+    'tests/ppt-creative-ownership.test.ts',
   ],
   candidate_lanes: [
     {
       lane_id: 'shared_lifecycle_review_overlay_convergence',
       lifecycle_focus: ['source_readiness', 'review_overlay'],
       write_scopes: [
-        'packages/redcube-runtime/src/creative-ownership.js',
-        'scripts/p19-creative-ownership-audit-lib.mjs',
-        'tests/p19-creative-ownership-freeze.test.js',
-        'tests/creative-ownership-recovery-audit.test.js',
+        'packages/redcube-runtime/src/creative-ownership.ts',
+        'scripts/p19-creative-ownership-audit-lib.ts',
+        'tests/p19-creative-ownership-freeze.test.ts',
+        'tests/creative-ownership-recovery-audit.test.ts',
       ],
       verification_commands: [
-        'node --test tests/p19-creative-ownership-freeze.test.js',
-        'node --test tests/creative-ownership-recovery-audit.test.js',
+        'node --test tests/p19-creative-ownership-freeze.test.ts',
+        'node --test tests/creative-ownership-recovery-audit.test.ts',
       ],
     },
     {
       lane_id: 'xiaohongshu_creative_ownership_recovery',
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'delivery_packaging'],
       write_scopes: [
-        'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
+        'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts',
         'packages/redcube-pack-xiaohongshu/src/index.ts',
         'prompts/xiaohongshu/**',
-        'tests/xiaohongshu-creative-ownership.test.js',
-        'tests/xiaohongshu-deliverable-e2e.test.js',
+        'tests/xiaohongshu-creative-ownership.test.ts',
+        'tests/xiaohongshu-deliverable-e2e.test.ts',
       ],
       verification_commands: [
-        'node --test tests/xiaohongshu-creative-ownership.test.js',
-        'node --test tests/xiaohongshu-deliverable-e2e.test.js',
+        'node --test tests/xiaohongshu-creative-ownership.test.ts',
+        'node --test tests/xiaohongshu-deliverable-e2e.test.ts',
       ],
     },
     {
       lane_id: 'ppt_deck_creative_ownership_recovery',
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'review_overlay'],
       write_scopes: [
-        'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
-        'packages/redcube-runtime-family-ppt/src/ppt-structured-artifact-builders.js',
+        'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts',
+        'packages/redcube-runtime-family-ppt/src/ppt-structured-artifact-builders.ts',
         'packages/redcube-pack-ppt/src/index.ts',
         'prompts/ppt_deck/**',
-        'tests/ppt-creative-ownership.test.js',
-        'tests/ppt-deliverable-e2e.test.js',
+        'tests/ppt-creative-ownership.test.ts',
+        'tests/ppt-deliverable-e2e.test.ts',
       ],
       verification_commands: [
-        'node --test tests/ppt-creative-ownership.test.js',
-        'node --test tests/ppt-deliverable-e2e.test.js',
+        'node --test tests/ppt-creative-ownership.test.ts',
+        'node --test tests/ppt-deliverable-e2e.test.ts',
       ],
     },
     {
       lane_id: 'red_tests_regression_audit_closeout',
       lifecycle_focus: ['regression', 'audit', 'reports'],
       write_scopes: [
-        'tests/review-platform.test.js',
-        'tests/reference-regression.test.js',
+        'tests/review-platform.test.ts',
+        'tests/reference-regression.test.ts',
         runtimeStateDisplayGlob('reports', 'redcube-runtime-program', '**'),
       ],
       verification_commands: [
-        'node --test tests/review-platform.test.js',
-        'node --test tests/reference-regression.test.js',
+        'node --test tests/review-platform.test.ts',
+        'node --test tests/reference-regression.test.ts',
         'npm test -- --test-reporter=dot',
       ],
     },
@@ -321,7 +321,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     violation_id: 'xhs.storyline.prompt_seed_authorship',
     stage: 'story_architecture',
     protected_surface: 'story_architecture_seed_authorship',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
+    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts',
     evidence_patterns: [
       "const seed = promptSeed(contract, 'storyline');",
       "audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement)",
@@ -353,7 +353,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     violation_id: 'xhs.publish_copy.seed_authorship',
     stage: 'delivery_packaging',
     protected_surface: 'publish_copy_body',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js',
+    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts',
     evidence_patterns: [
       "const seed = promptSeed(contract, 'publish_copy', {",
       'const body = safeText(publishSeed.body);',
@@ -367,7 +367,7 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
     violation_id: 'ppt.storyline.prompt_seed_authorship',
     stage: 'story_architecture',
     protected_surface: 'story_architecture_seed_authorship',
-    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js',
+    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts',
     evidence_patterns: [
       "const seed = promptSeed('storyline', {",
       'core_metaphor: safeText(seed?.storyline?.core_metaphor)',
@@ -404,9 +404,9 @@ function buildReviewOverlayStatus() {
     "requires_stages: ['render_html']",
     "stage_id: 'screenshot_review'",
     "requires_stages: ['visual_director_review']",
-  ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js', [
+  ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts', [
     "case 'visual_director_review':",
-  ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js', [
+  ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.ts', [
     "review_overlay: 'visual_director_review'",
   ]);
 

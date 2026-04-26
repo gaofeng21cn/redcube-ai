@@ -89,22 +89,22 @@
   },
   "minimal_test_surface": {
     "truth_freeze_tests": [
-      "tests/runtime-alignment-p0.test.js",
-      "tests/poster-production-hardening-freeze.test.js",
-      "tests/phase-2-source-intake-activation-package-freeze.test.js",
-      "tests/phase-2-source-intake-shared-source-truth-baseline.test.js",
-      "tests/phase-2-review-export-gate-audit-hardening.test.js"
+      "tests/runtime-alignment-p0.test.ts",
+      "tests/poster-production-hardening-freeze.test.ts",
+      "tests/phase-2-source-intake-activation-package-freeze.test.ts",
+      "tests/phase-2-source-intake-shared-source-truth-baseline.test.ts",
+      "tests/phase-2-review-export-gate-audit-hardening.test.ts"
     ],
     "behavior_tests": [
-      "tests/deliverable-review-loop.test.js",
-      "tests/review-platform.test.js",
-      "tests/ppt-deliverable-surface.test.js",
-      "tests/harness-completion-audit.test.js"
+      "tests/deliverable-review-loop.test.ts",
+      "tests/review-platform.test.ts",
+      "tests/ppt-deliverable-surface.test.ts",
+      "tests/harness-completion-audit.test.ts"
     ],
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-source-intake-activation-package-freeze.test.js tests/phase-2-source-intake-shared-source-truth-baseline.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/deliverable-review-loop.test.js tests/review-platform.test.js tests/ppt-deliverable-surface.test.js tests/harness-completion-audit.test.js",
+      "node --test tests/runtime-alignment-p0.test.ts tests/poster-production-hardening-freeze.test.ts tests/phase-2-source-intake-activation-package-freeze.test.ts tests/phase-2-source-intake-shared-source-truth-baseline.test.ts tests/phase-2-review-export-gate-audit-hardening.test.ts tests/deliverable-review-loop.test.ts tests/review-platform.test.ts tests/ppt-deliverable-surface.test.ts tests/harness-completion-audit.test.ts",
       "npm run test:full"
     ]
   },

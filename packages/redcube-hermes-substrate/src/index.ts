@@ -113,48 +113,49 @@ export interface HermesNativeProofExecutorDescriptor {
   execution_model: HermesNativeProofExecutionModel;
 }
 
-export declare const HERMES_SUBSTRATE_OWNER: 'Hermes';
-export declare const HERMES_RUNTIME_SURFACE: 'hermes_backed_runtime_substrate';
-export declare const HERMES_DEPLOYMENT_HOST: 'codex_default_host_agent_bridge';
-export declare const HERMES_DEPLOYMENT_STATUS: 'transition_only';
-export declare const HERMES_DEFAULT_ADAPTER: 'hermes';
-export declare const HERMES_FREEZE_ORIGIN: 'Hermes.A';
-export declare const CODEX_DEFAULT_ADAPTER: 'host_agent';
-export declare const HERMES_NATIVE_PROOF_ADAPTER: 'hermes_native_proof';
-export declare const CODEX_RUNTIME_SURFACE: 'codex_native_host_agent';
-export declare const CODEX_DEPLOYMENT_HOST: 'codex_local_operator_host';
-export declare const CODEX_DEPLOYMENT_STATUS: 'active_primary';
-export declare const CODEX_DEFAULT_MODEL_SELECTION: 'inherit_local_codex_default';
-export declare const CODEX_DEFAULT_REASONING_SELECTION: 'inherit_local_codex_default';
-export declare const CODEX_FREEZE_ORIGIN: 'P19.A';
-export declare const HERMES_NATIVE_PROOF_RUNTIME_SURFACE: 'hermes_native_full_agent_loop';
-export declare const HERMES_NATIVE_PROOF_DEPLOYMENT_HOST: 'local_hermes_agent_bridge';
-export declare const HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS: 'opt_in_available';
-export declare const HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION: 'inherit_local_hermes_default';
-export declare const HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION: 'inherit_local_hermes_default';
-export declare const HERMES_NATIVE_PROOF_FREEZE_ORIGIN: 'Hermes.Proof.A';
-export declare const RUNNING_RUN_STALE_TTL_MS: number;
-
-export declare function buildHermesRuntimeTopology(): HermesRuntimeTopology;
-export declare function buildCodexRuntimeTopology(): CodexRuntimeTopology;
-export declare function buildHermesNativeProofRuntimeTopology(): HermesNativeProofRuntimeTopology;
-export declare function normalizeCodexAdapter(adapter?: string): 'host_agent';
-export declare function normalizeHermesAdapter(adapter?: string): 'hermes';
-export declare function buildHermesExecutionModel(options?: { adapter?: string }): HermesExecutionModel;
-export declare function buildCodexExecutionModel(options?: { adapter?: string }): CodexExecutionModel;
-export declare function buildHermesNativeProofExecutionModel(options?: { adapter?: string }): HermesNativeProofExecutionModel;
-export declare function buildHermesExecutorDescriptor(options?: { adapter?: string }): HermesExecutorDescriptor;
-export declare function buildCodexExecutorDescriptor(options?: { adapter?: string }): CodexExecutorDescriptor;
-export declare function buildHermesNativeProofExecutorDescriptor(options?: { adapter?: string }): HermesNativeProofExecutorDescriptor;
-export declare function createHermesCreativeSource(options?: Record<string, unknown>): Record<string, unknown>;
-export declare function createHermesCreativeExecution(options?: Record<string, unknown>): Record<string, unknown>;
-export declare function createHermesReviewExecution(options?: Record<string, unknown>): Record<string, unknown>;
-export declare function readHermesNativeProofContract(options?: Record<string, unknown>): Record<string, unknown>;
-export declare function probeHermesNativeProof(options?: Record<string, unknown>): Record<string, unknown>;
-export declare function generateStructuredArtifactViaHermesNativeProof(options?: Record<string, unknown>): Record<string, unknown>;
-export declare function startHermesRun(options: Record<string, unknown>): Record<string, unknown>;
-export declare function completeHermesRun(options: Record<string, unknown>): Record<string, unknown>;
-export declare function failHermesRun(options: Record<string, unknown>): Record<string, unknown>;
-export declare function loadHermesRun(options: Record<string, unknown>): Record<string, unknown>;
-export declare function appendHermesEvent(workspaceRoot: string, runId: string, event: Record<string, unknown>): void;
-export declare function readHermesEvents(workspaceRoot: string, runId: string): Array<Record<string, unknown>>;
+export {
+  CODEX_DEFAULT_ADAPTER,
+  CODEX_DEFAULT_MODEL_SELECTION,
+  CODEX_DEFAULT_REASONING_SELECTION,
+  CODEX_DEPLOYMENT_HOST,
+  CODEX_DEPLOYMENT_STATUS,
+  CODEX_FREEZE_ORIGIN,
+  CODEX_RUNTIME_SURFACE,
+  HERMES_DEFAULT_ADAPTER,
+  HERMES_DEPLOYMENT_HOST,
+  HERMES_DEPLOYMENT_STATUS,
+  HERMES_FREEZE_ORIGIN,
+  HERMES_NATIVE_PROOF_ADAPTER,
+  HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION,
+  HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION,
+  HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
+  HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS,
+  HERMES_NATIVE_PROOF_FREEZE_ORIGIN,
+  HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+  HERMES_RUNTIME_SURFACE,
+  HERMES_SUBSTRATE_OWNER,
+  RUNNING_RUN_STALE_TTL_MS,
+  appendHermesEvent,
+  buildCodexExecutionModel,
+  buildCodexExecutorDescriptor,
+  buildCodexRuntimeTopology,
+  buildHermesExecutionModel,
+  buildHermesExecutorDescriptor,
+  buildHermesNativeProofExecutionModel,
+  buildHermesNativeProofExecutorDescriptor,
+  buildHermesNativeProofRuntimeTopology,
+  buildHermesRuntimeTopology,
+  completeHermesRun,
+  createHermesCreativeExecution,
+  createHermesCreativeSource,
+  createHermesReviewExecution,
+  failHermesRun,
+  generateStructuredArtifactViaHermesNativeProof,
+  loadHermesRun,
+  normalizeCodexAdapter,
+  normalizeHermesAdapter,
+  probeHermesNativeProof,
+  readHermesEvents,
+  readHermesNativeProofContract,
+  startHermesRun,
+} from './index.impl.js';

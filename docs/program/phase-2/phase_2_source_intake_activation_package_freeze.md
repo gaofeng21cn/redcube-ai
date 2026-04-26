@@ -109,11 +109,11 @@
 
 activation package freeze 至少要绑定：
 
-- `tests/runtime-alignment-p0.test.js`
-- `tests/poster-production-hardening-freeze.test.js`
-- `tests/stable-deliverable-manual-test-package.test.js`
-- `tests/phase-2-source-intake-activation-package-freeze.test.js`
-- `tests/source-intake.test.js`
+- `tests/runtime-alignment-p0.test.ts`
+- `tests/poster-production-hardening-freeze.test.ts`
+- `tests/stable-deliverable-manual-test-package.test.ts`
+- `tests/phase-2-source-intake-activation-package-freeze.test.ts`
+- `tests/source-intake.test.ts`
 
 同时要求：
 

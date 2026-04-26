@@ -97,37 +97,14 @@ export interface StructuredArtifactBatchGenerationResult {
   };
 }
 
-export declare const REDCUBE_CODEX_RUNTIME_OWNER: 'codex_cli';
-export declare const REDCUBE_CREATIVE_GENERATION_META_BEGIN: 'REDCUBE_CREATIVE_GENERATION_META_BEGIN';
-export declare const REDCUBE_CREATIVE_GENERATION_META_END: 'REDCUBE_CREATIVE_GENERATION_META_END';
-export declare const REDCUBE_STAGE_JSON_BEGIN: 'REDCUBE_STAGE_JSON_BEGIN';
-export declare const REDCUBE_STAGE_JSON_END: 'REDCUBE_STAGE_JSON_END';
-
-export declare function readCodexCliContract(
-  env?: Record<string, string | undefined>,
-): CodexCliContract;
-
-export declare function probeCodexCli(options?: {
-  contract?: CodexCliContract;
-  timeoutMs?: number;
-  cwd?: string;
-  prompt?: string;
-}): Promise<CodexCliProbeResult>;
-
-export declare function generateStructuredArtifactViaCodexCli(options?: {
-  family?: string;
-  route: string;
-  promptRelativePath: string;
-  context?: Record<string, unknown>;
-  outputContract?: Record<string, unknown>;
-  timeoutMs?: number;
-  cwd?: string;
-  contract?: CodexCliContract;
-}): Promise<StructuredArtifactGenerationResult>;
-
-export declare function generateStructuredArtifactBatchViaCodexCli(options?: {
-  stages: CodexCliBatchStageOptions[];
-  sessionPool?: CodexCliBatchSessionPoolDescriptor;
-  contract?: CodexCliContract;
-  cwd?: string;
-}): Promise<StructuredArtifactBatchGenerationResult>;
+export {
+  REDCUBE_CODEX_RUNTIME_OWNER,
+  REDCUBE_CREATIVE_GENERATION_META_BEGIN,
+  REDCUBE_CREATIVE_GENERATION_META_END,
+  REDCUBE_STAGE_JSON_BEGIN,
+  REDCUBE_STAGE_JSON_END,
+  generateStructuredArtifactBatchViaCodexCli,
+  generateStructuredArtifactViaCodexCli,
+  probeCodexCli,
+  readCodexCliContract,
+} from './index.impl.js';

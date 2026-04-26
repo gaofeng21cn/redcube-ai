@@ -115,21 +115,21 @@
   },
   "minimal_test_surface": {
     "truth_freeze_tests": [
-      "tests/runtime-alignment-p0.test.js",
-      "tests/poster-production-hardening-freeze.test.js",
-      "tests/phase-2-review-export-gate-audit-hardening.test.js",
-      "tests/phase-2-family-source-truth-consumption-convergence.test.js"
+      "tests/runtime-alignment-p0.test.ts",
+      "tests/poster-production-hardening-freeze.test.ts",
+      "tests/phase-2-review-export-gate-audit-hardening.test.ts",
+      "tests/phase-2-family-source-truth-consumption-convergence.test.ts"
     ],
     "behavior_tests": [
-      "tests/profile-contract-hydration.test.js",
-      "tests/family-source-truth-consumption.test.js",
-      "tests/deliverable-review-loop.test.js",
-      "tests/mcp-gateway.test.js"
+      "tests/profile-contract-hydration.test.ts",
+      "tests/family-source-truth-consumption.test.ts",
+      "tests/deliverable-review-loop.test.ts",
+      "tests/mcp-gateway.test.ts"
     ],
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.js tests/poster-production-hardening-freeze.test.js tests/phase-2-review-export-gate-audit-hardening.test.js tests/phase-2-family-source-truth-consumption-convergence.test.js tests/profile-contract-hydration.test.js tests/family-source-truth-consumption.test.js tests/deliverable-review-loop.test.js tests/mcp-gateway.test.js",
+      "node --test tests/runtime-alignment-p0.test.ts tests/poster-production-hardening-freeze.test.ts tests/phase-2-review-export-gate-audit-hardening.test.ts tests/phase-2-family-source-truth-consumption-convergence.test.ts tests/profile-contract-hydration.test.ts tests/family-source-truth-consumption.test.ts tests/deliverable-review-loop.test.ts tests/mcp-gateway.test.ts",
       "npm run test:full"
     ]
   },

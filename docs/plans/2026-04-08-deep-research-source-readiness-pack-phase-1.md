@@ -38,7 +38,7 @@
 
 ### Xiaohongshu Family
 
-- Modify: `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js`
+- Modify: `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts`
   - `buildResearch` 改为 readiness / fact-library artifact
   - `buildStoryline` 改为直接从 source truth / readiness pack 派生 storyline judgement
 - Modify: `prompts/xiaohongshu/research.md`
@@ -48,11 +48,11 @@
 
 ### Tests
 
-- Modify: `tests/source-intake.test.js`
+- Modify: `tests/source-intake.test.ts`
   - 覆盖 canonical `source-readiness-pack.json`
-- Modify: `tests/xiaohongshu-deliverable-e2e.test.js`
+- Modify: `tests/xiaohongshu-deliverable-e2e.test.ts`
   - 覆盖新 research artifact 边界与 storyline 消费来源
-- Modify: `tests/family-source-truth-consumption.test.js`
+- Modify: `tests/family-source-truth-consumption.test.ts`
   - 确认 shared source truth 新 pack 不破坏消费 summary
 
 ### Docs
@@ -71,7 +71,7 @@
 - Modify: `packages/redcube-runtime/src/shared-source-truth.js`
 - Modify: `packages/redcube-runtime-protocol/src/source-truth.ts`
 - Modify: `packages/redcube-runtime-protocol/src/types.ts`
-- Test: `tests/source-intake.test.js`
+- Test: `tests/source-intake.test.ts`
 
 - [ ] **Step 1: 写失败测试，要求 source intake 额外写出 readiness pack**
 
@@ -103,7 +103,7 @@ test('intakeSource writes canonical source readiness pack for downstream plannin
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `rtk node --test tests/source-intake.test.js`
+Run: `rtk node --test tests/source-intake.test.ts`
 Expected: FAIL，报 `sourceReadinessPackFile` 不存在或 pack 断言失败。
 
 - [ ] **Step 3: 增加 canonical path 与 pack builder**
@@ -240,7 +240,7 @@ return {
 
 - [ ] **Step 5: 跑测试确认通过**
 
-Run: `rtk node --test tests/source-intake.test.js`
+Run: `rtk node --test tests/source-intake.test.ts`
 Expected: PASS
 
 - [ ] **Step 6: Commit**
@@ -251,16 +251,16 @@ git add packages/redcube-runtime/src/source-readiness-pack.js \
   packages/redcube-runtime/src/shared-source-truth.js \
   packages/redcube-runtime-protocol/src/source-truth.ts \
   packages/redcube-runtime-protocol/src/types.ts \
-  tests/source-intake.test.js
+  tests/source-intake.test.ts
 git commit -m "feat: add canonical source readiness pack"
 ```
 
 ### Task 2: 收紧 xiaohongshu research 到 readiness / fact library 边界
 
 **Files:**
-- Modify: `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js`
+- Modify: `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts`
 - Modify: `prompts/xiaohongshu/research.md`
-- Test: `tests/xiaohongshu-deliverable-e2e.test.js`
+- Test: `tests/xiaohongshu-deliverable-e2e.test.ts`
 
 - [ ] **Step 1: 写失败测试，要求 research 不再承载 storyline judgement 主字段**
 
@@ -304,7 +304,7 @@ test('xiaohongshu research emits source readiness artifact instead of storyline 
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.js`
+Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.ts`
 Expected: FAIL，现有 `research` 仍输出 `audience_judgement` / `why_now`。
 
 - [ ] **Step 3: 重写 research artifact 为 readiness / fact library 输出**
@@ -321,7 +321,7 @@ Expected: FAIL，现有 `research` 仍输出 `audience_judgement` / `why_now`。
 - 明确当前是 single 还是 series
 ```
 
-在 `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js` 中把 `buildResearch()` 改成：
+在 `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts` 中把 `buildResearch()` 改成：
 
 ```js
 function buildResearch(contract) {
@@ -362,24 +362,24 @@ function buildResearch(contract) {
 
 - [ ] **Step 4: 跑测试确认通过**
 
-Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.js`
+Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.ts`
 Expected: PASS，新 `research` artifact 已收紧为 fact library / readiness 输出。
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js \
+git add packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts \
   prompts/xiaohongshu/research.md \
-  tests/xiaohongshu-deliverable-e2e.test.js
+  tests/xiaohongshu-deliverable-e2e.test.ts
 git commit -m "refactor: align xiaohongshu research with source readiness"
 ```
 
 ### Task 3: 把 storyline judgement 移回 storyline 阶段
 
 **Files:**
-- Modify: `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js`
+- Modify: `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts`
 - Modify: `prompts/xiaohongshu/storyline.md`
-- Test: `tests/xiaohongshu-deliverable-e2e.test.js`
+- Test: `tests/xiaohongshu-deliverable-e2e.test.ts`
 
 - [ ] **Step 1: 写失败测试，要求 storyline 直接承担 audience / why-now / tension / memory hook**
 
@@ -416,12 +416,12 @@ test('xiaohongshu storyline derives judgement from source readiness instead of r
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.js`
+Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.ts`
 Expected: FAIL，`buildStoryline()` 仍从 `research.research` 读取 judgement 字段。
 
 - [ ] **Step 3: 在 runtime 中改用 source truth / pack 派生 storyline inputs**
 
-在 `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js` 增加：
+在 `packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts` 增加：
 
 ```js
 function buildStorylineInputs(contract, research) {
@@ -451,16 +451,16 @@ const authoredArtifact = promptArtifact(contract, 'storyline', storylineInputs);
 
 - [ ] **Step 4: 跑相关测试**
 
-Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.js tests/xiaohongshu-creative-ownership.test.js`
+Run: `rtk node --test tests/xiaohongshu-deliverable-e2e.test.ts tests/xiaohongshu-creative-ownership.test.ts`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js \
+git add packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts \
   prompts/xiaohongshu/storyline.md \
-  tests/xiaohongshu-deliverable-e2e.test.js \
-  tests/xiaohongshu-creative-ownership.test.js
+  tests/xiaohongshu-deliverable-e2e.test.ts \
+  tests/xiaohongshu-creative-ownership.test.ts
 git commit -m "refactor: move storyline judgement out of research"
 ```
 
@@ -470,8 +470,8 @@ git commit -m "refactor: move storyline judgement out of research"
 - Modify: `docs/human_quickstart.md`
 - Modify: `README.md`
 - Modify: `README.zh-CN.md`
-- Test: `tests/public-docs-surface.test.js`
-- Test: `tests/runtime-alignment-p0.test.js`
+- Test: `tests/public-docs-surface.test.ts`
+- Test: `tests/runtime-alignment-p0.test.ts`
 
 - [ ] **Step 1: 写失败测试，要求公开文档出现 Source Readiness / Deep Research 正式口径**
 
@@ -490,7 +490,7 @@ test('public docs describe Deep Research as Source Readiness enhancement instead
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `rtk node --test tests/public-docs-surface.test.js tests/runtime-alignment-p0.test.js`
+Run: `rtk node --test tests/public-docs-surface.test.ts tests/runtime-alignment-p0.test.ts`
 Expected: FAIL，文档还没有完整新口径。
 
 - [ ] **Step 3: 修改公开文档**
@@ -521,24 +521,24 @@ Expected: FAIL，文档还没有完整新口径。
 
 - [ ] **Step 4: 跑文档测试**
 
-Run: `rtk node --test tests/public-docs-surface.test.js tests/runtime-alignment-p0.test.js`
+Run: `rtk node --test tests/public-docs-surface.test.ts tests/runtime-alignment-p0.test.ts`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add docs/human_quickstart.md README.md README.zh-CN.md \
-  tests/public-docs-surface.test.js tests/runtime-alignment-p0.test.js
+  tests/public-docs-surface.test.ts tests/runtime-alignment-p0.test.ts
 git commit -m "docs: publish Source Readiness and Deep Research contract"
 ```
 
 ### Task 5: 端到端回归与收尾
 
 **Files:**
-- Test: `tests/source-intake.test.js`
-- Test: `tests/xiaohongshu-deliverable-e2e.test.js`
-- Test: `tests/family-source-truth-consumption.test.js`
-- Test: `tests/review-platform.test.js`
+- Test: `tests/source-intake.test.ts`
+- Test: `tests/xiaohongshu-deliverable-e2e.test.ts`
+- Test: `tests/family-source-truth-consumption.test.ts`
+- Test: `tests/review-platform.test.ts`
 
 - [ ] **Step 1: 跑 shared Step 1 与 xiaohongshu 主链回归**
 
@@ -546,10 +546,10 @@ Run:
 
 ```bash
 rtk node --test \
-  tests/source-intake.test.js \
-  tests/xiaohongshu-deliverable-e2e.test.js \
-  tests/family-source-truth-consumption.test.js \
-  tests/review-platform.test.js
+  tests/source-intake.test.ts \
+  tests/xiaohongshu-deliverable-e2e.test.ts \
+  tests/family-source-truth-consumption.test.ts \
+  tests/review-platform.test.ts
 ```
 
 Expected: PASS
@@ -560,8 +560,8 @@ Run:
 
 ```bash
 rtk node --test \
-  tests/public-docs-surface.test.js \
-  tests/runtime-alignment-p0.test.js
+  tests/public-docs-surface.test.ts \
+  tests/runtime-alignment-p0.test.ts
 ```
 
 Expected: PASS
@@ -585,12 +585,12 @@ git add packages/redcube-runtime \
   packages/redcube-runtime-family-xiaohongshu \
   prompts/xiaohongshu \
   docs/human_quickstart.md README.md README.zh-CN.md \
-  tests/source-intake.test.js \
-  tests/xiaohongshu-deliverable-e2e.test.js \
-  tests/family-source-truth-consumption.test.js \
-  tests/public-docs-surface.test.js \
-  tests/runtime-alignment-p0.test.js \
-  tests/review-platform.test.js
+  tests/source-intake.test.ts \
+  tests/xiaohongshu-deliverable-e2e.test.ts \
+  tests/family-source-truth-consumption.test.ts \
+  tests/public-docs-surface.test.ts \
+  tests/runtime-alignment-p0.test.ts \
+  tests/review-platform.test.ts
 git commit -m "feat: land Source Readiness pack phase 1"
 ```
 

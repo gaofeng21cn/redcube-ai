@@ -8,13 +8,13 @@
 
 ### 1. Route run session envelope
 
-- 代码面：`packages/redcube-runtime/src/deliverable-routes.js`、`packages/redcube-runtime/src/index.js`、`packages/redcube-hermes-substrate/src/index.js`
+- 代码面：`packages/redcube-runtime/src/deliverable-routes.ts`、`packages/redcube-runtime/src/index.ts`、`packages/redcube-hermes-substrate/src/index.impl.ts`
 - Hermes 负责：run start / complete / fail、event append / read、runtime topology 落盘、run telemetry identity
 - 必须保持：`run_id` 不变；`topic_id` / `deliverable_id` 不丢；fail-closed 行为不退化
 
 ### 2. Executor identity and bridge projection
 
-- 代码面：`packages/redcube-runtime/src/executors.js`、`packages/redcube-runtime/src/managed-deliverable.js`
+- 代码面：`packages/redcube-runtime/src/executors.ts`、`packages/redcube-runtime/src/managed-deliverable.ts`
 - Hermes 负责：当前主执行 substrate 身份、compatibility adapter 切换回 primary substrate 的控制语义
 - Codex-local host-agent 只保留：transition deployment host / regression bridge / development shell
 

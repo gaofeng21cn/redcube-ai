@@ -75,14 +75,14 @@ family parity 只收紧 shared governance surface，不会抹平 family ontology
 
 ## 预期验证面
 
-- `tests/phase-2-family-parity-governance-surface-convergence.test.js`
-- `tests/deliverable-review-loop.test.js`
-- `tests/runtime-deliverable-route.test.js`
-- `tests/phase-2-behavior-convergence.test.js`
-- `tests/mcp-gateway.test.js`
-- `tests/cli-v2-smoke.test.js`
-- `tests/ppt-deliverable-e2e.test.js`
-- `tests/xiaohongshu-deliverable-e2e.test.js`
+- `tests/phase-2-family-parity-governance-surface-convergence.test.ts`
+- `tests/deliverable-review-loop.test.ts`
+- `tests/runtime-deliverable-route.test.ts`
+- `tests/phase-2-behavior-convergence.test.ts`
+- `tests/mcp-gateway.test.ts`
+- `tests/cli-v2-smoke.test.ts`
+- `tests/ppt-deliverable-e2e.test.ts`
+- `tests/xiaohongshu-deliverable-e2e.test.ts`
 
 ## 完成后真实去向
 

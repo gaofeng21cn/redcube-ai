@@ -3,7 +3,7 @@ set -euo pipefail
 
 lane="${1:-smoke}"
 
-node scripts/line-budget.mjs
+node --experimental-strip-types scripts/line-budget.ts
 
 case "$lane" in
   smoke|fast)

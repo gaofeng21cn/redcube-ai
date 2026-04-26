@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { existsSync, readFileSync } from 'node:fs';
-
 import {
   getPublicationProjection,
   getReviewState,

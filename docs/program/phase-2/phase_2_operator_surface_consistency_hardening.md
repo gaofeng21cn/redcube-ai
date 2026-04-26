@@ -58,12 +58,12 @@
 
 ## 预期验证面
 
-- `tests/gateway-actions.test.js`
-- `tests/workspace-operator-quickstart.test.js`
-- `tests/cli-v2-smoke.test.js`
-- `tests/mcp-gateway.test.js`
-- `tests/deliverable-review-loop.test.js`
-- `tests/phase-2-behavior-convergence.test.js`
+- `tests/gateway-actions.test.ts`
+- `tests/workspace-operator-quickstart.test.ts`
+- `tests/cli-v2-smoke.test.ts`
+- `tests/mcp-gateway.test.ts`
+- `tests/deliverable-review-loop.test.ts`
+- `tests/phase-2-behavior-convergence.test.ts`
 
 ## 吸收门槛
 

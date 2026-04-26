@@ -23,7 +23,7 @@
    - `task_intent -> surface_kind` 不匹配会拒绝
 2. 显式 API-server 启动的 upstream gateway probe 可通过：
    - 启动命令：`API_SERVER_ENABLED=true API_SERVER_HOST=127.0.0.1 API_SERVER_PORT=8642 API_SERVER_MODEL_NAME=hermes-agent hermes gateway run --replace`
-   - probe：`REDCUBE_HERMES_UPSTREAM_BASE_URL=http://127.0.0.1:8642 REDCUBE_HERMES_UPSTREAM_MODEL=hermes-agent node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface`
+   - probe：`REDCUBE_HERMES_UPSTREAM_BASE_URL=http://127.0.0.1:8642 REDCUBE_HERMES_UPSTREAM_MODEL=hermes-agent node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface`
    - probe 返回：`run.completed`
 
 ## 历史 blocker
@@ -31,7 +31,7 @@
 1. `scripts/verify.sh e2e` 曾在 live preflight 上 fail-closed：
    - `run events endpoint did not emit a terminal event`
 2. focused `ppt_deck` live e2e 当前在 `screenshot_review` 失败：
-   - 测试：`tests/ppt-deliverable-e2e.test.js`
+   - 测试：`tests/ppt-deliverable-e2e.test.ts`
    - 断言：`AssertionError: screenshot_review false !== true`
 
 ## 这意味着什么
@@ -50,7 +50,7 @@
 1. `npm run test:e2e` 已在当前宿主 fresh 全绿：
    - `ppt_deck` 通过 `screenshot_review / export_pptx / optimize_existing`
    - `xiaohongshu` 通过 `publish_copy / export_bundle / optimize_existing`
-2. `node scripts/run-test-group.mjs integration --test-name-pattern 'poster_onepager|knowledge-poster'` 已在当前宿主 fresh 全绿：
+2. `node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'` 已在当前宿主 fresh 全绿：
    - 补齐 guarded `poster_onepager` 的 upstream live proof
 3. 历史 `ppt_deck screenshot_review` 失败与 `/v1/runs/{run_id}/events` terminal-event 缺失，在这一轮标准 launcher + Playwright Python contract 下都没有再次复现
 

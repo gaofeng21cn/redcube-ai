@@ -48,10 +48,10 @@ jobs:
         run: npm run typecheck
 
       - name: Run fast tests
-        run: node scripts/run-test-group.mjs fast
+        run: node --experimental-strip-types scripts/run-test-group.ts fast
 
       - name: Run family tests
-        run: node scripts/run-test-group.mjs family
+        run: node --experimental-strip-types scripts/run-test-group.ts family
 
       - name: Run meta tests
-        run: node scripts/run-test-group.mjs meta
+        run: node --experimental-strip-types scripts/run-test-group.ts meta

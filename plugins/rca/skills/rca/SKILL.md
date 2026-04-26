@@ -18,7 +18,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 默认把本仓实现理解为 `TypeScript orchestration + Python native helpers`。
 - 新增 orchestration、contract、CLI/MCP、gateway 或 runtime service boundary 默认使用 TypeScript。
 - Office/PPT/document automation、截图/导出 helper 与修复循环默认使用 repo-owned Python helper，并继续受 RedCube route/gate 约束。
-- 仓内 JavaScript 只代表 migration policy 登记过的 legacy allowlisted residue；不得因为看见 `.js` 文件就把新 agent 工作默认写成 JavaScript。
+- 仓内已跟踪 JavaScript 已退役；新的 product、test 或 script JavaScript 会被 closeout audit 阻断，不得把新 agent 工作写成 JavaScript。
 
 ## 核心入口
 

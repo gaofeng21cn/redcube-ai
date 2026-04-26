@@ -11,7 +11,7 @@
   "connection_proof": {
     "required_runtime_owner": "upstream_hermes_agent",
     "adapter_surface": "@redcube/hermes-agent-client",
-    "probe_script": "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface",
+    "probe_script": "node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface",
     "live_gateway_command_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
     "python_command_env": "REDCUBE_PYTHON_COMMAND",
     "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
@@ -32,8 +32,8 @@
       "python3 -c \"import sys; import playwright; print(sys.executable)\"",
       "curl http://127.0.0.1:8642/v1/health",
       "curl http://127.0.0.1:8642/v1/models",
-      "node scripts/probe-upstream-hermes-agent.mjs --json",
-      "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface"
+      "node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json",
+      "node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface"
     ]
   },
   "cutover_scope": {
@@ -74,9 +74,9 @@
     "managed web runtime completion claim"
   ],
   "required_verification": [
-    "node scripts/probe-upstream-hermes-agent.mjs --json",
-    "node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface",
-    "node --test tests/upstream-hermes-agent-activation-package.test.js tests/upstream-hermes-agent-probe.test.js tests/runtime-deliverable-route.test.js tests/managed-deliverable-execution.test.js tests/service-safe-domain-entry.test.js",
+    "node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json",
+    "node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface",
+    "node --experimental-strip-types --test tests/upstream-hermes-agent-activation-package.test.ts tests/runtime-deliverable-route.test.ts tests/managed-deliverable-execution.test.ts tests/service-safe-domain-entry.test.ts",
     "npm run test:fast",
     "npm run typecheck"
   ],

@@ -26,7 +26,7 @@
     "typecheck": "npm run typecheck",
     "typecheck_model": "build_compiled_exports_then_no_emit",
     "build": "npm run build",
-    "package_contract_test": "node --test tests/typescript-baseline.test.js"
+    "package_contract_test": "node --test tests/typescript-baseline.test.ts"
   },
   "legacy_source_js_runtime_exports": [],
   "compiled_dist_runtime_exports": [

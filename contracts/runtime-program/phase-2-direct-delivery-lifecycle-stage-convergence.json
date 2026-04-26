@@ -152,17 +152,17 @@
   },
   "minimal_test_surface": {
     "truth_freeze_tests": [
-      "tests/direct-delivery-longrun-target.test.js",
-      "tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js"
+      "tests/direct-delivery-longrun-target.test.ts",
+      "tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.ts"
     ],
     "behavior_tests": [
-      "tests/profile-contract-hydration.test.js",
-      "tests/direct-delivery-operator-handoff.test.js"
+      "tests/profile-contract-hydration.test.ts",
+      "tests/direct-delivery-operator-handoff.test.ts"
     ],
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/direct-delivery-longrun-target.test.js tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.js tests/profile-contract-hydration.test.js tests/direct-delivery-operator-handoff.test.js",
+      "node --test tests/direct-delivery-longrun-target.test.ts tests/phase-2-direct-delivery-lifecycle-stage-convergence.test.ts tests/profile-contract-hydration.test.ts tests/direct-delivery-operator-handoff.test.ts",
       "npm run test:full"
     ]
   },

@@ -46,8 +46,8 @@
   "required_verification": [
     "git diff --check",
     "npm run typecheck",
-    "node --test tests/runtime-deliverable-route.test.js tests/family-parity-governance-surface.test.js tests/managed-deliverable-execution.test.js",
-    "node --test tests/hermes-runtime-canonical-path.test.js",
+    "node --test tests/runtime-deliverable-route.test.ts tests/family-parity-governance-surface.test.ts tests/managed-deliverable-execution.test.ts",
+    "node --test tests/hermes-runtime-canonical-path.test.ts",
     "npm run test:full"
   ]
 }

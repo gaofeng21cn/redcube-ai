@@ -10,7 +10,7 @@
 - OPL boundary：`OPL` 只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 - OPL Runtime Manager：目标形态中的 OPL 侧薄运行管理/投影层，负责 federated route 的 external `Hermes-Agent` profile/provisioning、registration/status 索引、doctor/repair/resume、native helper catalog 与高频状态索引；它不持有 RedCube visual truth、canonical artifacts、review/publication projection 或 concrete executor
 - 语言目标：RCA 长线实现收敛到 `TypeScript + Python`；TypeScript 继续承担 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries，Python 承担 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态
-- Agent-facing 语言面：新实现默认走 TypeScript orchestration 或 Python native helper；仓内 JavaScript 只作为 migration policy 登记过的 legacy allowlisted residue，不作为新代码默认模板
+- Agent-facing 语言面：新实现默认走 TypeScript orchestration 或 Python native helper；仓内已跟踪 JavaScript 已退役，新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断
 
 ## 当前执行口径
 
@@ -31,7 +31,7 @@
 ## 当前验证口径
 
 - hosted quality lane：`npm run typecheck -> npm run test:fast -> npm run test:family -> npm run test:meta`
-- family shared pin 审计统一经由 `scripts/run-test-group-lib.mjs`，必须在 clean-clone 环境下可运行
+- family shared pin 审计统一经由 `scripts/run-test-group-lib.ts`，必须在 clean-clone 环境下可运行
 - 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发
 
 ## 历史记录与追溯层

@@ -1,0 +1,31 @@
+// @ts-nocheck
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import test from 'node:test';
+
+const repoRoot = path.resolve(import.meta.dirname, '..');
+
+test('line budget script accepts current locked baseline', () => {
+  const result = spawnSync('node', ['--experimental-strip-types', 'scripts/line-budget.ts'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+});
+
+test('test:meta runs the line budget guard before meta tests', () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+
+  assert.equal(packageJson.scripts['line-budget'], 'node --experimental-strip-types scripts/line-budget.ts');
+  assert.equal(packageJson.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
+});
+
+test('verify runs the line budget guard before lane dispatch', () => {
+  const verifyScript = fs.readFileSync(path.join(repoRoot, 'scripts/verify.sh'), 'utf8');
+
+  assert.match(verifyScript, /node --experimental-strip-types scripts\/line-budget\.ts/);
+  assert.ok(verifyScript.indexOf('node --experimental-strip-types scripts/line-budget.ts') < verifyScript.indexOf('case "$lane" in'));
+});

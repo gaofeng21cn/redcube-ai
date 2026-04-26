@@ -1,0 +1,185 @@
+// @ts-nocheck
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import {
+  buildDeliverableRecord,
+  createOverlayRegistry,
+} from '@redcube/overlay-core';
+import { getDefaultOverlayCatalog } from '@redcube/overlay-registry';
+import { buildTopicRecord as buildXiaohongshuTopic } from '@redcube/overlay-xiaohongshu';
+import { pptDeckOverlay } from '@redcube/overlay-ppt';
+import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
+
+test('buildDeliverableRecord emits canonical visual-deliverable metadata', () => {
+  const deliverable = buildDeliverableRecord({
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    overlay: 'ppt_deck',
+    kind: 'ppt_deck',
+    title: '甲状腺门诊宣教 deck',
+  });
+
+  assert.equal(deliverable.topic_id, 'topic-a');
+  assert.equal(deliverable.deliverable_id, 'deck-a');
+  assert.equal(deliverable.overlay, 'ppt_deck');
+  assert.equal(deliverable.kind, 'ppt_deck');
+  assert.equal(deliverable.title, '甲状腺门诊宣教 deck');
+  assert.equal(deliverable.status, 'draft');
+});
+
+test('buildDeliverableRecord rejects blank required fields', () => {
+  assert.throws(
+    () => buildDeliverableRecord({
+      topicId: 'topic-a',
+      deliverableId: '   ',
+      overlay: 'ppt_deck',
+      kind: 'ppt_deck',
+      title: '甲状腺门诊宣教 deck',
+    }),
+    /Missing deliverable field: deliverableId/,
+  );
+});
+
+test('createOverlayRegistry resolves registered overlays by id', () => {
+  const registry = createOverlayRegistry({
+    ppt_deck: pptDeckOverlay,
+    xiaohongshu: xiaohongshuOverlay,
+  });
+
+  assert.equal(registry.getOverlay('xiaohongshu').overlayId, 'xiaohongshu');
+  assert.equal(registry.getOverlay('ppt_deck').overlayId, 'ppt_deck');
+  assert.deepEqual(registry.listOverlays(), ['ppt_deck', 'xiaohongshu']);
+  assert.deepEqual(
+    registry.listProfiles('ppt_deck'),
+    ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+  );
+});
+
+test('createOverlayRegistry rejects overlayId mismatch against registry key', () => {
+  assert.throws(
+    () => createOverlayRegistry({
+      xiaohongshu: { overlayId: 'ppt_deck', buildTopicRecord: buildXiaohongshuTopic },
+    }),
+    /Overlay registry key mismatch: expected xiaohongshu, got ppt_deck/,
+  );
+});
+
+test('createOverlayRegistry rejects profile lookup for unknown overlays', () => {
+  const registry = createOverlayRegistry({
+    xiaohongshu: xiaohongshuOverlay,
+  });
+
+  assert.throws(
+    () => registry.listProfiles('ppt_deck'),
+    /Unknown overlay: ppt_deck/,
+  );
+  assert.equal(typeof buildXiaohongshuTopic, 'function');
+});
+
+test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding discovery', () => {
+  const catalog = getDefaultOverlayCatalog();
+  const ppt = catalog.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck');
+  const xiaohongshu = catalog.overlays.find((overlay) => overlay.overlay_id === 'xiaohongshu');
+  const poster = catalog.overlays.find((overlay) => overlay.overlay_id === 'poster_onepager');
+  const pptCatalog = structuredClone(ppt);
+  const xiaohongshuCatalog = structuredClone(xiaohongshu);
+  const pptHtmlCompanion = pptCatalog.visual_authoring_policy.html_design_companion;
+  const xiaohongshuHtmlCompanion = xiaohongshuCatalog.visual_authoring_policy.html_design_companion;
+
+  assert.equal(pptHtmlCompanion.source_skill_id, 'ui-ux-pro-max');
+  assert.equal(pptHtmlCompanion.public_skill_policy, 'do_not_register_as_public_redcube_skill');
+  assert.equal(xiaohongshuHtmlCompanion.source_skill_id, 'ui-ux-pro-max');
+  assert.equal(xiaohongshuHtmlCompanion.activation_surface, 'internal_stage_context');
+  delete pptCatalog.visual_authoring_policy.html_design_companion;
+  delete xiaohongshuCatalog.visual_authoring_policy.html_design_companion;
+
+  assert.equal(catalog.surface_kind, 'overlay_catalog');
+  assert.deepEqual(
+    pptCatalog,
+    {
+      overlay_id: 'ppt_deck',
+      default_profile_id: 'lecture_student',
+      profiles: ['lecture_student', 'lecture_peer', 'executive_briefing', 'defense_deck'],
+      route_sequence: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'export_pptx'],
+      deliverable_kind: 'ppt_deck',
+      prompt_pack_id: 'ppt_deck_mainline_v1',
+      visual_authoring_policy: {
+        default_visual_route: 'render_html',
+        native_ppt_proof_lane: {
+          lane_id: 'ppt_deck_native_ppt_authoring_v0',
+          status: 'opt_in_proof_lane',
+          default_enabled: false,
+          runnable_routes: ['author_pptx_native', 'repair_pptx_native'],
+          replaces_routes: ['render_html', 'fix_html'],
+          preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+          preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+          ai_first_editing_contract: {
+            contract_id: 'ppt_native_ai_first_editing_contract_v1',
+            creative_owner: 'llm_agent',
+            editable_shape_plan_required: true,
+            editable_shape_manifest_required: true,
+            python_helper_role: 'execute_validate_export_only',
+            template_substitution_allowed: false,
+            preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+          },
+          unit_repair_scope: {
+            repair_route: 'repair_pptx_native',
+            scope: 'page',
+            target_source: 'screenshot_review.blocked_slide_ids',
+            passed_slides_reused: true,
+            preserved_slide_policy: 'do_not_reauthor_passed_slides',
+          },
+          authoring_artifact: 'native_pptx_file',
+          editable_artifact_required: true,
+          review_input_surface: 'rendered_pptx_screenshots',
+          export_contract_delta: {
+            source_artifact_field: 'export_bundle.source_pptx',
+            shape_manifest_field: 'export_bundle.native_ppt_shape_manifest',
+            repair_log_field: 'export_bundle.native_ppt_repair_log',
+          },
+        },
+      },
+      packages: {
+        overlay: '@redcube/overlay-ppt',
+        runtime_family: '@redcube/runtime-family-ppt',
+        pack: '@redcube/pack-ppt',
+      },
+    },
+  );
+  assert.deepEqual(
+    xiaohongshuCatalog,
+    {
+      overlay_id: 'xiaohongshu',
+      default_profile_id: 'standard_note',
+      profiles: ['standard_note'],
+      route_sequence: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle'],
+      deliverable_kind: 'xiaohongshu_note',
+      prompt_pack_id: 'xiaohongshu_mainline_v1',
+      visual_authoring_policy: {
+        default_visual_route: 'render_html',
+      },
+      packages: {
+        overlay: '@redcube/overlay-xiaohongshu',
+        runtime_family: '@redcube/runtime-family-xiaohongshu',
+        pack: '@redcube/pack-xiaohongshu',
+      },
+    },
+  );
+  assert.deepEqual(
+    poster,
+    {
+      overlay_id: 'poster_onepager',
+      default_profile_id: 'knowledge_poster',
+      profiles: ['knowledge_poster'],
+      route_sequence: ['storyline', 'poster_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'export_bundle'],
+      deliverable_kind: 'poster_onepager',
+      prompt_pack_id: 'poster_onepager_mainline_v1',
+      packages: {
+        overlay: '@redcube/overlay-poster-onepager',
+        runtime_family: '@redcube/runtime-family-poster-onepager',
+        pack: '@redcube/pack-poster-onepager',
+      },
+    },
+  );
+});

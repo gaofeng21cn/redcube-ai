@@ -32,8 +32,8 @@
 ```bash
 hermes gateway run -q
 REDCUBE_HERMES_GATEWAY_COMMAND='<known-good upstream gateway launch command>' scripts/verify.sh integration
-node scripts/probe-upstream-hermes-agent.mjs --json
-node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface
+node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json
+node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface
 ```
 
 ## 已冻结的 fresh proof
@@ -41,7 +41,7 @@ node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface
 - `hermes gateway run -q` 可启动 upstream API server
 - `curl http://127.0.0.1:8642/v1/health` 返回 `ok`
 - `curl http://127.0.0.1:8642/v1/models` 返回 `hermes-agent`
-- `node scripts/probe-upstream-hermes-agent.mjs --json --require-run-surface` 返回 `ok: true`
+- `node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface` 返回 `ok: true`
 
 ## 环境变量
 

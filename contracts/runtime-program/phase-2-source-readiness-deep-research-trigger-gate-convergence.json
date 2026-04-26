@@ -127,20 +127,20 @@
   },
   "minimal_test_surface": {
     "truth_freeze_tests": [
-      "tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js"
+      "tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.ts"
     ],
     "behavior_tests": [
-      "tests/source-readiness-deep-research-gate.test.js",
-      "tests/source-intake.test.js",
-      "tests/source-research.test.js",
-      "tests/deliverable-review-loop.test.js",
-      "tests/direct-delivery-operator-handoff.test.js",
-      "tests/phase-2-behavior-convergence.test.js"
+      "tests/source-readiness-deep-research-gate.test.ts",
+      "tests/source-intake.test.ts",
+      "tests/source-research.test.ts",
+      "tests/deliverable-review-loop.test.ts",
+      "tests/direct-delivery-operator-handoff.test.ts",
+      "tests/phase-2-behavior-convergence.test.ts"
     ],
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js tests/source-readiness-deep-research-gate.test.js tests/source-intake.test.js tests/source-research.test.js tests/deliverable-review-loop.test.js tests/direct-delivery-operator-handoff.test.js tests/phase-2-behavior-convergence.test.js",
+      "node --test tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.ts tests/source-readiness-deep-research-gate.test.ts tests/source-intake.test.ts tests/source-research.test.ts tests/deliverable-review-loop.test.ts tests/direct-delivery-operator-handoff.test.ts tests/phase-2-behavior-convergence.test.ts",
       "npm run test:full"
     ]
   },

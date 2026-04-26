@@ -30,7 +30,7 @@ import {
   runtimeWatch as runtimeWatchJs,
   getReviewState as getReviewStateJs,
   applyReviewMutation as applyReviewMutationJs,
-} from './index.js';
+} from './index.impl.js';
 
 import type {
   CreateDeliverableRequest,
@@ -93,39 +93,40 @@ export function listTopics(request: WorkspaceRootRequest): Promise<TopicCatalogR
 }
 
 export function getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse> {
-  return getOverlayCatalogJs(request) as Promise<OverlayCatalogResponse>;
+  void request;
+  return getOverlayCatalogJs() as unknown as Promise<OverlayCatalogResponse>;
 }
 
 export function intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse> {
-  return intakeSourceJs(request) as Promise<SourceIntakeResponse>;
+  return intakeSourceJs(request) as unknown as Promise<SourceIntakeResponse>;
 }
 
 export function researchSource(request: Record<string, unknown>): Promise<SourceResearchResponse> {
-  return researchSourceJs(request) as Promise<SourceResearchResponse>;
+  return researchSourceJs(request) as unknown as Promise<SourceResearchResponse>;
 }
 
 export function prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse> {
-  return prepareSourceAugmentationJs(request) as Promise<SourceAugmentationResponse>;
+  return prepareSourceAugmentationJs(request) as unknown as Promise<SourceAugmentationResponse>;
 }
 
 export function prepareSourceAugmentationResult(
   request: Record<string, unknown>,
 ): Promise<SourceAugmentationResultPreparationResponse> {
-  return prepareSourceAugmentationResultJs(request) as Promise<SourceAugmentationResultPreparationResponse>;
+  return prepareSourceAugmentationResultJs(request) as unknown as Promise<SourceAugmentationResultPreparationResponse>;
 }
 
 export function writeSourceAugmentationResult(
   request: Record<string, unknown>,
 ): Promise<SourceAugmentationResultWriteResponse> {
-  return writeSourceAugmentationResultJs(request) as Promise<SourceAugmentationResultWriteResponse>;
+  return writeSourceAugmentationResultJs(request) as unknown as Promise<SourceAugmentationResultWriteResponse>;
 }
 
 export function executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse> {
-  return executeSourceAugmentationJs(request) as Promise<SourceAugmentationExecutionResponse>;
+  return executeSourceAugmentationJs(request) as unknown as Promise<SourceAugmentationExecutionResponse>;
 }
 
 export function createDeliverable(request: CreateDeliverableRequest): Promise<DeliverableCreateResponse> {
-  return createDeliverableJs(request) as Promise<DeliverableCreateResponse>;
+  return createDeliverableJs(request) as unknown as Promise<DeliverableCreateResponse>;
 }
 
 export function getDeliverable(request: DeliverableRequest): Promise<DeliverableRecordResponse> {
@@ -133,36 +134,36 @@ export function getDeliverable(request: DeliverableRequest): Promise<Deliverable
 }
 
 export function getPublicationProjection(request: TopicRequest): Promise<PublicationProjectionResponse> {
-  return getPublicationProjectionJs(request) as Promise<PublicationProjectionResponse>;
+  return getPublicationProjectionJs(request) as unknown as Promise<PublicationProjectionResponse>;
 }
 
 export function getRun(request: WorkspaceRootRequest & { runId: string }): Promise<RunRecordResponse> {
-  return getRunJs(request) as Promise<RunRecordResponse>;
+  return getRunJs(request) as unknown as Promise<RunRecordResponse>;
 }
 
 export function invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse> {
-  return invokeDomainEntryJs(request) as Promise<DomainEntryResponse>;
+  return invokeDomainEntryJs(request) as unknown as Promise<DomainEntryResponse>;
 }
 
 export function invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse> {
-  return invokeProductEntryJs(request) as Promise<ProductEntryResponse>;
+  return invokeProductEntryJs(request) as unknown as Promise<ProductEntryResponse>;
 }
 
 export function invokeFederatedProductEntry(
   request: FederatedProductEntryRequest,
 ): Promise<FederatedProductEntryResponse> {
-  return invokeFederatedProductEntryJs(request) as Promise<FederatedProductEntryResponse>;
+  return invokeFederatedProductEntryJs(request) as unknown as Promise<FederatedProductEntryResponse>;
 }
 
 export function getProductEntrySession(request: {
   entry_session_id?: string;
   entrySessionId?: string;
 }): Promise<ProductEntrySessionResponse> {
-  return getProductEntrySessionJs(request) as Promise<ProductEntrySessionResponse>;
+  return getProductEntrySessionJs(request) as unknown as Promise<ProductEntrySessionResponse>;
 }
 
 export function getProductEntryManifest(request: Record<string, unknown>): Promise<ProductEntryManifestResponse> {
-  return getProductEntryManifestJs(request) as Promise<ProductEntryManifestResponse>;
+  return getProductEntryManifestJs(request) as unknown as Promise<ProductEntryManifestResponse>;
 }
 
 export function getProductStart(request: Record<string, unknown>): Promise<ProductEntryStartCompanion> {
@@ -178,7 +179,7 @@ export function getProductFrontdesk(request: Record<string, unknown>): Promise<P
 }
 
 export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {
-  return getManagedRunJs(request) as Promise<ManagedRunRecordResponse>;
+  return getManagedRunJs(request) as unknown as Promise<ManagedRunRecordResponse>;
 }
 
 export function superviseManagedRun(request: SuperviseManagedRunRequest): Promise<ManagedSupervisionResponse> {
@@ -186,19 +187,19 @@ export function superviseManagedRun(request: SuperviseManagedRunRequest): Promis
 }
 
 export function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunResponse> {
-  return runDeliverableRouteJs(request) as Promise<RouteRunResponse>;
+  return runDeliverableRouteJs(request) as unknown as Promise<RouteRunResponse>;
 }
 
 export function runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<ManagedRunResponse> {
-  return runManagedDeliverableJs(request) as Promise<ManagedRunResponse>;
+  return runManagedDeliverableJs(request) as unknown as Promise<ManagedRunResponse>;
 }
 
 export function runSourceFirstFanout(request: RunSourceFirstFanoutRequest): Promise<SourceFirstFanoutResponse> {
-  return runSourceFirstFanoutJs(request) as Promise<SourceFirstFanoutResponse>;
+  return runSourceFirstFanoutJs(request) as unknown as Promise<SourceFirstFanoutResponse>;
 }
 
 export function auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse> {
-  return auditDeliverableJs(request) as Promise<DeliverableAuditResponse>;
+  return auditDeliverableJs(request) as unknown as Promise<DeliverableAuditResponse>;
 }
 
 export function reviewRenderOutput(request: ReviewRenderOutputRequest): Promise<ReviewRenderOutputResponse> {

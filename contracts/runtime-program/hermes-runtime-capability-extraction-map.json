@@ -6,17 +6,17 @@
     {
       "capability": "route_run_session_envelope",
       "current_surfaces": [
-        "packages/redcube-runtime/src/deliverable-routes.js",
-        "packages/redcube-runtime/src/index.js",
-        "packages/redcube-hermes-substrate/src/index.js"
+        "packages/redcube-runtime/src/deliverable-routes.ts",
+        "packages/redcube-runtime/src/index.ts",
+        "packages/redcube-hermes-substrate/src/index.impl.ts"
       ],
       "required_truth": "start/complete/fail a routed run with preserved run_id/topic_id/deliverable_id and shared runtime topology"
     },
     {
       "capability": "executor_identity_and_bridge_projection",
       "current_surfaces": [
-        "packages/redcube-runtime/src/executors.js",
-        "packages/redcube-runtime/src/managed-deliverable.js",
+        "packages/redcube-runtime/src/executors.ts",
+        "packages/redcube-runtime/src/managed-deliverable.ts",
         "packages/redcube-runtime-protocol/src/managed-runs.ts"
       ],
       "required_truth": "Hermes is the product runtime owner; Codex-local host-agent is only the transition deployment host"
@@ -25,8 +25,8 @@
       "capability": "runtime_topology_surface",
       "current_surfaces": [
         "packages/redcube-overlay-core/src/contracts.ts",
-        "packages/redcube-governance/src/review-state.js",
-        "packages/redcube-governance/src/reviews.js"
+        "packages/redcube-governance/src/review-state.ts",
+        "packages/redcube-governance/src/reviews.ts"
       ],
       "required_truth": "create/review/audit/watch/projection expose one stable runtime_topology contract"
     }

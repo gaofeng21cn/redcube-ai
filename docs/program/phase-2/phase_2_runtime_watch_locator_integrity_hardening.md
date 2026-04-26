@@ -51,14 +51,14 @@
 
 ## 预期验证面
 
-- `tests/runtime-protocol-workspace.test.js`
-- `tests/runtime-deliverable-route.test.js`
-- `tests/deliverable-review-loop.test.js`
-- `tests/cli-v2-smoke.test.js`
-- `tests/mcp-gateway.test.js`
-- `tests/phase-2-behavior-convergence.test.js`
-- `tests/source-readiness-deep-research-gate.test.js`
-- `tests/direct-delivery-operator-handoff.test.js`
+- `tests/runtime-protocol-workspace.test.ts`
+- `tests/runtime-deliverable-route.test.ts`
+- `tests/deliverable-review-loop.test.ts`
+- `tests/cli-v2-smoke.test.ts`
+- `tests/mcp-gateway.test.ts`
+- `tests/phase-2-behavior-convergence.test.ts`
+- `tests/source-readiness-deep-research-gate.test.ts`
+- `tests/direct-delivery-operator-handoff.test.ts`
 
 ## 吸收门槛
 

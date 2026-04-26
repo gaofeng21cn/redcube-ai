@@ -91,11 +91,11 @@ direct-delivery families 的 hydrated `delivery_contract` 需要显式暴露：
 ## 最小验证面
 
 - `contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json`
-- `tests/phase-2-direct-delivery-operator-handoff-hardening.test.js`
-- `tests/direct-delivery-operator-handoff.test.js`
-- `tests/profile-contract-hydration.test.js`
-- `tests/review-platform.test.js`
-- `tests/deliverable-review-loop.test.js`
+- `tests/phase-2-direct-delivery-operator-handoff-hardening.test.ts`
+- `tests/direct-delivery-operator-handoff.test.ts`
+- `tests/profile-contract-hydration.test.ts`
+- `tests/review-platform.test.ts`
+- `tests/deliverable-review-loop.test.ts`
 
 ## 吸收后继续判断
 

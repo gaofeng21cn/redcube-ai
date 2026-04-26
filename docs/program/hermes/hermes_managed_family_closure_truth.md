@@ -39,9 +39,9 @@
 
 ## Verification
 
-- `node --test tests/managed-deliverable-execution.test.js`
-- `node --test tests/hermes-managed-family-closure-truth.test.js`
-- `node --test tests/hermes-stable-family-closure-truth.test.js`
-- `node --test tests/runtime-deliverable-route.test.js`
+- `node --test tests/managed-deliverable-execution.test.ts`
+- `node --test tests/hermes-managed-family-closure-truth.test.ts`
+- `node --test tests/hermes-stable-family-closure-truth.test.ts`
+- `node --test tests/runtime-deliverable-route.test.ts`
 - `npm run typecheck`
 - `npm run test:full`

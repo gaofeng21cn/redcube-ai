@@ -89,10 +89,10 @@ topic 级 canonical source truth 与 deliverable 级后续工件必须继续分�
 
 - `docs/references/source_readiness_deep_research_longrun_target_state.md`
 - `contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json`
-- `tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.js`
-- `tests/source-readiness-deep-research-gate.test.js`
-- `tests/source-intake.test.js`
-- `tests/source-research.test.js`
+- `tests/phase-2-source-readiness-deep-research-trigger-gate-convergence.test.ts`
+- `tests/source-readiness-deep-research-gate.test.ts`
+- `tests/source-intake.test.ts`
+- `tests/source-research.test.ts`
 
 ## 吸收门槛
 

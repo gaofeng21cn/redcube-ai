@@ -17,7 +17,7 @@
       "languageSurface": {
         "implementationTarget": "TypeScript orchestration + Python native helpers",
         "newCodeDefault": "TypeScript or Python under RedCube routes and gates",
-        "javascriptPolicy": "Legacy allowlisted residue only; do not default new agent work to JavaScript"
+        "javascriptPolicy": "Repo-tracked JavaScript is retired; closeout audit blocks new product, test, and script JavaScript"
       },
       "category": "Creative"
     }
