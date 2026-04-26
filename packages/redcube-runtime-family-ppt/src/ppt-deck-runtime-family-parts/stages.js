@@ -1064,13 +1064,13 @@ export function createPptDeckStageParts(deps) {
       slide,
       aiSlideReviewMap.get(slide.slide_id),
     ));
-    const slideReviews = copyReusedScreenshotsIntoCapture(
+    const slideReviews = applyMergedMechanicalConsistency(copyReusedScreenshotsIntoCapture(
       incrementalReview
         ? mergeSlideReviewList(priorReviewArtifact?.slide_reviews, freshSlideReviews, incrementalTargetSlideIds)
         : freshSlideReviews,
       incrementalTargetSlideIds,
       reviewCapture.screenshotsDir,
-    );
+    ));
     const mergedAiSlideReviews = slideReviews
       .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
       .filter(Boolean);
