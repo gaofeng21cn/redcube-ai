@@ -11,6 +11,7 @@ import path from 'node:path';
 
 import {
   AUDIT_FILE,
+  JS_RESIDUE_LINE_LOCK_FILE,
   buildCloseoutAudit,
   writeAuditFile,
 } from '../scripts/typescript-closeout-audit-lib.mjs';
@@ -47,6 +48,7 @@ test('P18 closeout audit proves structural TypeScript coverage across baseline, 
   assert.equal(audit.criteria.service_boundaries_typed, true);
   assert.equal(audit.criteria.utility_boundaries_typed, true);
   assert.equal(audit.criteria.high_churn_paths_typed, true);
+  assert.equal(audit.criteria.js_residue_line_growth_locked, true);
   assert.equal(audit.criteria.quality_gates_green, true);
   assert.deepEqual(
     audit.evidence.utility_boundaries.map((entry) => entry.directory),
@@ -71,6 +73,38 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
     assert.equal(typeof residue.exception_registration?.owner, 'string');
     assert.equal(typeof residue.exception_registration?.reason, 'string');
     assert.equal(typeof residue.exception_registration?.migration_window, 'string');
+  }
+});
+
+test('P18 closeout audit line-locks existing JS residue so it cannot keep absorbing new implementation', () => {
+  const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+
+  assert.equal(audit.criteria.js_residue_line_growth_locked, true);
+  assert.equal(audit.evidence.js_residue_line_lock.contract_file, JS_RESIDUE_LINE_LOCK_FILE);
+  assert.equal(audit.evidence.js_residue_line_lock.entries.length > 100, true);
+  assert.equal(
+    audit.evidence.js_residue_line_lock.entries.every((entry) => entry.actual_line_count <= entry.locked_line_count),
+    true,
+  );
+});
+
+test('P18 closeout audit fails closed when existing JS residue grows', () => {
+  const residueFile = path.join('packages/redcube-runtime/src/runtime-state.js');
+  const previousContent = readFileSync(residueFile, 'utf-8');
+
+  writeFileSync(residueFile, `${previousContent}\nexport const __lineLockTest = true;\n`, 'utf-8');
+
+  try {
+    const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+    const lockEntry = audit.evidence.js_residue_line_lock.entries.find((entry) => entry.file === residueFile);
+
+    assert.equal(audit.criteria.js_residue_line_growth_locked, false);
+    assert.equal(audit.criteria.closeout_ready, false);
+    assert.ok(lockEntry, residueFile);
+    assert.equal(lockEntry.line_growth > 0, true);
+    assert.equal(lockEntry.within_lock, false);
+  } finally {
+    writeFileSync(residueFile, previousContent, 'utf-8');
   }
 });
 

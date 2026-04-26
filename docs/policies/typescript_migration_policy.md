@@ -16,6 +16,8 @@
 - New `.js` files under `apps/*/src/**` or `packages/*/src/**` must be registered before merge.
 - Each registered JS exception must identify an owner, the reason it cannot land as TypeScript immediately, and a migration window.
 - Unregistered JS residue makes `criteria.js_residue_explicitly_closed_out` fail closed.
+- Existing JS residue is line-locked by `contracts/runtime-program/js-residue-line-lock.json`; JS files may shrink during migration, but they may not grow.
+- Any new implementation must land in TypeScript, or in Python-owned native helper surfaces when the work is Office/PPT/document automation.
 
 ## 编译与模块策略
 

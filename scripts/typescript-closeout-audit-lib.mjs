@@ -10,6 +10,7 @@ import {
 import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime-state.js';
 
 export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
+export const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',
@@ -214,6 +215,11 @@ function readText(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function countLines(content) {
+  if (content.length === 0) return 0;
+  return content.endsWith('\n') ? content.split('\n').length - 1 : content.split('\n').length;
+}
+
 function listSourceFiles(directory, extension) {
   const sourceDir = path.resolve(directory, 'src');
   if (!existsSync(sourceDir)) return [];
@@ -293,6 +299,36 @@ function residueAudit() {
   });
 }
 
+function residueLineLockAudit() {
+  const lock = readJson(JS_RESIDUE_LINE_LOCK_FILE);
+  const lockedLineCounts = lock.line_counts || {};
+  const entries = [];
+
+  for (const residue of residueAudit()) {
+    for (const file of residue.actual_js_files) {
+      const relativePath = `${residue.directory}/${file}`;
+      const actualLineCount = countLines(readText(relativePath));
+      const lockedLineCount = lockedLineCounts[relativePath];
+      const lineGrowth = typeof lockedLineCount === 'number'
+        ? actualLineCount - lockedLineCount
+        : null;
+      entries.push({
+        file: relativePath,
+        locked_line_count: lockedLineCount ?? null,
+        actual_line_count: actualLineCount,
+        line_growth: lineGrowth,
+        within_lock: typeof lockedLineCount === 'number' && actualLineCount <= lockedLineCount,
+      });
+    }
+  }
+
+  return {
+    contract_file: JS_RESIDUE_LINE_LOCK_FILE,
+    policy: lock.policy,
+    entries,
+  };
+}
+
 function categoryAudit(directories, rootTsconfig) {
   return directories.map((directory) => {
     const audit = packageAudit(directory, rootTsconfig);
@@ -340,6 +376,7 @@ export function buildCloseoutAudit(options = {}) {
   const utilityBoundaries = categoryAudit(UTILITY_BOUNDARIES, rootTsconfig);
   const highChurnPackages = categoryAudit(HIGH_CHURN_PACKAGES, rootTsconfig);
   const residueInventory = residueAudit();
+  const residueLineLock = residueLineLockAudit();
 
   const audit = {
     milestone: 'P18',
@@ -357,6 +394,7 @@ export function buildCloseoutAudit(options = {}) {
       utility_boundaries_typed: utilityBoundaries.every((entry) => entry.typed_boundary_ready),
       high_churn_paths_typed: highChurnPackages.every((entry) => entry.typed_boundary_ready),
       js_residue_explicitly_closed_out: residueInventory.every((entry) => entry.explicit_residue_only),
+      js_residue_line_growth_locked: residueLineLock.entries.every((entry) => entry.within_lock),
       quality_gates_green: Object.values(qualityGates).every((gate) => gate.status === 'pass' && gate.exit_code === 0),
     },
     evidence: {
@@ -365,6 +403,7 @@ export function buildCloseoutAudit(options = {}) {
       utility_boundaries: utilityBoundaries,
       high_churn_packages: highChurnPackages,
       js_residue_inventory: residueInventory,
+      js_residue_line_lock: residueLineLock,
     },
     quality_gates: qualityGates,
   };
