@@ -348,6 +348,21 @@ def build_markdown(result: Dict[str, Any]) -> str:
     return '\n'.join(lines).strip() + '\n'
 
 
+def target_slide_indexes(slide_ids: str, total: int) -> List[int]:
+    ids = [item.strip() for item in str(slide_ids or '').split(',') if item.strip()]
+    if not ids:
+        return list(range(total))
+    indexes: List[int] = []
+    for slide_id in ids:
+        digits = ''.join(ch for ch in slide_id if ch.isdigit())
+        if not digits:
+            continue
+        index = int(digits) - 1
+        if 0 <= index < total and index not in indexes:
+            indexes.append(index)
+    return indexes or list(range(total))
+
+
 async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
     global FRAME_WIDTH, FRAME_HEIGHT
     FRAME_WIDTH = float(args.frame_width)
@@ -387,7 +402,7 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                 """
             )
             slide_reviews: List[Dict[str, Any]] = []
-            for index in range(total):
+            for index in target_slide_indexes(args.slide_ids, int(total or 0)):
                 await page.evaluate('(slideIndex) => window.redcubeDeckReview.showSlide(slideIndex)', index)
                 await page.wait_for_timeout(120)
                 info = await page.evaluate(
@@ -771,6 +786,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--frame-width', type=float, default=1152)
     parser.add_argument('--frame-height', type=float, default=648)
     parser.add_argument('--device-scale-factor', type=float, default=DEFAULT_DEVICE_SCALE_FACTOR)
+    parser.add_argument('--slide-ids', default='')
     return parser.parse_args()
 
 

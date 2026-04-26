@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 
 import { createPptDeckRenderStageParts } from './render.js';
 import { createPptDeckNativePptStageParts } from './native-ppt.js';
@@ -454,6 +454,159 @@ export function createPptDeckStageParts(deps) {
     return `${lines.join('\n')}\n`;
   }
 
+  function slideIdSet(slideIds = []) {
+    return new Set(safeArray(slideIds).map((slideId) => safeText(slideId)).filter(Boolean));
+  }
+
+  function filterSlideScopedArray(value, slideIds) {
+    const allowedSlideIds = slideIdSet(slideIds);
+    return safeArray(value).filter((item) => {
+      const itemSlideId = safeText(typeof item === 'string' ? item : item?.slide_id);
+      return itemSlideId && allowedSlideIds.has(itemSlideId);
+    });
+  }
+
+  function buildPageLocalVisualDirectionContext(visualDirection, slideIds) {
+    const normalizedVisualDirection = visualDirection || {};
+    return {
+      mode: normalizedVisualDirection.mode,
+      what_it_is: normalizedVisualDirection.what_it_is,
+      what_it_is_not: normalizedVisualDirection.what_it_is_not,
+      visual_manifest: normalizedVisualDirection.visual_manifest,
+      palette: normalizedVisualDirection.palette,
+      typography_plan: normalizedVisualDirection.typography_plan,
+      page_family_ceiling: normalizedVisualDirection.page_family_ceiling || {},
+      final_instruction_to_html_generator: safeArray(normalizedVisualDirection.final_instruction_to_html_generator),
+      forbidden_regressions: safeArray(normalizedVisualDirection.forbidden_regressions),
+      peak_pages: filterSlideScopedArray(normalizedVisualDirection.peak_pages, slideIds),
+      page_role_table: filterSlideScopedArray(normalizedVisualDirection.page_role_table, slideIds),
+      rhythm_curve: filterSlideScopedArray(normalizedVisualDirection.rhythm_curve, slideIds),
+    };
+  }
+
+  function mergeSlideReviewList(priorReviews, freshReviews, targetSlideIds) {
+    const targetIds = slideIdSet(targetSlideIds);
+    const freshById = new Map(
+      safeArray(freshReviews)
+        .map((slide) => [safeText(slide?.slide_id), slide])
+        .filter(([slideId]) => slideId),
+    );
+    const merged = [];
+    const seen = new Set();
+    for (const prior of safeArray(priorReviews)) {
+      const slideId = safeText(prior?.slide_id);
+      if (!slideId) continue;
+      const fresh = targetIds.has(slideId) ? freshById.get(slideId) : null;
+      merged.push(fresh || prior);
+      seen.add(slideId);
+    }
+    for (const fresh of safeArray(freshReviews)) {
+      const slideId = safeText(fresh?.slide_id);
+      if (slideId && !seen.has(slideId)) merged.push(fresh);
+    }
+    return merged;
+  }
+
+  function titleConsistencyExempt(review) {
+    return safeText(review?.slide_id) === 'S01' || safeText(review?.layout_family) === 'cover_signal';
+  }
+
+  function refreshMechanicalStatus(review) {
+    const issues = safeArray(review?.issues);
+    return {
+      ...review,
+      status: issues.length === 0 ? 'pass' : 'block',
+      issues,
+    };
+  }
+
+  function applyMergedTitleTypographyConsistency(slideReviews) {
+    const bodySizes = safeArray(slideReviews)
+      .filter((slide) => !titleConsistencyExempt(slide))
+      .map((slide) => Number(slide?.metrics?.title_font_size || 0))
+      .filter((size) => size > 0)
+      .sort((left, right) => left - right);
+    const reference = bodySizes.length === 0
+      ? 0
+      : bodySizes[Math.floor((bodySizes.length - 1) / 2)];
+    for (const review of safeArray(slideReviews)) {
+      const checks = review.checks || {};
+      const metrics = review.metrics || {};
+      review.checks = checks;
+      review.metrics = metrics;
+      const withoutTitleIssue = safeArray(review.issues)
+        .filter((issue) => safeText(issue) !== 'title_typography_inconsistent');
+      if (titleConsistencyExempt(review)) {
+        checks.title_typography_ok = true;
+        metrics.title_font_reference = reference ? Number(reference.toFixed(2)) : null;
+        metrics.title_font_delta = 0;
+        review.issues = withoutTitleIssue;
+        continue;
+      }
+      const fontSize = Number(metrics.title_font_size || 0);
+      if (reference <= 0 || fontSize <= 0) {
+        checks.title_typography_ok = false;
+        metrics.title_font_reference = reference ? Number(reference.toFixed(2)) : null;
+        metrics.title_font_delta = null;
+        review.issues = [...withoutTitleIssue, 'title_typography_inconsistent'];
+        continue;
+      }
+      const delta = Math.abs(fontSize - reference);
+      checks.title_typography_ok = delta <= 2.5;
+      metrics.title_font_reference = Number(reference.toFixed(2));
+      metrics.title_font_delta = Number(delta.toFixed(2));
+      review.issues = checks.title_typography_ok
+        ? withoutTitleIssue
+        : [...withoutTitleIssue, 'title_typography_inconsistent'];
+    }
+    return safeArray(slideReviews).map((slide) => refreshMechanicalStatus(slide));
+  }
+
+  function collectIncrementalScreenshotReviewTargetSlideIds(renderArtifact, priorReviewArtifact) {
+    if (safeText(renderArtifact?.route) !== PAGE_FIX_ROUTE) return [];
+    if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
+    if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
+    return [...new Set([
+      ...safeArray(renderArtifact?.render_execution?.freshly_rendered_slide_ids),
+      ...safeArray(renderArtifact?.targeted_rerun?.target_slide_ids),
+    ].map((slideId) => safeText(slideId)).filter(Boolean))];
+  }
+
+  function copyReusedScreenshotsIntoCapture(slideReviews, targetSlideIds, screenshotsDir) {
+    const targetIds = slideIdSet(targetSlideIds);
+    return safeArray(slideReviews).map((slide) => {
+      const slideId = safeText(slide?.slide_id);
+      const source = safeText(slide?.screenshot_file);
+      if (!slideId || targetIds.has(slideId) || !source || !(mainExistsSync || existsSync)(source)) {
+        return slide;
+      }
+      const destination = path.join(screenshotsDir, path.basename(source));
+      if (path.resolve(source) !== path.resolve(destination)) {
+        copyFileSync(source, destination);
+      }
+      return {
+        ...slide,
+        screenshot_file: destination,
+      };
+    });
+  }
+
+  function summarizeMechanicalChecksFromSlides(slideReviews) {
+    const keys = [
+      'overflow_free',
+      'occlusion_free',
+      'visual_density_ok',
+      'speaker_fit_ok',
+      'edge_clearance_ok',
+      'block_content_fit_ok',
+      'title_typography_ok',
+    ];
+    return Object.fromEntries(keys.map((key) => [
+      key,
+      safeArray(slideReviews).every((slide) => slide?.checks?.[key] !== false),
+    ]));
+  }
+
   async function generateScreenshotReviewDraft(
     contract,
     deliverablePaths,
@@ -467,13 +620,11 @@ export function createPptDeckStageParts(deps) {
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
     const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
+    const blueprintSlides = summarizeBlueprintSlides(blueprintArtifact);
+    const visualDirection = visualArtifact?.visual_direction || null;
     const sharedContext = {
       ...buildAuthoringContext(contract),
       mode,
-      blueprint: {
-        slides: summarizeBlueprintSlides(blueprintArtifact),
-      },
-      visual_direction: visualArtifact?.visual_direction || null,
       director_review: directorReviewArtifact?.visual_director_review || null,
       screenshot_mechanics: {
         source_html_file: safeText(renderArtifact?.html_bundle?.html_file) || null,
@@ -498,7 +649,9 @@ export function createPptDeckStageParts(deps) {
       },
     };
     const aiSlideReviews = [];
-    aiSlideReviews.push(...(await Promise.all(chunkArray(slideReviews, SCREENSHOT_REVIEW_BATCH_SIZE).map(async (slideBatch) => {
+    aiSlideReviews.push(...(await Promise.all(safeArray(slideReviews).map(async (slide) => {
+      const slideBatch = [slide];
+      const batchSlideIds = slideBatch.map((item) => safeText(item?.slide_id)).filter(Boolean);
       const { data: batchData } = await generateStructuredArtifact({
         adapter,
         family: 'ppt_deck',
@@ -507,6 +660,10 @@ export function createPptDeckStageParts(deps) {
         context: {
           ...sharedContext,
           review_scope: 'slide_batch',
+          blueprint: {
+            slides: filterSlideScopedArray(blueprintSlides, batchSlideIds),
+          },
+          visual_direction: buildPageLocalVisualDirectionContext(visualDirection, batchSlideIds),
           screenshot_mechanics: {
             ...sharedContext.screenshot_mechanics,
             slides: slideBatch.map((slide) => ({
@@ -545,6 +702,14 @@ export function createPptDeckStageParts(deps) {
       context: {
         ...sharedContext,
         review_scope: 'summary',
+        blueprint: {
+          slides: blueprintSlides.map((slide) => ({
+            slide_id: slide.slide_id,
+            title: slide.title,
+            layout_family: slide.layout_family,
+          })),
+        },
+        visual_direction: visualDirection,
         ai_slide_reviews: aiSlideReviews,
       },
       outputContract: screenshotReviewSummaryOutputContract(),
@@ -687,23 +852,38 @@ export function createPptDeckStageParts(deps) {
     }
     const reviewHash = hashReviewInput(renderArtifact);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+    const incrementalTargetSlideIds = collectIncrementalScreenshotReviewTargetSlideIds(renderArtifact, priorReviewArtifact);
+    const incrementalReview = incrementalTargetSlideIds.length > 0;
+    if (incrementalReview && !nativeReviewInput) {
+      args.push('--slide-ids', incrementalTargetSlideIds.join(','));
+    }
     const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
-    const cacheStatus = cachedPayload ? 'hit' : 'miss';
-    const python = cachedPayload
+    const cacheStatus = cachedPayload && !incrementalReview ? 'hit' : 'miss';
+    const python = cacheStatus === 'hit'
       ? { command: 'cache', payload: cachedPayload }
       : (nativeReviewInput
           ? { command: 'native_ppt_shape_manifest', payload: nativeMechanicalReviewPayload(renderArtifact) }
           : runPython(PYTHON_REVIEW, args));
     const reviewPayload = python.payload;
-    const mechanicalSlideReviews = safeArray(reviewPayload.slide_reviews).map((slide) => ({
+    const freshMechanicalSlideReviews = safeArray(reviewPayload.slide_reviews).map((slide) => ({
       ...slide,
       status: safeArray(slide?.issues).length === 0 ? 'pass' : 'block',
     }));
+    const mechanicalSlideReviews = applyMergedTitleTypographyConsistency(incrementalReview
+      ? mergeSlideReviewList(
+          priorReviewArtifact?.mechanical_review?.slide_reviews || priorReviewArtifact?.slide_reviews,
+          freshMechanicalSlideReviews,
+          incrementalTargetSlideIds,
+        )
+      : freshMechanicalSlideReviews);
+    const mechanicalSlideReviewsForAi = incrementalReview
+      ? mechanicalSlideReviews.filter((slide) => slideIdSet(incrementalTargetSlideIds).has(safeText(slide?.slide_id)))
+      : mechanicalSlideReviews;
     const aiReviewPromise = generateScreenshotReviewDraft(
       contract,
       deliverablePaths,
       renderArtifact,
-      mechanicalSlideReviews,
+      mechanicalSlideReviewsForAi,
       reviewPayload,
       mode,
       adapter,
@@ -722,10 +902,20 @@ export function createPptDeckStageParts(deps) {
     ] = await Promise.all([aiReviewPromise, baselineReviewPromise]);
     const aiWeakPages = normalizeStringList(data?.weak_pages, 'screenshot_review.weak_pages', { min: 0, max: 4 });
     const aiSlideReviewMap = new Map(aiSlideReviews.map((item) => [item.slide_id, item]));
-    const slideReviews = mechanicalSlideReviews.map((slide) => buildAiFirstVisualSlideReview(
+    const freshSlideReviews = mechanicalSlideReviewsForAi.map((slide) => buildAiFirstVisualSlideReview(
       slide,
       aiSlideReviewMap.get(slide.slide_id),
     ));
+    const slideReviews = copyReusedScreenshotsIntoCapture(
+      incrementalReview
+        ? mergeSlideReviewList(priorReviewArtifact?.slide_reviews, freshSlideReviews, incrementalTargetSlideIds)
+        : freshSlideReviews,
+      incrementalTargetSlideIds,
+      reviewCapture.screenshotsDir,
+    );
+    const mergedAiSlideReviews = slideReviews
+      .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
+      .filter(Boolean);
     const latestChecks = {
       director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed)
         && Boolean(data?.director_intent_landed),
@@ -756,6 +946,15 @@ export function createPptDeckStageParts(deps) {
       review_execution: {
         ...creativeExecution('screenshot_review', generationRuntime, adapter),
         overlay: 'screenshot_review',
+        review_scope: incrementalReview ? 'incremental_page_review' : 'full_deck_review',
+        reviewed_slide_ids: incrementalReview
+          ? incrementalTargetSlideIds
+          : slideReviews.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+        reused_slide_ids: incrementalReview
+          ? slideReviews
+              .map((slide) => safeText(slide?.slide_id))
+              .filter((slideId) => slideId && !slideIdSet(incrementalTargetSlideIds).has(slideId))
+          : [],
       },
       review_overlay: 'screenshot_review',
       mode,
@@ -778,7 +977,7 @@ export function createPptDeckStageParts(deps) {
         anti_template_ok: Boolean(data?.anti_template_ok),
         weak_pages: aiWeakPages,
         review_summary: requireText(data?.review_summary, 'screenshot_review.review_summary'),
-        slide_reviews: aiSlideReviews,
+        slide_reviews: mergedAiSlideReviews,
         creative_sources: {
           review_judgement: creativeSourceStamp({
             route: 'screenshot_review',
@@ -793,10 +992,22 @@ export function createPptDeckStageParts(deps) {
       mechanical_review: {
         review_model: 'python_screenshot_layout_checks',
         ...mechanicalCacheMetadata(cacheStatus, reviewHash),
-        checks: reviewPayload.checks,
-        metrics: reviewPayload.metrics,
+        checks: summarizeMechanicalChecksFromSlides(mechanicalSlideReviews),
+        metrics: {
+          ...(reviewPayload.metrics || {}),
+          slide_count: mechanicalSlideReviews.length,
+          reviewed_slide_count: mechanicalSlideReviewsForAi.length,
+        },
         baseline: reviewPayload.baseline || null,
         slide_reviews: mechanicalSlideReviews,
+        incremental_review: incrementalReview
+          ? {
+              reviewed_slide_ids: incrementalTargetSlideIds,
+              reused_slide_ids: slideReviews
+                .map((slide) => safeText(slide?.slide_id))
+                .filter((slideId) => slideId && !slideIdSet(incrementalTargetSlideIds).has(slideId)),
+            }
+          : null,
       },
       report_markdown: reviewMarkdown,
       metrics: reviewPayload.metrics,

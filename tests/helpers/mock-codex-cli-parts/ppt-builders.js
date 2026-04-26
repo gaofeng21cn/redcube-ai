@@ -616,6 +616,34 @@ export function buildMockPptScreenshotReview(meta) {
       }
     }
   }
+  if (variants.has('require_page_local_review') && reviewScope !== 'summary') {
+    if (slides.length !== 1) {
+      throw new Error(`mock ppt screenshot review expected one slide per AI review unit: ${JSON.stringify(slides.map((slide) => slide.slide_id))}`);
+    }
+    const expectedSlideIds = new Set(
+      safeText(process.env.REDCUBE_MOCK_PPT_SCREENSHOT_EXPECTED_SLIDE_IDS)
+        .split(',')
+        .map((item) => safeText(item))
+        .filter(Boolean),
+    );
+    const currentSlideId = safeText(slides[0]?.slide_id);
+    if (expectedSlideIds.size > 0 && !expectedSlideIds.has(currentSlideId)) {
+      throw new Error(`mock ppt screenshot review expected only ${[...expectedSlideIds].join(',')}, got ${currentSlideId}`);
+    }
+    const blueprintSlides = safeArray(meta?.context?.blueprint?.slides);
+    if (blueprintSlides.length !== 1 || safeText(blueprintSlides[0]?.slide_id) !== currentSlideId) {
+      throw new Error(`mock ppt screenshot review expected page-local blueprint for ${currentSlideId}: ${JSON.stringify(blueprintSlides)}`);
+    }
+    const visualDirection = meta?.context?.visual_direction || {};
+    const pageRoleTable = safeArray(visualDirection?.page_role_table);
+    const rhythmCurve = safeArray(visualDirection?.rhythm_curve);
+    const peakPages = safeArray(visualDirection?.peak_pages);
+    if (pageRoleTable.some((item) => safeText(item?.slide_id) !== currentSlideId)
+      || rhythmCurve.some((item) => safeText(item?.slide_id) !== currentSlideId)
+      || peakPages.some((slideId) => safeText(slideId) !== currentSlideId)) {
+      throw new Error(`mock ppt screenshot review expected page-local visual direction for ${currentSlideId}: ${JSON.stringify(visualDirection)}`);
+    }
+  }
   const forcedBlockSlideId = variants.has('force_block')
     ? safeText(slides.find((slide) => safeText(slide?.slide_id) === 'S02')?.slide_id, safeText(slides[0]?.slide_id))
     : '';

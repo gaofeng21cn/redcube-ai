@@ -158,7 +158,7 @@ export function createPptDeckCoreHelpers({
     const fixArtifactFile = stageArtifactPath(contract, deliverablePaths, PAGE_FIX_ROUTE);
     const renderMtimeMs = safeFileMtimeMs(renderArtifactFile);
     const fixMtimeMs = safeFileMtimeMs(fixArtifactFile);
-    if (fixMtimeMs > renderMtimeMs) {
+    if (fixMtimeMs > 0 && fixMtimeMs >= renderMtimeMs) {
       return PAGE_FIX_ROUTE;
     }
     return 'render_html';

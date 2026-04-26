@@ -87,7 +87,11 @@ function makeXhsReviewParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     readCurrentHtmlArtifact: () => ({
       html_bundle: {
         html_file: htmlFile,
-        slides: [{ slide_id: 'N01', title: '第一页', content: '<p>ok</p>' }],
+        slides: [{
+          slide_id: 'N01',
+          title: '第一页',
+          content: '<section data-slide-root="true" data-slide-id="N01"><div data-qa-block="title" data-primary-point="true">第一页</div><div data-qa-block="body">ok</div></section>',
+        }],
       },
     }),
     readJson: () => ({}),
@@ -259,7 +263,13 @@ function makePptStageParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
       html_bundle: {
         html_file: htmlFile,
         page_count: 1,
-        slides: [{ slide_id: 'S01', title: '第一页', content_html: '<section>ok</section>' }],
+        slides: [{
+          slide_id: 'S01',
+          title: '第一页',
+          content: '<section data-slide-root="true" data-slide-id="S01" data-title="第一页" data-layout-family="hero" data-speaker-seconds="30" data-recipe-id="ppt.test" data-template-id="upstream_ai_html" data-peak-page="false" data-director-role="hero"><div data-qa-block="title" data-primary-point="true">第一页</div><div data-qa-block="body">ok</div></section>',
+          content_html: '<section>ok</section>',
+          evidence_and_sources: [{ public_label: '公开资料' }],
+        }],
       },
     }),
     readJson: () => ({}),
@@ -270,6 +280,7 @@ function makePptStageParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
           visual_director_review: {
             director_intent_landed: true,
             anti_template_ok: true,
+            memory_hook_present: true,
           },
         };
       }
@@ -285,12 +296,12 @@ function makePptStageParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     resolvePromptPackAsset: () => '',
     resolveRedCubePythonCommand: () => ({ command: 'node' }),
     safeArray: (value) => Array.isArray(value) ? value : [],
-    safeFileMtimeMs: () => 0,
+    safeFileMtimeMs: (file) => String(file || '').endsWith('render_html.json') ? 1 : 0,
     safeText: (value, fallback = '') => value == null || value === '' ? fallback : String(value),
     screenshotReviewSlideBatchOutputContract: () => ({}),
     screenshotReviewSummaryOutputContract: () => ({}),
     seedDeliverableStableViews: () => [],
-    stageArtifactPath: () => path.join(workspaceRoot, 'baseline-screenshot-review.json'),
+    stageArtifactPath: (_contract, _paths, stageId) => path.join(workspaceRoot, `${stageId}.json`),
     summarizeBlueprintSlides: () => [{ slide_id: 'S01', title: '第一页' }],
     summarizeRelativeQuality: () => 'baseline ok',
     validateRenderedReviewAnchors: () => [],
