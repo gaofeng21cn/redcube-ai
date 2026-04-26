@@ -4,27 +4,44 @@ function approvedPlanSlides(meta) {
   const approvedSlides = safeArray(meta?.context?.approved_slide_plan?.slides);
   if (approvedSlides.length === 0) return [];
   const sources = readySources(meta);
-  return approvedSlides.map((approved, index) => ({
-    slide_id: `S${String(approved.slide_no || index + 1).padStart(2, '0')}`,
-    slide_no: Number(approved.slide_no) || index + 1,
-    chapter_id: `C${Math.min(Math.floor(index / 6) + 1, 6)}`,
-    page_type: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'closure_peak' : 'public_evidence'),
-    layout_family: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'summary_peak' : 'multi_zone_compare'),
-    title: safeText(approved.title) || `Slide ${approved.slide_no || index + 1}`,
-    page_goal: '保留批准主线',
-    page_objective: '按用户已审阅的逐页故事线继续展开',
-    core_sentence: `本页延续已批准故事线第 ${approved.slide_no || index + 1} 页，不压缩、不合并。`,
-    evidence_points: ['批准故事线', '逐页展开'],
-    public_sources: [sources[index % sources.length] || sources[0]],
-    page_core_content: [
-      `保留第 ${approved.slide_no || index + 1} 页标题与叙事位置`,
-      '在后续视觉阶段扩写内容，而不是改变页数合同',
-    ],
-    visual_anchor_tracks: ['top-title', 'center-content', 'bottom-source-rail'],
-    speaker_notes: '这一页按批准主线继续讲，不合并到其他页面。',
-    transition_sentence: index === approvedSlides.length - 1 ? '完。' : '下一页继续沿批准主线推进。',
-    render_recipe_id: index === 0 ? 'ppt.hero_signal' : (index === approvedSlides.length - 1 ? 'ppt.summary_peak' : 'ppt.compare_zones'),
-  }));
+  const manuscriptEvidence = safeArray(meta?.context?.manuscript_evidence_table);
+  const evidenceForSlide = (approved, index) => {
+    const title = safeText(approved?.title);
+    const row = manuscriptEvidence.find((item) => title.includes(safeText(item?.manuscript_label)))
+      || manuscriptEvidence[index % Math.max(1, manuscriptEvidence.length)]
+      || null;
+    const numeric = safeArray(row?.key_numeric_results).map((item) => safeText(item)).filter(Boolean);
+    return {
+      label: safeText(row?.manuscript_label),
+      points: numeric.length > 0 ? numeric.slice(0, 2) : ['批准故事线', '逐页展开'],
+    };
+  };
+  return approvedSlides.map((approved, index) => {
+    const evidence = evidenceForSlide(approved, index);
+    return {
+      slide_id: `S${String(approved.slide_no || index + 1).padStart(2, '0')}`,
+      slide_no: Number(approved.slide_no) || index + 1,
+      chapter_id: `C${Math.min(Math.floor(index / 6) + 1, 6)}`,
+      page_type: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'closure_peak' : 'public_evidence'),
+      layout_family: index === 0 ? 'cover_signal' : (index === approvedSlides.length - 1 ? 'summary_peak' : 'multi_zone_compare'),
+      title: safeText(approved.title) || `Slide ${approved.slide_no || index + 1}`,
+      page_goal: '保留批准主线',
+      page_objective: '按用户已审阅的逐页故事线继续展开',
+      core_sentence: evidence.label
+        ? `本页延续已批准故事线第 ${approved.slide_no || index + 1} 页，并保留${evidence.label}的数字证据。`
+        : `本页延续已批准故事线第 ${approved.slide_no || index + 1} 页，不压缩、不合并。`,
+      evidence_points: evidence.points,
+      public_sources: [sources[index % sources.length] || sources[0]],
+      page_core_content: [
+        `保留第 ${approved.slide_no || index + 1} 页标题与叙事位置`,
+        evidence.points[0] || '在后续视觉阶段扩写内容，而不是改变页数合同',
+      ],
+      visual_anchor_tracks: ['top-title', 'center-content', 'bottom-source-rail'],
+      speaker_notes: '这一页按批准主线继续讲，不合并到其他页面。',
+      transition_sentence: index === approvedSlides.length - 1 ? '完。' : '下一页继续沿批准主线推进。',
+      render_recipe_id: index === 0 ? 'ppt.hero_signal' : (index === approvedSlides.length - 1 ? 'ppt.summary_peak' : 'ppt.compare_zones'),
+    };
+  });
 }
 
 function manuscriptLabels(meta) {

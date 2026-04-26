@@ -15,6 +15,7 @@ import { runDeliverableRoute } from './deliverable-routes.js';
 import { executeManagedDagLayers, planManagedDeliverableDag } from './managed-dag-scheduler.js';
 import { appendManagedEvent } from './managed-event-log.js';
 import { reconcileManagedRunLiveness } from './managed-run-liveness.js';
+import { buildSourceAuthoringContext, loadSharedSourceTruth, sourceAuthoringInputRefs } from './shared-source-truth.js';
 import {
   createManagedRun,
   loadManagedEscalationRecord,
@@ -244,18 +245,13 @@ function collectExistingArtifacts(deliverablePaths) {
     .map((entry) => path.join(deliverablePaths.artifactsDir, entry));
 }
 
-function buildEffectivePrompt({
-  contract,
-  stageContract,
-  userIntent,
-  upstreamStageOutputs,
-  existingArtifacts,
-}) {
+function buildEffectivePrompt({ contract, stageContract, userIntent, upstreamStageOutputs, existingArtifacts, sourceAuthoringContext }) {
   return [
     `用户意图: ${safeText(userIntent, safeText(contract.goal))}`,
     `交付目标: ${safeText(contract.title)} / ${safeText(contract.goal)}`,
     `交付合同: overlay=${safeText(contract.overlay)}, profile=${safeText(contract.profile_id)}, kind=${safeText(contract.deliverable_kind)}`,
     `当前阶段: ${stageLabel(stageContract.stage_id)}`,
+    `AI资料输入: ${sourceAuthoringContext ? `source_materials_full_text=${sourceAuthoringContext.source_truth.material_count} materials, ${sourceAuthoringContext.source_truth.content_bytes} bytes; approved_slide_plan=${sourceAuthoringContext.approved_slide_plan?.total_slides || 'none'}` : 'none'}`,
     `上游阶段输出: ${upstreamStageOutputs.length > 0 ? upstreamStageOutputs.map((item) => `${stageLabel(item.stage_id)}=${item.exists ? 'ready' : 'missing'}`).join(', ') : 'none'}`,
     `已有产物: ${existingArtifacts.length > 0 ? existingArtifacts.map((file) => path.basename(file)).join(', ') : 'none'}`,
     `阶段策略: prompt_file=${safeText(stageContract.prompt_file)}, output_artifact=${safeText(stageContract.output_artifact)}, requires=${safeArray(stageContract.requires_stages).join(', ') || 'none'}`,
@@ -263,14 +259,7 @@ function buildEffectivePrompt({
   ].join('\n');
 }
 
-function buildPromptAudit({
-  managedRun,
-  contract,
-  contractFile,
-  deliverablePaths,
-  stageContract,
-  attempt,
-}) {
+function buildPromptAudit({ managedRun, contract, contractFile, deliverablePaths, stageContract, attempt }) {
   const upstreamStageOutputs = safeArray(stageContract?.requires_stages).map((stageId) => {
     const ref = stageArtifactPath(contract, deliverablePaths, stageId);
     return {
@@ -280,6 +269,7 @@ function buildPromptAudit({
     };
   });
   const existingArtifacts = collectExistingArtifacts(deliverablePaths);
+  const sourceAuthoringContext = buildSourceAuthoringContext({ contract, deliverablePaths });
   return {
     schema_version: 1,
     managed_run_id: managedRun.managed_run_id,
@@ -299,6 +289,7 @@ function buildPromptAudit({
         title: safeText(contract.title),
         goal: safeText(contract.goal),
       },
+      ...(sourceAuthoringContext ? { source_authoring_context: sourceAuthoringContext } : {}),
       upstream_stage_outputs: upstreamStageOutputs,
       existing_artifacts: existingArtifacts,
       route_strategy: {
@@ -314,10 +305,12 @@ function buildPromptAudit({
       userIntent: managedRun.user_intent?.request,
       upstreamStageOutputs,
       existingArtifacts,
+      sourceAuthoringContext,
     }),
     input_refs: uniqueList([
       deliverablePaths.deliverableFile,
       contractFile,
+      ...sourceAuthoringInputRefs(contract),
       ...upstreamStageOutputs.filter((item) => item.exists).map((item) => item.ref),
       ...existingArtifacts,
     ]),
@@ -1332,11 +1325,12 @@ export async function runManagedDeliverable({
   mode = 'draft_new',
   baselineDeliverableId = '',
 }) {
-  const { deliverablePaths, contract, contractFile } = loadHydratedContract({
+  const { deliverablePaths, contract: storedContract, contractFile } = loadHydratedContract({
     workspaceRoot,
     topicId,
     deliverableId,
   });
+  const contract = { ...storedContract, shared_source_truth: loadSharedSourceTruth(workspaceRoot, topicId) };
   const requestedOverlay = safeText(overlay);
   const contractOverlay = safeText(contract?.overlay);
   const stages = safeArray(contract?.stage_sequence?.stages);

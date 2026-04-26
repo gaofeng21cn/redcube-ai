@@ -1,0 +1,138 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import os from 'node:os';
+import path from 'node:path';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+import {
+  invokeProductEntry,
+} from '../packages/redcube-gateway/src/index.js';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
+import {
+  startMockCodexCli,
+  withEnv,
+} from './helpers/mock-codex-cli.js';
+
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MOCK_REDCUBE_PYTHON_COMMAND = path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.mjs');
+const SERIAL_ENV_TEST = { concurrency: false };
+
+function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+async function withMockHermesAndRuntimeState(testFn) {
+  const upstream = await startMockCodexCli();
+  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
+  const restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
+    REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+  });
+  try {
+    return await testFn();
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
+}
+
+test('invokeProductEntry managed ppt deck preserves full manuscript source evidence and approved slide plan', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-manuscript-source-'));
+    const sourceFile = path.join(workspaceRoot, 'nfpitnet-three-papers.md');
+    const quietOpening = '这一段开头没有任何结果数字，用来证明不能只读资料开头。'.repeat(30);
+    const slidePlan = Array.from({ length: 21 }, (_, index) => {
+      const pageNo = index + 1;
+      return `${pageNo}. 第${pageNo}页：NF-PitNET 三篇论文同步，覆盖封面、共同队列、第一篇、第二篇、第三篇、投稿口径或结束页。`;
+    }).join('\n');
+    writeFileSync(sourceFile, [
+      '# NF-PitNET 三篇待投稿论文资料',
+      '',
+      quietOpening,
+      '',
+      '## 第一篇论文',
+      '分析队列357例；early non-GTR 57/357，占16.0%；GTR 300/357，占84.0%。',
+      'AUROC 0.800/0.802；Brier 0.110/0.143；校准斜率1.04/2.41；风险三分位4.2%、8.5%、35.6%。',
+      '',
+      '## 第二篇论文',
+      '持续性术后垂体功能减退98/357，占27.5%；中位随访约776天。',
+      '风险梯度8.4%、18.4%、35.7%、53.7%、66.7%；低中高8.4%、27.0%、56.1%；AUROC 0.708；Brier 0.171；校准斜率1.02。',
+      '',
+      '## 第三篇论文',
+      '侵袭性154/357，占43.1%；non-GTR 57/357，占16.0%。',
+      'Knosp 0-2为203/203非侵袭；Knosp 3-4为154/154侵袭；视物模糊64.3%；non-GTR 26.6%；中位直径30.0 mm。',
+      '最佳Brier差异<0.0001；Knosp+直径non-GTR AUROC 0.800。',
+      '',
+      '## 推荐逐页内容',
+      slidePlan,
+    ].join('\n'), 'utf-8');
+
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'nfpitnet-topic',
+      title: 'NF-PitNET 三篇论文同步',
+      brief: '三篇待投稿论文投前同步，只讲第一篇、第二篇、第三篇的论文故事、数字证据和边界。',
+      keywords: ['NF-PitNET', '第一篇', '第二篇', '第三篇'],
+      sourceFiles: [sourceFile],
+    });
+
+    const response = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-manuscript-source',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'nfpitnet-topic',
+        deliverable_id: 'nfpitnet-deck',
+        profile_id: 'lecture_peer',
+        title: 'NF-PitNET 三篇待投稿论文科室同步',
+        goal: '给科室主任和同事同步三篇准备投稿的 NF-PitNET 论文。按资料包中的21页逐页结构展开，不超过30页。只讲第一篇、第二篇、第三篇的论文故事、研究问题、队列终点、方法主线、主要数字结果、结论边界和投稿口径。',
+        user_intent: '先跑到详细大纲，必须保留资料包21页计划，且所有论文结论必须有数字证据。',
+        stop_after_stage: 'detailed_outline',
+      },
+    });
+
+    assert.equal(response.ok, true);
+    const managedRun = response.domain_entry_surface.result_surface.managed_run;
+    assert.deepEqual(
+      managedRun.route_runs.map((stageRun) => stageRun.stage_id),
+      ['storyline', 'detailed_outline'],
+    );
+
+    const artifactDir = path.join(
+      workspaceRoot,
+      'topics',
+      'nfpitnet-topic',
+      'deliverables',
+      'nfpitnet-deck',
+      'artifacts',
+    );
+    const storyline = readJson(path.join(artifactDir, 'storyline.json'));
+    const outline = readJson(path.join(artifactDir, 'detailed_outline.json'));
+    assert.equal(storyline.storyline.manuscript_evidence_table.length, 3);
+    assert.match(
+      storyline.storyline.manuscript_evidence_table[0].key_numeric_results.join('\n'),
+      /57\/357|16\.0|AUROC|Brier|1\.04/,
+    );
+    assert.equal(outline.detailed_outline.slides.length, 21);
+    assert.equal(Number(outline.detailed_outline.slides.at(-1).slide_no), 21);
+
+    const storylineAudit = readJson(managedRun.route_runs[0].prompt_audit_ref);
+    const outlineAudit = readJson(managedRun.route_runs[1].prompt_audit_ref);
+    assert.equal(
+      storylineAudit.input.source_authoring_context.source_materials_full_text[0].content_text.includes('Knosp+直径non-GTR AUROC 0.800'),
+      true,
+    );
+    assert.equal(storylineAudit.input.source_authoring_context.approved_slide_plan.total_slides, 21);
+    assert.equal(outlineAudit.input.source_authoring_context.manuscript_evidence_table.length, 3);
+    assert.equal(
+      outlineAudit.input.source_authoring_context.source_materials_full_text[0].content_text.length > quietOpening.length,
+      true,
+    );
+  });
+});

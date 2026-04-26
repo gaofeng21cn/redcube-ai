@@ -344,8 +344,8 @@ test('managed execution stops at explicit stop_after_stage instead of auto-runni
     );
     assert.equal(result.managed_run.execution_result.execution_kind, 'managed_dag_layer_execution');
     assert.equal(result.managed_run.execution_result.ok, true);
-    assert.equal(result.managed_run.execution_result.stopped_layer_index, 0);
-    assert.equal(result.managed_run.execution_result.layer_results.length, 1);
+    assert.equal(result.managed_run.execution_result.stopped_layer_index, 1);
+    assert.equal(result.managed_run.execution_result.layer_results.length, 2);
     assert.equal(result.progress_projection.current_stage, 'storyline');
     assert.equal(result.progress_projection.needs_user_decision, true);
     assert.match(result.progress_projection.next_system_action, /等待.*决定是否继续/i);
@@ -463,7 +463,7 @@ test('managed DAG execution fails closed and does not advance dependent stages a
     assert.equal(result.managed_run.status, 'escalated');
     assert.equal(result.managed_run.execution_result.execution_kind, 'managed_dag_layer_execution');
     assert.equal(result.managed_run.execution_result.ok, false);
-    assert.equal(result.managed_run.execution_result.failed_layer_index, 1);
+    assert.equal(result.managed_run.execution_result.failed_layer_index, 2);
     assert.equal(
       result.managed_run.execution_result.layer_results.at(-1).task_results[0].task_id,
       'ppt_deck:deck-a:detailed_outline',
