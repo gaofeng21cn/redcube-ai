@@ -222,7 +222,7 @@ export async function runManagedDeliverable(
 export async function getManagedRun(
   request: RuntimeManagedRunLookupRequest,
 ): Promise<RuntimeManagedRunResponse> {
-  return getManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
+  return getManagedRunJs(request) as unknown as Promise<RuntimeManagedRunResponse>;
 }
 
 export function loadRuntimeSupervisionLatest(request: {
