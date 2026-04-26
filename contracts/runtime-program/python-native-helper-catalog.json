@@ -3,6 +3,12 @@
   "date_anchor": "2026-04-26",
   "owner": "redcube_ai",
   "language": "python",
+  "package": {
+    "name": "redcube-ai",
+    "source_root": "python",
+    "import_root": "redcube_ai",
+    "pyproject": "pyproject.toml"
+  },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
   "typescript_boundary": "TypeScript owns product entry, CLI/MCP, gateway contracts, runtime-family route orchestration, and review/export gate wiring.",
   "bypass_policy": {
@@ -18,6 +24,7 @@
     {
       "helper_id": "ppt_deck_review",
       "script": "packages/redcube-runtime/scripts/ppt_deck_review.py",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.review",
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
       "runtime_surface": "screenshot_review",
@@ -40,6 +47,7 @@
     {
       "helper_id": "ppt_deck_export",
       "script": "packages/redcube-runtime/scripts/ppt_deck_export.py",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.export",
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
       "runtime_surface": "export_pptx",
@@ -65,6 +73,7 @@
     {
       "helper_id": "ppt_deck_native",
       "script": "packages/redcube-runtime/scripts/ppt_deck_native.py",
+      "package_module": "redcube_ai.native_helpers.ppt_deck.native",
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
       "runtime_surface": "native_ppt_authoring_repair",
@@ -94,6 +103,27 @@
         "contracts/runtime-program/current-program.json",
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "contracts/runtime-program/ppt-native-python-engine-contract.json"
+      ]
+    },
+    {
+      "helper_id": "hermes_native_proof_bridge",
+      "script": "packages/redcube-hermes-substrate/scripts/hermes_native_proof_bridge.py",
+      "package_module": "redcube_ai.hermes.native_proof_bridge",
+      "owner": "python_native_helper",
+      "deliverable_family": "runtime_substrate",
+      "runtime_surface": "hermes_native_full_agent_loop",
+      "routes": [],
+      "gates": [],
+      "purpose": "Opt-in Hermes-native full-agent-loop proof bridge used by the TypeScript executor adapter.",
+      "requires": [
+        "upstream-hermes-agent-local"
+      ],
+      "outputs": [
+        "structured_generation_payload",
+        "full_agent_loop_proof"
+      ],
+      "contract_refs": [
+        "contracts/runtime-program/current-program.json"
       ]
     }
   ]
