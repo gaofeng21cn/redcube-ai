@@ -37,6 +37,13 @@ function loadHydratedContract(deliverablePaths, storedDeliverable) {
 }
 
 const overlayRegistry = getDefaultOverlayRegistry();
+const REPEATED_BLOCK_FAIL_FAST_ROUTES = new Set([
+  'render_html',
+  'fix_html',
+  'visual_director_review',
+  'screenshot_review',
+]);
+const REPEATED_BLOCK_FAIL_FAST_OVERLAYS = new Set(['ppt_deck', 'xiaohongshu']);
 
 function routeStageDefinitions(contract) {
   return [
@@ -125,6 +132,32 @@ function fileMtimeMs(file) {
   return Number(statSync(file).mtimeMs || 0);
 }
 
+function safeText(value) {
+  const text = String(value || '').trim();
+  return text;
+}
+
+function safeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function uniqueStrings(value) {
+  return [...new Set(safeArray(value).map((item) => safeText(item)).filter(Boolean))];
+}
+
+function fileContentHash(file) {
+  const safeFile = safeText(file);
+  if (!safeFile || !existsSync(safeFile)) return null;
+  return createHash('sha256').update(readFileSync(safeFile)).digest('hex');
+}
+
+function routeInputFingerprints(files) {
+  return uniqueStrings(files).map((file) => ({
+    file,
+    sha256: fileContentHash(file),
+  }));
+}
+
 function routeRequiresArtifacts(contract, route) {
   return (contract?.stage_requirements?.[route]?.requires_artifacts || [])
     .map((stageId) => String(stageId || '').trim())
@@ -177,6 +210,7 @@ function buildRouteCacheKey({
   mode,
   baselineDeliverableId,
   adapter,
+  requiredArtifactFiles = [],
 }) {
   return createHash('sha256').update(stableJson({
     overlay,
@@ -194,22 +228,76 @@ function buildRouteCacheKey({
     mode,
     baselineDeliverableId,
     adapter,
+    input_fingerprints: routeInputFingerprints(requiredArtifactFiles),
   })).digest('hex');
+}
+
+function dependencyBecameNewerThanArtifact({ artifactFile, requiredArtifactFiles }) {
+  const artifactMtimeMs = fileMtimeMs(artifactFile);
+  if (artifactMtimeMs === 0) return true;
+  return requiredArtifactFiles.some((file) => fileMtimeMs(file) > artifactMtimeMs);
 }
 
 function cacheHitArtifact({ artifactFile, artifact, routeCacheKey, requiredArtifactFiles }) {
   if (!artifact || artifact?.status === 'block' || artifact?.status === 'failed') return null;
   if (artifact?.route_cache?.cache_key !== routeCacheKey) return null;
-  const artifactMtimeMs = fileMtimeMs(artifactFile);
-  if (artifactMtimeMs === 0) return null;
-  const staleDependency = requiredArtifactFiles.some((file) => fileMtimeMs(file) > artifactMtimeMs);
-  if (staleDependency) return null;
+  if (dependencyBecameNewerThanArtifact({ artifactFile, requiredArtifactFiles })) return null;
   return {
     ...artifact,
     route_cache: {
       ...(artifact.route_cache || {}),
       cache_status: 'hit',
       reused_from_artifact_file: artifactFile,
+    },
+  };
+}
+
+function collectFalseCheckIds(checks) {
+  if (!checks || typeof checks !== 'object' || Array.isArray(checks)) return [];
+  return Object.entries(checks)
+    .filter(([, value]) => value === false)
+    .map(([key]) => key);
+}
+
+function blockingSignatureForArtifact(artifact) {
+  const slideReviews = safeArray(artifact?.slide_reviews);
+  const blockedSlideReviews = slideReviews.filter((slide) => (
+    safeText(slide?.status) === 'block'
+    || safeArray(slide?.issues).length > 0
+  ));
+  const targetSlideIds = uniqueStrings([
+    ...safeArray(artifact?.target_slide_ids),
+    ...safeArray(artifact?.review_state_patch?.rerun_policy?.target_slide_ids),
+    ...safeArray(artifact?.review_state_patch?.target_slide_ids),
+    ...safeArray(artifact?.html_bundle?.repair_scope?.target_slide_ids),
+    ...blockedSlideReviews.map((slide) => slide?.slide_id),
+    ...safeArray(artifact?.ai_review?.weak_pages),
+  ]);
+  const blockedChecks = uniqueStrings([
+    ...collectFalseCheckIds(artifact?.checks),
+    ...safeArray(artifact?.issues),
+    ...blockedSlideReviews.flatMap((slide) => safeArray(slide?.issues)),
+  ]);
+  const blockingReasons = uniqueStrings([
+    ...safeArray(artifact?.blocking_reasons),
+    ...safeArray(artifact?.review_state_patch?.blocking_reasons),
+    ...safeArray(artifact?.review_state_patch?.rerun_policy?.blocking_reasons),
+    ...blockedChecks,
+  ]);
+  return {
+    target_slide_ids: targetSlideIds,
+    blocked_checks: blockedChecks,
+    blocking_reasons: blockingReasons.length > 0 ? blockingReasons : ['route_blocked'],
+  };
+}
+
+function attachBlockingSignature(artifact) {
+  if (!artifact || (artifact.status !== 'block' && artifact.status !== 'failed')) return artifact;
+  return {
+    ...artifact,
+    blocking_signature: {
+      contract: 'redcube_repeated_block_signature.v1',
+      ...blockingSignatureForArtifact(artifact),
     },
   };
 }
@@ -225,15 +313,97 @@ function readCachedRouteArtifact({ artifactFile, routeCacheKey, requiredArtifact
 }
 
 function attachRouteCache(artifact, routeCacheKey) {
+  const artifactWithBlockingSignature = attachBlockingSignature(artifact);
   return {
-    ...artifact,
+    ...artifactWithBlockingSignature,
     route_cache: {
       cache_status: 'miss',
       cache_key: routeCacheKey,
+      input_hash: routeCacheKey,
       contract: 'redcube_route_stage_cache.v1',
       reuse_policy: 'reuse_only_when_inputs_match_and_artifact_is_non_blocking',
     },
   };
+}
+
+function failFastEnabledForRoute({ overlay, route }) {
+  return REPEATED_BLOCK_FAIL_FAST_OVERLAYS.has(overlay)
+    && REPEATED_BLOCK_FAIL_FAST_ROUTES.has(route);
+}
+
+function buildRepeatedBlockFailFastArtifact({
+  artifactFile,
+  priorArtifact,
+  routeCacheKey,
+  route,
+  overlay,
+  topicId,
+  deliverableId,
+}) {
+  const priorSignature = priorArtifact?.blocking_signature || blockingSignatureForArtifact(priorArtifact);
+  const targetSlideIds = uniqueStrings(priorSignature?.target_slide_ids);
+  const blockingReasons = uniqueStrings(priorSignature?.blocking_reasons);
+  const blockedChecks = uniqueStrings(priorSignature?.blocked_checks);
+  return {
+    ...priorArtifact,
+    status: 'failed',
+    failure_kind: 'repeated_block_without_input_change',
+    route,
+    overlay,
+    topic_id: topicId,
+    deliverable_id: deliverableId,
+    target_slide_ids: targetSlideIds,
+    blocking_reasons: blockingReasons,
+    repeated_block_fail_fast: {
+      schema_version: 1,
+      failure_kind: 'repeated_block_without_input_change',
+      route,
+      overlay,
+      target_slide_ids: targetSlideIds,
+      blocking_reasons: blockingReasons,
+      blocked_checks: blockedChecks,
+      route_cache: {
+        cache_key: routeCacheKey,
+        input_hash: routeCacheKey,
+        prior_artifact_file: artifactFile,
+      },
+      recommended_action: 'change_input_or_route_to_page_local_fix',
+      quality_gate_policy: 'fail_fast_does_not_turn_blocked_into_pass',
+    },
+    route_cache: {
+      ...(priorArtifact.route_cache || {}),
+      cache_status: 'blocked_fail_fast',
+      cache_key: routeCacheKey,
+      input_hash: routeCacheKey,
+      reused_from_artifact_file: artifactFile,
+    },
+  };
+}
+
+function readRepeatedBlockFailFastArtifact({
+  artifactFile,
+  routeCacheKey,
+  requiredArtifactFiles,
+  overlay,
+  route,
+  topicId,
+  deliverableId,
+}) {
+  if (!failFastEnabledForRoute({ overlay, route })) return null;
+  if (!existsSync(artifactFile)) return null;
+  const priorArtifact = JSON.parse(readFileSync(artifactFile, 'utf-8'));
+  if (priorArtifact?.status !== 'block' && priorArtifact?.status !== 'failed') return null;
+  if (priorArtifact?.route_cache?.cache_key !== routeCacheKey) return null;
+  if (dependencyBecameNewerThanArtifact({ artifactFile, requiredArtifactFiles })) return null;
+  return buildRepeatedBlockFailFastArtifact({
+    artifactFile,
+    priorArtifact,
+    routeCacheKey,
+    route,
+    overlay,
+    topicId,
+    deliverableId,
+  });
 }
 
 export function validateDeliverableRouteInput({
@@ -332,6 +502,7 @@ export async function executeDeliverableRouteLocally({
     mode,
     baselineDeliverableId,
     adapter: executor.adapter,
+    requiredArtifactFiles,
   });
 
   const cachedArtifact = readCachedRouteArtifact({
@@ -362,6 +533,27 @@ export async function executeDeliverableRouteLocally({
         execution_model: executor.execution_model,
       },
     };
+  }
+
+  const repeatedBlockArtifact = readRepeatedBlockFailFastArtifact({
+    artifactFile,
+    routeCacheKey,
+    requiredArtifactFiles,
+    overlay,
+    route: safeRoute,
+    topicId,
+    deliverableId,
+  });
+  if (repeatedBlockArtifact) {
+    writeFileSync(artifactFile, JSON.stringify(repeatedBlockArtifact, null, 2), 'utf-8');
+    const error = new Error(`Route ${safeRoute} fail-fast: repeated block without input change`);
+    error.code = 'repeated_block_without_input_change';
+    error.failure_kind = 'repeated_block_without_input_change';
+    error.target_slide_ids = repeatedBlockArtifact.repeated_block_fail_fast.target_slide_ids;
+    error.blocking_reasons = repeatedBlockArtifact.repeated_block_fail_fast.blocking_reasons;
+    error.recommended_action = repeatedBlockArtifact.repeated_block_fail_fast.recommended_action;
+    error.artifact_file = artifactFile;
+    throw error;
   }
 
   const artifact = attachRouteCache(await executor.runRoute({

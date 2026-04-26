@@ -11,7 +11,10 @@ import {
 
 export async function getRun({ workspaceRoot, runId }) {
   const run = loadRun({ workspaceRoot, runId });
-  const recommendedAction = run.status === 'failed'
+  const staleStatus = run.status === 'expired' || run.status === 'orphaned';
+  const recommendedAction = staleStatus
+    ? 'inspect_stale_run'
+    : run.status === 'failed'
     ? 'inspect_run_failure'
     : (run.status === 'completed' ? 'review_runtime_state' : 'continue');
   return {

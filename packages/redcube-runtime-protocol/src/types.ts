@@ -279,7 +279,7 @@ export interface RunTelemetryEnvelope {
   overlay: string;
   executor_kind: string | null;
   execution_surface: string | null;
-  status: 'running' | 'completed' | 'failed';
+  status: 'running' | 'completed' | 'failed' | 'expired' | 'orphaned';
   started_at: string | null;
   finished_at: string | null;
   latency_ms: number | null;
@@ -305,7 +305,7 @@ export interface RunRecord {
   overlay: string;
   topic_id: string | null;
   deliverable_id: string | null;
-  status: 'running' | 'completed' | 'failed';
+  status: 'running' | 'completed' | 'failed' | 'expired' | 'orphaned';
   started_at: string | null;
   finished_at: string | null;
   current_stage: string | null;

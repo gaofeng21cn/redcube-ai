@@ -79,6 +79,7 @@ export async function runtimeWatch(request) {
     source_readiness_summary: response?.source_readiness_summary || null,
     gate_summary: response?.gate_summary || null,
     lifecycle_stage_summary: response?.lifecycle_stage_summary || null,
+    run_stale_audit: resolvedRun?.stale_run_audit || null,
     run_telemetry: buildRunTelemetrySummary(runSource),
     error_taxonomy: buildErrorTaxonomySummary(runSource),
     rerun_analytics: buildRerunAnalyticsSummary(runSource),

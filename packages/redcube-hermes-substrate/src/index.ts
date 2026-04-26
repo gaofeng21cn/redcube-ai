@@ -133,6 +133,7 @@ export declare const HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS: 'opt_in_available';
 export declare const HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION: 'inherit_local_hermes_default';
 export declare const HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION: 'inherit_local_hermes_default';
 export declare const HERMES_NATIVE_PROOF_FREEZE_ORIGIN: 'Hermes.Proof.A';
+export declare const RUNNING_RUN_STALE_TTL_MS: number;
 
 export declare function buildHermesRuntimeTopology(): HermesRuntimeTopology;
 export declare function buildCodexRuntimeTopology(): CodexRuntimeTopology;

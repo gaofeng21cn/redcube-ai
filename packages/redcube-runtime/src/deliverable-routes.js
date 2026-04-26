@@ -298,6 +298,11 @@ export async function runDeliverableRoute({
     ).trim() || 'Codex route execution failed';
     const failure = new Error(failureMessage);
     failure.code = error?.code || null;
+    failure.failure_kind = error?.failure_kind || error?.failureKind || null;
+    failure.target_slide_ids = Array.isArray(error?.target_slide_ids) ? error.target_slide_ids : [];
+    failure.blocking_reasons = Array.isArray(error?.blocking_reasons) ? error.blocking_reasons : [];
+    failure.recommended_action = String(error?.recommended_action || '').trim() || null;
+    failure.artifact_file = String(error?.artifact_file || '').trim() || null;
     failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
     failure.requiresExternalSecret = error?.requiresExternalSecret === true;
     const failedRun = failHermesRun({

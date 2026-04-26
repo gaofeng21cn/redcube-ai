@@ -24,6 +24,7 @@ export const HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS = 'opt_in_available';
 export const HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
 export const HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
 export const HERMES_NATIVE_PROOF_FREEZE_ORIGIN = 'Hermes.Proof.A';
+export const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
 
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
@@ -99,6 +100,33 @@ function computeLatencyMs(startedAt, finishedAt) {
     return null;
   }
   return Math.max(finishMs - startMs, 0);
+}
+
+function runningRunStaleAudit(run, now = new Date()) {
+  if (String(run?.status || '').trim() !== 'running') {
+    return null;
+  }
+  const checkedAt = now.toISOString();
+  const startedAt = String(run?.started_at || '').trim();
+  const startedMs = Date.parse(startedAt);
+  if (!Number.isFinite(startedMs)) {
+    return {
+      status_after: 'orphaned',
+      reason_code: 'running_run_missing_started_at',
+      age_ms: null,
+      marked_at: checkedAt,
+    };
+  }
+  const ageMs = Math.max(now.getTime() - startedMs, 0);
+  if (ageMs <= RUNNING_RUN_STALE_TTL_MS) {
+    return null;
+  }
+  return {
+    status_after: 'expired',
+    reason_code: 'running_run_exceeded_stale_ttl',
+    age_ms: ageMs,
+    marked_at: checkedAt,
+  };
 }
 
 function runFile(workspaceRoot, runId) {
@@ -182,6 +210,11 @@ function normalizeError(error) {
     return {
       code: String(error.code || '').trim() || null,
       message: error instanceof Error ? error.message : String(error.message || error),
+      failure_kind: String(error.failure_kind || error.failureKind || '').trim() || null,
+      target_slide_ids: Array.isArray(error.target_slide_ids) ? error.target_slide_ids : [],
+      blocking_reasons: Array.isArray(error.blocking_reasons) ? error.blocking_reasons : [],
+      recommended_action: String(error.recommended_action || '').trim() || null,
+      artifact_file: String(error.artifact_file || '').trim() || null,
       requires_human_confirmation: error.requiresHumanConfirmation === true,
       requires_external_secret: error.requiresExternalSecret === true,
     };
@@ -189,9 +222,72 @@ function normalizeError(error) {
   return {
     code: null,
     message: error instanceof Error ? error.message : String(error),
+    failure_kind: null,
+    target_slide_ids: [],
+    blocking_reasons: [],
+    recommended_action: null,
+    artifact_file: null,
     requires_human_confirmation: false,
     requires_external_secret: false,
   };
+}
+
+function loadHermesRunRaw({ workspaceRoot, runId }) {
+  const file = runFile(workspaceRoot, runId);
+  if (!existsSync(file)) {
+    throw new Error(`Run not found: ${runId}`);
+  }
+
+  return {
+    file,
+    run: JSON.parse(readFileSync(file, 'utf-8')),
+  };
+}
+
+function markStaleRunningRunIfNeeded({ workspaceRoot, runId, checkedSurface = 'loadRun' }) {
+  const { file, run } = loadHermesRunRaw({ workspaceRoot, runId });
+  const staleAudit = runningRunStaleAudit(run);
+  if (!staleAudit) {
+    return run;
+  }
+  const markedRun = {
+    ...run,
+    status: staleAudit.status_after,
+    finished_at: run.finished_at || staleAudit.marked_at,
+    error_kind: run.error_kind || 'execution_error',
+    error: run.error || {
+      code: staleAudit.status_after,
+      message: staleAudit.status_after === 'expired'
+        ? 'Running run exceeded stale TTL and was marked expired on read'
+        : 'Running run has no valid start timestamp and was marked orphaned on read',
+    },
+    stale_run_audit: {
+      schema_version: 1,
+      audit_contract: 'redcube_stale_running_run.v1',
+      marked_at: staleAudit.marked_at,
+      marked_by: 'redcube_runtime_run_reader',
+      checked_surface: checkedSurface,
+      status_before: 'running',
+      status_after: staleAudit.status_after,
+      reason_code: staleAudit.reason_code,
+      run_id: run.run_id,
+      route: run.route,
+      overlay: run.overlay,
+      topic_id: run.topic_id || null,
+      deliverable_id: run.deliverable_id || null,
+      started_at: run.started_at || null,
+      stale_after_ms: RUNNING_RUN_STALE_TTL_MS,
+      age_ms: staleAudit.age_ms,
+    },
+  };
+  markedRun.telemetry = buildRunTelemetry(
+    markedRun,
+    markedRun?.executor,
+    markedRun.status,
+    markedRun.finished_at,
+  );
+  writeFileSync(file, JSON.stringify(markedRun, null, 2), 'utf-8');
+  return markedRun;
 }
 
 export function buildHermesRuntimeTopology() {
@@ -459,7 +555,7 @@ export function completeHermesRun({
   executor,
   telemetry = {},
 }) {
-  const run = loadHermesRun({ workspaceRoot, runId });
+  const { run } = loadHermesRunRaw({ workspaceRoot, runId });
   const completedRun = {
     ...run,
     status: 'completed',
@@ -495,7 +591,7 @@ export function failHermesRun({
   executor,
   telemetry = {},
 }) {
-  const run = loadHermesRun({ workspaceRoot, runId });
+  const { run } = loadHermesRunRaw({ workspaceRoot, runId });
   const failedRun = {
     ...run,
     status: 'failed',
@@ -522,12 +618,7 @@ export function failHermesRun({
 }
 
 export function loadHermesRun({ workspaceRoot, runId }) {
-  const file = runFile(workspaceRoot, runId);
-  if (!existsSync(file)) {
-    throw new Error(`Run not found: ${runId}`);
-  }
-
-  return JSON.parse(readFileSync(file, 'utf-8'));
+  return markStaleRunningRunIfNeeded({ workspaceRoot, runId });
 }
 
 export function appendHermesEvent(workspaceRoot, runId, event) {
