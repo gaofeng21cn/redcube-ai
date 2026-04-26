@@ -1,10 +1,15 @@
 import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { materializeScreenshotCaptureStore, runRedCubePythonHelper } from '@redcube/runtime-protocol';
+import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 
 import { createPptDeckRenderStageParts } from './render.js';
 import { createPptDeckNativePptStageParts } from './native-ppt.js';
 import { createPptDeckExportStageParts } from './export.js';
+import {
+  collectIncrementalDirectorReviewTargetSlideIds,
+  collectIncrementalScreenshotReviewTargetSlideIds,
+} from './incremental-review-scope.js';
+import { materializePptScreenshotReviewCapture } from './screenshot-capture.js';
 
 export function createPptDeckStageParts(deps) {
   const {
@@ -108,22 +113,6 @@ export function createPptDeckStageParts(deps) {
     hashReviewInput,
   } = exportParts;
 
-  function collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact, currentVisualStage) {
-    if (!priorReviewArtifact?.visual_director_review) return [];
-    if (safeText(currentVisualStage) === 'repair_pptx_native') {
-      return [...new Set([
-        ...safeArray(renderArtifact?.unit_repair_scope?.target_slide_ids),
-        ...safeArray(renderArtifact?.native_ppt_repair_log?.target_slide_ids),
-      ].map((slideId) => safeText(slideId)).filter(Boolean))];
-    }
-    if (safeText(currentVisualStage) !== PAGE_FIX_ROUTE) return [];
-    if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
-    return [...new Set([
-      ...safeArray(renderArtifact?.render_execution?.freshly_rendered_slide_ids),
-      ...safeArray(renderArtifact?.targeted_rerun?.target_slide_ids),
-    ].map((slideId) => safeText(slideId)).filter(Boolean))];
-  }
-
   function buildDirectorPreflightContext(preflight, slideIds) {
     return {
       anti_template_ok: Boolean(preflight?.antiTemplateOk),
@@ -147,7 +136,12 @@ export function createPptDeckStageParts(deps) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-    const incrementalTargetSlideIds = collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact, currentVisualStage);
+    const incrementalTargetSlideIds = collectIncrementalDirectorReviewTargetSlideIds({
+      renderArtifact,
+      priorReviewArtifact,
+      currentVisualStage,
+      pageFixRoute: PAGE_FIX_ROUTE,
+    });
     const incrementalReview = incrementalTargetSlideIds.length > 0;
     const targetSlideIdSet = slideIdSet(incrementalTargetSlideIds);
     const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
@@ -697,47 +691,6 @@ export function createPptDeckStageParts(deps) {
     return safeArray(slideReviews).map((slide) => refreshMechanicalStatus(slide));
   }
 
-  function collectIncrementalScreenshotReviewTargetSlideIds(renderArtifact, priorReviewArtifact) {
-    if (safeText(renderArtifact?.route) === 'repair_pptx_native') {
-      if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
-      return [...new Set([
-        ...safeArray(renderArtifact?.unit_repair_scope?.target_slide_ids),
-        ...safeArray(renderArtifact?.native_ppt_repair_log?.target_slide_ids),
-      ].map((slideId) => safeText(slideId)).filter(Boolean))];
-    }
-    if (safeText(renderArtifact?.route) !== PAGE_FIX_ROUTE) return [];
-    if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
-    if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
-    return [...new Set([
-      ...safeArray(renderArtifact?.render_execution?.freshly_rendered_slide_ids),
-      ...safeArray(renderArtifact?.targeted_rerun?.target_slide_ids),
-    ].map((slideId) => safeText(slideId)).filter(Boolean))];
-  }
-
-  function materializeCaptureSlideReviews(deliverablePaths, reviewCapture, slideReviews) {
-    const manifest = materializeScreenshotCaptureStore({
-      reportsDir: deliverablePaths.reportsDir,
-      captureId: reviewCapture.captureId,
-      screenshotsDir: reviewCapture.screenshotsDir,
-      slideReviews,
-      currentViewMode: 'hardlink',
-    });
-    const captureBySlideId = new Map(
-      safeArray(manifest.slides)
-        .map((slide) => [safeText(slide?.slide_id), slide])
-        .filter(([slideId]) => slideId),
-    );
-    return {
-      manifest,
-      slideReviews: safeArray(slideReviews).map((slide) => {
-        const capture = captureBySlideId.get(safeText(slide?.slide_id));
-        return capture?.capture_path
-          ? { ...slide, screenshot_file: capture.capture_path }
-          : slide;
-      }),
-    };
-  }
-
   function summarizeMechanicalChecksFromSlides(slideReviews) {
     const keys = [
       'overflow_free',
@@ -1027,7 +980,11 @@ export function createPptDeckStageParts(deps) {
     }
     const reviewHash = hashReviewInput(renderArtifact);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-    const incrementalTargetSlideIds = collectIncrementalScreenshotReviewTargetSlideIds(renderArtifact, priorReviewArtifact);
+    const incrementalTargetSlideIds = collectIncrementalScreenshotReviewTargetSlideIds({
+      renderArtifact,
+      priorReviewArtifact,
+      pageFixRoute: PAGE_FIX_ROUTE,
+    });
     const incrementalReview = incrementalTargetSlideIds.length > 0;
     if (incrementalReview && !nativeReviewInput) {
       args.push('--slide-ids', incrementalTargetSlideIds.join(','));
@@ -1087,19 +1044,14 @@ export function createPptDeckStageParts(deps) {
         : freshSlideReviews,
     );
     const {
-      manifest: captureManifest,
+      captureManifest,
       slideReviews,
-    } = materializeCaptureSlideReviews(deliverablePaths, reviewCapture, candidateSlideReviews);
-    const captureBySlideId = new Map(
-      safeArray(captureManifest.slides)
-        .map((slide) => [safeText(slide?.slide_id), slide])
-        .filter(([slideId]) => slideId),
-    );
-    const capturedMechanicalSlideReviews = mechanicalSlideReviews.map((slide) => {
-      const capture = captureBySlideId.get(safeText(slide?.slide_id));
-      return capture?.capture_path
-        ? { ...slide, screenshot_file: capture.capture_path }
-        : slide;
+      mechanicalSlideReviews: capturedMechanicalSlideReviews,
+    } = materializePptScreenshotReviewCapture({
+      deliverablePaths,
+      reviewCapture,
+      slideReviews: candidateSlideReviews,
+      mechanicalSlideReviews,
     });
     const mergedAiSlideReviews = slideReviews
       .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
