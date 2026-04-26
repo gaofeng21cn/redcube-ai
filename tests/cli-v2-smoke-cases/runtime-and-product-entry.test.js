@@ -48,6 +48,10 @@ function createIsolatedCliInstall() {
     path.resolve('apps/redcube-cli/src/cli.js'),
     path.join(cliDir, 'cli.js'),
   );
+  copyFileSync(
+    path.resolve('apps/redcube-cli/src/cli.ts'),
+    path.join(cliDir, 'cli.ts'),
+  );
   writeFileSync(
     path.join(installRoot, 'package.json'),
     JSON.stringify({
@@ -164,6 +168,10 @@ function createIsolatedCliInstall() {
   copyPackageIntoInstall(
     path.resolve('contracts'),
     path.join(installRoot, 'node_modules', 'contracts'),
+  );
+  copyPackageIntoInstall(
+    path.resolve('contracts'),
+    path.join(gatewayPackagePath, 'node_modules', 'contracts'),
   );
   const oplGatewaySharedDist = gatewayResolve.resolve('opl-gateway-shared/family-orchestration');
   const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
