@@ -173,6 +173,7 @@ const FAST = [
   'tests/service-safe-domain-entry.test.js',
   'tests/product-entry-native-ppt-proof-lane.test.js',
   'tests/python-native-helper-catalog.test.js',
+  'tests/product-entry-runtime-manager-registration.test.js',
   'tests/product-entry.test.js',
   'tests/source-augmentation-provider.test.js',
 ];
