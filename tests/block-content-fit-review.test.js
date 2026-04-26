@@ -282,6 +282,108 @@ function runReviewWithDecorativeGroundOverlap() {
   return JSON.parse(result.stdout);
 }
 
+function runReviewWithInconsistentPageNumbers() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-page-number-review-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+
+  const inspections = [
+    {
+      slideId: 'S01',
+      title: '第一页',
+      layoutFamily: 'cover_signal',
+      speakerSeconds: 60,
+      primaryPoints: 1,
+      wrapper: { clientWidth: 1152, clientHeight: 648, scrollWidth: 1152, scrollHeight: 648 },
+      bodyScroll: false,
+      blocks: [
+        { id: 'title', left: 72, top: 64, width: 800, height: 80, right: 872, bottom: 144, area: 64000 },
+        { id: 'page-number', left: 1024, top: 588, width: 52, height: 18, right: 1076, bottom: 606, area: 936 },
+      ],
+      auditBlocks: [],
+      titleMeta: { titleFontSize: 56, titleLineCount: 1, titleBlockId: 'title' },
+    },
+    {
+      slideId: 'S02',
+      title: '第二页',
+      layoutFamily: 'multi_zone_compare',
+      speakerSeconds: 60,
+      primaryPoints: 1,
+      wrapper: { clientWidth: 1152, clientHeight: 648, scrollWidth: 1152, scrollHeight: 648 },
+      bodyScroll: false,
+      blocks: [
+        { id: 'title', left: 72, top: 64, width: 800, height: 80, right: 872, bottom: 144, area: 64000 },
+        { id: 'body', left: 96, top: 200, width: 680, height: 220, right: 776, bottom: 420, area: 149600 },
+        { id: 'page-number', left: 68, top: 584, width: 72, height: 22, right: 140, bottom: 606, area: 1584 },
+      ],
+      auditBlocks: [],
+      titleMeta: { titleFontSize: 44, titleLineCount: 1, titleBlockId: 'title' },
+    },
+  ];
+
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible" data-slide-shell="S01">
+    <div class="slide-content-wrapper" style="width:1152px;height:648px;overflow:hidden;position:relative;background:#F8FAFC;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="S01" data-title="第一页" data-layout-family="cover_signal" data-speaker-seconds="60" style="position:relative;width:1152px;height:648px;">
+        <div data-qa-block="title" style="position:absolute;left:72px;top:64px;width:800px;font-size:56px;line-height:1.08;font-weight:800;color:#0F172A;">第一页</div>
+        <div data-qa-block="page-number" style="position:absolute;right:76px;bottom:42px;font-size:18px;line-height:1;font-weight:600;color:#64748B;">01</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide" data-slide-shell="S02" style="display:none;">
+    <div class="slide-content-wrapper" style="width:1152px;height:648px;overflow:hidden;position:relative;background:#F8FAFC;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="S02" data-title="第二页" data-layout-family="multi_zone_compare" data-speaker-seconds="60" style="position:relative;width:1152px;height:648px;">
+        <div data-qa-block="title" style="position:absolute;left:72px;top:64px;width:800px;font-size:44px;line-height:1.12;font-weight:780;color:#0F172A;">第二页</div>
+        <div data-qa-block="body" data-primary-point="true" style="position:absolute;left:96px;top:200px;width:680px;height:220px;border-radius:28px;background:#FFFFFF;border:1px solid #CBD5E1;"></div>
+        <div data-qa-block="page-number" style="position:absolute;left:68px;bottom:40px;font-size:22px;line-height:1;font-weight:600;color:#111827;">2 / 8</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const inspections = ${JSON.stringify(inspections)};
+    let current = 0;
+    window.redcubeDeckReview = {
+      totalSlides: inspections.length,
+      showSlide(index) {
+        current = index;
+        document.querySelectorAll('.slide').forEach((slide, slideIndex) => {
+          slide.classList.toggle('visible', slideIndex === index);
+          slide.style.display = slideIndex === index ? '' : 'none';
+        });
+      },
+      inspectCurrentSlide() { return inspections[current]; }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '5',
+      '--frame-width',
+      '1152',
+      '--frame-height',
+      '648',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
 function runReviewWithUnframedHeader() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-header-'));
   const htmlFile = path.join(workspaceRoot, 'deck.html');
@@ -737,6 +839,21 @@ test('shared screenshot review ignores decorative ground containers for occlusio
   assert.equal(payload.slide_reviews[0].checks.visual_density_ok, true);
   assert.deepEqual(payload.slide_reviews[0].metrics.overlaps, []);
   assert.equal(payload.slide_reviews[0].metrics.occupied_ratio < 0.82, true);
+});
+
+test('shared screenshot review blocks inconsistent page number syntax and styling across a full deck', () => {
+  const payload = runReviewWithInconsistentPageNumbers();
+  assert.equal(payload.status, 'block');
+  assert.equal(payload.checks.page_number_consistency_ok, false);
+  assert.equal(payload.slide_reviews[0].checks.page_number_consistency_ok, true);
+  assert.equal(payload.slide_reviews[1].checks.page_number_consistency_ok, false);
+  assert.equal(payload.slide_reviews[1].issues.includes('page_number_consistency_failed'), true);
+  assert.equal(payload.slide_reviews[1].metrics.page_number_audit.syntax_family, 'current_total_slash');
+  assert.equal(payload.slide_reviews[1].metrics.page_number_audit.reference.syntax_family, 'two_digit');
+  assert.equal(payload.slide_reviews[1].metrics.page_number_audit.failures.includes('syntax_family'), true);
+  assert.equal(payload.slide_reviews[1].metrics.page_number_audit.failures.includes('position'), true);
+  assert.equal(payload.slide_reviews[1].metrics.page_number_audit.failures.includes('font_size'), true);
+  assert.equal(payload.slide_reviews[1].metrics.page_number_audit.failures.includes('color'), true);
 });
 
 test('shared screenshot review does not treat unframed header groups as block content overflow', () => {

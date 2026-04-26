@@ -31,6 +31,9 @@ TITLE_FONT_SIZE_TOLERANCE = 2.5
 EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
 INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
 BLOCK_CONTENT_OVERFLOW_TOLERANCE = 1.5
+PAGE_NUMBER_POSITION_TOLERANCE = 8.0
+PAGE_NUMBER_FONT_SIZE_TOLERANCE = 1.5
+PAGE_NUMBER_COLOR_TOLERANCE = 18.0
 
 
 def fail(message: str) -> None:
@@ -161,6 +164,83 @@ def apply_title_typography_consistency(slide_reviews: List[Dict[str, Any]]) -> D
     }
 
 
+def page_number_reference_candidates(slide_reviews: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [
+        review.get('metrics', {}).get('page_number_audit', {}) or {}
+        for review in slide_reviews
+        if (review.get('metrics', {}).get('page_number_audit', {}) or {}).get('present')
+    ]
+
+
+def page_number_position_failure(current: Dict[str, Any], reference: Dict[str, Any]) -> bool:
+    if current.get('position_family') != reference.get('position_family'):
+        return True
+    current_rect = current.get('rect', {}) or {}
+    reference_rect = reference.get('rect', {}) or {}
+    for key in ('left', 'top', 'right_gap', 'bottom_gap'):
+        current_value = current_rect.get(key)
+        reference_value = reference_rect.get(key)
+        if current_value is None or reference_value is None:
+            continue
+        if abs(float(current_value) - float(reference_value)) > PAGE_NUMBER_POSITION_TOLERANCE:
+            return True
+    return False
+
+
+def page_number_color_failure(current: Dict[str, Any], reference: Dict[str, Any]) -> bool:
+    current_rgb = current.get('color_rgb')
+    reference_rgb = reference.get('color_rgb')
+    if not isinstance(current_rgb, list) or not isinstance(reference_rgb, list):
+        return False
+    if len(current_rgb) < 3 or len(reference_rgb) < 3:
+        return False
+    return any(abs(float(current_rgb[index]) - float(reference_rgb[index])) > PAGE_NUMBER_COLOR_TOLERANCE for index in range(3))
+
+
+def page_number_reference_payload(reference: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        'text': reference.get('text'),
+        'syntax_family': reference.get('syntax_family'),
+        'position_family': reference.get('position_family'),
+        'font_size': reference.get('font_size'),
+        'color_rgb': reference.get('color_rgb'),
+        'rect': reference.get('rect'),
+    }
+
+
+def apply_page_number_consistency(slide_reviews: List[Dict[str, Any]]) -> Dict[str, Any]:
+    candidates = page_number_reference_candidates(slide_reviews)
+    reference = candidates[0] if candidates else None
+    for review in slide_reviews:
+        checks = review.setdefault('checks', {})
+        metrics = review.setdefault('metrics', {})
+        audit = metrics.setdefault('page_number_audit', {'present': False})
+        failures: List[str] = []
+        if reference and audit.get('present'):
+            if audit.get('syntax_family') != reference.get('syntax_family'):
+                failures.append('syntax_family')
+            if page_number_position_failure(audit, reference):
+                failures.append('position')
+            if abs(float(audit.get('font_size', 0) or 0) - float(reference.get('font_size', 0) or 0)) > PAGE_NUMBER_FONT_SIZE_TOLERANCE:
+                failures.append('font_size')
+            if page_number_color_failure(audit, reference):
+                failures.append('color')
+        audit['reference'] = page_number_reference_payload(reference) if reference else None
+        audit['failures'] = failures
+        checks['page_number_consistency_ok'] = len(failures) == 0
+        without_page_number_issue = [
+            issue for issue in review.get('issues', [])
+            if issue != 'page_number_consistency_failed'
+        ]
+        review['issues'] = without_page_number_issue
+        if failures:
+            review['issues'].append('page_number_consistency_failed')
+    return {
+        'reference': page_number_reference_payload(reference) if reference else None,
+        'slide_count_with_page_number': len(candidates),
+    }
+
+
 def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
     wrapper = info.get('wrapper', {}) or {}
     blocks = [
@@ -170,6 +250,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
     audit_blocks = info.get('auditBlocks', []) or []
     title_meta = info.get('titleMeta', {}) or {}
     block_content_audit = info.get('blockContentAudit', {}) or {}
+    page_number_audit = info.get('pageNumberAudit', {}) or {'present': False}
     issues: List[str] = []
     overflow_free = (
         float(wrapper.get('scrollWidth', 0)) <= float(wrapper.get('clientWidth', 0)) + 1
@@ -236,6 +317,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'edge_clearance_ok': edge_clearance_ok,
             'block_content_fit_ok': block_content_fit_ok,
             'title_typography_ok': True,
+            'page_number_consistency_ok': True,
         },
         'metrics': {
             'occupied_ratio': round(occupied_ratio, 4),
@@ -247,13 +329,14 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'title_font_size': round(float(title_meta.get('titleFontSize', 0) or 0), 2),
             'title_line_count': int(title_meta.get('titleLineCount', 0) or 0),
             'title_block_id': title_meta.get('titleBlockId'),
+            'page_number_audit': page_number_audit,
         },
         'issues': issues,
     }
 
 
 def summarize_checks(slide_reviews: List[Dict[str, Any]]) -> Dict[str, bool]:
-    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok', 'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok']
+    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok', 'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok', 'page_number_consistency_ok']
     return {
         key: all(bool(review.get('checks', {}).get(key)) for review in slide_reviews)
         for key in keys
@@ -417,6 +500,28 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                       const adjacentReadableBlockIgnoreIdTokens = {json.dumps(EDGE_CLEARANCE_IGNORED_IDS)};
                       const round = (value) => Math.round((Number(value) || 0) * 100) / 100;
                       const normalizeText = (value) => String(value || '').replace(/\\s+/g, '').trim();
+                      const normalizePageNumberText = (value) => String(value || '').replace(/\\s+/g, ' ').trim();
+                      const classifyPageNumberSyntax = (text) => {{
+                        const normalized = normalizePageNumberText(text);
+                        if (/^\\d{{2}}$/.test(normalized)) return 'two_digit';
+                        if (/^\\d+$/.test(normalized)) return 'plain_number';
+                        if (/^\\d+\\s*\\/\\s*\\d+$/.test(normalized)) return 'current_total_slash';
+                        if (/^P\\s*\\d+$/i.test(normalized)) return 'p_prefixed';
+                        if (/^第\\s*\\d+\\s*页$/.test(normalized)) return 'chinese_page';
+                        return normalized ? 'custom' : 'missing';
+                      }};
+                      const parseRgb = (value) => {{
+                        const match = String(value || '').match(/rgba?\\(([^)]+)\\)/i);
+                        if (!match) return null;
+                        return match[1].split(',').slice(0, 3).map((part) => Number.parseFloat(part.trim()));
+                      }};
+                      const classifyPositionFamily = (rect) => {{
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+                        const horizontal = centerX < bounds.width * 0.33 ? 'left' : (centerX > bounds.width * 0.67 ? 'right' : 'center');
+                        const vertical = centerY < bounds.height * 0.33 ? 'top' : (centerY > bounds.height * 0.67 ? 'bottom' : 'middle');
+                        return `${{vertical}}-${{horizontal}}`;
+                      }};
                       const isVisibleElement = (node) => {{
                         if (!(node instanceof Element)) return false;
                         const style = window.getComputedStyle(node);
@@ -637,9 +742,42 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                         return {{
                           ...base,
                           blockContentAudit: {{ failures: [] }},
+                          pageNumberAudit: {{ present: false }},
                         }};
                       }}
                       const bounds = wrapper.getBoundingClientRect();
+                      const pageNumberIdTokens = {json.dumps(EDGE_CLEARANCE_IGNORED_IDS)};
+                      const pageNumberPattern = /^(?:\\d{{1,2}}|\\d+\\s*\\/\\s*\\d+|P\\s*\\d+|第\\s*\\d+\\s*页)$/i;
+                      const pageNumberNodes = Array.from(wrapper.querySelectorAll('[data-qa-block], [data-page-number], [aria-label]'))
+                        .filter((node) => node instanceof Element && isVisibleElement(node))
+                        .filter((node) => {{
+                          const blockId = String(node.getAttribute('data-qa-block') || node.getAttribute('data-page-number') || node.getAttribute('aria-label') || '').toLowerCase();
+                          const text = normalizePageNumberText(node.textContent || '');
+                          return pageNumberIdTokens.some((token) => blockId.includes(token)) || pageNumberPattern.test(text);
+                        }});
+                      const pageNumberNode = pageNumberNodes[0] || null;
+                      let pageNumberAudit = {{ present: false }};
+                      if (pageNumberNode) {{
+                        const rect = rectRelativeToBounds(pageNumberNode.getBoundingClientRect(), bounds);
+                        const style = window.getComputedStyle(pageNumberNode);
+                        const text = normalizePageNumberText(pageNumberNode.textContent || '');
+                        pageNumberAudit = {{
+                          present: true,
+                          block_id: pageNumberNode.getAttribute('data-qa-block') || pageNumberNode.getAttribute('data-page-number') || null,
+                          text,
+                          syntax_family: classifyPageNumberSyntax(text),
+                          position_family: classifyPositionFamily(rect),
+                          font_size: round(Number.parseFloat(style.fontSize || '0')),
+                          font_weight: String(style.fontWeight || ''),
+                          color: style.color || '',
+                          color_rgb: parseRgb(style.color || ''),
+                          rect: {{
+                            ...rect,
+                            right_gap: round(bounds.width - rect.right),
+                            bottom_gap: round(bounds.height - rect.bottom),
+                          }},
+                        }};
+                      }}
                       const qaBlocks = Array.from(wrapper.querySelectorAll('[data-qa-block]'))
                         .filter((node) => isVisibleElement(node));
                       const leafBlocks = qaBlocks
@@ -728,6 +866,7 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                       return {{
                         ...base,
                         blockContentAudit: {{ failures }},
+                        pageNumberAudit,
                       }};
                     }}
                     """
@@ -742,6 +881,7 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
             await browser.close()
 
     title_metrics = apply_title_typography_consistency(slide_reviews)
+    page_number_metrics = apply_page_number_consistency(slide_reviews)
     screenshot_dimensions = {
         'width': int(round(float(args.frame_width) * float(args.device_scale_factor))),
         'height': int(round(float(args.frame_height) * float(args.device_scale_factor))),
@@ -760,6 +900,7 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
             'slide_count': len(slide_reviews),
             'average_density': round(statistics.mean([review['metrics']['occupied_ratio'] for review in slide_reviews]) if slide_reviews else 0.0, 4),
             'title_typography_reference': title_metrics['reference_font_size'],
+            'page_number_consistency': page_number_metrics,
         },
         'device_scale_factor': float(args.device_scale_factor),
         'screenshot_dimensions': screenshot_dimensions,
