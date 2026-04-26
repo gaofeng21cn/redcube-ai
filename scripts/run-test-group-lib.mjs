@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 import {
@@ -296,11 +296,42 @@ export function partitionTestFilesForExecution({ groupName, files = [] }) {
 }
 
 export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {
-  const args = ['--test'];
+  const args = ['--experimental-strip-types', '--test'];
   if (serialized) {
     // Browser / screenshot / local-exec heavy files can still oversubscribe the host;
     // keep only that explicit subset at file-level concurrency 1.
     args.push('--test-concurrency=1');
   }
   return [...args, ...forwardedArgs];
+}
+
+export function discoverRootTestFiles({ testsDir = 'tests', entries } = {}) {
+  const directoryEntries = entries ?? readdirSync(path.resolve(testsDir));
+  return directoryEntries
+    .filter((entry) => entry.endsWith('.test.js') || entry.endsWith('.test.ts'))
+    .map((entry) => `${testsDir}/${entry}`)
+    .sort();
+}
+
+export function assertRootTestPartition({
+  discoveredFiles,
+  partitionFiles,
+  partitionName = 'meta/family/integration/e2e/historical',
+} = {}) {
+  const discovered = [...discoveredFiles].sort();
+  const base = [...partitionFiles];
+  const duplicates = base.filter((file, index) => base.indexOf(file) !== index);
+  if (duplicates.length > 0) {
+    throw new Error(`${partitionName} 分组存在重复项: ${[...new Set(duplicates)].join(', ')}`);
+  }
+
+  const missing = discovered.filter((file) => !base.includes(file));
+  if (missing.length > 0) {
+    throw new Error(`未被纳入 ${partitionName} 的测试文件: ${missing.join(', ')}`);
+  }
+
+  const unexpected = base.filter((file) => !discovered.includes(file));
+  if (unexpected.length > 0) {
+    throw new Error(`分组里存在非根级测试文件: ${unexpected.join(', ')}`);
+  }
 }

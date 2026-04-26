@@ -1,14 +1,16 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import {
   assertCurrentRepoSharedPinAlignment,
+  assertRootTestPartition,
   assertRequiredRuntimeSharedResolution,
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
+  discoverRootTestFiles,
   partitionTestFilesForExecution,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
   resolveRedCubePythonCommand,
@@ -217,13 +219,6 @@ async function prepareSerializedVerification(groupName) {
   };
 }
 
-function discoveredRootTests() {
-  return readdirSync(path.resolve('tests'))
-    .filter((entry) => entry.endsWith('.test.js'))
-    .map((entry) => `tests/${entry}`)
-    .sort();
-}
-
 function assertTrackedFiles(files, groupName) {
   for (const file of files) {
     if (!existsSync(path.resolve(file))) {
@@ -233,22 +228,11 @@ function assertTrackedFiles(files, groupName) {
 }
 
 function assertPartition() {
-  const discovered = discoveredRootTests();
   const base = [...META, ...FAMILY, ...INTEGRATION, ...E2E, ...HISTORICAL];
-  const duplicates = base.filter((file, index) => base.indexOf(file) !== index);
-  if (duplicates.length > 0) {
-    throw new Error(`meta/family/integration/e2e/historical 分组存在重复项: ${[...new Set(duplicates)].join(', ')}`);
-  }
-
-  const missing = discovered.filter((file) => !base.includes(file));
-  if (missing.length > 0) {
-    throw new Error(`未被纳入 meta/family/integration/e2e/historical 的测试文件: ${missing.join(', ')}`);
-  }
-
-  const unexpected = base.filter((file) => !discovered.includes(file));
-  if (unexpected.length > 0) {
-    throw new Error(`分组里存在非根级测试文件: ${unexpected.join(', ')}`);
-  }
+  assertRootTestPartition({
+    discoveredFiles: discoverRootTestFiles(),
+    partitionFiles: base,
+  });
 }
 
 function printUsage() {

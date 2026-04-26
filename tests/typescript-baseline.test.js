@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
+import {
+  assertRootTestPartition,
+  buildNodeTestArgs,
+  discoverRootTestFiles,
+} from '../scripts/run-test-group-lib.mjs';
+
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
@@ -28,6 +34,7 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
   assert.equal(typecheck.include.includes('tests/**/*.js'), true);
   assert.equal(typecheck.include.includes('tests/**/*.mjs'), true);
   assert.equal(typecheck.include.includes('scripts/**/*.mjs'), true);
+  assert.equal(typecheck.include.includes('scripts/**/*.ts'), true);
 });
 
 test('root package exposes formal typecheck entrypoint', () => {
@@ -67,4 +74,34 @@ test('typescript migration policy reference stays tracked', () => {
 
 test('root AGENTS stays tracked', () => {
   assert.equal(existsSync(path.resolve('AGENTS.md')), true);
+});
+
+test('test runner treats root-level TypeScript tests as first-class lane members', () => {
+  assert.deepEqual(
+    buildNodeTestArgs({
+      forwardedArgs: ['--test-reporter=spec'],
+      serialized: false,
+    }),
+    ['--experimental-strip-types', '--test', '--test-reporter=spec'],
+  );
+
+  assert.deepEqual(
+    discoverRootTestFiles({
+      entries: ['alpha.test.js', 'beta.test.ts', 'nested', 'helper.js'],
+    }),
+    ['tests/alpha.test.js', 'tests/beta.test.ts'],
+  );
+
+  assert.doesNotThrow(() => assertRootTestPartition({
+    discoveredFiles: ['tests/alpha.test.js', 'tests/beta.test.ts'],
+    partitionFiles: ['tests/alpha.test.js', 'tests/beta.test.ts'],
+  }));
+
+  assert.throws(
+    () => assertRootTestPartition({
+      discoveredFiles: ['tests/alpha.test.js', 'tests/beta.test.ts'],
+      partitionFiles: ['tests/alpha.test.js'],
+    }),
+    /未被纳入 meta\/family\/integration\/e2e\/historical 的测试文件: tests\/beta\.test\.ts/,
+  );
 });

@@ -65,8 +65,11 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
 
   assert.equal(audit.criteria.js_residue_explicitly_closed_out, true);
   assert.equal(audit.criteria.new_unregistered_js_blocked, true);
+  assert.equal(audit.criteria.test_and_script_language_policy_closed, true);
   assert.deepEqual(audit.language_target.primary_implementation_languages, ['TypeScript', 'Python']);
   assert.equal(audit.language_target.javascript_policy, 'legacy_allowlisted_residue_only');
+  assert.equal(audit.language_target.test_language_policy, 'new_tests_default_to_typescript');
+  assert.equal(audit.language_target.script_language_policy, 'new_scripts_default_to_typescript');
   assert.equal(audit.evidence.js_residue_summary.totals.unregistered_js_file_count, 0);
   assert.equal(audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count > 100, true);
   assert.equal(audit.evidence.js_residue_summary.by_directory.length > 10, true);
@@ -81,6 +84,21 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
     assert.equal(typeof residue.exception_registration?.reason, 'string');
     assert.equal(typeof residue.exception_registration?.migration_window, 'string');
   }
+});
+
+test('P18 closeout audit registers existing JS tests and scripts while allowing TS additions', () => {
+  const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+  const policy = audit.evidence.test_and_script_language_policy;
+
+  assert.equal(policy.status, 'closed');
+  assert.equal(policy.tests.scan_glob, 'tests/**/*.test.{js,ts}');
+  assert.equal(policy.tests.allowed_new_extension, '.test.ts');
+  assert.equal(policy.tests.unregistered_js_files.length, 0);
+  assert.equal(policy.tests.registered_js_files.includes('tests/typescript-baseline.test.js'), true);
+  assert.equal(policy.scripts.scan_glob, 'scripts/**/*.{mjs,ts}');
+  assert.equal(policy.scripts.allowed_new_extension, '.ts');
+  assert.equal(policy.scripts.unregistered_js_files.length, 0);
+  assert.equal(policy.scripts.registered_js_files.includes('scripts/run-test-group.mjs'), true);
 });
 
 test('P18 closeout audit classifies legacy allowlisted JS separately from unregistered JS residue', () => {
@@ -190,6 +208,23 @@ test('P18 closeout audit fails closed when a new package adds JS without registr
     assert.deepEqual(residue.unregistered_js_files, [unexpectedFile]);
   } finally {
     rmSync(residueDirectory, { recursive: true, force: true });
+  }
+});
+
+test('P18 closeout audit fails closed when a new JS script appears without registration', () => {
+  const unexpectedPath = 'scripts/__closeout-unregistered-script.mjs';
+
+  writeFileSync(unexpectedPath, 'export const unregistered = true;\n', 'utf-8');
+
+  try {
+    const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+    const scriptsPolicy = audit.evidence.test_and_script_language_policy.scripts;
+
+    assert.equal(audit.criteria.test_and_script_language_policy_closed, false);
+    assert.equal(audit.criteria.closeout_ready, false);
+    assert.deepEqual(scriptsPolicy.unregistered_js_files, [unexpectedPath]);
+  } finally {
+    rmSync(unexpectedPath, { force: true });
   }
 });
 

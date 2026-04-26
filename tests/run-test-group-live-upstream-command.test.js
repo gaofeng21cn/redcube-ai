@@ -29,17 +29,17 @@ test('run-test-group only adds file-level serialization to explicit route-heavy 
   assert.deepEqual(buildNodeTestArgs({
     forwardedArgs: ['--test-reporter=spec'],
     serialized: true,
-  }), ['--test', '--test-concurrency=1', '--test-reporter=spec']);
+  }), ['--experimental-strip-types', '--test', '--test-concurrency=1', '--test-reporter=spec']);
 
   assert.deepEqual(buildNodeTestArgs({
     forwardedArgs: [],
     serialized: true,
-  }), ['--test', '--test-concurrency=1']);
+  }), ['--experimental-strip-types', '--test', '--test-concurrency=1']);
 
   assert.deepEqual(buildNodeTestArgs({
     forwardedArgs: ['--test-reporter=spec'],
     serialized: false,
-  }), ['--test', '--test-reporter=spec']);
+  }), ['--experimental-strip-types', '--test', '--test-reporter=spec']);
 });
 
 test('run-test-group partitions route-heavy files away from the default parallel batch', () => {

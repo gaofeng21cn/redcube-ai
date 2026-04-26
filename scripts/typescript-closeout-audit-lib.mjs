@@ -211,12 +211,49 @@ const LANGUAGE_TARGET = Object.freeze({
   default_new_runtime_code: 'TypeScript',
   native_helper_language: 'Python',
   javascript_policy: 'legacy_allowlisted_residue_only',
+  test_language_policy: 'new_tests_default_to_typescript',
+  script_language_policy: 'new_scripts_default_to_typescript',
   agent_guidance: [
     'New product/runtime contracts, CLI/MCP surfaces, gateway actions, packages, and tests should land as TypeScript.',
     'New Office/PPT/document automation helpers should land in Python-owned helper surfaces.',
-    'New JavaScript under apps/*/src/** or packages/*/src/** is blocked unless it is explicitly registered as a migration exception before merge.',
+    'New JavaScript under apps/*/src/**, packages/*/src/**, tests/**, or scripts/** is blocked unless it is explicitly registered as a migration exception before merge.',
   ],
 });
+
+const TEST_JS_SUPPORT_ALLOWLIST = Object.freeze([
+  'tests/cli-v2-smoke-cases/review-and-root-resolution.test.js',
+  'tests/cli-v2-smoke-cases/runtime-and-product-entry.test.js',
+  'tests/cli-v2-smoke-cases/workspace-and-deliverables.test.js',
+  'tests/helpers/complete-source-readiness.js',
+  'tests/helpers/mock-codex-cli-bin.mjs',
+  'tests/helpers/mock-codex-cli-parts/poster-builders.js',
+  'tests/helpers/mock-codex-cli-parts/ppt-builders.js',
+  'tests/helpers/mock-codex-cli-parts/runtime.js',
+  'tests/helpers/mock-codex-cli-parts/shared.js',
+  'tests/helpers/mock-codex-cli-parts/xiaohongshu-builders.js',
+  'tests/helpers/mock-codex-cli.js',
+  'tests/helpers/mock-hermes-native-bridge.mjs',
+  'tests/helpers/mock-redcube-python-with-playwright.mjs',
+  'tests/helpers/workspace-git-boundary.js',
+  'tests/ppt-creative-ownership-cases/foundation-and-routes.test.js',
+  'tests/ppt-creative-ownership-cases/render-revision-context.test.js',
+  'tests/ppt-creative-ownership-cases/stable-surfaces-and-render.test.js',
+  'tests/ppt-creative-ownership-cases/targeted-rerender-and-export.test.js',
+  'tests/ppt-creative-ownership-cases/targeted-rerender-operator-context.test.js',
+]);
+
+const SCRIPT_JS_ALLOWLIST = Object.freeze([
+  'scripts/check-line-budget.mjs',
+  'scripts/execute-redcube-service-entry.mjs',
+  'scripts/install-codex-plugin.mjs',
+  'scripts/line-budget.mjs',
+  'scripts/p19-creative-ownership-audit-lib.mjs',
+  'scripts/probe-upstream-hermes-agent.mjs',
+  'scripts/run-test-group-lib.mjs',
+  'scripts/run-test-group.mjs',
+  'scripts/run-typescript-closeout-audit.mjs',
+  'scripts/typescript-closeout-audit-lib.mjs',
+]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
@@ -255,6 +292,79 @@ function listSourceFiles(directory, extension) {
 
   visit(sourceDir);
   return files.sort();
+}
+
+function listFilesUnder(directory, predicate) {
+  const root = path.resolve(directory);
+  if (!existsSync(root)) return [];
+
+  const files = [];
+  function visit(currentDirectory) {
+    for (const entry of readdirSync(currentDirectory, { withFileTypes: true })) {
+      const fullPath = path.join(currentDirectory, entry.name);
+      if (entry.isDirectory()) {
+        visit(fullPath);
+      } else if (entry.isFile() && predicate(fullPath)) {
+        files.push(path.relative(path.resolve(), fullPath).split(path.sep).join('/'));
+      }
+    }
+  }
+
+  visit(root);
+  return files.sort();
+}
+
+function readRegisteredRootTestFiles() {
+  const runner = readText('scripts/run-test-group.mjs');
+  return [...new Set([...runner.matchAll(/'([^']+\.test\.(?:js|ts))'/g)].map((entry) => entry[1]))].sort();
+}
+
+function languageSurfaceAudit() {
+  const registeredRootTests = readRegisteredRootTestFiles();
+  const registeredTestJs = [...new Set([
+    ...registeredRootTests.filter((file) => file.endsWith('.js')),
+    ...TEST_JS_SUPPORT_ALLOWLIST,
+  ])].sort();
+  const actualTestJs = listFilesUnder('tests', (file) => (
+    file.endsWith('.js') || file.endsWith('.mjs') || file.endsWith('.cjs')
+  ));
+  const actualTestTs = listFilesUnder('tests', (file) => file.endsWith('.ts'));
+  const actualScriptJs = listFilesUnder('scripts', (file) => (
+    file.endsWith('.mjs') || file.endsWith('.js') || file.endsWith('.cjs')
+  ));
+  const actualScriptTs = listFilesUnder('scripts', (file) => file.endsWith('.ts'));
+  const registeredScriptJs = [...SCRIPT_JS_ALLOWLIST].sort();
+
+  const tests = {
+    scan_glob: 'tests/**/*.test.{js,ts}',
+    allowed_new_extension: '.test.ts',
+    registered_js_files: registeredTestJs,
+    registered_ts_files: registeredRootTests.filter((file) => file.endsWith('.ts')),
+    actual_js_files: actualTestJs,
+    actual_ts_files: actualTestTs,
+    unregistered_js_files: fileDifference(actualTestJs, registeredTestJs),
+    missing_registered_js_files: fileDifference(registeredTestJs, actualTestJs),
+  };
+  const scripts = {
+    scan_glob: 'scripts/**/*.{mjs,ts}',
+    allowed_new_extension: '.ts',
+    registered_js_files: registeredScriptJs,
+    actual_js_files: actualScriptJs,
+    actual_ts_files: actualScriptTs,
+    unregistered_js_files: fileDifference(actualScriptJs, registeredScriptJs),
+    missing_registered_js_files: fileDifference(registeredScriptJs, actualScriptJs),
+  };
+  const closed = tests.unregistered_js_files.length === 0
+    && tests.missing_registered_js_files.length === 0
+    && scripts.unregistered_js_files.length === 0
+    && scripts.missing_registered_js_files.length === 0;
+
+  return {
+    status: closed ? 'closed' : 'open',
+    policy: 'Tests and scripts are TypeScript-first; JavaScript is allowed only through explicit registration.',
+    tests,
+    scripts,
+  };
 }
 
 function listResidueDirectories() {
@@ -467,6 +577,7 @@ export function buildCloseoutAudit(options = {}) {
   const residueInventory = residueAudit();
   const residueLineLock = residueLineLockAudit(residueInventory);
   const jsResidueSummary = residueSummary(residueInventory, residueLineLock);
+  const testAndScriptLanguagePolicy = languageSurfaceAudit();
 
   const audit = {
     milestone: 'P18',
@@ -487,6 +598,7 @@ export function buildCloseoutAudit(options = {}) {
       js_residue_explicitly_closed_out: residueInventory.every((entry) => entry.explicit_residue_only),
       new_unregistered_js_blocked: jsResidueSummary.totals.unregistered_js_file_count === 0,
       js_residue_line_growth_locked: residueLineLock.entries.every((entry) => entry.within_lock),
+      test_and_script_language_policy_closed: testAndScriptLanguagePolicy.status === 'closed',
       quality_gates_green: Object.values(qualityGates).every((gate) => gate.status === 'pass' && gate.exit_code === 0),
     },
     evidence: {
@@ -497,6 +609,7 @@ export function buildCloseoutAudit(options = {}) {
       js_residue_inventory: residueInventory,
       js_residue_line_lock: residueLineLock,
       js_residue_summary: jsResidueSummary,
+      test_and_script_language_policy: testAndScriptLanguagePolicy,
     },
     quality_gates: qualityGates,
   };
