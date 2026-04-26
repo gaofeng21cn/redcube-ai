@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 const FAMILY_VALIDATORS = [
   {
@@ -39,7 +40,7 @@ function loadValidator(file, validatorName) {
 }
 
 function loadFunction(file, functionName) {
-  const source = readFileSync(file, 'utf-8');
+  const source = readImplementation(file);
   const functionCode = extractFunction(source, functionName);
   return new Function(`
     function safeText(value, fallback = '') {
@@ -59,6 +60,12 @@ function loadFunction(file, functionName) {
     ${functionCode}
     return ${functionName};
   `)();
+}
+
+function readImplementation(file) {
+  const source = readFileSync(file, 'utf-8');
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? readFileSync(path.join(path.dirname(file), shell[1]), 'utf-8') : source;
 }
 
 function buildMinimalSlideHtml(slideId, withStyleTag = false) {
@@ -144,6 +151,58 @@ test('ppt authoring page budget honors explicit source page ranges', () => {
   assert.deepEqual(pageBudget('lecture_peer', contract), {
     min_slides: 16,
     max_slides: 22,
-    source: 'explicit_request',
+    source: 'explicit_request_range',
+  });
+});
+
+test('ppt authoring page budget derives from explicit slide plans independent of profile', () => {
+  const pageBudget = loadFunction(
+    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
+    'pageBudget',
+  );
+  const slidePlan = Array.from({ length: 21 }, (_, index) => {
+    const pageNo = index + 1;
+    return `${pageNo}. 第${pageNo}页：科室汇报逐页结构，覆盖封面、论文结果、方法边界或总结。`;
+  }).join('\n');
+  const contract = {
+    goal: '制作科室内部汇报，幻灯片不超过30页。',
+    shared_source_truth: {
+      source_brief: {
+        brief_text: `建议逐页结构如下：\n${slidePlan}`,
+      },
+    },
+  };
+
+  const peerBudget = pageBudget('lecture_peer', contract);
+  assert.deepEqual(peerBudget, {
+    min_slides: 21,
+    max_slides: 21,
+    source: 'source_slide_plan_count',
+  });
+  assert.deepEqual(pageBudget('executive_briefing', contract), peerBudget);
+});
+
+test('ppt authoring page budget derives per-paper minimums from task evidence', () => {
+  const pageBudget = loadFunction(
+    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
+    'pageBudget',
+  );
+  const contract = {
+    goal: '三篇论文科室汇报，不超过30页。每篇至少4页：临床问题与终点、方法或模型策略、关键数字结果、解释与边界。',
+    shared_source_truth: {
+      source_brief: {
+        brief_text: [
+          '第一篇：术前 early non-GTR 风险分层。',
+          '第二篇：术后 3 个月内分泌负担随访分层。',
+          '第三篇：侵袭表型结构与 Knosp 边界。',
+        ].join('\n'),
+      },
+    },
+  };
+
+  assert.deepEqual(pageBudget('lecture_peer', contract), {
+    min_slides: 16,
+    max_slides: 20,
+    source: 'per_item_minimum_request',
   });
 });

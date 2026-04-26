@@ -87,6 +87,8 @@ const LEAF_TS_MIGRATION_LOCKS = {
   'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js': 1,
   'packages/redcube-runtime-family-registry/src/index.js': 1,
   'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js': 1,
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.js': 1,
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js': 1,
   'packages/redcube-runtime-protocol/src/index.js': 1,
   'packages/redcube-runtime-protocol/src/managed-runs.js': 1,
   'packages/redcube-runtime-protocol/src/python-command.js': 1,

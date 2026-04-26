@@ -7,9 +7,15 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 test('ppt family runtime uses upstream structured generation directly and no longer imports pack builders', () => {
   const runtime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.js');
-  const runtimeCore = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js');
+  const runtimeCore = readImplementation('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js');
 
   assert.equal(runtime.includes('function buildOutlineSlides('), false);
   assert.equal(runtime.includes('function buildSlideBlueprint('), false);
