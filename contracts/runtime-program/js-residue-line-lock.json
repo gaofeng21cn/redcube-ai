@@ -45,7 +45,7 @@
     "packages/redcube-governance/src/index.js": 16,
     "packages/redcube-governance/src/review-state.js": 905,
     "packages/redcube-governance/src/reviews.js": 350,
-    "packages/redcube-hermes-substrate/src/hermes-native-proof-client.js": 344,
+    "packages/redcube-hermes-substrate/src/hermes-native-proof-client.js": 357,
     "packages/redcube-hermes-substrate/src/index.js": 537,
     "packages/redcube-llm/src/index.js": 683,
     "packages/redcube-overlay-core/src/contracts.js": 1,

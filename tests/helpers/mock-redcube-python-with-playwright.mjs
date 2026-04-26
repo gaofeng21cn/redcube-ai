@@ -167,10 +167,111 @@ function buildExportPayload(args) {
   };
 }
 
+function normalizeHelperInvocation(argv) {
+  if (argv[0] === '-m') {
+    return {
+      helper: String(argv[1] || '').trim(),
+      args: argv.slice(2),
+    };
+  }
+  const script = String(argv[0] || '').trim();
+  return {
+    helper: path.basename(script),
+    args: argv.slice(1),
+  };
+}
+
+function buildNativePayload(args) {
+  const inputJson = args['input-json'];
+  const outputPptx = args['output-pptx'];
+  const outputPdf = args['output-pdf'];
+  const shapeManifestFile = args['shape-manifest'];
+  const previewDir = args['preview-dir'];
+  const repairLogFile = args['repair-log'];
+  const engineContractFile = args['engine-contract'];
+  if (!inputJson) fail('mock native requires --input-json');
+  if (!outputPptx) fail('mock native requires --output-pptx');
+  if (!shapeManifestFile) fail('mock native requires --shape-manifest');
+  if (!previewDir) fail('mock native requires --preview-dir');
+
+  const input = JSON.parse(readText(inputJson));
+  const engineContract = engineContractFile ? JSON.parse(readText(engineContractFile)) : {};
+  const blueprintSlides = Array.isArray(input?.blueprint?.slides) && input.blueprint.slides.length > 0
+    ? input.blueprint.slides
+    : Array.from({ length: 6 }, (_, index) => ({
+        slide_id: `S${String(index + 1).padStart(2, '0')}`,
+        title: `Slide ${index + 1}`,
+      }));
+  ensureDir(previewDir);
+  const slides = blueprintSlides.map((slide, index) => {
+    const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
+    const screenshotFile = path.join(previewDir, `${slideId}.png`);
+    writeBinary(screenshotFile, PNG_1X1);
+    return {
+      slide_id: slideId,
+      title: String(slide?.title || `Slide ${index + 1}`),
+      layout_family: String(slide?.layout_family || 'mock_native_layout'),
+      text_box_count: 2,
+      shape_count: 2,
+      screenshot_file: screenshotFile,
+    };
+  });
+  writeBinary(outputPptx, Buffer.from('mock-native-pptx'));
+  if (outputPdf) {
+    writeBinary(outputPdf, Buffer.from('%PDF-1.4\n%mock-native\n'));
+  }
+  const shapeManifest = {
+    schema_version: 1,
+    engine_contract: engineContract,
+    engine_contract_file: engineContractFile || null,
+    slides,
+  };
+  writeText(shapeManifestFile, JSON.stringify(shapeManifest, null, 2));
+  const repairLog = {
+    target_slide_ids: Array.isArray(input?.repair_feedback)
+      ? input.repair_feedback.map((item) => item?.slide_id).filter(Boolean)
+      : [],
+    consumed_review_stage: args.mode === 'repair' ? 'screenshot_review' : null,
+    repair_log_file: repairLogFile || null,
+  };
+  if (repairLogFile) {
+    writeText(repairLogFile, JSON.stringify(repairLog, null, 2));
+  }
+  return {
+    status: 'completed',
+    builder: { kind: 'mock_python_pptx_native_shapes' },
+    shape_manifest_schema_version: 1,
+    pptx_file: outputPptx,
+    pdf_file: outputPdf || null,
+    shape_manifest_file: shapeManifestFile,
+    repair_log_file: repairLogFile || null,
+    page_count: slides.length,
+    screenshot_dimensions: { width: 2304, height: 1296 },
+    preview_screenshots: slides.map((slide) => slide.screenshot_file),
+    slides,
+    repair_log: repairLog,
+    engine_contract: engineContract,
+    engine_contract_file: engineContractFile || null,
+  };
+}
+
 function main() {
-  const [script, ...rest] = process.argv.slice(2);
-  const basename = path.basename(String(script || ''));
-  const args = parseArgs(rest);
+  const invocation = normalizeHelperInvocation(process.argv.slice(2));
+  const basename = path.basename(invocation.helper);
+  const args = parseArgs(invocation.args);
+
+  if (invocation.helper === 'redcube_ai.native_helpers.ppt_deck.review') {
+    process.stdout.write(`${JSON.stringify(buildPassReviewPayload(args))}\n`);
+    return;
+  }
+  if (invocation.helper === 'redcube_ai.native_helpers.ppt_deck.export') {
+    process.stdout.write(`${JSON.stringify(buildExportPayload(args))}\n`);
+    return;
+  }
+  if (invocation.helper === 'redcube_ai.native_helpers.ppt_deck.native') {
+    process.stdout.write(`${JSON.stringify(buildNativePayload(args))}\n`);
+    return;
+  }
 
   if (basename.endsWith('_review.py')) {
     process.stdout.write(`${JSON.stringify(buildPassReviewPayload(args))}\n`);
@@ -180,7 +281,11 @@ function main() {
     process.stdout.write(`${JSON.stringify(buildExportPayload(args))}\n`);
     return;
   }
-  fail(`unsupported mock redcube python script: ${basename || '(missing)'}`);
+  if (basename.endsWith('_native.py')) {
+    process.stdout.write(`${JSON.stringify(buildNativePayload(args))}\n`);
+    return;
+  }
+  fail(`unsupported mock redcube python helper: ${invocation.helper || '(missing)'}`);
 }
 
 main();

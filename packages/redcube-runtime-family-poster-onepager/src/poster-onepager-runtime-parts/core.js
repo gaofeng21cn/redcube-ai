@@ -1,13 +1,13 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
 
 import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
-  resolveRedCubePythonCommand,
+  resolvePythonNativeHelper,
+  runRedCubePythonHelper,
 } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
@@ -29,7 +29,7 @@ import { createPosterOnepagerReviewHelpers } from './review-helpers.js';
 export function createPosterOnepagerRuntimeCore() {
   const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
   const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
-  const PYTHON_REVIEW = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_review.py');
+  const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
   const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
   const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
   const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
@@ -680,14 +680,12 @@ export function createPosterOnepagerRuntimeCore() {
     return String(value || '').replace(/\s+/g, ' ').trim().slice(0, maxLength);
   }
   
-  function runPython(script, args) {
-    if (!existsSync(script)) throw new Error(`Missing python helper: ${script}`);
-    const pythonCommand = resolveRedCubePythonCommand();
-    const result = spawnSync(pythonCommand.command, [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
-    if (result.status !== 0) {
-      throw new Error((result.stderr || result.stdout || `python helper failed: ${script}`).trim());
-    }
-    return JSON.parse(result.stdout);
+  function runPython(helper, args) {
+    return runRedCubePythonHelper(helper, args, {
+      fileExists: existsSync,
+      missingMessagePrefix: 'Missing python helper',
+      failureMessagePrefix: 'python helper failed',
+    }).payload;
   }
   
   async function generateDirectorReviewDraft(

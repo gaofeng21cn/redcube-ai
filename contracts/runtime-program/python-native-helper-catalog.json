@@ -11,6 +11,16 @@
   },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
   "typescript_boundary": "TypeScript owns product entry, CLI/MCP, gateway contracts, runtime-family route orchestration, and review/export gate wiring.",
+  "invocation_policy": {
+    "preferred_internal_invocation": "package_module",
+    "preferred_argv_shape": [
+      "python",
+      "-m",
+      "<package_module>"
+    ],
+    "compatibility_script_wrappers_allowed": true,
+    "compatibility_script_wrappers_are_preferred": false
+  },
   "bypass_policy": {
     "generic_bypass_allowed": false,
     "required_entry_surface": "RedCube product-entry or runtime-family route",
@@ -30,6 +40,13 @@
         "module": "redcube_ai.native_helpers.ppt_deck.review",
         "callable": "main",
         "module_command": "python -m redcube_ai.native_helpers.ppt_deck.review"
+      },
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.review"
+        ]
       },
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
@@ -59,6 +76,13 @@
         "module": "redcube_ai.native_helpers.ppt_deck.export",
         "callable": "main",
         "module_command": "python -m redcube_ai.native_helpers.ppt_deck.export"
+      },
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.export"
+        ]
       },
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
@@ -91,6 +115,13 @@
         "module": "redcube_ai.native_helpers.ppt_deck.native",
         "callable": "main",
         "module_command": "python -m redcube_ai.native_helpers.ppt_deck.native"
+      },
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.native_helpers.ppt_deck.native"
+        ]
       },
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
@@ -132,6 +163,13 @@
         "module": "redcube_ai.hermes.native_proof_bridge",
         "callable": "main",
         "module_command": "python -m redcube_ai.hermes.native_proof_bridge"
+      },
+      "preferred_invocation": {
+        "kind": "package_module",
+        "argv": [
+          "-m",
+          "redcube_ai.hermes.native_proof_bridge"
+        ]
       },
       "owner": "python_native_helper",
       "deliverable_family": "runtime_substrate",

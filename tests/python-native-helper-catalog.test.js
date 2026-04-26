@@ -1,12 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { probeHermesNativeProof } from '../packages/redcube-hermes-substrate/src/index.js';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
 const ENGINE_CONTRACT_FILE = 'contracts/runtime-program/ppt-native-python-engine-contract.json';
 const PROOF_LANE_FILE = 'contracts/runtime-program/ppt-native-authoring-proof-lane.json';
+
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+
+const RUNTIME_PYTHON_CALLER_FILES = [
+  'packages/redcube-runtime-protocol/src/python-native-helper.ts',
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js',
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/export.js',
+  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.js',
+  'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js',
+  'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.js',
+  'packages/redcube-hermes-substrate/src/hermes-native-proof-client.js',
+];
 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
@@ -49,6 +66,12 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
     pyproject: 'pyproject.toml',
   });
   assert.equal(existsSync(path.resolve(catalog.package.pyproject)), true);
+  assert.deepEqual(catalog.invocation_policy, {
+    preferred_internal_invocation: 'package_module',
+    preferred_argv_shape: ['python', '-m', '<package_module>'],
+    compatibility_script_wrappers_allowed: true,
+    compatibility_script_wrappers_are_preferred: false,
+  });
   assert.equal(catalog.bypass_policy.generic_bypass_allowed, false);
   assert.equal(currentProgram.longrun_goal.language_target.python_native_helper_catalog, CATALOG_FILE);
   assert.equal(currentProgram.current_state.runtime_manager_status.native_helper_catalog, CATALOG_FILE);
@@ -75,6 +98,10 @@ test('Python native helper catalog only points at tracked Python helper scripts'
     assert.equal(helper.package_entrypoint.module, helper.package_module, helper.helper_id);
     assert.equal(helper.package_entrypoint.callable, 'main', helper.helper_id);
     assert.equal(helper.package_entrypoint.module_command, `python -m ${helper.package_module}`, helper.helper_id);
+    assert.deepEqual(helper.preferred_invocation, {
+      kind: 'package_module',
+      argv: ['-m', helper.package_module],
+    }, helper.helper_id);
     assert.match(helper.package_entrypoint.console_script, /^redcube-/, helper.helper_id);
     assert.equal(existsSync(path.resolve(helper.script)), true, helper.script);
   }
@@ -144,6 +171,55 @@ test('Compatibility wrapper scripts remain thin package entrypoints', () => {
     assert.match(wrapper, new RegExp(`from ${helper.package_module.replaceAll('.', '\\.')} import main`), helper.helper_id);
     assert.match(wrapper, /if __name__ == ['"]__main__['"]:/, helper.helper_id);
   }
+});
+
+test('Runtime Python helper callers prefer package module invocation over wrapper script paths', () => {
+  const combinedSource = RUNTIME_PYTHON_CALLER_FILES
+    .map((file) => readFileSync(path.resolve(file), 'utf-8'))
+    .join('\n');
+
+  assert.doesNotMatch(
+    combinedSource,
+    /const\s+PYTHON_[A-Z_]+\s*=\s*path\.join\([^;]+redcube-runtime\/scripts\/ppt_deck_[a-z_]+\.py/s,
+  );
+  assert.doesNotMatch(combinedSource, /DEFAULT_BRIDGE_SCRIPT/);
+  assert.match(combinedSource, /'-m',\s*helper\.packageModule/);
+  assert.match(combinedSource, /runRedCubePythonHelper/);
+  assert.match(combinedSource, /'-m',\s*DEFAULT_BRIDGE_MODULE/);
+  assert.match(combinedSource, /python-native-helper-catalog\.json/);
+
+  for (const helper of readJson(CATALOG_FILE).helpers) {
+    const source = combinedSource.includes(helper.helper_id);
+    assert.equal(source, true, `${helper.helper_id} must be resolved from the helper catalog by id`);
+  }
+});
+
+test('Hermes native proof client defaults to the package module bridge', () => {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-module-entry-'));
+  const argvFile = path.join(tempDir, 'argv.json');
+  const mockPython = path.join(tempDir, 'mock-python.mjs');
+  writeFileSync(mockPython, [
+    '#!/usr/bin/env node',
+    "import { readFileSync, writeFileSync } from 'node:fs';",
+    `writeFileSync(${JSON.stringify(argvFile)}, JSON.stringify(process.argv.slice(2)));`,
+    'const request = JSON.parse(readFileSync(process.argv.at(-1), "utf-8"));',
+    'if (request.action !== "probe") throw new Error("expected probe request");',
+    'process.stdout.write(JSON.stringify({ ok: true, contract: { model: "mock-model" } }) + "\\n");',
+  ].join('\n'), { mode: 0o755 });
+
+  const probe = probeHermesNativeProof({
+    cwd: path.resolve('.'),
+    env: {
+      ...process.env,
+      REDCUBE_HERMES_NATIVE_PYTHON_COMMAND: mockPython,
+      REDCUBE_HERMES_NATIVE_BRIDGE_COMMAND: '',
+    },
+  });
+
+  assert.equal(probe.ok, true, probe.blocking_reason);
+  const argv = JSON.parse(readFileSync(argvFile, 'utf-8'));
+  assert.deepEqual(argv.slice(0, 2), ['-m', 'redcube_ai.hermes.native_proof_bridge']);
+  assert.equal(path.basename(argv.at(-1)), 'request.json');
 });
 
 test('Native PPT helper routes stay tied to the engine contract and review/export gates', () => {

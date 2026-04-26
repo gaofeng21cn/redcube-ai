@@ -380,7 +380,9 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     page_count_match: boolean;
     real_conversion_invocation: {
       tool: string;
-      script: 'packages/redcube-runtime/scripts/ppt_deck_export.py' | 'packages/redcube-runtime/scripts/ppt_deck_native.py';
+      helper_id: string;
+      package_module: string | null;
+      compatibility_script: string | null;
       command: string[];
     };
   };

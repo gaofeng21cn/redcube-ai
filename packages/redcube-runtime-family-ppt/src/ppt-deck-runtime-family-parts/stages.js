@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
+import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 
 import { createPptDeckRenderStageParts } from './render.js';
 import { createPptDeckNativePptStageParts } from './native-ppt.js';
@@ -59,7 +59,6 @@ export function createPptDeckStageParts(deps) {
     renderHtmlSummaryOutputContract,
     requireText,
     resolvePromptPackAsset,
-    resolveRedCubePythonCommand,
     safeArray,
     safeFileMtimeMs,
     safeText,
@@ -100,6 +99,7 @@ export function createPptDeckStageParts(deps) {
   const exportParts = createPptDeckExportStageParts({
     ...deps,
     PYTHON_EXPORT,
+    PYTHON_NATIVE,
     isNativePptArtifact,
     readCurrentVisualArtifact,
   });
@@ -335,19 +335,12 @@ export function createPptDeckStageParts(deps) {
     }
   }
 
-  function runPython(script, args) {
-    if (!(mainExistsSync || existsSync)(script)) {
-      throw new Error(`Missing ppt_deck python helper: ${script}`);
-    }
-    const pythonCommand = resolveRedCubePythonCommand();
-    const result = spawnSync(pythonCommand.command, [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
-    if (result.status !== 0) {
-      throw new Error((result.stderr || result.stdout || `ppt_deck python helper failed: ${script}`).trim());
-    }
-    return {
-      command: pythonCommand.command,
-      payload: JSON.parse(result.stdout),
-    };
+  function runPython(helper, args) {
+    return runRedCubePythonHelper(helper, args, {
+      fileExists: mainExistsSync || existsSync,
+      missingMessagePrefix: 'Missing ppt_deck python helper',
+      failureMessagePrefix: 'ppt_deck python helper failed',
+    });
   }
 
   function cachedMechanicalReview(priorArtifact, hash) {
@@ -1151,6 +1144,13 @@ export function createPptDeckStageParts(deps) {
       mechanical_review: {
         review_model: 'python_screenshot_layout_checks',
         ...mechanicalCacheMetadata(cacheStatus, reviewHash),
+        python_helper_invocation: python.package_module
+          ? {
+              helper_id: python.helper_id,
+              package_module: python.package_module,
+              command: [...python.argv, ...args],
+            }
+          : null,
         checks: summarizeMechanicalChecksFromSlides(mechanicalSlideReviews),
         metrics: {
           ...(reviewPayload.metrics || {}),

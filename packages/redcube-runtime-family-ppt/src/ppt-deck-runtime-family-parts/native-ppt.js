@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 
 export function createPptDeckNativePptStageParts(deps) {
   const {
@@ -17,7 +17,6 @@ export function createPptDeckNativePptStageParts(deps) {
     existsSync,
     readCurrentHtmlArtifact,
     readStageArtifact,
-    resolveRedCubePythonCommand,
     safeArray,
     safeFileMtimeMs,
     safeText,
@@ -36,19 +35,12 @@ export function createPptDeckNativePptStageParts(deps) {
     return cachedNativeEngineContract;
   }
 
-  function runPython(script, args) {
-    if (!existsSync(script)) {
-      throw new Error(`Missing ppt_deck python helper: ${script}`);
-    }
-    const pythonCommand = resolveRedCubePythonCommand();
-    const result = spawnSync(pythonCommand.command, [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
-    if (result.status !== 0) {
-      throw new Error((result.stderr || result.stdout || `ppt_deck python helper failed: ${script}`).trim());
-    }
-    return {
-      command: pythonCommand.command,
-      payload: JSON.parse(result.stdout),
-    };
+  function runPython(helper, args) {
+    return runRedCubePythonHelper(helper, args, {
+      fileExists: existsSync,
+      missingMessagePrefix: 'Missing ppt_deck python helper',
+      failureMessagePrefix: 'ppt_deck python helper failed',
+    });
   }
 
   function currentNativePptStageId(contract, deliverablePaths) {
@@ -273,6 +265,13 @@ export function createPptDeckNativePptStageParts(deps) {
         screenshot_dimensions: payload.screenshot_dimensions || null,
         preview_screenshots: safeArray(payload.preview_screenshots),
         slides: safeArray(payload.slides),
+        python_helper_invocation: python.package_module
+          ? {
+              helper_id: python.helper_id,
+              package_module: python.package_module,
+              command: [...python.argv, '--input-json', paths.inputFile],
+            }
+          : null,
         creative_sources: {
           pptx_materialization: creativeSourceStamp({
             route,

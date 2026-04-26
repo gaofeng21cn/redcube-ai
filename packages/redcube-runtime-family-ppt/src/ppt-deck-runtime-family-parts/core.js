@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   existsSync,
@@ -16,6 +15,7 @@ import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
+  resolvePythonNativeHelper,
 } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
@@ -67,9 +67,9 @@ import { createPptDeckCoreHelpers } from './core-helpers.js';
 export function createPptDeckRuntimeCore() {
   const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
   const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
-  const PYTHON_REVIEW = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_review.py');
-  const PYTHON_EXPORT = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_export.py');
-  const PYTHON_NATIVE = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_native.py');
+  const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
+  const PYTHON_EXPORT = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_export');
+  const PYTHON_NATIVE = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_native');
   const NATIVE_PPT_ENGINE_CONTRACT = path.join(REPO_ROOT, 'contracts/runtime-program/ppt-native-python-engine-contract.json');
   const PROMPT_PACK = Object.freeze({
     storyline: 'prompts/ppt_deck/storyline.md',

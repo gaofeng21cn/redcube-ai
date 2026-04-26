@@ -1,13 +1,17 @@
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, readFileSync } from 'node:fs';
+import {
+  pythonHelperReference,
+  runRedCubePythonHelper,
+} from '@redcube/runtime-protocol';
 
 export function createPptDeckExportStageParts(deps) {
   const {
     CANVAS,
     CODEX_DEFAULT_ADAPTER,
     PYTHON_EXPORT,
+    PYTHON_NATIVE,
     attachCommon,
     ensureDir,
     existsSync: mainExistsSync,
@@ -16,25 +20,17 @@ export function createPptDeckExportStageParts(deps) {
     isNativePptArtifact,
     readCurrentVisualArtifact,
     readStageArtifact,
-    resolveRedCubePythonCommand,
     safeArray,
     safeText,
     writeText,
   } = deps;
 
-  function runPython(script, args) {
-    if (!(mainExistsSync || existsSync)(script)) {
-      throw new Error(`Missing ppt_deck python helper: ${script}`);
-    }
-    const pythonCommand = resolveRedCubePythonCommand();
-    const result = spawnSync(pythonCommand.command, [script, ...args], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
-    if (result.status !== 0) {
-      throw new Error((result.stderr || result.stdout || `ppt_deck python helper failed: ${script}`).trim());
-    }
-    return {
-      command: pythonCommand.command,
-      payload: JSON.parse(result.stdout),
-    };
+  function runPython(helper, args) {
+    return runRedCubePythonHelper(helper, args, {
+      fileExists: mainExistsSync || existsSync,
+      missingMessagePrefix: 'Missing ppt_deck python helper',
+      failureMessagePrefix: 'ppt_deck python helper failed',
+    });
   }
 
   function hashFileIfPresent(hash, file) {
@@ -183,7 +179,7 @@ export function createPptDeckExportStageParts(deps) {
         preview_metrics: previewMetrics,
         real_conversion_invocation: {
           tool: 'native_pptx_copy',
-          script: 'packages/redcube-runtime/scripts/ppt_deck_native.py',
+          ...pythonHelperReference(PYTHON_NATIVE),
           command: ['--source-pptx', sourcePptx, '--output-pptx', pptxFile],
         },
       },
@@ -265,8 +261,10 @@ export function createPptDeckExportStageParts(deps) {
         preview_metrics: previewMetrics,
         real_conversion_invocation: {
           tool: python.command,
-          script: 'packages/redcube-runtime/scripts/ppt_deck_export.py',
-          command: ['--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile],
+          helper_id: python.helper_id,
+          package_module: python.package_module,
+          compatibility_script: python.compatibility_script,
+          command: [...python.argv, '--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile],
         },
       },
       artifact_refs: [stableViewHtmlFile, pptxPath, pdfPath, notesFile].filter(Boolean),

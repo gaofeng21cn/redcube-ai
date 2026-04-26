@@ -5,9 +5,13 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import {
+  buildPythonHelperEnv,
+  resolvePythonNativeHelper,
+} from '@redcube/runtime-protocol';
+
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
-const DEFAULT_BRIDGE_SCRIPT = path.resolve(MODULE_DIR, '../scripts/hermes_native_proof_bridge.py');
 const DEFAULT_PROBE_TIMEOUT_MS = 60000;
 const DEFAULT_GENERATION_TIMEOUT_MS = 600000;
 
@@ -18,6 +22,9 @@ const HERMES_NATIVE_PROOF_RUNTIME_SURFACE = 'hermes_native_full_agent_loop';
 const HERMES_NATIVE_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
 const HERMES_NATIVE_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
 const HERMES_NATIVE_FREEZE_ORIGIN = 'Hermes.Proof.A';
+
+const DEFAULT_BRIDGE_HELPER = resolvePythonNativeHelper(REPO_ROOT, 'hermes_native_proof_bridge');
+const DEFAULT_BRIDGE_MODULE = DEFAULT_BRIDGE_HELPER.packageModule;
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -46,10 +53,16 @@ function parseCommand(value, fallback) {
 function resolveBridgeCommand(env = process.env) {
   const explicitBridge = safeText(env?.[HERMES_NATIVE_BRIDGE_COMMAND_ENV]);
   if (explicitBridge) {
-    return parseCommand(explicitBridge, []);
+    return {
+      argv: parseCommand(explicitBridge, []),
+      env,
+    };
   }
   const pythonCommand = safeText(env?.[HERMES_NATIVE_PYTHON_COMMAND_ENV], 'python3');
-  return [pythonCommand, DEFAULT_BRIDGE_SCRIPT];
+  return {
+    argv: [pythonCommand, '-m', DEFAULT_BRIDGE_MODULE],
+    env: buildPythonHelperEnv(DEFAULT_BRIDGE_HELPER.pythonRoot, env),
+  };
 }
 
 function readPromptGuidance(relativePath) {
@@ -177,9 +190,9 @@ function runBridgeRequest(
   const command = resolveBridgeCommand(env);
 
   try {
-    const completed = spawnSync(command[0], [...command.slice(1), requestFile], {
+    const completed = spawnSync(command.argv[0], [...command.argv.slice(1), requestFile], {
       cwd,
-      env,
+      env: command.env,
       encoding: 'utf-8',
       timeout: timeoutMs,
       maxBuffer: 20 * 1024 * 1024,

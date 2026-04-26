@@ -10,6 +10,51 @@ export interface ResolvedRedCubePythonCommand {
   source: 'env' | 'python3_with_playwright' | 'managed_python_runtime';
 }
 
+export interface RedCubePythonNativeHelper {
+  helperId: string;
+  packageModule: string;
+  pythonRoot: string;
+  compatibilityScript: string | null;
+  catalogFile: string;
+}
+
+export interface ResolveRedCubePythonNativeHelperOptions {
+  catalogFile?: string;
+}
+
+export interface RedCubePythonHelperInvocation {
+  helperId: string;
+  packageModule: string | null;
+  compatibilityScript: string | null;
+  argv: string[];
+  env: Record<string, string | undefined>;
+  label: string;
+}
+
+export interface RedCubePythonHelperReference {
+  helper_id: string;
+  package_module: string | null;
+  compatibility_script: string | null;
+}
+
+export interface RunRedCubePythonHelperOptions {
+  env?: Record<string, string | undefined>;
+  spawnSyncImpl?: typeof spawnSync;
+  fileExists?: (file: string) => boolean;
+  maxBuffer?: number;
+  missingMessagePrefix?: string;
+  failureMessagePrefix?: string;
+}
+
+export interface RedCubePythonHelperRunResult {
+  command: string;
+  helper_id: string;
+  package_module: string | null;
+  compatibility_script: string | null;
+  argv: string[];
+  payload: unknown;
+}
+
 export interface WorkspaceContract {
   workspaceRoot: string;
   workspaceFile: string;

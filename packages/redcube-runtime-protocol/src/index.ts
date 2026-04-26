@@ -28,6 +28,13 @@ import {
   REDCUBE_PYTHON_COMMAND_ENV as REDCUBE_PYTHON_COMMAND_ENV_JS,
   resolveRedCubePythonCommand as resolveRedCubePythonCommandJs,
 } from './python-command.js';
+import {
+  buildPythonHelperEnv as buildPythonHelperEnvTs,
+  pythonHelperReference as pythonHelperReferenceTs,
+  resolvePythonHelperInvocation as resolvePythonHelperInvocationTs,
+  resolvePythonNativeHelper as resolvePythonNativeHelperTs,
+  runRedCubePythonHelper as runRedCubePythonHelperTs,
+} from './python-native-helper.js';
 
 import type {
   BuildSourceTruthConsumptionSummaryOptions,
@@ -53,6 +60,12 @@ import type {
   RuntimeErrorKind,
   ResolvedRedCubePythonCommand,
   ResolveRedCubePythonCommandOptions,
+  RedCubePythonHelperInvocation,
+  RedCubePythonHelperReference,
+  RedCubePythonHelperRunResult,
+  RedCubePythonNativeHelper,
+  ResolveRedCubePythonNativeHelperOptions,
+  RunRedCubePythonHelperOptions,
   SourceArtifactPaths,
   SourceReadinessSummary,
   SourceAugmentationRequestContract,
@@ -150,6 +163,42 @@ export function resolveRedCubePythonCommand(
   return resolveRedCubePythonCommandJs(options) as ResolvedRedCubePythonCommand;
 }
 
+export function buildPythonHelperEnv(
+  pythonRoot: string,
+  env: Record<string, string | undefined> = process.env,
+): Record<string, string | undefined> {
+  return buildPythonHelperEnvTs(pythonRoot, env);
+}
+
+export function resolvePythonNativeHelper(
+  repoRoot: string,
+  helperId: string,
+  options: ResolveRedCubePythonNativeHelperOptions = {},
+): RedCubePythonNativeHelper {
+  return resolvePythonNativeHelperTs(repoRoot, helperId, options);
+}
+
+export function resolvePythonHelperInvocation(
+  helper: RedCubePythonNativeHelper | string,
+  options: RunRedCubePythonHelperOptions = {},
+): RedCubePythonHelperInvocation {
+  return resolvePythonHelperInvocationTs(helper, options);
+}
+
+export function pythonHelperReference(
+  helper: RedCubePythonNativeHelper | string,
+): RedCubePythonHelperReference | null {
+  return pythonHelperReferenceTs(helper);
+}
+
+export function runRedCubePythonHelper(
+  helper: RedCubePythonNativeHelper | string,
+  args: string[],
+  options: RunRedCubePythonHelperOptions = {},
+): RedCubePythonHelperRunResult {
+  return runRedCubePythonHelperTs(helper, args, options);
+}
+
 export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 };
@@ -178,6 +227,12 @@ export type {
   RuntimeErrorKind,
   ResolvedRedCubePythonCommand,
   ResolveRedCubePythonCommandOptions,
+  RedCubePythonHelperInvocation,
+  RedCubePythonHelperReference,
+  RedCubePythonHelperRunResult,
+  RedCubePythonNativeHelper,
+  ResolveRedCubePythonNativeHelperOptions,
+  RunRedCubePythonHelperOptions,
   SourceArtifactPaths,
   SourceReadinessSummary,
   SourceAugmentationRequestContract,

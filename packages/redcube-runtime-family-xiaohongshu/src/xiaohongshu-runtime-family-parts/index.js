@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
 
 import {
   generateStructuredArtifactBatchViaCodexCli,
@@ -10,7 +9,8 @@ import {
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
-  resolveRedCubePythonCommand,
+  resolvePythonNativeHelper,
+  runRedCubePythonHelper,
 } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
@@ -30,7 +30,8 @@ import { createXiaohongshuReviewParts } from './review.js';
 import { createXiaohongshuDeliveryParts } from './delivery.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const PYTHON_REVIEW = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_review.py');
+const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
+const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
 const CANVAS = { ratio: '3:4', width: 448, height: 597 };
 
 const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
@@ -255,17 +256,12 @@ function syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths) {
   return shared.syncCandidateHtml(shared.getDeliverableViewSurfacePaths(deliverablePaths), candidateHtmlFile);
 }
 
-function runPython(script, args) {
-  if (!existsSync(script)) throw new Error(`Missing python helper: ${script}`);
-  const pythonCommand = resolveRedCubePythonCommand();
-  const result = spawnSync(pythonCommand.command, [script, ...args], {
-    encoding: 'utf-8',
-    maxBuffer: 16 * 1024 * 1024,
-  });
-  if (result.status !== 0) {
-    throw new Error((result.stderr || result.stdout || `python helper failed: ${script}`).trim());
-  }
-  return JSON.parse(result.stdout);
+function runPython(helper, args) {
+  return runRedCubePythonHelper(helper, args, {
+    fileExists: existsSync,
+    missingMessagePrefix: 'Missing python helper',
+    failureMessagePrefix: 'python helper failed',
+  }).payload;
 }
 
 function computeBaselineReview(workspaceRoot, topicId, baselineDeliverableId, slideReviews) {
