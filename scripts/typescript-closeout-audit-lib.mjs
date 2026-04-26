@@ -221,6 +221,7 @@ const LANGUAGE_TARGET = Object.freeze({
 });
 
 const TEST_JS_SUPPORT_ALLOWLIST = Object.freeze([
+  'tests/cli-v2-smoke-cases/cli-summary-output.test.js',
   'tests/cli-v2-smoke-cases/review-and-root-resolution.test.js',
   'tests/cli-v2-smoke-cases/runtime-and-product-entry.test.js',
   'tests/cli-v2-smoke-cases/workspace-and-deliverables.test.js',

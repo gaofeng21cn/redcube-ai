@@ -95,6 +95,75 @@ function candidateCountForRoute({ route, candidateCount }) {
     : 1;
 }
 
+function compactArray(value) {
+  return Array.isArray(value)
+    ? Array.from(new Set(value.map((item) => String(item || '').trim()).filter(Boolean))).sort()
+    : [];
+}
+
+function numberOrNull(value) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function generationRuntimeFromArtifact(artifact = {}) {
+  return artifact?.creative_execution?.generation_runtime
+    || artifact?.review_execution?.generation_runtime
+    || artifact?.render_execution?.generation_runtime
+    || artifact?.html_bundle?.render_execution?.generation_runtime
+    || artifact?.generation_runtime
+    || null;
+}
+
+function buildRoutePromptTelemetry(routeResult = {}) {
+  const artifact = routeResult?.artifact || {};
+  const generationRuntime = generationRuntimeFromArtifact(artifact) || {};
+  const reviewExecution = artifact?.review_execution || {};
+  const renderExecution = artifact?.render_execution || artifact?.html_bundle?.render_execution || {};
+  const targetedRerun = artifact?.targeted_rerun || {};
+  const slideScope = {
+    ...(generationRuntime?.slide_scope || {}),
+    target_slide_ids: compactArray([
+      ...compactArray(generationRuntime?.slide_scope?.target_slide_ids),
+      ...compactArray(generationRuntime?.target_slide_scope?.target_slide_ids),
+      ...compactArray(reviewExecution?.target_slide_ids),
+      ...compactArray(renderExecution?.targeted_slide_ids),
+      ...compactArray(targetedRerun?.target_slide_ids),
+    ]),
+    reviewed_slide_ids: compactArray([
+      ...compactArray(generationRuntime?.slide_scope?.reviewed_slide_ids),
+      ...compactArray(reviewExecution?.reviewed_slide_ids),
+    ]),
+    reused_slide_ids: compactArray([
+      ...compactArray(generationRuntime?.slide_scope?.reused_slide_ids),
+      ...compactArray(reviewExecution?.reused_slide_ids),
+      ...compactArray(renderExecution?.reused_slide_ids),
+      ...compactArray(targetedRerun?.reused_slide_ids),
+    ]),
+  };
+  slideScope.slide_ids = compactArray([
+    ...compactArray(generationRuntime?.slide_scope?.slide_ids),
+    ...slideScope.target_slide_ids,
+    ...slideScope.reviewed_slide_ids,
+    ...slideScope.reused_slide_ids,
+  ]);
+
+  return {
+    prompt_pack_file: String(generationRuntime?.prompt_pack_file || artifact?.prompt_pack?.relative_path || '').trim() || null,
+    prompt_files: compactArray(generationRuntime?.prompt_files),
+    prompt_bytes: numberOrNull(generationRuntime?.prompt_bytes),
+    context_bytes: numberOrNull(generationRuntime?.context_bytes),
+    prompt_tokens: numberOrNull(generationRuntime?.prompt_tokens),
+    completion_tokens: numberOrNull(generationRuntime?.completion_tokens),
+    total_tokens: numberOrNull(generationRuntime?.total_tokens),
+    estimated_prompt_tokens: numberOrNull(generationRuntime?.estimated_prompt_tokens),
+    provider_usage: generationRuntime?.provider_usage || generationRuntime?.usage || null,
+    slide_scope: slideScope,
+    target_slide_scope: {
+      target_slide_ids: slideScope.target_slide_ids,
+    },
+  };
+}
+
 export async function runDeliverableRoute({
   workspaceRoot,
   overlay,
@@ -202,6 +271,7 @@ export async function runDeliverableRoute({
       }],
       artifactRefs: routeResult.artifact_refs,
       executor,
+      telemetry: buildRoutePromptTelemetry(routeResult),
     });
 
     appendHermesEvent(workspaceRoot, completedRun.run_id, {

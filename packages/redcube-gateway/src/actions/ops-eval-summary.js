@@ -35,8 +35,17 @@ export function buildRunTelemetrySummary(source = {}) {
     started_at: toNullableString(telemetry.started_at || source?.started_at),
     finished_at: toNullableString(telemetry.finished_at || source?.finished_at),
     latency_ms: toNullableNumber(telemetry.latency_ms),
+    prompt_pack_file: toNullableString(telemetry.prompt_pack_file),
+    prompt_files: toStringArray(telemetry.prompt_files),
+    prompt_bytes: toNullableNumber(telemetry.prompt_bytes),
+    context_bytes: toNullableNumber(telemetry.context_bytes),
     prompt_tokens: toNullableNumber(telemetry.prompt_tokens),
     completion_tokens: toNullableNumber(telemetry.completion_tokens),
+    total_tokens: toNullableNumber(telemetry.total_tokens),
+    estimated_prompt_tokens: toNullableNumber(telemetry.estimated_prompt_tokens),
+    provider_usage: telemetry.provider_usage || null,
+    slide_scope: telemetry.slide_scope || null,
+    target_slide_scope: telemetry.target_slide_scope || null,
     estimated_cost: toNullableNumber(telemetry.estimated_cost),
   };
 }

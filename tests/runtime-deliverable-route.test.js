@@ -221,6 +221,14 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
     assert.equal(stored.run_telemetry.run_id, result.run.run_id);
     assert.equal(stored.run_telemetry.route, 'storyline');
     assert.equal(stored.run_telemetry.executor_kind, 'host_agent');
+    assert.equal(stored.run_telemetry.prompt_pack_file, 'prompts/ppt_deck/storyline.md');
+    assert.equal(Number.isInteger(stored.run_telemetry.prompt_bytes), true);
+    assert.equal(stored.run_telemetry.prompt_bytes > 0, true);
+    assert.equal(Number.isInteger(stored.run_telemetry.context_bytes), true);
+    assert.equal(stored.run_telemetry.context_bytes > 0, true);
+    assert.deepEqual(stored.run_telemetry.prompt_files, ['prompts/ppt_deck/storyline.md']);
+    assert.deepEqual(stored.run_telemetry.slide_scope.target_slide_ids, []);
+    assert.equal(stored.run.telemetry.prompt_pack_file, 'prompts/ppt_deck/storyline.md');
     assert.equal(stored.error_taxonomy.error_kind, null);
     assert.equal(stored.rerun_analytics.rerun_count, 0);
     assert.equal(stored.cost_summary.executor_identity, 'codex_native_host_agent');

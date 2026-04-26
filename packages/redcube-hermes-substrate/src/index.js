@@ -457,6 +457,7 @@ export function completeHermesRun({
   stageResults,
   artifactRefs,
   executor,
+  telemetry = {},
 }) {
   const run = loadHermesRun({ workspaceRoot, runId });
   const completedRun = {
@@ -469,6 +470,10 @@ export function completeHermesRun({
     error_kind: null,
     runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
     executor: executor || run?.executor,
+    telemetry: {
+      ...(run?.telemetry || {}),
+      ...(telemetry && typeof telemetry === 'object' ? telemetry : {}),
+    },
   };
   completedRun.telemetry = buildRunTelemetry(
     completedRun,
@@ -488,6 +493,7 @@ export function failHermesRun({
   error,
   errorKind = 'execution_error',
   executor,
+  telemetry = {},
 }) {
   const run = loadHermesRun({ workspaceRoot, runId });
   const failedRun = {
@@ -499,6 +505,10 @@ export function failHermesRun({
     runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
     executor: executor || run?.executor,
     error: normalizeError(error),
+    telemetry: {
+      ...(run?.telemetry || {}),
+      ...(telemetry && typeof telemetry === 'object' ? telemetry : {}),
+    },
   };
   failedRun.telemetry = buildRunTelemetry(
     failedRun,
