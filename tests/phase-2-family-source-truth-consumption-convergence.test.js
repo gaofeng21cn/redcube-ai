@@ -42,9 +42,9 @@ test('phase-2 family source-truth consumption convergence stays absorbed provena
 
 test('phase-2 family source-truth consumption convergence freezes shared source_truth_contract and guarded poster boundary without promoting controller', () => {
   const contract = readJson(TRANCHE_CONTRACT);
-  const pptProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
-  const xhsContracts = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.js');
-  const posterContracts = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.js');
+  const pptProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.ts');
+  const xhsContracts = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.ts');
+  const posterContracts = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.ts');
 
   assert.equal(contract.object_boundary.in_scope.includes('ppt_deck, xiaohongshu, and guarded poster_onepager expose one shared source_truth_contract surface inside hydrated deliverable contracts'), true);
   assert.equal(contract.source_truth_contract_surface.route_gate_rule, 'authoritative_fail_closed_in_audit_and_runtime_watch');

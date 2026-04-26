@@ -9,7 +9,7 @@ import {
 } from '../packages/redcube-gateway/src/index.js';
 import {
   persistReviewStatePatch,
-} from '../packages/redcube-governance/src/index.js';
+} from '@redcube/governance';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

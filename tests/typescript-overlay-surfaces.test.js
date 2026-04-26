@@ -7,12 +7,9 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
-function readText(file) {
-  return readFileSync(path.resolve(file), 'utf-8');
-}
-
-function assertTsBackedCompatShell(file, target) {
-  assert.equal(readText(file).trim(), `export * from '${target}';`);
+function assertTsOnlySource(file) {
+  assert.equal(existsSync(path.resolve(file)), true, file);
+  assert.equal(existsSync(path.resolve(file.replace(/\.ts$/, '.js'))), false, file);
 }
 
 test('P17 slice 3: overlay-core exposes a TypeScript entrypoint and typed registry contracts', () => {
@@ -40,9 +37,9 @@ test('P17 slice 3: overlay-core exposes a TypeScript entrypoint and typed regist
   assert.match(entry, /hydrateDeliverableContract/);
   assert.match(entry, /createOverlayRegistry/);
   assert.doesNotMatch(entry, /\bJs\b/);
-  assertTsBackedCompatShell('packages/redcube-overlay-core/src/index.js', './index.ts');
-  assertTsBackedCompatShell('packages/redcube-overlay-core/src/contracts.js', './contracts.ts');
-  assertTsBackedCompatShell('packages/redcube-overlay-core/src/registry.js', './registry.ts');
+  assertTsOnlySource('packages/redcube-overlay-core/src/index.ts');
+  assertTsOnlySource('packages/redcube-overlay-core/src/contracts.ts');
+  assertTsOnlySource('packages/redcube-overlay-core/src/registry.ts');
 
   assert.match(types, /interface OverlayDefinition/);
   assert.match(types, /interface OverlayRegistry/);
@@ -72,7 +69,7 @@ test('P17 slice 3: overlay-registry exposes a TypeScript entrypoint and typed de
   assert.match(entry, /getDefaultOverlayCatalog/);
   assert.match(entry, /loadDefaultOverlayEntries/);
   assert.doesNotMatch(entry, /from '\.\/index\.js'/);
-  assertTsBackedCompatShell('packages/redcube-overlay-registry/src/index.js', './index.ts');
+  assertTsOnlySource('packages/redcube-overlay-registry/src/index.ts');
 
   assert.match(types, /interface DefaultOverlayModuleSpec/);
   assert.match(types, /interface OverlayCatalogSurface/);
@@ -84,6 +81,9 @@ test('P17 slice 4: overlay-xiaohongshu exposes a TypeScript entrypoint and typed
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/tsconfig.json')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/gates.js')), false);
+  assertTsOnlySource('packages/redcube-overlay-xiaohongshu/src/index.ts');
+  assertTsOnlySource('packages/redcube-overlay-xiaohongshu/src/contracts.ts');
+  assertTsOnlySource('packages/redcube-overlay-xiaohongshu/src/surface.ts');
 
   const pkg = readJson('packages/redcube-overlay-xiaohongshu/package.json');
   const rootTsconfig = readJson('tsconfig.json');
@@ -119,6 +119,10 @@ test('P17 slice 5: overlay-ppt exposes a TypeScript entrypoint and typed overlay
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/tsconfig.json')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/gates.js')), false);
+  assertTsOnlySource('packages/redcube-overlay-ppt/src/index.ts');
+  assertTsOnlySource('packages/redcube-overlay-ppt/src/contracts.ts');
+  assertTsOnlySource('packages/redcube-overlay-ppt/src/profiles.ts');
+  assertTsOnlySource('packages/redcube-overlay-ppt/src/surface.ts');
 
   const pkg = readJson('packages/redcube-overlay-ppt/package.json');
   const rootTsconfig = readJson('tsconfig.json');

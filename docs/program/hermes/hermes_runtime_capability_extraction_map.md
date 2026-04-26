@@ -20,7 +20,7 @@
 
 ### 3. Shared runtime topology surface
 
-- 代码面：`packages/redcube-overlay-core/src/contracts.js`、governance review/audit/watch/projection surface
+- 代码面：`packages/redcube-overlay-core/src/contracts.ts`、governance review/audit/watch/projection surface
 - Hermes 负责：统一输出 `runtime_topology`
 - 必须保持：所有 stable family 看到的是同一份 topology truth
 

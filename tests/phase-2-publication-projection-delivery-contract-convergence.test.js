@@ -44,12 +44,12 @@ test('phase-2 publication projection delivery contract convergence stays absorbe
 
 test('phase-2 publication projection delivery contract convergence freezes one hydrated delivery contract surface across the stable families', () => {
   const contract = readJson(TRANCHE_CONTRACT);
-  const pptProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
-  const xhsContracts = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.js');
-  const posterContracts = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.js');
-  const pptSurface = readImplementation('packages/redcube-overlay-ppt/src/surface.js');
-  const xhsSurface = readImplementation('packages/redcube-overlay-xiaohongshu/src/surface.js');
-  const posterSurface = readImplementation('packages/redcube-overlay-poster-onepager/src/surface.js');
+  const pptProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.ts');
+  const xhsContracts = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.ts');
+  const posterContracts = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.ts');
+  const pptSurface = readImplementation('packages/redcube-overlay-ppt/src/surface.ts');
+  const xhsSurface = readImplementation('packages/redcube-overlay-xiaohongshu/src/surface.ts');
+  const posterSurface = readImplementation('packages/redcube-overlay-poster-onepager/src/surface.ts');
   const reviewState = read('packages/redcube-governance/src/review-state.js');
 
   assert.equal(contract.delivery_contract_surface.families.ppt_deck.required_export_route, 'export_pptx');

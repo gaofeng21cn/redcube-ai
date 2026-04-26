@@ -50,9 +50,9 @@ test('poster pack shell no longer exports creative builders or compilers', () =>
 });
 
 test('overlay render contracts keep pack ids but no longer declare compiler registry wiring', () => {
-  const pptOverlay = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
-  const xhsOverlay = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.js');
-  const posterOverlay = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.js');
+  const pptOverlay = readImplementation('packages/redcube-overlay-ppt/src/profiles.ts');
+  const xhsOverlay = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.ts');
+  const posterOverlay = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.ts');
 
   assert.equal(pptOverlay.includes("compiler_module:"), false);
   assert.equal(pptOverlay.includes("compiler_export:"), false);

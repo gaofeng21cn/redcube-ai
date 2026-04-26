@@ -9,7 +9,7 @@ import {
   bootstrapPrivateProfile,
   exportPrivateProfile,
   installPrivateProfile,
-} from '../packages/redcube-config/src/private-profile.js';
+} from '@redcube/redcube-config/private-profile';
 
 function write(filePath, content = '') {
   mkdirSync(path.dirname(filePath), { recursive: true });

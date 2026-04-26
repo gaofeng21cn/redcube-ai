@@ -9,10 +9,11 @@ test('reference-os exposes a TypeScript contract entrypoint and types file', () 
 
   const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-reference-os/package.json'), 'utf-8'));
   const entry = readFileSync(path.resolve('packages/redcube-reference-os/src/index.ts'), 'utf-8');
-  const runtimeEntry = readFileSync(path.resolve('packages/redcube-reference-os/src/index.js'), 'utf-8');
 
   assert.equal(pkg.types, './dist/index.d.ts');
-  assert.equal(runtimeEntry.trim(), "export * from './index.ts';");
+  assert.equal(existsSync(path.resolve('packages/redcube-reference-os/src/index.js')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-reference-os/src/reference-samples.js')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-reference-os/src/relative-quality.js')), false);
   assert.match(entry, /buildReferenceQualityReport/);
   assert.match(entry, /buildReferencePromotionReport/);
   assert.match(entry, /buildReferenceReplacementReport/);

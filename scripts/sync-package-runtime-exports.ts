@@ -31,9 +31,6 @@ const contract = readJson<TypeScriptPackageBuildContract>(
 
 const syncedTargets: string[] = [];
 const tsBackedTargets: string[] = [];
-const TYPESCRIPT_BUILT_RUNTIME_EXPORTS = new Set([
-  'packages/redcube-runtime-protocol|./dist/index.js',
-]);
 
 function isTsBackedCompatibilityShell(sourceText: string, target: string): boolean {
   const sourceStem = target
@@ -56,19 +53,19 @@ for (const entry of contract.compiled_dist_runtime_exports) {
     const sourceTypes = sourceRuntime.replace(/\.js$/, '.ts');
     const distRuntime = path.resolve(entry.directory, exportTarget.target);
 
-    if (!existsSync(sourceRuntime)) {
-      throw new Error(`${entry.package_name} declares ${exportTarget.target} but has no ${sourceRuntime}`);
-    }
     if (!existsSync(sourceTypes)) {
       throw new Error(`${entry.package_name} declares ${exportTarget.target} but has no ${sourceTypes}`);
     }
+    if (!existsSync(sourceRuntime)) {
+      if (!existsSync(distRuntime)) {
+        throw new Error(`${entry.package_name} TypeScript-backed export did not build ${exportTarget.target}`);
+      }
+      tsBackedTargets.push(path.relative(process.cwd(), distRuntime).split(path.sep).join('/'));
+      continue;
+    }
 
     const sourceText = readFileSync(sourceRuntime, 'utf-8');
-    const exportKey = `${entry.directory}|${exportTarget.target}`;
-    if (
-      TYPESCRIPT_BUILT_RUNTIME_EXPORTS.has(exportKey)
-      || isTsBackedCompatibilityShell(sourceText, exportTarget.target)
-    ) {
+    if (isTsBackedCompatibilityShell(sourceText, exportTarget.target)) {
       if (!existsSync(distRuntime)) {
         throw new Error(`${entry.package_name} TypeScript-backed export did not build ${exportTarget.target}`);
       }

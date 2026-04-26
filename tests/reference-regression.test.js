@@ -15,9 +15,9 @@ import {
   summarizeReferenceCoverage,
   validateReferenceSampleMeta,
 } from '../packages/redcube-runtime/src/index.js';
-import { createOverlayRegistry } from '../packages/redcube-overlay-core/src/index.js';
-import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
-import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
+import { createOverlayRegistry } from '@redcube/overlay-core';
+import { pptDeckOverlay } from '@redcube/overlay-ppt';
+import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 
 function readJson(file) {

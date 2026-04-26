@@ -17,14 +17,14 @@
       "current_surfaces": [
         "packages/redcube-runtime/src/executors.js",
         "packages/redcube-runtime/src/managed-deliverable.js",
-        "packages/redcube-runtime-protocol/src/managed-runs.js"
+        "packages/redcube-runtime-protocol/src/managed-runs.ts"
       ],
       "required_truth": "Hermes is the product runtime owner; Codex-local host-agent is only the transition deployment host"
     },
     {
       "capability": "runtime_topology_surface",
       "current_surfaces": [
-        "packages/redcube-overlay-core/src/contracts.js",
+        "packages/redcube-overlay-core/src/contracts.ts",
         "packages/redcube-governance/src/review-state.js",
         "packages/redcube-governance/src/reviews.js"
       ],

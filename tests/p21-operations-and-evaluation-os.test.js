@@ -21,7 +21,7 @@ function readJson(file) {
 
 test('P21.A red: run record contract must freeze telemetry, error taxonomy, and rerun lineage surfaces', () => {
   const runtimeProtocolTypes = read('packages/redcube-runtime-protocol/src/types.ts');
-  const runRecordFactory = readImplementation('packages/redcube-runtime-protocol/src/runs.js');
+  const runRecordFactory = readImplementation('packages/redcube-runtime-protocol/src/runs.ts');
   const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
   const hermesSubstrate = read('packages/redcube-hermes-substrate/src/index.js');
 

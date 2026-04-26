@@ -9,7 +9,7 @@ import {
   completeHermesRun,
   failHermesRun,
   startHermesRun,
-} from '../packages/redcube-hermes-substrate/src/index.js';
+} from '@redcube/hermes-substrate';
 
 function tempWorkspaceRoot() {
   return mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-topology-'));

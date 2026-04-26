@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 
-import { materializeScreenshotCaptureStore } from '../packages/redcube-runtime-protocol/src/screenshot-capture-store.js';
+import { materializeScreenshotCaptureStore } from '@redcube/runtime-protocol';
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/review.js';
 

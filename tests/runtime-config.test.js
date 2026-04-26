@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 
-import { loadRuntimeConfig } from '../packages/redcube-config/src/index.js';
+import { loadRuntimeConfig } from '@redcube/redcube-config';
 
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });

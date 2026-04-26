@@ -31,7 +31,7 @@
   - 在写完 canonical quartet 后写入 `source-readiness-pack.json`
 - Modify: `packages/redcube-runtime/src/shared-source-truth.js`
   - 把 `source_readiness_pack` 纳入 shared truth 读取面
-- Modify: `packages/redcube-runtime-protocol/src/source-truth.js`
+- Modify: `packages/redcube-runtime-protocol/src/source-truth.ts`
   - 增加 `sourceReadinessPackFile`
 - Modify: `packages/redcube-runtime-protocol/src/types.ts`
   - 扩充 `SourceArtifactPaths`
@@ -69,7 +69,7 @@
 - Create: `packages/redcube-runtime/src/source-readiness-pack.js`
 - Modify: `packages/redcube-runtime/src/source-intake.js`
 - Modify: `packages/redcube-runtime/src/shared-source-truth.js`
-- Modify: `packages/redcube-runtime-protocol/src/source-truth.js`
+- Modify: `packages/redcube-runtime-protocol/src/source-truth.ts`
 - Modify: `packages/redcube-runtime-protocol/src/types.ts`
 - Test: `tests/source-intake.test.js`
 
@@ -108,7 +108,7 @@ Expected: FAIL，报 `sourceReadinessPackFile` 不存在或 pack 断言失败。
 
 - [ ] **Step 3: 增加 canonical path 与 pack builder**
 
-在 `packages/redcube-runtime-protocol/src/source-truth.js` 增加新路径：
+在 `packages/redcube-runtime-protocol/src/source-truth.ts` 增加新路径：
 
 ```js
 export function getSourceArtifactPaths(workspaceRoot, topicId) {
@@ -249,7 +249,7 @@ Expected: PASS
 git add packages/redcube-runtime/src/source-readiness-pack.js \
   packages/redcube-runtime/src/source-intake.js \
   packages/redcube-runtime/src/shared-source-truth.js \
-  packages/redcube-runtime-protocol/src/source-truth.js \
+  packages/redcube-runtime-protocol/src/source-truth.ts \
   packages/redcube-runtime-protocol/src/types.ts \
   tests/source-intake.test.js
 git commit -m "feat: add canonical source readiness pack"

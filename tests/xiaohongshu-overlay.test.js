@@ -6,7 +6,7 @@ import {
   evaluateStorylineGate,
   buildXiaohongshuDeliverableRecord,
   hydrateXiaohongshuContract,
-} from '../packages/redcube-overlay-xiaohongshu/src/index.js';
+} from '@redcube/overlay-xiaohongshu';
 
 test('buildTopicRecord emits canonical xiaohongshu topic metadata', () => {
   const topic = buildTopicRecord({ topicId: 'topic-a', title: '甲状腺科普系列' });

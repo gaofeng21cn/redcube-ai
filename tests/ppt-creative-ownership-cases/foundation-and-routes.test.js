@@ -11,7 +11,7 @@ import {
 } from '../../packages/redcube-gateway/src/index.js';
 import {
   getPublicationProjection,
-} from '../../packages/redcube-governance/src/index.js';
+} from '../@redcube/governance';
 import {
   startMockCodexCli,
   withEnv,
@@ -197,7 +197,7 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
     read('packages/redcube-runtime/scripts/ppt_deck_review.py'),
     read('python/redcube_ai/native_helpers/ppt_deck/review.py'),
   ].join('\n');
-  const overlayProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
+  const overlayProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.ts');
 
   assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);
   assert.equal(runtime.includes("core_metaphor: safeText(seed?.storyline?.core_metaphor)"), false);

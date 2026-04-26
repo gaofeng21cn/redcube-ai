@@ -42,7 +42,6 @@ test('P20.C red: overlay registry must expose poster_onepager as the third famil
 test('P20.C red: poster_onepager onboarding packages and prompt surface must exist as machine-readable truth', () => {
   const requiredPaths = [
     'packages/redcube-overlay-poster-onepager/package.json',
-    'packages/redcube-overlay-poster-onepager/src/index.js',
     'packages/redcube-overlay-poster-onepager/src/index.ts',
     'packages/redcube-runtime-family-poster-onepager/package.json',
     'packages/redcube-runtime-family-poster-onepager/src/index.js',

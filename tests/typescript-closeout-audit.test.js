@@ -41,9 +41,6 @@ function passingQualityGates() {
 }
 
 const LEAF_TS_MIGRATION_LOCKS = {
-  'packages/redcube-config/src/index.js': 1,
-  'packages/redcube-config/src/private-profile.js': 1,
-  'packages/redcube-config/src/xiaohongshu-author-profile.js': 1,
   'packages/redcube-gateway/src/actions/doctor-workspace.js': 1,
   'packages/redcube-gateway/src/actions/execute-source-augmentation.js': 1,
   'packages/redcube-gateway/src/actions/get-deliverable.js': 1,
@@ -63,42 +60,12 @@ const LEAF_TS_MIGRATION_LOCKS = {
   'packages/redcube-gateway/src/actions/source-research.js': 1,
   'packages/redcube-gateway/src/actions/supervise-managed-run.js': 1,
   'packages/redcube-gateway/src/actions/write-source-augmentation-result.js': 1,
-  'packages/redcube-overlay-core/src/contracts.js': 1,
-  'packages/redcube-overlay-core/src/index.js': 1,
-  'packages/redcube-overlay-core/src/registry.js': 1,
-  'packages/redcube-hermes-substrate/src/hermes-native-proof-client.js': 1,
-  'packages/redcube-overlay-poster-onepager/src/contracts.js': 1,
-  'packages/redcube-overlay-poster-onepager/src/index.js': 1,
-  'packages/redcube-overlay-poster-onepager/src/surface.js': 1,
-  'packages/redcube-overlay-ppt/src/contracts.js': 1,
-  'packages/redcube-overlay-ppt/src/index.js': 1,
-  'packages/redcube-overlay-ppt/src/profiles.js': 1,
-  'packages/redcube-overlay-ppt/src/surface.js': 1,
-  'packages/redcube-overlay-registry/src/index.js': 1,
-  'packages/redcube-overlay-xiaohongshu/src/contracts.js': 1,
-  'packages/redcube-overlay-xiaohongshu/src/index.js': 1,
-  'packages/redcube-overlay-xiaohongshu/src/surface.js': 1,
-  'packages/redcube-reference-os/src/index.js': 1,
-  'packages/redcube-reference-os/src/reference-samples.js': 1,
-  'packages/redcube-reference-os/src/relative-quality.js': 1,
   'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/review-helpers.js': 1,
   'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.js': 1,
   'packages/redcube-runtime-family-registry/src/index.js': 1,
   'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js': 1,
   'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.js': 1,
   'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js': 1,
-  'packages/redcube-runtime-protocol/src/index.js': 1,
-  'packages/redcube-runtime-protocol/src/managed-runs.js': 1,
-  'packages/redcube-runtime-protocol/src/python-command.js': 1,
-  'packages/redcube-runtime-protocol/src/python-native-helper.js': 1,
-  'packages/redcube-runtime-protocol/src/runs.js': 1,
-  'packages/redcube-runtime-protocol/src/screenshot-capture-store.js': 1,
-  'packages/redcube-runtime-protocol/src/source-augmentation-contract.js': 1,
-  'packages/redcube-runtime-protocol/src/source-readiness-summary.js': 1,
-  'packages/redcube-runtime-protocol/src/source-truth.js': 1,
-  'packages/redcube-runtime-protocol/src/workspace.js': 1,
-  'packages/redcube-governance/src/governance-surface.js': 1,
-  'packages/redcube-governance/src/index.js': 1,
   'packages/redcube-runtime/src/candidate-racing.js': 1,
   'packages/redcube-runtime/src/creative-ownership.js': 1,
   'packages/redcube-runtime/src/executors.js': 1,
@@ -167,14 +134,14 @@ test('P18 closeout audit keeps JS residue explicit instead of silently drifting'
   assert.equal(audit.language_target.test_language_policy, 'new_tests_default_to_typescript');
   assert.equal(audit.language_target.script_language_policy, 'new_scripts_default_to_typescript');
   assert.equal(audit.evidence.js_residue_summary.totals.unregistered_js_file_count, 0);
-  assert.equal(audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count > 100, true);
+  assert.equal(audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count > 80, true);
   assert.equal(
     audit.evidence.js_residue_retirement_budget.actual_legacy_allowlisted_js_file_count,
     audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count,
   );
   assert.equal(audit.evidence.js_residue_retirement_budget.legacy_allowlisted_js_file_count_within_budget, true);
   assert.equal(audit.evidence.js_residue_retirement_budget.actual_js_line_count_within_budget, true);
-  assert.equal(audit.evidence.js_residue_summary.by_directory.length > 10, true);
+  assert.equal(audit.evidence.js_residue_summary.by_directory.length > 5, true);
   for (const residue of audit.evidence.js_residue_inventory) {
     assert.deepEqual(
       residue.actual_js_files,
@@ -230,7 +197,7 @@ test('P18 closeout audit line-locks existing JS residue so it cannot keep absorb
 
   assert.equal(audit.criteria.js_residue_line_growth_locked, true);
   assert.equal(audit.evidence.js_residue_line_lock.contract_file, JS_RESIDUE_LINE_LOCK_FILE);
-  assert.equal(audit.evidence.js_residue_line_lock.entries.length > 100, true);
+  assert.equal(audit.evidence.js_residue_line_lock.entries.length > 80, true);
   assert.equal(
     audit.evidence.js_residue_line_lock.entries.every((entry) => entry.actual_line_count <= entry.locked_line_count),
     true,

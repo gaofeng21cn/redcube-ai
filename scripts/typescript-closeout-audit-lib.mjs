@@ -51,11 +51,6 @@ const HIGH_CHURN_PACKAGES = [
 
 const JS_RESIDUE_ALLOWLIST = {
   'packages/redcube-codex-cli-client': ['src/index.js'],
-  'packages/redcube-config': [
-    'src/index.js',
-    'src/private-profile.js',
-    'src/xiaohongshu-author-profile.js',
-  ],
   'packages/redcube-gateway': [
     'src/actions/audit-deliverable.js',
     'src/actions/create-deliverable.js',
@@ -90,41 +85,11 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/index.js',
   ],
   'packages/redcube-governance': [
-    'src/governance-surface.js',
-    'src/index.js',
     'src/review-state.js',
     'src/reviews.js',
   ],
   'packages/redcube-hermes-substrate': [
-    'src/hermes-native-proof-client.js',
     'src/index.js',
-  ],
-  'packages/redcube-overlay-core': [
-    'src/contracts.js',
-    'src/index.js',
-    'src/registry.js',
-  ],
-  'packages/redcube-overlay-poster-onepager': [
-    'src/contracts.js',
-    'src/index.js',
-    'src/surface.js',
-  ],
-  'packages/redcube-overlay-ppt': [
-    'src/contracts.js',
-    'src/index.js',
-    'src/profiles.js',
-    'src/surface.js',
-  ],
-  'packages/redcube-overlay-registry': ['src/index.js'],
-  'packages/redcube-overlay-xiaohongshu': [
-    'src/contracts.js',
-    'src/index.js',
-    'src/surface.js',
-  ],
-  'packages/redcube-reference-os': [
-    'src/index.js',
-    'src/reference-samples.js',
-    'src/relative-quality.js',
   ],
   'packages/redcube-runtime': [
     'src/candidate-racing.js',
@@ -183,18 +148,6 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/xiaohongshu-runtime-family-parts/shared.js',
     'src/xiaohongshu-runtime-family-parts/support.js',
     'src/xiaohongshu-runtime.js',
-  ],
-  'packages/redcube-runtime-protocol': [
-    'src/index.js',
-    'src/managed-runs.js',
-    'src/python-command.js',
-    'src/python-native-helper.js',
-    'src/runs.js',
-    'src/screenshot-capture-store.js',
-    'src/source-augmentation-contract.js',
-    'src/source-readiness-summary.js',
-    'src/source-truth.js',
-    'src/workspace.js',
   ],
 };
 

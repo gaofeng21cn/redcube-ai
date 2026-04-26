@@ -12,7 +12,7 @@ import {
   runDeliverableRoute,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
-import { getDeliverablePaths } from '../packages/redcube-runtime-protocol/src/index.js';
+import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
 

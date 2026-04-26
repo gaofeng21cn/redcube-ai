@@ -4,10 +4,10 @@ import assert from 'node:assert/strict';
 import {
   createOverlayRegistry,
   hydrateDeliverableContract,
-} from '../packages/redcube-overlay-core/src/index.js';
-import { getDefaultOverlayRegistry } from '../packages/redcube-overlay-registry/src/index.js';
-import { pptDeckOverlay } from '../packages/redcube-overlay-ppt/src/index.js';
-import { xiaohongshuOverlay } from '../packages/redcube-overlay-xiaohongshu/src/index.js';
+} from '@redcube/overlay-core';
+import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
+import { pptDeckOverlay } from '@redcube/overlay-ppt';
+import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
 
 test('createOverlayRegistry exposes family profiles for ppt_deck and xiaohongshu', () => {
   const registry = createOverlayRegistry({

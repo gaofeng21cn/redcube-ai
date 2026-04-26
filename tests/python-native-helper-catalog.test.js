@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { probeHermesNativeProof } from '../packages/redcube-hermes-substrate/src/index.js';
+import { probeHermesNativeProof } from '@redcube/hermes-substrate';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
 const ENGINE_CONTRACT_FILE = 'contracts/runtime-program/ppt-native-python-engine-contract.json';
@@ -22,7 +22,7 @@ const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.js',
   'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js',
   'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.js',
-  'packages/redcube-hermes-substrate/src/hermes-native-proof-client.js',
+  'packages/redcube-hermes-substrate/src/hermes-native-proof-client.ts',
 ];
 
 function readJson(file) {

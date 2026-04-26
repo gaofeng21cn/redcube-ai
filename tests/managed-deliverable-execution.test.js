@@ -20,7 +20,7 @@ import {
   superviseManagedRun,
   runtimeWatch,
 } from '../packages/redcube-gateway/src/index.js';
-import { resolveWorkspaceContract } from '../packages/redcube-runtime-protocol/src/index.js';
+import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import {
   startMockCodexCli,

@@ -5,7 +5,7 @@ import {
   buildDeckRecord,
   evaluateStoryboardGate,
   hydratePptDeckContract,
-} from '../packages/redcube-overlay-ppt/src/index.js';
+} from '@redcube/overlay-ppt';
 
 test('buildDeckRecord emits canonical ppt deck metadata', () => {
   const hydratedContract = hydratePptDeckContract({

@@ -11,7 +11,7 @@ import {
 } from '../../packages/redcube-gateway/src/index.js';
 import {
   getPublicationProjection,
-} from '../../packages/redcube-governance/src/index.js';
+} from '../@redcube/governance';
 import {
   startMockCodexCli,
   withEnv,

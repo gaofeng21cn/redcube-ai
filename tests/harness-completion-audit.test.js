@@ -72,8 +72,8 @@ test('harness audit: publish governance is single-owner and family runtimes no l
 test('harness audit: reference quality is a formal operating surface, not only test fixtures', () => {
   const referenceOsIndex = read('packages/redcube-reference-os/src/index.ts');
   const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.js');
-  const referenceSamples = readImplementation('packages/redcube-reference-os/src/reference-samples.js');
-  const relativeQuality = readImplementation('packages/redcube-reference-os/src/relative-quality.js');
+  const referenceSamples = readImplementation('packages/redcube-reference-os/src/reference-samples.ts');
+  const relativeQuality = readImplementation('packages/redcube-reference-os/src/relative-quality.ts');
 
   assert.equal(referenceOsIndex.includes('listReferenceSamples'), true);
   assert.equal(referenceOsIndex.includes('buildReferenceQualityReport'), true);
@@ -124,9 +124,9 @@ test('harness audit: extension proof shows onboarding is registry-driven instead
   );
   assert.deepEqual(
     [
-      readImplementation('packages/redcube-overlay-ppt/src/profiles.js').includes("pack_id: 'ppt_deck_mainline_v1'"),
-      readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.js').includes("pack_id: 'xiaohongshu_mainline_v1'"),
-      readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.js').includes("pack_id: 'poster_onepager_mainline_v1'"),
+      readImplementation('packages/redcube-overlay-ppt/src/profiles.ts').includes("pack_id: 'ppt_deck_mainline_v1'"),
+      readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.ts').includes("pack_id: 'xiaohongshu_mainline_v1'"),
+      readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.ts').includes("pack_id: 'poster_onepager_mainline_v1'"),
     ],
     [true, true, true],
   );
