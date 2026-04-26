@@ -41,6 +41,9 @@ function passingQualityGates() {
 }
 
 const LEAF_TS_MIGRATION_LOCKS = {
+  'packages/redcube-config/src/index.js': 1,
+  'packages/redcube-config/src/private-profile.js': 1,
+  'packages/redcube-config/src/xiaohongshu-author-profile.js': 1,
   'packages/redcube-gateway/src/actions/doctor-workspace.js': 1,
   'packages/redcube-gateway/src/actions/execute-source-augmentation.js': 1,
   'packages/redcube-gateway/src/actions/get-deliverable.js': 1,
