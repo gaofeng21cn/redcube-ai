@@ -403,7 +403,7 @@ export function createPptDeckAuthoringParts(deps) {
       speaker_role: preset.speaker,
       audience: sharedSourceAudience(contract, preset.audience),
       promise: preset.promise,
-      page_budget: pageBudget(contract.profile_id),
+      page_budget: pageBudget(contract.profile_id, contract),
       page_library: PPT_PAGE_LIBRARY,
       source_fact_summary: sharedFactLibrarySummary(contract),
       ready_sources: sharedSourceLabels(contract),

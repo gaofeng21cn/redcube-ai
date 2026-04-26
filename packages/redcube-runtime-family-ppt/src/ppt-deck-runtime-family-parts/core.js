@@ -564,15 +564,37 @@ export function createPptDeckRuntimeCore() {
     };
   }
   
-  function pageBudget(profileId) {
-    switch (profileId) {
+  function pageBudget(profileId, contract = null) {
+    const fallback = (() => {
+      switch (profileId) {
       case 'executive_briefing':
         return { min_slides: 6, max_slides: 8 };
       case 'defense_deck':
         return { min_slides: 8, max_slides: 12 };
       default:
         return { min_slides: 8, max_slides: 10 };
+      }
+    })();
+    const corpus = [
+      safeText(contract?.goal),
+      safeText(contract?.shared_source_truth?.source_brief?.brief_text),
+      ...safeArray(contract?.shared_source_truth?.extracted_materials?.materials)
+        .map((material) => safeText(material?.content_text || material?.excerpt)),
+    ].filter(Boolean).join('\n');
+    const rangeMatch = corpus.match(/(?:建议|目标|期望|控制在|页数)?\s*(\d{1,2})\s*(?:[-–—~至到])\s*(\d{1,2})\s*页/);
+    if (!rangeMatch) {
+      return fallback;
     }
+    const requestedMin = Number(rangeMatch[1]);
+    const requestedMax = Number(rangeMatch[2]);
+    const upperBoundMatch = corpus.match(/(?:不超过|最多|上限|不多于)\s*(\d{1,2})\s*页/);
+    const upperBound = upperBoundMatch ? Number(upperBoundMatch[1]) : 30;
+    const minSlides = Math.max(6, Math.min(requestedMin, requestedMax));
+    const maxSlides = Math.min(Math.max(requestedMin, requestedMax), upperBound, 30);
+    if (!Number.isFinite(minSlides) || !Number.isFinite(maxSlides) || minSlides > maxSlides) {
+      return fallback;
+    }
+    return { min_slides: minSlides, max_slides: maxSlides, source: 'explicit_request' };
   }
   
   function requireText(value, label) {

@@ -35,12 +35,19 @@ function extractFunction(source, name) {
 }
 
 function loadValidator(file, validatorName) {
+  return loadFunction(file, validatorName);
+}
+
+function loadFunction(file, functionName) {
   const source = readFileSync(file, 'utf-8');
-  const functionCode = extractFunction(source, validatorName);
+  const functionCode = extractFunction(source, functionName);
   return new Function(`
     function safeText(value, fallback = '') {
       const text = String(value ?? '').replace(/\\uFFFD+/g, '').trim();
       return text || fallback;
+    }
+    function safeArray(value) {
+      return Array.isArray(value) ? value : [];
     }
     function requireText(value, label) {
       const text = safeText(value);
@@ -50,7 +57,7 @@ function loadValidator(file, validatorName) {
       return text;
     }
     ${functionCode}
-    return ${validatorName};
+    return ${functionName};
   `)();
 }
 
@@ -114,4 +121,29 @@ test('ppt render_html rejects internal paper IDs and talk-track meta-language', 
     () => validate(leakedHtml, 'S01'),
     /authoring metadata/i,
   );
+});
+
+test('ppt authoring page budget honors explicit source page ranges', () => {
+  const pageBudget = loadFunction(
+    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
+    'pageBudget',
+  );
+  const contract = {
+    goal: '制作科室内部汇报，幻灯片不超过30页。',
+    shared_source_truth: {
+      extracted_materials: {
+        materials: [
+          {
+            content_text: '页数：不超过 30 页，建议 16-22 页。',
+          },
+        ],
+      },
+    },
+  };
+
+  assert.deepEqual(pageBudget('lecture_peer', contract), {
+    min_slides: 16,
+    max_slides: 22,
+    source: 'explicit_request',
+  });
 });
