@@ -800,6 +800,7 @@ export function createPptDeckRuntimeCore() {
     PPT_PAGE_LIBRARY,
     attachCommon,
     audienceFacingMaterials,
+    audienceFacingTextLines,
     creativeExecution,
     deckPreset,
     extractAudienceFacingSnippet,

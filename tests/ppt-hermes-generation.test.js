@@ -9,6 +9,7 @@ import {
   intakeSource,
   runDeliverableRoute,
 } from '../packages/redcube-gateway/src/index.js';
+import { createPptDeckRuntimeCore } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/core.js';
 import {
   startMockCodexCli,
   withEnv,
@@ -30,6 +31,103 @@ async function withMockHermesUpstream(testFn) {
     await upstream.close();
   }
 }
+
+test('ppt authoring context passes full source materials instead of first-line excerpts', () => {
+  const { authoringParts } = createPptDeckRuntimeCore();
+  const lateEvidence = '后半段主要结果：357例，57/357 early non-GTR，16.0%；AUROC 0.800，Brier 0.110，校准斜率 1.04。';
+  const longOpening = '这是一段没有数字证据的材料开头，用来证明不能只截取开头。'.repeat(20);
+  const contract = {
+    title: 'NF-PitNET 三篇论文科室内部进展汇报',
+    goal: '三篇成文论文要投稿，给主任和同事同步第一篇、第二篇、第三篇的故事、结论和证据。',
+    profile_id: 'lecture_peer',
+    shared_source_truth: {
+      source_brief: {
+        brief_text: '待投稿论文同步，必须讲清数字结果。',
+        input_mode: 'source_files',
+        confidence: 'high',
+      },
+      source_index: {
+        sources: [
+          {
+            status: 'ready',
+            relative_path: 'materials/full-paper-pack.md',
+            kind: 'file',
+          },
+        ],
+      },
+      extracted_materials: {
+        materials: [
+          {
+            material_id: 'MAT-1',
+            source_id: 'SRC-1',
+            kind: 'file',
+            title: 'NF-PitNET full paper pack',
+            content_text: `${longOpening}\n\n${lateEvidence}`,
+          },
+        ],
+      },
+    },
+  };
+
+  const context = authoringParts.buildAuthoringContext(contract);
+  assert.equal(context.evidence_excerpts, undefined);
+  assert.equal(context.source_materials_full_text.length, 1);
+  assert.equal(context.source_materials_full_text[0].content_text.includes(lateEvidence), true);
+  assert.equal(context.content_density_contract?.purpose, 'manuscript_submission_sync');
+});
+
+test('ppt manuscript sync blocks abstract outlines without visible paper evidence', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-manuscript-density-'));
+    const sourceFile = path.join(workspaceRoot, 'nfpitnet-paper-pack.md');
+    writeFileSync(sourceFile, [
+      '# NF-PitNET 三篇论文资料',
+      '',
+      '第一篇：357例，57/357 early non-GTR，16.0%；AUROC 0.800，Brier 0.110。',
+      '第二篇：98/357 持续性术后垂体功能减退，27.5%；AUROC 0.708，Brier 0.171。',
+      '第三篇：154/357 侵袭性病例，43.1%；Knosp 0-2 为 203/203 非侵袭，Knosp 3-4 为 154/154 侵袭。',
+    ].join('\n'), 'utf-8');
+
+    await intakeSource({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'NF-PitNET 三篇论文同步',
+      brief: '三篇成文论文要投稿，给主任和同事同步第一篇、第二篇、第三篇的故事、结论和证据。',
+      keywords: ['NF-PitNET', '第一篇', '第二篇', '第三篇'],
+      sourceFiles: [sourceFile],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'NF-PitNET 三篇论文科室内部进展汇报',
+      goal: '三篇成文论文要投稿，给主任和同事同步第一篇、第二篇、第三篇的故事、结论和证据。',
+    });
+
+    const storylineResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+    assert.equal(storylineResult.ok, true);
+
+    const outlineResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'detailed_outline',
+    });
+
+    assert.equal(outlineResult.ok, false);
+    assert.match(outlineResult.run?.error?.message || '', /manuscript sync requires/);
+  });
+});
 
 test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
   await withMockHermesUpstream(async () => {

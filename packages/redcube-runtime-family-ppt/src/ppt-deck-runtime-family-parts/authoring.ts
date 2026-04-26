@@ -8,6 +8,7 @@ export function createPptDeckAuthoringParts(deps) {
     PPT_PAGE_LIBRARY,
     attachCommon,
     audienceFacingMaterials,
+    audienceFacingTextLines,
     creativeExecution,
     deckPreset,
     extractAudienceFacingSnippet,
@@ -143,6 +144,110 @@ export function createPptDeckAuthoringParts(deps) {
     }
   }
 
+  function authoringCorpus(contract) {
+    return [
+      safeText(contract?.title),
+      safeText(contract?.goal),
+      safeText(contract?.user_intent),
+      safeText(contract?.userIntent),
+      safeText(contract?.delivery_request?.goal),
+      safeText(contract?.delivery_request?.user_intent),
+      safeText(contract?.delivery_request?.userIntent),
+      safeText(contract?.shared_source_truth?.source_brief?.brief_text),
+      ...audienceFacingMaterials(contract).map((material) => safeText(material?.content_text || material?.excerpt)),
+    ].filter(Boolean).join('\n');
+  }
+
+  function hasQuantitativeEvidence(text) {
+    return /(?:\d+\s*\/\s*\d+|\d+(?:\.\d+)?\s*%|\bAUROC\b|\bBrier\b|校准斜率|calibration|Knosp\s*\d|<\s*0\.?\d+|中位|median|\d+\.\d+)/i.test(safeText(text));
+  }
+
+  function manuscriptSyncRequired(contract) {
+    const corpus = authoringCorpus(contract);
+    return /(投稿|待投|要投|投的论文|成文论文|manuscript|第一篇|第二篇|第三篇)/i.test(corpus)
+      && /(论文|paper|manuscript|研究)/i.test(corpus)
+      && hasQuantitativeEvidence(corpus);
+  }
+
+  function manuscriptSyncContract(contract) {
+    if (!manuscriptSyncRequired(contract)) return null;
+    return {
+      purpose: 'manuscript_submission_sync',
+      source_consumption_policy: 'AI must receive and read source_materials_full_text. Programmatic snippets or first-lines are not an acceptable substitute.',
+      visible_slide_focus: [
+        '同步三篇待投稿或已成文论文的研究故事、主要结论和数字证据',
+        '每篇论文至少覆盖研究问题、队列/终点、方法或模型策略、关键数字结果、结论边界',
+      ],
+      required_evidence_policy: '每篇论文的主要发现页必须把关键数字写入 title/core_sentence/evidence_points/page_core_content 中的至少一个听众可见字段。',
+      prohibited_framing: [
+        '不要把论文同步改写成临床应用推广、科室价值展示、管理行动建议或可复用框架宣传',
+        '不要使用“科室价值”“应用场景”“服务随访安排”“服务手术策略”“证据链可复用”作为章节目标',
+      ],
+    };
+  }
+
+  function manuscriptLabels(contract, slides = []) {
+    const corpus = [
+      authoringCorpus(contract),
+      ...safeArray(slides).flatMap((slide) => [
+        slide?.title,
+        slide?.core_sentence,
+        ...(safeArray(slide?.page_core_content).map((item) => item?.text ?? item)),
+      ]),
+    ].map((item) => safeText(item)).filter(Boolean).join('\n');
+    return [...new Set([...corpus.matchAll(/第\s*([一二三四五六七八九十\d]{1,3})\s*篇/g)]
+      .map((match) => `第${safeText(match[1])}篇`))]
+      .slice(0, 8);
+  }
+
+  function visibleSlideText(slide) {
+    return [
+      slide?.title,
+      slide?.core_sentence,
+      ...safeArray(slide?.evidence_points),
+      ...safeArray(slide?.page_core_content).map((item) => item?.text ?? item),
+    ].map((item) => safeText(item)).filter(Boolean).join('\n');
+  }
+
+  function assertManuscriptEvidenceDensity(slides, contract, label) {
+    if (!manuscriptSyncRequired(contract)) return;
+    const labels = manuscriptLabels(contract, slides);
+    if (labels.length === 0) return;
+    for (const manuscriptLabel of labels) {
+      const manuscriptSlides = safeArray(slides)
+        .filter((slide) => visibleSlideText(slide).includes(manuscriptLabel));
+      if (manuscriptSlides.length === 0) {
+        throw new Error(`${label} manuscript sync requires a visible section for ${manuscriptLabel}`);
+      }
+      const hasVisibleEvidence = manuscriptSlides.some((slide) => hasQuantitativeEvidence(visibleSlideText(slide)));
+      if (!hasVisibleEvidence) {
+        throw new Error(`${label} manuscript sync requires visible numeric evidence for ${manuscriptLabel}`);
+      }
+    }
+  }
+
+  function fullSourceMaterials(contract) {
+    return audienceFacingMaterials(contract)
+      .map((material, index) => ({
+        material_ref: safeText(material?.material_id) || `material_${index + 1}`,
+        source_ref: safeText(material?.source_id),
+        title: safeText(material?.title) || safeText(material?.relative_path),
+        content_text: safeText(material?.content_text || material?.excerpt),
+      }))
+      .filter((material) => material.content_text);
+  }
+
+  function fullOperatorMaterials(contract) {
+    return sharedOperatorMaterials(contract)
+      .map((material, index) => ({
+        material_ref: safeText(material?.material_id) || `operator_material_${index + 1}`,
+        source_ref: safeText(material?.source_id),
+        title: safeText(material?.title) || safeText(material?.relative_path),
+        content_text: safeText(material?.content_text || material?.excerpt),
+      }))
+      .filter((material) => material.content_text);
+  }
+
   function normalizeChapterStructure(chapterStructure, slides) {
     const normalized = safeArray(chapterStructure)
       .map((chapter, index) => ({
@@ -161,6 +266,7 @@ export function createPptDeckAuthoringParts(deps) {
       throw new Error('upstream ppt detailed_outline must contain at least 6 slides');
     }
     assertApprovedSlidePlan(slides, contract, 'upstream ppt detailed_outline');
+    assertManuscriptEvidenceDensity(slides, contract, 'upstream ppt detailed_outline');
     return {
       chapter_structure: normalizeChapterStructure(data?.chapter_structure, slides),
       slides,
@@ -174,6 +280,7 @@ export function createPptDeckAuthoringParts(deps) {
       throw new Error('upstream ppt slide_blueprint must contain at least 6 slides');
     }
     assertApprovedSlidePlan(slides, contract, 'upstream ppt slide_blueprint');
+    assertManuscriptEvidenceDensity(slides, contract, 'upstream ppt slide_blueprint');
     return {
       chapter_goal: requireText(data?.chapter_goal, 'slide_blueprint.chapter_goal'),
       slides,
@@ -408,14 +515,8 @@ export function createPptDeckAuthoringParts(deps) {
       page_library: PPT_PAGE_LIBRARY,
       source_fact_summary: sharedFactLibrarySummary(contract),
       ready_sources: sharedSourceLabels(contract),
-      evidence_excerpts: audienceFacingMaterials(contract)
-        .slice(0, 6)
-        .map((material) => ({
-          material_id: material.material_id,
-          source_id: material.source_id,
-          excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
-        }))
-        .filter((material) => material.excerpt),
+      source_materials_full_text: fullSourceMaterials(contract),
+      content_density_contract: manuscriptSyncContract(contract),
       source_truth: {
         input_mode: sharedSourceInputMode(contract) || 'seed_only',
         confidence: sharedSourceConfidence(contract) || 'low',
@@ -473,21 +574,17 @@ export function createPptDeckAuthoringParts(deps) {
         ],
       },
       approved_slide_plan: extractApprovedSlidePlan(contract),
-      operator_playbook: sharedOperatorMaterials(contract)
-        .slice(0, 6)
-        .map((material) => ({
-          source_id: material.source_id,
-          excerpt: extractAudienceFacingSnippet(material.content_text || material.excerpt, 220),
-        }))
-        .filter((item) => item.excerpt),
+      operator_playbook_full_text: fullOperatorMaterials(contract),
       authoring_guardrails: [
-        '如果 operator_playbook 提供了具名讲者署名，speaker / speaker_signature 必须保留 exact identity，不得泛化成“同行讲者”“正式讲者”等占位标签',
+        '如果 operator_playbook_full_text 提供了具名讲者署名，speaker / speaker_signature 必须保留 exact identity，不得泛化成“同行讲者”“正式讲者”等占位标签',
         'delivery_goal 只表示制作目标，不得原样进入 slide 标题、正文、讲稿或视觉宣言',
         '不要把“封面必须署名”“重点回答三件事”“先讲什么后讲什么”等系统操作说明写成 audience-facing 内容',
-        'operator_playbook 只作为制作约束，不得被改写成课堂正文、标题、来源或讲稿台词',
+        'operator_playbook_full_text 只作为制作约束，不得被改写成课堂正文、标题、来源或讲稿台词',
         'speaker_notes、transition_sentence、page_goal、page_objective、visual_anchor_tracks 是讲者/作者工作面，不能成为听众可见标题、正文、页脚或卡片文案',
         'source_id、material_id、SRC-*、MAT-*、内部项目编号与管理编号只允许留在 provenance，不允许作为听众可见论文标签；若用户给出对外口径，必须按该口径重命名',
         '如果共享事实材料不足，只能做保守抽象，不要发明内部流程细节或伪来源',
+        '如果 content_density_contract.purpose 是 manuscript_submission_sync，页面主语必须是论文故事、结论和数字证据；不要改写成应用价值、管理建议或科室价值宣传',
+        'source_materials_full_text 是完整资料，不是摘要；storyline、detailed_outline、slide_blueprint 必须通读全文后选择论文故事、结论与证据，不能只依赖开头、标题或 source_fact_summary',
       ],
     };
   }

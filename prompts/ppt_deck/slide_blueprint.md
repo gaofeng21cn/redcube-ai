@@ -16,12 +16,15 @@
 - speaker_notes
 - transition_sentence
 - explicit anchor / grid / track for complex structure pages
+- 必须基于 `source_materials_full_text` 全文展开，不得只使用材料开头、摘要、标题、source_fact_summary 或截断 excerpt
+- 如果任务是待投稿/成文论文同步，主要发现页必须在听众可见字段中落入关键数字证据；不能只写“风险分层更清楚”“模型表现更好”“边界更明确”等无数字概括
 
 听众可见边界：
 - `title`、`page_core_content`、关键图示标签和底部边界条是听众可见面，只能写研究内容、证据结果、边界和团队需要知道的决策信息
 - `speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`evidence_and_sources.source_id`、`material_id` 是作者/系统工作面，不得被复制、改写或压成页面正文
 - 若用户区分了内部管理编号和对外论文顺序，蓝图标题和正文必须使用对外顺序标签，例如“第一篇 / 第二篇 / 第三篇”，内部编号只保留在来源/provenance
 - 不要把“建议怎么讲”“可发表表达”“讲稿备忘录”“待确认的写作口径”做成投影片主内容；需要讨论的事项必须改写成听众能直接理解的研究边界或团队确认项
+- 待投稿/成文论文同步不得把论文包装成已可推广的科室应用、临床管理工具或价值宣传；页面应同步论文准备投稿所需的故事、结论、证据和局限
 
 ## runtime_seed
 ```json
