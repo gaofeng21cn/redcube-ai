@@ -1,6 +1,6 @@
 ---
 name: rca
-description: Operate RedCube AI as the formal RCA visual-deliverable domain app through product-entry, recoverable deliverable runtime, and same-session continuation contracts.
+description: Operate RedCube AI as the formal RCA visual-deliverable domain app through TypeScript orchestration, Python native helpers, product-entry, recoverable deliverable runtime, and same-session continuation contracts.
 ---
 
 # RCA App Skill
@@ -12,6 +12,13 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - `RedCube AI` 面向 Codex 的单一 app skill 薄入口层
 - 建立在现有 CLI、gateway、runtime contract 与 deliverable loop 之上
 - 不替代 `redcube` CLI、gateway contract，也不替代 repo 内其他自动化入口；这些入口只能作为 RedCube runtime 的受控 surface，不能成为绕开 runtime 的替代执行路径
+
+## Agent 语言面
+
+- 默认把本仓实现理解为 `TypeScript orchestration + Python native helpers`。
+- 新增 orchestration、contract、CLI/MCP、gateway 或 runtime service boundary 默认使用 TypeScript。
+- Office/PPT/document automation、截图/导出 helper 与修复循环默认使用 repo-owned Python helper，并继续受 RedCube route/gate 约束。
+- 仓内 JavaScript 只代表 migration policy 登记过的 legacy allowlisted residue；不得因为看见 `.js` 文件就把新 agent 工作默认写成 JavaScript。
 
 ## 核心入口
 

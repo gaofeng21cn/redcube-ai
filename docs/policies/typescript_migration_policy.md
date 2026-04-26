@@ -6,6 +6,7 @@
 
 - 新代码默认使用 TypeScript
 - 新增实现默认走 TypeScript；新增 JS 必须登记为显式例外
+- Agent-facing prompt、skill descriptor 与安装器输出必须把 `TypeScript + Python` 写成默认实现面，避免新 Agent 被仓内残留 JavaScript 文件误导
 - 不做一次性全仓重写
 - 旧 JS 只在明确迁移窗口内短期共存
 - 不允许把迁移做成“后缀变了，但导出 surface 仍然是 `any`”

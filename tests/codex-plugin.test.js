@@ -11,11 +11,7 @@ const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json')
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'rca', 'SKILL.md');
 const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'rca', 'agents', 'openai.yaml');
 const installerPath = path.join(repoRoot, 'scripts', 'install-codex-plugin.mjs');
-
-function readJson(filePath) {
-  return JSON.parse(readFileSync(filePath, 'utf-8'));
-}
-
+function readJson(filePath) { return JSON.parse(readFileSync(filePath, 'utf-8')); }
 test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
   const manifest = readJson(pluginManifestPath);
@@ -30,8 +26,10 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(manifest.description, /Codex plugin/i);
   assert.match(metadataText, /display_name: "RedCube AI"/);
   assert.match(metadataText, /default_prompt: "Use \$rca/);
+  assert.match(metadataText, /TypeScript orchestration plus Python native helpers; JavaScript is legacy allowlisted residue only/);
   assert.match(skillText, /redcube product frontdesk/i);
   assert.match(skillText, /redcube product invoke/i);
+  assert.match(skillText, /TypeScript orchestration \+ Python native helpers[\s\S]*legacy allowlisted residue[\s\S]*不得因为看见 `\.js` 文件就把新 agent 工作默认写成 JavaScript/);
   assert.match(skillText, /storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx/i);
   assert.match(skillText, /不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或直接编辑文件来替代 RedCube/i);
   assert.match(skillText, /render_html` 是默认视觉实现路线/i);
@@ -84,6 +82,8 @@ test('codex plugin installer keeps plugin and skill paths repo-local with machin
       installation: 'AVAILABLE',
       authentication: 'ON_INSTALL',
     },
+    languageSurface: result.language_surface,
     category: 'Creative',
   });
+  assert.match(result.language_surface.javascriptPolicy, /legacy allowlisted residue/i);
 });

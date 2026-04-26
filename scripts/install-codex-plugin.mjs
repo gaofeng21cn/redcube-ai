@@ -10,7 +10,7 @@ const MARKETPLACE_DISPLAY_NAME = 'RedCube AI Local';
 const LEGACY_MARKETPLACE_DISPLAY_NAMES = ['RCA Local'];
 const PLUGIN_CATEGORY = 'Creative';
 const LEGACY_PLUGIN_NAMES = ['redcube-ai'];
-
+const LANGUAGE_SURFACE = { implementationTarget: 'TypeScript orchestration + Python native helpers', newCodeDefault: 'TypeScript or Python under RedCube routes and gates', javascriptPolicy: 'Legacy allowlisted residue only; do not default new agent work to JavaScript' };
 function resolveDefaultRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 }
@@ -18,7 +18,6 @@ function resolveDefaultRepoRoot() {
 function usage() {
   process.stdout.write('Usage: node scripts/install-codex-plugin.mjs [--repo-root /abs/path/to/repo] [--home /abs/path/to/home]\n');
 }
-
 function parseArgs(argv = process.argv.slice(2)) {
   const parsed = {
     repoRoot: resolveDefaultRepoRoot(),
@@ -112,6 +111,7 @@ function upsertMarketplace(marketplacePath) {
       installation: 'AVAILABLE',
       authentication: 'ON_INSTALL',
     },
+    languageSurface: LANGUAGE_SURFACE,
     category: PLUGIN_CATEGORY,
   };
 
@@ -178,7 +178,7 @@ function installCodexPlugin({ repoRoot, home }) {
     home: resolvedHome,
     plugin_root: repoPluginRoot,
     skill_root: repoSkillRoot,
-    marketplace_path: marketplacePath,
+    marketplace_path: marketplacePath, language_surface: LANGUAGE_SURFACE,
   };
 }
 

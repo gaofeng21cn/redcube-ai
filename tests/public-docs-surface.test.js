@@ -8,7 +8,6 @@ const repoRoot = process.cwd();
 function readText(file) {
   return readFileSync(path.join(repoRoot, file), 'utf-8');
 }
-
 test('public docs surface keeps the tracked entry files in place', () => {
   assert.equal(existsSync(path.join(repoRoot, 'guides', 'README.md')), false);
   for (const file of [
@@ -56,6 +55,7 @@ test('public docs surface keeps the default entry chain and isolates historical 
   assert.match(docsStatus, /invokeProductEntry/);
   assert.match(docsStatus, /invokeFederatedProductEntry/);
   assert.match(docsStatus, /invokeDomainEntry/);
+  assert.match(`${readme}\n${readmeZh}\n${docsStatus}`, /TypeScript orchestration plus Python native helpers[\s\S]*JavaScript files visible in the tree are legacy allowlisted residue[\s\S]*TypeScript orchestration 加 Python native helpers[\s\S]*JavaScript 文件只是迁移策略下的 legacy allowlisted residue[\s\S]*新实现默认走 TypeScript orchestration 或 Python native helper[\s\S]*JavaScript 只作为 migration policy 登记过的 legacy allowlisted residue/);
   assert.match(docsArchitecture, /RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces/);
   assert.match(docsArchitecture, /invokeProductEntry/);
   assert.match(docsArchitecture, /invokeFederatedProductEntry/);

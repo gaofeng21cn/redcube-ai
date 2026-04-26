@@ -10,6 +10,7 @@
 - OPL boundary：`OPL` 只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 - OPL Runtime Manager：目标形态中的 OPL 侧薄运行管理/投影层，负责 federated route 的 external `Hermes-Agent` profile/provisioning、registration/status 索引、doctor/repair/resume、native helper catalog 与高频状态索引；它不持有 RedCube visual truth、canonical artifacts、review/publication projection 或 concrete executor
 - 语言目标：RCA 长线实现收敛到 `TypeScript + Python`；TypeScript 继续承担 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries，Python 承担 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态
+- Agent-facing 语言面：新实现默认走 TypeScript orchestration 或 Python native helper；仓内 JavaScript 只作为 migration policy 登记过的 legacy allowlisted residue，不作为新代码默认模板
 
 ## 当前执行口径
 

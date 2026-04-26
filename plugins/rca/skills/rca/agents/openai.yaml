@@ -1,4 +1,4 @@
 interface:
   display_name: "RedCube AI"
   short_description: "Visual deliverable runtime for Codex"
-  default_prompt: "Use $rca to inspect the current RedCube AI product entry and continue the active deliverable loop."
+  default_prompt: "Use $rca to inspect the current RedCube AI product entry and continue the active deliverable loop. Treat implementation work as TypeScript orchestration plus Python native helpers; JavaScript is legacy allowlisted residue only."
