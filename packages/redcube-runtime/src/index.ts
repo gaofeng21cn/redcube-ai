@@ -165,7 +165,7 @@ export function readManagedEvents(workspaceRoot: string, managedRunId: string): 
 }
 
 export function planCandidateRace(request: Record<string, unknown>): Record<string, unknown> {
-  return planCandidateRaceJs(request) as Record<string, unknown>;
+  return planCandidateRaceJs(request) as unknown as Record<string, unknown>;
 }
 
 export function selectCandidateRaceWinner(request: Record<string, unknown>): Record<string, unknown> {
@@ -231,7 +231,7 @@ export async function superviseManagedRun(
 }
 
 export function planManagedDeliverableDag(request: Record<string, unknown>): Record<string, unknown> {
-  return planManagedDeliverableDagJs(request) as Record<string, unknown>;
+  return planManagedDeliverableDagJs(request) as unknown as Record<string, unknown>;
 }
 
 export function executeManagedDagLayers(request: Record<string, unknown>): Promise<Record<string, unknown>> {
