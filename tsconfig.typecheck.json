@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./.tsbuildinfo/typecheck.tsbuildinfo"
+  },
+  "include": [
+    "tests/**/*.js",
+    "tests/**/*.mjs",
+    "tests/**/*.cjs",
+    "tests/**/*.ts",
+    "packages/**/*.js",
+    "packages/**/*.mjs",
+    "packages/**/*.cjs",
+    "packages/**/*.ts",
+    "apps/**/*.js",
+    "apps/**/*.mjs",
+    "apps/**/*.cjs",
+    "scripts/**/*.mjs",
+    "apps/**/*.ts"
+  ]
+}
