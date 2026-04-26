@@ -25,7 +25,12 @@ interface ResidueViolation extends ResidueDefinition {
 }
 
 function readRepoFile(relativePath: string): string {
-  return readFileSync(path.join(REPO_ROOT, relativePath), 'utf-8');
+  const absolutePath = path.join(REPO_ROOT, relativePath);
+  const source = readFileSync(absolutePath, 'utf-8');
+  const tsBackedShell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return tsBackedShell
+    ? readFileSync(path.join(path.dirname(absolutePath), tsBackedShell[1]), 'utf-8')
+    : source;
 }
 
 function matchesAllEvidence(relativePath: string, evidencePatterns: string[]): boolean {
