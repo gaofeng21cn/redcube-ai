@@ -801,11 +801,9 @@ export async function getProductEntryManifest(request) {
 	      recommended_action: 'invoke_product_entry',
 	      route_equivalence: routeEquivalence,
 	      deliverable_facade: deliverableFacade,
-	      current_truth: {
-	        product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
-	        federated_product_entry_contract: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
-	        managed_product_entry_contract: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
-	      },
+	      review_state: { surface_kind: 'review_state', owner: 'redcube_ai', status: 'runtime_projection_ref', summary: 'Manifest-level read-only ref for RCA review state; runtime truth is produced by product-entry/session execution.', runtime_truth_surface: 'getReviewState', session_command_template: productEntrySessionCommand, route_rule: 'must_use_redcube_product_entry_and_review_export_gates' },
+	      publication_projection: { surface_kind: 'publication_projection', owner: 'redcube_ai', status: 'runtime_projection_ref', summary: 'Manifest-level read-only ref for RCA publication projection; runtime truth is produced by product-entry/session execution.', runtime_truth_surface: 'getPublicationProjection', session_command_template: productEntrySessionCommand, route_rule: 'must_use_redcube_product_entry_and_review_export_gates' },
+	      current_truth: { product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF, federated_product_entry_contract: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF, managed_product_entry_contract: MANAGED_PRODUCT_ENTRY_CONTRACT_REF },
 	      session_continuity: {
 	        surface_kind: 'session_continuity',
 	        owner: 'redcube_ai',

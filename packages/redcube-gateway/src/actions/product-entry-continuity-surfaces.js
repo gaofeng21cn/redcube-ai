@@ -267,13 +267,8 @@ export function buildOplRuntimeManagerRegistration({
       ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration',
       command: PRODUCT_MANIFEST_COMMAND,
     },
-    consumable_projection_refs: [
-      '/skill_catalog/skills/0/domain_projection/runtime_continuity',
-      '/product_entry_shell/opl_bridge',
-      '/artifact_inventory',
-      '/review_state',
-      '/publication_projection',
-    ],
+    indexable_surfaces: [{ surface_id: 'product_entry_registration', surface_kind: 'skill_catalog', ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration' }, { surface_id: 'internal_opl_bridge', surface_kind: 'federated_product_entry', ref: '/product_entry_shell/opl_bridge' }, { surface_id: 'session_continuity', surface_kind: 'session_continuity', ref: '/session_continuity' }, { surface_id: 'artifact_inventory', surface_kind: 'artifact_inventory', ref: '/artifact_inventory' }, { surface_id: 'runtime_health', surface_kind: 'runtime_inventory', ref: '/runtime_inventory' }, { surface_id: 'review_publication_projection_refs', surface_kind: 'review_publication_refs', refs: ['/review_state', '/publication_projection'] }],
+    consumable_projection_refs: ['/skill_catalog/skills/0/domain_projection/runtime_continuity', '/product_entry_shell/opl_bridge', '/session_continuity', '/artifact_inventory', '/runtime_inventory', '/review_state', '/publication_projection'],
     state_index_inputs: {
       workspace_registry_index: '/workspace_locator',
       managed_session_ledger_index: '/session_continuity',
@@ -297,11 +292,9 @@ export function buildOplRuntimeManagerRegistration({
       publication_projection_ref: '/publication_projection',
       route_rule: 'must_use_redcube_product_entry_and_review_export_gates',
     },
-    non_goals: [
-      'not_a_visual_domain_truth_owner',
-      'not_a_canonical_artifact_owner',
-      'not_a_review_or_publication_projection_owner',
-      'not_a_concrete_executor',
-    ],
+    route_equivalence: { ref: '/route_equivalence', downstream_domain_entry_ref: '/route_equivalence/downstream_runtime_truth', rule: 'direct_product_entry_and_internal_opl_bridge_share_the_same_downstream_domain_entry' },
+    native_helper_index_consumption: { surface_kind: 'native_helper_index_consumption_proof', consumption_mode: 'index_only', input_refs: ['/runtime_inventory', '/artifact_inventory', '/skill_catalog/skills/0/domain_projection/runtime_continuity'], proof_summary: 'OPL Runtime Manager may index RCA native/helper availability and artifact pickup refs without writing RedCube visual truth, canonical artifacts, review/publication truth, or executor state.', writes_visual_truth: false, owns_canonical_artifacts: false, owns_executor: false },
+    authority_boundary: { owns_visual_truth: false, owns_canonical_artifacts: false, owns_review_truth: false, owns_publication_projection: false, owns_concrete_executor: false, allowed_authority: ['read_product_entry_registration_index', 'read_internal_opl_bridge_index', 'read_session_continuity_index', 'read_artifact_inventory_index', 'read_runtime_health_index', 'read_review_publication_projection_refs'] },
+    non_goals: ['not_a_visual_domain_truth_owner', 'not_a_canonical_artifact_owner', 'not_a_review_or_publication_projection_owner', 'not_a_concrete_executor'],
   };
 }
