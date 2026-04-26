@@ -12,6 +12,12 @@ function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
 }
 
+function readImplementation(file) {
+  const source = read(file);
+  const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
+  return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
 function readJson(file) {
   return JSON.parse(read(file));
 }
@@ -36,9 +42,9 @@ test('phase-2 family source-truth consumption convergence stays absorbed provena
 
 test('phase-2 family source-truth consumption convergence freezes shared source_truth_contract and guarded poster boundary without promoting controller', () => {
   const contract = readJson(TRANCHE_CONTRACT);
-  const pptProfiles = read('packages/redcube-overlay-ppt/src/profiles.js');
-  const xhsContracts = read('packages/redcube-overlay-xiaohongshu/src/contracts.js');
-  const posterContracts = read('packages/redcube-overlay-poster-onepager/src/contracts.js');
+  const pptProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.js');
+  const xhsContracts = readImplementation('packages/redcube-overlay-xiaohongshu/src/contracts.js');
+  const posterContracts = readImplementation('packages/redcube-overlay-poster-onepager/src/contracts.js');
 
   assert.equal(contract.object_boundary.in_scope.includes('ppt_deck, xiaohongshu, and guarded poster_onepager expose one shared source_truth_contract surface inside hydrated deliverable contracts'), true);
   assert.equal(contract.source_truth_contract_surface.route_gate_rule, 'authoritative_fail_closed_in_audit_and_runtime_watch');
