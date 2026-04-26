@@ -18,8 +18,8 @@ test('P17 slice 6: runtime-family-xiaohongshu exposes a TypeScript entrypoint an
   const entry = readFileSync(path.resolve('packages/redcube-runtime-family-xiaohongshu/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-xiaohongshu/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-xiaohongshu'),
     true,
@@ -49,8 +49,8 @@ test('P17 slice 7: runtime-family-ppt exposes a TypeScript entrypoint and typed 
   const entry = readFileSync(path.resolve('packages/redcube-runtime-family-ppt/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-ppt/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-ppt'),
     true,
@@ -80,8 +80,8 @@ test('P20.C: runtime-family-poster-onepager exposes a TypeScript entrypoint and 
   const entry = readFileSync(path.resolve('packages/redcube-runtime-family-poster-onepager/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-poster-onepager/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-poster-onepager'),
     true,

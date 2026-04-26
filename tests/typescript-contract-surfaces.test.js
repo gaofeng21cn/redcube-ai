@@ -10,7 +10,7 @@ test('P15 slice 1: runtime-protocol exposes a TypeScript entrypoint and typed co
   const packageJson = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-protocol/package.json'), 'utf-8'));
   const entry = readFileSync(path.resolve('packages/redcube-runtime-protocol/src/index.ts'), 'utf-8');
 
-  assert.equal(packageJson.types, './src/index.ts');
+  assert.equal(packageJson.types, './dist/index.d.ts');
   assert.match(entry, /export type/);
   assert.match(entry, /WorkspaceContract/);
   assert.match(entry, /RunRecord/);

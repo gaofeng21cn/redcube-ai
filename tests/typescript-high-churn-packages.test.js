@@ -19,7 +19,7 @@ test('P17 slice 1: pack-xiaohongshu remains a typed pack shell without creative 
   const types = readFileSync(path.resolve('packages/redcube-pack-xiaohongshu/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-pack-xiaohongshu'),
     true,
@@ -49,7 +49,7 @@ test('P17 slice 2: pack-ppt remains a typed pack shell without creative builder 
   const types = readFileSync(path.resolve('packages/redcube-pack-ppt/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-pack-ppt'),
     true,
@@ -82,7 +82,7 @@ test('P20.C: pack-poster-onepager remains a typed pack shell without creative bu
   const types = readFileSync(path.resolve('packages/redcube-pack-poster-onepager/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-pack-poster-onepager'),
     true,
@@ -112,8 +112,8 @@ test('P17 slice 6: runtime-family-xiaohongshu exposes a TypeScript runtime entry
   const entry = readFileSync(path.resolve('packages/redcube-runtime-family-xiaohongshu/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-xiaohongshu/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-xiaohongshu'),
     true,
@@ -143,8 +143,8 @@ test('P17 slice 7: runtime-family-ppt exposes a TypeScript runtime entrypoint an
   const entry = readFileSync(path.resolve('packages/redcube-runtime-family-ppt/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-ppt/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-ppt'),
     true,

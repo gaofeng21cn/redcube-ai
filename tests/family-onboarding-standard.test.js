@@ -23,7 +23,7 @@ test('gateway actions no longer hardcode overlay family packages directly', () =
 });
 
 test('overlay registry package exports default registry entrypoint', () => {
-  const registryIndex = read('packages/redcube-overlay-registry/src/index.js');
+  const registryIndex = read('packages/redcube-overlay-registry/src/index.ts');
   const registryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
   const gatewayPackage = JSON.parse(read('packages/redcube-gateway/package.json'));
 

@@ -28,8 +28,8 @@ test('P17 slice 3: overlay-core exposes a TypeScript entrypoint and typed regist
   const entry = readFileSync(path.resolve('packages/redcube-overlay-core/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-overlay-core/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-core'),
     true,
@@ -61,8 +61,8 @@ test('P17 slice 3: overlay-registry exposes a TypeScript entrypoint and typed de
   const entry = readFileSync(path.resolve('packages/redcube-overlay-registry/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-overlay-registry/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-registry'),
     true,
@@ -91,8 +91,8 @@ test('P17 slice 4: overlay-xiaohongshu exposes a TypeScript entrypoint and typed
   const entry = readFileSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-xiaohongshu'),
     true,
@@ -126,8 +126,8 @@ test('P17 slice 5: overlay-ppt exposes a TypeScript entrypoint and typed overlay
   const entry = readFileSync(path.resolve('packages/redcube-overlay-ppt/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-overlay-ppt/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-ppt'),
     true,

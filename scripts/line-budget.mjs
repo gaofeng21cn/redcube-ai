@@ -11,13 +11,13 @@ const BASELINE = new Map(Object.entries({
   "packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.js": 1302,
   "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js": 1033,
   "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/render.js": 1208,
-  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js": 1147,
+  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.js": 1306,
   "packages/redcube-runtime/src/managed-deliverable.js": 1435,
   "packages/redcube-tools/src/index.js": 1031,
   "tests/helpers/mock-codex-cli.js": 1389,
   "tests/mcp-gateway.test.js": 1159,
   "tests/product-entry.test.js": 1388,
-  "tests/ppt-creative-ownership-cases/targeted-rerender-and-export.test.js": 1185,
+  "tests/ppt-creative-ownership-cases/targeted-rerender-and-export.test.js": 1232,
   "tests/source-intake.test.js": 1225,
 }));
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.py', '.sh', '.bash', '.zsh', '.rs', '.go']);

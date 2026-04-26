@@ -11,7 +11,7 @@ test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed bou
   const entry = readFileSync(path.resolve('packages/redcube-runtime/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
+  assert.equal(pkg.types, './dist/index.d.ts');
   assert.match(entry, /runDeliverableRoute/);
   assert.match(entry, /resolveExecutorAdapter/);
   assert.match(entry, /P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT/);
@@ -73,8 +73,8 @@ test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and
   const runtimeEntry = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/index.js'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/types.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.base.json');
+  assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-registry'),
     true,
@@ -102,7 +102,7 @@ test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed 
   const entry = readFileSync(path.resolve('packages/redcube-codex-cli-client/src/index.ts'), 'utf-8');
   const types = readFileSync(path.resolve('packages/redcube-codex-cli-client/src/index.ts'), 'utf-8');
 
-  assert.equal(pkg.types, './src/index.ts');
+  assert.equal(pkg.types, './dist/index.d.ts');
   assert.match(entry, /readCodexCliContract/);
   assert.match(entry, /probeCodexCli/);
   assert.match(entry, /generateStructuredArtifactViaCodexCli/);
@@ -115,6 +115,7 @@ test('P23.A: utility packages expose TypeScript service entrypoints without chan
   const packages = [
     {
       directory: 'packages/redcube-config',
+      expectedTypesEntry: './dist/index.d.ts',
       publicEntrypoints: [
         'src/index.ts',
         'src/private-profile.ts',
@@ -127,6 +128,7 @@ test('P23.A: utility packages expose TypeScript service entrypoints without chan
     },
     {
       directory: 'packages/redcube-tools',
+      expectedTypesEntry: './src/index.ts',
       publicEntrypoints: ['src/index.ts'],
       expectedTypes: [
         /interface RedcubeProjectBundle/,
@@ -135,6 +137,7 @@ test('P23.A: utility packages expose TypeScript service entrypoints without chan
     },
     {
       directory: 'packages/redcube-llm',
+      expectedTypesEntry: './src/index.ts',
       publicEntrypoints: ['src/index.ts'],
       expectedTypes: [
         /interface RedcubeNoteDraftRequest/,
@@ -149,8 +152,8 @@ test('P23.A: utility packages expose TypeScript service entrypoints without chan
     const packageTsconfig = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'tsconfig.json'), 'utf-8'));
     const types = readFileSync(path.resolve(pkgSpec.directory, 'src/types.ts'), 'utf-8');
 
-    assert.equal(pkg.types, './src/index.ts', pkgSpec.directory);
-    assert.equal(packageTsconfig.extends, '../../tsconfig.base.json', pkgSpec.directory);
+    assert.equal(pkg.types, pkgSpec.expectedTypesEntry, pkgSpec.directory);
+    assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json', pkgSpec.directory);
     assert.equal(
       rootTsconfig.references.some((entrypoint) => entrypoint.path === `./${pkgSpec.directory}`),
       true,
@@ -166,8 +169,10 @@ test('P23.A: utility packages expose TypeScript service entrypoints without chan
   }
 
   const redcubeConfigPkg = JSON.parse(readFileSync(path.resolve('packages/redcube-config/package.json'), 'utf-8'));
-  assert.equal(redcubeConfigPkg.exports['.'].default, './src/index.js');
-  assert.equal(redcubeConfigPkg.exports['./private-profile'].default, './src/private-profile.js');
-  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].default, './src/xiaohongshu-author-profile.js');
-  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].types, './src/xiaohongshu-author-profile.ts');
+  assert.equal(redcubeConfigPkg.exports['.'].default, './dist/index.js');
+  assert.equal(redcubeConfigPkg.exports['.'].types, './dist/index.d.ts');
+  assert.equal(redcubeConfigPkg.exports['./private-profile'].default, './dist/private-profile.js');
+  assert.equal(redcubeConfigPkg.exports['./private-profile'].types, './dist/private-profile.d.ts');
+  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].default, './dist/xiaohongshu-author-profile.js');
+  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].types, './dist/xiaohongshu-author-profile.d.ts');
 });

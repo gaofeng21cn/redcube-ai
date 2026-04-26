@@ -15,7 +15,7 @@ test('gateway exposes a TypeScript entrypoint and typed product surface contract
   const types = read('packages/redcube-gateway/src/types.ts');
   const entry = read('packages/redcube-gateway/src/index.ts');
 
-  assert.equal(packageJson.types, './src/index.ts');
+  assert.equal(packageJson.types, './dist/index.d.ts');
   assert.match(types, /export interface WorkspaceDoctorResponse/);
   assert.match(types, /export interface DeliverableCreateResponse/);
   assert.match(types, /export interface RouteRunResponse/);
