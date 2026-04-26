@@ -1,0 +1,11 @@
+{
+  "kind": "redcube_native_ppt_python_engine",
+  "language": "python",
+  "contract_version": 1,
+  "owned_routes": [
+    "author_pptx_native",
+    "repair_pptx_native"
+  ],
+  "input_boundary": "slide_blueprint_plus_visual_direction_json",
+  "review_boundary": "rendered_pptx_screenshots"
+}

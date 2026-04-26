@@ -1,10 +1,12 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
 export function createPptDeckNativePptStageParts(deps) {
   const {
     CODEX_DEFAULT_ADAPTER,
     CREATIVE_MATERIALIZED_FROM,
+    NATIVE_PPT_ENGINE_CONTRACT,
     PYTHON_NATIVE,
     attachCommon,
     collectSlidesNeedingTargetedRevision,
@@ -22,6 +24,17 @@ export function createPptDeckNativePptStageParts(deps) {
     stageArtifactPath,
     writeJson,
   } = deps;
+
+  let cachedNativeEngineContract = null;
+
+  function expectedNativeEngineContract() {
+    if (cachedNativeEngineContract) return cachedNativeEngineContract;
+    if (!existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
+      throw new Error(`Missing native PPT engine contract: ${NATIVE_PPT_ENGINE_CONTRACT}`);
+    }
+    cachedNativeEngineContract = JSON.parse(readFileSync(NATIVE_PPT_ENGINE_CONTRACT, 'utf-8'));
+    return cachedNativeEngineContract;
+  }
 
   function runPython(script, args) {
     if (!existsSync(script)) {
@@ -114,24 +127,18 @@ export function createPptDeckNativePptStageParts(deps) {
   function requireNativeEngineContract(payload) {
     const contract = payload?.engine_contract || {};
     const ownedRoutes = safeArray(contract?.owned_routes).map((route) => safeText(route)).filter(Boolean);
-    const expectedRoutes = ['author_pptx_native', 'repair_pptx_native'];
+    const expected = expectedNativeEngineContract();
+    const expectedRoutes = safeArray(expected?.owned_routes).map((route) => safeText(route)).filter(Boolean);
     const valid = safeText(contract?.kind) === 'redcube_native_ppt_python_engine'
       && safeText(contract?.language) === 'python'
       && Number(contract?.contract_version || 0) === 1
       && expectedRoutes.every((route) => ownedRoutes.includes(route))
-      && safeText(contract?.input_boundary) === 'slide_blueprint_plus_visual_direction_json'
-      && safeText(contract?.review_boundary) === 'rendered_pptx_screenshots';
+      && safeText(contract?.input_boundary) === safeText(expected?.input_boundary)
+      && safeText(contract?.review_boundary) === safeText(expected?.review_boundary);
     if (!valid) {
       throw new Error('Native PPT route requires python engine contract v1');
     }
-    return {
-      kind: 'redcube_native_ppt_python_engine',
-      language: 'python',
-      contract_version: 1,
-      owned_routes: expectedRoutes,
-      input_boundary: 'slide_blueprint_plus_visual_direction_json',
-      review_boundary: 'rendered_pptx_screenshots',
-    };
+    return expected;
   }
 
   function nativeMechanicalReviewPayload(nativeArtifact) {
@@ -232,6 +239,7 @@ export function createPptDeckNativePptStageParts(deps) {
       '--preview-dir', paths.previewDir,
       '--output-pdf', paths.pdfFile,
       '--repair-log', paths.repairLogFile,
+      '--engine-contract', NATIVE_PPT_ENGINE_CONTRACT,
     ]);
     const payload = python.payload;
     const engineContract = requireNativeEngineContract(payload);
@@ -254,6 +262,7 @@ export function createPptDeckNativePptStageParts(deps) {
         source_visual_route: route,
         builder: payload.builder || { kind: 'python_pptx_native_shapes' },
         engine_contract: engineContract,
+        engine_contract_file: NATIVE_PPT_ENGINE_CONTRACT,
         shape_manifest_schema_version: Number(payload.shape_manifest_schema_version || 0),
         editable_artifact: true,
         pptx_file: safeText(payload.pptx_file, paths.pptxFile),
@@ -286,6 +295,7 @@ export function createPptDeckNativePptStageParts(deps) {
         safeText(payload.pdf_file, paths.pdfFile),
         safeText(payload.shape_manifest_file, paths.shapeManifestFile),
         safeText(payload.repair_log_file, paths.repairLogFile),
+        NATIVE_PPT_ENGINE_CONTRACT,
         ...safeArray(payload.preview_screenshots),
       ].filter(Boolean),
       review_state_patch: {

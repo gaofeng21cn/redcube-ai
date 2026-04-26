@@ -15,14 +15,12 @@ from pptx.util import Inches, Pt
 CANVAS_PX = (1152, 648)
 SLIDE_W = Inches(16)
 SLIDE_H = Inches(9)
-ENGINE_CONTRACT = {
-    'kind': 'redcube_native_ppt_python_engine',
-    'language': 'python',
-    'contract_version': 1,
-    'owned_routes': ['author_pptx_native', 'repair_pptx_native'],
-    'input_boundary': 'slide_blueprint_plus_visual_direction_json',
-    'review_boundary': 'rendered_pptx_screenshots',
-}
+DEFAULT_ENGINE_CONTRACT_FILE = (
+    Path(__file__).resolve().parents[3]
+    / 'contracts'
+    / 'runtime-program'
+    / 'ppt-native-python-engine-contract.json'
+)
 
 
 def fail(message: str) -> None:
@@ -37,6 +35,26 @@ def safe_text(value, fallback: str = '') -> str:
 
 def safe_list(value):
     return value if isinstance(value, list) else []
+
+
+def load_engine_contract(contract_file: Path) -> dict:
+    if not contract_file.exists():
+        fail(f'engine contract not found: {contract_file}')
+    contract = json.loads(contract_file.read_text(encoding='utf-8'))
+    required = {
+        'kind': 'redcube_native_ppt_python_engine',
+        'language': 'python',
+        'contract_version': 1,
+        'input_boundary': 'slide_blueprint_plus_visual_direction_json',
+        'review_boundary': 'rendered_pptx_screenshots',
+    }
+    for key, expected in required.items():
+        if contract.get(key) != expected:
+            fail(f'engine contract field mismatch: {key}')
+    routes = contract.get('owned_routes')
+    if routes != ['author_pptx_native', 'repair_pptx_native']:
+        fail('engine contract owned_routes mismatch')
+    return contract
 
 
 def rgb(hex_value: str) -> RGBColor:
@@ -255,12 +273,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--preview-dir', required=True)
     parser.add_argument('--output-pdf')
     parser.add_argument('--repair-log')
+    parser.add_argument('--engine-contract', default=str(DEFAULT_ENGINE_CONTRACT_FILE))
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     payload = json.loads(Path(args.input_json).read_text(encoding='utf-8'))
+    engine_contract_file = Path(args.engine_contract).resolve()
+    engine_contract = load_engine_contract(engine_contract_file)
     blueprint = payload.get('blueprint') or {}
     slides = safe_list(blueprint.get('slides'))
     if not slides:
@@ -292,7 +313,8 @@ def main() -> None:
     manifest = {
         'schema_version': 1,
         'artifact_kind': 'ppt_deck_native_shape_manifest',
-        'engine_contract': ENGINE_CONTRACT,
+        'engine_contract': engine_contract,
+        'engine_contract_file': str(engine_contract_file),
         'mode': args.mode,
         'editable_artifact': True,
         'pptx_file': str(output_pptx),
@@ -308,7 +330,8 @@ def main() -> None:
     result = {
         'status': 'completed',
         'builder': {'kind': 'python_pptx_native_shapes'},
-        'engine_contract': ENGINE_CONTRACT,
+        'engine_contract': engine_contract,
+        'engine_contract_file': str(engine_contract_file),
         'shape_manifest_schema_version': manifest['schema_version'],
         'mode': args.mode,
         'page_count': len(slides),

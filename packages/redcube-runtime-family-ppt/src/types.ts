@@ -332,6 +332,7 @@ export interface PptNativePptBundleArtifact extends PptRuntimeArtifactBase {
       kind?: string;
     };
     engine_contract: PptNativePptEngineContract;
+    engine_contract_file: string;
     shape_manifest_schema_version: number;
     editable_artifact: true;
     pptx_file: string;

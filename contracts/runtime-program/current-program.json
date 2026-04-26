@@ -198,6 +198,7 @@
       "ppt_native_authoring_proof_lane": {
         "status": "opt_in_proof_lane",
         "contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
+        "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
         "brief": "docs/program/phase-2/phase_2_ppt_native_authoring_proof_lane.md",
         "default_mainline_changed": false,
         "default_visual_route": "render_html",

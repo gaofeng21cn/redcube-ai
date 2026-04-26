@@ -18,6 +18,10 @@ function writeJson(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
 }
 
+function nativeEngineContract() {
+  return readJson(path.resolve('contracts/runtime-program/ppt-native-python-engine-contract.json'));
+}
+
 async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-native' }) {
   await createDeliverable({
     workspaceRoot,
@@ -56,21 +60,19 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(authorResult.ok, true);
     const authored = readJson(authorResult.artifactFile);
     assert.equal(authored.native_ppt_bundle?.editable_artifact, true);
-    const expectedEngineContract = {
-      kind: 'redcube_native_ppt_python_engine',
-      language: 'python',
-      contract_version: 1,
-      owned_routes: ['author_pptx_native', 'repair_pptx_native'],
-      input_boundary: 'slide_blueprint_plus_visual_direction_json',
-      review_boundary: 'rendered_pptx_screenshots',
-    };
+    const expectedEngineContract = nativeEngineContract();
     assert.deepEqual(authored.native_ppt_bundle?.engine_contract, expectedEngineContract);
+    assert.equal(
+      authored.native_ppt_bundle?.engine_contract_file,
+      path.resolve('contracts/runtime-program/ppt-native-python-engine-contract.json'),
+    );
     assert.equal(authored.native_ppt_bundle?.shape_manifest_schema_version, 1);
     assert.equal(existsSync(authored.native_ppt_bundle?.pptx_file), true);
     assert.equal(existsSync(authored.native_ppt_bundle?.shape_manifest_file), true);
     const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
     assert.equal(shapeManifest.schema_version, 1);
     assert.deepEqual(shapeManifest.engine_contract, expectedEngineContract);
+    assert.equal(shapeManifest.engine_contract_file, authored.native_ppt_bundle.engine_contract_file);
     assert.equal(authored.native_ppt_bundle?.source_visual_route, 'author_pptx_native');
     assert.equal(authored.native_ppt_bundle?.slides.length >= 6, true);
     assert.equal(
@@ -109,6 +111,23 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(existsSync(exported.export_bundle?.pptx_file), true);
     assert.equal(existsSync(exported.export_bundle?.pdf_file), true);
   });
+});
+
+test('native PPT proof lane records the Python engine contract as the single ownership source', () => {
+  const engineContract = nativeEngineContract();
+  const proofLane = readJson(path.resolve('contracts/runtime-program/ppt-native-authoring-proof-lane.json'));
+  const currentProgram = readJson(path.resolve('contracts/runtime-program/current-program.json'));
+
+  assert.equal(engineContract.language, 'python');
+  assert.deepEqual(engineContract.owned_routes, ['author_pptx_native', 'repair_pptx_native']);
+  assert.equal(
+    proofLane.candidate_route_model.runtime_executor_proof.engine_contract,
+    'contracts/runtime-program/ppt-native-python-engine-contract.json',
+  );
+  assert.equal(
+    currentProgram.current_state.exploration_lanes.ppt_native_authoring_proof_lane.engine_contract,
+    'contracts/runtime-program/ppt-native-python-engine-contract.json',
+  );
 });
 
 test('native PPT repair consumes screenshot feedback and targets blocked slides', async () => {

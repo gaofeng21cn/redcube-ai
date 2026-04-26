@@ -70,6 +70,7 @@ export function createPptDeckRuntimeCore() {
   const PYTHON_REVIEW = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_review.py');
   const PYTHON_EXPORT = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_export.py');
   const PYTHON_NATIVE = path.join(MODULE_DIR, '../../../redcube-runtime/scripts/ppt_deck_native.py');
+  const NATIVE_PPT_ENGINE_CONTRACT = path.join(REPO_ROOT, 'contracts/runtime-program/ppt-native-python-engine-contract.json');
   const PROMPT_PACK = Object.freeze({
     storyline: 'prompts/ppt_deck/storyline.md',
     detailed_outline: 'prompts/ppt_deck/detailed_outline.md',
@@ -713,6 +714,7 @@ export function createPptDeckRuntimeCore() {
     CREATIVE_MATERIALIZED_FROM,
     PAGE_FIX_ROUTE,
     PROMPT_PACK,
+    NATIVE_PPT_ENGINE_CONTRACT,
     PYTHON_EXPORT,
     PYTHON_NATIVE,
     PYTHON_REVIEW,
