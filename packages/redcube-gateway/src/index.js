@@ -1,8 +1,17 @@
 export { doctorWorkspace } from './actions/doctor-workspace.js';
 export { listTopics } from './actions/list-topics.js';
-export async function getOverlayCatalog(request) {
-  const module = await import('./actions/get-overlay-catalog.js');
-  return module.getOverlayCatalog(request);
+export async function getOverlayCatalog() {
+  const { getDefaultOverlayCatalog } = await import('@redcube/overlay-registry');
+  const catalog = getDefaultOverlayCatalog();
+  return {
+    ok: true,
+    ...catalog,
+    recommended_action: 'create_deliverable',
+    summary: {
+      total_overlays: catalog.overlays.length,
+      total_profiles: catalog.overlays.reduce((sum, overlay) => sum + overlay.profiles.length, 0),
+    },
+  };
 }
 export async function intakeSource(request) {
   const module = await import('./actions/intake-source.js');
@@ -42,8 +51,8 @@ export async function getDeliverable(request) {
   return module.getDeliverable(request);
 }
 export async function getPublicationProjection(request) {
-  const module = await import('./actions/get-publication-projection.js');
-  return module.getPublicationProjection(request);
+  const { getPublicationProjection: loadPublicationProjection } = await import('@redcube/runtime');
+  return loadPublicationProjection(request);
 }
 
 export async function getRun(request) {
@@ -110,8 +119,8 @@ export async function auditDeliverable(request) {
 }
 
 export async function reviewRenderOutput(request) {
-  const module = await import('./actions/review-render-output.js');
-  return module.reviewRenderOutput(request);
+  const { reviewRenderedDeliverable } = await import('@redcube/runtime');
+  return reviewRenderedDeliverable(request);
 }
 
 export async function runtimeWatch(request) {
@@ -120,11 +129,11 @@ export async function runtimeWatch(request) {
 }
 
 export async function getReviewState(request) {
-  const module = await import('./actions/get-review-state.js');
-  return module.getReviewState(request);
+  const { getReviewState: loadReviewState } = await import('@redcube/runtime');
+  return loadReviewState(request);
 }
 
 export async function applyReviewMutation(request) {
-  const module = await import('./actions/apply-review-mutation.js');
-  return module.applyReviewMutation(request);
+  const { applyReviewMutation: mutateReviewState } = await import('@redcube/runtime');
+  return mutateReviewState(request);
 }

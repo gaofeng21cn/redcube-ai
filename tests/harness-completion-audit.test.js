@@ -92,7 +92,7 @@ test('harness audit: gateway product surface is stable across success and failur
   const runRoute = read('packages/redcube-gateway/src/actions/run-deliverable-route.js');
   const doctor = read('packages/redcube-gateway/src/actions/doctor-workspace.js');
   const listTopics = read('packages/redcube-gateway/src/actions/list-topics.js');
-  const getOverlayCatalog = read('packages/redcube-gateway/src/actions/get-overlay-catalog.js');
+  const gatewayIndex = read('packages/redcube-gateway/src/index.js');
 
   assert.equal(cli.includes("error_kind: 'cli_usage_error'"), true);
   assert.equal(cli.includes("recommended_action: 'read_help'"), true);
@@ -106,8 +106,8 @@ test('harness audit: gateway product surface is stable across success and failur
   assert.equal(runRoute.includes("error_kind: result.ok ? null : 'route_failure'"), true);
   assert.equal(doctor.includes("surface_kind: 'workspace_doctor'"), true);
   assert.equal(listTopics.includes("surface_kind: 'topic_catalog'"), true);
-  assert.equal(getOverlayCatalog.includes('getDefaultOverlayCatalog'), true);
-  assert.equal(getOverlayCatalog.includes("recommended_action: 'create_deliverable'"), true);
+  assert.equal(gatewayIndex.includes('getDefaultOverlayCatalog'), true);
+  assert.equal(gatewayIndex.includes("recommended_action: 'create_deliverable'"), true);
 });
 
 test('harness audit: extension proof shows onboarding is registry-driven instead of trunk hardcoded', () => {
