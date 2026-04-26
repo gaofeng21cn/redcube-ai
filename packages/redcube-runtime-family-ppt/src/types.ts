@@ -203,6 +203,9 @@ export interface PptSlideReviewChecks {
 
 export interface PptSlideReviewMetrics {
   text_char_count?: number;
+  title_font_size?: number;
+  title_font_reference?: number | null;
+  title_font_delta?: number | null;
   block_count?: number;
   overlap_pairs?: number;
   occupied_ratio?: number;

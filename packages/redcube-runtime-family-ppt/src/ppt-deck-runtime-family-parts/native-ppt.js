@@ -148,7 +148,6 @@ export function createPptDeckNativePptStageParts(deps) {
       title: safeText(slide?.title),
       layout_family: safeText(slide?.layout_family),
       screenshot_file: safeText(slide?.preview_screenshot_file),
-      status: 'pass',
       checks: {
         overflow_free: true,
         occlusion_free: true,
@@ -159,6 +158,7 @@ export function createPptDeckNativePptStageParts(deps) {
         title_typography_ok: true,
       },
       metrics: {
+        title_font_size: Number(slide?.title_font_size || 32),
         text_char_count: 0,
         block_count: Number(slide?.shape_count || 0),
         overlap_pairs: 0,

@@ -243,6 +243,7 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             'slide_id': safe_text(slide_data.get('slide_id'), f'S{index:02d}'),
             'title': safe_text(slide_data.get('title'), f'Slide {index}'),
             'layout_family': safe_text(slide_data.get('layout_family')),
+            'title_font_size': 32,
             'shape_count': len(slide.shapes),
             'text_box_count': sum(1 for shape in slide.shapes if getattr(shape, 'has_text_frame', False)),
             'preview_screenshot_file': str(preview_file),
