@@ -81,10 +81,21 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   const ppt = catalog.overlays.find((overlay) => overlay.overlay_id === 'ppt_deck');
   const xiaohongshu = catalog.overlays.find((overlay) => overlay.overlay_id === 'xiaohongshu');
   const poster = catalog.overlays.find((overlay) => overlay.overlay_id === 'poster_onepager');
+  const pptCatalog = structuredClone(ppt);
+  const xiaohongshuCatalog = structuredClone(xiaohongshu);
+  const pptHtmlCompanion = pptCatalog.visual_authoring_policy.html_design_companion;
+  const xiaohongshuHtmlCompanion = xiaohongshuCatalog.visual_authoring_policy.html_design_companion;
+
+  assert.equal(pptHtmlCompanion.source_skill_id, 'ui-ux-pro-max');
+  assert.equal(pptHtmlCompanion.public_skill_policy, 'do_not_register_as_public_redcube_skill');
+  assert.equal(xiaohongshuHtmlCompanion.source_skill_id, 'ui-ux-pro-max');
+  assert.equal(xiaohongshuHtmlCompanion.activation_surface, 'internal_stage_context');
+  delete pptCatalog.visual_authoring_policy.html_design_companion;
+  delete xiaohongshuCatalog.visual_authoring_policy.html_design_companion;
 
   assert.equal(catalog.surface_kind, 'overlay_catalog');
   assert.deepEqual(
-    ppt,
+    pptCatalog,
     {
       overlay_id: 'ppt_deck',
       default_profile_id: 'lecture_student',
@@ -136,7 +147,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
     },
   );
   assert.deepEqual(
-    xiaohongshu,
+    xiaohongshuCatalog,
     {
       overlay_id: 'xiaohongshu',
       default_profile_id: 'standard_note',
@@ -144,6 +155,9 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       route_sequence: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle'],
       deliverable_kind: 'xiaohongshu_note',
       prompt_pack_id: 'xiaohongshu_mainline_v1',
+      visual_authoring_policy: {
+        default_visual_route: 'render_html',
+      },
       packages: {
         overlay: '@redcube/overlay-xiaohongshu',
         runtime_family: '@redcube/runtime-family-xiaohongshu',

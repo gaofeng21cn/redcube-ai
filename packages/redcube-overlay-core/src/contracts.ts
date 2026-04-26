@@ -62,6 +62,64 @@ export const REQUIRED_GOVERNANCE_SUMMARIES = [
   'lifecycle_stage_summary',
 ] as const;
 
+const UI_UX_PRO_MAX_HTML_RULES = [
+  {
+    rule_id: 'accessibility.contrast_and_semantics',
+    priority: 1,
+    guidance: '保持足够文字对比度；功能色必须用文字、图标或结构共同表达，避免只靠颜色传意。',
+  },
+  {
+    rule_id: 'layout.content_fit_and_spacing',
+    priority: 2,
+    guidance: '为标题、正文、标签、节点和底部说明保留稳定安全间距；优先减字、扩容或重排，不用硬挤、遮挡或坏断词。',
+  },
+  {
+    rule_id: 'typography.system_scale',
+    priority: 3,
+    guidance: '使用一致的标题、正文、标签和页码字号梯度；保持自然语义换行，避免单字尾行和跨页字号漂移。',
+  },
+  {
+    rule_id: 'style.director_consistency',
+    priority: 4,
+    guidance: '视觉风格服从交付物类型、受众和 director intent；同一风格系统内切换构图，不退化成重复卡片模板。',
+  },
+  {
+    rule_id: 'responsive.canvas_stability',
+    priority: 5,
+    guidance: 'HTML 必须稳定落在目标画布内，使用明确尺寸、层级和语义块，禁止横向滚动、裁切、遮挡和布局跳变。',
+  },
+] as const;
+
+export function buildUiUxProMaxHtmlCompanion({
+  family = '',
+  canvas = {},
+  appliesToRoutes = ['render_html', 'fix_html'],
+}: {
+  family?: string;
+  canvas?: JsonObject;
+  appliesToRoutes?: string[];
+} = {}): JsonObject {
+  return structuredClone({
+    companion_id: 'ui_ux_pro_max_html_quality_v1',
+    source_skill_id: 'ui-ux-pro-max',
+    source_skill_name: 'UI/UX Pro Max',
+    activation_surface: 'internal_stage_context',
+    public_skill_policy: 'do_not_register_as_public_redcube_skill',
+    family: String(family || '').trim(),
+    applies_to_routes: appliesToRoutes.map((route) => String(route || '').trim()).filter(Boolean),
+    applies_to_surfaces: ['html_generation_prompt_context', 'html_repair_prompt_context', 'render_artifact_metadata'],
+    design_domains: [
+      'accessibility',
+      'layout_responsive',
+      'typography_color',
+      'style_selection',
+      'visual_hierarchy',
+    ],
+    canvas,
+    rules: UI_UX_PRO_MAX_HTML_RULES.map((rule) => ({ ...rule })),
+  }) as JsonObject;
+}
+
 function textValue(value: JsonValue | undefined): string {
   return String(value || '').trim();
 }

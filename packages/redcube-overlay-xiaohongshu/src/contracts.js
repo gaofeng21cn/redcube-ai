@@ -1,4 +1,4 @@
-import { buildDeliverableRecord } from '@redcube/overlay-core';
+import { buildDeliverableRecord, buildUiUxProMaxHtmlCompanion } from '@redcube/overlay-core';
 
 const SOURCE_TRUTH_CONSUMPTION_FIELDS = Object.freeze([
   'authoritative_source_kind',
@@ -207,7 +207,7 @@ const PROMPT_PACK = {
   },
   render_contract: {
     render_strategy: 'prompt_director_first',
-    shell_file: 'render_shell.html',
+    shell_file: 'render_shell.html', ui_ux_quality_companion: buildUiUxProMaxHtmlCompanion({ family: 'xiaohongshu', canvas: LAYOUT_RULES.canvas }),
     recipe_registry: {
       cover_note: 'xhs.hero_note',
       myth_compare: 'xhs.split_contrast',
@@ -283,9 +283,9 @@ export function describeXiaohongshuOverlay() {
     overlay_id: 'xiaohongshu',
     default_profile_id: 'standard_note',
     profiles: ['standard_note'],
-    deliverable_kind: 'xiaohongshu_note',
-    prompt_pack_id: PROMPT_PACK.pack_id,
+    deliverable_kind: 'xiaohongshu_note', prompt_pack_id: PROMPT_PACK.pack_id,
     route_sequence: STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
+    visual_authoring_policy: { default_visual_route: 'render_html', html_design_companion: PROMPT_PACK.render_contract.ui_ux_quality_companion },
     packages: {
       overlay: '@redcube/overlay-xiaohongshu',
       runtime_family: '@redcube/runtime-family-xiaohongshu',

@@ -92,6 +92,22 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   assert.equal(lectureStudent.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(lectureStudent.delivery_contract.required_export_route, 'export_pptx');
   assert.equal(lectureStudent.prompt_pack.render_contract.default_visual_route, 'render_html');
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.ui_ux_quality_companion.source_skill_id,
+    'ui-ux-pro-max',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.ui_ux_quality_companion.activation_surface,
+    'internal_stage_context',
+  );
+  assert.deepEqual(
+    lectureStudent.prompt_pack.render_contract.ui_ux_quality_companion.applies_to_routes,
+    ['render_html', 'fix_html'],
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.ui_ux_quality_companion.public_skill_policy,
+    'do_not_register_as_public_redcube_skill',
+  );
   assert.equal(lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.status, 'opt_in_proof_lane');
   assert.deepEqual(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,

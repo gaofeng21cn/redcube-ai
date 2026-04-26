@@ -81,7 +81,7 @@ export function createPptDeckRenderStageParts(deps) {
   function renderContract(contract) {
     return contract?.prompt_pack?.render_contract || {};
   }
-
+  function htmlDesignCompanion(contract) { const companion = renderContract(contract)?.ui_ux_quality_companion; return companion && typeof companion === 'object' ? companion : null; }
   const SCREENSHOT_MECHANICAL_ISSUE_LABELS = Object.freeze({
     overflow_detected: '存在溢出或裁切',
     occlusion_detected: '存在遮挡或重叠',
@@ -762,7 +762,7 @@ export function createPptDeckRenderStageParts(deps) {
         '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
         '不要使用 renderSlide/layoutByType/cardsGrid/pageType，不要输出 <script>/<style> block，也不要把模板注册表或内部文档写入 HTML。',
         'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
-      ],
+      ], ui_ux_quality_companion: htmlDesignCompanion(contract),
     };
     const slideBatches = renderPlan.mode === 'targeted_revision_only'
       ? chunkArray(renderPlan.slides_to_render, renderBatchSize)
@@ -1037,7 +1037,7 @@ export function createPptDeckRenderStageParts(deps) {
       peak_pages: safeArray(visualArtifact?.visual_direction?.peak_pages),
       page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
       rerender_mode: safeText(renderExecution?.mode, 'full_regeneration'),
-      render_execution: renderExecution || null,
+      render_execution: renderExecution || null, html_design_companion: htmlDesignCompanion(contract),
       slides: slidesMarkup.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
@@ -1099,7 +1099,7 @@ export function createPptDeckRenderStageParts(deps) {
         render_strategy: renderPlan.render_strategy,
         generator_instructions: renderPlan.generator_instructions,
         render_summary: normalizeStringList(data?.render_summary, `${route}.render_summary`, { min: 1, max: 4 }),
-        render_execution: renderExecution || null,
+        render_execution: renderExecution || null, html_design_companion: renderPlan.html_design_companion,
         shell_contract: {
           ratio: CANVAS.ratio,
           width: CANVAS.width,

@@ -40,7 +40,7 @@ export function createXiaohongshuRenderParts(deps) {
     validateRenderedReviewAnchors,
     validateRenderedSlideContent,
   } = deps;
-
+  function htmlDesignCompanion(contract) { const companion = renderContract(contract)?.ui_ux_quality_companion; return companion && typeof companion === 'object' ? companion : null; }
   function chunkArray(items, size) {
     const source = safeArray(items);
     const batchSize = Math.max(Number(size) || 1, 1);
@@ -71,7 +71,7 @@ export function createXiaohongshuRenderParts(deps) {
         '每页至少提供 2 个语义化 data-qa-block，并至少标记 1 个 data-primary-point=true，供截图审稿读取布局结构。',
         '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或模板注册表写进 HTML。',
         '版式由 AI 直接创作，不能退化成固定卡片模板拼装。',
-      ],
+      ], ui_ux_quality_companion: htmlDesignCompanion(contract),
     };
     const planSlides = summarizePlanSlides(plan);
     const renderBatchStages = chunkArray(planSlides, 1).map((slideBatch, batchIndex) => {
@@ -303,7 +303,7 @@ export function createXiaohongshuRenderParts(deps) {
         source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
         visual_anchor_system: visual?.visual_direction?.visual_anchor_system || buildVisualAnchorSystem(),
         signature_exposure_grammar: visual?.visual_direction?.signature_exposure_grammar || buildSignatureExposureGrammar(),
-      },
+      }, html_design_companion: htmlDesignCompanion(contract),
       slides: slides.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
@@ -334,7 +334,7 @@ export function createXiaohongshuRenderParts(deps) {
         page_count: slides.length,
         shell_contract: CANVAS,
         render_strategy: renderPlan.render_strategy,
-        director_contract: renderPlan.director_contract,
+        director_contract: renderPlan.director_contract, html_design_companion: renderPlan.html_design_companion,
         slides,
         render_summary: normalizeStringList(data?.render_summary, 'render_html.render_summary', { min: 1, max: 4 }),
       },
@@ -400,7 +400,7 @@ export function createXiaohongshuRenderParts(deps) {
           '若当前卡片已有可用结构，优先局部修复遮挡、溢出、换行、层级和留白，不要换成另一套版式。',
           '必须保留 data-slide-root=true、匹配的 data-slide-id、至少 2 个 data-qa-block 和 1 个 data-primary-point=true。',
           '不要外链图片，不要脚本，不要 <style> block，不要把内部文档或制作流程写进画面。',
-        ],
+        ], ui_ux_quality_companion: htmlDesignCompanion(contract),
       },
       outputContract: deps.fixHtmlOutputContract(),
       localFileInspection: buildFixHtmlLocalInspection(screenshotReview, targetSlideIds),
@@ -442,7 +442,7 @@ export function createXiaohongshuRenderParts(deps) {
         source_language_discipline: safeText(visual?.visual_direction?.source_language_discipline),
         visual_anchor_system: visual?.visual_direction?.visual_anchor_system || buildVisualAnchorSystem(),
         signature_exposure_grammar: visual?.visual_direction?.signature_exposure_grammar || buildSignatureExposureGrammar(),
-      },
+      }, html_design_companion: htmlDesignCompanion(contract),
       slides: slides.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
@@ -472,7 +472,7 @@ export function createXiaohongshuRenderParts(deps) {
         page_count: slides.length,
         shell_contract: CANVAS,
         render_strategy: renderPlan.render_strategy,
-        director_contract: renderPlan.director_contract,
+        director_contract: renderPlan.director_contract, html_design_companion: renderPlan.html_design_companion,
         repair_scope: renderPlan.repair_scope,
         slides,
         render_summary: buildDeterministicFixHtmlSummary({

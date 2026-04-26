@@ -52,6 +52,22 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
   assert.equal(contract.prompt_pack.render_contract.compiler_module ?? null, null);
   assert.equal(contract.prompt_pack.render_contract.compiler_export ?? null, null);
+  assert.equal(
+    contract.prompt_pack.render_contract.ui_ux_quality_companion.source_skill_id,
+    'ui-ux-pro-max',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.ui_ux_quality_companion.activation_surface,
+    'internal_stage_context',
+  );
+  assert.deepEqual(
+    contract.prompt_pack.render_contract.ui_ux_quality_companion.applies_to_routes,
+    ['render_html', 'fix_html'],
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.ui_ux_quality_companion.public_skill_policy,
+    'do_not_register_as_public_redcube_skill',
+  );
   assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, true);
 });

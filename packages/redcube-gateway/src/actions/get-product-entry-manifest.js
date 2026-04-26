@@ -207,13 +207,9 @@ function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) 
 }
 
 function buildDeliverableFacadeContract() {
-  const pptDeckOverlay = overlayRegistry.getOverlay('ppt_deck');
-  const pptDeckSequence = typeof pptDeckOverlay?.describeOverlay === 'function'
-    ? pptDeckOverlay.describeOverlay().route_sequence || []
-    : [];
-  const pptDeckVisualPolicy = typeof pptDeckOverlay?.describeOverlay === 'function'
-    ? pptDeckOverlay.describeOverlay().visual_authoring_policy || {}
-    : {};
+  const pptDeckDescription = overlayRegistry.getOverlay('ppt_deck')?.describeOverlay?.() || {};
+  const xiaohongshuVisualPolicy = overlayRegistry.getOverlay('xiaohongshu')?.describeOverlay?.().visual_authoring_policy || {};
+  const pptDeckVisualPolicy = pptDeckDescription.visual_authoring_policy || {};
   return {
     surface_kind: 'deliverable_facade_contract',
     owner: 'redcube_ai',
@@ -232,9 +228,10 @@ function buildDeliverableFacadeContract() {
         deliverable_family: 'ppt_deck',
         route_surface: 'runManagedDeliverable',
         route_fallback_surface: 'runDeliverableRoute',
-        protected_stage_sequence: pptDeckSequence,
+        protected_stage_sequence: pptDeckDescription.route_sequence || [],
         default_visual_route: 'render_html',
         native_ppt_proof_lane: pptDeckVisualPolicy.native_ppt_proof_lane || null,
+        html_design_companion: pptDeckVisualPolicy.html_design_companion || null,
         route_gate_policy: 'fail_closed_against_overlay_stage_sequence',
         default_run_mode: 'auto_to_terminal',
         stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
@@ -246,6 +243,7 @@ function buildDeliverableFacadeContract() {
         deliverable_family: 'xiaohongshu',
         route_surface: 'runDeliverableRoute',
         route_fallback_surface: 'runManagedDeliverable',
+        default_visual_route: 'render_html', html_design_companion: xiaohongshuVisualPolicy.html_design_companion || null,
       },
     },
   };

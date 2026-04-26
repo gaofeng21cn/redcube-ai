@@ -37,7 +37,16 @@ function makePptRenderParts({ stageCalls }) {
   const contract = {
     title: '批量生成测试',
     profile_id: 'lecture_peer',
-    prompt_pack: { render_contract: {} },
+    prompt_pack: {
+      render_contract: {
+        ui_ux_quality_companion: {
+          source_skill_id: 'ui-ux-pro-max',
+          activation_surface: 'internal_stage_context',
+          applies_to_routes: ['render_html', 'fix_html'],
+          rules: [{ rule_id: 'layout.content_fit', priority: 1 }],
+        },
+      },
+    },
     lifecycle_model: { route_to_stage: { render_html: 'visual_authorship' } },
   };
   const deps = {
@@ -213,6 +222,18 @@ test('ppt render_html batches same-route slide chunks through durable per-batch 
     'S03',
     'S04,S05',
     'S06',
+  ]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.ui_ux_quality_companion.source_skill_id), [
+    'ui-ux-pro-max',
+    'ui-ux-pro-max',
+    'ui-ux-pro-max',
+    'ui-ux-pro-max',
+  ]);
+  assert.deepEqual(stageCalls.map((stage) => stage.context.ui_ux_quality_companion.activation_surface), [
+    'internal_stage_context',
+    'internal_stage_context',
+    'internal_stage_context',
+    'internal_stage_context',
   ]);
   assert.deepEqual(artifact.render_execution.codex_batch_runtime.durable_cache.stage_cache_status.map((stage) => stage.stage_id), [
     'render_html_batch_01_S01_S02',

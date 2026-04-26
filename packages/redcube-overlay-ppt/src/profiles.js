@@ -1,4 +1,4 @@
-import { mergeContractLayers } from '@redcube/overlay-core';
+import { buildUiUxProMaxHtmlCompanion, mergeContractLayers } from '@redcube/overlay-core';
 
 const SOURCE_TRUTH_CONSUMPTION_FIELDS = Object.freeze([
   'authoritative_source_kind',
@@ -355,7 +355,7 @@ const FAMILY_PROMPT_PACK = {
   render_contract: {
     render_strategy: 'prompt_director_first',
     default_visual_route: 'render_html',
-    native_ppt_proof_lane: NATIVE_PPT_PROOF_LANE,
+    native_ppt_proof_lane: NATIVE_PPT_PROOF_LANE, ui_ux_quality_companion: buildUiUxProMaxHtmlCompanion({ family: 'ppt_deck', canvas: FAMILY_LAYOUT_RULES.canvas }),
     shell_file: 'render_shell.html',
     recipe_registry: {
       cover_hero: 'ppt.hero_signal',
@@ -611,7 +611,7 @@ export function describePptDeckOverlay() {
     route_sequence: FAMILY_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
     visual_authoring_policy: {
       default_visual_route: FAMILY_PROMPT_PACK.render_contract.default_visual_route,
-      native_ppt_proof_lane: FAMILY_PROMPT_PACK.render_contract.native_ppt_proof_lane,
+      native_ppt_proof_lane: FAMILY_PROMPT_PACK.render_contract.native_ppt_proof_lane, html_design_companion: FAMILY_PROMPT_PACK.render_contract.ui_ux_quality_companion,
     },
     packages: {
       overlay: '@redcube/overlay-ppt',

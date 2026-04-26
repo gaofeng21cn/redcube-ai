@@ -911,7 +911,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.task_lifecycle.checkpoint_summary.status, 'operator_review_required');
     assert.deepEqual(manifest.task_lifecycle.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
-    assert.equal(manifest.skill_catalog.skills.length, 1);
+    assert.equal(manifest.skill_catalog.skills.length, 1); assert.equal(manifest.skill_catalog.skills.some((skill) => skill.skill_id === 'ui-ux-pro-max'), false);
     assert.deepEqual(manifest.skill_catalog.supported_commands, [
       'redcube product frontdesk',
       'redcube product invoke',
@@ -1050,7 +1050,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'export_pptx',
       ],
     );
-    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route, 'render_html');
+    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route, 'render_html'); for (const family of ['ppt_deck', 'xiaohongshu']) { const companion = manifest.deliverable_facade.family_route_policy[family].html_design_companion; assert.equal(companion.source_skill_id, 'ui-ux-pro-max'); assert.equal(companion.activation_surface, 'internal_stage_context'); assert.equal(companion.public_skill_policy, 'do_not_register_as_public_redcube_skill'); }
     assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_run_mode, 'auto_to_terminal');
     assert.equal(
       manifest.deliverable_facade.family_route_policy.ppt_deck.stop_policy,
