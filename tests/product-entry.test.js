@@ -601,6 +601,66 @@ test('getProductEntrySession reconciles a stale session checkpoint with the work
   });
 });
 
+test('getProductEntrySession preserves a newer route-run checkpoint over stale managed supervision', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-route-checkpoint',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-route-checkpoint',
+        profile_id: 'lecture_student',
+        title: 'Product entry route checkpoint proof',
+        goal: '验证 route-run checkpoint 不被旧 managed supervision 覆盖',
+        user_intent: '先做到故事主线',
+        stop_after_stage: 'storyline',
+      },
+    });
+
+    const routeRun = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-route-checkpoint',
+      },
+      delivery_request: {
+        route: 'storyline',
+        user_intent: '直接重跑故事主线',
+      },
+    });
+
+    assert.equal(routeRun.domain_entry_surface.result_surface.surface_kind, 'route_run');
+    assert.equal(Boolean(routeRun.continuation_snapshot.latest_run_id), true);
+    assert.equal(routeRun.continuation_snapshot.latest_managed_run_id, null);
+
+    const sessionFile = routeRun.entry_session.session_file;
+    assert.equal(readJson(sessionFile).latest_surface_kind, 'route_run');
+
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-route-checkpoint',
+    });
+
+    assert.equal(
+      session.continuation_snapshot.latest_run_id,
+      routeRun.continuation_snapshot.latest_run_id,
+    );
+    assert.equal(session.continuation_snapshot.latest_managed_run_id, null);
+    assert.equal(
+      session.session_continuity.restore_point.latest_handle,
+      routeRun.continuation_snapshot.latest_run_id,
+    );
+    assert.equal(readJson(sessionFile).latest_surface_kind, 'route_run');
+  });
+});
+
 test('invokeFederatedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);

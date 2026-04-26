@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs';
+
 import {
   getPublicationProjection,
   getReviewState,
@@ -30,8 +32,66 @@ function safeText(value, fallback = '') {
   return text || fallback;
 }
 
+function readJsonRecord(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
 
-function buildRecommendedAction({ managedRun, runtimeLoopClosure }) {
+function parseTimestampMs(value) {
+  const text = safeText(value);
+  if (!text) return null;
+  const ms = Date.parse(text);
+  return Number.isNaN(ms) ? null : ms;
+}
+
+function runtimeSupervisionIsNewerThanSession(runtimeSupervision, session) {
+  const runtimeMs = parseTimestampMs(
+    runtimeSupervision?.recorded_at
+      || runtimeSupervision?.checked_at
+      || runtimeSupervision?.updated_at,
+  );
+  if (runtimeMs == null) return false;
+
+  const sessionMs = parseTimestampMs(session?.updated_at);
+  if (sessionMs == null) return true;
+
+  return runtimeMs > sessionMs;
+}
+
+function shouldPreserveRouteCheckpoint(runtimeSupervision, session) {
+  if (safeText(session.latest_surface_kind) !== 'route_run' || !safeText(session.latest_run_id)) {
+    return false;
+  }
+  return !runtimeSupervisionIsNewerThanSession(runtimeSupervision, session);
+}
+
+function publicationProjectionForDeliverable(publicationProjection, deliverableId) {
+  const deliverables = publicationProjection?.publication?.deliverables || {};
+  return deliverables[safeText(deliverableId)] || null;
+}
+
+function deliveryProjectionIsOutputReady({ reviewState, publicationProjection, deliverableId }) {
+  const deliverableProjection = publicationProjectionForDeliverable(publicationProjection, deliverableId);
+  const gateSummary = deliverableProjection?.gate_summary || reviewState?.gate_summary || {};
+  const operatorHandoff = deliverableProjection?.operator_handoff || {};
+  const reviewStatePayload = reviewState?.state || {};
+
+  return safeText(deliverableProjection?.current) === 'output_ready'
+    || safeText(gateSummary?.operator_handoff_status) === 'ready'
+    || safeText(operatorHandoff?.gate_status) === 'ready'
+    || (
+      safeText(reviewStatePayload?.current_status) === 'completed'
+      && safeText(reviewStatePayload?.latest_review_stage) === 'export_pptx'
+      && reviewStatePayload?.ready_for_export === true
+    );
+}
+
+function buildRecommendedAction({
+  managedRun,
+  runtimeLoopClosure,
+  reviewState,
+  publicationProjection,
+  deliverableId,
+}) {
   const projection = managedRun?.progress_projection || null;
   if (projection?.needs_user_decision) {
     return 'decide_product_next_step';
@@ -39,7 +99,53 @@ function buildRecommendedAction({ managedRun, runtimeLoopClosure }) {
   if (projection?.content_status === 'completed') {
     return 'pick_up_artifacts';
   }
+  if (deliveryProjectionIsOutputReady({ reviewState, publicationProjection, deliverableId })) {
+    return 'pick_up_artifacts';
+  }
   return runtimeLoopClosure?.control_policy?.recommended_action || 'continue_product_entry';
+}
+
+function collectArtifactRefsFromPublishBundle(publishBundleFile) {
+  const file = safeText(publishBundleFile);
+  if (!file || !existsSync(file)) return [];
+  const artifact = readJsonRecord(file);
+  const exportBundle = artifact?.export_bundle || {};
+  return [
+    file,
+    ...(Array.isArray(artifact?.artifact_refs) ? artifact.artifact_refs : []),
+    exportBundle?.source_html,
+    exportBundle?.pptx_file,
+    exportBundle?.pdf_file,
+    exportBundle?.presenter_notes_file,
+  ].map((entry) => safeText(entry)).filter(Boolean);
+}
+
+function artifactRefsFromPublicationProjection(publicationProjection, deliverableId) {
+  const deliverableProjection = publicationProjectionForDeliverable(publicationProjection, deliverableId);
+  const publishBundleFile = safeText(
+    deliverableProjection?.canonical_export_artifact
+      || deliverableProjection?.operator_handoff?.canonical_export_artifact,
+  );
+  return [...new Set(collectArtifactRefsFromPublishBundle(publishBundleFile))];
+}
+
+function mergeArtifactInventoryWithPublicationRefs({ artifactInventory, publicationProjection, deliverableId }) {
+  if (Array.isArray(artifactInventory?.artifact_refs) && artifactInventory.artifact_refs.length > 0) {
+    return artifactInventory;
+  }
+  const artifactRefs = artifactRefsFromPublicationProjection(publicationProjection, deliverableId);
+  if (artifactRefs.length === 0) {
+    return artifactInventory;
+  }
+  return {
+    ...artifactInventory,
+    artifact_refs: artifactRefs,
+    summary: {
+      ...artifactInventory.summary,
+      artifact_ref_count: artifactRefs.length,
+      artifact_source: 'publication_projection',
+    },
+  };
 }
 
 function requireField(name, value) {
@@ -66,6 +172,9 @@ function reconcileSessionCheckpointWithWorkspaceLatest(session) {
 
   const latestManagedRunId = safeText(runtimeSupervision.managed_run_id);
   if (!latestManagedRunId || latestManagedRunId === safeText(session.latest_managed_run_id)) {
+    return session;
+  }
+  if (shouldPreserveRouteCheckpoint(runtimeSupervision, session)) {
     return session;
   }
 
@@ -134,10 +243,14 @@ export async function getProductEntrySession(request) {
     continuationSnapshot,
   });
   const progressProjection = buildProgressProjectionSurface({ continuationSnapshot });
-  const artifactInventory = buildArtifactInventorySurface({
-    entrySessionId,
-    sessionFile: productEntrySessionFile(entrySessionId),
-    continuationSnapshot,
+  const artifactInventory = mergeArtifactInventoryWithPublicationRefs({
+    artifactInventory: buildArtifactInventorySurface({
+      entrySessionId,
+      sessionFile: productEntrySessionFile(entrySessionId),
+      continuationSnapshot,
+    }),
+    publicationProjection,
+    deliverableId: session.deliverable_id,
   });
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,
@@ -156,7 +269,13 @@ export async function getProductEntrySession(request) {
   return {
     ok: true,
     surface_kind: 'product_entry_session',
-    recommended_action: buildRecommendedAction({ managedRun, runtimeLoopClosure }),
+    recommended_action: buildRecommendedAction({
+      managedRun,
+      runtimeLoopClosure,
+      reviewState,
+      publicationProjection,
+      deliverableId: session.deliverable_id,
+    }),
     product_entry_contract_id: 'managed_product_entry_hardening',
     entry_session: buildEntrySessionSurface({
       entry_session_id: entrySessionId,
