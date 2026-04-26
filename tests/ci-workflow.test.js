@@ -139,7 +139,17 @@ test('ppt render shell protects short Chinese terms from single-character orphan
 
   assert.match(pptShell, /rca-cjk-token/);
   assert.match(pptShell, /protectCjkShortTokens/);
-  for (const token of ['自动推进', '资料同步推进', '线索', '问题', '走向', '对齐']) {
+  for (const token of [
+    '自动推进',
+    '资料同步推进',
+    '线索',
+    '问题',
+    '走向',
+    '对齐',
+    '阶段产物可审查',
+    '证据边界',
+    '不越界',
+  ]) {
     assert.match(pptShell, new RegExp(token));
   }
 });
