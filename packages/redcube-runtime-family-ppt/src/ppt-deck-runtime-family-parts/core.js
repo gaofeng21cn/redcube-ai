@@ -117,6 +117,7 @@ export function createPptDeckRuntimeCore() {
     'edge_clearance_out_of_range',
     'block_content_overflow_detected',
     'title_typography_inconsistent',
+    'page_number_consistency_failed',
   ]);
   const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
     'ai_review_passed',
@@ -126,6 +127,7 @@ export function createPptDeckRuntimeCore() {
     'edge_clearance_ok',
     'block_content_fit_ok',
     'title_typography_ok',
+    'page_number_consistency_ok',
   ]);
   const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
     storyline: 'story_architecture',
@@ -290,6 +292,7 @@ export function createPptDeckRuntimeCore() {
       'edge_clearance_ok',
       'block_content_fit_ok',
       'title_typography_ok',
+      'page_number_consistency_ok',
     ].includes(check));
   }
   
@@ -495,6 +498,12 @@ export function createPptDeckRuntimeCore() {
     if (!slide || typeof slide !== 'object') return false;
     if (safeText(slide?.status) === 'block') return true;
     if (hasAiVisualBlock(slide?.ai_review)) return true;
+    const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
+      ? safeArray(slide?.mechanical_issues)
+      : safeArray(slide?.issues);
+    if (mechanicalIssues.some((issue) => safeText(issue) === 'page_number_consistency_failed')) {
+      return true;
+    }
     const aiJudgement = normalizeAiVisualJudgement(slide?.ai_review?.judgement);
     const recommendedFix = safeText(slide?.ai_review?.recommended_fix).toLowerCase();
     if (
@@ -504,9 +513,6 @@ export function createPptDeckRuntimeCore() {
     ) {
       return false;
     }
-    const mechanicalIssues = safeArray(slide?.mechanical_issues).length > 0
-      ? safeArray(slide?.mechanical_issues)
-      : safeArray(slide?.issues);
     return mechanicalIssues.some((issue) => TARGETED_SCREENSHOT_MECHANICAL_ISSUES.has(safeText(issue)));
   }
   

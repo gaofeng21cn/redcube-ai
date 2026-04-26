@@ -289,6 +289,68 @@ for (const family of FAMILY_FILES) {
       assert.equal(rerunStage, 'fix_html');
     });
 
+    test(`${family.label} screenshot_review treats page number consistency failures as fix_html page fixes`, () => {
+      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
+      const reviewed = helpers.buildAiFirstVisualSlideReview(
+        {
+          slide_id: 'S04',
+          issues: ['page_number_consistency_failed'],
+          checks: {
+            overflow_free: true,
+            occlusion_free: true,
+            visual_density_ok: true,
+            speaker_fit_ok: true,
+            edge_clearance_ok: true,
+            block_content_fit_ok: true,
+            title_typography_ok: true,
+            page_number_consistency_ok: false,
+          },
+          metrics: {
+            page_number_audit: {
+              text: '4 / 8',
+              syntax_family: 'current_total_slash',
+              reference: { text: '01', syntax_family: 'two_digit' },
+              failures: ['syntax_family', 'position'],
+            },
+          },
+        },
+        {
+          judgement: 'pass',
+        },
+      );
+
+      assert.equal(reviewed.status, 'pass');
+      assert.deepEqual(reviewed.mechanical_issues, ['page_number_consistency_failed']);
+      assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'page_number_consistency_ok'), false);
+      assert.equal(helpers.slideNeedsTargetedRevision(reviewed), true);
+
+      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
+        {
+          stage_sequence: {
+            stages: [
+              { stage_id: 'storyline' },
+              { stage_id: 'detailed_outline' },
+              { stage_id: 'slide_blueprint' },
+              { stage_id: 'visual_direction' },
+              { stage_id: 'render_html' },
+              { stage_id: 'fix_html' },
+              { stage_id: 'visual_director_review' },
+              { stage_id: 'screenshot_review' },
+            ],
+          },
+          review_surface: {
+            rerun_from_stage: {
+              page_number_consistency_ok: 'fix_html',
+            },
+          },
+        },
+        ['page_number_consistency_ok'],
+        [reviewed],
+      );
+
+      assert.equal(rerunStage, 'fix_html');
+    });
+
     test(`${family.label} screenshot_review still routes speaker fit failures back to slide_blueprint`, () => {
       const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
       const rerunStage = helpers.deriveScreenshotReviewRerunStage(

@@ -332,6 +332,19 @@ export function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
   const title = safeText(slide.title).replace(/\s+/g, ' ').slice(0, 26);
   const coreSentence = safeText(slide.core_sentence).replace(/\s+/g, ' ').slice(0, 54);
   const sourceLabel = safeText(safeArray(slide.public_sources || []).at(0), '公开来源');
+  const renderVariants = new Set(
+    safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
+  const driftPageNumber = renderVariants.has('drift_page_number_s05') && safeText(slide.slide_id) === 'S05';
+  const pageNumberText = driftPageNumber
+    ? String(slide.slide_no).padStart(2, '0')
+    : `${String(slide.slide_no).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+  const pageNumberStyle = driftPageNumber
+    ? 'font-weight:700;font-size:20px;color:#111827;transform:translateX(-42px);'
+    : 'font-weight:700;font-size:14px;color:#475569;';
   const cards = safeArray(slide.page_core_content)
     .slice(0, 2)
     .map((item, index) => `
@@ -350,7 +363,7 @@ export function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
       </section>
       <footer data-qa-block="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#475569;">
         <div>${sourceLabel}</div>
-        <div style="font-weight:700;">${String(slide.slide_no).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}</div>
+        <div data-page-number="true" style="${pageNumberStyle}">${pageNumberText}</div>
       </footer>
     </div>
   `.trim();

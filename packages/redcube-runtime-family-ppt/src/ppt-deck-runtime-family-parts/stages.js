@@ -429,6 +429,7 @@ export function createPptDeckStageParts(deps) {
       `- edge_clearance_ok：${reviewArtifact.checks.edge_clearance_ok}`,
       `- block_content_fit_ok：${reviewArtifact.checks.block_content_fit_ok}`,
       `- title_typography_ok：${reviewArtifact.checks.title_typography_ok}`,
+      `- page_number_consistency_ok：${reviewArtifact.checks.page_number_consistency_ok}`,
     );
     if (Object.hasOwn(reviewArtifact.checks, 'baseline_comparison_passed')) {
       lines.push(`- baseline_comparison_passed：${reviewArtifact.checks.baseline_comparison_passed}`);
@@ -520,6 +521,77 @@ export function createPptDeckStageParts(deps) {
     };
   }
 
+  function pageNumberReferenceCandidates(slideReviews) {
+    return safeArray(slideReviews)
+      .map((slide) => slide?.metrics?.page_number_audit || {})
+      .filter((audit) => audit?.present);
+  }
+
+  function pageNumberReferencePayload(reference) {
+    if (!reference) return null;
+    return {
+      text: reference.text,
+      syntax_family: reference.syntax_family,
+      position_family: reference.position_family,
+      font_size: reference.font_size,
+      color_rgb: reference.color_rgb,
+      rect: reference.rect,
+    };
+  }
+
+  function pageNumberPositionFailure(current, reference) {
+    if (safeText(current?.position_family) !== safeText(reference?.position_family)) return true;
+    const currentRect = current?.rect || {};
+    const referenceRect = reference?.rect || {};
+    for (const key of ['left', 'top', 'right_gap', 'bottom_gap']) {
+      const currentValue = currentRect[key];
+      const referenceValue = referenceRect[key];
+      if (currentValue == null || referenceValue == null) continue;
+      if (Math.abs(Number(currentValue) - Number(referenceValue)) > 8) return true;
+    }
+    return false;
+  }
+
+  function pageNumberColorFailure(current, reference) {
+    const currentRgb = safeArray(current?.color_rgb);
+    const referenceRgb = safeArray(reference?.color_rgb);
+    if (currentRgb.length < 3 || referenceRgb.length < 3) return false;
+    return [0, 1, 2].some((index) => Math.abs(Number(currentRgb[index]) - Number(referenceRgb[index])) > 18);
+  }
+
+  function applyMergedPageNumberConsistency(slideReviews) {
+    const reference = pageNumberReferenceCandidates(slideReviews)[0] || null;
+    const referencePayload = pageNumberReferencePayload(reference);
+    for (const review of safeArray(slideReviews)) {
+      const checks = review.checks || {};
+      const metrics = review.metrics || {};
+      const audit = metrics.page_number_audit || { present: false };
+      review.checks = checks;
+      review.metrics = metrics;
+      metrics.page_number_audit = audit;
+      const failures = [];
+      if (reference && audit?.present) {
+        if (safeText(audit.syntax_family) !== safeText(reference.syntax_family)) failures.push('syntax_family');
+        if (pageNumberPositionFailure(audit, reference)) failures.push('position');
+        if (Math.abs(Number(audit.font_size || 0) - Number(reference.font_size || 0)) > 1.5) failures.push('font_size');
+        if (pageNumberColorFailure(audit, reference)) failures.push('color');
+      }
+      audit.reference = referencePayload;
+      audit.failures = failures;
+      checks.page_number_consistency_ok = failures.length === 0;
+      const withoutPageNumberIssue = safeArray(review.issues)
+        .filter((issue) => safeText(issue) !== 'page_number_consistency_failed');
+      review.issues = failures.length === 0
+        ? withoutPageNumberIssue
+        : [...withoutPageNumberIssue, 'page_number_consistency_failed'];
+    }
+    return safeArray(slideReviews).map((slide) => refreshMechanicalStatus(slide));
+  }
+
+  function applyMergedMechanicalConsistency(slideReviews) {
+    return applyMergedPageNumberConsistency(applyMergedTitleTypographyConsistency(slideReviews));
+  }
+
   function applyMergedTitleTypographyConsistency(slideReviews) {
     const bodySizes = safeArray(slideReviews)
       .filter((slide) => !titleConsistencyExempt(slide))
@@ -600,6 +672,7 @@ export function createPptDeckStageParts(deps) {
       'edge_clearance_ok',
       'block_content_fit_ok',
       'title_typography_ok',
+      'page_number_consistency_ok',
     ];
     return Object.fromEntries(keys.map((key) => [
       key,
@@ -644,6 +717,7 @@ export function createPptDeckStageParts(deps) {
           title_font_size: slide.metrics?.title_font_size ?? null,
           title_font_reference: slide.metrics?.title_font_reference ?? null,
           title_font_delta: slide.metrics?.title_font_delta ?? null,
+          page_number_audit: slide.metrics?.page_number_audit ?? null,
           source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
         })),
       },
@@ -679,6 +753,7 @@ export function createPptDeckStageParts(deps) {
               title_font_size: slide.metrics?.title_font_size ?? null,
               title_font_reference: slide.metrics?.title_font_reference ?? null,
               title_font_delta: slide.metrics?.title_font_delta ?? null,
+              page_number_audit: slide.metrics?.page_number_audit ?? null,
               source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
             })),
           },
@@ -869,7 +944,7 @@ export function createPptDeckStageParts(deps) {
       ...slide,
       status: safeArray(slide?.issues).length === 0 ? 'pass' : 'block',
     }));
-    const mechanicalSlideReviews = applyMergedTitleTypographyConsistency(incrementalReview
+    const mechanicalSlideReviews = applyMergedMechanicalConsistency(incrementalReview
       ? mergeSlideReviewList(
           priorReviewArtifact?.mechanical_review?.slide_reviews || priorReviewArtifact?.slide_reviews,
           freshMechanicalSlideReviews,
@@ -929,6 +1004,7 @@ export function createPptDeckStageParts(deps) {
       edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
       block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
       title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
+      page_number_consistency_ok: aiFirstMechanicalCheckValue(slideReviews, 'page_number_consistency_ok'),
       ...(baselineReview
         ? { baseline_comparison_passed: baselineReview.passed }
         : {}),
