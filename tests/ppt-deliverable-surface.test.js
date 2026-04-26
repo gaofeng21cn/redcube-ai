@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import {
   existsSync,
   mkdtempSync,
@@ -18,6 +17,7 @@ import {
 } from '../packages/redcube-gateway/src/index.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.js';
+import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.js';
 
 async function prepareSourceReadiness(workspaceRoot) {
   await completeSourceReadiness({
@@ -49,12 +49,7 @@ test('createDeliverable initializes workspace AGENTS guardrails without overwrit
   assert.match(agentsText, /RedCube AI \/ RCA product-entry/);
   assert.match(agentsText, /render_html -> visual_director_review -> screenshot_review -> export_pptx/);
   assert.match(agentsText, /不得用通用 PowerPoint 模板/);
-  assert.equal(existsSync(path.join(workspaceRoot, '.git')), true);
-  assert.match(readFileSync(path.join(workspaceRoot, '.gitignore'), 'utf-8'), /^runtime\/$/m);
-  assert.equal(
-    execFileSync('git', ['-C', workspaceRoot, 'check-ignore', 'runtime/probe.json'], { encoding: 'utf-8' }).trim(),
-    'runtime/probe.json',
-  );
+  assertWorkspaceGitBoundary(workspaceRoot);
 
   writeFileSync(agentsFile, '# Custom workspace rule\n', 'utf-8');
   const second = await createDeliverable({

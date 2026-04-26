@@ -13,6 +13,7 @@ import {
 } from 'node:fs';
 
 import { importLegacyProject } from '../packages/redcube-gateway/src/index.js';
+import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.js';
 
 function createLegacyProjectFixture() {
   const rootDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-legacy-root-'));
@@ -49,12 +50,7 @@ test('importLegacyProject copies legacy project inputs into canonical workspace 
   assert.equal(result.summary.audit_status, 'pass');
   assert.equal(result.mode, 'historical_project_to_workspace');
   assert.equal(result.project, 'topic-a');
-  assert.equal(existsSync(path.join(workspaceRoot, '.git')), true);
-  assert.match(readFileSync(path.join(workspaceRoot, '.gitignore'), 'utf-8'), /^runtime\/$/m);
-  assert.equal(
-    execFileSync('git', ['-C', workspaceRoot, 'check-ignore', 'runtime/probe.json'], { encoding: 'utf-8' }).trim(),
-    'runtime/probe.json',
-  );
+  assertWorkspaceGitBoundary(workspaceRoot);
   assert.equal(
     existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'inputs', 'raw_materials', 'source.md')),
     true,
