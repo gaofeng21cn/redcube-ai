@@ -108,10 +108,43 @@ export function createPptDeckStageParts(deps) {
     hashReviewInput,
   } = exportParts;
 
-  async function generateDirectorReviewDraft(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+  function collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact, currentVisualStage) {
+    if (safeText(currentVisualStage) !== PAGE_FIX_ROUTE) return [];
+    if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
+    if (!priorReviewArtifact?.visual_director_review) return [];
+    return [...new Set([
+      ...safeArray(renderArtifact?.render_execution?.freshly_rendered_slide_ids),
+      ...safeArray(renderArtifact?.targeted_rerun?.target_slide_ids),
+    ].map((slideId) => safeText(slideId)).filter(Boolean))];
+  }
+
+  function buildDirectorPreflightContext(preflight, slideIds) {
+    return {
+      anti_template_ok: Boolean(preflight?.antiTemplateOk),
+      weak_pages: filterSlideScopedArray(preflight?.weakPages, slideIds),
+      findings: safeArray(preflight?.findings)
+        .filter((finding) => {
+          const text = safeText(finding);
+          return safeArray(slideIds).some((slideId) => text.includes(safeText(slideId)));
+        }),
+      slides: safeArray(slideIds).map((slideId) => ({
+        slide_id: safeText(slideId),
+        weak_page: filterSlideScopedArray(preflight?.weakPages, [slideId]).length > 0,
+        findings: safeArray(preflight?.findings).filter((finding) => safeText(finding).includes(safeText(slideId))),
+      })),
+    };
+  }
+
+  async function generateDirectorReviewDraft(contract, deliverablePaths, preflight, adapter = CODEX_DEFAULT_ADAPTER) {
     const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const currentVisualStage = currentVisualStageId(contract, deliverablePaths);
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
+    const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+    const incrementalTargetSlideIds = collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact, currentVisualStage);
+    const incrementalReview = incrementalTargetSlideIds.length > 0;
+    const targetSlideIdSet = slideIdSet(incrementalTargetSlideIds);
+    const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
     const renderSummary = isNativePptArtifact(renderArtifact)
       ? summarizeNativeSlides(renderArtifact).map((slide) => ({
           slide_id: slide.slide_id,
@@ -126,7 +159,16 @@ export function createPptDeckStageParts(deps) {
           layout_family: slide.layout_family,
           peak_page: slide.director_contract?.peak_page,
           text_excerpt: normalizeInlineText(String(slide.content || '').replace(/<[^>]+>/g, ' '), 220),
+          ...(incrementalReview
+            ? { source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null }
+            : {}),
         }));
+    const reviewRenderSummary = incrementalReview
+      ? renderSummary.filter((slide) => targetSlideIdSet.has(safeText(slide?.slide_id)))
+      : renderSummary;
+    const reviewedSlideIds = incrementalReview
+      ? incrementalTargetSlideIds
+      : renderSummary.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
     const { data, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
@@ -134,11 +176,19 @@ export function createPptDeckStageParts(deps) {
       promptRelativePath: PROMPT_PACK.visual_director_review,
       context: {
         ...buildAuthoringContext(contract),
+        review_scope: incrementalReview ? 'incremental_page_review' : 'full_deck_review',
         blueprint: {
-          slides: summarizeBlueprintSlides(blueprintArtifact),
+          slides: incrementalReview
+            ? filterSlideScopedArray(summarizeBlueprintSlides(blueprintArtifact), incrementalTargetSlideIds)
+            : summarizeBlueprintSlides(blueprintArtifact),
         },
-        visual_direction: visualArtifact?.visual_direction || null,
-        render_summary: renderSummary,
+        visual_direction: incrementalReview
+          ? buildPageLocalVisualDirectionContext(visualArtifact?.visual_direction || null, incrementalTargetSlideIds)
+          : visualArtifact?.visual_direction || null,
+        render_summary: reviewRenderSummary,
+        director_preflight: incrementalReview
+          ? buildDirectorPreflightContext(preflight, incrementalTargetSlideIds)
+          : null,
         source_surface_kind: isNativePptArtifact(renderArtifact) ? 'native_pptx' : 'html',
       },
       outputContract: directorReviewOutputContract(),
@@ -146,6 +196,14 @@ export function createPptDeckStageParts(deps) {
     return {
       data,
       generationRuntime,
+      reviewScope: incrementalReview ? 'incremental_page_review' : 'full_deck_review',
+      reviewedSlideIds,
+      reusedSlideIds: incrementalReview
+        ? renderSummary
+            .map((slide) => safeText(slide?.slide_id))
+            .filter((slideId) => slideId && !targetSlideIdSet.has(slideId))
+        : [],
+      priorReviewArtifact: incrementalReview ? priorReviewArtifact : null,
     };
   }
 
@@ -727,16 +785,38 @@ export function createPptDeckStageParts(deps) {
     const preflight = isNativePptArtifact(renderArtifact)
       ? directorNativePptPreflight(renderArtifact)
       : directorHtmlPreflight(renderArtifact);
-    const { data, generationRuntime } = await generateDirectorReviewDraft(contract, deliverablePaths, adapter);
-    const directorIntentLanded = Boolean(data?.director_intent_landed);
-    const antiTemplateOk = Boolean(data?.anti_template_ok) && preflight.antiTemplateOk;
+    const {
+      data,
+      generationRuntime,
+      reviewScope,
+      reviewedSlideIds,
+      reusedSlideIds,
+      priorReviewArtifact,
+    } = await generateDirectorReviewDraft(contract, deliverablePaths, preflight, adapter);
+    const priorReview = priorReviewArtifact?.visual_director_review || null;
+    const incrementalReview = reviewScope === 'incremental_page_review';
+    const targetSlideIds = slideIdSet(reviewedSlideIds);
+    const priorWeakPages = incrementalReview
+      ? safeArray(priorReview?.weak_pages).filter((slideId) => !targetSlideIds.has(safeText(slideId)))
+      : [];
+    const directorIntentLanded = Boolean(data?.director_intent_landed)
+      && (!incrementalReview || Boolean(priorReview?.director_intent_landed));
+    const antiTemplateOk = Boolean(data?.anti_template_ok)
+      && preflight.antiTemplateOk
+      && (!incrementalReview || Boolean(priorReview?.anti_template_ok));
     const memoryHookPresent = Boolean(data?.memory_hook_present);
-    const peakPagesLanded = Boolean(data?.peak_pages_landed ?? true);
+    const peakPagesLanded = Boolean(data?.peak_pages_landed ?? true)
+      && (!incrementalReview || Boolean(priorReview?.peak_pages_landed ?? true));
     const weakPages = [...new Set([
+      ...priorWeakPages,
       ...normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', { min: 0, max: 4 }),
       ...preflight.weakPages,
     ])];
-    const homogeneousLayoutRisk = Math.max(Number(data?.homogeneous_layout_risk || 0), preflight.homogeneousLayoutRisk);
+    const homogeneousLayoutRisk = Math.max(
+      Number(data?.homogeneous_layout_risk || 0),
+      Number(incrementalReview ? priorReview?.homogeneous_layout_risk || 0 : 0),
+      preflight.homogeneousLayoutRisk,
+    );
     const reviewSummary = [
       requireText(data?.review_summary, 'visual_director_review.review_summary'),
       ...preflight.findings.map((finding) => `deterministic preflight blocked ${finding}`),
@@ -761,6 +841,9 @@ export function createPptDeckStageParts(deps) {
       review_execution: {
         ...creativeExecution('visual_director_review', generationRuntime, adapter),
         overlay: 'visual_director_review',
+        review_scope: reviewScope,
+        reviewed_slide_ids: reviewedSlideIds,
+        reused_slide_ids: reusedSlideIds,
       },
       review_overlay: 'visual_director_review',
       status,
