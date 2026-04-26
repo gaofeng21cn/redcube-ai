@@ -31,9 +31,11 @@ test('ppt family runtime keeps the public route entry while heavy stage builders
 });
 
 test('xiaohongshu family runtime keeps AI-first generation in runtime-family instead of pack imports', () => {
-  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const runtimeEntry = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
   const runtimeParts = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.js');
 
+  assert.equal(runtimeEntry.trim(), "export * from './xiaohongshu-runtime.ts';");
   assert.equal(runtime.includes('function inferVisualPresentation('), false);
   assert.equal(runtime.includes('function buildPlanSlides('), false);
   assert.equal(runtime.includes('@redcube/pack-xiaohongshu'), false);
@@ -43,8 +45,10 @@ test('xiaohongshu family runtime keeps AI-first generation in runtime-family ins
 });
 
 test('xiaohongshu family runtime keeps the public route entry while heavy stage builders move into family parts', () => {
-  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const runtimeEntry = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
 
+  assert.equal(runtimeEntry.trim(), "export * from './xiaohongshu-runtime.ts';");
   assert.equal(runtime.includes("from './xiaohongshu-runtime-family-parts/index.js'"), true);
   assert.equal(runtime.includes('export async function runXiaohongshuRoute('), true);
   assert.equal(runtime.includes('async function buildStoryline('), false);

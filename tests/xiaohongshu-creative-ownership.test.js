@@ -157,7 +157,8 @@ test.after(async () => {
 
 test('xiaohongshu Codex-backed mainline owns protected creative outputs instead of JS builders', () => {
   const packEntry = read('packages/redcube-pack-xiaohongshu/src/index.ts');
-  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const runtimeEntry = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.js');
+  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
   const storylinePrompt = read('prompts/xiaohongshu/storyline.md');
   const singleNotePlanPrompt = read('prompts/xiaohongshu/single_note_plan.md');
   const renderHtmlPrompt = read('prompts/xiaohongshu/render_html.md');
@@ -173,6 +174,7 @@ test('xiaohongshu Codex-backed mainline owns protected creative outputs instead 
   assert.equal(packEntry.includes('buildXhsVisualDirection'), false);
   assert.equal(packEntry.includes('buildXhsRenderHtml'), false);
   assert.equal(packEntry.includes('compileXhsRenderSlides'), false);
+  assert.equal(runtimeEntry.trim(), "export * from './xiaohongshu-runtime.ts';");
   assert.match(runtime, /from '\.\/xiaohongshu-runtime-family-parts\/index\.js'/);
   assert.match(runtime, /export async function runXiaohongshuRoute\(/);
   assert.equal(runtime.includes('async function buildStoryline('), false);
