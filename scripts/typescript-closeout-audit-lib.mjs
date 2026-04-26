@@ -194,6 +194,7 @@ const JS_RESIDUE_ALLOWLIST = {
     'src/index.js',
     'src/managed-runs.js',
     'src/python-command.js',
+    'src/python-native-helper.js',
     'src/runs.js',
     'src/screenshot-capture-store.js',
     'src/source-augmentation-contract.js',
