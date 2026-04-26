@@ -89,13 +89,13 @@ test('harness audit: reference quality is a formal operating surface, not only t
 });
 
 test('harness audit: gateway product surface is stable across success and failure paths', () => {
-  const cli = read('apps/redcube-cli/src/cli.js');
-  const mcp = read('apps/redcube-mcp/src/server.js');
+  const cli = read('apps/redcube-cli/src/cli.ts');
+  const mcp = read('apps/redcube-mcp/src/server.ts');
   const getDeliverable = readImplementation('packages/redcube-gateway/src/actions/get-deliverable.js');
   const runRoute = readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.js');
   const doctor = readImplementation('packages/redcube-gateway/src/actions/doctor-workspace.js');
-  const listTopics = read('packages/redcube-gateway/src/actions/list-topics.js');
-  const gatewayIndex = read('packages/redcube-gateway/src/index.js');
+  const listTopics = readImplementation('packages/redcube-gateway/src/actions/list-topics.js');
+  const gatewayIndex = readImplementation('packages/redcube-gateway/src/index.js');
 
   assert.equal(cli.includes("error_kind: 'cli_usage_error'"), true);
   assert.equal(cli.includes("recommended_action: 'read_help'"), true);
