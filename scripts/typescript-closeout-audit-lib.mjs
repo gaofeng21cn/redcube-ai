@@ -105,13 +105,11 @@ const JS_RESIDUE_ALLOWLIST = {
   ],
   'packages/redcube-overlay-poster-onepager': [
     'src/contracts.js',
-    'src/gates.js',
     'src/index.js',
     'src/surface.js',
   ],
   'packages/redcube-overlay-ppt': [
     'src/contracts.js',
-    'src/gates.js',
     'src/index.js',
     'src/profiles.js',
     'src/surface.js',
@@ -119,7 +117,6 @@ const JS_RESIDUE_ALLOWLIST = {
   'packages/redcube-overlay-registry': ['src/index.js'],
   'packages/redcube-overlay-xiaohongshu': [
     'src/contracts.js',
-    'src/gates.js',
     'src/index.js',
     'src/surface.js',
   ],

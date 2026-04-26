@@ -4,7 +4,6 @@ import {
   describeXiaohongshuOverlay as describeXiaohongshuOverlayJs,
   hydrateXiaohongshuContract as hydrateXiaohongshuContractJs,
 } from './contracts.js';
-import { evaluateStorylineGate as evaluateStorylineGateJs } from './gates.js';
 import {
   buildXiaohongshuSurfaceBundle as buildXiaohongshuSurfaceBundleJs,
   listXiaohongshuSurfaceArtifactPaths as listXiaohongshuSurfaceArtifactPathsJs,
@@ -18,6 +17,7 @@ import type {
   XiaohongshuHydratedContract,
   XiaohongshuOverlayCatalogEntry,
   XiaohongshuOverlayDefinition,
+  XiaohongshuStorylineGateInput,
   XiaohongshuStorylineGateReport,
   XiaohongshuSurfaceArtifact,
   XiaohongshuSurfaceArtifactContent,
@@ -54,10 +54,25 @@ export function buildXiaohongshuDeliverableRecord(
   }) as XiaohongshuDeliverableRecord;
 }
 
-export function evaluateStorylineGate(input: { storylineText?: string }): XiaohongshuStorylineGateReport {
-  return evaluateStorylineGateJs({
-    storylineText: input.storylineText,
-  }) as XiaohongshuStorylineGateReport;
+export function evaluateStorylineGate(input: XiaohongshuStorylineGateInput): XiaohongshuStorylineGateReport {
+  const text = String(input.storylineText || '').trim();
+  if (!text) {
+    return {
+      status: 'block',
+      blockers: ['storyline_empty'],
+      advisories: [],
+      metrics: { char_count: 0 },
+      next_action: 'rerun_storyline',
+    };
+  }
+
+  return {
+    status: 'pass',
+    blockers: [],
+    advisories: [],
+    metrics: { char_count: text.length },
+    next_action: 'continue',
+  };
 }
 
 export function buildXiaohongshuSurfaceBundle(
@@ -110,6 +125,7 @@ export type {
   XiaohongshuReviewSurface,
   XiaohongshuStageId,
   XiaohongshuStageSequence,
+  XiaohongshuStorylineGateInput,
   XiaohongshuStorylineGateReport,
   XiaohongshuSurfaceArtifact,
   XiaohongshuSurfaceArtifactContent,

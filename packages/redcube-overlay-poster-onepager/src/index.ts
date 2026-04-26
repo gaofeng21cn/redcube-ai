@@ -3,7 +3,6 @@ import {
   describePosterOnepagerOverlay as describePosterOnepagerOverlayJs,
   hydratePosterOnepagerContract as hydratePosterOnepagerContractJs,
 } from './contracts.js';
-import { evaluatePosterStorylineGate as evaluatePosterStorylineGateJs } from './gates.js';
 import {
   buildPosterSurfaceBundle as buildPosterSurfaceBundleJs,
   listPosterSurfaceArtifactPaths as listPosterSurfaceArtifactPathsJs,
@@ -54,9 +53,12 @@ export function hydratePosterOnepagerContract(
 }
 
 export function evaluatePosterStorylineGate(input: { headline?: string }): PosterOnepagerStorylineGateReport {
-  return evaluatePosterStorylineGateJs({
-    headline: input.headline,
-  }) as PosterOnepagerStorylineGateReport;
+  const text = String(input.headline || '').trim();
+  return {
+    ok: text.length > 0,
+    blocker: text.length > 0 ? null : 'headline_missing',
+    next_action: text.length > 0 ? 'continue' : 'rerun_storyline',
+  };
 }
 
 export function buildPosterSurfaceBundle(request: PosterSurfaceBundleRequest): PosterSurfaceArtifact[] {

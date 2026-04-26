@@ -66,6 +66,7 @@ test('P17 slice 4: overlay-xiaohongshu exposes a TypeScript entrypoint and typed
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/tsconfig.json')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-xiaohongshu/src/gates.js')), false);
 
   const pkg = readJson('packages/redcube-overlay-xiaohongshu/package.json');
   const rootTsconfig = readJson('tsconfig.json');
@@ -100,6 +101,7 @@ test('P17 slice 5: overlay-ppt exposes a TypeScript entrypoint and typed overlay
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/tsconfig.json')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-ppt/src/gates.js')), false);
 
   const pkg = readJson('packages/redcube-overlay-ppt/package.json');
   const rootTsconfig = readJson('tsconfig.json');
