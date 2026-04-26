@@ -851,6 +851,96 @@ test('ppt screenshot_review incrementally reviews only freshly fixed slides and 
   });
 });
 
+test('ppt visual_director_review incrementally reviews only freshly fixed slides and reuses prior director result', async () => {
+  await withMockHermesUpstream(async () => {
+    const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
+      clonePrefix: 'redcube-ppt-incremental-director-review-',
+      routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
+    });
+    for (const { route, result } of routeResults) {
+      assert.equal(result.ok, true, route);
+    }
+
+    const artifactsDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+    );
+    const priorQualityGateFile = path.join(artifactsDir, 'quality_gate.json');
+    const priorQualityGate = readJson(priorQualityGateFile);
+    writeFileSync(priorQualityGateFile, JSON.stringify({
+      ...priorQualityGate,
+      status: 'block',
+      checks: {
+        ...priorQualityGate.checks,
+        ai_review_passed: false,
+        block_content_fit_ok: false,
+      },
+      slide_reviews: priorQualityGate.slide_reviews.map((slide) => (
+        slide.slide_id === 'S05'
+          ? {
+              ...slide,
+              status: 'block',
+              issues: ['ai_visual_risk'],
+              mechanical_issues: ['block_content_overflow_detected'],
+              ai_review: {
+                judgement: 'block',
+                visual_findings: ['S05 主面板底部标签贴近下缘，只需要局部修页。'],
+                recommended_fix: '只修 S05，放宽底部留白。',
+              },
+            }
+          : slide
+      )),
+      ai_review: {
+        ...priorQualityGate.ai_review,
+        weak_pages: ['S05'],
+        review_summary: '当前只有 S05 需要 fix_html 后复核。',
+      },
+    }, null, 2), 'utf-8');
+
+    const restoreRenderVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
+    });
+    try {
+      const fixResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'fix_html',
+      });
+      assert.equal(fixResult.ok, true);
+      assert.deepEqual(fixResult.artifact?.render_execution?.freshly_rendered_slide_ids, ['S05']);
+    } finally {
+      restoreRenderVariant();
+    }
+
+    const restoreDirectorVariant = withEnv({
+      REDCUBE_MOCK_PPT_DIRECTOR_REVIEW_VARIANT: 'require_page_local_delta_review',
+      REDCUBE_MOCK_PPT_DIRECTOR_EXPECTED_SLIDE_IDS: 'S05',
+    });
+    try {
+      const reviewed = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'visual_director_review',
+      });
+      assert.equal(reviewed.ok, true);
+      assert.equal(reviewed.artifact?.review_execution?.review_scope, 'incremental_page_review');
+      assert.deepEqual(reviewed.artifact?.review_execution?.reviewed_slide_ids, ['S05']);
+      assert.equal(reviewed.artifact?.review_execution?.reused_slide_ids.includes('S01'), true);
+      assert.equal(reviewed.artifact?.status, 'pass');
+    } finally {
+      restoreDirectorVariant();
+    }
+  });
+});
+
 test('ppt screenshot_review forwards current slide source_html alongside screenshots', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-source-html-'));

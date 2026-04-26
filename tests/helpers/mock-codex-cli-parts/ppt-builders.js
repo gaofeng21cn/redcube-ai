@@ -579,6 +579,52 @@ export function buildMockPptRender(meta) {
 
 export function buildMockPptDirectorReview(meta) {
   const slides = safeArray(meta?.context?.render_summary);
+  const reviewScope = safeText(meta?.context?.review_scope, 'full_deck_review');
+  const variants = new Set(
+    safeText(process.env.REDCUBE_MOCK_PPT_DIRECTOR_REVIEW_VARIANT)
+      .split(',')
+      .map((item) => safeText(item))
+      .filter(Boolean),
+  );
+  if (variants.has('require_page_local_delta_review')) {
+    if (reviewScope !== 'incremental_page_review' && reviewScope !== 'delta_page_review') {
+      throw new Error(`mock ppt director review expected incremental page review scope, got ${reviewScope}`);
+    }
+    if (slides.length !== 1) {
+      throw new Error(`mock ppt director review expected one targeted slide: ${JSON.stringify(slides.map((slide) => slide.slide_id))}`);
+    }
+    const expectedSlideIds = new Set(
+      safeText(process.env.REDCUBE_MOCK_PPT_DIRECTOR_EXPECTED_SLIDE_IDS)
+        .split(',')
+        .map((item) => safeText(item))
+        .filter(Boolean),
+    );
+    const currentSlideId = safeText(slides[0]?.slide_id);
+    if (expectedSlideIds.size > 0 && !expectedSlideIds.has(currentSlideId)) {
+      throw new Error(`mock ppt director review expected only ${[...expectedSlideIds].join(',')}, got ${currentSlideId}`);
+    }
+    const sourceHtml = safeText(slides[0]?.source_html);
+    if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(currentSlideId)) {
+      throw new Error(`mock ppt director review expected rendered source_html for ${currentSlideId}`);
+    }
+    const blueprintSlides = safeArray(meta?.context?.blueprint?.slides);
+    if (blueprintSlides.length !== 1 || safeText(blueprintSlides[0]?.slide_id) !== currentSlideId) {
+      throw new Error(`mock ppt director review expected page-local blueprint for ${currentSlideId}: ${JSON.stringify(blueprintSlides)}`);
+    }
+    const visualDirection = meta?.context?.visual_direction || {};
+    const pageRoleTable = safeArray(visualDirection?.page_role_table);
+    const rhythmCurve = safeArray(visualDirection?.rhythm_curve);
+    const peakPages = safeArray(visualDirection?.peak_pages);
+    if (pageRoleTable.some((item) => safeText(item?.slide_id) !== currentSlideId)
+      || rhythmCurve.some((item) => safeText(item?.slide_id) !== currentSlideId)
+      || peakPages.some((slideId) => safeText(slideId) !== currentSlideId)) {
+      throw new Error(`mock ppt director review expected page-local visual direction for ${currentSlideId}: ${JSON.stringify(visualDirection)}`);
+    }
+    const preflightSlides = safeArray(meta?.context?.director_preflight?.slides);
+    if (preflightSlides.length !== 1 || safeText(preflightSlides[0]?.slide_id) !== currentSlideId) {
+      throw new Error(`mock ppt director review expected page-local preflight for ${currentSlideId}: ${JSON.stringify(preflightSlides)}`);
+    }
+  }
   return {
     director_intent_landed: true,
     anti_template_ok: true,
