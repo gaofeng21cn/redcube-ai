@@ -563,9 +563,33 @@ export function createPptDeckRuntimeCore() {
       return firstExactMatch;
     }
     const countExplicitSlidePlanItems = () => {
+      const countConsecutive = (numbers) => {
+        const uniqueNumbers = [...new Set(numbers.filter((value) => value !== null))].sort((a, b) => a - b);
+        const groups = [];
+        let current = [];
+        for (const itemNo of uniqueNumbers) {
+          const previous = current[current.length - 1];
+          if (current.length === 0 || itemNo === previous + 1) {
+            current.push(itemNo);
+          } else {
+            groups.push(current);
+            current = [itemNo];
+          }
+        }
+        if (current.length > 0) groups.push(current);
+        return groups
+          .filter((group) => group.length >= 6 && (group[0] === 1 || group.length >= 10))
+          .map((group) => group.length)
+          .sort((a, b) => b - a)[0] || 0;
+      };
+      const slideHeadingCount = countConsecutive(
+        [...corpus.matchAll(/^\s*#{1,6}\s*Slide\s+(\d{1,3})\s*[：:.-]?/gim)]
+          .map((match) => numberValue(match[1])),
+      );
       const lines = corpus.split(/\r?\n/);
       const groups = [];
       let current = [];
+      let inSlidePlanBlock = false;
       const flush = () => {
         if (current.length > 0) {
           groups.push(current);
@@ -574,9 +598,21 @@ export function createPptDeckRuntimeCore() {
       };
       for (const line of lines) {
         const match = line.match(/^\s*(\d{1,3})[.、)、)]\s*(\S[\s\S]*)$/);
+        const isSlidePlanHeading = !match && /(?:推荐|建议|批准|approved).*(?:逐页|每页|页内容|页结构|页计划|幻灯片|slides?|PPT)|(?:逐页|每页).*(?:内容|结构|计划)|slide\s*plan/i.test(line);
+        if (isSlidePlanHeading) {
+          flush();
+          inSlidePlanBlock = true;
+          continue;
+        }
+        if (/^\s{0,3}#{1,4}\s+\S/.test(line) && !isSlidePlanHeading) {
+          flush();
+          inSlidePlanBlock = false;
+          continue;
+        }
         const itemNo = match ? numberValue(match[1]) : null;
         const itemText = match ? safeText(match[2]) : '';
-        const slideLike = /页|封面|结束|总览|目录|论文|研究|结果|边界|问题|模型|评分|队列|方法|证据|slide|PPT|汇报|总结|引言|结论|临床|终点/i.test(itemText);
+        const slideLike = inSlidePlanBlock
+          || /页|封面|结束|总览|目录|论文|篇|研究|结果|边界|问题|模型|评分|队列|方法|证据|风险|负担|Knosp|slide|PPT|汇报|总结|引言|结论|临床|终点/i.test(itemText);
         if (itemNo === null || !slideLike) {
           flush();
           continue;
@@ -590,10 +626,11 @@ export function createPptDeckRuntimeCore() {
         }
       }
       flush();
-      return groups
+      const numberedListCount = groups
         .filter((group) => group.length >= 6 && (group[0].itemNo === 1 || group.length >= 10))
         .map((group) => group.length)
         .sort((a, b) => b - a)[0] || 0;
+      return Math.max(slideHeadingCount, numberedListCount);
     };
     const slidePlanCount = countExplicitSlidePlanItems();
     const slidePlanBudget = slidePlanCount > 0

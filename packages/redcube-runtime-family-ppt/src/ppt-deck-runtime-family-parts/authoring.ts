@@ -125,6 +125,7 @@ export function createPptDeckAuthoringParts(deps) {
       const lines = corpus.split(/\r?\n/);
       const groups = [];
       let current = [];
+      let inSlidePlanBlock = false;
       const flush = () => {
         if (current.length > 0) {
           groups.push(current);
@@ -133,9 +134,21 @@ export function createPptDeckAuthoringParts(deps) {
       };
       for (const line of lines) {
         const match = line.match(/^\s*(\d{1,3})[.、)、)]\s*(\S[\s\S]*)$/);
+        const isSlidePlanHeading = !match && /(?:推荐|建议|批准|approved).*(?:逐页|每页|页内容|页结构|页计划|幻灯片|slides?|PPT)|(?:逐页|每页).*(?:内容|结构|计划)|slide\s*plan/i.test(line);
+        if (isSlidePlanHeading) {
+          flush();
+          inSlidePlanBlock = true;
+          continue;
+        }
+        if (/^\s{0,3}#{1,4}\s+\S/.test(line) && !isSlidePlanHeading) {
+          flush();
+          inSlidePlanBlock = false;
+          continue;
+        }
         const slideNo = match ? Number(match[1]) : null;
         const rawTitle = match ? safeText(match[2]) : '';
-        const slideLike = /页|封面|结束|总览|目录|论文|研究|结果|边界|问题|模型|评分|队列|方法|证据|slide|PPT|汇报|总结|引言|结论|临床|终点/i.test(rawTitle);
+        const slideLike = inSlidePlanBlock
+          || /页|封面|结束|总览|目录|论文|篇|研究|结果|边界|问题|模型|评分|队列|方法|证据|风险|负担|Knosp|slide|PPT|汇报|总结|引言|结论|临床|终点/i.test(rawTitle);
         if (!Number.isFinite(slideNo) || slideNo <= 0 || !slideLike) {
           flush();
           continue;

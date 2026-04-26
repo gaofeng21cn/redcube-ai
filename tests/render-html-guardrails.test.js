@@ -160,10 +160,29 @@ test('ppt authoring page budget derives from explicit slide plans independent of
     'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.js',
     'pageBudget',
   );
-  const slidePlan = Array.from({ length: 21 }, (_, index) => {
-    const pageNo = index + 1;
-    return `${pageNo}. 第${pageNo}页：科室汇报逐页结构，覆盖封面、论文结果、方法边界或总结。`;
-  }).join('\n');
+  const slidePlan = [
+    '1. 封面：NF-PitNET 三篇论文科室内部进展汇报',
+    '2. 本次同步的范围',
+    '3. 共同数据基础',
+    '4. 三篇论文一览',
+    '5. 第一篇：研究问题与论文主线',
+    '6. 第一篇：队列、终点和事件数',
+    '7. 第一篇：模型策略和评价指标',
+    '8. 第一篇：主要模型表现',
+    '9. 第一篇：风险三分位结果',
+    '10. 第二篇：研究问题与术后 3 个月 landmark',
+    '11. 第二篇：队列、终点和事件数',
+    '12. 第二篇：评分构成',
+    '13. 第二篇：风险梯度',
+    '14. 第二篇：模型比较',
+    '15. 第三篇：研究问题与侵袭表型主线',
+    '16. 第三篇：队列、终点和事件数',
+    '17. 第三篇：Knosp 与侵袭性结构',
+    '18. 第三篇：高 Knosp 伴随负担',
+    '19. 第三篇：Knosp 之外模型增量',
+    '20. 三篇论文的投稿口径总表',
+    '21. 结束页',
+  ].join('\n');
   const contract = {
     goal: '制作科室内部汇报，幻灯片不超过30页。',
     shared_source_truth: {
