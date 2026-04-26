@@ -179,6 +179,17 @@ test('ppt render_html batches same-route slide chunks through durable per-batch 
   );
   mkdirSync(staleBatchDir, { recursive: true });
   writeFileSync(path.join(staleBatchDir, 'S25.html'), '<div data-slide-id="S25">stale</div>');
+  const obsoleteBatchDir = path.join(
+    deliverablePaths.deliverableDir,
+    'artifacts',
+    'render_batches',
+    'render_html',
+    'render_html_batch_99_S25',
+  );
+  const obsoleteBatchFile = `${obsoleteBatchDir}.json`;
+  mkdirSync(obsoleteBatchDir, { recursive: true });
+  writeFileSync(obsoleteBatchFile, JSON.stringify({ stage_id: 'render_html_batch_99_S25' }));
+  writeFileSync(path.join(obsoleteBatchDir, 'S25.html'), '<div data-slide-id="S25">obsolete</div>');
 
   const artifact = await stageParts.buildRenderHtmlArtifact({
     workspaceRoot,
@@ -214,6 +225,8 @@ test('ppt render_html batches same-route slide chunks through durable per-batch 
   assert.equal(existsSync(path.join(deliverablePaths.deliverableDir, 'artifacts', 'render_batches', 'render_html', 'render_html_batch_01_S01_S02', 'S01.html')), true);
   assert.equal(existsSync(path.join(staleBatchDir, 'S25.html')), false);
   assert.equal(existsSync(path.join(staleBatchDir, 'S06.html')), true);
+  assert.equal(existsSync(obsoleteBatchFile), false);
+  assert.equal(existsSync(obsoleteBatchDir), false);
   assert.equal(artifact.render_execution.batch_count, 4);
   assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.generated_batch_count, 4);
   assert.equal(artifact.render_execution.codex_batch_runtime.durable_cache.reused_batch_count, 0);

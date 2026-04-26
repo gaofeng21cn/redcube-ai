@@ -54,6 +54,23 @@ export function createPptDeckRenderBatchCacheParts(deps) {
     }
   }
 
+  function pruneInactiveRenderBatchArtifacts(deliverablePaths, route, activeStageIds) {
+    const root = renderBatchCacheRoot(deliverablePaths, route);
+    const active = new Set(safeArray(activeStageIds).map((stageId) => safeText(stageId)).filter(Boolean));
+    if (active.size === 0 || !(mainExistsSync || existsSync)(root)) return;
+    for (const entry of readdirSync(root, { withFileTypes: true })) {
+      const entryPath = path.join(root, entry.name);
+      if (entry.isFile() && entry.name.endsWith('.json')) {
+        const stageId = entry.name.replace(/\.json$/, '');
+        if (!active.has(stageId)) rmSync(entryPath, { force: true });
+        continue;
+      }
+      if (entry.isDirectory() && !active.has(entry.name)) {
+        rmSync(entryPath, { recursive: true, force: true });
+      }
+    }
+  }
+
   function buildRenderBatchCacheKey({
     route,
     renderPlan,
@@ -184,6 +201,11 @@ export function createPptDeckRenderBatchCacheParts(deps) {
       });
       stageCacheStatus.push({ stage_id: stage.stage_id, cache_status: 'fresh' });
     }
+    pruneInactiveRenderBatchArtifacts(
+      deliverablePaths,
+      route,
+      stages.map((stage) => stage.stage_id),
+    );
     return {
       data,
       batchRuntime: {

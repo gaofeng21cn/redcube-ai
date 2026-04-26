@@ -830,7 +830,11 @@ test('ppt render_html persists durable batch artifacts and resumes from complete
       'render_batches',
       'render_html',
     );
-    const firstBatchStageId = 'render_html_batch_01_S01_S02_S03_S04_S05_S06';
+    const batchFilesAfterInterruption = readdirSync(batchRoot)
+      .filter((entry) => /^render_html_batch_\d{2}_S\d/.test(entry) && entry.endsWith('.json'))
+      .sort();
+    assert.deepEqual(batchFilesAfterInterruption, ['render_html_batch_01_S01_S02_S03.json']);
+    const firstBatchStageId = batchFilesAfterInterruption[0].replace(/\.json$/, '');
     const firstBatchFile = path.join(batchRoot, `${firstBatchStageId}.json`);
     const firstSlideFile = path.join(batchRoot, firstBatchStageId, 'S01.html');
     assert.equal(existsSync(firstBatchFile), true);
@@ -959,6 +963,36 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
     mkdirSync(screenshotsDir, { recursive: true });
     writeFileSync(path.join(screenshotsDir, 'slide-02.png'), TINY_PNG);
     writeFileSync(path.join(screenshotsDir, 'slide-06.png'), TINY_PNG);
+    const operatorSlidesDir = path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'views',
+      'operator',
+      '幻灯片',
+    );
+    mkdirSync(operatorSlidesDir, { recursive: true });
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    writeFileSync(path.join(operatorSlidesDir, '当前返修要求.md'), [
+      '# 当前返修要求',
+      '',
+      '```json',
+      JSON.stringify({
+        target_slide_ids: ['S02'],
+        global_requirements: ['本轮只修截图阻断页，不要顺手重画已通过页面。'],
+        slide_feedback: [
+          {
+            slide_id: 'S02',
+            issues: ['左栏底部说明带压进主体区域，必须释放纵向空间。'],
+            avoid: ['不要新增说明卡片。'],
+          },
+        ],
+      }, null, 2),
+      '```',
+      '',
+    ].join('\n'), 'utf-8');
 
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_revision_context',
@@ -972,6 +1006,11 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
         route: 'fix_html',
       });
       assert.equal(renderResult.ok, true);
+      const renderArtifact = readJson(renderResult.artifactFile);
+      assert.deepEqual(renderArtifact.revision_context?.operator_revision_brief?.target_slide_ids, ['S02']);
+      const s02Focus = renderArtifact.html_bundle.slides.find((slide) => slide.slide_id === 'S02')?.revision_focus;
+      assert.equal(s02Focus?.operator_requested_revision, true);
+      assert.match(s02Focus?.recommended_fix || '', /释放纵向空间/);
     } finally {
       restoreVariant();
     }

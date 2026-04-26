@@ -17,6 +17,7 @@
     .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 180ms ease; display: flex; align-items: center; justify-content: center; }
     .slide.visible { opacity: 1; visibility: visible; }
     .slide-content-wrapper { width: 1152px; height: 648px; overflow: hidden; position: relative; }
+    .rca-cjk-token { display: inline-block; white-space: nowrap; }
   </style>
 </head>
 <body data-render-strategy="__REDCUBE_RENDER_STRATEGY__">
@@ -35,13 +36,80 @@
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const progressIndicator = document.getElementById('progress-indicator');
+    const CJK_KEEP_TOKENS = [
+      '资料同步推进',
+      '自动推进',
+      '质量边界',
+      '署名责任',
+      '医生监督',
+      '医生确认',
+      'PI确认',
+      '科研路径',
+      '研究边界',
+      '统计计划',
+      '变量终点',
+      '质量门禁',
+      '阶段产物',
+      '可执行任务',
+      '待处理',
+      '已完成',
+      '证据包',
+      '可审查',
+      '可追踪',
+      '可复核',
+      '工作流',
+      '线索',
+      '问题',
+      '走向',
+      '对齐',
+      '推进',
+    ].sort((a, b) => b.length - a.length);
+    const CJK_KEEP_TOKEN_PATTERN = new RegExp(
+      '(' + CJK_KEEP_TOKENS.map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')',
+      'g',
+    );
     let currentSlide = 0;
+    function protectCjkShortTokens(root) {
+      const textNodes = [];
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          const text = node.nodeValue || '';
+          const parent = node.parentElement;
+          if (!parent || !text.trim()) return NodeFilter.FILTER_REJECT;
+          if (parent.closest('script, style, noscript, .rca-cjk-token')) return NodeFilter.FILTER_REJECT;
+          return CJK_KEEP_TOKENS.some((token) => text.includes(token))
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      });
+      while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+      }
+      for (const node of textNodes) {
+        const text = node.nodeValue || '';
+        const parts = text.split(CJK_KEEP_TOKEN_PATTERN).filter((part) => part.length > 0);
+        if (parts.length <= 1) continue;
+        const fragment = document.createDocumentFragment();
+        for (const part of parts) {
+          if (CJK_KEEP_TOKENS.includes(part)) {
+            const token = document.createElement('span');
+            token.className = 'rca-cjk-token';
+            token.textContent = part;
+            fragment.appendChild(token);
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        }
+        node.parentNode.replaceChild(fragment, node);
+      }
+    }
     function setupSlides() {
       slideDisplayArea.innerHTML = '';
       slidesData.forEach((slide) => {
         const element = document.createElement('div');
         element.className = 'slide';
         element.innerHTML = '<div class="slide-content-wrapper">' + slide.content + '</div>';
+        protectCjkShortTokens(element);
         slideDisplayArea.appendChild(element);
       });
     }

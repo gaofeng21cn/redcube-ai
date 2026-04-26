@@ -866,6 +866,7 @@ export function createPptDeckRenderStageParts(deps) {
         render_summary: safeArray(summaryData?.render_summary),
       },
       generationRuntime,
+      revisionContext: sharedRevisionContext,
       renderExecution: {
         route,
         mode: renderPlan.mode,
@@ -891,7 +892,7 @@ export function createPptDeckRenderStageParts(deps) {
   }) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-    const { data, generationRuntime, renderExecution } = await generateRenderHtmlDraft({
+    const { data, generationRuntime, revisionContext, renderExecution } = await generateRenderHtmlDraft({
       workspaceRoot,
       deliverableId,
       contract,
@@ -908,6 +909,7 @@ export function createPptDeckRenderStageParts(deps) {
       safeText(item.slide_id),
       validateRenderedSlideContent(item.content_html, safeText(item.slide_id)),
     ]));
+    const revisionFocusBySlideId = buildRenderRevisionFocusMap(revisionContext);
     const slidesMarkup = safeArray(blueprintArtifact?.slide_blueprint?.slides).map((slide) => {
       const rawContent = slideHtmlById.get(slide.slide_id);
       if (!rawContent) {
@@ -953,6 +955,7 @@ export function createPptDeckRenderStageParts(deps) {
         template_id: 'upstream_ai_html',
         page_goal: slide.page_goal,
         page_core_content: safeArray(slide.page_core_content),
+        revision_focus: revisionFocusBySlideId.get(safeText(slide.slide_id)) || null,
         evidence_and_sources: safeArray(slide.evidence_and_sources),
         speaker_seconds: slide.speaker_seconds,
         transition_sentence: slide.transition_sentence,
@@ -1044,6 +1047,7 @@ export function createPptDeckRenderStageParts(deps) {
         adapter,
       ),
       render_execution: renderExecution || null,
+      revision_context: revisionContext || null,
       ...(targetedRerun ? { targeted_rerun: targetedRerun } : {}),
       lifecycle_stage: contract.lifecycle_model?.route_to_stage?.[route] || contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
       html_bundle: {
