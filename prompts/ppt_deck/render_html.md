@@ -58,6 +58,8 @@
 - 复杂结构页必须显式网格 / 轨道 / 锚点
 - 若上下文提供 `revision_context`，必须优先修复其中点名的 blocked slides、遮挡/裁切与最弱页问题；不要无视上一轮审稿意见原样重画
 - 若封面页 blueprint 已给出具名讲者署名，要把它当成正式封面信息排版，而不是系统注释
+- 若 blueprint slide 提供 `evidence_points`，这些是读者可见的证据点，不是来源元数据；主要结果页必须把其中的关键数字渲染成数据芯片、证据条、表格单元或图示标签，不能在 HTML 中丢掉
+- 如果 `content_density_contract.purpose = manuscript_submission_sync`，每篇论文的结果页必须可见呈现对应 `manuscript_evidence_table` / `evidence_points` 中的关键数字；不能把 AUROC、Brier、校准、事件率、风险梯度、Knosp 分布等退化成抽象描述
 - final HTML markup 必须由 AI 直接创作；runtime 只负责 shell 边界、审阅契约与持久化，不得退回模板编译
 - 生成的 audience-facing HTML 必须被视为当前 `authored_markup_registry` 的唯一合法来源；不得把 registry、模板名或内部制作痕迹写进画面
 - 必须遵守 `audience_visibility_contract`：`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`operator_playbook`、`revision_context`、`source_id`、`material_id` 都是作者/系统工作面，不得出现在任何听众可见标题、正文、页脚、badge、图注或卡片中

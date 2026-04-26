@@ -92,7 +92,7 @@ function normalizeBlueprintSlide(slide, contract, canvas, materializedFrom, gene
     page_goal: slide.page_goal,
     core_sentence: slide.core_sentence,
     render_recipe_id: slide.render_recipe_id,
-    page_core_content: pageCoreContent,
+    page_core_content: pageCoreContent, evidence_points: safeArray(slide.evidence_points).map((item) => safeText(item)).filter(Boolean),
     visual_presentation: {
       layout_family: slide.layout_family,
       anchor_tracks: visualAnchorTracks,
@@ -105,12 +105,12 @@ function normalizeBlueprintSlide(slide, contract, canvas, materializedFrom, gene
       : preset.speaker_seconds,
     transition_sentence: slide.transition_sentence,
     creative_sources: {
-      page_core_content: majorBlueprintText,
+      page_core_content: majorBlueprintText, evidence_points: majorBlueprintText,
       speaker_notes: majorBlueprintText,
       transition_sentence: majorBlueprintText,
     },
     creative_authorship: {
-      page_core_content: majorBlueprintText,
+      page_core_content: majorBlueprintText, evidence_points: majorBlueprintText,
       speaker_notes: majorBlueprintText,
       transition_sentence: majorBlueprintText,
     },
@@ -139,9 +139,8 @@ export function buildPptDetailedOutlineArtifact({
     lifecycle_stage: lifecycleStage,
     detailed_outline: {
       chapter_structure: safeArray(authoredOutline?.chapter_structure),
-      page_budget: {
-        total_slides: safeArray(authoredOutline?.slides).length,
-      },
+      page_budget: { total_slides: safeArray(authoredOutline?.slides).length },
+      manuscript_evidence_table: safeArray(authoredOutline?.manuscript_evidence_table).map((row) => ({ manuscript_label: safeText(row?.manuscript_label), research_question: safeText(row?.research_question), primary_endpoint: safeText(row?.primary_endpoint), method_or_model: safeText(row?.method_or_model), key_numeric_results: safeArray(row?.key_numeric_results).map((item) => safeText(item)).filter(Boolean), main_conclusion: safeText(row?.main_conclusion), boundary: safeText(row?.boundary) })).filter((row) => row.manuscript_label && row.key_numeric_results.length > 0),
       slides: safeArray(authoredOutline?.slides).map((slide) => ({
         slide_id: slide.slide_id,
         slide_no: String(slide.slide_no).padStart(2, '0'),

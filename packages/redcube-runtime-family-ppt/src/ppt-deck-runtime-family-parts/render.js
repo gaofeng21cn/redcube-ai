@@ -454,7 +454,7 @@ export function createPptDeckRenderStageParts(deps) {
       title: slide.title,
       page_goal: slide.page_goal,
       core_sentence: slide.core_sentence,
-      page_core_content: slide.page_core_content,
+      page_core_content: slide.page_core_content, evidence_points: safeArray(slide.evidence_points),
       anchor_tracks: slide.visual_presentation?.anchor_tracks,
       speaker_seconds: slide.speaker_seconds,
       render_recipe_id: slide.render_recipe_id,

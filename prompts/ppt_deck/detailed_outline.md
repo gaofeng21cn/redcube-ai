@@ -11,7 +11,9 @@
 要求：
 - 每页明确 core_sentence / evidence_points / page_objective
 - `source_materials_full_text` 是完整资料输入，必须通读全文后规划页面；不得只消费材料开头、source_fact_summary、ready_sources 或任何截断 excerpt
+- 如果上下文提供 `manuscript_evidence_table`，必须把它当作 storyline 已从全文抽取出的结构化证据表来消费；每篇论文的研究问题、终点、方法、关键数字结果、结论边界都要能在逐页大纲里找到落点
 - 如果任务是待投稿/成文论文同步，每篇论文必须至少有一页听众可见内容直接写出关键数字证据，例如样本量、事件率、AUROC、Brier、校准、风险分层、Knosp 分布等；数字只能来自 source_materials_full_text
+- 待投稿/成文论文同步的主要结果页不得只把数字放在讲稿或视觉锚点里；`evidence_points` 必须保留具体数字，必要时 `page_core_content` 也要直接写出关键数字，供后续 HTML 可见渲染
 - 待投稿/成文论文同步的页面主语是“论文故事、结论、证据、边界”，不得硬扯“科室价值”“应用场景”“管理建议”“服务临床动作”或把论文写成已经可推广使用的工具
 - 若存在具名讲者署名，封面页必须把署名落成 audience-facing cover element，而不是写成“封面必须署名”这类元指令
 - 听众可见字段只允许承载标题、结论、证据摘要、边界和必要数字；`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks` 是讲者/作者工作面，不得复制或改写成页面正文

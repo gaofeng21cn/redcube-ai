@@ -74,6 +74,8 @@ test('ppt authoring context passes full source materials instead of first-line e
   assert.equal(context.source_materials_full_text.length, 1);
   assert.equal(context.source_materials_full_text[0].content_text.includes(lateEvidence), true);
   assert.equal(context.content_density_contract?.purpose, 'manuscript_submission_sync');
+  assert.equal(context.source_evidence_extraction_contract?.source_input, 'source_materials_full_text');
+  assert.equal(context.source_evidence_extraction_contract?.output_field, 'manuscript_evidence_table');
 });
 
 test('ppt manuscript sync blocks abstract outlines without visible paper evidence', async () => {
@@ -115,6 +117,20 @@ test('ppt manuscript sync blocks abstract outlines without visible paper evidenc
       route: 'storyline',
     });
     assert.equal(storylineResult.ok, true);
+    const storylineArtifact = readJson(path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-a',
+      'artifacts',
+      'storyline.json',
+    ));
+    assert.equal(storylineArtifact.storyline.manuscript_evidence_table.length, 3);
+    assert.match(
+      storylineArtifact.storyline.manuscript_evidence_table[0].key_numeric_results.join('\n'),
+      /357|57\/357|16\.0|AUROC|Brier/,
+    );
 
     const outlineResult = await runDeliverableRoute({
       workspaceRoot,

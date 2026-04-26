@@ -174,6 +174,7 @@ export function createPptDeckAuthoringParts(deps) {
     return {
       purpose: 'manuscript_submission_sync',
       source_consumption_policy: 'AI must receive and read source_materials_full_text. Programmatic snippets or first-lines are not an acceptable substitute.',
+      evidence_table_policy: 'The storyline stage must read source_materials_full_text and author manuscript_evidence_table as structured evidence for downstream outline and blueprint stages.',
       visible_slide_focus: [
         '同步三篇待投稿或已成文论文的研究故事、主要结论和数字证据',
         '每篇论文至少覆盖研究问题、队列/终点、方法或模型策略、关键数字结果、结论边界',
@@ -182,6 +183,31 @@ export function createPptDeckAuthoringParts(deps) {
       prohibited_framing: [
         '不要把论文同步改写成临床应用推广、科室价值展示、管理行动建议或可复用框架宣传',
         '不要使用“科室价值”“应用场景”“服务随访安排”“服务手术策略”“证据链可复用”作为章节目标',
+      ],
+    };
+  }
+
+  function manuscriptEvidenceExtractionContract(contract) {
+    if (!manuscriptSyncRequired(contract)) return null;
+    return {
+      contract_id: 'ppt_deck_ai_first_manuscript_evidence_table_v1',
+      source_input: 'source_materials_full_text',
+      extraction_owner: 'storyline_ai_stage',
+      output_field: 'manuscript_evidence_table',
+      downstream_consumers: ['detailed_outline', 'slide_blueprint', 'render_html'],
+      required_row_fields: [
+        'manuscript_label',
+        'research_question',
+        'primary_endpoint',
+        'method_or_model',
+        'key_numeric_results',
+        'main_conclusion',
+        'boundary',
+      ],
+      policy: [
+        'storyline 必须从 source_materials_full_text 全文抽取每篇论文的数字证据表',
+        'detailed_outline 和 slide_blueprint 必须消费 manuscript_evidence_table，不得重新退化成抽象概括',
+        '程序只校验结构和可见数字是否存在，不用开头片段替 AI 选证据',
       ],
     };
   }
@@ -224,6 +250,39 @@ export function createPptDeckAuthoringParts(deps) {
         throw new Error(`${label} manuscript sync requires visible numeric evidence for ${manuscriptLabel}`);
       }
     }
+  }
+
+  function normalizeManuscriptEvidenceRow(row, index, label) {
+    const normalized = {
+      manuscript_label: requireText(row?.manuscript_label, `${label}[${index}].manuscript_label`),
+      research_question: requireText(row?.research_question, `${label}[${index}].research_question`),
+      primary_endpoint: requireText(row?.primary_endpoint, `${label}[${index}].primary_endpoint`),
+      method_or_model: requireText(row?.method_or_model, `${label}[${index}].method_or_model`),
+      key_numeric_results: normalizeStringList(row?.key_numeric_results, `${label}[${index}].key_numeric_results`, { min: 2, max: 8 }),
+      main_conclusion: requireText(row?.main_conclusion, `${label}[${index}].main_conclusion`),
+      boundary: requireText(row?.boundary, `${label}[${index}].boundary`),
+    };
+    if (!normalized.key_numeric_results.some((item) => hasQuantitativeEvidence(item))) {
+      throw new Error(`${label}[${index}].key_numeric_results must include numeric evidence from source_materials_full_text`);
+    }
+    return normalized;
+  }
+
+  function normalizeManuscriptEvidenceTable(value, contract, label) {
+    const rows = safeArray(value).map((row, index) => normalizeManuscriptEvidenceRow(row, index, label));
+    if (!manuscriptSyncRequired(contract)) return rows;
+    const requiredLabels = manuscriptLabels(contract);
+    if (requiredLabels.length === 0) return rows;
+    for (const manuscriptLabel of requiredLabels) {
+      const row = rows.find((item) => safeText(item.manuscript_label).includes(manuscriptLabel));
+      if (!row) {
+        throw new Error(`${label} must include structured evidence for ${manuscriptLabel}`);
+      }
+      if (!row.key_numeric_results.some((item) => hasQuantitativeEvidence(item))) {
+        throw new Error(`${label} must include numeric evidence for ${manuscriptLabel}`);
+      }
+    }
+    return rows;
   }
 
   function fullSourceMaterials(contract) {
@@ -371,6 +430,17 @@ export function createPptDeckAuthoringParts(deps) {
       hook: ['<string>'],
       journey: ['<string>', '<string>', '<string>'],
       resolution: ['<string>'],
+      manuscript_evidence_table: [
+        {
+          manuscript_label: '第一篇',
+          research_question: '<string>',
+          primary_endpoint: '<string>',
+          method_or_model: '<string>',
+          key_numeric_results: ['<string with source numeric evidence>', '<string with source numeric evidence>'],
+          main_conclusion: '<string>',
+          boundary: '<string>',
+        },
+      ],
     };
   }
 
@@ -517,6 +587,7 @@ export function createPptDeckAuthoringParts(deps) {
       ready_sources: sharedSourceLabels(contract),
       source_materials_full_text: fullSourceMaterials(contract),
       content_density_contract: manuscriptSyncContract(contract),
+      source_evidence_extraction_contract: manuscriptEvidenceExtractionContract(contract),
       source_truth: {
         input_mode: sharedSourceInputMode(contract) || 'seed_only',
         confidence: sharedSourceConfidence(contract) || 'low',
@@ -584,6 +655,7 @@ export function createPptDeckAuthoringParts(deps) {
         'source_id、material_id、SRC-*、MAT-*、内部项目编号与管理编号只允许留在 provenance，不允许作为听众可见论文标签；若用户给出对外口径，必须按该口径重命名',
         '如果共享事实材料不足，只能做保守抽象，不要发明内部流程细节或伪来源',
         '如果 content_density_contract.purpose 是 manuscript_submission_sync，页面主语必须是论文故事、结论和数字证据；不要改写成应用价值、管理建议或科室价值宣传',
+        '如果 source_evidence_extraction_contract 存在，storyline 必须先从 source_materials_full_text 全文产出 manuscript_evidence_table；outline、blueprint 和 render 后续阶段必须沿用这张结构化证据表',
         'source_materials_full_text 是完整资料，不是摘要；storyline、detailed_outline、slide_blueprint 必须通读全文后选择论文故事、结论与证据，不能只依赖开头、标题或 source_fact_summary',
       ],
     };
@@ -607,6 +679,11 @@ export function createPptDeckAuthoringParts(deps) {
         hook: normalizeStringList(data?.hook, 'storyline.hook', { min: 1, max: 3 }),
         journey: normalizeStringList(data?.journey, 'storyline.journey', { min: 3, max: 5 }),
         resolution: normalizeStringList(data?.resolution, 'storyline.resolution', { min: 1, max: 3 }),
+        manuscript_evidence_table: normalizeManuscriptEvidenceTable(
+          data?.manuscript_evidence_table,
+          contract,
+          'storyline.manuscript_evidence_table',
+        ),
       },
       generationRuntime,
     };
@@ -623,7 +700,9 @@ export function createPptDeckAuthoringParts(deps) {
         hook: safeArray(storylineArtifact?.storyline?.narrative_arc?.hook),
         journey: safeArray(storylineArtifact?.storyline?.narrative_arc?.journey),
         resolution: safeArray(storylineArtifact?.storyline?.narrative_arc?.resolution),
+        manuscript_evidence_table: safeArray(storylineArtifact?.storyline?.manuscript_evidence_table),
       },
+      manuscript_evidence_table: safeArray(storylineArtifact?.storyline?.manuscript_evidence_table),
     };
   }
 
@@ -637,7 +716,14 @@ export function createPptDeckAuthoringParts(deps) {
       outputContract: detailedOutlineOutputContract(),
     });
     return {
-      authoredOutline: normalizeOutlineDraft(data, contract),
+      authoredOutline: {
+        ...normalizeOutlineDraft(data, contract),
+        manuscript_evidence_table: normalizeManuscriptEvidenceTable(
+          storylineArtifact?.storyline?.manuscript_evidence_table,
+          contract,
+          'storyline.manuscript_evidence_table',
+        ),
+      },
       generationRuntime,
     };
   }
@@ -671,6 +757,7 @@ export function createPptDeckAuthoringParts(deps) {
       promptRelativePath: PROMPT_PACK.slide_blueprint,
       context: {
         ...buildAuthoringContext(contract),
+        manuscript_evidence_table: safeArray(outlineArtifact?.detailed_outline?.manuscript_evidence_table),
         outline: {
           chapter_structure: safeArray(outlineArtifact?.detailed_outline?.chapter_structure),
           slides: summarizeOutlineSlides(outlineArtifact),
@@ -742,9 +829,11 @@ export function createPptDeckAuthoringParts(deps) {
         source_sufficiency_judgement: sharedSourceSufficiencyStatus(contract),
         deep_research_state: sharedSourceDeepResearchState(contract),
         fact_library_summary: sharedFactLibrarySummary(contract),
+        manuscript_evidence_table: safeArray(authoredStoryline.manuscript_evidence_table),
         creative_sources: {
           core_metaphor: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
           narrative_arc: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
+          manuscript_evidence_table: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
         },
       },
     };
