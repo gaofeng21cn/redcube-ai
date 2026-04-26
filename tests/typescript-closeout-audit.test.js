@@ -41,6 +41,19 @@ function passingQualityGates() {
 }
 
 const LEAF_TS_MIGRATION_LOCKS = {
+  'packages/redcube-gateway/src/actions/doctor-workspace.js': 1,
+  'packages/redcube-gateway/src/actions/execute-source-augmentation.js': 1,
+  'packages/redcube-gateway/src/actions/get-deliverable.js': 1,
+  'packages/redcube-gateway/src/actions/get-managed-run.js': 1,
+  'packages/redcube-gateway/src/actions/get-product-frontdesk.js': 1,
+  'packages/redcube-gateway/src/actions/get-product-start.js': 1,
+  'packages/redcube-gateway/src/actions/get-run.js': 1,
+  'packages/redcube-gateway/src/actions/intake-source.js': 1,
+  'packages/redcube-gateway/src/actions/prepare-source-augmentation-result.js': 1,
+  'packages/redcube-gateway/src/actions/prepare-source-augmentation.js': 1,
+  'packages/redcube-gateway/src/actions/run-deliverable-route.js': 1,
+  'packages/redcube-gateway/src/actions/run-managed-deliverable.js': 1,
+  'packages/redcube-gateway/src/actions/write-source-augmentation-result.js': 1,
   'packages/redcube-overlay-core/src/contracts.js': 1,
   'packages/redcube-overlay-core/src/index.js': 1,
   'packages/redcube-overlay-core/src/registry.js': 1,
