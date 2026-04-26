@@ -2,22 +2,19 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/redcube-cli"
+      "path": "./packages/redcube-runtime-protocol"
     },
     {
-      "path": "./apps/redcube-mcp"
-    },
-    {
-      "path": "./packages/redcube-gateway"
-    },
-    {
-      "path": "./packages/redcube-governance"
+      "path": "./packages/redcube-hermes-substrate"
     },
     {
       "path": "./packages/redcube-overlay-core"
     },
     {
-      "path": "./packages/redcube-overlay-registry"
+      "path": "./packages/redcube-governance"
+    },
+    {
+      "path": "./packages/redcube-reference-os"
     },
     {
       "path": "./packages/redcube-overlay-xiaohongshu"
@@ -29,7 +26,7 @@
       "path": "./packages/redcube-overlay-poster-onepager"
     },
     {
-      "path": "./packages/redcube-reference-os"
+      "path": "./packages/redcube-overlay-registry"
     },
     {
       "path": "./packages/redcube-config"
@@ -41,7 +38,7 @@
       "path": "./packages/redcube-llm"
     },
     {
-      "path": "./packages/redcube-runtime-protocol"
+      "path": "./packages/redcube-runtime"
     },
     {
       "path": "./packages/redcube-pack-ppt"
@@ -68,7 +65,13 @@
       "path": "./packages/redcube-runtime-family-registry"
     },
     {
-      "path": "./packages/redcube-runtime"
+      "path": "./packages/redcube-gateway"
+    },
+    {
+      "path": "./apps/redcube-cli"
+    },
+    {
+      "path": "./apps/redcube-mcp"
     },
     {
       "path": "./tsconfig.tests.json"

@@ -128,6 +128,30 @@ test('workspace packages and apps participate in package-level tsconfig layering
   }
 });
 
+test('root package build graph lists dist-export dependencies before consumers', () => {
+  const rootConfig = readJson('tsconfig.json');
+  const referenceIndex = new Map(
+    rootConfig.references.map((entry, index) => [entry.path, index]),
+  );
+
+  const before = (dependency, consumer) => {
+    assert.equal(referenceIndex.has(dependency), true, dependency);
+    assert.equal(referenceIndex.has(consumer), true, consumer);
+    assert.equal(
+      referenceIndex.get(dependency) < referenceIndex.get(consumer),
+      true,
+      `${dependency} must build before ${consumer}`,
+    );
+  };
+
+  before('./packages/redcube-runtime-protocol', './packages/redcube-hermes-substrate');
+  before('./packages/redcube-hermes-substrate', './packages/redcube-overlay-core');
+  before('./packages/redcube-overlay-core', './packages/redcube-governance');
+  before('./packages/redcube-governance', './packages/redcube-runtime');
+  before('./packages/redcube-runtime', './packages/redcube-gateway');
+  before('./packages/redcube-gateway', './apps/redcube-cli');
+});
+
 test('typescript migration policy reference stays tracked', () => {
   assert.equal(existsSync(path.resolve('docs/policies/typescript_migration_policy.md')), true);
 });
