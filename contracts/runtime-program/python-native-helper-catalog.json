@@ -25,6 +25,12 @@
       "helper_id": "ppt_deck_review",
       "script": "packages/redcube-runtime/scripts/ppt_deck_review.py",
       "package_module": "redcube_ai.native_helpers.ppt_deck.review",
+      "package_entrypoint": {
+        "console_script": "redcube-ppt-deck-review",
+        "module": "redcube_ai.native_helpers.ppt_deck.review",
+        "callable": "main",
+        "module_command": "python -m redcube_ai.native_helpers.ppt_deck.review"
+      },
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
       "runtime_surface": "screenshot_review",
@@ -48,6 +54,12 @@
       "helper_id": "ppt_deck_export",
       "script": "packages/redcube-runtime/scripts/ppt_deck_export.py",
       "package_module": "redcube_ai.native_helpers.ppt_deck.export",
+      "package_entrypoint": {
+        "console_script": "redcube-ppt-deck-export",
+        "module": "redcube_ai.native_helpers.ppt_deck.export",
+        "callable": "main",
+        "module_command": "python -m redcube_ai.native_helpers.ppt_deck.export"
+      },
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
       "runtime_surface": "export_pptx",
@@ -74,6 +86,12 @@
       "helper_id": "ppt_deck_native",
       "script": "packages/redcube-runtime/scripts/ppt_deck_native.py",
       "package_module": "redcube_ai.native_helpers.ppt_deck.native",
+      "package_entrypoint": {
+        "console_script": "redcube-ppt-deck-native",
+        "module": "redcube_ai.native_helpers.ppt_deck.native",
+        "callable": "main",
+        "module_command": "python -m redcube_ai.native_helpers.ppt_deck.native"
+      },
       "owner": "python_native_helper",
       "deliverable_family": "ppt_deck",
       "runtime_surface": "native_ppt_authoring_repair",
@@ -109,6 +127,12 @@
       "helper_id": "hermes_native_proof_bridge",
       "script": "packages/redcube-hermes-substrate/scripts/hermes_native_proof_bridge.py",
       "package_module": "redcube_ai.hermes.native_proof_bridge",
+      "package_entrypoint": {
+        "console_script": "redcube-hermes-native-proof-bridge",
+        "module": "redcube_ai.hermes.native_proof_bridge",
+        "callable": "main",
+        "module_command": "python -m redcube_ai.hermes.native_proof_bridge"
+      },
       "owner": "python_native_helper",
       "deliverable_family": "runtime_substrate",
       "runtime_surface": "hermes_native_full_agent_loop",

@@ -16,6 +16,26 @@ function helperById(catalog) {
   return Object.fromEntries(catalog.helpers.map((helper) => [helper.helper_id, helper]));
 }
 
+function readPyprojectScripts() {
+  const result = spawnSync(
+    'python3',
+    [
+      '-c',
+      [
+        'import json, tomllib',
+        "data = tomllib.loads(open('pyproject.toml', 'rb').read().decode('utf-8'))",
+        "print(json.dumps(data.get('project', {}).get('scripts', {})))",
+      ].join('; '),
+    ],
+    {
+      cwd: path.resolve('.'),
+      encoding: 'utf-8',
+    },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
 test('Python native helper catalog records the repo-owned helper boundary', () => {
   const catalog = readJson(CATALOG_FILE);
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
@@ -52,6 +72,10 @@ test('Python native helper catalog only points at tracked Python helper scripts'
     assert.equal(helper.script.endsWith('.py'), true, helper.helper_id);
     assert.equal(typeof helper.package_module, 'string', helper.helper_id);
     assert.match(helper.package_module, /^redcube_ai\./, helper.helper_id);
+    assert.equal(helper.package_entrypoint.module, helper.package_module, helper.helper_id);
+    assert.equal(helper.package_entrypoint.callable, 'main', helper.helper_id);
+    assert.equal(helper.package_entrypoint.module_command, `python -m ${helper.package_module}`, helper.helper_id);
+    assert.match(helper.package_entrypoint.console_script, /^redcube-/, helper.helper_id);
     assert.equal(existsSync(path.resolve(helper.script)), true, helper.script);
   }
 
@@ -61,10 +85,15 @@ test('Python native helper catalog only points at tracked Python helper scripts'
   assert.equal(helpers.hermes_native_proof_bridge.deliverable_family, 'runtime_substrate');
 });
 
-test('Python helper package modules import from the formal package root', () => {
+test('Python helper package modules and entrypoint callables import from the formal package root', () => {
   const catalog = readJson(CATALOG_FILE);
-  const moduleImports = catalog.helpers.map((helper) => `import ${helper.package_module}`).join('; ');
-  const result = spawnSync('python3', ['-c', moduleImports], {
+  const moduleChecks = catalog.helpers.map((helper) => {
+    return [
+      `module = importlib.import_module(${JSON.stringify(helper.package_module)})`,
+      "assert callable(getattr(module, 'main', None))",
+    ].join('; ');
+  }).join('; ');
+  const result = spawnSync('python3', ['-c', `import importlib; ${moduleChecks}`], {
     cwd: path.resolve('.'),
     encoding: 'utf-8',
     env: {
@@ -74,6 +103,47 @@ test('Python helper package modules import from the formal package root', () => 
   });
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
+});
+
+test('Python helper catalog package entrypoints match pyproject console scripts', () => {
+  const catalog = readJson(CATALOG_FILE);
+  const scripts = readPyprojectScripts();
+
+  for (const helper of catalog.helpers) {
+    const { console_script: consoleScript, module, callable } = helper.package_entrypoint;
+    assert.equal(
+      scripts[consoleScript],
+      `${module}:${callable}`,
+      `${helper.helper_id} console script must resolve to the package main callable`,
+    );
+  }
+});
+
+test('Python helper modules are discoverable through python -m help without running gates', () => {
+  const catalog = readJson(CATALOG_FILE);
+
+  for (const helper of catalog.helpers) {
+    const result = spawnSync('python3', ['-m', helper.package_module, '--help'], {
+      cwd: path.resolve('.'),
+      encoding: 'utf-8',
+      env: {
+        ...process.env,
+        PYTHONPATH: path.resolve('python'),
+      },
+    });
+
+    assert.equal(result.status, 0, `${helper.helper_id}: ${result.stderr || result.stdout}`);
+  }
+});
+
+test('Compatibility wrapper scripts remain thin package entrypoints', () => {
+  const catalog = readJson(CATALOG_FILE);
+
+  for (const helper of catalog.helpers) {
+    const wrapper = readFileSync(path.resolve(helper.script), 'utf-8');
+    assert.match(wrapper, new RegExp(`from ${helper.package_module.replaceAll('.', '\\.')} import main`), helper.helper_id);
+    assert.match(wrapper, /if __name__ == ['"]__main__['"]:/, helper.helper_id);
+  }
 });
 
 test('Native PPT helper routes stay tied to the engine contract and review/export gates', () => {

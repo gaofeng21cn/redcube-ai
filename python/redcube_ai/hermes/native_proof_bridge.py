@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
@@ -204,10 +205,17 @@ def _run_probe() -> dict[str, Any]:
     }
 
 
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run the RedCube AI Hermes-native proof bridge from a request JSON file."
+    )
+    parser.add_argument("request_json", help="Path to a probe or generate request JSON file.")
+    return parser.parse_args(argv)
+
+
 def main() -> int:
-    request_path = str(sys.argv[1] if len(sys.argv) > 1 else "").strip()
-    if not request_path:
-        raise RuntimeError("Hermes-native proof bridge 缺少 request json path。")
+    args = parse_args()
+    request_path = str(args.request_json).strip()
     request = json.loads(Path(request_path).read_text(encoding="utf-8"))
     action = str(request.get("action") or "").strip()
     if action == "probe":
