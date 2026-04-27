@@ -157,5 +157,7 @@ export {
   probeHermesNativeProof,
   readHermesEvents,
   readHermesNativeProofContract,
+  runAgentLoopViaHermesAgentApi,
   startHermesRun,
+  structuredCallViaHermesAgentApi,
 } from './index.impl.js';

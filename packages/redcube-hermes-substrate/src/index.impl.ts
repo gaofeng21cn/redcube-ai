@@ -446,6 +446,10 @@ export {
   probeHermesNativeProof,
   readHermesNativeProofContract,
 } from './hermes-native-proof-client.js';
+export {
+  runAgentLoopViaHermesAgentApi,
+  structuredCallViaHermesAgentApi,
+} from './hermes-agent-api-client.js';
 
 export function createHermesCreativeSource({
   route = null,
