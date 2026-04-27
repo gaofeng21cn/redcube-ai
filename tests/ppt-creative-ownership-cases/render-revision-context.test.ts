@@ -97,6 +97,16 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
           slide_id: 'S02',
           status: 'block',
           issues: ['occlusion_detected'],
+          metrics: {
+            block_content_failures: [
+              {
+                block_id: 'ring-overview',
+                overflow_reason: 'surface_text_targets_overlap',
+                overlap_width: 168,
+                overlap_height: 58,
+              },
+            ],
+          },
           ai_review: {
             judgement: 'block',
             visual_findings: ['底部说明带压进主体区域，左栏最后一条内容被截断。'],
@@ -106,7 +116,15 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
         {
           slide_id: 'S06',
           status: 'block',
-          issues: ['occlusion_detected'],
+          issues: ['occlusion_detected', 'title_typography_inconsistent'],
+          checks: {
+            title_typography_ok: false,
+          },
+          metrics: {
+            title_font_size: 30,
+            title_font_reference: 44,
+            title_font_delta: 14,
+          },
           ai_review: {
             judgement: 'block',
             visual_findings: ['判定门更像说明卡叠放，第二、三道门与右侧标签发生遮挡。'],
@@ -119,7 +137,6 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
         review_summary: 'S02 与 S06 存在遮挡，需要回到 render_html 重建布局。',
       },
     }, null, 2), 'utf-8');
-
     const screenshotsDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-a', 'reports', 'screenshots');
     mkdirSync(screenshotsDir, { recursive: true });
     writeFileSync(path.join(screenshotsDir, 'slide-02.png'), TINY_PNG);
@@ -164,6 +181,11 @@ test('ppt fix_html forwards prior director and screenshot review feedback to Cod
       const s02Focus = renderArtifact.html_bundle.slides.find((slide) => slide.slide_id === 'S02')?.revision_focus;
       assert.equal(s02Focus?.operator_requested_revision, true);
       assert.match(s02Focus?.recommended_fix || '', /释放纵向空间/);
+      assert.match(s02Focus?.recommended_fix || '', /内部元素重叠 168x58px/);
+      const s06Focus = renderArtifact.html_bundle.slides.find((slide) => slide.slide_id === 'S06')?.revision_focus;
+      assert.match(s06Focus?.recommended_fix || '', /主标题字号 30px/);
+      assert.match(s06Focus?.recommended_fix || '', /参考档位 44px/);
+      assert.match(s06Focus?.recommended_fix || '', /低于参考 14px/);
     } finally {
       restoreVariant();
     }

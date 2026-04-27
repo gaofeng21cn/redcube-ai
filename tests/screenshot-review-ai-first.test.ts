@@ -75,16 +75,18 @@ function loadHelpers(file, extraNames = []) {
   if (file.includes('poster-onepager-runtime-parts/review-helpers.ts')) {
     return POSTER_HELPERS;
   }
-  const source = readFileSync(file, 'utf-8');
+  const source = file.includes('ppt-deck-runtime-family-parts/core.ts')
+    ? `${readFileSync('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core-constants.ts', 'utf-8')}\n${readFileSync(file, 'utf-8')}`
+    : readFileSync(file, 'utf-8');
   const extractConstExpression = (name, fallback) => {
     const match = source.match(new RegExp(`const ${name} = ([^;]+);`));
     return match ? match[1] : fallback;
   };
   const functionCode = [...HELPER_NAMES, ...extraNames].map((name) => extractFunction(source, name)).join('\n\n');
   return new Function(`
-    const HARD_SCREENSHOT_BLOCKING_ISSUES = ${extractConstExpression('HARD_SCREENSHOT_BLOCKING_ISSUES', "new Set(['overflow_detected'])")};
     const PAGE_FIX_ROUTE = ${extractConstExpression('PAGE_FIX_ROUTE', "'fix_html'")};
     const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = ${extractConstExpression('TARGETED_SCREENSHOT_MECHANICAL_ISSUES', "new Set(['overflow_detected', 'occlusion_detected', 'visual_density_out_of_range', 'block_content_overflow_detected'])")};
+    const HARD_SCREENSHOT_BLOCKING_ISSUES = ${extractConstExpression('HARD_SCREENSHOT_BLOCKING_ISSUES', "new Set(['overflow_detected'])")};
     const TARGETED_SCREENSHOT_RERUN_CHECKS = ${extractConstExpression('TARGETED_SCREENSHOT_RERUN_CHECKS', "new Set(['ai_review_passed', 'overflow_free', 'occlusion_free', 'visual_density_ok'])")};
     const hardScreenshotBlockingIssues = HARD_SCREENSHOT_BLOCKING_ISSUES;
     const targetedScreenshotMechanicalIssues = TARGETED_SCREENSHOT_MECHANICAL_ISSUES;
@@ -118,8 +120,13 @@ for (const family of FAMILY_FILES) {
       },
     );
 
-    assert.equal(reviewed.status, 'pass');
-    assert.deepEqual(reviewed.issues, []);
+    if (family.label === 'ppt') {
+      assert.equal(reviewed.status, 'block');
+      assert.deepEqual(reviewed.issues, ['occlusion_detected', 'visual_density_out_of_range']);
+    } else {
+      assert.equal(reviewed.status, 'pass');
+      assert.deepEqual(reviewed.issues, []);
+    }
     assert.deepEqual(reviewed.mechanical_issues, ['occlusion_detected', 'visual_density_out_of_range', 'speaker_fit_out_of_range']);
     assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'occlusion_free'), false);
     assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'visual_density_ok'), false);
@@ -274,7 +281,8 @@ for (const family of FAMILY_FILES) {
         },
       );
 
-      assert.equal(reviewed.status, 'pass');
+      assert.equal(reviewed.status, 'block');
+      assert.deepEqual(reviewed.issues, ['edge_clearance_out_of_range', 'title_typography_inconsistent']);
       assert.deepEqual(reviewed.mechanical_issues, ['edge_clearance_out_of_range', 'title_typography_inconsistent']);
       assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'edge_clearance_ok'), false);
       assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'title_typography_ok'), false);
@@ -341,7 +349,8 @@ for (const family of FAMILY_FILES) {
         },
       );
 
-      assert.equal(reviewed.status, 'pass');
+      assert.equal(reviewed.status, 'block');
+      assert.deepEqual(reviewed.issues, ['page_number_consistency_failed']);
       assert.deepEqual(reviewed.mechanical_issues, ['page_number_consistency_failed']);
       assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'page_number_consistency_ok'), false);
       assert.equal(helpers.slideNeedsTargetedRevision(reviewed), true);

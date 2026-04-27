@@ -1,6 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
@@ -171,7 +172,25 @@ function makePptStageParts() {
       writeFileSync(file, text);
     },
   });
-  return { stageParts, workspaceRoot, contract, remember: (artifact) => artifacts.set('screenshot_review', artifact), counts: () => ({ python: readCount(callCountFile), aiBatchCalls }) };
+  return { stageParts, workspaceRoot, contract, htmlFile, slideHtml, remember: (artifact) => artifacts.set('screenshot_review', artifact), counts: () => ({ python: readCount(callCountFile), aiBatchCalls }) };
+}
+
+function legacyPptScreenshotMechanicsV1Hash({ htmlFile, slideHtml }) {
+  const hash = createHash('sha256');
+  hash.update('ppt_deck_screenshot_mechanics:v1\n');
+  hash.update('1152x648\n');
+  hash.update(htmlFile);
+  hash.update('\n');
+  if (htmlFile && existsSync(htmlFile)) {
+    hash.update(readFileSync(htmlFile));
+  }
+  hash.update('\nslides\n');
+  hash.update(JSON.stringify([{
+    slide_id: 'S01',
+    title: '第一页',
+    html: slideHtml,
+  }]));
+  return hash.digest('hex');
 }
 
 test('ppt screenshot_review reuses mechanical cache for identical HTML while still running AI visual gate', async () => {
@@ -212,6 +231,53 @@ test('ppt screenshot_review reuses mechanical cache for identical HTML while sti
   assert.equal(second.mechanical_review.cache_status, 'hit');
   assert.equal(second.mechanical_review.hash, first.mechanical_review.hash);
   assert.equal(second.mechanical_review.freshness, 'current');
+});
+
+test('ppt screenshot_review rejects legacy v1 mechanical cache after review rules change', async () => {
+  const fixture = makePptStageParts();
+  const legacyHash = legacyPptScreenshotMechanicsV1Hash(fixture);
+  fixture.remember({
+    mechanical_review: {
+      hash: legacyHash,
+      slide_reviews: [
+        {
+          slide_id: 'S01',
+          title: '第一页',
+          layout_family: 'hero',
+          checks: { overflow_free: true },
+          issues: [],
+          metrics: { occupied_ratio: 0.5 },
+        },
+      ],
+    },
+    review_capture: {
+      device_scale_factor: 2,
+      screenshot_dimensions: { width: 2304, height: 1296 },
+    },
+  });
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  let reviewed;
+  try {
+    reviewed = await fixture.stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract: fixture.contract,
+      mode: 'create_new',
+      adapter: 'test-adapter',
+    });
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+  }
+
+  assert.equal(fixture.counts().python, 1);
+  assert.equal(reviewed.mechanical_review.cache_status, 'miss');
+  assert.notEqual(reviewed.mechanical_review.hash, legacyHash);
 });
 
 function makeXhsReviewParts() {

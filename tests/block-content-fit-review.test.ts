@@ -902,3 +902,97 @@ test('shared screenshot review blocks adjacent readable qa blocks with unsafe cl
     true,
   );
 });
+
+function runReviewForSingleSlideBody(bodyHtml) {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-surface-'));
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const outputDir = path.join(workspaceRoot, 'screenshots');
+  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
+  mkdirSync(outputDir, { recursive: true });
+  writeFileSync(htmlFile, `<!doctype html>
+<html>
+<body>
+  <div class="slide visible">
+    <div class="slide-content-wrapper" style="width:1152px;height:648px;overflow:hidden;position:relative;background:#F7F8FC;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+      <div data-slide-root="true" data-slide-id="S04" data-title="同一队列的三条剖面" data-layout-family="ring_cross" data-speaker-seconds="65" style="position:relative;width:1152px;height:648px;overflow:hidden;background:#F7F8FC;">
+        ${bodyHtml}
+      </div>
+    </div>
+  </div>
+  <script>
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() {},
+      inspectCurrentSlide() {
+        return {
+          slideId: 'S04',
+          title: '同一队列的三条剖面',
+          layoutFamily: 'ring_cross',
+          speakerSeconds: 65,
+          primaryPoints: 1,
+          wrapper: { clientWidth: 1152, clientHeight: 648, scrollWidth: 1152, scrollHeight: 648 },
+          bodyScroll: false,
+          blocks: [],
+          auditBlocks: [],
+          titleMeta: { titleFontSize: 44, titleLineCount: 1, titleBlockId: 'header' }
+        };
+      }
+    };
+  </script>
+</body>
+</html>`, 'utf-8');
+  const result = spawnSync(
+    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    [
+      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+      '--html',
+      htmlFile,
+      '--output-dir',
+      outputDir,
+      '--review-markdown',
+      reviewMarkdown,
+      '--max-primary-points',
+      '5',
+      '--frame-width',
+      '1152',
+      '--frame-height',
+      '648',
+    ],
+    { encoding: 'utf-8' },
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
+test('shared screenshot review blocks overlapping or overflowing surfaced children inside a qa block', () => {
+  const overlapPayload = runReviewForSingleSlideBody(`
+    <section data-qa-block="ring-overview" data-primary-point="true" style="position:absolute;left:250px;top:190px;width:652px;height:286px;">
+      <div style="position:absolute;left:242px;top:63px;width:168px;height:168px;border-radius:50%;background:#FFFFFF;border:2px solid #BFDBFE;display:flex;align-items:center;justify-content:center;text-align:center;font-size:32px;font-weight:800;">357例队列</div>
+      <div style="position:absolute;left:213px;top:212px;width:226px;height:108px;border-radius:8px;background:#FFFFFF;border:1px solid #D7E2F2;padding:16px 18px;box-sizing:border-box;font-size:20px;font-weight:720;">第三篇<br />Knosp结构边界</div>
+    </section>
+  `);
+  assert.equal(overlapPayload.status, 'block');
+  assert.equal(overlapPayload.checks.block_content_fit_ok, false);
+  assert.equal(overlapPayload.slide_reviews[0].checks.occlusion_free, false);
+  assert.equal(
+    overlapPayload.slide_reviews[0].metrics.block_content_failures.some((failure) => failure.overflow_reason === 'surface_text_targets_overlap'),
+    true,
+  );
+
+  const scrollPayload = runReviewForSingleSlideBody(`
+    <section data-qa-block="model-rail" data-primary-point="true" style="position:absolute;left:72px;top:188px;width:1008px;height:254px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:28px 30px;box-sizing:border-box;">
+      <div style="height:150px;width:299px;border:1px solid #E5E7EB;border-radius:8px;background:#F8FAFC;padding:18px;box-sizing:border-box;overflow:visible;font-size:21px;line-height:1.18;font-weight:720;">
+        核心术前模型
+        <div style="margin-top:17px;display:flex;flex-wrap:wrap;gap:8px;font-size:15.8px;line-height:1.25;font-weight:650;color:#475569;">
+          <span style="white-space:nowrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:999px;padding:6px 9px;">年龄/性别</span><span style="white-space:nowrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:999px;padding:6px 9px;">视觉症状</span><span style="white-space:nowrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:999px;padding:6px 9px;">内分泌状态</span><span style="white-space:nowrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:999px;padding:6px 9px;">最大直径</span><span style="white-space:nowrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:999px;padding:6px 9px;">Knosp分级</span><span style="white-space:nowrap;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:999px;padding:6px 9px;">侵袭性</span>
+        </div>
+      </div>
+    </section>
+  `);
+  assert.equal(scrollPayload.status, 'block');
+  assert.equal(scrollPayload.checks.block_content_fit_ok, false);
+  assert.equal(
+    scrollPayload.slide_reviews[0].metrics.block_content_failures.some((failure) => failure.overflow_reason === 'surface_text_scroll_overflow'),
+    true,
+  );
+});

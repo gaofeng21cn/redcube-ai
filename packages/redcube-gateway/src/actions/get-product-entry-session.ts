@@ -117,6 +117,10 @@ function collectArtifactRefsFromPublishBundle(publishBundleFile) {
     exportBundle?.pptx_file,
     exportBundle?.pdf_file,
     exportBundle?.presenter_notes_file,
+    exportBundle?.final_delivery?.pptx_file,
+    exportBundle?.final_delivery?.pdf_file,
+    exportBundle?.final_delivery?.manifest_file,
+    exportBundle?.final_delivery?.readme_file,
   ].map((entry) => safeText(entry)).filter(Boolean);
 }
 

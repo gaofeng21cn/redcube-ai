@@ -29,16 +29,20 @@
 - 自然换行优先于硬挤一行；中文页默认中文优先，不要无意义中英混用
 - 若标题或短句在当前字号梯度下本可单行成立，则禁止继续保留无必要 `<br/>`
 - 短中文词组只能在自然语义处分行；不要把“推进中 / 被偷换”“正式主链 / 不靠聪明捷径”这类短句硬拆
-- 中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”等词拆成单字尾行。空间不足时用更短文案、更宽容器、语义换行，或用 inline-block/word-break: keep-all 保护短词
+- 中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”“垂体功能减退”“术后垂体功能减退”“持续性术后垂体功能减退”“随机森林”“校准斜率”“阈值区间”“净获益”等词拆成单字尾行。空间不足时用更短文案、更宽容器、语义换行，或用 inline-block/word-break: keep-all 保护短词
 - 修页时必须检查纵向信息分布；如果信息都挤在中段而底部大片发空，优先下移结构、扩大底部承载区或重分配层次，而不是只在中段局部打补丁
 - 底部 summary / takeaway 区必须是有效信息承载或视觉收束，不得只剩一条装饰条，同时让上中段继续拥挤
 - 若是 `multi_zone_compare` 的左拆右并页，修页时必须恢复明显主从比例：左侧辅助区应更窄、更轻，右侧主峰区应更大、更集中，不能继续读成等权双栏
 - 修页时要检查页码连续性；位置、语法、字重和灰度要与前后页一致，不要顺手改成另一套页码样式
+- 若 `mechanical_findings` 指出 `title_typography_inconsistent` 并给出当前字号、参考档位和差值，必须按这些数字判断方向：当前低于参考就调大到参考档位附近，当前高于参考就缩短标题、自然换行或降到参考档位附近；不要凭视觉印象反向修复
 - 若是 `ring_cross` / 四向骨架页，修页时要恢复中心与四侧卡片近似等距；不能只修溢出却留下明显失衡
+- 若 `mechanical_findings` / `metrics.block_content_failures` 出现 `surface_text_targets_overlap` 或 `surface_text_targets_too_close`，必须直接调整中心节点、卡片或子 surface 的几何关系，恢复至少 8px 可见间距；不能只改文案后保留圆形节点与卡片接触、压入或重叠
 - 若是 `judgement_ladder` / `timeline_band`，遇到卡片内放不下时，优先减字、扩卡和重排，不要靠手插 `<br/>` 继续制造断句
+- 若 `mechanical_findings` / `metrics.block_content_failures` 出现 `surface_text_scroll_overflow`，必须让对应卡片本身满足 `scrollHeight <= clientHeight`：优先删减芯片/正文、降低次级字号、扩大卡片高度或改为更稀疏布局；不得依靠 `overflow:hidden`、遮盖、把溢出内容藏起来或继续 `overflow:visible`
 - 相邻读者可见 `data-qa-block`、导语、主卡、步骤卡、总结卡和底部说明之间必须恢复至少 6px 可见安全间距；标题区贴主面板、导语贴卡片、底部说明贴组块都要修
 - 如果 `mechanical_findings` / `metrics.block_content_failures` 出现 `adjacent_readable_blocks_too_close`，必须在两个相邻 `data-qa-block` 之间用可测量 CSS 产生间距：优先把 slide root 或局部 wrapper 改为 `display:grid` / `display:flex; flex-direction:column` 并设置 `gap`，或给前一块 `margin-bottom` / 后一块 `margin-top`；不得只改固定 `height` 后让后一块继续紧贴前一块。修完后目标间距必须高于阈值至少 2px（通常 ≥8px）。
 - 如果 `edge_clearance_failures` 指向父容器 `block_padding` 为负值，说明子内容实际超出父容器内边距；必须降低该父容器内部网格行高、字号、padding、gap 或减少可见字数，使所有子行总高小于父容器内容高度，并保留至少 8px 底部内边距。不要依靠 `overflow:hidden`、把页脚/底条下移，或只扩大外层高度掩盖内部越界。
+- 如果同一页在上一轮 `fix_html` 后仍因同一父容器的 `edge_clearance_failures` / `surface_text_scroll_overflow` 被阻断，本轮必须删除或合并至少一个次级说明句、芯片或装饰行；不得继续保留同等长度的等价文案，也不得只做 padding、line-height、字号微调。
 - 如果 `page_number_consistency_failed` 指向位置失败，必须按 `page_number_audit.reference` 恢复页码：保持两位数字、18px、右下角、灰度一致，并把 `right_gap` / `bottom_gap` 调回参考值附近；不得让页码跟随底部说明条向下漂移。
 - 如果同一页同时有 `visual_density_out_of_range` 和底部/父容器留白失败，优先重排和压缩次级文字，让信息区域更紧凑但留白达标；不要为了“填满页面”增加无证据装饰或新增结论。
 

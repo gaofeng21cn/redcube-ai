@@ -1172,6 +1172,7 @@ export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayR
   adapter?: string;
   userIntent?: string;
   managedRunId?: string | null;
+  stopAfterStage?: string;
 }
 
 export interface RunManagedDeliverableRequest extends DeliverableRequest, OverlayRequest {

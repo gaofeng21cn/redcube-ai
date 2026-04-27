@@ -371,6 +371,13 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     pptx_file: string;
     pdf_file: string;
     presenter_notes_file: string;
+    final_delivery?: {
+      current_dir: string;
+      pptx_file: string;
+      pdf_file: string;
+      manifest_file: string;
+      readme_file: string;
+    };
     review_capture?: PptReviewCapture | null;
     delivery_state: {
       current: 'output_ready';

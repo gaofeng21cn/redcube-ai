@@ -205,10 +205,14 @@ test('ppt screenshot_review writes immutable capture screenshots and export uses
       exportArtifact.export_bundle.real_conversion_invocation.command.includes(screenshotReview.review_capture.screenshots_dir),
       true,
     );
+    assert.ok(exportArtifact.export_bundle.final_delivery.pptx_file.endsWith('Med Auto Science 同行讲课.pptx'));
+    assert.ok(exportArtifact.export_bundle.final_delivery.pdf_file.endsWith('Med Auto Science 同行讲课.pdf'));
+    assert.equal(existsSync(exportArtifact.export_bundle.final_delivery.pptx_file), true);
+    assert.equal(existsSync(exportArtifact.export_bundle.final_delivery.pdf_file), true);
   });
 });
 
-test('ppt rerunning upstream HTML keeps the last exported publish bundle visible while publication projection falls back to draft', async () => {
+test('ppt rerunning upstream HTML retires the stale publish bundle while publication projection falls back to draft', async () => {
   await withMockHermesUpstream(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-stale-export-',
@@ -220,9 +224,11 @@ test('ppt rerunning upstream HTML keeps the last exported publish bundle visible
 
     const surfacePaths = getPptDeliverableSurfacePaths(workspaceRoot);
     const publishPptxFile = path.join(surfacePaths.publishDir, 'deck-a.pptx');
+    const publishPdfFile = path.join(surfacePaths.publishDir, 'deck-a.pdf');
     const archiveDir = path.join(surfacePaths.publishDir, 'archive');
     const readmeFile = path.join(surfacePaths.publishDir, 'README.md');
     assert.equal(existsSync(publishPptxFile), true);
+    assert.equal(existsSync(publishPdfFile), true);
 
     const rerender = await runDeliverableRoute({
       workspaceRoot,
@@ -240,11 +246,16 @@ test('ppt rerunning upstream HTML keeps the last exported publish bundle visible
     assert.equal(projection.current, 'draft');
     assert.equal(projection.deliverables['deck-a']?.current, 'draft');
     assert.equal(projection.deliverables['deck-a']?.delivery_state, null);
-    assert.equal(existsSync(publishPptxFile), true);
-    assert.equal(existsSync(archiveDir), false);
-    assert.match(read(readmeFile), /当前导出状态：last_export_available/);
-    assert.match(read(readmeFile), /最近一次导出的 .* 仍保留在当前目录/);
-    assert.match(read(readmeFile), /可能落后于最新 HTML 与截图质控/);
+    assert.equal(existsSync(publishPptxFile), false);
+    assert.equal(existsSync(publishPdfFile), false);
+    assert.equal(existsSync(archiveDir), true);
+    const retiredDirs = readdirSync(archiveDir, { withFileTypes: true }).filter((entry) => entry.isDirectory());
+    assert.equal(retiredDirs.length > 0, true);
+    const latestRetiredDir = path.join(archiveDir, retiredDirs.at(-1).name);
+    assert.equal(existsSync(path.join(latestRetiredDir, 'deck-a.pptx')), true);
+    assert.equal(existsSync(path.join(latestRetiredDir, 'deck-a.pdf')), true);
+    assert.match(read(readmeFile), /当前导出状态：no_current_export/);
+    assert.match(read(readmeFile), /退役导出归档：archive\//);
   });
 });
 

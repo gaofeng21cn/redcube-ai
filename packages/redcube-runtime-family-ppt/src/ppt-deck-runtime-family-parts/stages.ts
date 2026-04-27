@@ -24,6 +24,7 @@ export function createPptDeckStageParts(deps) {
     PYTHON_REVIEW,
     RENDER_HTML_BATCH_SIZE,
     RENDER_REFERENCE_SLIDE_WINDOW,
+    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v2:surface-target-audit',
     SCREENSHOT_REVIEW_BATCH_SIZE,
     TARGETED_RENDER_HTML_BATCH_SIZE,
     aiFirstMechanicalCheckValue,
@@ -345,6 +346,7 @@ export function createPptDeckStageParts(deps) {
   }
 
   function cachedMechanicalReview(priorArtifact, hash) {
+    if (safeText(priorArtifact?.mechanical_review?.ruleset_id) !== SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID) return null;
     if (safeText(priorArtifact?.mechanical_review?.hash) !== hash) return null;
     const slideReviews = safeArray(priorArtifact?.mechanical_review?.slide_reviews);
     if (slideReviews.length === 0) return null;
@@ -362,6 +364,7 @@ export function createPptDeckStageParts(deps) {
     return {
       cache_status: cacheStatus,
       hash,
+      ruleset_id: SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID,
       freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
     };
   }
@@ -981,11 +984,12 @@ export function createPptDeckStageParts(deps) {
     }
     const reviewHash = hashReviewInput(renderArtifact);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-    const incrementalTargetSlideIds = collectIncrementalScreenshotReviewTargetSlideIds({
+    const priorMechanicalRulesetCurrent = safeText(priorReviewArtifact?.mechanical_review?.ruleset_id) === SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID;
+    const incrementalTargetSlideIds = priorMechanicalRulesetCurrent ? collectIncrementalScreenshotReviewTargetSlideIds({
       renderArtifact,
       priorReviewArtifact,
       pageFixRoute: PAGE_FIX_ROUTE,
-    });
+    }) : [];
     const incrementalReview = incrementalTargetSlideIds.length > 0;
     if (incrementalReview && !nativeReviewInput) {
       args.push('--slide-ids', incrementalTargetSlideIds.join(','));

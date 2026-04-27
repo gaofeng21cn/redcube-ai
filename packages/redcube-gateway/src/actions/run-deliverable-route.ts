@@ -24,11 +24,14 @@ type RouteRunGatewayResponse = Omit<RouteRunResponse, 'run' | 'summary'> & {
   run: RuntimeRunRouteResponse['run'];
   artifact?: unknown;
   dependency_route_runs?: DependencyRouteRun[];
+  continuation_route_runs?: DependencyRouteRun[];
   summary: RouteRunResponse['summary'] & {
     cache_status: string;
     requested_route: string;
     executed_route: string;
     auto_recovered_dependency_routes: string[];
+    continued_route_sequence: string[];
+    stop_after_stage: string | null;
     recovery_terminal_reason: string | null;
   };
 };
@@ -37,8 +40,9 @@ function readJsonRecord(file: string): JsonObject {
   return JSON.parse(readFileSync(file, 'utf-8')) as JsonObject;
 }
 
-function safeText(value: unknown): string {
-  return String(value || '').trim();
+function safeText(value: unknown, fallback = ''): string {
+  const text = String(value || '').trim();
+  return text || fallback;
 }
 
 function routeResultErrorMessage(result: RuntimeRouteResult): string {
@@ -96,7 +100,7 @@ function artifactRequestsFixHtml(artifact: unknown): boolean {
     );
 }
 
-function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageId: string): JsonObject | null {
+function readHydratedContractForRequest(request: RunDeliverableRouteRequest): JsonObject {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
     request.topicId,
@@ -104,16 +108,39 @@ function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageI
   );
   const deliverable = readJsonRecord(deliverablePaths.deliverableFile);
   const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
-  const hydratedContract = readJsonRecord(path.join(deliverablePaths.deliverableDir, contractRef)) as {
-    stage_sequence?: {
-      stages?: unknown[];
-      alternate_stages?: unknown[];
-    };
-  };
+  return readJsonRecord(path.join(deliverablePaths.deliverableDir, contractRef));
+}
+
+function stageDefinitions(contract: JsonObject, includeAlternates = true): unknown[] {
   const stages = [
-    ...(Array.isArray(hydratedContract.stage_sequence?.stages) ? hydratedContract.stage_sequence.stages : []),
-    ...(Array.isArray(hydratedContract.stage_sequence?.alternate_stages) ? hydratedContract.stage_sequence.alternate_stages : []),
+    ...(Array.isArray((contract as { stage_sequence?: { stages?: unknown[] } }).stage_sequence?.stages)
+      ? (contract as { stage_sequence?: { stages?: unknown[] } }).stage_sequence?.stages || []
+      : []),
   ];
+  if (includeAlternates) {
+    stages.push(
+      ...(Array.isArray((contract as { stage_sequence?: { alternate_stages?: unknown[] } }).stage_sequence?.alternate_stages)
+        ? (contract as { stage_sequence?: { alternate_stages?: unknown[] } }).stage_sequence?.alternate_stages || []
+        : []),
+    );
+  }
+  return stages;
+}
+
+function routeSequenceStageIds(contract: JsonObject): string[] {
+  return stageDefinitions(contract, false)
+    .map((stage) => safeText((stage as { stage_id?: unknown })?.stage_id))
+    .filter(Boolean);
+}
+
+function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageId: string): JsonObject | null {
+  const deliverablePaths = getDeliverablePaths(
+    request.workspaceRoot,
+    request.topicId,
+    request.deliverableId,
+  );
+  const hydratedContract = readHydratedContractForRequest(request);
+  const stages = stageDefinitions(hydratedContract, true);
   const stage = stages.find((item) => safeText((item as { stage_id?: unknown })?.stage_id) === stageId) as {
     output_artifact?: unknown;
   } | undefined;
@@ -122,6 +149,47 @@ function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageI
     safeText(stage?.output_artifact) || `${stageId}.json`,
   );
   return existsSync(artifactFile) ? readJsonRecord(artifactFile) : null;
+}
+
+function nextLinearStageId(contract: JsonObject, currentRoute: string): string | null {
+  const stageIds = routeSequenceStageIds(contract);
+  const currentIndex = stageIds.indexOf(currentRoute);
+  if (currentIndex < 0) return null;
+  return stageIds[currentIndex + 1] || null;
+}
+
+function reviewRerunStageAfterFixHtml(contract: JsonObject): string | null {
+  const reviewStageId = safeText((contract as { review_surface?: { artifact_stage?: unknown } }).review_surface?.artifact_stage);
+  if (!reviewStageId) return null;
+  const hardStops = Array.isArray((contract as { stage_sequence?: { hard_stops?: unknown[] } }).stage_sequence?.hard_stops)
+    ? (contract as { stage_sequence?: { hard_stops?: unknown[] } }).stage_sequence?.hard_stops || []
+    : [];
+  const reviewHardStop = hardStops.find(
+    (entry) => safeText((entry as { stage_id?: unknown })?.stage_id) === reviewStageId,
+  ) as { rerun_from_stage?: unknown } | undefined;
+  return safeText(reviewHardStop?.rerun_from_stage, reviewStageId) || null;
+}
+
+function nextContinuationStageId({
+  request,
+  contract,
+  currentRoute,
+}: {
+  request: RunDeliverableRouteRequest;
+  contract: JsonObject;
+  currentRoute: string;
+}): string | null {
+  if (currentRoute === 'fix_html') {
+    return reviewRerunStageAfterFixHtml(contract) || nextLinearStageId(contract, currentRoute);
+  }
+  const nextStage = nextLinearStageId(contract, currentRoute);
+  if (currentRoute === 'screenshot_review' && nextStage === 'fix_html') {
+    const reviewArtifact = readStageArtifactForRequest(request, 'screenshot_review');
+    if (!artifactRequestsFixHtml(reviewArtifact)) {
+      return nextLinearStageId(contract, 'fix_html');
+    }
+  }
+  return nextStage;
 }
 
 function dependencyRouteCanContinue({
@@ -206,15 +274,75 @@ async function runWithRecoverableDependencies(request: RunDeliverableRouteReques
   };
 }
 
+async function continueToStopAfterStage({
+  request,
+  result,
+}: {
+  request: RunDeliverableRouteRequest;
+  result: RuntimeRouteResult;
+}): Promise<{
+  result: RuntimeRouteResult;
+  continuationRouteRuns: DependencyRouteRun[];
+}> {
+  const stopAfterStage = safeText(request.stopAfterStage);
+  if (!stopAfterStage) {
+    return { result, continuationRouteRuns: [] };
+  }
+
+  const contract = readHydratedContractForRequest(request);
+  const stageIds = routeSequenceStageIds(contract);
+  const requestedRoute = safeText(request.route);
+  if (!stageIds.includes(requestedRoute) || !stageIds.includes(stopAfterStage)) {
+    return { result, continuationRouteRuns: [] };
+  }
+
+  let currentRoute = requestedRoute;
+  let currentResult = result;
+  const continuationRouteRuns: DependencyRouteRun[] = [];
+  const visited = new Set([currentRoute]);
+  const maxContinuationHops = stageIds.length + 2;
+
+  for (let hop = 0; hop < maxContinuationHops; hop += 1) {
+    if (currentRoute === stopAfterStage) {
+      return { result: currentResult, continuationRouteRuns };
+    }
+    if (currentResult.ok !== true) {
+      return { result: currentResult, continuationRouteRuns };
+    }
+
+    const nextRoute = nextContinuationStageId({
+      request,
+      contract,
+      currentRoute,
+    });
+    if (!nextRoute || visited.has(`${currentRoute}->${nextRoute}`)) {
+      return { result: currentResult, continuationRouteRuns };
+    }
+    visited.add(`${currentRoute}->${nextRoute}`);
+
+    currentResult = await runHostedRoute({
+      ...request,
+      route: nextRoute,
+      stopAfterStage: undefined,
+    });
+    currentRoute = nextRoute;
+    continuationRouteRuns.push(summarizeDependencyRoute(nextRoute, currentResult));
+  }
+
+  return { result: currentResult, continuationRouteRuns };
+}
+
 function buildRouteRunGatewayResponse({
   request,
   result,
   dependencyRouteRuns,
+  continuationRouteRuns,
   recoveryTerminalReason,
 }: {
   request: RunDeliverableRouteRequest;
   result: RuntimeRouteResult;
   dependencyRouteRuns: DependencyRouteRun[];
+  continuationRouteRuns: DependencyRouteRun[];
   recoveryTerminalReason: string | null;
 }): RouteRunGatewayResponse {
   const deliverablePaths = getDeliverablePaths(
@@ -240,9 +368,12 @@ function buildRouteRunGatewayResponse({
       requested_route: request.route,
       executed_route: safeText(run?.current_stage) || request.route,
       auto_recovered_dependency_routes: dependencyRouteRuns.map((entry) => entry.route),
+      continued_route_sequence: continuationRouteRuns.map((entry) => entry.route),
+      stop_after_stage: safeText(request.stopAfterStage) || null,
       recovery_terminal_reason: recoveryTerminalReason,
     },
     dependency_route_runs: dependencyRouteRuns,
+    continuation_route_runs: continuationRouteRuns,
     artifact: result.artifact || null,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),
   };
@@ -250,10 +381,15 @@ function buildRouteRunGatewayResponse({
 
 export async function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunGatewayResponse> {
   const routed = await runWithRecoverableDependencies(request);
-  return buildRouteRunGatewayResponse({
+  const continued = await continueToStopAfterStage({
     request,
     result: routed.result,
+  });
+  return buildRouteRunGatewayResponse({
+    request,
+    result: continued.result,
     dependencyRouteRuns: routed.dependencyRouteRuns,
+    continuationRouteRuns: continued.continuationRouteRuns,
     recoveryTerminalReason: routed.recoveryTerminalReason,
   });
 }

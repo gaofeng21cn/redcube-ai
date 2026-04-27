@@ -111,3 +111,90 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
     }
   });
 });
+
+test('runDeliverableRoute continues from ppt fix_html to requested stop-after review gate', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-stop-after-'));
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'Route stop-after proof',
+      brief: '验证 direct route 回修后会继续复审到指定 gate。',
+      keywords: ['ppt', 'fix_html', 'stop-after'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Route stop-after proof',
+      goal: '验证 route stop-after continuation',
+    });
+
+    for (const route of [
+      'storyline',
+      'detailed_outline',
+      'slide_blueprint',
+      'visual_direction',
+      'render_html',
+      'visual_director_review',
+    ]) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const restoreBlockedReview = withEnv({
+      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'force_block',
+    });
+    try {
+      const blockedReview = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'screenshot_review',
+      });
+      assert.equal(blockedReview.ok, false);
+    } finally {
+      restoreBlockedReview();
+    }
+
+    const restoreFixVariant = withEnv({
+      REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
+    });
+    try {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'fix_html',
+        stopAfterStage: 'screenshot_review',
+      });
+
+      assert.equal(result.ok, true);
+      assert.equal(result.summary.requested_route, 'fix_html');
+      assert.equal(result.summary.executed_route, 'screenshot_review');
+      assert.equal(result.summary.stop_after_stage, 'screenshot_review');
+      assert.deepEqual(result.summary.continued_route_sequence, [
+        'visual_director_review',
+        'screenshot_review',
+      ]);
+      assert.deepEqual(
+        result.continuation_route_runs.map((entry) => entry.route),
+        ['visual_director_review', 'screenshot_review'],
+      );
+      assert.equal(result.artifact?.status, 'pass');
+    } finally {
+      restoreFixVariant();
+    }
+  });
+});

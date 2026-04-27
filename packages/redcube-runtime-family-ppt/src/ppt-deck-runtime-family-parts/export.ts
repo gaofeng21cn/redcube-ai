@@ -13,6 +13,7 @@ export interface PptDeckExportStageDeps {
   CODEX_DEFAULT_ADAPTER: string;
   PYTHON_EXPORT: string;
   PYTHON_NATIVE: string;
+  SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID?: string;
   attachCommon(route: string, contract: JsonRecord, generationRuntime: JsonRecord | null, adapter: string): JsonRecord;
   ensureDir(dir: string): string;
   existsSync?: (file: string) => boolean;
@@ -35,6 +36,7 @@ export interface BuildExportArtifactInput {
 }
 
 interface NativeExportBundleInput {
+  workspaceRoot: string;
   renderArtifact: JsonRecord;
   reviewArtifact: JsonRecord;
   pptxFile: string;
@@ -66,6 +68,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     CODEX_DEFAULT_ADAPTER,
     PYTHON_EXPORT,
     PYTHON_NATIVE,
+    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v2:surface-target-audit',
     attachCommon,
     ensureDir,
     existsSync: mainExistsSync,
@@ -112,7 +115,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     }
     const htmlFile = safeText(renderArtifact?.html_bundle?.html_file);
     const hash = createHash('sha256');
-    hash.update('ppt_deck_screenshot_mechanics:v1\n');
+    hash.update(`${SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID}\n`);
     hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
     hash.update(htmlFile);
     hash.update('\n');
@@ -175,15 +178,84 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     };
   }
 
-  function buildNativeExportBundle({
-    renderArtifact,
-    reviewArtifact,
-    pptxFile,
-    pdfFile,
-    notesFile,
-    adapter,
+  function sanitizeDeliveryFileBase(value: unknown, fallback = 'presentation'): string {
+    const text = safeText(value, fallback)
+      .replace(/[\\/:*?"<>|]/g, ' ')
+      .replace(/[：]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return text || fallback;
+  }
+
+  function syncWorkspaceFinalDelivery({
+    workspaceRoot,
     contract,
-  }: NativeExportBundleInput) {
+    deliverableId,
+    pptxPath,
+    pdfPath,
+  }: {
+    workspaceRoot: string;
+    contract: JsonRecord;
+    deliverableId: string;
+    pptxPath: string;
+    pdfPath: string;
+  }) {
+    const finalDeliveryDir = ensureDir(path.join(workspaceRoot, '交付成果'));
+    const baseName = sanitizeDeliveryFileBase(contract?.title, deliverableId);
+    const finalPptxFile = path.join(finalDeliveryDir, `${baseName}.pptx`);
+    const finalPdfFile = path.join(finalDeliveryDir, `${baseName}.pdf`);
+    const manifestFile = path.join(finalDeliveryDir, 'manifest.json');
+    const readmeFile = path.join(finalDeliveryDir, 'README.md');
+    if (pptxPath && fileExists(pptxPath)) {
+      copyFileSync(pptxPath, finalPptxFile);
+    }
+    if (pdfPath && fileExists(pdfPath)) {
+      copyFileSync(pdfPath, finalPdfFile);
+    }
+    const manifest = {
+      surface_kind: 'ppt_deck_final_delivery',
+      current: 'output_ready',
+      title: safeText(contract?.title),
+      deliverable_id: deliverableId,
+      pptx_file: finalPptxFile,
+      pdf_file: finalPdfFile,
+      source_pptx_file: pptxPath,
+      source_pdf_file: pdfPath,
+      updated_at: new Date().toISOString(),
+    };
+    writeText(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`);
+    writeText(readmeFile, [
+      '# 交付成果',
+      '',
+      `- 讲题：${safeText(contract?.title)}`,
+      '- 当前状态：output_ready',
+      `- PPTX：${path.basename(finalPptxFile)}`,
+      `- PDF：${path.basename(finalPdfFile)}`,
+      '',
+      '规则：',
+      '- 这里是给用户直接取用的当前最终版入口。',
+      '- `topics/`、`runtime/` 与各版本目录是 RCA 运行态，不作为人工查找最终文件的入口。',
+      '',
+    ].join('\n'));
+    return {
+      current_dir: finalDeliveryDir,
+      pptx_file: finalPptxFile,
+      pdf_file: finalPdfFile,
+      manifest_file: manifestFile,
+      readme_file: readmeFile,
+    };
+  }
+
+  function buildNativeExportBundle({
+  renderArtifact,
+  reviewArtifact,
+  pptxFile,
+  pdfFile,
+  notesFile,
+  adapter,
+  contract,
+  workspaceRoot,
+}: NativeExportBundleInput) {
     const bundle = renderArtifact.native_ppt_bundle || {};
     const sourcePptx = safeText(bundle.pptx_file);
     const sourcePdf = safeText(bundle.pdf_file);
@@ -204,6 +276,13 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       reviewed_page_count: safeArray(reviewArtifact?.slide_reviews).length,
       page_count_match: safeArray(reviewArtifact?.slide_reviews).length === pageCount,
     };
+    const finalDelivery = syncWorkspaceFinalDelivery({
+      workspaceRoot,
+      contract,
+      deliverableId: safeText(contract?.deliverable_id),
+      pptxPath: pptxFile,
+      pdfPath: pdfFile,
+    });
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       status: 'completed',
@@ -228,6 +307,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         pptx_file: pptxFile,
         pdf_file: pdfFile,
         presenter_notes_file: notesFile,
+        final_delivery: finalDelivery,
         review_capture: reviewArtifact.review_capture || null,
         delivery_state: {
           current: 'output_ready',
@@ -247,7 +327,18 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           command: ['--source-pptx', sourcePptx, '--output-pptx', pptxFile],
         },
       },
-      artifact_refs: [sourcePptx, shapeManifestFile, repairLogFile, pptxFile, pdfFile, notesFile].filter(Boolean),
+      artifact_refs: [
+        sourcePptx,
+        shapeManifestFile,
+        repairLogFile,
+        pptxFile,
+        pdfFile,
+        notesFile,
+        finalDelivery.pptx_file,
+        finalDelivery.pdf_file,
+        finalDelivery.manifest_file,
+        finalDelivery.readme_file,
+      ].filter(Boolean),
     };
   }
 
@@ -268,7 +359,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     writeText(notesFile, blueprintArtifact.slide_blueprint.slides.map((slide: JsonRecord) => `## ${slide.slide_id} ${slide.title}\n\n${slide.speaker_notes}`).join('\n\n'));
     if (isNativePptArtifact(renderArtifact)) {
-      return buildNativeExportBundle({ renderArtifact, reviewArtifact, pptxFile, pdfFile, notesFile, adapter, contract });
+      return buildNativeExportBundle({ workspaceRoot, renderArtifact, reviewArtifact, pptxFile, pdfFile, notesFile, adapter, contract });
     }
     const screenshotsDir = safeText(reviewArtifact?.review_capture?.screenshots_dir);
     if (!screenshotsDir) {
@@ -297,6 +388,13 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const conversionCommand = cachedPreview
       ? []
       : [...python.argv, '--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile];
+    const finalDelivery = syncWorkspaceFinalDelivery({
+      workspaceRoot,
+      contract,
+      deliverableId,
+      pptxPath,
+      pdfPath,
+    });
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       status: 'completed',
@@ -317,6 +415,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         pptx_file: pptxPath,
         pdf_file: pdfPath,
         presenter_notes_file: notesFile,
+        final_delivery: finalDelivery,
         review_capture: reviewArtifact.review_capture || null,
         delivery_state: {
           current: 'output_ready',
@@ -334,7 +433,16 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           command: conversionCommand,
         },
       },
-      artifact_refs: [stableViewHtmlFile, pptxPath, pdfPath, notesFile].filter(Boolean),
+      artifact_refs: [
+        stableViewHtmlFile,
+        pptxPath,
+        pdfPath,
+        notesFile,
+        finalDelivery.pptx_file,
+        finalDelivery.pdf_file,
+        finalDelivery.manifest_file,
+        finalDelivery.readme_file,
+      ].filter(Boolean),
     };
   }
 

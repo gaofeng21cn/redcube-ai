@@ -282,6 +282,43 @@ export function createPptDeckSurfaceParts(deps) {
     cpSync(source, destination);
     return destination;
   }
+
+  function buildArchiveSegment(reason) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    return `${timestamp}-${sanitizeSurfaceSegment(reason, 'stale-export')}`;
+  }
+
+  function retireStalePublishOutputs(publishPaths, reason) {
+    const files = [
+      publishPaths.pptxFile,
+      publishPaths.pdfFile,
+      publishPaths.presenterNotesFile,
+    ].filter((file) => safeText(file) && existsSync(file));
+    if (files.length === 0) {
+      return null;
+    }
+    const archiveDir = ensureDir(path.join(publishPaths.publishDir, 'archive', buildArchiveSegment(reason)));
+    const archivedFiles = [];
+    for (const file of files) {
+      const archivedFile = copySurfaceFile(file, path.join(archiveDir, path.basename(file)));
+      if (archivedFile) {
+        archivedFiles.push(archivedFile);
+        rmSync(file, { force: true });
+      }
+    }
+    const manifestFile = path.join(archiveDir, 'retirement.json');
+    writeJson(manifestFile, {
+      surface_kind: 'ppt_deck_retired_publish_output',
+      reason: safeText(reason, 'stale_export'),
+      retired_at: new Date().toISOString(),
+      archived_files: archivedFiles,
+    });
+    return {
+      archive_dir: archiveDir,
+      archived_files: archivedFiles,
+      manifest_file: manifestFile,
+    };
+  }
   
   function safeReadJsonIfExists(file) {
     if (!safeText(file) || !existsSync(file)) return null;
@@ -521,12 +558,13 @@ export function createPptDeckSurfaceParts(deps) {
       `- 讲题：${safeText(contract?.title)}`,
       '- 当前导出状态：no_current_export',
       `- 最近一次 export artifact：${formatTimestamp(exportState.exportArtifactMtimeMs)}`,
+      exportState.retiredExportArchiveDir ? `- 退役导出归档：${path.relative(exportState.publishDir || '', exportState.retiredExportArchiveDir)}` : '',
       '',
       '规则：',
-      '- 当前没有可交付 PPTX；如果你看到 `archive/` 下的旧文件，那只是历史导出留痕。',
+      '- 当前目录没有可交付 PPTX/PDF；旧导出只保留在 `archive/` 下作为运行态留痕。',
       '- 上游 stage 一旦重跑，旧导出会从当前目录退场，直到新的 `export_pptx` 完成。',
         '',
-      ].join('\n');
+      ].filter((line) => line !== '').join('\n');
   }
   
   function buildPublishSurfaceState({ route, contract, deliverablePaths, publishPaths, payload }) {
@@ -542,6 +580,7 @@ export function createPptDeckSurfaceParts(deps) {
     return {
       ...freshness,
       currentExportReady,
+      publishDir: publishPaths.publishDir,
       hasCurrentExportFiles: [publishPaths.pptxFile, publishPaths.pdfFile, publishPaths.presenterNotesFile]
         .every((file) => existsSync(file)),
       hasAnyExportFiles: [publishPaths.pptxFile, publishPaths.pdfFile, publishPaths.presenterNotesFile]
@@ -612,7 +651,19 @@ export function createPptDeckSurfaceParts(deps) {
       publishPaths: operatorPaths,
       payload,
     });
-    writeText(operatorPaths.publishReadmeFile, buildPublishReadmeMarkdown(contract, publishState));
+    const retirement = !publishState.currentExportReady && publishState.hasAnyExportFiles
+      ? retireStalePublishOutputs(operatorPaths, route)
+      : null;
+    const finalPublishState = retirement
+      ? {
+        ...publishState,
+        hasCurrentExportFiles: false,
+        hasAnyExportFiles: false,
+        retiredExportArchiveDir: retirement.archive_dir,
+        retiredExportArchiveFiles: retirement.archived_files,
+      }
+      : publishState;
+    writeText(operatorPaths.publishReadmeFile, buildPublishReadmeMarkdown(contract, finalPublishState));
     refs.push(operatorPaths.publishReadmeFile);
     return refs;
   }

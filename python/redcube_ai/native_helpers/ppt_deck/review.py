@@ -27,6 +27,10 @@ MIN_CONTENT_PADDING = 8.0
 MIN_ADJACENT_READABLE_BLOCK_GAP = 6.0
 MIN_ADJACENT_READABLE_BLOCK_OVERLAP_PIXELS = 48.0
 MIN_ADJACENT_READABLE_BLOCK_OVERLAP_RATIO = 0.25
+MIN_SURFACE_TARGET_GAP = 8.0
+MIN_SURFACE_TARGET_OVERLAP_PIXELS = 8.0
+MIN_SURFACE_TARGET_OVERLAP_RATIO = 0.04
+SURFACE_SCROLL_OVERFLOW_TOLERANCE = 4.0
 TITLE_FONT_SIZE_TOLERANCE = 2.5
 EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
 INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
@@ -301,6 +305,14 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
         issues.append('edge_clearance_out_of_range')
 
     block_content_failures = block_content_audit.get('failures', []) or []
+    block_content_occlusion_failures = [
+        failure for failure in block_content_failures
+        if failure.get('overflow_reason') == 'surface_text_targets_overlap'
+    ]
+    if block_content_occlusion_failures:
+        occlusion_free = False
+        if 'occlusion_detected' not in issues:
+            issues.append('occlusion_detected')
     block_content_fit_ok = len(block_content_failures) == 0
     if not block_content_fit_ok:
         issues.append('block_content_overflow_detected')
@@ -497,6 +509,10 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                       const minAdjacentReadableBlockGap = {MIN_ADJACENT_READABLE_BLOCK_GAP};
                       const minAdjacentReadableBlockOverlapPixels = {MIN_ADJACENT_READABLE_BLOCK_OVERLAP_PIXELS};
                       const minAdjacentReadableBlockOverlapRatio = {MIN_ADJACENT_READABLE_BLOCK_OVERLAP_RATIO};
+                      const minSurfaceTargetGap = {MIN_SURFACE_TARGET_GAP};
+                      const minSurfaceTargetOverlapPixels = {MIN_SURFACE_TARGET_OVERLAP_PIXELS};
+                      const minSurfaceTargetOverlapRatio = {MIN_SURFACE_TARGET_OVERLAP_RATIO};
+                      const surfaceScrollOverflowTolerance = {SURFACE_SCROLL_OVERFLOW_TOLERANCE};
                       const adjacentReadableBlockIgnoreIdTokens = {json.dumps(EDGE_CLEARANCE_IGNORED_IDS)};
                       const round = (value) => Math.round((Number(value) || 0) * 100) / 100;
                       const normalizeText = (value) => String(value || '').replace(/\\s+/g, '').trim();
@@ -791,9 +807,134 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                         return hasExplicitFrame && hasDecorativeSurface(node);
                       }});
                       const adjacentReadableBlockFailures = collectAdjacentReadableBlockFailures(leafBlocks);
+                      const collectSurfaceTargetFailures = (blockId, targets) => {{
+                        const failures = [];
+                        const surfacedTargets = targets
+                          .filter((node) => node instanceof Element && isVisibleElement(node))
+                          .map((node, index) => ({{
+                            node,
+                            id: `${{blockId}}:surface-${{index + 1}}`,
+                            tag: node.tagName.toLowerCase(),
+                            rect: rectRelativeToBounds(node.getBoundingClientRect(), bounds),
+                          }}))
+                          .filter((item) => item.rect.width > 0 && item.rect.height > 0);
+                        for (const target of surfacedTargets) {{
+                          const scrollOverflowX = (target.node.scrollWidth || 0) > (target.node.clientWidth || 0) + surfaceScrollOverflowTolerance;
+                          const scrollOverflowY = (target.node.scrollHeight || 0) > (target.node.clientHeight || 0) + surfaceScrollOverflowTolerance;
+                          if (scrollOverflowX || scrollOverflowY) {{
+                            failures.push({{
+                              block_id: blockId,
+                              target_id: target.id,
+                              target_tag: target.tag,
+                              overflow_sides: [
+                                ...(scrollOverflowX ? ['right'] : []),
+                                ...(scrollOverflowY ? ['bottom'] : []),
+                              ],
+                              scroll_overflow_x: scrollOverflowX,
+                              scroll_overflow_y: scrollOverflowY,
+                              scroll_overflow_x_px: round((target.node.scrollWidth || 0) - (target.node.clientWidth || 0)),
+                              scroll_overflow_y_px: round((target.node.scrollHeight || 0) - (target.node.clientHeight || 0)),
+                              block_rect: target.rect,
+                              overflow_reason: 'surface_text_scroll_overflow',
+                            }});
+                          }}
+                        }}
+                        const horizontalOverlap = (left, right) => Math.max(0, Math.min(left.rect.right, right.rect.right) - Math.max(left.rect.left, right.rect.left));
+                        const verticalOverlap = (left, right) => Math.max(0, Math.min(left.rect.bottom, right.rect.bottom) - Math.max(left.rect.top, right.rect.top));
+                        const overlapThreshold = (left, right, axis) => Math.max(
+                          minSurfaceTargetOverlapPixels,
+                          Math.min(axis === 'horizontal' ? left.rect.width : left.rect.height, axis === 'horizontal' ? right.rect.width : right.rect.height) * minSurfaceTargetOverlapRatio,
+                        );
+                        for (let index = 0; index < surfacedTargets.length; index += 1) {{
+                          const current = surfacedTargets[index];
+                          for (const other of surfacedTargets.slice(index + 1)) {{
+                            if (current.node.contains(other.node) || other.node.contains(current.node)) continue;
+                            const xOverlap = horizontalOverlap(current, other);
+                            const yOverlap = verticalOverlap(current, other);
+                            const overlapArea = xOverlap * yOverlap;
+                            const smallerArea = Math.max(1, Math.min(current.rect.width * current.rect.height, other.rect.width * other.rect.height));
+                            if (
+                              xOverlap > overlapThreshold(current, other, 'horizontal')
+                              && yOverlap > overlapThreshold(current, other, 'vertical')
+                              && overlapArea / smallerArea >= minSurfaceTargetOverlapRatio
+                            ) {{
+                              failures.push({{
+                                block_id: blockId,
+                                target_id: current.id,
+                                adjacent_target_id: other.id,
+                                target_tag: current.tag,
+                                overflow_sides: [],
+                                scroll_overflow_x: false,
+                                scroll_overflow_y: false,
+                                block_rect: current.rect,
+                                adjacent_block_rect: other.rect,
+                                overflow_reason: 'surface_text_targets_overlap',
+                                overlap_width: round(xOverlap),
+                                overlap_height: round(yOverlap),
+                                overlap_ratio: round(overlapArea / smallerArea),
+                              }});
+                              continue;
+                            }}
+                            const upper = current.rect.top <= other.rect.top ? current : other;
+                            const lower = upper === current ? other : current;
+                            const verticalGap = lower.rect.top - upper.rect.bottom;
+                            if (
+                              verticalGap >= -tolerance
+                              && verticalGap < minSurfaceTargetGap
+                              && xOverlap >= Math.max(minAdjacentReadableBlockOverlapPixels, Math.min(upper.rect.width, lower.rect.width) * minAdjacentReadableBlockOverlapRatio)
+                            ) {{
+                              failures.push({{
+                                block_id: blockId,
+                                target_id: upper.id,
+                                adjacent_target_id: lower.id,
+                                target_tag: upper.tag,
+                                overflow_sides: [],
+                                scroll_overflow_x: false,
+                                scroll_overflow_y: false,
+                                block_rect: upper.rect,
+                                adjacent_block_rect: lower.rect,
+                                overflow_reason: 'surface_text_targets_too_close',
+                                clearance_axis: 'vertical',
+                                gap: round(verticalGap),
+                                threshold: round(minSurfaceTargetGap),
+                                overlap: round(xOverlap),
+                              }});
+                              continue;
+                            }}
+                            const left = current.rect.left <= other.rect.left ? current : other;
+                            const right = left === current ? other : current;
+                            const horizontalGap = right.rect.left - left.rect.right;
+                            if (
+                              horizontalGap >= -tolerance
+                              && horizontalGap < minSurfaceTargetGap
+                              && yOverlap >= Math.max(minAdjacentReadableBlockOverlapPixels, Math.min(left.rect.height, right.rect.height) * minAdjacentReadableBlockOverlapRatio)
+                            ) {{
+                              failures.push({{
+                                block_id: blockId,
+                                target_id: left.id,
+                                adjacent_target_id: right.id,
+                                target_tag: left.tag,
+                                overflow_sides: [],
+                                scroll_overflow_x: false,
+                                scroll_overflow_y: false,
+                                block_rect: left.rect,
+                                adjacent_block_rect: right.rect,
+                                overflow_reason: 'surface_text_targets_too_close',
+                                clearance_axis: 'horizontal',
+                                gap: round(horizontalGap),
+                                threshold: round(minSurfaceTargetGap),
+                                overlap: round(yOverlap),
+                              }});
+                            }}
+                          }}
+                        }}
+                        return failures;
+                      }};
                       const leafFailures = leafBlocks.flatMap((node, index) => {{
                         const blockId = node.getAttribute('data-qa-block') || `block-${{index + 1}}`;
-                        return collectAuditTargets(node).map((target) => {{
+                        const auditTargets = collectAuditTargets(node);
+                        return [
+                          ...auditTargets.map((target) => {{
                           const targetRect = target.getBoundingClientRect();
                           const targetRelative = rectRelativeToBounds(targetRect, bounds);
                           const textRects = [];
@@ -835,7 +976,9 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                             max_text_right: round(Math.max(...textRects.map((rect) => rect.right))),
                             max_text_bottom: round(Math.max(...textRects.map((rect) => rect.bottom))),
                           }};
-                        }}).filter(Boolean);
+                          }}).filter(Boolean),
+                          ...collectSurfaceTargetFailures(blockId, auditTargets),
+                        ];
                       }});
                       const groupFailures = parentGroups.flatMap((node, index) => {{
                         const groupId = node.getAttribute('data-qa-block') || `group-${{index + 1}}`;

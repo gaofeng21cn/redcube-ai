@@ -116,6 +116,52 @@ export function createPptDeckRenderStageParts(deps) {
     );
   }
 
+  function summarizeBlockContentFailure(slide, failure) {
+    const slideId = safeText(slide?.slide_id);
+    const blockId = safeText(failure?.block_id, 'unknown-block');
+    const reason = safeText(failure?.overflow_reason, 'block_content_failure');
+    if (reason === 'surface_text_targets_overlap') {
+      return normalizeInlineText(
+        `机械审计：${slideId} 的 ${blockId} 内部元素重叠 ${failure?.overlap_width ?? 'unknown'}x${failure?.overlap_height ?? 'unknown'}px`,
+        220,
+      );
+    }
+    if (reason === 'surface_text_scroll_overflow') {
+      return normalizeInlineText(
+        `机械审计：${slideId} 的 ${blockId} 内部文本容器 scroll overflow ${failure?.scroll_overflow_y_px ?? 0}px`,
+        220,
+      );
+    }
+    if (reason === 'surface_text_targets_too_close') {
+      return normalizeInlineText(
+        `机械审计：${slideId} 的 ${blockId} 内部元素间距 ${failure?.gap ?? 'unknown'}px，低于阈值 ${failure?.threshold ?? 'unknown'}px`,
+        220,
+      );
+    }
+    return normalizeInlineText(`机械审计：${slideId} 的 ${blockId} 存在 ${reason}`, 220);
+  }
+
+  function summarizeTitleTypographyFinding(slide) {
+    const issues = new Set(safeArray(slide?.issues).map((issue) => safeText(issue)));
+    if (!issues.has('title_typography_inconsistent') && slide?.checks?.title_typography_ok !== false) {
+      return null;
+    }
+    const fontSize = Number(slide?.metrics?.title_font_size || 0);
+    const reference = Number(slide?.metrics?.title_font_reference || 0);
+    const delta = Number(slide?.metrics?.title_font_delta || 0);
+    if (!Number.isFinite(fontSize) || !Number.isFinite(reference) || fontSize <= 0 || reference <= 0) {
+      return normalizeInlineText(
+        `机械审计：${safeText(slide?.slide_id)} 主标题字号无法与正文页参考档位稳定对齐；修复时必须恢复本套正文页标题体系。`,
+        220,
+      );
+    }
+    const direction = fontSize < reference ? '低于' : '高于';
+    return normalizeInlineText(
+      `机械审计：${safeText(slide?.slide_id)} 主标题字号 ${fontSize}px，正文页参考档位 ${reference}px，当前${direction}参考 ${delta}px；应调回参考档位±2.5px，必要时缩短标题或自然语义换行。`,
+      260,
+    );
+  }
+
   function summarizeRenderRevisionSlideFeedback(reviewArtifact) {
     const slideReviews = safeArray(reviewArtifact?.slide_reviews).length > 0
       ? safeArray(reviewArtifact?.slide_reviews)
@@ -140,7 +186,9 @@ export function createPptDeckRenderStageParts(deps) {
             `机械审计：${SCREENSHOT_MECHANICAL_ISSUE_LABELS[safeText(issue)] || safeText(issue)}`,
             220,
           )),
+          summarizeTitleTypographyFinding(slide),
           ...safeArray(slide?.metrics?.edge_clearance_failures).map((failure) => summarizeMechanicalFinding(slide, failure)),
+          ...safeArray(slide?.metrics?.block_content_failures).map((failure) => summarizeBlockContentFailure(slide, failure)),
         ].filter(Boolean),
         ai_findings: safeArray(slide?.ai_review?.visual_findings).map((item) => normalizeInlineText(item, 220)),
         recommended_fix: normalizeInlineText(slide?.ai_review?.recommended_fix, 220),
@@ -224,7 +272,7 @@ export function createPptDeckRenderStageParts(deps) {
           previous_route: PAGE_FIX_ROUTE,
           previous_target_slide_ids: Array.from(previousFixSlideIds),
           repeat_blocked_slide_ids: repeatBlockedSlideIds,
-          escalation_rule: '上一轮 fix_html 后仍被 screenshot_review 拦下的页面必须结构级简化、重排或扩大容器；不得继续只做 padding、line-height 或微缩字号调整。',
+          escalation_rule: '上一轮 fix_html 后仍被 screenshot_review 拦下的页面必须结构级简化、重排或扩大容器；如果仍是同一父容器 edge_clearance/block_content 问题，必须删除或合并至少一个次级说明句、芯片或装饰行；不得继续只做 padding、line-height 或微缩字号调整。',
         }
       : null;
     const screenshotSummary = screenshotReviewArtifact
@@ -310,7 +358,7 @@ export function createPptDeckRenderStageParts(deps) {
         ...operatorKeep.map((item) => `保留：${item}`),
         ...operatorAvoid.map((item) => `避免：${item}`),
         ...(repeatBlockAfterFix
-          ? ['重复阻塞强制规则：必须明显删减至少一个次级元素、重排结构或扩大主要容器，不得仅调整 padding、line-height 或微缩字号。']
+          ? ['重复阻塞强制规则：必须明显删减至少一个次级元素、重排结构或扩大主要容器；如果同一父容器仍有 edge_clearance/block_content 问题，必须删除或合并至少一个次级说明句、芯片或装饰行，不得仅调整 padding、line-height 或微缩字号。']
           : []),
       ].filter(Boolean);
       focusBySlideId.set(slideId, {
