@@ -52,7 +52,7 @@
     }
   ],
   "boundary_assertions": [
-    "run surface remains owned by upstream Hermes-Agent",
+    "upstream Hermes-Agent live run surface was verified in this closeout, while current OPL federation is mediated by OPL Runtime Manager",
     "RedCube continues to own auditDeliverable, runtimeWatch, getReviewState, and getPublicationProjection truth",
     "guarded poster_onepager remains limited to the knowledge-poster boundary and does not activate academic poster semantics"
   ],
@@ -68,8 +68,8 @@
   "current_truth": {
     "f4_closeout_completed": true,
     "remaining_gap": [
-      "mature RedCube Product Entry is still not landed",
-      "repo-verified OPL Product Entry -> OPL Gateway -> RedCube user-facing route is still not landed"
+      "mature RedCube Product Entry end-user product shell is still not landed",
+      "managed web runtime product shell on top of the landed RedCube service surface is still not landed"
     ],
     "historical_blocker_root_cause_status": "historical current-host blocker did not reproduce under the standard live launcher plus Playwright Python contract, so this closeout does not overclaim one isolated single root cause"
   }

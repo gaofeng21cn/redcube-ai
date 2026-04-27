@@ -72,7 +72,7 @@
 
 这里的关键约束是：
 
-- direct `RedCube` product entry 和 `OPL Gateway` internal handoff 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
+- direct `RedCube` product entry 和 `OPL Runtime Manager` internal bridge 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
 - `OPL Runtime Manager` 只消费 product-entry registration、federated invocation、session continuity、runtimeWatch、artifact inventory、review/publication projection，不创建第二套 RedCube truth
 - today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
 - `invokeFederatedProductEntry` 继续作为 internal OPL bridge contract

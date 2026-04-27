@@ -4,12 +4,13 @@
 
 ## 目标
 
-在 `runDeliverableRoute / runManagedDeliverable` 已经把 runtime run surface 切到真实上游 `Hermes-Agent` 之后，
-继续冻结一个 future `OPL Gateway` 可直接调用的 service-safe domain entry surface。
+在 `runDeliverableRoute / runManagedDeliverable` 已经具备显式 external `Hermes-Agent` hosted/proof backend 之后，
+继续冻结一个 `OPL Runtime Manager` 可通过 internal bridge 调用的 service-safe domain entry surface。
 
 这层 surface 的边界是：
 
-- runtime session / run / watch 仍交给上游 `Hermes-Agent`
+- OPL 侧 federation 由 `OPL Runtime Manager` 作为 thin product-managed adapter/projection layer 挂到 external `Hermes-Agent` substrate
+- 默认 concrete executor 仍是 `Codex CLI`
 - visual domain truth 仍由 `RedCube AI` 负责
 - 不引入聊天 UI，不改写当前 formal-entry matrix
 
@@ -55,5 +56,5 @@ RedCube domain payload 继续单独补：
 
 这不是成熟的用户产品入口，也不是聊天壳。
 它只是一个 service-safe、machine-readable 的 domain adapter，
-让 future `OPL Gateway` 可以在不越过 visual-domain boundary 的前提下，
-调用同一条已经切到上游 `Hermes-Agent` 的 runtime mainline。
+让 `OPL Runtime Manager` 可以在不越过 visual-domain boundary 的前提下，
+通过 external `Hermes-Agent` substrate 的 projection / hosted backend 调用同一条 RedCube domain-entry mainline。

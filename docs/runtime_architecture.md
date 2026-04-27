@@ -46,10 +46,12 @@ Agent
 ```text
 User / Agent
   -> OPL Product Entry
-      -> OPL Gateway
-          -> RedCube service-safe domain entry
-              -> executor adapter
-                  -> RedCube visual-domain truth surfaces
+      -> OPL Runtime Manager
+          -> external Hermes-Agent runtime substrate
+              -> RedCube service-safe domain entry
+                  -> executor adapter
+                      -> concrete executor
+                          -> RedCube visual-domain truth surfaces
 ```
 
 当前冻结的最终收口链还要再明确一层：
@@ -291,7 +293,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 - `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
 - `xiaohongshu` 共享同一 harness，但不自动等同于 `Presentation Ops`
 - `RedCube AI` 仍然必须保留独立 domain-agent 角色，而不是退化成 OPL 的内部模块
-- final target route 应理解成：`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+- final target route 应理解成：`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 ## 更稳定的规则在哪里
 

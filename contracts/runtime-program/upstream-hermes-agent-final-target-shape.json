@@ -3,15 +3,35 @@
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
   "target_goal": {
-    "label": "independent RedCube visual-deliverable domain agent on upstream Hermes-Agent runtime substrate",
-    "summary": "Freeze the final target shape in which both direct RedCube entry and OPL-federated entry converge onto the same service-safe RedCube domain-agent entry, while upstream Hermes-Agent owns runtime substrate, RedCube owns visual-domain truth, and Codex CLI remains the default concrete executor."
+    "label": "independent RedCube visual-deliverable domain agent with an OPL Runtime Manager federation bridge over external Hermes-Agent",
+    "summary": "Freeze the final target shape in which direct RedCube entry and OPL Runtime Manager-federated entry converge onto the same service-safe RedCube domain-agent entry, while OPL Runtime Manager is the thin product-managed adapter/projection layer over external Hermes-Agent substrate, RedCube owns visual-domain truth, and Codex CLI remains the default concrete executor."
   },
   "final_target_route": {
-    "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces",
-    "opl_federated_entry": "User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces"
+    "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
+    "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
   },
   "runtime_boundary": {
-    "runtime_owner": "upstream_hermes_agent",
+    "runtime_owner": "optional_hosted_runtime_carrier",
+    "opl_runtime_manager": {
+      "manager": "OPL Runtime Manager",
+      "layer_role": "product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
+      "owns": [
+        "profile/provisioning",
+        "task registration hydration",
+        "runtime status projection",
+        "doctor/repair/resume",
+        "native helper catalog",
+        "high-frequency status index"
+      ],
+      "does_not_own": [
+        "RedCube visual-domain truth",
+        "canonical artifacts",
+        "review-state truth",
+        "publication projection truth",
+        "concrete executor",
+        "private Hermes-Agent fork"
+      ]
+    },
     "redcube_owns": [
       "domain-agent authority across gateway -> family -> profile -> pack boundaries",
       "visual-domain truth and canonical artifacts",
@@ -24,7 +44,8 @@
       "repo-local managed runtime pilot is the long-term runtime owner",
       "service-safe domain entry already equals a landed end-user product entry",
       "RedCube AI became the whole OPL",
-      "RedCube AI is an OPL-internal workflow"
+      "RedCube AI is an OPL-internal workflow",
+      "repo-local Hermes wrapper proves external Hermes-Agent substrate ownership"
     ]
   },
   "entry_surface_contract": {
@@ -90,7 +111,7 @@
   },
   "current_gap": {
     "repo_verified_today": [
-      "upstream Hermes-Agent owns route / managed run execution",
+      "OPL Runtime Manager bridge targets external Hermes-Agent runtime substrate without owning RedCube visual-domain truth",
       "RedCube service-safe domain entry is callable",
       "RedCube product-entry service surface is callable",
       "OPL handoff can federate into the same downstream product entry",
@@ -109,6 +130,7 @@
     "new family onboarding",
     "controller expansion",
     "academic poster expansion",
-    "repackaging repo-local Hermes naming as upstream proof"
+    "repackaging repo-local Hermes naming as upstream proof",
+    "claiming a mature end-user product shell has landed"
   ]
 }

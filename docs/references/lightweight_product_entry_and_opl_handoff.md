@@ -18,17 +18,18 @@
 
 这个仓已经冻结的 direct domain 级产品链路是：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes-Agent managed runtime -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 在 `OPL` 家族级入口下，也必须兼容同一条下游形态，但这条路径在这里仅作为 internal bridge / reference surface：
 
-`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 这也是当前“最终目标形态”冻结件要表达的主线，详见 `docs/program/upstream_hermes_agent_final_target_shape.md`。
 
 这意味着：
 
 - `OPL` 只保留 family-level session/runtime/projection 编排与 shared modules/contracts/indexes
+- `OPL Runtime Manager` 是 thin product-managed adapter/projection layer，不持有 RedCube visual-domain truth 或 concrete executor
 - `RedCube AI` 是独立 visual domain agent，提供自己的 lightweight direct entry
 - 两者都存在，但作用域不同
 

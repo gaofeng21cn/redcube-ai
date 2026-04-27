@@ -24,13 +24,14 @@ test('upstream Hermes-Agent final target shape is frozen as the OPL-callable Red
   assert.equal(finalTarget.status, 'closeout_completed');
   assert.equal(
     finalTarget.final_target_route.redcube_direct_entry,
-    'User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces',
+    'User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces',
   );
   assert.equal(
     finalTarget.final_target_route.opl_federated_entry,
-    'User -> OPL Product Entry -> OPL Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces',
+    'User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces',
   );
-  assert.equal(finalTarget.runtime_boundary.runtime_owner, 'upstream_hermes_agent');
+  assert.equal(finalTarget.runtime_boundary.runtime_owner, 'optional_hosted_runtime_carrier');
+  assert.equal(finalTarget.runtime_boundary.opl_runtime_manager.manager, 'OPL Runtime Manager');
   assert.deepEqual(finalTarget.entry_surface_contract.formal_entry.repo_verified, ['CLI', 'MCP']);
   assert.equal(
     finalTarget.entry_surface_contract.service_safe_domain_entry.contract,

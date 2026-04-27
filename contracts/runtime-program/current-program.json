@@ -5,8 +5,8 @@
     "label": "independent visual-deliverable domain agent with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL Runtime Manager when federated",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
-      "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces",
-      "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces"
+      "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
+      "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
     },
     "runtime_manager_boundary": {
       "manager": "OPL Runtime Manager",

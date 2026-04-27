@@ -1,22 +1,25 @@
-# OPL Gateway Internal Product Entry Bridge
+# OPL Runtime Manager Internal Product Entry Bridge
 
 状态锚点：`2026-04-12`
 
+历史说明：本文件名保留早期 `OPL Gateway` provenance；正文 current-facing 口径以 `OPL Runtime Manager` 为准。
+
 ## 一句话结论
 
-`OPL Gateway` 现在可以通过一个 repo-verified internal bridge surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
+`OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，可以通过 repo-verified internal bridge surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
 
 ## 这一步解决什么
 
 它把上层 handoff 收口成：
 
-`User -> OPL Product Entry -> OPL Gateway -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 关键不变量是：
 
 - OPL handoff 不再需要分叉成另一套 RedCube 私有入口协议
-- direct `RedCube Product Entry` 与 `OPL Gateway` internal bridge 共用同一 downstream `product entry`
+- direct `RedCube Product Entry` 与 `OPL Runtime Manager` internal bridge 共用同一 downstream `product entry`
 - `invokeDomainEntry` 继续是 domain-level service-safe adapter
+- `OPL Runtime Manager` 不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor
 
 ## 合同与调用面
 
@@ -40,3 +43,4 @@
 - 不把 `OPL` 写成 RedCube 内部控制面
 - 不让 federation 反向改写 visual-domain truth
 - 不因为 handoff landed 就过度宣称 end-user product shell 已成熟
+- 不把 repo-local Hermes wrapper 或旧 Gateway 命名写成 external `Hermes-Agent` substrate proof

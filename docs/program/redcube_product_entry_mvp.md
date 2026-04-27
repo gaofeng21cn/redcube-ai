@@ -11,12 +11,12 @@
 
 它把用户级 direct entry 收口成同一条可调用主线：
 
-`User -> RedCube Product Entry -> RedCube Gateway -> Hermes runtime substrate -> RedCube service-safe domain entry -> RedCube visual-domain truth surfaces`
+`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 并且保持下面几点不变：
 
 - visual-domain boundary 仍在 `RedCube AI`
-- runtime substrate owner 仍是上游 `Hermes-Agent`
+- 默认 concrete executor 仍是 `Codex CLI`
 - 下游实际执行仍统一走 `invokeDomainEntry`
 
 ## 合同与调用面

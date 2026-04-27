@@ -45,21 +45,21 @@
 
 因此当前可以诚实宣称：
 
-- upstream `Hermes-Agent` 继续拥有 live run surface
+- upstream `Hermes-Agent` live run surface 在该 closeout 中可被验证；当前 federation 口径由 `OPL Runtime Manager` 作为薄 adapter/projection layer 消费
 - `RedCube AI` 继续拥有 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 与 visual-domain truth
 - F4 不再是当前宿主上的 stop boundary
 
 但当前不能过度宣称：
 
 - mature `RedCube Product Entry` 已落地
-- `OPL Product Entry -> OPL Gateway -> RedCube` 用户前台路线已 repo-verified
+- `OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube` 是成熟 end-user 托管前台路线
 
 ## 当前真实 gap
 
 F4 closeout 完成后，当前主线剩余的 truthful gap 是：
 
-- mature 的 `RedCube Product Entry`
-- repo-verified 的 `OPL Product Entry -> OPL Gateway -> RedCube` 用户前台路线
+- mature 的 `RedCube Product Entry` end-user product shell
+- managed web runtime 上的 end-user 产品化壳
 
-也就是说，下一阶段的问题已经不是“runtime substrate 是否真的切到上游”，
+也就是说，下一阶段的问题已经不是“旧 terminal-event blocker 是否仍阻塞当前宿主”，
 而是“最终用户产品入口何时以同一个 service-safe domain entry 落地”。

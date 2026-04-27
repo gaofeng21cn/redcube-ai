@@ -64,11 +64,11 @@ test('public docs surface keeps the default entry chain and isolates historical 
   assert.equal(currentProgram.current_state.runtime_substrate_owner, 'optional_hosted_runtime_carrier');
   assert.match(
     currentProgram.longrun_goal.final_target_route.redcube_direct_entry,
-    /RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/,
+    /RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces/,
   );
   assert.match(
     currentProgram.longrun_goal.final_target_route.opl_federated_entry,
-    /OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces/,
+    /OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces/,
   );
 
   assert.doesNotMatch(docsReadme, /repo-tracked program|current truth|active tranche|current-program\.json/i);

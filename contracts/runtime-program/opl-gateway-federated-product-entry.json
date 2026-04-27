@@ -3,6 +3,18 @@
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
   "goal": "Land a repo-verified internal OPL bridge surface that converges onto the same RedCube product-entry downstream contract.",
+  "current_facing_boundary": {
+    "manager": "OPL Runtime Manager",
+    "legacy_entry_mode": "opl_gateway",
+    "layer_role": "thin product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
+    "does_not_own": [
+      "RedCube visual-domain truth",
+      "canonical artifacts",
+      "review-state truth",
+      "publication projection truth",
+      "concrete executor"
+    ]
+  },
   "callable_surface": {
     "gateway_action": "invokeFederatedProductEntry",
     "cli_entry": "redcube product federate",
