@@ -44,6 +44,7 @@
 - `docs/program/`：仓库跟踪的 program 记录，包含 absorbed 里程碑
 - `docs/references/`：支持性技术参考
 - `docs/policies/`：稳定治理与运行规则
+- [AI-first 质量边界 Policy](./policies/ai_first_quality_boundary.md)：固定 author / reviewer 判断必须由 AI-authored artifact 持有，pack、schema、gate、audit 与 projection 只承担机械约束和证据传递。
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md)：保留 future-facing 设计目标的参考文档，退出根层活跃表面
 - [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md)：source-plane 的 future target 继续留在同一 reference 层
 

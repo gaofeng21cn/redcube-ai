@@ -48,5 +48,6 @@
 
 - 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 `OPL Runtime Manager`、external `Hermes-Agent` substrate、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
+- 保持 AI-first 质量边界：story / visual / markup authorship 与最终视觉 reviewer 判断由 AI-authored artifact 持有；pack、schema、gate、audit、scorecard 与 projection 只表达结构、证据、机械状态和 rerun hints
 - 保持 native PPT proof lane 显式可选、默认关闭；HTML 主线与 native PPT 路线都继续经过 `visual_director_review`、`screenshot_review` 与 `export_pptx`
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

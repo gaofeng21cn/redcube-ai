@@ -44,6 +44,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - `docs/program/`: tracked program records, including absorbed milestones
 - `docs/references/`: supporting technical references
 - `docs/policies/`: stable governance and operating rules
+- [AI-first quality boundary policy](./policies/ai_first_quality_boundary.md): stable rule that keeps author/reviewer judgment in AI-authored artifacts while packs, schemas, gates, audits, and projections stay mechanical.
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
 - [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md): source-plane future target kept in the same reference layer
 
