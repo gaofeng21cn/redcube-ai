@@ -89,6 +89,8 @@ test('current program points to the current mainline while retaining durable ide
   assert.match(currentProgram.longrun_goal.final_target_route.opl_federated_entry, /OPL Runtime Manager -> external Hermes-Agent runtime substrate/);
   assert.match(currentProgram.longrun_goal.language_target.typescript_owner, /product entry/);
   assert.match(currentProgram.longrun_goal.language_target.python_owner, /native Office\/PPT/);
+  assert.match(currentProgram.longrun_goal.language_target.legacy_javascript_policy, /repo-tracked JavaScript is retired/);
+  assert.doesNotMatch(currentProgram.longrun_goal.language_target.legacy_javascript_policy, /staged retirement/);
   assert.equal(currentProgram.formal_entry.default_formal_entry, 'CLI');
   assert.deepEqual(currentProgram.formal_entry.supported_protocol_layer, ['MCP']);
   assert.equal(currentProgram.execution_handle_contract.program_id.role, 'active mainline control-plane pointer');

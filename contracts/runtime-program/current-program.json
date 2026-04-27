@@ -35,7 +35,7 @@
       "typescript_package_build_contract": "contracts/runtime-program/typescript-package-build-contract.json",
       "python_owner": "native Office/PPT manipulation, screenshot/export helpers, document/PPT repair loops, and MAS/MAG shared automation ecosystem",
       "python_native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
-      "legacy_javascript_policy": "staged retirement behind existing TypeScript service boundaries; no new creative/runtime truth should be added to legacy JS paths",
+      "legacy_javascript_policy": "repo-tracked JavaScript is retired and must remain at zero files; new creative/runtime truth belongs in TypeScript or Python-owned helper surfaces",
       "ppt_deck_direction": "keep render_html as the default visual route today while using Python-backed native PPT authoring/repair as the explicit proof lane for future editable-PPT workflows"
     },
     "north_star": [
