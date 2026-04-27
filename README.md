@@ -67,6 +67,7 @@ You can start with prompts like:
 - The direct route and the internal OPL bridge both converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
 - `OPL` stays at family-level session/runtime/projection orchestration plus shared modules/contracts/indexes, and its federated product-entry path is an internal integration surface rather than the first public story.
 - The target `OPL Runtime Manager` indexes RedCube product-entry/session/runtime/artifact/review projections over an external `Hermes-Agent` substrate, but RedCube remains the visual-domain truth owner.
+- RedCube's public executor backend contract is `codex_cli` or `hermes_agent`; `execution_shape` is declared separately as `structured_call` or `agent_loop`.
 - The implementation target is `TypeScript + Python`: TypeScript for product/runtime contracts and service boundaries, Python via the repo-owned `redcube_ai` helper package for native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
 - Content framing, audience fit, and final acceptance stay with experts.
 - External publishing and upload steps stay under human supervision.

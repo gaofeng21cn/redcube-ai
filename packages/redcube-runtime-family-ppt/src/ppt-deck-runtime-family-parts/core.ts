@@ -20,9 +20,13 @@ import {
 } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
+  HERMES_AGENT_EXECUTOR_BACKEND,
+  HERMES_DEFAULT_ADAPTER,
   HERMES_NATIVE_PROOF_ADAPTER,
   buildCodexExecutionModel,
+  buildHermesExecutionModel,
   buildHermesNativeProofExecutionModel,
+  generateStructuredArtifactViaHermesAgentApi,
   generateStructuredArtifactViaHermesNativeProof,
 } from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
@@ -95,6 +99,7 @@ export function createPptDeckRuntimeCore() {
   const PYTHON_NATIVE = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_native');
   const NATIVE_PPT_ENGINE_CONTRACT = path.join(REPO_ROOT, 'contracts/runtime-program/ppt-native-python-engine-contract.json');
   const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
+  const HERMES_AGENT_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
   const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
 
   const {
@@ -259,13 +264,27 @@ export function createPptDeckRuntimeCore() {
     }
   }
   
+  function isHermesAgentAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
+    const requested = safeText(adapter);
+    return requested === HERMES_DEFAULT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND;
+  }
+
   function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    return adapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? HERMES_NATIVE_PROOF_EXECUTION_MODEL
-      : CODEX_EXECUTION_MODEL;
+    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) return HERMES_NATIVE_PROOF_EXECUTION_MODEL;
+    if (isHermesAgentAdapter(adapter)) return HERMES_AGENT_EXECUTION_MODEL;
+    return CODEX_EXECUTION_MODEL;
   }
   
   function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+    if (isHermesAgentAdapter(adapter)) {
+      if (safeText(generationRuntime?.creative_owner)) {
+        return safeText(generationRuntime.creative_owner);
+      }
+      if (safeText(generationRuntime?.owner)) {
+        return safeText(generationRuntime.owner);
+      }
+      return HERMES_AGENT_EXECUTOR_BACKEND;
+    }
     if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
       if (safeText(generationRuntime?.creative_owner)) {
         return safeText(generationRuntime.creative_owner);
@@ -285,6 +304,9 @@ export function createPptDeckRuntimeCore() {
     if (safeText(generationRuntime?.adapter_surface)) {
       return safeText(generationRuntime.adapter_surface);
     }
+    if (isHermesAgentAdapter(adapter)) {
+      return 'hermes_agent_api_server';
+    }
     return adapter === HERMES_NATIVE_PROOF_ADAPTER
       ? 'hermes_native_full_agent_loop'
       : 'codex_native_host_agent';
@@ -294,6 +316,9 @@ export function createPptDeckRuntimeCore() {
     adapter = CODEX_DEFAULT_ADAPTER,
     ...input
   }) {
+    if (isHermesAgentAdapter(adapter)) {
+      return generateStructuredArtifactViaHermesAgentApi(input);
+    }
     if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
       return generateStructuredArtifactViaHermesNativeProof(input);
     }
@@ -305,6 +330,29 @@ export function createPptDeckRuntimeCore() {
     stages = [],
     ...input
   }) {
+    if (isHermesAgentAdapter(adapter)) {
+      const data = [];
+      for (const stage of stages) {
+        const result = await generateStructuredArtifactViaHermesAgentApi(stage);
+        data.push({
+          stage_id: safeText(stage?.stage_id),
+          data: result.data,
+          generationRuntime: result.generationRuntime,
+        });
+      }
+      return {
+        data,
+        batchRuntime: {
+          owner: HERMES_AGENT_EXECUTOR_BACKEND,
+          session_pool: {
+            reuse_supported: false,
+            reuse_claimed: false,
+            reuse_status: 'unsupported_by_adapter',
+            invocation_count: data.length,
+          },
+        },
+      };
+    }
     if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
       const data = [];
       for (const stage of stages) {

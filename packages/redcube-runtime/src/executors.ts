@@ -1,8 +1,11 @@
 import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 import {
   CODEX_DEFAULT_ADAPTER,
+  HERMES_AGENT_EXECUTOR_BACKEND,
+  HERMES_DEFAULT_ADAPTER,
   HERMES_NATIVE_PROOF_ADAPTER,
   buildCodexExecutorDescriptor,
+  buildHermesExecutorDescriptor,
   buildHermesNativeProofExecutorDescriptor,
 } from '@redcube/hermes-substrate';
 import type { RuntimeFamilyContract } from '@redcube/runtime-family-registry';
@@ -21,6 +24,8 @@ interface ExecutorRouteInput {
 
 interface ExecutorDescriptor extends Record<string, unknown> {
   adapter: string;
+  executor_backend?: 'codex_cli' | 'hermes_agent';
+  execution_shape?: 'structured_call' | 'agent_loop';
   execution_model?: Record<string, unknown>;
 }
 
@@ -45,6 +50,8 @@ interface ExecutorAdapter extends ExecutorDescriptor {
 /**
  * @typedef {{
  *   adapter: string,
+ *   executor_backend?: "codex_cli" | "hermes_agent",
+ *   execution_shape?: "structured_call" | "agent_loop",
  *   primary?: boolean,
  *   execution_surface?: string,
  *   creative_execution?: string,
@@ -89,10 +96,15 @@ interface ExecutorAdapter extends ExecutorDescriptor {
  * @returns {ExecutorAdapter}
  */
 export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER }: { adapter?: string } = {}): ExecutorAdapter {
+  const requestedAdapter = String(adapter || '').trim();
   const descriptor = (
-    String(adapter || '').trim() === HERMES_NATIVE_PROOF_ADAPTER
+    requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER
       ? buildHermesNativeProofExecutorDescriptor({ adapter })
-      : buildCodexExecutorDescriptor({ adapter })
+      : (
+          requestedAdapter === HERMES_DEFAULT_ADAPTER || requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND
+            ? buildHermesExecutorDescriptor({ adapter })
+            : buildCodexExecutorDescriptor({ adapter })
+        )
   ) as unknown as ExecutorDescriptor;
 
   return {
@@ -135,6 +147,8 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER }: { ad
         contract,
         stage_contract: stageContract,
         ...artifact,
+        executor_backend: descriptor.executor_backend,
+        execution_shape: descriptor.execution_shape,
         execution_model: descriptor.execution_model,
       };
     },

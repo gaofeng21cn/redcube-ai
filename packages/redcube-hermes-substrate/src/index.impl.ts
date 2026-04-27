@@ -13,6 +13,10 @@ export const HERMES_DEFAULT_ADAPTER = 'hermes';
 export const HERMES_FREEZE_ORIGIN = 'Hermes.A';
 export const CODEX_DEFAULT_ADAPTER = 'host_agent';
 export const HERMES_NATIVE_PROOF_ADAPTER = 'hermes_native_proof';
+export const CODEX_EXECUTOR_BACKEND = 'codex_cli';
+export const HERMES_AGENT_EXECUTOR_BACKEND = 'hermes_agent';
+export const STRUCTURED_CALL_EXECUTION_SHAPE = 'structured_call';
+export const AGENT_LOOP_EXECUTION_SHAPE = 'agent_loop';
 export const CODEX_RUNTIME_SURFACE = 'codex_native_host_agent';
 export const CODEX_DEPLOYMENT_HOST = 'codex_local_operator_host';
 export const CODEX_DEPLOYMENT_STATUS = 'active_primary';
@@ -29,6 +33,8 @@ export const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
 
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
+  executor_backend: HERMES_AGENT_EXECUTOR_BACKEND,
+  execution_shape: AGENT_LOOP_EXECUTION_SHAPE,
   runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
   runtime_substrate_surface: HERMES_RUNTIME_SURFACE,
   deployment_host: HERMES_DEPLOYMENT_HOST,
@@ -45,6 +51,8 @@ const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
 
 const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
+  executor_backend: CODEX_EXECUTOR_BACKEND,
+  execution_shape: STRUCTURED_CALL_EXECUTION_SHAPE,
   runtime_substrate_owner: 'Codex CLI',
   runtime_substrate_surface: CODEX_RUNTIME_SURFACE,
   deployment_host: CODEX_DEPLOYMENT_HOST,
@@ -61,6 +69,8 @@ const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
 
 const HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
+  executor_backend: HERMES_AGENT_EXECUTOR_BACKEND,
+  execution_shape: AGENT_LOOP_EXECUTION_SHAPE,
   runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
   runtime_substrate_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
   deployment_host: HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
@@ -233,6 +243,42 @@ function normalizeError(error) {
   };
 }
 
+export function normalizeExecutorBackend(value = CODEX_DEFAULT_ADAPTER) {
+  const requested = String(value || '').trim();
+  if (!requested || requested === CODEX_DEFAULT_ADAPTER || requested === CODEX_EXECUTOR_BACKEND) {
+    return CODEX_EXECUTOR_BACKEND;
+  }
+  if (
+    requested === HERMES_DEFAULT_ADAPTER
+    || requested === HERMES_NATIVE_PROOF_ADAPTER
+    || requested === HERMES_AGENT_EXECUTOR_BACKEND
+  ) {
+    return HERMES_AGENT_EXECUTOR_BACKEND;
+  }
+  throw new Error(`Unsupported executor backend: ${requested}`);
+}
+
+export function buildExecutorBackendContract({ adapter = CODEX_DEFAULT_ADAPTER, route = '' } = {}) {
+  const executorBackend = normalizeExecutorBackend(adapter);
+  return {
+    executor_backend: executorBackend,
+    execution_shape: executorBackend === HERMES_AGENT_EXECUTOR_BACKEND
+      ? AGENT_LOOP_EXECUTION_SHAPE
+      : STRUCTURED_CALL_EXECUTION_SHAPE,
+    route_execution_policy: {
+      render_html_default_shape: STRUCTURED_CALL_EXECUTION_SHAPE,
+      fix_html_default_shape: STRUCTURED_CALL_EXECUTION_SHAPE,
+      fix_html_escalation_shape: AGENT_LOOP_EXECUTION_SHAPE,
+      route: String(route || '').trim() || null,
+    },
+    compatibility_aliases: {
+      host_agent: CODEX_EXECUTOR_BACKEND,
+      hermes: HERMES_AGENT_EXECUTOR_BACKEND,
+      hermes_native_proof: HERMES_AGENT_EXECUTOR_BACKEND,
+    },
+  };
+}
+
 function loadHermesRunRaw({ workspaceRoot, runId }) {
   const file = runFile(workspaceRoot, runId);
   if (!existsSync(file)) {
@@ -322,7 +368,7 @@ export function normalizeCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
 
 export function normalizeHermesAdapter(adapter = HERMES_DEFAULT_ADAPTER) {
   const requested = String(adapter || '').trim();
-  if (!requested || requested === 'host_agent' || requested === HERMES_DEFAULT_ADAPTER) {
+  if (!requested || requested === 'host_agent' || requested === HERMES_DEFAULT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND) {
     return HERMES_DEFAULT_ADAPTER;
   }
   throw new Error(`Unsupported executor adapter: ${requested}`);
@@ -331,8 +377,11 @@ export function normalizeHermesAdapter(adapter = HERMES_DEFAULT_ADAPTER) {
 export function buildHermesExecutionModel({ adapter = HERMES_DEFAULT_ADAPTER } = {}) {
   const requestedAdapter = String(adapter || '').trim() || HERMES_DEFAULT_ADAPTER;
   normalizeHermesAdapter(requestedAdapter);
+  const backendContract = buildExecutorBackendContract({ adapter: HERMES_DEFAULT_ADAPTER });
   return {
     mainline_adapter: HERMES_DEFAULT_ADAPTER,
+    executor_backend: backendContract.executor_backend,
+    execution_shape: backendContract.execution_shape,
     primary_surface: HERMES_RUNTIME_SURFACE,
     adapter_role: 'primary_creative_executor',
     runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
@@ -346,8 +395,11 @@ export function buildHermesExecutionModel({ adapter = HERMES_DEFAULT_ADAPTER } =
 export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {}) {
   const requestedAdapter = String(adapter || '').trim() || CODEX_DEFAULT_ADAPTER;
   normalizeCodexAdapter(requestedAdapter);
+  const backendContract = buildExecutorBackendContract({ adapter: CODEX_DEFAULT_ADAPTER });
   return {
     mainline_adapter: CODEX_DEFAULT_ADAPTER,
+    executor_backend: backendContract.executor_backend,
+    execution_shape: backendContract.execution_shape,
     primary_surface: CODEX_RUNTIME_SURFACE,
     adapter_role: 'primary_creative_executor',
     runtime_substrate_owner: 'Codex CLI',
@@ -365,8 +417,11 @@ export function buildHermesNativeProofExecutionModel({ adapter = HERMES_NATIVE_P
   if (requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER) {
     throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
   }
+  const backendContract = buildExecutorBackendContract({ adapter: HERMES_NATIVE_PROOF_ADAPTER });
   return {
     mainline_adapter: HERMES_NATIVE_PROOF_ADAPTER,
+    executor_backend: backendContract.executor_backend,
+    execution_shape: backendContract.execution_shape,
     primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
     adapter_role: 'opt_in_proof_executor',
     runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
@@ -385,6 +440,7 @@ export function buildHermesExecutorDescriptor({ adapter = HERMES_DEFAULT_ADAPTER
   const executionModel = buildHermesExecutionModel({ adapter: requestedAdapter });
   return {
     adapter: normalizedAdapter,
+    ...buildExecutorBackendContract({ adapter: normalizedAdapter }),
     requested_adapter: requestedAdapter,
     primary: true,
     execution_surface: HERMES_RUNTIME_SURFACE,
@@ -400,6 +456,7 @@ export function buildCodexExecutorDescriptor({ adapter = CODEX_DEFAULT_ADAPTER }
   const executionModel = buildCodexExecutionModel({ adapter: requestedAdapter });
   return {
     adapter: normalizedAdapter,
+    ...buildExecutorBackendContract({ adapter: normalizedAdapter }),
     requested_adapter: requestedAdapter,
     primary: true,
     execution_surface: CODEX_RUNTIME_SURFACE,
@@ -417,6 +474,7 @@ export function buildHermesNativeProofExecutorDescriptor({ adapter = HERMES_NATI
   const executionModel = buildHermesNativeProofExecutionModel({ adapter: requestedAdapter });
   return {
     adapter: HERMES_NATIVE_PROOF_ADAPTER,
+    ...buildExecutorBackendContract({ adapter: HERMES_NATIVE_PROOF_ADAPTER }),
     requested_adapter: requestedAdapter,
     primary: false,
     execution_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
@@ -447,6 +505,7 @@ export {
   readHermesNativeProofContract,
 } from './hermes-native-proof-client.js';
 export {
+  generateStructuredArtifactViaHermesAgentApi,
   runAgentLoopViaHermesAgentApi,
   structuredCallViaHermesAgentApi,
 } from './hermes-agent-api-client.js';

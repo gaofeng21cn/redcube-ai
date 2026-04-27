@@ -24,6 +24,7 @@
 - `route_equivalence` 已作为 manifest 合同面冻结：`frontdesk`、`invoke`、`session` 与 internal `OPL bridge` 都只指向同一 downstream `domain_entry`、同一 session continuity / progress / artifact / review / publication truth，不新增第二公开 skill 或第二运行语义
 - `deliverable_facade` 已覆盖当前 `ppt_deck` 与 `xiaohongshu` surface：facade 只声明现有 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`，不改核心生成逻辑
 - direct route 只用于显式 stage rerun、定点回修或 runtime gate 指定的局部恢复；默认新交付继续走 `run_managed_deliverable` / `auto_to_terminal`。`run_deliverable_route` 现在会把本轮 `delivery_request.user_intent` 写入 route authoring context，并纳入 route cache key，避免定点回修指令被旧 artifact 复用吞掉。
+- executor backend public contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 单独表达 `structured_call` / `agent_loop`。`render_html` 默认结构化调用；`fix_html` 默认结构化回修并复审到 `screenshot_review`，若复审仍要求 `fix_html`，最多升级一次 `hermes_agent + agent_loop` 并记录 execution proof。
 - `ppt_deck` native PPT authoring / repair 已作为显式 opt-in proof lane 落到可运行 executor：`author_pptx_native` 生成可编辑 PPTX 与 shape manifest，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`
 - native PPT proof lane 已登记在 `contracts/runtime-program/python-native-helper-catalog.json`；Python helper 现在由 repo-owned `redcube_ai` package 承载，既有脚本只保留兼容入口；Python helper 不能绕过 `visual_director_review`、`screenshot_review` 与 `export_pptx` gate，也不能替代 RedCube product-entry/runtime-family route
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`

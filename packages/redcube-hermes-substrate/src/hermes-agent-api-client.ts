@@ -1,10 +1,18 @@
 import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const HERMES_AGENT_API_OWNER = 'upstream_hermes_agent';
 const HERMES_AGENT_API_SURFACE = 'hermes_agent_api_server';
 const CHAT_COMPLETIONS_PATH = '/v1/chat/completions';
 const RUNS_PATH = '/v1/runs';
 const DEFAULT_COMPAT_MODEL = 'redcube-api-compat';
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
+const HERMES_AGENT_API_BASE_URL_ENV = 'REDCUBE_HERMES_AGENT_API_BASE_URL';
+const HERMES_AGENT_API_KEY_ENV = 'REDCUBE_HERMES_AGENT_API_KEY';
+const HERMES_AGENT_API_COMPAT_MODEL_ENV = 'REDCUBE_HERMES_AGENT_API_COMPAT_MODEL';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -45,6 +53,19 @@ export interface HermesAgentLoopRequest extends HermesAgentApiClientOptions {
   metadata?: JsonRecord;
 }
 
+export interface GenerateStructuredArtifactViaHermesAgentApiRequest {
+  family?: unknown;
+  route?: unknown;
+  promptRelativePath?: unknown;
+  context?: unknown;
+  outputContract?: unknown;
+  cwd?: string;
+  timeoutMs?: number;
+  env?: NodeJS.ProcessEnv;
+  localFileInspection?: unknown[];
+  fetchImpl?: FetchLike;
+}
+
 function isJsonRecord(value: unknown): value is JsonRecord {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
@@ -60,6 +81,11 @@ function requireText(name: string, value: unknown): string {
 function optionalText(value: unknown): string | null {
   const text = String(value || '').trim();
   return text || null;
+}
+
+function safeText(value: unknown, fallback = ''): string {
+  const text = String(value || '').trim();
+  return text || fallback;
 }
 
 function normalizeBaseUrl(value: unknown): string {
@@ -180,6 +206,82 @@ function buildProof({
   };
 }
 
+function readPromptGuidance(relativePath: string): string {
+  const safePath = requireText('Hermes-Agent promptRelativePath', relativePath);
+  const absolutePath = path.join(REPO_ROOT, safePath);
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Missing prompt pack asset: ${safePath}`);
+  }
+  const raw = readFileSync(absolutePath, 'utf-8');
+  const runtimeSectionIndex = raw.search(/^##\s+runtime_(seed|artifact)\b/m);
+  return (runtimeSectionIndex === -1 ? raw : raw.slice(0, runtimeSectionIndex)).trim();
+}
+
+function normalizeLocalFileInspection(value: unknown): JsonRecord[] {
+  return (Array.isArray(value) ? value : [])
+    .map((entry) => ({
+      label: safeText((entry as JsonRecord)?.label, 'local-file'),
+      path: safeText((entry as JsonRecord)?.path),
+      media_type: safeText((entry as JsonRecord)?.media_type, 'application/octet-stream'),
+      purpose: safeText((entry as JsonRecord)?.purpose),
+    }))
+    .filter((entry) => entry.path);
+}
+
+function buildGenerationPrompt({
+  family,
+  route,
+  promptRelativePath,
+  context,
+  outputContract,
+  localFileInspection = [],
+}: {
+  family: string;
+  route: string;
+  promptRelativePath: string;
+  context: unknown;
+  outputContract: unknown;
+  localFileInspection?: unknown[];
+}): string {
+  const inspectedFiles = normalizeLocalFileInspection(localFileInspection);
+  return [
+    'You are the RedCube AI Hermes-Agent API creative execution runtime.',
+    `Produce the ${family}:${route} artifact as audience-facing creative output.`,
+    'Use the supplied prompt guidance, context, output contract, and explicitly listed local files only.',
+    'Return a JSON object only.',
+    '',
+    '# Prompt Pack Guidance',
+    readPromptGuidance(promptRelativePath),
+    '',
+    '# Context',
+    JSON.stringify(context, null, 2),
+    '',
+    '# Output Contract',
+    JSON.stringify(outputContract, null, 2),
+    '',
+    '# Local File Inspection',
+    JSON.stringify(inspectedFiles, null, 2),
+  ].join('\n');
+}
+
+function resolveHermesAgentApiOptions(env: NodeJS.ProcessEnv = process.env) {
+  return {
+    baseUrl: requireText(HERMES_AGENT_API_BASE_URL_ENV, env[HERMES_AGENT_API_BASE_URL_ENV]),
+    apiKey: optionalText(env[HERMES_AGENT_API_KEY_ENV]),
+    model: safeText(env[HERMES_AGENT_API_COMPAT_MODEL_ENV], DEFAULT_COMPAT_MODEL),
+  };
+}
+
+function payloadFromHermesAgentOutput(output: unknown): JsonRecord {
+  const payload = isJsonRecord(output) && isJsonRecord(output.payload)
+    ? output.payload
+    : output;
+  if (!isJsonRecord(payload)) {
+    throw new Error('Hermes-Agent agent_loop returned no structured artifact payload');
+  }
+  return payload;
+}
+
 export async function structuredCallViaHermesAgentApi({
   baseUrl,
   apiKey = null,
@@ -268,5 +370,81 @@ export async function runAgentLoopViaHermesAgentApi({
       requestedModel,
       runEvents,
     }),
+  };
+}
+
+export async function generateStructuredArtifactViaHermesAgentApi({
+  family,
+  route,
+  promptRelativePath,
+  context,
+  outputContract,
+  timeoutMs,
+  env = process.env,
+  localFileInspection = [],
+  fetchImpl,
+}: GenerateStructuredArtifactViaHermesAgentApiRequest) {
+  const safeFamily = safeText(family, 'unknown_family');
+  const safeRoute = safeText(route, 'unknown_route');
+  const safePromptRelativePath = requireText('Hermes-Agent promptRelativePath', promptRelativePath);
+  const api = resolveHermesAgentApiOptions(env);
+  const prompt = buildGenerationPrompt({
+    family: safeFamily,
+    route: safeRoute,
+    promptRelativePath: safePromptRelativePath,
+    context,
+    outputContract,
+    localFileInspection,
+  });
+  const result = await runAgentLoopViaHermesAgentApi({
+    ...api,
+    input: {
+      family: safeFamily,
+      route: safeRoute,
+      prompt,
+      context,
+      output_contract: outputContract,
+      local_file_inspection: normalizeLocalFileInspection(localFileInspection),
+    },
+    metadata: {
+      family: safeFamily,
+      route: safeRoute,
+      execution_shape: 'agent_loop',
+      prompt_relative_path: safePromptRelativePath,
+    },
+    fetchImpl,
+    timeoutMs,
+  });
+  const proof = result.proof as JsonRecord;
+  return {
+    data: payloadFromHermesAgentOutput(result.data),
+    generationRuntime: {
+      owner: 'hermes_agent',
+      adapter_surface: '@redcube/hermes-substrate',
+      api_surface: HERMES_AGENT_API_SURFACE,
+      run_id: safeText(proof.run_id, `hermes-agent-${randomUUID()}`),
+      session_id: safeText(proof.session_id) || null,
+      model_selection: 'hermes_agent_server_runtime',
+      reasoning_selection: 'hermes_agent_server_runtime',
+      model: safeText(proof.model),
+      provider: safeText(proof.provider),
+      api_mode: 'hermes_agent_api_server',
+      prompt_pack_file: safePromptRelativePath,
+      proof,
+      creative_owner: 'hermes_agent',
+      primary_surface: HERMES_AGENT_API_SURFACE,
+      execution_model: {
+        mainline_adapter: 'hermes',
+        executor_backend: 'hermes_agent',
+        execution_shape: 'agent_loop',
+        primary_surface: HERMES_AGENT_API_SURFACE,
+        adapter_role: 'primary_creative_executor',
+        runtime_substrate_owner: 'Hermes-Agent',
+        deployment_host: 'external_hermes_agent_api_server',
+        deployment_host_status: 'explicit_runtime_switch',
+        requested_adapter: 'hermes_agent',
+        freeze_origin_milestone: 'Hermes.API.A',
+      },
+    },
   };
 }

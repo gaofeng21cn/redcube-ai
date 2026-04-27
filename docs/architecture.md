@@ -101,10 +101,17 @@
 
 当前 executor-adapter contract 也已经冻结成统一口径：
 
-- 默认正式执行器是 `host_agent`
-  - 它对应本机 Codex CLI autonomous / host-agent runtime
-- 备选 proof 执行器是 `hermes_native_proof`
-  - 只有 caller 显式传 `adapter = hermes_native_proof` 时才会启用
+- public executor backend 固定为 `codex_cli` 与 `hermes_agent`
+  - 旧内部 `host_agent` 只作为 `codex_cli` 的 adapter 兼容名保留
+  - 旧内部 `hermes_native_proof` 只作为 `hermes_agent` full-agent-loop proof adapter 保留
+- `execution_shape` 固定为 `structured_call` 与 `agent_loop`
+  - `render_html` 默认 `structured_call`
+  - `fix_html` 默认先 `structured_call`，复审仍要求回修时最多升级一次 `hermes_agent + agent_loop`
+  - `simple_llm` 与 `openai_compatible_gateway` 不作为 RedCube 一等 backend
+- 默认正式 backend 是 `codex_cli`
+  - 它对应本机 Codex CLI autonomous runtime
+- 备选 proof backend 是 `hermes_agent`
+  - 只有 caller 显式传 Hermes proof adapter，或 `fix_html` escalation policy 触发时才会启用
   - 当前已经对齐到 `ppt_deck`、`xiaohongshu`、`poster_onepager` 三个 family
   - 底层不是单轮 chat relay，而是 `@redcube/hermes-substrate -> hermes_native_proof_bridge.py -> run_agent.AIAgent.run_conversation`
   - 默认 model / reasoning 继承本机 Hermes 默认配置，不在 repo 内 pin 死

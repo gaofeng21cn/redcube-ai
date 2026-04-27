@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { buildGovernanceSurfaceContract } from '@redcube/overlay-core';
@@ -11,6 +11,7 @@ import type { RuntimeRunRouteResponse } from '@redcube/runtime';
 
 type RuntimeRouteResult = RuntimeRunRouteResponse & {
   artifact?: unknown;
+  artifactFile?: string;
   cache_status?: unknown;
 };
 type DependencyRouteRun = {
@@ -20,11 +21,35 @@ type DependencyRouteRun = {
   status: string | null;
 };
 
+type FixHtmlEscalationAttempt = {
+  attempt_index: number;
+  route: 'fix_html';
+  executor_backend: 'codex_cli' | 'hermes_agent';
+  execution_shape: 'structured_call' | 'agent_loop';
+  adapter: string;
+  ok: boolean;
+  run_id: string | null;
+  status: string | null;
+  executed_route: string | null;
+  review_requires_fix_html: boolean;
+  dependency_route_runs: DependencyRouteRun[];
+  continuation_route_runs: DependencyRouteRun[];
+};
+
+type FixHtmlExecutionProof = {
+  proof_kind: 'fix_html_agentic_escalation';
+  policy: 'structured_call_then_single_agent_loop_escalation';
+  escalation_status: 'not_required' | 'escalated' | 'escalated_still_requires_fix_html' | 'already_agent_loop';
+  stop_after_stage: string;
+  attempts: FixHtmlEscalationAttempt[];
+};
+
 type RouteRunGatewayResponse = Omit<RouteRunResponse, 'run' | 'summary'> & {
   run: RuntimeRunRouteResponse['run'];
   artifact?: unknown;
   dependency_route_runs?: DependencyRouteRun[];
   continuation_route_runs?: DependencyRouteRun[];
+  execution_proof?: FixHtmlExecutionProof;
   summary: RouteRunResponse['summary'] & {
     cache_status: string;
     requested_route: string;
@@ -33,8 +58,12 @@ type RouteRunGatewayResponse = Omit<RouteRunResponse, 'run' | 'summary'> & {
     continued_route_sequence: string[];
     stop_after_stage: string | null;
     recovery_terminal_reason: string | null;
+    fix_html_escalation_status: FixHtmlExecutionProof['escalation_status'] | null;
   };
 };
+
+const CODEX_STRUCTURED_ADAPTER = 'host_agent';
+const HERMES_AGENT_LOOP_ADAPTER = 'hermes_agent';
 
 function readJsonRecord(file: string): JsonObject {
   return JSON.parse(readFileSync(file, 'utf-8')) as JsonObject;
@@ -51,10 +80,16 @@ function routeResultErrorMessage(result: RuntimeRouteResult): string {
   return safeText(error?.message || run?.error?.message);
 }
 
-function recoverableDependencyRoutes(route: string, result: RuntimeRouteResult): string[] {
+function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): string[] {
+  const route = request.route;
   const message = routeResultErrorMessage(result);
   if (route === 'fix_html' && /requires screenshot_review based on the current HTML/i.test(message)) {
     return ['visual_director_review', 'screenshot_review'];
+  }
+  if (route === 'fix_html' && /requires completed stage artifacts: .*screenshot_review/i.test(message)) {
+    return readStageArtifactForRequest(request, 'visual_director_review')
+      ? ['screenshot_review']
+      : [];
   }
   if (route === 'screenshot_review' && /requires visual_director_review to be rerun after the latest visual changes/i.test(message)) {
     return ['visual_director_review'];
@@ -133,7 +168,7 @@ function routeSequenceStageIds(contract: JsonObject): string[] {
     .filter(Boolean);
 }
 
-function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageId: string): JsonObject | null {
+function stageArtifactFileForRequest(request: RunDeliverableRouteRequest, stageId: string): string {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
     request.topicId,
@@ -148,6 +183,11 @@ function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageI
     deliverablePaths.artifactsDir,
     safeText(stage?.output_artifact) || `${stageId}.json`,
   );
+  return artifactFile;
+}
+
+function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageId: string): JsonObject | null {
+  const artifactFile = stageArtifactFileForRequest(request, stageId);
   return existsSync(artifactFile) ? readJsonRecord(artifactFile) : null;
 }
 
@@ -225,7 +265,7 @@ async function runWithRecoverableDependencies(request: RunDeliverableRouteReques
   recoveryTerminalReason: string | null;
 }> {
   const initialResult = await runHostedRoute(request);
-  const dependencyRoutes = initialResult.ok === true ? [] : recoverableDependencyRoutes(request.route, initialResult);
+  const dependencyRoutes = initialResult.ok === true ? [] : recoverableDependencyRoutes(request, initialResult);
   if (dependencyRoutes.length === 0) {
     return {
       result: initialResult,
@@ -332,18 +372,210 @@ async function continueToStopAfterStage({
   return { result: currentResult, continuationRouteRuns };
 }
 
+function runAdapter(request: RunDeliverableRouteRequest): string {
+  return safeText(request.adapter, CODEX_STRUCTURED_ADAPTER);
+}
+
+function executorBackendForAdapter(adapter: string): 'codex_cli' | 'hermes_agent' {
+  return adapter === HERMES_AGENT_LOOP_ADAPTER || adapter === 'hermes_agent' || adapter === 'hermes'
+    ? 'hermes_agent'
+    : 'codex_cli';
+}
+
+function executionShapeForBackend(executorBackend: 'codex_cli' | 'hermes_agent'): 'structured_call' | 'agent_loop' {
+  return executorBackend === 'hermes_agent' ? 'agent_loop' : 'structured_call';
+}
+
+function runCurrentStage(result: RuntimeRouteResult): string | null {
+  const run = result.run as { current_stage?: unknown } | undefined;
+  return safeText(run?.current_stage) || null;
+}
+
+function resultOrStoredReviewRequestsFixHtml(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): boolean {
+  return artifactRequestsFixHtml(result.artifact)
+    || artifactRequestsFixHtml(readStageArtifactForRequest(request, 'screenshot_review'));
+}
+
+function summarizeFixHtmlAttempt({
+  request,
+  result,
+  dependencyRouteRuns,
+  continuationRouteRuns,
+  attemptIndex,
+}: {
+  request: RunDeliverableRouteRequest;
+  result: RuntimeRouteResult;
+  dependencyRouteRuns: DependencyRouteRun[];
+  continuationRouteRuns: DependencyRouteRun[];
+  attemptIndex: number;
+}): FixHtmlEscalationAttempt {
+  const adapter = runAdapter(request);
+  const executorBackend = executorBackendForAdapter(adapter);
+  const run = result.run as { run_id?: unknown; status?: unknown } | undefined;
+  return {
+    attempt_index: attemptIndex,
+    route: 'fix_html',
+    executor_backend: executorBackend,
+    execution_shape: executionShapeForBackend(executorBackend),
+    adapter,
+    ok: result.ok === true,
+    run_id: safeText(run?.run_id) || null,
+    status: safeText(run?.status) || null,
+    executed_route: runCurrentStage(result),
+    review_requires_fix_html: resultOrStoredReviewRequestsFixHtml(request, result),
+    dependency_route_runs: dependencyRouteRuns,
+    continuation_route_runs: continuationRouteRuns,
+  };
+}
+
+function hydrateResultArtifactFromStage(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): RuntimeRouteResult {
+  if (result.artifact && result.artifactFile) return result;
+  const stageId = runCurrentStage(result) || safeText(request.stopAfterStage) || safeText(request.route);
+  if (!stageId) return result;
+  const artifactFile = stageArtifactFileForRequest(request, stageId);
+  if (!existsSync(artifactFile)) return result;
+  return {
+    ...result,
+    artifactFile,
+    artifact: readJsonRecord(artifactFile),
+  };
+}
+
+function persistFixHtmlExecutionProof({
+  request,
+  result,
+  proof,
+}: {
+  request: RunDeliverableRouteRequest;
+  result: RuntimeRouteResult;
+  proof: FixHtmlExecutionProof;
+}): RuntimeRouteResult {
+  const hydrated = hydrateResultArtifactFromStage(request, result);
+  const artifact = hydrated.artifact && typeof hydrated.artifact === 'object' && !Array.isArray(hydrated.artifact)
+    ? {
+        ...(hydrated.artifact as JsonObject),
+        execution_proof: proof as unknown as JsonObject,
+      }
+    : { execution_proof: proof as unknown as JsonObject };
+  if (hydrated.artifactFile) {
+    writeFileSync(hydrated.artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
+  }
+  return {
+    ...hydrated,
+    artifact,
+  };
+}
+
+async function runFixHtmlAttempt(request: RunDeliverableRouteRequest): Promise<{
+  result: RuntimeRouteResult;
+  dependencyRouteRuns: DependencyRouteRun[];
+  continuationRouteRuns: DependencyRouteRun[];
+  recoveryTerminalReason: string | null;
+}> {
+  const routed = await runWithRecoverableDependencies(request);
+  const continued = await continueToStopAfterStage({
+    request,
+    result: routed.result,
+  });
+  return {
+    result: continued.result,
+    dependencyRouteRuns: routed.dependencyRouteRuns,
+    continuationRouteRuns: continued.continuationRouteRuns,
+    recoveryTerminalReason: routed.recoveryTerminalReason,
+  };
+}
+
+async function runFixHtmlWithAgenticEscalation(request: RunDeliverableRouteRequest): Promise<{
+  result: RuntimeRouteResult;
+  dependencyRouteRuns: DependencyRouteRun[];
+  continuationRouteRuns: DependencyRouteRun[];
+  recoveryTerminalReason: string | null;
+  executionProof: FixHtmlExecutionProof;
+}> {
+  const stopAfterStage = safeText(request.stopAfterStage, 'screenshot_review');
+  const initialAdapter = runAdapter(request);
+  const firstRequest = {
+    ...request,
+    adapter: initialAdapter,
+    stopAfterStage,
+  };
+  const first = await runFixHtmlAttempt(firstRequest);
+  const attempts = [
+    summarizeFixHtmlAttempt({
+      request: firstRequest,
+      result: first.result,
+      dependencyRouteRuns: first.dependencyRouteRuns,
+      continuationRouteRuns: first.continuationRouteRuns,
+      attemptIndex: 1,
+    }),
+  ];
+
+  let result = first.result;
+  let dependencyRouteRuns = first.dependencyRouteRuns;
+  let continuationRouteRuns = first.continuationRouteRuns;
+  let recoveryTerminalReason = first.recoveryTerminalReason;
+  let escalationStatus: FixHtmlExecutionProof['escalation_status'] = 'not_required';
+  const shouldEscalate = resultOrStoredReviewRequestsFixHtml(firstRequest, first.result);
+
+  if (shouldEscalate && executorBackendForAdapter(initialAdapter) !== 'hermes_agent') {
+    const escalationRequest = {
+      ...firstRequest,
+      adapter: HERMES_AGENT_LOOP_ADAPTER,
+    };
+    const escalated = await runFixHtmlAttempt(escalationRequest);
+    const secondAttempt = summarizeFixHtmlAttempt({
+      request: escalationRequest,
+      result: escalated.result,
+      dependencyRouteRuns: escalated.dependencyRouteRuns,
+      continuationRouteRuns: escalated.continuationRouteRuns,
+      attemptIndex: 2,
+    });
+    attempts.push(secondAttempt);
+    result = escalated.result;
+    dependencyRouteRuns = [...dependencyRouteRuns, ...escalated.dependencyRouteRuns];
+    continuationRouteRuns = [...continuationRouteRuns, ...escalated.continuationRouteRuns];
+    recoveryTerminalReason = escalated.recoveryTerminalReason;
+    escalationStatus = secondAttempt.review_requires_fix_html
+      ? 'escalated_still_requires_fix_html'
+      : 'escalated';
+  } else if (shouldEscalate) {
+    escalationStatus = 'already_agent_loop';
+  }
+
+  const executionProof: FixHtmlExecutionProof = {
+    proof_kind: 'fix_html_agentic_escalation',
+    policy: 'structured_call_then_single_agent_loop_escalation',
+    escalation_status: escalationStatus,
+    stop_after_stage: stopAfterStage,
+    attempts,
+  };
+  return {
+    result: persistFixHtmlExecutionProof({
+      request: { ...request, stopAfterStage },
+      result,
+      proof: executionProof,
+    }),
+    dependencyRouteRuns,
+    continuationRouteRuns,
+    recoveryTerminalReason,
+    executionProof,
+  };
+}
+
 function buildRouteRunGatewayResponse({
   request,
   result,
   dependencyRouteRuns,
   continuationRouteRuns,
   recoveryTerminalReason,
+  executionProof = null,
 }: {
   request: RunDeliverableRouteRequest;
   result: RuntimeRouteResult;
   dependencyRouteRuns: DependencyRouteRun[];
   continuationRouteRuns: DependencyRouteRun[];
   recoveryTerminalReason: string | null;
+  executionProof?: FixHtmlExecutionProof | null;
 }): RouteRunGatewayResponse {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
@@ -371,15 +603,31 @@ function buildRouteRunGatewayResponse({
       continued_route_sequence: continuationRouteRuns.map((entry) => entry.route),
       stop_after_stage: safeText(request.stopAfterStage) || null,
       recovery_terminal_reason: recoveryTerminalReason,
+      fix_html_escalation_status: executionProof?.escalation_status || null,
     },
     dependency_route_runs: dependencyRouteRuns,
     continuation_route_runs: continuationRouteRuns,
+    ...(executionProof ? { execution_proof: executionProof } : {}),
     artifact: result.artifact || null,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),
   };
 }
 
 export async function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunGatewayResponse> {
+  if (request.route === 'fix_html') {
+    const escalated = await runFixHtmlWithAgenticEscalation(request);
+    return buildRouteRunGatewayResponse({
+      request: {
+        ...request,
+        stopAfterStage: safeText(request.stopAfterStage, escalated.executionProof.stop_after_stage),
+      },
+      result: escalated.result,
+      dependencyRouteRuns: escalated.dependencyRouteRuns,
+      continuationRouteRuns: escalated.continuationRouteRuns,
+      recoveryTerminalReason: escalated.recoveryTerminalReason,
+      executionProof: escalated.executionProof,
+    });
+  }
   const routed = await runWithRecoverableDependencies(request);
   const continued = await continueToStopAfterStage({
     request,
@@ -391,5 +639,6 @@ export async function runDeliverableRoute(request: RunDeliverableRouteRequest): 
     dependencyRouteRuns: routed.dependencyRouteRuns,
     continuationRouteRuns: continued.continuationRouteRuns,
     recoveryTerminalReason: routed.recoveryTerminalReason,
+    executionProof: null,
   });
 }

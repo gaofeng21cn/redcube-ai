@@ -171,7 +171,7 @@ export function buildGovernanceSurfaceContract(contract: JsonObject = {}): Gover
       internal_controller_surface: 'controller',
       controller_repo_verified: false,
     },
-    runtime_topology: buildCodexRuntimeTopology() as GovernanceSurfaceContract['runtime_topology'],
+    runtime_topology: buildCodexRuntimeTopology() as unknown as GovernanceSurfaceContract['runtime_topology'],
   };
 }
 

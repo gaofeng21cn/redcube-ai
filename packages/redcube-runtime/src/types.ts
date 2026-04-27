@@ -26,7 +26,9 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
-export type RuntimeManagedRunAdapter = 'hermes' | 'host_agent' | 'hermes_native_proof';
+export type RuntimeExecutorBackend = 'codex_cli' | 'hermes_agent';
+export type RuntimeExecutionShape = 'structured_call' | 'agent_loop';
+export type RuntimeManagedRunAdapter = 'hermes' | 'host_agent' | 'hermes_native_proof' | RuntimeExecutorBackend;
 
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];

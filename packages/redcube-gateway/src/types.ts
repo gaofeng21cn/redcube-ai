@@ -157,6 +157,7 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
   run: Record<string, unknown>;
   events: unknown[];
   artifactFile?: string;
+  execution_proof?: Record<string, unknown>;
   error?: unknown;
   error_kind: string | null;
   governance_surface: GovernanceSurfaceContract;

@@ -1,5 +1,7 @@
 export interface HermesRuntimeTopology {
   schema_version: 1;
+  executor_backend: 'hermes_agent';
+  execution_shape: 'agent_loop';
   runtime_substrate_owner: 'Hermes';
   runtime_substrate_surface: 'hermes_backed_runtime_substrate';
   deployment_host: 'codex_default_host_agent_bridge';
@@ -16,6 +18,8 @@ export interface HermesRuntimeTopology {
 
 export interface CodexRuntimeTopology {
   schema_version: 1;
+  executor_backend: 'codex_cli';
+  execution_shape: 'structured_call';
   runtime_substrate_owner: 'Codex CLI';
   runtime_substrate_surface: 'codex_native_host_agent';
   deployment_host: 'codex_local_operator_host';
@@ -32,6 +36,8 @@ export interface CodexRuntimeTopology {
 
 export interface HermesNativeProofRuntimeTopology {
   schema_version: 1;
+  executor_backend: 'hermes_agent';
+  execution_shape: 'agent_loop';
   runtime_substrate_owner: 'Hermes';
   runtime_substrate_surface: 'hermes_native_full_agent_loop';
   deployment_host: 'local_hermes_agent_bridge';
@@ -48,6 +54,8 @@ export interface HermesNativeProofRuntimeTopology {
 
 export interface HermesExecutionModel {
   mainline_adapter: 'hermes';
+  executor_backend: 'hermes_agent';
+  execution_shape: 'agent_loop';
   primary_surface: 'hermes_backed_runtime_substrate';
   adapter_role: 'primary_creative_executor';
   runtime_substrate_owner: 'Hermes';
@@ -59,6 +67,8 @@ export interface HermesExecutionModel {
 
 export interface HermesExecutorDescriptor {
   adapter: 'hermes';
+  executor_backend: 'hermes_agent';
+  execution_shape: 'agent_loop';
   requested_adapter: string;
   primary: true;
   execution_surface: 'hermes_backed_runtime_substrate';
@@ -69,6 +79,8 @@ export interface HermesExecutorDescriptor {
 
 export interface CodexExecutionModel {
   mainline_adapter: 'host_agent';
+  executor_backend: 'codex_cli';
+  execution_shape: 'structured_call';
   primary_surface: 'codex_native_host_agent';
   adapter_role: 'primary_creative_executor';
   runtime_substrate_owner: 'Codex CLI';
@@ -82,6 +94,8 @@ export interface CodexExecutionModel {
 
 export interface HermesNativeProofExecutionModel {
   mainline_adapter: 'hermes_native_proof';
+  executor_backend: 'hermes_agent';
+  execution_shape: 'agent_loop';
   primary_surface: 'hermes_native_full_agent_loop';
   adapter_role: 'opt_in_proof_executor';
   runtime_substrate_owner: 'Hermes';
@@ -95,6 +109,8 @@ export interface HermesNativeProofExecutionModel {
 
 export interface CodexExecutorDescriptor {
   adapter: 'host_agent';
+  executor_backend: 'codex_cli';
+  execution_shape: 'structured_call';
   requested_adapter: string;
   primary: true;
   execution_surface: 'codex_native_host_agent';
@@ -105,6 +121,8 @@ export interface CodexExecutorDescriptor {
 
 export interface HermesNativeProofExecutorDescriptor {
   adapter: 'hermes_native_proof';
+  executor_backend: 'hermes_agent';
+  execution_shape: 'agent_loop';
   requested_adapter: string;
   primary: false;
   execution_surface: 'hermes_native_full_agent_loop';
@@ -119,9 +137,12 @@ export {
   CODEX_DEFAULT_REASONING_SELECTION,
   CODEX_DEPLOYMENT_HOST,
   CODEX_DEPLOYMENT_STATUS,
+  CODEX_EXECUTOR_BACKEND,
   CODEX_FREEZE_ORIGIN,
   CODEX_RUNTIME_SURFACE,
+  AGENT_LOOP_EXECUTION_SHAPE,
   HERMES_DEFAULT_ADAPTER,
+  HERMES_AGENT_EXECUTOR_BACKEND,
   HERMES_DEPLOYMENT_HOST,
   HERMES_DEPLOYMENT_STATUS,
   HERMES_FREEZE_ORIGIN,
@@ -135,10 +156,12 @@ export {
   HERMES_RUNTIME_SURFACE,
   HERMES_SUBSTRATE_OWNER,
   RUNNING_RUN_STALE_TTL_MS,
+  STRUCTURED_CALL_EXECUTION_SHAPE,
   appendHermesEvent,
   buildCodexExecutionModel,
   buildCodexExecutorDescriptor,
   buildCodexRuntimeTopology,
+  buildExecutorBackendContract,
   buildHermesExecutionModel,
   buildHermesExecutorDescriptor,
   buildHermesNativeProofExecutionModel,
@@ -150,9 +173,11 @@ export {
   createHermesCreativeSource,
   createHermesReviewExecution,
   failHermesRun,
+  generateStructuredArtifactViaHermesAgentApi,
   generateStructuredArtifactViaHermesNativeProof,
   loadHermesRun,
   normalizeCodexAdapter,
+  normalizeExecutorBackend,
   normalizeHermesAdapter,
   probeHermesNativeProof,
   readHermesEvents,

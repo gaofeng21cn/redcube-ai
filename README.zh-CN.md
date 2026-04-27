@@ -67,6 +67,7 @@
 - direct route 与内部 OPL bridge 都收敛到同一个下游 RedCube domain-agent entry（`invokeDomainEntry` service-safe surface）。
 - `OPL` 只保留 family-level 的 session/runtime/projection 编排与 shared modules/contracts/indexes；它的 federated product-entry 路径只是内部集成面，不是第一公开主语。
 - 目标形态中的 `OPL Runtime Manager` 可以在外部 `Hermes-Agent` substrate 之上索引 RedCube product-entry/session/runtime/artifact/review projection，但 RedCube 继续持有 visual-domain truth。
+- RedCube 的 public executor backend contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 另行声明为 `structured_call` 或 `agent_loop`。
 - 实现语言目标是 `TypeScript + Python`：TypeScript 管 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
 - 内容界定、受众适配和最终采用由专家把关。
 - 外部发布、上传和最终对外交付由人工监督完成。

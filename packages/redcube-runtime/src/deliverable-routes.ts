@@ -3,6 +3,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 import {
   CODEX_DEFAULT_ADAPTER,
+  HERMES_AGENT_EXECUTOR_BACKEND,
+  HERMES_DEFAULT_ADAPTER,
   HERMES_NATIVE_PROOF_ADAPTER,
   appendHermesEvent,
   completeHermesRun,
@@ -57,11 +59,30 @@ function buildHermesNativeRuntimeDescriptor(hermesContract) {
   };
 }
 
+function buildHermesAgentRuntimeDescriptor(env = process.env) {
+  return {
+    owner: HERMES_AGENT_EXECUTOR_BACKEND,
+    adapter_surface: '@redcube/hermes-substrate',
+    api_surface: 'hermes_agent_api_server',
+    model_selection: 'hermes_agent_server_runtime',
+    reasoning_selection: 'hermes_agent_server_runtime',
+    model: String(env.REDCUBE_HERMES_AGENT_API_COMPAT_MODEL || 'redcube-api-compat').trim(),
+    base_url: String(env.REDCUBE_HERMES_AGENT_API_BASE_URL || '').trim() || null,
+    api_mode: 'agent_loop',
+  };
+}
+
 function buildExecutorDescriptor(executor, runtimeDescriptor) {
   if (executor?.adapter === HERMES_NATIVE_PROOF_ADAPTER) {
     return {
       ...(executor || {}),
       hermes_native_runtime: runtimeDescriptor,
+    };
+  }
+  if (executor?.adapter === HERMES_DEFAULT_ADAPTER || executor?.adapter === HERMES_AGENT_EXECUTOR_BACKEND) {
+    return {
+      ...(executor || {}),
+      hermes_agent_runtime: runtimeDescriptor,
     };
   }
   return {
@@ -82,6 +103,11 @@ function patchArtifactExecutionModel(artifactFile, executor) {
     ...(executor?.hermes_native_runtime
       ? {
           hermes_native_runtime: executor.hermes_native_runtime,
+        }
+      : {}),
+    ...(executor?.hermes_agent_runtime
+      ? {
+          hermes_agent_runtime: executor.hermes_agent_runtime,
         }
       : {}),
   };
@@ -189,7 +215,11 @@ export async function runDeliverableRoute({
   const fallbackExecutor = resolveExecutorAdapter({ adapter });
   const runtimeDescriptor = fallbackExecutor.adapter === HERMES_NATIVE_PROOF_ADAPTER
     ? buildHermesNativeRuntimeDescriptor(readHermesNativeProofContract({ cwd: workspaceRoot }))
-    : buildCodexRuntimeDescriptor(readCodexCliContract());
+    : (
+        fallbackExecutor.adapter === HERMES_DEFAULT_ADAPTER || fallbackExecutor.adapter === HERMES_AGENT_EXECUTOR_BACKEND
+          ? buildHermesAgentRuntimeDescriptor()
+          : buildCodexRuntimeDescriptor(readCodexCliContract())
+      );
   const executor = buildExecutorDescriptor(
     {
       adapter: fallbackExecutor.adapter,
@@ -217,7 +247,11 @@ export async function runDeliverableRoute({
   appendHermesEvent(workspaceRoot, run.run_id, {
     type: executor.adapter === HERMES_NATIVE_PROOF_ADAPTER
       ? 'hermes_native_route_started'
-      : 'codex_route_started',
+      : (
+          executor.adapter === HERMES_DEFAULT_ADAPTER || executor.adapter === HERMES_AGENT_EXECUTOR_BACKEND
+            ? 'hermes_agent_route_started'
+            : 'codex_route_started'
+        ),
     route: safeRoute,
     overlay,
     deliverable_id: deliverableId,
@@ -229,6 +263,11 @@ export async function runDeliverableRoute({
     ...(executor.hermes_native_runtime
       ? {
           hermes_native_runtime: executor.hermes_native_runtime,
+        }
+      : {}),
+    ...(executor.hermes_agent_runtime
+      ? {
+          hermes_agent_runtime: executor.hermes_agent_runtime,
         }
       : {}),
   });

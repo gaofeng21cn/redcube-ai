@@ -112,6 +112,7 @@ const INTEGRATION = [
   'tests/review-stage-concurrency.test.ts',
   'tests/screenshot-cache.test.ts',
   'tests/runtime-deliverable-route-recovery.test.ts',
+  'tests/rca-executor-backend-contract.test.ts',
   'tests/runtime-deliverable-route.test.ts',
   'tests/screenshot-review-ai-first.test.ts',
   'tests/service-safe-domain-entry.test.ts',

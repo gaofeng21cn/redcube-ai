@@ -57,6 +57,9 @@
 - `Hermes-Agent` 在本仓长线中优先承担 runtime substrate / orchestration owner。
 - `RedCube AI` 继续持有 visual deliverable 的 family/profile/pack authority、audit truth 与 executor routing。
 - 具体生成步骤允许继续通过 `Executor Adapter` 选择最合适的执行器；只有在拿到显式 proof 后，才允许把某条 route 迁到新的 executor。
+- executor backend 的 public contract 只冻结 `codex_cli` 与 `hermes_agent`；旧内部 `host_agent` / `hermes_native_proof` 只作为 adapter 兼容名映射到这两类 backend。
+- `execution_shape` 单独表达为 `structured_call` 或 `agent_loop`；`render_html` 默认 `structured_call`，`fix_html` 先结构化回修，复审仍阻断时最多升级一次 `hermes_agent + agent_loop`。
+- 本仓不维护 `simple_llm` 或 `openai_compatible_gateway` 作为一等 backend；不同 provider/model 适配交给外部 `Hermes-Agent` runtime 或相应 domain adapter proof。
 
 ## 2026-04-13
 
