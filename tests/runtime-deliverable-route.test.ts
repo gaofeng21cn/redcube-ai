@@ -23,6 +23,7 @@ import { completeSourceReadiness } from './helpers/complete-source-readiness.ts'
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([
   process.execPath,
+  '--experimental-strip-types',
   path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.ts'),
 ]);
 

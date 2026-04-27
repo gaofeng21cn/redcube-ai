@@ -77,6 +77,7 @@ const FAMILY = [
 
 const INTEGRATION = [
   'tests/block-content-fit-review.test.ts',
+  'tests/block-content-fit-review-surface-children.test.ts',
   'tests/cli-v2-smoke.test.ts',
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',

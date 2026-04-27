@@ -154,7 +154,7 @@ export function buildMockCodexLastMessage(prompt) {
 
 export async function startMockCodexCli() {
   return {
-    command: JSON.stringify(['node', path.join(MODULE_DIR, 'mock-codex-cli-bin.ts')]),
+    command: JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'mock-codex-cli-bin.ts')]),
     async close() {},
   };
 }

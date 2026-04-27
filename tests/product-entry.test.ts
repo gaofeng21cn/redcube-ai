@@ -26,9 +26,11 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
-  new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url),
-);
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+]);
 const GATEWAY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-gateway/package.json', import.meta.url),
 );

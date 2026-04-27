@@ -43,6 +43,25 @@ function safeText(value: unknown): string {
   return String(value || '').trim();
 }
 
+function parseExplicitPythonCommand(value: string): Pick<ResolvedRedCubePythonCommand, 'command' | 'args'> {
+  const raw = safeText(value);
+  if (raw.startsWith('[')) {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      throw new Error(`${REDCUBE_PYTHON_COMMAND_ENV} 若使用 JSON array，必须是非空字符串数组`);
+    }
+    const command = parsed.map((item) => safeText(item)).filter(Boolean);
+    if (command.length === 0) {
+      throw new Error(`${REDCUBE_PYTHON_COMMAND_ENV} 解析后不能为空`);
+    }
+    return {
+      command: command[0],
+      args: command.slice(1),
+    };
+  }
+  return { command: raw };
+}
+
 function isJsonRecord(value: unknown): value is JsonRecord {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
@@ -274,7 +293,7 @@ export function resolveRedCubePythonCommand({
   const explicitCommand = safeText(env?.[REDCUBE_PYTHON_COMMAND_ENV]);
   if (explicitCommand) {
     return {
-      command: explicitCommand,
+      ...parseExplicitPythonCommand(explicitCommand),
       source: 'env',
     };
   }

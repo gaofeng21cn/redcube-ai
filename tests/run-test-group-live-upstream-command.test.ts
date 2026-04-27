@@ -158,6 +158,22 @@ test('run-test-group resolves an explicit Python command for screenshot review a
 
   assert.deepEqual(
     resolveRedCubePythonCommand({
+      env: {
+        REDCUBE_PYTHON_COMMAND: '["node","--experimental-strip-types","/tmp/mock-redcube-python.ts"]',
+      },
+      spawnSyncImpl() {
+        throw new Error('should not probe when REDCUBE_PYTHON_COMMAND is explicit');
+      },
+    }),
+    {
+      command: 'node',
+      args: ['--experimental-strip-types', '/tmp/mock-redcube-python.ts'],
+      source: 'env',
+    },
+  );
+
+  assert.deepEqual(
+    resolveRedCubePythonCommand({
       env: {},
       spawnSyncImpl(command, args) {
         if (command === 'python3') {

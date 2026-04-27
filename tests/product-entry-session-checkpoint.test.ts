@@ -17,9 +17,11 @@ import {
 } from './helpers/mock-codex-cli.ts';
 
 const SERIAL_ENV_TEST = { concurrency: false };
-const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
-  new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url),
-);
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

@@ -29,11 +29,8 @@ import {
 } from './helpers/mock-codex-cli.ts';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([
-  process.execPath,
-  path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.ts'),
-]);
-const MOCK_REDCUBE_PYTHON_COMMAND = path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.ts');
+const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.ts')]);
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.ts')]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

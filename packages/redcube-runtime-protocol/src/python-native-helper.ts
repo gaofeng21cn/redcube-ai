@@ -126,7 +126,7 @@ export function runRedCubePythonHelper(
     env: options.env,
     spawnSyncImpl,
   });
-  const result = spawnSyncImpl(pythonCommand.command, [...invocation.argv, ...args], {
+  const result = spawnSyncImpl(pythonCommand.command, [...(pythonCommand.args || []), ...invocation.argv, ...args], {
     encoding: 'utf-8',
     env: invocation.env,
     maxBuffer: options.maxBuffer || 16 * 1024 * 1024,

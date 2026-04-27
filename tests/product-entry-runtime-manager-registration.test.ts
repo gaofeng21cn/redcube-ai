@@ -13,9 +13,11 @@ import {
   withEnv,
 } from './helpers/mock-codex-cli.ts';
 
-const MOCK_REDCUBE_PYTHON_COMMAND = fileURLToPath(
-  new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url),
-);
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+]);
 
 async function withMockRuntime(testFn) {
   const upstream = await startMockCodexCli();
