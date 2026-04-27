@@ -813,11 +813,9 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                         }}
                         return failures;
                       }};
-                      const leafFailures = leafBlocks.flatMap((node, index) => {{
-                        const blockId = node.getAttribute('data-qa-block') || `block-${{index + 1}}`;
-                        const auditTargets = collectAuditTargets(node);
-                        return [
-                          ...auditTargets.map((target) => {{
+                      const collectTextOverflowFailures = (blockId, targets) => {{
+                        const failures = [];
+                        for (const target of targets.filter((node) => node instanceof Element && isVisibleElement(node))) {{
                           const targetRect = target.getBoundingClientRect();
                           const targetRelative = rectRelativeToBounds(targetRect, bounds);
                           const textRects = [];
@@ -839,27 +837,35 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                               textRects.push(rectRelativeToBounds(rect, bounds));
                             }}
                           }}
-                          if (textRects.length === 0) return null;
+                          if (textRects.length === 0) continue;
                           const overflowSides = [];
                           if (textRects.some((rect) => rect.left < targetRelative.left - tolerance)) overflowSides.push('left');
                           if (textRects.some((rect) => rect.top < targetRelative.top - tolerance)) overflowSides.push('top');
                           if (textRects.some((rect) => rect.right > targetRelative.right + tolerance)) overflowSides.push('right');
                           if (textRects.some((rect) => rect.bottom > targetRelative.bottom + tolerance)) overflowSides.push('bottom');
-                          if (overflowSides.length === 0) {{
-                            return null;
-                          }}
-                          return {{
+                          if (overflowSides.length === 0) continue;
+                          failures.push({{
                             block_id: blockId,
                             target_tag: target.tagName.toLowerCase(),
                             overflow_sides: Array.from(new Set(overflowSides)),
                             scroll_overflow_x: (target.scrollWidth || 0) > (target.clientWidth || 0) + 1,
                             scroll_overflow_y: (target.scrollHeight || 0) > (target.clientHeight || 0) + 1,
                             block_rect: targetRelative,
+                            overflow_reason: 'block_text_overflow',
                             text_rect_count: textRects.length,
                             max_text_right: round(Math.max(...textRects.map((rect) => rect.right))),
                             max_text_bottom: round(Math.max(...textRects.map((rect) => rect.bottom))),
-                          }};
-                          }}).filter(Boolean),
+                          }});
+                        }}
+                        return failures;
+                      }};
+                      const collectLocalGroupAuditTargets = (groupNode) => collectAuditTargets(groupNode)
+                        .filter((target) => target === groupNode || target.closest('[data-qa-block]') === groupNode);
+                      const leafFailures = leafBlocks.flatMap((node, index) => {{
+                        const blockId = node.getAttribute('data-qa-block') || `block-${{index + 1}}`;
+                        const auditTargets = collectAuditTargets(node);
+                        return [
+                          ...collectTextOverflowFailures(blockId, auditTargets),
                           ...collectSurfaceTargetFailures(blockId, auditTargets),
                         ];
                       }});
@@ -870,18 +876,24 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                           .filter((child) => child !== node && isVisibleElement(child));
                         const contentRect = buildRelativeRectFromNodes(descendantBlocks);
                         const overflowSides = overflowSidesForRects(contentRect, groupRect);
-                        if (overflowSides.length === 0) return [];
-                        return [{{
-                          block_id: groupId,
-                          target_tag: node.tagName.toLowerCase(),
-                          overflow_sides: overflowSides,
-                          scroll_overflow_x: false,
-                          scroll_overflow_y: false,
-                          block_rect: groupRect,
-                          content_rect: contentRect,
-                          overflow_reason: 'parent_group_frame_overflow',
-                          child_block_count: descendantBlocks.length,
-                        }}];
+                        const failures = [];
+                        if (overflowSides.length > 0) {{
+                          failures.push({{
+                            block_id: groupId,
+                            target_tag: node.tagName.toLowerCase(),
+                            overflow_sides: overflowSides,
+                            scroll_overflow_x: false,
+                            scroll_overflow_y: false,
+                            block_rect: groupRect,
+                            content_rect: contentRect,
+                            overflow_reason: 'parent_group_frame_overflow',
+                            child_block_count: descendantBlocks.length,
+                          }});
+                        }}
+                        const localTargets = collectLocalGroupAuditTargets(node);
+                        failures.push(...collectTextOverflowFailures(groupId, localTargets));
+                        failures.push(...collectSurfaceTargetFailures(groupId, localTargets));
+                        return failures;
                       }});
                       const failures = [
                         ...leafFailures,

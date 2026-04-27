@@ -28,7 +28,7 @@ export const STAGE_REQUIREMENTS = Object.freeze({
 });
 
 export const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
-export const SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v2:surface-target-audit';
+export const SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit';
 export const RENDER_HTML_BATCH_SIZE = 6;
 export const TARGETED_RENDER_HTML_BATCH_SIZE = 1;
 export const SCREENSHOT_REVIEW_BATCH_SIZE = 3;

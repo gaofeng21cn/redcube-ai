@@ -24,7 +24,7 @@ export function createPptDeckStageParts(deps) {
     PYTHON_REVIEW,
     RENDER_HTML_BATCH_SIZE,
     RENDER_REFERENCE_SLIDE_WINDOW,
-    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v2:surface-target-audit',
+    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit',
     SCREENSHOT_REVIEW_BATCH_SIZE,
     TARGETED_RENDER_HTML_BATCH_SIZE,
     aiFirstMechanicalCheckValue,

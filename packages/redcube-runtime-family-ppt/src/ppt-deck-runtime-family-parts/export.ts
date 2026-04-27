@@ -68,7 +68,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     CODEX_DEFAULT_ADAPTER,
     PYTHON_EXPORT,
     PYTHON_NATIVE,
-    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v2:surface-target-audit',
+    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit',
     attachCommon,
     ensureDir,
     existsSync: mainExistsSync,
