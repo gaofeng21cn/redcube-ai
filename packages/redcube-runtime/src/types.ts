@@ -299,6 +299,10 @@ export interface RuntimeRunRouteRequest {
   runId?: string | null;
   managedRunId?: string | null;
   adapter?: string;
+  executorBackend?: 'codex_cli' | 'hermes_agent';
+  executor_backend?: 'codex_cli' | 'hermes_agent';
+  oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
+  opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   mode?: string;
   baselineDeliverableId?: string;

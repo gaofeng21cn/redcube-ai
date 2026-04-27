@@ -174,6 +174,7 @@ export {
   createHermesReviewExecution,
   failHermesRun,
   generateStructuredArtifactViaHermesAgentApi,
+  generateStructuredArtifactViaHermesAgentStructuredCall,
   generateStructuredArtifactViaHermesNativeProof,
   loadHermesRun,
   normalizeCodexAdapter,

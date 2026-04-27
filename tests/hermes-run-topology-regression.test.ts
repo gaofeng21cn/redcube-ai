@@ -10,6 +10,7 @@ import {
   buildCodexExecutorDescriptor,
   completeHermesRun,
   failHermesRun,
+  generateStructuredArtifactViaHermesAgentStructuredCall,
   runAgentLoopViaHermesAgentApi,
   startHermesRun,
   structuredCallViaHermesAgentApi,
@@ -40,6 +41,7 @@ async function startMockHermesAgentApiServer() {
         id: 'chatcmpl-mock-1',
         provider: 'mock-hermes-provider',
         model: 'server-selected-model',
+        hermes_profile: body.hermes_profile || body.metadata?.hermes_profile || null,
         session_id: 'session-chat-1',
         run_id: 'run-chat-1',
         choices: [
@@ -61,6 +63,7 @@ async function startMockHermesAgentApiServer() {
         id: 'run-agent-1',
         provider: 'mock-hermes-provider',
         model: 'server-selected-agent-loop-model',
+        hermes_profile: body.hermes_profile || body.metadata?.hermes_profile || null,
         session_id: 'session-agent-1',
         run_id: 'run-agent-1',
         output: {
@@ -181,6 +184,47 @@ test('Hermes-Agent API structured_call posts chat completions and records server
     assert.equal(server.requests[0].method, 'POST');
     assert.equal(server.requests[0].url, '/v1/chat/completions');
     assert.equal(server.requests[0].body.model, 'caller-compat-model');
+  } finally {
+    await server.close();
+  }
+});
+
+test('Hermes-Agent artifact structured_call uses chat completions and records selected profile proof', async () => {
+  const server = await startMockHermesAgentApiServer();
+  try {
+    const result = await generateStructuredArtifactViaHermesAgentStructuredCall({
+      family: 'ppt_deck',
+      route: 'render_html',
+      promptRelativePath: 'prompts/ppt_deck/render_html.md',
+      context: {
+        title: 'profile routed structured call',
+      },
+      outputContract: {
+        type: 'object',
+      },
+      hermesProfile: 'huawei-deepseek-v4-flash',
+      env: {
+        REDCUBE_HERMES_AGENT_API_BASE_URL: server.baseUrl,
+        REDCUBE_HERMES_AGENT_API_COMPAT_MODEL: 'caller-compat-model',
+      },
+    });
+
+    assert.deepEqual(result.data, {
+      ok: true,
+      route: 'structured_call',
+    });
+    assert.equal(result.generationRuntime.execution_model.execution_shape, 'structured_call');
+    assert.equal(result.generationRuntime.proof.endpoint, '/v1/chat/completions');
+    assert.equal(result.generationRuntime.proof.request_model_role, 'api_compatibility_only');
+    assert.equal(result.generationRuntime.proof.hermes_profile, 'huawei-deepseek-v4-flash');
+    assert.equal(result.generationRuntime.hermes_profile, 'huawei-deepseek-v4-flash');
+    assert.deepEqual(
+      server.requests.map((entry) => `${entry.method} ${entry.url}`),
+      ['POST /v1/chat/completions'],
+    );
+    assert.equal(server.requests[0].body.model, 'caller-compat-model');
+    assert.equal(server.requests[0].body.hermes_profile, 'huawei-deepseek-v4-flash');
+    assert.equal(server.requests[0].body.metadata.execution_shape, 'structured_call');
   } finally {
     await server.close();
   }

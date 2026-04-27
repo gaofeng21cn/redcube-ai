@@ -506,6 +506,7 @@ export {
 } from './hermes-native-proof-client.js';
 export {
   generateStructuredArtifactViaHermesAgentApi,
+  generateStructuredArtifactViaHermesAgentStructuredCall,
   runAgentLoopViaHermesAgentApi,
   structuredCallViaHermesAgentApi,
 } from './hermes-agent-api-client.js';

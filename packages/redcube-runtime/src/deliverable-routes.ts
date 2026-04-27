@@ -1,4 +1,5 @@
 // @ts-nocheck
+import path from 'node:path';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import {
@@ -15,6 +16,8 @@ import {
 } from '@redcube/hermes-substrate';
 
 import { readCodexCliContract } from '@redcube/codex-cli-client';
+import { resolveExecutorRouting } from '@redcube/redcube-config';
+import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { runCandidateRaceRoute } from './candidate-racing.js';
 import { executeDeliverableRouteLocally, validateDeliverableRouteInput } from './deliverable-route-local.js';
 import { resolveExecutorAdapter } from './executors.js';
@@ -59,7 +62,7 @@ function buildHermesNativeRuntimeDescriptor(hermesContract) {
   };
 }
 
-function buildHermesAgentRuntimeDescriptor(env = process.env) {
+function buildHermesAgentRuntimeDescriptor(env = process.env, executionShape = 'agent_loop', hermesProfile = null) {
   return {
     owner: HERMES_AGENT_EXECUTOR_BACKEND,
     adapter_surface: '@redcube/hermes-substrate',
@@ -68,7 +71,8 @@ function buildHermesAgentRuntimeDescriptor(env = process.env) {
     reasoning_selection: 'hermes_agent_server_runtime',
     model: String(env.REDCUBE_HERMES_AGENT_API_COMPAT_MODEL || 'redcube-api-compat').trim(),
     base_url: String(env.REDCUBE_HERMES_AGENT_API_BASE_URL || '').trim() || null,
-    api_mode: 'agent_loop',
+    hermes_profile: String(hermesProfile || '').trim() || null,
+    api_mode: executionShape === 'structured_call' ? 'structured_call' : 'agent_loop',
   };
 }
 
@@ -120,6 +124,14 @@ function candidateCountForRoute({ route, candidateCount }) {
   return route === 'visual_direction' && process.env.REDCUBE_VISUAL_DIRECTION_CANDIDATES
     ? Math.max(1, Number(process.env.REDCUBE_VISUAL_DIRECTION_CANDIDATES) || 1)
     : 1;
+}
+
+function readHydratedContractProfileId({ workspaceRoot, topicId, deliverableId }) {
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
+  const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
+  const hydratedContract = JSON.parse(readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'));
+  return String(hydratedContract.profile_id || deliverable.profile_id || '').trim() || null;
 }
 
 function compactArray(value) {
@@ -191,7 +203,8 @@ function buildRoutePromptTelemetry(routeResult = {}) {
   };
 }
 
-export async function runDeliverableRoute({
+export async function runDeliverableRoute(request) {
+  const {
   workspaceRoot,
   overlay,
   topicId,
@@ -203,7 +216,7 @@ export async function runDeliverableRoute({
   mode = 'draft_new',
   baselineDeliverableId = '',
   candidateCount = 1,
-}) {
+  } = request;
   const safeRoute = requireSafeSegment('route', route);
   validateDeliverableRouteInput({
     workspaceRoot,
@@ -212,12 +225,30 @@ export async function runDeliverableRoute({
     deliverableId,
     route: safeRoute,
   });
-  const fallbackExecutor = resolveExecutorAdapter({ adapter });
+  const requestHasExplicitAdapter = Object.prototype.hasOwnProperty.call(request, 'adapter')
+    && String(request.adapter || '').trim();
+  const profileId = readHydratedContractProfileId({ workspaceRoot, topicId, deliverableId });
+  const executorRouting = resolveExecutorRouting({
+    family: overlay,
+    profileId,
+    route: safeRoute,
+    requestAdapter: requestHasExplicitAdapter ? adapter : null,
+    requestExecutorBackend: request.executorBackend || request.executor_backend || null,
+    oplDefaultExecutorBackend: request.oplDefaultExecutorBackend || request.opl_default_executor_backend || null,
+  });
+  const selectedExecutor = executorRouting.selected_executor;
+  const fallbackExecutor = resolveExecutorAdapter({
+    adapter: selectedExecutor.adapter,
+    executorBackend: selectedExecutor.executor_backend,
+    executionShape: selectedExecutor.execution_shape,
+    hermesProfile: selectedExecutor.hermes_profile,
+    executorRouting,
+  });
   const runtimeDescriptor = fallbackExecutor.adapter === HERMES_NATIVE_PROOF_ADAPTER
     ? buildHermesNativeRuntimeDescriptor(readHermesNativeProofContract({ cwd: workspaceRoot }))
     : (
         fallbackExecutor.adapter === HERMES_DEFAULT_ADAPTER || fallbackExecutor.adapter === HERMES_AGENT_EXECUTOR_BACKEND
-          ? buildHermesAgentRuntimeDescriptor()
+          ? buildHermesAgentRuntimeDescriptor(process.env, selectedExecutor.execution_shape, selectedExecutor.hermes_profile)
           : buildCodexRuntimeDescriptor(readCodexCliContract())
       );
   const executor = buildExecutorDescriptor(
@@ -285,7 +316,11 @@ export async function runDeliverableRoute({
         topicId,
         deliverableId,
         route: safeRoute,
-        adapter, userIntent,
+        adapter: selectedExecutor.adapter,
+        executionShape: selectedExecutor.execution_shape,
+        hermesProfile: selectedExecutor.hermes_profile,
+        executorRouting,
+        userIntent,
         mode,
         baselineDeliverableId,
       }),

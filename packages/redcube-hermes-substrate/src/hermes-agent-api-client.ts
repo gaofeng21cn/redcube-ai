@@ -64,6 +64,8 @@ export interface GenerateStructuredArtifactViaHermesAgentApiRequest {
   env?: NodeJS.ProcessEnv;
   localFileInspection?: unknown[];
   fetchImpl?: FetchLike;
+  hermesProfile?: unknown;
+  executorRouting?: unknown;
 }
 
 function isJsonRecord(value: unknown): value is JsonRecord {
@@ -180,12 +182,14 @@ function buildProof({
   endpoint,
   response,
   requestedModel,
+  hermesProfile = null,
   runEvents = [],
 }: {
   callSurface: 'structured_call' | 'agent_loop';
   endpoint: string;
   response: JsonRecord;
   requestedModel: string;
+  hermesProfile?: string | null;
   runEvents?: unknown[];
 }) {
   return {
@@ -200,6 +204,7 @@ function buildProof({
     requested_model: requestedModel,
     request_model_role: 'api_compatibility_only',
     model_selection_basis: 'hermes_agent_server_runtime',
+    hermes_profile: optionalText(response.hermes_profile || response.profile) || optionalText(hermesProfile),
     session_id: optionalText(response.session_id),
     run_id: optionalText(response.run_id),
     run_events: runEvents,
@@ -277,7 +282,7 @@ function payloadFromHermesAgentOutput(output: unknown): JsonRecord {
     ? output.payload
     : output;
   if (!isJsonRecord(payload)) {
-    throw new Error('Hermes-Agent agent_loop returned no structured artifact payload');
+    throw new Error('Hermes-Agent returned no structured artifact payload');
   }
   return payload;
 }
@@ -302,6 +307,7 @@ export async function structuredCallViaHermesAgentApi({
     path: CHAT_COMPLETIONS_PATH,
     body: {
       model: requestedModel,
+      ...(optionalText(metadata.hermes_profile) ? { hermes_profile: optionalText(metadata.hermes_profile) } : {}),
       messages,
       response_format: responseFormat,
       metadata,
@@ -317,6 +323,7 @@ export async function structuredCallViaHermesAgentApi({
     endpoint: CHAT_COMPLETIONS_PATH,
     response,
     requestedModel,
+    hermesProfile: optionalText(metadata.hermes_profile),
   });
   return {
     data: parseStructuredContent(response),
@@ -340,6 +347,7 @@ export async function runAgentLoopViaHermesAgentApi({
     path: RUNS_PATH,
     body: {
       model: requestedModel,
+      ...(optionalText(metadata.hermes_profile) ? { hermes_profile: optionalText(metadata.hermes_profile) } : {}),
       input,
       metadata,
     },
@@ -368,7 +376,125 @@ export async function runAgentLoopViaHermesAgentApi({
       endpoint: `${RUNS_PATH} -> ${eventsEndpoint}`,
       response: runResponse,
       requestedModel,
+      hermesProfile: optionalText(metadata.hermes_profile),
       runEvents,
+    }),
+  };
+}
+
+function buildGenerationMessages(prompt: string): Array<{ role: string; content: string }> {
+  return [
+    {
+      role: 'system',
+      content: 'You are RedCube AI structured_call runtime. Return only valid JSON that satisfies the requested output contract.',
+    },
+    {
+      role: 'user',
+      content: prompt,
+    },
+  ];
+}
+
+function buildGenerationRuntime({
+  proof,
+  promptRelativePath,
+  executionShape,
+  hermesProfile,
+  route,
+  executorRouting,
+}: {
+  proof: JsonRecord;
+  promptRelativePath: string;
+  executionShape: 'structured_call' | 'agent_loop';
+  hermesProfile?: string | null;
+  route?: string | null;
+  executorRouting?: unknown;
+}) {
+  return {
+    owner: 'hermes_agent',
+    adapter_surface: '@redcube/hermes-substrate',
+    api_surface: HERMES_AGENT_API_SURFACE,
+    run_id: safeText(proof.run_id, `hermes-agent-${randomUUID()}`),
+    session_id: safeText(proof.session_id) || null,
+    model_selection: 'hermes_agent_server_runtime',
+    reasoning_selection: 'hermes_agent_server_runtime',
+    model: safeText(proof.model),
+    provider: safeText(proof.provider),
+    hermes_profile: safeText(proof.hermes_profile || hermesProfile) || null,
+    api_mode: 'hermes_agent_api_server',
+    prompt_pack_file: promptRelativePath,
+    proof,
+    ...(executorRouting ? { executor_routing: executorRouting } : {}),
+    creative_owner: 'hermes_agent',
+    primary_surface: HERMES_AGENT_API_SURFACE,
+    execution_model: {
+      mainline_adapter: 'hermes_agent',
+      executor_backend: 'hermes_agent',
+      execution_shape: executionShape,
+      primary_surface: HERMES_AGENT_API_SURFACE,
+      adapter_role: 'primary_creative_executor',
+      runtime_substrate_owner: 'Hermes-Agent',
+      deployment_host: 'external_hermes_agent_api_server',
+      deployment_host_status: 'explicit_runtime_switch',
+      requested_adapter: 'hermes_agent',
+      route: safeText(route) || null,
+      hermes_profile: safeText(proof.hermes_profile || hermesProfile) || null,
+      freeze_origin_milestone: 'Hermes.API.A',
+    },
+  };
+}
+
+export async function generateStructuredArtifactViaHermesAgentStructuredCall({
+  family,
+  route,
+  promptRelativePath,
+  context,
+  outputContract,
+  timeoutMs,
+  env = process.env,
+  localFileInspection = [],
+  fetchImpl,
+  hermesProfile = null,
+  executorRouting = null,
+}: GenerateStructuredArtifactViaHermesAgentApiRequest) {
+  const safeFamily = safeText(family, 'unknown_family');
+  const safeRoute = safeText(route, 'unknown_route');
+  const safePromptRelativePath = requireText('Hermes-Agent promptRelativePath', promptRelativePath);
+  const api = resolveHermesAgentApiOptions(env);
+  const profile = optionalText(hermesProfile);
+  const prompt = buildGenerationPrompt({
+    family: safeFamily,
+    route: safeRoute,
+    promptRelativePath: safePromptRelativePath,
+    context,
+    outputContract,
+    localFileInspection,
+  });
+  const result = await structuredCallViaHermesAgentApi({
+    ...api,
+    messages: buildGenerationMessages(prompt),
+    responseFormat: { type: 'json_object' },
+    metadata: {
+      family: safeFamily,
+      route: safeRoute,
+      execution_shape: 'structured_call',
+      prompt_relative_path: safePromptRelativePath,
+      ...(profile ? { hermes_profile: profile } : {}),
+      ...(executorRouting ? { executor_routing: executorRouting } : {}),
+    },
+    fetchImpl,
+    timeoutMs,
+  });
+  const proof = result.proof as JsonRecord;
+  return {
+    data: payloadFromHermesAgentOutput(result.data),
+    generationRuntime: buildGenerationRuntime({
+      proof,
+      promptRelativePath: safePromptRelativePath,
+      executionShape: 'structured_call',
+      hermesProfile: profile,
+      route: safeRoute,
+      executorRouting,
     }),
   };
 }
@@ -383,6 +509,8 @@ export async function generateStructuredArtifactViaHermesAgentApi({
   env = process.env,
   localFileInspection = [],
   fetchImpl,
+  hermesProfile = null,
+  executorRouting = null,
 }: GenerateStructuredArtifactViaHermesAgentApiRequest) {
   const safeFamily = safeText(family, 'unknown_family');
   const safeRoute = safeText(route, 'unknown_route');
@@ -411,6 +539,8 @@ export async function generateStructuredArtifactViaHermesAgentApi({
       route: safeRoute,
       execution_shape: 'agent_loop',
       prompt_relative_path: safePromptRelativePath,
+      ...(optionalText(hermesProfile) ? { hermes_profile: optionalText(hermesProfile) } : {}),
+      ...(executorRouting ? { executor_routing: executorRouting } : {}),
     },
     fetchImpl,
     timeoutMs,
@@ -418,33 +548,13 @@ export async function generateStructuredArtifactViaHermesAgentApi({
   const proof = result.proof as JsonRecord;
   return {
     data: payloadFromHermesAgentOutput(result.data),
-    generationRuntime: {
-      owner: 'hermes_agent',
-      adapter_surface: '@redcube/hermes-substrate',
-      api_surface: HERMES_AGENT_API_SURFACE,
-      run_id: safeText(proof.run_id, `hermes-agent-${randomUUID()}`),
-      session_id: safeText(proof.session_id) || null,
-      model_selection: 'hermes_agent_server_runtime',
-      reasoning_selection: 'hermes_agent_server_runtime',
-      model: safeText(proof.model),
-      provider: safeText(proof.provider),
-      api_mode: 'hermes_agent_api_server',
-      prompt_pack_file: safePromptRelativePath,
+    generationRuntime: buildGenerationRuntime({
       proof,
-      creative_owner: 'hermes_agent',
-      primary_surface: HERMES_AGENT_API_SURFACE,
-      execution_model: {
-        mainline_adapter: 'hermes',
-        executor_backend: 'hermes_agent',
-        execution_shape: 'agent_loop',
-        primary_surface: HERMES_AGENT_API_SURFACE,
-        adapter_role: 'primary_creative_executor',
-        runtime_substrate_owner: 'Hermes-Agent',
-        deployment_host: 'external_hermes_agent_api_server',
-        deployment_host_status: 'explicit_runtime_switch',
-        requested_adapter: 'hermes_agent',
-        freeze_origin_milestone: 'Hermes.API.A',
-      },
-    },
+      promptRelativePath: safePromptRelativePath,
+      executionShape: 'agent_loop',
+      hermesProfile: optionalText(hermesProfile),
+      route: safeRoute,
+      executorRouting,
+    }),
   };
 }

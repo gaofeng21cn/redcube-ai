@@ -95,6 +95,10 @@ export async function runPptDeckRoute({
   mode = 'draft_new',
   baselineDeliverableId = '',
   adapter = CODEX_DEFAULT_ADAPTER,
+  executor = null,
+  executionShape = executor?.execution_shape,
+  hermesProfile = executor?.hermes_profile || null,
+  executorRouting = executor?.executor_routing || null,
 }) {
   ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
@@ -159,7 +163,16 @@ export async function runPptDeckRoute({
       break;
     }
     case 'render_html':
-      payload = await buildRenderHtmlArtifact({ workspaceRoot, deliverableId, contract, deliverablePaths, adapter });
+      payload = await buildRenderHtmlArtifact({
+        workspaceRoot,
+        deliverableId,
+        contract,
+        deliverablePaths,
+        adapter,
+        executionShape,
+        hermesProfile,
+        executorRouting,
+      });
       break;
     case 'author_pptx_native':
       payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
@@ -172,6 +185,9 @@ export async function runPptDeckRoute({
         deliverablePaths,
         route: PAGE_FIX_ROUTE,
         adapter,
+        executionShape,
+        hermesProfile,
+        executorRouting,
       });
       break;
     case 'repair_pptx_native':

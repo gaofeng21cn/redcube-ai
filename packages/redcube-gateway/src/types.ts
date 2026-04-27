@@ -1171,6 +1171,10 @@ export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
 export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayRequest {
   route: string;
   adapter?: string;
+  executorBackend?: 'codex_cli' | 'hermes_agent';
+  executor_backend?: 'codex_cli' | 'hermes_agent';
+  oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
+  opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   managedRunId?: string | null;
   stopAfterStage?: string;

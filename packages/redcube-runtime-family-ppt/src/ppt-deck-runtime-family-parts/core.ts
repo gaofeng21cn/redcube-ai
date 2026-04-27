@@ -27,6 +27,7 @@ import {
   buildHermesExecutionModel,
   buildHermesNativeProofExecutionModel,
   generateStructuredArtifactViaHermesAgentApi,
+  generateStructuredArtifactViaHermesAgentStructuredCall,
   generateStructuredArtifactViaHermesNativeProof,
 } from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
@@ -40,6 +41,7 @@ import { createPptDeckAuthoringParts } from './authoring.js';
 import { createPptDeckStageParts } from './stages.js';
 import { createPptDeckSurfaceParts } from './surface.js';
 import { createPptDeckCoreHelpers } from './core-helpers.js';
+import { createStructuredArtifactExecutor } from './executor-routing.js';
 import {
   ALLOWED_RECIPE_IDS,
   BANNED_RENDER_TOKENS,
@@ -198,7 +200,7 @@ export function createPptDeckRuntimeCore() {
       'page_number_consistency_ok',
     ].includes(check));
   }
-  
+
   function deriveProfileChecks(contract, blueprintArtifact, storylineArtifact) {
     const slides = safeArray(blueprintArtifact?.slide_blueprint?.slides);
     const pageTypes = slides.map((slide) => slide.page_type);
@@ -311,29 +313,37 @@ export function createPptDeckRuntimeCore() {
       ? 'hermes_native_full_agent_loop'
       : 'codex_native_host_agent';
   }
-  
-  async function generateStructuredArtifact({
-    adapter = CODEX_DEFAULT_ADAPTER,
-    ...input
-  }) {
-    if (isHermesAgentAdapter(adapter)) {
-      return generateStructuredArtifactViaHermesAgentApi(input);
-    }
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-      return generateStructuredArtifactViaHermesNativeProof(input);
-    }
-    return generateStructuredArtifactViaCodexCli(input);
-  }
+
+  const generateStructuredArtifact = createStructuredArtifactExecutor({
+    CODEX_DEFAULT_ADAPTER,
+    HERMES_AGENT_EXECUTOR_BACKEND,
+    HERMES_NATIVE_PROOF_ADAPTER,
+    generateStructuredArtifactViaCodexCli,
+    generateStructuredArtifactViaHermesAgentApi,
+    generateStructuredArtifactViaHermesAgentStructuredCall,
+    generateStructuredArtifactViaHermesNativeProof,
+    isHermesAgentAdapter,
+    safeText,
+  });
 
   async function generateStructuredArtifactBatch({
     adapter = CODEX_DEFAULT_ADAPTER,
     stages = [],
+    executionShape = null,
+    hermesProfile = null,
+    executorRouting = null,
     ...input
   }) {
     if (isHermesAgentAdapter(adapter)) {
       const data = [];
       for (const stage of stages) {
-        const result = await generateStructuredArtifactViaHermesAgentApi(stage);
+        const result = await generateStructuredArtifact({
+          adapter,
+          executionShape,
+          hermesProfile,
+          executorRouting,
+          ...stage,
+        });
         data.push({
           stage_id: safeText(stage?.stage_id),
           data: result.data,

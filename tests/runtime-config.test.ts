@@ -5,7 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 
-import { loadRuntimeConfig } from '@redcube/redcube-config';
+import {
+  loadExecutorRoutingConfig,
+  loadRuntimeConfig,
+  resolveExecutorRouting,
+} from '@redcube/redcube-config';
 
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -164,6 +168,123 @@ test('loadRuntimeConfig prefers repo-local private config over user-global confi
 
     assert.equal(resolved.promptsDir, path.join(repoRoot, 'config', 'local', 'prompts-local'));
     assert.equal(resolved.sources.promptsDir, path.join(repoRoot, 'config', 'local', 'runtime.json'));
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test('resolveExecutorRouting keeps built-in default on Codex CLI when no config exists', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  try {
+    const resolved = resolveExecutorRouting({
+      cwd: repoRoot,
+      homeDir: path.join(repoRoot, 'missing-home'),
+      env: {},
+      family: 'ppt_deck',
+      profileId: 'lecture_peer',
+      route: 'render_html',
+    });
+
+    assert.equal(resolved.effective_default_executor.executor_backend, 'codex_cli');
+    assert.equal(resolved.effective_default_executor.source, 'domain_builtin_default');
+    assert.equal(resolved.selected_executor.executor_backend, 'codex_cli');
+    assert.equal(resolved.selected_executor.execution_shape, 'structured_call');
+    assert.equal(resolved.structured_call_routing.enabled, false);
+    assert.equal(resolved.matched_route_key, null);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test('resolveExecutorRouting honors OPL default executor before domain local default', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  const homeDir = path.join(repoRoot, 'fake-home');
+
+  writeJson(path.join(homeDir, '.codex', 'projects', 'redcube-ai', 'runtime-state', 'config', 'executor-routing.json'), {
+    schema_version: 1,
+    default_executor: {
+      executor_backend: 'codex_cli',
+      execution_shape: 'structured_call',
+    },
+  });
+
+  try {
+    const resolved = resolveExecutorRouting({
+      cwd: repoRoot,
+      homeDir,
+      env: {
+        REDCUBE_OPL_DEFAULT_EXECUTOR_BACKEND: 'hermes_agent',
+      },
+      family: 'ppt_deck',
+      profileId: 'lecture_peer',
+      route: 'render_html',
+    });
+
+    assert.equal(resolved.effective_default_executor.executor_backend, 'hermes_agent');
+    assert.equal(resolved.effective_default_executor.execution_shape, 'agent_loop');
+    assert.equal(resolved.effective_default_executor.source, 'opl_runtime_manager_default_executor');
+    assert.equal(resolved.selected_executor.executor_backend, 'hermes_agent');
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test('loadExecutorRoutingConfig resolves opt-in structured_call route model profiles without activating defaults', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  const homeDir = path.join(repoRoot, 'fake-home');
+  const routingFile = path.join(homeDir, '.codex', 'projects', 'redcube-ai', 'runtime-state', 'config', 'executor-routing.json');
+
+  writeJson(routingFile, {
+    schema_version: 1,
+    structured_call_routing: {
+      enabled: true,
+      default_on_missing: 'inherit_effective_default_executor',
+      routes: {
+        'ppt_deck/lecture_peer/render_html': {
+          executor_backend: 'hermes_agent',
+          execution_shape: 'structured_call',
+          hermes_profile: 'huawei-deepseek-v4-flash',
+          fallback: 'inherit_effective_default_executor',
+          failure_policy: 'fallback_with_proof',
+        },
+      },
+    },
+  });
+
+  try {
+    const loaded = loadExecutorRoutingConfig({
+      cwd: repoRoot,
+      homeDir,
+      env: {},
+    });
+    assert.deepEqual(loaded.source_files, [routingFile]);
+    assert.equal(loaded.config.structured_call_routing.enabled, true);
+
+    const matched = resolveExecutorRouting({
+      cwd: repoRoot,
+      homeDir,
+      env: {},
+      family: 'ppt_deck',
+      profileId: 'lecture_peer',
+      route: 'render_html',
+    });
+    assert.equal(matched.effective_default_executor.executor_backend, 'codex_cli');
+    assert.equal(matched.effective_default_executor.source, 'domain_local_user_config');
+    assert.equal(matched.matched_route_key, 'ppt_deck/lecture_peer/render_html');
+    assert.equal(matched.selected_executor.executor_backend, 'hermes_agent');
+    assert.equal(matched.selected_executor.execution_shape, 'structured_call');
+    assert.equal(matched.selected_executor.hermes_profile, 'huawei-deepseek-v4-flash');
+
+    const missing = resolveExecutorRouting({
+      cwd: repoRoot,
+      homeDir,
+      env: {},
+      family: 'ppt_deck',
+      profileId: 'lecture_peer',
+      route: 'slide_blueprint',
+    });
+    assert.equal(missing.matched_route_key, null);
+    assert.equal(missing.selected_executor.executor_backend, 'codex_cli');
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

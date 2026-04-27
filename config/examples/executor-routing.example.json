@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "structured_call_routing": {
+    "enabled": true,
+    "default_on_missing": "inherit_effective_default_executor",
+    "routes": {
+      "ppt_deck/lecture_peer/render_html": {
+        "executor_backend": "hermes_agent",
+        "execution_shape": "structured_call",
+        "hermes_profile": "huawei-deepseek-v4-flash",
+        "fallback": "inherit_effective_default_executor",
+        "failure_policy": "fallback_with_proof"
+      },
+      "ppt_deck/lecture_peer/fix_html": {
+        "executor_backend": "hermes_agent",
+        "execution_shape": "structured_call",
+        "hermes_profile": "huawei-glm-5.1",
+        "fallback": "inherit_effective_default_executor",
+        "failure_policy": "fallback_with_proof"
+      }
+    }
+  }
+}

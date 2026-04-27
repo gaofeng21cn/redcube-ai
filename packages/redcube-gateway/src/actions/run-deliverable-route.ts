@@ -372,8 +372,9 @@ async function continueToStopAfterStage({
   return { result: currentResult, continuationRouteRuns };
 }
 
-function runAdapter(request: RunDeliverableRouteRequest): string {
-  return safeText(request.adapter, CODEX_STRUCTURED_ADAPTER);
+function runAdapter(request: RunDeliverableRouteRequest, result: RuntimeRouteResult | null = null): string {
+  const run = result?.run as { executor?: { adapter?: unknown } } | undefined;
+  return safeText(run?.executor?.adapter || request.adapter, CODEX_STRUCTURED_ADAPTER);
 }
 
 function executorBackendForAdapter(adapter: string): 'codex_cli' | 'hermes_agent' {
@@ -382,7 +383,13 @@ function executorBackendForAdapter(adapter: string): 'codex_cli' | 'hermes_agent
     : 'codex_cli';
 }
 
-function executionShapeForBackend(executorBackend: 'codex_cli' | 'hermes_agent'): 'structured_call' | 'agent_loop' {
+function executionShapeForBackend(
+  executorBackend: 'codex_cli' | 'hermes_agent',
+  result: RuntimeRouteResult | null = null,
+): 'structured_call' | 'agent_loop' {
+  const run = result?.run as { executor?: { execution_shape?: unknown } } | undefined;
+  const shape = safeText(run?.executor?.execution_shape);
+  if (shape === 'structured_call' || shape === 'agent_loop') return shape;
   return executorBackend === 'hermes_agent' ? 'agent_loop' : 'structured_call';
 }
 
@@ -409,14 +416,14 @@ function summarizeFixHtmlAttempt({
   continuationRouteRuns: DependencyRouteRun[];
   attemptIndex: number;
 }): FixHtmlEscalationAttempt {
-  const adapter = runAdapter(request);
+  const adapter = runAdapter(request, result);
   const executorBackend = executorBackendForAdapter(adapter);
   const run = result.run as { run_id?: unknown; status?: unknown } | undefined;
   return {
     attempt_index: attemptIndex,
     route: 'fix_html',
     executor_backend: executorBackend,
-    execution_shape: executionShapeForBackend(executorBackend),
+    execution_shape: executionShapeForBackend(executorBackend, result),
     adapter,
     ok: result.ok === true,
     run_id: safeText(run?.run_id) || null,

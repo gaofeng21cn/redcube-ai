@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://redcube.local/contracts/runtime-program/rca-executor-routing-config.schema.json",
+  "title": "RedCube RCA Executor Routing Config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "default_executor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "executor_backend": {
+          "enum": ["codex_cli", "hermes_agent"]
+        },
+        "execution_shape": {
+          "enum": ["structured_call", "agent_loop"]
+        },
+        "hermes_profile": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "structured_call_routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "default_on_missing": {
+          "const": "inherit_effective_default_executor"
+        },
+        "routes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["executor_backend", "execution_shape"],
+            "properties": {
+              "executor_backend": {
+                "enum": ["codex_cli", "hermes_agent"]
+              },
+              "execution_shape": {
+                "const": "structured_call"
+              },
+              "hermes_profile": {
+                "type": "string",
+                "minLength": 1
+              },
+              "fallback": {
+                "enum": ["inherit_effective_default_executor", "fail_closed"]
+              },
+              "failure_policy": {
+                "enum": ["fallback_with_proof", "fail_closed"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

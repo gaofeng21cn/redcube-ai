@@ -4,6 +4,7 @@ import {
   HERMES_AGENT_EXECUTOR_BACKEND,
   HERMES_DEFAULT_ADAPTER,
   HERMES_NATIVE_PROOF_ADAPTER,
+  STRUCTURED_CALL_EXECUTION_SHAPE,
   buildCodexExecutorDescriptor,
   buildHermesExecutorDescriptor,
   buildHermesNativeProofExecutorDescriptor,
@@ -20,6 +21,9 @@ interface ExecutorRouteInput {
   stageContract: { stage_id?: string } | null;
   mode?: string;
   baselineDeliverableId?: string;
+  executionShape?: 'structured_call' | 'agent_loop';
+  hermesProfile?: string | null;
+  executorRouting?: Record<string, unknown> | null;
 }
 
 interface ExecutorDescriptor extends Record<string, unknown> {
@@ -92,20 +96,61 @@ interface ExecutorAdapter extends ExecutorDescriptor {
  */
 
 /**
- * @param {{ adapter?: string }} [options]
+ * @param {{ adapter?: string, executorBackend?: "codex_cli" | "hermes_agent", executionShape?: "structured_call" | "agent_loop", hermesProfile?: string | null, executorRouting?: Record<string, unknown> | null }} [options]
  * @returns {ExecutorAdapter}
  */
-export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER }: { adapter?: string } = {}): ExecutorAdapter {
+export function resolveExecutorAdapter({
+  adapter = CODEX_DEFAULT_ADAPTER,
+  executorBackend = undefined,
+  executionShape = undefined,
+  hermesProfile = null,
+  executorRouting = null,
+}: {
+  adapter?: string;
+  executorBackend?: 'codex_cli' | 'hermes_agent';
+  executionShape?: 'structured_call' | 'agent_loop';
+  hermesProfile?: string | null;
+  executorRouting?: Record<string, unknown> | null;
+} = {}): ExecutorAdapter {
   const requestedAdapter = String(adapter || '').trim();
-  const descriptor = (
+  const requestedBackend = executorBackend || (
+    requestedAdapter === HERMES_DEFAULT_ADAPTER || requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND || requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER
+      ? HERMES_AGENT_EXECUTOR_BACKEND
+      : 'codex_cli'
+  );
+  const descriptorBase = (
     requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER
       ? buildHermesNativeProofExecutorDescriptor({ adapter })
       : (
-          requestedAdapter === HERMES_DEFAULT_ADAPTER || requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND
+          requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND || requestedAdapter === HERMES_DEFAULT_ADAPTER || requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND
             ? buildHermesExecutorDescriptor({ adapter })
             : buildCodexExecutorDescriptor({ adapter })
         )
   ) as unknown as ExecutorDescriptor;
+  const descriptor = {
+    ...descriptorBase,
+    adapter: requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND && requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER
+      ? HERMES_AGENT_EXECUTOR_BACKEND
+      : descriptorBase.adapter,
+    ...(executionShape
+      ? {
+          execution_shape: executionShape,
+          execution_model: {
+            ...(descriptorBase.execution_model || {}),
+            execution_shape: executionShape,
+            ...(executionShape === STRUCTURED_CALL_EXECUTION_SHAPE && requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
+              ? {
+                  mainline_adapter: HERMES_AGENT_EXECUTOR_BACKEND,
+                  primary_surface: 'hermes_agent_api_server',
+                  requested_adapter: HERMES_AGENT_EXECUTOR_BACKEND,
+                }
+              : {}),
+          },
+        }
+      : {}),
+    ...(hermesProfile ? { hermes_profile: hermesProfile } : {}),
+    ...(executorRouting ? { executor_routing: executorRouting } : {}),
+  } as ExecutorDescriptor;
 
   return {
     ...descriptor,
@@ -119,6 +164,9 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER }: { ad
       stageContract,
       mode = 'draft_new',
       baselineDeliverableId = '',
+      executionShape = descriptor.execution_shape,
+      hermesProfile = String(descriptor.hermes_profile || '').trim() || null,
+      executorRouting = descriptor.executor_routing as Record<string, unknown> | null,
     }) {
       if (!stageContract?.stage_id) {
         throw new Error(`Missing stage contract for route: ${route}`);
@@ -138,6 +186,9 @@ export function resolveExecutorAdapter({ adapter = CODEX_DEFAULT_ADAPTER }: { ad
         baselineDeliverableId,
         adapter: descriptor.adapter,
         executor: descriptor,
+        executionShape,
+        hermesProfile,
+        executorRouting,
       }) as Record<string, unknown>;
       return {
         overlay,
