@@ -1,0 +1,98 @@
+// @ts-nocheck
+import path from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+
+import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
+
+export function safeText(value, fallback = '') {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
+export function safeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+export function ensureDir(dir) {
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+function copySurfaceFile(source, destination) {
+  const sourceFile = safeText(source);
+  const destinationFile = safeText(destination);
+  if (!sourceFile || !destinationFile || !existsSync(sourceFile)) return null;
+  ensureDir(path.dirname(destinationFile));
+  writeFileSync(destinationFile, readFileSync(sourceFile));
+  return destinationFile;
+}
+
+export function getDeliverableViewSurfacePaths(deliverablePaths, deliverableId) {
+  return {
+    stableHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.html`),
+    stableSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`),
+    draftHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.html`),
+    draftSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.slides.json`),
+  };
+}
+
+export function seedStableViewIfMissing(paths, htmlFile, slidesFile) {
+  const refs = [];
+  if (!existsSync(paths.stableHtmlFile)) {
+    const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
+    if (stableHtmlRef) refs.push(stableHtmlRef);
+  }
+  if (!existsSync(paths.stableSlidesFile)) {
+    const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
+    if (stableSlidesRef) refs.push(stableSlidesRef);
+  }
+  return refs;
+}
+
+export function promoteStableView(paths, htmlFile, slidesFile) {
+  const refs = [];
+  const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
+  if (stableHtmlRef) refs.push(stableHtmlRef);
+  const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
+  if (stableSlidesRef) refs.push(stableSlidesRef);
+  return refs;
+}
+
+export function writeJson(file, value) {
+  ensureDir(path.dirname(file));
+  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
+}
+
+export function writeText(file, value) {
+  ensureDir(path.dirname(file));
+  writeFileSync(file, value, 'utf-8');
+}
+
+export function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+export function stageArtifactPath(contract, deliverablePaths, stageId) {
+  const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
+  return path.join(
+    deliverablePaths.artifactsDir,
+    safeText(stage?.output_artifact, `${stageId}.json`),
+  );
+}
+
+export function readStageArtifact(contract, deliverablePaths, stageId) {
+  const file = stageArtifactPath(contract, deliverablePaths, stageId);
+  return existsSync(file) ? readJson(file) : null;
+}
+
+export function normalizeInlineText(value, maxLength = 220) {
+  return String(value || '').replace(/\s+/g, ' ').trim().slice(0, maxLength);
+}
+
+export function runPython(helper, args) {
+  return runRedCubePythonHelper(helper, args, {
+    fileExists: existsSync,
+    missingMessagePrefix: 'Missing python helper',
+    failureMessagePrefix: 'python helper failed',
+  }).payload;
+}

@@ -1,26 +1,40 @@
 // @ts-nocheck
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 
-import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolvePythonNativeHelper,
-  runRedCubePythonHelper,
 } from '@redcube/runtime-protocol';
-import {
-  CODEX_DEFAULT_ADAPTER,
-  HERMES_NATIVE_PROOF_ADAPTER,
-  buildCodexExecutionModel,
-  buildHermesNativeProofExecutionModel,
-  generateStructuredArtifactViaHermesNativeProof,
-} from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 import { createPosterOnepagerAuthoringParts } from './authoring.js';
+import { createPosterOnepagerPromptSourceTruthHelpers } from './prompt-source-truth-helpers.js';
 import { createPosterOnepagerReviewHelpers } from './review-helpers.js';
+import {
+  CODEX_DEFAULT_ADAPTER,
+  createPosterOnepagerRouteReviewHelpers,
+  generateStructuredArtifact,
+  lifecycleStageForRoute,
+  reviewOverlayForRoute,
+} from './route-review-helpers.js';
+import {
+  ensureDir,
+  getDeliverableViewSurfacePaths,
+  normalizeInlineText,
+  promoteStableView,
+  readJson,
+  readStageArtifact,
+  runPython,
+  safeArray,
+  safeText,
+  seedStableViewIfMissing,
+  stageArtifactPath,
+  writeJson,
+  writeText,
+} from './surface-helpers.js';
 
 /**
  * @typedef {import('./types.js').PosterRuntimeRunRequest} PosterRuntimeRunRequest
@@ -33,8 +47,6 @@ export function createPosterOnepagerRuntimeCore() {
   const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
   const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
   const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);
-  const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
-  const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
   const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
   const MIN_REVIEW_QA_BLOCKS = 2;
   const MIN_REVIEW_PRIMARY_POINTS = 1;
@@ -50,209 +62,18 @@ export function createPosterOnepagerRuntimeCore() {
     poster_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
   });
-  
-  function safeText(value, fallback = '') {
-    const text = String(value || '').trim();
-    return text || fallback;
-  }
-  
-  function safeArray(value) {
-    return Array.isArray(value) ? value : [];
-  }
-  
-  function ensureDir(dir) {
-    mkdirSync(dir, { recursive: true });
-    return dir;
-  }
-  
-  function copySurfaceFile(source, destination) {
-    const sourceFile = safeText(source);
-    const destinationFile = safeText(destination);
-    if (!sourceFile || !destinationFile || !existsSync(sourceFile)) return null;
-    ensureDir(path.dirname(destinationFile));
-    writeFileSync(destinationFile, readFileSync(sourceFile));
-    return destinationFile;
-  }
-  
-  function getDeliverableViewSurfacePaths(deliverablePaths, deliverableId) {
-    return {
-      stableHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.html`),
-      stableSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.slides.json`),
-      draftHtmlFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.html`),
-      draftSlidesFile: path.join(deliverablePaths.viewsDir, `${deliverableId}.draft.slides.json`),
-    };
-  }
-  
-  function seedStableViewIfMissing(paths, htmlFile, slidesFile) {
-    const refs = [];
-    if (!existsSync(paths.stableHtmlFile)) {
-      const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
-      if (stableHtmlRef) refs.push(stableHtmlRef);
-    }
-    if (!existsSync(paths.stableSlidesFile)) {
-      const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
-      if (stableSlidesRef) refs.push(stableSlidesRef);
-    }
-    return refs;
-  }
-  
-  function promoteStableView(paths, htmlFile, slidesFile) {
-    const refs = [];
-    const stableHtmlRef = copySurfaceFile(htmlFile, paths.stableHtmlFile);
-    if (stableHtmlRef) refs.push(stableHtmlRef);
-    const stableSlidesRef = copySurfaceFile(slidesFile, paths.stableSlidesFile);
-    if (stableSlidesRef) refs.push(stableSlidesRef);
-    return refs;
-  }
-  
-  function writeJson(file, value) {
-    ensureDir(path.dirname(file));
-    writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-  }
-  
-  function writeText(file, value) {
-    ensureDir(path.dirname(file));
-    writeFileSync(file, value, 'utf-8');
-  }
-  
-  function readJson(file) {
-    return JSON.parse(readFileSync(file, 'utf-8'));
-  }
-  
-  function stageArtifactPath(contract, deliverablePaths, stageId) {
-    const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
-    return path.join(
-      deliverablePaths.artifactsDir,
-      safeText(stage?.output_artifact, `${stageId}.json`),
-    );
-  }
-  
-  function readStageArtifact(contract, deliverablePaths, stageId) {
-    const file = stageArtifactPath(contract, deliverablePaths, stageId);
-    return existsSync(file) ? readJson(file) : null;
-  }
-  
-  function promptPackRoot(contract) {
-    const root = safeText(contract?.prompt_pack?.root);
-    if (!root) {
-      throw new Error('poster_onepager hydrated contract 缺少 prompt_pack.root');
-    }
-    return root;
-  }
-  
-  function promptRoute(contract, route) {
-    const relativePath = safeText(contract?.prompt_pack?.routes?.[route]);
-    if (!relativePath) {
-      throw new Error(`poster_onepager hydrated contract 缺少 prompt_pack.routes.${route}`);
-    }
-    return relativePath;
-  }
-  
-  function resolvePromptPackAsset(contract, relativePath) {
-    const assetPath = safeText(relativePath);
-    if (!assetPath) return '';
-    if (path.isAbsolute(assetPath)) return assetPath;
-    if (assetPath.startsWith('prompts/')) return assetPath;
-    if (assetPath.startsWith(`${promptPackRoot(contract)}/`)) return assetPath;
-    return path.posix.join(promptPackRoot(contract), assetPath);
-  }
-  
-  function promptMeta(contract, route) {
-    const relativePath = promptRoute(contract, route);
-    const absolutePath = path.join(REPO_ROOT, relativePath);
-    return {
-      root: promptPackRoot(contract),
-      file: path.basename(relativePath),
-      relative_path: relativePath,
-      source: existsSync(absolutePath) ? 'repo' : 'embedded',
-    };
-  }
-  
-  function readPromptPackText(relativePath) {
-    const absolutePath = path.isAbsolute(relativePath)
-      ? relativePath
-      : path.join(REPO_ROOT, relativePath);
-    if (!existsSync(absolutePath)) {
-      throw new Error(`Missing prompt pack asset: ${relativePath}`);
-    }
-    return readFileSync(absolutePath, 'utf-8');
-  }
-  
-  function renderSeedValue(value, vars) {
-    if (Array.isArray(value)) return value.map((item) => renderSeedValue(item, vars));
-    if (value && typeof value === 'object') {
-      return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, renderSeedValue(item, vars)]));
-    }
-    if (typeof value === 'string') {
-      return value.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (_match, key) => safeText(vars[key]));
-    }
-    return value;
-  }
-  
-  function promptPackJsonSection(contract, route, section, vars = {}) {
-    const absolutePath = path.join(REPO_ROOT, promptRoute(contract, route));
-    if (!existsSync(absolutePath)) return null;
-    const raw = readFileSync(absolutePath, 'utf-8');
-    const match = raw.match(new RegExp(`## ${section}\\s*\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\``));
-    if (!match) return null;
-    return renderSeedValue(JSON.parse(match[1]), vars);
-  }
-  
-  function promptArtifact(contract, route, vars = {}) {
-    return promptPackJsonSection(contract, route, 'runtime_artifact', vars);
-  }
-  
-  function promptSeed(contract, route, vars = {}) {
-    return promptPackJsonSection(contract, route, 'runtime_seed', vars);
-  }
-  
-  function isOperatorContextMaterial(material) {
-    const kind = safeText(material?.kind);
-    return safeText(material?.source_role) === 'operator_context'
-      || kind === 'brief'
-      || kind === 'keywords';
-  }
-  
-  function sourceTruth(contract) {
-    return contract?.shared_source_truth || null;
-  }
-  
-  function sourceMaterials(contract) {
-    return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
-      .filter((material) => !isOperatorContextMaterial(material));
-  }
-  
-  function operatorMaterials(contract) {
-    return safeArray(sourceTruth(contract)?.extracted_materials?.materials)
-      .filter((material) => isOperatorContextMaterial(material));
-  }
-  
-  function sourceMaterialIds(contract) {
-    return sourceMaterials(contract).map((material) => material.material_id).filter(Boolean);
-  }
-  
-  function publicSources() {
-    return [
-      '公开临床指南 / 系统综述 / 正式流程资料',
-      '同行评议论文 / 真实世界研究',
-      '用户当次指定素材',
-    ];
-  }
-  
-  function sourceLabels(contract) {
-    const labels = safeArray(sourceTruth(contract)?.source_index?.sources)
-      .filter((source) => source.status === 'ready' && !isOperatorContextMaterial(source))
-      .map((source) => source.relative_path || source.kind);
-    return labels.length > 0 ? labels : publicSources();
-  }
-  
-  function lifecycleStageForRoute(contract, route) {
-    return contract?.lifecycle_model?.route_to_stage?.[route] || null;
-  }
-  
-  function reviewOverlayForRoute(contract, route) {
-    return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
-  }
+  const {
+    promptMeta,
+    promptRoute,
+    publicSources,
+    readPromptPackText,
+    resolvePromptPackAsset,
+    sourceLabels,
+    sourceMaterialIds,
+    sourceMaterials,
+    sourceTruth,
+    operatorMaterials,
+  } = createPosterOnepagerPromptSourceTruthHelpers({ repoRoot: REPO_ROOT });
   
   function stageOrder(contract, stageId) {
     return safeArray(contract?.stage_sequence?.stages).findIndex((stage) => stage?.stage_id === stageId);
@@ -273,96 +94,13 @@ export function createPosterOnepagerRuntimeCore() {
       return earliest;
     }, null);
   }
-  
-  function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    return adapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? HERMES_NATIVE_PROOF_EXECUTION_MODEL
-      : CODEX_EXECUTION_MODEL;
-  }
-  
-  function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    if (safeText(generationRuntime?.creative_owner)) {
-      return safeText(generationRuntime.creative_owner);
-    }
-    return adapter === HERMES_NATIVE_PROOF_ADAPTER ? HERMES_NATIVE_PROOF_ADAPTER : 'host_agent';
-  }
-  
-  function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    if (safeText(generationRuntime?.primary_surface)) {
-      return safeText(generationRuntime.primary_surface);
-    }
-    return adapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? 'hermes_native_full_agent_loop'
-      : 'codex_native_host_agent';
-  }
-  
-  async function generateStructuredArtifact({
-    adapter = CODEX_DEFAULT_ADAPTER,
-    ...input
-  }) {
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-      return generateStructuredArtifactViaHermesNativeProof(input);
-    }
-    return generateStructuredArtifactViaCodexCli(input);
-  }
-  
-  function creativeExecution(
-    lifecycleStage,
-    generationRuntime = null,
-    adapter = CODEX_DEFAULT_ADAPTER,
-  ) {
-    return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
-      lifecycle_stage: lifecycleStage,
-      ownership_model: 'director_first',
-      ...(generationRuntime
-        ? {
-            generation_runtime: generationRuntime,
-          }
-        : {}),
-    };
-  }
-  
-  function creativeSourceStamp({
-    route,
-    lifecycleStage,
-    authoredSurface,
-    materializedFrom = 'prompt_pack_seed',
-    generationRuntime = null,
-    adapter = CODEX_DEFAULT_ADAPTER,
-  }) {
-    return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
-      stage_owner: primarySurface(generationRuntime, adapter),
-      route,
-      lifecycle_stage: lifecycleStage,
-      authored_surface: authoredSurface,
-      materialized_from: materializedFrom,
-    };
-  }
-  
-  function reviewAuthorship(overlay, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    return {
-      overlay,
-      primary_surface: primarySurface(generationRuntime, adapter),
-      contract_asset: 'prompt_pack_seed',
-    };
-  }
-  
-  function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    return {
-      route,
-      overlay: contract.overlay,
-      profile_id: contract.profile_id,
-      produced_at: new Date().toISOString(),
-      prompt_pack: promptMeta(contract, route),
-      lifecycle_stage: lifecycleStageForRoute(contract, route),
-      review_overlay: reviewOverlayForRoute(contract, route),
-      execution_model: generationRuntime?.execution_model || executionModelForAdapter(adapter),
-    };
-  }
+  const {
+    attachCommon,
+    creativeExecution,
+    creativeSourceStamp,
+    primarySurface,
+    reviewAuthorship,
+  } = createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText });
   
   const {
     requireText,
