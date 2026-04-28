@@ -139,8 +139,7 @@ export function createPptDeckDirectorReviewParts(deps) {
     return normalizeInlineText(safeText(html).replace(/<script\b[\s\S]*?<\/script>/gi, ' ').replace(/<style\b[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&(nbsp|amp|lt|gt|quot|#39);/g, ' '), 1200);
   }
 
-  function directorHtmlPreflight(renderArtifact) {
-    const slides = safeArray(renderArtifact?.html_bundle?.slides);
+  function detectAudienceMetadataLeaks(slides) {
     const weakPages = new Set();
     const findings = [];
     const metadataLeakPatterns = [
@@ -158,6 +157,10 @@ export function createPptDeckDirectorReviewParts(deps) {
       const leaked = metadataLeakPatterns.some((pattern) => pattern.test(visibleText));
       if (leaked) { weakPages.add(slideId); findings.push(`${slideId}: audience-facing metadata leak`); }
     }
+    return { weakPages, findings };
+  }
+
+  function detectHomogeneousWhiteCardRun(slides) {
     let currentRun = [];
     let longestRun = [];
     for (const slide of slides) {
@@ -172,6 +175,13 @@ export function createPptDeckDirectorReviewParts(deps) {
       currentRun = denseWhiteCard ? [...currentRun, slide] : [];
       if (currentRun.length > longestRun.length) longestRun = currentRun;
     }
+    return longestRun;
+  }
+
+  function directorHtmlPreflight(renderArtifact) {
+    const slides = safeArray(renderArtifact?.html_bundle?.slides);
+    const { weakPages, findings } = detectAudienceMetadataLeaks(slides);
+    const longestRun = detectHomogeneousWhiteCardRun(slides);
     if (longestRun.length >= 4) for (const slide of longestRun) weakPages.add(safeText(slide?.slide_id));
     if (longestRun.length >= 4) findings.push(`homogeneous white-card run: ${longestRun.map((slide) => safeText(slide?.slide_id)).join(',')}`);
     const homogeneousLayoutRisk = longestRun.length >= 4 ? Math.min(0.95, 0.35 + (longestRun.length / Math.max(slides.length, 1))) : 0;

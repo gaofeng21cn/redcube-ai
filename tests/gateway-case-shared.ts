@@ -1,26 +1,52 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+
 import {
-  getProductFrontdesk,
-  getProductStart,
-  getProductPreflight,
-  invokeFederatedProductEntry,
-  invokeProductEntry,
+  callGatewayTool,
+  getToolDefinitions,
+  listGatewayTools,
+} from '../apps/redcube-mcp/dist/server.js';
+import {
+  createDeliverable,
+  executeSourceAugmentation,
   getProductEntryManifest,
   getProductEntrySession,
+  getProductFrontdesk,
+  getProductPreflight,
+  getProductStart,
+  intakeSource,
+  invokeFederatedProductEntry,
+  invokeProductEntry,
+  prepareSourceAugmentationResult,
+  researchSource,
+  runDeliverableRoute,
+  runManagedDeliverable,
+  writeSourceAugmentationResult,
 } from '@redcube/gateway';
-import { completeSourceReadiness } from '../helpers/complete-source-readiness.ts';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,
   withEnv,
-} from '../helpers/mock-codex-cli.ts';
+} from './helpers/mock-codex-cli.ts';
+import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -29,10 +55,10 @@ function readJson(file) {
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   process.execPath,
   '--experimental-strip-types',
-  fileURLToPath(new URL('../helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
 const GATEWAY_PACKAGE_JSON = fileURLToPath(
-  new URL('../../packages/redcube-gateway/package.json', import.meta.url),
+  new URL('../packages/redcube-gateway/package.json', import.meta.url),
 );
 const gatewayRequire = createRequire(GATEWAY_PACKAGE_JSON);
 const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-gateway-shared/product-entry-companions';
@@ -52,6 +78,19 @@ async function withMockHermesAndRuntimeState(testFn) {
   });
   try {
     return await testFn({ runtimeStateRoot });
+  } finally {
+    restoreEnv();
+    await upstream.close();
+  }
+}
+
+async function withMockHermesUpstream(testFn) {
+  const upstream = await startMockCodexCli();
+  const restoreEnv = withEnv({
+    REDCUBE_CODEX_COMMAND: upstream.command,
+  });
+  try {
+    return await testFn();
   } finally {
     restoreEnv();
     await upstream.close();
@@ -144,59 +183,90 @@ function assertRuntimeLoopClosureShape(surface, { source, entryMode }) {
   assert.equal(surface.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
 }
 
+function buildAugmentationResultPayload(overrides = {}) {
+  return {
+    topic_summary: '围绕甲状腺门诊沟通，先解释判断顺序，再解释术语与下一步动作。',
+    reference_source_list: [
+      { reference_id: 'REF-001', label: '国家指南', url: 'https://example.com/guideline' },
+      { reference_id: 'REF-002', label: '系统综述', url: 'https://example.com/review' },
+    ],
+    key_fact_groups: [
+      { fact_id: 'FACT-001', label: 'TSH 异常后需要结合 FT4 判断下一步动作。', reference_id: 'REF-001' },
+      { fact_id: 'FACT-002', label: '门诊沟通里应先解释判断顺序，再解释术语。', reference_id: 'REF-002' },
+    ],
+    source_quality_notes: ['优先使用公开指南与系统综述。'],
+    evidence_gap_resolution: [
+      { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' },
+      { gap_id: 'consumable_material_missing', status: 'resolved', note: '已补入可直接消费的事实材料。' },
+    ],
+    ...overrides,
+  };
+}
+
+function withAction(action, args = {}) {
+  return {
+    action,
+    ...args,
+  };
+}
+
+function withOperation(operation, args = {}) {
+  return {
+    operation,
+    ...args,
+  };
+}
+
 const SERIAL_ENV_TEST = { concurrency: false };
 
-
-test('gateway shared family orchestration surface exposes the frontdesk product-entry preset builder', async () => {
-  const familyOrchestration = await importGatewaySharedModule('opl-gateway-shared/family-orchestration');
-
-  assert.equal(
-    typeof familyOrchestration.buildFamilyFrontdeskProductEntryOrchestration,
-    'function',
-  );
-});
-
-test('session continuation family orchestration companion uses the shared continuation refs', async () => {
-  const companionModule = await import('../../packages/redcube-gateway/dist/actions/family-orchestration-companion.js');
-  const buildSessionContinuationFamilyOrchestration = companionModule.buildSessionContinuationFamilyOrchestration;
-  assert.equal(typeof buildSessionContinuationFamilyOrchestration, 'function');
-
-  const requested = buildSessionContinuationFamilyOrchestration({
-    continuationSnapshot: {
-      managed_progress_projection: {
-        needs_user_decision: true,
-      },
-    },
-  });
-  assert.equal(requested.human_gates[0].status, 'requested');
-  assert.deepEqual(requested.human_gates[0].review_surface, {
-    ref_kind: 'json_pointer',
-    ref: '/review_state',
-    label: 'current review state surface',
-  });
-  assert.deepEqual(requested.event_envelope_surface, {
-    ref_kind: 'json_pointer',
-    ref: '/continuation_snapshot/managed_progress_projection/latest_events',
-    label: 'managed run event companion',
-  });
-  assert.deepEqual(requested.checkpoint_lineage_surface, {
-    ref_kind: 'json_pointer',
-    ref: '/continuation_snapshot/latest_managed_run_id',
-    label: 'latest managed-run continuation locator',
-  });
-
-  const approved = buildSessionContinuationFamilyOrchestration({
-    continuationSnapshot: {
-      managed_progress_projection: {
-        needs_user_decision: false,
-      },
-    },
-    sessionLocatorField: 'entry_session_contract.entry_session_id',
-  });
-  assert.equal(approved.human_gates[0].status, 'approved');
-  assert.equal(
-    approved.resume_contract.session_locator_field,
-    'entry_session_contract.entry_session_id',
-  );
-});
-
+export {
+  Client,
+  GATEWAY_PACKAGE_JSON,
+  PRODUCT_ENTRY_COMPANIONS_SPECIFIER,
+  PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
+  SERIAL_ENV_TEST,
+  StdioClientTransport,
+  assert,
+  assertFamilyOrchestrationCompanion,
+  assertRuntimeLoopClosureShape,
+  assertWorkspaceGitBoundary,
+  buildAugmentationResultPayload,
+  callGatewayTool,
+  chmodSync,
+  completeSourceReadiness,
+  createDeliverable,
+  execFileSync,
+  executeSourceAugmentation,
+  existsSync,
+  fileURLToPath,
+  getProductEntryManifest,
+  getProductEntrySession,
+  getProductFrontdesk,
+  getProductPreflight,
+  getProductStart,
+  getToolDefinitions,
+  importGatewaySharedModule,
+  intakeSource,
+  invokeFederatedProductEntry,
+  invokeProductEntry,
+  listGatewayTools,
+  mkdirSync,
+  mkdtempSync,
+  os,
+  path,
+  prepareProductEntryWorkspace,
+  prepareSourceAugmentationResult,
+  readFileSync,
+  readJson,
+  researchSource,
+  runDeliverableRoute,
+  runManagedDeliverable,
+  test,
+  unlinkSync,
+  withAction,
+  withMockHermesAndRuntimeState,
+  withMockHermesUpstream,
+  withOperation,
+  writeFileSync,
+  writeSourceAugmentationResult,
+};

@@ -1,57 +1,21 @@
 // @ts-nocheck
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import os from 'node:os';
-import path from 'node:path';
-import { mkdtempSync, unlinkSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-
 import {
+  assert,
   callGatewayTool,
-  getToolDefinitions,
-  listGatewayTools,
-} from '../../apps/redcube-mcp/dist/server.js';
-import {
+  completeSourceReadiness,
   createDeliverable,
   intakeSource,
+  listGatewayTools,
+  mkdtempSync,
+  os,
+  path,
   runDeliverableRoute,
   runManagedDeliverable,
-} from '@redcube/gateway';
-import { completeSourceReadiness } from '../helpers/complete-source-readiness.ts';
-import {
-  startMockCodexCli,
-  withEnv,
-} from '../helpers/mock-codex-cli.ts';
-
-async function withMockHermesUpstream(testFn) {
-  const upstream = await startMockCodexCli();
-  const restoreEnv = withEnv({
-    REDCUBE_CODEX_COMMAND: upstream.command,
-  });
-  try {
-    return await testFn();
-  } finally {
-    restoreEnv();
-    await upstream.close();
-  }
-}
-
-function withAction(action, args = {}) {
-  return {
-    action,
-    ...args,
-  };
-}
-
-function withOperation(operation, args = {}) {
-  return {
-    operation,
-    ...args,
-  };
-}
+  test,
+  withAction,
+  withMockHermesUpstream,
+  withOperation,
+} from '../gateway-case-shared.ts';
 
 test('callGatewayTool delegates product-entry gateway actions', async () => {
   const direct = await callGatewayTool(

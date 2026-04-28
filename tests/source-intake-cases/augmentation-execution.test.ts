@@ -1,49 +1,21 @@
 // @ts-nocheck
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import os from 'node:os';
-import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import {
+  assert,
+  buildAugmentationResultPayload,
   chmodSync,
-  existsSync,
-  mkdtempSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from 'node:fs';
-
-import {
+  execFileSync,
   executeSourceAugmentation,
+  existsSync,
   intakeSource,
-  prepareSourceAugmentationResult,
-  researchSource,
+  mkdirSync,
+  mkdtempSync,
+  os,
+  path,
+  readJson,
+  test,
+  writeFileSync,
   writeSourceAugmentationResult,
-} from '@redcube/gateway';
-import { assertWorkspaceGitBoundary } from '../helpers/workspace-git-boundary.ts';
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function buildAugmentationResultPayload(overrides = {}) {
-  return {
-    topic_summary: '围绕甲状腺门诊沟通，先解释判断顺序，再解释术语与下一步动作。',
-    reference_source_list: [
-      { reference_id: 'REF-001', label: '国家指南', url: 'https://example.com/guideline' },
-      { reference_id: 'REF-002', label: '系统综述', url: 'https://example.com/review' },
-    ],
-    key_fact_groups: [
-      { fact_id: 'FACT-001', label: 'TSH 异常后需要结合 FT4 判断下一步动作。', reference_id: 'REF-001' },
-      { fact_id: 'FACT-002', label: '门诊沟通里应先解释判断顺序，再解释术语。', reference_id: 'REF-002' },
-    ],
-    source_quality_notes: ['优先使用公开指南与系统综述。'],
-    evidence_gap_resolution: [
-      { gap_id: 'public_evidence_missing', status: 'resolved', note: '已补入可追溯公开来源。' },
-      { gap_id: 'consumable_material_missing', status: 'resolved', note: '已补入可直接消费的事实材料。' },
-    ],
-    ...overrides,
-  };
-}
+} from '../gateway-case-shared.ts';
 
 test('executeSourceAugmentation blocks explicitly when augmentation executor is unavailable', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));

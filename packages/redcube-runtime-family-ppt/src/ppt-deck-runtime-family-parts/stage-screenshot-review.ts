@@ -98,22 +98,34 @@ export function createPptDeckScreenshotReviewParts(deps) {
     };
   }
 
-  function computeSlideReview(page, blueprintSlide, maxPrimaryPoints) {
-    const metrics = {
-      text_char_count: Number(page.text_chars || page.metrics?.text_char_count || 0),
-      block_count: Number(page.zone_count || page.metrics?.block_count || 0),
-      overlap_pairs: Number(page.overlap_pairs || page.metrics?.overlap_pairs || 0),
-      clipped_nodes: Number(page.clipped_nodes || page.metrics?.clipped_nodes || 0),
-    };
-    const overflowFree = Boolean(page.overflow_free);
-    const occlusionFree = metrics.clipped_nodes === 0 && metrics.overlap_pairs === 0;
-    const visualDensityOk = metrics.block_count <= maxPrimaryPoints + 4 && metrics.text_char_count <= 340;
-    const speakerFitOk = Number(blueprintSlide?.speaker_seconds || 0) >= 20 && Number(blueprintSlide?.speaker_seconds || 0) <= 120;
+  function pageMetric(page, directKey, metricKey) {
+    const directValue = page[directKey];
+    if (directValue !== undefined && directValue !== null) return Number(directValue || 0);
+    return Number(page.metrics?.[metricKey] || 0);
+  }
+
+  function slideReviewIssues({ overflowFree, occlusionFree, visualDensityOk, speakerFitOk }) {
     const issues = [];
     if (!overflowFree) issues.push('overflow_detected');
     if (!occlusionFree) issues.push('occlusion_detected');
     if (!visualDensityOk) issues.push('visual_density_out_of_range');
     if (!speakerFitOk) issues.push('speaker_fit_out_of_range');
+    return issues;
+  }
+
+  function computeSlideReview(page, blueprintSlide, maxPrimaryPoints) {
+    const metrics = {
+      text_char_count: pageMetric(page, 'text_chars', 'text_char_count'),
+      block_count: pageMetric(page, 'zone_count', 'block_count'),
+      overlap_pairs: pageMetric(page, 'overlap_pairs', 'overlap_pairs'),
+      clipped_nodes: pageMetric(page, 'clipped_nodes', 'clipped_nodes'),
+    };
+    const overflowFree = Boolean(page.overflow_free);
+    const occlusionFree = metrics.clipped_nodes === 0 && metrics.overlap_pairs === 0;
+    const visualDensityOk = metrics.block_count <= maxPrimaryPoints + 4 && metrics.text_char_count <= 340;
+    const speakerSeconds = Number(blueprintSlide?.speaker_seconds || 0);
+    const speakerFitOk = speakerSeconds >= 20 && speakerSeconds <= 120;
+    const issues = slideReviewIssues({ overflowFree, occlusionFree, visualDensityOk, speakerFitOk });
     return {
       slide_id: page.slide_id,
       title: page.title,

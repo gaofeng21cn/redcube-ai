@@ -1,22 +1,25 @@
 // @ts-nocheck
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import os from 'node:os';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
-
 import {
+  assert,
+  cpSync,
   createDeliverable,
-  runDeliverableRoute,
-} from '@redcube/gateway';
-import {
+  existsSync,
   getPublicationProjection,
-} from '@redcube/governance';
-import {
+  mkdirSync,
+  mkdtempSync,
+  os,
+  path,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  runDeliverableRoute,
+  spawnSync,
   startMockCodexCli,
+  statSync,
+  test,
   withEnv,
-} from '../helpers/mock-codex-cli.ts';
+  writeFileSync,
+} from './shared.ts';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
