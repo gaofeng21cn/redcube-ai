@@ -415,18 +415,6 @@ export function createPosterOnepagerRuntimeCore() {
   }
   
 
-  function normalizeInlineText(value, maxLength = 220) {
-    return String(value || '').replace(/\s+/g, ' ').trim().slice(0, maxLength);
-  }
-  
-  function runPython(helper, args) {
-    return runRedCubePythonHelper(helper, args, {
-      fileExists: existsSync,
-      missingMessagePrefix: 'Missing python helper',
-      failureMessagePrefix: 'python helper failed',
-    }).payload;
-  }
-  
   async function generateDirectorReviewDraft(
     contract,
     deliverablePaths,
