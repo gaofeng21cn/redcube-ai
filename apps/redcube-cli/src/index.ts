@@ -1,12 +1,8 @@
-import {
-  buildHelp as buildHelpJs,
-  executeCli as executeCliJs,
-  getCliGatewayActions as getCliGatewayActionsJs,
-  main as mainJs,
-  parseArgs as parseArgsJs,
-  resolveWorkspaceRoot as resolveWorkspaceRootJs,
-  runCli as runCliJs,
-} from './cli.js';
+import { executeCli as executeCliJs } from './cli-parts/dispatch.js';
+import { getCliGatewayActions as getCliGatewayActionsJs } from './cli-parts/gateway-actions.js';
+import { buildHelp as buildHelpJs } from './cli-parts/help.js';
+import { parseArgs as parseArgsJs, resolveWorkspaceRoot as resolveWorkspaceRootJs } from './cli-parts/options.js';
+import { main as mainJs, runCli as runCliJs } from './cli-parts/run.js';
 
 import type {
   CliDependencies,

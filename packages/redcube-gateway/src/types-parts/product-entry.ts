@@ -1,0 +1,671 @@
+import type {
+  FamilySharedHandoffSurface,
+  GatewayInteractionContractSurface,
+} from 'opl-gateway-shared/family-entry-contracts';
+import type {
+  FamilyFrontdeskEntrySurfaces,
+  FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
+  FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
+  FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
+  ProductEntryResumeContract as SharedProductEntryResumeContract,
+} from 'opl-gateway-shared/product-entry-companions';
+
+import type {
+  DomainEntryContractSurface,
+  PublicationProjectionResponse,
+  RouteRunResponse,
+  SurfaceBase,
+  SurfaceSummary,
+} from './foundation.js';
+import type {
+  ManagedRunProjection,
+  ManagedRunResponse,
+  ManagedRuntimeSupervision,
+} from './managed.js';
+import type { ReviewStateResponse } from './review.js';
+
+export interface DomainEntryRequest extends Record<string, unknown> {
+  target_domain_id: string;
+  task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode: string;
+  workspace_locator: {
+    workspace_root: string;
+  };
+  runtime_session_contract: {
+    runtime_owner: string;
+    adapter_surface?: string;
+    session_mode?: string;
+  };
+  return_surface_contract: {
+    surface_kind: string;
+  };
+  domain_payload: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    route?: string;
+    adapter?: string;
+    user_intent?: string;
+    lifecycle_policy?: string;
+    stop_after_stage?: string;
+    mode?: string;
+    baseline_deliverable_id?: string;
+  };
+}
+
+export interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
+  entry_contract_id: string;
+  target_domain_id: string;
+  task_intent: string;
+  entry_mode: string;
+  runtime_session_contract: Record<string, unknown>;
+  return_surface_contract: Record<string, unknown>;
+  domain_payload: Record<string, unknown>;
+  result_surface: ManagedRunResponse | RouteRunResponse;
+  summary: {
+    task_intent: string;
+    actual_surface_kind: string;
+    target_handle: string | null;
+  };
+}
+
+export interface ProductEntryRequest extends Record<string, unknown> {
+  workspace_locator: {
+    workspace_root: string;
+  };
+  entry_session_contract: {
+    entry_session_id: string;
+  };
+  task_intent?: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode?: string;
+  delivery_request: {
+    deliverable_family?: string;
+    topic_id?: string;
+    deliverable_id?: string;
+    profile_id?: string;
+    title?: string;
+    goal?: string;
+    route?: string;
+    adapter?: string;
+    user_intent?: string;
+    lifecycle_policy?: string;
+    stop_after_stage?: string;
+    mode?: string;
+    baseline_deliverable_id?: string;
+  };
+}
+
+export type FamilyOrchestrationReferenceRef = SharedFamilyOrchestrationReferenceRef;
+
+export type FamilyOrchestrationGatePreview = SharedFamilyOrchestrationGatePreview;
+
+export type FamilyOrchestrationResumeContract = SharedProductEntryResumeContract;
+
+export type FamilyOrchestrationCompanion = SharedFamilyOrchestrationCompanion;
+
+export interface ProductEntryQuickstartStep {
+  step_id: string;
+  title?: string;
+  command: string;
+  surface_kind: string;
+  summary?: string;
+  requires?: string[];
+}
+
+export interface ProductEntryQuickstartCompanion {
+  surface_kind: 'product_entry_quickstart' | string;
+  recommended_step_id: string;
+  summary?: string;
+  steps: ProductEntryQuickstartStep[];
+  resume_contract?: FamilyOrchestrationResumeContract;
+  human_gate_ids?: string[];
+}
+
+export interface ProductEntryStartMode {
+  mode_id: string;
+  title?: string;
+  command: string;
+  surface_kind: string;
+  summary?: string;
+  requires?: string[];
+}
+
+export interface ProductEntryStartCompanion {
+  ok: boolean;
+  surface_kind: 'product_entry_start' | string;
+  target_domain_id?: string;
+  workspace_locator?: {
+    workspace_surface_kind: string;
+    workspace_root: string;
+  };
+  summary: string;
+  recommended_mode_id: string;
+  modes: ProductEntryStartMode[];
+  resume_surface: {
+    surface_kind: string;
+    command: string;
+    session_locator_field?: string;
+    checkpoint_locator_field?: string;
+  };
+  human_gate_ids: string[];
+}
+
+export interface ProductEntryOverviewCompanion {
+  surface_kind: 'product_entry_overview' | string;
+  summary: string;
+  frontdesk_command: string;
+  recommended_command: string;
+  operator_loop_command: string;
+  progress_surface?: {
+    surface_kind: string;
+    command: string;
+    step_id?: string;
+  };
+  resume_surface?: {
+    surface_kind: string;
+    command: string;
+    session_locator_field?: string;
+    checkpoint_locator_field?: string;
+  };
+  recommended_step_id?: string;
+  next_focus: string[];
+  remaining_gaps_count: number;
+  human_gate_ids?: string[];
+}
+
+export interface ProductEntryReadinessCompanion {
+  surface_kind: 'product_entry_readiness' | string;
+  verdict: string;
+  usable_now: boolean;
+  good_to_use_now: boolean;
+  fully_automatic: boolean;
+  summary: string;
+  recommended_start_surface: string;
+  recommended_start_command: string;
+  recommended_loop_surface: string;
+  recommended_loop_command: string;
+  blocking_gaps: string[];
+}
+
+export interface ProductEntryPreflightCheck {
+  check_id: string;
+  title: string;
+  status: 'pass' | 'warn' | 'fail' | string;
+  blocking: boolean;
+  summary: string;
+  command: string;
+}
+
+export interface ProductEntryPreflightCompanion {
+  surface_kind: 'product_entry_preflight';
+  summary?: SurfaceSummary | string;
+  ready_to_try_now: boolean;
+  recommended_check_command: string;
+  recommended_start_command: string;
+  blocking_check_ids: string[];
+  checks: ProductEntryPreflightCheck[];
+}
+
+export interface ProductEntryRestorePoint {
+  latest_handle: string | null;
+  latest_managed_run_id: string | null;
+  latest_run_id: string | null;
+}
+
+export interface SessionContinuitySurface {
+  surface_kind: 'session_continuity';
+  entry_session_id: string;
+  session_file: string;
+  runtime_owner: string;
+  delivery_identity: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    profile_id: string | null;
+  };
+  restore_point: ProductEntryRestorePoint;
+  summary: {
+    entry_session_id: string;
+    latest_handle: string | null;
+  };
+}
+
+export interface ProgressProjectionSurface {
+  surface_kind: 'progress_projection';
+  managed_run_id: string | null;
+  projection: ManagedRunProjection;
+  refs: ManagedRuntimeSupervision['refs'] | null;
+  summary: {
+    current_stage: string | null;
+    content_status: ManagedRunProjection['content_status'] | null;
+    needs_user_decision: boolean;
+  };
+}
+
+export interface ArtifactInventorySurface {
+  surface_kind: 'artifact_inventory';
+  entry_session_id: string;
+  session_file: string;
+  restore_point: ProductEntryRestorePoint;
+  artifact_refs: string[];
+  refs: ManagedRuntimeSupervision['refs'] | null;
+  summary: {
+    latest_handle: string | null;
+    artifact_ref_count: number;
+  };
+}
+
+export interface RuntimeLoopClosureSurface {
+  surface_kind: 'runtime_loop_closure';
+  loop_owner: {
+    runtime_owner: string;
+    domain_owner: string;
+    product_entry_owner: string;
+  };
+  resume_point: {
+    entry_session_id: string | null;
+    session_file: string | null;
+    latest_managed_run_id: string | null;
+    latest_run_id: string | null;
+    latest_handle: string | null;
+    resume_command_template: string;
+    checkpoint_locator_field: string;
+  };
+  progress_cursor: {
+    surface_kind: 'progress_projection';
+    surface_ref: string;
+    managed_run_id: string | null;
+    current_stage: string | null;
+    content_status: ManagedRunProjection['content_status'] | null;
+    needs_user_decision: boolean;
+  };
+  artifact_pickup: {
+    surface_kind: 'artifact_inventory';
+    surface_ref: string;
+    deliverable_family: string | null;
+    topic_id: string | null;
+    deliverable_id: string | null;
+    artifact_refs: string[];
+    artifact_ref_count: number;
+  };
+  control_policy: {
+    approval_gate_id: string;
+    approval_required: boolean;
+    interrupt_policy: string;
+    continue_action: {
+      command: string;
+      surface_kind: 'product_entry_session';
+    };
+    human_gate_ids: string[];
+  };
+  source_linkage: {
+    current_source: string;
+    entry_mode: string | null;
+    direct_surface_kind: 'product_entry';
+    federated_surface_kind: 'federated_product_entry';
+    session_surface_kind: 'product_entry_session';
+    downstream_entry_surface_kind: 'domain_entry';
+  };
+}
+
+export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
+  product_entry_contract_id: string;
+  entry_session: {
+    entry_session_id: string;
+    session_file: string;
+    resumed_from_session: boolean;
+    created_deliverable: boolean;
+    runtime_owner: string;
+  };
+  delivery_identity: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    profile_id: string | null;
+  };
+  domain_entry_surface: DomainEntryResponse;
+  continuation_snapshot: {
+    latest_managed_run_id: string | null;
+    latest_run_id: string | null;
+    managed_progress_projection: ManagedRunProjection | null;
+    runtime_supervision: ManagedRuntimeSupervision | null;
+  };
+  session_continuity: SessionContinuitySurface;
+  progress_projection: ProgressProjectionSurface | null;
+  artifact_inventory: ArtifactInventorySurface;
+  runtime_loop_closure: RuntimeLoopClosureSurface;
+  review_state: ReviewStateResponse;
+  publication_projection: PublicationProjectionResponse;
+  family_orchestration: FamilyOrchestrationCompanion;
+  summary: {
+    entry_session_id: string;
+    task_intent: string;
+    actual_surface_kind: string | null;
+    target_handle: string | null;
+  };
+}
+
+export interface FederatedProductEntryRequest extends Record<string, unknown> {
+  target_domain_id: string;
+  task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  entry_mode: string;
+  workspace_locator: {
+    workspace_root: string;
+  };
+  runtime_session_contract: {
+    runtime_owner: string;
+  };
+  return_surface_contract: {
+    surface_kind: string;
+  };
+  entry_session_contract: ProductEntryRequest['entry_session_contract'];
+  delivery_request: ProductEntryRequest['delivery_request'];
+}
+
+export interface FederatedProductEntryResponse extends SurfaceBase<'federated_product_entry'> {
+  federated_product_entry_contract_id: string;
+  target_domain_id: string;
+  entry_mode: string;
+  runtime_session_contract: Record<string, unknown>;
+  return_surface_contract: {
+    requested_surface_kind: string;
+    actual_surface_kind: string;
+  };
+  family_orchestration: FamilyOrchestrationCompanion;
+  product_entry_surface: ProductEntryResponse;
+  runtime_loop_closure: RuntimeLoopClosureSurface;
+  summary: {
+    entry_session_id: string | null;
+    actual_surface_kind: string;
+    target_handle: string | null;
+  };
+}
+
+export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_session'> {
+  product_entry_contract_id: string;
+  entry_session: {
+    entry_session_id: string;
+    session_file: string;
+    runtime_owner: string;
+  };
+  delivery_identity: {
+    deliverable_family: string;
+    topic_id: string;
+    deliverable_id: string;
+    profile_id: string | null;
+  };
+  continuation_snapshot: {
+    latest_managed_run_id: string | null;
+    latest_run_id: string | null;
+    managed_progress_projection: ManagedRunProjection | null;
+    runtime_supervision: ManagedRuntimeSupervision | null;
+  };
+  session_continuity: SessionContinuitySurface;
+  progress_projection: ProgressProjectionSurface | null;
+  artifact_inventory: ArtifactInventorySurface;
+  runtime_loop_closure: RuntimeLoopClosureSurface;
+  review_state: ReviewStateResponse;
+  publication_projection: PublicationProjectionResponse;
+  family_orchestration: FamilyOrchestrationCompanion;
+  summary: {
+    entry_session_id: string;
+    deliverable_id: string;
+    latest_handle: string | null;
+  };
+}
+
+export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry_manifest'> {
+  manifest_version: 2 | number;
+  manifest_kind: string;
+  target_domain_id: string;
+  formal_entry: {
+    default: 'CLI' | string;
+    supported_protocols: string[];
+    internal_surface: string;
+  };
+  workspace_locator: {
+    workspace_surface_kind: string;
+    workspace_root: string;
+  };
+  recommended_shell: 'direct' | 'opl_bridge' | 'session' | string;
+  frontdesk_surface: {
+    shell_key: 'frontdesk' | string;
+    command: string;
+    surface_kind: string;
+    summary: string;
+  };
+  operator_loop_surface: {
+    shell_key: 'direct' | 'opl_bridge' | 'session' | string;
+    command: string;
+    surface_kind: string;
+    summary: string;
+    continuation_shell_key?: 'direct' | 'opl_bridge' | 'session' | string;
+    continuation_command?: string;
+  };
+  operator_loop_actions: Record<string, {
+    command: string;
+    surface_kind: string;
+    summary: string;
+    requires: string[];
+  }>;
+  product_entry_status: {
+    summary: string;
+    next_focus: string[];
+    remaining_gaps_count: number;
+  };
+  runtime: {
+    runtime_owner: string;
+    runtime_state_root: string;
+    session_store_root: string;
+  };
+  managed_runtime_contract: {
+    shared_contract_ref: string;
+    runtime_owner: string;
+    domain_owner: string;
+    executor_owner: string;
+    supervision_status_surface: {
+      surface_kind: string;
+      owner: string;
+    };
+    attention_queue_surface: {
+      surface_kind: string;
+      owner: string;
+    };
+    recovery_contract_surface: {
+      surface_kind: string;
+      owner: string;
+    };
+    fail_closed_rules: string[];
+  };
+  product_entry_shell: {
+    frontdesk: {
+      command: string;
+      command_template: string;
+      surface_kind: 'product_frontdesk' | string;
+    };
+    direct: {
+      command: string;
+      command_template: string;
+      surface_kind: 'product_entry';
+    };
+    opl_bridge: {
+      command: string;
+      command_template: string;
+      surface_kind: 'federated_product_entry';
+    };
+    session: {
+      command: string;
+      command_template: string;
+      surface_kind: 'product_entry_session';
+    };
+  };
+  shared_handoff: FamilySharedHandoffSurface & {
+    opl_return_surface: {
+      surface_kind: 'product_entry';
+      target_domain_id: string;
+    };
+  };
+  domain_entry_contract: DomainEntryContractSurface;
+  gateway_interaction_contract: GatewayInteractionContractSurface;
+  product_entry_start: ProductEntryStartCompanion;
+  product_entry_overview: ProductEntryOverviewCompanion;
+  product_entry_preflight: ProductEntryPreflightCompanion;
+  product_entry_readiness: ProductEntryReadinessCompanion;
+  product_entry_quickstart: ProductEntryQuickstartCompanion;
+  family_orchestration: FamilyOrchestrationCompanion;
+  current_truth: {
+    product_entry_contract: string;
+    federated_product_entry_contract: string;
+    managed_product_entry_contract: string;
+  };
+  session_continuity: {
+    surface_kind: 'session_continuity';
+    owner: string;
+    status: string;
+    summary: string;
+    progress_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    artifact_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_field_refs: Array<{
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+    session_surface_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    session_file_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    session_command_template: string;
+    truth_surfaces: Array<{
+      surface_kind: string;
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+  };
+  progress_projection: {
+    surface_kind: 'progress_projection';
+    owner: string;
+    status: string;
+    summary: string;
+    projection_field_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    runtime_refs_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    fallback_projection_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    fallback_runtime_refs_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    truth_surfaces: Array<{
+      surface_kind: string;
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+  };
+  artifact_inventory: {
+    surface_kind: 'artifact_inventory';
+    owner: string;
+    status: string;
+    summary: string;
+    artifact_refs_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    artifact_ref_count_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    artifact_refs_fallback_ref: {
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    };
+    restore_point_field_refs: Array<{
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+    session_command_template: string;
+    truth_surfaces: Array<{
+      surface_kind: string;
+      ref_kind: string;
+      ref: string;
+      label?: string;
+    }>;
+  };
+  runtime_loop_closure: RuntimeLoopClosureSurface;
+  notes: string[];
+}
+
+export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk'> {
+  target_domain_id: string;
+  frontdesk_surface: ProductEntryManifestResponse['frontdesk_surface'];
+  workspace_locator: ProductEntryManifestResponse['workspace_locator'];
+  runtime: ProductEntryManifestResponse['runtime'];
+  product_entry_status: ProductEntryManifestResponse['product_entry_status'];
+  operator_loop_surface: ProductEntryManifestResponse['operator_loop_surface'];
+  operator_loop_actions: ProductEntryManifestResponse['operator_loop_actions'];
+  product_entry_start: ProductEntryManifestResponse['product_entry_start'];
+  product_entry_overview: ProductEntryManifestResponse['product_entry_overview'];
+  product_entry_preflight: ProductEntryManifestResponse['product_entry_preflight'];
+  product_entry_readiness: ProductEntryManifestResponse['product_entry_readiness'];
+  product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
+  family_orchestration: ProductEntryManifestResponse['family_orchestration'];
+  product_entry_manifest: ProductEntryManifestResponse;
+  entry_surfaces: FamilyFrontdeskEntrySurfaces & {
+    direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
+    opl_bridge: ProductEntryManifestResponse['product_entry_shell']['opl_bridge'];
+    session: ProductEntryManifestResponse['product_entry_shell']['session'];
+  };
+  domain_entry_contract: ProductEntryManifestResponse['domain_entry_contract'];
+  gateway_interaction_contract: ProductEntryManifestResponse['gateway_interaction_contract'];
+  summary: {
+    frontdesk_command: string | null;
+    recommended_command: string;
+    operator_loop_command: string | null;
+  };
+  notes: string[];
+}
+
+export interface ProductPreflightResponse extends SurfaceBase<'product_entry_preflight'>, ProductEntryPreflightCompanion {
+  target_domain_id: string;
+  workspace_locator: ProductEntryManifestResponse['workspace_locator'];
+}

@@ -307,7 +307,6 @@ function buildOperatorQuickstart() {
   };
 }
 
-
 function buildCommandHelp(commandKey: string): JsonMap | null {
   const operatorQuickstart = buildOperatorQuickstart();
   const catalog = {
@@ -426,10 +425,6 @@ export function getCliGatewayActions(overrides: GatewayActionMap = {}): typeof D
   };
 }
 
-/**
- * @param {Record<string, unknown>} [gatewayActions]
- * @returns {Promise<Record<string, unknown>>}
- */
 export async function buildHelp(gatewayActions: GatewayActionMap = getCliGatewayActions()): Promise<JsonMap> {
   const overlayCatalog = await gatewayActions.getOverlayCatalog();
 
@@ -865,7 +860,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
     throw new Error('product 命令支持 frontdesk|start|preflight|invoke|session|manifest；internal OPL bridge 由外层 shell 调用');
   }
-
 
   if (command === 'review') {
     if (subcommand === 'get') {
