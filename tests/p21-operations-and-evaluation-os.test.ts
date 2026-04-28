@@ -8,11 +8,7 @@ const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluati
 const GATEWAY_TYPE_SURFACE_FILES = [
   'packages/redcube-gateway/src/types.ts',
   'packages/redcube-gateway/src/types-parts/foundation.ts',
-  'packages/redcube-gateway/src/types-parts/managed.ts',
   'packages/redcube-gateway/src/types-parts/product-entry.ts',
-  'packages/redcube-gateway/src/types-parts/review.ts',
-  'packages/redcube-gateway/src/types-parts/source.ts',
-  'packages/redcube-gateway/src/types-parts/telemetry.ts',
 ];
 
 function read(file) {

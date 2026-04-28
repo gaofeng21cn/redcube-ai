@@ -6,7 +6,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 
 import { buildPerformanceReport as buildGatewayPerformanceReport } from '@redcube/gateway';
 import { buildPerformanceReport } from '@redcube/runtime';
-import { executeCli } from '../apps/redcube-cli/src/cli.ts';
+import { executeCli } from '../apps/redcube-cli/dist/cli.js';
 
 function writeJson(file: string, value: unknown): void {
   mkdirSync(path.dirname(file), { recursive: true });

@@ -53,6 +53,14 @@ function createIsolatedCliInstall() {
     path.resolve('apps/redcube-cli/src/cli.ts'),
     path.join(cliDir, 'cli.ts'),
   );
+  cpSync(
+    path.resolve('apps/redcube-cli/dist/cli-parts'),
+    path.join(cliDir, 'cli-parts'),
+    {
+      recursive: true,
+      force: true,
+    },
+  );
   writeFileSync(
     path.join(installRoot, 'package.json'),
     JSON.stringify({

@@ -1,4 +1,3 @@
-import { getCliGatewayActions } from './gateway-actions.js';
 import type { GatewayActionMap, JsonMap } from './types.js';
 
 function buildCommonFlows(overlayCatalog: { overlays: JsonMap[] }): JsonMap {
@@ -161,7 +160,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
  * @param {Record<string, unknown>} [gatewayActions]
  * @returns {Promise<Record<string, unknown>>}
  */
-export async function buildHelp(gatewayActions: GatewayActionMap = getCliGatewayActions()): Promise<JsonMap> {
+export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonMap> {
   const overlayCatalog = await gatewayActions.getOverlayCatalog();
 
   return {

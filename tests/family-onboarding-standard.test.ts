@@ -14,6 +14,13 @@ function readImplementation(file) {
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
 }
 
+function readCliSource() {
+  return [
+    read('apps/redcube-cli/src/cli.ts'),
+    read('apps/redcube-cli/src/cli-parts/help.ts'),
+  ].join('\n');
+}
+
 test('gateway actions no longer hardcode overlay family packages directly', () => {
   const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.ts');
   const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.ts');
@@ -61,7 +68,7 @@ test('overlay registry package exports default registry entrypoint', () => {
 });
 
 test('CLI onboarding usage no longer hardcodes current overlay ids in deliverable create help', () => {
-  const cliSource = read('apps/redcube-cli/src/cli.ts');
+  const cliSource = readCliSource();
 
   assert.equal(cliSource.includes('<ppt_deck|xiaohongshu>'), false);
   assert.equal(cliSource.includes('redcube profile --action list'), true);

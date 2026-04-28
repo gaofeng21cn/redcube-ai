@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 
-import { getSourceArtifactPaths } from './source-truth.js';
+import { getTopicPaths } from './workspace.js';
 import type { SourceReadinessSummary } from './types.js';
 
 type JsonRecord = Record<string, unknown>;
@@ -32,6 +33,14 @@ function safeReadJson(file: string): JsonRecord | null {
   }
 }
 
+function getSourceReadinessArtifactPaths(workspaceRoot: string, topicId: string) {
+  const topicPaths = getTopicPaths(workspaceRoot, topicId);
+  return {
+    sourceAuditFile: path.join(topicPaths.canonicalDir, 'source-audit.json'),
+    sourceReadinessPackFile: path.join(topicPaths.canonicalDir, 'source-readiness-pack.json'),
+  };
+}
+
 function nextRequiredSurface({
   auditExists,
   auditValid,
@@ -56,7 +65,7 @@ export function loadSourceReadinessSummary(workspaceRoot: string, topicId: strin
     return null;
   }
 
-  const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
+  const sourcePaths = getSourceReadinessArtifactPaths(workspaceRoot, topicId);
   const auditExists = existsSync(sourcePaths.sourceAuditFile);
   const readinessExists = existsSync(sourcePaths.sourceReadinessPackFile);
   const sourceAudit = auditExists ? safeReadJson(sourcePaths.sourceAuditFile) : null;

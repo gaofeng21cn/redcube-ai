@@ -2,15 +2,6 @@ import type { GovernanceSurfaceContract } from '@redcube/overlay-core';
 import type { WorkspaceContract } from '@redcube/runtime-protocol';
 import type { FamilyDomainEntryContractSurface } from 'opl-gateway-shared/family-entry-contracts';
 
-import type {
-  ApprovalThroughputSummary,
-  CostSummary,
-  ErrorTaxonomySummary,
-  MetricExtensionSummary,
-  QualityDriftSummary,
-  RerunAnalyticsSummary,
-  RunTelemetrySummary,
-} from './telemetry.js';
 
 export interface WorkspaceRootRequest {
   workspaceRoot: string;
@@ -177,4 +168,398 @@ export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayR
   userIntent?: string;
   managedRunId?: string | null;
   stopAfterStage?: string;
+}
+
+// Telemetry summaries
+export type PosterMetricId =
+  | 'far_view_readability'
+  | 'scan_path_clarity'
+  | 'figure_claim_alignment'
+  | 'density_balance'
+  | 'citation_visibility'
+  | 'venue_metadata_complete'
+  | 'print_export_safe';
+
+export interface MetricExtensionMetricSummary {
+  metric_id: PosterMetricId | string;
+  value: number | string | boolean | null;
+  status: 'not_evaluated' | 'captured';
+}
+
+export interface MetricExtensionSummary {
+  extension_id: string;
+  overlay_scope: string[];
+  profile_scope: string[];
+  status: 'declared' | 'inactive';
+  metrics: MetricExtensionMetricSummary[];
+}
+
+export interface RunTelemetrySummary {
+  run_id: string | null;
+  route: string | null;
+  overlay: string | null;
+  scope: string | null;
+  target: string | null;
+  executor_kind: string | null;
+  execution_surface: string | null;
+  status: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  latency_ms: number | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  estimated_cost: number | null;
+}
+
+export interface ErrorTaxonomySummary {
+  error_kind: string | null;
+  error_message: string | null;
+  current_stage: string | null;
+  failed: boolean;
+}
+
+export interface RerunAnalyticsSummary {
+  rerun_count: number;
+  previous_run_id: string | null;
+  source_stage: string | null;
+  blocking_review: string | null;
+  baseline_deliverable_id: string | null;
+}
+
+export interface CostSummary {
+  executor_identity: string | null;
+  executor_kind: string | null;
+  latency_ms: number | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  estimated_cost: number | null;
+}
+
+export interface QualityDriftSummary {
+  relative_quality_verdict: string | null;
+  degradation_count: number;
+  improvement_count: number;
+  acceptable_change_count: number;
+  baseline_promotion_state: string | null;
+  promoted_reference_id: string | null;
+}
+
+export interface ApprovalThroughputSummary {
+  publish_state: string | null;
+  pending_review_count: number;
+  approval_pending: boolean;
+  published: boolean;
+  blocked: boolean;
+}
+
+
+// Managed run surfaces
+export interface ManagedRunProjection {
+  current_stage: string | null;
+  latest_events: Array<{
+    at: string;
+    stage_id: string | null;
+    kind: string;
+    summary: string;
+  }>;
+  current_blockers: string[];
+  next_system_action: string | null;
+  needs_user_decision: boolean;
+  final_artifact_refs: string[];
+  content_status: 'running' | 'completed' | 'paused_for_user_request' | 'blocked_by_runtime' | 'blocked_requires_human';
+  completed_stages: string[];
+  remaining_stages: string[];
+  last_completed_stage: string | null;
+  last_completed_at: string | null;
+  human_report: {
+    reported_at: string | null;
+    recent_completion: string;
+    mainline_status: string;
+    runtime_health: string;
+    current_blockers: string;
+    next_system_action: string;
+    needs_human_intervention: boolean;
+  };
+}
+
+export interface ManagedRuntimeSupervision {
+  schema_version: 1;
+  recorded_at: string;
+  managed_run_id: string;
+  overlay: string;
+  topic_id: string;
+  deliverable_id: string;
+  health_status: 'live' | 'recovering' | 'degraded' | 'paused' | 'completed' | 'escalated';
+  runtime_liveness_audit: {
+    status: 'live' | 'none';
+    checked_at: string | null;
+    reason_code: string;
+  };
+  worker_running: boolean;
+  active_run_id: string | null;
+  current_stage: string | null;
+  content_status: ManagedRunProjection['content_status'];
+  current_blockers: string[];
+  needs_human_intervention: boolean;
+  summary: string;
+  next_action: string | null;
+  last_transition: string;
+  recovery_attempt_count: number;
+  consecutive_failure_count: number;
+  refs: {
+    managed_run_path: string;
+    progress_projection_path: string;
+    runtime_supervision_path: string;
+    escalation_record_path: string;
+  };
+}
+
+export interface ManagedEscalationRecord {
+  schema_version: 1;
+  recorded_at: string;
+  managed_run_id: string;
+  escalation_status: 'none' | 'escalated';
+  reason_code: string | null;
+  severity: 'none' | 'managed_runtime';
+  recommended_actions: string[];
+  evidence_refs: string[];
+  runtime_context_refs: Record<string, string>;
+  requires_human_intervention: boolean;
+}
+
+export interface ManagedRunResponse extends SurfaceBase<'managed_run'> {
+  managed_run: Record<string, unknown>;
+  progress_projection: ManagedRunProjection;
+  runtime_supervision: ManagedRuntimeSupervision;
+  escalation_record: ManagedEscalationRecord;
+  summary: {
+    managed_run_id: string | null;
+    status: string | null;
+    current_stage: string | null;
+  };
+}
+
+export interface ManagedRunRecordResponse extends SurfaceBase<'managed_run_record'> {
+  managed_run: ManagedRunResponse['managed_run'];
+  progress_projection: ManagedRunProjection;
+  runtime_supervision: ManagedRuntimeSupervision;
+  escalation_record: ManagedEscalationRecord;
+  summary: ManagedRunResponse['summary'];
+}
+
+export interface ManagedSupervisionResponse extends SurfaceBase<'managed_supervision'> {
+  managed_run: ManagedRunResponse['managed_run'];
+  progress_projection: ManagedRunProjection;
+  runtime_supervision: ManagedRuntimeSupervision;
+  escalation_record: ManagedEscalationRecord;
+  summary: ManagedRunResponse['summary'];
+}
+
+export interface RunManagedDeliverableRequest extends DeliverableRequest, OverlayRequest {
+  adapter?: string;
+  userIntent?: string;
+  stopAfterStage?: string;
+  mode?: string;
+  baselineDeliverableId?: string;
+}
+
+export interface SuperviseManagedRunRequest extends WorkspaceRootRequest {
+  managedRunId: string;
+}
+
+
+// Review surfaces
+export interface ReviewStateResponse extends SurfaceBase<'review_state'> {
+  state: Record<string, unknown>;
+  state_type: 'canonical';
+  canonical_source: {
+    kind: string;
+  };
+  quality_summary: Record<string, unknown>;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract;
+}
+
+export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
+  run_id: string;
+  current_stage: string | null;
+  status: string;
+  pending_reviews: string[];
+  review_state: Record<string, unknown>;
+  quality_summary: Record<string, unknown>;
+  publication_projection: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract;
+  resumable: boolean;
+  profile_id: string | null;
+  delivery_contract: Record<string, unknown> | null;
+  required_export_bundle: Record<string, unknown> | null;
+  run_telemetry: RunTelemetrySummary;
+  error_taxonomy: ErrorTaxonomySummary;
+  rerun_analytics: RerunAnalyticsSummary;
+  cost_summary: CostSummary;
+  quality_drift_summary: QualityDriftSummary;
+  approval_throughput_summary: ApprovalThroughputSummary;
+  metric_extensions: MetricExtensionSummary[];
+}
+
+export interface ReviewMutationRequest extends DeliverableRequest {
+  mutation: Record<string, unknown>;
+}
+
+export interface ReviewMutationResponse {
+  ok: boolean;
+  state: Record<string, unknown>;
+  quality_summary?: Record<string, unknown>;
+  state_file?: string;
+  history_file?: string;
+  publication_state_file?: string | null;
+}
+
+export interface ReviewRenderOutputRequest extends Partial<DeliverableRequest>, Partial<OverlayRequest> {
+  checks: Record<string, unknown>;
+}
+
+export interface ReviewRenderOutputResponse {
+  ok: boolean;
+  status: string;
+  issues?: string[];
+  rerun_from_stage?: string | null;
+  recommended_action?: string;
+}
+
+export interface DeliverableAuditRequest extends Partial<DeliverableRequest>, OverlayRequest {
+  mode: string;
+  baselineDeliverableId?: string;
+}
+
+export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
+  status: string;
+  issues: string[];
+  rerun_from_stage: string | null;
+  quality_summary: Record<string, unknown>;
+  review_state?: Record<string, unknown> | null;
+  publication_projection?: Record<string, unknown> | null;
+  source_readiness_summary: Record<string, unknown> | null;
+  gate_summary: Record<string, unknown> | null;
+  operator_handoff: Record<string, unknown> | null;
+  lifecycle_stage_summary: Record<string, unknown> | null;
+  governance_surface: GovernanceSurfaceContract | null;
+  delivery_contract?: Record<string, unknown> | null;
+}
+
+
+// Source surfaces
+export interface SourceIntakeResponse extends SurfaceBase<'source_intake'> {
+  artifactFiles: Record<string, string>;
+  audit: Record<string, unknown>;
+  augmentation: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    audit_status: string | null;
+    blocking_reason_count: number;
+  };
+}
+
+export interface SourceResearchResponse extends SurfaceBase<'source_research'> {
+  artifactFiles: Record<string, string>;
+  stage: string;
+  planningReady: boolean;
+  report: Record<string, unknown>;
+  intake: Record<string, unknown>;
+  augmentation?: Record<string, unknown>;
+  resultPreparation?: Record<string, unknown>;
+  resultWrite?: Record<string, unknown>;
+  execution?: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    stage: string | null;
+    planning_ready: boolean;
+  };
+}
+
+export interface SourceAugmentationResponse extends SurfaceBase<'source_augmentation'> {
+  artifactFiles: Record<string, string>;
+  augmentation: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    status: string | null;
+    readiness_target: string | null;
+  };
+}
+
+export interface SourceAugmentationResultPreparationResponse extends SurfaceBase<'source_augmentation_result_preparation'> {
+  artifactFiles: Record<string, string>;
+  request: Record<string, unknown>;
+  resultDraft: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    readiness_target: string | null;
+    evidence_gap_count: number;
+  };
+}
+
+export interface SourceAugmentationResultWriteResponse extends SurfaceBase<'source_augmentation_result_write'> {
+  artifactFiles: Record<string, string>;
+  resultContract: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    readiness_target: string | null;
+    reference_source_count: number;
+    fact_group_count: number;
+  };
+}
+
+export interface SourceAugmentationExecutionResponse extends SurfaceBase<'source_augmentation_execution'> {
+  artifactFiles: Record<string, string>;
+  report: Record<string, unknown>;
+  summary: {
+    topic_id: string;
+    status: string | null;
+    readiness_target: string | null;
+  };
+}
+
+export interface SourceFirstFanoutDeliverableRequest extends OverlayRequest {
+  deliverableId: string;
+  profileId: string;
+  title: string;
+  goal: string;
+  userIntent?: string;
+  adapter?: string;
+  stopAfterStage?: string;
+  mode?: string;
+  baselineDeliverableId?: string;
+}
+
+export interface RunSourceFirstFanoutRequest extends TopicRequest {
+  title?: string;
+  brief?: string;
+  keywords?: string[];
+  sourceFiles?: string[];
+  operatorFiles?: string[];
+  deliverables: SourceFirstFanoutDeliverableRequest[];
+}
+
+export interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fanout'> {
+  source_barrier: SourceResearchResponse;
+  source_pack_federation?: Record<string, unknown>;
+  source_pack_manifest?: Record<string, unknown>;
+  planner?: Record<string, unknown>;
+  created_deliverables?: DeliverableCreateResponse[];
+  managed_runs?: ManagedRunResponse[];
+  summary: {
+    topic_id: string;
+    source_barrier_status: string;
+    deliverable_count: number;
+    managed_run_count: number;
+    parallel_family_ready?: boolean;
+    max_parallel_width?: number;
+  };
 }

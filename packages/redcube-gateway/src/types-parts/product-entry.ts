@@ -12,17 +12,15 @@ import type {
 
 import type {
   DomainEntryContractSurface,
+  ManagedRunProjection,
+  ManagedRunResponse,
+  ManagedRuntimeSupervision,
   PublicationProjectionResponse,
+  ReviewStateResponse,
   RouteRunResponse,
   SurfaceBase,
   SurfaceSummary,
 } from './foundation.js';
-import type {
-  ManagedRunProjection,
-  ManagedRunResponse,
-  ManagedRuntimeSupervision,
-} from './managed.js';
-import type { ReviewStateResponse } from './review.js';
 
 export interface DomainEntryRequest extends Record<string, unknown> {
   target_domain_id: string;

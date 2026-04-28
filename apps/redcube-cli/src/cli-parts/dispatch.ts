@@ -1,8 +1,87 @@
-import { getCliGatewayActions } from './gateway-actions.js';
+import {
+  auditDeliverable,
+  applyReviewMutation,
+  createDeliverable,
+  doctorWorkspace,
+  getDeliverable,
+  getOverlayCatalog,
+  getPublicationProjection,
+  getReviewState,
+  getRun as getGatewayRun,
+  getManagedRun as getGatewayManagedRun,
+  invokeDomainEntry,
+  invokeFederatedProductEntry,
+  invokeProductEntry,
+  getProductFrontdesk,
+  getProductEntryManifest,
+  getProductStart,
+  getProductPreflight,
+  getProductEntrySession,
+  buildPerformanceReport,
+  superviseManagedRun as superviseGatewayManagedRun,
+  intakeSource,
+  researchSource,
+  prepareSourceAugmentation,
+  prepareSourceAugmentationResult,
+  writeSourceAugmentationResult,
+  executeSourceAugmentation,
+  listTopics as listTopicsGateway,
+  runtimeWatch,
+  runDeliverableRoute,
+  runManagedDeliverable,
+} from '@redcube/gateway';
+
 import { buildCommandHelp, buildHelp } from './help.js';
+import { buildCliJsonSummary } from './json-summary.js';
 import { parseArgs, resolveWorkspaceRoot } from './options.js';
+import { printJson } from './output.js';
 import { loadPrivateProfileModule } from './private-profile.js';
 import type { CliDependenciesMap, JsonMap } from './types.js';
+
+const DEFAULT_GATEWAY_ACTIONS = {
+  auditDeliverable,
+  applyReviewMutation,
+  createDeliverable,
+  doctorWorkspace,
+  getDeliverable,
+  getOverlayCatalog,
+  getPublicationProjection,
+  getReviewState,
+  getRun: getGatewayRun,
+  getManagedRun: getGatewayManagedRun,
+  invokeDomainEntry,
+  invokeFederatedProductEntry,
+  invokeProductEntry,
+  getProductFrontdesk,
+  getProductEntryManifest,
+  getProductStart,
+  getProductPreflight,
+  getProductEntrySession,
+  buildPerformanceReport,
+  superviseManagedRun: superviseGatewayManagedRun,
+  intakeSource,
+  researchSource,
+  prepareSourceAugmentation,
+  prepareSourceAugmentationResult,
+  writeSourceAugmentationResult,
+  executeSourceAugmentation,
+  listTopics: listTopicsGateway,
+  runtimeWatch,
+  runDeliverableRoute,
+  runManagedDeliverable,
+};
+
+export function getCliGatewayActions(overrides: Record<string, unknown> = {}): typeof DEFAULT_GATEWAY_ACTIONS {
+  return {
+    ...DEFAULT_GATEWAY_ACTIONS,
+    ...overrides,
+  };
+}
+
+function shouldPrintSummary(argv: string[]): boolean {
+  const options = parseArgs(argv);
+  return options.jsonSummary === true || options.quiet === true;
+}
 
 export async function executeCli(argv: string[], deps: CliDependenciesMap = {}): Promise<JsonMap> {
   const [command, ...rest] = argv;
@@ -382,4 +461,15 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   }
 
   throw new Error(`未知命令: ${command}`);
+}
+
+export async function runCli(argv: string[], deps: CliDependenciesMap = {}): Promise<JsonMap> {
+  const result = await executeCli(argv, deps);
+  const printer = deps.printJson || printJson;
+  printer(shouldPrintSummary(argv) ? buildCliJsonSummary(result) : result);
+  return result;
+}
+
+export async function main(argv = process.argv.slice(2), deps: CliDependenciesMap = {}): Promise<JsonMap> {
+  return runCli(argv, deps);
 }

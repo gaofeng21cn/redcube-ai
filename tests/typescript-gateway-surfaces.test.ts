@@ -16,7 +16,6 @@ test('gateway exposes a TypeScript entrypoint and typed product surface contract
   const types = [
     read('packages/redcube-gateway/src/types.ts'),
     read('packages/redcube-gateway/src/types-parts/foundation.ts'),
-    read('packages/redcube-gateway/src/types-parts/managed.ts'),
     read('packages/redcube-gateway/src/types-parts/product-entry.ts'),
   ].join('\n');
   const entry = read('packages/redcube-gateway/src/index.ts');

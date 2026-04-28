@@ -14,6 +14,14 @@ function readImplementation(file) {
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
 }
 
+function readCliSource() {
+  return [
+    read('apps/redcube-cli/src/cli.ts'),
+    read('apps/redcube-cli/src/cli-parts/help.ts'),
+    read('apps/redcube-cli/src/cli-parts/output.ts'),
+  ].join('\n');
+}
+
 test('harness audit: runtime/kernel no longer owns family render branches and core capability planes are package-scoped', () => {
   const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.ts');
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
@@ -90,7 +98,7 @@ test('harness audit: reference quality is a formal operating surface, not only t
 });
 
 test('harness audit: gateway product surface is stable across success and failure paths', () => {
-  const cli = read('apps/redcube-cli/src/cli.ts');
+  const cli = readCliSource();
   const mcp = read('apps/redcube-mcp/src/server.ts');
   const getDeliverable = readImplementation('packages/redcube-gateway/src/actions/get-deliverable.ts');
   const runRoute = readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.ts');

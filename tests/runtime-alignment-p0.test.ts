@@ -24,9 +24,16 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
+function readCliSource() {
+  return [
+    read('apps/redcube-cli/src/cli.ts'),
+    read('apps/redcube-cli/src/cli-parts/help.ts'),
+  ].join('\n');
+}
+
 test('repo-tracked docs keep durable runtime truth while public readmes stay shell-first and codex-default', () => {
   const pkg = JSON.parse(read('package.json'));
-  const cli = read('apps/redcube-cli/src/cli.ts');
+  const cli = readCliSource();
 
   assert.equal(Boolean(pkg.scripts.redcube), true);
   assert.equal(Boolean(pkg.scripts.mcp), true);
@@ -50,7 +57,7 @@ test('repo-tracked docs keep durable runtime truth while public readmes stay she
 });
 
 test('CLI help exposes the current deliverable adapter set, including the explicit Hermes proof lane', () => {
-  const cli = read('apps/redcube-cli/src/cli.ts');
+  const cli = readCliSource();
 
   assert.equal(
     cli.includes('[--adapter <host_agent|hermes_native_proof>]'),
