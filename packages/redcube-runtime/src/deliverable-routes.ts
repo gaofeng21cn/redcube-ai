@@ -95,6 +95,134 @@ function buildExecutorDescriptor(executor, runtimeDescriptor) {
   };
 }
 
+function parseRouteRequest(request) {
+  const {
+    workspaceRoot,
+    overlay,
+    topicId,
+    deliverableId,
+    route,
+    runId = null,
+    managedRunId = null,
+    adapter = CODEX_DEFAULT_ADAPTER,
+    userIntent = '',
+    mode = 'draft_new',
+    baselineDeliverableId = '',
+    candidateCount = 1,
+  } = request;
+  const safeRoute = requireSafeSegment('route', route);
+  validateDeliverableRouteInput({
+    workspaceRoot,
+    overlay,
+    topicId,
+    deliverableId,
+    route: safeRoute,
+  });
+  return {
+    workspaceRoot,
+    overlay,
+    topicId,
+    deliverableId,
+    runId,
+    managedRunId,
+    adapter,
+    userIntent,
+    mode,
+    baselineDeliverableId,
+    candidateCount,
+    safeRoute,
+  };
+}
+
+function requestHasExplicitAdapter(request) {
+  return Object.prototype.hasOwnProperty.call(request, 'adapter')
+    && String(request.adapter || '').trim();
+}
+
+function buildRuntimeDescriptor({ workspaceRoot, selectedExecutor, fallbackExecutor }) {
+  if (fallbackExecutor.adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    return buildHermesNativeRuntimeDescriptor(readHermesNativeProofContract({ cwd: workspaceRoot }));
+  }
+  if (fallbackExecutor.adapter === HERMES_DEFAULT_ADAPTER || fallbackExecutor.adapter === HERMES_AGENT_EXECUTOR_BACKEND) {
+    return buildHermesAgentRuntimeDescriptor(
+      process.env,
+      selectedExecutor.execution_shape,
+      selectedExecutor.hermes_profile,
+    );
+  }
+  return buildCodexRuntimeDescriptor(readCodexCliContract());
+}
+
+function resolveRouteExecutor({ workspaceRoot, overlay, topicId, deliverableId, safeRoute, request, adapter }) {
+  const profileId = readHydratedContractProfileId({ workspaceRoot, topicId, deliverableId });
+  const executorRouting = resolveExecutorRouting({
+    family: overlay,
+    profileId,
+    route: safeRoute,
+    requestAdapter: requestHasExplicitAdapter(request) ? adapter : null,
+    requestExecutorBackend: request.executorBackend || request.executor_backend || null,
+    oplDefaultExecutorBackend: request.oplDefaultExecutorBackend || request.opl_default_executor_backend || null,
+  });
+  const selectedExecutor = executorRouting.selected_executor;
+  const fallbackExecutor = resolveExecutorAdapter({
+    adapter: selectedExecutor.adapter,
+    executorBackend: selectedExecutor.executor_backend,
+    executionShape: selectedExecutor.execution_shape,
+    hermesProfile: selectedExecutor.hermes_profile,
+    executorRouting,
+  });
+  const runtimeDescriptor = buildRuntimeDescriptor({
+    workspaceRoot,
+    selectedExecutor,
+    fallbackExecutor,
+  });
+  const executor = buildExecutorDescriptor(
+    {
+      adapter: fallbackExecutor.adapter,
+      primary: fallbackExecutor.primary,
+      execution_surface: fallbackExecutor.execution_surface,
+      creative_execution: fallbackExecutor.creative_execution,
+      execution_model: fallbackExecutor.execution_model,
+    },
+    runtimeDescriptor,
+  );
+  return {
+    executorRouting,
+    selectedExecutor,
+    executor,
+  };
+}
+
+function buildRouteStartedEvent({ executor, safeRoute, overlay, deliverableId }) {
+  return {
+    type: executor.adapter === HERMES_NATIVE_PROOF_ADAPTER
+      ? 'hermes_native_route_started'
+      : (
+          executor.adapter === HERMES_DEFAULT_ADAPTER || executor.adapter === HERMES_AGENT_EXECUTOR_BACKEND
+            ? 'hermes_agent_route_started'
+            : 'codex_route_started'
+        ),
+    route: safeRoute,
+    overlay,
+    deliverable_id: deliverableId,
+    ...(executor.codex_cli_runtime
+      ? {
+          codex_cli_runtime: executor.codex_cli_runtime,
+        }
+      : {}),
+    ...(executor.hermes_native_runtime
+      ? {
+          hermes_native_runtime: executor.hermes_native_runtime,
+        }
+      : {}),
+    ...(executor.hermes_agent_runtime
+      ? {
+          hermes_agent_runtime: executor.hermes_agent_runtime,
+        }
+      : {}),
+  };
+}
+
 function patchArtifactExecutionModel(artifactFile, executor) {
   const artifact = JSON.parse(readFileSync(artifactFile, 'utf-8'));
   artifact.execution_model = {
@@ -246,64 +374,202 @@ function buildRoutePromptTelemetry(routeResult = {}) {
   };
 }
 
+function materializeRouteResult({ raced, executor }) {
+  const routeResult = raced.artifact;
+  routeResult.artifact = {
+    ...(routeResult.artifact || {}),
+    candidate_race: raced.race,
+  };
+  writeFileSync(routeResult.artifact_file, JSON.stringify(routeResult.artifact, null, 2), 'utf-8');
+  routeResult.artifact_refs = Array.from(new Set([
+    ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
+  ]));
+  patchArtifactExecutionModel(routeResult.artifact_file, executor);
+  return routeResult;
+}
+
+async function executeRouteCandidateRace({
+  workspaceRoot,
+  overlay,
+  topicId,
+  deliverableId,
+  safeRoute,
+  selectedExecutor,
+  executorRouting,
+  userIntent,
+  mode,
+  baselineDeliverableId,
+  candidateCount,
+  executor,
+}) {
+  const routeCandidateCount = candidateCountForRoute({ route: safeRoute, candidateCount });
+  const raced = await runCandidateRaceRoute({
+    family: overlay,
+    route: safeRoute,
+    candidateCount: routeCandidateCount,
+    qualityGate: 'structured_contract_validation',
+    runCandidate: async () => executeDeliverableRouteLocally({
+      workspaceRoot,
+      overlay,
+      topicId,
+      deliverableId,
+      route: safeRoute,
+      adapter: selectedExecutor.adapter,
+      executionShape: selectedExecutor.execution_shape,
+      hermesProfile: selectedExecutor.hermes_profile,
+      executorRouting,
+      userIntent,
+      mode,
+      baselineDeliverableId,
+    }),
+    scoreCandidate: (candidate) => Number(candidate?.artifact?.visual_direction?.rhythm_curve?.length || 1),
+  });
+  return materializeRouteResult({ raced, executor });
+}
+
+function buildCompletedRouteResponse({
+  workspaceRoot,
+  run,
+  safeRoute,
+  overlay,
+  deliverableId,
+  routeResult,
+  executor,
+}) {
+  const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
+  const completedRun = completeHermesRun({
+    workspaceRoot,
+    runId: run.run_id,
+    currentStage: safeRoute,
+    stageResults: [{
+      stage: safeRoute,
+      status: routeResult.cache_status === 'hit' ? 'cached' : routeRunStatus,
+    }],
+    artifactRefs: routeResult.artifact_refs,
+    executor,
+    telemetry: buildRoutePromptTelemetry(routeResult),
+    status: routeRunStatus,
+    errorKind: routeRunStatus === 'quality_blocked' ? 'quality_blocked' : null,
+  });
+
+  appendHermesEvent(workspaceRoot, completedRun.run_id, {
+    type: routeRunStatus === 'quality_blocked' ? 'run_quality_blocked' : 'run_completed',
+    route: safeRoute,
+    overlay,
+    deliverable_id: deliverableId,
+    profile_id: routeResult.artifact?.contract?.profile_id || null,
+    artifact_file: routeResult.artifact_file,
+    cache_status: routeResult.cache_status || 'miss',
+  });
+
+  return {
+    ok: true,
+    run: completedRun,
+    events: readHermesEvents(workspaceRoot, completedRun.run_id),
+    artifactFile: routeResult.artifact_file,
+    artifact: routeResult.artifact,
+    cache_status: routeResult.cache_status || 'miss',
+  };
+}
+
+function normalizeRouteFailure(error) {
+  const failureMessage = String(
+    error instanceof Error ? error.message : error,
+  ).trim() || 'Codex route execution failed';
+  const failure = new Error(failureMessage);
+  failure.code = error?.code || null;
+  failure.failure_kind = error?.failure_kind || error?.failureKind || null;
+  failure.target_slide_ids = Array.isArray(error?.target_slide_ids) ? error.target_slide_ids : [];
+  failure.blocking_reasons = Array.isArray(error?.blocking_reasons) ? error.blocking_reasons : [];
+  failure.recommended_action = String(error?.recommended_action || '').trim() || null;
+  failure.artifact_file = String(error?.artifact_file || '').trim() || null;
+  failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
+  failure.requiresExternalSecret = error?.requiresExternalSecret === true;
+  const failureKind = String(failure.failure_kind || failure.code || '').trim();
+  const qualityBlocked = failureKind === 'quality_blocked' || /^Route .+ blocked/.test(failureMessage);
+  if (qualityBlocked) {
+    failure.code = failure.code || 'quality_blocked';
+    failure.failure_kind = 'quality_blocked';
+  }
+  return {
+    failure,
+    qualityBlocked,
+  };
+}
+
+function failedArtifactForError(error, failure) {
+  return failure.artifact_file && existsSync(failure.artifact_file)
+    ? JSON.parse(readFileSync(failure.artifact_file, 'utf-8'))
+    : (error?.artifact || null);
+}
+
+function buildFailedRouteResponse({
+  workspaceRoot,
+  run,
+  safeRoute,
+  overlay,
+  deliverableId,
+  error,
+  executor,
+}) {
+  const { failure, qualityBlocked } = normalizeRouteFailure(error);
+  const failedArtifact = failedArtifactForError(error, failure);
+  const failedRun = failHermesRun({
+    workspaceRoot,
+    runId: run.run_id,
+    currentStage: safeRoute,
+    error: failure,
+    executor,
+    errorKind: qualityBlocked ? 'quality_blocked' : 'execution_error',
+    status: qualityBlocked ? 'quality_blocked' : 'failed',
+    telemetry: failedArtifact
+      ? buildRoutePromptTelemetry({
+          artifact: failedArtifact,
+          cache_status: failedArtifact?.route_cache?.cache_status || 'miss',
+        })
+      : {},
+  });
+
+  appendHermesEvent(workspaceRoot, failedRun.run_id, {
+    type: qualityBlocked ? 'run_quality_blocked' : 'run_failed',
+    route: safeRoute,
+    overlay,
+    deliverable_id: deliverableId,
+    error: failedRun.error,
+  });
+
+  return {
+    ok: false,
+    run: failedRun,
+    events: readHermesEvents(workspaceRoot, failedRun.run_id),
+    error: failedRun.error,
+  };
+}
+
 export async function runDeliverableRoute(request) {
+  const routeRequest = parseRouteRequest(request);
   const {
   workspaceRoot,
   overlay,
   topicId,
   deliverableId,
-  route,
   runId = null,
   managedRunId = null,
   adapter = CODEX_DEFAULT_ADAPTER, userIntent = '',
   mode = 'draft_new',
   baselineDeliverableId = '',
   candidateCount = 1,
-  } = request;
-  const safeRoute = requireSafeSegment('route', route);
-  validateDeliverableRouteInput({
+    safeRoute,
+  } = routeRequest;
+  const { executorRouting, selectedExecutor, executor } = resolveRouteExecutor({
     workspaceRoot,
     overlay,
     topicId,
     deliverableId,
-    route: safeRoute,
+    safeRoute,
+    request,
+    adapter,
   });
-  const requestHasExplicitAdapter = Object.prototype.hasOwnProperty.call(request, 'adapter')
-    && String(request.adapter || '').trim();
-  const profileId = readHydratedContractProfileId({ workspaceRoot, topicId, deliverableId });
-  const executorRouting = resolveExecutorRouting({
-    family: overlay,
-    profileId,
-    route: safeRoute,
-    requestAdapter: requestHasExplicitAdapter ? adapter : null,
-    requestExecutorBackend: request.executorBackend || request.executor_backend || null,
-    oplDefaultExecutorBackend: request.oplDefaultExecutorBackend || request.opl_default_executor_backend || null,
-  });
-  const selectedExecutor = executorRouting.selected_executor;
-  const fallbackExecutor = resolveExecutorAdapter({
-    adapter: selectedExecutor.adapter,
-    executorBackend: selectedExecutor.executor_backend,
-    executionShape: selectedExecutor.execution_shape,
-    hermesProfile: selectedExecutor.hermes_profile,
-    executorRouting,
-  });
-  const runtimeDescriptor = fallbackExecutor.adapter === HERMES_NATIVE_PROOF_ADAPTER
-    ? buildHermesNativeRuntimeDescriptor(readHermesNativeProofContract({ cwd: workspaceRoot }))
-    : (
-        fallbackExecutor.adapter === HERMES_DEFAULT_ADAPTER || fallbackExecutor.adapter === HERMES_AGENT_EXECUTOR_BACKEND
-          ? buildHermesAgentRuntimeDescriptor(process.env, selectedExecutor.execution_shape, selectedExecutor.hermes_profile)
-          : buildCodexRuntimeDescriptor(readCodexCliContract())
-      );
-  const executor = buildExecutorDescriptor(
-    {
-      adapter: fallbackExecutor.adapter,
-      primary: fallbackExecutor.primary,
-      execution_surface: fallbackExecutor.execution_surface,
-      creative_execution: fallbackExecutor.creative_execution,
-      execution_model: fallbackExecutor.execution_model,
-    },
-    runtimeDescriptor,
-  );
 
   const run = startHermesRun({
     workspaceRoot,
@@ -318,152 +584,46 @@ export async function runDeliverableRoute(request) {
     executor,
   });
 
-  appendHermesEvent(workspaceRoot, run.run_id, {
-    type: executor.adapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? 'hermes_native_route_started'
-      : (
-          executor.adapter === HERMES_DEFAULT_ADAPTER || executor.adapter === HERMES_AGENT_EXECUTOR_BACKEND
-            ? 'hermes_agent_route_started'
-            : 'codex_route_started'
-        ),
-    route: safeRoute,
+  appendHermesEvent(workspaceRoot, run.run_id, buildRouteStartedEvent({
+    executor,
+    safeRoute,
     overlay,
-    deliverable_id: deliverableId,
-    ...(executor.codex_cli_runtime
-      ? {
-          codex_cli_runtime: executor.codex_cli_runtime,
-        }
-      : {}),
-    ...(executor.hermes_native_runtime
-      ? {
-          hermes_native_runtime: executor.hermes_native_runtime,
-        }
-      : {}),
-    ...(executor.hermes_agent_runtime
-      ? {
-          hermes_agent_runtime: executor.hermes_agent_runtime,
-        }
-      : {}),
-  });
+    deliverableId,
+  }));
 
   try {
-    const routeCandidateCount = candidateCountForRoute({ route: safeRoute, candidateCount });
-    const raced = await runCandidateRaceRoute({
-      family: overlay,
-      route: safeRoute,
-      candidateCount: routeCandidateCount,
-      qualityGate: 'structured_contract_validation',
-      runCandidate: async () => executeDeliverableRouteLocally({
-        workspaceRoot,
-        overlay,
-        topicId,
-        deliverableId,
-        route: safeRoute,
-        adapter: selectedExecutor.adapter,
-        executionShape: selectedExecutor.execution_shape,
-        hermesProfile: selectedExecutor.hermes_profile,
-        executorRouting,
-        userIntent,
-        mode,
-        baselineDeliverableId,
-      }),
-      scoreCandidate: (candidate) => Number(candidate?.artifact?.visual_direction?.rhythm_curve?.length || 1),
-    });
-    const routeResult = raced.artifact;
-    routeResult.artifact = {
-      ...(routeResult.artifact || {}),
-      candidate_race: raced.race,
-    };
-    writeFileSync(routeResult.artifact_file, JSON.stringify(routeResult.artifact, null, 2), 'utf-8');
-    routeResult.artifact_refs = Array.from(new Set([
-      ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
-    ]));
-    patchArtifactExecutionModel(routeResult.artifact_file, executor);
-    const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
-    const completedRun = completeHermesRun({
+    const routeResult = await executeRouteCandidateRace({
       workspaceRoot,
-      runId: run.run_id,
-      currentStage: safeRoute,
-      stageResults: [{
-        stage: safeRoute,
-        status: routeResult.cache_status === 'hit' ? 'cached' : routeRunStatus,
-      }],
-      artifactRefs: routeResult.artifact_refs,
-      executor,
-      telemetry: buildRoutePromptTelemetry(routeResult),
-      status: routeRunStatus,
-      errorKind: routeRunStatus === 'quality_blocked' ? 'quality_blocked' : null,
-    });
-
-    appendHermesEvent(workspaceRoot, completedRun.run_id, {
-      type: routeRunStatus === 'quality_blocked' ? 'run_quality_blocked' : 'run_completed',
-      route: safeRoute,
       overlay,
-      deliverable_id: deliverableId,
-      profile_id: routeResult.artifact?.contract?.profile_id || null,
-      artifact_file: routeResult.artifact_file,
-      cache_status: routeResult.cache_status || 'miss',
+      topicId,
+      deliverableId,
+      safeRoute,
+      selectedExecutor,
+      executorRouting,
+      userIntent,
+      mode,
+      baselineDeliverableId,
+      candidateCount,
+      executor,
     });
-
-    return {
-      ok: true,
-      run: completedRun,
-      events: readHermesEvents(workspaceRoot, completedRun.run_id),
-      artifactFile: routeResult.artifact_file,
-      artifact: routeResult.artifact,
-      cache_status: routeResult.cache_status || 'miss',
-    };
+    return buildCompletedRouteResponse({
+      workspaceRoot,
+      run,
+      safeRoute,
+      overlay,
+      deliverableId,
+      routeResult,
+      executor,
+    });
   } catch (error) {
-    const failureMessage = String(
-      error instanceof Error ? error.message : error,
-    ).trim() || 'Codex route execution failed';
-    const failure = new Error(failureMessage);
-    failure.code = error?.code || null;
-    failure.failure_kind = error?.failure_kind || error?.failureKind || null;
-    failure.target_slide_ids = Array.isArray(error?.target_slide_ids) ? error.target_slide_ids : [];
-    failure.blocking_reasons = Array.isArray(error?.blocking_reasons) ? error.blocking_reasons : [];
-    failure.recommended_action = String(error?.recommended_action || '').trim() || null;
-    failure.artifact_file = String(error?.artifact_file || '').trim() || null;
-    failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
-    failure.requiresExternalSecret = error?.requiresExternalSecret === true;
-    const failureKind = String(failure.failure_kind || failure.code || '').trim();
-    const qualityBlocked = failureKind === 'quality_blocked' || /^Route .+ blocked/.test(failureMessage);
-    if (qualityBlocked) {
-      failure.code = failure.code || 'quality_blocked';
-      failure.failure_kind = 'quality_blocked';
-    }
-    const failedArtifact = failure.artifact_file && existsSync(failure.artifact_file)
-      ? JSON.parse(readFileSync(failure.artifact_file, 'utf-8'))
-      : (error?.artifact || null);
-    const failedRun = failHermesRun({
+    return buildFailedRouteResponse({
       workspaceRoot,
-      runId: run.run_id,
-      currentStage: safeRoute,
-      error: failure,
-      executor,
-      errorKind: qualityBlocked ? 'quality_blocked' : 'execution_error',
-      status: qualityBlocked ? 'quality_blocked' : 'failed',
-      telemetry: failedArtifact
-        ? buildRoutePromptTelemetry({
-            artifact: failedArtifact,
-            cache_status: failedArtifact?.route_cache?.cache_status || 'miss',
-          })
-        : {},
-    });
-
-    appendHermesEvent(workspaceRoot, failedRun.run_id, {
-      type: qualityBlocked ? 'run_quality_blocked' : 'run_failed',
-      route: safeRoute,
+      run,
+      safeRoute,
       overlay,
-      deliverable_id: deliverableId,
-      error: failedRun.error,
+      deliverableId,
+      error,
+      executor,
     });
-
-    return {
-      ok: false,
-      run: failedRun,
-      events: readHermesEvents(workspaceRoot, failedRun.run_id),
-      error: failedRun.error,
-    };
   }
 }
