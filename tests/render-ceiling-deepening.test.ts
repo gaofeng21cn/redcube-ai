@@ -69,8 +69,10 @@ test('xiaohongshu family runtime keeps the public route entry while heavy stage 
 test('poster family runtime keeps AI-first generation in runtime-family without cross-package source imports', () => {
   const runtime = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.ts');
   const runtimeCore = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts');
+  const routeReviewHelpers = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/route-review-helpers.ts');
 
   assert.equal(runtime.includes('@redcube/pack-poster-onepager'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtimeCore.includes('generateStructuredArtifactViaCodexCli'), true);
+  assert.equal(runtimeCore.includes('generateStructuredArtifact'), true);
+  assert.equal(routeReviewHelpers.includes('generateStructuredArtifactViaCodexCli'), true);
 });

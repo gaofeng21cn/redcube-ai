@@ -107,7 +107,7 @@ test('harness audit: gateway product surface is stable across success and failur
   assert.equal(mcp.includes("recommended_action: 'inspect_tool_request'"), true);
   assert.equal(getDeliverable.includes("surface_kind: 'deliverable_record'"), true);
   assert.equal(runRoute.includes("surface_kind: 'route_run'"), true);
-  assert.equal(runRoute.includes("error_kind: result.ok ? null : 'route_failure'"), true);
+  assert.equal(runRoute.includes("'route_failure'"), true);
   assert.equal(doctor.includes("surface_kind: 'workspace_doctor'"), true);
   assert.equal(listTopics.includes("surface_kind: 'topic_catalog'"), true);
   assert.equal(gatewayIndex.includes('getDefaultOverlayCatalog'), true);

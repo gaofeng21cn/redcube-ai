@@ -13,7 +13,12 @@ test('gateway exposes a TypeScript entrypoint and typed product surface contract
   assert.equal(existsSync(path.resolve('packages/redcube-gateway/src/types.ts')), true);
 
   const packageJson = JSON.parse(read('packages/redcube-gateway/package.json'));
-  const types = read('packages/redcube-gateway/src/types.ts');
+  const types = [
+    read('packages/redcube-gateway/src/types.ts'),
+    read('packages/redcube-gateway/src/types-parts/foundation.ts'),
+    read('packages/redcube-gateway/src/types-parts/managed.ts'),
+    read('packages/redcube-gateway/src/types-parts/product-entry.ts'),
+  ].join('\n');
   const entry = read('packages/redcube-gateway/src/index.ts');
 
   assert.equal(packageJson.types, './dist/index.d.ts');
