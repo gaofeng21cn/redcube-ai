@@ -23,6 +23,7 @@ interface ScreenshotCaptureStoreInput {
   slideReviews?: unknown;
   manifestFile?: unknown;
   currentViewMode?: unknown;
+  captureMode?: unknown;
   generatedAt?: string;
 }
 
@@ -110,6 +111,7 @@ export function materializeScreenshotCaptureStore({
   slideReviews,
   manifestFile = '',
   currentViewMode = 'hardlink',
+  captureMode = 'full',
   generatedAt = new Date().toISOString(),
 }: ScreenshotCaptureStoreInput = {}): Record<string, unknown> {
   const reportsRoot = safeText(reportsDir);
@@ -165,6 +167,7 @@ export function materializeScreenshotCaptureStore({
   const manifest = {
     schema_version: 1,
     capture_id: resolvedCaptureId,
+    capture_mode: safeText(captureMode, 'full'),
     generated_at: generatedAt,
     reports_dir: reportsRoot,
     screenshots_dir: captureRoot,

@@ -2,6 +2,7 @@ import path from 'node:path';
 import { createHash, type Hash } from 'node:crypto';
 import { copyFileSync, existsSync, readFileSync } from 'node:fs';
 import {
+  materializeScreenshotCaptureStore,
   pythonHelperReference,
   runRedCubePythonHelper,
 } from '@redcube/runtime-protocol';
@@ -342,6 +343,34 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     };
   }
 
+  function materializeFullCaptureForExport({
+    deliverablePaths,
+    reviewArtifact,
+    screenshotsDir,
+  }: {
+    deliverablePaths: JsonRecord;
+    reviewArtifact: JsonRecord;
+    screenshotsDir: string;
+  }): { screenshotsDir: string; manifest: JsonRecord | null } {
+    if (safeText(reviewArtifact?.review_capture?.capture_mode, 'full') !== 'delta') {
+      return { screenshotsDir, manifest: null };
+    }
+    const captureId = `${safeText(reviewArtifact?.review_capture?.capture_id, 'review-capture')}-full`;
+    const fullScreenshotsDir = path.join(deliverablePaths.reportsDir, 'screenshots', captureId);
+    const manifest = materializeScreenshotCaptureStore({
+      reportsDir: deliverablePaths.reportsDir,
+      captureId,
+      screenshotsDir: fullScreenshotsDir,
+      slideReviews: safeArray(reviewArtifact?.slide_reviews),
+      currentViewMode: 'hardlink',
+      captureMode: 'full',
+    }) as JsonRecord;
+    return {
+      screenshotsDir: fullScreenshotsDir,
+      manifest,
+    };
+  }
+
   function buildExportArtifact({
     workspaceRoot,
     topicId,
@@ -361,13 +390,19 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     if (isNativePptArtifact(renderArtifact)) {
       return buildNativeExportBundle({ workspaceRoot, renderArtifact, reviewArtifact, pptxFile, pdfFile, notesFile, adapter, contract });
     }
-    const screenshotsDir = safeText(reviewArtifact?.review_capture?.screenshots_dir);
-    if (!screenshotsDir) {
+    const reviewedScreenshotsDir = safeText(reviewArtifact?.review_capture?.screenshots_dir);
+    if (!reviewedScreenshotsDir) {
       throw new Error('Route export_pptx requires screenshot_review immutable capture screenshots; rerun screenshot_review before export');
     }
-    if (!fileExists(screenshotsDir)) {
-      throw new Error(`Reviewed screenshot capture directory not found: ${screenshotsDir}`);
+    if (!fileExists(reviewedScreenshotsDir)) {
+      throw new Error(`Reviewed screenshot capture directory not found: ${reviewedScreenshotsDir}`);
     }
+    const exportCapture = materializeFullCaptureForExport({
+      deliverablePaths,
+      reviewArtifact,
+      screenshotsDir: reviewedScreenshotsDir,
+    });
+    const screenshotsDir = exportCapture.screenshotsDir;
     const stableViewHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
     if (!fileExists(stableViewHtmlFile)) {
       throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
@@ -416,7 +451,12 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         pdf_file: pdfPath,
         presenter_notes_file: notesFile,
         final_delivery: finalDelivery,
-        review_capture: reviewArtifact.review_capture || null,
+        review_capture: {
+          ...(reviewArtifact.review_capture || {}),
+          export_screenshots_dir: screenshotsDir,
+          export_manifest_file: exportCapture.manifest?.manifest_file || null,
+          export_capture_mode: exportCapture.manifest?.capture_mode || safeText(reviewArtifact?.review_capture?.capture_mode, 'full'),
+        },
         delivery_state: {
           current: 'output_ready',
           next: null,

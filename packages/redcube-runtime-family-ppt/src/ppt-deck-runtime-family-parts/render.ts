@@ -272,6 +272,9 @@ export function createPptDeckRenderStageParts(deps) {
           previous_route: PAGE_FIX_ROUTE,
           previous_target_slide_ids: Array.from(previousFixSlideIds),
           repeat_blocked_slide_ids: repeatBlockedSlideIds,
+          escalation_strategy: 'structure_level_repair_required',
+          structure_level_repair_required: true,
+          invalid_repair_patterns: ['padding_only', 'line_height_only', 'micro_font_scale_only'],
           escalation_rule: '上一轮 fix_html 后仍被 screenshot_review 拦下的页面必须结构级简化、重排或扩大容器；如果仍是同一父容器 edge_clearance/block_content 问题，必须删除或合并至少一个次级说明句、芯片或装饰行；不得继续只做 padding、line-height 或微缩字号调整。',
         }
       : null;
@@ -366,6 +369,10 @@ export function createPptDeckRenderStageParts(deps) {
         blocked_for_screenshot_review: blockedSlideIds.has(slideId),
         operator_requested_revision: operatorTargetSlideIds.has(slideId),
         repeat_block_after_fix: repeatBlockAfterFix,
+        structure_level_repair_required: repeatBlockAfterFix,
+        invalid_repair_patterns: repeatBlockAfterFix
+          ? ['padding_only', 'line_height_only', 'micro_font_scale_only']
+          : [],
         blocked_checks: safeArray(slideFeedback?.blocked_checks),
         ai_findings: aiFindings,
         recommended_fix: recommendedFixParts.join('；'),
@@ -655,6 +662,32 @@ export function createPptDeckRenderStageParts(deps) {
     };
   }
 
+  function buildRenderSummaryRevisionDigest({ revisionContext, renderedSlideIds = [], reusedSlideIds = [] }) {
+    const scopedRevisionContext = filterRenderRevisionContextForSlides(revisionContext, renderedSlideIds);
+    if (!scopedRevisionContext) return null;
+    return {
+      has_prior_review_feedback: true,
+      target_slide_ids: safeArray(renderedSlideIds).map((slideId) => safeText(slideId)).filter(Boolean),
+      reused_slide_ids: safeArray(reusedSlideIds).map((slideId) => safeText(slideId)).filter(Boolean),
+      blocked_checks: safeArray(scopedRevisionContext?.screenshot_review?.blocked_checks),
+      blocked_slide_ids: safeArray(scopedRevisionContext?.screenshot_review?.blocked_slide_ids),
+      slide_feedback: safeArray(scopedRevisionContext?.screenshot_review?.slide_feedback).map((slide) => ({
+        slide_id: safeText(slide?.slide_id),
+        blocked_checks: safeArray(slide?.blocked_checks),
+        recommended_fix: normalizeInlineText(slide?.recommended_fix, 220),
+      })),
+      operator_target_slide_ids: safeArray(scopedRevisionContext?.operator_revision_brief?.target_slide_ids),
+      repair_attempt: scopedRevisionContext?.repair_attempt
+        ? {
+            repeat_blocked_slide_ids: safeArray(scopedRevisionContext.repair_attempt.repeat_blocked_slide_ids),
+            escalation_strategy: 'structure_level_repair_required',
+            structure_level_repair_required: true,
+            invalid_repair_patterns: ['padding_only', 'line_height_only', 'micro_font_scale_only'],
+          }
+        : null,
+    };
+  }
+
   function slideScreenshotFileName(slideId) {
     const digits = safeText(slideId).replace(/\D+/g, '');
     if (!digits) return '';
@@ -849,14 +882,25 @@ export function createPptDeckRenderStageParts(deps) {
               slideBatch,
               renderedSlideHtmlById,
             });
+        const batchSlideIds = promptSlides.map((slide) => slide.slide_id);
+        const visualDirectionContext = buildRenderVisualDirectionContext(
+          fullVisualDirection,
+          batchSlideIds,
+          route,
+        );
+        const revisionContext = filterRenderRevisionContextForSlides(
+          sharedRevisionContext,
+          batchSlideIds,
+        );
         const cacheKey = buildRenderBatchCacheKey({
           route,
           renderPlan,
           revisionFreshness,
-          visualArtifact,
           promptSlides,
           referenceSlides,
           promptRelativePath,
+          visualDirectionContext,
+          revisionContext,
         });
         return {
           family: 'ppt_deck',
@@ -864,11 +908,7 @@ export function createPptDeckRenderStageParts(deps) {
           promptRelativePath,
           context: {
             ...sharedContext,
-            visual_direction: buildRenderVisualDirectionContext(
-              fullVisualDirection,
-              promptSlides.map((slide) => slide.slide_id),
-              route,
-            ),
+            visual_direction: visualDirectionContext,
             render_scope: 'slide_batch',
             rerender_mode: renderPlan.mode,
             render_batch: {
@@ -882,10 +922,7 @@ export function createPptDeckRenderStageParts(deps) {
             blueprint: {
               slides: promptSlides,
             },
-            revision_context: filterRenderRevisionContextForSlides(
-              sharedRevisionContext,
-              promptSlides.map((slide) => slide.slide_id),
-            ) || sharedRevisionContext,
+            revision_context: revisionContext,
           },
           outputContract: renderHtmlOutputContract(),
           cwd: deliverablePaths.deliverableDir,
@@ -955,7 +992,11 @@ export function createPptDeckRenderStageParts(deps) {
         },
         rendered_slide_ids: freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
         reused_slide_ids: [...renderPlan.reused_slides.keys()],
-        revision_context: sharedRevisionContext,
+        revision_context: buildRenderSummaryRevisionDigest({
+          revisionContext: sharedRevisionContext,
+          renderedSlideIds: freshlyRenderedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+          reusedSlideIds: [...renderPlan.reused_slides.keys()],
+        }),
       },
       outputContract: renderHtmlSummaryOutputContract(),
       cwd: deliverablePaths.deliverableDir,

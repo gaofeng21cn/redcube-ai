@@ -20,6 +20,7 @@ import {
   getProductStart as getProductStartJs,
   getProductPreflight as getProductPreflightJs,
   getProductFrontdesk as getProductFrontdeskJs,
+  buildPerformanceReport as buildPerformanceReportJs,
   getManagedRun as getManagedRunJs,
   superviseManagedRun as superviseManagedRunJs,
   runDeliverableRoute as runDeliverableRouteJs,
@@ -135,6 +136,13 @@ export function getDeliverable(request: DeliverableRequest): Promise<Deliverable
 
 export function getPublicationProjection(request: TopicRequest): Promise<PublicationProjectionResponse> {
   return getPublicationProjectionJs(request) as unknown as Promise<PublicationProjectionResponse>;
+}
+
+export function buildPerformanceReport(request: WorkspaceRootRequest & {
+  topicId?: string | null;
+  deliverableId?: string | null;
+}): Promise<Record<string, any>> {
+  return buildPerformanceReportJs(request) as Promise<Record<string, any>>;
 }
 
 export function getRun(request: WorkspaceRootRequest & { runId: string }): Promise<RunRecordResponse> {

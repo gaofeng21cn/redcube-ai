@@ -89,6 +89,9 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
     });
 
     assert.equal(result.ok, false);
+    assert.equal(result.run.status, 'quality_blocked');
+    assert.equal(result.run.error_kind, 'quality_blocked');
+    assert.equal(result.run.error.failure_kind, 'quality_blocked');
     const qualityGate = readJson(path.join(workspaceRoot, 'topics/topic-a/deliverables/note-a/artifacts/quality_gate.json'));
     assert.equal(qualityGate.status, 'block');
     assert.equal(qualityGate.preflight_gate.status, 'block');

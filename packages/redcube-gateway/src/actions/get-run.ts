@@ -36,6 +36,8 @@ export async function getRun({
   const staleStatus = run.status === 'expired' || run.status === 'orphaned';
   const recommendedAction = staleStatus
     ? 'inspect_stale_run'
+    : run.status === 'quality_blocked'
+      ? 'run_recommended_repair'
     : run.status === 'failed'
       ? 'inspect_run_failure'
       : (run.status === 'completed' ? 'review_runtime_state' : 'continue');

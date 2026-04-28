@@ -712,6 +712,75 @@ export function createPptDeckStageParts(deps) {
     ]));
   }
 
+  function runtimeNumber(value) {
+    return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  }
+
+  function runtimeCachedTokens(runtime) {
+    return runtimeNumber(runtime?.cached_tokens)
+      || runtimeNumber(runtime?.provider_usage?.cached_tokens)
+      || runtimeNumber(runtime?.usage?.cached_tokens);
+  }
+
+  function normalizeStructuredRuntimeCall(runtime, {
+    callKind,
+    reviewScope,
+    targetSlideIds = [],
+  }) {
+    const call = {
+      ...(runtime || {}),
+      call_kind: callKind,
+      review_scope: reviewScope,
+      target_slide_ids: safeArray(targetSlideIds).map((slideId) => safeText(slideId)).filter(Boolean),
+    };
+    const cachedTokens = runtimeCachedTokens(call);
+    if (cachedTokens > 0) call.cached_tokens = cachedTokens;
+    if (cachedTokens > 0) call.cache_hit = true;
+    return call;
+  }
+
+  function sumRuntimeMetric(calls, key) {
+    return safeArray(calls).reduce((total, call) => total + runtimeNumber(call?.[key]), 0);
+  }
+
+  function buildRuntimeRollup(summaryRuntime, childCalls) {
+    const calls = safeArray(childCalls);
+    return {
+      ...(summaryRuntime || {}),
+      review_scope: 'summary',
+      prompt_bytes: sumRuntimeMetric(calls, 'prompt_bytes') || summaryRuntime?.prompt_bytes || null,
+      context_bytes: sumRuntimeMetric(calls, 'context_bytes') || summaryRuntime?.context_bytes || null,
+      estimated_prompt_tokens: sumRuntimeMetric(calls, 'estimated_prompt_tokens') || summaryRuntime?.estimated_prompt_tokens || null,
+      prompt_tokens: sumRuntimeMetric(calls, 'prompt_tokens') || summaryRuntime?.prompt_tokens || null,
+      completion_tokens: sumRuntimeMetric(calls, 'completion_tokens') || summaryRuntime?.completion_tokens || null,
+      total_tokens: sumRuntimeMetric(calls, 'total_tokens') || summaryRuntime?.total_tokens || null,
+      cached_tokens: sumRuntimeMetric(calls, 'cached_tokens') || runtimeCachedTokens(summaryRuntime) || null,
+      cache_hit: calls.some((call) => call?.cache_hit === true) || null,
+      child_calls: calls,
+    };
+  }
+
+  function buildPriorPassDigest({ priorReviewArtifact, targetSlideIds, allSlideReviews }) {
+    const targetIds = slideIdSet(targetSlideIds);
+    const allIds = safeArray(allSlideReviews).map((slide) => safeText(slide?.slide_id)).filter(Boolean);
+    const priorSlides = safeArray(priorReviewArtifact?.slide_reviews);
+    const reusedSlideIds = (allIds.length > 0 ? allIds : priorSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean))
+      .filter((slideId) => slideId && !targetIds.has(slideId));
+    const blockedPriorSlides = priorSlides
+      .filter((slide) => safeText(slide?.status) === 'block' || hasAiVisualBlock(slide?.ai_review))
+      .map((slide) => safeText(slide?.slide_id))
+      .filter(Boolean);
+    return {
+      source_review_stage: 'screenshot_review',
+      carry_forward_policy: 'reused pages keep prior passed AI and mechanical judgement until final full export gate',
+      target_slide_ids: [...targetIds],
+      reused_slide_ids: reusedSlideIds,
+      prior_passed_slide_count: priorSlides.filter((slide) => !blockedPriorSlides.includes(safeText(slide?.slide_id))).length,
+      prior_blocked_slide_ids: blockedPriorSlides,
+      prior_weak_pages: safeArray(priorReviewArtifact?.ai_review?.weak_pages),
+    };
+  }
+
   async function generateScreenshotReviewDraft(
     contract,
     deliverablePaths,
@@ -720,6 +789,7 @@ export function createPptDeckStageParts(deps) {
     reviewPayload,
     mode,
     adapter = CODEX_DEFAULT_ADAPTER,
+    reviewOptions = {},
   ) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
@@ -727,6 +797,20 @@ export function createPptDeckStageParts(deps) {
     const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
     const blueprintSlides = summarizeBlueprintSlides(blueprintArtifact);
     const visualDirection = visualArtifact?.visual_direction || null;
+    const incrementalReview = reviewOptions?.incrementalReview === true;
+    const targetSlideIds = incrementalReview
+      ? safeArray(reviewOptions?.targetSlideIds).map((slideId) => safeText(slideId)).filter(Boolean)
+      : [];
+    const summaryBlueprintSlides = incrementalReview
+      ? filterSlideScopedArray(blueprintSlides, targetSlideIds)
+      : blueprintSlides.map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+        }));
+    const summaryVisualDirection = incrementalReview
+      ? buildPageLocalVisualDirectionContext(visualDirection, targetSlideIds)
+      : visualDirection;
     const sharedContext = {
       ...buildAuthoringContext(contract),
       mode,
@@ -754,11 +838,10 @@ export function createPptDeckStageParts(deps) {
         })),
       },
     };
-    const aiSlideReviews = [];
-    aiSlideReviews.push(...(await Promise.all(safeArray(slideReviews).map(async (slide) => {
+    const batchResults = await Promise.all(safeArray(slideReviews).map(async (slide) => {
       const slideBatch = [slide];
       const batchSlideIds = slideBatch.map((item) => safeText(item?.slide_id)).filter(Boolean);
-      const { data: batchData } = await generateStructuredArtifact({
+      const { data: batchData, generationRuntime: batchRuntime } = await generateStructuredArtifact({
         adapter,
         family: 'ppt_deck',
         route: 'screenshot_review',
@@ -799,8 +882,16 @@ export function createPptDeckStageParts(deps) {
         })),
         cwd: deliverablePaths.deliverableDir,
       });
-      return normalizePptScreenshotAiSlideReviews(batchData?.slide_reviews, slideBatch);
-    }))).flat());
+      return {
+        aiSlideReviews: normalizePptScreenshotAiSlideReviews(batchData?.slide_reviews, slideBatch),
+        generationRuntime: normalizeStructuredRuntimeCall(batchRuntime, {
+          callKind: 'slide_batch',
+          reviewScope: 'slide_batch',
+          targetSlideIds: batchSlideIds,
+        }),
+      };
+    }));
+    const aiSlideReviews = batchResults.flatMap((result) => result.aiSlideReviews);
     const { data, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
@@ -810,22 +901,33 @@ export function createPptDeckStageParts(deps) {
         ...sharedContext,
         review_scope: 'summary',
         blueprint: {
-          slides: blueprintSlides.map((slide) => ({
-            slide_id: slide.slide_id,
-            title: slide.title,
-            layout_family: slide.layout_family,
-          })),
+          slides: summaryBlueprintSlides,
         },
-        visual_direction: visualDirection,
+        visual_direction: summaryVisualDirection,
+        prior_pass_digest: incrementalReview
+          ? buildPriorPassDigest({
+              priorReviewArtifact: reviewOptions?.priorReviewArtifact || null,
+              targetSlideIds,
+              allSlideReviews: reviewOptions?.allSlideReviews || slideReviews,
+            })
+          : null,
         ai_slide_reviews: aiSlideReviews,
       },
       outputContract: screenshotReviewSummaryOutputContract(),
       cwd: deliverablePaths.deliverableDir,
     });
+    const summaryCall = normalizeStructuredRuntimeCall(generationRuntime, {
+      callKind: 'summary',
+      reviewScope: 'summary',
+      targetSlideIds,
+    });
     return {
       data,
       aiSlideReviews,
-      generationRuntime,
+      generationRuntime: buildRuntimeRollup(generationRuntime, [
+        ...batchResults.map((result) => result.generationRuntime),
+        summaryCall,
+      ]),
     };
   }
 
@@ -984,6 +1086,10 @@ export function createPptDeckStageParts(deps) {
     }
     const reviewHash = hashReviewInput(renderArtifact);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
+    const priorCaptureManifest = safeText(priorReviewArtifact?.review_capture?.manifest_file)
+      && existsSync(safeText(priorReviewArtifact?.review_capture?.manifest_file))
+      ? JSON.parse(readFileSync(safeText(priorReviewArtifact.review_capture.manifest_file), 'utf-8'))
+      : null;
     const priorMechanicalRulesetCurrent = safeText(priorReviewArtifact?.mechanical_review?.ruleset_id) === SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID;
     const incrementalTargetSlideIds = priorMechanicalRulesetCurrent ? collectIncrementalScreenshotReviewTargetSlideIds({
       renderArtifact,
@@ -1024,6 +1130,12 @@ export function createPptDeckStageParts(deps) {
       reviewPayload,
       mode,
       adapter,
+      {
+        incrementalReview,
+        targetSlideIds: incrementalTargetSlideIds,
+        allSlideReviews: mechanicalSlideReviews,
+        priorReviewArtifact,
+      },
     );
     const baselineReviewPromise = mode === 'optimize_existing'
       ? Promise.resolve(baselineComparison({
@@ -1057,6 +1169,9 @@ export function createPptDeckStageParts(deps) {
       reviewCapture,
       slideReviews: candidateSlideReviews,
       mechanicalSlideReviews,
+      targetSlideIds: incrementalTargetSlideIds,
+      priorCaptureManifest,
+      captureMode: incrementalReview ? 'delta' : 'full',
     });
     const mergedAiSlideReviews = slideReviews
       .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
@@ -1115,6 +1230,8 @@ export function createPptDeckStageParts(deps) {
         review_markdown_file: reviewCapture.reviewMarkdownFile,
         manifest_file: captureManifest.manifest_file,
         store_dir: captureManifest.store_dir,
+        capture_mode: captureManifest.capture_mode || (incrementalReview ? 'delta' : 'full'),
+        requires_full_materialization_before_export: incrementalReview,
         device_scale_factor: Number(reviewPayload.device_scale_factor || 2),
         screenshot_dimensions: reviewPayload.screenshot_dimensions || null,
       },

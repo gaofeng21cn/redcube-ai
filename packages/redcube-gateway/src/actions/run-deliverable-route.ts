@@ -39,7 +39,12 @@ type FixHtmlEscalationAttempt = {
 type FixHtmlExecutionProof = {
   proof_kind: 'fix_html_agentic_escalation';
   policy: 'structured_call_then_single_agent_loop_escalation';
-  escalation_status: 'not_required' | 'escalated' | 'escalated_still_requires_fix_html' | 'already_agent_loop';
+  escalation_status:
+    | 'not_required'
+    | 'escalated'
+    | 'escalated_still_requires_fix_html'
+    | 'escalation_unavailable'
+    | 'already_agent_loop';
   stop_after_stage: string;
   attempts: FixHtmlEscalationAttempt[];
 };
@@ -78,6 +83,12 @@ function routeResultErrorMessage(result: RuntimeRouteResult): string {
   const error = result.error as { message?: unknown } | undefined;
   const run = result.run as { error?: { message?: unknown } } | undefined;
   return safeText(error?.message || run?.error?.message);
+}
+
+function routeResultArtifactFile(result: RuntimeRouteResult): string | null {
+  const error = result.error as { artifact_file?: unknown } | undefined;
+  const run = result.run as { error?: { artifact_file?: unknown } } | undefined;
+  return safeText(result.artifactFile || error?.artifact_file || run?.error?.artifact_file) || null;
 }
 
 function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): string[] {
@@ -383,6 +394,10 @@ function executorBackendForAdapter(adapter: string): 'codex_cli' | 'hermes_agent
     : 'codex_cli';
 }
 
+function hermesAgentLoopAvailable(): boolean {
+  return Boolean(safeText(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL));
+}
+
 function executionShapeForBackend(
   executorBackend: 'codex_cli' | 'hermes_agent',
   result: RuntimeRouteResult | null = null,
@@ -435,9 +450,14 @@ function summarizeFixHtmlAttempt({
   };
 }
 
-function hydrateResultArtifactFromStage(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): RuntimeRouteResult {
-  if (result.artifact && result.artifactFile) return result;
-  const stageId = runCurrentStage(result) || safeText(request.stopAfterStage) || safeText(request.route);
+function hydrateResultArtifactFromStage(
+  request: RunDeliverableRouteRequest,
+  result: RuntimeRouteResult,
+  preferredStageId: string | null = null,
+): RuntimeRouteResult {
+  const preferred = safeText(preferredStageId);
+  if (!preferred && result.artifact && result.artifactFile) return result;
+  const stageId = preferred || runCurrentStage(result) || safeText(request.stopAfterStage) || safeText(request.route);
   if (!stageId) return result;
   const artifactFile = stageArtifactFileForRequest(request, stageId);
   if (!existsSync(artifactFile)) return result;
@@ -446,6 +466,15 @@ function hydrateResultArtifactFromStage(request: RunDeliverableRouteRequest, res
     artifactFile,
     artifact: readJsonRecord(artifactFile),
   };
+}
+
+function attachExecutionProof(artifact: unknown, proof: FixHtmlExecutionProof): JsonObject {
+  return artifact && typeof artifact === 'object' && !Array.isArray(artifact)
+    ? {
+        ...(artifact as JsonObject),
+        execution_proof: proof as unknown as JsonObject,
+      }
+    : { execution_proof: proof as unknown as JsonObject };
 }
 
 function persistFixHtmlExecutionProof({
@@ -457,18 +486,27 @@ function persistFixHtmlExecutionProof({
   result: RuntimeRouteResult;
   proof: FixHtmlExecutionProof;
 }): RuntimeRouteResult {
-  const hydrated = hydrateResultArtifactFromStage(request, result);
-  const artifact = hydrated.artifact && typeof hydrated.artifact === 'object' && !Array.isArray(hydrated.artifact)
-    ? {
-        ...(hydrated.artifact as JsonObject),
-        execution_proof: proof as unknown as JsonObject,
-      }
-    : { execution_proof: proof as unknown as JsonObject };
+  const qualityBlockedAfterFix = safeText((result.run as { status?: unknown } | undefined)?.status) === 'quality_blocked';
+  const explicitStopAfterStage = Boolean(safeText(request.stopAfterStage));
+  const shouldReturnFixArtifact = qualityBlockedAfterFix || !explicitStopAfterStage;
+  const hydrated = shouldReturnFixArtifact
+    ? hydrateResultArtifactFromStage(request, result, 'fix_html')
+    : result;
+  const artifact = attachExecutionProof(hydrated.artifact, proof);
   if (hydrated.artifactFile) {
     writeFileSync(hydrated.artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
   }
+  const resultArtifactFile = routeResultArtifactFile(result);
+  if (resultArtifactFile && resultArtifactFile !== hydrated.artifactFile && existsSync(resultArtifactFile)) {
+    writeFileSync(
+      resultArtifactFile,
+      JSON.stringify(attachExecutionProof(readJsonRecord(resultArtifactFile), proof), null, 2),
+      'utf-8',
+    );
+  }
   return {
     ...hydrated,
+    ok: qualityBlockedAfterFix ? true : hydrated.ok,
     artifact,
   };
 }
@@ -524,7 +562,11 @@ async function runFixHtmlWithAgenticEscalation(request: RunDeliverableRouteReque
   let escalationStatus: FixHtmlExecutionProof['escalation_status'] = 'not_required';
   const shouldEscalate = resultOrStoredReviewRequestsFixHtml(firstRequest, first.result);
 
-  if (shouldEscalate && executorBackendForAdapter(initialAdapter) !== 'hermes_agent') {
+  if (
+    shouldEscalate
+    && executorBackendForAdapter(initialAdapter) !== 'hermes_agent'
+    && hermesAgentLoopAvailable()
+  ) {
     const escalationRequest = {
       ...firstRequest,
       adapter: HERMES_AGENT_LOOP_ADAPTER,
@@ -546,7 +588,9 @@ async function runFixHtmlWithAgenticEscalation(request: RunDeliverableRouteReque
       ? 'escalated_still_requires_fix_html'
       : 'escalated';
   } else if (shouldEscalate) {
-    escalationStatus = 'already_agent_loop';
+    escalationStatus = executorBackendForAdapter(initialAdapter) === 'hermes_agent'
+      ? 'already_agent_loop'
+      : 'escalation_unavailable';
   }
 
   const executionProof: FixHtmlExecutionProof = {
@@ -558,7 +602,7 @@ async function runFixHtmlWithAgenticEscalation(request: RunDeliverableRouteReque
   };
   return {
     result: persistFixHtmlExecutionProof({
-      request: { ...request, stopAfterStage },
+      request,
       result,
       proof: executionProof,
     }),
@@ -593,12 +637,13 @@ function buildRouteRunGatewayResponse({
   const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
   const hydratedContract = readJsonRecord(path.join(deliverablePaths.deliverableDir, contractRef));
   const run = result.run as { current_stage?: unknown; run_id?: unknown; status?: unknown } | undefined;
+  const qualityBlocked = result.ok !== true && safeText(run?.status) === 'quality_blocked';
 
   return {
     ...result,
     surface_kind: 'route_run',
-    recommended_action: result.ok ? 'continue' : 'inspect_run_failure',
-    error_kind: result.ok ? null : 'route_failure',
+    recommended_action: result.ok ? 'continue' : (qualityBlocked ? 'run_recommended_repair' : 'inspect_run_failure'),
+    error_kind: result.ok ? null : (qualityBlocked ? 'quality_blocked' : 'route_failure'),
     summary: {
       route: request.route,
       run_id: result.run?.run_id || null,

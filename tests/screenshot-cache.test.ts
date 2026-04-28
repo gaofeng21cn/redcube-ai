@@ -7,6 +7,7 @@ import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 
 import { materializeScreenshotCaptureStore } from '@redcube/runtime-protocol';
+import { materializePptScreenshotReviewCapture } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/screenshot-capture.js';
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/dist/xiaohongshu-runtime-family-parts/review.js';
 
@@ -63,6 +64,63 @@ test('screenshot capture store deduplicates same slide content while preserving 
   assert.deepEqual(first.slides[0].dimensions, { width: 1, height: 1 });
   assert.equal(first.manifest_file, path.join(firstCaptureDir, 'capture-manifest.json'));
   assert.equal(JSON.parse(readFileSync(first.manifest_file, 'utf-8')).slides[0].store_path, first.slides[0].store_path);
+});
+
+test('ppt screenshot delta capture materializes only target slides while reusing prior capture paths', () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-delta-capture-'));
+  const reportsDir = path.join(workspaceRoot, 'reports');
+  const priorDir = path.join(reportsDir, 'screenshots', 'capture-a');
+  const deltaDir = path.join(reportsDir, 'screenshots', 'capture-b');
+  const s01 = path.join(priorDir, 'slide-01.png');
+  const s02Prior = path.join(priorDir, 'slide-02.png');
+  const s02Fresh = path.join(deltaDir, 'slide-02.png');
+  mkdirSync(priorDir, { recursive: true });
+  mkdirSync(deltaDir, { recursive: true });
+  writeFileSync(s01, ONE_BY_ONE_PNG);
+  writeFileSync(s02Prior, ONE_BY_ONE_PNG);
+  writeFileSync(s02Fresh, Buffer.from('fresh-s02'));
+  const priorManifest = materializeScreenshotCaptureStore({
+    reportsDir,
+    captureId: 'capture-a',
+    screenshotsDir: priorDir,
+    slideReviews: [
+      { slide_id: 'S01', screenshot_file: s01 },
+      { slide_id: 'S02', screenshot_file: s02Prior },
+    ],
+  });
+
+  const materialized = materializePptScreenshotReviewCapture({
+    deliverablePaths: { reportsDir },
+    reviewCapture: { captureId: 'capture-b', screenshotsDir: deltaDir },
+    slideReviews: [
+      { slide_id: 'S01', screenshot_file: s01 },
+      { slide_id: 'S02', screenshot_file: s02Fresh },
+    ],
+    mechanicalSlideReviews: [
+      { slide_id: 'S01', screenshot_file: s01 },
+      { slide_id: 'S02', screenshot_file: s02Fresh },
+    ],
+    targetSlideIds: ['S02'],
+    priorCaptureManifest: priorManifest,
+    captureMode: 'delta',
+  });
+
+  assert.equal(materialized.captureManifest.capture_mode, 'delta');
+  assert.deepEqual(materialized.captureManifest.slides.map((slide) => slide.slide_id), ['S02']);
+  assert.equal(existsSync(path.join(deltaDir, 'slide-01.png')), false);
+  assert.equal(existsSync(path.join(deltaDir, 'slide-02.png')), true);
+  assert.equal(
+    materialized.slideReviews.find((slide) => slide.slide_id === 'S01').screenshot_file,
+    priorManifest.slides.find((slide) => slide.slide_id === 'S01').capture_path,
+  );
+  assert.equal(
+    materialized.slideReviews.find((slide) => slide.slide_id === 'S02').screenshot_file,
+    path.join(deltaDir, 'slide-02.png'),
+  );
+  assert.equal(
+    materialized.mechanicalSlideReviews.find((slide) => slide.slide_id === 'S01').screenshot_file,
+    priorManifest.slides.find((slide) => slide.slide_id === 'S01').capture_path,
+  );
 });
 
 function makePptStageParts() {
@@ -278,6 +336,221 @@ test('ppt screenshot_review rejects legacy v1 mechanical cache after review rule
   assert.equal(fixture.counts().python, 1);
   assert.equal(reviewed.mechanical_review.cache_status, 'miss');
   assert.notEqual(reviewed.mechanical_review.hash, legacyHash);
+});
+
+function makeIncrementalPptScreenshotFixture() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-incremental-review-'));
+  const reportsDir = path.join(workspaceRoot, 'reports');
+  const screenshotsDir = path.join(reportsDir, 'screenshots', 'capture-b');
+  const priorScreenshotsDir = path.join(reportsDir, 'screenshots', 'capture-a');
+  mkdirSync(screenshotsDir, { recursive: true });
+  mkdirSync(priorScreenshotsDir, { recursive: true });
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const s01Screenshot = path.join(priorScreenshotsDir, 'slide-01.png');
+  const s02Screenshot = path.join(screenshotsDir, 'slide-02.png');
+  writeFileSync(s01Screenshot, 'prior-s01');
+  writeFileSync(s02Screenshot, 'fresh-s02');
+  const s01Html = '<section data-slide-root="true" data-slide-id="S01" data-qa-block="root" data-primary-point="true" data-title="第一页" data-layout-family="body" data-speaker-seconds="30" data-recipe-id="body_metric" data-template-id="none" data-peak-page="false" data-director-role="body"><div data-qa-block="body">stable html</div></section>';
+  const s02Html = '<section data-slide-root="true" data-slide-id="S02" data-qa-block="root" data-primary-point="true" data-title="第二页" data-layout-family="body" data-speaker-seconds="30" data-recipe-id="body_metric" data-template-id="none" data-peak-page="false" data-director-role="body"><div data-qa-block="body">fresh html</div></section>';
+  writeFileSync(htmlFile, `<html><body>${s01Html}${s02Html}</body></html>`);
+  const reviewScript = path.join(workspaceRoot, 'review-helper.mjs');
+  writeFileSync(reviewScript, `console.log(JSON.stringify({ slide_reviews: [{ slide_id: 'S02', title: '第二页', layout_family: 'body', screenshot_file: ${JSON.stringify(s02Screenshot)}, checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true, page_number_consistency_ok: true }, issues: [], metrics: { occupied_ratio: 0.5, title_font_size: 34 } }], checks: { overflow_free: true }, metrics: { page_count: 2 }, baseline: {} }));\n`);
+  const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'deck-a' };
+  const priorReviewArtifact = {
+    status: 'pass',
+    review_capture: {
+      capture_id: 'capture-a',
+      screenshots_dir: priorScreenshotsDir,
+    },
+    slide_reviews: [
+      {
+        slide_id: 'S01',
+        title: '第一页',
+        layout_family: 'body',
+        screenshot_file: s01Screenshot,
+        checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true, page_number_consistency_ok: true },
+        issues: [],
+        metrics: { occupied_ratio: 0.5, title_font_size: 34 },
+        ai_review: { judgement: 'pass', visual_findings: [], recommended_fix: '' },
+      },
+      {
+        slide_id: 'S02',
+        title: '第二页',
+        layout_family: 'body',
+        screenshot_file: path.join(priorScreenshotsDir, 'slide-02.png'),
+        checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true, page_number_consistency_ok: true },
+        issues: [],
+        metrics: { occupied_ratio: 0.5, title_font_size: 34 },
+        ai_review: { judgement: 'pass', visual_findings: [], recommended_fix: '' },
+      },
+    ],
+    mechanical_review: {
+      ruleset_id: 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit',
+      slide_reviews: [
+        { slide_id: 'S01', screenshot_file: s01Screenshot, checks: { overflow_free: true }, issues: [], metrics: { occupied_ratio: 0.5, title_font_size: 34 } },
+        { slide_id: 'S02', screenshot_file: path.join(priorScreenshotsDir, 'slide-02.png'), checks: { overflow_free: true }, issues: [], metrics: { occupied_ratio: 0.5, title_font_size: 34 } },
+      ],
+    },
+  };
+  writeFileSync(path.join(priorScreenshotsDir, 'slide-02.png'), 'prior-s02');
+  const contexts = [];
+  const stageParts = createPptDeckStageParts({
+    CANVAS: { width: 1152, height: 648 },
+    CODEX_DEFAULT_ADAPTER: 'test-adapter',
+    CREATIVE_MATERIALIZED_FROM: 'test',
+    PAGE_FIX_ROUTE: 'fix_html',
+    PROMPT_PACK: { screenshot_review: 'screenshot-review.md' },
+    PYTHON_EXPORT: '/tmp/export.py',
+    PYTHON_REVIEW: reviewScript,
+    RENDER_HTML_BATCH_SIZE: 2,
+    RENDER_REFERENCE_SLIDE_WINDOW: 2,
+    SCREENSHOT_REVIEW_BATCH_SIZE: 2,
+    TARGETED_RENDER_HTML_BATCH_SIZE: 1,
+    aiFirstMechanicalCheckValue: (slides, check) => slides.every((slide) => slide.checks?.[check] !== false),
+    attachCommon: (stage) => ({ stage }),
+    buildAiFirstVisualSlideReview: (slide, aiReview) => ({ ...slide, status: aiReview?.judgement === 'block' ? 'block' : slide.status, ai_review: aiReview }),
+    buildAuthoringContext: () => ({}),
+    buildDeckHtml: () => '<html></html>',
+    chunkArray: (items, size) => {
+      const chunks = [];
+      for (let index = 0; index < items.length; index += size) chunks.push(items.slice(index, index + size));
+      return chunks;
+    },
+    collectSlidesNeedingTargetedRevision: () => [],
+    compareFailuresAndDensity: () => ({ verdict: 'not_degraded' }),
+    createReviewCapturePaths: () => ({ captureId: 'capture-b', screenshotsDir, reviewMarkdownFile: path.join(screenshotsDir, 'review.md') }),
+    creativeExecution: (_route, generationRuntime) => ({ generation_runtime: generationRuntime }),
+    creativeSourceStamp: () => ({}),
+    currentHtmlStageId: () => 'fix_html',
+    deriveProfileChecks: () => ({}),
+    deriveScreenshotReviewRerunStage: () => 'fix_html',
+    directorReviewOutputContract: () => ({}),
+    ensureDir: (dir) => {
+      mkdirSync(dir, { recursive: true });
+      return dir;
+    },
+    extraChecks: () => ({}),
+    generateStructuredArtifact: async ({ context }) => {
+      contexts.push(context);
+      if (context?.review_scope === 'slide_batch') {
+        return {
+          data: { slide_reviews: [{ slide_id: 'S02', judgement: 'pass', visual_findings: [], recommended_fix: '' }] },
+          generationRuntime: { estimated_prompt_tokens: 10, prompt_bytes: 100, context_bytes: 50, provider_usage: { input_tokens: 10 } },
+        };
+      }
+      if (context?.review_scope === 'summary') {
+        return {
+          data: { director_intent_landed: true, anti_template_ok: true, weak_pages: [], review_summary: 'ai ok' },
+          generationRuntime: { estimated_prompt_tokens: 5, prompt_bytes: 60, context_bytes: 30 },
+        };
+      }
+      return { data: {}, generationRuntime: {} };
+    },
+    getDeliverablePaths: () => deliverablePaths,
+    getDeliverableViewSurfacePaths: () => ({ stableHtmlFile: htmlFile }),
+    getReviewState: () => ({}),
+    hasAiVisualBlock: (review) => review?.judgement === 'block',
+    hydrateRenderedSlideRootMetadata: (slide) => slide,
+    isBaselineApprovedState: () => true,
+    loadOperatorRevisionBrief: () => null,
+    normalizeInlineText: (value) => String(value || ''),
+    normalizePptScreenshotAiSlideReviews: (value) => value,
+    normalizeStringList: (value) => safeArray(value),
+    normalizeTypographyPlan: (value) => value,
+    primarySurface: () => 'test-surface',
+    readCurrentHtmlArtifact: () => ({
+      route: 'fix_html',
+      render_execution: { mode: 'targeted_revision_only', freshly_rendered_slide_ids: ['S02'], reused_slide_ids: ['S01'] },
+      targeted_rerun: { target_slide_ids: ['S02'], reused_slide_ids: ['S01'] },
+      html_bundle: {
+        html_file: htmlFile,
+        page_count: 2,
+        slides: [
+          { slide_id: 'S01', title: '第一页', content: s01Html, content_html: s01Html, evidence_and_sources: [{ public_label: 'source' }] },
+          { slide_id: 'S02', title: '第二页', content: s02Html, content_html: s02Html, evidence_and_sources: [{ public_label: 'source' }] },
+        ],
+      },
+    }),
+    readJson: () => ({}),
+    readPromptPackText: () => '',
+    readStageArtifact: (_contract, _paths, stage) => {
+      if (stage === 'screenshot_review') return priorReviewArtifact;
+      if (stage === 'visual_director_review') return { visual_director_review: { director_intent_landed: true, anti_template_ok: true } };
+      if (stage === 'slide_blueprint') return { slide_blueprint: { slides: [{ slide_id: 'S01', title: '第一页' }, { slide_id: 'S02', title: '第二页' }] } };
+      if (stage === 'visual_direction') return {
+        visual_direction: {
+          visual_manifest: 'full deck visual manifest',
+          page_role_table: [{ slide_id: 'S01', page_role: 'stable' }, { slide_id: 'S02', page_role: 'fresh' }],
+          peak_pages: ['S01', 'S02'],
+          rhythm_curve: [{ slide_id: 'S01', role: 'stable' }, { slide_id: 'S02', role: 'fresh' }],
+          global_notes: 'this should not be forwarded in incremental summary',
+        },
+      };
+      if (stage === 'storyline') return {};
+      return {};
+    },
+    renderHtmlOutputContract: () => ({}),
+    renderHtmlSummaryOutputContract: () => ({}),
+    requireText: (value) => String(value || ''),
+    resolvePromptPackAsset: () => '',
+    resolveRedCubePythonCommand: () => ({ command: 'node' }),
+    safeArray,
+    safeFileMtimeMs: () => 1,
+    safeText,
+    screenshotReviewSlideBatchOutputContract: () => ({}),
+    screenshotReviewSummaryOutputContract: () => ({}),
+    seedDeliverableStableViews: () => [],
+    stageArtifactPath: () => path.join(workspaceRoot, 'screenshot-review.json'),
+    summarizeBlueprintSlides: (artifact) => safeArray(artifact?.slide_blueprint?.slides),
+    summarizeRelativeQuality: () => 'baseline ok',
+    validateRenderedReviewAnchors: () => [],
+    validateRenderedSlideContent: () => [],
+    writeJson: (file, value) => writeFileSync(file, JSON.stringify(value)),
+    writeText: (file, text) => {
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(file, text);
+    },
+  });
+  return { stageParts, workspaceRoot, contract: { title: 'PPT incremental', layout_rules: { max_primary_points_per_slide: 5 } }, contexts };
+}
+
+test('ppt incremental screenshot_review summarizes only changed slides and records child-call telemetry', async () => {
+  const fixture = makeIncrementalPptScreenshotFixture();
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  let artifact;
+  try {
+    artifact = await fixture.stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract: fixture.contract,
+      mode: 'create_new',
+      adapter: 'test-adapter',
+    });
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+  }
+
+  const slideBatchContext = fixture.contexts.find((context) => context.review_scope === 'slide_batch');
+  const summaryContext = fixture.contexts.find((context) => context.review_scope === 'summary');
+  assert.deepEqual(slideBatchContext.screenshot_mechanics.slides.map((slide) => slide.slide_id), ['S02']);
+  assert.deepEqual(summaryContext.blueprint.slides.map((slide) => slide.slide_id), ['S02']);
+  assert.deepEqual(summaryContext.visual_direction.page_role_table.map((slide) => slide.slide_id), ['S02']);
+  assert.equal(Object.hasOwn(summaryContext.visual_direction, 'global_notes'), false);
+  assert.deepEqual(summaryContext.prior_pass_digest.reused_slide_ids, ['S01']);
+  assert.equal(artifact.review_execution.review_scope, 'incremental_page_review');
+  assert.equal(artifact.review_execution.generation_runtime.estimated_prompt_tokens, 15);
+  assert.equal(artifact.review_execution.generation_runtime.prompt_bytes, 160);
+  assert.equal(artifact.review_execution.generation_runtime.context_bytes, 80);
+  assert.deepEqual(
+    artifact.review_execution.generation_runtime.child_calls.map((call) => call.review_scope),
+    ['slide_batch', 'summary'],
+  );
 });
 
 function makeXhsReviewParts() {

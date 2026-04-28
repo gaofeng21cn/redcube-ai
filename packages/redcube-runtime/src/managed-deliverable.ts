@@ -691,7 +691,7 @@ function buildStageIngestion({
         stage_id: stageId,
         attempt,
         route_run_id: safeText(routeResult?.run?.run_id) || null,
-        status: 'failed',
+        status: 'quality_blocked',
         summary: `${stageLabel(stageId)}要求回到${stageLabel(reviewRerunPolicy.rerunFromStage)}继续修复，系统已自动切回返修阶段。`,
         artifacts: artifactRefs,
         decision: 'rerun_from_review_stage',
@@ -1071,11 +1071,14 @@ async function executeManagedStageTask({
   }
   managedRun.worker_running = false;
   managedRun.active_run_id = null;
+  const qualityBlocked = safeText(routeResult?.run?.status) === 'quality_blocked';
   managedRun.runtime_liveness_audit = buildRuntimeLivenessAudit({
-    status: 'none',
-    reasonCode: routeResult?.ok ? 'stage_execution_finished' : 'stage_execution_failed',
+    status: qualityBlocked ? 'live' : 'none',
+    reasonCode: routeResult?.ok
+      ? 'stage_execution_finished'
+      : (qualityBlocked ? 'stage_quality_blocked' : 'stage_execution_failed'),
   });
-  managedRun.runtime_health_status = routeResult?.ok ? 'degraded' : 'escalated';
+  managedRun.runtime_health_status = routeResult?.ok || qualityBlocked ? 'degraded' : 'escalated';
   promptAudit.output_refs = uniqueList([
     routeResult?.artifactFile,
     ...safeArray(routeResult?.run?.artifact_refs),

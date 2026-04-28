@@ -838,12 +838,18 @@ test('ppt screenshot_review incrementally reviews only freshly fixed slides and 
       assert.equal(reviewed.ok, true);
       assert.equal(reviewed.artifact?.review_execution?.review_scope, 'incremental_page_review');
       assert.deepEqual(reviewed.artifact?.review_execution?.reviewed_slide_ids, ['S05']);
+      assert.equal(reviewed.artifact?.review_execution?.reused_slide_ids.includes('S01'), true);
+      assert.equal(reviewed.artifact?.review_capture?.capture_mode, 'delta');
+      assert.equal(reviewed.artifact?.review_capture?.requires_full_materialization_before_export, true);
+      const captureManifest = readJson(reviewed.artifact?.review_capture?.manifest_file);
+      assert.deepEqual(captureManifest.slides.map((slide) => slide.slide_id), ['S05']);
+      assert.equal(existsSync(path.join(reviewed.artifact?.review_capture?.screenshots_dir, 'slide-01.png')), false);
       assert.equal(reviewed.artifact?.slide_reviews.length, priorQualityGate.slide_reviews.length);
       assert.equal(reviewed.artifact?.slide_reviews.find((slide) => slide.slide_id === 'S05')?.ai_review?.judgement, 'pass');
-      assert.notEqual(reviewed.artifact?.slide_reviews.find((slide) => slide.slide_id === 'S01')?.screenshot_file, priorS01Screenshot);
+      assert.equal(reviewed.artifact?.slide_reviews.find((slide) => slide.slide_id === 'S01')?.screenshot_file, priorS01Screenshot);
       assert.match(
-        reviewed.artifact?.slide_reviews.find((slide) => slide.slide_id === 'S01')?.screenshot_file || '',
-        /\/reports\/screenshots\/capture-[^/]+\/slide-01\.png$/,
+        reviewed.artifact?.slide_reviews.find((slide) => slide.slide_id === 'S05')?.screenshot_file || '',
+        /\/reports\/screenshots\/capture-[^/]+\/slide-05\.png$/,
       );
       assert.equal(reviewed.artifact?.status, 'pass');
     } finally {
@@ -1119,6 +1125,7 @@ test('ppt screenshot_review recalculates page number consistency after increment
         route: 'fix_html',
       });
       assert.equal(fixResult.ok, true);
+      assert.equal(fixResult.summary.fix_html_escalation_status, 'escalation_unavailable');
       assert.deepEqual(fixResult.artifact?.render_execution?.freshly_rendered_slide_ids, ['S05']);
     } finally {
       restoreRenderVariant();

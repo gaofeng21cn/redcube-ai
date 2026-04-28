@@ -22,6 +22,7 @@ import {
   getProductStart,
   getProductPreflight,
   getProductEntrySession,
+  buildPerformanceReport,
   superviseManagedRun as superviseGatewayManagedRun,
   intakeSource,
   researchSource,
@@ -64,6 +65,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getProductStart,
   getProductPreflight,
   getProductEntrySession,
+  buildPerformanceReport,
   superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
   researchSource,
@@ -351,6 +353,12 @@ function buildCommandHelp(commandKey: string): JsonMap | null {
       gateway_action: 'runtimeWatch',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId', 'runId'],
     },
+    'report performance': {
+      summary: '聚合 route/run/review/render/capture telemetry，输出 RedCube performance report surface。',
+      usage: 'redcube report performance --workspace-root <dir> [--topic-id <id>] [--deliverable-id <id>]',
+      gateway_action: 'buildPerformanceReport',
+      boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
+    },
     'product invoke': {
       summary: '以 direct RedCube product entry 方式创建或继续同一 deliverable，并下沉到同一个 service-safe domain entry。',
       usage: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
@@ -499,6 +507,10 @@ export async function buildHelp(gatewayActions: GatewayActionMap = getCliGateway
         command: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       },
       {
+        task: '汇总 workspace / deliverable 的性能与 token telemetry',
+        command: 'redcube report performance --workspace-root <dir> [--topic-id <id>] [--deliverable-id <id>]',
+      },
+      {
         task: '先打开 RedCube 轻量前台，查看当前 product-entry 入口和继续方式',
         command: 'redcube product frontdesk --workspace-root <dir>',
       },
@@ -526,6 +538,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap = getCliGateway
       product: ['frontdesk', 'start', 'preflight', 'invoke', 'session', 'manifest'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
+      report: ['performance'],
       profile: ['list', 'bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
@@ -564,6 +577,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap = getCliGateway
       reviewProjection: 'redcube review projection --workspace-root <dir> --topic-id <id>',
       reviewWatch: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> --run-id <id>',
       reviewMutate: 'redcube review mutate --workspace-root <dir> --topic-id <id> --deliverable-id <id> --type <request_changes|bind_baseline|approve_publish|promote_publish|promote_baseline> [--issues a,b] [--rerun-from-stage <stage>] [--baseline-deliverable-id <id>] [--notes <text>] [--actor <human|agent>] [--promoted-reference-id <id>]',
+      reportPerformance: 'redcube report performance --workspace-root <dir> [--topic-id <id>] [--deliverable-id <id>]',
       profile: 'redcube profile --action <list|bootstrap|export|install> [--source-dir <dir>] [--bundle <file>] [--config-home <dir>] [--force]',
     },
   };
@@ -907,6 +921,18 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     return gateway.getRun({
       workspaceRoot: resolveWorkspaceRoot(options, cwd),
       runId: options.runId || '',
+    });
+  }
+
+  if (command === 'report') {
+    if (subcommand !== 'performance') {
+      throw new Error('report 命令仅支持 performance');
+    }
+
+    return gateway.buildPerformanceReport({
+      workspaceRoot: resolveWorkspaceRoot(options, cwd),
+      topicId: options.topicId || null,
+      deliverableId: options.deliverableId || null,
     });
   }
 

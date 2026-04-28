@@ -78,6 +78,7 @@ import {
   saveManagedRun as saveManagedRunJs,
 } from './managed-run-store.js';
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
+import { buildPerformanceReport as buildPerformanceReportJs } from './performance-report.js';
 import { resolveSourceAugmentationAdapter as resolveSourceAugmentationAdapterJs } from './source-augmentation-executor.js';
 import { prepareSourceAugmentation as prepareSourceAugmentationJs } from './source-augmentation-request.js';
 export {
@@ -322,6 +323,14 @@ export function loadManagedProgressProjection(
   request: RuntimeManagedRunLookupRequest,
 ): RuntimeManagedProgressProjection | null {
   return loadManagedProgressProjectionJs(request) as RuntimeManagedProgressProjection | null;
+}
+
+export function buildPerformanceReport(request: {
+  workspaceRoot: string;
+  topicId?: string | null;
+  deliverableId?: string | null;
+}): Record<string, any> {
+  return buildPerformanceReportJs(request);
 }
 
 export function saveManagedProgressProjection(request: {

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   CODEX_DEFAULT_ADAPTER,
@@ -144,6 +144,42 @@ function numberOrNull(value) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function sumNumber(values) {
+  const total = values.reduce((sum, value) => (
+    typeof value === 'number' && Number.isFinite(value) ? sum + value : sum
+  ), 0);
+  return total > 0 ? total : null;
+}
+
+function normalizeGenerationChildCalls(generationRuntime = {}) {
+  return Array.isArray(generationRuntime?.child_calls)
+    ? generationRuntime.child_calls.filter((call) => call && typeof call === 'object')
+    : [];
+}
+
+function runtimeMetric(generationRuntime, childCalls, key) {
+  const direct = numberOrNull(generationRuntime?.[key]);
+  if (direct != null) return direct;
+  return sumNumber(childCalls.map((call) => call?.[key]));
+}
+
+function blockedChecksFromArtifact(artifact = {}) {
+  return compactArray([
+    ...compactArray(artifact?.blocking_reasons),
+    ...compactArray(artifact?.review_state_patch?.blocking_reasons),
+    ...compactArray(artifact?.review_state_patch?.pending_reviews),
+    ...Object.entries(artifact?.checks || {})
+      .filter(([, value]) => value === false)
+      .map(([key]) => key),
+  ]);
+}
+
+function isQualityBlockedArtifact(artifact = {}) {
+  const rerunPolicy = artifact?.review_state_patch?.rerun_policy || {};
+  return String(artifact?.status || '').trim() === 'block'
+    || String(rerunPolicy?.status || '').trim() === 'rerun_required';
+}
+
 function generationRuntimeFromArtifact(artifact = {}) {
   return artifact?.creative_execution?.generation_runtime
     || artifact?.review_execution?.generation_runtime
@@ -156,6 +192,7 @@ function generationRuntimeFromArtifact(artifact = {}) {
 function buildRoutePromptTelemetry(routeResult = {}) {
   const artifact = routeResult?.artifact || {};
   const generationRuntime = generationRuntimeFromArtifact(artifact) || {};
+  const childCalls = normalizeGenerationChildCalls(generationRuntime);
   const reviewExecution = artifact?.review_execution || {};
   const renderExecution = artifact?.render_execution || artifact?.html_bundle?.render_execution || {};
   const targetedRerun = artifact?.targeted_rerun || {};
@@ -189,13 +226,19 @@ function buildRoutePromptTelemetry(routeResult = {}) {
   return {
     prompt_pack_file: String(generationRuntime?.prompt_pack_file || artifact?.prompt_pack?.relative_path || '').trim() || null,
     prompt_files: compactArray(generationRuntime?.prompt_files),
-    prompt_bytes: numberOrNull(generationRuntime?.prompt_bytes),
-    context_bytes: numberOrNull(generationRuntime?.context_bytes),
-    prompt_tokens: numberOrNull(generationRuntime?.prompt_tokens),
-    completion_tokens: numberOrNull(generationRuntime?.completion_tokens),
-    total_tokens: numberOrNull(generationRuntime?.total_tokens),
-    estimated_prompt_tokens: numberOrNull(generationRuntime?.estimated_prompt_tokens),
+    prompt_bytes: runtimeMetric(generationRuntime, childCalls, 'prompt_bytes'),
+    context_bytes: runtimeMetric(generationRuntime, childCalls, 'context_bytes'),
+    prompt_tokens: runtimeMetric(generationRuntime, childCalls, 'prompt_tokens'),
+    completion_tokens: runtimeMetric(generationRuntime, childCalls, 'completion_tokens'),
+    total_tokens: runtimeMetric(generationRuntime, childCalls, 'total_tokens'),
+    estimated_prompt_tokens: runtimeMetric(generationRuntime, childCalls, 'estimated_prompt_tokens'),
     provider_usage: generationRuntime?.provider_usage || generationRuntime?.usage || null,
+    cached_tokens: numberOrNull(generationRuntime?.cached_tokens),
+    cache_hit: generationRuntime?.cache_hit === true ? true : null,
+    child_calls: childCalls,
+    review_scope: String(reviewExecution?.review_scope || generationRuntime?.review_scope || '').trim() || null,
+    cache_status: routeResult?.cache_status || artifact?.route_cache?.cache_status || artifact?.mechanical_cache?.cache_status || null,
+    blocked_checks: blockedChecksFromArtifact(artifact),
     slide_scope: slideScope,
     target_slide_scope: {
       target_slide_ids: slideScope.target_slide_ids,
@@ -336,21 +379,24 @@ export async function runDeliverableRoute(request) {
       ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
     ]));
     patchArtifactExecutionModel(routeResult.artifact_file, executor);
+    const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
     const completedRun = completeHermesRun({
       workspaceRoot,
       runId: run.run_id,
       currentStage: safeRoute,
       stageResults: [{
         stage: safeRoute,
-        status: routeResult.cache_status === 'hit' ? 'cached' : 'completed',
+        status: routeResult.cache_status === 'hit' ? 'cached' : routeRunStatus,
       }],
       artifactRefs: routeResult.artifact_refs,
       executor,
       telemetry: buildRoutePromptTelemetry(routeResult),
+      status: routeRunStatus,
+      errorKind: routeRunStatus === 'quality_blocked' ? 'quality_blocked' : null,
     });
 
     appendHermesEvent(workspaceRoot, completedRun.run_id, {
-      type: 'run_completed',
+      type: routeRunStatus === 'quality_blocked' ? 'run_quality_blocked' : 'run_completed',
       route: safeRoute,
       overlay,
       deliverable_id: deliverableId,
@@ -380,16 +426,33 @@ export async function runDeliverableRoute(request) {
     failure.artifact_file = String(error?.artifact_file || '').trim() || null;
     failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
     failure.requiresExternalSecret = error?.requiresExternalSecret === true;
+    const failureKind = String(failure.failure_kind || failure.code || '').trim();
+    const qualityBlocked = failureKind === 'quality_blocked' || /^Route .+ blocked/.test(failureMessage);
+    if (qualityBlocked) {
+      failure.code = failure.code || 'quality_blocked';
+      failure.failure_kind = 'quality_blocked';
+    }
+    const failedArtifact = failure.artifact_file && existsSync(failure.artifact_file)
+      ? JSON.parse(readFileSync(failure.artifact_file, 'utf-8'))
+      : (error?.artifact || null);
     const failedRun = failHermesRun({
       workspaceRoot,
       runId: run.run_id,
       currentStage: safeRoute,
       error: failure,
       executor,
+      errorKind: qualityBlocked ? 'quality_blocked' : 'execution_error',
+      status: qualityBlocked ? 'quality_blocked' : 'failed',
+      telemetry: failedArtifact
+        ? buildRoutePromptTelemetry({
+            artifact: failedArtifact,
+            cache_status: failedArtifact?.route_cache?.cache_status || 'miss',
+          })
+        : {},
     });
 
     appendHermesEvent(workspaceRoot, failedRun.run_id, {
-      type: 'run_failed',
+      type: qualityBlocked ? 'run_quality_blocked' : 'run_failed',
       route: safeRoute,
       overlay,
       deliverable_id: deliverableId,

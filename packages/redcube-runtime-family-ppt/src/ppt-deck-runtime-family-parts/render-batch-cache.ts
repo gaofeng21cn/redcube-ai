@@ -76,13 +76,14 @@ export function createPptDeckRenderBatchCacheParts(deps) {
     route,
     renderPlan,
     revisionFreshness,
-    visualArtifact,
     promptSlides,
     referenceSlides,
     promptRelativePath,
+    visualDirectionContext = null,
+    revisionContext = null,
   }) {
     return stableHash({
-      version: 1,
+      version: 2,
       route,
       promptRelativePath,
       rerender_mode: renderPlan.mode,
@@ -96,7 +97,8 @@ export function createPptDeckRenderBatchCacheParts(deps) {
         visual_summary: slide?.visual_summary || {},
         slide_identity: slide?.slide_identity || {},
       })),
-      visual_direction_hash: stableHash(visualArtifact?.visual_direction || {}),
+      visual_direction_hash: stableHash(visualDirectionContext || {}),
+      revision_context_hash: stableHash(revisionContext || {}),
     });
   }
 

@@ -619,16 +619,19 @@ export function completeHermesRun({
   artifactRefs,
   executor,
   telemetry = {},
+  status = 'completed',
+  errorKind = null,
 }) {
   const { run } = loadHermesRunRaw({ workspaceRoot, runId });
+  const runStatus = String(status || '').trim() || 'completed';
   const completedRun = {
     ...run,
-    status: 'completed',
+    status: runStatus,
     finished_at: new Date().toISOString(),
     current_stage: currentStage,
     stage_results: stageResults,
     artifact_refs: artifactRefs,
-    error_kind: null,
+    error_kind: errorKind,
     runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
     executor: executor || run?.executor,
     telemetry: {
@@ -639,7 +642,7 @@ export function completeHermesRun({
   completedRun.telemetry = buildRunTelemetry(
     completedRun,
     executor || run?.executor,
-    'completed',
+    runStatus,
     completedRun.finished_at,
   );
 
@@ -655,11 +658,13 @@ export function failHermesRun({
   errorKind = 'execution_error',
   executor,
   telemetry = {},
+  status = 'failed',
 }) {
   const { run } = loadHermesRunRaw({ workspaceRoot, runId });
+  const runStatus = String(status || '').trim() || 'failed';
   const failedRun = {
     ...run,
-    status: 'failed',
+    status: runStatus,
     finished_at: new Date().toISOString(),
     current_stage: currentStage,
     error_kind: errorKind,
@@ -674,7 +679,7 @@ export function failHermesRun({
   failedRun.telemetry = buildRunTelemetry(
     failedRun,
     executor || run?.executor,
-    'failed',
+    runStatus,
     failedRun.finished_at,
   );
 

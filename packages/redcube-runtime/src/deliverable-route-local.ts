@@ -614,11 +614,34 @@ export async function executeDeliverableRouteLocally({
   }
 
   if (artifact?.status === 'block' || artifact?.status === 'failed') {
-    throw new Error(
+    const blockingReasons = uniqueStrings([
+      ...safeArray(artifact?.blocking_reasons),
+      ...safeArray(artifact?.review_state_patch?.blocking_reasons),
+      ...safeArray(artifact?.review_state_patch?.pending_reviews),
+      ...Object.entries(artifact?.checks || {})
+        .filter(([, value]) => value === false)
+        .map(([key]) => key),
+    ]);
+    const error = new Error(
       safeRoute === 'screenshot_review'
         ? `Route ${safeRoute} blocked: ${JSON.stringify(artifact?.checks || artifact?.issues || {})}`
         : `Route ${safeRoute} blocked`,
     );
+    error.code = 'quality_blocked';
+    error.failure_kind = 'quality_blocked';
+    error.target_slide_ids = uniqueStrings([
+      ...safeArray(artifact?.target_slide_ids),
+      ...safeArray(artifact?.preflight_gate?.target_slide_ids),
+      ...safeArray(artifact?.review_state_patch?.rerun_policy?.target_slide_ids),
+      ...safeArray(artifact?.review_execution?.reviewed_slide_ids),
+    ]);
+    error.blocking_reasons = blockingReasons.length > 0 ? blockingReasons : ['quality_gate_blocked'];
+    error.recommended_action = safeText(artifact?.review_state_patch?.rerun_from_stage)
+      || safeText(artifact?.review_state_patch?.rerun_policy?.rerun_from_stage)
+      || 'rerun_required';
+    error.artifact_file = artifactFile;
+    error.artifact = artifact;
+    throw error;
   }
 
   return {

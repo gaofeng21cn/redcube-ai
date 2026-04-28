@@ -10,6 +10,9 @@ interface PptScreenshotCaptureDeps {
   };
   slideReviews: JsonRecord[];
   mechanicalSlideReviews: JsonRecord[];
+  targetSlideIds?: unknown[];
+  priorCaptureManifest?: JsonRecord | null;
+  captureMode?: 'full' | 'delta';
 }
 
 function safeText(value: unknown, fallback = ''): string {
@@ -43,15 +46,27 @@ export function materializePptScreenshotReviewCapture({
   reviewCapture,
   slideReviews,
   mechanicalSlideReviews,
+  targetSlideIds = [],
+  priorCaptureManifest = null,
+  captureMode = 'full',
 }: PptScreenshotCaptureDeps) {
+  const normalizedCaptureMode = captureMode === 'delta' ? 'delta' : 'full';
+  const targetIdSet = new Set(safeArray(targetSlideIds).map((slideId) => safeText(slideId)).filter(Boolean));
+  const slidesToMaterialize = normalizedCaptureMode === 'delta' && targetIdSet.size > 0
+    ? safeArray(slideReviews).filter((slide) => targetIdSet.has(safeText(slide?.slide_id)))
+    : slideReviews;
   const captureManifest = materializeScreenshotCaptureStore({
     reportsDir: deliverablePaths.reportsDir,
     captureId: reviewCapture.captureId,
     screenshotsDir: reviewCapture.screenshotsDir,
-    slideReviews,
+    slideReviews: slidesToMaterialize,
     currentViewMode: 'hardlink',
+    captureMode: normalizedCaptureMode,
   });
-  const captureBySlideId = captureMapFromManifest(captureManifest);
+  const captureBySlideId = new Map([
+    ...captureMapFromManifest(priorCaptureManifest || {}),
+    ...captureMapFromManifest(captureManifest),
+  ]);
   return {
     captureManifest,
     slideReviews: applyCapturePaths(slideReviews, captureBySlideId),

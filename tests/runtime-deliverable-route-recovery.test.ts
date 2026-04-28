@@ -176,7 +176,7 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
         route: 'fix_html',
       });
 
-      assert.equal(result.ok, false);
+      assert.equal(result.ok, true);
       assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
         'visual_director_review',
         'screenshot_review',
@@ -188,6 +188,8 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
         ['visual_director_review', 'screenshot_review'],
       );
       assert.equal(result.execution_proof?.proof_kind, 'fix_html_agentic_escalation');
+      assert.equal(result.execution_proof?.escalation_status, 'escalated_still_requires_fix_html');
+      assert.deepEqual(result.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02']);
       const fixArtifact = JSON.parse(readFileSync(fixBundleFile, 'utf-8'));
       assert.deepEqual(fixArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
     } finally {

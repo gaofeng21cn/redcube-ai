@@ -52,6 +52,11 @@ export async function getPublicationProjection(request) {
   return loadPublicationProjection(request);
 }
 
+export async function buildPerformanceReport(request) {
+  const { buildPerformanceReport: buildRuntimePerformanceReport } = await import('@redcube/runtime');
+  return buildRuntimePerformanceReport(request);
+}
+
 export async function getRun(request) {
   const module = await import('./actions/get-run.js');
   return module.getRun(request);
