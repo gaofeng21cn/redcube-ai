@@ -401,11 +401,11 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(frontdeskParsed.frontdesk_surface.command, 'redcube product frontdesk');
     assert.equal(frontdeskParsed.product_entry_manifest.frontdesk_surface.command, 'redcube product frontdesk');
     assert.equal(frontdeskParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(frontdeskParsed.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
+    assert.equal(frontdeskParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
     assert.equal(frontdeskParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(frontdeskParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
     assert.equal(frontdeskParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(frontdeskParsed.runtime_loop_closure.source_linkage.current_source, 'frontdesk');
+    assert.equal(frontdeskParsed.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
     assert.equal(frontdeskParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(frontdeskParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
     assert.equal(frontdeskParsed.product_entry_readiness.usable_now, true);
@@ -637,7 +637,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.frontdesk_surface.command, 'redcube product frontdesk');
     assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifestParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(manifestParsed.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
+    assert.equal(manifestParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
     assert.equal(manifestParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
     assert.equal(
       manifestParsed.family_orchestration.resume_contract.session_locator_field,

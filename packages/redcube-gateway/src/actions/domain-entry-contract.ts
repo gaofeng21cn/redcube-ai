@@ -128,6 +128,8 @@ export function buildRedCubeGatewayInteractionContract({
   federatedProductEntryContractRef,
 }) {
   return buildFamilyGatewayInteractionContract({
+    frontdoor_owner: 'redcube_agent_entry_shell',
+    user_interaction_mode: 'agent_facing_product_entry_overview',
     shared_downstream_entry: REDCUBE_DOMAIN_ENTRY_ADAPTER,
     extra_shared_handoff_envelope: [
       'entry_session_contract',

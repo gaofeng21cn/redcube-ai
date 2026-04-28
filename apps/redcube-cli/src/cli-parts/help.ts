@@ -116,19 +116,19 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['entrySessionId'],
     },
     'product frontdesk': {
-      summary: '读取 RedCube 轻量 direct frontdesk，先查看 direct / session 入口和当前主线状态，并了解 internal OPL bridge 合同。',
+      summary: '读取 RedCube agent-facing product-entry overview；`frontdesk` 是兼容命令键，用于查看 direct / session 入口、当前主线状态和 internal OPL bridge 合同。',
       usage: 'redcube product frontdesk --workspace-root <dir>',
       gateway_action: 'getProductFrontdesk',
       boundary_fields: ['workspaceRoot'],
     },
     'product start': {
-      summary: '读取统一的 product-entry start surface，直接查看 frontdesk / direct / internal OPL bridge / resume 四类启动方式。',
+      summary: '读取统一的 product-entry start surface，直接查看 overview / direct / internal OPL bridge / resume 四类启动方式。',
       usage: 'redcube product start --workspace-root <dir>',
       gateway_action: 'getProductStart',
       boundary_fields: ['workspaceRoot'],
     },
     'product preflight': {
-      summary: '读取当前 direct product-entry frontdoor 的开机前真实自检面。',
+      summary: '读取当前 direct product-entry overview contract 的开机前真实自检面。',
       usage: 'redcube product preflight --workspace-root <dir>',
       gateway_action: 'getProductPreflight',
       boundary_fields: ['workspaceRoot'],
@@ -242,11 +242,11 @@ export async function buildHelp(gatewayActions: GatewayActionMap = getCliGateway
         command: 'redcube report performance --workspace-root <dir> [--topic-id <id>] [--deliverable-id <id>]',
       },
       {
-        task: '先打开 RedCube 轻量前台，查看当前 product-entry 入口和继续方式',
+        task: '先读取 RedCube product-entry overview，查看当前 product-entry 入口和继续方式',
         command: 'redcube product frontdesk --workspace-root <dir>',
       },
       {
-        task: '读取统一的 product-entry start surface，决定 frontdesk / direct / internal OPL bridge / resume 从哪条入口启动',
+        task: '读取统一的 product-entry start surface，决定 overview / direct / internal OPL bridge / resume 从哪条入口启动',
         command: 'redcube product start --workspace-root <dir>',
       },
       {

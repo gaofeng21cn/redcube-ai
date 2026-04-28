@@ -79,7 +79,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
             ref: '/family_orchestration/action_graph',
           },
           action_graph: {
-            graph_id: 'redcube_frontdoor_product_entry_graph',
+            graph_id: 'redcube_product_entry_overview_graph',
           },
           human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
           resume_contract: {
@@ -117,7 +117,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
             ref: '/family_orchestration/action_graph',
           },
           action_graph: {
-            graph_id: 'redcube_frontdoor_product_entry_graph',
+            graph_id: 'redcube_product_entry_overview_graph',
           },
           human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
           resume_contract: {
@@ -149,7 +149,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
             ref: '/family_orchestration/action_graph',
           },
           action_graph: {
-            graph_id: 'redcube_frontdoor_product_entry_graph',
+            graph_id: 'redcube_product_entry_overview_graph',
           },
           human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
           resume_contract: {
@@ -164,7 +164,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   assert.equal(direct.surface_kind, 'product_entry');
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
   assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-  assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
+  assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
   assert.equal(federated.surface_kind, 'federated_product_entry');
   assert.equal(federated.summary.entry_session_id, 'session-a');
   assert.equal(federated.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');

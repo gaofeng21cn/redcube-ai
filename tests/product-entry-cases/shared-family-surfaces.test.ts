@@ -75,7 +75,7 @@ async function prepareProductEntryWorkspace() {
 function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.action_graph_ref.ref_kind, 'json_pointer');
   assert.equal(surface.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-  assert.equal(surface.family_orchestration.action_graph.graph_id, 'redcube_frontdoor_product_entry_graph');
+  assert.equal(surface.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
   assert.equal(surface.family_orchestration.action_graph.target_domain_id, 'redcube_ai');
   assert.deepEqual(
     surface.family_orchestration.action_graph.nodes.map((node) => node.node_id),

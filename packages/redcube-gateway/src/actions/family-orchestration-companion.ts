@@ -15,11 +15,11 @@ const PRODUCT_ENTRY_ACTION_GRAPH_REF = Object.freeze({
 });
 
 const PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC = Object.freeze({
-  graph_id: 'redcube_frontdoor_product_entry_graph',
+  graph_id: 'redcube_product_entry_overview_graph',
   target_domain_id: 'redcube_ai',
   graph_kind: 'visual_deliverable_orchestration',
   graph_version: '2026-04-13',
-  frontdesk_title: 'Open RedCube frontdesk',
+  frontdesk_title: 'Open RedCube product-entry overview',
   frontdesk_surface_kind: 'product_frontdesk',
   direct_title: 'Start or continue the direct product loop',
   direct_surface_kind: 'product_entry',

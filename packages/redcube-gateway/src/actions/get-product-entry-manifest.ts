@@ -116,7 +116,7 @@ const LONG_TASK_STAGE_POLICY = {
   ],
   operator_rule: (
     'For long PPT tasks, do not compress the whole request into one prompt. '
-    + 'Start from frontdesk/source intake, create or reuse an entry_session_id, checkpoint each stage, '
+    + 'Start from product-entry overview/source intake, create or reuse an entry_session_id, checkpoint each stage, '
     + 'and resume through product session before moving to the next stage. '
     + 'When no stop_after_stage is requested, product invoke continues autonomously to terminal export unless a runtime review gate blocks it.'
   ),
@@ -156,7 +156,7 @@ function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) 
     surface_kind: 'route_equivalence_contract',
     owner: 'redcube_ai',
     status: 'repo_tracked',
-    summary: 'RCA frontdesk, direct invoke, same-session continuation, and the internal OPL bridge converge on the same downstream deliverable runtime truth.',
+    summary: 'RCA product-entry overview, direct invoke, same-session continuation, and the internal OPL bridge converge on the same downstream deliverable runtime truth; `frontdesk` remains the compatibility command key for the overview surface.',
     public_skill_policy: {
       skill_count: 1,
       skill_ids: ['redcube-ai'],
@@ -168,7 +168,7 @@ function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) 
         route_id: 'product_frontdesk',
         command: PRODUCT_FRONTDESK_COMMAND,
         surface_kind: 'product_frontdesk',
-        role: 'canonical_public_frontdesk',
+        role: 'compat_product_entry_overview_command',
       },
       {
         route_id: 'product_invoke',
@@ -288,16 +288,16 @@ export async function getProductEntryManifest(request) {
   const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
   const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
-      'Open the RedCube frontdesk first; if the user requested plan/storyline review, invoke with lifecycle_policy=operator_review_after_plan; otherwise direct invoke runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.'
+      'Open the RedCube product-entry overview first via the `frontdesk` compatibility command; if the user requested plan/storyline review, invoke with lifecycle_policy=operator_review_after_plan; otherwise direct invoke runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.'
     ),
     recommended_step_id: 'open_frontdesk',
     steps: [
       {
         step_id: 'open_frontdesk',
-        title: 'Open RedCube frontdesk',
+        title: 'Open RedCube product-entry overview',
         command: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_frontdesk',
-        summary: 'Open the direct RedCube frontdesk for the current workspace.',
+        summary: 'Read the agent-facing product-entry overview for the current workspace; `frontdesk` is the legacy command key, not a GUI shell.',
         requires: [],
       },
       {
@@ -325,7 +325,7 @@ export async function getProductEntryManifest(request) {
     human_gate_ids: humanGateIds,
   });
   const productEntryOverview = buildProductEntryOverview({
-    summary: 'Repo-verified product-entry service surface 已 landed；direct invoke 默认 auto_to_terminal，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`frontdesk` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
@@ -340,7 +340,7 @@ export async function getProductEntryManifest(request) {
     ),
     recommended_step_id: productEntryQuickstart.recommended_step_id,
     next_focus: [
-      '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
+      '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
       '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
     ],
     remaining_gaps_count: 2,
@@ -348,17 +348,17 @@ export async function getProductEntryManifest(request) {
   });
   const productEntryStart = buildProductEntryStart({
     summary: (
-      '先打开 RedCube frontdesk；direct session 默认自动推进到终态，'
+      '先读取 RedCube product-entry overview（`frontdesk` 兼容命令）；direct session 默认自动推进到终态，'
       + '需要给外层 OPL shell 走 bridge contract 时使用 internal OPL bridge handoff，已有 session 则直接恢复。'
     ),
     recommended_mode_id: 'open_frontdesk',
     modes: [
       {
         mode_id: 'open_frontdesk',
-        title: 'Open RedCube frontdesk',
+        title: 'Open RedCube product-entry overview',
         command: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_frontdesk',
-        summary: 'Open the direct RedCube frontdesk for the current workspace.',
+        summary: 'Read the agent-facing product-entry overview for the current workspace; `frontdesk` is the legacy command key, not a GUI shell.',
         requires: [],
       },
       {
@@ -407,7 +407,7 @@ export async function getProductEntryManifest(request) {
     good_to_use_now: false,
     fully_automatic: false,
     summary: (
-      '当前可以作为 RedCube 的 direct frontdesk / CLI product-entry 主线使用，'
+      '当前可以作为 RedCube 的 agent-facing product-entry overview / CLI product-entry 主线使用，'
       + 'internal OPL bridge contract 也已冻结给外层壳读取，'
       + '但还不是成熟的最终用户前台或托管 Web 产品。'
     ),
@@ -550,6 +550,7 @@ export async function getProductEntryManifest(request) {
   const skillActivationHints = {
     plugin_name: 'redcube-ai',
     skill_semantics: 'single_domain_app_skill',
+    canonical_entry_semantics: 'agent_facing_product_entry_overview',
     entry_shell_key: 'frontdesk',
     entry_command: PRODUCT_FRONTDESK_COMMAND,
     supporting_shell_keys: ['direct', 'session'],
@@ -569,7 +570,7 @@ export async function getProductEntryManifest(request) {
     },
   };
   const skillCatalog = buildSkillCatalog({
-    summary: 'RedCube AI is exposed as one domain app skill; frontdesk, direct invoke, and session continuity commands remain internal product-entry contracts for OPL and operator tooling.',
+    summary: 'RedCube AI is exposed as one domain app skill; the `frontdesk` command remains a compatibility key for the agent-facing product-entry overview, while direct invoke and session continuity stay internal product-entry contracts for OPL and operator tooling.',
     skills: [
       {
         skill_id: 'redcube-ai',
@@ -577,7 +578,7 @@ export async function getProductEntryManifest(request) {
         owner: 'redcube_ai',
         distribution_mode: 'repo_tracked',
         surface_kind: 'product_frontdesk',
-        description: 'Operate the RedCube AI domain app through the canonical frontdesk entry while preserving the same direct and session contracts underneath.',
+        description: 'Operate the RedCube AI domain app through the agent-facing product-entry overview while preserving the `frontdesk` compatibility command and the same direct/session contracts underneath.',
         command: PRODUCT_FRONTDESK_COMMAND,
         readiness: 'landed',
         tags: ['domain-app', 'product-entry', 'visual-deliverables'],
@@ -665,9 +666,14 @@ export async function getProductEntryManifest(request) {
       command_template: `${PRODUCT_FRONTDESK_COMMAND} --workspace-root ${workspaceRoot}`,
       surface_kind: 'product_frontdesk',
       purpose: (
-        '当前 direct RedCube frontdesk，先暴露 direct / session 入口，'
-        + '并把 internal OPL bridge 保持在单独的 bridge contract。'
+        '当前 agent-facing product-entry overview/intake shell；`frontdesk` 只是兼容命令键，'
+        + '用于暴露 direct / session 入口，并把 internal OPL bridge 保持在单独的 bridge contract。'
       ),
+      extra_payload: {
+        canonical_entry_semantics: 'agent_facing_product_entry_overview',
+        legacy_command_key: 'frontdesk',
+        claims_gui_shell: false,
+      },
     },
     direct: {
       command: PRODUCT_INVOKE_COMMAND,
@@ -760,9 +766,9 @@ export async function getProductEntryManifest(request) {
       active_baton_status: safeText(activeBaton.status, 'unknown'),
     },
     product_entry_status: {
-      summary: 'Repo-verified product-entry service surface 已 landed；direct invoke 默认 auto_to_terminal，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`frontdesk` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
       next_focus: [
-        '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry service surface 之上。',
+        '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
         '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
       ],
       remaining_gaps_count: 2,
@@ -791,7 +797,7 @@ export async function getProductEntryManifest(request) {
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: familyOrchestration,
     notes: [
-      'This manifest freezes the current repo-verified RedCube product-entry service surface.',
+      'This manifest freezes the current repo-verified RedCube product-entry overview/intake service surface; `frontdesk` is retained only as the compatibility command key.',
       'The OPL bridge stays available as an internal integration contract instead of a first-read user entry shell.',
       'It does not claim that a mature end-user shell or managed web productization is already landed.',
     ],

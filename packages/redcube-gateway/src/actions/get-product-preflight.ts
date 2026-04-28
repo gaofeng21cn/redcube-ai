@@ -74,19 +74,19 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       command: checkCommand,
     }),
     buildProgramCheck({
-      check_id: 'frontdoor_contract_landed',
-      title: 'Frontdoor Contract Landed',
+      check_id: 'product_entry_overview_contract_landed',
+      title: 'Product Entry Overview Contract Landed',
       status: 'pass',
       blocking: true,
-      summary: 'direct RedCube frontdoor contract 已 landed，可由 frontdesk / manifest 直接消费。',
+      summary: 'direct RedCube product-entry overview contract 已 landed，可由 `frontdesk` 兼容命令 / manifest 直接消费。',
       command: startCommand,
     }),
   ];
   const hasBlockingChecks = checks.some((check) => check.blocking && check.status !== 'pass');
   const productEntryPreflight = buildProductEntryPreflight({
     summary: hasBlockingChecks
-      ? 'Current product-entry preflight is blocked; fix the workspace or runtime-state setup before opening the RedCube frontdesk.'
-      : 'Current product-entry preflight passed; inspect the workspace doctor output and then open the RedCube frontdesk.',
+      ? 'Current product-entry preflight is blocked; fix the workspace or runtime-state setup before reading the RedCube product-entry overview.'
+      : 'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `frontdesk` compatibility command.',
     recommended_check_command: checkCommand,
     recommended_start_command: startCommand,
     checks,
