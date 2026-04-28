@@ -2,78 +2,100 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-process.chdir(repoRoot);
+const scriptPath = fileURLToPath(import.meta.url);
+const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 
-const DEFAULT_LIMIT = 1000;
-const BASELINE = new Map(Object.entries({
-  "packages/redcube-gateway/src/types.ts": 1238,
-  "packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts": 1302,
-  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts": 1033,
-  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/render.ts": 1208,
-  "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.ts": 1306,
-  "packages/redcube-runtime/src/managed-deliverable.ts": 1435,
-  "tests/helpers/mock-codex-cli.ts": 1389,
-  "tests/mcp-gateway.test.ts": 1160,
-  "tests/product-entry.test.ts": 1389,
-  "tests/ppt-creative-ownership-cases/targeted-rerender-and-export.test.ts": 1233,
-  "tests/source-intake.test.ts": 1226,
-}));
+export const DEFAULT_LIMIT = 1000;
+export const BASELINE_ENTRIES = {};
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.py', '.sh', '.bash', '.zsh', '.rs', '.go']);
 const IGNORED_PARTS = new Set(['node_modules', 'dist', 'build', 'coverage', '.venv', '__pycache__']);
 const IGNORED_SUFFIXES = ['.min.js'];
 
-const mode = process.argv.includes('--list') ? 'list' : 'check';
+export function evaluateLineBudget({
+  baselineEntries = BASELINE_ENTRIES,
+  exists,
+  limit = DEFAULT_LIMIT,
+  readFile,
+  trackedFiles,
+}) {
+  const baseline = new Map(Object.entries(baselineEntries));
+  const oversize = [];
+  const failures = [];
+  const lineCounts = new Map();
 
-const trackedFiles = spawnSync('git', ['ls-files'], { encoding: 'utf8' });
-if (trackedFiles.status !== 0) {
-  process.stderr.write(trackedFiles.stderr || 'line budget: git ls-files failed\n');
-  process.exit(trackedFiles.status ?? 1);
+  for (const relativePath of trackedFiles) {
+    if (!isCodeFile(relativePath)) {
+      continue;
+    }
+    if (!exists(relativePath)) {
+      continue;
+    }
+    const lineCount = countLines(readFile(relativePath));
+    lineCounts.set(relativePath, lineCount);
+    if (lineCount <= limit) {
+      continue;
+    }
+    oversize.push([relativePath, lineCount]);
+    const allowed = baseline.get(relativePath);
+    if (allowed === undefined) {
+      failures.push(`${relativePath}: ${lineCount} lines exceeds ${limit} line budget; split into focused modules or add an explicit reviewed baseline`);
+    } else if (lineCount > allowed) {
+      failures.push(`${relativePath}: ${lineCount} lines exceeds locked baseline ${allowed}; split before growing this file`);
+    }
+  }
+
+  oversize.sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+
+  for (const relativePath of baseline.keys()) {
+    if (!exists(relativePath)) {
+      failures.push(`${relativePath}: stale line-budget baseline entry; remove it after deleting or renaming the file`);
+      continue;
+    }
+    if (!lineCounts.has(relativePath)) {
+      failures.push(`${relativePath}: stale line-budget baseline entry; file is no longer tracked as a counted code file`);
+      continue;
+    }
+    const lineCount = lineCounts.get(relativePath);
+    if (lineCount <= limit) {
+      failures.push(`${relativePath}: stale line-budget baseline entry; file is now ${lineCount} lines within the ${limit} line budget; remove the baseline entry`);
+    }
+  }
+
+  return { failures, oversize };
 }
 
-const oversize = [];
-const failures = [];
-for (const relativePath of trackedFiles.stdout.split('\n').filter(Boolean)) {
-  if (!isCodeFile(relativePath)) {
-    continue;
-  }
-  const absolutePath = path.join(repoRoot, relativePath);
-  if (!fs.existsSync(absolutePath)) {
-    continue;
-  }
-  const lineCount = countLines(fs.readFileSync(absolutePath, 'utf8'));
-  if (lineCount <= DEFAULT_LIMIT) {
-    continue;
-  }
-  oversize.push([relativePath, lineCount]);
-  const allowed = BASELINE.get(relativePath);
-  if (allowed === undefined) {
-    failures.push(`${relativePath}: ${lineCount} lines exceeds ${DEFAULT_LIMIT} line budget; split into focused modules or add an explicit reviewed baseline`);
-  } else if (lineCount > allowed) {
-    failures.push(`${relativePath}: ${lineCount} lines exceeds locked baseline ${allowed}; split before growing this file`);
-  }
-}
+function main() {
+  process.chdir(repoRoot);
 
-oversize.sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+  const mode = process.argv.includes('--list') ? 'list' : 'check';
 
-if (mode === 'list') {
-  for (const [relativePath, lineCount] of oversize) {
-    process.stdout.write(`${String(lineCount).padStart(6, ' ')} ${relativePath}\n`);
+  const trackedFiles = spawnSync('git', ['ls-files'], { encoding: 'utf8' });
+  if (trackedFiles.status !== 0) {
+    process.stderr.write(trackedFiles.stderr || 'line budget: git ls-files failed\n');
+    process.exit(trackedFiles.status ?? 1);
   }
-  process.exit(0);
-}
 
-const staleBaseline = [...BASELINE.keys()].filter((relativePath) => !fs.existsSync(path.join(repoRoot, relativePath)));
-for (const relativePath of staleBaseline) {
-  failures.push(`${relativePath}: stale line-budget baseline entry; remove it after deleting or renaming the file`);
-}
+  const result = evaluateLineBudget({
+    exists: (relativePath) => fs.existsSync(path.join(repoRoot, relativePath)),
+    readFile: (relativePath) => fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'),
+    trackedFiles: trackedFiles.stdout.split('\n').filter(Boolean),
+  });
 
-if (failures.length > 0) {
-  process.stderr.write(`line budget check failed (${failures.length} issue${failures.length === 1 ? '' : 's'}):\n`);
-  process.stderr.write(failures.map((failure) => `- ${failure}`).join('\n'));
-  process.stderr.write('\n');
-  process.exit(1);
+  if (mode === 'list') {
+    for (const [relativePath, lineCount] of result.oversize) {
+      process.stdout.write(`${String(lineCount).padStart(6, ' ')} ${relativePath}\n`);
+    }
+    process.exit(0);
+  }
+
+  if (result.failures.length > 0) {
+    process.stderr.write(`line budget check failed (${result.failures.length} issue${result.failures.length === 1 ? '' : 's'}):\n`);
+    process.stderr.write(result.failures.map((failure) => `- ${failure}`).join('\n'));
+    process.stderr.write('\n');
+    process.exit(1);
+  }
 }
 
 function isCodeFile(relativePath) {
@@ -87,9 +109,13 @@ function isCodeFile(relativePath) {
   return CODE_EXTENSIONS.has(path.extname(relativePath));
 }
 
-function countLines(content) {
+export function countLines(content) {
   if (content.length === 0) {
     return 0;
   }
   return content.endsWith('\n') ? content.split('\n').length - 1 : content.split('\n').length;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
+  main();
 }
