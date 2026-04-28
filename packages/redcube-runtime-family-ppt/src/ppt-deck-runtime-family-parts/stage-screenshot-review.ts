@@ -1,13 +1,11 @@
 // @ts-nocheck
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
-
-import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 
 import {
   collectIncrementalScreenshotReviewTargetSlideIds,
 } from './incremental-review-scope.js';
 import { materializePptScreenshotReviewCapture } from './screenshot-capture.js';
+import { createPptDeckScreenshotReviewMechanicsParts } from './stage-screenshot-review-mechanics.js';
 import { createPptDeckScreenshotPreflightParts } from './stage-screenshot-preflight.js';
 import { createPptDeckStageReviewScopeParts } from './stage-review-scope.js';
 
@@ -30,7 +28,6 @@ export function createPptDeckScreenshotReviewParts(deps) {
     creativeSourceStamp,
     deriveProfileChecks,
     deriveScreenshotReviewRerunStage,
-    extraChecks,
     generateStructuredArtifact,
     getDeliverablePaths,
     hasAiVisualBlock,
@@ -65,100 +62,31 @@ export function createPptDeckScreenshotReviewParts(deps) {
     buildReviewMarkdown,
     buildScreenshotReviewPreflightArtifact,
   } = createPptDeckScreenshotPreflightParts(deps);
-
-  function runPython(helper, args) {
-    return runRedCubePythonHelper(helper, args, {
-      fileExists: mainExistsSync || existsSync,
-      missingMessagePrefix: 'Missing ppt_deck python helper',
-      failureMessagePrefix: 'ppt_deck python helper failed',
-    });
-  }
-
-  function cachedMechanicalReview(priorArtifact, hash) {
-    if (safeText(priorArtifact?.mechanical_review?.ruleset_id) !== SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID) return null;
-    if (safeText(priorArtifact?.mechanical_review?.hash) !== hash) return null;
-    const slideReviews = safeArray(priorArtifact?.mechanical_review?.slide_reviews);
-    if (slideReviews.length === 0) return null;
-    return {
-      checks: priorArtifact.mechanical_review.checks || {},
-      metrics: priorArtifact.mechanical_review.metrics || {},
-      baseline: priorArtifact.mechanical_review.baseline || null,
-      device_scale_factor: priorArtifact.review_capture?.device_scale_factor || 2,
-      screenshot_dimensions: priorArtifact.review_capture?.screenshot_dimensions || null,
-      slide_reviews: slideReviews,
-    };
-  }
-
-  function mechanicalCacheMetadata(cacheStatus, hash) {
-    return {
-      cache_status: cacheStatus,
-      hash,
-      ruleset_id: SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID,
-      freshness: cacheStatus === 'hit' ? 'current' : 'fresh',
-    };
-  }
-
-  function pageMetric(page, directKey, metricKey) {
-    const directValue = page[directKey];
-    if (directValue !== undefined && directValue !== null) return Number(directValue || 0);
-    return Number(page.metrics?.[metricKey] || 0);
-  }
-
-  function slideReviewIssues({ overflowFree, occlusionFree, visualDensityOk, speakerFitOk }) {
-    const issues = [];
-    if (!overflowFree) issues.push('overflow_detected');
-    if (!occlusionFree) issues.push('occlusion_detected');
-    if (!visualDensityOk) issues.push('visual_density_out_of_range');
-    if (!speakerFitOk) issues.push('speaker_fit_out_of_range');
-    return issues;
-  }
-
-  function computeSlideReview(page, blueprintSlide, maxPrimaryPoints) {
-    const metrics = {
-      text_char_count: pageMetric(page, 'text_chars', 'text_char_count'),
-      block_count: pageMetric(page, 'zone_count', 'block_count'),
-      overlap_pairs: pageMetric(page, 'overlap_pairs', 'overlap_pairs'),
-      clipped_nodes: pageMetric(page, 'clipped_nodes', 'clipped_nodes'),
-    };
-    const overflowFree = Boolean(page.overflow_free);
-    const occlusionFree = metrics.clipped_nodes === 0 && metrics.overlap_pairs === 0;
-    const visualDensityOk = metrics.block_count <= maxPrimaryPoints + 4 && metrics.text_char_count <= 340;
-    const speakerSeconds = Number(blueprintSlide?.speaker_seconds || 0);
-    const speakerFitOk = speakerSeconds >= 20 && speakerSeconds <= 120;
-    const issues = slideReviewIssues({ overflowFree, occlusionFree, visualDensityOk, speakerFitOk });
-    return {
-      slide_id: page.slide_id,
-      title: page.title,
-      layout_family: blueprintSlide?.visual_presentation?.layout_family || '',
-      screenshot_file: page.screenshot_path,
-      status: issues.length === 0 ? 'pass' : 'block',
-      checks: {
-        overflow_free: overflowFree,
-        occlusion_free: occlusionFree,
-        visual_density_ok: visualDensityOk,
-        speaker_fit_ok: speakerFitOk,
-      },
-      metrics: {
-        text_char_count: metrics.text_char_count,
-        block_count: metrics.block_count,
-        overlap_pairs: metrics.overlap_pairs,
-      },
-      issues,
-    };
-  }
-
-  function summarizeChecks(slideReviews, contract) {
-    const base = {
-      overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
-      occlusion_free: slideReviews.every((slide) => slide.checks.occlusion_free),
-      visual_density_ok: slideReviews.every((slide) => slide.checks.visual_density_ok),
-      speaker_fit_ok: slideReviews.every((slide) => slide.checks.speaker_fit_ok),
-    };
-    for (const check of extraChecks(contract)) {
-      base[check] = true;
-    }
-    return base;
-  }
+  const {
+    applyMergedMechanicalConsistency,
+    buildLatestScreenshotChecks,
+    buildMechanicalReviewArgs,
+    cachedMechanicalReview,
+    loadPriorCaptureManifest,
+    mechanicalCacheMetadata,
+    resolveMechanicalReviewExecution,
+    summarizeMechanicalChecksFromSlides,
+  } = createPptDeckScreenshotReviewMechanicsParts({
+    PAGE_FIX_ROUTE,
+    PYTHON_REVIEW,
+    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID,
+    aiFirstMechanicalCheckValue,
+    deriveProfileChecks,
+    getDeliverablePaths,
+    hasAiVisualBlock,
+    mainExistsSync,
+    nativeMechanicalReviewPayload,
+    readJson,
+    readStageArtifact,
+    safeArray,
+    safeText,
+    stageArtifactPath,
+  });
 
   async function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, slideReviews }) {
     const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
@@ -214,149 +142,6 @@ export function createPptDeckScreenshotReviewParts(deps) {
       if (slideId && !seen.has(slideId)) merged.push(fresh);
     }
     return merged;
-  }
-
-  function titleConsistencyExempt(review) {
-    return safeText(review?.slide_id) === 'S01' || safeText(review?.layout_family) === 'cover_signal';
-  }
-
-  function refreshMechanicalStatus(review) {
-    const issues = safeArray(review?.issues);
-    return {
-      ...review,
-      status: issues.length === 0 ? 'pass' : 'block',
-      issues,
-    };
-  }
-
-  function pageNumberReferenceCandidates(slideReviews) {
-    return safeArray(slideReviews)
-      .map((slide) => slide?.metrics?.page_number_audit || {})
-      .filter((audit) => audit?.present);
-  }
-
-  function pageNumberReferencePayload(reference) {
-    if (!reference) return null;
-    return {
-      text: reference.text,
-      syntax_family: reference.syntax_family,
-      position_family: reference.position_family,
-      font_size: reference.font_size,
-      color_rgb: reference.color_rgb,
-      rect: reference.rect,
-    };
-  }
-
-  function pageNumberPositionFailure(current, reference) {
-    if (safeText(current?.position_family) !== safeText(reference?.position_family)) return true;
-    const currentRect = current?.rect || {};
-    const referenceRect = reference?.rect || {};
-    for (const key of ['left', 'top', 'right_gap', 'bottom_gap']) {
-      const currentValue = currentRect[key];
-      const referenceValue = referenceRect[key];
-      if (currentValue == null || referenceValue == null) continue;
-      if (Math.abs(Number(currentValue) - Number(referenceValue)) > 8) return true;
-    }
-    return false;
-  }
-
-  function pageNumberColorFailure(current, reference) {
-    const currentRgb = safeArray(current?.color_rgb);
-    const referenceRgb = safeArray(reference?.color_rgb);
-    if (currentRgb.length < 3 || referenceRgb.length < 3) return false;
-    return [0, 1, 2].some((index) => Math.abs(Number(currentRgb[index]) - Number(referenceRgb[index])) > 18);
-  }
-
-  function applyMergedPageNumberConsistency(slideReviews) {
-    const reference = pageNumberReferenceCandidates(slideReviews)[0] || null;
-    const referencePayload = pageNumberReferencePayload(reference);
-    for (const review of safeArray(slideReviews)) {
-      const checks = review.checks || {};
-      const metrics = review.metrics || {};
-      const audit = metrics.page_number_audit || { present: false };
-      review.checks = checks;
-      review.metrics = metrics;
-      metrics.page_number_audit = audit;
-      const failures = [];
-      if (reference && audit?.present) {
-        if (safeText(audit.syntax_family) !== safeText(reference.syntax_family)) failures.push('syntax_family');
-        if (pageNumberPositionFailure(audit, reference)) failures.push('position');
-        if (Math.abs(Number(audit.font_size || 0) - Number(reference.font_size || 0)) > 1.5) failures.push('font_size');
-        if (pageNumberColorFailure(audit, reference)) failures.push('color');
-      }
-      audit.reference = referencePayload;
-      audit.failures = failures;
-      checks.page_number_consistency_ok = failures.length === 0;
-      const withoutPageNumberIssue = safeArray(review.issues)
-        .filter((issue) => safeText(issue) !== 'page_number_consistency_failed');
-      review.issues = failures.length === 0
-        ? withoutPageNumberIssue
-        : [...withoutPageNumberIssue, 'page_number_consistency_failed'];
-    }
-    return safeArray(slideReviews).map((slide) => refreshMechanicalStatus(slide));
-  }
-
-  function applyMergedMechanicalConsistency(slideReviews) {
-    return applyMergedPageNumberConsistency(applyMergedTitleTypographyConsistency(slideReviews));
-  }
-
-  function applyMergedTitleTypographyConsistency(slideReviews) {
-    const bodySizes = safeArray(slideReviews)
-      .filter((slide) => !titleConsistencyExempt(slide))
-      .map((slide) => Number(slide?.metrics?.title_font_size || 0))
-      .filter((size) => size > 0)
-      .sort((left, right) => left - right);
-    const reference = bodySizes.length === 0
-      ? 0
-      : bodySizes[Math.floor((bodySizes.length - 1) / 2)];
-    for (const review of safeArray(slideReviews)) {
-      const checks = review.checks || {};
-      const metrics = review.metrics || {};
-      review.checks = checks;
-      review.metrics = metrics;
-      const withoutTitleIssue = safeArray(review.issues)
-        .filter((issue) => safeText(issue) !== 'title_typography_inconsistent');
-      if (titleConsistencyExempt(review)) {
-        checks.title_typography_ok = true;
-        metrics.title_font_reference = reference ? Number(reference.toFixed(2)) : null;
-        metrics.title_font_delta = 0;
-        review.issues = withoutTitleIssue;
-        continue;
-      }
-      const fontSize = Number(metrics.title_font_size || 0);
-      if (reference <= 0 || fontSize <= 0) {
-        checks.title_typography_ok = false;
-        metrics.title_font_reference = reference ? Number(reference.toFixed(2)) : null;
-        metrics.title_font_delta = null;
-        review.issues = [...withoutTitleIssue, 'title_typography_inconsistent'];
-        continue;
-      }
-      const delta = Math.abs(fontSize - reference);
-      checks.title_typography_ok = delta <= 2.5;
-      metrics.title_font_reference = Number(reference.toFixed(2));
-      metrics.title_font_delta = Number(delta.toFixed(2));
-      review.issues = checks.title_typography_ok
-        ? withoutTitleIssue
-        : [...withoutTitleIssue, 'title_typography_inconsistent'];
-    }
-    return safeArray(slideReviews).map((slide) => refreshMechanicalStatus(slide));
-  }
-
-  function summarizeMechanicalChecksFromSlides(slideReviews) {
-    const keys = [
-      'overflow_free',
-      'occlusion_free',
-      'visual_density_ok',
-      'speaker_fit_ok',
-      'edge_clearance_ok',
-      'block_content_fit_ok',
-      'title_typography_ok',
-      'page_number_consistency_ok',
-    ];
-    return Object.fromEntries(keys.map((key) => [
-      key,
-      safeArray(slideReviews).every((slide) => slide?.checks?.[key] !== false),
-    ]));
   }
 
   function runtimeNumber(value) {
@@ -583,81 +368,6 @@ export function createPptDeckScreenshotReviewParts(deps) {
         summaryCall,
       ]),
     };
-  }
-
-  function buildMechanicalReviewArgs({
-    workspaceRoot,
-    topicId,
-    baselineDeliverableId,
-    contract,
-    renderArtifact,
-    reviewCapture,
-    mode,
-    nativeReviewInput,
-  }) {
-    if (nativeReviewInput) return [];
-    const args = [
-      '--html', renderArtifact.html_bundle.html_file,
-      '--output-dir', reviewCapture.screenshotsDir,
-      '--review-markdown', reviewCapture.reviewMarkdownFile,
-      '--max-primary-points', String(contract.layout_rules?.max_primary_points_per_slide || 5),
-      '--device-scale-factor', '2',
-    ];
-    if (mode !== 'optimize_existing') return args;
-    const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
-    const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
-    const baselineArtifact = readStageArtifact(baselineContract, baselinePaths, 'screenshot_review');
-    if (!baselineArtifact) {
-      throw new Error(`Baseline screenshot review artifact missing: ${baselineDeliverableId}`);
-    }
-    args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
-    return args;
-  }
-
-  function loadPriorCaptureManifest(priorReviewArtifact) {
-    const manifestFile = safeText(priorReviewArtifact?.review_capture?.manifest_file);
-    if (!manifestFile || !existsSync(manifestFile)) return null;
-    return JSON.parse(readFileSync(manifestFile, 'utf-8'));
-  }
-
-  function resolveMechanicalReviewExecution({ cacheStatus, cachedPayload, nativeReviewInput, renderArtifact, args }) {
-    if (cacheStatus === 'hit') return { command: 'cache', payload: cachedPayload };
-    if (nativeReviewInput) {
-      return {
-        command: 'native_ppt_shape_manifest',
-        payload: nativeMechanicalReviewPayload(renderArtifact),
-      };
-    }
-    return runPython(PYTHON_REVIEW, args);
-  }
-
-  function buildLatestScreenshotChecks({
-    contract,
-    blueprintArtifact,
-    storylineArtifact,
-    directorReviewArtifact,
-    data,
-    slideReviews,
-    baselineReview,
-  }) {
-    const checks = {
-      director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed)
-        && Boolean(data?.director_intent_landed),
-      anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok)
-        && Boolean(data?.anti_template_ok),
-      ai_review_passed: slideReviews.every((slide) => !hasAiVisualBlock(slide?.ai_review)),
-      overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
-      occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
-      visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
-      speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
-      edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
-      block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
-      title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
-      page_number_consistency_ok: aiFirstMechanicalCheckValue(slideReviews, 'page_number_consistency_ok'),
-      ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
-    };
-    if (baselineReview) checks.baseline_comparison_passed = baselineReview.passed;
-    return checks;
   }
 
   async function buildScreenshotReviewArtifact({
