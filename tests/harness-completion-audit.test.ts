@@ -104,7 +104,7 @@ test('harness audit: gateway product surface is stable across success and failur
   const runRoute = readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.ts');
   const doctor = readImplementation('packages/redcube-gateway/src/actions/doctor-workspace.ts');
   const listTopics = readImplementation('packages/redcube-gateway/src/actions/list-topics.ts');
-  const gatewayIndex = readImplementation('packages/redcube-gateway/src/index.impl.ts');
+  const gatewayIndex = readImplementation('packages/redcube-gateway/src/index.ts');
 
   assert.equal(cli.includes("error_kind: 'cli_usage_error'"), true);
   assert.equal(cli.includes("recommended_action: 'read_help'"), true);

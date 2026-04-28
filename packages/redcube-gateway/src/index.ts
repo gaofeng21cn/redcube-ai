@@ -1,37 +1,9 @@
 import {
   doctorWorkspace as doctorWorkspaceJs,
+} from './actions/doctor-workspace.js';
+import {
   listTopics as listTopicsJs,
-  getOverlayCatalog as getOverlayCatalogJs,
-  intakeSource as intakeSourceJs,
-  researchSource as researchSourceJs,
-  prepareSourceAugmentation as prepareSourceAugmentationJs,
-  prepareSourceAugmentationResult as prepareSourceAugmentationResultJs,
-  writeSourceAugmentationResult as writeSourceAugmentationResultJs,
-  executeSourceAugmentation as executeSourceAugmentationJs,
-  createDeliverable as createDeliverableJs,
-  getDeliverable as getDeliverableJs,
-  getPublicationProjection as getPublicationProjectionJs,
-  getRun as getRunJs,
-  invokeDomainEntry as invokeDomainEntryJs,
-  invokeProductEntry as invokeProductEntryJs,
-  invokeFederatedProductEntry as invokeFederatedProductEntryJs,
-  getProductEntrySession as getProductEntrySessionJs,
-  getProductEntryManifest as getProductEntryManifestJs,
-  getProductStart as getProductStartJs,
-  getProductPreflight as getProductPreflightJs,
-  getProductFrontdesk as getProductFrontdeskJs,
-  buildPerformanceReport as buildPerformanceReportJs,
-  getManagedRun as getManagedRunJs,
-  superviseManagedRun as superviseManagedRunJs,
-  runDeliverableRoute as runDeliverableRouteJs,
-  runManagedDeliverable as runManagedDeliverableJs,
-  runSourceFirstFanout as runSourceFirstFanoutJs,
-  auditDeliverable as auditDeliverableJs,
-  reviewRenderOutput as reviewRenderOutputJs,
-  runtimeWatch as runtimeWatchJs,
-  getReviewState as getReviewStateJs,
-  applyReviewMutation as applyReviewMutationJs,
-} from './index.impl.js';
+} from './actions/list-topics.js';
 
 import type {
   CreateDeliverableRequest,
@@ -84,6 +56,165 @@ import type {
   WorkspaceRootRequest,
   ReviewStateResponse,
 } from './types.js';
+
+async function getOverlayCatalogJs() {
+  const { getDefaultOverlayCatalog } = await import('@redcube/overlay-registry');
+  const catalog = getDefaultOverlayCatalog();
+  return {
+    ok: true,
+    ...catalog,
+    recommended_action: 'create_deliverable',
+    summary: {
+      total_overlays: catalog.overlays.length,
+      total_profiles: catalog.overlays.reduce((sum, overlay) => sum + overlay.profiles.length, 0),
+    },
+  };
+}
+
+async function intakeSourceJs(request: any) {
+  const module = await import('./actions/intake-source.js');
+  return module.intakeSource(request);
+}
+
+async function researchSourceJs(request: any) {
+  const module = await import('./actions/source-research.js');
+  return module.researchSource(request);
+}
+
+async function prepareSourceAugmentationJs(request: any) {
+  const module = await import('./actions/prepare-source-augmentation.js');
+  return module.prepareSourceAugmentation(request);
+}
+
+async function prepareSourceAugmentationResultJs(request: any) {
+  const module = await import('./actions/prepare-source-augmentation-result.js');
+  return module.prepareSourceAugmentationResult(request);
+}
+
+async function writeSourceAugmentationResultJs(request: any) {
+  const module = await import('./actions/write-source-augmentation-result.js');
+  return module.writeSourceAugmentationResult(request);
+}
+
+async function executeSourceAugmentationJs(request: any) {
+  const module = await import('./actions/execute-source-augmentation.js');
+  return module.executeSourceAugmentation(request);
+}
+
+async function createDeliverableJs(request: any) {
+  const module = await import('./actions/create-deliverable.js');
+  return module.createDeliverable(request);
+}
+
+async function getDeliverableJs(request: any) {
+  const module = await import('./actions/get-deliverable.js');
+  return module.getDeliverable(request);
+}
+
+async function getPublicationProjectionJs(request: any) {
+  const { getPublicationProjection: loadPublicationProjection } = await import('@redcube/runtime');
+  return loadPublicationProjection(request);
+}
+
+async function buildPerformanceReportJs(request: any) {
+  const { buildPerformanceReport: buildRuntimePerformanceReport } = await import('@redcube/runtime');
+  return buildRuntimePerformanceReport(request);
+}
+
+async function getRunJs(request: any) {
+  const module = await import('./actions/get-run.js');
+  return module.getRun(request);
+}
+
+async function getManagedRunJs(request: any) {
+  const module = await import('./actions/get-managed-run.js');
+  return module.getManagedRun(request);
+}
+
+async function superviseManagedRunJs(request: any) {
+  const module = await import('./actions/supervise-managed-run.js');
+  return module.superviseManagedRun(request);
+}
+
+async function runDeliverableRouteJs(request: any) {
+  const module = await import('./actions/run-deliverable-route.js');
+  return module.runDeliverableRoute(request);
+}
+
+async function runManagedDeliverableJs(request: any) {
+  const module = await import('./actions/run-managed-deliverable.js');
+  return module.runManagedDeliverable(request);
+}
+
+async function runSourceFirstFanoutJs(request: any) {
+  const module = await import('./actions/run-source-first-fanout.js');
+  return module.runSourceFirstFanout(request);
+}
+
+async function invokeDomainEntryJs(request: any) {
+  const module = await import('./actions/invoke-domain-entry.js');
+  return module.invokeDomainEntry(request);
+}
+
+async function invokeProductEntryJs(request: any) {
+  const module = await import('./actions/invoke-product-entry.js');
+  return module.invokeProductEntry(request);
+}
+
+async function invokeFederatedProductEntryJs(request: any) {
+  const module = await import('./actions/invoke-federated-product-entry.js');
+  return module.invokeFederatedProductEntry(request);
+}
+
+async function getProductEntrySessionJs(request: any) {
+  const module = await import('./actions/get-product-entry-session.js');
+  return module.getProductEntrySession(request);
+}
+
+async function getProductEntryManifestJs(request: any) {
+  const module = await import('./actions/get-product-entry-manifest.js');
+  return module.getProductEntryManifest(request);
+}
+
+async function getProductStartJs(request: any) {
+  const module = await import('./actions/get-product-start.js');
+  return module.getProductStart(request);
+}
+
+async function getProductPreflightJs(request: any) {
+  const module = await import('./actions/get-product-preflight.js');
+  return module.getProductPreflight(request);
+}
+
+async function getProductFrontdeskJs(request: any) {
+  const module = await import('./actions/get-product-frontdesk.js');
+  return module.getProductFrontdesk(request);
+}
+
+async function auditDeliverableJs(request: any) {
+  const module = await import('./actions/audit-deliverable.js');
+  return module.auditDeliverable(request);
+}
+
+async function reviewRenderOutputJs(request: any) {
+  const { reviewRenderedDeliverable } = await import('@redcube/runtime');
+  return reviewRenderedDeliverable(request);
+}
+
+async function runtimeWatchJs(request: any) {
+  const module = await import('./actions/runtime-watch.js');
+  return module.runtimeWatch(request);
+}
+
+async function getReviewStateJs(request: any) {
+  const { getReviewState: loadReviewState } = await import('@redcube/runtime');
+  return loadReviewState(request);
+}
+
+async function applyReviewMutationJs(request: any) {
+  const { applyReviewMutation: mutateReviewState } = await import('@redcube/runtime');
+  return mutateReviewState(request);
+}
 
 export function doctorWorkspace(request: WorkspaceRootRequest): Promise<WorkspaceDoctorResponse> {
   return doctorWorkspaceJs(request) as Promise<WorkspaceDoctorResponse>;
