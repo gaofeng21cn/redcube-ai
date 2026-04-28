@@ -12,7 +12,7 @@ import {
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 
 const TOPIC_ID = 'topic-a';

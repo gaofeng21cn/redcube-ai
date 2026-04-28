@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   getReviewState,
   runSourceFirstFanout,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,

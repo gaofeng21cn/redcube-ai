@@ -12,7 +12,7 @@ import {
   getRun,
   runtimeWatch,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { appendEvent, startRun } from '@redcube/runtime';
 import {
   startMockCodexCli,

@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync } from 'node:fs';
 
-import { createDeliverable, runDeliverableRoute } from '@redcube/gateway';
+import { createDeliverable, runDeliverableRoute } from './gateway-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,

@@ -7,7 +7,7 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   createDeliverable,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import {
   persistReviewStatePatch,
 } from '@redcube/governance';

@@ -8,7 +8,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import {
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 
 function readJson(file) {

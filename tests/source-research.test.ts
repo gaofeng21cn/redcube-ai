@@ -9,7 +9,7 @@ import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 
 import {
   researchSource,
   writeSourceAugmentationResult,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { buildResolvedAugmentationPayload } from './helpers/complete-source-readiness.ts';
 
 function readJson(file) {

@@ -9,7 +9,7 @@ import { createServer } from 'node:http';
 import {
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import {
   buildMockCreativeOutput,
   startMockCodexCli,

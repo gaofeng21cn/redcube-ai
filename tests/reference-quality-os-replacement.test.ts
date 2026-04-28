@@ -10,7 +10,7 @@ import {
   createDeliverable,
   intakeSource,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import {
   buildReferencePromotionReport,
   buildReferenceReplacementReport,

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { mkdtempSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { getProductEntryManifest } from '@redcube/gateway';
+import { getProductEntryManifest } from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,

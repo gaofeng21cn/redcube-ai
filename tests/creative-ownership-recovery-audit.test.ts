@@ -8,7 +8,7 @@ import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import {
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { resolveExecutorAdapter } from '@redcube/runtime';
 import {
   AUDIT_FILE,

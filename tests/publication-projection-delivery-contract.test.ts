@@ -9,7 +9,7 @@ import {
   createDeliverable,
   getPublicationProjection,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {

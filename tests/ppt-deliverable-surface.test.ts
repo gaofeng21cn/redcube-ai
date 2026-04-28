@@ -15,7 +15,7 @@ import {
   auditDeliverable,
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.ts';

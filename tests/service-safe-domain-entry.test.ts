@@ -8,7 +8,7 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import {
   createDeliverable,
   invokeDomainEntry,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,

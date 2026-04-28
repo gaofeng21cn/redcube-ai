@@ -8,7 +8,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, wri
 import {
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,

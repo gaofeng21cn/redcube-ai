@@ -9,7 +9,7 @@ import {
   createDeliverable,
   intakeSource,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { createPptDeckRuntimeCore } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/core.js';
 import {
   startMockCodexCli,

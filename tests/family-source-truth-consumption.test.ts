@@ -9,7 +9,7 @@ import {
   createDeliverable,
   intakeSource,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 
 function readJson(file) {

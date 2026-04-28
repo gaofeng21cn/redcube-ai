@@ -390,17 +390,24 @@ export function createPptDeckScreenshotReviewParts(deps) {
     return safeArray(calls).reduce((total, call) => total + runtimeNumber(call?.[key]), 0);
   }
 
+  function rollupRuntimeMetric(calls, summaryRuntime, key) {
+    const total = sumRuntimeMetric(calls, key);
+    if (total) return total;
+    const summaryValue = runtimeNumber(summaryRuntime?.[key]);
+    return summaryValue || null;
+  }
+
   function buildRuntimeRollup(summaryRuntime, childCalls) {
     const calls = safeArray(childCalls);
     return {
       ...(summaryRuntime || {}),
       review_scope: 'summary',
-      prompt_bytes: sumRuntimeMetric(calls, 'prompt_bytes') || summaryRuntime?.prompt_bytes || null,
-      context_bytes: sumRuntimeMetric(calls, 'context_bytes') || summaryRuntime?.context_bytes || null,
-      estimated_prompt_tokens: sumRuntimeMetric(calls, 'estimated_prompt_tokens') || summaryRuntime?.estimated_prompt_tokens || null,
-      prompt_tokens: sumRuntimeMetric(calls, 'prompt_tokens') || summaryRuntime?.prompt_tokens || null,
-      completion_tokens: sumRuntimeMetric(calls, 'completion_tokens') || summaryRuntime?.completion_tokens || null,
-      total_tokens: sumRuntimeMetric(calls, 'total_tokens') || summaryRuntime?.total_tokens || null,
+      prompt_bytes: rollupRuntimeMetric(calls, summaryRuntime, 'prompt_bytes'),
+      context_bytes: rollupRuntimeMetric(calls, summaryRuntime, 'context_bytes'),
+      estimated_prompt_tokens: rollupRuntimeMetric(calls, summaryRuntime, 'estimated_prompt_tokens'),
+      prompt_tokens: rollupRuntimeMetric(calls, summaryRuntime, 'prompt_tokens'),
+      completion_tokens: rollupRuntimeMetric(calls, summaryRuntime, 'completion_tokens'),
+      total_tokens: rollupRuntimeMetric(calls, summaryRuntime, 'total_tokens'),
       cached_tokens: sumRuntimeMetric(calls, 'cached_tokens') || runtimeCachedTokens(summaryRuntime) || null,
       cache_hit: calls.some((call) => call?.cache_hit === true) || null,
       child_calls: calls,
@@ -578,6 +585,80 @@ export function createPptDeckScreenshotReviewParts(deps) {
     };
   }
 
+  function buildMechanicalReviewArgs({
+    workspaceRoot,
+    topicId,
+    baselineDeliverableId,
+    contract,
+    renderArtifact,
+    reviewCapture,
+    mode,
+    nativeReviewInput,
+  }) {
+    if (nativeReviewInput) return [];
+    const args = [
+      '--html', renderArtifact.html_bundle.html_file,
+      '--output-dir', reviewCapture.screenshotsDir,
+      '--review-markdown', reviewCapture.reviewMarkdownFile,
+      '--max-primary-points', String(contract.layout_rules?.max_primary_points_per_slide || 5),
+      '--device-scale-factor', '2',
+    ];
+    if (mode !== 'optimize_existing') return args;
+    const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
+    const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
+    const baselineArtifact = readStageArtifact(baselineContract, baselinePaths, 'screenshot_review');
+    if (!baselineArtifact) {
+      throw new Error(`Baseline screenshot review artifact missing: ${baselineDeliverableId}`);
+    }
+    args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
+    return args;
+  }
+
+  function loadPriorCaptureManifest(priorReviewArtifact) {
+    const manifestFile = safeText(priorReviewArtifact?.review_capture?.manifest_file);
+    if (!manifestFile || !existsSync(manifestFile)) return null;
+    return JSON.parse(readFileSync(manifestFile, 'utf-8'));
+  }
+
+  function resolveMechanicalReviewExecution({ cacheStatus, cachedPayload, nativeReviewInput, renderArtifact, args }) {
+    if (cacheStatus === 'hit') return { command: 'cache', payload: cachedPayload };
+    if (nativeReviewInput) {
+      return {
+        command: 'native_ppt_shape_manifest',
+        payload: nativeMechanicalReviewPayload(renderArtifact),
+      };
+    }
+    return runPython(PYTHON_REVIEW, args);
+  }
+
+  function buildLatestScreenshotChecks({
+    contract,
+    blueprintArtifact,
+    storylineArtifact,
+    directorReviewArtifact,
+    data,
+    slideReviews,
+    baselineReview,
+  }) {
+    const checks = {
+      director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed)
+        && Boolean(data?.director_intent_landed),
+      anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok)
+        && Boolean(data?.anti_template_ok),
+      ai_review_passed: slideReviews.every((slide) => !hasAiVisualBlock(slide?.ai_review)),
+      overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
+      occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
+      visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
+      speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
+      edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
+      block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
+      title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
+      page_number_consistency_ok: aiFirstMechanicalCheckValue(slideReviews, 'page_number_consistency_ok'),
+      ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
+    };
+    if (baselineReview) checks.baseline_comparison_passed = baselineReview.passed;
+    return checks;
+  }
 
   async function buildScreenshotReviewArtifact({
     workspaceRoot,
@@ -598,30 +679,19 @@ export function createPptDeckScreenshotReviewParts(deps) {
     if (preflightArtifact) return preflightArtifact;
     const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
     const reviewCapture = createReviewCapturePaths(deliverablePaths, deliverableId);
-    const args = nativeReviewInput
-      ? []
-      : [
-          '--html', renderArtifact.html_bundle.html_file,
-          '--output-dir', reviewCapture.screenshotsDir,
-          '--review-markdown', reviewCapture.reviewMarkdownFile,
-          '--max-primary-points', String(contract.layout_rules?.max_primary_points_per_slide || 5),
-          '--device-scale-factor', '2',
-        ];
-    if (mode === 'optimize_existing') {
-      const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
-      const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
-      const baselineArtifact = readStageArtifact(baselineContract, baselinePaths, 'screenshot_review');
-      if (!baselineArtifact) {
-        throw new Error(`Baseline screenshot review artifact missing: ${baselineDeliverableId}`);
-      }
-      args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
-    }
+    const args = buildMechanicalReviewArgs({
+      workspaceRoot,
+      topicId,
+      baselineDeliverableId,
+      contract,
+      renderArtifact,
+      reviewCapture,
+      mode,
+      nativeReviewInput,
+    });
     const reviewHash = hashReviewInput(renderArtifact);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-    const priorCaptureManifest = safeText(priorReviewArtifact?.review_capture?.manifest_file)
-      && existsSync(safeText(priorReviewArtifact?.review_capture?.manifest_file))
-      ? JSON.parse(readFileSync(safeText(priorReviewArtifact.review_capture.manifest_file), 'utf-8'))
-      : null;
+    const priorCaptureManifest = loadPriorCaptureManifest(priorReviewArtifact);
     const priorMechanicalRulesetCurrent = safeText(priorReviewArtifact?.mechanical_review?.ruleset_id) === SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID;
     const incrementalTargetSlideIds = priorMechanicalRulesetCurrent ? collectIncrementalScreenshotReviewTargetSlideIds({
       renderArtifact,
@@ -634,11 +704,13 @@ export function createPptDeckScreenshotReviewParts(deps) {
     }
     const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
     const cacheStatus = cachedPayload && !incrementalReview ? 'hit' : 'miss';
-    const python = cacheStatus === 'hit'
-      ? { command: 'cache', payload: cachedPayload }
-      : (nativeReviewInput
-          ? { command: 'native_ppt_shape_manifest', payload: nativeMechanicalReviewPayload(renderArtifact) }
-          : runPython(PYTHON_REVIEW, args));
+    const python = resolveMechanicalReviewExecution({
+      cacheStatus,
+      cachedPayload,
+      nativeReviewInput,
+      renderArtifact,
+      args,
+    });
     const reviewPayload = python.payload;
     const freshMechanicalSlideReviews = safeArray(reviewPayload.slide_reviews).map((slide) => ({
       ...slide,
@@ -708,25 +780,15 @@ export function createPptDeckScreenshotReviewParts(deps) {
     const mergedAiSlideReviews = slideReviews
       .map((slide) => slide?.ai_review ? { slide_id: safeText(slide?.slide_id), ...slide.ai_review } : null)
       .filter(Boolean);
-    const latestChecks = {
-      director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed)
-        && Boolean(data?.director_intent_landed),
-      anti_template_ok: Boolean(directorReviewArtifact?.visual_director_review?.anti_template_ok)
-        && Boolean(data?.anti_template_ok),
-      ai_review_passed: slideReviews.every((slide) => !hasAiVisualBlock(slide?.ai_review)),
-      overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
-      occlusion_free: aiFirstMechanicalCheckValue(slideReviews, 'occlusion_free'),
-      visual_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'visual_density_ok'),
-      speaker_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'speaker_fit_ok'),
-      edge_clearance_ok: aiFirstMechanicalCheckValue(slideReviews, 'edge_clearance_ok'),
-      block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
-      title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
-      page_number_consistency_ok: aiFirstMechanicalCheckValue(slideReviews, 'page_number_consistency_ok'),
-      ...(baselineReview
-        ? { baseline_comparison_passed: baselineReview.passed }
-        : {}),
-      ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
-    };
+    const latestChecks = buildLatestScreenshotChecks({
+      contract,
+      blueprintArtifact,
+      storylineArtifact,
+      directorReviewArtifact,
+      data,
+      slideReviews,
+      baselineReview,
+    });
     const failedChecks = Object.entries(latestChecks)
       .filter(([, value]) => value === false)
       .map(([key]) => key);

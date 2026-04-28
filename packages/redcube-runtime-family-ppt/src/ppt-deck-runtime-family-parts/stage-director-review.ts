@@ -210,22 +210,7 @@ export function createPptDeckDirectorReviewParts(deps) {
     };
   }
 
-
-  async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
-    const preflight = isNativePptArtifact(renderArtifact)
-      ? directorNativePptPreflight(renderArtifact)
-      : directorHtmlPreflight(renderArtifact);
-    const {
-      data,
-      generationRuntime,
-      reviewScope,
-      reviewedSlideIds,
-      reusedSlideIds,
-      priorReviewArtifact,
-    } = await generateDirectorReviewDraft(contract, deliverablePaths, preflight, adapter);
-    const priorReview = priorReviewArtifact?.visual_director_review || null;
-    const incrementalReview = reviewScope === 'incremental_page_review';
+  function buildDirectorReviewDecision({ data, preflight, priorReview, incrementalReview, reviewedSlideIds }) {
     const targetSlideIds = slideIdSet(reviewedSlideIds);
     const priorWeakPages = incrementalReview
       ? safeArray(priorReview?.weak_pages).filter((slideId) => !targetSlideIds.has(safeText(slideId)))
@@ -253,20 +238,79 @@ export function createPptDeckDirectorReviewParts(deps) {
       ...preflight.findings.map((finding) => `deterministic preflight blocked ${finding}`),
     ].join(' ');
     const status = directorIntentLanded && antiTemplateOk && peakPagesLanded ? 'pass' : 'block';
-    const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
-    const reviewOwner = primarySurface(generationRuntime, adapter);
+    return {
+      antiTemplateOk,
+      directorIntentLanded,
+      homogeneousLayoutRisk,
+      memoryHookPresent,
+      peakPagesLanded,
+      reviewSummary,
+      status,
+      weakPages,
+    };
+  }
+
+  function writeDirectorReviewReport(reviewFile, reviewOwner, decision) {
     writeText(reviewFile, [
       '# 视觉总监复盘',
       '',
       `- review_owner: ${reviewOwner}`,
-      `- director_intent_landed: ${directorIntentLanded}`,
-      `- anti_template_ok: ${antiTemplateOk}`,
-      `- peak_pages_landed: ${peakPagesLanded}`,
-      `- memory_hook_present: ${memoryHookPresent}`,
-      `- homogeneous_layout_risk: ${homogeneousLayoutRisk}`,
-      `- weak_pages: ${weakPages.join(',') || 'none'}`,
-      `- review_summary: ${reviewSummary || 'none'}`,
+      `- director_intent_landed: ${decision.directorIntentLanded}`,
+      `- anti_template_ok: ${decision.antiTemplateOk}`,
+      `- peak_pages_landed: ${decision.peakPagesLanded}`,
+      `- memory_hook_present: ${decision.memoryHookPresent}`,
+      `- homogeneous_layout_risk: ${decision.homogeneousLayoutRisk}`,
+      `- weak_pages: ${decision.weakPages.join(',') || 'none'}`,
+      `- review_summary: ${decision.reviewSummary || 'none'}`,
     ].join('\n'));
+  }
+
+  function buildDirectorReviewStatePatch(status, decision) {
+    return {
+      current_status: status === 'pass' ? 'director_review_passed' : 'blocked_for_revision',
+      ready_for_export: false,
+      latest_review_stage: 'visual_director_review',
+      latest_checks: {
+        director_intent_landed: decision.directorIntentLanded,
+        anti_template_ok: decision.antiTemplateOk,
+        memory_hook_present: decision.memoryHookPresent,
+      },
+      pending_reviews: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
+      blocking_reasons: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
+      rerun_from_stage: status === 'pass' ? null : 'render_html',
+      rerun_policy: {
+        status: status === 'pass' ? 'idle' : 'rerun_required',
+        rerun_from_stage: status === 'pass' ? null : 'render_html',
+      },
+    };
+  }
+
+  async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
+    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const preflight = isNativePptArtifact(renderArtifact)
+      ? directorNativePptPreflight(renderArtifact)
+      : directorHtmlPreflight(renderArtifact);
+    const {
+      data,
+      generationRuntime,
+      reviewScope,
+      reviewedSlideIds,
+      reusedSlideIds,
+      priorReviewArtifact,
+    } = await generateDirectorReviewDraft(contract, deliverablePaths, preflight, adapter);
+    const priorReview = priorReviewArtifact?.visual_director_review || null;
+    const incrementalReview = reviewScope === 'incremental_page_review';
+    const decision = buildDirectorReviewDecision({
+      data,
+      preflight,
+      priorReview,
+      incrementalReview,
+      reviewedSlideIds,
+    });
+    const status = decision.status;
+    const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
+    const reviewOwner = primarySurface(generationRuntime, adapter);
+    writeDirectorReviewReport(reviewFile, reviewOwner, decision);
     return {
       ...attachCommon('visual_director_review', contract, generationRuntime, adapter),
       review_execution: {
@@ -280,13 +324,13 @@ export function createPptDeckDirectorReviewParts(deps) {
       status,
       visual_director_review: {
         review_model: 'director_first_visual_judgement',
-        director_intent_landed: directorIntentLanded,
-        anti_template_ok: antiTemplateOk,
-        peak_pages_landed: peakPagesLanded,
-        memory_hook_present: memoryHookPresent,
-        weak_pages: weakPages,
-        homogeneous_layout_risk: homogeneousLayoutRisk,
-        review_summary: reviewSummary,
+        director_intent_landed: decision.directorIntentLanded,
+        anti_template_ok: decision.antiTemplateOk,
+        peak_pages_landed: decision.peakPagesLanded,
+        memory_hook_present: decision.memoryHookPresent,
+        weak_pages: decision.weakPages,
+        homogeneous_layout_risk: decision.homogeneousLayoutRisk,
+        review_summary: decision.reviewSummary,
         deterministic_preflight: {
           gate_model: 'deterministic_ppt_director_review_preflight',
           anti_template_ok: preflight.antiTemplateOk,
@@ -307,23 +351,7 @@ export function createPptDeckDirectorReviewParts(deps) {
         },
       },
       artifact_refs: [reviewFile],
-      review_state_patch: {
-        current_status: status === 'pass' ? 'director_review_passed' : 'blocked_for_revision',
-        ready_for_export: false,
-        latest_review_stage: 'visual_director_review',
-        latest_checks: {
-          director_intent_landed: directorIntentLanded,
-          anti_template_ok: antiTemplateOk,
-          memory_hook_present: memoryHookPresent,
-        },
-        pending_reviews: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
-        blocking_reasons: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
-        rerun_from_stage: status === 'pass' ? null : 'render_html',
-        rerun_policy: {
-          status: status === 'pass' ? 'idle' : 'rerun_required',
-          rerun_from_stage: status === 'pass' ? null : 'render_html',
-        },
-      },
+      review_state_patch: buildDirectorReviewStatePatch(status, decision),
     };
   }
 

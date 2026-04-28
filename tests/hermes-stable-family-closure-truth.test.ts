@@ -12,7 +12,7 @@ import {
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { runPosterOnepagerRoute } from '../packages/redcube-runtime-family-poster-onepager/dist/index.js';
 import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
 import { runXiaohongshuRoute } from '../packages/redcube-runtime-family-xiaohongshu/dist/index.js';

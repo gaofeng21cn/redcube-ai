@@ -12,7 +12,7 @@ import {
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,

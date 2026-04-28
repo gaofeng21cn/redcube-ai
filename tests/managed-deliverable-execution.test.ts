@@ -20,7 +20,7 @@ import {
   runManagedDeliverable,
   superviseManagedRun,
   runtimeWatch,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {

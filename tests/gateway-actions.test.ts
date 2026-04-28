@@ -9,7 +9,7 @@ import {
   doctorWorkspace,
   getOverlayCatalog,
   listTopics,
-} from '@redcube/gateway';
+} from './gateway-test-api.ts';
 
 test('doctorWorkspace reports canonical directories and workspace file presence', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-'));
