@@ -14,7 +14,7 @@ import {
   runAgentLoopViaHermesAgentApi,
   startHermesRun,
   structuredCallViaHermesAgentApi,
-} from '@redcube/hermes-substrate';
+} from './helpers/package-surfaces.ts';
 
 function tempWorkspaceRoot() {
   return mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-topology-'));

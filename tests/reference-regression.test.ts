@@ -13,12 +13,12 @@ import {
 } from './gateway-test-api.ts';
 import {
   loadReferenceSampleFixture,
+  createOverlayRegistry,
+  pptDeckOverlay,
   summarizeReferenceCoverage,
   validateReferenceSampleMeta,
-} from '@redcube/runtime';
-import { createOverlayRegistry } from '@redcube/overlay-core';
-import { pptDeckOverlay } from '@redcube/overlay-ppt';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
+  xiaohongshuOverlay,
+} from './helpers/package-surfaces.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 
 function readJson(file) {

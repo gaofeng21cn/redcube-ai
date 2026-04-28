@@ -10,7 +10,7 @@ import {
   createManagedRun as createRuntimeManagedRun,
   saveManagedRun,
   startRun,
-} from '@redcube/runtime';
+} from './helpers/package-surfaces.ts';
 import {
   auditDeliverable,
   createDeliverable,
@@ -21,7 +21,7 @@ import {
   superviseManagedRun,
   runtimeWatch,
 } from './gateway-test-api.ts';
-import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
+import { resolveWorkspaceContract } from './helpers/package-surfaces.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,

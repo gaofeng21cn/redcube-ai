@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { probeHermesNativeProof } from '@redcube/hermes-substrate';
+import { probeHermesNativeProof } from './helpers/package-surfaces.ts';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
 const ENGINE_CONTRACT_FILE = 'contracts/runtime-program/ppt-native-python-engine-contract.json';

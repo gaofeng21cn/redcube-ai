@@ -4,10 +4,10 @@ import assert from 'node:assert/strict';
 
 import {
   buildTopicRecord,
-  evaluateStorylineGate,
   buildXiaohongshuDeliverableRecord,
+  evaluateStorylineGate,
   hydrateXiaohongshuContract,
-} from '@redcube/overlay-xiaohongshu';
+} from './helpers/package-surfaces.ts';
 
 test('buildTopicRecord emits canonical xiaohongshu topic metadata', () => {
   const topic = buildTopicRecord({ topicId: 'topic-a', title: '甲状腺科普系列' });

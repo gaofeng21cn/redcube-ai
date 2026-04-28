@@ -9,7 +9,7 @@ import {
   getNotePaths,
   getTopicPaths,
   resolveWorkspaceContract,
-} from '@redcube/runtime-protocol';
+} from './helpers/package-surfaces.ts';
 
 test('resolveWorkspaceContract returns canonical workspace metadata paths', () => {
   const workspaceRoot = path.join('/tmp', 'redcube-workspace');

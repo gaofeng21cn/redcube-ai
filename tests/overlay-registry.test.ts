@@ -5,11 +5,11 @@ import assert from 'node:assert/strict';
 import {
   buildDeliverableRecord,
   createOverlayRegistry,
-} from '@redcube/overlay-core';
-import { getDefaultOverlayCatalog } from '@redcube/overlay-registry';
-import { buildTopicRecord as buildXiaohongshuTopic } from '@redcube/overlay-xiaohongshu';
-import { pptDeckOverlay } from '@redcube/overlay-ppt';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
+  buildXiaohongshuTopic,
+  getDefaultOverlayCatalog,
+  pptDeckOverlay,
+  xiaohongshuOverlay,
+} from './helpers/package-surfaces.ts';
 
 test('buildDeliverableRecord emits canonical visual-deliverable metadata', () => {
   const deliverable = buildDeliverableRecord({

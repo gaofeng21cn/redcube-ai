@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { resolveSourceAugmentationAdapter } from '@redcube/runtime';
+import { resolveSourceAugmentationAdapter } from './helpers/package-surfaces.ts';
 
 test('resolveSourceAugmentationAdapter exposes a formal default adapter surface', () => {
   const adapter = resolveSourceAugmentationAdapter();

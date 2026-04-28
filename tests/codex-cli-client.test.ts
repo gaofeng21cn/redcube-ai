@@ -11,7 +11,7 @@ import {
   generateStructuredArtifactViaCodexCli,
   probeCodexCli,
   readCodexCliContract,
-} from '@redcube/codex-cli-client';
+} from './helpers/package-surfaces.ts';
 
 test('readCodexCliContract falls back to local Codex defaults', () => {
   const homeRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-home-'));

@@ -9,7 +9,7 @@ import {
   loadExecutorRoutingConfig,
   loadRuntimeConfig,
   resolveExecutorRouting,
-} from '@redcube/redcube-config';
+} from './helpers/package-surfaces.ts';
 
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });

@@ -13,7 +13,7 @@ import {
   runDeliverableRoute,
   runtimeWatch,
 } from './gateway-test-api.ts';
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import { getDeliverablePaths } from './helpers/package-surfaces.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
 

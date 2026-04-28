@@ -9,7 +9,7 @@ import {
   createDeliverable,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { resolveExecutorAdapter } from '@redcube/runtime';
+import { resolveExecutorAdapter } from './helpers/package-surfaces.ts';
 import {
   AUDIT_FILE,
   buildCreativeOwnershipAudit,

@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 
-import * as runtimeProtocol from '@redcube/runtime-protocol';
+import * as runtimeProtocol from './helpers/package-surfaces.ts';
 
 function getValidator(name) {
   assert.equal(typeof runtimeProtocol[name], 'function', `${name} 必须由 runtime-protocol 导出`);

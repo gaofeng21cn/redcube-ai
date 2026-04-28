@@ -14,7 +14,7 @@ import {
 import {
   buildReferencePromotionReport,
   buildReferenceReplacementReport,
-} from '@redcube/runtime';
+} from './helpers/package-surfaces.ts';
 import {
   startMockCodexCli,
   withEnv,

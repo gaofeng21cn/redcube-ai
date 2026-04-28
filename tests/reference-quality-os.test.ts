@@ -5,11 +5,11 @@ import path from 'node:path';
 
 import {
   buildReferenceQualityReport,
+  createOverlayRegistry,
   listReferenceSamples,
-} from '@redcube/runtime';
-import { createOverlayRegistry } from '@redcube/overlay-core';
-import { pptDeckOverlay } from '@redcube/overlay-ppt';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
+  pptDeckOverlay,
+  xiaohongshuOverlay,
+} from './helpers/package-surfaces.ts';
 
 function overlayRegistry() {
   return createOverlayRegistry({

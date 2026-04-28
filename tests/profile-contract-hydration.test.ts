@@ -4,11 +4,11 @@ import assert from 'node:assert/strict';
 
 import {
   createOverlayRegistry,
+  getDefaultOverlayRegistry,
   hydrateDeliverableContract,
-} from '@redcube/overlay-core';
-import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
-import { pptDeckOverlay } from '@redcube/overlay-ppt';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
+  pptDeckOverlay,
+  xiaohongshuOverlay,
+} from './helpers/package-surfaces.ts';
 
 test('createOverlayRegistry exposes family profiles for ppt_deck and xiaohongshu', () => {
   const registry = createOverlayRegistry({
