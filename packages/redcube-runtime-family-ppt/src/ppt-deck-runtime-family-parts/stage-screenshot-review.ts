@@ -18,7 +18,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
     PAGE_FIX_ROUTE,
     PROMPT_PACK,
     PYTHON_REVIEW,
-    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID,
+    SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit',
     aiFirstMechanicalCheckValue,
     attachCommon,
     buildAiFirstVisualSlideReview,

@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core-profile-presets.ts';
+
 const FAMILY_VALIDATORS = [
   {
     label: 'ppt',
@@ -61,6 +63,16 @@ function loadFunction(file, functionName) {
     ${functionCode}
     return ${functionName};
   `)();
+}
+
+function loadPptPageBudget() {
+  return createPptDeckProfilePresetParts({
+    safeArray: (value) => Array.isArray(value) ? value : [],
+    safeText: (value, fallback = '') => {
+      const text = String(value ?? '').replace(/\uFFFD+/g, '').trim();
+      return text || fallback;
+    },
+  }).pageBudget;
 }
 
 function readImplementation(file) {
@@ -132,10 +144,7 @@ test('ppt render_html rejects internal paper IDs and talk-track meta-language', 
 });
 
 test('ppt authoring page budget keeps source page ranges as AI planning signals', () => {
-  const pageBudget = loadFunction(
-    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
-    'pageBudget',
-  );
+  const pageBudget = loadPptPageBudget();
   const contract = {
     goal: '制作科室内部汇报，幻灯片不超过30页。',
     shared_source_truth: {
@@ -164,10 +173,7 @@ test('ppt authoring page budget keeps source page ranges as AI planning signals'
 });
 
 test('ppt authoring page budget treats source slide plans as suggestions only', () => {
-  const pageBudget = loadFunction(
-    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
-    'pageBudget',
-  );
+  const pageBudget = loadPptPageBudget();
   const slidePlan = [
     '1. 封面：NF-PitNET 三篇论文科室内部进展汇报',
     '2. 本次同步的范围',
@@ -215,10 +221,7 @@ test('ppt authoring page budget treats source slide plans as suggestions only', 
 });
 
 test('ppt authoring page budget does not derive hard budgets from per-paper guidance', () => {
-  const pageBudget = loadFunction(
-    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
-    'pageBudget',
-  );
+  const pageBudget = loadPptPageBudget();
   const contract = {
     goal: '三篇论文科室汇报，不超过30页。每篇至少4页：临床问题与终点、方法或模型策略、关键数字结果、解释与边界。',
     shared_source_truth: {
