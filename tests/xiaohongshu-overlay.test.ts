@@ -7,7 +7,7 @@ import {
   buildXiaohongshuDeliverableRecord,
   evaluateStorylineGate,
   hydrateXiaohongshuContract,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 test('buildTopicRecord emits canonical xiaohongshu topic metadata', () => {
   const topic = buildTopicRecord({ topicId: 'topic-a', title: '甲状腺科普系列' });

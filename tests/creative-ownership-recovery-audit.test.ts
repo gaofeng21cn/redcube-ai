@@ -9,7 +9,7 @@ import {
   createDeliverable,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { resolveExecutorAdapter } from './helpers/package-surfaces.ts';
+import { resolveExecutorAdapter } from './package-surfaces.ts';
 import {
   AUDIT_FILE,
   buildCreativeOwnershipAudit,
@@ -18,7 +18,7 @@ import {
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

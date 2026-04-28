@@ -10,7 +10,7 @@ import {
   createManagedRun as createRuntimeManagedRun,
   saveManagedRun,
   startRun,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 import {
   auditDeliverable,
   createDeliverable,
@@ -21,12 +21,12 @@ import {
   superviseManagedRun,
   runtimeWatch,
 } from './gateway-test-api.ts';
-import { resolveWorkspaceContract } from './helpers/package-surfaces.ts';
+import { resolveWorkspaceContract } from './package-surfaces.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.ts')]);

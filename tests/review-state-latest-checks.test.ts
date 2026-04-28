@@ -10,7 +10,7 @@ import {
 } from './gateway-test-api.ts';
 import {
   persistReviewStatePatch,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

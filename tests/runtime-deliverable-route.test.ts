@@ -13,11 +13,11 @@ import {
   runtimeWatch,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { appendEvent, startRun } from './helpers/package-surfaces.ts';
+import { appendEvent, startRun } from './package-surfaces.ts';
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));

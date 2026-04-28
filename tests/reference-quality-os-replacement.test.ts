@@ -14,11 +14,11 @@ import {
 import {
   buildReferencePromotionReport,
   buildReferenceReplacementReport,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 let promotedCatalogWorkspaceRoot = '';
 let restoreEnv = () => {};

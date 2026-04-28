@@ -14,7 +14,7 @@ import { createPptDeckRuntimeCore } from '../packages/redcube-runtime-family-ppt
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

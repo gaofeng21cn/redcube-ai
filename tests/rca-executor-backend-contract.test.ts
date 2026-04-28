@@ -6,7 +6,7 @@ import {
   buildExecutorBackendContract,
   buildHermesNativeProofExecutorDescriptor,
   normalizeExecutorBackend,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 test('RCA executor contract exposes only canonical public backends and execution shapes', () => {
   assert.equal(normalizeExecutorBackend('host_agent'), 'codex_cli');

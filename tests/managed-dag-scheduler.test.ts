@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { planManagedDeliverableDag, executeManagedDagLayers } from './helpers/package-surfaces.ts';
+import { planManagedDeliverableDag, executeManagedDagLayers } from './package-surfaces.ts';
 
 test('managed DAG scheduler exposes dependency layers for a single deliverable without relaxing stage order', () => {
   const plan = planManagedDeliverableDag({

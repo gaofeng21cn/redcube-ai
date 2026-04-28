@@ -9,7 +9,7 @@ import {
   loadExecutorRoutingConfig,
   loadRuntimeConfig,
   resolveExecutorRouting,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });

@@ -10,7 +10,7 @@ import {
   bootstrapPrivateProfile,
   exportPrivateProfile,
   installPrivateProfile,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 function write(filePath, content = '') {
   mkdirSync(path.dirname(filePath), { recursive: true });

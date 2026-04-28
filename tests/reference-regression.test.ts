@@ -18,8 +18,8 @@ import {
   summarizeReferenceCoverage,
   validateReferenceSampleMeta,
   xiaohongshuOverlay,
-} from './helpers/package-surfaces.ts';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
+} from './package-surfaces.ts';
+import { withMockHermesUpstream } from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

@@ -10,7 +10,7 @@ import {
   getPublicationProjection,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
+import { withMockHermesUpstream } from './mock-codex-cli.ts';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {
   for (const route of routes) {

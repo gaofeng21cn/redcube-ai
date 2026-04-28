@@ -6,7 +6,7 @@ import {
   buildDeckRecord,
   evaluateStoryboardGate,
   hydratePptDeckContract,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 test('buildDeckRecord emits canonical ppt deck metadata', () => {
   const hydratedContract = hydratePptDeckContract({

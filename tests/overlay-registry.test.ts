@@ -9,7 +9,7 @@ import {
   getDefaultOverlayCatalog,
   pptDeckOverlay,
   xiaohongshuOverlay,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 test('buildDeliverableRecord emits canonical visual-deliverable metadata', () => {
   const deliverable = buildDeliverableRecord({

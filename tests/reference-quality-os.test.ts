@@ -9,7 +9,7 @@ import {
   listReferenceSamples,
   pptDeckOverlay,
   xiaohongshuOverlay,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 function overlayRegistry() {
   return createOverlayRegistry({

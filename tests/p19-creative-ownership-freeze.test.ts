@@ -10,7 +10,7 @@ import {
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_TEAM_GATE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 import {
   STATUS_FILE,
   buildCreativeOwnershipAudit,

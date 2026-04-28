@@ -17,7 +17,7 @@ import {
   runDeliverableRoute,
 } from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
+import { withMockHermesUpstream } from './mock-codex-cli.ts';
 import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.ts';
 
 async function prepareSourceReadiness(workspaceRoot) {

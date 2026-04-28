@@ -13,7 +13,7 @@ import {
   runDeliverableRoute,
   runtimeWatch,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
+import { withMockHermesUpstream } from './mock-codex-cli.ts';
 
 const TOPIC_ID = 'topic-a';
 const XHS_SHARED_STATE_TOPIC_ID = 'topic-shared-state';

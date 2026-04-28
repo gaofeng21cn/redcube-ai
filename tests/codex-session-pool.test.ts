@@ -8,7 +8,7 @@ import path from 'node:path';
 import {
   generateStructuredArtifactBatchViaCodexCli,
   readCodexCliContract,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 test('Codex batch surface preserves per-stage contracts and records reuse as unsupported for exec-only CLI', async () => {
   const promptDir = mkdtempSync(path.join(tmpdir(), 'redcube-codex-session-pool-'));

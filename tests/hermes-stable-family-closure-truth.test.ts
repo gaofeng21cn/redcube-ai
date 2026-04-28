@@ -20,7 +20,7 @@ import { completeSourceReadiness } from './helpers/complete-source-readiness.ts'
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/hermes-stable-family-closure-truth.json';

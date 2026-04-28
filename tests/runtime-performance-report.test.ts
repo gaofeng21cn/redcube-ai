@@ -5,7 +5,7 @@ import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 import { buildPerformanceReport as buildGatewayPerformanceReport } from './gateway-test-api.ts';
-import { buildPerformanceReport } from './helpers/package-surfaces.ts';
+import { buildPerformanceReport } from './package-surfaces.ts';
 import { executeCli } from '../apps/redcube-cli/dist/cli.js';
 
 function writeJson(file: string, value: unknown): void {

@@ -12,7 +12,7 @@ import {
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');

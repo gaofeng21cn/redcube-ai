@@ -9,7 +9,7 @@ import {
   createDeliverable,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
+import { withMockHermesUpstream } from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

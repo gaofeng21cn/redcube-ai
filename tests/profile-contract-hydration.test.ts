@@ -8,7 +8,7 @@ import {
   hydrateDeliverableContract,
   pptDeckOverlay,
   xiaohongshuOverlay,
-} from './helpers/package-surfaces.ts';
+} from './package-surfaces.ts';
 
 test('createOverlayRegistry exposes family profiles for ppt_deck and xiaohongshu', () => {
   const registry = createOverlayRegistry({

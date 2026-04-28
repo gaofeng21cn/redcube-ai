@@ -11,7 +11,7 @@ import { completeSourceReadiness } from './helpers/complete-source-readiness.ts'
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   process.execPath,

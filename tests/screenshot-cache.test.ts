@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 
-import { materializeScreenshotCaptureStore } from './helpers/package-surfaces.ts';
+import { materializeScreenshotCaptureStore } from './package-surfaces.ts';
 import { materializePptScreenshotReviewCapture } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/screenshot-capture.js';
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/dist/xiaohongshu-runtime-family-parts/review.js';

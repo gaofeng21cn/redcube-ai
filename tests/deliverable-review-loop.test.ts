@@ -17,7 +17,7 @@ import { completeSourceReadiness } from './helpers/complete-source-readiness.ts'
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
+} from './mock-codex-cli.ts';
 
 async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();

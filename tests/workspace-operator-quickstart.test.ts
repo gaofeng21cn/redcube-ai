@@ -8,7 +8,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildHelp, getCliGatewayActions } from '../apps/redcube-cli/dist/cli.js';
 import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
-import { withMockHermesUpstream } from './helpers/mock-codex-cli.ts';
+import { withMockHermesUpstream } from './mock-codex-cli.ts';
 
 function runCli(args, options = {}) {
   const output = execFileSync(

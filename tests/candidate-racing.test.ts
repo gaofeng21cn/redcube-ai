@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { planCandidateRace, runCandidateRaceRoute, selectCandidateRaceWinner } from './helpers/package-surfaces.ts';
+import { planCandidateRace, runCandidateRaceRoute, selectCandidateRaceWinner } from './package-surfaces.ts';
 
 test('candidate racing planner records parallel candidates without claiming quality gate bypass', () => {
   const plan = planCandidateRace({
