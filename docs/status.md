@@ -17,9 +17,9 @@
 - product-entry service surface：`invokeProductEntry`、`getProductEntrySession`、`redcube product invoke`、`redcube product session`
 - internal OPL bridge surface：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
 - shared service-safe domain entry：`invokeDomainEntry`、`invoke_domain_entry`
-- direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`
+- direct domain surfaces：`frontdesk / start / preflight / invoke / session / manifest`；其中 `frontdesk` 是 agent-facing product-entry overview / intake / entry-shell contract，保留 `redcube product frontdesk` 作为 legacy command key / compat command，不代表 GUI、WebUI 或最终用户前台壳
 - 稳定可调用面：`redcube-ai` app skill、`CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本，以及这些 surface 对应的 repo-tracked contracts
-- `skill_catalog` 现在对外收口为单一 `redcube-ai` app skill；`frontdesk`、`invoke`、`session` 继续作为这个 skill 底下的 machine-readable command contracts，并在同一 skill descriptor 的 `domain_projection.runtime_continuity` 输出可直接消费的 same-session runtime continuity envelope
+- `skill_catalog` 现在对外收口为单一 `redcube-ai` app skill；`frontdesk`、`invoke`、`session` 继续作为这个 skill 底下的 machine-readable command contracts，其中 `frontdesk` 只承载 product-entry overview / intake / entry-shell 语义，并在同一 skill descriptor 的 `domain_projection.runtime_continuity` 输出可直接消费的 same-session runtime continuity envelope
 - 同一 `domain_projection` 现已暴露 `opl_runtime_manager_registration` v1：OPL Runtime Manager 可索引 RCA 的 product-entry registration、internal OPL bridge、session continuity、artifact inventory、runtime health 与 review/publication projection refs，但不拥有 RedCube visual truth 或 canonical artifacts
 - `route_equivalence` 已作为 manifest 合同面冻结：`frontdesk`、`invoke`、`session` 与 internal `OPL bridge` 都只指向同一 downstream `domain_entry`、同一 session continuity / progress / artifact / review / publication truth，不新增第二公开 skill 或第二运行语义
 - `deliverable_facade` 已覆盖当前 `ppt_deck` 与 `xiaohongshu` surface：facade 只声明现有 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`，不改核心生成逻辑

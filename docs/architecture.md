@@ -14,6 +14,7 @@
 `service-safe domain entry -> executor adapter -> concrete executor -> audit / review / publication projection`
 
 当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`frontdesk`、`invoke`、`session continuation` 与 internal `OPL bridge` 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义。
+这里的 `frontdesk` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product frontdesk` 作为 legacy command key / compat command 保留，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
@@ -29,7 +30,7 @@
 当前这条主线需要区分三层入口：
 
 - `direct product entry`
-  - 给人类与 host-agent 共用的 `CLI` / `MCP`、frontdesk、session 续跑入口，也是第一公开主语
+  - 第一公开主语是单一 `redcube-ai` app skill；`CLI` / `MCP` 提供可验证协议入口，`frontdesk` 只作为 skill 下的 machine-readable product-entry overview / intake / entry-shell contract，`session` 负责续跑
 - `internal OPL handoff`
   - 给 `OPL Runtime Manager` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 internal bridge / integration surface
 - `future managed product shell`

@@ -27,7 +27,9 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - `redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `redcube product session --entry-session-id <entry-session-id>`
 
-默认先开 frontdesk，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
+`redcube product frontdesk` 是 legacy command key / compat command；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
+
+默认先读取 frontdesk/manifest，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
 
 默认交付运行方式：
 
@@ -58,7 +60,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 当用户要求 RCA / RedCube AI 制作较长 PPT、资料较多的 deck、或任何容易超过单轮 prompt 的 visual deliverable 时，不要把完整任务压成一个巨大 prompt 直接生成。默认采用同一 `entry_session_id` 下的可恢复阶段流：
 
-1. `source/material intake`：用 frontdesk / manifest 读取 workspace、资料包、缺口与交付目标，冻结 source package 和 missing materials。
+1. `source/material intake`：用 frontdesk / manifest 读取 workspace、资料包、缺口与交付目标；这里的 frontdesk 是 product-entry overview / intake shell，不是 GUI 前台，随后冻结 source package 和 missing materials。
 2. `plan`：在 product-entry session 内生成 storyline、outline、slide blueprint 或执行计划，并把阶段产物写入同一 deliverable loop。
 3. `deliverable`：按 plan 继续生成 PPT artifacts；长运行中用 session surface 读取 progress / artifact inventory，而不是重新开一轮 prompt-only 任务。
 4. `review`：通过 review state、publication projection 与 operator review gate 判断是否需要从明确 stage rerun。
@@ -70,7 +72,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - 任何写操作前，先读取当前 workspace 与 product-entry manifest
 - 把 `product_entry_manifest`、`domain_entry_contract`、`task_lifecycle` 当作正式 contract surface
-- 保持 `frontdesk -> direct invoke -> session continuation` 同一条 same-session deliverable loop
+- 保持 `frontdesk -> direct invoke -> session continuation` 同一条 same-session deliverable loop；这里的 `frontdesk` 指 machine-readable product-entry overview / intake shell
 - 长 PPT 任务必须先拆成 `source/material intake -> plan -> deliverable -> review`，每段使用同一 session 可恢复推进
 - 不绕开 gateway contract 直接手改 runtime state
 - 不把 internal OPL bridge 写成新的独立用户 skill；它继续是内部 contract
@@ -83,7 +85,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## 典型任务
 
-- 打开当前 workspace 的 RedCube frontdesk
+- 读取当前 workspace 的 RedCube product-entry frontdesk overview / intake shell
 - 检查 product-entry manifest 和 task lifecycle
 - 继续同一 entry session 下的 deliverable loop
 - 通过结构化命令驱动 visual deliverable 生成与审阅

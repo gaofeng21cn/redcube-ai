@@ -5,7 +5,7 @@
 `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的独立 visual-deliverable domain agent。
 对外第一主语是单一 `redcube-ai` app skill 与 direct product entry；当前仓库主线按 `Auto-only` 理解，formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 当前可执行基线已经按三层边界收口：对外默认稳定 capability surface 是 `redcube-ai app skill / CLI / MCP / invokeDomainEntry / invokeProductEntry / 本地脚本 / repo-tracked contracts`，默认 concrete executor 仍是本地 `Codex CLI`；`Hermes-Agent` 相关路径只保留为显式 hosted/proof backend 或技术参考。
-当前入口真相是：`redcube-ai` app skill、`CLI / MCP` 已经构成可验证的 `agent entry`，同时 repo-verified 的轻量 `product entry` service surface 也已落地；但真正面向最终用户的成熟前台壳仍未落地。
+当前入口真相是：`redcube-ai` app skill、`CLI / MCP` 已经构成可验证的 `agent entry`，同时 repo-verified 的轻量 `product entry` service surface 也已落地；`frontdesk` 在这里仅指面向 agent 的 product-entry overview / intake / entry-shell contract，legacy `redcube product frontdesk` 命令键继续保留为兼容入口，但真正面向最终用户的成熟 GUI / WebUI / managed web shell 仍未落地。
 当前统一协作模型是：`RedCube AI` 自己继续负责 domain authority、review / publication projection 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，但默认 lane 仍是 `Codex CLI`，而 hosted/proof backend 只作为显式附加层挂在同一套 contract 之下。
 `gateway / harness` 在本仓继续作为内部架构边界语言，不作为仓库对外第一身份。
 当前已冻结的 direct target shape 是：
