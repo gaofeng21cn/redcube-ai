@@ -82,6 +82,8 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(deliverable?.description.includes('deliverable lifecycle execution'), true);
   assert.equal(review?.description.includes('deliverable boundary'), true);
   assert.equal(review?.description.includes('runtime watch'), true);
+  assert.equal(productEntry?.description.includes('frontdesk'), true);
+  assert.equal(productEntry?.description.includes('preflight'), true);
   assert.equal(productEntry?.description.includes('product-entry'), true);
   assert.equal(Object.hasOwn(review?.inputSchema || {}, 'runId'), true);
   assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'entry_session_contract'), true);
@@ -308,4 +310,3 @@ test('callGatewayTool delegates overlay catalog gateway action', async () => {
   assert.equal(result.summary.total_overlays, 1);
   assert.deepEqual(result.overlays, [{ overlay_id: 'poster', profiles: ['default'] }]);
 });
-

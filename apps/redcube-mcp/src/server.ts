@@ -15,6 +15,9 @@ import {
   invokeProductEntry,
   getProductEntryManifest,
   getProductEntrySession,
+  getProductFrontdesk,
+  getProductStart,
+  getProductPreflight,
   getManagedRun,
   superviseManagedRun,
   getOverlayCatalog,
@@ -48,6 +51,9 @@ export const DEFAULT_GATEWAY_ACTIONS = {
   invokeProductEntry,
   getProductEntryManifest,
   getProductEntrySession,
+  getProductFrontdesk,
+  getProductStart,
+  getProductPreflight,
   createDeliverable,
   getDeliverable,
   getPublicationProjection,
@@ -133,6 +139,9 @@ const TOOL_ROUTE_DEFINITIONS = {
       invoke_federated_product_entry: 'invokeFederatedProductEntry',
       get_product_entry_session: 'getProductEntrySession',
       get_product_entry_manifest: 'getProductEntryManifest',
+      get_product_frontdesk: 'getProductFrontdesk',
+      get_product_start: 'getProductStart',
+      get_product_preflight: 'getProductPreflight',
     },
   },
 };
@@ -204,7 +213,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'redcube_product_entry',
-    description: 'Grouped product-entry surface for direct, session, manifest, and domain-entry actions, with an internal OPL bridge handoff kept for shell integration.',
+    description: 'Grouped product-entry surface for frontdesk, start, preflight, direct, session, manifest, and domain-entry actions, with an internal OPL bridge handoff kept for shell integration.',
     inputSchema: {
       action: ACTION_STRING,
       target_domain_id: z.string().optional().describe('Target domain id. Must be redcube_ai.'),

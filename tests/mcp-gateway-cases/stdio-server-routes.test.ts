@@ -107,6 +107,58 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
   }
 });
 
+test('stdio MCP server exposes current product-entry overview surfaces', async () => {
+  const serverPath = fileURLToPath(
+    new URL('../../apps/redcube-mcp/dist/server.js', import.meta.url),
+  );
+  const repoRoot = fileURLToPath(new URL('../..', import.meta.url));
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-product-entry-'));
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: repoRoot,
+    env: { ...process.env },
+    stderr: 'pipe',
+  });
+  const client = new Client({
+    name: 'redcube-mcp-test-client',
+    version: '0.1.0',
+  });
+
+  await client.connect(transport);
+
+  try {
+    const tools = await client.listTools();
+    const productEntryTool = tools.tools.find((tool) => tool.name === 'redcube_product_entry');
+    assert.ok(productEntryTool);
+
+    const frontdesk = await client.callTool({
+      name: 'redcube_product_entry',
+      arguments: withAction('get_product_frontdesk', { workspaceRoot }),
+    });
+    const start = await client.callTool({
+      name: 'redcube_product_entry',
+      arguments: withAction('get_product_start', { workspaceRoot }),
+    });
+    const preflight = await client.callTool({
+      name: 'redcube_product_entry',
+      arguments: withAction('get_product_preflight', { workspaceRoot }),
+    });
+
+    assert.equal(frontdesk.isError, undefined);
+    assert.equal(frontdesk.structuredContent.surface_kind, 'product_frontdesk');
+    assert.equal(frontdesk.structuredContent.frontdesk_surface.command, 'redcube product frontdesk');
+    assert.equal(start.isError, undefined);
+    assert.equal(start.structuredContent.surface_kind, 'product_entry_start');
+    assert.equal(start.structuredContent.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(preflight.isError, undefined);
+    assert.equal(preflight.structuredContent.surface_kind, 'product_entry_preflight');
+    assert.equal(preflight.structuredContent.workspace_locator.workspace_root, workspaceRoot);
+  } finally {
+    await transport.close();
+  }
+});
+
 test('stdio MCP server rejects runtime_watch when the topic locator does not match the persisted run identity', async () => {
   await withMockHermesUpstream(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-watch-mismatch-'));

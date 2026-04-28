@@ -160,6 +160,52 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
       }),
     },
   );
+  const frontdesk = await callGatewayTool(
+    'redcube_product_entry',
+    withAction('get_product_frontdesk', {
+      workspaceRoot: '/tmp/redcube-workspace',
+    }),
+    {
+      getProductFrontdesk: async (request) => ({
+        ok: true,
+        surface_kind: 'product_frontdesk',
+        frontdesk_surface: {
+          command: 'redcube product frontdesk',
+          workspace_root: request.workspaceRoot,
+        },
+      }),
+    },
+  );
+  const start = await callGatewayTool(
+    'redcube_product_entry',
+    withAction('get_product_start', {
+      workspaceRoot: '/tmp/redcube-workspace',
+    }),
+    {
+      getProductStart: async (request) => ({
+        ok: true,
+        surface_kind: 'product_entry_start',
+        workspace_locator: {
+          workspace_root: request.workspaceRoot,
+        },
+      }),
+    },
+  );
+  const preflight = await callGatewayTool(
+    'redcube_product_entry',
+    withAction('get_product_preflight', {
+      workspaceRoot: '/tmp/redcube-workspace',
+    }),
+    {
+      getProductPreflight: async (request) => ({
+        ok: true,
+        surface_kind: 'product_entry_preflight',
+        workspace_locator: {
+          workspace_root: request.workspaceRoot,
+        },
+      }),
+    },
+  );
 
   assert.equal(direct.surface_kind, 'product_entry');
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
@@ -171,6 +217,12 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+  assert.equal(frontdesk.surface_kind, 'product_frontdesk');
+  assert.equal(frontdesk.frontdesk_surface.command, 'redcube product frontdesk');
+  assert.equal(start.surface_kind, 'product_entry_start');
+  assert.equal(start.workspace_locator.workspace_root, '/tmp/redcube-workspace');
+  assert.equal(preflight.surface_kind, 'product_entry_preflight');
+  assert.equal(preflight.workspace_locator.workspace_root, '/tmp/redcube-workspace');
 });
 
 test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
@@ -506,4 +558,3 @@ test('listGatewayTools descriptions mention quality-facing runtime watch and rev
   assert.match(workspaceTool.description, /topic/i);
   assert.match(productEntryTool.description, /OPL bridge/i);
 });
-
