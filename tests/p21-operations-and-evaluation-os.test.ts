@@ -5,6 +5,15 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
 const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluation-closeout.json';
+const GATEWAY_TYPE_SURFACE_FILES = [
+  'packages/redcube-gateway/src/types.ts',
+  'packages/redcube-gateway/src/types-parts/foundation.ts',
+  'packages/redcube-gateway/src/types-parts/managed.ts',
+  'packages/redcube-gateway/src/types-parts/product-entry.ts',
+  'packages/redcube-gateway/src/types-parts/review.ts',
+  'packages/redcube-gateway/src/types-parts/source.ts',
+  'packages/redcube-gateway/src/types-parts/telemetry.ts',
+];
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -14,6 +23,10 @@ function readImplementation(file) {
   const source = read(file);
   const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
+function readGatewayTypes() {
+  return GATEWAY_TYPE_SURFACE_FILES.map(read).join('\n');
 }
 
 function readJson(file) {
@@ -44,7 +57,7 @@ test('P21.A red: run record contract must freeze telemetry, error taxonomy, and 
 });
 
 test('P21.A red: operator-facing run/watch surfaces must expose formal ops-eval summaries', () => {
-  const gatewayTypes = read('packages/redcube-gateway/src/types.ts');
+  const gatewayTypes = readGatewayTypes();
 
   assert.equal(gatewayTypes.includes('run_telemetry:'), true);
   assert.equal(gatewayTypes.includes('error_taxonomy:'), true);
@@ -67,7 +80,7 @@ test('P21 tracked closeout contract defines generic base contract, extension sur
 
 test('P21.C red: poster-specific metrics must be registered through a formal extension surface', () => {
   const governanceTypes = read('packages/redcube-governance/src/types.ts');
-  const gatewayTypes = read('packages/redcube-gateway/src/types.ts');
+  const gatewayTypes = readGatewayTypes();
   const audit = readJson(P21_CLOSEOUT_CONTRACT);
 
   assert.equal(governanceTypes.includes('export interface MetricExtensionRegistration'), true);
