@@ -97,7 +97,10 @@ test('ppt prompt seed helper does not merge profile-specific creative variants',
 });
 
 test('ppt runtime validators do not impose hidden default slide counts', () => {
-  const authoring = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.ts');
+  const authoring = [
+    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.ts'),
+    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring-source-helpers.ts'),
+  ].join('\n');
   const render = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/render.ts');
 
   assert.equal(/slides\.length\s*<\s*6/.test(authoring), false);
