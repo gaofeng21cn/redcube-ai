@@ -27,6 +27,8 @@
       "Write"
     ],
     "websiteURL": "https://github.com/gaofeng21cn/redcube-ai",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
     "defaultPrompt": [
       "Open the RedCube AI frontdesk for this workspace.",
       "Inspect the current RedCube product-entry manifest.",

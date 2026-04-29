@@ -9,6 +9,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync } from 'n
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
+const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
+const pluginIconSourcePath = path.join(pluginRoot, 'assets', 'icon.svg');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'rca', 'SKILL.md');
 const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'rca', 'agents', 'openai.yaml');
 const installerPath = path.join(repoRoot, 'scripts', 'install-codex-plugin.ts');
@@ -24,7 +26,11 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(manifest.skills, './skills/');
   assert.equal(manifest.interface.displayName, 'RedCube AI');
   assert.equal(manifest.interface.category, 'Creative');
+  assert.equal(manifest.interface.composerIcon, './assets/icon.png');
+  assert.equal(manifest.interface.logo, './assets/icon.png');
   assert.match(manifest.description, /Codex plugin/i);
+  assert.equal(existsSync(pluginIconPath), true);
+  assert.equal(existsSync(pluginIconSourcePath), true);
   assert.match(metadataText, /display_name: "RedCube AI"/);
   assert.match(metadataText, /default_prompt: "Use \$rca/);
   assert.match(metadataText, /TypeScript orchestration plus Python native helpers; repo-tracked JavaScript is retired and blocked by closeout audit/);
