@@ -158,7 +158,10 @@ test('generateStructuredArtifactViaCodexCli records deterministic prompt telemet
 });
 
 test('codex-cli client keeps async codex exec attached while preserving timeout cleanup', () => {
-  const source = readFileSync(new URL('../packages/redcube-codex-cli-client/src/index.impl.ts', import.meta.url), 'utf-8');
+  const source = readFileSync(
+    new URL('../packages/redcube-codex-cli-client/src/index-parts/command-process.ts', import.meta.url),
+    'utf-8',
+  );
 
   assert.match(source, /detached:\s*false/);
   assert.match(source, /process\.kill\(-pid,\s*'SIGKILL'\)/);

@@ -1,66 +1,86 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 
-function extractFunction(source, name) {
-  const start = source.indexOf(`function ${name}`);
-  if (start === -1) {
-    throw new Error(`Missing function ${name}`);
-  }
-  const next = source.indexOf('\nfunction ', start + 1);
-  return source.slice(start, next === -1 ? undefined : next);
+import {
+  REDCUBE_STAGE_JSON_BEGIN,
+  REDCUBE_STAGE_JSON_END,
+  generateStructuredArtifactViaCodexCli,
+  readCodexCliContract,
+} from './package-surfaces.ts';
+
+async function captureGenerationTimeout(options = {}) {
+  const observedTimeouts = [];
+  await generateStructuredArtifactViaCodexCli({
+    family: 'ppt_deck',
+    route: 'storyline',
+    promptRelativePath: 'prompts/ppt_deck/storyline.md',
+    context: { title: 'Timeout contract' },
+    outputContract: {
+      type: 'object',
+      required: ['ok'],
+    },
+    contract: readCodexCliContract({
+      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    }),
+    spawnSyncImpl(_command, args, spawnOptions) {
+      observedTimeouts.push(spawnOptions.timeout);
+      const outputFlagIndex = args.indexOf('--output-last-message');
+      writeFileSync(
+        args[outputFlagIndex + 1],
+        [
+          REDCUBE_STAGE_JSON_BEGIN,
+          JSON.stringify({ ok: true }),
+          REDCUBE_STAGE_JSON_END,
+        ].join('\n'),
+        'utf-8',
+      );
+      return {
+        status: 0,
+        stdout: JSON.stringify({ event: 'run.completed', run_id: 'mock-run' }),
+        stderr: '',
+        error: null,
+      };
+    },
+    ...options,
+  });
+
+  return observedTimeouts.at(-1);
 }
 
-test('codex cli grants longer default timeout to image-backed review prompts while preserving explicit overrides', () => {
-  const source = readFileSync('packages/redcube-codex-cli-client/src/index.impl.ts', 'utf-8');
-  const helperCode = [
-    extractFunction(source, 'safeText'),
-    extractFunction(source, 'normalizeLocalFileInspection'),
-    extractFunction(source, 'resolveGenerationTimeoutMs'),
-  ].join('\n\n');
-
-  const helpers = new Function(`
-    const DEFAULT_CODEX_GENERATION_TIMEOUT_MS = 600000;
-    const DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS = 1800000;
-    ${helperCode}
-    return { resolveGenerationTimeoutMs };
-  `)();
-
-  assert.equal(helpers.resolveGenerationTimeoutMs(undefined, []), 600000);
-  assert.equal(helpers.resolveGenerationTimeoutMs(undefined, [
-    { path: '/tmp/slide-01.png', media_type: 'image/png', label: 'slide-01' },
-  ]), 1800000);
-  assert.equal(helpers.resolveGenerationTimeoutMs(123456, [
-    { path: '/tmp/slide-01.png', media_type: 'image/png', label: 'slide-01' },
-  ]), 123456);
+test('codex cli grants longer default timeout to image-backed review prompts while preserving explicit overrides', async () => {
+  assert.equal(await captureGenerationTimeout(), 600000);
+  assert.equal(
+    await captureGenerationTimeout({
+      localFileInspection: [
+        { path: '/tmp/slide-01.png', media_type: 'image/png', label: 'slide-01' },
+      ],
+    }),
+    1800000,
+  );
+  assert.equal(
+    await captureGenerationTimeout({
+      timeoutMs: 123456,
+      localFileInspection: [
+        { path: '/tmp/slide-01.png', media_type: 'image/png', label: 'slide-01' },
+      ],
+    }),
+    123456,
+  );
 });
 
-test('codex cli grants render_html routes the same longer default timeout as image-backed review prompts', () => {
-  const source = readFileSync('packages/redcube-codex-cli-client/src/index.impl.ts', 'utf-8');
-  const helperCode = [
-    extractFunction(source, 'safeText'),
-    extractFunction(source, 'normalizeLocalFileInspection'),
-    extractFunction(source, 'resolveGenerationTimeoutMs'),
-  ].join('\n\n');
-
-  const helpers = new Function(`
-    const DEFAULT_CODEX_GENERATION_TIMEOUT_MS = 600000;
-    const DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS = 1800000;
-    ${helperCode}
-    return { resolveGenerationTimeoutMs };
-  `)();
-
+test('codex cli grants render_html routes the same longer default timeout as image-backed review prompts', async () => {
   assert.equal(
-    helpers.resolveGenerationTimeoutMs(undefined, [], { family: 'ppt_deck', route: 'render_html' }),
+    await captureGenerationTimeout({ route: 'render_html' }),
     1800000,
   );
   assert.equal(
-    helpers.resolveGenerationTimeoutMs(undefined, [], { family: 'xiaohongshu', route: 'render_html' }),
+    await captureGenerationTimeout({ family: 'xiaohongshu', route: 'render_html' }),
     1800000,
   );
   assert.equal(
-    helpers.resolveGenerationTimeoutMs(undefined, [], { family: 'ppt_deck', route: 'storyline' }),
+    await captureGenerationTimeout({ family: 'ppt_deck', route: 'storyline' }),
     600000,
   );
 });
