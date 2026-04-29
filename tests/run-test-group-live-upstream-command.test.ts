@@ -48,6 +48,7 @@ test('run-test-group partitions route-heavy files away from the default parallel
     partitionTestFilesForExecution({
       groupName: 'integration',
       files: [
+        'tests/managed-deliverable-execution.test.ts',
         'tests/runtime-deliverable-route.test.ts',
         'tests/review-platform.test.ts',
         'tests/source-intake.test.ts',
@@ -55,10 +56,11 @@ test('run-test-group partitions route-heavy files away from the default parallel
     }),
     {
       parallel_files: [
-        'tests/runtime-deliverable-route.test.ts',
         'tests/source-intake.test.ts',
       ],
       serialized_files: [
+        'tests/managed-deliverable-execution.test.ts',
+        'tests/runtime-deliverable-route.test.ts',
         'tests/review-platform.test.ts',
       ],
     },

@@ -14,6 +14,14 @@ function readImplementation(file) {
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
 }
 
+function readGovernanceReviewStateSurface() {
+  return [
+    read('packages/redcube-governance/src/review-state.ts'),
+    read('packages/redcube-governance/src/review-state-parts/mutations.ts'),
+    read('packages/redcube-governance/src/review-state-parts/projection.ts'),
+  ].join('\n');
+}
+
 test('family runtimes no longer directly author canonical publish owner fields', () => {
   const pptRuntime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts');
   const xhsRuntime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
@@ -36,7 +44,7 @@ test('family runtimes no longer directly author publication projection file hint
 
 test('@redcube/governance remains the canonical publish truth owner surface', () => {
   const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.ts');
-  const governanceReviewState = read('packages/redcube-governance/src/review-state.ts');
+  const governanceReviewState = readGovernanceReviewStateSurface();
 
   assert.equal(runtimeIndex.includes("from '@redcube/governance'"), true);
   assert.equal(governanceReviewState.includes('approve_publish'), true);

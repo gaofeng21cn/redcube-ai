@@ -14,6 +14,14 @@ function readImplementation(file) {
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
 }
 
+function readGovernanceReviewStateSurface() {
+  return [
+    read('packages/redcube-governance/src/review-state.ts'),
+    read('packages/redcube-governance/src/review-state-parts/mutations.ts'),
+    read('packages/redcube-governance/src/review-state-parts/projection.ts'),
+  ].join('\n');
+}
+
 function readCliSource() {
   return [
     read('apps/redcube-cli/src/cli.ts'),
@@ -63,7 +71,7 @@ test('harness audit: source truth remains canonical through the current source i
 });
 
 test('harness audit: publish governance is single-owner and family runtimes no longer author publish truth', () => {
-  const governanceReviewState = read('packages/redcube-governance/src/review-state.ts');
+  const governanceReviewState = readGovernanceReviewStateSurface();
   const pptRuntime = read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts');
   const xhsRuntime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
 

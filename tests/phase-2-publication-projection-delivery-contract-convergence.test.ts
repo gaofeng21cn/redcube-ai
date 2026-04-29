@@ -19,6 +19,13 @@ function readImplementation(file) {
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
 }
 
+function readGovernanceReviewStateSurface() {
+  return [
+    read('packages/redcube-governance/src/review-state.ts'),
+    read('packages/redcube-governance/src/review-state-parts/projection.ts'),
+  ].join('\n');
+}
+
 function readJson(file) {
   return JSON.parse(read(file));
 }
@@ -51,7 +58,7 @@ test('phase-2 publication projection delivery contract convergence freezes one h
   const pptSurface = readImplementation('packages/redcube-overlay-ppt/src/surface.ts');
   const xhsSurface = readImplementation('packages/redcube-overlay-xiaohongshu/src/surface.ts');
   const posterSurface = readImplementation('packages/redcube-overlay-poster-onepager/src/surface.ts');
-  const reviewState = read('packages/redcube-governance/src/review-state.ts');
+  const reviewState = readGovernanceReviewStateSurface();
 
   assert.equal(contract.delivery_contract_surface.families.ppt_deck.required_export_route, 'export_pptx');
   assert.equal(contract.delivery_contract_surface.families.ppt_deck.projection_model, 'direct_delivery');
