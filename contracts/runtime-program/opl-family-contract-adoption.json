@@ -1,0 +1,67 @@
+{
+  "contract_kind": "rca_opl_family_contract_adoption.v1",
+  "domain_id": "redcube-ai",
+  "domain_owner": "RedCube AI",
+  "opl_role": "family-level projection consumer only",
+  "attempt_projection": {
+    "source_surfaces": [
+      "product-entry session",
+      "runtimeWatch",
+      "artifact inventory",
+      "runtime health"
+    ],
+    "maps_to_opl_contract": "opl_family_runtime_attempt_contract.v1",
+    "owner_boundary": "RCA owns visual deliverable runtime and route truth"
+  },
+  "quality_projection": {
+    "source_surfaces": [
+      "content-fit review",
+      "visual_director_review",
+      "screenshot_review",
+      "render proof",
+      "export proof",
+      "getReviewState",
+      "getPublicationProjection"
+    ],
+    "maps_to_opl_contract": "opl_family_domain_quality_projection_contract.v1",
+    "quality_gate_owner": "RCA visual deliverable quality",
+    "claim_only_ready_forbidden": true
+  },
+  "incident_projection": {
+    "source_surfaces": [
+      "runtimeWatch",
+      "managed deliverable report",
+      "review/export gate audit",
+      "operator handoff"
+    ],
+    "maps_to_opl_contract": "opl_family_incident_learning_loop.v1",
+    "closure_rule": "domain-specific failure requires RCA-owned closure ref"
+  },
+  "operator_projection": {
+    "source_surfaces": [
+      "product entry",
+      "product session",
+      "internal OPL bridge",
+      "artifact inventory",
+      "review/publication projection refs"
+    ],
+    "maps_to_opl_contract": "opl_family_product_operator_projection.v1",
+    "required_fields": [
+      "source_refs",
+      "freshness",
+      "owner_split",
+      "next_surface_ref",
+      "human_gate_reason"
+    ]
+  },
+  "non_goals": [
+    "OPL owns RedCube visual truth",
+    "OPL owns canonical artifacts",
+    "OPL owns review/export judgment",
+    "medical publication gate",
+    "grant fundability gate",
+    "generic persona QA",
+    "claim-only ready"
+  ]
+}
+

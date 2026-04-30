@@ -45,6 +45,7 @@ const META = [
   'tests/legacy-cleanup.test.ts',
   'tests/line-budget.test.ts',
   'tests/overlay-registry.test.ts',
+  'tests/opl-family-contract-adoption.test.ts',
   'tests/pack-first-completion.test.ts',
   'tests/ppt-overlay.test.ts',
   'tests/profile-contract-hydration.test.ts',
