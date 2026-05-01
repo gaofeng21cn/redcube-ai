@@ -77,6 +77,18 @@ test('verify runs the line budget guard before lane dispatch', () => {
   assert.ok(verifyScript.indexOf('node --experimental-strip-types scripts/line-budget.ts') < verifyScript.indexOf('case "$lane" in'));
 });
 
+test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy fast lane', () => {
+  const healthcheck = fs.readFileSync(path.join(repoRoot, 'scripts/opl-module-healthcheck.sh'), 'utf8');
+
+  assert.match(healthcheck, /npm run test:line-budget/);
+  assert.match(healthcheck, /npm run --silent build/);
+  assert.match(healthcheck, /tests\/product-entry\.test\.ts/);
+  assert.match(healthcheck, /tests\/product-entry-runtime-manager-registration\.test\.ts/);
+  assert.match(healthcheck, /tests\/product-entry-session-checkpoint\.test\.ts/);
+  assert.match(healthcheck, /tests\/product-entry-cases\/manifest-and-start-surfaces\.test\.ts/);
+  assert.doesNotMatch(healthcheck, /test:fast|scripts\/verify\.sh fast|run-test-group\.ts fast/);
+});
+
 function makeLines(lineCount) {
   return Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n') + '\n';
 }
