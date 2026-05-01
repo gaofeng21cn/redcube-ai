@@ -53,6 +53,7 @@
 - 默认 smoke 是 `npm test` / `npm run test:fast`。
 - `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:historical` 是显式 lane。
 - `npm run test:full` 是 clean-clone 基线。
+- plan-closeout 必须显式列出 `planned`、`done`、`deferred`、`skipped`、`verification`、`commit-push state`；任何 `deferred` 项都要写成可检索 backlog，不得让计划项静默消失。
 
 ## 并行开发与工作树
 

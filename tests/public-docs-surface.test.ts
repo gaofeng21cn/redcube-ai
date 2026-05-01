@@ -38,6 +38,24 @@ test('public docs surface keeps the governance references tracked', () => {
   }
 });
 
+test('root AGENTS requires explicit plan closeout accounting', () => {
+  const agents = readText('AGENTS.md');
+
+  assert.match(agents, /plan-closeout/);
+  for (const field of [
+    'planned',
+    'done',
+    'deferred',
+    'skipped',
+    'verification',
+    'commit-push state',
+  ]) {
+    assert.match(agents, new RegExp(field));
+  }
+  assert.match(agents, /deferred[\s\S]*backlog/);
+  assert.match(agents, /可检索/);
+});
+
 test('public docs surface keeps the default entry chain and isolates historical program wording', () => {
   const readme = readText('README.md');
   const readmeZh = readText('README.zh-CN.md');

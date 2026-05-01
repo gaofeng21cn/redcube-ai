@@ -1,6 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import {
@@ -43,6 +43,30 @@ function mergeAuditReports(reports) {
 
 function artifactKey(relativePath) {
   return path.basename(relativePath, '.json').replace(/-/g, '_');
+}
+
+function toRelativeSurfacePath(rootDir, absolutePath) {
+  return path.relative(rootDir, absolutePath).split(path.sep).join('/');
+}
+
+function collectJsonSurfacePaths(rootDir) {
+  if (!existsSync(rootDir)) {
+    return [];
+  }
+
+  const entries = [];
+  for (const entry of readdirSync(rootDir)) {
+    const absolutePath = path.join(rootDir, entry);
+    const stats = statSync(absolutePath);
+    if (stats.isDirectory()) {
+      entries.push(...collectJsonSurfacePaths(absolutePath));
+      continue;
+    }
+    if (stats.isFile() && absolutePath.endsWith('.json')) {
+      entries.push(absolutePath);
+    }
+  }
+  return entries;
 }
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
@@ -207,8 +231,11 @@ function auditOverlaySurface({
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const missingIssues = [];
   const invalidIssues = [];
+  const extraIssues = [];
+  const expectedSurfacePaths = overlayDefinition.listSurfaceArtifactPaths();
+  const expectedSurfacePathSet = new Set(expectedSurfacePaths);
 
-  for (const relativePath of overlayDefinition.listSurfaceArtifactPaths()) {
+  for (const relativePath of expectedSurfacePaths) {
     const absolutePath = path.join(deliverablePaths.deliverableDir, relativePath);
     if (!existsSync(absolutePath)) {
       missingIssues.push(`deliverable_contract_missing:${artifactKey(relativePath)}`);
@@ -225,10 +252,21 @@ function auditOverlaySurface({
     }
   }
 
-  if (missingIssues.length > 0 || invalidIssues.length > 0) {
+  const surfaceRoots = [...new Set(expectedSurfacePaths.map((relativePath) => relativePath.split('/')[0]).filter(Boolean))];
+  for (const surfaceRoot of surfaceRoots) {
+    for (const absolutePath of collectJsonSurfacePaths(path.join(deliverablePaths.deliverableDir, surfaceRoot))) {
+      const relativePath = toRelativeSurfacePath(deliverablePaths.deliverableDir, absolutePath);
+      if (!expectedSurfacePathSet.has(relativePath)) {
+        extraIssues.push(`deliverable_contract_extra:${artifactKey(relativePath)}`);
+      }
+    }
+  }
+  extraIssues.sort();
+
+  if (missingIssues.length > 0 || invalidIssues.length > 0 || extraIssues.length > 0) {
     return {
       status: 'block',
-      issues: [...missingIssues, ...invalidIssues],
+      issues: [...missingIssues, ...invalidIssues, ...extraIssues],
       rerun_from_stage: 'intake',
       recommended_action: 'rehydrate_deliverable_surface',
     };
