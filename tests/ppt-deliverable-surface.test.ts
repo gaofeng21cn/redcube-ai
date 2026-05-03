@@ -128,7 +128,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.equal(hydratedContract.prompt_pack.stages.render_html.file, 'render_html.md');
   assert.equal(hydratedContract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
   assert.equal(hydratedContract.prompt_pack.render_contract.default_visual_route, 'render_html');
-  assert.equal(hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'opt_in_proof_lane');
+  assert.equal(hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.deepEqual(
     hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
     ['render_html', 'fix_html'],

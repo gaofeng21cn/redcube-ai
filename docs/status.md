@@ -27,8 +27,8 @@
 - direct route 只用于显式 stage rerun、定点回修或 runtime gate 指定的局部恢复；默认新交付继续走 `run_managed_deliverable` / `auto_to_terminal`。`run_deliverable_route` 现在会把本轮 `delivery_request.user_intent` 写入 route authoring context，并纳入 route cache key，避免定点回修指令被旧 artifact 复用吞掉。
 - executor backend public contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 单独表达 `structured_call` / `agent_loop`。`render_html` 默认结构化调用；`fix_html` 默认结构化回修并复审到 `screenshot_review`，若复审仍要求 `fix_html`，最多升级一次 `hermes_agent + agent_loop` 并记录 execution proof。
 - executor routing 配置为 opt-in：`config/examples/executor-routing.example.json` 仅作示例，真实本机配置放 `$CODEX_HOME/projects/redcube-ai/runtime-state/config/executor-routing.json`、`config/local/executor-routing.json` 或 `REDCUBE_EXECUTOR_ROUTING_CONFIG`。RCA 只保存 Hermes profile id，不保存 provider/base URL/API key/model list。
-- `ppt_deck` native PPT authoring / repair 已作为显式 opt-in proof lane 落到可运行 executor：`author_pptx_native` 生成可编辑 PPTX 与 shape manifest，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`
-- native PPT proof lane 已登记在 `contracts/runtime-program/python-native-helper-catalog.json`；Python helper 现在由 repo-owned `redcube_ai` package 承载，既有脚本只保留兼容入口；Python helper 不能绕过 `visual_director_review`、`screenshot_review` 与 `export_pptx` gate，也不能替代 RedCube product-entry/runtime-family route
+- `ppt_deck` native PPT authoring / repair 已作为生产可选、默认关闭路线落到可运行 executor：`author_pptx_native` 通过 RedCube clean-room SVG IR 与 DrawingML writer 生成可编辑 PPTX、shape manifest 和 true PPTX render proof，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`
+- native PPT selectable lane 已登记在 `contracts/runtime-program/python-native-helper-catalog.json`；Python helper 现在由 repo-owned `redcube_ai` package 承载，既有脚本只保留兼容入口；Python helper 不能绕过 `visual_director_review`、`screenshot_review` 与 `export_pptx` gate，也不能替代 RedCube product-entry/runtime-family route
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
 ## 当前验证口径
@@ -51,5 +51,5 @@
 - 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 `OPL Runtime Manager`、external `Hermes-Agent` substrate、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持 AI-first 质量边界：story / visual / markup authorship 与最终视觉 reviewer 判断由 AI-authored artifact 持有；pack、schema、gate、audit、scorecard 与 projection 只表达结构、证据、机械状态和 rerun hints
-- 保持 native PPT proof lane 显式可选、默认关闭；HTML 主线与 native PPT 路线都继续经过 `visual_director_review`、`screenshot_review` 与 `export_pptx`
+- 保持 native PPT lane 生产可选、默认关闭；HTML 主线与 native PPT 路线都继续经过 `visual_director_review`、`screenshot_review` 与 `export_pptx`
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

@@ -108,8 +108,9 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
         default_visual_route: 'render_html',
         native_ppt_proof_lane: {
           lane_id: 'ppt_deck_native_ppt_authoring_v0',
-          status: 'opt_in_proof_lane',
+          status: 'production_selectable_optional',
           default_enabled: false,
+          production_selectable: true,
           runnable_routes: ['author_pptx_native', 'repair_pptx_native'],
           replaces_routes: ['render_html', 'fix_html'],
           preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
@@ -133,6 +134,21 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
           authoring_artifact: 'native_pptx_file',
           editable_artifact_required: true,
           review_input_surface: 'rendered_pptx_screenshots',
+          engine_capabilities: {
+            authoring_ir: 'redcube_svg_ir',
+            pptx_writer: 'redcube_drawingml_writer',
+            editable_pptx: true,
+            strict_svg_preflight: true,
+            true_render_proof_required: true,
+            true_render_proof_renderer: 'powerpoint_applescript',
+            screenshot_packaging: false,
+          },
+          true_render_proof: {
+            required: true,
+            renderer_kind: 'powerpoint_applescript',
+            synthetic_preview_allowed: false,
+            fail_closed_when_missing: true,
+          },
           export_contract_delta: {
             source_artifact_field: 'export_bundle.source_pptx',
             shape_manifest_field: 'export_bundle.native_ppt_shape_manifest',

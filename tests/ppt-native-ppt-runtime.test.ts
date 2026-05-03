@@ -93,6 +93,12 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       shapeManifest.native_quality_surface.required_per_slide_metrics.includes('occupied_ratio'),
       true,
     );
+    assert.equal(shapeManifest.engine_capabilities?.authoring_ir, 'redcube_svg_ir');
+    assert.equal(shapeManifest.engine_capabilities?.pptx_writer, 'redcube_drawingml_writer');
+    assert.equal(shapeManifest.engine_capabilities?.true_render_proof_required, true);
+    assert.equal(shapeManifest.render_proof?.source_surface_kind, 'native_pptx');
+    assert.equal(shapeManifest.render_proof?.renderer_kind, 'powerpoint_applescript');
+    assert.equal(shapeManifest.render_proof?.synthetic_preview, false);
     assert.deepEqual(shapeManifest.engine_contract, expectedEngineContract);
     assert.equal(shapeManifest.engine_contract_file, authored.native_ppt_bundle.engine_contract_file);
     assert.deepEqual(shapeManifest.ai_first_editing_contract, authored.ai_first_editing_contract);
@@ -107,6 +113,8 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       authored.native_ppt_bundle.preview_screenshots.every((file) => existsSync(file)),
       true,
     );
+    assert.equal(authored.native_ppt_bundle?.render_proof?.synthetic_preview, false);
+    assert.equal(authored.native_ppt_bundle?.engine_capabilities?.authoring_ir, 'redcube_svg_ir');
 
     let screenshotReviewArtifact = null;
     for (const route of ['visual_director_review', 'screenshot_review', 'export_pptx']) {
@@ -125,6 +133,8 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     const nativeMechanicalSlide = screenshotReviewArtifact.mechanical_review.slide_reviews[0];
     const nativeManifestSlide = shapeManifest.slides.find((slide) => slide.slide_id === nativeMechanicalSlide.slide_id);
     assert.equal(nativeMechanicalSlide.metrics.native_quality_source, 'shape_manifest');
+    assert.equal(nativeMechanicalSlide.metrics.render_proof_source, 'true_pptx_render');
+    assert.equal(nativeMechanicalSlide.metrics.synthetic_preview, false);
     assert.equal(nativeMechanicalSlide.metrics.occupied_ratio, nativeManifestSlide.metrics.occupied_ratio);
     assert.equal(nativeMechanicalSlide.metrics.text_char_count, nativeManifestSlide.metrics.text_char_count);
     assert.equal(nativeMechanicalSlide.metrics.edge_clearance.bottom, nativeManifestSlide.metrics.edge_clearance.bottom);
@@ -246,6 +256,13 @@ test('native PPT proof lane records the Python engine contract as the single own
   assert.equal(
     proofLane.candidate_route_model.native_ppt_quality_surface.quality_model,
     'shape_manifest_layout_metrics_v1',
+  );
+  assert.equal(engineContract.engine_capabilities.authoring_ir, 'redcube_svg_ir');
+  assert.equal(engineContract.engine_capabilities.pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(engineContract.true_render_proof.required, true);
+  assert.equal(
+    proofLane.candidate_route_model.runtime_executor_proof.engine_capabilities.true_render_proof_required,
+    true,
   );
   assert.equal(engineContract.native_ppt_quality_surface.fail_closed_when_missing, true);
   assert.equal(

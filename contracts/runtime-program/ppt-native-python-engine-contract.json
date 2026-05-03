@@ -8,6 +8,35 @@
   ],
   "input_boundary": "slide_blueprint_plus_visual_direction_json",
   "review_boundary": "rendered_pptx_screenshots",
+  "engine_capabilities": {
+    "authoring_ir": "redcube_svg_ir",
+    "authoring_ir_version": 1,
+    "pptx_writer": "redcube_drawingml_writer",
+    "editable_pptx": true,
+    "strict_svg_preflight": true,
+    "true_render_proof_required": true,
+    "true_render_proof_renderer": "powerpoint_applescript",
+    "screenshot_packaging": false
+  },
+  "true_render_proof": {
+    "required": true,
+    "source_surface_kind": "native_pptx",
+    "renderer_kind": "powerpoint_applescript",
+    "synthetic_preview_allowed": false,
+    "fail_closed_when_missing": true
+  },
+  "clean_room_boundary": {
+    "owner": "redcube_ai",
+    "source_policy": "clean_room_rewrite",
+    "vendor_ppt_master_source": false,
+    "borrowed_scope": [
+      "svg_technical_rules",
+      "svg_quality_gate",
+      "drawingml_pptx_writer_boundary",
+      "shape_group_text_image_metrics",
+      "deterministic_chart_coordinate_checks"
+    ]
+  },
   "native_ppt_quality_surface": {
     "quality_model": "shape_manifest_layout_metrics_v1",
     "source_surface_kind": "native_pptx",

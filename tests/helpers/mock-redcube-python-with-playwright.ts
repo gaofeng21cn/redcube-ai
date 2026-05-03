@@ -9,6 +9,17 @@ const PNG_1X1 = Buffer.from(
   'base64',
 );
 
+const NATIVE_ENGINE_CAPABILITIES = {
+  authoring_ir: 'redcube_svg_ir',
+  authoring_ir_version: 1,
+  pptx_writer: 'redcube_drawingml_writer',
+  editable_pptx: true,
+  strict_svg_preflight: true,
+  true_render_proof_required: true,
+  true_render_proof_renderer: 'powerpoint_applescript',
+  screenshot_packaging: false,
+};
+
 function fail(message) {
   process.stderr.write(`${String(message || 'unknown error').trim()}\n`);
   process.exit(1);
@@ -208,6 +219,10 @@ function buildNativePayload(args) {
     const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
     const screenshotFile = path.join(previewDir, `${slideId}.png`);
     writeBinary(screenshotFile, PNG_1X1);
+    const bounds = [
+      { left: 96, top: 96, width: 960, height: 88, right: 1056, bottom: 184 },
+      { left: 96, top: 250, width: 960, height: 68, right: 1056, bottom: 318 },
+    ];
     return {
       slide_id: slideId,
       title: String(slide?.title || `Slide ${index + 1}`),
@@ -215,16 +230,108 @@ function buildNativePayload(args) {
       text_box_count: 2,
       shape_count: 2,
       screenshot_file: screenshotFile,
+      preview_screenshot_file: screenshotFile,
+      preview_screenshot_sha256: 'mock-sha256',
+      preview_screenshot_dimensions: { width: 2304, height: 1296 },
+      render_proof_source: 'true_pptx_render',
+      synthetic_preview: false,
+      native_shapes: [
+        {
+          shape_id: `${slideId}-title`,
+          kind: 'text_box',
+          role: 'title',
+          quality_role: 'content',
+          text: String(slide?.title || `Slide ${index + 1}`),
+          bounds: bounds[0],
+        },
+        {
+          shape_id: `${slideId}-body`,
+          kind: 'text_box',
+          role: 'body',
+          quality_role: 'content',
+          text: 'Mock native editable body',
+          bounds: bounds[1],
+        },
+      ],
+      checks: {
+        overflow_free: true,
+        occlusion_free: true,
+        visual_density_ok: true,
+        speaker_fit_ok: true,
+        edge_clearance_ok: true,
+        block_content_fit_ok: true,
+        title_typography_ok: true,
+        page_number_consistency_ok: true,
+      },
+      metrics: {
+        title_font_size: 32,
+        text_char_count: 72,
+        block_count: 2,
+        shape_count: 2,
+        overlap_pairs: 0,
+        overlaps: [],
+        clipped_nodes: 0,
+        occupied_ratio: 0.18,
+        primary_points: 3,
+        edge_clearance: { left: 96, top: 96, right: 96, bottom: 330 },
+        block_content_failures: [],
+        bounds,
+      },
+      redcube_svg_ir_file: path.join(previewDir, `${slideId}.svg`),
+      redcube_svg_ir_sha256: 'mock-svg-sha256',
+      redcube_svg_ir_preflight: {
+        status: 'pass',
+        strict: true,
+        allowed_tags: ['svg', 'g', 'rect', 'text'],
+      },
+      issues: [],
     };
   });
   writeBinary(outputPptx, Buffer.from('mock-native-pptx'));
   if (outputPdf) {
     writeBinary(outputPdf, Buffer.from('%PDF-1.4\n%mock-native\n'));
   }
+  const renderProof = {
+    source_surface_kind: 'native_pptx',
+    renderer_kind: 'powerpoint_applescript',
+    synthetic_preview: false,
+    required: true,
+    pptx_file: outputPptx,
+    pdf_file: outputPdf || null,
+    preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
+  };
   const shapeManifest = {
     schema_version: 1,
+    artifact_kind: 'ppt_deck_native_shape_manifest',
     engine_contract: engineContract,
     engine_contract_file: engineContractFile || null,
+    engine_capabilities: NATIVE_ENGINE_CAPABILITIES,
+    native_quality_model: 'shape_manifest_layout_metrics_v1',
+    native_quality_surface: {
+      quality_model: 'shape_manifest_layout_metrics_v1',
+      source_surface_kind: 'native_pptx',
+      required_per_slide_metrics: [
+        'bounds',
+        'text_char_count',
+        'primary_points',
+        'occupied_ratio',
+        'edge_clearance',
+        'overlap_pairs',
+        'preview_screenshot_sha256',
+        'preview_screenshot_dimensions',
+      ],
+      fail_closed_when_missing: true,
+    },
+    render_proof: renderProof,
+    redcube_svg_ir: {
+      kind: 'redcube_svg_ir',
+      version: 1,
+      strict_preflight: true,
+      dir: previewDir,
+      files: slides.map((slide) => slide.redcube_svg_ir_file),
+    },
+    screenshot_dimensions: { width: 2304, height: 1296 },
+    preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
     slides,
   };
   writeText(shapeManifestFile, JSON.stringify(shapeManifest, null, 2));
@@ -240,7 +347,21 @@ function buildNativePayload(args) {
   }
   return {
     status: 'completed',
-    builder: { kind: 'mock_python_pptx_native_shapes' },
+    builder: {
+      kind: 'redcube_drawingml_writer',
+      implementation: 'mock_python_pptx_native_shapes',
+      surface: 'editable_native_pptx',
+      screenshot_packaging: false,
+    },
+    capability: {
+      kind: 'RedCube DrawingML writer',
+      editable_artifact: true,
+      native_shapes: true,
+      redcube_svg_ir: true,
+      strict_svg_preflight: true,
+      render_proof_required: true,
+    },
+    engine_capabilities: NATIVE_ENGINE_CAPABILITIES,
     shape_manifest_schema_version: 1,
     pptx_file: outputPptx,
     pdf_file: outputPdf || null,
@@ -248,7 +369,9 @@ function buildNativePayload(args) {
     repair_log_file: repairLogFile || null,
     page_count: slides.length,
     screenshot_dimensions: { width: 2304, height: 1296 },
-    preview_screenshots: slides.map((slide) => slide.screenshot_file),
+    render_proof: renderProof,
+    redcube_svg_ir: shapeManifest.redcube_svg_ir,
+    preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
     slides,
     repair_log: repairLog,
     engine_contract: engineContract,

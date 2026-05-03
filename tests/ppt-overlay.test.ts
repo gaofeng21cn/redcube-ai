@@ -109,7 +109,7 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
     lectureStudent.prompt_pack.render_contract.ui_ux_quality_companion.public_skill_policy,
     'do_not_register_as_public_redcube_skill',
   );
-  assert.equal(lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.status, 'opt_in_proof_lane');
+  assert.equal(lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.deepEqual(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
     ['render_html', 'fix_html'],

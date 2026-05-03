@@ -3,9 +3,13 @@ import argparse
 import hashlib
 import json
 import math
+import shutil
+import subprocess
 import sys
 import textwrap
 from pathlib import Path
+from xml.etree import ElementTree
+from xml.sax.saxutils import escape as xml_escape
 
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
@@ -24,6 +28,23 @@ MIN_NATIVE_DENSITY = 0.18
 MAX_NATIVE_DENSITY = 0.82
 MIN_NATIVE_EDGE_CLEARANCE = 24.0
 MAX_NATIVE_PRIMARY_POINTS = 5
+ENGINE_CAPABILITIES = {
+    'authoring_ir': 'redcube_svg_ir',
+    'authoring_ir_version': 1,
+    'pptx_writer': 'redcube_drawingml_writer',
+    'editable_pptx': True,
+    'strict_svg_preflight': True,
+    'true_render_proof_required': True,
+    'true_render_proof_renderer': 'powerpoint_applescript',
+    'screenshot_packaging': False,
+}
+SVG_NS = 'http://www.w3.org/2000/svg'
+STRICT_SVG_ALLOWED_TAGS = {
+    f'{{{SVG_NS}}}svg',
+    f'{{{SVG_NS}}}g',
+    f'{{{SVG_NS}}}rect',
+    f'{{{SVG_NS}}}text',
+}
 DEFAULT_ENGINE_CONTRACT_FILE = (
     Path(__file__).resolve().parents[4]
     / 'contracts'
@@ -83,6 +104,11 @@ def file_sha256(file: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def image_dimensions(file: Path) -> dict:
+    with Image.open(file) as image:
+        return {'width': int(image.width), 'height': int(image.height)}
 
 
 def text_capacity_failure(shape: dict) -> dict | None:
@@ -173,6 +199,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'primary_points': primary_points,
             'edge_clearance': {key: round(value, 2) for key, value in edge_clearance.items()},
             'block_content_failures': block_content_failures,
+            'bounds': [shape['bounds'] for shape in content_shapes],
         },
     }
 
@@ -194,6 +221,13 @@ def load_engine_contract(contract_file: Path) -> dict:
     routes = contract.get('owned_routes')
     if routes != ['author_pptx_native', 'repair_pptx_native']:
         fail('engine contract owned_routes mismatch')
+    capabilities = contract.get('engine_capabilities') or {}
+    for key, expected in ENGINE_CAPABILITIES.items():
+        if capabilities.get(key) != expected:
+            fail(f'engine contract capability mismatch: {key}')
+    render_proof = contract.get('true_render_proof') or {}
+    if render_proof.get('required') is not True:
+        fail('engine contract true_render_proof.required mismatch')
     return contract
 
 
@@ -247,7 +281,47 @@ def add_panel(slide, left, top, width, height, fill, line=None):
     return shape
 
 
+def normalize_slide_data(payload: dict) -> list:
+    plan = payload.get('editable_shape_plan') or {}
+    plan_slides = safe_list(plan.get('slides'))
+    blueprint = payload.get('blueprint') or {}
+    blueprint_slides = safe_list(blueprint.get('slides'))
+    blueprint_by_id = {
+        safe_text(slide.get('slide_id'), f'S{index + 1:02d}'): slide
+        for index, slide in enumerate(blueprint_slides)
+        if isinstance(slide, dict)
+    }
+    source_slides = plan_slides or blueprint_slides
+    if not source_slides:
+        fail('native PPT authoring requires editable_shape_plan.slides or slide_blueprint.slides')
+    slides = []
+    for index, raw_slide in enumerate(source_slides, 1):
+        if not isinstance(raw_slide, dict):
+            continue
+        slide_id = safe_text(raw_slide.get('slide_id'), f'S{index:02d}')
+        blueprint_slide = blueprint_by_id.get(slide_id, {})
+        merged = {**blueprint_slide, **raw_slide}
+        plan_shapes = [
+            shape for shape in safe_list(raw_slide.get('native_shapes'))
+            if isinstance(shape, dict)
+        ]
+        merged['_editable_native_shapes'] = plan_shapes
+        slides.append(merged)
+    if not slides:
+        fail('native PPT authoring requires at least one valid slide object')
+    return slides
+
+
 def slide_points(slide_data):
+    plan_points = [
+        safe_text(shape.get('editable_text') or shape.get('text'))
+        for shape in safe_list(slide_data.get('_editable_native_shapes'))
+        if isinstance(shape, dict)
+        and safe_text(shape.get('role')) in {'point_text', 'bullet', 'body', 'content'}
+        and safe_text(shape.get('editable_text') or shape.get('text'))
+    ]
+    if plan_points:
+        return plan_points[:4]
     points = [
         safe_text(item)
         for item in safe_list(slide_data.get('page_core_content'))
@@ -265,6 +339,144 @@ def slide_points(slide_data):
     return [safe_text(slide_data.get('core_sentence'), 'Key message')]
 
 
+def slide_title(slide_data, index: int) -> str:
+    title_shape = next(
+        (
+            shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
+            if isinstance(shape, dict)
+            and safe_text(shape.get('role')) == 'title'
+            and safe_text(shape.get('editable_text') or shape.get('text'))
+        ),
+        None,
+    )
+    if title_shape:
+        return safe_text(title_shape.get('editable_text') or title_shape.get('text'), f'Slide {index}')
+    return safe_text(slide_data.get('title'), f'Slide {index}')
+
+
+def slide_core_sentence(slide_data) -> str:
+    core_shape = next(
+        (
+            shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
+            if isinstance(shape, dict)
+            and safe_text(shape.get('role')) in {'core_sentence', 'subtitle'}
+            and safe_text(shape.get('editable_text') or shape.get('text'))
+        ),
+        None,
+    )
+    if core_shape:
+        return safe_text(core_shape.get('editable_text') or core_shape.get('text'))
+    return safe_text(slide_data.get('core_sentence'))
+
+
+def svg_rect(x, y, width, height, fill, intent, shape_id='', stroke='none', rx=0):
+    attrs = [
+        f'x="{x}"',
+        f'y="{y}"',
+        f'width="{width}"',
+        f'height="{height}"',
+        f'fill="{xml_escape(fill)}"',
+        f'stroke="{xml_escape(stroke)}"',
+        f'data-intent="{xml_escape(intent)}"',
+    ]
+    if shape_id:
+        attrs.append(f'id="{xml_escape(shape_id)}"')
+    if rx:
+        attrs.append(f'rx="{rx}"')
+    return f'    <rect {" ".join(attrs)} />'
+
+
+def svg_text(x, y, text, size, fill, intent, shape_id='', weight='400'):
+    attrs = [
+        f'x="{x}"',
+        f'y="{y}"',
+        f'font-size="{size}"',
+        f'font-family="Aptos, Arial, sans-serif"',
+        f'font-weight="{weight}"',
+        f'fill="{xml_escape(fill)}"',
+        f'data-intent="{xml_escape(intent)}"',
+    ]
+    if shape_id:
+        attrs.append(f'id="{xml_escape(shape_id)}"')
+    return f'    <text {" ".join(attrs)}>{xml_escape(safe_text(text))}</text>'
+
+
+def build_slide_svg_ir(slide_data, index: int, total: int, palette: dict, repaired: bool) -> str:
+    slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
+    lines = [
+        f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}">',
+        '  <g id="slide-root" data-intent="group:slide">',
+        svg_rect(0, 0, CANVAS_PX[0], CANVAS_PX[1], palette['bg'], 'rect:background', f'{slide_id}-background'),
+        svg_rect(0, 0, 36, CANVAS_PX[1], palette['accent'], 'rect:accent_bar', f'{slide_id}-accent-bar'),
+        svg_text(84, 88, slide_title(slide_data, index), 34, palette['ink'], 'text:title', f'{slide_id}-title', '700'),
+        svg_text(84, 176, slide_core_sentence(slide_data), 22, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'),
+    ]
+    if repaired:
+        lines.append(svg_rect(1032, 36, 52, 12, palette['accent'], 'rect:repair_marker', f'{slide_id}-repair-marker'))
+    y = 250
+    for point_index, point in enumerate(slide_points(slide_data)[:4], 1):
+        lines.extend([
+            f'    <g id="{xml_escape(f"{slide_id}-point-{point_index}")}" data-intent="group:content_point">',
+            svg_rect(96, y, 960, 68, palette['panel'], 'rect:content_panel', f'{slide_id}-point-{point_index}-panel', rx=18),
+            svg_text(124, y + 43, str(point_index), 24, palette['accent'], 'text:point_index', f'{slide_id}-point-{point_index}-index', '700'),
+            svg_text(176, y + 42, point, 19, palette['ink'], 'text:point_text', f'{slide_id}-point-{point_index}-text'),
+            '    </g>',
+        ])
+        y += 86
+    footer = f'{slide_id} / {index} of {total}'
+    lines.extend([
+        svg_text(84, 612, footer, 16, palette['muted'], 'text:page_number', f'{slide_id}-footer'),
+        '  </g>',
+        '</svg>',
+    ])
+    return '\n'.join(lines) + '\n'
+
+
+def strict_svg_preflight(svg_file: Path) -> dict:
+    try:
+        root = ElementTree.parse(svg_file).getroot()
+    except ElementTree.ParseError as exc:
+        fail(f'SVG IR preflight failed for {svg_file}: {exc}')
+    if root.tag != f'{{{SVG_NS}}}svg':
+        fail(f'SVG IR preflight failed for {svg_file}: root element must be svg')
+    if root.attrib.get('data-redcube-ir') != 'redcube_svg_ir_v1':
+        fail(f'SVG IR preflight failed for {svg_file}: missing redcube_svg_ir_v1 marker')
+    counts = {'text': 0, 'rect': 0, 'group': 0}
+    for element in root.iter():
+        if element.tag not in STRICT_SVG_ALLOWED_TAGS:
+            fail(f'SVG IR preflight failed for {svg_file}: unsupported tag {element.tag}')
+        local = element.tag.split('}', 1)[-1]
+        if local == 'image':
+            fail(f'SVG IR preflight failed for {svg_file}: raster image nodes are not allowed')
+        if local == 'text':
+            counts['text'] += 1
+        elif local == 'rect':
+            counts['rect'] += 1
+        elif local == 'g':
+            counts['group'] += 1
+    if counts['text'] < 1 or counts['rect'] < 1 or counts['group'] < 1:
+        fail(f'SVG IR preflight failed for {svg_file}: text/rect/group intent is required')
+    return {
+        'status': 'pass',
+        'strict': True,
+        'allowed_tags': ['svg', 'g', 'rect', 'text'],
+        'intent_counts': counts,
+    }
+
+
+def render_slide_svg_ir(slide_data, index: int, total: int, svg_dir: Path, palette: dict, repaired: bool) -> dict:
+    slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
+    svg_file = svg_dir / f'{index:02d}-{slide_id}.svg'
+    svg_file.parent.mkdir(parents=True, exist_ok=True)
+    svg_file.write_text(build_slide_svg_ir(slide_data, index, total, palette, repaired), encoding='utf-8')
+    preflight = strict_svg_preflight(svg_file)
+    return {
+        'file': str(svg_file),
+        'sha256': file_sha256(svg_file),
+        'preflight': preflight,
+    }
+
+
 def draw_wrapped(draw, xy, text, image_font, fill, width_chars):
     lines = []
     for paragraph in safe_text(text).split('\n'):
@@ -276,7 +488,7 @@ def draw_wrapped(draw, xy, text, image_font, fill, width_chars):
         y += line_height
 
 
-def render_preview(slide_data, index, total, preview_file: Path, palette, repaired: bool):
+def render_synthetic_debug_preview(slide_data, index, total, preview_file: Path, palette, repaired: bool):
     image = Image.new('RGB', CANVAS_PX, palette['bg'])
     draw = ImageDraw.Draw(image)
     accent = palette['accent']
@@ -301,18 +513,18 @@ def render_preview(slide_data, index, total, preview_file: Path, palette, repair
     image.save(preview_file)
 
 
-def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids):
+def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids):
     prs = Presentation()
     prs.slide_width = SLIDE_W
     prs.slide_height = SLIDE_H
     blank_layout = prs.slide_layouts[6]
-    preview_files = []
     manifest_slides = []
     for index, slide_data in enumerate(slides, 1):
         palette = PALETTES[(index - 1) % len(PALETTES)]
         slide = prs.slides.add_slide(blank_layout)
         repaired = safe_text(slide_data.get('slide_id')) in repaired_slide_ids
         slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
+        svg_ir = render_slide_svg_ir(slide_data, index, len(slides), svg_ir_dir, palette, repaired)
         native_shapes = []
 
         def record_shape(shape_id, kind, left, top, width, height, role, text='', font_size=0, quality_role='content'):
@@ -342,7 +554,7 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             Inches(0.55),
             Inches(13.3),
             Inches(0.92),
-            safe_text(slide_data.get('title'), f'Slide {index}'),
+            slide_title(slide_data, index),
             32,
             rgb(palette['ink']),
             bold=True,
@@ -355,7 +567,7 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             Inches(13.3),
             Inches(0.92),
             'title',
-            safe_text(slide_data.get('title'), f'Slide {index}'),
+            slide_title(slide_data, index),
             32,
         )
         add_textbox(
@@ -364,7 +576,7 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             Inches(1.62),
             Inches(13.3),
             Inches(0.72),
-            safe_text(slide_data.get('core_sentence')),
+            slide_core_sentence(slide_data),
             18,
             rgb(palette['muted']),
         )
@@ -376,7 +588,7 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             Inches(13.3),
             Inches(0.72),
             'core_sentence',
-            safe_text(slide_data.get('core_sentence')),
+            slide_core_sentence(slide_data),
             18,
         )
         top = Inches(3.05)
@@ -459,20 +671,27 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
             footer_text,
             10,
         )
-        preview_file = preview_dir / f'{index:02d}-{slide_id}.png'
-        render_preview(slide_data, index, len(slides), preview_file, palette, repaired)
-        preview_files.append(str(preview_file))
         quality = evaluate_native_slide_quality(native_shapes, len(points))
         manifest_slides.append({
             'slide_id': slide_id,
-            'title': safe_text(slide_data.get('title'), f'Slide {index}'),
+            'title': slide_title(slide_data, index),
             'layout_family': safe_text(slide_data.get('layout_family')),
             'title_font_size': 32,
             'shape_count': len(slide.shapes),
             'text_box_count': sum(1 for shape in slide.shapes if getattr(shape, 'has_text_frame', False)),
-            'preview_screenshot_file': str(preview_file),
-            'preview_screenshot_sha256': file_sha256(preview_file),
-            'preview_screenshot_dimensions': {'width': CANVAS_PX[0], 'height': CANVAS_PX[1]},
+            'redcube_svg_ir_file': svg_ir['file'],
+            'redcube_svg_ir_sha256': svg_ir['sha256'],
+            'redcube_svg_ir_preflight': svg_ir['preflight'],
+            'redcube_svg_ir': {
+                'file': svg_ir['file'],
+                'sha256': svg_ir['sha256'],
+                'preflight': svg_ir['preflight'],
+            },
+            'preview_screenshot_file': '',
+            'preview_screenshot_sha256': '',
+            'preview_screenshot_dimensions': None,
+            'render_proof_source': 'true_pptx_render',
+            'synthetic_preview': False,
             'native_shapes': native_shapes,
             'checks': quality['checks'],
             'metrics': quality['metrics'],
@@ -481,18 +700,114 @@ def build_deck(slides, output_pptx: Path, preview_dir: Path, repaired_slide_ids)
         })
     output_pptx.parent.mkdir(parents=True, exist_ok=True)
     prs.save(str(output_pptx))
-    return preview_files, manifest_slides
+    return manifest_slides
 
 
-def build_pdf(preview_files, output_pdf: Path):
-    output_pdf.parent.mkdir(parents=True, exist_ok=True)
-    images = [Image.open(file).convert('RGB') for file in preview_files]
-    try:
-        first, rest = images[0], images[1:]
-        first.save(str(output_pdf), save_all=True, append_images=rest)
-    finally:
-        for image in images:
-            image.close()
+def apple_script_text(value: Path | str) -> str:
+    return str(value).replace('\\', '\\\\').replace('"', '\\"')
+
+
+def render_powerpoint_pptx(output_pptx: Path, preview_dir: Path, output_pdf: Path | None) -> dict:
+    if not Path('/Applications/Microsoft PowerPoint.app').exists():
+        fail('true PPTX render proof requires Microsoft PowerPoint at /Applications/Microsoft PowerPoint.app')
+    preview_dir.mkdir(parents=True, exist_ok=True)
+    for stale in preview_dir.glob('*'):
+        if stale.is_file() and stale.suffix.lower() in {'.png', '.pdf'}:
+            stale.unlink()
+    pdf_target = output_pdf or (preview_dir / 'render-proof.pdf')
+    pdf_target.parent.mkdir(parents=True, exist_ok=True)
+    script = f'''
+set pptxPath to POSIX file "{apple_script_text(output_pptx)}"
+set pngDir to POSIX file "{apple_script_text(preview_dir)}"
+set pdfPath to POSIX file "{apple_script_text(pdf_target)}"
+tell application id "com.microsoft.Powerpoint"
+    launch
+    open pptxPath
+    set deckRef to active presentation
+    save deckRef in pngDir as save as PNG
+    save deckRef in pdfPath as save as PDF
+    close deckRef saving no
+end tell
+'''
+    completed = subprocess.run(
+        ['osascript', '-e', script],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        stderr = safe_text(completed.stderr) or safe_text(completed.stdout) or 'unknown osascript error'
+        fail(f'true PPTX render proof failed via PowerPoint AppleScript: {stderr}')
+    png_files = sorted(path for path in preview_dir.glob('*.png') if path.is_file())
+    if not png_files:
+        png_files = render_png_from_pdf(pdf_target, preview_dir)
+    if not png_files:
+        fail(f'true PPTX render proof produced no PNG previews in {preview_dir}')
+    if output_pdf and not output_pdf.exists() and pdf_target.exists():
+        shutil.copyfile(pdf_target, output_pdf)
+    return {
+        'source_surface_kind': 'native_pptx',
+        'renderer_kind': 'powerpoint_applescript',
+        'synthetic_preview': False,
+        'required': True,
+        'pptx_file': str(output_pptx),
+        'pdf_file': str(output_pdf or pdf_target),
+        'preview_screenshots': [str(path) for path in png_files],
+    }
+
+
+def render_png_from_pdf(pdf_file: Path, preview_dir: Path) -> list[Path]:
+    if not pdf_file.exists():
+        return []
+    pdftoppm = shutil.which('pdftoppm')
+    if pdftoppm:
+        prefix = preview_dir / 'slide'
+        completed = subprocess.run(
+            [pdftoppm, '-png', '-r', '144', str(pdf_file), str(prefix)],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode != 0:
+            stderr = safe_text(completed.stderr) or safe_text(completed.stdout)
+            fail(f'PDF-to-PNG render proof conversion failed with pdftoppm: {stderr}')
+        return sorted(path for path in preview_dir.glob('slide-*.png') if path.is_file())
+    magick = shutil.which('magick') or shutil.which('convert')
+    if magick:
+        output_pattern = str(preview_dir / 'slide-%02d.png')
+        completed = subprocess.run(
+            [magick, '-density', '144', str(pdf_file), output_pattern],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode != 0:
+            stderr = safe_text(completed.stderr) or safe_text(completed.stdout)
+            fail(f'PDF-to-PNG render proof conversion failed with ImageMagick: {stderr}')
+        return sorted(path for path in preview_dir.glob('slide-*.png') if path.is_file())
+    fail('PowerPoint PDF render succeeded, but no PDF-to-PNG converter is available for preview screenshots')
+
+
+def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
+    preview_files = [Path(path) for path in safe_list(render_proof.get('preview_screenshots'))]
+    if len(preview_files) != len(manifest_slides):
+        fail(
+            'true PPTX render proof slide count mismatch: '
+            f'{len(preview_files)} previews for {len(manifest_slides)} manifest slides'
+        )
+    attached = []
+    for slide, preview_file in zip(manifest_slides, preview_files):
+        if not preview_file.exists():
+            fail(f'true PPTX render proof screenshot missing: {preview_file}')
+        attached.append({
+            **slide,
+            'preview_screenshot_file': str(preview_file),
+            'preview_screenshot_sha256': file_sha256(preview_file),
+            'preview_screenshot_dimensions': image_dimensions(preview_file),
+            'render_proof_source': 'true_pptx_render',
+            'synthetic_preview': False,
+        })
+    return attached
 
 
 def parse_args() -> argparse.Namespace:
@@ -513,10 +828,7 @@ def main() -> None:
     payload = json.loads(Path(args.input_json).read_text(encoding='utf-8'))
     engine_contract_file = Path(args.engine_contract).resolve()
     engine_contract = load_engine_contract(engine_contract_file)
-    blueprint = payload.get('blueprint') or {}
-    slides = safe_list(blueprint.get('slides'))
-    if not slides:
-        fail('native PPT authoring requires slide_blueprint.slides')
+    slides = normalize_slide_data(payload)
     repair_feedback = safe_list(payload.get('repair_feedback'))
     repaired_slide_ids = {
         safe_text(item.get('slide_id'))
@@ -526,10 +838,12 @@ def main() -> None:
     output_pptx = Path(args.output_pptx).resolve()
     shape_manifest = Path(args.shape_manifest).resolve()
     preview_dir = Path(args.preview_dir).resolve()
-    preview_files, manifest_slides = build_deck(slides, output_pptx, preview_dir, repaired_slide_ids)
+    svg_ir_dir = preview_dir.parent / f'{preview_dir.name}-redcube-svg-ir'
+    manifest_slides = build_deck(slides, output_pptx, svg_ir_dir, repaired_slide_ids)
     output_pdf = Path(args.output_pdf).resolve() if args.output_pdf else None
-    if output_pdf:
-        build_pdf(preview_files, output_pdf)
+    render_proof = render_powerpoint_pptx(output_pptx, preview_dir, output_pdf)
+    manifest_slides = attach_rendered_previews(manifest_slides, render_proof)
+    preview_files = safe_list(render_proof.get('preview_screenshots'))
     repair_log_file = Path(args.repair_log).resolve() if args.repair_log else None
     repair_log = {
         'mode': args.mode,
@@ -546,6 +860,20 @@ def main() -> None:
         'artifact_kind': 'ppt_deck_native_shape_manifest',
         'engine_contract': engine_contract,
         'engine_contract_file': str(engine_contract_file),
+        'builder': {
+            'kind': 'redcube_drawingml_writer',
+            'implementation': 'python_pptx_native_shapes',
+            'surface': 'editable_native_pptx',
+            'screenshot_packaging': False,
+        },
+        'capability': {
+            'kind': 'RedCube DrawingML writer',
+            'editable_artifact': True,
+            'native_shapes': True,
+            'redcube_svg_ir': True,
+            'strict_svg_preflight': True,
+            'render_proof_required': True,
+        },
         'native_quality_model': 'shape_manifest_layout_metrics_v1',
         'native_quality_surface': {
             'quality_model': 'shape_manifest_layout_metrics_v1',
@@ -562,12 +890,21 @@ def main() -> None:
             ],
             'fail_closed_when_missing': True,
         },
+        'engine_capabilities': ENGINE_CAPABILITIES,
+        'render_proof': render_proof,
+        'redcube_svg_ir': {
+            'kind': 'redcube_svg_ir',
+            'version': 1,
+            'strict_preflight': True,
+            'dir': str(svg_ir_dir),
+            'files': [slide['redcube_svg_ir_file'] for slide in manifest_slides],
+        },
         'mode': args.mode,
         'editable_artifact': True,
         'pptx_file': str(output_pptx),
         'pdf_file': str(output_pdf) if output_pdf else None,
         'page_count': len(slides),
-        'screenshot_dimensions': {'width': CANVAS_PX[0], 'height': CANVAS_PX[1]},
+        'screenshot_dimensions': image_dimensions(Path(preview_files[0])) if preview_files else None,
         'preview_screenshots': preview_files,
         'slides': manifest_slides,
         'repair_log': repair_log,
@@ -576,9 +913,11 @@ def main() -> None:
     shape_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
     result = {
         'status': 'completed',
-        'builder': {'kind': 'python_pptx_native_shapes'},
+        'builder': manifest['builder'],
+        'capability': manifest['capability'],
         'engine_contract': engine_contract,
         'engine_contract_file': str(engine_contract_file),
+        'engine_capabilities': ENGINE_CAPABILITIES,
         'shape_manifest_schema_version': manifest['schema_version'],
         'mode': args.mode,
         'page_count': len(slides),
@@ -587,6 +926,8 @@ def main() -> None:
         'shape_manifest_file': str(shape_manifest),
         'native_quality_model': manifest['native_quality_model'],
         'native_quality_surface': manifest['native_quality_surface'],
+        'render_proof': render_proof,
+        'redcube_svg_ir': manifest['redcube_svg_ir'],
         'preview_screenshots': preview_files,
         'screenshot_dimensions': manifest['screenshot_dimensions'],
         'slides': manifest_slides,

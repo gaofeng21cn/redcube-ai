@@ -73,6 +73,16 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     template_substitution_allowed: false,
     preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
   });
+  const REQUIRED_ENGINE_CAPABILITIES = Object.freeze({
+    authoring_ir: 'redcube_svg_ir',
+    authoring_ir_version: 1,
+    pptx_writer: 'redcube_drawingml_writer',
+    editable_pptx: true,
+    strict_svg_preflight: true,
+    true_render_proof_required: true,
+    true_render_proof_renderer: 'powerpoint_applescript',
+    screenshot_packaging: false,
+  });
 
   function expectedNativeEngineContract(): JsonRecord {
     if (cachedNativeEngineContract) return cachedNativeEngineContract;
@@ -204,6 +214,14 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         route,
         scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
         target_slide_ids: ['S02'],
+        authoring_ir: {
+          kind: 'redcube_svg_ir',
+          version: 1,
+          required: true,
+          strict_svg_preflight_required: true,
+          allowed_svg_tags: ['svg', 'g', 'rect', 'text'],
+          unsupported_svg_tags: ['image', 'foreignObject', 'script'],
+        },
         slides: [
           {
             slide_id: 'S01',
@@ -219,6 +237,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
                 editable_text: '<text>',
               },
             ],
+            redcube_svg_ir_intent: {
+              root_viewbox: '0 0 1152 648',
+              editable_text_required: true,
+              required_intents: ['text:title', 'text:point_text', 'rect:content_panel', 'group:content_point'],
+            },
           },
         ],
       },
@@ -299,16 +322,41 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const ownedRoutes = safeArray(contract?.owned_routes).map((route) => safeText(route)).filter(Boolean);
     const expected = expectedNativeEngineContract();
     const expectedRoutes = safeArray(expected?.owned_routes).map((route) => safeText(route)).filter(Boolean);
+    const capabilities = contract?.engine_capabilities || {};
     const valid = safeText(contract?.kind) === 'redcube_native_ppt_python_engine'
       && safeText(contract?.language) === 'python'
       && Number(contract?.contract_version || 0) === 1
       && expectedRoutes.every((route) => ownedRoutes.includes(route))
       && safeText(contract?.input_boundary) === safeText(expected?.input_boundary)
-      && safeText(contract?.review_boundary) === safeText(expected?.review_boundary);
+      && safeText(contract?.review_boundary) === safeText(expected?.review_boundary)
+      && Object.entries(REQUIRED_ENGINE_CAPABILITIES).every(([key, value]) => capabilities?.[key] === value)
+      && contract?.true_render_proof?.required === true;
     if (!valid) {
       throw new Error('Native PPT route requires python engine contract v1');
     }
     return expected;
+  }
+
+  function requireTrueRenderProof(payload: JsonRecord, shapeManifest: JsonRecord): JsonRecord {
+    const proof = payload?.render_proof || shapeManifest?.render_proof || {};
+    const previewScreenshots = safeArray(proof?.preview_screenshots || payload?.preview_screenshots);
+    const valid = safeText(proof?.source_surface_kind) === 'native_pptx'
+      && safeText(proof?.renderer_kind) === 'powerpoint_applescript'
+      && proof?.synthetic_preview === false
+      && proof?.required === true
+      && previewScreenshots.length > 0
+      && previewScreenshots.every((file) => existsSync(safeText(file)));
+    if (!valid) {
+      throw new Error('Native PPT route requires true PowerPoint-rendered screenshots; synthetic or missing preview proof is blocked');
+    }
+    return {
+      ...proof,
+      source_surface_kind: 'native_pptx',
+      renderer_kind: 'powerpoint_applescript',
+      synthetic_preview: false,
+      required: true,
+      preview_screenshots: previewScreenshots.map((file) => safeText(file)).filter(Boolean),
+    };
   }
 
   function readNativeShapeManifest(file: string): JsonRecord {
@@ -354,6 +402,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     if (missing.length > 0) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
     if (!manifestSlide.preview_screenshot_sha256) return ['native_preview_screenshot_hash_missing'];
+    if (manifestSlide.synthetic_preview !== false) return ['native_true_render_proof_missing'];
+    if (safeText(manifestSlide.render_proof_source) !== 'true_pptx_render') return ['native_true_render_proof_missing'];
     return [];
   }
 
@@ -365,13 +415,22 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   function nativeMechanicalReviewPayload(nativeArtifact: JsonRecord | null) {
     const bundle = nativeArtifact?.native_ppt_bundle || {};
     const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
+    const renderProof = bundle?.render_proof || shapeManifest?.render_proof || {};
+    const missingRenderProof = safeText(renderProof?.source_surface_kind) !== 'native_pptx'
+      || safeText(renderProof?.renderer_kind) !== 'powerpoint_applescript'
+      || renderProof?.synthetic_preview !== false
+      || renderProof?.required !== true
+      || safeArray(bundle?.preview_screenshots).length === 0;
     const manifestSlidesById = new Map(
       safeArray(shapeManifest?.slides).map((slide) => [safeText(slide?.slide_id), slide]),
     );
     const slideReviews = safeArray(bundle?.slides).map((slide) => {
       const slideId = safeText(slide?.slide_id);
       const manifestSlide = manifestSlidesById.get(slideId);
-      const missingIssues = nativeQualityMissingIssues(manifestSlide);
+      const missingIssues = [
+        ...nativeQualityMissingIssues(manifestSlide),
+        ...(missingRenderProof ? ['native_true_render_proof_missing'] : []),
+      ];
       const missingQuality = missingIssues.length > 0;
       return {
         slide_id: slideId,
@@ -403,6 +462,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           native_text_box_count: Number(slide?.text_box_count || 0),
           native_quality_source: 'shape_manifest',
           native_quality_model: shapeManifest?.native_quality_model || 'shape_manifest_layout_metrics',
+          render_proof_source: missingRenderProof ? 'missing_true_pptx_render' : 'true_pptx_render',
+          synthetic_preview: renderProof?.synthetic_preview !== false,
           block_content_failures: safeArray(manifestSlide?.metrics?.block_content_failures),
         },
         issues: [
@@ -416,6 +477,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       source_surface_kind: 'native_pptx',
       source_pptx: safeText(bundle?.pptx_file),
       shape_manifest_file: safeText(bundle?.shape_manifest_file),
+      render_proof: renderProof,
       page_count: Number(bundle?.page_count || slideReviews.length),
       device_scale_factor: 1,
       screenshot_dimensions: bundle?.screenshot_dimensions || null,
@@ -424,6 +486,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         page_count: slideReviews.length,
         source_surface_kind: 'native_pptx',
         native_quality_model: shapeManifest?.native_quality_model || 'shape_manifest_layout_metrics',
+        render_proof_source: missingRenderProof ? 'missing_true_pptx_render' : 'true_pptx_render',
+        synthetic_preview: renderProof?.synthetic_preview !== false,
         average_density: slideReviews.reduce((sum, slide) => sum + Number(slide?.metrics?.occupied_ratio || 0), 0)
           / Math.max(slideReviews.length, 1),
       },
@@ -514,10 +578,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const shapeManifest = existsSync(paths.shapeManifestFile)
       ? JSON.parse(readFileSync(paths.shapeManifestFile, 'utf-8'))
       : {};
+    const renderProof = requireTrueRenderProof(payload, shapeManifest);
     writeJson(paths.shapeManifestFile, {
       ...shapeManifest,
       ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
       editable_shape_plan_file: paths.editableShapePlanFile,
+      engine_capabilities: payload.engine_capabilities || shapeManifest.engine_capabilities || REQUIRED_ENGINE_CAPABILITIES,
+      render_proof: renderProof,
     });
     const repairLog = payload.repair_log || {
       target_slide_ids: repairFeedback.map((slide) => slide.slide_id),
@@ -536,6 +603,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       native_ppt_bundle: {
         source_visual_route: route,
         builder: payload.builder || { kind: 'python_pptx_native_shapes' },
+        capability: payload.capability || null,
+        engine_capabilities: payload.engine_capabilities || shapeManifest.engine_capabilities || REQUIRED_ENGINE_CAPABILITIES,
+        render_proof: renderProof,
+        redcube_svg_ir: payload.redcube_svg_ir || shapeManifest.redcube_svg_ir || null,
         ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
         ai_first_shape_plan_contract: modelContract || AI_FIRST_EDITING_CONTRACT,
         engine_contract: engineContract,
@@ -548,8 +619,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         shape_manifest_file: safeText(payload.shape_manifest_file, paths.shapeManifestFile),
         repair_log_file: safeText(payload.repair_log_file, paths.repairLogFile),
         page_count: Number(payload.page_count || 0),
-        screenshot_dimensions: payload.screenshot_dimensions || null,
-        preview_screenshots: safeArray(payload.preview_screenshots),
+        screenshot_dimensions: payload.screenshot_dimensions || shapeManifest.screenshot_dimensions || null,
+        preview_screenshots: safeArray(renderProof.preview_screenshots),
         slides: safeArray(payload.slides),
         python_helper_invocation: python.package_module
           ? {
@@ -591,7 +662,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         safeText(payload.shape_manifest_file, paths.shapeManifestFile),
         safeText(payload.repair_log_file, paths.repairLogFile),
         NATIVE_PPT_ENGINE_CONTRACT,
-        ...safeArray(payload.preview_screenshots),
+        ...safeArray(renderProof.preview_screenshots),
       ].filter(Boolean),
       review_state_patch: {
         current_status: 'draft',

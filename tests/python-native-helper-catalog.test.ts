@@ -248,6 +248,13 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(report.bypass_policy.required_entry_surface, 'RedCube product-entry or runtime-family route');
   assert.deepEqual(nativeHelper.routes, ['author_pptx_native', 'repair_pptx_native']);
   assert.deepEqual(nativeHelper.gates, ['visual_director_review', 'screenshot_review', 'export_pptx']);
+  assert.equal(nativeHelper.capability_status, 'production_selectable_optional');
+  assert.equal(nativeHelper.default_enabled, false);
+  assert.equal(nativeHelper.engine_capabilities.authoring_ir, 'redcube_svg_ir');
+  assert.equal(nativeHelper.engine_capabilities.pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(nativeHelper.engine_capabilities.true_render_proof_required, true);
+  assert.equal(nativeHelper.true_render_proof.required, true);
+  assert.equal(nativeHelper.true_render_proof.synthetic_preview_allowed, false);
 });
 
 test('Compatibility wrapper scripts remain thin package entrypoints', () => {

@@ -36,7 +36,7 @@
       "python_owner": "native Office/PPT manipulation, screenshot/export helpers, document/PPT repair loops, and MAS/MAG shared automation ecosystem",
       "python_native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
       "legacy_javascript_policy": "repo-tracked JavaScript is retired and must remain at zero files; new creative/runtime truth belongs in TypeScript or Python-owned helper surfaces",
-      "ppt_deck_direction": "keep render_html as the default visual route today while using Python-backed native PPT authoring/repair as the explicit proof lane for future editable-PPT workflows"
+      "ppt_deck_direction": "keep render_html as the default visual route today while exposing Python-backed native PPT authoring/repair as a production-selectable optional route for editable-PPT workflows"
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
@@ -201,13 +201,21 @@
     },
     "exploration_lanes": {
       "ppt_native_authoring_proof_lane": {
-        "status": "opt_in_proof_lane",
+        "status": "production_selectable_optional",
         "contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
         "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
         "brief": "docs/program/phase-2/phase_2_ppt_native_authoring_proof_lane.md",
         "default_mainline_changed": false,
         "default_visual_route": "render_html",
+        "production_selectable": true,
+        "default_enabled": false,
+        "engine_capabilities": {
+          "authoring_ir": "redcube_svg_ir",
+          "pptx_writer": "redcube_drawingml_writer",
+          "true_render_proof_required": true,
+          "true_render_proof_renderer": "powerpoint_applescript"
+        },
         "replaces_routes": [
           "render_html",
           "fix_html"

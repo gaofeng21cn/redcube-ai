@@ -37,8 +37,9 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
       'export_pptx',
     ],
   );
-  assert.equal(pptPolicy.native_ppt_proof_lane.status, 'opt_in_proof_lane');
+  assert.equal(pptPolicy.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.equal(pptPolicy.native_ppt_proof_lane.default_enabled, false);
+  assert.equal(pptPolicy.native_ppt_proof_lane.production_selectable, true);
   assert.deepEqual(pptPolicy.native_ppt_proof_lane.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
   assert.deepEqual(pptPolicy.native_ppt_proof_lane.replaces_routes, ['render_html', 'fix_html']);
   assert.deepEqual(
@@ -61,6 +62,17 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
     passed_slides_reused: true,
     preserved_slide_policy: 'do_not_reauthor_passed_slides',
   });
+  assert.deepEqual(pptPolicy.native_ppt_proof_lane.engine_capabilities, {
+    authoring_ir: 'redcube_svg_ir',
+    pptx_writer: 'redcube_drawingml_writer',
+    editable_pptx: true,
+    strict_svg_preflight: true,
+    true_render_proof_required: true,
+    true_render_proof_renderer: 'powerpoint_applescript',
+    screenshot_packaging: false,
+  });
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.required, true);
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.synthetic_preview_allowed, false);
 });
 
 test('native helper doctor stays diagnostic-only and preserves product-entry proof lane gates', async () => {

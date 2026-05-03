@@ -147,9 +147,27 @@
         "export_pptx"
       ],
       "purpose": "Editable native PPTX authoring and screenshot-feedback repair.",
+      "capability_status": "production_selectable_optional",
+      "default_enabled": false,
+      "engine_capabilities": {
+        "authoring_ir": "redcube_svg_ir",
+        "pptx_writer": "redcube_drawingml_writer",
+        "editable_pptx": true,
+        "strict_svg_preflight": true,
+        "true_render_proof_required": true,
+        "true_render_proof_renderer": "powerpoint_applescript",
+        "screenshot_packaging": false
+      },
+      "true_render_proof": {
+        "required": true,
+        "renderer_kind": "powerpoint_applescript",
+        "synthetic_preview_allowed": false,
+        "fail_closed_when_missing": true
+      },
       "requires": [
         "Pillow",
-        "python-pptx"
+        "python-pptx",
+        "Microsoft PowerPoint"
       ],
       "outputs": [
         "native_pptx_file",

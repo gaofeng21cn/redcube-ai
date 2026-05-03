@@ -209,6 +209,8 @@ export interface PptSlideReviewMetrics {
   block_count?: number;
   overlap_pairs?: number;
   occupied_ratio?: number;
+  render_proof_source?: string;
+  synthetic_preview?: boolean;
   block_content_failures?: Array<Record<string, unknown>>;
 }
 
@@ -324,6 +326,23 @@ export interface PptNativePptEngineContract {
   owned_routes: Array<'author_pptx_native' | 'repair_pptx_native'>;
   input_boundary: 'slide_blueprint_plus_visual_direction_json';
   review_boundary: 'rendered_pptx_screenshots';
+  engine_capabilities: {
+    authoring_ir: 'redcube_svg_ir';
+    authoring_ir_version: 1;
+    pptx_writer: 'redcube_drawingml_writer';
+    editable_pptx: true;
+    strict_svg_preflight: true;
+    true_render_proof_required: true;
+    true_render_proof_renderer: 'powerpoint_applescript';
+    screenshot_packaging: false;
+  };
+  true_render_proof: {
+    required: true;
+    source_surface_kind: 'native_pptx';
+    renderer_kind: 'powerpoint_applescript';
+    synthetic_preview_allowed: false;
+    fail_closed_when_missing: true;
+  };
 }
 
 export interface PptNativePptBundleArtifact extends PptRuntimeArtifactBase {
@@ -333,6 +352,14 @@ export interface PptNativePptBundleArtifact extends PptRuntimeArtifactBase {
     source_visual_route: 'author_pptx_native';
     builder?: {
       kind?: string;
+    };
+    engine_capabilities?: PptNativePptEngineContract['engine_capabilities'];
+    render_proof?: {
+      source_surface_kind?: 'native_pptx';
+      renderer_kind?: 'powerpoint_applescript';
+      synthetic_preview?: false;
+      required?: true;
+      preview_screenshots?: string[];
     };
     engine_contract: PptNativePptEngineContract;
     engine_contract_file: string;

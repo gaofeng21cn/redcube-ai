@@ -50,7 +50,7 @@ test('ppt mainline quality closeout keeps native PPT proof lane separate from HT
   const closeout = readJson(CLOSEOUT_CONTRACT);
   const nativeProof = readJson(NATIVE_PROOF_CONTRACT);
 
-  assert.equal(nativeProof.candidate_route_model.status, 'opt_in_proof_lane');
+  assert.equal(nativeProof.candidate_route_model.status, 'production_selectable_optional');
   assert.equal(nativeProof.candidate_route_model.default_enabled, false);
   assert.equal(nativeProof.scope.default_mainline_changed, false);
   assert.equal(closeout.boundary.native_ppt_proof_lane_role, 'second_line_future_promotion_candidate');

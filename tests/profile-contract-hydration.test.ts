@@ -64,8 +64,9 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.export_bundle.bundle_id, 'lecture_student_bundle');
   assert.equal(contract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
   assert.equal(contract.prompt_pack.render_contract.default_visual_route, 'render_html');
-  assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'opt_in_proof_lane');
+  assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.default_enabled, false);
+  assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.production_selectable, true);
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.review_input_surface, 'rendered_pptx_screenshots');
   assert.deepEqual(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,

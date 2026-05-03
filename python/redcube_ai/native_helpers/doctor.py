@@ -78,6 +78,10 @@ def _helper_diagnostics(helper: dict[str, Any], scripts: dict[str, str]) -> dict
         },
         "routes": list(helper.get("routes") or []),
         "gates": list(helper.get("gates") or []),
+        "capability_status": helper.get("capability_status"),
+        "default_enabled": helper.get("default_enabled"),
+        "engine_capabilities": helper.get("engine_capabilities"),
+        "true_render_proof": helper.get("true_render_proof"),
     }
 
 

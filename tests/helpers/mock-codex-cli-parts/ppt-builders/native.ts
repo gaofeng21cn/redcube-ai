@@ -24,6 +24,13 @@ export function buildMockPptNativeShapePlan(meta) {
       route,
       scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
       target_slide_ids: [...targetSlideIds],
+      authoring_ir: {
+        kind: 'redcube_svg_ir',
+        version: 1,
+        required: true,
+        strict_svg_preflight_required: true,
+        allowed_svg_tags: ['svg', 'g', 'rect', 'text'],
+      },
       consumed_feedback_count: repairFeedback.length,
       slides: slides.map((slide, index) => ({
         slide_id: safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`),
@@ -46,6 +53,11 @@ export function buildMockPptNativeShapePlan(meta) {
             editable_text: safeArray(slide?.page_core_content).map((item) => safeText(item?.text || item)).filter(Boolean).join('\n'),
           },
         ],
+        redcube_svg_ir_intent: {
+          root_viewbox: '0 0 1152 648',
+          editable_text_required: true,
+          required_intents: ['text:title', 'text:point_text', 'rect:content_panel', 'group:content_point'],
+        },
         repair_directive: targetSlideIds.has(safeText(slide?.slide_id)) ? 'apply screenshot feedback to this editable slide only' : 'preserve passed slide',
       })),
     },
