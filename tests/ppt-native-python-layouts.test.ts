@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -12,6 +13,13 @@ function readJson(file) {
 
 function writeJson(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function resolveTestPythonCommand() {
+  const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
+  return explicitTestPython
+    ? { command: explicitTestPython, args: [] }
+    : resolveRedCubePythonCommand();
 }
 
 test('native Python layout writer extracts audience text and emits distinct layout families without true render', () => {
@@ -81,7 +89,8 @@ for slide in pptx.slides:
     ])
 print(json.dumps({'slides': manifest, 'pptx_slides': pptx_slides}, ensure_ascii=False))
 `;
-  const stdout = execFileSync('/opt/homebrew/bin/python3', ['-c', script], {
+  const python = resolveTestPythonCommand();
+  const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
     cwd: path.resolve('.'),
     env: { ...process.env, PYTHONPATH: path.resolve('python') },
     encoding: 'utf-8',
