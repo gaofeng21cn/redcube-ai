@@ -89,6 +89,13 @@ test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy
   assert.doesNotMatch(healthcheck, /test:fast|scripts\/verify\.sh fast|run-test-group\.ts fast/);
 });
 
+test('OPL module bootstrap uses reproducible npm install without mutating lockfile', () => {
+  const bootstrap = fs.readFileSync(path.join(repoRoot, 'scripts/opl-module-bootstrap.sh'), 'utf8');
+
+  assert.match(bootstrap, /npm ci/);
+  assert.doesNotMatch(bootstrap, /npm install/);
+});
+
 function makeLines(lineCount) {
   return Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n') + '\n';
 }
