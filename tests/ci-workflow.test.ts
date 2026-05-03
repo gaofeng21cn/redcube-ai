@@ -78,6 +78,29 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(pythonRequirements, /^Pillow==12\.1\.1$/m);
 });
 
+test('Sentrux advisory publishes OPL quality details without changing the default quality lane', () => {
+  const workflow = readRepoFile('.github/workflows/sentrux-advisory.yml');
+
+  assert.match(workflow, /\bsentrux gate \./);
+  assert.match(workflow, /\bsentrux check \./);
+  assert.match(workflow, /uses:\s*gaofeng21cn\/one-person-lab\/\.github\/actions\/quality-details@main\b/);
+  assert.match(
+    workflow,
+    /limit:\s*['"]20['"]/
+  );
+  assert.match(
+    workflow,
+    /json-limit:\s*['"]50['"]/
+  );
+  assert.match(workflow, /uses:\s*actions\/upload-artifact@v6\b/);
+  assert.match(workflow, /name:\s*opl-quality-details\b/);
+  assert.match(workflow, /path:\s*artifacts\/opl-quality-details\/quality-details\.json\b/);
+
+  const verify = readRepoFile('scripts/verify.sh');
+  assert.match(verify, /smoke\|fast\)\n\s+npm run test:line-budget\n\s+npm run test:fast/);
+  assert.doesNotMatch(verify, /quality details|sentrux-advisory|opl-quality-details/);
+});
+
 test('repo-local family pin wrapper is the only allowed direct upstream family helper entrypoint', () => {
   const allowedFiles = new Set(['scripts/run-test-group-lib.ts']);
   const disallowedDirectImports = [];
