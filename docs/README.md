@@ -24,6 +24,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.
 - `OPL` joins through the internal bridge surface when family-level routing is needed.
 - The implementation target is `TypeScript + Python`: TypeScript owns product/runtime contracts and service boundaries, while Python owns native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
+- `frontdesk` command keys remain agent-facing product-entry overview / intake / entry-shell contracts below the single `redcube-ai` app skill; they do not imply a mature GUI, WebUI, or end-user front office.
 
 ## Technical Working Set
 
