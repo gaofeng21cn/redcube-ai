@@ -247,7 +247,13 @@
         "python_command_requirement": "screenshot review and export helpers must execute on a Python executable with playwright installed",
         "node_test_file_concurrency": {
           "light_files": "runner_default",
-          "route_heavy_files": 1
+          "route_heavy_files": 1,
+          "route_heavy_groups": [
+            "fast",
+            "integration",
+            "e2e",
+            "full"
+          ]
         },
         "preflight_requires": [
           "codex exec",

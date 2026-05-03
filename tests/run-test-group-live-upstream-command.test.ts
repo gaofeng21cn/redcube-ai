@@ -9,6 +9,7 @@ import {
   buildNodeTestArgs,
   partitionTestFilesForExecution,
   resolveRedCubePythonCommand,
+  ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES,
   SERIALIZED_ROUTE_HEAVY_TEST_FILES,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
 } from '../scripts/run-test-group-lib.ts';
@@ -24,6 +25,14 @@ test('run-test-group keeps local codex preflight on integration/e2e/full groups'
     [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
     ['e2e', 'full', 'integration'],
   );
+});
+
+test('run-test-group serializes route-heavy fast files without enabling live Codex preflight', () => {
+  assert.deepEqual(
+    [...ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES].sort(),
+    ['e2e', 'fast', 'full', 'integration'],
+  );
+  assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
 });
 
 test('run-test-group only adds file-level serialization to explicit route-heavy batches', () => {
@@ -76,6 +85,26 @@ test('run-test-group partitions route-heavy files away from the default parallel
       serialized_files: [],
     },
   );
+
+  assert.deepEqual(
+    partitionTestFilesForExecution({
+      groupName: 'fast',
+      files: [
+        'tests/ppt-native-ppt-runtime.test.ts',
+        'tests/runtime-deliverable-route-recovery.test.ts',
+        'tests/public-docs-surface.test.ts',
+      ],
+    }),
+    {
+      parallel_files: [
+        'tests/public-docs-surface.test.ts',
+      ],
+      serialized_files: [
+        'tests/ppt-native-ppt-runtime.test.ts',
+        'tests/runtime-deliverable-route-recovery.test.ts',
+      ],
+    },
+  );
 });
 
 test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
@@ -120,6 +149,25 @@ test('serialized route-heavy verification files stay on the mock codex upstream 
   }
 });
 
+test('native PPT fast runtime tests use the mock Python helper instead of launching PowerPoint', () => {
+  const content = readFileSync('tests/ppt-native-ppt-runtime.test.ts', 'utf-8');
+  assert.match(content, /mock-redcube-python-with-playwright\.ts/);
+  assert.match(content, /REDCUBE_PYTHON_COMMAND/);
+  assert.doesNotMatch(content, /redcube_ai\.native_helpers\.ppt_deck\.native/);
+});
+
+test('fast Python helper catalog checks do not execute the real native PowerPoint helper', () => {
+  const content = readFileSync('tests/python-native-helper-catalog.test.ts', 'utf-8');
+  const catalog = JSON.parse(readFileSync('contracts/runtime-program/python-native-helper-catalog.json', 'utf-8'));
+  const nativeHelper = catalog.helpers.find((helper) => helper.helper_id === 'ppt_deck_native');
+
+  assert.match(content, /helper\.helper_id === 'ppt_deck_native'/);
+  assert.match(content, /importlib\.import_module/);
+  assert.equal(nativeHelper.package_module, 'redcube_ai.native_helpers.ppt_deck.native');
+  assert.equal(nativeHelper.default_enabled, false);
+  assert.equal(nativeHelper.capability_status, 'production_selectable_optional');
+});
+
 function readSerializedTestFileWithImportedCases(file) {
   const content = readFileSync(file, 'utf-8');
   const importedCaseFiles = [...content.matchAll(/await import\(['"](.+?)['"]\);/g)]
@@ -132,6 +180,10 @@ test('serialized verification rule is documented in current program contract', (
 
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.light_files, 'runner_default');
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_files, 1);
+  assert.deepEqual(
+    currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_groups,
+    ['fast', 'integration', 'e2e', 'full'],
+  );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /route-heavy codex\/browser verification files stay serialized/i,

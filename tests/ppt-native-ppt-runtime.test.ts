@@ -1,15 +1,22 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withEnv, withMockHermesUpstream } from './mock-codex-cli.ts';
+import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
+
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -46,9 +53,20 @@ async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-nat
   }
 }
 
+async function withMockNativePptRuntime(testFn) {
+  const restoreEnv = withEnv({
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
+  });
+  try {
+    return await withMockHermesUpstream(testFn);
+  } finally {
+    restoreEnv();
+  }
+}
+
 test('native PPT lane authors editable PPTX and still passes review/export gates', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-'));
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-');
     await runNativePlanningChain({ workspaceRoot });
 
     const authorResult = await runDeliverableRoute({
@@ -158,8 +176,8 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
 });
 
 test('native PPT screenshot review blocks from shape-manifest quality metrics instead of fixed pass values', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-quality-'));
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-quality-');
     await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-quality' });
 
     const authorResult = await runDeliverableRoute({
@@ -272,8 +290,8 @@ test('native PPT proof lane records the Python engine contract as the single own
 });
 
 test('native PPT repair consumes screenshot feedback and targets blocked slides', async () => {
-  await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-repair-'));
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-repair-');
     await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-repair' });
 
     const authorResult = await runDeliverableRoute({

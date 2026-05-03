@@ -12,6 +12,7 @@ import {
 } from 'opl-gateway-shared/family-shared-release';
 
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'e2e', 'full']);
+export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set(['fast', 'integration', 'e2e', 'full']);
 export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',
@@ -23,10 +24,12 @@ export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/ppt-creative-ownership.test.ts',
   'tests/ppt-deliverable-e2e.test.ts',
   'tests/ppt-deliverable-surface.test.ts',
+  'tests/ppt-native-ppt-runtime.test.ts',
   'tests/publication-projection-delivery-contract.test.ts',
   'tests/reference-quality-os-replacement.test.ts',
   'tests/reference-regression.test.ts',
   'tests/review-platform.test.ts',
+  'tests/runtime-deliverable-route-recovery.test.ts',
   'tests/runtime-deliverable-route.test.ts',
   'tests/workspace-operator-quickstart.test.ts',
   'tests/xiaohongshu-creative-ownership.test.ts',
@@ -286,7 +289,7 @@ export function assertCurrentRepoSharedPinAlignment(options = {}) {
 
 export function partitionTestFilesForExecution({ groupName, files = [] }) {
   const plannedFiles = [...files];
-  if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
+  if (!ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES.has(groupName)) {
     return {
       parallel_files: plannedFiles,
       serialized_files: [],

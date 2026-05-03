@@ -222,13 +222,14 @@ function buildNativePayload(args) {
     const bounds = [
       { left: 96, top: 96, width: 960, height: 88, right: 1056, bottom: 184 },
       { left: 96, top: 250, width: 960, height: 68, right: 1056, bottom: 318 },
+      { left: 96, top: 360, width: 420, height: 160, right: 516, bottom: 520 },
     ];
     return {
       slide_id: slideId,
       title: String(slide?.title || `Slide ${index + 1}`),
       layout_family: String(slide?.layout_family || 'mock_native_layout'),
       text_box_count: 2,
-      shape_count: 2,
+      shape_count: 3,
       screenshot_file: screenshotFile,
       preview_screenshot_file: screenshotFile,
       preview_screenshot_sha256: 'mock-sha256',
@@ -252,6 +253,13 @@ function buildNativePayload(args) {
           text: 'Mock native editable body',
           bounds: bounds[1],
         },
+        {
+          shape_id: `${slideId}-accent-panel`,
+          kind: 'shape',
+          role: 'visual_anchor',
+          quality_role: 'visual_structure',
+          bounds: bounds[2],
+        },
       ],
       checks: {
         overflow_free: true,
@@ -266,8 +274,8 @@ function buildNativePayload(args) {
       metrics: {
         title_font_size: 32,
         text_char_count: 72,
-        block_count: 2,
-        shape_count: 2,
+        block_count: 3,
+        shape_count: 3,
         overlap_pairs: 0,
         overlaps: [],
         clipped_nodes: 0,

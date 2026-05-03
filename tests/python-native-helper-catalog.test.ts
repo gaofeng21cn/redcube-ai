@@ -190,11 +190,24 @@ test('Python helper catalog package entrypoints match pyproject console scripts'
   }
 });
 
-test('Python helper modules are discoverable through python -m help without running gates', () => {
+test('Python helper modules are discoverable without running native PowerPoint gates in fast checks', () => {
   const catalog = readJson(CATALOG_FILE);
 
   for (const helper of catalog.helpers) {
-    const result = spawnSync('python3', ['-m', helper.package_module, '--help'], {
+    const result = helper.helper_id === 'ppt_deck_native'
+      ? spawnSync('python3', ['-c', [
+        'import importlib',
+        `module = importlib.import_module(${JSON.stringify(helper.package_module)})`,
+        "assert callable(getattr(module, 'main', None))",
+      ].join('; ')], {
+        cwd: path.resolve('.'),
+        encoding: 'utf-8',
+        env: {
+          ...process.env,
+          PYTHONPATH: path.resolve('python'),
+        },
+      })
+      : spawnSync('python3', ['-m', helper.package_module, '--help'], {
       cwd: path.resolve('.'),
       encoding: 'utf-8',
       env: {
