@@ -14,13 +14,22 @@ import {
   runDeliverableRoute,
 } from './gateway-test-api.ts';
 import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
+
+let cachedPythonCommand = null;
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 function hasPythonPptPipeline() {
-  const result = spawnSync('python3', ['-c', 'import pptx, playwright, PIL'], {
+  const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
+  cachedPythonCommand = cachedPythonCommand || (
+    explicitTestPython
+      ? { command: explicitTestPython, args: [] }
+      : resolveRedCubePythonCommand()
+  );
+  const result = spawnSync(cachedPythonCommand.command, [...(cachedPythonCommand.args || []), '-c', 'import pptx, playwright, PIL'], {
     encoding: 'utf-8',
   });
   return result.status === 0;

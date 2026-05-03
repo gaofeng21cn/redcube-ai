@@ -26,6 +26,13 @@ function writeJson(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
 }
 
+function flattenNativeVisibleText(nativeArtifact, shapeManifest) {
+  return [
+    JSON.stringify(nativeArtifact?.native_ppt_bundle?.slides || []),
+    JSON.stringify(shapeManifest?.slides || []),
+  ].join('\n');
+}
+
 function nativeEngineContract() {
   return readJson(path.resolve('contracts/runtime-program/ppt-native-python-engine-contract.json'));
 }
@@ -127,6 +134,21 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       authored.native_ppt_bundle.slides.every((slide) => slide.text_box_count >= 2 && slide.shape_count >= 2),
       true,
     );
+    const layoutFamilies = authored.native_ppt_bundle.slides.map((slide) => slide.layout_family);
+    assert.deepEqual(
+      [...new Set(layoutFamilies)],
+      ['cover_signal', 'multi_zone_compare', 'timeline_band', 'judgement_ladder', 'ring_cross', 'summary_peak'],
+    );
+    assert.equal(
+      authored.native_ppt_bundle.slides.every((slide) => slide.layout_writer === `${slide.layout_family}_native_writer`),
+      true,
+    );
+    const visibleText = flattenNativeVisibleText(authored, shapeManifest);
+    assert.doesNotMatch(visibleText, /\{\s*"?label"?\s*:/i);
+    assert.doesNotMatch(visibleText, /\{\s*'?label'?\s*:/i);
+    assert.doesNotMatch(visibleText, /\{\s*"?text"?\s*:/i);
+    assert.doesNotMatch(visibleText, /\{\s*'?text'?\s*:/i);
+    assert.doesNotMatch(visibleText, /editable_text/i);
     assert.equal(
       authored.native_ppt_bundle.preview_screenshots.every((file) => existsSync(file)),
       true,

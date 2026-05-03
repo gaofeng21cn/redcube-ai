@@ -20,6 +20,7 @@ import {
   withEnv,
   writeFileSync,
 } from './shared.ts';
+import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -50,6 +51,27 @@ const PPT_ROUTES_TO_RENDER_HTML = ['storyline', 'detailed_outline', 'slide_bluep
 const PPT_ROUTES_TO_SCREENSHOT_REVIEW = [...PPT_ROUTES_TO_RENDER_HTML, 'visual_director_review', 'screenshot_review'];
 const PPT_ROUTES_TO_EXPORT_PPTX = [...PPT_ROUTES_TO_SCREENSHOT_REVIEW, 'export_pptx'];
 const preparedPptWorkspaceCache = new Map();
+let cachedPythonCommand = null;
+
+function resolveTestPythonCommand() {
+  if (cachedPythonCommand) {
+    return cachedPythonCommand;
+  }
+  const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
+  cachedPythonCommand = explicitTestPython
+    ? { command: explicitTestPython, args: [] }
+    : resolveRedCubePythonCommand();
+  return cachedPythonCommand;
+}
+
+function runReviewScript(args) {
+  const python = resolveTestPythonCommand();
+  return spawnSync(
+    python.command,
+    [...(python.args || []), path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'), ...args],
+    { encoding: 'utf-8' },
+  );
+}
 
 async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
@@ -400,10 +422,7 @@ test('ppt review script ignores decorative foundation blocks that only serve as 
   </script>
 </body>
 </html>`, 'utf-8');
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReviewScript([
       '--html',
       htmlFile,
       '--output-dir',
@@ -416,9 +435,7 @@ test('ppt review script ignores decorative foundation blocks that only serve as 
       '1152',
       '--frame-height',
       '648',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.slide_reviews[0].checks.occlusion_free, true);
@@ -510,10 +527,7 @@ test('ppt review script ignores stack-like grouping containers without their own
   </script>
 </body>
 </html>`, 'utf-8');
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReviewScript([
       '--html',
       htmlFile,
       '--output-dir',
@@ -526,9 +540,7 @@ test('ppt review script ignores stack-like grouping containers without their own
       '1152',
       '--frame-height',
       '648',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.slide_reviews[0].checks.edge_clearance_ok, true);

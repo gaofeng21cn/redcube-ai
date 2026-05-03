@@ -6,6 +6,21 @@ import path from 'node:path';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
+import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
+
+let cachedPythonCommand = null;
+
+function resolveTestPythonCommand() {
+  if (cachedPythonCommand) {
+    return cachedPythonCommand;
+  }
+  const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
+  cachedPythonCommand = explicitTestPython
+    ? { command: explicitTestPython, args: [] }
+    : resolveRedCubePythonCommand();
+  return cachedPythonCommand;
+}
+
 function runReviewForSingleSlideBody(bodyHtml) {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-surface-'));
   const htmlFile = path.join(workspaceRoot, 'deck.html');
@@ -44,9 +59,11 @@ function runReviewForSingleSlideBody(bodyHtml) {
   </script>
 </body>
 </html>`, 'utf-8');
+  const python = resolveTestPythonCommand();
   const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
+    python.command,
     [
+      ...(python.args || []),
       path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
       '--html',
       htmlFile,

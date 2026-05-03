@@ -214,22 +214,43 @@ function buildNativePayload(args) {
         slide_id: `S${String(index + 1).padStart(2, '0')}`,
         title: `Slide ${index + 1}`,
       }));
+  const planSlidesById = new Map(
+    Array.isArray(input?.editable_shape_plan?.slides)
+      ? input.editable_shape_plan.slides.map((slide) => [String(slide?.slide_id || ''), slide])
+      : [],
+  );
+  const layoutWriterFor = (layoutFamily) => `${layoutFamily || 'multi_zone_compare'}_native_writer`;
   ensureDir(previewDir);
   const slides = blueprintSlides.map((slide, index) => {
     const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
+    const planSlide = planSlidesById.get(slideId) || {};
+    const layoutFamily = String(
+      planSlide?.layout_family
+        || slide?.visual_presentation?.layout_family
+        || slide?.layout_family
+        || 'multi_zone_compare',
+    );
     const screenshotFile = path.join(previewDir, `${slideId}.png`);
     writeBinary(screenshotFile, PNG_1X1);
     const bounds = [
-      { left: 96, top: 96, width: 960, height: 88, right: 1056, bottom: 184 },
-      { left: 96, top: 250, width: 960, height: 68, right: 1056, bottom: 318 },
-      { left: 96, top: 360, width: 420, height: 160, right: 516, bottom: 520 },
+      { left: 72, top: 64, width: 1008, height: 88, right: 1080, bottom: 152 },
+      { left: 96, top: 220, width: 420, height: 120, right: 516, bottom: 340 },
+      { left: 576, top: 220, width: 420, height: 120, right: 996, bottom: 340 },
     ];
+    const pageCoreContent = Array.isArray(planSlide?.page_core_content)
+      ? planSlide.page_core_content
+      : (Array.isArray(slide?.page_core_content) ? slide.page_core_content : []);
+    const bodyText = pageCoreContent
+      .map((item) => String(item?.text || item || '').trim())
+      .filter(Boolean)
+      .join('\n') || 'Mock native editable body';
     return {
       slide_id: slideId,
       title: String(slide?.title || `Slide ${index + 1}`),
-      layout_family: String(slide?.layout_family || 'mock_native_layout'),
-      text_box_count: 2,
-      shape_count: 3,
+      layout_family: layoutFamily,
+      layout_writer: layoutWriterFor(layoutFamily),
+      text_box_count: 3,
+      shape_count: 5,
       screenshot_file: screenshotFile,
       preview_screenshot_file: screenshotFile,
       preview_screenshot_sha256: 'mock-sha256',
@@ -250,14 +271,15 @@ function buildNativePayload(args) {
           kind: 'text_box',
           role: 'body',
           quality_role: 'content',
-          text: 'Mock native editable body',
+          text: bodyText,
           bounds: bounds[1],
         },
         {
-          shape_id: `${slideId}-accent-panel`,
-          kind: 'shape',
-          role: 'visual_anchor',
-          quality_role: 'visual_structure',
+          shape_id: `${slideId}-support`,
+          kind: 'text_box',
+          role: 'support',
+          quality_role: 'content',
+          text: `${layoutFamily} proof`,
           bounds: bounds[2],
         },
       ],
@@ -275,13 +297,13 @@ function buildNativePayload(args) {
         title_font_size: 32,
         text_char_count: 72,
         block_count: 3,
-        shape_count: 3,
+        shape_count: 5,
         overlap_pairs: 0,
         overlaps: [],
         clipped_nodes: 0,
-        occupied_ratio: 0.18,
+        occupied_ratio: 0.31,
         primary_points: 3,
-        edge_clearance: { left: 96, top: 96, right: 96, bottom: 330 },
+        edge_clearance: { left: 72, top: 64, right: 72, bottom: 300 },
         block_content_failures: [],
         bounds,
       },

@@ -6,6 +6,30 @@ import path from 'node:path';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
+import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts';
+
+let cachedPythonCommand = null;
+
+function resolveTestPythonCommand() {
+  if (cachedPythonCommand) {
+    return cachedPythonCommand;
+  }
+  const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
+  cachedPythonCommand = explicitTestPython
+    ? { command: explicitTestPython, args: [] }
+    : resolveRedCubePythonCommand();
+  return cachedPythonCommand;
+}
+
+function runReview(args) {
+  const python = resolveTestPythonCommand();
+  return spawnSync(
+    python.command,
+    [...(python.args || []), path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'), ...args],
+    { encoding: 'utf-8' },
+  );
+}
+
 export function runReviewWithOverflowingBlock() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-'));
   const htmlFile = path.join(workspaceRoot, 'deck.html');
@@ -127,10 +151,7 @@ export function runReviewWithOverflowingBlock() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -143,9 +164,7 @@ export function runReviewWithOverflowingBlock() {
       '1152',
       '--frame-height',
       '648',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -260,10 +279,7 @@ export function runReviewWithDecorativeGroundOverlap() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -276,9 +292,7 @@ export function runReviewWithDecorativeGroundOverlap() {
       '1152',
       '--frame-height',
       '648',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -362,10 +376,7 @@ export function runReviewWithInconsistentPageNumbers() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -378,9 +389,7 @@ export function runReviewWithInconsistentPageNumbers() {
       '1152',
       '--frame-height',
       '648',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -466,10 +475,7 @@ export function runReviewWithUnframedHeader() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -482,9 +488,7 @@ export function runReviewWithUnframedHeader() {
       '448',
       '--frame-height',
       '597',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -597,10 +601,7 @@ export function runReviewWithOverflowingChildGroup() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -613,9 +614,7 @@ export function runReviewWithOverflowingChildGroup() {
       '448',
       '--frame-height',
       '597',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -699,10 +698,7 @@ export function runReviewWithUntaggedTakeawayText() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -715,9 +711,7 @@ export function runReviewWithUntaggedTakeawayText() {
       '448',
       '--frame-height',
       '597',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -800,10 +794,7 @@ export function runReviewWithAdjacentReadableBlocksTooClose() {
 </body>
 </html>`, 'utf-8');
 
-  const result = spawnSync(
-    process.env.REDCUBE_TEST_PYTHON || 'python3',
-    [
-      path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'),
+  const result = runReview([
       '--html',
       htmlFile,
       '--output-dir',
@@ -816,9 +807,7 @@ export function runReviewWithAdjacentReadableBlocksTooClose() {
       '448',
       '--frame-height',
       '597',
-    ],
-    { encoding: 'utf-8' },
-  );
+    ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }

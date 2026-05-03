@@ -158,11 +158,19 @@ test('native PPT fast runtime tests use the mock Python helper instead of launch
 
 test('fast Python helper catalog checks do not execute the real native PowerPoint helper', () => {
   const content = readFileSync('tests/python-native-helper-catalog.test.ts', 'utf-8');
+  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const catalog = JSON.parse(readFileSync('contracts/runtime-program/python-native-helper-catalog.json', 'utf-8'));
   const nativeHelper = catalog.helpers.find((helper) => helper.helper_id === 'ppt_deck_native');
+  const meta = readGroupList(script, 'META');
+  const fast = readGroupList(script, 'FAST');
 
-  assert.match(content, /helper\.helper_id === 'ppt_deck_native'/);
+  assert.equal(meta.includes('tests/python-native-helper-catalog.test.ts'), true);
+  assert.equal(fast.includes('tests/python-native-helper-catalog.test.ts'), true);
+  assert.match(content, /NATIVE_PPT_HELPER_ID = 'ppt_deck_native'/);
   assert.match(content, /importlib\.import_module/);
+  assert.match(content, /runPythonImportabilityCheck\(helper\.package_module\)/);
+  assert.doesNotMatch(content, /runPython\(\['-m',\s*NATIVE_PPT_PACKAGE_MODULE,\s*'--help'\]\)/);
+  assert.doesNotMatch(content, /runPythonModule\(NATIVE_PPT_PACKAGE_MODULE/);
   assert.equal(nativeHelper.package_module, 'redcube_ai.native_helpers.ppt_deck.native');
   assert.equal(nativeHelper.default_enabled, false);
   assert.equal(nativeHelper.capability_status, 'production_selectable_optional');

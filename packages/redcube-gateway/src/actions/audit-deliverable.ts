@@ -252,7 +252,14 @@ function auditOverlaySurface({
     }
   }
 
-  const surfaceRoots = [...new Set(expectedSurfacePaths.map((relativePath) => relativePath.split('/')[0]).filter(Boolean))];
+  const surfaceRoots = [
+    ...new Set(
+      expectedSurfacePaths
+        .filter((relativePath) => relativePath.startsWith('contracts/'))
+        .map((relativePath) => relativePath.split('/')[0])
+        .filter(Boolean),
+    ),
+  ];
   for (const surfaceRoot of surfaceRoots) {
     for (const absolutePath of collectJsonSurfacePaths(path.join(deliverablePaths.deliverableDir, surfaceRoot))) {
       const relativePath = toRelativeSurfacePath(deliverablePaths.deliverableDir, absolutePath);

@@ -6,23 +6,14 @@ import math
 import shutil
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
-from xml.etree import ElementTree
-from xml.sax.saxutils import escape as xml_escape
 
-from PIL import Image, ImageDraw, ImageFont
-from pptx import Presentation
-from pptx.dml.color import RGBColor
-from pptx.enum.shapes import MSO_SHAPE
-from pptx.util import Inches, Pt
+from PIL import Image
+
+from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
 
 
 CANVAS_PX = (1152, 648)
-SLIDE_W = Inches(16)
-SLIDE_H = Inches(9)
-EMU_PER_INCH = 914400
-PX_PER_INCH = CANVAS_PX[0] / 16
 FRAME_AREA = float(CANVAS_PX[0] * CANVAS_PX[1])
 MIN_NATIVE_DENSITY = 0.18
 MAX_NATIVE_DENSITY = 0.82
@@ -38,13 +29,6 @@ ENGINE_CAPABILITIES = {
     'true_render_proof_renderer': 'powerpoint_applescript',
     'screenshot_packaging': False,
 }
-SVG_NS = 'http://www.w3.org/2000/svg'
-STRICT_SVG_ALLOWED_TAGS = {
-    f'{{{SVG_NS}}}svg',
-    f'{{{SVG_NS}}}g',
-    f'{{{SVG_NS}}}rect',
-    f'{{{SVG_NS}}}text',
-}
 DEFAULT_ENGINE_CONTRACT_FILE = (
     Path(__file__).resolve().parents[4]
     / 'contracts'
@@ -58,36 +42,8 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def safe_text(value, fallback: str = '') -> str:
-    text = str(value or '').strip()
-    return text or fallback
-
-
-def safe_list(value):
-    return value if isinstance(value, list) else []
-
-
 def clamp(value: float, lower: float, upper: float) -> float:
     return max(lower, min(upper, value))
-
-
-def emu_to_px(value) -> float:
-    return float(value) / EMU_PER_INCH * PX_PER_INCH
-
-
-def shape_rect(left, top, width, height) -> dict:
-    x = emu_to_px(left)
-    y = emu_to_px(top)
-    w = emu_to_px(width)
-    h = emu_to_px(height)
-    return {
-        'left': round(x, 2),
-        'top': round(y, 2),
-        'width': round(w, 2),
-        'height': round(h, 2),
-        'right': round(x + w, 2),
-        'bottom': round(y + h, 2),
-    }
 
 
 def rect_overlap_area(rect_a: dict, rect_b: dict) -> float:
@@ -136,6 +92,15 @@ def text_capacity_failure(shape: dict) -> dict | None:
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
     overlap_shapes = [shape for shape in content_shapes if shape.get('kind') == 'text_box']
+    title_shapes = [
+        shape for shape in native_shapes
+        if shape.get('role') == 'title' and shape.get('kind') == 'text_box' and safe_text(shape.get('text'))
+    ]
+    title_font_size = max((float(shape.get('font_size') or 0) for shape in title_shapes), default=0.0)
+    page_number_shapes = [
+        shape for shape in native_shapes
+        if shape.get('role') == 'page_number' and safe_text(shape.get('text'))
+    ]
     occupied_area = sum(float(shape['bounds']['width']) * float(shape['bounds']['height']) for shape in content_shapes)
     occupied_ratio = clamp(occupied_area / FRAME_AREA, 0.0, 1.0)
     if content_shapes:
@@ -163,6 +128,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     ]
     text_char_count = sum(len(safe_text(shape.get('text'))) for shape in content_shapes)
     clipped_nodes = len(block_content_failures)
+    title_typography_ok = bool(title_shapes) and title_font_size >= 28.0
+    page_number_consistency_ok = bool(page_number_shapes)
     checks = {
         'overflow_free': clipped_nodes == 0,
         'occlusion_free': len(overlap_pairs) == 0,
@@ -170,8 +137,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'speaker_fit_ok': text_char_count <= 950,
         'edge_clearance_ok': min(edge_clearance.values()) >= MIN_NATIVE_EDGE_CLEARANCE,
         'block_content_fit_ok': clipped_nodes == 0,
-        'title_typography_ok': True,
-        'page_number_consistency_ok': True,
+        'title_typography_ok': title_typography_ok,
+        'page_number_consistency_ok': page_number_consistency_ok,
     }
     issues = []
     if not checks['visual_density_ok']:
@@ -184,11 +151,15 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('block_content_overflow_detected')
     if not checks['speaker_fit_ok']:
         issues.append('speaker_fit_exceeded')
+    if not checks['title_typography_ok']:
+        issues.append('title_typography_missing_or_too_small')
+    if not checks['page_number_consistency_ok']:
+        issues.append('page_number_missing')
     return {
         'checks': checks,
         'issues': issues,
         'metrics': {
-            'title_font_size': 32,
+            'title_font_size': round(title_font_size, 2),
             'text_char_count': text_char_count,
             'block_count': len(content_shapes),
             'shape_count': len(native_shapes),
@@ -231,56 +202,6 @@ def load_engine_contract(contract_file: Path) -> dict:
     return contract
 
 
-def rgb(hex_value: str) -> RGBColor:
-    value = hex_value.strip().lstrip('#')
-    return RGBColor(int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
-
-
-PALETTES = [
-    {'bg': '#F7F3EA', 'ink': '#18212B', 'muted': '#59636F', 'accent': '#BA3F1D', 'panel': '#EFE6D6'},
-    {'bg': '#EEF4F1', 'ink': '#12231F', 'muted': '#52645F', 'accent': '#147C72', 'panel': '#DCEAE4'},
-    {'bg': '#F3F1F7', 'ink': '#201B2C', 'muted': '#625A6F', 'accent': '#6E4AA8', 'panel': '#E4DFF0'},
-    {'bg': '#F4F6F8', 'ink': '#152033', 'muted': '#5D6675', 'accent': '#2E6FBB', 'panel': '#E2E8F0'},
-]
-
-
-def font(size: int, bold: bool = False):
-    candidates = [
-        '/System/Library/Fonts/PingFang.ttc',
-        '/System/Library/Fonts/Supplemental/Arial Unicode.ttf',
-        '/Library/Fonts/Arial Unicode.ttf',
-    ]
-    for candidate in candidates:
-        try:
-            return ImageFont.truetype(candidate, size=size)
-        except Exception:
-            continue
-    return ImageFont.load_default()
-
-
-def add_textbox(slide, left, top, width, height, text, size, color, bold=False):
-    box = slide.shapes.add_textbox(left, top, width, height)
-    frame = box.text_frame
-    frame.clear()
-    frame.word_wrap = True
-    paragraph = frame.paragraphs[0]
-    run = paragraph.add_run()
-    run.text = text
-    run.font.size = Pt(size)
-    run.font.bold = bold
-    run.font.color.rgb = color
-    return box
-
-
-def add_panel(slide, left, top, width, height, fill, line=None):
-    shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
-    shape.fill.solid()
-    shape.fill.fore_color.rgb = fill
-    shape.line.color.rgb = line or fill
-    shape.line.width = Pt(1)
-    return shape
-
-
 def normalize_slide_data(payload: dict) -> list:
     plan = payload.get('editable_shape_plan') or {}
     plan_slides = safe_list(plan.get('slides'))
@@ -310,397 +231,6 @@ def normalize_slide_data(payload: dict) -> list:
     if not slides:
         fail('native PPT authoring requires at least one valid slide object')
     return slides
-
-
-def slide_points(slide_data):
-    plan_points = [
-        safe_text(shape.get('editable_text') or shape.get('text'))
-        for shape in safe_list(slide_data.get('_editable_native_shapes'))
-        if isinstance(shape, dict)
-        and safe_text(shape.get('role')) in {'point_text', 'bullet', 'body', 'content'}
-        and safe_text(shape.get('editable_text') or shape.get('text'))
-    ]
-    if plan_points:
-        return plan_points[:4]
-    points = [
-        safe_text(item)
-        for item in safe_list(slide_data.get('page_core_content'))
-        if safe_text(item)
-    ]
-    if points:
-        return points[:4]
-    points = [
-        safe_text(item)
-        for item in safe_list(slide_data.get('evidence_points'))
-        if safe_text(item)
-    ]
-    if points:
-        return points[:4]
-    return [safe_text(slide_data.get('core_sentence'), 'Key message')]
-
-
-def slide_title(slide_data, index: int) -> str:
-    title_shape = next(
-        (
-            shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
-            if isinstance(shape, dict)
-            and safe_text(shape.get('role')) == 'title'
-            and safe_text(shape.get('editable_text') or shape.get('text'))
-        ),
-        None,
-    )
-    if title_shape:
-        return safe_text(title_shape.get('editable_text') or title_shape.get('text'), f'Slide {index}')
-    return safe_text(slide_data.get('title'), f'Slide {index}')
-
-
-def slide_core_sentence(slide_data) -> str:
-    core_shape = next(
-        (
-            shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
-            if isinstance(shape, dict)
-            and safe_text(shape.get('role')) in {'core_sentence', 'subtitle'}
-            and safe_text(shape.get('editable_text') or shape.get('text'))
-        ),
-        None,
-    )
-    if core_shape:
-        return safe_text(core_shape.get('editable_text') or core_shape.get('text'))
-    return safe_text(slide_data.get('core_sentence'))
-
-
-def svg_rect(x, y, width, height, fill, intent, shape_id='', stroke='none', rx=0):
-    attrs = [
-        f'x="{x}"',
-        f'y="{y}"',
-        f'width="{width}"',
-        f'height="{height}"',
-        f'fill="{xml_escape(fill)}"',
-        f'stroke="{xml_escape(stroke)}"',
-        f'data-intent="{xml_escape(intent)}"',
-    ]
-    if shape_id:
-        attrs.append(f'id="{xml_escape(shape_id)}"')
-    if rx:
-        attrs.append(f'rx="{rx}"')
-    return f'    <rect {" ".join(attrs)} />'
-
-
-def svg_text(x, y, text, size, fill, intent, shape_id='', weight='400'):
-    attrs = [
-        f'x="{x}"',
-        f'y="{y}"',
-        f'font-size="{size}"',
-        f'font-family="Aptos, Arial, sans-serif"',
-        f'font-weight="{weight}"',
-        f'fill="{xml_escape(fill)}"',
-        f'data-intent="{xml_escape(intent)}"',
-    ]
-    if shape_id:
-        attrs.append(f'id="{xml_escape(shape_id)}"')
-    return f'    <text {" ".join(attrs)}>{xml_escape(safe_text(text))}</text>'
-
-
-def build_slide_svg_ir(slide_data, index: int, total: int, palette: dict, repaired: bool) -> str:
-    slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
-    lines = [
-        f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}">',
-        '  <g id="slide-root" data-intent="group:slide">',
-        svg_rect(0, 0, CANVAS_PX[0], CANVAS_PX[1], palette['bg'], 'rect:background', f'{slide_id}-background'),
-        svg_rect(0, 0, 36, CANVAS_PX[1], palette['accent'], 'rect:accent_bar', f'{slide_id}-accent-bar'),
-        svg_text(84, 88, slide_title(slide_data, index), 34, palette['ink'], 'text:title', f'{slide_id}-title', '700'),
-        svg_text(84, 176, slide_core_sentence(slide_data), 22, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'),
-    ]
-    if repaired:
-        lines.append(svg_rect(1032, 36, 52, 12, palette['accent'], 'rect:repair_marker', f'{slide_id}-repair-marker'))
-    y = 250
-    for point_index, point in enumerate(slide_points(slide_data)[:4], 1):
-        lines.extend([
-            f'    <g id="{xml_escape(f"{slide_id}-point-{point_index}")}" data-intent="group:content_point">',
-            svg_rect(96, y, 960, 68, palette['panel'], 'rect:content_panel', f'{slide_id}-point-{point_index}-panel', rx=18),
-            svg_text(124, y + 43, str(point_index), 24, palette['accent'], 'text:point_index', f'{slide_id}-point-{point_index}-index', '700'),
-            svg_text(176, y + 42, point, 19, palette['ink'], 'text:point_text', f'{slide_id}-point-{point_index}-text'),
-            '    </g>',
-        ])
-        y += 86
-    footer = f'{slide_id} / {index} of {total}'
-    lines.extend([
-        svg_text(84, 612, footer, 16, palette['muted'], 'text:page_number', f'{slide_id}-footer'),
-        '  </g>',
-        '</svg>',
-    ])
-    return '\n'.join(lines) + '\n'
-
-
-def strict_svg_preflight(svg_file: Path) -> dict:
-    try:
-        root = ElementTree.parse(svg_file).getroot()
-    except ElementTree.ParseError as exc:
-        fail(f'SVG IR preflight failed for {svg_file}: {exc}')
-    if root.tag != f'{{{SVG_NS}}}svg':
-        fail(f'SVG IR preflight failed for {svg_file}: root element must be svg')
-    if root.attrib.get('data-redcube-ir') != 'redcube_svg_ir_v1':
-        fail(f'SVG IR preflight failed for {svg_file}: missing redcube_svg_ir_v1 marker')
-    counts = {'text': 0, 'rect': 0, 'group': 0}
-    for element in root.iter():
-        if element.tag not in STRICT_SVG_ALLOWED_TAGS:
-            fail(f'SVG IR preflight failed for {svg_file}: unsupported tag {element.tag}')
-        local = element.tag.split('}', 1)[-1]
-        if local == 'image':
-            fail(f'SVG IR preflight failed for {svg_file}: raster image nodes are not allowed')
-        if local == 'text':
-            counts['text'] += 1
-        elif local == 'rect':
-            counts['rect'] += 1
-        elif local == 'g':
-            counts['group'] += 1
-    if counts['text'] < 1 or counts['rect'] < 1 or counts['group'] < 1:
-        fail(f'SVG IR preflight failed for {svg_file}: text/rect/group intent is required')
-    return {
-        'status': 'pass',
-        'strict': True,
-        'allowed_tags': ['svg', 'g', 'rect', 'text'],
-        'intent_counts': counts,
-    }
-
-
-def render_slide_svg_ir(slide_data, index: int, total: int, svg_dir: Path, palette: dict, repaired: bool) -> dict:
-    slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
-    svg_file = svg_dir / f'{index:02d}-{slide_id}.svg'
-    svg_file.parent.mkdir(parents=True, exist_ok=True)
-    svg_file.write_text(build_slide_svg_ir(slide_data, index, total, palette, repaired), encoding='utf-8')
-    preflight = strict_svg_preflight(svg_file)
-    return {
-        'file': str(svg_file),
-        'sha256': file_sha256(svg_file),
-        'preflight': preflight,
-    }
-
-
-def draw_wrapped(draw, xy, text, image_font, fill, width_chars):
-    lines = []
-    for paragraph in safe_text(text).split('\n'):
-        lines.extend(textwrap.wrap(paragraph, width=width_chars) or [''])
-    x, y = xy
-    line_height = int(image_font.size * 1.35) if hasattr(image_font, 'size') else 18
-    for line in lines[:6]:
-        draw.text((x, y), line, font=image_font, fill=fill)
-        y += line_height
-
-
-def render_synthetic_debug_preview(slide_data, index, total, preview_file: Path, palette, repaired: bool):
-    image = Image.new('RGB', CANVAS_PX, palette['bg'])
-    draw = ImageDraw.Draw(image)
-    accent = palette['accent']
-    ink = palette['ink']
-    muted = palette['muted']
-    panel = palette['panel']
-    draw.rectangle([0, 0, 36, CANVAS_PX[1]], fill=accent)
-    draw.rectangle([84, 116, 1068, 118], fill=accent)
-    if repaired:
-        draw.rectangle([1032, 36, 1084, 48], fill=accent)
-    draw_wrapped(draw, (84, 54), safe_text(slide_data.get('title'), f'Slide {index}'), font(34, True), ink, 29)
-    draw_wrapped(draw, (84, 142), safe_text(slide_data.get('core_sentence')), font(22), muted, 50)
-    y = 250
-    for point_index, point in enumerate(slide_points(slide_data)[:4], 1):
-        draw.rounded_rectangle([96, y, 1056, y + 68], radius=18, fill=panel)
-        draw.text((124, y + 18), f'{point_index}', font=font(24, True), fill=accent)
-        draw_wrapped(draw, (176, y + 16), point, font(19), ink, 58)
-        y += 86
-    footer = f'{safe_text(slide_data.get("slide_id"), f"S{index:02d}")} / {index} of {total}'
-    draw.text((84, 596), footer, font=font(16), fill=muted)
-    preview_file.parent.mkdir(parents=True, exist_ok=True)
-    image.save(preview_file)
-
-
-def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids):
-    prs = Presentation()
-    prs.slide_width = SLIDE_W
-    prs.slide_height = SLIDE_H
-    blank_layout = prs.slide_layouts[6]
-    manifest_slides = []
-    for index, slide_data in enumerate(slides, 1):
-        palette = PALETTES[(index - 1) % len(PALETTES)]
-        slide = prs.slides.add_slide(blank_layout)
-        repaired = safe_text(slide_data.get('slide_id')) in repaired_slide_ids
-        slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
-        svg_ir = render_slide_svg_ir(slide_data, index, len(slides), svg_ir_dir, palette, repaired)
-        native_shapes = []
-
-        def record_shape(shape_id, kind, left, top, width, height, role, text='', font_size=0, quality_role='content'):
-            native_shapes.append({
-                'shape_id': shape_id,
-                'kind': kind,
-                'role': role,
-                'quality_role': quality_role,
-                'bounds': shape_rect(left, top, width, height),
-                'text': safe_text(text),
-                'font_size': font_size,
-            })
-
-        bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, SLIDE_W, SLIDE_H)
-        bg.fill.solid()
-        bg.fill.fore_color.rgb = rgb(palette['bg'])
-        bg.line.color.rgb = rgb(palette['bg'])
-        record_shape(f'{slide_id}-background', 'shape', 0, 0, SLIDE_W, SLIDE_H, 'background', quality_role='decorative')
-        bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(0.5), SLIDE_H)
-        bar.fill.solid()
-        bar.fill.fore_color.rgb = rgb(palette['accent'])
-        bar.line.color.rgb = rgb(palette['accent'])
-        record_shape(f'{slide_id}-accent-bar', 'shape', 0, 0, Inches(0.5), SLIDE_H, 'accent_bar', quality_role='decorative')
-        add_textbox(
-            slide,
-            Inches(1.15),
-            Inches(0.55),
-            Inches(13.3),
-            Inches(0.92),
-            slide_title(slide_data, index),
-            32,
-            rgb(palette['ink']),
-            bold=True,
-        )
-        record_shape(
-            f'{slide_id}-title',
-            'text_box',
-            Inches(1.15),
-            Inches(0.55),
-            Inches(13.3),
-            Inches(0.92),
-            'title',
-            slide_title(slide_data, index),
-            32,
-        )
-        add_textbox(
-            slide,
-            Inches(1.15),
-            Inches(1.62),
-            Inches(13.3),
-            Inches(0.72),
-            slide_core_sentence(slide_data),
-            18,
-            rgb(palette['muted']),
-        )
-        record_shape(
-            f'{slide_id}-core-sentence',
-            'text_box',
-            Inches(1.15),
-            Inches(1.62),
-            Inches(13.3),
-            Inches(0.72),
-            'core_sentence',
-            slide_core_sentence(slide_data),
-            18,
-        )
-        top = Inches(3.05)
-        points = slide_points(slide_data)[:4]
-        for point_index, point in enumerate(points, 1):
-            panel = add_panel(slide, Inches(1.25), top, Inches(13.3), Inches(0.78), rgb(palette['panel']))
-            record_shape(
-                f'{slide_id}-point-{point_index}-panel',
-                'shape',
-                Inches(1.25),
-                top,
-                Inches(13.3),
-                Inches(0.78),
-                'content_panel',
-                quality_role='decorative',
-            )
-            add_textbox(
-                slide,
-                Inches(1.45),
-                top + Inches(0.13),
-                Inches(0.45),
-                Inches(0.34),
-                str(point_index),
-                18,
-                rgb(palette['accent']),
-                bold=True,
-            )
-            record_shape(
-                f'{slide_id}-point-{point_index}-index',
-                'text_box',
-                Inches(1.45),
-                top + Inches(0.13),
-                Inches(0.45),
-                Inches(0.34),
-                'point_index',
-                str(point_index),
-                18,
-            )
-            add_textbox(
-                slide,
-                Inches(2.1),
-                top + Inches(0.11),
-                Inches(11.8),
-                Inches(0.42),
-                point,
-                15,
-                rgb(palette['ink']),
-            )
-            record_shape(
-                f'{slide_id}-point-{point_index}-text',
-                'text_box',
-                Inches(2.1),
-                top + Inches(0.11),
-                Inches(11.8),
-                Inches(0.42),
-                'point_text',
-                point,
-                15,
-            )
-            top += Inches(0.96)
-        footer_text = f'{slide_id} / {index} of {len(slides)}'
-        add_textbox(
-            slide,
-            Inches(1.15),
-            Inches(8.25),
-            Inches(13.3),
-            Inches(0.3),
-            footer_text,
-            10,
-            rgb(palette['muted']),
-        )
-        record_shape(
-            f'{slide_id}-footer',
-            'text_box',
-            Inches(1.15),
-            Inches(8.25),
-            Inches(13.3),
-            Inches(0.3),
-            'page_number',
-            footer_text,
-            10,
-        )
-        quality = evaluate_native_slide_quality(native_shapes, len(points))
-        manifest_slides.append({
-            'slide_id': slide_id,
-            'title': slide_title(slide_data, index),
-            'layout_family': safe_text(slide_data.get('layout_family')),
-            'title_font_size': 32,
-            'shape_count': len(slide.shapes),
-            'text_box_count': sum(1 for shape in slide.shapes if getattr(shape, 'has_text_frame', False)),
-            'redcube_svg_ir_file': svg_ir['file'],
-            'redcube_svg_ir_sha256': svg_ir['sha256'],
-            'redcube_svg_ir_preflight': svg_ir['preflight'],
-            'redcube_svg_ir': {
-                'file': svg_ir['file'],
-                'sha256': svg_ir['sha256'],
-                'preflight': svg_ir['preflight'],
-            },
-            'preview_screenshot_file': '',
-            'preview_screenshot_sha256': '',
-            'preview_screenshot_dimensions': None,
-            'render_proof_source': 'true_pptx_render',
-            'synthetic_preview': False,
-            'native_shapes': native_shapes,
-            'checks': quality['checks'],
-            'metrics': quality['metrics'],
-            'issues': quality['issues'],
-            'repaired': repaired,
-        })
-    output_pptx.parent.mkdir(parents=True, exist_ok=True)
-    prs.save(str(output_pptx))
-    return manifest_slides
 
 
 def apple_script_text(value: Path | str) -> str:
@@ -839,7 +369,10 @@ def main() -> None:
     shape_manifest = Path(args.shape_manifest).resolve()
     preview_dir = Path(args.preview_dir).resolve()
     svg_ir_dir = preview_dir.parent / f'{preview_dir.name}-redcube-svg-ir'
-    manifest_slides = build_deck(slides, output_pptx, svg_ir_dir, repaired_slide_ids)
+    try:
+        manifest_slides = build_deck(slides, output_pptx, svg_ir_dir, repaired_slide_ids, evaluate_native_slide_quality)
+    except RuntimeError as exc:
+        fail(str(exc))
     output_pdf = Path(args.output_pdf).resolve() if args.output_pdf else None
     render_proof = render_powerpoint_pptx(output_pptx, preview_dir, output_pdf)
     manifest_slides = attach_rendered_previews(manifest_slides, render_proof)

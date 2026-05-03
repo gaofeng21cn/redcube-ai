@@ -8,12 +8,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { probeHermesNativeProof } from './package-surfaces.ts';
+import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
 const ENGINE_CONTRACT_FILE = 'contracts/runtime-program/ppt-native-python-engine-contract.json';
 const PROOF_LANE_FILE = 'contracts/runtime-program/ppt-native-authoring-proof-lane.json';
+const NATIVE_PPT_HELPER_ID = 'ppt_deck_native';
+const NATIVE_PPT_PACKAGE_MODULE = 'redcube_ai.native_helpers.ppt_deck.native';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+let cachedPythonCommand = null;
 
 const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-protocol/src/python-native-helper.ts',
@@ -40,33 +44,52 @@ function helperById(catalog) {
   return Object.fromEntries(catalog.helpers.map((helper) => [helper.helper_id, helper]));
 }
 
-function runPythonModule(module, args = []) {
-  return spawnSync('python3', ['-m', module, ...args], {
+function resolveTestPythonCommand() {
+  if (cachedPythonCommand) {
+    return cachedPythonCommand;
+  }
+  const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
+  cachedPythonCommand = explicitTestPython
+    ? { command: explicitTestPython, args: [] }
+    : resolveRedCubePythonCommand();
+  return cachedPythonCommand;
+}
+
+function runPython(args, options = {}) {
+  const python = resolveTestPythonCommand();
+  return spawnSync(python.command, [...(python.args || []), ...args], {
     cwd: path.resolve('.'),
     encoding: 'utf-8',
+    ...options,
     env: {
       ...process.env,
       PYTHONPATH: path.resolve('python'),
+      ...(options.env || {}),
     },
   });
 }
 
+function runPythonModule(module, args = []) {
+  return runPython(['-m', module, ...args]);
+}
+
+function runPythonImportabilityCheck(module) {
+  return runPython(['-c', [
+    'import importlib',
+    `module = importlib.import_module(${JSON.stringify(module)})`,
+    "assert callable(getattr(module, 'main', None))",
+  ].join('; ')]);
+}
+
 function readPyprojectScripts() {
-  const result = spawnSync(
-    'python3',
+  const result = runPython([
+    '-c',
     [
-      '-c',
-      [
-        'import json, tomllib',
-        "data = tomllib.loads(open('pyproject.toml', 'rb').read().decode('utf-8'))",
-        "print(json.dumps(data.get('project', {}).get('scripts', {})))",
-      ].join('; '),
-    ],
-    {
-      cwd: path.resolve('.'),
-      encoding: 'utf-8',
-    },
-  );
+      'import json, tomllib',
+      "data = tomllib.loads(open('pyproject.toml', 'rb').read().decode('utf-8'))",
+      "print(json.dumps(data.get('project', {}).get('scripts', {})))",
+    ].join('; '),
+  ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
 }
@@ -164,14 +187,7 @@ test('Python helper package modules and entrypoint callables import from the for
       "assert callable(getattr(module, 'main', None))",
     ].join('; ');
   }).join('; ');
-  const result = spawnSync('python3', ['-c', `import importlib; ${moduleChecks}`], {
-    cwd: path.resolve('.'),
-    encoding: 'utf-8',
-    env: {
-      ...process.env,
-      PYTHONPATH: path.resolve('python'),
-    },
-  });
+  const result = runPython(['-c', `import importlib; ${moduleChecks}`]);
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
@@ -190,34 +206,31 @@ test('Python helper catalog package entrypoints match pyproject console scripts'
   }
 });
 
-test('Python helper modules are discoverable without running native PowerPoint gates in fast checks', () => {
+test('Python helper modules are discoverable without running native PowerPoint gates in fast/meta checks', () => {
   const catalog = readJson(CATALOG_FILE);
 
   for (const helper of catalog.helpers) {
-    const result = helper.helper_id === 'ppt_deck_native'
-      ? spawnSync('python3', ['-c', [
-        'import importlib',
-        `module = importlib.import_module(${JSON.stringify(helper.package_module)})`,
-        "assert callable(getattr(module, 'main', None))",
-      ].join('; ')], {
-        cwd: path.resolve('.'),
-        encoding: 'utf-8',
-        env: {
-          ...process.env,
-          PYTHONPATH: path.resolve('python'),
-        },
-      })
-      : spawnSync('python3', ['-m', helper.package_module, '--help'], {
-      cwd: path.resolve('.'),
-      encoding: 'utf-8',
-      env: {
-        ...process.env,
-        PYTHONPATH: path.resolve('python'),
-      },
-    });
+    const result = helper.helper_id === NATIVE_PPT_HELPER_ID
+      ? runPythonImportabilityCheck(helper.package_module)
+      : runPython(['-m', helper.package_module, '--help']);
 
     assert.equal(result.status, 0, `${helper.helper_id}: ${result.stderr || result.stdout}`);
   }
+});
+
+test('Native PPT helper catalog check never invokes the real native PowerPoint entrypoint', () => {
+  const catalog = readJson(CATALOG_FILE);
+  const helpers = helperById(catalog);
+  const nativeHelper = helpers[NATIVE_PPT_HELPER_ID];
+  const source = readFileSync(fileURLToPath(import.meta.url), 'utf-8');
+
+  assert.equal(nativeHelper.package_module, NATIVE_PPT_PACKAGE_MODULE);
+  assert.equal(nativeHelper.default_enabled, false);
+  assert.equal(nativeHelper.capability_status, 'production_selectable_optional');
+  assert.equal(nativeHelper.package_entrypoint.module_command, `python -m ${NATIVE_PPT_PACKAGE_MODULE}`);
+  assert.doesNotMatch(source, /runPython\(\['-m',\s*NATIVE_PPT_PACKAGE_MODULE,\s*'--help'\]\)/);
+  assert.doesNotMatch(source, /runPythonModule\(NATIVE_PPT_PACKAGE_MODULE/);
+  assert.match(source, /runPythonImportabilityCheck\(helper\.package_module\)/);
 });
 
 test('Python native helper doctor runs as a package module and emits fixed JSON diagnostics', () => {
