@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import platform
+import shutil
 import sys
 import tomllib
 from pathlib import Path
@@ -16,7 +18,14 @@ OPTIONAL_IMPORT_NAMES = {
     "python-pptx": "pptx",
     "playwright": "playwright",
     "upstream-hermes-agent-local": None,
+    "Microsoft PowerPoint": None,
 }
+
+NATIVE_PPT_DOCKER_COMMAND = (
+    "docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof . "
+    "&& docker run --rm -it -v \"$PWD:/workspace\" -w /workspace redcube-native-ppt-proof "
+    "bash -lc \"npm ci && python3 -m redcube_ai.native_helpers.doctor\""
+)
 
 
 def _pyproject_metadata(pyproject_file: Path) -> dict[str, Any]:
@@ -51,6 +60,123 @@ def _dependency_summary(requirements: list[str]) -> list[dict[str, Any]]:
     return summary
 
 
+def _command_probe(name: str, *candidates: str) -> dict[str, Any]:
+    for candidate in candidates:
+        path = shutil.which(candidate)
+        if path:
+            return {
+                "name": name,
+                "available": True,
+                "command": candidate,
+                "path": path,
+                "blocked_reason": None,
+            }
+    return {
+        "name": name,
+        "available": False,
+        "command": candidates[0] if candidates else None,
+        "path": None,
+        "blocked_reason": f"missing executable: {' or '.join(candidates)}",
+    }
+
+
+def _python_dependency_probe(name: str, import_name: str) -> dict[str, Any]:
+    available = importlib.util.find_spec(import_name) is not None
+    return {
+        "name": name,
+        "available": available,
+        "import_name": import_name,
+        "blocked_reason": None if available else f"missing Python package import: {import_name}",
+    }
+
+
+def _powerpoint_probe() -> dict[str, Any]:
+    mac_app = Path("/Applications/Microsoft PowerPoint.app")
+    osa = shutil.which("osascript")
+    available = platform.system() == "Darwin" and mac_app.exists() and bool(osa)
+    blocked = []
+    if platform.system() != "Darwin":
+        blocked.append("Microsoft PowerPoint AppleScript render proof is macOS-only")
+    if not mac_app.exists():
+        blocked.append("missing /Applications/Microsoft PowerPoint.app")
+    if not osa:
+        blocked.append("missing osascript executable")
+    return {
+        "name": "powerpoint_applescript",
+        "available": available,
+        "renderer_kind": "powerpoint_applescript",
+        "app_path": str(mac_app),
+        "osascript_path": osa,
+        "blocked_reason": None if available else "; ".join(blocked),
+        "fallback_for_linux_native_proof": False,
+    }
+
+
+def _renderer_availability() -> dict[str, Any]:
+    libreoffice = _command_probe("libreoffice", "libreoffice", "soffice")
+    pdftoppm = _command_probe("pdftoppm", "pdftoppm")
+    pdfinfo = _command_probe("pdfinfo", "pdfinfo")
+    python_deps = [
+        _python_dependency_probe("Pillow", "PIL"),
+        _python_dependency_probe("python-pptx", "pptx"),
+        _python_dependency_probe("playwright", "playwright"),
+    ]
+    powerpoint = _powerpoint_probe()
+    linux_proof_checks = [
+        libreoffice,
+        pdftoppm,
+        pdfinfo,
+        *python_deps,
+    ]
+    linux_ready = all(check["available"] for check in linux_proof_checks)
+    blocked_reasons = [
+        str(check["blocked_reason"])
+        for check in linux_proof_checks
+        if not check["available"] and check.get("blocked_reason")
+    ]
+    return {
+        "surface_kind": "native_ppt_renderer_availability",
+        "executes_generation": False,
+        "executes_review_export_gates": False,
+        "linux_native_proof": {
+            "available": linux_ready,
+            "renderer_kind": "libreoffice_pdf_plus_poppler_png",
+            "blocked_reason": None if linux_ready else "; ".join(blocked_reasons),
+            "required_system_packages": [
+                "libreoffice",
+                "poppler-utils",
+                "fonts-noto-cjk",
+            ],
+            "required_python_packages": [
+                "Pillow",
+                "python-pptx",
+                "playwright",
+            ],
+        },
+        "renderers": {
+            "libreoffice": libreoffice,
+            "poppler": {
+                "available": pdftoppm["available"] and pdfinfo["available"],
+                "commands": {
+                    "pdftoppm": pdftoppm,
+                    "pdfinfo": pdfinfo,
+                },
+                "blocked_reason": None
+                if pdftoppm["available"] and pdfinfo["available"]
+                else "; ".join(
+                    str(check["blocked_reason"])
+                    for check in (pdftoppm, pdfinfo)
+                    if check.get("blocked_reason")
+                ),
+            },
+            "powerpoint_applescript": powerpoint,
+        },
+        "python_dependencies": python_deps,
+        "powerpoint_fallback_allowed": False,
+        "suggested_docker_command": NATIVE_PPT_DOCKER_COMMAND,
+    }
+
+
 def _helper_diagnostics(helper: dict[str, Any], scripts: dict[str, str]) -> dict[str, Any]:
     module = str(helper.get("package_module") or "")
     entrypoint = helper.get("package_entrypoint", {}) if isinstance(helper.get("package_entrypoint"), dict) else {}
@@ -76,6 +202,7 @@ def _helper_diagnostics(helper: dict[str, Any], scripts: dict[str, str]) -> dict
             "declared": list(helper.get("requires") or []),
             "summary": _dependency_summary(list(helper.get("requires") or [])),
         },
+        "renderer_availability": _renderer_availability() if helper.get("helper_id") == "ppt_deck_native" else None,
         "routes": list(helper.get("routes") or []),
         "gates": list(helper.get("gates") or []),
         "capability_status": helper.get("capability_status"),
@@ -101,6 +228,7 @@ def build_report(catalog_file: Path | None = None) -> dict[str, Any]:
     return {
         "surface_kind": "python_native_helper_doctor",
         "status": "ok" if all_entrypoints_registered and all_modules_found else "degraded",
+        "renderer_availability": _renderer_availability(),
         "package": {
             "name": pyproject.get("name") or package.get("name"),
             "version": pyproject.get("version"),

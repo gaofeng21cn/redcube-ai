@@ -251,6 +251,29 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
     path: CATALOG_FILE,
     contract_id: 'python-native-helper-catalog',
   });
+  assert.equal(report.renderer_availability.surface_kind, 'native_ppt_renderer_availability');
+  assert.equal(report.renderer_availability.executes_generation, false);
+  assert.equal(report.renderer_availability.executes_review_export_gates, false);
+  assert.equal(report.renderer_availability.linux_native_proof.renderer_kind, 'libreoffice_pdf_plus_poppler_png');
+  assert.deepEqual(report.renderer_availability.linux_native_proof.required_system_packages, [
+    'libreoffice',
+    'poppler-utils',
+    'fonts-noto-cjk',
+  ]);
+  assert.deepEqual(report.renderer_availability.linux_native_proof.required_python_packages, [
+    'Pillow',
+    'python-pptx',
+    'playwright',
+  ]);
+  assert.equal(report.renderer_availability.powerpoint_fallback_allowed, false);
+  assert.match(report.renderer_availability.suggested_docker_command, /docker build -f tools\/native-ppt-proof\/Dockerfile/);
+  assert.equal(typeof report.renderer_availability.linux_native_proof.available, 'boolean');
+  assert.equal(
+    report.renderer_availability.linux_native_proof.available
+      ? report.renderer_availability.linux_native_proof.blocked_reason
+      : typeof report.renderer_availability.linux_native_proof.blocked_reason,
+    report.renderer_availability.linux_native_proof.available ? null : 'string',
+  );
   assert.equal(report.helper_count, catalog.helpers.length);
   assert.deepEqual(report.bypass_policy, catalog.bypass_policy);
   assert.deepEqual(report.required_gates, ['visual_director_review', 'screenshot_review', 'export_pptx']);
@@ -260,6 +283,12 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
     assert.equal(helper.importability.module_spec_found, true, helper.helper_id);
     assert.equal(helper.entrypoint.matches_pyproject, true, helper.helper_id);
     assert.equal(Array.isArray(helper.optional_dependencies.summary), true, helper.helper_id);
+    if (helper.helper_id === 'ppt_deck_native') {
+      assert.equal(helper.renderer_availability.linux_native_proof.renderer_kind, 'libreoffice_pdf_plus_poppler_png');
+      assert.equal(helper.renderer_availability.renderers.powerpoint_applescript.fallback_for_linux_native_proof, false);
+    } else {
+      assert.equal(helper.renderer_availability, null);
+    }
   }
 });
 
@@ -281,6 +310,19 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_required, true);
   assert.equal(nativeHelper.true_render_proof.required, true);
   assert.equal(nativeHelper.true_render_proof.synthetic_preview_allowed, false);
+  assert.equal(nativeHelper.renderer_availability.executes_generation, false);
+  assert.equal(nativeHelper.renderer_availability.executes_review_export_gates, false);
+  assert.equal(nativeHelper.renderer_availability.powerpoint_fallback_allowed, false);
+});
+
+test('Fast and meta diagnostic coverage does not invoke the native PPT renderer', () => {
+  const runTestGroup = readFileSync(path.resolve('scripts/run-test-group.ts'), 'utf-8');
+  const doctor = readFileSync(path.resolve('python/redcube_ai/native_helpers/doctor.py'), 'utf-8');
+
+  assert.match(runTestGroup, /tests\/python-native-helper-catalog\.test\.ts/);
+  assert.doesNotMatch(runTestGroup, /redcube-ppt-deck-native|ppt_deck_native\.py|tools\/native-ppt-proof|libreoffice|soffice|pdftoppm/);
+  assert.doesNotMatch(doctor, /subprocess|run\(|Popen/);
+  assert.match(doctor, /shutil\.which/);
 });
 
 test('Compatibility wrapper scripts remain thin package entrypoints', () => {

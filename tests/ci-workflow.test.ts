@@ -68,7 +68,7 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?sudo apt-get update[\s\S]*?sudo apt-get install -y libreoffice poppler-utils fonts-noto-cjk[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta/);
   assert.doesNotMatch(workflow, /\n\s{2}integration:\n/);
   assert.doesNotMatch(workflow, /\n\s{2}render-e2e:\n/);
 
@@ -76,6 +76,25 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(pythonRequirements, /^playwright==1\.58\.0$/m);
   assert.match(pythonRequirements, /^python-pptx==1\.0\.2$/m);
   assert.match(pythonRequirements, /^Pillow==12\.1\.1$/m);
+});
+
+test('native PPT Linux proof environment is documented without adding a PowerPoint fallback', () => {
+  const dockerfile = readRepoFile('tools/native-ppt-proof/Dockerfile');
+  const docs = readRepoFile('docs/native-ppt-proof-environment.md');
+  const workflow = readRepoFile('.github/workflows/ci.yml');
+
+  for (const source of [dockerfile, docs, workflow]) {
+    assert.match(source, /libreoffice/);
+    assert.match(source, /poppler-utils/);
+    assert.match(source, /fonts-noto-cjk/);
+  }
+
+  assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
+  assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
+  assert.match(docs, /npm ci/);
+  assert.match(docs, /python3? -m redcube_ai\.native_helpers\.doctor/);
+  assert.doesNotMatch(dockerfile, /PowerPoint|powerpoint_applescript/);
+  assert.match(docs, /does not replace RedCube product-entry/);
 });
 
 test('Sentrux advisory publishes OPL quality details without changing the default quality lane', () => {
