@@ -9,6 +9,7 @@ import {
   readFileSync,
   readdirSync,
   writeFileSync,
+  buildManagedRepeatedReviewRerunDecision,
   createRuntimeManagedRun,
   saveManagedRun,
   startRun,
@@ -34,6 +35,35 @@ import {
   withMockHermesUpstream,
   withMockHermesNativeProof,
 } from './shared.ts';
+
+test('managed rerun guard escalates repeated identical screenshot repair requests', () => {
+  const managedRun = {
+    stage_results: [
+      {
+        stage_id: 'screenshot_review',
+        decision: 'rerun_from_review_stage',
+        review_rerun_signature: {
+          review_stage_id: 'screenshot_review',
+          rerun_from_stage: 'repair_image_pages',
+          target_slide_ids: ['S02'],
+          blocking_reasons: ['block_content_fit_ok'],
+        },
+      },
+    ],
+  };
+  const decision = buildManagedRepeatedReviewRerunDecision({
+    managedRun,
+    stageId: 'screenshot_review',
+    rerunFromStage: 'repair_image_pages',
+    targetSlideIds: ['S02'],
+    blockingReasons: ['block_content_fit_ok'],
+  });
+
+  assert.equal(decision.shouldEscalate, true);
+  assert.equal(decision.reason_code, 'repeated_review_rerun_without_progress');
+  assert.equal(decision.signature.rerun_from_stage, 'repair_image_pages');
+  assert.deepEqual(decision.signature.target_slide_ids, ['S02']);
+});
 
 test('managed execution defaults to auto_to_terminal and runs a ppt deliverable to final export with auditable prompt records', async () => {
   await withMockHermesUpstream(async () => {

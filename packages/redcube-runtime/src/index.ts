@@ -46,6 +46,7 @@ import {
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import {
+  buildManagedRepeatedReviewRerunDecision as buildManagedRepeatedReviewRerunDecisionJs,
   getManagedRun as getManagedRunJs,
   runManagedDeliverable as runManagedDeliverableJs,
   superviseManagedRun as superviseManagedRunJs,
@@ -224,6 +225,21 @@ export async function getManagedRun(
   request: RuntimeManagedRunLookupRequest,
 ): Promise<RuntimeManagedRunResponse> {
   return getManagedRunJs(request) as unknown as Promise<RuntimeManagedRunResponse>;
+}
+
+export function buildManagedRepeatedReviewRerunDecision(
+  request: {
+    managedRun: unknown;
+    stageId: unknown;
+    rerunFromStage: unknown;
+    targetSlideIds?: unknown[];
+    blockingReasons?: unknown[];
+  },
+): Record<string, unknown> {
+  const buildDecision = buildManagedRepeatedReviewRerunDecisionJs as unknown as (
+    decisionRequest: Record<string, unknown>,
+  ) => Record<string, unknown>;
+  return buildDecision(request as Record<string, unknown>);
 }
 
 export function loadRuntimeSupervisionLatest(request: {

@@ -231,10 +231,14 @@
         },
         "proof_runner": {
           "status": "landed",
-          "command": "tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof",
+          "command": "tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof --mock-image-generation",
+          "cli_command": "redcube image-ppt proof --output-dir artifacts/image-ppt-proof --mock-image-generation",
           "ci_contract": "tools/image-ppt-proof/ci-contract.json",
           "artifact_index": "artifacts/image-ppt-proof/artifact-index.json",
           "default_mode": "mock",
+          "default_fixture": "tests/fixtures/ppt-image-first-lightweight/fixture.json",
+          "max_default_slide_count": 6,
+          "full_colorectal_ai_long_deck_regression_allowed_by_default": false,
           "live_mode_requires": [
             "REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD",
             "or OPENAI_API_KEY"
@@ -250,6 +254,54 @@
           ],
           "default_quality_lane_runs_real_image_generation": false,
           "uploads_artifact_index": true
+        },
+        "visual_qa_hardening": {
+          "status": "landed",
+          "default_live_api_required": false,
+          "mechanical_checks": [
+            "16:9",
+            "non-empty PNG",
+            "duplicate hash",
+            "low information density",
+            "edge crop risk",
+            "title area crop risk",
+            "fragmentation risk",
+            "manifest presence",
+            "internal field leak risk",
+            "optional OCR manifest sidecar"
+          ],
+          "fail_closed_when_missing_png_or_manifest": true,
+          "rerun_route": "repair_image_pages"
+        },
+        "cache_resume_and_repair": {
+          "status": "landed",
+          "cache_key_inputs": [
+            "slide_blueprint_hash",
+            "visual_direction_hash",
+            "prompt_hash",
+            "style_reference_hash",
+            "model",
+            "tool_options"
+          ],
+          "default_reuses_same_key_png": true,
+          "repair_scope": "blocked_slide_ids_only",
+          "unblocked_slide_policy": "reuse_prior_png_and_record_preserved_hashes",
+          "fail_closed_when_prior_png_missing": true,
+          "token_persistence_allowed": false
+        },
+        "operator_ux": {
+          "status": "landed",
+          "manifest_frontdesk_session_surfaces": [
+            "image_first_proof_readiness",
+            "style_reference_summary",
+            "cache_status",
+            "artifact_inventory",
+            "blocked_reason"
+          ],
+          "controlled_helper_command": "redcube image-ppt proof",
+          "public_skill_policy": "do_not_register_as_second_public_skill",
+          "default_helper_mode": "mock",
+          "live_helper_mode": "explicit"
         },
         "artifact_contract": {
           "pptx_editable_shapes": false,
@@ -276,7 +328,15 @@
             "author_pptx_native",
             "repair_pptx_native"
           ]
-        }
+        },
+        "deferred": [
+          "full colorectal AI long PPT as routine regression fixture",
+          "animation",
+          "narration",
+          "template import",
+          "online image search",
+          "SVG editor"
+        ]
       },
       "ppt_native_authoring_proof_lane": {
         "status": "production_selectable_optional",

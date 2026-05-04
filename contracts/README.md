@@ -15,7 +15,7 @@
 - `runtime-program/managed-product-entry-hardening.json`：当前 product-entry session continuity 冻结件
 - `product_frontdesk` 等 product-entry command keys 只作为单一 `redcube-ai` app skill 下的 machine-readable overview / intake / entry-shell contract 保留；它们不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 - `runtime-program/rca-executor-routing-config.schema.json`：RCA executor routing 的 opt-in 配置 schema；只表达 `codex_cli` / `hermes_agent` 与 `structured_call` / `agent_loop`，不保存 provider secret
-- `runtime-program/ppt-image-first-production-route.json`：`ppt_deck` 当前默认 image-first visual route 冻结件；`author_image_pages / repair_image_pages` 通过 Responses `image_generation` 生成整页 16:9 PNG，并继续走 review/export gate
+- `runtime-program/ppt-image-first-production-route.json`：`ppt_deck` 当前默认 image-first visual route 冻结件；`author_image_pages / repair_image_pages` 通过 Responses `image_generation` 生成整页 16:9 PNG，并继续走 review/export gate；默认 lightweight proof 不调用真实 API 且不把完整“肠癌AI”长 PPT 纳入常规回归
 - `runtime-program/ppt-native-authoring-proof-lane.json`：`ppt_deck` native PPT authoring / repair 生产可选、默认关闭路线冻结件；用户明确要求可编辑 / 原生 PPTX / DrawingML 时替代当前 image-first author/repair stages
 - `runtime-program/ppt-native-python-engine-contract.json`：RedCube-owned clean-room SVG IR / DrawingML writer / true render proof engine 合同
 - Python native helper contract 必须挂在 RedCube route/selectable lane、review/export gate 与 repo-tracked contract 下；不得作为绕过 visual-domain truth 的通用 Office/PPT 脚本入口。

@@ -144,6 +144,12 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       gateway_action: 'runNativePptProductEntryProof',
       boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
     },
+    'image-ppt proof': {
+      summary: '受控执行 ppt_deck image-first lightweight proof runner；默认 mock，不调用真实图片 API，live 必须显式开启。',
+      usage: 'redcube image-ppt proof --output-dir <dir> [--mock-image-generation|--live-image-generation] [--skip-system-deps] [--style-reference-dir <dir>]',
+      gateway_action: 'repo_owned_image_ppt_proof_runner',
+      boundary_fields: ['outputDir', 'styleReferenceDir'],
+    },
   };
   const entry = (catalog as Record<string, JsonMap>)[commandKey];
   if (!entry) {
@@ -273,6 +279,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       managed: ['get', 'supervise'],
       product: ['frontdesk', 'start', 'preflight', 'invoke', 'session', 'manifest'],
       'native-ppt': ['proof'],
+      'image-ppt': ['proof'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       report: ['performance'],
@@ -309,6 +316,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       productSession: 'redcube product session --entry-session-id <id>',
       productManifest: 'redcube product manifest --workspace-root <dir>',
       nativePptProof: 'redcube native-ppt proof --workspace-root <dir> --entry-session-id <id> --topic-id <id> --deliverable-id <id> [--route <author_pptx_native|repair_pptx_native>]',
+      imagePptProof: 'redcube image-ppt proof --output-dir <dir> [--mock-image-generation|--live-image-generation] [--skip-system-deps] [--style-reference-dir <dir>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       profileList: 'redcube profile --action list',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',

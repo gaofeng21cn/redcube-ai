@@ -7,6 +7,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } fro
 import { fileURLToPath } from 'node:url';
 
 import {
+  buildManagedRepeatedReviewRerunDecision,
   createManagedRun as createRuntimeManagedRun,
   saveManagedRun,
   startRun,
@@ -96,6 +97,7 @@ export {
   readFileSync,
   readdirSync,
   writeFileSync,
+  buildManagedRepeatedReviewRerunDecision,
   createRuntimeManagedRun,
   saveManagedRun,
   startRun,

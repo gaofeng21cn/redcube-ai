@@ -726,7 +726,24 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
   assert.equal(proof.request.route, 'author_pptx_native');
 });
 
+test('CLI image-ppt proof runs repo-owned lightweight mock runner by default', async () => {
+  const outputDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-image-ppt-proof-'));
+  const proof = await executeCli([
+    'image-ppt',
+    'proof',
+    '--output-dir',
+    outputDir,
+    '--skip-system-deps',
+  ]);
 
+  assert.equal(proof.ok, true);
+  assert.equal(proof.surface_kind, 'image_ppt_product_entry_proof');
+  assert.equal(proof.command, 'redcube image-ppt proof');
+  assert.equal(proof.image_generation_mode, 'mock');
+  assert.equal(proof.live_mode_requires_explicit_flag, true);
+  assert.equal(proof.mock_mode_calls_api, false);
+  assert.match(proof.artifact_index_file, /artifact-index\.json$/);
+});
 
 test('CLI review get and mutate proxy review platform actions', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-'));

@@ -60,6 +60,59 @@ function reviewRerunStageAfterRepair(contract) {
   return safeText(reviewHardStop?.rerun_from_stage, reviewStageId) || null;
 }
 
+function normalizedSignatureList(value) {
+  return uniqueList(value).sort();
+}
+
+function buildReviewRerunSignature({
+  stageId,
+  rerunFromStage,
+  targetSlideIds = [],
+  blockingReasons = [],
+}) {
+  return {
+    review_stage_id: safeText(stageId),
+    rerun_from_stage: safeText(rerunFromStage),
+    target_slide_ids: normalizedSignatureList(targetSlideIds),
+    blocking_reasons: normalizedSignatureList(blockingReasons),
+  };
+}
+
+function stableSignatureKey(signature) {
+  return JSON.stringify({
+    review_stage_id: safeText(signature?.review_stage_id),
+    rerun_from_stage: safeText(signature?.rerun_from_stage),
+    target_slide_ids: normalizedSignatureList(signature?.target_slide_ids),
+    blocking_reasons: normalizedSignatureList(signature?.blocking_reasons),
+  });
+}
+
+export function buildManagedRepeatedReviewRerunDecision({
+  managedRun,
+  stageId,
+  rerunFromStage,
+  targetSlideIds = [],
+  blockingReasons = [],
+}) {
+  const signature = buildReviewRerunSignature({
+    stageId,
+    rerunFromStage,
+    targetSlideIds,
+    blockingReasons,
+  });
+  const key = stableSignatureKey(signature);
+  const priorCount = safeArray(managedRun?.stage_results)
+    .filter((stageResult) => safeText(stageResult?.decision) === 'rerun_from_review_stage')
+    .filter((stageResult) => stableSignatureKey(stageResult?.review_rerun_signature) === key)
+    .length;
+  return {
+    signature,
+    prior_count: priorCount,
+    shouldEscalate: priorCount >= 1,
+    reason_code: priorCount >= 1 ? 'repeated_review_rerun_without_progress' : null,
+  };
+}
+
 function buildSkippedStageResult({
   managedRun,
   stageId,
@@ -125,6 +178,28 @@ function buildStageIngestion({
       routeResult?.error?.message || routeResult?.run?.error?.message || routeResult?.error,
       'route_execution_failed',
     );
+    if (errorCode === 'repeated_block_without_input_change') {
+      return {
+        schema_version: 1,
+        managed_run_id: managedRun.managed_run_id,
+        stage_id: stageId,
+        attempt,
+        route_run_id: safeText(routeResult?.run?.run_id) || null,
+        status: 'failed',
+        summary: `${stageLabel(stageId)}重复遇到相同阻断，系统已升级到 supervisor 监管面。`,
+        artifacts: artifactRefs,
+        decision: 'escalate_runtime',
+        next_action: 'supervise_managed_run',
+        blocking_reason: blockingReason,
+        controller_decision: {
+          decision: 'escalate_runtime',
+          reason_code: 'repeated_block_without_input_change',
+          requires_human_confirmation: false,
+          requires_external_secret: false,
+        },
+        recorded_at: new Date().toISOString(),
+      };
+    }
     const reviewRerunPolicy = loadRouteReviewRerunPolicy({
       workspaceRoot,
       topicId,
@@ -132,6 +207,43 @@ function buildStageIngestion({
       stageId,
     });
     if (reviewRerunPolicy) {
+      const rerunDecision = buildManagedRepeatedReviewRerunDecision({
+        managedRun,
+        stageId,
+        rerunFromStage: reviewRerunPolicy.rerunFromStage,
+        targetSlideIds: routeResult?.run?.error?.target_slide_ids,
+        blockingReasons: routeResult?.run?.error?.blocking_reasons?.length
+          ? routeResult.run.error.blocking_reasons
+          : [blockingReason],
+      });
+      if (rerunDecision.shouldEscalate) {
+        return {
+          schema_version: 1,
+          managed_run_id: managedRun.managed_run_id,
+          stage_id: stageId,
+          attempt,
+          route_run_id: safeText(routeResult?.run?.run_id) || null,
+          status: 'failed',
+          summary: `${stageLabel(stageId)}重复要求回到${stageLabel(reviewRerunPolicy.rerunFromStage)}但阻断签名未变化，系统已升级到 supervisor 监管面。`,
+          artifacts: artifactRefs,
+          decision: 'escalate_runtime',
+          next_action: 'supervise_managed_run',
+          blocking_reason: blockingReason,
+          review_rerun_signature: rerunDecision.signature,
+          repeated_review_rerun: {
+            schema_version: 1,
+            prior_count: rerunDecision.prior_count,
+            reason_code: rerunDecision.reason_code,
+          },
+          controller_decision: {
+            decision: 'escalate_runtime',
+            reason_code: rerunDecision.reason_code,
+            requires_human_confirmation: false,
+            requires_external_secret: false,
+          },
+          recorded_at: new Date().toISOString(),
+        };
+      }
       return {
         schema_version: 1,
         managed_run_id: managedRun.managed_run_id,
@@ -144,6 +256,7 @@ function buildStageIngestion({
         decision: 'rerun_from_review_stage',
         next_action: `run_${reviewRerunPolicy.rerunFromStage}`,
         blocking_reason: blockingReason,
+        review_rerun_signature: rerunDecision.signature,
         controller_decision: {
           decision: 'rerun_from_review_stage',
           reason_code: 'review_rerun_required',

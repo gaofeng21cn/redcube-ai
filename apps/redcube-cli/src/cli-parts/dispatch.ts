@@ -1,3 +1,5 @@
+import { spawnSync } from 'node:child_process';
+import path from 'node:path';
 import {
   auditDeliverable,
   applyReviewMutation,
@@ -85,6 +87,46 @@ export function getCliGatewayActions(overrides: Record<string, unknown> = {}): t
 function shouldPrintSummary(argv: string[]): boolean {
   const options = parseArgs(argv);
   return options.jsonSummary === true || options.quiet === true;
+}
+
+function repoRootFromCwd(cwd: () => string): string {
+  return path.resolve(cwd());
+}
+
+function runRepoOwnedImagePptProof(options: JsonMap, cwd: () => string): JsonMap {
+  const repoRoot = repoRootFromCwd(cwd);
+  const outputDir = String(options.outputDir || 'artifacts/image-ppt-proof');
+  const args = [
+    'tools/image-ppt-proof/run.sh',
+    '--output-dir',
+    outputDir,
+    options.liveImageGeneration === true ? '--live-image-generation' : '--mock-image-generation',
+  ];
+  if (options.skipSystemDeps === true) args.push('--skip-system-deps');
+  if (options.fixture) args.push('--fixture', String(options.fixture));
+  if (options.styleReferenceDir) args.push('--style-reference-dir', String(options.styleReferenceDir));
+  const result = spawnSync(args[0], args.slice(1), {
+    cwd: repoRoot,
+    encoding: 'utf-8',
+    env: process.env,
+  });
+  if (result.status !== 0) {
+    throw new Error(`redcube image-ppt proof failed: ${result.stderr || result.stdout}`);
+  }
+  const artifactIndexFile = path.resolve(repoRoot, outputDir, 'artifact-index.json');
+  return {
+    ok: true,
+    surface_kind: 'image_ppt_product_entry_proof',
+    command: 'redcube image-ppt proof',
+    repo_owned_runner: true,
+    public_skill_policy: 'do_not_register_as_second_public_skill',
+    image_generation_mode: options.liveImageGeneration === true ? 'live' : 'mock',
+    live_mode_requires_explicit_flag: true,
+    mock_mode_calls_api: false,
+    output_dir: path.resolve(repoRoot, outputDir),
+    artifact_index_file: artifactIndexFile,
+    runner_stdout: result.stdout,
+  };
 }
 
 export async function executeCli(argv: string[], deps: CliDependenciesMap = {}): Promise<JsonMap> {
@@ -375,6 +417,14 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     throw new Error('native-ppt 命令仅支持 proof');
+  }
+
+  if (command === 'image-ppt') {
+    if (subcommand === 'proof') {
+      return runRepoOwnedImagePptProof(options, cwd);
+    }
+
+    throw new Error('image-ppt 命令仅支持 proof');
   }
 
   if (command === 'review') {

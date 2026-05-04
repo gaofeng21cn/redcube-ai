@@ -92,6 +92,10 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     const seedHash = createHash('sha256').update(seed).digest();
     const background = [248, 246, 238];
     const accent = [seedHash[0], seedHash[1], seedHash[2]].map((value) => 80 + (value % 120));
+    const contentLeft = Math.floor(width * 0.09);
+    const contentRight = Math.floor(width * 0.91);
+    const contentTop = Math.floor(height * 0.14);
+    const contentBottom = Math.floor(height * 0.84);
     const bytesPerPixel = 4;
     const scanlineLength = 1 + (width * bytesPerPixel);
     const raw = Buffer.alloc(scanlineLength * height);
@@ -100,9 +104,10 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       raw[rowOffset] = 0;
       for (let x = 0; x < width; x += 1) {
         const offset = rowOffset + 1 + (x * bytesPerPixel);
-        const band = ((x + Math.floor(y * 1.7)) % 181) < 5;
-        const marker = x > width * 0.08 && x < width * 0.92 && y > height * 0.18 && y < height * 0.82
-          && (((Math.floor(x / 46) + Math.floor(y / 38)) % 11) === 0);
+        const inSafeContent = x >= contentLeft && x <= contentRight && y >= contentTop && y <= contentBottom;
+        const band = inSafeContent && (((x - contentLeft) + Math.floor((y - contentTop) * 0.8)) % 128) < 6;
+        const marker = inSafeContent
+          && (((Math.floor((x - contentLeft) / 52) + Math.floor((y - contentTop) / 44)) % 10) === 0);
         raw[offset] = band || marker ? accent[0] : background[0];
         raw[offset + 1] = band || marker ? accent[1] : background[1];
         raw[offset + 2] = band || marker ? accent[2] : background[2];

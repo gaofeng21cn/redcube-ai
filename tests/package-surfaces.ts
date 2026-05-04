@@ -25,6 +25,7 @@ export {
   applyReviewMutation,
   appendEvent,
   buildCreativeOwnershipResidueAudit,
+  buildManagedRepeatedReviewRerunDecision,
   buildPerformanceReport,
   buildReferenceQualityReport,
   buildReferencePromotionReport,

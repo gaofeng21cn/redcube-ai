@@ -51,8 +51,11 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx`
 
 - `author_image_pages` 是默认视觉实现路线，通过 Responses `image_generation` 生成完整 16:9 PPT 页面 PNG；HTML routes 与 native editable PPTX routes 只能作为显式选择路线，不能替代默认 `author_image_pages -> screenshot_review -> export_pptx`。
-- 截图质控未通过时，必须从明确 stage rerun 或 `repair_image_pages` 回修，不能跳过 review gate 直接交付。
+- `author_image_pages` 可复用同 key 的 image artifact cache；真实 image generation 只在 cache miss、显式重绘或 blocked-slide repair target 时发生，artifact 不记录 token。
+- `screenshot_review` 必须消费 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR sidecar 检查；缺关键 artifact 或 hard-block 视觉 QA 时 fail-closed。
+- 截图质控未通过时，必须从明确 stage rerun 或 `repair_image_pages` 回修；`repair_image_pages` 只重绘 blocked slide ids，未阻断页复用并记录 preserved hashes，不能跳过 review gate 直接交付。
 - 用户明确要求 HTML / CSS / 网页时走 `render_html / fix_html`；用户明确要求可编辑 / 原生 PPTX / DrawingML 时走 `author_pptx_native / repair_pptx_native`。
+- `redcube image-ppt proof` 是 repo-owned lightweight proof helper，默认 mock、不调用真实图片 API、不注册第二公开 skill；live image generation 必须显式开启，常规回归不得使用完整“肠癌AI”长 PPT。
 
 ## PPT 长任务入口规则
 

@@ -90,6 +90,10 @@ test('product-entry manifest exposes image-first default and explicit native PPT
   assert.equal(manifest.native_ppt_operator_ux.status, 'blocked');
   assert.equal(manifest.native_ppt_operator_ux.route_selection.default_visual_route, 'author_image_pages');
   assert.equal(manifest.native_ppt_operator_ux.route_selection.default_visual_policy, 'image_first');
+  assert.equal(
+    manifest.native_ppt_operator_ux.route_selection.operator_copy,
+    'Default route is image-first page authoring; HTML and native editable PPTX routes require explicit operator selection.',
+  );
   assert.deepEqual(manifest.native_ppt_operator_ux.route_selection.image_routes, ['author_image_pages', 'repair_image_pages']);
   assert.deepEqual(manifest.native_ppt_operator_ux.route_selection.html_routes, ['render_html', 'fix_html']);
   assert.equal(manifest.native_ppt_operator_ux.route_selection.style_reference_dir_input, 'delivery_request.style_reference_dir');
@@ -118,13 +122,34 @@ test('product-entry manifest exposes image-first default and explicit native PPT
   assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.surface_kind, 'image_provider_diagnostics');
   assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.default_route, 'author_image_pages');
   assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(manifest.native_ppt_operator_ux.image_first_proof_readiness.status, 'blocked');
+  assert.equal(manifest.native_ppt_operator_ux.image_first_proof_readiness.mock_mode_calls_api, false);
+  assert.equal(
+    manifest.native_ppt_operator_ux.image_first_proof_readiness.blocked_reason,
+    'product_entry_preflight_blocked',
+  );
+  assert.equal(manifest.native_ppt_operator_ux.style_reference_summary.status, 'optional_not_provided');
+  assert.equal(manifest.native_ppt_operator_ux.cache_status.status, 'runtime_cache_not_inspected');
+  assert.equal(manifest.native_ppt_operator_ux.artifact_inventory.status, 'session_artifacts_not_inspected');
   assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.helper_command, 'redcube image-ppt proof');
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.downstream_gateway_action, 'repo_owned_image_ppt_proof_runner');
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.delegates_to, 'tools/image-ppt-proof/run.sh');
+  assert.doesNotMatch(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--workspace-root/);
+  assert.match(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--mock-image-generation/);
+  assert.doesNotMatch(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--live-image-generation/);
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.live_mode_requires_explicit_flag, true);
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.default_mock_calls_api, false);
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.smoke_mode, 'lightweight_real_style_mock');
   assert.deepEqual(manifest.native_ppt_operator_ux.image_proof_runner.allowed_routes, ['author_image_pages', 'repair_image_pages']);
   assert.equal(manifest.product_entry_shell.native_ppt_proof.command, 'redcube native-ppt proof');
   assert.equal(manifest.product_entry_shell.image_ppt_proof.command, 'redcube image-ppt proof');
+  assert.equal(manifest.product_entry_shell.image_ppt_proof.image_first_proof_readiness.status, 'blocked');
+  assert.equal(manifest.product_entry_shell.image_ppt_proof.cache_status.status, 'runtime_cache_not_inspected');
+  assert.equal(manifest.product_entry_shell.image_ppt_proof.artifact_inventory.status, 'session_artifacts_not_inspected');
   assert.equal(manifest.operator_loop_actions.run_native_ppt_proof.surface_kind, 'native_ppt_product_entry_proof');
   assert.equal(manifest.operator_loop_actions.run_image_ppt_proof.surface_kind, 'image_ppt_product_entry_proof');
   assert.equal(manifest.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
+  assert.equal(manifest.ppt_deck_visual_route_truth.image_first_proof_readiness.status, 'blocked');
   assert.equal(manifest.ppt_deck_visual_route_truth.image_provider_diagnostics.surface_kind, 'image_provider_diagnostics');
   assert.equal(manifest.skill_catalog.skills.length, 1);
   assert.equal(manifest.skill_catalog.supported_commands.includes('redcube image-ppt proof'), true);
