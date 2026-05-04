@@ -1,5 +1,5 @@
 import {
-  buildFamilyProductFrontdeskFromManifest,
+  buildFamilyProductFrontdoorFromManifest,
 } from 'opl-gateway-shared/product-entry-companions';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
@@ -28,7 +28,7 @@ type ProductFrontdeskSurface = ProductFrontdeskResponse & {
 
 export async function getProductFrontdesk(request: Record<string, unknown>): Promise<ProductFrontdeskSurface> {
   const manifest = await getProductEntryManifest(request) as unknown as GatewayProductEntryManifest;
-  const buildFrontdesk = buildFamilyProductFrontdeskFromManifest as (input: unknown) => unknown;
+  const buildFrontdesk = buildFamilyProductFrontdoorFromManifest as (input: unknown) => unknown;
   const frontdeskSurface = buildFrontdesk({
     recommended_action: 'inspect_or_start_product_entry',
     product_entry_manifest: manifest,
@@ -50,6 +50,8 @@ export async function getProductFrontdesk(request: Record<string, unknown>): Pro
 
   return {
     ...frontdeskSurface,
+    surface_kind: 'product_frontdesk',
+    frontdesk_surface: manifest.frontdesk_surface,
     deliverable_facade: manifest.deliverable_facade,
     native_ppt_operator_ux: manifest.native_ppt_operator_ux,
     ppt_deck_visual_route_truth: manifest.ppt_deck_visual_route_truth,

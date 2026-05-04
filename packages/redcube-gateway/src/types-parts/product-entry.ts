@@ -3,7 +3,7 @@ import type {
   GatewayInteractionContractSurface,
 } from 'opl-gateway-shared/family-entry-contracts';
 import type {
-  FamilyFrontdeskEntrySurfaces,
+  FamilyFrontdoorEntrySurfaces,
   FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
   FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
   FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
@@ -648,7 +648,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
   family_orchestration: ProductEntryManifestResponse['family_orchestration'];
   product_entry_manifest: ProductEntryManifestResponse;
-  entry_surfaces: FamilyFrontdeskEntrySurfaces & {
+  entry_surfaces: FamilyFrontdoorEntrySurfaces & {
     direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
     opl_bridge: ProductEntryManifestResponse['product_entry_shell']['opl_bridge'];
     session: ProductEntryManifestResponse['product_entry_shell']['session'];

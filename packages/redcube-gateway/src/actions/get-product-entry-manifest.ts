@@ -153,9 +153,10 @@ export async function getProductEntryManifest(request) {
     resume_contract: familyOrchestration.resume_contract,
     human_gate_ids: humanGateIds,
   });
-  const productEntryOverview = buildProductEntryOverview({
+  const productEntryOverview = {
+    ...buildProductEntryOverview({
     summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`frontdesk` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
-    frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
+    frontdoor_command: PRODUCT_FRONTDESK_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
     progress_surface: {
@@ -174,7 +175,9 @@ export async function getProductEntryManifest(request) {
     ],
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,
-  });
+    }),
+    frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
+  };
   const productEntryStart = buildProductEntryStart({
     summary: (
       '先读取 RedCube product-entry overview（`frontdesk` 兼容命令）；direct session 默认自动推进到终态，'
@@ -652,7 +655,7 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: PRODUCT_INVOKE_COMMAND,
-    frontdesk_surface: frontdeskSurface,
+    frontdoor_surface: frontdeskSurface,
     operator_loop_surface: operatorLoopSurface,
     operator_loop_actions: operatorLoopActions,
     repo_mainline: {
@@ -720,9 +723,14 @@ export async function getProductEntryManifest(request) {
       productEntrySessionCommand,
     }),
 	  });
-  return {
-    ...manifest,
-    native_ppt_operator_ux: nativePptOperatorUx,
+	  return {
+	    ...manifest,
+    frontdesk_surface: frontdeskSurface,
+    product_entry_overview: {
+      ...manifest.product_entry_overview,
+      frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
+    },
+	    native_ppt_operator_ux: nativePptOperatorUx,
     ppt_deck_visual_route_truth: {
       surface_kind: 'ppt_deck_visual_route_truth',
       default_visual_route: pptRoutePolicy.default_visual_route,

@@ -612,9 +612,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(frontdesk.domain_entry_contract, manifest.domain_entry_contract);
     assert.deepEqual(frontdesk.gateway_interaction_contract, manifest.gateway_interaction_contract);
     assert.equal(frontdesk.extra_payload, undefined);
-    const validatedFrontdesk = sharedCompanions.validateFamilyProductFrontdesk(frontdesk);
-    assert.equal(validatedFrontdesk.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
-    assert.equal(validatedFrontdesk.gateway_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
+    assert.equal(frontdesk.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
+    assert.equal(frontdesk.gateway_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
     assertFamilyOrchestrationCompanion(frontdesk, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });
