@@ -214,7 +214,8 @@
           "authoring_ir": "redcube_svg_ir",
           "pptx_writer": "redcube_drawingml_writer",
           "true_render_proof_required": true,
-          "true_render_proof_renderer": "powerpoint_applescript"
+          "true_render_proof_renderer": "libreoffice_headless",
+          "cross_platform_render_required": true
         },
         "replaces_routes": [
           "render_html",

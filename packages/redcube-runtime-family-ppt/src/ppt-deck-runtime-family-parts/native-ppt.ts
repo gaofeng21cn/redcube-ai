@@ -80,7 +80,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     editable_pptx: true,
     strict_svg_preflight: true,
     true_render_proof_required: true,
-    true_render_proof_renderer: 'powerpoint_applescript',
+    true_render_proof_renderer: 'libreoffice_headless',
+    cross_platform_render_required: true,
     screenshot_packaging: false,
   });
 
@@ -330,7 +331,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       && safeText(contract?.input_boundary) === safeText(expected?.input_boundary)
       && safeText(contract?.review_boundary) === safeText(expected?.review_boundary)
       && Object.entries(REQUIRED_ENGINE_CAPABILITIES).every(([key, value]) => capabilities?.[key] === value)
-      && contract?.true_render_proof?.required === true;
+      && contract?.true_render_proof?.required === true
+      && contract?.true_render_proof?.renderer_kind === safeText(expected?.true_render_proof?.renderer_kind)
+      && contract?.true_render_proof?.runtime === safeText(expected?.true_render_proof?.runtime)
+      && contract?.true_render_proof?.cross_platform_render_required === true;
     if (!valid) {
       throw new Error('Native PPT route requires python engine contract v1');
     }
@@ -338,21 +342,26 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   }
 
   function requireTrueRenderProof(payload: JsonRecord, shapeManifest: JsonRecord): JsonRecord {
+    const expected = expectedNativeEngineContract()?.true_render_proof || {};
     const proof = payload?.render_proof || shapeManifest?.render_proof || {};
     const previewScreenshots = safeArray(proof?.preview_screenshots || payload?.preview_screenshots);
     const valid = safeText(proof?.source_surface_kind) === 'native_pptx'
-      && safeText(proof?.renderer_kind) === 'powerpoint_applescript'
+      && safeText(proof?.renderer_kind) === safeText(expected?.renderer_kind)
+      && safeText(proof?.runtime) === safeText(expected?.runtime)
+      && proof?.cross_platform_render_required === true
       && proof?.synthetic_preview === false
       && proof?.required === true
       && previewScreenshots.length > 0
       && previewScreenshots.every((file) => existsSync(safeText(file)));
     if (!valid) {
-      throw new Error('Native PPT route requires true PowerPoint-rendered screenshots; synthetic or missing preview proof is blocked');
+      throw new Error('Native PPT route requires LibreOffice headless true-render proof; stale PowerPoint, synthetic, or missing preview proof is blocked');
     }
     return {
       ...proof,
       source_surface_kind: 'native_pptx',
-      renderer_kind: 'powerpoint_applescript',
+      renderer_kind: safeText(expected?.renderer_kind),
+      runtime: safeText(expected?.runtime),
+      cross_platform_render_required: true,
       synthetic_preview: false,
       required: true,
       preview_screenshots: previewScreenshots.map((file) => safeText(file)).filter(Boolean),
@@ -388,7 +397,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     return Number.isFinite(number) ? number : null;
   }
 
-  function nativeQualityMissingIssues(manifestSlide: JsonRecord | undefined): string[] {
+  function nativeQualityMissingIssues(manifestSlide: JsonRecord | undefined, expectedProof: JsonRecord): string[] {
     if (!manifestSlide) return ['native_quality_metrics_missing'];
     const metrics = manifestSlide.metrics || {};
     const missing = [
@@ -403,7 +412,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
     if (!manifestSlide.preview_screenshot_sha256) return ['native_preview_screenshot_hash_missing'];
     if (manifestSlide.synthetic_preview !== false) return ['native_true_render_proof_missing'];
-    if (safeText(manifestSlide.render_proof_source) !== 'true_pptx_render') return ['native_true_render_proof_missing'];
+    if (safeText(manifestSlide.render_proof_source) !== safeText(expectedProof?.renderer_kind)) return ['native_true_render_proof_missing'];
     return [];
   }
 
@@ -415,9 +424,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   function nativeMechanicalReviewPayload(nativeArtifact: JsonRecord | null) {
     const bundle = nativeArtifact?.native_ppt_bundle || {};
     const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
+    const expectedProof = expectedNativeEngineContract()?.true_render_proof || {};
     const renderProof = bundle?.render_proof || shapeManifest?.render_proof || {};
     const missingRenderProof = safeText(renderProof?.source_surface_kind) !== 'native_pptx'
-      || safeText(renderProof?.renderer_kind) !== 'powerpoint_applescript'
+      || safeText(renderProof?.renderer_kind) !== safeText(expectedProof?.renderer_kind)
+      || safeText(renderProof?.runtime) !== safeText(expectedProof?.runtime)
+      || renderProof?.cross_platform_render_required !== true
       || renderProof?.synthetic_preview !== false
       || renderProof?.required !== true
       || safeArray(bundle?.preview_screenshots).length === 0;
@@ -428,7 +440,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       const slideId = safeText(slide?.slide_id);
       const manifestSlide = manifestSlidesById.get(slideId);
       const missingIssues = [
-        ...nativeQualityMissingIssues(manifestSlide),
+        ...nativeQualityMissingIssues(manifestSlide, expectedProof),
         ...(missingRenderProof ? ['native_true_render_proof_missing'] : []),
       ];
       const missingQuality = missingIssues.length > 0;
@@ -462,7 +474,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           native_text_box_count: Number(slide?.text_box_count || 0),
           native_quality_source: 'shape_manifest',
           native_quality_model: shapeManifest?.native_quality_model || 'shape_manifest_layout_metrics',
-          render_proof_source: missingRenderProof ? 'missing_true_pptx_render' : 'true_pptx_render',
+          render_proof_source: missingRenderProof ? 'missing_contract_declared_true_render' : safeText(expectedProof?.renderer_kind),
           synthetic_preview: renderProof?.synthetic_preview !== false,
           block_content_failures: safeArray(manifestSlide?.metrics?.block_content_failures),
         },
@@ -486,7 +498,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         page_count: slideReviews.length,
         source_surface_kind: 'native_pptx',
         native_quality_model: shapeManifest?.native_quality_model || 'shape_manifest_layout_metrics',
-        render_proof_source: missingRenderProof ? 'missing_true_pptx_render' : 'true_pptx_render',
+        render_proof_source: missingRenderProof ? 'missing_contract_declared_true_render' : safeText(expectedProof?.renderer_kind),
         synthetic_preview: renderProof?.synthetic_preview !== false,
         average_density: slideReviews.reduce((sum, slide) => sum + Number(slide?.metrics?.occupied_ratio || 0), 0)
           / Math.max(slideReviews.length, 1),
