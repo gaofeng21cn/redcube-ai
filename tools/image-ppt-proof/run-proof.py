@@ -13,6 +13,9 @@ from urllib.request import Request, urlopen
 from pathlib import Path
 
 
+DEFAULT_FIXTURE = Path("tests/fixtures/ppt-image-first-lightweight/fixture.json")
+
+
 def png_chunk(kind, data):
     payload = kind + data
     return len(data).to_bytes(4, "big") + kind + data + (zlib.crc32(payload) & 0xFFFFFFFF).to_bytes(4, "big")
@@ -58,64 +61,121 @@ def write_json(path, payload):
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def write_prompt_manifests(output_root):
+def read_json(path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def load_fixture(path):
+    fixture = read_json(path)
+    pages = fixture.get("pages", [])
+    max_slide_count = int(fixture.get("max_slide_count", 6))
+    if not pages:
+        raise SystemExit(f"Fixture has no pages: {path}")
+    if len(pages) > max_slide_count or len(pages) > 6:
+        raise SystemExit(f"Lightweight image PPT proof fixture must contain <=6 pages: {path}")
+    canvas = fixture.get("canvas", {})
+    width = int(canvas.get("width", 1536))
+    height = int(canvas.get("height", 864))
     prompts = [
         {
-            "prompt_id": "hero-product-signal",
-            "slide_id": "S01",
-            "prompt": "Create a bright image-first title slide background for a RedCube AI presentation proof.",
-            "size": "1024x1024",
-        },
-        {
-            "prompt_id": "workflow-gallery",
-            "slide_id": "S02",
-            "prompt": "Create a clean workflow gallery image showing source truth to final PPT delivery.",
-            "size": "1024x1024",
-        },
-        {
-            "prompt_id": "medical-concept-map",
-            "slide_id": "S03",
-            "prompt": "Create a Chinese medical lecture concept-map slide with hand-drawn arrows and pastel marker blocks.",
-            "size": "1536x864",
-        },
-        {
-            "prompt_id": "platform-architecture",
-            "slide_id": "S04",
-            "prompt": "Create a RedCube AI platform architecture slide with a source-readiness to review-gate system diagram.",
-            "size": "1536x864",
-        },
-        {
-            "prompt_id": "evidence-checklist",
-            "slide_id": "S05",
-            "prompt": "Create a concise operator evidence checklist slide with PNG, manifest, PPTX, PDF, and gallery proof blocks.",
-            "size": "1536x864",
-        },
-        {
-            "prompt_id": "closing-summary",
-            "slide_id": "S06",
-            "prompt": "Create a closing summary slide in the same white dotted paper and hand-drawn medical lecture style.",
-            "size": "1536x864",
-        },
+            "prompt_id": page["prompt_id"],
+            "slide_id": page["slide_id"],
+            "prompt": page["prompt"],
+            "size": f"{width}x{height}",
+        }
+        for page in pages
     ]
+    return fixture, prompts
+
+
+def write_prompt_manifests(output_root, fixture, prompts):
     write_json(output_root / "run-manifest.json", {
         "schema_version": "image_ppt_proof_run_manifest.v1",
         "proof_runner": "tools/image-ppt-proof/run.sh",
+        "fixture_id": fixture.get("fixture_id"),
+        "mode": fixture.get("mode", "lightweight_real_style_smoke"),
         "workspace_root": (output_root / "workspace").as_posix(),
         "image_first": True,
         "required_outputs": [
             "image-manifest.json",
             "prompt-manifest.json",
+            "style-manifest.json",
+            "review/review-summary.json",
             "export/export-bundle.json",
             "gallery/gallery.json",
+            "gallery/final-gallery-manifest.json",
             "export/final-delivery-manifest.json",
             "artifact-index.json",
         ],
     })
     write_json(output_root / "prompt-manifest.json", {
         "schema_version": "image_ppt_prompt_manifest.v1",
+        "fixture_id": fixture.get("fixture_id"),
+        "profile_id": fixture.get("profile_id"),
+        "mode": fixture.get("mode", "lightweight_real_style_smoke"),
+        "max_slide_count": fixture.get("max_slide_count", 6),
         "prompts": prompts,
     })
     return prompts
+
+
+def iter_style_reference_sources(fixture, style_reference_dir):
+    if style_reference_dir:
+        root = Path(style_reference_dir).expanduser().resolve()
+        if not root.is_dir():
+            raise SystemExit(f"--style-reference-dir must point to a directory: {style_reference_dir}")
+        for source in sorted(root.iterdir()):
+            if source.is_file() and source.suffix.lower() == ".png":
+                yield {"filename": source.name, "source_file": source}
+        return
+    for seed in fixture.get("style_reference_seeds", []):
+        yield {"filename": seed["filename"], "seed": seed["seed"]}
+
+
+def write_style_manifest(output_root, fixture, style_reference_dir):
+    style_dir = output_root / "style-references"
+    style_dir.mkdir(parents=True, exist_ok=True)
+    canvas = fixture.get("canvas", {})
+    width = int(canvas.get("width", 1536))
+    height = int(canvas.get("height", 864))
+    references = []
+    for index, source in enumerate(iter_style_reference_sources(fixture, style_reference_dir), start=1):
+        filename = Path(source["filename"]).name
+        artifact_file = style_dir / filename
+        if "source_file" in source:
+            artifact_file.write_bytes(source["source_file"].read_bytes())
+        else:
+            artifact_file.write_bytes(mock_png(width, height, source["seed"]))
+        references.append({
+            "reference_id": f"style-reference-{index:02d}",
+            "filename": filename,
+            "sha256": file_sha256(artifact_file),
+            "dimensions": png_dimensions(artifact_file),
+            "artifact_copy": artifact_file.relative_to(output_root).as_posix(),
+        })
+
+    if not references:
+        raise SystemExit("Lightweight image PPT proof requires at least one style reference artifact copy")
+
+    style_manifest = {
+        "schema_version": "image_ppt_style_manifest.v1",
+        "fixture_id": fixture.get("fixture_id"),
+        "profile_id": fixture.get("profile_id"),
+        "mode": fixture.get("mode", "lightweight_real_style_smoke"),
+        "truth_policy": "style_reference_truth_is_hash_filename_dimensions_and_local_artifact_copy",
+        "external_style_reference_dir_recorded_as_truth": False,
+        "style_references": references,
+    }
+    write_json(output_root / "style-manifest.json", style_manifest)
+    return style_manifest
 
 
 def parse_codex_config():
@@ -268,7 +328,7 @@ def write_live_png(path, prompt):
     }
 
 
-def write_images(output_root, mode, prompts):
+def write_images(output_root, mode, fixture, prompts):
     image_dir = output_root / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
     images = []
@@ -299,6 +359,9 @@ def write_images(output_root, mode, prompts):
 
     image_manifest = {
         "schema_version": "image_ppt_image_manifest.v1",
+        "fixture_id": fixture.get("fixture_id"),
+        "profile_id": fixture.get("profile_id"),
+        "mode": fixture.get("mode", "lightweight_real_style_smoke"),
         "image_generation_mode": mode,
         "uses_real_api": mode == "live",
         "images": images,
@@ -307,16 +370,20 @@ def write_images(output_root, mode, prompts):
     return image_manifest
 
 
-def write_delivery(output_root, mode, image_manifest):
+def write_delivery(output_root, mode, fixture, image_manifest, style_manifest):
     export_dir = output_root / "export"
     gallery_dir = output_root / "gallery"
+    review_dir = output_root / "review"
     export_dir.mkdir(parents=True, exist_ok=True)
     gallery_dir.mkdir(parents=True, exist_ok=True)
+    review_dir.mkdir(parents=True, exist_ok=True)
 
     pptx_file = export_dir / "image-first-proof.pptx"
     pdf_file = export_dir / "image-first-proof.pdf"
     export_bundle_file = export_dir / "export-bundle.json"
     gallery_file = gallery_dir / "gallery.json"
+    final_gallery_manifest_file = gallery_dir / "final-gallery-manifest.json"
+    review_summary_file = review_dir / "review-summary.json"
     final_delivery_manifest_file = export_dir / "final-delivery-manifest.json"
 
     with zipfile.ZipFile(pptx_file, "w", compression=zipfile.ZIP_DEFLATED) as deck:
@@ -333,6 +400,9 @@ def write_delivery(output_root, mode, image_manifest):
         "pptx_file": pptx_file.resolve().as_posix(),
         "pdf_file": pdf_file.resolve().as_posix(),
         "image_manifest_file": (output_root / "image-manifest.json").resolve().as_posix(),
+        "prompt_manifest_file": (output_root / "prompt-manifest.json").resolve().as_posix(),
+        "style_manifest_file": (output_root / "style-manifest.json").resolve().as_posix(),
+        "review_summary_file": review_summary_file.resolve().as_posix(),
     })
     write_json(gallery_file, {
         "schema_version": "image_ppt_gallery.v1",
@@ -340,6 +410,36 @@ def write_delivery(output_root, mode, image_manifest):
             {"slide_id": image["slide_id"], "image_id": image["image_id"], "png_file": image["png_file"]}
             for image in image_manifest["images"]
         ],
+    })
+    write_json(final_gallery_manifest_file, {
+        "schema_version": "image_ppt_final_gallery_manifest.v1",
+        "fixture_id": fixture.get("fixture_id"),
+        "status": "ready",
+        "items": [
+            {
+                "slide_id": image["slide_id"],
+                "image_id": image["image_id"],
+                "png_file": image["png_file"],
+                "sha256": file_sha256(Path(image["png_file"])),
+                "dimensions": image["dimensions"],
+            }
+            for image in image_manifest["images"]
+        ],
+    })
+    write_json(review_summary_file, {
+        "schema_version": "image_ppt_review_summary.v1",
+        "fixture_id": fixture.get("fixture_id"),
+        "status": "passed",
+        "image_count": len(image_manifest["images"]),
+        "style_reference_count": len(style_manifest["style_references"]),
+        "checks": {
+            "lightweight_slide_count_lte_6": len(image_manifest["images"]) <= 6,
+            "mock_mode_uses_real_api": mode == "live",
+            "style_reference_truth_has_local_artifact_copy": all(
+                reference.get("artifact_copy") and reference.get("sha256") and reference.get("filename")
+                for reference in style_manifest["style_references"]
+            ),
+        },
     })
     write_json(final_delivery_manifest_file, {
         "schema_version": "image_ppt_final_delivery_manifest.v1",
@@ -349,12 +449,15 @@ def write_delivery(output_root, mode, image_manifest):
             "pdf": pdf_file.resolve().as_posix(),
             "export_bundle": export_bundle_file.resolve().as_posix(),
             "gallery": gallery_file.resolve().as_posix(),
+            "final_gallery_manifest": final_gallery_manifest_file.resolve().as_posix(),
+            "review_summary": review_summary_file.resolve().as_posix(),
         },
     })
 
     summary = {
         "schema_version": "image_ppt_proof_summary.v1",
         "status": "passed",
+        "fixture_id": fixture.get("fixture_id"),
         "source_visual_route": "author_image_pages",
         "editable": False,
         "image_generation_mode": mode,
@@ -365,6 +468,9 @@ def write_delivery(output_root, mode, image_manifest):
             "pdf_file": pdf_file.resolve().as_posix(),
             "export_bundle_file": export_bundle_file.resolve().as_posix(),
             "gallery_file": gallery_file.resolve().as_posix(),
+            "gallery_final_manifest_file": final_gallery_manifest_file.resolve().as_posix(),
+            "style_manifest_file": (output_root / "style-manifest.json").resolve().as_posix(),
+            "review_summary_file": review_summary_file.resolve().as_posix(),
             "final_delivery_manifest_file": final_delivery_manifest_file.resolve().as_posix(),
         },
     }
@@ -376,13 +482,18 @@ def main():
     parser = argparse.ArgumentParser(description="Run image-first PPT proof.")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--image-generation-mode", choices=["mock", "live"], required=True)
+    parser.add_argument("--fixture", default=DEFAULT_FIXTURE.as_posix())
+    parser.add_argument("--style-reference-dir", default="")
     args = parser.parse_args()
 
     output_root = Path(args.output_dir).resolve()
     (output_root / "workspace").mkdir(parents=True, exist_ok=True)
-    prompts = write_prompt_manifests(output_root)
-    image_manifest = write_images(output_root, args.image_generation_mode, prompts)
-    write_delivery(output_root, args.image_generation_mode, image_manifest)
+    fixture_file = Path(args.fixture).resolve()
+    fixture, prompts = load_fixture(fixture_file)
+    prompts = write_prompt_manifests(output_root, fixture, prompts)
+    style_manifest = write_style_manifest(output_root, fixture, args.style_reference_dir)
+    image_manifest = write_images(output_root, args.image_generation_mode, fixture, prompts)
+    write_delivery(output_root, args.image_generation_mode, fixture, image_manifest, style_manifest)
 
 
 if __name__ == "__main__":

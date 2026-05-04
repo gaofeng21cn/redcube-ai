@@ -5,13 +5,15 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
 
 output_root="${REDCUBE_IMAGE_PPT_PROOF_OUTPUT_DIR:-artifacts/image-ppt-proof}"
+fixture_file="${REDCUBE_IMAGE_PPT_PROOF_FIXTURE:-tests/fixtures/ppt-image-first-lightweight/fixture.json}"
+style_reference_dir="${REDCUBE_IMAGE_PPT_PROOF_STYLE_REFERENCE_DIR:-}"
 image_generation_mode="${REDCUBE_IMAGE_PPT_PROOF_MODE:-mock}"
 skip_system_deps="${REDCUBE_IMAGE_PPT_PROOF_SKIP_SYSTEM_DEPS:-0}"
 proof_python=""
 
 usage() {
   printf '%s\n' \
-    'Usage: tools/image-ppt-proof/run.sh [--output-dir <dir>] [--mock-image-generation|--live-image-generation] [--skip-system-deps]' \
+    'Usage: tools/image-ppt-proof/run.sh [--output-dir <dir>] [--fixture <file>] [--style-reference-dir <dir>] [--mock-image-generation|--live-image-generation] [--skip-system-deps]' \
     '' \
     'Runs the repo-owned image-first PPT proof lane:' \
     '  1. optional native PPT proof dependency install' \
@@ -59,6 +61,22 @@ while [ "$#" -gt 0 ]; do
       output_root="$2"
       shift 2
       ;;
+    --fixture)
+      if [ "$#" -lt 2 ]; then
+        echo "--fixture requires a value" >&2
+        exit 2
+      fi
+      fixture_file="$2"
+      shift 2
+      ;;
+    --style-reference-dir)
+      if [ "$#" -lt 2 ]; then
+        echo "--style-reference-dir requires a value" >&2
+        exit 2
+      fi
+      style_reference_dir="$2"
+      shift 2
+      ;;
     --mock-image-generation)
       image_generation_mode="mock"
       shift
@@ -97,6 +115,7 @@ gallery_dir="$output_root/gallery"
 run_manifest="$output_root/run-manifest.json"
 prompt_manifest="$output_root/prompt-manifest.json"
 image_manifest="$output_root/image-manifest.json"
+style_manifest="$output_root/style-manifest.json"
 proof_summary="$output_root/proof-summary.json"
 artifact_index="$output_root/artifact-index.json"
 
@@ -108,7 +127,9 @@ fi
 
 "$proof_python" tools/image-ppt-proof/run-proof.py \
   --output-dir "$output_root" \
-  --image-generation-mode "$image_generation_mode"
+  --image-generation-mode "$image_generation_mode" \
+  --fixture "$fixture_file" \
+  ${style_reference_dir:+--style-reference-dir "$style_reference_dir"}
 
 "$proof_python" tools/image-ppt-proof/build-artifact-index.py \
   --output-dir "$output_root" \

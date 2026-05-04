@@ -9,6 +9,8 @@ REQUIRED_REPORTS = [
     ("run_manifest_json", "run-manifest.json", "application/json", "run_manifest"),
     ("prompt_manifest_json", "prompt-manifest.json", "application/json", "prompt_manifest"),
     ("image_manifest_json", "image-manifest.json", "application/json", "image_generation"),
+    ("style_manifest_json", "style-manifest.json", "application/json", "style_reference"),
+    ("review_summary_json", "review/review-summary.json", "application/json", "review"),
     ("proof_summary_json", "proof-summary.json", "application/json", "proof_summary"),
 ]
 
@@ -57,8 +59,10 @@ def append_ref_artifact(artifacts, *, artifact_id, value, output_root, media_typ
 def build_index(output_root):
     output_root = output_root.resolve()
     image_manifest_file = output_root / "image-manifest.json"
+    style_manifest_file = output_root / "style-manifest.json"
     summary_file = output_root / "proof-summary.json"
     image_manifest = read_json(image_manifest_file) if image_manifest_file.exists() else {}
+    style_manifest = read_json(style_manifest_file) if style_manifest_file.exists() else {}
     summary = read_json(summary_file) if summary_file.exists() else {}
 
     artifacts = [
@@ -81,6 +85,19 @@ def build_index(output_root):
             media_type="image/png",
             category="image_generation",
         )
+
+    for index, reference in enumerate(style_manifest.get("style_references", []), start=1):
+        artifact_copy = reference.get("artifact_copy")
+        if artifact_copy:
+            artifacts.append(
+                artifact_entry(
+                    artifact_id=f"style_reference_png_{index:02d}",
+                    path=output_root / artifact_copy,
+                    output_root=output_root,
+                    media_type="image/png",
+                    category="style_reference",
+                )
+            )
 
     delivery = summary.get("delivery_artifacts", {})
     append_ref_artifact(
@@ -117,6 +134,14 @@ def build_index(output_root):
     )
     append_ref_artifact(
         artifacts,
+        artifact_id="gallery_final_manifest_json",
+        value=delivery.get("gallery_final_manifest_file"),
+        output_root=output_root,
+        media_type="application/json",
+        category="gallery",
+    )
+    append_ref_artifact(
+        artifacts,
         artifact_id="final_delivery_manifest_json",
         value=delivery.get("final_delivery_manifest_file"),
         output_root=output_root,
@@ -137,7 +162,8 @@ def build_index(output_root):
         "missing_required_artifacts": missing_required,
         "retention_contract": {
             "required_artifact_ids": [artifact["artifact_id"] for artifact in artifacts if artifact["required"]],
-            "png_count": sum(1 for artifact in artifacts if artifact["media_type"] == "image/png"),
+            "png_count": len(image_manifest.get("images", [])),
+            "style_reference_png_count": len(style_manifest.get("style_references", [])),
             "image_generation_mode": summary.get("image_generation_mode"),
             "proof_summary_status": summary.get("status"),
             "artifact_categories": sorted({artifact["category"] for artifact in artifacts}),

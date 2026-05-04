@@ -1,0 +1,50 @@
+{
+  "fixture_id": "ppt_image_first_lightweight_real_style_smoke_v1",
+  "profile_id": "ppt_deck_image_first_handdrawn_medical_default_v1",
+  "mode": "lightweight_real_style_smoke",
+  "external_api_invocation_by_default": false,
+  "max_slide_count": 6,
+  "canvas": {
+    "width": 1536,
+    "height": 864,
+    "aspect_ratio": "16:9"
+  },
+  "style_reference_policy": {
+    "external_style_reference_dir_allowed": true,
+    "manifest_must_not_store_external_dir_as_truth": true,
+    "truth_fields": [
+      "filename",
+      "sha256",
+      "dimensions",
+      "artifact_copy"
+    ]
+  },
+  "pages": [
+    {
+      "prompt_id": "clinic-title-real-style",
+      "slide_id": "S01",
+      "prompt": "Create a complete 16:9 PPT slide page image for a Chinese medical lecture title page, bright real-style notebook background, black hand-drawn outlines, pastel marker blocks, large readable Chinese title, no isolated assets."
+    },
+    {
+      "prompt_id": "clinic-pathway-real-style",
+      "slide_id": "S02",
+      "prompt": "Create a complete 16:9 PPT slide page image showing a clinic pathway diagram, realistic paper texture, hand-drawn arrows, pastel labels, high readability, no separate components."
+    },
+    {
+      "prompt_id": "evidence-check-real-style",
+      "slide_id": "S03",
+      "prompt": "Create a complete 16:9 PPT slide page image showing an evidence checklist for PNG, PPTX, PDF, prompt manifest, style manifest, review summary, and gallery manifest, real lecture board style."
+    },
+    {
+      "prompt_id": "delivery-close-real-style",
+      "slide_id": "S04",
+      "prompt": "Create a complete 16:9 PPT slide page image for a delivery closeout summary, light real-style paper, clean medical lecture composition, bold markers, final proof status visible."
+    }
+  ],
+  "style_reference_seeds": [
+    {
+      "filename": "lightweight-real-style-reference.png",
+      "seed": "lightweight real-style reference: paper texture, pastel marker, hand-drawn clinical arrows"
+    }
+  ]
+}
