@@ -339,6 +339,28 @@ function runNodeTestBatch({ label, files, serialized }) {
   return result.status ?? 1;
 }
 
+function runSerializedNodeTestFiles({ label, files }) {
+  if (files.length === 0) {
+    return 0;
+  }
+
+  process.stdout.write(
+    `[run-test-group] ${groupName} ${label}: ${files.length} files (one process per file)\n`,
+  );
+
+  for (const file of files) {
+    const status = runNodeTestBatch({
+      label: `${label}: ${file}`,
+      files: [file],
+      serialized: true,
+    });
+    if (status !== 0) {
+      return status;
+    }
+  }
+  return 0;
+}
+
 try {
   const parallelStatus = runNodeTestBatch({
     label: 'parallel batch',
@@ -349,10 +371,9 @@ try {
     process.exit(parallelStatus);
   }
 
-  const serializedStatus = runNodeTestBatch({
+  const serializedStatus = runSerializedNodeTestFiles({
     label: 'serialized route-heavy batch',
     files: executionPlan.serialized_files,
-    serialized: true,
   });
   process.exit(serializedStatus);
 } finally {

@@ -38,7 +38,9 @@ test('run-test-group serializes route-heavy fast files without enabling live Cod
   assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
 });
 
-test('run-test-group only adds file-level serialization to explicit route-heavy batches', () => {
+test('run-test-group only adds file-level serialization to explicit route-heavy file processes', () => {
+  const runner = readFileSync('scripts/run-test-group.ts', 'utf-8');
+
   assert.deepEqual(buildNodeTestArgs({
     forwardedArgs: ['--test-reporter=spec'],
     serialized: true,
@@ -53,6 +55,11 @@ test('run-test-group only adds file-level serialization to explicit route-heavy 
     forwardedArgs: ['--test-reporter=spec'],
     serialized: false,
   }), ['--experimental-strip-types', '--test', '--test-reporter=spec']);
+
+  assert.match(runner, /function runSerializedNodeTestFiles/);
+  assert.match(runner, /for \(const file of files\)/);
+  assert.match(runner, /files: \[file\]/);
+  assert.match(runner, /one process per file/);
 });
 
 test('run-test-group partitions route-heavy files away from the default parallel batch', () => {
