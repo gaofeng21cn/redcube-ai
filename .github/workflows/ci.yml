@@ -29,9 +29,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install native proof system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libreoffice poppler-utils fonts-noto-cjk
+        run: tools/native-ppt-proof/install-deps.sh
 
       - name: Install Python test dependencies
         run: |

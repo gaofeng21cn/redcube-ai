@@ -5,13 +5,15 @@ from unittest import mock
 
 from PIL import Image
 
+from redcube_ai.native_helpers import renderer_dependencies
 from redcube_ai.native_helpers.ppt_deck import native
 
 
 class NativePptLibreOfficeRendererTest(unittest.TestCase):
     def test_auto_renderer_fails_closed_instead_of_selecting_legacy_desktop_renderer(self):
         with (
-            mock.patch.object(native.shutil, 'which', return_value=None),
+            mock.patch.object(renderer_dependencies.shutil, 'which', return_value=None),
+            mock.patch.object(renderer_dependencies.Path, 'exists', return_value=False),
             mock.patch('sys.stderr'),
             self.assertRaises(SystemExit),
         ):
@@ -22,7 +24,8 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
             return '/usr/local/bin/soffice' if name == 'soffice' else None
 
         with (
-            mock.patch.object(native.shutil, 'which', side_effect=fake_which),
+            mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
+            mock.patch.object(renderer_dependencies.Path, 'exists', return_value=False),
             self.assertRaises(SystemExit),
             mock.patch('sys.stderr') as stderr,
         ):
@@ -31,6 +34,36 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
         self.assertIn('pdftoppm', message)
         self.assertIn('Poppler', message)
         self.assertIn('Docker', message)
+        self.assertIn('tools/native-ppt-proof/install-deps.sh', message)
+
+    def test_renderer_resolves_macos_homebrew_cask_libreoffice_app_path(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            cask_soffice = root / 'LibreOffice.app' / 'Contents' / 'MacOS' / 'soffice'
+            cask_soffice.parent.mkdir(parents=True)
+            cask_soffice.write_text('#!/bin/sh\n', encoding='utf-8')
+
+            def fake_which(name):
+                return '/usr/local/bin/pdftoppm' if name == 'pdftoppm' else None
+
+            def fake_run(command, text, capture_output, check):
+                if command[:2] == [str(cask_soffice), '--version']:
+                    return native.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 26.2.3\n', stderr='')
+                if command[:2] == ['/usr/local/bin/pdftoppm', '-v']:
+                    return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 26.04.0\n')
+                raise AssertionError(f'unexpected command: {command}')
+
+            with (
+                mock.patch.object(renderer_dependencies, 'MACOS_LIBREOFFICE_PATHS', (cask_soffice,)),
+                mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
+                mock.patch.object(native.subprocess, 'run', side_effect=fake_run),
+            ):
+                renderer = native.resolve_renderer('auto')
+
+            self.assertEqual(renderer['soffice'], str(cask_soffice))
+            self.assertEqual(renderer['pdftoppm'], '/usr/local/bin/pdftoppm')
+            self.assertIn('LibreOffice 26.2.3', renderer['libreoffice_version'])
+            self.assertIn('redcube_dependency_installer', renderer['dependency_install_commands'])
 
     def test_libreoffice_render_proof_records_hashes_versions_and_pipeline(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -61,7 +94,7 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
                 raise AssertionError(f'unexpected command: {command}')
 
             with (
-                mock.patch.object(native.shutil, 'which', side_effect=fake_which),
+                mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
                 mock.patch.object(native.subprocess, 'run', side_effect=fake_run),
             ):
                 proof = native.render_pptx(
@@ -87,6 +120,8 @@ class NativePptLibreOfficeRendererTest(unittest.TestCase):
             self.assertEqual(slides[0]['renderer_kind'], 'libreoffice_headless')
             self.assertEqual(slides[0]['renderer_pipeline'], 'libreoffice_headless_pdf_png_v1')
             self.assertEqual(slides[0]['render_provenance']['preview_screenshot_sha256'], proof['preview_png_hashes'][0]['sha256'])
+            self.assertEqual(slides[0]['preview_screenshot_dimensions'], {'width': 32, 'height': 18})
+            self.assertEqual(slides[0]['render_provenance']['preview_screenshot_dimensions'], {'width': 32, 'height': 18})
             self.assertFalse(slides[0]['synthetic_preview'])
 
 

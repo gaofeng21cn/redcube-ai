@@ -13,6 +13,14 @@ Required project dependencies:
 - Python packages from `.github/requirements/ci-python.txt`
 - Node packages from `npm ci`
 
+Install native proof system dependencies on the current machine:
+
+```bash
+tools/native-ppt-proof/install-deps.sh
+```
+
+On macOS this installs LibreOffice through Homebrew cask and Poppler / Noto CJK fonts through Homebrew packages. On Debian or Ubuntu this installs `libreoffice`, `poppler-utils`, and `fonts-noto-cjk` through `apt-get`.
+
 Run the same diagnostics surface locally:
 
 ```bash

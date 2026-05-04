@@ -277,6 +277,19 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
     'playwright',
   ]);
   assert.equal(report.renderer_availability.desktop_app_fallback_allowed, false);
+  assert.deepEqual(report.renderer_availability.dependency_install, {
+    automatic_installer: 'tools/native-ppt-proof/install-deps.sh',
+    suggested_command: report.renderer_availability.dependency_install.suggested_command,
+    commands: {
+      redcube_dependency_installer: 'tools/native-ppt-proof/install-deps.sh',
+      macos_homebrew: 'brew install --cask libreoffice && brew install poppler font-noto-sans-cjk',
+      debian_ubuntu: 'sudo apt-get update && sudo apt-get install -y libreoffice poppler-utils fonts-noto-cjk',
+      docker: report.renderer_availability.suggested_docker_command,
+    },
+    executes_generation: false,
+    executes_review_export_gates: false,
+  });
+  assert.match(report.renderer_availability.dependency_install.suggested_command, /install-deps\.sh|apt-get|docker build/);
   assert.match(report.renderer_availability.suggested_docker_command, /docker build -f tools\/native-ppt-proof\/Dockerfile/);
   assert.equal(typeof report.renderer_availability.linux_native_proof.available, 'boolean');
   assert.equal(
@@ -330,16 +343,22 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.renderer_availability.executes_generation, false);
   assert.equal(nativeHelper.renderer_availability.executes_review_export_gates, false);
   assert.equal(nativeHelper.renderer_availability.desktop_app_fallback_allowed, false);
+  assert.equal(
+    nativeHelper.renderer_availability.dependency_install.automatic_installer,
+    'tools/native-ppt-proof/install-deps.sh',
+  );
 });
 
 test('Fast and meta diagnostic coverage does not invoke the native PPT renderer', () => {
   const runTestGroup = readFileSync(path.resolve('scripts/run-test-group.ts'), 'utf-8');
   const doctor = readFileSync(path.resolve('python/redcube_ai/native_helpers/doctor.py'), 'utf-8');
+  const rendererDependencies = readFileSync(path.resolve('python/redcube_ai/native_helpers/renderer_dependencies.py'), 'utf-8');
 
   assert.match(runTestGroup, /tests\/python-native-helper-catalog\.test\.ts/);
   assert.doesNotMatch(runTestGroup, /redcube-ppt-deck-native|ppt_deck_native\.py|tools\/native-ppt-proof|libreoffice|soffice|pdftoppm/);
   assert.doesNotMatch(doctor, /subprocess|run\(|Popen/);
-  assert.match(doctor, /shutil\.which/);
+  assert.doesNotMatch(rendererDependencies, /subprocess|run\(|Popen/);
+  assert.match(rendererDependencies, /shutil\.which/);
 });
 
 test('Compatibility wrapper scripts remain thin package entrypoints', () => {

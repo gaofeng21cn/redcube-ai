@@ -11,6 +11,12 @@ from pathlib import Path
 
 from PIL import Image
 
+from redcube_ai.native_helpers.renderer_dependencies import (
+    install_commands,
+    libreoffice_probe,
+    platform_install_hint,
+    poppler_probe,
+)
 from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
 
 
@@ -268,23 +274,27 @@ def resolve_renderer(renderer_name: str) -> dict:
     requested = safe_text(renderer_name, 'auto')
     if requested not in {'auto', RENDERER_KIND}:
         fail(f'unsupported native PPT renderer: {requested}; expected auto or {RENDERER_KIND}')
-    soffice = shutil.which('soffice') or shutil.which('libreoffice')
+    soffice_probe = libreoffice_probe()
+    soffice = safe_text(soffice_probe.get('path'))
+    install_hint = platform_install_hint()
     if not soffice:
         fail(
             'native PPT true render requires LibreOffice headless (soffice or libreoffice) for '
-            f'{RENDERER_PIPELINE}; install LibreOffice locally or run the RedCube native helper in Docker'
+            f'{RENDERER_PIPELINE}; run {install_hint} or use Docker'
         )
-    pdftoppm = shutil.which('pdftoppm')
+    pdftoppm_probe = poppler_probe('pdftoppm')
+    pdftoppm = safe_text(pdftoppm_probe.get('path'))
     if not pdftoppm:
         fail(
             'native PPT true render requires Poppler pdftoppm for PDF-to-PNG previews; '
-            'install poppler locally or run the RedCube native helper in Docker'
+            f'run {install_hint} or use Docker'
         )
     return {
         'kind': RENDERER_KIND,
         'pipeline': RENDERER_PIPELINE,
         'soffice': soffice,
         'pdftoppm': pdftoppm,
+        'dependency_install_commands': install_commands(),
         'libreoffice_version': command_version([soffice, '--version']),
         'poppler_version': command_version([pdftoppm, '-v']),
     }
@@ -401,6 +411,7 @@ def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
         preview_sha256 = file_sha256(preview_file)
         if index < len(preview_hashes) and preview_hashes[index].get('sha256') != preview_sha256:
             fail(f'true PPTX render proof screenshot hash mismatch: {preview_file}')
+        preview_dimensions = image_dimensions(preview_file)
         render_provenance = {
             'renderer_kind': render_proof.get('renderer_kind'),
             'renderer_pipeline': render_proof.get('renderer_pipeline'),
@@ -409,13 +420,14 @@ def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
             'pdf_sha256': render_proof.get('pdf_sha256'),
             'preview_screenshot_sha256': preview_sha256,
             'preview_screenshot_file': str(preview_file),
+            'preview_screenshot_dimensions': preview_dimensions,
             'synthetic_preview': False,
         }
         attached.append({
             **slide,
             'preview_screenshot_file': str(preview_file),
             'preview_screenshot_sha256': preview_sha256,
-            'preview_screenshot_dimensions': image_dimensions(preview_file),
+            'preview_screenshot_dimensions': preview_dimensions,
             'render_proof_source': safe_text(render_proof.get('renderer_kind')),
             'renderer_kind': render_proof.get('renderer_kind'),
             'renderer_pipeline': render_proof.get('renderer_pipeline'),

@@ -3,13 +3,20 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import shutil
 import sys
 import tomllib
 from pathlib import Path
 from typing import Any
 
 from .catalog import CATALOG_FILE, load_helper_catalog, repo_root
+from .renderer_dependencies import (
+    NATIVE_PPT_DOCKER_COMMAND,
+    command_probe,
+    install_commands,
+    libreoffice_probe,
+    platform_install_hint,
+    poppler_probe,
+)
 
 
 OPTIONAL_IMPORT_NAMES = {
@@ -19,13 +26,6 @@ OPTIONAL_IMPORT_NAMES = {
     "LibreOffice headless": None,
     "upstream-hermes-agent-local": None,
 }
-
-NATIVE_PPT_DOCKER_COMMAND = (
-    "docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof . "
-    "&& docker run --rm -it -v \"$PWD:/workspace\" -w /workspace redcube-native-ppt-proof "
-    "bash -lc \"npm ci && python3 -m redcube_ai.native_helpers.doctor\""
-)
-
 
 def _pyproject_metadata(pyproject_file: Path) -> dict[str, Any]:
     data = tomllib.loads(pyproject_file.read_text(encoding="utf-8"))
@@ -60,23 +60,7 @@ def _dependency_summary(requirements: list[str]) -> list[dict[str, Any]]:
 
 
 def _command_probe(name: str, *candidates: str) -> dict[str, Any]:
-    for candidate in candidates:
-        path = shutil.which(candidate)
-        if path:
-            return {
-                "name": name,
-                "available": True,
-                "command": candidate,
-                "path": path,
-                "blocked_reason": None,
-            }
-    return {
-        "name": name,
-        "available": False,
-        "command": candidates[0] if candidates else None,
-        "path": None,
-        "blocked_reason": f"missing executable: {' or '.join(candidates)}",
-    }
+    return command_probe(name, *candidates)
 
 
 def _python_dependency_probe(name: str, import_name: str) -> dict[str, Any]:
@@ -90,9 +74,9 @@ def _python_dependency_probe(name: str, import_name: str) -> dict[str, Any]:
 
 
 def _renderer_availability() -> dict[str, Any]:
-    libreoffice = _command_probe("libreoffice", "libreoffice", "soffice")
-    pdftoppm = _command_probe("pdftoppm", "pdftoppm")
-    pdfinfo = _command_probe("pdfinfo", "pdfinfo")
+    libreoffice = libreoffice_probe()
+    pdftoppm = poppler_probe("pdftoppm")
+    pdfinfo = poppler_probe("pdfinfo")
     python_deps = [
         _python_dependency_probe("Pillow", "PIL"),
         _python_dependency_probe("python-pptx", "pptx"),
@@ -149,6 +133,13 @@ def _renderer_availability() -> dict[str, Any]:
         },
         "python_dependencies": python_deps,
         "desktop_app_fallback_allowed": False,
+        "dependency_install": {
+            "automatic_installer": "tools/native-ppt-proof/install-deps.sh",
+            "suggested_command": platform_install_hint(),
+            "commands": install_commands(),
+            "executes_generation": False,
+            "executes_review_export_gates": False,
+        },
         "suggested_docker_command": NATIVE_PPT_DOCKER_COMMAND,
     }
 
