@@ -131,7 +131,7 @@ test('run-test-group usage and verify shim include the family verification lane'
 
   assert.match(script, /<fast\|meta\|family\|integration\|e2e\|historical\|full>/);
   assert.match(verifyScript, /family\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|meta\|family\|integration\|e2e\|historical\|full\]/);
+  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|e2e\|historical\|full\]/);
 });
 
 test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {

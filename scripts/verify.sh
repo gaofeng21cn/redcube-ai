@@ -13,6 +13,10 @@ case "$lane" in
   line-budget)
     npm run test:line-budget
     ;;
+  structure)
+    npm run test:line-budget
+    scripts/run-structural-quality-gate.sh
+    ;;
   meta)
     npm run test:meta
     ;;
@@ -33,7 +37,7 @@ case "$lane" in
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|meta|family|integration|e2e|historical|full]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|structure|meta|family|integration|e2e|historical|full]" >&2
     exit 1
     ;;
 esac
