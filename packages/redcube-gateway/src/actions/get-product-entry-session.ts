@@ -124,6 +124,49 @@ function collectArtifactRefsFromPublishBundle(publishBundleFile) {
   ].map((entry) => safeText(entry)).filter(Boolean);
 }
 
+function classifyArtifact(path) {
+  const text = safeText(path);
+  if (/\.pptx$/i.test(text)) return 'pptx';
+  if (/\.pdf$/i.test(text)) return 'pdf';
+  if (/\.png$/i.test(text)) return 'preview_png';
+  if (/shape[_-]manifest.*\.json$/i.test(text) || /native_ppt_shape_manifest.*\.json$/i.test(text)) return 'shape_manifest';
+  if (/manifest.*\.json$/i.test(text)) return 'manifest';
+  if (/readme\.md$/i.test(text)) return 'readme';
+  return 'artifact';
+}
+
+function buildNativeProofArtifactInventory({ artifactInventory, publicationProjection, deliverableId }) {
+  const refs = Array.isArray(artifactInventory?.artifact_refs) ? artifactInventory.artifact_refs : [];
+  const classifiedRefs = refs.map((entry) => ({
+    artifact_kind: classifyArtifact(entry),
+    path: entry,
+  }));
+  const nativeRefs = classifiedRefs.filter((entry) => (
+    ['pptx', 'pdf', 'preview_png', 'shape_manifest', 'manifest'].includes(entry.artifact_kind)
+    || /native[_-]ppt|shape[_-]manifest|final[_-]delivery/i.test(entry.path)
+  ));
+  const deliverableProjection = publicationProjectionForDeliverable(publicationProjection, deliverableId);
+  return {
+    surface_kind: 'native_ppt_proof_artifact_inventory',
+    artifact_refs: nativeRefs,
+    source_artifact_inventory: artifactInventory,
+    publication_projection_ref: deliverableProjection
+      ? {
+        ref_kind: 'publication_projection_deliverable',
+        deliverable_id: deliverableId,
+      }
+      : null,
+    summary: {
+      artifact_ref_count: nativeRefs.length,
+      has_pptx: nativeRefs.some((entry) => entry.artifact_kind === 'pptx'),
+      has_pdf: nativeRefs.some((entry) => entry.artifact_kind === 'pdf'),
+      has_preview_png: nativeRefs.some((entry) => entry.artifact_kind === 'preview_png'),
+      has_shape_manifest: nativeRefs.some((entry) => entry.artifact_kind === 'shape_manifest'),
+      blocked_reason: nativeRefs.length > 0 ? null : 'native_proof_artifacts_not_found_in_session_inventory',
+    },
+  };
+}
+
 function artifactRefsFromPublicationProjection(publicationProjection, deliverableId) {
   const deliverableProjection = publicationProjectionForDeliverable(publicationProjection, deliverableId);
   const publishBundleFile = safeText(
@@ -256,6 +299,11 @@ export async function getProductEntrySession(request) {
     publicationProjection,
     deliverableId: session.deliverable_id,
   });
+  const nativeProofArtifactInventory = buildNativeProofArtifactInventory({
+    artifactInventory,
+    publicationProjection,
+    deliverableId: session.deliverable_id,
+  });
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,
     sessionFile: productEntrySessionFile(entrySessionId),
@@ -301,6 +349,7 @@ export async function getProductEntrySession(request) {
     session_continuity: sessionContinuity,
     progress_projection: progressProjection,
     artifact_inventory: artifactInventory,
+    native_proof_artifact_inventory: nativeProofArtifactInventory,
     runtime_loop_closure: runtimeLoopClosure,
     review_state: reviewState,
     publication_projection: publicationProjection,
@@ -310,6 +359,7 @@ export async function getProductEntrySession(request) {
       deliverable_id: session.deliverable_id,
       latest_handle: session.latest_managed_run_id || session.latest_run_id || null,
       target_handle: session.latest_managed_run_id || session.latest_run_id || null,
+      native_proof_artifact_ref_count: nativeProofArtifactInventory.summary.artifact_ref_count,
       approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
       gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
       resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,

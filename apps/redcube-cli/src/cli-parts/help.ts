@@ -138,6 +138,12 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       gateway_action: 'getProductEntryManifest',
       boundary_fields: ['workspaceRoot'],
     },
+    'native-ppt proof': {
+      summary: '受控执行 ppt_deck native PPT proof route；只调用 repo-owned proof runner，并保持 product-entry review/export gates。',
+      usage: 'redcube native-ppt proof --workspace-root <dir> --entry-session-id <id> --topic-id <id> --deliverable-id <id> [--route <author_pptx_native|repair_pptx_native>] [--stop-after-stage <stage>]',
+      gateway_action: 'runNativePptProductEntryProof',
+      boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
+    },
   };
   const entry = (catalog as Record<string, JsonMap>)[commandKey];
   if (!entry) {
@@ -266,6 +272,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
       product: ['frontdesk', 'start', 'preflight', 'invoke', 'session', 'manifest'],
+      'native-ppt': ['proof'],
       runs: ['get'],
       review: ['get', 'projection', 'watch', 'mutate'],
       report: ['performance'],
@@ -301,6 +308,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
       productSession: 'redcube product session --entry-session-id <id>',
       productManifest: 'redcube product manifest --workspace-root <dir>',
+      nativePptProof: 'redcube native-ppt proof --workspace-root <dir> --entry-session-id <id> --topic-id <id> --deliverable-id <id> [--route <author_pptx_native|repair_pptx_native>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',
       profileList: 'redcube profile --action list',
       reviewGet: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',

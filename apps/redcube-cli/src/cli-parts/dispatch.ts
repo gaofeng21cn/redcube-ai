@@ -57,6 +57,10 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getProductStart,
   getProductPreflight,
   getProductEntrySession,
+  runNativePptProductEntryProof: async (request: Record<string, unknown>) => {
+    const gateway = await import('@redcube/gateway');
+    return (gateway as Record<string, any>).runNativePptProductEntryProof(request);
+  },
   buildPerformanceReport,
   superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
@@ -354,6 +358,23 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     throw new Error('product 命令支持 frontdesk|start|preflight|invoke|session|manifest；internal OPL bridge 由外层 shell 调用');
+  }
+
+  if (command === 'native-ppt') {
+    if (subcommand === 'proof') {
+      return gateway.runNativePptProductEntryProof({
+        workspace_root: resolveWorkspaceRoot(options, cwd),
+        entry_session_id: options.entrySessionId || '',
+        topic_id: options.topicId || '',
+        deliverable_id: options.deliverableId || '',
+        route: options.route || 'author_pptx_native',
+        adapter: options.adapter || '',
+        user_intent: options.userIntent || '',
+        stop_after_stage: options.stopAfterStage || '',
+      });
+    }
+
+    throw new Error('native-ppt 命令仅支持 proof');
   }
 
   if (command === 'review') {

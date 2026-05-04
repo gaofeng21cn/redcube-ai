@@ -72,6 +72,7 @@ export interface CliGatewayActions {
   invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse>;
   invokeFederatedProductEntry(request: FederatedProductEntryRequest): Promise<FederatedProductEntryResponse>;
   getProductEntrySession(request: { entry_session_id?: string; entrySessionId?: string }): Promise<ProductEntrySessionResponse>;
+  runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
   executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse>;

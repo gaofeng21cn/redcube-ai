@@ -224,5 +224,10 @@ test('live product-entry native PPT proof reaches review and export gates with r
     assert.equal(session.delivery_identity.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.summary.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.session_continuity.restore_point.latest_handle, session.continuation_snapshot.latest_run_id);
+    assert.equal(session.native_proof_artifact_inventory.surface_kind, 'native_ppt_proof_artifact_inventory');
+    assert.equal(session.native_proof_artifact_inventory.summary.has_pptx, true);
+    assert.equal(session.native_proof_artifact_inventory.summary.has_pdf, true);
+    assert.equal(session.native_proof_artifact_inventory.summary.has_shape_manifest, true);
+    assert.equal(session.summary.native_proof_artifact_ref_count > 0, true);
   });
 });

@@ -19,6 +19,9 @@ import {
   startMockCodexCli,
   withEnv,
 } from '../helpers/mock-codex-cli.ts';
+import {
+  executeCli,
+} from '../../apps/redcube-cli/dist/cli.js';
 
 const execFileAsync = promisify(execFile);
 const gatewayResolve = createRequire(path.resolve('packages/redcube-gateway/package.json'));
@@ -420,6 +423,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(frontdeskParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
     assert.equal(frontdeskParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(frontdeskParsed.product_entry_preflight.ready_to_try_now, true);
+    assert.equal(frontdeskParsed.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
+    assert.equal(frontdeskParsed.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
     assert.equal(
       frontdeskParsed.product_entry_preflight.recommended_check_command,
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
@@ -662,6 +667,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(manifestParsed.product_entry_preflight.ready_to_try_now, true);
     assert.equal(manifestParsed.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(manifestParsed.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
+    assert.equal(manifestParsed.operator_loop_actions.run_native_ppt_proof.command, 'redcube native-ppt proof');
 
     const startParsed = await execCliAsync(
       cliPath,
@@ -686,6 +693,37 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(startParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(startParsed.runtime_loop_closure.source_linkage.current_source, 'start');
   });
+});
+
+test('CLI native-ppt proof proxies the controlled product-entry helper surface', async () => {
+  const proof = await executeCli([
+    'native-ppt',
+    'proof',
+    '--workspace-root',
+    '/tmp/redcube-native-proof-cli',
+    '--entry-session-id',
+    'session-native-proof',
+    '--topic-id',
+    'topic-a',
+    '--deliverable-id',
+    'deck-a',
+  ], {
+    gateway: {
+      runNativePptProductEntryProof: async (request) => ({
+        ok: true,
+        surface_kind: 'native_ppt_product_entry_proof',
+        request,
+      }),
+    },
+  });
+
+  assert.equal(proof.ok, true);
+  assert.equal(proof.surface_kind, 'native_ppt_product_entry_proof');
+  assert.equal(proof.request.workspace_root, '/tmp/redcube-native-proof-cli');
+  assert.equal(proof.request.entry_session_id, 'session-native-proof');
+  assert.equal(proof.request.topic_id, 'topic-a');
+  assert.equal(proof.request.deliverable_id, 'deck-a');
+  assert.equal(proof.request.route, 'author_pptx_native');
 });
 
 

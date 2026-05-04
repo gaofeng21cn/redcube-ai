@@ -61,7 +61,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.product_entry_quickstart.human_gate_ids, ['redcube_operator_review_gate']);
     assert.deepEqual(
       manifest.product_entry_quickstart.steps.map((step) => step.step_id),
-      ['open_frontdesk', 'continue_current_loop', 'inspect_current_progress'],
+      ['open_frontdesk', 'continue_current_loop', 'inspect_current_progress', 'optional_native_ppt_proof'],
     );
     assert.equal(
       manifest.product_entry_quickstart.steps[0].command,
@@ -72,6 +72,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
     );
     assert.deepEqual(manifest.product_entry_quickstart.steps[2].requires, ['entry_session_id']);
+    assert.equal(manifest.product_entry_quickstart.steps[3].surface_kind, 'native_ppt_product_entry_proof');
+    assert.match(manifest.product_entry_quickstart.steps[3].command, /redcube native-ppt proof/);
     assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(
       manifest.product_entry_overview.summary,
@@ -225,8 +227,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'redcube product frontdesk',
       'redcube product invoke',
       'redcube product session',
+      'redcube native-ppt proof',
     ]);
-    assert.equal(manifest.skill_catalog.command_contracts.length, 3);
+    assert.equal(manifest.skill_catalog.command_contracts.length, 4);
     assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube-ai');
     assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
     assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product frontdesk');
@@ -253,6 +256,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
           session: {
             command: 'redcube product session',
             target_surface_kind: 'product_entry_session',
+          },
+          native_ppt_proof: {
+            command: 'redcube native-ppt proof',
+            target_surface_kind: 'native_ppt_product_entry_proof',
+            role: 'controlled_operator_helper',
           },
         },
       },
@@ -471,6 +479,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'delivery_request',
 	    ]);
 	    assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
+      assert.equal(manifest.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
+      assert.equal(manifest.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
+      assert.equal(manifest.native_ppt_operator_ux.proof_runner.public_skill_policy, 'do_not_register_as_second_public_skill');
+      assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].check_id, 'libreoffice_headless');
 	    assert.equal(manifest.session_continuity.surface_kind, 'session_continuity');
 	    assert.equal(manifest.session_continuity.owner, 'redcube_ai');
 	    assert.equal(manifest.session_continuity.status, 'repo_tracked');
@@ -551,6 +563,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(frontdesk.product_entry_start.modes[2].mode_id, 'opl_bridge_handoff');
     assert.equal(frontdesk.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.deepEqual(frontdesk.product_entry_start, manifest.product_entry_start);
+    assert.deepEqual(frontdesk.native_ppt_operator_ux, manifest.native_ppt_operator_ux);
     assert.equal(frontdesk.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(frontdesk.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
     assert.equal(frontdesk.runtime_loop_closure.source_linkage.entry_mode, 'product_entry_overview_projection');

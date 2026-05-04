@@ -78,6 +78,34 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.runtime, 'libreoffice_headless');
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.cross_platform_render_required, true);
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.synthetic_preview_allowed, false);
+  assert.equal(manifest.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
+  assert.equal(manifest.native_ppt_operator_ux.status, 'blocked');
+  assert.equal(manifest.native_ppt_operator_ux.route_selection.default_enabled, false);
+  assert.equal(manifest.native_ppt_operator_ux.route_selection.production_selectable, true);
+  assert.deepEqual(manifest.native_ppt_operator_ux.route_selection.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
+  assert.deepEqual(
+    manifest.native_ppt_operator_ux.route_selection.selectable_when,
+    [
+      'deliverable_family=ppt_deck',
+      'operator_explicitly_selects_native_ppt_proof',
+      'native_ppt_dependencies_pass',
+      'source_ready_or_existing_deliverable_contract_present',
+    ],
+  );
+  assert.equal(manifest.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
+  assert.equal(manifest.native_ppt_operator_ux.proof_runner.repo_owned_runner, true);
+  assert.equal(manifest.native_ppt_operator_ux.proof_runner.public_skill_policy, 'do_not_register_as_second_public_skill');
+  assert.match(manifest.native_ppt_operator_ux.proof_runner.command_template, /--route author_pptx_native/);
+  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.surface_kind, 'native_ppt_dependency_diagnostics');
+  assert.deepEqual(
+    manifest.native_ppt_operator_ux.dependency_diagnostics.checks.map((check) => check.check_id),
+    ['product_entry_preflight', 'workspace_contract_present', 'libreoffice_headless', 'poppler_pdftoppm'],
+  );
+  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].blocked_reason, 'soffice_headless_missing_or_unusable');
+  assert.equal(manifest.product_entry_shell.native_ppt_proof.command, 'redcube native-ppt proof');
+  assert.equal(manifest.operator_loop_actions.run_native_ppt_proof.surface_kind, 'native_ppt_product_entry_proof');
+  assert.equal(manifest.skill_catalog.skills.length, 1);
+  assert.equal(manifest.skill_catalog.supported_commands.includes('redcube native-ppt proof'), true);
 });
 
 test('native helper doctor stays diagnostic-only and preserves product-entry proof lane gates', async () => {

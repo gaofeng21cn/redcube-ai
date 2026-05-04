@@ -191,6 +191,11 @@ async function getProductFrontdeskJs(request: any) {
   return module.getProductFrontdesk(request);
 }
 
+async function runNativePptProductEntryProofJs(request: any) {
+  const module = await import('./actions/native-ppt-product-entry-proof.js');
+  return module.runNativePptProductEntryProof(request);
+}
+
 async function auditDeliverableJs(request: any) {
   const module = await import('./actions/audit-deliverable.js');
   return module.auditDeliverable(request);
@@ -315,6 +320,10 @@ export function getProductPreflight(request: Record<string, unknown>): Promise<P
 
 export function getProductFrontdesk(request: Record<string, unknown>): Promise<ProductFrontdeskResponse> {
   return getProductFrontdeskJs(request) as Promise<ProductFrontdeskResponse>;
+}
+
+export function runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return runNativePptProductEntryProofJs(request) as Promise<Record<string, unknown>>;
 }
 
 export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {

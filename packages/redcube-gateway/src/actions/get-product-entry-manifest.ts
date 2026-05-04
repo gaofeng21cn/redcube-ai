@@ -38,6 +38,7 @@ import { getProductPreflight } from './get-product-preflight.js';
 import { buildOplRuntimeManagerRegistration } from './product-entry-continuity-surfaces.js';
 import { buildRouteEquivalenceContract, buildDeliverableFacadeContract } from './get-product-entry-manifest-parts/contracts.js';
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
+import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
 import {
   FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
   LONG_TASK_STAGE_POLICY,
@@ -63,6 +64,12 @@ export async function getProductEntryManifest(request) {
   const currentState = currentProgram.current_state || {};
   const activeMainline = currentState.active_mainline || {};
   const activeBaton = currentState.active_baton || {};
+  const deliverableFacade = buildDeliverableFacadeContract();
+  const nativePptOperatorUx = buildNativePptOperatorUx({
+    workspaceRoot,
+    productEntryPreflight,
+    pptPolicy: deliverableFacade.family_route_policy.ppt_deck,
+  });
   const domainEntryContract = buildRedCubeDomainEntryContract({
     productManifestCommand: PRODUCT_MANIFEST_COMMAND,
     productFrontdeskCommand: PRODUCT_FRONTDESK_COMMAND,
@@ -123,6 +130,14 @@ export async function getProductEntryManifest(request) {
         surface_kind: 'product_entry_session',
         summary: 'Inspect the current session progress for the same deliverable.',
         requires: ['entry_session_id'],
+      },
+      {
+        step_id: 'optional_native_ppt_proof',
+        title: 'Run optional native PPT proof',
+        command: nativePptOperatorUx.proof_runner.command_template,
+        surface_kind: 'native_ppt_product_entry_proof',
+        summary: 'Use only when the operator explicitly selects the native PPT proof lane; this helper delegates to the repo-owned route runner and preserves review/export gates.',
+        requires: ['entry_session_id', 'topic_id', 'deliverable_id'],
       },
     ],
     resume_contract: familyOrchestration.resume_contract,
@@ -233,7 +248,6 @@ export async function getProductEntryManifest(request) {
     runtime,
     productEntrySessionCommand,
   });
-  const deliverableFacade = buildDeliverableFacadeContract();
   const managedRuntimeContract = buildManagedRuntimeContract({
     domain_owner: 'redcube_ai',
     executor_owner: 'codex_cli',
@@ -371,6 +385,11 @@ export async function getProductEntryManifest(request) {
         command: PRODUCT_SESSION_COMMAND,
         target_surface_kind: 'product_entry_session',
       },
+      native_ppt_proof: {
+        command: nativePptOperatorUx.proof_runner.helper_command,
+        target_surface_kind: 'native_ppt_product_entry_proof',
+        role: 'controlled_operator_helper',
+      },
     },
   };
   const skillCatalog = buildSkillCatalog({
@@ -398,6 +417,7 @@ export async function getProductEntryManifest(request) {
       PRODUCT_FRONTDESK_COMMAND,
       PRODUCT_INVOKE_COMMAND,
       PRODUCT_SESSION_COMMAND,
+      nativePptOperatorUx.proof_runner.helper_command,
     ],
     command_contracts: [
       {
@@ -414,6 +434,12 @@ export async function getProductEntryManifest(request) {
         command: PRODUCT_SESSION_COMMAND,
         shell_key: 'session',
         target_surface_kind: 'product_entry_session',
+      },
+      {
+        command: nativePptOperatorUx.proof_runner.helper_command,
+        shell_key: 'native_ppt_proof',
+        target_surface_kind: 'native_ppt_product_entry_proof',
+        public_skill_policy: 'do_not_register_as_second_public_skill',
       },
     ],
   });
@@ -506,6 +532,17 @@ export async function getProductEntryManifest(request) {
       surface_kind: 'product_entry_session',
       purpose: '在已有 entry_session_id 下继续同一交付并检查当前 session 进度。',
     },
+    native_ppt_proof: {
+      command: nativePptOperatorUx.proof_runner.helper_command,
+      command_template: nativePptOperatorUx.proof_runner.command_template,
+      surface_kind: 'native_ppt_product_entry_proof',
+      purpose: '受控 operator helper；仅在显式选择 native PPT proof lane 时调用 repo-owned route runner，不注册第二公开 skill。',
+      extra_payload: {
+        selectable_status: nativePptOperatorUx.status,
+        blocked_reason: nativePptOperatorUx.blocked_reason,
+        allowed_routes: nativePptOperatorUx.proof_runner.allowed_routes,
+      },
+    },
   });
   const frontdeskSurface = buildProductEntryShellLinkedSurface({
     shell_key: 'frontdesk',
@@ -543,9 +580,15 @@ export async function getProductEntryManifest(request) {
       summary: productEntryShell.opl_bridge.purpose,
       requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
     },
+    run_native_ppt_proof: {
+      command: productEntryShell.native_ppt_proof.command,
+      surface_kind: productEntryShell.native_ppt_proof.surface_kind,
+      summary: productEntryShell.native_ppt_proof.purpose,
+      requires: ['entry_session_id', 'topic_id', 'deliverable_id'],
+    },
   });
 
-  return buildFamilyProductEntryManifest({
+  const manifest = buildFamilyProductEntryManifest({
     manifest_kind: 'redcube_product_entry_manifest',
     target_domain_id: 'redcube_ai',
     formal_entry: {
@@ -596,8 +639,9 @@ export async function getProductEntryManifest(request) {
       blocking_check_ids: productEntryPreflight.blocking_check_ids,
       checks: productEntryPreflight.checks,
       runtime_loop_closure: productEntryPreflight.runtime_loop_closure,
-    },
-    product_entry_readiness: productEntryReadiness,
+	    },
+    native_ppt_operator_ux: nativePptOperatorUx,
+	    product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: familyOrchestration,
     notes: [
@@ -610,7 +654,38 @@ export async function getProductEntryManifest(request) {
 	    extra_payload: buildManifestExtraPayload({
       routeEquivalence,
       deliverableFacade,
+      nativePptOperatorUx,
       productEntrySessionCommand,
     }),
 	  });
+  return {
+    ...manifest,
+    native_ppt_operator_ux: nativePptOperatorUx,
+    product_entry_shell: {
+      ...manifest.product_entry_shell,
+      native_ppt_proof: productEntryShell.native_ppt_proof,
+    },
+    operator_loop_actions: {
+      ...manifest.operator_loop_actions,
+      run_native_ppt_proof: operatorLoopActions.run_native_ppt_proof,
+    },
+    skill_catalog: {
+      ...manifest.skill_catalog,
+      supported_commands: [...new Set([
+        ...(manifest.skill_catalog?.supported_commands || []),
+        nativePptOperatorUx.proof_runner.helper_command,
+      ])],
+      command_contracts: [
+        ...(manifest.skill_catalog?.command_contracts || []).filter(
+          (contract) => contract?.command !== nativePptOperatorUx.proof_runner.helper_command,
+        ),
+        {
+          command: nativePptOperatorUx.proof_runner.helper_command,
+          shell_key: 'native_ppt_proof',
+          target_surface_kind: 'native_ppt_product_entry_proof',
+          public_skill_policy: 'do_not_register_as_second_public_skill',
+        },
+      ],
+    },
+  };
 	}
