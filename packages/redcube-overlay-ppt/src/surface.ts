@@ -153,7 +153,8 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.required === true
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.true_render_proof_renderer === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.cross_platform_render_required === true
-    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_kind === 'libreoffice_headless_pdf_png_v1'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_kind === 'libreoffice_headless'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_pipeline === 'libreoffice_headless_pdf_png_v1'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.runtime === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.cross_platform_render_required === true
     && content?.render_contract?.shell_file === 'render_shell.html'

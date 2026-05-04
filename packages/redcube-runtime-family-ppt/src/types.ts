@@ -340,7 +340,8 @@ export interface PptNativePptEngineContract {
   true_render_proof: {
     required: true;
     source_surface_kind: 'native_pptx';
-    renderer_kind: 'libreoffice_headless_pdf_png_v1';
+    renderer_kind: 'libreoffice_headless';
+    renderer_pipeline: 'libreoffice_headless_pdf_png_v1';
     runtime: 'libreoffice_headless';
     cross_platform_render_required: true;
     synthetic_preview_allowed: false;
@@ -359,7 +360,8 @@ export interface PptNativePptBundleArtifact extends PptRuntimeArtifactBase {
     engine_capabilities?: PptNativePptEngineContract['engine_capabilities'];
     render_proof?: {
       source_surface_kind?: 'native_pptx';
-      renderer_kind?: 'libreoffice_headless_pdf_png_v1';
+      renderer_kind?: 'libreoffice_headless';
+      renderer_pipeline?: 'libreoffice_headless_pdf_png_v1';
       runtime?: 'libreoffice_headless';
       cross_platform_render_required?: true;
       synthetic_preview?: false;

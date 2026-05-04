@@ -416,7 +416,7 @@ def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
             'preview_screenshot_file': str(preview_file),
             'preview_screenshot_sha256': preview_sha256,
             'preview_screenshot_dimensions': image_dimensions(preview_file),
-            'render_proof_source': 'true_pptx_render',
+            'render_proof_source': safe_text(render_proof.get('renderer_kind')),
             'renderer_kind': render_proof.get('renderer_kind'),
             'renderer_pipeline': render_proof.get('renderer_pipeline'),
             'render_provenance': render_provenance,

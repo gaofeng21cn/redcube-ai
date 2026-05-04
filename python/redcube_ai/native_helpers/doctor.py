@@ -16,6 +16,7 @@ OPTIONAL_IMPORT_NAMES = {
     "Pillow": "PIL",
     "python-pptx": "pptx",
     "playwright": "playwright",
+    "LibreOffice headless": None,
     "upstream-hermes-agent-local": None,
 }
 

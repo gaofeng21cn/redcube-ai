@@ -333,6 +333,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       && Object.entries(REQUIRED_ENGINE_CAPABILITIES).every(([key, value]) => capabilities?.[key] === value)
       && contract?.true_render_proof?.required === true
       && contract?.true_render_proof?.renderer_kind === safeText(expected?.true_render_proof?.renderer_kind)
+      && contract?.true_render_proof?.renderer_pipeline === safeText(expected?.true_render_proof?.renderer_pipeline)
       && contract?.true_render_proof?.runtime === safeText(expected?.true_render_proof?.runtime)
       && contract?.true_render_proof?.cross_platform_render_required === true;
     if (!valid) {
@@ -347,6 +348,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const previewScreenshots = safeArray(proof?.preview_screenshots || payload?.preview_screenshots);
     const valid = safeText(proof?.source_surface_kind) === 'native_pptx'
       && safeText(proof?.renderer_kind) === safeText(expected?.renderer_kind)
+      && safeText(proof?.renderer_pipeline) === safeText(expected?.renderer_pipeline)
       && safeText(proof?.runtime) === safeText(expected?.runtime)
       && proof?.cross_platform_render_required === true
       && proof?.synthetic_preview === false
@@ -354,12 +356,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       && previewScreenshots.length > 0
       && previewScreenshots.every((file) => existsSync(safeText(file)));
     if (!valid) {
-      throw new Error('Native PPT route requires LibreOffice headless true-render proof; stale PowerPoint, synthetic, or missing preview proof is blocked');
+      throw new Error('Native PPT route requires LibreOffice headless true-render proof; stale desktop-app, synthetic, or missing preview proof is blocked');
     }
     return {
       ...proof,
       source_surface_kind: 'native_pptx',
       renderer_kind: safeText(expected?.renderer_kind),
+      renderer_pipeline: safeText(expected?.renderer_pipeline),
       runtime: safeText(expected?.runtime),
       cross_platform_render_required: true,
       synthetic_preview: false,
@@ -413,6 +416,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     if (!manifestSlide.preview_screenshot_sha256) return ['native_preview_screenshot_hash_missing'];
     if (manifestSlide.synthetic_preview !== false) return ['native_true_render_proof_missing'];
     if (safeText(manifestSlide.render_proof_source) !== safeText(expectedProof?.renderer_kind)) return ['native_true_render_proof_missing'];
+    if (safeText(manifestSlide.renderer_pipeline) !== safeText(expectedProof?.renderer_pipeline)) return ['native_true_render_proof_missing'];
     return [];
   }
 
@@ -428,6 +432,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const renderProof = bundle?.render_proof || shapeManifest?.render_proof || {};
     const missingRenderProof = safeText(renderProof?.source_surface_kind) !== 'native_pptx'
       || safeText(renderProof?.renderer_kind) !== safeText(expectedProof?.renderer_kind)
+      || safeText(renderProof?.renderer_pipeline) !== safeText(expectedProof?.renderer_pipeline)
       || safeText(renderProof?.runtime) !== safeText(expectedProof?.runtime)
       || renderProof?.cross_platform_render_required !== true
       || renderProof?.synthetic_preview !== false
