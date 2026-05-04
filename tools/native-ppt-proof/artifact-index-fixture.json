@@ -1,0 +1,181 @@
+{
+  "schema_version": "native_ppt_proof_artifact_index.v2",
+  "output_root": "/tmp/redcube/native-ppt-proof",
+  "status": "passed",
+  "missing_required_artifacts": [],
+  "retention_contract": {
+    "required_artifact_ids": [
+      "doctor_json",
+      "product_manifest_json",
+      "product_frontdesk_json",
+      "native_helper_input_json",
+      "native_helper_output_json",
+      "proof_summary_json",
+      "editable_pptx",
+      "rendered_pdf",
+      "shape_manifest_json",
+      "preview_png_01",
+      "preview_png_02",
+      "preview_png_03",
+      "preview_png_04",
+      "preview_png_05",
+      "preview_png_06"
+    ],
+    "preview_png_count": 6,
+    "doctor_status": "ok",
+    "proof_summary_status": "passed",
+    "renderer_pipeline": "libreoffice_headless_pdf_png_v1"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "doctor_json",
+      "relative_path": "doctor.json",
+      "media_type": "application/json",
+      "category": "runtime_doctor",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "artifact_id": "product_manifest_json",
+      "relative_path": "product-manifest.json",
+      "media_type": "application/json",
+      "category": "product_entry",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "abababababababababababababababababababababababababababababababab"
+    },
+    {
+      "artifact_id": "product_frontdesk_json",
+      "relative_path": "product-frontdesk.json",
+      "media_type": "application/json",
+      "category": "product_entry",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "acacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacac"
+    },
+    {
+      "artifact_id": "native_helper_input_json",
+      "relative_path": "native-helper-input.json",
+      "media_type": "application/json",
+      "category": "native_helper",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "adadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad"
+    },
+    {
+      "artifact_id": "native_helper_output_json",
+      "relative_path": "native-helper-output.json",
+      "media_type": "application/json",
+      "category": "native_helper",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "aeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeae"
+    },
+    {
+      "artifact_id": "proof_summary_json",
+      "relative_path": "proof-summary.json",
+      "media_type": "application/json",
+      "category": "proof_summary",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "afafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafaf"
+    },
+    {
+      "artifact_id": "editable_pptx",
+      "relative_path": "native-helper/benchmark-author.pptx",
+      "media_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "artifact_id": "rendered_pdf",
+      "relative_path": "native-helper/benchmark-author.pdf",
+      "media_type": "application/pdf",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "artifact_id": "shape_manifest_json",
+      "relative_path": "native-helper/benchmark-shape-manifest.json",
+      "media_type": "application/json",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "artifact_id": "preview_png_01",
+      "relative_path": "native-helper/previews/slide-01.png",
+      "media_type": "image/png",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    {
+      "artifact_id": "preview_png_02",
+      "relative_path": "native-helper/previews/slide-02.png",
+      "media_type": "image/png",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2"
+    },
+    {
+      "artifact_id": "preview_png_03",
+      "relative_path": "native-helper/previews/slide-03.png",
+      "media_type": "image/png",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3"
+    },
+    {
+      "artifact_id": "preview_png_04",
+      "relative_path": "native-helper/previews/slide-04.png",
+      "media_type": "image/png",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4"
+    },
+    {
+      "artifact_id": "preview_png_05",
+      "relative_path": "native-helper/previews/slide-05.png",
+      "media_type": "image/png",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5"
+    },
+    {
+      "artifact_id": "preview_png_06",
+      "relative_path": "native-helper/previews/slide-06.png",
+      "media_type": "image/png",
+      "category": "native_render",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6"
+    }
+  ]
+}

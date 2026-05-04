@@ -1,0 +1,46 @@
+{
+  "schema_version": "native_ppt_proof_ci_contract.v2",
+  "default_quality_lane": {
+    "runs_true_renderer": false,
+    "required_workflow_events": ["push", "pull_request"],
+    "allowed_checks": ["typecheck", "fast", "family", "meta"]
+  },
+  "proof_job": {
+    "job_id": "native-ppt-proof",
+    "runs_true_renderer": true,
+    "required_triggers": {
+      "manual": "workflow_dispatch",
+      "nightly": {
+        "event": "schedule",
+        "cron": "17 19 * * *"
+      },
+      "pull_request_label": {
+        "event": "pull_request",
+        "types": ["labeled", "synchronize", "opened", "reopened"],
+        "label": "native-ppt-proof"
+      }
+    },
+    "required_cache_layers": [
+      {
+        "id": "npm",
+        "uses": "actions/setup-node",
+        "key_source": "package-lock.json"
+      },
+      {
+        "id": "pip",
+        "uses": "actions/cache",
+        "key_source": ".github/requirements/ci-python.txt"
+      },
+      {
+        "id": "playwright",
+        "uses": "actions/cache",
+        "key_source": ".github/requirements/ci-python.txt"
+      }
+    ],
+    "artifact_index": {
+      "path": "artifacts/native-ppt-proof/artifact-index.json",
+      "schema_version": "native_ppt_proof_artifact_index.v2",
+      "required": true
+    }
+  }
+}

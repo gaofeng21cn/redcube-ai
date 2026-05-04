@@ -83,6 +83,7 @@ manifest_report="$output_root/product-manifest.json"
 frontdesk_report="$output_root/product-frontdesk.json"
 helper_report="$output_root/native-helper-output.json"
 summary_report="$output_root/proof-summary.json"
+artifact_index_report="$output_root/artifact-index.json"
 native_dir="$output_root/native-helper"
 preview_dir="$native_dir/previews"
 
@@ -211,3 +212,7 @@ print(json.dumps(summary, ensure_ascii=False, indent=2))
 if failures:
     raise SystemExit(1)
 PY
+
+"$proof_python" tools/native-ppt-proof/build-artifact-index.py \
+  --output-dir "$output_root" \
+  --index-file "$artifact_index_report"

@@ -105,6 +105,8 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native/);
   assert.match(runner, /native-helper-output\.json/);
   assert.match(runner, /proof-summary\.json/);
+  assert.match(runner, /artifact-index\.json/);
+  assert.match(runner, /build-artifact-index\.py/);
   assert.match(runner, /synthetic preview/);
   assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
   assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
@@ -117,6 +119,36 @@ test('native PPT Linux proof environment is documented without adding a desktop-
     assert.doesNotMatch(source, new RegExp(['osa', 'script'].join(''), 'i'));
   }
   assert.match(docs, /does not replace RedCube product-entry/);
+});
+
+test('native PPT proof V2 contract is ready for opt-in CI triggers and cache policy', () => {
+  const contract = readRepoJson('tools/native-ppt-proof/ci-contract.json');
+  const runner = readRepoFile('tools/native-ppt-proof/run.sh');
+  const workflow = readRepoFile('.github/workflows/ci.yml');
+
+  assert.equal(contract.schema_version, 'native_ppt_proof_ci_contract.v2');
+  assert.equal(contract.default_quality_lane.runs_true_renderer, false);
+  assert.deepEqual(contract.default_quality_lane.required_workflow_events, ['push', 'pull_request']);
+  assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
+  assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
+  assert.match(contract.proof_job.required_triggers.nightly.cron, /^\d+ \d+ \* \* \*$/);
+  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'native-ppt-proof');
+  assert.deepEqual(
+    contract.proof_job.required_triggers.pull_request_label.types,
+    ['labeled', 'synchronize', 'opened', 'reopened'],
+  );
+  assert.deepEqual(
+    contract.proof_job.required_cache_layers.map((layer) => layer.id),
+    ['npm', 'pip', 'playwright'],
+  );
+  assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
+  assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
+  assert.match(runner, /artifact-index\.json/);
+  assert.match(runner, /build-artifact-index\.py/);
+  assert.doesNotMatch(
+    workflow,
+    /quality:\n[\s\S]*?tools\/native-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
+  );
 });
 
 test('Sentrux advisory publishes OPL quality details without changing the default quality lane', () => {
