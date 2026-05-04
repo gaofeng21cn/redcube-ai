@@ -353,6 +353,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       && proof?.cross_platform_render_required === true
       && proof?.synthetic_preview === false
       && proof?.required === true
+      && (
+        shapeManifest?.proof_flags == null
+        || shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 === true
+      )
       && previewScreenshots.length > 0
       && previewScreenshots.every((file) => existsSync(safeText(file)));
     if (!valid) {
@@ -438,6 +442,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       || renderProof?.cross_platform_render_required !== true
       || renderProof?.synthetic_preview !== false
       || renderProof?.required !== true
+      || shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 !== true
       || renderProofScreenshots.length === 0
       || !renderProofScreenshots.every((file) => existsSync(safeText(file)));
     const manifestSlidesById = new Map(
@@ -604,6 +609,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       editable_shape_plan_file: paths.editableShapePlanFile,
       engine_capabilities: payload.engine_capabilities || shapeManifest.engine_capabilities || REQUIRED_ENGINE_CAPABILITIES,
       render_proof: renderProof,
+      proof_flags: {
+        ...(shapeManifest.proof_flags || {}),
+        true_render_proof: true,
+        libreoffice_headless_pdf_png_v1: safeText(renderProof.renderer_pipeline) === 'libreoffice_headless_pdf_png_v1',
+        synthetic_preview_allowed: false,
+      },
     });
     const repairLog = payload.repair_log || {
       target_slide_ids: repairFeedback.map((slide) => slide.slide_id),
@@ -671,6 +682,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         ...repairLog,
         consumed_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : repairLog.consumed_review_stage,
         target_slide_ids: safeArray(repairLog.target_slide_ids),
+        preserved_slide_ids: safeArray(repairLog.preserved_slide_ids),
+        blocked_slide_ids_source: safeText(repairLog.blocked_slide_ids_source),
+        scope: safeText(repairLog.scope, route === 'repair_pptx_native' ? 'page' : 'deck'),
+        feedback_count: Number(repairLog.feedback_count || repairFeedback.length || 0),
         repair_log_file: safeText(repairLog.repair_log_file, paths.repairLogFile),
       },
       artifact_refs: [

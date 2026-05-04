@@ -103,6 +103,18 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     hash.update('\n');
   }
 
+  function fileSha256(file: unknown): string | null {
+    const resolvedFile = safeText(file);
+    if (!resolvedFile || !fileExists(resolvedFile)) return null;
+    return createHash('sha256').update(readFileSync(resolvedFile)).digest('hex');
+  }
+
+  function readJsonIfPresent(file: unknown): JsonRecord {
+    const resolvedFile = safeText(file);
+    if (!resolvedFile || !fileExists(resolvedFile)) return {};
+    return JSON.parse(readFileSync(resolvedFile, 'utf-8'));
+  }
+
   function hashReviewInput(renderArtifact: JsonRecord): string {
     if (isNativePptArtifact(renderArtifact)) {
       const hash = createHash('sha256');
@@ -262,11 +274,22 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const sourcePdf = safeText(bundle.pdf_file);
     const shapeManifestFile = safeText(bundle.shape_manifest_file);
     const repairLogFile = safeText(bundle.repair_log_file);
+    const previewPngFiles = safeArray(bundle.preview_screenshots).map((file) => safeText(file)).filter(Boolean);
     if (!sourcePptx || !fileExists(sourcePptx)) {
       throw new Error(`Route export_pptx requires native PPTX source before export: ${sourcePptx}`);
     }
     if (!sourcePdf || !fileExists(sourcePdf)) {
       throw new Error(`Route export_pptx requires native PPTX preview PDF before export: ${sourcePdf}`);
+    }
+    const shapeManifest = readJsonIfPresent(shapeManifestFile);
+    const rendererProof = shapeManifest.render_proof || bundle.render_proof || {};
+    if (shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 !== true) {
+      throw new Error('Route export_pptx requires native shape manifest LibreOffice headless PDF/PNG v1 proof before native export');
+    }
+    if (safeText(rendererProof?.source_surface_kind) !== 'native_pptx'
+      || safeText(rendererProof?.renderer_pipeline) !== 'libreoffice_headless_pdf_png_v1'
+      || rendererProof?.synthetic_preview !== false) {
+      throw new Error('Route export_pptx requires native renderer proof from libreoffice_headless_pdf_png_v1 before native export');
     }
     copyFileSync(sourcePptx, pptxFile);
     copyFileSync(sourcePdf, pdfFile);
@@ -284,6 +307,54 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       pptxPath: pptxFile,
       pdfPath: pdfFile,
     });
+    const sourceArtifacts = {
+      pptx_file: sourcePptx,
+      pdf_file: sourcePdf,
+      shape_manifest_file: shapeManifestFile,
+      repair_log_file: repairLogFile,
+      preview_png_files: previewPngFiles,
+    };
+    const evidenceHashes = {
+      source_pptx_sha256: fileSha256(sourcePptx),
+      source_pdf_sha256: fileSha256(sourcePdf),
+      shape_manifest_sha256: fileSha256(shapeManifestFile),
+      repair_log_sha256: fileSha256(repairLogFile),
+      final_pptx_sha256: fileSha256(pptxFile),
+      final_pdf_sha256: fileSha256(pdfFile),
+      preview_png_sha256: previewPngFiles.map((file) => ({
+        file,
+        sha256: fileSha256(file),
+      })),
+    };
+    const allPreviewHashesPresent = previewPngFiles.length > 0
+      && evidenceHashes.preview_png_sha256.every((item) => Boolean(item.sha256));
+    const shapeManifestSummary = {
+      schema_version: Number(shapeManifest.schema_version || shapeManifest.shape_manifest_schema_version || 0),
+      slide_count: safeArray(shapeManifest.slides).length || Number(bundle.page_count || 0),
+      native_quality_model: safeText(shapeManifest.native_quality_model) || null,
+      libreoffice_headless_pdf_png_v1: shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 === true
+        && safeText(rendererProof?.renderer_pipeline) === 'libreoffice_headless_pdf_png_v1',
+      all_preview_hashes_present: allPreviewHashesPresent,
+    };
+    const finalArtifactRefs = {
+      pptx_file: pptxFile,
+      pdf_file: pdfFile,
+      presenter_notes_file: notesFile,
+      final_delivery_pptx_file: finalDelivery.pptx_file,
+      final_delivery_pdf_file: finalDelivery.pdf_file,
+    };
+    const operatorProofSummary = {
+      proof_surface: 'native_export_bundle_operator_proof_summary_v1',
+      status: 'output_ready',
+      source_visual_route: safeText(renderArtifact.route),
+      renderer_pipeline: safeText(rendererProof?.renderer_pipeline),
+      libreoffice_headless_pdf_png_v1: shapeManifestSummary.libreoffice_headless_pdf_png_v1,
+      artifact_hashes: evidenceHashes,
+      source_artifact_refs: sourceArtifacts,
+      final_artifact_refs: finalArtifactRefs,
+      shape_manifest_file: shapeManifestFile,
+      repair_log_file: repairLogFile,
+    };
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       status: 'completed',
@@ -305,6 +376,21 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         source_html: null,
         native_ppt_shape_manifest: shapeManifestFile,
         native_ppt_repair_log: repairLogFile,
+        source_artifacts: sourceArtifacts,
+        evidence_hashes: evidenceHashes,
+        renderer_proof: {
+          source_surface_kind: 'native_pptx',
+          renderer_kind: safeText(rendererProof?.renderer_kind),
+          renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+          runtime: safeText(rendererProof?.runtime),
+          libreoffice_version: safeText(rendererProof?.libreoffice_version),
+          poppler_version: safeText(rendererProof?.poppler_version),
+          synthetic_preview: false,
+          required: true,
+          preview_screenshots: previewPngFiles,
+        },
+        shape_manifest_summary: shapeManifestSummary,
+        operator_proof_summary: operatorProofSummary,
         pptx_file: pptxFile,
         pdf_file: pdfFile,
         presenter_notes_file: notesFile,
@@ -330,8 +416,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       },
       artifact_refs: [
         sourcePptx,
+        sourcePdf,
         shapeManifestFile,
         repairLogFile,
+        ...previewPngFiles,
         pptxFile,
         pdfFile,
         notesFile,

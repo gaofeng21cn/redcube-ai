@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
 const PNG_1X1 = Buffer.from(
@@ -57,6 +58,15 @@ function parseArgs(argv) {
 
 function readText(file) {
   return readFileSync(file, 'utf-8');
+}
+
+function fileSha256(file) {
+  if (!file) return '';
+  try {
+    return createHash('sha256').update(readFileSync(file)).digest('hex');
+  } catch {
+    return '';
+  }
 }
 
 function ensureDir(dir) {
@@ -231,6 +241,11 @@ function buildNativePayload(args) {
       ? input.editable_shape_plan.slides.map((slide) => [String(slide?.slide_id || ''), slide])
       : [],
   );
+  const repairFeedbackSlideIds = new Set(
+    Array.isArray(input?.repair_feedback)
+      ? input.repair_feedback.map((item) => String(item?.slide_id || '').trim()).filter(Boolean)
+      : [],
+  );
   const layoutWriterFor = (layoutFamily) => `${layoutFamily || 'multi_zone_compare'}_native_writer`;
   ensureDir(previewDir);
   const slides = blueprintSlides.map((slide, index) => {
@@ -265,12 +280,13 @@ function buildNativePayload(args) {
       shape_count: 5,
       screenshot_file: screenshotFile,
       preview_screenshot_file: screenshotFile,
-      preview_screenshot_sha256: 'mock-sha256',
+      preview_screenshot_sha256: fileSha256(screenshotFile),
       preview_screenshot_dimensions: { width: 2304, height: 1296 },
       render_proof_source: rendererKind,
       renderer_kind: rendererKind,
       renderer_pipeline: mockNativeRendererPipeline(rendererKind),
       synthetic_preview: false,
+      repaired: repairFeedbackSlideIds.has(slideId),
       native_shapes: [
         {
           shape_id: `${slideId}-title`,
@@ -346,6 +362,14 @@ function buildNativePayload(args) {
     pdf_file: outputPdf || null,
     command_family: rendererKind === 'libreoffice_headless' ? 'soffice --headless' : 'legacy desktop renderer',
     cross_platform_render_required: rendererKind === 'libreoffice_headless',
+    libreoffice_version: rendererKind === 'libreoffice_headless' ? 'LibreOffice mock 24.2.0' : 'unknown',
+    poppler_version: rendererKind === 'libreoffice_headless' ? 'pdftoppm mock 24.02.0' : 'unknown',
+    source_pptx_sha256: fileSha256(outputPptx),
+    pdf_sha256: fileSha256(outputPdf),
+    preview_png_hashes: slides.map((slide) => ({
+      file: slide.preview_screenshot_file,
+      sha256: slide.preview_screenshot_sha256,
+    })),
     preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
   };
   const shapeManifest = {
@@ -387,7 +411,15 @@ function buildNativePayload(args) {
     target_slide_ids: Array.isArray(input?.repair_feedback)
       ? input.repair_feedback.map((item) => item?.slide_id).filter(Boolean)
       : [],
+    preserved_slide_ids: slides
+      .map((slide) => slide.slide_id)
+      .filter((slideId) => !repairFeedbackSlideIds.has(slideId)),
+    blocked_slide_ids_source: args.mode === 'repair'
+      ? 'screenshot_review.slide_reviews.status_block'
+      : null,
+    scope: args.mode === 'repair' ? 'page' : 'deck',
     consumed_review_stage: args.mode === 'repair' ? 'screenshot_review' : null,
+    feedback_count: Array.isArray(input?.repair_feedback) ? input.repair_feedback.length : 0,
     repair_log_file: repairLogFile || null,
   };
   if (repairLogFile) {

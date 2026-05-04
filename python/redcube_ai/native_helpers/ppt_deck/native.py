@@ -499,6 +499,13 @@ def main() -> None:
         'mode': args.mode,
         'consumed_review_stage': 'screenshot_review' if args.mode == 'repair' else None,
         'target_slide_ids': sorted(repaired_slide_ids),
+        'preserved_slide_ids': [
+            safe_text(slide.get('slide_id'))
+            for slide in manifest_slides
+            if safe_text(slide.get('slide_id')) and safe_text(slide.get('slide_id')) not in repaired_slide_ids
+        ],
+        'blocked_slide_ids_source': 'screenshot_review.slide_reviews.status_block' if args.mode == 'repair' else None,
+        'scope': 'page' if args.mode == 'repair' else 'deck',
         'feedback_count': len(repair_feedback),
         'repair_log_file': str(repair_log_file) if repair_log_file else None,
     }
