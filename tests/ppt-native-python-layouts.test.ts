@@ -116,6 +116,105 @@ function buildLibreOfficeRenderProvenance({ result, rendererKind, fixtureId }) {
   };
 }
 
+function suitePayload(suite) {
+  return {
+    editable_shape_plan: suite.editable_shape_plan,
+  };
+}
+
+function assertBenchmarkSuiteQuality({ fixture, suite, result, previewMetrics = [] }) {
+  const defaults = fixture.suite_defaults;
+  const slides = result.slides;
+  const layoutFamilies = slides.map((slide) => slide.layout_family);
+
+  assert.equal(slides.length, suite.expected_page_count);
+  assert.equal(result.pptx_slides.length, suite.expected_page_count);
+  assert.equal(slides.length >= defaults.expected_page_count_min, true);
+  assert.equal(slides.length <= defaults.expected_page_count_max, true);
+  assert.deepEqual(layoutFamilies, suite.expected_layout_families);
+  assert.equal(new Set(layoutFamilies).size >= defaults.min_layout_family_count, true);
+  assert.equal(slides.every((slide) => slide.layout_writer === `${slide.layout_family}_native_writer`), true);
+
+  const shapeNames = result.pptx_slides.flatMap((pptxSlide) => pptxSlide.map((shape) => shape.name));
+  for (const anchorShape of suite.expected_anchor_shapes) {
+    assert.equal(shapeNames.includes(anchorShape), true, `${suite.suite_id}: ${anchorShape} should exist`);
+  }
+
+  assert.equal(slides.every((slide) => slide.shape_count >= defaults.min_shape_count), true);
+  assert.equal(slides.every((slide) => slide.text_box_count >= defaults.min_text_box_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.block_count >= defaults.min_content_shape_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.decorative_shape_count >= defaults.min_decorative_shape_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.shape_kind_count >= defaults.min_shape_kind_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.role_count >= 8), true);
+  assert.equal(slides.every((slide) => slide.metrics.layout_richness_score >= defaults.min_layout_richness_score), true);
+  assert.equal(slides.every((slide) => slide.checks.layout_richness_ok), true);
+  assert.equal(slides.every((slide) => slide.redcube_svg_ir_preflight.status === 'pass'), true);
+  assert.equal(slides.every((slide) => /^[a-f0-9]{64}$/.test(slide.redcube_svg_ir_sha256)), true);
+  assert.equal(slides.every((slide) => slide.checks.overflow_free), true);
+  assert.equal(slides.every((slide) => slide.checks.occlusion_free), true);
+  assert.equal(slides.every((slide) => slide.checks.visual_density_ok), true);
+  assert.equal(slides.every((slide) => slide.checks.edge_clearance_ok), true);
+  assert.equal(slides.every((slide) => slide.metrics.primary_points >= 3), true);
+  assert.equal(slides.every((slide) => slide.metrics.overlap_pairs === 0), true);
+  assert.equal(slides.every((slide) => slide.metrics.occupied_ratio > defaults.min_density), true);
+  assert.equal(slides.every((slide) => slide.metrics.occupied_ratio < defaults.max_density), true);
+
+  const editableShapeCount = result.pptx_slides.reduce((total, pptxSlide) => total + pptxSlide.length, 0);
+  assert.equal(editableShapeCount >= defaults.min_editable_shape_count * suite.expected_page_count, true);
+
+  const geometrySignatures = result.pptx_slides.map((pptxSlide, index) => {
+    const anchorShape = suite.expected_anchor_shapes[index];
+    const shape = pptxSlide.find((candidate) => candidate.name === anchorShape);
+    return shape ? `${shape.name}:${shape.left},${shape.top},${shape.width},${shape.height}` : '';
+  });
+  assert.equal(geometrySignatures.every(Boolean), true);
+  assert.equal(new Set(geometrySignatures).size, suite.expected_page_count);
+
+  const visibleText = JSON.stringify(slides.flatMap((slide) => (
+    slide.native_shapes.map((shape) => shape.text).filter(Boolean)
+  )));
+  for (const fragment of fixture.forbidden_visible_text_fragments) {
+    assert.doesNotMatch(visibleText, new RegExp(fragment, 'i'));
+  }
+  assert.doesNotMatch(visibleText, /\{\s*["']?(label|text)["']?\s*:/i);
+  for (const fragment of suite.expected_visible_text_fragments) {
+    assert.match(visibleText, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+
+  if (previewMetrics.length) {
+    assert.equal(previewMetrics.length, suite.expected_page_count);
+    assert.equal(previewMetrics.every((item) => item.sha256 && item.sha256 !== sha256Hex(Buffer.alloc(0))), true);
+    assert.equal(previewMetrics.every((item) => item.dimensions.width > 0 && item.dimensions.height > 0), true);
+  }
+
+  const renderProvenance = buildLibreOfficeRenderProvenance({
+    result,
+    rendererKind: fixture.expected_renderer_kind,
+    fixtureId: `${fixture.fixture_id}:${suite.suite_id}`,
+  });
+  assert.equal(renderProvenance.renderer_kind, fixture.expected_renderer_kind);
+  assert.equal(renderProvenance.page_count, suite.expected_page_count);
+  assert.equal(renderProvenance.pages.length, suite.expected_page_count);
+  assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.svg_ir_sha256)), true);
+  assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.drawingml_shape_hash)), true);
+  assert.match(renderProvenance.render_hash, /^[a-f0-9]{64}$/);
+
+  return {
+    suite_id: suite.suite_id,
+    route: suite.editable_shape_plan.route,
+    page_count: slides.length,
+    layout_family_count: new Set(layoutFamilies).size,
+    editable_shape_count: editableShapeCount,
+    png_non_empty_pages: previewMetrics.length,
+    field_leakage_count: 0,
+    overlap_pairs: slides.reduce((total, slide) => total + slide.metrics.overlap_pairs, 0),
+    density_min: Math.min(...slides.map((slide) => slide.metrics.occupied_ratio)),
+    density_max: Math.max(...slides.map((slide) => slide.metrics.occupied_ratio)),
+    edge_clearance_min: Math.min(...slides.flatMap((slide) => Object.values(slide.metrics.edge_clearance))),
+    render_hash: renderProvenance.render_hash,
+  };
+}
+
 test('native Python layout writer extracts audience text and emits distinct layout families without true render', () => {
   const slides = [
     ['S01', 'cover_signal', 'ppt.hero_signal'],
@@ -183,100 +282,63 @@ test('native Python layout writer extracts audience text and emits distinct layo
   assert.match(visibleText, /Audience point 1A/);
 });
 
-test('native PPT visual benchmark fixture captures six-page layout, shape, leakage, metrics, and render provenance contract', () => {
+test('native PPT visual benchmark fixture captures four domain suites with layout, shape, leakage, metrics, and render provenance contract', () => {
   const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
-  const result = runNativeLayoutWriter(fixture, 'redcube-native-visual-benchmark-');
-  const slides = result.slides;
-  const layoutFamilies = slides.map((slide) => slide.layout_family);
+  assert.equal(fixture.route_policy.native_default_route, false);
+  assert.equal(fixture.route_policy.comparison_only, true);
+  assert.equal(fixture.suites.length, 4);
+  assert.deepEqual(fixture.suites.map((suite) => suite.suite_label), [
+    '商业汇报',
+    '学术讲座',
+    '数据图表型',
+    '中文长文本型',
+  ]);
 
-  assert.equal(slides.length, fixture.expected_page_count);
-  assert.equal(result.pptx_slides.length, fixture.expected_page_count);
-  assert.deepEqual(layoutFamilies, fixture.expected_layout_families);
-  assert.equal(new Set(layoutFamilies).size, fixture.expected_layout_families.length);
-  assert.equal(slides.every((slide) => slide.layout_writer === `${slide.layout_family}_native_writer`), true);
-
-  const shapeNames = result.pptx_slides.flatMap((pptxSlide) => pptxSlide.map((shape) => shape.name));
-  for (const anchorShape of fixture.expected_anchor_shapes) {
-    assert.equal(shapeNames.includes(anchorShape), true, `${anchorShape} should exist in DrawingML output`);
-  }
-
-  assert.equal(slides.every((slide) => slide.shape_count >= fixture.min_shape_count), true);
-  assert.equal(slides.every((slide) => slide.text_box_count >= fixture.min_text_box_count), true);
-  assert.equal(slides.every((slide) => slide.metrics.block_count >= fixture.min_content_shape_count), true);
-  assert.equal(slides.every((slide) => slide.metrics.decorative_shape_count >= fixture.min_decorative_shape_count), true);
-  assert.equal(slides.every((slide) => slide.metrics.shape_kind_count >= fixture.min_shape_kind_count), true);
-  assert.equal(slides.every((slide) => slide.metrics.role_count >= 8), true);
-  assert.equal(slides.every((slide) => slide.metrics.layout_richness_score >= 0.68), true);
-  assert.equal(slides.every((slide) => slide.checks.layout_richness_ok), true);
-  assert.equal(slides.every((slide) => slide.redcube_svg_ir_preflight.status === 'pass'), true);
-  assert.equal(slides.every((slide) => /^[a-f0-9]{64}$/.test(slide.redcube_svg_ir_sha256)), true);
-  assert.equal(slides.every((slide) => slide.checks.overflow_free), true);
-  assert.equal(slides.every((slide) => slide.checks.occlusion_free), true);
-  assert.equal(slides.every((slide) => slide.checks.visual_density_ok), true);
-  assert.equal(slides.every((slide) => slide.checks.edge_clearance_ok), true);
-  assert.equal(slides.every((slide) => slide.metrics.primary_points >= 3), true);
-  assert.equal(slides.every((slide) => slide.metrics.overlap_pairs === 0), true);
-  assert.equal(slides.every((slide) => slide.metrics.occupied_ratio > 0.18), true);
-  assert.equal(slides.every((slide) => slide.metrics.occupied_ratio < 0.82), true);
-
-  const geometrySignatures = result.pptx_slides.map((pptxSlide, index) => {
-    const anchorShape = fixture.expected_anchor_shapes[index];
-    const shape = pptxSlide.find((candidate) => candidate.name === anchorShape);
-    return shape ? `${shape.name}:${shape.left},${shape.top},${shape.width},${shape.height}` : '';
+  const reportRows = fixture.suites.map((suite) => {
+    const result = runNativeLayoutWriter(suitePayload(suite), `redcube-native-visual-benchmark-${suite.suite_id}-`);
+    return assertBenchmarkSuiteQuality({ fixture, suite, result });
   });
-  assert.equal(geometrySignatures.every(Boolean), true);
-  assert.equal(new Set(geometrySignatures).size, fixture.expected_page_count);
 
-  const visibleText = JSON.stringify(slides.flatMap((slide) => (
-    slide.native_shapes.map((shape) => shape.text).filter(Boolean)
-  )));
-  for (const fragment of fixture.forbidden_visible_text_fragments) {
-    assert.doesNotMatch(visibleText, new RegExp(fragment, 'i'));
-  }
-  assert.doesNotMatch(visibleText, /\{\s*["']?(label|text)["']?\s*:/i);
-  assert.match(visibleText, /Executive signal holds across channels/);
-  assert.match(visibleText, /Gate four authorizes scale/);
-  assert.match(visibleText, /Primary outcome is ready/);
-
-  const renderProvenance = buildLibreOfficeRenderProvenance({
-    result,
-    rendererKind: fixture.expected_renderer_kind,
-    fixtureId: fixture.fixture_id,
-  });
-  assert.equal(renderProvenance.renderer_kind, 'libreoffice_headless');
-  assert.equal(renderProvenance.page_count, fixture.expected_page_count);
-  assert.equal(renderProvenance.pages.length, fixture.expected_page_count);
-  assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.svg_ir_sha256)), true);
-  assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.drawingml_shape_hash)), true);
-  assert.match(renderProvenance.render_hash, /^[a-f0-9]{64}$/);
+  const requiredFields = fixture.quality_comparison_report.required_record_fields;
+  assert.equal(reportRows.every((row) => requiredFields.every((field) => Object.hasOwn(row, field))), true);
+  assert.equal(reportRows.every((row) => row.route === 'author_pptx_native'), true);
+  assert.equal(reportRows.every((row) => row.page_count >= 6 && row.page_count <= 10), true);
+  assert.equal(reportRows.every((row) => row.layout_family_count >= fixture.suite_defaults.min_layout_family_count), true);
+  assert.equal(reportRows.every((row) => row.editable_shape_count >= fixture.suite_defaults.min_editable_shape_count * row.page_count), true);
+  assert.equal(reportRows.every((row) => row.field_leakage_count === 0), true);
+  assert.equal(reportRows.every((row) => row.overlap_pairs === 0), true);
+  assert.equal(reportRows.every((row) => /^[a-f0-9]{64}$/.test(row.render_hash)), true);
 });
 
-test('native render preview attachment records PNG manifest metrics without packaging screenshots into PPTX', () => {
+test('native render preview attachment records PNG manifest metrics for every benchmark suite without packaging screenshots into PPTX', () => {
   const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
-  const result = runNativeLayoutWriter(fixture, 'redcube-native-render-preview-');
-  const previewDir = path.join(result.workspaceRoot, 'previews');
-  mkdirSync(previewDir, { recursive: true });
-  const previewMetrics = result.slides.map((slide, index) => {
-    const file = path.join(previewDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
-    return { file, ...writeTinyPng(file), slide_id: slide.slide_id };
-  });
-  const inputFile = path.join(result.workspaceRoot, 'attach-input.json');
-  writeJson(inputFile, {
-    slides: result.slides,
-    render_proof: {
-      renderer_kind: 'libreoffice_headless',
-      renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
-      source_surface_kind: 'native_pptx',
-      source_pptx_sha256: sha256Hex(readFileSync(result.outputPptx)),
-      pdf_sha256: sha256Hex(Buffer.from('pdf-proof')),
-      preview_screenshots: previewMetrics.map((item) => item.file),
-      preview_png_hashes: previewMetrics.map((item) => ({
-        file: item.file,
-        sha256: item.sha256,
-      })),
-    },
-  });
-  const script = `
+  for (const suite of fixture.suites) {
+    const result = runNativeLayoutWriter(suitePayload(suite), `redcube-native-render-preview-${suite.suite_id}-`);
+    const previewDir = path.join(result.workspaceRoot, 'previews');
+    mkdirSync(previewDir, { recursive: true });
+    const previewMetrics = result.slides.map((slide, index) => {
+      const file = path.join(previewDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
+      return { file, ...writeTinyPng(file), slide_id: slide.slide_id };
+    });
+    assertBenchmarkSuiteQuality({ fixture, suite, result, previewMetrics });
+
+    const inputFile = path.join(result.workspaceRoot, 'attach-input.json');
+    writeJson(inputFile, {
+      slides: result.slides,
+      render_proof: {
+        renderer_kind: 'libreoffice_headless',
+        renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+        source_surface_kind: 'native_pptx',
+        source_pptx_sha256: sha256Hex(readFileSync(result.outputPptx)),
+        pdf_sha256: sha256Hex(Buffer.from('pdf-proof')),
+        preview_screenshots: previewMetrics.map((item) => item.file),
+        preview_png_hashes: previewMetrics.map((item) => ({
+          file: item.file,
+          sha256: item.sha256,
+        })),
+      },
+    });
+    const script = `
 import json
 from pathlib import Path
 from redcube_ai.native_helpers.ppt_deck.native import attach_rendered_previews
@@ -284,26 +346,27 @@ from redcube_ai.native_helpers.ppt_deck.native import attach_rendered_previews
 payload = json.loads(Path(${JSON.stringify(inputFile)}).read_text(encoding='utf-8'))
 print(json.dumps(attach_rendered_previews(payload['slides'], payload['render_proof']), ensure_ascii=False))
 `;
-  const python = resolveTestPythonCommand();
-  const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
-    cwd: path.resolve('.'),
-    env: { ...process.env, PYTHONPATH: path.resolve('python') },
-    encoding: 'utf-8',
-  });
-  const attachedSlides = JSON.parse(stdout);
+    const python = resolveTestPythonCommand();
+    const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
+      cwd: path.resolve('.'),
+      env: { ...process.env, PYTHONPATH: path.resolve('python') },
+      encoding: 'utf-8',
+    });
+    const attachedSlides = JSON.parse(stdout);
 
-  assert.equal(attachedSlides.length, fixture.expected_page_count);
-  for (const [index, slide] of attachedSlides.entries()) {
-    const expected = previewMetrics[index];
-    assert.equal(slide.preview_screenshot_file, expected.file);
-    assert.equal(slide.preview_screenshot_sha256, expected.sha256);
-    assert.deepEqual(slide.preview_screenshot_dimensions, expected.dimensions);
-    assert.equal(slide.synthetic_preview, false);
-    assert.equal(slide.render_provenance.preview_screenshot_sha256, expected.sha256);
-    assert.deepEqual(slide.render_provenance.preview_screenshot_dimensions, expected.dimensions);
-  }
-  const outputBytes = readFileSync(result.outputPptx);
-  for (const preview of previewMetrics) {
-    assert.equal(outputBytes.includes(readFileSync(preview.file)), false);
+    assert.equal(attachedSlides.length, suite.expected_page_count);
+    for (const [index, slide] of attachedSlides.entries()) {
+      const expected = previewMetrics[index];
+      assert.equal(slide.preview_screenshot_file, expected.file);
+      assert.equal(slide.preview_screenshot_sha256, expected.sha256);
+      assert.deepEqual(slide.preview_screenshot_dimensions, expected.dimensions);
+      assert.equal(slide.synthetic_preview, false);
+      assert.equal(slide.render_provenance.preview_screenshot_sha256, expected.sha256);
+      assert.deepEqual(slide.render_provenance.preview_screenshot_dimensions, expected.dimensions);
+    }
+    const outputBytes = readFileSync(result.outputPptx);
+    for (const preview of previewMetrics) {
+      assert.equal(outputBytes.includes(readFileSync(preview.file)), false);
+    }
   }
 });
