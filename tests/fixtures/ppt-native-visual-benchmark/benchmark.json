@@ -2,8 +2,11 @@
   "fixture_id": "ppt_native_visual_benchmark_v1",
   "expected_renderer_kind": "libreoffice_headless",
   "expected_page_count": 6,
-  "min_shape_count": 5,
-  "min_text_box_count": 3,
+  "min_shape_count": 14,
+  "min_text_box_count": 6,
+  "min_content_shape_count": 7,
+  "min_decorative_shape_count": 5,
+  "min_shape_kind_count": 3,
   "expected_layout_families": [
     "cover_signal",
     "multi_zone_compare",

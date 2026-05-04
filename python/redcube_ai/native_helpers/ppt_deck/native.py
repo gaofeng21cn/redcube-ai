@@ -26,6 +26,7 @@ MIN_NATIVE_DENSITY = 0.18
 MAX_NATIVE_DENSITY = 0.82
 MIN_NATIVE_EDGE_CLEARANCE = 24.0
 MAX_NATIVE_PRIMARY_POINTS = 5
+MIN_NATIVE_LAYOUT_RICHNESS = 0.68
 ENGINE_CAPABILITIES = {
     'authoring_ir': 'redcube_svg_ir',
     'authoring_ir_version': 1,
@@ -101,7 +102,10 @@ def text_capacity_failure(shape: dict) -> dict | None:
 
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
+    decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
     overlap_shapes = [shape for shape in content_shapes if shape.get('kind') == 'text_box']
+    shape_kinds = {safe_text(shape.get('kind')) for shape in native_shapes if safe_text(shape.get('kind'))}
+    shape_roles = {safe_text(shape.get('role')) for shape in native_shapes if safe_text(shape.get('role'))}
     title_shapes = [
         shape for shape in native_shapes
         if shape.get('role') == 'title' and shape.get('kind') == 'text_box' and safe_text(shape.get('text'))
@@ -140,6 +144,14 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     clipped_nodes = len(block_content_failures)
     title_typography_ok = bool(title_shapes) and title_font_size >= 28.0
     page_number_consistency_ok = bool(page_number_shapes)
+    layout_richness_score = round(clamp(
+        (min(len(native_shapes), 20) / 20.0 * 0.34)
+        + (min(len(shape_kinds), 4) / 4.0 * 0.22)
+        + (min(len(shape_roles), 10) / 10.0 * 0.22)
+        + (min(len(decorative_shapes), 7) / 7.0 * 0.22),
+        0.0,
+        1.0,
+    ), 4)
     checks = {
         'overflow_free': clipped_nodes == 0,
         'occlusion_free': len(overlap_pairs) == 0,
@@ -149,6 +161,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'block_content_fit_ok': clipped_nodes == 0,
         'title_typography_ok': title_typography_ok,
         'page_number_consistency_ok': page_number_consistency_ok,
+        'layout_richness_ok': layout_richness_score >= MIN_NATIVE_LAYOUT_RICHNESS,
     }
     issues = []
     if not checks['visual_density_ok']:
@@ -165,6 +178,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('title_typography_missing_or_too_small')
     if not checks['page_number_consistency_ok']:
         issues.append('page_number_missing')
+    if not checks['layout_richness_ok']:
+        issues.append('layout_richness_below_threshold')
     return {
         'checks': checks,
         'issues': issues,
@@ -172,7 +187,11 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'title_font_size': round(title_font_size, 2),
             'text_char_count': text_char_count,
             'block_count': len(content_shapes),
+            'decorative_shape_count': len(decorative_shapes),
             'shape_count': len(native_shapes),
+            'shape_kind_count': len(shape_kinds),
+            'role_count': len(shape_roles),
+            'layout_richness_score': layout_richness_score,
             'overlap_pairs': len(overlap_pairs),
             'overlaps': overlap_pairs,
             'clipped_nodes': clipped_nodes,

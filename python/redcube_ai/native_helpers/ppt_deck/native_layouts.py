@@ -5,7 +5,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor
-from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
 from pptx.util import Inches, Pt
 
 
@@ -383,7 +383,34 @@ class SlideBuilder:
         shape.line.color.rgb = rgb(line_color)
         shape.line.width = Pt(1)
         shape.name = shape_id
-        self.record_shape(shape_id, 'shape', left, top, width, height, role, quality_role=quality_role)
+        self.record_shape(shape_id, 'rounded_rect' if radius else 'rect', left, top, width, height, role, quality_role=quality_role)
+        return shape
+
+    def oval(self, shape_id, left, top, width, height, fill_key, role, quality_role='decorative', line_key=None):
+        shape = self.slide.shapes.add_shape(MSO_SHAPE.OVAL, left, top, width, height)
+        shape.fill.solid()
+        shape.fill.fore_color.rgb = rgb(self.palette[fill_key] if fill_key in self.palette else fill_key)
+        line_color = self.palette.get(line_key or fill_key, self.palette.get(fill_key, fill_key))
+        shape.line.color.rgb = rgb(line_color)
+        shape.line.width = Pt(1)
+        shape.name = shape_id
+        self.record_shape(shape_id, 'oval', left, top, width, height, role, quality_role=quality_role)
+        return shape
+
+    def line(self, shape_id, begin_x, begin_y, end_x, end_y, color_key='line', width=1.2, role='connector', quality_role='decorative'):
+        begin_x = int(begin_x)
+        begin_y = int(begin_y)
+        end_x = int(end_x)
+        end_y = int(end_y)
+        shape = self.slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, begin_x, begin_y, end_x, end_y)
+        shape.name = shape_id
+        shape.line.color.rgb = rgb(self.palette[color_key] if color_key in self.palette else color_key)
+        shape.line.width = Pt(width)
+        left = min(begin_x, end_x)
+        top = min(begin_y, end_y)
+        box_width = abs(end_x - begin_x)
+        box_height = abs(end_y - begin_y)
+        self.record_shape(shape_id, 'line', left, top, box_width, box_height, role, quality_role=quality_role)
         return shape
 
     def text(self, shape_id, left, top, width, height, text, size, color_key, role, bold=False, quality_role='content'):
@@ -410,6 +437,9 @@ class SlideBuilder:
 def add_background(ctx: SlideBuilder):
     ctx.rect(f'{ctx.slide_id}-background', 0, 0, SLIDE_W, SLIDE_H, 'bg', 'background', radius=False)
     ctx.rect(f'{ctx.slide_id}-top-rule', Inches(1.0), Inches(0.36), Inches(1.85), Inches(0.08), 'accent', 'accent_rule', radius=False)
+    ctx.line(f'{ctx.slide_id}-left-rail', Inches(0.62), Inches(0.8), Inches(0.62), Inches(7.7), 'line', 1.1, 'layout_rail')
+    ctx.oval(f'{ctx.slide_id}-corner-dot', Inches(14.42), Inches(0.48), Inches(0.18), Inches(0.18), 'accent', 'accent_dot')
+    ctx.rect(f'{ctx.slide_id}-corner-chip', Inches(14.7), Inches(0.54), Inches(0.34), Inches(0.08), 'line', 'accent_chip', radius=False)
 
 
 def add_footer(ctx: SlideBuilder, index: int, total: int):
@@ -442,9 +472,12 @@ def write_cover_signal(ctx: SlideBuilder, slide_data, index: int, total: int, re
     ctx.text(f'{ctx.slide_id}-title', Inches(1.28), Inches(1.68), Inches(9.45), Inches(0.92), title, 34, 'ink', 'title', True)
     ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.28), Inches(2.68), Inches(9.4), Inches(0.54), core, 17, 'muted', 'core_sentence')
     ctx.rect(f'{ctx.slide_id}-accent-slab', Inches(12.0), Inches(0.95), Inches(2.55), Inches(6.6), 'accent', 'hero_accent', 'decorative', radius=False)
+    ctx.line(f'{ctx.slide_id}-hero-vector', Inches(10.8), Inches(2.18), Inches(12.0), Inches(2.18), 'accent', 1.6, 'hero_vector')
+    ctx.oval(f'{ctx.slide_id}-hero-node', Inches(11.24), Inches(2.04), Inches(0.28), Inches(0.28), 'bg', 'hero_node', 'decorative', 'accent')
     for point_index, point in enumerate(points[:3], 1):
         x = Inches(1.0 + ((point_index - 1) * 4.55))
         ctx.rect(f'{ctx.slide_id}-signal-{point_index}-panel', x, Inches(5.35), Inches(3.95), Inches(1.0), 'panel', 'signal_panel', 'content', 'line')
+        ctx.oval(f'{ctx.slide_id}-signal-{point_index}-dot', x + Inches(0.18), Inches(5.12), Inches(0.18), Inches(0.18), 'accent', 'signal_dot')
         ctx.text(f'{ctx.slide_id}-signal-{point_index}-text', x + Inches(0.24), Inches(5.58), Inches(3.4), Inches(0.48), point, 14, 'ink', 'point_text', True)
     add_footer(ctx, index, total)
 
@@ -462,9 +495,11 @@ def write_multi_zone_compare(ctx: SlideBuilder, slide_data, index: int, total: i
     for point_index, point in enumerate(points[:4], 1):
         left, top, width, height = zones[point_index - 1]
         ctx.rect(f'{ctx.slide_id}-zone-{point_index}-panel', left, top, width, height, 'panel', 'compare_panel', 'content', 'line')
+        ctx.rect(f'{ctx.slide_id}-zone-{point_index}-tab', left + Inches(0.28), top + Inches(0.18), Inches(1.05), Inches(0.12), 'accent', 'zone_tab', radius=False)
         ctx.text(f'{ctx.slide_id}-zone-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(0.6), Inches(0.38), f'{point_index:02d}', 14, 'accent', 'point_index', True)
         ctx.text(f'{ctx.slide_id}-zone-{point_index}-text', left + Inches(0.28), top + Inches(0.74), width - Inches(0.58), height - Inches(0.9), point, 14, 'ink', 'point_text')
     ctx.rect(f'{ctx.slide_id}-bridge-rule', Inches(7.78), Inches(2.38), Inches(0.08), Inches(4.0), 'accent', 'compare_divider', radius=False)
+    ctx.line(f'{ctx.slide_id}-horizontal-bridge', Inches(1.2), Inches(4.55), Inches(14.55), Inches(4.55), 'line', 1.1, 'compare_bridge')
     add_footer(ctx, index, total)
 
 
@@ -476,6 +511,9 @@ def write_timeline_band(ctx: SlideBuilder, slide_data, index: int, total: int, r
     for point_index, point in enumerate(points[:4], 1):
         left = Inches(1.0 + ((point_index - 1) * 3.65))
         top = Inches(2.55 if point_index % 2 else 4.45)
+        center_x = left + Inches(1.52)
+        ctx.line(f'{ctx.slide_id}-milestone-{point_index}-stem', center_x, Inches(4.06), center_x, top + Inches(0.08), 'line', 1.1, 'timeline_stem')
+        ctx.oval(f'{ctx.slide_id}-milestone-{point_index}-node', center_x - Inches(0.11), Inches(3.93), Inches(0.22), Inches(0.22), 'accent', 'timeline_node')
         ctx.rect(f'{ctx.slide_id}-milestone-{point_index}-panel', left, top, Inches(3.05), Inches(1.15), 'panel', 'timeline_panel', 'content', 'line')
         ctx.text(f'{ctx.slide_id}-milestone-{point_index}-index', left + Inches(0.22), top + Inches(0.18), Inches(0.65), Inches(0.32), f'{point_index:02d}', 13, 'accent', 'point_index', True)
         ctx.text(f'{ctx.slide_id}-milestone-{point_index}-text', left + Inches(0.22), top + Inches(0.56), Inches(2.55), Inches(0.46), point, 12.5, 'ink', 'point_text')
@@ -486,10 +524,12 @@ def write_judgement_ladder(ctx: SlideBuilder, slide_data, index: int, total: int
     add_background(ctx)
     add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
+    ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(0.95), Inches(6.62), Inches(12.85), Inches(3.84), 'line', 1.5, 'ladder_spine')
     for point_index, point in enumerate(points[:4], 1):
         left = Inches(1.08 + ((point_index - 1) * 3.18))
         top = Inches(5.8 - ((point_index - 1) * 0.72))
         height = Inches(0.92 + ((point_index - 1) * 0.32))
+        ctx.oval(f'{ctx.slide_id}-gate-{point_index}-node', left - Inches(0.18), top + Inches(0.16), Inches(0.22), Inches(0.22), 'accent', 'gate_node')
         ctx.rect(f'{ctx.slide_id}-gate-{point_index}-panel', left, top, Inches(2.76), height, 'panel', 'judgement_step', 'content', 'line')
         ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.2), top + Inches(0.16), Inches(1.3), Inches(0.3), f'Gate {point_index}', 13, 'accent', 'point_index', True)
         ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.2), top + Inches(0.54), Inches(2.3), height - Inches(0.68), point, 12.5, 'ink', 'point_text')
@@ -508,9 +548,20 @@ def write_ring_cross(ctx: SlideBuilder, slide_data, index: int, total: int, repa
         (Inches(10.55), Inches(5.06), Inches(4.35), Inches(1.3)),
         (Inches(1.02), Inches(5.06), Inches(4.35), Inches(1.3)),
     ]
+    hub_points = [
+        (Inches(6.25), Inches(3.62)),
+        (Inches(9.43), Inches(3.62)),
+        (Inches(9.43), Inches(4.12)),
+        (Inches(6.25), Inches(4.12)),
+    ]
     for point_index, point in enumerate(points[:4], 1):
         left, top, width, height = positions[point_index - 1]
+        end_x, end_y = hub_points[point_index - 1]
+        start_x = left + (width if point_index in {1, 4} else 0)
+        start_y = top + (height / 2)
+        ctx.line(f'{ctx.slide_id}-axis-{point_index}-connector', start_x, start_y, end_x, end_y, 'line', 1.2, 'axis_connector')
         ctx.rect(f'{ctx.slide_id}-axis-{point_index}-panel', left, top, width, height, 'panel', 'axis_panel', 'content', 'line')
+        ctx.oval(f'{ctx.slide_id}-axis-{point_index}-node', left + Inches(0.16), top + Inches(0.16), Inches(0.18), Inches(0.18), 'accent', 'axis_node')
         ctx.text(f'{ctx.slide_id}-axis-{point_index}-text', left + Inches(0.24), top + Inches(0.32), width - Inches(0.5), Inches(0.62), point, 13.5, 'ink', 'point_text', True)
     add_footer(ctx, index, total)
 
@@ -521,9 +572,11 @@ def write_summary_peak(ctx: SlideBuilder, slide_data, index: int, total: int, re
     points = slide_points(slide_data)
     primary = points[0] if points else slide_core_sentence(slide_data)
     ctx.rect(f'{ctx.slide_id}-summary-peak', Inches(1.0), Inches(2.38), Inches(13.7), Inches(1.35), 'accent', 'summary_peak', 'content')
+    ctx.rect(f'{ctx.slide_id}-peak-shadow', Inches(1.26), Inches(3.82), Inches(13.18), Inches(0.12), 'line', 'peak_shadow', radius=False)
     ctx.text(f'{ctx.slide_id}-peak-text', Inches(1.48), Inches(2.75), Inches(12.5), Inches(0.54), primary, 18, '#FFFFFF', 'summary_peak', True)
     for point_index, point in enumerate(points[1:4] or points[:3], 1):
         left = Inches(1.0 + ((point_index - 1) * 4.63))
+        ctx.oval(f'{ctx.slide_id}-takeaway-{point_index}-node', left + Inches(0.2), Inches(4.28), Inches(0.22), Inches(0.22), 'accent', 'takeaway_node')
         ctx.rect(f'{ctx.slide_id}-takeaway-{point_index}-panel', left, Inches(4.55), Inches(4.05), Inches(1.25), 'panel', 'takeaway_panel', 'content', 'line')
         ctx.text(f'{ctx.slide_id}-takeaway-{point_index}-text', left + Inches(0.26), Inches(4.92), Inches(3.5), Inches(0.48), point, 13.5, 'ink', 'point_text', True)
     add_footer(ctx, index, total)

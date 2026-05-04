@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 function readJson(file) {
@@ -72,6 +72,19 @@ print(json.dumps({'slides': manifest, 'pptx_slides': pptx_slides, 'pptx_file': $
 
 function stableHash(data) {
   return createHash('sha256').update(JSON.stringify(data)).digest('hex');
+}
+
+function sha256Hex(buffer) {
+  return createHash('sha256').update(buffer).digest('hex');
+}
+
+function writeTinyPng(file) {
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVR4nGP8z8Dwn4GBgYGJAQoAABMIAgLQdUeRAAAAAElFTkSuQmCC',
+    'base64',
+  );
+  writeFileSync(file, png);
+  return { sha256: sha256Hex(png), dimensions: { width: 2, height: 2 } };
 }
 
 function buildLibreOfficeRenderProvenance({ result, rendererKind, fixtureId }) {
@@ -189,6 +202,12 @@ test('native PPT visual benchmark fixture captures six-page layout, shape, leaka
 
   assert.equal(slides.every((slide) => slide.shape_count >= fixture.min_shape_count), true);
   assert.equal(slides.every((slide) => slide.text_box_count >= fixture.min_text_box_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.block_count >= fixture.min_content_shape_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.decorative_shape_count >= fixture.min_decorative_shape_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.shape_kind_count >= fixture.min_shape_kind_count), true);
+  assert.equal(slides.every((slide) => slide.metrics.role_count >= 8), true);
+  assert.equal(slides.every((slide) => slide.metrics.layout_richness_score >= 0.68), true);
+  assert.equal(slides.every((slide) => slide.checks.layout_richness_ok), true);
   assert.equal(slides.every((slide) => slide.redcube_svg_ir_preflight.status === 'pass'), true);
   assert.equal(slides.every((slide) => /^[a-f0-9]{64}$/.test(slide.redcube_svg_ir_sha256)), true);
   assert.equal(slides.every((slide) => slide.checks.overflow_free), true);
@@ -230,4 +249,61 @@ test('native PPT visual benchmark fixture captures six-page layout, shape, leaka
   assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.svg_ir_sha256)), true);
   assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.drawingml_shape_hash)), true);
   assert.match(renderProvenance.render_hash, /^[a-f0-9]{64}$/);
+});
+
+test('native render preview attachment records PNG manifest metrics without packaging screenshots into PPTX', () => {
+  const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
+  const result = runNativeLayoutWriter(fixture, 'redcube-native-render-preview-');
+  const previewDir = path.join(result.workspaceRoot, 'previews');
+  mkdirSync(previewDir, { recursive: true });
+  const previewMetrics = result.slides.map((slide, index) => {
+    const file = path.join(previewDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
+    return { file, ...writeTinyPng(file), slide_id: slide.slide_id };
+  });
+  const inputFile = path.join(result.workspaceRoot, 'attach-input.json');
+  writeJson(inputFile, {
+    slides: result.slides,
+    render_proof: {
+      renderer_kind: 'libreoffice_headless',
+      renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+      source_surface_kind: 'native_pptx',
+      source_pptx_sha256: sha256Hex(readFileSync(result.outputPptx)),
+      pdf_sha256: sha256Hex(Buffer.from('pdf-proof')),
+      preview_screenshots: previewMetrics.map((item) => item.file),
+      preview_png_hashes: previewMetrics.map((item) => ({
+        file: item.file,
+        sha256: item.sha256,
+      })),
+    },
+  });
+  const script = `
+import json
+from pathlib import Path
+from redcube_ai.native_helpers.ppt_deck.native import attach_rendered_previews
+
+payload = json.loads(Path(${JSON.stringify(inputFile)}).read_text(encoding='utf-8'))
+print(json.dumps(attach_rendered_previews(payload['slides'], payload['render_proof']), ensure_ascii=False))
+`;
+  const python = resolveTestPythonCommand();
+  const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
+    cwd: path.resolve('.'),
+    env: { ...process.env, PYTHONPATH: path.resolve('python') },
+    encoding: 'utf-8',
+  });
+  const attachedSlides = JSON.parse(stdout);
+
+  assert.equal(attachedSlides.length, fixture.expected_page_count);
+  for (const [index, slide] of attachedSlides.entries()) {
+    const expected = previewMetrics[index];
+    assert.equal(slide.preview_screenshot_file, expected.file);
+    assert.equal(slide.preview_screenshot_sha256, expected.sha256);
+    assert.deepEqual(slide.preview_screenshot_dimensions, expected.dimensions);
+    assert.equal(slide.synthetic_preview, false);
+    assert.equal(slide.render_provenance.preview_screenshot_sha256, expected.sha256);
+    assert.deepEqual(slide.render_provenance.preview_screenshot_dimensions, expected.dimensions);
+  }
+  const outputBytes = readFileSync(result.outputPptx);
+  for (const preview of previewMetrics) {
+    assert.equal(outputBytes.includes(readFileSync(preview.file)), false);
+  }
 });
