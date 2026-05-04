@@ -69,12 +69,14 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
     strict_svg_preflight: true,
     true_render_proof_required: true,
     true_render_proof_renderer: 'libreoffice_headless',
+    cross_platform_render_required: true,
     screenshot_packaging: false,
   });
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.required, true);
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.renderer_kind, 'libreoffice_headless');
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.command_family, 'soffice --headless');
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.cross_platform, true);
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.runtime, 'libreoffice_headless');
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.cross_platform_render_required, true);
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.synthetic_preview_allowed, false);
 });
 

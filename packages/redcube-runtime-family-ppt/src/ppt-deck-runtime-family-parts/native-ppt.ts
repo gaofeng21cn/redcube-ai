@@ -429,7 +429,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const bundle = nativeArtifact?.native_ppt_bundle || {};
     const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
     const expectedProof = expectedNativeEngineContract()?.true_render_proof || {};
-    const renderProof = bundle?.render_proof || shapeManifest?.render_proof || {};
+    const renderProof = shapeManifest?.render_proof || {};
+    const renderProofScreenshots = safeArray(renderProof?.preview_screenshots);
     const missingRenderProof = safeText(renderProof?.source_surface_kind) !== 'native_pptx'
       || safeText(renderProof?.renderer_kind) !== safeText(expectedProof?.renderer_kind)
       || safeText(renderProof?.renderer_pipeline) !== safeText(expectedProof?.renderer_pipeline)
@@ -437,7 +438,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       || renderProof?.cross_platform_render_required !== true
       || renderProof?.synthetic_preview !== false
       || renderProof?.required !== true
-      || safeArray(bundle?.preview_screenshots).length === 0;
+      || renderProofScreenshots.length === 0
+      || !renderProofScreenshots.every((file) => existsSync(safeText(file)));
     const manifestSlidesById = new Map(
       safeArray(shapeManifest?.slides).map((slide) => [safeText(slide?.slide_id), slide]),
     );

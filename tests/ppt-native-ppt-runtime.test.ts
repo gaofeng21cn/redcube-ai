@@ -122,11 +122,14 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(shapeManifest.engine_capabilities?.pptx_writer, 'redcube_drawingml_writer');
     assert.equal(shapeManifest.engine_capabilities?.true_render_proof_required, true);
     assert.equal(shapeManifest.engine_capabilities?.true_render_proof_renderer, 'libreoffice_headless');
+    assert.equal(shapeManifest.engine_capabilities?.cross_platform_render_required, true);
     assert.equal(shapeManifest.render_proof?.source_surface_kind, 'native_pptx');
     assert.equal(shapeManifest.render_proof?.renderer_kind, 'libreoffice_headless');
+    assert.equal(shapeManifest.render_proof?.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
+    assert.equal(shapeManifest.render_proof?.runtime, 'libreoffice_headless');
     assert.equal(shapeManifest.render_proof?.synthetic_preview, false);
     assert.equal(shapeManifest.render_proof?.command_family, 'soffice --headless');
-    assert.equal(shapeManifest.render_proof?.cross_platform, true);
+    assert.equal(shapeManifest.render_proof?.cross_platform_render_required, true);
     assert.deepEqual(shapeManifest.engine_contract, expectedEngineContract);
     assert.equal(shapeManifest.engine_contract_file, authored.native_ppt_bundle.engine_contract_file);
     assert.deepEqual(shapeManifest.ai_first_editing_contract, authored.ai_first_editing_contract);
@@ -158,6 +161,7 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     );
     assert.equal(authored.native_ppt_bundle?.render_proof?.synthetic_preview, false);
     assert.equal(authored.native_ppt_bundle?.render_proof?.renderer_kind, 'libreoffice_headless');
+    assert.equal(authored.native_ppt_bundle?.render_proof?.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
     assert.equal(authored.native_ppt_bundle?.engine_capabilities?.authoring_ir, 'redcube_svg_ir');
 
     let screenshotReviewArtifact = null;
@@ -177,7 +181,7 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     const nativeMechanicalSlide = screenshotReviewArtifact.mechanical_review.slide_reviews[0];
     const nativeManifestSlide = shapeManifest.slides.find((slide) => slide.slide_id === nativeMechanicalSlide.slide_id);
     assert.equal(nativeMechanicalSlide.metrics.native_quality_source, 'shape_manifest');
-    assert.equal(nativeMechanicalSlide.metrics.render_proof_source, 'true_pptx_render');
+    assert.equal(nativeMechanicalSlide.metrics.render_proof_source, 'libreoffice_headless');
     assert.equal(nativeMechanicalSlide.metrics.synthetic_preview, false);
     assert.equal(nativeMechanicalSlide.metrics.occupied_ratio, nativeManifestSlide.metrics.occupied_ratio);
     assert.equal(nativeMechanicalSlide.metrics.text_char_count, nativeManifestSlide.metrics.text_char_count);
@@ -201,9 +205,9 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
   });
 });
 
-test('native PPT route rejects stale PowerPoint AppleScript proof provenance before screenshot review', async () => {
+test('native PPT route rejects stale desktop-app proof provenance before screenshot review', async () => {
   const restoreRenderer = withEnv({
-    REDCUBE_MOCK_NATIVE_RENDERER_KIND: 'powerpoint_applescript',
+    REDCUBE_MOCK_NATIVE_RENDERER_KIND: 'legacy_desktop_renderer',
   });
   try {
     await withMockNativePptRuntime(async () => {
@@ -221,7 +225,7 @@ test('native PPT route rejects stale PowerPoint AppleScript proof provenance bef
       assert.equal(nativeResult.ok, false);
       assert.match(
         String(nativeResult.error?.message || nativeResult.error || ''),
-        /LibreOffice headless|stale PowerPoint AppleScript|true render proof/i,
+        /LibreOffice headless|stale desktop-app|true-render proof/i,
       );
     });
   } finally {
@@ -243,27 +247,6 @@ test('native PPT screenshot review blocks missing render proof and missing scree
     });
     assert.equal(authorResult.ok, true);
     const authored = readJson(authorResult.artifactFile);
-    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
-    delete shapeManifest.render_proof;
-    shapeManifest.preview_screenshots = [];
-    for (const slide of shapeManifest.slides) {
-      delete slide.preview_screenshot_file;
-      delete slide.preview_screenshot_sha256;
-      slide.render_proof_source = 'missing_true_pptx_render';
-      slide.synthetic_preview = true;
-    }
-    writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
-
-    authored.native_ppt_bundle.render_proof = null;
-    authored.native_ppt_bundle.preview_screenshots = [];
-    authored.native_ppt_bundle.slides = authored.native_ppt_bundle.slides.map((slide) => ({
-      ...slide,
-      preview_screenshot_file: '',
-      screenshot_file: '',
-      render_proof_source: 'missing_true_pptx_render',
-      synthetic_preview: true,
-    }));
-    writeJson(authorResult.artifactFile, authored);
 
     const directorResult = await runDeliverableRoute({
       workspaceRoot,
@@ -273,6 +256,17 @@ test('native PPT screenshot review blocks missing render proof and missing scree
       route: 'visual_director_review',
     });
     assert.equal(directorResult.ok, true);
+
+    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
+    delete shapeManifest.render_proof;
+    shapeManifest.preview_screenshots = [];
+    for (const slide of shapeManifest.slides) {
+      delete slide.preview_screenshot_file;
+      delete slide.preview_screenshot_sha256;
+      slide.render_proof_source = 'missing_contract_declared_true_render';
+      slide.synthetic_preview = true;
+    }
+    writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
 
     const screenshotResult = await runDeliverableRoute({
       workspaceRoot,
@@ -305,7 +299,7 @@ test('native PPT screenshot review blocks missing render proof and missing scree
     );
     assert.equal(
       screenshotReview.mechanical_review.metrics.render_proof_source,
-      'missing_true_pptx_render',
+      'missing_contract_declared_true_render',
     );
   });
 });

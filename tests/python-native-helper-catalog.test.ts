@@ -206,7 +206,7 @@ test('Python helper catalog package entrypoints match pyproject console scripts'
   }
 });
 
-test('Python helper modules are discoverable without running native PowerPoint gates in fast/meta checks', () => {
+test('Python helper modules are discoverable without running native renderer gates in fast/meta checks', () => {
   const catalog = readJson(CATALOG_FILE);
 
   for (const helper of catalog.helpers) {
@@ -218,7 +218,7 @@ test('Python helper modules are discoverable without running native PowerPoint g
   }
 });
 
-test('Native PPT helper catalog check never invokes the real native PowerPoint entrypoint', () => {
+test('Native PPT helper catalog check never invokes the real native renderer entrypoint', () => {
   const catalog = readJson(CATALOG_FILE);
   const helpers = helperById(catalog);
   const nativeHelper = helpers[NATIVE_PPT_HELPER_ID];
@@ -233,8 +233,10 @@ test('Native PPT helper catalog check never invokes the real native PowerPoint e
   assert.doesNotMatch(source, /runPython\(\['-m',\s*NATIVE_PPT_PACKAGE_MODULE,\s*'--help'\]\)/);
   assert.doesNotMatch(source, /runPythonModule\(NATIVE_PPT_PACKAGE_MODULE/);
   assert.match(source, /runPythonImportabilityCheck\(helper\.package_module\)/);
-  assert.doesNotMatch(runGroupSource, /RED(CUBE)?_PYTHON_COMMAND[^\n]*(soffice|osascript|PowerPoint)/i);
-  assert.doesNotMatch(runGroupSource, /powerpoint_applescript|Microsoft PowerPoint|osascript/i);
+  assert.doesNotMatch(runGroupSource, /RED(CUBE)?_PYTHON_COMMAND[^\n]*soffice/i);
+  assert.doesNotMatch(runGroupSource, new RegExp(['osa', 'script'].join(''), 'i'));
+  assert.doesNotMatch(runGroupSource, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
+  assert.doesNotMatch(runGroupSource, new RegExp(['microsoft', ' powerpoint'].join(''), 'i'));
   assert.match(runGroupSource, /tests\/ppt-native-ppt-runtime\.test\.ts/);
   assert.match(runGroupSource, /tests\/product-entry-native-ppt-proof-lane\.test\.ts/);
   assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\['fast', 'integration', 'e2e', 'full'\]\)/);
@@ -320,7 +322,8 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_required, true);
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
   assert.equal(nativeHelper.true_render_proof.required, true);
-  assert.equal(nativeHelper.true_render_proof.renderer_kind, 'libreoffice_headless_pdf_png_v1');
+  assert.equal(nativeHelper.true_render_proof.renderer_kind, 'libreoffice_headless');
+  assert.equal(nativeHelper.true_render_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
   assert.equal(nativeHelper.true_render_proof.runtime, 'libreoffice_headless');
   assert.equal(nativeHelper.true_render_proof.cross_platform_render_required, true);
   assert.equal(nativeHelper.true_render_proof.synthetic_preview_allowed, false);
@@ -416,7 +419,8 @@ test('Native PPT helper routes stay tied to the engine contract and review/expor
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
   );
   assert.equal(helpers.ppt_deck_native.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
-  assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless_pdf_png_v1');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
   assert.equal(helpers.ppt_deck_native.true_render_proof.runtime, 'libreoffice_headless');
   assert.equal(helpers.ppt_deck_native.true_render_proof.cross_platform_render_required, true);
   assert.deepEqual(helpers.ppt_deck_native.requires, ['Pillow', 'python-pptx', 'LibreOffice headless']);

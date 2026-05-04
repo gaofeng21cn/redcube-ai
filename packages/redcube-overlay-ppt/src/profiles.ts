@@ -120,7 +120,8 @@ const NATIVE_PPT_PROOF_LANE = Object.freeze({
   },
   true_render_proof: {
     required: true,
-    renderer_kind: 'libreoffice_headless_pdf_png_v1',
+    renderer_kind: 'libreoffice_headless',
+    renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
     runtime: 'libreoffice_headless',
     cross_platform_render_required: true,
     synthetic_preview_allowed: false,

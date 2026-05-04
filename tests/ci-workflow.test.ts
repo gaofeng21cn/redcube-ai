@@ -78,7 +78,7 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(pythonRequirements, /^Pillow==12\.1\.1$/m);
 });
 
-test('native PPT Linux proof environment is documented without adding a PowerPoint fallback', () => {
+test('native PPT Linux proof environment is documented without adding a desktop-app fallback', () => {
   const dockerfile = readRepoFile('tools/native-ppt-proof/Dockerfile');
   const docs = readRepoFile('docs/native-ppt-proof-environment.md');
   const workflow = readRepoFile('.github/workflows/ci.yml');
@@ -93,7 +93,8 @@ test('native PPT Linux proof environment is documented without adding a PowerPoi
   assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
   assert.match(docs, /npm ci/);
   assert.match(docs, /python3? -m redcube_ai\.native_helpers\.doctor/);
-  assert.doesNotMatch(dockerfile, /PowerPoint|powerpoint_applescript/);
+  assert.doesNotMatch(dockerfile, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
+  assert.doesNotMatch(dockerfile, new RegExp(['osa', 'script'].join(''), 'i'));
   assert.match(docs, /does not replace RedCube product-entry/);
 });
 

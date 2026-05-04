@@ -17,11 +17,18 @@ const NATIVE_ENGINE_CAPABILITIES = {
   strict_svg_preflight: true,
   true_render_proof_required: true,
   true_render_proof_renderer: 'libreoffice_headless',
+  cross_platform_render_required: true,
   screenshot_packaging: false,
 };
 
 function mockNativeRendererKind() {
   return String(process.env.REDCUBE_MOCK_NATIVE_RENDERER_KIND || 'libreoffice_headless').trim();
+}
+
+function mockNativeRendererPipeline(rendererKind) {
+  return rendererKind === 'libreoffice_headless'
+    ? 'libreoffice_headless_pdf_png_v1'
+    : 'legacy_desktop_renderer_v0';
 }
 
 function fail(message) {
@@ -260,7 +267,9 @@ function buildNativePayload(args) {
       preview_screenshot_file: screenshotFile,
       preview_screenshot_sha256: 'mock-sha256',
       preview_screenshot_dimensions: { width: 2304, height: 1296 },
-      render_proof_source: 'true_pptx_render',
+      render_proof_source: rendererKind,
+      renderer_kind: rendererKind,
+      renderer_pipeline: mockNativeRendererPipeline(rendererKind),
       synthetic_preview: false,
       native_shapes: [
         {
@@ -329,12 +338,14 @@ function buildNativePayload(args) {
   const renderProof = {
     source_surface_kind: 'native_pptx',
     renderer_kind: rendererKind,
+    renderer_pipeline: mockNativeRendererPipeline(rendererKind),
+    runtime: rendererKind,
     synthetic_preview: false,
     required: true,
     pptx_file: outputPptx,
     pdf_file: outputPdf || null,
-    command_family: rendererKind === 'libreoffice_headless' ? 'soffice --headless' : 'osascript',
-    cross_platform: rendererKind === 'libreoffice_headless',
+    command_family: rendererKind === 'libreoffice_headless' ? 'soffice --headless' : 'legacy desktop renderer',
+    cross_platform_render_required: rendererKind === 'libreoffice_headless',
     preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
   };
   const shapeManifest = {

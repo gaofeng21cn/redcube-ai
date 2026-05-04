@@ -116,6 +116,10 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   );
   assert.equal(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_kind,
+    'libreoffice_headless',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_pipeline,
     'libreoffice_headless_pdf_png_v1',
   );
   assert.equal(
