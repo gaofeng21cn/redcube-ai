@@ -1,0 +1,139 @@
+{
+  "fixture_id": "ppt_native_visual_benchmark_v1",
+  "expected_renderer_kind": "libreoffice_headless",
+  "expected_page_count": 6,
+  "min_shape_count": 5,
+  "min_text_box_count": 3,
+  "expected_layout_families": [
+    "cover_signal",
+    "multi_zone_compare",
+    "timeline_band",
+    "judgement_ladder",
+    "ring_cross",
+    "summary_peak"
+  ],
+  "expected_anchor_shapes": [
+    "E01-hero-block",
+    "E02-zone-1-panel",
+    "E03-timeline-rail",
+    "E04-gate-1-panel",
+    "E05-center-hub",
+    "E06-summary-peak"
+  ],
+  "forbidden_visible_text_fragments": [
+    "Label-only metadata",
+    "private_metric",
+    "manifest_only",
+    "editable_text",
+    "page_core_content",
+    "不会显示的字段名",
+    "仍然不显示字段名"
+  ],
+  "editable_shape_plan": {
+    "contract_kind": "redcube_ai_first_native_ppt_shape_plan",
+    "route": "author_pptx_native",
+    "slides": [
+      {
+        "slide_id": "E01",
+        "title": "Native benchmark cover signal",
+        "layout_family": "cover_signal",
+        "render_recipe_id": "ppt.hero_signal",
+        "core_sentence": "Revenue story starts from one visible signal.",
+        "page_core_content": [
+          { "label": "Label-only metadata 01", "private_metric": "do-not-render" },
+          { "label": "不会显示的字段名", "text": "Executive signal holds across channels" },
+          { "label": "仍然不显示字段名", "text": "Editable emphasis stays in DrawingML" },
+          "Audience-ready cover takeaway"
+        ],
+        "native_shapes": [
+          { "shape_id": "E01-title", "role": "title", "editable_text": "Native benchmark cover signal" }
+        ]
+      },
+      {
+        "slide_id": "E02",
+        "title": "Four-zone operational comparison",
+        "layout_family": "multi_zone_compare",
+        "render_recipe_id": "ppt.compare_zones",
+        "core_sentence": "The deck must compare zones without flattening shapes.",
+        "page_core_content": [
+          { "label": "Label-only metadata 02", "manifest_only": true },
+          { "label": "不会显示的字段名", "text": "North region expands efficiently" },
+          { "label": "仍然不显示字段名", "text": "South region needs margin guardrails" },
+          { "text": "Enterprise motion remains editable" },
+          "Channel mix has visible contrast"
+        ],
+        "native_shapes": [
+          { "shape_id": "E02-title", "role": "title", "editable_text": "Four-zone operational comparison" }
+        ]
+      },
+      {
+        "slide_id": "E03",
+        "title": "Milestone cadence with rail",
+        "layout_family": "timeline_band",
+        "render_recipe_id": "ppt.timeline_rail",
+        "core_sentence": "A timeline benchmark needs alternating page geometry.",
+        "page_core_content": [
+          { "label": "Label-only metadata 03", "private_metric": "timeline" },
+          { "label": "不会显示的字段名", "text": "Discovery locks baseline" },
+          { "label": "仍然不显示字段名", "text": "Pilot proves repeatability" },
+          { "text": "Scale plan keeps provenance" },
+          "Launch checkpoint remains reviewable"
+        ],
+        "native_shapes": [
+          { "shape_id": "E03-title", "role": "title", "editable_text": "Milestone cadence with rail" }
+        ]
+      },
+      {
+        "slide_id": "E04",
+        "title": "Judgement ladder decision path",
+        "layout_family": "judgement_ladder",
+        "render_recipe_id": "ppt.judgement_ladder",
+        "core_sentence": "The decision path rises through editable gates.",
+        "page_core_content": [
+          { "label": "Label-only metadata 04", "manifest_only": "ladder" },
+          { "label": "不会显示的字段名", "text": "Gate one confirms evidence" },
+          { "label": "仍然不显示字段名", "text": "Gate two checks adoption" },
+          { "text": "Gate three secures timing" },
+          "Gate four authorizes scale"
+        ],
+        "native_shapes": [
+          { "shape_id": "E04-title", "role": "title", "editable_text": "Judgement ladder decision path" }
+        ]
+      },
+      {
+        "slide_id": "E05",
+        "title": "Ring cross synthesis map",
+        "layout_family": "ring_cross",
+        "render_recipe_id": "ppt.ring_cross",
+        "core_sentence": "A hub-and-axis page checks radial diversity.",
+        "page_core_content": [
+          { "label": "Label-only metadata 05", "private_metric": "ring" },
+          { "label": "不会显示的字段名", "text": "Product signal" },
+          { "label": "仍然不显示字段名", "text": "Market signal" },
+          { "text": "Execution signal" },
+          "Risk signal"
+        ],
+        "native_shapes": [
+          { "shape_id": "E05-title", "role": "title", "editable_text": "Ring cross synthesis map" }
+        ]
+      },
+      {
+        "slide_id": "E06",
+        "title": "Summary peak investor close",
+        "layout_family": "summary_peak",
+        "render_recipe_id": "ppt.summary_peak",
+        "core_sentence": "The closing page stresses one editable peak.",
+        "page_core_content": [
+          { "label": "Label-only metadata 06", "manifest_only": "summary" },
+          { "label": "不会显示的字段名", "text": "Primary outcome is ready" },
+          { "label": "仍然不显示字段名", "text": "Secondary proof is durable" },
+          { "text": "Operating ask is precise" },
+          "Follow-up path is clear"
+        ],
+        "native_shapes": [
+          { "shape_id": "E06-title", "role": "title", "editable_text": "Summary peak investor close" }
+        ]
+      }
+    ]
+  }
+}
