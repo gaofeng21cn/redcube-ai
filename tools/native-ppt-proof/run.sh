@@ -6,6 +6,7 @@ cd "$repo_root"
 
 output_root="${REDCUBE_NATIVE_PPT_PROOF_OUTPUT_DIR:-artifacts/native-ppt-proof}"
 skip_system_deps="${REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS:-0}"
+proof_python=""
 
 usage() {
   cat <<'USAGE'
@@ -18,7 +19,33 @@ Runs the repo-owned native PPT proof lane:
   4. true LibreOffice/Poppler native PPT fixture proof
 
 Set REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1 to skip tools/native-ppt-proof/install-deps.sh.
+Set REDCUBE_NATIVE_PPT_PROOF_PYTHON, REDCUBE_TEST_PYTHON, or REDCUBE_PYTHON_COMMAND
+to force the Python interpreter used by the proof runner.
 USAGE
+}
+
+python_is_usable() {
+  [ -n "$1" ] && [ -x "$1" ] && "$1" -c 'import sys; print(sys.executable)' >/dev/null 2>&1
+}
+
+resolve_proof_python() {
+  for candidate in \
+    "${REDCUBE_NATIVE_PPT_PROOF_PYTHON:-}" \
+    "${REDCUBE_TEST_PYTHON:-}" \
+    "${REDCUBE_PYTHON_COMMAND:-}" \
+    "$HOME/.codex/projects/redcube-ai/runtime-state/python/stable-playwright/venv/bin/python" \
+    "/opt/homebrew/bin/python3" \
+    "/usr/bin/python3" \
+    "$(command -v python3 2>/dev/null || true)"
+  do
+    if python_is_usable "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  echo "No usable Python interpreter found for native PPT proof runner." >&2
+  echo "Set REDCUBE_NATIVE_PPT_PROOF_PYTHON or run tools/native-ppt-proof/install-deps.sh in a Python-ready environment." >&2
+  return 127
 }
 
 while [ "$#" -gt 0 ]; do
@@ -47,7 +74,8 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-output_root="$(python3 -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve())' "$output_root")"
+proof_python="$(resolve_proof_python)"
+output_root="$("$proof_python" -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve())' "$output_root")"
 workspace_root="$output_root/workspace"
 fixture_input="$output_root/native-helper-input.json"
 doctor_report="$output_root/doctor.json"
@@ -67,7 +95,7 @@ fi
 npm run --silent build
 
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
-  python3 -m redcube_ai.native_helpers.doctor > "$doctor_report"
+  "$proof_python" -m redcube_ai.native_helpers.doctor > "$doctor_report"
 
 node apps/redcube-cli/dist/cli.js product manifest \
   --workspace-root "$workspace_root" > "$manifest_report"
@@ -75,7 +103,7 @@ node apps/redcube-cli/dist/cli.js product manifest \
 node apps/redcube-cli/dist/cli.js product frontdesk \
   --workspace-root "$workspace_root" > "$frontdesk_report"
 
-python3 - "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" "$fixture_input" <<'PY'
+"$proof_python" - "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" "$fixture_input" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -90,7 +118,7 @@ Path(sys.argv[2]).write_text(json.dumps(payload, ensure_ascii=False, indent=2), 
 PY
 
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
-  python3 -m redcube_ai.native_helpers.ppt_deck.native \
+  "$proof_python" -m redcube_ai.native_helpers.ppt_deck.native \
     --input-json "$fixture_input" \
     --mode author \
     --output-pptx "$native_dir/benchmark-author.pptx" \
@@ -100,7 +128,7 @@ PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
     --engine-contract "$repo_root/contracts/runtime-program/ppt-native-python-engine-contract.json" \
     > "$helper_report"
 
-python3 - "$doctor_report" "$manifest_report" "$frontdesk_report" "$helper_report" "$summary_report" <<'PY'
+"$proof_python" - "$doctor_report" "$manifest_report" "$frontdesk_report" "$helper_report" "$summary_report" <<'PY'
 import json
 import sys
 from pathlib import Path
