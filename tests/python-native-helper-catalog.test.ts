@@ -262,7 +262,8 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
   assert.equal(report.renderer_availability.surface_kind, 'native_ppt_renderer_availability');
   assert.equal(report.renderer_availability.executes_generation, false);
   assert.equal(report.renderer_availability.executes_review_export_gates, false);
-  assert.equal(report.renderer_availability.linux_native_proof.renderer_kind, 'libreoffice_pdf_plus_poppler_png');
+  assert.equal(report.renderer_availability.linux_native_proof.renderer_kind, 'libreoffice_headless');
+  assert.equal(report.renderer_availability.linux_native_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
   assert.deepEqual(report.renderer_availability.linux_native_proof.required_system_packages, [
     'libreoffice',
     'poppler-utils',
@@ -273,7 +274,7 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
     'python-pptx',
     'playwright',
   ]);
-  assert.equal(report.renderer_availability.powerpoint_fallback_allowed, false);
+  assert.equal(report.renderer_availability.desktop_app_fallback_allowed, false);
   assert.match(report.renderer_availability.suggested_docker_command, /docker build -f tools\/native-ppt-proof\/Dockerfile/);
   assert.equal(typeof report.renderer_availability.linux_native_proof.available, 'boolean');
   assert.equal(
@@ -292,8 +293,9 @@ test('Python native helper doctor runs as a package module and emits fixed JSON 
     assert.equal(helper.entrypoint.matches_pyproject, true, helper.helper_id);
     assert.equal(Array.isArray(helper.optional_dependencies.summary), true, helper.helper_id);
     if (helper.helper_id === 'ppt_deck_native') {
-      assert.equal(helper.renderer_availability.linux_native_proof.renderer_kind, 'libreoffice_pdf_plus_poppler_png');
-      assert.equal(helper.renderer_availability.renderers.powerpoint_applescript.fallback_for_linux_native_proof, false);
+      assert.equal(helper.renderer_availability.linux_native_proof.renderer_kind, 'libreoffice_headless');
+      assert.equal(helper.renderer_availability.linux_native_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
+      assert.equal(helper.renderer_availability.desktop_app_fallback_allowed, false);
     } else {
       assert.equal(helper.renderer_availability, null);
     }
@@ -324,7 +326,7 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.true_render_proof.synthetic_preview_allowed, false);
   assert.equal(nativeHelper.renderer_availability.executes_generation, false);
   assert.equal(nativeHelper.renderer_availability.executes_review_export_gates, false);
-  assert.equal(nativeHelper.renderer_availability.powerpoint_fallback_allowed, false);
+  assert.equal(nativeHelper.renderer_availability.desktop_app_fallback_allowed, false);
 });
 
 test('Fast and meta diagnostic coverage does not invoke the native PPT renderer', () => {
