@@ -177,8 +177,16 @@
         "native_pptx_file",
         "shape_manifest.json",
         "preview_screenshots",
-        "repair_log.json"
+        "repair_log.json",
+        "chart/table/metric-grid manifest metrics",
+        "native_ppt_repair_evidence_v1"
       ],
+      "proof_runner": {
+        "repo_owned_runner": "tools/native-ppt-proof/run.sh",
+        "controlled_cli_command": "redcube native-ppt proof",
+        "artifact_index": "artifacts/native-ppt-proof/artifact-index.json",
+        "public_skill_policy": "do_not_register_as_second_public_skill"
+      },
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
       "proof_lane_contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
       "contract_refs": [

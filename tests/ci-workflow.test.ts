@@ -71,7 +71,9 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta/);
   assert.doesNotMatch(workflow, /quality:\n[\s\S]*?tools\/native-ppt-proof\/install-deps\.sh[\s\S]*?Run build and typecheck/);
   assert.match(workflow, /workflow_dispatch:/);
-  assert.match(workflow, /native-ppt-proof:\n[\s\S]*?if:\s*github\.event_name == 'workflow_dispatch'[\s\S]*?tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof[\s\S]*?uses:\s*actions\/upload-artifact@v6[\s\S]*?name:\s*native-ppt-proof[\s\S]*?path:\s*artifacts\/native-ppt-proof/);
+  assert.match(workflow, /schedule:\n\s+- cron:\s*['"]17 19 \* \* \*['"]/);
+  assert.match(workflow, /pull_request:\n\s+types:\s+\[opened, synchronize, reopened, labeled\]/);
+  assert.match(workflow, /native-ppt-proof:\n[\s\S]*?github\.event_name == 'workflow_dispatch'[\s\S]*?github\.event_name == 'schedule'[\s\S]*?native-ppt-proof[\s\S]*?uses:\s*actions\/cache@v4[\s\S]*?path:\s*~\/\.cache\/pip[\s\S]*?uses:\s*actions\/cache@v4[\s\S]*?path:\s*~\/\.cache\/ms-playwright[\s\S]*?tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof[\s\S]*?uses:\s*actions\/upload-artifact@v6[\s\S]*?name:\s*native-ppt-proof[\s\S]*?artifacts\/native-ppt-proof\/artifact-index\.json/);
   assert.doesNotMatch(workflow, /\n\s{2}integration:\n/);
   assert.doesNotMatch(workflow, /\n\s{2}render-e2e:\n/);
 
@@ -107,6 +109,7 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /proof-summary\.json/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /build-artifact-index\.py/);
+  assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
   assert.match(runner, /synthetic preview/);
   assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
   assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
@@ -143,6 +146,10 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   );
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
+  assert.match(workflow, /github\.event_name == 'schedule'/);
+  assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
+  assert.match(workflow, /native-ppt-proof-pip-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('\.github\/requirements\/ci-python\.txt'\) \}\}/);
+  assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('\.github\/requirements\/ci-python\.txt'\) \}\}/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /build-artifact-index\.py/);
   assert.doesNotMatch(

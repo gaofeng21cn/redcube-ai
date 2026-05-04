@@ -100,11 +100,25 @@
         "shape_kind_count",
         "role_count",
         "layout_richness_score",
+        "chart_bounds",
+        "table_bounds",
+        "metric_grid_bounds",
+        "chart_metrics",
+        "table_metrics",
+        "metric_grid_metrics",
+        "axis_label_count",
+        "legend_label_count",
+        "table_cell_fit_ok",
+        "table_cell_fit_failures",
+        "numeric_label_overflow_count",
+        "numeric_label_overflows",
+        "coordinate_determinism_hash",
         "preview_screenshot_sha256",
         "preview_screenshot_dimensions"
       ],
       "fail_closed_when_missing": true,
-      "review_behavior": "screenshot_review consumes native shape manifest metrics and blocks on missing or failing quality checks"
+      "review_behavior": "screenshot_review consumes native shape manifest metrics and blocks on missing or failing quality checks",
+      "chart_table_metric_grid_review_behavior": "screenshot_review blocks native slides that contain editable chart/table/metric-grid shapes when required manifest metrics are missing"
     },
     "runtime_executor_proof": {
       "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
@@ -126,8 +140,25 @@
       "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
       "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
       "ci_manual_lane": ".github/workflows/ci.yml workflow_dispatch native-ppt-proof",
+      "ci_proof_lane_v2": ".github/workflows/ci.yml workflow_dispatch + schedule + pull_request label native-ppt-proof",
+      "proof_artifact_index": "artifacts/native-ppt-proof/artifact-index.json",
       "visual_benchmark_fixture": "tests/fixtures/ppt-native-visual-benchmark/benchmark.json",
-      "export_operator_proof_summary": "native_export_bundle_operator_proof_summary_v1"
+      "visual_benchmark_fixture_id": "ppt_native_visual_benchmark_v2",
+      "visual_benchmark_suites": [
+        "business_review",
+        "academic_lecture",
+        "data_charts",
+        "chinese_long_text"
+      ],
+      "editable_structural_shapes": [
+        "chart",
+        "table",
+        "metric_grid"
+      ],
+      "repair_evidence_surface": "native_ppt_repair_evidence_v1",
+      "export_operator_proof_summary": "native_export_bundle_operator_proof_summary_v1",
+      "export_operator_artifact_gallery": "native_export_operator_artifact_gallery_v1",
+      "operator_helper_command": "redcube native-ppt proof"
     },
     "required_export_fields": [
       "export_bundle.source_pptx",
@@ -137,7 +168,15 @@
       "export_bundle.evidence_hashes",
       "export_bundle.renderer_proof",
       "export_bundle.shape_manifest_summary",
-      "export_bundle.operator_proof_summary"
+      "export_bundle.operator_proof_summary",
+      "export_bundle.artifact_gallery.index_file"
+    ],
+    "required_repair_evidence_fields": [
+      "native_ppt_repair_log.repair_evidence.evidence_surface",
+      "native_ppt_repair_log.repair_evidence.per_slide_hashes",
+      "native_ppt_repair_log.repair_evidence.preserved_slide_hashes",
+      "native_ppt_repair_log.repair_evidence.repair_units",
+      "native_ppt_repair_log.repair_evidence.non_blocking_slide_reuse_ok"
     ]
   },
   "promotion_gates": [

@@ -277,7 +277,7 @@
       "suite_label": "数据图表型",
       "expected_page_count": 6,
       "expected_layout_families": ["cover_signal", "multi_zone_compare", "ring_cross", "timeline_band", "judgement_ladder", "summary_peak"],
-      "expected_anchor_shapes": ["D01-hero-block", "D02-zone-1-panel", "D03-center-hub", "D04-timeline-rail", "D05-gate-1-panel", "D06-summary-peak"],
+      "expected_anchor_shapes": ["D01-hero-block", "D02-structured-note-1-panel", "D03-center-hub", "D04-timeline-rail", "D05-gate-1-panel", "D06-summary-peak"],
       "expected_visible_text_fragments": ["Metric panel replaces screenshot charts", "Variance band remains editable", "Decision threshold is visible"],
       "editable_shape_plan": {
         "contract_kind": "redcube_ai_first_native_ppt_shape_plan",

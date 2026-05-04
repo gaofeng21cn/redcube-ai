@@ -55,16 +55,46 @@
       "shape_kind_count",
       "role_count",
       "layout_richness_score",
+      "chart_bounds",
+      "table_bounds",
+      "metric_grid_bounds",
+      "chart_metrics",
+      "table_metrics",
+      "metric_grid_metrics",
+      "axis_label_count",
+      "legend_label_count",
+      "table_cell_fit_ok",
+      "table_cell_fit_failures",
+      "numeric_label_overflow_count",
+      "numeric_label_overflows",
+      "coordinate_determinism_hash",
       "preview_screenshot_sha256",
       "preview_screenshot_dimensions"
     ],
+    "editable_structural_shapes": [
+      "chart",
+      "table",
+      "metric_grid"
+    ],
+    "chart_table_metric_grid_fail_closed": true,
     "fail_closed_when_missing": true
   },
   "production_hardening": {
     "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
     "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
+    "proof_artifact_index": "artifacts/native-ppt-proof/artifact-index.json",
+    "ci_proof_lane": "workflow_dispatch + nightly schedule + pull_request label native-ppt-proof",
     "visual_benchmark_fixture": "tests/fixtures/ppt-native-visual-benchmark/benchmark.json",
-    "operator_export_proof_summary": "native_export_bundle_operator_proof_summary_v1"
+    "visual_benchmark_fixture_id": "ppt_native_visual_benchmark_v2",
+    "visual_benchmark_suites": [
+      "business_review",
+      "academic_lecture",
+      "data_charts",
+      "chinese_long_text"
+    ],
+    "operator_export_proof_summary": "native_export_bundle_operator_proof_summary_v1",
+    "operator_artifact_gallery": "native_export_operator_artifact_gallery_v1",
+    "repair_evidence_surface": "native_ppt_repair_evidence_v1"
   },
   "ai_first_boundary": {
     "creative_owner": "llm_agent",

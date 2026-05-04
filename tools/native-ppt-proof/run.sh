@@ -110,10 +110,15 @@ import sys
 from pathlib import Path
 
 fixture = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+suite = next(
+    (item for item in fixture.get("suites", []) if item.get("suite_id") == "data_charts"),
+    (fixture.get("suites") or [fixture])[0],
+)
 payload = {
     "fixture_id": fixture["fixture_id"],
+    "suite_id": suite.get("suite_id"),
     "route": "author_pptx_native",
-    "editable_shape_plan": fixture["editable_shape_plan"],
+    "editable_shape_plan": suite["editable_shape_plan"],
 }
 Path(sys.argv[2]).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 PY

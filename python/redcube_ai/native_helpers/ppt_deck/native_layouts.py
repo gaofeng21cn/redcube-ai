@@ -677,6 +677,15 @@ def write_multi_zone_compare(ctx: SlideBuilder, slide_data, index: int, total: i
     add_background(ctx)
     add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
+    if native_structural_shapes(slide_data):
+        for point_index, point in enumerate(points[:3], 1):
+            left = Inches(1.0 + ((point_index - 1) * 4.35))
+            ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-panel', left, Inches(7.08), Inches(3.78), Inches(0.62), 'panel', 'structured_note_panel', 'content', 'line')
+            ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-tab', left + Inches(0.18), Inches(7.23), Inches(0.6), Inches(0.09), 'accent', 'structured_note_tab', radius=False)
+            ctx.text(f'{ctx.slide_id}-structured-note-{point_index}-text', left + Inches(0.9), Inches(7.2), Inches(2.62), Inches(0.25), point, 9.5, 'ink', 'point_text')
+        ctx.line(f'{ctx.slide_id}-structured-baseline', Inches(1.0), Inches(6.94), Inches(14.2), Inches(6.94), 'line', 1.1, 'structured_baseline')
+        add_footer(ctx, index, total)
+        return
     zones = [
         (Inches(0.95), Inches(2.25), Inches(6.65), Inches(2.15)),
         (Inches(8.05), Inches(2.25), Inches(6.65), Inches(2.15)),
@@ -715,6 +724,20 @@ def write_judgement_ladder(ctx: SlideBuilder, slide_data, index: int, total: int
     add_background(ctx)
     add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
+    if len(points) <= 2:
+        ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(1.1), Inches(3.58), Inches(13.9), Inches(5.52), 'line', 1.5, 'ladder_spine')
+        positions = [
+            (Inches(1.05), Inches(2.62), Inches(6.1), Inches(2.12)),
+            (Inches(7.95), Inches(3.82), Inches(6.1), Inches(2.12)),
+        ]
+        for point_index, point in enumerate(points, 1):
+            left, top, width, height = positions[point_index - 1]
+            ctx.oval(f'{ctx.slide_id}-gate-{point_index}-node', left - Inches(0.2), top + Inches(0.28), Inches(0.24), Inches(0.24), 'accent', 'gate_node')
+            ctx.rect(f'{ctx.slide_id}-gate-{point_index}-panel', left, top, width, height, 'panel', 'judgement_step', 'content', 'line')
+            ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(1.35), Inches(0.32), f'Gate {point_index}', 13, 'accent', 'point_index', True)
+            ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.28), top + Inches(0.76), width - Inches(0.56), height - Inches(0.98), point, 14, 'ink', 'point_text')
+        add_footer(ctx, index, total)
+        return
     ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(0.95), Inches(6.62), Inches(12.85), Inches(3.84), 'line', 1.5, 'ladder_spine')
     for point_index, point in enumerate(points[:4], 1):
         left = Inches(1.08 + ((point_index - 1) * 3.18))

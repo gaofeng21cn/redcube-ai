@@ -41,7 +41,9 @@ Run the repo-owned native proof runner:
 tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
 ```
 
-The runner installs native proof system dependencies unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set, builds the TypeScript packages, checks the product-entry manifest/frontdesk native lane, and renders the six-page native PPT benchmark through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `product-manifest.json`, `product-frontdesk.json`, `native-helper-output.json`, `proof-summary.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory.
+The runner installs native proof system dependencies unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set, builds the TypeScript packages, checks the product-entry manifest/frontdesk native lane, and renders the `data_charts` suite from the V2 native PPT benchmark through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `product-manifest.json`, `product-frontdesk.json`, `native-helper-output.json`, `proof-summary.json`, `artifact-index.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory.
+
+The native proof CI job is intentionally optional. It runs on `workflow_dispatch`, the nightly schedule, or a pull request labeled `native-ppt-proof`; default push and PR quality jobs keep true renderer execution out of the fast/meta lane.
 
 For a full product-entry smoke instead of the fixture runner, use:
 
