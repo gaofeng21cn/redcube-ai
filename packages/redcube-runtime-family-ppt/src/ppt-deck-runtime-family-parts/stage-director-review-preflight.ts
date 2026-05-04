@@ -11,6 +11,7 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     safeArray,
     safeText,
     slideIdSet,
+    summarizeImagePages,
     summarizeNativeSlides,
     writeText,
   } = deps;
@@ -114,6 +115,32 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     };
   }
 
+  function directorImagePagesPreflight(imageArtifact) {
+    const pages = summarizeImagePages(imageArtifact);
+    const weakPages = [];
+    const findings = [];
+    for (const page of pages) {
+      if (!safeText(page.png_file) || !(mainExistsSync || existsSync)(page.png_file)) {
+        weakPages.push(page.slide_id);
+        findings.push(`${page.slide_id}: image page PNG missing`);
+      }
+      if (!safeText(page.prompt_manifest_file) || !(mainExistsSync || existsSync)(page.prompt_manifest_file)) {
+        weakPages.push(page.slide_id);
+        findings.push(`${page.slide_id}: image prompt manifest missing`);
+      }
+      if (!safeText(page.style_manifest_file) || !(mainExistsSync || existsSync)(page.style_manifest_file)) {
+        weakPages.push(page.slide_id);
+        findings.push(`${page.slide_id}: image style manifest missing`);
+      }
+    }
+    return {
+      antiTemplateOk: findings.length === 0,
+      weakPages: [...new Set(weakPages)].filter(Boolean),
+      homogeneousLayoutRisk: 0.12,
+      findings,
+    };
+  }
+
   function buildDirectorReviewDecision({ data, preflight, priorReview, incrementalReview, reviewedSlideIds }) {
     const targetSlideIds = slideIdSet(reviewedSlideIds);
     const priorWeakPages = incrementalReview
@@ -169,7 +196,8 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     ].join('\n'));
   }
 
-  function buildDirectorReviewStatePatch(status, decision) {
+  function buildDirectorReviewStatePatch(status, decision, rerunFromStage = 'render_html') {
+    const blockedRerunStage = safeText(rerunFromStage, 'render_html');
     return {
       current_status: status === 'pass' ? 'director_review_passed' : 'blocked_for_revision',
       ready_for_export: false,
@@ -181,10 +209,10 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
       },
       pending_reviews: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
       blocking_reasons: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
-      rerun_from_stage: status === 'pass' ? null : 'render_html',
+      rerun_from_stage: status === 'pass' ? null : blockedRerunStage,
       rerun_policy: {
         status: status === 'pass' ? 'idle' : 'rerun_required',
-        rerun_from_stage: status === 'pass' ? null : 'render_html',
+        rerun_from_stage: status === 'pass' ? null : blockedRerunStage,
       },
     };
   }
@@ -194,6 +222,7 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     buildDirectorReviewDecision,
     buildDirectorReviewStatePatch,
     directorHtmlPreflight,
+    directorImagePagesPreflight,
     directorNativePptPreflight,
     writeDirectorReviewReport,
   };

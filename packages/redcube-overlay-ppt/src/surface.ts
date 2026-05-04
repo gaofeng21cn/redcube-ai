@@ -104,9 +104,11 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'storyline')
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'visual_director_review'),
   'contracts/stage-requirements.json': (content: SurfaceContract) =>
-    Array.isArray(content?.render_html?.requires_artifacts)
-    && content.render_html.requires_artifacts.includes('slide_blueprint')
-    && content.render_html.requires_artifacts.includes('visual_direction')
+    Array.isArray(content?.author_image_pages?.requires_artifacts)
+    && content.author_image_pages.requires_artifacts.includes('slide_blueprint')
+    && content.author_image_pages.requires_artifacts.includes('visual_direction')
+    && Array.isArray(content?.repair_image_pages?.requires_artifacts)
+    && content.repair_image_pages.requires_artifacts.includes('author_image_pages')
     && Array.isArray(content?.screenshot_review?.requires_artifacts)
     && content.screenshot_review.requires_artifacts.includes('visual_director_review')
     && content.export_pptx?.requires_review_pass === true,
@@ -126,25 +128,38 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
   'contracts/prompt-pack.json': (content: SurfaceContract) =>
     typeof content?.root === 'string'
     && content.root === 'prompts/ppt_deck'
+    && content.routes.author_image_pages === 'prompts/ppt_deck/author_image_pages.md'
     && typeof content?.routes?.render_html === 'string'
     && content.routes.render_html === 'prompts/ppt_deck/render_html.md'
     && content.routes.author_pptx_native === 'prompts/ppt_deck/author_pptx_native.md'
+    && content.routes.repair_image_pages === 'prompts/ppt_deck/repair_image_pages.md'
     && content.routes.repair_pptx_native === 'prompts/ppt_deck/repair_pptx_native.md'
     && typeof content?.routes?.visual_director_review === 'string'
     && content.routes.visual_director_review === 'prompts/ppt_deck/director_review.md'
+    && content.stages.author_image_pages?.file === 'author_image_pages.md'
     && typeof content?.stages?.render_html?.file === 'string'
     && content.stages.render_html.file === 'render_html.md'
     && content.stages.author_pptx_native?.file === 'author_pptx_native.md'
+    && content.stages.repair_image_pages?.file === 'repair_image_pages.md'
     && content.stages.repair_pptx_native?.file === 'repair_pptx_native.md'
     && typeof content?.stages?.visual_director_review?.file === 'string'
     && content.stages.visual_director_review.file === 'director_review.md'
-    && content?.render_contract?.render_strategy === 'prompt_director_first'
-    && content.render_contract.default_visual_route === 'render_html'
+    && content?.render_contract?.render_strategy === 'image_first_page_authoring'
+    && content.render_contract.default_visual_route === 'author_image_pages'
+    && content.render_contract.image_page_authoring_lane?.status === 'production_default'
+    && content.render_contract.image_page_authoring_lane?.default_enabled === true
+    && content.render_contract.image_page_authoring_lane?.style_reference_dir_input === 'delivery_request.style_reference_dir'
+    && content.render_contract.image_page_authoring_lane?.provider_diagnostics_surface === 'image_provider_diagnostics'
+    && content.render_contract.html_authoring_lane?.status === 'production_selectable_optional'
+    && content.render_contract.html_authoring_lane?.default_enabled === false
+    && content.render_contract.html_authoring_lane?.explicit_selection_required === true
     && content.render_contract.native_ppt_proof_lane?.status === 'production_selectable_optional'
     && content.render_contract.native_ppt_proof_lane?.default_enabled === false
     && content.render_contract.native_ppt_proof_lane?.production_selectable === true
     && Array.isArray(content.render_contract.native_ppt_proof_lane?.replaces_routes)
-    && content.render_contract.native_ppt_proof_lane.replaces_routes.join(',') === 'render_html,fix_html'
+    && content.render_contract.native_ppt_proof_lane.replaces_routes.join(',') === 'author_image_pages,repair_image_pages'
+    && Array.isArray(content.render_contract.native_ppt_proof_lane?.legacy_html_replaces_routes)
+    && content.render_contract.native_ppt_proof_lane.legacy_html_replaces_routes.join(',') === 'render_html,fix_html'
     && Array.isArray(content.render_contract.native_ppt_proof_lane?.preserved_gates)
     && content.render_contract.native_ppt_proof_lane.preserved_gates.join(',') === 'visual_director_review,screenshot_review,export_pptx'
     && content.render_contract.native_ppt_proof_lane?.review_input_surface === 'rendered_pptx_screenshots'
@@ -157,6 +172,9 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_pipeline === 'libreoffice_headless_pdf_png_v1'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.runtime === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.cross_platform_render_required === true
+    && Array.isArray(content.render_contract.selectable_explicit_routes)
+    && content.render_contract.selectable_explicit_routes.join(',') === 'render_html,fix_html,author_pptx_native,repair_pptx_native'
+    && content.render_contract.explicit_route_policy === 'html_and_native_routes_require_operator_selection'
     && content?.render_contract?.shell_file === 'render_shell.html'
     && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content: SurfaceContract) =>
@@ -166,6 +184,7 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.required_checks.includes('anti_template_ok')
     && content.rerun_from_stage
     && typeof content.rerun_from_stage === 'object'
+    && content.rerun_from_stage.overflow_free === 'repair_image_pages'
     && content.rerun_from_stage.director_intent_landed === 'visual_director_review'
     && content.rerun_from_stage.anti_template_ok === 'visual_director_review',
   'contracts/layout-rules.json': (content: SurfaceContract) =>
@@ -215,6 +234,7 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
   'views/display-registry.json': (content: SurfaceContract) =>
     Array.isArray(content?.surfaces)
     && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'source_index')
+    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'author_image_pages')
     && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'visual_director_review')
     && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'screenshot_review')
     && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'export_pptx'),

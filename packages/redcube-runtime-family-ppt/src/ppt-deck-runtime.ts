@@ -64,6 +64,7 @@ const {
 const {
   buildDirectorReview,
   buildExportArtifact,
+  buildImagePagesArtifact,
   buildNativePptArtifact,
   buildRenderHtmlArtifact,
   buildScreenshotReviewArtifact,
@@ -174,6 +175,9 @@ export async function runPptDeckRoute({
         executorRouting,
       });
       break;
+    case 'author_image_pages':
+      payload = await buildImagePagesArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
+      break;
     case 'author_pptx_native':
       payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
       break;
@@ -192,6 +196,9 @@ export async function runPptDeckRoute({
       break;
     case 'repair_pptx_native':
       payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
+      break;
+    case 'repair_image_pages':
+      payload = await buildImagePagesArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
       break;
     case 'visual_director_review':
       payload = await buildDirectorReview(contract, deliverablePaths, adapter);

@@ -195,6 +195,30 @@ function mergeArtifactInventoryWithPublicationRefs({ artifactInventory, publicat
   };
 }
 
+function buildPptImageRouteSessionSurface({ session }) {
+  if (safeText(session.deliverable_family) !== 'ppt_deck') {
+    return null;
+  }
+  return {
+    surface_kind: 'ppt_deck_visual_route_session',
+    default_visual_route: 'author_image_pages',
+    default_visual_policy: 'image_first',
+    repair_route: 'repair_image_pages',
+    selectable_explicit_routes: ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+    route_selection_policy: {
+      html_routes: ['render_html', 'fix_html'],
+      native_routes: ['author_pptx_native', 'repair_pptx_native'],
+      explicit_selection_required_for: ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+      style_reference_dir_input: 'delivery_request.style_reference_dir',
+    },
+    provider_diagnostics: {
+      surface_kind: 'image_provider_diagnostics',
+      provider_status: 'runtime_checked',
+      blocked_reason: null,
+    },
+  };
+}
+
 function requireField(name, value) {
   const text = safeText(value);
   if (!text) {
@@ -317,6 +341,7 @@ export async function getProductEntrySession(request) {
     source: 'session',
     entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
   });
+  const pptImageRouteSession = buildPptImageRouteSessionSurface({ session });
 
   return {
     ok: true,
@@ -350,6 +375,7 @@ export async function getProductEntrySession(request) {
     progress_projection: progressProjection,
     artifact_inventory: artifactInventory,
     native_proof_artifact_inventory: nativeProofArtifactInventory,
+    ppt_deck_visual_route_session: pptImageRouteSession,
     runtime_loop_closure: runtimeLoopClosure,
     review_state: reviewState,
     publication_projection: publicationProjection,
@@ -360,6 +386,8 @@ export async function getProductEntrySession(request) {
       latest_handle: session.latest_managed_run_id || session.latest_run_id || null,
       target_handle: session.latest_managed_run_id || session.latest_run_id || null,
       native_proof_artifact_ref_count: nativeProofArtifactInventory.summary.artifact_ref_count,
+      ppt_deck_default_visual_route: pptImageRouteSession?.default_visual_route || null,
+      ppt_deck_default_visual_policy: pptImageRouteSession?.default_visual_policy || null,
       approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
       gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
       resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,

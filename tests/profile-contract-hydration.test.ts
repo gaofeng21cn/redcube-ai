@@ -49,10 +49,10 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
-      'render_html',
+      'author_image_pages',
       'visual_director_review',
       'screenshot_review',
-      'fix_html',
+      'repair_image_pages',
       'export_pptx',
     ],
   );
@@ -62,8 +62,13 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   );
   assert.equal(contract.layout_rules.density_mode, 'teaching_spread');
   assert.equal(contract.export_bundle.bundle_id, 'lecture_student_bundle');
-  assert.equal(contract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
-  assert.equal(contract.prompt_pack.render_contract.default_visual_route, 'render_html');
+  assert.equal(contract.prompt_pack.render_contract.render_strategy, 'image_first_page_authoring');
+  assert.equal(contract.prompt_pack.render_contract.default_visual_route, 'author_image_pages');
+  assert.equal(contract.prompt_pack.render_contract.image_page_authoring_lane.status, 'production_default');
+  assert.equal(contract.prompt_pack.render_contract.image_page_authoring_lane.default_enabled, true);
+  assert.equal(contract.prompt_pack.render_contract.image_page_authoring_lane.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(contract.prompt_pack.render_contract.html_authoring_lane.status, 'production_selectable_optional');
+  assert.equal(contract.prompt_pack.render_contract.html_authoring_lane.default_enabled, false);
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.default_enabled, false);
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.production_selectable, true);
@@ -90,6 +95,10 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   );
   assert.deepEqual(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
+    ['author_image_pages', 'repair_image_pages'],
+  );
+  assert.deepEqual(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.legacy_html_replaces_routes,
     ['render_html', 'fix_html'],
   );
   assert.equal(contract.prompt_pack.render_contract.shell_file, 'render_shell.html');

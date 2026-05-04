@@ -83,7 +83,7 @@ test('stable families expose one explicit governance_surface contract on create 
       deliverableId: 'deck-a',
       title: '甲状腺门诊教学 deck',
       goal: '给本科生讲授甲状腺基础知识',
-      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'],
+      routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review'],
     });
     const note = await buildReviewReadyWorkspace({
       workspaceRoot,

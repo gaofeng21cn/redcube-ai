@@ -25,16 +25,18 @@
 - `route_equivalence` 已作为 manifest 合同面冻结：`frontdesk`、`invoke`、`session` 与 internal `OPL bridge` 都只指向同一 downstream `domain_entry`、同一 session continuity / progress / artifact / review / publication truth，不新增第二公开 skill 或第二运行语义
 - `deliverable_facade` 已覆盖当前 `ppt_deck` 与 `xiaohongshu` surface：facade 只声明现有 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`，不改核心生成逻辑
 - direct route 只用于显式 stage rerun、定点回修或 runtime gate 指定的局部恢复；默认新交付继续走 `run_managed_deliverable` / `auto_to_terminal`。`run_deliverable_route` 现在会把本轮 `delivery_request.user_intent` 写入 route authoring context，并纳入 route cache key，避免定点回修指令被旧 artifact 复用吞掉。
-- executor backend public contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 单独表达 `structured_call` / `agent_loop`。`render_html` 默认结构化调用；`fix_html` 默认结构化回修并复审到 `screenshot_review`，若复审仍要求 `fix_html`，最多升级一次 `hermes_agent + agent_loop` 并记录 execution proof。
+- executor backend public contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 单独表达 `structured_call` / `agent_loop`。`ppt_deck` 默认视觉路线现在是 `author_image_pages`，通过 Responses `image_generation` 生成整页 PNG；HTML `render_html/fix_html` 与 native editable PPTX `author_pptx_native/repair_pptx_native` 只在用户显式选择对应路线时启用。
 - executor routing 配置为 opt-in：`config/examples/executor-routing.example.json` 仅作示例，真实本机配置放 `$CODEX_HOME/projects/redcube-ai/runtime-state/config/executor-routing.json`、`config/local/executor-routing.json` 或 `REDCUBE_EXECUTOR_ROUTING_CONFIG`。RCA 只保存 Hermes profile id，不保存 provider/base URL/API key/model list。
-- `ppt_deck` native PPT authoring / repair 已作为生产可选、默认关闭路线落到可运行 executor：`author_pptx_native` 通过 RedCube clean-room SVG IR 与 DrawingML writer 生成可编辑 PPTX、shape manifest 和 true PPTX render proof，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`
+- `ppt_deck` image-first route 已成为默认 visual route：`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> repair_image_pages -> export_pptx`。`author_image_pages` 记录 provider/base URL host、`/responses`、request model、`gpt-image-2` 默认模型、image call id、prompt/style hashes 与 PNG hashes；token 不进入 artifact。`export_pptx` 将整页 PNG 装配成 PPTX/PDF，并明确 `editable=false`。
+- `ppt_deck` native PPT authoring / repair 继续作为生产可选、默认关闭的可编辑路线：`author_pptx_native` 通过 RedCube clean-room SVG IR 与 DrawingML writer 生成可编辑 PPTX、shape manifest 和 true PPTX render proof，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log。
 - native PPT selectable lane 已登记在 `contracts/runtime-program/python-native-helper-catalog.json`；Python helper 现在由 repo-owned `redcube_ai` package 承载，既有脚本只保留兼容入口；Python helper 不能绕过 `visual_director_review`、`screenshot_review` 与 `export_pptx` gate，也不能替代 RedCube product-entry/runtime-family route
+- image-first proof runner 已落地：`tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof` 默认 mock 且不调用真实图片 API；live 模式显式要求 `REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD` 或 `OPENAI_API_KEY`。CI 的 `image-ppt-proof` 可选 lane 只在 manual、nightly 或 PR label 触发，默认 fast/meta 不调用真实 image generation。
 - native PPT 生产硬化已补齐真实 product-entry smoke、可复现 proof runner、手动 CI true-proof lane、视觉 benchmark 与 export operator proof summary：`tests/product-entry-native-ppt-live-proof.test.ts` 走 source readiness、create deliverable、`author_pptx_native`、review gates 与 export；`tools/native-ppt-proof/run.sh` 在 LibreOffice headless -> PDF -> Poppler PNG 环境生成 editable PPTX、PDF、PNG、shape manifest 与 proof summary；默认 fast/meta 仍不触发真实 renderer
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
 ## 当前验证口径
 
-- hosted quality lane：`npm run typecheck -> npm run test:fast -> npm run test:family -> npm run test:meta`
+- hosted quality lane：`npm run typecheck -> run-test-group fast -> run-test-group family -> run-test-group meta:ci`，其中 `meta:ci` 只跑 fast 未覆盖的 meta remainder，避免默认 CI 重复执行同一批根级测试文件
 - family shared pin 审计统一经由 `scripts/run-test-group-lib.ts`，必须在 clean-clone 环境下可运行
 - 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发
 
@@ -52,5 +54,5 @@
 - 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 `OPL Runtime Manager`、external `Hermes-Agent` substrate、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持 AI-first 质量边界：story / visual / markup authorship 与最终视觉 reviewer 判断由 AI-authored artifact 持有；pack、schema、gate、audit、scorecard 与 projection 只表达结构、证据、机械状态和 rerun hints
-- 保持 native PPT lane 生产可选、默认关闭；HTML 主线与 native PPT 路线都继续经过 `visual_director_review`、`screenshot_review` 与 `export_pptx`
+- 保持 image-first 为 `ppt_deck` 默认视觉路线；HTML 与 native editable PPTX 都保持生产可选、显式选择，并继续经过 `visual_director_review`、`screenshot_review` 与 `export_pptx`
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

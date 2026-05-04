@@ -13,7 +13,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
-test('product-entry manifest exposes native PPT proof lane without changing the default PPT stage sequence', async () => {
+test('product-entry manifest exposes image-first default and explicit native PPT proof lane', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-manifest-'));
   const manifest = await getProductEntryManifest({
     workspace_locator: {
@@ -22,7 +22,8 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
   });
 
   const pptPolicy = manifest.deliverable_facade.family_route_policy.ppt_deck;
-  assert.equal(pptPolicy.default_visual_route, 'render_html');
+  assert.equal(pptPolicy.default_visual_route, 'author_image_pages');
+  assert.equal(pptPolicy.default_visual_policy, 'image_first');
   assert.deepEqual(
     pptPolicy.protected_stage_sequence,
     [
@@ -30,18 +31,25 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
-      'render_html',
+      'author_image_pages',
       'visual_director_review',
       'screenshot_review',
-      'fix_html',
+      'repair_image_pages',
       'export_pptx',
     ],
   );
+  assert.equal(pptPolicy.image_page_authoring_lane.status, 'production_default');
+  assert.equal(pptPolicy.image_page_authoring_lane.default_enabled, true);
+  assert.equal(pptPolicy.image_page_authoring_lane.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(pptPolicy.html_authoring_lane.status, 'production_selectable_optional');
+  assert.equal(pptPolicy.html_authoring_lane.explicit_selection_required, true);
+  assert.deepEqual(pptPolicy.route_selection_policy.explicit_selection_required_for, ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native']);
   assert.equal(pptPolicy.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.equal(pptPolicy.native_ppt_proof_lane.default_enabled, false);
   assert.equal(pptPolicy.native_ppt_proof_lane.production_selectable, true);
   assert.deepEqual(pptPolicy.native_ppt_proof_lane.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
-  assert.deepEqual(pptPolicy.native_ppt_proof_lane.replaces_routes, ['render_html', 'fix_html']);
+  assert.deepEqual(pptPolicy.native_ppt_proof_lane.replaces_routes, ['author_image_pages', 'repair_image_pages']);
+  assert.deepEqual(pptPolicy.native_ppt_proof_lane.legacy_html_replaces_routes, ['render_html', 'fix_html']);
   assert.deepEqual(
     pptPolicy.native_ppt_proof_lane.preserved_gates,
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
@@ -80,6 +88,11 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.synthetic_preview_allowed, false);
   assert.equal(manifest.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
   assert.equal(manifest.native_ppt_operator_ux.status, 'blocked');
+  assert.equal(manifest.native_ppt_operator_ux.route_selection.default_visual_route, 'author_image_pages');
+  assert.equal(manifest.native_ppt_operator_ux.route_selection.default_visual_policy, 'image_first');
+  assert.deepEqual(manifest.native_ppt_operator_ux.route_selection.image_routes, ['author_image_pages', 'repair_image_pages']);
+  assert.deepEqual(manifest.native_ppt_operator_ux.route_selection.html_routes, ['render_html', 'fix_html']);
+  assert.equal(manifest.native_ppt_operator_ux.route_selection.style_reference_dir_input, 'delivery_request.style_reference_dir');
   assert.equal(manifest.native_ppt_operator_ux.route_selection.default_enabled, false);
   assert.equal(manifest.native_ppt_operator_ux.route_selection.production_selectable, true);
   assert.deepEqual(manifest.native_ppt_operator_ux.route_selection.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
@@ -102,9 +115,19 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
     ['product_entry_preflight', 'workspace_contract_present', 'libreoffice_headless', 'poppler_pdftoppm'],
   );
   assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].blocked_reason, 'soffice_headless_missing_or_unusable');
+  assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.surface_kind, 'image_provider_diagnostics');
+  assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.default_route, 'author_image_pages');
+  assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.helper_command, 'redcube image-ppt proof');
+  assert.deepEqual(manifest.native_ppt_operator_ux.image_proof_runner.allowed_routes, ['author_image_pages', 'repair_image_pages']);
   assert.equal(manifest.product_entry_shell.native_ppt_proof.command, 'redcube native-ppt proof');
+  assert.equal(manifest.product_entry_shell.image_ppt_proof.command, 'redcube image-ppt proof');
   assert.equal(manifest.operator_loop_actions.run_native_ppt_proof.surface_kind, 'native_ppt_product_entry_proof');
+  assert.equal(manifest.operator_loop_actions.run_image_ppt_proof.surface_kind, 'image_ppt_product_entry_proof');
+  assert.equal(manifest.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
+  assert.equal(manifest.ppt_deck_visual_route_truth.image_provider_diagnostics.surface_kind, 'image_provider_diagnostics');
   assert.equal(manifest.skill_catalog.skills.length, 1);
+  assert.equal(manifest.skill_catalog.supported_commands.includes('redcube image-ppt proof'), true);
   assert.equal(manifest.skill_catalog.supported_commands.includes('redcube native-ppt proof'), true);
 });
 

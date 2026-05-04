@@ -1,5 +1,6 @@
 // @ts-nocheck
 export const NATIVE_PPT_PROOF_COMMAND = 'redcube native-ppt proof';
+export const IMAGE_PPT_PROOF_COMMAND = 'redcube image-ppt proof';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -16,6 +17,8 @@ export function buildNativePptOperatorUx({
   pptPolicy,
 }) {
   const proofLane = pptPolicy?.native_ppt_proof_lane || {};
+  const imageLane = pptPolicy?.image_page_authoring_lane || {};
+  const htmlLane = pptPolicy?.html_authoring_lane || {};
   const runnableRoutes = Array.isArray(proofLane.runnable_routes)
     ? proofLane.runnable_routes
     : ['author_pptx_native', 'repair_pptx_native'];
@@ -40,6 +43,23 @@ export function buildNativePptOperatorUx({
     summary: 'Native PPT proof lane is an operator-selectable proof route for ppt_deck; it stays opt-in and preserves the review/export gates.',
     route_selection: {
       deliverable_family: 'ppt_deck',
+      default_visual_route: safeText(pptPolicy?.default_visual_route, 'author_image_pages'),
+      default_visual_policy: safeText(pptPolicy?.default_visual_policy, 'image_first'),
+      image_first_default: imageLane?.default_enabled === true,
+      image_routes: Array.isArray(imageLane.runnable_routes)
+        ? imageLane.runnable_routes
+        : ['author_image_pages', 'repair_image_pages'],
+      html_routes: Array.isArray(htmlLane.runnable_routes)
+        ? htmlLane.runnable_routes
+        : ['render_html', 'fix_html'],
+      native_routes: runnableRoutes,
+      explicit_selection_required_for: Array.isArray(pptPolicy?.selectable_explicit_routes)
+        ? pptPolicy.selectable_explicit_routes
+        : ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+      style_reference_dir_input: safeText(
+        pptPolicy?.route_selection_policy?.style_reference_dir_input || imageLane.style_reference_dir_input,
+        'delivery_request.style_reference_dir',
+      ),
       selectable_when: [
         'deliverable_family=ppt_deck',
         'operator_explicitly_selects_native_ppt_proof',
@@ -92,6 +112,37 @@ export function buildNativePptOperatorUx({
       ],
       native_helper_doctor_role: 'diagnostic_only',
       review_export_gates_execute_via_product_entry: true,
+    },
+    image_provider_diagnostics: {
+      surface_kind: 'image_provider_diagnostics',
+      diagnostic_only: true,
+      default_route: safeText(pptPolicy?.default_visual_route, 'author_image_pages'),
+      provider_status: 'runtime_checked',
+      style_reference_dir_input: safeText(
+        pptPolicy?.route_selection_policy?.style_reference_dir_input || imageLane.style_reference_dir_input,
+        'delivery_request.style_reference_dir',
+      ),
+      blocked_reason: productEntryPreflight?.ready_to_try_now === true
+        ? null
+        : 'product_entry_preflight_blocked',
+    },
+    image_proof_runner: {
+      surface_kind: 'image_ppt_proof_runner_command',
+      helper_command: IMAGE_PPT_PROOF_COMMAND,
+      command_template: (
+        `${IMAGE_PPT_PROOF_COMMAND} --workspace-root ${workspaceRoot} `
+        + '--entry-session-id <entry-session-id> --topic-id <topic-id> '
+        + '--deliverable-id <deliverable-id> --route author_image_pages '
+        + '--style-reference-dir <style-reference-dir>'
+      ),
+      repo_owned_runner: true,
+      downstream_gateway_action: 'runDeliverableRoute',
+      delegates_to: 'runDeliverableRoute',
+      public_skill_policy: 'do_not_register_as_second_public_skill',
+      allowed_routes: Array.isArray(imageLane.runnable_routes)
+        ? imageLane.runnable_routes
+        : ['author_image_pages', 'repair_image_pages'],
+      required_review_export_gates: preservedGates,
     },
     proof_runner: {
       surface_kind: 'native_ppt_proof_runner_command',

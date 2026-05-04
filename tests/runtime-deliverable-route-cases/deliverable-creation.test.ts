@@ -65,10 +65,10 @@ test('createDeliverable writes canonical deliverable metadata', async () => {
     'detailed_outline',
     'slide_blueprint',
     'visual_direction',
-    'render_html',
+    'author_image_pages',
     'visual_director_review',
     'screenshot_review',
-    'fix_html',
+    'repair_image_pages',
     'export_pptx',
   ]);
 });

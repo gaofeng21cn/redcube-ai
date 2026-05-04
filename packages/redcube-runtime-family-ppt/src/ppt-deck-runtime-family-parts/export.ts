@@ -20,6 +20,7 @@ export interface PptDeckExportStageDeps {
   existsSync?: (file: string) => boolean;
   getDeliverablePaths(workspaceRoot: string, topicId: string, deliverableId: string): JsonRecord;
   getDeliverableViewSurfacePaths(deliverablePaths: JsonRecord, deliverableId: string): { stableHtmlFile: string };
+  isImagePagesArtifact?(renderArtifact: JsonRecord | null | undefined): boolean;
   isNativePptArtifact(renderArtifact: JsonRecord | null | undefined): boolean;
   readCurrentVisualArtifact(contract: JsonRecord, deliverablePaths: JsonRecord): JsonRecord;
   readStageArtifact(contract: JsonRecord, deliverablePaths: JsonRecord, stageId: string): JsonRecord;
@@ -75,6 +76,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     existsSync: mainExistsSync,
     getDeliverablePaths,
     getDeliverableViewSurfacePaths,
+    isImagePagesArtifact,
     isNativePptArtifact,
     readCurrentVisualArtifact,
     readStageArtifact,
@@ -116,6 +118,20 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
   }
 
   function hashReviewInput(renderArtifact: JsonRecord): string {
+    if (isImagePagesArtifact?.(renderArtifact)) {
+      const hash = createHash('sha256');
+      hash.update('ppt_deck_image_pages_screenshot_mechanics:v1\n');
+      hash.update(safeText(renderArtifact?.route));
+      hash.update('\n');
+      for (const page of safeArray(renderArtifact?.image_pages_bundle?.pages || renderArtifact?.image_pages?.pages || renderArtifact?.pages)) {
+        hash.update(safeText(page?.slide_id));
+        hash.update('\n');
+        hashFileIfPresent(hash, page?.png_file || page?.image_file || page?.screenshot_file || page?.file);
+        hashFileIfPresent(hash, page?.prompt_manifest_file || renderArtifact?.image_pages_bundle?.prompt_manifest_file);
+        hashFileIfPresent(hash, page?.style_manifest_file || renderArtifact?.image_pages_bundle?.style_manifest_file);
+      }
+      return hash.digest('hex');
+    }
     if (isNativePptArtifact(renderArtifact)) {
       const hash = createHash('sha256');
       hash.update('ppt_deck_native_ppt_screenshot_mechanics:v1\n');
@@ -148,6 +164,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const hash = createHash('sha256');
     hash.update('ppt_deck_export_preview:v1\n');
     hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
+    hash.update(`source_visual_route:${safeText(reviewArtifact?.review_capture?.source_visual_route)}\n`);
     hashFileIfPresent(hash, stableViewHtmlFile);
     hash.update('screenshots\n');
     for (const slide of safeArray(reviewArtifact?.slide_reviews)) {
@@ -169,11 +186,14 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
   }
 
   function exportPreviewMetricsFromPayload({ exportPayload, renderArtifact, reviewArtifact }: ExportPreviewMetricsInput) {
+    const sourcePageCount = isImagePagesArtifact?.(renderArtifact)
+      ? Number(renderArtifact?.image_pages_bundle?.page_count || safeArray(renderArtifact?.image_pages_bundle?.pages || renderArtifact?.image_pages?.pages || renderArtifact?.pages).length)
+      : Number(renderArtifact?.html_bundle?.page_count || 0);
     return {
       page_count: Number(exportPayload?.page_count || 0),
-      render_page_count: Number(renderArtifact?.html_bundle?.page_count || 0),
+      render_page_count: sourcePageCount,
       reviewed_page_count: safeArray(reviewArtifact?.slide_reviews).length,
-      page_count_match: Number(exportPayload?.page_count || 0) === Number(renderArtifact?.html_bundle?.page_count || 0),
+      page_count_match: Number(exportPayload?.page_count || 0) === sourcePageCount,
     };
   }
 
@@ -485,6 +505,75 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     };
   }
 
+  function imagePagesSourceRefs(renderArtifact: JsonRecord): JsonRecord {
+    const bundle = renderArtifact?.image_pages_bundle || renderArtifact?.image_pages || {};
+    const pages = safeArray(bundle?.pages || renderArtifact?.pages).map((page) => ({
+      slide_id: safeText(page?.slide_id),
+      title: safeText(page?.title),
+      png_file: safeText(page?.png_file || page?.image_file || page?.screenshot_file || page?.file),
+      prompt_manifest_file: safeText(page?.prompt_manifest_file || bundle?.prompt_manifest_file || renderArtifact?.prompt_manifest_file),
+      style_manifest_file: safeText(page?.style_manifest_file || bundle?.style_manifest_file || renderArtifact?.style_manifest_file),
+    }));
+    return {
+      source_visual_route: safeText(renderArtifact?.route),
+      prompt_manifest_file: safeText(bundle?.prompt_manifest_file || renderArtifact?.prompt_manifest_file),
+      style_manifest_file: safeText(bundle?.style_manifest_file || renderArtifact?.style_manifest_file),
+      pages,
+      png_files: pages.map((page) => page.png_file).filter(Boolean),
+      prompt_manifest_files: [...new Set(pages.map((page) => page.prompt_manifest_file).filter(Boolean))],
+      style_manifest_files: [...new Set(pages.map((page) => page.style_manifest_file).filter(Boolean))],
+    };
+  }
+
+  function buildImagePagesArtifactGallery({
+    contract,
+    deliverableId,
+    renderArtifact,
+    pptxPath,
+    pdfPath,
+    notesFile,
+    finalDelivery,
+  }: JsonRecord): JsonRecord {
+    const sourceArtifacts = imagePagesSourceRefs(renderArtifact);
+    const artifactGalleryDir = ensureDir(path.join(path.dirname(pptxPath), 'artifact_gallery'));
+    const artifactGalleryIndexFile = path.join(artifactGalleryDir, 'index.json');
+    const gallery = {
+      surface_kind: 'image_pages_export_operator_artifact_gallery_v1',
+      status: 'output_ready',
+      title: safeText(contract?.title),
+      deliverable_id: deliverableId,
+      source_visual_route: safeText(renderArtifact?.route),
+      editable: false,
+      artifacts: {
+        source: sourceArtifacts,
+        final: {
+          pptx_file: pptxPath,
+          pdf_file: pdfPath,
+          presenter_notes_file: notesFile,
+          final_delivery_pptx_file: finalDelivery.pptx_file,
+          final_delivery_pdf_file: finalDelivery.pdf_file,
+        },
+        evidence: {
+          final_delivery_manifest_file: finalDelivery.manifest_file,
+          final_delivery_readme_file: finalDelivery.readme_file,
+        },
+      },
+      hashes: {
+        source_png_sha256: sourceArtifacts.png_files.map((file: string) => ({ file, sha256: fileSha256(file) })),
+        prompt_manifest_sha256: sourceArtifacts.prompt_manifest_files.map((file: string) => ({ file, sha256: fileSha256(file) })),
+        style_manifest_sha256: sourceArtifacts.style_manifest_files.map((file: string) => ({ file, sha256: fileSha256(file) })),
+        final_pptx_sha256: fileSha256(pptxPath),
+        final_pdf_sha256: fileSha256(pdfPath),
+      },
+      updated_at: new Date().toISOString(),
+    };
+    writeJson(artifactGalleryIndexFile, gallery);
+    return {
+      ...gallery,
+      index_file: artifactGalleryIndexFile,
+    };
+  }
+
   function materializeFullCaptureForExport({
     deliverablePaths,
     reviewArtifact,
@@ -545,8 +634,9 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       screenshotsDir: reviewedScreenshotsDir,
     });
     const screenshotsDir = exportCapture.screenshotsDir;
-    const stableViewHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
-    if (!fileExists(stableViewHtmlFile)) {
+    const imagePagesExportInput = isImagePagesArtifact?.(renderArtifact) === true;
+    const stableViewHtmlFile = imagePagesExportInput ? '' : getDeliverableViewSurfacePaths(deliverablePaths, deliverableId).stableHtmlFile;
+    if (!imagePagesExportInput && !fileExists(stableViewHtmlFile)) {
       throw new Error(`Route export_pptx requires reviewed stable HTML surface before export: ${stableViewHtmlFile}`);
     }
     const previewHash = hashExportPreviewInput({ stableViewHtmlFile, reviewArtifact });
@@ -572,6 +662,17 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       pptxPath,
       pdfPath,
     });
+    const imageGallery = imagePagesExportInput
+      ? buildImagePagesArtifactGallery({
+          contract,
+          deliverableId,
+          renderArtifact,
+          pptxPath,
+          pdfPath,
+          notesFile,
+          finalDelivery,
+        })
+      : null;
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       status: 'completed',
@@ -588,7 +689,16 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         },
       },
       export_bundle: {
+        source_visual_route: imagePagesExportInput ? safeText(renderArtifact?.route) : undefined,
+        editable: imagePagesExportInput ? false : undefined,
         source_html: stableViewHtmlFile,
+        source_artifacts: imagePagesExportInput ? imagePagesSourceRefs(renderArtifact) : undefined,
+        artifact_gallery: imageGallery ? {
+          index_file: imageGallery.index_file,
+          surface_kind: imageGallery.surface_kind,
+          status: imageGallery.status,
+          editable: false,
+        } : undefined,
         pptx_file: pptxPath,
         pdf_file: pdfPath,
         presenter_notes_file: notesFile,
@@ -617,6 +727,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       },
       artifact_refs: [
         stableViewHtmlFile,
+        imageGallery?.index_file,
+        ...safeArray(imageGallery?.artifacts?.source?.png_files),
+        ...safeArray(imageGallery?.artifacts?.source?.prompt_manifest_files),
+        ...safeArray(imageGallery?.artifacts?.source?.style_manifest_files),
         pptxPath,
         pdfPath,
         notesFile,

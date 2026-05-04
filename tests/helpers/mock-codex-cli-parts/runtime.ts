@@ -93,6 +93,12 @@ export function buildCreativeRunOutput(meta) {
     case 'render_html':
     case 'fix_html':
       return buildMockPptRender(meta);
+    case 'author_image_pages':
+    case 'repair_image_pages':
+      return {
+        image_pages: [],
+        render_summary: ['image pages are produced by the runtime Responses image adapter, not the structured mock CLI.'],
+      };
     case 'author_pptx_native':
     case 'repair_pptx_native':
       return buildMockPptNativeShapePlan(meta);
@@ -153,9 +159,19 @@ export function buildMockCodexLastMessage(prompt) {
 }
 
 export async function startMockCodexCli() {
+  const previousImageGenerationMock = process.env.REDCUBE_IMAGE_GENERATION_MOCK;
+  if (previousImageGenerationMock === undefined) {
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+  }
   return {
     command: JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'mock-codex-cli-bin.ts')]),
-    async close() {},
+    async close() {
+      if (previousImageGenerationMock === undefined) {
+        delete process.env.REDCUBE_IMAGE_GENERATION_MOCK;
+      } else {
+        process.env.REDCUBE_IMAGE_GENERATION_MOCK = previousImageGenerationMock;
+      }
+    },
   };
 }
 

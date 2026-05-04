@@ -13,6 +13,8 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
     deriveProfileChecks,
     getDeliverablePaths,
     hasAiVisualBlock,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     mainExistsSync,
     nativeMechanicalReviewPayload,
     readJson,
@@ -206,8 +208,9 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
     reviewCapture,
     mode,
     nativeReviewInput,
+    imagePagesReviewInput,
   }) {
-    if (nativeReviewInput) return [];
+    if (nativeReviewInput || imagePagesReviewInput) return [];
     const args = [
       '--html', renderArtifact.html_bundle.html_file,
       '--output-dir', reviewCapture.screenshotsDir,
@@ -232,12 +235,18 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
     return JSON.parse(readFileSync(manifestFile, 'utf-8'));
   }
 
-  function resolveMechanicalReviewExecution({ cacheStatus, cachedPayload, nativeReviewInput, renderArtifact, args }) {
+  function resolveMechanicalReviewExecution({ cacheStatus, cachedPayload, nativeReviewInput, imagePagesReviewInput, renderArtifact, args }) {
     if (cacheStatus === 'hit') return { command: 'cache', payload: cachedPayload };
     if (nativeReviewInput) {
       return {
         command: 'native_ppt_shape_manifest',
         payload: nativeMechanicalReviewPayload(renderArtifact),
+      };
+    }
+    if (imagePagesReviewInput || isImagePagesArtifact?.(renderArtifact)) {
+      return {
+        command: 'image_pages_manifest_png',
+        payload: imagePagesMechanicalReviewPayload(renderArtifact),
       };
     }
     return runPython(PYTHON_REVIEW, args);

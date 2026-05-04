@@ -18,7 +18,7 @@ import { withMockHermesUpstream } from './mock-codex-cli.ts';
 const TOPIC_ID = 'topic-a';
 const XHS_SHARED_STATE_TOPIC_ID = 'topic-shared-state';
 const ROUTES_BY_OVERLAY = {
-  ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review'],
+  ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review'],
   xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'],
 };
 const FIXTURE_PROMISES = new Map();
@@ -172,21 +172,21 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
         type: 'request_changes',
         actor: 'human',
         review_stage: 'screenshot_review',
-        rerun_from_stage: 'render_html',
+        rerun_from_stage: 'author_image_pages',
         issues: ['visual_peak_missing'],
         notes: '关键页视觉峰值不够',
       },
     });
     assert.equal(blocked.state.current_status, 'blocked_for_revision');
-    assert.equal(blocked.state.rerun_from_stage, 'render_html');
+    assert.equal(blocked.state.rerun_from_stage, 'author_image_pages');
     assert.deepEqual(blocked.state.pending_reviews, ['visual_peak_missing']);
 
     const watchBlocked = await runtimeWatch({ workspaceRoot, topicId: TOPIC_ID, deliverableId: 'deck-candidate' });
     assert.equal(watchBlocked.status, 'review_pending');
     assert.equal(watchBlocked.review_state.current_status, 'blocked_for_revision');
-    assert.equal(watchBlocked.review_state.rerun_from_stage, 'render_html');
+    assert.equal(watchBlocked.review_state.rerun_from_stage, 'author_image_pages');
 
-    assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'render_html' })).ok, true);
+    assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'author_image_pages' })).ok, true);
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'visual_director_review' })).ok, true);
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'screenshot_review' })).ok, true);
 

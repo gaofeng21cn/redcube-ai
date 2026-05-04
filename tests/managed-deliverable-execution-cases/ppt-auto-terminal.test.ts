@@ -74,11 +74,11 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
     assert.equal(result.managed_run.route_runs.length, 8);
     assert.equal(result.managed_run.stage_results.length, 9);
     assert.equal(
-      result.managed_run.route_runs.some((stageRun) => stageRun.stage_id === 'fix_html'),
+      result.managed_run.route_runs.some((stageRun) => stageRun.stage_id === 'repair_image_pages'),
       false,
     );
     assert.equal(
-      result.managed_run.stage_results.some((stageResult) => stageResult.stage_id === 'fix_html' && stageResult.status === 'skipped'),
+      result.managed_run.stage_results.some((stageResult) => stageResult.stage_id === 'repair_image_pages' && stageResult.status === 'skipped'),
       true,
     );
     assert.equal(
@@ -178,7 +178,7 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
   });
 });
 
-test('managed auto_to_terminal skips fix_html when screenshot_review does not request a rerun', async () => {
+test('managed auto_to_terminal skips repair_image_pages when screenshot_review does not request a rerun', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-skip-fix-html-'));
 
@@ -186,7 +186,7 @@ test('managed auto_to_terminal skips fix_html when screenshot_review does not re
       workspaceRoot,
       topicId: 'topic-a',
       title: '甲状腺门诊科普',
-      brief: '验证 happy path 不会无条件进入 fix_html。',
+      brief: '验证 happy path 不会无条件进入 repair_image_pages。',
       keywords: ['甲状腺', 'PPT'],
     });
 
@@ -216,7 +216,7 @@ test('managed auto_to_terminal skips fix_html when screenshot_review does not re
         'detailed_outline',
         'slide_blueprint',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
         'export_pptx',
@@ -229,16 +229,16 @@ test('managed auto_to_terminal skips fix_html when screenshot_review does not re
         'detailed_outline',
         'slide_blueprint',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
-        'fix_html',
+        'repair_image_pages',
         'export_pptx',
       ],
     );
     assert.equal(
       result.managed_run.stage_results.some(
-        (stageResult) => stageResult.stage_id === 'fix_html' && stageResult.status === 'skipped',
+        (stageResult) => stageResult.stage_id === 'repair_image_pages' && stageResult.status === 'skipped',
       ),
       true,
     );

@@ -12,7 +12,9 @@ import {
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
   discoverRootTestFiles,
+  parseRunTestGroupArgs,
   partitionTestFilesForExecution,
+  selectGroupFiles,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
   resolveRedCubePythonCommand,
 } from './run-test-group-lib.ts';
@@ -41,6 +43,7 @@ const META = [
   'tests/codex-cli-timeout.test.ts',
   'tests/family-onboarding-standard.test.ts',
   'tests/harness-completion-audit.test.ts',
+  'tests/image-ppt-proof-runner.test.ts',
   'tests/kernel-split-extraction.test.ts',
   'tests/legacy-cleanup.test.ts',
   'tests/line-budget.test.ts',
@@ -48,6 +51,10 @@ const META = [
   'tests/opl-family-contract-adoption.test.ts',
   'tests/pack-first-completion.test.ts',
   'tests/ppt-mainline-quality-closeout.test.ts',
+  'tests/ppt-image-first-style-benchmark.test.ts',
+  'tests/ppt-image-pages-runtime.test.ts',
+  'tests/ppt-image-review-export.test.ts',
+  'tests/ppt-image-route-selection.test.ts',
   'tests/ppt-overlay.test.ts',
   'tests/profile-contract-hydration.test.ts',
   'tests/python-native-helper-catalog.test.ts',
@@ -182,6 +189,10 @@ const FAST = [
   'tests/ppt-hermes-generation.test.ts',
   'tests/ppt-native-ppt-runtime.test.ts',
   'tests/ppt-native-python-layouts.test.ts',
+  'tests/ppt-image-pages-runtime.test.ts',
+  'tests/ppt-image-review-export.test.ts',
+  'tests/ppt-image-route-selection.test.ts',
+  'tests/ppt-image-first-style-benchmark.test.ts',
   'tests/ppt-render-batch-generation.test.ts',
   'tests/service-safe-domain-entry.test.ts',
   'tests/product-entry-manuscript-source.test.ts',
@@ -196,6 +207,7 @@ const FAST = [
 const GROUPS = {
   fast: FAST,
   meta: META,
+  'meta:ci': META.filter((file) => !FAST.includes(file)),
   family: FAMILY,
   integration: INTEGRATION,
   e2e: E2E,
@@ -249,12 +261,22 @@ function assertPartition() {
 
 function printUsage() {
   process.stdout.write([
-    '用法: node --experimental-strip-types scripts/run-test-group.ts <fast|meta|family|integration|e2e|historical|full> [node --test 参数]',
+    '用法: node --experimental-strip-types scripts/run-test-group.ts <fast|meta|meta:ci|family|integration|e2e|historical|full> [--files tests/a.test.ts,tests/b.test.ts] [node --test 参数]',
     '示例: node --experimental-strip-types scripts/run-test-group.ts full --test-reporter=dot',
+    '示例: node --experimental-strip-types scripts/run-test-group.ts integration --files tests/source-intake.test.ts --test-reporter=dot',
   ].join('\n'));
 }
 
-const [, , groupName, ...forwardedArgs] = process.argv;
+let parsedArgs;
+try {
+  parsedArgs = parseRunTestGroupArgs(process.argv.slice(2));
+} catch (error) {
+  process.stderr.write(`${error.message}\n`);
+  printUsage();
+  process.exit(1);
+}
+
+const { groupName, forwardedArgs, requestedFiles } = parsedArgs;
 
 if (!groupName || !Object.hasOwn(GROUPS, groupName)) {
   printUsage();
@@ -267,12 +289,17 @@ assertTrackedFiles(INTEGRATION, 'integration');
 assertTrackedFiles(E2E, 'e2e');
 assertTrackedFiles(HISTORICAL, 'historical');
 assertTrackedFiles(FAST, 'fast');
+assertTrackedFiles(GROUPS['meta:ci'], 'meta:ci');
 assertPartition();
 
 const serializedVerificationHandle = await prepareSerializedVerification(groupName);
 const executionPlan = partitionTestFilesForExecution({
   groupName,
-  files: GROUPS[groupName],
+  files: selectGroupFiles({
+    groupName,
+    groupFiles: GROUPS[groupName],
+    requestedFiles,
+  }),
 });
 
 function runNodeTestBatch({ label, files, serialized }) {

@@ -61,7 +61,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.product_entry_quickstart.human_gate_ids, ['redcube_operator_review_gate']);
     assert.deepEqual(
       manifest.product_entry_quickstart.steps.map((step) => step.step_id),
-      ['open_frontdesk', 'continue_current_loop', 'inspect_current_progress', 'optional_native_ppt_proof'],
+      ['open_frontdesk', 'continue_current_loop', 'inspect_current_progress', 'default_image_ppt_proof', 'optional_native_ppt_proof'],
     );
     assert.equal(
       manifest.product_entry_quickstart.steps[0].command,
@@ -72,8 +72,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
     );
     assert.deepEqual(manifest.product_entry_quickstart.steps[2].requires, ['entry_session_id']);
-    assert.equal(manifest.product_entry_quickstart.steps[3].surface_kind, 'native_ppt_product_entry_proof');
-    assert.match(manifest.product_entry_quickstart.steps[3].command, /redcube native-ppt proof/);
+    assert.equal(manifest.product_entry_quickstart.steps[3].surface_kind, 'image_ppt_product_entry_proof');
+    assert.match(manifest.product_entry_quickstart.steps[3].command, /redcube image-ppt proof/);
+    assert.equal(manifest.product_entry_quickstart.steps[4].surface_kind, 'native_ppt_product_entry_proof');
+    assert.match(manifest.product_entry_quickstart.steps[4].command, /redcube native-ppt proof/);
     assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(
       manifest.product_entry_overview.summary,
@@ -227,9 +229,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'redcube product frontdesk',
       'redcube product invoke',
       'redcube product session',
+      'redcube image-ppt proof',
       'redcube native-ppt proof',
     ]);
-    assert.equal(manifest.skill_catalog.command_contracts.length, 4);
+    assert.equal(manifest.skill_catalog.command_contracts.length, 5);
     assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube-ai');
     assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
     assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product frontdesk');
@@ -256,6 +259,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
           session: {
             command: 'redcube product session',
             target_surface_kind: 'product_entry_session',
+          },
+          image_ppt_proof: {
+            command: 'redcube image-ppt proof',
+            target_surface_kind: 'image_ppt_product_entry_proof',
+            role: 'controlled_operator_helper',
           },
           native_ppt_proof: {
             command: 'redcube native-ppt proof',
@@ -367,14 +375,18 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'detailed_outline',
         'slide_blueprint',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
-        'fix_html',
+        'repair_image_pages',
         'export_pptx',
       ],
     );
-    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route, 'render_html'); for (const family of ['ppt_deck', 'xiaohongshu']) { const companion = manifest.deliverable_facade.family_route_policy[family].html_design_companion; assert.equal(companion.source_skill_id, 'ui-ux-pro-max'); assert.equal(companion.activation_surface, 'internal_stage_context'); assert.equal(companion.public_skill_policy, 'do_not_register_as_public_redcube_skill'); }
+    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route, 'author_image_pages');
+    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_policy, 'image_first');
+    assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
+    assert.deepEqual(manifest.deliverable_facade.family_route_policy.ppt_deck.route_selection_policy.explicit_selection_required_for, ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native']);
+    for (const family of ['ppt_deck', 'xiaohongshu']) { const companion = manifest.deliverable_facade.family_route_policy[family].html_design_companion; assert.equal(companion.source_skill_id, 'ui-ux-pro-max'); assert.equal(companion.activation_surface, 'internal_stage_context'); assert.equal(companion.public_skill_policy, 'do_not_register_as_public_redcube_skill'); }
     assert.equal(manifest.deliverable_facade.family_route_policy.ppt_deck.default_run_mode, 'auto_to_terminal');
     assert.equal(
       manifest.deliverable_facade.family_route_policy.ppt_deck.stop_policy,
@@ -382,7 +394,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(
       manifest.deliverable_facade.family_route_policy.ppt_deck.bypass_policy,
-      'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_requests_exploration',
+      'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_selects_html_or_native_route',
     );
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
     assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
@@ -480,7 +492,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	    ]);
 	    assert.equal(manifest.current_truth.product_entry_contract, 'contracts/runtime-program/redcube-product-entry-mvp.json');
       assert.equal(manifest.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
+      assert.equal(manifest.native_ppt_operator_ux.route_selection.default_visual_route, 'author_image_pages');
+      assert.equal(manifest.native_ppt_operator_ux.route_selection.style_reference_dir_input, 'delivery_request.style_reference_dir');
+      assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.surface_kind, 'image_provider_diagnostics');
+      assert.equal(manifest.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
       assert.equal(manifest.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
+      assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.helper_command, 'redcube image-ppt proof');
       assert.equal(manifest.native_ppt_operator_ux.proof_runner.public_skill_policy, 'do_not_register_as_second_public_skill');
       assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].check_id, 'libreoffice_headless');
 	    assert.equal(manifest.session_continuity.surface_kind, 'session_continuity');
@@ -640,13 +657,16 @@ test('product frontdesk exposes overlay stage sequence for ppt_deck callers', as
         'detailed_outline',
         'slide_blueprint',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
-        'fix_html',
+        'repair_image_pages',
         'export_pptx',
       ],
     );
+    assert.equal(frontdesk.overlay_stage_sequences.ppt_deck.default_visual_route, 'author_image_pages');
+    assert.equal(frontdesk.overlay_stage_sequences.ppt_deck.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
+    assert.equal(frontdesk.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
     assert.equal(frontdesk.overlay_stage_sequences.ppt_deck.route_gate_policy, 'fail_closed_against_overlay_stage_sequence');
   });
 });

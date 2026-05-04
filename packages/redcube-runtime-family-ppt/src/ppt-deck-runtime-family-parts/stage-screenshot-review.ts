@@ -32,6 +32,8 @@ export function createPptDeckScreenshotReviewParts(deps) {
     getDeliverablePaths,
     hasAiVisualBlock,
     hashReviewInput,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     isNativePptArtifact,
     loadPriorRenderedSlideHtmlMap,
     mainExistsSync,
@@ -81,6 +83,8 @@ export function createPptDeckScreenshotReviewParts(deps) {
     hasAiVisualBlock,
     mainExistsSync,
     nativeMechanicalReviewPayload,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     readJson,
     readStageArtifact,
     safeArray,
@@ -234,6 +238,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
     const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
+    const imagePagesReviewInput = isImagePagesArtifact(renderArtifact);
     const blueprintSlides = summarizeBlueprintSlides(blueprintArtifact);
     const visualDirection = visualArtifact?.visual_direction || null;
     const incrementalReview = reviewOptions?.incrementalReview === true;
@@ -255,7 +260,11 @@ export function createPptDeckScreenshotReviewParts(deps) {
       mode,
       director_review: directorReviewArtifact?.visual_director_review || null,
       screenshot_mechanics: {
-        source_html_file: safeText(renderArtifact?.html_bundle?.html_file) || null,
+          source_html_file: imagePagesReviewInput ? null : safeText(renderArtifact?.html_bundle?.html_file) || null,
+          source_visual_route: safeText(renderArtifact?.route) || null,
+          source_surface_kind: imagePagesReviewInput
+            ? 'image_pages'
+            : isNativePptArtifact(renderArtifact) ? 'native_pptx' : 'html',
         overall_checks: reviewPayload?.checks || null,
         metrics: reviewPayload?.metrics || null,
         baseline: reviewPayload?.baseline || null,
@@ -273,7 +282,8 @@ export function createPptDeckScreenshotReviewParts(deps) {
           title_font_reference: slide.metrics?.title_font_reference ?? null,
           title_font_delta: slide.metrics?.title_font_delta ?? null,
           page_number_audit: slide.metrics?.page_number_audit ?? null,
-          source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
+          source_html: imagePagesReviewInput ? null : renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
+          source_png: imagePagesReviewInput ? safeText(slide.screenshot_file) : null,
         })),
       },
     };
@@ -308,7 +318,8 @@ export function createPptDeckScreenshotReviewParts(deps) {
               title_font_reference: slide.metrics?.title_font_reference ?? null,
               title_font_delta: slide.metrics?.title_font_delta ?? null,
               page_number_audit: slide.metrics?.page_number_audit ?? null,
-              source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
+              source_html: imagePagesReviewInput ? null : renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
+              source_png: imagePagesReviewInput ? safeText(slide.screenshot_file) : null,
             })),
           },
         },
@@ -382,10 +393,11 @@ export function createPptDeckScreenshotReviewParts(deps) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
     const nativeReviewInput = isNativePptArtifact(renderArtifact);
+    const imagePagesReviewInput = isImagePagesArtifact(renderArtifact);
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
     const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-    const preflightArtifact = nativeReviewInput ? null : buildScreenshotReviewPreflightArtifact(contract, renderArtifact, adapter);
+    const preflightArtifact = nativeReviewInput || imagePagesReviewInput ? null : buildScreenshotReviewPreflightArtifact(contract, renderArtifact, adapter);
     if (preflightArtifact) return preflightArtifact;
     const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverableId}_视觉质控.md`);
     const reviewCapture = createReviewCapturePaths(deliverablePaths, deliverableId);
@@ -398,6 +410,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
       reviewCapture,
       mode,
       nativeReviewInput,
+      imagePagesReviewInput,
     });
     const reviewHash = hashReviewInput(renderArtifact);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
@@ -418,6 +431,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
       cacheStatus,
       cachedPayload,
       nativeReviewInput,
+      imagePagesReviewInput,
       renderArtifact,
       args,
     });
@@ -505,7 +519,8 @@ export function createPptDeckScreenshotReviewParts(deps) {
     const status = failedChecks.length === 0 ? 'pass' : 'block';
     const rerunFromStage = status === 'pass'
       ? null
-      : nativeReviewInput ? 'repair_pptx_native' : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
+      : imagePagesReviewInput ? 'repair_image_pages'
+        : nativeReviewInput ? 'repair_pptx_native' : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
     const artifact = {
       ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
       review_execution: {
@@ -528,8 +543,11 @@ export function createPptDeckScreenshotReviewParts(deps) {
       checks: latestChecks,
       review_capture: {
         capture_id: reviewCapture.captureId,
+        source_visual_route: safeText(renderArtifact?.route) || null,
         screenshots_dir: nativeReviewInput
           ? path.dirname(safeText(safeArray(renderArtifact?.native_ppt_bundle?.preview_screenshots)[0], reviewCapture.screenshotsDir))
+          : imagePagesReviewInput
+            ? path.dirname(safeText(slideReviews[0]?.screenshot_file, reviewCapture.screenshotsDir))
           : reviewCapture.screenshotsDir,
         review_markdown_file: reviewCapture.reviewMarkdownFile,
         manifest_file: captureManifest.manifest_file,

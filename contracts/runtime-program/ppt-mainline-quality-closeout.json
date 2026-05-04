@@ -5,13 +5,16 @@
   "scope": {
     "question": "whether the current RCA ppt_deck HTML mainline still has an unresolved visual quality closure gap from the historical OPL-series deck issue",
     "deliverable_family": "ppt_deck",
-    "default_visual_route": "render_html",
+    "default_visual_route_at_closeout": "render_html",
+    "current_default_visual_route": "author_image_pages",
+    "current_default_route_contract": "contracts/runtime-program/ppt-image-first-production-route.json",
     "historical_debt_status": "resolved_by_later_work",
     "historical_opl_series_deck_required_for_closeout": false,
     "out_of_scope": [
       "rerun historical OPL-series PPT",
       "manual repair of a historical PPT artifact",
       "native PPT proof lane as HTML-mainline fallback",
+      "current image-first default route promotion",
       "new product-entry semantics"
     ]
   },
@@ -23,6 +26,11 @@
       "fix_html only regenerates targeted blocked pages and preserves prior passed pages",
       "visual_director_review and screenshot_review can incrementally review freshly fixed pages",
       "export_pptx records the stable reviewed HTML instead of exporting stale draft markup"
+    ],
+    "current_route_note": [
+      "this closeout is historical evidence for the former HTML default route",
+      "the current ppt_deck default visual route is author_image_pages",
+      "HTML render_html/fix_html remains production-selectable optional"
     ],
     "parallelism_boundary": [
       "slide review batching is parallelized only behind the same screenshot_review gate",
@@ -43,7 +51,9 @@
   },
   "boundary": {
     "html_mainline_verdict": "meets_expected_quality_closure_contract",
-    "native_ppt_proof_lane_role": "second_line_future_promotion_candidate",
+    "current_default_visual_route": "author_image_pages",
+    "html_authoring_lane_role": "production_selectable_optional_historical_default",
+    "native_ppt_proof_lane_role": "second_line_editable_pptx_candidate",
     "native_ppt_used_for_this_closeout": false,
     "native_ppt_boundary_reason": "native PPT authoring and repair are opt-in proof routes for future promotion assessment; they are not the repair path for the HTML mainline closeout"
   },
@@ -57,13 +67,15 @@
       "confirmed screenshot_review routes page-level failures to fix_html and structural speaker-fit failures to slide_blueprint",
       "confirmed fix_html targeted repair preserves passed pages and refreshes downstream review/export state",
       "confirmed review and repair parallelism remains behind the same quality gates",
-      "confirmed native PPT remains an opt-in proof lane and was not used as an HTML-mainline fallback"
+      "confirmed native PPT remains an opt-in proof lane and was not used as an HTML-mainline fallback",
+      "recorded that the current ppt_deck default visual route is image-first author_image_pages"
     ],
     "deferred": [],
     "skipped": [
       "historical OPL-series deck rerun",
       "manual repair of the historical deck artifact",
       "native PPT promotion or fallback wiring",
+      "current image-first route proof rerun inside this historical HTML closeout",
       "new historical sample taxonomy"
     ],
     "verification": {

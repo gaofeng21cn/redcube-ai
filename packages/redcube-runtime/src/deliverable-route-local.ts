@@ -36,6 +36,8 @@ const overlayRegistry = getDefaultOverlayRegistry();
 const REPEATED_BLOCK_FAIL_FAST_ROUTES = new Set([
   'render_html',
   'fix_html',
+  'author_image_pages',
+  'repair_image_pages',
   'visual_director_review',
   'screenshot_review',
 ]);
@@ -177,7 +179,7 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
   const files = routeRequiresArtifacts(contract, route)
     .map((stageId) => stageArtifactFile(deliverablePaths, contract, stageId));
   if (overlay === 'ppt_deck') {
-    if (['render_html', 'fix_html'].includes(route)) {
+    if (['render_html', 'fix_html', 'author_image_pages', 'repair_image_pages'].includes(route)) {
       files.push(
         stageArtifactFile(deliverablePaths, contract, 'visual_director_review'),
         stageArtifactFile(deliverablePaths, contract, 'screenshot_review'),
@@ -188,6 +190,8 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
       files.push(
         stageArtifactFile(deliverablePaths, contract, 'render_html'),
         stageArtifactFile(deliverablePaths, contract, 'fix_html'),
+        stageArtifactFile(deliverablePaths, contract, 'author_image_pages'),
+        stageArtifactFile(deliverablePaths, contract, 'repair_image_pages'),
         stageArtifactFile(deliverablePaths, contract, 'author_pptx_native'),
         stageArtifactFile(deliverablePaths, contract, 'repair_pptx_native'),
         ...pptDraftViewFiles(deliverablePaths, deliverableId),

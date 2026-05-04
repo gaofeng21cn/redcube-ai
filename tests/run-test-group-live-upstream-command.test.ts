@@ -7,7 +7,9 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   buildNodeTestArgs,
+  parseRunTestGroupArgs,
   partitionTestFilesForExecution,
+  selectGroupFiles,
   resolveRedCubePythonCommand,
   ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES,
   SERIALIZED_ROUTE_HEAVY_TEST_FILES,
@@ -107,6 +109,84 @@ test('run-test-group partitions route-heavy files away from the default parallel
   );
 });
 
+test('run-test-group exposes a CI meta remainder lane without repeating fast meta coverage', () => {
+  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
+  const meta = readGroupList(script, 'META');
+  const fast = readGroupList(script, 'FAST');
+
+  assert.match(script, /'meta:ci': META\.filter\(\(file\) => !FAST\.includes\(file\)\)/);
+  assert.equal(fast.some((file) => meta.includes(file)), true);
+  assert.equal(
+    meta.filter((file) => !fast.includes(file)).length,
+    meta.length - fast.filter((file) => meta.includes(file)).length,
+  );
+});
+
+test('run-test-group supports explicit targeted files inside the selected lane', () => {
+  assert.deepEqual(
+    parseRunTestGroupArgs([
+      'integration',
+      '--files',
+      'tests/source-intake.test.ts,tests/runtime-deliverable-route.test.ts',
+      '--test-reporter=dot',
+    ]),
+    {
+      groupName: 'integration',
+      requestedFiles: [
+        'tests/source-intake.test.ts',
+        'tests/runtime-deliverable-route.test.ts',
+      ],
+      forwardedArgs: ['--test-reporter=dot'],
+    },
+  );
+
+  assert.deepEqual(
+    parseRunTestGroupArgs([
+      'meta',
+      '--files=./tests/codex-cli-client.test.ts',
+    ]),
+    {
+      groupName: 'meta',
+      requestedFiles: ['./tests/codex-cli-client.test.ts'],
+      forwardedArgs: [],
+    },
+  );
+
+  assert.deepEqual(
+    selectGroupFiles({
+      groupName: 'integration',
+      groupFiles: [
+        'tests/runtime-deliverable-route.test.ts',
+        'tests/source-intake.test.ts',
+      ],
+      requestedFiles: [
+        'tests/source-intake.test.ts',
+      ],
+    }),
+    [
+      'tests/source-intake.test.ts',
+    ],
+  );
+
+  assert.throws(
+    () => selectGroupFiles({
+      groupName: 'meta',
+      groupFiles: ['tests/codex-cli-client.test.ts'],
+      requestedFiles: ['tests/source-intake.test.ts'],
+    }),
+    /meta 分组不包含请求的测试文件: tests\/source-intake\.test\.ts/,
+  );
+
+  assert.throws(
+    () => selectGroupFiles({
+      groupName: 'meta',
+      groupFiles: ['tests/codex-cli-client.test.ts'],
+      requestedFiles: ['tests/helpers/test-workspace.ts'],
+    }),
+    /--files 只接受根级测试文件/,
+  );
+});
+
 test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const meta = readGroupList(script, 'META');
@@ -129,7 +209,8 @@ test('run-test-group usage and verify shim include the family verification lane'
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
 
-  assert.match(script, /<fast\|meta\|family\|integration\|e2e\|historical\|full>/);
+  assert.match(script, /<fast\|meta\|meta:ci\|family\|integration\|e2e\|historical\|full>/);
+  assert.match(script, /\[--files tests\/a\.test\.ts,tests\/b\.test\.ts\]/);
   assert.match(verifyScript, /family\)/);
   assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|e2e\|historical\|full\]/);
 });
@@ -195,6 +276,10 @@ test('serialized verification rule is documented in current program contract', (
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /route-heavy codex\/browser verification files stay serialized/i,
+  );
+  assert.match(
+    currentProgram.current_state.green_baseline.ci_quality_lane_reason,
+    /meta:ci runs only the meta remainder not already covered by fast/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,

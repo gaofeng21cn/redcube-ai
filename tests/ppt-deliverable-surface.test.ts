@@ -48,8 +48,9 @@ test('createDeliverable initializes workspace AGENTS guardrails without overwrit
   assert.equal(existsSync(agentsFile), true);
   const agentsText = readFileSync(agentsFile, 'utf-8');
   assert.match(agentsText, /RedCube AI \/ RCA product-entry/);
-  assert.match(agentsText, /render_html -> visual_director_review -> screenshot_review -> export_pptx/);
-  assert.match(agentsText, /不得用通用 PowerPoint 模板/);
+  assert.match(agentsText, /author_image_pages -> visual_director_review -> screenshot_review -> export_pptx/);
+  assert.match(agentsText, /delivery_request\.style_reference_dir/);
+  assert.match(agentsText, /HTML\/native routes 只能/);
   assertWorkspaceGitBoundary(workspaceRoot);
 
   writeFileSync(agentsFile, '# Custom workspace rule\n', 'utf-8');
@@ -116,7 +117,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
-      'render_html',
+      'author_image_pages',
       'visual_director_review',
       'screenshot_review',
       'export_pptx',
@@ -125,12 +126,19 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.equal(hydratedContract.profile_id, 'lecture_student');
   assert.equal(hydratedContract.export_bundle.bundle_id, 'lecture_student_bundle');
   assert.equal(hydratedContract.prompt_pack.root, 'prompts/ppt_deck');
+  assert.equal(hydratedContract.prompt_pack.stages.author_image_pages.file, 'author_image_pages.md');
   assert.equal(hydratedContract.prompt_pack.stages.render_html.file, 'render_html.md');
-  assert.equal(hydratedContract.prompt_pack.render_contract.render_strategy, 'prompt_director_first');
-  assert.equal(hydratedContract.prompt_pack.render_contract.default_visual_route, 'render_html');
+  assert.equal(hydratedContract.prompt_pack.render_contract.render_strategy, 'image_first_page_authoring');
+  assert.equal(hydratedContract.prompt_pack.render_contract.default_visual_route, 'author_image_pages');
+  assert.equal(hydratedContract.prompt_pack.render_contract.image_page_authoring_lane.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(hydratedContract.prompt_pack.render_contract.html_authoring_lane.explicit_selection_required, true);
   assert.equal(hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.deepEqual(
     hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
+    ['author_image_pages', 'repair_image_pages'],
+  );
+  assert.deepEqual(
+    hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.legacy_html_replaces_routes,
     ['render_html', 'fix_html'],
   );
   assert.equal(hydratedContract.prompt_pack.render_contract.shell_file, 'render_shell.html');
@@ -144,7 +152,7 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.deepEqual(
     JSON.parse(
       readFileSync(path.join(deliverableDir, 'contracts/stage-requirements.json'), 'utf-8'),
-    ).render_html.requires_artifacts,
+    ).author_image_pages.requires_artifacts,
     ['slide_blueprint', 'visual_direction'],
   );
   assert.equal(

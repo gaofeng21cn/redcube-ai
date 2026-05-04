@@ -2,6 +2,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
+import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
 
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
@@ -123,31 +124,17 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     return Boolean(safeText(artifact?.native_ppt_bundle?.pptx_file));
   }
 
-  function currentVisualStageId(contract: JsonRecord, deliverablePaths: JsonRecord): string {
-    const htmlStage = currentHtmlStageId(contract, deliverablePaths);
-    const htmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, htmlStage));
-    const nativeStage = currentNativePptStageId(contract, deliverablePaths);
-    const nativeMtimeMs = nativeStage
-      ? safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, nativeStage))
-      : 0;
-    if (nativeMtimeMs > htmlMtimeMs) {
-      return nativeStage;
-    }
-    return htmlMtimeMs > 0 ? htmlStage : nativeStage;
-  }
-
-  function readCurrentVisualArtifact(contract: JsonRecord, deliverablePaths: JsonRecord): JsonRecord | null {
-    const stageId = currentVisualStageId(contract, deliverablePaths);
-    if (!stageId) return null;
-    return stageId === 'render_html' || stageId === 'fix_html'
-      ? readCurrentHtmlArtifact(contract, deliverablePaths)
-      : readStageArtifact(contract, deliverablePaths, stageId);
-  }
-
-  function visualArtifactMtimeMs(contract: JsonRecord, deliverablePaths: JsonRecord): number {
-    const stageId = currentVisualStageId(contract, deliverablePaths);
-    return stageId ? safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, stageId)) : 0;
-  }
+  const visualArtifacts = createPptDeckVisualArtifactParts({
+    currentHtmlStageId,
+    currentNativePptStageId,
+    existsSync,
+    readCurrentHtmlArtifact,
+    readStageArtifact,
+    safeArray,
+    safeFileMtimeMs,
+    safeText,
+    stageArtifactPath,
+  });
 
   function nativeArtifactPaths({ deliverablePaths, deliverableId, route }: NativeArtifactPathRequest) {
     const nativeDir = ensureDir(path.join(deliverablePaths.artifactsDir, 'native_ppt'));
@@ -874,12 +861,15 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   return {
     buildNativePptArtifact,
     currentNativePptStageId,
-    currentVisualStageId,
+    currentVisualStageId: visualArtifacts.currentVisualStageId,
     isNativePptArtifact,
     nativeMechanicalReviewPayload,
+    imagePagesMechanicalReviewPayload: visualArtifacts.imagePagesMechanicalReviewPayload,
     readCurrentNativePptArtifact,
-    readCurrentVisualArtifact,
+    readCurrentVisualArtifact: visualArtifacts.readCurrentVisualArtifact,
+    isImagePagesArtifact: visualArtifacts.isImagePagesArtifact,
     summarizeNativeSlides,
-    visualArtifactMtimeMs,
+    summarizeImagePages: visualArtifacts.summarizeImagePages,
+    visualArtifactMtimeMs: visualArtifacts.visualArtifactMtimeMs,
   };
 }

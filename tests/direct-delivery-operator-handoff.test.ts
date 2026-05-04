@@ -47,7 +47,7 @@ test('direct-delivery families expose one aligned operator_handoff summary acros
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
-      'render_html',
+      'author_image_pages',
       'visual_director_review',
       'screenshot_review',
       'export_pptx',

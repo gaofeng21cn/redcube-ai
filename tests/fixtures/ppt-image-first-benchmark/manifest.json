@@ -1,0 +1,65 @@
+{
+  "manifest_id": "ppt_image_first_crc_ai_fixture_manifest_v1",
+  "fixture_id": "crc_ai_image_first_ppt_benchmark_v1",
+  "profile_id": "ppt_deck_image_first_handdrawn_medical_default_v1",
+  "external_api_invocation": false,
+  "external_images_vendored": false,
+  "image_evidence_mode": "placeholder_manifest_hash",
+  "placeholder_assets": [
+    {
+      "slide_id": "slide-01-cn-lecture-framing",
+      "logical_file": "placeholder://ppt-image-first/slide-01-cn-lecture-framing.png",
+      "mime_type": "image/png",
+      "pixel_size": "1920x1080",
+      "sha256": "6e8010e0d9f66f5dc5c8c8769fa5e3ba4f836e82f748b7ab0b9b741a0e0e37ea"
+    },
+    {
+      "slide_id": "slide-02-medical-concept-map",
+      "logical_file": "placeholder://ppt-image-first/slide-02-medical-concept-map.png",
+      "mime_type": "image/png",
+      "pixel_size": "1920x1080",
+      "sha256": "b2a0d6d97a048b75b1e8412ff8a3c1a6b7d191815af0d515dd7fd42684f3f7fb"
+    },
+    {
+      "slide_id": "slide-03-platform-architecture",
+      "logical_file": "placeholder://ppt-image-first/slide-03-platform-architecture.png",
+      "mime_type": "image/png",
+      "pixel_size": "1920x1080",
+      "sha256": "ba48e3b2c0db322264df09e6166511ea1cae5d9ca9ee6e295f65b3d78d3fba16"
+    },
+    {
+      "slide_id": "slide-04-disease-package-boundary",
+      "logical_file": "placeholder://ppt-image-first/slide-04-disease-package-boundary.png",
+      "mime_type": "image/png",
+      "pixel_size": "1920x1080",
+      "sha256": "df68e4cf244e11f0760f00d2c841940ba28c7cd92a7ca4e768e24e5153871762"
+    },
+    {
+      "slide_id": "slide-05-governance-human-gate",
+      "logical_file": "placeholder://ppt-image-first/slide-05-governance-human-gate.png",
+      "mime_type": "image/png",
+      "pixel_size": "1920x1080",
+      "sha256": "2fb01d678c47fe05102a84d0f881c0a6c5b0f8bc769b8ff2f8f0b339cdf09913"
+    },
+    {
+      "slide_id": "slide-06-summary-bridge",
+      "logical_file": "placeholder://ppt-image-first/slide-06-summary-bridge.png",
+      "mime_type": "image/png",
+      "pixel_size": "1920x1080",
+      "sha256": "f331f3ab3f5a6be2a0877ee90a1ffcfec41ac20dd2119af43f900924776b1f5e"
+    }
+  ],
+  "hash_semantics": "Hashes are deterministic fixture placeholders for manifest integrity tests; they are not generated-image evidence.",
+  "style_reference_override_case": {
+    "style_reference_dir": "/abs/operator/style_refs",
+    "expected_effect": "replace_reference_directory_only",
+    "must_not_change": [
+      "profile_id",
+      "default_canvas",
+      "whole_page_requirements",
+      "forbidden_styles",
+      "fragmentation_risk_controls",
+      "medical_boundary_defaults"
+    ]
+  }
+}

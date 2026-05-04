@@ -1,6 +1,7 @@
 // @ts-nocheck
 import path from 'node:path';
 
+import { createPptDeckImagePageStageParts } from './image-pages.js';
 import { createPptDeckRenderStageParts } from './render.js';
 import { createPptDeckNativePptStageParts } from './native-ppt.js';
 import { createPptDeckExportStageParts } from './export.js';
@@ -83,6 +84,9 @@ export function createPptDeckStageParts(deps) {
     ...deps,
     readCurrentHtmlArtifact,
   });
+  const imagePageParts = createPptDeckImagePageStageParts({
+    ...deps,
+  });
   const { loadPriorRenderedSlideHtmlMap } = renderParts;
   const nativePptParts = createPptDeckNativePptStageParts({
     ...deps,
@@ -92,9 +96,12 @@ export function createPptDeckStageParts(deps) {
   const {
     buildNativePptArtifact,
     currentVisualStageId,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     isNativePptArtifact,
     nativeMechanicalReviewPayload,
     readCurrentVisualArtifact,
+    summarizeImagePages,
     summarizeNativeSlides,
     visualArtifactMtimeMs,
   } = nativePptParts;
@@ -102,6 +109,7 @@ export function createPptDeckStageParts(deps) {
     ...deps,
     PYTHON_EXPORT,
     PYTHON_NATIVE,
+    isImagePagesArtifact,
     isNativePptArtifact,
     readCurrentVisualArtifact,
   });
@@ -112,15 +120,19 @@ export function createPptDeckStageParts(deps) {
   const { buildDirectorReview } = createPptDeckDirectorReviewParts({
     ...deps,
     currentVisualStageId,
+    isImagePagesArtifact,
     isNativePptArtifact,
     loadPriorRenderedSlideHtmlMap,
     mainExistsSync,
     readCurrentVisualArtifact,
+    summarizeImagePages,
     summarizeNativeSlides,
   });
   const { buildScreenshotReviewArtifact } = createPptDeckScreenshotReviewParts({
     ...deps,
     hashReviewInput,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     isNativePptArtifact,
     loadPriorRenderedSlideHtmlMap,
     mainExistsSync,
@@ -166,8 +178,15 @@ export function createPptDeckStageParts(deps) {
         throw new Error('Route repair_pptx_native requires screenshot_review based on the current native PPTX; rerun screenshot_review first');
       }
     }
+    if (route === 'repair_image_pages') {
+      const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+      const authorMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'author_image_pages'));
+      if (screenshotReviewMtimeMs < authorMtimeMs) {
+        throw new Error('Route repair_image_pages requires screenshot_review based on the current image pages; rerun screenshot_review first');
+      }
+    }
     if (route === 'visual_director_review' && !currentVisualStage) {
-      throw new Error('Route visual_director_review requires render_html or author_pptx_native before review');
+      throw new Error('Route visual_director_review requires author_image_pages, render_html, or author_pptx_native before review');
     }
     if (route === 'screenshot_review') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
@@ -194,6 +213,7 @@ export function createPptDeckStageParts(deps) {
 
   return {
     ...renderParts,
+    ...imagePageParts,
     ...nativePptParts,
     buildDirectorReview,
     buildExportArtifact,

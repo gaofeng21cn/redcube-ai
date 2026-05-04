@@ -40,10 +40,10 @@ test('buildDeckRecord emits canonical ppt deck metadata', () => {
     'detailed_outline',
     'slide_blueprint',
     'visual_direction',
-    'render_html',
+    'author_image_pages',
     'visual_director_review',
     'screenshot_review',
-    'fix_html',
+    'repair_image_pages',
     'export_pptx',
   ]);
 });
@@ -92,7 +92,12 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   assert.equal(lectureStudent.export_bundle.bundle_id, 'lecture_student_bundle');
   assert.equal(lectureStudent.delivery_contract.required_export_bundle_id, 'lecture_student_bundle');
   assert.equal(lectureStudent.delivery_contract.required_export_route, 'export_pptx');
-  assert.equal(lectureStudent.prompt_pack.render_contract.default_visual_route, 'render_html');
+  assert.equal(lectureStudent.prompt_pack.render_contract.render_strategy, 'image_first_page_authoring');
+  assert.equal(lectureStudent.prompt_pack.render_contract.default_visual_route, 'author_image_pages');
+  assert.equal(lectureStudent.prompt_pack.render_contract.image_page_authoring_lane.status, 'production_default');
+  assert.equal(lectureStudent.prompt_pack.render_contract.image_page_authoring_lane.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(lectureStudent.prompt_pack.render_contract.html_authoring_lane.status, 'production_selectable_optional');
+  assert.equal(lectureStudent.prompt_pack.render_contract.html_authoring_lane.explicit_selection_required, true);
   assert.equal(
     lectureStudent.prompt_pack.render_contract.ui_ux_quality_companion.source_skill_id,
     'ui-ux-pro-max',
@@ -132,11 +137,23 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   );
   assert.deepEqual(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
+    ['author_image_pages', 'repair_image_pages'],
+  );
+  assert.deepEqual(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.legacy_html_replaces_routes,
     ['render_html', 'fix_html'],
   );
   assert.deepEqual(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.preserved_gates,
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
+  );
+  assert.deepEqual(
+    lectureStudent.prompt_pack.render_contract.selectable_explicit_routes,
+    ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.explicit_route_policy,
+    'html_and_native_routes_require_operator_selection',
   );
 
   assert.equal(

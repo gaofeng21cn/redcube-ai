@@ -1,0 +1,57 @@
+{
+  "schema_version": "image_ppt_proof_ci_contract.v1",
+  "default_quality_lane": {
+    "runs_real_image_generation": false,
+    "required_workflow_events": ["push", "pull_request"],
+    "allowed_checks": ["typecheck", "fast", "family", "meta"]
+  },
+  "proof_job": {
+    "job_id": "image-ppt-proof",
+    "runs_real_image_generation_by_default": false,
+    "required_triggers": {
+      "manual": "workflow_dispatch",
+      "nightly": {
+        "event": "schedule",
+        "cron": "17 19 * * *"
+      },
+      "pull_request_label": {
+        "event": "pull_request",
+        "types": ["labeled", "synchronize", "opened", "reopened"],
+        "label": "image-ppt-proof"
+      }
+    },
+    "required_cache_layers": [
+      {
+        "id": "npm",
+        "uses": "actions/setup-node",
+        "key_source": "package-lock.json"
+      },
+      {
+        "id": "pip",
+        "uses": "actions/cache",
+        "key_source": ".github/requirements/ci-python.txt"
+      },
+      {
+        "id": "playwright",
+        "uses": "actions/cache",
+        "key_source": ".github/requirements/ci-python.txt"
+      }
+    ],
+    "artifact_index": {
+      "path": "artifacts/image-ppt-proof/artifact-index.json",
+      "schema_version": "image_ppt_proof_artifact_index.v1",
+      "required": true
+    },
+    "required_artifact_refs": [
+      "generated_png",
+      "run_manifest_json",
+      "prompt_manifest_json",
+      "image_manifest_json",
+      "image_first_pptx",
+      "rendered_pdf",
+      "export_bundle_json",
+      "gallery_json",
+      "final_delivery_manifest_json"
+    ]
+  }
+}

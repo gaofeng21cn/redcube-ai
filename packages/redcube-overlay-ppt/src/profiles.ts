@@ -86,7 +86,8 @@ const NATIVE_PPT_PROOF_LANE = Object.freeze({
   default_enabled: false,
   production_selectable: true,
   runnable_routes: ['author_pptx_native', 'repair_pptx_native'],
-  replaces_routes: ['render_html', 'fix_html'],
+  replaces_routes: ['author_image_pages', 'repair_image_pages'],
+  legacy_html_replaces_routes: ['render_html', 'fix_html'],
   preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
   preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
   ai_first_editing_contract: {
@@ -134,6 +135,34 @@ const NATIVE_PPT_PROOF_LANE = Object.freeze({
   },
 });
 
+const HTML_AUTHORING_LANE = Object.freeze({
+  lane_id: 'ppt_deck_html_authoring_v0',
+  status: 'production_selectable_optional',
+  default_enabled: false,
+  production_selectable: true,
+  runnable_routes: ['render_html', 'fix_html'],
+  replaces_routes: ['author_image_pages', 'repair_image_pages'],
+  preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+  preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+  explicit_selection_required: true,
+});
+
+const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
+  lane_id: 'ppt_deck_image_page_authoring_v0',
+  status: 'production_default',
+  default_enabled: true,
+  production_selectable: true,
+  runnable_routes: ['author_image_pages', 'repair_image_pages'],
+  replaces_routes: ['render_html', 'fix_html'],
+  preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+  preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
+  authoring_artifact: 'image_page_bundle',
+  page_image_artifacts_required: true,
+  style_reference_dir_input: 'delivery_request.style_reference_dir',
+  review_input_surface: 'image_page_screenshots',
+  provider_diagnostics_surface: 'image_provider_diagnostics',
+});
+
 const FAMILY_STAGE_SEQUENCE = {
   flow_id: 'ppt_deck_standard_flow',
   stages: [
@@ -162,16 +191,16 @@ const FAMILY_STAGE_SEQUENCE = {
       requires_stages: ['slide_blueprint'],
     },
     {
-      stage_id: 'render_html',
-      prompt_file: 'render_html.md',
-      output_artifact: 'render_bundle.json',
+      stage_id: 'author_image_pages',
+      prompt_file: 'author_image_pages.md',
+      output_artifact: 'image_pages_bundle.json',
       requires_stages: ['slide_blueprint', 'visual_direction'],
     },
     {
       stage_id: 'visual_director_review',
       prompt_file: 'director_review.md',
       output_artifact: 'director_review.json',
-      requires_stages: ['render_html'],
+      requires_stages: ['author_image_pages'],
     },
     {
       stage_id: 'screenshot_review',
@@ -180,10 +209,10 @@ const FAMILY_STAGE_SEQUENCE = {
       requires_stages: ['visual_director_review'],
     },
     {
-      stage_id: 'fix_html',
-      prompt_file: 'fix_html.md',
-      output_artifact: 'fix_bundle.json',
-      requires_stages: ['render_html', 'screenshot_review'],
+      stage_id: 'repair_image_pages',
+      prompt_file: 'repair_image_pages.md',
+      output_artifact: 'image_pages_repair_bundle.json',
+      requires_stages: ['author_image_pages', 'screenshot_review'],
     },
     {
       stage_id: 'export_pptx',
@@ -193,6 +222,22 @@ const FAMILY_STAGE_SEQUENCE = {
     },
   ],
   alternate_stages: [
+    {
+      stage_id: 'render_html',
+      prompt_file: 'render_html.md',
+      output_artifact: 'render_bundle.json',
+      requires_stages: ['slide_blueprint', 'visual_direction'],
+      lane_id: HTML_AUTHORING_LANE.lane_id,
+      replaces_stage: 'author_image_pages',
+    },
+    {
+      stage_id: 'fix_html',
+      prompt_file: 'fix_html.md',
+      output_artifact: 'fix_bundle.json',
+      requires_stages: ['render_html', 'screenshot_review'],
+      lane_id: HTML_AUTHORING_LANE.lane_id,
+      replaces_stage: 'repair_image_pages',
+    },
     {
       stage_id: 'author_pptx_native',
       prompt_file: 'author_pptx_native.md',
@@ -212,7 +257,7 @@ const FAMILY_STAGE_SEQUENCE = {
   ],
   hard_stops: [
     {
-      stage_id: 'render_html',
+      stage_id: 'author_image_pages',
       requires_stage_outputs: ['slide_blueprint', 'visual_direction'],
       rerun_from_stage: 'slide_blueprint',
     },
@@ -222,13 +267,23 @@ const FAMILY_STAGE_SEQUENCE = {
       rerun_from_stage: 'visual_director_review',
     },
     {
-      stage_id: 'fix_html',
-      requires_stage_outputs: ['render_html', 'screenshot_review'],
+      stage_id: 'repair_image_pages',
+      requires_stage_outputs: ['author_image_pages', 'screenshot_review'],
       rerun_from_stage: 'screenshot_review',
     },
     {
       stage_id: 'export_pptx',
       requires_review: ['screenshot_review'],
+      rerun_from_stage: 'screenshot_review',
+    },
+    {
+      stage_id: 'render_html',
+      requires_stage_outputs: ['slide_blueprint', 'visual_direction'],
+      rerun_from_stage: 'slide_blueprint',
+    },
+    {
+      stage_id: 'fix_html',
+      requires_stage_outputs: ['render_html', 'screenshot_review'],
       rerun_from_stage: 'screenshot_review',
     },
     {
@@ -262,13 +317,13 @@ const FAMILY_REVIEW_SURFACE = {
     optimize_existing: ['baseline_comparison_passed'],
   },
   rerun_from_stage: {
-    overflow_free: 'fix_html',
-    occlusion_free: 'fix_html',
+    overflow_free: 'repair_image_pages',
+    occlusion_free: 'repair_image_pages',
     visual_density_ok: 'visual_direction',
     speaker_fit_ok: 'slide_blueprint',
-    edge_clearance_ok: 'fix_html',
-    block_content_fit_ok: 'fix_html',
-    title_typography_ok: 'fix_html',
+    edge_clearance_ok: 'repair_image_pages',
+    block_content_fit_ok: 'repair_image_pages',
+    title_typography_ok: 'repair_image_pages',
     director_intent_landed: 'visual_director_review',
     anti_template_ok: 'visual_director_review',
     baseline_comparison_passed: 'visual_direction',
@@ -330,6 +385,9 @@ const FAMILY_STAGE_REQUIREMENTS = {
   visual_direction: {
     requires_artifacts: ['slide_blueprint'],
   },
+  author_image_pages: {
+    requires_artifacts: ['slide_blueprint', 'visual_direction'],
+  },
   render_html: {
     requires_artifacts: ['slide_blueprint', 'visual_direction'],
   },
@@ -339,11 +397,14 @@ const FAMILY_STAGE_REQUIREMENTS = {
   fix_html: {
     requires_artifacts: ['render_html', 'screenshot_review'],
   },
+  repair_image_pages: {
+    requires_artifacts: ['author_image_pages', 'screenshot_review'],
+  },
   repair_pptx_native: {
     requires_artifacts: ['author_pptx_native', 'screenshot_review'],
   },
   visual_director_review: {
-    requires_artifacts: ['render_html'],
+    requires_artifacts: ['author_image_pages'],
   },
   screenshot_review: {
     requires_artifacts: ['visual_director_review'],
@@ -362,8 +423,10 @@ const FAMILY_PROMPT_PACK = {
     detailed_outline: 'prompts/ppt_deck/detailed_outline.md',
     slide_blueprint: 'prompts/ppt_deck/slide_blueprint.md',
     visual_direction: 'prompts/ppt_deck/visual_direction.md',
+    author_image_pages: 'prompts/ppt_deck/author_image_pages.md',
     render_html: 'prompts/ppt_deck/render_html.md',
     author_pptx_native: 'prompts/ppt_deck/author_pptx_native.md',
+    repair_image_pages: 'prompts/ppt_deck/repair_image_pages.md',
     fix_html: 'prompts/ppt_deck/fix_html.md',
     repair_pptx_native: 'prompts/ppt_deck/repair_pptx_native.md',
     visual_director_review: 'prompts/ppt_deck/director_review.md',
@@ -375,8 +438,10 @@ const FAMILY_PROMPT_PACK = {
     detailed_outline: { file: 'detailed_outline.md' },
     slide_blueprint: { file: 'slide_blueprint.md' },
     visual_direction: { file: 'visual_direction.md' },
+    author_image_pages: { file: 'author_image_pages.md' },
     render_html: { file: 'render_html.md' },
     author_pptx_native: { file: 'author_pptx_native.md' },
+    repair_image_pages: { file: 'repair_image_pages.md' },
     fix_html: { file: 'fix_html.md' },
     repair_pptx_native: { file: 'repair_pptx_native.md' },
     visual_director_review: { file: 'director_review.md' },
@@ -384,9 +449,13 @@ const FAMILY_PROMPT_PACK = {
     export_pptx: { file: 'export_pptx.md' },
   },
   render_contract: {
-    render_strategy: 'prompt_director_first',
-    default_visual_route: 'render_html',
-    native_ppt_proof_lane: NATIVE_PPT_PROOF_LANE, ui_ux_quality_companion: buildUiUxProMaxHtmlCompanion({ family: 'ppt_deck', canvas: FAMILY_LAYOUT_RULES.canvas }),
+    render_strategy: 'image_first_page_authoring',
+    default_visual_route: 'author_image_pages',
+    image_page_authoring_lane: IMAGE_PAGE_AUTHORING_LANE,
+    html_authoring_lane: HTML_AUTHORING_LANE,
+    native_ppt_proof_lane: NATIVE_PPT_PROOF_LANE, ui_ux_quality_companion: buildUiUxProMaxHtmlCompanion({ family: 'ppt_deck', canvas: FAMILY_LAYOUT_RULES.canvas, appliesToRoutes: ['render_html', 'fix_html'] }),
+    selectable_explicit_routes: ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+    explicit_route_policy: 'html_and_native_routes_require_operator_selection',
     shell_file: 'render_shell.html',
     recipe_registry: {
       cover_hero: 'ppt.hero_signal',
@@ -438,7 +507,7 @@ const FAMILY_DISPLAY_REGISTRY = {
       required_when: 'always',
     },
     {
-      id: 'render_html',
+      id: 'author_image_pages',
       kind: 'render_output',
       required_when: 'always',
     },
@@ -472,8 +541,10 @@ const FAMILY_LIFECYCLE_MODEL = {
     detailed_outline: 'story_architecture',
     slide_blueprint: 'story_architecture',
     visual_direction: 'visual_authorship',
+    author_image_pages: 'visual_authorship',
     render_html: 'visual_authorship',
     author_pptx_native: 'visual_authorship',
+    repair_image_pages: 'visual_authorship',
     fix_html: 'visual_authorship',
     repair_pptx_native: 'visual_authorship',
     export_pptx: 'delivery_packaging',
@@ -524,8 +595,10 @@ const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
     detailed_outline: 'plan',
     slide_blueprint: 'plan',
     visual_direction: 'visual',
+    author_image_pages: 'visual',
     render_html: 'visual',
     author_pptx_native: 'visual',
+    repair_image_pages: 'visual',
     fix_html: 'visual',
     repair_pptx_native: 'visual',
     visual_director_review: 'visual',
@@ -646,6 +719,8 @@ export function describePptDeckOverlay(): PptDeckOverlayCatalogEntry {
     route_sequence: FAMILY_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
     visual_authoring_policy: {
       default_visual_route: FAMILY_PROMPT_PACK.render_contract.default_visual_route,
+      image_page_authoring_lane: FAMILY_PROMPT_PACK.render_contract.image_page_authoring_lane,
+      html_authoring_lane: FAMILY_PROMPT_PACK.render_contract.html_authoring_lane,
       native_ppt_proof_lane: FAMILY_PROMPT_PACK.render_contract.native_ppt_proof_lane, html_design_companion: FAMILY_PROMPT_PACK.render_contract.ui_ux_quality_companion,
     },
     packages: {

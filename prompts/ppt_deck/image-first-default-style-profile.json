@@ -1,0 +1,111 @@
+{
+  "profile_id": "ppt_deck_image_first_handdrawn_medical_default_v1",
+  "deliverable_kind": "ppt_deck",
+  "visual_route": "image_first_full_slide",
+  "model_family": "gpt-image-2",
+  "default_canvas": {
+    "aspect_ratio": "16:9",
+    "pixel_size": "1920x1080",
+    "page_contract": "complete_ppt_slide_page_image"
+  },
+  "style_system": {
+    "background": [
+      "white dotted notebook paper background",
+      "subtle paper texture",
+      "bright clean lecture surface"
+    ],
+    "linework": [
+      "bold black hand-drawn sketch outlines",
+      "hand-drawn arrows",
+      "dashed connectors where useful"
+    ],
+    "color": [
+      "pastel marker blocks",
+      "mint green",
+      "sky blue",
+      "soft yellow",
+      "small red highlights only for risk boundary or warning"
+    ],
+    "decorative_grammar": [
+      "sticker tape corners",
+      "small medical icons",
+      "small system icons",
+      "light hand-drawn labels"
+    ],
+    "typography": [
+      "large Chinese main title",
+      "few short Chinese labels",
+      "minimal small text",
+      "clear readable lecture lettering"
+    ],
+    "content_density": {
+      "max_main_title_count": 1,
+      "max_label_words_per_node": 8,
+      "small_text_policy": "avoid_unless_structural_label",
+      "speaker_notes_policy": "long sentences stay outside the image prompt"
+    }
+  },
+  "required_prompt_fields": [
+    "use_case",
+    "asset_type",
+    "primary_request",
+    "exact_main_title",
+    "content_structure",
+    "style",
+    "avoid"
+  ],
+  "whole_page_requirements": [
+    "state that the output is a complete 16:9 PPT slide page image",
+    "state the 1920x1080 target size",
+    "include the full page background, title, visual structure, arrows, labels, and whitespace",
+    "avoid asking for separate icons, UI parts, sticker packs, or isolated diagram elements"
+  ],
+  "fragmentation_risk_controls": {
+    "forbidden_asset_requests": [
+      "icon set",
+      "separate components",
+      "transparent sticker pack",
+      "diagram elements only",
+      "individual UI widgets",
+      "asset sheet"
+    ],
+    "required_language": [
+      "complete 16:9 PPT slide page image",
+      "full page",
+      "single finished lecture slide"
+    ]
+  },
+  "forbidden_styles": [
+    "dark futuristic console",
+    "cyberpunk dashboard",
+    "glassmorphism",
+    "photo collage",
+    "3D dashboard",
+    "dense data table",
+    "excessive gradient",
+    "logo watermark",
+    "screenshot collage",
+    "English-heavy labels",
+    "tiny unreadable paragraphs",
+    "generic AI robot mascot dominance"
+  ],
+  "medical_boundary_defaults": [
+    "Do not imply a research workspace is the medical meta-agent platform itself.",
+    "Do not imply a single disease model is directly copied to another disease.",
+    "High-risk clinical or governance nodes must visibly keep human handoff."
+  ],
+  "style_reference_policy": {
+    "default_reference_dir": "operator_supplied_style_refs",
+    "user_override_field": "style_reference_dir",
+    "override_semantics": "User style references may replace the reference-image directory for visual inspiration only.",
+    "mandatory_constraints_after_override": [
+      "default_canvas",
+      "whole_page_requirements",
+      "style_system.typography",
+      "fragmentation_risk_controls",
+      "forbidden_styles",
+      "medical_boundary_defaults"
+    ],
+    "repo_vendor_policy": "Do not vendor external reference images into the repo. Use manifest metadata and hashes for benchmark fixtures."
+  }
+}

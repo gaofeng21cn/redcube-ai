@@ -49,10 +49,10 @@ test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the cu
       'hydrated-deliverable.json',
     );
     const contract = JSON.parse(readFileSync(contractFile, 'utf-8'));
-    contract.stage_sequence.stages = contract.stage_sequence.stages.filter((stage) => stage.stage_id !== 'fix_html');
-    delete contract.stage_requirements.fix_html;
-    delete contract.prompt_pack.routes.fix_html;
-    delete contract.prompt_pack.stages.fix_html;
+    contract.stage_sequence.stages = contract.stage_sequence.stages.filter((stage) => stage.stage_id !== 'repair_image_pages');
+    delete contract.stage_requirements.repair_image_pages;
+    delete contract.prompt_pack.routes.repair_image_pages;
+    delete contract.prompt_pack.stages.repair_image_pages;
     writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
 
     const result = await runDeliverableRoute({
@@ -60,7 +60,7 @@ test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the cu
       overlay: 'ppt_deck',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-      route: 'fix_html',
+      route: 'repair_image_pages',
     });
 
     assert.equal(result.ok, false);
@@ -68,7 +68,7 @@ test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the cu
 
     const refreshedContract = JSON.parse(readFileSync(contractFile, 'utf-8'));
     assert.equal(
-      refreshedContract.stage_sequence.stages.some((stage) => stage?.stage_id === 'fix_html'),
+      refreshedContract.stage_sequence.stages.some((stage) => stage?.stage_id === 'repair_image_pages'),
       true,
     );
     assert.equal(result.governance_surface?.family_boundary?.overlay, 'ppt_deck');

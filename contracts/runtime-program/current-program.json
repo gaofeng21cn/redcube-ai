@@ -36,7 +36,7 @@
       "python_owner": "native Office/PPT manipulation, screenshot/export helpers, document/PPT repair loops, and MAS/MAG shared automation ecosystem",
       "python_native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
       "legacy_javascript_policy": "repo-tracked JavaScript is retired and must remain at zero files; new creative/runtime truth belongs in TypeScript or Python-owned helper surfaces",
-      "ppt_deck_direction": "keep render_html as the default visual route today while exposing Python-backed native PPT authoring/repair as a production-selectable optional route for editable-PPT workflows"
+      "ppt_deck_direction": "use image-first full-slide PNG authoring through Responses image_generation as the default visual route; keep HTML and native editable PPTX as explicit selectable optional routes"
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
@@ -61,13 +61,13 @@
         "detailed_outline",
         "slide_blueprint",
         "visual_direction",
-        "render_html",
+        "author_image_pages",
         "visual_director_review",
         "screenshot_review",
-        "fix_html",
+        "repair_image_pages",
         "export_pptx"
       ],
-      "ppt_deck_default_visual_route": "render_html"
+      "ppt_deck_default_visual_route": "author_image_pages"
     }
   },
   "formal_entry": {
@@ -200,6 +200,84 @@
       "repo_local_pack_compiler_status": "removed_from_active_mainline"
     },
     "exploration_lanes": {
+      "ppt_image_first_production_route": {
+        "status": "landed",
+        "contract": "contracts/runtime-program/ppt-image-first-production-route.json",
+        "default_visual_route": "author_image_pages",
+        "default_visual_policy": "image_first",
+        "default_enabled": true,
+        "production_route": true,
+        "route_chain": [
+          "storyline",
+          "detailed_outline",
+          "slide_blueprint",
+          "visual_direction",
+          "author_image_pages",
+          "visual_director_review",
+          "screenshot_review",
+          "repair_image_pages",
+          "export_pptx"
+        ],
+        "api_surface": {
+          "endpoint": "/responses",
+          "tool": "image_generation",
+          "default_image_model": "gpt-image-2",
+          "token_persisted_in_artifacts": false
+        },
+        "style_system": {
+          "default_profile": "prompts/ppt_deck/image-first-default-style-profile.json",
+          "prompt_template": "prompts/ppt_deck/image_first_prompt_template.md",
+          "user_style_reference_dir_takes_precedence": true
+        },
+        "proof_runner": {
+          "status": "landed",
+          "command": "tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof",
+          "ci_contract": "tools/image-ppt-proof/ci-contract.json",
+          "artifact_index": "artifacts/image-ppt-proof/artifact-index.json",
+          "default_mode": "mock",
+          "live_mode_requires": [
+            "REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD",
+            "or OPENAI_API_KEY"
+          ]
+        },
+        "ci_optional_lane": {
+          "status": "landed",
+          "workflow": ".github/workflows/ci.yml",
+          "triggers": [
+            "workflow_dispatch",
+            "nightly schedule 17 19 * * *",
+            "pull_request label image-ppt-proof"
+          ],
+          "default_quality_lane_runs_real_image_generation": false,
+          "uploads_artifact_index": true
+        },
+        "artifact_contract": {
+          "pptx_editable_shapes": false,
+          "source_visual_route_recorded": true,
+          "required_artifacts": [
+            "PNG image pages",
+            "image manifest",
+            "prompt manifest",
+            "style manifest",
+            "PPTX assembled from full-slide images",
+            "PDF",
+            "review capture",
+            "export bundle",
+            "artifact gallery",
+            "final delivery manifest"
+          ]
+        },
+        "alternate_explicit_routes": {
+          "html": [
+            "render_html",
+            "fix_html"
+          ],
+          "native_editable_pptx": [
+            "author_pptx_native",
+            "repair_pptx_native"
+          ]
+        }
+      },
       "ppt_native_authoring_proof_lane": {
         "status": "production_selectable_optional",
         "contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
@@ -207,7 +285,7 @@
         "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
         "brief": "docs/program/phase-2/phase_2_ppt_native_authoring_proof_lane.md",
         "default_mainline_changed": false,
-        "default_visual_route": "render_html",
+        "default_visual_route": "author_image_pages",
         "production_selectable": true,
         "default_enabled": false,
         "engine_capabilities": {
@@ -425,7 +503,7 @@
         "fonts-noto-cjk",
         "playwright-chromium"
       ],
-      "ci_quality_lane_reason": "test:fast now covers poster governed screenshot review, test:family keeps the family shared pin contract clean-clone safe, and only route-heavy Codex/browser verification files stay serialized on the active Codex stable-family mainline",
+      "ci_quality_lane_reason": "test:fast covers the hosted smoke subset, test:family keeps the family shared pin contract clean-clone safe, meta:ci runs only the meta remainder not already covered by fast, and only route-heavy Codex/browser verification files stay serialized on the active Codex stable-family mainline",
       "required_verification": [
         "git status --short",
         "git diff --check",

@@ -72,6 +72,7 @@ export function buildDeliverableFacadeContract() {
   const pptDeckDescription = overlayRegistry.getOverlay('ppt_deck')?.describeOverlay?.() || {};
   const xiaohongshuVisualPolicy = overlayRegistry.getOverlay('xiaohongshu')?.describeOverlay?.().visual_authoring_policy || {};
   const pptDeckVisualPolicy = pptDeckDescription.visual_authoring_policy || {};
+  const pptDefaultVisualRoute = pptDeckVisualPolicy.default_visual_route || 'author_image_pages';
   return {
     surface_kind: 'deliverable_facade_contract',
     owner: 'redcube_ai',
@@ -91,15 +92,32 @@ export function buildDeliverableFacadeContract() {
         route_surface: 'runManagedDeliverable',
         route_fallback_surface: 'runDeliverableRoute',
         protected_stage_sequence: pptDeckDescription.route_sequence || [],
-        default_visual_route: 'render_html',
+        default_visual_route: pptDefaultVisualRoute,
+        default_visual_policy: 'image_first',
+        image_page_authoring_lane: pptDeckVisualPolicy.image_page_authoring_lane || null,
+        html_authoring_lane: pptDeckVisualPolicy.html_authoring_lane || null,
         native_ppt_proof_lane: pptDeckVisualPolicy.native_ppt_proof_lane || null,
         html_design_companion: pptDeckVisualPolicy.html_design_companion || null,
+        selectable_explicit_routes: ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+        route_selection_policy: {
+          default_route: pptDefaultVisualRoute,
+          default_route_family: 'image_pages',
+          html_routes: ['render_html', 'fix_html'],
+          native_routes: ['author_pptx_native', 'repair_pptx_native'],
+          explicit_selection_required_for: ['render_html', 'fix_html', 'author_pptx_native', 'repair_pptx_native'],
+          style_reference_dir_input: 'delivery_request.style_reference_dir',
+        },
+        provider_diagnostics: {
+          surface_kind: 'image_provider_diagnostics',
+          required_for_default_route: true,
+          blocked_reason_field: 'blocked_reason',
+        },
         route_gate_policy: 'fail_closed_against_overlay_stage_sequence',
         default_run_mode: 'auto_to_terminal',
         stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
         export_route: 'export_pptx',
         review_routes: ['visual_director_review', 'screenshot_review'],
-        bypass_policy: 'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_requests_exploration',
+        bypass_policy: 'forbid_generic_presentation_or_native_pptx_bypass_unless_user_explicitly_selects_html_or_native_route',
       },
       xiaohongshu: {
         deliverable_family: 'xiaohongshu',

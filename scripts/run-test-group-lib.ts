@@ -313,6 +313,65 @@ export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {
   return [...args, ...forwardedArgs];
 }
 
+function parseRequestedFileList(value) {
+  return String(value || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+export function parseRunTestGroupArgs(argv = []) {
+  const [groupName, ...args] = argv;
+  const forwardedArgs = [];
+  const requestedFiles = [];
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === '--files') {
+      const value = args[index + 1];
+      if (!value || String(value).startsWith('--')) {
+        throw new Error('--files 需要一个逗号分隔的测试文件列表');
+      }
+      requestedFiles.push(...parseRequestedFileList(value));
+      index += 1;
+      continue;
+    }
+    if (String(arg).startsWith('--files=')) {
+      requestedFiles.push(...parseRequestedFileList(String(arg).slice('--files='.length)));
+      continue;
+    }
+    forwardedArgs.push(arg);
+  }
+
+  return {
+    groupName,
+    forwardedArgs,
+    requestedFiles,
+  };
+}
+
+export function normalizeRequestedTestFiles(files = []) {
+  const normalized = files.map((file) => String(file).trim().replaceAll(path.sep, '/').replace(/^\.\//, ''));
+  const invalid = normalized.filter((file) => !/^tests\/[^/]+\.test\.(?:js|ts)$/.test(file));
+  if (invalid.length > 0) {
+    throw new Error(`--files 只接受根级测试文件: ${invalid.join(', ')}`);
+  }
+  return [...new Set(normalized)];
+}
+
+export function selectGroupFiles({ groupName, groupFiles = [], requestedFiles = [] } = {}) {
+  if (requestedFiles.length === 0) {
+    return [...groupFiles];
+  }
+
+  const normalized = normalizeRequestedTestFiles(requestedFiles);
+  const missing = normalized.filter((file) => !groupFiles.includes(file));
+  if (missing.length > 0) {
+    throw new Error(`${groupName} 分组不包含请求的测试文件: ${missing.join(', ')}`);
+  }
+  return groupFiles.filter((file) => normalized.includes(file));
+}
+
 export function discoverRootTestFiles({ testsDir = 'tests', entries } = {}) {
   const directoryEntries = entries ?? readdirSync(path.resolve(testsDir));
   return directoryEntries

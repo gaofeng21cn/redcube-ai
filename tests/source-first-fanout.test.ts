@@ -31,6 +31,7 @@ async function withMockRuntime(testFn) {
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
     REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
+    REDCUBE_IMAGE_GENERATION_MOCK: '1',
   });
   try {
     return await testFn();
@@ -123,7 +124,7 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
         'detailed_outline',
         'slide_blueprint',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
         'export_pptx',

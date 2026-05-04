@@ -1,0 +1,102 @@
+{
+  "contract_id": "ppt_image_first_production_route_v1",
+  "status": "landed",
+  "deliverable_family": "ppt_deck",
+  "default_visual_route": "author_image_pages",
+  "default_visual_policy": "image_first",
+  "default_enabled": true,
+  "route_chain": [
+    "storyline",
+    "detailed_outline",
+    "slide_blueprint",
+    "visual_direction",
+    "author_image_pages",
+    "visual_director_review",
+    "screenshot_review",
+    "repair_image_pages",
+    "export_pptx"
+  ],
+  "api_contract": {
+    "endpoint": "/responses",
+    "tool": "image_generation",
+    "default_image_model": "gpt-image-2",
+    "token_persistence_allowed": false,
+    "artifact_provenance_fields": [
+      "provider",
+      "base_url_host",
+      "endpoint",
+      "request_model",
+      "default_image_model",
+      "tool_options",
+      "response_id",
+      "image_call_id",
+      "revised_prompt",
+      "image_sha256",
+      "prompt_hash",
+      "style_reference_hash",
+      "generated_at"
+    ]
+  },
+  "style_contract": {
+    "default_style_profile": "prompts/ppt_deck/image-first-default-style-profile.json",
+    "prompt_template": "prompts/ppt_deck/image_first_prompt_template.md",
+    "user_style_reference_dir_precedence": true,
+    "style_reference_artifact_store_required": true
+  },
+  "review_export_gates": {
+    "visual_director_review_consumes": [
+      "full-slide PNG",
+      "prompt manifest",
+      "style manifest"
+    ],
+    "screenshot_review_consumes": [
+      "full-slide PNG",
+      "image_pages_bundle",
+      "prompt manifest",
+      "style manifest"
+    ],
+    "mechanical_checks": [
+      "16:9",
+      "non-empty PNG",
+      "duplicate hash",
+      "low information density",
+      "manifest presence",
+      "internal field leak risk"
+    ],
+    "export_pptx": {
+      "source_visual_route": "author_image_pages|repair_image_pages",
+      "editable_shapes_claim_allowed": false,
+      "full_slide_image_pages_allowed": true
+    }
+  },
+  "alternate_routes": {
+    "html": {
+      "status": "production_selectable_optional",
+      "explicit_selection_required": true,
+      "routes": ["render_html", "fix_html"]
+    },
+    "native_editable_pptx": {
+      "status": "production_selectable_optional",
+      "explicit_selection_required": true,
+      "routes": ["author_pptx_native", "repair_pptx_native"],
+      "use_when": ["editable", "native PPTX", "DrawingML", "可编辑"]
+    }
+  },
+  "proof_runner": {
+    "command": "tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof",
+    "ci_contract": "tools/image-ppt-proof/ci-contract.json",
+    "default_mode": "mock",
+    "live_mode": "explicit",
+    "live_mode_requires": [
+      "REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD",
+      "or OPENAI_API_KEY"
+    ]
+  },
+  "deferred": [
+    "animation",
+    "narration",
+    "template import",
+    "online image search",
+    "SVG editor"
+  ]
+}

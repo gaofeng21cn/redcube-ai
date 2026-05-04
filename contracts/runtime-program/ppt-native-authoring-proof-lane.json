@@ -5,10 +5,15 @@
   "owner": "redcube_ai",
   "deliverable_family": "ppt_deck",
   "scope": {
-    "goal": "Evaluate direct native PPTX authoring and repair as an opt-in replacement for the HTML authoring stages.",
+    "goal": "Evaluate direct native PPTX authoring and repair as an opt-in replacement for the current image-first authoring stages when editable PPTX is explicitly requested.",
     "default_mainline_changed": false,
-    "default_visual_route": "render_html",
+    "default_visual_route": "author_image_pages",
+    "previous_html_default_visual_route": "render_html",
     "replaces_routes": [
+      "author_image_pages",
+      "repair_image_pages"
+    ],
+    "legacy_html_replaces_routes": [
       "render_html",
       "fix_html"
     ],
@@ -41,8 +46,10 @@
     ],
     "author_route": "author_pptx_native",
     "repair_route": "repair_pptx_native",
-    "author_route_replaces": "render_html",
-    "repair_route_replaces": "fix_html",
+    "author_route_replaces": "author_image_pages",
+    "repair_route_replaces": "repair_image_pages",
+    "legacy_author_route_replaced": "render_html",
+    "legacy_repair_route_replaced": "fix_html",
     "authoring_artifact": "native_pptx_file",
     "editable_artifact_required": true,
     "ai_first_editing_contract": {
@@ -125,7 +132,7 @@
       "native_writer": "packages/redcube-runtime/scripts/ppt_deck_native.py",
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
       "route_surface": "runDeliverableRoute",
-      "stage_sequence_model": "alternate_stages",
+      "stage_sequence_model": "explicit_selectable_alternate_stages",
       "default_stage_sequence_changed": false,
       "engine_capabilities": {
         "authoring_ir": "redcube_svg_ir",
@@ -180,7 +187,7 @@
     ]
   },
   "promotion_gates": [
-    "same topic/profile can run through HTML mainline and native-PPT proof lane without identity drift",
+    "same topic/profile can run through image-first mainline, explicit HTML lane, and native-PPT proof lane without identity drift",
     "native PPTX produces editable slides rather than screenshot-only wrappers",
     "screenshot_review judges rendered PPTX screenshots as the final visible artifact",
     "repair route consumes review feedback and updates only the blocked PPTX pages when possible",
@@ -188,8 +195,9 @@
     "runManagedDeliverable and product-entry route gates remain fail-closed"
   ],
   "rollback_policy": {
-    "default_mainline_impact": "none",
+    "default_mainline_impact": "none; native remains explicit selectable while image-first stays the default visual route",
     "disable_action": "do not select the native PPT proof lane",
-    "html_mainline_required_to_remain_green": true
+    "image_first_mainline_required_to_remain_green": true,
+    "html_selectable_lane_required_to_remain_green": true
   }
 }

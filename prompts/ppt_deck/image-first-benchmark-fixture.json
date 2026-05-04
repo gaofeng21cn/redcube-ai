@@ -1,0 +1,96 @@
+{
+  "fixture_id": "crc_ai_image_first_ppt_benchmark_v1",
+  "profile_id": "ppt_deck_image_first_handdrawn_medical_default_v1",
+  "source_experience": {
+    "topic": "colorectal-cancer AI lecture GPT-image-2 full-slide experiment",
+    "source_kind": "local_readonly_experience",
+    "external_images_vendored": false
+  },
+  "style_reference_dir_policy": {
+    "default": "operator_supplied_style_refs",
+    "user_override_allowed": true,
+    "override_field": "style_reference_dir",
+    "override_scope": "visual_reference_only",
+    "must_preserve_profile_constraints": true
+  },
+  "benchmark_pages": [
+    {
+      "slide_id": "slide-01-cn-lecture-framing",
+      "coverage": ["Chinese lecture", "opening concept"],
+      "prompt": {
+        "use_case": "teaching-medical-concept",
+        "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
+        "primary_request": "Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.",
+        "exact_main_title": "从肠癌闭环看医疗 AI 的真正起点",
+        "content_structure": "Full page layout on a white dotted paper background. Left side shows a simple hand-drawn colon cancer care loop with four large nodes: 筛查, 诊断, 治疗, 随访. A thick black arrow leads to the right-side judgement board: 先闭环, 再智能. Add one bottom tape note: 讲课先抓住一个真实临床闭环. Keep all labels large and short.",
+        "style": "white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical icons, large readable Chinese title, few short labels.",
+        "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
+      }
+    },
+    {
+      "slide_id": "slide-02-medical-concept-map",
+      "coverage": ["medical concept diagram", "clinical loop"],
+      "prompt": {
+        "use_case": "teaching-medical-concept",
+        "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
+        "primary_request": "Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.",
+        "exact_main_title": "医疗 AI 要先接住临床问题",
+        "content_structure": "Draw a full-page concept map. Center has a large rounded rectangle labeled 临床问题. Three pastel branches connect to 症状线索, 检查证据, 治疗决策. A doctor handoff gate sits near the treatment branch with a small red mark labeled 高风险人工接管. Bottom callout: 智能体服务判断链, 不是替代医生.",
+        "style": "white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical icons, large readable Chinese title, few short labels.",
+        "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
+      }
+    },
+    {
+      "slide_id": "slide-03-platform-architecture",
+      "coverage": ["platform architecture", "system diagram"],
+      "prompt": {
+        "use_case": "medical-platform-architecture",
+        "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
+        "primary_request": "Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.",
+        "exact_main_title": "医疗元智能体平台由四层组成",
+        "content_structure": "Use a full-page stacked architecture diagram. Bottom layer: 共享底座. Middle cards: 医学知识, 工具调用, 任务编排. Top layer: 专病智能体. Use thick arrows upward and a side tape note: 平台负责复制, 专病负责落地. Add small system icons, but keep the page clean and readable.",
+        "style": "white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical and system icons, large readable Chinese title, few short labels.",
+        "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
+      }
+    },
+    {
+      "slide_id": "slide-04-disease-package-boundary",
+      "coverage": ["governance and boundary", "disease package"],
+      "prompt": {
+        "use_case": "governance-boundary",
+        "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
+        "primary_request": "Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.",
+        "exact_main_title": "换规则包, 不重写平台核心",
+        "content_structure": "Draw a full-slide plug-in diagram. A stable base labeled 平台核心 sits at the bottom. Three removable cartridges above it are 肠癌规则包, 糖尿病规则包, IBD规则包. Each cartridge has only three short tags: 指南, 指标, 禁忌. Add a red boundary label: 不能把肠癌模型直接搬到其他疾病.",
+        "style": "white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical/system icons, large readable Chinese title, few short labels.",
+        "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
+      }
+    },
+    {
+      "slide_id": "slide-05-governance-human-gate",
+      "coverage": ["governance and boundary", "human gate"],
+      "prompt": {
+        "use_case": "governance-boundary",
+        "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
+        "primary_request": "Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.",
+        "exact_main_title": "治理底座决定哪些节点必须人工接管",
+        "content_structure": "Create a full-page governance board. Center shield labeled 治理底座. Four large checklist cards around it: 证据来源, 风险分级, 人机门控, 审计指标. Three agent lanes feed into the shield: 诊疗, 科研, 流程. Use one red handwritten banner: 高风险节点必须人工接管.",
+        "style": "white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical and system icons, large readable Chinese title, few short labels.",
+        "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
+      }
+    },
+    {
+      "slide_id": "slide-06-summary-bridge",
+      "coverage": ["summary page", "closing judgement"],
+      "prompt": {
+        "use_case": "summary",
+        "asset_type": "Full 16:9 PPT slide page image, 1920x1080.",
+        "primary_request": "Create a complete 16:9 PPT slide page image in Chinese, full page, as one single finished lecture slide, not separate elements.",
+        "exact_main_title": "平台负责复制, 专病负责落地",
+        "content_structure": "Make a full-slide closing page with one big hand-drawn bridge. Left pillar: 肠癌验证能力. Middle bridge: 平台沉淀共性. Right pillar: 专病规则包落地. Add one forward arrow to 下一章: AI 原生医疗生态. Keep the page confident, sparse, and memorable.",
+        "style": "white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical/system icons, large readable Chinese title, few short labels.",
+        "avoid": "dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components."
+      }
+    }
+  ]
+}

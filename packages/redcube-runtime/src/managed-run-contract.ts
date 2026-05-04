@@ -70,11 +70,27 @@ export function assertManagedStopAfterStageDeclared({ stopAfterStage, stages }) 
 }
 
 export function stageArtifactPath(contract, deliverablePaths, stageId) {
-  const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
+  const stage = [
+    ...safeArray(contract?.stage_sequence?.stages),
+    ...safeArray(contract?.stage_sequence?.alternate_stages),
+  ].find((item) => item?.stage_id === stageId);
   return path.join(
     deliverablePaths.artifactsDir,
     safeText(stage?.output_artifact, `${stageId}.json`),
   );
+}
+
+function repairRouteIds(contract) {
+  return new Set([
+    ...safeArray(contract?.stage_sequence?.stages),
+    ...safeArray(contract?.stage_sequence?.alternate_stages),
+  ]
+    .map((stage) => safeText(stage?.stage_id))
+    .filter((stageId) => stageId === 'fix_html' || stageId.startsWith('repair_')));
+}
+
+function isRepairRoute(contract, stageId) {
+  return repairRouteIds(contract).has(safeText(stageId));
 }
 
 export function shouldSkipAutoToTerminalStage({
@@ -86,7 +102,7 @@ export function shouldSkipAutoToTerminalStage({
   if (managedRun?.mode !== 'auto_to_terminal') {
     return false;
   }
-  if (stageId !== 'fix_html') {
+  if (!isRepairRoute(contract, stageId)) {
     return false;
   }
   const reviewStageId = safeText(contract?.review_surface?.artifact_stage, 'screenshot_review');
@@ -109,7 +125,7 @@ export function shouldSkipManagedStage({
   if (managedRun?.mode !== 'auto_to_terminal') {
     return false;
   }
-  if (stageId !== 'fix_html') {
+  if (!isRepairRoute(contract, stageId)) {
     return false;
   }
   const reviewStageId = safeText(contract?.review_surface?.artifact_stage, 'screenshot_review');

@@ -89,6 +89,7 @@ test('getProductEntrySession reconciles a stale session checkpoint with the work
       },
       delivery_request: {
         user_intent: '继续推进',
+        stop_after_stage: 'detailed_outline',
       },
     });
 

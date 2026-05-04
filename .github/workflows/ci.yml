@@ -52,8 +52,8 @@ jobs:
       - name: Run family tests
         run: node --experimental-strip-types scripts/run-test-group.ts family
 
-      - name: Run meta tests
-        run: node --experimental-strip-types scripts/run-test-group.ts meta
+      - name: Run remaining meta tests
+        run: node --experimental-strip-types scripts/run-test-group.ts meta:ci
 
   native-ppt-proof:
     if: >-
@@ -111,3 +111,60 @@ jobs:
           path: |
             artifacts/native-ppt-proof
             artifacts/native-ppt-proof/artifact-index.json
+
+  image-ppt-proof:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.labels.*.name, 'image-ppt-proof'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: image-ppt-proof-pip-${{ runner.os }}-${{ hashFiles('.github/requirements/ci-python.txt') }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: image-ppt-proof-playwright-${{ runner.os }}-${{ hashFiles('.github/requirements/ci-python.txt') }}
+
+      - name: Install Python proof dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r .github/requirements/ci-python.txt
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run image PPT proof
+        run: tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof --mock-image-generation
+
+      - name: Upload image PPT proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: image-ppt-proof
+          path: |
+            artifacts/image-ppt-proof
+            artifacts/image-ppt-proof/artifact-index.json

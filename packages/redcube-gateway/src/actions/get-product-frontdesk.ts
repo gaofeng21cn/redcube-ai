@@ -14,12 +14,14 @@ type GatewayProductEntryManifest = ProductEntryManifestResponse & {
     family_route_policy?: Record<string, unknown>;
   } & Record<string, unknown>;
   native_ppt_operator_ux?: unknown;
+  ppt_deck_visual_route_truth?: unknown;
   schema_ref?: string;
 };
 
 type ProductFrontdeskSurface = ProductFrontdeskResponse & {
   deliverable_facade?: unknown;
   native_ppt_operator_ux?: unknown;
+  ppt_deck_visual_route_truth?: unknown;
   overlay_stage_sequences: Record<string, unknown>;
   runtime_loop_closure: RuntimeLoopClosureSurface;
 };
@@ -50,6 +52,7 @@ export async function getProductFrontdesk(request: Record<string, unknown>): Pro
     ...frontdeskSurface,
     deliverable_facade: manifest.deliverable_facade,
     native_ppt_operator_ux: manifest.native_ppt_operator_ux,
+    ppt_deck_visual_route_truth: manifest.ppt_deck_visual_route_truth,
     overlay_stage_sequences: manifest.deliverable_facade?.family_route_policy || {},
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
       runtimeOwner: manifest.runtime?.runtime_owner || MANAGED_RUNTIME_OWNER,

@@ -2,20 +2,21 @@
 
 ## 定位
 
-这条线现在定义 `ppt_deck` 的 native PPTX authoring / repair 作为生产可选路线；默认 HTML 主线仍然保持不变。
+这条线现在定义 `ppt_deck` 的 native PPTX authoring / repair 作为生产可选路线。当前默认视觉路线已经是 image-first；native PPTX 只在用户明确要求可编辑、原生 PPTX 或 DrawingML 时启用。
 
 它不改变 RCA 做 PPT 的上游流程：`storyline`、`detailed_outline`、`slide_blueprint`、`visual_direction` 继续作为 RedCube 的结构和视觉导演真相面。
 
 ## 边界
 
-当前默认主线保持：
+当前默认主线为：
 
-`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> fix_html -> export_pptx`
+`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> repair_image_pages -> export_pptx`
 
-native PPT production-selectable lane 的目标是在调用方显式选择时，用直接可编辑 PPTX 产物替换其中涉及 HTML 代码生成和 HTML 定点返修的两段：
+native PPT production-selectable lane 的目标是在调用方显式选择时，用直接可编辑 PPTX 产物替换当前 image-first 整页图生成和定点重绘两段。历史 HTML 路线仍作为显式二线保留：
 
-- `render_html` 的候选替代：`author_pptx_native`
-- `fix_html` 的候选替代：`repair_pptx_native`
+- `author_image_pages` 的可编辑替代：`author_pptx_native`
+- `repair_image_pages` 的可编辑替代：`repair_pptx_native`
+- 历史 HTML 二线：`render_html / fix_html`
 
 `visual_director_review`、`screenshot_review`、`export_pptx` 继续保留为硬闸门。审查依据应从 HTML 截图扩展为“最终 PPTX 渲染截图”，而不是绕过截图级可见结果判断。
 
@@ -29,13 +30,14 @@ native PPT production-selectable lane 的目标是在调用方显式选择时，
 
 hydrated `ppt_deck` contract 现在暴露：
 
-- `prompt_pack.render_contract.default_visual_route = "render_html"`
+- `prompt_pack.render_contract.default_visual_route = "author_image_pages"`
 - `prompt_pack.render_contract.native_ppt_proof_lane.status = "production_selectable_optional"`
 - `prompt_pack.render_contract.native_ppt_proof_lane.default_enabled = false`
 - `prompt_pack.render_contract.native_ppt_proof_lane.engine_capabilities.authoring_ir = "redcube_svg_ir"`
 - `prompt_pack.render_contract.native_ppt_proof_lane.engine_capabilities.pptx_writer = "redcube_drawingml_writer"`
 - `prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.required = true`
-- `prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes = ["render_html", "fix_html"]`
+- `prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes = ["author_image_pages", "repair_image_pages"]`
+- `prompt_pack.render_contract.native_ppt_proof_lane.legacy_html_replaces_routes = ["render_html", "fix_html"]`
 - `prompt_pack.render_contract.native_ppt_proof_lane.preserved_gates = ["visual_director_review", "screenshot_review", "export_pptx"]`
 
 product-entry manifest 同步投影同一 selectable lane，但不把它加入默认 protected stage sequence。

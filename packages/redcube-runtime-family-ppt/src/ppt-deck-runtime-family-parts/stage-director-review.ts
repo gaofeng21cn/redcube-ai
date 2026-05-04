@@ -20,6 +20,7 @@ export function createPptDeckDirectorReviewParts(deps) {
     currentVisualStageId,
     directorReviewOutputContract,
     generateStructuredArtifact,
+    isImagePagesArtifact,
     isNativePptArtifact,
     loadPriorRenderedSlideHtmlMap,
     mainExistsSync,
@@ -32,6 +33,7 @@ export function createPptDeckDirectorReviewParts(deps) {
     safeArray,
     safeText,
     summarizeBlueprintSlides,
+    summarizeImagePages,
     summarizeNativeSlides,
     writeText,
   } = deps;
@@ -45,6 +47,7 @@ export function createPptDeckDirectorReviewParts(deps) {
     buildDirectorReviewDecision,
     buildDirectorReviewStatePatch,
     directorHtmlPreflight,
+    directorImagePagesPreflight,
     directorNativePptPreflight,
     writeDirectorReviewReport,
   } = createPptDeckDirectorReviewPreflightParts({
@@ -56,6 +59,7 @@ export function createPptDeckDirectorReviewParts(deps) {
     safeArray,
     safeText,
     slideIdSet,
+    summarizeImagePages,
     summarizeNativeSlides,
     writeText,
   });
@@ -75,7 +79,21 @@ export function createPptDeckDirectorReviewParts(deps) {
     const incrementalReview = incrementalTargetSlideIds.length > 0;
     const targetSlideIdSet = slideIdSet(incrementalTargetSlideIds);
     const renderedSlideHtmlById = loadPriorRenderedSlideHtmlMap(renderArtifact);
-    const renderSummary = isNativePptArtifact(renderArtifact)
+    const sourceSurfaceKind = isImagePagesArtifact(renderArtifact)
+      ? 'image_pages'
+      : isNativePptArtifact(renderArtifact) ? 'native_pptx' : 'html';
+    const renderSummary = isImagePagesArtifact(renderArtifact)
+      ? summarizeImagePages(renderArtifact).map((page) => ({
+          slide_id: page.slide_id,
+          title: page.title,
+          layout_family: page.layout_family,
+          peak_page: false,
+          png_file: page.png_file,
+          prompt_manifest_file: page.prompt_manifest_file,
+          style_manifest_file: page.style_manifest_file,
+          text_excerpt: `image-first page: PNG=${path.basename(page.png_file || '')}; prompt_manifest=${path.basename(page.prompt_manifest_file || '')}; style_manifest=${path.basename(page.style_manifest_file || '')}`,
+        }))
+      : isNativePptArtifact(renderArtifact)
       ? summarizeNativeSlides(renderArtifact).map((slide) => ({
           slide_id: slide.slide_id,
           title: slide.title,
@@ -119,8 +137,16 @@ export function createPptDeckDirectorReviewParts(deps) {
         director_preflight: incrementalReview
           ? buildDirectorPreflightContext(preflight, incrementalTargetSlideIds)
           : null,
-        source_surface_kind: isNativePptArtifact(renderArtifact) ? 'native_pptx' : 'html',
+        source_surface_kind: sourceSurfaceKind,
       },
+      localFileInspection: sourceSurfaceKind === 'image_pages'
+        ? renderSummary.map((page, index) => ({
+            label: `${page.slide_id} ${safeText(page.title, `Slide ${index + 1}`)}`.trim(),
+            path: page.png_file,
+            media_type: 'image/png',
+            purpose: `Review image-first PPT page ${page.slide_id}`,
+          }))
+        : undefined,
       outputContract: directorReviewOutputContract(),
     });
     return {
@@ -139,7 +165,12 @@ export function createPptDeckDirectorReviewParts(deps) {
 
   async function buildDirectorReview(contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
-    const preflight = isNativePptArtifact(renderArtifact)
+    const sourceSurfaceKind = isImagePagesArtifact(renderArtifact)
+      ? 'image_pages'
+      : isNativePptArtifact(renderArtifact) ? 'native_pptx' : 'html';
+    const preflight = isImagePagesArtifact(renderArtifact)
+      ? directorImagePagesPreflight(renderArtifact)
+      : isNativePptArtifact(renderArtifact)
       ? directorNativePptPreflight(renderArtifact)
       : directorHtmlPreflight(renderArtifact);
     const {
@@ -189,7 +220,9 @@ export function createPptDeckDirectorReviewParts(deps) {
           weak_pages: preflight.weakPages,
           findings: preflight.findings,
         },
-        rewrite_action: safeText(data?.rewrite_action) || (status === 'pass' ? 'none' : 'revise_render_html'),
+        rewrite_action: safeText(data?.rewrite_action) || (status === 'pass'
+          ? 'none'
+          : sourceSurfaceKind === 'image_pages' ? 'repair_image_pages' : 'revise_render_html'),
         overlay_handoff: 'screenshot_review',
         creative_sources: {
           review_judgement: creativeSourceStamp({
@@ -203,7 +236,11 @@ export function createPptDeckDirectorReviewParts(deps) {
         },
       },
       artifact_refs: [reviewFile],
-      review_state_patch: buildDirectorReviewStatePatch(status, decision),
+      review_state_patch: buildDirectorReviewStatePatch(
+        status,
+        decision,
+        sourceSurfaceKind === 'image_pages' ? 'repair_image_pages' : 'render_html',
+      ),
     };
   }
 

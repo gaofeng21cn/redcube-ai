@@ -45,7 +45,12 @@ function nextStageId(stages, currentStageId) {
   return stages[index + 1]?.stage_id || null;
 }
 
-function reviewRerunStageAfterFixHtml(contract) {
+function isRepairStage(stageId) {
+  const id = safeText(stageId);
+  return id === 'fix_html' || id.startsWith('repair_');
+}
+
+function reviewRerunStageAfterRepair(contract) {
   const reviewStageId = safeText(contract?.review_surface?.artifact_stage);
   if (!reviewStageId) {
     return null;
@@ -101,7 +106,9 @@ function buildStageIngestion({
     ...safeArray(routeResult?.run?.artifact_refs),
   ]);
   const forcedNextStage = managedRun?.mode === 'auto_to_terminal' && stageId === 'fix_html'
-    ? reviewRerunStageAfterFixHtml(contract)
+    ? reviewRerunStageAfterRepair(contract)
+    : managedRun?.mode === 'auto_to_terminal' && isRepairStage(stageId)
+    ? reviewRerunStageAfterRepair(contract)
     : null;
   const nextStage = forcedNextStage || nextStageId(stages, stageId);
 

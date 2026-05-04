@@ -34,7 +34,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 默认交付运行方式：
 
 - 对于不需要人工中途审阅的新交付，使用一次 `redcube product invoke`，不指定 `route`、不指定 `stop_after_stage`，让 RCA managed runtime 按 `auto_to_terminal` 自主推进到 review/export gate。
-- 只有在用户明确要求先审阅计划、批准后继续、定点回修、重跑某个 stage，或 runtime gate 已给出明确 `rerun_from_stage` 时，才使用 route-level invoke，例如 `--route fix_html`。
+- 只有在用户明确要求先审阅计划、批准后继续、定点回修、重跑某个 stage，或 runtime gate 已给出明确 `rerun_from_stage` 时，才使用 route-level invoke，例如 `--route repair_image_pages`。
 - `redcube product session` 是恢复、检查进度和拾取产物的控制面，不应被当成外层 Codex 逐 stage 手工创作的替代品。
 
 ## Domain runtime 护栏
@@ -48,10 +48,11 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 当 overlay / deliverable kind 是 `ppt_deck` 时，默认且受保护的路线是：
 
-`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx`
+`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx`
 
-- `render_html` 是默认视觉实现路线；原生 PowerPoint 对象、artifact-tool editable deck 或 `python-pptx` 只能作为显式探索路线，不能替代默认 `render_html -> screenshot_review -> export_pptx`。
-- 截图质控未通过时，必须从明确 stage rerun 或 `fix_html` 回修，不能跳过 review gate 直接交付。
+- `author_image_pages` 是默认视觉实现路线，通过 Responses `image_generation` 生成完整 16:9 PPT 页面 PNG；HTML routes 与 native editable PPTX routes 只能作为显式选择路线，不能替代默认 `author_image_pages -> screenshot_review -> export_pptx`。
+- 截图质控未通过时，必须从明确 stage rerun 或 `repair_image_pages` 回修，不能跳过 review gate 直接交付。
+- 用户明确要求 HTML / CSS / 网页时走 `render_html / fix_html`；用户明确要求可编辑 / 原生 PPTX / DrawingML 时走 `author_pptx_native / repair_pptx_native`。
 
 ## PPT 长任务入口规则
 
@@ -66,7 +67,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 4. `review`：通过 review state、publication projection 与 operator review gate 判断是否需要从明确 stage rerun。
 
 每一阶段都要保留 `entry_session_id`、`topic_id`、`deliverable_id`，并优先用 `redcube product session --entry-session-id <entry-session-id>` 恢复、检查进度和拾取 artifact。
-这套可恢复阶段流是 RCA runtime 的断点与治理模型；如果没有显式人工审阅或 runtime 阻塞，外层操作者应让 `product invoke` 一次性跑到终态，而不是逐个调用 `storyline`、`detailed_outline`、`render_html` 等内部 stage。
+这套可恢复阶段流是 RCA runtime 的断点与治理模型；如果没有显式人工审阅或 runtime 阻塞，外层操作者应让 `product invoke` 一次性跑到终态，而不是逐个调用 `storyline`、`detailed_outline`、`author_image_pages` 等内部 stage。
 
 ## 操作约束
 

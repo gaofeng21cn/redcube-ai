@@ -68,12 +68,14 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta:ci/);
+  assert.doesNotMatch(workflow, /Run meta tests\n\s+run:\s*node --experimental-strip-types scripts\/run-test-group\.ts meta\n/);
   assert.doesNotMatch(workflow, /quality:\n[\s\S]*?tools\/native-ppt-proof\/install-deps\.sh[\s\S]*?Run build and typecheck/);
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /schedule:\n\s+- cron:\s*['"]17 19 \* \* \*['"]/);
   assert.match(workflow, /pull_request:\n\s+types:\s+\[opened, synchronize, reopened, labeled\]/);
   assert.match(workflow, /native-ppt-proof:\n[\s\S]*?github\.event_name == 'workflow_dispatch'[\s\S]*?github\.event_name == 'schedule'[\s\S]*?native-ppt-proof[\s\S]*?uses:\s*actions\/cache@v4[\s\S]*?path:\s*~\/\.cache\/pip[\s\S]*?uses:\s*actions\/cache@v4[\s\S]*?path:\s*~\/\.cache\/ms-playwright[\s\S]*?tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof[\s\S]*?uses:\s*actions\/upload-artifact@v6[\s\S]*?name:\s*native-ppt-proof[\s\S]*?artifacts\/native-ppt-proof\/artifact-index\.json/);
+  assert.match(workflow, /image-ppt-proof:\n[\s\S]*?github\.event_name == 'workflow_dispatch'[\s\S]*?github\.event_name == 'schedule'[\s\S]*?image-ppt-proof[\s\S]*?uses:\s*actions\/cache@v4[\s\S]*?path:\s*~\/\.cache\/pip[\s\S]*?uses:\s*actions\/cache@v4[\s\S]*?path:\s*~\/\.cache\/ms-playwright[\s\S]*?tools\/image-ppt-proof\/run\.sh --output-dir artifacts\/image-ppt-proof --mock-image-generation[\s\S]*?uses:\s*actions\/upload-artifact@v6[\s\S]*?name:\s*image-ppt-proof[\s\S]*?artifacts\/image-ppt-proof\/artifact-index\.json/);
   assert.doesNotMatch(workflow, /\n\s{2}integration:\n/);
   assert.doesNotMatch(workflow, /\n\s{2}render-e2e:\n/);
 
@@ -156,6 +158,54 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
     workflow,
     /quality:\n[\s\S]*?tools\/native-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
   );
+  assert.doesNotMatch(
+    workflow,
+    /quality:\n[\s\S]*?tools\/image-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
+  );
+});
+
+test('image PPT proof optional CI lane never runs live image generation by default', () => {
+  const contract = readRepoJson('tools/image-ppt-proof/ci-contract.json');
+  const runner = readRepoFile('tools/image-ppt-proof/run.sh');
+  const proofImplementation = readRepoFile('tools/image-ppt-proof/run-proof.py');
+  const workflow = readRepoFile('.github/workflows/ci.yml');
+
+  assert.equal(contract.schema_version, 'image_ppt_proof_ci_contract.v1');
+  assert.equal(contract.default_quality_lane.runs_real_image_generation, false);
+  assert.equal(contract.proof_job.runs_real_image_generation_by_default, false);
+  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'image-ppt-proof');
+  assert.equal(contract.proof_job.artifact_index.path, 'artifacts/image-ppt-proof/artifact-index.json');
+  assert.equal(contract.proof_job.artifact_index.schema_version, 'image_ppt_proof_artifact_index.v1');
+  assert.deepEqual(
+    contract.proof_job.required_artifact_refs,
+    [
+      'generated_png',
+      'run_manifest_json',
+      'prompt_manifest_json',
+      'image_manifest_json',
+      'image_first_pptx',
+      'rendered_pdf',
+      'export_bundle_json',
+      'gallery_json',
+      'final_delivery_manifest_json',
+    ],
+  );
+  assert.match(workflow, /image-ppt-proof:\n[\s\S]*?github\.event_name == 'schedule'/);
+  assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'image-ppt-proof'\)/);
+  assert.match(workflow, /tools\/image-ppt-proof\/run\.sh --output-dir artifacts\/image-ppt-proof --mock-image-generation/);
+  assert.doesNotMatch(workflow, /tools\/image-ppt-proof\/run\.sh[^\n]*--live-image-generation/);
+  assert.match(workflow, /name:\s*image-ppt-proof[\s\S]*?artifacts\/image-ppt-proof\/artifact-index\.json/);
+  assert.match(runner, /--mock-image-generation/);
+  assert.match(runner, /--live-image-generation/);
+  assert.match(runner, /OPENAI_API_KEY/);
+  assert.match(runner, /current Codex provider config/);
+  assert.match(proofImplementation, /image_generation/);
+  assert.match(proofImplementation, /parse_codex_config/);
+  assert.match(proofImplementation, /experimental_bearer_token/);
+  assert.match(proofImplementation, /base_url_host/);
+  assert.match(proofImplementation, /token/);
+  assert.match(proofImplementation, /prompt-manifest\.json/);
+  assert.match(proofImplementation, /final-delivery-manifest\.json/);
 });
 
 test('Sentrux advisory publishes OPL quality details without changing the default quality lane', () => {

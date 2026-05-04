@@ -231,6 +231,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       },
       delivery_request: {
         user_intent: '继续推进到最终 PPT',
+        stop_after_stage: 'visual_direction',
       },
     });
 
@@ -295,6 +296,8 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.equal(session.session_continuity.surface_kind, 'session_continuity');
     assert.equal(session.session_continuity.entry_session_id, 'session-a');
     assert.equal(session.summary.target_handle, session.summary.latest_handle);
+    assert.equal(session.ppt_deck_visual_route_session.default_visual_route, 'author_image_pages');
+    assert.equal(session.ppt_deck_visual_route_session.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
     assert.equal(
       session.summary.approval_required,
       session.runtime_loop_closure.control_policy.approval_required,

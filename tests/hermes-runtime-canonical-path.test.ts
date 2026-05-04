@@ -70,7 +70,7 @@ test('ppt_deck canonical mainline closes through the current Codex host-agent ru
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
-      'render_html',
+      'author_image_pages',
       'visual_director_review',
       'screenshot_review',
       'export_pptx',

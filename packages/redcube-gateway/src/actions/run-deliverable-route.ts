@@ -124,6 +124,18 @@ function summarizeDependencyRoute(route: string, result: RuntimeRouteResult): De
   };
 }
 
+function uniqueDependencyRouteRuns(entries: DependencyRouteRun[]): DependencyRouteRun[] {
+  const seen = new Set<string>();
+  const unique: DependencyRouteRun[] = [];
+  for (const entry of entries) {
+    const route = safeText(entry?.route);
+    if (!route || seen.has(route)) continue;
+    seen.add(route);
+    unique.push(entry);
+  }
+  return unique;
+}
+
 function artifactRequestsFixHtml(artifact: unknown): boolean {
   const record = artifact as {
     status?: unknown;
@@ -209,18 +221,6 @@ function nextLinearStageId(contract: JsonObject, currentRoute: string): string |
   return stageIds[currentIndex + 1] || null;
 }
 
-function reviewRerunStageAfterFixHtml(contract: JsonObject): string | null {
-  const reviewStageId = safeText((contract as { review_surface?: { artifact_stage?: unknown } }).review_surface?.artifact_stage);
-  if (!reviewStageId) return null;
-  const hardStops = Array.isArray((contract as { stage_sequence?: { hard_stops?: unknown[] } }).stage_sequence?.hard_stops)
-    ? (contract as { stage_sequence?: { hard_stops?: unknown[] } }).stage_sequence?.hard_stops || []
-    : [];
-  const reviewHardStop = hardStops.find(
-    (entry) => safeText((entry as { stage_id?: unknown })?.stage_id) === reviewStageId,
-  ) as { rerun_from_stage?: unknown } | undefined;
-  return safeText(reviewHardStop?.rerun_from_stage, reviewStageId) || null;
-}
-
 function nextContinuationStageId({
   request,
   contract,
@@ -231,7 +231,7 @@ function nextContinuationStageId({
   currentRoute: string;
 }): string | null {
   if (currentRoute === 'fix_html') {
-    return reviewRerunStageAfterFixHtml(contract) || nextLinearStageId(contract, currentRoute);
+    return 'visual_director_review';
   }
   const nextStage = nextLinearStageId(contract, currentRoute);
   if (currentRoute === 'screenshot_review' && nextStage === 'fix_html') {
@@ -342,8 +342,11 @@ async function continueToStopAfterStage({
 
   const contract = readHydratedContractForRequest(request);
   const stageIds = routeSequenceStageIds(contract);
+  const declaredStageIds = stageDefinitions(contract, true)
+    .map((stage) => safeText((stage as { stage_id?: unknown })?.stage_id))
+    .filter(Boolean);
   const requestedRoute = safeText(request.route);
-  if (!stageIds.includes(requestedRoute) || !stageIds.includes(stopAfterStage)) {
+  if (!declaredStageIds.includes(requestedRoute) || !declaredStageIds.includes(stopAfterStage)) {
     return { result, continuationRouteRuns: [] };
   }
 
@@ -351,7 +354,7 @@ async function continueToStopAfterStage({
   let currentResult = result;
   const continuationRouteRuns: DependencyRouteRun[] = [];
   const visited = new Set([currentRoute]);
-  const maxContinuationHops = stageIds.length + 2;
+  const maxContinuationHops = declaredStageIds.length + 2;
 
   for (let hop = 0; hop < maxContinuationHops; hop += 1) {
     if (currentRoute === stopAfterStage) {
@@ -504,10 +507,26 @@ function persistFixHtmlExecutionProof({
       'utf-8',
     );
   }
+  const screenshotReviewArtifactFile = stageArtifactFileForRequest(request, 'screenshot_review');
+  if (
+    screenshotReviewArtifactFile
+    && screenshotReviewArtifactFile !== hydrated.artifactFile
+    && screenshotReviewArtifactFile !== resultArtifactFile
+    && existsSync(screenshotReviewArtifactFile)
+  ) {
+    writeFileSync(
+      screenshotReviewArtifactFile,
+      JSON.stringify(attachExecutionProof(readJsonRecord(screenshotReviewArtifactFile), proof), null, 2),
+      'utf-8',
+    );
+  }
+  const persistedArtifact = hydrated.artifactFile && existsSync(hydrated.artifactFile)
+    ? readJsonRecord(hydrated.artifactFile)
+    : artifact;
   return {
     ...hydrated,
     ok: qualityBlockedAfterFix ? true : hydrated.ok,
-    artifact,
+    artifact: persistedArtifact,
   };
 }
 
@@ -606,7 +625,7 @@ async function runFixHtmlWithAgenticEscalation(request: RunDeliverableRouteReque
       result,
       proof: executionProof,
     }),
-    dependencyRouteRuns,
+    dependencyRouteRuns: uniqueDependencyRouteRuns(dependencyRouteRuns),
     continuationRouteRuns,
     recoveryTerminalReason,
     executionProof,

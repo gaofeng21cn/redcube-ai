@@ -70,6 +70,8 @@ export async function getProductEntryManifest(request) {
     productEntryPreflight,
     pptPolicy: deliverableFacade.family_route_policy.ppt_deck,
   });
+  const pptRoutePolicy = deliverableFacade.family_route_policy.ppt_deck || {};
+  const pptRouteSelection = nativePptOperatorUx.route_selection || {};
   const domainEntryContract = buildRedCubeDomainEntryContract({
     productManifestCommand: PRODUCT_MANIFEST_COMMAND,
     productFrontdeskCommand: PRODUCT_FRONTDESK_COMMAND,
@@ -130,6 +132,14 @@ export async function getProductEntryManifest(request) {
         surface_kind: 'product_entry_session',
         summary: 'Inspect the current session progress for the same deliverable.',
         requires: ['entry_session_id'],
+      },
+      {
+        step_id: 'default_image_ppt_proof',
+        title: 'Run default image-first PPT proof',
+        command: nativePptOperatorUx.image_proof_runner.command_template,
+        surface_kind: 'image_ppt_product_entry_proof',
+        summary: 'Default ppt_deck visual route uses image-first page authoring; style_reference_dir is accepted through delivery_request.style_reference_dir and provider diagnostics expose blocked_reason.',
+        requires: ['entry_session_id', 'topic_id', 'deliverable_id'],
       },
       {
         step_id: 'optional_native_ppt_proof',
@@ -390,6 +400,11 @@ export async function getProductEntryManifest(request) {
         target_surface_kind: 'native_ppt_product_entry_proof',
         role: 'controlled_operator_helper',
       },
+      image_ppt_proof: {
+        command: nativePptOperatorUx.image_proof_runner.helper_command,
+        target_surface_kind: 'image_ppt_product_entry_proof',
+        role: 'controlled_operator_helper',
+      },
     },
   };
   const skillCatalog = buildSkillCatalog({
@@ -417,6 +432,7 @@ export async function getProductEntryManifest(request) {
       PRODUCT_FRONTDESK_COMMAND,
       PRODUCT_INVOKE_COMMAND,
       PRODUCT_SESSION_COMMAND,
+      nativePptOperatorUx.image_proof_runner.helper_command,
       nativePptOperatorUx.proof_runner.helper_command,
     ],
     command_contracts: [
@@ -434,6 +450,12 @@ export async function getProductEntryManifest(request) {
         command: PRODUCT_SESSION_COMMAND,
         shell_key: 'session',
         target_surface_kind: 'product_entry_session',
+      },
+      {
+        command: nativePptOperatorUx.image_proof_runner.helper_command,
+        shell_key: 'image_ppt_proof',
+        target_surface_kind: 'image_ppt_product_entry_proof',
+        public_skill_policy: 'do_not_register_as_second_public_skill',
       },
       {
         command: nativePptOperatorUx.proof_runner.helper_command,
@@ -503,6 +525,11 @@ export async function getProductEntryManifest(request) {
         canonical_entry_semantics: 'agent_facing_product_entry_overview',
         legacy_command_key: 'frontdesk',
         claims_gui_shell: false,
+        ppt_deck_default_visual_route: pptRoutePolicy.default_visual_route,
+        ppt_deck_default_visual_policy: pptRoutePolicy.default_visual_policy,
+        route_selection_policy: pptRoutePolicy.route_selection_policy,
+        style_reference_dir_input: pptRouteSelection.style_reference_dir_input,
+        provider_diagnostics: nativePptOperatorUx.image_provider_diagnostics,
       },
     },
     direct: {
@@ -541,6 +568,19 @@ export async function getProductEntryManifest(request) {
         selectable_status: nativePptOperatorUx.status,
         blocked_reason: nativePptOperatorUx.blocked_reason,
         allowed_routes: nativePptOperatorUx.proof_runner.allowed_routes,
+      },
+    },
+    image_ppt_proof: {
+      command: nativePptOperatorUx.image_proof_runner.helper_command,
+      command_template: nativePptOperatorUx.image_proof_runner.command_template,
+      surface_kind: 'image_ppt_product_entry_proof',
+      purpose: '受控 operator helper；映射 ppt_deck 默认 image-first proof route，不注册第二公开 skill。',
+      extra_payload: {
+        default_visual_route: pptRoutePolicy.default_visual_route,
+        default_visual_policy: pptRoutePolicy.default_visual_policy,
+        style_reference_dir_input: pptRouteSelection.style_reference_dir_input,
+        provider_diagnostics: nativePptOperatorUx.image_provider_diagnostics,
+        allowed_routes: nativePptOperatorUx.image_proof_runner.allowed_routes,
       },
     },
   });
@@ -584,6 +624,12 @@ export async function getProductEntryManifest(request) {
       command: productEntryShell.native_ppt_proof.command,
       surface_kind: productEntryShell.native_ppt_proof.surface_kind,
       summary: productEntryShell.native_ppt_proof.purpose,
+      requires: ['entry_session_id', 'topic_id', 'deliverable_id'],
+    },
+    run_image_ppt_proof: {
+      command: productEntryShell.image_ppt_proof.command,
+      surface_kind: productEntryShell.image_ppt_proof.surface_kind,
+      summary: productEntryShell.image_ppt_proof.purpose,
       requires: ['entry_session_id', 'topic_id', 'deliverable_id'],
     },
   });
@@ -641,6 +687,14 @@ export async function getProductEntryManifest(request) {
       runtime_loop_closure: productEntryPreflight.runtime_loop_closure,
 	    },
     native_ppt_operator_ux: nativePptOperatorUx,
+    ppt_deck_visual_route_truth: {
+      surface_kind: 'ppt_deck_visual_route_truth',
+      default_visual_route: pptRoutePolicy.default_visual_route,
+      default_visual_policy: pptRoutePolicy.default_visual_policy,
+      protected_stage_sequence: pptRoutePolicy.protected_stage_sequence,
+      route_selection_policy: pptRoutePolicy.route_selection_policy,
+      image_provider_diagnostics: nativePptOperatorUx.image_provider_diagnostics,
+    },
 	    product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: familyOrchestration,
@@ -661,24 +715,41 @@ export async function getProductEntryManifest(request) {
   return {
     ...manifest,
     native_ppt_operator_ux: nativePptOperatorUx,
+    ppt_deck_visual_route_truth: {
+      surface_kind: 'ppt_deck_visual_route_truth',
+      default_visual_route: pptRoutePolicy.default_visual_route,
+      default_visual_policy: pptRoutePolicy.default_visual_policy,
+      protected_stage_sequence: pptRoutePolicy.protected_stage_sequence,
+      route_selection_policy: pptRoutePolicy.route_selection_policy,
+      image_provider_diagnostics: nativePptOperatorUx.image_provider_diagnostics,
+    },
     product_entry_shell: {
       ...manifest.product_entry_shell,
       native_ppt_proof: productEntryShell.native_ppt_proof,
+      image_ppt_proof: productEntryShell.image_ppt_proof,
     },
     operator_loop_actions: {
       ...manifest.operator_loop_actions,
       run_native_ppt_proof: operatorLoopActions.run_native_ppt_proof,
+      run_image_ppt_proof: operatorLoopActions.run_image_ppt_proof,
     },
     skill_catalog: {
       ...manifest.skill_catalog,
       supported_commands: [...new Set([
         ...(manifest.skill_catalog?.supported_commands || []),
+        nativePptOperatorUx.image_proof_runner.helper_command,
         nativePptOperatorUx.proof_runner.helper_command,
       ])],
       command_contracts: [
-        ...(manifest.skill_catalog?.command_contracts || []).filter(
-          (contract) => contract?.command !== nativePptOperatorUx.proof_runner.helper_command,
-        ),
+        ...(manifest.skill_catalog?.command_contracts || [])
+          .filter((contract) => contract?.command !== nativePptOperatorUx.proof_runner.helper_command)
+          .filter((contract) => contract?.command !== nativePptOperatorUx.image_proof_runner.helper_command),
+        {
+          command: nativePptOperatorUx.image_proof_runner.helper_command,
+          shell_key: 'image_ppt_proof',
+          target_surface_kind: 'image_ppt_product_entry_proof',
+          public_skill_policy: 'do_not_register_as_second_public_skill',
+        },
         {
           command: nativePptOperatorUx.proof_runner.helper_command,
           shell_key: 'native_ppt_proof',
