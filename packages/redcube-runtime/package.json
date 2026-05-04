@@ -12,6 +12,8 @@
     "@redcube/redcube-config": "0.1.0",
     "@redcube/hermes-substrate": "0.1.0",
     "@redcube/governance": "0.1.0",
+    "@redcube/overlay-core": "0.1.0",
+    "@redcube/overlay-registry": "0.1.0",
     "@redcube/reference-os": "0.1.0",
     "@redcube/runtime-family-registry": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0"

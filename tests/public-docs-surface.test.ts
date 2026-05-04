@@ -32,10 +32,48 @@ test('public docs surface keeps the governance references tracked', () => {
   for (const file of [
     ['docs', 'invariants.md'],
     ['docs', 'decisions.md'],
+    ['docs', 'program', 'phase-2', 'phase_2_architecture_boundary_governance.md'],
     ['contracts', 'README.md'],
   ]) {
     assert.equal(existsSync(path.join(repoRoot, ...file)), true, file.join('/'));
   }
+});
+
+test('architecture boundary governance keeps owner map and follow-on backlog explicit', () => {
+  const boundaryGovernance = readText(path.join(
+    'docs',
+    'program',
+    'phase-2',
+    'phase_2_architecture_boundary_governance.md',
+  ));
+
+  for (const owner of [
+    'apps',
+    'gateway',
+    'runtime',
+    'runtime-family',
+    'overlay',
+    'pack',
+    'governance',
+    'runtime-protocol',
+  ]) {
+    assert.match(boundaryGovernance, new RegExp(`\\\`${owner}\\\``));
+  }
+
+  for (const gate of [
+    'package/layer boundary meta gate',
+    'nested-test registration gate',
+    'arch-boundary-overlay-core-runtime-topology-extraction',
+    'arch-boundary-product-manifest-thin-composer',
+    'arch-boundary-runtime-family-review-snapshot-injection',
+    'arch-boundary-pack-provenance-cleanup',
+  ]) {
+    assert.match(boundaryGovernance, new RegExp(gate));
+  }
+
+  assert.match(boundaryGovernance, /Martin Fowler/);
+  assert.match(boundaryGovernance, /Team Topologies/);
+  assert.match(boundaryGovernance, /Test Pyramid/);
 });
 
 test('root AGENTS requires explicit plan closeout accounting', () => {

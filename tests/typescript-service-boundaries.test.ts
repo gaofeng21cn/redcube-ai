@@ -1,8 +1,10 @@
 // @ts-nocheck
+await import('./typescript-service-boundary-cases/package-dependency-boundary.test.ts');
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 
 test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed boundary exports', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/index.ts')), true);
@@ -169,4 +171,80 @@ test('P23.A: current utility package exposes TypeScript service entrypoints with
   assert.equal(redcubeConfigPkg.exports['./private-profile'].types, './dist/private-profile.d.ts');
   assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].default, './dist/xiaohongshu-author-profile.js');
   assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].types, './dist/xiaohongshu-author-profile.d.ts');
+});
+
+const TESTS_DIR = 'tests';
+
+function toRepoPath(file) {
+  return file.split(path.sep).join('/');
+}
+
+function collectTestFiles(dir = TESTS_DIR) {
+  return readdirSync(dir)
+    .flatMap((entry) => {
+      const file = path.join(dir, entry);
+      if (statSync(file).isDirectory()) {
+        return collectTestFiles(file);
+      }
+      return file.endsWith('.test.ts') ? [toRepoPath(file)] : [];
+    })
+    .sort();
+}
+
+function rootTestFiles(files) {
+  return files.filter((file) => /^tests\/[^/]+\.test\.ts$/.test(file));
+}
+
+function nestedTestFiles(files) {
+  return files.filter((file) => /^tests\/[^/]+\/.+\.test\.ts$/.test(file));
+}
+
+function importedTestFiles(file) {
+  const source = readFileSync(file, 'utf-8');
+  const importSpecifiers = [
+    ...source.matchAll(/\bimport\s*\(\s*(['"])(\.{1,2}\/[^'"]+?\.test\.ts)\1\s*\)/g),
+    ...source.matchAll(/^\s*import\s+(['"])(\.{1,2}\/[^'"]+?\.test\.ts)\1\s*;?/gm),
+  ].map((match) => match[2]);
+
+  return importSpecifiers.map((specifier) => (
+    toRepoPath(path.normalize(path.join(path.dirname(file), specifier)))
+  ));
+}
+
+function reachableFromRootTests(rootFiles) {
+  const reachable = new Set();
+  const pending = [...rootFiles];
+
+  while (pending.length > 0) {
+    const current = pending.pop();
+    if (!current || reachable.has(current)) {
+      continue;
+    }
+    reachable.add(current);
+
+    for (const imported of importedTestFiles(current)) {
+      if (!reachable.has(imported)) {
+        pending.push(imported);
+      }
+    }
+  }
+
+  return reachable;
+}
+
+test('nested test files are explicitly mounted from root test entrypoints', () => {
+  const testFiles = collectTestFiles();
+  const rootFiles = rootTestFiles(testFiles);
+  const nestedFiles = nestedTestFiles(testFiles);
+  const reachableFiles = reachableFromRootTests(rootFiles);
+  const unmounted = nestedFiles.filter((file) => !reachableFiles.has(file));
+
+  assert.deepEqual(
+    unmounted,
+    [],
+    [
+      'nested tests must be reachable from a root tests/*.test.ts entrypoint via explicit test imports',
+      ...unmounted,
+    ].join('\n'),
+  );
 });
