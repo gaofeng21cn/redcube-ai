@@ -74,14 +74,14 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   );
   assert.equal(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_kind,
+    'libreoffice_headless_pdf_png_v1',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.runtime,
     'libreoffice_headless',
   );
   assert.equal(
-    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.command_family,
-    'soffice --headless',
-  );
-  assert.equal(
-    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.cross_platform,
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.cross_platform_render_required,
     true,
   );
   assert.deepEqual(

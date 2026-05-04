@@ -318,14 +318,13 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_required, true);
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
   assert.equal(nativeHelper.true_render_proof.required, true);
-  assert.equal(nativeHelper.true_render_proof.renderer_kind, 'libreoffice_headless');
-  assert.equal(nativeHelper.true_render_proof.command_family, 'soffice --headless');
-  assert.equal(nativeHelper.true_render_proof.cross_platform, true);
+  assert.equal(nativeHelper.true_render_proof.renderer_kind, 'libreoffice_headless_pdf_png_v1');
+  assert.equal(nativeHelper.true_render_proof.runtime, 'libreoffice_headless');
+  assert.equal(nativeHelper.true_render_proof.cross_platform_render_required, true);
   assert.equal(nativeHelper.true_render_proof.synthetic_preview_allowed, false);
   assert.equal(nativeHelper.renderer_availability.executes_generation, false);
   assert.equal(nativeHelper.renderer_availability.executes_review_export_gates, false);
   assert.equal(nativeHelper.renderer_availability.powerpoint_fallback_allowed, false);
-  assert.deepEqual(nativeHelper.requires, ['Pillow', 'python-pptx', 'LibreOffice headless']);
 });
 
 test('Fast and meta diagnostic coverage does not invoke the native PPT renderer', () => {
@@ -415,9 +414,9 @@ test('Native PPT helper routes stay tied to the engine contract and review/expor
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
   );
   assert.equal(helpers.ppt_deck_native.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
-  assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless');
-  assert.equal(helpers.ppt_deck_native.true_render_proof.command_family, 'soffice --headless');
-  assert.equal(helpers.ppt_deck_native.true_render_proof.cross_platform, true);
+  assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless_pdf_png_v1');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.runtime, 'libreoffice_headless');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.cross_platform_render_required, true);
   assert.deepEqual(helpers.ppt_deck_native.requires, ['Pillow', 'python-pptx', 'LibreOffice headless']);
 });
 

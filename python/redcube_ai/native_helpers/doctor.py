@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import platform
 import shutil
 import sys
 import tomllib
@@ -18,7 +17,6 @@ OPTIONAL_IMPORT_NAMES = {
     "python-pptx": "pptx",
     "playwright": "playwright",
     "upstream-hermes-agent-local": None,
-    "Microsoft PowerPoint": None,
 }
 
 NATIVE_PPT_DOCKER_COMMAND = (
@@ -90,28 +88,6 @@ def _python_dependency_probe(name: str, import_name: str) -> dict[str, Any]:
     }
 
 
-def _powerpoint_probe() -> dict[str, Any]:
-    mac_app = Path("/Applications/Microsoft PowerPoint.app")
-    osa = shutil.which("osascript")
-    available = platform.system() == "Darwin" and mac_app.exists() and bool(osa)
-    blocked = []
-    if platform.system() != "Darwin":
-        blocked.append("Microsoft PowerPoint AppleScript render proof is macOS-only")
-    if not mac_app.exists():
-        blocked.append("missing /Applications/Microsoft PowerPoint.app")
-    if not osa:
-        blocked.append("missing osascript executable")
-    return {
-        "name": "powerpoint_applescript",
-        "available": available,
-        "renderer_kind": "powerpoint_applescript",
-        "app_path": str(mac_app),
-        "osascript_path": osa,
-        "blocked_reason": None if available else "; ".join(blocked),
-        "fallback_for_linux_native_proof": False,
-    }
-
-
 def _renderer_availability() -> dict[str, Any]:
     libreoffice = _command_probe("libreoffice", "libreoffice", "soffice")
     pdftoppm = _command_probe("pdftoppm", "pdftoppm")
@@ -121,7 +97,6 @@ def _renderer_availability() -> dict[str, Any]:
         _python_dependency_probe("python-pptx", "pptx"),
         _python_dependency_probe("playwright", "playwright"),
     ]
-    powerpoint = _powerpoint_probe()
     linux_proof_checks = [
         libreoffice,
         pdftoppm,
@@ -140,7 +115,8 @@ def _renderer_availability() -> dict[str, Any]:
         "executes_review_export_gates": False,
         "linux_native_proof": {
             "available": linux_ready,
-            "renderer_kind": "libreoffice_pdf_plus_poppler_png",
+            "renderer_kind": "libreoffice_headless",
+            "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
             "blocked_reason": None if linux_ready else "; ".join(blocked_reasons),
             "required_system_packages": [
                 "libreoffice",
@@ -169,10 +145,9 @@ def _renderer_availability() -> dict[str, Any]:
                     if check.get("blocked_reason")
                 ),
             },
-            "powerpoint_applescript": powerpoint,
         },
         "python_dependencies": python_deps,
-        "powerpoint_fallback_allowed": False,
+        "desktop_app_fallback_allowed": False,
         "suggested_docker_command": NATIVE_PPT_DOCKER_COMMAND,
     }
 

@@ -27,7 +27,8 @@ ENGINE_CAPABILITIES = {
     'editable_pptx': True,
     'strict_svg_preflight': True,
     'true_render_proof_required': True,
-    'true_render_proof_renderer': 'libreoffice_headless_pdf_png_v1',
+    'true_render_proof_renderer': 'libreoffice_headless',
+    'cross_platform_render_required': True,
     'screenshot_packaging': False,
 }
 RENDERER_PIPELINE = 'libreoffice_headless_pdf_png_v1'
@@ -197,26 +198,18 @@ def load_engine_contract(contract_file: Path) -> dict:
         fail('engine contract owned_routes mismatch')
     capabilities = contract.get('engine_capabilities') or {}
     for key, expected in ENGINE_CAPABILITIES.items():
-        if key == 'true_render_proof_renderer':
-            continue
         if capabilities.get(key) != expected:
             fail(f'engine contract capability mismatch: {key}')
     render_proof = contract.get('true_render_proof') or {}
     if render_proof.get('required') is not True:
         fail('engine contract true_render_proof.required mismatch')
-    effective_contract = {
-        **contract,
-        'engine_capabilities': {
-            **capabilities,
-            'true_render_proof_renderer': RENDERER_PIPELINE,
-        },
-        'true_render_proof': {
-            **render_proof,
-            'renderer_kind': RENDERER_KIND,
-            'renderer_pipeline': RENDERER_PIPELINE,
-        },
-    }
-    return effective_contract
+    if render_proof.get('renderer_kind') != RENDERER_KIND:
+        fail('engine contract true_render_proof.renderer_kind mismatch')
+    if render_proof.get('renderer_pipeline') != RENDERER_PIPELINE:
+        fail('engine contract true_render_proof.renderer_pipeline mismatch')
+    if render_proof.get('cross_platform_render_required') is not True:
+        fail('engine contract true_render_proof.cross_platform_render_required mismatch')
+    return contract
 
 
 def normalize_slide_data(payload: dict) -> list:
@@ -375,6 +368,9 @@ def render_pptx(
         'source_surface_kind': 'native_pptx',
         'renderer_kind': renderer['kind'],
         'renderer_pipeline': renderer['pipeline'],
+        'runtime': RENDERER_KIND,
+        'command_family': 'soffice --headless',
+        'cross_platform_render_required': True,
         'synthetic_preview': False,
         'required': True,
         'pptx_file': str(output_pptx),
