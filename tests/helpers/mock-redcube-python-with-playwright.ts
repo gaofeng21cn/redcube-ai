@@ -86,14 +86,15 @@ function writeBinary(file, value) {
 
 function extractSlidesFromHtml(htmlFile) {
   const html = readText(htmlFile);
-  const matches = [...html.matchAll(/data-slide-id="([^"]+)"[^>]*data-title="([^"]*)"[^>]*data-layout-family="([^"]*)"/g)];
+  const matches = [...html.matchAll(/data-slide-id="([^"]+)"[^>]*data-title="([^"]*)"[^>]*data-speaker-seconds="([^"]*)"[^>]*data-layout-family="([^"]*)"/g)];
   if (matches.length === 0) {
-    return [{ slide_id: 'S01', title: 'Slide 1', layout_family: 'default' }];
+    return [{ slide_id: 'S01', title: 'Slide 1', speaker_seconds: 60, layout_family: 'default' }];
   }
   return matches.map((match, index) => ({
     slide_id: match[1] || `S${String(index + 1).padStart(2, '0')}`,
     title: match[2] || `Slide ${index + 1}`,
-    layout_family: match[3] || 'default',
+    speaker_seconds: Number(match[3] || 60),
+    layout_family: match[4] || 'default',
   }));
 }
 
@@ -118,6 +119,8 @@ function buildPassReviewPayload(args) {
 
   const slide_reviews = slides.map((slide, index) => {
     const screenshot_file = path.join(outputDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
+    const speakerSeconds = Number.isFinite(slide.speaker_seconds) ? slide.speaker_seconds : 60;
+    const speakerFitOk = speakerSeconds >= 20 && speakerSeconds <= 110;
     writeBinary(screenshot_file, PNG_1X1);
     return {
       slide_id: slide.slide_id,
@@ -128,7 +131,7 @@ function buildPassReviewPayload(args) {
         overflow_free: true,
         occlusion_free: true,
         visual_density_ok: true,
-        speaker_fit_ok: true,
+        speaker_fit_ok: speakerFitOk,
         edge_clearance_ok: true,
         block_content_fit_ok: true,
         title_typography_ok: true,
@@ -136,14 +139,14 @@ function buildPassReviewPayload(args) {
       metrics: {
         occupied_ratio: 0.52,
         primary_points: 3,
-        speaker_seconds: 60,
+        speaker_seconds: speakerSeconds,
         overlaps: [],
         edge_clearance_failures: [],
         title_font_size: 40,
         title_line_count: 1,
         title_block_id: `title-${slide.slide_id}`,
       },
-      issues: [],
+      issues: speakerFitOk ? [] : ['speaker_fit_out_of_range'],
       device_scale_factor: Number(args['device-scale-factor'] || 2),
       screenshot_dimensions: {
         width: 2304,
@@ -151,15 +154,16 @@ function buildPassReviewPayload(args) {
       },
     };
   });
+  const speakerFitOk = slide_reviews.every((slide) => slide.checks.speaker_fit_ok);
 
   return {
-    status: 'pass',
+    status: speakerFitOk ? 'pass' : 'block',
     slide_reviews,
     checks: {
       overflow_free: true,
       occlusion_free: true,
       visual_density_ok: true,
-      speaker_fit_ok: true,
+      speaker_fit_ok: speakerFitOk,
       edge_clearance_ok: true,
       block_content_fit_ok: true,
       title_typography_ok: true,

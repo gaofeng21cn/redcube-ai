@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
@@ -16,6 +17,12 @@ import {
   withEnv,
 } from './mock-codex-cli.ts';
 
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+]);
+
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
@@ -24,6 +31,7 @@ async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
   });
   try {
     return await testFn();
