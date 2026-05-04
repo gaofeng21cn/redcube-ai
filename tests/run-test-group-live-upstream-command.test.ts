@@ -10,6 +10,7 @@ import {
   parseRunTestGroupArgs,
   partitionTestFilesForExecution,
   selectGroupFiles,
+  excludeCoveredTestFiles,
   resolveRedCubePythonCommand,
   ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES,
   SERIALIZED_ROUTE_HEAVY_TEST_FILES,
@@ -25,14 +26,14 @@ function readGroupList(script, groupName) {
 test('run-test-group keeps local codex preflight on integration/e2e/full groups', () => {
   assert.deepEqual(
     [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
-    ['e2e', 'full', 'integration'],
+    ['e2e', 'full', 'integration', 'integration:remaining'],
   );
 });
 
 test('run-test-group serializes route-heavy fast files without enabling live Codex preflight', () => {
   assert.deepEqual(
     [...ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES].sort(),
-    ['e2e', 'fast', 'full', 'integration'],
+    ['e2e', 'fast', 'full', 'integration', 'integration:remaining'],
   );
   assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
 });
@@ -114,12 +115,22 @@ test('run-test-group exposes a CI meta remainder lane without repeating fast met
   const meta = readGroupList(script, 'META');
   const fast = readGroupList(script, 'FAST');
 
-  assert.match(script, /'meta:ci': META\.filter\(\(file\) => !FAST\.includes\(file\)\)/);
+  assert.match(script, /'meta:ci': excludeCoveredTestFiles\(META, FAST\)/);
   assert.equal(fast.some((file) => meta.includes(file)), true);
   assert.equal(
-    meta.filter((file) => !fast.includes(file)).length,
+    excludeCoveredTestFiles(meta, fast).length,
     meta.length - fast.filter((file) => meta.includes(file)).length,
   );
+});
+
+test('run-test-group exposes an integration remainder lane for local fast-then-integration verification', () => {
+  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
+  const integration = readGroupList(script, 'INTEGRATION');
+  const fast = readGroupList(script, 'FAST');
+
+  assert.match(script, /'integration:remaining': excludeCoveredTestFiles\(INTEGRATION, FAST\)/);
+  assert.equal(fast.some((file) => integration.includes(file)), true);
+  assert.equal(excludeCoveredTestFiles(integration, fast).length, 35);
 });
 
 test('run-test-group supports explicit targeted files inside the selected lane', () => {
@@ -209,10 +220,11 @@ test('run-test-group usage and verify shim include the family verification lane'
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
 
-  assert.match(script, /<fast\|meta\|meta:ci\|family\|integration\|e2e\|historical\|full>/);
+  assert.match(script, /<fast\|meta\|meta:ci\|family\|integration\|integration:remaining\|e2e\|historical\|full>/);
   assert.match(script, /\[--files tests\/a\.test\.ts,tests\/b\.test\.ts\]/);
   assert.match(verifyScript, /family\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|e2e\|historical\|full\]/);
+  assert.match(verifyScript, /integration-remaining\)/);
+  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\]/);
 });
 
 test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {
@@ -271,7 +283,7 @@ test('serialized verification rule is documented in current program contract', (
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_files, 1);
   assert.deepEqual(
     currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_groups,
-    ['fast', 'integration', 'e2e', 'full'],
+    ['fast', 'integration', 'integration:remaining', 'e2e', 'full'],
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
@@ -280,6 +292,10 @@ test('serialized verification rule is documented in current program contract', (
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /meta:ci runs only the meta remainder not already covered by fast/i,
+  );
+  assert.match(
+    currentProgram.current_state.green_baseline.ci_quality_lane_reason,
+    /integration:remaining keeps local fast-then-integration verification from rerunning fast-covered integration files/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,

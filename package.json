@@ -15,6 +15,7 @@
     "test:meta": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta",
     "test:family": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts family",
     "test:integration": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration",
+    "test:integration:remaining": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration:remaining",
     "test:e2e": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e",
     "test:historical": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts historical",
     "test:full": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full",

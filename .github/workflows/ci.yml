@@ -37,9 +37,6 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install -r .github/requirements/ci-python.txt
 
-      - name: Install Playwright browser
-        run: python3 -m playwright install --with-deps chromium
-
       - name: Install Node dependencies
         run: npm ci
 

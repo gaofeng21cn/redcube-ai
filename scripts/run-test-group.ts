@@ -17,6 +17,7 @@ import {
   selectGroupFiles,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
   resolveRedCubePythonCommand,
+  excludeCoveredTestFiles,
 } from './run-test-group-lib.ts';
 import {
   probeCodexCli,
@@ -207,9 +208,10 @@ const FAST = [
 const GROUPS = {
   fast: FAST,
   meta: META,
-  'meta:ci': META.filter((file) => !FAST.includes(file)),
+  'meta:ci': excludeCoveredTestFiles(META, FAST),
   family: FAMILY,
   integration: INTEGRATION,
+  'integration:remaining': excludeCoveredTestFiles(INTEGRATION, FAST),
   e2e: E2E,
   historical: HISTORICAL,
   full: [...META, ...FAMILY, ...INTEGRATION, ...E2E, ...HISTORICAL],
@@ -261,8 +263,9 @@ function assertPartition() {
 
 function printUsage() {
   process.stdout.write([
-    '用法: node --experimental-strip-types scripts/run-test-group.ts <fast|meta|meta:ci|family|integration|e2e|historical|full> [--files tests/a.test.ts,tests/b.test.ts] [node --test 参数]',
+    '用法: node --experimental-strip-types scripts/run-test-group.ts <fast|meta|meta:ci|family|integration|integration:remaining|e2e|historical|full> [--files tests/a.test.ts,tests/b.test.ts] [node --test 参数]',
     '示例: node --experimental-strip-types scripts/run-test-group.ts full --test-reporter=dot',
+    '示例: node --experimental-strip-types scripts/run-test-group.ts integration:remaining --test-reporter=dot',
     '示例: node --experimental-strip-types scripts/run-test-group.ts integration --files tests/source-intake.test.ts --test-reporter=dot',
   ].join('\n'));
 }
@@ -290,6 +293,7 @@ assertTrackedFiles(E2E, 'e2e');
 assertTrackedFiles(HISTORICAL, 'historical');
 assertTrackedFiles(FAST, 'fast');
 assertTrackedFiles(GROUPS['meta:ci'], 'meta:ci');
+assertTrackedFiles(GROUPS['integration:remaining'], 'integration:remaining');
 assertPartition();
 
 const serializedVerificationHandle = await prepareSerializedVerification(groupName);

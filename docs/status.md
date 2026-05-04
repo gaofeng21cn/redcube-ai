@@ -36,9 +36,9 @@
 
 ## 当前验证口径
 
-- hosted quality lane：`npm run typecheck -> run-test-group fast -> run-test-group family -> run-test-group meta:ci`，其中 `meta:ci` 只跑 fast 未覆盖的 meta remainder，避免默认 CI 重复执行同一批根级测试文件
+- hosted quality lane：`npm run typecheck -> run-test-group fast -> run-test-group family -> run-test-group meta:ci`，其中 `meta:ci` 只跑 fast 未覆盖的 meta remainder，避免默认 CI 重复执行同一批根级测试文件；Playwright Chromium / renderer proof 环境只留在显式 `native-ppt-proof` 与 `image-ppt-proof` jobs，默认 quality lane 不再安装浏览器
 - family shared pin 审计统一经由 `scripts/run-test-group-lib.ts`，必须在 clean-clone 环境下可运行
-- 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发
+- 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发；本地已跑 fast 后可用 `npm run test:integration:remaining` 跳过 fast 已覆盖的 integration 文件
 
 ## 历史记录与追溯层
 

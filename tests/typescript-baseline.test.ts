@@ -102,6 +102,7 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:fast'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts fast');
   assert.equal(pkg.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
   assert.equal(pkg.scripts['test:integration'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration');
+  assert.equal(pkg.scripts['test:integration:remaining'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration:remaining');
   assert.equal(pkg.scripts['test:e2e'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e');
   assert.equal(pkg.scripts['test:historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts historical');
   assert.equal(pkg.scripts['test:full'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full');

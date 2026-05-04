@@ -239,7 +239,7 @@ test('Native PPT helper catalog check never invokes the real native renderer ent
   assert.doesNotMatch(runGroupSource, new RegExp(['microsoft', ' powerpoint'].join(''), 'i'));
   assert.match(runGroupSource, /tests\/ppt-native-ppt-runtime\.test\.ts/);
   assert.match(runGroupSource, /tests\/product-entry-native-ppt-proof-lane\.test\.ts/);
-  assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\['fast', 'integration', 'e2e', 'full'\]\)/);
+  assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\['fast', 'integration', 'integration:remaining', 'e2e', 'full'\]\)/);
   assert.doesNotMatch(runGroupLibSource, /SERIALIZED_VERIFICATION_GROUP_NAMES = new Set\(\[[^\]]*'fast'|'meta'/);
 });
 

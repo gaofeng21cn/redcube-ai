@@ -480,6 +480,7 @@
           "route_heavy_groups": [
             "fast",
             "integration",
+            "integration:remaining",
             "e2e",
             "full"
           ]
@@ -500,10 +501,9 @@
       },
       "ci_quality_lane_requires": [
         "python-3.12",
-        "fonts-noto-cjk",
-        "playwright-chromium"
+        "ci-python-requirements"
       ],
-      "ci_quality_lane_reason": "test:fast covers the hosted smoke subset, test:family keeps the family shared pin contract clean-clone safe, meta:ci runs only the meta remainder not already covered by fast, and only route-heavy Codex/browser verification files stay serialized on the active Codex stable-family mainline",
+      "ci_quality_lane_reason": "test:fast covers the hosted smoke subset, test:family keeps the family shared pin contract clean-clone safe, meta:ci runs only the meta remainder not already covered by fast, integration:remaining keeps local fast-then-integration verification from rerunning fast-covered integration files, route-heavy Codex/browser verification files stay serialized, and proof-only browser/renderer setup stays in the explicit native-ppt-proof and image-ppt-proof jobs instead of the default quality lane",
       "required_verification": [
         "git status --short",
         "git diff --check",

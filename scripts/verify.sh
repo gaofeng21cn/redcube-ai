@@ -26,6 +26,9 @@ case "$lane" in
   integration)
     npm run test:integration
     ;;
+  integration-remaining)
+    npm run test:integration:remaining
+    ;;
   e2e)
     npm run test:e2e
     ;;
@@ -37,7 +40,7 @@ case "$lane" in
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|structure|meta|family|integration|e2e|historical|full]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|structure|meta|family|integration|integration-remaining|e2e|historical|full]" >&2
     exit 1
     ;;
 esac

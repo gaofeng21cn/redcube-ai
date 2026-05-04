@@ -68,7 +68,8 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta:ci/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta:ci/);
+  assert.doesNotMatch(workflow, /quality:\n[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?Run build and typecheck/);
   assert.doesNotMatch(workflow, /Run meta tests\n\s+run:\s*node --experimental-strip-types scripts\/run-test-group\.ts meta\n/);
   assert.doesNotMatch(workflow, /quality:\n[\s\S]*?tools\/native-ppt-proof\/install-deps\.sh[\s\S]*?Run build and typecheck/);
   assert.match(workflow, /workflow_dispatch:/);
