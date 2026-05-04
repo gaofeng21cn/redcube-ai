@@ -310,7 +310,38 @@
               { "text": "Acquisition score lags" },
               "Expansion score is balanced"
             ],
-            "native_shapes": [{ "shape_id": "D02-title", "role": "title", "editable_text": "Segment score grid" }]
+            "native_shapes": [
+              { "shape_id": "D02-title", "role": "title", "editable_text": "Segment score grid" },
+              {
+                "shape_id": "D02-growth-chart",
+                "kind": "chart",
+                "series_name": "Growth",
+                "categories": ["Retention", "Acquisition", "Expansion"],
+                "values": [42, 31, 27],
+                "bounds": { "left_in": 1.0, "top_in": 2.15, "width_in": 5.75, "height_in": 2.72 }
+              },
+              {
+                "shape_id": "D02-operating-table",
+                "kind": "table",
+                "headers": ["Metric", "Signal", "Guardrail"],
+                "rows": [
+                  ["Retention", "Improves", "Capacity"],
+                  ["Acquisition", "Lags", "Pricing"],
+                  ["Expansion", "Balanced", "Cycle"]
+                ],
+                "bounds": { "left_in": 7.38, "top_in": 2.15, "width_in": 6.45, "height_in": 2.72 }
+              },
+              {
+                "shape_id": "D02-metric-grid",
+                "kind": "metric_grid",
+                "items": [
+                  { "label": "Retention", "value": "42%" },
+                  { "label": "Acquisition", "value": "31%" },
+                  { "label": "Expansion", "value": "27%" }
+                ],
+                "bounds": { "left_in": 1.0, "top_in": 5.9, "width_in": 13.2, "height_in": 1.05 }
+              }
+            ]
           },
           {
             "slide_id": "D03",

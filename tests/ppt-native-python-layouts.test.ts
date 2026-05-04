@@ -78,6 +78,30 @@ function sha256Hex(buffer) {
   return createHash('sha256').update(buffer).digest('hex');
 }
 
+function unzipPptxEntries(file) {
+  const script = `
+import json
+import zipfile
+from pathlib import Path
+
+pptx_file = Path(${JSON.stringify(file)})
+with zipfile.ZipFile(pptx_file) as archive:
+    entries = {
+        name: archive.read(name).decode('utf-8', errors='replace')
+        for name in archive.namelist()
+        if name.endswith('.xml')
+    }
+print(json.dumps(entries, ensure_ascii=False))
+`;
+  const python = resolveTestPythonCommand();
+  const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
+    cwd: path.resolve('.'),
+    env: { ...process.env, PYTHONPATH: path.resolve('python') },
+    encoding: 'utf-8',
+  });
+  return JSON.parse(stdout);
+}
+
 function writeTinyPng(file) {
   const png = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVR4nGP8z8Dwn4GBgYGJAQoAABMIAgLQdUeRAAAAAElFTkSuQmCC',
@@ -308,6 +332,31 @@ test('native PPT visual benchmark fixture captures four domain suites with layou
   assert.equal(reportRows.every((row) => row.field_leakage_count === 0), true);
   assert.equal(reportRows.every((row) => row.overlap_pairs === 0), true);
   assert.equal(reportRows.every((row) => /^[a-f0-9]{64}$/.test(row.render_hash)), true);
+
+  const dataSuite = fixture.suites.find((suite) => suite.suite_id === 'data_charts');
+  const dataResult = runNativeLayoutWriter(suitePayload(dataSuite), 'redcube-native-visual-benchmark-data-charts-structured-');
+  const dataSlide = dataResult.slides.find((slide) => slide.slide_id === 'D02');
+  assert.equal(dataSlide.metrics.chart_count, 1);
+  assert.equal(dataSlide.metrics.chart_bounds.length, 1);
+  assert.equal(dataSlide.metrics.axis_label_count, 3);
+  assert.equal(dataSlide.metrics.legend_label_count, 1);
+  assert.equal(dataSlide.metrics.numeric_label_overflow_count, 0);
+  assert.equal(dataSlide.metrics.table_count, 1);
+  assert.equal(dataSlide.metrics.table_bounds.length, 1);
+  assert.equal(dataSlide.metrics.table_cell_fit_ok, true);
+  assert.deepEqual(dataSlide.metrics.table_cell_fit_failures, []);
+  assert.equal(dataSlide.metrics.metric_grid_count, 1);
+  assert.equal(dataSlide.metrics.metric_grid_bounds.length, 1);
+  assert.match(dataSlide.metrics.coordinate_determinism_hash, /^[a-f0-9]{64}$/);
+
+  const pptxEntries = unzipPptxEntries(dataResult.outputPptx);
+  const slide2 = pptxEntries['ppt/slides/slide2.xml'];
+  assert.match(slide2, /D02-growth-chart/);
+  assert.match(slide2, /D02-operating-table/);
+  assert.match(slide2, /graphicFrame/);
+  assert.equal(Object.keys(pptxEntries).some((name) => /^ppt\/charts\/chart\d+\.xml$/.test(name)), true);
+  assert.equal(Object.values(pptxEntries).some((xml) => xml.includes('<c:barChart>')), true);
+  assert.equal(slide2.includes('<a:tbl>'), true);
 });
 
 test('native render preview attachment records PNG manifest metrics for every benchmark suite without packaging screenshots into PPTX', () => {

@@ -5,6 +5,8 @@ from xml.sax.saxutils import escape as xml_escape
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
 from pptx.util import Inches, Pt
 
@@ -135,6 +137,28 @@ def layout_writer_id(layout: str) -> str:
 
 def shape_text(shape: dict) -> str:
     return visible_text(shape.get('editable_text') or shape.get('text'))
+
+
+def shape_kind(shape: dict) -> str:
+    return safe_text(shape.get('kind') or shape.get('type') or shape.get('role')).lower()
+
+
+def native_structural_shapes(slide_data: dict) -> list[dict]:
+    return [
+        shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
+        if isinstance(shape, dict) and shape_kind(shape) in {'chart', 'table', 'metric_grid'}
+    ]
+
+
+def spec_bounds(shape_spec: dict, default_left, default_top, default_width, default_height):
+    bounds = shape_spec.get('bounds') if isinstance(shape_spec.get('bounds'), dict) else {}
+    left = float(bounds.get('left_in') if bounds.get('left_in') is not None else bounds.get('x_in') if bounds.get('x_in') is not None else -1)
+    top = float(bounds.get('top_in') if bounds.get('top_in') is not None else bounds.get('y_in') if bounds.get('y_in') is not None else -1)
+    width = float(bounds.get('width_in') if bounds.get('width_in') is not None else bounds.get('w_in') if bounds.get('w_in') is not None else -1)
+    height = float(bounds.get('height_in') if bounds.get('height_in') is not None else bounds.get('h_in') if bounds.get('h_in') is not None else -1)
+    if min(left, top, width, height) <= 0:
+        return default_left, default_top, default_width, default_height
+    return Inches(left), Inches(top), Inches(width), Inches(height)
 
 
 def slide_title(slide_data, index: int) -> str:
@@ -374,6 +398,29 @@ class SlideBuilder:
             'font_size': font_size,
         })
 
+    def record_structured_shape(
+        self,
+        shape_id,
+        kind,
+        left,
+        top,
+        width,
+        height,
+        role,
+        metrics: dict,
+        quality_role='content',
+    ):
+        self.native_shapes.append({
+            'shape_id': shape_id,
+            'kind': kind,
+            'role': role,
+            'quality_role': quality_role,
+            'bounds': shape_rect(left, top, width, height),
+            'text': '',
+            'font_size': 0,
+            'metrics': metrics,
+        })
+
     def rect(self, shape_id, left, top, width, height, fill_key, role, quality_role='decorative', line_key=None, radius=True):
         shape_type = MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE
         shape = self.slide.shapes.add_shape(shape_type, left, top, width, height)
@@ -432,6 +479,150 @@ class SlideBuilder:
         run.font.color.rgb = rgb(self.palette[color_key] if color_key in self.palette else color_key)
         self.record_shape(shape_id, 'text_box', left, top, width, height, role, text, size, quality_role)
         return box
+
+    def chart(self, shape_spec: dict, default_index: int):
+        shape_id = safe_text(shape_spec.get('shape_id'), f'{self.slide_id}-chart-{default_index}')
+        categories = visible_text_lines(shape_spec.get('categories'), limit=8)
+        raw_values = safe_list(shape_spec.get('values'))
+        values = [float(value) for value in raw_values[:len(categories)] if isinstance(value, (int, float))]
+        if len(categories) < 2 or len(values) != len(categories):
+            raise ValueError(f'native chart {shape_id} requires matching categories and numeric values')
+        chart_data = CategoryChartData()
+        chart_data.categories = categories
+        chart_data.add_series(visible_text(shape_spec.get('series_name'), 'Series 1'), values)
+        left, top, width, height = spec_bounds(shape_spec, Inches(1.0), Inches(2.15), Inches(6.2), Inches(3.65))
+        chart_shape = self.slide.shapes.add_chart(
+            XL_CHART_TYPE.COLUMN_CLUSTERED,
+            left,
+            top,
+            width,
+            height,
+            chart_data,
+        )
+        chart_shape.name = shape_id
+        chart = chart_shape.chart
+        chart.has_legend = True
+        chart.legend.position = XL_LEGEND_POSITION.BOTTOM
+        chart.value_axis.has_major_gridlines = True
+        label_overflows = [
+            {'label': label, 'char_count': len(label), 'limit': 18}
+            for label in categories
+            if len(label) > 18
+        ]
+        numeric_overflows = [
+            {'value': value, 'char_count': len(f'{value:g}'), 'limit': 8}
+            for value in values
+            if len(f'{value:g}') > 8
+        ]
+        metrics = {
+            'kind': 'chart',
+            'chart_type': 'column_clustered',
+            'axis_label_count': len(categories),
+            'legend_label_count': 1,
+            'series_count': 1,
+            'data_point_count': len(values),
+            'label_overflow_count': len(label_overflows),
+            'label_overflows': label_overflows,
+            'numeric_label_overflow_count': len(numeric_overflows),
+            'numeric_label_overflows': numeric_overflows,
+        }
+        self.record_structured_shape(shape_id, 'chart', left, top, width, height, 'chart', metrics)
+        return chart_shape
+
+    def table(self, shape_spec: dict, default_index: int):
+        shape_id = safe_text(shape_spec.get('shape_id'), f'{self.slide_id}-table-{default_index}')
+        headers = visible_text_lines(shape_spec.get('headers'), limit=6)
+        rows = [
+            visible_text_lines(row, limit=len(headers) or 6)
+            for row in safe_list(shape_spec.get('rows'))
+            if isinstance(row, list)
+        ][:8]
+        column_count = len(headers) or max((len(row) for row in rows), default=0)
+        if column_count < 2 or not rows:
+            raise ValueError(f'native table {shape_id} requires at least two columns and one row')
+        headers = (headers or [f'Column {index + 1}' for index in range(column_count)])[:column_count]
+        rows = [(row + [''] * column_count)[:column_count] for row in rows]
+        left, top, width, height = spec_bounds(shape_spec, Inches(7.65), Inches(2.15), Inches(6.35), Inches(3.65))
+        table_shape = self.slide.shapes.add_table(len(rows) + 1, column_count, left, top, width, height)
+        table_shape.name = shape_id
+        table = table_shape.table
+        for column_index in range(column_count):
+            table.columns[column_index].width = int(width / column_count)
+        row_height = int(height / (len(rows) + 1))
+        for row_index in range(len(rows) + 1):
+            table.rows[row_index].height = row_height
+        for column_index, header in enumerate(headers):
+            cell = table.cell(0, column_index)
+            cell.text = assert_authoring_text_capacity(header, 80, f'{shape_id}-header-{column_index + 1}')
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = rgb(self.palette['panel'])
+            for paragraph in cell.text_frame.paragraphs:
+                for run in paragraph.runs:
+                    run.font.bold = True
+                    run.font.size = Pt(10)
+                    run.font.color.rgb = rgb(self.palette['ink'])
+        cell_failures = []
+        for row_index, row in enumerate(rows, 1):
+            for column_index, value in enumerate(row):
+                cell = table.cell(row_index, column_index)
+                cell.text = assert_authoring_text_capacity(value, 90, f'{shape_id}-r{row_index}c{column_index + 1}')
+                for paragraph in cell.text_frame.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.size = Pt(9)
+                        run.font.color.rgb = rgb(self.palette['ink'])
+                if len(value) > 34:
+                    cell_failures.append({
+                        'row': row_index,
+                        'column': column_index + 1,
+                        'char_count': len(value),
+                        'limit': 34,
+                    })
+        metrics = {
+            'kind': 'table',
+            'row_count': len(rows) + 1,
+            'column_count': column_count,
+            'body_row_count': len(rows),
+            'cell_count': (len(rows) + 1) * column_count,
+            'cell_fit_ok': len(cell_failures) == 0,
+            'cell_fit_failure_count': len(cell_failures),
+            'cell_fit_failures': cell_failures,
+        }
+        self.record_structured_shape(shape_id, 'table', left, top, width, height, 'table', metrics)
+        return table_shape
+
+    def metric_grid(self, shape_spec: dict, default_index: int):
+        shape_id = safe_text(shape_spec.get('shape_id'), f'{self.slide_id}-metric-grid-{default_index}')
+        items = [
+            item for item in safe_list(shape_spec.get('items'))
+            if isinstance(item, dict)
+        ][:4]
+        if len(items) < 2:
+            raise ValueError(f'native metric grid {shape_id} requires at least two metric items')
+        left, top, width, height = spec_bounds(shape_spec, Inches(1.0), Inches(5.95), Inches(13.7), Inches(1.2))
+        columns = len(items)
+        numeric_overflows = []
+        for item_index, item in enumerate(items, 1):
+            cell_left = left + int((item_index - 1) * width / columns)
+            cell_width = int(width / columns) - Inches(0.12)
+            value = visible_text(item.get('value'), '0')
+            label = visible_text(item.get('label'), f'Metric {item_index}')
+            if len(value) > 10:
+                numeric_overflows.append({
+                    'item_index': item_index,
+                    'value': value,
+                    'char_count': len(value),
+                    'limit': 10,
+                })
+            self.rect(f'{shape_id}-{item_index}-panel', cell_left, top, cell_width, height, 'panel', 'metric_cell', 'content', 'line')
+            self.text(f'{shape_id}-{item_index}-value', cell_left + Inches(0.18), top + Inches(0.16), cell_width - Inches(0.36), Inches(0.38), value, 18, 'accent', 'metric_value', True)
+            self.text(f'{shape_id}-{item_index}-label', cell_left + Inches(0.18), top + Inches(0.62), cell_width - Inches(0.36), Inches(0.32), label, 9.5, 'muted', 'metric_label')
+        metrics = {
+            'kind': 'metric_grid',
+            'item_count': len(items),
+            'numeric_label_overflow_count': len(numeric_overflows),
+            'numeric_label_overflows': numeric_overflows,
+        }
+        self.record_structured_shape(shape_id, 'metric_grid', left, top, width, height, 'metric_grid', metrics)
 
 
 def add_background(ctx: SlideBuilder):
@@ -582,6 +773,17 @@ def write_summary_peak(ctx: SlideBuilder, slide_data, index: int, total: int, re
     add_footer(ctx, index, total)
 
 
+def write_structural_native_shapes(ctx: SlideBuilder, slide_data: dict):
+    for shape_index, shape_spec in enumerate(native_structural_shapes(slide_data), 1):
+        kind = shape_kind(shape_spec)
+        if kind == 'chart':
+            ctx.chart(shape_spec, shape_index)
+        elif kind == 'table':
+            ctx.table(shape_spec, shape_index)
+        elif kind == 'metric_grid':
+            ctx.metric_grid(shape_spec, shape_index)
+
+
 LAYOUT_WRITERS = {
     'cover_signal': write_cover_signal,
     'multi_zone_compare': write_multi_zone_compare,
@@ -611,6 +813,10 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
             raise RuntimeError(str(exc)) from exc
         ctx = SlideBuilder(slide, palette, slide_id)
         writer(ctx, slide_data, index, len(slides), repaired)
+        try:
+            write_structural_native_shapes(ctx, slide_data)
+        except ValueError as exc:
+            raise RuntimeError(str(exc)) from exc
         if repaired:
             ctx.rect(f'{slide_id}-repair-marker', Inches(14.18), Inches(0.38), Inches(0.72), Inches(0.12), 'accent', 'repair_marker', radius=False)
         points = slide_points(slide_data)

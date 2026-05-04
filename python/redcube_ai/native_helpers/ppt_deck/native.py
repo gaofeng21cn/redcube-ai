@@ -63,6 +63,39 @@ def rect_overlap_area(rect_a: dict, rect_b: dict) -> float:
     return overlap_w * overlap_h
 
 
+def rect_union_area(rects: list[dict]) -> float:
+    if not rects:
+        return 0.0
+    x_edges = sorted({
+        float(rect[key])
+        for rect in rects
+        for key in ('left', 'right')
+    })
+    y_edges = sorted({
+        float(rect[key])
+        for rect in rects
+        for key in ('top', 'bottom')
+    })
+    area = 0.0
+    for x_index, left in enumerate(x_edges[:-1]):
+        right = x_edges[x_index + 1]
+        if right <= left:
+            continue
+        for y_index, top in enumerate(y_edges[:-1]):
+            bottom = y_edges[y_index + 1]
+            if bottom <= top:
+                continue
+            center_x = (left + right) / 2.0
+            center_y = (top + bottom) / 2.0
+            if any(
+                float(rect['left']) <= center_x <= float(rect['right'])
+                and float(rect['top']) <= center_y <= float(rect['bottom'])
+                for rect in rects
+            ):
+                area += (right - left) * (bottom - top)
+    return area
+
+
 def file_sha256(file: Path) -> str:
     if not file.exists():
         return ''
@@ -79,6 +112,8 @@ def image_dimensions(file: Path) -> dict:
 
 
 def text_capacity_failure(shape: dict) -> dict | None:
+    if shape.get('kind') in {'chart', 'table', 'metric_grid'}:
+        return None
     text = safe_text(shape.get('text'))
     if not text:
         return None
@@ -115,7 +150,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         shape for shape in native_shapes
         if shape.get('role') == 'page_number' and safe_text(shape.get('text'))
     ]
-    occupied_area = sum(float(shape['bounds']['width']) * float(shape['bounds']['height']) for shape in content_shapes)
+    occupied_area = rect_union_area([shape['bounds'] for shape in content_shapes])
     occupied_ratio = clamp(occupied_area / FRAME_AREA, 0.0, 1.0)
     if content_shapes:
         edge_clearance = {
@@ -140,6 +175,44 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         failure for failure in (text_capacity_failure(shape) for shape in content_shapes)
         if failure
     ]
+    chart_shapes = [shape for shape in native_shapes if shape.get('kind') == 'chart']
+    table_shapes = [shape for shape in native_shapes if shape.get('kind') == 'table']
+    metric_grid_shapes = [shape for shape in native_shapes if shape.get('kind') == 'metric_grid']
+    chart_metrics = []
+    table_metrics = []
+    metric_grid_metrics = []
+    numeric_label_overflows = []
+    table_cell_fit_failures = []
+    for shape in chart_shapes:
+        metrics = dict(shape.get('metrics') or {})
+        metrics['shape_id'] = shape.get('shape_id')
+        metrics['bounds'] = shape.get('bounds')
+        chart_metrics.append(metrics)
+        numeric_label_overflows.extend(metrics.get('numeric_label_overflows') or [])
+    for shape in table_shapes:
+        metrics = dict(shape.get('metrics') or {})
+        metrics['shape_id'] = shape.get('shape_id')
+        metrics['bounds'] = shape.get('bounds')
+        table_metrics.append(metrics)
+        table_cell_fit_failures.extend(metrics.get('cell_fit_failures') or [])
+    for shape in metric_grid_shapes:
+        metrics = dict(shape.get('metrics') or {})
+        metrics['shape_id'] = shape.get('shape_id')
+        metrics['bounds'] = shape.get('bounds')
+        metric_grid_metrics.append(metrics)
+        numeric_label_overflows.extend(metrics.get('numeric_label_overflows') or [])
+    coordinate_payload = [
+        {
+            'shape_id': shape.get('shape_id'),
+            'kind': shape.get('kind'),
+            'role': shape.get('role'),
+            'bounds': shape.get('bounds'),
+        }
+        for shape in native_shapes
+    ]
+    coordinate_determinism_hash = hashlib.sha256(
+        json.dumps(coordinate_payload, ensure_ascii=False, sort_keys=True).encode('utf-8')
+    ).hexdigest()
     text_char_count = sum(len(safe_text(shape.get('text'))) for shape in content_shapes)
     clipped_nodes = len(block_content_failures)
     title_typography_ok = bool(title_shapes) and title_font_size >= 28.0
@@ -200,6 +273,22 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'edge_clearance': {key: round(value, 2) for key, value in edge_clearance.items()},
             'block_content_failures': block_content_failures,
             'bounds': [shape['bounds'] for shape in content_shapes],
+            'chart_count': len(chart_shapes),
+            'table_count': len(table_shapes),
+            'metric_grid_count': len(metric_grid_shapes),
+            'chart_metrics': chart_metrics,
+            'table_metrics': table_metrics,
+            'metric_grid_metrics': metric_grid_metrics,
+            'chart_bounds': [shape['bounds'] for shape in chart_shapes],
+            'table_bounds': [shape['bounds'] for shape in table_shapes],
+            'metric_grid_bounds': [shape['bounds'] for shape in metric_grid_shapes],
+            'axis_label_count': sum(int(metrics.get('axis_label_count') or 0) for metrics in chart_metrics),
+            'legend_label_count': sum(int(metrics.get('legend_label_count') or 0) for metrics in chart_metrics),
+            'table_cell_fit_ok': len(table_cell_fit_failures) == 0,
+            'table_cell_fit_failures': table_cell_fit_failures,
+            'numeric_label_overflow_count': len(numeric_label_overflows),
+            'numeric_label_overflows': numeric_label_overflows,
+            'coordinate_determinism_hash': coordinate_determinism_hash,
         },
     }
 
@@ -542,6 +631,13 @@ def main() -> None:
                 'occupied_ratio',
                 'edge_clearance',
                 'overlap_pairs',
+                'chart_bounds',
+                'table_bounds',
+                'axis_label_count',
+                'legend_label_count',
+                'table_cell_fit_ok',
+                'numeric_label_overflow_count',
+                'coordinate_determinism_hash',
                 'preview_screenshot_sha256',
                 'preview_screenshot_dimensions',
             ],
