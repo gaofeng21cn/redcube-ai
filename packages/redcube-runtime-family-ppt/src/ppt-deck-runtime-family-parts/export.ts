@@ -259,6 +259,10 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     };
   }
 
+  function writeJson(file: string, data: unknown): void {
+    writeText(file, `${JSON.stringify(data, null, 2)}\n`);
+  }
+
   function buildNativeExportBundle({
   renderArtifact,
   reviewArtifact,
@@ -355,6 +359,50 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       shape_manifest_file: shapeManifestFile,
       repair_log_file: repairLogFile,
     };
+    const artifactGalleryDir = ensureDir(path.join(path.dirname(pptxFile), 'artifact_gallery'));
+    const artifactGalleryIndexFile = path.join(artifactGalleryDir, 'index.json');
+    const artifactGalleryIndex = {
+      surface_kind: 'native_export_operator_artifact_gallery_v1',
+      status: 'output_ready',
+      title: safeText(contract?.title),
+      deliverable_id: safeText(contract?.deliverable_id),
+      source_visual_route: safeText(renderArtifact.route),
+      renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+      libreoffice_headless_pdf_png_v1: shapeManifestSummary.libreoffice_headless_pdf_png_v1,
+      artifacts: {
+        source: {
+          pptx_file: sourcePptx,
+          pdf_file: sourcePdf,
+          preview_png_files: previewPngFiles,
+        },
+        final: {
+          pptx_file: pptxFile,
+          pdf_file: pdfFile,
+          presenter_notes_file: notesFile,
+          final_delivery_pptx_file: finalDelivery.pptx_file,
+          final_delivery_pdf_file: finalDelivery.pdf_file,
+        },
+        evidence: {
+          shape_manifest_file: shapeManifestFile,
+          repair_log_file: repairLogFile,
+          final_delivery_manifest_file: finalDelivery.manifest_file,
+          final_delivery_readme_file: finalDelivery.readme_file,
+        },
+      },
+      hashes: evidenceHashes,
+      shape_manifest_summary: shapeManifestSummary,
+      proof_summary: operatorProofSummary,
+      operator_read_order: [
+        'proof_summary',
+        'artifacts.final.pptx_file',
+        'artifacts.final.pdf_file',
+        'artifacts.source.preview_png_files',
+        'artifacts.evidence.shape_manifest_file',
+        'artifacts.evidence.repair_log_file',
+      ],
+      updated_at: new Date().toISOString(),
+    };
+    writeJson(artifactGalleryIndexFile, artifactGalleryIndex);
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
       status: 'completed',
@@ -391,6 +439,11 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         },
         shape_manifest_summary: shapeManifestSummary,
         operator_proof_summary: operatorProofSummary,
+        artifact_gallery: {
+          index_file: artifactGalleryIndexFile,
+          surface_kind: artifactGalleryIndex.surface_kind,
+          status: artifactGalleryIndex.status,
+        },
         pptx_file: pptxFile,
         pdf_file: pdfFile,
         presenter_notes_file: notesFile,
@@ -427,6 +480,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         finalDelivery.pdf_file,
         finalDelivery.manifest_file,
         finalDelivery.readme_file,
+        artifactGalleryIndexFile,
       ].filter(Boolean),
     };
   }

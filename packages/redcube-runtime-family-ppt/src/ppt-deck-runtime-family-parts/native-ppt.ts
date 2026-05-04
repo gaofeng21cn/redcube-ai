@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 
@@ -380,6 +381,126 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     return JSON.parse(readFileSync(file, 'utf-8'));
   }
 
+  function stableJson(value: unknown): string {
+    if (Array.isArray(value)) {
+      return `[${value.map((item) => stableJson(item)).join(',')}]`;
+    }
+    if (value && typeof value === 'object') {
+      return `{${Object.keys(value as JsonRecord).sort().map((key) => (
+        `${JSON.stringify(key)}:${stableJson((value as JsonRecord)[key])}`
+      )).join(',')}}`;
+    }
+    return JSON.stringify(value);
+  }
+
+  function slideEvidencePayload(slide: JsonRecord | undefined): JsonRecord | null {
+    if (!slide) return null;
+    const {
+      preview_screenshot_file: _previewScreenshotFile,
+      screenshot_file: _screenshotFile,
+      redcube_svg_ir_file: _redcubeSvgIrFile,
+      ...content
+    } = slide;
+    return content;
+  }
+
+  function slideEvidenceHash(slide: JsonRecord | undefined): string | null {
+    const payload = slideEvidencePayload(slide);
+    if (!payload) return null;
+    return createHash('sha256').update(stableJson(payload)).digest('hex');
+  }
+
+  function repairReasonFromFeedback(feedback: JsonRecord | undefined): JsonRecord {
+    return {
+      issues: safeArray(feedback?.issues).map((issue) => safeText(issue)).filter(Boolean),
+      mechanical_issues: safeArray(feedback?.mechanical_issues).map((issue) => safeText(issue)).filter(Boolean),
+      visual_findings: safeArray(feedback?.visual_findings).map((issue) => safeText(issue)).filter(Boolean),
+      recommended_fix: safeText(feedback?.recommended_fix),
+    };
+  }
+
+  function buildRepairEvidence({
+    route,
+    priorShapeManifest,
+    shapeManifest,
+    repairFeedback,
+    unitRepairScope,
+  }: {
+    route: NativePptRoute;
+    priorShapeManifest: JsonRecord;
+    shapeManifest: JsonRecord;
+    repairFeedback: JsonRecord[];
+    unitRepairScope: JsonRecord;
+  }): JsonRecord {
+    const priorSlidesById = new Map(
+      safeArray(priorShapeManifest?.slides).map((slide) => [safeText(slide?.slide_id), slide]),
+    );
+    const afterSlides = safeArray(shapeManifest?.slides);
+    const afterSlidesById = new Map(afterSlides.map((slide) => [safeText(slide?.slide_id), slide]));
+    const feedbackById = new Map(safeArray(repairFeedback).map((slide) => [safeText(slide?.slide_id), slide]));
+    const targetSlideIds = safeArray(unitRepairScope?.target_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean);
+    const preservedSlideIds = safeArray(unitRepairScope?.preserved_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean);
+    const targetSet = new Set(targetSlideIds);
+    const allSlideIds = [...new Set([
+      ...safeArray(priorShapeManifest?.slides).map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+      ...afterSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+    ])];
+    const perSlideHashes = allSlideIds.map((slideId) => {
+      const beforeSlide = priorSlidesById.get(slideId);
+      const afterSlide = afterSlidesById.get(slideId);
+      const beforeHash = slideEvidenceHash(beforeSlide);
+      const afterHash = slideEvidenceHash(afterSlide);
+      const targeted = targetSet.has(slideId);
+      return {
+        slide_id: slideId,
+        targeted,
+        before_slide_hash: beforeHash,
+        after_slide_hash: afterHash,
+        preserved_slide_hash: targeted ? null : beforeHash,
+        hash_status: beforeHash && afterHash && beforeHash === afterHash ? 'unchanged' : targeted ? 'changed_by_targeted_repair' : 'changed_without_target',
+        targeted_repair_reason: targeted ? repairReasonFromFeedback(feedbackById.get(slideId)) : null,
+      };
+    });
+    const preservedSlideHashes = preservedSlideIds.map((slideId) => {
+      const evidence = perSlideHashes.find((slide) => slide.slide_id === slideId);
+      return {
+        slide_id: slideId,
+        before_slide_hash: evidence?.before_slide_hash || null,
+        after_slide_hash: evidence?.after_slide_hash || null,
+        preserved_slide_hash: evidence?.preserved_slide_hash || null,
+        proof_status: evidence?.hash_status === 'unchanged' ? 'unchanged' : 'changed_without_target',
+      };
+    });
+    const repairUnits = targetSlideIds.map((slideId) => {
+      const feedback = feedbackById.get(slideId);
+      const beforeSlide = priorSlidesById.get(slideId);
+      const afterSlide = afterSlidesById.get(slideId);
+      return {
+        slide_id: slideId,
+        reason: repairReasonFromFeedback(feedback),
+        input: {
+          source_review_stage: 'screenshot_review',
+          review_feedback: feedback || null,
+          before_slide_hash: slideEvidenceHash(beforeSlide),
+          before_slide_manifest: beforeSlide || null,
+        },
+        output: {
+          after_slide_hash: slideEvidenceHash(afterSlide),
+          after_slide_manifest: afterSlide || null,
+        },
+      };
+    });
+    return {
+      evidence_surface: 'native_ppt_repair_evidence_v1',
+      route,
+      source_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : null,
+      per_slide_hashes: perSlideHashes,
+      preserved_slide_hashes: preservedSlideHashes,
+      repair_units: repairUnits,
+      non_blocking_slide_reuse_ok: preservedSlideHashes.every((slide) => slide.proof_status === 'unchanged'),
+    };
+  }
+
   function aggregateNativeChecks(slideReviews: JsonRecord[]): JsonRecord {
     const checkKeys = [
       'overflow_free',
@@ -417,6 +538,21 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     ].filter(([, value]) => finiteNumberOrNull(value) === null);
     if (missing.length > 0) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
+    const nativeShapes = safeArray(manifestSlide?.native_shapes);
+    const hasChartShape = nativeShapes.some((shape) => {
+      const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
+      return text.includes('chart');
+    });
+    const hasTableShape = nativeShapes.some((shape) => {
+      const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
+      return text.includes('table');
+    });
+    if (hasChartShape && (!metrics.chart_metrics || typeof metrics.chart_metrics !== 'object')) {
+      return ['native_chart_metrics_missing'];
+    }
+    if (hasTableShape && (!metrics.table_metrics || typeof metrics.table_metrics !== 'object')) {
+      return ['native_table_metrics_missing'];
+    }
     if (!manifestSlide.preview_screenshot_sha256) return ['native_preview_screenshot_hash_missing'];
     if (manifestSlide.synthetic_preview !== false) return ['native_true_render_proof_missing'];
     if (safeText(manifestSlide.render_proof_source) !== safeText(expectedProof?.renderer_kind)) return ['native_true_render_proof_missing'];
@@ -548,6 +684,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const reviewArtifact = route === 'repair_pptx_native'
       ? readStageArtifact(contract, deliverablePaths, 'screenshot_review')
       : null;
+    const priorNativeArtifact = route === 'repair_pptx_native'
+      ? readCurrentNativePptArtifact(contract, deliverablePaths)
+      : null;
+    const priorShapeManifest = route === 'repair_pptx_native'
+      ? readNativeShapeManifest(safeText(priorNativeArtifact?.native_ppt_bundle?.shape_manifest_file))
+      : {};
     const repairFeedback = route === 'repair_pptx_native'
       ? repairFeedbackFromReview(reviewArtifact)
       : [];
@@ -621,6 +763,22 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       consumed_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : null,
       repair_log_file: paths.repairLogFile,
     };
+    const repairEvidence = buildRepairEvidence({
+      route,
+      priorShapeManifest,
+      shapeManifest: readNativeShapeManifest(paths.shapeManifestFile),
+      repairFeedback,
+      unitRepairScope,
+    });
+    const enrichedRepairLog = {
+      ...repairLog,
+      repair_evidence: repairEvidence,
+      per_slide_hashes: repairEvidence.per_slide_hashes,
+      preserved_slide_hashes: repairEvidence.preserved_slide_hashes,
+      repair_units: repairEvidence.repair_units,
+      non_blocking_slide_reuse_ok: repairEvidence.non_blocking_slide_reuse_ok,
+    };
+    writeJson(paths.repairLogFile, enrichedRepairLog);
     return {
       ...attachCommon(route, contract, null, adapter),
       status: 'completed',
@@ -679,14 +837,14 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         },
       },
       native_ppt_repair_log: {
-        ...repairLog,
-        consumed_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : repairLog.consumed_review_stage,
-        target_slide_ids: safeArray(repairLog.target_slide_ids),
-        preserved_slide_ids: safeArray(repairLog.preserved_slide_ids),
-        blocked_slide_ids_source: safeText(repairLog.blocked_slide_ids_source),
-        scope: safeText(repairLog.scope, route === 'repair_pptx_native' ? 'page' : 'deck'),
-        feedback_count: Number(repairLog.feedback_count || repairFeedback.length || 0),
-        repair_log_file: safeText(repairLog.repair_log_file, paths.repairLogFile),
+        ...enrichedRepairLog,
+        consumed_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : enrichedRepairLog.consumed_review_stage,
+        target_slide_ids: safeArray(enrichedRepairLog.target_slide_ids),
+        preserved_slide_ids: safeArray(enrichedRepairLog.preserved_slide_ids),
+        blocked_slide_ids_source: safeText(enrichedRepairLog.blocked_slide_ids_source),
+        scope: safeText(enrichedRepairLog.scope, route === 'repair_pptx_native' ? 'page' : 'deck'),
+        feedback_count: Number(enrichedRepairLog.feedback_count || repairFeedback.length || 0),
+        repair_log_file: safeText(enrichedRepairLog.repair_log_file, paths.repairLogFile),
       },
       artifact_refs: [
         paths.inputFile,

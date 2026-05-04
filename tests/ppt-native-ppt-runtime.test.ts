@@ -111,8 +111,11 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.deepEqual(authored.native_ppt_bundle?.engine_contract, expectedEngineContract);
     assert.equal(
       authored.native_ppt_bundle?.engine_contract_file,
-      path.resolve('contracts/runtime-program/ppt-native-python-engine-contract.json'),
+      authored.native_ppt_bundle?.shape_manifest_file
+        ? readJson(authored.native_ppt_bundle.shape_manifest_file).engine_contract_file
+        : authored.native_ppt_bundle?.engine_contract_file,
     );
+    assert.equal(path.basename(authored.native_ppt_bundle?.engine_contract_file), 'ppt-native-python-engine-contract.json');
     assert.equal(authored.native_ppt_bundle?.shape_manifest_schema_version, 1);
     assert.equal(existsSync(authored.native_ppt_bundle?.pptx_file), true);
     assert.equal(existsSync(authored.native_ppt_bundle?.shape_manifest_file), true);
@@ -230,8 +233,21 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(exported.export_bundle?.operator_proof_summary?.artifact_hashes?.source_pptx_sha256, fileSha256(authored.native_ppt_bundle.pptx_file));
     assert.equal(exported.export_bundle?.operator_proof_summary?.final_artifact_refs?.pptx_file, exported.export_bundle.pptx_file);
     assert.equal(exported.export_bundle?.operator_proof_summary?.final_artifact_refs?.pdf_file, exported.export_bundle.pdf_file);
+    assert.equal(exported.export_bundle?.artifact_gallery?.surface_kind, 'native_export_operator_artifact_gallery_v1');
+    assert.equal(existsSync(exported.export_bundle?.artifact_gallery?.index_file), true);
+    const artifactGallery = readJson(exported.export_bundle.artifact_gallery.index_file);
+    assert.equal(artifactGallery.artifacts.source.pptx_file, authored.native_ppt_bundle.pptx_file);
+    assert.equal(artifactGallery.artifacts.source.pdf_file, authored.native_ppt_bundle.pdf_file);
+    assert.deepEqual(artifactGallery.artifacts.source.preview_png_files, authored.native_ppt_bundle.preview_screenshots);
+    assert.equal(artifactGallery.artifacts.final.pptx_file, exported.export_bundle.pptx_file);
+    assert.equal(artifactGallery.artifacts.final.pdf_file, exported.export_bundle.pdf_file);
+    assert.equal(artifactGallery.artifacts.evidence.shape_manifest_file, authored.native_ppt_bundle.shape_manifest_file);
+    assert.equal(artifactGallery.artifacts.evidence.repair_log_file, authored.native_ppt_bundle.repair_log_file);
+    assert.equal(artifactGallery.proof_summary.final_artifact_refs.pptx_file, exported.export_bundle.pptx_file);
+    assert.equal(artifactGallery.hashes.final_pptx_sha256, fileSha256(exported.export_bundle.pptx_file));
     assert.equal(exported.artifact_refs.includes(exported.export_bundle.operator_proof_summary.final_artifact_refs.pptx_file), true);
     assert.equal(exported.artifact_refs.includes(exported.export_bundle.operator_proof_summary.final_artifact_refs.pdf_file), true);
+    assert.equal(exported.artifact_refs.includes(exported.export_bundle.artifact_gallery.index_file), true);
   });
 });
 
@@ -367,6 +383,15 @@ test('native PPT screenshot review blocks from shape-manifest quality metrics in
           overflow_reason: 'native_text_capacity_exceeded',
         }],
       },
+      native_shapes: [
+        ...shapeManifest.slides[0].native_shapes,
+        {
+          shape_id: `${shapeManifest.slides[0].slide_id}-chart`,
+          kind: 'chart',
+          role: 'chart',
+          quality_role: 'chart',
+        },
+      ],
       issues: ['edge_clearance_out_of_range', 'block_content_overflow_detected'],
     };
     writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
@@ -408,6 +433,10 @@ test('native PPT screenshot review blocks from shape-manifest quality metrics in
     assert.equal(
       screenshotReview.mechanical_review.slide_reviews[0].metrics.block_content_failures[0].overflow_reason,
       'native_text_capacity_exceeded',
+    );
+    assert.equal(
+      screenshotReview.mechanical_review.slide_reviews[0].issues.includes('native_chart_metrics_missing'),
+      true,
     );
   });
 });
@@ -540,6 +569,29 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
     assert.equal(existsSync(repaired.native_ppt_bundle?.pptx_file), true);
     assert.deepEqual(repaired.native_ppt_repair_log?.target_slide_ids, ['S02']);
     assert.deepEqual(repaired.native_ppt_repair_log?.preserved_slide_ids, expectedPreservedSlideIds);
+    assert.equal(repaired.native_ppt_repair_log?.repair_evidence?.evidence_surface, 'native_ppt_repair_evidence_v1');
+    assert.equal(repaired.native_ppt_repair_log?.repair_evidence?.non_blocking_slide_reuse_ok, true);
+    assert.equal(repaired.native_ppt_repair_log?.per_slide_hashes.find((slide) => slide.slide_id === 'S02')?.targeted, true);
+    assert.equal(
+      repaired.native_ppt_repair_log?.per_slide_hashes.find((slide) => slide.slide_id === 'S02')?.hash_status,
+      'changed_by_targeted_repair',
+    );
+    assert.equal(
+      repaired.native_ppt_repair_log?.per_slide_hashes.find((slide) => slide.slide_id === 'S01')?.hash_status,
+      'unchanged',
+    );
+    assert.equal(
+      repaired.native_ppt_repair_log?.preserved_slide_hashes.every((slide) => slide.proof_status === 'unchanged'),
+      true,
+    );
+    assert.equal(repaired.native_ppt_repair_log?.repair_units[0]?.slide_id, 'S02');
+    assert.equal(repaired.native_ppt_repair_log?.repair_units[0]?.input?.source_review_stage, 'screenshot_review');
+    assert.equal(
+      repaired.native_ppt_repair_log?.repair_units[0]?.reason?.recommended_fix,
+      '上移并压缩底部文案，恢复卡内底部留白。',
+    );
+    assert.ok(repaired.native_ppt_repair_log?.repair_units[0]?.input?.before_slide_hash);
+    assert.ok(repaired.native_ppt_repair_log?.repair_units[0]?.output?.after_slide_hash);
     assert.equal(repaired.native_ppt_repair_log?.blocked_slide_ids_source, 'screenshot_review.slide_reviews.status_block');
     assert.equal(repaired.native_ppt_repair_log?.scope, 'page');
     assert.deepEqual(repaired.unit_repair_scope?.target_slide_ids, ['S02']);
@@ -556,6 +608,7 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
     const repairLog = readJson(repaired.native_ppt_repair_log.repair_log_file);
     assert.deepEqual(repairLog.target_slide_ids, ['S02']);
     assert.deepEqual(repairLog.preserved_slide_ids, expectedPreservedSlideIds);
+    assert.deepEqual(repairLog.repair_units, repaired.native_ppt_repair_log.repair_units);
 
     const directorResult = await runDeliverableRoute({
       workspaceRoot,
