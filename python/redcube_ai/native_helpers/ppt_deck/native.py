@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import math
+import platform
 import shutil
 import subprocess
 import sys
@@ -26,9 +27,11 @@ ENGINE_CAPABILITIES = {
     'editable_pptx': True,
     'strict_svg_preflight': True,
     'true_render_proof_required': True,
-    'true_render_proof_renderer': 'powerpoint_applescript',
+    'true_render_proof_renderer': 'libreoffice_headless_pdf_png_v1',
     'screenshot_packaging': False,
 }
+RENDERER_PIPELINE = 'libreoffice_headless_pdf_png_v1'
+RENDERER_KIND = 'libreoffice_headless'
 DEFAULT_ENGINE_CONTRACT_FILE = (
     Path(__file__).resolve().parents[4]
     / 'contracts'
@@ -194,12 +197,26 @@ def load_engine_contract(contract_file: Path) -> dict:
         fail('engine contract owned_routes mismatch')
     capabilities = contract.get('engine_capabilities') or {}
     for key, expected in ENGINE_CAPABILITIES.items():
+        if key == 'true_render_proof_renderer':
+            continue
         if capabilities.get(key) != expected:
             fail(f'engine contract capability mismatch: {key}')
     render_proof = contract.get('true_render_proof') or {}
     if render_proof.get('required') is not True:
         fail('engine contract true_render_proof.required mismatch')
-    return contract
+    effective_contract = {
+        **contract,
+        'engine_capabilities': {
+            **capabilities,
+            'true_render_proof_renderer': RENDERER_PIPELINE,
+        },
+        'true_render_proof': {
+            **render_proof,
+            'renderer_kind': RENDERER_KIND,
+            'renderer_pipeline': RENDERER_PIPELINE,
+        },
+    }
+    return effective_contract
 
 
 def normalize_slide_data(payload: dict) -> list:
@@ -233,89 +250,144 @@ def normalize_slide_data(payload: dict) -> list:
     return slides
 
 
-def apple_script_text(value: Path | str) -> str:
-    return str(value).replace('\\', '\\\\').replace('"', '\\"')
+def command_version(command: list[str]) -> str:
+    completed = subprocess.run(
+        command,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return safe_text(completed.stdout) or safe_text(completed.stderr) or 'unknown'
 
 
-def render_powerpoint_pptx(output_pptx: Path, preview_dir: Path, output_pdf: Path | None) -> dict:
-    if not Path('/Applications/Microsoft PowerPoint.app').exists():
-        fail('true PPTX render proof requires Microsoft PowerPoint at /Applications/Microsoft PowerPoint.app')
+def platform_provenance() -> dict:
+    uname = platform.uname()
+    return {
+        'system': uname.system,
+        'release': uname.release,
+        'version': uname.version,
+        'machine': uname.machine,
+        'python': platform.python_version(),
+    }
+
+
+def resolve_renderer(renderer_name: str) -> dict:
+    requested = safe_text(renderer_name, 'auto')
+    if requested not in {'auto', RENDERER_KIND}:
+        fail(f'unsupported native PPT renderer: {requested}; expected auto or {RENDERER_KIND}')
+    soffice = shutil.which('soffice') or shutil.which('libreoffice')
+    if not soffice:
+        fail(
+            'native PPT true render requires LibreOffice headless (soffice or libreoffice) for '
+            f'{RENDERER_PIPELINE}; install LibreOffice locally or run the RedCube native helper in Docker'
+        )
+    pdftoppm = shutil.which('pdftoppm')
+    if not pdftoppm:
+        fail(
+            'native PPT true render requires Poppler pdftoppm for PDF-to-PNG previews; '
+            'install poppler locally or run the RedCube native helper in Docker'
+        )
+    return {
+        'kind': RENDERER_KIND,
+        'pipeline': RENDERER_PIPELINE,
+        'soffice': soffice,
+        'pdftoppm': pdftoppm,
+        'libreoffice_version': command_version([soffice, '--version']),
+        'poppler_version': command_version([pdftoppm, '-v']),
+    }
+
+
+def clean_render_outputs(preview_dir: Path, pdf_target: Path) -> None:
     preview_dir.mkdir(parents=True, exist_ok=True)
     for stale in preview_dir.glob('*'):
         if stale.is_file() and stale.suffix.lower() in {'.png', '.pdf'}:
             stale.unlink()
-    pdf_target = output_pdf or (preview_dir / 'render-proof.pdf')
+    if pdf_target.exists():
+        pdf_target.unlink()
+
+
+def render_pptx_to_pdf(output_pptx: Path, pdf_target: Path, renderer: dict) -> None:
     pdf_target.parent.mkdir(parents=True, exist_ok=True)
-    script = f'''
-set pptxPath to POSIX file "{apple_script_text(output_pptx)}"
-set pngDir to POSIX file "{apple_script_text(preview_dir)}"
-set pdfPath to POSIX file "{apple_script_text(pdf_target)}"
-tell application id "com.microsoft.Powerpoint"
-    launch
-    open pptxPath
-    set deckRef to active presentation
-    save deckRef in pngDir as save as PNG
-    save deckRef in pdfPath as save as PDF
-    close deckRef saving no
-end tell
-'''
+    convert_dir = pdf_target.parent
     completed = subprocess.run(
-        ['osascript', '-e', script],
+        [
+            renderer['soffice'],
+            '--headless',
+            '--convert-to',
+            'pdf',
+            '--outdir',
+            str(convert_dir),
+            str(output_pptx),
+        ],
         text=True,
         capture_output=True,
         check=False,
     )
     if completed.returncode != 0:
-        stderr = safe_text(completed.stderr) or safe_text(completed.stdout) or 'unknown osascript error'
-        fail(f'true PPTX render proof failed via PowerPoint AppleScript: {stderr}')
-    png_files = sorted(path for path in preview_dir.glob('*.png') if path.is_file())
+        stderr = safe_text(completed.stderr) or safe_text(completed.stdout) or 'unknown LibreOffice error'
+        fail(f'true PPTX render proof failed via LibreOffice headless: {stderr}')
+    converted_pdf = convert_dir / f'{output_pptx.stem}.pdf'
+    if not converted_pdf.exists():
+        fail(f'LibreOffice headless did not produce expected PDF: {converted_pdf}')
+    if converted_pdf.resolve() != pdf_target.resolve():
+        if pdf_target.exists():
+            pdf_target.unlink()
+        shutil.move(str(converted_pdf), str(pdf_target))
+
+
+def render_png_from_pdf(pdf_file: Path, preview_dir: Path, renderer: dict) -> list[Path]:
+    if not pdf_file.exists():
+        fail(f'LibreOffice PDF render output missing before Poppler conversion: {pdf_file}')
+    prefix = preview_dir / 'slide'
+    completed = subprocess.run(
+        [renderer['pdftoppm'], '-png', '-r', '144', str(pdf_file), str(prefix)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        stderr = safe_text(completed.stderr) or safe_text(completed.stdout) or 'unknown Poppler error'
+        fail(f'PDF-to-PNG render proof conversion failed with Poppler pdftoppm: {stderr}')
+    return sorted(path for path in preview_dir.glob('slide-*.png') if path.is_file())
+
+
+def render_pptx(
+    output_pptx: Path,
+    preview_dir: Path,
+    output_pdf: Path | None,
+    renderer_name: str = 'auto',
+) -> dict:
+    renderer = resolve_renderer(renderer_name)
+    pdf_target = output_pdf or (preview_dir / 'render-proof.pdf')
+    clean_render_outputs(preview_dir, pdf_target)
+    render_pptx_to_pdf(output_pptx, pdf_target, renderer)
+    png_files = render_png_from_pdf(pdf_target, preview_dir, renderer)
     if not png_files:
-        png_files = render_png_from_pdf(pdf_target, preview_dir)
-    if not png_files:
-        fail(f'true PPTX render proof produced no PNG previews in {preview_dir}')
-    if output_pdf and not output_pdf.exists() and pdf_target.exists():
-        shutil.copyfile(pdf_target, output_pdf)
+        fail(f'true PPTX render proof produced no Poppler PNG previews in {preview_dir}')
+    preview_hashes = [
+        {
+            'file': str(path),
+            'sha256': file_sha256(path),
+        }
+        for path in png_files
+    ]
     return {
         'source_surface_kind': 'native_pptx',
-        'renderer_kind': 'powerpoint_applescript',
+        'renderer_kind': renderer['kind'],
+        'renderer_pipeline': renderer['pipeline'],
         'synthetic_preview': False,
         'required': True,
         'pptx_file': str(output_pptx),
-        'pdf_file': str(output_pdf or pdf_target),
+        'pdf_file': str(pdf_target),
+        'libreoffice_version': renderer['libreoffice_version'],
+        'poppler_version': renderer['poppler_version'],
+        'platform': platform_provenance(),
+        'source_pptx_sha256': file_sha256(output_pptx),
+        'pdf_sha256': file_sha256(pdf_target),
+        'preview_png_hashes': preview_hashes,
+        'slide_count': len(png_files),
         'preview_screenshots': [str(path) for path in png_files],
     }
-
-
-def render_png_from_pdf(pdf_file: Path, preview_dir: Path) -> list[Path]:
-    if not pdf_file.exists():
-        return []
-    pdftoppm = shutil.which('pdftoppm')
-    if pdftoppm:
-        prefix = preview_dir / 'slide'
-        completed = subprocess.run(
-            [pdftoppm, '-png', '-r', '144', str(pdf_file), str(prefix)],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        if completed.returncode != 0:
-            stderr = safe_text(completed.stderr) or safe_text(completed.stdout)
-            fail(f'PDF-to-PNG render proof conversion failed with pdftoppm: {stderr}')
-        return sorted(path for path in preview_dir.glob('slide-*.png') if path.is_file())
-    magick = shutil.which('magick') or shutil.which('convert')
-    if magick:
-        output_pattern = str(preview_dir / 'slide-%02d.png')
-        completed = subprocess.run(
-            [magick, '-density', '144', str(pdf_file), output_pattern],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        if completed.returncode != 0:
-            stderr = safe_text(completed.stderr) or safe_text(completed.stdout)
-            fail(f'PDF-to-PNG render proof conversion failed with ImageMagick: {stderr}')
-        return sorted(path for path in preview_dir.glob('slide-*.png') if path.is_file())
-    fail('PowerPoint PDF render succeeded, but no PDF-to-PNG converter is available for preview screenshots')
 
 
 def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
@@ -326,15 +398,32 @@ def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
             f'{len(preview_files)} previews for {len(manifest_slides)} manifest slides'
         )
     attached = []
-    for slide, preview_file in zip(manifest_slides, preview_files):
+    preview_hashes = safe_list(render_proof.get('preview_png_hashes'))
+    for index, (slide, preview_file) in enumerate(zip(manifest_slides, preview_files)):
         if not preview_file.exists():
             fail(f'true PPTX render proof screenshot missing: {preview_file}')
+        preview_sha256 = file_sha256(preview_file)
+        if index < len(preview_hashes) and preview_hashes[index].get('sha256') != preview_sha256:
+            fail(f'true PPTX render proof screenshot hash mismatch: {preview_file}')
+        render_provenance = {
+            'renderer_kind': render_proof.get('renderer_kind'),
+            'renderer_pipeline': render_proof.get('renderer_pipeline'),
+            'source_surface_kind': render_proof.get('source_surface_kind'),
+            'source_pptx_sha256': render_proof.get('source_pptx_sha256'),
+            'pdf_sha256': render_proof.get('pdf_sha256'),
+            'preview_screenshot_sha256': preview_sha256,
+            'preview_screenshot_file': str(preview_file),
+            'synthetic_preview': False,
+        }
         attached.append({
             **slide,
             'preview_screenshot_file': str(preview_file),
-            'preview_screenshot_sha256': file_sha256(preview_file),
+            'preview_screenshot_sha256': preview_sha256,
             'preview_screenshot_dimensions': image_dimensions(preview_file),
             'render_proof_source': 'true_pptx_render',
+            'renderer_kind': render_proof.get('renderer_kind'),
+            'renderer_pipeline': render_proof.get('renderer_pipeline'),
+            'render_provenance': render_provenance,
             'synthetic_preview': False,
         })
     return attached
@@ -348,6 +437,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--shape-manifest', required=True)
     parser.add_argument('--preview-dir', required=True)
     parser.add_argument('--output-pdf')
+    parser.add_argument('--renderer', choices=['auto', RENDERER_KIND], default='auto')
     parser.add_argument('--repair-log')
     parser.add_argument('--engine-contract', default=str(DEFAULT_ENGINE_CONTRACT_FILE))
     return parser.parse_args()
@@ -374,7 +464,7 @@ def main() -> None:
     except RuntimeError as exc:
         fail(str(exc))
     output_pdf = Path(args.output_pdf).resolve() if args.output_pdf else None
-    render_proof = render_powerpoint_pptx(output_pptx, preview_dir, output_pdf)
+    render_proof = render_pptx(output_pptx, preview_dir, output_pdf, renderer_name=args.renderer)
     manifest_slides = attach_rendered_previews(manifest_slides, render_proof)
     preview_files = safe_list(render_proof.get('preview_screenshots'))
     repair_log_file = Path(args.repair_log).resolve() if args.repair_log else None
