@@ -68,7 +68,10 @@ test('CI workflow pins reproducible toolchain and keeps hosted CI on the honest 
   assert.match(workflow, /node-version-file:\s*['"]?\.nvmrc['"]?/);
   assert.match(workflow, /cache:\s*['"]?npm['"]?/);
   assert.match(workflow, /\brun:\s*npm ci\b/);
-  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?tools\/native-ppt-proof\/install-deps\.sh[\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta/);
+  assert.match(workflow, /quality:\n[\s\S]*?uses:\s*actions\/setup-python@v6\b[\s\S]*?python-version:\s*['"]3\.12['"][\s\S]*?python3 -m pip install -r \.github\/requirements\/ci-python\.txt[\s\S]*?python3 -m playwright install --with-deps chromium[\s\S]*?npm run typecheck[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts fast[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts family[\s\S]*?node --experimental-strip-types scripts\/run-test-group\.ts meta/);
+  assert.doesNotMatch(workflow, /quality:\n[\s\S]*?tools\/native-ppt-proof\/install-deps\.sh[\s\S]*?Run build and typecheck/);
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.match(workflow, /native-ppt-proof:\n[\s\S]*?if:\s*github\.event_name == 'workflow_dispatch'[\s\S]*?tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof[\s\S]*?uses:\s*actions\/upload-artifact@v6[\s\S]*?name:\s*native-ppt-proof[\s\S]*?path:\s*artifacts\/native-ppt-proof/);
   assert.doesNotMatch(workflow, /\n\s{2}integration:\n/);
   assert.doesNotMatch(workflow, /\n\s{2}render-e2e:\n/);
 
@@ -83,24 +86,36 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   const docs = readRepoFile('docs/native-ppt-proof-environment.md');
   const workflow = readRepoFile('.github/workflows/ci.yml');
   const installScript = readRepoFile('tools/native-ppt-proof/install-deps.sh');
+  const runner = readRepoFile('tools/native-ppt-proof/run.sh');
 
   for (const source of [dockerfile, docs, installScript]) {
     assert.match(source, /libreoffice/);
-    assert.match(source, /poppler-utils/);
+    assert.match(source, /poppler-utils|Poppler/);
     assert.match(source, /fonts-noto-cjk/);
   }
 
-  assert.match(workflow, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(runner, /LibreOffice\/Poppler/);
+  assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof/);
   assert.match(installScript, /brew install --cask libreoffice/);
   assert.match(installScript, /brew install poppler/);
   assert.match(installScript, /apt-get install -y libreoffice poppler-utils fonts-noto-cjk/);
+  assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(runner, /redcube_ai\.native_helpers\.doctor/);
+  assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native/);
+  assert.match(runner, /native-helper-output\.json/);
+  assert.match(runner, /proof-summary\.json/);
+  assert.match(runner, /synthetic preview/);
   assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
   assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
   assert.match(docs, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(docs, /tools\/native-ppt-proof\/run\.sh/);
   assert.match(docs, /npm ci/);
   assert.match(docs, /python3? -m redcube_ai\.native_helpers\.doctor/);
-  assert.doesNotMatch(dockerfile, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
-  assert.doesNotMatch(dockerfile, new RegExp(['osa', 'script'].join(''), 'i'));
+  for (const source of [dockerfile, runner]) {
+    assert.doesNotMatch(source, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
+    assert.doesNotMatch(source, new RegExp(['osa', 'script'].join(''), 'i'));
+  }
   assert.match(docs, /does not replace RedCube product-entry/);
 });
 

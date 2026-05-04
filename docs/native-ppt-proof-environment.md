@@ -29,11 +29,19 @@ npm ci
 python3 -m redcube_ai.native_helpers.doctor
 ```
 
+Run the repo-owned native proof runner:
+
+```bash
+tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
+```
+
+The runner installs native proof system dependencies unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set, builds the TypeScript packages, checks the product-entry manifest/frontdesk native lane, and renders the six-page native PPT benchmark through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `product-manifest.json`, `product-frontdesk.json`, `native-helper-output.json`, `proof-summary.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory.
+
 Build and run the Docker proof image:
 
 ```bash
 docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof .
-docker run --rm -it -v "$PWD:/workspace" -w /workspace redcube-native-ppt-proof bash -lc "npm ci && python3 -m redcube_ai.native_helpers.doctor"
+docker run --rm -it -v "$PWD:/workspace" -w /workspace redcube-native-ppt-proof bash -lc "npm ci && tools/native-ppt-proof/run.sh --skip-system-deps --output-dir artifacts/native-ppt-proof"
 ```
 
 The doctor reports `renderer_availability.linux_native_proof` with blocked reasons and the suggested Docker command. Fast/meta tests only read diagnostics and importability; they must not invoke the real native PPT renderer or review/export gates.

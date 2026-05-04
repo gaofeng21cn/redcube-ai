@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -28,9 +29,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install native proof system dependencies
-        run: tools/native-ppt-proof/install-deps.sh
-
       - name: Install Python test dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -53,3 +51,42 @@ jobs:
 
       - name: Run meta tests
         run: node --experimental-strip-types scripts/run-test-group.ts meta
+
+  native-ppt-proof:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Python native helper dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r .github/requirements/ci-python.txt
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run native PPT true proof
+        run: tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
+
+      - name: Upload native PPT proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: native-ppt-proof
+          path: artifacts/native-ppt-proof
