@@ -33,6 +33,8 @@ export type XhsRecipeId =
   | 'xhs.evidence_bands'
   | 'xhs.checklist_close';
 
+export type XhsPackProvenanceSource = 'prompt_pack_seed' | 'runtime_artifact_provenance';
+
 export interface PackDeliverablePaths {
   deliverableId: string;
   deliverableDir: string;
@@ -267,8 +269,8 @@ export interface XhsRenderSlide {
   speaker_seconds: number;
   total_slides: number;
   creative_sources: {
-    recipe_selection: 'codex_cli_json_output';
-    final_markup: 'codex_cli_json_output';
+    recipe_selection: XhsPackProvenanceSource;
+    final_markup: XhsPackProvenanceSource;
   };
   content: string;
 }

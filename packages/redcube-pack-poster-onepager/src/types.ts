@@ -5,10 +5,10 @@ export type PosterMigrationMode = 'draft_new' | 'optimize_existing';
 export type PosterLayoutFamily = 'hero_band' | 'evidence_columns' | 'pathway_strip' | 'action_footer';
 export type PosterRecipeId = 'poster.hero_band' | 'poster.evidence_columns' | 'poster.pathway_strip' | 'poster.action_footer';
 
-export interface PosterCreativeSourceStamp {
-  owner: 'host_agent';
-  primary_surface: 'codex_native_host_agent';
-  stage_owner: 'codex_native_host_agent';
+export interface PosterPackProvenanceStamp {
+  owner: 'runtime_artifact_provenance';
+  primary_surface: 'runtime_artifact_provenance';
+  stage_owner: 'runtime_artifact_provenance';
   route: string;
   lifecycle_stage: string;
   authored_surface: string;
@@ -108,8 +108,8 @@ export interface PosterBlueprintSlide {
     canvas: PosterCanvasContract;
   };
   creative_sources: {
-    major_blueprint_text: PosterCreativeSourceStamp;
-    render_recipe_id: PosterCreativeSourceStamp;
+    major_blueprint_text: PosterPackProvenanceStamp;
+    render_recipe_id: PosterPackProvenanceStamp;
   };
 }
 
@@ -173,9 +173,9 @@ export interface PosterVisualDirectionArtifact {
     };
     baseline_deliverable_id: string | null;
     creative_sources?: {
-      visual_manifest: PosterCreativeSourceStamp;
-      poster_motif: PosterCreativeSourceStamp;
-      page_family_ceiling: PosterCreativeSourceStamp;
+      visual_manifest: PosterPackProvenanceStamp;
+      poster_motif: PosterPackProvenanceStamp;
+      page_family_ceiling: PosterPackProvenanceStamp;
     };
   };
 }
@@ -218,14 +218,14 @@ export interface PosterRenderSlide {
   };
   total_slides: number;
   creative_sources: {
-    recipe_selection: PosterCreativeSourceStamp;
-    final_markup: PosterCreativeSourceStamp;
+    recipe_selection: PosterPackProvenanceStamp;
+    final_markup: PosterPackProvenanceStamp;
   };
   creative_authorship: {
     recipe_decision: PosterRenderSlide['creative_sources']['recipe_selection'];
     final_html_markup: PosterRenderSlide['creative_sources']['final_markup'];
   };
-  markup_contract_source: 'codex_cli_json_output';
+  markup_contract_source: 'runtime_artifact_provenance';
   content: string;
 }
 

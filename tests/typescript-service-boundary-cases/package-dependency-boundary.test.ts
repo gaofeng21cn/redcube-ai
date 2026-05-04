@@ -42,7 +42,7 @@ const ALLOWED_DEPENDENCY_LAYERS = new Map([
   ['runtime', new Set(['client', 'config', 'governance', 'overlay', 'reference', 'runtime-family-registry', 'protocol', 'substrate'])],
   ['runtime-family-registry', new Set(['runtime-family'])],
   ['runtime-family', new Set(['client', 'config', 'governance', 'overlay', 'pack', 'reference', 'protocol', 'substrate'])],
-  ['overlay', new Set(['overlay', 'pack', 'substrate'])],
+  ['overlay', new Set(['overlay', 'pack', 'protocol'])],
   ['pack', new Set(['pack', 'protocol'])],
   ['protocol', new Set(['protocol'])],
   ['config', new Set(['config', 'protocol'])],

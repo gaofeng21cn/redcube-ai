@@ -27,6 +27,8 @@ test('P17 slice 3: overlay-core exposes a TypeScript entrypoint and typed regist
   const types = readFileSync(path.resolve('packages/redcube-overlay-core/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './dist/index.d.ts');
+  assert.equal(pkg.dependencies?.['@redcube/runtime-protocol'], '0.1.0');
+  assert.equal(pkg.dependencies?.['@redcube/hermes-substrate'], undefined);
   assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-core'),

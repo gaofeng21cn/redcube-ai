@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -12,6 +12,19 @@ function readImplementation(file) {
   const source = read(file);
   const shell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
+}
+
+function sourceFiles(dir) {
+  return readdirSync(path.resolve(dir), { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return sourceFiles(file);
+    }
+    if (entry.isFile() && /\.(?:ts|js|mjs|cjs)$/.test(entry.name)) {
+      return [file];
+    }
+    return [];
+  });
 }
 
 test('pack shells no longer export xiaohongshu creative builders or compilers', () => {
@@ -114,4 +127,33 @@ test('poster_onepager onboarding still reads prompt-pack and rerun policy from h
   assert.equal(posterRuntimeCore.includes('prompts/poster_onepager'), false);
   assert.equal(posterRuntimeCore.includes('DEFAULT_PROMPT_PACK'), false);
   assert.equal(posterRuntimeCore.includes('contract?.review_surface?.rerun_from_stage'), true);
+});
+
+test('pack source types do not encode executor-owner provenance strings', () => {
+  const packSourceRoots = [
+    'packages/redcube-pack-ppt/src',
+    'packages/redcube-pack-poster-onepager/src',
+    'packages/redcube-pack-xiaohongshu/src',
+  ];
+  const bannedExecutorOwnerStrings = [
+    'host_agent',
+    'hermes',
+    'codex_cli_json_output',
+    'codex_native_host_agent',
+  ];
+  const violations = [];
+
+  for (const root of packSourceRoots) {
+    assert.equal(statSync(path.resolve(root)).isDirectory(), true);
+    for (const file of sourceFiles(root)) {
+      const source = read(file);
+      for (const banned of bannedExecutorOwnerStrings) {
+        if (source.includes(banned)) {
+          violations.push(`${file}: ${banned}`);
+        }
+      }
+    }
+  }
+
+  assert.deepEqual(violations, []);
 });

@@ -55,6 +55,8 @@ export type PptRecipeId =
   | 'ppt.summary_peak'
   | `ppt.${PptLayoutFamily}`;
 
+export type PptPackProvenanceSource = 'prompt_pack_seed' | 'runtime_artifact_provenance';
+
 export interface PptCanvasContract {
   width: number;
   height: number;
@@ -144,8 +146,8 @@ export interface PptDetailedOutlineSummary {
   public_sources: string[];
   render_recipe_id: PptRecipeId;
   creative_sources: {
-    major_text: 'hermes';
-    recipe_selection: 'hermes';
+    major_text: PptPackProvenanceSource;
+    recipe_selection: PptPackProvenanceSource;
   };
 }
 
@@ -192,11 +194,11 @@ export interface PptBlueprintSlide {
   speaker_seconds: number;
   transition_sentence: string;
   creative_sources: {
-    page_core_content: 'hermes';
-    speaker_notes: 'hermes';
-    transition_sentence: 'hermes';
-    visual_presentation: 'hermes';
-    recipe_selection: 'hermes';
+    page_core_content: PptPackProvenanceSource;
+    speaker_notes: PptPackProvenanceSource;
+    transition_sentence: PptPackProvenanceSource;
+    visual_presentation: PptPackProvenanceSource;
+    recipe_selection: PptPackProvenanceSource;
   };
 }
 
@@ -254,10 +256,10 @@ export interface PptVisualDirection {
   baseline_deliverable_id: string | null;
   mode: PptMigrationMode;
   creative_sources?: {
-    visual_manifest: 'hermes';
-    rhythm_curve: 'hermes';
-    peak_pages: 'hermes';
-    page_family_ceiling: 'hermes';
+    visual_manifest: PptPackProvenanceSource;
+    rhythm_curve: PptPackProvenanceSource;
+    peak_pages: PptPackProvenanceSource;
+    page_family_ceiling: PptPackProvenanceSource;
   };
 }
 
@@ -308,10 +310,10 @@ export interface PptRenderSlide {
   palette: PptPalette;
   total_slides: number;
   creative_sources: {
-    recipe_selection: 'codex_cli_json_output';
-    final_markup: 'codex_cli_json_output';
+    recipe_selection: PptPackProvenanceSource;
+    final_markup: PptPackProvenanceSource;
   };
-  markup_contract_source: 'codex_cli_json_output';
+  markup_contract_source: 'runtime_artifact_provenance';
   content: string;
 }
 

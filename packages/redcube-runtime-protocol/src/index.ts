@@ -32,6 +32,9 @@ import {
   materializeScreenshotCaptureStore as materializeScreenshotCaptureStoreJs,
 } from './screenshot-capture-store.js';
 import {
+  buildCodexRuntimeTopology as buildCodexRuntimeTopologyTs,
+} from './runtime-topology.js';
+import {
   buildPythonHelperEnv as buildPythonHelperEnvTs,
   pythonHelperReference as pythonHelperReferenceTs,
   resolvePythonHelperInvocation as resolvePythonHelperInvocationTs,
@@ -41,6 +44,7 @@ import {
 
 import type {
   BuildSourceTruthConsumptionSummaryOptions,
+  CodexRuntimeTopology,
   CreateManagedRunRecordInput,
   ManagedControllerDecisionRecord,
   ManagedEscalationRecord,
@@ -206,12 +210,17 @@ export function materializeScreenshotCaptureStore(input: Record<string, unknown>
   return materializeScreenshotCaptureStoreJs(input) as Record<string, unknown>;
 }
 
+export function buildCodexRuntimeTopology(): CodexRuntimeTopology {
+  return buildCodexRuntimeTopologyTs();
+}
+
 export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 };
 
 export type {
   BuildSourceTruthConsumptionSummaryOptions,
+  CodexRuntimeTopology,
   CreateManagedRunRecordInput,
   ManagedControllerDecisionRecord,
   ManagedEscalationRecord,

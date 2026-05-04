@@ -1,5 +1,6 @@
 // @ts-nocheck
 await import('./typescript-service-boundary-cases/package-dependency-boundary.test.ts');
+await import('./typescript-service-boundary-cases/runtime-topology-authority.test.ts');
 
 import test from 'node:test';
 import assert from 'node:assert/strict';

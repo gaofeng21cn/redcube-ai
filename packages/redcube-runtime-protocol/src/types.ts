@@ -56,6 +56,24 @@ export interface RedCubePythonHelperRunResult {
   payload: unknown;
 }
 
+export interface CodexRuntimeTopology {
+  schema_version: 1;
+  executor_backend: 'codex_cli';
+  execution_shape: 'structured_call';
+  runtime_substrate_owner: 'Codex CLI';
+  runtime_substrate_surface: 'codex_native_host_agent';
+  deployment_host: 'codex_local_operator_host';
+  deployment_host_status: 'active_primary';
+  gateway_role: 'visual_deliverable_domain_gateway';
+  domain_harness_os: 'RedCube Domain Harness OS';
+  family_pack_boundary: 'family_profile_pack_harness_execution';
+  product_mode: 'auto_only';
+  default_formal_entry: 'CLI';
+  supported_protocol_layer: ['MCP'];
+  internal_controller_surface: 'controller';
+  controller_repo_verified: false;
+}
+
 export interface WorkspaceContract {
   workspaceRoot: string;
   workspaceFile: string;

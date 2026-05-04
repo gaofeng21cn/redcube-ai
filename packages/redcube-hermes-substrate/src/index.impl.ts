@@ -3,7 +3,11 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
-import { createRunRecord, resolveWorkspaceContract } from '@redcube/runtime-protocol';
+import {
+  buildCodexRuntimeTopology as buildProtocolCodexRuntimeTopology,
+  createRunRecord,
+  resolveWorkspaceContract,
+} from '@redcube/runtime-protocol';
 
 export const HERMES_SUBSTRATE_OWNER = 'Hermes';
 export const HERMES_RUNTIME_SURFACE = 'hermes_backed_runtime_substrate';
@@ -39,24 +43,6 @@ const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   runtime_substrate_surface: HERMES_RUNTIME_SURFACE,
   deployment_host: HERMES_DEPLOYMENT_HOST,
   deployment_host_status: HERMES_DEPLOYMENT_STATUS,
-  gateway_role: 'visual_deliverable_domain_gateway',
-  domain_harness_os: 'RedCube Domain Harness OS',
-  family_pack_boundary: 'family_profile_pack_harness_execution',
-  product_mode: 'auto_only',
-  default_formal_entry: 'CLI',
-  supported_protocol_layer: ['MCP'],
-  internal_controller_surface: 'controller',
-  controller_repo_verified: false,
-});
-
-const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
-  schema_version: 1,
-  executor_backend: CODEX_EXECUTOR_BACKEND,
-  execution_shape: STRUCTURED_CALL_EXECUTION_SHAPE,
-  runtime_substrate_owner: 'Codex CLI',
-  runtime_substrate_surface: CODEX_RUNTIME_SURFACE,
-  deployment_host: CODEX_DEPLOYMENT_HOST,
-  deployment_host_status: CODEX_DEPLOYMENT_STATUS,
   gateway_role: 'visual_deliverable_domain_gateway',
   domain_harness_os: 'RedCube Domain Harness OS',
   family_pack_boundary: 'family_profile_pack_harness_execution',
@@ -345,10 +331,7 @@ export function buildHermesRuntimeTopology() {
 }
 
 export function buildCodexRuntimeTopology() {
-  return {
-    ...CODEX_RUNTIME_TOPOLOGY,
-    supported_protocol_layer: [...CODEX_RUNTIME_TOPOLOGY.supported_protocol_layer],
-  };
+  return buildProtocolCodexRuntimeTopology();
 }
 
 export function buildHermesNativeProofRuntimeTopology() {

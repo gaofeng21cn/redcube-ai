@@ -1,4 +1,4 @@
-import { buildCodexRuntimeTopology } from '@redcube/hermes-substrate';
+import { buildCodexRuntimeTopology } from '@redcube/runtime-protocol';
 
 import type {
   DeliverableRecord,
