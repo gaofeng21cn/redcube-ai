@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync, utimesSync } from 'node:fs';
 import { createServer } from 'node:http';
+import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
@@ -17,10 +18,17 @@ import {
 } from './mock-codex-cli.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 
+const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+]);
+
 async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
   });
   try {
     return await testFn();

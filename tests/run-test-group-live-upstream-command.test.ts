@@ -293,7 +293,12 @@ test('serialized route-heavy verification files stay on the mock codex upstream 
 });
 
 test('native PPT fast runtime tests use the mock Python helper instead of launching the native renderer', () => {
-  for (const file of ['tests/ppt-native-ppt-runtime.test.ts', 'tests/ppt-hermes-generation.test.ts']) {
+  for (const file of [
+    'tests/ppt-native-ppt-runtime.test.ts',
+    'tests/ppt-hermes-generation.test.ts',
+    'tests/runtime-deliverable-route-recovery.test.ts',
+    'tests/runtime-deliverable-route-cases/shared.ts',
+  ]) {
     const content = readFileSync(file, 'utf-8');
     assert.match(content, /mock-redcube-python-with-playwright\.ts/);
     assert.match(content, /REDCUBE_PYTHON_COMMAND/);

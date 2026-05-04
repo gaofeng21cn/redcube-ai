@@ -26,11 +26,17 @@ export const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.ts'),
 ]);
+export const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
+  process.execPath,
+  '--experimental-strip-types',
+  path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.ts'),
+]);
 
 export async function withMockHermesUpstream(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
   });
   try {
     return await testFn();
