@@ -1,7 +1,7 @@
 {
   "contract_id": "ppt-native-authoring-proof-lane",
   "date_anchor": "2026-04-25",
-  "status": "runtime_proof_landed",
+  "status": "production_hardening_landed",
   "owner": "redcube_ai",
   "deliverable_family": "ppt_deck",
   "scope": {
@@ -96,6 +96,10 @@
         "occupied_ratio",
         "edge_clearance",
         "overlap_pairs",
+        "decorative_shape_count",
+        "shape_kind_count",
+        "role_count",
+        "layout_richness_score",
         "preview_screenshot_sha256",
         "preview_screenshot_dimensions"
       ],
@@ -116,12 +120,24 @@
         "true_render_proof_renderer": "libreoffice_headless",
         "cross_platform_render_required": true
       },
-      "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX"
+      "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX and records operator-facing proof summary, source/final hashes, renderer provenance, shape manifest, repair log, and PNG proof refs"
+    },
+    "production_hardening": {
+      "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
+      "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
+      "ci_manual_lane": ".github/workflows/ci.yml workflow_dispatch native-ppt-proof",
+      "visual_benchmark_fixture": "tests/fixtures/ppt-native-visual-benchmark/benchmark.json",
+      "export_operator_proof_summary": "native_export_bundle_operator_proof_summary_v1"
     },
     "required_export_fields": [
       "export_bundle.source_pptx",
       "export_bundle.native_ppt_shape_manifest",
-      "export_bundle.native_ppt_repair_log"
+      "export_bundle.native_ppt_repair_log",
+      "export_bundle.source_artifacts",
+      "export_bundle.evidence_hashes",
+      "export_bundle.renderer_proof",
+      "export_bundle.shape_manifest_summary",
+      "export_bundle.operator_proof_summary"
     ]
   },
   "promotion_gates": [

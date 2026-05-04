@@ -51,10 +51,20 @@
       "occupied_ratio",
       "edge_clearance",
       "overlap_pairs",
+      "decorative_shape_count",
+      "shape_kind_count",
+      "role_count",
+      "layout_richness_score",
       "preview_screenshot_sha256",
       "preview_screenshot_dimensions"
     ],
     "fail_closed_when_missing": true
+  },
+  "production_hardening": {
+    "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
+    "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
+    "visual_benchmark_fixture": "tests/fixtures/ppt-native-visual-benchmark/benchmark.json",
+    "operator_export_proof_summary": "native_export_bundle_operator_proof_summary_v1"
   },
   "ai_first_boundary": {
     "creative_owner": "llm_agent",

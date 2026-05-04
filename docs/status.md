@@ -29,6 +29,7 @@
 - executor routing 配置为 opt-in：`config/examples/executor-routing.example.json` 仅作示例，真实本机配置放 `$CODEX_HOME/projects/redcube-ai/runtime-state/config/executor-routing.json`、`config/local/executor-routing.json` 或 `REDCUBE_EXECUTOR_ROUTING_CONFIG`。RCA 只保存 Hermes profile id，不保存 provider/base URL/API key/model list。
 - `ppt_deck` native PPT authoring / repair 已作为生产可选、默认关闭路线落到可运行 executor：`author_pptx_native` 通过 RedCube clean-room SVG IR 与 DrawingML writer 生成可编辑 PPTX、shape manifest 和 true PPTX render proof，`repair_pptx_native` 消费 `screenshot_review` feedback 并记录 repair log；默认 visual route 仍是 `render_html`
 - native PPT selectable lane 已登记在 `contracts/runtime-program/python-native-helper-catalog.json`；Python helper 现在由 repo-owned `redcube_ai` package 承载，既有脚本只保留兼容入口；Python helper 不能绕过 `visual_director_review`、`screenshot_review` 与 `export_pptx` gate，也不能替代 RedCube product-entry/runtime-family route
+- native PPT 生产硬化已补齐真实 product-entry smoke、可复现 proof runner、手动 CI true-proof lane、视觉 benchmark 与 export operator proof summary：`tests/product-entry-native-ppt-live-proof.test.ts` 走 source readiness、create deliverable、`author_pptx_native`、review gates 与 export；`tools/native-ppt-proof/run.sh` 在 LibreOffice headless -> PDF -> Poppler PNG 环境生成 editable PPTX、PDF、PNG、shape manifest 与 proof summary；默认 fast/meta 仍不触发真实 renderer
 - domain durable handles：`program_id`、`topic_id`、`deliverable_id`、`run_id`
 
 ## 当前验证口径

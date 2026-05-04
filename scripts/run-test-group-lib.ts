@@ -25,6 +25,7 @@ export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/ppt-deliverable-e2e.test.ts',
   'tests/ppt-deliverable-surface.test.ts',
   'tests/ppt-native-ppt-runtime.test.ts',
+  'tests/product-entry-native-ppt-live-proof.test.ts',
   'tests/publication-projection-delivery-contract.test.ts',
   'tests/reference-quality-os-replacement.test.ts',
   'tests/reference-regression.test.ts',

@@ -217,6 +217,70 @@
           "true_render_proof_renderer": "libreoffice_headless",
           "cross_platform_render_required": true
         },
+        "production_hardening": {
+          "live_product_entry_proof": {
+            "status": "landed",
+            "test": "tests/product-entry-native-ppt-live-proof.test.ts",
+            "route_chain": [
+              "source_readiness",
+              "create_deliverable",
+              "author_pptx_native",
+              "visual_director_review",
+              "screenshot_review",
+              "export_pptx"
+            ],
+            "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+            "synthetic_preview_allowed": false
+          },
+          "proof_runner": {
+            "status": "landed",
+            "command": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
+            "artifacts": [
+              "doctor.json",
+              "product-manifest.json",
+              "product-frontdesk.json",
+              "native-helper-output.json",
+              "proof-summary.json",
+              "editable PPTX",
+              "PDF",
+              "shape manifest",
+              "PNG screenshots"
+            ]
+          },
+          "ci_manual_lane": {
+            "status": "landed",
+            "workflow": ".github/workflows/ci.yml",
+            "trigger": "workflow_dispatch",
+            "default_quality_lane_runs_true_renderer": false,
+            "uploads_artifacts": true
+          },
+          "visual_benchmark": {
+            "status": "landed",
+            "fixture": "tests/fixtures/ppt-native-visual-benchmark/benchmark.json",
+            "minimum_pages": 6,
+            "quality_checks": [
+              "layout diversity",
+              "editable shape richness",
+              "field leakage regression",
+              "PNG preview manifest metrics",
+              "no screenshot packaging into PPTX"
+            ]
+          },
+          "export_evidence": {
+            "status": "landed",
+            "operator_proof_summary": "native_export_bundle_operator_proof_summary_v1",
+            "records_hashes": [
+              "source PPTX",
+              "source PDF",
+              "shape manifest",
+              "repair log",
+              "final PPTX",
+              "final PDF",
+              "preview PNG"
+            ],
+            "repair_scope": "blocked_slide_ids_where_available"
+          }
+        },
         "replaces_routes": [
           "render_html",
           "fix_html"

@@ -99,6 +99,7 @@ const INTEGRATION = [
   'tests/preflight-gates.test.ts',
   'tests/private-profile.test.ts',
   'tests/product-entry-manuscript-source.test.ts',
+  'tests/product-entry-native-ppt-live-proof.test.ts',
   'tests/product-entry-native-ppt-proof-lane.test.ts',
   'tests/product-entry-runtime-manager-registration.test.ts',
   'tests/product-entry-session-checkpoint.test.ts',
