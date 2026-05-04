@@ -19,6 +19,7 @@
     "test:e2e": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e",
     "test:historical": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts historical",
     "test:full": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full",
+    "test:full:remaining": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:remaining",
     "test:line-budget": "node --experimental-strip-types scripts/check-line-budget.ts",
     "typecheck": "npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false",
     "build": "tsc --build tsconfig.json --pretty false --force && node --experimental-strip-types scripts/sync-package-runtime-exports.ts",

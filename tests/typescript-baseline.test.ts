@@ -106,6 +106,7 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:e2e'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e');
   assert.equal(pkg.scripts['test:historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts historical');
   assert.equal(pkg.scripts['test:full'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full');
+  assert.equal(pkg.scripts['test:full:remaining'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:remaining');
   assert.equal(pkg.scripts.typecheck, 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false');
   assert.equal(
     pkg.scripts['audit:typescript-closeout'],

@@ -50,7 +50,7 @@ async function runChain({ workspaceRoot, deliverableId, mode = 'draft_new', base
     'detailed_outline',
     'slide_blueprint',
     'visual_direction',
-    'render_html',
+    'author_image_pages',
     'visual_director_review',
     'screenshot_review',
   ];
@@ -255,27 +255,23 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
     assert.equal(Array.isArray(visualDirection.visual_direction?.forbidden_regressions), true);
     assert.equal(Array.isArray(visualDirection.visual_direction?.page_role_table), true);
 
-    const renderBundle = readJson(chain[4].result.artifactFile);
-    assert.equal(typeof renderBundle.html_bundle?.html_file, 'string');
-    assert.equal(existsSync(renderBundle.html_bundle.html_file), true);
-    assert.equal(renderBundle.html_bundle?.render_strategy, 'prompt_director_first');
-    assert.deepEqual(
-      renderBundle.html_bundle?.generator_instructions,
-      visualDirection.visual_direction?.final_instruction_to_html_generator,
-    );
-    assert.deepEqual(
-      renderBundle.html_bundle?.slides?.map((slide) => slide.layout_family),
-      blueprint.slide_blueprint.slides.map((slide) => slide.visual_presentation.layout_family),
-    );
-    assert.equal(renderBundle.html_bundle?.slides.every((slide) => typeof slide.recipe_id === 'string' && slide.recipe_id.length > 0), true);
-    const html = readFileSync(renderBundle.html_bundle.html_file, 'utf-8');
-    assert.match(html, /id="slide-display-area"/);
-    assert.match(html, /id="prev-btn"/);
-    assert.match(html, /id="next-btn"/);
-    assert.match(html, /const slidesData =\s*\[/);
-    assert.match(html, /data-render-strategy="prompt-director-first"/);
-    assert.match(html, /id="redcube-render-plan"/);
-    assert.equal(/renderSlide|layoutByType|cardsGrid|pageType/.test(html), false);
+    const imageBundle = readJson(chain[4].result.artifactFile);
+    assert.equal(imageBundle.route, 'author_image_pages');
+    assert.equal(imageBundle.status, 'completed');
+    assert.equal(imageBundle.image_generation_runtime?.endpoint, '/responses');
+    assert.equal(imageBundle.image_generation_runtime?.token_persisted, false);
+    assert.equal(imageBundle.image_pages_bundle?.source_visual_route, 'author_image_pages');
+    assert.equal(imageBundle.image_pages_bundle?.editable, false);
+    assert.equal(imageBundle.image_page_manifest?.page_count, blueprint.slide_blueprint.slides.length);
+    assert.equal(imageBundle.image_pages_bundle?.page_count, blueprint.slide_blueprint.slides.length);
+    assert.equal(Array.isArray(imageBundle.image_page_manifest?.slides), true);
+    assert.equal(imageBundle.image_page_manifest.slides.every((slide) => existsSync(slide.image_file)), true);
+    assert.equal(imageBundle.image_page_manifest.slides.every((slide) => existsSync(slide.source.prompt_file)), true);
+    assert.equal(existsSync(imageBundle.image_page_manifest.prompt_manifest), true);
+    assert.equal(existsSync(imageBundle.image_page_manifest.style_manifest), true);
+    assert.equal(existsSync(imageBundle.image_page_manifest.generation_metadata_file), true);
+    assert.equal(imageBundle.image_pages_bundle.pages.every((page) => existsSync(page.prompt_manifest_file)), true);
+    assert.equal(imageBundle.image_pages_bundle.pages.every((page) => existsSync(page.style_manifest_file)), true);
 
     const directorReview = readJson(chain[5].result.artifactFile);
     assert.equal(directorReview.review_overlay, 'visual_director_review');
@@ -284,7 +280,10 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
     const reviewBundle = readJson(chain[6].result.artifactFile);
     assert.equal(typeof reviewBundle.status, 'string');
     assert.equal(Array.isArray(reviewBundle.slide_reviews), true);
-    assert.equal(reviewBundle.slide_reviews.length, renderBundle.html_bundle.page_count);
+    assert.equal(reviewBundle.slide_reviews.length, imageBundle.image_pages_bundle.page_count);
+    assert.equal(reviewBundle.review_capture?.source_visual_route, 'author_image_pages');
+    assert.equal(reviewBundle.mechanical_review?.python_helper_invocation, null);
+    assert.equal(reviewBundle.mechanical_review?.metrics?.source_surface_kind, 'image_pages');
     assert.equal(typeof reviewBundle.checks?.overflow_free, 'boolean');
     assert.equal(typeof reviewBundle.checks?.occlusion_free, 'boolean');
     assert.equal(typeof reviewBundle.checks?.visual_density_ok, 'boolean');

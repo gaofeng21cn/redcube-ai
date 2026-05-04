@@ -216,6 +216,13 @@ const GROUPS = {
   historical: HISTORICAL,
   full: [...META, ...FAMILY, ...INTEGRATION, ...E2E, ...HISTORICAL],
 };
+const FULL_REMAINING_COVERED = [
+  ...FAST,
+  ...FAMILY,
+  ...GROUPS['meta:ci'],
+  ...GROUPS['integration:remaining'],
+];
+GROUPS['full:remaining'] = excludeCoveredTestFiles(GROUPS.full, FULL_REMAINING_COVERED);
 async function prepareSerializedVerification(groupName) {
   if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
     return null;
@@ -263,8 +270,9 @@ function assertPartition() {
 
 function printUsage() {
   process.stdout.write([
-    '用法: node --experimental-strip-types scripts/run-test-group.ts <fast|meta|meta:ci|family|integration|integration:remaining|e2e|historical|full> [--files tests/a.test.ts,tests/b.test.ts] [node --test 参数]',
+    '用法: node --experimental-strip-types scripts/run-test-group.ts <fast|meta|meta:ci|family|integration|integration:remaining|e2e|historical|full|full:remaining> [--files tests/a.test.ts,tests/b.test.ts] [node --test 参数]',
     '示例: node --experimental-strip-types scripts/run-test-group.ts full --test-reporter=dot',
+    '示例: node --experimental-strip-types scripts/run-test-group.ts full:remaining --test-reporter=dot',
     '示例: node --experimental-strip-types scripts/run-test-group.ts integration:remaining --test-reporter=dot',
     '示例: node --experimental-strip-types scripts/run-test-group.ts integration --files tests/source-intake.test.ts --test-reporter=dot',
   ].join('\n'));
@@ -294,16 +302,18 @@ assertTrackedFiles(HISTORICAL, 'historical');
 assertTrackedFiles(FAST, 'fast');
 assertTrackedFiles(GROUPS['meta:ci'], 'meta:ci');
 assertTrackedFiles(GROUPS['integration:remaining'], 'integration:remaining');
+assertTrackedFiles(GROUPS['full:remaining'], 'full:remaining');
 assertPartition();
 
+const selectedFiles = selectGroupFiles({
+  groupName,
+  groupFiles: GROUPS[groupName],
+  requestedFiles,
+});
 const serializedVerificationHandle = await prepareSerializedVerification(groupName);
 const executionPlan = partitionTestFilesForExecution({
   groupName,
-  files: selectGroupFiles({
-    groupName,
-    groupFiles: GROUPS[groupName],
-    requestedFiles,
-  }),
+  files: selectedFiles,
 });
 
 function runNodeTestBatch({ label, files, serialized }) {

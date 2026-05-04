@@ -11,8 +11,8 @@ import {
   resolveOwnerRepoRoot,
 } from 'opl-gateway-shared/family-shared-release';
 
-export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'integration:remaining', 'e2e', 'full']);
-export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set(['fast', 'integration', 'integration:remaining', 'e2e', 'full']);
+export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'integration:remaining', 'e2e', 'full', 'full:remaining']);
+export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set(['fast', 'integration', 'integration:remaining', 'e2e', 'full', 'full:remaining']);
 export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',
@@ -305,7 +305,13 @@ export function partitionTestFilesForExecution({ groupName, files = [] }) {
 
 export function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
   const covered = new Set(coveredFiles);
-  return baseFiles.filter((file) => !covered.has(file));
+  const selected = [];
+  for (const file of baseFiles) {
+    if (!covered.has(file) && !selected.includes(file)) {
+      selected.push(file);
+    }
+  }
+  return selected;
 }
 
 export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {

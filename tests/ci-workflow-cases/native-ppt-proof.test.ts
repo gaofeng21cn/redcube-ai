@@ -1,0 +1,84 @@
+// @ts-nocheck
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import { readRepoFile, readRepoJson } from './shared.ts';
+
+test('native PPT Linux proof environment is documented without adding a desktop-app fallback', () => {
+  const dockerfile = readRepoFile('tools/native-ppt-proof/Dockerfile');
+  const docs = readRepoFile('docs/native-ppt-proof-environment.md');
+  const workflow = readRepoFile('.github/workflows/ci.yml');
+  const installScript = readRepoFile('tools/native-ppt-proof/install-deps.sh');
+  const runner = readRepoFile('tools/native-ppt-proof/run.sh');
+
+  for (const source of [dockerfile, docs, installScript]) {
+    assert.match(source, /libreoffice/);
+    assert.match(source, /poppler-utils|Poppler/);
+    assert.match(source, /fonts-noto-cjk/);
+  }
+
+  assert.match(runner, /LibreOffice\/Poppler/);
+  assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof/);
+  assert.match(installScript, /brew install --cask libreoffice/);
+  assert.match(installScript, /brew install poppler/);
+  assert.match(installScript, /apt-get install -y libreoffice poppler-utils fonts-noto-cjk/);
+  assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(runner, /redcube_ai\.native_helpers\.doctor/);
+  assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native/);
+  assert.match(runner, /native-helper-output\.json/);
+  assert.match(runner, /proof-summary\.json/);
+  assert.match(runner, /artifact-index\.json/);
+  assert.match(runner, /build-artifact-index\.py/);
+  assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
+  assert.match(runner, /synthetic preview/);
+  assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
+  assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
+  assert.match(docs, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(docs, /tools\/native-ppt-proof\/run\.sh/);
+  assert.match(docs, /npm ci/);
+  assert.match(docs, /python3? -m redcube_ai\.native_helpers\.doctor/);
+  for (const source of [dockerfile, runner]) {
+    assert.doesNotMatch(source, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
+    assert.doesNotMatch(source, new RegExp(['osa', 'script'].join(''), 'i'));
+  }
+  assert.match(docs, /does not replace RedCube product-entry/);
+});
+
+test('native PPT proof V2 contract is ready for opt-in CI triggers and cache policy', () => {
+  const contract = readRepoJson('tools/native-ppt-proof/ci-contract.json');
+  const runner = readRepoFile('tools/native-ppt-proof/run.sh');
+  const workflow = readRepoFile('.github/workflows/ci.yml');
+
+  assert.equal(contract.schema_version, 'native_ppt_proof_ci_contract.v2');
+  assert.equal(contract.default_quality_lane.runs_true_renderer, false);
+  assert.deepEqual(contract.default_quality_lane.required_workflow_events, ['push', 'pull_request']);
+  assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
+  assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
+  assert.match(contract.proof_job.required_triggers.nightly.cron, /^\d+ \d+ \* \* \*$/);
+  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'native-ppt-proof');
+  assert.deepEqual(
+    contract.proof_job.required_triggers.pull_request_label.types,
+    ['labeled', 'synchronize', 'opened', 'reopened'],
+  );
+  assert.deepEqual(
+    contract.proof_job.required_cache_layers.map((layer) => layer.id),
+    ['npm', 'pip', 'playwright'],
+  );
+  assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
+  assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
+  assert.match(workflow, /github\.event_name == 'schedule'/);
+  assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
+  assert.match(workflow, /native-ppt-proof-pip-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('\.github\/requirements\/ci-python\.txt'\) \}\}/);
+  assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('\.github\/requirements\/ci-python\.txt'\) \}\}/);
+  assert.match(runner, /artifact-index\.json/);
+  assert.match(runner, /build-artifact-index\.py/);
+  assert.doesNotMatch(
+    workflow,
+    /quality:\n[\s\S]*?tools\/native-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
+  );
+  assert.doesNotMatch(
+    workflow,
+    /quality:\n[\s\S]*?tools\/image-ppt-proof\/run\.sh[\s\S]*?Run family tests/,
+  );
+});

@@ -38,9 +38,12 @@ case "$lane" in
   full)
     npm run test:full
     ;;
+  full-remaining)
+    npm run test:full:remaining
+    ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|structure|meta|family|integration|integration-remaining|e2e|historical|full]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|structure|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining]" >&2
     exit 1
     ;;
 esac

@@ -26,14 +26,14 @@ function readGroupList(script, groupName) {
 test('run-test-group keeps local codex preflight on integration/e2e/full groups', () => {
   assert.deepEqual(
     [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
-    ['e2e', 'full', 'integration', 'integration:remaining'],
+    ['e2e', 'full', 'full:remaining', 'integration', 'integration:remaining'],
   );
 });
 
 test('run-test-group serializes route-heavy fast files without enabling live Codex preflight', () => {
   assert.deepEqual(
     [...ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES].sort(),
-    ['e2e', 'fast', 'full', 'integration', 'integration:remaining'],
+    ['e2e', 'fast', 'full', 'full:remaining', 'integration', 'integration:remaining'],
   );
   assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
 });
@@ -123,6 +123,16 @@ test('run-test-group exposes a CI meta remainder lane without repeating fast met
   );
 });
 
+test('run-test-group remainder helper removes covered files and duplicate remainder entries', () => {
+  assert.deepEqual(
+    excludeCoveredTestFiles(
+      ['tests/a.test.ts', 'tests/b.test.ts', 'tests/a.test.ts', 'tests/c.test.ts'],
+      ['tests/b.test.ts'],
+    ),
+    ['tests/a.test.ts', 'tests/c.test.ts'],
+  );
+});
+
 test('run-test-group exposes an integration remainder lane for local fast-then-integration verification', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const integration = readGroupList(script, 'INTEGRATION');
@@ -131,6 +141,28 @@ test('run-test-group exposes an integration remainder lane for local fast-then-i
   assert.match(script, /'integration:remaining': excludeCoveredTestFiles\(INTEGRATION, FAST\)/);
   assert.equal(fast.some((file) => integration.includes(file)), true);
   assert.equal(excludeCoveredTestFiles(integration, fast).length, 35);
+});
+
+test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {
+  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
+  const e2e = readGroupList(script, 'E2E');
+  const historical = readGroupList(script, 'HISTORICAL');
+  const full = [
+    ...readGroupList(script, 'META'),
+    ...readGroupList(script, 'FAMILY'),
+    ...readGroupList(script, 'INTEGRATION'),
+    ...e2e,
+    ...historical,
+  ];
+  const covered = [
+    ...readGroupList(script, 'FAST'),
+    ...readGroupList(script, 'FAMILY'),
+    ...excludeCoveredTestFiles(readGroupList(script, 'META'), readGroupList(script, 'FAST')),
+    ...excludeCoveredTestFiles(readGroupList(script, 'INTEGRATION'), readGroupList(script, 'FAST')),
+  ];
+
+  assert.match(script, /GROUPS\['full:remaining'\] = excludeCoveredTestFiles\(GROUPS\.full, FULL_REMAINING_COVERED\)/);
+  assert.deepEqual(excludeCoveredTestFiles(full, covered), [...e2e, ...historical]);
 });
 
 test('run-test-group supports explicit targeted files inside the selected lane', () => {
@@ -198,6 +230,16 @@ test('run-test-group supports explicit targeted files inside the selected lane',
   );
 });
 
+test('run-test-group validates requested files before serialized preflight', () => {
+  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
+  const selectIndex = script.indexOf('const selectedFiles = selectGroupFiles({');
+  const preflightIndex = script.indexOf('const serializedVerificationHandle = await prepareSerializedVerification(groupName);');
+
+  assert.equal(selectIndex > 0, true);
+  assert.equal(preflightIndex > 0, true);
+  assert.equal(selectIndex < preflightIndex, true);
+});
+
 test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const meta = readGroupList(script, 'META');
@@ -220,11 +262,12 @@ test('run-test-group usage and verify shim include the family verification lane'
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
 
-  assert.match(script, /<fast\|meta\|meta:ci\|family\|integration\|integration:remaining\|e2e\|historical\|full>/);
+  assert.match(script, /<fast\|meta\|meta:ci\|family\|integration\|integration:remaining\|e2e\|historical\|full\|full:remaining>/);
   assert.match(script, /\[--files tests\/a\.test\.ts,tests\/b\.test\.ts\]/);
   assert.match(verifyScript, /family\)/);
   assert.match(verifyScript, /integration-remaining\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\]/);
+  assert.match(verifyScript, /full-remaining\)/);
+  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\]/);
 });
 
 test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {
@@ -283,7 +326,7 @@ test('serialized verification rule is documented in current program contract', (
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_files, 1);
   assert.deepEqual(
     currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_groups,
-    ['fast', 'integration', 'integration:remaining', 'e2e', 'full'],
+    ['fast', 'integration', 'integration:remaining', 'e2e', 'full', 'full:remaining'],
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
@@ -296,6 +339,10 @@ test('serialized verification rule is documented in current program contract', (
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /integration:remaining keeps local fast-then-integration verification from rerunning fast-covered integration files/i,
+  );
+  assert.match(
+    currentProgram.current_state.green_baseline.ci_quality_lane_reason,
+    /full:remaining keeps local fast-family-meta-integration verification from rerunning already covered files/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,

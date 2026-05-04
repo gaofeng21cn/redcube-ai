@@ -190,9 +190,12 @@ test('P18 closeout audit fails closed when nested JS appears without an explicit
   const residueDirectory = 'packages/redcube-runtime';
   const unexpectedFile = 'src/__closeout-audit-test__/unregistered.js';
   const unexpectedPath = path.join(residueDirectory, unexpectedFile);
+  const caseDirectory = 'tests/__closeout-audit-nested-ts-case__';
 
   mkdirSync(path.dirname(unexpectedPath), { recursive: true });
+  mkdirSync(caseDirectory, { recursive: true });
   writeFileSync(unexpectedPath, 'export const unregistered = true;\n', 'utf-8');
+  writeFileSync(path.join(caseDirectory, 'case.test.ts'), 'export const nestedTsCase = true;\n', 'utf-8');
 
   try {
     const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
@@ -215,6 +218,7 @@ test('P18 closeout audit fails closed when nested JS appears without an explicit
     assert.equal(summary.unregistered_js_file_count, 1);
   } finally {
     rmSync(path.dirname(unexpectedPath), { recursive: true, force: true });
+    rmSync(caseDirectory, { recursive: true, force: true });
   }
 });
 
