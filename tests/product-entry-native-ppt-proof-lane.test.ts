@@ -68,10 +68,13 @@ test('product-entry manifest exposes native PPT proof lane without changing the 
     editable_pptx: true,
     strict_svg_preflight: true,
     true_render_proof_required: true,
-    true_render_proof_renderer: 'powerpoint_applescript',
+    true_render_proof_renderer: 'libreoffice_headless',
     screenshot_packaging: false,
   });
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.required, true);
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.renderer_kind, 'libreoffice_headless');
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.command_family, 'soffice --headless');
+  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.cross_platform, true);
   assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.synthetic_preview_allowed, false);
 });
 

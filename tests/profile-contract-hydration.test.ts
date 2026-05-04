@@ -68,6 +68,22 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.default_enabled, false);
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.production_selectable, true);
   assert.equal(contract.prompt_pack.render_contract.native_ppt_proof_lane.review_input_surface, 'rendered_pptx_screenshots');
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.engine_capabilities.true_render_proof_renderer,
+    'libreoffice_headless',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_kind,
+    'libreoffice_headless',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.command_family,
+    'soffice --headless',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.cross_platform,
+    true,
+  );
   assert.deepEqual(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
     ['render_html', 'fix_html'],

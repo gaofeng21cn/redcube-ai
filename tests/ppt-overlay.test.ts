@@ -110,6 +110,22 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
     'do_not_register_as_public_redcube_skill',
   );
   assert.equal(lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.engine_capabilities.true_render_proof_renderer,
+    'libreoffice_headless',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_kind,
+    'libreoffice_headless',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.command_family,
+    'soffice --headless',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.cross_platform,
+    true,
+  );
   assert.deepEqual(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.replaces_routes,
     ['render_html', 'fix_html'],

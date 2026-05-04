@@ -223,6 +223,8 @@ test('Native PPT helper catalog check never invokes the real native PowerPoint e
   const helpers = helperById(catalog);
   const nativeHelper = helpers[NATIVE_PPT_HELPER_ID];
   const source = readFileSync(fileURLToPath(import.meta.url), 'utf-8');
+  const runGroupSource = readFileSync(path.resolve('scripts/run-test-group.ts'), 'utf-8');
+  const runGroupLibSource = readFileSync(path.resolve('scripts/run-test-group-lib.ts'), 'utf-8');
 
   assert.equal(nativeHelper.package_module, NATIVE_PPT_PACKAGE_MODULE);
   assert.equal(nativeHelper.default_enabled, false);
@@ -231,6 +233,12 @@ test('Native PPT helper catalog check never invokes the real native PowerPoint e
   assert.doesNotMatch(source, /runPython\(\['-m',\s*NATIVE_PPT_PACKAGE_MODULE,\s*'--help'\]\)/);
   assert.doesNotMatch(source, /runPythonModule\(NATIVE_PPT_PACKAGE_MODULE/);
   assert.match(source, /runPythonImportabilityCheck\(helper\.package_module\)/);
+  assert.doesNotMatch(runGroupSource, /RED(CUBE)?_PYTHON_COMMAND[^\n]*(soffice|osascript|PowerPoint)/i);
+  assert.doesNotMatch(runGroupSource, /powerpoint_applescript|Microsoft PowerPoint|osascript/i);
+  assert.match(runGroupSource, /tests\/ppt-native-ppt-runtime\.test\.ts/);
+  assert.match(runGroupSource, /tests\/product-entry-native-ppt-proof-lane\.test\.ts/);
+  assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\['fast', 'integration', 'e2e', 'full'\]\)/);
+  assert.doesNotMatch(runGroupLibSource, /SERIALIZED_VERIFICATION_GROUP_NAMES = new Set\(\[[^\]]*'fast'|'meta'/);
 });
 
 test('Python native helper doctor runs as a package module and emits fixed JSON diagnostics', () => {
@@ -308,11 +316,16 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.engine_capabilities.authoring_ir, 'redcube_svg_ir');
   assert.equal(nativeHelper.engine_capabilities.pptx_writer, 'redcube_drawingml_writer');
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_required, true);
+  assert.equal(nativeHelper.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
   assert.equal(nativeHelper.true_render_proof.required, true);
+  assert.equal(nativeHelper.true_render_proof.renderer_kind, 'libreoffice_headless');
+  assert.equal(nativeHelper.true_render_proof.command_family, 'soffice --headless');
+  assert.equal(nativeHelper.true_render_proof.cross_platform, true);
   assert.equal(nativeHelper.true_render_proof.synthetic_preview_allowed, false);
   assert.equal(nativeHelper.renderer_availability.executes_generation, false);
   assert.equal(nativeHelper.renderer_availability.executes_review_export_gates, false);
   assert.equal(nativeHelper.renderer_availability.powerpoint_fallback_allowed, false);
+  assert.deepEqual(nativeHelper.requires, ['Pillow', 'python-pptx', 'LibreOffice headless']);
 });
 
 test('Fast and meta diagnostic coverage does not invoke the native PPT renderer', () => {
@@ -401,6 +414,11 @@ test('Native PPT helper routes stay tied to the engine contract and review/expor
     helpers.ppt_deck_native.gates,
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
   );
+  assert.equal(helpers.ppt_deck_native.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.command_family, 'soffice --headless');
+  assert.equal(helpers.ppt_deck_native.true_render_proof.cross_platform, true);
+  assert.deepEqual(helpers.ppt_deck_native.requires, ['Pillow', 'python-pptx', 'LibreOffice headless']);
 });
 
 test('Review and export helpers stay scoped to their existing runtime gates', () => {

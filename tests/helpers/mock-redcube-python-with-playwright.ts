@@ -16,9 +16,13 @@ const NATIVE_ENGINE_CAPABILITIES = {
   editable_pptx: true,
   strict_svg_preflight: true,
   true_render_proof_required: true,
-  true_render_proof_renderer: 'powerpoint_applescript',
+  true_render_proof_renderer: 'libreoffice_headless',
   screenshot_packaging: false,
 };
+
+function mockNativeRendererKind() {
+  return String(process.env.REDCUBE_MOCK_NATIVE_RENDERER_KIND || 'libreoffice_headless').trim();
+}
 
 function fail(message) {
   process.stderr.write(`${String(message || 'unknown error').trim()}\n`);
@@ -208,6 +212,7 @@ function buildNativePayload(args) {
 
   const input = JSON.parse(readText(inputJson));
   const engineContract = engineContractFile ? JSON.parse(readText(engineContractFile)) : {};
+  const rendererKind = mockNativeRendererKind();
   const blueprintSlides = Array.isArray(input?.blueprint?.slides) && input.blueprint.slides.length > 0
     ? input.blueprint.slides
     : Array.from({ length: 6 }, (_, index) => ({
@@ -323,11 +328,13 @@ function buildNativePayload(args) {
   }
   const renderProof = {
     source_surface_kind: 'native_pptx',
-    renderer_kind: 'powerpoint_applescript',
+    renderer_kind: rendererKind,
     synthetic_preview: false,
     required: true,
     pptx_file: outputPptx,
     pdf_file: outputPdf || null,
+    command_family: rendererKind === 'libreoffice_headless' ? 'soffice --headless' : 'osascript',
+    cross_platform: rendererKind === 'libreoffice_headless',
     preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
   };
   const shapeManifest = {
