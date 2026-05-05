@@ -29,6 +29,10 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /proof-summary\.json/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /build-artifact-index\.py/);
+  assert.match(
+    runner,
+    /"\$\(command -v python3 2>\/dev\/null \|\| true\)"[\s\S]*"\$HOME\/\.codex\/projects\/redcube-ai\/runtime-state\/python\/stable-playwright\/venv\/bin\/python"[\s\S]*"\/usr\/bin\/python3"/,
+  );
   assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
   assert.match(runner, /synthetic preview/);
   assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);

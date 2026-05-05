@@ -33,10 +33,10 @@ resolve_proof_python() {
     "${REDCUBE_NATIVE_PPT_PROOF_PYTHON:-}" \
     "${REDCUBE_TEST_PYTHON:-}" \
     "${REDCUBE_PYTHON_COMMAND:-}" \
+    "$(command -v python3 2>/dev/null || true)" \
     "$HOME/.codex/projects/redcube-ai/runtime-state/python/stable-playwright/venv/bin/python" \
     "/opt/homebrew/bin/python3" \
-    "/usr/bin/python3" \
-    "$(command -v python3 2>/dev/null || true)"
+    "/usr/bin/python3"
   do
     if python_is_usable "$candidate"; then
       printf '%s\n' "$candidate"
