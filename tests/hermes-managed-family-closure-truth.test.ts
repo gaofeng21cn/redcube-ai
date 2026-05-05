@@ -1,13 +1,11 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/hermes-managed-family-closure-truth.json';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/hermes-stable-family-closure-truth.json';
-const TRANCHE_BRIEF = 'docs/program/hermes/hermes_managed_family_closure_truth.md';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -18,8 +16,6 @@ test('managed family closure truth remains historical provenance under the repo-
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
 
-  assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.tranche_id, 'hermes_managed_family_closure_truth');
   assert.equal(contract.predecessor_tranche, predecessor.tranche_id);
   assert.equal(

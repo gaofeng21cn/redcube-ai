@@ -102,12 +102,12 @@ test('run-test-group partitions route-heavy files away from the default parallel
       files: [
         'tests/ppt-native-ppt-runtime.test.ts',
         'tests/runtime-deliverable-route-recovery.test.ts',
-        'tests/public-docs-surface.test.ts',
+        'tests/product-entry.test.ts',
       ],
     }),
     {
       parallel_files: [
-        'tests/public-docs-surface.test.ts',
+        'tests/product-entry.test.ts',
       ],
       serialized_files: [
         'tests/ppt-native-ppt-runtime.test.ts',
@@ -247,7 +247,7 @@ test('run-test-group validates requested files before serialized preflight', () 
   assert.equal(selectIndex < preflightIndex, true);
 });
 
-test('default meta keeps docs-surface in integration and phase-2/longrun in historical lane', () => {
+test('default meta keeps phase-2/longrun in historical lane', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const meta = readGroupList(script, 'META');
   const family = readGroupList(script, 'FAMILY');
@@ -256,10 +256,8 @@ test('default meta keeps docs-surface in integration and phase-2/longrun in hist
 
   assert.deepEqual(family, ['tests/family-shared-release.test.ts']);
   assert.equal(meta.includes('tests/family-shared-release.test.ts'), false);
-  assert.equal(meta.includes('tests/public-docs-surface.test.ts'), false);
   assert.equal(meta.includes('tests/direct-delivery-longrun-target.test.ts'), false);
   assert.equal(meta.includes('tests/phase-2-behavior-convergence.test.ts'), false);
-  assert.equal(integration.includes('tests/public-docs-surface.test.ts'), true);
   assert.equal(integration.includes('tests/direct-delivery-longrun-target.test.ts'), false);
   assert.equal(historical.includes('tests/direct-delivery-longrun-target.test.ts'), true);
   assert.equal(historical.includes('tests/phase-2-behavior-convergence.test.ts'), true);

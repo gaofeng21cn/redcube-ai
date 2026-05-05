@@ -6,7 +6,6 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json';
-const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_workspace_operator_quickstart_convergence.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json';
 
 function read(file) {
@@ -40,7 +39,6 @@ test('workspace operator quickstart convergence freezes brand-new or thin worksp
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.operator_quickstart_surface.canonical_route.join(' -> '), 'workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run');
   assert.equal(contract.workspace_bootstrap_surface.doctor_surface, 'redcube workspace doctor');
   assert.equal(contract.workspace_bootstrap_surface.doctor_on_brand_new_recommended_action, 'run_source_intake');

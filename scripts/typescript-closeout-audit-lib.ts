@@ -411,8 +411,6 @@ export function buildCloseoutAudit(options = {}) {
   const rootPackage = readJson('package.json');
   const baseTsconfig = readJson('tsconfig.base.json');
   const rootTsconfig = readJson('tsconfig.json');
-  const migrationPolicy = readText('docs/policies/typescript_migration_policy.md');
-
   const contractSurfaces = categoryAudit(CONTRACT_SURFACES, rootTsconfig);
   const serviceBoundaries = categoryAudit(SERVICE_BOUNDARIES, rootTsconfig);
   const utilityBoundaries = categoryAudit(UTILITY_BOUNDARIES, rootTsconfig);
@@ -435,9 +433,7 @@ export function buildCloseoutAudit(options = {}) {
       new_code_defaults_to_typescript:
         baseTsconfig.compilerOptions.module === 'NodeNext'
         && baseTsconfig.compilerOptions.moduleResolution === 'NodeNext'
-        && rootPackage.scripts.typecheck === 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false'
-        && /新代码默认使用 TypeScript/.test(migrationPolicy)
-        && /typecheck 成为正式质量门/.test(migrationPolicy),
+        && rootPackage.scripts.typecheck === 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false',
       core_contract_surfaces_typed: contractSurfaces.every((entry) => entry.typed_boundary_ready),
       service_boundaries_typed: serviceBoundaries.every((entry) => entry.typed_boundary_ready),
       utility_boundaries_typed: utilityBoundaries.every((entry) => entry.typed_boundary_ready),

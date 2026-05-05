@@ -2,10 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 
 const CLOSEOUT_CONTRACT = 'contracts/runtime-program/ppt-mainline-quality-closeout.json';
-const CLOSEOUT_BRIEF = 'docs/references/ppt_mainline_quality_closeout.md';
 const NATIVE_PROOF_CONTRACT = 'contracts/runtime-program/ppt-native-authoring-proof-lane.json';
 
 function read(file) {
@@ -19,7 +18,6 @@ function readJson(file) {
 test('ppt mainline quality closeout records historical visual debt as resolved by later HTML-mainline work', () => {
   const closeout = readJson(CLOSEOUT_CONTRACT);
 
-  assert.equal(existsSync(path.resolve(CLOSEOUT_BRIEF)), true);
   assert.equal(closeout.closeout_id, 'ppt_mainline_quality_closeout');
   assert.equal(closeout.status, 'closeout_completed');
   assert.equal(closeout.scope.default_visual_route_at_closeout, 'render_html');

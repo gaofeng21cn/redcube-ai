@@ -83,7 +83,6 @@
   - `tests/phase-2-workspace-operator-quickstart-convergence.test.ts`
 - quickstart behavior：
   - `tests/workspace-operator-quickstart.test.ts`
-  - `tests/public-docs-surface.test.ts`
   - `tests/source-intake.test.ts`
   - `tests/source-research.test.ts`
 - `tests/cli-v2-smoke.test.ts`

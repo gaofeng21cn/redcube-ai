@@ -103,7 +103,6 @@
     ],
     "behavior_tests": [
       "tests/workspace-operator-quickstart.test.ts",
-      "tests/public-docs-surface.test.ts",
       "tests/source-intake.test.ts",
       "tests/source-research.test.ts",
       "tests/cli-v2-smoke.test.ts",
@@ -114,7 +113,7 @@
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.ts tests/phase-2-workspace-operator-quickstart-convergence.test.ts tests/workspace-operator-quickstart.test.ts tests/public-docs-surface.test.ts tests/source-intake.test.ts tests/source-research.test.ts tests/cli-v2-smoke.test.ts tests/deliverable-review-loop.test.ts tests/direct-delivery-operator-handoff.test.ts tests/phase-2-behavior-convergence.test.ts",
+      "node --test tests/runtime-alignment-p0.test.ts tests/phase-2-workspace-operator-quickstart-convergence.test.ts tests/workspace-operator-quickstart.test.ts tests/source-intake.test.ts tests/source-research.test.ts tests/cli-v2-smoke.test.ts tests/deliverable-review-loop.test.ts tests/direct-delivery-operator-handoff.test.ts tests/phase-2-behavior-convergence.test.ts",
       "npm run test:full"
     ]
   },

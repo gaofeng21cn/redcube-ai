@@ -8,7 +8,6 @@ const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
 const BOARD_CONTRACT = 'contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json';
-const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_family_parity_governance_surface_convergence.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -54,7 +53,6 @@ test('family parity governance tranche is now absorbed provenance without wideni
 
   assert.equal(existsSync(path.resolve(BOARD_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(tranche.status, 'closeout_completed');
   assert.deepEqual(tranche.scope.consumer_families, ['ppt_deck', 'xiaohongshu', 'poster_onepager']);
   assert.equal(tranche.scope.required_family_boundaries.includes('xiaohongshu remains human_publication rather than direct-delivery'), true);

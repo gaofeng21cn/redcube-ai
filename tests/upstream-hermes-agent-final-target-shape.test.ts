@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const FINAL_TARGET_CONTRACT = 'contracts/runtime-program/upstream-hermes-agent-final-target-shape.json';
-const FINAL_TARGET_BRIEF = 'docs/program/upstream_hermes_agent_final_target_shape.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -57,6 +56,6 @@ test('upstream Hermes-Agent final target shape is frozen as the OPL-callable Red
   );
   assert.equal(
     currentProgram.current_state.foundation_milestones.upstream_hermes_agent_final_target_shape.brief,
-    FINAL_TARGET_BRIEF,
+    finalTarget.brief,
   );
 });

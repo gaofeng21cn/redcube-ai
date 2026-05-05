@@ -7,7 +7,6 @@ import { existsSync, readFileSync } from 'node:fs';
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const MANUAL_TEST_CONTRACT = 'contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json';
 const HARDENING_BACKLOG = 'contracts/runtime-program/stable-deliverable-hardening-backlog.json';
-const OPERATOR_BRIEF = 'docs/stable_deliverable_manual_test_brief.md';
 const BASELINE_CONTRACT = 'contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json';
 const HARDENING_CONTRACT = 'contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json';
 
@@ -36,7 +35,6 @@ test('stable deliverable manual-test contract remains the completed foundation b
   assert.equal(existsSync(path.resolve(HARDENING_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(BASELINE_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(OPERATOR_BRIEF)), true);
   assert.equal(existsSync(path.resolve(HARDENING_BACKLOG)), true);
   assert.equal(contract.activation.owner, 'Codex App');
   assert.equal(contract.activation.required, true);
@@ -118,13 +116,12 @@ test('stable deliverable manual-test contract defines ppt_deck and xiaohongshu m
   assert.equal(xhs.fail_criteria.length > 0, true);
 });
 
-test('stable deliverable manual-test brief and backlog surface remain repo-tracked and machine-readable after baton absorption', () => {
+test('stable deliverable manual-test backlog surface remains machine-readable after baton absorption', () => {
   const contract = readJson(MANUAL_TEST_CONTRACT);
   const backlog = readJson(HARDENING_BACKLOG);
 
   assert.equal(existsSync(path.resolve(MANUAL_TEST_CONTRACT)), true);
   assert.equal(existsSync(path.resolve(HARDENING_BACKLOG)), true);
-  assert.equal(existsSync(path.resolve(OPERATOR_BRIEF)), true);
   assert.equal(contract.backlog_capture.file, HARDENING_BACKLOG);
   assert.equal(backlog.status, 'manual_test_completed_no_findings');
   assert.deepEqual(backlog.allowed_scope, ['ppt_deck', 'xiaohongshu']);

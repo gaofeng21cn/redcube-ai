@@ -1,6 +1,7 @@
 # Historical Deep Research Source Readiness Pack Phase 1 Plan
 
 > 历史规划工件，冻结于 `2026-04-08`。它保留当时的 source-readiness 第一阶段实现设想。当前 direct route、federated route 和活跃运行口径以 `docs/status.md`、`docs/architecture.md`、`docs/README.md` 和 `contracts/runtime-program/current-program.json` 为准。
+> 其中引用的 `tests/public-docs-surface.test.ts` 是已退役的历史文档 wording test，不再作为当前可运行验证入口；叙述性 README/docs 由人工/Agent review 对齐。
 
 **Historical goal:** 把第 1 步 `Source Readiness` 升格为正式可消费能力面，先落一版共享 `Source Readiness Pack`，并让 `xiaohongshu` 率先消费它，完成 `Deep Research` 的第一阶段落地。
 

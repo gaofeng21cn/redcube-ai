@@ -49,6 +49,7 @@
 - 能删就别加；能复用现有模式就别新起抽象。
 - 没有明确必要不要新增依赖。
 - 修改 formal-entry、execution handle、runtime mainline、program brief 路径、测试命令或 CI 分层时，必须同步改 README、docs、contracts 与相关测试。
+- 叙述性 `README*`、`docs/**` 和参考文档不作为脚本/测试的断言对象；可以测试 machine-readable contract、schema、CLI/API 行为、生成产物结构与路径，但不要用测试固定文档措辞、章节或状态文案。
 - 默认最小验证入口是 `scripts/verify.sh`。
 - 默认 smoke 是 `npm test` / `npm run test:fast`。
 - `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:historical` 是显式 lane。

@@ -6,7 +6,6 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
-const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json';
 
 function read(file) {
@@ -40,7 +39,6 @@ test('runtime watch locator integrity hardening freezes run identity persistence
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.deepEqual(contract.minimal_test_surface.truth_freeze_tests, ['tests/phase-2-runtime-watch-locator-integrity-hardening.test.ts']);
   assert.deepEqual(contract.run_locator_integrity_surface.required_run_record_fields, ['topic_id', 'deliverable_id']);
   assert.equal(contract.run_locator_integrity_surface.deliverable_watch_without_run_rule.includes('without runId or run'), true);

@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const ACTIVATION_PACKAGE_CONTRACT = 'contracts/runtime-program/upstream-hermes-agent-activation-package.json';
-const ACTIVATION_PACKAGE_BRIEF = 'docs/program/upstream_hermes_agent_activation_package.md';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');

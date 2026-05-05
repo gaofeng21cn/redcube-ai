@@ -34,7 +34,6 @@ assertCurrentRepoSharedPinAlignment({ repoRoot });
 
 const META = [
   'tests/ai-first-authoring-boundary.test.ts',
-  'tests/bilingual-home-readme.test.ts',
   'tests/ci-workflow.test.ts',
   'tests/candidate-racing.test.ts',
   'tests/codex-plugin.test.ts',
@@ -113,7 +112,6 @@ const INTEGRATION = [
   'tests/product-entry-session-checkpoint.test.ts',
   'tests/product-entry.test.ts',
   'tests/publication-projection-delivery-contract.test.ts',
-  'tests/public-docs-surface.test.ts',
   'tests/reference-quality-os-replacement.test.ts',
   'tests/reference-regression.test.ts',
   'tests/render-html-guardrails.test.ts',
@@ -185,7 +183,6 @@ const FAST = [
   'tests/runtime-deliverable-route-recovery.test.ts',
   'tests/runtime-deliverable-route.test.ts',
   'tests/runtime-performance-report.test.ts',
-  'tests/public-docs-surface.test.ts',
   'tests/ppt-mainline-quality-closeout.test.ts',
   'tests/ppt-hermes-generation.test.ts',
   'tests/ppt-native-ppt-runtime.test.ts',

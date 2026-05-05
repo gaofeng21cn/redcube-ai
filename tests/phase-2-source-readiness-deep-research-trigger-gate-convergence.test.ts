@@ -6,8 +6,6 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json';
-const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md';
-const FUTURE_TARGET = 'docs/references/source_readiness_deep_research_longrun_target_state.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json';
 
 function read(file) {
@@ -42,8 +40,6 @@ test('source-readiness deep research trigger+gate convergence freezes trigger lo
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
-  assert.equal(existsSync(path.resolve(FUTURE_TARGET)), true);
   assert.equal(contract.trigger_and_gate_surface.research_positioning.belongs_to, 'source_readiness');
   assert.equal(contract.trigger_and_gate_surface.force_trigger_conditions.includes('input only contains topic, keywords, or rough idea'), true);
   assert.equal(contract.trigger_and_gate_surface.pass_condition.includes('planning_ready=true'), true);

@@ -6,12 +6,11 @@ import { readRepoFile, readRepoJson } from './shared.ts';
 
 test('native PPT Linux proof environment is documented without adding a desktop-app fallback', () => {
   const dockerfile = readRepoFile('tools/native-ppt-proof/Dockerfile');
-  const docs = readRepoFile('docs/native-ppt-proof-environment.md');
   const workflow = readRepoFile('.github/workflows/ci.yml');
   const installScript = readRepoFile('tools/native-ppt-proof/install-deps.sh');
   const runner = readRepoFile('tools/native-ppt-proof/run.sh');
 
-  for (const source of [dockerfile, docs, installScript]) {
+  for (const source of [dockerfile, installScript]) {
     assert.match(source, /libreoffice/);
     assert.match(source, /poppler-utils|Poppler/);
     assert.match(source, /fonts-noto-cjk/);
@@ -34,15 +33,10 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /synthetic preview/);
   assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
   assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
-  assert.match(docs, /tools\/native-ppt-proof\/install-deps\.sh/);
-  assert.match(docs, /tools\/native-ppt-proof\/run\.sh/);
-  assert.match(docs, /npm ci/);
-  assert.match(docs, /python3? -m redcube_ai\.native_helpers\.doctor/);
   for (const source of [dockerfile, runner]) {
     assert.doesNotMatch(source, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
     assert.doesNotMatch(source, new RegExp(['osa', 'script'].join(''), 'i'));
   }
-  assert.match(docs, /does not replace RedCube product-entry/);
 });
 
 test('native PPT proof V2 contract is ready for opt-in CI triggers and cache policy', () => {

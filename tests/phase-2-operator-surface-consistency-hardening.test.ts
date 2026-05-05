@@ -6,7 +6,6 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/phase-2-operator-surface-consistency-hardening.json';
-const TRANCHE_BRIEF = 'docs/program/phase-2/phase_2_operator_surface_consistency_hardening.md';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json';
 
 function read(file) {
@@ -39,7 +38,6 @@ test('operator surface consistency hardening freezes doctor/help/runtime-watch c
   const contract = readJson(TRANCHE_CONTRACT);
 
   assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.deepEqual(contract.minimal_test_surface.truth_freeze_tests, ['tests/phase-2-operator-surface-consistency-hardening.test.ts']);
   assert.equal(contract.operator_surface_alignment.workspace_doctor.must_not_emit_recommended_action.includes('initialize_workspace_contract'), true);
   assert.equal(contract.operator_surface_alignment.cli_help_surface.supported_commands.includes('review watch'), true);

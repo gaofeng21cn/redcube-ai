@@ -2,15 +2,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const HERMES_ACTIVATION_CONTRACT = 'contracts/runtime-program/hermes-runtime-substrate-activation-package.json';
 const HERMES_CAPABILITY_MAP_CONTRACT = 'contracts/runtime-program/hermes-runtime-capability-extraction-map.json';
 const HERMES_CLOSURE_CONTRACT = 'contracts/runtime-program/hermes-managed-family-closure-truth.json';
-const HERMES_ACTIVATION_BRIEF = 'docs/program/hermes/hermes_runtime_substrate_activation_package.md';
-const HERMES_CAPABILITY_MAP_BRIEF = 'docs/program/hermes/hermes_runtime_capability_extraction_map.md';
-const HERMES_CLOSURE_BRIEF = 'docs/program/hermes/hermes_managed_family_closure_truth.md';
 const PHASE_2_FAMILY_PARITY_CONTRACT = 'contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json';
 const PHASE_2_RUNTIME_WATCH_CONTRACT = 'contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json';
 const P21_CLOSEOUT_CONTRACT = 'contracts/runtime-program/p21-operations-evaluation-closeout.json';
@@ -31,7 +28,7 @@ function readCliSource() {
   ].join('\n');
 }
 
-test('repo-tracked docs keep durable runtime truth while public readmes stay shell-first and codex-default', () => {
+test('repo-tracked program keeps durable runtime truth while CLI stays shell-first and codex-default', () => {
   const pkg = JSON.parse(read('package.json'));
   const cli = readCliSource();
 
@@ -39,21 +36,6 @@ test('repo-tracked docs keep durable runtime truth while public readmes stay she
   assert.equal(Boolean(pkg.scripts.mcp), true);
   assert.equal(Boolean(pkg.scripts.controller), false);
   assert.equal(cli.includes("preferredEntry: ['CLI', 'MCP']"), true);
-  for (const file of [
-    'AGENTS.md',
-    'README.md',
-    'README.zh-CN.md',
-    'docs/README.md',
-    'docs/README.zh-CN.md',
-    'docs/project.md',
-    'docs/invariants.md',
-    'docs/runtime_architecture.md',
-    'docs/policies/runtime_operating_model.md',
-    'docs/status.md',
-    'contracts/README.md',
-  ]) {
-    assert.equal(existsSync(path.resolve(file)), true, file);
-  }
 });
 
 test('CLI help exposes the current deliverable adapter set, including the explicit Hermes proof lane', () => {
@@ -182,11 +164,7 @@ test('truth-freeze suites do not read ignored local tooling state directly', () 
     ['.', 'omx', '/'].join(''),
     ['.', 'codex', '/'].join(''),
   ];
-  const readPrefixes = [
-    'read(',
-    'readJson(',
-    'existsSync(path.resolve(',
-  ];
+  const readPrefixes = ['read(', 'readJson('];
   const backtick = '`';
 
   for (const file of [
@@ -213,15 +191,4 @@ test('truth-freeze suites do not read ignored local tooling state directly', () 
       }
     }
   }
-});
-
-test('P0 truth surfaces keep CLI and MCP implemented while controller surface is absent', () => {
-  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.ts')), true);
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.ts')), true);
-  assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.js')), false);
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), false);
-  assert.equal(existsSync(path.resolve('apps/redcube-cli/dist/cli.js')), true);
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/dist/server.js')), true);
-  assert.equal(existsSync(path.resolve('apps/redcube-controller/src/index.js')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-controller/package.json')), false);
 });

@@ -160,10 +160,6 @@ test('root package build graph lists dist-export dependencies before consumers',
   before('./packages/redcube-gateway', './apps/redcube-cli');
 });
 
-test('typescript migration policy reference stays tracked', () => {
-  assert.equal(existsSync(path.resolve('docs/policies/typescript_migration_policy.md')), true);
-});
-
 test('typescript package build contract requires runtime exports to resolve through compiled dist artifacts', () => {
   const contractFile = 'contracts/runtime-program/typescript-package-build-contract.json';
   const contract = readJson(contractFile);

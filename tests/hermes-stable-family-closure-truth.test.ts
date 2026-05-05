@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   auditDeliverable,
@@ -25,7 +25,6 @@ import {
 const CURRENT_PROGRAM_CONTRACT = 'contracts/runtime-program/current-program.json';
 const TRANCHE_CONTRACT = 'contracts/runtime-program/hermes-stable-family-closure-truth.json';
 const PREDECESSOR_CONTRACT = 'contracts/runtime-program/hermes-runtime-substrate-canonical-closure.json';
-const TRANCHE_BRIEF = 'docs/program/hermes/hermes_stable_family_closure_truth.md';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -72,8 +71,6 @@ test('stable family closure truth remains historical provenance under the repo-v
   const contract = readJson(TRANCHE_CONTRACT);
   const predecessor = readJson(PREDECESSOR_CONTRACT);
 
-  assert.equal(existsSync(path.resolve(TRANCHE_CONTRACT)), true);
-  assert.equal(existsSync(path.resolve(TRANCHE_BRIEF)), true);
   assert.equal(contract.tranche_id, 'hermes_stable_family_closure_truth');
   assert.equal(contract.status, 'closeout_completed');
   assert.equal(contract.predecessor_tranche, predecessor.tranche_id);

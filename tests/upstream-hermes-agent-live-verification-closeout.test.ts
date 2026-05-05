@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const CLOSEOUT_CONTRACT = 'contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json';
-const CLOSEOUT_BRIEF = 'docs/program/upstream_hermes_agent_live_verification_closeout.md';
 const BLOCKER_CONTRACT = 'contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json';
 
 function readJson(file) {

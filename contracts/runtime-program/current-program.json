@@ -782,7 +782,7 @@
         "verification_commands": [
           "git diff --check",
           "npm run typecheck",
-          "node --test tests/product-entry.test.ts tests/cli-v2-smoke.test.ts tests/mcp-gateway.test.ts tests/public-docs-surface.test.ts tests/upstream-hermes-agent-final-target-shape.test.ts",
+          "node --test tests/product-entry.test.ts tests/cli-v2-smoke.test.ts tests/mcp-gateway.test.ts tests/upstream-hermes-agent-final-target-shape.test.ts",
           "npm run test:fast"
         ],
         "suite_result": "pass",

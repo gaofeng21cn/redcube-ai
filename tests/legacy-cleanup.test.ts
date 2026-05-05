@@ -42,29 +42,22 @@ test('legacy redcube-agent/workbench runtime path is removed from active code an
   assert.equal(existsSync(path.join(repoRoot, 'packages', 'redcube-tools')), false);
   assert.equal(existsSync(path.join(repoRoot, 'packages', 'redcube-overlay-paper-poster')), false);
   assert.equal(existsSync(path.join(repoRoot, 'packages', 'redcube-gateway', 'src', 'actions', 'import-legacy-project.js')), false);
-  assert.equal(existsSync(path.join(repoRoot, 'docs', 'history')), false);
   assert.equal(existsSync(path.join(repoRoot, '.redcube_pi', 'workbench')), false);
-  assert.equal(existsSync(path.join(repoRoot, 'guides', 'README.md')), false);
 
   const scopedFiles = [
     ...walk(path.join(repoRoot, 'apps')),
     ...walk(path.join(repoRoot, 'contracts')),
-    ...walk(path.join(repoRoot, 'docs')),
     ...walk(path.join(repoRoot, 'packages')),
     ...walk(path.join(repoRoot, 'scripts')),
     ...walk(path.join(repoRoot, 'tests')),
     path.join(repoRoot, 'AGENTS.md'),
-    path.join(repoRoot, 'README.md'),
-    path.join(repoRoot, 'README.zh-CN.md'),
     path.join(repoRoot, 'package-lock.json'),
     path.join(repoRoot, 'package.json'),
   ].filter(
     (file) =>
       existsSync(file) &&
       !file.endsWith(path.join('tests', 'legacy-cleanup.test.ts')) &&
-      !file.endsWith(path.join('tests', 'typescript-service-boundaries.test.ts')) &&
-      !file.endsWith(path.join('tests', 'public-docs-surface.test.ts')) &&
-      !file.includes(`${path.sep}docs${path.sep}superpowers${path.sep}`)
+      !file.endsWith(path.join('tests', 'typescript-service-boundaries.test.ts'))
   );
 
   for (const file of scopedFiles) {
@@ -86,7 +79,6 @@ test('legacy redcube-agent/workbench runtime path is removed from active code an
     assert.equal(content.includes('historical_intake_import'), false, file);
     assert.equal(content.includes('legacy_import'), false, file);
     assert.equal(content.includes('legacy-project.json'), false, file);
-    assert.equal(content.includes('docs/history'), false, file);
     assert.equal(content.includes('workbench-models.js'), false, file);
     assert.equal(content.includes('workbench'), false, file);
     assert.equal(content.includes('.redcube_pi/workbench'), false, file);
