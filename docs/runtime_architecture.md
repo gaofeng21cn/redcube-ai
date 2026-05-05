@@ -208,7 +208,9 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 负责：
 
 - `visual_direction`
-- `render_html`
+- route-specific visual implementation
+  - `ppt_deck` 默认：`author_image_pages`
+  - 显式 HTML 路线：`render_html`
 
 这一步必须由 agent / director 主导。
 代码只保留 shell、canvas、artifact write、render gate。

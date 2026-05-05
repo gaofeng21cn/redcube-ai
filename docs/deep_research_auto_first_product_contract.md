@@ -244,7 +244,7 @@
 - `Source Readiness`：`source intake + shared source truth augmentation`
 - `Storyline`：`storyline`
 - `Plan`：`detailed_outline + slide_blueprint`
-- `Visual`：`visual_direction + render_html`
+- `Visual`：`visual_direction + author_image_pages`（默认 image-first）；显式 HTML 路线仍可使用 `render_html`
 - `Delivery`：`export_pptx`
 
 因此：

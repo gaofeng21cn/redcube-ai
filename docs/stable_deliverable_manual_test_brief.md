@@ -1,6 +1,6 @@
 # Historical Stable Deliverable Manual Test Brief
 
-> 历史手工测试简报，冻结于 `2026-04-07`。它保留当时的 `stable deliverable` hardening 手测方案。当前默认入口、运行链路与验证口径以 `docs/status.md`、`docs/architecture.md`、`docs/README.md` 和 `contracts/runtime-program/current-program.json` 为准。
+> 历史手工测试简报，冻结于 `2026-04-07`。它保留当时的 `stable deliverable` hardening 手测方案。当前默认入口、运行链路与验证口径以 `docs/status.md`、`docs/architecture.md`、`docs/README.md` 和 `contracts/runtime-program/current-program.json` 为准；当前 `ppt_deck` 默认 image-first 路线由 `contracts/runtime-program/ppt-image-first-production-route.json` 接管。
 
 当前 baton 名称：`stable deliverable manual-test-driven hardening`
 

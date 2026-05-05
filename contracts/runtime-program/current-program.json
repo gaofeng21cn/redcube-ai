@@ -38,6 +38,31 @@
       "legacy_javascript_policy": "repo-tracked JavaScript is retired and must remain at zero files; new creative/runtime truth belongs in TypeScript or Python-owned helper surfaces",
       "ppt_deck_direction": "use image-first full-slide PNG authoring through Responses image_generation as the default visual route; keep HTML and native editable PPTX as explicit selectable optional routes"
     },
+    "persistence_policy": {
+      "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
+      "sqlite_status": "deferred_for_rca",
+      "sqlite_adoption_gate": [
+        "measured artifact or session file-count growth",
+        "cross-deliverable query pressure",
+        "operator need for global artifact inventory",
+        "JSON retention ledger maintenance cost"
+      ],
+      "if_adopted_scope": [
+        "session index",
+        "deliverable index",
+        "route run index",
+        "artifact path and hash index",
+        "review and export bundle projection",
+        "retention ledger projection"
+      ],
+      "must_not_own": [
+        "visual-domain truth",
+        "canonical artifact truth",
+        "review/export judgment",
+        "PNG/PPTX/PDF blob storage"
+      ],
+      "source_reference": "MAS/MDS runtime lifecycle SQLite sidecar pattern"
+    },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
       "keep controller as an internal-only surface",
@@ -198,6 +223,25 @@
       ],
       "pack_semantics": "domain_boundary_and_pack_id_only",
       "repo_local_pack_compiler_status": "removed_from_active_mainline"
+    },
+    "runtime_persistence_strategy": {
+      "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
+      "sqlite_sidecar_enabled_now": false,
+      "sqlite_decision": "deferred_until_measured_rca_runtime_file_growth_or_query_pressure",
+      "canonical_truth_surfaces_remain_files": [
+        "product-entry/session truth",
+        "deliverable contracts",
+        "review state",
+        "export bundles",
+        "artifact gallery manifests",
+        "final delivery manifests"
+      ],
+      "future_sidecar_constraints": [
+        "must be rebuildable",
+        "must not store PNG/PPTX/PDF blobs",
+        "must not replace visual-domain truth or review/export judgment",
+        "must not be Git-tracked"
+      ]
     },
     "exploration_lanes": {
       "ppt_image_first_production_route": {

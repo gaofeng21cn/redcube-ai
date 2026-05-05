@@ -1,6 +1,10 @@
 {
   "baton_id": "stable_deliverable_manual_test_driven_hardening",
   "status": "manual_test_completed_no_findings",
+  "historical_snapshot": true,
+  "is_active_current_ppt_default": false,
+  "successor_current_ppt_contract": "contracts/runtime-program/ppt-image-first-production-route.json",
+  "historical_scope_note": "This backlog records the 2026-04-07 HTML-route manual test package; current ppt_deck default visual authoring is author_image_pages.",
   "allowed_scope": [
     "ppt_deck",
     "xiaohongshu"

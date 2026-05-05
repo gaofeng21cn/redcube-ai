@@ -90,7 +90,10 @@
           "detailed_outline": "plan",
           "slide_blueprint": "plan",
           "visual_direction": "visual",
+          "author_image_pages": "visual",
+          "repair_image_pages": "visual",
           "render_html": "visual",
+          "fix_html": "visual",
           "visual_director_review": "visual",
           "screenshot_review": "visual",
           "export_pptx": "delivery"
@@ -145,7 +148,7 @@
     ],
     "must_keep_honest": [
       "Storyline and Plan remain a split view over story_architecture rather than a policy rename",
-      "Visual remains the direct-delivery envelope for visual_direction, render_html, visual_director_review, and screenshot_review",
+      "Visual remains the direct-delivery envelope for visual_direction, current ppt_deck author_image_pages, explicit HTML render_html/fix_html, visual_director_review, and screenshot_review",
       "Delivery continues to contain required export, operator_handoff, and closeout rather than introducing a sixth lifecycle step",
       "xiaohongshu remains explicit human publication contrast and does not receive the direct-delivery lifecycle contract"
     ]

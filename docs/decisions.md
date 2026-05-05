@@ -1,5 +1,21 @@
 # RedCube AI 关键决策
 
+## 2026-05-05
+
+### 决策：`ppt_deck` 默认视觉路线切到 image-first，HTML/native 保持显式可选
+
+- `ppt_deck` 的默认视觉路线固定为 `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> repair_image_pages -> export_pptx`。
+- `author_image_pages` 通过 Responses `image_generation` 生成完整 16:9 PNG 页面；`export_pptx` 将整页图装配成 PPTX/PDF，并明确不承诺 editable shapes。
+- 用户明确要求 HTML / CSS / 网页时走 `render_html / fix_html`；用户明确要求可编辑 / 原生 PPTX / DrawingML 时走 `author_pptx_native / repair_pptx_native`。
+- 旧的 `render_html` executor wording 只描述显式 HTML route 的执行形态，不再表示 `ppt_deck` 默认视觉路线。
+
+### 决策：RCA 暂不引入 SQLite 作为持久层，保留为可重建索引型 deferred option
+
+- MAS/MDS 的 SQLite program 解决的是 `.ds` 运行态大量小文件、历史游标、retention ledger 与 cold archive restore 问题；RCA 当前主要增长面是 deliverable artifact、manifest、review/export bundle，而不是同等级别的 runtime 小文件生命周期。
+- RCA 现阶段继续采用 `file authority + artifact index + Git source control`：canonical artifacts、review state、export bundle、gallery manifest 与 product-entry/session truth 保持文件 authority。
+- SQLite 只在未来出现实测触发条件时进入评估：artifact/session 文件数量明显增长、跨 deliverable 查询变慢、operator 需要全局 artifact inventory，或 JSON retention ledger 已难以维护。
+- 若未来启用 SQLite，它只能作为可删除、可重建的 sidecar index，存储 session/deliverable/route/artifact/review/export 索引与 hash/provenance；不得存放 PNG/PPTX/PDF blob，不得成为 visual-domain truth、canonical artifact truth 或 review/export judgment owner。
+
 ## 2026-04-26
 
 ### 决策：RCA 对齐 OPL Runtime Manager 与 TS/Python 目标形态
@@ -58,7 +74,7 @@
 - `RedCube AI` 继续持有 visual deliverable 的 family/profile/pack authority、audit truth 与 executor routing。
 - 具体生成步骤允许继续通过 `Executor Adapter` 选择最合适的执行器；只有在拿到显式 proof 后，才允许把某条 route 迁到新的 executor。
 - executor backend 的 public contract 只冻结 `codex_cli` 与 `hermes_agent`；旧内部 `host_agent` / `hermes_native_proof` 只作为 adapter 兼容名映射到这两类 backend。
-- `execution_shape` 单独表达为 `structured_call` 或 `agent_loop`；`render_html` 默认 `structured_call`，`fix_html` 先结构化回修，复审仍阻断时最多升级一次 `hermes_agent + agent_loop`。
+- `execution_shape` 单独表达为 `structured_call` 或 `agent_loop`；显式 HTML route 的 `render_html` 默认 `structured_call`，`fix_html` 先结构化回修，复审仍阻断时最多升级一次 `hermes_agent + agent_loop`。
 - route-level `structured_call` routing 只作为 opt-in domain config 生效；未配置或未命中时继承 effective default executor，effective default executor 优先取 request、OPL handoff、domain local config，再回到内建 `codex_cli`。
 - 本仓不维护 `simple_llm` 或 `openai_compatible_gateway` 作为一等 backend；不同 provider/model 适配交给外部 `Hermes-Agent` runtime 或相应 domain adapter proof。
 

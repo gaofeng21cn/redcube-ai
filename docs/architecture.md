@@ -106,8 +106,8 @@
   - 旧内部 `host_agent` 只作为 `codex_cli` 的 adapter 兼容名保留
   - 旧内部 `hermes_native_proof` 只作为 `hermes_agent` full-agent-loop proof adapter 保留
 - `execution_shape` 固定为 `structured_call` 与 `agent_loop`
-  - `render_html` 默认 `structured_call`
-  - `fix_html` 默认先 `structured_call`，复审仍要求回修时最多升级一次 `hermes_agent + agent_loop`
+  - 显式 HTML route 的 `render_html` 默认 `structured_call`
+  - 显式 HTML repair route 的 `fix_html` 默认先 `structured_call`，复审仍要求回修时最多升级一次 `hermes_agent + agent_loop`
   - `simple_llm` 与 `openai_compatible_gateway` 不作为 RedCube 一等 backend
 - 默认正式 backend 是 `codex_cli`
   - 它对应本机 Codex CLI autonomous runtime
@@ -130,7 +130,7 @@
 当前还要额外冻结一个边界：
 
 - `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一走 `runtime-family + Codex CLI structured generation`
-- repo-local `pack/compiler` 不再 author story / blueprint / visual direction / final HTML 这类创作真值
+- repo-local `pack/compiler` 不再 author story / blueprint / visual direction / final visual artifact 这类创作真值
 - `pack` 可以继续存在，但只能作为 typed shell、pack-id carrier 或非创作边界，不能再回退成脚本编译创作路径
 
 因此，“接入 Hermes”不等于“所有视觉生成步骤都改成 Hermes 自己执行”。

@@ -2,6 +2,10 @@
   "baton_id": "stable_deliverable_manual_test_driven_hardening",
   "status": "closeout_completed",
   "review_status": "passed",
+  "historical_snapshot": true,
+  "is_active_current_ppt_default": false,
+  "successor_current_ppt_contract": "contracts/runtime-program/ppt-image-first-production-route.json",
+  "historical_scope_note": "This contract records the 2026-04-07 HTML-route manual test package; current ppt_deck default visual authoring is author_image_pages.",
   "activation": {
     "owner": "Codex App",
     "required": true,

@@ -34,7 +34,7 @@
 
 You can start with prompts like:
 
-- "Turn these lecture notes and references into a polished teaching deck, keep the progress visible, and leave me editable files."
+- "Turn these lecture notes and references into a polished teaching deck, keep the progress visible, and export the final PPTX/PDF. If I ask for editable slides, use the native PPTX route."
 - "Use this source package to draft a Xiaohongshu note series, tell me what is still missing, and keep each review round traceable."
 - "Make a poster from this project summary, track the review comments, and export the final delivery files when the content is ready."
 
@@ -43,11 +43,11 @@ You can start with prompts like:
 - Turning notes, outlines, references, screenshots, and draft fragments into formal slide decks, note series, and poster-style deliverables.
 - Keeping multi-round review, reruns, and export checks tied to the same workspace.
 - Showing human-readable progress while longer-running jobs continue in the background.
-- Delivering editable files that stay connected to their source material and review history.
+- Delivering exported files that stay connected to their source material and review history; editable PPTX is an explicit route when requested.
 
 ## Current Delivery Focus
 
-- `Slides` for teaching decks, academic talks, internal briefings, and formal reports.
+- `Slides` for teaching decks, academic talks, internal briefings, and formal reports. The current default PPT route is image-first full-slide authoring; HTML and editable native PPTX are explicit selectable routes.
 - `Xiaohongshu notes` for knowledge posts, science communication, and serialized publishing.
 - `Knowledge posters` for single-page visual delivery.
 - Academic paper and conference poster lanes continue to be evaluated case by case.
