@@ -22,10 +22,12 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## 核心入口
 
-- `redcube product manifest --workspace-root <dir>`
-- `redcube product frontdesk --workspace-root <dir>`
-- `redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
-- `redcube product session --entry-session-id <entry-session-id>`
+自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
+
+- `npm run --prefix <redcube-ai-repo> redcube -- product manifest --workspace-root <dir>`
+- `npm run --prefix <redcube-ai-repo> redcube -- product frontdesk --workspace-root <dir>`
+- `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
+- `npm run --prefix <redcube-ai-repo> redcube -- product session --entry-session-id <entry-session-id>`
 
 `redcube product frontdesk` 是 legacy command key / compat command；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
 
@@ -42,7 +44,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 用户点名 `RCA` / `RedCube AI` 或任务属于 slide deck、视觉交付、讲稿、海报、小红书等 RedCube 覆盖范围时，必须通过 RedCube product-entry / deliverable runtime 推进。
 - 不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或直接编辑文件来替代 RedCube 的默认创作与审阅链路，除非用户明确要求“探索替代技术路线”或“绕开 RedCube runtime”。
 - 直接产出 HTML、截图、PPTX、PDF 或其他文件前，必须先确认当前 overlay 的 stage sequence，并把产物落在同一 `topic_id` / `deliverable_id` / `entry_session_id` 的 deliverable loop 中。
-- 如果本机没有全局 `redcube` 命令，应使用 repo-local `npm run redcube -- ...` 或等价安装入口继续走同一 product-entry contract；不得因此改走通用工具路径。
+- 使用 repo-local `npm run --prefix <redcube-ai-repo> redcube -- ...` 继续走同一 product-entry contract；不得因为全局 `redcube` 缺失或过期而改走通用工具路径。
 
 ## PPT deck 默认路线
 

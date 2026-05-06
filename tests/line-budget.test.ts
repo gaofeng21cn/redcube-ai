@@ -96,6 +96,14 @@ test('OPL module bootstrap uses reproducible npm install without mutating lockfi
   assert.doesNotMatch(bootstrap, /npm install/);
 });
 
+test('RCA skill prefers repo-local launcher over PATH global CLI', () => {
+  const skill = fs.readFileSync(path.join(repoRoot, 'plugins/rca/skills/rca/SKILL.md'), 'utf8');
+
+  assert.match(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
+  assert.match(skill, /shell PATH lookup/);
+  assert.match(skill, /用户 PATH 上的裸 `redcube`/);
+});
+
 function makeLines(lineCount) {
   return Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n') + '\n';
 }
