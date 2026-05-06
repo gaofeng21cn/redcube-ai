@@ -19,4 +19,5 @@ Current entry groups:
 Historical material moved out of this layer:
 
 - repo-local Hermes migration provenance: `../history/hermes/`
-- local AI / Superpowers process drafts: `../history/superpowers/`
+- historical plans with no active runtime-program contract link: `../history/plans/`
+- local AI / Superpowers process drafts stay ignored under `../superpowers/` and are not repo-tracked history.

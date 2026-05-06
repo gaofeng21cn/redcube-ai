@@ -12,5 +12,7 @@
 当前分组：
 
 - `hermes/`：repo-local Hermes migration provenance。这些文件不证明上游 `Hermes-Agent` 已经持有当前 runtime owner。
+- `plans/`：保留用于追溯、但不再服务当前 active program baton 的历史计划。
 
 仍被 runtime-program 机器合同引用的 active program brief 继续保留在 `../program/`。
+本地 AI / Superpowers 过程草稿继续保持在被忽略的 `../superpowers/` 下，不导入 repo-tracked history。

@@ -12,5 +12,7 @@ Use this layer for:
 Current groups:
 
 - `hermes/`: repo-local Hermes migration provenance. These files do not prove that upstream `Hermes-Agent` owns the active runtime.
+- `plans/`: historical plans that are retained for traceability but no longer serve the active program baton.
 
 Active program briefs that are still linked from machine-readable runtime-program contracts remain in `../program/`.
+Local AI/Superpowers process drafts stay ignored under `../superpowers/` and are not imported into repo-tracked history.

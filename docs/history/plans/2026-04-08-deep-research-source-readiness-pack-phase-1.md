@@ -618,7 +618,7 @@ git commit -m "feat: land Source Readiness pack phase 1"
 
 ## Execution Handoff
 
-Plan complete and saved to `docs/plans/2026-04-08-deep-research-source-readiness-pack-phase-1.md`. Two execution options:
+Plan complete and archived at `docs/history/plans/2026-04-08-deep-research-source-readiness-pack-phase-1.md`. Two execution options:
 
 1. Subagent-Driven (recommended) - 我派发新子代理逐任务执行并逐步 review
 2. Inline Execution - 在当前 session 里按任务直接实现
