@@ -23,9 +23,12 @@ Primary request: Create a complete 16:9 PPT slide page image in Chinese, full pa
 Exact main title: <short Chinese title>
 Content structure: <one core judgement, full-page layout, major diagram parts, arrows, callouts, and limited labels>
 Style: white dotted notebook paper background, bold black sketch outlines, pastel marker blocks, hand-drawn arrows, sticker tape, small medical/system icons, large readable Chinese title, few short labels.
-Avoid: dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components.
+Facts: only use whitelisted shared source truth, approved slide blueprint text, and verified operator assets; if source support is missing, use general wording.
+Avoid: dark futuristic console, cyberpunk dashboard, glassmorphism, photo collage, 3D dashboard, dense data table, excessive gradient, logo watermark, screenshot collage, English-heavy labels, tiny unreadable paragraphs, isolated icon sets, separate components, page numbers, slide numbers, chapter tabs, fake QR codes, fake download links, fake DOI, fake logo, unverified hospital names, unverified patient demographics, unverified publication status.
 ```
 
 ## Override Policy
 
 `style_reference_dir` may point to user-supplied local reference images for inspiration. It must not relax the full-slide contract, Chinese lecture readability, medical boundary defaults, fragmentation controls, or forbidden style list.
+
+Verified QR/download/UI/paper/logo assets are handled after generation through a deterministic overlay manifest and machine checks when applicable. Do not use PIL, Canvas, or HTML rebuilds to patch model-composed page errors; redraw blocked pages through `repair_image_pages`.

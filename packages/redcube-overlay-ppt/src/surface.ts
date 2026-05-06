@@ -150,6 +150,16 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.render_contract.image_page_authoring_lane?.default_enabled === true
     && content.render_contract.image_page_authoring_lane?.style_reference_dir_input === 'delivery_request.style_reference_dir'
     && content.render_contract.image_page_authoring_lane?.provider_diagnostics_surface === 'image_provider_diagnostics'
+    && content.render_contract.image_page_authoring_lane?.fact_governance?.fact_whitelist_surface === 'shared_source_truth.readable_shared_source_truth_fields'
+    && content.render_contract.image_page_authoring_lane?.fact_governance?.verification_ledger_surface === 'reports/fact-verification-ledger.json'
+    && Array.isArray(content.render_contract.image_page_authoring_lane?.fact_governance?.forbidden_generated_artifacts)
+    && content.render_contract.image_page_authoring_lane.fact_governance.forbidden_generated_artifacts.includes('fake QR code')
+    && content.render_contract.image_page_authoring_lane?.verified_asset_overlay_policy?.deterministic_overlay_only === true
+    && content.render_contract.image_page_authoring_lane?.verified_asset_overlay_policy?.composition_repair_allowed === false
+    && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.contract_id === 'ppt_image_first_long_deck_production_v1'
+    && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.full_long_deck_default_regression === false
+    && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.line_divergence_policy?.image_route_is_not_html_skin === true
+    && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.rejected_repair_route_policy?.rejected_route_provenance_required === true
     && content.render_contract.html_authoring_lane?.status === 'production_selectable_optional'
     && content.render_contract.html_authoring_lane?.default_enabled === false
     && content.render_contract.html_authoring_lane?.explicit_selection_required === true

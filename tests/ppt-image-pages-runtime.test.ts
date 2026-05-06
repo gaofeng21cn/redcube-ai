@@ -126,6 +126,15 @@ test('ppt author_image_pages writes mocked Responses PNG pages and generation me
   assert.equal(existsSync(artifact.image_page_manifest.prompt_manifest), true);
   assert.equal(existsSync(artifact.image_page_manifest.style_manifest), true);
   assert.equal(existsSync(artifact.image_page_manifest.generation_metadata_file), true);
+  const deckPromptManifest = readJson(artifact.image_page_manifest.prompt_manifest);
+  const slidePromptManifest = readJson(artifact.image_pages_bundle.pages[0].prompt_manifest_file);
+  assert.equal(deckPromptManifest.fact_governance.fact_whitelist_surface, 'shared_source_truth.readable_shared_source_truth_fields');
+  assert.equal(deckPromptManifest.verified_asset_policy.deterministic_overlay_only, true);
+  assert.equal(deckPromptManifest.long_deck_contract.contract_id, 'ppt_image_first_long_deck_production_v1');
+  assert.equal(deckPromptManifest.forbidden_generated_artifacts.includes('fake QR code'), true);
+  assert.equal(slidePromptManifest.fact_governance.verification_ledger_surface, 'reports/fact-verification-ledger.json');
+  assert.equal(slidePromptManifest.verified_asset_policy.composition_repair_allowed, false);
+  assert.equal(slidePromptManifest.long_deck_contract.full_long_deck_default_regression, false);
   assert.equal(artifact.image_page_manifest.slides[0].dimensions.width, 1536);
   assert.equal(artifact.image_page_manifest.slides[0].dimensions.height, 864);
   assert.equal(existsSync(artifact.image_pages_bundle.pages[0].prompt_manifest_file), true);

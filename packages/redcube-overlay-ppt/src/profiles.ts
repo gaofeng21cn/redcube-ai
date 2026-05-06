@@ -147,6 +147,86 @@ const HTML_AUTHORING_LANE = Object.freeze({
   explicit_selection_required: true,
 });
 
+const IMAGE_PAGE_FACT_GOVERNANCE = Object.freeze({
+  fact_whitelist_surface: 'shared_source_truth.readable_shared_source_truth_fields',
+  verification_ledger_surface: 'reports/fact-verification-ledger.json',
+  rule: 'visible factual claims in generated full-slide images must trace to whitelisted source truth or operator-approved verified assets',
+  unresolved_claim_policy: 'block_or_rephrase_as_general_without_unverified_specifics',
+  prompt_manifest_required_fields: [
+    'fact_governance',
+    'verified_asset_policy',
+    'forbidden_generated_artifacts',
+  ],
+  forbidden_generated_artifacts: [
+    'fake QR code',
+    'fake download link',
+    'fake DOI',
+    'fake logo',
+    'unverified hospital name',
+    'unverified patient demographics',
+    'unverified publication status',
+  ],
+});
+
+const IMAGE_PAGE_VERIFIED_ASSET_POLICY = Object.freeze({
+  asset_overlay_surface: 'verified_asset_overlay_manifest',
+  allowed_overlay_assets: [
+    'real QR code',
+    'download entry',
+    'verified UI screenshot',
+    'verified paper screenshot',
+    'operator supplied logo',
+  ],
+  deterministic_overlay_only: true,
+  overlay_manifest_required: true,
+  machine_verification_required_when_applicable: true,
+  composition_repair_allowed: false,
+  model_generation_forbidden: [
+    'QR code',
+    'download URL',
+    'DOI',
+    'logo',
+    'publication screenshot',
+  ],
+});
+
+const IMAGE_PAGE_LONG_DECK_CONTRACT = Object.freeze({
+  contract_id: 'ppt_image_first_long_deck_production_v1',
+  applies_when: 'expected_slide_count > proof_runner.max_default_slide_count or operator marks deck as long_deck',
+  full_long_deck_default_regression: false,
+  canonical_slide_naming: 'slideNN-short-name.png',
+  expected_slide_count_source: 'slide_blueprint.expected_slide_count || slide_blueprint.slides.length',
+  required_artifact_surfaces: [
+    'prompts',
+    'images_raw',
+    'images_1920x1080',
+    'style_refs',
+    'fact_verification_ledger',
+    'visual_qc_ledger',
+    'contact_sheet',
+    'pptx',
+  ],
+  completeness_gates: [
+    'expected slide count matches image page count',
+    'continuous slideNN ordering',
+    'all generated pages are 16:9 PNG',
+    'exported PPTX has one full-slide image per slide',
+    'exported PPTX media count matches slide count',
+    'full-deck contact sheet or manifest exists for operator review',
+  ],
+  line_divergence_policy: {
+    shared_truth_before_divergence: ['source_truth', 'storyline'],
+    divergence_allowed_from: ['detailed_outline', 'slide_blueprint', 'visual_direction'],
+    html_route_must_not_consume_image_route_pngs_by_default: true,
+    image_route_is_not_html_skin: true,
+  },
+  rejected_repair_route_policy: {
+    forbidden_for_page_fixes: ['PIL composition patch', 'Canvas redraw patch', 'HTML rebuild patch'],
+    allowed_postprocess_scope: ['deterministic verified asset overlay only'],
+    rejected_route_provenance_required: true,
+  },
+});
+
 const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
   lane_id: 'ppt_deck_image_page_authoring_v0',
   status: 'production_default',
@@ -161,6 +241,9 @@ const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
   style_reference_dir_input: 'delivery_request.style_reference_dir',
   review_input_surface: 'image_page_screenshots',
   provider_diagnostics_surface: 'image_provider_diagnostics',
+  fact_governance: IMAGE_PAGE_FACT_GOVERNANCE,
+  verified_asset_overlay_policy: IMAGE_PAGE_VERIFIED_ASSET_POLICY,
+  long_deck_production_contract: IMAGE_PAGE_LONG_DECK_CONTRACT,
 });
 
 const FAMILY_STAGE_SEQUENCE = {

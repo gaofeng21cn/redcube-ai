@@ -131,6 +131,18 @@ test('createDeliverable hydrates ppt deck contract surface', async () => {
   assert.equal(hydratedContract.prompt_pack.render_contract.render_strategy, 'image_first_page_authoring');
   assert.equal(hydratedContract.prompt_pack.render_contract.default_visual_route, 'author_image_pages');
   assert.equal(hydratedContract.prompt_pack.render_contract.image_page_authoring_lane.style_reference_dir_input, 'delivery_request.style_reference_dir');
+  assert.equal(
+    hydratedContract.prompt_pack.render_contract.image_page_authoring_lane.fact_governance.unresolved_claim_policy,
+    'block_or_rephrase_as_general_without_unverified_specifics',
+  );
+  assert.equal(
+    hydratedContract.prompt_pack.render_contract.image_page_authoring_lane.verified_asset_overlay_policy.overlay_manifest_required,
+    true,
+  );
+  assert.equal(
+    hydratedContract.prompt_pack.render_contract.image_page_authoring_lane.long_deck_production_contract.completeness_gates.includes('full-deck contact sheet or manifest exists for operator review'),
+    true,
+  );
   assert.equal(hydratedContract.prompt_pack.render_contract.html_authoring_lane.explicit_selection_required, true);
   assert.equal(hydratedContract.prompt_pack.render_contract.native_ppt_proof_lane.status, 'production_selectable_optional');
   assert.deepEqual(

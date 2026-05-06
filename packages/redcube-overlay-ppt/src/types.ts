@@ -332,6 +332,43 @@ export interface PptDeckImagePageAuthoringLane {
   style_reference_dir_input: 'delivery_request.style_reference_dir';
   review_input_surface: 'image_page_screenshots';
   provider_diagnostics_surface: 'image_provider_diagnostics';
+  fact_governance: {
+    fact_whitelist_surface: 'shared_source_truth.readable_shared_source_truth_fields';
+    verification_ledger_surface: 'reports/fact-verification-ledger.json';
+    rule: string;
+    unresolved_claim_policy: 'block_or_rephrase_as_general_without_unverified_specifics';
+    prompt_manifest_required_fields: ReadonlyArray<'fact_governance' | 'verified_asset_policy' | 'forbidden_generated_artifacts'>;
+    forbidden_generated_artifacts: ReadonlyArray<string>;
+  };
+  verified_asset_overlay_policy: {
+    asset_overlay_surface: 'verified_asset_overlay_manifest';
+    allowed_overlay_assets: ReadonlyArray<string>;
+    deterministic_overlay_only: true;
+    overlay_manifest_required: true;
+    machine_verification_required_when_applicable: true;
+    composition_repair_allowed: false;
+    model_generation_forbidden: ReadonlyArray<string>;
+  };
+  long_deck_production_contract: {
+    contract_id: 'ppt_image_first_long_deck_production_v1';
+    applies_when: string;
+    full_long_deck_default_regression: false;
+    canonical_slide_naming: 'slideNN-short-name.png';
+    expected_slide_count_source: string;
+    required_artifact_surfaces: ReadonlyArray<string>;
+    completeness_gates: ReadonlyArray<string>;
+    line_divergence_policy: {
+      shared_truth_before_divergence: ReadonlyArray<string>;
+      divergence_allowed_from: ReadonlyArray<'detailed_outline' | 'slide_blueprint' | 'visual_direction'>;
+      html_route_must_not_consume_image_route_pngs_by_default: true;
+      image_route_is_not_html_skin: true;
+    };
+    rejected_repair_route_policy: {
+      forbidden_for_page_fixes: ReadonlyArray<string>;
+      allowed_postprocess_scope: ReadonlyArray<string>;
+      rejected_route_provenance_required: true;
+    };
+  };
 }
 
 export interface PptDeckRenderContract {

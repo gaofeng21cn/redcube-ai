@@ -40,6 +40,18 @@ test('ppt_deck defaults to image-first page authoring and keeps html/native expl
   ]);
   assert.equal(contract.prompt_pack.render_contract.default_visual_route, 'author_image_pages');
   assert.equal(contract.prompt_pack.render_contract.render_strategy, 'image_first_page_authoring');
+  assert.equal(
+    contract.prompt_pack.render_contract.image_page_authoring_lane.fact_governance.fact_whitelist_surface,
+    'shared_source_truth.readable_shared_source_truth_fields',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.image_page_authoring_lane.verified_asset_overlay_policy.model_generation_forbidden.includes('QR code'),
+    true,
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.image_page_authoring_lane.long_deck_production_contract.rejected_repair_route_policy.forbidden_for_page_fixes.includes('PIL composition patch'),
+    true,
+  );
   assert.deepEqual(contract.prompt_pack.render_contract.selectable_explicit_routes, [
     'render_html',
     'fix_html',

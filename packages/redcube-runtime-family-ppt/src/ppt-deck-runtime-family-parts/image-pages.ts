@@ -291,12 +291,36 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     };
   }
 
+  function imageAuthoringLane(contract: JsonRecord): JsonRecord {
+    return contract?.prompt_pack?.render_contract?.image_page_authoring_lane
+      || contract?.render_contract?.image_page_authoring_lane
+      || {};
+  }
+
+  function imageFactGovernance(contract: JsonRecord): JsonRecord {
+    const lane = imageAuthoringLane(contract);
+    return lane?.fact_governance || {};
+  }
+
+  function verifiedAssetOverlayPolicy(contract: JsonRecord): JsonRecord {
+    const lane = imageAuthoringLane(contract);
+    return lane?.verified_asset_overlay_policy || {};
+  }
+
+  function longDeckProductionContract(contract: JsonRecord): JsonRecord {
+    const lane = imageAuthoringLane(contract);
+    return lane?.long_deck_production_contract || {};
+  }
+
   function slidePrompt({
     route,
     slide,
     visualDirection,
     styleManifest,
     promptTemplate,
+    factGovernance,
+    verifiedAssetPolicy,
+    longDeckContract,
     repairFeedback,
   }: {
     route: ImagePageRoute;
@@ -304,6 +328,9 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     visualDirection: JsonRecord;
     styleManifest: JsonRecord;
     promptTemplate: string;
+    factGovernance: JsonRecord;
+    verifiedAssetPolicy: JsonRecord;
+    longDeckContract: JsonRecord;
     repairFeedback: JsonRecord | null;
   }): string {
     return [
@@ -316,6 +343,10 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       `Layout family: ${safeText(slide?.layout_family)}.`,
       `Visual direction: ${stableJson(visualDirection).slice(0, 3000)}.`,
       `Style system: ${stableJson(styleManifest).slice(0, 2600)}.`,
+      `Fact governance: visible factual claims must follow this contract: ${stableJson(factGovernance).slice(0, 1600)}.`,
+      `Verified asset overlay policy: ${stableJson(verifiedAssetPolicy).slice(0, 1600)}.`,
+      `Long deck production contract: ${stableJson(longDeckContract).slice(0, 1600)}.`,
+      `Do not invent QR codes, download links, DOI strings, logos, hospital names, patient demographics, publication status, page numbers, slide numbers, or chapter corner labels unless they are explicitly supplied by the source truth or verified asset policy.`,
       repairFeedback ? `Repair feedback: ${stableJson(repairFeedback).slice(0, 1200)}.` : '',
       `No UI chrome, no speaker notes, no internal metadata. Use clear readable text inside the page.`,
     ].filter(Boolean).join('\n');
@@ -458,6 +489,9 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     const styleProfile = defaultStyleProfile();
     const promptTemplate = defaultPromptTemplate();
     const styleReferences = copyStyleReferences(contract, paths);
+    const factGovernance = imageFactGovernance(contract);
+    const verifiedAssetPolicy = verifiedAssetOverlayPolicy(contract);
+    const longDeckContract = longDeckProductionContract(contract);
     const deckStyleManifest = {
       kind: 'ppt_image_first_style_manifest',
       route,
@@ -496,6 +530,9 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
         visualDirection: visualArtifact?.visual_direction || {},
         styleManifest: deckStyleManifest,
         promptTemplate: promptTemplate.text,
+        factGovernance,
+        verifiedAssetPolicy,
+        longDeckContract,
         repairFeedback: repairFeedbackById.get(slideId) || null,
       });
       const promptHash = sha256(prompt);
@@ -531,6 +568,12 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
           title: safeText(slide?.title),
           layout_family: safeText(slide?.layout_family),
         },
+        fact_governance: factGovernance,
+        verified_asset_policy: verifiedAssetPolicy,
+        long_deck_contract: longDeckContract,
+        forbidden_generated_artifacts: safeArray(factGovernance?.forbidden_generated_artifacts)
+          .map((item) => safeText(item))
+          .filter(Boolean),
         generated_at: new Date().toISOString(),
       };
       const slideStyleManifest = {
@@ -631,7 +674,17 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       generation_metadata_file: paths.metadataFile,
       preserved_slide_hashes: preservedSlideHashes,
     };
-    writeJson(paths.promptManifestFile, { kind: 'ppt_image_page_prompt_manifest', route, prompts: promptEntries });
+    writeJson(paths.promptManifestFile, {
+      kind: 'ppt_image_page_prompt_manifest',
+      route,
+      fact_governance: factGovernance,
+      verified_asset_policy: verifiedAssetPolicy,
+      long_deck_contract: longDeckContract,
+      forbidden_generated_artifacts: safeArray(factGovernance?.forbidden_generated_artifacts)
+        .map((item) => safeText(item))
+        .filter(Boolean),
+      prompts: promptEntries,
+    });
     writeJson(paths.styleManifestFile, deckStyleManifest);
     writeJson(paths.metadataFile, { kind: 'ppt_image_generation_metadata', route, calls: generationMetadata });
     writeJson(paths.manifestFile, manifest);
