@@ -13,6 +13,8 @@ import {
 
 const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
 const DEFAULT_IMAGE_SIZE = '1086x1448';
+const DEFAULT_STYLE_PROFILE_ASSET = 'prompts/xiaohongshu/image-first-default-style-profile.json';
+const DEFAULT_STYLE_REFERENCE_DIR = 'prompts/xiaohongshu/style-references/medical-handdrawn-note-default';
 const DEFAULT_PROMPT_TEMPLATE_ASSET = 'prompts/xiaohongshu/image_first_prompt_template.md';
 const REFERENCE_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
 
@@ -118,6 +120,23 @@ export function createXiaohongshuImagePageParts(deps) {
     return path.isAbsolute(assetPath) ? assetPath : path.join(process.cwd(), assetPath);
   }
 
+  function readJsonIfPresent(file) {
+    if (!file || !existsSync(file)) return {};
+    return JSON.parse(readFileSync(file, 'utf-8'));
+  }
+
+  function defaultStyleProfile(contract) {
+    const fromContract = contract?.prompt_pack?.render_contract?.image_generation || contract?.image_generation || {};
+    const profileAsset = safeText(fromContract?.default_style_profile, DEFAULT_STYLE_PROFILE_ASSET);
+    const profileFile = promptAssetPath(profileAsset);
+    const bytes = existsSync(profileFile) ? readFileSync(profileFile) : Buffer.alloc(0);
+    return {
+      profile_file: profileFile,
+      profile_hash: bytes.length > 0 ? sha256(bytes) : '',
+      profile: readJsonIfPresent(profileFile),
+    };
+  }
+
   function defaultPromptTemplate() {
     const templateFile = promptAssetPath(DEFAULT_PROMPT_TEMPLATE_ASSET);
     const text = existsSync(templateFile) ? readFileSync(templateFile, 'utf-8') : '';
@@ -193,39 +212,48 @@ export function createXiaohongshuImagePageParts(deps) {
     };
   }
 
-  function candidateStyleReferenceDir(contract) {
-    return safeText(
+  function styleReferenceDirPolicy(contract) {
+    const fromContract = contract?.prompt_pack?.render_contract?.image_generation || contract?.image_generation || {};
+    const userDir = safeText(
       contract?.delivery_request?.style_reference_dir
         || contract?.style_reference_dir
-        || contract?.prompt_pack?.render_contract?.image_generation?.style_reference_dir
+        || fromContract?.style_reference_dir
         || process.env.REDCUBE_XHS_STYLE_REFERENCE_DIR
         || process.env.REDCUBE_IMAGE_PPT_STYLE_REFERENCE_DIR,
     );
+    const builtInDir = safeText(fromContract?.built_in_style_reference_dir, DEFAULT_STYLE_REFERENCE_DIR);
+    return {
+      requestedDir: userDir,
+      builtInDir,
+      effectiveDir: userDir || builtInDir,
+      sourceMode: userDir ? 'user_style_reference_dir' : 'built_in_style_reference_template',
+      shouldCopyToArtifact: Boolean(userDir),
+    };
   }
 
   function copyStyleReferences(contract, paths) {
-    const requestedDir = candidateStyleReferenceDir(contract);
-    if (!requestedDir) {
-      return { mode: 'repo_default_style_profile', requested_dir_hash: null, copied_files: [] };
-    }
-    if (!existsSync(requestedDir) || !statSync(requestedDir).isDirectory()) {
+    const policy = styleReferenceDirPolicy(contract);
+    const referenceDir = promptAssetPath(policy.effectiveDir);
+    if (!referenceDir || !existsSync(referenceDir) || !statSync(referenceDir).isDirectory()) {
       return {
-        mode: 'user_style_reference_dir_blocked',
-        requested_dir_hash: sha256(requestedDir),
+        mode: policy.requestedDir ? 'user_style_reference_dir_blocked' : 'built_in_style_reference_dir_blocked',
+        requested_dir_hash: policy.requestedDir ? sha256(policy.requestedDir) : null,
+        built_in_dir_hash: policy.builtInDir ? sha256(policy.builtInDir) : null,
         blocked_reason: 'style_reference_dir_missing_or_not_directory',
         copied_files: [],
       };
     }
-    const copiedFiles = readdirSync(requestedDir)
+    const referenceFiles = readdirSync(referenceDir)
       .filter((name) => REFERENCE_IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase()))
       .slice(0, 16)
       .map((name) => {
-        const sourceFile = path.join(requestedDir, name);
-        const targetFile = path.join(paths.referenceDir, name);
-        copyFileSync(sourceFile, targetFile);
-        const bytes = readFileSync(targetFile);
+        const sourceFile = path.join(referenceDir, name);
+        const targetFile = policy.shouldCopyToArtifact ? path.join(paths.referenceDir, name) : '';
+        if (policy.shouldCopyToArtifact) copyFileSync(sourceFile, targetFile);
+        const bytes = readFileSync(policy.shouldCopyToArtifact ? targetFile : sourceFile);
         return {
           file_name: name,
+          repo_reference: policy.shouldCopyToArtifact ? '' : path.posix.join(policy.effectiveDir, name),
           copied_file: targetFile,
           sha256: sha256(bytes),
           bytes: bytes.length,
@@ -233,11 +261,26 @@ export function createXiaohongshuImagePageParts(deps) {
         };
       });
     return {
-      mode: copiedFiles.length > 0 ? 'user_style_reference_dir' : 'user_style_reference_dir_empty',
-      requested_dir_hash: sha256(requestedDir),
-      copied_files: copiedFiles,
-      authorization_notice: 'Operator supplied style references are copied into this deliverable artifact store for local style grounding.',
+      mode: referenceFiles.length > 0 ? policy.sourceMode : `${policy.sourceMode}_empty`,
+      requested_dir_hash: policy.requestedDir ? sha256(policy.requestedDir) : null,
+      built_in_dir_hash: policy.builtInDir ? sha256(policy.builtInDir) : null,
+      effective_dir_hash: sha256(policy.effectiveDir),
+      copied_files: referenceFiles.filter((item) => safeText(item?.copied_file)),
+      built_in_reference_files: policy.shouldCopyToArtifact ? [] : referenceFiles,
+      reference_scope: 'visual_style_only',
+      artifact_materialization: policy.shouldCopyToArtifact ? 'copied_operator_references' : 'repo_builtin_reference_manifest_only',
+      author_identity_policy: {
+        built_in_references_visible_author_identity_allowed: false,
+        user_references_must_not_be_copied_for_author_identity: true,
+      },
+      authorization_notice: policy.requestedDir
+        ? 'Operator supplied style references replace built-in RCA references in the style manifest for visual grounding only.'
+        : 'RCA built-in naturally no-author style references are recorded in the style manifest for local style grounding and audit without copying reference PNGs into the deliverable artifact store.',
     };
+  }
+
+  function styleReferenceFileCount(styleReferences) {
+    return safeArray(styleReferences?.copied_files).length + safeArray(styleReferences?.built_in_reference_files).length;
   }
 
   function repairFeedbackFromReview(reviewArtifact) {
@@ -388,19 +431,32 @@ export function createXiaohongshuImagePageParts(deps) {
     const paths = imagePagePaths(deliverablePaths, deliverableId, route);
     const config = responsesConfig();
     const toolOptions = imageGenerationToolOptions(contract);
+    const styleProfile = defaultStyleProfile(contract);
     const promptTemplate = defaultPromptTemplate();
     const styleReferences = copyStyleReferences(contract, paths);
     const styleManifest = {
       kind: 'xiaohongshu_image_first_style_manifest',
       route,
       source_visual_route: route,
+      default_style_profile_file: styleProfile.profile_file,
+      default_style_profile_hash: styleProfile.profile_hash,
       prompt_template_file: promptTemplate.file,
       prompt_template_hash: promptTemplate.hash,
       style_reference: styleReferences,
+      style_profile: styleProfile.profile,
       visual_direction_hash: sha256(stableJson(visualArtifact?.visual_direction || {})),
       fact_copy_guard: {
         reference_images_style_only: true,
         fact_whitelist_source: 'single_note_plan.page_core_content',
+        forbidden_reference_carryover: [
+          'author_names',
+          'page_numbers',
+          'series_names',
+          'disease_objects',
+          'logos',
+          'qr_codes',
+          'institutions',
+        ],
       },
       generated_at: new Date().toISOString(),
     };
@@ -484,6 +540,9 @@ export function createXiaohongshuImagePageParts(deps) {
         image_sha256: imageHash,
         image_file: imageFile,
         style_reference_hash: sha256(stableJson(styleReferences)),
+        style_reference_mode: safeText(styleReferences?.mode),
+        style_reference_image_count: styleReferenceFileCount(styleReferences),
+        reference_images_attached_to_request: false,
         style_manifest_file: styleManifestFile,
         prompt_manifest_file: promptManifestFile,
         dimensions,

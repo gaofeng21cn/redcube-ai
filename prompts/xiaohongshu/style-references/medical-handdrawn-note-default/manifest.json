@@ -1,0 +1,42 @@
+{
+  "template_id": "medical_handdrawn_note_no_author_v1",
+  "profile_id": "xiaohongshu_image_first_medical_handdrawn_note_default_v1",
+  "source_workbench": "AI小红书笔记/output/胸痛科普系列",
+  "curation_date": "2026-05-06",
+  "reference_scope": "visual_style_only",
+  "runtime_use": {
+    "default_request_parameter": false,
+    "default_artifact_copy": false,
+    "usage": "Repo-bundled reference layer for style profile, operator inspection, and style-manifest grounding."
+  },
+  "author_identity_policy": {
+    "visible_author_identity_allowed": false,
+    "visible_qr_or_logo_allowed": false,
+    "visible_institution_identity_allowed": false,
+    "notes": "Only naturally no-author interior pages are included. Do not use edited-over footer references as built-in RCA style assets."
+  },
+  "fact_copy_policy": {
+    "copy_reference_facts_allowed": false,
+    "copy_reference_page_numbers_allowed": false,
+    "copy_reference_series_names_allowed": false,
+    "copy_reference_disease_objects_allowed": false,
+    "allowed_use": "Use paper texture, hand-drawn linework, marker colors, note-card hierarchy, and decorative grammar only."
+  },
+  "images": [
+    {
+      "file": "concept_map_no_author.png",
+      "role": "concept_map",
+      "layout_cues": ["central anatomy map", "radial arrows", "pastel sticky notes", "bottom conclusion strip"]
+    },
+    {
+      "file": "checklist_stack_no_author.png",
+      "role": "checklist_stack",
+      "layout_cues": ["mechanism illustration", "numbered checklist", "warning closure", "marker emphasis"]
+    },
+    {
+      "file": "assessment_board_no_author.png",
+      "role": "assessment_board",
+      "layout_cues": ["board panel", "three action cards", "medical icon labels", "balanced whitespace"]
+    }
+  ]
+}

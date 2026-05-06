@@ -1,0 +1,96 @@
+{
+  "profile_id": "xiaohongshu_image_first_medical_handdrawn_note_default_v1",
+  "deliverable_kind": "xiaohongshu_note",
+  "visual_route": "image_first_full_note_page",
+  "model_family": "gpt-image-2",
+  "default_canvas": {
+    "aspect_ratio": "3:4",
+    "pixel_size": "1086x1448",
+    "page_contract": "complete_xiaohongshu_note_page_image"
+  },
+  "style_system": {
+    "background": [
+      "warm dotted notebook paper",
+      "subtle paper texture",
+      "clean mobile note page"
+    ],
+    "linework": [
+      "bold black hand-drawn Chinese lettering",
+      "marker arrows",
+      "dashed connectors",
+      "loose sketch outlines"
+    ],
+    "color": [
+      "mint green title wash",
+      "sky blue note strips",
+      "soft yellow taped paper",
+      "small red marker emphasis for warning or priority only",
+      "restrained green accent"
+    ],
+    "decorative_grammar": [
+      "washi tape corners",
+      "torn paper note blocks",
+      "round numbered stickers",
+      "small hand-drawn medical icons",
+      "simple hearts, stars, arrows, and warning marks as secondary decoration"
+    ],
+    "typography": [
+      "large readable Chinese title",
+      "short Chinese labels",
+      "few primary points per page",
+      "avoid tiny paragraphs",
+      "stable but topic-specific footer signature grammar"
+    ],
+    "layout_families": [
+      "central concept map",
+      "stacked checklist",
+      "assessment board with three action cards"
+    ]
+  },
+  "built_in_reference_template": {
+    "template_id": "medical_handdrawn_note_no_author_v1",
+    "reference_dir": "prompts/xiaohongshu/style-references/medical-handdrawn-note-default",
+    "author_identity_policy": "built-in reference images must be naturally free of visible author names, QR codes, logos, and publication identity before becoming default RCA assets",
+    "reference_scope": "visual_style_only",
+    "default_runtime_use": "style_manifest_and_operator_reference_only"
+  },
+  "whole_page_requirements": [
+    "state that the output is a complete 3:4 Xiaohongshu note page image",
+    "state the 1086x1448 target size",
+    "include full page background, title, visual structure, labels, decorative grammar, and safe margins",
+    "avoid asking for isolated stickers, icon packs, component sheets, HTML screenshots, or separate design elements"
+  ],
+  "fragmentation_risk_controls": {
+    "forbidden_asset_requests": [
+      "icon set",
+      "separate stickers",
+      "transparent sticker pack",
+      "diagram elements only",
+      "HTML screenshot",
+      "component sheet"
+    ],
+    "required_language": [
+      "complete 3:4 Xiaohongshu note page image",
+      "full page",
+      "single finished note page"
+    ]
+  },
+  "fact_boundary_defaults": [
+    "Medical and scientific facts must come only from the current page fact whitelist.",
+    "Reference images are visual style anchors only.",
+    "Do not copy reference-image disease objects, page numbers, series names, author names, logos, QR codes, or institution names."
+  ],
+  "style_reference_policy": {
+    "default_reference_dir": "prompts/xiaohongshu/style-references/medical-handdrawn-note-default",
+    "user_override_field": "style_reference_dir",
+    "override_semantics": "User style references replace the built-in reference manifest for visual inspiration only.",
+    "mandatory_constraints_after_override": [
+      "default_canvas",
+      "whole_page_requirements",
+      "style_system.typography",
+      "fragmentation_risk_controls",
+      "fact_boundary_defaults"
+    ],
+    "repo_vendor_policy": "Only curated, naturally no-author reference images may be vendored as RCA built-in default style templates."
+  }
+}

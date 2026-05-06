@@ -244,7 +244,10 @@ const PROMPT_PACK = {
       output_mode: 'full_page_png',
       canvas: { ...LAYOUT_RULES.canvas, width: 1086, height: 1448 },
       page_image_artifacts_required: true,
+      default_style_profile: 'prompts/xiaohongshu/image-first-default-style-profile.json',
+      built_in_style_reference_dir: 'prompts/xiaohongshu/style-references/medical-handdrawn-note-default',
       style_reference_dir_input: 'delivery_request.style_reference_dir',
+      style_reference_override_semantics: 'operator_style_reference_dir_replaces_built_in_reference_manifest_for_visual_style_only',
       review_input_surface: 'image_page_png_manifest',
     },
     html_authoring_lane: {

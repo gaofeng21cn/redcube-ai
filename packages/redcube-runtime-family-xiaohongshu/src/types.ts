@@ -85,7 +85,10 @@ export interface XhsRuntimeRenderContract {
     size?: '1086x1448';
     output_mode?: 'full_page_png';
     page_image_artifacts_required?: boolean;
+    default_style_profile?: string;
+    built_in_style_reference_dir?: string;
     style_reference_dir_input?: string;
+    style_reference_override_semantics?: string;
     review_input_surface?: string;
   };
   selectable_explicit_routes?: Array<'render_html' | 'fix_html'>;

@@ -258,7 +258,10 @@ export interface XiaohongshuPromptPack {
         scrollbars_forbidden: true;
       };
       page_image_artifacts_required: true;
+      default_style_profile: string;
+      built_in_style_reference_dir: string;
       style_reference_dir_input: 'delivery_request.style_reference_dir';
+      style_reference_override_semantics: string;
       review_input_surface: 'image_page_png_manifest';
     };
     selectable_explicit_routes: ReadonlyArray<'render_html' | 'fix_html'>;

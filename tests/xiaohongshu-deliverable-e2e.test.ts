@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   applyReviewMutation,
@@ -138,6 +138,24 @@ test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets 
     assert.equal(existsSync(authored.image_page_manifest.generation_metadata_file), true);
     assert.equal(authored.image_page_manifest.slides[0].dimensions.width, 1086);
     assert.equal(authored.image_page_manifest.slides[0].dimensions.height, 1448);
+    const authoredStyleManifest = readJson(authored.image_page_manifest.style_manifest);
+    assert.equal(
+      authoredStyleManifest.default_style_profile_file.endsWith('prompts/xiaohongshu/image-first-default-style-profile.json'),
+      true,
+    );
+    assert.equal(authoredStyleManifest.style_profile.profile_id, 'xiaohongshu_image_first_medical_handdrawn_note_default_v1');
+    assert.equal(authoredStyleManifest.style_reference.mode, 'built_in_style_reference_template');
+    assert.equal(authoredStyleManifest.style_reference.artifact_materialization, 'repo_builtin_reference_manifest_only');
+    assert.equal(authoredStyleManifest.style_reference.copied_files.length, 0);
+    assert.equal(authoredStyleManifest.style_reference.built_in_reference_files.length, 3);
+    assert.equal(authoredStyleManifest.fact_copy_guard.reference_images_style_only, true);
+    assert.equal(authoredStyleManifest.fact_copy_guard.forbidden_reference_carryover.includes('author_names'), true);
+    for (const reference of authoredStyleManifest.style_reference.built_in_reference_files) {
+      assert.equal(reference.repo_reference.startsWith('prompts/xiaohongshu/style-references/medical-handdrawn-note-default/'), true);
+      assert.equal(existsSync(path.resolve(reference.repo_reference)), true);
+      assert.equal(reference.copied_file, '');
+      assert.match(reference.file_name, /no_author\.png$/);
+    }
 
     const blockedSlide = authored.image_page_manifest.slides[1] || authored.image_page_manifest.slides[0];
     writeJson(stageArtifactFile(created, 'screenshot_review'), {
@@ -177,6 +195,61 @@ test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets 
       assert.equal(preservedAfter.hash, preservedBefore.hash);
       assert.equal(preservedAfter.preserved_slide_hash, preservedBefore.hash);
     }
+  });
+});
+
+test('xiaohongshu style_reference_dir replaces built-in no-author style manifest only', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-style-ref-'));
+    const styleRefDir = path.join(workspaceRoot, 'operator-style-ref');
+    mkdirSync(styleRefDir, { recursive: true });
+    writeFileSync(path.join(styleRefDir, 'operator-style.png'), Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000000020001e221bc330000000049454e44ae426082', 'hex'));
+    const created = await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: '甲状腺门诊小红书科普',
+      goal: '为门诊患者生成可发布的科普图文',
+    });
+    const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
+    const contract = readJson(contractFile);
+    contract.delivery_request = {
+      ...(contract.delivery_request || {}),
+      style_reference_dir: styleRefDir,
+    };
+    writeJson(contractFile, contract);
+
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const authoredResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route: 'author_image_pages',
+    });
+    assert.equal(authoredResult.ok, true);
+    const authored = readJson(authoredResult.artifactFile);
+    const styleManifest = readJson(authored.image_page_manifest.style_manifest);
+
+    assert.equal(styleManifest.style_reference.mode, 'user_style_reference_dir');
+    assert.equal(styleManifest.style_reference.artifact_materialization, 'copied_operator_references');
+    assert.equal(styleManifest.style_reference.copied_files.length, 1);
+    assert.equal(styleManifest.style_reference.copied_files[0].file_name, 'operator-style.png');
+    assert.equal(existsSync(styleManifest.style_reference.copied_files[0].copied_file), true);
+    assert.equal(styleManifest.fact_copy_guard.reference_images_style_only, true);
   });
 });
 

@@ -1,6 +1,8 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 
 import {
   buildTopicRecord,
@@ -63,6 +65,18 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
   assert.equal(contract.prompt_pack.render_contract.image_generation.size, '1086x1448');
   assert.equal(contract.prompt_pack.render_contract.image_generation.output_mode, 'full_page_png');
   assert.equal(contract.prompt_pack.render_contract.image_generation.canvas.ratio, '3:4');
+  assert.equal(
+    contract.prompt_pack.render_contract.image_generation.default_style_profile,
+    'prompts/xiaohongshu/image-first-default-style-profile.json',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.image_generation.built_in_style_reference_dir,
+    'prompts/xiaohongshu/style-references/medical-handdrawn-note-default',
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.image_generation.style_reference_override_semantics,
+    'operator_style_reference_dir_replaces_built_in_reference_manifest_for_visual_style_only',
+  );
   assert.deepEqual(
     contract.prompt_pack.render_contract.selectable_explicit_routes,
     ['render_html', 'fix_html'],
@@ -85,6 +99,35 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
   );
   assert.equal(contract.delivery_contract.required_export_route, 'export_bundle');
   assert.equal(contract.delivery_contract.human_gate.required, true);
+});
+
+test('xiaohongshu built-in image-first style template is sanitized and style-only', () => {
+  const profileFile = path.resolve('prompts/xiaohongshu/image-first-default-style-profile.json');
+  const referenceDir = path.resolve('prompts/xiaohongshu/style-references/medical-handdrawn-note-default');
+  const manifestFile = path.join(referenceDir, 'manifest.json');
+  const profile = JSON.parse(readFileSync(profileFile, 'utf-8'));
+  const manifest = JSON.parse(readFileSync(manifestFile, 'utf-8'));
+
+  assert.equal(profile.profile_id, 'xiaohongshu_image_first_medical_handdrawn_note_default_v1');
+  assert.equal(profile.default_canvas.aspect_ratio, '3:4');
+  assert.equal(profile.built_in_reference_template.reference_scope, 'visual_style_only');
+  assert.equal(profile.built_in_reference_template.default_runtime_use, 'style_manifest_and_operator_reference_only');
+  assert.equal(profile.built_in_reference_template.author_identity_policy.includes('naturally free of visible author names'), true);
+  assert.equal(profile.style_reference_policy.default_reference_dir, 'prompts/xiaohongshu/style-references/medical-handdrawn-note-default');
+  assert.equal(profile.style_reference_policy.user_override_field, 'style_reference_dir');
+  assert.equal(profile.style_reference_policy.override_semantics.includes('replace'), true);
+  assert.equal(manifest.reference_scope, 'visual_style_only');
+  assert.equal(manifest.runtime_use.default_request_parameter, false);
+  assert.equal(manifest.runtime_use.default_artifact_copy, false);
+  assert.equal(manifest.author_identity_policy.visible_author_identity_allowed, false);
+  assert.equal(manifest.author_identity_policy.visible_qr_or_logo_allowed, false);
+  assert.equal(manifest.author_identity_policy.notes.includes('naturally no-author interior pages'), true);
+  assert.equal(manifest.fact_copy_policy.copy_reference_facts_allowed, false);
+  assert.equal(manifest.images.length, 3);
+  for (const image of manifest.images) {
+    assert.equal(existsSync(path.join(referenceDir, image.file)), true, image.file);
+    assert.match(image.file, /no_author\.png$/);
+  }
 });
 
 test('buildXiaohongshuDeliverableRecord emits canonical xiaohongshu deliverable metadata', () => {
