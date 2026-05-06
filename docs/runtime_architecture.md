@@ -209,6 +209,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 
 - `visual_direction`
 - route-specific visual implementation
+  - `xiaohongshu` 默认：`author_image_pages`
   - `ppt_deck` 默认：`author_image_pages`
   - 显式 HTML 路线：`render_html`
 

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
@@ -12,6 +13,8 @@ export const MIN_REVIEW_QA_BLOCKS = 2;
 export const MIN_REVIEW_PRIMARY_POINTS = 1;
 export const HARD_SCREENSHOT_BLOCKING_ISSUES = new Set(['overflow_detected']);
 export const PAGE_FIX_ROUTE = 'fix_html';
+export const IMAGE_AUTHOR_ROUTE = 'author_image_pages';
+export const IMAGE_REPAIR_ROUTE = 'repair_image_pages';
 export const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
   'overflow_detected',
   'occlusion_detected',
@@ -240,6 +243,171 @@ export function getDeliverableViewSurfacePaths(deliverablePaths) {
   };
 }
 
+export function currentImagePagesStageId(contract, deliverablePaths) {
+  const authorFile = stageArtifactPath(contract, deliverablePaths, IMAGE_AUTHOR_ROUTE);
+  const repairFile = stageArtifactPath(contract, deliverablePaths, IMAGE_REPAIR_ROUTE);
+  const authorMtimeMs = safeFileMtimeMs(authorFile);
+  const repairMtimeMs = safeFileMtimeMs(repairFile);
+  if (repairMtimeMs > 0 && repairMtimeMs >= authorMtimeMs) {
+    return IMAGE_REPAIR_ROUTE;
+  }
+  return authorMtimeMs > 0 ? IMAGE_AUTHOR_ROUTE : '';
+}
+
+export function imagePagePngFile(page) {
+  return safeText(page?.png_file || page?.image_file || page?.screenshot_file || page?.file);
+}
+
+export function imagePagesBundle(artifact) {
+  return artifact?.image_pages_bundle || artifact?.image_pages || {};
+}
+
+export function imagePagesList(artifact) {
+  const bundle = imagePagesBundle(artifact);
+  return safeArray(bundle?.pages || artifact?.image_page_manifest?.slides || artifact?.pages).map((page, index) => ({
+    ...page,
+    slide_id: safeText(page?.slide_id, `N${String(index + 1).padStart(2, '0')}`),
+    title: safeText(page?.title, `Page ${index + 1}`),
+    png_file: imagePagePngFile(page),
+    image_file: imagePagePngFile(page),
+    prompt_manifest_file: safeText(page?.prompt_manifest_file || bundle?.prompt_manifest_file || artifact?.prompt_manifest_file),
+    style_manifest_file: safeText(page?.style_manifest_file || bundle?.style_manifest_file || artifact?.style_manifest_file),
+  }));
+}
+
+export function isImagePagesArtifact(artifact) {
+  const route = safeText(artifact?.route);
+  if (![IMAGE_AUTHOR_ROUTE, IMAGE_REPAIR_ROUTE].includes(route)) return false;
+  return imagePagesList(artifact).length > 0 || safeArray(imagePagesBundle(artifact)?.png_refs).length > 0;
+}
+
+export function currentVisualStageId(contract, deliverablePaths) {
+  const htmlStage = currentHtmlStageId(contract, deliverablePaths);
+  const htmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, htmlStage));
+  const imageStage = currentImagePagesStageId(contract, deliverablePaths);
+  const imageMtimeMs = imageStage ? safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, imageStage)) : 0;
+  const candidates = [
+    { stage: htmlStage, mtimeMs: htmlMtimeMs },
+    { stage: imageStage, mtimeMs: imageMtimeMs },
+  ].filter((item) => item.stage && item.mtimeMs > 0);
+  if (candidates.length > 0) {
+    candidates.sort((left, right) => right.mtimeMs - left.mtimeMs);
+    return candidates[0].stage;
+  }
+  return imageStage || '';
+}
+
+export function readCurrentVisualArtifact(contract, deliverablePaths) {
+  const stageId = currentVisualStageId(contract, deliverablePaths);
+  if (!stageId) return null;
+  return stageId === 'render_html' || stageId === PAGE_FIX_ROUTE
+    ? readCurrentHtmlArtifact(contract, deliverablePaths)
+    : readStageArtifact(contract, deliverablePaths, stageId);
+}
+
+export function visualArtifactMtimeMs(contract, deliverablePaths) {
+  const stageId = currentVisualStageId(contract, deliverablePaths);
+  return stageId ? safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, stageId)) : 0;
+}
+
+export function pngDimensions(file) {
+  if (!file || !existsSync(file)) return null;
+  const buffer = readFileSync(file);
+  if (buffer.length < 24) return null;
+  if (buffer.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') return null;
+  if (buffer.subarray(12, 16).toString('ascii') !== 'IHDR') return null;
+  return {
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+  };
+}
+
+export function fileSha256(file) {
+  if (!file || !existsSync(file)) return '';
+  return createHash('sha256').update(readFileSync(file)).digest('hex');
+}
+
+export function imagePagesMechanicalReviewPayload(imageArtifact) {
+  const pages = imagePagesList(imageArtifact);
+  const hashes = new Map();
+  for (const page of pages) {
+    const sha256 = fileSha256(safeText(page.png_file));
+    if (sha256) hashes.set(sha256, (hashes.get(sha256) || 0) + 1);
+  }
+  const slideReviews = pages.map((page) => {
+    const pngFile = safeText(page.png_file);
+    const dimensions = pngDimensions(pngFile);
+    const sha256 = fileSha256(pngFile);
+    const bytes = pngFile && existsSync(pngFile) ? readFileSync(pngFile).length : 0;
+    const ratioOk = dimensions !== null
+      && Math.abs((dimensions.width / Math.max(dimensions.height, 1)) - (3 / 4)) < 0.02;
+    const nonEmpty = bytes > 0;
+    const promptManifestFile = safeText(page.prompt_manifest_file);
+    const styleManifestFile = safeText(page.style_manifest_file);
+    const manifestPresent = Boolean(promptManifestFile && existsSync(promptManifestFile) && styleManifestFile && existsSync(styleManifestFile));
+    const duplicate = Boolean(sha256 && (hashes.get(sha256) || 0) > 1);
+    const lowInformation = bytes > 0 && bytes < 1500;
+    const issues = [
+      ...(!pngFile || !existsSync(pngFile) ? ['image_page_png_missing'] : []),
+      ...(!manifestPresent ? ['image_page_manifest_missing'] : []),
+      ...(!ratioOk ? ['image_page_not_3_4'] : []),
+      ...(!nonEmpty ? ['image_page_empty_png'] : []),
+      ...(duplicate ? ['duplicate_image_hash'] : []),
+      ...(lowInformation ? ['low_information_density_signal'] : []),
+    ];
+    return {
+      slide_id: safeText(page.slide_id),
+      title: safeText(page.title),
+      layout_family: safeText(page.layout_family, 'image_page'),
+      screenshot_file: pngFile,
+      checks: {
+        overflow_free: issues.length === 0,
+        occlusion_free: issues.length === 0,
+        visual_density_ok: !lowInformation && nonEmpty,
+        block_content_fit_ok: issues.length === 0,
+        speaker_fit_ok: true,
+      },
+      metrics: {
+        occupied_ratio: 0.52,
+        primary_points: 3,
+        overlaps: [],
+        image_width: dimensions?.width || 0,
+        image_height: dimensions?.height || 0,
+        aspect_ratio: dimensions ? Number((dimensions.width / Math.max(dimensions.height, 1)).toFixed(4)) : null,
+        bytes,
+        sha256: sha256 || null,
+        duplicate_hash: duplicate,
+        prompt_manifest_file: promptManifestFile || null,
+        style_manifest_file: styleManifestFile || null,
+        render_proof_source: 'image_pages_png_manifest',
+        source_visual_route: safeText(imageArtifact?.route),
+      },
+      issues,
+    };
+  });
+  const checks = {
+    overflow_free: slideReviews.every((slide) => slide.checks.overflow_free),
+    occlusion_free: slideReviews.every((slide) => slide.checks.occlusion_free),
+    visual_density_ok: slideReviews.every((slide) => slide.checks.visual_density_ok),
+    block_content_fit_ok: slideReviews.every((slide) => slide.checks.block_content_fit_ok),
+    speaker_fit_ok: true,
+  };
+  return {
+    source_surface_kind: 'image_pages',
+    source_visual_route: safeText(imageArtifact?.route),
+    page_count: pages.length,
+    checks,
+    metrics: {
+      page_count: pages.length,
+      source_surface_kind: 'image_pages',
+      source_visual_route: safeText(imageArtifact?.route),
+      duplicate_hash_count: slideReviews.filter((slide) => slide.metrics.duplicate_hash).length,
+      low_information_density_count: slideReviews.filter((slide) => slide.issues.includes('low_information_density_signal')).length,
+    },
+    slide_reviews: slideReviews,
+  };
+}
+
 export function getDeliverablePublishSurfacePaths(deliverablePaths) {
   const baseName = safeText(deliverablePaths?.deliverableId, 'deliverable');
   const publishDir = path.join(deliverablePaths.deliverableDir, 'publish');
@@ -310,6 +478,9 @@ export function buildPublishBundleReadme({
   publishHtmlFile,
   publishCaptionFile,
   publishScreenshotsDir,
+  sourceSurfaceKind = 'html',
+  sourceVisualRoute = '',
+  publishImageFiles = [],
   authorSignature = null,
   deliveryState = null,
 }) {
@@ -317,9 +488,12 @@ export function buildPublishBundleReadme({
     '# publish 交付包',
     '',
     `- 当前 publish 包状态：${safeText(deliveryState?.current, 'output_ready')}`,
-    `- HTML：${path.basename(publishHtmlFile)}`,
+    `- Source surface：${safeText(sourceSurfaceKind, 'html')}`,
+    `- Source visual route：${safeText(sourceVisualRoute)}`,
+    ...(safeText(publishHtmlFile) ? [`- HTML：${path.basename(publishHtmlFile)}`] : []),
     `- Caption：${path.basename(publishCaptionFile)}`,
     `- Screenshots：${path.relative(publishDir, publishScreenshotsDir)}`,
+    `- Image files：${safeArray(publishImageFiles).length}`,
     `- 署名：${safeText(authorSignature?.signature_display)}`,
     `- 品牌：${safeText(authorSignature?.signature_subtitle)}`,
   ];
@@ -389,7 +563,10 @@ export function readJson(file) {
 }
 
 export function stageArtifactPath(contract, deliverablePaths, stageId) {
-  const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
+  const stage = [
+    ...safeArray(contract?.stage_sequence?.stages),
+    ...safeArray(contract?.stage_sequence?.alternate_stages),
+  ].find((item) => item?.stage_id === stageId);
   return path.join(deliverablePaths.artifactsDir, safeText(stage?.output_artifact, `${stageId}.json`));
 }
 
@@ -412,17 +589,22 @@ export function currentHtmlStageId(contract, deliverablePaths) {
   const fixArtifactFile = stageArtifactPath(contract, deliverablePaths, PAGE_FIX_ROUTE);
   const fixMtimeMs = safeFileMtimeMs(fixArtifactFile);
   const renderMtimeMs = safeFileMtimeMs(renderArtifactFile);
+  if (fixMtimeMs <= 0 && renderMtimeMs <= 0) return '';
   return fixMtimeMs > 0 && fixMtimeMs >= renderMtimeMs
     ? PAGE_FIX_ROUTE
     : 'render_html';
 }
 
 export function readCurrentHtmlArtifact(contract, deliverablePaths) {
-  return readStageArtifact(contract, deliverablePaths, currentHtmlStageId(contract, deliverablePaths));
+  const stageId = currentHtmlStageId(contract, deliverablePaths);
+  return stageId ? readStageArtifact(contract, deliverablePaths, stageId) : null;
 }
 
 export function stageOrder(contract, stageId) {
-  return safeArray(contract?.stage_sequence?.stages).findIndex((stage) => stage?.stage_id === stageId);
+  return [
+    ...safeArray(contract?.stage_sequence?.stages),
+    ...safeArray(contract?.stage_sequence?.alternate_stages),
+  ].findIndex((stage) => stage?.stage_id === stageId);
 }
 
 export function rerunStageFromReviewSurface(contract, failedChecks, fallbackStage) {

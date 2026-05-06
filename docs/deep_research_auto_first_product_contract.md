@@ -236,7 +236,7 @@
 - `Source Readiness`：`source intake + research`
 - `Storyline`：`storyline`
 - `Plan`：`single_note_plan`
-- `Visual`：`visual_direction + render_html`
+- `Visual`：`visual_direction + author_image_pages`（默认 image-first）；显式 HTML 路线仍可使用 `render_html`
 - `Delivery`：`publish_copy + export_bundle`
 
 ### 10.2 PPT

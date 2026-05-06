@@ -670,6 +670,24 @@ test('product frontdesk exposes overlay stage sequence for ppt_deck callers', as
     assert.equal(frontdesk.overlay_stage_sequences.ppt_deck.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
     assert.equal(frontdesk.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
     assert.equal(frontdesk.overlay_stage_sequences.ppt_deck.route_gate_policy, 'fail_closed_against_overlay_stage_sequence');
+    assert.deepEqual(
+      frontdesk.overlay_stage_sequences.xiaohongshu.protected_stage_sequence,
+      [
+        'research',
+        'storyline',
+        'single_note_plan',
+        'visual_direction',
+        'author_image_pages',
+        'visual_director_review',
+        'screenshot_review',
+        'repair_image_pages',
+        'publish_copy',
+        'export_bundle',
+      ],
+    );
+    assert.equal(frontdesk.overlay_stage_sequences.xiaohongshu.default_visual_route, 'author_image_pages');
+    assert.equal(frontdesk.overlay_stage_sequences.xiaohongshu.default_visual_policy, 'image_first');
+    assert.equal(frontdesk.overlay_stage_sequences.xiaohongshu.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
   });
 });
 

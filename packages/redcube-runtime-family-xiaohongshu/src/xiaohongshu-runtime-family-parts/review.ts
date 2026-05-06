@@ -25,6 +25,9 @@ export function createXiaohongshuReviewParts(deps) {
     getDeliverableViewSurfacePaths,
     hasAiVisualBlock,
     hasAiVisualPass,
+    imagePagesList,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     loadPriorRenderedXhsSlideHtmlMap,
     markPublishBundleStaleAfterBlockedReview,
     normalizeStringList,
@@ -33,6 +36,7 @@ export function createXiaohongshuReviewParts(deps) {
     promoteStableHtml,
     promptRoute,
     readCurrentHtmlArtifact,
+    readCurrentVisualArtifact,
     readJson,
     readStageArtifact,
     requireText,
@@ -69,6 +73,8 @@ export function createXiaohongshuReviewParts(deps) {
     getDeliverableViewSurfacePaths,
     hasAiVisualBlock,
     hasAiVisualPass,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     loadPriorRenderedXhsSlideHtmlMap,
     markPublishBundleStaleAfterBlockedReview,
     normalizeStringList,
@@ -77,6 +83,7 @@ export function createXiaohongshuReviewParts(deps) {
     promoteStableHtml,
     promptRoute,
     readCurrentHtmlArtifact,
+    readCurrentVisualArtifact,
     readJson,
     readStageArtifact,
     requireText,
@@ -96,11 +103,12 @@ export function createXiaohongshuReviewParts(deps) {
   }
 
   function collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact) {
-    if (safeText(renderArtifact?.route) !== 'fix_html') return [];
+    if (!['fix_html', 'repair_image_pages'].includes(safeText(renderArtifact?.route))) return [];
     if (!priorReviewArtifact?.visual_director_review) return [];
     return [...new Set([
       ...safeArray(renderArtifact?.unit_repair_scope?.target_slide_ids),
       ...safeArray(renderArtifact?.html_bundle?.repair_scope?.target_slide_ids),
+      ...safeArray(renderArtifact?.repair_image_pages?.blocked_slide_ids),
     ].map((slideId) => safeText(slideId)).filter(Boolean))];
   }
 
@@ -115,11 +123,30 @@ export function createXiaohongshuReviewParts(deps) {
     const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
     const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
     const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-    const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const render = readCurrentVisualArtifact(contract, deliverablePaths);
     const incrementalReview = safeArray(incrementalTargetSlideIds).length > 0;
-    const renderedSlides = incrementalReview
-      ? filterSlideScopedArray(render?.html_bundle?.slides, incrementalTargetSlideIds)
-      : safeArray(render?.html_bundle?.slides);
+    const imagePagesReviewInput = isImagePagesArtifact(render);
+    const renderedSlides = imagePagesReviewInput
+      ? imagePagesList(render).map((page) => ({
+          slide_id: page.slide_id,
+          title: page.title,
+          layout_family: page.layout_family,
+          peak_page: false,
+          text_excerpt: `image-first XHS page: PNG=${path.basename(page.png_file || '')}; prompt_manifest=${path.basename(page.prompt_manifest_file || '')}; style_manifest=${path.basename(page.style_manifest_file || '')}`,
+          png_file: page.png_file,
+          prompt_manifest_file: page.prompt_manifest_file,
+          style_manifest_file: page.style_manifest_file,
+        }))
+      : safeArray(render?.html_bundle?.slides).map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          layout_family: slide.layout_family,
+          peak_page: slide.director_contract?.peak_page,
+          text_excerpt: stripHtml(slide.content).slice(0, 180),
+        }));
+    const reviewRenderSummary = incrementalReview
+      ? filterSlideScopedArray(renderedSlides, incrementalTargetSlideIds)
+      : renderedSlides;
     return generateStructuredArtifact({
       adapter,
       family: 'xiaohongshu',
@@ -135,21 +162,26 @@ export function createXiaohongshuReviewParts(deps) {
             : summarizePlanSlides(plan),
         },
         visual_direction: visual?.visual_direction || null,
-        render_summary: renderedSlides.map((slide) => ({
-          slide_id: slide.slide_id,
-          title: slide.title,
-          layout_family: slide.layout_family,
-          peak_page: slide.director_contract?.peak_page,
-          text_excerpt: stripHtml(slide.content).slice(0, 180),
-        })),
+        render_summary: reviewRenderSummary,
+        source_surface_kind: imagePagesReviewInput ? 'image_pages' : 'html',
       },
+      localFileInspection: imagePagesReviewInput
+        ? reviewRenderSummary.map((page, index) => ({
+            label: `${page.slide_id} ${safeText(page.title, `Page ${index + 1}`)}`.trim(),
+            path: page.png_file,
+            media_type: 'image/png',
+            purpose: `Review image-first Xiaohongshu page ${page.slide_id}`,
+          }))
+        : undefined,
       outputContract: directorReviewOutputContract(),
     });
   }
 
   async function buildDirectorReview(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-    const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
-    const renderArtifact = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const candidateSurfaceRefs = isImagePagesArtifact(renderArtifact)
+      ? safeArray(renderArtifact?.artifact_refs)
+      : syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
     const priorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     const incrementalTargetSlideIds = collectIncrementalDirectorReviewTargetSlideIds(renderArtifact, priorReviewArtifact);
     const incrementalReview = incrementalTargetSlideIds.length > 0;
@@ -163,7 +195,11 @@ export function createXiaohongshuReviewParts(deps) {
     const directorIntentLanded = Boolean(data?.director_intent_landed);
     const antiTemplateOk = Boolean(data?.anti_template_ok);
     const memoryHookPresent = Boolean(data?.memory_hook_present);
-    const renderedSlides = safeArray(readCurrentHtmlArtifact(contract, deliverablePaths)?.html_bundle?.slides);
+    const currentVisualArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const imagePagesReviewInput = isImagePagesArtifact(currentVisualArtifact);
+    const renderedSlides = imagePagesReviewInput
+      ? imagePagesList(currentVisualArtifact)
+      : safeArray(readCurrentHtmlArtifact(contract, deliverablePaths)?.html_bundle?.slides);
     const weakPages = normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', {
       min: 0,
       max: renderedSlides.length,
@@ -210,7 +246,7 @@ export function createXiaohongshuReviewParts(deps) {
         homogeneous_layout_risk: homogeneousLayoutRisk,
         weak_pages: weakPages,
         review_summary: reviewSummary,
-        rewrite_action: status === 'pass' ? 'none' : safeText(data?.rewrite_action, 'revise_render_html'),
+        rewrite_action: status === 'pass' ? 'none' : safeText(data?.rewrite_action, imagePagesReviewInput ? 'repair_image_pages' : 'revise_render_html'),
         creative_sources: {
           review_judgement: creativeSourceStamp({
             route: 'visual_director_review',
@@ -246,10 +282,10 @@ export function createXiaohongshuReviewParts(deps) {
               anti_template_ok: antiTemplateOk,
               memory_hook_present: memoryHookPresent,
             }).filter(([, value]) => value === false).map(([key]) => key),
-        rerun_from_stage: status === 'pass' ? null : 'render_html',
+        rerun_from_stage: status === 'pass' ? null : imagePagesReviewInput ? 'repair_image_pages' : 'render_html',
         rerun_policy: {
           status: status === 'pass' ? 'idle' : 'rerun_required',
-          rerun_from_stage: status === 'pass' ? null : 'render_html',
+          rerun_from_stage: status === 'pass' ? null : imagePagesReviewInput ? 'repair_image_pages' : 'render_html',
         },
       },
     };

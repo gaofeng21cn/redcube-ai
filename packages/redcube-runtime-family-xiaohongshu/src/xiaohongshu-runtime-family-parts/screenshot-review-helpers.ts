@@ -54,6 +54,27 @@ export function createXiaohongshuScreenshotReviewHelpers(deps) {
     const hash = createHash('sha256');
     hash.update('xiaohongshu_screenshot_mechanics:v1\n');
     hash.update(`${CANVAS.width}x${CANVAS.height}\n`);
+    hash.update(`${safeText(render?.route)}\n`);
+    const imagePages = safeArray(render?.image_pages_bundle?.pages || render?.image_page_manifest?.slides);
+    if (imagePages.length > 0) {
+      hash.update('image_pages\n');
+      for (const page of imagePages) {
+        const pngFile = safeText(page?.png_file || page?.image_file || page?.screenshot_file || page?.file);
+        hash.update(JSON.stringify({
+          slide_id: safeText(page?.slide_id),
+          title: safeText(page?.title),
+          png_file: pngFile,
+          prompt_manifest_file: safeText(page?.prompt_manifest_file),
+          style_manifest_file: safeText(page?.style_manifest_file),
+        }));
+        hash.update('\n');
+        if (pngFile && existsSync(pngFile)) {
+          hash.update(readFileSync(pngFile));
+        }
+        hash.update('\n');
+      }
+      return hash.digest('hex');
+    }
     hash.update(htmlFile);
     hash.update('\n');
     if (htmlFile && existsSync(htmlFile)) {

@@ -26,6 +26,7 @@ import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 import * as shared from './shared.js';
 import * as support from './support.js';
 import { createXiaohongshuAuthoringParts } from './authoring.js';
+import { createXiaohongshuImagePageParts } from './image-pages.js';
 import { createXiaohongshuRenderParts } from './render.js';
 import { createXiaohongshuReviewParts } from './review.js';
 import { createXiaohongshuDeliveryParts } from './delivery.js';
@@ -33,13 +34,15 @@ import { createXiaohongshuDeliveryParts } from './delivery.js';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
 const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
-const CANVAS = { ratio: '3:4', width: 448, height: 597 };
+const CANVAS = { ratio: '3:4', width: 1086, height: 1448 };
 
 const LIFECYCLE_STAGE_BY_ROUTE = Object.freeze({
   research: 'source_readiness',
   storyline: 'story_architecture',
   single_note_plan: 'story_architecture',
   visual_direction: 'visual_authorship',
+  author_image_pages: 'visual_authorship',
+  repair_image_pages: 'visual_authorship',
   render_html: 'visual_authorship',
   fix_html: 'visual_authorship',
   visual_director_review: 'review_overlay',
@@ -53,6 +56,8 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',
   single_note_plan: 'story_architecture',
   visual_direction: 'visual_authorship',
+  author_image_pages: 'visual_authorship',
+  repair_image_pages: 'visual_authorship',
   fix_html: 'visual_authorship',
 });
 
@@ -192,7 +197,8 @@ function attachCommon(route, contract, generationRuntime = null, adapter = CODEX
 function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const contract = shared.readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
-  const required = shared.safeArray(contract?.stage_requirements?.[route]?.requires_artifacts);
+  const required = shared.safeArray(contract?.stage_requirements?.[route]?.requires_artifacts)
+    .filter((stageId) => !(route === 'visual_director_review' && stageId === 'author_image_pages'));
   const missing = required.filter((stageId) => !shared.readStageArtifact(contract, deliverablePaths, stageId));
   if (missing.length > 0) {
     throw new Error(`Route ${route} requires completed stage artifacts: ${missing.join(', ')}`);
@@ -205,11 +211,23 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   }
   const currentHtmlStage = shared.currentHtmlStageId(contract, deliverablePaths);
   const currentHtmlMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, currentHtmlStage));
+  const currentVisualStage = shared.currentVisualStageId(contract, deliverablePaths);
+  const currentVisualMtimeMs = shared.visualArtifactMtimeMs(contract, deliverablePaths);
   if (route === shared.PAGE_FIX_ROUTE) {
     const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
     if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
       throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
     }
+  }
+  if (route === shared.IMAGE_REPAIR_ROUTE) {
+    const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+    const authorMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, shared.IMAGE_AUTHOR_ROUTE));
+    if (screenshotReviewMtimeMs < authorMtimeMs) {
+      throw new Error('Route repair_image_pages requires screenshot_review based on the current image pages; rerun screenshot_review first');
+    }
+  }
+  if (route === 'visual_director_review' && !currentVisualStage) {
+    throw new Error('Route visual_director_review requires author_image_pages or render_html before review');
   }
   if (route === 'screenshot_review') {
     const directorReviewArtifact = shared.readStageArtifact(contract, deliverablePaths, 'visual_director_review');
@@ -217,8 +235,8 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
       throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
     }
     const directorReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
-    if (directorReviewMtimeMs < currentHtmlMtimeMs) {
-      throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest HTML changes');
+    if (directorReviewMtimeMs < currentVisualMtimeMs) {
+      throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest visual changes');
     }
   }
   if (route === 'screenshot_review' && mode === 'optimize_existing' && !shared.safeText(baselineDeliverableId)) {
@@ -236,8 +254,8 @@ function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mod
   }
   if (route === 'publish_copy' || route === 'export_bundle') {
     const screenshotReviewMtimeMs = shared.safeFileMtimeMs(shared.stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
-    if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
-      throw new Error(`Route ${route} requires screenshot_review to be rerun after the latest HTML changes`);
+    if (screenshotReviewMtimeMs < currentVisualMtimeMs) {
+      throw new Error(`Route ${route} requires screenshot_review to be rerun after the latest visual changes`);
     }
   }
   if (route === 'export_bundle') {
@@ -326,6 +344,7 @@ const runtimeDeps = {
 };
 
 const authoringParts = createXiaohongshuAuthoringParts(runtimeDeps);
+const imagePageParts = createXiaohongshuImagePageParts(runtimeDeps);
 const renderParts = createXiaohongshuRenderParts(runtimeDeps);
 const reviewParts = createXiaohongshuReviewParts(runtimeDeps);
 const deliveryParts = createXiaohongshuDeliveryParts(runtimeDeps);
@@ -371,6 +390,22 @@ export async function runXiaohongshuRoute({
           baselineDeliverableId,
           adapter,
         );
+      case 'author_image_pages':
+        return imagePageParts.buildImagePagesArtifact({
+          deliverableId,
+          contract,
+          deliverablePaths,
+          route: 'author_image_pages',
+          adapter,
+        });
+      case 'repair_image_pages':
+        return imagePageParts.buildImagePagesArtifact({
+          deliverableId,
+          contract,
+          deliverablePaths,
+          route: 'repair_image_pages',
+          adapter,
+        });
       case 'render_html':
         return renderParts.buildRenderHtml(workspaceRoot, contract, deliverablePaths, adapter);
       case 'fix_html':

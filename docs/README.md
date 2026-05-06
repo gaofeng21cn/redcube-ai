@@ -25,6 +25,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - `OPL` joins through the internal bridge surface when family-level routing is needed.
 - The implementation target is `TypeScript + Python`: TypeScript owns product/runtime contracts and service boundaries, while Python owns native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
 - `ppt_deck` defaults to image-first full-slide PNG authoring through `author_image_pages`; HTML `render_html/fix_html` and editable native PPTX `author_pptx_native/repair_pptx_native` remain explicit selectable routes.
+- `xiaohongshu` now follows the same image-first product route: `author_image_pages` generates full 3:4 PNG note pages with GPT-Image-2, `screenshot_review` consumes the PNG/page manifest, and `repair_image_pages` redraws only blocked pages. HTML `render_html/fix_html` remains explicit for deterministic web drafts and historical maintenance.
 - Runtime truth remains file-authority first with rebuildable artifact indexes. SQLite persistence is deferred for RCA until measured artifact/session file growth or cross-deliverable query pressure justifies a rebuildable sidecar index.
 - `frontdesk` command keys remain agent-facing product-entry overview / intake / entry-shell contracts below the single `redcube-ai` app skill; they do not imply a mature GUI, WebUI, or end-user front office.
 

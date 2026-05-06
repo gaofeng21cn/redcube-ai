@@ -92,7 +92,7 @@ test('createDeliverable supports xiaohongshu on the shared runtime mainline', as
   assert.equal(created.deliverable.overlay, 'xiaohongshu');
   assert.equal(created.deliverable.kind, 'xiaohongshu_note');
   assert.equal(created.deliverable.profile_id, 'standard_note');
-  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle']);
+  assert.deepEqual(created.deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'repair_image_pages', 'publish_copy', 'export_bundle']);
 });
 
 test('createDeliverable supports poster_onepager on the shared runtime mainline', async () => {

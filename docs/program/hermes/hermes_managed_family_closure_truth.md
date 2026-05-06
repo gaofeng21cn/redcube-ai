@@ -18,7 +18,7 @@
 
 - managed control plane 现在会在创建 durable managed state 之前，先校验请求 `overlay` 是否与 hydrated deliverable contract 一致
 - managed control plane 现在会在进入执行前校验 `stop_after_stage` 是否属于 hydrated `stage_sequence`，不再静默忽略未声明阶段
-- `xiaohongshu` 可以沿 `research -> storyline -> single_note_plan -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> publish_copy -> export_bundle` 跑通 Hermes-backed managed closure
+- `xiaohongshu` 可以沿当前默认 image-first 主线 `research -> storyline -> single_note_plan -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> repair_image_pages -> publish_copy -> export_bundle` 跑通 Hermes-backed managed closure；`render_html/fix_html` 只作为显式 HTML lane 保留
 - `poster_onepager` 可以沿 `storyline -> poster_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_bundle` 跑通 guarded knowledge-poster managed closure
 - `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 会继续与 managed family closure 的最终 routed run 对齐
 

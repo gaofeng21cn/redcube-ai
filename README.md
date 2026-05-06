@@ -48,7 +48,7 @@ You can start with prompts like:
 ## Current Delivery Focus
 
 - `Slides` for teaching decks, academic talks, internal briefings, and formal reports. The current default PPT route is image-first full-slide authoring; HTML and editable native PPTX are explicit selectable routes.
-- `Xiaohongshu notes` for knowledge posts, science communication, and serialized publishing.
+- `Xiaohongshu notes` for knowledge posts, science communication, and serialized publishing. The default route is GPT-Image-2 full-page 3:4 PNG authoring through `author_image_pages`; HTML remains an explicit maintenance route.
 - `Knowledge posters` for single-page visual delivery.
 - Academic paper and conference poster lanes continue to be evaluated case by case.
 

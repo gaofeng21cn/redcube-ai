@@ -189,6 +189,7 @@ function makeXhsDeliveryParts() {
       metrics: { page_count: 1 },
     }],
     ['publish_copy', { publish_copy: { caption_file: captionFile, author_signature: 'RedCube' } }],
+    ['render_html', { route: 'render_html', html_bundle: { html_file: stableHtmlFile, slides: [{ slide_id: 'P01', content: '<article>stable note</article>' }] } }],
   ]);
 
   const deliveryParts = createXiaohongshuDeliveryParts({
@@ -219,9 +220,13 @@ function makeXhsDeliveryParts() {
       publishReadmeFile: path.join(paths.deliverableDir, 'publish', 'README.md'),
     }),
     getDeliverableViewSurfacePaths: () => ({ stableHtmlFile }),
+    imagePagesList: () => [],
+    isImagePagesArtifact: () => false,
     isSeries: () => false,
     normalizeStringList: (value) => safeArray(value),
     primarySurface: () => 'test-surface',
+    readCurrentHtmlArtifact: () => artifacts.get('render_html'),
+    readCurrentVisualArtifact: () => artifacts.get('render_html'),
     readStageArtifact: (_contract, _paths, stage) => artifacts.get(stage) || null,
     requireText: (value) => safeText(value, 'ok'),
     safeArray,

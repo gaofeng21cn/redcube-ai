@@ -92,7 +92,7 @@ test('stable families expose one explicit governance_surface contract on create 
       deliverableId: 'note-a',
       title: '甲状腺门诊小红书科普',
       goal: '为门诊患者生成可发布的科普图文',
-      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'],
+      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy'],
     });
     const poster = await buildReviewReadyWorkspace({
       workspaceRoot,
@@ -165,7 +165,7 @@ test('canonical publication projection, audit, and watch rebuild governance summ
       deliverableId: 'note-a',
       title: '甲状腺门诊小红书科普',
       goal: '为门诊患者生成可发布的科普图文',
-      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'],
+      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy'],
     });
     await buildReviewReadyWorkspace({
       workspaceRoot,

@@ -200,8 +200,16 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
   }
   if (overlay === 'xiaohongshu' && ['visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'].includes(route)) {
     files.push(
+      stageArtifactFile(deliverablePaths, contract, 'author_image_pages'),
+      stageArtifactFile(deliverablePaths, contract, 'repair_image_pages'),
       stageArtifactFile(deliverablePaths, contract, 'render_html'),
       stageArtifactFile(deliverablePaths, contract, 'fix_html'),
+    );
+  }
+  if (overlay === 'xiaohongshu' && ['author_image_pages', 'repair_image_pages', 'render_html', 'fix_html'].includes(route)) {
+    files.push(
+      stageArtifactFile(deliverablePaths, contract, 'visual_director_review'),
+      stageArtifactFile(deliverablePaths, contract, 'screenshot_review'),
     );
   }
   return Array.from(new Set(files));

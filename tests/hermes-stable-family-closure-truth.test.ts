@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   auditDeliverable,
@@ -211,7 +211,7 @@ test('xiaohongshu human-publication closure keeps the current Codex host-agent r
       'storyline',
       'single_note_plan',
       'visual_direction',
-      'render_html',
+      'author_image_pages',
       'visual_director_review',
       'screenshot_review',
       'publish_copy',
@@ -265,10 +265,13 @@ test('xiaohongshu human-publication closure keeps the current Codex host-agent r
     assert.equal(artifact.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
     assert.equal(artifact.export_bundle.delivery_state.current, 'output_ready');
-    assert.equal(existsSync(artifact.export_bundle.html_file), true);
+    assert.equal(artifact.export_bundle.source_surface_kind, 'image_pages');
+    assert.equal(artifact.export_bundle.source_visual_route, 'author_image_pages');
+    assert.equal(artifact.export_bundle.html_file, '');
     assert.equal(existsSync(artifact.export_bundle.caption_file), true);
     assert.equal(Array.isArray(artifact.export_bundle.png_files), true);
     assert.equal(artifact.export_bundle.png_files.length > 0, true);
+    assert.equal(artifact.export_bundle.png_files.every((file) => existsSync(file)), true);
 
     assert.equal(review.governance_surface.family_boundary.human_publication, true);
     assert.equal(review.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');

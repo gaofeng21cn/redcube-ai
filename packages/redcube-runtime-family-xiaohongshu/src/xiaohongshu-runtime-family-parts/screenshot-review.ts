@@ -25,6 +25,8 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
     getDeliverableViewSurfacePaths,
     hasAiVisualBlock,
     hasAiVisualPass,
+    imagePagesMechanicalReviewPayload,
+    isImagePagesArtifact,
     loadPriorRenderedXhsSlideHtmlMap,
     markPublishBundleStaleAfterBlockedReview,
     normalizeStringList,
@@ -33,6 +35,7 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
     promoteStableHtml,
     promptRoute,
     readCurrentHtmlArtifact,
+    readCurrentVisualArtifact,
     readJson,
     readStageArtifact,
     requireText,
@@ -81,6 +84,7 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
     const visual = readStageArtifact(contract, deliverablePaths, 'visual_direction');
     const directorReview = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
     const renderedSlideHtmlById = loadPriorRenderedXhsSlideHtmlMap(renderArtifact);
+    const imagePagesReviewInput = isImagePagesArtifact(renderArtifact);
     return generateStructuredArtifact({
       adapter,
       family: 'xiaohongshu',
@@ -96,7 +100,9 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
         visual_direction: visual?.visual_direction || null,
         director_review: directorReview?.visual_director_review || null,
         screenshot_mechanics: {
-          source_html_file: safeText(renderArtifact?.html_bundle?.html_file) || null,
+          source_html_file: imagePagesReviewInput ? null : safeText(renderArtifact?.html_bundle?.html_file) || null,
+          source_visual_route: safeText(renderArtifact?.route) || null,
+          source_surface_kind: imagePagesReviewInput ? 'image_pages' : 'html',
           overall_checks: reviewPayload?.checks || null,
           metrics: reviewPayload?.metrics || null,
           baseline: reviewPayload?.baseline || null,
@@ -108,7 +114,8 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
             issues: slide.issues,
             occupied_ratio: slide.metrics?.occupied_ratio ?? null,
             primary_points: slide.metrics?.primary_points ?? null,
-            source_html: renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
+            source_html: imagePagesReviewInput ? null : renderedSlideHtmlById.get(safeText(slide.slide_id)) || null,
+            source_png: imagePagesReviewInput ? safeText(slide.screenshot_file) : null,
           })),
         },
       },
@@ -132,16 +139,19 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
     baselineDeliverableId,
     adapter = CODEX_DEFAULT_ADAPTER,
   ) {
-    const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
-    const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const render = readCurrentVisualArtifact(contract, deliverablePaths);
+    const imagePagesReviewInput = isImagePagesArtifact(render);
+    const candidateSurfaceRefs = imagePagesReviewInput
+      ? safeArray(render?.artifact_refs)
+      : syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
     const preflightArtifact = buildPreflightGateArtifact(contract, render);
-    if (preflightArtifact) {
+    if (!imagePagesReviewInput && preflightArtifact) {
       return preflightArtifact;
     }
     const research = readStageArtifact(contract, deliverablePaths, 'research');
     const reviewMarkdown = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉质控复核.md`);
     const screenshotsDir = ensureDir(path.join(deliverablePaths.reportsDir, 'screenshots'));
-    const args = [
+    const args = imagePagesReviewInput ? [] : [
       '--html', render.html_bundle.html_file,
       '--output-dir', screenshotsDir,
       '--review-markdown', reviewMarkdown,
@@ -149,7 +159,7 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
       '--frame-width', String(CANVAS.width),
       '--frame-height', String(CANVAS.height),
     ];
-    if (mode === 'optimize_existing') {
+    if (!imagePagesReviewInput && mode === 'optimize_existing') {
       const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
       const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
       args.push('--baseline-review', stageArtifactPath(baselineContract, baselinePaths, 'screenshot_review'));
@@ -163,7 +173,9 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
     }
     const cachedPayload = cachedMechanicalReview(priorReviewArtifact, reviewHash);
     const cacheStatus = cachedPayload && !incrementalReview ? 'hit' : 'miss';
-    const python = cacheStatus === 'hit' ? cachedPayload : runPython(PYTHON_REVIEW, args);
+    const python = imagePagesReviewInput
+      ? imagePagesMechanicalReviewPayload(render)
+      : cacheStatus === 'hit' ? cachedPayload : runPython(PYTHON_REVIEW, args);
     const freshMechanicalSlideReviews = safeArray(python.slide_reviews).map((slide) => {
       const occupiedRatio = Number(slide?.metrics?.occupied_ratio || 0);
       const overlaps = safeArray(slide?.metrics?.overlaps);
@@ -198,13 +210,15 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
           incrementalTargetSlideIds,
         )
       : freshMechanicalSlideReviews;
-    const captureManifest = materializeScreenshotCaptureStore({
-      reportsDir: deliverablePaths.reportsDir,
-      captureId: 'current',
-      screenshotsDir,
-      slideReviews: mechanicalSlideReviews,
-      currentViewMode: 'source',
-    });
+    const captureManifest = imagePagesReviewInput
+      ? { slides: mechanicalSlideReviews.map((slide) => ({ slide_id: slide.slide_id, current_path: slide.screenshot_file })) }
+      : materializeScreenshotCaptureStore({
+          reportsDir: deliverablePaths.reportsDir,
+          captureId: 'current',
+          screenshotsDir,
+          slideReviews: mechanicalSlideReviews,
+          currentViewMode: 'source',
+        });
     const captureBySlideId = new Map(
       safeArray(captureManifest.slides)
         .map((slide) => [safeText(slide?.slide_id), slide])
@@ -284,15 +298,18 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
     const status = failedChecks.length === 0 ? 'pass' : 'block';
     const rerunFromStage = status === 'pass'
       ? null
-      : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
-    const targetedSlideIds = status === 'pass' || rerunFromStage !== 'fix_html'
+      : imagePagesReviewInput
+        ? 'repair_image_pages'
+        : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
+    const targetedRepairRoute = imagePagesReviewInput ? 'repair_image_pages' : 'fix_html';
+    const targetedSlideIds = status === 'pass' || rerunFromStage !== targetedRepairRoute
       ? []
       : collectSlidesNeedingTargetedRevision(slideReviews)
           .map((slide) => safeText(slide?.slide_id))
           .filter(Boolean);
     const targetedRerunPolicy = targetedSlideIds.length > 0
       ? {
-          default_route: 'fix_html',
+          default_route: targetedRepairRoute,
           scope: 'page',
           target_slide_ids: targetedSlideIds,
           source_review_stage: 'screenshot_review',
@@ -365,7 +382,7 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
       },
       report_markdown: reviewMarkdown,
       metrics: python.metrics,
-      artifact_refs: [...candidateSurfaceRefs, reviewMarkdown, captureManifest.manifest_file, ...slideReviews.map((slide) => slide.screenshot_file)],
+      artifact_refs: [...candidateSurfaceRefs, reviewMarkdown, captureManifest.manifest_file, ...slideReviews.map((slide) => slide.screenshot_file)].filter(Boolean),
       review_state_patch: {
         current_status: status === 'pass' ? 'review_passed' : 'blocked_for_revision',
         ready_for_export: false,
@@ -397,7 +414,9 @@ export function createXiaohongshuScreenshotReviewParts(deps) {
       artifact.artifact_refs = [
         ...new Set([
           ...safeArray(artifact.artifact_refs),
-          ...promoteStableHtml(getDeliverableViewSurfacePaths(deliverablePaths), render.html_bundle.html_file),
+          ...(imagePagesReviewInput
+            ? []
+            : promoteStableHtml(getDeliverableViewSurfacePaths(deliverablePaths), render.html_bundle.html_file)),
         ]),
       ];
     } else {

@@ -234,30 +234,47 @@ export function buildMockXhsVisualDirection(meta) {
   };
 }
 
-export function buildXhsSlideMarkup(slide, totalSlides, peakPage = false, authorBranding = null) {
+function xhsCanvasFromMeta(meta) {
+  const shell = meta?.context?.shell_contract || {};
+  const width = Number(shell.width || 1086);
+  const height = Number(shell.height || 1448);
+  return {
+    width: Number.isFinite(width) && width > 0 ? Math.round(width) : 1086,
+    height: Number.isFinite(height) && height > 0 ? Math.round(height) : 1448,
+  };
+}
+
+function px(value) {
+  return `${Math.round(value)}px`;
+}
+
+export function buildXhsSlideMarkup(slide, totalSlides, peakPage = false, authorBranding = null, canvas = { width: 1086, height: 1448 }) {
   const accent = peakPage ? '#DC2626' : '#2563EB';
   const signatureDisplay = safeText(authorBranding?.signature_display);
   const signatureSubtitle = safeText(authorBranding?.signature_subtitle);
   const showBranding = Boolean(signatureDisplay) && (Number(slide.slide_no) === 1 || Number(slide.slide_no) === totalSlides);
+  const scale = Math.min(Number(canvas.width || 1086) / 448, Number(canvas.height || 1448) / 597);
+  const rootWidth = Number(canvas.width || 1086);
+  const rootHeight = Number(canvas.height || 1448);
   const cards = safeArray(slide.page_core_content)
     .slice(0, 3)
     .map((item, index) => `
-      <article data-qa-block="card-${index + 1}" data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:12px 14px;border-radius:18px;background:${index === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.8)'};border:1px solid rgba(15,23,42,0.1);font-size:${index === 0 ? '24px' : '18px'};line-height:1.5;color:#0F172A;">${safeText(item)}</article>
+      <article data-qa-block="card-${index + 1}" data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:${px(18 * scale)} ${px(22 * scale)};border-radius:${px(18 * scale)};background:${index === 0 ? '#FFFFFF' : 'rgba(255,255,255,0.8)'};border:${Math.max(1, Math.round(scale))}px solid rgba(15,23,42,0.1);font-size:${px((index === 0 ? 24 : 18) * scale)};line-height:1.5;color:#0F172A;">${safeText(item)}</article>
     `)
     .join('');
   return `
-    <div data-slide-root="true" data-slide-id="${safeText(slide.slide_id)}" data-title="${safeText(slide.title)}" data-speaker-seconds="36" data-layout-family="${safeText(slide.layout_family)}" data-recipe-id="${safeText(slide.render_recipe_id)}" data-template-id="upstream_ai_html" data-peak-page="${peakPage}" style="position:relative;width:448px;height:597px;background:#FFFBF0;overflow:hidden;padding:22px 20px 26px;display:grid;grid-template-rows:auto 1fr auto;gap:14px;">
-      <header data-qa-block="header" style="display:grid;gap:8px;">
-        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:${accent};">${safeText(slide.page_goal)}</div>
-        <h2 style="margin:0;font-size:28px;line-height:1.2;color:#0F172A;">${safeText(slide.title)}</h2>
+    <div data-slide-root="true" data-slide-id="${safeText(slide.slide_id)}" data-title="${safeText(slide.title)}" data-speaker-seconds="36" data-layout-family="${safeText(slide.layout_family)}" data-recipe-id="${safeText(slide.render_recipe_id)}" data-template-id="upstream_ai_html" data-peak-page="${peakPage}" style="position:relative;width:${px(rootWidth)};height:${px(rootHeight)};background:#FFFBF0;overflow:hidden;padding:${px(54 * scale)} ${px(46 * scale)} ${px(60 * scale)};display:grid;grid-template-rows:auto 1fr auto;gap:${px(26 * scale)};">
+      <header data-qa-block="header" style="display:grid;gap:${px(10 * scale)};">
+        <div style="font-size:${px(11 * scale)};letter-spacing:0.08em;text-transform:uppercase;font-weight:800;color:${accent};">${safeText(slide.page_goal)}</div>
+        <h2 style="margin:0;font-size:${px(30 * scale)};line-height:1.18;color:#0F172A;">${safeText(slide.title)}</h2>
       </header>
-      <section style="display:grid;gap:12px;align-content:start;">
+      <section style="display:grid;gap:${px(18 * scale)};align-content:start;">
         ${cards}
       </section>
-      ${showBranding ? `<div data-qa-block="author-branding" style="position:absolute;right:20px;bottom:56px;max-width:156px;padding:6px 8px;border-radius:12px;background:rgba(255,255,255,0.92);border:1px solid rgba(15,23,42,0.08);box-shadow:0 8px 18px rgba(15,23,42,0.06);text-align:right;"><div style="font-size:11px;line-height:1.25;color:${accent};font-weight:800;">${signatureDisplay}</div><div style="margin-top:2px;font-size:10px;line-height:1.25;color:#64748B;">${signatureSubtitle}</div></div>` : ''}
-      <footer data-qa-block="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#475569;">
-        <div>${safeText(slide.source_language)}</div>
-        <div style="font-weight:700;">${slide.slide_no} / ${totalSlides}</div>
+      <footer style="display:flex;justify-content:space-between;align-items:center;gap:${px(12 * scale)};font-size:${px(12 * scale)};color:#475569;">
+        <div data-qa-block="source-language">${safeText(slide.source_language)}</div>
+        ${showBranding ? `<div data-qa-block="author-branding" style="max-width:${px(180 * scale)};padding:${px(6 * scale)} ${px(8 * scale)};border-radius:${px(12 * scale)};background:rgba(255,255,255,0.92);border:${Math.max(1, Math.round(scale))}px solid rgba(15,23,42,0.08);box-shadow:0 ${px(6 * scale)} ${px(14 * scale)} rgba(15,23,42,0.06);text-align:center;"><div style="font-size:${px(11 * scale)};line-height:1.25;color:${accent};font-weight:800;">${signatureDisplay}</div><div style="margin-top:${px(2 * scale)};font-size:${px(10 * scale)};line-height:1.25;color:#64748B;">${signatureSubtitle}</div></div>` : ''}
+        <div data-qa-block="page-counter" style="font-weight:700;">${slide.slide_no} / ${totalSlides}</div>
       </footer>
     </div>
   `.trim();
@@ -267,6 +284,7 @@ export function buildMockXhsRender(meta) {
   const slides = safeArray(meta?.context?.plan?.slides);
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
   const authorBranding = meta?.context?.author_branding || null;
+  const canvas = xhsCanvasFromMeta(meta);
   const route = safeText(meta?.route);
   const renderVariants = new Set(
     safeText(process.env.REDCUBE_MOCK_XHS_RENDER_VARIANT)
@@ -303,6 +321,7 @@ export function buildMockXhsRender(meta) {
           slides.length,
           peakPages.has(slide.slide_id),
           authorBranding,
+          canvas,
         );
         if (renderVariants.has('repair_marker')) {
           const slideId = safeText(slide?.slide_id);
@@ -404,6 +423,27 @@ export function buildMockXhsScreenshotReview(meta) {
           ? ['当前卡片保留了待修标记，系统应回到 fix_html 处理后再复核。']
           : ['当前卡片已达到继续推进的截图质量。'],
         recommended_fix: safeText(slide?.slide_id) === blockedSlideId ? '执行 fix_html 并重跑 screenshot_review。' : 'none',
+      })),
+    };
+  }
+  if (variants.has('block_until_repair_image_pages')) {
+    const sourceSurfaceKind = safeText(meta?.context?.screenshot_mechanics?.source_surface_kind);
+    const sourceVisualRoute = safeText(meta?.context?.screenshot_mechanics?.source_visual_route);
+    const blockedSlideId = sourceSurfaceKind === 'image_pages' && sourceVisualRoute === 'author_image_pages'
+      ? 'N02'
+      : '';
+    return {
+      director_intent_landed: true,
+      anti_template_ok: true,
+      weak_pages: blockedSlideId ? [blockedSlideId] : [],
+      review_summary: blockedSlideId ? `${blockedSlideId} 需要通过 repair_image_pages 重绘后再放行。` : '问题页已通过重绘，可以继续发布流程。',
+      slide_reviews: slides.map((slide) => ({
+        slide_id: safeText(slide?.slide_id),
+        judgement: safeText(slide?.slide_id) === blockedSlideId ? 'block' : 'pass',
+        visual_findings: safeText(slide?.slide_id) === blockedSlideId
+          ? ['当前整页图仍有视觉阻断，系统应回到 repair_image_pages 重绘该页。']
+          : ['当前整页图已达到继续推进的视觉质量。'],
+        recommended_fix: safeText(slide?.slide_id) === blockedSlideId ? '执行 repair_image_pages 并重跑 screenshot_review。' : 'none',
       })),
     };
   }

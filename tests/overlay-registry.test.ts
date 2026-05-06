@@ -194,25 +194,27 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       },
     },
   );
+  assert.equal(xiaohongshuCatalog.overlay_id, 'xiaohongshu');
+  assert.equal(xiaohongshuCatalog.default_profile_id, 'standard_note');
+  assert.deepEqual(xiaohongshuCatalog.profiles, ['standard_note']);
   assert.deepEqual(
-    xiaohongshuCatalog,
-    {
-      overlay_id: 'xiaohongshu',
-      default_profile_id: 'standard_note',
-      profiles: ['standard_note'],
-      route_sequence: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle'],
-      deliverable_kind: 'xiaohongshu_note',
-      prompt_pack_id: 'xiaohongshu_mainline_v1',
-      visual_authoring_policy: {
-        default_visual_route: 'render_html',
-      },
-      packages: {
-        overlay: '@redcube/overlay-xiaohongshu',
-        runtime_family: '@redcube/runtime-family-xiaohongshu',
-        pack: '@redcube/pack-xiaohongshu',
-      },
-    },
+    xiaohongshuCatalog.route_sequence,
+    ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'repair_image_pages', 'publish_copy', 'export_bundle'],
   );
+  assert.equal(xiaohongshuCatalog.deliverable_kind, 'xiaohongshu_note');
+  assert.equal(xiaohongshuCatalog.prompt_pack_id, 'xiaohongshu_mainline_v1');
+  assert.equal(xiaohongshuCatalog.visual_authoring_policy.default_visual_route, 'author_image_pages');
+  assert.equal(xiaohongshuCatalog.visual_authoring_policy.default_visual_policy, 'image_first');
+  assert.equal(xiaohongshuCatalog.visual_authoring_policy.image_generation.default_model, 'gpt-image-2');
+  assert.deepEqual(
+    xiaohongshuCatalog.visual_authoring_policy.route_selection_policy.explicit_selection_required_for,
+    ['render_html', 'fix_html'],
+  );
+  assert.deepEqual(xiaohongshuCatalog.packages, {
+    overlay: '@redcube/overlay-xiaohongshu',
+    runtime_family: '@redcube/runtime-family-xiaohongshu',
+    pack: '@redcube/pack-xiaohongshu',
+  });
   assert.deepEqual(
     poster,
     {

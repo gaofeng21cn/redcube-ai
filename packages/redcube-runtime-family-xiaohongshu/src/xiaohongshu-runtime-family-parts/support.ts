@@ -399,7 +399,7 @@ export function directorReviewOutputContract() {
     homogeneous_layout_risk: 0.18,
     weak_pages: ['N03'],
     review_summary: '<string>',
-    rewrite_action: 'none | revise_render_html',
+    rewrite_action: 'none | revise_render_html | repair_image_pages',
   };
 }
 

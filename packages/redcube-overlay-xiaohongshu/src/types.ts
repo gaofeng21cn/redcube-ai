@@ -11,6 +11,8 @@ export type XiaohongshuStageId =
   | 'storyline'
   | 'single_note_plan'
   | 'visual_direction'
+  | 'author_image_pages'
+  | 'repair_image_pages'
   | 'render_html'
   | 'fix_html'
   | 'visual_director_review'
@@ -22,6 +24,8 @@ export type XiaohongshuPromptFile =
   | 'storyline.md'
   | 'single_note_plan.md'
   | 'visual_direction.md'
+  | 'author_image_pages.md'
+  | 'repair_image_pages.md'
   | 'render_html.md'
   | 'fix_html.md'
   | 'director_review.md'
@@ -33,6 +37,8 @@ export type XiaohongshuOutputArtifactFile =
   | 'storyline.json'
   | 'single_note_plan.json'
   | 'visual_direction.json'
+  | 'image_pages_bundle.json'
+  | 'image_pages_repair_bundle.json'
   | 'render_bundle.json'
   | 'fix_bundle.json'
   | 'director_review.json'
@@ -68,6 +74,8 @@ export type XiaohongshuDisplaySurfaceId =
   | 'storyline'
   | 'single_note_plan'
   | 'visual_direction'
+  | 'author_image_pages'
+  | 'repair_image_pages'
   | 'render_html'
   | 'fix_html'
   | 'visual_director_review'
@@ -85,7 +93,7 @@ export type XiaohongshuDisplaySurfaceKind =
   | 'publish_copy'
   | 'delivery_bundle'
   | 'series_surface';
-export type XiaohongshuDisplaySurfaceCondition = 'always' | 'approved_for_export' | 'series_mode';
+export type XiaohongshuDisplaySurfaceCondition = 'always' | 'approved_for_export' | 'series_mode' | 'review_rerun_required' | 'explicit_html_route';
 export type XiaohongshuSurfaceArtifactPath =
   | 'contracts/stage-sequence.json'
   | 'contracts/stage-requirements.json'
@@ -130,6 +138,7 @@ export interface XiaohongshuStageHardStop {
 export interface XiaohongshuStageSequence {
   flow_id: 'xiaohongshu_official_flow';
   stages: XiaohongshuStageDefinition[];
+  alternate_stages?: XiaohongshuStageDefinition[];
   hard_stops: XiaohongshuStageHardStop[];
 }
 
@@ -143,6 +152,8 @@ export interface XiaohongshuStageRequirements {
   storyline: XiaohongshuStageRequirement;
   single_note_plan: XiaohongshuStageRequirement;
   visual_direction: XiaohongshuStageRequirement;
+  author_image_pages: XiaohongshuStageRequirement;
+  repair_image_pages: XiaohongshuStageRequirement;
   render_html: XiaohongshuStageRequirement;
   fix_html: XiaohongshuStageRequirement;
   visual_director_review: XiaohongshuStageRequirement;
@@ -176,8 +187,8 @@ export interface XiaohongshuLayoutRules {
   density_mode: 'mobile_note_stack';
   canvas: {
     ratio: '3:4';
-    width: 448;
-    height: 597;
+    width: 1086;
+    height: 1448;
     scrollbars_forbidden: true;
   };
   max_primary_points_per_slide: 4;
@@ -210,6 +221,8 @@ export interface XiaohongshuPromptPack {
     storyline: 'prompts/xiaohongshu/storyline.md';
     single_note_plan: 'prompts/xiaohongshu/single_note_plan.md';
     visual_direction: 'prompts/xiaohongshu/visual_direction.md';
+    author_image_pages: 'prompts/xiaohongshu/author_image_pages.md';
+    repair_image_pages: 'prompts/xiaohongshu/repair_image_pages.md';
     render_html: 'prompts/xiaohongshu/render_html.md';
     fix_html: 'prompts/xiaohongshu/fix_html.md';
     visual_director_review: 'prompts/xiaohongshu/director_review.md';
@@ -222,6 +235,8 @@ export interface XiaohongshuPromptPack {
     storyline: { file: 'storyline.md' };
     single_note_plan: { file: 'single_note_plan.md' };
     visual_direction: { file: 'visual_direction.md' };
+    author_image_pages: { file: 'author_image_pages.md' };
+    repair_image_pages: { file: 'repair_image_pages.md' };
     render_html: { file: 'render_html.md' };
     fix_html: { file: 'fix_html.md' };
     visual_director_review: { file: 'director_review.md' };
@@ -230,7 +245,24 @@ export interface XiaohongshuPromptPack {
     export_bundle: { file: 'export_bundle.md' };
   };
   render_contract: {
-    render_strategy: 'prompt_director_first';
+    render_strategy: 'image_first_page_authoring';
+    default_visual_route: 'author_image_pages';
+    image_generation: {
+      default_model: 'gpt-image-2';
+      size: '1086x1448';
+      output_mode: 'full_page_png';
+      canvas: {
+        ratio: '3:4';
+        width: 1086;
+        height: 1448;
+        scrollbars_forbidden: true;
+      };
+      page_image_artifacts_required: true;
+      style_reference_dir_input: 'delivery_request.style_reference_dir';
+      review_input_surface: 'image_page_png_manifest';
+    };
+    selectable_explicit_routes: ReadonlyArray<'render_html' | 'fix_html'>;
+    explicit_route_policy: 'html_routes_require_operator_selection';
     shell_file: 'render_shell.html';
     recipe_registry: {
       cover_note: 'xhs.hero_note';

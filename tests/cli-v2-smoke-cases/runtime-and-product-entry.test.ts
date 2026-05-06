@@ -829,7 +829,7 @@ test('CLI review projection proxies topic publication projection read path', asy
     );
     assert.equal(createOutput.ok, true);
 
-    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
       const output = await execCliAsync(
         cliPath,
         [

@@ -56,7 +56,8 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.root === 'prompts/xiaohongshu'
     && typeof content?.routes?.publish_copy === 'string'
     && typeof content?.routes?.visual_director_review === 'string'
-    && content?.render_contract?.render_strategy === 'prompt_director_first'
+    && content?.render_contract?.render_strategy === 'image_first_page_authoring'
+    && content?.render_contract?.default_visual_route === 'author_image_pages'
     && content?.render_contract?.shell_file === 'render_shell.html'
     && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content: SurfaceContract) =>
@@ -67,8 +68,8 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && typeof content?.rerun_from_stage === 'object',
   'contracts/layout-rules.json': (content: SurfaceContract) =>
     content?.canvas?.ratio === '3:4'
-    && content?.canvas?.width === 448
-    && content?.canvas?.height === 597
+    && content?.canvas?.width === 1086
+    && content?.canvas?.height === 1448
     && Array.isArray(content?.forbidden_template_routes),
   'contracts/baseline-policy.json': (content: SurfaceContract) =>
     content?.modes?.draft_new?.baseline_required === false

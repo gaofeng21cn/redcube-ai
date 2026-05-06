@@ -4,7 +4,7 @@
 
 ## Owner boundary
 
-- `storyline`、`detailed_outline`、`slide_blueprint`、`visual_direction`、`render_html` 中的主要 story / visual / markup authorship 必须来自 AI author artifact。
+- `storyline`、`detailed_outline`、`slide_blueprint`、`visual_direction`、`author_image_pages`、`render_html` 中的主要 story / visual / markup authorship 必须来自 AI author artifact。
 - `visual_director_review` 与 `screenshot_review` 的最终视觉判断必须来自 AI reviewer artifact；程序可以提供截图、几何指标、layout QC 和证据引用，但不能把这些机械信号包装成最终视觉结论。
 - `profile pack`、`deliverable contract`、schema、runtime gate、audit report、publication projection 和 baseline scorecard 只拥有结构、引用、状态与可追溯性。
 - `pack-first` 不等于 `AI-first`。把模板或规则搬进 pack 之后，如果主要创作或最终判断仍由确定性程序持有，就仍然违反 AI-first 边界。

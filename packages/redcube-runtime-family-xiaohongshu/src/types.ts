@@ -17,6 +17,8 @@ export type XhsRuntimeRoute =
   | 'storyline'
   | 'single_note_plan'
   | 'visual_direction'
+  | 'author_image_pages'
+  | 'repair_image_pages'
   | 'render_html'
   | 'fix_html'
   | 'visual_director_review'
@@ -37,6 +39,7 @@ export interface XhsRuntimeStageDefinition {
 
 export interface XhsRuntimeStageSequence {
   stages?: XhsRuntimeStageDefinition[];
+  alternate_stages?: XhsRuntimeStageDefinition[];
 }
 
 export interface XhsRuntimeStageRequirement {
@@ -49,6 +52,8 @@ export interface XhsRuntimeStageRequirements {
   storyline?: XhsRuntimeStageRequirement;
   single_note_plan?: XhsRuntimeStageRequirement;
   visual_direction?: XhsRuntimeStageRequirement;
+  author_image_pages?: XhsRuntimeStageRequirement;
+  repair_image_pages?: XhsRuntimeStageRequirement;
   render_html?: XhsRuntimeStageRequirement;
   fix_html?: XhsRuntimeStageRequirement;
   visual_director_review?: XhsRuntimeStageRequirement;
@@ -62,6 +67,8 @@ export interface XhsRuntimePromptRoutes {
   storyline?: string;
   single_note_plan?: string;
   visual_direction?: string;
+  author_image_pages?: string;
+  repair_image_pages?: string;
   render_html?: string;
   fix_html?: string;
   visual_director_review?: string;
@@ -71,6 +78,18 @@ export interface XhsRuntimePromptRoutes {
 }
 
 export interface XhsRuntimeRenderContract {
+  render_strategy?: 'image_first_page_authoring';
+  default_visual_route?: 'author_image_pages';
+  image_generation?: {
+    default_model?: 'gpt-image-2';
+    size?: '1086x1448';
+    output_mode?: 'full_page_png';
+    page_image_artifacts_required?: boolean;
+    style_reference_dir_input?: string;
+    review_input_surface?: string;
+  };
+  selectable_explicit_routes?: Array<'render_html' | 'fix_html'>;
+  explicit_route_policy?: 'html_routes_require_operator_selection';
   shell_file?: string;
   recipe_registry?: {
     default?: string;
@@ -189,7 +208,7 @@ export interface XhsDirectorReviewArtifact extends XhsRuntimeArtifactBase {
     memory_hook_present: boolean;
     homogeneous_layout_risk: number;
     weak_pages: string[];
-    rewrite_action: 'none' | 'revise_render_html';
+    rewrite_action: 'none' | 'revise_render_html' | 'repair_image_pages';
   };
   artifact_refs: string[];
   review_state_patch: XhsRuntimeReviewStatePatch;
@@ -291,6 +310,7 @@ export interface XhsPublishCopyArtifact extends XhsRuntimeArtifactBase {
     hashtags: string[];
     publish_suggestion: {
       cover_slide_id: string;
+      source_surface_kind?: 'image_pages' | 'html';
       recommended_time: string;
     };
     quality_gate: {
@@ -310,6 +330,80 @@ export interface XhsPublishCopyArtifact extends XhsRuntimeArtifactBase {
   review_state_patch: XhsRuntimeReviewStatePatch;
 }
 
+export interface XhsImagePageRecord {
+  slide_id: string;
+  title?: string;
+  layout_family?: string;
+  page_goal?: string;
+  image_file: string;
+  png_file: string;
+  prompt_manifest_file?: string;
+  style_manifest_file?: string;
+  dimensions?: {
+    width?: number;
+    height?: number;
+    ratio?: '3:4';
+  };
+  hash?: string;
+  sha256?: string;
+  generated?: boolean;
+  preserved?: boolean;
+  preserved_slide_hash?: string;
+  source_route?: 'author_image_pages' | 'repair_image_pages';
+}
+
+export interface XhsImagePagesArtifact extends XhsRuntimeArtifactBase {
+  route: 'author_image_pages' | 'repair_image_pages';
+  status: 'completed';
+  image_generation_runtime: {
+    provider?: string;
+    base_url_host?: string;
+    endpoint: '/responses';
+    request_model: string;
+    tool_options?: unknown;
+    token_persisted: false;
+  };
+  image_pages_bundle: {
+    kind: 'xiaohongshu_image_pages_bundle';
+    source_visual_route: 'author_image_pages' | 'repair_image_pages';
+    editable: false;
+    page_count: number;
+    dimensions: {
+      width: 1086;
+      height: 1448;
+      ratio: '3:4';
+    };
+    pages: XhsImagePageRecord[];
+    png_refs: string[];
+    prompt_manifest_file: string;
+    style_manifest_file: string;
+    generation_metadata_file: string;
+    preserved_slide_hashes: Array<{
+      slide_id: string;
+      preserved_slide_hash: string;
+      image_file: string;
+    }>;
+  };
+  image_page_manifest: {
+    kind: 'xiaohongshu_image_page_manifest';
+    source_visual_route: 'author_image_pages' | 'repair_image_pages';
+    editable: false;
+    page_count: number;
+    slides: XhsImagePageRecord[];
+    prompt_manifest: string;
+    style_manifest: string;
+    generation_metadata_file: string;
+  };
+  image_generation_calls: unknown[];
+  repair_image_pages: {
+    source_review_stage: 'screenshot_review';
+    blocked_slide_ids: string[];
+    preserved_slide_hashes: unknown[];
+  } | null;
+  artifact_refs: string[];
+  review_state_patch: XhsRuntimeReviewStatePatch;
+}
+
 export interface XhsSeriesSurfaces {
   cadence_file: string;
   path_mapping_file: string;
@@ -320,10 +414,20 @@ export interface XhsExportBundleArtifact extends XhsRuntimeArtifactBase {
   route: 'export_bundle';
   status: 'completed';
   export_bundle: {
+    source_surface_kind?: 'image_pages' | 'html';
+    source_visual_route?: 'author_image_pages' | 'repair_image_pages' | 'render_html' | 'fix_html';
+    editable?: false;
     html_file: string;
+    source_html?: string;
+    source_artifacts?: unknown;
     png_files: string[];
     caption_file: string;
     publish_manifest_file: string;
+    publish_dir?: string;
+    publish_html_file?: string;
+    publish_caption_file?: string;
+    publish_png_files?: string[];
+    publish_image_files?: string[];
     delivery_state: {
       current: 'output_ready';
       next: 'published_pending_human';
@@ -360,6 +464,8 @@ export type XhsRuntimeRouteResult =
   | XhsRuntimeRouteOutput<'storyline', XhsStorylineArtifact>
   | XhsRuntimeRouteOutput<'single_note_plan', XhsPlanArtifact>
   | XhsRuntimeRouteOutput<'visual_direction', XhsVisualDirectionArtifact>
+  | XhsRuntimeRouteOutput<'author_image_pages', XhsImagePagesArtifact & { route: 'author_image_pages' }>
+  | XhsRuntimeRouteOutput<'repair_image_pages', XhsImagePagesArtifact & { route: 'repair_image_pages' }>
   | XhsRuntimeRouteOutput<'render_html', XhsRenderArtifact>
   | XhsRuntimeRouteOutput<'fix_html', XhsFixHtmlArtifact>
   | XhsRuntimeRouteOutput<'visual_director_review', XhsDirectorReviewArtifact>

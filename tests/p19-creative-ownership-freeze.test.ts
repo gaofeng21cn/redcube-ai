@@ -35,6 +35,13 @@ test('P19.A freezes Codex-native host-agent as the formal primary creative execu
   assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.runtime, 'hermes_native_full_agent_loop');
   assert.equal(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.status, 'opt_in_proof_executor');
   assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.xiaohongshu.story_architecture, ['storyline', 'single_note_plan']);
+  assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.xiaohongshu.visual_authorship, [
+    'visual_direction',
+    'author_image_pages',
+    'repair_image_pages',
+    'render_html',
+    'fix_html',
+  ]);
   assert.deepEqual(P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.protected_creative_routes.ppt_deck.visual_authorship, [
     'visual_direction',
     'author_image_pages',

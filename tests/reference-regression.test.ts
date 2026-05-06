@@ -38,7 +38,7 @@ function fixtureUsesSourceBackedRuntime(fixture) {
 }
 
 const OVERLAY_ROUTES = {
-  xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'],
+  xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy'],
   ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review'],
 };
 

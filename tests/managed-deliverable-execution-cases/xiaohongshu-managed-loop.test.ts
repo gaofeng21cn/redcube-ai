@@ -77,7 +77,7 @@ test('managed execution keeps xiaohongshu on the Codex-backed human-publication 
         'storyline',
         'single_note_plan',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
         'publish_copy',
@@ -144,7 +144,7 @@ test('managed execution keeps xiaohongshu on the Codex-backed human-publication 
   });
 });
 
-test('managed xiaohongshu follows review rerun_from_stage and finishes after fix_html instead of stopping on screenshot block', async () => {
+test('managed xiaohongshu follows review rerun_from_stage and finishes after repair_image_pages instead of stopping on screenshot block', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-xhs-rerun-'));
 
@@ -152,8 +152,8 @@ test('managed xiaohongshu follows review rerun_from_stage and finishes after fix
       workspaceRoot,
       topicId: 'topic-a',
       title: '托管小红书回修主线',
-      brief: '验证 managed 遇到 screenshot_review block 时会自动回到 fix_html 而不是停住。',
-      keywords: ['小红书', 'fix_html', 'managed'],
+      brief: '验证 managed 遇到 screenshot_review block 时会自动回到 repair_image_pages 而不是停住。',
+      keywords: ['小红书', 'repair_image_pages', 'managed'],
     });
 
     await createDeliverable({
@@ -167,8 +167,7 @@ test('managed xiaohongshu follows review rerun_from_stage and finishes after fix
     });
 
     const restoreVariant = withEnv({
-      REDCUBE_MOCK_XHS_RENDER_VARIANT: 'repair_marker',
-      REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT: 'block_until_fix_html',
+      REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT: 'block_until_repair_image_pages',
     });
     try {
       const result = await runManagedDeliverable({
@@ -188,10 +187,10 @@ test('managed xiaohongshu follows review rerun_from_stage and finishes after fix
           'storyline',
           'single_note_plan',
           'visual_direction',
-          'render_html',
+          'author_image_pages',
           'visual_director_review',
           'screenshot_review',
-          'fix_html',
+          'repair_image_pages',
           'visual_director_review',
           'screenshot_review',
           'publish_copy',

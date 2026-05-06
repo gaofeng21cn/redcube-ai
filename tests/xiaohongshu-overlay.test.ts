@@ -15,7 +15,7 @@ test('buildTopicRecord emits canonical xiaohongshu topic metadata', () => {
   assert.equal(topic.topic_id, 'topic-a');
   assert.equal(topic.overlay, 'xiaohongshu');
   assert.equal(topic.status, 'draft');
-  assert.deepEqual(topic.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle']);
+  assert.deepEqual(topic.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'repair_image_pages', 'publish_copy', 'export_bundle']);
 });
 
 test('evaluateStorylineGate blocks empty storyline content', () => {
@@ -48,11 +48,25 @@ test('hydrateXiaohongshuContract emits standard_note contract on shared runtime 
   assert.equal(contract.deliverable_kind, 'xiaohongshu_note');
   assert.deepEqual(
     contract.stage_sequence.stages.map((stage) => stage.stage_id),
-    ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle'],
+    ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'repair_image_pages', 'publish_copy', 'export_bundle'],
+  );
+  assert.deepEqual(
+    contract.stage_sequence.alternate_stages.map((stage) => stage.stage_id),
+    ['render_html', 'fix_html'],
   );
   assert.equal(contract.export_bundle.bundle_id, 'xiaohongshu_standard_bundle');
   assert.equal(contract.prompt_pack.render_contract.compiler_module ?? null, null);
   assert.equal(contract.prompt_pack.render_contract.compiler_export ?? null, null);
+  assert.equal(contract.prompt_pack.render_contract.render_strategy, 'image_first_page_authoring');
+  assert.equal(contract.prompt_pack.render_contract.default_visual_route, 'author_image_pages');
+  assert.equal(contract.prompt_pack.render_contract.image_generation.default_model, 'gpt-image-2');
+  assert.equal(contract.prompt_pack.render_contract.image_generation.size, '1086x1448');
+  assert.equal(contract.prompt_pack.render_contract.image_generation.output_mode, 'full_page_png');
+  assert.equal(contract.prompt_pack.render_contract.image_generation.canvas.ratio, '3:4');
+  assert.deepEqual(
+    contract.prompt_pack.render_contract.selectable_explicit_routes,
+    ['render_html', 'fix_html'],
+  );
   assert.equal(
     contract.prompt_pack.render_contract.ui_ux_quality_companion.source_skill_id,
     'ui-ux-pro-max',
@@ -95,5 +109,5 @@ test('buildXiaohongshuDeliverableRecord emits canonical xiaohongshu deliverable 
   assert.equal(deliverable.deliverable_kind, 'xiaohongshu_note');
   assert.equal(deliverable.profile_id, 'standard_note');
   assert.equal(deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
-  assert.deepEqual(deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'fix_html', 'publish_copy', 'export_bundle']);
+  assert.deepEqual(deliverable.routes, ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'repair_image_pages', 'publish_copy', 'export_bundle']);
 });

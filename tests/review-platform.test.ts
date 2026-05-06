@@ -19,7 +19,7 @@ const TOPIC_ID = 'topic-a';
 const XHS_SHARED_STATE_TOPIC_ID = 'topic-shared-state';
 const ROUTES_BY_OVERLAY = {
   ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review'],
-  xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy'],
+  xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy'],
 };
 const FIXTURE_PROMISES = new Map();
 

@@ -67,7 +67,7 @@
 
 - `research` 不应作为小红书专属 creative stage 固化在长期语义里
 - `single_note_plan` 与 `detailed_outline + slide_blueprint` 可以在 route 粒度上不同，但在宏观上都属于 `Story Architecture`
-- `visual_direction + render_html` 在两条 family 中都属于 `Visual Authorship`
+- `visual_direction + author_image_pages` 是 `xiaohongshu` 与 `ppt_deck` 当前默认 `Visual Authorship`；`render_html/fix_html` 只作为显式 HTML lane 继续属于同一宏观阶段
 - `publish_copy + export_bundle` 与 `export_pptx` 在宏观上都属于 `Delivery Packaging`
 
 ## 稳定对象模型

@@ -18,7 +18,29 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-async function runXhsChain({ workspaceRoot, deliverableId, mode = 'draft_new', baselineDeliverableId = '' }) {
+function writeJson(file, data) {
+  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function stageArtifactFile(created, stageId) {
+  const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
+  const contract = readJson(contractFile);
+  const stages = [
+    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ];
+  const stage = stages.find((item) => item.stage_id === stageId);
+  return path.join(path.dirname(created.deliverableFile), 'artifacts', stage?.output_artifact || `${stageId}.json`);
+}
+
+function xhsRouteArtifact(results, route) {
+  return readJson(results.find((item) => item.route === route).result.artifactFile);
+}
+
+async function runXhsChain({ workspaceRoot, deliverableId, mode = 'draft_new', baselineDeliverableId = '', visualRoute = 'author_image_pages' }) {
+  if (visualRoute === 'author_image_pages' || visualRoute === 'repair_image_pages') {
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+  }
   const common = {
     workspaceRoot,
     overlay: 'xiaohongshu',
@@ -32,7 +54,7 @@ async function runXhsChain({ workspaceRoot, deliverableId, mode = 'draft_new', b
     'storyline',
     'single_note_plan',
     'visual_direction',
-    'render_html',
+    visualRoute,
     'visual_director_review',
     'screenshot_review',
     'publish_copy',
@@ -51,6 +73,8 @@ test('xiaohongshu ships dedicated official prompt pack', () => {
     'storyline.md',
     'single_note_plan.md',
     'visual_direction.md',
+    'author_image_pages.md',
+    'repair_image_pages.md',
     'render_html.md',
     'director_review.md',
     'screenshot_review.md',
@@ -61,6 +85,99 @@ test('xiaohongshu ships dedicated official prompt pack', () => {
   for (const file of files) {
     assert.equal(existsSync(file), true, file);
   }
+});
+
+test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets and repair preserves passing pages', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-image-pages-'));
+    const created = await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      title: '甲状腺门诊小红书科普',
+      goal: '为门诊患者生成可发布的科普图文',
+    });
+
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+    for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const authoredResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route: 'author_image_pages',
+    });
+    assert.equal(authoredResult.ok, true);
+    const authored = readJson(authoredResult.artifactFile);
+    assert.equal(authored.status, 'completed');
+    assert.equal(authored.image_generation_runtime.endpoint, '/responses');
+    assert.equal(authored.image_generation_runtime.token_persisted, false);
+    assert.equal(authored.image_generation_runtime.request_model, 'gpt-image-2');
+    assert.equal(authored.image_pages_bundle.source_visual_route, 'author_image_pages');
+    assert.equal(authored.image_pages_bundle.dimensions.ratio, '3:4');
+    assert.equal(authored.image_pages_bundle.editable, false);
+    assert.equal(authored.image_page_manifest.slides.length > 0, true);
+    assert.equal(authored.image_generation_calls.length, authored.image_page_manifest.slides.length);
+    assert.equal(authored.image_generation_calls[0].default_image_model, 'gpt-image-2');
+    assert.equal(authored.image_generation_calls[0].image_generation_tool_options.type, 'image_generation');
+    assert.equal(existsSync(authored.image_page_manifest.slides[0].image_file), true);
+    assert.equal(existsSync(authored.image_page_manifest.prompt_manifest), true);
+    assert.equal(existsSync(authored.image_page_manifest.style_manifest), true);
+    assert.equal(existsSync(authored.image_page_manifest.generation_metadata_file), true);
+    assert.equal(authored.image_page_manifest.slides[0].dimensions.width, 1086);
+    assert.equal(authored.image_page_manifest.slides[0].dimensions.height, 1448);
+
+    const blockedSlide = authored.image_page_manifest.slides[1] || authored.image_page_manifest.slides[0];
+    writeJson(stageArtifactFile(created, 'screenshot_review'), {
+      route: 'screenshot_review',
+      status: 'block',
+      blocked_slide_ids: [blockedSlide.slide_id],
+      slide_reviews: authored.image_page_manifest.slides.map((slide) => ({
+        slide_id: slide.slide_id,
+        title: slide.title,
+        status: slide.slide_id === blockedSlide.slide_id ? 'block' : 'pass',
+        checks: { block_content_fit_ok: slide.slide_id !== blockedSlide.slide_id },
+        issues: slide.slide_id === blockedSlide.slide_id ? ['block_content_overflow_detected'] : [],
+        mechanical_issues: slide.slide_id === blockedSlide.slide_id ? ['block_content_overflow_detected'] : [],
+        ai_review: {
+          judgement: slide.slide_id === blockedSlide.slide_id ? 'block' : 'pass',
+          visual_findings: [slide.slide_id === blockedSlide.slide_id ? '文字拥挤，需要重绘整页图' : '可保留'],
+          recommended_fix: slide.slide_id === blockedSlide.slide_id ? 'redraw this XHS page only' : 'none',
+        },
+      })),
+    });
+
+    const repairedResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      route: 'repair_image_pages',
+    });
+    assert.equal(repairedResult.ok, true);
+    const repaired = readJson(repairedResult.artifactFile);
+    assert.equal(repaired.image_generation_calls.length, 1);
+    assert.deepEqual(repaired.repair_image_pages.blocked_slide_ids, [blockedSlide.slide_id]);
+    const preservedBefore = authored.image_page_manifest.slides.find((slide) => slide.slide_id !== blockedSlide.slide_id);
+    if (preservedBefore) {
+      const preservedAfter = repaired.image_page_manifest.slides.find((slide) => slide.slide_id === preservedBefore.slide_id);
+      assert.equal(preservedAfter.preserved, true);
+      assert.equal(preservedAfter.hash, preservedBefore.hash);
+      assert.equal(preservedAfter.preserved_slide_hash, preservedBefore.hash);
+    }
+  });
 });
 
 test('xiaohongshu render_html blocks until single_note_plan and visual_direction exist', async () => {
@@ -185,24 +302,16 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
     assert.equal(Array.isArray(visual.visual_direction?.page_role_table), true);
 
     const render = readJson(chain[4].result.artifactFile);
-    assert.equal(existsSync(render.html_bundle?.html_file), true);
-    assert.equal(render.render_execution?.route, 'render_html');
-    assert.equal(render.render_execution?.batch_count, render.html_bundle.slides.length);
-    assert.equal(render.render_execution?.codex_batch_runtime?.session_pool?.reuse_claimed, false);
-    assert.deepEqual(
-      render.render_execution?.freshly_rendered_slide_ids,
-      render.html_bundle.slides.map((slide) => slide.slide_id),
-    );
-    assert.equal(render.html_bundle?.render_strategy, 'prompt_director_first');
-    assert.deepEqual(render.html_bundle?.director_contract?.peak_pages, visual.visual_direction?.peak_pages);
-    assert.deepEqual(render.html_bundle?.director_contract?.page_family_ceiling, visual.visual_direction?.page_family_ceiling);
-    assert.equal(render.html_bundle?.slides.every((slide) => typeof slide.recipe_id === 'string' && slide.recipe_id.length > 0), true);
-    assert.equal(render.html_bundle?.slides.every((slide) => typeof slide.content === 'string' && slide.content.includes('data-recipe-id=')), true);
-    const html = readFileSync(render.html_bundle.html_file, 'utf-8');
-    assert.match(html, /slide-display-area/);
-    assert.match(html, /const slidesData = \[/);
-    assert.match(html, /data-render-strategy="prompt-director-first"/);
-    assert.match(html, /id="redcube-render-plan"/);
+    assert.equal(render.route, 'author_image_pages');
+    assert.equal(render.image_pages_bundle?.source_visual_route, 'author_image_pages');
+    assert.equal(render.image_pages_bundle?.dimensions?.ratio, '3:4');
+    assert.equal(render.image_pages_bundle?.editable, false);
+    assert.equal(render.image_page_manifest?.slides.length, plan.single_note_plan.slides.length);
+    assert.equal(render.image_generation_calls.length, plan.single_note_plan.slides.length);
+    assert.equal(render.image_generation_calls[0].default_image_model, 'gpt-image-2');
+    assert.equal(render.image_page_manifest.slides.every((slide) => existsSync(slide.image_file)), true);
+    assert.equal(existsSync(render.image_page_manifest.prompt_manifest), true);
+    assert.equal(existsSync(render.image_page_manifest.style_manifest), true);
 
     const directorReview = readJson(chain[5].result.artifactFile);
     assert.equal(typeof directorReview.visual_director_review?.director_intent_landed, 'boolean');
@@ -235,6 +344,35 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
   });
 });
 
+test('xiaohongshu explicit render_html route remains available for deterministic HTML maintenance', async () => {
+  await withMockHermesUpstream(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-html-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId: 'note-html',
+      title: '甲状腺门诊小红书科普 HTML',
+      goal: '验证显式 HTML 分支仍可运行',
+    });
+
+    const chain = await runXhsChain({ workspaceRoot, deliverableId: 'note-html', visualRoute: 'render_html' });
+    for (const { route, result } of chain) {
+      assert.equal(result.ok, true, route);
+    }
+    const render = xhsRouteArtifact(chain, 'render_html');
+    assert.equal(existsSync(render.html_bundle?.html_file), true);
+    assert.equal(render.render_execution?.route, 'render_html');
+    assert.equal(render.html_bundle?.render_strategy, 'image_first_page_authoring');
+    assert.equal(render.html_bundle?.slides.every((slide) => typeof slide.content === 'string' && slide.content.includes('data-recipe-id=')), true);
+    const html = readFileSync(render.html_bundle.html_file, 'utf-8');
+    assert.match(html, /slide-display-area/);
+    assert.match(html, /const slidesData = \[/);
+    assert.match(html, /id="redcube-render-plan"/);
+  });
+});
+
 test('xiaohongshu manual thyroid clinic case keeps clinic-topic fidelity instead of generic tool-flow copy', async () => {
   await withMockHermesUpstream(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-manual-'));
@@ -253,8 +391,8 @@ test('xiaohongshu manual thyroid clinic case keeps clinic-topic fidelity instead
       assert.equal(result.ok, true, route);
     }
 
-    const plan = readJson(chain[2].result.artifactFile);
-    const copy = readJson(chain[7].result.artifactFile);
+    const plan = xhsRouteArtifact(chain, 'single_note_plan');
+    const copy = xhsRouteArtifact(chain, 'publish_copy');
     const planText = (plan.single_note_plan?.slides || [])
       .map((slide) => [slide.title, ...(slide.page_core_content || [])].join(' '))
       .join(' ');
@@ -341,10 +479,22 @@ test('xiaohongshu export_bundle performs real delivery and series surfaces when 
     });
     assert.equal(exportResult.ok, true);
     const bundle = readJson(exportResult.artifactFile);
-    assert.equal(existsSync(bundle.export_bundle?.html_file), true);
+    assert.equal(bundle.export_bundle?.source_surface_kind, 'image_pages');
+    assert.equal(bundle.export_bundle?.source_visual_route, 'author_image_pages');
+    assert.equal(bundle.export_bundle?.html_file, '');
+    assert.equal(bundle.export_bundle?.publish_html_file, '');
+    assert.equal(Array.isArray(bundle.export_bundle?.source_artifacts?.pages), true);
+    assert.equal(bundle.export_bundle.source_artifacts.pages.length > 0, true);
+    assert.equal(
+      bundle.export_bundle.source_artifacts.pages.every((page) => existsSync(page.png_file)),
+      true,
+    );
     assert.equal(existsSync(bundle.export_bundle?.caption_file), true);
     assert.equal(Array.isArray(bundle.export_bundle?.png_files), true);
     assert.equal(bundle.export_bundle.png_files.length > 0, true);
+    assert.equal(Array.isArray(bundle.export_bundle?.publish_image_files), true);
+    assert.equal(bundle.export_bundle.publish_image_files.length, bundle.export_bundle.png_files.length);
+    assert.equal(bundle.export_bundle.publish_image_files.every((file) => existsSync(file)), true);
     assert.equal(typeof bundle.export_bundle?.delivery_state?.current, 'string');
     assert.equal(bundle.export_bundle.delivery_state.current, 'output_ready');
     assert.equal(Object.hasOwn(bundle, 'publication_state_file'), false);

@@ -71,8 +71,10 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
 export function buildDeliverableFacadeContract() {
   const pptDeckDescription = overlayRegistry.getOverlay('ppt_deck')?.describeOverlay?.() || {};
   const xiaohongshuVisualPolicy = overlayRegistry.getOverlay('xiaohongshu')?.describeOverlay?.().visual_authoring_policy || {};
+  const xiaohongshuDescription = overlayRegistry.getOverlay('xiaohongshu')?.describeOverlay?.() || {};
   const pptDeckVisualPolicy = pptDeckDescription.visual_authoring_policy || {};
   const pptDefaultVisualRoute = pptDeckVisualPolicy.default_visual_route || 'author_image_pages';
+  const xhsDefaultVisualRoute = xiaohongshuVisualPolicy.default_visual_route || 'author_image_pages';
   return {
     surface_kind: 'deliverable_facade_contract',
     owner: 'redcube_ai',
@@ -123,8 +125,25 @@ export function buildDeliverableFacadeContract() {
         deliverable_family: 'xiaohongshu',
         route_surface: 'runDeliverableRoute',
         route_fallback_surface: 'runManagedDeliverable',
-        default_visual_route: 'render_html',
+        protected_stage_sequence: xiaohongshuDescription.route_sequence || [],
+        default_visual_route: xhsDefaultVisualRoute,
+        default_visual_policy: xiaohongshuVisualPolicy.default_visual_policy || 'image_first',
+        image_generation: xiaohongshuVisualPolicy.image_generation || null,
         html_design_companion: xiaohongshuVisualPolicy.html_design_companion || null,
+        selectable_explicit_routes: xiaohongshuVisualPolicy.route_selection_policy?.explicit_selection_required_for || ['render_html', 'fix_html'],
+        route_selection_policy: {
+          default_route: xhsDefaultVisualRoute,
+          default_route_family: 'image_pages',
+          html_routes: ['render_html', 'fix_html'],
+          explicit_selection_required_for: xiaohongshuVisualPolicy.route_selection_policy?.explicit_selection_required_for || ['render_html', 'fix_html'],
+          style_reference_dir_input: xiaohongshuVisualPolicy.route_selection_policy?.style_reference_dir_input || 'delivery_request.style_reference_dir',
+        },
+        route_gate_policy: 'fail_closed_against_overlay_stage_sequence',
+        default_run_mode: 'auto_to_terminal',
+        stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
+        export_route: 'export_bundle',
+        review_routes: ['visual_director_review', 'screenshot_review'],
+        bypass_policy: 'forbid_generic_html_or_converter_bypass_unless_user_explicitly_selects_html_route',
       },
     },
   };

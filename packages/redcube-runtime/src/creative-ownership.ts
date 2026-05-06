@@ -86,7 +86,7 @@ export const P19_UNIFIED_LIFECYCLE_CONTRACT = Object.freeze({
     xiaohongshu: {
       source_readiness: ['shared_source_readiness', 'research_augmentation_optional'],
       story_architecture: ['storyline', 'single_note_plan'],
-      visual_authorship: ['visual_direction', 'render_html', 'fix_html'],
+      visual_authorship: ['visual_direction', 'author_image_pages', 'repair_image_pages', 'render_html', 'fix_html'],
       delivery_packaging: ['publish_copy', 'export_bundle'],
       review_overlay: ['visual_director_review', 'screenshot_review'],
     },
@@ -248,7 +248,7 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   },
   protected_creative_routes: P19_UNIFIED_LIFECYCLE_CONTRACT.family_mapping,
   primary_creative_routes: {
-    xiaohongshu: ['storyline', 'single_note_plan', 'visual_direction', 'render_html', 'fix_html', 'publish_copy'],
+    xiaohongshu: ['storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'repair_image_pages', 'render_html', 'fix_html', 'publish_copy'],
     ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'repair_image_pages', 'render_html', 'fix_html'],
   },
   unified_lifecycle: P19_UNIFIED_LIFECYCLE_CONTRACT,

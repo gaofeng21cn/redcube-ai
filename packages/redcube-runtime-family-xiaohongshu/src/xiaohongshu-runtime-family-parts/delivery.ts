@@ -17,10 +17,13 @@ export function createXiaohongshuDeliveryParts(deps) {
     generateStructuredArtifact,
     getDeliverablePublishSurfacePaths,
     getDeliverableViewSurfacePaths,
+    imagePagesList,
+    isImagePagesArtifact,
     isSeries,
     normalizeStringList,
     promptRoute,
     readCurrentHtmlArtifact,
+    readCurrentVisualArtifact,
     readStageArtifact,
     requireText,
     resolveAuthorBranding,
@@ -36,7 +39,11 @@ export function createXiaohongshuDeliveryParts(deps) {
     const research = readStageArtifact(contract, deliverablePaths, 'research');
     const storyline = readStageArtifact(contract, deliverablePaths, 'storyline');
     const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-    const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const render = readCurrentVisualArtifact(contract, deliverablePaths);
+    const imagePagesInput = isImagePagesArtifact(render);
+    const pages = imagePagesInput
+      ? imagePagesList(render)
+      : safeArray(render?.html_bundle?.slides);
     return generateStructuredArtifact({
       adapter,
       family: 'xiaohongshu',
@@ -46,11 +53,14 @@ export function createXiaohongshuDeliveryParts(deps) {
         ...buildAuthoringContext({ workspaceRoot, contract, research }),
         storyline: storyline?.storyline || null,
         title_options: safeArray(plan?.single_note_plan?.title_options).slice(0, 3),
-        cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
-        render_summary: safeArray(render?.html_bundle?.slides).map((slide) => ({
+        cover_slide_id: pages?.[0]?.slide_id || 'N01',
+        source_surface_kind: imagePagesInput ? 'image_pages' : 'html',
+        render_summary: pages.map((slide) => ({
           slide_id: slide.slide_id,
           title: slide.title,
-          text_excerpt: stripHtml(slide.content).slice(0, 100),
+          text_excerpt: imagePagesInput
+            ? `image-first XHS page: ${path.basename(slide.png_file || slide.image_file || '')}`
+            : stripHtml(slide.content).slice(0, 100),
         })),
       },
       outputContract: {
@@ -76,9 +86,15 @@ export function createXiaohongshuDeliveryParts(deps) {
   }
 
   async function buildPublishCopy(workspaceRoot, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
-    const candidateSurfaceRefs = syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
     const plan = readStageArtifact(contract, deliverablePaths, 'single_note_plan');
-    const render = readCurrentHtmlArtifact(contract, deliverablePaths);
+    const render = readCurrentVisualArtifact(contract, deliverablePaths);
+    const imagePagesInput = isImagePagesArtifact(render);
+    const visualPages = imagePagesInput
+      ? imagePagesList(render)
+      : safeArray(render?.html_bundle?.slides);
+    const candidateSurfaceRefs = imagePagesInput
+      ? safeArray(render?.artifact_refs)
+      : syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths);
     const authorBranding = resolveAuthorBranding(workspaceRoot, contract);
     const titles = safeArray(plan?.single_note_plan?.title_options).slice(0, 3);
     const { data, generationRuntime } = await generatePublishCopyDraft(
@@ -126,7 +142,8 @@ export function createXiaohongshuDeliveryParts(deps) {
         interaction_questions: interactionQuestions,
         hashtags,
         publish_suggestion: {
-          cover_slide_id: render?.html_bundle?.slides?.[0]?.slide_id || 'N01',
+          cover_slide_id: visualPages?.[0]?.slide_id || 'N01',
+          source_surface_kind: imagePagesInput ? 'image_pages' : 'html',
           recommended_time: requireText(data?.publish_suggestion?.recommended_time, 'publish_copy.publish_suggestion.recommended_time'),
         },
         author_signature: {
@@ -216,12 +233,40 @@ export function createXiaohongshuDeliveryParts(deps) {
     const mappingFile = path.join(deliverablePaths.reportsDir, '06_目录索引与路径映射.md');
     const overviewFile = path.join(deliverablePaths.reportsDir, '99_交付总览.md');
     writeText(cadenceFile, ['# 05_全系列发布节奏建议', '', '1. 先发认知破冰页', '2. 再发机制解释页', '3. 最后发动作清单页'].join('\n'));
-    writeText(mappingFile, ['# 06_目录索引与路径映射', '', `- HTML: ${exportBundle.html_file}`, `- Caption: ${exportBundle.caption_file}`].join('\n'));
+    writeText(mappingFile, [
+      '# 06_目录索引与路径映射',
+      '',
+      `- Source visual route: ${safeText(exportBundle.source_visual_route)}`,
+      `- Source surface: ${safeText(exportBundle.source_surface_kind)}`,
+      ...(safeText(exportBundle.html_file) ? [`- HTML: ${exportBundle.html_file}`] : []),
+      `- Images: ${safeArray(exportBundle.png_files).length}`,
+      `- Caption: ${exportBundle.caption_file}`,
+    ].join('\n'));
     writeText(overviewFile, ['# 99_交付总览', '', `- 当前状态：${exportBundle.delivery_state.current}`, `- PNG页数：${exportBundle.png_files.length}`].join('\n'));
     return {
       cadence_file: cadenceFile,
       path_mapping_file: mappingFile,
       delivery_overview_file: overviewFile,
+    };
+  }
+
+  function imagePagesSourceRefs(renderArtifact) {
+    const pages = imagePagesList(renderArtifact).map((page) => ({
+      slide_id: safeText(page?.slide_id),
+      title: safeText(page?.title),
+      png_file: safeText(page?.png_file || page?.image_file || page?.screenshot_file || page?.file),
+      prompt_manifest_file: safeText(page?.prompt_manifest_file),
+      style_manifest_file: safeText(page?.style_manifest_file),
+    }));
+    return {
+      source_visual_route: safeText(renderArtifact?.route),
+      prompt_manifest_file: safeText(renderArtifact?.image_pages_bundle?.prompt_manifest_file || renderArtifact?.image_page_manifest?.prompt_manifest),
+      style_manifest_file: safeText(renderArtifact?.image_pages_bundle?.style_manifest_file || renderArtifact?.image_page_manifest?.style_manifest),
+      generation_metadata_file: safeText(renderArtifact?.image_pages_bundle?.generation_metadata_file || renderArtifact?.image_page_manifest?.generation_metadata_file),
+      pages,
+      png_files: pages.map((page) => page.png_file).filter(Boolean),
+      prompt_manifest_files: [...new Set(pages.map((page) => page.prompt_manifest_file).filter(Boolean))],
+      style_manifest_files: [...new Set(pages.map((page) => page.style_manifest_file).filter(Boolean))],
     };
   }
 
@@ -278,8 +323,10 @@ export function createXiaohongshuDeliveryParts(deps) {
   function buildExportBundle(workspaceRoot, topicId, contract, deliverablePaths, adapter = CODEX_DEFAULT_ADAPTER) {
     const review = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     const copy = readStageArtifact(contract, deliverablePaths, 'publish_copy');
-    const stableHtmlFile = getDeliverableViewSurfacePaths(deliverablePaths).stableHtmlFile;
-    if (!existsSync(stableHtmlFile)) {
+    const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
+    const imagePagesInput = isImagePagesArtifact(renderArtifact);
+    const stableHtmlFile = imagePagesInput ? '' : getDeliverableViewSurfacePaths(deliverablePaths).stableHtmlFile;
+    if (!imagePagesInput && !existsSync(stableHtmlFile)) {
       throw new Error(`Route export_bundle requires reviewed stable HTML surface before export: ${stableHtmlFile}`);
     }
     const publishPaths = getDeliverablePublishSurfacePaths(deliverablePaths);
@@ -298,17 +345,26 @@ export function createXiaohongshuDeliveryParts(deps) {
     const publishPngFiles = pngFiles
       .map((file) => copySurfaceFile(file, path.join(publishScreenshotsDir, path.basename(file))))
       .filter(Boolean);
-    copySurfaceFile(stableHtmlFile, publishHtmlFile);
+    if (!imagePagesInput) {
+      copySurfaceFile(stableHtmlFile, publishHtmlFile);
+    }
     copySurfaceFile(copy.publish_copy.caption_file, publishCaptionFile);
+    const sourceArtifacts = imagePagesInput ? imagePagesSourceRefs(renderArtifact) : null;
     const exportBundle = {
+      source_surface_kind: imagePagesInput ? 'image_pages' : 'html',
+      source_visual_route: imagePagesInput ? safeText(renderArtifact?.route) : safeText(renderArtifact?.route, 'render_html'),
+      editable: imagePagesInput ? false : undefined,
       html_file: stableHtmlFile,
+      source_html: stableHtmlFile,
+      source_artifacts: sourceArtifacts,
       png_files: pngFiles,
       caption_file: copy.publish_copy.caption_file,
       publish_manifest_file: manifestFile,
       publish_dir: publishDir,
-      publish_html_file: publishHtmlFile,
+      publish_html_file: imagePagesInput ? '' : publishHtmlFile,
       publish_caption_file: publishCaptionFile,
       publish_png_files: publishPngFiles,
+      publish_image_files: publishPngFiles,
       author_signature: copy.publish_copy.author_signature || null,
       preview_cache: exportPreviewCacheMetadata(previewCacheStatus, previewHash),
       preview_metrics: previewMetrics,
@@ -324,6 +380,9 @@ export function createXiaohongshuDeliveryParts(deps) {
       publishHtmlFile,
       publishCaptionFile,
       publishScreenshotsDir,
+      sourceSurfaceKind: exportBundle.source_surface_kind,
+      sourceVisualRoute: exportBundle.source_visual_route,
+      publishImageFiles: publishPngFiles,
       authorSignature: copy.publish_copy.author_signature || null,
       deliveryState: exportBundle.delivery_state,
     }));
@@ -336,8 +395,10 @@ export function createXiaohongshuDeliveryParts(deps) {
         manifestFile,
         publishManifestFile,
         publishReadmeFile,
-        stableHtmlFile,
-        publishHtmlFile,
+        ...(stableHtmlFile ? [stableHtmlFile] : []),
+        ...(imagePagesInput ? safeArray(sourceArtifacts?.png_files) : [publishHtmlFile]),
+        ...safeArray(sourceArtifacts?.prompt_manifest_files),
+        ...safeArray(sourceArtifacts?.style_manifest_files),
         copy.publish_copy.caption_file,
         publishCaptionFile,
         ...pngFiles,

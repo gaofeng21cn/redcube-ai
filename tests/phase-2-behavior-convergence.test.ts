@@ -60,7 +60,7 @@ async function buildReviewReadyXiaohongshuWorkspace(workspaceRoot) {
     title: '甲状腺门诊小红书科普',
     goal: '为门诊患者生成可发布的科普图文',
   });
-  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
+  for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy']) {
     const result = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'xiaohongshu',
