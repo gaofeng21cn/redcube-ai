@@ -3,7 +3,7 @@
 这份文档写给需要理解 `RedCube AI` 技术边界的读者。
 它属于仓库跟踪的操作文档层，不属于默认对外双语公开正文面。
 如果未来要把它提升到默认公开面，必须同步补齐英文 `.md` 与中文 `.zh-CN.md` 镜像。
-其中凡是历史 `docs/program/hermes/*` 冻结件，当前都只能读成 repo-local migration provenance，而不是上游 `Hermes-Agent` 已接管 runtime 的证据。
+其中凡是历史 `docs/history/hermes/*` 冻结件，当前都只能读成 repo-local migration provenance，而不是上游 `Hermes-Agent` 已接管 runtime 的证据。
 当前公开第一身份是独立 visual-deliverable domain agent；`gateway / harness` 只作为仓内边界层与执行层语言保留。
 
 ## 一句话理解

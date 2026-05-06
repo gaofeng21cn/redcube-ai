@@ -14,7 +14,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 | --- | --- | --- |
 | Potential users and domain experts | [Repository home](../README.md) | Understand what RedCube delivers before opening technical files |
 | Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and active governance surface |
-| Developers and maintainers | `docs/program/`, `docs/references/`, `docs/policies/` | Track implementation records, references, and governance |
+| Developers and maintainers | [Program](./program/README.md), [References](./references/README.md), [Policies](./policies/README.md), [History](./history/README.md) | Track active baton records, references, stable rules, and archived provenance |
 
 ## Current Baseline
 
@@ -37,17 +37,19 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - [Invariants](./invariants.md)
 - [Decisions](./decisions.md)
 - [Contracts Overview](../contracts/README.md)
+- [Docs Portfolio Consolidation](./docs_portfolio_consolidation.md)
 
 ## Maintainer Governance Surface
 
 - Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
-- Historical and provenance audits stay in the same reference layer instead of the default public entry path.
+- Historical and provenance audits stay in `docs/history/` when they no longer serve the active program baton; still-current operator references stay in `docs/references/`.
 
 ## Reference Layers
 
-- `docs/program/`: tracked program records, including absorbed milestones
-- `docs/references/`: supporting technical references
+- `docs/program/`: active program baton and contract-linked records that remain readable from `contracts/runtime-program/current-program.json`
+- `docs/references/`: supporting technical references that explain current operation, target states, or maintainer practice
 - `docs/policies/`: stable governance and operating rules
+- `docs/history/`: archived provenance, repo-local migration records, and local AI/Superpowers process drafts
 - [AI-first quality boundary policy](./policies/ai_first_quality_boundary.md): stable rule that keeps author/reviewer judgment in AI-authored artifacts while packs, schemas, gates, audits, and projections stay mechanical.
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
 - [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md): source-plane future target kept in the same reference layer
@@ -57,3 +59,4 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - Keep `README*` and `docs/README*` aligned with the repo-verified direct route, the internal OPL Runtime Manager bridge/reference surface, and the service-safe domain entry surface.
 - Keep English and Chinese public docs mirrored where applicable.
 - Keep reference materials only when they still support current contracts.
+- Do not move a program brief that is still linked from a machine-readable runtime-program contract unless that contract is changed in the same scoped tranche.

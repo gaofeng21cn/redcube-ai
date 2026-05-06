@@ -45,7 +45,8 @@
 ## 历史记录与追溯层
 
 - absorbed milestones 与 phase-2 records：`docs/program/phase-2/`
-- Hermes migration/history records：`docs/program/hermes/`
+- repo-local Hermes migration/history records：`docs/history/hermes/`
+- AI / Superpowers process drafts：保持未跟踪，不进入 repo-tracked docs history
 - 支持性技术参考：`docs/references/`
 - direct-delivery future target reference：`docs/references/direct_delivery_longrun_target_state.md`
 - source-readiness future target reference：`docs/references/source_readiness_deep_research_longrun_target_state.md`
