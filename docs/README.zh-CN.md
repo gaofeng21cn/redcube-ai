@@ -42,10 +42,11 @@
 
 - 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
+- `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
 
 ## 参考层
 
-- `docs/program/`：当前 program baton 以及仍被 `contracts/runtime-program/current-program.json` 或 tranche contract 链接的人类可读记录
+- `docs/program/`：当前 program baton 与 follow-on records 的人类可读记录
 - `docs/references/`：解释当前运行、目标状态或维护者实践的支持性技术参考
 - `docs/policies/`：稳定治理与运行规则
 - `docs/history/`：归档 provenance、repo-local migration 记录，以及不再服务当前 active program baton 的历史计划
@@ -59,4 +60,4 @@
 - `README*` 与 `docs/README*` 统一围绕 repo-verified direct route、内部 OPL Runtime Manager bridge/reference surface 与 service-safe domain entry surface 叙事。
 - 对外文档在适用时保持中英双语镜像。
 - 参考材料只在仍支撑当前合同时保留。
-- 仍被 runtime-program 机器合同引用的 program brief 不单独搬迁；需要搬迁时必须在同一明确范围内同步机器合同。
+- 机器可读 runtime-program contract 应引用 contract/schema/source 路径来表达可执行真相，或使用 `human_doc:*` 语义 ID 表达读者上下文；不应让 prose 文档层级变成测试或 runtime 的路径兼容约束。

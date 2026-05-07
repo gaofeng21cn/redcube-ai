@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 test('P15 slice 1: runtime-protocol exposes a TypeScript entrypoint and typed contract exports', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-runtime-protocol/src/index.ts')), true);
@@ -88,6 +88,22 @@ test('reference-os exposes a TypeScript contract entrypoint and types file', () 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
+
+function findRuntimeProgramContracts(dir = 'contracts/runtime-program') {
+  return readdirSync(path.resolve(dir), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.join(dir, entry.name))
+    .sort();
+}
+
+test('runtime program contracts do not pin human docs paths', () => {
+  const prosePathPattern = /(?:^|["'\s:[{,])(?:README(?:\.zh-CN)?\.md|docs\/[^"'\s\]]+?\.md(?:#[^"'\s\]]*)?)/;
+
+  for (const contractFile of findRuntimeProgramContracts()) {
+    const raw = readFileSync(path.resolve(contractFile), 'utf-8');
+    assert.doesNotMatch(raw, prosePathPattern, `${contractFile} must use machine paths or human_doc:* semantic refs`);
+  }
+});
 
 test('P17 slice 6: runtime-family-xiaohongshu exposes a TypeScript entrypoint and typed runtime-family contracts', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-xiaohongshu/src/index.ts')), true);

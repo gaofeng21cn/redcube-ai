@@ -360,7 +360,13 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commandGroups.product.includes('invoke'), true);
   assert.equal(parsed.commandGroups.product.includes('session'), true);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
-  assert.equal(parsed.whereToReadNext.humanQuickstart, 'docs/human_quickstart.md');
+  assert.equal(parsed.whereToReadNext.humanQuickstart, 'human_doc:human_quickstart');
+  assert.equal(parsed.whereToReadNext.deliverableExamples, 'human_doc:deliverable_examples');
+  assert.equal(parsed.whereToReadNext.runtimeArchitecture, 'human_doc:runtime_architecture');
+  assert.equal(
+    Object.values(parsed.whereToReadNext).every((surface) => typeof surface === 'string' && surface.startsWith('human_doc:')),
+    true,
+  );
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
   assert.equal(typeof parsed.usage.sourceResearch, 'string');
   assert.match(parsed.usage.reviewMutate, /promote_baseline/);

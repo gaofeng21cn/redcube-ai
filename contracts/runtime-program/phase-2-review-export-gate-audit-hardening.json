@@ -113,12 +113,12 @@
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json",
       "contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json",
-      "docs/program/phase-2/phase_2_review_export_gate_audit_hardening.md",
-      "README.md",
-      "README.zh-CN.md",
-      "docs/runtime_architecture.md",
-      "docs/domain-harness-os-positioning.md",
-      "docs/policies/runtime_operating_model.md"
+      "human_doc:program_phase_2_phase_2_review_export_gate_audit_hardening",
+      "human_doc:repository_home",
+      "human_doc:repository_home_zh_cn",
+      "human_doc:runtime_architecture",
+      "human_doc:domain_harness_os_positioning",
+      "human_doc:policies_runtime_operating_model"
     ],
     "must_record": [
       "review/export/gate/audit hardening has an absorbed tranche on the same mainline",

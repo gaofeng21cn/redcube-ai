@@ -286,12 +286,12 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       profile: ['list', 'bootstrap', 'export', 'install'],
     },
     whereToReadNext: {
-      humanQuickstart: 'docs/human_quickstart.md',
-      deliverableExamples: 'docs/deliverable_examples.md',
-      runtimeArchitecture: 'docs/runtime_architecture.md',
-      runtimePolicy: 'docs/policies/runtime_operating_model.md',
-      contractPolicy: 'docs/policies/deliverable_contract_model.md',
-      privateProfileSetup: 'docs/private-profile-setup.md',
+      humanQuickstart: 'human_doc:human_quickstart',
+      deliverableExamples: 'human_doc:deliverable_examples',
+      runtimeArchitecture: 'human_doc:runtime_architecture',
+      runtimePolicy: 'human_doc:policies_runtime_operating_model',
+      contractPolicy: 'human_doc:policies_deliverable_contract_model',
+      privateProfileSetup: 'human_doc:private_profile_setup',
     },
     usage: {
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',

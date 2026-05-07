@@ -30,10 +30,10 @@
   "required_truth_sources": [
     "contracts/runtime-program/current-program.json",
     "contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json",
-    "docs/program/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md",
-    "docs/runtime_architecture.md",
-    "docs/policies/runtime_operating_model.md",
-    "docs/domain-harness-os-positioning.md"
+    "human_doc:program_phase_2_phase_2_runtime_watch_locator_integrity_hardening",
+    "human_doc:runtime_architecture",
+    "human_doc:policies_runtime_operating_model",
+    "human_doc:domain_harness_os_positioning"
   ],
   "required_verification": [
     "git diff --check",

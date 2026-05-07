@@ -51,7 +51,7 @@
       "deliverable_id": "lecture-01",
       "title": "Thyroid Basics",
       "goal": "Explain thyroid fundamentals to undergraduate students",
-      "reference_surface": "docs/deliverable_examples.md#示例一：给学生讲课的-PPT",
+      "reference_surface": "human_doc:deliverable_examples#ppt",
       "test_input": [
         "课程提纲：定义、功能、常见检查、诊疗边界",
         "讲义笔记：TSH / T3 / T4、甲减 / 甲亢症状、就诊路径",
@@ -104,7 +104,7 @@
       "deliverable_id": "note-01",
       "title": "甲状腺门诊小红书科普",
       "goal": "为门诊患者生成可发布的科普图文",
-      "reference_surface": "docs/deliverable_examples.md#示例二：知识传播型小红书图文",
+      "reference_surface": "human_doc:deliverable_examples#xiaohongshu",
       "test_input": [
         "门诊常见问题列表：症状、检查、何时复诊",
         "专业边界说明：不能替代医生面诊；避免夸大疗效",

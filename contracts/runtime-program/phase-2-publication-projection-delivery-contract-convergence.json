@@ -148,12 +148,12 @@
     "repo_tracked_truth_surfaces": [
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json",
-      "docs/program/phase-2/phase_2_publication_projection_delivery_contract_convergence.md",
-      "README.md",
-      "README.zh-CN.md",
-      "docs/runtime_architecture.md",
-      "docs/domain-harness-os-positioning.md",
-      "docs/policies/runtime_operating_model.md"
+      "human_doc:program_phase_2_phase_2_publication_projection_delivery_contract_convergence",
+      "human_doc:repository_home",
+      "human_doc:repository_home_zh_cn",
+      "human_doc:runtime_architecture",
+      "human_doc:domain_harness_os_positioning",
+      "human_doc:policies_runtime_operating_model"
     ],
     "must_record": [
       "publication projection / delivery contract convergence has an absorbed tranche on the same mainline",

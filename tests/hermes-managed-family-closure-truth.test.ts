@@ -32,7 +32,7 @@ test('managed family closure truth remains historical provenance under the repo-
   );
   assert.equal(
     currentProgram.current_state.active_baton.artifacts.managed_product_entry_brief,
-    'docs/program/managed_product_entry_hardening.md',
+    'human_doc:program_managed_product_entry_hardening',
   );
   assert.equal(
     currentProgram.current_state.active_baton.scope.required_session_store_root,

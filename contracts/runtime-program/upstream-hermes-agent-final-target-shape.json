@@ -87,7 +87,7 @@
         "runtime_session_contract",
         "return_surface_contract"
       ],
-      "reference_doc": "docs/references/lightweight_product_entry_and_opl_handoff.md"
+      "reference_doc": "human_doc:references_lightweight_product_entry_and_opl_handoff"
     }
   },
   "durable_truth_contract": {

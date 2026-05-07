@@ -69,7 +69,7 @@ test('upstream Hermes-Agent activation package is closed out as the frozen upstr
   );
   assert.equal(
     currentProgram.current_state.next_activation_package.brief,
-    'docs/program/managed_product_entry_hardening.md',
+    'human_doc:program_managed_product_entry_hardening',
   );
   assert.equal(
     currentProgram.current_state.next_activation_package.probe_script,

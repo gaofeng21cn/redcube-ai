@@ -4,7 +4,7 @@
   "status": "closeout_completed",
   "scope": {
     "phase_id": "F4_end_to_end_verification_and_absorb",
-    "board": "docs/program/upstream_hermes_agent_fast_cutover_board.md",
+    "board": "human_doc:program_upstream_hermes_agent_fast_cutover_board",
     "runtime_owner": "upstream_hermes_agent"
   },
   "resolved_blocker_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",

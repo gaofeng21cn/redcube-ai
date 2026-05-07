@@ -43,10 +43,11 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 
 - Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
 - Historical and provenance audits stay in `docs/history/` when they no longer serve the active program baton; still-current operator references stay in `docs/references/`.
+- `README*` and `docs/**` are human-readable surfaces. Runtime contracts, tests, scripts, and dashboards may expose `human_doc:*` semantic pointers for reader context, but they must not pin repo documentation paths as stable machine-readable APIs.
 
 ## Reference Layers
 
-- `docs/program/`: active program baton and contract-linked records that remain readable from `contracts/runtime-program/current-program.json`
+- `docs/program/`: human-readable active program baton and follow-on records
 - `docs/references/`: supporting technical references that explain current operation, target states, or maintainer practice
 - `docs/policies/`: stable governance and operating rules
 - `docs/history/`: archived provenance, repo-local migration records, and historical plans that no longer serve the active program baton
@@ -60,4 +61,4 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - Keep `README*` and `docs/README*` aligned with the repo-verified direct route, the internal OPL Runtime Manager bridge/reference surface, and the service-safe domain entry surface.
 - Keep English and Chinese public docs mirrored where applicable.
 - Keep reference materials only when they still support current contracts.
-- Do not move a program brief that is still linked from a machine-readable runtime-program contract unless that contract is changed in the same scoped tranche.
+- Machine-readable runtime-program contracts should point to contract/schema/source paths for executable truth, or to `human_doc:*` semantic IDs for reader context; they should not make prose documentation layout a test/runtime compatibility constraint.

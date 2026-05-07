@@ -46,7 +46,7 @@
         "review_status": "passed",
         "artifacts": {
           "manual_test_contract": "contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json",
-          "manual_test_brief": "docs/stable_deliverable_manual_test_brief.md",
+          "manual_test_brief": "human_doc:stable_deliverable_manual_test_brief",
           "hardening_backlog": "contracts/runtime-program/stable-deliverable-hardening-backlog.json"
         }
       }
@@ -160,7 +160,7 @@
       },
       {
         "gate_id": "operator_flow_frozen",
-        "surface": "docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md",
+        "surface": "human_doc:program_phase_2_phase_2_source_intake_activation_package_freeze",
         "pass_condition": "operators can see explicit activation order, gate surfaces, and stop conditions"
       },
       {
@@ -236,10 +236,10 @@
       "$CODEX_HOME/projects/redcube-ai/runtime-state/reports/redcube-runtime-program/ITERATION_LOG.md"
     ],
     "repo_tracked_truth_surfaces": [
-      "README.md",
-      "README.zh-CN.md",
-      "docs/runtime_architecture.md",
-      "docs/program/phase-2/phase_2_source_intake_activation_package_freeze.md",
+      "human_doc:repository_home",
+      "human_doc:repository_home_zh_cn",
+      "human_doc:runtime_architecture",
+      "human_doc:program_phase_2_phase_2_source_intake_activation_package_freeze",
       "contracts/runtime-program/current-program.json",
       "contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json"
     ],

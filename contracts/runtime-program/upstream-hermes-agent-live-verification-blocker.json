@@ -4,7 +4,7 @@
   "status": "historical_blocker_resolved",
   "scope": {
     "phase_id": "F4_end_to_end_verification_and_absorb",
-    "board": "docs/program/upstream_hermes_agent_fast_cutover_board.md",
+    "board": "human_doc:program_upstream_hermes_agent_fast_cutover_board",
     "runtime_owner": "upstream_hermes_agent"
   },
   "verified_passes": [
@@ -53,7 +53,7 @@
   "resolution": {
     "status": "resolved_after_fresh_live_verification",
     "resolved_by_contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json",
-    "resolved_by_brief": "docs/program/upstream_hermes_agent_live_verification_closeout.md",
+    "resolved_by_brief": "human_doc:program_upstream_hermes_agent_live_verification_closeout",
     "fresh_verification": [
       "npm run test:e2e",
       "node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'",
