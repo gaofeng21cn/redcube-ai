@@ -127,6 +127,8 @@
 - `executor adapter` 只负责把这些 contract 下沉到具体执行器
 - 默认主线仍是 Codex CLI；Hermes-native 先作为 opt-in proof lane 保持可选，不提前替换默认
 
+`ppt_deck` runtime family 的 core 现在也按这个边界组织：`core.ts` 保留 route / lifecycle / visual-domain assembly，execution adapter、creative owner/source stamp、primary surface 和 structured artifact batch/executor helper 进入 `ppt-deck-runtime-family-parts/execution-adapters.ts`。这让 core 不再直接承载 executor/backend 分支，同时保持 public route、payload shape 和 runtime-family contract 不变。
+
 当前还要额外冻结一个边界：
 
 - `ppt_deck`、`xiaohongshu`、`poster_onepager` 的受保护创作 stage 现在统一走 `runtime-family + Codex CLI structured generation`
