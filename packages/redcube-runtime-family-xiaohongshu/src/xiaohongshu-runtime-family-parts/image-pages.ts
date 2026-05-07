@@ -1,22 +1,8 @@
 // @ts-nocheck
 import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { deflateSync } from 'node:zlib';
-import {
-  copyFileSync,
-  existsSync,
-  readdirSync,
-  readFileSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
+import { writeFileSync } from 'node:fs';
 
-const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
-const DEFAULT_IMAGE_SIZE = '1086x1448';
-const DEFAULT_STYLE_PROFILE_ASSET = 'prompts/xiaohongshu/image-first-default-style-profile.json';
-const DEFAULT_STYLE_REFERENCE_DIR = 'prompts/xiaohongshu/style-references/medical-handdrawn-note-default';
-const DEFAULT_PROMPT_TEMPLATE_ASSET = 'prompts/xiaohongshu/image_first_prompt_template.md';
-const REFERENCE_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
+import { createXiaohongshuImagePageRuntimeHelpers } from './image-page-runtime-helpers.js';
 
 export function createXiaohongshuImagePageParts(deps) {
   const {
@@ -33,255 +19,26 @@ export function createXiaohongshuImagePageParts(deps) {
     safeText,
     writeJson,
   } = deps;
-
-  function stableJson(value) {
-    if (Array.isArray(value)) return `[${value.map((item) => stableJson(item)).join(',')}]`;
-    if (value && typeof value === 'object') {
-      return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
-    }
-    return JSON.stringify(value);
-  }
-
-  function sha256(value) {
-    return createHash('sha256').update(value).digest('hex');
-  }
-
-  function crc32(buffer) {
-    let crc = 0xffffffff;
-    for (const byte of buffer) {
-      crc ^= byte;
-      for (let bit = 0; bit < 8; bit += 1) {
-        crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
-      }
-    }
-    return (crc ^ 0xffffffff) >>> 0;
-  }
-
-  function pngChunk(type, data) {
-    const typeBuffer = Buffer.from(type, 'ascii');
-    const length = Buffer.alloc(4);
-    length.writeUInt32BE(data.length, 0);
-    const crc = Buffer.alloc(4);
-    crc.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])), 0);
-    return Buffer.concat([length, typeBuffer, data, crc]);
-  }
-
-  function solidPngBuffer(width, height, seed) {
-    const seedHash = createHash('sha256').update(seed).digest();
-    const background = [255, 250, 240];
-    const accent = [seedHash[0], seedHash[1], seedHash[2]].map((value) => 90 + (value % 120));
-    const contentLeft = Math.floor(width * 0.08);
-    const contentRight = Math.floor(width * 0.92);
-    const contentTop = Math.floor(height * 0.08);
-    const contentBottom = Math.floor(height * 0.9);
-    const scanlineLength = 1 + (width * 4);
-    const raw = Buffer.alloc(scanlineLength * height);
-    for (let y = 0; y < height; y += 1) {
-      const rowOffset = y * scanlineLength;
-      raw[rowOffset] = 0;
-      for (let x = 0; x < width; x += 1) {
-        const offset = rowOffset + 1 + (x * 4);
-        const inContent = x >= contentLeft && x <= contentRight && y >= contentTop && y <= contentBottom;
-        const band = inContent && (((x - contentLeft) + Math.floor((y - contentTop) * 0.55)) % 118) < 7;
-        const dot = inContent && (((Math.floor((x - contentLeft) / 42) + Math.floor((y - contentTop) / 58)) % 11) === 0);
-        raw[offset] = band || dot ? accent[0] : background[0];
-        raw[offset + 1] = band || dot ? accent[1] : background[1];
-        raw[offset + 2] = band || dot ? accent[2] : background[2];
-        raw[offset + 3] = 255;
-      }
-    }
-    const ihdr = Buffer.alloc(13);
-    ihdr.writeUInt32BE(width, 0);
-    ihdr.writeUInt32BE(height, 4);
-    ihdr[8] = 8;
-    ihdr[9] = 6;
-    ihdr[10] = 0;
-    ihdr[11] = 0;
-    ihdr[12] = 0;
-    return Buffer.concat([
-      Buffer.from('89504e470d0a1a0a', 'hex'),
-      pngChunk('IHDR', ihdr),
-      pngChunk('IDAT', deflateSync(raw)),
-      pngChunk('IEND', Buffer.alloc(0)),
-    ]);
-  }
-
-  function pngDimensions(buffer) {
-    if (buffer.length >= 24 && buffer.subarray(0, 8).toString('hex') === '89504e470d0a1a0a') {
-      return {
-        width: buffer.readUInt32BE(16),
-        height: buffer.readUInt32BE(20),
-      };
-    }
-    return { width: CANVAS.width, height: CANVAS.height };
-  }
-
-  function promptAssetPath(assetPath) {
-    return path.isAbsolute(assetPath) ? assetPath : path.join(process.cwd(), assetPath);
-  }
-
-  function readJsonIfPresent(file) {
-    if (!file || !existsSync(file)) return {};
-    return JSON.parse(readFileSync(file, 'utf-8'));
-  }
-
-  function defaultStyleProfile(contract) {
-    const fromContract = contract?.prompt_pack?.render_contract?.image_generation || contract?.image_generation || {};
-    const profileAsset = safeText(fromContract?.default_style_profile, DEFAULT_STYLE_PROFILE_ASSET);
-    const profileFile = promptAssetPath(profileAsset);
-    const bytes = existsSync(profileFile) ? readFileSync(profileFile) : Buffer.alloc(0);
-    return {
-      profile_file: profileFile,
-      profile_hash: bytes.length > 0 ? sha256(bytes) : '',
-      profile: readJsonIfPresent(profileFile),
-    };
-  }
-
-  function defaultPromptTemplate() {
-    const templateFile = promptAssetPath(DEFAULT_PROMPT_TEMPLATE_ASSET);
-    const text = existsSync(templateFile) ? readFileSync(templateFile, 'utf-8') : '';
-    return { file: templateFile, hash: text ? sha256(text) : '', text };
-  }
-
-  function imagePagePaths(deliverablePaths, deliverableId, route) {
-    const root = ensureDir(path.join(deliverablePaths.artifactsDir, 'image_pages'));
-    const pageDir = ensureDir(path.join(root, route));
-    const promptDir = ensureDir(path.join(pageDir, 'prompt_manifests'));
-    const styleDir = ensureDir(path.join(pageDir, 'style_manifests'));
-    const referenceDir = ensureDir(path.join(pageDir, 'style_references'));
-    const basename = `${deliverableId}-${route}`;
-    return {
-      root,
-      pageDir,
-      promptDir,
-      styleDir,
-      referenceDir,
-      manifestFile: path.join(root, `${basename}-manifest.json`),
-      promptManifestFile: path.join(root, `${basename}-prompts.json`),
-      styleManifestFile: path.join(root, `${basename}-style.json`),
-      metadataFile: path.join(root, `${basename}-generation-metadata.json`),
-    };
-  }
-
-  function parseCodexConfig() {
-    const configFile = path.join(process.env.CODEX_HOME || path.join(process.env.HOME || '', '.codex'), 'config.toml');
-    if (!existsSync(configFile)) return {};
-    const raw = readFileSync(configFile, 'utf-8');
-    const modelProvider = raw.match(/^model_provider\s*=\s*"([^"]+)"/m)?.[1] || '';
-    const providerBlock = modelProvider
-      ? raw.match(new RegExp(`\\[model_providers\\.${modelProvider.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]([\\s\\S]*?)(?:\\n\\[|$)`))?.[1] || ''
-      : '';
-    return {
-      provider: modelProvider,
-      base_url: providerBlock.match(/base_url\s*=\s*"([^"]+)"/)?.[1] || '',
-      token: providerBlock.match(/experimental_bearer_token\s*=\s*"([^"]+)"/)?.[1] || '',
-    };
-  }
-
-  function responsesConfig() {
-    const codex = parseCodexConfig();
-    const provider = safeText(process.env.REDCUBE_IMAGE_GENERATION_PROVIDER, safeText(codex.provider, 'codex_default'));
-    const baseUrl = safeText(process.env.REDCUBE_IMAGE_GENERATION_BASE_URL, safeText(codex.base_url, 'https://api.openai.com/v1'));
-    const model = safeText(process.env.REDCUBE_IMAGE_GENERATION_MODEL, DEFAULT_IMAGE_MODEL);
-    const token = safeText(process.env.REDCUBE_IMAGE_GENERATION_TOKEN, safeText(codex.token));
-    const host = (() => {
-      try {
-        return new URL(baseUrl).host;
-      } catch {
-        return '';
-      }
-    })();
-    return {
-      provider,
-      base_url: baseUrl,
-      base_url_host: host,
-      endpoint: `${baseUrl.replace(/\/+$/, '')}/responses`,
-      model,
-      token,
-    };
-  }
-
-  function imageGenerationToolOptions(contract) {
-    const fromContract = contract?.prompt_pack?.render_contract?.image_generation || contract?.image_generation || {};
-    return {
-      type: 'image_generation',
-      size: safeText(fromContract?.size, DEFAULT_IMAGE_SIZE),
-      quality: safeText(fromContract?.quality, 'high'),
-      format: safeText(fromContract?.format, 'png'),
-      background: safeText(fromContract?.background, 'opaque'),
-    };
-  }
-
-  function styleReferenceDirPolicy(contract) {
-    const fromContract = contract?.prompt_pack?.render_contract?.image_generation || contract?.image_generation || {};
-    const userDir = safeText(
-      contract?.delivery_request?.style_reference_dir
-        || contract?.style_reference_dir
-        || fromContract?.style_reference_dir
-        || process.env.REDCUBE_XHS_STYLE_REFERENCE_DIR
-        || process.env.REDCUBE_IMAGE_PPT_STYLE_REFERENCE_DIR,
-    );
-    const builtInDir = safeText(fromContract?.built_in_style_reference_dir, DEFAULT_STYLE_REFERENCE_DIR);
-    return {
-      requestedDir: userDir,
-      builtInDir,
-      effectiveDir: userDir || builtInDir,
-      sourceMode: userDir ? 'user_style_reference_dir' : 'built_in_style_reference_template',
-      shouldCopyToArtifact: Boolean(userDir),
-    };
-  }
-
-  function copyStyleReferences(contract, paths) {
-    const policy = styleReferenceDirPolicy(contract);
-    const referenceDir = promptAssetPath(policy.effectiveDir);
-    if (!referenceDir || !existsSync(referenceDir) || !statSync(referenceDir).isDirectory()) {
-      return {
-        mode: policy.requestedDir ? 'user_style_reference_dir_blocked' : 'built_in_style_reference_dir_blocked',
-        requested_dir_hash: policy.requestedDir ? sha256(policy.requestedDir) : null,
-        built_in_dir_hash: policy.builtInDir ? sha256(policy.builtInDir) : null,
-        blocked_reason: 'style_reference_dir_missing_or_not_directory',
-        copied_files: [],
-      };
-    }
-    const referenceFiles = readdirSync(referenceDir)
-      .filter((name) => REFERENCE_IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase()))
-      .slice(0, 16)
-      .map((name) => {
-        const sourceFile = path.join(referenceDir, name);
-        const targetFile = policy.shouldCopyToArtifact ? path.join(paths.referenceDir, name) : '';
-        if (policy.shouldCopyToArtifact) copyFileSync(sourceFile, targetFile);
-        const bytes = readFileSync(policy.shouldCopyToArtifact ? targetFile : sourceFile);
-        return {
-          file_name: name,
-          repo_reference: policy.shouldCopyToArtifact ? '' : path.posix.join(policy.effectiveDir, name),
-          copied_file: targetFile,
-          sha256: sha256(bytes),
-          bytes: bytes.length,
-          dimensions: pngDimensions(bytes),
-        };
-      });
-    return {
-      mode: referenceFiles.length > 0 ? policy.sourceMode : `${policy.sourceMode}_empty`,
-      requested_dir_hash: policy.requestedDir ? sha256(policy.requestedDir) : null,
-      built_in_dir_hash: policy.builtInDir ? sha256(policy.builtInDir) : null,
-      effective_dir_hash: sha256(policy.effectiveDir),
-      copied_files: referenceFiles.filter((item) => safeText(item?.copied_file)),
-      built_in_reference_files: policy.shouldCopyToArtifact ? [] : referenceFiles,
-      reference_scope: 'visual_style_only',
-      artifact_materialization: policy.shouldCopyToArtifact ? 'copied_operator_references' : 'repo_builtin_reference_manifest_only',
-      author_identity_policy: {
-        built_in_references_visible_author_identity_allowed: false,
-        user_references_must_not_be_copied_for_author_identity: true,
-      },
-      authorization_notice: policy.requestedDir
-        ? 'Operator supplied style references replace built-in RCA references in the style manifest for visual grounding only.'
-        : 'RCA built-in naturally no-author style references are recorded in the style manifest for local style grounding and audit without copying reference PNGs into the deliverable artifact store.',
-    };
-  }
-
-  function styleReferenceFileCount(styleReferences) {
-    return safeArray(styleReferences?.copied_files).length + safeArray(styleReferences?.built_in_reference_files).length;
-  }
+  const {
+    DEFAULT_IMAGE_MODEL,
+    callResponsesImageGeneration,
+    copyStyleReferences,
+    defaultPromptTemplate,
+    defaultStyleProfile,
+    imageGenerationToolOptions,
+    imagePagePaths,
+    normalizeImageBase64,
+    pngDimensions,
+    responseImageCall,
+    responsesConfig,
+    sha256,
+    stableJson,
+    styleReferenceFileCount,
+  } = createXiaohongshuImagePageRuntimeHelpers({
+    CANVAS,
+    ensureDir,
+    safeText,
+  });
 
   function repairFeedbackFromReview(reviewArtifact) {
     const explicitBlockedSlideIds = new Set(
@@ -351,60 +108,6 @@ export function createXiaohongshuImagePageParts(deps) {
       'Reference images are style anchors only; do not copy their facts, logos, page numbers, QR codes, institutions, or disease objects.',
       'No UI chrome, no internal metadata, no prompt labels. Use safe margins and readable Chinese text.',
     ].filter(Boolean).join('\n');
-  }
-
-  function normalizeImageBase64(response) {
-    for (const item of safeArray(response?.output)) {
-      if (safeText(item?.type) === 'image_generation_call') {
-        const result = safeText(item?.result);
-        if (result) return result.replace(/^data:image\/png;base64,/, '');
-      }
-      for (const content of safeArray(item?.content)) {
-        const image = safeText(content?.image_base64 || content?.b64_json);
-        if (image) return image.replace(/^data:image\/png;base64,/, '');
-      }
-    }
-    return safeText(response?.image_base64 || response?.b64_json || response?.data?.[0]?.b64_json)
-      .replace(/^data:image\/png;base64,/, '');
-  }
-
-  function responseImageCall(response) {
-    return safeArray(response?.output).find((item) => safeText(item?.type) === 'image_generation_call') || {};
-  }
-
-  async function callResponsesImageGeneration({ config, prompt, toolOptions, route, slideId }) {
-    if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
-      const mockBytes = solidPngBuffer(CANVAS.width, CANVAS.height, `${route}:${slideId}:${prompt}`);
-      return {
-        id: `resp_mock_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`,
-        output: [{
-          type: 'image_generation_call',
-          id: `ig_mock_${sha256(`${slideId}:${prompt}`).slice(0, 16)}`,
-          revised_prompt: prompt,
-          result: mockBytes.toString('base64'),
-        }],
-      };
-    }
-    if (!safeText(config.token)) {
-      throw new Error('Responses image_generation requires Codex provider token or REDCUBE_IMAGE_GENERATION_TOKEN');
-    }
-    const response = await fetch(safeText(config.endpoint), {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${safeText(config.token)}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: safeText(config.model),
-        input: prompt,
-        tools: [toolOptions],
-        tool_choice: { type: 'image_generation' },
-      }),
-    });
-    if (!response.ok) {
-      throw new Error(`Responses image_generation failed: ${response.status} ${await response.text()}`);
-    }
-    return response.json();
   }
 
   async function buildImagePagesArtifact({

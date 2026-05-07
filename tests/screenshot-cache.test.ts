@@ -594,6 +594,7 @@ function makeXhsReviewParts() {
     getDeliverableViewSurfacePaths: () => ({ stableHtmlFile: htmlFile }),
     hasAiVisualBlock: (review) => review?.judgement === 'block',
     hasAiVisualPass: (review) => review?.judgement === 'pass',
+    isImagePagesArtifact: () => false,
     loadPriorRenderedXhsSlideHtmlMap: () => new Map([['N01', '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>']]),
     markPublishBundleStaleAfterBlockedReview: () => [],
     normalizeStringList: (value) => safeArray(value),
@@ -602,6 +603,7 @@ function makeXhsReviewParts() {
     promoteStableHtml: () => ['stable.html'],
     promptRoute: () => 'prompt.md',
     readCurrentHtmlArtifact: () => ({ html_bundle: { html_file: htmlFile, slides: [{ slide_id: 'N01', title: '第一页', content: '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>' }] } }),
+    readCurrentVisualArtifact: () => ({ route: 'render_html', html_bundle: { html_file: htmlFile, slides: [{ slide_id: 'N01', title: '第一页', content: '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>' }] } }),
     readJson: () => ({}),
     readStageArtifact: (_contract, _paths, stage) => {
       if (stage === 'screenshot_review') return artifacts.get('screenshot_review') || null;
