@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | 潜在用户与领域专家 | [仓库首页](../README.zh-CN.md) | 先理解 RedCube 交付什么，再进入技术细节 |
 | 技术规划与架构读者 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md)、[合同说明](../contracts/README.md) | 读取当前边界、执行模型和当前治理面 |
-| 开发者与维护者 | [Program](./program/README.md)、[References](./references/README.md)、[Policies](./policies/README.md)、[History](./history/README.zh-CN.md) | 追踪当前 baton、参考资料、稳定规则与历史 provenance |
+| 开发者与维护者 | [Product](./product/README.md)、[Runtime](./runtime/README.md)、[Delivery](./delivery/README.md)、[Source](./source/README.md)、[Policies](./policies/README.md)、[Program](./program/README.md)、[References](./references/README.md)、[History](./history/README.zh-CN.md) | 追踪生命周期文档、稳定规则、当前 baton、参考资料与历史 provenance |
 
 ## 当前基线
 
@@ -38,6 +38,19 @@
 - [合同说明](../contracts/README.md)
 - [Docs portfolio consolidation](./docs_portfolio_consolidation.md)
 
+## 生命周期分层
+
+| 分层 | 职责 | 入口 |
+| --- | --- | --- |
+| Product | 人类 / operator 入口、product handoff、profile 与发布协作 | [Product docs](./product/README.md) |
+| Runtime | runtime topology、executor/backend 边界、service-safe entry、watch/projection 语义 | [Runtime docs](./runtime/README.md) |
+| Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
+| Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) |
+| Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) |
+| Program | 当前 baton 与 contract-linked closeout records | [Program](./program/README.md) |
+| References | 不持有 active baton 的支持性技术参考 | [References](./references/README.md) |
+| History | 已归档 provenance 与历史计划 | [History](./history/README.zh-CN.md) |
+
 ## 维护者治理入口
 
 - 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
@@ -46,9 +59,13 @@
 
 ## 参考层
 
+- `docs/product/`：面向 product 与 operator 的人类可读指南
+- `docs/runtime/`：runtime topology 与 execution/projection 说明
+- `docs/delivery/`：deliverable family、route、proof、export 与示例材料
+- `docs/source/`：source readiness 与 augmentation 材料
+- `docs/policies/`：稳定治理与运行规则
 - `docs/program/`：当前 program baton 与 follow-on records 的人类可读记录
 - `docs/references/`：解释当前运行、目标状态或维护者实践的支持性技术参考
-- `docs/policies/`：稳定治理与运行规则
 - `docs/history/`：归档 provenance、repo-local migration 记录，以及不再服务当前 active program baton 的历史计划
 - 本地 AI / Superpowers 过程草稿继续在被忽略的 `docs/superpowers/` 下维护，不进入 repo-tracked history。
 - [AI-first 质量边界 Policy](./policies/ai_first_quality_boundary.md)：固定 author / reviewer 判断必须由 AI-authored artifact 持有，pack、schema、gate、audit 与 projection 只承担机械约束和证据传递。

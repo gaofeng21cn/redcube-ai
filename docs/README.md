@@ -14,7 +14,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 | --- | --- | --- |
 | Potential users and domain experts | [Repository home](../README.md) | Understand what RedCube delivers before opening technical files |
 | Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and active governance surface |
-| Developers and maintainers | [Program](./program/README.md), [References](./references/README.md), [Policies](./policies/README.md), [History](./history/README.md) | Track active baton records, references, stable rules, and archived provenance |
+| Developers and maintainers | [Product](./product/README.md), [Runtime](./runtime/README.md), [Delivery](./delivery/README.md), [Source](./source/README.md), [Policies](./policies/README.md), [Program](./program/README.md), [References](./references/README.md), [History](./history/README.md) | Track lifecycle docs, stable rules, active baton records, references, and archived provenance |
 
 ## Current Baseline
 
@@ -39,6 +39,19 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - [Contracts Overview](../contracts/README.md)
 - [Docs Portfolio Consolidation](./docs_portfolio_consolidation.md)
 
+## Lifecycle Layers
+
+| Layer | Responsibility | Start here |
+| --- | --- | --- |
+| Product | Human/operator entry, product handoff, profile and publishing coordination | [Product docs](./product/README.md) |
+| Runtime | Runtime topology, executor/backend boundaries, service-safe entry, watch/projection semantics | [Runtime docs](./runtime/README.md) |
+| Delivery | Deliverable families, routes, proof environments, export expectations, examples | [Delivery docs](./delivery/README.md) |
+| Source | Source readiness, augmentation, deep research trigger/gate, source truth consumption | [Source docs](./source/README.md) |
+| Policies | Stable governance and operating rules | [Policies](./policies/README.md) |
+| Program | Active baton and contract-linked closeout records | [Program](./program/README.md) |
+| References | Supporting technical references that do not own the active baton | [References](./references/README.md) |
+| History | Archived provenance and historical plans | [History](./history/README.md) |
+
 ## Maintainer Governance Surface
 
 - Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
@@ -47,9 +60,13 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 
 ## Reference Layers
 
+- `docs/product/`: product-facing and operator-facing human guides
+- `docs/runtime/`: runtime topology and execution/projection explanations
+- `docs/delivery/`: deliverable family, route, proof, export, and example materials
+- `docs/source/`: source readiness and augmentation materials
+- `docs/policies/`: stable governance and operating rules
 - `docs/program/`: human-readable active program baton and follow-on records
 - `docs/references/`: supporting technical references that explain current operation, target states, or maintainer practice
-- `docs/policies/`: stable governance and operating rules
 - `docs/history/`: archived provenance, repo-local migration records, and historical plans that no longer serve the active program baton
 - Local AI/Superpowers process drafts stay ignored under `docs/superpowers/` and are not part of repo-tracked history.
 - [AI-first quality boundary policy](./policies/ai_first_quality_boundary.md): stable rule that keeps author/reviewer judgment in AI-authored artifacts while packs, schemas, gates, audits, and projections stay mechanical.

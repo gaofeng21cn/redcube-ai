@@ -1,0 +1,17 @@
+# Delivery Docs
+
+`docs/delivery/` holds human-readable deliverable lifecycle material: family examples, route descriptions, proof environments, export expectations, and manual validation briefs.
+
+This layer explains how visual deliverables are shaped and checked. The executable delivery contract remains in runtime-family code, schemas, contract JSON, and generated artifact manifests.
+
+Current delivery materials:
+
+- [Deliverable examples](./deliverable_examples.md)
+
+Current delivery-facing root materials still being consolidated:
+
+- `../image-first-ppt-production-route.md`
+- `../native-ppt-proof-environment.md`
+- `../stable_deliverable_manual_test_brief.md`
+
+Runtime contracts should use `human_doc:*` semantic pointers for reader context, not this directory layout as a stable machine-readable interface.

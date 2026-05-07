@@ -127,7 +127,7 @@ activation package freeze 至少要绑定：
 
 - `README.md`
 - `README.zh-CN.md`
-- `docs/runtime_architecture.md`
+- `human_doc:runtime_architecture`（人读路径当前为 `docs/runtime/runtime_architecture.md`）
 - `contracts/runtime-program/current-program.json`
 - `contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json`
 - `$CODEX_HOME/projects/redcube-ai/runtime-state/context/CURRENT_PROGRAM.md`

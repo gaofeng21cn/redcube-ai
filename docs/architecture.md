@@ -212,3 +212,12 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 - `docs/references/*`
 
 这层分别承载稳定规则和非活跃参考材料。
+
+### 6. Lifecycle reading layers
+
+- `docs/product/*`
+- `docs/runtime/*`
+- `docs/delivery/*`
+- `docs/source/*`
+
+这层按 product、runtime、delivery 与 source 生命周期职责承载人类可读说明。机器可读合同继续使用 contract/schema/source/artifact 路径或 `human_doc:*` 语义 ID，不把这些 Markdown 路径当成稳定 API。

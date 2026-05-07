@@ -44,6 +44,11 @@
 
 ## 历史记录与追溯层
 
+- product lifecycle：`docs/product/`
+- runtime lifecycle：`docs/runtime/`
+- delivery lifecycle：`docs/delivery/`
+- source lifecycle：`docs/source/`
+- 稳定 rules：`docs/policies/`
 - absorbed milestones 与 phase-2 records：`docs/program/phase-2/`
 - repo-local Hermes migration/history records：`docs/history/hermes/`
 - AI / Superpowers process drafts：保持未跟踪，不进入 repo-tracked docs history

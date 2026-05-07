@@ -303,9 +303,9 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 
 如果你要读长期稳定的正式规则，请继续看：
 
-- [运行模型 Policy](policies/runtime_operating_model.md)
-- [交付合同模型 Policy](policies/deliverable_contract_model.md)
+- [运行模型 Policy](../policies/runtime_operating_model.md)
+- [交付合同模型 Policy](../policies/deliverable_contract_model.md)
 
 如果你只想快速开始，而不关心技术层次，请回到：
 
-- [人类用户快速上手](human_quickstart.md)
+- [人类用户快速上手](../human_quickstart.md)

@@ -41,7 +41,7 @@
   - 课程提纲：定义、功能、常见检查、诊疗边界
   - 讲义笔记：`TSH / T3 / T4`、甲减 / 甲亢症状、就诊路径
   - 必保留边界：不能替代临床诊断；示例仅用于教学
-- 参考面：`docs/deliverable_examples.md#示例一：给学生讲课的-PPT`
+- 参考面：`human_doc:deliverable_examples#ppt`（人读路径当前为 `docs/delivery/deliverable_examples.md#示例一：给学生讲课的-PPT`）
 
 ### 建议 CLI 序列
 
@@ -111,7 +111,7 @@ npm run redcube -- deliverable create \
   - 门诊常见问题列表：症状、检查、何时复诊
   - 专业边界说明：不能替代医生面诊；避免夸大疗效
   - 平台风格要求：首页钩子、分屏节奏、结尾行动建议
-- 参考面：`docs/deliverable_examples.md#示例二：知识传播型小红书图文`
+- 参考面：`human_doc:deliverable_examples#xiaohongshu`（人读路径当前为 `docs/delivery/deliverable_examples.md#示例二：知识传播型小红书图文`）
 
 ### 建议 CLI 序列
 
