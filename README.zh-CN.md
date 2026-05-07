@@ -88,8 +88,7 @@
 - 当前 repo-verified public entry surfaces 是单一 `redcube-ai` app skill、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contract，就构成了稳定可调用面。本地默认 concrete executor 仍是 `Codex CLI`，hosted/proof backend 继续只在显式 opt-in lane 中出现。
 - Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。
 - 如果外部 agent 或 OPL 需要直接读取 repo-tracked skill surface，使用单一 `redcube-ai` app skill，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI-backed commands；`frontdesk` / `invoke` / `session` 继续作为这个 skill 底下的 machine-readable command contracts。legacy `redcube product frontdesk` 命令键继续保留为兼容入口，语义是 product-entry overview / intake shell，不代表成熟 human-facing GUI 或 WebUI；OPL federated bridge 仍然只是内部集成面。
-- hosted quality lane 固定先跑一次 `npm run typecheck`，生成 compiled package exports 后再做类型检查，然后直接跑 `node --experimental-strip-types scripts/run-test-group.ts fast`、`family` 和 `meta:ci`；`meta:ci` 是扣除 fast 已覆盖文件后的 meta remainder，避免 hosted CI 重复跑同一批根级测试文件。浏览器 / renderer proof 环境只留在显式 `native-ppt-proof` 和 `image-ppt-proof` jobs，不进入默认 quality lane。family shared pin 检查必须继续通过 `scripts/run-test-group-lib.ts` 保持 clean-clone 可运行。
-- 本地 `npm run test:integration`、`npm run test:e2e`、`npm run test:full` 和 `npm run test:full:remaining` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发。已经本地跑过 fast 后，可用 `npm run test:integration:remaining` 只跑 fast 尚未覆盖的 integration 文件。已经本地跑过 fast + family + meta:ci + integration:remaining 后，可用 `npm run test:full:remaining` 只跑动态推导出的 full 余量，避免重复执行已覆盖的 meta/integration 文件。
+- 测试 lane 真相放在 `scripts/test-registry.ts`，当前验证矩阵以 [当前状态](./docs/status.md) 为准。`smoke` 是最小本地入口，`fast` 是核心回归快线，hosted CI 等价于 `npm run test:ci`，`historical` 只在显式要求时运行。
 - `docs/program/` 用来读已经吸收进主线的阶段里程碑，`docs/references/` 用来读 bridge 和 provenance 材料；Agent 不需要先从零散实现文件里反推当前执行真相。
 
 </details>

@@ -26,7 +26,9 @@ test('Sentrux advisory publishes OPL quality details without changing the defaul
   assert.match(workflow, /path:\s*artifacts\/opl-quality-details\/quality-details\.json\b/);
 
   const verify = readRepoFile('scripts/verify.sh');
-  assert.match(verify, /smoke\|fast\)\n\s+npm run test:line-budget\n\s+npm run test:fast/);
+  assert.match(verify, /smoke\)\n\s+npm run test:line-budget\n\s+npm run test:smoke/);
+  assert.match(verify, /fast\)\n\s+npm run test:line-budget\n\s+npm run test:fast/);
+  assert.match(verify, /ci\)\n\s+npm run test:line-budget\n\s+npm run test:ci/);
   assert.match(verify, /structure\)\n\s+npm run test:line-budget\n\s+scripts\/run-structural-quality-gate\.sh/);
   assert.doesNotMatch(verify, /quality details|sentrux-advisory|opl-quality-details/);
 

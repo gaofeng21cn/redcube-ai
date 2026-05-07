@@ -11,8 +11,24 @@ import {
   resolveOwnerRepoRoot,
 } from 'opl-gateway-shared/family-shared-release';
 
-export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set(['integration', 'integration:remaining', 'e2e', 'full', 'full:remaining']);
-export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set(['fast', 'integration', 'integration:remaining', 'e2e', 'full', 'full:remaining']);
+export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
+  'integration',
+  'integration:remaining',
+  'e2e',
+  'full',
+  'full:remaining',
+  'full:with-historical',
+]);
+export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
+  'smoke',
+  'fast',
+  'integration',
+  'integration:remaining',
+  'e2e',
+  'full',
+  'full:remaining',
+  'full:with-historical',
+]);
 export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',

@@ -10,32 +10,42 @@ import {
   parseRunTestGroupArgs,
   partitionTestFilesForExecution,
   selectGroupFiles,
-  excludeCoveredTestFiles,
   resolveRedCubePythonCommand,
   ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES,
   SERIALIZED_ROUTE_HEAVY_TEST_FILES,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
 } from '../scripts/run-test-group-lib.ts';
+import {
+  buildTestGroups,
+} from '../scripts/test-registry.ts';
 
-function readGroupList(script, groupName) {
-  const match = script.match(new RegExp(`const ${groupName} = \\[(.*?)\\];`, 's'));
-  assert.ok(match, `missing ${groupName} group`);
-  return [...match[1].matchAll(/'([^']+\.test\.(?:js|ts))'/g)].map((entry) => entry[1]);
+const GROUPS = buildTestGroups();
+
+function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
+  const covered = new Set(coveredFiles);
+  const selected = [];
+  for (const file of baseFiles) {
+    if (!covered.has(file) && !selected.includes(file)) {
+      selected.push(file);
+    }
+  }
+  return selected;
 }
 
 test('run-test-group keeps local codex preflight on integration/e2e/full groups', () => {
   assert.deepEqual(
     [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
-    ['e2e', 'full', 'full:remaining', 'integration', 'integration:remaining'],
+    ['e2e', 'full', 'full:remaining', 'full:with-historical', 'integration', 'integration:remaining'],
   );
 });
 
 test('run-test-group serializes route-heavy fast files without enabling live Codex preflight', () => {
   assert.deepEqual(
     [...ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES].sort(),
-    ['e2e', 'fast', 'full', 'full:remaining', 'integration', 'integration:remaining'],
+    ['e2e', 'fast', 'full', 'full:remaining', 'full:with-historical', 'integration', 'integration:remaining', 'smoke'],
   );
   assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
+  assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('smoke'), false);
 });
 
 test('run-test-group only adds file-level serialization to explicit route-heavy file processes', () => {
@@ -119,13 +129,13 @@ test('run-test-group partitions route-heavy files away from the default parallel
 
 test('run-test-group exposes a CI meta remainder lane without repeating fast meta coverage', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
-  const meta = readGroupList(script, 'META');
-  const fast = readGroupList(script, 'FAST');
+  const meta = GROUPS.meta;
+  const fast = GROUPS.fast;
 
-  assert.match(script, /'meta:ci': excludeCoveredTestFiles\(META, FAST\)/);
+  assert.match(script, /const GROUPS = buildTestGroups\(\)/);
   assert.equal(fast.some((file) => meta.includes(file)), true);
   assert.equal(
-    excludeCoveredTestFiles(meta, fast).length,
+    GROUPS['meta:ci'].length,
     meta.length - fast.filter((file) => meta.includes(file)).length,
   );
 });
@@ -141,35 +151,29 @@ test('run-test-group remainder helper removes covered files and duplicate remain
 });
 
 test('run-test-group exposes an integration remainder lane for local fast-then-integration verification', () => {
-  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
-  const integration = readGroupList(script, 'INTEGRATION');
-  const fast = readGroupList(script, 'FAST');
+  const integration = GROUPS.integration;
+  const fast = GROUPS.fast;
 
-  assert.match(script, /'integration:remaining': excludeCoveredTestFiles\(INTEGRATION, FAST\)/);
   assert.equal(fast.some((file) => integration.includes(file)), true);
-  assert.equal(excludeCoveredTestFiles(integration, fast).length, 35);
+  assert.equal(GROUPS['integration:remaining'].length, 35);
 });
 
 test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {
-  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
-  const e2e = readGroupList(script, 'E2E');
-  const historical = readGroupList(script, 'HISTORICAL');
-  const full = [
-    ...readGroupList(script, 'META'),
-    ...readGroupList(script, 'FAMILY'),
-    ...readGroupList(script, 'INTEGRATION'),
-    ...e2e,
-    ...historical,
-  ];
+  const e2e = GROUPS.e2e;
+  const historical = GROUPS.historical;
+  const full = GROUPS.full;
   const covered = [
-    ...readGroupList(script, 'FAST'),
-    ...readGroupList(script, 'FAMILY'),
-    ...excludeCoveredTestFiles(readGroupList(script, 'META'), readGroupList(script, 'FAST')),
-    ...excludeCoveredTestFiles(readGroupList(script, 'INTEGRATION'), readGroupList(script, 'FAST')),
+    ...GROUPS.fast,
+    ...GROUPS.family,
+    ...GROUPS['meta:ci'],
+    ...GROUPS['integration:remaining'],
   ];
 
-  assert.match(script, /GROUPS\['full:remaining'\] = excludeCoveredTestFiles\(GROUPS\.full, FULL_REMAINING_COVERED\)/);
-  assert.deepEqual(excludeCoveredTestFiles(full, covered), [...e2e, ...historical]);
+  assert.deepEqual(excludeCoveredTestFiles(full, covered), e2e);
+  for (const historicalFile of historical) {
+    assert.equal(full.includes(historicalFile), false, historicalFile);
+    assert.equal(GROUPS['full:with-historical'].includes(historicalFile), true, historicalFile);
+  }
 });
 
 test('run-test-group supports explicit targeted files inside the selected lane', () => {
@@ -248,11 +252,10 @@ test('run-test-group validates requested files before serialized preflight', () 
 });
 
 test('default meta keeps phase-2/longrun in historical lane', () => {
-  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
-  const meta = readGroupList(script, 'META');
-  const family = readGroupList(script, 'FAMILY');
-  const integration = readGroupList(script, 'INTEGRATION');
-  const historical = readGroupList(script, 'HISTORICAL');
+  const meta = GROUPS.meta;
+  const family = GROUPS.family;
+  const integration = GROUPS.integration;
+  const historical = GROUPS.historical;
 
   assert.deepEqual(family, ['tests/family-shared-release.test.ts']);
   assert.equal(meta.includes('tests/family-shared-release.test.ts'), false);
@@ -267,12 +270,15 @@ test('run-test-group usage and verify shim include the family verification lane'
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
 
-  assert.match(script, /<fast\|meta\|meta:ci\|family\|integration\|integration:remaining\|e2e\|historical\|full\|full:remaining>/);
+  assert.match(script, /const groupNames = Object\.keys\(GROUPS\)\.join\('\|'\)/);
   assert.match(script, /\[--files tests\/a\.test\.ts,tests\/b\.test\.ts\]/);
+  assert.match(verifyScript, /smoke\)/);
   assert.match(verifyScript, /family\)/);
+  assert.match(verifyScript, /ci\)/);
   assert.match(verifyScript, /integration-remaining\)/);
   assert.match(verifyScript, /full-remaining\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|line-budget\|structure\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\]/);
+  assert.match(verifyScript, /full-with-historical\)/);
+  assert.match(verifyScript, /\[smoke\|fast\|ci\|line-budget\|structure\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\|full-with-historical\]/);
 });
 
 test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {
@@ -306,11 +312,10 @@ test('native PPT fast runtime tests use the mock Python helper instead of launch
 
 test('fast Python helper catalog checks do not execute the real native PPT helper', () => {
   const content = readFileSync('tests/python-native-helper-catalog.test.ts', 'utf-8');
-  const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const catalog = JSON.parse(readFileSync('contracts/runtime-program/python-native-helper-catalog.json', 'utf-8'));
   const nativeHelper = catalog.helpers.find((helper) => helper.helper_id === 'ppt_deck_native');
-  const meta = readGroupList(script, 'META');
-  const fast = readGroupList(script, 'FAST');
+  const meta = GROUPS.meta;
+  const fast = GROUPS.fast;
 
   assert.equal(meta.includes('tests/python-native-helper-catalog.test.ts'), true);
   assert.equal(fast.includes('tests/python-native-helper-catalog.test.ts'), true);
@@ -338,7 +343,7 @@ test('serialized verification rule is documented in current program contract', (
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_files, 1);
   assert.deepEqual(
     currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_groups,
-    ['fast', 'integration', 'integration:remaining', 'e2e', 'full', 'full:remaining'],
+    ['smoke', 'fast', 'integration', 'integration:remaining', 'e2e', 'full', 'full:remaining', 'full:with-historical'],
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
@@ -354,7 +359,11 @@ test('serialized verification rule is documented in current program contract', (
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
-    /full:remaining keeps local fast-family-meta-integration verification from rerunning already covered files/i,
+    /full:remaining keeps local fast-family-meta-integration verification from rerunning already covered active files/i,
+  );
+  assert.match(
+    currentProgram.current_state.green_baseline.ci_quality_lane_reason,
+    /historical stays explicit through test:historical or full:with-historical/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,

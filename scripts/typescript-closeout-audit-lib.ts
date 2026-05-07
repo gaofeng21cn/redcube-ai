@@ -9,6 +9,7 @@ import {
 } from 'node:fs';
 
 import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime-state.ts';
+import { rootPartitionFiles } from './test-registry.ts';
 
 export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
 export const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
@@ -136,8 +137,7 @@ function listFilesUnder(directory, predicate) {
 }
 
 function readRegisteredRootTestFiles() {
-  const runner = readText('scripts/run-test-group.ts');
-  return [...new Set([...runner.matchAll(/'([^']+\.test\.(?:js|ts))'/g)].map((entry) => entry[1]))].sort();
+  return rootPartitionFiles().sort();
 }
 
 function languageSurfaceAudit() {

@@ -9,6 +9,11 @@ import {
   buildNodeTestArgs,
   discoverRootTestFiles,
 } from '../scripts/run-test-group-lib.ts';
+import {
+  assertValidTestRegistry,
+  buildTestGroups,
+  TEST_REGISTRY,
+} from '../scripts/test-registry.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
@@ -98,15 +103,22 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
 
 test('root package exposes formal typecheck entrypoint', () => {
   const pkg = readJson('package.json');
-  assert.equal(pkg.scripts.test, 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts fast');
+  assert.equal(pkg.scripts.test, 'npm run test:fast');
+  assert.equal(pkg.scripts['test:smoke'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts smoke');
   assert.equal(pkg.scripts['test:fast'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts fast');
+  assert.equal(
+    pkg.scripts['test:ci'],
+    'npm run typecheck && node --experimental-strip-types scripts/run-test-group.ts fast && node --experimental-strip-types scripts/run-test-group.ts family && node --experimental-strip-types scripts/run-test-group.ts meta:ci',
+  );
   assert.equal(pkg.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
+  assert.equal(pkg.scripts['test:meta:ci'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta:ci');
   assert.equal(pkg.scripts['test:integration'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration');
   assert.equal(pkg.scripts['test:integration:remaining'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration:remaining');
   assert.equal(pkg.scripts['test:e2e'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e');
   assert.equal(pkg.scripts['test:historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts historical');
   assert.equal(pkg.scripts['test:full'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full');
   assert.equal(pkg.scripts['test:full:remaining'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:remaining');
+  assert.equal(pkg.scripts['test:full:with-historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:with-historical');
   assert.equal(pkg.scripts.typecheck, 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false');
   assert.equal(
     pkg.scripts['audit:typescript-closeout'],
@@ -315,4 +327,36 @@ test('test runner treats root-level TypeScript tests as first-class lane members
     }),
     /未被纳入 meta\/family\/integration\/e2e\/historical 的测试文件: tests\/beta\.test\.ts/,
   );
+});
+
+test('test registry is the single source of truth for lane membership and keeps historical explicit', () => {
+  assert.doesNotThrow(() => assertValidTestRegistry());
+
+  const groups = buildTestGroups();
+  const registryFiles = TEST_REGISTRY.map((entry) => entry.file);
+
+  assert.equal(registryFiles.length, new Set(registryFiles).size);
+  assert.equal(groups.historical.length, 27);
+  assert.equal(groups.fast.length, 32);
+  assert.equal(groups.smoke.length > 0, true);
+  assert.equal(groups.smoke.length < groups.fast.length, true);
+  assert.equal(groups['meta:ci'].some((file) => groups.fast.includes(file)), false);
+  assert.equal(groups['integration:remaining'].some((file) => groups.fast.includes(file)), false);
+
+  for (const historicalFile of groups.historical) {
+    assert.equal(groups.full.includes(historicalFile), false, historicalFile);
+    assert.equal(groups['full:with-historical'].includes(historicalFile), true, historicalFile);
+  }
+
+  for (const entry of TEST_REGISTRY) {
+    assert.deepEqual(Object.keys(entry), [
+      'file',
+      'lane',
+      'size',
+      'layer',
+      'state',
+      'ci_default',
+      'coverage_id',
+    ]);
+  }
 });

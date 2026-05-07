@@ -7,9 +7,17 @@ node --experimental-strip-types scripts/line-budget.ts
 scripts/repo-hygiene.sh
 
 case "$lane" in
-  smoke|fast)
+  smoke)
+    npm run test:line-budget
+    npm run test:smoke
+    ;;
+  fast)
     npm run test:line-budget
     npm run test:fast
+    ;;
+  ci)
+    npm run test:line-budget
+    npm run test:ci
     ;;
   line-budget)
     npm run test:line-budget
@@ -42,9 +50,12 @@ case "$lane" in
   full-remaining)
     npm run test:full:remaining
     ;;
+  full-with-historical)
+    npm run test:full:with-historical
+    ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|line-budget|structure|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|ci|line-budget|structure|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining|full-with-historical]" >&2
     exit 1
     ;;
 esac

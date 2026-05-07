@@ -223,7 +223,7 @@ test('Native PPT helper catalog check never invokes the real native renderer ent
   const helpers = helperById(catalog);
   const nativeHelper = helpers[NATIVE_PPT_HELPER_ID];
   const source = readFileSync(fileURLToPath(import.meta.url), 'utf-8');
-  const runGroupSource = readFileSync(path.resolve('scripts/run-test-group.ts'), 'utf-8');
+  const registrySource = readFileSync(path.resolve('scripts/test-registry.ts'), 'utf-8');
   const runGroupLibSource = readFileSync(path.resolve('scripts/run-test-group-lib.ts'), 'utf-8');
 
   assert.equal(nativeHelper.package_module, NATIVE_PPT_PACKAGE_MODULE);
@@ -233,13 +233,13 @@ test('Native PPT helper catalog check never invokes the real native renderer ent
   assert.doesNotMatch(source, /runPython\(\['-m',\s*NATIVE_PPT_PACKAGE_MODULE,\s*'--help'\]\)/);
   assert.doesNotMatch(source, /runPythonModule\(NATIVE_PPT_PACKAGE_MODULE/);
   assert.match(source, /runPythonImportabilityCheck\(helper\.package_module\)/);
-  assert.doesNotMatch(runGroupSource, /RED(CUBE)?_PYTHON_COMMAND[^\n]*soffice/i);
-  assert.doesNotMatch(runGroupSource, new RegExp(['osa', 'script'].join(''), 'i'));
-  assert.doesNotMatch(runGroupSource, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
-  assert.doesNotMatch(runGroupSource, new RegExp(['microsoft', ' powerpoint'].join(''), 'i'));
-  assert.match(runGroupSource, /tests\/ppt-native-ppt-runtime\.test\.ts/);
-  assert.match(runGroupSource, /tests\/product-entry-native-ppt-proof-lane\.test\.ts/);
-  assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\['fast', 'integration', 'integration:remaining', 'e2e', 'full', 'full:remaining'\]\)/);
+  assert.doesNotMatch(registrySource, /RED(CUBE)?_PYTHON_COMMAND[^\n]*soffice/i);
+  assert.doesNotMatch(registrySource, new RegExp(['osa', 'script'].join(''), 'i'));
+  assert.doesNotMatch(registrySource, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
+  assert.doesNotMatch(registrySource, new RegExp(['microsoft', ' powerpoint'].join(''), 'i'));
+  assert.match(registrySource, /tests\/ppt-native-ppt-runtime\.test\.ts/);
+  assert.match(registrySource, /tests\/product-entry-native-ppt-proof-lane\.test\.ts/);
+  assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\[[\s\S]*'smoke'[\s\S]*'fast'[\s\S]*'full:with-historical'[\s\S]*\]\)/);
   assert.doesNotMatch(runGroupLibSource, /SERIALIZED_VERIFICATION_GROUP_NAMES = new Set\(\[[^\]]*'fast'|'meta'/);
 });
 
@@ -350,12 +350,12 @@ test('Python native helper doctor does not create a bypass around review/export 
 });
 
 test('Fast and meta diagnostic coverage does not invoke the native PPT renderer', () => {
-  const runTestGroup = readFileSync(path.resolve('scripts/run-test-group.ts'), 'utf-8');
+  const registrySource = readFileSync(path.resolve('scripts/test-registry.ts'), 'utf-8');
   const doctor = readFileSync(path.resolve('python/redcube_ai/native_helpers/doctor.py'), 'utf-8');
   const rendererDependencies = readFileSync(path.resolve('python/redcube_ai/native_helpers/renderer_dependencies.py'), 'utf-8');
 
-  assert.match(runTestGroup, /tests\/python-native-helper-catalog\.test\.ts/);
-  assert.doesNotMatch(runTestGroup, /redcube-ppt-deck-native|ppt_deck_native\.py|tools\/native-ppt-proof|libreoffice|soffice|pdftoppm/);
+  assert.match(registrySource, /tests\/python-native-helper-catalog\.test\.ts/);
+  assert.doesNotMatch(registrySource, /redcube-ppt-deck-native|ppt_deck_native\.py|tools\/native-ppt-proof|libreoffice|soffice|pdftoppm/);
   assert.doesNotMatch(doctor, /subprocess|run\(|Popen/);
   assert.doesNotMatch(rendererDependencies, /subprocess|run\(|Popen/);
   assert.match(rendererDependencies, /shutil\.which/);
