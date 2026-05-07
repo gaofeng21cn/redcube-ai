@@ -15,6 +15,7 @@ output/
 data/
 external/
 tmp/
+artifacts/
 config/local/**
 !config/local/
 !config/local/.gitkeep
@@ -22,6 +23,7 @@ config/local/**
 
 # Python
 __pycache__/
+*.egg-info/
 *.pyc
 *.pyo
 *.pyd
@@ -30,6 +32,8 @@ __pycache__/
 # Node
 node_modules/
 dist/
+build/
+out/
 coverage/
 *.log
 
@@ -42,4 +46,6 @@ RedCube AI.app/
 .runtime-program/
 .omx/
 .codex/
+runtime-state/
+.agent-contract-baseline.json
 .tsbuildinfo/

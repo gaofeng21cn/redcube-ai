@@ -28,6 +28,14 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
+const hygieneResult = spawnSync('scripts/repo-hygiene.sh', {
+  cwd: repoRoot,
+  encoding: 'utf8',
+  stdio: 'inherit',
+});
+if (hygieneResult.status !== 0) {
+  process.exit(hygieneResult.status ?? 1);
+}
 assertWorkspacePackageResolution({ repoRoot });
 assertRequiredRuntimeSharedResolution({ repoRoot });
 assertCurrentRepoSharedPinAlignment({ repoRoot });

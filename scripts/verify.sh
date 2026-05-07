@@ -4,6 +4,7 @@ set -euo pipefail
 lane="${1:-smoke}"
 
 node --experimental-strip-types scripts/line-budget.ts
+scripts/repo-hygiene.sh
 
 case "$lane" in
   smoke|fast)
