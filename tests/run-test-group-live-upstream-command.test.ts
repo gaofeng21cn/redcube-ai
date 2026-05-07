@@ -78,6 +78,7 @@ test('run-test-group partitions route-heavy files away from the default parallel
       groupName: 'integration',
       files: [
         'tests/managed-deliverable-execution.test.ts',
+        'tests/runtime-deliverable-route-integration.test.ts',
         'tests/runtime-deliverable-route.test.ts',
         'tests/review-platform.test.ts',
         'tests/source-intake.test.ts',
@@ -89,6 +90,7 @@ test('run-test-group partitions route-heavy files away from the default parallel
       ],
       serialized_files: [
         'tests/managed-deliverable-execution.test.ts',
+        'tests/runtime-deliverable-route-integration.test.ts',
         'tests/runtime-deliverable-route.test.ts',
         'tests/review-platform.test.ts',
       ],
@@ -155,7 +157,7 @@ test('run-test-group exposes an integration remainder lane for local fast-then-i
   const fast = GROUPS.fast;
 
   assert.equal(fast.some((file) => integration.includes(file)), true);
-  assert.equal(GROUPS['integration:remaining'].length, 35);
+  assert.equal(GROUPS['integration:remaining'].length, 37);
 });
 
 test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {
@@ -292,7 +294,7 @@ test('deliverable review loop integration stays on the mock codex upstream inste
 test('serialized route-heavy verification files stay on the mock codex upstream instead of the live CLI', () => {
   for (const file of [...SERIALIZED_ROUTE_HEAVY_TEST_FILES].sort()) {
     const content = readSerializedTestFileWithImportedCases(file);
-    assert.match(content, /withMockHermesUpstream|REDCUBE_CODEX_COMMAND/);
+    assert.match(content, /withMockHermes(?:AndRuntimeState|Upstream)|REDCUBE_CODEX_COMMAND/);
   }
 });
 

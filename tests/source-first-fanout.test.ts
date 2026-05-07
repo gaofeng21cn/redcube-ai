@@ -137,7 +137,7 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
         'storyline',
         'single_note_plan',
         'visual_direction',
-        'render_html',
+        'author_image_pages',
         'visual_director_review',
         'screenshot_review',
         'publish_copy',

@@ -81,6 +81,8 @@ function makeXhsReviewParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     getDeliverableViewSurfacePaths: () => ({}),
     hasAiVisualBlock: (review) => review?.judgement === 'block',
     hasAiVisualPass: (review) => review?.judgement === 'pass',
+    imagePagesMechanicalReviewPayload: () => ({}),
+    isImagePagesArtifact: () => false,
     loadPriorRenderedXhsSlideHtmlMap: () => new Map([['N01', '<section>ok</section>']]),
     markPublishBundleStaleAfterBlockedReview: () => [],
     normalizeStringList: (value) => Array.isArray(value) ? value : [],
@@ -89,6 +91,17 @@ function makeXhsReviewParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     promoteStableHtml: () => ['stable.html'],
     promptRoute: () => 'prompt.md',
     readCurrentHtmlArtifact: () => ({
+      html_bundle: {
+        html_file: htmlFile,
+        slides: [{
+          slide_id: 'N01',
+          title: '第一页',
+          content: '<section data-slide-root="true" data-slide-id="N01"><div data-qa-block="title" data-primary-point="true">第一页</div><div data-qa-block="body">ok</div></section>',
+        }],
+      },
+    }),
+    readCurrentVisualArtifact: () => ({
+      route: 'render_html',
       html_bundle: {
         html_file: htmlFile,
         slides: [{
