@@ -23,7 +23,7 @@
 - 一旦新的 runtime substrate 目标已经明确，新增投入默认服务目标形态；旧宿主只允许作为迁移桥、兼容层或回归对照存在。
 - 不做降级处理、兜底补丁、启发式修补或“先糊住再说”式实现。
 
-## 文档体系
+## 文档分层与生命周期治理
 
 - `README*` 与 `docs/README*` 是默认公开入口。
 - `docs/project.md`：项目概览与产品角色。
@@ -31,17 +31,25 @@
 - `docs/invariants.md`：硬约束与不能破坏的边界。
 - `docs/decisions.md`：仍有效的关键决策与取舍。
 - `docs/status.md`：当前默认入口链路、执行口径、验证口径与历史索引。
-- `docs/program/phase-2/`：Phase 2 absorbed tranche、prefrozen follow-on board 与 provenance brief。
+- `docs/docs_portfolio_consolidation.md` 是当前文档组合治理入口；维护者应先读核心五件套，再按该文件判断新增、更新、归档或 tombstone。
+- 每份长期文档都必须能说明 `owner`、`purpose`、`state`、`machine boundary`；缺少任一信号时，先补入口或归位，再继续扩写。
+- `docs/product/`：product entry、quickstart、operator handoff、profile 设置与发布协作。
+- `docs/runtime/`：runtime topology、executor / substrate、service-safe entry、watch / projection 语义说明。
+- `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。
+- `docs/source/`：source readiness、augmentation、research trigger / gate 与 source truth 消费说明。
+- `docs/program/`：active baton、absorbed tranche 与 contract-linked program records；`docs/program/phase-2/` 保留 Phase 2 absorbed tranche、prefrozen follow-on board 与 provenance brief。
 - `contracts/runtime-program/current-program.json`：当前机器可读主线合同与 active baton 指针。
 - `contracts/runtime-program/*.json`：机器可读主线合同。
 - `docs/policies/*`：稳定规则。
-- `docs/references/*`：定位、背景、审计与非活跃参考。
+- `docs/references/*`：定位、背景、审计、target-state 与维护者实践参考。
+- `docs/history/`：repo-tracked 历史 provenance、归档过程记录与不再服务当前 baton 的历史计划。
 
 ## 文档规则
 
 - 公开文档保持中英双语；内部操作、规划与审计说明默认中文。
 - narrative 规则放根 `AGENTS.md`、`docs/README*` 与核心五件套；machine-readable contract 放 `contracts/runtime-program/*.json`。
 - 新文档先判断角色，再决定落点；不要把核心知识、program brief、参考材料和历史记录混在同一层。
+- `README*`、`docs/**` 与参考文档是人读面。代码、测试、contracts、dashboard 或 runtime 不得把 prose path、Markdown 章节或文案当成稳定机器接口；确需关联人读材料时，使用 contract/schema/source 路径或 `human_doc:*` 语义 ID。
 
 ## 变更与验证
 
