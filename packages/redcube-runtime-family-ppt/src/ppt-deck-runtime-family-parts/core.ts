@@ -9,27 +9,11 @@ import {
 } from 'node:fs';
 
 import {
-  generateStructuredArtifactBatchViaCodexCli,
-  generateStructuredArtifactViaCodexCli,
-} from '@redcube/codex-cli-client';
-import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,
   resolveRedCubePythonCommand,
   resolvePythonNativeHelper,
 } from '@redcube/runtime-protocol';
-import {
-  CODEX_DEFAULT_ADAPTER,
-  HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_DEFAULT_ADAPTER,
-  HERMES_NATIVE_PROOF_ADAPTER,
-  buildCodexExecutionModel,
-  buildHermesExecutionModel,
-  buildHermesNativeProofExecutionModel,
-  generateStructuredArtifactViaHermesAgentApi,
-  generateStructuredArtifactViaHermesAgentStructuredCall,
-  generateStructuredArtifactViaHermesNativeProof,
-} from '@redcube/hermes-substrate';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 import {
@@ -42,7 +26,7 @@ import { createPptDeckStageParts } from './stages.js';
 import { createPptDeckSurfaceParts } from './surface.js';
 import { createPptDeckCoreHelpers } from './core-helpers.js';
 import { createPptDeckProfilePresetParts } from './core-profile-presets.js';
-import { createStructuredArtifactExecutor } from './executor-routing.js';
+import { createPptDeckExecutionAdapterParts } from './execution-adapters.js';
 import {
   ALLOWED_RECIPE_IDS,
   BANNED_RENDER_TOKENS,
@@ -101,9 +85,6 @@ export function createPptDeckRuntimeCore() {
   const PYTHON_EXPORT = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_export');
   const PYTHON_NATIVE = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_native');
   const NATIVE_PPT_ENGINE_CONTRACT = path.join(REPO_ROOT, 'contracts/runtime-program/ppt-native-python-engine-contract.json');
-  const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
-  const HERMES_AGENT_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
-  const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
 
   const {
     safeText,
@@ -196,162 +177,18 @@ export function createPptDeckRuntimeCore() {
     safeArray,
     safeText,
   });
-
-  function isHermesAgentAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    const requested = safeText(adapter);
-    return requested === HERMES_DEFAULT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND;
-  }
-
-  function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) return HERMES_NATIVE_PROOF_EXECUTION_MODEL;
-    if (isHermesAgentAdapter(adapter)) return HERMES_AGENT_EXECUTION_MODEL;
-    return CODEX_EXECUTION_MODEL;
-  }
-  
-  function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    if (isHermesAgentAdapter(adapter)) {
-      if (safeText(generationRuntime?.creative_owner)) {
-        return safeText(generationRuntime.creative_owner);
-      }
-      if (safeText(generationRuntime?.owner)) {
-        return safeText(generationRuntime.owner);
-      }
-      return HERMES_AGENT_EXECUTOR_BACKEND;
-    }
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-      if (safeText(generationRuntime?.creative_owner)) {
-        return safeText(generationRuntime.creative_owner);
-      }
-      if (safeText(generationRuntime?.owner)) {
-        return safeText(generationRuntime.owner);
-      }
-      return HERMES_NATIVE_PROOF_ADAPTER;
-    }
-    return 'host_agent';
-  }
-  
-  function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    if (safeText(generationRuntime?.primary_surface)) {
-      return safeText(generationRuntime.primary_surface);
-    }
-    if (safeText(generationRuntime?.adapter_surface)) {
-      return safeText(generationRuntime.adapter_surface);
-    }
-    if (isHermesAgentAdapter(adapter)) {
-      return 'hermes_agent_api_server';
-    }
-    return adapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? 'hermes_native_full_agent_loop'
-      : 'codex_native_host_agent';
-  }
-
-  const generateStructuredArtifact = createStructuredArtifactExecutor({
+  const {
     CODEX_DEFAULT_ADAPTER,
-    HERMES_AGENT_EXECUTOR_BACKEND,
-    HERMES_NATIVE_PROOF_ADAPTER,
-    generateStructuredArtifactViaCodexCli,
-    generateStructuredArtifactViaHermesAgentApi,
-    generateStructuredArtifactViaHermesAgentStructuredCall,
-    generateStructuredArtifactViaHermesNativeProof,
-    isHermesAgentAdapter,
+    creativeExecution,
+    creativeSourceStamp,
+    executionModelForAdapter,
+    generateStructuredArtifact,
+    generateStructuredArtifactBatch,
+    primarySurface,
+    runtimeCreativeSource,
+  } = createPptDeckExecutionAdapterParts({
     safeText,
   });
-
-  async function generateStructuredArtifactBatch({
-    adapter = CODEX_DEFAULT_ADAPTER,
-    stages = [],
-    executionShape = null,
-    hermesProfile = null,
-    executorRouting = null,
-    ...input
-  }) {
-    if (isHermesAgentAdapter(adapter)) {
-      const data = [];
-      for (const stage of stages) {
-        const result = await generateStructuredArtifact({
-          adapter,
-          executionShape,
-          hermesProfile,
-          executorRouting,
-          ...stage,
-        });
-        data.push({
-          stage_id: safeText(stage?.stage_id),
-          data: result.data,
-          generationRuntime: result.generationRuntime,
-        });
-      }
-      return {
-        data,
-        batchRuntime: {
-          owner: HERMES_AGENT_EXECUTOR_BACKEND,
-          session_pool: {
-            reuse_supported: false,
-            reuse_claimed: false,
-            reuse_status: 'unsupported_by_adapter',
-            invocation_count: data.length,
-          },
-        },
-      };
-    }
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-      const data = [];
-      for (const stage of stages) {
-        const result = await generateStructuredArtifactViaHermesNativeProof(stage);
-        data.push({
-          stage_id: safeText(stage?.stage_id),
-          data: result.data,
-          generationRuntime: result.generationRuntime,
-        });
-      }
-      return {
-        data,
-        batchRuntime: {
-          owner: HERMES_NATIVE_PROOF_ADAPTER,
-          session_pool: {
-            reuse_supported: false,
-            reuse_claimed: false,
-            reuse_status: 'unsupported_by_adapter',
-            invocation_count: data.length,
-          },
-        },
-      };
-    }
-    return generateStructuredArtifactBatchViaCodexCli({ stages, ...input });
-  }
-  
-  function runtimeCreativeSource(
-    protectedSurface,
-    artifactSource,
-    generationRuntime = null,
-    adapter = CODEX_DEFAULT_ADAPTER,
-  ) {
-    return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
-      stage_owner: primarySurface(generationRuntime, adapter),
-      ownership_model: 'director_first',
-      authored_surface: protectedSurface,
-      materialized_from: artifactSource,
-    };
-  }
-  
-  function creativeSourceStamp({
-    route,
-    lifecycleStage,
-    authoredSurface,
-    materializedFrom = 'prompt_pack_seed',
-    generationRuntime = null,
-    adapter = CODEX_DEFAULT_ADAPTER,
-  }) {
-    return {
-      ...runtimeCreativeSource(authoredSurface, materializedFrom, generationRuntime, adapter),
-      route,
-      lifecycle_stage: lifecycleStage,
-      authored_surface: authoredSurface,
-      materialized_from: materializedFrom,
-    };
-  }
   
   function lifecycleStageForRoute(contract, route) {
     return contract?.lifecycle_model?.route_to_stage?.[route] || null;
@@ -422,20 +259,6 @@ export function createPptDeckRuntimeCore() {
   
   function reviewOverlayForRoute(contract, route) {
     return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
-  }
-  
-  function creativeExecution(routeOrLifecycleStage, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
-      lifecycle_stage: routeOrLifecycleStage,
-      ownership_model: 'director_first',
-      ...(generationRuntime
-        ? {
-            generation_runtime: generationRuntime,
-          }
-        : {}),
-    };
   }
   
   function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
