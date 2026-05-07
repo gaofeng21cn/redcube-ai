@@ -251,7 +251,7 @@ test('run-test-group validates requested files before serialized preflight', () 
   assert.equal(selectIndex < preflightIndex, true);
 });
 
-test('default meta keeps phase-2/longrun in historical lane', () => {
+test('default lanes keep historical provenance compact and explicit', () => {
   const meta = GROUPS.meta;
   const family = GROUPS.family;
   const integration = GROUPS.integration;
@@ -261,9 +261,9 @@ test('default meta keeps phase-2/longrun in historical lane', () => {
   assert.equal(meta.includes('tests/family-shared-release.test.ts'), false);
   assert.equal(meta.includes('tests/direct-delivery-longrun-target.test.ts'), false);
   assert.equal(meta.includes('tests/phase-2-behavior-convergence.test.ts'), false);
+  assert.equal(meta.includes('tests/runtime-program-provenance.test.ts'), false);
   assert.equal(integration.includes('tests/direct-delivery-longrun-target.test.ts'), false);
-  assert.equal(historical.includes('tests/direct-delivery-longrun-target.test.ts'), true);
-  assert.equal(historical.includes('tests/phase-2-behavior-convergence.test.ts'), true);
+  assert.deepEqual(historical, ['tests/runtime-program-provenance.test.ts']);
 });
 
 test('run-test-group usage and verify shim include the family verification lane', () => {
