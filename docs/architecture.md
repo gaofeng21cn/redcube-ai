@@ -15,6 +15,7 @@
 
 当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`status`、`invoke`、`session continuation` 与 internal `OPL bridge` 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义。
 这里的 `status` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
+`family_action_catalog` 是 RCA-owned callable action metadata 单一声明面；product-entry manifest、CLI help、MCP descriptors/routes 与 app skill command contracts 都从它派生。`OPL` 只读取该 catalog 做 family-level discovery/export/parity，不写 RedCube visual-domain truth、managed run truth、review/publication projection 或 canonical artifacts。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 

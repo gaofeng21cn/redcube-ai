@@ -29,6 +29,8 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `npm run --prefix <redcube-ai-repo> redcube -- product session --entry-session-id <entry-session-id>`
 
+`product manifest` 暴露 RCA-owned `family_action_catalog`；CLI help、MCP descriptors/routes、skill command contracts 与 product-entry action metadata 从同一份 action definition 派生，`OPL` 只做 discovery/export/parity。
+
 `redcube product status` 是 legacy command key / compat command；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
 
 默认先读取 status/manifest，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
