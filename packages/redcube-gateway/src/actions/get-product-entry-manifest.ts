@@ -35,7 +35,11 @@ import {
 } from './domain-entry-contract.js';
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
-import { buildOplRuntimeManagerRegistration } from './product-entry-continuity-surfaces.js';
+import {
+  buildOplFamilyLifecycleAdapterSurface,
+  buildOplRuntimeManagerRegistration,
+  buildRuntimeLoopClosureManifestSurface,
+} from './product-entry-continuity-surfaces.js';
 import { buildRouteEquivalenceContract, buildDeliverableFacadeContract } from './get-product-entry-manifest-parts/contracts.js';
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
@@ -260,6 +264,28 @@ export async function getProductEntryManifest(request) {
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,
     productEntrySessionCommand,
+  });
+  const manifestRuntimeLoopClosure = buildRuntimeLoopClosureManifestSurface({
+    runtimeOwner: runtime.runtime_owner,
+  });
+  const manifestReviewState = {
+    surface_kind: 'review_state',
+    owner: 'redcube_ai',
+    status: 'runtime_projection_ref',
+  };
+  const manifestPublicationProjection = {
+    surface_kind: 'publication_projection',
+    owner: 'redcube_ai',
+    status: 'runtime_projection_ref',
+  };
+  const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
+    runtimeOwner: runtime.runtime_owner,
+    runtimeLoopClosure: manifestRuntimeLoopClosure,
+    reviewState: manifestReviewState,
+    publicationProjection: manifestPublicationProjection,
+    source: 'manifest',
+    entryMode: 'manifest_projection',
+    manifestProjection: true,
   });
   const managedRuntimeContract = buildManagedRuntimeContract({
     domain_owner: 'redcube_ai',
@@ -694,6 +720,7 @@ export async function getProductEntryManifest(request) {
       runtime_loop_closure: productEntryPreflight.runtime_loop_closure,
 	    },
     native_ppt_operator_ux: nativePptOperatorUx,
+    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
     ppt_deck_visual_route_truth: {
       surface_kind: 'ppt_deck_visual_route_truth',
       default_visual_route: pptRoutePolicy.default_visual_route,
@@ -730,7 +757,8 @@ export async function getProductEntryManifest(request) {
       ...manifest.product_entry_overview,
       frontdesk_command: PRODUCT_FRONTDESK_COMMAND,
     },
-	    native_ppt_operator_ux: nativePptOperatorUx,
+    native_ppt_operator_ux: nativePptOperatorUx,
+    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
     ppt_deck_visual_route_truth: {
       surface_kind: 'ppt_deck_visual_route_truth',
       default_visual_route: pptRoutePolicy.default_visual_route,

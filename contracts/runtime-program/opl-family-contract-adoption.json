@@ -54,6 +54,35 @@
       "human_gate_reason"
     ]
   },
+  "lifecycle_adapter_surface": {
+    "surface_kind": "opl_family_lifecycle_adapter",
+    "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
+    "source_surfaces": [
+      "managed-runs",
+      "product-entry sessions",
+      "review state",
+      "publication projection",
+      "artifact inventory",
+      "runtime loop closure"
+    ],
+    "exposed_on": [
+      "product-entry manifest",
+      "direct product entry response",
+      "product-entry session response",
+      "federated product entry response"
+    ],
+    "maps_to_opl_contracts": [
+      "opl_family_runtime_attempt_contract.v1",
+      "opl_family_product_operator_projection.v1",
+      "opl_family_domain_quality_projection_contract.v1"
+    ],
+    "adoption_state_values": [
+      "discoverable_manifest_projection",
+      "hydrated_session_projection"
+    ],
+    "sqlite_status": "deferred_for_rca",
+    "authority_model": "file_authority_plus_rebuildable_artifact_indexes"
+  },
   "non_goals": [
     "OPL owns RedCube visual truth",
     "OPL owns canonical artifacts",
@@ -64,4 +93,3 @@
     "claim-only ready"
   ]
 }
-

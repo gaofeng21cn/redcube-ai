@@ -554,6 +554,40 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.runtime_loop_closure.source_linkage.federated_surface_kind, 'federated_product_entry');
       assert.equal(manifest.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
       assert.equal(manifest.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
+      assert.equal(manifest.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
+      assert.equal(manifest.opl_family_lifecycle_adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
+      assert.equal(manifest.opl_family_lifecycle_adapter.discovery.adoption_state, 'discoverable_manifest_projection');
+      assert.equal(manifest.opl_family_lifecycle_adapter.persistence.sqlite.status, 'deferred_for_rca');
+      assert.equal(manifest.opl_family_lifecycle_adapter.persistence.authority_model, 'file_authority_plus_rebuildable_artifact_indexes');
+      assert.deepEqual(
+        manifest.opl_family_lifecycle_adapter.discovery.owner_split,
+        {
+          family_persistence_owner: 'redcube_ai',
+          lifecycle_projection_owner: 'redcube_ai',
+          domain_truth_owner: 'redcube_ai',
+          review_publication_owner: 'redcube_ai',
+          runtime_manager_consumer: 'opl_runtime_manager',
+          executor_owner: 'codex_cli',
+        },
+      );
+      assert.deepEqual(
+        manifest.opl_family_lifecycle_adapter.discovery.route_surfaces.map((surface) => surface.surface_id),
+        [
+          'product_entry_registration',
+          'internal_opl_bridge',
+          'product_entry_session',
+          'managed_run_store',
+          'review_state',
+          'publication_projection',
+        ],
+      );
+      assert.equal(
+        manifest.opl_family_lifecycle_adapter.adoption.required_input_fields.includes('entry_session_id'),
+        true,
+      );
+      assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_visual_truth, false);
+      assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_canonical_artifacts, false);
+      assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_review_truth, false);
 	    const validatedManifest = sharedCompanions.validateFamilyProductEntryManifest(manifest, {
 	      requireRuntimeCompanions: true,
 	    });
