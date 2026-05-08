@@ -196,28 +196,28 @@
       ]
     },
     {
-      "helper_id": "hermes_native_proof_bridge",
-      "script": "packages/redcube-hermes-substrate/scripts/hermes_native_proof_bridge.py",
-      "package_module": "redcube_ai.hermes.native_proof_bridge",
+      "helper_id": "hermes_agent_loop_bridge",
+      "script": "python/redcube_ai/hermes/agent_loop_bridge.py",
+      "package_module": "redcube_ai.hermes.agent_loop_bridge_impl",
       "package_entrypoint": {
-        "console_script": "redcube-hermes-native-proof-bridge",
-        "module": "redcube_ai.hermes.native_proof_bridge",
+        "console_script": "redcube-hermes-agent-loop-bridge",
+        "module": "redcube_ai.hermes.agent_loop_bridge_impl",
         "callable": "main",
-        "module_command": "python -m redcube_ai.hermes.native_proof_bridge"
+        "module_command": "python -m redcube_ai.hermes.agent_loop_bridge_impl"
       },
       "preferred_invocation": {
         "kind": "package_module",
         "argv": [
           "-m",
-          "redcube_ai.hermes.native_proof_bridge"
+          "redcube_ai.hermes.agent_loop_bridge_impl"
         ]
       },
       "owner": "python_native_helper",
-      "deliverable_family": "runtime_substrate",
-      "runtime_surface": "hermes_native_full_agent_loop",
+      "deliverable_family": "runtime_protocol",
+      "runtime_surface": "hermes_agent_loop",
       "routes": [],
       "gates": [],
-      "purpose": "Opt-in Hermes-native full-agent-loop proof bridge used by the TypeScript executor adapter.",
+      "purpose": "Opt-in Hermes-Agent loop full-agent-loop proof bridge used by the TypeScript executor adapter.",
       "requires": [
         "upstream-hermes-agent-local"
       ],

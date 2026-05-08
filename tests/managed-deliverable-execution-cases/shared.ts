@@ -30,7 +30,7 @@ import {
 } from '../mock-codex-cli.ts';
 
 export const MODULE_DIR = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-export const MOCK_HERMES_NATIVE_BRIDGE_COMMAND = JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'helpers/mock-hermes-native-bridge.ts')]);
+export const MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND = JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'helpers/mock-hermes-agent-loop-bridge.ts')]);
 export const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([process.execPath, '--experimental-strip-types', path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.ts')]);
 
 export function readJson(file) {
@@ -76,9 +76,9 @@ export async function withMockHermesUpstream(testFn) {
   }
 }
 
-export async function withMockHermesNativeProof(testFn) {
+export async function withMockHermesAgentLoop(testFn) {
   const restoreEnv = withEnv({
-    REDCUBE_HERMES_NATIVE_BRIDGE_COMMAND: MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+    REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND: MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   });
   try {
     return await testFn();

@@ -1,14 +1,14 @@
 import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 import {
+  AGENT_LOOP_EXECUTION_SHAPE,
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_DEFAULT_ADAPTER,
-  HERMES_NATIVE_PROOF_ADAPTER,
+  HERMES_AGENT_ADAPTER,
   STRUCTURED_CALL_EXECUTION_SHAPE,
   buildCodexExecutorDescriptor,
   buildHermesExecutorDescriptor,
-  buildHermesNativeProofExecutorDescriptor,
-} from '@redcube/hermes-substrate';
+  buildHermesAgentLoopExecutorDescriptor,
+} from '@redcube/runtime-protocol';
 import type { RuntimeFamilyContract } from '@redcube/runtime-family-registry';
 
 interface ExecutorRouteInput {
@@ -60,8 +60,8 @@ interface ExecutorAdapter extends ExecutorDescriptor {
  *   execution_surface?: string,
  *   creative_execution?: string,
  *   execution_model?: {
- *     mainline_adapter: "host_agent",
- *     primary_surface: "codex_native_host_agent",
+ *     mainline_adapter: "codex_cli",
+ *     primary_surface: "codex_cli_runtime",
  *     adapter_role: "primary_creative_executor",
  *     runtime_substrate_owner: "Codex CLI",
  *     deployment_host: "codex_local_operator_host",
@@ -82,8 +82,8 @@ interface ExecutorAdapter extends ExecutorDescriptor {
  *     topic_id?: string,
  *     deliverable_id?: string,
  *     execution_model?: {
- *       mainline_adapter: "host_agent",
- *       primary_surface: "codex_native_host_agent",
+ *       mainline_adapter: "codex_cli",
+ *       primary_surface: "codex_cli_runtime",
  *       adapter_role: "primary_creative_executor",
  *       runtime_substrate_owner: "Codex CLI",
  *       deployment_host: "codex_local_operator_host",
@@ -114,31 +114,36 @@ export function resolveExecutorAdapter({
 } = {}): ExecutorAdapter {
   const requestedAdapter = String(adapter || '').trim();
   const requestedBackend = executorBackend || (
-    requestedAdapter === HERMES_DEFAULT_ADAPTER || requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND || requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER
+    requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND || requestedAdapter === HERMES_AGENT_ADAPTER
       ? HERMES_AGENT_EXECUTOR_BACKEND
       : 'codex_cli'
   );
+  const requestedShape = executionShape || (
+    requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
+      ? AGENT_LOOP_EXECUTION_SHAPE
+      : STRUCTURED_CALL_EXECUTION_SHAPE
+  );
   const descriptorBase = (
-    requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? buildHermesNativeProofExecutorDescriptor({ adapter })
+    requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND && requestedShape === AGENT_LOOP_EXECUTION_SHAPE
+      ? buildHermesAgentLoopExecutorDescriptor({ adapter })
       : (
-          requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND || requestedAdapter === HERMES_DEFAULT_ADAPTER || requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND
+          requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
             ? buildHermesExecutorDescriptor({ adapter })
             : buildCodexExecutorDescriptor({ adapter })
         )
   ) as unknown as ExecutorDescriptor;
   const descriptor = {
     ...descriptorBase,
-    adapter: requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND && requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER
+    adapter: requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND && requestedAdapter !== HERMES_AGENT_ADAPTER
       ? HERMES_AGENT_EXECUTOR_BACKEND
       : descriptorBase.adapter,
     ...(executionShape
       ? {
-          execution_shape: executionShape,
+          execution_shape: requestedShape,
           execution_model: {
             ...(descriptorBase.execution_model || {}),
-            execution_shape: executionShape,
-            ...(executionShape === STRUCTURED_CALL_EXECUTION_SHAPE && requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
+            execution_shape: requestedShape,
+            ...(requestedShape === STRUCTURED_CALL_EXECUTION_SHAPE && requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
               ? {
                   mainline_adapter: HERMES_AGENT_EXECUTOR_BACKEND,
                   primary_surface: 'hermes_agent_api_server',

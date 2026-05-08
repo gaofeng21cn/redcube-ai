@@ -19,7 +19,7 @@
 
 当前统一口径：
 
-- `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_native_proof` proof lane 共同成立
+- `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_agent` proof lane 共同成立
 - 默认 concrete executor 仍是本地 `Codex CLI`；external `Hermes-Agent` 只作为显式 hosted/proof backend 与 OPL Runtime Manager 目标 substrate 出现，不改写默认公开 capability contract；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance
 - 共享宏观生命周期是：
   - `Source Readiness`

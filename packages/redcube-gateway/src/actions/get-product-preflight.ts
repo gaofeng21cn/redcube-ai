@@ -41,7 +41,7 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
   const workspaceRootExists = existsSync(doctor.workspaceRoot);
   const runtimeStateRootReady = existsSync(runtimeStateRoot);
   const checkCommand = `redcube workspace doctor --workspace-root ${doctor.workspaceRoot}`;
-  const startCommand = `redcube product frontdesk --workspace-root ${doctor.workspaceRoot}`;
+  const startCommand = `redcube product status --workspace-root ${doctor.workspaceRoot}`;
   const checks = [
     buildProgramCheck({
       check_id: 'workspace_root_resolved',
@@ -78,7 +78,7 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       title: 'Product Entry Overview Contract Landed',
       status: 'pass',
       blocking: true,
-      summary: 'direct RedCube product-entry overview contract 已 landed，可由 `frontdesk` 兼容命令 / manifest 直接消费。',
+      summary: 'direct RedCube product-entry overview contract 已 landed，可由 `status` 兼容命令 / manifest 直接消费。',
       command: startCommand,
     }),
   ];
@@ -86,7 +86,7 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
   const productEntryPreflight = buildProductEntryPreflight({
     summary: hasBlockingChecks
       ? 'Current product-entry preflight is blocked; fix the workspace or runtime-state setup before reading the RedCube product-entry overview.'
-      : 'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `frontdesk` compatibility command.',
+      : 'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `status` compatibility command.',
     recommended_check_command: checkCommand,
     recommended_start_command: startCommand,
     checks,

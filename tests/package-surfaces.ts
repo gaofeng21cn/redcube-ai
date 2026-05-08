@@ -75,16 +75,16 @@ export {
 export {
   buildCodexExecutorDescriptor,
   buildExecutorBackendContract,
-  buildHermesNativeProofExecutorDescriptor,
+  buildHermesAgentLoopExecutorDescriptor,
   completeHermesRun,
   failHermesRun,
   generateStructuredArtifactViaHermesAgentStructuredCall,
   normalizeExecutorBackend,
-  probeHermesNativeProof,
+  probeHermesAgentLoop,
   runAgentLoopViaHermesAgentApi,
   startHermesRun,
   structuredCallViaHermesAgentApi,
-} from '@redcube/hermes-substrate';
+} from '@redcube/runtime-protocol';
 export {
   persistReviewStatePatch,
 } from '@redcube/governance';

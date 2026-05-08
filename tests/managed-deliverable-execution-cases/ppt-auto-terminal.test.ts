@@ -26,14 +26,14 @@ import {
   startMockCodexCli,
   withEnv,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   MOCK_REDCUBE_PYTHON_COMMAND,
   readJson,
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('managed rerun guard escalates repeated identical screenshot repair requests', () => {
@@ -143,8 +143,8 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
       result.progress_projection.latest_events.every((event) => !String(event.summary).includes('run-')),
       true,
     );
-    assert.equal(result.managed_run.requested_adapter, 'host_agent');
-    assert.equal(result.managed_run.active_adapter, 'host_agent');
+    assert.equal(result.managed_run.requested_adapter, 'codex_cli');
+    assert.equal(result.managed_run.active_adapter, 'codex_cli');
     assert.equal(result.managed_run.active_run_id, null);
     assert.equal(result.managed_run.worker_running, false);
     assert.equal(result.managed_run.runtime_liveness_audit.status, 'none');

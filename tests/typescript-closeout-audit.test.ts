@@ -46,7 +46,7 @@ const RETIRED_SOURCE_JS_FILES = {
   'packages/redcube-gateway/src/actions/execute-source-augmentation.ts': 1,
   'packages/redcube-gateway/src/actions/get-deliverable.ts': 1,
   'packages/redcube-gateway/src/actions/get-managed-run.ts': 1,
-  'packages/redcube-gateway/src/actions/get-product-frontdesk.ts': 1,
+  'packages/redcube-gateway/src/actions/get-product-status.ts': 1,
   'packages/redcube-gateway/src/actions/get-product-preflight.ts': 1,
   'packages/redcube-gateway/src/actions/get-product-start.ts': 1,
   'packages/redcube-gateway/src/actions/get-run.ts': 1,

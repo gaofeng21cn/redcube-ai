@@ -26,7 +26,7 @@ import {
 import {
   appendHermesEvent as appendEventJs,
   readHermesEvents as readEventsJs,
-} from '@redcube/hermes-substrate';
+} from '@redcube/runtime-protocol';
 import { appendManagedEvent as appendManagedEventJs, readManagedEvents as readManagedEventsJs } from './managed-event-log.js';
 import {
   planCandidateRace as planCandidateRaceJs,
@@ -67,7 +67,7 @@ import {
   failHermesRun as failRunJs,
   loadHermesRun as loadRunJs,
   startHermesRun as startRunJs,
-} from '@redcube/hermes-substrate';
+} from '@redcube/runtime-protocol';
 import {
   createManagedRun as createManagedRunJs,
   loadManagedProgressProjection as loadManagedProgressProjectionJs,

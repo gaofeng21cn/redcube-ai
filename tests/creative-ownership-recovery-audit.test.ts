@@ -32,9 +32,9 @@ test('current runtime defaults to Codex substrate while Hermes proof stays opt-i
 
   try {
     const runtimeExecutor = resolveExecutorAdapter();
-    assert.equal(runtimeExecutor.adapter, 'host_agent');
-    assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'host_agent');
-    assert.equal(runtimeExecutor.execution_model.primary_surface, 'codex_native_host_agent');
+    assert.equal(runtimeExecutor.adapter, 'codex_cli');
+    assert.equal(runtimeExecutor.execution_model.mainline_adapter, 'codex_cli');
+    assert.equal(runtimeExecutor.execution_model.primary_surface, 'codex_cli_runtime');
     assert.equal(runtimeExecutor.execution_model.adapter_role, 'primary_creative_executor');
     assert.equal(runtimeExecutor.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(runtimeExecutor.execution_model.deployment_host, 'codex_local_operator_host');
@@ -45,11 +45,11 @@ test('current runtime defaults to Codex substrate while Hermes proof stays opt-i
       /Unsupported executor adapter: external_llm/,
     );
 
-    const hermesNativeProof = resolveExecutorAdapter({ adapter: 'hermes_native_proof' });
-    assert.equal(hermesNativeProof.adapter, 'hermes_native_proof');
+    const hermesNativeProof = resolveExecutorAdapter({ adapter: 'hermes_agent' });
+    assert.equal(hermesNativeProof.adapter, 'hermes_agent');
     assert.equal(hermesNativeProof.primary, false);
-    assert.equal(hermesNativeProof.execution_model.mainline_adapter, 'hermes_native_proof');
-    assert.equal(hermesNativeProof.execution_model.primary_surface, 'hermes_native_full_agent_loop');
+    assert.equal(hermesNativeProof.execution_model.mainline_adapter, 'hermes_agent');
+    assert.equal(hermesNativeProof.execution_model.primary_surface, 'hermes_agent_loop');
     assert.equal(hermesNativeProof.execution_model.adapter_role, 'opt_in_proof_executor');
     assert.equal(hermesNativeProof.execution_model.default_model_selection, 'inherit_local_hermes_default');
     assert.equal(hermesNativeProof.execution_model.default_reasoning_effort, 'inherit_local_hermes_default');
@@ -74,15 +74,15 @@ test('current runtime defaults to Codex substrate while Hermes proof stays opt-i
     });
 
     assert.equal(result.ok, true);
-    assert.equal(result.run.executor.adapter, 'host_agent');
-    assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent');
-    assert.equal(result.run.executor.execution_model.primary_surface, 'codex_native_host_agent');
+    assert.equal(result.run.executor.adapter, 'codex_cli');
+    assert.equal(result.run.executor.execution_model.mainline_adapter, 'codex_cli');
+    assert.equal(result.run.executor.execution_model.primary_surface, 'codex_cli_runtime');
     assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(result.run.executor.execution_model.deployment_host, 'codex_local_operator_host');
 
     const artifact = readJson(result.artifactFile);
-    assert.equal(artifact.execution_model.mainline_adapter, 'host_agent');
-    assert.equal(artifact.execution_model.primary_surface, 'codex_native_host_agent');
+    assert.equal(artifact.execution_model.mainline_adapter, 'codex_cli');
+    assert.equal(artifact.execution_model.primary_surface, 'codex_cli_runtime');
     assert.equal(artifact.execution_model.runtime_substrate_owner, 'Codex CLI');
     assert.equal(artifact.execution_model.freeze_origin_milestone, 'P19.A');
   } finally {
@@ -98,9 +98,9 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
   assert.equal(audit.phase, 'shared_execution_and_audit_closeout');
   assert.deepEqual(audit.completed_milestones, ['P19.A', 'P19.B', 'P19.C']);
   assert.equal(audit.closeout_ready, true);
-  assert.equal(audit.execution_model.mainline_adapter, 'host_agent');
-  assert.equal(audit.execution_model.primary_surface, 'codex_native_host_agent');
-  assert.equal(audit.execution_model.proof_executor, 'hermes_native_proof');
+  assert.equal(audit.execution_model.mainline_adapter, 'codex_cli');
+  assert.equal(audit.execution_model.primary_surface, 'codex_cli_runtime');
+  assert.equal(audit.execution_model.proof_executor, 'hermes_agent');
   assert.equal(audit.execution_model.freeze_origin_milestone, 'P19.A');
   assert.deepEqual(audit.unified_lifecycle.stages, [
     'source_readiness',
@@ -160,7 +160,7 @@ test('P19 audit emits a machine-readable closeout report artifact', () => {
   assert.equal(stored.milestone, 'P19.D');
   assert.equal(stored.phase, 'shared_execution_and_audit_closeout');
   assert.equal(stored.closeout_ready, true);
-  assert.equal(stored.execution_model.proof_executor, 'hermes_native_proof');
+  assert.equal(stored.execution_model.proof_executor, 'hermes_agent');
   assert.equal(stored.residue.xiaohongshu.status, 'cleared');
   assert.equal(stored.residue.ppt_deck.status, 'cleared');
   assert.equal(stored.review_overlay.ppt_deck.status, 'active');

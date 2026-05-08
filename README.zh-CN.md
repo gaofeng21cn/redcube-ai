@@ -61,7 +61,7 @@
 ## 当前边界
 
 - `RedCube AI` 是独立的 visual-deliverable domain agent。
-- 对外第一入口是单一 `redcube-ai` app skill；`frontdesk` / `invoke` / `session` 继续作为这个 skill 底下的 machine-readable command contracts。其中 `frontdesk` 指面向 agent 的 product-entry overview / intake / entry shell，不代表已经落地 GUI、WebUI 或最终用户前台壳。
+- 对外第一入口是单一 `redcube-ai` app skill；`status` / `invoke` / `session` 继续作为这个 skill 底下的 machine-readable command contracts。其中 `status` 指面向 agent 的 product-entry overview / intake / entry shell，不代表已经落地 GUI、WebUI 或最终用户前台壳。
 - 它对外稳定暴露的 callable surface 是本地 CLI、MCP/product-entry commands、`invokeDomainEntry`、本地脚本与 repo-tracked contract，方便 `Codex` 或 `OPL` skill activation 直接调用。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。
 - direct route 与内部 OPL bridge 都收敛到同一个下游 RedCube domain-agent entry（`invokeDomainEntry` service-safe surface）。
@@ -87,7 +87,7 @@
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
 - 当前 repo-verified public entry surfaces 是单一 `redcube-ai` app skill、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contract，就构成了稳定可调用面。本地默认 concrete executor 仍是 `Codex CLI`，hosted/proof backend 继续只在显式 opt-in lane 中出现。
 - Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。
-- 如果外部 agent 或 OPL 需要直接读取 repo-tracked skill surface，使用单一 `redcube-ai` app skill，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI-backed commands；`frontdesk` / `invoke` / `session` 继续作为这个 skill 底下的 machine-readable command contracts。legacy `redcube product frontdesk` 命令键继续保留为兼容入口，语义是 product-entry overview / intake shell，不代表成熟 human-facing GUI 或 WebUI；OPL federated bridge 仍然只是内部集成面。
+- 如果外部 agent 或 OPL 需要直接读取 repo-tracked skill surface，使用单一 `redcube-ai` app skill，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI-backed commands；`status` / `invoke` / `session` 继续作为这个 skill 底下的 machine-readable command contracts。legacy `redcube product status` 命令键继续保留为兼容入口，语义是 product-entry overview / intake shell，不代表成熟 human-facing GUI 或 WebUI；OPL federated bridge 仍然只是内部集成面。
 - 测试 lane 真相放在 `scripts/test-registry.ts`，当前验证矩阵以 [当前状态](./docs/status.md) 为准。`smoke` 是最小本地入口，`fast` 是核心回归快线，hosted CI 等价于 `npm run test:ci`，`historical` 只在显式要求时运行。
 - `docs/program/` 用来读已经吸收进主线的阶段里程碑，`docs/references/` 用来读 bridge 和 provenance 材料；Agent 不需要先从零散实现文件里反推当前执行真相。
 

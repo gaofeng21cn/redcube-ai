@@ -164,8 +164,7 @@ test('root package build graph lists dist-export dependencies before consumers',
     );
   };
 
-  before('./packages/redcube-runtime-protocol', './packages/redcube-hermes-substrate');
-  before('./packages/redcube-hermes-substrate', './packages/redcube-overlay-core');
+  before('./packages/redcube-runtime-protocol', './packages/redcube-overlay-core');
   before('./packages/redcube-overlay-core', './packages/redcube-governance');
   before('./packages/redcube-governance', './packages/redcube-runtime');
   before('./packages/redcube-runtime', './packages/redcube-gateway');
@@ -266,7 +265,7 @@ test('compiled dist runtime entrypoints preserve package runtime exports', async
 
   const runtimeExpectations = [
     {
-      packageName: '@redcube/hermes-substrate',
+      packageName: '@redcube/runtime-protocol',
       exports: ['CODEX_DEFAULT_MODEL_SELECTION', 'buildCodexRuntimeTopology'],
     },
     {
@@ -275,7 +274,7 @@ test('compiled dist runtime entrypoints preserve package runtime exports', async
     },
     {
       packageName: '@redcube/gateway',
-      exports: ['getProductFrontdesk', 'runDeliverableRoute'],
+      exports: ['getProductStatus', 'runDeliverableRoute'],
     },
     {
       packageName: '@redcube/runtime-protocol',

@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { probeHermesNativeProof } from './package-surfaces.ts';
+import { probeHermesAgentLoop } from './package-surfaces.ts';
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
@@ -27,7 +27,7 @@ const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts',
   'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts',
   'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.ts',
-  'packages/redcube-hermes-substrate/src/hermes-native-proof-client.ts',
+  'packages/redcube-runtime-protocol/src/hermes-agent-loop-bridge-client.ts',
 ];
 
 function readJson(file) {
@@ -154,7 +154,7 @@ test('Python native helper catalog only points at tracked Python helper scripts'
 
   assert.deepEqual(
     Object.keys(helpers).sort(),
-    ['hermes_native_proof_bridge', 'ppt_deck_export', 'ppt_deck_native', 'ppt_deck_review'],
+    ['hermes_agent_loop_bridge', 'ppt_deck_export', 'ppt_deck_native', 'ppt_deck_review'],
   );
 
   for (const helper of catalog.helpers) {
@@ -176,7 +176,7 @@ test('Python native helper catalog only points at tracked Python helper scripts'
   assert.equal(helpers.ppt_deck_review.deliverable_family, 'ppt_deck');
   assert.equal(helpers.ppt_deck_export.deliverable_family, 'ppt_deck');
   assert.equal(helpers.ppt_deck_native.deliverable_family, 'ppt_deck');
-  assert.equal(helpers.hermes_native_proof_bridge.deliverable_family, 'runtime_substrate');
+  assert.equal(helpers.hermes_agent_loop_bridge.deliverable_family, 'runtime_protocol');
 });
 
 test('Python helper package modules and entrypoint callables import from the formal package root', () => {
@@ -383,7 +383,7 @@ test('Runtime Python helper callers prefer package module invocation over wrappe
   assert.doesNotMatch(combinedSource, /DEFAULT_BRIDGE_SCRIPT/);
   assert.match(combinedSource, /'-m',\s*helper\.packageModule/);
   assert.match(combinedSource, /runRedCubePythonHelper/);
-  assert.match(combinedSource, /'-m',\s*DEFAULT_BRIDGE_MODULE/);
+  assert.match(combinedSource, /'-m',\s*DEFAULT_AGENT_LOOP_MODULE/);
   assert.match(combinedSource, /python-native-helper-catalog\.json/);
 
   for (const helper of readJson(CATALOG_FILE).helpers) {
@@ -392,7 +392,7 @@ test('Runtime Python helper callers prefer package module invocation over wrappe
   }
 });
 
-test('Hermes native proof client defaults to the package module bridge', () => {
+test('Hermes-Agent loop client defaults to the package module bridge', () => {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-module-entry-'));
   const argvFile = path.join(tempDir, 'argv.json');
   const mockPython = path.join(tempDir, 'mock-python.mjs');
@@ -405,18 +405,18 @@ test('Hermes native proof client defaults to the package module bridge', () => {
     'process.stdout.write(JSON.stringify({ ok: true, contract: { model: "mock-model" } }) + "\\n");',
   ].join('\n'), { mode: 0o755 });
 
-  const probe = probeHermesNativeProof({
+  const probe = probeHermesAgentLoop({
     cwd: path.resolve('.'),
     env: {
       ...process.env,
-      REDCUBE_HERMES_NATIVE_PYTHON_COMMAND: mockPython,
-      REDCUBE_HERMES_NATIVE_BRIDGE_COMMAND: '',
+      REDCUBE_HERMES_AGENT_LOOP_PYTHON_COMMAND: mockPython,
+      REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND: '',
     },
   });
 
   assert.equal(probe.ok, true, probe.blocking_reason);
   const argv = JSON.parse(readFileSync(argvFile, 'utf-8'));
-  assert.deepEqual(argv.slice(0, 2), ['-m', 'redcube_ai.hermes.native_proof_bridge']);
+  assert.deepEqual(argv.slice(0, 2), ['-m', 'redcube_ai.hermes.agent_loop_bridge_impl']);
   assert.equal(path.basename(argv.at(-1)), 'request.json');
 });
 
@@ -457,7 +457,7 @@ test('Review and export helpers stay scoped to their existing runtime gates', ()
   assert.deepEqual(helpers.ppt_deck_export.gates, ['export_pptx']);
   assert.deepEqual(helpers.ppt_deck_export.requires, ['Pillow', 'python-pptx']);
 
-  assert.deepEqual(helpers.hermes_native_proof_bridge.routes, []);
-  assert.deepEqual(helpers.hermes_native_proof_bridge.gates, []);
-  assert.deepEqual(helpers.hermes_native_proof_bridge.requires, ['upstream-hermes-agent-local']);
+  assert.deepEqual(helpers.hermes_agent_loop_bridge.routes, []);
+  assert.deepEqual(helpers.hermes_agent_loop_bridge.gates, []);
+  assert.deepEqual(helpers.hermes_agent_loop_bridge.requires, ['upstream-hermes-agent-local']);
 });

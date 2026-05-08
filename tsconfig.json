@@ -5,9 +5,6 @@
       "path": "./packages/redcube-runtime-protocol"
     },
     {
-      "path": "./packages/redcube-hermes-substrate"
-    },
-    {
       "path": "./packages/redcube-overlay-core"
     },
     {

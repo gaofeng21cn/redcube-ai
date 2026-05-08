@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { existsSync, readdirSync } from 'node:fs';
 
-import { CODEX_RUNTIME_SURFACE } from '@redcube/hermes-substrate';
+import { CODEX_RUNTIME_SURFACE } from '@redcube/runtime-protocol';
 
 import { buildSourceAuthoringContext, sourceAuthoringInputRefs } from './shared-source-truth.js';
 import {

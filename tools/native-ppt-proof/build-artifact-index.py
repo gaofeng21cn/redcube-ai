@@ -8,7 +8,7 @@ from pathlib import Path
 REQUIRED_REPORTS = [
     ("doctor_json", "doctor.json", "application/json", "runtime_doctor"),
     ("product_manifest_json", "product-manifest.json", "application/json", "product_entry"),
-    ("product_frontdesk_json", "product-frontdesk.json", "application/json", "product_entry"),
+    ("product_status_json", "product-status.json", "application/json", "product_entry"),
     ("native_helper_input_json", "native-helper-input.json", "application/json", "native_helper"),
     ("native_helper_output_json", "native-helper-output.json", "application/json", "native_helper"),
     ("proof_summary_json", "proof-summary.json", "application/json", "proof_summary"),

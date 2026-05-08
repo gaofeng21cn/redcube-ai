@@ -1,7 +1,7 @@
 // @ts-nocheck
 export const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
 export const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
-export const PRODUCT_FRONTDESK_COMMAND = 'redcube product frontdesk';
+export const PRODUCT_STATUS_COMMAND = 'redcube product status';
 export const PRODUCT_START_COMMAND = 'redcube product start';
 export const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
 export const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
@@ -40,8 +40,8 @@ export const LONG_TASK_STAGE_POLICY = {
     {
       stage_id: 'source_material_intake',
       title: 'Source/material intake',
-      surface_kind: 'product_frontdesk',
-      command: PRODUCT_FRONTDESK_COMMAND,
+      surface_kind: 'product_status',
+      command: PRODUCT_STATUS_COMMAND,
       resumable_via: PRODUCT_SESSION_COMMAND,
       output_contract: 'source_package_and_missing_materials',
     },

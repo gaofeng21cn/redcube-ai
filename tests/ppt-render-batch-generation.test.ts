@@ -122,7 +122,7 @@ function makePptRenderParts({ stageCalls }) {
     normalizePptScreenshotAiSlideReviews: (value) => value,
     normalizeStringList: (value) => Array.isArray(value) ? value : [],
     normalizeTypographyPlan: (value) => value || {},
-    primarySurface: () => 'codex_native_host_agent',
+    primarySurface: () => 'codex_cli_runtime',
     readCurrentHtmlArtifact: () => null,
     readJson: () => ({}),
     readPromptPackText: () => '<html><body>{{slides}}</body></html>',

@@ -80,7 +80,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     },
     'deliverable run': {
       summary: '按 hydrated contract 执行单个 deliverable route。',
-      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|hermes_native_proof>]',
+      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
       gateway_action: 'runDeliverableRoute',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
@@ -114,10 +114,10 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       gateway_action: 'getProductEntrySession',
       boundary_fields: ['entrySessionId'],
     },
-    'product frontdesk': {
-      summary: '读取 RedCube agent-facing product-entry overview；`frontdesk` 是兼容命令键，用于查看 direct / session 入口、当前主线状态和 internal OPL bridge 合同。',
-      usage: 'redcube product frontdesk --workspace-root <dir>',
-      gateway_action: 'getProductFrontdesk',
+    'product status': {
+      summary: '读取 RedCube agent-facing product-entry overview；`status` 是兼容命令键，用于查看 direct / session 入口、当前主线状态和 internal OPL bridge 合同。',
+      usage: 'redcube product status --workspace-root <dir>',
+      gateway_action: 'getProductStatus',
       boundary_fields: ['workspaceRoot'],
     },
     'product start': {
@@ -226,7 +226,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       },
       {
         task: '按声明的 route 执行当前交付阶段',
-        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|hermes_native_proof>]',
+        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
       },
       {
         task: '托管执行整个交付链路并查看 managed 进度',
@@ -254,7 +254,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       },
       {
         task: '先读取 RedCube product-entry overview，查看当前 product-entry 入口和继续方式',
-        command: 'redcube product frontdesk --workspace-root <dir>',
+        command: 'redcube product status --workspace-root <dir>',
       },
       {
         task: '读取统一的 product-entry start surface，决定 overview / direct / internal OPL bridge / resume 从哪条入口启动',
@@ -277,7 +277,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
       managed: ['get', 'supervise'],
-      product: ['frontdesk', 'start', 'preflight', 'invoke', 'session', 'manifest'],
+      product: ['status', 'start', 'preflight', 'invoke', 'session', 'manifest'],
       'native-ppt': ['proof'],
       'image-ppt': ['proof'],
       runs: ['get'],
@@ -305,11 +305,11 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
-      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <host_agent|hermes_native_proof>]',
-      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <host_agent|hermes_native_proof>]',
+      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <codex_cli|hermes_agent>]',
+      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
       managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
       managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
-      productFrontdesk: 'redcube product frontdesk --workspace-root <dir>',
+      productStatus: 'redcube product status --workspace-root <dir>',
       productStart: 'redcube product start --workspace-root <dir>',
       productPreflight: 'redcube product preflight --workspace-root <dir>',
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',

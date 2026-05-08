@@ -5,35 +5,42 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, write
 
 import {
   buildCodexRuntimeTopology as buildProtocolCodexRuntimeTopology,
+} from './runtime-topology.js';
+import {
   createRunRecord,
+} from './runs.js';
+import {
   resolveWorkspaceContract,
-} from '@redcube/runtime-protocol';
+} from './workspace.js';
 
 export const HERMES_SUBSTRATE_OWNER = 'Hermes';
-export const HERMES_RUNTIME_SURFACE = 'hermes_backed_runtime_substrate';
-export const HERMES_DEPLOYMENT_HOST = 'codex_default_host_agent_bridge';
+export const HERMES_RUNTIME_SURFACE = 'hermes_agent_api_server';
+export const HERMES_DEPLOYMENT_HOST = 'codex_cli_operator_bridge';
 export const HERMES_DEPLOYMENT_STATUS = 'transition_only';
-export const HERMES_DEFAULT_ADAPTER = 'hermes';
-export const HERMES_FREEZE_ORIGIN = 'Hermes.A';
-export const CODEX_DEFAULT_ADAPTER = 'host_agent';
-export const HERMES_NATIVE_PROOF_ADAPTER = 'hermes_native_proof';
 export const CODEX_EXECUTOR_BACKEND = 'codex_cli';
 export const HERMES_AGENT_EXECUTOR_BACKEND = 'hermes_agent';
+export const CODEX_DEFAULT_ADAPTER = CODEX_EXECUTOR_BACKEND;
+export const HERMES_AGENT_ADAPTER = HERMES_AGENT_EXECUTOR_BACKEND;
+export const HERMES_DEFAULT_ADAPTER = HERMES_AGENT_EXECUTOR_BACKEND;
+export const HERMES_FREEZE_ORIGIN = 'Hermes.A';
 export const STRUCTURED_CALL_EXECUTION_SHAPE = 'structured_call';
 export const AGENT_LOOP_EXECUTION_SHAPE = 'agent_loop';
-export const CODEX_RUNTIME_SURFACE = 'codex_native_host_agent';
+export const CODEX_RUNTIME_SURFACE = 'codex_cli_runtime';
 export const CODEX_DEPLOYMENT_HOST = 'codex_local_operator_host';
 export const CODEX_DEPLOYMENT_STATUS = 'active_primary';
 export const CODEX_DEFAULT_MODEL_SELECTION = 'inherit_local_codex_default';
 export const CODEX_DEFAULT_REASONING_SELECTION = 'inherit_local_codex_default';
 export const CODEX_FREEZE_ORIGIN = 'P19.A';
-export const HERMES_NATIVE_PROOF_RUNTIME_SURFACE = 'hermes_native_full_agent_loop';
-export const HERMES_NATIVE_PROOF_DEPLOYMENT_HOST = 'local_hermes_agent_bridge';
-export const HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS = 'opt_in_available';
-export const HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
-export const HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
-export const HERMES_NATIVE_PROOF_FREEZE_ORIGIN = 'Hermes.Proof.A';
+export const HERMES_AGENT_LOOP_RUNTIME_SURFACE = 'hermes_agent_loop';
+export const HERMES_AGENT_LOOP_DEPLOYMENT_HOST = 'local_hermes_agent_bridge';
+export const HERMES_AGENT_LOOP_DEPLOYMENT_STATUS = 'opt_in_available';
+export const HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
+export const HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
+export const HERMES_AGENT_LOOP_FREEZE_ORIGIN = 'Hermes.Proof.A';
 export const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
+
+export type CodexExecutionModel = ReturnType<typeof buildCodexExecutionModel>;
+export type HermesAgentLoopExecutionModel = ReturnType<typeof buildHermesAgentLoopExecutionModel>;
 
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
@@ -53,14 +60,14 @@ const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   controller_repo_verified: false,
 });
 
-const HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY = Object.freeze({
+const HERMES_AGENT_LOOP_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
   executor_backend: HERMES_AGENT_EXECUTOR_BACKEND,
   execution_shape: AGENT_LOOP_EXECUTION_SHAPE,
   runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
-  runtime_substrate_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
-  deployment_host: HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
-  deployment_host_status: HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS,
+  runtime_substrate_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
+  deployment_host: HERMES_AGENT_LOOP_DEPLOYMENT_HOST,
+  deployment_host_status: HERMES_AGENT_LOOP_DEPLOYMENT_STATUS,
   gateway_role: 'visual_deliverable_domain_gateway',
   domain_harness_os: 'RedCube Domain Harness OS',
   family_pack_boundary: 'family_profile_pack_harness_execution',
@@ -234,11 +241,7 @@ export function normalizeExecutorBackend(value = CODEX_DEFAULT_ADAPTER) {
   if (!requested || requested === CODEX_DEFAULT_ADAPTER || requested === CODEX_EXECUTOR_BACKEND) {
     return CODEX_EXECUTOR_BACKEND;
   }
-  if (
-    requested === HERMES_DEFAULT_ADAPTER
-    || requested === HERMES_NATIVE_PROOF_ADAPTER
-    || requested === HERMES_AGENT_EXECUTOR_BACKEND
-  ) {
+  if (requested === HERMES_AGENT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND) {
     return HERMES_AGENT_EXECUTOR_BACKEND;
   }
   throw new Error(`Unsupported executor backend: ${requested}`);
@@ -256,11 +259,6 @@ export function buildExecutorBackendContract({ adapter = CODEX_DEFAULT_ADAPTER, 
       fix_html_default_shape: STRUCTURED_CALL_EXECUTION_SHAPE,
       fix_html_escalation_shape: AGENT_LOOP_EXECUTION_SHAPE,
       route: String(route || '').trim() || null,
-    },
-    compatibility_aliases: {
-      host_agent: CODEX_EXECUTOR_BACKEND,
-      hermes: HERMES_AGENT_EXECUTOR_BACKEND,
-      hermes_native_proof: HERMES_AGENT_EXECUTOR_BACKEND,
     },
   };
 }
@@ -334,16 +332,16 @@ export function buildCodexRuntimeTopology() {
   return buildProtocolCodexRuntimeTopology();
 }
 
-export function buildHermesNativeProofRuntimeTopology() {
+export function buildHermesAgentLoopRuntimeTopology() {
   return {
-    ...HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY,
-    supported_protocol_layer: [...HERMES_NATIVE_PROOF_RUNTIME_TOPOLOGY.supported_protocol_layer],
+    ...HERMES_AGENT_LOOP_RUNTIME_TOPOLOGY,
+    supported_protocol_layer: [...HERMES_AGENT_LOOP_RUNTIME_TOPOLOGY.supported_protocol_layer],
   };
 }
 
 export function normalizeCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
   const requested = String(adapter || '').trim();
-  if (!requested || requested === CODEX_DEFAULT_ADAPTER || requested === HERMES_DEFAULT_ADAPTER) {
+  if (!requested || requested === CODEX_DEFAULT_ADAPTER) {
     return CODEX_DEFAULT_ADAPTER;
   }
   throw new Error(`Unsupported executor adapter: ${requested}`);
@@ -351,7 +349,7 @@ export function normalizeCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
 
 export function normalizeHermesAdapter(adapter = HERMES_DEFAULT_ADAPTER) {
   const requested = String(adapter || '').trim();
-  if (!requested || requested === 'host_agent' || requested === HERMES_DEFAULT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND) {
+  if (!requested || requested === HERMES_DEFAULT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND) {
     return HERMES_DEFAULT_ADAPTER;
   }
   throw new Error(`Unsupported executor adapter: ${requested}`);
@@ -395,25 +393,25 @@ export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {
   };
 }
 
-export function buildHermesNativeProofExecutionModel({ adapter = HERMES_NATIVE_PROOF_ADAPTER } = {}) {
-  const requestedAdapter = String(adapter || '').trim() || HERMES_NATIVE_PROOF_ADAPTER;
-  if (requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER) {
+export function buildHermesAgentLoopExecutionModel({ adapter = HERMES_AGENT_ADAPTER } = {}) {
+  const requestedAdapter = String(adapter || '').trim() || HERMES_AGENT_ADAPTER;
+  if (requestedAdapter !== HERMES_AGENT_ADAPTER) {
     throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
   }
-  const backendContract = buildExecutorBackendContract({ adapter: HERMES_NATIVE_PROOF_ADAPTER });
+  const backendContract = buildExecutorBackendContract({ adapter: HERMES_AGENT_ADAPTER });
   return {
-    mainline_adapter: HERMES_NATIVE_PROOF_ADAPTER,
+    mainline_adapter: HERMES_AGENT_ADAPTER,
     executor_backend: backendContract.executor_backend,
     execution_shape: backendContract.execution_shape,
-    primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+    primary_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
     adapter_role: 'opt_in_proof_executor',
     runtime_substrate_owner: HERMES_SUBSTRATE_OWNER,
-    deployment_host: HERMES_NATIVE_PROOF_DEPLOYMENT_HOST,
-    deployment_host_status: HERMES_NATIVE_PROOF_DEPLOYMENT_STATUS,
+    deployment_host: HERMES_AGENT_LOOP_DEPLOYMENT_HOST,
+    deployment_host_status: HERMES_AGENT_LOOP_DEPLOYMENT_STATUS,
     requested_adapter: requestedAdapter,
-    default_model_selection: HERMES_NATIVE_PROOF_DEFAULT_MODEL_SELECTION,
-    default_reasoning_effort: HERMES_NATIVE_PROOF_DEFAULT_REASONING_SELECTION,
-    freeze_origin_milestone: HERMES_NATIVE_PROOF_FREEZE_ORIGIN,
+    default_model_selection: HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION,
+    default_reasoning_effort: HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION,
+    freeze_origin_milestone: HERMES_AGENT_LOOP_FREEZE_ORIGIN,
   };
 }
 
@@ -449,20 +447,20 @@ export function buildCodexExecutorDescriptor({ adapter = CODEX_DEFAULT_ADAPTER }
   };
 }
 
-export function buildHermesNativeProofExecutorDescriptor({ adapter = HERMES_NATIVE_PROOF_ADAPTER } = {}) {
-  const requestedAdapter = String(adapter || '').trim() || HERMES_NATIVE_PROOF_ADAPTER;
-  if (requestedAdapter !== HERMES_NATIVE_PROOF_ADAPTER) {
+export function buildHermesAgentLoopExecutorDescriptor({ adapter = HERMES_AGENT_ADAPTER } = {}) {
+  const requestedAdapter = String(adapter || '').trim() || HERMES_AGENT_ADAPTER;
+  if (requestedAdapter !== HERMES_AGENT_ADAPTER) {
     throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
   }
-  const executionModel = buildHermesNativeProofExecutionModel({ adapter: requestedAdapter });
+  const executionModel = buildHermesAgentLoopExecutionModel({ adapter: requestedAdapter });
   return {
-    adapter: HERMES_NATIVE_PROOF_ADAPTER,
-    ...buildExecutorBackendContract({ adapter: HERMES_NATIVE_PROOF_ADAPTER }),
+    adapter: HERMES_AGENT_ADAPTER,
+    ...buildExecutorBackendContract({ adapter: HERMES_AGENT_ADAPTER }),
     requested_adapter: requestedAdapter,
     primary: false,
-    execution_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+    execution_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
     creative_execution: 'agent_first_director_first',
-    runtime_topology: buildHermesNativeProofRuntimeTopology(),
+    runtime_topology: buildHermesAgentLoopRuntimeTopology(),
     execution_model: executionModel,
   };
 }
@@ -473,20 +471,25 @@ function resolveRuntimeTopologyForExecutor(executor) {
     || executor?.adapter
     || '',
   ).trim();
+  const executionShape = String(
+    executor?.execution_model?.execution_shape
+    || executor?.execution_shape
+    || '',
+  ).trim();
   if (mainlineAdapter === CODEX_DEFAULT_ADAPTER) {
     return buildCodexRuntimeTopology();
   }
-  if (mainlineAdapter === HERMES_NATIVE_PROOF_ADAPTER) {
-    return buildHermesNativeProofRuntimeTopology();
+  if (mainlineAdapter === HERMES_AGENT_ADAPTER && executionShape === AGENT_LOOP_EXECUTION_SHAPE) {
+    return buildHermesAgentLoopRuntimeTopology();
   }
   return buildHermesRuntimeTopology();
 }
 
 export {
-  generateStructuredArtifactViaHermesNativeProof,
-  probeHermesNativeProof,
-  readHermesNativeProofContract,
-} from './hermes-native-proof-client.js';
+  generateStructuredArtifactViaHermesAgentLoop,
+  probeHermesAgentLoop,
+  readHermesAgentLoopContract,
+} from './hermes-agent-loop-bridge-client.js';
 export {
   generateStructuredArtifactViaHermesAgentApi,
   generateStructuredArtifactViaHermesAgentStructuredCall,

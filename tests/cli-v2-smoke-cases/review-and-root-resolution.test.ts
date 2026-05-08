@@ -139,10 +139,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-hermes-substrate'),
-    path.join(gatewayNodeModulesDir, 'hermes-substrate'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
     path.join(gatewayNodeModulesDir, 'codex-cli-client'),
   );

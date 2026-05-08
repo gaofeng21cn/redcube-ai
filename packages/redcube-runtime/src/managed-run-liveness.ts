@@ -1,4 +1,4 @@
-import { loadHermesRun } from '@redcube/hermes-substrate';
+import { loadHermesRun } from '@redcube/runtime-protocol';
 import type {
   RuntimeManagedRunRecord,
   RuntimeManagedRuntimeLivenessAudit,

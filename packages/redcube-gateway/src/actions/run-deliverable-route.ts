@@ -67,7 +67,7 @@ type RouteRunGatewayResponse = Omit<RouteRunResponse, 'run' | 'summary'> & {
   };
 };
 
-const CODEX_STRUCTURED_ADAPTER = 'host_agent';
+const CODEX_STRUCTURED_ADAPTER = 'codex_cli';
 const HERMES_AGENT_LOOP_ADAPTER = 'hermes_agent';
 
 function readJsonRecord(file: string): JsonObject {

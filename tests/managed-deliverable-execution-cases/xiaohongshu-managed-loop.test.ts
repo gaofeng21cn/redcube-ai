@@ -25,14 +25,14 @@ import {
   startMockCodexCli,
   withEnv,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   MOCK_REDCUBE_PYTHON_COMMAND,
   readJson,
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('managed execution keeps xiaohongshu on the Codex-backed human-publication closure without drifting durable truth', async () => {
@@ -132,7 +132,7 @@ test('managed execution keeps xiaohongshu on the Codex-backed human-publication 
   assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
   assert.equal(audit.gate_summary.approval_required, true);
   assert.equal(audit.gate_summary.delivery_projection_current, 'approval_pending');
-  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
 
   assert.equal(watch.run_id, result.managed_run.route_runs.at(-1).route_run_id);
   assert.equal(watch.review_state.current_status, review.state.current_status);

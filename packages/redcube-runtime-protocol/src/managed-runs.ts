@@ -23,13 +23,13 @@ function normalizeMode(value: unknown): ManagedRunMode {
     : 'auto_to_terminal';
 }
 
-function normalizeAdapter(value: unknown): 'host_agent' | 'hermes_native_proof' {
+function normalizeAdapter(value: unknown): 'codex_cli' | 'hermes_agent' {
   const text = String(value || '').trim();
-  if (!text || text === 'host_agent' || text === 'hermes') {
-    return 'host_agent';
+  if (!text || text === 'codex_cli') {
+    return 'codex_cli';
   }
-  if (text === 'hermes_native_proof') {
-    return 'hermes_native_proof';
+  if (text === 'hermes_agent') {
+    return 'hermes_agent';
   }
   throw new Error(`Unsupported executor adapter: ${text}`);
 }

@@ -15,7 +15,7 @@ export function createXiaohongshuScreenshotReviewHelpers(deps) {
     const lines = [
       `# ${contract.title} 视觉质控`,
       '',
-      `- review_owner: ${safeText(reviewOwner, 'codex_native_host_agent')}`,
+      `- review_owner: ${safeText(reviewOwner, 'codex_cli_runtime')}`,
       `- 状态: ${reviewArtifact.status}`,
       `- capture_manifest: ${safeText(reviewArtifact.review_capture?.manifest_file, 'none')}`,
       `- capture_store_dir: ${safeText(reviewArtifact.review_capture?.store_dir, 'none')}`,

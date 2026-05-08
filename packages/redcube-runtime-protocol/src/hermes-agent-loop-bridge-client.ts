@@ -8,23 +8,23 @@ import { fileURLToPath } from 'node:url';
 import {
   buildPythonHelperEnv,
   resolvePythonNativeHelper,
-} from '@redcube/runtime-protocol';
+} from './python-native-helper.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const DEFAULT_PROBE_TIMEOUT_MS = 60000;
 const DEFAULT_GENERATION_TIMEOUT_MS = 600000;
 
-const HERMES_NATIVE_BRIDGE_COMMAND_ENV = 'REDCUBE_HERMES_NATIVE_BRIDGE_COMMAND';
-const HERMES_NATIVE_PYTHON_COMMAND_ENV = 'REDCUBE_HERMES_NATIVE_PYTHON_COMMAND';
-const HERMES_NATIVE_PROOF_ADAPTER = 'hermes_native_proof';
-const HERMES_NATIVE_PROOF_RUNTIME_SURFACE = 'hermes_native_full_agent_loop';
-const HERMES_NATIVE_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
-const HERMES_NATIVE_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
-const HERMES_NATIVE_FREEZE_ORIGIN = 'Hermes.Proof.A';
+const HERMES_AGENT_LOOP_BRIDGE_COMMAND_ENV = 'REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND';
+const HERMES_AGENT_LOOP_PYTHON_COMMAND_ENV = 'REDCUBE_HERMES_AGENT_LOOP_PYTHON_COMMAND';
+const HERMES_AGENT_ADAPTER = 'hermes_agent';
+const HERMES_AGENT_LOOP_RUNTIME_SURFACE = 'hermes_agent_loop';
+const HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
+const HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
+const HERMES_AGENT_LOOP_FREEZE_ORIGIN = 'Hermes.Proof.A';
 
-const DEFAULT_BRIDGE_HELPER = resolvePythonNativeHelper(REPO_ROOT, 'hermes_native_proof_bridge');
-const DEFAULT_BRIDGE_MODULE = DEFAULT_BRIDGE_HELPER.packageModule;
+const DEFAULT_AGENT_LOOP_HELPER = resolvePythonNativeHelper(REPO_ROOT, 'hermes_agent_loop_bridge');
+const DEFAULT_AGENT_LOOP_MODULE = DEFAULT_AGENT_LOOP_HELPER.packageModule;
 
 type JsonRecord = Record<string, unknown>;
 
@@ -55,7 +55,7 @@ interface GenerationInputRequest {
   localFileInspection?: unknown[];
 }
 
-interface HermesNativeContract extends JsonRecord {
+interface HermesAgentLoopContract extends JsonRecord {
   model: string;
   provider: string | null;
   base_url: string | null;
@@ -94,11 +94,11 @@ function parseCommand(value: unknown, fallback: string[]): string[] {
   if (raw.startsWith('[')) {
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      throw new Error(`${HERMES_NATIVE_BRIDGE_COMMAND_ENV} 若使用 JSON array，必须是非空字符串数组`);
+      throw new Error(`${HERMES_AGENT_LOOP_BRIDGE_COMMAND_ENV} 若使用 JSON array，必须是非空字符串数组`);
     }
     const command = parsed.map((item) => safeText(item)).filter(Boolean);
     if (command.length === 0) {
-      throw new Error(`${HERMES_NATIVE_BRIDGE_COMMAND_ENV} 解析后不能为空`);
+      throw new Error(`${HERMES_AGENT_LOOP_BRIDGE_COMMAND_ENV} 解析后不能为空`);
     }
     return command;
   }
@@ -106,17 +106,17 @@ function parseCommand(value: unknown, fallback: string[]): string[] {
 }
 
 function resolveBridgeCommand(env: NodeJS.ProcessEnv = process.env): BridgeCommand {
-  const explicitBridge = safeText(env?.[HERMES_NATIVE_BRIDGE_COMMAND_ENV]);
+  const explicitBridge = safeText(env?.[HERMES_AGENT_LOOP_BRIDGE_COMMAND_ENV]);
   if (explicitBridge) {
     return {
       argv: parseCommand(explicitBridge, []),
       env,
     };
   }
-  const pythonCommand = safeText(env?.[HERMES_NATIVE_PYTHON_COMMAND_ENV], 'python3');
+  const pythonCommand = safeText(env?.[HERMES_AGENT_LOOP_PYTHON_COMMAND_ENV], 'python3');
   return {
-    argv: [pythonCommand, '-m', DEFAULT_BRIDGE_MODULE],
-    env: buildPythonHelperEnv(DEFAULT_BRIDGE_HELPER.pythonRoot, env) as NodeJS.ProcessEnv,
+    argv: [pythonCommand, '-m', DEFAULT_AGENT_LOOP_MODULE],
+    env: buildPythonHelperEnv(DEFAULT_AGENT_LOOP_HELPER.pythonRoot, env) as NodeJS.ProcessEnv,
   };
 }
 
@@ -171,7 +171,7 @@ function buildLocalFileInspectionSection(localFileInspection: unknown[] = []): s
 function buildGenerationInstructions(family: string, route: string, localFileInspection: unknown[] = []): string {
   const localFiles = normalizeLocalFileInspection(localFileInspection);
   return [
-    'You are the RedCube AI Hermes-native creative generation runtime.',
+    'You are the RedCube AI Hermes-Agent loop creative generation runtime.',
     `Produce the ${family}:${route} artifact as audience-facing creative output.`,
     'This route is running as a full Hermes agent loop proof. You must use tools to read the provided local prompt file before answering.',
     localFiles.length > 0
@@ -216,18 +216,18 @@ function buildGenerationInput({
   ].join('\n');
 }
 
-function buildHermesNativeExecutionModel(requestedAdapter = HERMES_NATIVE_PROOF_ADAPTER) {
+function buildHermesAgentLoopExecutionModel(requestedAdapter = HERMES_AGENT_ADAPTER) {
   return {
-    mainline_adapter: HERMES_NATIVE_PROOF_ADAPTER,
-    primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+    mainline_adapter: HERMES_AGENT_ADAPTER,
+    primary_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
     adapter_role: 'opt_in_proof_executor',
     runtime_substrate_owner: 'Hermes',
     deployment_host: 'local_hermes_agent_bridge',
     deployment_host_status: 'opt_in_available',
     requested_adapter: requestedAdapter,
-    default_model_selection: HERMES_NATIVE_DEFAULT_MODEL_SELECTION,
-    default_reasoning_effort: HERMES_NATIVE_DEFAULT_REASONING_SELECTION,
-    freeze_origin_milestone: HERMES_NATIVE_FREEZE_ORIGIN,
+    default_model_selection: HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION,
+    default_reasoning_effort: HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION,
+    freeze_origin_milestone: HERMES_AGENT_LOOP_FREEZE_ORIGIN,
   };
 }
 
@@ -239,7 +239,7 @@ function runBridgeRequest(
     timeoutMs = DEFAULT_PROBE_TIMEOUT_MS,
   }: BridgeRequestOptions = {},
 ): JsonRecord {
-  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-native-proof-'));
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-agent-loop-'));
   const requestFile = path.join(tempDir, 'request.json');
   writeFileSync(requestFile, JSON.stringify(request, null, 2), 'utf-8');
   const command = resolveBridgeCommand(env);
@@ -259,16 +259,16 @@ function runBridgeRequest(
     if (completed.status !== 0) {
       const stderr = safeText(completed.stderr);
       const stdout = safeText(completed.stdout);
-      throw new Error(stderr || stdout || `Hermes-native bridge exited with status ${completed.status}`);
+      throw new Error(stderr || stdout || `Hermes-Agent loop bridge exited with status ${completed.status}`);
     }
 
     const stdout = safeText(completed.stdout);
     if (!stdout) {
-      throw new Error('Hermes-native bridge returned empty stdout');
+      throw new Error('Hermes-Agent loop bridge returned empty stdout');
     }
     const parsed = JSON.parse(stdout) as unknown;
     if (!isJsonRecord(parsed)) {
-      throw new Error('Hermes-native bridge returned non-object JSON');
+      throw new Error('Hermes-Agent loop bridge returned non-object JSON');
     }
     return parsed;
   } finally {
@@ -276,13 +276,13 @@ function runBridgeRequest(
   }
 }
 
-function normalizeContract(contract: unknown): HermesNativeContract {
+function normalizeContract(contract: unknown): HermesAgentLoopContract {
   const resolved = isJsonRecord(contract)
     ? { ...contract }
     : {};
   const model = safeText(resolved.model);
   if (!model) {
-    throw new Error('Hermes-native proof 缺少可执行 model');
+    throw new Error('Hermes-Agent loop 缺少可执行 model');
   }
   return {
     ...resolved,
@@ -291,12 +291,12 @@ function normalizeContract(contract: unknown): HermesNativeContract {
     base_url: safeText(resolved.base_url) || null,
     api_mode: safeText(resolved.api_mode) || null,
     reasoning_effort: safeText(resolved.reasoning_effort) || null,
-    model_selection: safeText(resolved.model_selection, HERMES_NATIVE_DEFAULT_MODEL_SELECTION),
-    reasoning_selection: safeText(resolved.reasoning_selection, HERMES_NATIVE_DEFAULT_REASONING_SELECTION),
+    model_selection: safeText(resolved.model_selection, HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION),
+    reasoning_selection: safeText(resolved.reasoning_selection, HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION),
   };
 }
 
-export function readHermesNativeProofContract({
+export function readHermesAgentLoopContract({
   cwd = process.cwd(),
   env = process.env,
 } = {}) {
@@ -305,20 +305,20 @@ export function readHermesNativeProofContract({
     { cwd, env, timeoutMs: DEFAULT_PROBE_TIMEOUT_MS },
   );
   if (response?.ok !== true) {
-    throw new Error(safeText(response?.blocking_reason, 'Hermes-native proof probe failed'));
+    throw new Error(safeText(response?.blocking_reason, 'Hermes-Agent loop probe failed'));
   }
   return normalizeContract(response.contract);
 }
 
-export function probeHermesNativeProof({
+export function probeHermesAgentLoop({
   cwd = process.cwd(),
   env = process.env,
 } = {}) {
   try {
-    const contract = readHermesNativeProofContract({ cwd, env });
+    const contract = readHermesAgentLoopContract({ cwd, env });
     return {
       ok: true,
-      runtime_owner: HERMES_NATIVE_PROOF_ADAPTER,
+      runtime_owner: HERMES_AGENT_ADAPTER,
       contract,
       error_kind: null,
       blocking_reason: null,
@@ -326,15 +326,15 @@ export function probeHermesNativeProof({
   } catch (error) {
     return {
       ok: false,
-      runtime_owner: HERMES_NATIVE_PROOF_ADAPTER,
+      runtime_owner: HERMES_AGENT_ADAPTER,
       contract: null,
-      error_kind: 'hermes_native_proof_probe_failed',
+      error_kind: 'hermes_agent_loop_probe_failed',
       blocking_reason: error instanceof Error ? error.message : String(error),
     };
   }
 }
 
-export function generateStructuredArtifactViaHermesNativeProof({
+export function generateStructuredArtifactViaHermesAgentLoop({
   family,
   route,
   promptRelativePath,
@@ -376,29 +376,29 @@ export function generateStructuredArtifactViaHermesNativeProof({
     { cwd, env, timeoutMs },
   );
   if (response?.ok !== true) {
-    throw new Error(safeText(response?.blocking_reason, `Hermes-native structured generation failed: ${safeFamily}:${safeRoute}`));
+    throw new Error(safeText(response?.blocking_reason, `Hermes-Agent loop structured generation failed: ${safeFamily}:${safeRoute}`));
   }
 
   const contract = normalizeContract(response.contract);
   const payload = response?.payload;
   if (!isJsonRecord(payload)) {
-    throw new Error(`Hermes-native structured generation returned invalid JSON for route: ${safeFamily}:${safeRoute}`);
+    throw new Error(`Hermes-Agent loop structured generation returned invalid JSON for route: ${safeFamily}:${safeRoute}`);
   }
 
   const proof = isJsonRecord(response?.proof)
     ? response.proof
     : {};
   if (proof.full_agent_loop_proved !== true) {
-    throw new Error(`Hermes-native proof missing full agent loop evidence for route: ${safeFamily}:${safeRoute}`);
+    throw new Error(`Hermes-Agent loop missing full agent loop evidence for route: ${safeFamily}:${safeRoute}`);
   }
 
-  const executionModel = buildHermesNativeExecutionModel(HERMES_NATIVE_PROOF_ADAPTER);
+  const executionModel = buildHermesAgentLoopExecutionModel(HERMES_AGENT_ADAPTER);
   return {
     data: payload,
     generationRuntime: {
-      owner: HERMES_NATIVE_PROOF_ADAPTER,
-      adapter_surface: '@redcube/hermes-substrate',
-      run_id: safeText(proof.session_id, `hermes-native-${randomUUID()}`),
+      owner: HERMES_AGENT_ADAPTER,
+      adapter_surface: '@redcube/runtime-protocol',
+      run_id: safeText(proof.session_id, `hermes-agent-${randomUUID()}`),
       session_id: safeText(proof.session_id) || null,
       model_selection: contract.model_selection,
       reasoning_selection: contract.reasoning_selection,
@@ -408,8 +408,8 @@ export function generateStructuredArtifactViaHermesNativeProof({
       reasoning_effort: contract.reasoning_effort,
       prompt_pack_file: safePromptRelativePath,
       proof,
-      creative_owner: HERMES_NATIVE_PROOF_ADAPTER,
-      primary_surface: HERMES_NATIVE_PROOF_RUNTIME_SURFACE,
+      creative_owner: HERMES_AGENT_ADAPTER,
+      primary_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
       execution_model: executionModel,
     },
   };

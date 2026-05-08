@@ -218,6 +218,53 @@ export {
   getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
 };
 
+export {
+  AGENT_LOOP_EXECUTION_SHAPE,
+  CODEX_DEFAULT_ADAPTER,
+  CODEX_DEFAULT_MODEL_SELECTION,
+  CODEX_DEFAULT_REASONING_SELECTION,
+  CODEX_EXECUTOR_BACKEND,
+  CODEX_RUNTIME_SURFACE,
+  HERMES_AGENT_ADAPTER,
+  HERMES_AGENT_EXECUTOR_BACKEND,
+  HERMES_AGENT_LOOP_RUNTIME_SURFACE,
+  HERMES_RUNTIME_SURFACE,
+  STRUCTURED_CALL_EXECUTION_SHAPE,
+  appendHermesEvent,
+  buildCodexExecutorDescriptor,
+  buildCodexExecutionModel,
+  buildExecutorBackendContract,
+  buildHermesAgentLoopExecutorDescriptor,
+  buildHermesAgentLoopExecutionModel,
+  buildHermesExecutorDescriptor,
+  buildHermesExecutionModel,
+  buildHermesRuntimeTopology,
+  completeHermesRun,
+  failHermesRun,
+  loadHermesRun,
+  normalizeExecutorBackend,
+  readHermesEvents,
+  startHermesRun,
+} from './executor-runtime.js';
+
+export {
+  generateStructuredArtifactViaHermesAgentApi,
+  generateStructuredArtifactViaHermesAgentStructuredCall,
+  runAgentLoopViaHermesAgentApi,
+  structuredCallViaHermesAgentApi,
+} from './hermes-agent-api-client.js';
+
+export {
+  generateStructuredArtifactViaHermesAgentLoop,
+  probeHermesAgentLoop,
+  readHermesAgentLoopContract,
+} from './hermes-agent-loop-bridge-client.js';
+
+export type {
+  CodexExecutionModel,
+  HermesAgentLoopExecutionModel,
+} from './executor-runtime.js';
+
 export type {
   BuildSourceTruthConsumptionSummaryOptions,
   CodexRuntimeTopology,

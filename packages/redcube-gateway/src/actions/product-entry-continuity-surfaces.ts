@@ -242,7 +242,7 @@ export function buildRuntimeLoopClosureManifestSurface({
 }
 
 const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
-const PRODUCT_FRONTDESK_COMMAND = 'redcube product frontdesk';
+const PRODUCT_STATUS_COMMAND = 'redcube product status';
 const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
 
 export function buildOplRuntimeManagerRegistration({
@@ -259,8 +259,8 @@ export function buildOplRuntimeManagerRegistration({
     runtime_owner: runtimeContinuityEnvelope.runtime_owner,
     executor_owner: runtimeContinuityEnvelope.executor_owner,
     domain_entry_surface: {
-      surface_kind: 'product_frontdesk',
-      command: PRODUCT_FRONTDESK_COMMAND,
+      surface_kind: 'product_status',
+      command: PRODUCT_STATUS_COMMAND,
       manifest_command: PRODUCT_MANIFEST_COMMAND,
     },
     registration_surface: {

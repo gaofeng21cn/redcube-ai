@@ -109,7 +109,7 @@ test('stable families expose one explicit governance_surface contract on create 
       assert.deepEqual(created.governance_surface.required_summaries, REQUIRED_GOVERNANCE_SUMMARIES);
       assert.equal(typeof created.governance_surface.family_boundary.family_kind, 'string');
       assert.equal(created.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
-      assert.equal(created.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
+      assert.equal(created.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
       assert.equal(created.governance_surface.runtime_topology.deployment_host, 'codex_local_operator_host');
     }
     const posterPaths = getDeliverablePaths(workspaceRoot, 'topic-a', 'poster-a');
@@ -117,8 +117,8 @@ test('stable families expose one explicit governance_surface contract on create 
       path.join(posterPaths.reportsDir, 'poster-a_视觉总监复盘.md'),
       'utf-8',
     );
-    assert.match(posterDirectorReviewMarkdown, /- review_owner: codex_native_host_agent/);
-    assert.equal((posterDirectorReviewMarkdown.match(/codex_native_host_agent/g) || []).length, 1);
+    assert.match(posterDirectorReviewMarkdown, /- review_owner: codex_cli_runtime/);
+    assert.equal((posterDirectorReviewMarkdown.match(/codex_cli_runtime/g) || []).length, 1);
 
     const review = await getReviewState({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
     const projection = await getPublicationProjection({ workspaceRoot, topicId: 'topic-a' });

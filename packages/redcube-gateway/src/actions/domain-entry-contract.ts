@@ -26,13 +26,13 @@ export const RCA_DOMAIN_AGENT_ENTRY_SPEC_V1 = {
   codex_entry_strategy: 'domain_agent_entry',
   artifact_conventions: 'deck_and_visual_delivery',
   progress_conventions: 'deliverable_build_narration',
-  entry_command: 'redcube product frontdesk',
+  entry_command: 'redcube product status',
   manifest_command: 'redcube product manifest',
 };
 
 export function buildRedCubeDomainEntryContract({
   productManifestCommand,
-  productFrontdeskCommand,
+  productStatusCommand,
   productStartCommand,
   productInvokeCommand,
   productFederateCommand,
@@ -52,11 +52,11 @@ export function buildRedCubeDomainEntryContract({
       },
     },
     {
-      command: productFrontdeskCommand,
+      command: productStatusCommand,
       required_fields: ['workspace_root'],
       extra_payload: {
-        gateway_action: 'getProductFrontdesk',
-        target_surface_kind: 'product_frontdesk',
+        gateway_action: 'getProductStatus',
+        target_surface_kind: 'product_status',
       },
     },
     {
@@ -123,7 +123,7 @@ export function buildRedCubeDomainEntryContract({
 }
 
 export function buildRedCubeGatewayInteractionContract({
-  productFrontdeskCommand,
+  productStatusCommand,
   productManifestCommand,
   federatedProductEntryContractRef,
 }) {
@@ -136,7 +136,7 @@ export function buildRedCubeGatewayInteractionContract({
       'delivery_request',
     ],
     extra_payload: {
-      direct_frontdesk_command: productFrontdeskCommand,
+      direct_status_command: productStatusCommand,
       manifest_command: productManifestCommand,
       federated_contract_ref: federatedProductEntryContractRef,
     },

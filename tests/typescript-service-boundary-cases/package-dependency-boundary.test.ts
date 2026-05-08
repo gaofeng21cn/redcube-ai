@@ -33,7 +33,6 @@ const LAYER_BY_PACKAGE = new Map([
   ['@redcube/reference-os', 'reference'],
   ['@redcube/governance', 'governance'],
   ['@redcube/codex-cli-client', 'client'],
-  ['@redcube/hermes-substrate', 'substrate'],
 ]);
 
 const ALLOWED_DEPENDENCY_LAYERS = new Map([

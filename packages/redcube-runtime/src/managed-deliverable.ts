@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { CODEX_DEFAULT_ADAPTER, HERMES_NATIVE_PROOF_ADAPTER } from '@redcube/hermes-substrate';
+import { CODEX_DEFAULT_ADAPTER, HERMES_AGENT_ADAPTER } from '@redcube/runtime-protocol';
 
 import { planManagedDeliverableDag } from './managed-dag-scheduler.js';
 import { reconcileManagedRunLiveness } from './managed-run-liveness.js';
@@ -59,7 +59,7 @@ export async function runManagedDeliverable({
   const runtimeReady = await probeRequestedRuntime(normalizedAdapter, workspaceRoot);
   if (!runtimeReady.ok) {
     const error = new Error(
-      `${normalizedAdapter === HERMES_NATIVE_PROOF_ADAPTER ? 'Hermes-native proof' : 'Codex CLI'} blocked: ${runtimeReady.blocking_reason || runtimeReady.error_kind || 'unknown'}`,
+      `${normalizedAdapter === HERMES_AGENT_ADAPTER ? 'Hermes-Agent loop' : 'Codex CLI'} blocked: ${runtimeReady.blocking_reason || runtimeReady.error_kind || 'unknown'}`,
     );
     error.runtime_owner = runtimeReady.runtime_owner;
     error.probe = runtimeReady;

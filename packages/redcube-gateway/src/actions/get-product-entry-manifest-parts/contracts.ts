@@ -4,7 +4,7 @@ import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import {
   DELIVERABLE_FACADE_TRUTH_SURFACES,
   PRODUCT_FEDERATE_COMMAND,
-  PRODUCT_FRONTDESK_COMMAND,
+  PRODUCT_STATUS_COMMAND,
   PRODUCT_INVOKE_COMMAND,
   PRODUCT_SESSION_COMMAND,
   ROUTE_EQUIVALENCE_SHARED_TRUTH_SURFACES,
@@ -17,7 +17,7 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
     surface_kind: 'route_equivalence_contract',
     owner: 'redcube_ai',
     status: 'repo_tracked',
-    summary: 'RCA product-entry overview, direct invoke, same-session continuation, and the internal OPL bridge converge on the same downstream deliverable runtime truth; `frontdesk` remains the compatibility command key for the overview surface.',
+    summary: 'RCA product-entry overview, direct invoke, same-session continuation, and the internal OPL bridge converge on the same downstream deliverable runtime truth; `status` remains the compatibility command key for the overview surface.',
     public_skill_policy: {
       skill_count: 1,
       skill_ids: ['redcube-ai'],
@@ -26,9 +26,9 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
     },
     equivalent_routes: [
       {
-        route_id: 'product_frontdesk',
-        command: PRODUCT_FRONTDESK_COMMAND,
-        surface_kind: 'product_frontdesk',
+        route_id: 'product_status',
+        command: PRODUCT_STATUS_COMMAND,
+        surface_kind: 'product_status',
         role: 'compat_product_entry_overview_command',
       },
       {

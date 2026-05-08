@@ -20,9 +20,9 @@ import {
   withEnv,
   completeSourceReadiness,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the current overlay contract declares the requested route', async () => {

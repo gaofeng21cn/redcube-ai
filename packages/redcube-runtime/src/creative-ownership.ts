@@ -234,16 +234,16 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   milestone: 'P19.A',
   tracking_model: P19_UNIFIED_LIFECYCLE_CONTRACT.tracking_model,
   primary_executor: {
-    adapter: 'host_agent',
-    runtime: 'codex_native_host_agent',
+    adapter: 'codex_cli',
+    runtime: 'codex_cli_runtime',
     status: 'formal_primary_executor',
   },
   adapter_roles: {
-    host_agent: 'formal_primary_executor',
+    codex_cli: 'formal_primary_executor',
   },
   proof_executor: {
-    adapter: 'hermes_native_proof',
-    runtime: 'hermes_native_full_agent_loop',
+    adapter: 'hermes_agent',
+    runtime: 'hermes_agent_loop',
     status: 'opt_in_proof_executor',
   },
   protected_creative_routes: P19_UNIFIED_LIFECYCLE_CONTRACT.family_mapping,

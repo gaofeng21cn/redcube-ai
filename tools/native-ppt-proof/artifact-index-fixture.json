@@ -7,7 +7,7 @@
     "required_artifact_ids": [
       "doctor_json",
       "product_manifest_json",
-      "product_frontdesk_json",
+      "product_status_json",
       "native_helper_input_json",
       "native_helper_output_json",
       "proof_summary_json",
@@ -48,8 +48,8 @@
       "sha256": "abababababababababababababababababababababababababababababababab"
     },
     {
-      "artifact_id": "product_frontdesk_json",
-      "relative_path": "product-frontdesk.json",
+      "artifact_id": "product_status_json",
+      "relative_path": "product-status.json",
       "media_type": "application/json",
       "category": "product_entry",
       "required": true,

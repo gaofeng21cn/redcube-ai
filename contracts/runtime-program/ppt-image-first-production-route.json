@@ -217,7 +217,7 @@
       "status": "landed",
       "surfaces": [
         "manifest",
-        "frontdesk",
+        "status",
         "session",
         "redcube image-ppt proof"
       ]
