@@ -796,7 +796,7 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: PRODUCT_INVOKE_COMMAND,
-    product_entry_surface: productEntryOverview,
+    product_entry_surface: entryStatusSurface,
     operator_loop_surface: operatorLoopSurface,
     operator_loop_actions: operatorLoopActions,
     repo_mainline: {

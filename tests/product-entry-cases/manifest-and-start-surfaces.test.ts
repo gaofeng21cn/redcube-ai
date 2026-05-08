@@ -44,6 +44,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.entry_status_surface.command, 'redcube product status');
     assert.equal(manifest.entry_status_surface.surface_kind, 'product_status');
     assert.match(manifest.entry_status_surface.summary, /product-entry overview/i);
+    assert.deepEqual(manifest.product_entry_surface, manifest.entry_status_surface);
     assert.equal(manifest.operator_loop_surface.shell_key, 'direct');
     assert.equal(manifest.operator_loop_surface.command, 'redcube product invoke');
     assert.equal(manifest.operator_loop_surface.surface_kind, 'product_entry');
