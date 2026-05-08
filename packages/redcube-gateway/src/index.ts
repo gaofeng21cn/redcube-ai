@@ -366,6 +366,12 @@ export function applyReviewMutation(request: ReviewMutationRequest): Promise<Rev
   return applyReviewMutationJs(request) as Promise<ReviewMutationResponse>;
 }
 
+export {
+  buildRedCubeActionMetadata,
+  findRedCubeCliCommand,
+  getRedCubeFamilyActionCatalog,
+} from './actions/family-action-catalog.js';
+
 export type {
   CreateDeliverableRequest,
   DeliverableAuditRequest,

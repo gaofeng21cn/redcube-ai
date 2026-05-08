@@ -40,6 +40,9 @@ import {
   buildOplRuntimeManagerRegistration,
   buildRuntimeLoopClosureManifestSurface,
 } from './product-entry-continuity-surfaces.js';
+import {
+  buildRedCubeActionMetadata,
+} from './family-action-catalog.js';
 import { buildRouteEquivalenceContract, buildDeliverableFacadeContract } from './get-product-entry-manifest-parts/contracts.js';
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
@@ -528,6 +531,23 @@ export async function getProductEntryManifest(request) {
     recommended_artifact_command: productEntrySessionCommand,
   };
   const oplRuntimeManagerRegistration = buildOplRuntimeManagerRegistration({ runtimeContinuityEnvelope, productEntrySessionCommand });
+  const actionMetadata = buildRedCubeActionMetadata();
+  const skillCommandContracts = actionMetadata.skill_commands.map((contract) => {
+    const result = {
+      action_id: contract.action_id,
+      command_contract_id: contract.command_contract_id,
+      command: contract.command,
+      shell_key: contract.shell_key,
+      target_surface_kind: contract.surface_kind,
+      required_fields: contract.required_fields,
+      effect: contract.effect,
+      summary: contract.summary,
+    };
+    if (contract.public_skill_policy) {
+      result.public_skill_policy = contract.public_skill_policy;
+    }
+    return result;
+  });
   const skillActivationHints = {
     plugin_name: 'redcube-ai',
     skill_semantics: 'single_domain_app_skill',
@@ -578,45 +598,16 @@ export async function getProductEntryManifest(request) {
           runtime_continuity: runtimeContinuityEnvelope,
           opl_runtime_manager_registration: oplRuntimeManagerRegistration,
           long_task_stage_policy: LONG_TASK_STAGE_POLICY,
+          family_action_catalog_ref: {
+            ref_kind: 'json_pointer',
+            ref: '/family_action_catalog',
+            label: 'RedCube family action catalog',
+          },
         },
       },
     ],
-    supported_commands: [
-      PRODUCT_STATUS_COMMAND,
-      PRODUCT_INVOKE_COMMAND,
-      PRODUCT_SESSION_COMMAND,
-      nativePptOperatorUx.image_proof_runner.helper_command,
-      nativePptOperatorUx.proof_runner.helper_command,
-    ],
-    command_contracts: [
-      {
-        command: PRODUCT_STATUS_COMMAND,
-        shell_key: 'status',
-        target_surface_kind: 'product_status',
-      },
-      {
-        command: PRODUCT_INVOKE_COMMAND,
-        shell_key: 'direct',
-        target_surface_kind: 'product_entry',
-      },
-      {
-        command: PRODUCT_SESSION_COMMAND,
-        shell_key: 'session',
-        target_surface_kind: 'product_entry_session',
-      },
-      {
-        command: nativePptOperatorUx.image_proof_runner.helper_command,
-        shell_key: 'image_ppt_proof',
-        target_surface_kind: 'image_ppt_product_entry_proof',
-        public_skill_policy: 'do_not_register_as_second_public_skill',
-      },
-      {
-        command: nativePptOperatorUx.proof_runner.helper_command,
-        shell_key: 'native_ppt_proof',
-        target_surface_kind: 'native_ppt_product_entry_proof',
-        public_skill_policy: 'do_not_register_as_second_public_skill',
-      },
-    ],
+    supported_commands: actionMetadata.skill_commands.map((contract) => contract.command),
+    command_contracts: skillCommandContracts,
   });
   const automation = buildAutomationCatalog({
     summary: 'RedCube automation companions expose continuation board tracking with operator review-gated continuation truth.',
@@ -830,6 +821,16 @@ export async function getProductEntryManifest(request) {
     persistence_policy: persistencePolicy,
     lifecycle_ledger: lifecycleLedger,
     owner_route: ownerRoute,
+    family_action_catalog: actionMetadata.family_action_catalog,
+    family_action_catalog_parity: actionMetadata.parity,
+    action_metadata: {
+      surface_kind: 'redcube_action_metadata_projection',
+      product_entry: actionMetadata.product_entry,
+      cli_commands: actionMetadata.cli_commands,
+      mcp_tools: actionMetadata.mcp_tools,
+      mcp_actions: actionMetadata.mcp_actions,
+      skill_commands: actionMetadata.skill_commands,
+    },
     skill_catalog: skillCatalog,
     automation,
     product_entry_shell: productEntryShell,
@@ -911,28 +912,18 @@ export async function getProductEntryManifest(request) {
     },
     skill_catalog: {
       ...manifest.skill_catalog,
-      supported_commands: [...new Set([
-        ...(manifest.skill_catalog?.supported_commands || []),
-        nativePptOperatorUx.image_proof_runner.helper_command,
-        nativePptOperatorUx.proof_runner.helper_command,
-      ])],
-      command_contracts: [
-        ...(manifest.skill_catalog?.command_contracts || [])
-          .filter((contract) => contract?.command !== nativePptOperatorUx.proof_runner.helper_command)
-          .filter((contract) => contract?.command !== nativePptOperatorUx.image_proof_runner.helper_command),
-        {
-          command: nativePptOperatorUx.image_proof_runner.helper_command,
-          shell_key: 'image_ppt_proof',
-          target_surface_kind: 'image_ppt_product_entry_proof',
-          public_skill_policy: 'do_not_register_as_second_public_skill',
-        },
-        {
-          command: nativePptOperatorUx.proof_runner.helper_command,
-          shell_key: 'native_ppt_proof',
-          target_surface_kind: 'native_ppt_product_entry_proof',
-          public_skill_policy: 'do_not_register_as_second_public_skill',
-        },
-      ],
+      supported_commands: actionMetadata.skill_commands.map((contract) => contract.command),
+      command_contracts: skillCommandContracts,
+    },
+    family_action_catalog: actionMetadata.family_action_catalog,
+    family_action_catalog_parity: actionMetadata.parity,
+    action_metadata: {
+      surface_kind: 'redcube_action_metadata_projection',
+      product_entry: actionMetadata.product_entry,
+      cli_commands: actionMetadata.cli_commands,
+      mcp_tools: actionMetadata.mcp_tools,
+      mcp_actions: actionMetadata.mcp_actions,
+      skill_commands: actionMetadata.skill_commands,
     },
   };
 	}

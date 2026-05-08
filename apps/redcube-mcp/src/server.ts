@@ -35,6 +35,7 @@ import {
   runDeliverableRoute,
   runManagedDeliverable,
   runtimeWatch,
+  buildRedCubeActionMetadata,
 } from '@redcube/gateway';
 import * as z from 'zod/v4';
 
@@ -146,10 +147,34 @@ const TOOL_ROUTE_DEFINITIONS = {
   },
 };
 
+const ACTION_METADATA = buildRedCubeActionMetadata();
+const MCP_TOOL_METADATA = new Map(ACTION_METADATA.mcp_tools.map((tool) => [tool.name, tool]));
+const MCP_ROUTE_METADATA = Object.fromEntries(
+  Object.entries(ACTION_METADATA.mcp_route_definitions).map(([name, definition]) => {
+    const base = TOOL_ROUTE_DEFINITIONS[name as ToolName];
+    return [
+      name,
+      {
+        selector: definition.selector || base?.selector,
+        routes: {
+          ...(base?.routes || {}),
+          ...(definition.routes || {}),
+        },
+      },
+    ];
+  }),
+);
+
+function getMcpToolProjection(name: string) {
+  return MCP_TOOL_METADATA.get(name)?.action_catalog_projection;
+}
+
 export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_workspace',
-    description: 'Grouped workspace/topic discovery surface for workspace doctor, topic catalog, and overlay catalog actions.',
+    description: MCP_TOOL_METADATA.get('redcube_workspace')?.description
+      || 'Grouped workspace/topic discovery surface for workspace doctor, topic catalog, and overlay catalog actions.',
+    action_catalog_projection: getMcpToolProjection('redcube_workspace'),
     inputSchema: {
       action: ACTION_STRING,
       workspaceRoot: WORKSPACE_ROOT.optional(),
@@ -157,7 +182,9 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'redcube_sources',
-    description: 'Grouped source intake/research and augmentation surface for canonical source readiness and augmentation orchestration.',
+    description: MCP_TOOL_METADATA.get('redcube_sources')?.description
+      || 'Grouped source intake/research and augmentation surface for canonical source readiness and augmentation orchestration.',
+    action_catalog_projection: getMcpToolProjection('redcube_sources'),
     inputSchema: {
       operation: OPERATION_STRING,
       workspaceRoot: WORKSPACE_ROOT.optional(),
@@ -174,7 +201,9 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'redcube_deliverable',
-    description: 'Grouped deliverable lifecycle execution surface for create/get/run/managed route actions across one deliverable boundary.',
+    description: MCP_TOOL_METADATA.get('redcube_deliverable')?.description
+      || 'Grouped deliverable lifecycle execution surface for create/get/run/managed route actions across one deliverable boundary.',
+    action_catalog_projection: getMcpToolProjection('redcube_deliverable'),
     inputSchema: {
       action: ACTION_STRING,
       workspaceRoot: WORKSPACE_ROOT.optional(),
@@ -196,7 +225,9 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'redcube_review',
-    description: 'Grouped deliverable boundary review surface for publication projection, audit, review mutation, and runtime watch actions.',
+    description: MCP_TOOL_METADATA.get('redcube_review')?.description
+      || 'Grouped deliverable boundary review surface for publication projection, audit, review mutation, and runtime watch actions.',
+    action_catalog_projection: getMcpToolProjection('redcube_review'),
     inputSchema: {
       action: ACTION_STRING,
       workspaceRoot: OPTIONAL_WORKSPACE_ROOT,
@@ -213,7 +244,9 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'redcube_product_entry',
-    description: 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, and domain-entry actions, with an internal OPL bridge handoff kept for shell integration.',
+    description: MCP_TOOL_METADATA.get('redcube_product_entry')?.description
+      || 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, and domain-entry actions, with an internal OPL bridge handoff kept for shell integration.',
+    action_catalog_projection: getMcpToolProjection('redcube_product_entry'),
     inputSchema: {
       action: ACTION_STRING,
       target_domain_id: z.string().optional().describe('Target domain id. Must be redcube_ai.'),
@@ -326,7 +359,7 @@ export async function callGatewayTool(name: string, args: ToolArgs, deps: Partia
     throw new Error(`Unknown tool: ${name}`);
   }
 
-  const routeDefinition = TOOL_ROUTE_DEFINITIONS[name as ToolName];
+  const routeDefinition = MCP_ROUTE_METADATA[name as ToolName] || TOOL_ROUTE_DEFINITIONS[name as ToolName];
   if (!routeDefinition) {
     throw new Error(`Tool routing not configured: ${name}`);
   }

@@ -19,6 +19,10 @@ import {
   withMockHermesUpstream,
   withOperation,
 } from '../gateway-case-shared.ts';
+import {
+  buildRedCubeActionMetadata,
+  getRedCubeFamilyActionCatalog,
+} from '../../packages/redcube-gateway/dist/index.js';
 
 test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
   const tools = listGatewayTools();
@@ -59,6 +63,46 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'entry_session_id'), true);
   assert.equal(Object.hasOwn(workspace?.inputSchema || {}, 'action'), true);
   assert.equal(Object.hasOwn(sources?.inputSchema || {}, 'operation'), true);
+});
+
+test('MCP catalog definitions are projected from the RedCube family action catalog', () => {
+  const catalog = getRedCubeFamilyActionCatalog();
+  const metadata = buildRedCubeActionMetadata();
+  const definitions = getToolDefinitions();
+  const listedTools = listGatewayTools();
+
+  assert.equal(catalog.surface_kind, 'family_action_catalog');
+  assert.equal(metadata.parity.status, 'aligned');
+  assert.deepEqual(metadata.parity.issues, []);
+  assert.deepEqual(
+    definitions.map((tool) => tool.name),
+    metadata.mcp_tools.map((tool) => tool.name),
+  );
+  assert.deepEqual(
+    listedTools.map((tool) => [tool.name, tool.description]),
+    metadata.mcp_tools.map((tool) => [tool.name, tool.description]),
+  );
+
+  const productEntryTool = definitions.find((tool) => tool.name === 'redcube_product_entry');
+  const productEntryActions = metadata.mcp_actions
+    .filter((action) => action.tool_name === 'redcube_product_entry')
+    .map((action) => action.action_key);
+
+  assert.deepEqual(productEntryActions, [
+    'get_product_status',
+    'get_product_start',
+    'get_product_preflight',
+    'invoke_product_entry',
+    'invoke_federated_product_entry',
+    'get_product_entry_session',
+    'get_product_entry_manifest',
+    'invoke_domain_entry',
+  ]);
+  assert.equal(productEntryTool?.description, metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.description);
+  assert.deepEqual(
+    productEntryTool?.action_catalog_projection,
+    metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.action_catalog_projection,
+  );
 });
 
 test('callGatewayTool delegates to injected gateway action', async () => {
@@ -541,10 +585,11 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
   await client.connect(transport);
 
   try {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-error-'));
     const result = await client.callTool({
       name: 'redcube_deliverable',
       arguments: withAction('create_deliverable', {
-        workspaceRoot: '/tmp/redcube-workspace',
+        workspaceRoot,
         overlay: 'poster',
         profileId: 'default',
         topicId: 'topic-a',

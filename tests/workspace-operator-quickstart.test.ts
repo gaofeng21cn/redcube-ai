@@ -6,8 +6,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { buildHelp, getCliGatewayActions } from '../apps/redcube-cli/dist/cli.js';
+import { buildCommandHelp, buildHelp, getCliGatewayActions } from '../apps/redcube-cli/dist/cli.js';
 import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
+import { buildRedCubeActionMetadata } from '../packages/redcube-gateway/dist/index.js';
 import { withMockHermesUpstream } from './mock-codex-cli.ts';
 
 function runCli(args, options = {}) {
@@ -114,6 +115,26 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
       'redcube_workspace',
     ],
   );
+});
+
+test('CLI product-entry and proof command help is projected from family action metadata', () => {
+  const metadata = buildRedCubeActionMetadata();
+
+  for (const entry of metadata.cli_commands.filter((command) => (
+    command.command.startsWith('redcube product ')
+    || command.command.startsWith('redcube image-ppt ')
+    || command.command.startsWith('redcube native-ppt ')
+  ))) {
+    const commandKey = entry.command.replace(/^redcube /, '');
+    const help = buildCommandHelp(commandKey);
+
+    assert.equal(help.surface_kind, 'command_help');
+    assert.equal(help.command, commandKey);
+    assert.equal(help.summary, entry.summary);
+    assert.equal(help.usage, entry.usage);
+    assert.equal(help.gateway_action, entry.gateway_action);
+    assert.deepEqual(help.boundary_fields, entry.boundary_fields);
+  }
 });
 
 test('brand-new workspace quickstart converges doctor -> source research -> create -> audit -> run with aligned governance surfaces', async () => {

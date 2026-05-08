@@ -231,6 +231,61 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.lifecycle_ledger.actions[0].action_id, 'verify_redcube_product_entry_manifest');
     assert.equal(manifest.owner_route.surface_kind, 'family_owner_route');
     assert.equal(manifest.owner_route.next_owner, 'redcube_ai');
+    assert.equal(manifest.family_action_catalog.surface_kind, 'family_action_catalog');
+    assert.equal(manifest.family_action_catalog.version, 'family-action-catalog.v1');
+    assert.equal(manifest.family_action_catalog.catalog_id, 'redcube_product_entry_action_catalog');
+    assert.equal(manifest.family_action_catalog.target_domain_id, 'redcube_ai');
+    assert.equal(manifest.family_action_catalog.owner, 'redcube_ai');
+    assert.deepEqual(manifest.family_action_catalog.authority_boundary, {
+      domain_truth_owner: 'redcube_ai',
+      opl_role: 'projection_consumer_only',
+      write_policy: 'no_domain_truth_writes',
+    });
+    assert.deepEqual(
+      manifest.family_action_catalog.actions.map((action) => action.action_id),
+      [
+        'get_product_status',
+        'get_product_start',
+        'get_product_preflight',
+        'invoke_product_entry',
+        'invoke_federated_product_entry',
+        'get_product_entry_session',
+        'get_product_entry_manifest',
+        'run_image_ppt_proof',
+        'run_native_ppt_proof',
+        'invoke_domain_entry',
+      ],
+    );
+    assert.deepEqual(
+      manifest.family_action_catalog.actions
+        .filter((action) => action.supported_surfaces.skill)
+        .map((action) => action.source_command.command),
+      [
+        'redcube product status',
+        'redcube product invoke',
+        'redcube product session',
+        'redcube image-ppt proof',
+        'redcube native-ppt proof',
+      ],
+    );
+    assert.equal(manifest.family_action_catalog_parity.surface_kind, 'family_action_catalog_parity');
+    assert.equal(manifest.family_action_catalog_parity.status, 'aligned');
+    assert.deepEqual(manifest.family_action_catalog_parity.issues, []);
+    assert.deepEqual(
+      manifest.action_metadata.product_entry.map((entry) => [entry.action_key, entry.command, entry.surface_kind]),
+      [
+        ['get_product_status', 'redcube product status', 'product_status'],
+        ['get_product_start', 'redcube product start', 'product_entry_start'],
+        ['get_product_preflight', 'redcube product preflight', 'product_entry_preflight'],
+        ['start_deliverable', 'redcube product invoke', 'product_entry'],
+        ['opl_bridge_handoff', 'redcube product federate', 'federated_product_entry'],
+        ['continue_session', 'redcube product session', 'product_entry_session'],
+        ['get_product_entry_manifest', 'redcube product manifest', 'product_entry_manifest'],
+        ['run_image_ppt_proof', 'redcube image-ppt proof', 'image_ppt_product_entry_proof'],
+        ['run_native_ppt_proof', 'redcube native-ppt proof', 'native_ppt_product_entry_proof'],
+        ['invoke_domain_entry', 'redcube service-safe domain entry', 'domain_entry'],
+      ],
+    );
     assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
     assert.equal(manifest.skill_catalog.skills.length, 1); assert.equal(manifest.skill_catalog.skills.some((skill) => skill.skill_id === 'ui-ux-pro-max'), false);
     assert.deepEqual(manifest.skill_catalog.supported_commands, [
@@ -241,6 +296,20 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'redcube native-ppt proof',
     ]);
     assert.equal(manifest.skill_catalog.command_contracts.length, 5);
+    assert.deepEqual(
+      manifest.skill_catalog.command_contracts.map((contract) => [
+        contract.action_id,
+        contract.command,
+        contract.target_surface_kind,
+      ]),
+      [
+        ['get_product_status', 'redcube product status', 'product_status'],
+        ['invoke_product_entry', 'redcube product invoke', 'product_entry'],
+        ['get_product_entry_session', 'redcube product session', 'product_entry_session'],
+        ['run_image_ppt_proof', 'redcube image-ppt proof', 'image_ppt_product_entry_proof'],
+        ['run_native_ppt_proof', 'redcube native-ppt proof', 'native_ppt_product_entry_proof'],
+      ],
+    );
     assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube-ai');
     assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
     assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product status');

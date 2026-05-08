@@ -5,6 +5,7 @@ import {
   runCli as runCliJs,
 } from './cli-parts/dispatch.js';
 import { buildHelp as buildHelpJs } from './cli-parts/help.js';
+import { buildCommandHelp as buildCommandHelpJs } from './cli-parts/help.js';
 import { parseArgs as parseArgsJs, resolveWorkspaceRoot as resolveWorkspaceRootJs } from './cli-parts/options.js';
 
 import type {
@@ -30,6 +31,10 @@ export function getCliGatewayActions(overrides: Partial<CliGatewayActions> = {})
 export async function buildHelp(gatewayActions?: CliGatewayActions): Promise<CliHelpSurface> {
   const actions = gatewayActions || getCliGatewayActionsJs();
   return buildHelpJs(actions as unknown as Record<string, unknown>) as Promise<CliHelpSurface>;
+}
+
+export function buildCommandHelp(commandKey: string): Record<string, unknown> | null {
+  return buildCommandHelpJs(commandKey);
 }
 
 export async function executeCli(argv: string[], deps: CliDependencies = {}): Promise<CliRunSurface> {

@@ -1,4 +1,5 @@
 import type { GatewayActionMap, JsonMap } from './types.js';
+import { buildRedCubeActionMetadata } from '@redcube/gateway';
 
 function buildCommonFlows(overlayCatalog: { overlays: JsonMap[] }): JsonMap {
   return Object.fromEntries(
@@ -47,6 +48,10 @@ function buildOperatorQuickstart() {
 
 export function buildCommandHelp(commandKey: string): JsonMap | null {
   const operatorQuickstart = buildOperatorQuickstart();
+  const command = `redcube ${commandKey}`;
+  const actionCommand = buildRedCubeActionMetadata().cli_commands
+    .filter((entry): entry is JsonMap => Boolean(entry))
+    .find((entry) => entry.command === command);
   const catalog = {
     'workspace doctor': {
       summary: '诊断 workspace 合同与 canonical 目录，并把 brand-new workspace 引向 Source Readiness bootstrap writers。',
@@ -151,7 +156,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['outputDir', 'styleReferenceDir'],
     },
   };
-  const entry = (catalog as Record<string, JsonMap>)[commandKey];
+  const entry = actionCommand || (catalog as Record<string, JsonMap>)[commandKey];
   if (!entry) {
     return null;
   }
@@ -163,6 +168,8 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     usage: entry.usage,
     gateway_action: entry.gateway_action,
     boundary_fields: entry.boundary_fields,
+    action_id: entry.action_id,
+    source_metadata: actionCommand ? 'redcube_family_action_catalog' : 'cli_help_catalog',
     canonical_operator_route: operatorQuickstart.canonicalRoute,
     operator_quickstart: operatorQuickstart,
   };
