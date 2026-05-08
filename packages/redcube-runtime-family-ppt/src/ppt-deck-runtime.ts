@@ -71,6 +71,139 @@ const {
   ensurePrerequisites,
 } = stageParts;
 
+async function buildDetailedOutlineRoutePayload({ contract, deliverablePaths, adapter }) {
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const { authoredOutline, generationRuntime } = await generateOutlineDraft(contract, storylineArtifact, adapter);
+  return buildPptDetailedOutlineArtifact({
+    contract,
+    attachCommon,
+    authoredOutline,
+    generationRuntime,
+    lifecycleStage: lifecycleStageForRoute(contract, 'detailed_outline') || 'story_architecture',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+  });
+}
+
+async function buildSlideBlueprintRoutePayload({ contract, deliverablePaths, adapter }) {
+  const outlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
+  const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(contract, outlineArtifact, adapter);
+  return buildPptSlideBlueprintArtifact({
+    contract,
+    attachCommon,
+    authoredBlueprint,
+    generationRuntime,
+    lifecycleStage: lifecycleStageForRoute(contract, 'slide_blueprint') || 'story_architecture',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    canvas: CANVAS,
+    bannedRenderTokens: BANNED_RENDER_TOKENS,
+  });
+}
+
+async function buildVisualDirectionRoutePayload({
+  contract,
+  deliverablePaths,
+  mode,
+  baselineDeliverableId,
+  adapter,
+}) {
+  const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
+  const { authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(
+    contract,
+    blueprintArtifact,
+    mode,
+    baselineDeliverableId,
+    adapter,
+  );
+  return buildPptVisualDirectionArtifact({
+    contract,
+    blueprintArtifact,
+    authoredVisualDirection,
+    attachCommon,
+    generationRuntime,
+    lifecycleStage: lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
+    materializedFrom: CREATIVE_MATERIALIZED_FROM,
+    baselineDeliverableId,
+    mode,
+    sharedSourceConfidence: sharedSourceConfidence(contract),
+  });
+}
+
+async function buildRenderRoutePayload({
+  workspaceRoot,
+  deliverableId,
+  contract,
+  deliverablePaths,
+  route,
+  adapter,
+  executionShape,
+  hermesProfile,
+  executorRouting,
+}) {
+  return buildRenderHtmlArtifact({
+    workspaceRoot,
+    deliverableId,
+    contract,
+    deliverablePaths,
+    ...(route ? { route } : {}),
+    adapter,
+    executionShape,
+    hermesProfile,
+    executorRouting,
+  });
+}
+
+const PPT_ROUTE_PAYLOAD_BUILDERS = Object.freeze({
+  storyline: ({ contract, adapter }) => buildStoryline(contract, adapter),
+  detailed_outline: buildDetailedOutlineRoutePayload,
+  slide_blueprint: buildSlideBlueprintRoutePayload,
+  visual_direction: buildVisualDirectionRoutePayload,
+  render_html: buildRenderRoutePayload,
+  author_image_pages: ({ deliverableId, contract, deliverablePaths, route, adapter }) => (
+    buildImagePagesArtifact({ deliverableId, contract, deliverablePaths, route, adapter })
+  ),
+  author_pptx_native: ({ deliverableId, contract, deliverablePaths, route, adapter }) => (
+    buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter })
+  ),
+  fix_html: (context) => buildRenderRoutePayload({ ...context, route: PAGE_FIX_ROUTE }),
+  repair_pptx_native: ({ deliverableId, contract, deliverablePaths, route, adapter }) => (
+    buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter })
+  ),
+  repair_image_pages: ({ deliverableId, contract, deliverablePaths, route, adapter }) => (
+    buildImagePagesArtifact({ deliverableId, contract, deliverablePaths, route, adapter })
+  ),
+  visual_director_review: ({ contract, deliverablePaths, adapter }) => (
+    buildDirectorReview(contract, deliverablePaths, adapter)
+  ),
+  screenshot_review: ({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+    contract,
+    mode,
+    baselineDeliverableId,
+    adapter,
+  }) => buildScreenshotReviewArtifact({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+    contract,
+    mode,
+    baselineDeliverableId,
+    adapter,
+  }),
+  export_pptx: ({ workspaceRoot, topicId, deliverableId, contract, adapter }) => (
+    buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract, adapter })
+  ),
+});
+
+async function buildRoutePayload(context) {
+  const buildPayload = PPT_ROUTE_PAYLOAD_BUILDERS[context.route];
+  if (!buildPayload) {
+    throw new Error(`Unsupported ppt_deck route: ${context.route}`);
+  }
+  return buildPayload(context);
+}
+
 export function canRunPptDeck(contract) {
   return contract?.deliverable_kind === 'ppt_deck';
 }
@@ -107,119 +240,20 @@ export async function runPptDeckRoute({
     ...safeArray(contract.stage_sequence?.stages),
     ...safeArray(contract.stage_sequence?.alternate_stages),
   ].find((stage) => stage?.stage_id === route) || null;
-  let payload;
-  switch (route) {
-    case 'storyline':
-      payload = await buildStoryline(contract, adapter);
-      break;
-    case 'detailed_outline': {
-      const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
-      const { authoredOutline, generationRuntime } = await generateOutlineDraft(contract, storylineArtifact, adapter);
-      payload = buildPptDetailedOutlineArtifact({
-        contract,
-        attachCommon,
-        authoredOutline,
-        generationRuntime,
-        lifecycleStage: lifecycleStageForRoute(contract, 'detailed_outline') || 'story_architecture',
-        materializedFrom: CREATIVE_MATERIALIZED_FROM,
-      });
-      break;
-    }
-    case 'slide_blueprint': {
-      const outlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
-      const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(contract, outlineArtifact, adapter);
-      payload = buildPptSlideBlueprintArtifact({
-        contract,
-        attachCommon,
-        authoredBlueprint,
-        generationRuntime,
-        lifecycleStage: lifecycleStageForRoute(contract, 'slide_blueprint') || 'story_architecture',
-        materializedFrom: CREATIVE_MATERIALIZED_FROM,
-        canvas: CANVAS,
-        bannedRenderTokens: BANNED_RENDER_TOKENS,
-      });
-      break;
-    }
-    case 'visual_direction': {
-      const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
-      const { authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(
-        contract,
-        blueprintArtifact,
-        mode,
-        baselineDeliverableId,
-        adapter,
-      );
-      payload = buildPptVisualDirectionArtifact({
-        contract,
-        blueprintArtifact,
-        authoredVisualDirection,
-        attachCommon,
-        generationRuntime,
-        lifecycleStage: lifecycleStageForRoute(contract, 'visual_direction') || 'visual_authorship',
-        materializedFrom: CREATIVE_MATERIALIZED_FROM,
-        baselineDeliverableId,
-        mode,
-        sharedSourceConfidence: sharedSourceConfidence(contract),
-      });
-      break;
-    }
-    case 'render_html':
-      payload = await buildRenderHtmlArtifact({
-        workspaceRoot,
-        deliverableId,
-        contract,
-        deliverablePaths,
-        adapter,
-        executionShape,
-        hermesProfile,
-        executorRouting,
-      });
-      break;
-    case 'author_image_pages':
-      payload = await buildImagePagesArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
-      break;
-    case 'author_pptx_native':
-      payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
-      break;
-    case 'fix_html':
-      payload = await buildRenderHtmlArtifact({
-        workspaceRoot,
-        deliverableId,
-        contract,
-        deliverablePaths,
-        route: PAGE_FIX_ROUTE,
-        adapter,
-        executionShape,
-        hermesProfile,
-        executorRouting,
-      });
-      break;
-    case 'repair_pptx_native':
-      payload = await buildNativePptArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
-      break;
-    case 'repair_image_pages':
-      payload = await buildImagePagesArtifact({ deliverableId, contract, deliverablePaths, route, adapter });
-      break;
-    case 'visual_director_review':
-      payload = await buildDirectorReview(contract, deliverablePaths, adapter);
-      break;
-    case 'screenshot_review':
-      payload = await buildScreenshotReviewArtifact({
-        workspaceRoot,
-        topicId,
-        deliverableId,
-        contract,
-        mode,
-        baselineDeliverableId,
-        adapter,
-      });
-      break;
-    case 'export_pptx':
-      payload = buildExportArtifact({ workspaceRoot, topicId, deliverableId, contract, adapter });
-      break;
-    default:
-      throw new Error(`Unsupported ppt_deck route: ${route}`);
-  }
+  let payload = await buildRoutePayload({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+    route,
+    contract,
+    mode,
+    baselineDeliverableId,
+    adapter,
+    executionShape,
+    hermesProfile,
+    executorRouting,
+    deliverablePaths,
+  });
   payload = attachRouteReviewReset(payload, route);
   payload = appendArtifactRefs(
     payload,

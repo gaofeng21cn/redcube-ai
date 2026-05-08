@@ -128,94 +128,108 @@ def clearance_failures(block: Dict[str, Any]) -> List[Dict[str, Any]]:
     return failures
 
 
-def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
-    wrapper = info.get('wrapper', {}) or {}
-    blocks = [
+def review_blocks(info: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [
         block for block in (info.get('blocks', []) or [])
         if not is_decorative_surface_container(block)
     ]
-    audit_blocks = info.get('auditBlocks', []) or []
-    title_meta = info.get('titleMeta', {}) or {}
-    block_content_audit = info.get('blockContentAudit', {}) or {}
-    page_number_audit = info.get('pageNumberAudit', {}) or {'present': False}
-    issues: List[str] = []
-    overflow_free = (
+
+
+def overflow_is_free(info: Dict[str, Any]) -> bool:
+    wrapper = info.get('wrapper', {}) or {}
+    return (
         float(wrapper.get('scrollWidth', 0)) <= float(wrapper.get('clientWidth', 0)) + 1
         and float(wrapper.get('scrollHeight', 0)) <= float(wrapper.get('clientHeight', 0)) + 1
         and not bool(info.get('bodyScroll'))
     )
-    if not overflow_free:
-        issues.append('overflow_detected')
 
+
+def overlap_failures(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     overlaps = []
-    occlusion_free = True
     for index, block in enumerate(blocks):
         for other in blocks[index + 1:]:
             overlap_w, overlap_h, overlap_area = overlap_details(block, other)
-            if overlap_w > OVERLAP_PIXELS and overlap_h > OVERLAP_PIXELS:
-                smaller_area = max(1.0, min(float(block.get('area', 0)), float(other.get('area', 0))))
-                ratio = overlap_area / smaller_area
-                if ratio >= OVERLAP_RATIO:
-                    if should_ignore_overlap(block, other, ratio):
-                        continue
-                    overlaps.append({
-                        'a': block.get('id'),
-                        'b': other.get('id'),
-                        'ratio': round(ratio, 4),
-                    })
-    if overlaps:
-        occlusion_free = False
-        issues.append('occlusion_detected')
+            if overlap_w <= OVERLAP_PIXELS or overlap_h <= OVERLAP_PIXELS:
+                continue
+            smaller_area = max(1.0, min(float(block.get('area', 0)), float(other.get('area', 0))))
+            ratio = overlap_area / smaller_area
+            if ratio < OVERLAP_RATIO or should_ignore_overlap(block, other, ratio):
+                continue
+            overlaps.append({
+                'a': block.get('id'),
+                'b': other.get('id'),
+                'ratio': round(ratio, 4),
+            })
+    return overlaps
 
+
+def density_metrics(blocks: List[Dict[str, Any]], primary_points: int, max_primary_points: int) -> Dict[str, Any]:
     occupied_area = sum(float(block.get('area', 0)) for block in blocks)
     frame_area = FRAME_WIDTH * FRAME_HEIGHT
     occupied_ratio = clamp(occupied_area / frame_area if frame_area else 0.0, 0.0, 1.0)
-    primary_points = int(info.get('primaryPoints', 0) or 0)
-    visual_density_ok = MIN_DENSITY <= occupied_ratio <= MAX_DENSITY and primary_points <= max_primary_points
-    if not visual_density_ok:
-        issues.append('visual_density_out_of_range')
+    return {
+        'occupied_ratio': occupied_ratio,
+        'visual_density_ok': MIN_DENSITY <= occupied_ratio <= MAX_DENSITY and primary_points <= max_primary_points,
+    }
 
-    speaker_seconds = int(info.get('speakerSeconds', 0) or 0)
-    speaker_fit_ok = MIN_SPEAKER_SECONDS <= speaker_seconds <= MAX_SPEAKER_SECONDS and primary_points <= max_primary_points + 1
-    if not speaker_fit_ok:
-        issues.append('speaker_fit_out_of_range')
 
-    edge_failures = []
+def collect_edge_failures(audit_blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    failures = []
     for block in audit_blocks:
-        edge_failures.extend(clearance_failures(block))
-    edge_clearance_ok = len(edge_failures) == 0
-    if not edge_clearance_ok:
-        issues.append('edge_clearance_out_of_range')
+        failures.extend(clearance_failures(block))
+    return failures
 
+
+def issue_list(checks: Dict[str, bool]) -> List[str]:
+    issue_by_check = {
+        'overflow_free': 'overflow_detected',
+        'occlusion_free': 'occlusion_detected',
+        'visual_density_ok': 'visual_density_out_of_range',
+        'speaker_fit_ok': 'speaker_fit_out_of_range',
+        'edge_clearance_ok': 'edge_clearance_out_of_range',
+        'block_content_fit_ok': 'block_content_overflow_detected',
+    }
+    return [
+        issue
+        for check, issue in issue_by_check.items()
+        if not checks.get(check)
+    ]
+
+
+def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
+    blocks = review_blocks(info)
+    audit_blocks = info.get('auditBlocks', []) or []
+    title_meta = info.get('titleMeta', {}) or {}
+    block_content_audit = info.get('blockContentAudit', {}) or {}
+    page_number_audit = info.get('pageNumberAudit', {}) or {'present': False}
+    overlaps = overlap_failures(blocks)
+    primary_points = int(info.get('primaryPoints', 0) or 0)
+    density = density_metrics(blocks, primary_points, max_primary_points)
+    speaker_seconds = int(info.get('speakerSeconds', 0) or 0)
+    edge_failures = collect_edge_failures(audit_blocks)
     block_content_failures = block_content_audit.get('failures', []) or []
     block_content_occlusion_failures = [
         failure for failure in block_content_failures
         if failure.get('overflow_reason') == 'surface_text_targets_overlap'
     ]
-    if block_content_occlusion_failures:
-        occlusion_free = False
-        if 'occlusion_detected' not in issues:
-            issues.append('occlusion_detected')
-    block_content_fit_ok = len(block_content_failures) == 0
-    if not block_content_fit_ok:
-        issues.append('block_content_overflow_detected')
+    checks = {
+        'overflow_free': overflow_is_free(info),
+        'occlusion_free': not overlaps and not block_content_occlusion_failures,
+        'visual_density_ok': density['visual_density_ok'],
+        'speaker_fit_ok': MIN_SPEAKER_SECONDS <= speaker_seconds <= MAX_SPEAKER_SECONDS and primary_points <= max_primary_points + 1,
+        'edge_clearance_ok': len(edge_failures) == 0,
+        'block_content_fit_ok': len(block_content_failures) == 0,
+        'title_typography_ok': True,
+        'page_number_consistency_ok': True,
+    }
 
     return {
         'slide_id': info.get('slideId'),
         'title': info.get('title'),
         'layout_family': info.get('layoutFamily'),
-        'checks': {
-            'overflow_free': overflow_free,
-            'occlusion_free': occlusion_free,
-            'visual_density_ok': visual_density_ok,
-            'speaker_fit_ok': speaker_fit_ok,
-            'edge_clearance_ok': edge_clearance_ok,
-            'block_content_fit_ok': block_content_fit_ok,
-            'title_typography_ok': True,
-            'page_number_consistency_ok': True,
-        },
+        'checks': checks,
         'metrics': {
-            'occupied_ratio': round(occupied_ratio, 4),
+            'occupied_ratio': round(density['occupied_ratio'], 4),
             'primary_points': primary_points,
             'speaker_seconds': speaker_seconds,
             'overlaps': overlaps,
@@ -226,7 +240,7 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'title_block_id': title_meta.get('titleBlockId'),
             'page_number_audit': page_number_audit,
         },
-        'issues': issues,
+        'issues': issue_list(checks),
     }
 
 

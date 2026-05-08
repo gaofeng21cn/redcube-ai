@@ -406,7 +406,8 @@ function buildReviewOverlayStatus() {
     "stage_id: 'screenshot_review'",
     "requires_stages: ['visual_director_review']",
   ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts', [
-    "case 'visual_director_review':",
+    'visual_director_review: ({ contract, deliverablePaths, adapter }) => (',
+    'buildDirectorReview(contract, deliverablePaths, adapter)',
   ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stage-director-review.ts', [
     "review_overlay: 'visual_director_review'",
   ]);
