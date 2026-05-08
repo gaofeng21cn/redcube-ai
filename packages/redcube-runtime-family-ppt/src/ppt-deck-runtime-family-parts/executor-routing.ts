@@ -3,11 +3,11 @@
 export function createStructuredArtifactExecutor({
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_NATIVE_PROOF_ADAPTER,
+  HERMES_AGENT_ADAPTER,
   generateStructuredArtifactViaCodexCli,
   generateStructuredArtifactViaHermesAgentApi,
   generateStructuredArtifactViaHermesAgentStructuredCall,
-  generateStructuredArtifactViaHermesNativeProof,
+  generateStructuredArtifactViaHermesAgentLoop,
   isHermesAgentAdapter,
   safeText,
 }) {
@@ -32,6 +32,9 @@ export function createStructuredArtifactExecutor({
     executorRouting,
     ...input
   }) {
+    if (adapter === HERMES_AGENT_ADAPTER && safeText(executionShape) !== 'structured_call') {
+      return generateStructuredArtifactViaHermesAgentLoop(input);
+    }
     if (isHermesAgentAdapter(adapter)) {
       if (safeText(executionShape) === 'structured_call') {
         return generateStructuredArtifactViaHermesAgentStructuredCall({
@@ -46,8 +49,8 @@ export function createStructuredArtifactExecutor({
         executorRouting,
       });
     }
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-      return generateStructuredArtifactViaHermesNativeProof(input);
+    if (adapter === HERMES_AGENT_ADAPTER) {
+      return generateStructuredArtifactViaHermesAgentLoop(input);
     }
     return generateStructuredArtifactViaCodexCli(input);
   }

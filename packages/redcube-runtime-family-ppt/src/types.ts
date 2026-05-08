@@ -12,10 +12,10 @@ import type {
 import type { RelativeQualityRubric } from '@redcube/reference-os';
 import type {
   CodexExecutionModel,
-  HermesNativeProofExecutionModel,
-} from '@redcube/hermes-substrate';
+  HermesAgentLoopExecutionModel,
+} from '@redcube/runtime-protocol';
 
-export type PptRuntimeExecutionModel = CodexExecutionModel | HermesNativeProofExecutionModel;
+export type PptRuntimeExecutionModel = CodexExecutionModel | HermesAgentLoopExecutionModel;
 
 export type PptRuntimeRoute = PptDeckStageId;
 export type PptRuntimeMode = 'draft_new' | 'optimize_existing';

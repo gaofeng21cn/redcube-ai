@@ -13,8 +13,8 @@
 
 `service-safe domain entry -> executor adapter -> concrete executor -> audit / review / publication projection`
 
-当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`frontdesk`、`invoke`、`session continuation` 与 internal `OPL bridge` 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义。
-这里的 `frontdesk` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product frontdesk` 作为 legacy command key / compat command 保留，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
+当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`status`、`invoke`、`session continuation` 与 internal `OPL bridge` 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义。
+这里的 `status` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 作为 legacy command key / compat command 保留，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
@@ -30,7 +30,7 @@
 当前这条主线需要区分三层入口：
 
 - `direct product entry`
-  - 第一公开主语是单一 `redcube-ai` app skill；`CLI` / `MCP` 提供可验证协议入口，`frontdesk` 只作为 skill 下的 machine-readable product-entry overview / intake / entry-shell contract，`session` 负责续跑
+  - 第一公开主语是单一 `redcube-ai` app skill；`CLI` / `MCP` 提供可验证协议入口，`status` 只作为 skill 下的 machine-readable product-entry overview / intake / entry-shell contract，`session` 负责续跑
 - `internal OPL handoff`
   - 给 `OPL Runtime Manager` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 internal bridge / integration surface
 - `future managed product shell`
@@ -91,7 +91,7 @@
 
 - 默认 agent execution lane
 - 受保护创作 stage 的结构化生成执行
-- 作为 `host_agent` adapter 的 concrete runtime
+- 作为 `codex_cli` adapter 的 concrete runtime
 
 `RedCube AI` 自己继续持有：
 
@@ -103,8 +103,8 @@
 当前 executor-adapter contract 也已经冻结成统一口径：
 
 - public executor backend 固定为 `codex_cli` 与 `hermes_agent`
-  - 旧内部 `host_agent` 只作为 `codex_cli` 的 adapter 兼容名保留
-  - 旧内部 `hermes_native_proof` 只作为 `hermes_agent` full-agent-loop proof adapter 保留
+  - active surfaces 不保留退役 adapter alias
+  - `hermes_agent` 只表示显式 full-agent-loop proof backend
 - `execution_shape` 固定为 `structured_call` 与 `agent_loop`
   - 显式 HTML route 的 `render_html` 默认 `structured_call`
   - 显式 HTML repair route 的 `fix_html` 默认先 `structured_call`，复审仍要求回修时最多升级一次 `hermes_agent + agent_loop`
@@ -114,7 +114,7 @@
 - 备选 proof backend 是 `hermes_agent`
   - 只有 caller 显式传 Hermes proof adapter，或 `fix_html` escalation policy 触发时才会启用
   - 当前已经对齐到 `ppt_deck`、`xiaohongshu`、`poster_onepager` 三个 family
-  - 底层不是单轮 chat relay，而是 `@redcube/hermes-substrate -> hermes_native_proof_bridge.py -> run_agent.AIAgent.run_conversation`
+  - 底层不是单轮 chat relay，而是 external Hermes-Agent loop bridge
   - 默认 model / reasoning 继承本机 Hermes 默认配置，不在 repo 内 pin 死
 
 这意味着 RedCube 现在的 family runtime 并不是“写死 Codex-only”，而是：
@@ -125,7 +125,7 @@
 
 - `runtime family contract` 继续定义 route、artifact、review surface 与 visual-domain truth
 - `executor adapter` 只负责把这些 contract 下沉到具体执行器
-- 默认主线仍是 Codex CLI；Hermes-native 先作为 opt-in proof lane 保持可选，不提前替换默认
+- 默认主线仍是 Codex CLI；Hermes-Agent loop 先作为 opt-in proof lane 保持可选，不提前替换默认
 
 `ppt_deck` runtime family 的 core 现在也按这个边界组织：`core.ts` 保留 route / lifecycle / visual-domain assembly，execution adapter、creative owner/source stamp、primary surface 和 structured artifact batch/executor helper 进入 `ppt-deck-runtime-family-parts/execution-adapters.ts`。这让 core 不再直接承载 executor/backend 分支，同时保持 public route、payload shape 和 runtime-family contract 不变。
 
@@ -140,7 +140,7 @@
 更准确的目标是：
 
 - 由 `RedCube AI` 统一稳定 capability surface 与 visual-domain truth
-- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-native` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
+- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-Agent loop` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
 - 由 `OPL Runtime Manager` 统一 federated 长期托管、状态索引、doctor/repair/resume 与 native helper catalog；未来自有 sidecar 只有在外部 `Hermes-Agent` 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
 
 ## Language Target

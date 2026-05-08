@@ -25,14 +25,14 @@ import {
   startMockCodexCli,
   withEnv,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   MOCK_REDCUBE_PYTHON_COMMAND,
   readJson,
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('managed execution keeps poster_onepager on the guarded knowledge-poster closure without drifting direct-delivery truth', async () => {
@@ -129,7 +129,7 @@ test('managed execution keeps poster_onepager on the guarded knowledge-poster cl
   assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
   assert.equal(audit.gate_summary.operator_handoff_status, 'ready');
   assert.equal(audit.gate_summary.delivery_projection_current, 'output_ready');
-  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
+  assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
 
   assert.equal(watch.run_id, result.managed_run.route_runs.at(-1).route_run_id);
   assert.equal(watch.review_state.current_status, review.state.current_status);

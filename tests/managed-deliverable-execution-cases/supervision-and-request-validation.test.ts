@@ -25,14 +25,14 @@ import {
   startMockCodexCli,
   withEnv,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   MOCK_REDCUBE_PYTHON_COMMAND,
   readJson,
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('managed supervision marks a stale active route run instead of reporting it as live', async () => {
@@ -55,7 +55,7 @@ test('managed supervision marks a stale active route run instead of reporting it
     target: 'deck-a',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
-    executor: { adapter: 'host_agent', execution_surface: 'codex_native_host_agent' },
+    executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
   });
   const activeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${activeRun.run_id}.json`);
   const staleActiveRun = readJson(activeRunFile);
@@ -69,7 +69,7 @@ test('managed supervision marks a stale active route run instead of reporting it
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     userIntent: '继续完成 PPT',
-    adapter: 'host_agent',
+    adapter: 'codex_cli',
   });
   managedRun.status = 'running';
   managedRun.current_stage = 'render_html';

@@ -6,29 +6,28 @@ import {
 import {
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_DEFAULT_ADAPTER,
-  HERMES_NATIVE_PROOF_ADAPTER,
+  HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
   buildHermesExecutionModel,
-  buildHermesNativeProofExecutionModel,
+  buildHermesAgentLoopExecutionModel,
   generateStructuredArtifactViaHermesAgentApi,
   generateStructuredArtifactViaHermesAgentStructuredCall,
-  generateStructuredArtifactViaHermesNativeProof,
-} from '@redcube/hermes-substrate';
+  generateStructuredArtifactViaHermesAgentLoop,
+} from '@redcube/runtime-protocol';
 import { createStructuredArtifactExecutor } from './executor-routing.js';
 
 export function createPptDeckExecutionAdapterParts({ safeText }) {
   const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
   const HERMES_AGENT_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
-  const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
+  const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());
 
   function isHermesAgentAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
     const requested = safeText(adapter);
-    return requested === HERMES_DEFAULT_ADAPTER || requested === HERMES_AGENT_EXECUTOR_BACKEND;
+    return requested === HERMES_AGENT_EXECUTOR_BACKEND;
   }
 
   function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) return HERMES_NATIVE_PROOF_EXECUTION_MODEL;
+    if (adapter === HERMES_AGENT_ADAPTER) return HERMES_AGENT_LOOP_EXECUTION_MODEL;
     if (isHermesAgentAdapter(adapter)) return HERMES_AGENT_EXECUTION_MODEL;
     return CODEX_EXECUTION_MODEL;
   }
@@ -43,16 +42,16 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
       }
       return HERMES_AGENT_EXECUTOR_BACKEND;
     }
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    if (adapter === HERMES_AGENT_ADAPTER) {
       if (safeText(generationRuntime?.creative_owner)) {
         return safeText(generationRuntime.creative_owner);
       }
       if (safeText(generationRuntime?.owner)) {
         return safeText(generationRuntime.owner);
       }
-      return HERMES_NATIVE_PROOF_ADAPTER;
+      return HERMES_AGENT_ADAPTER;
     }
-    return 'host_agent';
+    return 'codex_cli';
   }
 
   function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
@@ -65,9 +64,9 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
     if (isHermesAgentAdapter(adapter)) {
       return 'hermes_agent_api_server';
     }
-    return adapter === HERMES_NATIVE_PROOF_ADAPTER
-      ? 'hermes_native_full_agent_loop'
-      : 'codex_native_host_agent';
+    return adapter === HERMES_AGENT_ADAPTER
+      ? 'hermes_agent_loop'
+      : 'codex_cli_runtime';
   }
 
   function runtimeCreativeSource(
@@ -120,11 +119,11 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
   const generateStructuredArtifact = createStructuredArtifactExecutor({
     CODEX_DEFAULT_ADAPTER,
     HERMES_AGENT_EXECUTOR_BACKEND,
-    HERMES_NATIVE_PROOF_ADAPTER,
+    HERMES_AGENT_ADAPTER,
     generateStructuredArtifactViaCodexCli,
     generateStructuredArtifactViaHermesAgentApi,
     generateStructuredArtifactViaHermesAgentStructuredCall,
-    generateStructuredArtifactViaHermesNativeProof,
+    generateStructuredArtifactViaHermesAgentLoop,
     isHermesAgentAdapter,
     safeText,
   });
@@ -166,10 +165,10 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
         },
       };
     }
-    if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+    if (adapter === HERMES_AGENT_ADAPTER) {
       const data = [];
       for (const stage of stages) {
-        const result = await generateStructuredArtifactViaHermesNativeProof(stage);
+        const result = await generateStructuredArtifactViaHermesAgentLoop(stage);
         data.push({
           stage_id: safeText(stage?.stage_id),
           data: result.data,
@@ -179,7 +178,7 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
       return {
         data,
         batchRuntime: {
-          owner: HERMES_NATIVE_PROOF_ADAPTER,
+          owner: HERMES_AGENT_ADAPTER,
           session_pool: {
             reuse_supported: false,
             reuse_claimed: false,
@@ -195,7 +194,7 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
   return {
     CODEX_DEFAULT_ADAPTER,
     HERMES_AGENT_EXECUTOR_BACKEND,
-    HERMES_NATIVE_PROOF_ADAPTER,
+    HERMES_AGENT_ADAPTER,
     creativeExecution,
     creativeSourceStamp,
     executionModelForAdapter,

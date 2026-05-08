@@ -215,7 +215,7 @@
     },
     "deployment_host": "codex_local_operator_host",
     "deployment_host_status": "active_primary",
-    "host_agent_longterm_owner": false,
+    "codex_cli_longterm_owner": false,
     "phase_id": "repo_verified_product_entry_and_opl_federation",
     "phase_label": "Repo-Verified Product Entry And OPL Federation",
     "workstream": "repo_verified_product_entry_and_opl_federation",
@@ -420,7 +420,7 @@
         },
         "operator_ux": {
           "status": "landed",
-          "manifest_frontdesk_session_surfaces": [
+          "manifest_status_session_surfaces": [
             "image_first_proof_readiness",
             "style_reference_summary",
             "cache_status",
@@ -511,7 +511,7 @@
             "artifacts": [
               "doctor.json",
               "product-manifest.json",
-              "product-frontdesk.json",
+              "product-status.json",
               "native-helper-output.json",
               "proof-summary.json",
               "artifact-index.json",
@@ -857,7 +857,7 @@
         "route_equivalence": {
           "status": "repo_tracked_manifest_contract",
           "routes": [
-            "product_frontdesk",
+            "product_status",
             "product_invoke",
             "session_continuation",
             "internal_opl_bridge"

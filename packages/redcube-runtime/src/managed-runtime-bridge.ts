@@ -1,20 +1,20 @@
 // @ts-nocheck
 import {
   CODEX_DEFAULT_ADAPTER,
-  HERMES_NATIVE_PROOF_ADAPTER,
-  probeHermesNativeProof,
-} from '@redcube/hermes-substrate';
+  HERMES_AGENT_ADAPTER,
+  probeHermesAgentLoop,
+} from '@redcube/runtime-protocol';
 import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
 
 import { safeText } from './managed-run-shared.js';
 
 export function assertSupportedManagedAdapter(adapter) {
   const requestedAdapter = safeText(adapter);
-  if (!requestedAdapter || requestedAdapter === CODEX_DEFAULT_ADAPTER || requestedAdapter === 'hermes') {
+  if (!requestedAdapter || requestedAdapter === CODEX_DEFAULT_ADAPTER) {
     return CODEX_DEFAULT_ADAPTER;
   }
-  if (requestedAdapter === HERMES_NATIVE_PROOF_ADAPTER) {
-    return HERMES_NATIVE_PROOF_ADAPTER;
+  if (requestedAdapter === HERMES_AGENT_ADAPTER) {
+    return HERMES_AGENT_ADAPTER;
   }
   throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
 }
@@ -23,8 +23,8 @@ export function assertSupportedManagedAdapter(adapter) {
  * @returns {Promise<Record<string, any>>}
  */
 export async function probeRequestedRuntime(adapter, workspaceRoot): Promise<Record<string, any>> {
-  if (safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER) {
-    return probeHermesNativeProof({ cwd: workspaceRoot });
+  if (safeText(adapter) === HERMES_AGENT_ADAPTER) {
+    return probeHermesAgentLoop({ cwd: workspaceRoot });
   }
 
   const codexContract = readCodexCliContract();
@@ -42,11 +42,11 @@ export async function probeRequestedRuntime(adapter, workspaceRoot): Promise<Rec
  * @returns {Record<string, any>}
  */
 export function runtimeBridgeFromProbe(adapter, probeResult): Record<string, any> {
-  if (safeText(adapter) === HERMES_NATIVE_PROOF_ADAPTER) {
+  if (safeText(adapter) === HERMES_AGENT_ADAPTER) {
     const contract = probeResult?.contract || {};
     return {
-      owner: HERMES_NATIVE_PROOF_ADAPTER,
-      adapter_surface: '@redcube/hermes-substrate',
+      owner: HERMES_AGENT_ADAPTER,
+      adapter_surface: '@redcube/runtime-protocol',
       model_selection: contract.model_selection,
       reasoning_selection: contract.reasoning_selection,
       model: contract.model,

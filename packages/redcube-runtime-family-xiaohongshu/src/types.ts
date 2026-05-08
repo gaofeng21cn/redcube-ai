@@ -7,10 +7,10 @@ import type {
 } from '@redcube/pack-xiaohongshu';
 import type {
   CodexExecutionModel,
-  HermesNativeProofExecutionModel,
-} from '@redcube/hermes-substrate';
+  HermesAgentLoopExecutionModel,
+} from '@redcube/runtime-protocol';
 
-export type XhsRuntimeExecutionModel = CodexExecutionModel | HermesNativeProofExecutionModel;
+export type XhsRuntimeExecutionModel = CodexExecutionModel | HermesAgentLoopExecutionModel;
 
 export type XhsRuntimeRoute =
   | 'research'

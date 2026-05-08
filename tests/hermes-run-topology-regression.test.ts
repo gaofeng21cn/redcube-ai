@@ -126,7 +126,7 @@ test('completeHermesRun keeps Codex runtime topology for Codex-native executor',
   });
 
   assert.equal(completed.runtime_topology.runtime_substrate_owner, 'Codex CLI');
-  assert.equal(completed.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
+  assert.equal(completed.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
   assert.equal(completed.runtime_topology.deployment_host_status, 'active_primary');
 });
 
@@ -152,7 +152,7 @@ test('failHermesRun keeps Codex runtime topology for Codex-native executor', () 
   });
 
   assert.equal(failed.runtime_topology.runtime_substrate_owner, 'Codex CLI');
-  assert.equal(failed.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
+  assert.equal(failed.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
   assert.equal(failed.runtime_topology.deployment_host_status, 'active_primary');
 });
 

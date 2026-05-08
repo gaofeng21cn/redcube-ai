@@ -28,7 +28,7 @@ export interface RuntimeRunRecord {
 
 export type RuntimeExecutorBackend = 'codex_cli' | 'hermes_agent';
 export type RuntimeExecutionShape = 'structured_call' | 'agent_loop';
-export type RuntimeManagedRunAdapter = 'hermes' | 'host_agent' | 'hermes_native_proof' | RuntimeExecutorBackend;
+export type RuntimeManagedRunAdapter = 'codex_cli' | 'hermes_agent' | RuntimeExecutorBackend;
 
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];
@@ -65,16 +65,16 @@ export interface RuntimeCreativeOwnershipExecutionContract {
   milestone: 'P19.A';
   tracking_model: 'unified_lifecycle';
   primary_executor: {
-    adapter: 'host_agent';
-    runtime: 'codex_native_host_agent';
+    adapter: 'codex_cli';
+    runtime: 'codex_cli_runtime';
     status: 'formal_primary_executor';
   };
   adapter_roles: {
-    host_agent: 'formal_primary_executor';
+    codex_cli: 'formal_primary_executor';
   };
   proof_executor: {
-    adapter: 'hermes_native_proof';
-    runtime: 'hermes_native_full_agent_loop';
+    adapter: 'hermes_agent';
+    runtime: 'hermes_agent_loop';
     status: 'opt_in_proof_executor';
   };
   protected_creative_routes: {
@@ -140,10 +140,10 @@ export interface RuntimeCreativeOwnershipAudit {
   closeout_ready: true;
   tracking_model: 'unified_lifecycle';
   shared_execution_contract: {
-    primary_adapter: 'host_agent';
-    primary_runtime: 'codex_native_host_agent';
-    proof_executor: 'hermes_native_proof';
-    proof_runtime: 'hermes_native_full_agent_loop';
+    primary_adapter: 'codex_cli';
+    primary_runtime: 'codex_cli_runtime';
+    proof_executor: 'hermes_agent';
+    proof_runtime: 'hermes_agent_loop';
     freeze_origin_milestone: 'P19.A';
     mainline_topology: string[];
   };
@@ -201,10 +201,10 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
   completed_milestones: Array<'P19.A' | 'P19.B' | 'P19.C'>;
   closeout_ready: true;
   execution_model: {
-    mainline_adapter: 'host_agent';
-    primary_surface: 'codex_native_host_agent';
+    mainline_adapter: 'codex_cli';
+    primary_surface: 'codex_cli_runtime';
     adapter_role: 'primary_creative_executor';
-    proof_executor: 'hermes_native_proof';
+    proof_executor: 'hermes_agent';
     freeze_origin_milestone: 'P19.A';
   };
   unified_lifecycle: {

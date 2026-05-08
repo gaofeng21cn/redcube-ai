@@ -24,7 +24,7 @@ test('native PPT proof artifact index fixture preserves every proof surface', ()
   for (const artifactId of [
     'doctor_json',
     'product_manifest_json',
-    'product_frontdesk_json',
+    'product_status_json',
     'native_helper_output_json',
     'proof_summary_json',
     'editable_pptx',

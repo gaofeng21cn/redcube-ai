@@ -49,7 +49,7 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(deliverable?.description.includes('deliverable lifecycle execution'), true);
   assert.equal(review?.description.includes('deliverable boundary'), true);
   assert.equal(review?.description.includes('runtime watch'), true);
-  assert.equal(productEntry?.description.includes('frontdesk'), true);
+  assert.equal(productEntry?.description.includes('status'), true);
   assert.equal(productEntry?.description.includes('preflight'), true);
   assert.equal(productEntry?.description.includes('product-entry'), true);
   assert.equal(Object.hasOwn(review?.inputSchema || {}, 'runId'), true);
@@ -357,9 +357,9 @@ test('stdio MCP server exposes current product-entry overview surfaces', async (
     const productEntryTool = tools.tools.find((tool) => tool.name === 'redcube_product_entry');
     assert.ok(productEntryTool);
 
-    const frontdesk = await client.callTool({
+    const status = await client.callTool({
       name: 'redcube_product_entry',
-      arguments: withAction('get_product_frontdesk', { workspaceRoot }),
+      arguments: withAction('get_product_status', { workspaceRoot }),
     });
     const start = await client.callTool({
       name: 'redcube_product_entry',
@@ -370,9 +370,9 @@ test('stdio MCP server exposes current product-entry overview surfaces', async (
       arguments: withAction('get_product_preflight', { workspaceRoot }),
     });
 
-    assert.equal(frontdesk.isError, undefined);
-    assert.equal(frontdesk.structuredContent.surface_kind, 'product_frontdesk');
-    assert.equal(frontdesk.structuredContent.frontdesk_surface.command, 'redcube product frontdesk');
+    assert.equal(status.isError, undefined);
+    assert.equal(status.structuredContent.surface_kind, 'product_status');
+    assert.equal(status.structuredContent.status_surface.command, 'redcube product status');
     assert.equal(start.isError, undefined);
     assert.equal(start.structuredContent.surface_kind, 'product_entry_start');
     assert.equal(start.structuredContent.workspace_locator.workspace_root, workspaceRoot);

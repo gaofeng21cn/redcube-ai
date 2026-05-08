@@ -34,7 +34,6 @@ export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/direct-delivery-operator-handoff.test.ts',
   'tests/family-parity-governance-surface.test.ts',
   'tests/family-source-truth-consumption.test.ts',
-  'tests/hermes-runtime-canonical-path.test.ts',
   'tests/managed-deliverable-execution.test.ts',
   'tests/poster-creative-ownership.test.ts',
   'tests/ppt-creative-ownership.test.ts',

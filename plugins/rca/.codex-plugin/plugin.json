@@ -30,7 +30,7 @@
     "composerIcon": "./assets/icon.png",
     "logo": "./assets/icon.png",
     "defaultPrompt": [
-      "Open the RedCube AI frontdesk for this workspace.",
+      "Open the RedCube AI status for this workspace.",
       "Inspect the current RedCube product-entry manifest.",
       "Continue the active RedCube deliverable loop in the same entry session."
     ],

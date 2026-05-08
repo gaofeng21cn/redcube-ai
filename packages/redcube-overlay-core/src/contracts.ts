@@ -203,7 +203,7 @@ export function validateGovernanceSurfaceContract(content: JsonObject): boolean 
     && formalEntry.internal_controller_surface === 'controller'
     && formalEntry.controller_repo_verified === false
     && runtimeTopology.runtime_substrate_owner === 'Codex CLI'
-    && runtimeTopology.runtime_substrate_surface === 'codex_native_host_agent'
+    && runtimeTopology.runtime_substrate_surface === 'codex_cli_runtime'
     && runtimeTopology.deployment_host === 'codex_local_operator_host'
     && runtimeTopology.deployment_host_status === 'active_primary'
     && runtimeTopology.default_formal_entry === 'CLI'

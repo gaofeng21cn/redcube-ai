@@ -79,8 +79,8 @@ function optionalString(value: unknown): string {
 
 function normalizeExecutorBackend(value: unknown, fieldName = 'executor_backend'): RedcubeExecutorBackend {
   const text = optionalString(value);
-  if (!text || text === 'host_agent' || text === CODEX_DEFAULT_BACKEND) return CODEX_DEFAULT_BACKEND;
-  if (text === 'hermes' || text === 'hermes_native_proof' || text === HERMES_AGENT_BACKEND) {
+  if (!text || text === 'codex_cli' || text === CODEX_DEFAULT_BACKEND) return CODEX_DEFAULT_BACKEND;
+  if (text === 'hermes_agent' || text === HERMES_AGENT_BACKEND) {
     return HERMES_AGENT_BACKEND;
   }
   throw new Error(`Unsupported RCA executor backend in ${fieldName}: ${text}`);
@@ -98,7 +98,7 @@ function normalizeExecutionShape(
 }
 
 function adapterForBackend(backend: RedcubeExecutorBackend): string {
-  return backend === HERMES_AGENT_BACKEND ? HERMES_AGENT_BACKEND : 'host_agent';
+  return backend === HERMES_AGENT_BACKEND ? HERMES_AGENT_BACKEND : 'codex_cli';
 }
 
 function selectionForBackend({
@@ -125,18 +125,18 @@ function selectionForBackend({
 
 function selectionForRequestedAdapter(adapter: string): RedcubeExecutorSelection {
   const requested = optionalString(adapter);
-  if (!requested || requested === 'host_agent' || requested === CODEX_DEFAULT_BACKEND) {
+  if (!requested || requested === 'codex_cli' || requested === CODEX_DEFAULT_BACKEND) {
     return selectionForBackend({
       backend: CODEX_DEFAULT_BACKEND,
       executionShape: STRUCTURED_CALL_SHAPE,
       source: 'request_explicit_executor',
-      adapter: 'host_agent',
+      adapter: 'codex_cli',
     });
   }
-  if (requested === 'hermes' || requested === 'hermes_native_proof' || requested === HERMES_AGENT_BACKEND) {
+  if (requested === 'hermes_agent' || requested === HERMES_AGENT_BACKEND) {
     return selectionForBackend({
       backend: HERMES_AGENT_BACKEND,
-      executionShape: requested === 'hermes_native_proof' ? AGENT_LOOP_SHAPE : normalizeExecutionShape(null, HERMES_AGENT_BACKEND),
+      executionShape: AGENT_LOOP_SHAPE,
       source: 'request_explicit_executor',
       adapter: requested,
     });

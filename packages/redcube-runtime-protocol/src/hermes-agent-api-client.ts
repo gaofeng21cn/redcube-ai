@@ -195,7 +195,7 @@ function buildProof({
   return {
     proof_id: `hermes-agent-api-${randomUUID()}`,
     runtime_owner: HERMES_AGENT_API_OWNER,
-    adapter_surface: '@redcube/hermes-substrate',
+    adapter_surface: '@redcube/runtime-protocol',
     api_surface: HERMES_AGENT_API_SURFACE,
     call_surface: callSurface,
     endpoint,
@@ -412,7 +412,7 @@ function buildGenerationRuntime({
 }) {
   return {
     owner: 'hermes_agent',
-    adapter_surface: '@redcube/hermes-substrate',
+    adapter_surface: '@redcube/runtime-protocol',
     api_surface: HERMES_AGENT_API_SURFACE,
     run_id: safeText(proof.run_id, `hermes-agent-${randomUUID()}`),
     session_id: safeText(proof.session_id) || null,

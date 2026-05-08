@@ -9,12 +9,12 @@ function safeArray(value) {
 }
 
 function creativeOwner(generationRuntime = null) {
-  const owner = safeText(generationRuntime?.creative_owner, 'host_agent');
-  return owner === 'codex_cli' ? 'host_agent' : owner;
+  const owner = safeText(generationRuntime?.creative_owner, 'codex_cli');
+  return owner === 'codex_cli' ? 'codex_cli' : owner;
 }
 
 function primarySurface(generationRuntime = null) {
-  return safeText(generationRuntime?.primary_surface, 'codex_native_host_agent');
+  return safeText(generationRuntime?.primary_surface, 'codex_cli_runtime');
 }
 
 function creativeExecution(lifecycleStage, generationRuntime = null) {

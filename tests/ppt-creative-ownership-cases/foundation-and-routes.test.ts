@@ -574,27 +574,27 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
     }
 
     const storyline = readJson(results[0].artifactFile);
-    assert.equal(storyline.creative_execution?.owner, 'host_agent');
+    assert.equal(storyline.creative_execution?.owner, 'codex_cli');
     assert.equal(storyline.creative_execution?.lifecycle_stage, 'story_architecture');
     assert.equal(storyline.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(storyline.storyline.creative_sources?.core_metaphor?.materialized_from, 'codex_cli_json_output');
     assert.equal(storyline.storyline.creative_sources?.narrative_arc?.materialized_from, 'codex_cli_json_output');
 
     const outline = readJson(results[1].artifactFile);
-    assert.equal(outline.creative_execution?.owner, 'host_agent');
+    assert.equal(outline.creative_execution?.owner, 'codex_cli');
     assert.equal(outline.creative_execution?.lifecycle_stage, 'story_architecture');
     assert.equal(outline.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      outline.detailed_outline.slides.every((slide) => slide.creative_authorship?.major_text?.owner === 'host_agent'),
+      outline.detailed_outline.slides.every((slide) => slide.creative_authorship?.major_text?.owner === 'codex_cli'),
       true,
     );
 
     const blueprint = readJson(results[2].artifactFile);
-    assert.equal(blueprint.creative_execution?.owner, 'host_agent');
+    assert.equal(blueprint.creative_execution?.owner, 'codex_cli');
     assert.equal(blueprint.creative_execution?.lifecycle_stage, 'story_architecture');
     assert.equal(blueprint.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.page_core_content?.owner === 'host_agent'),
+      blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.page_core_content?.owner === 'codex_cli'),
       true,
     );
     assert.equal(
@@ -602,23 +602,23 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
       true,
     );
     assert.equal(
-      blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.speaker_notes?.owner === 'host_agent'),
+      blueprint.slide_blueprint.slides.every((slide) => slide.creative_authorship?.speaker_notes?.owner === 'codex_cli'),
       true,
     );
 
     const visual = readJson(results[3].artifactFile);
-    assert.equal(visual.creative_execution?.owner, 'host_agent');
+    assert.equal(visual.creative_execution?.owner, 'codex_cli');
     assert.equal(visual.creative_execution?.lifecycle_stage, 'visual_authorship');
     assert.equal(visual.creative_execution?.generation_runtime?.owner, 'codex_cli');
-    assert.equal(visual.visual_direction?.creative_authorship?.visual_direction?.owner, 'host_agent');
+    assert.equal(visual.visual_direction?.creative_authorship?.visual_direction?.owner, 'codex_cli');
     assert.equal(visual.visual_direction?.creative_authorship?.visual_direction?.materialized_from, 'codex_cli_json_output');
 
     const render = readJson(results[4].artifactFile);
-    assert.equal(render.creative_execution?.owner, 'host_agent');
+    assert.equal(render.creative_execution?.owner, 'codex_cli');
     assert.equal(render.creative_execution?.lifecycle_stage, 'visual_authorship');
     assert.equal(render.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.owner === 'host_agent'),
+      render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.owner === 'codex_cli'),
       true,
     );
     assert.equal(
@@ -627,7 +627,7 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
     );
 
     const directorReview = readJson(results[5].artifactFile);
-    assert.equal(directorReview.review_execution?.owner, 'host_agent');
+    assert.equal(directorReview.review_execution?.owner, 'codex_cli');
     assert.equal(directorReview.review_execution?.overlay, 'visual_director_review');
     assert.equal(directorReview.review_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(directorReview.visual_director_review?.review_model, 'director_first_visual_judgement');
@@ -635,7 +635,7 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
 
     const screenshotReview = readJson(results[6].artifactFile);
     assert.equal(screenshotReview.review_overlay, 'screenshot_review');
-    assert.equal(screenshotReview.review_execution?.owner, 'host_agent');
+    assert.equal(screenshotReview.review_execution?.owner, 'codex_cli');
     assert.equal(screenshotReview.review_execution?.overlay, 'screenshot_review');
     assert.equal(screenshotReview.review_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(screenshotReview.ai_review?.review_model, 'screenshot_director_first_visual_judgement');

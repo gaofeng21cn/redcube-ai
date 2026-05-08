@@ -82,16 +82,6 @@
       ]
     },
     {
-      "directory": "packages/redcube-hermes-substrate",
-      "package_name": "@redcube/hermes-substrate",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
       "directory": "packages/redcube-overlay-core",
       "package_name": "@redcube/overlay-core",
       "exports": [

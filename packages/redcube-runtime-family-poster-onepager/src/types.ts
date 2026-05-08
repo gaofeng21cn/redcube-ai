@@ -11,10 +11,10 @@ import type {
 } from '@redcube/pack-poster-onepager';
 import type {
   CodexExecutionModel,
-  HermesNativeProofExecutionModel,
-} from '@redcube/hermes-substrate';
+  HermesAgentLoopExecutionModel,
+} from '@redcube/runtime-protocol';
 
-export type PosterRuntimeExecutionModel = CodexExecutionModel | HermesNativeProofExecutionModel;
+export type PosterRuntimeExecutionModel = CodexExecutionModel | HermesAgentLoopExecutionModel;
 
 export type PosterRuntimeRoute = PosterOnepagerStageId;
 export type PosterRuntimeMode = 'draft_new' | 'optimize_existing';

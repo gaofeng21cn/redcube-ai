@@ -136,10 +136,10 @@ test('pack source types do not encode executor-owner provenance strings', () => 
     'packages/redcube-pack-xiaohongshu/src',
   ];
   const bannedExecutorOwnerStrings = [
-    'host_agent',
+    'codex_cli',
     'hermes',
     'codex_cli_json_output',
-    'codex_native_host_agent',
+    'codex_cli_runtime',
   ];
   const violations = [];
 

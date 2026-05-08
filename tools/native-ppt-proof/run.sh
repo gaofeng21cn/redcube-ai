@@ -15,7 +15,7 @@ Usage: tools/native-ppt-proof/run.sh [--output-dir <dir>] [--skip-system-deps]
 Runs the repo-owned native PPT proof lane:
   1. optional native proof dependency install
   2. Python native helper doctor
-  3. product-entry manifest/frontdesk smoke
+  3. product-entry manifest/status smoke
   4. true LibreOffice/Poppler native PPT fixture proof
 
 Set REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1 to skip tools/native-ppt-proof/install-deps.sh.
@@ -80,7 +80,7 @@ workspace_root="$output_root/workspace"
 fixture_input="$output_root/native-helper-input.json"
 doctor_report="$output_root/doctor.json"
 manifest_report="$output_root/product-manifest.json"
-frontdesk_report="$output_root/product-frontdesk.json"
+status_report="$output_root/product-status.json"
 helper_report="$output_root/native-helper-output.json"
 summary_report="$output_root/proof-summary.json"
 artifact_index_report="$output_root/artifact-index.json"
@@ -101,8 +101,8 @@ PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
 node apps/redcube-cli/dist/cli.js product manifest \
   --workspace-root "$workspace_root" > "$manifest_report"
 
-node apps/redcube-cli/dist/cli.js product frontdesk \
-  --workspace-root "$workspace_root" > "$frontdesk_report"
+node apps/redcube-cli/dist/cli.js product status \
+  --workspace-root "$workspace_root" > "$status_report"
 
 "$proof_python" - "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" "$fixture_input" <<'PY'
 import json
@@ -134,14 +134,14 @@ PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
     --engine-contract "$repo_root/contracts/runtime-program/ppt-native-python-engine-contract.json" \
     > "$helper_report"
 
-"$proof_python" - "$doctor_report" "$manifest_report" "$frontdesk_report" "$helper_report" "$summary_report" <<'PY'
+"$proof_python" - "$doctor_report" "$manifest_report" "$status_report" "$helper_report" "$summary_report" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 doctor = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 manifest = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-frontdesk = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
+status = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
 helper = json.loads(Path(sys.argv[4]).read_text(encoding="utf-8"))
 summary_file = Path(sys.argv[5])
 
@@ -151,8 +151,8 @@ proof_lane = (
     .get("ppt_deck", {})
     .get("native_ppt_proof_lane", {})
 )
-frontdesk_lane = (
-    frontdesk.get("product_entry_manifest", {})
+status_lane = (
+    status.get("product_entry_manifest", {})
     .get("deliverable_facade", {})
     .get("family_route_policy", {})
     .get("ppt_deck", {})
@@ -169,8 +169,8 @@ if proof_lane.get("default_enabled") is not False:
     failures.append("product-entry native proof lane must remain default_enabled=false")
 if proof_lane.get("runnable_routes") != ["author_pptx_native", "repair_pptx_native"]:
     failures.append("product-entry native proof lane runnable routes mismatch")
-if frontdesk_lane.get("default_enabled") is not False:
-    failures.append("frontdesk native proof lane must remain default_enabled=false")
+if status_lane.get("default_enabled") is not False:
+    failures.append("status native proof lane must remain default_enabled=false")
 if helper.get("status") != "completed":
     failures.append(f"native helper status is {helper.get('status')!r}")
 if render_proof.get("renderer_kind") != "libreoffice_headless":

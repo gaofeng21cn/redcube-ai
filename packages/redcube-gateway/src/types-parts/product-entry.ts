@@ -151,7 +151,7 @@ export interface ProductEntryStartCompanion {
 export interface ProductEntryOverviewCompanion {
   surface_kind: 'product_entry_overview' | string;
   summary: string;
-  frontdesk_command: string;
+  status_command: string;
   recommended_command: string;
   operator_loop_command: string;
   progress_surface?: {
@@ -461,8 +461,8 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     workspace_root: string;
   };
   recommended_shell: 'direct' | 'opl_bridge' | 'session' | string;
-  frontdesk_surface: {
-    shell_key: 'frontdesk' | string;
+  status_surface: {
+    shell_key: 'status' | string;
     command: string;
     surface_kind: string;
     summary: string;
@@ -511,10 +511,10 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     fail_closed_rules: string[];
   };
   product_entry_shell: {
-    frontdesk: {
+    status: {
       command: string;
       command_template: string;
-      surface_kind: 'product_frontdesk' | string;
+      surface_kind: 'product_status' | string;
     };
     direct: {
       command: string;
@@ -669,9 +669,9 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
   notes: string[];
 }
 
-export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk'> {
+export interface ProductStatusResponse extends SurfaceBase<'product_status'> {
   target_domain_id: string;
-  frontdesk_surface: ProductEntryManifestResponse['frontdesk_surface'];
+  status_surface: ProductEntryManifestResponse['status_surface'];
   workspace_locator: ProductEntryManifestResponse['workspace_locator'];
   runtime: ProductEntryManifestResponse['runtime'];
   product_entry_status: ProductEntryManifestResponse['product_entry_status'];
@@ -692,7 +692,7 @@ export interface ProductFrontdeskResponse extends SurfaceBase<'product_frontdesk
   domain_entry_contract: ProductEntryManifestResponse['domain_entry_contract'];
   gateway_interaction_contract: ProductEntryManifestResponse['gateway_interaction_contract'];
   summary: {
-    frontdesk_command: string | null;
+    status_command: string | null;
     recommended_command: string;
     operator_loop_command: string | null;
   };

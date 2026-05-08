@@ -15,11 +15,11 @@ import {
 } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
-  HERMES_NATIVE_PROOF_ADAPTER,
+  HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
-  buildHermesNativeProofExecutionModel,
-  generateStructuredArtifactViaHermesNativeProof,
-} from '@redcube/hermes-substrate';
+  buildHermesAgentLoopExecutionModel,
+  generateStructuredArtifactViaHermesAgentLoop,
+} from '@redcube/runtime-protocol';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
@@ -62,12 +62,12 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
 });
 
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
-const HERMES_NATIVE_PROOF_EXECUTION_MODEL = Object.freeze(buildHermesNativeProofExecutionModel());
+const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 
 function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-  return adapter === HERMES_NATIVE_PROOF_ADAPTER
-    ? HERMES_NATIVE_PROOF_EXECUTION_MODEL
+  return adapter === HERMES_AGENT_ADAPTER
+    ? HERMES_AGENT_LOOP_EXECUTION_MODEL
     : CODEX_EXECUTION_MODEL;
 }
 
@@ -75,24 +75,24 @@ function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER
   if (shared.safeText(generationRuntime?.creative_owner)) {
     return shared.safeText(generationRuntime.creative_owner);
   }
-  return adapter === HERMES_NATIVE_PROOF_ADAPTER ? HERMES_NATIVE_PROOF_ADAPTER : 'host_agent';
+  return adapter === HERMES_AGENT_ADAPTER ? HERMES_AGENT_ADAPTER : 'codex_cli';
 }
 
 function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   if (shared.safeText(generationRuntime?.primary_surface)) {
     return shared.safeText(generationRuntime.primary_surface);
   }
-  return adapter === HERMES_NATIVE_PROOF_ADAPTER
-    ? 'hermes_native_full_agent_loop'
-    : 'codex_native_host_agent';
+  return adapter === HERMES_AGENT_ADAPTER
+    ? 'hermes_agent_loop'
+    : 'codex_cli_runtime';
 }
 
 async function generateStructuredArtifact({
   adapter = CODEX_DEFAULT_ADAPTER,
   ...input
 }) {
-  if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
-    return generateStructuredArtifactViaHermesNativeProof(input);
+  if (adapter === HERMES_AGENT_ADAPTER) {
+    return generateStructuredArtifactViaHermesAgentLoop(input);
   }
   return generateStructuredArtifactViaCodexCli(input);
 }
@@ -101,7 +101,7 @@ async function generateStructuredArtifactBatch({
   adapter = CODEX_DEFAULT_ADAPTER,
   ...input
 }) {
-  if (adapter === HERMES_NATIVE_PROOF_ADAPTER) {
+  if (adapter === HERMES_AGENT_ADAPTER) {
     const data = [];
     for (const stage of shared.safeArray(input.stages)) {
       const stageInput = typeof stage === 'function'
@@ -110,7 +110,7 @@ async function generateStructuredArtifactBatch({
             stage_id: stage.stage_id,
           }
         : stage;
-      const result = await generateStructuredArtifactViaHermesNativeProof(stageInput);
+      const result = await generateStructuredArtifactViaHermesAgentLoop(stageInput);
       data.push({
         stage_id: stageInput.stage_id,
         data: result.data,

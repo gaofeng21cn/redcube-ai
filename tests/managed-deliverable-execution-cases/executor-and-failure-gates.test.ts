@@ -25,25 +25,25 @@ import {
   startMockCodexCli,
   withEnv,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   MOCK_REDCUBE_PYTHON_COMMAND,
   readJson,
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
-test('managed execution accepts explicit hermes_native_proof adapter and keeps it as the active executor', async () => {
-  await withMockHermesNativeProof(async () => {
+test('managed execution accepts explicit hermes_agent adapter and keeps it as the active executor', async () => {
+  await withMockHermesAgentLoop(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-hermes-proof-'));
 
     await completeSourceReadiness({
       workspaceRoot,
       topicId: 'topic-a',
       title: 'Hermes proof managed route',
-      brief: '只需要先验证 storyline 阶段的 Hermes-native full agent loop。',
+      brief: '只需要先验证 storyline 阶段的 Hermes-Agent loop full agent loop。',
       keywords: ['Hermes', 'proof'],
     });
 
@@ -54,7 +54,7 @@ test('managed execution accepts explicit hermes_native_proof adapter and keeps i
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       title: 'Hermes proof managed route',
-      goal: '验证托管运行可显式走 Hermes-native proof adapter',
+      goal: '验证托管运行可显式走 Hermes-Agent loop adapter',
     });
 
     const result = await runManagedDeliverable({
@@ -64,14 +64,14 @@ test('managed execution accepts explicit hermes_native_proof adapter and keeps i
       deliverableId: 'deck-a',
       userIntent: '先只跑 storyline',
       stopAfterStage: 'storyline',
-      adapter: 'hermes_native_proof',
+      adapter: 'hermes_agent',
     });
 
     assert.equal(result.ok, true);
     assert.equal(result.summary.status, 'stopped_after_stage');
-    assert.equal(result.managed_run.requested_adapter, 'hermes_native_proof');
-    assert.equal(result.managed_run.active_adapter, 'hermes_native_proof');
-    assert.equal(result.managed_run.runtime_bridge?.owner, 'hermes_native_proof');
+    assert.equal(result.managed_run.requested_adapter, 'hermes_agent');
+    assert.equal(result.managed_run.active_adapter, 'hermes_agent');
+    assert.equal(result.managed_run.runtime_bridge?.owner, 'hermes_agent');
     assert.equal(result.managed_run.runtime_bridge?.model_selection, 'inherit_local_hermes_default');
     assert.equal(result.managed_run.runtime_bridge?.reasoning_selection, 'inherit_local_hermes_default');
     assert.equal(result.managed_run.route_runs.length, 1);
@@ -84,10 +84,10 @@ test('managed execution accepts explicit hermes_native_proof adapter and keeps i
       workspaceRoot,
       managedRunId: result.managed_run.managed_run_id,
     });
-    assert.equal(stored.managed_run.requested_adapter, 'hermes_native_proof');
-    assert.equal(stored.managed_run.active_adapter, 'hermes_native_proof');
-    assert.equal(stored.managed_run.runtime_bridge?.owner, 'hermes_native_proof');
-    assert.equal(stored.runtime_supervision.runtime_owner, 'hermes_native_proof');
+    assert.equal(stored.managed_run.requested_adapter, 'hermes_agent');
+    assert.equal(stored.managed_run.active_adapter, 'hermes_agent');
+    assert.equal(stored.managed_run.runtime_bridge?.owner, 'hermes_agent');
+    assert.equal(stored.runtime_supervision.runtime_owner, 'hermes_agent');
   });
 });
 

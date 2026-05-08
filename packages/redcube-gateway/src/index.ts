@@ -27,7 +27,7 @@ import type {
   ProductEntryResponse,
   ProductEntryManifestResponse,
   ProductEntryStartCompanion,
-  ProductFrontdeskResponse,
+  ProductStatusResponse,
   ProductPreflightResponse,
   ProductEntrySessionResponse,
   OverlayCatalogResponse,
@@ -186,9 +186,9 @@ async function getProductPreflightJs(request: any) {
   return module.getProductPreflight(request);
 }
 
-async function getProductFrontdeskJs(request: any) {
-  const module = await import('./actions/get-product-frontdesk.js');
-  return module.getProductFrontdesk(request);
+async function getProductStatusJs(request: any) {
+  const module = await import('./actions/get-product-status.js');
+  return module.getProductStatus(request);
 }
 
 async function runNativePptProductEntryProofJs(request: any) {
@@ -318,8 +318,8 @@ export function getProductPreflight(request: Record<string, unknown>): Promise<P
   return getProductPreflightJs(request) as Promise<ProductPreflightResponse>;
 }
 
-export function getProductFrontdesk(request: Record<string, unknown>): Promise<ProductFrontdeskResponse> {
-  return getProductFrontdeskJs(request) as Promise<ProductFrontdeskResponse>;
+export function getProductStatus(request: Record<string, unknown>): Promise<ProductStatusResponse> {
+  return getProductStatusJs(request) as Promise<ProductStatusResponse>;
 }
 
 export function runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>> {
@@ -388,7 +388,7 @@ export type {
   ProductEntryResponse,
   ProductEntryManifestResponse,
   ProductEntryStartCompanion,
-  ProductFrontdeskResponse,
+  ProductStatusResponse,
   ProductPreflightResponse,
   ProductEntrySessionResponse,
   OverlayCatalogResponse,

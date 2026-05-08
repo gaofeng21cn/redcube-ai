@@ -53,7 +53,7 @@
 
 - 三层角色命名与 owner truth
 - runtime owner / domain owner / executor owner 的 machine-readable envelope
-- frontdesk / cockpit / progress 上的用户可见术语
+- status / cockpit / progress 上的用户可见术语
 - domain supervision 不得越过 runtime 的 fail-closed 规则
 
 第二批再考虑代码共享：

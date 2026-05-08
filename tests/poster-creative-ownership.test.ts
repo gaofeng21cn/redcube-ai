@@ -103,13 +103,13 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
 
     const storyline = readJson(results[0].artifactFile);
     assert.equal(storyline.creative_execution?.generation_runtime?.owner, 'codex_cli');
-    assert.equal(storyline.storyline.creative_sources?.headline?.owner, 'host_agent');
+    assert.equal(storyline.storyline.creative_sources?.headline?.owner, 'codex_cli');
     assert.equal(storyline.storyline.creative_sources?.headline?.materialized_from, 'codex_cli_json_output');
 
     const blueprint = readJson(results[1].artifactFile);
     assert.equal(blueprint.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      blueprint.poster_blueprint.slides.every((slide) => slide.creative_authorship?.major_blueprint_text?.owner === 'host_agent'),
+      blueprint.poster_blueprint.slides.every((slide) => slide.creative_authorship?.major_blueprint_text?.owner === 'codex_cli'),
       true,
     );
     assert.equal(
@@ -119,13 +119,13 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
 
     const visual = readJson(results[2].artifactFile);
     assert.equal(visual.creative_execution?.generation_runtime?.owner, 'codex_cli');
-    assert.equal(visual.visual_direction.creative_sources?.visual_manifest?.owner, 'host_agent');
+    assert.equal(visual.visual_direction.creative_sources?.visual_manifest?.owner, 'codex_cli');
     assert.equal(visual.visual_direction.creative_sources?.visual_manifest?.materialized_from, 'codex_cli_json_output');
 
     const render = readJson(results[3].artifactFile);
     assert.equal(render.creative_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(
-      render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.owner === 'host_agent'),
+      render.html_bundle.slides.every((slide) => slide.creative_authorship?.final_html_markup?.owner === 'codex_cli'),
       true,
     );
     assert.equal(
@@ -136,7 +136,7 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
     assert.equal(html.includes('prompt_pack_artifact'), false);
 
     const directorReview = readJson(results[4].artifactFile);
-    assert.equal(directorReview.review_execution?.owner, 'host_agent');
+    assert.equal(directorReview.review_execution?.owner, 'codex_cli');
     assert.equal(directorReview.review_execution?.overlay, 'visual_director_review');
     assert.equal(directorReview.review_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(directorReview.visual_director_review?.review_model, 'director_first_visual_judgement');
@@ -144,7 +144,7 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
 
     const screenshotReview = readJson(results[5].artifactFile);
     assert.equal(screenshotReview.review_overlay, 'screenshot_review');
-    assert.equal(screenshotReview.review_execution?.owner, 'host_agent');
+    assert.equal(screenshotReview.review_execution?.owner, 'codex_cli');
     assert.equal(screenshotReview.review_execution?.overlay, 'screenshot_review');
     assert.equal(screenshotReview.review_execution?.generation_runtime?.owner, 'codex_cli');
     assert.equal(screenshotReview.ai_review?.review_model, 'screenshot_director_first_visual_judgement');

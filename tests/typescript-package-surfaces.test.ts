@@ -131,7 +131,7 @@ const PACKAGE_SURFACES = Object.freeze([
     packageTsconfigExtends: '../../tsconfig.package-build.json',
     rootReference: true,
     requiredFiles: ['src/index.ts', 'src/contracts.ts', 'src/registry.ts', 'src/types.ts', 'tsconfig.json'],
-    dependencies: { '@redcube/runtime-protocol': '0.1.0', '@redcube/hermes-substrate': undefined },
+    dependencies: { '@redcube/runtime-protocol': '0.1.0' },
     entryMatches: [/buildDeliverableRecord/, /mergeContractLayers/, /hydrateDeliverableContract/, /createOverlayRegistry/],
     entryDoesNotMatch: [/\bJs\b/],
     typeMatches: [/interface OverlayDefinition/, /interface OverlayRegistry/, /interface HydratedDeliverableContract/],

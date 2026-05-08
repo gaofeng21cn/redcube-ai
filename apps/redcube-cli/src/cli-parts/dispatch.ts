@@ -14,7 +14,7 @@ import {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
-  getProductFrontdesk,
+  getProductStatus,
   getProductEntryManifest,
   getProductStart,
   getProductPreflight,
@@ -54,7 +54,7 @@ const DEFAULT_GATEWAY_ACTIONS = {
   invokeDomainEntry,
   invokeFederatedProductEntry,
   invokeProductEntry,
-  getProductFrontdesk,
+  getProductStatus,
   getProductEntryManifest,
   getProductStart,
   getProductPreflight,
@@ -307,8 +307,8 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   }
 
   if (command === 'product') {
-    if (subcommand === 'frontdesk') {
-      return gateway.getProductFrontdesk({
+    if (subcommand === 'status') {
+      return gateway.getProductStatus({
         workspace_root: resolveWorkspaceRoot(options, cwd),
       });
     }
@@ -399,7 +399,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       });
     }
 
-    throw new Error('product 命令支持 frontdesk|start|preflight|invoke|session|manifest；internal OPL bridge 由外层 shell 调用');
+    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest；internal OPL bridge 由外层 shell 调用');
   }
 
   if (command === 'native-ppt') {

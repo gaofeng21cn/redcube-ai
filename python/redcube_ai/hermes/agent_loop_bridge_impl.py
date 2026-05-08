@@ -31,7 +31,7 @@ def _normalize_contract(config: dict[str, Any]) -> dict[str, Any]:
     )
     if model is None:
         raise RuntimeError(
-            "Hermes-native proof 缺少可执行 model：请在 `~/.hermes/config.yaml` 提供 `model.default`，"
+            "Hermes-Agent loop 缺少可执行 model：请在 `~/.hermes/config.yaml` 提供 `model.default`，"
             "或显式设置 `REDCUBE_HERMES_MODEL`。"
         )
 
@@ -63,7 +63,7 @@ def _load_dependencies() -> tuple[Any, Any, Any]:
         from run_agent import AIAgent
     except Exception as exc:  # noqa: BLE001
         raise RuntimeError(
-            "Hermes-native proof bridge 无法导入上游 Hermes-Agent 依赖。"
+            "Hermes-Agent loop bridge 无法导入上游 Hermes-Agent 依赖。"
         ) from exc
     return load_config, parse_reasoning_effort, AIAgent
 
@@ -77,7 +77,7 @@ def _parse_json_object(payload: Any) -> dict[str, Any]:
     if isinstance(payload, dict):
         return payload
     if not isinstance(payload, str) or not payload.strip():
-        raise RuntimeError("Hermes-native proof 未返回 final JSON object。")
+        raise RuntimeError("Hermes-Agent loop 未返回 final JSON object。")
     stripped = payload.strip()
     if stripped.startswith("```"):
         lines = stripped.splitlines()
@@ -88,7 +88,7 @@ def _parse_json_object(payload: Any) -> dict[str, Any]:
         stripped = "\n".join(lines).strip()
     parsed = json.loads(stripped)
     if not isinstance(parsed, dict):
-        raise RuntimeError("Hermes-native proof final response 顶层必须是 JSON object。")
+        raise RuntimeError("Hermes-Agent loop final response 顶层必须是 JSON object。")
     return parsed
 
 
@@ -104,7 +104,7 @@ def _pushd(cwd: Path):
 
 def _build_bridge_prompt(prompt_file: Path) -> str:
     return (
-        "You are running the RedCube AI Hermes-native structured generation proof.\n"
+        "You are running the RedCube AI Hermes-Agent loop structured generation proof.\n"
         "Before producing the final answer, use the available file-reading tool to read this prompt file exactly once:\n"
         f"{prompt_file}\n"
         "Then follow the prompt faithfully and return a JSON object only.\n"
@@ -119,15 +119,15 @@ def _run_generate(request: dict[str, Any]) -> dict[str, Any]:
 
     cwd = Path(str(request.get("cwd") or "")).expanduser().resolve()
     if not cwd.exists():
-        raise RuntimeError(f"Hermes-native proof working directory 不存在: {cwd}")
+        raise RuntimeError(f"Hermes-Agent loop working directory 不存在: {cwd}")
 
     prompt_text = str(request.get("prompt") or "").strip()
     if not prompt_text:
-        raise RuntimeError("Hermes-native proof 缺少 prompt。")
+        raise RuntimeError("Hermes-Agent loop 缺少 prompt。")
 
     events: list[dict[str, Any]] = []
 
-    with tempfile.TemporaryDirectory(prefix="redcube-hermes-native-proof-") as temp_dir:
+    with tempfile.TemporaryDirectory(prefix="redcube-hermes-agent-loop-") as temp_dir:
         prompt_file = Path(temp_dir) / "prompt.md"
         prompt_file.write_text(prompt_text, encoding="utf-8")
 
@@ -165,14 +165,14 @@ def _run_generate(request: dict[str, Any]) -> dict[str, Any]:
                 close()
 
     if not isinstance(result, dict):
-        raise RuntimeError("Hermes-native proof 返回值必须是 object。")
+        raise RuntimeError("Hermes-Agent loop 返回值必须是 object。")
     if not result.get("completed"):
-        raise RuntimeError("Hermes-native proof 未完成完整 agent loop。")
+        raise RuntimeError("Hermes-Agent loop 未完成完整 agent loop。")
 
     tool_start_events = [event for event in events if event.get("type") == "tool_start"]
     tool_complete_events = [event for event in events if event.get("type") == "tool_complete"]
     if not tool_start_events or not tool_complete_events:
-        raise RuntimeError("Hermes-native proof 未触发任何工具事件，不接受 chat-only 结果。")
+        raise RuntimeError("Hermes-Agent loop 未触发任何工具事件，不接受 chat-only 结果。")
 
     payload = _parse_json_object(result.get("final_response"))
     proof = {
@@ -207,7 +207,7 @@ def _run_probe() -> dict[str, Any]:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the RedCube AI Hermes-native proof bridge from a request JSON file."
+        description="Run the RedCube AI Hermes-Agent loop bridge from a request JSON file."
     )
     parser.add_argument("request_json", help="Path to a probe or generate request JSON file.")
     return parser.parse_args(argv)
@@ -223,7 +223,7 @@ def main() -> int:
     elif action == "generate":
         payload = _run_generate(request)
     else:
-        raise RuntimeError(f"Unsupported Hermes-native proof bridge action: {action}")
+        raise RuntimeError(f"Unsupported Hermes-Agent loop bridge action: {action}")
     sys.stdout.write(json.dumps(payload, ensure_ascii=False))
     sys.stdout.write("\n")
     return 0

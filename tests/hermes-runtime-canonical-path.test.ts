@@ -30,7 +30,7 @@ function withoutUpdatedAt(payload) {
   return clone;
 }
 
-async function withMockCodexHostAgent(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -43,8 +43,8 @@ async function withMockCodexHostAgent(testFn) {
   }
 }
 
-test('ppt_deck canonical mainline closes through the current Codex host-agent runtime without drifting durable truth', async () => {
-  await withMockCodexHostAgent(async () => {
+test('ppt_deck canonical mainline closes through the current Codex CLI runtime without drifting durable truth', async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-canonical-'));
 
     await completeSourceReadiness({
@@ -86,7 +86,7 @@ test('ppt_deck canonical mainline closes through the current Codex host-agent ru
         route,
       });
       assert.equal(result.ok, true, route);
-      assert.equal(result.run.executor.execution_model.mainline_adapter, 'host_agent', route);
+      assert.equal(result.run.executor.execution_model.mainline_adapter, 'codex_cli', route);
       assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'Codex CLI', route);
       assert.equal(result.run.runtime_topology.runtime_substrate_owner, 'Codex CLI', route);
       lastResult = result;
@@ -120,7 +120,7 @@ test('ppt_deck canonical mainline closes through the current Codex host-agent ru
     assert.equal(review.governance_surface.runtime_topology.deployment_host, 'codex_local_operator_host');
     assert.deepEqual(audit.review_state, review.state);
     assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
-    assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_native_host_agent');
+    assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
     assert.equal(watch.run_id, lastResult.run.run_id);
     assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
     assert.equal(watch.review_state.current_status, review.state.current_status);

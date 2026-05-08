@@ -139,10 +139,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-hermes-substrate'),
-    path.join(gatewayNodeModulesDir, 'hermes-substrate'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
     path.join(gatewayNodeModulesDir, 'codex-cli-client'),
   );
@@ -317,7 +313,7 @@ test('CLI product invalid subcommand keeps the internal OPL bridge out of public
 
   assert.equal(parsed.ok, false);
   assert.equal(parsed.error_kind, 'cli_usage_error');
-  assert.match(parsed.error, /frontdesk\|start\|preflight\|invoke\|session\|manifest/);
+  assert.match(parsed.error, /status\|start\|preflight\|invoke\|session\|manifest/);
   assert.equal(parsed.error.includes('federate'), false);
 });
 

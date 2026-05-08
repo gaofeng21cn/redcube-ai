@@ -37,16 +37,6 @@ const HISTORICAL_CONTRACTS = Object.freeze([
     contract: 'contracts/runtime-program/upstream-hermes-agent-final-target-shape.json',
     status: 'closeout_completed',
   },
-  {
-    milestone: 'hermes_stable_family_closure_truth',
-    contract: 'contracts/runtime-program/hermes-stable-family-closure-truth.json',
-    status: 'historical_local_migration_artifact',
-  },
-  {
-    milestone: 'hermes_managed_family_closure_truth',
-    contract: 'contracts/runtime-program/hermes-managed-family-closure-truth.json',
-    status: 'historical_local_migration_artifact',
-  },
 ]);
 
 test('current runtime program keeps one active baton and machine-readable historical provenance', () => {

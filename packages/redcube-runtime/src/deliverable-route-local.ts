@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { persistReviewStatePatch } from '@redcube/governance';
-import { CODEX_DEFAULT_ADAPTER } from '@redcube/hermes-substrate';
+import { CODEX_DEFAULT_ADAPTER } from '@redcube/runtime-protocol';
 import { hydrateDeliverableContract } from '@redcube/overlay-core';
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { resolveExecutorAdapter } from './executors.js';

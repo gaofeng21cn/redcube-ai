@@ -29,7 +29,7 @@ import {
   executeSourceAugmentation,
   getProductEntryManifest,
   getProductEntrySession,
-  getProductFrontdesk,
+  getProductStatus,
   getProductPreflight,
   getProductStart,
   intakeSource,
@@ -119,13 +119,13 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.deepEqual(
     surface.family_orchestration.action_graph.nodes.map((node) => node.node_id),
     [
-      'step:open_frontdesk',
+      'step:open_status',
       'step:continue_current_loop',
       'step:opl_bridge_handoff',
       'step:inspect_current_progress',
     ],
   );
-  assert.deepEqual(surface.family_orchestration.action_graph.entry_nodes, ['step:open_frontdesk']);
+  assert.deepEqual(surface.family_orchestration.action_graph.entry_nodes, ['step:open_status']);
   assert.deepEqual(surface.family_orchestration.action_graph.exit_nodes, ['step:inspect_current_progress']);
   assert.equal(Array.isArray(surface.family_orchestration.human_gates), true);
   assert.equal(surface.family_orchestration.human_gates.length >= 1, true);
@@ -241,7 +241,7 @@ export {
   fileURLToPath,
   getProductEntryManifest,
   getProductEntrySession,
-  getProductFrontdesk,
+  getProductStatus,
   getProductPreflight,
   getProductStart,
   getToolDefinitions,

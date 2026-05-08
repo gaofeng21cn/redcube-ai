@@ -142,10 +142,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-hermes-substrate'),
-    path.join(gatewayNodeModulesDir, 'hermes-substrate'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
     path.join(gatewayNodeModulesDir, 'codex-cli-client'),
   );
@@ -361,7 +357,7 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
   });
 });
 
-test('CLI product frontdesk, product invoke, product federate, and product session proxy the product-entry service surface', async () => {
+test('CLI product status, product invoke, product federate, and product session proxy the product-entry service surface', async () => {
   await withMockHermesUpstreamCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
@@ -391,11 +387,11 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
       },
     );
 
-    const frontdeskParsed = await execCliAsync(
+    const statusParsed = await execCliAsync(
       cliPath,
       [
         'product',
-        'frontdesk',
+        'status',
         '--workspace-root',
         workspaceRoot,
       ],
@@ -407,26 +403,26 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
         },
       },
     );
-    assert.equal(frontdeskParsed.ok, true);
-    assert.equal(frontdeskParsed.surface_kind, 'product_frontdesk');
-    assert.equal(frontdeskParsed.frontdesk_surface.command, 'redcube product frontdesk');
-    assert.equal(frontdeskParsed.product_entry_manifest.frontdesk_surface.command, 'redcube product frontdesk');
-    assert.equal(frontdeskParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(frontdeskParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-    assert.equal(frontdeskParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
-    assert.equal(frontdeskParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
-    assert.equal(frontdeskParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(frontdeskParsed.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
-    assert.equal(frontdeskParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
-    assert.equal(frontdeskParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
-    assert.equal(frontdeskParsed.product_entry_readiness.usable_now, true);
-    assert.equal(frontdeskParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
-    assert.equal(frontdeskParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
-    assert.equal(frontdeskParsed.product_entry_preflight.ready_to_try_now, true);
-    assert.equal(frontdeskParsed.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
-    assert.equal(frontdeskParsed.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
+    assert.equal(statusParsed.ok, true);
+    assert.equal(statusParsed.surface_kind, 'product_status');
+    assert.equal(statusParsed.status_surface.command, 'redcube product status');
+    assert.equal(statusParsed.product_entry_manifest.status_surface.command, 'redcube product status');
+    assert.equal(statusParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(statusParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
+    assert.equal(statusParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
+    assert.equal(statusParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+    assert.equal(statusParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
+    assert.equal(statusParsed.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
+    assert.equal(statusParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
+    assert.equal(statusParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(statusParsed.product_entry_readiness.usable_now, true);
+    assert.equal(statusParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
+    assert.equal(statusParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
+    assert.equal(statusParsed.product_entry_preflight.ready_to_try_now, true);
+    assert.equal(statusParsed.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
+    assert.equal(statusParsed.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
     assert.equal(
-      frontdeskParsed.product_entry_preflight.recommended_check_command,
+      statusParsed.product_entry_preflight.recommended_check_command,
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
     );
 
@@ -647,7 +643,7 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     assert.equal(manifestParsed.manifest_kind, 'redcube_product_entry_manifest');
     assert.equal(manifestParsed.manifest_version, 2);
     assert.equal(manifestParsed.workspace_locator.workspace_root, workspaceRoot);
-    assert.equal(manifestParsed.frontdesk_surface.command, 'redcube product frontdesk');
+    assert.equal(manifestParsed.status_surface.command, 'redcube product status');
     assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifestParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
     assert.equal(manifestParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
@@ -658,9 +654,9 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     );
     assert.equal(manifestParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifestParsed.product_entry_readiness.good_to_use_now, false);
-    assert.equal(manifestParsed.product_entry_readiness.recommended_start_command, 'redcube product frontdesk');
+    assert.equal(manifestParsed.product_entry_readiness.recommended_start_command, 'redcube product status');
     assert.equal(manifestParsed.product_entry_start.surface_kind, 'product_entry_start');
-    assert.equal(manifestParsed.product_entry_start.recommended_mode_id, 'open_frontdesk');
+    assert.equal(manifestParsed.product_entry_start.recommended_mode_id, 'open_status');
     assert.equal(manifestParsed.product_entry_start.modes[1].mode_id, 'start_direct_session');
     assert.equal(manifestParsed.product_entry_start.modes[2].mode_id, 'opl_bridge_handoff');
     assert.equal(manifestParsed.product_entry_start.modes[3].mode_id, 'resume_session');
@@ -688,8 +684,8 @@ test('CLI product frontdesk, product invoke, product federate, and product sessi
     );
     assert.equal(startParsed.ok, true);
     assert.equal(startParsed.surface_kind, 'product_entry_start');
-    assert.equal(startParsed.recommended_mode_id, 'open_frontdesk');
-    assert.equal(startParsed.modes[0].command, `redcube product frontdesk --workspace-root ${workspaceRoot}`);
+    assert.equal(startParsed.recommended_mode_id, 'open_status');
+    assert.equal(startParsed.modes[0].command, `redcube product status --workspace-root ${workspaceRoot}`);
     assert.equal(startParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(startParsed.runtime_loop_closure.source_linkage.current_source, 'start');
   });

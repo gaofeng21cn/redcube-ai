@@ -5,7 +5,7 @@ const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
   executor_backend: 'codex_cli',
   execution_shape: 'structured_call',
   runtime_substrate_owner: 'Codex CLI',
-  runtime_substrate_surface: 'codex_native_host_agent',
+  runtime_substrate_surface: 'codex_cli_runtime',
   deployment_host: 'codex_local_operator_host',
   deployment_host_status: 'active_primary',
   gateway_role: 'visual_deliverable_domain_gateway',

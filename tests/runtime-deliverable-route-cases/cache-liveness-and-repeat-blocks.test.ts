@@ -20,9 +20,9 @@ import {
   withEnv,
   completeSourceReadiness,
   MODULE_DIR,
-  MOCK_HERMES_NATIVE_BRIDGE_COMMAND,
+  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   withMockHermesUpstream,
-  withMockHermesNativeProof,
+  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute reuses a fresh gated stage artifact when the route cache key is unchanged', async () => {
@@ -84,7 +84,7 @@ test('getRun and runtimeWatch expire stale persisted running route runs with an 
     target: 'deck-a',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
-    executor: { adapter: 'host_agent', execution_surface: 'codex_native_host_agent' },
+    executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
   });
   const runFile = path.join(workspaceRoot, 'runtime', 'runs', `${run.run_id}.json`);
   const staleRun = JSON.parse(readFileSync(runFile, 'utf-8'));

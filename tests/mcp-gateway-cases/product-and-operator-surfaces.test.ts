@@ -124,17 +124,17 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
       }),
     },
   );
-  const frontdesk = await callGatewayTool(
+  const status = await callGatewayTool(
     'redcube_product_entry',
-    withAction('get_product_frontdesk', {
+    withAction('get_product_status', {
       workspaceRoot: '/tmp/redcube-workspace',
     }),
     {
-      getProductFrontdesk: async (request) => ({
+      getProductStatus: async (request) => ({
         ok: true,
-        surface_kind: 'product_frontdesk',
-        frontdesk_surface: {
-          command: 'redcube product frontdesk',
+        surface_kind: 'product_status',
+        status_surface: {
+          command: 'redcube product status',
           workspace_root: request.workspaceRoot,
         },
       }),
@@ -181,8 +181,8 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
-  assert.equal(frontdesk.surface_kind, 'product_frontdesk');
-  assert.equal(frontdesk.frontdesk_surface.command, 'redcube product frontdesk');
+  assert.equal(status.surface_kind, 'product_status');
+  assert.equal(status.status_surface.command, 'redcube product status');
   assert.equal(start.surface_kind, 'product_entry_start');
   assert.equal(start.workspace_locator.workspace_root, '/tmp/redcube-workspace');
   assert.equal(preflight.surface_kind, 'product_entry_preflight');

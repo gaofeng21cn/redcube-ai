@@ -44,7 +44,7 @@ export function createPosterOnepagerScreenshotReviewParts(deps) {
     const lines = [
       `# ${contract.title} 视觉质控`,
       '',
-      `- review_owner: ${safeText(reviewOwner, 'codex_native_host_agent')}`,
+      `- review_owner: ${safeText(reviewOwner, 'codex_cli_runtime')}`,
       `- 状态: ${reviewArtifact.status}`,
       `- director_intent_landed: ${reviewArtifact.checks.director_intent_landed}`,
       `- anti_template_ok: ${reviewArtifact.checks.anti_template_ok}`,
