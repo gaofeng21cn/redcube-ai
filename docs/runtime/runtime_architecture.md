@@ -9,7 +9,7 @@
 ## 一句话理解
 
 `RedCube AI` 不是 GUI 工具集合，而是面向 agent 的独立 visual-deliverable domain agent，提供 direct product entry、service-safe domain entry 与 visual-domain truth surfaces。
-其中 `status` 只表示 agent-facing product-entry overview / intake / entry-shell contract；legacy `redcube product status` 命令键继续保留为兼容命令，不表示 GUI、WebUI 或最终用户前台壳已经落地。
+其中 `status` 只表示 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示 GUI、WebUI 或最终用户前台壳已经落地。
 
 这里的 `Agent-first` 通过默认 `Codex CLI host-agent runtime` 与显式 `hermes_agent` proof lane 共同成立。
 在当前 Codex-native 语境里，`RedCube AI` 持有 visual-domain governance / audit / projection truth，默认 concrete executor 是本地 Codex CLI host-agent runtime；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance / compatibility bridge；

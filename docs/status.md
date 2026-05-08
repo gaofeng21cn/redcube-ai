@@ -17,7 +17,7 @@
 - product-entry service surface：`invokeProductEntry`、`getProductEntrySession`、`redcube product invoke`、`redcube product session`
 - internal OPL bridge surface：`invokeFederatedProductEntry`、`invoke_federated_product_entry`、`redcube product federate`
 - shared service-safe domain entry：`invokeDomainEntry`、`invoke_domain_entry`
-- direct domain surfaces：`status / start / preflight / invoke / session / manifest`；其中 `status` 是单一 `redcube-ai` app skill 之下的 agent-facing product-entry overview / intake / entry-shell contract，保留 `redcube product status` 作为 legacy command key / compat command，不代表 GUI、WebUI 或最终用户前台壳
+- direct domain surfaces：`status / start / preflight / invoke / session / manifest`；其中 `status` 是单一 `redcube-ai` app skill 之下的 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不代表 GUI、WebUI 或最终用户前台壳
 - 稳定可调用面：`redcube-ai` app skill、`CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本，以及这些 surface 对应的 repo-tracked contracts
 - `skill_catalog` 现在对外收口为单一 `redcube-ai` app skill；`status`、`invoke`、`session` 继续作为这个 skill 底下的 machine-readable command contracts，其中 `status` 只承载 product-entry overview / intake / entry-shell 语义，并在同一 skill descriptor 的 `domain_projection.runtime_continuity` 输出可直接消费的 same-session runtime continuity envelope
 - 同一 `domain_projection` 现已暴露 `opl_runtime_manager_registration` v1：OPL Runtime Manager 可索引 RCA 的 product-entry registration、internal OPL bridge、session continuity、artifact inventory、runtime health 与 review/publication projection refs，但不拥有 RedCube visual truth 或 canonical artifacts
@@ -43,6 +43,7 @@
 - `smoke` 是最小开发入口：`npm run test:smoke` 只覆盖少量核心入口与结构守门；`fast` 是核心回归快线，不再等同于 smoke；`ci` / `npm run test:ci` 等价于 hosted quality lane
 - hosted quality lane：`npm run typecheck -> run-test-group fast -> run-test-group family -> run-test-group meta:ci`，其中 `meta:ci` 只跑 fast 未覆盖的 meta remainder，避免默认 CI 重复执行同一批根级测试文件；Playwright Chromium / renderer proof 环境只留在显式 `native-ppt-proof` 与 `image-ppt-proof` jobs，默认 quality lane 不再安装浏览器
 - family shared pin 审计统一经由 `scripts/run-test-group-lib.ts`，必须在 clean-clone 环境下可运行
+- 当前 OPL family shared release pin 已对齐到 `b427ced5e57f24f7ceb3d3868fb49934ff4ad8c3`；`packages/redcube-gateway/package.json` 与 `package-lock.json` 共同持有这条 JS shared package pin。
 - TypeScript package surface、overlay surface 与 high-churn package 守门已合并到 `tests/typescript-package-surfaces.test.ts`；meta lane 保留 package boundary、compiled dist export、service boundary 与 CI quality lane 四类硬门禁，不再用多份 root 测试重复锁同一批包入口。
 - 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` / `npm run test:full:remaining` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发；本地已跑 fast 后可用 `npm run test:integration:remaining` 跳过 fast 已覆盖的 integration 文件；本地已跑 fast + family + meta:ci + integration:remaining 后可用 `npm run test:full:remaining` 跳过已覆盖的 meta/integration 文件，只跑动态推导出的 full 余量
 - `historical` 只承载一个紧凑的 runtime-program provenance guard，旧 phase/freeze/closeout/longrun 叙述锁定测试已归并；默认 `full` 不再隐式包含 historical，需要历史回归时显式运行 `npm run test:historical` 或 `./scripts/verify.sh full-with-historical`

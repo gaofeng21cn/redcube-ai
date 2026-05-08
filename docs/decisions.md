@@ -95,7 +95,7 @@
 - `gateway / harness` 继续保留为内部架构边界语言，不再作为仓库对外第一身份。
 - repo-verified direct route 与 internal OPL bridge route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
 - 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeFederatedProductEntry` 只保留为内部 bridge / integration surface。
-- `status` 只作为该 skill 下的 machine-readable product-entry overview / intake / entry-shell contract；legacy `redcube product status` command key 为兼容保留，不代表 GUI / WebUI / 最终用户前台壳已落地。
+- `status` 只作为该 skill 下的 machine-readable product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不代表 GUI / WebUI / 最终用户前台壳已落地。
 
 ### 决策：保持 honest owner split，不改 default executor owner
 
