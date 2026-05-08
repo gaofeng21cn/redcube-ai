@@ -138,12 +138,25 @@ test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets 
     assert.equal(existsSync(authored.image_page_manifest.generation_metadata_file), true);
     assert.equal(authored.image_page_manifest.slides[0].dimensions.width, 1086);
     assert.equal(authored.image_page_manifest.slides[0].dimensions.height, 1448);
+    assert.equal(authored.image_page_manifest.expected_page_count, authored.image_page_manifest.actual_page_count);
+    assert.equal(authored.image_page_manifest.page_count_gate_pass, true);
+    assert.equal(authored.image_page_manifest.dimension_gate.pass, true);
+    assert.deepEqual(authored.image_page_manifest.dimension_gate.off_size_slide_ids, []);
+    assert.equal(authored.image_page_manifest.final_image_set_policy.clean_final_image_set_required, true);
+    assert.equal(authored.image_page_manifest.final_image_set_policy.contact_sheet_or_gallery_review_expected_for_series, true);
+    assert.equal(authored.image_page_manifest.production_quality_policy.density_standard, 'medium_density_mobile_readable');
+    assert.equal(authored.image_page_manifest.production_quality_policy.default_information_page_structure.main_module_count, 3);
+    assert.equal(authored.image_page_manifest.production_quality_policy.layout_quality_gates.bottom_half_substantive_module_required, true);
     const authoredStyleManifest = readJson(authored.image_page_manifest.style_manifest);
     assert.equal(
       authoredStyleManifest.default_style_profile_file.endsWith('prompts/xiaohongshu/image-first-default-style-profile.json'),
       true,
     );
     assert.equal(authoredStyleManifest.style_profile.profile_id, 'xiaohongshu_image_first_medical_handdrawn_note_default_v1');
+    assert.equal(authoredStyleManifest.production_quality_policy.source_workbench_sample.length, 6);
+    assert.equal(authoredStyleManifest.production_quality_policy.density_standard, 'medium_density_mobile_readable');
+    assert.equal(authoredStyleManifest.delivery_quality_policy.clean_final_image_set_required, true);
+    assert.equal(authoredStyleManifest.delivery_quality_policy.contact_sheet_or_gallery_review_expected_for_series, true);
     assert.equal(authoredStyleManifest.style_reference.mode, 'built_in_style_reference_template');
     assert.equal(authoredStyleManifest.style_reference.artifact_materialization, 'repo_builtin_reference_manifest_only');
     assert.equal(authoredStyleManifest.style_reference.copied_files.length, 0);

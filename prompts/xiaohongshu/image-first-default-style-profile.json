@@ -38,6 +38,9 @@
       "large readable Chinese title",
       "short Chinese labels",
       "few primary points per page",
+      "one core judgement sentence on information pages",
+      "three short main information modules on standard pages",
+      "one boundary note for medical or action-risk pages",
       "avoid tiny paragraphs",
       "stable but topic-specific footer signature grammar"
     ],
@@ -58,8 +61,60 @@
     "state that the output is a complete 3:4 Xiaohongshu note page image",
     "state the 1086x1448 target size",
     "include full page background, title, visual structure, labels, decorative grammar, and safe margins",
+    "standard medical information pages should keep medium-density mobile-readable structure instead of title-only keyword tags",
+    "the lower half of non-cover pages should carry real information modules, not only icons or decorative stickers",
     "avoid asking for isolated stickers, icon packs, component sheets, HTML screenshots, or separate design elements"
   ],
+  "production_quality_system": {
+    "source_workbench_evidence": [
+      "AI小红书笔记/output/男性备孕科普系列",
+      "AI小红书笔记/output/女性备孕科普系列",
+      "AI小红书笔记/output/备孕科普系列",
+      "AI小红书笔记/output/急腹症科普系列",
+      "AI小红书笔记/output/胸痛科普系列",
+      "AI小红书笔记/output/用 Codex 全自动做小红书图文笔记"
+    ],
+    "density_standard": "medium_density_mobile_readable",
+    "default_information_page_structure": [
+      "large title",
+      "one core judgement",
+      "three short main information modules",
+      "one boundary note when medical, safety, or action risk is present"
+    ],
+    "text_density_targets": {
+      "main_module_length_cn_chars": "8-14 preferred, about 18 maximum",
+      "page_total_cn_chars": "45-70 preferred, about 80 maximum for complex mechanism pages",
+      "complex_mechanism_page_max_modules": 4
+    },
+    "layout_quality_gates": {
+      "unique_layout_count_min": 3,
+      "max_consecutive_same_layout": 3,
+      "bottom_half_substantive_module_required": true,
+      "diagram_primitive_pages_required_when_total_pages_at_least_8": 2,
+      "plain_card_fallback_page_max_when_total_pages_at_least_8": 1
+    },
+    "blocking_regressions": [
+      "keyword-only low-density pages that omit judgement or action boundary",
+      "tiny dense card paragraphs that are not mobile readable",
+      "lower-half decoration without substantive information on information pages",
+      "deleting key medical judgement or boundary content only to reduce typo risk",
+      "reusing the same header-list-footer composition across most pages",
+      "using deterministic image patches to repair model-composed text, facts, or composition"
+    ]
+  },
+  "delivery_quality_surfaces": {
+    "expected_final_png_size": "1086x1448",
+    "final_image_set_policy": "final publish image set should contain only current slide_*.png style pages; source candidates or redraw rounds belong in source/provenance surfaces",
+    "contact_sheet_review_policy": "multi-note series should expose note-level and series-level contact-sheet or gallery review surfaces before final human publication",
+    "traceability_requirements": [
+      "page prompt manifest",
+      "style manifest",
+      "generation metadata",
+      "source image provenance",
+      "redraw or preserve decision",
+      "review outcome per page"
+    ]
+  },
   "fragmentation_risk_controls": {
     "forbidden_asset_requests": [
       "icon set",

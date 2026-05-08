@@ -16,6 +16,9 @@
 - 封面、机制峰值页和结尾页都要定义清楚的视觉锚点；XHS 优先 Font Awesome Free，emoji 只做补充
 - 禁止把孤立单字贴纸、随机图形或内部标签当成视觉锚点
 - 必须显式定义相邻可读块安全间距：副标题、主卡、步骤条、底部收束、署名之间要有清楚呼吸；视觉贴住按失败处理
+- 必须把最近成熟系列验证过的中密度手机可读原则写进导演稿：核心判断、3 个短模块、边界提示、下半区实质信息。
+- 必须输出页面差异策略：`unique_layout_count`、`max_consecutive_same_layout`、关键机制页是否有下半区模块、是否避免连续上重下空。
+- 当总页数 >= 8 时，必须规划至少 2 页机制/流程/图解类页面，且普通卡片堆叠页不得成为主要视觉 fallback。
 
 ## runtime_seed
 
@@ -42,6 +45,13 @@
       "<AI-authored anti-template constraint>",
       "<AI-authored anti-template constraint>"
     ],
+    "production_quality_gates": {
+      "density_standard": "medium_density_mobile_readable",
+      "unique_layout_count_min": 3,
+      "max_consecutive_same_layout": 3,
+      "bottom_half_substantive_module_required": true,
+      "contact_sheet_review_expected_for_series": true
+    },
     "source_language_discipline": "<AI-authored source-language discipline>",
     "forbidden_regressions": [
       "<AI-authored forbidden regression>",

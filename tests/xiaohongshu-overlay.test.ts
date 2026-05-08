@@ -110,6 +110,16 @@ test('xiaohongshu built-in image-first style template is sanitized and style-onl
 
   assert.equal(profile.profile_id, 'xiaohongshu_image_first_medical_handdrawn_note_default_v1');
   assert.equal(profile.default_canvas.aspect_ratio, '3:4');
+  assert.equal(profile.production_quality_system.source_workbench_evidence.length, 6);
+  assert.equal(profile.production_quality_system.density_standard, 'medium_density_mobile_readable');
+  assert.equal(profile.production_quality_system.default_information_page_structure.includes('one core judgement'), true);
+  assert.equal(profile.production_quality_system.default_information_page_structure.includes('three short main information modules'), true);
+  assert.equal(profile.production_quality_system.text_density_targets.complex_mechanism_page_max_modules, 4);
+  assert.equal(profile.production_quality_system.layout_quality_gates.unique_layout_count_min, 3);
+  assert.equal(profile.production_quality_system.layout_quality_gates.bottom_half_substantive_module_required, true);
+  assert.equal(profile.production_quality_system.blocking_regressions.includes('keyword-only low-density pages that omit judgement or action boundary'), true);
+  assert.equal(profile.delivery_quality_surfaces.final_image_set_policy.includes('slide_*.png'), true);
+  assert.equal(profile.delivery_quality_surfaces.contact_sheet_review_policy.includes('contact-sheet'), true);
   assert.equal(profile.built_in_reference_template.reference_scope, 'visual_style_only');
   assert.equal(profile.built_in_reference_template.default_runtime_use, 'style_manifest_and_operator_reference_only');
   assert.equal(profile.built_in_reference_template.author_identity_policy.includes('naturally free of visible author names'), true);

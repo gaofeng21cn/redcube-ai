@@ -13,6 +13,10 @@
 - 每页从策划阶段就要规划相邻读者可见文字块、主卡、底部收束条之间的安全间距；副标题贴主卡、收藏条压正文、卡片互相贴住都属于版心失败。
 - 封面与结尾页都要有清楚的 audience-facing 视觉抓手；禁止把孤立单字贴纸、内部标签或无语义装饰当成锚点。
 - 标题和核心短句按自然语义组织；能单行成立的短句不要为了造型主动拆行。
+- 医学/健康/科普信息页默认采用“中密度 + 手机可读”：1 句核心判断、3 个短主信息模块、1 条边界提示；复杂机制页最多 4 个主模块。
+- 主信息模块优先 8-14 个汉字，最多约 18 个汉字；不要把 5-6 条长句塞进小卡片，也不要降级成只有标题和关键词标签。
+- 除封面、章节过渡和极简收束页外，每页下半区必须承载实质信息模块，不能只放图标、花草、装饰贴纸或留白。
+- 相邻页面至少变换主视觉动作和信息模块位置；系列或 8 页以上图文必须提前规划机制图、清单、流程、行动卡等不同布局原型。
 - `source_materials_full_text` 是完整资料输入，必须由 AI 阅读后决定页数、页面顺序、标题和内容；不得照抄本 prompt 的字段占位或历史默认页。
 
 ## runtime_seed
@@ -36,14 +40,18 @@
         "page_goal": "<private authoring goal>",
         "progression_role": "<hook | tension | explain | mechanism_peak | evidence_peak | memory_close>",
         "page_core_content": [
-          "<AI-authored visible content from source_materials_full_text>",
-          "<AI-authored visible content from source_materials_full_text>",
-          "<AI-authored visible content from source_materials_full_text>"
+          "<AI-authored core judgement from source_materials_full_text>",
+          "<AI-authored short main module from source_materials_full_text>",
+          "<AI-authored short main module from source_materials_full_text>",
+          "<AI-authored short main module from source_materials_full_text>",
+          "<AI-authored boundary note when medical/action risk exists>"
         ],
         "visual_presentation": {
           "layout_family": "<layout family>",
           "main_visual_action": "<AI-authored visual action>",
           "action_primitive": "<AI-authored primitive>",
+          "lower_half_module": "<substantive lower-half module or explicit reason when cover/transition page>",
+          "density_target": "<medium_density_mobile_readable | cover_hook | memory_close>",
           "anchor_tracks": [
             "<visual anchor>",
             "<visual anchor>",

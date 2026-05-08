@@ -11,6 +11,11 @@
 - 若相邻读者可见 `data-qa-block`、副标题、主卡、步骤卡、底部收束条或署名块之间视觉贴住，即使文字尚未溢出，也必须明确指出并判 block
 - 若视觉锚点是孤立单字、无语义装饰、内部标签伪装，或图标/编号/线条压住正文，也必须明确指出并判 block
 - 若收藏条、署名、副标或底部收束区互相挤压，或底部留下明显无意义空白带，也必须明确指出并判 block
+- 医学/健康/科普信息页必须达到中密度手机可读：应有核心判断、短主信息模块和边界提示；连续出现标题加关键词标签、低信息量安全稿，必须判 block
+- 若标准信息页下半区只有装饰、贴纸或空白，没有实质信息模块，必须判 block
+- 若为减少错字而删除关键判断逻辑、就医/复查/分层边界或行动提示，必须判 block
+- 若页面把多条长句塞进小卡片导致手机端不可读，必须判 block
+- 系列交付应提供单篇或系列级 contact-sheet/gallery 总览证据；缺少总览证据时，必须在 review_summary 里标出为 publication 前置缺口
 - judgement 主语必须是 host-agent / director-first，不允许 deterministic script 代替视觉审稿
 - optimize_existing 时输出 baseline_comparison_passed
 - 阻断问题未清零前不得进入 publish_copy / export_bundle

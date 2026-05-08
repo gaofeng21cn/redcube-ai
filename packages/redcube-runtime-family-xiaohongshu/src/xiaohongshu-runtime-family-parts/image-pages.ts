@@ -105,6 +105,8 @@ export function createXiaohongshuImagePageParts(deps) {
       `Visual direction: ${stableJson(visualDirection).slice(0, 3000)}.`,
       `Style system: ${stableJson(styleManifest).slice(0, 2400)}.`,
       repairFeedback ? `Repair feedback: ${stableJson(repairFeedback).slice(0, 1200)}.` : '',
+      'Production quality: medical/science information pages should be medium-density and mobile-readable, with one core judgement, three short modules, and one boundary note when applicable.',
+      'Layout quality: non-cover pages need substantive lower-half information; vary adjacent page visual actions and module placement.',
       'Reference images are style anchors only; do not copy their facts, logos, page numbers, QR codes, institutions, or disease objects.',
       'No UI chrome, no internal metadata, no prompt labels. Use safe margins and readable Chinese text.',
     ].filter(Boolean).join('\n');
@@ -137,6 +139,53 @@ export function createXiaohongshuImagePageParts(deps) {
     const styleProfile = defaultStyleProfile(contract);
     const promptTemplate = defaultPromptTemplate();
     const styleReferences = copyStyleReferences(contract, paths);
+    const productionQualityPolicy = {
+      source_workbench_sample: [
+        'AI小红书笔记/output/男性备孕科普系列',
+        'AI小红书笔记/output/女性备孕科普系列',
+        'AI小红书笔记/output/备孕科普系列',
+        'AI小红书笔记/output/急腹症科普系列',
+        'AI小红书笔记/output/胸痛科普系列',
+        'AI小红书笔记/output/用 Codex 全自动做小红书图文笔记',
+      ],
+      density_standard: 'medium_density_mobile_readable',
+      default_information_page_structure: {
+        core_judgement_count: 1,
+        main_module_count: 3,
+        boundary_note_required_when_medical_or_action_risk: true,
+        main_module_length_cn_chars_preferred: '8-14',
+        main_module_length_cn_chars_max: 18,
+        page_total_cn_chars_preferred: '45-70',
+        complex_mechanism_page_max_modules: 4,
+      },
+      layout_quality_gates: {
+        unique_layout_count_min: 3,
+        max_consecutive_same_layout: 3,
+        bottom_half_substantive_module_required: true,
+        decoration_only_lower_half_blocks_publication: true,
+      },
+      forbidden_completion_shortcuts: [
+        'keyword_only_low_density_safe_draft',
+        'tiny_dense_card_paragraphs',
+        'delete_medical_boundary_to_reduce_typo_risk',
+        'deterministic_image_patch_for_model_text_or_fact_errors',
+      ],
+    };
+    const deliveryQualityPolicy = {
+      final_png_size: `${CANVAS.width}x${CANVAS.height}`,
+      clean_final_image_set_required: true,
+      source_candidate_separation: 'source candidates, redraw rounds, and operator references must stay in provenance surfaces instead of the final publish image set',
+      contact_sheet_or_gallery_review_expected_for_series: true,
+      human_review_surfaces: [
+        'page prompt manifest',
+        'style manifest',
+        'generation metadata',
+        'page image manifest',
+        'visual director review',
+        'screenshot review',
+        'export bundle',
+      ],
+    };
     const styleManifest = {
       kind: 'xiaohongshu_image_first_style_manifest',
       route,
@@ -148,6 +197,8 @@ export function createXiaohongshuImagePageParts(deps) {
       style_reference: styleReferences,
       style_profile: styleProfile.profile,
       visual_direction_hash: sha256(stableJson(visualArtifact?.visual_direction || {})),
+      production_quality_policy: productionQualityPolicy,
+      delivery_quality_policy: deliveryQualityPolicy,
       fact_copy_guard: {
         reference_images_style_only: true,
         fact_whitelist_source: 'single_note_plan.page_core_content',
@@ -310,7 +361,26 @@ export function createXiaohongshuImagePageParts(deps) {
       source_visual_route: route,
       editable: false,
       page_count: bundlePages.length,
+      expected_page_count: allSlides.length,
+      actual_page_count: bundlePages.length,
+      page_count_gate_pass: bundlePages.length === allSlides.length,
       dimensions: { width: CANVAS.width, height: CANVAS.height, ratio: safeText(CANVAS.ratio, '3:4') },
+      dimension_gate: {
+        expected_width: CANVAS.width,
+        expected_height: CANVAS.height,
+        checked_page_count: bundlePages.length,
+        pass: bundlePages.every((slide) => Number(slide?.dimensions?.width) === CANVAS.width && Number(slide?.dimensions?.height) === CANVAS.height),
+        off_size_slide_ids: bundlePages
+          .filter((slide) => Number(slide?.dimensions?.width) !== CANVAS.width || Number(slide?.dimensions?.height) !== CANVAS.height)
+          .map((slide) => safeText(slide?.slide_id))
+          .filter(Boolean),
+      },
+      final_image_set_policy: {
+        clean_final_image_set_required: true,
+        source_candidate_separation: 'source candidates and redraw rounds are provenance, not final publish pages',
+        contact_sheet_or_gallery_review_expected_for_series: true,
+      },
+      production_quality_policy: productionQualityPolicy,
       slides: bundlePages,
       prompt_manifest: paths.promptManifestFile,
       style_manifest: paths.styleManifestFile,

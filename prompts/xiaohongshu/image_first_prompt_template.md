@@ -13,6 +13,8 @@ Keep these defaults active even when `style_reference_dir` is supplied:
 - Warm dotted notebook paper or clean mobile-note background, readable hierarchy, strong cover hook when page role is cover.
 - Bold black hand-drawn Chinese lettering, pastel marker blocks, taped paper corners, restrained medical icons, safe margins, and clear bottom closure.
 - Built-in RCA style references, when present, are sanitized no-author visual templates; use them for visual grammar only.
+- For medical/science information pages, use medium-density mobile-readable structure: one core judgement, three short main information modules, and one boundary note when safety/action risk is present.
+- Keep lower-half content substantive on non-cover pages; do not leave the bottom half as decoration-only whitespace.
 - Medical and scientific facts must come only from the page fact whitelist.
 
 ## Per-Page Prompt Shape
@@ -24,8 +26,10 @@ Exact page title: <short Chinese title>
 Page goal: <one page-level purpose>
 Fact whitelist: <allowed facts, numbers, dates, treatment boundaries, source labels>
 Visual action: <main scene/action/diagram metaphor>
-Style: warm paper or clean mobile-note page, readable hierarchy, strong title, limited text, restrained hand-drawn markers, taped note-card grammar, safe margins, stable signature grammar.
-Avoid: HTML screenshot, loose icon sheet, photo collage, fake QR code, copied logo, invented institution, copied reference-page facts, tiny dense text, page-number errors, internal metadata.
+Readable density: <core judgement + 3 short modules + boundary note when applicable; module text 8-14 Chinese chars preferred>.
+Layout rhythm: <unique layout family for this page; lower-half substantive module; avoid repeating adjacent page composition>.
+Style: warm paper or clean mobile-note page, readable hierarchy, strong title, medium-density but mobile readable text, restrained hand-drawn markers, taped note-card grammar, safe margins, stable signature grammar.
+Avoid: HTML screenshot, loose icon sheet, photo collage, fake QR code, copied logo, invented institution, copied reference-page facts, title-only keyword tags, tiny dense text, lower-half decoration-only layout, page-number errors, internal metadata.
 ```
 
 ## Override Policy
