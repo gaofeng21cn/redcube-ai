@@ -359,6 +359,25 @@ function buildProductEntryResponse({
   familyOrchestration,
   taskIntent,
 }) {
+  const deliveryIdentitySurface = buildDeliveryIdentitySurface({
+    deliverable_family: resolvedIdentity.deliverableFamily,
+    topic_id: resolvedIdentity.topicId,
+    deliverable_id: resolvedIdentity.deliverableId,
+    profile_id: resolvedIdentity.profileId || undefined,
+    extra_payload: resolvedIdentity.profileId
+      ? undefined
+      : {
+        profile_id: null,
+      },
+  });
+  const summary = buildProductEntrySummary({
+    entrySessionId: entrySession.entrySessionId,
+    taskIntent,
+    domainEntrySurface,
+    continuationSnapshot,
+    runtimeLoopClosure,
+    familyOrchestration,
+  });
   return {
     ok: domainEntrySurface.ok,
     surface_kind: 'product_entry',
@@ -371,17 +390,7 @@ function buildProductEntryResponse({
       created_deliverable: createdDeliverable,
       runtime_owner: MANAGED_RUNTIME_OWNER,
     }),
-    delivery_identity: buildDeliveryIdentitySurface({
-      deliverable_family: resolvedIdentity.deliverableFamily,
-      topic_id: resolvedIdentity.topicId,
-      deliverable_id: resolvedIdentity.deliverableId,
-      profile_id: resolvedIdentity.profileId || undefined,
-      extra_payload: resolvedIdentity.profileId
-        ? undefined
-        : {
-          profile_id: null,
-        },
-    }),
+    delivery_identity: deliveryIdentitySurface,
     domain_entry_surface: domainEntrySurface,
     continuation_snapshot: continuationSnapshot,
     session_continuity: sessionContinuity,
@@ -392,14 +401,7 @@ function buildProductEntryResponse({
     publication_projection: publicationProjection,
     opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
     family_orchestration: familyOrchestration,
-    summary: buildProductEntrySummary({
-      entrySessionId: entrySession.entrySessionId,
-      taskIntent,
-      domainEntrySurface,
-      continuationSnapshot,
-      runtimeLoopClosure,
-      familyOrchestration,
-    }),
+    summary,
   };
 }
 
