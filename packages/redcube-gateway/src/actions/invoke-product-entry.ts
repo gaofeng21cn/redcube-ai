@@ -207,6 +207,202 @@ function buildSessionRecord({
   };
 }
 
+function buildResolvedDeliveryIdentityPayload(resolvedIdentity, { includeProfile = true } = {}) {
+  const payload = {
+    deliverable_family: resolvedIdentity.deliverableFamily,
+    topic_id: resolvedIdentity.topicId,
+    deliverable_id: resolvedIdentity.deliverableId,
+  };
+  if (includeProfile) {
+    payload.profile_id = resolvedIdentity.profileId || null;
+  }
+  return payload;
+}
+
+async function readReviewAndPublicationSurfaces({ workspaceRoot, topicId, deliverableId }) {
+  const [reviewState, publicationProjection] = await Promise.all([
+    getReviewState({
+      workspaceRoot,
+      topicId,
+      deliverableId,
+    }),
+    getPublicationProjection({
+      workspaceRoot,
+      topicId,
+    }),
+  ]);
+  return { reviewState, publicationProjection };
+}
+
+function buildProductEntrySummary({
+  entrySessionId,
+  taskIntent,
+  domainEntrySurface,
+  continuationSnapshot,
+  runtimeLoopClosure,
+  familyOrchestration,
+}) {
+  const latestHandle = continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null;
+  return {
+    entry_session_id: entrySessionId,
+    task_intent: taskIntent,
+    actual_surface_kind: domainEntrySurface.result_surface?.surface_kind || null,
+    target_handle: latestHandle,
+    latest_handle: latestHandle,
+    approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
+    gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
+    resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,
+    session_locator_field: familyOrchestration?.resume_contract?.session_locator_field || null,
+    checkpoint_locator_field: familyOrchestration?.resume_contract?.checkpoint_locator_field || null,
+  };
+}
+
+async function ensureDeliverableForProductEntry({
+  workspaceRoot,
+  deliveryIdentity,
+  delivery,
+}) {
+  const deliverableFamily = requireField(
+    'delivery_request.deliverable_family',
+    deliveryIdentity.deliverableFamily,
+  );
+  const topicId = requireField('delivery_request.topic_id', deliveryIdentity.topicId);
+  const deliverableId = requireField('delivery_request.deliverable_id', deliveryIdentity.deliverableId);
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  let createdDeliverable = false;
+
+  if (!existsSync(deliverablePaths.deliverableFile)) {
+    await createDeliverable({
+      workspaceRoot,
+      overlay: deliverableFamily,
+      profileId: requireField('delivery_request.profile_id', deliveryIdentity.profileId),
+      topicId,
+      deliverableId,
+      title: requireField('delivery_request.title', deliveryIdentity.title),
+      goal: requireField('delivery_request.goal', deliveryIdentity.goal),
+    });
+    createdDeliverable = true;
+  }
+
+  const deliverableRecord = await getDeliverable({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+  });
+  assertRequestedStagesAllowed({ deliverableRecord, delivery });
+  return {
+    createdDeliverable,
+    deliverableRecord,
+    resolvedIdentity: {
+      deliverableFamily,
+      topicId,
+      deliverableId,
+      profileId: safeText(deliverableRecord?.deliverable?.profile_id, deliveryIdentity.profileId),
+      title: safeText(deliverableRecord?.deliverable?.title, deliveryIdentity.title),
+      goal: safeText(deliverableRecord?.deliverable?.goal, deliveryIdentity.goal),
+    },
+  };
+}
+
+function buildDomainEntryRequest({
+  workspaceRoot,
+  taskIntent,
+  entryMode,
+  delivery,
+  resolvedIdentity,
+}) {
+  return {
+    target_domain_id: 'redcube_ai',
+    task_intent: taskIntent,
+    entry_mode: entryMode,
+    workspace_locator: {
+      workspace_root: workspaceRoot,
+    },
+    runtime_session_contract: {
+      runtime_owner: MANAGED_RUNTIME_OWNER,
+      adapter_surface: DEFAULT_EXECUTOR_ADAPTER_SURFACE,
+      session_mode: 'entry_session',
+    },
+    return_surface_contract: {
+      surface_kind: taskIntent === 'run_deliverable_route' ? 'route_run' : 'managed_run',
+    },
+    domain_payload: {
+      deliverable_family: resolvedIdentity.deliverableFamily,
+      topic_id: resolvedIdentity.topicId,
+      deliverable_id: resolvedIdentity.deliverableId,
+      route: delivery.route || undefined,
+      adapter: delivery.adapter || undefined,
+      user_intent: delivery.userIntent || undefined,
+      stop_after_stage: delivery.stopAfterStage || undefined,
+      lifecycle_policy: delivery.lifecyclePolicy || undefined,
+      mode: delivery.mode || undefined,
+      baseline_deliverable_id: delivery.baselineDeliverableId || undefined,
+    },
+  };
+}
+
+function buildProductEntryResponse({
+  entrySession,
+  existingSession,
+  createdDeliverable,
+  resolvedIdentity,
+  domainEntrySurface,
+  continuationSnapshot,
+  persisted,
+  sessionContinuity,
+  progressProjection,
+  artifactInventory,
+  runtimeLoopClosure,
+  reviewState,
+  publicationProjection,
+  oplFamilyLifecycleAdapter,
+  familyOrchestration,
+  taskIntent,
+}) {
+  return {
+    ok: domainEntrySurface.ok,
+    surface_kind: 'product_entry',
+    recommended_action: domainEntrySurface.recommended_action || 'review_product_entry',
+    product_entry_contract_id: PRODUCT_ENTRY_ID,
+    entry_session: buildEntrySessionSurface({
+      entry_session_id: entrySession.entrySessionId,
+      session_file: persisted.file,
+      resumed_from_session: existingSession != null,
+      created_deliverable: createdDeliverable,
+      runtime_owner: MANAGED_RUNTIME_OWNER,
+    }),
+    delivery_identity: buildDeliveryIdentitySurface({
+      deliverable_family: resolvedIdentity.deliverableFamily,
+      topic_id: resolvedIdentity.topicId,
+      deliverable_id: resolvedIdentity.deliverableId,
+      profile_id: resolvedIdentity.profileId || undefined,
+      extra_payload: resolvedIdentity.profileId
+        ? undefined
+        : {
+          profile_id: null,
+        },
+    }),
+    domain_entry_surface: domainEntrySurface,
+    continuation_snapshot: continuationSnapshot,
+    session_continuity: sessionContinuity,
+    progress_projection: progressProjection,
+    artifact_inventory: artifactInventory,
+    runtime_loop_closure: runtimeLoopClosure,
+    review_state: reviewState,
+    publication_projection: publicationProjection,
+    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
+    family_orchestration: familyOrchestration,
+    summary: buildProductEntrySummary({
+      entrySessionId: entrySession.entrySessionId,
+      taskIntent,
+      domainEntrySurface,
+      continuationSnapshot,
+      runtimeLoopClosure,
+      familyOrchestration,
+    }),
+  };
+}
+
 export async function invokeProductEntry(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const entrySession = normalizeEntrySessionContract(request);
@@ -228,80 +424,22 @@ export async function invokeProductEntry(request) {
     taskIntent,
     existingSession,
   });
-  const deliverableFamily = requireField(
-    'delivery_request.deliverable_family',
-    deliveryIdentity.deliverableFamily,
-  );
-  const topicId = requireField(
-    'delivery_request.topic_id',
-    deliveryIdentity.topicId,
-  );
-  const deliverableId = requireField(
-    'delivery_request.deliverable_id',
-    deliveryIdentity.deliverableId,
-  );
 
-  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  let createdDeliverable = false;
-  if (!existsSync(deliverablePaths.deliverableFile)) {
-    const profileId = requireField('delivery_request.profile_id', deliveryIdentity.profileId);
-    const title = requireField('delivery_request.title', deliveryIdentity.title);
-    const goal = requireField('delivery_request.goal', deliveryIdentity.goal);
-    await createDeliverable({
-      workspaceRoot,
-      overlay: deliverableFamily,
-      profileId,
-      topicId,
-      deliverableId,
-      title,
-      goal,
-    });
-    createdDeliverable = true;
-  }
-
-  const deliverableRecord = await getDeliverable({
+  const {
+    createdDeliverable,
+    resolvedIdentity,
+  } = await ensureDeliverableForProductEntry({
     workspaceRoot,
-    topicId,
-    deliverableId,
+    deliveryIdentity,
+    delivery,
   });
-  assertRequestedStagesAllowed({ deliverableRecord, delivery });
-  const resolvedIdentity = {
-    deliverableFamily,
-    topicId,
-    deliverableId,
-    profileId: safeText(deliverableRecord?.deliverable?.profile_id, deliveryIdentity.profileId),
-    title: safeText(deliverableRecord?.deliverable?.title, deliveryIdentity.title),
-    goal: safeText(deliverableRecord?.deliverable?.goal, deliveryIdentity.goal),
-  };
-
-  const domainEntrySurface = await invokeDomainEntry({
-    target_domain_id: 'redcube_ai',
-    task_intent: taskIntent,
-    entry_mode: entryMode,
-    workspace_locator: {
-      workspace_root: workspaceRoot,
-    },
-    runtime_session_contract: {
-      runtime_owner: MANAGED_RUNTIME_OWNER,
-      adapter_surface: DEFAULT_EXECUTOR_ADAPTER_SURFACE,
-      session_mode: 'entry_session',
-    },
-    return_surface_contract: {
-      surface_kind: taskIntent === 'run_deliverable_route' ? 'route_run' : 'managed_run',
-    },
-    domain_payload: {
-      deliverable_family: deliverableFamily,
-      topic_id: topicId,
-      deliverable_id: deliverableId,
-      route: delivery.route || undefined,
-      adapter: delivery.adapter || undefined,
-      user_intent: delivery.userIntent || undefined,
-      stop_after_stage: delivery.stopAfterStage || undefined,
-      lifecycle_policy: delivery.lifecyclePolicy || undefined,
-      mode: delivery.mode || undefined,
-      baseline_deliverable_id: delivery.baselineDeliverableId || undefined,
-    },
-  });
+  const domainEntrySurface = await invokeDomainEntry(buildDomainEntryRequest({
+    workspaceRoot,
+    taskIntent,
+    entryMode,
+    delivery,
+    resolvedIdentity,
+  }));
 
   const continuationSnapshot = buildContinuationSnapshot(domainEntrySurface);
   const persisted = saveProductEntrySession({
@@ -336,26 +474,16 @@ export async function invokeProductEntry(request) {
     entrySessionId: entrySession.entrySessionId,
     sessionFile: persisted.file,
     runtimeOwner: MANAGED_RUNTIME_OWNER,
-    deliveryIdentity: {
-      deliverable_family: resolvedIdentity.deliverableFamily,
-      topic_id: resolvedIdentity.topicId,
-      deliverable_id: resolvedIdentity.deliverableId,
-    },
+    deliveryIdentity: buildResolvedDeliveryIdentityPayload(resolvedIdentity, { includeProfile: false }),
     continuationSnapshot,
     source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
     entryMode,
   });
-  const [reviewState, publicationProjection] = await Promise.all([
-    getReviewState({
-      workspaceRoot,
-      topicId,
-      deliverableId,
-    }),
-    getPublicationProjection({
-      workspaceRoot,
-      topicId,
-    }),
-  ]);
+  const { reviewState, publicationProjection } = await readReviewAndPublicationSurfaces({
+    workspaceRoot,
+    topicId: resolvedIdentity.topicId,
+    deliverableId: resolvedIdentity.deliverableId,
+  });
   const familyOrchestration = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot,
   });
@@ -363,12 +491,7 @@ export async function invokeProductEntry(request) {
     runtimeOwner: MANAGED_RUNTIME_OWNER,
     entrySessionId: entrySession.entrySessionId,
     sessionFile: persisted.file,
-    deliveryIdentity: {
-      deliverable_family: resolvedIdentity.deliverableFamily,
-      topic_id: resolvedIdentity.topicId,
-      deliverable_id: resolvedIdentity.deliverableId,
-      profile_id: resolvedIdentity.profileId || null,
-    },
+    deliveryIdentity: buildResolvedDeliveryIdentityPayload(resolvedIdentity),
     continuationSnapshot,
     runtimeLoopClosure,
     reviewState,
@@ -377,50 +500,22 @@ export async function invokeProductEntry(request) {
     entryMode,
   });
 
-  return {
-    ok: domainEntrySurface.ok,
-    surface_kind: 'product_entry',
-    recommended_action: domainEntrySurface.recommended_action || 'review_product_entry',
-    product_entry_contract_id: PRODUCT_ENTRY_ID,
-    entry_session: buildEntrySessionSurface({
-      entry_session_id: entrySession.entrySessionId,
-      session_file: persisted.file,
-      resumed_from_session: existingSession != null,
-      created_deliverable: createdDeliverable,
-      runtime_owner: MANAGED_RUNTIME_OWNER,
-    }),
-    delivery_identity: buildDeliveryIdentitySurface({
-      deliverable_family: resolvedIdentity.deliverableFamily,
-      topic_id: resolvedIdentity.topicId,
-      deliverable_id: resolvedIdentity.deliverableId,
-      profile_id: resolvedIdentity.profileId || undefined,
-      extra_payload: resolvedIdentity.profileId
-        ? undefined
-        : {
-          profile_id: null,
-        },
-    }),
-    domain_entry_surface: domainEntrySurface,
-    continuation_snapshot: continuationSnapshot,
-    session_continuity: sessionContinuity,
-    progress_projection: progressProjection,
-    artifact_inventory: artifactInventory,
-    runtime_loop_closure: runtimeLoopClosure,
-    review_state: reviewState,
-    publication_projection: publicationProjection,
-    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
-    family_orchestration: familyOrchestration,
-    summary: {
-      entry_session_id: entrySession.entrySessionId,
-      task_intent: taskIntent,
-      actual_surface_kind: domainEntrySurface.result_surface?.surface_kind || null,
-      target_handle: continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null,
-      latest_handle: continuationSnapshot.latest_managed_run_id || continuationSnapshot.latest_run_id || null,
-      approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
-      gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
-      resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,
-      session_locator_field: familyOrchestration?.resume_contract?.session_locator_field || null,
-      checkpoint_locator_field: familyOrchestration?.resume_contract?.checkpoint_locator_field || null,
-    },
-  };
+  return buildProductEntryResponse({
+    entrySession,
+    existingSession,
+    createdDeliverable,
+    resolvedIdentity,
+    domainEntrySurface,
+    continuationSnapshot,
+    persisted,
+    sessionContinuity,
+    progressProjection,
+    artifactInventory,
+    runtimeLoopClosure,
+    reviewState,
+    publicationProjection,
+    oplFamilyLifecycleAdapter,
+    familyOrchestration,
+    taskIntent,
+  });
 }

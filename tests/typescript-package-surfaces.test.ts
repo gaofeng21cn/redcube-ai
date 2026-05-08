@@ -176,20 +176,8 @@ const PACKAGE_SURFACES = Object.freeze([
   },
 ]);
 
-function assertPackageSurface(spec, rootTsconfig) {
-  const pkg = readJson(path.join(spec.directory, 'package.json'));
-  const entry = read(path.join(spec.directory, 'src/index.ts'));
-  const typeFiles = spec.typeFiles ?? ['src/types.ts'];
-  const types = typeFiles.map((file) => read(path.join(spec.directory, file))).join('\n');
-
+function assertPackageMetadata(spec, rootTsconfig, pkg) {
   assert.equal(pkg.types, spec.expectedTypesEntry, spec.directory);
-
-  for (const file of spec.requiredFiles ?? []) {
-    assertFileExists(path.join(spec.directory, file));
-  }
-  for (const file of spec.missingFiles ?? []) {
-    assertFileMissing(path.join(spec.directory, file));
-  }
   for (const [dependency, version] of Object.entries(spec.dependencies ?? {})) {
     assert.equal(pkg.dependencies?.[dependency], version, `${spec.directory} ${dependency}`);
   }
@@ -199,6 +187,21 @@ function assertPackageSurface(spec, rootTsconfig) {
   if (spec.rootReference) {
     assertRootReference(rootTsconfig, spec.directory);
   }
+}
+
+function assertPackageFiles(spec) {
+  for (const file of spec.requiredFiles ?? []) {
+    assertFileExists(path.join(spec.directory, file));
+  }
+  for (const file of spec.missingFiles ?? []) {
+    assertFileMissing(path.join(spec.directory, file));
+  }
+  for (const file of spec.tsOnlyFiles ?? []) {
+    assertTsOnlySource(path.join(spec.directory, file));
+  }
+}
+
+function assertPackageTextPatterns(spec, entry, types) {
   for (const pattern of spec.entryMatches ?? []) {
     assert.match(entry, pattern, spec.directory);
   }
@@ -211,9 +214,17 @@ function assertPackageSurface(spec, rootTsconfig) {
   if (spec.typeNoAny) {
     assert.doesNotMatch(types, /\bany\b/, spec.directory);
   }
-  for (const file of spec.tsOnlyFiles ?? []) {
-    assertTsOnlySource(path.join(spec.directory, file));
-  }
+}
+
+function assertPackageSurface(spec, rootTsconfig) {
+  const pkg = readJson(path.join(spec.directory, 'package.json'));
+  const entry = read(path.join(spec.directory, 'src/index.ts'));
+  const typeFiles = spec.typeFiles ?? ['src/types.ts'];
+  const types = typeFiles.map((file) => read(path.join(spec.directory, file))).join('\n');
+
+  assertPackageMetadata(spec, rootTsconfig, pkg);
+  assertPackageFiles(spec);
+  assertPackageTextPatterns(spec, entry, types);
 }
 
 function findRuntimeProgramContracts(dir = 'contracts/runtime-program') {

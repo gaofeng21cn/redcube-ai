@@ -262,6 +262,47 @@ function reconcileSessionCheckpointWithWorkspaceLatest(session) {
   }).session;
 }
 
+function buildSessionDeliveryIdentityPayload(session, { includeProfile = true } = {}) {
+  const payload = {
+    deliverable_family: session.deliverable_family,
+    topic_id: session.topic_id,
+    deliverable_id: session.deliverable_id,
+  };
+  if (includeProfile) {
+    payload.profile_id = session.profile_id || null;
+  }
+  return payload;
+}
+
+function productEntrySessionPath(entrySessionId) {
+  return productEntrySessionFile(entrySessionId);
+}
+
+function buildProductEntrySessionSummary({
+  entrySessionId,
+  session,
+  nativeProofArtifactInventory,
+  pptImageRouteSession,
+  runtimeLoopClosure,
+  familyOrchestration,
+}) {
+  const latestHandle = session.latest_managed_run_id || session.latest_run_id || null;
+  return {
+    entry_session_id: entrySessionId,
+    deliverable_id: session.deliverable_id,
+    latest_handle: latestHandle,
+    target_handle: latestHandle,
+    native_proof_artifact_ref_count: nativeProofArtifactInventory.summary.artifact_ref_count,
+    ppt_deck_default_visual_route: pptImageRouteSession?.default_visual_route || null,
+    ppt_deck_default_visual_policy: pptImageRouteSession?.default_visual_policy || null,
+    approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
+    gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
+    resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,
+    session_locator_field: familyOrchestration?.resume_contract?.session_locator_field || null,
+    checkpoint_locator_field: familyOrchestration?.resume_contract?.checkpoint_locator_field || null,
+  };
+}
+
 export async function getProductEntrySession(request) {
   const entrySessionId = requireField(
     'entry_session_id',
@@ -304,21 +345,16 @@ export async function getProductEntrySession(request) {
   });
   const sessionContinuity = buildSessionContinuitySurface({
     entrySessionId,
-    sessionFile: productEntrySessionFile(entrySessionId),
+    sessionFile: productEntrySessionPath(entrySessionId),
     runtimeOwner: session.runtime_owner,
-    deliveryIdentity: {
-      deliverable_family: session.deliverable_family,
-      topic_id: session.topic_id,
-      deliverable_id: session.deliverable_id,
-      profile_id: session.profile_id || null,
-    },
+    deliveryIdentity: buildSessionDeliveryIdentityPayload(session),
     continuationSnapshot,
   });
   const progressProjection = buildProgressProjectionSurface({ continuationSnapshot });
   const artifactInventory = mergeArtifactInventoryWithPublicationRefs({
     artifactInventory: buildArtifactInventorySurface({
       entrySessionId,
-      sessionFile: productEntrySessionFile(entrySessionId),
+      sessionFile: productEntrySessionPath(entrySessionId),
       continuationSnapshot,
     }),
     publicationProjection,
@@ -331,13 +367,9 @@ export async function getProductEntrySession(request) {
   });
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,
-    sessionFile: productEntrySessionFile(entrySessionId),
+    sessionFile: productEntrySessionPath(entrySessionId),
     runtimeOwner: session.runtime_owner,
-    deliveryIdentity: {
-      deliverable_family: session.deliverable_family,
-      topic_id: session.topic_id,
-      deliverable_id: session.deliverable_id,
-    },
+    deliveryIdentity: buildSessionDeliveryIdentityPayload(session, { includeProfile: false }),
     continuationSnapshot,
     source: 'session',
     entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
@@ -346,13 +378,8 @@ export async function getProductEntrySession(request) {
   const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
     runtimeOwner: session.runtime_owner,
     entrySessionId,
-    sessionFile: productEntrySessionFile(entrySessionId),
-    deliveryIdentity: {
-      deliverable_family: session.deliverable_family,
-      topic_id: session.topic_id,
-      deliverable_id: session.deliverable_id,
-      profile_id: session.profile_id || null,
-    },
+    sessionFile: productEntrySessionPath(entrySessionId),
+    deliveryIdentity: buildSessionDeliveryIdentityPayload(session),
     continuationSnapshot,
     runtimeLoopClosure,
     reviewState,
@@ -374,7 +401,7 @@ export async function getProductEntrySession(request) {
     product_entry_contract_id: 'managed_product_entry_hardening',
     entry_session: buildEntrySessionSurface({
       entry_session_id: entrySessionId,
-      session_file: productEntrySessionFile(entrySessionId),
+      session_file: productEntrySessionPath(entrySessionId),
       runtime_owner: session.runtime_owner,
     }),
     delivery_identity: buildDeliveryIdentitySurface({
@@ -399,19 +426,13 @@ export async function getProductEntrySession(request) {
     publication_projection: publicationProjection,
     opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
     family_orchestration: familyOrchestration,
-    summary: {
-      entry_session_id: entrySessionId,
-      deliverable_id: session.deliverable_id,
-      latest_handle: session.latest_managed_run_id || session.latest_run_id || null,
-      target_handle: session.latest_managed_run_id || session.latest_run_id || null,
-      native_proof_artifact_ref_count: nativeProofArtifactInventory.summary.artifact_ref_count,
-      ppt_deck_default_visual_route: pptImageRouteSession?.default_visual_route || null,
-      ppt_deck_default_visual_policy: pptImageRouteSession?.default_visual_policy || null,
-      approval_required: Boolean(runtimeLoopClosure?.control_policy?.approval_required),
-      gate_status: runtimeLoopClosure?.control_policy?.gate_status || null,
-      resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,
-      session_locator_field: familyOrchestration?.resume_contract?.session_locator_field || null,
-      checkpoint_locator_field: familyOrchestration?.resume_contract?.checkpoint_locator_field || null,
-    },
+    summary: buildProductEntrySessionSummary({
+      entrySessionId,
+      session,
+      nativeProofArtifactInventory,
+      pptImageRouteSession,
+      runtimeLoopClosure,
+      familyOrchestration,
+    }),
   };
 }
