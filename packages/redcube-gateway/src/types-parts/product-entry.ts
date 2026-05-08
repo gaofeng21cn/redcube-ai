@@ -306,6 +306,38 @@ export interface RuntimeLoopClosureSurface {
   };
 }
 
+export interface OplFamilyLifecycleAdapterSurface {
+  surface_kind: 'opl_family_lifecycle_adapter';
+  adapter_id: string;
+  version: string;
+  domain_id: string;
+  domain_owner: string;
+  discovery: {
+    adoption_state: string;
+    owner_split: Record<string, string>;
+    route_surfaces: Array<Record<string, unknown>>;
+    delivery_identity: {
+      deliverable_family: string | null;
+      topic_id: string | null;
+      deliverable_id: string | null;
+      profile_id: string | null;
+    };
+  };
+  persistence: Record<string, unknown>;
+  lifecycle: Record<string, unknown>;
+  owner_route_discovery: Record<string, unknown>;
+  adoption: Record<string, unknown>;
+  authority_boundary: {
+    owns_visual_truth: boolean;
+    owns_canonical_artifacts: boolean;
+    owns_review_truth: boolean;
+    owns_publication_projection: boolean;
+    owns_concrete_executor: boolean;
+    allowed_authority: string[];
+  };
+  non_goals: string[];
+}
+
 export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
@@ -334,6 +366,7 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   runtime_loop_closure: RuntimeLoopClosureSurface;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
+  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
   family_orchestration: FamilyOrchestrationCompanion;
   summary: {
     entry_session_id: string;
@@ -372,6 +405,7 @@ export interface FederatedProductEntryResponse extends SurfaceBase<'federated_pr
   family_orchestration: FamilyOrchestrationCompanion;
   product_entry_surface: ProductEntryResponse;
   runtime_loop_closure: RuntimeLoopClosureSurface;
+  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
   summary: {
     entry_session_id: string | null;
     actual_surface_kind: string;
@@ -404,6 +438,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   runtime_loop_closure: RuntimeLoopClosureSurface;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
+  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
   family_orchestration: FamilyOrchestrationCompanion;
   summary: {
     entry_session_id: string;
@@ -630,6 +665,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     }>;
   };
   runtime_loop_closure: RuntimeLoopClosureSurface;
+  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
   notes: string[];
 }
 

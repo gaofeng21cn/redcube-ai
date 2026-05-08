@@ -179,6 +179,21 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     );
     assert.equal(response.review_state.surface_kind, 'review_state');
     assert.equal(response.publication_projection.surface_kind, 'publication_projection');
+    assert.equal(response.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
+    assert.equal(response.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
+    assert.equal(response.opl_family_lifecycle_adapter.persistence.session.entry_session_id, 'session-a');
+    assert.equal(
+      response.opl_family_lifecycle_adapter.persistence.managed_run.managed_run_id,
+      response.continuation_snapshot.latest_managed_run_id,
+    );
+    assert.equal(response.opl_family_lifecycle_adapter.lifecycle.current_stage, response.progress_projection.projection.current_stage);
+    assert.equal(response.opl_family_lifecycle_adapter.lifecycle.content_status, response.progress_projection.projection.content_status);
+    assert.equal(response.opl_family_lifecycle_adapter.lifecycle.review_publication.review_state_ref.surface_kind, 'review_state');
+    assert.equal(response.opl_family_lifecycle_adapter.lifecycle.review_publication.publication_projection_ref.surface_kind, 'publication_projection');
+    assert.equal(response.opl_family_lifecycle_adapter.owner_route_discovery.recommended_owner_route, 'resolve_review_gate');
+    assert.equal(response.opl_family_lifecycle_adapter.adoption.resume_surface.command, 'redcube product session --entry-session-id <entry-session-id>');
+    assert.equal(response.opl_family_lifecycle_adapter.authority_boundary.owns_visual_truth, false);
+    assert.equal(response.opl_family_lifecycle_adapter.authority_boundary.owns_publication_projection, false);
     assertRuntimeLoopClosureShape(response, {
       source: 'direct',
       entryMode: 'redcube_product_entry',
@@ -337,6 +352,17 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     }
     assert.equal(session.review_state.surface_kind, 'review_state');
     assert.equal(session.publication_projection.surface_kind, 'publication_projection');
+    assert.equal(session.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
+    assert.equal(session.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
+    assert.equal(session.opl_family_lifecycle_adapter.persistence.session.entry_session_id, 'session-a');
+    assert.equal(
+      session.opl_family_lifecycle_adapter.persistence.managed_run.managed_run_id,
+      session.continuation_snapshot.latest_managed_run_id,
+    );
+    assert.equal(session.opl_family_lifecycle_adapter.lifecycle.content_status, session.progress_projection.projection.content_status);
+    assert.equal(session.opl_family_lifecycle_adapter.owner_route_discovery.candidate_routes[0].route_id, 'product_entry_session');
+    assert.equal(session.opl_family_lifecycle_adapter.adoption.adoption_command, 'redcube product session --entry-session-id <entry-session-id>');
+    assert.equal(session.opl_family_lifecycle_adapter.persistence.sqlite.status, 'deferred_for_rca');
     assertRuntimeLoopClosureShape(continued, {
       source: 'direct',
       entryMode: 'redcube_product_entry',
@@ -442,6 +468,9 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.deepEqual(response.session_continuity, response.product_entry_surface.session_continuity);
     assert.deepEqual(response.progress_projection, response.product_entry_surface.progress_projection);
     assert.deepEqual(response.artifact_inventory, response.product_entry_surface.artifact_inventory);
+    assert.deepEqual(response.opl_family_lifecycle_adapter, response.product_entry_surface.opl_family_lifecycle_adapter);
+    assert.equal(response.opl_family_lifecycle_adapter.owner_route_discovery.current_source, 'federated');
+    assert.equal(response.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
     assert.equal(response.product_entry_surface.session_continuity.entry_session_id, 'session-federated');
     assert.equal(response.product_entry_surface.session_continuity.restore_point.latest_handle, response.summary.target_handle);
     assertRuntimeLoopClosureShape(response.product_entry_surface, {

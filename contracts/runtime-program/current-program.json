@@ -18,7 +18,8 @@
         "getProductEntrySession",
         "runtimeWatch",
         "artifact inventory",
-        "review and publication projection"
+        "review and publication projection",
+        "opl_family_lifecycle_adapter"
       ],
       "does_not_own": [
         "visual-domain truth",
@@ -248,7 +249,8 @@
         "review state",
         "export bundles",
         "artifact gallery manifests",
-        "final delivery manifests"
+        "final delivery manifests",
+        "opl_family_lifecycle_adapter projection"
       ],
       "future_sidecar_constraints": [
         "must be rebuildable",
@@ -894,6 +896,26 @@
             "getPublicationProjection"
           ],
           "core_generation_logic_changed": false
+        },
+        "opl_family_lifecycle_adapter": {
+          "status": "repo_tracked_projection_contract",
+          "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
+          "source_surfaces": [
+            "managed-runs",
+            "product-entry sessions",
+            "review/publication projections",
+            "artifact inventory",
+            "runtime loop closure"
+          ],
+          "exposes": [
+            "family persistence",
+            "lifecycle projection",
+            "owner-route discovery",
+            "adoption surface"
+          ],
+          "sqlite_status": "deferred_for_rca",
+          "domain_truth_owner": "redcube_ai",
+          "opl_role": "projection_consumer_only"
         }
       },
       "artifacts": {

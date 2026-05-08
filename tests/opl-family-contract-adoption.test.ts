@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const CONTRACT_PATH = 'contracts/runtime-program/opl-family-contract-adoption.json';
+const CURRENT_PROGRAM_PATH = 'contracts/runtime-program/current-program.json';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -15,6 +16,10 @@ function read(relativePath) {
 
 function contract() {
   return JSON.parse(read(CONTRACT_PATH));
+}
+
+function currentProgram() {
+  return JSON.parse(read(CURRENT_PROGRAM_PATH));
 }
 
 test('RCA declares thin OPL family contract adoption', () => {
@@ -74,4 +79,46 @@ test('RCA operator and incident projection require source refs and RCA closure',
   ]) {
     assert.ok(payload.non_goals.includes(nonGoal));
   }
+});
+
+test('RCA exposes a thick OPL family lifecycle adapter while keeping SQLite deferred', () => {
+  const payload = contract();
+  const adapter = payload.lifecycle_adapter_surface;
+
+  assert.equal(adapter.surface_kind, 'opl_family_lifecycle_adapter');
+  assert.equal(adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
+  assert.equal(adapter.sqlite_status, 'deferred_for_rca');
+  assert.equal(adapter.authority_model, 'file_authority_plus_rebuildable_artifact_indexes');
+  for (const surface of [
+    'managed-runs',
+    'product-entry sessions',
+    'review state',
+    'publication projection',
+  ]) {
+    assert.ok(adapter.source_surfaces.includes(surface));
+  }
+  assert.deepEqual(adapter.adoption_state_values, [
+    'discoverable_manifest_projection',
+    'hydrated_session_projection',
+  ]);
+  assert.ok(adapter.exposed_on.includes('federated product entry response'));
+});
+
+test('current runtime program points OPL Runtime Manager at the RCA lifecycle adapter projection', () => {
+  const payload = currentProgram();
+  const managerBoundary = payload.longrun_goal.runtime_manager_boundary;
+  const persistence = payload.current_state.runtime_persistence_strategy;
+  const adapter = payload.current_state.active_baton.scope.opl_family_lifecycle_adapter;
+
+  assert.ok(managerBoundary.consumes_redcube_surfaces.includes('opl_family_lifecycle_adapter'));
+  assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('opl_family_lifecycle_adapter projection'));
+  assert.equal(adapter.status, 'repo_tracked_projection_contract');
+  assert.equal(adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
+  assert.equal(adapter.sqlite_status, 'deferred_for_rca');
+  assert.deepEqual(adapter.exposes, [
+    'family persistence',
+    'lifecycle projection',
+    'owner-route discovery',
+    'adoption surface',
+  ]);
 });

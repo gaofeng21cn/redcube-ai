@@ -23,6 +23,7 @@ import { getDeliverable } from './get-deliverable.js';
 import { invokeDomainEntry } from './invoke-domain-entry.js';
 import {
   buildArtifactInventorySurface,
+  buildOplFamilyLifecycleAdapterSurface,
   buildProgressProjectionSurface,
   buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
@@ -358,6 +359,23 @@ export async function invokeProductEntry(request) {
   const familyOrchestration = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot,
   });
+  const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
+    runtimeOwner: MANAGED_RUNTIME_OWNER,
+    entrySessionId: entrySession.entrySessionId,
+    sessionFile: persisted.file,
+    deliveryIdentity: {
+      deliverable_family: resolvedIdentity.deliverableFamily,
+      topic_id: resolvedIdentity.topicId,
+      deliverable_id: resolvedIdentity.deliverableId,
+      profile_id: resolvedIdentity.profileId || null,
+    },
+    continuationSnapshot,
+    runtimeLoopClosure,
+    reviewState,
+    publicationProjection,
+    source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
+    entryMode,
+  });
 
   return {
     ok: domainEntrySurface.ok,
@@ -390,6 +408,7 @@ export async function invokeProductEntry(request) {
     runtime_loop_closure: runtimeLoopClosure,
     review_state: reviewState,
     publication_projection: publicationProjection,
+    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
     family_orchestration: familyOrchestration,
     summary: {
       entry_session_id: entrySession.entrySessionId,

@@ -104,6 +104,7 @@ export async function invokeFederatedProductEntry(request) {
     runtime_loop_closure: productEntrySurface.runtime_loop_closure,
     review_state: productEntrySurface.review_state,
     publication_projection: productEntrySurface.publication_projection,
+    opl_family_lifecycle_adapter: productEntrySurface.opl_family_lifecycle_adapter,
     summary: {
       entry_session_id: productEntrySurface.summary?.entry_session_id || null,
       actual_surface_kind: productEntrySurface.surface_kind,

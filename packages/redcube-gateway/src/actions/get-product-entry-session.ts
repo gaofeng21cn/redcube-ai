@@ -20,6 +20,7 @@ import {
 import { getManagedRun } from './get-managed-run.js';
 import {
   buildArtifactInventorySurface,
+  buildOplFamilyLifecycleAdapterSurface,
   buildProgressProjectionSurface,
   buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
@@ -342,6 +343,23 @@ export async function getProductEntrySession(request) {
     entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
   });
   const pptImageRouteSession = buildPptImageRouteSessionSurface({ session });
+  const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
+    runtimeOwner: session.runtime_owner,
+    entrySessionId,
+    sessionFile: productEntrySessionFile(entrySessionId),
+    deliveryIdentity: {
+      deliverable_family: session.deliverable_family,
+      topic_id: session.topic_id,
+      deliverable_id: session.deliverable_id,
+      profile_id: session.profile_id || null,
+    },
+    continuationSnapshot,
+    runtimeLoopClosure,
+    reviewState,
+    publicationProjection,
+    source: 'session',
+    entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
+  });
 
   return {
     ok: true,
@@ -379,6 +397,7 @@ export async function getProductEntrySession(request) {
     runtime_loop_closure: runtimeLoopClosure,
     review_state: reviewState,
     publication_projection: publicationProjection,
+    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
     family_orchestration: familyOrchestration,
     summary: {
       entry_session_id: entrySessionId,

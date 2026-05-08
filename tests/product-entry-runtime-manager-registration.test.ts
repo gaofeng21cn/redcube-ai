@@ -102,11 +102,12 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'artifact_inventory',
         'runtime_health',
         'review_publication_projection_refs',
+        'opl_family_lifecycle_adapter',
       ],
     );
     assert.deepEqual(
-      registration.consumable_projection_refs.slice(-2),
-      ['/review_state', '/publication_projection'],
+      registration.consumable_projection_refs.slice(-3),
+      ['/review_state', '/publication_projection', '/opl_family_lifecycle_adapter'],
     );
     assert.equal(
       registration.review_publication_truth.route_rule,
