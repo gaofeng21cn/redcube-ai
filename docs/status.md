@@ -47,8 +47,6 @@
 - 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` / `npm run test:full:remaining` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发；本地已跑 fast 后可用 `npm run test:integration:remaining` 跳过 fast 已覆盖的 integration 文件；本地已跑 fast + family + meta:ci + integration:remaining 后可用 `npm run test:full:remaining` 跳过已覆盖的 meta/integration 文件，只跑动态推导出的 full 余量
 - `historical` 只承载一个紧凑的 runtime-program provenance guard，旧 phase/freeze/closeout/longrun 叙述锁定测试已归并；默认 `full` 不再隐式包含 historical，需要历史回归时显式运行 `npm run test:historical` 或 `./scripts/verify.sh full-with-historical`
 - runtime/product-entry route 覆盖分层为 fast 入口 smoke / fail-closed 与 `integration:remaining` 完整 happy path：`product-entry-route-integration.test.ts` 和 `runtime-deliverable-route-integration.test.ts` 承载 create -> run -> session / watch / projection 主路径，CLI / MCP 继续保留 public entry 代理与关键 shape smoke
-- runtime/product-entry route 覆盖分层为 fast 入口 smoke / fail-closed 与 `integration:remaining` 完整 happy path：`product-entry-route-integration.test.ts` 和 `runtime-deliverable-route-integration.test.ts` 承载 create -> run -> session / watch / projection 主路径，CLI / MCP 继续保留 public entry 代理与关键 shape smoke
-- `historical` 只承载一个紧凑的 runtime-program provenance guard，旧 phase/freeze/closeout/longrun 叙述锁定测试已归并；默认 `full` 不再隐式包含 historical，需要历史回归时显式运行 `npm run test:historical` 或 `./scripts/verify.sh full-with-historical`
 - `scripts/verify.sh` 与 `scripts/run-test-group.ts` 现在都会先执行 `scripts/repo-hygiene.sh`；tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json`，并且 `.agents/` 只允许 `.agents/plugins/marketplace.json` 作为当前插件入口 source。
 
 ## 历史记录与追溯层
