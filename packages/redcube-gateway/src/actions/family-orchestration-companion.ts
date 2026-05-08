@@ -1,6 +1,6 @@
 // @ts-nocheck
 import {
-  buildFamilyFrontdoorProductEntryOrchestration,
+  buildFamilyProductEntryPresetOrchestration,
 } from 'opl-gateway-shared/family-orchestration';
 
 function safeText(value, fallback = '') {
@@ -19,9 +19,9 @@ const PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC = Object.freeze({
   target_domain_id: 'redcube_ai',
   graph_kind: 'visual_deliverable_orchestration',
   graph_version: '2026-04-13',
-  frontdoor_node_id: 'step:open_status',
-  frontdoor_title: 'Open RedCube product-entry overview',
-  frontdoor_surface_kind: 'product_status',
+  entry_node_id: 'step:open_status',
+  entry_title: 'Open RedCube product-entry overview',
+  entry_surface_kind: 'product_status',
   direct_title: 'Start or continue the direct product loop',
   direct_surface_kind: 'product_entry',
   federated_title: 'Enter the same loop through internal OPL bridge',
@@ -82,8 +82,11 @@ export function buildFamilyOrchestrationCompanion({
     throw new Error('family_orchestration.resume_contract.session_locator_field 不能为空');
   }
 
-  return buildFamilyFrontdoorProductEntryOrchestration({
+  return buildFamilyProductEntryPresetOrchestration({
     ...PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC,
+    product_entry_node_id: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.entry_node_id,
+    product_entry_title: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.entry_title,
+    product_entry_surface_kind: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.entry_surface_kind,
     review_gate_status: safeText(gateStatus, 'requested'),
     ...(reviewSurfaceRef ? { review_surface: reviewSurfaceRef } : {}),
     action_graph_ref: PRODUCT_ENTRY_ACTION_GRAPH_REF,

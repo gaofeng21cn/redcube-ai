@@ -2,7 +2,7 @@
 import {
   buildDomainEntryCommandCatalog,
   buildFamilyDomainEntryContract,
-  buildFamilyGatewayInteractionContract,
+  buildFamilyUserInteractionContract,
   buildSharedHandoff,
   buildSharedHandoffReturnSurface,
 } from 'opl-gateway-shared/family-entry-contracts';
@@ -122,13 +122,13 @@ export function buildRedCubeDomainEntryContract({
   });
 }
 
-export function buildRedCubeGatewayInteractionContract({
+export function buildRedCubeUserInteractionContract({
   productStatusCommand,
   productManifestCommand,
   federatedProductEntryContractRef,
 }) {
-  return buildFamilyGatewayInteractionContract({
-    frontdoor_owner: 'redcube_agent_entry_shell',
+  return buildFamilyUserInteractionContract({
+    entry_owner: 'redcube_agent_entry_shell',
     user_interaction_mode: 'agent_facing_product_entry_overview',
     shared_downstream_entry: REDCUBE_DOMAIN_ENTRY_ADAPTER,
     extra_shared_handoff_envelope: [
@@ -136,7 +136,7 @@ export function buildRedCubeGatewayInteractionContract({
       'delivery_request',
     ],
     extra_payload: {
-      direct_status_command: productStatusCommand,
+      entry_status_command: productStatusCommand,
       manifest_command: productManifestCommand,
       federated_contract_ref: federatedProductEntryContractRef,
     },

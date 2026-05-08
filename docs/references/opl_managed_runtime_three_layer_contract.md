@@ -42,8 +42,8 @@
 
 - 这轮已完成的是跨仓 contract / 入口 / 文档同构
 - 这轮没有宣称跨仓共享代码模块已经抽离完成
-- 默认 executor 仍是 `host_agent`
-- `hermes_native_proof` 继续只是 opt-in full-agent-loop proof lane
+- 默认 executor backend 仍是 `codex_cli`
+- `hermes_agent` 继续只是显式 opt-in full-agent-loop proof lane
 
 ## 共享框架下一步
 

@@ -133,7 +133,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
       getProductStatus: async (request) => ({
         ok: true,
         surface_kind: 'product_status',
-        status_surface: {
+        entry_status_surface: {
           command: 'redcube product status',
           workspace_root: request.workspaceRoot,
         },
@@ -182,7 +182,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
   assert.equal(status.surface_kind, 'product_status');
-  assert.equal(status.status_surface.command, 'redcube product status');
+  assert.equal(status.entry_status_surface.command, 'redcube product status');
   assert.equal(start.surface_kind, 'product_entry_start');
   assert.equal(start.workspace_locator.workspace_root, '/tmp/redcube-workspace');
   assert.equal(preflight.surface_kind, 'product_entry_preflight');

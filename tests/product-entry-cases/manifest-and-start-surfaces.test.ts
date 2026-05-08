@@ -40,10 +40,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(manifest.recommended_shell, 'direct');
     assert.equal(manifest.recommended_command, 'redcube product invoke');
-    assert.equal(manifest.status_surface.shell_key, 'status');
-    assert.equal(manifest.status_surface.command, 'redcube product status');
-    assert.equal(manifest.status_surface.surface_kind, 'product_status');
-    assert.match(manifest.status_surface.summary, /product-entry overview/i);
+    assert.equal(manifest.entry_status_surface.shell_key, 'status');
+    assert.equal(manifest.entry_status_surface.command, 'redcube product status');
+    assert.equal(manifest.entry_status_surface.surface_kind, 'product_status');
+    assert.match(manifest.entry_status_surface.summary, /product-entry overview/i);
     assert.equal(manifest.operator_loop_surface.shell_key, 'direct');
     assert.equal(manifest.operator_loop_surface.command, 'redcube product invoke');
     assert.equal(manifest.operator_loop_surface.surface_kind, 'product_entry');
@@ -81,7 +81,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.product_entry_overview.summary,
       'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     );
-    assert.equal(manifest.product_entry_overview.status_command, 'redcube product status');
+    assert.equal(manifest.product_entry_overview.product_entry_command, 'redcube product status');
+    assert.equal(manifest.product_entry_overview.entry_status_command, 'redcube product status');
     assert.equal(manifest.product_entry_overview.recommended_command, 'redcube product invoke');
     assert.equal(manifest.product_entry_overview.operator_loop_command, 'redcube product invoke');
     assert.deepEqual(manifest.product_entry_overview.progress_surface, {
@@ -223,6 +224,13 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.task_lifecycle.checkpoint_summary.surface_kind, 'checkpoint_summary');
     assert.equal(manifest.task_lifecycle.checkpoint_summary.status, 'operator_review_required');
     assert.deepEqual(manifest.task_lifecycle.human_gate_ids, ['redcube_operator_review_gate']);
+    assert.equal(manifest.persistence_policy.surface_kind, 'family_persistence_policy');
+    assert.equal(manifest.persistence_policy.policy_id, 'redcube_product_entry_persistence_policy');
+    assert.equal(manifest.persistence_policy.authority_surfaces[0].storage_role, 'file_authority');
+    assert.equal(manifest.lifecycle_ledger.surface_kind, 'family_lifecycle_ledger');
+    assert.equal(manifest.lifecycle_ledger.actions[0].action_id, 'verify_redcube_product_entry_manifest');
+    assert.equal(manifest.owner_route.surface_kind, 'family_owner_route');
+    assert.equal(manifest.owner_route.next_owner, 'redcube_ai');
     assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
     assert.equal(manifest.skill_catalog.skills.length, 1); assert.equal(manifest.skill_catalog.skills.some((skill) => skill.skill_id === 'ui-ux-pro-max'), false);
     assert.deepEqual(manifest.skill_catalog.supported_commands, [
@@ -474,13 +482,13 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         optional_fields: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
     );
-    assert.equal(manifest.gateway_interaction_contract.surface_kind, 'gateway_interaction_contract');
-    assert.equal(manifest.gateway_interaction_contract.frontdoor_owner, 'redcube_agent_entry_shell');
-    assert.equal(manifest.gateway_interaction_contract.user_interaction_mode, 'agent_facing_product_entry_overview');
-	    assert.equal(manifest.gateway_interaction_contract.user_commands_required, false);
-	    assert.equal(manifest.gateway_interaction_contract.command_surfaces_for_agent_consumption_only, true);
-	    assert.equal(manifest.gateway_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
-    assert.deepEqual(manifest.gateway_interaction_contract.shared_handoff_envelope, [
+    assert.equal(manifest.user_interaction_contract.surface_kind, 'user_interaction_contract');
+    assert.equal(manifest.user_interaction_contract.entry_owner, 'redcube_agent_entry_shell');
+    assert.equal(manifest.user_interaction_contract.user_interaction_mode, 'agent_facing_product_entry_overview');
+	    assert.equal(manifest.user_interaction_contract.user_commands_required, false);
+	    assert.equal(manifest.user_interaction_contract.command_surfaces_for_agent_consumption_only, true);
+	    assert.equal(manifest.user_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
+    assert.deepEqual(manifest.user_interaction_contract.shared_handoff_envelope, [
       'target_domain_id',
       'task_intent',
       'entry_mode',
@@ -592,7 +600,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	      requireRuntimeCompanions: true,
 	    });
     assert.equal(validatedManifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
-    assert.equal(validatedManifest.gateway_interaction_contract.frontdoor_owner, 'redcube_agent_entry_shell');
+    assert.equal(validatedManifest.user_interaction_contract.entry_owner, 'redcube_agent_entry_shell');
     assertFamilyOrchestrationCompanion(manifest, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });
@@ -644,10 +652,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(status.product_entry_quickstart.steps[2].surface_kind, 'product_entry_session');
     assert.equal(status.schema_ref, manifest.schema_ref);
     assert.deepEqual(status.domain_entry_contract, manifest.domain_entry_contract);
-    assert.deepEqual(status.gateway_interaction_contract, manifest.gateway_interaction_contract);
+    assert.deepEqual(status.user_interaction_contract, manifest.user_interaction_contract);
     assert.equal(status.extra_payload, undefined);
     assert.equal(status.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
-    assert.equal(status.gateway_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
+    assert.equal(status.user_interaction_contract.shared_downstream_entry, 'RedCubeDomainEntry');
     assertFamilyOrchestrationCompanion(status, {
       sessionLocatorField: 'entry_session_contract.entry_session_id',
     });

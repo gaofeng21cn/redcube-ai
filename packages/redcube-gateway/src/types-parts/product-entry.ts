@@ -1,9 +1,9 @@
 import type {
   FamilySharedHandoffSurface,
-  GatewayInteractionContractSurface,
+  UserInteractionContractSurface,
 } from 'opl-gateway-shared/family-entry-contracts';
 import type {
-  FamilyFrontdoorEntrySurfaces,
+  FamilyProductEntrySurfaces,
   FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
   FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
   FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
@@ -151,9 +151,10 @@ export interface ProductEntryStartCompanion {
 export interface ProductEntryOverviewCompanion {
   surface_kind: 'product_entry_overview' | string;
   summary: string;
-  status_command: string;
+  product_entry_command: string;
   recommended_command: string;
   operator_loop_command: string;
+  entry_status_command?: string;
   progress_surface?: {
     surface_kind: string;
     command: string;
@@ -461,6 +462,13 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     workspace_root: string;
   };
   recommended_shell: 'direct' | 'opl_bridge' | 'session' | string;
+  recommended_command: string;
+  entry_status_surface: {
+    shell_key: 'status' | string;
+    command: string;
+    surface_kind: string;
+    summary: string;
+  };
   status_surface: {
     shell_key: 'status' | string;
     command: string;
@@ -510,6 +518,13 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     };
     fail_closed_rules: string[];
   };
+  runtime_inventory?: Record<string, unknown>;
+  task_lifecycle?: Record<string, unknown>;
+  persistence_policy?: Record<string, unknown>;
+  lifecycle_ledger?: Record<string, unknown>;
+  owner_route?: Record<string, unknown>;
+  skill_catalog?: Record<string, unknown>;
+  automation?: Record<string, unknown>;
   product_entry_shell: {
     status: {
       command: string;
@@ -539,7 +554,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     };
   };
   domain_entry_contract: DomainEntryContractSurface;
-  gateway_interaction_contract: GatewayInteractionContractSurface;
+  user_interaction_contract: UserInteractionContractSurface;
   product_entry_start: ProductEntryStartCompanion;
   product_entry_overview: ProductEntryOverviewCompanion;
   product_entry_preflight: ProductEntryPreflightCompanion;
@@ -671,6 +686,8 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
 
 export interface ProductStatusResponse extends SurfaceBase<'product_status'> {
   target_domain_id: string;
+  schema_ref?: string;
+  entry_status_surface: ProductEntryManifestResponse['entry_status_surface'];
   status_surface: ProductEntryManifestResponse['status_surface'];
   workspace_locator: ProductEntryManifestResponse['workspace_locator'];
   runtime: ProductEntryManifestResponse['runtime'];
@@ -684,15 +701,15 @@ export interface ProductStatusResponse extends SurfaceBase<'product_status'> {
   product_entry_quickstart: ProductEntryManifestResponse['product_entry_quickstart'];
   family_orchestration: ProductEntryManifestResponse['family_orchestration'];
   product_entry_manifest: ProductEntryManifestResponse;
-  entry_surfaces: FamilyFrontdoorEntrySurfaces & {
+  entry_surfaces: FamilyProductEntrySurfaces & {
     direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
     opl_bridge: ProductEntryManifestResponse['product_entry_shell']['opl_bridge'];
     session: ProductEntryManifestResponse['product_entry_shell']['session'];
   };
   domain_entry_contract: ProductEntryManifestResponse['domain_entry_contract'];
-  gateway_interaction_contract: ProductEntryManifestResponse['gateway_interaction_contract'];
+  user_interaction_contract: ProductEntryManifestResponse['user_interaction_contract'];
   summary: {
-    status_command: string | null;
+    product_entry_command: string | null;
     recommended_command: string;
     operator_loop_command: string | null;
   };

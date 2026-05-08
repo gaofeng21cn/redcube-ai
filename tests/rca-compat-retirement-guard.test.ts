@@ -37,6 +37,18 @@ const RETIRED_CONTRACTS = Object.freeze([
   'contracts/runtime-program/hermes-managed-family-closure-truth.json',
 ]);
 const RETIRED_ACTIVE_PATTERNS = Object.freeze([
+  /\bgateway_interaction_contract\b/,
+  /\bfrontdoor_owner\b/,
+  /\bfrontdoor_surface\b/,
+  /\bfrontdoor_command\b/,
+  /\bfrontdoor_node_id\b/,
+  /\bfrontdoor_title\b/,
+  /\bfrontdoor_surface_kind\b/,
+  /\bGatewayInteractionContractSurface\b/,
+  /\bFamilyFrontdoorEntrySurfaces\b/,
+  /\bbuildFamilyGatewayInteractionContract\b/,
+  /\bbuildFamilyProductFrontdoorFromManifest\b/,
+  /\bbuildFamilyFrontdoorProductEntryOrchestration\b/,
   /@redcube\/hermes-substrate/,
   /\bhost_agent\b/,
   /\bhermes_native_proof\b/,
@@ -51,7 +63,7 @@ function listTextFiles(root) {
     const normalized = file.split(path.sep).join('/');
     if (entry.isDirectory()) {
       if (entry.name === 'dist' || entry.name === 'build' || entry.name === 'node_modules') return [];
-      if (normalized === 'docs/history' || normalized === 'docs/references') return [];
+      if (normalized === 'docs/history') return [];
       return listTextFiles(file);
     }
     return entry.isFile() && TEXT_EXTENSIONS.has(path.extname(entry.name)) ? [file] : [];

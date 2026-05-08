@@ -493,11 +493,11 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
   });
 });
 
-test('gateway shared family orchestration surface exposes the frontdoor product-entry preset builder', async () => {
+test('gateway shared family orchestration surface exposes the product-entry preset builder', async () => {
   const familyOrchestration = await importGatewaySharedModule('opl-gateway-shared/family-orchestration');
 
   assert.equal(
-    typeof familyOrchestration.buildFamilyFrontdoorProductEntryOrchestration,
+    typeof familyOrchestration.buildFamilyProductEntryPresetOrchestration,
     'function',
   );
 });

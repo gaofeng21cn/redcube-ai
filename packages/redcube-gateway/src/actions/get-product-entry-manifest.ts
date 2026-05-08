@@ -30,8 +30,8 @@ import {
 
 import {
   buildRedCubeDomainEntryContract,
-  buildRedCubeGatewayInteractionContract,
   buildRedCubeSharedHandoff,
+  buildRedCubeUserInteractionContract,
 } from './domain-entry-contract.js';
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
@@ -88,7 +88,7 @@ export async function getProductEntryManifest(request) {
     federatedProductEntryContractRef: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
     managedProductEntryContractRef: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
   });
-  const gatewayInteractionContract = buildRedCubeGatewayInteractionContract({
+  const userInteractionContract = buildRedCubeUserInteractionContract({
     productStatusCommand: PRODUCT_STATUS_COMMAND,
     productManifestCommand: PRODUCT_MANIFEST_COMMAND,
     federatedProductEntryContractRef: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
@@ -160,7 +160,7 @@ export async function getProductEntryManifest(request) {
   const productEntryOverview = {
     ...buildProductEntryOverview({
     summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
-    frontdoor_command: PRODUCT_STATUS_COMMAND,
+    product_entry_command: PRODUCT_STATUS_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
     progress_surface: {
@@ -180,7 +180,7 @@ export async function getProductEntryManifest(request) {
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,
     }),
-    status_command: PRODUCT_STATUS_COMMAND,
+    entry_status_command: PRODUCT_STATUS_COMMAND,
   };
   const productEntryStart = buildProductEntryStart({
     summary: (
@@ -373,6 +373,130 @@ export async function getProductEntryManifest(request) {
       continuation_surface_kind: 'product_entry_session',
     },
   });
+  const persistencePolicy = {
+    surface_kind: 'family_persistence_policy',
+    version: 'family-persistence-policy.v1',
+    target_domain_id: 'redcube_ai',
+    policy_id: 'redcube_product_entry_persistence_policy',
+    summary: 'RedCube runtime contracts stay file-authoritative while product-entry manifests expose OPL family persistence discovery.',
+    authority_surfaces: [
+      {
+        surface_id: 'redcube_runtime_program_contract',
+        surface_role: 'runtime_contract_authority',
+        storage_role: 'file_authority',
+        owner: 'redcube_ai',
+        ref: {
+          ref_kind: 'repo_path',
+          ref: 'contracts/runtime-program/current-program.json',
+          label: 'current runtime program contract',
+        },
+        rebuild_from_refs: [
+          {
+            ref_kind: 'repo_path',
+            ref: 'packages/redcube-gateway/src/actions/get-product-entry-manifest.ts',
+            label: 'product-entry manifest builder',
+          },
+        ],
+      },
+    ],
+    sidecar_indexes: [],
+    projection_caches: [
+      {
+        surface_id: 'redcube_product_entry_manifest_projection',
+        surface_role: 'product_entry_manifest_read_model',
+        storage_role: 'projection_cache',
+        owner: 'redcube_ai',
+        ref: {
+          ref_kind: 'json_pointer',
+          ref: '/product_entry_overview',
+          label: 'product-entry overview projection',
+        },
+        rebuild_from_refs: [
+          {
+            ref_kind: 'json_pointer',
+            ref: '/runtime_inventory',
+            label: 'runtime inventory',
+          },
+          {
+            ref_kind: 'json_pointer',
+            ref: '/task_lifecycle',
+            label: 'task lifecycle',
+          },
+        ],
+      },
+    ],
+    source_provenance: [],
+  };
+  const lifecycleLedger = {
+    surface_kind: 'family_lifecycle_ledger',
+    version: 'family-lifecycle-ledger.v1',
+    target_domain_id: 'redcube_ai',
+    ledger_id: 'redcube_product_entry_lifecycle_ledger',
+    phase: 'verify',
+    status: 'verified',
+    summary: 'Lifecycle discovery records the current RedCube product-entry contract and the session resume proof surface.',
+    actions: [
+      {
+        action_id: 'verify_redcube_product_entry_manifest',
+        action_kind: 'verify_manifest_projection',
+        target_ref: {
+          ref_kind: 'json_pointer',
+          ref: '/product_entry_overview',
+          label: 'product-entry overview',
+        },
+        authority_owner: 'redcube_ai',
+        safety_gate: 'runtime_contract_verified',
+        result: 'verified',
+        manifest_ref: {
+          ref_kind: 'repo_path',
+          ref: 'contracts/runtime-program/current-program.json',
+          label: 'current runtime program contract',
+        },
+        sha256: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+        restore_ref: {
+          ref_kind: 'json_pointer',
+          ref: '/operator_loop_actions/continue_session',
+          label: 'continue session action',
+        },
+      },
+    ],
+  };
+  const ownerRoute = {
+    surface_kind: 'family_owner_route',
+    version: 'family-owner-route.v1',
+    target_domain_id: 'redcube_ai',
+    route_id: 'redcube_product_entry_owner_route',
+    route_epoch: '2026-05-08T00:00:00Z',
+    source_fingerprint: 'manifest:redcube_product_entry_manifest:v2',
+    next_owner: 'redcube_ai',
+    allowed_actions: [
+      'continue_session',
+      'inspect_progress',
+      'handoff_to_opl_bridge',
+    ],
+    idempotency_key: 'redcube_ai:redcube_product_entry_owner_route:2026-05-08',
+    status: 'active',
+    summary: 'OPL can discover RedCube route ownership without owning visual deliverable truth.',
+    handoff_refs: [
+      {
+        ref_kind: 'json_pointer',
+        ref: '/shared_handoff/opl_return_surface',
+        label: 'OPL return surface',
+      },
+    ],
+    projection_refs: [
+      {
+        ref_kind: 'json_pointer',
+        ref: '/runtime_inventory',
+        label: 'runtime inventory',
+      },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/task_lifecycle',
+        label: 'task lifecycle',
+      },
+    ],
+  };
   const runtimeContinuityEnvelope = {
     surface_kind: 'skill_runtime_continuity',
     runtime_owner: runtime.runtime_owner,
@@ -617,7 +741,7 @@ export async function getProductEntryManifest(request) {
       },
     },
   });
-  const statusSurface = buildProductEntryShellLinkedSurface({
+  const entryStatusSurface = buildProductEntryShellLinkedSurface({
     shell_key: 'status',
     shell_surface: productEntryShell.status,
     summary: productEntryShell.status.purpose,
@@ -681,7 +805,7 @@ export async function getProductEntryManifest(request) {
     },
     recommended_shell: 'direct',
     recommended_command: PRODUCT_INVOKE_COMMAND,
-    frontdoor_surface: statusSurface,
+    product_entry_surface: productEntryOverview,
     operator_loop_surface: operatorLoopSurface,
     operator_loop_actions: operatorLoopActions,
     repo_mainline: {
@@ -703,6 +827,9 @@ export async function getProductEntryManifest(request) {
     managed_runtime_contract: managedRuntimeContract,
     runtime_inventory: runtimeInventory,
     task_lifecycle: taskLifecycle,
+    persistence_policy: persistencePolicy,
+    lifecycle_ledger: lifecycleLedger,
+    owner_route: ownerRoute,
     skill_catalog: skillCatalog,
     automation,
     product_entry_shell: productEntryShell,
@@ -742,7 +869,7 @@ export async function getProductEntryManifest(request) {
       'It does not claim that a mature end-user shell or managed web productization is already landed.',
     ],
     domain_entry_contract: domainEntryContract,
-	    gateway_interaction_contract: gatewayInteractionContract,
+	    user_interaction_contract: userInteractionContract,
 	    extra_payload: buildManifestExtraPayload({
       routeEquivalence,
       deliverableFacade,
@@ -752,10 +879,11 @@ export async function getProductEntryManifest(request) {
 	  });
 	  return {
 	    ...manifest,
-    status_surface: statusSurface,
+    entry_status_surface: entryStatusSurface,
+    status_surface: entryStatusSurface,
     product_entry_overview: {
       ...manifest.product_entry_overview,
-      status_command: PRODUCT_STATUS_COMMAND,
+      entry_status_command: PRODUCT_STATUS_COMMAND,
     },
     native_ppt_operator_ux: nativePptOperatorUx,
     opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,

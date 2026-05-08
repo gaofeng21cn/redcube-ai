@@ -372,7 +372,7 @@ test('stdio MCP server exposes current product-entry overview surfaces', async (
 
     assert.equal(status.isError, undefined);
     assert.equal(status.structuredContent.surface_kind, 'product_status');
-    assert.equal(status.structuredContent.status_surface.command, 'redcube product status');
+    assert.equal(status.structuredContent.entry_status_surface.command, 'redcube product status');
     assert.equal(start.isError, undefined);
     assert.equal(start.structuredContent.surface_kind, 'product_entry_start');
     assert.equal(start.structuredContent.workspace_locator.workspace_root, workspaceRoot);

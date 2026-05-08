@@ -405,8 +405,8 @@ test('CLI product status, product invoke, product federate, and product session 
     );
     assert.equal(statusParsed.ok, true);
     assert.equal(statusParsed.surface_kind, 'product_status');
-    assert.equal(statusParsed.status_surface.command, 'redcube product status');
-    assert.equal(statusParsed.product_entry_manifest.status_surface.command, 'redcube product status');
+    assert.equal(statusParsed.entry_status_surface.command, 'redcube product status');
+    assert.equal(statusParsed.product_entry_manifest.entry_status_surface.command, 'redcube product status');
     assert.equal(statusParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
     assert.equal(statusParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
     assert.equal(statusParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
@@ -643,7 +643,7 @@ test('CLI product status, product invoke, product federate, and product session 
     assert.equal(manifestParsed.manifest_kind, 'redcube_product_entry_manifest');
     assert.equal(manifestParsed.manifest_version, 2);
     assert.equal(manifestParsed.workspace_locator.workspace_root, workspaceRoot);
-    assert.equal(manifestParsed.status_surface.command, 'redcube product status');
+    assert.equal(manifestParsed.entry_status_surface.command, 'redcube product status');
     assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifestParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
     assert.equal(manifestParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
