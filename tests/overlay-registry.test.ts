@@ -197,6 +197,46 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
               rejected_route_provenance_required: true,
             },
           },
+          audience_language_policy: {
+            visible_operator_language_allowed: false,
+            forbidden_visible_fragments: [
+              '汇报讨论用途',
+              '客观专业版',
+              '本次汇报边界',
+              '不在展示页暴露',
+              '本地原始文件名',
+              '清洗脚本名',
+              'RCA',
+              'RedCube',
+              'source intake',
+              'author_pptx_native',
+              'slide_blueprint',
+              'visual_direction',
+            ],
+            rewrite_target: 'project-facing audience language',
+          },
+          layout_legibility_policy: {
+            title_safe_zone_clear: {
+              required: true,
+              forbidden_elements: [
+                'section chip',
+                'corner card',
+                'badge',
+                'tag',
+                'decorative label',
+              ],
+              preferred_section_signal: 'footer_or_omit',
+            },
+            table_legibility: {
+              min_body_font_pt: 11,
+              max_blank_ratio_in_card: 0.38,
+              compact_cell_padding_required: true,
+            },
+            layout_density: {
+              avoid_oversized_empty_cards: true,
+              max_blank_ratio_in_card: 0.38,
+            },
+          },
         },
         html_authoring_lane: {
           lane_id: 'ppt_deck_html_authoring_v0',

@@ -33,6 +33,7 @@
 - `speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks`、`evidence_and_sources.source_id`、`material_id` 是作者/系统工作面，不得被复制、改写或压成页面正文。
 - 若用户区分了内部管理编号和对外论文顺序，蓝图标题和正文必须使用对外顺序标签，例如“第一篇 / 第二篇 / 第三篇”，内部编号只保留在来源/provenance。
 - 不要把“建议怎么讲”“可发表表达”“讲稿备忘录”“待确认的写作口径”做成投影片主内容；需要讨论的事项必须改写成听众能直接理解的研究边界或团队确认项。
+- 不要把交付用途、操作者要求或系统约束写成投影片正文，例如“汇报讨论用途”“客观专业版”“本次汇报边界”“不在展示页暴露”“RCA”“RedCube”“source intake”“author_pptx_native”“slide_blueprint”“visual_direction”等；这些内容只服务生成过程，蓝图必须改写为项目负责人可直接阅读的研究目标、数据边界、分析方向或决策项。
 - 待投稿/成文论文同步不得把论文包装成已可推广的科室应用、临床管理工具或价值宣传；页面应同步论文准备投稿所需的故事、结论、证据和局限。
 
 ## AI-first output schema

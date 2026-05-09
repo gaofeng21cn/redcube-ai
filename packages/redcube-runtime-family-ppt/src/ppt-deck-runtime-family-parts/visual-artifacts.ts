@@ -26,6 +26,10 @@ function aggregateChecks(slideReviews: JsonRecord[]): JsonRecord {
     'block_content_fit_ok',
     'title_typography_ok',
     'page_number_consistency_ok',
+    'external_audience_language_ok',
+    'title_safe_zone_clear',
+    'table_legibility_ok',
+    'layout_density_ok',
   ];
   return Object.fromEntries(
     checkKeys.map((key) => [
@@ -157,6 +161,54 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
       : [];
   }
 
+  function operatorLanguageFragments(promptManifest: JsonRecord, styleManifest: JsonRecord): string[] {
+    const policyFragments = safeArray(promptManifest?.audience_language_policy?.forbidden_visible_fragments)
+      .map((item) => safeText(item))
+      .filter(Boolean);
+    const defaultFragments = [
+      '汇报讨论用途',
+      '客观专业版',
+      '本次汇报边界',
+      '不在展示页暴露',
+      '本地原始文件名',
+      '清洗脚本名',
+      'RCA',
+      'RedCube',
+      'source intake',
+      'author_pptx_native',
+      'slide_blueprint',
+      'visual_direction',
+    ];
+    const visibleText = [
+      JSON.stringify(promptManifest?.visible_text_audit || {}),
+      JSON.stringify(styleManifest?.visible_text_audit || {}),
+    ].join('\n');
+    return [...new Set([...policyFragments, ...defaultFragments]
+      .filter((fragment) => visibleText.includes(fragment)))];
+  }
+
+  function layoutLegibilityMetrics(promptManifest: JsonRecord, styleManifest: JsonRecord): JsonRecord {
+    const policy = promptManifest?.layout_legibility_policy || styleManifest?.layout_legibility_policy || {};
+    const quality = promptManifest?.layout_quality || styleManifest?.layout_quality || {};
+    const tablePolicy = policy?.table_legibility || {};
+    const minFontThreshold = Number(tablePolicy?.min_body_font_pt || 11);
+    const blankThreshold = Number(tablePolicy?.max_blank_ratio_in_card || 0.38);
+    const tableMinFontPt = Number(quality?.table_min_font_pt ?? quality?.tableMinFontPt ?? minFontThreshold);
+    const cardBlankRatio = Number(quality?.card_blank_ratio ?? quality?.cardBlankRatio ?? 0);
+    const titleSafeZoneClear = quality?.title_safe_zone_clear !== false && quality?.titleSafeZoneClear !== false;
+    const tableLegibilityOk = tableMinFontPt >= minFontThreshold && quality?.table_cell_fit_ok !== false;
+    const layoutDensityOk = cardBlankRatio <= blankThreshold;
+    return {
+      title_safe_zone_clear: titleSafeZoneClear,
+      table_legibility_ok: tableLegibilityOk,
+      layout_density_ok: layoutDensityOk,
+      table_min_font_pt: Number.isFinite(tableMinFontPt) ? tableMinFontPt : minFontThreshold,
+      table_min_font_threshold_pt: minFontThreshold,
+      card_blank_ratio: Number.isFinite(cardBlankRatio) ? cardBlankRatio : 0,
+      card_blank_ratio_threshold: blankThreshold,
+    };
+  }
+
   function imagePagesMechanicalReviewPayload(imageArtifact: JsonRecord | null) {
     const pages = imagePagesList(imageArtifact);
     const hashes = new Map<string, number>();
@@ -173,12 +225,15 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
       const bytes = pngFile && existsSync(pngFile) ? readFileSync(pngFile).length : 0;
       const promptManifest = readJsonIfPresent(promptManifestFile);
       const styleManifest = readJsonIfPresent(styleManifestFile);
+      const operatorFragments = operatorLanguageFragments(promptManifest, styleManifest);
+      const layoutMetrics = layoutLegibilityMetrics(promptManifest, styleManifest);
       const ratioOk = dimensions !== null
         && Math.abs((dimensions.width / Math.max(dimensions.height, 1)) - (16 / 9)) < 0.01;
       const nonEmpty = bytes > 0;
       const manifestPresent = Boolean(promptManifestFile && existsSync(promptManifestFile) && styleManifestFile && existsSync(styleManifestFile));
       const duplicate = Boolean(sha256 && (hashes.get(sha256) || 0) > 1);
       const lowInformation = bytes > 0 && bytes < 1500;
+      const externalAudienceLanguageOk = operatorFragments.length === 0;
       const issues = [
         ...(!pngFile || !existsSync(pngFile) ? ['image_page_png_missing'] : []),
         ...(!manifestPresent ? ['image_page_manifest_missing'] : []),
@@ -187,6 +242,10 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
         ...(duplicate ? ['duplicate_image_hash'] : []),
         ...(lowInformation ? ['low_information_density_signal'] : []),
         ...manifestLeakIssues(promptManifest, styleManifest),
+        ...(!externalAudienceLanguageOk ? ['operator_language_leak_detected'] : []),
+        ...(!layoutMetrics.title_safe_zone_clear ? ['title_safe_zone_obstructed'] : []),
+        ...(!layoutMetrics.table_legibility_ok ? ['table_font_below_minimum'] : []),
+        ...(!layoutMetrics.layout_density_ok ? ['layout_density_too_sparse'] : []),
       ];
       return {
         slide_id: safeText(page.slide_id),
@@ -202,6 +261,10 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
           block_content_fit_ok: issues.length === 0,
           title_typography_ok: true,
           page_number_consistency_ok: true,
+          external_audience_language_ok: externalAudienceLanguageOk,
+          title_safe_zone_clear: layoutMetrics.title_safe_zone_clear,
+          table_legibility_ok: layoutMetrics.table_legibility_ok,
+          layout_density_ok: layoutMetrics.layout_density_ok,
         },
         metrics: {
           image_width: dimensions?.width || 0,
@@ -215,6 +278,12 @@ export function createPptDeckVisualArtifactParts(deps: VisualArtifactDeps) {
           style_manifest_file: styleManifestFile || null,
           render_proof_source: 'image_pages_png_manifest',
           source_visual_route: safeText(imageArtifact?.route),
+          operator_language_fragments: operatorFragments,
+          title_safe_zone_clearance_ok: layoutMetrics.title_safe_zone_clear,
+          table_min_font_pt: layoutMetrics.table_min_font_pt,
+          table_min_font_threshold_pt: layoutMetrics.table_min_font_threshold_pt,
+          card_blank_ratio: layoutMetrics.card_blank_ratio,
+          card_blank_ratio_threshold: layoutMetrics.card_blank_ratio_threshold,
         },
         issues,
       };

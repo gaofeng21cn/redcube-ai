@@ -132,9 +132,15 @@ test('ppt author_image_pages writes mocked Responses PNG pages and generation me
   assert.equal(deckPromptManifest.verified_asset_policy.deterministic_overlay_only, true);
   assert.equal(deckPromptManifest.long_deck_contract.contract_id, 'ppt_image_first_long_deck_production_v1');
   assert.equal(deckPromptManifest.forbidden_generated_artifacts.includes('fake QR code'), true);
+  assert.equal(deckPromptManifest.audience_language_policy.visible_operator_language_allowed, false);
+  assert.equal(deckPromptManifest.audience_language_policy.forbidden_visible_fragments.includes('汇报讨论用途'), true);
+  assert.equal(deckPromptManifest.layout_legibility_policy.title_safe_zone_clear.required, true);
+  assert.equal(deckPromptManifest.layout_legibility_policy.table_legibility.min_body_font_pt, 11);
   assert.equal(slidePromptManifest.fact_governance.verification_ledger_surface, 'reports/fact-verification-ledger.json');
   assert.equal(slidePromptManifest.verified_asset_policy.composition_repair_allowed, false);
   assert.equal(slidePromptManifest.long_deck_contract.full_long_deck_default_regression, false);
+  assert.equal(slidePromptManifest.audience_language_policy.forbidden_visible_fragments.includes('author_pptx_native'), true);
+  assert.equal(slidePromptManifest.layout_legibility_policy.table_legibility.max_blank_ratio_in_card, 0.38);
   assert.equal(artifact.image_page_manifest.slides[0].dimensions.width, 1536);
   assert.equal(artifact.image_page_manifest.slides[0].dimensions.height, 864);
   assert.equal(existsSync(artifact.image_pages_bundle.pages[0].prompt_manifest_file), true);

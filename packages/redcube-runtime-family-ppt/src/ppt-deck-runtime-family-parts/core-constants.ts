@@ -32,7 +32,7 @@ export const STAGE_REQUIREMENTS = Object.freeze({
 });
 
 export const CANVAS = Object.freeze({ width: 1152, height: 648, ratio: '16:9' });
-export const SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit';
+export const SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v4:audience-layout-legibility';
 export const RENDER_HTML_BATCH_SIZE = 6;
 export const TARGETED_RENDER_HTML_BATCH_SIZE = 1;
 export const SCREENSHOT_REVIEW_BATCH_SIZE = 3;
@@ -50,6 +50,11 @@ export const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
   'block_content_overflow_detected',
   'title_typography_inconsistent',
   'page_number_consistency_failed',
+  'operator_language_leak_detected',
+  'title_safe_zone_obstructed',
+  'table_font_below_minimum',
+  'table_cell_fit_failed',
+  'layout_density_too_sparse',
 ]);
 export const HARD_SCREENSHOT_BLOCKING_ISSUES = TARGETED_SCREENSHOT_MECHANICAL_ISSUES;
 export const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
@@ -61,6 +66,10 @@ export const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
   'block_content_fit_ok',
   'title_typography_ok',
   'page_number_consistency_ok',
+  'external_audience_language_ok',
+  'title_safe_zone_clear',
+  'table_legibility_ok',
+  'layout_density_ok',
 ]);
 export const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',

@@ -160,6 +160,10 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.full_long_deck_default_regression === false
     && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.line_divergence_policy?.image_route_is_not_html_skin === true
     && content.render_contract.image_page_authoring_lane?.long_deck_production_contract?.rejected_repair_route_policy?.rejected_route_provenance_required === true
+    && content.render_contract.image_page_authoring_lane?.audience_language_policy?.visible_operator_language_allowed === false
+    && content.render_contract.image_page_authoring_lane?.audience_language_policy?.forbidden_visible_fragments?.includes('汇报讨论用途')
+    && content.render_contract.image_page_authoring_lane?.layout_legibility_policy?.title_safe_zone_clear?.required === true
+    && content.render_contract.image_page_authoring_lane?.layout_legibility_policy?.table_legibility?.min_body_font_pt === 11
     && content.render_contract.html_authoring_lane?.status === 'production_selectable_optional'
     && content.render_contract.html_authoring_lane?.default_enabled === false
     && content.render_contract.html_authoring_lane?.explicit_selection_required === true
@@ -192,6 +196,10 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.required_checks.length > 0
     && content.required_checks.includes('director_intent_landed')
     && content.required_checks.includes('anti_template_ok')
+    && content.required_checks.includes('external_audience_language_ok')
+    && content.required_checks.includes('title_safe_zone_clear')
+    && content.required_checks.includes('table_legibility_ok')
+    && content.required_checks.includes('layout_density_ok')
     && content.rerun_from_stage
     && typeof content.rerun_from_stage === 'object'
     && content.rerun_from_stage.overflow_free === 'repair_image_pages'

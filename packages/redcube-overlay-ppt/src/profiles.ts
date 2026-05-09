@@ -227,6 +227,42 @@ const IMAGE_PAGE_LONG_DECK_CONTRACT = Object.freeze({
   },
 });
 
+const IMAGE_PAGE_AUDIENCE_LANGUAGE_POLICY = Object.freeze({
+  visible_operator_language_allowed: false,
+  forbidden_visible_fragments: [
+    '汇报讨论用途',
+    '客观专业版',
+    '本次汇报边界',
+    '不在展示页暴露',
+    '本地原始文件名',
+    '清洗脚本名',
+    'RCA',
+    'RedCube',
+    'source intake',
+    'author_pptx_native',
+    'slide_blueprint',
+    'visual_direction',
+  ],
+  rewrite_target: 'project-facing audience language',
+});
+
+const IMAGE_PAGE_LAYOUT_LEGIBILITY_POLICY = Object.freeze({
+  title_safe_zone_clear: {
+    required: true,
+    forbidden_elements: ['section chip', 'corner card', 'badge', 'tag', 'decorative label'],
+    preferred_section_signal: 'footer_or_omit',
+  },
+  table_legibility: {
+    min_body_font_pt: 11,
+    max_blank_ratio_in_card: 0.38,
+    compact_cell_padding_required: true,
+  },
+  layout_density: {
+    avoid_oversized_empty_cards: true,
+    max_blank_ratio_in_card: 0.38,
+  },
+});
+
 const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
   lane_id: 'ppt_deck_image_page_authoring_v0',
   status: 'production_default',
@@ -244,6 +280,8 @@ const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
   fact_governance: IMAGE_PAGE_FACT_GOVERNANCE,
   verified_asset_overlay_policy: IMAGE_PAGE_VERIFIED_ASSET_POLICY,
   long_deck_production_contract: IMAGE_PAGE_LONG_DECK_CONTRACT,
+  audience_language_policy: IMAGE_PAGE_AUDIENCE_LANGUAGE_POLICY,
+  layout_legibility_policy: IMAGE_PAGE_LAYOUT_LEGIBILITY_POLICY,
 });
 
 const FAMILY_STAGE_SEQUENCE = {
@@ -391,6 +429,10 @@ const FAMILY_REVIEW_SURFACE = {
     'edge_clearance_ok',
     'block_content_fit_ok',
     'title_typography_ok',
+    'external_audience_language_ok',
+    'title_safe_zone_clear',
+    'table_legibility_ok',
+    'layout_density_ok',
     'director_intent_landed',
     'anti_template_ok',
   ],
@@ -407,6 +449,10 @@ const FAMILY_REVIEW_SURFACE = {
     edge_clearance_ok: 'repair_image_pages',
     block_content_fit_ok: 'repair_image_pages',
     title_typography_ok: 'repair_image_pages',
+    external_audience_language_ok: 'repair_image_pages',
+    title_safe_zone_clear: 'repair_image_pages',
+    table_legibility_ok: 'repair_image_pages',
+    layout_density_ok: 'repair_image_pages',
     director_intent_landed: 'visual_director_review',
     anti_template_ok: 'visual_director_review',
     baseline_comparison_passed: 'visual_direction',

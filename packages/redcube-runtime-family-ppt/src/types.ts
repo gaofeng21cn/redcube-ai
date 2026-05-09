@@ -115,6 +115,10 @@ export interface PptRuntimeLatestChecks {
   edge_clearance_ok?: boolean;
   block_content_fit_ok?: boolean;
   title_typography_ok?: boolean;
+  external_audience_language_ok?: boolean;
+  title_safe_zone_clear?: boolean;
+  table_legibility_ok?: boolean;
+  layout_density_ok?: boolean;
   baseline_comparison_passed?: boolean;
   term_explained_on_first_use?: boolean;
   teaching_progression_clear?: boolean;
@@ -199,6 +203,10 @@ export interface PptSlideReviewChecks {
   edge_clearance_ok?: boolean;
   block_content_fit_ok?: boolean;
   title_typography_ok?: boolean;
+  external_audience_language_ok?: boolean;
+  title_safe_zone_clear?: boolean;
+  table_legibility_ok?: boolean;
+  layout_density_ok?: boolean;
 }
 
 export interface PptSlideReviewMetrics {
@@ -212,6 +220,11 @@ export interface PptSlideReviewMetrics {
   render_proof_source?: string;
   synthetic_preview?: boolean;
   block_content_failures?: Array<Record<string, unknown>>;
+  operator_language_fragments?: string[];
+  title_safe_zone_clearance_ok?: boolean;
+  table_min_font_pt?: number | null;
+  card_blank_ratio?: number | null;
+  table_metrics?: Array<Record<string, unknown>>;
 }
 
 export interface PptSlideReview {

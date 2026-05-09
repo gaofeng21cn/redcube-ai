@@ -498,6 +498,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       'block_content_fit_ok',
       'title_typography_ok',
       'page_number_consistency_ok',
+      'external_audience_language_ok',
+      'title_safe_zone_clear',
+      'table_legibility_ok',
+      'layout_density_ok',
     ];
     return Object.fromEntries(
       checkKeys.map((key) => [
@@ -522,6 +526,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       ['clipped_nodes', metrics.clipped_nodes],
       ['occupied_ratio', metrics.occupied_ratio],
       ['primary_points', metrics.primary_points],
+      ['title_safe_zone_clearance_ok', metrics.title_safe_zone_clearance_ok],
     ].filter(([, value]) => finiteNumberOrNull(value) === null);
     if (missing.length > 0) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
@@ -538,6 +543,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       return ['native_chart_metrics_missing'];
     }
     if (hasTableShape && (!metrics.table_metrics || typeof metrics.table_metrics !== 'object')) {
+      return ['native_table_metrics_missing'];
+    }
+    if (hasTableShape && finiteNumberOrNull(metrics.table_min_font_pt) === null) {
       return ['native_table_metrics_missing'];
     }
     if (!manifestSlide.preview_screenshot_sha256) return ['native_preview_screenshot_hash_missing'];
@@ -593,6 +601,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           block_content_fit_ok: booleanCheck(manifestSlide, 'block_content_fit_ok', missingQuality),
           title_typography_ok: booleanCheck(manifestSlide, 'title_typography_ok', missingQuality),
           page_number_consistency_ok: booleanCheck(manifestSlide, 'page_number_consistency_ok', missingQuality),
+          external_audience_language_ok: booleanCheck(manifestSlide, 'external_audience_language_ok', missingQuality),
+          title_safe_zone_clear: booleanCheck(manifestSlide, 'title_safe_zone_clear', missingQuality),
+          table_legibility_ok: booleanCheck(manifestSlide, 'table_legibility_ok', missingQuality),
+          layout_density_ok: booleanCheck(manifestSlide, 'layout_density_ok', missingQuality),
         },
         metrics: {
           title_font_size: Number(slide?.title_font_size || 32),
@@ -612,6 +624,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           render_proof_source: missingRenderProof ? 'missing_contract_declared_true_render' : safeText(expectedProof?.renderer_kind),
           synthetic_preview: renderProof?.synthetic_preview !== false,
           block_content_failures: safeArray(manifestSlide?.metrics?.block_content_failures),
+          operator_language_fragments: safeArray(manifestSlide?.metrics?.operator_language_fragments),
+          title_safe_zone_clearance_ok: manifestSlide?.metrics?.title_safe_zone_clearance_ok === true,
+          table_min_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.table_min_font_pt),
+          card_blank_ratio: finiteNumberOrNull(manifestSlide?.metrics?.card_blank_ratio),
+          table_metrics: manifestSlide?.metrics?.table_metrics || [],
         },
         issues: [
           ...safeArray(manifestSlide?.issues).map((issue) => safeText(issue)),

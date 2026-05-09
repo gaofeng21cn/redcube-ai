@@ -24,7 +24,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-function makeFixture({ missingManifest = false } = {}) {
+function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleManifestPatch = {} } = {}) {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-image-pages-'));
   const deliverableId = 'deck-image';
   const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', deliverableId);
@@ -40,8 +40,15 @@ function makeFixture({ missingManifest = false } = {}) {
   const exportScript = path.join(workspaceRoot, 'export-helper.py');
   writeFileSync(pngFile, Buffer.concat([PNG_16_9, Buffer.alloc(2000, 1)]));
   if (!missingManifest) {
-    writeJson(promptManifestFile, { prompts: [{ slide_id: 'S01', prompt: 'audience-facing image prompt' }] });
-    writeJson(styleManifestFile, { palette: ['#111111', '#f3f4f6'], visual_style: 'editorial' });
+    writeJson(promptManifestFile, {
+      prompts: [{ slide_id: 'S01', prompt: 'audience-facing image prompt' }],
+      ...promptManifestPatch,
+    });
+    writeJson(styleManifestFile, {
+      palette: ['#111111', '#f3f4f6'],
+      visual_style: 'editorial',
+      ...styleManifestPatch,
+    });
   }
   writeFileSync(exportScript, [
     'import json',
@@ -242,4 +249,43 @@ test('ppt image-first screenshot review fails closed when PNG manifest refs are 
   assert.equal(screenshot.review_state_patch.rerun_from_stage, 'repair_image_pages');
   assert.equal(screenshot.checks.block_content_fit_ok, false);
   assert.equal(screenshot.slide_reviews[0].issues.includes('image_page_manifest_missing'), true);
+});
+
+test('ppt image-first screenshot review fails closed on operator language and layout legibility policy leaks', async () => {
+  const fixture = makeFixture({
+    promptManifestPatch: {
+      visible_text_audit: {
+        text_fragments: ['项目数据资产与论文布局建议', '汇报讨论用途', '本次汇报边界'],
+      },
+      layout_quality: {
+        title_safe_zone_clear: false,
+        table_min_font_pt: 9,
+        card_blank_ratio: 0.52,
+      },
+    },
+  });
+  const director = await fixture.stageParts.buildDirectorReview(fixture.contract, fixture.deliverablePaths, 'test-adapter');
+  fixture.artifacts.set('visual_director_review', { ...director, status: 'pass' });
+
+  const screenshot = await fixture.stageParts.buildScreenshotReviewArtifact({
+    workspaceRoot: fixture.workspaceRoot,
+    topicId: 'topic-a',
+    deliverableId: 'deck-image',
+    contract: fixture.contract,
+    mode: 'draft_new',
+  });
+
+  assert.equal(screenshot.status, 'block');
+  assert.equal(screenshot.review_state_patch.rerun_from_stage, 'repair_image_pages');
+  assert.equal(screenshot.checks.external_audience_language_ok, false);
+  assert.equal(screenshot.checks.title_safe_zone_clear, false);
+  assert.equal(screenshot.checks.table_legibility_ok, false);
+  assert.equal(screenshot.checks.layout_density_ok, false);
+  assert.equal(screenshot.slide_reviews[0].issues.includes('operator_language_leak_detected'), true);
+  assert.equal(screenshot.slide_reviews[0].issues.includes('title_safe_zone_obstructed'), true);
+  assert.equal(screenshot.slide_reviews[0].issues.includes('table_font_below_minimum'), true);
+  assert.equal(screenshot.slide_reviews[0].issues.includes('layout_density_too_sparse'), true);
+  assert.equal(screenshot.slide_reviews[0].metrics.operator_language_fragments.includes('汇报讨论用途'), true);
+  assert.equal(screenshot.slide_reviews[0].metrics.table_min_font_pt, 9);
+  assert.equal(screenshot.slide_reviews[0].metrics.card_blank_ratio, 0.52);
 });

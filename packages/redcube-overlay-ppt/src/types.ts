@@ -60,6 +60,10 @@ export type PptDeckReviewCheck =
   | 'edge_clearance_ok'
   | 'block_content_fit_ok'
   | 'title_typography_ok'
+  | 'external_audience_language_ok'
+  | 'title_safe_zone_clear'
+  | 'table_legibility_ok'
+  | 'layout_density_ok'
   | 'director_intent_landed'
   | 'anti_template_ok'
   | 'baseline_comparison_passed'
@@ -153,6 +157,10 @@ export interface PptDeckReviewRerunMap {
   edge_clearance_ok: 'repair_image_pages';
   block_content_fit_ok: 'repair_image_pages';
   title_typography_ok: 'repair_image_pages';
+  external_audience_language_ok: 'repair_image_pages';
+  title_safe_zone_clear: 'repair_image_pages';
+  table_legibility_ok: 'repair_image_pages';
+  layout_density_ok: 'repair_image_pages';
   director_intent_landed: 'visual_director_review';
   anti_template_ok: 'visual_director_review';
   baseline_comparison_passed: 'visual_direction';
@@ -367,6 +375,27 @@ export interface PptDeckImagePageAuthoringLane {
       forbidden_for_page_fixes: ReadonlyArray<string>;
       allowed_postprocess_scope: ReadonlyArray<string>;
       rejected_route_provenance_required: true;
+    };
+  };
+  audience_language_policy: {
+    visible_operator_language_allowed: false;
+    forbidden_visible_fragments: ReadonlyArray<string>;
+    rewrite_target: string;
+  };
+  layout_legibility_policy: {
+    title_safe_zone_clear: {
+      required: true;
+      forbidden_elements: ReadonlyArray<string>;
+      preferred_section_signal: string;
+    };
+    table_legibility: {
+      min_body_font_pt: 11;
+      max_blank_ratio_in_card: number;
+      compact_cell_padding_required: true;
+    };
+    layout_density: {
+      avoid_oversized_empty_cards: true;
+      max_blank_ratio_in_card: number;
     };
   };
 }

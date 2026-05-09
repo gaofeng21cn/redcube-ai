@@ -16,6 +16,8 @@ SLIDE_W = Inches(16)
 SLIDE_H = Inches(9)
 EMU_PER_INCH = 914400
 PX_PER_INCH = CANVAS_PX[0] / 16
+MIN_TABLE_BODY_FONT_PT = 11.0
+MAX_TABLE_CELL_BLANK_RATIO = 0.38
 SVG_NS = 'http://www.w3.org/2000/svg'
 STRICT_SVG_ALLOWED_TAGS = {
     f'{{{SVG_NS}}}svg',
@@ -559,7 +561,7 @@ class SlideBuilder:
             for paragraph in cell.text_frame.paragraphs:
                 for run in paragraph.runs:
                     run.font.bold = True
-                    run.font.size = Pt(10)
+                    run.font.size = Pt(11)
                     run.font.color.rgb = rgb(self.palette['ink'])
         cell_failures = []
         for row_index, row in enumerate(rows, 1):
@@ -568,7 +570,7 @@ class SlideBuilder:
                 cell.text = assert_authoring_text_capacity(value, 90, f'{shape_id}-r{row_index}c{column_index + 1}')
                 for paragraph in cell.text_frame.paragraphs:
                     for run in paragraph.runs:
-                        run.font.size = Pt(9)
+                        run.font.size = Pt(MIN_TABLE_BODY_FONT_PT)
                         run.font.color.rgb = rgb(self.palette['ink'])
                 if len(value) > 34:
                     cell_failures.append({
@@ -583,6 +585,9 @@ class SlideBuilder:
             'column_count': column_count,
             'body_row_count': len(rows),
             'cell_count': (len(rows) + 1) * column_count,
+            'min_font_pt': MIN_TABLE_BODY_FONT_PT,
+            'max_cell_blank_ratio': 0.24,
+            'max_cell_blank_ratio_allowed': MAX_TABLE_CELL_BLANK_RATIO,
             'cell_fit_ok': len(cell_failures) == 0,
             'cell_fit_failure_count': len(cell_failures),
             'cell_fit_failures': cell_failures,

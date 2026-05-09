@@ -11,3 +11,5 @@ Repair by redrawing the blocked page from the same source truth and verified ass
 Keep the same fact whitelist as `author_image_pages`: do not invent QR codes, URLs, DOI strings, logos, hospital names, patient demographics, publication status, page numbers, slide numbers, or chapter corner labels.
 
 Do not expose internal field names, prompt metadata, source ids, operator notes, or runtime labels in the visible slide image.
+
+If the blocked reason includes operator-language leakage, remove the metadata phrase and rewrite it as audience-facing project content. If the blocked reason includes title safe zone, remove the section chip/card/tag from the title area. If it includes table legibility or sparse cards, enlarge table text to at least 11pt-equivalent and reduce empty padding rather than shrinking text further.

@@ -192,6 +192,10 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
       'block_content_fit_ok',
       'title_typography_ok',
       'page_number_consistency_ok',
+      'external_audience_language_ok',
+      'title_safe_zone_clear',
+      'table_legibility_ok',
+      'layout_density_ok',
     ];
     return Object.fromEntries(keys.map((key) => [
       key,
@@ -275,6 +279,10 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
       block_content_fit_ok: aiFirstMechanicalCheckValue(slideReviews, 'block_content_fit_ok'),
       title_typography_ok: aiFirstMechanicalCheckValue(slideReviews, 'title_typography_ok'),
       page_number_consistency_ok: aiFirstMechanicalCheckValue(slideReviews, 'page_number_consistency_ok'),
+      external_audience_language_ok: aiFirstMechanicalCheckValue(slideReviews, 'external_audience_language_ok'),
+      title_safe_zone_clear: aiFirstMechanicalCheckValue(slideReviews, 'title_safe_zone_clear'),
+      table_legibility_ok: aiFirstMechanicalCheckValue(slideReviews, 'table_legibility_ok'),
+      layout_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'layout_density_ok'),
       ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
     };
     if (baselineReview) checks.baseline_comparison_passed = baselineReview.passed;

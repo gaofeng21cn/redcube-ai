@@ -194,6 +194,12 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(nativeMechanicalSlide.metrics.occupied_ratio, nativeManifestSlide.metrics.occupied_ratio);
     assert.equal(nativeMechanicalSlide.metrics.text_char_count, nativeManifestSlide.metrics.text_char_count);
     assert.equal(nativeMechanicalSlide.metrics.edge_clearance.bottom, nativeManifestSlide.metrics.edge_clearance.bottom);
+    assert.equal(nativeMechanicalSlide.checks.external_audience_language_ok, true);
+    assert.equal(nativeMechanicalSlide.checks.title_safe_zone_clear, true);
+    assert.equal(nativeMechanicalSlide.checks.table_legibility_ok, true);
+    assert.equal(nativeMechanicalSlide.checks.layout_density_ok, true);
+    assert.equal(Array.isArray(nativeMechanicalSlide.metrics.operator_language_fragments), true);
+    assert.equal(nativeMechanicalSlide.metrics.title_safe_zone_clearance_ok, true);
 
     const exportArtifactFile = path.join(
       workspaceRoot,

@@ -26,6 +26,9 @@
 - 若 `source_html` 显示底部说明、图注、讲者信息、badge、节点说明或图标旁短句这类读者可见文字未落入任何 `data-qa-block`，必须判 block，并要求回到 fix_html 补齐审计覆盖与留白
 - 若页面存在显式父容器、虚线框、轨道框或大组块，任何子卡贴边、越界或戳出父框都必须明确指出并判 block；必要时结合 `source_html` 确认父子归属
 - 若相邻读者可见 `data-qa-block`、导语、主卡、步骤卡、总结卡或底部说明之间视觉贴住，即使文字尚未溢出，也必须明确指出并判 block
+- 若读者可见页面出现“汇报讨论用途”“客观专业版”“本次汇报边界”“不在展示页暴露”“RCA”“RedCube”“source intake”“author_pptx_native”“slide_blueprint”“visual_direction”等操作者、系统或 route 层文案，必须判 block；推荐修复必须要求改写为项目负责人可读的研究目标、数据边界、团队确认项或结论
+- 若主标题安全区被左上角 section chip、角标卡片、badge、tag 或装饰标签侵入，必须判 block；推荐修复必须要求移到页脚或删除
+- 若表格正文低于 11pt、表格单元格 padding/行高造成明显空白、或卡片内容与容器尺寸不匹配导致“字小但框大”，必须判 block；推荐修复必须要求提高字号、收紧单元格与容器，而不是继续缩字
 - 若怀疑截图裁切错误、下一页串入或非当前页内容可见，必须基于当前页截图中的明确可见文字/位置下判定，并在 `visual_findings` 写出该可见证据；不得仅凭相邻页标题、整套 deck 顺序或 `source_html` 上下文推断为 block
 - 必须保存逐页截图与 review 记录
 - optimize_existing 必须做 baseline relative review，输出 baseline_comparison_passed

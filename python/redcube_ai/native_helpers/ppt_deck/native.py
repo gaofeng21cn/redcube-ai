@@ -27,6 +27,23 @@ MAX_NATIVE_DENSITY = 0.82
 MIN_NATIVE_EDGE_CLEARANCE = 24.0
 MAX_NATIVE_PRIMARY_POINTS = 5
 MIN_NATIVE_LAYOUT_RICHNESS = 0.68
+TITLE_SAFE_ZONE_BOTTOM = 128.0
+MIN_TABLE_BODY_FONT_PT = 11.0
+MAX_TABLE_CELL_BLANK_RATIO = 0.38
+OPERATOR_LANGUAGE_FRAGMENTS = [
+    '汇报讨论用途',
+    '客观专业版',
+    '本次汇报边界',
+    '不在展示页暴露',
+    '本地原始文件名',
+    '清洗脚本名',
+    'RCA',
+    'RedCube',
+    'source intake',
+    'author_pptx_native',
+    'slide_blueprint',
+    'visual_direction',
+]
 ENGINE_CAPABILITIES = {
     'authoring_ir': 'redcube_svg_ir',
     'authoring_ir_version': 1,
@@ -135,6 +152,57 @@ def text_capacity_failure(shape: dict) -> dict | None:
     }
 
 
+def operator_language_fragments(native_shapes: list[dict]) -> list[str]:
+    visible_text = '\n'.join(
+        safe_text(shape.get('text'))
+        for shape in native_shapes
+        if shape.get('quality_role') == 'content'
+    )
+    return sorted({fragment for fragment in OPERATOR_LANGUAGE_FRAGMENTS if fragment in visible_text})
+
+
+def title_safe_zone_failures(native_shapes: list[dict]) -> list[dict]:
+    failures = []
+    for shape in native_shapes:
+        if shape.get('quality_role') != 'content':
+            continue
+        if shape.get('role') in {'title', 'core_sentence'}:
+            continue
+        rect = shape.get('bounds') or {}
+        top = float(rect.get('top') or 0.0)
+        if top < TITLE_SAFE_ZONE_BOTTOM:
+            failures.append({
+                'shape_id': shape.get('shape_id'),
+                'role': shape.get('role'),
+                'top': round(top, 2),
+                'safe_zone_bottom': TITLE_SAFE_ZONE_BOTTOM,
+            })
+    return failures
+
+
+def table_legibility_failures(table_metrics: list[dict]) -> list[dict]:
+    failures = []
+    for metrics in table_metrics:
+        min_font_pt = float(metrics.get('min_font_pt') or 0.0)
+        max_blank_ratio = float(metrics.get('max_cell_blank_ratio') or 0.0)
+        if min_font_pt < MIN_TABLE_BODY_FONT_PT:
+            failures.append({
+                'shape_id': metrics.get('shape_id'),
+                'reason': 'table_font_below_minimum',
+                'value': round(min_font_pt, 2),
+                'threshold': MIN_TABLE_BODY_FONT_PT,
+            })
+        if max_blank_ratio > MAX_TABLE_CELL_BLANK_RATIO:
+            failures.append({
+                'shape_id': metrics.get('shape_id'),
+                'reason': 'table_cell_blank_ratio_too_high',
+                'value': round(max_blank_ratio, 4),
+                'threshold': MAX_TABLE_CELL_BLANK_RATIO,
+            })
+        failures.extend(metrics.get('cell_fit_failures') or [])
+    return failures
+
+
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
     decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
@@ -201,6 +269,9 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         metrics['bounds'] = shape.get('bounds')
         metric_grid_metrics.append(metrics)
         numeric_label_overflows.extend(metrics.get('numeric_label_overflows') or [])
+    language_fragments = operator_language_fragments(content_shapes)
+    title_zone_failures = title_safe_zone_failures(content_shapes)
+    table_failures = table_legibility_failures(table_metrics)
     coordinate_payload = [
         {
             'shape_id': shape.get('shape_id'),
@@ -217,6 +288,14 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     clipped_nodes = len(block_content_failures)
     title_typography_ok = bool(title_shapes) and title_font_size >= 28.0
     page_number_consistency_ok = bool(page_number_shapes)
+    table_min_font_pt = min(
+        (float(metrics.get('min_font_pt') or MIN_TABLE_BODY_FONT_PT) for metrics in table_metrics),
+        default=MIN_TABLE_BODY_FONT_PT,
+    )
+    card_blank_ratio = max(
+        (float(metrics.get('max_cell_blank_ratio') or 0.0) for metrics in table_metrics),
+        default=0.24,
+    )
     layout_richness_score = round(clamp(
         (min(len(native_shapes), 20) / 20.0 * 0.34)
         + (min(len(shape_kinds), 4) / 4.0 * 0.22)
@@ -235,6 +314,10 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'title_typography_ok': title_typography_ok,
         'page_number_consistency_ok': page_number_consistency_ok,
         'layout_richness_ok': layout_richness_score >= MIN_NATIVE_LAYOUT_RICHNESS,
+        'external_audience_language_ok': len(language_fragments) == 0,
+        'title_safe_zone_clear': len(title_zone_failures) == 0,
+        'table_legibility_ok': len(table_failures) == 0,
+        'layout_density_ok': MIN_NATIVE_DENSITY <= occupied_ratio <= MAX_NATIVE_DENSITY and card_blank_ratio <= MAX_TABLE_CELL_BLANK_RATIO,
     }
     issues = []
     if not checks['visual_density_ok']:
@@ -253,6 +336,16 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('page_number_missing')
     if not checks['layout_richness_ok']:
         issues.append('layout_richness_below_threshold')
+    if not checks['external_audience_language_ok']:
+        issues.append('operator_language_leak_detected')
+    if not checks['title_safe_zone_clear']:
+        issues.append('title_safe_zone_obstructed')
+    if any(failure.get('reason') == 'table_font_below_minimum' for failure in table_failures):
+        issues.append('table_font_below_minimum')
+    if table_failures and 'table_font_below_minimum' not in issues:
+        issues.append('table_cell_fit_failed')
+    if not checks['layout_density_ok']:
+        issues.append('layout_density_too_sparse')
     return {
         'checks': checks,
         'issues': issues,
@@ -279,6 +372,12 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'chart_metrics': chart_metrics,
             'table_metrics': table_metrics,
             'metric_grid_metrics': metric_grid_metrics,
+            'operator_language_fragments': language_fragments,
+            'title_safe_zone_failures': title_zone_failures,
+            'title_safe_zone_clearance_ok': len(title_zone_failures) == 0,
+            'table_min_font_pt': round(table_min_font_pt, 2),
+            'table_legibility_failures': table_failures,
+            'card_blank_ratio': round(card_blank_ratio, 4),
             'chart_bounds': [shape['bounds'] for shape in chart_shapes],
             'table_bounds': [shape['bounds'] for shape in table_shapes],
             'metric_grid_bounds': [shape['bounds'] for shape in metric_grid_shapes],
@@ -636,6 +735,9 @@ def main() -> None:
                 'axis_label_count',
                 'legend_label_count',
                 'table_cell_fit_ok',
+                'table_min_font_pt',
+                'title_safe_zone_clearance_ok',
+                'operator_language_fragments',
                 'numeric_label_overflow_count',
                 'coordinate_determinism_hash',
                 'preview_screenshot_sha256',

@@ -27,3 +27,32 @@ test('ppt image-first production contract absorbs long-deck fact and asset gover
   assert.equal(activeLane.long_deck_production_contract.contract_id, 'ppt_image_first_long_deck_production_v1');
   assert.equal(activeLane.long_deck_production_contract.full_colorectal_ai_long_deck_regression_allowed_by_default, false);
 });
+
+test('ppt image-first production contract blocks internal-language, title-zone, and table-legibility regressions', () => {
+  const contract = readJson('contracts/runtime-program/ppt-image-first-production-route.json');
+  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const activeLane = currentProgram.current_state.exploration_lanes.ppt_image_first_production_route;
+
+  assert.equal(contract.audience_language_policy.visible_operator_language_allowed, false);
+  assert.equal(contract.audience_language_policy.forbidden_visible_fragments.includes('汇报讨论用途'), true);
+  assert.equal(contract.audience_language_policy.forbidden_visible_fragments.includes('本次汇报边界'), true);
+  assert.equal(contract.audience_language_policy.forbidden_visible_fragments.includes('author_pptx_native'), true);
+
+  assert.equal(contract.layout_legibility_policy.title_safe_zone_clear.required, true);
+  assert.equal(contract.layout_legibility_policy.title_safe_zone_clear.forbidden_elements.includes('section chip'), true);
+  assert.equal(contract.layout_legibility_policy.table_legibility.min_body_font_pt, 11);
+  assert.equal(contract.layout_legibility_policy.table_legibility.max_blank_ratio_in_card, 0.38);
+
+  assert.equal(contract.review_export_gates.mechanical_checks.includes('operator language leak'), true);
+  assert.equal(contract.review_export_gates.mechanical_checks.includes('title safe zone obstruction'), true);
+  assert.equal(contract.review_export_gates.mechanical_checks.includes('table font below 11pt'), true);
+  assert.equal(contract.review_export_gates.hard_block_checks.includes('external_audience_language_ok'), true);
+  assert.equal(contract.review_export_gates.hard_block_checks.includes('title_safe_zone_clear'), true);
+  assert.equal(contract.review_export_gates.hard_block_checks.includes('table_legibility_ok'), true);
+  assert.equal(contract.review_export_gates.hard_block_checks.includes('layout_density_ok'), true);
+
+  assert.deepEqual(
+    activeLane.visual_qa_hardening.hard_block_checks.slice(-4),
+    ['external_audience_language_ok', 'title_safe_zone_clear', 'table_legibility_ok', 'layout_density_ok'],
+  );
+});

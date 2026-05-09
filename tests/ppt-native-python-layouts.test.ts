@@ -345,6 +345,15 @@ test('native PPT visual benchmark fixture captures four domain suites with layou
   assert.equal(dataSlide.metrics.table_bounds.length, 1);
   assert.equal(dataSlide.metrics.table_cell_fit_ok, true);
   assert.deepEqual(dataSlide.metrics.table_cell_fit_failures, []);
+  assert.equal(dataSlide.checks.table_legibility_ok, true);
+  assert.equal(dataSlide.metrics.table_min_font_pt >= 11, true);
+  assert.equal(dataSlide.metrics.table_metrics[0].min_font_pt >= 11, true);
+  assert.equal(dataSlide.metrics.table_metrics[0].max_cell_blank_ratio <= 0.38, true);
+  assert.equal(dataSlide.checks.title_safe_zone_clear, true);
+  assert.equal(dataSlide.metrics.title_safe_zone_clearance_ok, true);
+  assert.equal(dataSlide.checks.external_audience_language_ok, true);
+  assert.equal(dataSlide.metrics.operator_language_fragments.length, 0);
+  assert.equal(dataSlide.checks.layout_density_ok, true);
   assert.equal(dataSlide.metrics.metric_grid_count, 1);
   assert.equal(dataSlide.metrics.metric_grid_bounds.length, 1);
   assert.match(dataSlide.metrics.coordinate_determinism_hash, /^[a-f0-9]{64}$/);

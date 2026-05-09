@@ -312,6 +312,16 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     return lane?.long_deck_production_contract || {};
   }
 
+  function audienceLanguagePolicy(contract: JsonRecord): JsonRecord {
+    const lane = imageAuthoringLane(contract);
+    return lane?.audience_language_policy || {};
+  }
+
+  function layoutLegibilityPolicy(contract: JsonRecord): JsonRecord {
+    const lane = imageAuthoringLane(contract);
+    return lane?.layout_legibility_policy || {};
+  }
+
   function slidePrompt({
     route,
     slide,
@@ -321,6 +331,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     factGovernance,
     verifiedAssetPolicy,
     longDeckContract,
+    audiencePolicy,
+    layoutLegibility,
     repairFeedback,
   }: {
     route: ImagePageRoute;
@@ -331,6 +343,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     factGovernance: JsonRecord;
     verifiedAssetPolicy: JsonRecord;
     longDeckContract: JsonRecord;
+    audiencePolicy: JsonRecord;
+    layoutLegibility: JsonRecord;
     repairFeedback: JsonRecord | null;
   }): string {
     return [
@@ -346,7 +360,12 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       `Fact governance: visible factual claims must follow this contract: ${stableJson(factGovernance).slice(0, 1600)}.`,
       `Verified asset overlay policy: ${stableJson(verifiedAssetPolicy).slice(0, 1600)}.`,
       `Long deck production contract: ${stableJson(longDeckContract).slice(0, 1600)}.`,
+      `Audience language policy: ${stableJson(audiencePolicy).slice(0, 1600)}.`,
+      `Layout legibility policy: ${stableJson(layoutLegibility).slice(0, 1600)}.`,
       `Do not invent QR codes, download links, DOI strings, logos, hospital names, patient demographics, publication status, page numbers, slide numbers, or chapter corner labels unless they are explicitly supplied by the source truth or verified asset policy.`,
+      `Keep the title safe zone clear: no section chip, tag, card, badge, or decorative label may overlap or compete with the main title area.`,
+      `Use project-facing audience language only. Do not place operator notes, internal process labels, local filenames, route names, prompt names, RCA/RedCube/source-intake references, or instructions about what not to expose into the visible slide.`,
+      `Tables must stay readable: body text at or above 11pt equivalent, compact cell padding, and no sparse oversized cards or empty table panels.`,
       repairFeedback ? `Repair feedback: ${stableJson(repairFeedback).slice(0, 1200)}.` : '',
       `No UI chrome, no speaker notes, no internal metadata. Use clear readable text inside the page.`,
     ].filter(Boolean).join('\n');
@@ -492,6 +511,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     const factGovernance = imageFactGovernance(contract);
     const verifiedAssetPolicy = verifiedAssetOverlayPolicy(contract);
     const longDeckContract = longDeckProductionContract(contract);
+    const audiencePolicy = audienceLanguagePolicy(contract);
+    const layoutLegibility = layoutLegibilityPolicy(contract);
     const deckStyleManifest = {
       kind: 'ppt_image_first_style_manifest',
       route,
@@ -502,6 +523,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       prompt_template_hash: promptTemplate.hash,
       style_reference: styleReferences,
       style_profile: styleProfile.profile,
+      audience_language_policy: audiencePolicy,
+      layout_legibility_policy: layoutLegibility,
       generated_at: new Date().toISOString(),
     };
     const promptEntries: JsonRecord[] = [];
@@ -533,6 +556,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
         factGovernance,
         verifiedAssetPolicy,
         longDeckContract,
+        audiencePolicy,
+        layoutLegibility,
         repairFeedback: repairFeedbackById.get(slideId) || null,
       });
       const promptHash = sha256(prompt);
@@ -571,6 +596,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
         fact_governance: factGovernance,
         verified_asset_policy: verifiedAssetPolicy,
         long_deck_contract: longDeckContract,
+        audience_language_policy: audiencePolicy,
+        layout_legibility_policy: layoutLegibility,
         forbidden_generated_artifacts: safeArray(factGovernance?.forbidden_generated_artifacts)
           .map((item) => safeText(item))
           .filter(Boolean),
@@ -680,6 +707,8 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       fact_governance: factGovernance,
       verified_asset_policy: verifiedAssetPolicy,
       long_deck_contract: longDeckContract,
+      audience_language_policy: audiencePolicy,
+      layout_legibility_policy: layoutLegibility,
       forbidden_generated_artifacts: safeArray(factGovernance?.forbidden_generated_artifacts)
         .map((item) => safeText(item))
         .filter(Boolean),
