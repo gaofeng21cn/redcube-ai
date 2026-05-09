@@ -308,4 +308,4 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 
 如果你只想快速开始，而不关心技术层次，请回到：
 
-- [人类用户快速上手](../human_quickstart.md)
+- [人类用户快速上手](../product/human_quickstart.md)

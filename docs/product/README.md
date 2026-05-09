@@ -6,8 +6,8 @@ This layer explains how a person or agent should approach RedCube AI as a produc
 
 Current product-facing materials still being consolidated:
 
-- `../human_quickstart.md`
-- `../private-profile-setup.md`
-- `../public-github-publish.md`
+- [Human quickstart](./human_quickstart.md)
+- [Private profile setup](./private-profile-setup.md)
+- [Public GitHub publishing](./public-github-publish.md)
 
-When these files move, update this README and human-facing links. Runtime contracts should continue to use `human_doc:*` semantic pointers or contract/schema/source paths, not prose document paths.
+Runtime contracts should continue to use `human_doc:*` semantic pointers or contract/schema/source paths, not prose document paths.

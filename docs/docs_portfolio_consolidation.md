@@ -1,6 +1,6 @@
 # Docs Portfolio Consolidation
 
-日期锚点：`2026-05-06`
+日期锚点：`2026-05-09`
 
 ## 本轮边界
 
@@ -32,7 +32,7 @@
 | `docs/references/` | 仍有价值但不承担 active baton 的技术参考 | OPL handoff、target-state references、治理 checklist |
 | `docs/history/` | 已归档 provenance 与历史计划 | Hermes migration records、历史 plans |
 
-根层 `docs/*.md` 只保留默认入口、核心五件套和少量尚未分类完成的过渡材料；新增稳定材料应先落到上述生命周期目录。
+根层 `docs/*.md` 只保留默认入口、核心五件套和文档组合治理入口；新增稳定材料应先落到上述生命周期目录。
 
 ## 本轮归档原则
 
@@ -43,6 +43,10 @@
 - `docs/deliverable_examples.md` 已按 delivery lifecycle 迁入 `docs/delivery/deliverable_examples.md`。
 - `docs/runtime_architecture.md` 已按 runtime lifecycle 迁入 `docs/runtime/runtime_architecture.md`。
 - `docs/source_augmentation_executor_contract.md` 已按 source lifecycle 迁入 `docs/source/source_augmentation_executor_contract.md`。
+- `docs/human_quickstart.md`、`docs/private-profile-setup.md` 与 `docs/public-github-publish.md` 已按 product lifecycle 迁入 `docs/product/`。
+- `docs/image-first-ppt-production-route.md`、`docs/native-ppt-proof-environment.md` 与 `docs/stable_deliverable_manual_test_brief.md` 已按 delivery lifecycle 迁入 `docs/delivery/`。
+- `docs/deep_research_auto_first_product_contract.md` 已按 source lifecycle 迁入 `docs/source/`。
+- `docs/domain-harness-os-positioning.md` 已降为 positioning reference，迁入 `docs/references/positioning/`。
 
 ## 机器面边界
 

@@ -57,7 +57,7 @@
 
 ### 3. Docs / help / behavior alignment
 
-- `README*`、`docs/README*`、`docs/human_quickstart.md` 与 CLI help 现在对同一 quickstart surface 说的是同一套话；
+- `README*`、`docs/README*`、`docs/product/human_quickstart.md` 与 CLI help 现在对同一 quickstart surface 说的是同一套话；
 - 对新目录的推荐口径继续保持：先 `workspace doctor` 做诊断，再由 `source intake` 或 `source research` 执行正式 bootstrap；
 - 不引入新的 `workspace init` 产品表面，也不靠 hidden fallback chain 偷写 contract truth。
 

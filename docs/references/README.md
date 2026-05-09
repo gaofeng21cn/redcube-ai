@@ -7,6 +7,7 @@ This layer is not the active baton. Active contract-linked program briefs stay i
 Current groups:
 
 - Maintainer and series governance: `series-doc-governance-checklist.md`
+- Positioning references: `positioning/domain-harness-os-positioning.md`
 - Current operator references: `rca_executor_routing_config.md`, `opl_family_contract_adoption.md`, `opl_managed_runtime_three_layer_contract.md`, `lightweight_product_entry_and_opl_handoff.md`
 - Future-facing target states: `direct_delivery_longrun_target_state.md`, `source_readiness_deep_research_longrun_target_state.md`
 - Audits and closeouts still relevant to current interpretation: `creative-stage-ai-first-audit-2026-04-13.md`, `ppt_mainline_quality_closeout.md`

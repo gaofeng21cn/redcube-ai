@@ -7,11 +7,8 @@ This layer explains how visual deliverables are shaped and checked. The executab
 Current delivery materials:
 
 - [Deliverable examples](./deliverable_examples.md)
-
-Current delivery-facing root materials still being consolidated:
-
-- `../image-first-ppt-production-route.md`
-- `../native-ppt-proof-environment.md`
-- `../stable_deliverable_manual_test_brief.md`
+- [Image-first PPT production route](./image-first-ppt-production-route.md)
+- [Native PPT proof environment](./native-ppt-proof-environment.md)
+- [Stable deliverable manual test brief](./stable_deliverable_manual_test_brief.md)
 
 Runtime contracts should use `human_doc:*` semantic pointers for reader context, not this directory layout as a stable machine-readable interface.

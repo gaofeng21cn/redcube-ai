@@ -260,7 +260,7 @@
 先收紧文档与 quickstart：
 
 - README
-- `docs/human_quickstart.md`
+- `docs/product/human_quickstart.md`
 - family quickstart 话术
 - Codex 调用口径
 
