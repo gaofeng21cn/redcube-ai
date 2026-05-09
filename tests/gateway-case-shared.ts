@@ -138,9 +138,9 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   );
 }
 
-function assertRuntimeLoopClosureShape(surface, { source, entryMode }) {
+function assertRuntimeLoopClosureShape(surface, { source, entryMode, runtimeOwner = 'codex_cli' }) {
   assert.equal(surface.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-  assert.equal(surface.runtime_loop_closure.loop_owner.runtime_owner, 'upstream_hermes_agent');
+  assert.equal(surface.runtime_loop_closure.loop_owner.runtime_owner, runtimeOwner);
   assert.equal(surface.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
   assert.equal(surface.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
   assert.equal(surface.runtime_loop_closure.resume_point.entry_session_id, surface.entry_session?.entry_session_id ?? null);

@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { buildRuntimeLoopClosureManifestSurface } from '../product-entry-continuity-surfaces.js';
 import {
+  DEFAULT_RUNTIME_OWNER,
   FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
   MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
-  MANAGED_RUNTIME_OWNER,
   PRODUCT_ENTRY_CONTRACT_REF,
 } from './policy.js';
 
@@ -160,7 +160,7 @@ export function buildManifestExtraPayload({
       ],
     },
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
-      runtimeOwner: MANAGED_RUNTIME_OWNER,
+      runtimeOwner: DEFAULT_RUNTIME_OWNER,
     }),
     continuity_descriptor: {
       session_continuity: {

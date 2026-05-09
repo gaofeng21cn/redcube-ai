@@ -83,7 +83,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
       sharedCompanions.buildEntrySessionSurface({
         entry_session_id: 'session-a',
         session_file: path.join(runtimeStateRoot, 'product-entry-sessions', 'session-a.json'),
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'codex_cli',
         resumed_from_session: false,
         created_deliverable: true,
       }),
@@ -157,8 +157,8 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.deepEqual(
       response.domain_entry_surface.runtime_session_contract,
       sharedCompanions.buildRuntimeSessionContract({
-        runtime_owner: 'upstream_hermes_agent',
-        expected_runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'codex_cli',
+        expected_runtime_owner: 'codex_cli',
         adapter_surface: '@redcube/codex-cli-client',
         session_mode: 'entry_session',
       }),
@@ -258,7 +258,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       sharedCompanions.buildEntrySessionSurface({
         entry_session_id: 'session-a',
         session_file: continued.entry_session.session_file,
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'codex_cli',
         resumed_from_session: true,
         created_deliverable: false,
       }),
@@ -287,7 +287,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       sharedCompanions.buildEntrySessionSurface({
         entry_session_id: 'session-a',
         session_file: session.entry_session.session_file,
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'codex_cli',
       }),
     );
     assert.deepEqual(
@@ -476,6 +476,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assertRuntimeLoopClosureShape(response.product_entry_surface, {
       source: 'federated',
       entryMode: 'opl_gateway',
+      runtimeOwner: 'upstream_hermes_agent',
     });
     assert.equal(response.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(response.runtime_loop_closure.source_linkage.current_source, 'federated');

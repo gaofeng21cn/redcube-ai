@@ -3,7 +3,7 @@ import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continui
 
 import type { ProductEntryManifestResponse, ProductEntryStartCompanion, RuntimeLoopClosureSurface } from '../types.js';
 
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 
 type ProductStartSurface = ProductEntryStartCompanion & {
   runtime_loop_closure: RuntimeLoopClosureSurface;
@@ -17,7 +17,7 @@ export async function getProductStart(request: Record<string, unknown>): Promise
     target_domain_id: manifest.target_domain_id,
     workspace_locator: manifest.workspace_locator,
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
-      runtimeOwner: manifest.runtime?.runtime_owner || MANAGED_RUNTIME_OWNER,
+      runtimeOwner: manifest.runtime?.runtime_owner || DEFAULT_RUNTIME_OWNER,
       source: 'start',
       entryMode: 'start_projection',
     }) as RuntimeLoopClosureSurface,

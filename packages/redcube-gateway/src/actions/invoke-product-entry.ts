@@ -30,7 +30,8 @@ import {
 } from './product-entry-continuity-surfaces.js';
 
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+const HOSTED_RUNTIME_OWNER = 'upstream_hermes_agent';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const SUPPORTED_TASK_INTENTS = new Set(['run_managed_deliverable', 'run_deliverable_route']);
 
@@ -185,6 +186,7 @@ function buildSessionRecord({
   deliveryIdentity,
   taskIntent,
   entryMode,
+  runtimeOwner,
   continuationSnapshot,
 }) {
   return {
@@ -197,7 +199,7 @@ function buildSessionRecord({
     profile_id: deliveryIdentity.profileId || null,
     title: deliveryIdentity.title || null,
     goal: deliveryIdentity.goal || null,
-    runtime_owner: MANAGED_RUNTIME_OWNER,
+    runtime_owner: runtimeOwner,
     last_task_intent: taskIntent,
     last_entry_mode: entryMode,
     latest_managed_run_id: continuationSnapshot.latest_managed_run_id,
@@ -308,6 +310,7 @@ function buildDomainEntryRequest({
   workspaceRoot,
   taskIntent,
   entryMode,
+  runtimeOwner,
   delivery,
   resolvedIdentity,
 }) {
@@ -319,7 +322,7 @@ function buildDomainEntryRequest({
       workspace_root: workspaceRoot,
     },
     runtime_session_contract: {
-      runtime_owner: MANAGED_RUNTIME_OWNER,
+      runtime_owner: runtimeOwner,
       adapter_surface: DEFAULT_EXECUTOR_ADAPTER_SURFACE,
       session_mode: 'entry_session',
     },
@@ -349,6 +352,7 @@ function buildProductEntryResponse({
   domainEntrySurface,
   continuationSnapshot,
   persisted,
+  runtimeOwner,
   sessionContinuity,
   progressProjection,
   artifactInventory,
@@ -388,7 +392,7 @@ function buildProductEntryResponse({
       session_file: persisted.file,
       resumed_from_session: existingSession != null,
       created_deliverable: createdDeliverable,
-      runtime_owner: MANAGED_RUNTIME_OWNER,
+      runtime_owner: runtimeOwner,
     }),
     delivery_identity: deliveryIdentitySurface,
     domain_entry_surface: domainEntrySurface,
@@ -412,6 +416,7 @@ export async function invokeProductEntry(request) {
   const delivery = normalizeDeliveryRequest(request);
   const taskIntent = resolveTaskIntent(request, delivery);
   const entryMode = safeText(request?.entry_mode || request?.entryMode, 'redcube_product_entry');
+  const runtimeOwner = entryMode === 'opl_gateway' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
 
   if (existingSession && safeText(existingSession.workspace_root) !== workspaceRoot) {
     throw new Error('entry_session_contract.entry_session_id 已绑定其他 workspace_root');
@@ -439,6 +444,7 @@ export async function invokeProductEntry(request) {
     workspaceRoot,
     taskIntent,
     entryMode,
+    runtimeOwner,
     delivery,
     resolvedIdentity,
   }));
@@ -451,13 +457,14 @@ export async function invokeProductEntry(request) {
       deliveryIdentity: resolvedIdentity,
       taskIntent,
       entryMode,
+      runtimeOwner,
       continuationSnapshot,
     }),
   });
   const sessionContinuity = buildSessionContinuitySurface({
     entrySessionId: entrySession.entrySessionId,
     sessionFile: persisted.file,
-    runtimeOwner: MANAGED_RUNTIME_OWNER,
+    runtimeOwner,
     deliveryIdentity: {
       deliverable_family: resolvedIdentity.deliverableFamily,
       topic_id: resolvedIdentity.topicId,
@@ -475,7 +482,7 @@ export async function invokeProductEntry(request) {
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId: entrySession.entrySessionId,
     sessionFile: persisted.file,
-    runtimeOwner: MANAGED_RUNTIME_OWNER,
+    runtimeOwner,
     deliveryIdentity: buildResolvedDeliveryIdentityPayload(resolvedIdentity, { includeProfile: false }),
     continuationSnapshot,
     source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
@@ -490,7 +497,7 @@ export async function invokeProductEntry(request) {
     continuationSnapshot,
   });
   const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
-    runtimeOwner: MANAGED_RUNTIME_OWNER,
+    runtimeOwner,
     entrySessionId: entrySession.entrySessionId,
     sessionFile: persisted.file,
     deliveryIdentity: buildResolvedDeliveryIdentityPayload(resolvedIdentity),
@@ -510,6 +517,7 @@ export async function invokeProductEntry(request) {
     domainEntrySurface,
     continuationSnapshot,
     persisted,
+    runtimeOwner,
     sessionContinuity,
     progressProjection,
     artifactInventory,

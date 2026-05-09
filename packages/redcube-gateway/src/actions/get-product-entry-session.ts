@@ -26,7 +26,9 @@ import {
   buildSessionContinuitySurface,
 } from './product-entry-continuity-surfaces.js';
 
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+const HOSTED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const SUPPORTED_RUNTIME_OWNERS = new Set([DEFAULT_RUNTIME_OWNER, HOSTED_RUNTIME_OWNER]);
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -313,7 +315,7 @@ export async function getProductEntrySession(request) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
   const session = reconcileSessionCheckpointWithWorkspaceLatest(storedSession);
-  if (safeText(session.runtime_owner) !== MANAGED_RUNTIME_OWNER) {
+  if (!SUPPORTED_RUNTIME_OWNERS.has(safeText(session.runtime_owner))) {
     throw new Error('product entry session runtime_owner 漂移');
   }
 

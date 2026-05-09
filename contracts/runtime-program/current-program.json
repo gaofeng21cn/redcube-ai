@@ -67,6 +67,7 @@
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
+      "keep direct product-entry runtime_owner and executor_owner on codex_cli unless a caller explicitly enters the OPL federated or Hermes proof lane",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
       "keep RedCube as an independent domain agent callable through both direct and OPL-federated entry routes",

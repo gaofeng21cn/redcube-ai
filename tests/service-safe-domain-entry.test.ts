@@ -210,7 +210,8 @@ test('service-safe domain entry contract is frozen in contracts and current prog
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
-  assert.equal(contract.runtime_session_contract.runtime_owner, 'upstream_hermes_agent');
+  assert.equal(contract.runtime_session_contract.default_runtime_owner, 'codex_cli');
+  assert.equal(contract.runtime_session_contract.hosted_runtime_owner_when_federated, 'upstream_hermes_agent');
   assert.deepEqual(contract.opl_handoff_envelope.minimum_fields, [
     'target_domain_id',
     'task_intent',

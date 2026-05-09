@@ -10,7 +10,7 @@ import {
 import { doctorWorkspace } from './doctor-workspace.js';
 import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
 
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 
 type ProductPreflightRequest = Record<string, any>;
 
@@ -100,7 +100,7 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       workspace_root: doctor.workspaceRoot,
     },
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
-      runtimeOwner: MANAGED_RUNTIME_OWNER,
+      runtimeOwner: DEFAULT_RUNTIME_OWNER,
       source: 'preflight',
       entryMode: 'preflight_projection',
     }),

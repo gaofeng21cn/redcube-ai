@@ -8,7 +8,8 @@ import { runDeliverableRoute } from './run-deliverable-route.js';
 import { runManagedDeliverable } from './run-managed-deliverable.js';
 
 const SERVICE_SAFE_DOMAIN_ENTRY_ID = 'redcube_service_safe_domain_entry';
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+const HOSTED_RUNTIME_OWNER = 'upstream_hermes_agent';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const TASK_INTENT_SURFACE_KIND = {
   run_managed_deliverable: 'managed_run',
@@ -77,12 +78,14 @@ function normalizeTargetDomainId(request) {
 
 function normalizeRuntimeSessionContract(request) {
   const contract = request?.runtime_session_contract || request?.runtimeSessionContract || {};
+  const entryMode = safeText(request?.entry_mode || request?.entryMode);
+  const expectedRuntimeOwner = entryMode === 'opl_gateway' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
   return buildRuntimeSessionContract({
     runtime_owner: requireField(
       'runtime_session_contract.runtime_owner',
       contract?.runtime_owner || contract?.runtimeOwner,
     ),
-    expected_runtime_owner: MANAGED_RUNTIME_OWNER,
+    expected_runtime_owner: expectedRuntimeOwner,
     adapter_surface: safeText(
       contract?.adapter_surface || contract?.adapterSurface,
       DEFAULT_EXECUTOR_ADAPTER_SURFACE,
