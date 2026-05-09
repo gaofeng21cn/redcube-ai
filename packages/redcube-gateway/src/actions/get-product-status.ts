@@ -7,7 +7,7 @@ import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continui
 
 import type { ProductEntryManifestResponse, ProductStatusResponse, RuntimeLoopClosureSurface } from '../types.js';
 
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 
 type GatewayProductEntryManifest = ProductEntryManifestResponse & {
   deliverable_facade?: {
@@ -79,7 +79,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
     ppt_deck_visual_route_truth: manifest.ppt_deck_visual_route_truth,
     overlay_stage_sequences: manifest.deliverable_facade?.family_route_policy || {},
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
-      runtimeOwner: manifest.runtime?.runtime_owner || MANAGED_RUNTIME_OWNER,
+      runtimeOwner: manifest.runtime?.runtime_owner || DEFAULT_RUNTIME_OWNER,
       source: 'product_entry_overview',
       entryMode: 'product_entry_overview_projection',
     }) as RuntimeLoopClosureSurface,

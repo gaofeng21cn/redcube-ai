@@ -5,7 +5,7 @@
   "owner_surface": "@redcube/gateway invokeDomainEntry",
   "entry_goal": {
     "label": "service-safe RedCube domain entry for OPL Runtime Manager handoff",
-    "summary": "Freeze one machine-readable RedCube domain adapter surface that can be called by OPL Runtime Manager while keeping OPL-side federation as a thin product-managed adapter/projection layer over external Hermes-Agent substrate and domain truth on RedCube."
+    "summary": "Freeze one machine-readable RedCube domain adapter surface. Direct RedCube product-entry uses Codex CLI by default; OPL-side federation remains a thin product-managed adapter/projection layer over explicit external Hermes-Agent substrate, with domain truth on RedCube."
   },
   "opl_handoff_envelope": {
     "minimum_fields": [
@@ -31,7 +31,8 @@
     }
   },
   "runtime_session_contract": {
-    "runtime_owner": "upstream_hermes_agent",
+    "default_runtime_owner": "codex_cli",
+    "hosted_runtime_owner_when_federated": "upstream_hermes_agent",
     "opl_runtime_manager_role": "product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
     "adapter_surface": "@redcube/codex-cli-client",
     "session_mode": "ephemeral_run"

@@ -13,6 +13,7 @@ import {
   getProductStart,
   importGatewaySharedModule,
   invokeProductEntry,
+  getProductEntrySession,
   readJson,
   test,
   withMockHermesAndRuntimeState,
@@ -175,11 +176,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       '成熟的最终用户前台壳仍未 landed。',
       'managed web productization 仍未 landed。',
     ]);
-    assert.equal(manifest.runtime.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.deepEqual(manifest.managed_runtime_contract, {
       shared_contract_ref: 'contracts/opl-gateway/managed-runtime-three-layer-contract.json',
-      runtime_owner: 'upstream_hermes_agent',
+      runtime_owner: 'codex_cli',
       domain_owner: 'redcube_ai',
       executor_owner: 'codex_cli',
       supervision_status_surface: {
@@ -201,7 +202,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       ],
     });
     assert.equal(manifest.runtime_inventory.surface_kind, 'runtime_inventory');
-    assert.equal(manifest.runtime_inventory.runtime_owner, 'upstream_hermes_agent');
+    assert.equal(manifest.runtime_inventory.runtime_owner, 'codex_cli');
     assert.equal(manifest.runtime_inventory.domain_owner, 'redcube_ai');
     assert.equal(manifest.runtime_inventory.executor_owner, 'codex_cli');
     assert.equal(manifest.runtime_inventory.status_surface.ref, '/product_entry_preflight');
@@ -355,7 +356,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.skill_catalog.skills[0].domain_projection.runtime_continuity,
       {
         surface_kind: 'skill_runtime_continuity',
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'codex_cli',
         domain_owner: 'redcube_ai',
         executor_owner: 'codex_cli',
         session_locator_field: 'entry_session_contract.entry_session_id',
@@ -431,7 +432,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(
       manifest.route_equivalence.downstream_runtime_truth.runtime_owner,
-      'upstream_hermes_agent',
+      'codex_cli',
     );
     assert.equal(manifest.deliverable_facade.surface_kind, 'deliverable_facade_contract');
     assert.deepEqual(manifest.deliverable_facade.covered_families, ['ppt_deck', 'xiaohongshu']);
@@ -606,7 +607,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	      '/continuation_snapshot/managed_progress_projection/final_artifact_refs',
 	    );
       assert.equal(manifest.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-      assert.equal(manifest.runtime_loop_closure.loop_owner.runtime_owner, 'upstream_hermes_agent');
+      assert.equal(manifest.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
       assert.equal(manifest.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
       assert.equal(manifest.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
       assert.equal(
@@ -752,6 +753,74 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(preflight.blocking_check_ids, []);
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
+  });
+});
+
+test('default product-entry path stays on codex_cli without requiring Hermes API server', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL), false);
+    assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND), false);
+
+    const manifest = await getProductEntryManifest({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
+    assert.equal(manifest.runtime_inventory.executor_owner, 'codex_cli');
+    assert.equal(manifest.managed_runtime_contract.runtime_owner, 'codex_cli');
+    assert.equal(manifest.managed_runtime_contract.executor_owner, 'codex_cli');
+    assert.equal(manifest.route_equivalence.downstream_runtime_truth.runtime_owner, 'codex_cli');
+    assert.equal(manifest.route_equivalence.downstream_runtime_truth.executor_owner, 'codex_cli');
+    assert.equal(manifest.runtime_inventory.substrate, 'codex_cli_runtime');
+    assert.equal(
+      manifest.skill_catalog.skills[0].domain_projection.runtime_continuity.runtime_owner,
+      'codex_cli',
+    );
+
+    const status = await getProductStatus({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(status.runtime.runtime_owner, 'codex_cli');
+    assert.equal(status.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+
+    const start = await getProductStart({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+
+    const invoked = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-codex-default',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-codex-default',
+        profile_id: 'lecture_student',
+        title: 'Codex default product entry proof',
+        goal: '验证未配置 Hermes 时默认 product-entry 只走 Codex CLI',
+        user_intent: '先给我主线故事',
+        stop_after_stage: 'storyline',
+      },
+    });
+    assert.equal(invoked.entry_session.runtime_owner, 'codex_cli');
+    assert.equal(invoked.session_continuity.runtime_owner, 'codex_cli');
+    assert.equal(invoked.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+    assert.equal(invoked.domain_entry_surface.runtime_session_contract.runtime_owner, 'codex_cli');
+    assert.equal(invoked.domain_entry_surface.runtime_session_contract.adapter_surface, '@redcube/codex-cli-client');
+    assert.equal(invoked.domain_entry_surface.result_surface.managed_run.adapter, 'codex_cli');
+    assert.equal(invoked.domain_entry_surface.result_surface.managed_run.runtime_bridge.owner, 'codex_cli');
+
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-codex-default',
+    });
+    assert.equal(session.entry_session.runtime_owner, 'codex_cli');
+    assert.equal(session.session_continuity.runtime_owner, 'codex_cli');
+    assert.equal(session.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
   });
 });
 

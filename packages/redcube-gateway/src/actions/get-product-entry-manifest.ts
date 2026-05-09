@@ -47,10 +47,10 @@ import { buildRouteEquivalenceContract, buildDeliverableFacadeContract } from '.
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
 import {
+  DEFAULT_RUNTIME_OWNER,
   FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
   LONG_TASK_STAGE_POLICY,
   MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
-  MANAGED_RUNTIME_OWNER,
   PRODUCT_ENTRY_CONTRACT_REF,
   PRODUCT_FEDERATE_COMMAND,
   PRODUCT_STATUS_COMMAND,
@@ -260,7 +260,7 @@ export async function getProductEntryManifest(request) {
     ],
   });
   const runtime = {
-    runtime_owner: MANAGED_RUNTIME_OWNER,
+    runtime_owner: DEFAULT_RUNTIME_OWNER,
     runtime_state_root: path.dirname(sessionStoreRoot),
     session_store_root: sessionStoreRoot,
   };
@@ -291,6 +291,7 @@ export async function getProductEntryManifest(request) {
     manifestProjection: true,
   });
   const managedRuntimeContract = buildManagedRuntimeContract({
+    runtime_owner: runtime.runtime_owner,
     domain_owner: 'redcube_ai',
     executor_owner: 'codex_cli',
     supervision_status_surface: 'product_entry_session',
@@ -305,7 +306,7 @@ export async function getProductEntryManifest(request) {
     runtime_owner: runtime.runtime_owner,
     domain_owner: managedRuntimeContract.domain_owner,
     executor_owner: managedRuntimeContract.executor_owner,
-    substrate: 'external_hermes_agent_target',
+    substrate: 'codex_cli_runtime',
     availability: productEntryPreflight.ready_to_try_now ? 'ready' : 'attention_needed',
     health_status: productEntryPreflight.ready_to_try_now ? 'healthy' : 'degraded',
     status_surface: {
