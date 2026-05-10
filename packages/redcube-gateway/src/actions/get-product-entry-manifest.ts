@@ -534,7 +534,9 @@ export async function getProductEntryManifest(request) {
   };
   const oplRuntimeManagerRegistration = buildOplRuntimeManagerRegistration({ runtimeContinuityEnvelope, productEntrySessionCommand });
   const actionMetadata = buildRedCubeActionMetadata();
-  const familyStageControlPlane = buildRedCubeFamilyStageControlPlane();
+  const familyStageControlPlane = buildRedCubeFamilyStageControlPlane({
+    familyActionCatalog: actionMetadata.family_action_catalog,
+  });
   const skillCommandContracts = actionMetadata.skill_commands.map((contract) => {
     const result = {
       action_id: contract.action_id,

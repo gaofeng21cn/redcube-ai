@@ -7,6 +7,7 @@ import {
   assert,
   assertFamilyOrchestrationCompanion,
   assertRuntimeLoopClosureShape,
+  execFileSync,
   getProductEntryManifest,
   getProductStatus,
   getProductPreflight,
@@ -282,6 +283,23 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.family_stage_control_plane.plane_id, 'redcube_ai_stage_control_plane');
     assert.equal(manifest.family_stage_control_plane.target_domain_id, 'redcube_ai');
     assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_role, 'projection_consumer_only');
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_visual_truth, true);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_review_publication_projection, true);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_artifact_authority, true);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_schedule_stage, false);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_visual_truth, false);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_review_truth, false);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_publication_projection, false);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.default_ppt_route_changed, false);
+    assert.equal(manifest.family_stage_control_plane.authority_boundary.managed_deliverable_runtime_changed, false);
+    assert.equal(manifest.family_stage_control_plane.freshness.status, 'current');
+    assert.equal(manifest.family_stage_control_plane.freshness.checked_at, 'manifest_build');
+    assert.equal(manifest.family_stage_control_plane.stage_action_parity.status, 'aligned');
+    assert.deepEqual(manifest.family_stage_control_plane.stage_action_parity.missing_action_refs, []);
+    assert.equal(
+      manifest.family_stage_control_plane.source_refs.some((sourceRef) => sourceRef.ref === '/family_action_catalog'),
+      true,
+    );
     assert.deepEqual(
       manifest.family_stage_control_plane.stages.map((stage) => stage.stage_id),
       [
@@ -293,6 +311,37 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'package_and_handoff',
       ],
     );
+    const catalogActionIds = new Set(manifest.family_action_catalog.actions.map((action) => action.action_id));
+    for (const stage of manifest.family_stage_control_plane.stages) {
+      assert.equal(stage.owner, 'redcube_ai');
+      assert.equal(typeof stage.goal, 'string');
+      assert.equal(stage.goal.length > 20, true);
+      assert.equal(stage.skills.some((skill) => skill.ref === 'redcube-ai'), true);
+      assert.equal(stage.source_refs.some((sourceRef) => sourceRef.ref === '/family_action_catalog'), true);
+      assert.equal(stage.source_refs.some((sourceRef) => sourceRef.ref === '/review_state'), true);
+      assert.equal(stage.source_refs.some((sourceRef) => sourceRef.ref === '/publication_projection'), true);
+      assert.equal(stage.freshness.status, 'current');
+      assert.equal(stage.freshness.checked_at, 'manifest_build');
+      assert.equal(stage.action_parity.status, 'aligned');
+      assert.deepEqual(stage.action_parity.missing_action_refs, []);
+      for (const actionRef of stage.allowed_action_refs) {
+        assert.equal(catalogActionIds.has(actionRef), true);
+      }
+      assert.equal(stage.handoff.next_owner, 'redcube_ai');
+      assert.equal(stage.handoff.resume_surface_ref, '/session_continuity');
+      assert.equal(stage.handoff.artifact_surface_ref, '/artifact_inventory');
+      assert.equal(stage.authority_boundary.domain_truth_owner, 'redcube_ai');
+      assert.equal(stage.authority_boundary.visual_truth_owner, 'redcube_ai');
+      assert.equal(stage.authority_boundary.artifact_authority_owner, 'redcube_ai');
+      assert.equal(stage.authority_boundary.review_publication_projection_owner, 'redcube_ai');
+      assert.equal(stage.authority_boundary.opl_role, 'projection_consumer_only');
+      assert.equal(stage.authority_boundary.opl_can_schedule_stage, false);
+      assert.equal(stage.authority_boundary.opl_can_write_visual_truth, false);
+      assert.equal(stage.authority_boundary.opl_can_write_review_truth, false);
+      assert.equal(stage.authority_boundary.opl_can_write_publication_projection, false);
+      assert.equal(stage.authority_boundary.default_ppt_route_changed, false);
+      assert.equal(stage.authority_boundary.managed_deliverable_runtime_changed, false);
+    }
     const artifactStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'artifact_creation');
     assert.deepEqual(artifactStage.domain_stage_refs, ['author_image_pages', 'render_html', 'author_pptx_native']);
     assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
@@ -790,6 +839,32 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(preflight.blocking_check_ids, []);
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
+
+    const cliManifest = JSON.parse(execFileSync(
+      process.execPath,
+      ['apps/redcube-cli/dist/cli.js', 'product', 'manifest', '--workspace-root', workspaceRoot, '--json'],
+      {
+        cwd: process.cwd(),
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
+        },
+      },
+    ));
+    assert.equal(cliManifest.ok, true);
+    assert.equal(cliManifest.family_stage_control_plane.surface_kind, 'family_stage_control_plane');
+    assert.deepEqual(
+      cliManifest.family_stage_control_plane.stages.map((stage) => stage.stage_id),
+      manifest.family_stage_control_plane.stages.map((stage) => stage.stage_id),
+    );
+    assert.equal(cliManifest.family_stage_control_plane.stage_action_parity.status, 'aligned');
+    assert.deepEqual(cliManifest.family_stage_control_plane.stage_action_parity.missing_action_refs, []);
+    assert.equal(
+      cliManifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'artifact_creation')
+        .authority_boundary.default_ppt_route_changed,
+      false,
+    );
   });
 });
 

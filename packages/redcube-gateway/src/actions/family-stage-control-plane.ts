@@ -73,11 +73,46 @@ const STAGES = [
   },
 ];
 
-function stageDescriptor(stage) {
+const PLANE_SOURCE_REFS = [
+  { ref_kind: 'json_pointer', ref: '/family_action_catalog', role: 'allowed_action_catalog' },
+  { ref_kind: 'json_pointer', ref: '/deliverable_facade/family_route_policy', role: 'route_stage_policy' },
+  { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'runtime_watch_projection' },
+  { ref_kind: 'json_pointer', ref: '/review_state', role: 'review_truth_projection' },
+  { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'publication_projection' },
+  { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_authority_projection' },
+];
+
+function buildFreshness(sourceRefs) {
+  return {
+    status: 'current',
+    checked_at: 'manifest_build',
+    source_ref_count: sourceRefs.length,
+    stale_if_missing: sourceRefs.map((sourceRef) => sourceRef.ref),
+  };
+}
+
+function buildActionParity(stage, actionIds) {
+  const missing_action_refs = stage.allowed_action_refs.filter((actionRef) => !actionIds.has(actionRef));
+  return {
+    status: missing_action_refs.length === 0 ? 'aligned' : 'missing_action_refs',
+    family_action_catalog_ref: '/family_action_catalog',
+    allowed_action_refs: stage.allowed_action_refs,
+    missing_action_refs,
+  };
+}
+
+function stageDescriptor(stage, actionIds) {
+  const sourceRefs = [
+    ...PLANE_SOURCE_REFS,
+    { ref_kind: 'route_stage_refs', ref: stage.domain_stage_refs, role: 'domain_stage_projection' },
+  ];
   return {
     ...stage,
     owner: 'redcube_ai',
     summary: `${stage.title} projected from RCA-owned route stages for OPL family discovery.`,
+    source_refs: sourceRefs,
+    freshness: buildFreshness(sourceRefs),
+    action_parity: buildActionParity(stage, actionIds),
     inputs: [
       { ref_kind: 'json_pointer', ref: '/family_action_catalog', role: 'allowed_action_catalog' },
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'progress_read_model' },
@@ -105,27 +140,60 @@ function stageDescriptor(stage) {
       domain_truth_owner: 'redcube_ai',
       visual_truth_owner: 'redcube_ai',
       artifact_authority_owner: 'redcube_ai',
+      review_publication_projection_owner: 'redcube_ai',
       opl_role: 'projection_consumer_only',
+      opl_can_schedule_stage: false,
+      opl_can_write_visual_truth: false,
+      opl_can_write_review_truth: false,
+      opl_can_write_publication_projection: false,
+      rca_owns_visual_truth: true,
+      rca_owns_review_publication_projection: true,
+      rca_owns_artifact_authority: true,
       default_ppt_route_changed: false,
       managed_deliverable_runtime_changed: false,
     },
   };
 }
 
-export function buildRedCubeFamilyStageControlPlane() {
+export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null } = {}) {
+  const actionIds = new Set((familyActionCatalog?.actions ?? []).map((action) => action.action_id));
+  const stages = STAGES.map((stage) => stageDescriptor(stage, actionIds));
+  const missingActionRefs = stages.flatMap((stage) => (
+    stage.action_parity.missing_action_refs.map((actionRef) => ({
+      stage_id: stage.stage_id,
+      action_ref: actionRef,
+    }))
+  ));
   return {
     surface_kind: 'family_stage_control_plane',
     version: 'family-stage-control-plane.v1',
     plane_id: 'redcube_ai_stage_control_plane',
     target_domain_id: 'redcube_ai',
     owner: 'redcube_ai',
+    source_refs: PLANE_SOURCE_REFS,
+    freshness: buildFreshness(PLANE_SOURCE_REFS),
+    stage_action_parity: {
+      surface_kind: 'family_stage_action_parity',
+      status: missingActionRefs.length === 0 ? 'aligned' : 'missing_action_refs',
+      family_action_catalog_ref: '/family_action_catalog',
+      missing_action_refs: missingActionRefs,
+    },
     authority_boundary: {
       domain_truth_owner: 'redcube_ai',
       opl_role: 'projection_consumer_only',
       write_policy: 'no_visual_truth_writes',
       no_quality_verdict: true,
+      rca_owns_visual_truth: true,
+      rca_owns_review_publication_projection: true,
+      rca_owns_artifact_authority: true,
+      opl_can_schedule_stage: false,
+      opl_can_write_visual_truth: false,
+      opl_can_write_review_truth: false,
+      opl_can_write_publication_projection: false,
+      default_ppt_route_changed: false,
+      managed_deliverable_runtime_changed: false,
     },
-    stages: STAGES.map(stageDescriptor),
+    stages,
     notes: [
       'Descriptor-only projection over existing RCA route stages.',
       'OPL discovery must not schedule routes, change default PPT route, or own visual/artifact authority.',

@@ -109,6 +109,31 @@
       "review_and_revision",
       "package_and_handoff"
     ],
+    "manifest_stage_descriptor_required_fields": [
+      "stage_id",
+      "stage_kind",
+      "goal",
+      "owner",
+      "skills",
+      "allowed_action_refs",
+      "handoff",
+      "source_refs",
+      "freshness",
+      "action_parity",
+      "authority_boundary"
+    ],
+    "manifest_stage_descriptor_truth": {
+      "allowed_action_refs_source": "family_action_catalog",
+      "freshness_source": "product_entry_manifest_build",
+      "source_refs_include": [
+        "family_action_catalog",
+        "deliverable_facade.family_route_policy",
+        "progress_projection",
+        "review_state",
+        "publication_projection",
+        "artifact_inventory"
+      ]
+    },
     "route_stage_projection": {
       "ppt_deck": {
         "source_intake": [
