@@ -704,6 +704,30 @@ export async function getProductEntryManifest(request) {
       surface_kind: 'product_entry_session',
       purpose: '在已有 entry_session_id 下继续同一交付并检查当前 session 进度。',
     },
+    sidecar: {
+      command: 'redcube product sidecar',
+      command_template: `redcube product sidecar export --workspace-root ${workspaceRoot} --format json`,
+      dispatch_command_template: 'redcube product sidecar dispatch --task <task.json> --format json',
+      surface_kind: 'product_sidecar_adapter',
+      purpose: 'RCA product sidecar adapter for OPL typed family queue and OPL-managed Hermes wakeups; it exposes guarded runtime/product-entry actions without owning visual truth, review verdicts, or publication gates.',
+      extra_payload: {
+        online_substrate_owner: 'external_hermes_agent',
+        control_plane_owner: 'opl',
+        domain_truth_owner: 'redcube_ai',
+        allowed_actions: [
+          'runtime_watch',
+          'supervise_managed_run',
+          'product_entry_continuation',
+          'notification_receipt',
+        ],
+        forbidden_writes: [
+          'visual_truth',
+          'review_verdict',
+          'publication_gate',
+          'canonical_artifacts',
+        ],
+      },
+    },
     native_ppt_proof: {
       command: nativePptOperatorUx.proof_runner.helper_command,
       command_template: nativePptOperatorUx.proof_runner.command_template,
@@ -903,11 +927,24 @@ export async function getProductEntryManifest(request) {
     },
     product_entry_shell: {
       ...manifest.product_entry_shell,
+      sidecar: productEntryShell.sidecar,
       native_ppt_proof: productEntryShell.native_ppt_proof,
       image_ppt_proof: productEntryShell.image_ppt_proof,
     },
     operator_loop_actions: {
       ...manifest.operator_loop_actions,
+      export_product_sidecar: {
+        command: 'redcube product sidecar export',
+        surface_kind: 'product_sidecar_export',
+        summary: 'Export the RCA product sidecar adapter for OPL/Hermes control-plane indexing.',
+        requires: ['workspace_root'],
+      },
+      dispatch_product_sidecar: {
+        command: 'redcube product sidecar dispatch',
+        surface_kind: 'product_sidecar_dispatch',
+        summary: 'Dispatch RCA-owned guarded sidecar actions only.',
+        requires: ['task'],
+      },
       run_native_ppt_proof: operatorLoopActions.run_native_ppt_proof,
       run_image_ppt_proof: operatorLoopActions.run_image_ppt_proof,
     },

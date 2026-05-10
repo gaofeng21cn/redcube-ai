@@ -11,6 +11,8 @@ import {
   getProductStatus,
   getProductPreflight,
   getProductStart,
+  exportProductSidecar,
+  dispatchProductSidecar,
   importGatewaySharedModule,
   invokeProductEntry,
   getProductEntrySession,
@@ -253,6 +255,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'invoke_federated_product_entry',
         'get_product_entry_session',
         'get_product_entry_manifest',
+        'export_product_sidecar',
+        'dispatch_product_sidecar',
         'run_image_ppt_proof',
         'run_native_ppt_proof',
         'invoke_domain_entry',
@@ -283,6 +287,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         ['opl_bridge_handoff', 'redcube product federate', 'federated_product_entry'],
         ['continue_session', 'redcube product session', 'product_entry_session'],
         ['get_product_entry_manifest', 'redcube product manifest', 'product_entry_manifest'],
+        ['export_product_sidecar', 'redcube product sidecar export', 'product_sidecar_export'],
+        ['dispatch_product_sidecar', 'redcube product sidecar dispatch', 'product_sidecar_dispatch'],
         ['run_image_ppt_proof', 'redcube image-ppt proof', 'image_ppt_product_entry_proof'],
         ['run_native_ppt_proof', 'redcube native-ppt proof', 'native_ppt_product_entry_proof'],
         ['invoke_domain_entry', 'redcube service-safe domain entry', 'domain_entry'],
@@ -399,6 +405,15 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.opl_bridge.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
+    assert.equal(manifest.product_entry_shell.sidecar.command, 'redcube product sidecar');
+    assert.equal(manifest.product_entry_shell.sidecar.online_substrate_owner, 'external_hermes_agent');
+    assert.equal(manifest.product_entry_shell.sidecar.control_plane_owner, 'opl');
+    assert.deepEqual(manifest.product_entry_shell.sidecar.allowed_actions, [
+      'runtime_watch',
+      'supervise_managed_run',
+      'product_entry_continuation',
+      'notification_receipt',
+    ]);
     assert.match(manifest.product_entry_shell.status.purpose, /product-entry overview/i);
     assert.equal(
       manifest.product_entry_shell.status.canonical_entry_semantics,
@@ -667,6 +682,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_visual_truth, false);
       assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_canonical_artifacts, false);
       assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_review_truth, false);
+      assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_publication_projection, false);
 	    const validatedManifest = sharedCompanions.validateFamilyProductEntryManifest(manifest, {
 	      requireRuntimeCompanions: true,
 	    });
@@ -753,6 +769,67 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(preflight.blocking_check_ids, []);
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(manifest.product_entry_preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
+  });
+});
+
+test('product sidecar export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
+  await withMockHermesAndRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const sidecar = await exportProductSidecar({
+      workspace_root: workspaceRoot,
+    });
+
+    assert.equal(sidecar.ok, true);
+    assert.equal(sidecar.surface_kind, 'product_sidecar_export');
+    assert.equal(sidecar.runtime_substrate.substrate_owner, 'external_hermes_agent');
+    assert.equal(sidecar.runtime_substrate.managed_by, 'opl_runtime_manager');
+    assert.equal(sidecar.runtime_substrate.queue_owner, 'opl');
+    assert.equal(sidecar.owner_boundary.hermes_owns_visual_truth, false);
+    assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
+    assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);
+    assert.equal(sidecar.owner_boundary.rca_owns_review_publication_projection, true);
+    assert.deepEqual(
+      sidecar.guarded_actions.map((entry) => entry.action),
+      [
+        'runtime_watch',
+        'supervise_managed_run',
+        'product_entry_continuation',
+        'notification_receipt',
+      ],
+    );
+    assert.deepEqual(sidecar.blocked_actions, [
+      'write_visual_truth',
+      'write_canonical_artifacts',
+      'write_review_verdict',
+      'write_publication_gate',
+      'mutate_review_state',
+      'publish_export_bundle',
+    ]);
+
+    const receipt = await dispatchProductSidecar({
+      task: {
+        action: 'notification_receipt',
+        notification_id: 'notice-1',
+      },
+    });
+    assert.equal(receipt.ok, true);
+    assert.equal(receipt.surface_kind, 'product_sidecar_dispatch');
+    assert.equal(receipt.result_surface.surface_kind, 'notification_receipt');
+    assert.equal(receipt.sidecar_policy.writes_visual_truth, false);
+    assert.equal(receipt.sidecar_policy.writes_review_verdict, false);
+    assert.equal(receipt.sidecar_policy.writes_publication_gate, false);
+
+    await assert.rejects(
+      () => dispatchProductSidecar({
+        task: {
+          action: 'write_publication_gate',
+          workspace_root: workspaceRoot,
+        },
+      }),
+      /product sidecar action 不允许/,
+    );
   });
 });
 

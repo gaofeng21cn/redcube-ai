@@ -298,6 +298,7 @@ RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
 - `xiaohongshu` 共享同一 harness，但不自动等同于 `Presentation Ops`
 - `RedCube AI` 仍然必须保留独立 domain-agent 角色，而不是退化成 OPL 的内部模块
 - final target route 应理解成：`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+- RCA product sidecar adapter 只暴露 `product sidecar export/dispatch` 这层 typed projection / guarded dispatch：Hermes 负责在线唤醒 substrate，OPL 负责 typed family queue/control plane，RCA 继续负责 runtimeWatch / superviseManagedRun / product-entry continuation 下游和 review/publication/operator handoff truth。
 
 ## 更稳定的规则在哪里
 

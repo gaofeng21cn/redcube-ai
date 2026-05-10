@@ -196,6 +196,16 @@ async function runNativePptProductEntryProofJs(request: any) {
   return module.runNativePptProductEntryProof(request);
 }
 
+async function exportProductSidecarJs(request: any) {
+  const module = await import('./actions/product-sidecar.js');
+  return module.exportProductSidecar(request);
+}
+
+async function dispatchProductSidecarJs(request: any) {
+  const module = await import('./actions/product-sidecar.js');
+  return module.dispatchProductSidecar(request);
+}
+
 async function auditDeliverableJs(request: any) {
   const module = await import('./actions/audit-deliverable.js');
   return module.auditDeliverable(request);
@@ -324,6 +334,14 @@ export function getProductStatus(request: Record<string, unknown>): Promise<Prod
 
 export function runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>> {
   return runNativePptProductEntryProofJs(request) as Promise<Record<string, unknown>>;
+}
+
+export function exportProductSidecar(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return exportProductSidecarJs(request) as Promise<Record<string, unknown>>;
+}
+
+export function dispatchProductSidecar(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return dispatchProductSidecarJs(request) as Promise<Record<string, unknown>>;
 }
 
 export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {

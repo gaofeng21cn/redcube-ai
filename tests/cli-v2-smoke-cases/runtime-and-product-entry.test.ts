@@ -722,6 +722,80 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
   assert.equal(proof.request.route, 'author_pptx_native');
 });
 
+test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', async () => {
+  const taskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-sidecar-task-')), 'task.json');
+  writeFileSync(
+    taskFile,
+    JSON.stringify({
+      action: 'notification_receipt',
+      notification_id: 'notice-1',
+    }),
+    'utf-8',
+  );
+
+  const exported = await executeCli([
+    'product',
+    'sidecar',
+    'export',
+    '--workspace-root',
+    '/tmp/redcube-sidecar-workspace',
+    '--format',
+    'json',
+  ], {
+    gateway: {
+      exportProductSidecar: async (request) => ({
+        ok: true,
+        surface_kind: 'product_sidecar_export',
+        request,
+        owner_boundary: {
+          hermes_owns_visual_truth: false,
+          opl_owns_publication_gate: false,
+          rca_owns_visual_truth: true,
+        },
+      }),
+    },
+  });
+
+  assert.equal(exported.ok, true);
+  assert.equal(exported.surface_kind, 'product_sidecar_export');
+  assert.equal(exported.request.workspace_root, '/tmp/redcube-sidecar-workspace');
+  assert.equal(exported.request.format, 'json');
+  assert.equal(exported.owner_boundary.hermes_owns_visual_truth, false);
+  assert.equal(exported.owner_boundary.opl_owns_publication_gate, false);
+  assert.equal(exported.owner_boundary.rca_owns_visual_truth, true);
+
+  const dispatched = await executeCli([
+    'product',
+    'sidecar',
+    'dispatch',
+    '--task',
+    taskFile,
+    '--format',
+    'json',
+  ], {
+    gateway: {
+      dispatchProductSidecar: async (request) => ({
+        ok: true,
+        surface_kind: 'product_sidecar_dispatch',
+        request,
+        sidecar_policy: {
+          writes_visual_truth: false,
+          writes_review_verdict: false,
+          writes_publication_gate: false,
+        },
+      }),
+    },
+  });
+
+  assert.equal(dispatched.ok, true);
+  assert.equal(dispatched.surface_kind, 'product_sidecar_dispatch');
+  assert.equal(dispatched.request.task_file, taskFile);
+  assert.equal(dispatched.request.format, 'json');
+  assert.equal(dispatched.sidecar_policy.writes_visual_truth, false);
+  assert.equal(dispatched.sidecar_policy.writes_review_verdict, false);
+  assert.equal(dispatched.sidecar_policy.writes_publication_gate, false);
+});
+
 test('CLI image-ppt proof runs repo-owned lightweight mock runner by default', async () => {
   const outputDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-image-ppt-proof-'));
   const proof = await executeCli([

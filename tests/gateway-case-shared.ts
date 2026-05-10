@@ -27,7 +27,6 @@ import {
 import {
   createDeliverable,
   executeSourceAugmentation,
-  getProductEntryManifest,
   getProductEntrySession,
   getProductStatus,
   getProductPreflight,
@@ -66,6 +65,21 @@ const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-gateway-shared/product-e
 
 async function importGatewaySharedModule(moduleSpecifier) {
   return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
+}
+
+async function getProductEntryManifest(request) {
+  const module = await import('../packages/redcube-gateway/dist/index.js');
+  return module.getProductEntryManifest(request);
+}
+
+async function exportProductSidecar(request) {
+  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  return module.exportProductSidecar(request);
+}
+
+async function dispatchProductSidecar(request) {
+  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  return module.dispatchProductSidecar(request);
 }
 
 async function withMockHermesAndRuntimeState(testFn) {
@@ -236,6 +250,8 @@ export {
   completeSourceReadiness,
   createDeliverable,
   execFileSync,
+  exportProductSidecar,
+  dispatchProductSidecar,
   executeSourceAugmentation,
   existsSync,
   fileURLToPath,

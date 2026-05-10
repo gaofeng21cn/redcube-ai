@@ -59,6 +59,14 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getProductStart,
   getProductPreflight,
   getProductEntrySession,
+  exportProductSidecar: async (request: Record<string, unknown>) => {
+    const gateway = await import('@redcube/gateway');
+    return (gateway as Record<string, any>).exportProductSidecar(request);
+  },
+  dispatchProductSidecar: async (request: Record<string, unknown>) => {
+    const gateway = await import('@redcube/gateway');
+    return (gateway as Record<string, any>).dispatchProductSidecar(request);
+  },
   runNativePptProductEntryProof: async (request: Record<string, unknown>) => {
     const gateway = await import('@redcube/gateway');
     return (gateway as Record<string, any>).runNativePptProductEntryProof(request);
@@ -399,7 +407,26 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       });
     }
 
-    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest；internal OPL bridge 由外层 shell 调用');
+    if (subcommand === 'sidecar') {
+      const sidecarAction = rest[1];
+      if (sidecarAction === 'export') {
+        return gateway.exportProductSidecar({
+          workspace_root: resolveWorkspaceRoot(options, cwd),
+          format: options.format || 'json',
+        });
+      }
+
+      if (sidecarAction === 'dispatch') {
+        return gateway.dispatchProductSidecar({
+          task_file: options.task || options.taskFile || '',
+          format: options.format || 'json',
+        });
+      }
+
+      throw new Error('product sidecar 命令仅支持 export|dispatch');
+    }
+
+    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest|sidecar；internal OPL bridge 由外层 shell 调用');
   }
 
   if (command === 'native-ppt') {

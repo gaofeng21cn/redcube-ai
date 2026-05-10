@@ -17,6 +17,8 @@ import {
 type JsonMap = Record<string, any>;
 
 const PRODUCT_PREFLIGHT_COMMAND = 'redcube product preflight';
+const PRODUCT_SIDECAR_EXPORT_COMMAND = 'redcube product sidecar export';
+const PRODUCT_SIDECAR_DISPATCH_COMMAND = 'redcube product sidecar dispatch';
 const IMAGE_PPT_PROOF_COMMAND = 'redcube image-ppt proof';
 const NATIVE_PPT_PROOF_COMMAND = 'redcube native-ppt proof';
 const SERVICE_SAFE_DOMAIN_ENTRY_COMMAND = 'redcube service-safe domain entry';
@@ -87,6 +89,24 @@ const PROJECTION_METADATA: Record<string, JsonMap> = {
   get_product_entry_manifest: {
     cli: help('redcube product manifest --workspace-root <dir>', 'getProductEntryManifest', ['workspaceRoot']),
     mcp: surface('redcube_product_entry', 'get_product_entry_manifest', 'getProductEntryManifest'),
+  },
+  export_product_sidecar: {
+    cli: help(
+      'redcube product sidecar export --workspace-root <dir> --format json',
+      'exportProductSidecar',
+      ['workspaceRoot'],
+      'sidecar_export',
+    ),
+    mcp: surface('redcube_product_entry', 'export_product_sidecar', 'exportProductSidecar'),
+  },
+  dispatch_product_sidecar: {
+    cli: help(
+      'redcube product sidecar dispatch --task <task.json> --format json',
+      'dispatchProductSidecar',
+      ['task'],
+      'sidecar_dispatch',
+    ),
+    mcp: surface('redcube_product_entry', 'dispatch_product_sidecar', 'dispatchProductSidecar'),
   },
   run_image_ppt_proof: {
     cli: help(
@@ -295,6 +315,55 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
         cli: { surface_kind: 'product_entry_manifest' },
         mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_entry_manifest' },
         product_entry: { action_key: 'get_product_entry_manifest', surface_kind: 'product_entry_manifest' },
+      },
+    }),
+    action({
+      actionId: 'export_product_sidecar',
+      title: 'Export RedCube product sidecar adapter',
+      summary: '导出 RCA product sidecar adapter，供 OPL typed family queue / Hermes online substrate 索引；不授予 visual truth、review verdict 或 publication gate 写权。',
+      effect: 'read_only',
+      command: PRODUCT_SIDECAR_EXPORT_COMMAND,
+      surfaceKind: 'product_sidecar_export',
+      inputSchemaRef: 'schema:redcube.product_sidecar.export.request.v1',
+      outputSchemaRef: 'schema:redcube.product_sidecar.export.response.v1',
+      supportedSurfaces: {
+        cli: { surface_kind: 'product_sidecar_export' },
+        mcp: { tool_name: 'redcube_product_entry', action_key: 'export_product_sidecar' },
+        product_entry: { action_key: 'export_product_sidecar', surface_kind: 'product_sidecar_export' },
+      },
+      authorityBoundary: {
+        opl_role: 'typed_family_control_plane',
+        hermes_role: 'online_runtime_substrate',
+        write_policy: 'read_projection_only',
+      },
+    }),
+    action({
+      actionId: 'dispatch_product_sidecar',
+      title: 'Dispatch RedCube product sidecar guarded action',
+      summary: '调度 RCA-owned guarded actions：runtime watch、supervise managed run、product-entry continuation、notification receipt；禁止写 visual truth、review verdict 或 publication gate。',
+      effect: 'mutating',
+      command: PRODUCT_SIDECAR_DISPATCH_COMMAND,
+      surfaceKind: 'product_sidecar_dispatch',
+      inputSchemaRef: 'schema:redcube.product_sidecar.dispatch.request.v1',
+      outputSchemaRef: 'schema:redcube.product_sidecar.dispatch.response.v1',
+      supportedSurfaces: {
+        cli: { surface_kind: 'product_sidecar_dispatch' },
+        mcp: { tool_name: 'redcube_product_entry', action_key: 'dispatch_product_sidecar' },
+        product_entry: { action_key: 'dispatch_product_sidecar', surface_kind: 'product_sidecar_dispatch' },
+      },
+      authorityBoundary: {
+        allowed_actions: [
+          'runtime_watch',
+          'supervise_managed_run',
+          'product_entry_continuation',
+          'notification_receipt',
+        ],
+        forbidden_writes: [
+          'visual_truth',
+          'review_verdict',
+          'publication_gate',
+          'canonical_artifacts',
+        ],
       },
     }),
     action({
