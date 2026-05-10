@@ -17,6 +17,7 @@
 `User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 这说明 `RedCube AI` 的理想型是一个可被用户直接进入、也可被 `OPL` 通过内部桥接调用的 visual-domain 产品 / 服务节点，而不是把仓库继续磨成 repo-local runtime，或把自己写成整个 `OPL`。
+在 OPL Codex-first、stage-led family agent framework 中，RCA 是 admitted domain agent，不是 OPL 内部模块。OPL 可以读取 RCA stage/action/projection descriptor，负责 queue、wakeup、handoff、receipt、approval/retry 和 operator projection；RCA 继续持有 source intake、communication strategy、visual direction、artifact creation、review/revision、package/handoff 等 stage 语义，以及 visual-domain truth、review/export gate 和 canonical artifact authority。
 在这条 OPL 路线上，`OPL Runtime Manager` 只负责 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
 
 ## 项目目标
@@ -27,6 +28,7 @@
 - 将实现目标收敛到 `TypeScript + Python`：TypeScript 持有 product entry、CLI/MCP、contracts、gateway、runtime-family shell 与 typed service boundaries；Python 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 自动化生态共享工具链。
 - 冻结一个可被 `OPL` handoff 调用的 service-safe domain entry adapter，而不是先做聊天 UI。
 - 落地可 direct 调用、也可由 `OPL` 通过 internal bridge 调用的 lightweight domain `product entry` service surface，并把 session continuity 收到用户级 runtime-state。
+- 保持 Codex App direct skill path 与 OPL 托管 path 的语义等价：两条路径都必须回到 RCA-owned route、review、artifact 和 export surface。
 - 在不改写 domain 语义的前提下，继续维护 absorbed tranche、follow-on board 与 provenance。
 
 ## 非目标

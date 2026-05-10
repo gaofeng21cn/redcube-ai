@@ -9,6 +9,8 @@
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - internal OPL bridge route：`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
+在 OPL Codex-first、stage-led family framework 中，这两条路线都可以被投影为 stage attempt，但 RCA owner 边界不变：OPL 只提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
+
 两条路线在进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
 
 `service-safe domain entry -> executor adapter -> concrete executor -> audit / review / publication projection`
@@ -17,7 +19,7 @@
 这里的 `status` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 `family_action_catalog` 是 RCA-owned callable action metadata 单一声明面；product-entry manifest、CLI help、MCP descriptors/routes 与 app skill command contracts 都从它派生。`OPL` 只读取该 catalog 做 family-level discovery/export/parity，不写 RedCube visual-domain truth、managed run truth、review/publication projection 或 canonical artifacts。
 `redcube product sidecar export --workspace-root <dir> --format json` 是给 OPL typed family queue / OPL-managed Hermes 在线唤醒使用的 product sidecar adapter projection；`redcube product sidecar dispatch --task <task.json> --format json` 只接受 RCA-owned guarded actions：`runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`notification_receipt`。该 sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。
-`stage_control_projection` 是给 OPL family Stage Control Plane 的 descriptor/read-only adapter：它把 RCA 已有 `ppt_deck`、`xiaohongshu`、`poster_onepager` route stages 投影到 `source_intake`、`communication_strategy`、`visual_direction`、`artifact_creation`、`review_and_revision`、`package_and_handoff` 等 family stage kinds。product-entry manifest 中的每个 stage descriptor 都包含 goal、owner、skills、allowed_action_refs、handoff、source refs、freshness、stage-to-action parity 与 authority boundary，供 OPL 真实 discovery smoke 消费；它不创建调度器、不改变 hydrated `stage_sequence`，也不接管 RedCube managed deliverable runtime。
+`stage_control_projection` 是给 OPL family Stage Control Plane 的 descriptor/read-only adapter：它把 RCA 已有 `ppt_deck`、`xiaohongshu`、`poster_onepager` route stages 投影到 `source_intake`、`communication_strategy`、`visual_direction`、`artifact_creation`、`review_and_revision`、`package_and_handoff` 等 family stage kinds。product-entry manifest 中的每个 stage descriptor 都包含 goal、owner、skills、allowed_action_refs、handoff、source refs、freshness、stage-to-action parity 与 authority boundary，供 OPL 真实 discovery smoke 消费；它不创建调度器、不改变 hydrated `stage_sequence`，也不接管 RedCube managed deliverable runtime。Codex App direct skill 调用与 OPL 托管调用必须在 `invokeDomainEntry` / product-entry command contract 后收敛；OPL stage metadata 不能成为第二 route truth、第二 review owner 或第二 artifact authority。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
