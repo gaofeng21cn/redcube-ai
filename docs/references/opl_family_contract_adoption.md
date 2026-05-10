@@ -40,6 +40,21 @@ manifest 暴露 `discoverable_manifest_projection`，用于 OPL Runtime Manager 
 
 该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite sidecar 保持 `deferred_for_rca`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估。
 
+## Stage Control Projection
+
+`stage_control_projection` 是 RCA 给 OPL family Stage Control Plane 的 descriptor/read-only adapter。它只把现有 hydrated overlay `stage_sequence`、managed-runs、`runtimeWatch`、review/publication projection 与 artifact inventory 投影成 family stage kind；它不调度 stage、不改写 stage sequence、不接管 RedCube managed deliverable runtime。
+
+当前映射覆盖 `ppt_deck`、`xiaohongshu` 与 `poster_onepager`：
+
+- `source_intake`：PPT 的 `storyline`、小红书的 `research`、poster 的 `storyline`
+- `communication_strategy`：PPT 的 `detailed_outline` / `slide_blueprint`、小红书的 `storyline` / `single_note_plan`、poster 的 `poster_blueprint`
+- `visual_direction`：各 family 的 `visual_direction`
+- `artifact_creation`：PPT 的 `author_image_pages` / explicit HTML / explicit native PPT authoring，小红书的 `author_image_pages` / explicit HTML，poster 的 `render_html`
+- `review_and_revision`：visual director review、screenshot review 与对应 repair/fix route
+- `package_and_handoff`：PPT 的 `export_pptx`、小红书的 `publish_copy` / `export_bundle`、poster 的 `export_bundle`
+
+RCA 继续持有 visual truth、review/publication projection 与 artifact authority；OPL 只消费 stage descriptor projection。PPT 默认 route 仍是 image-first `author_image_pages`，HTML/native PPT 仍是显式可选路线。
+
 ## Boundaries
 
 - `OPL` 只消费 RCA projection，不持有 RedCube visual truth。

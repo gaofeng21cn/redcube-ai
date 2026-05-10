@@ -83,6 +83,117 @@
     "sqlite_status": "deferred_for_rca",
     "authority_model": "file_authority_plus_rebuildable_artifact_indexes"
   },
+  "stage_control_projection": {
+    "surface_kind": "opl_family_stage_control_projection",
+    "projection_id": "rca.opl.family.stage-control.projection.v1",
+    "adapter_model": "descriptor_read_only",
+    "maps_to_opl_contract": "opl_family_stage_control_plane.v1",
+    "source_surfaces": [
+      "hydrated overlay stage_sequence",
+      "managed-runs",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection",
+      "artifact inventory"
+    ],
+    "covered_families": [
+      "ppt_deck",
+      "xiaohongshu",
+      "poster_onepager"
+    ],
+    "family_stage_kinds": [
+      "source_intake",
+      "communication_strategy",
+      "visual_direction",
+      "artifact_creation",
+      "review_and_revision",
+      "package_and_handoff"
+    ],
+    "route_stage_projection": {
+      "ppt_deck": {
+        "source_intake": [
+          "storyline"
+        ],
+        "communication_strategy": [
+          "detailed_outline",
+          "slide_blueprint"
+        ],
+        "visual_direction": [
+          "visual_direction"
+        ],
+        "artifact_creation": [
+          "author_image_pages",
+          "render_html",
+          "author_pptx_native"
+        ],
+        "review_and_revision": [
+          "visual_director_review",
+          "screenshot_review",
+          "repair_image_pages",
+          "fix_html",
+          "repair_pptx_native"
+        ],
+        "package_and_handoff": [
+          "export_pptx"
+        ]
+      },
+      "xiaohongshu": {
+        "source_intake": [
+          "research"
+        ],
+        "communication_strategy": [
+          "storyline",
+          "single_note_plan"
+        ],
+        "visual_direction": [
+          "visual_direction"
+        ],
+        "artifact_creation": [
+          "author_image_pages",
+          "render_html"
+        ],
+        "review_and_revision": [
+          "visual_director_review",
+          "screenshot_review",
+          "repair_image_pages",
+          "fix_html"
+        ],
+        "package_and_handoff": [
+          "publish_copy",
+          "export_bundle"
+        ]
+      },
+      "poster_onepager": {
+        "source_intake": [
+          "storyline"
+        ],
+        "communication_strategy": [
+          "poster_blueprint"
+        ],
+        "visual_direction": [
+          "visual_direction"
+        ],
+        "artifact_creation": [
+          "render_html"
+        ],
+        "review_and_revision": [
+          "visual_director_review",
+          "screenshot_review"
+        ],
+        "package_and_handoff": [
+          "export_bundle"
+        ]
+      }
+    },
+    "authority_boundary": {
+      "rca_owns_visual_truth": true,
+      "rca_owns_review_publication_projection": true,
+      "rca_owns_artifact_authority": true,
+      "opl_role": "read_only_stage_projection_consumer",
+      "default_ppt_route_changed": false,
+      "managed_deliverable_runtime_changed": false
+    }
+  },
   "non_goals": [
     "OPL owns RedCube visual truth",
     "OPL owns canonical artifacts",

@@ -19,7 +19,8 @@
         "runtimeWatch",
         "artifact inventory",
         "review and publication projection",
-        "opl_family_lifecycle_adapter"
+        "opl_family_lifecycle_adapter",
+        "opl_family_stage_control_projection"
       ],
       "does_not_own": [
         "visual-domain truth",
@@ -251,7 +252,8 @@
         "export bundles",
         "artifact gallery manifests",
         "final delivery manifests",
-        "opl_family_lifecycle_adapter projection"
+        "opl_family_lifecycle_adapter projection",
+        "opl_family_stage_control_projection projection"
       ],
       "future_sidecar_constraints": [
         "must be rebuildable",
@@ -967,6 +969,29 @@
           "sqlite_status": "deferred_for_rca",
           "domain_truth_owner": "redcube_ai",
           "opl_role": "projection_consumer_only"
+        },
+        "opl_family_stage_control_projection": {
+          "status": "repo_tracked_projection_contract",
+          "projection_id": "rca.opl.family.stage-control.projection.v1",
+          "adapter_model": "descriptor_read_only",
+          "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
+          "covered_families": [
+            "ppt_deck",
+            "xiaohongshu",
+            "poster_onepager"
+          ],
+          "family_stage_kinds": [
+            "source_intake",
+            "communication_strategy",
+            "visual_direction",
+            "artifact_creation",
+            "review_and_revision",
+            "package_and_handoff"
+          ],
+          "domain_truth_owner": "redcube_ai",
+          "opl_role": "read_only_stage_projection_consumer",
+          "default_ppt_route_changed": false,
+          "managed_deliverable_runtime_changed": false
         }
       },
       "artifacts": {
@@ -977,7 +1002,8 @@
         "federated_product_entry_brief": "human_doc:program_opl_gateway_federated_product_entry",
         "managed_product_entry_brief": "human_doc:program_managed_product_entry_hardening",
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
-        "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade"
+        "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
+        "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection"
       },
       "closeout": {
         "executed_at": "2026-04-12",

@@ -43,6 +43,7 @@ import {
 import {
   buildRedCubeActionMetadata,
 } from './family-action-catalog.js';
+import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plane.js';
 import { buildRouteEquivalenceContract, buildDeliverableFacadeContract } from './get-product-entry-manifest-parts/contracts.js';
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
@@ -533,6 +534,7 @@ export async function getProductEntryManifest(request) {
   };
   const oplRuntimeManagerRegistration = buildOplRuntimeManagerRegistration({ runtimeContinuityEnvelope, productEntrySessionCommand });
   const actionMetadata = buildRedCubeActionMetadata();
+  const familyStageControlPlane = buildRedCubeFamilyStageControlPlane();
   const skillCommandContracts = actionMetadata.skill_commands.map((contract) => {
     const result = {
       action_id: contract.action_id,
@@ -848,6 +850,7 @@ export async function getProductEntryManifest(request) {
     owner_route: ownerRoute,
     family_action_catalog: actionMetadata.family_action_catalog,
     family_action_catalog_parity: actionMetadata.parity,
+    family_stage_control_plane: familyStageControlPlane,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',
       product_entry: actionMetadata.product_entry,
@@ -955,6 +958,7 @@ export async function getProductEntryManifest(request) {
     },
     family_action_catalog: actionMetadata.family_action_catalog,
     family_action_catalog_parity: actionMetadata.parity,
+    family_stage_control_plane: familyStageControlPlane,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',
       product_entry: actionMetadata.product_entry,
