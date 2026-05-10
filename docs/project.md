@@ -14,11 +14,11 @@
 
 `OPL` 的 internal bridge / integration reference surface 对应：
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 这说明 `RedCube AI` 的理想型是一个可被用户直接进入、也可被 `OPL` 通过内部桥接调用的 visual-domain 产品 / 服务节点，而不是把仓库继续磨成 repo-local runtime，或把自己写成整个 `OPL`。
 在 OPL Codex-first、stage-led family agent framework 中，RCA 是 admitted domain agent，不是 OPL 内部模块。OPL 可以读取 RCA stage/action/projection descriptor，负责 queue、wakeup、handoff、receipt、approval/retry 和 operator projection；RCA 继续持有 source intake、communication strategy、visual direction、artifact creation、review/revision、package/handoff 等 stage 语义，以及 visual-domain truth、review/export gate 和 canonical artifact authority。
-在这条 OPL 路线上，`OPL Runtime Manager` 只负责 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
+在这条 OPL 路线上，`OPL Runtime Manager` 只负责 provider profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是目标生产 provider，Hermes 是迁移期 legacy/optional provider 或 executor/proof lane。它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
 
 ## 项目目标
 

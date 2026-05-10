@@ -67,7 +67,7 @@ You can start with prompts like:
 - The direct route and the internal OPL bridge both converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
 - `OPL` stays at family-level session/runtime/projection orchestration plus shared modules/contracts/indexes, and its federated product-entry path is an internal integration surface rather than the first public story.
 - In the stage-led OPL family framework, RedCube owns the visual-deliverable stage pack, prompts, skills, review gates, visual-domain truth, and export authority. OPL may provide wakeup, queue, handoff, receipts, and projection support, but it does not become the visual-domain brain or artifact owner.
-- The target `OPL Runtime Manager` indexes RedCube product-entry/session/runtime/artifact/review projections over an external `Hermes-Agent` substrate, but RedCube remains the visual-domain truth owner.
+- The target `OPL Runtime Manager` indexes RedCube product-entry/session/runtime/artifact/review projections over the configured OPL family runtime provider. Temporal is the target production substrate for durable stage attempts; Hermes remains a legacy/optional provider or executor/proof lane during migration. RedCube remains the visual-domain truth owner.
 - RedCube's public executor backend contract is `codex_cli` or `hermes_agent`; `execution_shape` is declared separately as `structured_call` or `agent_loop`.
 - The implementation target is `TypeScript + Python`: TypeScript for product/runtime contracts and service boundaries, Python via the repo-owned `redcube_ai` helper package for native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
 - Content framing, audience fit, and final acceptance stay with experts.

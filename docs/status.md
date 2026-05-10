@@ -6,11 +6,11 @@
 - OPL 关系：RCA 可以作为 OPL Codex-first、stage-led family agent framework 上的 admitted domain agent 被托管、唤醒和投影，但不是 OPL 内部模块。OPL 只负责 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry/dead-letter 和 operator projection；RCA 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。
 - formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
 - repo-verified direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- internal OPL bridge route：`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- internal OPL bridge route：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - 默认公开能力面：`RedCube AI` 持有稳定 capability surface 与 visual-domain truth，`redcube-ai` app skill / `Codex CLI` 继续作为主要可见 surface 与默认 concrete executor；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现
 - OPL boundary：`OPL` 只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 - Codex App direct skill 调用与 OPL 托管调用都必须回到同一套 RCA-owned route、review、artifact 和 export surface。
-- OPL Runtime Manager：目标形态中的 OPL 侧薄运行管理/投影层，负责 federated route 的 external `Hermes-Agent` profile/provisioning、registration/status 索引、doctor/repair/resume、native helper catalog 与高频状态索引；它不持有 RedCube visual truth、canonical artifacts、review/publication projection 或 concrete executor
+- OPL Runtime Manager：目标形态中的 OPL 侧薄运行管理/投影层，负责 federated route 的 family runtime provider profile/provisioning、registration/status 索引、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是目标生产 provider，Hermes 是迁移期 legacy/optional provider 或 executor/proof lane。它不持有 RedCube visual truth、canonical artifacts、review/publication projection 或 concrete executor
 - 语言目标：RCA 长线实现收敛到 `TypeScript + Python`；TypeScript 继续承担 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries，Python 承担 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态
 - Agent-facing 语言面：新实现默认走 TypeScript orchestration 或 Python native helper；仓内已跟踪 JavaScript 已退役，新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断
 
@@ -25,7 +25,7 @@
 - `family_action_catalog` 现在是 RCA-owned callable action metadata 的同源投影；product-entry manifest、CLI command help、MCP tool descriptors/routes 与 skill command contracts 都从这份 action metadata 派生，OPL 只消费 schema/helper/validator/discovery，不写入 RedCube domain truth
 - 同一 `domain_projection` 现已暴露 `opl_runtime_manager_registration` v1：OPL Runtime Manager 可索引 RCA 的 product-entry registration、internal OPL bridge、session continuity、artifact inventory、runtime health 与 review/publication projection refs，但不拥有 RedCube visual truth 或 canonical artifacts
 - product sidecar adapter 已落地为 `redcube product sidecar export --workspace-root <dir> --format json` 与 `redcube product sidecar dispatch --task <task.json> --format json`：export 映射 product-entry session、runtimeWatch、superviseManagedRun、review/publication projection 与 operator handoff；dispatch 只允许 `runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`notification_receipt`，并 fail-closed 拒绝 visual truth、review verdict、publication gate 或 canonical artifact 写入。
-- Hermes-first OPL Family Runtime 的 RCA 侧语义是：OPL-managed Hermes 负责 24h online substrate / wakeup，OPL 负责 typed family queue / control plane，RCA 继续持有 visual-domain truth、review/publication projection 与 artifact authority；默认 executor 可由 Codex 或 domain-selected executor 决定。
+- Provider-backed OPL Family Runtime 的 RCA 侧语义是：OPL family runtime provider 负责 24h online substrate / wakeup / signal-query / retry-dead-letter，OPL 负责 typed family queue / control plane，RCA 继续持有 visual-domain truth、review/publication projection 与 artifact authority；默认 executor 可由 Codex 或 domain-selected executor 决定。Temporal 是目标生产 provider，Hermes 只保留迁移期 legacy/optional provider 或 executor/proof lane。
 - `RCA` 已声明 `OPL` family contract adoption：`contracts/runtime-program/opl-family-contract-adoption.json` 与 `docs/references/opl_family_contract_adoption.md` 把 runtime attempt、visual quality projection、incident learning 与 product operator projection 映射回 RCA-owned surfaces；`OPL` 只消费投影，不持有 RedCube visual truth、canonical artifacts 或 review/export judgment。
 - `stage_control_projection` 已作为 RCA 对 OPL family Stage Control Plane 的 descriptor/read-only adapter 暴露在 product-entry manifest：每个 stage descriptor 都带有 goal、owner、skills、allowed_action_refs、handoff、source refs、freshness、stage-to-action parity 与 authority boundary；它只把 `ppt_deck`、`xiaohongshu`、`poster_onepager` 的现有 route stages 投影成 family stage kinds，不调度 stage、不改变 managed deliverable runtime，也不改变 PPT 默认 image-first route。
 - `route_equivalence` 已作为 manifest 合同面冻结：`status`、`invoke`、`session` 与 internal `OPL bridge` 都只指向同一 downstream `domain_entry`、同一 session continuity / progress / artifact / review / publication truth，不新增第二公开 skill 或第二运行语义；direct/default product-entry runtime owner 与 executor owner 都是 `codex_cli`，`upstream_hermes_agent` 只属于 internal OPL federated / hosted proof 语境
@@ -74,7 +74,7 @@
 ## 当前收口重点
 
 - 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
-- 保持 `OPL Runtime Manager`、external `Hermes-Agent` substrate、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
+- 保持 `OPL Runtime Manager`、provider-backed family runtime、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持 AI-first 质量边界：story / visual / markup authorship 与最终视觉 reviewer 判断由 AI-authored artifact 持有；pack、schema、gate、audit、scorecard 与 projection 只表达结构、证据、机械状态和 rerun hints
 - 保持 image-first 为 `ppt_deck` 与 `xiaohongshu` 默认视觉路线；HTML 与 native editable PPTX 都保持生产可选、显式选择，并继续经过对应的 `visual_director_review`、`screenshot_review` 与 export gate
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层

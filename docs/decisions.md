@@ -1,5 +1,14 @@
 # RedCube AI 关键决策
 
+## 2026-05-10
+
+### 决策：RCA 对齐 OPL provider-backed runtime，Temporal 为目标生产 substrate
+
+- `RedCube AI` 的 OPL 长期托管口径更新为 `OPL Runtime Manager / opl family-runtime -> configured family runtime provider -> RCA product sidecar export/dispatch -> RedCube service-safe domain entry`。
+- Temporal 是 OPL durable stage attempt 的目标生产 provider；Hermes-Agent 在迁移期只作为 legacy/optional provider、显式 hosted/proof backend、executor proof lane 或 Codex CLI fallback module。
+- `redcube product sidecar export|dispatch` 继续是 OPL provider 到 RCA owner surface 的受控桥接。OPL/Temporal/Hermes/local provider 只能 enqueue、dispatch、signal、query、投影 attempt/receipt，不得写 visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
+- RedCube 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。下方 Hermes-oriented OPL Runtime Manager 决策保留为迁移背景，后续新投入按 provider-backed / Temporal target 解释。
+
 ## 2026-05-05
 
 ### 决策：RCA 作为 OPL stage-led framework 上的独立 domain agent
@@ -27,10 +36,11 @@
 
 ### 决策：RCA 对齐 OPL Runtime Manager 与 TS/Python 目标形态
 
-- OPL federated route 的目标形态改为 `OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry`。
+- 状态：Runtime Manager 薄管理层、TS/Python 目标和 RCA owner split 继续有效；`external Hermes-Agent runtime substrate` 已被 2026-05-10 provider-backed / Temporal target 决策 supersede。
+- OPL federated route 的目标形态改为 `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry`。
 - `OPL Runtime Manager` 只负责 OPL 侧 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引，不持有 RedCube visual-domain truth、canonical artifacts、review/publication projection truth 或 concrete executor。
 - RCA 的实现语言目标固定为 `TypeScript + Python`：TypeScript 管 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries；Python 管 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态。
-- RCA product sidecar adapter 只作为 OPL typed family queue / OPL-managed Hermes wakeup 的受控投影与 dispatch 面启用；它不成为 OPL 自有 visual truth sidecar，也不持有 review verdict、publication gate 或 canonical artifact authority。
+- RCA product sidecar adapter 只作为 OPL typed family queue / OPL family runtime provider wakeup 的受控投影与 dispatch 面启用；它不成为 OPL 自有 visual truth sidecar，也不持有 review verdict、publication gate 或 canonical artifact authority。
 
 ## 2026-04-23
 

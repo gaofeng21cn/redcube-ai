@@ -67,7 +67,7 @@
 - direct route 与内部 OPL bridge 都收敛到同一个下游 RedCube domain-agent entry（`invokeDomainEntry` service-safe surface）。
 - `OPL` 只保留 family-level 的 session/runtime/projection 编排与 shared modules/contracts/indexes；它的 federated product-entry 路径只是内部集成面，不是第一公开主语。
 - 在 stage-led OPL family framework 中，RedCube 持有视觉交付 stage pack、prompt、skill、review gate、visual-domain truth 和 export authority。OPL 可以提供 wakeup、queue、handoff、receipt 和 projection 支撑，但不会成为视觉领域大脑或 artifact owner。
-- 目标形态中的 `OPL Runtime Manager` 可以在外部 `Hermes-Agent` substrate 之上索引 RedCube product-entry/session/runtime/artifact/review projection，但 RedCube 继续持有 visual-domain truth。
+- 目标形态中的 `OPL Runtime Manager` 可以在已配置的 OPL family runtime provider 之上索引 RedCube product-entry/session/runtime/artifact/review projection。Temporal 是 durable stage attempt 的目标生产 substrate；Hermes 在迁移期只作为 legacy/optional provider 或 executor/proof lane。RedCube 继续持有 visual-domain truth。
 - RedCube 的 public executor backend contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 另行声明为 `structured_call` 或 `agent_loop`。
 - 实现语言目标是 `TypeScript + Python`：TypeScript 管 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
 - 内容界定、受众适配和最终采用由专家把关。
