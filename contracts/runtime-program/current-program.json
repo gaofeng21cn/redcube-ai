@@ -6,11 +6,11 @@
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-      "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+      "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
     },
     "runtime_manager_boundary": {
       "manager": "OPL Runtime Manager",
-      "layer_role": "product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
+      "layer_role": "product-managed adapter/projection layer over the configured family runtime provider",
       "consumes_redcube_surfaces": [
         "redcube product-entry registration",
         "skill_catalog.domain_projection.opl_runtime_manager_registration",
@@ -71,7 +71,7 @@
       "keep direct product-entry runtime_owner and executor_owner on codex_cli unless a caller explicitly enters the OPL federated or Hermes proof lane",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
-      "keep RedCube as an independent domain agent callable through both direct and OPL-federated entry routes",
+      "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
       "keep OPL Runtime Manager as a thin federated runtime manager over external Hermes-Agent rather than a RedCube truth owner",
       "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
       "move implementation toward TypeScript for product/runtime contracts and Python for native PPT/Office/document helpers that share the MAS/MAG automation ecosystem",
@@ -228,7 +228,7 @@
     },
     "active_mainline": {
       "id": "redcube-runtime-program",
-      "label": "redcube-runtime-program / independent RedCube domain-agent truth plus stable callable surface plus repo-verified direct/federated entry converging on service-safe domain entry",
+      "label": "redcube-runtime-program / independent RedCube domain-agent truth plus stable callable surface plus repo-verified direct/OPL-hosted entry converging on service-safe domain entry",
       "unique": true
     },
     "creative_stage_mainline": {

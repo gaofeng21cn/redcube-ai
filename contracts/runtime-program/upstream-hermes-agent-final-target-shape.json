@@ -3,18 +3,18 @@
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
   "target_goal": {
-    "label": "independent RedCube visual-deliverable domain agent with an OPL Runtime Manager federation bridge over external Hermes-Agent",
-    "summary": "Freeze the final target shape in which direct RedCube entry and OPL Runtime Manager-federated entry converge onto the same service-safe RedCube domain-agent entry, while OPL Runtime Manager is the thin product-managed adapter/projection layer over external Hermes-Agent substrate, RedCube owns visual-domain truth, and Codex CLI remains the default concrete executor."
+    "label": "independent RedCube visual-deliverable domain agent with an OPL-hosted integration path",
+    "summary": "Freeze the target shape in which direct RedCube entry and the OPL-hosted path converge onto the same service-safe RedCube domain-agent entry, while OPL remains the product-managed adapter/projection layer over the configured family runtime provider, RedCube owns visual-domain truth, and Codex CLI remains the default concrete executor."
   },
   "final_target_route": {
     "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-    "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+    "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
   },
   "runtime_boundary": {
     "runtime_owner": "optional_hosted_runtime_carrier",
     "opl_runtime_manager": {
       "manager": "OPL Runtime Manager",
-      "layer_role": "product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
+      "layer_role": "product-managed adapter/projection layer over the configured family runtime provider",
       "owns": [
         "profile/provisioning",
         "task registration hydration",
@@ -111,7 +111,7 @@
   },
   "current_gap": {
     "repo_verified_today": [
-      "OPL Runtime Manager bridge targets external Hermes-Agent runtime substrate without owning RedCube visual-domain truth",
+      "OPL-hosted path targets the configured family runtime provider without owning RedCube visual-domain truth",
       "RedCube service-safe domain entry is callable",
       "RedCube product-entry service surface is callable",
       "OPL handoff can federate into the same downstream product entry",

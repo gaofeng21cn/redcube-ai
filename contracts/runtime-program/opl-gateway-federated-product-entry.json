@@ -6,7 +6,7 @@
   "current_facing_boundary": {
     "manager": "OPL Runtime Manager",
     "legacy_entry_mode": "opl_gateway",
-    "layer_role": "thin product-managed adapter/projection layer over external Hermes-Agent runtime substrate",
+    "layer_role": "thin product-managed adapter/projection layer over the configured family runtime provider",
     "does_not_own": [
       "RedCube visual-domain truth",
       "canonical artifacts",
