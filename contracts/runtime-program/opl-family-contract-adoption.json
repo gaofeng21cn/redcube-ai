@@ -237,11 +237,13 @@
       "declares_only": [
         "product_sidecar_adapter",
         "projection_builder",
-        "lifecycle_adapter"
+        "lifecycle_adapter",
+        "domain_memory_descriptor_locator"
       ],
       "sidecar_adapter_ref": "/product_entry_shell/sidecar",
       "projection_builder_ref": "/family_stage_control_plane",
-      "lifecycle_adapter_ref": "/opl_family_lifecycle_adapter"
+      "lifecycle_adapter_ref": "/opl_family_lifecycle_adapter",
+      "domain_memory_descriptor_locator_ref": "/domain_memory_descriptor_locator"
     },
     "artifact_locator_contract": {
       "contract_id": "rca.workspace_runtime_artifact_locator.v1",
@@ -253,6 +255,34 @@
         "rewrite_canonical_artifact",
         "mutate_review_state"
       ]
+    },
+    "domain_memory_descriptor_locator": {
+      "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
+      "locator_id": "rca.visual_pattern_memory.locator.v1",
+      "memory_family": "visual_pattern_memory",
+      "memory_model": "natural_language_pattern_cards",
+      "descriptor_model": "repo_tracked_descriptor_refs_only",
+      "locator_model": "rca_owned_memory_ref_locator",
+      "policy_ref": "docs/policies/visual_pattern_memory_policy.md",
+      "human_doc_ref": "docs/references/domain_memory_descriptor_locator.md",
+      "opl_consumes": [
+        "memory locator refs",
+        "memory provenance refs",
+        "writeback receipt refs"
+      ],
+      "opl_forbidden": [
+        "own_memory_content",
+        "choose_visual_route",
+        "issue_review_or_export_verdict",
+        "mutate_canonical_artifacts"
+      ],
+      "authority_boundary": {
+        "memory_content_owner": "redcube_ai",
+        "route_truth_owner": "redcube_ai",
+        "review_export_verdict_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "opl_role": "locator_ref_receipt_consumer_only"
+      }
     },
     "product_sidecar_receipt_refs": {
       "receipt_contract_id": "rca.product_sidecar.receipt_refs.v1",

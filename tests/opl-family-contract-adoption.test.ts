@@ -166,10 +166,12 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'product_sidecar_adapter',
     'projection_builder',
     'lifecycle_adapter',
+    'domain_memory_descriptor_locator',
   ]);
   assert.equal(skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
   assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
   assert.equal(skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+  assert.equal(skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
 });
 
 test('RCA artifact locator and sidecar receipts expose refs without OPL visual verdict ownership', () => {
@@ -199,17 +201,55 @@ test('RCA artifact locator and sidecar receipts expose refs without OPL visual v
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_canonical_artifact_content, false);
 });
 
+test('RCA domain memory descriptor exposes locator and receipts without moving visual authority to OPL', () => {
+  const payload = contract();
+  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+
+  assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
+  assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');
+  assert.equal(memory.memory_family, 'visual_pattern_memory');
+  assert.equal(memory.memory_model, 'natural_language_pattern_cards');
+  assert.equal(memory.descriptor_model, 'repo_tracked_descriptor_refs_only');
+  assert.equal(memory.locator_model, 'rca_owned_memory_ref_locator');
+  assert.equal(memory.policy_ref, 'docs/policies/visual_pattern_memory_policy.md');
+  assert.equal(memory.human_doc_ref, 'docs/references/domain_memory_descriptor_locator.md');
+  assert.deepEqual(memory.opl_consumes, [
+    'memory locator refs',
+    'memory provenance refs',
+    'writeback receipt refs',
+  ]);
+  for (const forbidden of [
+    'own_memory_content',
+    'choose_visual_route',
+    'issue_review_or_export_verdict',
+    'mutate_canonical_artifacts',
+  ]) {
+    assert.ok(memory.opl_forbidden.includes(forbidden));
+  }
+  assert.deepEqual(memory.authority_boundary, {
+    memory_content_owner: 'redcube_ai',
+    route_truth_owner: 'redcube_ai',
+    review_export_verdict_owner: 'redcube_ai',
+    artifact_authority_owner: 'redcube_ai',
+    opl_role: 'locator_ref_receipt_consumer_only',
+  });
+});
+
 test('current runtime program points OPL Runtime Manager at the RCA lifecycle adapter projection', () => {
   const payload = currentProgram();
   const managerBoundary = payload.longrun_goal.runtime_manager_boundary;
   const persistence = payload.current_state.runtime_persistence_strategy;
   const adapter = payload.current_state.active_baton.scope.opl_family_lifecycle_adapter;
   const stageProjection = payload.current_state.active_baton.scope.opl_family_stage_control_projection;
+  const memory = payload.current_state.active_baton.scope.domain_memory_descriptor_locator;
 
   assert.ok(managerBoundary.consumes_redcube_surfaces.includes('opl_family_lifecycle_adapter'));
   assert.ok(managerBoundary.consumes_redcube_surfaces.includes('opl_family_stage_control_projection'));
+  assert.ok(managerBoundary.consumes_redcube_surfaces.includes('domain_memory_descriptor_locator'));
+  assert.ok(managerBoundary.does_not_own.includes('domain memory content or verdicts'));
   assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('opl_family_lifecycle_adapter projection'));
   assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('opl_family_stage_control_projection projection'));
+  assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('domain_memory_descriptor_locator projection'));
   assert.equal(adapter.status, 'repo_tracked_projection_contract');
   assert.equal(adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
   assert.equal(adapter.sqlite_status, 'deferred_for_rca');
@@ -223,4 +263,12 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(stageProjection.adapter_model, 'descriptor_read_only');
   assert.equal(stageProjection.default_ppt_route_changed, false);
   assert.equal(stageProjection.managed_deliverable_runtime_changed, false);
+  assert.equal(memory.status, 'repo_tracked_descriptor_locator_contract');
+  assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
+  assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');
+  assert.equal(memory.memory_content_owner, 'redcube_ai');
+  assert.equal(memory.route_truth_owner, 'redcube_ai');
+  assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
+  assert.equal(memory.artifact_authority_owner, 'redcube_ai');
+  assert.equal(memory.opl_role, 'locator_ref_receipt_consumer_only');
 });

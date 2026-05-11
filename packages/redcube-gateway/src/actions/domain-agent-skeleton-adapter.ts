@@ -210,6 +210,101 @@ export function buildProductSidecarReceiptRefs() {
   };
 }
 
+export function buildDomainMemoryDescriptorLocator() {
+  return {
+    surface_kind: 'domain_memory_descriptor_locator',
+    descriptor_id: 'rca.visual_pattern_memory.descriptor.v1',
+    locator_id: 'rca.visual_pattern_memory.locator.v1',
+    domain_id: DOMAIN_ID,
+    owner: DOMAIN_OWNER,
+    memory_family: 'visual_pattern_memory',
+    memory_model: 'natural_language_pattern_cards',
+    descriptor_model: 'repo_tracked_descriptor_refs_only',
+    locator_model: 'rca_owned_memory_ref_locator',
+    policy_ref: {
+      ref_kind: 'repo_path',
+      ref: 'docs/policies/visual_pattern_memory_policy.md',
+      label: 'Visual Pattern Memory Policy',
+    },
+    human_doc_ref: {
+      ref_kind: 'repo_path',
+      ref: 'docs/references/domain_memory_descriptor_locator.md',
+      label: 'RCA domain memory descriptor and locator',
+    },
+    allowed_memory_card_shape: {
+      required_fields: [
+        'memory_id',
+        'memory_family',
+        'owner',
+        'stage_scope',
+        'deliverable_family',
+        'provenance_refs',
+        'content_ref',
+      ],
+      allowed_stage_scopes: [
+        'source_readiness',
+        'story_architecture',
+        'visual_authorship',
+        'review_overlay',
+        'delivery_packaging',
+      ],
+      allowed_provenance_ref_kinds: [
+        'visual_director_review_ref',
+        'screenshot_review_ref',
+        'export_closeout_ref',
+        'human_doc_ref',
+      ],
+    },
+    memory_locator: {
+      ref_kind: 'rca_memory_ref',
+      lookup_scope: 'rca_runtime_or_repo_memory_surfaces',
+      accepted_ref_prefixes: [
+        'rca-memory:visual-pattern:',
+        'human_doc:visual_pattern_memory:',
+      ],
+      content_owner: DOMAIN_OWNER,
+      content_storage_authority: DOMAIN_OWNER,
+      opl_consumable_fields: [
+        'memory_id',
+        'stage_scope',
+        'deliverable_family',
+        'provenance_refs',
+        'content_ref',
+        'writeback_receipt_ref',
+      ],
+    },
+    writeback_receipt_contract: {
+      receipt_contract_id: 'rca.visual_pattern_memory.writeback_receipt_refs.v1',
+      allowed_receipt_fields: [
+        'receipt_id',
+        'source_review_ref',
+        'candidate_memory_ref',
+        'writeback_status',
+        'owner',
+        'created_at',
+      ],
+      forbidden_receipt_fields: [
+        'memory_content_body',
+        'visual_verdict',
+        'export_verdict',
+        'review_verdict',
+        'canonical_artifact_blob',
+      ],
+    },
+    authority_boundary: {
+      memory_content_owner: DOMAIN_OWNER,
+      route_truth_owner: DOMAIN_OWNER,
+      review_export_verdict_owner: DOMAIN_OWNER,
+      artifact_authority_owner: DOMAIN_OWNER,
+      opl_role: 'locator_ref_receipt_consumer_only',
+      opl_can_hold_memory_content: false,
+      opl_can_choose_visual_route: false,
+      opl_can_issue_review_or_export_verdict: false,
+      opl_can_mutate_canonical_artifacts: false,
+    },
+  };
+}
+
 export function buildDomainAgentSkeletonAdapter({
   workspaceRoot,
   runtime,
@@ -225,6 +320,7 @@ export function buildDomainAgentSkeletonAdapter({
   });
   const receiptRefs = buildProductSidecarReceiptRefs();
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();
+  const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
     surface_kind: 'domain_agent_skeleton_adapter',
     adapter_id: SKELETON_ID,
@@ -243,16 +339,19 @@ export function buildDomainAgentSkeletonAdapter({
         'product_sidecar_adapter',
         'projection_builder',
         'lifecycle_adapter',
+        'domain_memory_descriptor_locator',
       ],
       sidecar_adapter_ref: productSidecarRef,
       projection_builder_ref: familyStageControlPlaneRef,
       lifecycle_adapter_ref: lifecycleAdapterRef,
+      domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
       session_command_template: productEntrySessionCommand || 'redcube product session --entry-session-id <entry-session-id>',
       runtime_owner: runtime?.runtime_owner || 'codex_cli',
       executor_owner: 'codex_cli',
       creates_visual_artifacts_in_repo: false,
     },
     artifact_locator_contract: artifactLocatorContract,
+    domain_memory_descriptor_locator: domainMemoryDescriptorLocator,
     product_sidecar_receipt_refs: receiptRefs,
     controlled_visual_stage_attempt: controlledAttemptFixture,
     opl_consumption_boundary: {
@@ -260,10 +359,13 @@ export function buildDomainAgentSkeletonAdapter({
         'stage_descriptor',
         'artifact_locator_descriptor',
         'artifact_refs',
+        'domain_memory_locator_refs',
+        'domain_memory_writeback_receipt_refs',
         'receipt_refs',
         'runtime_attempt_projection',
       ],
       does_not_consume_or_hold: [
+        'visual_pattern_memory_content',
         'visual_export_verdict',
         'review_verdict',
         'publication_projection_truth',
@@ -276,6 +378,7 @@ export function buildDomainAgentSkeletonAdapter({
       { ref_kind: 'json_pointer', ref: productSidecarRef, role: 'sidecar_adapter' },
       { ref_kind: 'json_pointer', ref: lifecycleAdapterRef, role: 'lifecycle_adapter' },
       { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_refs' },
+      { ref_kind: 'json_pointer', ref: '/domain_memory_descriptor_locator', role: 'domain_memory_locator_refs' },
       { ref_kind: 'json_pointer', ref: '/review_state', role: 'review_projection_ref' },
       { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'publication_projection_ref' },
     ],
