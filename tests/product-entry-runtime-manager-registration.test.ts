@@ -6,7 +6,6 @@ import path from 'node:path';
 import { mkdtempSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { getProductEntryManifest } from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,
@@ -18,6 +17,11 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
+
+async function getProductEntryManifest(request) {
+  const module = await import('../packages/redcube-gateway/dist/index.js');
+  return module.getProductEntryManifest(request);
+}
 
 async function withMockRuntime(testFn) {
   const upstream = await startMockCodexCli();
@@ -105,12 +109,13 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'opl_family_lifecycle_adapter',
         'domain_agent_skeleton_adapter',
         'artifact_locator_contract',
+        'domain_memory_descriptor_locator',
         'product_sidecar_receipt_refs',
       ],
     );
     assert.deepEqual(
-      registration.consumable_projection_refs.slice(-3),
-      ['/domain_agent_skeleton_adapter', '/artifact_locator_contract', '/product_sidecar_receipt_refs'],
+      registration.consumable_projection_refs.slice(-4),
+      ['/domain_agent_skeleton_adapter', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
     );
     assert.equal(registration.domain_agent_skeleton_adapter.ref, '/domain_agent_skeleton_adapter');
     assert.equal(registration.domain_agent_skeleton_adapter.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
@@ -118,7 +123,15 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       'product_sidecar_adapter',
       'projection_builder',
       'lifecycle_adapter',
+      'domain_memory_descriptor_locator',
     ]);
+    assert.equal(registration.domain_memory_descriptor_locator.ref, '/domain_memory_descriptor_locator');
+    assert.equal(registration.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
+    assert.equal(registration.domain_memory_descriptor_locator.locator_id, 'rca.visual_pattern_memory.locator.v1');
+    assert.equal(registration.domain_memory_descriptor_locator.memory_family, 'visual_pattern_memory');
+    assert.equal(registration.domain_memory_descriptor_locator.opl_role, 'locator_ref_receipt_consumer_only');
+    assert.equal(registration.domain_memory_descriptor_locator.opl_can_hold_memory_content, false);
+    assert.equal(registration.domain_memory_descriptor_locator.opl_can_issue_review_or_export_verdict, false);
     assert.equal(
       registration.review_publication_truth.route_rule,
       'must_use_redcube_product_entry_and_review_export_gates',
@@ -133,6 +146,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       owns_review_truth: false,
       owns_publication_projection: false,
       owns_concrete_executor: false,
+      owns_domain_memory_content: false,
       allowed_authority: [
         'read_product_entry_registration_index',
         'read_internal_opl_bridge_index',
@@ -140,6 +154,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'read_artifact_inventory_index',
         'read_runtime_health_index',
         'read_review_publication_projection_refs',
+        'read_domain_memory_locator_refs',
       ],
     });
     assert.equal(

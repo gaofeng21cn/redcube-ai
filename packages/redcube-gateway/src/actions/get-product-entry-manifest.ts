@@ -619,6 +619,11 @@ export async function getProductEntryManifest(request) {
             ref: '/family_action_catalog',
             label: 'RedCube family action catalog',
           },
+          domain_memory_descriptor_locator_ref: {
+            ref_kind: 'json_pointer',
+            ref: '/domain_memory_descriptor_locator',
+            label: 'RCA visual pattern memory descriptor locator',
+          },
         },
       },
     ],
@@ -866,6 +871,7 @@ export async function getProductEntryManifest(request) {
     family_stage_control_plane: familyStageControlPlane,
     domain_agent_skeleton_adapter: domainAgentSkeletonAdapter,
     artifact_locator_contract: domainAgentSkeletonAdapter.artifact_locator_contract,
+    domain_memory_descriptor_locator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator,
     product_sidecar_receipt_refs: domainAgentSkeletonAdapter.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: domainAgentSkeletonAdapter.controlled_visual_stage_attempt,
     action_metadata: {
@@ -978,6 +984,7 @@ export async function getProductEntryManifest(request) {
     family_stage_control_plane: familyStageControlPlane,
     domain_agent_skeleton_adapter: domainAgentSkeletonAdapter,
     artifact_locator_contract: domainAgentSkeletonAdapter.artifact_locator_contract,
+    domain_memory_descriptor_locator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator,
     product_sidecar_receipt_refs: domainAgentSkeletonAdapter.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: domainAgentSkeletonAdapter.controlled_visual_stage_attempt,
     action_metadata: {

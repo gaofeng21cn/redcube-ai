@@ -20,13 +20,15 @@
         "artifact inventory",
         "review and publication projection",
         "opl_family_lifecycle_adapter",
-        "opl_family_stage_control_projection"
+        "opl_family_stage_control_projection",
+        "domain_memory_descriptor_locator"
       ],
       "does_not_own": [
         "visual-domain truth",
         "canonical artifacts",
         "review-state truth",
         "publication projection truth",
+        "domain memory content or verdicts",
         "concrete executor",
         "private Hermes-Agent fork"
       ],
@@ -253,7 +255,8 @@
         "artifact gallery manifests",
         "final delivery manifests",
         "opl_family_lifecycle_adapter projection",
-        "opl_family_stage_control_projection projection"
+        "opl_family_stage_control_projection projection",
+        "domain_memory_descriptor_locator projection"
       ],
       "future_sidecar_constraints": [
         "must be rebuildable",
@@ -994,6 +997,20 @@
           "opl_role": "read_only_stage_projection_consumer",
           "default_ppt_route_changed": false,
           "managed_deliverable_runtime_changed": false
+        },
+        "domain_memory_descriptor_locator": {
+          "status": "repo_tracked_descriptor_locator_contract",
+          "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
+          "locator_id": "rca.visual_pattern_memory.locator.v1",
+          "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
+          "policy_ref": "docs/policies/visual_pattern_memory_policy.md",
+          "human_doc_ref": "docs/references/domain_memory_descriptor_locator.md",
+          "memory_family": "visual_pattern_memory",
+          "memory_content_owner": "redcube_ai",
+          "route_truth_owner": "redcube_ai",
+          "review_export_verdict_owner": "redcube_ai",
+          "artifact_authority_owner": "redcube_ai",
+          "opl_role": "locator_ref_receipt_consumer_only"
         }
       },
       "artifacts": {
@@ -1005,7 +1022,8 @@
         "managed_product_entry_brief": "human_doc:program_managed_product_entry_hardening",
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
         "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
-        "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection"
+        "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
+        "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator"
       },
       "closeout": {
         "executed_at": "2026-04-12",

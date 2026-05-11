@@ -360,10 +360,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'product_sidecar_adapter',
       'projection_builder',
       'lifecycle_adapter',
+      'domain_memory_descriptor_locator',
     ]);
     assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
     assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
     assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
     assert.equal(manifest.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
     assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.workspace_root, workspaceRoot);
@@ -371,6 +373,36 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_store_root, manifest.runtime.session_store_root);
     assert.equal(manifest.artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs, false);
     assert.equal(manifest.artifact_locator_contract.opl_consumption_policy.forbidden.includes('declare_visual_export_verdict'), true);
+    assert.equal(manifest.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
+    assert.equal(manifest.domain_memory_descriptor_locator.locator_id, 'rca.visual_pattern_memory.locator.v1');
+    assert.equal(manifest.domain_memory_descriptor_locator.memory_family, 'visual_pattern_memory');
+    assert.equal(manifest.domain_memory_descriptor_locator.memory_model, 'natural_language_pattern_cards');
+    assert.equal(manifest.domain_memory_descriptor_locator.policy_ref.ref, 'docs/policies/visual_pattern_memory_policy.md');
+    assert.equal(manifest.domain_memory_descriptor_locator.human_doc_ref.ref, 'docs/references/domain_memory_descriptor_locator.md');
+    assert.deepEqual(manifest.domain_memory_descriptor_locator.memory_locator.opl_consumable_fields, [
+      'memory_id',
+      'stage_scope',
+      'deliverable_family',
+      'provenance_refs',
+      'content_ref',
+      'writeback_receipt_ref',
+    ]);
+    assert.deepEqual(manifest.domain_memory_descriptor_locator.writeback_receipt_contract.forbidden_receipt_fields, [
+      'memory_content_body',
+      'visual_verdict',
+      'export_verdict',
+      'review_verdict',
+      'canonical_artifact_blob',
+    ]);
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.memory_content_owner, 'redcube_ai');
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.route_truth_owner, 'redcube_ai');
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.review_export_verdict_owner, 'redcube_ai');
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.artifact_authority_owner, 'redcube_ai');
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_role, 'locator_ref_receipt_consumer_only');
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_hold_memory_content, false);
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_choose_visual_route, false);
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_issue_review_or_export_verdict, false);
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_mutate_canonical_artifacts, false);
     assert.equal(manifest.product_sidecar_receipt_refs.receipt_contract_id, 'rca.product_sidecar.receipt_refs.v1');
     assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('visual_verdict'), true);
     assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('artifact_blob'), true);
@@ -427,6 +459,14 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product status');
     assert.equal(manifest.skill_catalog.skills[0].target_surface_kind, 'product_status');
     assert.deepEqual(manifest.skill_catalog.skills[0].tags, ['domain-app', 'product-entry', 'visual-deliverables']);
+    assert.deepEqual(
+      manifest.skill_catalog.skills[0].domain_projection.domain_memory_descriptor_locator_ref,
+      {
+        ref_kind: 'json_pointer',
+        ref: '/domain_memory_descriptor_locator',
+        label: 'RCA visual pattern memory descriptor locator',
+      },
+    );
     assert.deepEqual(
       manifest.skill_catalog.skills[0].domain_projection.skill_activation,
       {
