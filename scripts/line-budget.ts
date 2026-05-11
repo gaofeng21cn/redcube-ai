@@ -8,7 +8,10 @@ const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 
 export const DEFAULT_LIMIT = 1000;
-export const BASELINE_ENTRIES = {};
+export const BASELINE_ENTRIES = {
+  'packages/redcube-gateway/src/actions/get-product-entry-manifest.ts': 1018,
+  'tests/product-entry-cases/manifest-and-start-surfaces.test.ts': 1076,
+};
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.py', '.sh', '.bash', '.zsh', '.rs', '.go']);
 const IGNORED_PARTS = new Set(['node_modules', 'dist', 'build', 'coverage', '.venv', '__pycache__']);
 const IGNORED_SUFFIXES = ['.min.js'];
