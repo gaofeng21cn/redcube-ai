@@ -116,3 +116,75 @@ test('product-entry manifest exposes OPL standard domain_memory_descriptor for R
     );
   });
 });
+
+test('product-entry manifest exposes controlled consumed-memory and writeback receipt proof refs', async () => {
+  await withMockCodexRuntimeState(async () => {
+    const manifest = await getProductEntryManifest({
+      workspace_root: await prepareProductEntryWorkspace(),
+    });
+    const attempt = manifest.controlled_visual_stage_attempt;
+
+    assert.equal(
+      attempt.proof_model,
+      'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
+    );
+    assert.equal(
+      attempt.provider_controlled_proof_id,
+      'rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1',
+    );
+    assert.equal(
+      attempt.provider_controlled_proof_model,
+      'opl_hosted_attempt_consumes_memory_refs_and_returns_locator_only_receipts',
+    );
+    assert.deepEqual(attempt.memory_consumption_contract.required_fields, [
+      'memory_ref',
+      'memory_family',
+      'stage_scope',
+      'deliverable_family',
+      'provenance_refs',
+      'content_ref',
+    ]);
+    for (const field of [
+      'memory_content_body',
+      'slide_or_page_content',
+      'visual_verdict',
+      'export_verdict',
+      'review_verdict',
+      'canonical_artifact_blob',
+    ]) {
+      assert.ok(attempt.memory_consumption_contract.forbidden_fields.includes(field));
+    }
+    assert.equal(attempt.memory_consumption_contract.repository_boundary.repo_tracks_memory_content_body, false);
+    assert.equal(attempt.writeback_proof_contract.proposal_ref, 'rca-memory-proposal:visual-pattern:<proposal-id>');
+    assert.equal(attempt.writeback_proof_contract.receipt_ref, 'rca-memory-receipt:visual-pattern:<receipt-id>');
+    assert.equal(attempt.writeback_proof_contract.memory_locator_ref, 'rca-memory:visual-pattern:<memory-id>');
+    assert.equal(attempt.writeback_proof_contract.repository_boundary.repo_tracks_proposal_instance, false);
+    assert.equal(attempt.writeback_proof_contract.repository_boundary.repo_tracks_receipt_instance, false);
+    assert.equal(attempt.writeback_proof_contract.repository_boundary.repo_tracks_memory_entry, false);
+    assert.equal(attempt.writeback_proof_contract.repository_boundary.repo_tracks_visual_or_export_artifacts, false);
+
+    assert.deepEqual(attempt.opl_hosted_attempt.consumed_memory_refs, [
+      'rca-memory:visual-pattern:<memory-id>',
+    ]);
+    assert.equal(attempt.opl_hosted_attempt.writeback_receipt_ref, 'rca-memory-receipt:visual-pattern:<receipt-id>');
+    assert.equal(
+      attempt.opl_hosted_attempt.operator_receipt_projection_ref,
+      '/domain_memory_descriptor_locator/operator_receipt_projection',
+    );
+    assert.equal(attempt.equivalence_proof.direct_and_opl_share_consumed_memory_refs, true);
+    assert.equal(attempt.equivalence_proof.opl_writes_memory_content, false);
+    assert.equal(attempt.equivalence_proof.opl_writes_receipt_instance, false);
+    assert.equal(attempt.projection_only_result.memory_content_body, null);
+    assert.equal(attempt.projection_only_result.receipt_instance, null);
+    assert.deepEqual(attempt.projection_only_result.writeback_refs, {
+      proposal_ref: 'rca-memory-proposal:visual-pattern:<proposal-id>',
+      receipt_ref: 'rca-memory-receipt:visual-pattern:<receipt-id>',
+      memory_locator_ref: 'rca-memory:visual-pattern:<memory-id>',
+      operator_receipt_projection_ref: '/domain_memory_descriptor_locator/operator_receipt_projection',
+    });
+    assert.equal(attempt.opl_policy_proof.opl_consumes_memory_refs, true);
+    assert.equal(attempt.opl_policy_proof.opl_consumes_writeback_receipt_refs, true);
+    assert.equal(attempt.opl_policy_proof.opl_holds_memory_content, false);
+    assert.equal(attempt.opl_policy_proof.opl_holds_receipt_instance, false);
+  });
+});
