@@ -276,6 +276,96 @@
         "issue_review_or_export_verdict",
         "mutate_canonical_artifacts"
       ],
+      "migration_plan": {
+        "plan_id": "rca.visual_pattern_memory.migration_plan.v1",
+        "state": "repo_source_contract_landed_runtime_migration_pending",
+        "source_surfaces": [
+          "workspace_runtime_root",
+          "product_entry_session",
+          "visual_director_review",
+          "screenshot_review",
+          "export_closeout",
+          "human_doc_reference"
+        ],
+        "target_surface": "domain_owned_visual_pattern_memory",
+        "migration_steps": [
+          "discover_candidate_lessons",
+          "extract_reusable_pattern_card_candidate",
+          "record_seed_fixture_locator_ref",
+          "domain_review_accept_or_reject",
+          "publish_memory_locator_ref",
+          "emit_writeback_receipt_ref"
+        ],
+        "acceptance_gates": [
+          "source_ref_resolves_to_rca_owned_runtime_or_repo_reference",
+          "candidate_excludes_current_deliverable_content",
+          "candidate_excludes_review_export_verdict",
+          "candidate_excludes_canonical_artifact_blob",
+          "accepted_memory_has_rca_owner",
+          "writeback_receipt_is_locator_only"
+        ],
+        "repository_boundary": {
+          "repo_tracks_migration_plan": true,
+          "repo_tracks_seed_locator_contract": true,
+          "repo_tracks_memory_entries": false,
+          "repo_tracks_receipt_instances": false,
+          "repo_tracks_visual_or_export_artifacts": false,
+          "visual_truth_changed": false,
+          "route_truth_changed": false
+        }
+      },
+      "seed_fixture_locator": {
+        "fixture_id": "rca.visual_pattern_memory.seed_fixture_locator.v1",
+        "fixture_model": "locator_only_no_memory_content",
+        "source_root_model": "workspace_runtime_or_repo_reference",
+        "accepted_seed_ref_prefixes": [
+          "rca-memory-seed:visual-pattern:",
+          "workspace-runtime-ref:visual-pattern-seed:"
+        ],
+        "required_locator_fields": [
+          "seed_id",
+          "source_review_ref",
+          "stage_scope",
+          "deliverable_family",
+          "reusable_lesson_ref",
+          "provenance_refs",
+          "migration_status"
+        ],
+        "allowed_migration_status_values": [
+          "candidate",
+          "accepted_for_memory_writeback",
+          "rejected_for_memory_writeback",
+          "superseded"
+        ],
+        "forbidden_seed_fields": [
+          "memory_content_body",
+          "slide_or_page_content",
+          "visual_verdict",
+          "export_verdict",
+          "canonical_artifact_blob"
+        ]
+      },
+      "writeback_receipt_locator": {
+        "locator_id": "rca.visual_pattern_memory.writeback_receipt_locator.v1",
+        "receipt_contract_id": "rca.visual_pattern_memory.writeback_receipt_refs.v1",
+        "receipt_model": "locator_only_no_receipt_instance",
+        "source_root_model": "workspace_runtime_or_domain_memory_reference",
+        "locator_fields": [
+          "receipt_id",
+          "source_review_ref",
+          "candidate_memory_ref",
+          "writeback_status",
+          "owner",
+          "created_at"
+        ],
+        "accepted_status_values": [
+          "candidate",
+          "accepted",
+          "rejected",
+          "superseded"
+        ],
+        "repo_tracks_receipt_instances": false
+      },
       "authority_boundary": {
         "memory_content_owner": "redcube_ai",
         "route_truth_owner": "redcube_ai",

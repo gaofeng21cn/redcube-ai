@@ -999,18 +999,27 @@
           "managed_deliverable_runtime_changed": false
         },
         "domain_memory_descriptor_locator": {
-          "status": "repo_tracked_descriptor_locator_contract",
+          "status": "repo_tracked_descriptor_locator_and_migration_plan_contract",
           "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
           "locator_id": "rca.visual_pattern_memory.locator.v1",
           "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
           "policy_ref": "human_doc:visual_pattern_memory_policy",
           "human_doc_ref": "human_doc:domain_memory_descriptor_locator",
+          "migration_plan_id": "rca.visual_pattern_memory.migration_plan.v1",
+          "seed_fixture_locator_id": "rca.visual_pattern_memory.seed_fixture_locator.v1",
+          "writeback_receipt_locator_id": "rca.visual_pattern_memory.writeback_receipt_locator.v1",
+          "migration_state": "repo_source_contract_landed_runtime_migration_pending",
           "memory_family": "visual_pattern_memory",
           "memory_content_owner": "redcube_ai",
           "route_truth_owner": "redcube_ai",
           "review_export_verdict_owner": "redcube_ai",
           "artifact_authority_owner": "redcube_ai",
-          "opl_role": "locator_ref_receipt_consumer_only"
+          "opl_role": "locator_ref_receipt_consumer_only",
+          "repo_tracks_memory_entries": false,
+          "repo_tracks_receipt_instances": false,
+          "repo_tracks_visual_or_export_artifacts": false,
+          "visual_truth_changed": false,
+          "route_truth_changed": false
         }
       },
       "artifacts": {

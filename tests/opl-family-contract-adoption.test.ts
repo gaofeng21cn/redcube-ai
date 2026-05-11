@@ -235,6 +235,88 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
   });
 });
 
+test('RCA domain memory migration plan is locator-only and acceptance-gated', () => {
+  const payload = contract();
+  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const plan = memory.migration_plan;
+
+  assert.equal(plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
+  assert.equal(plan.state, 'repo_source_contract_landed_runtime_migration_pending');
+  assert.deepEqual(plan.source_surfaces, [
+    'workspace_runtime_root',
+    'product_entry_session',
+    'visual_director_review',
+    'screenshot_review',
+    'export_closeout',
+    'human_doc_reference',
+  ]);
+  assert.deepEqual(plan.migration_steps, [
+    'discover_candidate_lessons',
+    'extract_reusable_pattern_card_candidate',
+    'record_seed_fixture_locator_ref',
+    'domain_review_accept_or_reject',
+    'publish_memory_locator_ref',
+    'emit_writeback_receipt_ref',
+  ]);
+  for (const gate of [
+    'candidate_excludes_current_deliverable_content',
+    'candidate_excludes_review_export_verdict',
+    'candidate_excludes_canonical_artifact_blob',
+    'writeback_receipt_is_locator_only',
+  ]) {
+    assert.ok(plan.acceptance_gates.includes(gate));
+  }
+  assert.deepEqual(plan.repository_boundary, {
+    repo_tracks_migration_plan: true,
+    repo_tracks_seed_locator_contract: true,
+    repo_tracks_memory_entries: false,
+    repo_tracks_receipt_instances: false,
+    repo_tracks_visual_or_export_artifacts: false,
+    visual_truth_changed: false,
+    route_truth_changed: false,
+  });
+});
+
+test('RCA visual pattern memory seed and receipt surfaces do not carry memory content or artifacts', () => {
+  const payload = contract();
+  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const seed = memory.seed_fixture_locator;
+  const receipt = memory.writeback_receipt_locator;
+
+  assert.equal(seed.fixture_id, 'rca.visual_pattern_memory.seed_fixture_locator.v1');
+  assert.equal(seed.fixture_model, 'locator_only_no_memory_content');
+  assert.deepEqual(seed.required_locator_fields, [
+    'seed_id',
+    'source_review_ref',
+    'stage_scope',
+    'deliverable_family',
+    'reusable_lesson_ref',
+    'provenance_refs',
+    'migration_status',
+  ]);
+  for (const forbidden of [
+    'memory_content_body',
+    'slide_or_page_content',
+    'visual_verdict',
+    'export_verdict',
+    'canonical_artifact_blob',
+  ]) {
+    assert.ok(seed.forbidden_seed_fields.includes(forbidden));
+  }
+  assert.equal(receipt.locator_id, 'rca.visual_pattern_memory.writeback_receipt_locator.v1');
+  assert.equal(receipt.receipt_contract_id, 'rca.visual_pattern_memory.writeback_receipt_refs.v1');
+  assert.equal(receipt.receipt_model, 'locator_only_no_receipt_instance');
+  assert.equal(receipt.repo_tracks_receipt_instances, false);
+  assert.deepEqual(receipt.locator_fields, [
+    'receipt_id',
+    'source_review_ref',
+    'candidate_memory_ref',
+    'writeback_status',
+    'owner',
+    'created_at',
+  ]);
+});
+
 test('current runtime program points OPL Runtime Manager at the RCA lifecycle adapter projection', () => {
   const payload = currentProgram();
   const managerBoundary = payload.longrun_goal.runtime_manager_boundary;
@@ -263,12 +345,21 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(stageProjection.adapter_model, 'descriptor_read_only');
   assert.equal(stageProjection.default_ppt_route_changed, false);
   assert.equal(stageProjection.managed_deliverable_runtime_changed, false);
-  assert.equal(memory.status, 'repo_tracked_descriptor_locator_contract');
+  assert.equal(memory.status, 'repo_tracked_descriptor_locator_and_migration_plan_contract');
   assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
   assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');
+  assert.equal(memory.migration_plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
+  assert.equal(memory.seed_fixture_locator_id, 'rca.visual_pattern_memory.seed_fixture_locator.v1');
+  assert.equal(memory.writeback_receipt_locator_id, 'rca.visual_pattern_memory.writeback_receipt_locator.v1');
+  assert.equal(memory.migration_state, 'repo_source_contract_landed_runtime_migration_pending');
   assert.equal(memory.memory_content_owner, 'redcube_ai');
   assert.equal(memory.route_truth_owner, 'redcube_ai');
   assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
   assert.equal(memory.artifact_authority_owner, 'redcube_ai');
   assert.equal(memory.opl_role, 'locator_ref_receipt_consumer_only');
+  assert.equal(memory.repo_tracks_memory_entries, false);
+  assert.equal(memory.repo_tracks_receipt_instances, false);
+  assert.equal(memory.repo_tracks_visual_or_export_artifacts, false);
+  assert.equal(memory.visual_truth_changed, false);
+  assert.equal(memory.route_truth_changed, false);
 });

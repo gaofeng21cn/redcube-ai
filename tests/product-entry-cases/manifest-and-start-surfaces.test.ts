@@ -388,6 +388,45 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'review_verdict',
       'canonical_artifact_blob',
     ]);
+    assert.equal(manifest.domain_memory_descriptor_locator.migration_plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.migration_plan.state,
+      'repo_source_contract_landed_runtime_migration_pending',
+    );
+    assert.deepEqual(manifest.domain_memory_descriptor_locator.migration_plan.repository_boundary, {
+      repo_tracks_migration_plan: true,
+      repo_tracks_seed_locator_contract: true,
+      repo_tracks_memory_entries: false,
+      repo_tracks_receipt_instances: false,
+      repo_tracks_visual_or_export_artifacts: false,
+      visual_truth_changed: false,
+      route_truth_changed: false,
+    });
+    assert.deepEqual(manifest.domain_memory_descriptor_locator.seed_fixture_locator.required_locator_fields, [
+      'seed_id',
+      'source_review_ref',
+      'stage_scope',
+      'deliverable_family',
+      'reusable_lesson_ref',
+      'provenance_refs',
+      'migration_status',
+    ]);
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.seed_fixture_locator.forbidden_seed_fields.includes('memory_content_body'),
+      true,
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.seed_fixture_locator.forbidden_seed_fields.includes('canonical_artifact_blob'),
+      true,
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.writeback_receipt_locator.locator_id,
+      'rca.visual_pattern_memory.writeback_receipt_locator.v1',
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.writeback_receipt_locator.repo_tracks_receipt_instances,
+      false,
+    );
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.memory_content_owner, 'redcube_ai');
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.route_truth_owner, 'redcube_ai');
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.review_export_verdict_owner, 'redcube_ai');

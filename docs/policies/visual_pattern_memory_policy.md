@@ -89,12 +89,13 @@ Now:
 
 - keep this policy as the RCA memory owner reference;
 - preserve image-first / HTML / native route contracts as structured route truth;
-- record reusable visual lessons as prose in future review/export closeouts or reference docs.
+- keep `rca.visual_pattern_memory.migration_plan.v1`, `rca.visual_pattern_memory.seed_fixture_locator.v1`, and `rca.visual_pattern_memory.writeback_receipt_locator.v1` as repo-source contract surfaces for future migration and acceptance;
+- record reusable visual lessons as prose in future review/export closeouts, runtime/domain-memory roots, or reference docs.
 
 Next:
 
-- add explicit `knowledge_refs` / `visual_pattern_memory_refs` to stage descriptors when OPL's stage packet and closeout mechanics are stable;
-- route reusable visual lessons from `visual_director_review` and `screenshot_review` closeout into accepted/rejected memory writeback receipts;
+- wire explicit `knowledge_refs` / `visual_pattern_memory_refs` to stage descriptors when OPL's stage packet and closeout mechanics are stable;
+- route reusable visual lessons from `visual_director_review` and `screenshot_review` closeout into accepted/rejected memory writeback receipt refs;
 - show consumed memory refs in product-entry/operator projection.
 
 Defer:
