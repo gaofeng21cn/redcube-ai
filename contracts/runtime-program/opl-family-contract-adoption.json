@@ -307,15 +307,17 @@
       "descriptor_locator_ref": "/domain_memory_descriptor_locator",
       "refresh_policy": "domain_manifest_rebuild_required_before_stage_attempt"
     },
-      "migration_readiness": {
-      "status": "consumed_memory_writeback_receipt_proof_ready_descriptor_only",
-      "migration_state": "repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending",
+    "migration_readiness": {
+      "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
+      "migration_state": "descriptor_proof_contract_landed_runtime_writeback_pending",
       "memory_body_migration": "domain_owned_runtime_apply_required",
       "opl_apply_allowed": false,
       "repo_tracks_memory_entries": false,
-      "repo_tracks_receipt_instances": false
+      "repo_tracks_receipt_instances": false,
+      "descriptor_proof_contract_state": "landed",
+      "runtime_writeback_state": "pending"
     },
-    "status": "active",
+    "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
     "authority_boundary": {
       "opl_role": "locator_projection_owner",
       "domain_memory_owner": "redcube_ai",
@@ -395,7 +397,7 @@
       ],
       "migration_plan": {
         "plan_id": "rca.visual_pattern_memory.migration_plan.v1",
-        "state": "repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending",
+        "state": "descriptor_proof_contract_landed_runtime_writeback_pending",
         "source_surfaces": [
           "workspace_runtime_root",
           "product_entry_session",
@@ -436,7 +438,9 @@
           "repo_tracks_visual_or_export_artifacts": false,
           "visual_truth_changed": false,
           "route_truth_changed": false
-        }
+        },
+        "descriptor_proof_contract_state": "landed",
+        "runtime_writeback_state": "pending"
       },
       "seed_fixture_locator": {
         "fixture_id": "rca.visual_pattern_memory.seed_fixture_locator.v1",
@@ -491,7 +495,8 @@
           "rejected",
           "superseded"
         ],
-        "repo_tracks_receipt_instances": false
+        "repo_tracks_receipt_instances": false,
+        "runtime_writeback_state": "pending"
       },
       "authority_boundary": {
         "memory_content_owner": "redcube_ai",
@@ -583,7 +588,8 @@
           "opl_can_issue_decision": false,
           "opl_can_write_receipt_instance": false
         }
-      }
+      },
+      "status": "descriptor_proof_contract_landed_runtime_writeback_pending"
     },
     "product_sidecar_receipt_refs": {
       "receipt_contract_id": "rca.product_sidecar.receipt_refs.v1",
@@ -644,7 +650,8 @@
         "repo_tracks_proposal_instance": false,
         "repo_tracks_receipt_instance": false,
         "repo_tracks_memory_entry": false,
-        "repo_tracks_visual_or_export_artifacts": false
+        "repo_tracks_visual_or_export_artifacts": false,
+        "status": "descriptor_proof_contract_landed_runtime_writeback_pending"
       },
       "opl_hosted_attempt": {
         "consumed_memory_refs": [
@@ -666,7 +673,10 @@
       "opl_consumes_memory_refs": true,
       "opl_consumes_writeback_receipt_refs": true,
       "opl_holds_memory_content": false,
-      "opl_holds_receipt_instance": false
+      "opl_holds_receipt_instance": false,
+      "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
+      "proof_contract_state": "landed",
+      "runtime_writeback_state": "pending"
     }
   },
   "non_goals": [

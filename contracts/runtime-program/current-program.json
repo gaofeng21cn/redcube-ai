@@ -999,7 +999,7 @@
           "managed_deliverable_runtime_changed": false
         },
         "domain_memory_descriptor_locator": {
-          "status": "repo_tracked_descriptor_locator_proposal_decision_operator_projection_contract",
+          "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
           "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
           "locator_id": "rca.visual_pattern_memory.locator.v1",
           "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
@@ -1008,7 +1008,7 @@
           "migration_plan_id": "rca.visual_pattern_memory.migration_plan.v1",
           "seed_fixture_locator_id": "rca.visual_pattern_memory.seed_fixture_locator.v1",
           "writeback_receipt_locator_id": "rca.visual_pattern_memory.writeback_receipt_locator.v1",
-          "migration_state": "repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending",
+          "migration_state": "descriptor_proof_contract_landed_runtime_writeback_pending",
           "memory_family": "visual_pattern_memory",
           "memory_content_owner": "redcube_ai",
           "route_truth_owner": "redcube_ai",
@@ -1025,10 +1025,12 @@
           "operator_receipt_projection_id": "rca.visual_pattern_memory.operator_receipt_projection.v1",
           "repo_tracks_proposal_instances": false,
           "operator_receipt_projection_ready": true,
-          "opl_can_accept_or_reject_memory_writeback": false
+          "opl_can_accept_or_reject_memory_writeback": false,
+          "descriptor_proof_contract_state": "landed",
+          "runtime_writeback_state": "pending"
         },
         "controlled_visual_stage_attempt": {
-          "status": "repo_tracked_controlled_consumed_memory_writeback_receipt_proof_contract",
+          "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
           "fixture_id": "rca.controlled_visual_stage_attempt.fixture.v1",
           "provider_controlled_proof_id": "rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1",
           "covered_family": "ppt_deck",
@@ -1055,7 +1057,9 @@
           "repo_tracks_memory_entries": false,
           "repo_tracks_proposal_instances": false,
           "repo_tracks_receipt_instances": false,
-          "repo_tracks_visual_or_export_artifacts": false
+          "repo_tracks_visual_or_export_artifacts": false,
+          "proof_contract_state": "landed",
+          "runtime_writeback_state": "pending"
         }
       },
       "artifacts": {

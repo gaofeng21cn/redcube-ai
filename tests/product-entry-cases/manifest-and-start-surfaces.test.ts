@@ -375,6 +375,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs, false);
     assert.equal(manifest.artifact_locator_contract.opl_consumption_policy.forbidden.includes('declare_visual_export_verdict'), true);
     assert.equal(manifest.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.status,
+      'descriptor_proof_contract_landed_runtime_writeback_pending',
+    );
     assert.equal(manifest.domain_memory_descriptor_locator.locator_id, 'rca.visual_pattern_memory.locator.v1');
     assert.equal(manifest.domain_memory_descriptor_locator.memory_family, 'visual_pattern_memory');
     assert.equal(manifest.domain_memory_descriptor_locator.memory_model, 'natural_language_pattern_cards');
@@ -400,8 +404,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.domain_memory_descriptor_locator.migration_plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
     assert.equal(
       manifest.domain_memory_descriptor_locator.migration_plan.state,
-      'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending',
+      'descriptor_proof_contract_landed_runtime_writeback_pending',
     );
+    assert.equal(manifest.domain_memory_descriptor_locator.migration_plan.descriptor_proof_contract_state, 'landed');
+    assert.equal(manifest.domain_memory_descriptor_locator.migration_plan.runtime_writeback_state, 'pending');
     assert.ok(
       manifest.domain_memory_descriptor_locator.migration_plan.migration_steps.includes('generate_writeback_proposal_locator'),
     );
@@ -466,6 +472,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       false,
     );
     assert.equal(
+      manifest.domain_memory_descriptor_locator.writeback_receipt_locator.runtime_writeback_state,
+      'pending',
+    );
+    assert.equal(
       manifest.domain_memory_descriptor_locator.writeback_proposal_generator.generator_id,
       'rca.visual_pattern_memory.writeback_proposal_generator.v1',
     );
@@ -495,6 +505,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(manifest.visual_pattern_memory_writeback.surface_kind, 'visual_pattern_memory_writeback_projection');
     assert.equal(
+      manifest.visual_pattern_memory_writeback.status,
+      'descriptor_proof_contract_landed_runtime_writeback_pending',
+    );
+    assert.equal(manifest.visual_pattern_memory_writeback.proof_contract_state, 'landed');
+    assert.equal(manifest.visual_pattern_memory_writeback.runtime_writeback_state, 'pending');
+    assert.equal(
       manifest.visual_pattern_memory_writeback.proposal_generator.generator_id,
       'rca.visual_pattern_memory.writeback_proposal_generator.v1',
     );
@@ -522,6 +538,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('visual_verdict'), true);
     assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('artifact_blob'), true);
     assert.equal(manifest.controlled_visual_stage_attempt.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
+    assert.equal(
+      manifest.controlled_visual_stage_attempt.status,
+      'descriptor_proof_contract_landed_runtime_writeback_pending',
+    );
+    assert.equal(manifest.controlled_visual_stage_attempt.proof_contract_state, 'landed');
+    assert.equal(manifest.controlled_visual_stage_attempt.runtime_writeback_state, 'pending');
     assert.equal(
       manifest.controlled_visual_stage_attempt.proof_model,
       'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',

@@ -7,6 +7,8 @@ import {
   withMockCodexRuntimeState,
 } from '../gateway-case-shared.ts';
 
+const DOMAIN_MEMORY_ADOPTION_STATE = 'descriptor_proof_contract_landed_runtime_writeback_pending';
+
 function assertStandardFamilyDomainMemoryRef(descriptor) {
   assert.equal(descriptor.surface_kind, 'family_domain_memory_ref');
   assert.equal(descriptor.version, 'family-domain-memory-ref.v1');
@@ -76,11 +78,14 @@ function assertStandardFamilyDomainMemoryRef(descriptor) {
   assert.equal(descriptor.freshness.descriptor_locator_ref, '/domain_memory_descriptor_locator');
   assert.equal(
     descriptor.migration_readiness.status,
-    'consumed_memory_writeback_receipt_proof_ready_descriptor_only',
+    DOMAIN_MEMORY_ADOPTION_STATE,
   );
+  assert.equal(descriptor.migration_readiness.migration_state, DOMAIN_MEMORY_ADOPTION_STATE);
+  assert.equal(descriptor.migration_readiness.descriptor_proof_contract_state, 'landed');
+  assert.equal(descriptor.migration_readiness.runtime_writeback_state, 'pending');
   assert.equal(descriptor.migration_readiness.memory_body_migration, 'domain_owned_runtime_apply_required');
   assert.equal(descriptor.migration_readiness.opl_apply_allowed, false);
-  assert.equal(descriptor.status, 'active');
+  assert.equal(descriptor.status, DOMAIN_MEMORY_ADOPTION_STATE);
 
   assert.equal(descriptor.authority_boundary.opl_role, 'locator_projection_owner');
   assert.equal(descriptor.authority_boundary.domain_memory_owner, 'redcube_ai');
@@ -131,6 +136,9 @@ test('product-entry manifest exposes controlled consumed-memory and writeback re
       attempt.proof_model,
       'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
     );
+    assert.equal(attempt.status, DOMAIN_MEMORY_ADOPTION_STATE);
+    assert.equal(attempt.proof_contract_state, 'landed');
+    assert.equal(attempt.runtime_writeback_state, 'pending');
     assert.equal(
       attempt.provider_controlled_proof_id,
       'rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1',
@@ -159,6 +167,7 @@ test('product-entry manifest exposes controlled consumed-memory and writeback re
     }
     assert.equal(attempt.memory_consumption_contract.repository_boundary.repo_tracks_memory_content_body, false);
     assert.equal(attempt.writeback_proof_contract.proposal_ref, 'rca-memory-proposal:visual-pattern:<proposal-id>');
+    assert.equal(attempt.writeback_proof_contract.status, DOMAIN_MEMORY_ADOPTION_STATE);
     assert.equal(attempt.writeback_proof_contract.receipt_ref, 'rca-memory-receipt:visual-pattern:<receipt-id>');
     assert.equal(attempt.writeback_proof_contract.memory_locator_ref, 'rca-memory:visual-pattern:<memory-id>');
     assert.equal(attempt.writeback_proof_contract.repository_boundary.repo_tracks_proposal_instance, false);
@@ -178,6 +187,8 @@ test('product-entry manifest exposes controlled consumed-memory and writeback re
     assert.equal(attempt.equivalence_proof.opl_writes_memory_content, false);
     assert.equal(attempt.equivalence_proof.opl_writes_receipt_instance, false);
     assert.equal(attempt.projection_only_result.memory_content_body, null);
+    assert.equal(attempt.projection_only_result.status, DOMAIN_MEMORY_ADOPTION_STATE);
+    assert.equal(attempt.projection_only_result.runtime_writeback_state, 'pending');
     assert.equal(attempt.projection_only_result.receipt_instance, null);
     assert.deepEqual(attempt.projection_only_result.writeback_refs, {
       proposal_ref: 'rca-memory-proposal:visual-pattern:<proposal-id>',

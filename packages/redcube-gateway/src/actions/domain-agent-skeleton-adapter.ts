@@ -20,6 +20,9 @@ const FAMILY_MEMORY_FORBIDDEN_OPL_AUTHORITY = [
   'review_export_verdict_owner',
   'artifact_authority',
 ];
+const DOMAIN_MEMORY_ADOPTION_STATE = 'descriptor_proof_contract_landed_runtime_writeback_pending';
+const DOMAIN_MEMORY_PROOF_CONTRACT_STATE = 'landed';
+const DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE = 'pending';
 
 const REPO_SOURCE_BOUNDARIES = [
   {
@@ -155,9 +158,12 @@ export function buildControlledVisualStageAttemptFixture() {
   };
   return {
     surface_kind: 'controlled_visual_stage_attempt_fixture',
+    status: DOMAIN_MEMORY_ADOPTION_STATE,
     fixture_id: 'rca.controlled_visual_stage_attempt.fixture.v1',
     domain_id: DOMAIN_ID,
     proof_model: 'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
+    proof_contract_state: DOMAIN_MEMORY_PROOF_CONTRACT_STATE,
+    runtime_writeback_state: DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
     provider_controlled_proof_id: 'rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1',
     provider_controlled_proof_model: 'opl_hosted_attempt_consumes_memory_refs_and_returns_locator_only_receipts',
     covered_family: 'ppt_deck',
@@ -200,6 +206,7 @@ export function buildControlledVisualStageAttemptFixture() {
     },
     writeback_proof_contract: {
       surface_kind: 'controlled_memory_writeback_receipt_proof',
+      status: DOMAIN_MEMORY_ADOPTION_STATE,
       contract_id: 'rca.visual_pattern_memory.writeback_receipt_proof.v1',
       proposal_ref: 'rca-memory-proposal:visual-pattern:<proposal-id>',
       receipt_ref: 'rca-memory-receipt:visual-pattern:<receipt-id>',
@@ -261,6 +268,8 @@ export function buildControlledVisualStageAttemptFixture() {
       opl_writes_receipt_instance: false,
     },
     projection_only_result: {
+      status: DOMAIN_MEMORY_ADOPTION_STATE,
+      runtime_writeback_state: DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
       descriptor_refs: sharedRefs.descriptor_refs,
       consumed_memory_refs: sharedRefs.consumed_memory_refs,
       writeback_refs: {
@@ -453,7 +462,9 @@ export function buildDomainMemoryDescriptorLocator() {
   };
   const migrationPlan = {
     plan_id: 'rca.visual_pattern_memory.migration_plan.v1',
-    state: 'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending',
+    state: DOMAIN_MEMORY_ADOPTION_STATE,
+    descriptor_proof_contract_state: DOMAIN_MEMORY_PROOF_CONTRACT_STATE,
+    runtime_writeback_state: DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
     source_surfaces: [
       'workspace_runtime_root',
       'product_entry_session',
@@ -531,6 +542,7 @@ export function buildDomainMemoryDescriptorLocator() {
     locator_id: 'rca.visual_pattern_memory.writeback_receipt_locator.v1',
     receipt_contract_id: 'rca.visual_pattern_memory.writeback_receipt_refs.v1',
     receipt_model: 'locator_only_no_receipt_instance',
+    runtime_writeback_state: DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
     source_root_model: 'workspace_runtime_or_domain_memory_reference',
     locator_fields: [
       'receipt_id',
@@ -553,6 +565,7 @@ export function buildDomainMemoryDescriptorLocator() {
   };
   return {
     surface_kind: 'domain_memory_descriptor_locator',
+    status: DOMAIN_MEMORY_ADOPTION_STATE,
     descriptor_id: 'rca.visual_pattern_memory.descriptor.v1',
     locator_id: 'rca.visual_pattern_memory.locator.v1',
     domain_id: DOMAIN_ID,
@@ -725,14 +738,16 @@ export function buildFamilyDomainMemoryDescriptor({
       refresh_policy: 'domain_manifest_rebuild_required_before_stage_attempt',
     },
     migration_readiness: {
-      status: 'consumed_memory_writeback_receipt_proof_ready_descriptor_only',
+      status: DOMAIN_MEMORY_ADOPTION_STATE,
       migration_state: domainMemoryDescriptorLocator.migration_plan.state,
       memory_body_migration: 'domain_owned_runtime_apply_required',
+      descriptor_proof_contract_state: DOMAIN_MEMORY_PROOF_CONTRACT_STATE,
+      runtime_writeback_state: DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
       opl_apply_allowed: false,
       repo_tracks_memory_entries: false,
       repo_tracks_receipt_instances: false,
     },
-    status: 'active',
+    status: DOMAIN_MEMORY_ADOPTION_STATE,
     authority_boundary: {
       opl_role: 'locator_projection_owner',
       domain_memory_owner: DOMAIN_OWNER,

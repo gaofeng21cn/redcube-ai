@@ -869,6 +869,9 @@ export async function getProductEntryManifest(request) {
     domain_memory_descriptor_locator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator,
     visual_pattern_memory_writeback: {
       surface_kind: 'visual_pattern_memory_writeback_projection',
+      status: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.status,
+      proof_contract_state: domainAgentSkeletonAdapter.controlled_visual_stage_attempt.proof_contract_state,
+      runtime_writeback_state: domainAgentSkeletonAdapter.controlled_visual_stage_attempt.runtime_writeback_state,
       proposal_generator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.writeback_proposal_generator,
       accept_reject_command: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.accept_reject_command,
       operator_receipt_projection: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.operator_receipt_projection,
@@ -994,6 +997,9 @@ export async function getProductEntryManifest(request) {
     domain_memory_descriptor_locator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator,
     visual_pattern_memory_writeback: {
       surface_kind: 'visual_pattern_memory_writeback_projection',
+      status: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.status,
+      proof_contract_state: domainAgentSkeletonAdapter.controlled_visual_stage_attempt.proof_contract_state,
+      runtime_writeback_state: domainAgentSkeletonAdapter.controlled_visual_stage_attempt.runtime_writeback_state,
       proposal_generator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.writeback_proposal_generator,
       accept_reject_command: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.accept_reject_command,
       operator_receipt_projection: domainAgentSkeletonAdapter.domain_memory_descriptor_locator.operator_receipt_projection,

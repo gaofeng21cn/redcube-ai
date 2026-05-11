@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const CONTRACT_PATH = 'contracts/runtime-program/opl-family-contract-adoption.json';
 const CURRENT_PROGRAM_PATH = 'contracts/runtime-program/current-program.json';
+const DOMAIN_MEMORY_ADOPTION_STATE = 'descriptor_proof_contract_landed_runtime_writeback_pending';
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -287,10 +288,13 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
     label: 'RCA visual pattern memory writeback receipt locator',
   });
   assert.equal(descriptor.freshness.source, 'contract_manifest_projection');
-  assert.equal(descriptor.migration_readiness.status, 'consumed_memory_writeback_receipt_proof_ready_descriptor_only');
+  assert.equal(descriptor.migration_readiness.status, DOMAIN_MEMORY_ADOPTION_STATE);
+  assert.equal(descriptor.migration_readiness.migration_state, DOMAIN_MEMORY_ADOPTION_STATE);
+  assert.equal(descriptor.migration_readiness.descriptor_proof_contract_state, 'landed');
+  assert.equal(descriptor.migration_readiness.runtime_writeback_state, 'pending');
   assert.equal(descriptor.migration_readiness.memory_body_migration, 'domain_owned_runtime_apply_required');
   assert.equal(descriptor.migration_readiness.opl_apply_allowed, false);
-  assert.equal(descriptor.status, 'active');
+  assert.equal(descriptor.status, DOMAIN_MEMORY_ADOPTION_STATE);
   assert.equal(descriptor.authority_boundary.opl_role, 'locator_projection_owner');
   assert.equal(descriptor.authority_boundary.domain_memory_owner, 'redcube_ai');
   assert.ok(descriptor.authority_boundary.forbidden_opl_authority.includes('memory_store_owner'));
@@ -304,6 +308,7 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
   assert.equal(descriptor.authority_boundary.can_issue_review_or_export_verdict, false);
 
   assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
+  assert.equal(memory.status, DOMAIN_MEMORY_ADOPTION_STATE);
   assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');
   assert.equal(memory.memory_family, 'visual_pattern_memory');
   assert.equal(memory.memory_model, 'natural_language_pattern_cards');
@@ -340,7 +345,9 @@ test('RCA domain memory migration plan is locator-only and acceptance-gated', ()
   const plan = memory.migration_plan;
 
   assert.equal(plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
-  assert.equal(plan.state, 'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending');
+  assert.equal(plan.state, DOMAIN_MEMORY_ADOPTION_STATE);
+  assert.equal(plan.descriptor_proof_contract_state, 'landed');
+  assert.equal(plan.runtime_writeback_state, 'pending');
   assert.deepEqual(plan.source_surfaces, [
     'workspace_runtime_root',
     'product_entry_session',
@@ -410,6 +417,7 @@ test('RCA visual pattern memory seed and receipt surfaces do not carry memory co
   assert.equal(receipt.locator_id, 'rca.visual_pattern_memory.writeback_receipt_locator.v1');
   assert.equal(receipt.receipt_contract_id, 'rca.visual_pattern_memory.writeback_receipt_refs.v1');
   assert.equal(receipt.receipt_model, 'locator_only_no_receipt_instance');
+  assert.equal(receipt.runtime_writeback_state, 'pending');
   assert.equal(receipt.repo_tracks_receipt_instances, false);
   assert.deepEqual(receipt.locator_fields, [
     'receipt_id',
@@ -505,7 +513,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(stageProjection.managed_deliverable_runtime_changed, false);
   const attempt = payload.current_state.active_baton.scope.controlled_visual_stage_attempt;
 
-  assert.equal(memory.status, 'repo_tracked_descriptor_locator_proposal_decision_operator_projection_contract');
+  assert.equal(memory.status, DOMAIN_MEMORY_ADOPTION_STATE);
   assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
   assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');
   assert.equal(memory.migration_plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
@@ -516,8 +524,10 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(memory.operator_receipt_projection_id, 'rca.visual_pattern_memory.operator_receipt_projection.v1');
   assert.equal(
     memory.migration_state,
-    'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending',
+    DOMAIN_MEMORY_ADOPTION_STATE,
   );
+  assert.equal(memory.descriptor_proof_contract_state, 'landed');
+  assert.equal(memory.runtime_writeback_state, 'pending');
   assert.equal(memory.memory_content_owner, 'redcube_ai');
   assert.equal(memory.route_truth_owner, 'redcube_ai');
   assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
@@ -531,7 +541,9 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(memory.route_truth_changed, false);
   assert.equal(memory.operator_receipt_projection_ready, true);
   assert.equal(memory.opl_can_accept_or_reject_memory_writeback, false);
-  assert.equal(attempt.status, 'repo_tracked_controlled_consumed_memory_writeback_receipt_proof_contract');
+  assert.equal(attempt.status, DOMAIN_MEMORY_ADOPTION_STATE);
+  assert.equal(attempt.proof_contract_state, 'landed');
+  assert.equal(attempt.runtime_writeback_state, 'pending');
   assert.deepEqual(attempt.stage_kinds, ['review_and_revision', 'package_and_handoff']);
   assert.equal(attempt.direct_and_opl_share_descriptor_refs, true);
   assert.equal(attempt.direct_and_opl_share_sidecar_refs, true);
