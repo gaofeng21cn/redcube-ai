@@ -13,7 +13,7 @@ import {
   runDeliverableRoute,
   runtimeWatch,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 const TOPIC_ID = 'topic-a';
 const XHS_SHARED_STATE_TOPIC_ID = 'topic-shared-state';
@@ -152,7 +152,7 @@ async function clonePreparedWorkspace(name, buildFixture) {
 }
 
 test('platform review state tracks pending revisions and rerun loop for ppt_deck', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await clonePreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
 
     const readyState = await getReviewState({ workspaceRoot, topicId: TOPIC_ID, deliverableId: 'deck-candidate' });
@@ -200,7 +200,7 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
 });
 
 test('platform review state is shared by xiaohongshu and supports baseline binding metadata', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await clonePreparedWorkspace('xhs-baseline-candidate', buildXhsBaselineCandidateFixture);
 
     const state = await getReviewState({ workspaceRoot, topicId: XHS_SHARED_STATE_TOPIC_ID, deliverableId: 'note-a' });
@@ -291,7 +291,7 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
 });
 
 test('promote_baseline requires structured relative quality and approval gates, then records promotion state', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await clonePreparedWorkspace('xhs-baseline-candidate', buildXhsBaselineCandidateFixture);
 
     await assert.rejects(
@@ -375,7 +375,7 @@ test('approve_publish rejects xiaohongshu deliverable before publish_ready', asy
 });
 
 test('promote_baseline works for ppt_deck without human approval gate once relative quality exists', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await clonePreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
 
     const promoted = await applyReviewMutation({

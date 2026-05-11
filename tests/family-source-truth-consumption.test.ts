@@ -10,7 +10,7 @@ import {
   intakeSource,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -29,7 +29,7 @@ function expectSharedSummary(summary, role) {
 }
 
 test('ppt_deck emits shared source_truth_consumption across story and visual routes', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-family-source-truth-'));
     await intakeSource({
       workspaceRoot,
@@ -71,7 +71,7 @@ test('ppt_deck emits shared source_truth_consumption across story and visual rou
 });
 
 test('xiaohongshu emits shared source_truth_consumption across source/story/visual routes', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-family-source-truth-'));
     await intakeSource({
       workspaceRoot,
@@ -112,8 +112,8 @@ test('xiaohongshu emits shared source_truth_consumption across source/story/visu
   });
 });
 
-test('ppt_deck and xiaohongshu share a machine-readable source_pack fanout for the same topic', async () => {
-  await withMockHermesUpstream(async () => {
+test('ppt_deck and xiaohongshu share a machine-readable source pack fanout for the same topic', async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-pack-fanout-'));
     const intake = await intakeSource({
       workspaceRoot,
@@ -168,7 +168,7 @@ test('ppt_deck and xiaohongshu share a machine-readable source_pack fanout for t
 });
 
 test('poster_onepager keeps guarded knowledge-poster boundary while emitting shared source_truth_consumption', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-family-source-truth-'));
     await intakeSource({
       workspaceRoot,
@@ -211,7 +211,7 @@ test('poster_onepager keeps guarded knowledge-poster boundary while emitting sha
 
 
 test('ppt_deck treats operator slide plans as suggestions unless they are approved session artifacts', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-slide-plan-suggestion-'));
     const sourceOutline = Array.from({ length: 32 }, (_, index) => `## Slide ${index + 1}: 来源资料建议页 ${index + 1}`).join('\n\n');
     const sourceOutlineFile = path.join(workspaceRoot, 'source-outline.md');

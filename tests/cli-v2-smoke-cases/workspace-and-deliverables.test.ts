@@ -230,7 +230,7 @@ async function execCliExpectFailureAsync(cliPath, args, options = {}) {
   }
 }
 
-async function withMockHermesUpstreamCli(testFn) {
+async function withMockCodexRuntimeCli(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -620,7 +620,7 @@ test('CLI deliverable create works from isolated install without monorepo siblin
 });
 
 test('CLI deliverable run works from isolated install through the upstream Hermes service-entry bridge', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-isolated-run-'));
 
@@ -674,7 +674,7 @@ test('CLI deliverable run works from isolated install through the upstream Herme
 });
 
 test('CLI deliverable run and runs get proxy the contract-driven runtime mainline', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-run-'));
 

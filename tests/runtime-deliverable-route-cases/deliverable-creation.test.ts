@@ -21,7 +21,7 @@ import {
   completeSourceReadiness,
   MODULE_DIR,
   MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 

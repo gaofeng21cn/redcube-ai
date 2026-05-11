@@ -21,12 +21,12 @@ import {
   completeSourceReadiness,
   MODULE_DIR,
   MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute uses Codex-backed executor by default', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
     await createDeliverable({
@@ -107,7 +107,7 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
 });
 
 test('runDeliverableRoute executes other declared stages through Codex-backed executor', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
     await createDeliverable({

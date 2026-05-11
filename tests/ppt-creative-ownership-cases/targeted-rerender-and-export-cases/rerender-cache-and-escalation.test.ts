@@ -13,12 +13,12 @@ import {
   runDeliverableRoute,
   test,
   withEnv,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   writeFileSync,
 } from './shared.ts';
 
 test('ppt fix_html only regenerates blocked slides and preserves previously passed slides', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-targeted-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -99,7 +99,7 @@ test('ppt fix_html only regenerates blocked slides and preserves previously pass
 });
 
 test('ppt render_html route cache invalidates when operator revision brief changes', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-render-operator-revision-cache-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -164,7 +164,7 @@ test('ppt render_html route cache invalidates when operator revision brief chang
 });
 
 test('ppt visual review route cache invalidates after fix_html updates current HTML', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-review-cache-after-fix-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -248,7 +248,7 @@ test('ppt visual review route cache invalidates after fix_html updates current H
 });
 
 test('ppt fix_html escalates when the same slide is blocked again after a prior fix_html', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-repeat-block-escalation-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -339,7 +339,7 @@ test('ppt fix_html escalates when the same slide is blocked again after a prior 
 });
 
 test('ppt screenshot_review accepts pass_with_minor_watch as advisory pass', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-pass-with-minor-watch-',
       routes: [...PPT_ROUTES_TO_RENDER_HTML, 'visual_director_review'],
@@ -369,7 +369,7 @@ test('ppt screenshot_review accepts pass_with_minor_watch as advisory pass', asy
 });
 
 test('ppt fix_html targets slides blocked only by mechanical screenshot checks', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-mechanical-only-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -453,7 +453,7 @@ test('ppt fix_html targets slides blocked only by mechanical screenshot checks',
 });
 
 test('ppt fix_html ignores AI-passed mechanical false positives when another slide blocks', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-ignore-ai-passed-mechanical-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -538,7 +538,7 @@ test('ppt fix_html ignores AI-passed mechanical false positives when another sli
 });
 
 test('ppt fix_html prioritizes screenshot-blocked slides over advisory weak pages', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-blocked-over-weak-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -609,7 +609,7 @@ test('ppt fix_html prioritizes screenshot-blocked slides over advisory weak page
 });
 
 test('ppt screenshot_review incrementally reviews only freshly fixed slides and reuses prior passed pages', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-incremental-screenshot-review-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,

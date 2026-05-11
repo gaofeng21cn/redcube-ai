@@ -10,7 +10,7 @@ import {
   createDeliverable,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withEnv, withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withEnv, withMockCodexRuntime } from './mock-codex-cli.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
 
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
@@ -70,7 +70,7 @@ async function withMockNativePptRuntime(testFn) {
     REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
   });
   try {
-    return await withMockHermesUpstream(testFn);
+    return await withMockCodexRuntime(testFn);
   } finally {
     restoreEnv();
   }

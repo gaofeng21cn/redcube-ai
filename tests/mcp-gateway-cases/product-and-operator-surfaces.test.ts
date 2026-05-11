@@ -13,7 +13,7 @@ import {
   runManagedDeliverable,
   test,
   withAction,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withOperation,
 } from '../gateway-case-shared.ts';
 

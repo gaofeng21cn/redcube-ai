@@ -34,7 +34,7 @@ const DEFAULT_PPT_CREATIVE_METADATA = {
 const PPT_ROUTES_TO_RENDER_HTML = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'];
 const preparedPptWorkspaceCache = new Map();
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -160,7 +160,7 @@ function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliv
 }
 
 test('ppt fix_html honors operator revision brief slide ids in targeted rerender', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-operator-brief-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -271,7 +271,7 @@ test('ppt fix_html honors operator revision brief slide ids in targeted rerender
 });
 
 test('ppt fix_html scopes targeted rerender to operator-requested slides when only advisory weak pages remain', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-operator-only-',
       goal: '验证 operator 定点返修不会把其他 advisory weak pages 一起带入 fix_html',
@@ -356,7 +356,7 @@ test('ppt fix_html scopes targeted rerender to operator-requested slides when on
 });
 
 test('ppt fix_html runs page-local repair units in parallel for independent targeted slides', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-rerun-page-local-parallel-',
       goal: '验证 fix_html 每页只携带单页上下文，并发返修互不依赖的问题页。',
@@ -447,7 +447,7 @@ test('ppt fix_html runs page-local repair units in parallel for independent targ
 });
 
 test('ppt render_html ignores stale targeted revision context after visual_direction refresh', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-stale-targeted-context-',
       goal: '验证 visual_direction 更新后，render_html 不会继续吃旧的定点返修上下文',
@@ -538,7 +538,7 @@ test('ppt render_html ignores stale targeted revision context after visual_direc
 });
 
 test('ppt fix_html still allows targeted revision after visual_direction refresh when review and operator brief are fresh for the current HTML', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: initialRoutes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-fix-after-visual-refresh-',
       goal: '验证 visual_direction 更新后，fix_html 仍能针对当前 HTML 做定点返修',
@@ -692,7 +692,7 @@ test('ppt fix_html still allows targeted revision after visual_direction refresh
 });
 
 test('ppt fix_html forwards prior director and screenshot review feedback to Codex', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-context-'));
     await createDeliverable({
       workspaceRoot,

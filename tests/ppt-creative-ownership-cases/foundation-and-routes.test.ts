@@ -73,7 +73,7 @@ function runReviewScript(args) {
   );
 }
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -548,7 +548,7 @@ test('ppt review script ignores stack-like grouping containers without their own
 });
 
 test('ppt route artifacts record Codex-backed ownership for Story Architecture, Visual Authorship, and visual_director_review overlay', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-creative-'));
     await createDeliverable({
       workspaceRoot,
@@ -648,7 +648,7 @@ test('ppt route artifacts record Codex-backed ownership for Story Architecture, 
 });
 
 test('ppt route artifacts materialize lecture operator view files inside the canonical deliverable surface', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-operator-surface-'));
     await createDeliverable({
       workspaceRoot,

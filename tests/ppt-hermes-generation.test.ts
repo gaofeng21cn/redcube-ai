@@ -27,7 +27,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -88,7 +88,7 @@ test('ppt authoring context passes full source materials instead of first-line e
 });
 
 test('ppt manuscript sync blocks abstract outlines without visible paper evidence', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-manuscript-density-'));
     const sourceFile = path.join(workspaceRoot, 'nfpitnet-paper-pack.md');
     writeFileSync(sourceFile, [
@@ -163,7 +163,7 @@ test('ppt manuscript sync blocks abstract outlines without visible paper evidenc
 });
 
 test('ppt authoring treats numbered source slide plans as suggestions, not approved outline contracts', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-numbered-plan-'));
     const sourceFile = path.join(workspaceRoot, 'numbered-plan.md');
     const slidePlan = Array.from({ length: 21 }, (_, index) => {
@@ -222,7 +222,7 @@ test('ppt authoring treats numbered source slide plans as suggestions, not appro
 });
 
 test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-generation-'));
 
     await createDeliverable({
@@ -312,7 +312,7 @@ test('ppt core authoring stages carry Codex generation evidence and keep operato
 });
 
 test('ppt authoring context keeps lecture_peer audience and public source labels aligned to source truth', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-audience-'));
     const sourceFile = path.join(workspaceRoot, 'med-auto-science.md');
     writeFileSync(sourceFile, [
@@ -356,7 +356,7 @@ test('ppt authoring context keeps lecture_peer audience and public source labels
 });
 
 test('ppt screenshot review escalates speaker fit failures back to slide_blueprint instead of staying at render_html', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-rerun-stage-'));
 
     const created = await createDeliverable({

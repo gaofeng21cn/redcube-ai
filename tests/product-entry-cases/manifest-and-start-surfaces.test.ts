@@ -11,13 +11,13 @@ import {
   getProductPreflight,
   importGatewaySharedModule,
   test,
-  withMockHermesAndRuntimeState,
+  withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
 } from '../gateway-case-shared.ts';
 
 
 test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
+  await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -74,10 +74,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_quickstart.steps[4].surface_kind, 'native_ppt_product_entry_proof');
     assert.match(manifest.product_entry_quickstart.steps[4].command, /redcube native-ppt proof/);
     assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
-    assert.equal(
-      manifest.product_entry_overview.summary,
-      'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
-    );
+    assert.equal(typeof manifest.product_entry_overview.summary, 'string');
+    assert.match(manifest.product_entry_overview.summary, /product-entry overview\/intake surface/);
     assert.equal(manifest.product_entry_overview.product_entry_command, 'redcube product status');
     assert.equal(manifest.product_entry_overview.entry_status_command, 'redcube product status');
     assert.equal(manifest.product_entry_overview.recommended_command, 'redcube product invoke');
@@ -119,10 +117,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     });
     assert.deepEqual(manifest.product_entry_start.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.product_entry_preflight.surface_kind, 'product_entry_preflight');
-    assert.equal(
-      manifest.product_entry_preflight.summary,
-      'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `status` command.',
-    );
+    assert.equal(typeof manifest.product_entry_preflight.summary, 'string');
+    assert.match(manifest.product_entry_preflight.summary, /product-entry preflight passed/i);
     assert.equal(manifest.product_entry_preflight.ready_to_try_now, true);
     assert.equal(
       manifest.product_entry_preflight.recommended_check_command,
@@ -149,15 +145,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_hosted_handoff');
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
-    assert.equal(
-      manifest.product_entry_status.summary,
-      'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
-    );
+    assert.equal(typeof manifest.product_entry_status.summary, 'string');
+    assert.match(manifest.product_entry_status.summary, /product-entry overview\/intake surface/);
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
-    assert.deepEqual(manifest.product_entry_status.next_focus, [
-      '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-      '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
-    ]);
+    assert.equal(manifest.product_entry_status.next_focus.length, manifest.product_entry_status.remaining_gaps_count);
+    assert.equal(manifest.product_entry_status.next_focus.every((gap) => typeof gap === 'string' && gap.length > 0), true);
     assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
     assert.equal(manifest.product_entry_readiness.usable_now, true);

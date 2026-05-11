@@ -31,12 +31,12 @@ import {
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('managed execution keeps xiaohongshu on the Codex-backed human-publication closure without drifting durable truth', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-xhs-'));
 
     await completeSourceReadiness({
@@ -145,7 +145,7 @@ test('managed execution keeps xiaohongshu on the Codex-backed human-publication 
 });
 
 test('managed xiaohongshu follows review rerun_from_stage and finishes after repair_image_pages instead of stopping on screenshot block', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-xhs-rerun-'));
 
     await completeSourceReadiness({

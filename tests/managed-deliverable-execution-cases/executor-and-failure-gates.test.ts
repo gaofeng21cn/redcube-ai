@@ -31,7 +31,7 @@ import {
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
@@ -167,7 +167,7 @@ test('managed DAG execution fails closed and does not advance dependent stages a
 });
 
 test('managed control plane rejects retired external_llm adapter before creating durable managed state', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-failure-'));
 
     await completeSourceReadiness({

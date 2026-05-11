@@ -10,7 +10,7 @@ import {
   getPublicationProjection,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {
   for (const route of routes) {
@@ -26,7 +26,7 @@ async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes)
 }
 
 test('topic publication projection converges direct-delivery and human-publication families through hydrated delivery contracts', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-publication-projection-'));
 
     await createDeliverable({

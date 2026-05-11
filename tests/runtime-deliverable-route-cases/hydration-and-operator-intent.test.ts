@@ -21,12 +21,12 @@ import {
   completeSourceReadiness,
   MODULE_DIR,
   MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the current overlay contract declares the requested route', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-rehydrate-'));
 
     await createDeliverable({
@@ -76,7 +76,7 @@ test('runDeliverableRoute auto-rehydrates stale deliverable surfaces when the cu
 });
 
 test('runDeliverableRoute includes operator user intent in route authoring context and cache key', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-intent-'));
     await completeSourceReadiness({
       workspaceRoot,

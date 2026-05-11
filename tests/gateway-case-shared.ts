@@ -82,7 +82,7 @@ async function dispatchProductSidecar(request) {
   return module.dispatchProductSidecar(request);
 }
 
-async function withMockHermesAndRuntimeState(testFn) {
+async function withMockCodexRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
   const restoreEnv = withEnv({
@@ -98,7 +98,7 @@ async function withMockHermesAndRuntimeState(testFn) {
   }
 }
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -280,8 +280,8 @@ export {
   test,
   unlinkSync,
   withAction,
-  withMockHermesAndRuntimeState,
-  withMockHermesUpstream,
+  withMockCodexRuntimeState,
+  withMockCodexRuntime,
   withOperation,
   writeFileSync,
   writeSourceAugmentationResult,

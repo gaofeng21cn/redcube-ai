@@ -12,7 +12,7 @@ import {
   reviewRenderOutput,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -88,7 +88,7 @@ test('xiaohongshu ships dedicated official prompt pack', () => {
 });
 
 test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets and repair preserves passing pages', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-image-pages-'));
     const created = await createDeliverable({
       workspaceRoot,
@@ -212,7 +212,7 @@ test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets 
 });
 
 test('xiaohongshu style_reference_dir replaces built-in no-author style manifest only', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-style-ref-'));
     const styleRefDir = path.join(workspaceRoot, 'operator-style-ref');
     mkdirSync(styleRefDir, { recursive: true });
@@ -267,7 +267,7 @@ test('xiaohongshu style_reference_dir replaces built-in no-author style manifest
 });
 
 test('xiaohongshu render_html blocks until single_note_plan and visual_direction exist', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
     await createDeliverable({
       workspaceRoot,
@@ -293,7 +293,7 @@ test('xiaohongshu render_html blocks until single_note_plan and visual_direction
 });
 
 test('xiaohongshu render_html fails when prompt pack shell asset is missing', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
     const created = await createDeliverable({
       workspaceRoot,
@@ -335,7 +335,7 @@ test('xiaohongshu render_html fails when prompt pack shell asset is missing', as
 });
 
 test('xiaohongshu mainline produces real stage artifacts through publish_copy', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
     await createDeliverable({
       workspaceRoot,
@@ -431,7 +431,7 @@ test('xiaohongshu mainline produces real stage artifacts through publish_copy', 
 });
 
 test('xiaohongshu explicit render_html route remains available for deterministic HTML maintenance', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-html-'));
     await createDeliverable({
       workspaceRoot,
@@ -460,7 +460,7 @@ test('xiaohongshu explicit render_html route remains available for deterministic
 });
 
 test('xiaohongshu manual thyroid clinic case keeps clinic-topic fidelity instead of generic tool-flow copy', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-manual-'));
     await createDeliverable({
       workspaceRoot,
@@ -488,7 +488,7 @@ test('xiaohongshu manual thyroid clinic case keeps clinic-topic fidelity instead
 });
 
 test('xiaohongshu optimize_existing binds baseline and emits relative review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
     await createDeliverable({
       workspaceRoot,
@@ -542,7 +542,7 @@ test('xiaohongshu optimize_existing binds baseline and emits relative review', a
 });
 
 test('xiaohongshu export_bundle performs real delivery and series surfaces when needed', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-e2e-'));
     await createDeliverable({
       workspaceRoot,
@@ -592,7 +592,7 @@ test('xiaohongshu export_bundle performs real delivery and series surfaces when 
 });
 
 test('xiaohongshu research/storyline/plan/visual_direction consume shared source truth', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-source-'));
     const richFile = path.join(workspaceRoot, 'rich-material.md');
     writeFileSync(

@@ -14,7 +14,7 @@ import {
   runtimeWatch,
 } from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {
   for (const route of routes) {
@@ -24,7 +24,7 @@ async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes)
 }
 
 test('direct-delivery families expose one aligned operator_handoff summary across audit/watch/review/projection surfaces', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -100,7 +100,7 @@ test('direct-delivery families expose one aligned operator_handoff summary acros
 });
 
 test('direct-delivery operator_handoff stays blocked when canonical source readiness is missing even if export output is ready', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-blocked-'));
     await createDeliverable({
       workspaceRoot,
@@ -137,7 +137,7 @@ test('direct-delivery operator_handoff stays blocked when canonical source readi
 });
 
 test('human-publication family keeps explicit publish gate and does not expose direct-delivery lifecycle_stage_summary or operator_handoff', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-xhs-'));
     await completeSourceReadiness({
       workspaceRoot,

@@ -27,7 +27,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-async function withMockHermesAndRuntimeState(testFn) {
+async function withMockCodexRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
   const restoreEnv = withEnv({
@@ -44,7 +44,7 @@ async function withMockHermesAndRuntimeState(testFn) {
 }
 
 test('invokeProductEntry managed ppt deck preserves full manuscript evidence without enforcing source slide suggestions', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-manuscript-source-'));
     const sourceFile = path.join(workspaceRoot, 'nfpitnet-three-papers.md');
     const quietOpening = '这一段开头没有任何结果数字，用来证明不能只读资料开头。'.repeat(30);

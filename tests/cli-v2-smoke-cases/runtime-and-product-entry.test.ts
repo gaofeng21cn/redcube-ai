@@ -233,7 +233,7 @@ async function execCliExpectFailureAsync(cliPath, args, options = {}) {
   }
 }
 
-async function withMockHermesUpstreamCli(testFn) {
+async function withMockCodexRuntimeCli(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -248,7 +248,7 @@ async function withMockHermesUpstreamCli(testFn) {
 }
 
 test('CLI deliverable execute, managed get, and managed supervise proxy the managed execution control plane', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
 
@@ -358,7 +358,7 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
 });
 
 test('CLI product status, product invoke, product sidecar, and product session proxy the product-entry service surface', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
     const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-state-'));
@@ -879,7 +879,7 @@ test('CLI review get and mutate proxy review platform actions', () => {
 });
 
 test('CLI review projection proxies topic publication projection read path', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-projection-'));
 

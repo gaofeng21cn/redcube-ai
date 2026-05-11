@@ -62,7 +62,7 @@ export function assertNoManagedState(workspaceRoot) {
   assert.deepEqual(runtimeDirEntries(workspaceRoot, 'managed-escalation'), []);
 }
 
-export async function withMockHermesUpstream(testFn) {
+export async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,

@@ -9,7 +9,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildCommandHelp, buildHelp, getCliGatewayActions } from '../apps/redcube-cli/dist/cli.js';
 import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
 import { buildRedCubeActionMetadata } from '../packages/redcube-gateway/dist/index.js';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 function runCli(args, options = {}) {
   const output = execFileSync(
@@ -138,7 +138,7 @@ test('CLI product-entry and proof command help is projected from family action m
 });
 
 test('brand-new workspace quickstart converges doctor -> source research -> create -> audit -> run with aligned governance surfaces', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-quickstart-brand-new-'));
     const payloadFile = path.join(workspaceRoot, 'research-result.json');
     writeResearchPayload(payloadFile);

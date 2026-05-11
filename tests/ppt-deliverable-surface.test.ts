@@ -17,7 +17,7 @@ import {
   runDeliverableRoute,
 } from './gateway-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.ts';
 
 async function prepareSourceReadiness(workspaceRoot) {
@@ -214,7 +214,7 @@ test('auditDeliverable blocks when hydrated ppt deck surface is missing', async 
 });
 
 test('auditDeliverable passes when hydrated ppt deck surface exists and baseline is bound', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-surface-'));
     await prepareSourceReadiness(workspaceRoot);
 

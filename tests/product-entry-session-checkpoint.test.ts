@@ -27,7 +27,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-async function withMockHermesAndRuntimeState(testFn) {
+async function withMockCodexRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
   const restoreEnv = withEnv({
@@ -58,7 +58,7 @@ async function prepareProductEntryWorkspace() {
 }
 
 test('getProductEntrySession reconciles a stale session checkpoint with the workspace latest managed run', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const first = await invokeProductEntry({
@@ -130,7 +130,7 @@ test('getProductEntrySession reconciles a stale session checkpoint with the work
 });
 
 test('getProductEntrySession preserves a newer route-run checkpoint over stale managed supervision', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     await invokeProductEntry({

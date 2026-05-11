@@ -29,7 +29,7 @@ const MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND = JSON.stringify([
   fileURLToPath(new URL('./helpers/mock-hermes-agent-loop-bridge.ts', import.meta.url)),
 ]);
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -116,7 +116,7 @@ async function withMockHermesAgentApi(testFn) {
 }
 
 test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix_html', async () => {
-  await withMockHermesUpstream(async () => withMockHermesAgentApi(async () => {
+  await withMockCodexRuntime(async () => withMockHermesAgentApi(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-recovery-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -213,7 +213,7 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
 });
 
 test('runDeliverableRoute continues from ppt fix_html to requested stop-after review gate', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-stop-after-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -300,7 +300,7 @@ test('runDeliverableRoute continues from ppt fix_html to requested stop-after re
 });
 
 test('runDeliverableRoute escalates repeated ppt fix_html review blocks through Hermes agent loop once', async () => {
-  await withMockHermesUpstream(async () => withMockHermesAgentApi(async () => {
+  await withMockCodexRuntime(async () => withMockHermesAgentApi(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-escalation-'));
     await completeSourceReadiness({
       workspaceRoot,
