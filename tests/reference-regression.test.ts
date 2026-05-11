@@ -19,7 +19,7 @@ import {
   validateReferenceSampleMeta,
   xiaohongshuOverlay,
 } from './package-surfaces.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -204,7 +204,7 @@ test('reference coverage matrix fully covers active family/profile combinations'
 });
 
 test('xiaohongshu optimize_existing blocks unapproved baseline until approval, then supports relative regression review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-xhs-'));
     const preparedSourceTopics = new Set();
     const fixture = loadFixture('xiaohongshu', 'approved-note');
@@ -257,7 +257,7 @@ test('xiaohongshu optimize_existing blocks unapproved baseline until approval, t
 });
 
 test('ppt_deck active profiles all have approved samples that support relative regression review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-reference-ppt-'));
     const preparedSourceTopics = new Set();
     for (const sampleId of ['approved-deck', 'approved-peer-deck', 'approved-executive-deck', 'approved-defense-deck']) {

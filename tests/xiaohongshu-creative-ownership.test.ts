@@ -43,7 +43,7 @@ const XHS_ROUTES_THROUGH_PUBLISH_COPY = [...XHS_ROUTES_THROUGH_SCREENSHOT_REVIEW
 const XHS_ROUTES_THROUGH_EXPORT_BUNDLE = [...XHS_ROUTES_THROUGH_PUBLISH_COPY, 'export_bundle'];
 
 const preparedWorkspaceCache = new Map();
-let sharedMockHermesUpstream = null;
+let sharedMockCodexRuntime = null;
 let restoreMockHermesEnv = null;
 
 function withOptionalEnv(env = {}) {
@@ -53,13 +53,13 @@ function withOptionalEnv(env = {}) {
   return withEnv(env);
 }
 
-async function ensureMockHermesUpstream() {
-  if (sharedMockHermesUpstream) {
+async function ensureMockCodexRuntime() {
+  if (sharedMockCodexRuntime) {
     return;
   }
-  sharedMockHermesUpstream = await startMockCodexCli();
+  sharedMockCodexRuntime = await startMockCodexCli();
   restoreMockHermesEnv = withEnv({
-    REDCUBE_CODEX_COMMAND: sharedMockHermesUpstream.command,
+    REDCUBE_CODEX_COMMAND: sharedMockCodexRuntime.command,
   });
 }
 
@@ -140,8 +140,8 @@ function getXhsDeliverableDir(workspaceRoot) {
   return path.join(workspaceRoot, 'topics', XHS_TOPIC_ID, 'deliverables', XHS_DELIVERABLE_ID);
 }
 
-async function withMockHermesUpstream(testFn) {
-  await ensureMockHermesUpstream();
+async function withMockCodexRuntime(testFn) {
+  await ensureMockCodexRuntime();
   return await testFn();
 }
 
@@ -150,9 +150,9 @@ test.after(async () => {
     restoreMockHermesEnv();
     restoreMockHermesEnv = null;
   }
-  if (sharedMockHermesUpstream) {
-    await sharedMockHermesUpstream.close();
-    sharedMockHermesUpstream = null;
+  if (sharedMockCodexRuntime) {
+    await sharedMockCodexRuntime.close();
+    sharedMockCodexRuntime = null;
   }
 });
 
@@ -223,7 +223,7 @@ test('xiaohongshu Codex-backed mainline owns protected creative outputs instead 
 });
 
 test('xiaohongshu route artifacts record Codex-backed creative ownership for story, visual, review, and publish surfaces', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-publish-copy-default',
       workspacePrefix: 'redcube-xhs-creative-fixture-',
@@ -324,7 +324,7 @@ test('xiaohongshu route artifacts record Codex-backed creative ownership for sto
 });
 
 test('xiaohongshu screenshot_review forwards current slide source_html alongside screenshots', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-visual-review-default',
       workspacePrefix: 'redcube-xhs-visual-review-fixture-',
@@ -346,7 +346,7 @@ test('xiaohongshu screenshot_review forwards current slide source_html alongside
 });
 
 test('xiaohongshu screenshot_review accepts weak_pages lists longer than four items', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-visual-review-default',
       workspacePrefix: 'redcube-xhs-visual-review-fixture-',
@@ -375,7 +375,7 @@ test('xiaohongshu screenshot_review accepts weak_pages lists longer than four it
 });
 
 test('xiaohongshu uses workspace-level author profile and exports a human-usable publish package', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-workspace-author-'));
     const fakeConfigHome = path.join(workspaceRoot, 'fake-config-home');
 
@@ -467,7 +467,7 @@ test('xiaohongshu uses workspace-level author profile and exports a human-usable
 });
 
 test('xiaohongshu render_html keeps stable HTML empty until screenshot_review passes and exposes current candidate separately', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-render-html-default',
       workspacePrefix: 'redcube-xhs-render-html-fixture-',
@@ -493,7 +493,7 @@ test('xiaohongshu render_html keeps stable HTML empty until screenshot_review pa
 });
 
 test('xiaohongshu review stages self-heal current candidate alias from the live draft source', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-render-html-default',
       workspacePrefix: 'redcube-xhs-render-html-fixture-',
@@ -515,7 +515,7 @@ test('xiaohongshu review stages self-heal current candidate alias from the live 
 });
 
 test('xiaohongshu fix_html targets weak_pages together with blocked pages in the same rerun batch', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-visual-review-repair-marker-extra-weak',
       workspacePrefix: 'redcube-xhs-weak-page-targeting-fixture-',
@@ -554,7 +554,7 @@ test('xiaohongshu fix_html targets weak_pages together with blocked pages in the
 });
 
 test('xiaohongshu fix_html uses runtime-owned repair summary when model omits render_summary', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-visual-review-repair-marker-omit-render-summary',
       workspacePrefix: 'redcube-xhs-fix-summary-fixture-',
@@ -594,7 +594,7 @@ test('xiaohongshu fix_html uses runtime-owned repair summary when model omits re
 });
 
 test('xiaohongshu screenshot_review after fix_html reviews only repaired pages and reuses prior passed pages', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-visual-review-repair-marker-page-local-review',
       workspacePrefix: 'redcube-xhs-page-local-review-fixture-',
@@ -658,7 +658,7 @@ test('xiaohongshu screenshot_review after fix_html reviews only repaired pages a
 });
 
 test('xiaohongshu fix_html honors operator-targeted slide revision briefs even when screenshot_review already passes', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-screenshot-review-require-operator-revision-context',
       workspacePrefix: 'redcube-xhs-operator-revision-fixture-',
@@ -707,7 +707,7 @@ test('xiaohongshu fix_html honors operator-targeted slide revision briefs even w
 });
 
 test('xiaohongshu screenshot_review keeps local visual blocks on fix_html even when director_intent_landed turns soft-false', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-visual-review-default',
       workspacePrefix: 'redcube-xhs-visual-review-fixture-',
@@ -749,7 +749,7 @@ test('xiaohongshu screenshot_review keeps local visual blocks on fix_html even w
 });
 
 test('xiaohongshu rerender keeps stable views untouched and writes candidate draft separately', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-screenshot-review-default',
       workspacePrefix: 'redcube-xhs-stable-views-fixture-',
@@ -779,7 +779,7 @@ test('xiaohongshu rerender keeps stable views untouched and writes candidate dra
 });
 
 test('xiaohongshu export_bundle records the stable reviewed HTML instead of the latest draft candidate', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceFixtureRoot({
       cacheKey: 'xhs-through-export-bundle-default',
       workspacePrefix: 'redcube-xhs-export-stable-html-fixture-',
@@ -796,7 +796,7 @@ test('xiaohongshu export_bundle records the stable reviewed HTML instead of the 
 });
 
 test('xiaohongshu marks an existing publish package stale when a newer candidate is blocked by screenshot_review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await getPreparedWorkspaceClone({
       cacheKey: 'xhs-through-export-bundle-default',
       workspacePrefix: 'redcube-xhs-export-stable-html-fixture-',

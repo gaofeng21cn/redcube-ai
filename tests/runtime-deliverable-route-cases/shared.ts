@@ -32,7 +32,7 @@ export const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.ts'),
 ]);
 
-export async function withMockHermesUpstream(testFn) {
+export async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,

@@ -13,7 +13,7 @@ import {
   reviewRenderOutput,
   runDeliverableRoute,
 } from './gateway-test-api.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 let cachedPythonCommand = null;
@@ -66,7 +66,7 @@ async function runChain({ workspaceRoot, deliverableId, mode = 'draft_new', base
 let sharedOptimizeExportContextPromise;
 
 async function buildSharedOptimizeExportContext() {
-  return withMockHermesUpstream(async () => {
+  return withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
     await createDeliverable({
@@ -145,7 +145,7 @@ test('ppt_deck ships dedicated prompt pack instead of xiaohongshu prompt semanti
 });
 
 test('ppt_deck render_html blocks until slide_blueprint and visual_direction exist', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
     await createDeliverable({
@@ -172,7 +172,7 @@ test('ppt_deck render_html blocks until slide_blueprint and visual_direction exi
 });
 
 test('ppt_deck render_html fails when prompt pack shell asset is missing', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
     const created = await createDeliverable({
@@ -215,7 +215,7 @@ test('ppt_deck render_html fails when prompt pack shell asset is missing', async
 });
 
 test('lecture_student mainline produces real ppt_deck artifacts through screenshot review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
     await createDeliverable({
@@ -301,7 +301,7 @@ test('lecture_student mainline produces real ppt_deck artifacts through screensh
 });
 
 test('ppt_deck manual thyroid case keeps topic fidelity instead of falling back to stale AI workflow copy', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-manual-'));
 
     await createDeliverable({
@@ -371,7 +371,7 @@ test('export_pptx performs real delivery or explicit hard block', async () => {
 });
 
 test('ppt_deck storyline/outline/blueprint/visual_direction consume shared source truth', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-source-'));
     const richFile = path.join(workspaceRoot, 'rich-outline.md');
     writeFileSync(

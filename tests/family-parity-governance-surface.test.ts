@@ -15,7 +15,7 @@ import {
 } from './gateway-test-api.ts';
 import { getDeliverablePaths } from './package-surfaces.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
-import { withMockHermesUpstream } from './mock-codex-cli.ts';
+import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 const SHARED_GOVERNANCE_SURFACES = [
   'deliverable create',
@@ -73,7 +73,7 @@ async function buildReviewReadyWorkspace({ workspaceRoot, overlay, profileId, de
 }
 
 test('stable families expose one explicit governance_surface contract on create and canonical review surfaces', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
 
     const deck = await buildReviewReadyWorkspace({
@@ -156,7 +156,7 @@ test('stable families expose one explicit governance_surface contract on create 
 });
 
 test('canonical publication projection, audit, and watch rebuild governance summaries after stored drift is detected', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
     await buildReviewReadyWorkspace({
       workspaceRoot,

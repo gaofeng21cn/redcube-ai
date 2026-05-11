@@ -13,7 +13,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -27,7 +27,7 @@ async function withMockHermesUpstream(testFn) {
 }
 
 test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight before AI visual review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-preflight-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -108,7 +108,7 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
 });
 
 test('ppt screenshot_review fails fast on deterministic HTML preflight before AI visual review', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-preflight-'));
     await createDeliverable({
       workspaceRoot,

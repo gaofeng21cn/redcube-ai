@@ -21,7 +21,7 @@ import {
   completeSourceReadiness,
   MODULE_DIR,
   MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
@@ -94,7 +94,7 @@ test('runDeliverableRoute rejects overlay mismatch against stored deliverable', 
 });
 
 test('runDeliverableRoute rejects retired external_llm adapter before creating durable run state', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
     await createDeliverable({

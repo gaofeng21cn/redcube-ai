@@ -15,12 +15,12 @@ import {
   runDeliverableRoute,
   test,
   withEnv,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   writeFileSync,
 } from './shared.ts';
 
 test('ppt screenshot_review backfills page number consistency for legacy incremental prior reviews', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-incremental-legacy-page-number-review-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -134,7 +134,7 @@ test('ppt screenshot_review backfills page number consistency for legacy increme
 });
 
 test('ppt visual_director_review incrementally reviews only freshly fixed slides and reuses prior director result', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-incremental-director-review-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -224,7 +224,7 @@ test('ppt visual_director_review incrementally reviews only freshly fixed slides
 });
 
 test('ppt screenshot_review recalculates page number consistency after incremental page fixes', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-incremental-page-number-review-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -330,7 +330,7 @@ test('ppt screenshot_review recalculates page number consistency after increment
 });
 
 test('ppt screenshot_review forwards current slide source_html alongside screenshots', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-source-html-'));
     await createDeliverable({
       workspaceRoot,
@@ -364,7 +364,7 @@ test('ppt screenshot_review forwards current slide source_html alongside screens
 });
 
 test('ppt screenshot_review pass refreshes latest-capture pointer and export_pptx records the stable reviewed HTML', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-latest-capture-',
       goal: '验证 PPT 通过版截图指针和导出 source_html 都锚定稳定表面',

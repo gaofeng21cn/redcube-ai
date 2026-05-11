@@ -31,12 +31,12 @@ import {
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('managed execution keeps poster_onepager on the guarded knowledge-poster closure without drifting direct-delivery truth', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-poster-'));
 
     await completeSourceReadiness({

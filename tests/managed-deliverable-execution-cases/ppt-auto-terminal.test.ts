@@ -32,7 +32,7 @@ import {
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
@@ -66,7 +66,7 @@ test('managed rerun guard escalates repeated identical screenshot repair request
 });
 
 test('managed execution defaults to auto_to_terminal and runs a ppt deliverable to final export with auditable prompt records', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-run-'));
 
     await completeSourceReadiness({
@@ -209,7 +209,7 @@ test('managed execution defaults to auto_to_terminal and runs a ppt deliverable 
 });
 
 test('managed auto_to_terminal skips repair_image_pages when screenshot_review does not request a rerun', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-skip-fix-html-'));
 
     await completeSourceReadiness({
@@ -277,7 +277,7 @@ test('managed auto_to_terminal skips repair_image_pages when screenshot_review d
 });
 
 test('managed execution stops at explicit stop_after_stage instead of auto-running to terminal', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-stop-'));
 
     await completeSourceReadiness({

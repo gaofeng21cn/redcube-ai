@@ -21,12 +21,12 @@ import {
   completeSourceReadiness,
   MODULE_DIR,
   MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute supports poster_onepager routes on shared runtime', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
     await createDeliverable({
@@ -56,7 +56,7 @@ test('runDeliverableRoute supports poster_onepager routes on shared runtime', as
 });
 
 test('poster_onepager mainline runs through review and export on shared runtime', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 
     await createDeliverable({

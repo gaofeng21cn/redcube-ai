@@ -14,13 +14,13 @@ import {
   getProductEntrySession,
   readJson,
   test,
-  withMockHermesAndRuntimeState,
+  withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
 } from '../gateway-case-shared.ts';
 
 
 test('product sidecar export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const sidecar = await exportProductSidecar({
@@ -114,7 +114,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
 });
 
 test('default product-entry path stays on codex_cli without requiring Hermes API server', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL), false);
@@ -182,7 +182,7 @@ test('default product-entry path stays on codex_cli without requiring Hermes API
 });
 
 test('product status exposes overlay stage sequence for ppt_deck callers', async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const status = await getProductStatus({
       workspace_locator: {
@@ -230,7 +230,7 @@ test('product status exposes overlay stage sequence for ppt_deck callers', async
 });
 
 test('invokeProductEntry rejects route and stop_after_stage outside hydrated stage sequence', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     await assert.rejects(
@@ -257,7 +257,7 @@ test('invokeProductEntry rejects route and stop_after_stage outside hydrated sta
 });
 
 test('getProductStart exposes the same direct-entry start companion as the manifest', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const start = await getProductStart({

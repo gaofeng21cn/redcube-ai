@@ -19,7 +19,7 @@ import {
   withEnv,
 } from './mock-codex-cli.ts';
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -156,7 +156,7 @@ test('auditDeliverable blocks optimize_existing task when baseline is not approv
 });
 
 test('auditDeliverable surfaces promoted baseline summary for optimize_existing', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -466,7 +466,7 @@ test('runtimeWatch reports pending review loop state', async () => {
 
 
 test('runtimeWatch can load a persisted run from the canonical workspace/topic/deliverable/run locator', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-'));
 
     await completeSourceReadiness({
@@ -509,7 +509,7 @@ test('runtimeWatch can load a persisted run from the canonical workspace/topic/d
 });
 
 test('runtimeWatch keeps deliverable-level review watch available when no run locator is provided', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-deliverable-only-'));
 
     await createDeliverable({
@@ -562,7 +562,7 @@ test('runtimeWatch keeps deliverable-level review watch available when no run lo
 });
 
 test('runtimeWatch rejects a persisted run when topic locator does not match the run identity', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-mismatch-'));
 
     await completeSourceReadiness({
@@ -763,7 +763,7 @@ test('runtimeWatch exposes source readiness summary and gate summary from canoni
 });
 
 test('runtimeWatch exposes publication projection separately from canonical review state', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-review-loop-'));
 
     await createDeliverable({

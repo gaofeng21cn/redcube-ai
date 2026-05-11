@@ -29,7 +29,7 @@ const PPT_ROUTES_TO_RENDER_HTML = ['storyline', 'detailed_outline', 'slide_bluep
 const PPT_ROUTES_TO_SCREENSHOT_REVIEW = [...PPT_ROUTES_TO_RENDER_HTML, 'visual_director_review', 'screenshot_review'];
 const preparedPptWorkspaceCache = new Map();
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -172,6 +172,6 @@ export {
   runDeliverableRoute,
   test,
   withEnv,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   writeFileSync,
 };

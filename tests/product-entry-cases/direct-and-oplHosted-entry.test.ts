@@ -13,13 +13,13 @@ import {
   PRODUCT_ENTRY_COMPANIONS_SPECIFIER,
   readJson,
   test,
-  withMockHermesAndRuntimeState,
+  withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
 } from '../gateway-case-shared.ts';
 
 
 test('invokeProductEntry converts review-first deck intent into a stop-after-outline lifecycle gate', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const response = await invokeProductEntry({
@@ -52,7 +52,7 @@ test('invokeProductEntry converts review-first deck intent into a stop-after-out
 });
 
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async ({ runtimeStateRoot }) => {
+  await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -214,7 +214,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
 });
 
 test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -381,7 +381,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
 });
 
 test('invokeOplHostedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 

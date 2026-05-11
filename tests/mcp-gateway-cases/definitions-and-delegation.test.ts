@@ -16,7 +16,7 @@ import {
   test,
   unlinkSync,
   withAction,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withOperation,
 } from '../gateway-case-shared.ts';
 import {
@@ -426,7 +426,7 @@ test('stdio MCP server exposes current product-entry overview surfaces', async (
 });
 
 test('stdio MCP server rejects runtime_watch when the topic locator does not match the persisted run identity', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-watch-mismatch-'));
   await completeSourceReadiness({
     workspaceRoot,
@@ -607,7 +607,7 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
 });
 
 test('stdio MCP server can create deliverable, run declared route, and fetch run state', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-run-'));
   const serverPath = fileURLToPath(
     new URL('../../apps/redcube-mcp/dist/server.js', import.meta.url),
@@ -701,7 +701,7 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
 });
 
 test('stdio MCP server can create and run xiaohongshu deliverable routes on shared runtime', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-xhs-'));
   const serverPath = fileURLToPath(
     new URL('../../apps/redcube-mcp/dist/server.js', import.meta.url),

@@ -22,7 +22,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -75,7 +75,7 @@ test('poster_onepager creative mainline no longer lets runtime artifacts, seeds,
 });
 
 test('poster_onepager route artifacts record Codex-backed ownership for story, visual, render, and director review surfaces', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-creative-'));
     await createDeliverable({
       workspaceRoot,
@@ -160,7 +160,7 @@ test('poster_onepager route artifacts record Codex-backed ownership for story, v
 });
 
 test('poster_onepager screenshot_review forwards current source_html alongside screenshots', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-screenshot-source-html-'));
     await createDeliverable({
       workspaceRoot,
@@ -194,7 +194,7 @@ test('poster_onepager screenshot_review forwards current source_html alongside s
 });
 
 test('poster_onepager rerender keeps stable views untouched and writes candidate draft separately', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-stable-views-'));
     await createDeliverable({
       workspaceRoot,
@@ -244,7 +244,7 @@ test('poster_onepager rerender keeps stable views untouched and writes candidate
 });
 
 test('poster_onepager export_bundle records the stable reviewed HTML instead of the latest draft candidate', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-poster-export-stable-html-'));
     await createDeliverable({
       workspaceRoot,

@@ -41,7 +41,7 @@ const PPT_ROUTES_TO_SCREENSHOT_REVIEW = [...PPT_ROUTES_TO_RENDER_HTML, 'visual_d
 const PPT_ROUTES_TO_EXPORT_PPTX = [...PPT_ROUTES_TO_SCREENSHOT_REVIEW, 'export_pptx'];
 const preparedPptWorkspaceCache = new Map();
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -179,7 +179,7 @@ function rewriteRenderSlideContent(renderArtifact, slideId, rewriteContent) {
 }
 
 test('ppt screenshot_review writes immutable capture screenshots and export uses the reviewed capture directory', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-capture-proof-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -216,7 +216,7 @@ test('ppt screenshot_review writes immutable capture screenshots and export uses
 });
 
 test('ppt rerunning upstream HTML retires the stale publish bundle while publication projection falls back to draft', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-stale-export-',
       routes: PPT_ROUTES_TO_EXPORT_PPTX,
@@ -263,7 +263,7 @@ test('ppt rerunning upstream HTML retires the stale publish bundle while publica
 });
 
 test('ppt rerender keeps a missing canonical publish bundle missing until a new export recreates it', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-export-restore-',
       routes: PPT_ROUTES_TO_EXPORT_PPTX,
@@ -291,7 +291,7 @@ test('ppt rerender keeps a missing canonical publish bundle missing until a new 
 });
 
 test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a draft file until screenshot_review catches up', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-reviewed-html-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -359,7 +359,7 @@ test('ppt rerender keeps the reviewed HTML stable and writes newer markup into a
 });
 
 test('ppt visual_director_review blocks audience-facing operator metadata leaked into rendered HTML', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-director-metadata-leak-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -396,7 +396,7 @@ test('ppt visual_director_review blocks audience-facing operator metadata leaked
 });
 
 test('ppt visual_director_review allows public Prompt Engineering concept copy', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-director-public-prompt-copy-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -427,7 +427,7 @@ test('ppt visual_director_review allows public Prompt Engineering concept copy',
 });
 
 test('ppt visual_director_review blocks consecutive homogeneous dense white-card slides', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-director-card-density-',
       routes: PPT_ROUTES_TO_RENDER_HTML,
@@ -481,7 +481,7 @@ test('ppt visual_director_review blocks consecutive homogeneous dense white-card
 });
 
 test('ppt blocked screenshot_review keeps the prior default HTML and preserves the failed candidate as draft', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-blocked-html-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -567,7 +567,7 @@ test('ppt blocked screenshot_review keeps the prior default HTML and preserves t
 });
 
 test('ppt screenshot_review publishes stable root screenshots from the approved capture', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults: routes } = await clonePreparedPptWorkspace({
       clonePrefix: 'redcube-ppt-stable-screenshots-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
@@ -597,7 +597,7 @@ test('ppt screenshot_review publishes stable root screenshots from the approved 
 });
 
 test('ppt render_html hydrates review metadata onto slide root when upstream HTML omits those attrs', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'missing_root_meta',
     });
@@ -654,7 +654,7 @@ test('ppt render_html hydrates review metadata onto slide root when upstream HTM
 });
 
 test('ppt render_html fails fast when upstream HTML omits review anchors', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'missing_review_anchors',
     });
@@ -688,7 +688,7 @@ test('ppt render_html fails fast when upstream HTML omits review anchors', async
 });
 
 test('ppt render_html batches upstream slide generation instead of sending the whole deck at once', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_render_batching',
     });
@@ -719,7 +719,7 @@ test('ppt render_html batches upstream slide generation instead of sending the w
 });
 
 test('ppt render_html forwards recent slide style metadata to later batches to preserve deck continuity', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_reference_window',
     });
@@ -752,7 +752,7 @@ test('ppt render_html forwards recent slide style metadata to later batches to p
 });
 
 test('ppt render_html uses section batches for full regeneration while keeping cross-page continuity stable', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_section_batches',
     });
@@ -793,7 +793,7 @@ test('ppt render_html uses section batches for full regeneration while keeping c
 });
 
 test('ppt render_html persists durable batch artifacts and resumes from completed batches', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-render-durable-batches-'));
     await createDeliverable({
       workspaceRoot,
@@ -869,7 +869,7 @@ test('ppt render_html persists durable batch artifacts and resumes from complete
 });
 
 test('ppt screenshot_review runs slide review batches in parallel once Codex exec is async', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const lockDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-parallel-'));
     const overlapFile = path.join(lockDir, 'overlap.txt');
     const restoreVariant = withEnv({

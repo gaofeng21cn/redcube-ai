@@ -26,7 +26,7 @@ async function importGatewaySharedModule(moduleSpecifier) {
   return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
 }
 
-async function withMockHermesUpstream(testFn) {
+async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -64,7 +64,7 @@ async function prepareDomainEntryWorkspace() {
 }
 
 test('invokeDomainEntry runs the service-safe managed deliverable adapter under the configured OPL provider contract', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const sharedCompanions = await importGatewaySharedModule('opl-framework-shared/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
@@ -145,7 +145,7 @@ test('invokeDomainEntry rejects unsupported target domains', async () => {
 });
 
 test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL handoff envelope', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
     await assert.rejects(
@@ -175,7 +175,7 @@ test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL
 });
 
 test('invokeDomainEntry rejects mismatched requested surface kinds', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
     await assert.rejects(

@@ -21,12 +21,12 @@ import {
   completeSourceReadiness,
   MODULE_DIR,
   MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute reuses a fresh gated stage artifact when the route cache key is unchanged', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-cache-'));
     await createDeliverable({
       workspaceRoot,
@@ -117,7 +117,7 @@ test('getRun and runtimeWatch expire stale persisted running route runs with an 
 });
 
 test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts with unchanged route cache input', async () => {
-  await withMockHermesUpstream(async () => {
+  await withMockCodexRuntime(async () => {
     const pptWorkspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-ppt-fastfail-'));
     await createDeliverable({
       workspaceRoot: pptWorkspaceRoot,

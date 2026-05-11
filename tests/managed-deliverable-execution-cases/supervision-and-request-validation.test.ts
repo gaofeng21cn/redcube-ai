@@ -31,7 +31,7 @@ import {
   withoutUpdatedAt,
   runtimeDirEntries,
   assertNoManagedState,
-  withMockHermesUpstream,
+  withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
 

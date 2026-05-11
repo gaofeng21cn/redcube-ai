@@ -4,7 +4,7 @@ import {
   getProductEntryManifest,
   prepareProductEntryWorkspace,
   test,
-  withMockHermesAndRuntimeState,
+  withMockCodexRuntimeState,
 } from '../gateway-case-shared.ts';
 
 function assertStandardFamilyDomainMemoryRef(descriptor) {
@@ -99,7 +99,7 @@ function assertStandardFamilyDomainMemoryRef(descriptor) {
 }
 
 test('product-entry manifest exposes OPL standard domain_memory_descriptor for RCA visual pattern memory', async () => {
-  await withMockHermesAndRuntimeState(async () => {
+  await withMockCodexRuntimeState(async () => {
     const manifest = await getProductEntryManifest({
       workspace_root: await prepareProductEntryWorkspace(),
     });

@@ -230,7 +230,7 @@ async function execCliExpectFailureAsync(cliPath, args, options = {}) {
   }
 }
 
-async function withMockHermesUpstreamCli(testFn) {
+async function withMockCodexRuntimeCli(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -245,7 +245,7 @@ async function withMockHermesUpstreamCli(testFn) {
 }
 
 test('CLI review watch returns operator-facing runtime watch surface for a persisted run', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-'));
 
@@ -300,7 +300,7 @@ test('CLI review watch returns operator-facing runtime watch surface for a persi
 });
 
 test('CLI review watch rejects a persisted run when topic locator does not match the run identity', async () => {
-  await withMockHermesUpstreamCli(async () => {
+  await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-mismatch-'));
 

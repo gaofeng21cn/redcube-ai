@@ -283,18 +283,18 @@ test('run-test-group usage and verify shim include the family verification lane'
   assert.match(verifyScript, /\[smoke\|fast\|ci\|line-budget\|structure\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\|full-with-historical\]/);
 });
 
-test('deliverable review loop integration stays on the mock codex upstream instead of the live CLI', () => {
+test('deliverable review loop integration stays on the mock Codex runtime instead of the live CLI', () => {
   const reviewLoop = readFileSync('tests/deliverable-review-loop.test.ts', 'utf-8');
 
   assert.match(reviewLoop, /startMockCodexCli/);
-  assert.match(reviewLoop, /withMockHermesUpstream/);
+  assert.match(reviewLoop, /withMockCodexRuntime/);
   assert.match(reviewLoop, /REDCUBE_CODEX_COMMAND/);
 });
 
-test('serialized route-heavy verification files stay on the mock codex upstream instead of the live CLI', () => {
+test('serialized route-heavy verification files stay on the mock Codex runtime instead of the live CLI', () => {
   for (const file of [...SERIALIZED_ROUTE_HEAVY_TEST_FILES].sort()) {
     const content = readSerializedTestFileWithImportedCases(file);
-    assert.match(content, /withMockHermes(?:AndRuntimeState|Upstream)|REDCUBE_CODEX_COMMAND/);
+    assert.match(content, /withMockCodexRuntime(?:State)?|REDCUBE_CODEX_COMMAND/);
   }
 });
 
