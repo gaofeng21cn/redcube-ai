@@ -380,6 +380,10 @@ test('reviewRenderOutput loads lecture_student profile checks from hydrated cont
       edge_clearance_ok: true,
       block_content_fit_ok: true,
       title_typography_ok: true,
+      external_audience_language_ok: true,
+      title_safe_zone_clear: true,
+      table_legibility_ok: true,
+      layout_density_ok: true,
       teaching_progression_clear: true,
     },
   });
@@ -418,6 +422,10 @@ test('reviewRenderOutput loads executive_briefing profile checks from hydrated c
       edge_clearance_ok: true,
       block_content_fit_ok: true,
       title_typography_ok: true,
+      external_audience_language_ok: true,
+      title_safe_zone_clear: true,
+      table_legibility_ok: true,
+      layout_density_ok: true,
       decision_implication_clear: false,
       conclusion_up_front: true,
     },
@@ -514,7 +522,7 @@ test('runtimeWatch keeps deliverable-level review watch available when no run lo
       goal: '给学生讲清肠癌 AI 的问题、方法与边界',
     });
 
-    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review']) {
+    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review']) {
       const result = await runDeliverableRoute({
         workspaceRoot,
         overlay: 'ppt_deck',
