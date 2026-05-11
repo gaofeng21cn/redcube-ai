@@ -74,7 +74,10 @@ function assertStandardFamilyDomainMemoryRef(descriptor) {
 
   assert.equal(descriptor.freshness.source, 'product_entry_manifest_build');
   assert.equal(descriptor.freshness.descriptor_locator_ref, '/domain_memory_descriptor_locator');
-  assert.equal(descriptor.migration_readiness.status, 'migration_plan_ready_descriptor_only');
+  assert.equal(
+    descriptor.migration_readiness.status,
+    'consumed_memory_writeback_receipt_proof_ready_descriptor_only',
+  );
   assert.equal(descriptor.migration_readiness.memory_body_migration, 'domain_owned_runtime_apply_required');
   assert.equal(descriptor.migration_readiness.opl_apply_allowed, false);
   assert.equal(descriptor.status, 'active');
