@@ -86,6 +86,7 @@ test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy
   assert.match(healthcheck, /tests\/product-entry-runtime-manager-registration\.test\.ts/);
   assert.match(healthcheck, /tests\/product-entry-session-checkpoint\.test\.ts/);
   assert.match(healthcheck, /tests\/product-entry-cases\/manifest-and-start-surfaces\.test\.ts/);
+  assert.match(healthcheck, /tests\/product-entry-cases\/runtime-and-sidecar-surfaces\.test\.ts/);
   assert.doesNotMatch(healthcheck, /test:fast|scripts\/verify\.sh fast|run-test-group\.ts fast/);
 });
 
