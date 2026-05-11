@@ -56,7 +56,7 @@
 - `smoke` 是最小开发入口：`npm run test:smoke` 只覆盖少量核心入口与结构守门；`fast` 是核心回归快线，不再等同于 smoke；`ci` / `npm run test:ci` 等价于 hosted quality lane
 - hosted quality lane：`npm run typecheck -> run-test-group fast -> run-test-group family -> run-test-group meta:ci`，其中 `meta:ci` 只跑 fast 未覆盖的 meta remainder，避免默认 CI 重复执行同一批根级测试文件；Playwright Chromium / renderer proof 环境只留在显式 `native-ppt-proof` 与 `image-ppt-proof` jobs，默认 quality lane 不再安装浏览器
 - family shared pin 审计统一经由 `scripts/run-test-group-lib.ts`，必须在 clean-clone 环境下可运行
-- 当前 OPL family shared release pin 已对齐到 `2b08c7efd8acd80355e870087d4ce5be7b45d4d1`；`packages/redcube-gateway/package.json` 与 `package-lock.json` 共同持有这条 JS shared package pin。
+- 当前 OPL family shared release pin 已对齐到 `e3fd0b6be41e858958d42ea400a3e63c4205ff8a`；`packages/redcube-gateway/package.json` 与 `package-lock.json` 共同持有这条 JS shared package pin。
 - TypeScript package surface、overlay surface 与 high-churn package 守门已合并到 `tests/typescript-package-surfaces.test.ts`；meta lane 保留 package boundary、compiled dist export、service boundary 与 CI quality lane 四类硬门禁，不再用多份 root 测试重复锁同一批包入口。
 - 本地 `npm run test:integration` / `npm run test:e2e` / `npm run test:full` / `npm run test:full:remaining` 继续保留 Codex / Python preflight，但只把明确的 route-heavy 文件串行化；其余文件回到 Node test runner 默认并发；本地已跑 fast 后可用 `npm run test:integration:remaining` 跳过 fast 已覆盖的 integration 文件；本地已跑 fast + family + meta:ci + integration:remaining 后可用 `npm run test:full:remaining` 跳过已覆盖的 meta/integration 文件，只跑动态推导出的 full 余量
 - `historical` 只承载一个紧凑的 runtime-program provenance guard，旧 phase/freeze/closeout/longrun 叙述锁定测试已归并；默认 `full` 不再隐式包含 historical，需要历史回归时显式运行 `npm run test:historical` 或 `./scripts/verify.sh full-with-historical`
