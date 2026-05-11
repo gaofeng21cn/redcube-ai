@@ -1,9 +1,13 @@
 # RedCube AI 当前状态
 
+更新时间：`2026-05-11`
+
 ## 默认入口口径
 
 - 对外定位：`RedCube AI` 是独立 visual-deliverable domain agent，第一公开主语是单一 `redcube-ai` app skill 与 direct 调用入口；`OPL` 通过 internal bridge / integration surface 进入
 - OPL 关系：RCA 可以作为 OPL Codex-first、stage-led family agent framework 上的 admitted domain agent 被托管、唤醒和投影，但不是 OPL 内部模块。OPL 只负责 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry/dead-letter 和 operator projection；RCA 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。
+- OPL framework 总入口：涉及 stage-led framework、Temporal provider、执行语言、OPL-hosted path、旧 Hermes/Gateway/local-runtime surface 退役的跨仓问题，先读 `/Users/gaofeng/workspace/one-person-lab/docs/references/runtime-substrate/opl-stage-led-agent-framework-roadmap.zh-CN.md`；RCA 本仓只维护 visual-domain truth、descriptor/projection、service-safe domain entry 和 direct skill 等价。
+- Standard domain-agent skeleton 目标：RCA 后续应按 OPL 统一 `agent/`、`contracts/`、`runtime/`、`docs/` repo-source 边界映射现有 visual stages、prompt/skill、source/knowledge context、review/export gate、sidecar、receipt schema、projection builder 和 canonical artifact locator contract。当前先以 manifest/adapter 对齐，不要求立即物理移动目录；真实 PPT/图片/PDF、receipt 实例、中间产物和导出包属于 workspace / runtime artifact root，不属于开发仓源码目录。OPL 可上收 lifecycle/artifact/retention/restore 等 framework primitive，但不得持有 RCA visual truth、review/export verdict 或 canonical artifact content。
 - formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
 - repo-verified direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - internal OPL bridge route：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
@@ -13,6 +17,8 @@
 - OPL Runtime Manager：目标形态中的 OPL 侧薄运行管理/投影层，负责 federated route 的 family runtime provider profile/provisioning、registration/status 索引、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是目标生产 provider，Hermes 是迁移期 legacy/optional provider 或 executor/proof lane。它不持有 RedCube visual truth、canonical artifacts、review/publication projection 或 concrete executor
 - 语言目标：RCA 长线实现收敛到 `TypeScript + Python`；TypeScript 继续承担 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries，Python 承担 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态
 - Agent-facing 语言面：新实现默认走 TypeScript orchestration 或 Python native helper；仓内已跟踪 JavaScript 已退役，新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断
+- Stage-led OPL 对齐当前状态：RCA 已通过 `family_action_catalog`、`stage_control_projection`、`route_equivalence`、`product sidecar export/dispatch`、`opl_runtime_manager_registration` 和 product-entry manifest 暴露 OPL 可发现/可排队/可投影 surface。OPL 只能消费这些 RCA-owned descriptor / projection，不能替代 RCA 做 visual direction、artifact creation、review/revision、publication projection truth、export gate 或 canonical artifact authority。当前还不能把 RCA stage attempt 写成已完成 Temporal-backed production execution；Temporal provider、human-gate signal/query、App stage-attempt visibility 和真实 long-run soak 仍在 OPL 侧后续 lane。
+- 旧面退役校准：默认公开能力已收口到单一 `redcube-ai` app skill、CLI/MCP、`invokeDomainEntry` / `invokeProductEntry`、service-safe domain entry 和 product-entry/session surfaces；旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` compatibility command key、internal OPL bridge compatibility wording 只保留为 migration provenance、internal integration contract 或 compatibility key。它们当前不拥有默认 public entry、runtime owner、visual truth 或 artifact authority，但尚未全部物理删除；后续清理应以 direct route、product sidecar、stage descriptor 和 service-safe domain entry parity 已验证为前提。
 
 ## 当前执行口径
 

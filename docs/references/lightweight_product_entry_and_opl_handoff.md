@@ -22,9 +22,9 @@
 
 在 `OPL` 家族级入口下，也必须兼容同一条下游形态，但这条路径在这里仅作为 internal bridge / reference surface：
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
-这也是当前“最终目标形态”冻结件要表达的主线，详见 `docs/program/upstream_hermes_agent_final_target_shape.md`。
+这也是当前“最终目标形态”冻结件要表达的主线；较早的 Hermes-first program 文档只保留 provenance，当前按 provider-backed / Temporal-target 口径读取。
 
 这意味着：
 

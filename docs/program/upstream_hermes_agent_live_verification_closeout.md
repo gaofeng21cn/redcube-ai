@@ -52,7 +52,7 @@
 但当前不能过度宣称：
 
 - mature `RedCube Product Entry` 已落地
-- `OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube` 是成熟 end-user 托管前台路线
+- `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube` 已进入同一 downstream bridge，但仍不是成熟 end-user 托管前台路线；Hermes-first live verification 是历史 proof，不是当前生产 substrate 结论
 
 ## 当前真实 gap
 

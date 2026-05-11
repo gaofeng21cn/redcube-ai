@@ -6,7 +6,7 @@ This directory is the technical reading layer for `RedCube AI`.
 The current public reading path is anchored on the direct route, with the OPL Runtime Manager bridge kept as an internal integration/reference surface:
 
 - direct route: `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- internal OPL bridge: `User -> OPL Product Entry -> OPL Runtime Manager -> external Hermes-Agent runtime substrate -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- internal OPL bridge: `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## Start Here By Audience
 
@@ -20,7 +20,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 
 - `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the direct repo-verified product-entry service surface, and the stable callable surface built from the single `redcube-ai` app skill, `CLI`, `MCP`, local scripts, and repo-tracked contracts.
 - `Codex CLI` remains the default concrete executor selected behind the executor-adapter contract for local operator workflows.
-- `OPL Runtime Manager` is the target thin federated manager over the external `Hermes-Agent` substrate; it may index product-entry registration, session continuity, runtimeWatch, artifacts, and review/publication projection, but it does not own RedCube visual truth.
+- `OPL Runtime Manager` is the target thin federated manager over the configured family runtime provider. Temporal is the production substrate target; Hermes remains a legacy/optional provider or proof lane. OPL may index product-entry registration, session continuity, runtimeWatch, artifacts, and review/publication projection, but it does not own RedCube visual truth.
 - Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.
 - `OPL` joins through the internal bridge surface when family-level routing is needed.
 - The implementation target is `TypeScript + Python`: TypeScript owns product/runtime contracts and service boundaries, while Python owns native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
