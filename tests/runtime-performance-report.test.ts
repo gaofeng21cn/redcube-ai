@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
-import { buildPerformanceReport as buildGatewayPerformanceReport } from './gateway-test-api.ts';
+import { buildPerformanceReport as buildGatewayPerformanceReport } from './product-domain-action-test-api.ts';
 import { buildPerformanceReport } from './package-surfaces.ts';
 import { executeCli } from '../apps/redcube-cli/dist/cli.js';
 

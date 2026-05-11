@@ -15,7 +15,7 @@ import {
   test,
   withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
 
 test('invokeProductEntry converts review-first deck intent into a stop-after-outline lifecycle gate', SERIAL_ENV_TEST, async () => {

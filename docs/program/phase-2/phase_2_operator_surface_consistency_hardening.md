@@ -60,10 +60,10 @@
 
 ## 预期验证面
 
-- `tests/gateway-actions.test.ts`
+- `tests/product-domain-actions.test.ts`
 - `tests/workspace-operator-quickstart.test.ts`
 - `tests/cli-v2-smoke.test.ts`
-- `tests/mcp-gateway.test.ts`
+- `tests/product-domain-action-api.test.ts`
 - `tests/deliverable-review-loop.test.ts`
 - `tests/phase-2-behavior-convergence.test.ts`
 

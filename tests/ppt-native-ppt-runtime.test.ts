@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   createDeliverable,
   runDeliverableRoute,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { withEnv, withMockCodexRuntime } from './mock-codex-cli.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
 

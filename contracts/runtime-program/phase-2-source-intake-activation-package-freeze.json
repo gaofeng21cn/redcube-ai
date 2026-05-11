@@ -219,7 +219,7 @@
       "tests/source-intake.test.ts",
       "tests/ppt-deliverable-e2e.test.ts",
       "tests/xiaohongshu-deliverable-e2e.test.ts",
-      "tests/mcp-gateway.test.ts"
+      "tests/product-domain-action-api.test.ts"
     ],
     "required_commands": [
       "git diff --check",

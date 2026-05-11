@@ -57,7 +57,7 @@
 - `tests/runtime-deliverable-route.test.ts`
 - `tests/deliverable-review-loop.test.ts`
 - `tests/cli-v2-smoke.test.ts`
-- `tests/mcp-gateway.test.ts`
+- `tests/product-domain-action-api.test.ts`
 - `tests/phase-2-behavior-convergence.test.ts`
 - `tests/source-readiness-deep-research-gate.test.ts`
 - `tests/direct-delivery-operator-handoff.test.ts`

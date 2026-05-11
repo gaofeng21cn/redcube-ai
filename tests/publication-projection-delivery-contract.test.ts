@@ -9,7 +9,7 @@ import {
   createDeliverable,
   getPublicationProjection,
   runDeliverableRoute,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes) {

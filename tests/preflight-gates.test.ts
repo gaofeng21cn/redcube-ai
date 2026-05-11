@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { createDeliverable, runDeliverableRoute } from './gateway-test-api.ts';
+import { createDeliverable, runDeliverableRoute } from './product-domain-action-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { startMockCodexCli, withEnv } from './mock-codex-cli.ts';
 

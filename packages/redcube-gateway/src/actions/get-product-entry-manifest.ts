@@ -44,7 +44,7 @@ import {
   buildRedCubeActionMetadata,
 } from './family-action-catalog.js';
 import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plane.js';
-import { buildFamilyDomainMemoryDescriptor, buildStandardDomainAgentSkeleton } from './domain-agent-skeleton-adapter.js';
+import { buildFamilyDomainMemoryDescriptor, buildStandardDomainAgentSkeleton } from './standard-domain-agent-skeleton.js';
 import {
   OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
   buildRouteEquivalenceContract,

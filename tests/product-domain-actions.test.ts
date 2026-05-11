@@ -9,10 +9,10 @@ import {
   doctorWorkspace,
   getOverlayCatalog,
   listTopics,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 
 test('doctorWorkspace reports canonical directories and workspace file presence', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-'));
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-domain-action-'));
   writeFileSync(path.join(workspaceRoot, 'redcube.workspace.json'), JSON.stringify({ overlay: 'xiaohongshu' }), 'utf-8');
 
   const result = await doctorWorkspace({ workspaceRoot });
@@ -27,7 +27,7 @@ test('doctorWorkspace reports canonical directories and workspace file presence'
 });
 
 test('doctorWorkspace sends brand-new workspace bootstrap through source intake instead of a missing init command', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-bootstrap-'));
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-domain-action-bootstrap-'));
 
   const result = await doctorWorkspace({ workspaceRoot });
 
@@ -42,7 +42,7 @@ test('doctorWorkspace sends brand-new workspace bootstrap through source intake 
 });
 
 test('listTopics returns topic metadata from canonical workspace tree', async () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-gateway-'));
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-domain-action-'));
   const topicDir = path.join(workspaceRoot, 'topics', 'topic-a');
   mkdirSync(topicDir, { recursive: true });
   writeFileSync(path.join(topicDir, 'topic.json'), JSON.stringify({

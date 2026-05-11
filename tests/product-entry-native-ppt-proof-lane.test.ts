@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync } from 'node:fs';
 
-import { getProductEntryManifest } from './gateway-test-api.ts';
+import { getProductEntryManifest } from './product-domain-action-test-api.ts';
 
 const HELPER_CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
 

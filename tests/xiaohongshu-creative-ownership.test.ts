@@ -8,7 +8,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, wri
 import {
   createDeliverable,
   runDeliverableRoute,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,

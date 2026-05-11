@@ -15,7 +15,7 @@ import {
   test,
   writeFileSync,
   writeSourceAugmentationResult,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
 test('executeSourceAugmentation blocks explicitly when augmentation executor is unavailable', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-augment-'));

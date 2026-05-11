@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   getProductEntrySession,
   invokeProductEntry,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,

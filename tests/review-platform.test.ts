@@ -12,7 +12,7 @@ import {
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 const TOPIC_ID = 'topic-a';

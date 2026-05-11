@@ -7,7 +7,7 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   createDeliverable,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import {
   persistReviewStatePatch,
 } from './package-surfaces.ts';

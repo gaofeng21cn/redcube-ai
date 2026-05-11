@@ -8,7 +8,7 @@ import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import {
   createDeliverable,
   runDeliverableRoute,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { resolveExecutorAdapter } from './package-surfaces.ts';
 import {
   AUDIT_FILE,

@@ -16,7 +16,7 @@ import {
   test,
   writeFileSync,
   writeSourceAugmentationResult,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
 test('intakeSource creates canonical source truth from brief and keywords', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   getReviewState,
   runSourceFirstFanout,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,

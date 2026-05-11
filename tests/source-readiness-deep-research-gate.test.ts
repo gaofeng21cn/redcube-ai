@@ -12,7 +12,7 @@ import {
   getReviewState,
   intakeSource,
   runtimeWatch,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 
 test('auditDeliverable blocks when source_audit passes but planning_ready is still false', async () => {

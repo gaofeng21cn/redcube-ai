@@ -12,7 +12,7 @@ import {
   getRun,
   runtimeWatch,
   runDeliverableRoute,
-} from '../gateway-test-api.ts';
+} from '../product-domain-action-test-api.ts';
 import { appendEvent, startRun } from '../package-surfaces.ts';
 import {
   startMockCodexCli,

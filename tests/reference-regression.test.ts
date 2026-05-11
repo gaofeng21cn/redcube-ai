@@ -10,7 +10,7 @@ import {
   createDeliverable,
   intakeSource,
   runDeliverableRoute,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import {
   loadReferenceSampleFixture,
   createOverlayRegistry,

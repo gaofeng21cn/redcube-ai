@@ -16,7 +16,7 @@ import {
   test,
   withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
 
 test('product sidecar export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {

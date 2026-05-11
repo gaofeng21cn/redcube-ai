@@ -11,7 +11,7 @@ import {
   intakeSource,
   reviewRenderOutput,
   runDeliverableRoute,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 function readJson(file) {

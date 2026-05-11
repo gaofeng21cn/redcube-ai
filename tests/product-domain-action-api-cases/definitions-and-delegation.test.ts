@@ -18,13 +18,13 @@ import {
   withAction,
   withMockCodexRuntime,
   withOperation,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 import {
   buildRedCubeActionMetadata,
   getRedCubeFamilyActionCatalog,
 } from '../../packages/redcube-gateway/dist/index.js';
 
-test('listGatewayTools exposes deliverable-centric gateway actions in stable order', () => {
+test('listGatewayTools exposes deliverable-centric product/domain action API tools in stable order', () => {
   const tools = listGatewayTools();
 
   assert.deepEqual(
@@ -102,7 +102,7 @@ test('MCP catalog definitions are projected from the RedCube family action catal
   );
 });
 
-test('callGatewayTool delegates to injected gateway action', async () => {
+test('callGatewayTool delegates to injected product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_deliverable',
     withAction('create_deliverable', {
@@ -132,7 +132,7 @@ test('callGatewayTool delegates to injected gateway action', async () => {
   assert.equal(result.deliverable.deliverable_id, 'deck-a');
 });
 
-test('callGatewayTool delegates source intake gateway action', async () => {
+test('callGatewayTool delegates source intake product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_sources',
     withOperation('intake_source', {
@@ -159,7 +159,7 @@ test('callGatewayTool delegates source intake gateway action', async () => {
   assert.equal(result.audit.status, 'pass');
 });
 
-test('callGatewayTool delegates source research gateway action', async () => {
+test('callGatewayTool delegates source research product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_sources',
     withOperation('source_research', {
@@ -190,7 +190,7 @@ test('callGatewayTool delegates source research gateway action', async () => {
   assert.equal(result.planningReady, true);
 });
 
-test('callGatewayTool delegates source augmentation gateway action', async () => {
+test('callGatewayTool delegates source augmentation product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_sources',
     withOperation('prepare_source_augmentation', {
@@ -215,7 +215,7 @@ test('callGatewayTool delegates source augmentation gateway action', async () =>
   assert.equal(result.augmentation.readiness_target, 'planning_ready');
 });
 
-test('callGatewayTool delegates source augmentation result preparation gateway action', async () => {
+test('callGatewayTool delegates source augmentation result preparation product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_sources',
     withOperation('prepare_source_augmentation_result', {
@@ -241,7 +241,7 @@ test('callGatewayTool delegates source augmentation result preparation gateway a
   assert.equal(result.resultDraft.topic_id, 'topic-a');
 });
 
-test('callGatewayTool delegates source augmentation result write gateway action', async () => {
+test('callGatewayTool delegates source augmentation result write product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_sources',
     withOperation('write_source_augmentation_result', {
@@ -269,7 +269,7 @@ test('callGatewayTool delegates source augmentation result write gateway action'
   assert.equal(result.resultContract.status, 'completed');
 });
 
-test('callGatewayTool delegates source augmentation execution gateway action', async () => {
+test('callGatewayTool delegates source augmentation execution product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_sources',
     withOperation('execute_source_augmentation', {
@@ -294,7 +294,7 @@ test('callGatewayTool delegates source augmentation execution gateway action', a
   assert.equal(result.report.readiness_target, 'planning_ready');
 });
 
-test('callGatewayTool delegates overlay catalog gateway action', async () => {
+test('callGatewayTool delegates overlay catalog product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_workspace',
     withAction('get_overlay_catalog'),

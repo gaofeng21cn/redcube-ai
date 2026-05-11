@@ -71,7 +71,7 @@
       "tests/runtime-deliverable-route.test.ts",
       "tests/deliverable-review-loop.test.ts",
       "tests/cli-v2-smoke.test.ts",
-      "tests/mcp-gateway.test.ts",
+      "tests/product-domain-action-api.test.ts",
       "tests/phase-2-behavior-convergence.test.ts",
       "tests/source-readiness-deep-research-gate.test.ts",
       "tests/direct-delivery-operator-handoff.test.ts"
@@ -79,7 +79,7 @@
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.ts tests/phase-2-runtime-watch-locator-integrity-hardening.test.ts tests/runtime-protocol-workspace.test.ts tests/runtime-deliverable-route.test.ts tests/deliverable-review-loop.test.ts tests/cli-v2-smoke.test.ts tests/mcp-gateway.test.ts tests/phase-2-behavior-convergence.test.ts tests/source-readiness-deep-research-gate.test.ts tests/direct-delivery-operator-handoff.test.ts",
+      "node --test tests/runtime-alignment-p0.test.ts tests/phase-2-runtime-watch-locator-integrity-hardening.test.ts tests/runtime-protocol-workspace.test.ts tests/runtime-deliverable-route.test.ts tests/deliverable-review-loop.test.ts tests/cli-v2-smoke.test.ts tests/product-domain-action-api.test.ts tests/phase-2-behavior-convergence.test.ts tests/source-readiness-deep-research-gate.test.ts tests/direct-delivery-operator-handoff.test.ts",
       "npm run test:full"
     ]
   },

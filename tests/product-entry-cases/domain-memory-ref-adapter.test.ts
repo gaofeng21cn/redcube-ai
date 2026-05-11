@@ -5,7 +5,7 @@ import {
   prepareProductEntryWorkspace,
   test,
   withMockCodexRuntimeState,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
 const DOMAIN_MEMORY_ADOPTION_STATE = 'descriptor_proof_contract_landed_runtime_writeback_pending';
 

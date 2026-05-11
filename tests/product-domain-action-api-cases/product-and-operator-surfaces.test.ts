@@ -15,9 +15,9 @@ import {
   withAction,
   withMockCodexRuntime,
   withOperation,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
-test('callGatewayTool delegates product-entry gateway actions', async () => {
+test('callGatewayTool delegates product-entry product/domain actions', async () => {
   const direct = await callGatewayTool(
     'redcube_product_entry',
     withAction('invoke_product_entry', {
@@ -56,41 +56,52 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   );
   const oplHosted = await callGatewayTool(
     'redcube_product_entry',
-    withAction('product_sidecar_dispatch', {
-      target_domain_id: 'redcube_ai',
-      task_intent: 'run_managed_deliverable',
-      entry_mode: 'opl_hosted',
-      workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
-      runtime_session_contract: { runtime_owner: 'configured_family_runtime_provider' },
-      return_surface_contract: { surface_kind: 'product_entry' },
-      entry_session_contract: { entry_session_id: 'session-a' },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-a',
+    withAction('dispatch_product_sidecar', {
+      task: {
+        action: 'product_entry_continuation',
+        workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
+        entry_session_id: 'session-a',
+        task_intent: 'run_managed_deliverable',
+        entry_mode: 'opl_hosted',
+        delivery_request: {
+          deliverable_family: 'ppt_deck',
+          topic_id: 'topic-a',
+          deliverable_id: 'deck-a',
+        },
       },
     }),
     {
-      invokeOplHostedProductEntry: async (request) => ({
+      dispatchProductSidecar: async (request) => ({
         ok: true,
-        surface_kind: 'opl_hosted_product_entry',
-        opl_hosted_product_entry_contract_id: 'opl_framework_hosted_product_entry',
-        family_orchestration: {
-          action_graph_ref: {
-            ref_kind: 'json_pointer',
-            ref: '/family_orchestration/action_graph',
-          },
-          action_graph: {
-            graph_id: 'redcube_product_entry_overview_graph',
-          },
-          human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
-          resume_contract: {
-            surface_kind: 'product_entry_session',
-            session_locator_field: 'entry_session.entry_session_id',
-          },
+        surface_kind: 'product_sidecar_dispatch',
+        action: request.task.action,
+        sidecar_policy: {
+          writes_visual_truth: false,
         },
-        summary: {
-          entry_session_id: request.entry_session_contract.entry_session_id,
+        result_surface: {
+          ok: true,
+          surface_kind: 'product_entry',
+          product_entry_contract_id: 'redcube_product_entry',
+          entry_session: {
+            entry_session_id: request.task.entry_session_id,
+          },
+          domain_entry_surface: {
+            entry_mode: request.task.entry_mode,
+          },
+          family_orchestration: {
+            action_graph_ref: {
+              ref_kind: 'json_pointer',
+              ref: '/family_orchestration/action_graph',
+            },
+            action_graph: {
+              graph_id: 'redcube_product_entry_overview_graph',
+            },
+            human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
+            resume_contract: {
+              surface_kind: 'product_entry_session',
+              session_locator_field: 'entry_session.entry_session_id',
+            },
+          },
         },
       }),
     },
@@ -175,9 +186,13 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
   assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
   assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-  assert.equal(oplHosted.surface_kind, 'opl_hosted_product_entry');
-  assert.equal(oplHosted.summary.entry_session_id, 'session-a');
-  assert.equal(oplHosted.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
+  assert.equal(oplHosted.surface_kind, 'product_sidecar_dispatch');
+  assert.equal(oplHosted.action, 'product_entry_continuation');
+  assert.equal(oplHosted.sidecar_policy.writes_visual_truth, false);
+  assert.equal(oplHosted.result_surface.surface_kind, 'product_entry');
+  assert.equal(oplHosted.result_surface.entry_session.entry_session_id, 'session-a');
+  assert.equal(oplHosted.result_surface.domain_entry_surface.entry_mode, 'opl_hosted');
+  assert.equal(oplHosted.result_surface.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
@@ -227,7 +242,7 @@ test('callGatewayTool can return normalized discovery surfaces for doctor and to
   assert.equal(topics.summary.total_topics, 0);
 });
 
-test('callGatewayTool delegates publication projection gateway action', async () => {
+test('callGatewayTool delegates publication projection product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_review',
     withAction('get_publication_projection', {
@@ -296,7 +311,7 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
   assert.equal(routeRun.summary.route, 'storyline');
 });
 
-test('callGatewayTool delegates managed deliverable execution and managed run lookup', async () => {
+test('callGatewayTool delegates managed deliverable execution and managed run lookup actions', async () => {
   const managed = await callGatewayTool(
     'redcube_deliverable',
     withAction('run_managed_deliverable', {
@@ -455,7 +470,7 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
 
 
 
-test('callGatewayTool delegates review mutation gateway action', async () => {
+test('callGatewayTool delegates review mutation product/domain action', async () => {
   const result = await callGatewayTool(
     'redcube_review',
     withAction('apply_review_mutation', {
@@ -520,5 +535,5 @@ test('listGatewayTools descriptions mention quality-facing runtime watch and rev
   assert.match(deliverableTool.description, /route/i);
   assert.match(sourcesTool.description, /augmentation/i);
   assert.match(workspaceTool.description, /topic/i);
-  assert.match(productEntryTool.description, /OPL-hosted handoff/i);
+  assert.match(productEntryTool.description, /OPL-hosted.*handoff/i);
 });

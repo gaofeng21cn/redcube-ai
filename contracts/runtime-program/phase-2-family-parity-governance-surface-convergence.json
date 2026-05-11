@@ -68,7 +68,7 @@
       "tests/deliverable-review-loop.test.ts",
       "tests/runtime-deliverable-route.test.ts",
       "tests/phase-2-behavior-convergence.test.ts",
-      "tests/mcp-gateway.test.ts",
+      "tests/product-domain-action-api.test.ts",
       "tests/cli-v2-smoke.test.ts",
       "tests/ppt-deliverable-e2e.test.ts",
       "tests/xiaohongshu-deliverable-e2e.test.ts"
@@ -76,7 +76,7 @@
     "required_commands": [
       "git diff --check",
       "npm run typecheck",
-      "node --test tests/runtime-alignment-p0.test.ts tests/phase-2-family-parity-governance-surface-convergence.test.ts tests/deliverable-review-loop.test.ts tests/runtime-deliverable-route.test.ts tests/phase-2-behavior-convergence.test.ts tests/mcp-gateway.test.ts tests/cli-v2-smoke.test.ts tests/ppt-deliverable-e2e.test.ts tests/xiaohongshu-deliverable-e2e.test.ts",
+      "node --test tests/runtime-alignment-p0.test.ts tests/phase-2-family-parity-governance-surface-convergence.test.ts tests/deliverable-review-loop.test.ts tests/runtime-deliverable-route.test.ts tests/phase-2-behavior-convergence.test.ts tests/product-domain-action-api.test.ts tests/cli-v2-smoke.test.ts tests/ppt-deliverable-e2e.test.ts tests/xiaohongshu-deliverable-e2e.test.ts",
       "npm run test:full"
     ]
   },

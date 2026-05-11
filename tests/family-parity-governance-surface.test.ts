@@ -12,7 +12,7 @@ import {
   getReviewState,
   runDeliverableRoute,
   runtimeWatch,
-} from './gateway-test-api.ts';
+} from './product-domain-action-test-api.ts';
 import { getDeliverablePaths } from './package-surfaces.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';

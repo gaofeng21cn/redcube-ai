@@ -13,7 +13,7 @@ import {
   test,
   withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
-} from '../gateway-case-shared.ts';
+} from '../product-domain-action-case-shared.ts';
 
 
 test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {

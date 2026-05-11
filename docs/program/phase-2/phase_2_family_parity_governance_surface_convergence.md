@@ -81,7 +81,7 @@ family parity 只收紧 shared governance surface，不会抹平 family ontology
 - `tests/deliverable-review-loop.test.ts`
 - `tests/runtime-deliverable-route.test.ts`
 - `tests/phase-2-behavior-convergence.test.ts`
-- `tests/mcp-gateway.test.ts`
+- `tests/product-domain-action-api.test.ts`
 - `tests/cli-v2-smoke.test.ts`
 - `tests/ppt-deliverable-e2e.test.ts`
 - `tests/xiaohongshu-deliverable-e2e.test.ts`
