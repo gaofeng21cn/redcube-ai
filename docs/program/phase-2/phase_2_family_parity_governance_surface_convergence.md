@@ -1,5 +1,7 @@
 # Phase 2 Family Parity Governance Surface Convergence
 
+生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 family parity 真相以 runtime-program contracts、RCA-owned route/review/export surfaces 和核心五件套为准。
+
 ## 当前状态
 
 这条 same-mainline activation package 已在后续 Hermes 主线迁移前完成实现并吸收到主线 provenance。

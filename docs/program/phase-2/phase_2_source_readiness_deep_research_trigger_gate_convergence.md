@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-09`
 
+生命周期说明：本文是已吸收的 source-plane hardening tranche brief，保留为 contract-linked provenance。当前 Deep Research 只作为 Source Readiness 的补料能力读取；它不等同于完整 MDS Scout + Idea，也不重新定义 RCA 的公开身份。
+
 这份文档记录同一主线上的下一条 source-plane hardening tranche：
 
 - `source readiness deep research trigger + gate convergence`

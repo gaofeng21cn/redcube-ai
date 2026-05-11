@@ -2,6 +2,8 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文是 current baton brief，解释 RCA direct product-entry service surface。它仍被 runtime-program 当前合同引用，因此保留在 `docs/program/`；当前公开身份仍以 visual-deliverable domain agent、单一 `redcube-ai` app skill、CLI/MCP 和 `invokeProductEntry` 为准。
+
 ## 一句话结论
 
 `RedCube AI` 现在补上的，不是聊天 UI，也不是新 runtime。

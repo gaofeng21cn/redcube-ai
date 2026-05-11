@@ -2,7 +2,9 @@
 
 日期：2026-04-08
 
-状态：待用户审阅
+状态：absorbed product-semantics support
+
+生命周期说明：本文冻结的是 `Source Readiness -> Storyline -> Plan -> Visual -> Delivery` 的产品语义与 deep research 边界。当前可执行真相以 `docs/source/source_augmentation_executor_contract.md`、workspace canonical artifacts、runtime-family contracts 与 runtime-program contracts 为准；本文作为 absorbed product-semantics support 读取。
 
 ## 1. 设计结论
 

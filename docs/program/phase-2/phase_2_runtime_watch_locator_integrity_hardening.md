@@ -1,5 +1,7 @@
 # Phase 2 Runtime Watch Locator Integrity Hardening
 
+生命周期说明：本文是已吸收的 Phase 2 runtime-watch hardening brief，保留为 contract-linked provenance。当前 runtimeWatch / locator truth 以 machine-readable contracts、CLI/MCP surface 和 runtime artifacts 为准。
+
 ## 当前状态
 
 本 tranche closeout 已完成并吸收到当前 mainline。当前仓库正式口径是：deliverable-scope run record 必须持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch`、`CLI review watch`、`MCP runtime_watch` 在 quartet locator 与 run identity 不一致时必须 fail-closed。

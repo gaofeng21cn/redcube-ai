@@ -14,7 +14,7 @@ Current groups:
 
 - `hermes/`: repo-local Hermes migration provenance. These files do not prove that upstream `Hermes-Agent` owns the active runtime.
 - `plans/`: historical plans that are retained for traceability but no longer serve the active program baton.
-- `tombstones/`: retired wording and route narratives that should stay searchable without returning to the active public identity.
+- `tombstones/`: retired wording and route narratives that should stay searchable without returning to the active public identity. Current tombstone: `tombstones/retired-route-narratives-2026-05-11.md`.
 - Future tombstone notes should state the retired wording, the current owner surface, and whether any machine-readable `human_doc:*` links still require an in-place program brief.
 
 Active program briefs that are still linked from machine-readable runtime-program contracts remain in `../program/`.

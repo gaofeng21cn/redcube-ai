@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-09`
 
+生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 direct-delivery truth 以 RCA-owned route/review/export surfaces、核心五件套、`docs/delivery/` 与 runtime-program contracts 为准；本文不重新打开 Phase 2 作为新的公开产品方向。
+
 这份文档记录的是同一主线上的下一条 hardening tranche：
 
 - `direct-delivery lifecycle stage convergence`

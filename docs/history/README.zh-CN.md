@@ -14,7 +14,7 @@
 
 - `hermes/`：repo-local Hermes migration provenance。这些文件不证明上游 `Hermes-Agent` 已经持有当前 runtime owner。
 - `plans/`：保留用于追溯、但不再服务当前 active program baton 的历史计划。
-- `tombstones/`：已退役词汇与路线叙事，保留可检索性，但不得回到当前公开身份。
+- `tombstones/`：已退役词汇与路线叙事，保留可检索性，但不得回到当前公开身份。当前 tombstone：`tombstones/retired-route-narratives-2026-05-11.md`。
 - 后续 tombstone 应写清退役词汇、当前 truth owner，以及是否仍有机器可读 `human_doc:*` 链接要求 program brief 原位保留。
 
 仍被 runtime-program 机器合同引用的 active program brief 继续保留在 `../program/`。

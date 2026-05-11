@@ -1,5 +1,7 @@
 # Phase 2 PPT Native Authoring Production-Selectable Lane
 
+生命周期说明：本文是已吸收的 selectable proof lane brief，仍服务当前 `ppt_deck` native editable PPTX 可选路线。当前默认 PPT 视觉路线是 image-first；native PPTX 只在用户显式要求可编辑或 DrawingML 路线时启用。
+
 ## 定位
 
 这条线现在定义 `ppt_deck` 的 native PPTX authoring / repair 作为生产可选路线。当前默认视觉路线已经是 image-first；native PPTX 只在用户明确要求可编辑、原生 PPTX 或 DrawingML 时启用。

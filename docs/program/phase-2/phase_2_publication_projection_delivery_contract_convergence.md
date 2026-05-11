@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-08`
 
+生命周期说明：本文是已吸收的 Phase 2 delivery/projection hardening brief，保留为 contract-linked provenance。当前 publication projection 与 delivery contract truth 以 RCA-owned governance surfaces、`docs/delivery/`、`docs/status.md` 与 runtime-program contracts 为准。
+
 这份文档记录的是同一主线上的下一条 hardening tranche：
 
 - `publication projection / delivery contract convergence`

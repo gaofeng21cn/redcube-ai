@@ -2,6 +2,8 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文是 current baton / absorbed hardening brief，解释 product-entry session continuity 与用户级 runtime-state 行为。它仍被 runtime-program 当前合同引用，因此保留在 `docs/program/`；它不定义新的公开 GUI、WebUI 或第二产品入口。
+
 ## 一句话结论
 
 `product entry` 现在不再是一次性请求壳；它已经具备用户级 runtime-state session continuity。

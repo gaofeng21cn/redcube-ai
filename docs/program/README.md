@@ -2,7 +2,7 @@
 
 `docs/program/` holds the active baton, absorbed tranche briefs, and contract-linked program records.
 
-This directory is not the public identity layer. `RedCube AI` remains a visual-deliverable domain agent first; OPL is a Codex-first, stage-led runtime framework that may host RCA through an internal integration path. Older filenames that mention gateway, federation, bridge, harness, or Hermes-first routes are retained here only when machine-readable contracts still point to their `human_doc:*` semantic IDs.
+`RedCube AI` remains a visual-deliverable domain agent first; OPL is a Codex-first, stage-led runtime framework that may host RCA through an internal integration path. Older filenames that mention gateway, federation, bridge, harness, or Hermes-first routes are retained here when machine-readable contracts still point to their `human_doc:*` semantic IDs.
 
 ## Current Hierarchy
 
@@ -27,6 +27,16 @@ Current entry groups:
 - Product-entry and internal integration: `redcube_product_entry_mvp.md`, `managed_product_entry_hardening.md`, `opl_framework_hosted_product_entry.md`
 - Upstream Hermes-Agent proof and verification provenance: `upstream_hermes_agent_*.md`
 - Absorbed Phase 2 tranche records: `phase-2/`
+
+## Current Disposition
+
+| File or group | Lifecycle state | Current reader stance |
+| --- | --- | --- |
+| `redcube_product_entry_mvp.md` | current baton | Direct RCA product-entry service surface; read with `invokeProductEntry` and current CLI/MCP entry contracts. |
+| `managed_product_entry_hardening.md` | current baton | Product-entry session continuity and user-level runtime-state behavior. |
+| `opl_framework_hosted_product_entry.md` | contract-linked internal integration | OPL-hosted route context; OPL is the Codex-first, stage-led framework and does not own RCA visual truth. |
+| `upstream_hermes_agent_*.md` | proof / provenance, contract-linked | Historical upstream Hermes proof lane and blocker/closeout records; current runtime owner and public identity live in the core docs and current contracts. |
+| `phase-2/` | absorbed tranche, contract-linked | Hardening evidence already absorbed into current runtime/source/delivery/governance surfaces; keep here while `human_doc:*` links remain. |
 
 Historical material moved out of this layer:
 

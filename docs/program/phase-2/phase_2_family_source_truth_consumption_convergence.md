@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-08`
 
+生命周期说明：本文是已吸收的 Phase 2 source-plane hardening brief，保留为 contract-linked provenance。当前 source truth consumption 以 canonical workspace artifacts、`docs/source/`、runtime-family contracts 与 runtime-program contracts 为准。
+
 这份文档记录的是同一主线上的下一条 hardening tranche：
 
 - `family source-truth consumption convergence`

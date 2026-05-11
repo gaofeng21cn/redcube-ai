@@ -4,6 +4,8 @@
 
 日期锚点：`2026-04-08`
 
+生命周期说明：本文是已吸收的 Phase 2 review/export/gate/audit hardening brief，保留为 contract-linked provenance。当前 review verdict、export authority 与 artifact truth 由 RCA-owned review/export surfaces 和 runtime artifacts 持有。
+
 这份文档记录的是已经吸收到同一主线上的一条 hardening tranche：
 
 - `review`

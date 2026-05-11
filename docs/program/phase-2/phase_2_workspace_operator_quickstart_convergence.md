@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-10`
 
+生命周期说明：本文是已吸收的 workspace/operator quickstart hardening brief，保留为 contract-linked provenance。当前 quickstart truth 以 `docs/product/human_quickstart.md`、CLI help、runtime-program contracts 与 workspace artifacts 为准。
+
 这份文档记录同一 `redcube-runtime-program` 主线closeout 已完成并吸收到当前 mainline 的 current tranche：
 
 - `workspace operator quickstart convergence`

@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-07`
 
+生命周期说明：本文是已吸收的 activation freeze provenance，保留为 contract-linked Phase 2 记录。当前 source intake / shared source truth 可执行真相以 `docs/source/`、canonical workspace artifacts 和 runtime-program contracts 为准。
+
 当前这份文档只冻结一件事：
 
 - 未来 `Phase 2 / source intake + shared source truth` **如何被显式激活**

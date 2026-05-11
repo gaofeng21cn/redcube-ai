@@ -1,5 +1,7 @@
 # Phase 2 Family Parity + Autopilot Continuation Board
 
+生命周期说明：本文是 contract-linked continuation board / absorbed tranche context，不是当前新的 public mainline。当前 RCA 第一身份仍是 visual-deliverable domain agent；OPL 只作为 Codex-first、stage-led 托管框架和 family-level runtime/projection 支撑出现。
+
 ## 文档目的
 
 这份 board 不是新的 public mainline，而是把 `runtime watch locator integrity hardening` 之后的 same-mainline 长线继续冻结出来，让当前 Codex operator line 不会在完成当前 tranche 后因为 `next_tranche_candidate = null` 就立刻停车。

@@ -1,5 +1,7 @@
 # Phase 2 Architecture Boundary Governance
 
+生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 owner truth 以核心五件套、`docs/runtime/`、`docs/policies/` 与 machine-readable runtime-program contracts 为准；本文不重新打开 Phase 2 作为新的公开产品方向。
+
 ## 当前状态
 
 本 tranche 是一次 repo 结构治理收口。它不改变 `ppt_deck`、`xiaohongshu`、`poster_onepager` 的生成行为，也不改 formal-entry matrix；它把当前已经写在核心文档里的 owner 边界转成可执行的 meta gate。

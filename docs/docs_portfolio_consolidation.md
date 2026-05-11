@@ -6,6 +6,13 @@
 
 本轮只整理叙述性 `docs/**` 与文档索引，不改源码、测试或 `contracts/runtime-program/*.json`。
 
+本轮审阅按正文内容判断生命周期。已逐篇覆盖：
+
+- `docs/product/`、`docs/runtime/`、`docs/delivery/`、`docs/source/` 的 README 与正文文档。
+- `docs/program/` 根层 brief 与 `docs/program/phase-2/` 全部 tranche brief。
+- `docs/references/` 根层 reference、`docs/references/positioning/` 与 `docs/history/` 索引、Hermes history、plans、tombstones。
+- 根层 `README*`、`docs/README*`、核心五件套和本治理文档。
+
 ## 当前分层
 
 - `docs/README*`：公开 / 默认 docs 入口，指向核心五件套与稳定阅读层；它们是人读面索引，不是机器合同入口。
@@ -44,6 +51,42 @@
 4. 已完成、被替代或只剩 provenance 的计划进入 `docs/history/` 或 tombstone。
 5. `docs/README*` 和各子目录 README 第一屏必须让读者看出当前状态、层级、新旧关系和下一跳。
 
+## 当前 owner map
+
+| 内容层 | 当前 owner | 机器边界 | 文档处理 |
+| --- | --- | --- | --- |
+| 公开身份与读者入口 | `README*`、`docs/README*`、核心五件套 | 无；人读入口 | 只呈现 RCA visual-deliverable domain agent 第一身份，OPL 作为托管路径 |
+| Visual truth / route truth / review verdict / artifact authority | RCA runtime-family、review/export gate、canonical artifact surfaces | contracts、schema、runtime artifacts、CLI/MCP/API surface | 合入 `docs/architecture.md`、`docs/status.md`、`docs/runtime/`、`docs/delivery/` |
+| Product entry / session continuity | RCA product entry 与 `invokeProductEntry` | `contracts/runtime-program/current-program.json`、product-entry contracts | `docs/program/redcube_product_entry_mvp.md` 与 `managed_product_entry_hardening.md` 保留为 current baton |
+| OPL-hosted integration | OPL Runtime Manager / configured family runtime provider；RCA 仍持有下游 visual truth | `human_doc:program_opl_framework_hosted_product_entry`、runtime-program contracts | 保留在 `docs/program/`，标为 internal integration |
+| Upstream Hermes proof lane | 显式 hosted/proof backend 与历史 proof 证据 | `human_doc:program_upstream_hermes_agent_*`、proof contracts | contract-linked 原位保留；按 provenance/proof lane 读取 |
+| Phase 2 hardening tranche | 已吸收到 RCA current mainline 的分项 hardening evidence | `human_doc:program_phase_2_*` 与 phase-2 runtime-program contracts | 原位保留为 absorbed tranche，不作为新公开方向 |
+| Gateway / harness / bridge / federation / Hermes-first 旧叙事 | 无当前公开 owner；只剩内部边界、proof、reference 或 history | 部分仍有 `human_doc:*` link | contract-linked 原位降级；无链接材料进入 `docs/history/` 或 tombstone |
+
+## 关键文档处置表
+
+| 文档 / 分区 | 内容级判断 | 处置 | 保留理由 / 当前 owner |
+| --- | --- | --- | --- |
+| `docs/product/human_quickstart.md` | current product/operator support | 留在 `docs/product/` | 支撑人类与 Agent 使用 RCA 当前 workspace / source readiness / deliverable 流程 |
+| `docs/product/private-profile-setup.md` | current product-local setup support | 留在 `docs/product/` | 支撑 workspace `.redcube/` 与用户级私有层，不定义 runtime truth |
+| `docs/product/public-github-publish.md` | support reference for public repo hygiene | 留在 `docs/product/` | 仍服务公开仓库发布协作；不作为运行主线 |
+| `docs/runtime/runtime_architecture.md` | current runtime owner explanation | 留在 `docs/runtime/` | 解释 direct route、OPL-hosted route、executor/backend split 与 watch/projection 语义 |
+| `docs/delivery/*` | current delivery support / selectable proof lanes | 留在 `docs/delivery/` | 说明 image-first 默认路线、native PPT selectable lane、manual test brief 与示例 |
+| `docs/source/source_augmentation_executor_contract.md` | current source executor contract support | 留在 `docs/source/` | 支撑 `source augment` / `source execute-augmentation` 的 source readiness contract |
+| `docs/source/deep_research_auto_first_product_contract.md` | absorbed product-semantics support | 留在 `docs/source/`，更新状态说明 | 5 步 auto-first 口径已进入 current source/product docs；机器真相仍在 contracts/artifacts |
+| `docs/program/redcube_product_entry_mvp.md` | current baton | 留在 `docs/program/`，补 lifecycle note | `current-program.json` 指向 product-entry brief |
+| `docs/program/managed_product_entry_hardening.md` | current baton / session continuity | 留在 `docs/program/`，补 lifecycle note | `current-program.json` 指向 managed product-entry brief |
+| `docs/program/opl_framework_hosted_product_entry.md` | contract-linked internal integration | 原位保留 | OPL 托管路径仍需读者上下文；RCA 不让出 visual truth |
+| `docs/program/upstream_hermes_agent_*.md` | contract-linked proof / provenance | 原位保留，按 proof/provenance 文档阅读 | current contracts 仍有 `human_doc:*` 指针；当前 owner 是 RCA direct path + OPL provider-backed hosting |
+| `docs/program/phase-2/*.md` | absorbed tranche / contract-linked baton history | 原位保留，统一 lifecycle note | 多个 tranche contract 仍指向这些 human docs；其内容已吸收进 current runtime/delivery/source/governance |
+| `docs/references/positioning/domain-harness-os-positioning.md` | contract-linked positioning reference | 留在 `docs/references/positioning/` | `human_doc:domain_harness_os_positioning` 仍被合同引用；`gateway/harness` 只按内部边界词读 |
+| `docs/references/direct_delivery_longrun_target_state.md` | future-facing target reference | 留在 `docs/references/` | 说明 longrun target，不改写 current truth |
+| `docs/references/source_readiness_deep_research_longrun_target_state.md` | future-facing source target reference | 留在 `docs/references/` | 说明 future target，不宣称已 absorbed |
+| `docs/references/opl_*` 与 `lightweight_product_entry_and_opl_handoff.md` | supporting integration reference | 留在 `docs/references/` | 解释 OPL family contract / handoff，不承担 active baton |
+| `docs/history/hermes/*` | repo-local Hermes migration provenance | 留在 `docs/history/hermes/` | 明确不证明上游 Hermes-Agent 持有当前 runtime |
+| `docs/history/plans/2026-04-08-deep-research-source-readiness-pack-phase-1.md` | historical plan | 留在 `docs/history/plans/` | 已完成归档，作为 provenance 保存 |
+| `docs/history/tombstones/retired-route-narratives-2026-05-11.md` | retired narrative tombstone | 新增 tombstone | 给 gateway-first / bridge-first / Hermes-first 等旧词汇一个可检索但非当前的落点 |
+
 ## 本轮归档原则
 
 - `docs/program/hermes/**` 属于 repo-local Hermes migration provenance，已迁入 `docs/history/hermes/`。
@@ -57,6 +100,8 @@
 - `docs/image-first-ppt-production-route.md`、`docs/native-ppt-proof-environment.md` 与 `docs/stable_deliverable_manual_test_brief.md` 已按 delivery lifecycle 迁入 `docs/delivery/`。
 - `docs/deep_research_auto_first_product_contract.md` 已按 source lifecycle 迁入 `docs/source/`。
 - `docs/domain-harness-os-positioning.md` 已降为 positioning reference，迁入 `docs/references/positioning/`。
+- 本轮没有继续移动 `docs/program/phase-2/**`、`docs/program/upstream_hermes_agent_*.md`、`docs/program/opl_framework_hosted_product_entry.md` 或 `docs/references/positioning/domain-harness-os-positioning.md`，因为它们仍被 runtime-program 合同或 `human_doc:*` 语义 ID 引用；改为原位 lifecycle 降级与 README/index 解释。
+- 本轮新增 tombstone，只承接退役叙事和读法，不替代仍被合同引用的 program/reference 正文。
 
 ## 2026-05-11 RCA / OPL 口径收敛规则
 

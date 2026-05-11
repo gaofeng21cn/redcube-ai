@@ -1,5 +1,7 @@
 # Phase 2 Operator Surface Consistency Hardening
 
+生命周期说明：本文是已吸收的 Phase 2 operator-surface hardening brief，保留为 contract-linked provenance。当前 operator truth 以 CLI/MCP surfaces、runtimeWatch 合同、`docs/status.md` 与 `docs/runtime/` 为准。
+
 ## 当前状态
 
 本 tranche closeout 已完成并吸收到当前 mainline。当前仓库正式口径是：`workspace doctor` 继续保持诊断角色，command-scoped CLI help 必须 machine-readable 且 `--help` 不执行真实命令，`CLI review watch` / `MCP runtime_watch` 围绕同一 `runtimeWatch` governance truth 收口。

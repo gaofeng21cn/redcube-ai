@@ -2,6 +2,8 @@
 
 日期锚点：`2026-04-07`
 
+生命周期说明：本文是已吸收的 source intake baseline provenance，保留为 contract-linked Phase 2 记录。当前 source readiness truth 以 canonical workspace artifacts、`docs/source/` 与 runtime-program contracts 为准。
+
 当前这份文档记录的是已经吸收到主线的最小 baseline：
 
 - `source intake`
