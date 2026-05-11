@@ -36,6 +36,7 @@
 - 每份长期文档都必须能说明 `owner`、`purpose`、`state`、`machine boundary`；缺少任一信号时，先补入口或归位，再继续扩写。
 - 文档治理按内容生命周期判断，文件名和目录名只作为辅助信号；同一文档内的当前事实、active baton、absorbed tranche、support reference、legacy brief 和历史计划应分别归入当前 owner doc、program/reference 层或 history/tombstone 语境。
 - 入口文档应先呈现当前状态、层级、新旧关系和下一跳；旧 gateway / bridge / harness / Hermes-first 材料进入 internal integration、provenance 或 tombstone 语境。
+- `AGENTS.md` 只保留协作方式、硬约束和少量稳定身份边界；项目事实的完整当前态以 `docs/status.md`、`docs/project.md`、`docs/architecture.md`、`docs/invariants.md` 和 `contracts/runtime-program/current-program.json` 为准。
 - `docs/product/`：product entry、quickstart、operator handoff、profile 设置与发布协作。
 - `docs/runtime/`：runtime topology、executor / substrate、service-safe entry、watch / projection 语义说明。
 - `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。

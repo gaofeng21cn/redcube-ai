@@ -1,5 +1,7 @@
 # Hermes Runtime Capability Extraction Map
 
+> 历史说明：这份文档记录 repo-local Hermes migration line 的能力拆解，不代表当前仓库已经把 runtime owner 交给上游 `Hermes-Agent`，也不代表 Hermes 是当前默认 runtime substrate。当前状态以 `docs/status.md`、`docs/architecture.md` 和 `contracts/runtime-program/current-program.json` 为准。
+
 ## 目标
 
 把哪些能力必须迁入 Hermes substrate、哪些仍留在 RedCube domain、哪些仍是 family-specific surface，用能直接指导实现的方式冻结下来。

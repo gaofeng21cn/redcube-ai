@@ -1,5 +1,7 @@
 # Hermes Runtime Substrate Canonical Closure
 
+> 历史说明：这份文档记录 repo-local Hermes-backed closure 的当时事实，不代表当前仓库已经接入上游 `Hermes-Agent`，也不代表 Hermes 是当前默认 runtime substrate。当前状态以 `docs/status.md`、`docs/architecture.md` 和 `contracts/runtime-program/current-program.json` 为准。
+
 ## 当前状态
 
 这一 tranche 已在仓内实现并通过验证。

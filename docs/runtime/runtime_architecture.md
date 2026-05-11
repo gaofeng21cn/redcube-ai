@@ -55,13 +55,13 @@ User / Agent
                           -> RedCube visual-domain truth surfaces
 ```
 
-当前冻结的最终收口链还要再明确一层：
+当前冻结的收口链还要再明确一层：
 
 RedCube service-safe domain entry -> executor adapter -> concrete executor -> visual-domain truth surfaces
 
-也就是说，`OPL Product Entry` 与 `RedCube Product Entry` 现在都已经可以把调用收敛到同一个 service-safe domain entry；当前仍未落地的是成熟的最终用户 GUI / WebUI / managed web shell。
+也就是说，`OPL Product Entry` 与 `RedCube Product Entry` 现在都已经可以把调用收敛到同一个 service-safe domain entry；当前仍未落地的是成熟的最终用户 GUI / WebUI / managed web shell。当前架构读法以 direct route 与 OPL-hosted route 为主，旧 `managed web runtime -> Gateway` 语言只保留为历史迁移参考。
 
-同一 substrate 上的可迁移形态：
+历史迁移参考形态：
 
 ```text
 User / Agent
@@ -71,11 +71,13 @@ User / Agent
               -> Governance / Audit / Artifact persistence
 ```
 
+这段不是当前默认 runtime 架构，也不把 Gateway 重新提升为第一身份；当前 active owner 仍是 `RedCube AI` service-safe domain entry 与 visual-domain truth surfaces。
+
 ## 各层职责
 
-### RedCube Gateway
+### RedCube service-safe entry
 
-CLI 与 MCP 共享的唯一正式控制面，负责：
+CLI 与 MCP 当前收敛到同一套 service-safe domain entry。它负责：
 
 - 承接当前已实现的公开正式入口 `CLI`、`MCP`
 - `CLI` 是默认 formal entry

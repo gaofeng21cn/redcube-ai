@@ -2,6 +2,18 @@
 
 更新时间：`2026-05-11`
 
+## 一眼看当前层次
+
+| 层次 | 当前状态 | 读法 |
+| --- | --- | --- |
+| Public identity | `RedCube AI` independent visual-deliverable domain agent | 对外第一身份是单一 `redcube-ai` app skill / direct 调用入口。 |
+| Direct route | `landed` | `RedCube Product Entry -> service-safe domain entry -> executor adapter -> visual-domain truth surfaces`。 |
+| OPL-hosted route | `contract/projection landed; production provider soak pending` | OPL 可以托管、唤醒和投影 RCA，但不持有 visual truth、artifact authority 或 review/export verdict。 |
+| Default visual routes | `ppt_deck` and `xiaohongshu` image-first landed | HTML/native PPTX 是显式可选路线。 |
+| Domain memory | `repo-source contract landed; real memory writeback pending` | repo 保存 descriptor/locator/fixture，不保存真实 reusable visual lesson 或 receipt instance。 |
+| GUI/WebUI | `not current public surface` | 当前不把 GUI/WebUI 写成成熟产品入口。 |
+| Hermes/Gateway | `history/provenance/legacy optional` | 旧文件名和历史 freeze 不能读成当前 owner。 |
+
 ## 默认入口口径
 
 - 对外定位：`RedCube AI` 是独立 visual-deliverable domain agent，第一公开主语是单一 `redcube-ai` app skill 与 direct 调用入口；`OPL` 只作为托管运行 / 内部集成路径进入。
