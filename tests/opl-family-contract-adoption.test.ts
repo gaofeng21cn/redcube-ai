@@ -194,7 +194,10 @@ test('RCA artifact locator and sidecar receipts expose refs without OPL visual v
     assert.ok(skeleton.product_sidecar_receipt_refs.forbidden_receipt_fields.includes(field));
   }
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
-  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.proof_model, 'descriptor_sidecar_quality_ref_equivalence_only');
+  assert.equal(
+    skeleton.controlled_visual_stage_attempt_fixture.proof_model,
+    'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
+  );
   assert.deepEqual(skeleton.controlled_visual_stage_attempt_fixture.stage_kinds, ['review_and_revision', 'package_and_handoff']);
   assert.deepEqual(skeleton.controlled_visual_stage_attempt_fixture.route_stage_refs, [
     'visual_director_review',
@@ -284,7 +287,7 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
     label: 'RCA visual pattern memory writeback receipt locator',
   });
   assert.equal(descriptor.freshness.source, 'contract_manifest_projection');
-  assert.equal(descriptor.migration_readiness.status, 'migration_plan_ready_descriptor_only');
+  assert.equal(descriptor.migration_readiness.status, 'consumed_memory_writeback_receipt_proof_ready_descriptor_only');
   assert.equal(descriptor.migration_readiness.memory_body_migration, 'domain_owned_runtime_apply_required');
   assert.equal(descriptor.migration_readiness.opl_apply_allowed, false);
   assert.equal(descriptor.status, 'active');
@@ -337,7 +340,7 @@ test('RCA domain memory migration plan is locator-only and acceptance-gated', ()
   const plan = memory.migration_plan;
 
   assert.equal(plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
-  assert.equal(plan.state, 'repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending');
+  assert.equal(plan.state, 'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending');
   assert.deepEqual(plan.source_surfaces, [
     'workspace_runtime_root',
     'product_entry_session',
@@ -511,7 +514,10 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(memory.writeback_proposal_generator_id, 'rca.visual_pattern_memory.writeback_proposal_generator.v1');
   assert.equal(memory.accept_reject_command_id, 'rca.visual_pattern_memory.accept_reject.v1');
   assert.equal(memory.operator_receipt_projection_id, 'rca.visual_pattern_memory.operator_receipt_projection.v1');
-  assert.equal(memory.migration_state, 'repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending');
+  assert.equal(
+    memory.migration_state,
+    'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending',
+  );
   assert.equal(memory.memory_content_owner, 'redcube_ai');
   assert.equal(memory.route_truth_owner, 'redcube_ai');
   assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
@@ -525,7 +531,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(memory.route_truth_changed, false);
   assert.equal(memory.operator_receipt_projection_ready, true);
   assert.equal(memory.opl_can_accept_or_reject_memory_writeback, false);
-  assert.equal(attempt.status, 'repo_tracked_controlled_fixture_and_ref_equivalence_contract');
+  assert.equal(attempt.status, 'repo_tracked_controlled_consumed_memory_writeback_receipt_proof_contract');
   assert.deepEqual(attempt.stage_kinds, ['review_and_revision', 'package_and_handoff']);
   assert.equal(attempt.direct_and_opl_share_descriptor_refs, true);
   assert.equal(attempt.direct_and_opl_share_sidecar_refs, true);
