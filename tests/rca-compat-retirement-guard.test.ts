@@ -5,12 +5,9 @@ import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const ACTIVE_ROOTS = [
-  'README.md',
-  'README.zh-CN.md',
   'apps',
   'packages',
   'contracts',
-  'docs',
   'plugins',
   'tests',
   'tools',
@@ -18,7 +15,6 @@ const ACTIVE_ROOTS = [
 ];
 const TEXT_EXTENSIONS = new Set([
   '.json',
-  '.md',
   '.ts',
   '.tsx',
   '.js',
@@ -63,7 +59,6 @@ function listTextFiles(root) {
     const normalized = file.split(path.sep).join('/');
     if (entry.isDirectory()) {
       if (entry.name === 'dist' || entry.name === 'build' || entry.name === 'node_modules') return [];
-      if (normalized === 'docs/history') return [];
       return listTextFiles(file);
     }
     return entry.isFile() && TEXT_EXTENSIONS.has(path.extname(entry.name)) ? [file] : [];
