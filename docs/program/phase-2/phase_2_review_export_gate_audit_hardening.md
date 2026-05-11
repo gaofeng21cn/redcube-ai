@@ -17,7 +17,7 @@
 
 - `RedCube AI` 的全部长期目标
 - `controller` 已经成为正式入口的证明
-- 把 academic poster / federation / managed web runtime 一并写成已完成
+- 把 academic poster / OPL-hosted runtime integration / managed web runtime 一并写成已完成
 
 ## 当前结论
 
@@ -83,7 +83,7 @@
 - `controller` 扩展
 - 新 family / overlay 扩张
 - poster academic contract 主线
-- OPL federation
+- OPL-hosted runtime integration
 - managed web runtime migration
 
 ## 最小 closeout evidence

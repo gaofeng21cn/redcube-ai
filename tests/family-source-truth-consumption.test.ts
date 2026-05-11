@@ -112,9 +112,9 @@ test('xiaohongshu emits shared source_truth_consumption across source/story/visu
   });
 });
 
-test('ppt_deck and xiaohongshu share a machine-readable source_pack federation for the same topic', async () => {
+test('ppt_deck and xiaohongshu share a machine-readable source_pack fanout for the same topic', async () => {
   await withMockHermesUpstream(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-pack-federation-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-pack-fanout-'));
     const intake = await intakeSource({
       workspaceRoot,
       topicId: 'topic-oplHosted',
@@ -123,13 +123,13 @@ test('ppt_deck and xiaohongshu share a machine-readable source_pack federation f
       keywords: ['甲状腺', 'PPT', '小红书'],
     });
 
-    assert.equal(intake.artifactFiles.sourcePackFederationFile.endsWith('canonical/source-pack-federation.json'), true);
-    const intakeFederation = readJson(intake.artifactFiles.sourcePackFederationFile);
-    assert.equal(intakeFederation.artifact_kind, 'cross_family_source_pack_federation');
-    assert.equal(intakeFederation.topic_id, 'topic-oplHosted');
-    assert.equal(intakeFederation.source_pack.authoritative_source_kind, 'shared_source_truth');
-    assert.equal(intakeFederation.source_pack.readiness.sufficiency_status, intake.augmentation.trigger.source_sufficiency_status);
-    assert.deepEqual(intakeFederation.consumer_families, []);
+    assert.equal(intake.artifactFiles.sourcePackFanoutFile.endsWith('canonical/source-pack-fanout.json'), true);
+    const intakeFanout = readJson(intake.artifactFiles.sourcePackFanoutFile);
+    assert.equal(intakeFanout.artifact_kind, 'cross_family_source_pack_fanout');
+    assert.equal(intakeFanout.topic_id, 'topic-oplHosted');
+    assert.equal(intakeFanout.source_pack.authoritative_source_kind, 'shared_source_truth');
+    assert.equal(intakeFanout.source_pack.readiness.sufficiency_status, intake.augmentation.trigger.source_sufficiency_status);
+    assert.deepEqual(intakeFanout.consumer_families, []);
 
     await createDeliverable({
       workspaceRoot,
@@ -150,20 +150,20 @@ test('ppt_deck and xiaohongshu share a machine-readable source_pack federation f
       goal: '生成可发布小红书图文',
     });
 
-    const federation = readJson(intake.artifactFiles.sourcePackFederationFile);
-    assert.equal(createdNote.sourcePackFederationFile, intake.artifactFiles.sourcePackFederationFile);
-    assert.equal(federation.source_pack.artifact_files.source_readiness_pack, 'canonical/source-readiness-pack.json');
-    assert.equal(federation.source_pack.artifact_files.source_index, 'canonical/source-index.json');
-    assert.equal(federation.source_pack.artifact_files.source_pack_manifest, 'canonical/source-pack-manifest.json');
+    const fanout = readJson(intake.artifactFiles.sourcePackFanoutFile);
+    assert.equal(createdNote.sourcePackFanoutFile, intake.artifactFiles.sourcePackFanoutFile);
+    assert.equal(fanout.source_pack.artifact_files.source_readiness_pack, 'canonical/source-readiness-pack.json');
+    assert.equal(fanout.source_pack.artifact_files.source_index, 'canonical/source-index.json');
+    assert.equal(fanout.source_pack.artifact_files.source_pack_manifest, 'canonical/source-pack-manifest.json');
     assert.deepEqual(
-      federation.consumer_families.map((consumer) => consumer.family_id),
+      fanout.consumer_families.map((consumer) => consumer.family_id),
       ['ppt_deck', 'xiaohongshu'],
     );
     assert.deepEqual(
-      federation.consumer_families.map((consumer) => consumer.deliverables[0].deliverable_id),
+      fanout.consumer_families.map((consumer) => consumer.deliverables[0].deliverable_id),
       ['deck-oplHosted', 'note-oplHosted'],
     );
-    assert.equal(federation.parallel_family_ready, true);
+    assert.equal(fanout.parallel_family_ready, true);
   });
 });
 

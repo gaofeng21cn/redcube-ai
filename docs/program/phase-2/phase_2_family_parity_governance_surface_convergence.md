@@ -73,7 +73,7 @@ family parity 只收紧 shared governance surface，不会抹平 family ontology
 - 不新增 family / overlay
 - 不把 `xiaohongshu` 改写成 direct-delivery
 - 不推进 academic poster
-- 不推进 managed web runtime / OPL federation
+- 不推进 managed web runtime / OPL-hosted runtime integration
 
 ## 预期验证面
 

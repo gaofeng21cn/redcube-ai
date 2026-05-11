@@ -28,7 +28,7 @@
 - 最新已完成 baton：`stable deliverable manual-test-driven hardening`
 - 这份 freeze 已作为 predecessor baton 完成 closeout，并以 `3a7fbd6` 吸收到 `main`
 - 它曾冻结 future activation order；当前最小 Phase 2 baseline 已在其基础上进入主线
-- 当前仍保持：`controller` 不扩大、poster academic contract 不进入当前主线、OPL federation 不进入当前主线
+- 当前仍保持：`controller` 不扩大、poster academic contract 不进入当前主线、OPL-hosted runtime integration 不进入当前主线
 
 ## 目标
 
@@ -74,7 +74,7 @@
 - 扩 `controller`
 - 新增 family / overlay
 - 推进 poster academic contract
-- 推进 OPL federation
+- 推进 OPL-hosted runtime integration
 
 ## Canonical Artifact Schema
 

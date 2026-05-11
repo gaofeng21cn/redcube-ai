@@ -20,7 +20,7 @@
 - `controller` 已成为 repo-verified public formal entry 的声明；
 - `paper_poster / conference_poster` academic poster contract 已开启的声明；
 - `xiaohongshu` 已被改写成 direct-delivery 的声明；
-- `managed web runtime` 或 `OPL federation` 已开始迁移的声明。
+- `managed web runtime` 或 `OPL-hosted runtime integration` 已开始迁移的声明。
 
 ## 当前冻结结论
 
@@ -74,7 +74,7 @@
 - `xiaohongshu` 改写成 direct-delivery
 - `Deep Research` 改写成 `MedDeepScientist Scout + Idea`
 - `managed web runtime migration`
-- `OPL federation` 扩面
+- `OPL-hosted runtime integration` 扩面
 - hidden fallback chains as main behavior
 - prompt patch replacing contract hydration
 

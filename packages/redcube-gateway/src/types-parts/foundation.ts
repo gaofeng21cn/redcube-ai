@@ -549,7 +549,7 @@ export interface RunSourceFirstFanoutRequest extends TopicRequest {
 
 export interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fanout'> {
   source_barrier: SourceResearchResponse;
-  source_pack_federation?: Record<string, unknown>;
+  source_pack_fanout?: Record<string, unknown>;
   source_pack_manifest?: Record<string, unknown>;
   planner?: Record<string, unknown>;
   created_deliverables?: DeliverableCreateResponse[];

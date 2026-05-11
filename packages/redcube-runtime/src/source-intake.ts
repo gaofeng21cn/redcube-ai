@@ -91,7 +91,7 @@ export async function intakeSource({
   writeJson(sourcePaths.sourceAuditFile, artifacts.sourceAudit);
   writeJson(sourcePaths.sourceReadinessPackFile, artifacts.sourceReadinessPack);
   writeJson(sourcePaths.sourcePackManifestFile, artifacts.sourcePackManifest);
-  writeJson(sourcePaths.sourcePackFederationFile, artifacts.sourcePackFederation);
+  writeJson(sourcePaths.sourcePackFanoutFile, artifacts.sourcePackFanout);
   writeJson(sourcePaths.sourceAugmentationRequestFile, artifacts.sourceAugmentationRequest);
 
   return buildSourceIntakeResponse({

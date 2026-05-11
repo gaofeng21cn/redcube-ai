@@ -38,7 +38,7 @@
       "hidden fallback chains as main behavior",
       "prompt patch replacing contract hydration",
       "rewriting Deep Research as MedDeepScientist Scout plus Idea",
-      "OPL federation integration"
+      "OPL-hosted runtime integration"
     ]
   },
   "workspace_bootstrap_surface": {

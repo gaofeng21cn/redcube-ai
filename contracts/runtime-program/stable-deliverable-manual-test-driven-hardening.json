@@ -164,14 +164,14 @@
       "repro_steps",
       "next_action"
     ],
-    "policy": "Any manual-test failure or unstable pass enters the next hardening backlog. Do not reroute findings into Phase 2, controller expansion, new family work, poster academic work, or OPL federation."
+    "policy": "Any manual-test failure or unstable pass enters the next hardening backlog. Do not reroute findings into Phase 2, controller expansion, new family work, poster academic work, or OPL-hosted runtime integration."
   },
   "non_goals": [
     "Phase 2 / source intake + shared source truth",
     "controller expansion",
     "new family or overlay expansion",
     "poster academic contract advancement",
-    "OPL federation integration"
+    "OPL-hosted runtime integration"
   ],
   "execution_summary": {
     "executed_at": "2026-04-07",

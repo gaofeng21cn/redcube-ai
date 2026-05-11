@@ -86,13 +86,13 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
     assert.equal(result.summary.managed_run_count, 2);
     assert.equal(result.summary.parallel_family_ready, true);
 
-    assert.equal(result.source_pack_federation.artifact_kind, 'cross_family_source_pack_federation');
+    assert.equal(result.source_pack_fanout.artifact_kind, 'cross_family_source_pack_fanout');
     assert.deepEqual(
-      result.source_pack_federation.consumer_families.map((consumer) => consumer.family_id),
+      result.source_pack_fanout.consumer_families.map((consumer) => consumer.family_id),
       ['ppt_deck', 'xiaohongshu'],
     );
     assert.deepEqual(
-      result.source_pack_federation.consumer_families.map((consumer) => consumer.deliverables[0].deliverable_id),
+      result.source_pack_fanout.consumer_families.map((consumer) => consumer.deliverables[0].deliverable_id),
       ['deck-fanout', 'note-fanout'],
     );
 

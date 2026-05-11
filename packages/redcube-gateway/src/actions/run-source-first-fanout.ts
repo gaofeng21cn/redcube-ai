@@ -59,8 +59,8 @@ function assertUniqueDeliverables(deliverables) {
   }
 }
 
-function sourcePackBarrierId({ topicId, federation }) {
-  return `${topicId}/source-pack/${safeText(federation?.source_pack?.readiness?.sufficiency_status, 'unknown')}`;
+function sourcePackBarrierId({ topicId, fanout }) {
+  return `${topicId}/source-pack/${safeText(fanout?.source_pack?.readiness?.sufficiency_status, 'unknown')}`;
 }
 
 function planDeliverablesFromCreated(createdDeliverables) {
@@ -72,8 +72,8 @@ function planDeliverablesFromCreated(createdDeliverables) {
   }));
 }
 
-function buildFanoutPlanner({ topicId, sourcePackFederation, createdDeliverables }) {
-  const sourcePackId = sourcePackBarrierId({ topicId, federation: sourcePackFederation });
+function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables }) {
+  const sourcePackId = sourcePackBarrierId({ topicId, fanout: sourcePackFanout });
   const managedDag = planManagedDeliverableDag({
     sourcePackId,
     deliverables: planDeliverablesFromCreated(createdDeliverables),
@@ -85,8 +85,8 @@ function buildFanoutPlanner({ topicId, sourcePackFederation, createdDeliverables
     barrier: {
       task_kind: 'shared_source_pack_barrier',
       source_pack_id: sourcePackId,
-      authoritative_surface: sourcePackFederation?.authoritative_surface || 'shared_source_truth',
-      readiness: sourcePackFederation?.source_pack?.readiness || null,
+      authoritative_surface: sourcePackFanout?.authoritative_surface || 'shared_source_truth',
+      readiness: sourcePackFanout?.source_pack?.readiness || null,
       planned_reuse: true,
       actual_reuse: null,
       reuse_truth_source: 'source_pack_manifest.reuse',
@@ -173,11 +173,11 @@ export async function runSourceFirstFanout({
   }
 
   const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
-  const sourcePackFederation = readJson(sourcePaths.sourcePackFederationFile);
+  const sourcePackFanout = readJson(sourcePaths.sourcePackFanoutFile);
   const sourcePackManifest = readJson(sourcePaths.sourcePackManifestFile);
   const planner = buildFanoutPlanner({
     topicId,
-    sourcePackFederation,
+    sourcePackFanout,
     createdDeliverables,
   });
   planner.barrier.actual_reuse = sourcePackManifest?.reuse || null;
@@ -197,7 +197,7 @@ export async function runSourceFirstFanout({
       ? 'review_family_outputs'
       : 'inspect_family_gate_failures',
     source_barrier: sourceBarrier,
-    source_pack_federation: sourcePackFederation,
+    source_pack_fanout: sourcePackFanout,
     source_pack_manifest: sourcePackManifest,
     planner,
     created_deliverables: createdDeliverables,
@@ -207,7 +207,7 @@ export async function runSourceFirstFanout({
       source_barrier_status: 'planning_ready',
       deliverable_count: normalizedDeliverables.length,
       managed_run_count: managedRuns.length,
-      parallel_family_ready: sourcePackFederation.parallel_family_ready === true,
+      parallel_family_ready: sourcePackFanout.parallel_family_ready === true,
       max_parallel_width: planner.managed_dag.max_parallel_width,
     },
   };

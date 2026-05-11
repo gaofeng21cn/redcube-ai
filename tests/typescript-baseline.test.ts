@@ -278,7 +278,7 @@ test('compiled dist runtime entrypoints preserve package runtime exports', async
     },
     {
       packageName: '@redcube/runtime-protocol',
-      exports: ['buildSourcePackFederationArtifact', 'resolveWorkspaceContract'],
+      exports: ['buildSourcePackFanoutArtifact', 'resolveWorkspaceContract'],
     },
   ];
 

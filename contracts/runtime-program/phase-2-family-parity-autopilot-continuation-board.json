@@ -25,7 +25,7 @@
     "do not activate academic poster contracts",
     "do not promote managed web runtime into current repo truth",
     "do not widen formal entry beyond CLI plus MCP",
-    "do not collapse RedCube into OPL federation runtime ownership"
+    "do not collapse RedCube into OPL-hosted runtime ownership"
   ],
   "required_truth_sources": [
     "contracts/runtime-program/current-program.json",

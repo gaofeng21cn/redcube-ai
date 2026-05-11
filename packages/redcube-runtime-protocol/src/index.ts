@@ -13,7 +13,7 @@ import {
   resolveWorkspaceContract as resolveWorkspaceContractJs,
 } from './workspace.js';
 import {
-  buildSourcePackFederationArtifact as buildSourcePackFederationArtifactJs,
+  buildSourcePackFanoutArtifact as buildSourcePackFanoutArtifactJs,
   buildSourceTruthConsumptionSummary as buildSourceTruthConsumptionSummaryJs,
   getSourceArtifactPaths as getSourceArtifactPathsJs,
 } from './source-truth.js';
@@ -120,7 +120,7 @@ export function getSourceArtifactPaths(workspaceRoot: string, topicId: string): 
   return getSourceArtifactPathsJs(workspaceRoot, topicId) as SourceArtifactPaths;
 }
 
-export function buildSourcePackFederationArtifact(request: {
+export function buildSourcePackFanoutArtifact(request: {
   workspaceRoot: string;
   topicId: string;
   sourceIndex?: unknown;
@@ -130,8 +130,8 @@ export function buildSourcePackFederationArtifact(request: {
   sourceReadinessPack?: unknown;
   consumerFamilies?: unknown[];
 }): Record<string, unknown> {
-  return buildSourcePackFederationArtifactJs(
-    request as Parameters<typeof buildSourcePackFederationArtifactJs>[0],
+  return buildSourcePackFanoutArtifactJs(
+    request as Parameters<typeof buildSourcePackFanoutArtifactJs>[0],
   ) as Record<string, unknown>;
 }
 

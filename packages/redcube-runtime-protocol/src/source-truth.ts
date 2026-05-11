@@ -43,7 +43,7 @@ export function getSourceArtifactPaths(workspaceRoot: string, topicId: string): 
     sourceBriefFile: path.join(topicPaths.canonicalDir, 'source-brief.json'),
     sourceReadinessPackFile: path.join(topicPaths.canonicalDir, 'source-readiness-pack.json'),
     sourcePackManifestFile: path.join(topicPaths.canonicalDir, 'source-pack-manifest.json'),
-    sourcePackFederationFile: path.join(topicPaths.canonicalDir, 'source-pack-federation.json'),
+    sourcePackFanoutFile: path.join(topicPaths.canonicalDir, 'source-pack-fanout.json'),
     sourceAugmentationRequestFile: path.join(topicPaths.canonicalDir, 'source-augmentation-request.json'),
     sourceAugmentationResultFile: path.join(topicPaths.canonicalDir, 'source-augmentation-result.json'),
     sourceResearchReportFile: path.join(topicPaths.canonicalDir, 'source-research-report.json'),
@@ -84,7 +84,7 @@ function normalizeConsumerFamilyEntry(entry: unknown): {
   };
 }
 
-export function buildSourcePackFederationArtifact({
+export function buildSourcePackFanoutArtifact({
   workspaceRoot,
   topicId,
   sourceIndex,
@@ -123,7 +123,7 @@ export function buildSourcePackFederationArtifact({
 
   return {
     schema_version: 1,
-    artifact_kind: 'cross_family_source_pack_federation',
+    artifact_kind: 'cross_family_source_pack_fanout',
     topic_id: topicPaths.topicId,
     authoritative_surface: 'shared_source_truth',
     source_pack: {

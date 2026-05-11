@@ -128,7 +128,7 @@ export interface SourceArtifactPaths {
   sourceBriefFile: string;
   sourceReadinessPackFile: string;
   sourcePackManifestFile: string;
-  sourcePackFederationFile: string;
+  sourcePackFanoutFile: string;
   sourceAugmentationRequestFile: string;
   sourceAugmentationResultFile: string;
   sourceResearchReportFile: string;

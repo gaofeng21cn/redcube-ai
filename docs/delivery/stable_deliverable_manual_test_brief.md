@@ -13,7 +13,7 @@
 - 前置条件：`P0 review-closeout` 已通过，且 durable closeout 已 durably committed
 - 2026-04-07 首轮正式手工测试结果：`ppt_deck = pass`、`xiaohongshu = pass`、hardening backlog = `manual_test_completed_no_findings`
 - 范围只限：`ppt_deck`、`xiaohongshu`
-- 明确不做：不打开 `Phase 2 / source intake + shared source truth`、不扩 `controller`、不新增 family / overlay、不推进 poster academic contract、不扩大 OPL federation
+- 明确不做：不打开 `Phase 2 / source intake + shared source truth`、不扩 `controller`、不新增 family / overlay、不推进 poster academic contract、不扩大 OPL-hosted runtime integration
 
 ## 基线预检
 
@@ -191,4 +191,4 @@ npm run redcube -- deliverable create \
 - `controller` 扩展
 - 新 family / overlay
 - poster academic contract
-- OPL federation
+- OPL-hosted runtime integration

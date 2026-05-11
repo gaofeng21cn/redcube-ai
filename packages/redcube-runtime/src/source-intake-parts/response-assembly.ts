@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { existsSync } from 'node:fs';
 
-import { buildSourcePackFederationArtifact } from '@redcube/runtime-protocol';
+import { buildSourcePackFanoutArtifact } from '@redcube/runtime-protocol';
 
 import { buildSourceReadinessPack } from '../source-readiness-pack.js';
 import { buildSourceAugmentationRequest } from '../source-augmentation-request.js';
@@ -32,7 +32,7 @@ export function sourceArtifactFiles(sourcePaths) {
     sourceBriefFile: sourcePaths.sourceBriefFile,
     sourceReadinessPackFile: sourcePaths.sourceReadinessPackFile,
     sourcePackManifestFile: sourcePaths.sourcePackManifestFile,
-    sourcePackFederationFile: sourcePaths.sourcePackFederationFile,
+    sourcePackFanoutFile: sourcePaths.sourcePackFanoutFile,
     sourceAugmentationRequestFile: sourcePaths.sourceAugmentationRequestFile,
   };
 }
@@ -218,7 +218,7 @@ export function assembleSourceIntakeArtifacts({
     sourceAudit,
     sourceReadinessPack,
   });
-  const sourcePackFederation = buildSourcePackFederationArtifact({
+  const sourcePackFanout = buildSourcePackFanoutArtifact({
     workspaceRoot,
     topicId: sourcePaths.topicPaths.topicId,
     sourceIndex,
@@ -276,7 +276,7 @@ export function assembleSourceIntakeArtifacts({
     sourceAudit,
     sourceReadinessPack,
     sourcePackManifest,
-    sourcePackFederation,
+    sourcePackFanout,
     sourceAugmentationRequest,
   };
 }

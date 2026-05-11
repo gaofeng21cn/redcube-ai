@@ -99,7 +99,7 @@
 - direct-delivery lifecycle stage convergence
 - 新 family / overlay 扩张
 - poster academic contract 主线
-- OPL federation
+- OPL-hosted runtime integration
 
 ## 最小 closeout evidence
 

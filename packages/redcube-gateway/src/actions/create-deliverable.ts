@@ -9,7 +9,7 @@ import {
 import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { rebuildTopicPublicationProjection } from '@redcube/runtime';
 import {
-  buildSourcePackFederationArtifact,
+  buildSourcePackFanoutArtifact,
   ensureWorkspaceGitBoundary,
   getDeliverablePaths,
   getSourceArtifactPaths,
@@ -69,9 +69,9 @@ function readJsonIfExists(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-function upsertConsumerFamily(federation, deliverable) {
-  const families = Array.isArray(federation.consumer_families)
-    ? federation.consumer_families
+function upsertConsumerFamily(fanout, deliverable) {
+  const families = Array.isArray(fanout.consumer_families)
+    ? fanout.consumer_families
     : [];
   const familyId = String(deliverable.overlay || '').trim();
   const family = families.find((item) => item?.family_id === familyId);
@@ -99,7 +99,7 @@ function upsertConsumerFamily(federation, deliverable) {
   ];
 }
 
-function updateSourcePackFederation({ workspaceRoot, topicId, deliverable }) {
+function updateSourcePackFanout({ workspaceRoot, topicId, deliverable }) {
   const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
   const sourceIndex = readJsonIfExists(sourcePaths.sourceIndexFile);
   const extractedMaterials = readJsonIfExists(sourcePaths.extractedMaterialsFile);
@@ -110,9 +110,9 @@ function updateSourcePackFederation({ workspaceRoot, topicId, deliverable }) {
     return null;
   }
 
-  const previousFederation = readJsonIfExists(sourcePaths.sourcePackFederationFile) || {};
-  const consumerFamilies = upsertConsumerFamily(previousFederation, deliverable);
-  const nextFederation = buildSourcePackFederationArtifact({
+  const previousFanout = readJsonIfExists(sourcePaths.sourcePackFanoutFile) || {};
+  const consumerFamilies = upsertConsumerFamily(previousFanout, deliverable);
+  const nextFanout = buildSourcePackFanoutArtifact({
     workspaceRoot,
     topicId,
     sourceIndex,
@@ -122,8 +122,8 @@ function updateSourcePackFederation({ workspaceRoot, topicId, deliverable }) {
     sourceReadinessPack,
     consumerFamilies,
   });
-  writeFileSync(sourcePaths.sourcePackFederationFile, JSON.stringify(nextFederation, null, 2), 'utf-8');
-  return sourcePaths.sourcePackFederationFile;
+  writeFileSync(sourcePaths.sourcePackFanoutFile, JSON.stringify(nextFanout, null, 2), 'utf-8');
+  return sourcePaths.sourcePackFanoutFile;
 }
 
 export async function createDeliverable({
@@ -189,7 +189,7 @@ export async function createDeliverable({
     surfaceFiles.push(targetFile);
   }
 
-  const sourcePackFederationFile = updateSourcePackFederation({
+  const sourcePackFanoutFile = updateSourcePackFanout({
     workspaceRoot,
     topicId,
     deliverable,
@@ -209,7 +209,7 @@ export async function createDeliverable({
     deliverableFile: deliverablePaths.deliverableFile,
     deliverable,
     surfaceFiles,
-    sourcePackFederationFile,
+    sourcePackFanoutFile,
     workspaceAgentsFile,
     hydratedContract,
     governance_surface: governanceSurface,
