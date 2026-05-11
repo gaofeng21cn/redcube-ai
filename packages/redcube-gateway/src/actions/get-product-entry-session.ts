@@ -27,7 +27,7 @@ import {
 } from './product-entry-continuity-surfaces.js';
 
 const DEFAULT_RUNTIME_OWNER = 'codex_cli';
-const HOSTED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const SUPPORTED_RUNTIME_OWNERS = new Set([DEFAULT_RUNTIME_OWNER, HOSTED_RUNTIME_OWNER]);
 
 function safeText(value, fallback = '') {

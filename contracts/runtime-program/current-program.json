@@ -72,7 +72,7 @@
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
       "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
-      "keep OPL Runtime Manager as a thin federated runtime manager over external Hermes-Agent rather than a RedCube truth owner",
+      "keep OPL Runtime Manager as a thin federated runtime manager over configured family runtime providers rather than a RedCube truth owner",
       "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
       "move implementation toward TypeScript for product/runtime contracts and Python for native PPT/Office/document helpers that share the MAS/MAG automation ecosystem",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
@@ -864,7 +864,9 @@
       "scope": {
         "hardening_axis": "product_entry_service_surface_and_federation",
         "implementation_in_scope": true,
-        "runtime_substrate_owner": "upstream_hermes_agent",
+        "runtime_substrate_owner": "optional_hosted_runtime_carrier",
+        "default_runtime_owner": "codex_cli",
+        "hosted_runtime_owner_policy": "provider_selected_by_opl_runtime_manager_or_explicit_proof_lane",
         "deployment_host": "codex_local_operator_host",
         "consumer_families": [
           "ppt_deck",

@@ -1,6 +1,6 @@
 // @ts-nocheck
 export const DEFAULT_RUNTIME_OWNER = 'codex_cli';
-export const HOSTED_RUNTIME_OWNER = 'upstream_hermes_agent';
+export const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const MANAGED_RUNTIME_OWNER = HOSTED_RUNTIME_OWNER;
 export const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
 export const PRODUCT_STATUS_COMMAND = 'redcube product status';

@@ -7,7 +7,7 @@ import {
 import { invokeProductEntry } from './invoke-product-entry.js';
 
 const FEDERATED_PRODUCT_ENTRY_ID = 'opl_gateway_federated_product_entry';
-const MANAGED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const MANAGED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();

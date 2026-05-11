@@ -61,7 +61,7 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
       task_intent: 'run_managed_deliverable',
       entry_mode: 'opl_gateway',
       workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
-      runtime_session_contract: { runtime_owner: 'upstream_hermes_agent' },
+      runtime_session_contract: { runtime_owner: 'configured_family_runtime_provider' },
       return_surface_contract: { surface_kind: 'product_entry' },
       entry_session_contract: { entry_session_id: 'session-a' },
       delivery_request: {

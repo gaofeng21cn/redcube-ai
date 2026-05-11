@@ -39,7 +39,7 @@
     "default_task_intent": "run_managed_deliverable",
     "default_runtime_owner": "codex_cli",
     "default_executor_owner": "codex_cli",
-    "hosted_runtime_owner_when_federated": "upstream_hermes_agent",
+    "hosted_runtime_owner_when_federated": "configured_family_runtime_provider",
     "shared_domain_entry_contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json"
   },
   "behavior_contract": {

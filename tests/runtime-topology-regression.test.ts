@@ -17,7 +17,7 @@ import {
 } from './package-surfaces.ts';
 
 function tempWorkspaceRoot() {
-  return mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-topology-'));
+  return mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-topology-'));
 }
 
 async function startMockHermesAgentApiServer() {
@@ -103,7 +103,7 @@ async function startMockHermesAgentApiServer() {
   };
 }
 
-test('completeHermesRun keeps Codex runtime topology for Codex-native executor', () => {
+test('completed managed runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
   const run = startHermesRun({
@@ -130,7 +130,7 @@ test('completeHermesRun keeps Codex runtime topology for Codex-native executor',
   assert.equal(completed.runtime_topology.deployment_host_status, 'active_primary');
 });
 
-test('failHermesRun keeps Codex runtime topology for Codex-native executor', () => {
+test('failed managed runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
   const run = startHermesRun({

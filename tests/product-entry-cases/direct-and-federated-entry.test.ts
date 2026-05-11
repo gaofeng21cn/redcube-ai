@@ -393,7 +393,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
         workspace_root: workspaceRoot,
       },
       runtime_session_contract: {
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'configured_family_runtime_provider',
       },
       return_surface_contract: {
         surface_kind: 'product_entry',
@@ -421,8 +421,8 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assert.deepEqual(
       response.runtime_session_contract,
       sharedCompanions.buildRuntimeSessionContract({
-        runtime_owner: 'upstream_hermes_agent',
-        expected_runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'configured_family_runtime_provider',
+        expected_runtime_owner: 'configured_family_runtime_provider',
       }),
     );
     assert.deepEqual(
@@ -476,7 +476,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
     assertRuntimeLoopClosureShape(response.product_entry_surface, {
       source: 'federated',
       entryMode: 'opl_gateway',
-      runtimeOwner: 'upstream_hermes_agent',
+      runtimeOwner: 'configured_family_runtime_provider',
     });
     assert.equal(response.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(response.runtime_loop_closure.source_linkage.current_source, 'federated');

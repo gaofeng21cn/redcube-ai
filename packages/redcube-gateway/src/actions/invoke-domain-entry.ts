@@ -9,7 +9,7 @@ import { runManagedDeliverable } from './run-managed-deliverable.js';
 
 const SERVICE_SAFE_DOMAIN_ENTRY_ID = 'redcube_service_safe_domain_entry';
 const DEFAULT_RUNTIME_OWNER = 'codex_cli';
-const HOSTED_RUNTIME_OWNER = 'upstream_hermes_agent';
+const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const TASK_INTENT_SURFACE_KIND = {
   run_managed_deliverable: 'managed_run',

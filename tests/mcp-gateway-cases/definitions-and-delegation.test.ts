@@ -88,16 +88,13 @@ test('MCP catalog definitions are projected from the RedCube family action catal
     .filter((action) => action.tool_name === 'redcube_product_entry')
     .map((action) => action.action_key);
 
-  assert.deepEqual(productEntryActions, [
-    'get_product_status',
-    'get_product_start',
-    'get_product_preflight',
-    'invoke_product_entry',
-    'invoke_federated_product_entry',
-    'get_product_entry_session',
-    'get_product_entry_manifest',
-    'invoke_domain_entry',
-  ]);
+  assert.deepEqual(
+    productEntryActions,
+    productEntryTool?.action_catalog_projection?.action_keys,
+  );
+  assert.equal(productEntryActions.includes('export_product_sidecar'), true);
+  assert.equal(productEntryActions.includes('dispatch_product_sidecar'), true);
+  assert.equal(productEntryActions.includes('invoke_domain_entry'), true);
   assert.equal(productEntryTool?.description, metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.description);
   assert.deepEqual(
     productEntryTool?.action_catalog_projection,

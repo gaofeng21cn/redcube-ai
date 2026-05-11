@@ -369,7 +369,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
           workspace_root: resolveWorkspaceRoot(options, cwd),
         },
         runtime_session_contract: {
-          runtime_owner: 'upstream_hermes_agent',
+          runtime_owner: 'configured_family_runtime_provider',
         },
         return_surface_contract: {
           surface_kind: options.returnSurfaceKind || 'product_entry',

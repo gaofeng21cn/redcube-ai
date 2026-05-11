@@ -43,9 +43,9 @@ async function withMockCodexRuntime(testFn) {
   }
 }
 
-test('ppt_deck canonical mainline closes through the current Codex CLI runtime without drifting durable truth', async () => {
+test('ppt_deck canonical mainline closes through Codex CLI runtime without drifting durable truth', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-canonical-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-canonical-'));
 
     await completeSourceReadiness({
       workspaceRoot,

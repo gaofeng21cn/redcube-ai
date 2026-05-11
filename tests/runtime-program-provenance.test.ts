@@ -87,6 +87,8 @@ test('historical lane is a compact explicit provenance guard outside the active 
   for (const retiredFile of [
     'tests/direct-delivery-longrun-target.test.ts',
     'tests/phase-2-behavior-convergence.test.ts',
+    'tests/hermes-run-topology-regression.test.ts',
+    'tests/hermes-runtime-canonical-path.test.ts',
     'tests/upstream-hermes-agent-final-target-shape.test.ts',
   ]) {
     assert.equal(TEST_REGISTRY.some((entry) => entry.file === retiredFile), false, retiredFile);

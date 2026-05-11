@@ -92,9 +92,10 @@
 - 这组文档保留为历史 local-runtime migration artifact，用于追溯为何会走到今天这一步。
 - 当前真实主线应回到核心五件套：先完成 truth reset，再推进真实的上游 `Hermes-Agent` pilot。
 
-### 决策：统一 runtime substrate，不强制统一 visual executor
+### 历史决策：统一 runtime substrate，不强制统一 visual executor
 
-- `Hermes-Agent` 在本仓长线中优先承担 runtime substrate / orchestration owner。
+- 状态：此段保留为 2026-04-11 Hermes-first 迁移背景；2026-05-10 之后已被 provider-backed / Temporal target 与 Codex-first stage-led OPL framework 口径 supersede。
+- `Hermes-Agent` 在当时迁移设想中优先承担 runtime substrate / orchestration owner；当前只作为 legacy/optional provider、显式 hosted/proof backend 或 executor proof lane。
 - `RedCube AI` 继续持有 visual deliverable 的 family/profile/pack authority、audit truth 与 executor routing。
 - 具体生成步骤允许继续通过 `Executor Adapter` 选择最合适的执行器；只有在拿到显式 proof 后，才允许把某条 route 迁到新的 executor。
 - executor backend 的 public contract 只冻结 `codex_cli` 与 `hermes_agent`；旧内部 `codex_cli` / `hermes_agent` 只作为 adapter 兼容名映射到这两类 backend。
@@ -121,9 +122,10 @@
 - 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeFederatedProductEntry` 只保留为 OPL-hosted integration surface。
 - `status` 只作为该 skill 下的 machine-readable product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不代表 GUI / WebUI / 最终用户前台壳已落地。
 
-### 决策：保持 honest owner split，不改 default executor owner
+### 历史决策：保持 honest owner split，不改 default executor owner
 
-- `Hermes-Agent` 继续作为 managed runtime owner。
+- 状态：此段保留为 2026-04-21 owner split 背景；当前 active owner split 以 2026-05-10 provider-backed OPL runtime target 为准。
+- `Hermes-Agent` 不再作为默认 managed runtime owner；OPL Runtime Manager 通过 configured family runtime provider 承担托管路径，Temporal 是目标生产 provider，Hermes 只保留为 legacy/optional provider 或 proof lane。
 - `RedCube AI` 继续持有 visual-domain truth 与 domain durable surfaces。
 - `Codex CLI` 继续是 executor adapter 选中的默认 concrete executor，除非拿到显式 proof，不改默认 owner split。
 

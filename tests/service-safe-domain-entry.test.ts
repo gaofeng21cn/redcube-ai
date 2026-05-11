@@ -63,7 +63,7 @@ async function prepareDomainEntryWorkspace() {
   return workspaceRoot;
 }
 
-test('invokeDomainEntry runs the service-safe managed deliverable adapter under the Hermes-managed runtime contract', async () => {
+test('invokeDomainEntry runs the service-safe managed deliverable adapter under the configured OPL provider contract', async () => {
   await withMockHermesUpstream(async () => {
     const sharedCompanions = await importGatewaySharedModule('opl-gateway-shared/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
@@ -76,7 +76,7 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
         workspace_root: workspaceRoot,
       },
       runtime_session_contract: {
-        runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'configured_family_runtime_provider',
         adapter_surface: '@redcube/codex-cli-client',
         session_mode: 'ephemeral_run',
       },
@@ -100,8 +100,8 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
     assert.deepEqual(
       response.runtime_session_contract,
       sharedCompanions.buildRuntimeSessionContract({
-        runtime_owner: 'upstream_hermes_agent',
-        expected_runtime_owner: 'upstream_hermes_agent',
+        runtime_owner: 'configured_family_runtime_provider',
+        expected_runtime_owner: 'configured_family_runtime_provider',
         adapter_surface: '@redcube/codex-cli-client',
         session_mode: 'ephemeral_run',
       }),
@@ -132,7 +132,7 @@ test('invokeDomainEntry rejects unsupported target domains', async () => {
       target_domain_id: 'other_domain',
       task_intent: 'run_managed_deliverable',
       workspace_locator: { workspace_root: '/tmp/redcube' },
-      runtime_session_contract: { runtime_owner: 'upstream_hermes_agent' },
+      runtime_session_contract: { runtime_owner: 'configured_family_runtime_provider' },
       return_surface_contract: { surface_kind: 'managed_run' },
       domain_payload: {
         deliverable_family: 'ppt_deck',
@@ -156,7 +156,7 @@ test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL
           workspace_root: workspaceRoot,
         },
         runtime_session_contract: {
-          runtime_owner: 'upstream_hermes_agent',
+          runtime_owner: 'configured_family_runtime_provider',
           adapter_surface: '@redcube/codex-cli-client',
           session_mode: 'ephemeral_run',
         },
@@ -187,7 +187,7 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
           workspace_root: workspaceRoot,
         },
         runtime_session_contract: {
-          runtime_owner: 'upstream_hermes_agent',
+          runtime_owner: 'configured_family_runtime_provider',
           adapter_surface: '@redcube/codex-cli-client',
           session_mode: 'ephemeral_run',
         },
@@ -211,7 +211,7 @@ test('service-safe domain entry contract is frozen in contracts and current prog
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
   assert.equal(contract.runtime_session_contract.default_runtime_owner, 'codex_cli');
-  assert.equal(contract.runtime_session_contract.hosted_runtime_owner_when_federated, 'upstream_hermes_agent');
+  assert.equal(contract.runtime_session_contract.hosted_runtime_owner_when_federated, 'configured_family_runtime_provider');
   assert.deepEqual(contract.opl_handoff_envelope.minimum_fields, [
     'target_domain_id',
     'task_intent',
