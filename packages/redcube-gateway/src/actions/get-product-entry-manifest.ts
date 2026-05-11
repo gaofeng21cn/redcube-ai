@@ -44,7 +44,7 @@ import {
   buildRedCubeActionMetadata,
 } from './family-action-catalog.js';
 import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plane.js';
-import { buildDomainAgentSkeletonAdapter } from './domain-agent-skeleton-adapter.js';
+import { buildDomainAgentSkeletonAdapter, buildFamilyDomainMemoryDescriptor } from './domain-agent-skeleton-adapter.js';
 import {
   OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
   buildRouteEquivalenceContract,
@@ -270,6 +270,7 @@ export async function getProductEntryManifest(request) {
     runtime,
     productEntrySessionCommand,
   });
+  const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator });
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,
     productEntrySessionCommand,
@@ -619,11 +620,8 @@ export async function getProductEntryManifest(request) {
             ref: '/family_action_catalog',
             label: 'RedCube family action catalog',
           },
-          domain_memory_descriptor_locator_ref: {
-            ref_kind: 'json_pointer',
-            ref: '/domain_memory_descriptor_locator',
-            label: 'RCA visual pattern memory descriptor locator',
-          },
+          domain_memory_descriptor_locator_ref: { ref_kind: 'json_pointer', ref: '/domain_memory_descriptor_locator', label: 'RCA visual pattern memory descriptor locator' },
+          domain_memory_descriptor_ref: { ref_kind: 'json_pointer', ref: '/domain_memory_descriptor', label: 'RCA OPL family domain memory ref' },
         },
       },
     ],
@@ -992,6 +990,7 @@ export async function getProductEntryManifest(request) {
     family_stage_control_plane: familyStageControlPlane,
     domain_agent_skeleton_adapter: domainAgentSkeletonAdapter,
     artifact_locator_contract: domainAgentSkeletonAdapter.artifact_locator_contract,
+    domain_memory_descriptor: domainMemoryDescriptor,
     domain_memory_descriptor_locator: domainAgentSkeletonAdapter.domain_memory_descriptor_locator,
     visual_pattern_memory_writeback: {
       surface_kind: 'visual_pattern_memory_writeback_projection',

@@ -218,7 +218,87 @@ test('RCA artifact locator and sidecar receipts expose refs without OPL visual v
 
 test('RCA domain memory descriptor exposes locator and receipts without moving visual authority to OPL', () => {
   const payload = contract();
+  const descriptor = payload.domain_memory_descriptor;
   const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+
+  assert.equal(descriptor.surface_kind, 'family_domain_memory_ref');
+  assert.equal(descriptor.version, 'family-domain-memory-ref.v1');
+  assert.equal(descriptor.memory_ref_id, 'rca_visual_pattern_memory');
+  assert.equal(descriptor.target_domain_id, 'redcube_ai');
+  assert.equal(descriptor.owner, 'redcube_ai');
+  assert.equal(descriptor.memory_family, 'visual_pattern_memory');
+  assert.deepEqual(descriptor.memory_pack_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator',
+    role: 'domain_owned_memory_pack_descriptor',
+    label: 'RCA visual pattern memory descriptor locator',
+  });
+  assert.deepEqual(descriptor.stage_applicability, [
+    'source_intake',
+    'communication_strategy',
+    'visual_direction',
+    'artifact_creation',
+    'review_and_revision',
+    'package_and_handoff',
+  ]);
+  assert.deepEqual(descriptor.retrieval_contract_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/memory_locator',
+    role: 'locator_only_retrieval_contract',
+    label: 'RCA visual pattern memory locator',
+  });
+  assert.deepEqual(descriptor.writeback_contract_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/writeback_proposal_generator',
+    role: 'domain_owned_writeback_proposal_contract',
+    label: 'RCA visual pattern memory writeback proposal generator',
+  });
+  assert.deepEqual(descriptor.receipt_contract_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/writeback_receipt_contract',
+    role: 'locator_only_writeback_receipt_contract',
+    label: 'RCA visual pattern memory writeback receipt refs',
+  });
+  assert.deepEqual(descriptor.recall_projection_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/operator_receipt_projection',
+    role: 'operator_recall_receipt_projection',
+    label: 'RCA visual pattern memory operator receipt projection',
+  });
+  assert.deepEqual(descriptor.migration_plan_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/migration_plan',
+    role: 'domain_owned_migration_plan',
+    label: 'RCA visual pattern memory migration plan',
+  });
+  assert.deepEqual(descriptor.seed_corpus_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/seed_fixture_locator',
+    role: 'domain_owned_seed_locator',
+    label: 'RCA visual pattern memory seed fixture locator',
+  });
+  assert.deepEqual(descriptor.writeback_receipt_locator_ref, {
+    ref_kind: 'json_pointer',
+    ref: '/domain_memory_descriptor_locator/writeback_receipt_locator',
+    role: 'domain_owned_writeback_receipt_locator',
+    label: 'RCA visual pattern memory writeback receipt locator',
+  });
+  assert.equal(descriptor.freshness.source, 'contract_manifest_projection');
+  assert.equal(descriptor.migration_readiness.status, 'migration_plan_ready_descriptor_only');
+  assert.equal(descriptor.migration_readiness.memory_body_migration, 'domain_owned_runtime_apply_required');
+  assert.equal(descriptor.migration_readiness.opl_apply_allowed, false);
+  assert.equal(descriptor.status, 'active');
+  assert.equal(descriptor.authority_boundary.opl_role, 'locator_projection_owner');
+  assert.equal(descriptor.authority_boundary.domain_memory_owner, 'redcube_ai');
+  assert.ok(descriptor.authority_boundary.forbidden_opl_authority.includes('memory_store_owner'));
+  assert.ok(descriptor.authority_boundary.forbidden_opl_authority.includes('visual_route_owner'));
+  assert.ok(descriptor.authority_boundary.forbidden_opl_authority.includes('accept_reject_owner'));
+  assert.equal(descriptor.authority_boundary.can_write_domain_truth, false);
+  assert.equal(descriptor.authority_boundary.can_authorize_quality_verdict, false);
+  assert.equal(descriptor.authority_boundary.can_write_artifacts, false);
+  assert.equal(descriptor.authority_boundary.can_choose_visual_route, false);
+  assert.equal(descriptor.authority_boundary.can_accept_or_reject_memory_writeback, false);
+  assert.equal(descriptor.authority_boundary.can_issue_review_or_export_verdict, false);
 
   assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
   assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');

@@ -65,6 +65,6 @@ RCA 继续持有 visual truth、review/publication projection 与 artifact autho
 
 ## Domain Memory Index Status
 
-RCA 当前已经通过 product-entry manifest 暴露 visual pattern memory 的 migration plan、seed fixture locator、writeback proposal generator、accept/reject command、writeback receipt locator、operator receipt projection，以及 `controlled_visual_stage_attempt` proof。它们证明 direct RedCube skill 与 OPL-hosted path 可以回到同一 RCA-owned descriptor、sidecar 和 quality refs。
+RCA 当前已经通过 product-entry manifest 顶层 `domain_memory_descriptor` 暴露标准 `family-domain-memory-ref.v1` projection，并继续保留 RCA-owned `domain_memory_descriptor_locator`、migration plan、seed fixture locator、writeback proposal generator、accept/reject command、writeback receipt locator、operator receipt projection，以及 `controlled_visual_stage_attempt` proof。它们证明 direct RedCube skill 与 OPL-hosted path 可以回到同一 RCA-owned descriptor、sidecar 和 quality refs。
 
-OPL family memory index 仍需要 RCA 增加标准 `family_domain_memory_ref.v1` adapter。直到该 adapter landed，`opl domain-memory list` 会把 RCA 计为 missing memory descriptor。该 missing 只影响 OPL family-level resolved-memory projection，不授权 OPL 保存 RCA memory content、选择 visual route、写 review/export verdict 或修改 canonical artifacts。
+该 adapter 只解决 OPL family-level resolved-memory projection。OPL 可以索引、携带和投影 RCA memory refs；memory body、accept/reject、visual route、review/export verdict 与 canonical artifacts 继续由 RCA 持有。

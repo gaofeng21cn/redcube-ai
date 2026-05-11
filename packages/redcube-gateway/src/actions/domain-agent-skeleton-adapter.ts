@@ -3,6 +3,23 @@
 const DOMAIN_ID = 'redcube_ai';
 const DOMAIN_OWNER = 'redcube_ai';
 const SKELETON_ID = 'rca.domain-agent.skeleton.adapter.v1';
+const FAMILY_MEMORY_STAGE_APPLICABILITY = [
+  'source_intake',
+  'communication_strategy',
+  'visual_direction',
+  'artifact_creation',
+  'review_and_revision',
+  'package_and_handoff',
+];
+const FAMILY_MEMORY_FORBIDDEN_OPL_AUTHORITY = [
+  'memory_store_owner',
+  'domain_truth_owner',
+  'visual_route_owner',
+  'accept_reject_owner',
+  'quality_verdict_owner',
+  'review_export_verdict_owner',
+  'artifact_authority',
+];
 
 const REPO_SOURCE_BOUNDARIES = [
   {
@@ -557,6 +574,98 @@ export function buildDomainMemoryDescriptorLocator() {
       opl_can_accept_or_reject_memory_writeback: false,
       opl_can_issue_review_or_export_verdict: false,
       opl_can_mutate_canonical_artifacts: false,
+    },
+  };
+}
+
+export function buildFamilyDomainMemoryDescriptor({
+  domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator(),
+  freshnessSource = 'product_entry_manifest_build',
+} = {}) {
+  const ref = (path, role, label) => ({
+    ref_kind: 'json_pointer',
+    ref: path,
+    role,
+    label,
+  });
+
+  return {
+    surface_kind: 'family_domain_memory_ref',
+    version: 'family-domain-memory-ref.v1',
+    memory_ref_id: 'rca_visual_pattern_memory',
+    target_domain_id: DOMAIN_ID,
+    owner: DOMAIN_OWNER,
+    memory_family: domainMemoryDescriptorLocator.memory_family,
+    memory_pack_ref: ref(
+      '/domain_memory_descriptor_locator',
+      'domain_owned_memory_pack_descriptor',
+      'RCA visual pattern memory descriptor locator',
+    ),
+    stage_applicability: FAMILY_MEMORY_STAGE_APPLICABILITY,
+    retrieval_contract_ref: ref(
+      '/domain_memory_descriptor_locator/memory_locator',
+      'locator_only_retrieval_contract',
+      'RCA visual pattern memory locator',
+    ),
+    writeback_contract_ref: ref(
+      '/domain_memory_descriptor_locator/writeback_proposal_generator',
+      'domain_owned_writeback_proposal_contract',
+      'RCA visual pattern memory writeback proposal generator',
+    ),
+    receipt_contract_ref: ref(
+      '/domain_memory_descriptor_locator/writeback_receipt_contract',
+      'locator_only_writeback_receipt_contract',
+      'RCA visual pattern memory writeback receipt refs',
+    ),
+    recall_projection_ref: ref(
+      '/domain_memory_descriptor_locator/operator_receipt_projection',
+      'operator_recall_receipt_projection',
+      'RCA visual pattern memory operator receipt projection',
+    ),
+    migration_plan_ref: ref(
+      '/domain_memory_descriptor_locator/migration_plan',
+      'domain_owned_migration_plan',
+      'RCA visual pattern memory migration plan',
+    ),
+    seed_corpus_ref: ref(
+      '/domain_memory_descriptor_locator/seed_fixture_locator',
+      'domain_owned_seed_locator',
+      'RCA visual pattern memory seed fixture locator',
+    ),
+    writeback_receipt_locator_ref: ref(
+      '/domain_memory_descriptor_locator/writeback_receipt_locator',
+      'domain_owned_writeback_receipt_locator',
+      'RCA visual pattern memory writeback receipt locator',
+    ),
+    provenance_refs: [
+      ref('/domain_memory_descriptor_locator/policy_ref', 'policy', 'Visual Pattern Memory Policy'),
+      ref('/domain_memory_descriptor_locator/human_doc_ref', 'descriptor_reference', 'RCA domain memory descriptor and locator'),
+      ref('/controlled_visual_stage_attempt', 'controlled_stage_attempt_proof', 'RCA controlled visual stage attempt proof'),
+    ],
+    freshness: {
+      source: freshnessSource,
+      descriptor_locator_ref: '/domain_memory_descriptor_locator',
+      refresh_policy: 'domain_manifest_rebuild_required_before_stage_attempt',
+    },
+    migration_readiness: {
+      status: 'migration_plan_ready_descriptor_only',
+      migration_state: domainMemoryDescriptorLocator.migration_plan.state,
+      memory_body_migration: 'domain_owned_runtime_apply_required',
+      opl_apply_allowed: false,
+      repo_tracks_memory_entries: false,
+      repo_tracks_receipt_instances: false,
+    },
+    status: 'active',
+    authority_boundary: {
+      opl_role: 'locator_projection_owner',
+      domain_memory_owner: DOMAIN_OWNER,
+      forbidden_opl_authority: FAMILY_MEMORY_FORBIDDEN_OPL_AUTHORITY,
+      can_write_domain_truth: false,
+      can_authorize_quality_verdict: false,
+      can_write_artifacts: false,
+      can_choose_visual_route: false,
+      can_accept_or_reject_memory_writeback: false,
+      can_issue_review_or_export_verdict: false,
     },
   };
 }
