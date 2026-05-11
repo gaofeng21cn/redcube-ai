@@ -103,12 +103,22 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'runtime_health',
         'review_publication_projection_refs',
         'opl_family_lifecycle_adapter',
+        'domain_agent_skeleton_adapter',
+        'artifact_locator_contract',
+        'product_sidecar_receipt_refs',
       ],
     );
     assert.deepEqual(
       registration.consumable_projection_refs.slice(-3),
-      ['/review_state', '/publication_projection', '/opl_family_lifecycle_adapter'],
+      ['/domain_agent_skeleton_adapter', '/artifact_locator_contract', '/product_sidecar_receipt_refs'],
     );
+    assert.equal(registration.domain_agent_skeleton_adapter.ref, '/domain_agent_skeleton_adapter');
+    assert.equal(registration.domain_agent_skeleton_adapter.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
+    assert.deepEqual(registration.domain_agent_skeleton_adapter.runtime_declares_only, [
+      'product_sidecar_adapter',
+      'projection_builder',
+      'lifecycle_adapter',
+    ]);
     assert.equal(
       registration.review_publication_truth.route_rule,
       'must_use_redcube_product_entry_and_review_export_gates',

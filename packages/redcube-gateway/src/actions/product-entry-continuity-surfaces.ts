@@ -303,6 +303,7 @@ function buildOplFamilyPersistence({
   sessionFile,
   continuationSnapshot,
   runtimeLoopClosure,
+  artifactLocatorContract = null,
 }) {
   const restorePoint = buildRestorePoint({ continuationSnapshot });
   const runtimeRefs = continuationSnapshot?.runtime_supervision?.refs || null;
@@ -346,6 +347,13 @@ function buildOplFamilyPersistence({
       artifact_refs: safeArray(runtimeLoopClosure?.artifact_pickup?.artifact_refs),
       artifact_ref_count: Number(runtimeLoopClosure?.artifact_pickup?.artifact_ref_count || 0),
       source_ref: '/artifact_inventory',
+    },
+    artifact_locator_contract_ref: {
+      surface_kind: artifactLocatorContract?.surface_kind || 'artifact_locator_contract',
+      ref: '/artifact_locator_contract',
+      owner: REDCUBE_LOOP_OWNER,
+      locator_model: artifactLocatorContract?.locator_model || 'workspace_runtime_artifact_root_refs_only',
+      opl_consumption: 'descriptor_and_refs_only',
     },
   };
 }
@@ -515,6 +523,7 @@ export function buildOplFamilyLifecycleAdapterSurface({
   runtimeLoopClosure = null,
   reviewState = null,
   publicationProjection = null,
+  artifactLocatorContract = null,
   source = 'manifest',
   entryMode = 'manifest_projection',
   manifestProjection = false,
@@ -542,6 +551,7 @@ export function buildOplFamilyLifecycleAdapterSurface({
       sessionFile,
       continuationSnapshot,
       runtimeLoopClosure,
+      artifactLocatorContract,
     }),
     lifecycle: buildOplFamilyLifecycle({
       continuationSnapshot,
@@ -578,7 +588,9 @@ const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
 export function buildOplRuntimeManagerRegistration({
   runtimeContinuityEnvelope,
   productEntrySessionCommand,
+  domainAgentSkeletonAdapter = null,
 }) {
+  const skeletonRef = domainAgentSkeletonAdapter ? '/domain_agent_skeleton_adapter' : null;
   return {
     surface_kind: 'opl_runtime_manager_domain_registration',
     version: 'v1',
@@ -598,8 +610,8 @@ export function buildOplRuntimeManagerRegistration({
       ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration',
       command: PRODUCT_MANIFEST_COMMAND,
     },
-    indexable_surfaces: [{ surface_id: 'product_entry_registration', surface_kind: 'skill_catalog', ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration' }, { surface_id: 'internal_opl_bridge', surface_kind: 'federated_product_entry', ref: '/product_entry_shell/opl_bridge' }, { surface_id: 'session_continuity', surface_kind: 'session_continuity', ref: '/session_continuity' }, { surface_id: 'artifact_inventory', surface_kind: 'artifact_inventory', ref: '/artifact_inventory' }, { surface_id: 'runtime_health', surface_kind: 'runtime_inventory', ref: '/runtime_inventory' }, { surface_id: 'review_publication_projection_refs', surface_kind: 'review_publication_refs', refs: ['/review_state', '/publication_projection'] }, { surface_id: 'opl_family_lifecycle_adapter', surface_kind: 'opl_family_lifecycle_adapter', ref: '/opl_family_lifecycle_adapter' }],
-    consumable_projection_refs: ['/skill_catalog/skills/0/domain_projection/runtime_continuity', '/product_entry_shell/opl_bridge', '/session_continuity', '/artifact_inventory', '/runtime_inventory', '/review_state', '/publication_projection', '/opl_family_lifecycle_adapter'],
+    indexable_surfaces: [{ surface_id: 'product_entry_registration', surface_kind: 'skill_catalog', ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration' }, { surface_id: 'internal_opl_bridge', surface_kind: 'federated_product_entry', ref: '/product_entry_shell/opl_bridge' }, { surface_id: 'session_continuity', surface_kind: 'session_continuity', ref: '/session_continuity' }, { surface_id: 'artifact_inventory', surface_kind: 'artifact_inventory', ref: '/artifact_inventory' }, { surface_id: 'runtime_health', surface_kind: 'runtime_inventory', ref: '/runtime_inventory' }, { surface_id: 'review_publication_projection_refs', surface_kind: 'review_publication_refs', refs: ['/review_state', '/publication_projection'] }, { surface_id: 'opl_family_lifecycle_adapter', surface_kind: 'opl_family_lifecycle_adapter', ref: '/opl_family_lifecycle_adapter' }, { surface_id: 'domain_agent_skeleton_adapter', surface_kind: 'domain_agent_skeleton_adapter', ref: '/domain_agent_skeleton_adapter' }, { surface_id: 'artifact_locator_contract', surface_kind: 'artifact_locator_contract', ref: '/artifact_locator_contract' }, { surface_id: 'product_sidecar_receipt_refs', surface_kind: 'product_sidecar_receipt_refs', ref: '/product_sidecar_receipt_refs' }],
+    consumable_projection_refs: ['/skill_catalog/skills/0/domain_projection/runtime_continuity', '/product_entry_shell/opl_bridge', '/session_continuity', '/artifact_inventory', '/runtime_inventory', '/review_state', '/publication_projection', '/opl_family_lifecycle_adapter', '/domain_agent_skeleton_adapter', '/artifact_locator_contract', '/product_sidecar_receipt_refs'],
     state_index_inputs: {
       workspace_registry_index: '/workspace_locator',
       managed_session_ledger_index: '/session_continuity',
@@ -622,6 +634,16 @@ export function buildOplRuntimeManagerRegistration({
       review_state_ref: '/review_state',
       publication_projection_ref: '/publication_projection',
       route_rule: 'must_use_redcube_product_entry_and_review_export_gates',
+    },
+    domain_agent_skeleton_adapter: {
+      ref: skeletonRef || '/domain_agent_skeleton_adapter',
+      adapter_id: domainAgentSkeletonAdapter?.adapter_id || 'rca.domain-agent.skeleton.adapter.v1',
+      mapping_model: domainAgentSkeletonAdapter?.mapping_model || 'manifest_descriptor_mapping_only',
+      runtime_declares_only: domainAgentSkeletonAdapter?.runtime_declarations?.declares_only || [
+        'product_sidecar_adapter',
+        'projection_builder',
+        'lifecycle_adapter',
+      ],
     },
     route_equivalence: { ref: '/route_equivalence', downstream_domain_entry_ref: '/route_equivalence/downstream_runtime_truth', rule: 'direct_product_entry_and_internal_opl_bridge_share_the_same_downstream_domain_entry' },
     native_helper_index_consumption: { surface_kind: 'native_helper_index_consumption_proof', consumption_mode: 'index_only', input_refs: ['/runtime_inventory', '/artifact_inventory', '/skill_catalog/skills/0/domain_projection/runtime_continuity'], proof_summary: 'OPL Runtime Manager may index RCA native/helper availability and artifact pickup refs without writing RedCube visual truth, canonical artifacts, review/publication truth, or executor state.', writes_visual_truth: false, owns_canonical_artifacts: false, owns_executor: false },

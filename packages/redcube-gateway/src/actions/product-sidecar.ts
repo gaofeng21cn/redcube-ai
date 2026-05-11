@@ -158,6 +158,29 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         owner: DOMAIN_ID,
         writable_by_sidecar: false,
       },
+      domain_agent_skeleton_adapter: {
+        ref: '/domain_agent_skeleton_adapter',
+        owner: DOMAIN_ID,
+        mapping_model: manifest.domain_agent_skeleton_adapter?.mapping_model || 'manifest_descriptor_mapping_only',
+      },
+      artifact_locator_contract: {
+        ref: '/artifact_locator_contract',
+        owner: DOMAIN_ID,
+        locator_model: manifest.artifact_locator_contract?.locator_model || 'workspace_runtime_artifact_root_refs_only',
+        writable_by_sidecar: false,
+      },
+      receipt_refs: {
+        ref: '/product_sidecar_receipt_refs',
+        owner: DOMAIN_ID,
+        writable_by_sidecar: false,
+        forbidden_receipt_fields: manifest.product_sidecar_receipt_refs?.forbidden_receipt_fields || [],
+      },
+      controlled_visual_stage_attempt: {
+        ref: '/controlled_visual_stage_attempt',
+        owner: DOMAIN_ID,
+        opl_consumes_descriptor_refs: true,
+        opl_holds_visual_or_export_verdict: false,
+      },
     },
     guarded_actions: buildGuardedActionCatalog(),
     blocked_actions: [
@@ -174,6 +197,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       product_entry_manifest_ref: '/product_entry_manifest',
       opl_family_lifecycle_adapter_ref: '/opl_family_lifecycle_adapter',
       family_action_catalog_ref: '/family_action_catalog',
+      domain_agent_skeleton_adapter_ref: '/domain_agent_skeleton_adapter',
+      artifact_locator_contract_ref: '/artifact_locator_contract',
+      product_sidecar_receipt_refs_ref: '/product_sidecar_receipt_refs',
+      controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
     },
     summary: {
       online_substrate: HERMES_SUBSTRATE,

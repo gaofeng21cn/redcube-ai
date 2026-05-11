@@ -219,6 +219,60 @@
       "managed_deliverable_runtime_changed": false
     }
   },
+  "domain_agent_skeleton_adapter": {
+    "surface_kind": "domain_agent_skeleton_adapter",
+    "adapter_id": "rca.domain-agent.skeleton.adapter.v1",
+    "mapping_model": "manifest_descriptor_mapping_only",
+    "repo_source_boundary": {
+      "allowed_roots": [
+        "agent",
+        "contracts",
+        "runtime",
+        "docs"
+      ],
+      "repo_tracks_runtime_artifact_blobs": false,
+      "repo_tracks_receipt_instances": false
+    },
+    "runtime_declarations": {
+      "declares_only": [
+        "product_sidecar_adapter",
+        "projection_builder",
+        "lifecycle_adapter"
+      ],
+      "sidecar_adapter_ref": "/product_entry_shell/sidecar",
+      "projection_builder_ref": "/family_stage_control_plane",
+      "lifecycle_adapter_ref": "/opl_family_lifecycle_adapter"
+    },
+    "artifact_locator_contract": {
+      "contract_id": "rca.workspace_runtime_artifact_locator.v1",
+      "locator_model": "workspace_runtime_artifact_root_refs_only",
+      "repo_tracks_visual_or_export_artifact_blobs": false,
+      "opl_forbidden": [
+        "store_png_pptx_pdf_blob",
+        "declare_visual_export_verdict",
+        "rewrite_canonical_artifact",
+        "mutate_review_state"
+      ]
+    },
+    "product_sidecar_receipt_refs": {
+      "receipt_contract_id": "rca.product_sidecar.receipt_refs.v1",
+      "forbidden_receipt_fields": [
+        "visual_verdict",
+        "export_verdict",
+        "review_verdict",
+        "publication_gate_verdict",
+        "artifact_blob"
+      ]
+    },
+    "controlled_visual_stage_attempt_fixture": {
+      "fixture_id": "rca.controlled_visual_stage_attempt.fixture.v1",
+      "opl_consumes_descriptor_refs": true,
+      "opl_consumes_artifact_refs": true,
+      "opl_holds_visual_verdict": false,
+      "opl_holds_export_verdict": false,
+      "opl_holds_canonical_artifact_content": false
+    }
+  },
   "non_goals": [
     "OPL owns RedCube visual truth",
     "OPL owns canonical artifacts",

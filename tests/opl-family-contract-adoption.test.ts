@@ -147,6 +147,58 @@ test('RCA stage control projection maps route stages without owning runtime cont
   });
 });
 
+test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts separate', () => {
+  const payload = contract();
+  const skeleton = payload.domain_agent_skeleton_adapter;
+
+  assert.equal(skeleton.surface_kind, 'domain_agent_skeleton_adapter');
+  assert.equal(skeleton.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
+  assert.equal(skeleton.mapping_model, 'manifest_descriptor_mapping_only');
+  assert.deepEqual(skeleton.repo_source_boundary.allowed_roots, [
+    'agent',
+    'contracts',
+    'runtime',
+    'docs',
+  ]);
+  assert.equal(skeleton.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
+  assert.equal(skeleton.repo_source_boundary.repo_tracks_receipt_instances, false);
+  assert.deepEqual(skeleton.runtime_declarations.declares_only, [
+    'product_sidecar_adapter',
+    'projection_builder',
+    'lifecycle_adapter',
+  ]);
+  assert.equal(skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
+  assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
+  assert.equal(skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+});
+
+test('RCA artifact locator and sidecar receipts expose refs without OPL visual verdict ownership', () => {
+  const payload = contract();
+  const skeleton = payload.domain_agent_skeleton_adapter;
+
+  assert.equal(skeleton.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
+  assert.equal(skeleton.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+  assert.equal(skeleton.artifact_locator_contract.repo_tracks_visual_or_export_artifact_blobs, false);
+  for (const forbidden of [
+    'store_png_pptx_pdf_blob',
+    'declare_visual_export_verdict',
+    'rewrite_canonical_artifact',
+    'mutate_review_state',
+  ]) {
+    assert.ok(skeleton.artifact_locator_contract.opl_forbidden.includes(forbidden));
+  }
+  assert.equal(skeleton.product_sidecar_receipt_refs.receipt_contract_id, 'rca.product_sidecar.receipt_refs.v1');
+  for (const field of ['visual_verdict', 'export_verdict', 'review_verdict', 'publication_gate_verdict', 'artifact_blob']) {
+    assert.ok(skeleton.product_sidecar_receipt_refs.forbidden_receipt_fields.includes(field));
+  }
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_consumes_descriptor_refs, true);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_consumes_artifact_refs, true);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_visual_verdict, false);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_export_verdict, false);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_canonical_artifact_content, false);
+});
+
 test('current runtime program points OPL Runtime Manager at the RCA lifecycle adapter projection', () => {
   const payload = currentProgram();
   const managerBoundary = payload.longrun_goal.runtime_manager_boundary;

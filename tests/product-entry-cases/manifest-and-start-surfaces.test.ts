@@ -347,6 +347,40 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
     assert.equal(artifactStage.authority_boundary.default_ppt_route_changed, false);
     assert.equal(artifactStage.authority_boundary.managed_deliverable_runtime_changed, false);
+    assert.equal(manifest.domain_agent_skeleton_adapter.surface_kind, 'domain_agent_skeleton_adapter');
+    assert.equal(manifest.domain_agent_skeleton_adapter.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
+    assert.equal(manifest.domain_agent_skeleton_adapter.mapping_model, 'manifest_descriptor_mapping_only');
+    assert.equal(manifest.domain_agent_skeleton_adapter.repo_source_boundary.physical_relayout_required_now, false);
+    assert.deepEqual(
+      manifest.domain_agent_skeleton_adapter.repo_source_boundary.allowed_roots.map((root) => root.boundary_id),
+      ['agent', 'contracts', 'runtime', 'docs'],
+    );
+    assert.equal(manifest.domain_agent_skeleton_adapter.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
+    assert.deepEqual(manifest.domain_agent_skeleton_adapter.runtime_declarations.declares_only, [
+      'product_sidecar_adapter',
+      'projection_builder',
+      'lifecycle_adapter',
+    ]);
+    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
+    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
+    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+    assert.equal(manifest.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
+    assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+    assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.workspace_root, workspaceRoot);
+    assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.runtime_state_root, runtimeStateRoot);
+    assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_store_root, manifest.runtime.session_store_root);
+    assert.equal(manifest.artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs, false);
+    assert.equal(manifest.artifact_locator_contract.opl_consumption_policy.forbidden.includes('declare_visual_export_verdict'), true);
+    assert.equal(manifest.product_sidecar_receipt_refs.receipt_contract_id, 'rca.product_sidecar.receipt_refs.v1');
+    assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('visual_verdict'), true);
+    assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('artifact_blob'), true);
+    assert.equal(manifest.controlled_visual_stage_attempt.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
+    assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_consumes_descriptor_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_consumes_artifact_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_holds_visual_verdict, false);
+    assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_holds_export_verdict, false);
+    assert.equal(manifest.controlled_visual_stage_attempt.projection_only_result.visual_export_verdict, null);
+    assert.equal(manifest.opl_family_lifecycle_adapter.persistence.artifact_locator_contract_ref.ref, '/artifact_locator_contract');
     assert.deepEqual(
       manifest.action_metadata.product_entry.map((entry) => [entry.action_key, entry.command, entry.surface_kind]),
       [
@@ -886,6 +920,17 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
     assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);
     assert.equal(sidecar.owner_boundary.rca_owns_review_publication_projection, true);
+    assert.equal(sidecar.mapped_surfaces.domain_agent_skeleton_adapter.ref, '/domain_agent_skeleton_adapter');
+    assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.ref, '/artifact_locator_contract');
+    assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+    assert.equal(sidecar.mapped_surfaces.receipt_refs.ref, '/product_sidecar_receipt_refs');
+    assert.equal(sidecar.mapped_surfaces.receipt_refs.forbidden_receipt_fields.includes('export_verdict'), true);
+    assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.ref, '/controlled_visual_stage_attempt');
+    assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_consumes_descriptor_refs, true);
+    assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_holds_visual_or_export_verdict, false);
+    assert.equal(sidecar.source_manifest_refs.domain_agent_skeleton_adapter_ref, '/domain_agent_skeleton_adapter');
+    assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
+    assert.equal(sidecar.source_manifest_refs.product_sidecar_receipt_refs_ref, '/product_sidecar_receipt_refs');
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       [
