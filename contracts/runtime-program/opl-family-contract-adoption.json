@@ -307,9 +307,9 @@
       "descriptor_locator_ref": "/domain_memory_descriptor_locator",
       "refresh_policy": "domain_manifest_rebuild_required_before_stage_attempt"
     },
-    "migration_readiness": {
-      "status": "migration_plan_ready_descriptor_only",
-      "migration_state": "repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending",
+      "migration_readiness": {
+      "status": "consumed_memory_writeback_receipt_proof_ready_descriptor_only",
+      "migration_state": "repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending",
       "memory_body_migration": "domain_owned_runtime_apply_required",
       "opl_apply_allowed": false,
       "repo_tracks_memory_entries": false,
@@ -395,7 +395,7 @@
       ],
       "migration_plan": {
         "plan_id": "rca.visual_pattern_memory.migration_plan.v1",
-        "state": "repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending",
+        "state": "repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending",
         "source_surfaces": [
           "workspace_runtime_root",
           "product_entry_session",
@@ -423,8 +423,10 @@
           "proposal_is_locator_only",
           "decision_is_rca_owned_accept_or_reject",
           "accepted_memory_has_rca_owner",
+          "consumed_memory_refs_are_locator_only",
           "writeback_receipt_is_locator_only",
-          "operator_receipt_projection_is_locator_only"
+          "operator_receipt_projection_is_locator_only",
+          "opl_hosted_attempt_carries_refs_not_memory_body"
         ],
         "repository_boundary": {
           "repo_tracks_migration_plan": true,
@@ -600,7 +602,9 @@
       "opl_holds_visual_verdict": false,
       "opl_holds_export_verdict": false,
       "opl_holds_canonical_artifact_content": false,
-      "proof_model": "descriptor_sidecar_quality_ref_equivalence_only",
+      "proof_model": "consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only",
+      "provider_controlled_proof_id": "rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1",
+      "provider_controlled_proof_model": "opl_hosted_attempt_consumes_memory_refs_and_returns_locator_only_receipts",
       "covered_family": "ppt_deck",
       "stage_kinds": [
         "review_and_revision",
@@ -612,13 +616,57 @@
         "repair_image_pages",
         "export_pptx"
       ],
+      "memory_consumption_contract": {
+        "contract_id": "rca.visual_pattern_memory.consumed_memory_refs.v1",
+        "required_fields": [
+          "memory_ref",
+          "memory_family",
+          "stage_scope",
+          "deliverable_family",
+          "provenance_refs",
+          "content_ref"
+        ],
+        "forbidden_fields": [
+          "memory_content_body",
+          "slide_or_page_content",
+          "visual_verdict",
+          "export_verdict",
+          "review_verdict",
+          "canonical_artifact_blob"
+        ],
+        "repo_tracks_memory_content_body": false
+      },
+      "writeback_proof_contract": {
+        "contract_id": "rca.visual_pattern_memory.writeback_receipt_proof.v1",
+        "proposal_ref": "rca-memory-proposal:visual-pattern:<proposal-id>",
+        "receipt_ref": "rca-memory-receipt:visual-pattern:<receipt-id>",
+        "memory_locator_ref": "rca-memory:visual-pattern:<memory-id>",
+        "repo_tracks_proposal_instance": false,
+        "repo_tracks_receipt_instance": false,
+        "repo_tracks_memory_entry": false,
+        "repo_tracks_visual_or_export_artifacts": false
+      },
+      "opl_hosted_attempt": {
+        "consumed_memory_refs": [
+          "rca-memory:visual-pattern:<memory-id>"
+        ],
+        "writeback_receipt_ref": "rca-memory-receipt:visual-pattern:<receipt-id>",
+        "operator_receipt_projection_ref": "/domain_memory_descriptor_locator/operator_receipt_projection"
+      },
       "opl_consumes_quality_refs": true,
       "direct_and_opl_share_descriptor_refs": true,
+      "direct_and_opl_share_consumed_memory_refs": true,
       "direct_and_opl_share_sidecar_refs": true,
       "direct_and_opl_share_quality_refs": true,
       "opl_writes_visual_truth": false,
       "opl_writes_review_export_verdict": false,
-      "opl_writes_artifact_blob": false
+      "opl_writes_artifact_blob": false,
+      "opl_writes_memory_content": false,
+      "opl_writes_receipt_instance": false,
+      "opl_consumes_memory_refs": true,
+      "opl_consumes_writeback_receipt_refs": true,
+      "opl_holds_memory_content": false,
+      "opl_holds_receipt_instance": false
     }
   },
   "non_goals": [

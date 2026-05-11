@@ -137,7 +137,11 @@ export function buildControlledVisualStageAttemptFixture() {
       '/family_stage_control_plane/stages',
       '/artifact_locator_contract',
       '/domain_memory_descriptor_locator',
+      '/domain_memory_descriptor',
       '/product_sidecar_receipt_refs',
+    ],
+    consumed_memory_refs: [
+      'rca-memory:visual-pattern:<memory-id>',
     ],
     quality_refs: [
       '/review_state',
@@ -153,7 +157,9 @@ export function buildControlledVisualStageAttemptFixture() {
     surface_kind: 'controlled_visual_stage_attempt_fixture',
     fixture_id: 'rca.controlled_visual_stage_attempt.fixture.v1',
     domain_id: DOMAIN_ID,
-    proof_model: 'descriptor_sidecar_quality_ref_equivalence_only',
+    proof_model: 'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
+    provider_controlled_proof_id: 'rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1',
+    provider_controlled_proof_model: 'opl_hosted_attempt_consumes_memory_refs_and_returns_locator_only_receipts',
     covered_family: 'ppt_deck',
     stage_kinds: [
       'review_and_revision',
@@ -165,6 +171,55 @@ export function buildControlledVisualStageAttemptFixture() {
       'repair_image_pages',
       'export_pptx',
     ],
+    memory_consumption_contract: {
+      surface_kind: 'controlled_consumed_memory_refs',
+      contract_id: 'rca.visual_pattern_memory.consumed_memory_refs.v1',
+      source_descriptor_ref: '/domain_memory_descriptor',
+      locator_contract_ref: '/domain_memory_descriptor_locator/memory_locator',
+      required_fields: [
+        'memory_ref',
+        'memory_family',
+        'stage_scope',
+        'deliverable_family',
+        'provenance_refs',
+        'content_ref',
+      ],
+      forbidden_fields: [
+        'memory_content_body',
+        'slide_or_page_content',
+        'visual_verdict',
+        'export_verdict',
+        'review_verdict',
+        'canonical_artifact_blob',
+      ],
+      repository_boundary: {
+        repo_tracks_consumed_memory_ref_fixture: true,
+        repo_tracks_memory_content_body: false,
+        repo_tracks_visual_or_export_artifacts: false,
+      },
+    },
+    writeback_proof_contract: {
+      surface_kind: 'controlled_memory_writeback_receipt_proof',
+      contract_id: 'rca.visual_pattern_memory.writeback_receipt_proof.v1',
+      proposal_ref: 'rca-memory-proposal:visual-pattern:<proposal-id>',
+      receipt_ref: 'rca-memory-receipt:visual-pattern:<receipt-id>',
+      memory_locator_ref: 'rca-memory:visual-pattern:<memory-id>',
+      proposal_contract_ref: '/domain_memory_descriptor_locator/writeback_proposal_generator',
+      accept_reject_command_ref: '/domain_memory_descriptor_locator/accept_reject_command',
+      receipt_contract_ref: '/domain_memory_descriptor_locator/writeback_receipt_contract',
+      operator_receipt_projection_ref: '/domain_memory_descriptor_locator/operator_receipt_projection',
+      allowed_writeback_status_values: [
+        'accepted',
+        'rejected',
+      ],
+      repository_boundary: {
+        repo_tracks_proof_schema_and_locator_fixture: true,
+        repo_tracks_proposal_instance: false,
+        repo_tracks_receipt_instance: false,
+        repo_tracks_memory_entry: false,
+        repo_tracks_visual_or_export_artifacts: false,
+      },
+    },
     attempt_descriptor: {
       attempt_id: '<attempt-id>',
       entry_session_id: '<entry-session-id>',
@@ -180,6 +235,7 @@ export function buildControlledVisualStageAttemptFixture() {
       entry_surface: 'redcube-ai app skill / redcube product invoke',
       runtime_owner: 'codex_cli',
       convergence_ref: '/domain_entry_surface',
+      consumed_memory_refs: sharedRefs.consumed_memory_refs,
       ...sharedRefs,
     },
     opl_hosted_attempt: {
@@ -187,19 +243,32 @@ export function buildControlledVisualStageAttemptFixture() {
       runtime_owner: 'configured_family_runtime_provider',
       sidecar_dispatch_ref: '/product_entry_shell/sidecar',
       convergence_ref: '/domain_entry_surface',
+      consumed_memory_refs: sharedRefs.consumed_memory_refs,
+      writeback_receipt_ref: 'rca-memory-receipt:visual-pattern:<receipt-id>',
+      operator_receipt_projection_ref: '/domain_memory_descriptor_locator/operator_receipt_projection',
       ...sharedRefs,
     },
     equivalence_proof: {
       direct_and_opl_share_descriptor_refs: true,
+      direct_and_opl_share_consumed_memory_refs: true,
       direct_and_opl_share_sidecar_refs: true,
       direct_and_opl_share_quality_refs: true,
       downstream_truth_owner: DOMAIN_OWNER,
       opl_writes_visual_truth: false,
       opl_writes_review_export_verdict: false,
       opl_writes_artifact_blob: false,
+      opl_writes_memory_content: false,
+      opl_writes_receipt_instance: false,
     },
     projection_only_result: {
       descriptor_refs: sharedRefs.descriptor_refs,
+      consumed_memory_refs: sharedRefs.consumed_memory_refs,
+      writeback_refs: {
+        proposal_ref: 'rca-memory-proposal:visual-pattern:<proposal-id>',
+        receipt_ref: 'rca-memory-receipt:visual-pattern:<receipt-id>',
+        memory_locator_ref: 'rca-memory:visual-pattern:<memory-id>',
+        operator_receipt_projection_ref: '/domain_memory_descriptor_locator/operator_receipt_projection',
+      },
       artifact_refs: [
         {
           artifact_kind: 'png_page',
@@ -213,14 +282,20 @@ export function buildControlledVisualStageAttemptFixture() {
         '/publication_projection',
       ],
       visual_export_verdict: null,
+      memory_content_body: null,
+      receipt_instance: null,
     },
     opl_policy_proof: {
       opl_consumes_descriptor_refs: true,
+      opl_consumes_memory_refs: true,
+      opl_consumes_writeback_receipt_refs: true,
       opl_consumes_artifact_refs: true,
       opl_consumes_quality_refs: true,
       opl_holds_visual_verdict: false,
       opl_holds_export_verdict: false,
       opl_holds_canonical_artifact_content: false,
+      opl_holds_memory_content: false,
+      opl_holds_receipt_instance: false,
     },
   };
 }
@@ -378,7 +453,7 @@ export function buildDomainMemoryDescriptorLocator() {
   };
   const migrationPlan = {
     plan_id: 'rca.visual_pattern_memory.migration_plan.v1',
-    state: 'repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending',
+    state: 'repo_source_contract_landed_consumed_memory_writeback_receipt_proof_ready_runtime_writeback_pending',
     source_surfaces: [
       'workspace_runtime_root',
       'product_entry_session',
@@ -406,8 +481,10 @@ export function buildDomainMemoryDescriptorLocator() {
       'proposal_is_locator_only',
       'decision_is_rca_owned_accept_or_reject',
       'accepted_memory_has_rca_owner',
+      'consumed_memory_refs_are_locator_only',
       'writeback_receipt_is_locator_only',
       'operator_receipt_projection_is_locator_only',
+      'opl_hosted_attempt_carries_refs_not_memory_body',
     ],
     repository_boundary: {
       repo_tracks_migration_plan: true,
@@ -648,7 +725,7 @@ export function buildFamilyDomainMemoryDescriptor({
       refresh_policy: 'domain_manifest_rebuild_required_before_stage_attempt',
     },
     migration_readiness: {
-      status: 'migration_plan_ready_descriptor_only',
+      status: 'consumed_memory_writeback_receipt_proof_ready_descriptor_only',
       migration_state: domainMemoryDescriptorLocator.migration_plan.state,
       memory_body_migration: 'domain_owned_runtime_apply_required',
       opl_apply_allowed: false,
