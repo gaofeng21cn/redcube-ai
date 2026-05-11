@@ -239,7 +239,7 @@ test('intakeSource keeps operator files out of audience-facing fact library whil
   writeFileSync(contentFile, [
     '# Med Auto Science',
     '',
-    'Med Auto Science 是医学 Research Ops gateway，用正式控制链把 source readiness、study execution 与 publication delivery 收口在同一条主线上。',
+    'Med Auto Science 是医学科研 domain-agent，通过 source extraction、fact library、study planning 与 publication delivery，把证据、任务和交付状态连接到可验证的研究工作流。',
   ].join('\n'), 'utf-8');
   writeFileSync(operatorFile, [
     '# 讲课工作台规则',
@@ -260,9 +260,16 @@ test('intakeSource keeps operator files out of audience-facing fact library whil
   const index = readJson(result.artifactFiles.sourceIndexFile);
 
   assert.equal(pack.fact_library.topic_summary.includes('Med Auto Science'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('source extraction'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('fact library'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('domain-agent'), true);
   assert.equal(pack.fact_library.topic_summary.includes('封面必须署名'), false);
   assert.equal(
     pack.fact_library.reference_source_list.some((item) => item.includes('content-01-med-autoscience.md')),
+    true,
+  );
+  assert.equal(
+    pack.fact_library.key_fact_groups.some((item) => item.label.includes('source extraction') && item.source_id === 'SRC-FILE-1'),
     true,
   );
   assert.equal(
@@ -329,7 +336,7 @@ test('intakeSource cleans markdown wrapper noise out of audience-facing fact lib
     '',
     '# 项目概览',
     '',
-    '`Med Auto Science` 是共享 `Unified Harness Engineering Substrate` 之上的医学 `Research Ops` gateway 与 `Domain Harness OS`。',
+    '`Med Auto Science` 是医学科研 domain-agent，基于 source extraction 和 fact library 组织证据、规划研究任务，并把 publication delivery 产物保持在可审计状态。',
   ].join('\n'), 'utf-8');
 
   const result = await intakeSource({
@@ -345,10 +352,16 @@ test('intakeSource cleans markdown wrapper noise out of audience-facing fact lib
 
   assert.equal(pack.fact_library.topic_summary.includes('<p align'), false);
   assert.equal(pack.fact_library.topic_summary.includes('English'), false);
-  assert.equal(pack.fact_library.topic_summary.includes('Domain Harness OS'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('source extraction'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('fact library'), true);
+  assert.equal(pack.fact_library.topic_summary.includes('domain-agent'), true);
   assert.deepEqual(pack.fact_library.reference_source_list, [
     'inputs/raw_materials/source-intake/content-01-opl-readme.md',
   ]);
+  assert.equal(
+    pack.fact_library.key_fact_groups.some((item) => item.label.includes('fact library') && item.source_id === 'SRC-FILE-1'),
+    true,
+  );
   assert.equal(
     pack.fact_library.key_fact_groups.some((item) => ['SRC-BRIEF', 'SRC-KEYWORDS'].includes(item.source_id)),
     false,

@@ -318,7 +318,7 @@ test('ppt authoring context keeps lecture_peer audience and public source labels
     writeFileSync(sourceFile, [
       '# 项目概览',
       '',
-      '`Med Auto Science` 是共享 `Unified Harness Engineering Substrate` 之上的医学 `Research Ops` gateway 与 `Domain Harness OS`。',
+      '`Med Auto Science` 是医学科研 domain-agent，基于 source extraction 和 fact library 组织证据、规划研究任务，并把 publication delivery 产物保持在可审计状态。',
     ].join('\n'), 'utf-8');
 
     await intakeSource({
@@ -352,6 +352,12 @@ test('ppt authoring context keeps lecture_peer audience and public source labels
     assert.equal(storyline.storyline?.audience, '临床科研同行');
     assert.equal(storyline.storyline?.fact_library_summary.includes('<p align'), false);
     assert.equal(storyline.storyline?.fact_library_summary.includes('English'), false);
+    assert.equal(storyline.storyline?.fact_library_summary.includes('source extraction'), true);
+    assert.equal(storyline.storyline?.fact_library_summary.includes('fact library'), true);
+    assert.equal(storyline.storyline?.fact_library_summary.includes('domain-agent'), true);
+    assert.equal(Array.isArray(storyline.storyline?.source_truth_material_ids), true);
+    assert.equal(storyline.storyline?.source_truth_material_ids.length, 1);
+    assert.equal(storyline.storyline?.source_sufficiency_judgement, 'planning_ready');
   });
 });
 
