@@ -204,12 +204,12 @@
   "current_state": {
     "product_mainline_mode": "auto_only",
     "runtime_substrate_owner": "optional_hosted_runtime_carrier",
-      "runtime_manager_status": {
-        "target_layer": "OPL Runtime Manager",
-        "status": "target_contract_alignment",
-        "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
-        "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
-        "redcube_default_entry_unchanged": true,
+    "runtime_manager_status": {
+      "target_layer": "OPL Runtime Manager",
+      "status": "target_contract_alignment",
+      "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
+      "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
+      "redcube_default_entry_unchanged": true,
       "full_sidecar_enabled_now": false,
       "native_helper_scope": [
         "artifact indexing",
@@ -999,7 +999,7 @@
           "managed_deliverable_runtime_changed": false
         },
         "domain_memory_descriptor_locator": {
-          "status": "repo_tracked_descriptor_locator_and_migration_plan_contract",
+          "status": "repo_tracked_descriptor_locator_proposal_decision_operator_projection_contract",
           "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
           "locator_id": "rca.visual_pattern_memory.locator.v1",
           "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
@@ -1008,7 +1008,7 @@
           "migration_plan_id": "rca.visual_pattern_memory.migration_plan.v1",
           "seed_fixture_locator_id": "rca.visual_pattern_memory.seed_fixture_locator.v1",
           "writeback_receipt_locator_id": "rca.visual_pattern_memory.writeback_receipt_locator.v1",
-          "migration_state": "repo_source_contract_landed_runtime_migration_pending",
+          "migration_state": "repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending",
           "memory_family": "visual_pattern_memory",
           "memory_content_owner": "redcube_ai",
           "route_truth_owner": "redcube_ai",
@@ -1019,7 +1019,30 @@
           "repo_tracks_receipt_instances": false,
           "repo_tracks_visual_or_export_artifacts": false,
           "visual_truth_changed": false,
-          "route_truth_changed": false
+          "route_truth_changed": false,
+          "writeback_proposal_generator_id": "rca.visual_pattern_memory.writeback_proposal_generator.v1",
+          "accept_reject_command_id": "rca.visual_pattern_memory.accept_reject.v1",
+          "operator_receipt_projection_id": "rca.visual_pattern_memory.operator_receipt_projection.v1",
+          "repo_tracks_proposal_instances": false,
+          "operator_receipt_projection_ready": true,
+          "opl_can_accept_or_reject_memory_writeback": false
+        },
+        "controlled_visual_stage_attempt": {
+          "status": "repo_tracked_controlled_fixture_and_ref_equivalence_contract",
+          "fixture_id": "rca.controlled_visual_stage_attempt.fixture.v1",
+          "covered_family": "ppt_deck",
+          "stage_kinds": [
+            "review_and_revision",
+            "package_and_handoff"
+          ],
+          "direct_and_opl_share_descriptor_refs": true,
+          "direct_and_opl_share_sidecar_refs": true,
+          "direct_and_opl_share_quality_refs": true,
+          "downstream_truth_owner": "redcube_ai",
+          "opl_writes_visual_truth": false,
+          "opl_writes_review_export_verdict": false,
+          "opl_writes_artifact_blob": false,
+          "repo_tracks_visual_or_export_artifacts": false
         }
       },
       "artifacts": {
@@ -1032,7 +1055,9 @@
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
         "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
         "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
-        "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator"
+        "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
+        "visual_pattern_memory_writeback_manifest_surface": "redcube product manifest#/visual_pattern_memory_writeback",
+        "controlled_visual_stage_attempt_manifest_surface": "redcube product manifest#/controlled_visual_stage_attempt"
       },
       "closeout": {
         "executed_at": "2026-04-12",

@@ -54,9 +54,14 @@ const STAGES = [
     goal: 'Run visual, screenshot, source-fidelity, and repair gates before export.',
     domain_stage_refs: ['visual_director_review', 'screenshot_review', 'repair_image_pages', 'fix_html', 'repair_pptx_native'],
     allowed_action_refs: ['invoke_product_entry', 'get_product_entry_session'],
+    visual_pattern_memory_refs: [
+      '/domain_memory_descriptor_locator/writeback_proposal_generator',
+      '/domain_memory_descriptor_locator/accept_reject_command',
+    ],
     outputs: [
       { ref_kind: 'json_pointer', ref: '/review_state', role: 'review_projection' },
       { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'publication_projection' },
+      { ref_kind: 'json_pointer', ref: '/domain_memory_descriptor_locator/writeback_proposal_generator', role: 'memory_writeback_proposal_contract' },
     ],
   },
   {
@@ -66,9 +71,14 @@ const STAGES = [
     goal: 'Export final files, preview metadata, resume handles, and operator handoff refs.',
     domain_stage_refs: ['export_pptx', 'publish_copy', 'export_bundle', 'export_poster'],
     allowed_action_refs: ['get_product_entry_session', 'get_product_entry_manifest', 'export_product_sidecar'],
+    visual_pattern_memory_refs: [
+      '/domain_memory_descriptor_locator/writeback_receipt_locator',
+      '/domain_memory_descriptor_locator/operator_receipt_projection',
+    ],
     outputs: [
       { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'final_artifacts' },
       { ref_kind: 'json_pointer', ref: '/session_continuity', role: 'resume_handle' },
+      { ref_kind: 'json_pointer', ref: '/domain_memory_descriptor_locator/operator_receipt_projection', role: 'operator_memory_receipt_projection' },
     ],
   },
 ];
@@ -105,6 +115,11 @@ function stageDescriptor(stage, actionIds) {
   const sourceRefs = [
     ...PLANE_SOURCE_REFS,
     { ref_kind: 'route_stage_refs', ref: stage.domain_stage_refs, role: 'domain_stage_projection' },
+    ...(stage.visual_pattern_memory_refs || []).map((ref) => ({
+      ref_kind: 'json_pointer',
+      ref,
+      role: 'visual_pattern_memory_contract',
+    })),
   ];
   return {
     ...stage,
@@ -127,6 +142,7 @@ function stageDescriptor(stage, actionIds) {
       { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_prompt_pack' },
       { ref_kind: 'repo_path', ref: 'prompts/xiaohongshu', role: 'xiaohongshu_prompt_pack' },
     ],
+    visual_pattern_memory_refs: stage.visual_pattern_memory_refs || [],
     evaluation: [
       { ref_kind: 'json_pointer', ref: '/review_state', role: 'rca_review_state' },
       { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'rca_publication_projection' },

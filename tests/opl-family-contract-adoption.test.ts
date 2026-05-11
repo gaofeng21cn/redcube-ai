@@ -194,11 +194,26 @@ test('RCA artifact locator and sidecar receipts expose refs without OPL visual v
     assert.ok(skeleton.product_sidecar_receipt_refs.forbidden_receipt_fields.includes(field));
   }
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.proof_model, 'descriptor_sidecar_quality_ref_equivalence_only');
+  assert.deepEqual(skeleton.controlled_visual_stage_attempt_fixture.stage_kinds, ['review_and_revision', 'package_and_handoff']);
+  assert.deepEqual(skeleton.controlled_visual_stage_attempt_fixture.route_stage_refs, [
+    'visual_director_review',
+    'screenshot_review',
+    'repair_image_pages',
+    'export_pptx',
+  ]);
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_consumes_descriptor_refs, true);
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_consumes_artifact_refs, true);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_consumes_quality_refs, true);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.direct_and_opl_share_descriptor_refs, true);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.direct_and_opl_share_sidecar_refs, true);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.direct_and_opl_share_quality_refs, true);
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_visual_verdict, false);
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_export_verdict, false);
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_holds_canonical_artifact_content, false);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_writes_visual_truth, false);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_writes_review_export_verdict, false);
+  assert.equal(skeleton.controlled_visual_stage_attempt_fixture.opl_writes_artifact_blob, false);
 });
 
 test('RCA domain memory descriptor exposes locator and receipts without moving visual authority to OPL', () => {
@@ -232,6 +247,7 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
     review_export_verdict_owner: 'redcube_ai',
     artifact_authority_owner: 'redcube_ai',
     opl_role: 'locator_ref_receipt_consumer_only',
+    opl_can_accept_or_reject_memory_writeback: false,
   });
 });
 
@@ -241,7 +257,7 @@ test('RCA domain memory migration plan is locator-only and acceptance-gated', ()
   const plan = memory.migration_plan;
 
   assert.equal(plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
-  assert.equal(plan.state, 'repo_source_contract_landed_runtime_migration_pending');
+  assert.equal(plan.state, 'repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending');
   assert.deepEqual(plan.source_surfaces, [
     'workspace_runtime_root',
     'product_entry_session',
@@ -254,15 +270,20 @@ test('RCA domain memory migration plan is locator-only and acceptance-gated', ()
     'discover_candidate_lessons',
     'extract_reusable_pattern_card_candidate',
     'record_seed_fixture_locator_ref',
+    'generate_writeback_proposal_locator',
     'domain_review_accept_or_reject',
     'publish_memory_locator_ref',
     'emit_writeback_receipt_ref',
+    'project_operator_receipt_status',
   ]);
   for (const gate of [
     'candidate_excludes_current_deliverable_content',
     'candidate_excludes_review_export_verdict',
     'candidate_excludes_canonical_artifact_blob',
+    'proposal_is_locator_only',
+    'decision_is_rca_owned_accept_or_reject',
     'writeback_receipt_is_locator_only',
+    'operator_receipt_projection_is_locator_only',
   ]) {
     assert.ok(plan.acceptance_gates.includes(gate));
   }
@@ -309,12 +330,66 @@ test('RCA visual pattern memory seed and receipt surfaces do not carry memory co
   assert.equal(receipt.repo_tracks_receipt_instances, false);
   assert.deepEqual(receipt.locator_fields, [
     'receipt_id',
+    'proposal_id',
     'source_review_ref',
     'candidate_memory_ref',
     'writeback_status',
+    'memory_locator_ref',
+    'operator_receipt_projection_ref',
     'owner',
     'created_at',
   ]);
+});
+
+test('RCA visual pattern memory proposal, accept/reject, and operator receipt projection stay locator-only', () => {
+  const payload = contract();
+  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const proposal = memory.writeback_proposal_generator;
+  const decision = memory.accept_reject_command;
+  const projection = memory.operator_receipt_projection;
+
+  assert.equal(proposal.generator_id, 'rca.visual_pattern_memory.writeback_proposal_generator.v1');
+  assert.equal(proposal.generator_model, 'locator_only_candidate_projection');
+  assert.deepEqual(proposal.proposal_contract.required_fields, [
+    'proposal_id',
+    'seed_fixture_ref',
+    'source_review_ref',
+    'stage_scope',
+    'deliverable_family',
+    'candidate_memory_ref',
+    'provenance_refs',
+    'recommended_decision',
+  ]);
+  for (const field of ['memory_content_body', 'visual_verdict', 'export_verdict', 'canonical_artifact_blob']) {
+    assert.ok(proposal.proposal_contract.forbidden_fields.includes(field));
+  }
+  assert.equal(proposal.repository_boundary.repo_tracks_proposal_instances, false);
+
+  assert.equal(decision.command_id, 'rca.visual_pattern_memory.accept_reject.v1');
+  assert.deepEqual(decision.allowed_decisions, ['accepted', 'rejected']);
+  assert.deepEqual(decision.output_refs, [
+    'memory_locator_ref',
+    'writeback_receipt_ref',
+    'operator_receipt_projection_ref',
+  ]);
+  assert.equal(decision.side_effect_boundary.writes_domain_memory_outside_repo, true);
+  assert.equal(decision.side_effect_boundary.writes_repo_memory_entry, false);
+  assert.equal(decision.side_effect_boundary.writes_review_export_verdict, false);
+
+  assert.equal(projection.projection_id, 'rca.visual_pattern_memory.operator_receipt_projection.v1');
+  assert.deepEqual(projection.visible_fields, [
+    'receipt_id',
+    'proposal_id',
+    'writeback_status',
+    'memory_locator_ref',
+    'source_review_ref',
+    'operator_message_ref',
+  ]);
+  assert.ok(projection.forbidden_projection_fields.includes('memory_content_body'));
+  assert.ok(projection.forbidden_projection_fields.includes('artifact_blob'));
+  assert.equal(projection.opl_consumption_policy.opl_can_surface_projection, true);
+  assert.equal(projection.opl_consumption_policy.opl_can_store_memory_content, false);
+  assert.equal(projection.opl_consumption_policy.opl_can_issue_decision, false);
 });
 
 test('current runtime program points OPL Runtime Manager at the RCA lifecycle adapter projection', () => {
@@ -345,21 +420,37 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(stageProjection.adapter_model, 'descriptor_read_only');
   assert.equal(stageProjection.default_ppt_route_changed, false);
   assert.equal(stageProjection.managed_deliverable_runtime_changed, false);
-  assert.equal(memory.status, 'repo_tracked_descriptor_locator_and_migration_plan_contract');
+  const attempt = payload.current_state.active_baton.scope.controlled_visual_stage_attempt;
+
+  assert.equal(memory.status, 'repo_tracked_descriptor_locator_proposal_decision_operator_projection_contract');
   assert.equal(memory.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
   assert.equal(memory.locator_id, 'rca.visual_pattern_memory.locator.v1');
   assert.equal(memory.migration_plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
   assert.equal(memory.seed_fixture_locator_id, 'rca.visual_pattern_memory.seed_fixture_locator.v1');
   assert.equal(memory.writeback_receipt_locator_id, 'rca.visual_pattern_memory.writeback_receipt_locator.v1');
-  assert.equal(memory.migration_state, 'repo_source_contract_landed_runtime_migration_pending');
+  assert.equal(memory.writeback_proposal_generator_id, 'rca.visual_pattern_memory.writeback_proposal_generator.v1');
+  assert.equal(memory.accept_reject_command_id, 'rca.visual_pattern_memory.accept_reject.v1');
+  assert.equal(memory.operator_receipt_projection_id, 'rca.visual_pattern_memory.operator_receipt_projection.v1');
+  assert.equal(memory.migration_state, 'repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending');
   assert.equal(memory.memory_content_owner, 'redcube_ai');
   assert.equal(memory.route_truth_owner, 'redcube_ai');
   assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
   assert.equal(memory.artifact_authority_owner, 'redcube_ai');
   assert.equal(memory.opl_role, 'locator_ref_receipt_consumer_only');
   assert.equal(memory.repo_tracks_memory_entries, false);
+  assert.equal(memory.repo_tracks_proposal_instances, false);
   assert.equal(memory.repo_tracks_receipt_instances, false);
   assert.equal(memory.repo_tracks_visual_or_export_artifacts, false);
   assert.equal(memory.visual_truth_changed, false);
   assert.equal(memory.route_truth_changed, false);
+  assert.equal(memory.operator_receipt_projection_ready, true);
+  assert.equal(memory.opl_can_accept_or_reject_memory_writeback, false);
+  assert.equal(attempt.status, 'repo_tracked_controlled_fixture_and_ref_equivalence_contract');
+  assert.deepEqual(attempt.stage_kinds, ['review_and_revision', 'package_and_handoff']);
+  assert.equal(attempt.direct_and_opl_share_descriptor_refs, true);
+  assert.equal(attempt.direct_and_opl_share_sidecar_refs, true);
+  assert.equal(attempt.direct_and_opl_share_quality_refs, true);
+  assert.equal(attempt.opl_writes_visual_truth, false);
+  assert.equal(attempt.opl_writes_review_export_verdict, false);
+  assert.equal(attempt.opl_writes_artifact_blob, false);
 });
