@@ -377,8 +377,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.domain_memory_descriptor_locator.locator_id, 'rca.visual_pattern_memory.locator.v1');
     assert.equal(manifest.domain_memory_descriptor_locator.memory_family, 'visual_pattern_memory');
     assert.equal(manifest.domain_memory_descriptor_locator.memory_model, 'natural_language_pattern_cards');
-    assert.equal(manifest.domain_memory_descriptor_locator.policy_ref.ref, 'docs/policies/visual_pattern_memory_policy.md');
-    assert.equal(manifest.domain_memory_descriptor_locator.human_doc_ref.ref, 'docs/references/domain_memory_descriptor_locator.md');
+    assert.equal(manifest.domain_memory_descriptor_locator.policy_ref.ref_kind, 'human_doc');
+    assert.equal(manifest.domain_memory_descriptor_locator.policy_ref.ref, 'human_doc:visual_pattern_memory_policy');
+    assert.equal(manifest.domain_memory_descriptor_locator.human_doc_ref.ref_kind, 'human_doc');
+    assert.equal(manifest.domain_memory_descriptor_locator.human_doc_ref.ref, 'human_doc:domain_memory_descriptor_locator');
     assert.deepEqual(manifest.domain_memory_descriptor_locator.memory_locator.opl_consumable_fields, [
       'memory_id',
       'stage_scope',

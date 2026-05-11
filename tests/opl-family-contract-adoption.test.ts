@@ -211,8 +211,8 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
   assert.equal(memory.memory_model, 'natural_language_pattern_cards');
   assert.equal(memory.descriptor_model, 'repo_tracked_descriptor_refs_only');
   assert.equal(memory.locator_model, 'rca_owned_memory_ref_locator');
-  assert.equal(memory.policy_ref, 'docs/policies/visual_pattern_memory_policy.md');
-  assert.equal(memory.human_doc_ref, 'docs/references/domain_memory_descriptor_locator.md');
+  assert.equal(memory.policy_ref, 'human_doc:visual_pattern_memory_policy');
+  assert.equal(memory.human_doc_ref, 'human_doc:domain_memory_descriptor_locator');
   assert.deepEqual(memory.opl_consumes, [
     'memory locator refs',
     'memory provenance refs',

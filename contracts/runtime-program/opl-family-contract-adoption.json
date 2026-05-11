@@ -263,8 +263,8 @@
       "memory_model": "natural_language_pattern_cards",
       "descriptor_model": "repo_tracked_descriptor_refs_only",
       "locator_model": "rca_owned_memory_ref_locator",
-      "policy_ref": "docs/policies/visual_pattern_memory_policy.md",
-      "human_doc_ref": "docs/references/domain_memory_descriptor_locator.md",
+      "policy_ref": "human_doc:visual_pattern_memory_policy",
+      "human_doc_ref": "human_doc:domain_memory_descriptor_locator",
       "opl_consumes": [
         "memory locator refs",
         "memory provenance refs",

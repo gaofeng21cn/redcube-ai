@@ -222,13 +222,13 @@ export function buildDomainMemoryDescriptorLocator() {
     descriptor_model: 'repo_tracked_descriptor_refs_only',
     locator_model: 'rca_owned_memory_ref_locator',
     policy_ref: {
-      ref_kind: 'repo_path',
-      ref: 'docs/policies/visual_pattern_memory_policy.md',
+      ref_kind: 'human_doc',
+      ref: 'human_doc:visual_pattern_memory_policy',
       label: 'Visual Pattern Memory Policy',
     },
     human_doc_ref: {
-      ref_kind: 'repo_path',
-      ref: 'docs/references/domain_memory_descriptor_locator.md',
+      ref_kind: 'human_doc',
+      ref: 'human_doc:domain_memory_descriptor_locator',
       label: 'RCA domain memory descriptor and locator',
     },
     allowed_memory_card_shape: {
