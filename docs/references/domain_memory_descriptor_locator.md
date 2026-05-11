@@ -1,7 +1,7 @@
 # RCA Domain Memory Descriptor And Migration Locator
 
 Owner: `RedCube AI`
-Purpose: define the RCA-owned descriptor, migration plan, seed fixture locator, and writeback receipt locator boundary for visual pattern memory consumed by OPL-family surfaces.
+Purpose: define the RCA-owned descriptor, migration plan, seed fixture locator, writeback proposal, accept/reject command, writeback receipt locator, and operator receipt projection boundary for visual pattern memory consumed by OPL-family surfaces.
 State: `active reference`
 Machine boundary: executable truth is `redcube product manifest#/domain_memory_descriptor_locator`, `contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator`, and `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`.
 
@@ -33,14 +33,16 @@ Locator refs are RCA-owned references such as `rca-memory:visual-pattern:*` or `
 
 The landed repo-source migration surface is `rca.visual_pattern_memory.migration_plan.v1`.
 
-It expresses the flow for reusable visual lessons without storing lesson bodies in the repo:
+It expresses the flow for reusable visual lessons without storing lesson bodies, receipt instances, or artifact blobs in the repo:
 
 - discover candidate lessons from workspace/runtime root, product-entry session, `visual_director_review`, `screenshot_review`, export closeout, or a human reference;
 - extract a reusable pattern-card candidate outside repo-tracked artifact blobs;
 - record a seed fixture locator ref;
-- let RCA review the candidate as accepted or rejected for memory writeback;
+- generate a locator-only writeback proposal;
+- let RCA run the accept/reject command;
 - publish an RCA-owned memory locator ref when accepted;
-- emit a locator-only writeback receipt ref.
+- emit a locator-only writeback receipt ref;
+- project an operator-visible receipt status without exposing memory content or visual/export verdicts.
 
 Acceptance gates require candidates to exclude current deliverable content, review/export verdicts, and canonical artifact blobs. The repo tracks the migration plan and seed locator contract only; it does not track memory entries, receipt instances, PNG/PPTX/PDF artifacts, route truth changes, or visual truth changes.
 
@@ -51,6 +53,16 @@ Acceptance gates require candidates to exclude current deliverable content, revi
 Forbidden seed fields include memory content bodies, generated slide/page content, visual verdicts, export verdicts, and canonical artifact blobs.
 
 `rca.visual_pattern_memory.writeback_receipt_locator.v1` points to writeback receipt refs. Receipt instances remain runtime/domain-memory state, not repo-tracked source.
+
+`rca.visual_pattern_memory.writeback_proposal_generator.v1` defines the candidate proposal shape. It records proposal ids, seed refs, source review refs, stage scope, deliverable family, candidate memory refs, provenance refs, and a recommended decision. It explicitly forbids memory content bodies, generated page content, review/export verdicts, and canonical artifact blobs.
+
+`rca.visual_pattern_memory.accept_reject.v1` is the RCA-owned decision command contract. It accepts only `accepted` or `rejected`, outputs locator refs, and writes any real domain-memory result outside repo-tracked source.
+
+`rca.visual_pattern_memory.operator_receipt_projection.v1` is the operator-facing read model for writeback status. OPL may display or index this projection ref, but it cannot make the decision, store memory content, or write receipt instances.
+
+## Controlled Stage Attempt Proof
+
+`rca.controlled_visual_stage_attempt.fixture.v1` proves the review/revision/export portion of a visual stage attempt through descriptor refs only. The direct RedCube skill path and OPL-hosted path share the same descriptor refs, product sidecar refs, and quality refs. OPL consumes those refs for queue/projection/receipt behavior; RCA keeps the visual truth, review/export verdicts, and artifact authority.
 
 ## Authority
 

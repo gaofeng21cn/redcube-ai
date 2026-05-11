@@ -338,6 +338,24 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
     assert.equal(artifactStage.authority_boundary.default_ppt_route_changed, false);
     assert.equal(artifactStage.authority_boundary.managed_deliverable_runtime_changed, false);
+    const reviewStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'review_and_revision');
+    assert.deepEqual(reviewStage.visual_pattern_memory_refs, [
+      '/domain_memory_descriptor_locator/writeback_proposal_generator',
+      '/domain_memory_descriptor_locator/accept_reject_command',
+    ]);
+    assert.equal(
+      reviewStage.outputs.some((output) => output.ref === '/domain_memory_descriptor_locator/writeback_proposal_generator'),
+      true,
+    );
+    const handoffStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'package_and_handoff');
+    assert.deepEqual(handoffStage.visual_pattern_memory_refs, [
+      '/domain_memory_descriptor_locator/writeback_receipt_locator',
+      '/domain_memory_descriptor_locator/operator_receipt_projection',
+    ]);
+    assert.equal(
+      handoffStage.outputs.some((output) => output.ref === '/domain_memory_descriptor_locator/operator_receipt_projection'),
+      true,
+    );
     assert.equal(manifest.domain_agent_skeleton_adapter.surface_kind, 'domain_agent_skeleton_adapter');
     assert.equal(manifest.domain_agent_skeleton_adapter.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
     assert.equal(manifest.domain_agent_skeleton_adapter.mapping_model, 'manifest_descriptor_mapping_only');
@@ -390,7 +408,19 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.domain_memory_descriptor_locator.migration_plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
     assert.equal(
       manifest.domain_memory_descriptor_locator.migration_plan.state,
-      'repo_source_contract_landed_runtime_migration_pending',
+      'repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending',
+    );
+    assert.ok(
+      manifest.domain_memory_descriptor_locator.migration_plan.migration_steps.includes('generate_writeback_proposal_locator'),
+    );
+    assert.ok(
+      manifest.domain_memory_descriptor_locator.migration_plan.migration_steps.includes('project_operator_receipt_status'),
+    );
+    assert.ok(
+      manifest.domain_memory_descriptor_locator.migration_plan.acceptance_gates.includes('proposal_is_locator_only'),
+    );
+    assert.ok(
+      manifest.domain_memory_descriptor_locator.migration_plan.acceptance_gates.includes('operator_receipt_projection_is_locator_only'),
     );
     assert.deepEqual(manifest.domain_memory_descriptor_locator.migration_plan.repository_boundary, {
       repo_tracks_migration_plan: true,
@@ -422,10 +452,64 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.domain_memory_descriptor_locator.writeback_receipt_locator.locator_id,
       'rca.visual_pattern_memory.writeback_receipt_locator.v1',
     );
+    assert.deepEqual(manifest.domain_memory_descriptor_locator.writeback_receipt_locator.locator_fields, [
+      'receipt_id',
+      'proposal_id',
+      'source_review_ref',
+      'candidate_memory_ref',
+      'writeback_status',
+      'memory_locator_ref',
+      'operator_receipt_projection_ref',
+      'owner',
+      'created_at',
+    ]);
     assert.equal(
       manifest.domain_memory_descriptor_locator.writeback_receipt_locator.repo_tracks_receipt_instances,
       false,
     );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.writeback_proposal_generator.generator_id,
+      'rca.visual_pattern_memory.writeback_proposal_generator.v1',
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.writeback_proposal_generator.repository_boundary.repo_tracks_proposal_instances,
+      false,
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.accept_reject_command.command_id,
+      'rca.visual_pattern_memory.accept_reject.v1',
+    );
+    assert.deepEqual(
+      manifest.domain_memory_descriptor_locator.accept_reject_command.allowed_decisions,
+      ['accepted', 'rejected'],
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.accept_reject_command.side_effect_boundary.writes_repo_memory_entry,
+      false,
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.operator_receipt_projection.projection_id,
+      'rca.visual_pattern_memory.operator_receipt_projection.v1',
+    );
+    assert.equal(
+      manifest.domain_memory_descriptor_locator.operator_receipt_projection.opl_consumption_policy.opl_can_store_memory_content,
+      false,
+    );
+    assert.equal(manifest.visual_pattern_memory_writeback.surface_kind, 'visual_pattern_memory_writeback_projection');
+    assert.equal(
+      manifest.visual_pattern_memory_writeback.proposal_generator.generator_id,
+      'rca.visual_pattern_memory.writeback_proposal_generator.v1',
+    );
+    assert.equal(
+      manifest.visual_pattern_memory_writeback.accept_reject_command.command_id,
+      'rca.visual_pattern_memory.accept_reject.v1',
+    );
+    assert.equal(
+      manifest.visual_pattern_memory_writeback.operator_receipt_projection.projection_id,
+      'rca.visual_pattern_memory.operator_receipt_projection.v1',
+    );
+    assert.equal(manifest.visual_pattern_memory_writeback.repo_tracks_memory_entries, false);
+    assert.equal(manifest.visual_pattern_memory_writeback.repo_tracks_receipt_instances, false);
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.memory_content_owner, 'redcube_ai');
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.route_truth_owner, 'redcube_ai');
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.review_export_verdict_owner, 'redcube_ai');
@@ -433,14 +517,42 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_role, 'locator_ref_receipt_consumer_only');
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_hold_memory_content, false);
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_choose_visual_route, false);
+    assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_accept_or_reject_memory_writeback, false);
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_issue_review_or_export_verdict, false);
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_mutate_canonical_artifacts, false);
     assert.equal(manifest.product_sidecar_receipt_refs.receipt_contract_id, 'rca.product_sidecar.receipt_refs.v1');
     assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('visual_verdict'), true);
     assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('artifact_blob'), true);
     assert.equal(manifest.controlled_visual_stage_attempt.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
+    assert.equal(manifest.controlled_visual_stage_attempt.proof_model, 'descriptor_sidecar_quality_ref_equivalence_only');
+    assert.deepEqual(manifest.controlled_visual_stage_attempt.stage_kinds, ['review_and_revision', 'package_and_handoff']);
+    assert.deepEqual(manifest.controlled_visual_stage_attempt.route_stage_refs, [
+      'visual_director_review',
+      'screenshot_review',
+      'repair_image_pages',
+      'export_pptx',
+    ]);
+    assert.deepEqual(
+      manifest.controlled_visual_stage_attempt.direct_skill_attempt.descriptor_refs,
+      manifest.controlled_visual_stage_attempt.opl_hosted_attempt.descriptor_refs,
+    );
+    assert.deepEqual(
+      manifest.controlled_visual_stage_attempt.direct_skill_attempt.sidecar_refs,
+      manifest.controlled_visual_stage_attempt.opl_hosted_attempt.sidecar_refs,
+    );
+    assert.deepEqual(
+      manifest.controlled_visual_stage_attempt.direct_skill_attempt.quality_refs,
+      manifest.controlled_visual_stage_attempt.opl_hosted_attempt.quality_refs,
+    );
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_descriptor_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_sidecar_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_quality_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.opl_writes_visual_truth, false);
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.opl_writes_review_export_verdict, false);
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.opl_writes_artifact_blob, false);
     assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_consumes_descriptor_refs, true);
     assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_consumes_artifact_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_consumes_quality_refs, true);
     assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_holds_visual_verdict, false);
     assert.equal(manifest.controlled_visual_stage_attempt.opl_policy_proof.opl_holds_export_verdict, false);
     assert.equal(manifest.controlled_visual_stage_attempt.projection_only_result.visual_export_verdict, null);

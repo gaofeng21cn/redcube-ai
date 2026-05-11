@@ -89,14 +89,14 @@ Now:
 
 - keep this policy as the RCA memory owner reference;
 - preserve image-first / HTML / native route contracts as structured route truth;
-- keep `rca.visual_pattern_memory.migration_plan.v1`, `rca.visual_pattern_memory.seed_fixture_locator.v1`, and `rca.visual_pattern_memory.writeback_receipt_locator.v1` as repo-source contract surfaces for future migration and acceptance;
+- keep `rca.visual_pattern_memory.migration_plan.v1`, `rca.visual_pattern_memory.seed_fixture_locator.v1`, `rca.visual_pattern_memory.writeback_proposal_generator.v1`, `rca.visual_pattern_memory.accept_reject.v1`, `rca.visual_pattern_memory.writeback_receipt_locator.v1`, and `rca.visual_pattern_memory.operator_receipt_projection.v1` as repo-source contract surfaces for migration, RCA decision, and operator-visible receipt projection;
+- use `rca.controlled_visual_stage_attempt.fixture.v1` as a descriptor/sidecar/quality-ref proof that direct RedCube skill calls and OPL-hosted stage attempts converge on the same RCA-owned review/revision/export refs;
 - record reusable visual lessons as prose in future review/export closeouts, runtime/domain-memory roots, or reference docs.
 
 Next:
 
-- wire explicit `knowledge_refs` / `visual_pattern_memory_refs` to stage descriptors when OPL's stage packet and closeout mechanics are stable;
-- route reusable visual lessons from `visual_director_review` and `screenshot_review` closeout into accepted/rejected memory writeback receipt refs;
-- show consumed memory refs in product-entry/operator projection.
+- route reusable visual lessons from real `visual_director_review` and `screenshot_review` closeout into accepted/rejected domain-memory writebacks under runtime/domain-memory authority;
+- surface the locator-only operator receipt projection in product-entry/operator views once real receipt instances exist outside repo.
 
 Defer:
 

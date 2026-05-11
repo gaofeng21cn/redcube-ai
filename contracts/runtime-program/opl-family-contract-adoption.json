@@ -278,7 +278,7 @@
       ],
       "migration_plan": {
         "plan_id": "rca.visual_pattern_memory.migration_plan.v1",
-        "state": "repo_source_contract_landed_runtime_migration_pending",
+        "state": "repo_source_contract_landed_operator_projection_ready_runtime_writeback_pending",
         "source_surfaces": [
           "workspace_runtime_root",
           "product_entry_session",
@@ -292,17 +292,22 @@
           "discover_candidate_lessons",
           "extract_reusable_pattern_card_candidate",
           "record_seed_fixture_locator_ref",
+          "generate_writeback_proposal_locator",
           "domain_review_accept_or_reject",
           "publish_memory_locator_ref",
-          "emit_writeback_receipt_ref"
+          "emit_writeback_receipt_ref",
+          "project_operator_receipt_status"
         ],
         "acceptance_gates": [
           "source_ref_resolves_to_rca_owned_runtime_or_repo_reference",
           "candidate_excludes_current_deliverable_content",
           "candidate_excludes_review_export_verdict",
           "candidate_excludes_canonical_artifact_blob",
+          "proposal_is_locator_only",
+          "decision_is_rca_owned_accept_or_reject",
           "accepted_memory_has_rca_owner",
-          "writeback_receipt_is_locator_only"
+          "writeback_receipt_is_locator_only",
+          "operator_receipt_projection_is_locator_only"
         ],
         "repository_boundary": {
           "repo_tracks_migration_plan": true,
@@ -352,9 +357,12 @@
         "source_root_model": "workspace_runtime_or_domain_memory_reference",
         "locator_fields": [
           "receipt_id",
+          "proposal_id",
           "source_review_ref",
           "candidate_memory_ref",
           "writeback_status",
+          "memory_locator_ref",
+          "operator_receipt_projection_ref",
           "owner",
           "created_at"
         ],
@@ -371,7 +379,91 @@
         "route_truth_owner": "redcube_ai",
         "review_export_verdict_owner": "redcube_ai",
         "artifact_authority_owner": "redcube_ai",
-        "opl_role": "locator_ref_receipt_consumer_only"
+        "opl_role": "locator_ref_receipt_consumer_only",
+        "opl_can_accept_or_reject_memory_writeback": false
+      },
+      "writeback_proposal_generator": {
+        "generator_id": "rca.visual_pattern_memory.writeback_proposal_generator.v1",
+        "surface_kind": "visual_pattern_memory_writeback_proposal_generator",
+        "generator_model": "locator_only_candidate_projection",
+        "proposal_contract": {
+          "proposal_id_prefix": "rca-memory-proposal:visual-pattern:",
+          "required_fields": [
+            "proposal_id",
+            "seed_fixture_ref",
+            "source_review_ref",
+            "stage_scope",
+            "deliverable_family",
+            "candidate_memory_ref",
+            "provenance_refs",
+            "recommended_decision"
+          ],
+          "forbidden_fields": [
+            "memory_content_body",
+            "slide_or_page_content",
+            "visual_verdict",
+            "export_verdict",
+            "review_verdict",
+            "canonical_artifact_blob"
+          ]
+        },
+        "repository_boundary": {
+          "repo_tracks_generator_contract": true,
+          "repo_tracks_proposal_instances": false,
+          "repo_tracks_memory_entries": false,
+          "repo_tracks_receipt_instances": false,
+          "repo_tracks_visual_or_export_artifacts": false
+        }
+      },
+      "accept_reject_command": {
+        "command_id": "rca.visual_pattern_memory.accept_reject.v1",
+        "surface_kind": "visual_pattern_memory_accept_reject_command",
+        "owner": "redcube_ai",
+        "command_model": "rca_domain_memory_decision_locator_only",
+        "allowed_decisions": [
+          "accepted",
+          "rejected"
+        ],
+        "output_refs": [
+          "memory_locator_ref",
+          "writeback_receipt_ref",
+          "operator_receipt_projection_ref"
+        ],
+        "side_effect_boundary": {
+          "writes_domain_memory_outside_repo": true,
+          "writes_repo_memory_entry": false,
+          "writes_repo_receipt_instance": false,
+          "writes_visual_truth": false,
+          "writes_review_export_verdict": false,
+          "writes_canonical_artifact_blob": false
+        }
+      },
+      "operator_receipt_projection": {
+        "projection_id": "rca.visual_pattern_memory.operator_receipt_projection.v1",
+        "surface_kind": "visual_pattern_memory_operator_receipt_projection",
+        "projection_model": "operator_visible_locator_status_only",
+        "visible_fields": [
+          "receipt_id",
+          "proposal_id",
+          "writeback_status",
+          "memory_locator_ref",
+          "source_review_ref",
+          "operator_message_ref"
+        ],
+        "forbidden_projection_fields": [
+          "memory_content_body",
+          "visual_verdict",
+          "export_verdict",
+          "review_verdict",
+          "artifact_blob"
+        ],
+        "opl_consumption_policy": {
+          "opl_can_surface_projection": true,
+          "opl_can_store_projection_ref": true,
+          "opl_can_store_memory_content": false,
+          "opl_can_issue_decision": false,
+          "opl_can_write_receipt_instance": false
+        }
       }
     },
     "product_sidecar_receipt_refs": {
@@ -390,7 +482,26 @@
       "opl_consumes_artifact_refs": true,
       "opl_holds_visual_verdict": false,
       "opl_holds_export_verdict": false,
-      "opl_holds_canonical_artifact_content": false
+      "opl_holds_canonical_artifact_content": false,
+      "proof_model": "descriptor_sidecar_quality_ref_equivalence_only",
+      "covered_family": "ppt_deck",
+      "stage_kinds": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "route_stage_refs": [
+        "visual_director_review",
+        "screenshot_review",
+        "repair_image_pages",
+        "export_pptx"
+      ],
+      "opl_consumes_quality_refs": true,
+      "direct_and_opl_share_descriptor_refs": true,
+      "direct_and_opl_share_sidecar_refs": true,
+      "direct_and_opl_share_quality_refs": true,
+      "opl_writes_visual_truth": false,
+      "opl_writes_review_export_verdict": false,
+      "opl_writes_artifact_blob": false
     }
   },
   "non_goals": [
