@@ -8,7 +8,7 @@
 
 ## 这一步解决什么
 
-direct / federated 两条入口现在共享一个用户级 session store：
+direct / OPL-hosted 两条入口现在共享一个用户级 session store：
 
 `$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/`
 

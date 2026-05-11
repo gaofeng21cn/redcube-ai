@@ -52,7 +52,7 @@ future direct-delivery 应按这条 5 步工作线被完整定义：
 - `controller expansion`
 - new family / overlay expansion
 - managed web runtime migration
-- OPL federation integration
+- OPL-hosted integration
 - 任何 hidden fallback chain
 - 任何用 prompt patch 代替 contract hydration 的做法
 

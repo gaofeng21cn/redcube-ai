@@ -5,6 +5,7 @@
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 - 不得把 `controller` 误写成公开产品入口。
 - `Codex CLI` 作为 executor adapter 选中的默认 concrete executor 不得被隐式改写。
+- 在 OPL 托管路径中，除非调用方显式选择 hosted/proof backend，`Codex CLI` 仍是 RCA 的最小具体执行单元。
 
 ## Mainline truth
 
@@ -13,8 +14,8 @@
 - `docs/program/*/*.md` 是对应的人类可读 brief，必须与 contracts 和 tests 同步。
 - `Hermes-Agent` 一词只允许指上游外部 runtime 项目 / 服务；仓内自写 package、pilot、shim 或 scaffold 不得写成“已接入 Hermes-Agent”。
 - 对外主语固定为“独立 visual-deliverable domain agent”；`gateway / harness` 只作为内部架构边界语言。
-- repo-verified direct route 与 OPL federated route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
-- `OPL` 在 RCA 主线中只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes。
+- repo-verified direct route 与 OPL-hosted route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
+- `OPL` 在 RCA 主线中是可外部依赖的 Codex-first、stage-led 智能体运行框架；它只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不成为 RCA 第一公开身份。
 - `OPL Runtime Manager` 只允许作为 OPL 侧 thin adapter/projection layer over the configured family runtime provider；Temporal 是目标生产 substrate，`Hermes-Agent` 只保留为迁移期 legacy/optional provider、显式 hosted/proof backend 或 executor proof lane。它不得成为 RedCube visual-domain truth owner、canonical artifact owner、review/publication projection owner、scheduler kernel、session store、memory store、concrete executor 或 private Hermes fork。
 
 ## 目标优先级
@@ -32,6 +33,8 @@
 - `AGENTS.md` 只管工作方式，不堆项目事实。
 - 核心项目知识优先收敛到 `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md`。
 - 公开文档双语；内部规划、审计与维护文档默认中文。
+- `README*` 与 `docs/README*` 必须先写 RCA 的视觉交付身份，再写 OPL 托管 / 内部集成路径。
+- 含有旧 gateway、bridge、harness、Hermes-first 或 OPL-first 口径的文档，若仍被 `human_doc:*` 或 runtime-program 合同引用，留在原生命周期层并补充 lifecycle/provenance 说明；无合同引用且不服务当前 baton 的旧计划进入 `docs/history/` 或 tombstone 语境。
 
 ## 本地状态
 

@@ -17,6 +17,7 @@
 - [AI-first 质量边界 Policy](ai_first_quality_boundary.md)
 - [视觉模式记忆 Policy](visual_pattern_memory_policy.md)
 - [TypeScript 迁移 Policy](typescript_migration_policy.md)
+- 文档生命周期规则目前集中在 `../docs_portfolio_consolidation.md` 和 `../references/series-doc-governance-checklist.md`：公开入口先写 RCA 视觉交付身份，OPL 只作为托管运行框架路径；合同引用的旧 program brief 原位降级，无合同引用的旧计划进入 history / tombstone。
 
 当前统一口径：
 

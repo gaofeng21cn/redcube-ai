@@ -2,6 +2,8 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文件仍作为 contract-linked target/provenance brief 保留，但当前解释口径已被 2026-05-10 provider-backed OPL runtime target 更新。OPL 是可外部依赖的 Codex-first、stage-led 运行框架；Hermes 只保留 legacy/optional provider 或显式 proof lane；RedCube 的第一公开身份仍是视觉交付领域智能体。
+
 ## 一句话结论
 
 `RedCube AI` 的最终目标，不是继续打磨 repo-local runtime，也不是把自己写成整个 `OPL`。
@@ -52,16 +54,16 @@ configured family runtime provider 可承担：
 
 ## 当前已经落地的部分
 
-- external `Hermes-Agent` live/proof substrate 已有历史可验证 closeout 记录；当前 federation 入口通过 `OPL Runtime Manager` 作为薄 adapter/projection layer 消费 configured family runtime provider，不把 repo-local wrapper 或 Hermes-first proof 写成当前 substrate ownership proof
+- external `Hermes-Agent` live/proof substrate 已有历史可验证 closeout 记录；当前 OPL-hosted 入口通过 `OPL Runtime Manager` 作为薄 adapter/projection layer 消费 configured family runtime provider，不把 repo-local wrapper 或 Hermes-first proof 写成当前 substrate ownership proof
 - `redcube_service_safe_domain_entry` 已冻结为 machine-readable domain adapter
 - `CLI` / `MCP` 仍是 repo-verified public entry
-- repo-verified direct route 与 `OPL Runtime Manager` internal bridge 已对齐为同一 downstream domain-agent entry
+- repo-verified direct route 与 `OPL Runtime Manager` hosted integration 已对齐为同一 downstream domain-agent entry
 - visual-domain truth 仍由 `RedCube AI` 收口，没有被 runtime cutover 冲散
 
 ## 当前还没有落地的部分
 
 - repo-verified 的 `RedCube Product Entry` service surface 已落地，但成熟的最终用户产品入口前台壳仍未落地
-- repo-verified 的 `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube` internal bridge 已能进入同一个 downstream product entry，但仍不是成熟的 end-user 托管前台路线，也不等于生产级 Temporal stage execution 已完成
+- repo-verified 的 `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube` hosted integration 已能进入同一个 downstream product entry，但仍不是成熟的 end-user 托管前台路线，也不等于生产级 Temporal stage execution 已完成
 - 当前 landed 的是 service surface、CLI/MCP wrapper 与 session continuity，不是独立 UI 或 managed web runtime shell
 
 ## 当前真实 gap

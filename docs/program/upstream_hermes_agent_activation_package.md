@@ -2,6 +2,8 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文件是已完成的 upstream Hermes proof provenance，仍因 program 合同引用而原位保留。它不表示 Hermes 是 RCA 当前默认 runtime owner；当前默认 concrete executor 是 `Codex CLI`，OPL 托管路径按 provider-backed / Temporal-target 口径读取。
+
 这份 activation package 已完成 closeout。
 它现在承载的不是“下一步预告”，而是 F1 已冻结的真实 upstream 连接证据：
 

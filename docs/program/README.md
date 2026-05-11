@@ -1,19 +1,22 @@
 # Program Docs
 
-`docs/program/` holds the active baton and contract-linked program records.
+`docs/program/` holds the active baton, absorbed tranche briefs, and contract-linked program records.
+
+This directory is not the public identity layer. `RedCube AI` remains a visual-deliverable domain agent first; OPL is a Codex-first, stage-led runtime framework that may host RCA through an internal integration path. Older filenames that mention gateway, federation, bridge, harness, or Hermes-first routes are retained here only when machine-readable contracts still point to their `human_doc:*` semantic IDs.
 
 Current rules:
 
 - Keep briefs here when `contracts/runtime-program/current-program.json` or a tranche contract points to them.
-- Keep current product-entry, service-safe domain-entry, OPL bridge, and runtime baton records readable from this directory.
+- Keep current product-entry, service-safe domain-entry, OPL-hosted integration, and runtime baton records readable from this directory.
 - Treat `phase-2/` as absorbed tranche provenance that remains in place because runtime-program contracts still link to those briefs.
-- Treat `upstream_hermes_agent_*.md` as the current target-shape / blocker / closeout record set unless a later contract moves the baton.
+- Treat `upstream_hermes_agent_*.md` as historical proof / blocker / closeout records now read through the provider-backed OPL runtime target, unless a later contract moves the baton.
+- Add or preserve lifecycle notes on legacy-titled files instead of moving contract-linked briefs first.
 - Move repo-local migration notes that no longer serve the baton into `docs/history/`.
 
 Current entry groups:
 
-- Product-entry and bridge: `redcube_product_entry_mvp.md`, `managed_product_entry_hardening.md`, `opl_gateway_federated_product_entry.md`
-- Upstream Hermes-Agent target and verification records: `upstream_hermes_agent_*.md`
+- Product-entry and internal integration: `redcube_product_entry_mvp.md`, `managed_product_entry_hardening.md`, `opl_gateway_federated_product_entry.md`
+- Upstream Hermes-Agent proof and verification provenance: `upstream_hermes_agent_*.md`
 - Absorbed Phase 2 tranche records: `phase-2/`
 
 Historical material moved out of this layer:

@@ -8,7 +8,7 @@
   <a href="./README.md"><strong>English</strong></a> | <a href="./README.zh-CN.md">中文</a>
 </p>
 
-<p align="center"><strong>A skill-first visual-deliverable domain agent for turning source material, review cycles, and exported files into one managed delivery line</strong></p>
+<p align="center"><strong>A skill-first visual delivery agent for turning source material, review cycles, and exported files into one managed delivery line</strong></p>
 <p align="center">Slides · Xiaohongshu Notes · Posters</p>
 
 <table>
@@ -60,14 +60,12 @@ You can start with prompts like:
 
 ## Current Boundary
 
-- `RedCube AI` is an independent visual-deliverable domain agent.
+- `RedCube AI` is an independent visual-deliverable domain agent. Its first public identity is visual delivery: source intake, staged visual authorship, review, repair, export, and file handoff.
 - The first public surface is the single `redcube-ai` app skill; `status` / `invoke` / `session` stay as machine-readable command contracts underneath that skill. In that contract, `status` means the agent-facing product-entry overview / intake / entry shell, not a landed GUI, WebUI, or end-user front office.
 - Its stable callable surface is the local CLI, MCP/product-entry commands, `invokeDomainEntry`, local scripts, and repo-tracked contracts.
-- It covers source intake, deliverable creation, review loops, export, and file-oriented delivery.
-- The direct route and the internal OPL bridge both converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
-- `OPL` stays at family-level session/runtime/projection orchestration plus shared modules/contracts/indexes, and its federated product-entry path is an internal integration surface rather than the first public story.
-- In the stage-led OPL family framework, RedCube owns the visual-deliverable stage pack, prompts, skills, review gates, visual-domain truth, and export authority. OPL may provide wakeup, queue, handoff, receipts, and projection support, but it does not become the visual-domain brain or artifact owner.
-- The target `OPL Runtime Manager` indexes RedCube product-entry/session/runtime/artifact/review projections over the configured OPL family runtime provider. Temporal is the target production substrate for durable stage attempts; Hermes remains a legacy/optional provider or executor/proof lane during migration. RedCube remains the visual-domain truth owner.
+- OPL is the Codex-first, stage-led agent runtime framework that can host RedCube as an external domain agent. Its path is an internal integration / hosted-runtime path, not RedCube's first public identity.
+- When OPL hosts RedCube, Codex CLI remains the minimum concrete execution unit unless an explicit hosted/proof backend is selected; both direct and OPL-hosted paths converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
+- RedCube owns the visual-deliverable stage pack, prompts, skills, review gates, visual-domain truth, canonical artifacts, and export authority. OPL may provide queue, wakeup, handoff, receipts, retry/dead-letter handling, and projection support, but it does not become the visual-domain brain or artifact owner.
 - RedCube's public executor backend contract is `codex_cli` or `hermes_agent`; `execution_shape` is declared separately as `structured_call` or `agent_loop`.
 - The implementation target is `TypeScript + Python`: TypeScript for product/runtime contracts and service boundaries, Python via the repo-owned `redcube_ai` helper package for native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
 - Content framing, audience fit, and final acceptance stay with experts.
@@ -84,12 +82,12 @@ You can start with prompts like:
 <details>
   <summary><strong>Start here if you are handing this repo to Codex or another agent</strong></summary>
 
-- Read the [Docs Guide](./docs/README.md) first. It explains the direct route, the internal OPL bridge/reference surface, the stable capability surface, and the current technical baseline.
+- Read the [Docs Guide](./docs/README.md) first. It explains the direct RedCube route, the OPL-hosted integration path, the stable capability surface, and the current technical baseline.
 - Then read [Contracts Overview](./contracts/README.md) plus [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md) before changing entry wording or integration language.
 - The current repo-verified public entry surfaces are the single `redcube-ai` app skill, `CLI`, and `MCP`; `controller` remains the internal control plane. Together with `invokeDomainEntry`, `invokeProductEntry`, local scripts, and repo-tracked contracts, they form the stable callable surface. `Codex CLI` is still the default local concrete executor; hosted/proof backends remain explicit opt-in lanes.
-- RedCube can be invoked directly through its Codex app skill or through OPL. Both routes must converge on the same RedCube-owned route, review, artifact, and export surfaces.
+- RedCube can be invoked directly through its Codex app skill or through OPL as an external domain agent. Both routes must converge on the same RedCube-owned route, review, artifact, and export surfaces.
 - Treat the implementation surface as TypeScript orchestration plus Python native helpers. Repo-tracked JavaScript is retired; new product, test, or script JavaScript is blocked by the closeout audit.
-- When an external agent or OPL wants the repo-tracked skill surface directly, use the single `redcube-ai` app skill and launch CLI-backed commands through `npm run --prefix <redcube-ai-repo> redcube -- ...`; `status` / `invoke` / `session` remain machine-readable command contracts underneath that one skill. `redcube product status` is the current product-status command for the product-entry overview / intake shell; it does not imply a mature human-facing GUI or WebUI. The OPL federated bridge stays an internal integration surface.
+- When an external agent or OPL wants the repo-tracked skill surface directly, use the single `redcube-ai` app skill and launch CLI-backed commands through `npm run --prefix <redcube-ai-repo> redcube -- ...`; `status` / `invoke` / `session` remain machine-readable command contracts underneath that one skill. `redcube product status` is the current product-status command for the product-entry overview / intake shell; it does not imply a mature human-facing GUI or WebUI. The OPL-hosted path stays an internal integration surface.
 - Test lane truth lives in `scripts/test-registry.ts` and the current verification matrix is maintained in [Status](./docs/status.md). `smoke` is the minimal local entry, `fast` is the core regression lane, hosted CI is equivalent to `npm run test:ci`, and `historical` runs only when explicitly requested.
 - Use `docs/program/` for absorbed mainline milestones and `docs/references/` for bridge or provenance material, instead of reconstructing execution truth from scattered implementation files.
 

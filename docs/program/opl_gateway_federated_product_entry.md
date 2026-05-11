@@ -2,11 +2,11 @@
 
 状态锚点：`2026-04-12`
 
-历史说明：本文件名保留早期 `OPL Gateway` provenance；正文 current-facing 口径以 `OPL Runtime Manager` 为准。
+生命周期说明：本文件名保留早期 `OPL Gateway` provenance，且仍被 runtime-program 合同通过 `human_doc:*` 语义 ID 引用，因此原位保留。当前口径以 `OPL Runtime Manager` 托管集成路径为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth。
 
 ## 一句话结论
 
-`OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，可以通过 repo-verified internal bridge surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
+`OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，可以通过 repo-verified hosted integration surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
 
 ## 这一步解决什么
 
@@ -17,7 +17,7 @@
 关键不变量是：
 
 - OPL handoff 不再需要分叉成另一套 RedCube 私有入口协议
-- direct `RedCube Product Entry` 与 `OPL Runtime Manager` internal bridge 共用同一 downstream `product entry`
+- direct `RedCube Product Entry` 与 `OPL Runtime Manager` hosted integration 共用同一 downstream `product entry`
 - `invokeDomainEntry` 继续是 domain-level service-safe adapter
 - `OPL Runtime Manager` 不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor
 

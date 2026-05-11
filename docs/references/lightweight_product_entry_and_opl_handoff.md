@@ -1,5 +1,7 @@
 # RedCube AI 轻量产品入口与 OPL 内部 Handoff
 
+生命周期说明：本文是 supporting reference，用来解释 direct RedCube entry 与 OPL 托管集成路径如何共用同一 downstream domain entry。它不把 OPL / bridge / handoff 写成 RedCube 的对外第一身份；公开入口仍以 `redcube-ai` 应用技能和视觉交付领域智能体身份为准。
+
 ## 1. 当前真相
 
 `RedCube AI` 现在已经有可验证的 `operator entry`、`agent entry`，以及一层薄的 `product entry` service surface：
@@ -9,7 +11,7 @@
 - `agent entry`
   - 面向 `Codex` / Claude Code / OpenClaw 等 host-agent 的 `CLI` / `MCP`
 - `product entry`
-  - 面向 direct RedCube entry 与 OPL internal bridge 的 repo-verified service surface
+  - 面向 direct RedCube entry 与 OPL 托管集成路径的 repo-verified service surface
 
 但它仍然没有成熟的最终用户前台壳。
 也就是说，当前已经不是“完全没有 product entry”，而是“已经有可调用服务面，但还不是稳定的 end-user product shell”。
@@ -20,7 +22,7 @@
 
 `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
-在 `OPL` 家族级入口下，也必须兼容同一条下游形态，但这条路径在这里仅作为 internal bridge / reference surface：
+在 `OPL` 家族级入口下，也必须兼容同一条下游形态，但这条路径在这里仅作为 hosted integration / reference surface：
 
 `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
@@ -76,7 +78,7 @@
 
 ## 5. 当前不应过度宣称的事
 
-- 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` internal federation/bridge 写成已落地
+- 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` hosted integration 写成已落地
 - 但不能把它们写成成熟的最终用户前台壳或真实线上托管产品入口
 - 当前 route / managed run surface 已切到上游 `Hermes-Agent` managed runtime
 - 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行

@@ -4,10 +4,10 @@
 
 ## 主链路
 
-当前对外主链路以 direct route 为第一主语，OPL 路线保留为 internal bridge / integration surface：
+当前对外主链路以 direct route 为第一主语，OPL 路线保留为 hosted integration surface。OPL 是 Codex-first、stage-led 的完整智能体运行框架，可以托管 RCA，但它不是 RCA 的第一公开身份：
 
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- internal OPL bridge route：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- OPL-hosted route：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 在 OPL Codex-first、stage-led family framework 中，这两条路线都可以被投影为 stage attempt，但 RCA owner 边界不变：OPL 只提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
 
@@ -15,7 +15,7 @@
 
 `service-safe domain entry -> executor adapter -> concrete executor -> audit / review / publication projection`
 
-当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`status`、`invoke`、`session continuation` 与 internal `OPL bridge` 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义；direct product-entry 默认 runtime / executor 都是 `codex_cli`，只有 internal OPL bridge 或显式 Hermes proof lane 才声明 `upstream_hermes_agent`。
+当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`status`、`invoke`、`session continuation` 与 internal OPL integration 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义；direct product-entry 默认 runtime / executor 都是 `codex_cli`，只有 OPL-hosted integration 或显式 Hermes proof lane 才声明 `upstream_hermes_agent`。
 这里的 `status` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 `family_action_catalog` 是 RCA-owned callable action metadata 单一声明面；product-entry manifest、CLI help、MCP descriptors/routes 与 app skill command contracts 都从它派生。`OPL` 只读取该 catalog 做 family-level discovery/export/parity，不写 RedCube visual-domain truth、managed run truth、review/publication projection 或 canonical artifacts。
 `redcube product sidecar export --workspace-root <dir> --format json` 是给 OPL typed family queue / OPL family runtime provider 在线唤醒使用的 product sidecar adapter projection；`redcube product sidecar dispatch --task <task.json> --format json` 只接受 RCA-owned guarded actions：`runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`notification_receipt`。该 sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。
@@ -37,8 +37,8 @@
 
 - `direct product entry`
   - 第一公开主语是单一 `redcube-ai` app skill；`CLI` / `MCP` 提供可验证协议入口，`status` 只作为 skill 下的 machine-readable product-entry overview / intake / entry-shell contract，`session` 负责续跑
-- `internal OPL handoff`
-  - 给 `OPL Runtime Manager` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 internal bridge / integration surface
+- `OPL-hosted handoff`
+  - 给 `OPL Runtime Manager` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 hosted integration surface
 - `future managed product shell`
   - 给成熟最终用户前台壳预留的未来产品层
 
@@ -79,11 +79,11 @@
 
 这里的关键约束是：
 
-- direct `RedCube` product entry 和 `OPL Runtime Manager` internal bridge 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
-- `OPL Runtime Manager` 只消费 product-entry registration、federated invocation、session continuity、runtimeWatch、artifact inventory、review/publication projection，不创建第二套 RedCube truth
+- direct `RedCube` product entry 和 `OPL Runtime Manager` hosted integration 必须共用同一个 downstream domain-agent entry（service-safe domain entry）contract
+- `OPL Runtime Manager` 只消费 product-entry registration、hosted invocation、session continuity、runtimeWatch、artifact inventory、review/publication projection，不创建第二套 RedCube truth
 - product sidecar adapter 只把这些 RCA-owned surfaces 投影给 OPL provider；family runtime provider 是 24h online substrate / wakeup substrate，OPL 是 typed family queue / control plane，RCA 继续持有 visual-domain truth、review/publication projection 与 artifact authority
 - today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
-- `invokeFederatedProductEntry` 继续作为 internal OPL bridge contract
+- `invokeFederatedProductEntry` 继续作为 internal OPL integration contract
 - 成熟的最终用户产品入口前台壳仍未落地
 
 ## Hermes-Agent、RedCube AI 与 concrete executor 的分工
@@ -94,7 +94,7 @@
 - gateway / messaging / interrupt / resume
 - family 级长期在线 runtime substrate
 
-当前默认 concrete executor 仍是 `Codex CLI host-agent runtime`，它负责：
+当前默认 concrete executor 仍是 `Codex CLI host-agent runtime`。在 OPL stage-led runtime framework 中，它也是未显式选择 hosted/proof backend 时的最小具体执行单元，负责：
 
 - 默认 agent execution lane
 - 受保护创作 stage 的结构化生成执行
@@ -148,7 +148,7 @@
 
 - 由 `RedCube AI` 统一稳定 capability surface 与 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-Agent loop` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
-- 由 `OPL Runtime Manager` 统一 federated 长期托管、状态索引、doctor/repair/resume 与 native helper catalog；Temporal 是 OPL family runtime provider 的目标生产 substrate，未来自有 sidecar 只有在 provider abstraction 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
+- 由 `OPL Runtime Manager` 统一 hosted integration 的长期托管、状态索引、doctor/repair/resume 与 native helper catalog；Temporal 是 OPL family runtime provider 的目标生产 substrate，未来自有 sidecar 只有在 provider abstraction 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
 
 ## Language Target
 
@@ -174,11 +174,11 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 当前 repo-verified 的 product-entry service surface 是：
 
 - contract: `contracts/runtime-program/redcube-product-entry-mvp.json`
-- internal bridge contract: `contracts/runtime-program/opl-gateway-federated-product-entry.json`
+- hosted integration contract: `contracts/runtime-program/opl-gateway-federated-product-entry.json`（文件名保留历史 provenance）
 - managed hardening contract: `contracts/runtime-program/managed-product-entry-hardening.json`
 - callable surfaces:
   - `@redcube/gateway` `invokeProductEntry`
-  - `@redcube/gateway` `invokeFederatedProductEntry`（internal bridge）
+  - `@redcube/gateway` `invokeFederatedProductEntry`（OPL-hosted integration）
   - `@redcube/gateway` `getProductEntrySession`
 
 它们继续把执行下沉到同一个 `invokeDomainEntry`，同时把 session continuity 持久化到用户级 runtime-state，而不是把 product entry 写成 repo-local runtime 自己的新宿主。

@@ -2,14 +2,16 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文件记录 service-safe domain entry 的历史 Hermes-hosted proof 语境，当前应按 OPL-hosted integration / provider-backed runtime 口径读取。它不改变 RCA 的 direct public identity，也不把 Hermes-first route 提升为默认对外入口。
+
 ## 目标
 
 在 `runDeliverableRoute / runManagedDeliverable` 已经具备显式 external `Hermes-Agent` hosted/proof backend 之后，
-继续冻结一个 `OPL Runtime Manager` 可通过 internal bridge 调用的 service-safe domain entry surface。
+继续冻结一个 `OPL Runtime Manager` 可通过 OPL-hosted integration 调用的 service-safe domain entry surface。
 
 这层 surface 的边界是：
 
-- OPL 侧 federation 由 `OPL Runtime Manager` 作为 thin product-managed adapter/projection layer 挂到 external `Hermes-Agent` substrate
+- OPL-hosted integration 由 `OPL Runtime Manager` 作为 thin product-managed adapter/projection layer 挂到 configured family runtime provider
 - 默认 concrete executor 仍是 `Codex CLI`
 - visual domain truth 仍由 `RedCube AI` 负责
 - 不引入聊天 UI，不改写当前 formal-entry matrix

@@ -1,6 +1,6 @@
 # Domain Harness OS 定位与映射
 
-这份文档用于统一 `RedCube AI` 在 `Unified Harness Engineering Substrate` 中的位置与边界。
+这份文档用于统一 `RedCube AI` 在历史 `Unified Harness Engineering Substrate` 口径中的位置与边界。
 它是仓库跟踪的内部技术口径文档，不属于默认对外双语公开正文面。
 当前公开第一身份是独立 visual-deliverable domain agent 与单一 `redcube-ai` app skill；本文的 `Domain Gateway` / `Domain Harness OS` 词汇只按内部边界层与执行层语言理解。
 
@@ -14,7 +14,7 @@
 
 这里的关键约束是：
 
-- 共享同一 `Unified Harness Engineering Substrate`
+- 可被 OPL 这类 Codex-first、stage-led 运行框架托管
 - 通过同一套 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 控制链运行
 - 通过 family-specific contract 区分交付物，不通过平行系统分叉主线
 
@@ -48,8 +48,8 @@
 
 当前产品 runtime 形态：
 
-- `OPL Runtime Manager`（OPL 侧 thin product-managed adapter/projection layer，管理 external `Hermes-Agent` substrate 的 registration / status / doctor / repair / resume 投影）
-- external `Hermes-Agent` runtime substrate（显式 hosted/proof backend 或技术参考层；不是 repo-local wrapper proof）
+- `OPL Runtime Manager`（OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 registration / status / doctor / repair / resume 投影）
+- configured family runtime provider（Temporal 是目标生产 substrate；external `Hermes-Agent` 只作为 legacy/optional provider 或显式 hosted/proof lane）
 - 本地 Codex CLI host-agent runtime（当前默认 concrete executor）
 - `Codex` 本地 operator host（当前本地部署宿主 / workspace bridge）
 - `repo-local managed runtime pilot`（历史本地迁移工件 / 兼容桥）
@@ -81,7 +81,7 @@
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
 - `docs/history/hermes/*` 相关 activation package 已转为历史本地迁移工件；它们不再代表“上游 `Hermes-Agent` 已接管 runtime”
 - `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 都已吸收为同一主线 provenance
-- 当前 active tranche 应按 `repo-verified product entry + OPL Runtime Manager federation bridge + managed product-entry hardening` 理解：OPL federation 通过 thin product-managed adapter/projection layer 挂到 external `Hermes-Agent` substrate，默认 concrete executor 仍是本地 Codex CLI host-agent runtime；product-entry service surface 与 session continuity 已 landed，而 mature end-user product shell 仍未落地；stable family runtime output、`xiaohongshu` human-publication closure 与 guarded `poster_onepager` 仍在同一 RedCube visual-domain truth 上收口
+- 当前 active tranche 应按 `repo-verified product entry + OPL Runtime Manager hosted integration + managed product-entry hardening` 理解：OPL 托管路径通过 thin product-managed adapter/projection layer 挂到 configured family runtime provider，默认 concrete executor 仍是本地 Codex CLI host-agent runtime；product-entry service surface 与 session continuity 已 landed，而 mature end-user product shell 仍未落地；stable family runtime output、`xiaohongshu` human-publication closure 与 guarded `poster_onepager` 仍在同一 RedCube visual-domain truth 上收口
 - authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 

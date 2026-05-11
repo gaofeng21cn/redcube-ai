@@ -2,14 +2,16 @@
 
 这份参考文档冻结 `OPL` 家族仓在托管运行时上的统一 owner 口径。
 
+生命周期说明：本文保留历史三层 owner 讨论的参考价值。当前系列口径已经更新为 provider-backed OPL runtime：OPL 是 Codex-first、stage-led 的运行框架，Temporal 是目标生产 substrate，Hermes 只是 legacy/optional provider 或显式 proof lane；RCA 默认最小具体执行单元仍是 `Codex CLI`。
+
 目标不是这轮就完成跨仓共享代码抽取，而是先把跨仓不能再漂移的 contract 写死。
 
 ## 一句话形状
 
 统一按三层理解：
 
-- `Hermes-Agent`
-  - 长期运行与托管能力 owner
+- `OPL Runtime Manager / configured family runtime provider`
+  - 长期运行与托管能力 owner；Temporal 是目标生产 substrate，Hermes 只保留 legacy/optional provider 或显式 proof lane
 - domain supervision
   - 领域治理、质量门控、进度真相、恢复判断 owner
 - quest executor
@@ -17,8 +19,8 @@
 
 对应到 `RedCube AI`：
 
-- `Hermes-Agent`
-  - managed runtime / session / run / watch / resume owner
+- `OPL Runtime Manager / configured family runtime provider`
+  - managed runtime / session / run / watch / resume owner；不持有 RCA visual truth
 - `RedCube AI`
   - visual governance / audit / review / publication projection owner
 - concrete executor
@@ -34,7 +36,7 @@
 
 三层切开后：
 
-- `Hermes-Agent` 只负责长期在线、调度、恢复和托管宿主
+- `OPL Runtime Manager / configured family runtime provider` 只负责长期在线、调度、恢复和托管宿主
 - `RedCube AI` 只负责 visual-domain truth、review gate 与 publication projection
 - concrete executor 只负责按已放行 route 把活干出来
 

@@ -2,6 +2,13 @@
 
 ## 2026-05-10
 
+### 决策：RCA 文档第一身份收口到视觉交付，OPL 降为托管运行框架路径
+
+- `RedCube AI` 的公开首页、docs 入口和核心五件套先表达独立 visual-deliverable domain agent 身份，再表达 OPL 托管路径。
+- `OPL` 在 RCA 文档中固定解释为 Codex-first、stage-led 的完整智能体运行框架，可作为外部依赖托管 RCA；它不成为 RCA 对外第一身份，也不接管 visual-domain truth、canonical artifacts、review/export gate 或 publication projection。
+- `Codex CLI` 是 RCA direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的默认最小具体执行单元。
+- 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL bridge`、Hermes-first 口径只能出现在内部集成、provenance、合同兼容、或 tombstone 语境中；仍被 runtime-program 合同引用的 program brief 留在 `docs/program/`，通过 lifecycle note 降级，不因标题旧而先物理迁移。
+
 ### 决策：RCA 对齐 OPL provider-backed runtime，Temporal 为目标生产 substrate
 
 - `RedCube AI` 的 OPL 长期托管口径更新为 `OPL Runtime Manager / opl family-runtime -> configured family runtime provider -> RCA product sidecar export/dispatch -> RedCube service-safe domain entry`。
@@ -37,7 +44,7 @@
 ### 决策：RCA 对齐 OPL Runtime Manager 与 TS/Python 目标形态
 
 - 状态：Runtime Manager 薄管理层、TS/Python 目标和 RCA owner split 继续有效；`external Hermes-Agent runtime substrate` 已被 2026-05-10 provider-backed / Temporal target 决策 supersede。
-- OPL federated route 的目标形态改为 `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry`。
+- OPL-hosted route 的目标形态改为 `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry`。
 - `OPL Runtime Manager` 只负责 OPL 侧 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引，不持有 RedCube visual-domain truth、canonical artifacts、review/publication projection truth 或 concrete executor。
 - RCA 的实现语言目标固定为 `TypeScript + Python`：TypeScript 管 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries；Python 管 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态。
 - RCA product sidecar adapter 只作为 OPL typed family queue / OPL family runtime provider wakeup 的受控投影与 dispatch 面启用；它不成为 OPL 自有 visual truth sidecar，也不持有 review verdict、publication gate 或 canonical artifact authority。
@@ -110,8 +117,8 @@
 
 - `RedCube AI` 对外主语固定为独立 domain agent，可被 `Codex`、`OPL` 或其他通用 agent 直接调用。
 - `gateway / harness` 继续保留为内部架构边界语言，不再作为仓库对外第一身份。
-- repo-verified direct route 与 internal OPL bridge route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
-- 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeFederatedProductEntry` 只保留为内部 bridge / integration surface。
+- repo-verified direct route 与 OPL-hosted integration route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
+- 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeFederatedProductEntry` 只保留为 OPL-hosted integration surface。
 - `status` 只作为该 skill 下的 machine-readable product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不代表 GUI / WebUI / 最终用户前台壳已落地。
 
 ### 决策：保持 honest owner split，不改 default executor owner
@@ -120,7 +127,7 @@
 - `RedCube AI` 继续持有 visual-domain truth 与 domain durable surfaces。
 - `Codex CLI` 继续是 executor adapter 选中的默认 concrete executor，除非拿到显式 proof，不改默认 owner split。
 
-### 决策：OPL 角色收口到 family-level federation
+### 决策：OPL 角色收口到 family-level runtime hosting
 
 - `OPL` 在这条主线中只保留 family-level session/runtime/projection 编排与 shared modules/contracts/indexes。
-- `RedCube AI` 不被表达为 `OPL` 内部 workflow，而是独立 domain-agent 节点；federated 调用与 direct 调用只是入口差异，不是 domain ownership 差异。
+- `RedCube AI` 不被表达为 `OPL` 内部 workflow，而是独立 domain-agent 节点；OPL-hosted 调用与 direct 调用只是入口差异，不是 domain ownership 差异。

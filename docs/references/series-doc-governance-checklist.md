@@ -33,11 +33,12 @@
 
 ## 四、系列一致性检查
 
-- 文档必须把 `RedCube AI` 写成 visual-deliverable domain agent / domain harness surface，并把默认 direct route、federated `OPL Runtime Manager` route、configured family runtime provider、`RedCube service-safe domain entry` 与默认 `Codex CLI` concrete executor 写成同一条 repo-verified 链路。Temporal 是 provider-backed 生产目标；external `Hermes-Agent` 只可写成 legacy/optional provider 或显式 proof lane。
-- 系列项目名称与角色要与四仓当前真相同步：`One Person Lab` 是顶层 gateway，`Med Auto Science` 是 `Research Ops`，`Med Auto Grant` 是 author-side `Grant Ops`。
+- 文档必须把 `RedCube AI` 写成 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不承担公开第一身份。默认 direct route、OPL-hosted route、configured family runtime provider、`RedCube service-safe domain entry` 与默认 `Codex CLI` 最小执行单元必须写成同一条 repo-verified 链路。OPL 是 Codex-first、stage-led 的完整智能体运行框架；Temporal 是 provider-backed 生产目标；external `Hermes-Agent` 只可写成 legacy/optional provider 或显式 proof lane。
+- 系列项目名称与角色要与四仓当前真相同步：`One Person Lab` 是 Codex-first、stage-led agent runtime framework 与 shared runtime/contracts owner，`Med Auto Science` 是 `Research Ops`，`Med Auto Grant` 是 author-side `Grant Ops`，`RedCube AI` 是视觉交付 domain agent。
 - 若提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内 runtime package、pilot、shim、compatibility material 都只能写成 repo-side adapter 或 service-safe consumption surface。
-- 默认公开入口、program brief、内部参考、稳定规则、typed boundary audit 与历史 provenance 必须继续分层，不把 reference/history 重新挤进公开默认入口。
-- 修改 docs skeleton、公开入口、product-entry truth、program pointer、typed boundary 或 contract surface 时，必须同步更新相关测试。
+- 默认公开入口、program brief、内部参考、稳定规则、typed boundary audit 与历史 provenance 必须继续分层，不把 reference/history 重新挤进公开默认入口。旧 gateway、frontdoor、federation、harness-first、OPL bridge 或 Hermes-first 计划只在 internal integration、provenance、compatibility key 或 tombstone 语境保留。
+- 仍被 runtime-program contracts 通过 `human_doc:*` 指向的旧 brief 原位保留并补 lifecycle note；无合同引用且不服务当前 baton 的旧计划移动到 `docs/history/` 或 tombstone 语境。
+- 修改 docs skeleton、公开入口、product-entry truth、program pointer、typed boundary 或 contract surface 时，必须同步更新相关 contract/test；但不得用测试固定 README/docs prose、标题或状态文案。
 
 ## 五、默认验证
 

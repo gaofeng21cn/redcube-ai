@@ -8,11 +8,14 @@
 
 - 解释早期 runtime 形态来源的 repo-local migration 记录
 - 对追溯有用、但已经不属于当前 active program baton 的 absorbed 过程说明
+- 已退役 gateway、frontdoor、federation、harness-first、OPL-first 或 Hermes-first 叙事的 tombstone，避免读者把旧口径误读成当前 RedCube 身份
 
 当前分组：
 
 - `hermes/`：repo-local Hermes migration provenance。这些文件不证明上游 `Hermes-Agent` 已经持有当前 runtime owner。
 - `plans/`：保留用于追溯、但不再服务当前 active program baton 的历史计划。
+- `tombstones/`：已退役词汇与路线叙事，保留可检索性，但不得回到当前公开身份。
+- 后续 tombstone 应写清退役词汇、当前 truth owner，以及是否仍有机器可读 `human_doc:*` 链接要求 program brief 原位保留。
 
 仍被 runtime-program 机器合同引用的 active program brief 继续保留在 `../program/`。
 本地 AI / Superpowers 过程草稿继续保持在被忽略的 `../superpowers/` 下，不导入 repo-tracked history。

@@ -2,6 +2,8 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文件保留历史 blocker 证据；它不是当前 runtime owner 或 public identity 文档。当前 RCA 文档按 provider-backed OPL 托管路径、Temporal 目标生产 substrate、默认 `Codex CLI` 最小执行单元读取。
+
 ## 当前结论
 
 这份文档现在保留的是 `2026-04-12` 同日稍早出现过的历史 blocker 证据。
@@ -58,4 +60,4 @@
 
 1. 保留这份 blocker 作为历史证据，不把它删除或伪装成从未发生。
 2. 以 `upstream-hermes-agent-live-verification-closeout` 作为当前 F4 closeout 证明件继续推进。
-3. 把后续 truthful gap 明确切换到 mature `product entry` 与 `OPL Gateway` federation，而不是继续停在已解锁的历史 blocker 上。
+3. 把后续 truthful gap 明确切换到 mature `product entry` 与 OPL Runtime Manager hosted integration，而不是继续停在已解锁的历史 blocker 上。

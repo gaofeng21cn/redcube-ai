@@ -2,6 +2,8 @@
 
 状态锚点：`2026-04-12`
 
+生命周期说明：本文件是 F4 live verification closeout provenance。它证明过历史 Hermes-hosted proof lane 的 live run surface，不改变当前默认执行口径：RCA first public identity 是视觉交付领域智能体，OPL-hosted route 是内部集成路径，默认最小具体执行单元仍是 `Codex CLI`。
+
 ## 一句话结论
 
 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 端到端验证与 absorb，
@@ -45,14 +47,14 @@
 
 因此当前可以诚实宣称：
 
-- upstream `Hermes-Agent` live run surface 在该 closeout 中可被验证；当前 federation 口径由 `OPL Runtime Manager` 作为薄 adapter/projection layer 消费
+- upstream `Hermes-Agent` live run surface 在该 closeout 中可被验证；当前 OPL-hosted 口径由 `OPL Runtime Manager` 作为薄 adapter/projection layer 消费
 - `RedCube AI` 继续拥有 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 与 visual-domain truth
 - F4 不再是当前宿主上的 stop boundary
 
 但当前不能过度宣称：
 
 - mature `RedCube Product Entry` 已落地
-- `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube` 已进入同一 downstream bridge，但仍不是成熟 end-user 托管前台路线；Hermes-first live verification 是历史 proof，不是当前生产 substrate 结论
+- `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube` 已进入同一 downstream hosted integration path，但仍不是成熟 end-user 托管前台路线；Hermes-first live verification 是历史 proof，不是当前生产 substrate 结论
 
 ## 当前真实 gap
 
