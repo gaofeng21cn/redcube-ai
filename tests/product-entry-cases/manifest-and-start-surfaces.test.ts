@@ -550,7 +550,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.opl_bridge.command, 'redcube product federate');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.equal(manifest.product_entry_shell.sidecar.command, 'redcube product sidecar');
-    assert.equal(manifest.product_entry_shell.sidecar.online_substrate_owner, 'external_hermes_agent');
+    assert.equal(manifest.product_entry_shell.sidecar.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.product_entry_shell.sidecar.provider_transport_owner, 'opl_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.control_plane_owner, 'opl');
     assert.deepEqual(manifest.product_entry_shell.sidecar.allowed_actions, [
       'runtime_watch',
@@ -952,10 +953,11 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
 
     assert.equal(sidecar.ok, true);
     assert.equal(sidecar.surface_kind, 'product_sidecar_export');
-    assert.equal(sidecar.runtime_substrate.substrate_owner, 'external_hermes_agent');
-    assert.equal(sidecar.runtime_substrate.managed_by, 'opl_runtime_manager');
-    assert.equal(sidecar.runtime_substrate.queue_owner, 'opl');
-    assert.equal(sidecar.owner_boundary.hermes_owns_visual_truth, false);
+    assert.equal(sidecar.runtime_framework.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(sidecar.runtime_framework.provider_transport_owner, 'opl_family_runtime_provider');
+    assert.equal(sidecar.runtime_framework.managed_by, 'opl_runtime_manager');
+    assert.equal(sidecar.runtime_framework.queue_owner, 'opl');
+    assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
     assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);

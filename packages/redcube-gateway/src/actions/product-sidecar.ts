@@ -9,8 +9,8 @@ import { superviseManagedRun } from './supervise-managed-run.js';
 
 const SIDECAR_ID = 'redcube_product_sidecar_adapter.v1';
 const DOMAIN_ID = 'redcube_ai';
-const OPL_RUNTIME_OWNER = 'opl_managed_hermes';
-const HERMES_SUBSTRATE = 'external_hermes_agent';
+const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
+const OPL_PROVIDER_TRANSPORT = 'opl_family_runtime_provider';
 
 const GUARDED_ACTIONS = new Set([
   'runtime_watch',
@@ -53,14 +53,14 @@ function readTaskPayload(request) {
 
 function buildOwnerBoundary() {
   return {
-    hermes_role: 'online_runtime_substrate_wakeup_only',
+    provider_role: 'stage_attempt_queue_wakeup_transport_only',
     opl_role: 'typed_family_queue_and_control_plane',
     rca_role: 'visual_domain_truth_review_artifact_owner',
-    hermes_owns_visual_truth: false,
+    provider_owns_visual_truth: false,
     opl_owns_visual_truth: false,
-    hermes_owns_review_verdict: false,
+    provider_owns_review_verdict: false,
     opl_owns_review_verdict: false,
-    hermes_owns_publication_gate: false,
+    provider_owns_publication_gate: false,
     opl_owns_publication_gate: false,
     rca_owns_visual_truth: true,
     rca_owns_review_publication_projection: true,
@@ -112,11 +112,12 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
     workspace_locator: {
       workspace_root: workspaceRoot,
     },
-    runtime_substrate: {
-      substrate_owner: HERMES_SUBSTRATE,
+    runtime_framework: {
+      runtime_owner: OPL_RUNTIME_OWNER,
+      provider_transport_owner: OPL_PROVIDER_TRANSPORT,
       managed_by: 'opl_runtime_manager',
       queue_owner: 'opl',
-      online_wakeup_owner: HERMES_SUBSTRATE,
+      online_wakeup_owner: OPL_PROVIDER_TRANSPORT,
       default_executor_policy: {
         selected_by: 'codex_or_domain_selected_executor',
         domain_default_executor_owner: manifest.managed_runtime_contract?.executor_owner || 'codex_cli',
@@ -203,7 +204,8 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
     },
     summary: {
-      online_substrate: HERMES_SUBSTRATE,
+      runtime_owner: OPL_RUNTIME_OWNER,
+      provider_transport_owner: OPL_PROVIDER_TRANSPORT,
       control_plane_owner: 'opl',
       domain_truth_owner: DOMAIN_ID,
       guarded_action_count: GUARDED_ACTIONS.size,
@@ -271,7 +273,7 @@ function buildDispatchEnvelope({ task, result, action }) {
     summary: {
       action,
       result_surface_kind: result?.surface_kind || null,
-      hermes_role: 'wakeup_substrate_only',
+      provider_role: 'wakeup_transport_only',
       opl_role: 'typed_family_control_plane',
       rca_role: 'domain_truth_owner',
     },

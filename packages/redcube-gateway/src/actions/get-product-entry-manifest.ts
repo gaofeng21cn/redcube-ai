@@ -729,9 +729,10 @@ export async function getProductEntryManifest(request) {
       command_template: `redcube product sidecar export --workspace-root ${workspaceRoot} --format json`,
       dispatch_command_template: 'redcube product sidecar dispatch --task <task.json> --format json',
       surface_kind: 'product_sidecar_adapter',
-      purpose: 'RCA product sidecar adapter for OPL typed family queue and OPL-managed Hermes wakeups; it exposes guarded runtime/product-entry actions without owning visual truth, review verdicts, or publication gates.',
+      purpose: 'RCA product sidecar adapter for the configured OPL family runtime provider; it exposes guarded runtime/product-entry actions without owning visual truth, review verdicts, or publication gates.',
       extra_payload: {
-        online_substrate_owner: 'external_hermes_agent',
+        runtime_owner: 'configured_family_runtime_provider',
+        provider_transport_owner: 'opl_family_runtime_provider',
         control_plane_owner: 'opl',
         domain_truth_owner: 'redcube_ai',
         allowed_actions: [
@@ -962,7 +963,7 @@ export async function getProductEntryManifest(request) {
       export_product_sidecar: {
         command: 'redcube product sidecar export',
         surface_kind: 'product_sidecar_export',
-        summary: 'Export the RCA product sidecar adapter for OPL/Hermes control-plane indexing.',
+        summary: 'Export the RCA product sidecar adapter for OPL family runtime provider control-plane indexing.',
         requires: ['workspace_root'],
       },
       dispatch_product_sidecar: {

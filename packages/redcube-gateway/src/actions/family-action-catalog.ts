@@ -320,7 +320,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'export_product_sidecar',
       title: 'Export RedCube product sidecar adapter',
-      summary: '导出 RCA product sidecar adapter，供 OPL typed family queue / Hermes online substrate 索引；不授予 visual truth、review verdict 或 publication gate 写权。',
+      summary: '导出 RCA product sidecar adapter，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。',
       effect: 'read_only',
       command: PRODUCT_SIDECAR_EXPORT_COMMAND,
       surfaceKind: 'product_sidecar_export',
@@ -333,7 +333,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
       },
       authorityBoundary: {
         opl_role: 'typed_family_control_plane',
-        hermes_role: 'online_runtime_substrate',
+        provider_role: 'stage_attempt_queue_wakeup_transport',
         write_policy: 'read_projection_only',
       },
     }),
