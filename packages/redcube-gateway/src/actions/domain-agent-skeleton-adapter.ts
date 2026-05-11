@@ -2,7 +2,7 @@
 
 const DOMAIN_ID = 'redcube_ai';
 const DOMAIN_OWNER = 'redcube_ai';
-const SKELETON_ID = 'rca.domain-agent.skeleton.adapter.v1';
+const SKELETON_ID = 'rca.standard_domain_agent_skeleton.v1';
 const FAMILY_MEMORY_STAGE_APPLICABILITY = [
   'source_intake',
   'communication_strategy',
@@ -762,7 +762,7 @@ export function buildFamilyDomainMemoryDescriptor({
   };
 }
 
-export function buildDomainAgentSkeletonAdapter({
+export function buildStandardDomainAgentSkeleton({
   workspaceRoot,
   runtime,
   productEntrySessionCommand,
@@ -779,8 +779,8 @@ export function buildDomainAgentSkeletonAdapter({
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
-    surface_kind: 'domain_agent_skeleton_adapter',
-    adapter_id: SKELETON_ID,
+    surface_kind: 'standard_domain_agent_skeleton',
+    skeleton_id: SKELETON_ID,
     version: 'v1',
     domain_id: DOMAIN_ID,
     owner: DOMAIN_OWNER,

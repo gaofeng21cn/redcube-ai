@@ -1002,7 +1002,7 @@
           "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
           "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
           "locator_id": "rca.visual_pattern_memory.locator.v1",
-          "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
+          "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
           "policy_ref": "human_doc:visual_pattern_memory_policy",
           "human_doc_ref": "human_doc:domain_memory_descriptor_locator",
           "migration_plan_id": "rca.visual_pattern_memory.migration_plan.v1",
@@ -1072,7 +1072,7 @@
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
         "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
         "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
-        "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator",
+        "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
         "visual_pattern_memory_writeback_manifest_surface": "redcube product manifest#/visual_pattern_memory_writeback",
         "controlled_visual_stage_attempt_manifest_surface": "redcube product manifest#/controlled_visual_stage_attempt",
         "controlled_consumed_memory_writeback_receipt_proof_surface": "redcube product manifest#/controlled_visual_stage_attempt/writeback_proof_contract"

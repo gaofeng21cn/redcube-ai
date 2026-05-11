@@ -107,7 +107,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'runtime_health',
         'review_publication_projection_refs',
         'opl_family_lifecycle_adapter',
-        'domain_agent_skeleton_adapter',
+        'standard_domain_agent_skeleton',
         'artifact_locator_contract',
         'domain_memory_descriptor_locator',
         'product_sidecar_receipt_refs',
@@ -115,11 +115,11 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
     );
     assert.deepEqual(
       registration.consumable_projection_refs.slice(-4),
-      ['/domain_agent_skeleton_adapter', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
+      ['/standard_domain_agent_skeleton', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
     );
-    assert.equal(registration.domain_agent_skeleton_adapter.ref, '/domain_agent_skeleton_adapter');
-    assert.equal(registration.domain_agent_skeleton_adapter.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
-    assert.deepEqual(registration.domain_agent_skeleton_adapter.runtime_declares_only, [
+    assert.equal(registration.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
+    assert.equal(registration.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
+    assert.deepEqual(registration.standard_domain_agent_skeleton.runtime_declares_only, [
       'product_sidecar_adapter',
       'projection_builder',
       'lifecycle_adapter',

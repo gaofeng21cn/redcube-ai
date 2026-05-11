@@ -392,9 +392,10 @@ function runAdapter(request: RunDeliverableRouteRequest, result: RuntimeRouteRes
 }
 
 function executorBackendForAdapter(adapter: string): 'codex_cli' | 'hermes_agent' {
-  return adapter === HERMES_AGENT_LOOP_ADAPTER || adapter === 'hermes_agent' || adapter === 'hermes'
-    ? 'hermes_agent'
-    : 'codex_cli';
+  const requestedAdapter = safeText(adapter, CODEX_STRUCTURED_ADAPTER);
+  if (requestedAdapter === CODEX_STRUCTURED_ADAPTER) return 'codex_cli';
+  if (requestedAdapter === HERMES_AGENT_LOOP_ADAPTER) return 'hermes_agent';
+  throw new Error(`Unsupported executor adapter: ${requestedAdapter}`);
 }
 
 function hermesAgentLoopAvailable(): boolean {

@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: define the RCA-owned descriptor, migration plan, seed fixture locator, writeback proposal, accept/reject command, writeback receipt locator, and operator receipt projection boundary for visual pattern memory consumed by OPL-family surfaces.
 State: `active reference`
-Machine boundary: executable truth is `redcube product manifest#/domain_memory_descriptor_locator`, `contracts/runtime-program/opl-family-contract-adoption.json#/domain_agent_skeleton_adapter/domain_memory_descriptor_locator`, and `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`.
+Machine boundary: executable truth is `redcube product manifest#/domain_memory_descriptor_locator`, `contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator`, and `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`.
 
 ## Boundary
 

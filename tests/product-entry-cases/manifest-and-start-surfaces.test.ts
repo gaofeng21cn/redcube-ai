@@ -348,25 +348,25 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       handoffStage.outputs.some((output) => output.ref === '/domain_memory_descriptor_locator/operator_receipt_projection'),
       true,
     );
-    assert.equal(manifest.domain_agent_skeleton_adapter.surface_kind, 'domain_agent_skeleton_adapter');
-    assert.equal(manifest.domain_agent_skeleton_adapter.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
-    assert.equal(manifest.domain_agent_skeleton_adapter.mapping_model, 'manifest_descriptor_mapping_only');
-    assert.equal(manifest.domain_agent_skeleton_adapter.repo_source_boundary.physical_relayout_required_now, false);
+    assert.equal(manifest.standard_domain_agent_skeleton.surface_kind, 'standard_domain_agent_skeleton');
+    assert.equal(manifest.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
+    assert.equal(manifest.standard_domain_agent_skeleton.mapping_model, 'manifest_descriptor_mapping_only');
+    assert.equal(manifest.standard_domain_agent_skeleton.repo_source_boundary.physical_relayout_required_now, false);
     assert.deepEqual(
-      manifest.domain_agent_skeleton_adapter.repo_source_boundary.allowed_roots.map((root) => root.boundary_id),
+      manifest.standard_domain_agent_skeleton.repo_source_boundary.allowed_roots.map((root) => root.boundary_id),
       ['agent', 'contracts', 'runtime', 'docs'],
     );
-    assert.equal(manifest.domain_agent_skeleton_adapter.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
-    assert.deepEqual(manifest.domain_agent_skeleton_adapter.runtime_declarations.declares_only, [
+    assert.equal(manifest.standard_domain_agent_skeleton.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
+    assert.deepEqual(manifest.standard_domain_agent_skeleton.runtime_declarations.declares_only, [
       'product_sidecar_adapter',
       'projection_builder',
       'lifecycle_adapter',
       'domain_memory_descriptor_locator',
     ]);
-    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
-    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
-    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
-    assert.equal(manifest.domain_agent_skeleton_adapter.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
     assert.equal(manifest.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
     assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.workspace_root, workspaceRoot);

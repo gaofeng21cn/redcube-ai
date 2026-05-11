@@ -159,10 +159,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         owner: DOMAIN_ID,
         writable_by_sidecar: false,
       },
-      domain_agent_skeleton_adapter: {
-        ref: '/domain_agent_skeleton_adapter',
+      standard_domain_agent_skeleton: {
+        ref: '/standard_domain_agent_skeleton',
         owner: DOMAIN_ID,
-        mapping_model: manifest.domain_agent_skeleton_adapter?.mapping_model || 'manifest_descriptor_mapping_only',
+        mapping_model: manifest.standard_domain_agent_skeleton?.mapping_model || 'manifest_descriptor_mapping_only',
       },
       artifact_locator_contract: {
         ref: '/artifact_locator_contract',
@@ -214,7 +214,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       product_entry_manifest_ref: '/product_entry_manifest',
       opl_family_lifecycle_adapter_ref: '/opl_family_lifecycle_adapter',
       family_action_catalog_ref: '/family_action_catalog',
-      domain_agent_skeleton_adapter_ref: '/domain_agent_skeleton_adapter',
+      standard_domain_agent_skeleton_ref: '/standard_domain_agent_skeleton',
       artifact_locator_contract_ref: '/artifact_locator_contract',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
       product_sidecar_receipt_refs_ref: '/product_sidecar_receipt_refs',

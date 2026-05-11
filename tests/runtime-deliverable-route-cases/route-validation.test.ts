@@ -124,6 +124,37 @@ test('runDeliverableRoute rejects retired external_llm adapter before creating d
   });
 });
 
+test('runDeliverableRoute rejects retired hermes adapter alias before creating durable run state', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '甲状腺门诊科普 deck',
+      goal: '为本科生讲授甲状腺基础知识',
+    });
+
+    await assert.rejects(
+      () => runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'detailed_outline',
+        adapter: 'hermes',
+      }),
+      /Unsupported executor adapter: hermes/,
+    );
+
+    assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
+    assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
+  });
+});
+
 test('runDeliverableRoute rejects route not declared by hydrated deliverable contract', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 

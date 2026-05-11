@@ -150,10 +150,10 @@ test('RCA stage control projection maps route stages without owning runtime cont
 
 test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts separate', () => {
   const payload = contract();
-  const skeleton = payload.domain_agent_skeleton_adapter;
+  const skeleton = payload.standard_domain_agent_skeleton;
 
-  assert.equal(skeleton.surface_kind, 'domain_agent_skeleton_adapter');
-  assert.equal(skeleton.adapter_id, 'rca.domain-agent.skeleton.adapter.v1');
+  assert.equal(skeleton.surface_kind, 'standard_domain_agent_skeleton');
+  assert.equal(skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
   assert.equal(skeleton.mapping_model, 'manifest_descriptor_mapping_only');
   assert.deepEqual(skeleton.repo_source_boundary.allowed_roots, [
     'agent',
@@ -177,7 +177,7 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
 
 test('RCA artifact locator and sidecar receipts expose refs without OPL visual verdict ownership', () => {
   const payload = contract();
-  const skeleton = payload.domain_agent_skeleton_adapter;
+  const skeleton = payload.standard_domain_agent_skeleton;
 
   assert.equal(skeleton.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
   assert.equal(skeleton.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
@@ -223,7 +223,7 @@ test('RCA artifact locator and sidecar receipts expose refs without OPL visual v
 test('RCA domain memory descriptor exposes locator and receipts without moving visual authority to OPL', () => {
   const payload = contract();
   const descriptor = payload.domain_memory_descriptor;
-  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const memory = payload.standard_domain_agent_skeleton.domain_memory_descriptor_locator;
 
   assert.equal(descriptor.surface_kind, 'family_domain_memory_ref');
   assert.equal(descriptor.version, 'family-domain-memory-ref.v1');
@@ -341,7 +341,7 @@ test('RCA domain memory descriptor exposes locator and receipts without moving v
 
 test('RCA domain memory migration plan is locator-only and acceptance-gated', () => {
   const payload = contract();
-  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const memory = payload.standard_domain_agent_skeleton.domain_memory_descriptor_locator;
   const plan = memory.migration_plan;
 
   assert.equal(plan.plan_id, 'rca.visual_pattern_memory.migration_plan.v1');
@@ -390,7 +390,7 @@ test('RCA domain memory migration plan is locator-only and acceptance-gated', ()
 
 test('RCA visual pattern memory seed and receipt surfaces do not carry memory content or artifacts', () => {
   const payload = contract();
-  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const memory = payload.standard_domain_agent_skeleton.domain_memory_descriptor_locator;
   const seed = memory.seed_fixture_locator;
   const receipt = memory.writeback_receipt_locator;
 
@@ -434,7 +434,7 @@ test('RCA visual pattern memory seed and receipt surfaces do not carry memory co
 
 test('RCA visual pattern memory proposal, accept/reject, and operator receipt projection stay locator-only', () => {
   const payload = contract();
-  const memory = payload.domain_agent_skeleton_adapter.domain_memory_descriptor_locator;
+  const memory = payload.standard_domain_agent_skeleton.domain_memory_descriptor_locator;
   const proposal = memory.writeback_proposal_generator;
   const decision = memory.accept_reject_command;
   const projection = memory.operator_receipt_projection;

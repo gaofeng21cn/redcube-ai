@@ -120,7 +120,7 @@ test('product-entry manifest exposes OPL standard domain_memory_descriptor for R
     });
     assert.equal(
       manifest.domain_memory_descriptor.memory_pack_ref.ref,
-      manifest.domain_agent_skeleton_adapter.runtime_declarations.domain_memory_descriptor_locator_ref,
+      manifest.standard_domain_agent_skeleton.runtime_declarations.domain_memory_descriptor_locator_ref,
     );
   });
 });

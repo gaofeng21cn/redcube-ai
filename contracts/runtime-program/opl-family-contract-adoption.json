@@ -338,9 +338,8 @@
       "can_issue_review_or_export_verdict": false
     }
   },
-  "domain_agent_skeleton_adapter": {
-    "surface_kind": "domain_agent_skeleton_adapter",
-    "adapter_id": "rca.domain-agent.skeleton.adapter.v1",
+  "standard_domain_agent_skeleton": {
+    "surface_kind": "standard_domain_agent_skeleton",
     "mapping_model": "manifest_descriptor_mapping_only",
     "repo_source_boundary": {
       "allowed_roots": [
@@ -677,7 +676,8 @@
       "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
       "proof_contract_state": "landed",
       "runtime_writeback_state": "pending"
-    }
+    },
+    "skeleton_id": "rca.standard_domain_agent_skeleton.v1"
   },
   "non_goals": [
     "OPL owns RedCube visual truth",

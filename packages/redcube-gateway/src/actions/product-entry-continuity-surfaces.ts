@@ -588,9 +588,9 @@ const OPL_HOSTED_HANDOFF_REF = 'opl_framework:hosted_product_entry';
 export function buildOplRuntimeManagerRegistration({
   runtimeContinuityEnvelope,
   productEntrySessionCommand,
-  domainAgentSkeletonAdapter = null,
+  standardDomainAgentSkeleton = null,
 }) {
-  const skeletonRef = domainAgentSkeletonAdapter ? '/domain_agent_skeleton_adapter' : null;
+  const skeletonRef = standardDomainAgentSkeleton ? '/standard_domain_agent_skeleton' : null;
   return {
     surface_kind: 'opl_runtime_manager_domain_registration',
     version: 'v1',
@@ -610,8 +610,8 @@ export function buildOplRuntimeManagerRegistration({
       ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration',
       command: PRODUCT_MANIFEST_COMMAND,
     },
-    indexable_surfaces: [{ surface_id: 'product_entry_registration', surface_kind: 'skill_catalog', ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration' }, { surface_id: 'opl_hosted_stage_runtime', surface_kind: 'opl_hosted_product_entry', ref: '/product_entry_shell/opl_hosted' }, { surface_id: 'session_continuity', surface_kind: 'session_continuity', ref: '/session_continuity' }, { surface_id: 'artifact_inventory', surface_kind: 'artifact_inventory', ref: '/artifact_inventory' }, { surface_id: 'runtime_health', surface_kind: 'runtime_inventory', ref: '/runtime_inventory' }, { surface_id: 'review_publication_projection_refs', surface_kind: 'review_publication_refs', refs: ['/review_state', '/publication_projection'] }, { surface_id: 'opl_family_lifecycle_adapter', surface_kind: 'opl_family_lifecycle_adapter', ref: '/opl_family_lifecycle_adapter' }, { surface_id: 'domain_agent_skeleton_adapter', surface_kind: 'domain_agent_skeleton_adapter', ref: '/domain_agent_skeleton_adapter' }, { surface_id: 'artifact_locator_contract', surface_kind: 'artifact_locator_contract', ref: '/artifact_locator_contract' }, { surface_id: 'domain_memory_descriptor_locator', surface_kind: 'domain_memory_descriptor_locator', ref: '/domain_memory_descriptor_locator' }, { surface_id: 'product_sidecar_receipt_refs', surface_kind: 'product_sidecar_receipt_refs', ref: '/product_sidecar_receipt_refs' }],
-    consumable_projection_refs: ['/skill_catalog/skills/0/domain_projection/runtime_continuity', '/product_entry_shell/opl_hosted', '/session_continuity', '/artifact_inventory', '/runtime_inventory', '/review_state', '/publication_projection', '/opl_family_lifecycle_adapter', '/domain_agent_skeleton_adapter', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
+    indexable_surfaces: [{ surface_id: 'product_entry_registration', surface_kind: 'skill_catalog', ref: '/skill_catalog/skills/0/domain_projection/opl_runtime_manager_registration' }, { surface_id: 'opl_hosted_stage_runtime', surface_kind: 'opl_hosted_product_entry', ref: '/product_entry_shell/opl_hosted' }, { surface_id: 'session_continuity', surface_kind: 'session_continuity', ref: '/session_continuity' }, { surface_id: 'artifact_inventory', surface_kind: 'artifact_inventory', ref: '/artifact_inventory' }, { surface_id: 'runtime_health', surface_kind: 'runtime_inventory', ref: '/runtime_inventory' }, { surface_id: 'review_publication_projection_refs', surface_kind: 'review_publication_refs', refs: ['/review_state', '/publication_projection'] }, { surface_id: 'opl_family_lifecycle_adapter', surface_kind: 'opl_family_lifecycle_adapter', ref: '/opl_family_lifecycle_adapter' }, { surface_id: 'standard_domain_agent_skeleton', surface_kind: 'standard_domain_agent_skeleton', ref: '/standard_domain_agent_skeleton' }, { surface_id: 'artifact_locator_contract', surface_kind: 'artifact_locator_contract', ref: '/artifact_locator_contract' }, { surface_id: 'domain_memory_descriptor_locator', surface_kind: 'domain_memory_descriptor_locator', ref: '/domain_memory_descriptor_locator' }, { surface_id: 'product_sidecar_receipt_refs', surface_kind: 'product_sidecar_receipt_refs', ref: '/product_sidecar_receipt_refs' }],
+    consumable_projection_refs: ['/skill_catalog/skills/0/domain_projection/runtime_continuity', '/product_entry_shell/opl_hosted', '/session_continuity', '/artifact_inventory', '/runtime_inventory', '/review_state', '/publication_projection', '/opl_family_lifecycle_adapter', '/standard_domain_agent_skeleton', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
     state_index_inputs: {
       workspace_registry_index: '/workspace_locator',
       managed_session_ledger_index: '/session_continuity',
@@ -635,11 +635,11 @@ export function buildOplRuntimeManagerRegistration({
       publication_projection_ref: '/publication_projection',
       route_rule: 'must_use_redcube_product_entry_and_review_export_gates',
     },
-    domain_agent_skeleton_adapter: {
-      ref: skeletonRef || '/domain_agent_skeleton_adapter',
-      adapter_id: domainAgentSkeletonAdapter?.adapter_id || 'rca.domain-agent.skeleton.adapter.v1',
-      mapping_model: domainAgentSkeletonAdapter?.mapping_model || 'manifest_descriptor_mapping_only',
-      runtime_declares_only: domainAgentSkeletonAdapter?.runtime_declarations?.declares_only || [
+    standard_domain_agent_skeleton: {
+      ref: skeletonRef || '/standard_domain_agent_skeleton',
+      skeleton_id: standardDomainAgentSkeleton?.skeleton_id || 'rca.standard_domain_agent_skeleton.v1',
+      mapping_model: standardDomainAgentSkeleton?.mapping_model || 'manifest_descriptor_mapping_only',
+      runtime_declares_only: standardDomainAgentSkeleton?.runtime_declarations?.declares_only || [
         'product_sidecar_adapter',
         'projection_builder',
         'lifecycle_adapter',
@@ -647,8 +647,8 @@ export function buildOplRuntimeManagerRegistration({
     },
     domain_memory_descriptor_locator: {
       ref: '/domain_memory_descriptor_locator',
-      descriptor_id: domainAgentSkeletonAdapter?.domain_memory_descriptor_locator?.descriptor_id || 'rca.visual_pattern_memory.descriptor.v1',
-      locator_id: domainAgentSkeletonAdapter?.domain_memory_descriptor_locator?.locator_id || 'rca.visual_pattern_memory.locator.v1',
+      descriptor_id: standardDomainAgentSkeleton?.domain_memory_descriptor_locator?.descriptor_id || 'rca.visual_pattern_memory.descriptor.v1',
+      locator_id: standardDomainAgentSkeleton?.domain_memory_descriptor_locator?.locator_id || 'rca.visual_pattern_memory.locator.v1',
       memory_family: 'visual_pattern_memory',
       opl_role: 'locator_ref_receipt_consumer_only',
       opl_can_hold_memory_content: false,
