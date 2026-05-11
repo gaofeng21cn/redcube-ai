@@ -34,6 +34,16 @@
 
 根层 `docs/*.md` 只保留默认入口、核心五件套和文档组合治理入口；新增稳定材料应先落到上述生命周期目录。
 
+## 内容级整合规则
+
+文档生命周期按内容判断，文件名和所在目录只作为辅助信号。一个文件可以同时包含当前事实、absorbed tranche、support reference 和 historical plan；维护时先把这些内容拆清楚：
+
+1. 当前事实合入核心五件套、runtime-program contract、schema/source 或对应 owner doc。
+2. active baton 和仍被 `human_doc:*` 引用的 brief 留在 `docs/program/`，并写清 lifecycle state。
+3. 解释当前运行、服务支撑阅读的材料进入 `docs/references/`。
+4. 已完成、被替代或只剩 provenance 的计划进入 `docs/history/` 或 tombstone。
+5. `docs/README*` 和各子目录 README 第一屏必须让读者看出当前状态、层级、新旧关系和下一跳。
+
 ## 本轮归档原则
 
 - `docs/program/hermes/**` 属于 repo-local Hermes migration provenance，已迁入 `docs/history/hermes/`。

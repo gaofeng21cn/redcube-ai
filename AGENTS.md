@@ -8,7 +8,8 @@
 
 - `AGENTS.md` 只约束工作方式，不承载项目知识细节。
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
-- `RedCube AI` 是共享 `Unified Harness Engineering Substrate` 上的独立 visual-deliverable domain agent；`gateway / harness` 只作为仓内边界层与执行层语言保留，不作为对外第一身份。
+- `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` Codex-first、stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，`Codex CLI` 是 stage 内默认最小执行单元；RCA 持有 visual truth、layout/review verdict、route owner 和 artifact authority。
+- `gateway / harness` 只作为仓内边界层、执行层或历史语境保留；对外第一身份是 RedCube AI visual-deliverable domain agent。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
 - 关键 durable surface 继续围绕 `program_id`、`topic_id`、`deliverable_id`、`run_id`，以及 `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 收口。
@@ -33,6 +34,8 @@
 - `docs/status.md`：当前默认入口链路、执行口径、验证口径与历史索引。
 - `docs/docs_portfolio_consolidation.md` 是当前文档组合治理入口；维护者应先读核心五件套，再按该文件判断新增、更新、归档或 tombstone。
 - 每份长期文档都必须能说明 `owner`、`purpose`、`state`、`machine boundary`；缺少任一信号时，先补入口或归位，再继续扩写。
+- 文档治理按内容生命周期判断，文件名和目录名只作为辅助信号；同一文档内的当前事实、active baton、absorbed tranche、support reference、legacy brief 和历史计划应分别归入当前 owner doc、program/reference 层或 history/tombstone 语境。
+- 入口文档应先呈现当前状态、层级、新旧关系和下一跳；旧 gateway / bridge / harness / Hermes-first 材料进入 internal integration、provenance 或 tombstone 语境。
 - `docs/product/`：product entry、quickstart、operator handoff、profile 设置与发布协作。
 - `docs/runtime/`：runtime topology、executor / substrate、service-safe entry、watch / projection 语义说明。
 - `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。

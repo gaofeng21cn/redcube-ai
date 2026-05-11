@@ -43,6 +43,8 @@ The current public reading path starts from RedCube as a visual-deliverable doma
 
 | Layer | Responsibility | Start here |
 | --- | --- | --- |
+| Current truth | Current product role, active boundary, execution model, invariants, and durable decisions | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md) |
+| Machine truth | Runtime-program contracts, schemas, source, generated artifacts, and callable surfaces | [Contracts Overview](../contracts/README.md) |
 | Product | Human/operator entry, product handoff, profile and publishing coordination | [Product docs](./product/README.md) |
 | Runtime | Runtime topology, executor/backend boundaries, service-safe entry, watch/projection semantics | [Runtime docs](./runtime/README.md) |
 | Delivery | Deliverable families, routes, proof environments, export expectations, examples | [Delivery docs](./delivery/README.md) |
@@ -52,11 +54,17 @@ The current public reading path starts from RedCube as a visual-deliverable doma
 | References | Supporting technical references that do not own the active baton or public identity | [References](./references/README.md) |
 | History | Archived provenance, tombstones, and historical plans | [History](./history/README.md) |
 
+Read this table as hierarchy: current truth and machine truth come first;
+product/runtime/delivery/source/policies explain current work; program records
+track active or contract-linked baton material; references and history preserve
+support context and provenance.
+
 ## Maintainer Governance Surface
 
 - Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
 - Historical and provenance audits stay in `docs/history/` when they no longer serve the active program baton; still-current operator references stay in `docs/references/`.
 - Contract-linked program briefs stay in `docs/program/` until their `human_doc:*` references move. If their title or file name contains older gateway, bridge, harness, or Hermes-first language, add an in-file lifecycle note that marks the material as absorbed, internal, or provenance instead of moving it first.
+- RCA docs are maintained by content lifecycle. A file can stay in place while only part of its body is current; merge current facts into the owner doc, keep active baton records in program, move support explanation to references, and archive completed or superseded plan text after link review.
 - `README*` and `docs/**` are human-readable surfaces. Runtime contracts, tests, scripts, and dashboards may expose `human_doc:*` semantic pointers for reader context, but they must not pin repo documentation paths as stable machine-readable APIs.
 - Repository hygiene now runs before `scripts/verify.sh` lanes and before grouped test execution through `scripts/repo-hygiene.sh`. The tracked mainline must not contain generated or local-state payloads such as `dist/`, `build/`, `out/`, `__pycache__`, `*.egg-info`, `.DS_Store`, project-level `.codex/`, `.omx/`, `.runtime-program/`, `runtime-state/`, or `.agent-contract-baseline.json`. `.agents/plugins/marketplace.json` is the only tracked `.agents/` plugin source entrypoint.
 

@@ -4,6 +4,13 @@
 
 This layer explains source responsibilities. Canonical source truth remains in workspace artifacts, runtime-family contracts, schemas, and generated reports.
 
+## Current Role
+
+Source docs explain current source readiness, augmentation, deep research
+trigger/gate behavior, and source truth consumption. Completed source-readiness
+plans move to history; still-current source contracts stay here or in
+contracts/source surfaces with a clear machine boundary.
+
 Current materials:
 
 - [Source augmentation executor contract](./source_augmentation_executor_contract.md)

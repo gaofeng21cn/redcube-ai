@@ -4,6 +4,13 @@
 
 This layer explains how visual deliverables are shaped and checked. The executable delivery contract remains in runtime-family code, schemas, contract JSON, and generated artifact manifests.
 
+## Current Role
+
+Delivery docs explain current deliverable families, default routes, proof
+environments, examples, and manual validation. Route notes that describe older
+rendering paths should be labelled as optional, fallback, or historical support
+so readers can place them under the current default route.
+
 Current delivery materials:
 
 - [Deliverable examples](./deliverable_examples.md)

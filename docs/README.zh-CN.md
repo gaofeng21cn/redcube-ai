@@ -43,6 +43,8 @@
 
 | 分层 | 职责 | 入口 |
 | --- | --- | --- |
+| 当前真相 | 当前产品角色、活跃边界、执行模型、硬约束和持久决策 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md) |
+| 机器真相 | runtime-program contracts、schema、source、generated artifacts 和 callable surfaces | [合同说明](../contracts/README.md) |
 | Product | 人类 / operator 入口、product handoff、profile 与发布协作 | [Product docs](./product/README.md) |
 | Runtime | runtime topology、executor/backend 边界、service-safe entry、watch/projection 语义 | [Runtime docs](./runtime/README.md) |
 | Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
@@ -52,11 +54,14 @@
 | References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
 | History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.zh-CN.md) |
 
+这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；program 记录 active 或 contract-linked baton；references 与 history 分别保留支撑上下文和历史 provenance。
+
 ## 维护者治理入口
 
 - 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
 - 仍被 `human_doc:*` 语义 ID 引用的 program brief 继续留在 `docs/program/`。如果标题或文件名里含有旧 gateway、bridge、harness 或 Hermes-first 语言，先在文件内加生命周期说明，把材料标成已吸收、内部集成或 provenance，再考虑移动。
+- RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 program，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
 - `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
 - 仓库目录治理现在通过 `scripts/repo-hygiene.sh` 在 `scripts/verify.sh` 各 lane 和 grouped test 执行前运行。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json` 这类生成物 / 本地状态；`.agents/` 下唯一允许跟踪的插件入口是 `.agents/plugins/marketplace.json`。
 
