@@ -96,6 +96,7 @@ Now:
 
 Next:
 
+- keep OPL family index at `resolved_memory_descriptor_count=3` / `missing_memory_descriptor_count=0` while preserving RCA-owned visual memory bodies and decisions;
 - run an OPL-hosted controlled visual stage attempt that consumes visual pattern memory refs and emits accepted/rejected receipt refs;
 - route reusable visual lessons from real `visual_director_review` and `screenshot_review` closeout into accepted/rejected domain-memory writebacks under runtime/domain-memory authority;
 - surface the locator-only operator receipt projection in product-entry/operator views once real receipt instances exist outside repo.
