@@ -1,8 +1,8 @@
-# OPL Runtime Manager Internal Product Entry Bridge
+# OPL Framework Hosted Product Entry
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文件名保留早期 `OPL Gateway` provenance，且仍被 runtime-program 合同通过 `human_doc:*` 语义 ID 引用，因此原位保留。当前口径以 `OPL Runtime Manager` 托管集成路径为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth。
+生命周期说明：本文由早期 `OPL Gateway` handoff brief 迁移而来，当前口径以 `OPL Framework` 的 Codex-first、stage-led 托管路径为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth。
 
 ## 一句话结论
 
@@ -23,10 +23,10 @@
 
 ## 合同与调用面
 
-- contract：`contracts/runtime-program/opl-gateway-federated-product-entry.json`
-- gateway action：`invokeFederatedProductEntry`
-- CLI：`redcube product federate`
-- MCP：`invoke_federated_product_entry`
+- contract：`contracts/runtime-program/opl-framework-hosted-product-entry.json`
+- gateway action：`invokeOplHostedProductEntry`
+- framework action ref：`opl_framework:hosted_product_entry`
+- sidecar dispatch：`redcube product sidecar dispatch`
 
 ## 最小 handoff envelope
 
@@ -41,6 +41,6 @@
 ## 明确不做
 
 - 不把 `OPL` 写成 RedCube 内部控制面
-- 不让 federation 反向改写 visual-domain truth
+- 不让 hosted handoff 反向改写 visual-domain truth
 - 不因为 handoff landed 就过度宣称 end-user product shell 已成熟
 - 不把 repo-local Hermes wrapper 或旧 Gateway 命名写成 external `Hermes-Agent` substrate proof

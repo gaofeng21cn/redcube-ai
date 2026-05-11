@@ -7,7 +7,7 @@ import {
   existsSync,
   getProductEntrySession,
   importGatewaySharedModule,
-  invokeFederatedProductEntry,
+  invokeOplHostedProductEntry,
   invokeProductEntry,
   path,
   PRODUCT_ENTRY_COMPANIONS_SPECIFIER,
@@ -380,15 +380,15 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
   });
 });
 
-test('invokeFederatedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
+test('invokeOplHostedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
   await withMockHermesAndRuntimeState(async () => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const response = await invokeFederatedProductEntry({
+    const response = await invokeOplHostedProductEntry({
       target_domain_id: 'redcube_ai',
       task_intent: 'run_managed_deliverable',
-      entry_mode: 'opl_gateway',
+      entry_mode: 'opl_hosted',
       workspace_locator: {
         workspace_root: workspaceRoot,
       },
@@ -399,25 +399,25 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
         surface_kind: 'product_entry',
       },
       entry_session_contract: {
-        entry_session_id: 'session-federated',
+        entry_session_id: 'session-oplHosted',
       },
       delivery_request: {
         deliverable_family: 'ppt_deck',
         topic_id: 'topic-a',
         deliverable_id: 'deck-fed',
         profile_id: 'lecture_student',
-        title: 'Federated product entry proof',
-        goal: '验证 OPL federation',
+        title: 'OplHosted product entry proof',
+        goal: '验证 OPL-hosted stage runtime handoff',
         user_intent: '先给我主线故事',
         stop_after_stage: 'storyline',
       },
     });
 
     assert.equal(response.ok, true);
-    assert.equal(response.surface_kind, 'federated_product_entry');
-    assert.equal(response.federated_product_entry_contract_id, 'opl_gateway_federated_product_entry');
+    assert.equal(response.surface_kind, 'opl_hosted_product_entry');
+    assert.equal(response.opl_hosted_product_entry_contract_id, 'opl_framework_hosted_product_entry');
     assert.equal(response.target_domain_id, 'redcube_ai');
-    assert.equal(response.entry_mode, 'opl_gateway');
+    assert.equal(response.entry_mode, 'opl_hosted');
     assert.deepEqual(
       response.runtime_session_contract,
       sharedCompanions.buildRuntimeSessionContract({
@@ -434,13 +434,13 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
       }),
     );
     assert.equal(response.product_entry_surface.surface_kind, 'product_entry');
-    assert.equal(response.product_entry_surface.entry_session.entry_session_id, 'session-federated');
+    assert.equal(response.product_entry_surface.entry_session.entry_session_id, 'session-oplHosted');
     assert.deepEqual(response.entry_session, response.product_entry_surface.entry_session);
     assert.deepEqual(response.delivery_identity, response.product_entry_surface.delivery_identity);
     assert.deepEqual(response.continuation_snapshot, response.product_entry_surface.continuation_snapshot);
     assert.deepEqual(response.review_state, response.product_entry_surface.review_state);
     assert.deepEqual(response.publication_projection, response.product_entry_surface.publication_projection);
-    assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_gateway');
+    assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_hosted');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.summary.latest_handle, response.summary.target_handle);
     assert.equal(
@@ -464,23 +464,23 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
       response.family_orchestration.resume_contract.checkpoint_locator_field,
     );
     assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
-    assert.equal(response.session_continuity.entry_session_id, 'session-federated');
+    assert.equal(response.session_continuity.entry_session_id, 'session-oplHosted');
     assert.deepEqual(response.session_continuity, response.product_entry_surface.session_continuity);
     assert.deepEqual(response.progress_projection, response.product_entry_surface.progress_projection);
     assert.deepEqual(response.artifact_inventory, response.product_entry_surface.artifact_inventory);
     assert.deepEqual(response.opl_family_lifecycle_adapter, response.product_entry_surface.opl_family_lifecycle_adapter);
-    assert.equal(response.opl_family_lifecycle_adapter.owner_route_discovery.current_source, 'federated');
+    assert.equal(response.opl_family_lifecycle_adapter.owner_route_discovery.current_source, 'opl_hosted');
     assert.equal(response.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
-    assert.equal(response.product_entry_surface.session_continuity.entry_session_id, 'session-federated');
+    assert.equal(response.product_entry_surface.session_continuity.entry_session_id, 'session-oplHosted');
     assert.equal(response.product_entry_surface.session_continuity.restore_point.latest_handle, response.summary.target_handle);
     assertRuntimeLoopClosureShape(response.product_entry_surface, {
-      source: 'federated',
-      entryMode: 'opl_gateway',
+      source: 'opl_hosted',
+      entryMode: 'opl_hosted',
       runtimeOwner: 'configured_family_runtime_provider',
     });
     assert.equal(response.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(response.runtime_loop_closure.source_linkage.current_source, 'federated');
-    assert.equal(response.runtime_loop_closure.source_linkage.entry_mode, 'opl_gateway');
+    assert.equal(response.runtime_loop_closure.source_linkage.current_source, 'opl_hosted');
+    assert.equal(response.runtime_loop_closure.source_linkage.entry_mode, 'opl_hosted');
     assert.deepEqual(
       response.runtime_loop_closure.loop_owner,
       response.product_entry_surface.runtime_loop_closure.loop_owner,
@@ -495,7 +495,7 @@ test('invokeFederatedProductEntry validates the OPL envelope and converges onto 
 });
 
 test('gateway shared family orchestration surface exposes the product-entry preset builder', async () => {
-  const familyOrchestration = await importGatewaySharedModule('opl-gateway-shared/family-orchestration');
+  const familyOrchestration = await importGatewaySharedModule('opl-framework-shared/family-orchestration');
 
   assert.equal(
     typeof familyOrchestration.buildFamilyProductEntryPresetOrchestration,

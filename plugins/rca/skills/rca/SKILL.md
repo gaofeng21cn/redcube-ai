@@ -31,9 +31,9 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 `product manifest` 暴露 RCA-owned `family_action_catalog`；CLI help、MCP descriptors/routes、skill command contracts 与 product-entry action metadata 从同一份 action definition 派生，`OPL` 只做 discovery/export/parity。
 
-`redcube product status` 是 legacy command key / compat command；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
+`redcube product status` 是当前 product overview 命令；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
 
-默认先读取 status/manifest，再根据已知标识走 direct invoke 或 session continuation；`invokeFederatedProductEntry` 继续只作为内部 contract，不作为第二个公开 skill。
+默认先读取 status/manifest，再根据已知标识走 direct invoke 或 session continuation；OPL-hosted handoff 通过 `invokeOplHostedProductEntry` / product sidecar 进入同一 downstream RedCube product-entry contract，不作为第二个公开 skill。
 
 默认交付运行方式：
 
@@ -83,7 +83,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 保持 `status -> direct invoke -> session continuation` 同一条 same-session deliverable loop；这里的 `status` 指 machine-readable product-entry overview / intake shell
 - 长 PPT 任务必须先拆成 `source/material intake -> plan -> deliverable -> review`，每段使用同一 session 可恢复推进
 - 不绕开 gateway contract 直接手改 runtime state
-- 不把 internal OPL bridge 写成新的独立用户 skill；它继续是内部 contract
+- 不把 OPL-hosted handoff 写成新的独立用户 skill；它继续是内部集成 contract
 
 ## 首先应读的文件
 

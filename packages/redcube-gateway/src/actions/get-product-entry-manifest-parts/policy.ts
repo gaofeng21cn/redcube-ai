@@ -6,10 +6,10 @@ export const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
 export const PRODUCT_STATUS_COMMAND = 'redcube product status';
 export const PRODUCT_START_COMMAND = 'redcube product start';
 export const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
-export const PRODUCT_FEDERATE_COMMAND = 'redcube product federate';
+export const OPL_HOSTED_HANDOFF_REF = 'opl_framework:hosted_product_entry';
 export const PRODUCT_SESSION_COMMAND = 'redcube product session';
 export const PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/redcube-product-entry-mvp.json';
-export const FEDERATED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-gateway-federated-product-entry.json';
+export const OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-framework-hosted-product-entry.json';
 export const MANAGED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/managed-product-entry-hardening.json';
 export const SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF = 'contracts/runtime-program/service-safe-domain-entry-adapter.json';
 

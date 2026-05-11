@@ -248,7 +248,7 @@ test('getProductStart exposes the same direct-entry start companion as the manif
     assert.equal(start.recommended_mode_id, 'open_status');
     assert.deepEqual(
       start.modes.map((mode) => mode.mode_id),
-      ['open_status', 'start_direct_session', 'opl_bridge_handoff', 'resume_session'],
+      ['open_status', 'start_direct_session', 'opl_hosted_handoff', 'resume_session'],
     );
     assert.equal(
       start.modes[0].command,
@@ -265,7 +265,7 @@ test('getProductStart exposes the same direct-entry start companion as the manif
 test('product preflight consumes OPL shared program builders from the pinned owner commit', async () => {
   const gatewayPackage = readJson(GATEWAY_PACKAGE_JSON);
   assert.match(
-    gatewayPackage.dependencies['opl-gateway-shared'],
+    gatewayPackage.dependencies['opl-framework-shared'],
     /^git\+https:\/\/github\.com\/gaofeng21cn\/one-person-lab\.git#[0-9a-f]{40}$/,
   );
   const companions = await importGatewaySharedModule(PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER);

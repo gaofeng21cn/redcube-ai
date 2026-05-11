@@ -2,11 +2,11 @@
 import {
   buildReturnSurfaceContract,
   buildRuntimeSessionContract,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 
 import { invokeProductEntry } from './invoke-product-entry.js';
 
-const FEDERATED_PRODUCT_ENTRY_ID = 'opl_gateway_federated_product_entry';
+const OPL_HOSTED_PRODUCT_ENTRY_ID = 'opl_framework_hosted_product_entry';
 const MANAGED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 
 function safeText(value, fallback = '') {
@@ -32,8 +32,8 @@ function normalizeTargetDomainId(request) {
 
 function normalizeEntryMode(request) {
   const entryMode = requireField('entry_mode', request?.entry_mode || request?.entryMode);
-  if (entryMode !== 'opl_gateway') {
-    throw new Error(`entry_mode 必须为 opl_gateway，当前收到 ${entryMode}`);
+  if (entryMode !== 'opl_hosted') {
+    throw new Error(`entry_mode 必须为 opl_hosted，当前收到 ${entryMode}`);
   }
   return entryMode;
 }
@@ -69,7 +69,7 @@ function normalizeReturnSurfaceContract(request) {
   });
 }
 
-export async function invokeFederatedProductEntry(request) {
+export async function invokeOplHostedProductEntry(request) {
   const targetDomainId = normalizeTargetDomainId(request);
   const entryMode = normalizeEntryMode(request);
   const runtimeSessionContract = normalizeRuntimeSessionContract(request);
@@ -86,9 +86,9 @@ export async function invokeFederatedProductEntry(request) {
 
   return {
     ok: productEntrySurface.ok,
-    surface_kind: 'federated_product_entry',
+    surface_kind: 'opl_hosted_product_entry',
     recommended_action: productEntrySurface.recommended_action || null,
-    federated_product_entry_contract_id: FEDERATED_PRODUCT_ENTRY_ID,
+    opl_hosted_product_entry_contract_id: OPL_HOSTED_PRODUCT_ENTRY_ID,
     target_domain_id: targetDomainId,
     entry_mode: entryMode,
     runtime_session_contract: runtimeSessionContract,

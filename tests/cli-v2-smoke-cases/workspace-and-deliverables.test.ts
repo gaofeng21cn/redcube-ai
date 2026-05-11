@@ -178,11 +178,11 @@ function createIsolatedCliInstall() {
     path.resolve('contracts'),
     path.join(gatewayPackagePath, 'node_modules', 'contracts'),
   );
-  const oplGatewaySharedDist = gatewayResolve.resolve('opl-gateway-shared/family-orchestration');
+  const oplGatewaySharedDist = gatewayResolve.resolve('opl-framework-shared/family-orchestration');
   const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
   copyPackageIntoInstall(
     oplGatewaySharedPackageRoot,
-    path.join(gatewayPackagePath, 'node_modules', 'opl-gateway-shared'),
+    path.join(gatewayPackagePath, 'node_modules', 'opl-framework-shared'),
   );
 
   return {
@@ -302,7 +302,7 @@ test('CLI isolated install returns CLI JSON for unknown commands', () => {
   });
 });
 
-test('CLI product invalid subcommand keeps the internal OPL bridge out of public usage hints', () => {
+test('CLI product invalid subcommand keeps the OPL-hosted stage runtime handoff out of public usage hints', () => {
   const { cliPath, installRoot } = createIsolatedCliInstall();
 
   const parsed = execCliExpectFailure(

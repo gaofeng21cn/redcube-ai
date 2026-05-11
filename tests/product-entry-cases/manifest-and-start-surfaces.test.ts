@@ -52,7 +52,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.operator_loop_actions.start_deliverable.requires, ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id']);
     assert.equal(manifest.operator_loop_actions.continue_session.command, 'redcube product session');
     assert.deepEqual(manifest.operator_loop_actions.continue_session.requires, ['entry_session_id']);
-    assert.equal(manifest.operator_loop_actions.opl_bridge_handoff.command, 'redcube product federate');
+    assert.equal(manifest.operator_loop_actions.opl_hosted_handoff.command, 'opl_framework:hosted_product_entry');
     assert.equal(manifest.product_entry_quickstart.surface_kind, 'product_entry_quickstart');
     assert.equal(manifest.product_entry_quickstart.recommended_step_id, 'open_status');
     assert.deepEqual(manifest.product_entry_quickstart.human_gate_ids, ['redcube_operator_review_gate']);
@@ -76,7 +76,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(
       manifest.product_entry_overview.summary,
-      'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     );
     assert.equal(manifest.product_entry_overview.product_entry_command, 'redcube product status');
     assert.equal(manifest.product_entry_overview.entry_status_command, 'redcube product status');
@@ -99,7 +99,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_start.recommended_mode_id, 'open_status');
     assert.deepEqual(
       manifest.product_entry_start.modes.map((mode) => mode.mode_id),
-      ['open_status', 'start_direct_session', 'opl_bridge_handoff', 'resume_session'],
+      ['open_status', 'start_direct_session', 'opl_hosted_handoff', 'resume_session'],
     );
     assert.equal(
       manifest.product_entry_start.modes[0].command,
@@ -109,7 +109,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.product_entry_start.modes[1].requires,
       ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
     );
-    assert.equal(manifest.product_entry_start.modes[2].surface_kind, 'federated_product_entry');
+    assert.equal(manifest.product_entry_start.modes[2].surface_kind, 'opl_hosted_product_entry');
     assert.equal(manifest.product_entry_start.modes[3].surface_kind, 'product_entry_session');
     assert.deepEqual(manifest.product_entry_start.resume_surface, {
       surface_kind: 'product_entry_session',
@@ -121,7 +121,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(
       manifest.product_entry_preflight.summary,
-      'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `status` compatibility command.',
+      'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `status` command.',
     );
     assert.equal(manifest.product_entry_preflight.ready_to_try_now, true);
     assert.equal(
@@ -147,16 +147,16 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_preflight.checks[2].status, 'pass');
     assert.equal(manifest.product_entry_preflight.checks[3].status, 'pass');
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
-    assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_federation');
+    assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_hosted_handoff');
     assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
     assert.equal(
       manifest.product_entry_status.summary,
-      'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     );
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
     assert.deepEqual(manifest.product_entry_status.next_focus, [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-      '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
+      '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
     ]);
     assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
@@ -174,7 +174,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.deepEqual(manifest.managed_runtime_contract, {
-      shared_contract_ref: 'contracts/opl-gateway/managed-runtime-three-layer-contract.json',
+      shared_contract_ref: 'contracts/opl-framework/managed-runtime-three-layer-contract.json',
       runtime_owner: 'codex_cli',
       domain_owner: 'redcube_ai',
       executor_owner: 'codex_cli',
@@ -245,7 +245,6 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'get_product_start',
         'get_product_preflight',
         'invoke_product_entry',
-        'invoke_federated_product_entry',
         'get_product_entry_session',
         'get_product_entry_manifest',
         'export_product_sidecar',
@@ -453,7 +452,6 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         ['get_product_start', 'redcube product start', 'product_entry_start'],
         ['get_product_preflight', 'redcube product preflight', 'product_entry_preflight'],
         ['start_deliverable', 'redcube product invoke', 'product_entry'],
-        ['opl_bridge_handoff', 'redcube product federate', 'federated_product_entry'],
         ['continue_session', 'redcube product session', 'product_entry_session'],
         ['get_product_entry_manifest', 'redcube product manifest', 'product_entry_manifest'],
         ['export_product_sidecar', 'redcube product sidecar export', 'product_sidecar_export'],
@@ -580,7 +578,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.automation.automations[1].gate_policy, 'human_gate_required');
     assert.equal(manifest.product_entry_shell.status.command, 'redcube product status');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
-    assert.equal(manifest.product_entry_shell.opl_bridge.command, 'redcube product federate');
+    assert.equal(manifest.product_entry_shell.opl_hosted.command, 'opl_framework:hosted_product_entry');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
     assert.equal(manifest.product_entry_shell.sidecar.command, 'redcube product sidecar');
     assert.equal(manifest.product_entry_shell.sidecar.runtime_owner, 'configured_family_runtime_provider');
@@ -597,7 +595,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.product_entry_shell.status.canonical_entry_semantics,
       'agent_facing_product_entry_overview',
     );
-    assert.equal(manifest.product_entry_shell.status.legacy_command_key, 'status');
+    assert.equal(manifest.product_entry_shell.status.command_key, 'status');
     assert.equal(manifest.product_entry_shell.status.claims_gui_shell, false);
     assert.match(manifest.product_entry_shell.direct.purpose, /deliverable loop/i);
     assert.equal(manifest.route_equivalence.surface_kind, 'route_equivalence_contract');
@@ -605,7 +603,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.route_equivalence.public_skill_policy.skill_ids, ['redcube-ai']);
     assert.deepEqual(
       manifest.route_equivalence.equivalent_routes.map((route) => route.route_id),
-      ['product_status', 'product_invoke', 'session_continuation', 'internal_opl_bridge'],
+      ['product_status', 'product_invoke', 'session_continuation', 'opl_hosted_stage_runtime'],
     );
     assert.deepEqual(
       manifest.route_equivalence.shared_truth_surfaces,
@@ -672,16 +670,15 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
     assert.equal(manifest.domain_entry_contract.service_safe_surface_kind, 'domain_entry');
     assert.equal(manifest.domain_entry_contract.product_entry_builder_command, 'redcube product manifest');
-    assert.deepEqual(manifest.domain_entry_contract.supported_entry_modes, ['direct', 'opl_gateway', 'session']);
+    assert.deepEqual(manifest.domain_entry_contract.supported_entry_modes, ['direct', 'opl_hosted', 'session']);
     assert.deepEqual(manifest.domain_entry_contract.supported_commands, [
       'redcube product manifest',
       'redcube product status',
       'redcube product start',
       'redcube product invoke',
-      'redcube product federate',
       'redcube product session',
     ]);
-    assert.equal(manifest.domain_entry_contract.command_contracts.length, 6);
+    assert.equal(manifest.domain_entry_contract.command_contracts.length, 5);
     assert.equal(manifest.domain_entry_contract.command_contracts[0].command, 'redcube product manifest');
     assert.deepEqual(manifest.domain_entry_contract.command_contracts[0].required_fields, ['workspace_root']);
     assert.equal(manifest.domain_entry_contract.command_contracts[3].command, 'redcube product invoke');
@@ -692,17 +689,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'topic_id',
       'deliverable_id',
     ]);
-    assert.equal(manifest.domain_entry_contract.command_contracts[4].command, 'redcube product federate');
-    assert.deepEqual(manifest.domain_entry_contract.command_contracts[4].required_fields, [
-      'workspace_root',
-      'entry_session_id',
-      'target_domain_id',
-      'entry_mode',
-      'return_surface_kind',
-      'overlay',
-      'topic_id',
-      'deliverable_id',
-    ]);
+    assert.equal(manifest.domain_entry_contract.command_contracts[4].command, 'redcube product session');
     assert.equal(
       manifest.domain_entry_contract.domain_agent_entry_spec.surface_kind,
       'domain_agent_entry_spec',
@@ -823,7 +810,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.runtime_loop_closure.source_linkage.current_source, 'manifest');
       assert.equal(manifest.runtime_loop_closure.source_linkage.entry_mode, 'manifest_projection');
       assert.equal(manifest.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
-      assert.equal(manifest.runtime_loop_closure.source_linkage.federated_surface_kind, 'federated_product_entry');
+      assert.equal(manifest.runtime_loop_closure.source_linkage.opl_hosted_surface_kind, 'opl_hosted_product_entry');
       assert.equal(manifest.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
       assert.equal(manifest.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
       assert.equal(manifest.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
@@ -846,7 +833,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         manifest.opl_family_lifecycle_adapter.discovery.route_surfaces.map((surface) => surface.surface_id),
         [
           'product_entry_registration',
-          'internal_opl_bridge',
+          'opl_hosted_stage_runtime',
           'product_entry_session',
           'managed_run_store',
           'review_state',
@@ -887,7 +874,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(status.product_entry_overview.progress_surface.surface_kind, 'product_entry_session');
     assert.equal(status.product_entry_start.surface_kind, 'product_entry_start');
     assert.equal(status.product_entry_start.recommended_mode_id, 'open_status');
-    assert.equal(status.product_entry_start.modes[2].mode_id, 'opl_bridge_handoff');
+    assert.equal(status.product_entry_start.modes[2].mode_id, 'opl_hosted_handoff');
     assert.equal(status.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.deepEqual(status.product_entry_start, manifest.product_entry_start);
     assert.deepEqual(status.native_ppt_operator_ux, manifest.native_ppt_operator_ux);

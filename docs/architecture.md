@@ -83,7 +83,7 @@
 - `OPL Runtime Manager` 只消费 product-entry registration、hosted invocation、session continuity、runtimeWatch、artifact inventory、review/publication projection，不创建第二套 RedCube truth
 - product sidecar adapter 只把这些 RCA-owned surfaces 投影给 OPL provider；family runtime provider 是 24h online substrate / wakeup substrate，OPL 是 typed family queue / control plane，RCA 继续持有 visual-domain truth、review/publication projection 与 artifact authority
 - today repo-verified 的 public domain-entry service surface 是 `invokeProductEntry` / `getProductEntrySession`
-- `invokeFederatedProductEntry` 继续作为 internal OPL integration contract
+- `invokeOplHostedProductEntry` 继续作为 internal OPL integration contract
 - 成熟的最终用户产品入口前台壳仍未落地
 
 ## Hermes-Agent、RedCube AI 与 concrete executor 的分工
@@ -174,11 +174,11 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 当前 repo-verified 的 product-entry service surface 是：
 
 - contract: `contracts/runtime-program/redcube-product-entry-mvp.json`
-- hosted integration contract: `contracts/runtime-program/opl-gateway-federated-product-entry.json`（文件名保留历史 provenance）
+- hosted integration contract: `contracts/runtime-program/opl-framework-hosted-product-entry.json`（文件名保留历史 provenance）
 - managed hardening contract: `contracts/runtime-program/managed-product-entry-hardening.json`
 - callable surfaces:
   - `@redcube/gateway` `invokeProductEntry`
-  - `@redcube/gateway` `invokeFederatedProductEntry`（OPL-hosted integration）
+  - `@redcube/gateway` `invokeOplHostedProductEntry`（OPL-hosted integration）
   - `@redcube/gateway` `getProductEntrySession`
 
 它们继续把执行下沉到同一个 `invokeDomainEntry`，同时把 session continuity 持久化到用户级 runtime-state，而不是把 product entry 写成 repo-local runtime 自己的新宿主。

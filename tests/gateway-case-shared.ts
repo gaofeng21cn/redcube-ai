@@ -32,7 +32,7 @@ import {
   getProductPreflight,
   getProductStart,
   intakeSource,
-  invokeFederatedProductEntry,
+  invokeOplHostedProductEntry,
   invokeProductEntry,
   prepareSourceAugmentationResult,
   researchSource,
@@ -60,8 +60,8 @@ const GATEWAY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-gateway/package.json', import.meta.url),
 );
 const gatewayRequire = createRequire(GATEWAY_PACKAGE_JSON);
-const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-gateway-shared/product-entry-companions';
-const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-gateway-shared/product-entry-program-companions';
+const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-framework-shared/product-entry-companions';
+const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-framework-shared/product-entry-program-companions';
 
 async function importGatewaySharedModule(moduleSpecifier) {
   return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
@@ -118,7 +118,7 @@ async function prepareProductEntryWorkspace() {
     workspaceRoot,
     topicId: 'topic-a',
     title: 'Product entry proof',
-    brief: '验证 direct product entry、internal OPL bridge 与 session continuity。',
+    brief: '验证 direct product entry、OPL-hosted stage runtime handoff 与 session continuity。',
     keywords: ['product-entry', 'opl'],
   });
 
@@ -135,7 +135,7 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
     [
       'step:open_status',
       'step:continue_current_loop',
-      'step:opl_bridge_handoff',
+      'step:opl_hosted_handoff',
       'step:inspect_current_progress',
     ],
   );
@@ -192,7 +192,7 @@ function assertRuntimeLoopClosureShape(surface, { source, entryMode, runtimeOwne
   assert.equal(surface.runtime_loop_closure.source_linkage.current_source, source);
   assert.equal(surface.runtime_loop_closure.source_linkage.entry_mode, entryMode);
   assert.equal(surface.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
-  assert.equal(surface.runtime_loop_closure.source_linkage.federated_surface_kind, 'federated_product_entry');
+  assert.equal(surface.runtime_loop_closure.source_linkage.opl_hosted_surface_kind, 'opl_hosted_product_entry');
   assert.equal(surface.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
   assert.equal(surface.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
 }
@@ -263,7 +263,7 @@ export {
   getToolDefinitions,
   importGatewaySharedModule,
   intakeSource,
-  invokeFederatedProductEntry,
+  invokeOplHostedProductEntry,
   invokeProductEntry,
   listGatewayTools,
   mkdirSync,

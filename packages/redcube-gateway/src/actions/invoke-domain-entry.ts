@@ -2,7 +2,7 @@
 import {
   buildReturnSurfaceContract,
   buildRuntimeSessionContract,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 
 import { runDeliverableRoute } from './run-deliverable-route.js';
 import { runManagedDeliverable } from './run-managed-deliverable.js';
@@ -79,7 +79,7 @@ function normalizeTargetDomainId(request) {
 function normalizeRuntimeSessionContract(request) {
   const contract = request?.runtime_session_contract || request?.runtimeSessionContract || {};
   const entryMode = safeText(request?.entry_mode || request?.entryMode);
-  const expectedRuntimeOwner = entryMode === 'opl_gateway' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
+  const expectedRuntimeOwner = entryMode === 'opl_hosted' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
   return buildRuntimeSessionContract({
     runtime_owner: requireField(
       'runtime_session_contract.runtime_owner',

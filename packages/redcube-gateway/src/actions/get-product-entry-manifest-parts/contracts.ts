@@ -3,7 +3,6 @@ import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 
 import {
   DELIVERABLE_FACADE_TRUTH_SURFACES,
-  PRODUCT_FEDERATE_COMMAND,
   PRODUCT_STATUS_COMMAND,
   PRODUCT_INVOKE_COMMAND,
   PRODUCT_SESSION_COMMAND,
@@ -12,12 +11,21 @@ import {
 
 const overlayRegistry = getDefaultOverlayRegistry();
 
+export const OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT = Object.freeze({
+  contract_ref: 'contracts/opl-framework/managed-runtime-three-layer-contract.json',
+  canonical_fail_closed_rules: [
+    'domain_supervision_cannot_bypass_runtime',
+    'executor_cannot_declare_global_gate_clear',
+    'runtime_cannot_invent_domain_publishability_truth',
+  ],
+});
+
 export function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) {
   return {
     surface_kind: 'route_equivalence_contract',
     owner: 'redcube_ai',
     status: 'repo_tracked',
-    summary: 'RCA product-entry overview, direct invoke, same-session continuation, and the internal OPL bridge converge on the same downstream deliverable runtime truth; `status` remains the compatibility command key for the overview surface.',
+    summary: 'RCA product-entry overview, direct invoke, same-session continuation, and OPL-hosted stage runtime handoff converge on the same downstream deliverable runtime truth; `status` is the current overview command.',
     public_skill_policy: {
       skill_count: 1,
       skill_ids: ['redcube-ai'],
@@ -29,7 +37,7 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
         route_id: 'product_status',
         command: PRODUCT_STATUS_COMMAND,
         surface_kind: 'product_status',
-        role: 'compat_product_entry_overview_command',
+        role: 'product_entry_overview_command',
       },
       {
         route_id: 'product_invoke',
@@ -45,10 +53,9 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
         role: 'same_session_continuation',
       },
       {
-        route_id: 'internal_opl_bridge',
-        command: PRODUCT_FEDERATE_COMMAND,
-        surface_kind: 'federated_product_entry',
-        role: 'internal_bridge_only',
+        route_id: 'opl_hosted_stage_runtime',
+        surface_kind: 'opl_hosted_product_entry',
+        role: 'framework_handoff_only',
       },
     ],
     shared_truth_surfaces: ROUTE_EQUIVALENCE_SHARED_TRUTH_SURFACES,
@@ -86,7 +93,7 @@ export function buildDeliverableFacadeContract() {
     public_entry_policy: {
       canonical_skill_id: 'redcube-ai',
       new_public_entry_allowed: false,
-      internal_bridge_surface: 'invokeFederatedProductEntry',
+      opl_hosted_handoff_surface: 'invokeOplHostedProductEntry',
     },
     family_route_policy: {
       ppt_deck: {

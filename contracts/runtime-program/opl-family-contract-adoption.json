@@ -41,7 +41,7 @@
     "source_surfaces": [
       "product entry",
       "product session",
-      "internal OPL bridge",
+      "OPL-hosted stage runtime handoff",
       "artifact inventory",
       "review/publication projection refs"
     ],
@@ -69,7 +69,7 @@
       "product-entry manifest",
       "direct product entry response",
       "product-entry session response",
-      "federated product entry response"
+      "oplHosted product entry response"
     ],
     "maps_to_opl_contracts": [
       "opl_family_runtime_attempt_contract.v1",

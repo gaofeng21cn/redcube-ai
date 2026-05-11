@@ -2,11 +2,11 @@
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-26",
   "longrun_goal": {
-    "label": "independent visual-deliverable domain agent with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL Runtime Manager when federated",
+    "label": "independent visual-deliverable domain agent with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL Runtime Manager when oplHosted",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-      "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+      "opl_hosted_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
     },
     "runtime_manager_boundary": {
       "manager": "OPL Runtime Manager",
@@ -14,7 +14,7 @@
       "consumes_redcube_surfaces": [
         "redcube product-entry registration",
         "skill_catalog.domain_projection.opl_runtime_manager_registration",
-        "invokeFederatedProductEntry",
+        "invokeOplHostedProductEntry",
         "getProductEntrySession",
         "runtimeWatch",
         "artifact inventory",
@@ -70,11 +70,11 @@
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
-      "keep direct product-entry runtime_owner and executor_owner on codex_cli unless a caller explicitly enters the OPL federated or Hermes proof lane",
+      "keep direct product-entry runtime_owner and executor_owner on codex_cli unless a caller explicitly enters the OPL oplHosted or Hermes proof lane",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
       "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
-      "keep OPL Runtime Manager as a thin federated runtime manager over configured family runtime providers rather than a RedCube truth owner",
+      "keep OPL Runtime Manager as a thin oplHosted runtime manager over configured family runtime providers rather than a RedCube truth owner",
       "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
       "move implementation toward TypeScript for product/runtime contracts and Python for native PPT/Office/document helpers that share the MAS/MAG automation ecosystem",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
@@ -220,9 +220,9 @@
     "deployment_host": "codex_local_operator_host",
     "deployment_host_status": "active_primary",
     "codex_cli_longterm_owner": false,
-    "phase_id": "repo_verified_product_entry_and_opl_federation",
-    "phase_label": "Repo-Verified Product Entry And OPL Federation",
-    "workstream": "repo_verified_product_entry_and_opl_federation",
+    "phase_id": "repo_verified_product_entry_and_opl_hosted_handoff",
+    "phase_label": "Repo-Verified Product Entry And OPL-Hosted Handoff",
+    "workstream": "repo_verified_product_entry_and_opl_hosted_handoff",
     "review_closeout": {
       "status": "passed",
       "blocker": "none",
@@ -807,11 +807,11 @@
         "brief": "human_doc:program_redcube_product_entry_mvp",
         "gateway_surface": "invokeProductEntry"
       },
-      "opl_gateway_federated_product_entry": {
+      "opl_framework_hosted_product_entry": {
         "status": "closeout_completed",
-        "contract": "contracts/runtime-program/opl-gateway-federated-product-entry.json",
-        "brief": "human_doc:program_opl_gateway_federated_product_entry",
-        "gateway_surface": "invokeFederatedProductEntry"
+        "contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
+        "brief": "human_doc:program_opl_framework_hosted_product_entry",
+        "gateway_surface": "invokeOplHostedProductEntry"
       },
       "managed_product_entry_hardening": {
         "status": "closeout_completed",
@@ -865,7 +865,7 @@
       "review_status": "verified",
       "program_mode": "repo_verified_product_entry_service_surface",
       "scope": {
-        "hardening_axis": "product_entry_service_surface_and_federation",
+        "hardening_axis": "product_entry_service_surface_and_opl_hosted_handoff",
         "implementation_in_scope": true,
         "runtime_substrate_owner": "optional_hosted_runtime_carrier",
         "default_runtime_owner": "codex_cli",
@@ -878,13 +878,13 @@
         ],
         "entry_surfaces": [
           "invokeProductEntry",
-          "invokeFederatedProductEntry",
+          "invokeOplHostedProductEntry",
           "getProductEntrySession",
           "redcube product invoke",
-          "redcube product federate",
+          "redcube product sidecar",
           "redcube product session",
           "invoke_product_entry",
-          "invoke_federated_product_entry",
+          "product_sidecar_dispatch",
           "get_product_entry_session"
         ],
         "required_downstream_domain_surfaces": [
@@ -918,7 +918,7 @@
             "product_status",
             "product_invoke",
             "session_continuation",
-            "internal_opl_bridge"
+            "opl_hosted_stage_runtime"
           ],
           "shared_truth_surfaces": [
             "domain_entry_surface",
@@ -1024,10 +1024,10 @@
       },
       "artifacts": {
         "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
-        "federated_product_entry_contract": "contracts/runtime-program/opl-gateway-federated-product-entry.json",
+        "opl_hosted_product_entry_contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
         "managed_product_entry_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "product_entry_brief": "human_doc:program_redcube_product_entry_mvp",
-        "federated_product_entry_brief": "human_doc:program_opl_gateway_federated_product_entry",
+        "opl_hosted_product_entry_brief": "human_doc:program_opl_framework_hosted_product_entry",
         "managed_product_entry_brief": "human_doc:program_managed_product_entry_hardening",
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
         "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",

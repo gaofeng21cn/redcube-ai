@@ -12,7 +12,7 @@ import {
   buildDeliveryIdentitySurface,
   buildEntrySessionSurface,
   buildProductEntryContinuationSnapshot,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 
 import {
   buildSessionContinuationFamilyOrchestration,

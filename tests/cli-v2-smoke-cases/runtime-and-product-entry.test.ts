@@ -181,11 +181,11 @@ function createIsolatedCliInstall() {
     path.resolve('contracts'),
     path.join(gatewayPackagePath, 'node_modules', 'contracts'),
   );
-  const oplGatewaySharedDist = gatewayResolve.resolve('opl-gateway-shared/family-orchestration');
+  const oplGatewaySharedDist = gatewayResolve.resolve('opl-framework-shared/family-orchestration');
   const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
   copyPackageIntoInstall(
     oplGatewaySharedPackageRoot,
-    path.join(gatewayPackagePath, 'node_modules', 'opl-gateway-shared'),
+    path.join(gatewayPackagePath, 'node_modules', 'opl-framework-shared'),
   );
 
   return {
@@ -357,7 +357,7 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
   });
 });
 
-test('CLI product status, product invoke, product federate, and product session proxy the product-entry service surface', async () => {
+test('CLI product status, product invoke, product sidecar, and product session proxy the product-entry service surface', async () => {
   await withMockHermesUpstreamCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
@@ -507,39 +507,41 @@ test('CLI product status, product invoke, product federate, and product session 
       directParsed.family_orchestration.resume_contract.checkpoint_locator_field,
     );
 
-    const federatedParsed = await execCliAsync(
+    const sidecarTaskFile = path.join(runtimeStateRoot, 'opl-hosted-sidecar-task.json');
+    writeFileSync(
+      sidecarTaskFile,
+      JSON.stringify({
+        action: 'product_entry_continuation',
+        workspace_locator: {
+          workspace_root: workspaceRoot,
+        },
+        entry_session_id: 'session-oplHosted',
+        task_intent: 'run_managed_deliverable',
+        entry_mode: 'opl_hosted',
+        delivery_request: {
+          deliverable_family: 'ppt_deck',
+          topic_id: 'topic-a',
+          deliverable_id: 'deck-oplHosted',
+          profile_id: 'lecture_student',
+          title: '甲状腺门诊科普 deck oplHosted',
+          goal: '验证 OPL-hosted stage runtime handoff',
+          user_intent: '先给我主线故事',
+          stop_after_stage: 'storyline',
+        },
+      }),
+      'utf-8',
+    );
+
+    const oplHostedSidecar = await execCliAsync(
       cliPath,
       [
         'product',
-        'federate',
-        '--workspace-root',
-        workspaceRoot,
-        '--entry-session-id',
-        'session-fed',
-        '--target-domain-id',
-        'redcube_ai',
-        '--task-intent',
-        'run_managed_deliverable',
-        '--entry-mode',
-        'opl_gateway',
-        '--return-surface-kind',
-        'product_entry',
-        '--overlay',
-        'ppt_deck',
-        '--topic-id',
-        'topic-a',
-        '--deliverable-id',
-        'deck-fed',
-        '--profile-id',
-        'lecture_student',
-        '--title',
-        '甲状腺门诊科普 deck federated',
-        '--goal',
-        '验证 OPL federation',
-        '--user-intent',
-        '先给我主线故事',
-        '--stop-after-stage',
-        'storyline',
+        'sidecar',
+        'dispatch',
+        '--task',
+        sidecarTaskFile,
+        '--format',
+        'json',
       ],
       {
         cwd: installRoot,
@@ -549,39 +551,38 @@ test('CLI product status, product invoke, product federate, and product session 
         },
       },
     );
-    assert.equal(federatedParsed.ok, true);
-    assert.equal(federatedParsed.surface_kind, 'federated_product_entry');
-    assert.equal(federatedParsed.product_entry_surface.entry_session.entry_session_id, 'session-fed');
-    assert.equal(federatedParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(federatedParsed.family_orchestration.action_graph.edges.length, 4);
-    assert.equal(federatedParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
-    assert.equal(federatedParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
-    assert.equal(federatedParsed.summary.latest_handle, federatedParsed.summary.target_handle);
-    assert.deepEqual(federatedParsed.entry_session, federatedParsed.product_entry_surface.entry_session);
-    assert.deepEqual(federatedParsed.delivery_identity, federatedParsed.product_entry_surface.delivery_identity);
-    assert.deepEqual(federatedParsed.continuation_snapshot, federatedParsed.product_entry_surface.continuation_snapshot);
-    assert.deepEqual(federatedParsed.review_state, federatedParsed.product_entry_surface.review_state);
-    assert.deepEqual(federatedParsed.publication_projection, federatedParsed.product_entry_surface.publication_projection);
+    assert.equal(oplHostedSidecar.ok, true);
+    assert.equal(oplHostedSidecar.surface_kind, 'product_sidecar_dispatch');
+    assert.equal(oplHostedSidecar.action, 'product_entry_continuation');
+
+    const oplHostedParsed = oplHostedSidecar.result_surface;
+    assert.equal(oplHostedParsed.ok, true);
+    assert.equal(oplHostedParsed.surface_kind, 'product_entry');
+    assert.equal(oplHostedParsed.entry_session.entry_session_id, 'session-oplHosted');
+    assert.equal(oplHostedParsed.domain_entry_surface.entry_mode, 'opl_hosted');
+    assert.equal(oplHostedParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
+    assert.equal(oplHostedParsed.family_orchestration.action_graph.edges.length, 4);
+    assert.equal(oplHostedParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
+    assert.equal(oplHostedParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
+    assert.equal(oplHostedParsed.summary.latest_handle, oplHostedParsed.summary.target_handle);
     assert.equal(
-      federatedParsed.summary.approval_required,
-      federatedParsed.runtime_loop_closure.control_policy.approval_required,
+      oplHostedParsed.summary.approval_required,
+      oplHostedParsed.runtime_loop_closure.control_policy.approval_required,
     );
-    assert.equal(federatedParsed.summary.gate_status, federatedParsed.runtime_loop_closure.control_policy.gate_status);
+    assert.equal(oplHostedParsed.summary.gate_status, oplHostedParsed.runtime_loop_closure.control_policy.gate_status);
     assert.equal(
-      federatedParsed.summary.resume_command,
-      federatedParsed.runtime_loop_closure.control_policy.continue_action.command,
-    );
-    assert.equal(
-      federatedParsed.summary.session_locator_field,
-      federatedParsed.family_orchestration.resume_contract.session_locator_field,
+      oplHostedParsed.summary.resume_command,
+      oplHostedParsed.runtime_loop_closure.control_policy.continue_action.command,
     );
     assert.equal(
-      federatedParsed.summary.checkpoint_locator_field,
-      federatedParsed.family_orchestration.resume_contract.checkpoint_locator_field,
+      oplHostedParsed.summary.session_locator_field,
+      oplHostedParsed.family_orchestration.resume_contract.session_locator_field,
     );
-    assert.deepEqual(federatedParsed.session_continuity, federatedParsed.product_entry_surface.session_continuity);
-    assert.deepEqual(federatedParsed.progress_projection, federatedParsed.product_entry_surface.progress_projection);
-    assert.deepEqual(federatedParsed.artifact_inventory, federatedParsed.product_entry_surface.artifact_inventory);
+    assert.equal(
+      oplHostedParsed.summary.checkpoint_locator_field,
+      oplHostedParsed.family_orchestration.resume_contract.checkpoint_locator_field,
+    );
+    assert.equal(oplHostedParsed.runtime_loop_closure.source_linkage.current_source, 'opl_hosted');
 
     const sessionParsed = await execCliAsync(
       cliPath,
@@ -658,7 +659,7 @@ test('CLI product status, product invoke, product federate, and product session 
     assert.equal(manifestParsed.product_entry_start.surface_kind, 'product_entry_start');
     assert.equal(manifestParsed.product_entry_start.recommended_mode_id, 'open_status');
     assert.equal(manifestParsed.product_entry_start.modes[1].mode_id, 'start_direct_session');
-    assert.equal(manifestParsed.product_entry_start.modes[2].mode_id, 'opl_bridge_handoff');
+    assert.equal(manifestParsed.product_entry_start.modes[2].mode_id, 'opl_hosted_handoff');
     assert.equal(manifestParsed.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.equal(manifestParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
     assert.equal(manifestParsed.product_entry_preflight.ready_to_try_now, true);

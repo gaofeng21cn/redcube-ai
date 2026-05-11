@@ -5,7 +5,7 @@ import { productEntrySessionDir } from '@redcube/runtime';
 import {
   buildProductEntryPreflight,
   buildProgramCheck,
-} from 'opl-gateway-shared/product-entry-program-companions';
+} from 'opl-framework-shared/product-entry-program-companions';
 
 import { doctorWorkspace } from './doctor-workspace.js';
 import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
@@ -78,7 +78,7 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       title: 'Product Entry Overview Contract Landed',
       status: 'pass',
       blocking: true,
-      summary: 'direct RedCube product-entry overview contract 已 landed，可由 `status` 兼容命令 / manifest 直接消费。',
+      summary: 'direct RedCube product-entry overview contract 已 landed，可由 `status` 命令 / manifest 直接消费。',
       command: startCommand,
     }),
   ];
@@ -86,7 +86,7 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
   const productEntryPreflight = buildProductEntryPreflight({
     summary: hasBlockingChecks
       ? 'Current product-entry preflight is blocked; fix the workspace or runtime-state setup before reading the RedCube product-entry overview.'
-      : 'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `status` compatibility command.',
+      : 'Current product-entry preflight passed; inspect the workspace doctor output and then read the RedCube product-entry overview via the `status` command.',
     recommended_check_command: checkCommand,
     recommended_start_command: startCommand,
     checks,

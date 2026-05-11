@@ -5,7 +5,7 @@ import {
   buildFamilyUserInteractionContract,
   buildSharedHandoff,
   buildSharedHandoffReturnSurface,
-} from 'opl-gateway-shared/family-entry-contracts';
+} from 'opl-framework-shared/family-entry-contracts';
 
 export const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
 export const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
@@ -35,11 +35,10 @@ export function buildRedCubeDomainEntryContract({
   productStatusCommand,
   productStartCommand,
   productInvokeCommand,
-  productFederateCommand,
   productSessionCommand,
   serviceSafeDomainEntryContractRef,
   productEntryContractRef,
-  federatedProductEntryContractRef,
+  oplHostedProductEntryContractRef,
   managedProductEntryContractRef,
 }) {
   const commandCatalog = buildDomainEntryCommandCatalog([
@@ -77,24 +76,6 @@ export function buildRedCubeDomainEntryContract({
       },
     },
     {
-      command: productFederateCommand,
-      required_fields: [
-        'workspace_root',
-        'entry_session_id',
-        'target_domain_id',
-        'entry_mode',
-        'return_surface_kind',
-        'overlay',
-        'topic_id',
-        'deliverable_id',
-      ],
-      optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
-      extra_payload: {
-        gateway_action: 'invokeFederatedProductEntry',
-        target_surface_kind: 'federated_product_entry',
-      },
-    },
-    {
       command: productSessionCommand,
       required_fields: ['entry_session_id'],
       extra_payload: {
@@ -109,14 +90,15 @@ export function buildRedCubeDomainEntryContract({
     service_safe_surface_kind: 'domain_entry',
     product_entry_builder_command: productManifestCommand,
     product_entry_kind: PRODUCT_ENTRY_KIND,
-    supported_entry_modes: ['direct', 'opl_gateway', 'session'],
+    supported_entry_modes: ['direct', 'opl_hosted', 'session'],
     supported_commands: commandCatalog.supported_commands,
     command_contracts: commandCatalog.command_contracts,
     extra_payload: {
       service_safe_contract_ref: serviceSafeDomainEntryContractRef,
       direct_product_entry_contract_ref: productEntryContractRef,
-      federated_product_entry_contract_ref: federatedProductEntryContractRef,
+      opl_hosted_product_entry_contract_ref: oplHostedProductEntryContractRef,
       managed_session_contract_ref: managedProductEntryContractRef,
+      opl_hosted_handoff_ref: oplHostedProductEntryContractRef,
       domain_agent_entry_spec: RCA_DOMAIN_AGENT_ENTRY_SPEC_V1,
     },
   });
@@ -125,7 +107,7 @@ export function buildRedCubeDomainEntryContract({
 export function buildRedCubeUserInteractionContract({
   productStatusCommand,
   productManifestCommand,
-  federatedProductEntryContractRef,
+  oplHostedProductEntryContractRef,
 }) {
   return buildFamilyUserInteractionContract({
     entry_owner: 'redcube_agent_entry_shell',
@@ -138,7 +120,7 @@ export function buildRedCubeUserInteractionContract({
     extra_payload: {
       entry_status_command: productStatusCommand,
       manifest_command: productManifestCommand,
-      federated_contract_ref: federatedProductEntryContractRef,
+      opl_hosted_contract_ref: oplHostedProductEntryContractRef,
     },
   });
 }

@@ -107,12 +107,6 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       gateway_action: 'invokeProductEntry',
       boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
     },
-    'product federate': {
-      summary: '通过 internal OPL bridge 把 handoff 收口到同一个 downstream product entry；这条命令保留给外层 shell / compatibility bridge。',
-      usage: 'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
-      gateway_action: 'invokeFederatedProductEntry',
-      boundary_fields: ['workspaceRoot', 'entrySessionId', 'targetDomainId', 'topicId', 'deliverableId'],
-    },
     'product session': {
       summary: '读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。',
       usage: 'redcube product session --entry-session-id <id>',
@@ -120,13 +114,13 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['entrySessionId'],
     },
     'product status': {
-      summary: '读取 RedCube agent-facing product-entry overview；`status` 是兼容命令键，用于查看 direct / session 入口、当前主线状态和 internal OPL bridge 合同。',
+      summary: '读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted stage runtime handoff 合同。',
       usage: 'redcube product status --workspace-root <dir>',
       gateway_action: 'getProductStatus',
       boundary_fields: ['workspaceRoot'],
     },
     'product start': {
-      summary: '读取统一的 product-entry start surface，直接查看 overview / direct / internal OPL bridge / resume 四类启动方式。',
+      summary: '读取统一的 product-entry start surface，直接查看 overview / direct / OPL-hosted stage runtime handoff / resume 四类启动方式。',
       usage: 'redcube product start --workspace-root <dir>',
       gateway_action: 'getProductStart',
       boundary_fields: ['workspaceRoot'],
@@ -138,7 +132,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['workspaceRoot'],
     },
     'product manifest': {
-      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / internal OPL bridge / session 三个入口面。',
+      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / OPL-hosted stage runtime handoff / session 三个入口面。',
       usage: 'redcube product manifest --workspace-root <dir>',
       gateway_action: 'getProductEntryManifest',
       boundary_fields: ['workspaceRoot'],
@@ -270,7 +264,7 @@ export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonM
         command: 'redcube product status --workspace-root <dir>',
       },
       {
-        task: '读取统一的 product-entry start surface，决定 overview / direct / internal OPL bridge / resume 从哪条入口启动',
+        task: '读取统一的 product-entry start surface，决定 overview / direct / OPL-hosted stage runtime handoff / resume 从哪条入口启动',
         command: 'redcube product start --workspace-root <dir>',
       },
       {

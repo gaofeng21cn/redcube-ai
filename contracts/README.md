@@ -9,9 +9,9 @@
 当前保留的 repo-tracked machine-readable mainline truth：
 
 - `runtime-program/current-program.json`：当前 active mainline pointer，包含 `OPL Runtime Manager` 薄管理层边界与 `TypeScript + Python` 实现目标
-- `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct route 与 internal bridge 共用同一下游 domain entry）
+- `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct route 与 OPL-hosted handoff 共用同一下游 domain entry）
 - `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
-- `runtime-program/opl-gateway-federated-product-entry.json`：当前 internal OPL bridge / integration 冻结件
+- `runtime-program/opl-framework-hosted-product-entry.json`：当前 OPL-hosted stage runtime handoff / integration 冻结件
 - `runtime-program/managed-product-entry-hardening.json`：当前 product-entry session continuity 冻结件
 - `product_status` 等 product-entry command keys 只作为单一 `redcube-ai` app skill 下的 machine-readable overview / intake / entry-shell contract 保留；它们不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 - `runtime-program/rca-executor-routing-config.schema.json`：RCA executor routing 的 opt-in 配置 schema；只表达 `codex_cli` / `hermes_agent` 与 `structured_call` / `agent_loop`，不保存 provider secret

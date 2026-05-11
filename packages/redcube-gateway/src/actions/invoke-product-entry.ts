@@ -5,7 +5,7 @@ import {
   buildDeliveryIdentitySurface,
   buildEntrySessionSurface,
   buildProductEntryContinuationSnapshot,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 import {
   getPublicationProjection,
   getReviewState,
@@ -416,7 +416,7 @@ export async function invokeProductEntry(request) {
   const delivery = normalizeDeliveryRequest(request);
   const taskIntent = resolveTaskIntent(request, delivery);
   const entryMode = safeText(request?.entry_mode || request?.entryMode, 'redcube_product_entry');
-  const runtimeOwner = entryMode === 'opl_gateway' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
+  const runtimeOwner = entryMode === 'opl_hosted' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
 
   if (existingSession && safeText(existingSession.workspace_root) !== workspaceRoot) {
     throw new Error('entry_session_contract.entry_session_id 已绑定其他 workspace_root');
@@ -485,7 +485,7 @@ export async function invokeProductEntry(request) {
     runtimeOwner,
     deliveryIdentity: buildResolvedDeliveryIdentityPayload(resolvedIdentity, { includeProfile: false }),
     continuationSnapshot,
-    source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
+    source: entryMode === 'opl_hosted' ? 'opl_hosted' : 'direct',
     entryMode,
   });
   const { reviewState, publicationProjection } = await readReviewAndPublicationSurfaces({
@@ -505,7 +505,7 @@ export async function invokeProductEntry(request) {
     runtimeLoopClosure,
     reviewState,
     publicationProjection,
-    source: entryMode === 'opl_gateway' ? 'federated' : 'direct',
+    source: entryMode === 'opl_hosted' ? 'opl_hosted' : 'direct',
     entryMode,
   });
 

@@ -7,7 +7,7 @@
 - `RedCube AI` 的公开首页、docs 入口和核心五件套先表达独立 visual-deliverable domain agent 身份，再表达 OPL 托管路径。
 - `OPL` 在 RCA 文档中固定解释为 Codex-first、stage-led 的完整智能体运行框架，可作为外部依赖托管 RCA；它不成为 RCA 对外第一身份，也不接管 visual-domain truth、canonical artifacts、review/export gate 或 publication projection。
 - `Codex CLI` 是 RCA direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的默认最小具体执行单元。
-- 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL bridge`、Hermes-first 口径只能出现在内部集成、provenance、合同兼容、或 tombstone 语境中；仍被 runtime-program 合同引用的 program brief 留在 `docs/program/`，通过 lifecycle note 降级，不因标题旧而先物理迁移。
+- 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 口径只能出现在内部集成、provenance、合同引用、或 tombstone 语境中；仍被 runtime-program 合同引用的 program brief 留在 `docs/program/`，通过 lifecycle note 降级，不因标题旧而先物理迁移。
 
 ### 决策：RCA 对齐 OPL provider-backed runtime，Temporal 为目标生产 substrate
 
@@ -79,7 +79,7 @@
 
 ### 决策：目标 substrate 优先于旧宿主硬化
 
-原因：历史主线与当前基线仍然有验证价值，但一旦新的 runtime substrate 目标已经明确，新增投入就应默认服务目标形态。旧宿主形态只能保留为迁移桥、兼容层或回归对照，而不是继续被当成长线产品方向。
+原因：历史主线与当前基线仍然有验证价值，但一旦新的 runtime substrate 目标已经明确，新增投入就应默认服务目标形态。旧宿主形态只能保留为迁移桥、provenance 或回归对照，而不是继续被当成长线产品方向。
 
 ### 决策：`Hermes-Agent` 只指上游外部 runtime substrate
 
@@ -98,7 +98,7 @@
 - `Hermes-Agent` 在当时迁移设想中优先承担 runtime substrate / orchestration owner；当前只作为 legacy/optional provider、显式 hosted/proof backend 或 executor proof lane。
 - `RedCube AI` 继续持有 visual deliverable 的 family/profile/pack authority、audit truth 与 executor routing。
 - 具体生成步骤允许继续通过 `Executor Adapter` 选择最合适的执行器；只有在拿到显式 proof 后，才允许把某条 route 迁到新的 executor。
-- executor backend 的 public contract 只冻结 `codex_cli` 与 `hermes_agent`；旧内部 `codex_cli` / `hermes_agent` 只作为 adapter 兼容名映射到这两类 backend。
+- executor backend 的 public contract 只冻结 `codex_cli` 与 `hermes_agent`；旧内部 adapter 名称只映射到这两类 backend，不成为新的 public backend。
 - `execution_shape` 单独表达为 `structured_call` 或 `agent_loop`；显式 HTML route 的 `render_html` 默认 `structured_call`，`fix_html` 先结构化回修，复审仍阻断时最多升级一次 `hermes_agent + agent_loop`。
 - route-level `structured_call` routing 只作为 opt-in domain config 生效；未配置或未命中时继承 effective default executor，effective default executor 优先取 request、OPL handoff、domain local config，再回到内建 `codex_cli`。
 - 本仓不维护 `simple_llm` 或 `openai_compatible_gateway` 作为一等 backend；不同 provider/model 适配交给外部 `Hermes-Agent` runtime 或相应 domain adapter proof。
@@ -119,7 +119,7 @@
 - `RedCube AI` 对外主语固定为独立 domain agent，可被 `Codex`、`OPL` 或其他通用 agent 直接调用。
 - `gateway / harness` 继续保留为内部架构边界语言，不再作为仓库对外第一身份。
 - repo-verified direct route 与 OPL-hosted integration route 必须共同指向同一个 downstream domain-agent entry（`invokeDomainEntry` service-safe surface）。
-- 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeFederatedProductEntry` 只保留为 OPL-hosted integration surface。
+- 对外第一公开入口优先收口到单一 `redcube-ai` app skill；`invokeOplHostedProductEntry` 只保留为 OPL-hosted integration surface。
 - `status` 只作为该 skill 下的 machine-readable product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不代表 GUI / WebUI / 最终用户前台壳已落地。
 
 ### 历史决策：保持 honest owner split，不改 default executor owner

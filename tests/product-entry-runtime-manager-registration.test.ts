@@ -94,14 +94,14 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
     assert.equal(registration.domain_id, 'redcube');
     assert.equal(registration.domain_owner, 'redcube_ai');
     assert.equal(registration.registration_surface.command, 'redcube product manifest');
-    assert.equal(registration.federated_handoff_surface.command, 'redcube product federate');
+    assert.equal(registration.opl_hosted_handoff_surface.action_ref, 'opl_framework:hosted_product_entry');
     assert.equal(registration.state_index_inputs.artifact_projection_index, '/artifact_inventory');
     assert.equal(registration.state_index_inputs.runtime_health_snapshot_index, '/runtime_inventory');
     assert.deepEqual(
       registration.indexable_surfaces.map((surface) => surface.surface_id),
       [
         'product_entry_registration',
-        'internal_opl_bridge',
+        'opl_hosted_stage_runtime',
         'session_continuity',
         'artifact_inventory',
         'runtime_health',
@@ -149,7 +149,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       owns_domain_memory_content: false,
       allowed_authority: [
         'read_product_entry_registration_index',
-        'read_internal_opl_bridge_index',
+        'read_opl_hosted_stage_runtime_index',
         'read_session_continuity_index',
         'read_artifact_inventory_index',
         'read_runtime_health_index',
@@ -170,8 +170,8 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       'product_entry',
     );
     assert.equal(
-      manifest.route_equivalence.equivalent_routes.find((route) => route.route_id === 'internal_opl_bridge').surface_kind,
-      'federated_product_entry',
+      manifest.route_equivalence.equivalent_routes.find((route) => route.route_id === 'opl_hosted_stage_runtime').surface_kind,
+      'opl_hosted_product_entry',
     );
     assert.equal(
       manifest.route_equivalence.downstream_runtime_truth.entry_surface_kind,

@@ -24,7 +24,7 @@ Current rules:
 
 Current entry groups:
 
-- Product-entry and internal integration: `redcube_product_entry_mvp.md`, `managed_product_entry_hardening.md`, `opl_gateway_federated_product_entry.md`
+- Product-entry and internal integration: `redcube_product_entry_mvp.md`, `managed_product_entry_hardening.md`, `opl_framework_hosted_product_entry.md`
 - Upstream Hermes-Agent proof and verification provenance: `upstream_hermes_agent_*.md`
 - Absorbed Phase 2 tranche records: `phase-2/`
 

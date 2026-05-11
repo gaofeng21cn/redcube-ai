@@ -1,11 +1,11 @@
 {
-  "federated_product_entry_id": "opl_gateway_federated_product_entry",
+  "opl_hosted_product_entry_id": "opl_framework_hosted_product_entry",
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
-  "goal": "Land a repo-verified internal OPL bridge surface that converges onto the same RedCube product-entry downstream contract.",
+  "goal": "Land a repo-verified OPL-hosted stage runtime handoff surface that converges onto the same RedCube product-entry downstream contract.",
   "current_facing_boundary": {
     "manager": "OPL Runtime Manager",
-    "legacy_entry_mode": "opl_gateway",
+    "entry_mode": "opl_hosted",
     "layer_role": "thin product-managed adapter/projection layer over the configured family runtime provider",
     "does_not_own": [
       "RedCube visual-domain truth",
@@ -16,13 +16,13 @@
     ]
   },
   "callable_surface": {
-    "gateway_action": "invokeFederatedProductEntry",
-    "cli_entry": "redcube product federate",
-    "mcp_tool": "invoke_federated_product_entry"
+    "gateway_action": "invokeOplHostedProductEntry",
+    "framework_action_ref": "opl_framework:hosted_product_entry",
+    "sidecar_dispatch": "redcube product sidecar dispatch"
   },
-  "federation_contract": {
+  "hosted_handoff_contract": {
     "target_domain_id": "redcube_ai",
-    "required_entry_mode": "opl_gateway",
+    "required_entry_mode": "opl_hosted",
     "required_return_surface_kind": "product_entry",
     "required_runtime_owner": "configured_family_runtime_provider",
     "shared_handoff_envelope": [
@@ -48,9 +48,9 @@
     ]
   },
   "response_contract": {
-    "surface_kind": "federated_product_entry",
+    "surface_kind": "opl_hosted_product_entry",
     "must_include": [
-      "federated_product_entry_contract_id",
+      "opl_hosted_product_entry_contract_id",
       "target_domain_id",
       "entry_mode",
       "runtime_session_contract",

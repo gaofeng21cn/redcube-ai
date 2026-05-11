@@ -38,7 +38,7 @@
 - 不把 `RedCube AI` 写成 `OPL` 内部 workflow。
 - 不把 ontology 语义和宿主包装混写。
 - 不把 `OPL Runtime Manager` 或未来 OPL sidecar 写成 RedCube truth owner、executor owner、canonical artifact owner 或 private Hermes fork。
-- 不把旧 `external Hermes-Agent runtime substrate` wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` compatibility command key 或 internal bridge compatibility wording 重新提升为默认 public entry / runtime owner。
+- 不把旧 `external Hermes-Agent runtime substrate` wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 或旧 bridge wording 重新提升为默认 public entry / runtime owner。
 - 不用通用 Office/PPT/Python 脚本绕过 RedCube product-entry、runtime-family route、review/export gate；Python native helper 必须挂在 RedCube route/proof lane 与 contract 下。
 - 不用隐藏 fallback chain、prompt patch 或静默 profile 推断替代显式 contract。
 

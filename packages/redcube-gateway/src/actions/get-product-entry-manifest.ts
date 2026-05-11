@@ -2,19 +2,19 @@
 import path from 'node:path';
 
 import { productEntrySessionDir } from '@redcube/runtime';
-import { buildManagedRuntimeContract } from 'opl-gateway-shared/managed-runtime-contract';
+import { buildManagedRuntimeContract } from 'opl-framework-shared/managed-runtime-contract';
 import {
   buildCheckpointSummary,
   buildRuntimeInventory,
   buildTaskLifecycle,
-} from 'opl-gateway-shared/runtime-task-companions';
+} from 'opl-framework-shared/runtime-task-companions';
 import {
   buildSkillCatalog,
-} from 'opl-gateway-shared/skill-catalog';
+} from 'opl-framework-shared/skill-catalog';
 import {
   buildAutomationCatalog,
   buildAutomationDescriptor,
-} from 'opl-gateway-shared/automation-companions';
+} from 'opl-framework-shared/automation-companions';
 import {
   buildFamilyProductEntryManifest,
   buildOperatorLoopActionCatalog,
@@ -26,7 +26,7 @@ import {
   buildProductEntryShellCatalog,
   buildProductEntryShellLinkedSurface,
   collectFamilyHumanGateIds,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 
 import {
   buildRedCubeDomainEntryContract,
@@ -45,16 +45,20 @@ import {
 } from './family-action-catalog.js';
 import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plane.js';
 import { buildDomainAgentSkeletonAdapter } from './domain-agent-skeleton-adapter.js';
-import { buildRouteEquivalenceContract, buildDeliverableFacadeContract } from './get-product-entry-manifest-parts/contracts.js';
+import {
+  OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
+  buildRouteEquivalenceContract,
+  buildDeliverableFacadeContract,
+} from './get-product-entry-manifest-parts/contracts.js';
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
 import {
   DEFAULT_RUNTIME_OWNER,
-  FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+  OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
   LONG_TASK_STAGE_POLICY,
   MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
   PRODUCT_ENTRY_CONTRACT_REF,
-  PRODUCT_FEDERATE_COMMAND,
+  OPL_HOSTED_HANDOFF_REF,
   PRODUCT_STATUS_COMMAND,
   PRODUCT_INVOKE_COMMAND,
   PRODUCT_MANIFEST_COMMAND,
@@ -86,17 +90,16 @@ export async function getProductEntryManifest(request) {
     productStatusCommand: PRODUCT_STATUS_COMMAND,
     productStartCommand: PRODUCT_START_COMMAND,
     productInvokeCommand: PRODUCT_INVOKE_COMMAND,
-    productFederateCommand: PRODUCT_FEDERATE_COMMAND,
     productSessionCommand: PRODUCT_SESSION_COMMAND,
     serviceSafeDomainEntryContractRef: SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
     productEntryContractRef: PRODUCT_ENTRY_CONTRACT_REF,
-    federatedProductEntryContractRef: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+    oplHostedProductEntryContractRef: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
     managedProductEntryContractRef: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
   });
   const userInteractionContract = buildRedCubeUserInteractionContract({
     productStatusCommand: PRODUCT_STATUS_COMMAND,
     productManifestCommand: PRODUCT_MANIFEST_COMMAND,
-    federatedProductEntryContractRef: FEDERATED_PRODUCT_ENTRY_CONTRACT_REF,
+    oplHostedProductEntryContractRef: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
   });
   const familyOrchestration = buildFamilyOrchestrationCompanion({
     sessionLocatorField: 'entry_session_contract.entry_session_id',
@@ -110,7 +113,7 @@ export async function getProductEntryManifest(request) {
   const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
   const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
-      'Open the RedCube product-entry overview first via the `status` compatibility command; if the user requested plan/storyline review, invoke with lifecycle_policy=operator_review_after_plan; otherwise direct invoke runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.'
+      'Open the RedCube product-entry overview first via the `status` command; if the user requested plan/storyline review, invoke with lifecycle_policy=operator_review_after_plan; otherwise direct invoke runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.'
     ),
     recommended_step_id: 'open_status',
     steps: [
@@ -119,7 +122,7 @@ export async function getProductEntryManifest(request) {
         title: 'Open RedCube product-entry overview',
         command: `${PRODUCT_STATUS_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_status',
-        summary: 'Read the agent-facing product-entry overview for the current workspace; `status` is the legacy command key, not a GUI shell.',
+        summary: 'Read the agent-facing product-entry overview for the current workspace; `status` is the product overview command, not a GUI shell.',
         requires: [],
       },
       {
@@ -164,7 +167,7 @@ export async function getProductEntryManifest(request) {
   });
   const productEntryOverview = {
     ...buildProductEntryOverview({
-    summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     product_entry_command: PRODUCT_STATUS_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
@@ -180,7 +183,7 @@ export async function getProductEntryManifest(request) {
     recommended_step_id: productEntryQuickstart.recommended_step_id,
     next_focus: [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-      '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
+      '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
     ],
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,
@@ -189,8 +192,8 @@ export async function getProductEntryManifest(request) {
   };
   const productEntryStart = buildProductEntryStart({
     summary: (
-      '先读取 RedCube product-entry overview（`status` 兼容命令）；direct session 默认自动推进到终态，'
-      + '需要给外层 OPL shell 走 bridge contract 时使用 internal OPL bridge handoff，已有 session 则直接恢复。'
+      '先读取 RedCube product-entry overview（`status` 命令）；direct session 默认自动推进到终态，'
+      + '需要给 OPL framework 托管时使用 OPL-hosted stage runtime handoff，已有 session 则直接恢复。'
     ),
     recommended_mode_id: 'open_status',
     modes: [
@@ -199,7 +202,7 @@ export async function getProductEntryManifest(request) {
         title: 'Open RedCube product-entry overview',
         command: `${PRODUCT_STATUS_COMMAND} --workspace-root ${workspaceRoot}`,
         surface_kind: 'product_status',
-        summary: 'Read the agent-facing product-entry overview for the current workspace; `status` is the legacy command key, not a GUI shell.',
+        summary: 'Read the agent-facing product-entry overview for the current workspace; `status` is the product overview command, not a GUI shell.',
         requires: [],
       },
       {
@@ -215,16 +218,12 @@ export async function getProductEntryManifest(request) {
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
-        mode_id: 'opl_bridge_handoff',
-        title: 'Internal OPL bridge handoff',
-        command: (
-          `${PRODUCT_FEDERATE_COMMAND} --workspace-root ${workspaceRoot} `
-          + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
-          + '--entry-mode opl_gateway --return-surface-kind product_entry '
-          + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
-        ),
-        surface_kind: 'federated_product_entry',
-        summary: 'Reserved for OPL shell / compatibility bridge callers while preserving the same downstream product entry contract.',
+        mode_id: 'opl_hosted_handoff',
+        title: 'OPL-hosted stage runtime handoff',
+        command: OPL_HOSTED_HANDOFF_REF,
+        action_ref: OPL_HOSTED_HANDOFF_REF,
+        surface_kind: 'opl_hosted_product_entry',
+        summary: 'Reserved for OPL framework callers while preserving the same downstream product entry contract.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       },
       {
@@ -249,7 +248,7 @@ export async function getProductEntryManifest(request) {
     fully_automatic: false,
     summary: (
       '当前可以作为 RedCube 的 agent-facing product-entry overview / CLI product-entry 主线使用，'
-      + 'internal OPL bridge contract 也已冻结给外层壳读取，'
+      + 'OPL-hosted stage runtime handoff contract 也已冻结给外层壳读取，'
       + '但还不是成熟的最终用户前台或托管 Web 产品。'
     ),
     recommended_start_surface: 'product_status',
@@ -305,6 +304,7 @@ export async function getProductEntryManifest(request) {
     supervision_status_surface: 'product_entry_session',
     attention_queue_surface: 'product_status',
     recovery_contract_surface: 'product_entry_session',
+    contract: OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
   });
   const runtimeInventory = buildRuntimeInventory({
     summary: (
@@ -484,7 +484,7 @@ export async function getProductEntryManifest(request) {
     allowed_actions: [
       'continue_session',
       'inspect_progress',
-      'handoff_to_opl_bridge',
+      'handoff_to_opl_hosted',
     ],
     idempotency_key: 'redcube_ai:redcube_product_entry_owner_route:2026-05-08',
     status: 'active',
@@ -597,7 +597,7 @@ export async function getProductEntryManifest(request) {
     },
   };
   const skillCatalog = buildSkillCatalog({
-    summary: 'RedCube AI is exposed as one domain app skill; the `status` command remains a compatibility key for the agent-facing product-entry overview, while direct invoke and session continuity stay internal product-entry contracts for OPL and operator tooling.',
+    summary: 'RedCube AI is exposed as one domain app skill; the `status` command is the agent-facing product-entry overview command, while direct invoke and session continuity stay internal product-entry contracts for OPL and operator tooling.',
     skills: [
       {
         skill_id: 'redcube-ai',
@@ -605,7 +605,7 @@ export async function getProductEntryManifest(request) {
         owner: 'redcube_ai',
         distribution_mode: 'repo_tracked',
         surface_kind: 'product_status',
-        description: 'Operate the RedCube AI domain app through the agent-facing product-entry overview while preserving the `status` compatibility command and the same direct/session contracts underneath.',
+        description: 'Operate the RedCube AI domain app through the agent-facing product-entry overview while using the `status` product overview command and the same direct/session contracts underneath.',
         command: PRODUCT_STATUS_COMMAND,
         readiness: 'landed',
         tags: ['domain-app', 'product-entry', 'visual-deliverables'],
@@ -683,12 +683,12 @@ export async function getProductEntryManifest(request) {
       command_template: `${PRODUCT_STATUS_COMMAND} --workspace-root ${workspaceRoot}`,
       surface_kind: 'product_status',
       purpose: (
-        '当前 agent-facing product-entry overview/intake shell；`status` 只是兼容命令键，'
-        + '用于暴露 direct / session 入口，并把 internal OPL bridge 保持在单独的 bridge contract。'
+        '当前 agent-facing product-entry overview/intake shell；`status` 是当前 product overview 命令，'
+        + '用于暴露 direct / session 入口，并把 OPL-hosted stage runtime handoff 保持在单独的 bridge contract。'
       ),
       extra_payload: {
         canonical_entry_semantics: 'agent_facing_product_entry_overview',
-        legacy_command_key: 'status',
+        command_key: 'status',
         claims_gui_shell: false,
         ppt_deck_default_visual_route: pptRoutePolicy.default_visual_route,
         ppt_deck_default_visual_policy: pptRoutePolicy.default_visual_policy,
@@ -707,16 +707,11 @@ export async function getProductEntryManifest(request) {
       surface_kind: 'product_entry',
       purpose: '直接进入当前 deliverable loop 的 primary operator surface。',
     },
-    opl_bridge: {
-      command: PRODUCT_FEDERATE_COMMAND,
-      command_template: (
-        `${PRODUCT_FEDERATE_COMMAND} --workspace-root ${workspaceRoot} `
-        + '--entry-session-id <entry-session-id> --target-domain-id redcube_ai '
-        + '--entry-mode opl_gateway --return-surface-kind product_entry '
-        + '--overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>'
-      ),
-      surface_kind: 'federated_product_entry',
-      purpose: '通过 internal OPL bridge 进入同一 downstream product entry，保留给外层 shell / compatibility bridge。',
+    opl_hosted: {
+      command: OPL_HOSTED_HANDOFF_REF,
+      action_ref: OPL_HOSTED_HANDOFF_REF,
+      surface_kind: 'opl_hosted_product_entry',
+      purpose: '通过 OPL framework hosted stage runtime handoff 进入同一 downstream product entry。',
     },
     session: {
       command: PRODUCT_SESSION_COMMAND,
@@ -808,10 +803,11 @@ export async function getProductEntryManifest(request) {
       summary: productEntryShell.session.purpose,
       requires: ['entry_session_id'],
     },
-    opl_bridge_handoff: {
-      command: productEntryShell.opl_bridge.command,
-      surface_kind: productEntryShell.opl_bridge.surface_kind,
-      summary: productEntryShell.opl_bridge.purpose,
+    opl_hosted_handoff: {
+      command: productEntryShell.opl_hosted.command,
+      action_ref: productEntryShell.opl_hosted.action_ref,
+      surface_kind: productEntryShell.opl_hosted.surface_kind,
+      summary: productEntryShell.opl_hosted.purpose,
       requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
     },
     run_native_ppt_proof: {
@@ -853,10 +849,10 @@ export async function getProductEntryManifest(request) {
       active_baton_status: safeText(activeBaton.status, 'unknown'),
     },
     product_entry_status: {
-      summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 仅作为兼容命令键保留，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
       next_focus: [
         '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-        '继续把 internal OPL bridge 与同一 downstream product-entry contract 对齐。',
+        '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
       ],
       remaining_gaps_count: 2,
     },
@@ -917,8 +913,8 @@ export async function getProductEntryManifest(request) {
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: familyOrchestration,
     notes: [
-      'This manifest freezes the current repo-verified RedCube product-entry overview/intake service surface; `status` is retained only as the compatibility command key.',
-      'The OPL bridge stays available as an internal integration contract instead of a first-read user entry shell.',
+      'This manifest freezes the current repo-verified RedCube product-entry overview/intake service surface; `status` is the current product overview command.',
+      'The OPL-hosted handoff stays available as an internal integration contract instead of a first-read user entry shell.',
       'It does not claim that a mature end-user shell or managed web productization is already landed.',
     ],
     domain_entry_contract: domainEntryContract,

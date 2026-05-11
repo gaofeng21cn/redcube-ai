@@ -17,8 +17,8 @@ import type {
   FamilyOrchestrationGatePreview,
   FamilyOrchestrationReferenceRef,
   FamilyOrchestrationResumeContract,
-  FederatedProductEntryRequest,
-  FederatedProductEntryResponse,
+  OplHostedProductEntryRequest,
+  OplHostedProductEntryResponse,
   DeliverableRequest,
   ManagedRunRecordResponse,
   ManagedRunResponse,
@@ -161,9 +161,9 @@ async function invokeProductEntryJs(request: any) {
   return module.invokeProductEntry(request);
 }
 
-async function invokeFederatedProductEntryJs(request: any) {
-  const module = await import('./actions/invoke-federated-product-entry.js');
-  return module.invokeFederatedProductEntry(request);
+async function invokeOplHostedProductEntryJs(request: any) {
+  const module = await import('./actions/invoke-opl-hosted-product-entry.js');
+  return module.invokeOplHostedProductEntry(request);
 }
 
 async function getProductEntrySessionJs(request: any) {
@@ -303,10 +303,10 @@ export function invokeProductEntry(request: ProductEntryRequest): Promise<Produc
   return invokeProductEntryJs(request) as unknown as Promise<ProductEntryResponse>;
 }
 
-export function invokeFederatedProductEntry(
-  request: FederatedProductEntryRequest,
-): Promise<FederatedProductEntryResponse> {
-  return invokeFederatedProductEntryJs(request) as unknown as Promise<FederatedProductEntryResponse>;
+export function invokeOplHostedProductEntry(
+  request: OplHostedProductEntryRequest,
+): Promise<OplHostedProductEntryResponse> {
+  return invokeOplHostedProductEntryJs(request) as unknown as Promise<OplHostedProductEntryResponse>;
 }
 
 export function getProductEntrySession(request: {
@@ -402,8 +402,8 @@ export type {
   FamilyOrchestrationGatePreview,
   FamilyOrchestrationReferenceRef,
   FamilyOrchestrationResumeContract,
-  FederatedProductEntryRequest,
-  FederatedProductEntryResponse,
+  OplHostedProductEntryRequest,
+  OplHostedProductEntryResponse,
   DeliverableRequest,
   ManagedRunRecordResponse,
   ManagedRunResponse,

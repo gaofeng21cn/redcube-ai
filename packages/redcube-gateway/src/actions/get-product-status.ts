@@ -1,6 +1,6 @@
 import {
   buildFamilyProductEntrySurfaces,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
 import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
@@ -33,7 +33,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
     shell_aliases: {
       status: 'status',
       direct: 'direct',
-      opl_bridge: 'opl_bridge',
+      opl_hosted: 'opl_hosted',
       session: 'session',
     },
     shared_handoff: manifest.shared_handoff,
@@ -41,7 +41,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
   const entryStatusSurface = manifest.entry_status_surface ?? manifest.status_surface;
   const notes = [
     'This product-entry overview surface is exposed through the `status` command key as a lightweight direct-entry shell over the landed product-entry contracts.',
-    'The internal OPL bridge contract stays available for shell integration while direct RedCube entry remains the default public surface.',
+    'The OPL-hosted stage runtime handoff contract stays available for shell integration while direct RedCube entry remains the default public surface.',
     'It does not claim that a RedCube GUI shell or managed web productization is already landed.',
   ];
 

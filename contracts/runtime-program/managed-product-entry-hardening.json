@@ -48,7 +48,7 @@
     },
   "behavior_contract": {
     "session_identity_scope": "one durable deliverable per entry_session_id",
-    "direct_and_federated_entry_share_same_store": true,
+    "direct_and_opl_hosted_entry_share_same_store": true,
     "fail_closed_on": [
       "missing_entry_session_id",
       "session_not_found",

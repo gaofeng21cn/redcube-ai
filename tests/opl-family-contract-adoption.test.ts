@@ -101,7 +101,7 @@ test('RCA exposes a thick OPL family lifecycle adapter while keeping SQLite defe
     'discoverable_manifest_projection',
     'hydrated_session_projection',
   ]);
-  assert.ok(adapter.exposed_on.includes('federated product entry response'));
+  assert.ok(adapter.exposed_on.includes('oplHosted product entry response'));
 });
 
 test('RCA stage control projection maps route stages without owning runtime control', () => {

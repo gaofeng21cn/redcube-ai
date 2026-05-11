@@ -48,7 +48,7 @@
 
 - `docs/program/hermes/**` 属于 repo-local Hermes migration provenance，已迁入 `docs/history/hermes/`。
 - `docs/superpowers/**` 仍按本仓约定保持未跟踪；本轮不把本地 AI / Superpowers 过程草稿导入 repo-tracked history。
-- `docs/program/phase-2/**`、`docs/program/opl_gateway_federated_product_entry.md` 与 `docs/program/upstream_hermes_agent_*.md` 仍存在 runtime-program 合同引用，因此本轮只用 `docs/program/README.md` 与文件头 lifecycle note 标明 absorbed / internal integration / provenance 性质，不做物理迁移。
+- `docs/program/phase-2/**`、`docs/program/opl_framework_hosted_product_entry.md` 与 `docs/program/upstream_hermes_agent_*.md` 仍存在 runtime-program 合同引用，因此本轮只用 `docs/program/README.md` 与文件头 lifecycle note 标明 absorbed / internal integration / provenance 性质，不做物理迁移。
 - `docs/plans/2026-04-08-deep-research-source-readiness-pack-phase-1.md` 是已自标历史状态且无 runtime-program 合同引用的计划工件，归入 `docs/history/plans/`。
 - `docs/deliverable_examples.md` 已按 delivery lifecycle 迁入 `docs/delivery/deliverable_examples.md`。
 - `docs/runtime_architecture.md` 已按 runtime lifecycle 迁入 `docs/runtime/runtime_architecture.md`。
@@ -62,7 +62,7 @@
 
 - `README*` 与 `docs/README*` 先写 RCA 的视觉交付领域智能体身份；OPL 只作为 Codex-first、stage-led 的完整智能体运行框架和可外部依赖的托管路径出现。
 - Codex CLI 是默认 concrete executor，也是未显式选择 hosted/proof backend 时的最小执行单元。
-- `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL bridge`、Hermes-first 旧口径不进入公开第一身份。需要保留时，必须落在 internal integration、provenance、compatibility key 或 tombstone 语境。
+- `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 旧口径不进入公开第一身份。需要保留时，必须落在 internal integration、provenance、contract reference 或 tombstone 语境。
 - 合同引用优先于物理归档：仍被 `contracts/runtime-program/*.json` 通过 `human_doc:*` 指向的 program brief 不移动；若内容已过时，在文件头写清 lifecycle state、current truth owner 和 reader warning。
 - 无合同引用、且只保留历史价值的旧计划进入 `docs/history/`；仍解释当前运行但不拥有 baton 的材料进入 `docs/references/`。
 

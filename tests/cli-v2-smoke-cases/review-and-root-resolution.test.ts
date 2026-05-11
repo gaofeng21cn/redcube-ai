@@ -178,11 +178,11 @@ function createIsolatedCliInstall() {
     path.resolve('contracts'),
     path.join(gatewayPackagePath, 'node_modules', 'contracts'),
   );
-  const oplGatewaySharedDist = gatewayResolve.resolve('opl-gateway-shared/family-orchestration');
+  const oplGatewaySharedDist = gatewayResolve.resolve('opl-framework-shared/family-orchestration');
   const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
   copyPackageIntoInstall(
     oplGatewaySharedPackageRoot,
-    path.join(gatewayPackagePath, 'node_modules', 'opl-gateway-shared'),
+    path.join(gatewayPackagePath, 'node_modules', 'opl-framework-shared'),
   );
 
   return {

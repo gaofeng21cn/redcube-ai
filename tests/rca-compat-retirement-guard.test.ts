@@ -9,6 +9,7 @@ const ACTIVE_ROOTS = [
   'packages',
   'contracts',
   'plugins',
+  'scripts',
   'tests',
   'tools',
   'python',
@@ -51,6 +52,15 @@ const RETIRED_ACTIVE_PATTERNS = Object.freeze([
   /\bredcube product frontdesk\b/,
   /\bproduct_frontdesk\b/,
   /\bfrontdesk\b/,
+  /\binvokeFederatedProductEntry\b/,
+  /\bFederatedProductEntry\b/,
+  /\bfederated_product_entry\b/,
+  /\bproduct federate\b/,
+  /\bopl_gateway\b/,
+  /\bopl_bridge\b/,
+  /opl-gateway-shared/,
+  /\blegacy_command_key\b/,
+  /\bcompat_product_entry_overview_command\b/,
 ]);
 
 function listTextFiles(root) {

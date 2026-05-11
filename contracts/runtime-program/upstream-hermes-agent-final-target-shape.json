@@ -8,7 +8,7 @@
   },
   "final_target_route": {
     "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-    "opl_federated_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+    "opl_hosted_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
   },
   "runtime_boundary": {
     "runtime_owner": "optional_hosted_runtime_carrier",
@@ -69,7 +69,7 @@
       "status": "repo_verified_service_surface_landed",
       "contracts": [
         "contracts/runtime-program/redcube-product-entry-mvp.json",
-        "contracts/runtime-program/opl-gateway-federated-product-entry.json",
+        "contracts/runtime-program/opl-framework-hosted-product-entry.json",
         "contracts/runtime-program/managed-product-entry-hardening.json"
       ],
       "must_converge_with": [
@@ -114,8 +114,8 @@
       "OPL-hosted path targets the configured family runtime provider without owning RedCube visual-domain truth",
       "RedCube service-safe domain entry is callable",
       "RedCube product-entry service surface is callable",
-      "OPL handoff can federate into the same downstream product entry",
-      "direct and federated entries converge to the same downstream domain-agent entry",
+      "OPL-hosted handoff can enter the same downstream product entry",
+      "direct and oplHosted entries converge to the same downstream domain-agent entry",
       "RedCube still owns visual-domain truth",
       "Codex CLI remains the default concrete executor behind executor adapter"
     ],

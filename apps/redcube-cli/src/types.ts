@@ -6,8 +6,6 @@ import type {
   DeliverableRecordResponse,
   DomainEntryRequest,
   DomainEntryResponse,
-  FederatedProductEntryRequest,
-  FederatedProductEntryResponse,
   ManagedRunRecordResponse,
   ManagedRunResponse,
   ManagedSupervisionResponse,
@@ -70,7 +68,6 @@ export interface CliGatewayActions {
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
   invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse>;
   invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse>;
-  invokeFederatedProductEntry(request: FederatedProductEntryRequest): Promise<FederatedProductEntryResponse>;
   getProductEntrySession(request: { entry_session_id?: string; entrySessionId?: string }): Promise<ProductEntrySessionResponse>;
   runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
@@ -115,7 +112,6 @@ export type CliRunSurface =
   | DeliverableCreateResponse
   | DeliverableRecordResponse
   | DomainEntryResponse
-  | FederatedProductEntryResponse
   | DeliverableAuditResponse
   | ManagedRunResponse
   | ManagedRunRecordResponse

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import {
   buildFamilyProductEntryPresetOrchestration,
-} from 'opl-gateway-shared/family-orchestration';
+} from 'opl-framework-shared/family-orchestration';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -24,8 +24,10 @@ const PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC = Object.freeze({
   entry_surface_kind: 'product_status',
   direct_title: 'Start or continue the direct product loop',
   direct_surface_kind: 'product_entry',
-  federated_title: 'Enter the same loop through internal OPL bridge',
-  federated_surface_kind: 'federated_product_entry',
+  opl_hosted_node_id: 'step:opl_hosted_handoff',
+  opl_hosted_title: 'Enter the same loop through OPL-hosted stage runtime handoff',
+  opl_hosted_surface_kind: 'opl_hosted_product_entry',
+  opl_hosted_transition_event: 'enter_via_opl_hosted_handoff',
   progress_title: 'Inspect current product-entry progress',
   progress_surface_kind: 'product_entry_session',
   review_gate_id: 'redcube_operator_review_gate',
@@ -87,6 +89,10 @@ export function buildFamilyOrchestrationCompanion({
     product_entry_node_id: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.entry_node_id,
     product_entry_title: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.entry_title,
     product_entry_surface_kind: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.entry_surface_kind,
+    federated_node_id: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.opl_hosted_node_id,
+    federated_transition_event: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.opl_hosted_transition_event,
+    federated_title: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.opl_hosted_title,
+    federated_surface_kind: PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC.opl_hosted_surface_kind,
     review_gate_status: safeText(gateStatus, 'requested'),
     ...(reviewSurfaceRef ? { review_surface: reviewSurfaceRef } : {}),
     action_graph_ref: PRODUCT_ENTRY_ACTION_GRAPH_REF,

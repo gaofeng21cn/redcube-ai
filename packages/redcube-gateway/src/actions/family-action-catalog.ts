@@ -3,10 +3,9 @@ import {
   buildFamilyActionCatalogParity,
   normalizeFamilyActionCatalog,
   projectFamilyAction,
-} from 'opl-gateway-shared/family-action-catalog';
+} from 'opl-framework-shared/family-action-catalog';
 
 import {
-  PRODUCT_FEDERATE_COMMAND,
   PRODUCT_INVOKE_COMMAND,
   PRODUCT_MANIFEST_COMMAND,
   PRODUCT_SESSION_COMMAND,
@@ -47,7 +46,7 @@ const MCP_TOOLS = [
   {
     name: 'redcube_product_entry',
     selector: 'action',
-    description: 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, and domain-entry actions, with an internal OPL bridge handoff kept for shell integration.',
+    description: 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, sidecar, and domain-entry actions. OPL-hosted stage runtime handoff is exposed through framework-side contracts, not a public CLI/MCP action.',
   },
 ];
 
@@ -72,15 +71,6 @@ const PROJECTION_METADATA: Record<string, JsonMap> = {
       'direct',
     ),
     mcp: surface('redcube_product_entry', 'invoke_product_entry', 'invokeProductEntry'),
-  },
-  invoke_federated_product_entry: {
-    cli: help(
-      'redcube product federate --workspace-root <dir> --entry-session-id <id> --target-domain-id redcube_ai --entry-mode opl_gateway --return-surface-kind product_entry --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>]',
-      'invokeFederatedProductEntry',
-      ['workspaceRoot', 'entrySessionId', 'targetDomainId', 'topicId', 'deliverableId'],
-      'opl_bridge',
-    ),
-    mcp: surface('redcube_product_entry', 'invoke_federated_product_entry', 'invokeFederatedProductEntry'),
   },
   get_product_entry_session: {
     cli: help('redcube product session --entry-session-id <id>', 'getProductEntrySession', ['entrySessionId'], 'session'),
@@ -207,7 +197,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'get_product_status',
       title: 'Read RedCube product status',
-      summary: '读取 RedCube agent-facing product-entry overview；`status` 是兼容命令键，用于查看 direct / session 入口、当前主线状态和 internal OPL bridge 合同。',
+      summary: '读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted stage runtime handoff 合同。',
       effect: 'read_only',
       command: PRODUCT_STATUS_COMMAND,
       surfaceKind: 'product_status',
@@ -223,7 +213,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'get_product_start',
       title: 'Read RedCube product start surface',
-      summary: '读取统一的 product-entry start surface，直接查看 overview / direct / internal OPL bridge / resume 四类启动方式。',
+      summary: '读取统一的 product-entry start surface，直接查看 overview / direct / OPL-hosted handoff / resume 四类启动方式。',
       effect: 'read_only',
       command: PRODUCT_START_COMMAND,
       surfaceKind: 'product_entry_start',
@@ -269,23 +259,6 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
       },
     }),
     action({
-      actionId: 'invoke_federated_product_entry',
-      title: 'Invoke RedCube internal OPL bridge',
-      summary: '通过 internal OPL bridge 把 handoff 收口到同一个 downstream product entry；这条命令保留给外层 shell / compatibility bridge。',
-      effect: 'mutating',
-      command: PRODUCT_FEDERATE_COMMAND,
-      surfaceKind: 'federated_product_entry',
-      inputSchemaRef: 'schema:redcube.product_entry.federated.request.v1',
-      outputSchemaRef: 'schema:redcube.product_entry.federated.response.v1',
-      workspaceLocatorFields: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
-      humanGateIds: ['redcube_operator_review_gate'],
-      supportedSurfaces: {
-        cli: { surface_kind: 'federated_product_entry' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'invoke_federated_product_entry' },
-        product_entry: { action_key: 'opl_bridge_handoff', surface_kind: 'federated_product_entry' },
-      },
-    }),
-    action({
       actionId: 'get_product_entry_session',
       title: 'Read RedCube product-entry session',
       summary: '读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。',
@@ -305,7 +278,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'get_product_entry_manifest',
       title: 'Read RedCube product-entry manifest',
-      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / internal OPL bridge / session 三个入口面。',
+      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / OPL-hosted handoff / session 三个入口面。',
       effect: 'read_only',
       command: PRODUCT_MANIFEST_COMMAND,
       surfaceKind: 'product_entry_manifest',
@@ -401,7 +374,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'invoke_domain_entry',
       title: 'Invoke service-safe RedCube domain entry',
-      summary: 'Invoke the shared service-safe RedCube domain entry underneath direct product entry and internal OPL bridge callers.',
+      summary: 'Invoke the shared service-safe RedCube domain entry underneath direct product entry and OPL-hosted stage runtime callers.',
       effect: 'mutating',
       command: SERVICE_SAFE_DOMAIN_ENTRY_COMMAND,
       surfaceKind: 'domain_entry',

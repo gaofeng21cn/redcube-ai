@@ -12,7 +12,6 @@ import {
   getRun as getGatewayRun,
   getManagedRun as getGatewayManagedRun,
   invokeDomainEntry,
-  invokeFederatedProductEntry,
   invokeProductEntry,
   getProductStatus,
   getProductEntryManifest,
@@ -52,7 +51,6 @@ const DEFAULT_GATEWAY_ACTIONS = {
   getRun: getGatewayRun,
   getManagedRun: getGatewayManagedRun,
   invokeDomainEntry,
-  invokeFederatedProductEntry,
   invokeProductEntry,
   getProductStatus,
   getProductEntryManifest,
@@ -360,41 +358,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       });
     }
 
-    if (subcommand === 'federate') {
-      return gateway.invokeFederatedProductEntry({
-        target_domain_id: options.targetDomainId || 'redcube_ai',
-        task_intent: options.taskIntent || 'run_managed_deliverable',
-        entry_mode: options.entryMode || 'opl_gateway',
-        workspace_locator: {
-          workspace_root: resolveWorkspaceRoot(options, cwd),
-        },
-        runtime_session_contract: {
-          runtime_owner: 'configured_family_runtime_provider',
-        },
-        return_surface_contract: {
-          surface_kind: options.returnSurfaceKind || 'product_entry',
-        },
-        entry_session_contract: {
-          entry_session_id: options.entrySessionId || '',
-        },
-        delivery_request: {
-          deliverable_family: options.overlay || '',
-          topic_id: options.topicId || '',
-          deliverable_id: options.deliverableId || '',
-          profile_id: options.profileId || '',
-          title: options.title || '',
-          goal: options.goal || '',
-          route: options.route || '',
-          adapter: options.adapter || '',
-          user_intent: options.userIntent || '',
-          lifecycle_policy: options.lifecyclePolicy || '',
-          stop_after_stage: options.stopAfterStage || '',
-          mode: options.mode || 'draft_new',
-          baseline_deliverable_id: options.baselineDeliverableId || '',
-        },
-      });
-    }
-
     if (subcommand === 'session') {
       return gateway.getProductEntrySession({
         entry_session_id: options.entrySessionId || '',
@@ -426,7 +389,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       throw new Error('product sidecar 命令仅支持 export|dispatch');
     }
 
-    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest|sidecar；internal OPL bridge 由外层 shell 调用');
+    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest|sidecar；OPL-hosted stage runtime handoff 由 product sidecar 或 framework caller 调用');
   }
 
   if (command === 'native-ppt') {

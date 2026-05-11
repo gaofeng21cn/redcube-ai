@@ -50,11 +50,11 @@ test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared spe
         resolve_from: 'packages/redcube-runtime/package.json',
       },
       {
-        specifier: 'opl-gateway-shared/product-entry-companions',
+        specifier: 'opl-framework-shared/product-entry-companions',
         resolve_from: 'packages/redcube-gateway/package.json',
       },
       {
-        specifier: 'opl-gateway-shared/family-shared-release',
+        specifier: 'opl-framework-shared/family-shared-release',
         resolve_from: 'packages/redcube-gateway/package.json',
       },
     ],
@@ -77,18 +77,18 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
         resolve_from: 'packages/redcube-runtime/package.json',
       },
       {
-        specifier: 'opl-gateway-shared/product-entry-program-companions',
+        specifier: 'opl-framework-shared/product-entry-program-companions',
         resolve_from: 'packages/redcube-gateway/package.json',
       },
       {
-        specifier: 'opl-gateway-shared/family-shared-release',
+        specifier: 'opl-framework-shared/family-shared-release',
         resolve_from: 'packages/redcube-gateway/package.json',
       },
     ],
     resolve(specifier) {
       if (
-        specifier === 'opl-gateway-shared/product-entry-program-companions'
-        || specifier === 'opl-gateway-shared/family-shared-release'
+        specifier === 'opl-framework-shared/product-entry-program-companions'
+        || specifier === 'opl-framework-shared/family-shared-release'
       ) {
         const error = new Error('Cannot find module');
         error.code = 'ERR_MODULE_NOT_FOUND';
@@ -103,8 +103,8 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
   assert.deepEqual(
     result.missing_specifiers.map((entry) => entry.specifier).sort(),
     [
-      'opl-gateway-shared/family-shared-release',
-      'opl-gateway-shared/product-entry-program-companions',
+      'opl-framework-shared/family-shared-release',
+      'opl-framework-shared/product-entry-program-companions',
     ],
   );
   assert.match(result.message, /npm install/);
@@ -134,14 +134,14 @@ test('inspectCurrentRepoSharedPinAlignment falls back to the consumer pin when t
   const result = withTempRedcubeRepo(({ writeJson }) => {
     writeJson('packages/redcube-gateway/package.json', {
       dependencies: {
-        'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
+        'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
       },
     });
     writeJson('package-lock.json', {
       packages: {
         'packages/redcube-gateway': {
           dependencies: {
-            'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
+            'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
           },
         },
       },
@@ -169,14 +169,14 @@ test('inspectCurrentRepoSharedPinAlignment fallback still reports stale package-
   const result = withTempRedcubeRepo(({ writeJson }) => {
     writeJson('packages/redcube-gateway/package.json', {
       dependencies: {
-        'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
+        'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
       },
     });
     writeJson('package-lock.json', {
       packages: {
         'packages/redcube-gateway': {
           dependencies: {
-            'opl-gateway-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${staleCommit}`,
+            'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${staleCommit}`,
           },
         },
       },

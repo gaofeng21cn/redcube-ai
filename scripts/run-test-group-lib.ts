@@ -9,7 +9,7 @@ import {
   inspectCurrentRepoFamilySharedAlignment,
   inspectFamilySharedConsumerAlignment,
   resolveOwnerRepoRoot,
-} from 'opl-gateway-shared/family-shared-release';
+} from 'opl-framework-shared/family-shared-release';
 
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
   'integration',
@@ -66,22 +66,22 @@ export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
     resolve_from: 'packages/redcube-runtime/package.json',
   },
   {
-    specifier: 'opl-gateway-shared/product-entry-companions',
+    specifier: 'opl-framework-shared/product-entry-companions',
     resolve_from: 'packages/redcube-gateway/package.json',
   },
   {
-    specifier: 'opl-gateway-shared/product-entry-program-companions',
+    specifier: 'opl-framework-shared/product-entry-program-companions',
     resolve_from: 'packages/redcube-gateway/package.json',
   },
   {
-    specifier: 'opl-gateway-shared/family-shared-release',
+    specifier: 'opl-framework-shared/family-shared-release',
     resolve_from: 'packages/redcube-gateway/package.json',
   },
 ]);
 const REPO_LOCAL_SHARED_PIN_FALLBACKS = Object.freeze({
   redcube: Object.freeze({
     owner_repo: 'one-person-lab',
-    package_name: 'opl-gateway-shared',
+    package_name: 'opl-framework-shared',
     git_locator_prefix: 'git+https://github.com/gaofeng21cn/one-person-lab.git#',
     consumer: Object.freeze({
       repo_id: 'redcube',

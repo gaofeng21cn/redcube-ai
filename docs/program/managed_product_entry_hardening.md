@@ -28,7 +28,7 @@ direct / OPL-hosted 两条入口现在共享一个用户级 session store：
 
 ## 最小行为
 
-1. `invokeProductEntry` 与 `invokeFederatedProductEntry` 都写入同一个 session store
+1. `invokeProductEntry` 与 `invokeOplHostedProductEntry` 都写入同一个 session store
 2. `entry_session_id` 绑定同一 deliverable identity
 3. continuation surface 必须显式返回 latest handles，而不是靠 prompt 记忆
 4. 用户级 runtime-state 继续只落在 `$CODEX_HOME/projects/redcube-ai/runtime-state/`

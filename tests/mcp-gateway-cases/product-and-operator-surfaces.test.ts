@@ -54,12 +54,12 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
       }),
     },
   );
-  const federated = await callGatewayTool(
+  const oplHosted = await callGatewayTool(
     'redcube_product_entry',
-    withAction('invoke_federated_product_entry', {
+    withAction('product_sidecar_dispatch', {
       target_domain_id: 'redcube_ai',
       task_intent: 'run_managed_deliverable',
-      entry_mode: 'opl_gateway',
+      entry_mode: 'opl_hosted',
       workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
       runtime_session_contract: { runtime_owner: 'configured_family_runtime_provider' },
       return_surface_contract: { surface_kind: 'product_entry' },
@@ -71,10 +71,10 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
       },
     }),
     {
-      invokeFederatedProductEntry: async (request) => ({
+      invokeOplHostedProductEntry: async (request) => ({
         ok: true,
-        surface_kind: 'federated_product_entry',
-        federated_product_entry_contract_id: 'opl_gateway_federated_product_entry',
+        surface_kind: 'opl_hosted_product_entry',
+        opl_hosted_product_entry_contract_id: 'opl_framework_hosted_product_entry',
         family_orchestration: {
           action_graph_ref: {
             ref_kind: 'json_pointer',
@@ -175,9 +175,9 @@ test('callGatewayTool delegates product-entry gateway actions', async () => {
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
   assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
   assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-  assert.equal(federated.surface_kind, 'federated_product_entry');
-  assert.equal(federated.summary.entry_session_id, 'session-a');
-  assert.equal(federated.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
+  assert.equal(oplHosted.surface_kind, 'opl_hosted_product_entry');
+  assert.equal(oplHosted.summary.entry_session_id, 'session-a');
+  assert.equal(oplHosted.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
@@ -520,5 +520,5 @@ test('listGatewayTools descriptions mention quality-facing runtime watch and rev
   assert.match(deliverableTool.description, /route/i);
   assert.match(sourcesTool.description, /augmentation/i);
   assert.match(workspaceTool.description, /topic/i);
-  assert.match(productEntryTool.description, /OPL bridge/i);
+  assert.match(productEntryTool.description, /OPL-hosted handoff/i);
 });

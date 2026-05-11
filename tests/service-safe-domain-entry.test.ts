@@ -65,13 +65,13 @@ async function prepareDomainEntryWorkspace() {
 
 test('invokeDomainEntry runs the service-safe managed deliverable adapter under the configured OPL provider contract', async () => {
   await withMockHermesUpstream(async () => {
-    const sharedCompanions = await importGatewaySharedModule('opl-gateway-shared/product-entry-companions');
+    const sharedCompanions = await importGatewaySharedModule('opl-framework-shared/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
     const response = await invokeDomainEntry({
       target_domain_id: 'redcube_ai',
       task_intent: 'run_managed_deliverable',
-      entry_mode: 'opl_gateway',
+      entry_mode: 'opl_hosted',
       workspace_locator: {
         workspace_root: workspaceRoot,
       },
@@ -96,7 +96,7 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
     assert.equal(response.surface_kind, 'domain_entry');
     assert.equal(response.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.task_intent, 'run_managed_deliverable');
-    assert.equal(response.entry_mode, 'opl_gateway');
+    assert.equal(response.entry_mode, 'opl_hosted');
     assert.deepEqual(
       response.runtime_session_contract,
       sharedCompanions.buildRuntimeSessionContract({
@@ -182,7 +182,7 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
       () => invokeDomainEntry({
         target_domain_id: 'redcube_ai',
         task_intent: 'run_managed_deliverable',
-        entry_mode: 'opl_gateway',
+        entry_mode: 'opl_hosted',
         workspace_locator: {
           workspace_root: workspaceRoot,
         },
@@ -211,7 +211,7 @@ test('service-safe domain entry contract is frozen in contracts and current prog
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
   assert.equal(contract.runtime_session_contract.default_runtime_owner, 'codex_cli');
-  assert.equal(contract.runtime_session_contract.hosted_runtime_owner_when_federated, 'configured_family_runtime_provider');
+  assert.equal(contract.runtime_session_contract.hosted_runtime_owner_when_opl_hosted, 'configured_family_runtime_provider');
   assert.deepEqual(contract.opl_handoff_envelope.minimum_fields, [
     'target_domain_id',
     'task_intent',

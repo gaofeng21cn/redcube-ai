@@ -26,7 +26,7 @@
 - `TypeScript + Python` 是实现目标，不是绕过 runtime-family 的许可。Python native PPT/Office helper 必须挂在 RedCube product-entry、route/proof lane、review/export gate 与 repo-tracked contract 下。
 - 如果当前基线与长线目标并存，必须在 `docs/status.md` 与 `docs/README*` 中显式拆开。
 - 当前 OPL stage-led 对齐已经落到 RCA-owned `family_action_catalog`、`stage_control_projection`、`route_equivalence`、product sidecar adapter 与 `opl_runtime_manager_registration`；这些 surface 只供 OPL discovery、queue、wakeup、handoff、receipt、retry/dead-letter 和 operator projection 使用，不授权 OPL 生成 visual route、review verdict、publication projection truth 或 canonical artifact。
-- 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` compatibility command key、`internal OPL bridge` compatibility wording 只能作为 migration provenance、internal integration contract 或 compatibility key 保留；它们不得回到默认 public entry 或 runtime owner。物理删除必须以 direct route / service-safe domain entry / product sidecar / stage descriptor parity 已验证为前提。
+- 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 与旧 bridge wording 只能作为 migration provenance、internal integration contract 或 tombstone 语境保留；它们不得回到默认 public entry 或 runtime owner。active surface 必须以 direct route / service-safe domain entry / product sidecar / stage descriptor / OPL-hosted handoff parity 为准。
 
 ## 文档治理
 

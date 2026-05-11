@@ -1,14 +1,14 @@
 import type {
   FamilySharedHandoffSurface,
   UserInteractionContractSurface,
-} from 'opl-gateway-shared/family-entry-contracts';
+} from 'opl-framework-shared/family-entry-contracts';
 import type {
   FamilyProductEntrySurfaces,
   FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
   FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
   FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
   ProductEntryResumeContract as SharedProductEntryResumeContract,
-} from 'opl-gateway-shared/product-entry-companions';
+} from 'opl-framework-shared/product-entry-companions';
 
 import type {
   DomainEntryContractSurface,
@@ -301,7 +301,7 @@ export interface RuntimeLoopClosureSurface {
     current_source: string;
     entry_mode: string | null;
     direct_surface_kind: 'product_entry';
-    federated_surface_kind: 'federated_product_entry';
+    opl_hosted_surface_kind: 'opl_hosted_product_entry';
     session_surface_kind: 'product_entry_session';
     downstream_entry_surface_kind: 'domain_entry';
   };
@@ -377,7 +377,7 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   };
 }
 
-export interface FederatedProductEntryRequest extends Record<string, unknown> {
+export interface OplHostedProductEntryRequest extends Record<string, unknown> {
   target_domain_id: string;
   task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
   entry_mode: string;
@@ -394,8 +394,8 @@ export interface FederatedProductEntryRequest extends Record<string, unknown> {
   delivery_request: ProductEntryRequest['delivery_request'];
 }
 
-export interface FederatedProductEntryResponse extends SurfaceBase<'federated_product_entry'> {
-  federated_product_entry_contract_id: string;
+export interface OplHostedProductEntryResponse extends SurfaceBase<'opl_hosted_product_entry'> {
+  opl_hosted_product_entry_contract_id: string;
   target_domain_id: string;
   entry_mode: string;
   runtime_session_contract: Record<string, unknown>;
@@ -461,7 +461,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     workspace_surface_kind: string;
     workspace_root: string;
   };
-  recommended_shell: 'direct' | 'opl_bridge' | 'session' | string;
+  recommended_shell: 'direct' | 'opl_hosted_handoff' | 'session' | string;
   recommended_command: string;
   entry_status_surface: {
     shell_key: 'status' | string;
@@ -476,11 +476,11 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     summary: string;
   };
   operator_loop_surface: {
-    shell_key: 'direct' | 'opl_bridge' | 'session' | string;
+    shell_key: 'direct' | 'opl_hosted_handoff' | 'session' | string;
     command: string;
     surface_kind: string;
     summary: string;
-    continuation_shell_key?: 'direct' | 'opl_bridge' | 'session' | string;
+    continuation_shell_key?: 'direct' | 'opl_hosted_handoff' | 'session' | string;
     continuation_command?: string;
   };
   operator_loop_actions: Record<string, {
@@ -536,10 +536,11 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
       command_template: string;
       surface_kind: 'product_entry';
     };
-    opl_bridge: {
+    opl_hosted_handoff: {
       command: string;
-      command_template: string;
-      surface_kind: 'federated_product_entry';
+      action_ref?: string;
+      command_template?: string;
+      surface_kind: 'opl_hosted_product_entry';
     };
     session: {
       command: string;
@@ -563,7 +564,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
   family_orchestration: FamilyOrchestrationCompanion;
   current_truth: {
     product_entry_contract: string;
-    federated_product_entry_contract: string;
+    opl_hosted_product_entry_contract: string;
     managed_product_entry_contract: string;
   };
   session_continuity: {
@@ -703,7 +704,7 @@ export interface ProductStatusResponse extends SurfaceBase<'product_status'> {
   product_entry_manifest: ProductEntryManifestResponse;
   entry_surfaces: FamilyProductEntrySurfaces & {
     direct: ProductEntryManifestResponse['product_entry_shell']['direct'];
-    opl_bridge: ProductEntryManifestResponse['product_entry_shell']['opl_bridge'];
+    opl_hosted_handoff: ProductEntryManifestResponse['product_entry_shell']['opl_hosted_handoff'];
     session: ProductEntryManifestResponse['product_entry_shell']['session'];
   };
   domain_entry_contract: ProductEntryManifestResponse['domain_entry_contract'];
