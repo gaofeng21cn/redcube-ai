@@ -6,6 +6,8 @@
 
 本轮只整理叙述性 `docs/**` 与文档索引，不改源码、测试或 `contracts/runtime-program/*.json`。
 
+本轮 RCA runtime/program/history cleanup 的新增约束是：先审计 `contracts/runtime-program/*.json` 的 `human_doc:*` 引用；仍被引用的 program/reference 文档不移动，只补 lifecycle header、README 索引和 tombstone 读法。
+
 本轮审阅按正文内容判断生命周期。已逐篇覆盖：
 
 - `docs/product/`、`docs/runtime/`、`docs/delivery/`、`docs/source/` 的 README 与正文文档。
@@ -110,6 +112,24 @@
 - `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 旧口径不进入公开第一身份。需要保留时，必须落在 internal integration、provenance、contract reference 或 tombstone 语境。
 - 合同引用优先于物理归档：仍被 `contracts/runtime-program/*.json` 通过 `human_doc:*` 指向的 program brief 不移动；若内容已过时，在文件头写清 lifecycle state、current truth owner 和 reader warning。
 - 无合同引用、且只保留历史价值的旧计划进入 `docs/history/`；仍解释当前运行但不拥有 baton 的材料进入 `docs/references/`。
+
+## 2026-05-11 RCA runtime/program/history cleanup
+
+本轮 fresh `human_doc:*` 审计结论：
+
+- `current-program.json` 仍引用 product-entry、OPL-hosted integration 与多份 `program_upstream_hermes_agent_*` brief。
+- Phase 2 tranche contracts 仍引用多个 `program_phase_2_*` brief、`human_doc:runtime_architecture` 与 `human_doc:domain_harness_os_positioning`。
+- Upstream Hermes blocker / closeout contracts 仍引用 `program_upstream_hermes_agent_fast_cutover_board` 与 `program_upstream_hermes_agent_live_verification_closeout`。
+
+本轮处置：
+
+- `docs/runtime/runtime_architecture.md` 瘦身为 current runtime topology / executor-backend / watch-projection / OPL-hosted boundary 说明；Phase 2 closeout、old gateway/harness narrative 与 Hermes proof 细节下沉到 program/reference/history 索引读取。
+- `docs/program/phase-2/README.md` 新增为 absorbed tranche 子目录索引；各 tranche brief 原位保留，等待未来合同退链后再迁入 history。
+- `docs/program/upstream_hermes_agent_*.md` 因合同链接原位保留，继续按 historical proof / blocker / closeout provenance 读取。
+- `docs/references/positioning/domain-harness-os-positioning.md` 因 `human_doc:domain_harness_os_positioning` 原位保留，继续按 internal boundary vocabulary 读取。
+- `docs/history/tombstones/retired-route-narratives-2026-05-11.md` 补充 contract-linked exception 清单，防止旧 gateway/harness/Hermes-first 文件名被误读成当前 owner。
+
+本轮未移动 contract-linked program/reference 文件，也未修改 runtime-program contracts；因此无需运行 `npm run test:meta`。
 
 ## 机器面边界
 

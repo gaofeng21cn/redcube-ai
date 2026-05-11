@@ -18,4 +18,5 @@
 - 后续 tombstone 应写清退役词汇、当前 truth owner，以及是否仍有机器可读 `human_doc:*` 链接要求 program brief 原位保留。
 
 仍被 runtime-program 机器合同引用的 active program brief 继续保留在 `../program/`。
+仍有 `human_doc:*` 语义引用的 Phase 2 与 upstream Hermes proof brief 也继续留在 `../program/`，直到后续合同 lane 退链或重映射。
 本地 AI / Superpowers 过程草稿继续保持在被忽略的 `../superpowers/` 下，不导入 repo-tracked history。

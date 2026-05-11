@@ -18,4 +18,5 @@ Current groups:
 - Future tombstone notes should state the retired wording, the current owner surface, and whether any machine-readable `human_doc:*` links still require an in-place program brief.
 
 Active program briefs that are still linked from machine-readable runtime-program contracts remain in `../program/`.
+Contract-linked Phase 2 and upstream Hermes proof briefs remain there until their `human_doc:*` semantic IDs are retired or remapped.
 Local AI/Superpowers process drafts stay ignored under `../superpowers/` and are not imported into repo-tracked history.

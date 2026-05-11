@@ -26,7 +26,17 @@ Current entry groups:
 
 - Product-entry and internal integration: `redcube_product_entry_mvp.md`, `managed_product_entry_hardening.md`, `opl_framework_hosted_product_entry.md`
 - Upstream Hermes-Agent proof and verification provenance: `upstream_hermes_agent_*.md`
-- Absorbed Phase 2 tranche records: `phase-2/`
+- Absorbed Phase 2 tranche records: `phase-2/README.md`
+
+## Contract Link Audit
+
+Fresh `human_doc:*` audit shows these groups still have inbound runtime-program links and should not be physically moved in this cleanup lane:
+
+- `current-program.json` still points to `program_redcube_product_entry_mvp`, `program_managed_product_entry_hardening`, `program_opl_framework_hosted_product_entry`, and multiple `program_upstream_hermes_agent_*` briefs.
+- Phase 2 tranche contracts still point to `program_phase_2_*` briefs, `human_doc:runtime_architecture`, and `human_doc:domain_harness_os_positioning`.
+- Upstream Hermes blocker / closeout contracts still point to `program_upstream_hermes_agent_fast_cutover_board` and `program_upstream_hermes_agent_live_verification_closeout`.
+
+Therefore the safe action is lifecycle labeling and index clarification, not path migration. Once those semantic IDs are retired or remapped in a future contract lane, the corresponding provenance files can move into `../history/`.
 
 ## Current Disposition
 

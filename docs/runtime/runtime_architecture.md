@@ -1,48 +1,32 @@
 # 运行架构说明
 
-这份文档写给需要理解 `RedCube AI` 技术边界的读者。
-它属于仓库跟踪的操作文档层，不属于默认对外双语公开正文面。
-如果未来要把它提升到默认公开面，必须同步补齐英文 `.md` 与中文 `.zh-CN.md` 镜像。
-其中凡是历史 `docs/history/hermes/*` 冻结件，当前都只能读成 repo-local migration provenance，而不是上游 `Hermes-Agent` 已接管 runtime 的证据。
-当前公开第一身份是独立 visual-deliverable domain agent；`gateway / harness` 只作为仓内边界层与执行层语言保留。
+生命周期说明：本文是当前 runtime topology 的人读说明，服务 `human_doc:runtime_architecture` 语义引用。它不承载 program closeout、Phase 2 provenance、Hermes 迁移证明或 gateway / harness 历史叙事；这些材料分别归入 `docs/program/`、`docs/references/` 与 `docs/history/`。
 
-## 一句话理解
+## 文档边界
 
-`RedCube AI` 不是 GUI 工具集合，而是面向 agent 的独立 visual-deliverable domain agent，提供 direct product entry、service-safe domain entry 与 visual-domain truth surfaces。
-其中 `status` 只表示 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示 GUI、WebUI 或最终用户前台壳已经落地。
+| 字段 | 说明 |
+| --- | --- |
+| owner | RCA runtime / product-entry docs |
+| purpose | 解释 direct route、OPL-hosted route、executor/backend、watch/projection 的当前边界 |
+| state | current runtime explanation |
+| machine boundary | 可执行真相在 runtime-program contracts、CLI/MCP surfaces、gateway/runtime source、workspace/runtime artifacts；本文只是读者上下文 |
 
-这里的 `Agent-first` 通过默认 `Codex CLI host-agent runtime` 与显式 `hermes_agent` proof lane 共同成立。
-在当前 Codex-native 语境里，`RedCube AI` 持有 visual-domain governance / audit / projection truth，默认 concrete executor 是本地 Codex CLI host-agent runtime；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance / compatibility bridge；
-当前 formal-entry matrix 已固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`；
-当前已验证的公开正式入口是 `CLI`、`MCP`；
-代码应退回 contract、governance、audit、artifact persistence 与 render boundary。
+旧 `Gateway`、`Domain Harness OS`、Hermes-first、managed web runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner 或 visual truth owner。
 
-这里同样必须区分：
+## 当前拓扑
 
-- 长线目标：把 `RedCube AI` 收敛成稳定、可信、可复验的 visual-domain 产品 / 服务节点
-- 当前 program：当前 repo-tracked mainline 正在覆盖的能力层
-- 历史 freeze / closeout：把当前能力带进主线的 provenance 证据
-
-当前最成熟的两类交付物，加上一条已完成 extension proof 的海报 surface，是：
-
-- `PPT deck`
-- `小红书图文`
-- `poster_onepager / knowledge_poster`
-
-## 顶层链路
-
-独立使用时（当前默认）：
+RedCube direct route 是当前第一公开读法：
 
 ```text
-Agent
-  -> RedCube Product Entry / CLI（默认）/ MCP
+User / Agent
+  -> RedCube Product Entry / CLI / MCP
       -> RedCube service-safe domain entry
           -> executor adapter
-              -> concrete executor (default Codex CLI host-agent runtime)
+              -> concrete executor
                   -> RedCube visual-domain truth surfaces
 ```
 
-放在 `OPL` 顶层语义里时：
+OPL-hosted route 是内部托管集成读法：
 
 ```text
 User / Agent
@@ -55,260 +39,105 @@ User / Agent
                           -> RedCube visual-domain truth surfaces
 ```
 
-当前冻结的收口链还要再明确一层：
+两条路线在进入 RedCube service-safe domain entry 后必须收敛到同一套 route、review、artifact、publication projection 与 export authority。OPL 可以托管、唤醒、排队、投影和接收 receipt；RCA 继续持有 visual-domain truth、review/export verdict、canonical artifacts 与 domain memory content。
 
-RedCube service-safe domain entry -> executor adapter -> concrete executor -> visual-domain truth surfaces
+## Executor / Backend
 
-也就是说，`OPL Product Entry` 与 `RedCube Product Entry` 现在都已经可以把调用收敛到同一个 service-safe domain entry；当前仍未落地的是成熟的最终用户 GUI / WebUI / managed web shell。当前架构读法以 direct route 与 OPL-hosted route 为主，旧 `managed web runtime -> Gateway` 语言只保留为历史迁移参考。
+当前默认 concrete executor 是 `Codex CLI host-agent runtime`，对应 runtime-program surface 里的 `codex_cli`。它是 direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的最小执行单元。
 
-历史迁移参考形态：
+`hermes_agent` 只表示显式 hosted/proof backend、legacy/optional provider 或历史 proof lane。它不能作为默认 runtime owner 读取，也不能把旧 Hermes-first board 重新提升为当前公开主线。
 
-```text
-User / Agent
-  -> managed web runtime
-      -> Gateway
-          -> domain execution surface
-              -> Governance / Audit / Artifact persistence
-```
+OPL provider-backed 路径的目标生产 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 
-这段不是当前默认 runtime 架构，也不把 Gateway 重新提升为第一身份；当前 active owner 仍是 `RedCube AI` service-safe domain entry 与 visual-domain truth surfaces。
+RCA 长线实现语言面保持 `TypeScript + Python`：
 
-## 各层职责
+- TypeScript 持有 product entry、CLI/MCP、contracts、gateway、runtime-family shell 与 typed service boundaries。
+- Python 持有 native Office/PPT helper、截图/导出 helper 与文档/PPT 修复循环。
+- Python helper 必须挂在 RedCube route/proof lane、review/export gate 与 repo-tracked contract 下，不能绕过 product-entry 或 runtime-family。
 
-### RedCube service-safe entry
+## Durable Surface
 
-CLI 与 MCP 当前收敛到同一套 service-safe domain entry。它负责：
+当前 durable identity 固定为：
 
-- 承接当前已实现的公开正式入口 `CLI`、`MCP`
-- `CLI` 是默认 formal entry
-- `MCP` 是支持协议层
-- `controller` 当前未作为独立 public entry 在仓内落地
-- 装载 workspace contract
-- 路由到正确的 family / profile / pack
-- 返回结构化状态与 artifact 引用
+| handle | 用途 |
+| --- | --- |
+| `program_id` | active mainline pointer、program truth 与 absorbed provenance routing |
+| `topic_id` | topic 聚合根，承载 source audit 与 publication projection |
+| `deliverable_id` | topic 内交付物身份，承载 delivery contract、review state 与 export readiness |
+| `run_id` | 单次执行句柄，承载 telemetry、rerun linkage、runtime watch 与 event log |
 
-### Overlay / Family / Profile / Pack
+当前 canonical callable surfaces 固定为：
 
-负责定义交付物质量协议，而不是只定义 prompt 风格。
+| surface | 当前职责 |
+| --- | --- |
+| `invokeProductEntry` / `getProductEntrySession` | direct product entry 与 same-session continuation |
+| `invokeOplHostedProductEntry` | OPL-hosted integration，仍回到同一 downstream RedCube entry |
+| `invokeDomainEntry` / `invoke_domain_entry` | service-safe domain entry |
+| `auditDeliverable` | gate judgement，并回指 canonical review state、publication projection 与 hydrated delivery contract |
+| `runtimeWatch` | run / progress / escalation read model，必须和 review/publication projection 对齐 |
+| `getReviewState` | review truth read surface |
+| `getPublicationProjection` | publication / handoff projection read surface |
 
-它们决定：
+## Watch / Projection
 
-- 交付物类型
-- 阶段顺序
-- 审计门控
-- review surface
-- 导出要求
+`runtimeWatch` 是读模型和治理投影，不是第二套 runtime truth。它必须围绕同一组 `workspaceRoot`、`topic_id`、`deliverable_id`、`run_id` 与 artifact refs 读取状态，并与 `getReviewState`、`getPublicationProjection`、`auditDeliverable` 对齐。
 
-这里要特别避免一个错误：
+OPL 侧可通过 product sidecar 读取和派发受控动作：
 
-- `pack-first` 不等于 `AI-first`
-- 如果主要 story / visual / render authorship 仍由 deterministic JS 完成，
-  即使这些逻辑已经移到 pack，也仍然不算恢复了 AI-first 主线
+- `product sidecar export` 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。
+- `product sidecar dispatch` 只允许 `runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`notification_receipt` 这类 guarded actions。
 
-### RedCube Domain Harness OS
+Sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。任何需要生成、修复、审阅或导出视觉交付物的动作都必须回到 RCA-owned route 与 gate。
 
-负责执行、记录与审计，不负责顶层产品语义。
+## Family Lifecycle
 
-它负责：
-
-- run store
-- event log
-- rerun / resume
-- canonical artifact 落盘
-
-它不应该继续主导：
-
-- story architecture major text authorship
-- visual direction major expression
-- final HTML markup authorship
-
-这些都应逐步回到 agent / director 主执行面。
-
-## 部署形态与本体语义分离
-
-- 默认 concrete executor 是本地 `Codex CLI host-agent runtime`。
-- `Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留。
-- `Codex` 本地 operator host 是当前 deployment host / development shell。
-- 历史 `repo-local managed runtime pilot` 只作为迁移 provenance、兼容桥与回归对照保留。
-- 未来切到 managed web runtime 时，只要仍在同一 `Unified Harness Engineering Substrate` 上并保持同一 contract，RedCube 的 domain 语义不变。
-- `OPL` 是上层语义系统；RedCube 在其中是独立 visual-deliverable domain agent，不是 `OPL` 本体。
-- 当前仓库主线是 `Auto-only`；未来如需更高判断密度的 `Human-in-the-loop` 产品，应作为兼容 sibling 或 upper-layer product 复用同一 substrate，而不是把当前仓改成同仓双模。
-
-## 执行句柄与持久表面
-
-当前主线已经把身份与治理表面收紧成一组更明确的 contract：
-
-- `program_id`
-  - active mainline 的 control-plane pointer
-  - 用于 program truth、reports 路由与 absorbed provenance 追踪
-- `topic_id`
-  - topic 聚合根身份
-  - `topics/<topic>/canonical/source-audit.json` 与 `topics/<topic>/publication-state.json` 都挂在这一层
-- `deliverable_id`
-  - topic 内部的 durable deliverable 身份
-  - `contracts/delivery-contract.json`、`reports/review-state.json` 与 export readiness 都围绕它收口
-- `run_id`
-  - 单次 routed execution 的正式执行句柄
-  - run telemetry、rerun linkage、runtime watch 与 event log 必须持续回显同一个 `run_id`
-
-当前 canonical durable surfaces 也已经固定为：
-
-- audit / watch：`auditDeliverable`、`runtimeWatch`
-- review / projection：`getReviewState`、`getPublicationProjection`
-
-当前行为收口要求它们在同一 deliverable/topic 边界上保持一致：
-
-- `auditDeliverable` 不只输出 gate judgement，还要回指同一份 canonical `review_state`、topic 级 `publication_projection` 与 hydrated `delivery_contract`
-- `runtimeWatch` 必须和 `getReviewState` / `getPublicationProjection` 对齐，而不是自成一套 watch-only 状态
-
-这意味着后续如果继续统一三个业务仓，不应再重复发明“这次 run 到底靠什么识别、哪份 artifact 才算正式 durable truth”。
-RedCube 这一侧已经把这两个问题收紧到 repo-tracked contract 层。
-
-## 统一生命周期
-
-`RedCube` 现在应该按一套共享宏观生命周期理解，而不是把 `ppt_deck` 和 `xiaohongshu` 当成两套彼此割裂的流程：
+当前 family 共享同一宏观生命周期：
 
 1. `Source Readiness`
 2. `Story Architecture`
 3. `Visual Authorship`
 4. `Delivery Packaging`
 
-审核与治理采用双层 overlay：
+审核与治理叠加在 family route 上：
 
-- `visual_director_review`
-- `screenshot_review`
+- `visual_director_review` 负责导演层审片。
+- `screenshot_review` 负责技术质控。
 
-### Source Readiness
+当前默认 visual routes：
 
-负责：
+- `ppt_deck` 默认走 image-first `author_image_pages -> screenshot_review -> repair_image_pages -> export_pptx`。
+- `xiaohongshu` 默认走 image-first `author_image_pages -> screenshot_review -> repair_image_pages -> publish_copy -> export_bundle`。
+- HTML 与 native editable PPTX 都是显式可选路线，不是默认视觉路线。
 
-- intake / extract / normalize / audit
-- source sufficiency judgement
-- 在 source truth 不足时触发 research augmentation
+## OPL-hosted Boundary
 
-因此：
+OPL 是 Codex-first、stage-led 的运行框架，可以把 RCA 作为 admitted domain agent 托管。它的边界是：
 
-- `research` 不应继续被理解成 `xiaohongshu` 专属 creative stage
-- 它属于 shared source readiness / source augmentation
-- 它的完成标准是把 Step 1 推到 `planning_ready`，而不是替代 `Storyline`
+- 读取 RCA-owned descriptor、manifest、stage/action catalog、sidecar projection 与 receipt refs。
+- 管理 family-level queue、wakeup、handoff、approval/retry/dead-letter、trace/projection。
+- 通过 configured family runtime provider 调度 attempt。
 
-### Story Architecture
+OPL 的边界之外是：
 
-负责：
+- 不生成 RedCube visual route。
+- 不持有 review/export verdict。
+- 不持有 canonical artifacts。
+- 不写 publication projection truth。
+- 不接管 RCA domain memory content。
 
-- 讲什么
-- 怎么讲
-- 页/章节/篇章顺序
+Codex App direct skill 调用与 OPL-hosted 调用必须在 `invokeDomainEntry` / product-entry command contract 后收敛；OPL stage metadata 只能作为 descriptor/projection，不能成为第二 route truth、第二 review owner 或第二 artifact authority。
 
-当前语义映射：
+## Provenance 去向
 
-- `xiaohongshu`：`storyline + single_note_plan`
-- `ppt_deck`：`storyline + detailed_outline + slide_blueprint`
+本文只保留当前 runtime 拓扑。下列内容不再放在这里展开：
 
-### Visual Authorship
+- Phase 2 hardening closeout：`docs/program/phase-2/`
+- upstream Hermes proof / blocker / closeout：`docs/program/upstream_hermes_agent_*.md`
+- repo-local Hermes migration history：`docs/history/hermes/`
+- gateway / harness / bridge / Hermes-first 退役读法：`docs/history/tombstones/retired-route-narratives-2026-05-11.md`
+- OPL handoff 与 family contract 支撑材料：`docs/references/`
 
-负责：
-
-- `visual_direction`
-- route-specific visual implementation
-  - `xiaohongshu` 默认：`author_image_pages`
-  - `ppt_deck` 默认：`author_image_pages`
-  - 显式 HTML 路线：`render_html`
-
-这一步必须由 agent / director 主导。
-代码只保留 shell、canvas、artifact write、render gate。
-
-### Delivery Packaging
-
-负责最终交付包装：
-
-- `xiaohongshu`：`publish_copy + export_bundle`
-- `ppt_deck`：`export_pptx`
-
-### Review Overlay
-
-`visual_director_review` 负责导演层审片：
-
-- 导演意图是否落地
-- 是否反模板化
-- 是否有节奏、峰值页、记忆点
-
-`screenshot_review` 负责技术质控：
-
-- overflow
-- occlusion
-- density
-- speaker/time fit
-- baseline relative comparison
-
-## 当前 reality 与目标态
-
-当前 reality：
-
-- `source intake + shared source truth` 已作为 `Source Readiness` 的正式能力面进入当前主线：CLI / MCP 的 source intake 会把 canonical quartet 写入同一 substrate，`ppt_deck` / `xiaohongshu` 在同一 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 控制链上消费 `shared_source_truth`；`P0 review-closeout` 与 stable deliverable manual hardening 继续保持通过，activation package freeze 已完成并转为已吸收前置冻结件
-- 默认 concrete executor 仍是 `Codex CLI host-agent runtime`。`Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留；`Codex` 本地 operator host 同时作为当前部署宿主、workspace bridge 与 development shell，而历史 `repo-local managed runtime pilot` 只保留为 provenance / compatibility material
-- 三条 formal family surface 已共享 gateway / runtime / governance / artifact surfaces
-- `xiaohongshu` 已有 `visual_director_review + screenshot_review`
-- `ppt_deck` 也已有显式 `visual_director_review + screenshot_review`
-- `poster_onepager` 已完成第三 family onboarding / extension proof，但当前只应被解释为 knowledge poster
-- `paper_poster / conference_poster` academic poster contract 只保留为后续或历史冻结残留，不构成当前 active mainline
-- `review / export / gate / audit hardening` 已吸收为前置 provenance：`auditDeliverable / runtimeWatch` 已把 canonical source readiness 与 export gate summary 收口为共享治理面
-- `ppt_deck / xiaohongshu / poster_onepager 已围绕同一 source_truth_contract 与 source_truth_consumption summary 收口消费语义`
-- `source-readiness deep research trigger + gate convergence` 已把 `Deep Research` 冻结为 shared `Source Readiness` augmentation：canonical `source-readiness-pack`、`source-augmentation-request/result/report` 与 `source-research-report` 现在共同把 `planning_ready` 收紧成 formal release gate
-- `workspace / operator quickstart convergence` 已把 brand-new / thin workspace bootstrap 与 canonical operator route 收紧成同一条 repo-verified behavior surface：`workspace doctor` 保持诊断角色，而 `source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 成为当前可验证的 quickstart 路径；这些首写入口会初始化 workspace 外层 Git，并通过根级 `.gitignore` 排除 `runtime/` 本地运行态
-- `operator surface consistency hardening` 已把 `workspace doctor` 的 bootstrap guidance、command-scoped CLI help，以及 `CLI review watch` / `MCP runtime_watch` 的 locator truth 收紧到同一 canonical operator route 与 `runtimeWatch` governance path
-- `runtime watch locator integrity hardening` 已把 deliverable-scope run record 的 `topic_id` / `deliverable_id` 收紧进 canonical run envelope，并让 `runtimeWatch` / `review watch` / `runtime_watch` 在 quartet locator mismatch 时 fail-closed
-- `governance_surface.runtime_topology` 现在在 create / review / audit / watch / projection 上显式暴露当前默认 concrete executor、可选 hosted/proof backend、当前 deployment host，以及历史 local migration provenance
-- stable family runtime output 现在会直接暴露同一份 executor / backend bridge truth，而 routed artifact 在落盘前也会统一保留 `topic_id` / `deliverable_id` / `contract` / `stage_contract`
-- repo-hosted managed control plane 现在也已收口到同一 substrate：`runManagedDeliverable / getManagedRun / superviseManagedRun` 可以在 `ppt_deck`、`xiaohongshu`、guarded `poster_onepager` 上共享同一套 managed run / progress projection / runtime supervision / escalation truth，并会在 durable state 创建前 fail-closed 校验 `overlay` 与 `stop_after_stage`
-- service-safe domain entry adapter 也已冻结：`invokeDomainEntry` 通过同一条 `executor adapter -> concrete executor` 链驱动 `runManagedDeliverable / runDeliverableRoute`，同时把 `runtimeWatch / getReviewState / getPublicationProjection / auditDeliverable` 继续留在 RedCube 侧收口
-- `publication projection / delivery contract convergence` 已把 topic 级 `publication-state.json` 收紧到 hydrated `delivery_contract` 与 canonical review state；`xiaohongshu` 保持 human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery 语义
-- `xiaohongshu` 现已形成第二条 repo-local managed family closure：`planning_ready` source readiness 之后的 `research -> export_bundle` 闭环继续保持 human-publication 语义，而不会漂移成 direct delivery
-- `direct-delivery operator handoff hardening` 已把 `ppt_deck` / guarded `poster_onepager` 的 `operator_handoff` 收紧到同一 canonical governance path：`delivery_state` ownership 继续留在 required export artifact，而 handoff gate 由 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 共同收口
-- `direct-delivery lifecycle stage convergence` 已把 direct-delivery human workline 与当前 macro lifecycle 的 machine-readable bridge 收紧到同一 canonical contract surface：`Storyline + Plan` 继续映射到 `Story Architecture`，`Visual` 继续映射到 `Visual Authorship`，`Delivery` 继续映射到 `Delivery Packaging`，而 `operator_handoff / closeout` 仍留在 `Delivery`
-- `poster_onepager` 继续保持 guarded knowledge-poster 边界，不借此激活 academic poster contract；source-plane 更深层的扩展仍属于同一主线上的持续增强
-
-当前目标态：
-
-- 多条 family 在语义上统一到同一生命周期
-- `ppt_deck` 也具备显式 `visual_director_review`
-- `knowledge poster` 与 `academic poster` 正式切开
-- 代码只保留边界、校验、治理、审计、落盘与导出
-
-## 为什么 PPT 和小红书放在同一套系统里
-
-它们在目标场景上不同，但在运行形态上高度一致：
-
-- 都需要结构化阶段
-- 都需要审阅节点
-- 都需要视觉与质量约束
-- 都适合由 Agent 发起，而不是由人类手工点击界面
-
-因此它们共享同一 harness，只在 family / profile / pack contract 上分化。
-
-更准确地说：
-
-- 它们共享同一套宏观生命周期
-- 只是 family-specific 子工件数量不同
-- 当前阶段先统一生命周期语义与职责，再决定是否收敛 route naming
-
-## OPL 语义边界
-
-如果放回 `OPL` 顶层：
-
-- `ppt_deck` 是当前最直接映射到 `Presentation Ops` 的 family
-- `xiaohongshu` 共享同一 harness，但不自动等同于 `Presentation Ops`
-- `RedCube AI` 仍然必须保留独立 domain-agent 角色，而不是退化成 OPL 的内部模块
-- final target route 应理解成：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
-- RCA product sidecar adapter 只暴露 `product sidecar export/dispatch` 这层 typed projection / guarded dispatch：family runtime provider 负责在线唤醒 substrate，OPL 负责 typed family queue/control plane，RCA 继续负责 runtimeWatch / superviseManagedRun / product-entry continuation 下游和 review/publication/operator handoff truth；Temporal 是生产目标，Hermes 只保留 legacy/optional provider 或显式 proof lane。
-
-## 更稳定的规则在哪里
-
-如果你要读长期稳定的正式规则，请继续看：
+长期稳定规则继续看：
 
 - [运行模型 Policy](../policies/runtime_operating_model.md)
 - [交付合同模型 Policy](../policies/deliverable_contract_model.md)
-
-如果你只想快速开始，而不关心技术层次，请回到：
-
-- [人类用户快速上手](../product/human_quickstart.md)
