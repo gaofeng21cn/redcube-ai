@@ -71,6 +71,7 @@ The current public reading path is anchored on the direct route, with the OPL Ru
 - `docs/history/`: archived provenance, repo-local migration records, and historical plans that no longer serve the active program baton
 - Local AI/Superpowers process drafts stay ignored under `docs/superpowers/` and are not part of repo-tracked history.
 - [AI-first quality boundary policy](./policies/ai_first_quality_boundary.md): stable rule that keeps author/reviewer judgment in AI-authored artifacts while packs, schemas, gates, audits, and projections stay mechanical.
+- [Visual pattern memory policy](./policies/visual_pattern_memory_policy.md): stable rule that keeps visual story, style, density, route caveats, and review failure lessons as natural-language memory without replacing AI author/reviewer artifacts, route contracts, export gates, or canonical artifact authority.
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
 - [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md): source-plane future target kept in the same reference layer
 

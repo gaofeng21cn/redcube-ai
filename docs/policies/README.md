@@ -15,6 +15,7 @@
 - [运行模型 Policy](runtime_operating_model.md)
 - [交付合同模型 Policy](deliverable_contract_model.md)
 - [AI-first 质量边界 Policy](ai_first_quality_boundary.md)
+- [视觉模式记忆 Policy](visual_pattern_memory_policy.md)
 - [TypeScript 迁移 Policy](typescript_migration_policy.md)
 
 当前统一口径：
@@ -29,3 +30,4 @@
 - 审核统一采用：
   - `visual_director_review`
   - `screenshot_review`
+- 视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 这类经验先按自然语言 visual pattern memory 管理；image-first/native/HTML route、review/export gate 和 canonical artifact 继续保持结构化权威。

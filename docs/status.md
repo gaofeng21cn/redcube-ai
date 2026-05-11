@@ -82,5 +82,6 @@
 - 保持 direct route 与 internal OPL bridge route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 `OPL Runtime Manager`、provider-backed family runtime、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
 - 保持 AI-first 质量边界：story / visual / markup authorship 与最终视觉 reviewer 判断由 AI-authored artifact 持有；pack、schema、gate、audit、scorecard 与 projection 只表达结构、证据、机械状态和 rerun hints
+- 保持视觉模式经验的 natural-language-first 边界：视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 可作为 stage memory 被引用；image-first/native/HTML route、review/export gate、canonical artifact 与 publication projection 继续是结构化权威
 - 保持 image-first 为 `ppt_deck` 与 `xiaohongshu` 默认视觉路线；HTML 与 native editable PPTX 都保持生产可选、显式选择，并继续经过对应的 `visual_director_review`、`screenshot_review` 与 export gate
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层
