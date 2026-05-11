@@ -62,3 +62,9 @@ RCA 继续持有 visual truth、review/publication projection 与 artifact autho
 - RCA 不引入 MAS 的 medical publication gate。
 - RCA 不引入 MAG 的 grant fundability gate。
 - `Hermes-Agent` 只保留显式 hosted/proof backend，不成为 OPL 或 RCA 的默认 owner。
+
+## Domain Memory Index Status
+
+RCA 当前已经通过 product-entry manifest 暴露 visual pattern memory 的 migration plan、seed fixture locator、writeback proposal generator、accept/reject command、writeback receipt locator、operator receipt projection，以及 `controlled_visual_stage_attempt` proof。它们证明 direct RedCube skill 与 OPL-hosted path 可以回到同一 RCA-owned descriptor、sidecar 和 quality refs。
+
+OPL family memory index 仍需要 RCA 增加标准 `family_domain_memory_ref.v1` adapter。直到该 adapter landed，`opl domain-memory list` 会把 RCA 计为 missing memory descriptor。该 missing 只影响 OPL family-level resolved-memory projection，不授权 OPL 保存 RCA memory content、选择 visual route、写 review/export verdict 或修改 canonical artifacts。
