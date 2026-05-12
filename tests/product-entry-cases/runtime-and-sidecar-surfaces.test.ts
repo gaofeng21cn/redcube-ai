@@ -39,6 +39,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);
     assert.equal(sidecar.owner_boundary.rca_owns_review_publication_projection, true);
     assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
+    assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
+    assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_ref, '/standard_domain_agent_skeleton/repo_source_boundary/audit_surface');
+    assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_status, 'pass');
     assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.ref, '/artifact_locator_contract');
     assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.ref, '/product_sidecar_receipt_refs');
@@ -59,6 +62,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_generate_memory_content, false);
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_accept_or_reject, false);
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_receipt_instance, false);
+    assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.controlled_apply_proof_ref, '/controlled_memory_apply_proof');
+    assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_visual_truth, false);
+    assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_artifact_blob, false);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.ref, '/controlled_visual_stage_attempt');
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_consumes_descriptor_refs, true);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_consumes_quality_refs, true);
@@ -66,10 +72,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.direct_and_opl_share_sidecar_refs, true);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.direct_and_opl_share_quality_refs, true);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_holds_visual_or_export_verdict, false);
+    assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.controlled_memory_apply_proof_ref, '/controlled_memory_apply_proof');
+    assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.apply_proof_state, 'controlled_apply_proof_landed_memory_body_external');
     assert.equal(sidecar.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
     assert.equal(sidecar.source_manifest_refs.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
     assert.equal(sidecar.source_manifest_refs.product_sidecar_receipt_refs_ref, '/product_sidecar_receipt_refs');
+    assert.equal(sidecar.source_manifest_refs.controlled_visual_stage_attempt_ref, '/controlled_visual_stage_attempt');
+    assert.equal(sidecar.source_manifest_refs.controlled_memory_apply_proof_ref, '/controlled_memory_apply_proof');
+    assert.equal(sidecar.runtime_residue_retirement.status, 'active_path_retired');
+    assert.equal(sidecar.runtime_residue_retirement.active_path_policy.hermes_agent_default_runtime, false);
+    assert.equal(sidecar.runtime_residue_retirement.active_path_policy.gateway_first_public_entry, false);
+    assert.equal(sidecar.runtime_residue_retirement.active_path_policy.repo_local_manager_default, false);
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       [

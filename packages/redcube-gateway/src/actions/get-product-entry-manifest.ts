@@ -44,7 +44,12 @@ import {
   buildRedCubeActionMetadata,
 } from './family-action-catalog.js';
 import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plane.js';
-import { buildFamilyDomainMemoryDescriptor, buildStandardDomainAgentSkeleton } from './standard-domain-agent-skeleton.js';
+import {
+  buildFamilyDomainMemoryDescriptor,
+  buildRuntimeResidueRetirementAudit,
+  buildStandardDomainAgentSkeleton,
+  buildVisualPatternMemoryWritebackProjection,
+} from './standard-domain-agent-skeleton.js';
 import {
   OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
   buildRouteEquivalenceContract,
@@ -271,6 +276,8 @@ export async function getProductEntryManifest(request) {
     productEntrySessionCommand,
   });
   const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: standardDomainAgentSkeleton.domain_memory_descriptor_locator });
+  const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ standardDomainAgentSkeleton });
+  const runtimeResidueRetirement = buildRuntimeResidueRetirementAudit({ runtime });
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,
     productEntrySessionCommand,
@@ -867,22 +874,11 @@ export async function getProductEntryManifest(request) {
     standard_domain_agent_skeleton: standardDomainAgentSkeleton,
     artifact_locator_contract: standardDomainAgentSkeleton.artifact_locator_contract,
     domain_memory_descriptor_locator: standardDomainAgentSkeleton.domain_memory_descriptor_locator,
-    visual_pattern_memory_writeback: {
-      surface_kind: 'visual_pattern_memory_writeback_projection',
-      status: standardDomainAgentSkeleton.domain_memory_descriptor_locator.status,
-      proof_contract_state: standardDomainAgentSkeleton.controlled_visual_stage_attempt.proof_contract_state,
-      runtime_writeback_state: standardDomainAgentSkeleton.controlled_visual_stage_attempt.runtime_writeback_state,
-      proposal_generator: standardDomainAgentSkeleton.domain_memory_descriptor_locator.writeback_proposal_generator,
-      accept_reject_command: standardDomainAgentSkeleton.domain_memory_descriptor_locator.accept_reject_command,
-      operator_receipt_projection: standardDomainAgentSkeleton.domain_memory_descriptor_locator.operator_receipt_projection,
-      writeback_receipt_locator: standardDomainAgentSkeleton.domain_memory_descriptor_locator.writeback_receipt_locator,
-      repo_tracks_memory_entries: false,
-      repo_tracks_receipt_instances: false,
-      repo_tracks_visual_or_export_artifacts: false,
-      opl_role: 'operator_receipt_projection_consumer_only',
-    },
+    visual_pattern_memory_writeback: visualPatternMemoryWriteback,
     product_sidecar_receipt_refs: standardDomainAgentSkeleton.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
+    controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',
       product_entry: actionMetadata.product_entry,
@@ -995,22 +991,11 @@ export async function getProductEntryManifest(request) {
     artifact_locator_contract: standardDomainAgentSkeleton.artifact_locator_contract,
     domain_memory_descriptor: domainMemoryDescriptor,
     domain_memory_descriptor_locator: standardDomainAgentSkeleton.domain_memory_descriptor_locator,
-    visual_pattern_memory_writeback: {
-      surface_kind: 'visual_pattern_memory_writeback_projection',
-      status: standardDomainAgentSkeleton.domain_memory_descriptor_locator.status,
-      proof_contract_state: standardDomainAgentSkeleton.controlled_visual_stage_attempt.proof_contract_state,
-      runtime_writeback_state: standardDomainAgentSkeleton.controlled_visual_stage_attempt.runtime_writeback_state,
-      proposal_generator: standardDomainAgentSkeleton.domain_memory_descriptor_locator.writeback_proposal_generator,
-      accept_reject_command: standardDomainAgentSkeleton.domain_memory_descriptor_locator.accept_reject_command,
-      operator_receipt_projection: standardDomainAgentSkeleton.domain_memory_descriptor_locator.operator_receipt_projection,
-      writeback_receipt_locator: standardDomainAgentSkeleton.domain_memory_descriptor_locator.writeback_receipt_locator,
-      repo_tracks_memory_entries: false,
-      repo_tracks_receipt_instances: false,
-      repo_tracks_visual_or_export_artifacts: false,
-      opl_role: 'operator_receipt_projection_consumer_only',
-    },
+    visual_pattern_memory_writeback: visualPatternMemoryWriteback,
     product_sidecar_receipt_refs: standardDomainAgentSkeleton.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
+    controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',
       product_entry: actionMetadata.product_entry,

@@ -350,7 +350,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(manifest.standard_domain_agent_skeleton.surface_kind, 'standard_domain_agent_skeleton');
     assert.equal(manifest.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
-    assert.equal(manifest.standard_domain_agent_skeleton.mapping_model, 'manifest_descriptor_mapping_only');
+    assert.equal(manifest.standard_domain_agent_skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
     assert.equal(manifest.standard_domain_agent_skeleton.repo_source_boundary.physical_relayout_required_now, false);
     assert.deepEqual(
       manifest.standard_domain_agent_skeleton.repo_source_boundary.allowed_roots.map((root) => root.boundary_id),

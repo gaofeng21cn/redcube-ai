@@ -1,4 +1,17 @@
 // @ts-nocheck
+import {
+  CONTROLLED_MEMORY_APPLY_PROOF_STATE,
+  buildControlledMemoryApplyProof,
+  buildControlledMemoryApplyProofRef,
+  buildRuntimeResidueRetirementAudit,
+  buildSkeletonRepoSourceLayoutAudit,
+  buildVisualPatternMemoryWritebackProjection,
+} from './standard-domain-agent-skeleton-parts/memory-apply-proof.js';
+
+export {
+  buildRuntimeResidueRetirementAudit,
+  buildVisualPatternMemoryWritebackProjection,
+};
 
 const DOMAIN_ID = 'redcube_ai';
 const DOMAIN_OWNER = 'redcube_ai';
@@ -66,6 +79,15 @@ const REPO_SOURCE_BOUNDARIES = [
     ],
   },
 ];
+
+function ref(path, role, label) {
+  return {
+    ref_kind: 'json_pointer',
+    ref: path,
+    role,
+    label,
+  };
+}
 
 export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, sessionStoreRoot }) {
   return {
@@ -166,6 +188,8 @@ export function buildControlledVisualStageAttemptFixture() {
     runtime_writeback_state: DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
     provider_controlled_proof_id: 'rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1',
     provider_controlled_proof_model: 'opl_hosted_attempt_consumes_memory_refs_and_returns_locator_only_receipts',
+    apply_proof_state: CONTROLLED_MEMORY_APPLY_PROOF_STATE,
+    controlled_memory_apply_proof_ref: buildControlledMemoryApplyProofRef(),
     covered_family: 'ppt_deck',
     stage_kinds: [
       'review_and_revision',
@@ -672,13 +696,6 @@ export function buildFamilyDomainMemoryDescriptor({
   domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator(),
   freshnessSource = 'product_entry_manifest_build',
 } = {}) {
-  const ref = (path, role, label) => ({
-    ref_kind: 'json_pointer',
-    ref: path,
-    role,
-    label,
-  });
-
   return {
     surface_kind: 'family_domain_memory_ref',
     version: 'family-domain-memory-ref.v1',
@@ -777,6 +794,7 @@ export function buildStandardDomainAgentSkeleton({
   });
   const receiptRefs = buildProductSidecarReceiptRefs();
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();
+  const controlledMemoryApplyProof = buildControlledMemoryApplyProof();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
     surface_kind: 'standard_domain_agent_skeleton',
@@ -784,12 +802,15 @@ export function buildStandardDomainAgentSkeleton({
     version: 'v1',
     domain_id: DOMAIN_ID,
     owner: DOMAIN_OWNER,
-    mapping_model: 'manifest_descriptor_mapping_only',
+    mapping_model: 'physical_skeleton_repo_source_layout_with_manifest_projection',
     repo_source_boundary: {
       allowed_roots: REPO_SOURCE_BOUNDARIES,
       physical_relayout_required_now: false,
       repo_tracks_runtime_artifact_blobs: false,
       repo_tracks_receipt_instances: false,
+      audit_surface: buildSkeletonRepoSourceLayoutAudit({
+        repoSourceBoundaries: REPO_SOURCE_BOUNDARIES,
+      }),
     },
     runtime_declarations: {
       declares_only: [
@@ -811,6 +832,7 @@ export function buildStandardDomainAgentSkeleton({
     domain_memory_descriptor_locator: domainMemoryDescriptorLocator,
     product_sidecar_receipt_refs: receiptRefs,
     controlled_visual_stage_attempt: controlledAttemptFixture,
+    controlled_memory_apply_proof: controlledMemoryApplyProof,
     opl_consumption_boundary: {
       consumes: [
         'stage_descriptor',

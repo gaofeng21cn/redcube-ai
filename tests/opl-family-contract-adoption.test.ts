@@ -154,7 +154,7 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
 
   assert.equal(skeleton.surface_kind, 'standard_domain_agent_skeleton');
   assert.equal(skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
-  assert.equal(skeleton.mapping_model, 'manifest_descriptor_mapping_only');
+  assert.equal(skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
   assert.deepEqual(skeleton.repo_source_boundary.allowed_roots, [
     'agent',
     'contracts',
@@ -163,6 +163,15 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   ]);
   assert.equal(skeleton.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
   assert.equal(skeleton.repo_source_boundary.repo_tracks_receipt_instances, false);
+  assert.equal(skeleton.repo_source_boundary.audit_surface.status, 'pass');
+  assert.deepEqual(skeleton.repo_source_boundary.audit_surface.expected_roots, [
+    'agent',
+    'contracts',
+    'runtime',
+    'docs',
+  ]);
+  assert.deepEqual(skeleton.repo_source_boundary.audit_surface.missing_roots, []);
+  assert.ok(skeleton.repo_source_boundary.audit_surface.forbidden_repo_writes.includes('canonical_artifact_blob'));
   assert.deepEqual(skeleton.runtime_declarations.declares_only, [
     'product_sidecar_adapter',
     'projection_builder',
@@ -490,6 +499,9 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   const adapter = payload.current_state.active_baton.scope.opl_family_lifecycle_adapter;
   const stageProjection = payload.current_state.active_baton.scope.opl_family_stage_control_projection;
   const memory = payload.current_state.active_baton.scope.domain_memory_descriptor_locator;
+  const applyProof = payload.current_state.active_baton.scope.controlled_memory_apply_proof;
+  const skeletonLayout = payload.current_state.active_baton.scope.standard_domain_agent_skeleton_repo_source_layout;
+  const residueRetirement = payload.current_state.active_baton.scope.runtime_residue_retirement;
 
   assert.ok(managerBoundary.consumes_redcube_surfaces.includes('opl_family_lifecycle_adapter'));
   assert.ok(managerBoundary.consumes_redcube_surfaces.includes('opl_family_stage_control_projection'));
@@ -528,6 +540,8 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   );
   assert.equal(memory.descriptor_proof_contract_state, 'landed');
   assert.equal(memory.runtime_writeback_state, 'pending');
+  assert.equal(memory.controlled_apply_proof_state, 'controlled_apply_proof_landed_memory_body_external');
+  assert.equal(memory.controlled_memory_apply_proof_ref, 'redcube product manifest#/controlled_memory_apply_proof');
   assert.equal(memory.memory_content_owner, 'redcube_ai');
   assert.equal(memory.route_truth_owner, 'redcube_ai');
   assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
@@ -544,6 +558,8 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(attempt.status, DOMAIN_MEMORY_ADOPTION_STATE);
   assert.equal(attempt.proof_contract_state, 'landed');
   assert.equal(attempt.runtime_writeback_state, 'pending');
+  assert.equal(attempt.apply_proof_state, 'controlled_apply_proof_landed_memory_body_external');
+  assert.equal(attempt.controlled_memory_apply_proof_ref, 'redcube product manifest#/controlled_memory_apply_proof');
   assert.deepEqual(attempt.stage_kinds, ['review_and_revision', 'package_and_handoff']);
   assert.equal(attempt.direct_and_opl_share_descriptor_refs, true);
   assert.equal(attempt.direct_and_opl_share_sidecar_refs, true);
@@ -551,4 +567,34 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(attempt.opl_writes_visual_truth, false);
   assert.equal(attempt.opl_writes_review_export_verdict, false);
   assert.equal(attempt.opl_writes_artifact_blob, false);
+
+  assert.equal(applyProof.status, 'controlled_apply_proof_landed_memory_body_external');
+  assert.equal(applyProof.proof_id, 'rca.visual_pattern_memory.controlled_apply_proof.v1');
+  assert.equal(applyProof.consumes_visual_pattern_memory_refs, true);
+  assert.equal(applyProof.projects_writeback_proposal_ref, true);
+  assert.deepEqual(applyProof.projects_accept_reject_receipt_cases, ['accepted', 'rejected']);
+  assert.equal(applyProof.writes_visual_truth, false);
+  assert.equal(applyProof.writes_review_verdict, false);
+  assert.equal(applyProof.writes_export_verdict, false);
+  assert.equal(applyProof.writes_artifact_blob, false);
+  assert.equal(applyProof.repo_tracks_memory_content_body, false);
+  assert.equal(applyProof.repo_tracks_receipt_instances, false);
+
+  assert.equal(skeletonLayout.status, 'audit_surface_landed');
+  assert.equal(skeletonLayout.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
+  assert.deepEqual(skeletonLayout.expected_roots, ['agent', 'contracts', 'runtime', 'docs']);
+  assert.deepEqual(skeletonLayout.missing_roots, []);
+  assert.ok(skeletonLayout.forbidden_repo_writes.includes('memory_content_body'));
+
+  assert.equal(residueRetirement.status, 'active_path_retired');
+  assert.deepEqual(residueRetirement.retired_default_surfaces, [
+    'hermes_first_default_runtime',
+    'gateway_first_public_entry',
+    'repo_local_manager_default',
+  ]);
+  assert.deepEqual(residueRetirement.allowed_remaining_roles, [
+    'explicit_proof_backend',
+    'provenance',
+    'history',
+  ]);
 });
