@@ -9,6 +9,12 @@
 - OPL 只能读取 no-regression refs、blocker 和下一跳 contract gap；它不持有 visual truth、review/export verdict、canonical artifact、memory body 或 receipt instance。
 - 真实 controlled soak 需要在 OPL apply contract 开放后由 RCA-owned surface 产出 domain receipt。
 
+### 决策：PPT review helper line-budget 采用显式 reviewed baseline
+
+- `python/redcube_ai/native_helpers/ppt_deck/review.py` 当前为 1154 行，属于既有 native screenshot/layout review helper 的集中实现。
+- 本轮不改变 review 行为，不把拆分和 controlled soak blocker 混在同一个变更中；`scripts/line-budget.ts` 记录 1154 行 reviewed baseline，并 fail-closed 阻止继续增长。
+- 后续结构拆分应在独立 lane 内把 Playwright capture、block geometry audit、markdown report 和 result summary 拆成 focused modules；拆完且文件回到 1000 行以内后删除 baseline。
+
 ## 2026-05-10
 
 ### 决策：RCA 文档第一身份收口到视觉交付，OPL 降为托管运行框架路径
