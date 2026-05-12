@@ -370,6 +370,29 @@
         ]
       }
     },
+    "controlled_soak": {
+      "state": "deferred",
+      "deferred_reason": "OPL+MAS production closure has priority; RCA keeps descriptor/index/skeleton no-regression only in this lane.",
+      "required_opl_substrate": "Temporal production online runtime",
+      "no_regression_surfaces": [
+        "family_action_catalog",
+        "stage_control_projection",
+        "route_equivalence",
+        "standard_domain_agent_skeleton",
+        "artifact_locator_contract",
+        "product_sidecar_receipt_refs",
+        "domain_memory_descriptor",
+        "domain_memory_descriptor_locator",
+        "controlled_visual_stage_attempt",
+        "controlled_memory_apply_proof"
+      ],
+      "forbidden_deferred_claims": [
+        "provider_hosted_controlled_visual_stage_soak_completed",
+        "real_visual_memory_body_repo_tracked",
+        "accepted_or_rejected_receipt_instance_repo_tracked",
+        "OPL_holds_visual_or_export_verdict"
+      ]
+    },
     "runtime_declarations": {
       "declares_only": [
         "product_sidecar_adapter",

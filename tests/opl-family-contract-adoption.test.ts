@@ -171,6 +171,9 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'docs',
   ]);
   assert.deepEqual(skeleton.repo_source_boundary.audit_surface.missing_roots, []);
+  for (const root of skeleton.repo_source_boundary.allowed_roots) {
+    assert.equal(fs.existsSync(path.join(repoRoot, root)), true);
+  }
   assert.ok(skeleton.repo_source_boundary.audit_surface.forbidden_repo_writes.includes('canonical_artifact_blob'));
   assert.deepEqual(skeleton.runtime_declarations.declares_only, [
     'product_sidecar_adapter',
@@ -182,6 +185,30 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
   assert.equal(skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
   assert.equal(skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
+});
+
+test('RCA controlled soak remains deferred without descriptor index skeleton regression', () => {
+  const payload = contract();
+  const controlledSoak = payload.standard_domain_agent_skeleton.controlled_soak;
+
+  assert.equal(controlledSoak.state, 'deferred');
+  assert.equal(controlledSoak.required_opl_substrate, 'Temporal production online runtime');
+  assert.deepEqual(controlledSoak.no_regression_surfaces, [
+    'family_action_catalog',
+    'stage_control_projection',
+    'route_equivalence',
+    'standard_domain_agent_skeleton',
+    'artifact_locator_contract',
+    'product_sidecar_receipt_refs',
+    'domain_memory_descriptor',
+    'domain_memory_descriptor_locator',
+    'controlled_visual_stage_attempt',
+    'controlled_memory_apply_proof',
+  ]);
+  assert.ok(controlledSoak.forbidden_deferred_claims.includes('provider_hosted_controlled_visual_stage_soak_completed'));
+  assert.ok(controlledSoak.forbidden_deferred_claims.includes('real_visual_memory_body_repo_tracked'));
+  assert.ok(controlledSoak.forbidden_deferred_claims.includes('accepted_or_rejected_receipt_instance_repo_tracked'));
+  assert.ok(controlledSoak.forbidden_deferred_claims.includes('OPL_holds_visual_or_export_verdict'));
 });
 
 test('RCA artifact locator and sidecar receipts expose refs without OPL visual verdict ownership', () => {

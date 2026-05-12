@@ -175,6 +175,9 @@ test('P23.A: current utility package exposes TypeScript service entrypoints with
 });
 
 const TESTS_DIR = 'tests';
+const TRANSIENT_TEST_FIXTURE_DIRS = new Set([
+  '__closeout-audit-nested-ts-case__',
+]);
 
 function toRepoPath(file) {
   return file.split(path.sep).join('/');
@@ -185,6 +188,9 @@ function collectTestFiles(dir = TESTS_DIR) {
     .flatMap((entry) => {
       const file = path.join(dir, entry);
       if (statSync(file).isDirectory()) {
+        if (dir === TESTS_DIR && TRANSIENT_TEST_FIXTURE_DIRS.has(entry)) {
+          return [];
+        }
         return collectTestFiles(file);
       }
       return file.endsWith('.test.ts') ? [toRepoPath(file)] : [];
