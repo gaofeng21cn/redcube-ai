@@ -7,7 +7,7 @@
 当前对外主链路以 direct route 为第一主语，OPL 路线保留为 hosted integration surface。OPL 是 stage-led 的完整智能体运行框架，可以托管 RCA，但它不是 RCA 的第一公开身份：
 
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- OPL-hosted route：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- OPL-hosted route：`User -> OPL Product Entry -> OPL Runtime Manager -> Temporal-backed family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 在 OPL stage-led family framework 中，这两条路线都可以被投影为 stage attempt，但 RCA owner 边界不变：OPL 只提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
 
@@ -31,7 +31,7 @@
 - `RedCube AI` 维护 visual-domain truth、本地 canonical artifacts、稳定 capability surface，以及 audit / review / projection surface
 - 第一公民 concrete executor 继续由 `Codex CLI` 通过统一 executor-adapter contract 被选择
 - `OPL Runtime Manager` 只作为 OPL 侧 product-managed adapter/projection layer 管理 family runtime provider、registration/status 索引、doctor/repair/resume 与 native helper catalog
-- `Hermes-Agent` 只在显式 hosted/proof backend、legacy provider 或技术参考层作为外部 runtime substrate 出现；Temporal 是目标生产 provider
+- `Hermes-Agent` 只在显式 hosted/proof backend、legacy provider 或技术参考层作为外部 runtime substrate 出现；Temporal 是 OPL production online runtime 的必需 provider
 
 ## 入口 taxonomy 与 OPL handoff
 
@@ -54,7 +54,7 @@
 
 与 `OPL` 的家族级衔接则必须收敛到同一条下游形态：
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> Temporal-backed family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 `OPL -> RedCube` 的最小 handoff envelope 至少包括：
 
@@ -75,7 +75,7 @@
 
 当前已经冻结的 ideal target 不是让 `RedCube AI` 自己变成 runtime 平台，而是让它收敛成一个可直接进入、也可被 `OPL` 内部桥接调用的 visual-domain 产品 / 服务节点：
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL Runtime Manager -> Temporal-backed family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 与之对应的 direct domain 路线则是：
 
@@ -152,7 +152,7 @@
 
 - 由 `RedCube AI` 统一稳定 capability surface 与 visual-domain truth
 - 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前第一公民主线是 `Codex CLI`，`Hermes-Agent loop` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
-- 由 `OPL Runtime Manager` 统一 hosted integration 的长期托管、状态索引、doctor/repair/resume 与 native helper catalog；Temporal 是 OPL family runtime provider 的目标生产 substrate，未来自有 sidecar 只有在 provider abstraction 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
+- 由 `OPL Runtime Manager` 统一 hosted integration 的长期托管、状态索引、doctor/repair/resume 与 native helper catalog；Temporal 是 OPL family runtime provider 的 production required substrate，未来自有 sidecar 只有在 provider abstraction 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
 
 ## Language Target
 

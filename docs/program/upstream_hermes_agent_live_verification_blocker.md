@@ -2,7 +2,7 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文件保留历史 blocker 证据；它不是当前 runtime owner 或 public identity 文档。当前 RCA 文档按 provider-backed OPL 托管路径、Temporal 目标生产 substrate、默认 `Codex CLI` 最小执行单元读取。
+生命周期说明：本文件保留历史 blocker 证据；它不是当前 runtime owner 或 public identity 文档。当前 RCA 文档按 provider-backed OPL 托管路径、Temporal production online runtime 必需 substrate、默认 `Codex CLI` 最小执行单元读取。
 
 ## 当前结论
 

@@ -47,7 +47,7 @@ User / Agent
 
 `hermes_agent` 只表示显式 hosted/proof backend、legacy/optional provider 或历史 proof lane。它不能作为默认 runtime owner 读取，也不能把旧 Hermes-first board 重新提升为当前公开主线。
 
-OPL provider-backed 路径的目标生产 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
+OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 
 RCA 长线实现语言面保持 `TypeScript + Python`：
 

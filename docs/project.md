@@ -18,7 +18,7 @@
 
 这说明 `RedCube AI` 的理想型是一个可被用户直接进入、也可被 `OPL` 托管调用的 visual-domain 产品 / 服务节点，而不是把仓库继续磨成 repo-local runtime，或把自己写成整个 `OPL`。
 `OPL` 是 stage-led 的完整智能体运行框架，可以把 RCA 作为外部依赖 / admitted domain agent 托管；RCA 不是 OPL 内部模块。OPL 可以读取 RCA stage/action/projection descriptor，负责 queue、wakeup、handoff、receipt、approval/retry 和 operator projection；RCA 继续持有 source intake、communication strategy、visual direction、artifact creation、review/revision、package/handoff 等 stage 语义，以及 visual-domain truth、review/export gate 和 canonical artifact authority。
-在这条 OPL 路线上，`OPL Runtime Manager` 只负责 provider profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是目标生产 provider，Hermes 只在显式 provider / Agent executor adapter 或 proof lane 语境中出现。它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
+在这条 OPL 路线上，`OPL Runtime Manager` 只负责 provider profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是 production online runtime 的必需 substrate，Hermes 只在显式 provider / Agent executor adapter 或 proof lane 语境中出现。它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
 当前 stage-led 对齐已经落到 RCA-owned descriptor/projection 层：`family_action_catalog`、`stage_control_projection`、`route_equivalence`、`product sidecar export/dispatch`、`opl_runtime_manager_registration` 与 `standard_domain_agent_skeleton`。这些 surface 让 OPL 能做 discovery、typed queue、wakeup、handoff、receipt 和 operator projection；OPL 只消费 descriptor / refs，不生成 visual route、review verdict、publication projection truth 或 canonical artifact。
 
 ## 项目目标

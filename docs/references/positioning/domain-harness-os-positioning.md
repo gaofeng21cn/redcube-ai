@@ -49,7 +49,7 @@
 当前产品 runtime 形态：
 
 - `OPL Runtime Manager`（OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 registration / status / doctor / repair / resume 投影）
-- configured family runtime provider（Temporal 是目标生产 substrate；external `Hermes-Agent` 只作为 legacy/optional provider 或显式 hosted/proof lane）
+- configured family runtime provider（Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只作为 legacy/optional provider 或显式 hosted/proof lane）
 - 本地 Codex CLI host-agent runtime（当前默认 concrete executor）
 - `Codex` 本地 operator host（当前本地部署宿主 / workspace bridge）
 - `repo-local managed runtime pilot`（历史本地迁移工件 / 兼容桥）

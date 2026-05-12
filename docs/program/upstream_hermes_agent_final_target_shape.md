@@ -21,7 +21,7 @@
 最终目标是把 `RedCube AI` 收敛成一个 `OPL` 可调用、也可独立直达的 visual-domain 产品 / 服务节点。
 它应当：
 
-- 让 `OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是生产 substrate 目标，Hermes 只保留 legacy/optional provider 或显式 proof lane
+- 让 `OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是 production online runtime 的必需 substrate，Hermes 只保留 legacy/optional provider 或显式 proof lane
 - 让 `RedCube AI` 继续承担 `gateway -> family -> profile -> pack` authority 与 visual-domain truth
 - 让 direct `RedCube Product Entry` 与 `OPL Runtime Manager` handoff 收敛到同一个 service-safe domain entry contract
 - 让 `Codex CLI` 继续作为 executor adapter 背后的默认 concrete executor，不改写 default executor owner

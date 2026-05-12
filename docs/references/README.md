@@ -21,7 +21,7 @@ Current groups:
 | `positioning/domain-harness-os-positioning.md` | contract-linked positioning reference | Internal gateway / harness vocabulary only; public identity stays RCA visual delivery. |
 | `lightweight_product_entry_and_opl_handoff.md` | supporting integration reference | Explains direct RCA entry and OPL-hosted handoff converging on the same downstream domain entry. |
 | `opl_family_contract_adoption.md` | active support reference | Explains how RCA projects attempt/quality/incident/operator data to OPL without yielding visual truth. |
-| `opl_managed_runtime_three_layer_contract.md` | historical/supporting owner reference | Read through the current provider-backed OPL runtime target; Temporal is target substrate, Hermes is legacy/optional/proof. |
+| `opl_managed_runtime_three_layer_contract.md` | historical/supporting owner reference | Read through the current provider-backed OPL runtime target; Temporal is the required production online substrate, Hermes is legacy/optional/proof. |
 | `rca_executor_routing_config.md` | active operator reference | Explains opt-in executor routing; built-in default remains `codex_cli`. |
 | `domain_memory_descriptor_locator.md` | active contract-linked reference | RCA owns visual pattern memory descriptors, locators, and receipts; OPL consumes refs only. |
 | `direct_delivery_longrun_target_state.md` | future-facing reference | Target-state thinking; current runtime truth stays with runtime/source/delivery owner docs and contracts. |
