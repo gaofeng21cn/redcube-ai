@@ -161,12 +161,20 @@ def operator_language_fragments(native_shapes: list[dict]) -> list[str]:
     return sorted({fragment for fragment in OPERATOR_LANGUAGE_FRAGMENTS if fragment in visible_text})
 
 
+def title_safe_zone_shape(shape: dict) -> bool:
+    if shape.get('quality_role') != 'content':
+        return False
+    if shape.get('role') in {'title', 'core_sentence'}:
+        return False
+    if safe_text(shape.get('text')):
+        return True
+    return shape.get('kind') in {'chart', 'table', 'metric_grid'}
+
+
 def title_safe_zone_failures(native_shapes: list[dict]) -> list[dict]:
     failures = []
     for shape in native_shapes:
-        if shape.get('quality_role') != 'content':
-            continue
-        if shape.get('role') in {'title', 'core_sentence'}:
+        if not title_safe_zone_shape(shape):
             continue
         rect = shape.get('bounds') or {}
         top = float(rect.get('top') or 0.0)

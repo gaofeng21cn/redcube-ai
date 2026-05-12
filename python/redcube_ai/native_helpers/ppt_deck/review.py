@@ -39,6 +39,23 @@ SURFACE_SCROLL_OVERFLOW_TOLERANCE = 4.0
 EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
 INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
 BLOCK_CONTENT_OVERFLOW_TOLERANCE = 1.5
+TITLE_SAFE_ZONE_BOTTOM = 128.0
+MIN_TABLE_BODY_FONT_PX = 14.67
+MAX_TABLE_CELL_BLANK_RATIO = 0.38
+OPERATOR_LANGUAGE_FRAGMENTS = [
+    '汇报讨论用途',
+    '客观专业版',
+    '本次汇报边界',
+    '不在展示页暴露',
+    '本地原始文件名',
+    '清洗脚本名',
+    'RCA',
+    'RedCube',
+    'source intake',
+    'author_pptx_native',
+    'slide_blueprint',
+    'visual_direction',
+]
 
 
 def fail(message: str) -> None:
@@ -188,6 +205,10 @@ def issue_list(checks: Dict[str, bool]) -> List[str]:
         'speaker_fit_ok': 'speaker_fit_out_of_range',
         'edge_clearance_ok': 'edge_clearance_out_of_range',
         'block_content_fit_ok': 'block_content_overflow_detected',
+        'external_audience_language_ok': 'operator_language_leak_detected',
+        'title_safe_zone_clear': 'title_safe_zone_obstructed',
+        'table_legibility_ok': 'table_font_below_minimum',
+        'layout_density_ok': 'layout_density_too_sparse',
     }
     return [
         issue
@@ -196,18 +217,99 @@ def issue_list(checks: Dict[str, bool]) -> List[str]:
     ]
 
 
+def text_fragments(value: Any) -> List[str]:
+    text = str(value or '')
+    return sorted({fragment for fragment in OPERATOR_LANGUAGE_FRAGMENTS if fragment in text})
+
+
+def block_bottom(block: Dict[str, Any]) -> float:
+    top = float(block.get('top', 0) or 0)
+    height = float(block.get('height', 0) or 0)
+    return float(block.get('bottom') or (top + height) or 0)
+
+
+def title_safe_zone_bottom(info: Dict[str, Any], title_meta: Dict[str, Any]) -> Tuple[float, float | None, float | None]:
+    title_block_id = str(title_meta.get('titleBlockId') or '')
+    title_block = next(
+        (block for block in review_blocks(info) if str(block.get('id') or '') == title_block_id),
+        None,
+    )
+    if title_block:
+        title_bottom = block_bottom(title_block)
+        title_font_size = float(title_meta.get('titleFontSize', 0) or 0)
+        required_gap = max(12.0, min(24.0, title_font_size * 0.35))
+        return title_bottom + required_gap, title_bottom, required_gap
+
+    wrapper = info.get('wrapper', {}) or {}
+    frame_height = float(wrapper.get('clientHeight') or FRAME_HEIGHT)
+    return min(TITLE_SAFE_ZONE_BOTTOM, frame_height * 0.2), None, None
+
+
+def title_safe_zone_failures(info: Dict[str, Any], title_meta: Dict[str, Any]) -> List[Dict[str, Any]]:
+    title_block_id = str(title_meta.get('titleBlockId') or '')
+    safe_zone_bottom, title_bottom, required_gap = title_safe_zone_bottom(info, title_meta)
+    failures = []
+    for block in review_blocks(info):
+        block_id = str(block.get('id') or '')
+        if not block_id or block_id == title_block_id:
+            continue
+        if block_id.startswith('footer') or any(token in block_id.lower() for token in EDGE_CLEARANCE_IGNORED_IDS):
+            continue
+        if float(block.get('top', 0) or 0) < safe_zone_bottom:
+            failures.append({
+                'block_id': block_id,
+                'top': round(float(block.get('top', 0) or 0), 2),
+                'safe_zone_bottom': round(safe_zone_bottom, 2),
+                'title_bottom': round(title_bottom, 2) if title_bottom is not None else None,
+                'required_gap': round(required_gap, 2) if required_gap is not None else None,
+            })
+    return failures
+
+
+def table_legibility_failures(info: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], float, float]:
+    failures = []
+    table_metrics = info.get('tableMetrics', []) or []
+    min_font = MIN_TABLE_BODY_FONT_PX
+    max_blank_ratio = 0.0
+    for table in table_metrics:
+        table_id = table.get('table_id') or table.get('block_id')
+        table_min_font = float(table.get('min_font_px') or table.get('min_font_pt') or MIN_TABLE_BODY_FONT_PX)
+        blank_ratio = float(table.get('max_blank_ratio') or table.get('card_blank_ratio') or 0.0)
+        min_font = min(min_font, table_min_font)
+        max_blank_ratio = max(max_blank_ratio, blank_ratio)
+        if table_min_font < MIN_TABLE_BODY_FONT_PX:
+            failures.append({
+                'table_id': table_id,
+                'reason': 'table_font_below_minimum',
+                'value': round(table_min_font, 2),
+                'threshold': MIN_TABLE_BODY_FONT_PX,
+            })
+        if blank_ratio > MAX_TABLE_CELL_BLANK_RATIO:
+            failures.append({
+                'table_id': table_id,
+                'reason': 'table_cell_blank_ratio_too_high',
+                'value': round(blank_ratio, 4),
+                'threshold': MAX_TABLE_CELL_BLANK_RATIO,
+            })
+    return failures, min_font, max_blank_ratio
+
+
 def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
     blocks = review_blocks(info)
     audit_blocks = info.get('auditBlocks', []) or []
     title_meta = info.get('titleMeta', {}) or {}
     block_content_audit = info.get('blockContentAudit', {}) or {}
     page_number_audit = info.get('pageNumberAudit', {}) or {'present': False}
+    visible_text = info.get('visibleText') or ''
     overlaps = overlap_failures(blocks)
     primary_points = int(info.get('primaryPoints', 0) or 0)
     density = density_metrics(blocks, primary_points, max_primary_points)
     speaker_seconds = int(info.get('speakerSeconds', 0) or 0)
     edge_failures = collect_edge_failures(audit_blocks)
     block_content_failures = block_content_audit.get('failures', []) or []
+    operator_fragments = text_fragments(visible_text)
+    title_zone_failures = title_safe_zone_failures(info, title_meta)
+    table_failures, table_min_font_px, max_table_blank_ratio = table_legibility_failures(info)
     block_content_occlusion_failures = [
         failure for failure in block_content_failures
         if failure.get('overflow_reason') == 'surface_text_targets_overlap'
@@ -221,6 +323,10 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
         'block_content_fit_ok': len(block_content_failures) == 0,
         'title_typography_ok': True,
         'page_number_consistency_ok': True,
+        'external_audience_language_ok': len(operator_fragments) == 0,
+        'title_safe_zone_clear': len(title_zone_failures) == 0,
+        'table_legibility_ok': len(table_failures) == 0,
+        'layout_density_ok': density['visual_density_ok'] and max_table_blank_ratio <= MAX_TABLE_CELL_BLANK_RATIO,
     }
 
     return {
@@ -239,13 +345,34 @@ def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any
             'title_line_count': int(title_meta.get('titleLineCount', 0) or 0),
             'title_block_id': title_meta.get('titleBlockId'),
             'page_number_audit': page_number_audit,
+            'operator_language_fragments': operator_fragments,
+            'title_safe_zone_failures': title_zone_failures,
+            'title_safe_zone_clearance_ok': len(title_zone_failures) == 0,
+            'table_min_font_px': round(table_min_font_px, 2),
+            'table_min_font_pt': round(table_min_font_px * 72.0 / 96.0, 2),
+            'table_legibility_failures': table_failures,
+            'card_blank_ratio': round(max_table_blank_ratio, 4),
+            'card_blank_ratio_threshold': MAX_TABLE_CELL_BLANK_RATIO,
         },
         'issues': issue_list(checks),
     }
 
 
 def summarize_checks(slide_reviews: List[Dict[str, Any]]) -> Dict[str, bool]:
-    keys = ['overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok', 'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok', 'page_number_consistency_ok']
+    keys = [
+        'overflow_free',
+        'occlusion_free',
+        'visual_density_ok',
+        'speaker_fit_ok',
+        'edge_clearance_ok',
+        'block_content_fit_ok',
+        'title_typography_ok',
+        'page_number_consistency_ok',
+        'external_audience_language_ok',
+        'title_safe_zone_clear',
+        'table_legibility_ok',
+        'layout_density_ok',
+    ]
     return {
         key: all(bool(review.get('checks', {}).get(key)) for review in slide_reviews)
         for key in keys
@@ -696,6 +823,38 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                       const leafBlocks = qaBlocks
                         .filter((node) => !node.querySelector('[data-qa-block]'))
                         .filter((node) => isVisibleElement(node));
+                      const visibleText = normalizePageNumberText(wrapper.textContent || '');
+                      const tableMetrics = Array.from(wrapper.querySelectorAll('table, [data-table], [role="table"]'))
+                        .filter((node) => node instanceof Element && isVisibleElement(node))
+                        .map((node, tableIndex) => {{
+                          const cells = Array.from(node.querySelectorAll('th, td, [role="cell"], [role="columnheader"], [role="rowheader"]'))
+                            .filter((cell) => cell instanceof Element && isVisibleElement(cell));
+                          const cellMetrics = cells.map((cell) => {{
+                            const style = window.getComputedStyle(cell);
+                            const rect = cell.getBoundingClientRect();
+                            const text = normalizePageNumberText(cell.textContent || '');
+                            const textLength = normalizeText(text).length;
+                            const area = Math.max(1, rect.width * rect.height);
+                            const fontSize = Number.parseFloat(style.fontSize || '0') || 0;
+                            const estimatedTextArea = textLength * Math.max(fontSize, 1) * Math.max(fontSize * 0.62, 1);
+                            return {{
+                              fontSize,
+                              blankRatio: Math.max(0, Math.min(1, 1 - (estimatedTextArea / area))),
+                            }};
+                          }});
+                          const minFontPx = cellMetrics.length
+                            ? Math.min(...cellMetrics.map((metric) => metric.fontSize).filter((value) => value > 0))
+                            : null;
+                          const maxBlankRatio = cellMetrics.length
+                            ? Math.max(...cellMetrics.map((metric) => metric.blankRatio))
+                            : 0;
+                          return {{
+                            table_id: node.getAttribute('data-table') || node.getAttribute('data-qa-block') || `table-${{tableIndex + 1}}`,
+                            cell_count: cells.length,
+                            min_font_px: minFontPx,
+                            max_blank_ratio: round(maxBlankRatio),
+                          }};
+                        }});
                       const parentGroups = qaBlocks.filter((node) => {{
                         if (!node.querySelector('[data-qa-block]')) return false;
                         const style = window.getComputedStyle(node);
@@ -917,6 +1076,8 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
                       ];
                       return {{
                         ...base,
+                        visibleText,
+                        tableMetrics,
                         blockContentAudit: {{ failures }},
                         pageNumberAudit,
                       }};
