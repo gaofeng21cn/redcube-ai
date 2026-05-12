@@ -1,15 +1,15 @@
 # RedCube AI 架构
 
-对外主语：`RedCube AI` 是独立 visual-deliverable domain agent；`gateway / harness` 仅保留为内部架构边界语言。
+对外主语：`RedCube AI` 是独立 visual-deliverable Foundry Agent；公开发布形态是 built on `OPL Framework` 的 `OPL-compatible package`。`gateway / harness` 仅保留为内部架构边界语言。
 
 ## 主链路
 
-当前对外主链路以 direct route 为第一主语，OPL 路线保留为 hosted integration surface。OPL 是 Codex-first、stage-led 的完整智能体运行框架，可以托管 RCA，但它不是 RCA 的第一公开身份：
+当前对外主链路以 direct route 为第一主语，OPL 路线保留为 hosted integration surface。OPL 是 stage-led 的完整智能体运行框架，可以托管 RCA，但它不是 RCA 的第一公开身份：
 
 - direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - OPL-hosted route：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
-在 OPL Codex-first、stage-led family framework 中，这两条路线都可以被投影为 stage attempt，但 RCA owner 边界不变：OPL 只提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
+在 OPL stage-led family framework 中，这两条路线都可以被投影为 stage attempt，但 RCA owner 边界不变：OPL 只提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
 
 两条路线在进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
 
@@ -19,15 +19,17 @@
 这里的 `status` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 `family_action_catalog` 是 RCA-owned callable action metadata 单一声明面；product-entry manifest、CLI help、MCP descriptors/routes 与 app skill command contracts 都从它派生。`OPL` 只读取该 catalog 做 family-level discovery/export/parity，不写 RedCube visual-domain truth、managed run truth、review/publication projection 或 canonical artifacts。
 `redcube product sidecar export --workspace-root <dir> --format json` 是给 OPL typed family queue / OPL family runtime provider 在线唤醒使用的 product sidecar adapter projection；`redcube product sidecar dispatch --task <task.json> --format json` 只接受 RCA-owned guarded actions：`runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`notification_receipt`。该 sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。
-`domain_agent_skeleton_adapter` 是 RCA 对 OPL standard domain-agent skeleton 的 manifest-only mapping：repo-source 边界限定为 `agent / contracts / runtime / docs`，runtime 只声明 product sidecar、projection builder 与 lifecycle adapter；真实 PNG/PPTX/PDF、receipt 实例和 export bundle 继续落在 workspace/runtime artifact root，并通过 `artifact_locator_contract` 与 `product_sidecar_receipt_refs` 暴露 ref。
+`standard_domain_agent_skeleton` 是 RCA 对 OPL standard domain-agent skeleton 的 manifest-only mapping：repo-source 边界限定为 `agent / contracts / runtime / docs`，runtime 只声明 product sidecar、projection builder 与 lifecycle adapter；真实 PNG/PPTX/PDF、receipt 实例和 export bundle 继续落在 workspace/runtime artifact root，并通过 `artifact_locator_contract` 与 `product_sidecar_receipt_refs` 暴露 ref。
 `stage_control_projection` 是给 OPL family Stage Control Plane 的 descriptor/read-only adapter：它把 RCA 已有 `ppt_deck`、`xiaohongshu`、`poster_onepager` route stages 投影到 `source_intake`、`communication_strategy`、`visual_direction`、`artifact_creation`、`review_and_revision`、`package_and_handoff` 等 family stage kinds。product-entry manifest 中的每个 stage descriptor 都包含 goal、owner、skills、allowed_action_refs、handoff、source refs、freshness、stage-to-action parity 与 authority boundary，供 OPL 真实 discovery smoke 消费；它不创建调度器、不改变 hydrated `stage_sequence`，也不接管 RedCube managed deliverable runtime。Codex App direct skill 调用与 OPL 托管调用必须在 `invokeDomainEntry` / product-entry command contract 后收敛；OPL stage metadata 不能成为第二 route truth、第二 review owner 或第二 artifact authority。
+
+这四个 surface 合起来构成当前发布 package：single `redcube-ai` app skill 是用户/Agent 入口，`invokeDomainEntry` 是 service-safe domain entry，product sidecar/projection 是 OPL provider 和 family queue 的可读/受控派发边界，`stage_control_projection` 是 OPL Stage Control Plane 的只读 stage descriptor。它们全部指向同一 downstream RCA domain truth；RCA 继续独立持有 visual truth、route owner、review/export verdict 和 artifact authority。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
 当前仓内可执行的 runtime 基线按三层 owner 收口：
 
 - `RedCube AI` 维护 visual-domain truth、本地 canonical artifacts、稳定 capability surface，以及 audit / review / projection surface
-- 默认 concrete executor 继续由 `Codex CLI` 通过统一 executor-adapter contract 被选择
+- 第一公民 concrete executor 继续由 `Codex CLI` 通过统一 executor-adapter contract 被选择
 - `OPL Runtime Manager` 只作为 OPL 侧 product-managed adapter/projection layer 管理 family runtime provider、registration/status 索引、doctor/repair/resume 与 native helper catalog
 - `Hermes-Agent` 只在显式 hosted/proof backend、legacy provider 或技术参考层作为外部 runtime substrate 出现；Temporal 是目标生产 provider
 
@@ -39,6 +41,8 @@
   - 第一公开主语是单一 `redcube-ai` app skill；`CLI` / `MCP` 提供可验证协议入口，`status` 只作为 skill 下的 machine-readable product-entry overview / intake / entry-shell contract，`session` 负责续跑
 - `OPL-hosted handoff`
   - 给 `OPL Runtime Manager` 与 family-level caller 使用的 handoff contract；`OPL` 只承担 family-level session/runtime/projection 与 shared modules/contracts/indexes，且只作为 hosted integration surface
+- `OPL-compatible package surface`
+  - RedCube Foundry Agent 对 OPL Framework 暴露的 package 形态：app skill、service-safe domain entry、product sidecar/projection、stage control projection 与 standard domain-agent skeleton mapping；该层只负责 compatibility/discovery/handoff，不承担 visual-domain authority
 - `future managed product shell`
   - 给成熟最终用户前台壳预留的未来产品层
 
@@ -94,7 +98,7 @@
 - gateway / messaging / interrupt / resume
 - family 级长期在线 runtime substrate
 
-当前默认 concrete executor 仍是 `Codex CLI host-agent runtime`。在 OPL stage-led runtime framework 中，它也是未显式选择 hosted/proof backend 时的最小具体执行单元，负责：
+当前第一公民 concrete executor 是 `Codex CLI host-agent runtime`。在 OPL stage-led runtime framework 中，它也是未显式选择 hosted/proof backend 时的最小具体执行单元，负责：
 
 - 默认 agent execution lane
 - 受保护创作 stage 的结构化生成执行
@@ -132,7 +136,7 @@
 
 - `runtime family contract` 继续定义 route、artifact、review surface 与 visual-domain truth
 - `executor adapter` 只负责把这些 contract 下沉到具体执行器
-- 默认主线仍是 Codex CLI；Hermes-Agent loop 先作为 opt-in proof lane 保持可选，不提前替换默认
+- 第一公民主线仍是 Codex CLI；Hermes-Agent loop 先作为 opt-in proof lane 保持可选，不提前替换默认
 
 `ppt_deck` runtime family 的 core 现在也按这个边界组织：`core.ts` 保留 route / lifecycle / visual-domain assembly，execution adapter、creative owner/source stamp、primary surface 和 structured artifact batch/executor helper 进入 `ppt-deck-runtime-family-parts/execution-adapters.ts`。这让 core 不再直接承载 executor/backend 分支，同时保持 public route、payload shape 和 runtime-family contract 不变。
 
@@ -147,7 +151,7 @@
 更准确的目标是：
 
 - 由 `RedCube AI` 统一稳定 capability surface 与 visual-domain truth
-- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前正式主线默认是 `Codex CLI`，`Hermes-Agent loop` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
+- 由 `Executor Adapter` 在 domain 内按 deliverable route 选择具体执行器；当前第一公民主线是 `Codex CLI`，`Hermes-Agent loop` 则以同 contract 下的 full-agent-loop proof lane 形式并挂
 - 由 `OPL Runtime Manager` 统一 hosted integration 的长期托管、状态索引、doctor/repair/resume 与 native helper catalog；Temporal 是 OPL family runtime provider 的目标生产 substrate，未来自有 sidecar 只有在 provider abstraction 无法表达 task/wakeup/approval/audit/product isolation contract 时才进入 promotion 评估
 
 ## Language Target

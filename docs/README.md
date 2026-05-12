@@ -3,7 +3,7 @@
 **English** | [中文](./README.zh-CN.md)
 
 This directory is the technical reading layer for `RedCube AI`.
-The current public reading path starts from RedCube as a visual-deliverable domain agent. OPL is the Codex-first, stage-led agent runtime framework that can host RedCube as an external dependency, so the OPL path is documented as an internal hosted integration path rather than the first public story:
+The current public reading path starts from RedCube as the `RedCube AI Foundry Agent`: an OPL-compatible visual-deliverable package built on the OPL Framework. OPL is the stage-led agent runtime framework that can host RedCube as an external dependency, so the OPL path is documented as an internal hosted integration path rather than the first public story:
 
 - direct route: `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - OPL-hosted route: `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
@@ -19,6 +19,7 @@ The current public reading path starts from RedCube as a visual-deliverable doma
 ## Current Baseline
 
 - `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the direct repo-verified product-entry service surface, and the stable callable surface built from the single `redcube-ai` app skill, `CLI`, `MCP`, local scripts, and repo-tracked contracts.
+- The release shape is `RedCube AI Foundry Agent`: one app skill, one service-safe domain entry, product sidecar/projection refs, and read-only stage-control projection metadata. This is the OPL-compatible package surface; it is not a GUI/WebUI shell and it does not move route, review, export, or artifact authority into OPL.
 - `Codex CLI` remains the default concrete executor and the minimum execution unit selected behind the executor-adapter contract for local operator workflows.
 - `OPL Runtime Manager` is the OPL-side hosted integration manager over the configured family runtime provider. Temporal is the production substrate target; Hermes remains a legacy/optional provider or proof lane. OPL may index product-entry registration, session continuity, runtimeWatch, artifacts, and review/publication projection, but it does not own RedCube visual truth.
 - Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.

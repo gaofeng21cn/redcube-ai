@@ -3,7 +3,7 @@
 [English](./README.md) | **中文**
 
 这个目录是 `RedCube AI` 的技术阅读层。
-当前公开阅读路径从 RedCube 的视觉交付领域智能体身份开始。OPL 是 Codex-first、stage-led 的智能体运行框架，可以把 RedCube 作为外部依赖托管，因此 OPL 路径在这里只作为内部托管集成路径记录：
+当前公开阅读路径从 `RedCube AI Foundry Agent` 身份开始：它是 built on OPL Framework 的 OPL-compatible visual-deliverable package。OPL 是 stage-led 的智能体运行框架，可以把 RedCube 作为外部依赖托管，因此 OPL 路径在这里只作为内部托管集成路径记录：
 
 - RedCube 直达路径：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - OPL 托管路径：`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
@@ -19,6 +19,7 @@
 ## 当前基线
 
 - `RedCube AI` 持有视觉领域真相、`invokeDomainEntry`、direct repo-verified 的 product-entry service surface，以及由单一 `redcube-ai` 应用技能、`CLI`、`MCP`、本地脚本与仓库跟踪合同组成的稳定可调用面。
+- 当前发布形态是 `RedCube AI Foundry Agent`：一个 app skill、一个 service-safe domain entry、product sidecar / projection refs 和只读 stage-control projection metadata 共同组成 OPL-compatible package surface。它不是 GUI/WebUI 壳，也不会把 route、review、export 或 artifact authority 迁给 OPL。
 - `Codex CLI` 继续作为 executor-adapter 合同后面的默认具体执行器和最小执行单元，服务本地操作者工作流。
 - `OPL Runtime Manager` 是 OPL 侧托管集成管理层，位于已配置的 family runtime provider 之上；Temporal 是生产 substrate 候选，Hermes 保留为 legacy/optional provider 或 proof lane。它可以索引 product-entry registration、session continuity、runtimeWatch、artifact、review/publication projection，但不持有 RedCube visual truth。
 - `Hermes-Agent` 这类 hosted runtime carrier 只保留在显式 opt-in backend/proof lane 或技术参考层，不改写默认公开合同。

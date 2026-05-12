@@ -5,14 +5,15 @@
 ### 决策：RCA 文档第一身份收口到视觉交付，OPL 降为托管运行框架路径
 
 - `RedCube AI` 的公开首页、docs 入口和核心五件套先表达独立 visual-deliverable domain agent 身份，再表达 OPL 托管路径。
-- `OPL` 在 RCA 文档中固定解释为 Codex-first、stage-led 的完整智能体运行框架，可作为外部依赖托管 RCA；它不成为 RCA 对外第一身份，也不接管 visual-domain truth、canonical artifacts、review/export gate 或 publication projection。
+- 公开发布包装固定为 `RedCube AI Foundry Agent / OPL-compatible package built on OPL Framework`：single `redcube-ai` app skill、service-safe domain entry、product sidecar/projection、stage control projection 和 standard domain-agent skeleton mapping 是同一 package 的不同 surface。
+- `OPL` 在 RCA 文档中固定解释为 stage-led 的完整智能体运行框架，可作为外部依赖托管 RCA；它不成为 RCA 对外第一身份，也不接管 visual-domain truth、canonical artifacts、review/export gate 或 publication projection。
 - `Codex CLI` 是 RCA direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的默认最小具体执行单元。
 - 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 口径只能出现在内部集成、provenance、合同引用、或 tombstone 语境中；仍被 runtime-program 合同引用的 program brief 留在 `docs/program/`，通过 lifecycle note 降级，不因标题旧而先物理迁移。
 
 ### 决策：RCA 对齐 OPL provider-backed runtime，Temporal 为目标生产 substrate
 
 - `RedCube AI` 的 OPL 长期托管口径更新为 `OPL Runtime Manager / opl family-runtime -> configured family runtime provider -> RCA product sidecar export/dispatch -> RedCube service-safe domain entry`。
-- Temporal 是 OPL durable stage attempt 的目标生产 provider；Hermes-Agent 在迁移期只作为 legacy/optional provider、显式 hosted/proof backend、executor proof lane 或 Codex CLI fallback module。
+- Temporal 是 OPL durable stage attempt 的目标生产 provider；Hermes-Agent 迁移后作为可选 Agent executor adapter、显式 hosted/proof backend 或 executor proof lane 保留，不再作为目标 24h session/wakeup substrate。
 - `redcube product sidecar export|dispatch` 继续是 OPL provider 到 RCA owner surface 的受控桥接。OPL/Temporal/Hermes/local provider 只能 enqueue、dispatch、signal、query、投影 attempt/receipt，不得写 visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 - RedCube 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。下方 Hermes-oriented OPL Runtime Manager 决策保留为迁移背景，后续新投入按 provider-backed / Temporal target 解释。
 
@@ -20,7 +21,7 @@
 
 ### 决策：RCA 作为 OPL stage-led framework 上的独立 domain agent
 
-- `RedCube AI` 的 OPL 对齐口径固定为：RCA 是可被 Codex App skill 直接调用、也可由 OPL Codex-first stage-led family framework 托管的独立 visual-deliverable domain agent。
+- `RedCube AI` 的 OPL 对齐口径固定为：RCA 是可被 Codex App skill 直接调用、也可由 OPL stage-led family framework 托管的独立 visual-deliverable domain agent。
 - `OPL` 只持有 stage descriptor discovery、queue、wakeup、handoff、receipt、approval/retry/dead-letter、trace/projection 和 parity；RCA 持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。
 - 后续流程优化优先改 RCA stage pack、visual direction prompt、review gate、runtime-family route 和 export proof；不得把视觉路线、审美判断或 artifact authority 搬到 OPL 机械脚本。
 - Direct skill path 保持一等入口；经 OPL 托管调用时也必须回到同一套 RedCube-owned `invokeDomainEntry` / product-entry surface。
@@ -54,7 +55,7 @@
 ### 决策：默认公开能力面收口为稳定 capability surface
 
 - `RedCube AI` 对外默认合同优先冻结为 `CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contracts 这一组稳定 callable surface。
-- `Codex CLI` 继续作为默认 concrete executor。
+- `Codex CLI` 继续作为当前第一公民 concrete executor。
 - `Hermes-Agent` 相关路径只保留为显式 hosted/proof backend 或技术参考，不改写默认公开合同。
 
 ## 2026-04-11
@@ -94,8 +95,8 @@
 
 ### 历史决策：统一 runtime substrate，不强制统一 visual executor
 
-- 状态：此段保留为 2026-04-11 Hermes-first 迁移背景；2026-05-10 之后已被 provider-backed / Temporal target 与 Codex-first stage-led OPL framework 口径 supersede。
-- `Hermes-Agent` 在当时迁移设想中优先承担 runtime substrate / orchestration owner；当前只作为 legacy/optional provider、显式 hosted/proof backend 或 executor proof lane。
+- 状态：此段保留为 2026-04-11 Hermes-first 迁移背景；2026-05-10 之后已被 provider-backed / Temporal target 与 stage-led OPL framework 口径 supersede。
+- `Hermes-Agent` 在当时迁移设想中优先承担 runtime substrate / orchestration owner；当前只作为可选 Agent executor adapter、显式 hosted/proof backend 或 executor proof lane。
 - `RedCube AI` 继续持有 visual deliverable 的 family/profile/pack authority、audit truth 与 executor routing。
 - 具体生成步骤允许继续通过 `Executor Adapter` 选择最合适的执行器；只有在拿到显式 proof 后，才允许把某条 route 迁到新的 executor。
 - executor backend 的 public contract 只冻结 `codex_cli` 与 `hermes_agent`；旧内部 adapter 名称只映射到这两类 backend，不成为新的 public backend。
@@ -125,9 +126,9 @@
 ### 历史决策：保持 honest owner split，不改 default executor owner
 
 - 状态：此段保留为 2026-04-21 owner split 背景；当前 active owner split 以 2026-05-10 provider-backed OPL runtime target 为准。
-- `Hermes-Agent` 不再作为默认 managed runtime owner；OPL Runtime Manager 通过 configured family runtime provider 承担托管路径，Temporal 是目标生产 provider，Hermes 只保留为 legacy/optional provider 或 proof lane。
+- `Hermes-Agent` 不再作为默认 managed runtime owner；OPL Runtime Manager 通过 configured family runtime provider 承担托管路径，Temporal 是目标生产 provider，Hermes 只保留为可选 Agent executor adapter 或 proof lane。
 - `RedCube AI` 继续持有 visual-domain truth 与 domain durable surfaces。
-- `Codex CLI` 继续是 executor adapter 选中的默认 concrete executor，除非拿到显式 proof，不改默认 owner split。
+- `Codex CLI` 继续是 executor adapter 选中的第一公民 concrete executor，除非拿到显式 proof，不改默认 owner split。
 
 ### 决策：OPL 角色收口到 family-level runtime hosting
 

@@ -1,8 +1,56 @@
 {
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-26",
+  "product_release_metadata": {
+    "public_package_name": "RedCube AI Foundry Agent",
+    "positioning": "Foundry Agent / OPL-compatible package built on OPL Framework",
+    "package_family": "visual_deliverable_foundry_agent",
+    "opl_compatibility": {
+      "framework": "OPL Framework",
+      "compatibility_model": "admitted_domain_agent_package",
+      "package_surfaces": [
+        "single redcube-ai app skill",
+        "service-safe domain entry",
+        "product sidecar projection",
+        "stage control projection",
+        "standard domain-agent skeleton mapping"
+      ],
+      "opl_role": "discovery_queue_handoff_receipt_projection_consumer"
+    },
+    "public_surfaces": {
+      "app_skill_id": "redcube-ai",
+      "service_safe_domain_entry": "invokeDomainEntry",
+      "product_entry_surfaces": [
+        "invokeProductEntry",
+        "getProductEntrySession",
+        "redcube product status",
+        "redcube product invoke",
+        "redcube product session"
+      ],
+      "sidecar_surfaces": [
+        "redcube product sidecar export",
+        "redcube product sidecar dispatch"
+      ],
+      "stage_control_projection": "redcube product manifest#/stage_control_projection"
+    },
+    "authority_boundary": {
+      "rca_owns": [
+        "visual truth",
+        "review/export verdict",
+        "route owner",
+        "artifact authority"
+      ],
+      "opl_does_not_own": [
+        "visual truth",
+        "review/export verdict",
+        "canonical artifacts",
+        "domain memory content"
+      ],
+      "status_command_semantics": "entry shell only; not GUI/WebUI"
+    }
+  },
   "longrun_goal": {
-    "label": "independent visual-deliverable domain agent with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL Runtime Manager when oplHosted",
+    "label": "RedCube AI Foundry Agent / OPL-compatible visual-deliverable package with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL Runtime Manager when oplHosted",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",

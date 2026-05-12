@@ -2,9 +2,9 @@
 
 ## 项目是什么
 
-`RedCube AI` 是独立 visual-deliverable domain agent；它的第一公开身份是视觉交付，而不是 OPL、gateway、harness 或旧 route。
-对外第一主语是单一 `redcube-ai` app skill 与 direct product entry；当前仓库主线按 `Auto-only` 理解，formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
-当前可执行基线已经按三层边界收口：对外默认稳定 capability surface 是 `redcube-ai app skill / CLI / MCP / invokeDomainEntry / invokeProductEntry / 本地脚本 / repo-tracked contracts`，默认 concrete executor 仍是本地 `Codex CLI`；`Hermes-Agent` 相关路径只保留为显式 hosted/proof backend 或技术参考。
+`RedCube AI` 是独立 visual-deliverable Foundry Agent；它的第一公开身份是视觉交付，而不是 OPL、gateway、harness 或旧 route。
+对外发布形态是 `RedCube AI Foundry Agent`，一个 built on `OPL Framework` 的 `OPL-compatible package`：单一 `redcube-ai` app skill、direct product entry、service-safe domain entry、sidecar/projection 和 stage control projection 组成同一 package surface。当前仓库主线按 `Auto-only` 理解，formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
+当前可执行基线已经按三层边界收口：对外默认稳定 capability surface 是 `redcube-ai app skill / CLI / MCP / invokeDomainEntry / invokeProductEntry / 本地脚本 / repo-tracked contracts`，第一公民 concrete executor 仍是本地 `Codex CLI`；`Hermes-Agent` 相关路径只保留为显式 hosted/proof backend 或技术参考，不承诺行为或输出质量与 Codex CLI 等价。
 当前入口真相是：`redcube-ai` app skill、`CLI / MCP` 已经构成可验证的 `agent entry`，同时 repo-verified 的轻量 `product entry` service surface 也已落地；`status` 在这里仅指面向 agent 的 product-entry overview / intake / entry-shell contract，`redcube product status` 是当前 product-status command，但真正面向最终用户的成熟 GUI / WebUI / managed web shell 仍未落地。
 当前统一协作模型是：`RedCube AI` 自己继续负责 domain authority、review / publication projection 与 visual-domain truth；具体 deliverable 的执行器保持可插拔，但默认 lane 仍是 `Codex CLI`，而 hosted/proof backend 只作为显式附加层挂在同一套 contract 之下。
 `gateway / harness` 在本仓继续作为内部架构边界语言，不作为仓库对外第一身份。
@@ -17,19 +17,20 @@
 `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 这说明 `RedCube AI` 的理想型是一个可被用户直接进入、也可被 `OPL` 托管调用的 visual-domain 产品 / 服务节点，而不是把仓库继续磨成 repo-local runtime，或把自己写成整个 `OPL`。
-`OPL` 是 Codex-first、stage-led 的完整智能体运行框架，可以把 RCA 作为外部依赖 / admitted domain agent 托管；RCA 不是 OPL 内部模块。OPL 可以读取 RCA stage/action/projection descriptor，负责 queue、wakeup、handoff、receipt、approval/retry 和 operator projection；RCA 继续持有 source intake、communication strategy、visual direction、artifact creation、review/revision、package/handoff 等 stage 语义，以及 visual-domain truth、review/export gate 和 canonical artifact authority。
-在这条 OPL 路线上，`OPL Runtime Manager` 只负责 provider profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是目标生产 provider，Hermes 是迁移期 legacy/optional provider 或 executor/proof lane。它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
-当前 stage-led 对齐已经落到 RCA-owned descriptor/projection 层：`family_action_catalog`、`stage_control_projection`、`route_equivalence`、`product sidecar export/dispatch`、`opl_runtime_manager_registration` 与 `domain_agent_skeleton_adapter`。这些 surface 让 OPL 能做 discovery、typed queue、wakeup、handoff、receipt 和 operator projection；OPL 只消费 descriptor / refs，不生成 visual route、review verdict、publication projection truth 或 canonical artifact。
+`OPL` 是 stage-led 的完整智能体运行框架，可以把 RCA 作为外部依赖 / admitted domain agent 托管；RCA 不是 OPL 内部模块。OPL 可以读取 RCA stage/action/projection descriptor，负责 queue、wakeup、handoff、receipt、approval/retry 和 operator projection；RCA 继续持有 source intake、communication strategy、visual direction、artifact creation、review/revision、package/handoff 等 stage 语义，以及 visual-domain truth、review/export gate 和 canonical artifact authority。
+在这条 OPL 路线上，`OPL Runtime Manager` 只负责 provider profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是目标生产 provider，Hermes 只在显式 provider / Agent executor adapter 或 proof lane 语境中出现。它不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
+当前 stage-led 对齐已经落到 RCA-owned descriptor/projection 层：`family_action_catalog`、`stage_control_projection`、`route_equivalence`、`product sidecar export/dispatch`、`opl_runtime_manager_registration` 与 `standard_domain_agent_skeleton`。这些 surface 让 OPL 能做 discovery、typed queue、wakeup、handoff、receipt 和 operator projection；OPL 只消费 descriptor / refs，不生成 visual route、review verdict、publication projection truth 或 canonical artifact。
 
 ## 项目目标
 
 - 稳定独立 domain-agent 的 formal-entry、service-safe entry 与执行链路，并保持内部 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 边界可维护。
+- 把公开定位收口为 `Foundry Agent / OPL-compatible package built on OPL Framework`，并让 app skill、service-safe domain entry、sidecar/projection 和 stage control projection 指向同一发布形态。
 - 用 machine-readable contracts 与显式校验收紧 runtime mainline。
 - 保持稳定 capability surface、默认 `Codex CLI` concrete executor 与 visual-domain boundary 一起对齐；hosted runtime carrier 只作为显式可选 backend，不改写默认公开合同。
 - 将实现目标收敛到 `TypeScript + Python`：TypeScript 持有 product entry、CLI/MCP、contracts、gateway、runtime-family shell 与 typed service boundaries；Python 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 自动化生态共享工具链。
 - 冻结一个可被 `OPL` 托管路径调用的 service-safe domain entry adapter，而不是先做聊天 UI。
 - 落地可 direct 调用、也可由 `OPL` 通过托管集成路径调用的 lightweight domain `product entry` service surface，并把 session continuity 收到用户级 runtime-state。
-- 保持 Codex App direct skill path 与 OPL 托管 path 的语义等价：两条路径都必须回到 RCA-owned route、review、artifact 和 export surface；`Codex CLI` 是默认最小具体执行单元。
+- 保持 Codex App direct skill path 与 OPL 托管 path 的语义等价：两条路径都必须回到 RCA-owned route、review、artifact 和 export surface；Agent executor 是最小具体执行单位，`Codex CLI` 是当前第一公民 executor。
 - 在不改写 domain 语义的前提下，继续维护 absorbed tranche、follow-on board 与 provenance。
 
 ## 非目标
