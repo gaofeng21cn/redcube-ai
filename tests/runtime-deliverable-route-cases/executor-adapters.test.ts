@@ -179,7 +179,25 @@ test('runDeliverableRoute supports explicit hermes_agent adapter without changin
     assert.equal(result.run.executor.execution_surface, 'hermes_agent_loop');
     assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes_agent');
     assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.owner, 'hermes_agent');
+    assert.equal(result.run.executor.execution_model.adapter_role, 'opl_hosted_executor_adapter_proof');
+    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+    assert.equal(
+      result.run.executor.execution_model.opl_executor_adapter_receipt?.hosted_adapter_reference,
+      'opl_hosted:hermes_agent_loop',
+    );
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.owner, 'opl_runtime_manager');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.source, 'opl_executor_adapter_receipt');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.hosted_adapter_reference, 'opl_hosted:hermes_agent_loop');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(
+      result.run.executor.hermes_agent_loop_runtime?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.review_export_gate_owner, 'redcube_ai');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.activation, 'explicit_opt_in_only');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.auditability, 'receipt_backed');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.failure_mode, 'fail_closed');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.effect_equivalence_guaranteed, false);
     assert.equal(result.run.executor.hermes_agent_loop_runtime?.model_selection, 'inherit_local_hermes_default');
     assert.equal(result.run.executor.hermes_agent_loop_runtime?.reasoning_selection, 'inherit_local_hermes_default');
     assert.equal(result.events.some((event) => event?.type === 'hermes_agent_loop_route_started'), true);
@@ -188,17 +206,45 @@ test('runDeliverableRoute supports explicit hermes_agent adapter without changin
     assert.equal(stored.run.executor.adapter, 'hermes_agent');
     assert.equal(stored.run.executor.execution_surface, 'hermes_agent_loop');
     assert.equal(stored.run.executor.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(stored.run.executor.hermes_agent_loop_runtime?.owner, 'hermes_agent');
+    assert.equal(stored.run.executor.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+    assert.equal(stored.run.executor.hermes_agent_loop_runtime?.owner, 'opl_runtime_manager');
+    assert.equal(stored.run.executor.hermes_agent_loop_runtime?.source, 'opl_executor_adapter_receipt');
     assert.equal(stored.run_telemetry.executor_kind, 'hermes_agent');
     assert.equal(stored.cost_summary.executor_identity, 'hermes_agent_loop');
 
     const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
     assert.equal(artifact.execution_model.mainline_adapter, 'hermes_agent');
     assert.equal(artifact.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.creative_execution?.owner, 'hermes_agent');
+    assert.equal(artifact.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
+    assert.equal(
+      artifact.execution_model.opl_executor_adapter_receipt?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.review_export_gate_owner, 'redcube_ai');
+    assert.equal(artifact.creative_execution?.owner, 'redcube_ai_visual_deliverable_runtime');
     assert.equal(artifact.creative_execution?.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.creative_execution?.generation_runtime?.owner, 'hermes_agent');
+    assert.equal(artifact.creative_execution?.generation_runtime?.owner, 'opl_runtime_manager');
+    assert.equal(artifact.creative_execution?.generation_runtime?.source, 'opl_executor_adapter_receipt');
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
+      'opl_hosted:hermes_agent_loop',
+    );
+    assert.equal(artifact.creative_execution?.generation_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.creative_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(artifact.creative_execution?.generation_runtime?.review_export_gate_owner, 'redcube_ai');
     assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.proof?.opl_executor_adapter_receipt?.source,
+      'opl_executor_adapter_receipt',
+    );
   });
 });
 
@@ -249,7 +295,27 @@ test('runDeliverableRoute supports explicit hermes_agent adapter for xiaohongshu
     const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
     assert.equal(artifact.execution_model.mainline_adapter, 'hermes_agent');
     assert.equal(artifact.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.creative_execution?.owner, 'hermes_agent');
+    assert.equal(artifact.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
+    assert.equal(
+      artifact.execution_model.opl_executor_adapter_receipt?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(artifact.creative_execution?.owner, 'redcube_ai_visual_deliverable_runtime');
+    assert.equal(artifact.creative_execution?.generation_runtime?.source, 'opl_executor_adapter_receipt');
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
+      'opl_hosted:hermes_agent_loop',
+    );
+    assert.equal(artifact.creative_execution?.generation_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.creative_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
     assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
   });
 });
@@ -283,7 +349,27 @@ test('runDeliverableRoute supports explicit hermes_agent adapter for poster stor
     const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
     assert.equal(artifact.execution_model.mainline_adapter, 'hermes_agent');
     assert.equal(artifact.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.creative_execution?.owner, 'hermes_agent');
+    assert.equal(artifact.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
+    assert.equal(
+      artifact.execution_model.opl_executor_adapter_receipt?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(artifact.creative_execution?.owner, 'redcube_ai_visual_deliverable_runtime');
+    assert.equal(artifact.creative_execution?.generation_runtime?.source, 'opl_executor_adapter_receipt');
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
+      'opl_hosted:hermes_agent_loop',
+    );
+    assert.equal(artifact.creative_execution?.generation_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.creative_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
+    assert.equal(
+      artifact.creative_execution?.generation_runtime?.domain_truth_owner,
+      'redcube_ai_visual_deliverable_runtime',
+    );
     assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
   });
 });

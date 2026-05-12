@@ -22,6 +22,12 @@ const HERMES_AGENT_LOOP_RUNTIME_SURFACE = 'hermes_agent_loop';
 const HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION = 'inherit_local_hermes_default';
 const HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_default';
 const HERMES_AGENT_LOOP_FREEZE_ORIGIN = 'Hermes.Proof.A';
+const OPL_EXECUTOR_ADAPTER_RECEIPT_SOURCE = 'opl_executor_adapter_receipt';
+const OPL_HOSTED_HERMES_AGENT_LOOP_REFERENCE = 'opl_hosted:hermes_agent_loop';
+const OPL_RUNTIME_MANAGER_OWNER = 'OPL Runtime Manager';
+const OPL_RUNTIME_MANAGER_RUNTIME_OWNER = 'opl_runtime_manager';
+const RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER = 'redcube_ai_visual_deliverable_runtime';
+const RCA_REVIEW_EXPORT_GATE_OWNER = 'redcube_ai';
 
 const DEFAULT_AGENT_LOOP_HELPER = resolvePythonNativeHelper(REPO_ROOT, 'hermes_agent_loop_bridge');
 const DEFAULT_AGENT_LOOP_MODULE = DEFAULT_AGENT_LOOP_HELPER.packageModule;
@@ -217,17 +223,32 @@ function buildGenerationInput({
 }
 
 function buildHermesAgentLoopExecutionModel(requestedAdapter = HERMES_AGENT_ADAPTER) {
+  const oplExecutorAdapterReceipt = {
+    source: OPL_EXECUTOR_ADAPTER_RECEIPT_SOURCE,
+    owner: OPL_RUNTIME_MANAGER_RUNTIME_OWNER,
+    hosted_adapter_reference: OPL_HOSTED_HERMES_AGENT_LOOP_REFERENCE,
+    adapter: HERMES_AGENT_ADAPTER,
+    adapter_runtime_owner: HERMES_AGENT_ADAPTER,
+    runtime_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
+    domain_truth_owner: RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER,
+    review_export_gate_owner: RCA_REVIEW_EXPORT_GATE_OWNER,
+    activation: 'explicit_opt_in_only',
+    auditability: 'receipt_backed',
+    failure_mode: 'fail_closed',
+    effect_equivalence_guaranteed: false,
+  };
   return {
     mainline_adapter: HERMES_AGENT_ADAPTER,
     primary_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
-    adapter_role: 'opt_in_proof_executor',
-    runtime_substrate_owner: 'Hermes',
+    adapter_role: 'opl_hosted_executor_adapter_proof',
+    runtime_substrate_owner: OPL_RUNTIME_MANAGER_OWNER,
     deployment_host: 'local_hermes_agent_bridge',
     deployment_host_status: 'opt_in_available',
     requested_adapter: requestedAdapter,
     default_model_selection: HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION,
     default_reasoning_effort: HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION,
     freeze_origin_milestone: HERMES_AGENT_LOOP_FREEZE_ORIGIN,
+    opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
   };
 }
 
@@ -393,10 +414,11 @@ export function generateStructuredArtifactViaHermesAgentLoop({
   }
 
   const executionModel = buildHermesAgentLoopExecutionModel(HERMES_AGENT_ADAPTER);
+  const oplExecutorAdapterReceipt = executionModel.opl_executor_adapter_receipt;
   return {
     data: payload,
     generationRuntime: {
-      owner: HERMES_AGENT_ADAPTER,
+      owner: OPL_RUNTIME_MANAGER_RUNTIME_OWNER,
       adapter_surface: '@redcube/runtime-protocol',
       run_id: safeText(proof.session_id, `hermes-agent-${randomUUID()}`),
       session_id: safeText(proof.session_id) || null,
@@ -407,10 +429,19 @@ export function generateStructuredArtifactViaHermesAgentLoop({
       api_mode: contract.api_mode,
       reasoning_effort: contract.reasoning_effort,
       prompt_pack_file: safePromptRelativePath,
-      proof,
-      creative_owner: HERMES_AGENT_ADAPTER,
+      proof: {
+        ...proof,
+        opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
+      },
+      source: OPL_EXECUTOR_ADAPTER_RECEIPT_SOURCE,
+      hosted_adapter_reference: OPL_HOSTED_HERMES_AGENT_LOOP_REFERENCE,
+      adapter_runtime_owner: HERMES_AGENT_ADAPTER,
+      creative_owner: RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER,
+      domain_truth_owner: RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER,
+      review_export_gate_owner: RCA_REVIEW_EXPORT_GATE_OWNER,
       primary_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
       execution_model: executionModel,
+      opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
     },
   };
 }

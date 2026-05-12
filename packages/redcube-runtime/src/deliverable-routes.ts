@@ -48,8 +48,26 @@ function buildCodexRuntimeDescriptor(codexContract) {
 }
 
 function buildHermesAgentLoopRuntimeDescriptor(hermesContract) {
+  const defaultOplExecutorAdapterReceipt = {
+    source: 'opl_executor_adapter_receipt',
+    owner: 'opl_runtime_manager',
+    hosted_adapter_reference: 'opl_hosted:hermes_agent_loop',
+    adapter: HERMES_AGENT_ADAPTER,
+    adapter_runtime_owner: HERMES_AGENT_ADAPTER,
+    runtime_surface: 'hermes_agent_loop',
+    domain_truth_owner: 'redcube_ai_visual_deliverable_runtime',
+    review_export_gate_owner: 'redcube_ai',
+    activation: 'explicit_opt_in_only',
+    auditability: 'receipt_backed',
+    failure_mode: 'fail_closed',
+    effect_equivalence_guaranteed: false,
+  };
+  const oplExecutorAdapterReceipt = {
+    ...defaultOplExecutorAdapterReceipt,
+    ...(hermesContract.opl_executor_adapter_receipt || {}),
+  };
   return {
-    owner: HERMES_AGENT_ADAPTER,
+    owner: 'opl_runtime_manager',
     adapter_surface: '@redcube/runtime-protocol',
     model_selection: hermesContract.model_selection,
     reasoning_selection: hermesContract.reasoning_selection,
@@ -59,6 +77,16 @@ function buildHermesAgentLoopRuntimeDescriptor(hermesContract) {
     api_mode: hermesContract.api_mode,
     reasoning_effort: hermesContract.reasoning_effort,
     entrypoint: hermesContract.entrypoint,
+    source: oplExecutorAdapterReceipt.source,
+    hosted_adapter_reference: oplExecutorAdapterReceipt.hosted_adapter_reference,
+    adapter_runtime_owner: oplExecutorAdapterReceipt.adapter_runtime_owner,
+    domain_truth_owner: oplExecutorAdapterReceipt.domain_truth_owner,
+    review_export_gate_owner: oplExecutorAdapterReceipt.review_export_gate_owner,
+    activation: oplExecutorAdapterReceipt.activation,
+    auditability: oplExecutorAdapterReceipt.auditability,
+    failure_mode: oplExecutorAdapterReceipt.failure_mode,
+    effect_equivalence_guaranteed: oplExecutorAdapterReceipt.effect_equivalence_guaranteed,
+    opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
   };
 }
 
