@@ -779,6 +779,41 @@ export function buildFamilyDomainMemoryDescriptor({
   };
 }
 
+function buildControlledSoakNoRegressionAttempt() {
+  return {
+    surface_kind: 'controlled_soak_no_regression_attempt',
+    attempt_id: 'rca.controlled_soak.no_regression_attempt.v1',
+    target_domain_id: DOMAIN_ID,
+    state: 'deferred_typed_blocker',
+    controlled_soak_apply_contract_open: false,
+    deferred_blocker: {
+      blocker_kind: 'domain_apply_contract_gap',
+      blocker_id: 'rca_controlled_soak_apply_contract_not_open',
+      next_hop_contract_gap: 'opl_temporal_controlled_visual_stage_attempt_apply_contract',
+      required_owner: 'opl_framework',
+      domain_owner: DOMAIN_ID,
+    },
+    no_regression_surface_refs: [
+      '/controlled_visual_stage_attempt',
+      '/controlled_memory_apply_proof',
+      '/artifact_locator_contract',
+      '/runtime_residue_retirement',
+    ],
+    authority_boundary: {
+      opl_role: 'controlled_soak_attempt_router_only',
+      domain_truth_owner: DOMAIN_ID,
+      can_hold_visual_truth: false,
+      can_hold_review_export_verdict: false,
+      can_write_canonical_artifacts: false,
+    },
+    repository_boundary: {
+      repo_tracks_visual_or_export_artifacts: false,
+      repo_tracks_receipt_instance: false,
+      repo_tracks_no_regression_projection: true,
+    },
+  };
+}
+
 export function buildStandardDomainAgentSkeleton({
   workspaceRoot,
   runtime,
@@ -795,6 +830,7 @@ export function buildStandardDomainAgentSkeleton({
   const receiptRefs = buildProductSidecarReceiptRefs();
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();
   const controlledMemoryApplyProof = buildControlledMemoryApplyProof();
+  const controlledSoakNoRegressionAttempt = buildControlledSoakNoRegressionAttempt();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
     surface_kind: 'standard_domain_agent_skeleton',
@@ -833,6 +869,7 @@ export function buildStandardDomainAgentSkeleton({
     product_sidecar_receipt_refs: receiptRefs,
     controlled_visual_stage_attempt: controlledAttemptFixture,
     controlled_memory_apply_proof: controlledMemoryApplyProof,
+    controlled_soak_no_regression_attempt: controlledSoakNoRegressionAttempt,
     opl_consumption_boundary: {
       consumes: [
         'stage_descriptor',

@@ -1,5 +1,14 @@
 # RedCube AI 关键决策
 
+## 2026-05-12
+
+### 决策：RCA controlled soak 暂以 typed blocker 收口
+
+- `RedCube AI` 在 product-entry manifest 和 product sidecar projection 中新增 `controlled_soak_no_regression_attempt`。
+- 该 surface 当前固定为 `deferred_typed_blocker`，原因是 `opl_temporal_controlled_visual_stage_attempt_apply_contract` 尚未对 RCA domain apply 开放。
+- OPL 只能读取 no-regression refs、blocker 和下一跳 contract gap；它不持有 visual truth、review/export verdict、canonical artifact、memory body 或 receipt instance。
+- 真实 controlled soak 需要在 OPL apply contract 开放后由 RCA-owned surface 产出 domain receipt。
+
 ## 2026-05-10
 
 ### 决策：RCA 文档第一身份收口到视觉交付，OPL 降为托管运行框架路径

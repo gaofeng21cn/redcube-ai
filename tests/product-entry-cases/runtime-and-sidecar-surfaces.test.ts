@@ -84,6 +84,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.hermes_agent_default_runtime, false);
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.gateway_first_public_entry, false);
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.repo_local_manager_default, false);
+    assert.equal(
+      sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.ref,
+      '/controlled_soak_no_regression_attempt',
+    );
+    assert.equal(sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.state, 'deferred_typed_blocker');
+    assert.equal(
+      sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.next_hop_contract_gap,
+      'opl_temporal_controlled_visual_stage_attempt_apply_contract',
+    );
+    assert.equal(
+      sidecar.source_manifest_refs.controlled_soak_no_regression_attempt_ref,
+      '/controlled_soak_no_regression_attempt',
+    );
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       [

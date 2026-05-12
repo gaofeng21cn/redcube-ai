@@ -878,6 +878,7 @@ export async function getProductEntryManifest(request) {
     product_sidecar_receipt_refs: standardDomainAgentSkeleton.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',
@@ -995,6 +996,7 @@ export async function getProductEntryManifest(request) {
     product_sidecar_receipt_refs: standardDomainAgentSkeleton.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',

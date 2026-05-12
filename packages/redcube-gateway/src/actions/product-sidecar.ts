@@ -205,6 +205,17 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         direct_and_opl_share_sidecar_refs: true,
         direct_and_opl_share_quality_refs: true,
       },
+      controlled_soak_no_regression_attempt: {
+        ref: '/controlled_soak_no_regression_attempt',
+        owner: DOMAIN_ID,
+        state: manifest.controlled_soak_no_regression_attempt?.state || 'deferred_typed_blocker',
+        next_hop_contract_gap: (
+          manifest.controlled_soak_no_regression_attempt
+            ?.deferred_blocker
+            ?.next_hop_contract_gap || 'opl_temporal_controlled_visual_stage_attempt_apply_contract'
+        ),
+        writable_by_sidecar: false,
+      },
     },
     guarded_actions: buildGuardedActionCatalog(),
     blocked_actions: [
@@ -227,6 +238,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       product_sidecar_receipt_refs_ref: '/product_sidecar_receipt_refs',
       controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
       controlled_memory_apply_proof_ref: '/controlled_memory_apply_proof',
+      controlled_soak_no_regression_attempt_ref: '/controlled_soak_no_regression_attempt',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {
