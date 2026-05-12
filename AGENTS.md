@@ -8,7 +8,7 @@
 
 - `AGENTS.md` 只约束工作方式，不承载项目知识细节。
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
-- `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` Codex-first、stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，`Codex CLI` 是 stage 内默认最小执行单元；RCA 持有 visual truth、layout/review verdict、route owner 和 artifact authority。
+- `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，Agent executor 是 stage 内最小执行单位；`Codex CLI` 是当前第一公民 executor，其他 executor adapter 只能显式接入且不承诺行为效果等价。RCA 持有 visual truth、layout/review verdict、route owner 和 artifact authority。
 - `gateway / harness` 只作为仓内边界层、执行层或历史语境保留；对外第一身份是 RedCube AI visual-deliverable domain agent。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
