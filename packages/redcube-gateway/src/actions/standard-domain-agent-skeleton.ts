@@ -785,12 +785,17 @@ function buildControlledSoakNoRegressionAttempt() {
     attempt_id: 'rca.controlled_soak.no_regression_attempt.v1',
     target_domain_id: DOMAIN_ID,
     state: 'deferred_typed_blocker',
-    controlled_soak_apply_contract_open: false,
+    controlled_soak_apply_contract_open: true,
     deferred_blocker: {
-      blocker_kind: 'domain_apply_contract_gap',
-      blocker_id: 'rca_controlled_soak_apply_contract_not_open',
-      next_hop_contract_gap: 'opl_temporal_controlled_visual_stage_attempt_apply_contract',
-      required_owner: 'opl_framework',
+      blocker_kind: 'domain_owner_receipt_required',
+      blocker_id: 'rca_controlled_soak_domain_receipt_required',
+      source_contract: 'opl_temporal_controlled_visual_stage_attempt_apply_contract',
+      required_return_shapes: [
+        'domain_owner_receipt_ref',
+        'typed_blocker',
+        'no_regression_evidence_ref',
+      ],
+      required_owner: DOMAIN_ID,
       domain_owner: DOMAIN_ID,
     },
     no_regression_surface_refs: [

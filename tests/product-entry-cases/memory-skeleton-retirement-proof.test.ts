@@ -62,12 +62,17 @@ test('product-entry manifest exposes physical skeleton audit and runtime residue
     assert.equal(controlledSoak.surface_kind, 'controlled_soak_no_regression_attempt');
     assert.equal(controlledSoak.attempt_id, 'rca.controlled_soak.no_regression_attempt.v1');
     assert.equal(controlledSoak.state, 'deferred_typed_blocker');
-    assert.equal(controlledSoak.controlled_soak_apply_contract_open, false);
-    assert.equal(controlledSoak.deferred_blocker.blocker_kind, 'domain_apply_contract_gap');
+    assert.equal(controlledSoak.controlled_soak_apply_contract_open, true);
+    assert.equal(controlledSoak.deferred_blocker.blocker_kind, 'domain_owner_receipt_required');
     assert.equal(
-      controlledSoak.deferred_blocker.next_hop_contract_gap,
+      controlledSoak.deferred_blocker.source_contract,
       'opl_temporal_controlled_visual_stage_attempt_apply_contract',
     );
+    assert.deepEqual(controlledSoak.deferred_blocker.required_return_shapes, [
+      'domain_owner_receipt_ref',
+      'typed_blocker',
+      'no_regression_evidence_ref',
+    ]);
     assert.equal(controlledSoak.no_regression_surface_refs.includes('/controlled_visual_stage_attempt'), true);
     assert.equal(controlledSoak.no_regression_surface_refs.includes('/controlled_memory_apply_proof'), true);
     assert.equal(controlledSoak.authority_boundary.can_hold_visual_truth, false);

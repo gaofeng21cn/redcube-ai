@@ -209,11 +209,18 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         ref: '/controlled_soak_no_regression_attempt',
         owner: DOMAIN_ID,
         state: manifest.controlled_soak_no_regression_attempt?.state || 'deferred_typed_blocker',
-        next_hop_contract_gap: (
+        source_contract: (
           manifest.controlled_soak_no_regression_attempt
             ?.deferred_blocker
-            ?.next_hop_contract_gap || 'opl_temporal_controlled_visual_stage_attempt_apply_contract'
+            ?.source_contract || 'opl_temporal_controlled_visual_stage_attempt_apply_contract'
         ),
+        required_return_shapes: manifest.controlled_soak_no_regression_attempt
+          ?.deferred_blocker
+          ?.required_return_shapes || [
+            'domain_owner_receipt_ref',
+            'typed_blocker',
+            'no_regression_evidence_ref',
+          ],
         writable_by_sidecar: false,
       },
     },

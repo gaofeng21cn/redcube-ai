@@ -90,9 +90,14 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.state, 'deferred_typed_blocker');
     assert.equal(
-      sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.next_hop_contract_gap,
+      sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.source_contract,
       'opl_temporal_controlled_visual_stage_attempt_apply_contract',
     );
+    assert.deepEqual(sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.required_return_shapes, [
+      'domain_owner_receipt_ref',
+      'typed_blocker',
+      'no_regression_evidence_ref',
+    ]);
     assert.equal(
       sidecar.source_manifest_refs.controlled_soak_no_regression_attempt_ref,
       '/controlled_soak_no_regression_attempt',

@@ -5,9 +5,9 @@
 ### 决策：RCA controlled soak 暂以 typed blocker 收口
 
 - `RedCube AI` 在 product-entry manifest 和 product sidecar projection 中新增 `controlled_soak_no_regression_attempt`。
-- 该 surface 当前固定为 `deferred_typed_blocker`，原因是 `opl_temporal_controlled_visual_stage_attempt_apply_contract` 尚未对 RCA domain apply 开放。
+- 该 surface 当前固定为 `deferred_typed_blocker`，原因是 `opl_temporal_controlled_visual_stage_attempt_apply_contract` 已开放为 OPL attempt projection contract，但 RCA domain owner receipt / no-regression evidence 尚未产出。
 - OPL 只能读取 no-regression refs、blocker 和下一跳 contract gap；它不持有 visual truth、review/export verdict、canonical artifact、memory body 或 receipt instance。
-- 真实 controlled soak 需要在 OPL apply contract 开放后由 RCA-owned surface 产出 domain receipt。
+- 真实 controlled soak 需要由 RCA-owned surface 产出 domain receipt、typed blocker 或 no-regression evidence；没有这些 domain-owned return shape 之前不能声明 production soak success。
 
 ### 决策：PPT review helper line-budget 采用显式 reviewed baseline
 
