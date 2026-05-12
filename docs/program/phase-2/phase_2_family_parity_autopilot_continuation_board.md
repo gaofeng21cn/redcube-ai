@@ -1,6 +1,6 @@
 # Phase 2 Family Parity + Autopilot Continuation Board
 
-生命周期说明：本文是 contract-linked continuation board / absorbed tranche context，不是当前新的 public mainline。当前 RCA 第一身份仍是 visual-deliverable domain agent；OPL 只作为 Codex-first、stage-led 托管框架和 family-level runtime/projection 支撑出现。
+生命周期说明：本文是 contract-linked continuation board / absorbed tranche context，不是当前新的 public mainline。当前 RCA 第一身份仍是 visual-deliverable domain agent；OPL 只作为 stage-led、以 Agent executor 为最小执行单位 托管框架和 family-level runtime/projection 支撑出现。
 
 ## 文档目的
 

@@ -14,7 +14,7 @@
 
 这里的关键约束是：
 
-- 可被 OPL 这类 Codex-first、stage-led 运行框架托管
+- 可被 OPL 这类 stage-led、以 Agent executor 为最小执行单位 运行框架托管
 - 通过同一套 `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 控制链运行
 - 通过 family-specific contract 区分交付物，不通过平行系统分叉主线
 

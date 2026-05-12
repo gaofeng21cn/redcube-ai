@@ -2,7 +2,7 @@
 
 `docs/program/` holds the active baton, absorbed tranche briefs, and contract-linked program records.
 
-`RedCube AI` remains a visual-deliverable domain agent first; OPL is a Codex-first, stage-led runtime framework that may host RCA through an internal integration path. Older filenames that mention gateway, federation, bridge, harness, or Hermes-first routes are retained here when machine-readable contracts still point to their `human_doc:*` semantic IDs.
+`RedCube AI` remains a visual-deliverable domain agent first; OPL is a stage-led runtime framework with Agent executors as the minimum execution unit that may host RCA through an internal integration path. Older filenames that mention gateway, federation, bridge, harness, or Hermes-first routes are retained here when machine-readable contracts still point to their `human_doc:*` semantic IDs.
 
 ## Current Hierarchy
 
@@ -44,7 +44,7 @@ Therefore the safe action is lifecycle labeling and index clarification, not pat
 | --- | --- | --- |
 | `redcube_product_entry_mvp.md` | current baton | Direct RCA product-entry service surface; read with `invokeProductEntry` and current CLI/MCP entry contracts. |
 | `managed_product_entry_hardening.md` | current baton | Product-entry session continuity and user-level runtime-state behavior. |
-| `opl_framework_hosted_product_entry.md` | contract-linked internal integration | OPL-hosted route context; OPL is the Codex-first, stage-led framework and does not own RCA visual truth. |
+| `opl_framework_hosted_product_entry.md` | contract-linked internal integration | OPL-hosted route context; OPL is the stage-led framework with Agent executors as the minimum execution unit and does not own RCA visual truth. |
 | `upstream_hermes_agent_*.md` | proof / provenance, contract-linked | Historical upstream Hermes proof lane and blocker/closeout records; current runtime owner and public identity live in the core docs and current contracts. |
 | `phase-2/` | absorbed tranche, contract-linked | Hardening evidence already absorbed into current runtime/source/delivery/governance surfaces; keep here while `human_doc:*` links remain. |
 

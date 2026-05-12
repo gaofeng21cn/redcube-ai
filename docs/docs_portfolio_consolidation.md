@@ -107,7 +107,7 @@
 
 ## 2026-05-11 RCA / OPL 口径收敛规则
 
-- `README*` 与 `docs/README*` 先写 RCA 的视觉交付领域智能体身份；OPL 只作为 Codex-first、stage-led 的完整智能体运行框架和可外部依赖的托管路径出现。
+- `README*` 与 `docs/README*` 先写 RCA 的视觉交付领域智能体身份；OPL 只作为 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架和可外部依赖的托管路径出现。
 - Codex CLI 是默认 concrete executor，也是未显式选择 hosted/proof backend 时的最小执行单元。
 - `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 旧口径不进入公开第一身份。需要保留时，必须落在 internal integration、provenance、contract reference 或 tombstone 语境。
 - 合同引用优先于物理归档：仍被 `contracts/runtime-program/*.json` 通过 `human_doc:*` 指向的 program brief 不移动；若内容已过时，在文件头写清 lifecycle state、current truth owner 和 reader warning。

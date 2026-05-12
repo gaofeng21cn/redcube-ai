@@ -46,6 +46,7 @@ User / Agent
 当前默认 concrete executor 是 `Codex CLI host-agent runtime`，对应 runtime-program surface 里的 `codex_cli`。它是 direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的最小执行单元。
 
 `hermes_agent` 只表示显式 hosted/proof backend、legacy/optional provider 或历史 proof lane。它不能作为默认 runtime owner 读取，也不能把旧 Hermes-first board 重新提升为当前公开主线。
+`claude_code` 等未来 executor 也按 OPL generic Agent Executor Adapter / receipt 边界显式接入；RCA 只消费 receipt/projection refs，不实现 generic executor owner，也不承诺非默认 executor 的视觉质量、工具语义或 resume 行为与 `Codex CLI` 等价。2026-05-12 当前状态是 adapter/receipt/fail-closed 边界已落地，剩余验收是 provider-hosted controlled visual stage soak、真实 receipt instance、workspace/runtime memory writeback 和 no-forbidden-write proof。
 
 OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 
@@ -111,7 +112,7 @@ Sidecar 不写 visual truth、canonical artifacts、review verdict 或 publicati
 
 ## OPL-hosted Boundary
 
-OPL 是 Codex-first、stage-led 的运行框架，可以把 RCA 作为 admitted domain agent 托管。它的边界是：
+OPL 是 stage-led、以 Agent executor 为最小执行单位的运行框架，可以把 RCA 作为 admitted domain agent 托管。它的边界是：
 
 - 读取 RCA-owned descriptor、manifest、stage/action catalog、sidecar projection 与 receipt refs。
 - 管理 family-level queue、wakeup、handoff、approval/retry/dead-letter、trace/projection。

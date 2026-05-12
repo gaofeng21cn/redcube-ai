@@ -14,7 +14,7 @@ Each tombstone should state:
 Current truth:
 
 - RedCube AI is a visual-deliverable domain agent first.
-- OPL is the Codex-first, stage-led runtime framework and hosted integration path.
+- OPL is the stage-led runtime framework with Agent executors as the minimum execution unit and hosted integration path.
 - Codex CLI is the default minimum concrete execution unit unless a hosted/proof backend is explicitly selected.
 - Contract-linked old briefs stay in `docs/program/` with lifecycle notes until their machine-readable references move.
 

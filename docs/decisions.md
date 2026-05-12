@@ -26,6 +26,13 @@
 - `redcube product sidecar export|dispatch` 继续是 OPL provider 到 RCA owner surface 的受控桥接。OPL/Temporal/Hermes/local provider 只能 enqueue、dispatch、signal、query、投影 attempt/receipt，不得写 visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 - RedCube 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。下方 Hermes-oriented OPL Runtime Manager 决策保留为迁移背景，后续新投入按 Temporal-backed production runtime 解释。
 
+### 决策：RCA 消费 OPL 统一 Agent Executor Adapter receipt
+
+- RCA 的 concrete executor 默认仍是 `Codex CLI`；显式非默认 executor 通过 OPL generic Agent Executor Adapter 进入，RCA 只消费 OPL executor receipt / product sidecar receipt refs。
+- `Hermes-Agent`、`Claude Code` 等只作为显式 opt-in backend。它们必须可接入、可回执、可审计、fail-closed，但不承诺输出质量、视觉审美、tool semantics、resume 或 artifact 结果与 Codex CLI 等价。
+- RCA 保留 visual route truth、review/export gate、canonical artifacts、publication projection truth 和 visual-domain quality authority；generic executor owner 不进入 RCA。
+- 当前状态：除真实 production-hosted controlled visual stage soak 外，本边界已落地到 status/runtime architecture/product sidecar/receipt proof 口径；旧 Hermes/Gateway/local-manager active path 已降为 explicit proof/provenance/history。
+
 ## 2026-05-05
 
 ### 决策：RCA 作为 OPL stage-led framework 上的独立 domain agent

@@ -15,7 +15,7 @@
 ## Current owner surface
 
 - RedCube AI 是 visual-deliverable domain agent，持有 visual truth、layout/review verdict、route owner 与 artifact authority。
-- OPL 是 Codex-first、stage-led 的完整智能体运行框架，可通过内部托管路径调用 RedCube；它不持有 RedCube visual truth。
+- OPL 是 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架，可通过内部托管路径调用 RedCube；它不持有 RedCube visual truth。
 - Codex CLI 是未显式选择 hosted/proof backend 时的默认最小具体执行单元。
 - `gateway` / `harness` 只作为仓内边界层、执行层或历史语境词汇保留。
 - Hermes 只作为 legacy/optional provider、显式 hosted/proof backend 或历史 proof lane 出现。

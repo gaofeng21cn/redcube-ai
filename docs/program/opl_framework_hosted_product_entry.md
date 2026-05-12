@@ -2,7 +2,7 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文由早期 `OPL Gateway` handoff brief 迁移而来，当前口径以 `OPL Framework` 的 Codex-first、stage-led 托管路径为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth。
+生命周期说明：本文由早期 `OPL Gateway` handoff brief 迁移而来，当前口径以 `OPL Framework` 的 stage-led、以 Agent executor 为最小执行单位 托管路径为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth。
 
 ## 一句话结论
 
