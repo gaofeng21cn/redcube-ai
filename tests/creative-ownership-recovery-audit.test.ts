@@ -24,7 +24,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-test('current runtime defaults to Codex substrate while Hermes proof stays opt-in', async () => {
+test('current runtime defaults to Codex substrate while Hermes hosted proof stays opt-in', async () => {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -50,7 +50,7 @@ test('current runtime defaults to Codex substrate while Hermes proof stays opt-i
     assert.equal(hermesNativeProof.primary, false);
     assert.equal(hermesNativeProof.execution_model.mainline_adapter, 'hermes_agent');
     assert.equal(hermesNativeProof.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(hermesNativeProof.execution_model.adapter_role, 'opt_in_proof_executor');
+    assert.equal(hermesNativeProof.execution_model.adapter_role, 'opl_hosted_executor_adapter_proof');
     assert.equal(hermesNativeProof.execution_model.default_model_selection, 'inherit_local_hermes_default');
     assert.equal(hermesNativeProof.execution_model.default_reasoning_effort, 'inherit_local_hermes_default');
 
