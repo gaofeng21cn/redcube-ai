@@ -705,7 +705,7 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
     '--deliverable-id',
     'deck-a',
   ], {
-    gateway: {
+    domainActions: {
       runNativePptProductEntryProof: async (request) => ({
         ok: true,
         surface_kind: 'native_ppt_product_entry_proof',
@@ -753,7 +753,7 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     '--format',
     'json',
   ], {
-    gateway: {
+    domainActions: {
       exportProductSidecar: async (request) => ({
         ok: true,
         surface_kind: 'product_sidecar_export',
@@ -784,7 +784,7 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     '--format',
     'json',
   ], {
-    gateway: {
+    domainActions: {
       dispatchProductSidecar: async (request) => ({
         ok: true,
         surface_kind: 'product_sidecar_dispatch',
@@ -815,7 +815,7 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     '--format',
     'json',
   ], {
-    gateway: {
+    domainActions: {
       dispatchProductSidecar: async (request) => ({
         ok: true,
         surface_kind: 'product_sidecar_dispatch',

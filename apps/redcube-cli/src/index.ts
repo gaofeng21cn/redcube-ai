@@ -1,6 +1,6 @@
 import {
   executeCli as executeCliJs,
-  getCliGatewayActions as getCliGatewayActionsJs,
+  getCliDomainActions as getCliDomainActionsJs,
   main as mainJs,
   runCli as runCliJs,
 } from './cli-parts/dispatch.js';
@@ -10,7 +10,7 @@ import { parseArgs as parseArgsJs, resolveWorkspaceRoot as resolveWorkspaceRootJ
 
 import type {
   CliDependencies,
-  CliGatewayActions,
+  CliDomainActions,
   CliHelpSurface,
   CliOptions,
   CliRunSurface,
@@ -24,12 +24,12 @@ export function resolveWorkspaceRoot(options: CliOptions, cwd?: () => string): s
   return resolveWorkspaceRootJs(options, cwd);
 }
 
-export function getCliGatewayActions(overrides: Partial<CliGatewayActions> = {}): CliGatewayActions {
-  return getCliGatewayActionsJs(overrides) as CliGatewayActions;
+export function getCliDomainActions(overrides: Partial<CliDomainActions> = {}): CliDomainActions {
+  return getCliDomainActionsJs(overrides) as CliDomainActions;
 }
 
-export async function buildHelp(gatewayActions?: CliGatewayActions): Promise<CliHelpSurface> {
-  const actions = gatewayActions || getCliGatewayActionsJs();
+export async function buildHelp(domainActions?: CliDomainActions): Promise<CliHelpSurface> {
+  const actions = domainActions || getCliDomainActionsJs();
   return buildHelpJs(actions as unknown as Record<string, unknown>) as Promise<CliHelpSurface>;
 }
 
@@ -51,7 +51,7 @@ export async function main(argv?: string[], deps: CliDependencies = {}): Promise
 
 export type {
   CliDependencies,
-  CliGatewayActions,
+  CliDomainActions,
   CliHelpSurface,
   CliOptions,
   CliPrivateProfileBootstrapRequest,

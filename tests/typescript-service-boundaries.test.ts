@@ -68,7 +68,7 @@ test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed tool ga
   assert.match(entry, /callGatewayTool/);
   assert.match(entry, /createMcpServer/);
   assert.match(types, /interface GatewayToolDefinition/);
-  assert.match(types, /interface GatewayActionMap/);
+  assert.match(types, /interface DomainActionMap/);
 });
 
 test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and typed registry contracts', () => {

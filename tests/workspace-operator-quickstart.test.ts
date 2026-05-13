@@ -6,8 +6,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { buildCommandHelp, buildHelp, getCliGatewayActions } from '../apps/redcube-cli/dist/cli.js';
-import { getGatewayActions as getMcpGatewayActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
+import { buildCommandHelp, buildHelp, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
+import { getDomainActions as getMcpDomainActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
 import { buildRedCubeActionMetadata } from '../packages/redcube-gateway/dist/index.js';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
@@ -83,8 +83,8 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
 test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickstart action refs', async () => {
   const help = await buildHelp();
   const commands = help.commonTasks.map((item) => item.command);
-  const cliActions = getCliGatewayActions();
-  const mcpActions = getMcpGatewayActions();
+  const cliActions = getCliDomainActions();
+  const mcpActions = getMcpDomainActions();
   const toolNames = new Set(listGatewayTools().map((tool) => tool.name));
 
   assert.equal(new Set(commands).size, commands.length);

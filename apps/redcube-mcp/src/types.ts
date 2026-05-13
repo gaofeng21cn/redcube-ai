@@ -18,7 +18,7 @@ export interface GatewayToolResponse extends Record<string, unknown> {
   isError?: boolean;
 }
 
-export interface GatewayActionMap {
+export interface DomainActionMap {
   doctorWorkspace?: (args: Record<string, unknown>) => Promise<unknown>;
   listTopics?: (args: Record<string, unknown>) => Promise<unknown>;
   getOverlayCatalog?: (args?: unknown) => Promise<unknown>;
@@ -43,4 +43,4 @@ export interface GatewayActionMap {
   [key: string]: ((args: Record<string, unknown>) => Promise<unknown>) | ((args?: unknown) => Promise<unknown>) | undefined;
 }
 
-export interface McpServerDependencies extends GatewayActionMap {}
+export interface McpServerDependencies extends DomainActionMap {}

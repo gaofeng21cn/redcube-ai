@@ -39,7 +39,7 @@ import { printJson } from './output.js';
 import { loadPrivateProfileModule } from './private-profile.js';
 import type { CliDependenciesMap, JsonMap } from './types.js';
 
-const DEFAULT_GATEWAY_ACTIONS = {
+const DEFAULT_DOMAIN_ACTIONS = {
   auditDeliverable,
   applyReviewMutation,
   createDeliverable,
@@ -83,9 +83,9 @@ const DEFAULT_GATEWAY_ACTIONS = {
   runManagedDeliverable,
 };
 
-export function getCliGatewayActions(overrides: Record<string, unknown> = {}): typeof DEFAULT_GATEWAY_ACTIONS {
+export function getCliDomainActions(overrides: Record<string, unknown> = {}): typeof DEFAULT_DOMAIN_ACTIONS {
   return {
-    ...DEFAULT_GATEWAY_ACTIONS,
+    ...DEFAULT_DOMAIN_ACTIONS,
     ...overrides,
   };
 }
@@ -139,7 +139,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   const [command, ...rest] = argv;
   const subcommand = rest[0];
   const options = parseArgs(rest);
-  const gateway = getCliGatewayActions(deps.gateway || {});
+  const gateway = getCliDomainActions(deps.domainActions || {});
   const cwd = deps.cwd || process.cwd;
   const loadPrivateProfile = deps.loadPrivateProfileModule || loadPrivateProfileModule;
 

@@ -67,7 +67,7 @@ const LANGUAGE_TARGET = Object.freeze({
   test_language_policy: 'new_tests_default_to_typescript',
   script_language_policy: 'new_scripts_default_to_typescript',
   agent_guidance: [
-    'New product/runtime contracts, CLI/MCP surfaces, gateway actions, packages, and tests should land as TypeScript.',
+    'New product/runtime contracts, CLI/MCP surfaces, domain actions, packages, and tests should land as TypeScript.',
     'New Office/PPT/document automation helpers should land in Python-owned helper surfaces.',
     'Repo-tracked product, test, and script JavaScript is retired.',
     'New JavaScript under apps/*, packages/*, tests/*, or scripts/* is blocked before merge.',

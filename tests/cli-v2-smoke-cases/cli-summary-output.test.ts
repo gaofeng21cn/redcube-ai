@@ -43,10 +43,10 @@ function minimalLongSurface(kind, extra = {}) {
   };
 }
 
-async function captureCli(argv, gateway) {
+async function captureCli(argv, domainActions) {
   let printed = null;
   const result = await runCli(argv, {
-    gateway,
+    domainActions,
     cwd: () => '/tmp/redcube-workspace',
     printJson(value) {
       printed = value;
@@ -61,7 +61,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'deliverable run',
       argv: ['deliverable', 'run', '--workspace-root', '/tmp/ws', '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--route', 'screenshot_review', '--json-summary'],
-      gateway: {
+      domainActions: {
         runDeliverableRoute: async () => minimalLongSurface('route_run'),
       },
       expectedSurfaceKind: 'route_run',
@@ -69,7 +69,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'deliverable execute',
       argv: ['deliverable', 'execute', '--workspace-root', '/tmp/ws', '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--json-summary'],
-      gateway: {
+      domainActions: {
         runManagedDeliverable: async () => minimalLongSurface('managed_run'),
       },
       expectedSurfaceKind: 'managed_run',
@@ -77,7 +77,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'product invoke',
       argv: ['product', 'invoke', '--workspace-root', '/tmp/ws', '--entry-session-id', 'session-a', '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--json-summary'],
-      gateway: {
+      domainActions: {
         invokeProductEntry: async () => minimalLongSurface('product_entry', {
           continuation_snapshot: {
             latest_run_id: 'run-summary-1',
@@ -90,7 +90,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'managed get',
       argv: ['managed', 'get', '--workspace-root', '/tmp/ws', '--managed-run-id', 'managed-summary-1', '--json-summary'],
-      gateway: {
+      domainActions: {
         getManagedRun: async () => minimalLongSurface('managed_run_record'),
       },
       expectedSurfaceKind: 'managed_run_record',
@@ -98,7 +98,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'managed supervise',
       argv: ['managed', 'supervise', '--workspace-root', '/tmp/ws', '--managed-run-id', 'managed-summary-1', '--json-summary'],
-      gateway: {
+      domainActions: {
         superviseManagedRun: async () => minimalLongSurface('managed_supervision'),
       },
       expectedSurfaceKind: 'managed_supervision',
@@ -106,7 +106,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'runs get',
       argv: ['runs', 'get', '--workspace-root', '/tmp/ws', '--run-id', 'run-summary-1', '--json-summary'],
-      gateway: {
+      domainActions: {
         getRun: async () => minimalLongSurface('run_record'),
       },
       expectedSurfaceKind: 'run_record',
@@ -114,7 +114,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'review get',
       argv: ['review', 'get', '--workspace-root', '/tmp/ws', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--json-summary'],
-      gateway: {
+      domainActions: {
         getReviewState: async () => minimalLongSurface('review_state'),
       },
       expectedSurfaceKind: 'review_state',
@@ -122,7 +122,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     {
       name: 'review watch',
       argv: ['review', 'watch', '--workspace-root', '/tmp/ws', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', 'run-summary-1', '--json-summary'],
-      gateway: {
+      domainActions: {
         runtimeWatch: async () => minimalLongSurface('runtime_watch'),
       },
       expectedSurfaceKind: 'runtime_watch',
@@ -130,7 +130,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
   ];
 
   for (const item of cases) {
-    const { printed, result } = await captureCli(item.argv, item.gateway);
+    const { printed, result } = await captureCli(item.argv, item.domainActions);
     assert.equal(result.ok, true, item.name);
     assert.equal(printed.ok, true, item.name);
     assert.equal(printed.surface_kind, item.expectedSurfaceKind, item.name);

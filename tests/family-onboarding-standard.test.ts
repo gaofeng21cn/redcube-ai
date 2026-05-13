@@ -21,7 +21,7 @@ function readCliSource() {
   ].join('\n');
 }
 
-test('gateway actions no longer hardcode overlay family packages directly', () => {
+test('domain actions no longer hardcode overlay family packages directly', () => {
   const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.ts');
   const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.ts');
 

@@ -62,7 +62,7 @@ export interface CliPrivateProfileModule {
   installPrivateProfile(request: CliPrivateProfileBundleRequest): CliPrivateProfileResult;
 }
 
-export interface CliGatewayActions {
+export interface CliDomainActions {
   doctorWorkspace(request: { workspaceRoot: string }): Promise<WorkspaceDoctorResponse>;
   listTopics(request: { workspaceRoot: string }): Promise<TopicCatalogResponse>;
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
@@ -95,7 +95,7 @@ export interface CliGatewayActions {
 }
 
 export interface CliDependencies {
-  gateway?: Partial<CliGatewayActions>;
+  domainActions?: Partial<CliDomainActions>;
   loadPrivateProfileModule?: () => Promise<CliPrivateProfileModule>;
   cwd?: () => string;
   printJson?: (data: CliRunSurface) => void;

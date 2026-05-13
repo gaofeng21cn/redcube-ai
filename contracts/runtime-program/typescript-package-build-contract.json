@@ -19,7 +19,7 @@
       "contract/governance/overlay packages",
       "CLI/MCP entry packages",
       "runtime-family packages",
-      "gateway actions"
+      "domain actions"
     ]
   },
   "quality_gates": {

@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   executeCli as executeCliJs,
-  getCliGatewayActions as getCliGatewayActionsJs,
+  getCliDomainActions as getCliDomainActionsJs,
   main as mainJs,
   runCli as runCliJs,
 } from './cli-parts/dispatch.js';
@@ -18,7 +18,7 @@ import {
 } from './cli-parts/options.js';
 import type {
   CliDependenciesMap,
-  GatewayActionMap,
+  DomainActionMap,
   JsonMap,
 } from './cli-parts/types.js';
 
@@ -30,12 +30,12 @@ export function resolveWorkspaceRoot(options: JsonMap, cwd?: () => string): stri
   return resolveWorkspaceRootJs(options, cwd);
 }
 
-export function getCliGatewayActions(overrides: GatewayActionMap = {}): JsonMap {
-  return getCliGatewayActionsJs(overrides);
+export function getCliDomainActions(overrides: DomainActionMap = {}): JsonMap {
+  return getCliDomainActionsJs(overrides);
 }
 
-export async function buildHelp(gatewayActions?: GatewayActionMap): Promise<JsonMap> {
-  const actions = gatewayActions || getCliGatewayActionsJs();
+export async function buildHelp(domainActions?: DomainActionMap): Promise<JsonMap> {
+  const actions = domainActions || getCliDomainActionsJs();
   return buildHelpJs(actions);
 }
 

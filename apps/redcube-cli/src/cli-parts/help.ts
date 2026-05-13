@@ -1,4 +1,4 @@
-import type { GatewayActionMap, JsonMap } from './types.js';
+import type { DomainActionMap, JsonMap } from './types.js';
 import { buildRedCubeActionMetadata } from '@redcube/gateway';
 
 function buildCommonFlows(overlayCatalog: { overlays: JsonMap[] }): JsonMap {
@@ -177,11 +177,11 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
 }
 
 /**
- * @param {Record<string, unknown>} [gatewayActions]
+ * @param {Record<string, unknown>} [domainActions]
  * @returns {Promise<Record<string, unknown>>}
  */
-export async function buildHelp(gatewayActions: GatewayActionMap): Promise<JsonMap> {
-  const overlayCatalog = await gatewayActions.getOverlayCatalog();
+export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap> {
+  const overlayCatalog = await domainActions.getOverlayCatalog();
 
   return {
     ok: true,

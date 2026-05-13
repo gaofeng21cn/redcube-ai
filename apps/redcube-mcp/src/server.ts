@@ -40,11 +40,11 @@ import {
 } from '@redcube/gateway';
 import * as z from 'zod/v4';
 
-type GatewayActionMap = Record<string, ((args: Record<string, unknown>) => Promise<unknown>) | ((args?: unknown) => Promise<unknown>)>;
+type DomainActionMap = Record<string, ((args: Record<string, unknown>) => Promise<unknown>) | ((args?: unknown) => Promise<unknown>)>;
 type ToolName = keyof typeof TOOL_ROUTE_DEFINITIONS;
 type ToolArgs = Record<string, unknown>;
 
-export const DEFAULT_GATEWAY_ACTIONS = {
+export const DEFAULT_DOMAIN_ACTIONS = {
   doctorWorkspace,
   listTopics,
   getOverlayCatalog,
@@ -304,9 +304,9 @@ export const TOOL_DEFINITIONS = [
   },
 ];
 
-export function getGatewayActions(overrides = {}) {
+export function getDomainActions(overrides = {}) {
   return {
-    ...DEFAULT_GATEWAY_ACTIONS,
+    ...DEFAULT_DOMAIN_ACTIONS,
     ...overrides,
   };
 }
@@ -357,7 +357,7 @@ export function getToolDefinitions() {
   return TOOL_DEFINITIONS;
 }
 
-export async function callGatewayTool(name: string, args: ToolArgs, deps: Partial<GatewayActionMap> = {}) {
+export async function callGatewayTool(name: string, args: ToolArgs, deps: Partial<DomainActionMap> = {}) {
   const definition = findToolDefinition(name);
   if (!definition) {
     throw new Error(`Unknown tool: ${name}`);
@@ -383,7 +383,7 @@ export async function callGatewayTool(name: string, args: ToolArgs, deps: Partia
   };
   delete forwardedArgs[routeDefinition.selector];
 
-  const actions = getGatewayActions(deps) as Partial<GatewayActionMap>;
+  const actions = getDomainActions(deps) as Partial<DomainActionMap>;
   const action = actions[actionKey];
   if (typeof action !== 'function') {
     throw new Error(`Gateway action not configured: ${actionKey}`);
@@ -392,7 +392,7 @@ export async function callGatewayTool(name: string, args: ToolArgs, deps: Partia
   return action(forwardedArgs);
 }
 
-export function createMcpServer(deps: Partial<GatewayActionMap> = {}) {
+export function createMcpServer(deps: Partial<DomainActionMap> = {}) {
   const server = new McpServer({
     name: 'redcube-gateway',
     version: '0.1.0',
@@ -419,7 +419,7 @@ export function createMcpServer(deps: Partial<GatewayActionMap> = {}) {
   return server;
 }
 
-export async function runStdioServer(deps: Partial<GatewayActionMap> = {}) {
+export async function runStdioServer(deps: Partial<DomainActionMap> = {}) {
   const server = createMcpServer(deps);
   const transport = new StdioServerTransport();
   await server.connect(transport);

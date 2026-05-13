@@ -407,7 +407,7 @@ test('intakeSource blocks pdf extraction explicitly when mineru is unavailable',
   }
 });
 
-test('CLI source intake proxies gateway action', () => {
+test('CLI source intake proxies domain action', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
 
   const output = execFileSync(
