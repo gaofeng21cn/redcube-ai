@@ -7,8 +7,18 @@ import {
   buildSkeletonRepoSourceLayoutAudit,
   buildVisualPatternMemoryWritebackProjection,
 } from './standard-domain-agent-skeleton-parts/memory-apply-proof.js';
+import {
+  buildDomainOwnerReceiptContract,
+  buildLifecycleGuardedApplyProof,
+  buildPhysicalSkeletonFollowThrough,
+  buildReviewHelperBaselineFollowThrough,
+} from './standard-domain-agent-skeleton-parts/functional-closure.js';
 
 export {
+  buildDomainOwnerReceiptContract,
+  buildLifecycleGuardedApplyProof,
+  buildPhysicalSkeletonFollowThrough,
+  buildReviewHelperBaselineFollowThrough,
   buildRuntimeResidueRetirementAudit,
   buildVisualPatternMemoryWritebackProjection,
 };
@@ -836,6 +846,10 @@ export function buildStandardDomainAgentSkeleton({
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();
   const controlledMemoryApplyProof = buildControlledMemoryApplyProof();
   const controlledSoakNoRegressionAttempt = buildControlledSoakNoRegressionAttempt();
+  const domainOwnerReceiptContract = buildDomainOwnerReceiptContract();
+  const lifecycleGuardedApplyProof = buildLifecycleGuardedApplyProof();
+  const physicalSkeletonFollowThrough = buildPhysicalSkeletonFollowThrough();
+  const reviewHelperBaselineFollowThrough = buildReviewHelperBaselineFollowThrough();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
     surface_kind: 'standard_domain_agent_skeleton',
@@ -875,6 +889,10 @@ export function buildStandardDomainAgentSkeleton({
     controlled_visual_stage_attempt: controlledAttemptFixture,
     controlled_memory_apply_proof: controlledMemoryApplyProof,
     controlled_soak_no_regression_attempt: controlledSoakNoRegressionAttempt,
+    domain_owner_receipt_contract: domainOwnerReceiptContract,
+    lifecycle_guarded_apply_proof: lifecycleGuardedApplyProof,
+    physical_skeleton_follow_through: physicalSkeletonFollowThrough,
+    review_helper_baseline_follow_through: reviewHelperBaselineFollowThrough,
     opl_consumption_boundary: {
       consumes: [
         'stage_descriptor',

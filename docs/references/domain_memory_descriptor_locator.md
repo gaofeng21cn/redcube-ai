@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: define the RCA-owned descriptor, migration plan, seed fixture locator, writeback proposal, accept/reject command, writeback receipt locator, controlled apply proof, and operator receipt projection boundary for visual pattern memory consumed by OPL-family surfaces.
 State: `active reference`
-Machine boundary: executable truth is `redcube product manifest#/domain_memory_descriptor_locator`, `redcube product manifest#/controlled_memory_apply_proof`, `contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator`, and `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`.
+Machine boundary: executable truth is `redcube product manifest#/domain_memory_descriptor_locator`, `redcube product manifest#/controlled_memory_apply_proof`, `redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances`, `contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator`, and `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`.
 
 ## Boundary
 
@@ -64,9 +64,9 @@ Forbidden seed fields include memory content bodies, generated slide/page conten
 
 `rca.controlled_visual_stage_attempt.fixture.v1` proves the review/revision/export portion of a visual stage attempt through descriptor refs only. The direct RedCube skill path and OPL-hosted path share the same descriptor refs, product sidecar refs, and quality refs. OPL consumes those refs for queue/projection/receipt behavior; RCA keeps the visual truth, review/export verdicts, and artifact authority.
 
-`rca.visual_pattern_memory.controlled_apply_proof.v1` is the landed controlled apply proof. It exposes consumed visual pattern memory refs, a locator-only writeback proposal projection, accepted/rejected receipt projection cases, and a no-forbidden-write audit. It intentionally excludes memory content bodies, slide/page content, review/export verdicts, visual truth, canonical artifact blobs, and receipt instances from repo source.
+`rca.visual_pattern_memory.controlled_apply_proof.v1` is the landed controlled apply proof. It exposes consumed visual pattern memory refs, a locator-only writeback proposal projection, accepted/rejected receipt projection cases, accepted/rejected runtime receipt refs, and a no-forbidden-write audit. It intentionally excludes memory content bodies, slide/page content, review/export verdicts, visual truth, canonical artifact blobs, and receipt instances from repo source.
 
-This proof closes the repo-source/audit part of the memory apply lane. Real reusable visual lesson body migration, real receipt instances, and domain-owned memory body writeback remain runtime/domain-memory responsibilities outside repo-tracked source.
+This proof closes the repo-source/audit and receipt-ref part of the memory apply lane. Real reusable visual lesson body migration, real receipt instance materialization, and domain-owned memory body writeback remain runtime/domain-memory responsibilities outside repo-tracked source.
 
 ## Authority
 

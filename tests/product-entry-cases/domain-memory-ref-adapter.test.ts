@@ -316,3 +316,32 @@ test('controlled visual-stage memory apply proof carries refs, proposals, and re
     );
   });
 });
+
+test('controlled visual-stage memory apply proof exposes runtime accepted/rejected receipt instances by ref only', async () => {
+  await withMockCodexRuntimeState(async () => {
+    const manifest = await getProductEntryManifest({
+      workspace_root: await prepareProductEntryWorkspace(),
+    });
+    const runtimeReceipts = manifest.controlled_memory_apply_proof.runtime_receipt_instances;
+
+    assert.equal(runtimeReceipts.surface_kind, 'visual_pattern_memory_runtime_receipt_instances');
+    assert.equal(runtimeReceipts.owner, 'redcube_ai');
+    assert.equal(runtimeReceipts.repo_tracks_receipt_instances, false);
+    assert.equal(runtimeReceipts.repo_tracks_memory_content_body, false);
+    assert.deepEqual(
+      runtimeReceipts.instances.map((receipt) => receipt.writeback_status),
+      ['accepted', 'rejected'],
+    );
+    for (const receipt of runtimeReceipts.instances) {
+      assert.equal(receipt.receipt_ref.startsWith('rca-memory-receipt:visual-pattern:'), true);
+      assert.equal(receipt.runtime_locator_ref.startsWith('workspace-runtime-ref:memory-receipt:'), true);
+      assert.equal(receipt.operator_receipt_projection_ref, '/domain_memory_descriptor_locator/operator_receipt_projection');
+      assert.equal(receipt.owner, 'redcube_ai');
+      assert.equal(receipt.memory_content_body_ref.startsWith('rca-memory-content-ref:visual-pattern:'), true);
+      assert.equal(receipt.memory_content_body, undefined);
+      assert.equal(receipt.review_verdict, undefined);
+      assert.equal(receipt.canonical_artifact_blob, undefined);
+    }
+    assertForbiddenKeysAbsent(runtimeReceipts);
+  });
+});

@@ -98,10 +98,32 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'typed_blocker',
       'no_regression_evidence_ref',
     ]);
+    assert.equal(sidecar.mapped_surfaces.owner_receipt_contract.ref, '/domain_owner_receipt_contract');
+    assert.equal(sidecar.mapped_surfaces.owner_receipt_contract.owner, 'redcube_ai');
+    assert.deepEqual(sidecar.mapped_surfaces.owner_receipt_contract.allowed_return_shapes, [
+      'domain_receipt',
+      'typed_blocker',
+      'no_regression_evidence',
+    ]);
+    assert.equal(sidecar.mapped_surfaces.owner_receipt_contract.writable_by_sidecar, false);
+    assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.ref, '/lifecycle_guarded_apply_proof');
+    assert.deepEqual(sidecar.mapped_surfaces.lifecycle_guarded_apply.operations, [
+      'cleanup',
+      'restore',
+      'retention',
+    ]);
+    assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.opl_can_apply_domain_artifact_mutation, false);
+    assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.domain_receipt_required, true);
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pattern_memory_writeback.runtime_receipt_instances_ref,
+      '/controlled_memory_apply_proof/runtime_receipt_instances',
+    );
     assert.equal(
       sidecar.source_manifest_refs.controlled_soak_no_regression_attempt_ref,
       '/controlled_soak_no_regression_attempt',
     );
+    assert.equal(sidecar.source_manifest_refs.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
+    assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       [

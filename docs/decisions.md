@@ -1,5 +1,15 @@
 # RedCube AI 关键决策
 
+## 2026-05-13
+
+### 决策：RCA functional closure 以 owner receipt / memory receipt refs / lifecycle guarded proof 收口
+
+- `RedCube AI` 在 product-entry manifest 和 product sidecar projection 中新增 `domain_owner_receipt_contract`、`lifecycle_guarded_apply_proof`、`physical_skeleton_follow_through` 与 `review_helper_baseline_follow_through`，并把 `controlled_memory_apply_proof` 扩展到 accepted/rejected runtime receipt refs。
+- RCA owner receipt 统一返回 `domain_receipt`、`typed_blocker` 或 `no_regression_evidence`，且只暴露 refs、source refs、forbidden-write proof refs 和 owner 边界；OPL 只能保存 receipt refs、typed blocker 或 no-regression evidence ref。
+- cleanup/restore/retention 的 OPL-owned locator metadata 可以被 OPL 编排；任何 RedCube domain artifact 删除、重写、review/export verdict 或 memory body 写入都必须由 RCA 返回 domain receipt 或 typed blocker。
+- `agent/ contracts/ runtime/ docs/` 物理 skeleton 本轮只做低风险 repo-source entrypoint follow-through 和 parity proof，不移动 workspace artifacts、receipt instances、memory body、PNG/PPTX/PDF 或 review/export verdict。
+- `python/redcube_ai/native_helpers/ppt_deck/review.py` baseline 的后续拆分边界固定为 screenshot capture、geometry audit、markdown report、summary projection；baseline 继续 fail-closed 阻止增长，拆分完成且文件低于 1000 行后删除 baseline。
+
 ## 2026-05-12
 
 ### 决策：RCA controlled soak 暂以 typed blocker 收口

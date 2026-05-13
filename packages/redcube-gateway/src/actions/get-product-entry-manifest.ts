@@ -879,6 +879,10 @@ export async function getProductEntryManifest(request) {
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
+    domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
+    lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
+    physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
+    review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',
@@ -997,6 +1001,10 @@ export async function getProductEntryManifest(request) {
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
+    domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
+    lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
+    physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
+    review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: {
       surface_kind: 'redcube_action_metadata_projection',

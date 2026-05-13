@@ -180,11 +180,15 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'projection_builder',
     'lifecycle_adapter',
     'domain_memory_descriptor_locator',
+    'domain_owner_receipt_contract',
+    'lifecycle_guarded_apply_proof',
   ]);
   assert.equal(skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
   assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
   assert.equal(skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
   assert.equal(skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
+  assert.equal(skeleton.runtime_declarations.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
+  assert.equal(skeleton.runtime_declarations.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
 });
 
 test('RCA controlled soak remains deferred without descriptor index skeleton regression', () => {
@@ -204,6 +208,10 @@ test('RCA controlled soak remains deferred without descriptor index skeleton reg
     'domain_memory_descriptor_locator',
     'controlled_visual_stage_attempt',
     'controlled_memory_apply_proof',
+    'domain_owner_receipt_contract',
+    'lifecycle_guarded_apply_proof',
+    'physical_skeleton_follow_through',
+    'review_helper_baseline_follow_through',
   ]);
   assert.ok(controlledSoak.forbidden_deferred_claims.includes('provider_hosted_controlled_visual_stage_soak_completed'));
   assert.ok(controlledSoak.forbidden_deferred_claims.includes('real_visual_memory_body_repo_tracked'));
@@ -600,6 +608,11 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(applyProof.consumes_visual_pattern_memory_refs, true);
   assert.equal(applyProof.projects_writeback_proposal_ref, true);
   assert.deepEqual(applyProof.projects_accept_reject_receipt_cases, ['accepted', 'rejected']);
+  assert.equal(
+    applyProof.runtime_receipt_instances_ref,
+    'redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances',
+  );
+  assert.deepEqual(applyProof.projects_runtime_receipt_statuses, ['accepted', 'rejected']);
   assert.equal(applyProof.writes_visual_truth, false);
   assert.equal(applyProof.writes_review_verdict, false);
   assert.equal(applyProof.writes_export_verdict, false);
@@ -612,6 +625,35 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.deepEqual(skeletonLayout.expected_roots, ['agent', 'contracts', 'runtime', 'docs']);
   assert.deepEqual(skeletonLayout.missing_roots, []);
   assert.ok(skeletonLayout.forbidden_repo_writes.includes('memory_content_body'));
+
+  const ownerReceipt = payload.current_state.active_baton.scope.domain_owner_receipt_contract;
+  assert.equal(ownerReceipt.status, 'contract_landed');
+  assert.equal(ownerReceipt.contract_id, 'rca.domain_owner_receipt.v1');
+  assert.deepEqual(ownerReceipt.allowed_return_shapes, ['domain_receipt', 'typed_blocker', 'no_regression_evidence']);
+  assert.equal(ownerReceipt.opl_can_store_receipt_refs, true);
+  assert.equal(ownerReceipt.opl_can_store_visual_truth, false);
+  assert.equal(ownerReceipt.opl_can_store_review_export_verdict, false);
+  assert.equal(ownerReceipt.opl_can_store_canonical_artifact_blob, false);
+
+  const lifecycleApply = payload.current_state.active_baton.scope.lifecycle_guarded_apply_proof;
+  assert.equal(lifecycleApply.status, 'guarded_apply_proof_landed_domain_artifact_mutation_requires_receipt');
+  assert.deepEqual(lifecycleApply.operations, ['cleanup', 'restore', 'retention']);
+  assert.equal(lifecycleApply.domain_artifact_mutation_requires_domain_receipt, true);
+  assert.equal(lifecycleApply.opl_can_apply_domain_artifact_mutation, false);
+
+  const physicalFollowThrough = payload.current_state.active_baton.scope.physical_skeleton_follow_through;
+  assert.equal(physicalFollowThrough.status, 'low_risk_repo_source_follow_through_landed');
+  assert.deepEqual(physicalFollowThrough.physical_roots, ['agent', 'contracts', 'runtime', 'docs']);
+
+  const reviewHelper = payload.current_state.active_baton.scope.review_helper_baseline_follow_through;
+  assert.equal(reviewHelper.status, 'baseline_guarded_split_plan_landed');
+  assert.equal(reviewHelper.helper_path, 'python/redcube_ai/native_helpers/ppt_deck/review.py');
+  assert.deepEqual(reviewHelper.split_plan_module_boundaries, [
+    'screenshot_capture',
+    'geometry_audit',
+    'markdown_report',
+    'summary_projection',
+  ]);
 
   assert.equal(residueRetirement.status, 'active_path_retired');
   assert.deepEqual(residueRetirement.retired_default_surfaces, [

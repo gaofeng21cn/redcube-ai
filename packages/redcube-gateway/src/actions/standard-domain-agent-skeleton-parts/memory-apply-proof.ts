@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { buildRuntimeMemoryReceiptInstances } from './functional-closure.js';
 
 const DOMAIN_OWNER = 'redcube_ai';
 export const CONTROLLED_MEMORY_APPLY_PROOF_STATE = 'controlled_apply_proof_landed_memory_body_external';
@@ -124,6 +125,7 @@ export function buildControlledMemoryApplyProof() {
         },
       ],
     },
+    runtime_receipt_instances: buildRuntimeMemoryReceiptInstances(),
     forbidden_write_audit: {
       writes_visual_truth: false,
       writes_review_verdict: false,
