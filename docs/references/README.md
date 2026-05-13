@@ -11,7 +11,7 @@ Current groups:
 - Maintainer and series governance: `series-doc-governance-checklist.md`
 - Positioning references: `positioning/domain-harness-os-positioning.md` (internal boundary vocabulary, not public first identity)
 - Current operator references: `rca_executor_routing_config.md`, `opl_family_contract_adoption.md`, `opl_managed_runtime_three_layer_contract.md`, `lightweight_product_entry_and_opl_handoff.md`, `domain_memory_descriptor_locator.md`
-- Future-facing target states: `direct_delivery_longrun_target_state.md`, `source_readiness_deep_research_longrun_target_state.md`
+- Future-facing target states: `direct_delivery_longrun_target_state.md`, `source_readiness_deep_research_longrun_target_state.md`, `rca-visual-deliverable-agent-ideal-state.zh-CN.md`
 - Audits and closeouts still relevant to current interpretation: `creative-stage-ai-first-audit-2026-04-13.md`, `ppt_mainline_quality_closeout.md`
 
 ## Current Disposition
@@ -26,5 +26,6 @@ Current groups:
 | `domain_memory_descriptor_locator.md` | active contract-linked reference | RCA owns visual pattern memory descriptors, locators, and receipts; OPL consumes refs only. |
 | `direct_delivery_longrun_target_state.md` | future-facing reference | Target-state thinking; current runtime truth stays with runtime/source/delivery owner docs and contracts. |
 | `source_readiness_deep_research_longrun_target_state.md` | future-facing reference | Source-plane target-state thinking only. |
+| `rca-visual-deliverable-agent-ideal-state.zh-CN.md` | north-star reference | Target-state thinking for RCA as a visual-deliverable Foundry Agent; current truth stays in core docs, contracts, product-entry manifest, workspace artifacts, and RCA-owned gates. |
 | `creative-stage-ai-first-audit-2026-04-13.md` | audit provenance with current caution | Useful to understand AI-first closure; older `render_html` defaults must be read against current image-first default. |
 | `ppt_mainline_quality_closeout.md` | resolved historical quality closeout | HTML quality debt closeout; current PPT default is image-first. |
