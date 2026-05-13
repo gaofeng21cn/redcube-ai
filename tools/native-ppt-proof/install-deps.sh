@@ -42,10 +42,10 @@ install_linux() {
 
   if have_command sudo; then
     sudo apt-get update
-    sudo apt-get install -y libreoffice poppler-utils fonts-noto-cjk
+    sudo apt-get install -y --no-install-recommends libreoffice poppler-utils fonts-noto-cjk
   else
     apt-get update
-    apt-get install -y libreoffice poppler-utils fonts-noto-cjk
+    apt-get install -y --no-install-recommends libreoffice poppler-utils fonts-noto-cjk
   fi
 }
 

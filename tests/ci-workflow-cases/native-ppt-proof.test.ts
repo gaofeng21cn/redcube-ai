@@ -21,7 +21,7 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof/);
   assert.match(installScript, /brew install --cask libreoffice/);
   assert.match(installScript, /brew install poppler/);
-  assert.match(installScript, /apt-get install -y libreoffice poppler-utils fonts-noto-cjk/);
+  assert.match(installScript, /apt-get install -y --no-install-recommends libreoffice poppler-utils fonts-noto-cjk/);
   assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
   assert.match(runner, /redcube_ai\.native_helpers\.doctor/);
   assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native/);
