@@ -24,7 +24,7 @@
     "in_scope": [
       "persist topic_id and deliverable_id on deliverable-scope run records so runtime watch can verify the canonical workspace/topic/deliverable/run quartet instead of trusting an implicit convention",
       "make runtimeWatch fail closed when a persisted or preloaded run does not match the requested topic_id and deliverable_id",
-      "keep CLI review watch and MCP runtime_watch on the same fail-closed quartet locator truth as the shared runtimeWatch gateway action",
+      "keep CLI review watch and MCP runtime_watch on the same fail-closed quartet locator truth as the shared runtimeWatch action surface",
       "keep auditDeliverable, runtimeWatch, getReviewState, and getPublicationProjection aligned on the same governance summaries while tightening run-boundary identity integrity"
     ],
     "out_of_scope": [
@@ -60,7 +60,7 @@
     "deliverable_watch_without_run_rule": "when workspaceRoot/topicId/deliverableId are supplied without runId or run, runtimeWatch remains a deliverable-level review watch surface and does not require run identity fields",
     "cli_surface": "redcube review watch",
     "mcp_tool": "runtime_watch",
-    "shared_gateway_action": "runtimeWatch"
+    "shared_action_surface": "runtimeWatch"
   },
   "minimal_test_surface": {
     "truth_freeze_tests": [

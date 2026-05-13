@@ -121,23 +121,23 @@ const PROJECTION_METADATA: Record<string, JsonMap> = {
 
 function help(
   usage: string,
-  gatewayAction: string,
+  apiSurface: string,
   boundaryFields: string[],
   shellKey?: string,
 ): JsonMap {
   return {
     usage,
-    gateway_action: gatewayAction,
+    api_surface: apiSurface,
     boundary_fields: boundaryFields,
     ...(shellKey ? { shell_key: shellKey } : {}),
   };
 }
 
-function surface(toolName: string, actionKey: string, gatewayAction: string, command?: string): JsonMap {
+function surface(toolName: string, actionKey: string, apiSurface: string, command?: string): JsonMap {
   return {
     tool_name: toolName,
     action_key: actionKey,
-    gateway_action: gatewayAction,
+    api_surface: apiSurface,
     ...(command ? { command } : {}),
   };
 }
@@ -412,8 +412,9 @@ function cliEntry(actionEntry: JsonMap): JsonMap | null {
   const metadata = PROJECTION_METADATA[actionEntry.action_id]?.cli ?? {};
   return {
     ...projected,
+    action_ref: actionEntry.action_id,
     usage: metadata.usage,
-    gateway_action: metadata.gateway_action,
+    api_surface: metadata.api_surface,
     boundary_fields: metadata.boundary_fields ?? [],
     shell_key: metadata.shell_key ?? null,
   };
@@ -447,7 +448,7 @@ function mcpAction(actionEntry: JsonMap): JsonMap | null {
     ...projected,
     tool_name: descriptor.tool_name,
     action_key: descriptor.action_key,
-    gateway_action: metadata.gateway_action,
+    api_surface: metadata.api_surface,
   };
 }
 
@@ -467,7 +468,7 @@ export function buildRedCubeActionMetadata() {
       const routes = Object.fromEntries(
         mcpActions
           .filter((entry) => entry.tool_name === tool.name)
-          .map((entry) => [entry.action_key, entry.gateway_action]),
+          .map((entry) => [entry.action_key, entry.api_surface]),
       );
       return [tool.name, { selector: tool.selector, routes }];
     }),

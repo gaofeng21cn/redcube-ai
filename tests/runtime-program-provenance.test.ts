@@ -2,15 +2,49 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 import {
   buildTestGroups,
   TEST_REGISTRY,
 } from '../scripts/test-registry.ts';
 
+const ACTIVE_MACHINE_READABLE_ROOTS = Object.freeze([
+  'apps',
+  'packages',
+  'contracts',
+  'plugins',
+  'scripts',
+  'tests',
+  'tools',
+  'python',
+]);
+const TEXT_EXTENSIONS = new Set([
+  '.json',
+  '.ts',
+  '.tsx',
+  '.js',
+  '.mjs',
+  '.cjs',
+  '.py',
+  '.sh',
+  '.yaml',
+  '.yml',
+]);
+
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
+}
+
+function listTextFiles(root) {
+  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'dist' || entry.name === 'build' || entry.name === 'node_modules') return [];
+      return listTextFiles(file);
+    }
+    return entry.isFile() && TEXT_EXTENSIONS.has(path.extname(entry.name)) ? [file] : [];
+  });
 }
 
 const ACTIVE_BATON_ID = 'managed_product_entry_hardening';
@@ -56,7 +90,8 @@ test('current runtime program keeps one active baton and machine-readable histor
   const activeContract = readJson(ACTIVE_BATON_CONTRACT);
   assert.equal(activeContract.managed_product_entry_hardening_id, ACTIVE_BATON_ID);
   assert.equal(activeContract.status, 'closeout_completed');
-  assert.equal(activeContract.callable_surface.gateway_action, 'getProductEntrySession');
+  assert.equal(activeContract.callable_surface.action_ref, 'get_product_entry_session');
+  assert.equal(activeContract.callable_surface.api_surface, 'getProductEntrySession');
 
   for (const historicalContract of HISTORICAL_CONTRACTS) {
     const milestone = currentProgram.current_state.foundation_milestones[historicalContract.milestone];
@@ -69,6 +104,32 @@ test('current runtime program keeps one active baton and machine-readable histor
   for (const snapshot of Object.values(currentProgram.historical_snapshots)) {
     assert.equal(snapshot.is_active_mainline, false);
   }
+});
+
+test('active machine-readable surfaces use neutral action naming instead of retired gateway fields', () => {
+  const violations = [];
+  const forbidden = new RegExp(
+    `\\b(?:${[
+      ['gateway', 'surface'],
+      ['gateway', 'action'],
+      ['gateway', 'actions'],
+      ['shared', 'gateway', 'action'],
+      ['downstream', 'gateway', 'action'],
+    ].map((parts) => parts.join('_')).join('|')})\\b`,
+  );
+
+  for (const file of ACTIVE_MACHINE_READABLE_ROOTS.flatMap((root) => {
+    if (!existsSync(path.resolve(root))) return [];
+    return path.extname(root) ? [root] : listTextFiles(root);
+  })) {
+    if (file === 'tests/runtime-program-provenance.test.ts') continue;
+    const text = readFileSync(file, 'utf-8');
+    if (forbidden.test(text)) {
+      violations.push(file);
+    }
+  }
+
+  assert.deepEqual(violations, []);
 });
 
 test('historical lane is a compact explicit provenance guard outside the active full suite', () => {

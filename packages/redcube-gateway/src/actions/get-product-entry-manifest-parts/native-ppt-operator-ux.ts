@@ -176,7 +176,7 @@ export function buildNativePptOperatorUx({
         + '--style-reference-dir <style-reference-dir> --mock-image-generation'
       ),
       repo_owned_runner: true,
-      downstream_gateway_action: 'repo_owned_image_ppt_proof_runner',
+      downstream_action_ref: 'repo_owned_image_ppt_proof_runner',
       delegates_to: 'tools/image-ppt-proof/run.sh',
       public_skill_policy: 'do_not_register_as_second_public_skill',
       allowed_routes: Array.isArray(imageLane.runnable_routes)
@@ -200,7 +200,7 @@ export function buildNativePptOperatorUx({
         + '--deliverable-id <deliverable-id> --route author_pptx_native'
       ),
       repo_owned_runner: true,
-      downstream_gateway_action: 'runNativePptProductEntryProof',
+      downstream_action_ref: 'runNativePptProductEntryProof',
       delegates_to: 'runDeliverableRoute',
       public_skill_policy: 'do_not_register_as_second_public_skill',
       allowed_routes: runnableRoutes,

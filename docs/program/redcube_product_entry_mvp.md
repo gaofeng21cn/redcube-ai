@@ -24,7 +24,8 @@
 ## 合同与调用面
 
 - contract：`contracts/runtime-program/redcube-product-entry-mvp.json`
-- gateway action：`invokeProductEntry`
+- action ref：`invoke_product_entry`
+- API surface：`invokeProductEntry`
 - CLI：`redcube product invoke`
 - MCP：`invoke_product_entry`
 

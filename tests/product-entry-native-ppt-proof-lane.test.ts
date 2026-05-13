@@ -132,7 +132,7 @@ test('product-entry manifest exposes image-first default and explicit native PPT
   assert.equal(manifest.native_ppt_operator_ux.cache_status.status, 'runtime_cache_not_inspected');
   assert.equal(manifest.native_ppt_operator_ux.artifact_inventory.status, 'session_artifacts_not_inspected');
   assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.helper_command, 'redcube image-ppt proof');
-  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.downstream_gateway_action, 'repo_owned_image_ppt_proof_runner');
+  assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.downstream_action_ref, 'repo_owned_image_ppt_proof_runner');
   assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.delegates_to, 'tools/image-ppt-proof/run.sh');
   assert.doesNotMatch(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--workspace-root/);
   assert.match(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--mock-image-generation/);

@@ -24,8 +24,8 @@
 ## 合同与调用面
 
 - contract：`contracts/runtime-program/opl-framework-hosted-product-entry.json`
-- gateway action：`invokeOplHostedProductEntry`
-- framework action ref：`opl_framework:hosted_product_entry`
+- action ref：`opl_framework:hosted_product_entry`
+- API surface：`invokeOplHostedProductEntry`
 - sidecar dispatch：`redcube product sidecar dispatch`
 
 ## 最小 handoff envelope

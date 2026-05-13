@@ -16,8 +16,8 @@
     ]
   },
   "callable_surface": {
-    "gateway_action": "invokeOplHostedProductEntry",
-    "framework_action_ref": "opl_framework:hosted_product_entry",
+    "action_ref": "opl_framework:hosted_product_entry",
+    "api_surface": "invokeOplHostedProductEntry",
     "sidecar_dispatch": "redcube product sidecar dispatch"
   },
   "hosted_handoff_contract": {

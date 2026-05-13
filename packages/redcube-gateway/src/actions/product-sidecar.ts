@@ -78,35 +78,35 @@ function buildGuardedActionCatalog() {
       effect: 'read_only',
       summary: 'Read RCA runtimeWatch for an existing run locator.',
       required_fields: ['workspace_root', 'topic_id', 'deliverable_id', 'run_id'],
-      gateway_action: 'runtimeWatch',
+      api_surface: 'runtimeWatch',
     },
     {
       action: 'supervise_managed_run',
       effect: 'guarded_runtime_tick',
       summary: 'Run one RCA-owned superviseManagedRun tick for an existing managed run.',
       required_fields: ['workspace_root', 'managed_run_id'],
-      gateway_action: 'superviseManagedRun',
+      api_surface: 'superviseManagedRun',
     },
     {
       action: 'product_entry_continuation',
       effect: 'guarded_product_entry_continuation',
       summary: 'Continue the same RCA product-entry session through RCA-owned gates.',
       required_fields: ['workspace_root', 'entry_session_id'],
-      gateway_action: 'invokeProductEntry',
+      api_surface: 'invokeProductEntry',
     },
     {
       action: 'emit_no_regression_evidence',
       effect: 'guarded_runtime_evidence_write',
       summary: 'Emit RCA-owned no-regression evidence refs for descriptor/runtime surfaces without writing visual artifacts or claiming long soak.',
       required_fields: ['workspace_root', 'evidence_id'],
-      gateway_action: 'productSidecarEmitNoRegressionEvidence',
+      api_surface: 'productSidecarEmitNoRegressionEvidence',
     },
     {
       action: 'notification_receipt',
       effect: 'control_plane_ack_only',
       summary: 'Acknowledge an OPL/Hermes notification without writing RCA visual truth, review verdict, or publication gate.',
       required_fields: ['notification_id'],
-      gateway_action: 'none',
+      api_surface: 'none',
     },
   ];
 }
@@ -144,12 +144,12 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       },
       runtime_watch: {
         command: 'redcube review watch',
-        gateway_action: 'runtimeWatch',
+        api_surface: 'runtimeWatch',
         owner: DOMAIN_ID,
       },
       supervise_managed_run: {
         command: 'redcube managed supervise',
-        gateway_action: 'superviseManagedRun',
+        api_surface: 'superviseManagedRun',
         owner: DOMAIN_ID,
       },
       review_projection: {

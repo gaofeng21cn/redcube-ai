@@ -46,7 +46,7 @@ export function buildRedCubeDomainEntryContract({
       command: productManifestCommand,
       required_fields: ['workspace_root'],
       extra_payload: {
-        gateway_action: 'getProductEntryManifest',
+        api_surface: 'getProductEntryManifest',
         target_surface_kind: 'product_entry_manifest',
       },
     },
@@ -54,7 +54,7 @@ export function buildRedCubeDomainEntryContract({
       command: productStatusCommand,
       required_fields: ['workspace_root'],
       extra_payload: {
-        gateway_action: 'getProductStatus',
+        api_surface: 'getProductStatus',
         target_surface_kind: 'product_status',
       },
     },
@@ -62,7 +62,7 @@ export function buildRedCubeDomainEntryContract({
       command: productStartCommand,
       required_fields: ['workspace_root'],
       extra_payload: {
-        gateway_action: 'getProductStart',
+        api_surface: 'getProductStart',
         target_surface_kind: 'product_entry_start',
       },
     },
@@ -71,7 +71,7 @@ export function buildRedCubeDomainEntryContract({
       required_fields: ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
       extra_payload: {
-        gateway_action: 'invokeProductEntry',
+        api_surface: 'invokeProductEntry',
         target_surface_kind: 'product_entry',
       },
     },
@@ -79,7 +79,7 @@ export function buildRedCubeDomainEntryContract({
       command: productSessionCommand,
       required_fields: ['entry_session_id'],
       extra_payload: {
-        gateway_action: 'getProductEntrySession',
+        api_surface: 'getProductEntrySession',
         target_surface_kind: 'product_entry_session',
       },
     },

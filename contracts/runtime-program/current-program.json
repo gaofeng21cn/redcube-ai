@@ -846,26 +846,26 @@
         "status": "closeout_completed",
         "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
         "brief": "human_doc:program_upstream_hermes_agent_service_safe_domain_entry",
-        "gateway_surface": "invokeDomainEntry",
+        "action_surface": "invokeDomainEntry",
         "validation_mode": "fail_closed_on_missing_or_mismatched_opl_handoff_envelope"
       },
       "redcube_product_entry_mvp": {
         "status": "closeout_completed",
         "contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
         "brief": "human_doc:program_redcube_product_entry_mvp",
-        "gateway_surface": "invokeProductEntry"
+        "action_surface": "invokeProductEntry"
       },
       "opl_framework_hosted_product_entry": {
         "status": "closeout_completed",
         "contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
         "brief": "human_doc:program_opl_framework_hosted_product_entry",
-        "gateway_surface": "invokeOplHostedProductEntry"
+        "action_surface": "invokeOplHostedProductEntry"
       },
       "managed_product_entry_hardening": {
         "status": "closeout_completed",
         "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "brief": "human_doc:program_managed_product_entry_hardening",
-        "gateway_surface": "getProductEntrySession"
+        "action_surface": "getProductEntrySession"
       },
       "upstream_hermes_agent_live_verification_blocker": {
         "status": "historical_blocker_resolved",

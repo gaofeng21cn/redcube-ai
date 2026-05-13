@@ -24,7 +24,8 @@ direct / OPL-hosted 两条入口现在共享一个用户级 session store：
 ## 合同与调用面
 
 - contract：`contracts/runtime-program/managed-product-entry-hardening.json`
-- gateway action：`getProductEntrySession`
+- action ref：`get_product_entry_session`
+- API surface：`getProductEntrySession`
 - CLI：`redcube product session`
 - MCP：`get_product_entry_session`
 

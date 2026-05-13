@@ -904,7 +904,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
       assert.equal(manifest.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
       assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.helper_command, 'redcube image-ppt proof');
-      assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.downstream_gateway_action, 'repo_owned_image_ppt_proof_runner');
+      assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.downstream_action_ref, 'repo_owned_image_ppt_proof_runner');
       assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.delegates_to, 'tools/image-ppt-proof/run.sh');
       assert.doesNotMatch(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--workspace-root/);
       assert.equal(manifest.native_ppt_operator_ux.proof_runner.public_skill_policy, 'do_not_register_as_second_public_skill');

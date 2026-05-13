@@ -80,7 +80,7 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
   assert.equal(typeof parsed.usage.deliverableExecute, 'string');
 });
 
-test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickstart gateway actions', async () => {
+test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickstart action refs', async () => {
   const help = await buildHelp();
   const commands = help.commonTasks.map((item) => item.command);
   const cliActions = getCliGatewayActions();
@@ -132,7 +132,8 @@ test('CLI product-entry and proof command help is projected from family action m
     assert.equal(help.command, commandKey);
     assert.equal(help.summary, entry.summary);
     assert.equal(help.usage, entry.usage);
-    assert.equal(help.gateway_action, entry.gateway_action);
+    assert.equal(help.action_ref, entry.action_ref);
+    assert.equal(help.api_surface, entry.api_surface);
     assert.deepEqual(help.boundary_fields, entry.boundary_fields);
   }
 });

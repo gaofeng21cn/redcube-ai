@@ -382,43 +382,43 @@ test('CLI subcommand --help returns machine-readable command help without execut
     {
       args: ['workspace', 'doctor', '--help'],
       command: 'workspace doctor',
-      gatewayAction: 'doctorWorkspace',
+      actionRef: 'doctorWorkspace',
       usageIncludes: '--workspace-root <dir>',
     },
     {
       args: ['source', 'intake', '--help'],
       command: 'source intake',
-      gatewayAction: 'intakeSource',
+      actionRef: 'intakeSource',
       usageIncludes: '--topic-id <id>',
     },
     {
       args: ['source', 'research', '--help'],
       command: 'source research',
-      gatewayAction: 'researchSource',
+      actionRef: 'researchSource',
       usageIncludes: '--payload-file /abs/result.json',
     },
     {
       args: ['deliverable', 'create', '--help'],
       command: 'deliverable create',
-      gatewayAction: 'createDeliverable',
+      actionRef: 'createDeliverable',
       usageIncludes: '--deliverable-id <id>',
     },
     {
       args: ['deliverable', 'audit', '--help'],
       command: 'deliverable audit',
-      gatewayAction: 'auditDeliverable',
+      actionRef: 'auditDeliverable',
       usageIncludes: '--mode <draft_new|optimize_existing>',
     },
     {
       args: ['deliverable', 'run', '--help'],
       command: 'deliverable run',
-      gatewayAction: 'runDeliverableRoute',
+      actionRef: 'runDeliverableRoute',
       usageIncludes: '--route <stage>',
     },
     {
       args: ['review', 'watch', '--help'],
       command: 'review watch',
-      gatewayAction: 'runtimeWatch',
+      actionRef: 'runtimeWatch',
       usageIncludes: '--run-id <id>',
     },
   ];
@@ -432,7 +432,7 @@ test('CLI subcommand --help returns machine-readable command help without execut
     assert.equal(parsed.ok, true);
     assert.equal(parsed.surface_kind, 'command_help');
     assert.equal(parsed.command, item.command);
-    assert.equal(parsed.gateway_action, item.gatewayAction);
+    assert.equal(parsed.action_ref, item.actionRef);
     assert.equal(parsed.usage.includes(item.usageIncludes), true);
     assert.deepEqual(parsed.canonical_operator_route, expectedRoute);
   }

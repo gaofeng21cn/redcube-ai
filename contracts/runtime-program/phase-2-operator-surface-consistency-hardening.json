@@ -70,7 +70,7 @@
         "command",
         "summary",
         "usage",
-        "gateway_action",
+        "action_ref",
         "canonical_operator_route"
       ]
     },
@@ -94,7 +94,7 @@
     "mcp_cli_alignment": {
       "cli_surface": "redcube review watch",
       "mcp_tool": "runtime_watch",
-      "shared_gateway_action": "runtimeWatch"
+      "shared_action_surface": "runtimeWatch"
     }
   },
   "minimal_test_surface": {

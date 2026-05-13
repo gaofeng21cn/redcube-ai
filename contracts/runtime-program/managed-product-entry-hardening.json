@@ -4,7 +4,8 @@
   "status": "closeout_completed",
   "goal": "Persist product-entry session continuity under user-level runtime-state and expose a repo-verified continuation surface.",
   "callable_surface": {
-    "gateway_action": "getProductEntrySession",
+    "action_ref": "get_product_entry_session",
+    "api_surface": "getProductEntrySession",
     "cli_entry": "redcube product session",
     "mcp_tool": "get_product_entry_session"
   },

@@ -4,7 +4,8 @@
   "status": "closeout_completed",
   "goal": "Land a repo-verified RedCube direct product-entry service surface without changing the visual-domain boundary.",
   "callable_surface": {
-    "gateway_action": "invokeProductEntry",
+    "action_ref": "invoke_product_entry",
+    "api_surface": "invokeProductEntry",
     "cli_entry": "redcube product invoke",
     "mcp_tool": "invoke_product_entry"
   },
