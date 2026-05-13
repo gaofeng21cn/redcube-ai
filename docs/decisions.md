@@ -8,7 +8,7 @@
 - RCA owner receipt 统一返回 `domain_receipt`、`typed_blocker` 或 `no_regression_evidence`，且只暴露 refs、source refs、forbidden-write proof refs 和 owner 边界；OPL 只能保存 receipt refs、typed blocker 或 no-regression evidence ref。
 - cleanup/restore/retention 的 OPL-owned locator metadata 可以被 OPL 编排；任何 RedCube domain artifact 删除、重写、review/export verdict 或 memory body 写入都必须由 RCA 返回 domain receipt 或 typed blocker。
 - `agent/ contracts/ runtime/ docs/` 物理 skeleton 本轮只做低风险 repo-source entrypoint follow-through 和 parity proof，不移动 workspace artifacts、receipt instances、memory body、PNG/PPTX/PDF 或 review/export verdict。
-- `python/redcube_ai/native_helpers/ppt_deck/review.py` baseline 的后续拆分边界固定为 screenshot capture、geometry audit、markdown report、summary projection；baseline 继续 fail-closed 阻止增长，拆分完成且文件低于 1000 行后删除 baseline。
+- `python/redcube_ai/native_helpers/ppt_deck/review.py` baseline 的后续拆分边界固定为 screenshot capture、geometry audit、markdown report、summary projection；2026-05-13 follow-through 已拆出 geometry audit、markdown report 与 summary projection，并删除 `review.py` line-budget baseline。
 
 ## 2026-05-12
 
@@ -19,11 +19,11 @@
 - OPL 只能读取 no-regression refs、blocker 和下一跳 contract gap；它不持有 visual truth、review/export verdict、canonical artifact、memory body 或 receipt instance。
 - 真实 controlled soak 需要由 RCA-owned surface 产出 domain receipt、typed blocker 或 no-regression evidence；没有这些 domain-owned return shape 之前不能声明 production soak success。
 
-### 决策：PPT review helper line-budget 采用显式 reviewed baseline
+### 决策：PPT review helper baseline 已降级为默认 line-budget 守门
 
 - `python/redcube_ai/native_helpers/ppt_deck/review.py` 当前为 1154 行，属于既有 native screenshot/layout review helper 的集中实现。
-- 本轮不改变 review 行为，不把拆分和 controlled soak blocker 混在同一个变更中；`scripts/line-budget.ts` 记录 1154 行 reviewed baseline，并 fail-closed 阻止继续增长。
-- 后续结构拆分应在独立 lane 内把 Playwright capture、block geometry audit、markdown report 和 result summary 拆成 focused modules；拆完且文件回到 1000 行以内后删除 baseline。
+- 2026-05-13 follow-through 不改变 review 行为，已把 geometry audit 与 result summary / markdown report 拆成 focused modules；`scripts/line-budget.ts` 不再保留 `review.py` baseline。
+- 后续结构拆分只剩 Playwright screenshot capture 主体，应继续按行为保持的 native review 验证推进。
 
 ## 2026-05-10
 

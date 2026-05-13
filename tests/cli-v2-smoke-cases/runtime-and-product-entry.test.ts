@@ -733,6 +733,16 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     }),
     'utf-8',
   );
+  const evidenceTaskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-sidecar-evidence-task-')), 'task.json');
+  writeFileSync(
+    evidenceTaskFile,
+    JSON.stringify({
+      action: 'emit_no_regression_evidence',
+      workspace_root: '/tmp/redcube-sidecar-workspace',
+      evidence_id: 'cli-no-regression',
+    }),
+    'utf-8',
+  );
 
   const exported = await executeCli([
     'product',
@@ -795,6 +805,34 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
   assert.equal(dispatched.sidecar_policy.writes_visual_truth, false);
   assert.equal(dispatched.sidecar_policy.writes_review_verdict, false);
   assert.equal(dispatched.sidecar_policy.writes_publication_gate, false);
+
+  const evidenceDispatched = await executeCli([
+    'product',
+    'sidecar',
+    'dispatch',
+    '--task',
+    evidenceTaskFile,
+    '--format',
+    'json',
+  ], {
+    gateway: {
+      dispatchProductSidecar: async (request) => ({
+        ok: true,
+        surface_kind: 'product_sidecar_dispatch',
+        request,
+        result_surface: {
+          surface_kind: 'no_regression_evidence',
+          evidence_ref: 'rca-no-regression:visual-stage:cli-no-regression',
+        },
+      }),
+    },
+  });
+
+  assert.equal(evidenceDispatched.ok, true);
+  assert.equal(evidenceDispatched.surface_kind, 'product_sidecar_dispatch');
+  assert.equal(evidenceDispatched.request.task_file, evidenceTaskFile);
+  assert.equal(evidenceDispatched.result_surface.surface_kind, 'no_regression_evidence');
+  assert.equal(evidenceDispatched.result_surface.evidence_ref, 'rca-no-regression:visual-stage:cli-no-regression');
 });
 
 test('CLI image-ppt proof runs repo-owned lightweight mock runner by default', async () => {

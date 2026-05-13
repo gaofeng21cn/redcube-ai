@@ -735,12 +735,7 @@ export async function getProductEntryManifest(request) {
         provider_transport_owner: 'opl_family_runtime_provider',
         control_plane_owner: 'opl',
         domain_truth_owner: 'redcube_ai',
-        allowed_actions: [
-          'runtime_watch',
-          'supervise_managed_run',
-          'product_entry_continuation',
-          'notification_receipt',
-        ],
+        allowed_actions: ['runtime_watch', 'supervise_managed_run', 'product_entry_continuation', 'emit_no_regression_evidence', 'notification_receipt'],
         forbidden_writes: [
           'visual_truth',
           'review_verdict',

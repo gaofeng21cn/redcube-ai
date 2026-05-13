@@ -124,15 +124,16 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(sidecar.source_manifest_refs.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
     assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
-    assert.deepEqual(
-      sidecar.guarded_actions.map((entry) => entry.action),
-      [
-        'runtime_watch',
-        'supervise_managed_run',
-        'product_entry_continuation',
-        'notification_receipt',
-      ],
-    );
+  assert.deepEqual(
+    sidecar.guarded_actions.map((entry) => entry.action),
+    [
+      'runtime_watch',
+      'supervise_managed_run',
+      'product_entry_continuation',
+      'emit_no_regression_evidence',
+      'notification_receipt',
+    ],
+  );
     assert.deepEqual(sidecar.blocked_actions, [
       'write_visual_truth',
       'write_canonical_artifacts',
@@ -154,6 +155,34 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(receipt.sidecar_policy.writes_visual_truth, false);
     assert.equal(receipt.sidecar_policy.writes_review_verdict, false);
     assert.equal(receipt.sidecar_policy.writes_publication_gate, false);
+
+    const evidence = await dispatchProductSidecar({
+      task: {
+        action: 'emit_no_regression_evidence',
+        workspace_root: workspaceRoot,
+        evidence_id: 'unit-no-regression',
+      },
+    });
+    assert.equal(evidence.ok, true);
+    assert.equal(evidence.result_surface.surface_kind, 'no_regression_evidence');
+    assert.equal(evidence.result_surface.evidence_ref, 'rca-no-regression:visual-stage:unit-no-regression');
+    assert.equal(
+      evidence.result_surface.runtime_locator_ref,
+      'workspace-runtime-ref:no-regression-evidence:unit-no-regression',
+    );
+    assert.equal(evidence.result_surface.coverage.long_visual_soak_claimed, false);
+    assert.equal(evidence.result_surface.coverage.visual_artifact_blob_written, false);
+    assert.equal(evidence.result_surface.coverage.review_export_verdict_written, false);
+    assert.equal(evidence.result_surface.coverage.memory_content_body_written, false);
+    assert.equal(evidence.result_surface.repository_boundary.repo_tracks_runtime_evidence_instance, false);
+    assert.equal(evidence.result_surface.authority_boundary.opl_can_store_no_regression_evidence_ref, true);
+    const evidenceFile = readJson(evidence.result_surface.evidence_file);
+    assert.equal(evidenceFile.surface_kind, 'no_regression_evidence');
+    assert.equal(evidenceFile.evidence_ref, evidence.result_surface.evidence_ref);
+    assert.equal(evidenceFile.source_manifest_refs.runtime_residue_retirement_status, 'active_path_retired');
+    assert.equal(evidenceFile.source_manifest_refs.skeleton_repo_source_layout_audit_status, 'pass');
+    assert.equal(evidenceFile.coverage.verifies_legacy_default_active_path_retired, true);
+    assert.equal(evidenceFile.coverage.long_visual_soak_claimed, false);
 
     await assert.rejects(
       () => dispatchProductSidecar({

@@ -627,7 +627,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.ok(skeletonLayout.forbidden_repo_writes.includes('memory_content_body'));
 
   const ownerReceipt = payload.current_state.active_baton.scope.domain_owner_receipt_contract;
-  assert.equal(ownerReceipt.status, 'contract_landed');
+  assert.equal(ownerReceipt.status, 'contract_landed_runtime_no_regression_evidence_ref_available');
   assert.equal(ownerReceipt.contract_id, 'rca.domain_owner_receipt.v1');
   assert.deepEqual(ownerReceipt.allowed_return_shapes, ['domain_receipt', 'typed_blocker', 'no_regression_evidence']);
   assert.equal(ownerReceipt.opl_can_store_receipt_refs, true);
@@ -646,13 +646,17 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.deepEqual(physicalFollowThrough.physical_roots, ['agent', 'contracts', 'runtime', 'docs']);
 
   const reviewHelper = payload.current_state.active_baton.scope.review_helper_baseline_follow_through;
-  assert.equal(reviewHelper.status, 'baseline_guarded_split_plan_landed');
+  assert.equal(reviewHelper.status, 'summary_and_geometry_split_landed_baseline_removed');
   assert.equal(reviewHelper.helper_path, 'python/redcube_ai/native_helpers/ppt_deck/review.py');
   assert.deepEqual(reviewHelper.split_plan_module_boundaries, [
-    'screenshot_capture',
-    'geometry_audit',
-    'markdown_report',
-    'summary_projection',
+    'screenshot_capture_remaining',
+    'geometry_audit_landed',
+    'markdown_report_landed',
+    'summary_projection_landed',
+  ]);
+  assert.deepEqual(reviewHelper.landed_modules, [
+    'python/redcube_ai/native_helpers/ppt_deck/review_geometry.py',
+    'python/redcube_ai/native_helpers/ppt_deck/review_summary.py',
   ]);
 
   assert.equal(residueRetirement.status, 'active_path_retired');

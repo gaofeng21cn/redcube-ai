@@ -109,6 +109,10 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     assert.equal(ownerReceipt.opl_consumption_policy.opl_can_store_visual_truth, false);
     assert.equal(ownerReceipt.opl_consumption_policy.opl_can_store_review_export_verdict, false);
     assert.equal(ownerReceipt.opl_consumption_policy.opl_can_store_canonical_artifact_blob, false);
+    const noRegressionCase = ownerReceipt.receipt_cases.find((receipt) => receipt.return_shape === 'no_regression_evidence');
+    assert.equal(noRegressionCase.generator_action, 'emit_no_regression_evidence');
+    assert.equal(noRegressionCase.runtime_locator_ref, 'workspace-runtime-ref:no-regression-evidence:<evidence-id>');
+    assert.equal(ownerReceipt.repository_boundary.repo_tracks_runtime_evidence_instances, false);
     assert.deepEqual(
       ownerReceipt.receipt_cases.map((receipt) => receipt.return_shape),
       ['domain_receipt', 'typed_blocker', 'no_regression_evidence'],
@@ -153,14 +157,19 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     const reviewHelper = manifest.review_helper_baseline_follow_through;
     assert.equal(reviewHelper.surface_kind, 'review_helper_baseline_follow_through');
     assert.equal(reviewHelper.helper_path, 'python/redcube_ai/native_helpers/ppt_deck/review.py');
-    assert.equal(reviewHelper.current_line_budget_baseline, 1154);
-    assert.equal(reviewHelper.growth_guard, 'fail_closed_on_growth');
+    assert.equal(reviewHelper.current_line_budget_baseline, null);
+    assert.equal(reviewHelper.current_helper_line_budget_state, 'within_budget_after_summary_and_geometry_split');
+    assert.equal(reviewHelper.growth_guard, 'default_1000_line_budget');
     assert.deepEqual(reviewHelper.split_plan.module_boundaries, [
-      'screenshot_capture',
-      'geometry_audit',
-      'markdown_report',
-      'summary_projection',
+      'screenshot_capture_remaining',
+      'geometry_audit_landed',
+      'markdown_report_landed',
+      'summary_projection_landed',
     ]);
-    assert.equal(reviewHelper.status, 'baseline_guarded_split_plan_landed');
+    assert.deepEqual(reviewHelper.split_plan.landed_modules, [
+      'python/redcube_ai/native_helpers/ppt_deck/review_geometry.py',
+      'python/redcube_ai/native_helpers/ppt_deck/review_summary.py',
+    ]);
+    assert.equal(reviewHelper.status, 'summary_and_geometry_split_landed_baseline_removed');
   });
 });

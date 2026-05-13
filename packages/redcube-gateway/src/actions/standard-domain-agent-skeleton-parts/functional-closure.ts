@@ -44,6 +44,8 @@ export function buildDomainOwnerReceiptContract() {
       {
         return_shape: 'no_regression_evidence',
         evidence_ref: 'rca-no-regression:visual-stage:<evidence-id>',
+        runtime_locator_ref: 'workspace-runtime-ref:no-regression-evidence:<evidence-id>',
+        generator_action: 'emit_no_regression_evidence',
         attempt_ref: '/controlled_visual_stage_attempt',
         surface_refs: [
           '/controlled_memory_apply_proof',
@@ -67,6 +69,7 @@ export function buildDomainOwnerReceiptContract() {
     repository_boundary: {
       repo_tracks_contract_and_fixture_refs: true,
       repo_tracks_live_receipt_instances: false,
+      repo_tracks_runtime_evidence_instances: false,
       repo_tracks_visual_truth: false,
       repo_tracks_review_export_verdict: false,
       repo_tracks_canonical_artifact_blob: false,
@@ -206,23 +209,28 @@ export function buildReviewHelperBaselineFollowThrough() {
   return {
     surface_kind: 'review_helper_baseline_follow_through',
     helper_path: 'python/redcube_ai/native_helpers/ppt_deck/review.py',
-    current_line_budget_baseline: 1154,
-    growth_guard: 'fail_closed_on_growth',
-    status: 'baseline_guarded_split_plan_landed',
+    current_line_budget_baseline: null,
+    current_helper_line_budget_state: 'within_budget_after_summary_and_geometry_split',
+    growth_guard: 'default_1000_line_budget',
+    status: 'summary_and_geometry_split_landed_baseline_removed',
     split_plan: {
       module_boundaries: [
-        'screenshot_capture',
-        'geometry_audit',
-        'markdown_report',
-        'summary_projection',
+        'screenshot_capture_remaining',
+        'geometry_audit_landed',
+        'markdown_report_landed',
+        'summary_projection_landed',
       ],
-      first_safe_split_target: 'geometry_audit',
-      delete_baseline_gate: 'review.py_under_1000_lines_with_focused_native_review_tests_green',
+      landed_modules: [
+        'python/redcube_ai/native_helpers/ppt_deck/review_geometry.py',
+        'python/redcube_ai/native_helpers/ppt_deck/review_summary.py',
+      ],
+      remaining_split_target: 'screenshot_capture',
+      delete_baseline_gate: 'completed',
     },
     typed_blocker: {
-      blocker_kind: 'review_helper_large_file_decomposition_remaining',
+      blocker_kind: 'review_helper_capture_decomposition_remaining',
       blocker_id: 'rca_review_helper_split_remaining',
-      reason: 'The reviewed baseline is guarded against growth; full deletion of the baseline still requires behavior-preserving module extraction and native review verification.',
+      reason: 'The line-budget baseline is removed; screenshot capture remains in the main helper and should be split only with behavior-preserving native review verification.',
       source_guard: 'scripts/line-budget.ts',
     },
   };

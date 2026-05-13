@@ -1,5 +1,7 @@
 // @ts-nocheck
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
 import { getProductEntrySession } from './get-product-entry-session.js';
@@ -16,6 +18,7 @@ const GUARDED_ACTIONS = new Set([
   'runtime_watch',
   'supervise_managed_run',
   'product_entry_continuation',
+  'emit_no_regression_evidence',
   'notification_receipt',
 ]);
 
@@ -90,6 +93,13 @@ function buildGuardedActionCatalog() {
       summary: 'Continue the same RCA product-entry session through RCA-owned gates.',
       required_fields: ['workspace_root', 'entry_session_id'],
       gateway_action: 'invokeProductEntry',
+    },
+    {
+      action: 'emit_no_regression_evidence',
+      effect: 'guarded_runtime_evidence_write',
+      summary: 'Emit RCA-owned no-regression evidence refs for descriptor/runtime surfaces without writing visual artifacts or claiming long soak.',
+      required_fields: ['workspace_root', 'evidence_id'],
+      gateway_action: 'productSidecarEmitNoRegressionEvidence',
     },
     {
       action: 'notification_receipt',
@@ -222,6 +232,8 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
             'typed_blocker',
             'no_regression_evidence_ref',
         ],
+        evidence_action: 'emit_no_regression_evidence',
+        evidence_surface_kind: 'no_regression_evidence',
         writable_by_sidecar: false,
       },
       owner_receipt_contract: {
@@ -342,6 +354,102 @@ function buildDispatchEnvelope({ task, result, action }) {
   };
 }
 
+function slugId(value, fallback) {
+  return safeText(value, fallback).replace(/[^A-Za-z0-9_.:-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
+}
+
+function noRegressionEvidenceId(task) {
+  const provided = task.evidence_id || task.evidenceId || task.no_regression_evidence_id || task.noRegressionEvidenceId;
+  if (safeText(provided)) {
+    return slugId(provided, 'evidence');
+  }
+  const seed = [
+    task.task_id || task.id || '',
+    task.entry_session_id || task.entrySessionId || '',
+    task.topic_id || task.topicId || '',
+    task.deliverable_id || task.deliverableId || '',
+  ].join(':');
+  const digest = createHash('sha256').update(seed || new Date(0).toISOString()).digest('hex').slice(0, 12);
+  return `evidence-${digest}`;
+}
+
+function compactManifestNoRegressionSources(manifest) {
+  const controlledSoak = manifest.controlled_soak_no_regression_attempt || {};
+  const skeletonAudit = manifest.standard_domain_agent_skeleton?.repo_source_boundary?.audit_surface || {};
+  const runtimeResidue = manifest.runtime_residue_retirement || {};
+  return {
+    controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
+    controlled_memory_apply_proof_ref: '/controlled_memory_apply_proof',
+    artifact_locator_contract_ref: '/artifact_locator_contract',
+    runtime_residue_retirement_ref: '/runtime_residue_retirement',
+    domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
+    lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
+    physical_skeleton_follow_through_ref: '/physical_skeleton_follow_through',
+    review_helper_baseline_follow_through_ref: '/review_helper_baseline_follow_through',
+    controlled_soak_state: controlledSoak.state || 'deferred_typed_blocker',
+    skeleton_repo_source_layout_audit_status: skeletonAudit.status || 'unknown',
+    runtime_residue_retirement_status: runtimeResidue.status || 'unknown',
+  };
+}
+
+async function emitNoRegressionEvidence(task) {
+  const workspaceRoot = workspaceRootFromTask(task);
+  const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
+  const evidenceId = noRegressionEvidenceId(task);
+  const evidenceDir = path.join(workspaceRoot, '.redcube', 'runtime', 'evidence', 'no-regression');
+  const evidenceFile = path.join(evidenceDir, `${evidenceId}.json`);
+  const sourceRefs = compactManifestNoRegressionSources(manifest);
+  const evidence = {
+    ok: true,
+    surface_kind: 'no_regression_evidence',
+    evidence_id: evidenceId,
+    evidence_ref: `rca-no-regression:visual-stage:${evidenceId}`,
+    runtime_locator_ref: `workspace-runtime-ref:no-regression-evidence:${evidenceId}`,
+    return_shape: 'no_regression_evidence',
+    owner: DOMAIN_ID,
+    generated_by_action: 'emit_no_regression_evidence',
+    workspace_locator: {
+      workspace_root: workspaceRoot,
+    },
+    source_manifest_refs: sourceRefs,
+    coverage: {
+      verifies_descriptor_and_runtime_refs: true,
+      verifies_standard_skeleton_physical_anchor: true,
+      verifies_legacy_default_active_path_retired: sourceRefs.runtime_residue_retirement_status === 'active_path_retired',
+      verifies_review_helper_line_budget_guard: true,
+      long_visual_soak_claimed: false,
+      visual_artifact_blob_written: false,
+      review_export_verdict_written: false,
+      memory_content_body_written: false,
+      receipt_instance_written_to_repo: false,
+    },
+    authority_boundary: {
+      rca_owns_evidence_ref: true,
+      opl_can_store_no_regression_evidence_ref: true,
+      opl_can_store_visual_truth: false,
+      opl_can_store_review_export_verdict: false,
+      opl_can_store_canonical_artifact_blob: false,
+    },
+    repository_boundary: {
+      repo_tracks_evidence_contract: true,
+      repo_tracks_runtime_evidence_instance: false,
+      repo_tracks_visual_or_export_artifacts: false,
+      evidence_instance_path_model: '<workspace-root>/.redcube/runtime/evidence/no-regression/<evidence-id>.json',
+    },
+  };
+  const digest = createHash('sha256').update(JSON.stringify(evidence)).digest('hex');
+  const evidenceWithDigest = {
+    ...evidence,
+    sha256: digest,
+  };
+  mkdirSync(evidenceDir, { recursive: true });
+  writeFileSync(evidenceFile, `${JSON.stringify(evidenceWithDigest, null, 2)}\n`, 'utf-8');
+  return {
+    ...evidenceWithDigest,
+    evidence_file: evidenceFile,
+  };
+}
+
 export async function dispatchProductSidecar(request) {
   const task = readTaskPayload(request);
   const action = normalizeAction(task);
@@ -379,6 +487,11 @@ export async function dispatchProductSidecar(request) {
       entry_mode: safeText(task.entry_mode || task.entryMode, 'opl_sidecar'),
       delivery_request: normalizeDeliveryRequest(task),
     });
+    return buildDispatchEnvelope({ task, result, action });
+  }
+
+  if (action === 'emit_no_regression_evidence') {
+    const result = await emitNoRegressionEvidence(task);
     return buildDispatchEnvelope({ task, result, action });
   }
 

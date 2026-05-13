@@ -10,7 +10,6 @@ const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 export const DEFAULT_LIMIT = 1000;
 export const BASELINE_ENTRIES = {
   'packages/redcube-gateway/src/actions/get-product-entry-manifest.ts': 1018,
-  'python/redcube_ai/native_helpers/ppt_deck/review.py': 1154,
   'tests/product-entry-cases/manifest-and-start-surfaces.test.ts': 1116,
 };
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.py', '.sh', '.bash', '.zsh', '.rs', '.go']);

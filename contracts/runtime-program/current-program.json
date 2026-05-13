@@ -1174,7 +1174,7 @@
           ]
         },
         "domain_owner_receipt_contract": {
-          "status": "contract_landed",
+          "status": "contract_landed_runtime_no_regression_evidence_ref_available",
           "contract_id": "rca.domain_owner_receipt.v1",
           "source_manifest_surface": "redcube product manifest#/domain_owner_receipt_contract",
           "allowed_return_shapes": [
@@ -1191,6 +1191,17 @@
             "forbidden_write_proof_ref"
           ],
           "owner": "redcube_ai",
+          "no_regression_evidence": {
+            "action": "emit_no_regression_evidence",
+            "dispatch_surface": "redcube product sidecar dispatch",
+            "surface_kind": "no_regression_evidence",
+            "evidence_ref_model": "rca-no-regression:visual-stage:<evidence-id>",
+            "runtime_locator_ref_model": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",
+            "workspace_path_model": "<workspace-root>/.redcube/runtime/evidence/no-regression/<evidence-id>.json",
+            "long_visual_soak_claimed": false,
+            "repo_tracks_runtime_evidence_instance": false,
+            "writes_visual_or_export_artifact": false
+          },
           "opl_can_store_receipt_refs": true,
           "opl_can_store_visual_truth": false,
           "opl_can_store_review_export_verdict": false,
@@ -1228,17 +1239,23 @@
           ]
         },
         "review_helper_baseline_follow_through": {
-          "status": "baseline_guarded_split_plan_landed",
+          "status": "summary_and_geometry_split_landed_baseline_removed",
           "source_manifest_surface": "redcube product manifest#/review_helper_baseline_follow_through",
           "helper_path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
-          "current_line_budget_baseline": 1154,
-          "growth_guard": "fail_closed_on_growth",
+          "current_line_budget_baseline": null,
+          "current_helper_line_budget_state": "within_budget_after_summary_and_geometry_split",
+          "growth_guard": "default_1000_line_budget",
           "split_plan_module_boundaries": [
-            "screenshot_capture",
-            "geometry_audit",
-            "markdown_report",
-            "summary_projection"
-          ]
+            "screenshot_capture_remaining",
+            "geometry_audit_landed",
+            "markdown_report_landed",
+            "summary_projection_landed"
+          ],
+          "landed_modules": [
+            "python/redcube_ai/native_helpers/ppt_deck/review_geometry.py",
+            "python/redcube_ai/native_helpers/ppt_deck/review_summary.py"
+          ],
+          "remaining_split_target": "screenshot_capture"
         }
       },
       "artifacts": {

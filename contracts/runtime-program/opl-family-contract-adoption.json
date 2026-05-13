@@ -372,8 +372,18 @@
     },
     "controlled_soak": {
       "state": "deferred",
-      "deferred_reason": "OPL+MAS production closure has priority; RCA keeps descriptor/index/skeleton no-regression only in this lane.",
+      "deferred_reason": "Provider-hosted visual-stage long soak remains deferred; RCA can emit owner no-regression evidence refs for descriptor/runtime surfaces through product sidecar.",
       "required_opl_substrate": "Temporal production online runtime",
+      "owner_no_regression_evidence": {
+        "state": "runtime_evidence_ref_available",
+        "action": "emit_no_regression_evidence",
+        "surface_kind": "no_regression_evidence",
+        "evidence_ref_model": "rca-no-regression:visual-stage:<evidence-id>",
+        "runtime_locator_ref_model": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",
+        "workspace_path_model": "<workspace-root>/.redcube/runtime/evidence/no-regression/<evidence-id>.json",
+        "long_visual_soak_claimed": false,
+        "repo_tracks_runtime_evidence_instance": false
+      },
       "no_regression_surfaces": [
         "family_action_catalog",
         "stage_control_projection",
@@ -802,13 +812,17 @@
       ]
     },
     "review_helper_baseline_follow_through": {
-      "status": "baseline_guarded_split_plan_landed",
+      "status": "summary_and_geometry_split_landed_baseline_removed",
       "helper_path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
       "split_plan_module_boundaries": [
-        "screenshot_capture",
-        "geometry_audit",
-        "markdown_report",
-        "summary_projection"
+        "screenshot_capture_remaining",
+        "geometry_audit_landed",
+        "markdown_report_landed",
+        "summary_projection_landed"
+      ],
+      "landed_modules": [
+        "python/redcube_ai/native_helpers/ppt_deck/review_geometry.py",
+        "python/redcube_ai/native_helpers/ppt_deck/review_summary.py"
       ]
     }
   },

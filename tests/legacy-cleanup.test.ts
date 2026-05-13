@@ -45,3 +45,18 @@ test('legacy redcube-agent/workbench runtime path is removed from active code an
   assert.equal(existsSync(path.join(repoRoot, 'packages', 'redcube-gateway', 'src', 'actions', 'import-legacy-project.js')), false);
   assert.equal(existsSync(path.join(repoRoot, '.redcube_pi', 'workbench')), false);
 });
+
+test('legacy default active-path wording is tombstoned while RCA runtime evidence stays ref-only', () => {
+  const status = readText(path.join(repoRoot, 'docs', 'status.md'));
+  const tombstone = readText(path.join(repoRoot, 'docs', 'history', 'tombstones', 'retired-route-narratives-2026-05-11.md'));
+  const runtimeDoc = readText(path.join(repoRoot, 'docs', 'runtime', 'runtime_architecture.md'));
+  const productSidecar = readText(path.join(repoRoot, 'packages', 'redcube-gateway', 'src', 'actions', 'product-sidecar.ts'));
+
+  assert.match(tombstone, /Physical follow-through note/);
+  assert.match(tombstone, /无合同引用的旧 active-path 物理入口不得重新进入 active code\/tests\/package surface/);
+  assert.match(runtimeDoc, /emit_no_regression_evidence/);
+  assert.match(status, /不声明 visual long soak 完成/);
+  assert.match(productSidecar, /repo_tracks_runtime_evidence_instance: false/);
+  assert.match(productSidecar, /visual_artifact_blob_written: false/);
+  assert.match(productSidecar, /review_export_verdict_written: false/);
+});

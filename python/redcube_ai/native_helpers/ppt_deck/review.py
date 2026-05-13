@@ -2,7 +2,6 @@
 import argparse
 import asyncio
 import json
-import statistics
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -13,285 +12,44 @@ from redcube_ai.native_helpers.ppt_deck.review_consistency import (
     apply_page_number_consistency,
     apply_title_typography_consistency,
 )
+from redcube_ai.native_helpers.ppt_deck.review_geometry import (
+    BLOCK_CONTENT_OVERFLOW_TOLERANCE,
+    DEFAULT_DEVICE_SCALE_FACTOR,
+    EDGE_CLEARANCE_IGNORED_IDS,
+    MAX_TABLE_CELL_BLANK_RATIO,
+    MIN_ADJACENT_READABLE_BLOCK_GAP,
+    MIN_ADJACENT_READABLE_BLOCK_OVERLAP_PIXELS,
+    MIN_ADJACENT_READABLE_BLOCK_OVERLAP_RATIO,
+    MIN_SPEAKER_SECONDS,
+    MIN_SURFACE_TARGET_GAP,
+    MIN_SURFACE_TARGET_OVERLAP_PIXELS,
+    MIN_SURFACE_TARGET_OVERLAP_RATIO,
+    MAX_SPEAKER_SECONDS,
+    SURFACE_SCROLL_OVERFLOW_TOLERANCE,
+    collect_edge_failures,
+    density_metrics,
+    issue_list,
+    overlap_failures,
+    overflow_is_free,
+    review_blocks,
+    set_frame_size,
+    table_legibility_failures,
+    text_fragments,
+    title_safe_zone_failures,
+)
+from redcube_ai.native_helpers.ppt_deck.review_summary import (
+    baseline_check as compute_baseline_check,
+    build_markdown,
+)
 
-FRAME_WIDTH = 1152.0
-FRAME_HEIGHT = 648.0
 CHROME_CANDIDATES = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-]
-MIN_DENSITY = 0.18
-MAX_DENSITY = 0.82
-OVERLAP_PIXELS = 12.0
-OVERLAP_RATIO = 0.08
-MIN_SPEAKER_SECONDS = 20
-MAX_SPEAKER_SECONDS = 120
-DEFAULT_DEVICE_SCALE_FACTOR = 2.0
-MIN_BLOCK_EDGE_CLEARANCE = 24.0
-MIN_LARGE_BLOCK_BOTTOM_CLEARANCE = 32.0
-MIN_CONTENT_PADDING = 8.0
-MIN_ADJACENT_READABLE_BLOCK_GAP = 6.0
-MIN_ADJACENT_READABLE_BLOCK_OVERLAP_PIXELS = 48.0
-MIN_ADJACENT_READABLE_BLOCK_OVERLAP_RATIO = 0.25
-MIN_SURFACE_TARGET_GAP = 8.0
-MIN_SURFACE_TARGET_OVERLAP_PIXELS = 8.0
-MIN_SURFACE_TARGET_OVERLAP_RATIO = 0.04
-SURFACE_SCROLL_OVERFLOW_TOLERANCE = 4.0
-EDGE_CLEARANCE_IGNORED_IDS = ('page-number', 'page_no', 'page-no', 'slide-number', 'pager')
-INTERNAL_PADDING_ROLE_HINTS = ('card', 'panel', 'zone', 'row', 'stack', 'ladder', 'notes', 'band', 'summary', 'takeaway')
-BLOCK_CONTENT_OVERFLOW_TOLERANCE = 1.5
-TITLE_SAFE_ZONE_BOTTOM = 128.0
-MIN_TABLE_BODY_FONT_PX = 14.67
-MAX_TABLE_CELL_BLANK_RATIO = 0.38
-OPERATOR_LANGUAGE_FRAGMENTS = [
-    '汇报讨论用途',
-    '客观专业版',
-    '本次汇报边界',
-    '不在展示页暴露',
-    '本地原始文件名',
-    '清洗脚本名',
-    'RCA',
-    'RedCube',
-    'source intake',
-    'author_pptx_native',
-    'slide_blueprint',
-    'visual_direction',
 ]
 
 
 def fail(message: str) -> None:
     print(message, file=sys.stderr)
     raise SystemExit(1)
-
-
-def clamp(value: float, lower: float, upper: float) -> float:
-    return max(lower, min(upper, value))
-
-
-def overlap_details(block_a: Dict[str, Any], block_b: Dict[str, Any]) -> Tuple[float, float, float]:
-    ax1, ay1 = float(block_a.get('left', 0)), float(block_a.get('top', 0))
-    ax2 = ax1 + float(block_a.get('width', 0))
-    ay2 = ay1 + float(block_a.get('height', 0))
-    bx1, by1 = float(block_b.get('left', 0)), float(block_b.get('top', 0))
-    bx2 = bx1 + float(block_b.get('width', 0))
-    by2 = by1 + float(block_b.get('height', 0))
-    overlap_w = max(0.0, min(ax2, bx2) - max(ax1, bx1))
-    overlap_h = max(0.0, min(ay2, by2) - max(ay1, by1))
-    overlap_area = overlap_w * overlap_h
-    return overlap_w, overlap_h, overlap_area
-
-
-def is_decorative_surface_container(block: Dict[str, Any]) -> bool:
-    return bool(block.get('hasSurfaceFrame')) and int(block.get('textNodeCount', 0) or 0) == 0
-
-
-def should_ignore_overlap(block_a: Dict[str, Any], block_b: Dict[str, Any], ratio: float) -> bool:
-    if ratio < 0.98:
-        return False
-    return is_decorative_surface_container(block_a) != is_decorative_surface_container(block_b)
-
-
-def is_clearance_relevant_block(block: Dict[str, Any]) -> bool:
-    block_id = str(block.get('id') or '').lower()
-    if any(token in block_id for token in EDGE_CLEARANCE_IGNORED_IDS):
-        return False
-    return float(block.get('area', 0) or 0) >= 3000.0 and float(block.get('height', 0) or 0) >= 60.0
-
-
-def is_internal_padding_relevant(block: Dict[str, Any]) -> bool:
-    block_id = str(block.get('id') or '').lower()
-    if any(token in block_id for token in EDGE_CLEARANCE_IGNORED_IDS):
-        return False
-    if int(block.get('textNodeCount', 0) or 0) == 0:
-        return False
-    if float(block.get('height', 0) or 0) < 72.0:
-        return False
-    return bool(block.get('hasSurfaceFrame'))
-
-
-def clearance_failures(block: Dict[str, Any]) -> List[Dict[str, Any]]:
-    failures: List[Dict[str, Any]] = []
-    if not is_clearance_relevant_block(block):
-        return failures
-    edge_clearance = block.get('edgeClearance', {}) or {}
-    internal_padding = block.get('internalPadding', {}) or {}
-    block_height = float(block.get('height', 0) or 0)
-    side_thresholds = {
-        'left': MIN_BLOCK_EDGE_CLEARANCE,
-        'top': MIN_BLOCK_EDGE_CLEARANCE,
-        'right': MIN_BLOCK_EDGE_CLEARANCE,
-        'bottom': MIN_LARGE_BLOCK_BOTTOM_CLEARANCE if block_height >= 120.0 else MIN_BLOCK_EDGE_CLEARANCE,
-    }
-    for side, threshold in side_thresholds.items():
-        value = float(edge_clearance.get(side, 9999) or 0)
-        if value < threshold:
-            failures.append({
-                'block_id': block.get('id'),
-                'scope': 'wrapper_edge',
-                'side': side,
-                'value': round(value, 2),
-                'threshold': round(threshold, 2),
-            })
-    if internal_padding and is_internal_padding_relevant(block):
-        for side in ('left', 'top', 'right', 'bottom'):
-            value = float(internal_padding.get(side, 9999) or 0)
-            if value < MIN_CONTENT_PADDING:
-                failures.append({
-                    'block_id': block.get('id'),
-                    'scope': 'block_padding',
-                    'side': side,
-                    'value': round(value, 2),
-                    'threshold': round(MIN_CONTENT_PADDING, 2),
-                })
-    return failures
-
-
-def review_blocks(info: Dict[str, Any]) -> List[Dict[str, Any]]:
-    return [
-        block for block in (info.get('blocks', []) or [])
-        if not is_decorative_surface_container(block)
-    ]
-
-
-def overflow_is_free(info: Dict[str, Any]) -> bool:
-    wrapper = info.get('wrapper', {}) or {}
-    return (
-        float(wrapper.get('scrollWidth', 0)) <= float(wrapper.get('clientWidth', 0)) + 1
-        and float(wrapper.get('scrollHeight', 0)) <= float(wrapper.get('clientHeight', 0)) + 1
-        and not bool(info.get('bodyScroll'))
-    )
-
-
-def overlap_failures(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    overlaps = []
-    for index, block in enumerate(blocks):
-        for other in blocks[index + 1:]:
-            overlap_w, overlap_h, overlap_area = overlap_details(block, other)
-            if overlap_w <= OVERLAP_PIXELS or overlap_h <= OVERLAP_PIXELS:
-                continue
-            smaller_area = max(1.0, min(float(block.get('area', 0)), float(other.get('area', 0))))
-            ratio = overlap_area / smaller_area
-            if ratio < OVERLAP_RATIO or should_ignore_overlap(block, other, ratio):
-                continue
-            overlaps.append({
-                'a': block.get('id'),
-                'b': other.get('id'),
-                'ratio': round(ratio, 4),
-            })
-    return overlaps
-
-
-def density_metrics(blocks: List[Dict[str, Any]], primary_points: int, max_primary_points: int) -> Dict[str, Any]:
-    occupied_area = sum(float(block.get('area', 0)) for block in blocks)
-    frame_area = FRAME_WIDTH * FRAME_HEIGHT
-    occupied_ratio = clamp(occupied_area / frame_area if frame_area else 0.0, 0.0, 1.0)
-    return {
-        'occupied_ratio': occupied_ratio,
-        'visual_density_ok': MIN_DENSITY <= occupied_ratio <= MAX_DENSITY and primary_points <= max_primary_points,
-    }
-
-
-def collect_edge_failures(audit_blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    failures = []
-    for block in audit_blocks:
-        failures.extend(clearance_failures(block))
-    return failures
-
-
-def issue_list(checks: Dict[str, bool]) -> List[str]:
-    issue_by_check = {
-        'overflow_free': 'overflow_detected',
-        'occlusion_free': 'occlusion_detected',
-        'visual_density_ok': 'visual_density_out_of_range',
-        'speaker_fit_ok': 'speaker_fit_out_of_range',
-        'edge_clearance_ok': 'edge_clearance_out_of_range',
-        'block_content_fit_ok': 'block_content_overflow_detected',
-        'external_audience_language_ok': 'operator_language_leak_detected',
-        'title_safe_zone_clear': 'title_safe_zone_obstructed',
-        'table_legibility_ok': 'table_font_below_minimum',
-        'layout_density_ok': 'layout_density_too_sparse',
-    }
-    return [
-        issue
-        for check, issue in issue_by_check.items()
-        if not checks.get(check)
-    ]
-
-
-def text_fragments(value: Any) -> List[str]:
-    text = str(value or '')
-    return sorted({fragment for fragment in OPERATOR_LANGUAGE_FRAGMENTS if fragment in text})
-
-
-def block_bottom(block: Dict[str, Any]) -> float:
-    top = float(block.get('top', 0) or 0)
-    height = float(block.get('height', 0) or 0)
-    return float(block.get('bottom') or (top + height) or 0)
-
-
-def title_safe_zone_bottom(info: Dict[str, Any], title_meta: Dict[str, Any]) -> Tuple[float, float | None, float | None]:
-    title_block_id = str(title_meta.get('titleBlockId') or '')
-    title_block = next(
-        (block for block in review_blocks(info) if str(block.get('id') or '') == title_block_id),
-        None,
-    )
-    if title_block:
-        title_bottom = block_bottom(title_block)
-        title_font_size = float(title_meta.get('titleFontSize', 0) or 0)
-        required_gap = max(12.0, min(24.0, title_font_size * 0.35))
-        return title_bottom + required_gap, title_bottom, required_gap
-
-    wrapper = info.get('wrapper', {}) or {}
-    frame_height = float(wrapper.get('clientHeight') or FRAME_HEIGHT)
-    return min(TITLE_SAFE_ZONE_BOTTOM, frame_height * 0.2), None, None
-
-
-def title_safe_zone_failures(info: Dict[str, Any], title_meta: Dict[str, Any]) -> List[Dict[str, Any]]:
-    title_block_id = str(title_meta.get('titleBlockId') or '')
-    safe_zone_bottom, title_bottom, required_gap = title_safe_zone_bottom(info, title_meta)
-    failures = []
-    for block in review_blocks(info):
-        block_id = str(block.get('id') or '')
-        if not block_id or block_id == title_block_id:
-            continue
-        if block_id.startswith('footer') or any(token in block_id.lower() for token in EDGE_CLEARANCE_IGNORED_IDS):
-            continue
-        if float(block.get('top', 0) or 0) < safe_zone_bottom:
-            failures.append({
-                'block_id': block_id,
-                'top': round(float(block.get('top', 0) or 0), 2),
-                'safe_zone_bottom': round(safe_zone_bottom, 2),
-                'title_bottom': round(title_bottom, 2) if title_bottom is not None else None,
-                'required_gap': round(required_gap, 2) if required_gap is not None else None,
-            })
-    return failures
-
-
-def table_legibility_failures(info: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], float, float]:
-    failures = []
-    table_metrics = info.get('tableMetrics', []) or []
-    min_font = MIN_TABLE_BODY_FONT_PX
-    max_blank_ratio = 0.0
-    for table in table_metrics:
-        table_id = table.get('table_id') or table.get('block_id')
-        table_min_font = float(table.get('min_font_px') or table.get('min_font_pt') or MIN_TABLE_BODY_FONT_PX)
-        blank_ratio = float(table.get('max_blank_ratio') or table.get('card_blank_ratio') or 0.0)
-        min_font = min(min_font, table_min_font)
-        max_blank_ratio = max(max_blank_ratio, blank_ratio)
-        if table_min_font < MIN_TABLE_BODY_FONT_PX:
-            failures.append({
-                'table_id': table_id,
-                'reason': 'table_font_below_minimum',
-                'value': round(table_min_font, 2),
-                'threshold': MIN_TABLE_BODY_FONT_PX,
-            })
-        if blank_ratio > MAX_TABLE_CELL_BLANK_RATIO:
-            failures.append({
-                'table_id': table_id,
-                'reason': 'table_cell_blank_ratio_too_high',
-                'value': round(blank_ratio, 4),
-                'threshold': MAX_TABLE_CELL_BLANK_RATIO,
-            })
-    return failures, min_font, max_blank_ratio
 
 
 def review_slide(info: Dict[str, Any], max_primary_points: int) -> Dict[str, Any]:
@@ -379,94 +137,6 @@ def summarize_checks(slide_reviews: List[Dict[str, Any]]) -> Dict[str, bool]:
     }
 
 
-def baseline_check(slide_reviews: List[Dict[str, Any]], baseline_file: Path) -> Dict[str, Any]:
-    if not baseline_file.exists():
-        fail(f'Baseline review file not found: {baseline_file}')
-    baseline = json.loads(baseline_file.read_text(encoding='utf-8'))
-    baseline_reviews = baseline.get('slide_reviews', []) or []
-    current_avg = statistics.mean([review['metrics']['occupied_ratio'] for review in slide_reviews]) if slide_reviews else 0.0
-    baseline_avg = statistics.mean([review.get('metrics', {}).get('occupied_ratio', 0.0) for review in baseline_reviews]) if baseline_reviews else 0.0
-    current_failures = sum(1 for review in slide_reviews if review.get('issues'))
-    baseline_failures = sum(1 for review in baseline_reviews if review.get('issues'))
-    failure_delta = current_failures - baseline_failures
-    density_delta = current_avg - baseline_avg
-    failure_status = 'improved' if failure_delta < 0 else ('degraded' if failure_delta > 0 else 'acceptable')
-    density_status = 'improved' if density_delta < 0 else ('degraded' if density_delta > 0.08 else 'acceptable')
-    relative_quality = {
-        'verdict': 'degraded' if 'degraded' in [failure_status, density_status] else ('improved' if 'improved' in [failure_status, density_status] else 'acceptable'),
-        'degradations': [name for name, status in [('failed_slide_count', failure_status), ('average_density', density_status)] if status == 'degraded'],
-        'improvements': [name for name, status in [('failed_slide_count', failure_status), ('average_density', density_status)] if status == 'improved'],
-        'acceptable_changes': [name for name, status in [('failed_slide_count', failure_status), ('average_density', density_status)] if status == 'acceptable'],
-        'dimensions': [
-            {
-                'dimension_id': 'failed_slide_count',
-                'label': '失败页数',
-                'current': current_failures,
-                'baseline': baseline_failures,
-                'delta': failure_delta,
-                'tolerance': 0,
-                'preferred_direction': 'lower',
-                'status': failure_status,
-            },
-            {
-                'dimension_id': 'average_density',
-                'label': '平均占用率',
-                'current': round(current_avg, 4),
-                'baseline': round(baseline_avg, 4),
-                'delta': round(density_delta, 4),
-                'tolerance': 0.08,
-                'preferred_direction': 'lower',
-                'status': density_status,
-            },
-        ],
-    }
-    passed = relative_quality['verdict'] != 'degraded'
-    summary = (
-        '相对 baseline 出现退化：' + '、'.join(relative_quality['degradations'])
-        if relative_quality['verdict'] == 'degraded'
-        else (
-            '相对 baseline 保持可接受且有提升：' + '、'.join(relative_quality['improvements'])
-            if relative_quality['improvements']
-            else '相对 baseline 变化可接受。'
-        )
-    )
-    return {
-        'baseline_comparison_passed': passed,
-        'baseline_review_file': str(baseline_file),
-        'current_average_density': round(current_avg, 4),
-        'baseline_average_density': round(baseline_avg, 4),
-        'current_failed_slides': current_failures,
-        'baseline_failed_slides': baseline_failures,
-        'relative_quality': relative_quality,
-        'summary': summary,
-    }
-
-
-def build_markdown(result: Dict[str, Any]) -> str:
-    lines = ['# 视觉质控', '']
-    checks = result.get('checks', {})
-    lines.append('## 总体检查')
-    for key, value in checks.items():
-        lines.append(f'- {key}: {"PASS" if value else "BLOCK"}')
-    if 'baseline_comparison_passed' in checks:
-        lines.append(f'- baseline_comparison_passed: {"PASS" if checks["baseline_comparison_passed"] else "BLOCK"}')
-    lines.append('')
-    lines.append('## 分页记录')
-    for review in result.get('slide_reviews', []):
-        lines.append(f"### {review.get('slide_id')} / {review.get('title')}")
-        lines.append(f"- layout_family: {review.get('layout_family')}")
-        lines.append(f"- screenshot: {review.get('screenshot_file')}")
-        lines.append(f"- occupied_ratio: {review.get('metrics', {}).get('occupied_ratio')}")
-        lines.append(f"- primary_points: {review.get('metrics', {}).get('primary_points')}")
-        lines.append(f"- speaker_seconds: {review.get('metrics', {}).get('speaker_seconds')}")
-        if review.get('issues'):
-            lines.append(f"- issues: {', '.join(review['issues'])}")
-        else:
-            lines.append('- issues: none')
-        lines.append('')
-    return '\n'.join(lines).strip() + '\n'
-
-
 def target_slide_indexes(slide_ids: str, total: int) -> List[int]:
     ids = [item.strip() for item in str(slide_ids or '').split(',') if item.strip()]
     if not ids:
@@ -483,9 +153,7 @@ def target_slide_indexes(slide_ids: str, total: int) -> List[int]:
 
 
 async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
-    global FRAME_WIDTH, FRAME_HEIGHT
-    FRAME_WIDTH = float(args.frame_width)
-    FRAME_HEIGHT = float(args.frame_height)
+    set_frame_size(args.frame_width, args.frame_height)
     html_file = Path(args.html).resolve()
     if not html_file.exists():
         fail(f'HTML file not found: {html_file}')
@@ -1102,7 +770,10 @@ async def collect_review(args: argparse.Namespace) -> Dict[str, Any]:
     checks = summarize_checks(slide_reviews)
     baseline_summary = None
     if args.baseline_review:
-        baseline_summary = baseline_check(slide_reviews, Path(args.baseline_review).resolve())
+        try:
+            baseline_summary = compute_baseline_check(slide_reviews, Path(args.baseline_review).resolve())
+        except ValueError as exc:
+            fail(str(exc))
         checks['baseline_comparison_passed'] = baseline_summary['baseline_comparison_passed']
 
     result = {

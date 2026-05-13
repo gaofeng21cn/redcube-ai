@@ -24,7 +24,7 @@
 
 这四个 surface 合起来构成当前发布 package：single `redcube-ai` app skill 是用户/Agent 入口，`invokeDomainEntry` 是 service-safe domain entry，product sidecar/projection 是 OPL provider 和 family queue 的可读/受控派发边界，`stage_control_projection` 是 OPL Stage Control Plane 的只读 stage descriptor。它们全部指向同一 downstream RCA domain truth；RCA 继续独立持有 visual truth、route owner、review/export verdict 和 artifact authority。
 
-RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract` 统一 domain receipt、typed blocker 与 no-regression evidence return shape；`lifecycle_guarded_apply_proof` 覆盖 cleanup/restore/retention 的 guarded apply 语义；`physical_skeleton_follow_through` 证明 `agent/ contracts/ runtime/ docs/` 入口可被 OPL 消费；`review_helper_baseline_follow_through` 把 PPT review helper 的 line-budget baseline 后续拆分固定为可审查模块边界。这些 surface 仍是 RCA-owned projection，不把 visual truth、review/export verdict、canonical artifact 或 memory body 移给 OPL。
+RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract` 统一 domain receipt、typed blocker 与 no-regression evidence return shape；`lifecycle_guarded_apply_proof` 覆盖 cleanup/restore/retention 的 guarded apply 语义；`physical_skeleton_follow_through` 证明 `agent/ contracts/ runtime/ docs/` 入口可被 OPL 消费；`review_helper_baseline_follow_through` 记录 PPT review helper 的 baseline removal、geometry audit / markdown report / summary projection 拆分与剩余 screenshot capture 边界。这些 surface 仍是 RCA-owned projection，不把 visual truth、review/export verdict、canonical artifact 或 memory body 移给 OPL。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
