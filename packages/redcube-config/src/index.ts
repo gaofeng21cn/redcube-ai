@@ -470,7 +470,6 @@ function prelimWorkspaceRoot({
 
   const envWorkspace = String(
     env.REDCUBE_WORKSPACE_ROOT
-    || env.REDCUBE_WORKBENCH_ROOT
     || '',
   ).trim();
   if (envWorkspace) return path.resolve(envWorkspace);
@@ -522,7 +521,6 @@ export function loadRuntimeConfig(options: RedcubeRuntimeConfigOptions = {}): Re
   const finalWorkspaceRoot = String(
     explicit.workspaceRoot
     || env.REDCUBE_WORKSPACE_ROOT
-    || env.REDCUBE_WORKBENCH_ROOT
     || runtimeState.values.workspaceRoot
     || rootDir,
   ).trim();
@@ -546,9 +544,7 @@ export function loadRuntimeConfig(options: RedcubeRuntimeConfigOptions = {}): Re
         ? 'explicit.workspaceRoot'
         : env.REDCUBE_WORKSPACE_ROOT
           ? 'env:REDCUBE_WORKSPACE_ROOT'
-          : env.REDCUBE_WORKBENCH_ROOT
-            ? 'env:REDCUBE_WORKBENCH_ROOT'
-            : runtimeState.sources.workspaceRoot || (rootDir ? 'fallback.rootDir' : 'fallback.cwd'),
+          : runtimeState.sources.workspaceRoot || (rootDir ? 'fallback.rootDir' : 'fallback.cwd'),
       promptsDir: explicit.promptsDir
         ? 'explicit.promptsDir'
         : env.REDCUBE_PROMPTS_DIR

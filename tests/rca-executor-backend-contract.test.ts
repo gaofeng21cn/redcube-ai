@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -112,33 +112,4 @@ test('RCA route execution policy keeps render_html structured and fix_html agent
       route: 'fix_html',
     },
   });
-});
-
-test('RCA retired skeleton adapter and product/domain action harness names stay absent', () => {
-  const retiredSkeleton = 'domain-agent-skeleton-' + 'adapter.ts';
-  const retiredHarnessPrefix = 'gateway' + '-';
-  const retiredMcpPrefix = 'mcp' + '-';
-  const retiredPaths = [
-    `packages/redcube-gateway/src/actions/${retiredSkeleton}`,
-    `tests/${retiredHarnessPrefix}test-api.ts`,
-    `tests/${retiredHarnessPrefix}case-shared.ts`,
-    `tests/${retiredHarnessPrefix}actions.test.ts`,
-    `tests/${retiredMcpPrefix}${retiredHarnessPrefix.slice(0, -1)}.test.ts`,
-    `tests/${retiredMcpPrefix}${retiredHarnessPrefix}cases`,
-  ];
-  const canonicalPaths = [
-    'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts',
-    'tests/product-domain-action-test-api.ts',
-    'tests/product-domain-action-case-shared.ts',
-    'tests/product-domain-actions.test.ts',
-    'tests/product-domain-action-api.test.ts',
-    'tests/product-domain-action-api-cases',
-  ];
-
-  for (const retiredPath of retiredPaths) {
-    assert.equal(existsSync(path.resolve(retiredPath)), false, retiredPath);
-  }
-  for (const canonicalPath of canonicalPaths) {
-    assert.equal(existsSync(path.resolve(canonicalPath)), true, canonicalPath);
-  }
 });

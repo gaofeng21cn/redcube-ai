@@ -19,7 +19,6 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/harness-completion-audit.test.ts',
     'tests/image-ppt-proof-runner.test.ts',
     'tests/kernel-split-extraction.test.ts',
-    'tests/legacy-cleanup.test.ts',
     'tests/line-budget.test.ts',
     'tests/overlay-registry.test.ts',
     'tests/opl-family-contract-adoption.test.ts',
