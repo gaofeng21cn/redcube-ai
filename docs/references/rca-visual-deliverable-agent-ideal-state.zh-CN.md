@@ -283,6 +283,8 @@ RCA 达到理想生产级状态时，应满足以下门槛：
 
 本节只维护 RCA 自己的完善计划。MAS、MAG、MDS 或 One Person Lab App 的并行 backlog 不写入本文；RCA 只说明哪些 visual-deliverable 能力由 RCA 持有，哪些通用外围应上收到 OPL Framework / One Person Lab App。
 
+OPL 系列项目的全局主参考是 `/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.zh-CN.md`。涉及跨仓总顺序、shared primitive owner、App/workbench 通用目标和旧兼容面退役纪律时，以该主参考和 OPL docs 为准。
+
 ### 通用模块上收 OPL 清单
 
 RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。下列能力具有跨 domain 复用价值，应优先沉淀到 OPL，而不是在 RCA 内长期维护一套私有平台：

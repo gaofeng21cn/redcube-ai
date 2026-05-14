@@ -94,14 +94,14 @@
 - delivery lifecycle：`docs/delivery/`
 - source lifecycle：`docs/source/`
 - 稳定 rules：`docs/policies/`
-- absorbed milestones 与 phase-2 records：`docs/program/phase-2/`
+- absorbed milestones 与 phase-2 records：`docs/history/phase-2/`
 - repo-local Hermes migration/history records：`docs/history/hermes/`
 - AI / Superpowers process drafts：保持未跟踪，不进入 repo-tracked docs history
 - 支持性技术参考：`docs/references/`
 - direct-delivery future target reference：`docs/references/direct_delivery_longrun_target_state.md`
 - source-readiness future target reference：`docs/references/source_readiness_deep_research_longrun_target_state.md`
 - 维护者验证与文档治理：`docs/references/series-doc-governance-checklist.md`
-- 文档生命周期治理：`docs/docs_portfolio_consolidation.md`。合同仍引用的 program brief 留在 `docs/program/` 并用生命周期说明降级；不再服务当前 baton 且无合同引用的计划进入 `docs/history/` 或 tombstone 语境；supporting reference 不能重新成为公开第一身份。
+- 文档生命周期治理：`docs/docs_portfolio_consolidation.md`。合同仍引用的 reader-context brief 按生命周期进入 `docs/active/` 或 `docs/history/` 并用生命周期说明降级；不再服务当前 baton 且无合同引用的计划进入 `docs/history/` 或 tombstone 语境；supporting reference 不能重新成为公开第一身份。
 
 ## 当前收口重点
 
@@ -121,5 +121,5 @@
 - product/domain action surface：CLI/MCP/help/manifest 从 `family_action_catalog` 派生，注入 API 使用 `domainActions` / `callDomainTool` / `listDomainTools` / `DomainTool*`，不恢复 `GatewayActionMap` / `getCliGatewayActions` / `callGatewayTool` / `listGatewayTools` 等旧命名。
 - runtime proof surface：Hermes 只保留为显式 opt-in executor/proof backend；证明入口是 runtime-protocol tests 和 Python helper catalog tests，不恢复 standalone upstream probe script。
 - Python helper surface：当前仍允许 `script` / `compatibility_script` 作为 thin wrapper ref，但 preferred invocation 是 package module；后续退链要先完成 catalog、runtime callsite 和 native helper proof 同步，不能保留第二套 helper authority。
-- docs/program surface：仍被 `human_doc:*` 引用的 Phase 2 / Hermes / harness brief 原位保留为 absorbed provenance；无合同引用的旧计划直接进 `docs/history/` 或 tombstone，不再新增兼容性计划。
+- docs active/history surface：仍被 `human_doc:*` 引用的 current baton、Phase 2 / Hermes / harness brief 按生命周期保留为 current baton 或 absorbed provenance；无合同引用的旧计划直接进 `docs/history/` 或 tombstone，不再新增兼容性计划。
 - target-state / gap surface：RCA 理想目标态与当前差距统一读 `docs/references/rca-visual-deliverable-agent-ideal-state.zh-CN.md` 的“当前差距与完善计划”；该文档只作为 north-star 和 gap planning reference，不能替代当前 truth surface。

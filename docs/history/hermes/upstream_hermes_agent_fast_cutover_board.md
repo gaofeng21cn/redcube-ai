@@ -27,7 +27,7 @@
 
 配套冻结件：
 
-- final target brief：`docs/program/upstream_hermes_agent_final_target_shape.md`
+- final target brief：`docs/history/hermes/upstream_hermes_agent_final_target_shape.md`
 - final target contract：`contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`
 
 ## 一句话目标
@@ -108,4 +108,4 @@
 
 ## 长线 Codex 提示词
 
-> 你现在负责 `RedCube AI` 的 `upstream Hermes-Agent fast cutover` 主线。先完整读取并遵守以下文档：`AGENTS.md`、`README.md`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`contracts/runtime-program/current-program.json`、`docs/program/upstream_hermes_agent_fast_cutover_board.md`。目标不是继续打磨 repo-local runtime，也不是先做 UI；目标是在不改写 RedCube visual domain boundary 的前提下，以最快速度把 runtime substrate 责任切到真实上游 `Hermes-Agent`，并形成可被未来 `OPL Runtime Manager` 调用的 service-safe domain entry surface。你必须按 board 的顺序自行推进：先冻结真实上游连接证据，再迁移 runtime owner，再收口 domain entry adapter，再做端到端验证。你可以自己写 activation package、tests、contracts、docs，并在每个 honest tranche 完成后直接 absorb 到 `main`、提交、push、继续下一棒；不要因为“已完成一个小 tranche”就停车。只有遇到真实硬 blocker 才允许停下，例如：需要外部安装/凭证/网络服务、需要用户做不可替代决策、或继续前进会造成 truth drift。禁止做的事：把 repo-local `Hermes` 命名包装成已接入上游、先开新 family、先补 academic poster、先做聊天 UI、先讲平台故事。每次推进都必须同步更新 docs / contracts / tests，并用 fresh verification 证明当前说法成立。
+> 你现在负责 `RedCube AI` 的 `upstream Hermes-Agent fast cutover` 主线。先完整读取并遵守以下文档：`AGENTS.md`、`README.md`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`contracts/runtime-program/current-program.json`、`docs/history/hermes/upstream_hermes_agent_fast_cutover_board.md`。目标不是继续打磨 repo-local runtime，也不是先做 UI；目标是在不改写 RedCube visual domain boundary 的前提下，以最快速度把 runtime substrate 责任切到真实上游 `Hermes-Agent`，并形成可被未来 `OPL Runtime Manager` 调用的 service-safe domain entry surface。你必须按 board 的顺序自行推进：先冻结真实上游连接证据，再迁移 runtime owner，再收口 domain entry adapter，再做端到端验证。你可以自己写 activation package、tests、contracts、docs，并在每个 honest tranche 完成后直接 absorb 到 `main`、提交、push、继续下一棒；不要因为“已完成一个小 tranche”就停车。只有遇到真实硬 blocker 才允许停下，例如：需要外部安装/凭证/网络服务、需要用户做不可替代决策、或继续前进会造成 truth drift。禁止做的事：把 repo-local `Hermes` 命名包装成已接入上游、先开新 family、先补 academic poster、先做聊天 UI、先讲平台故事。每次推进都必须同步更新 docs / contracts / tests，并用 fresh verification 证明当前说法成立。

@@ -9,5 +9,5 @@ Current runtime and product-entry truth should be read from:
 - `../../project.md`
 - `../../status.md`
 - `../../architecture.md`
-- `../../program/README.md`
+- `../../active/README.md`
 - `../../../contracts/runtime-program/current-program.json`

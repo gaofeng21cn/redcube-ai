@@ -14,7 +14,13 @@
 | --- | --- | --- |
 | 潜在用户与领域专家 | [仓库首页](../README.zh-CN.md) | 先理解 RedCube 交付什么，再进入技术细节 |
 | 技术规划与架构读者 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md)、[合同说明](../contracts/README.md) | 读取当前边界、执行模型和当前治理面 |
-| 开发者与维护者 | [Product](./product/README.md)、[Runtime](./runtime/README.md)、[Delivery](./delivery/README.md)、[Source](./source/README.md)、[Policies](./policies/README.md)、[Program](./program/README.md)、[References](./references/README.md)、[History](./history/README.zh-CN.md) | 追踪生命周期文档、稳定规则、当前 baton、参考资料与历史 provenance |
+| 开发者与维护者 | [Product](./product/README.md)、[Runtime](./runtime/README.md)、[Delivery](./delivery/README.md)、[Source](./source/README.md)、[Policies](./policies/README.md)、[Active](./active/README.md)、[References](./references/README.md)、[History](./history/README.zh-CN.md) | 追踪生命周期文档、稳定规则、当前 baton、参考资料与历史 provenance |
+
+## OPL 系列分层
+
+OPL 系列项目的全局主参考是 `/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.zh-CN.md`。它维护 OPL Framework 的全局目标、全局差距、通用能力上收边界、App/workbench 目标和跨仓开发顺序。
+
+RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、visual truth、review/export verdict、artifact authority、direct product-entry path、OPL-hosted sidecar/projection/receipt 边界，以及哪些通用 source/workspace intake、artifact gallery、route/decision graph、review/repair transport、native-helper envelope、memory locator 和 observability primitive 应上收到 OPL。MAS、MAG、MDS 或 OPL-owned App/workbench 的并行 backlog 不写入 RCA 文档。
 
 ## 当前基线
 
@@ -51,17 +57,24 @@
 | Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
 | Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) |
 | Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) |
-| Program | 合同引用的 baton、已吸收 closeout 记录，以及仍有 `human_doc:*` 链接的旧 brief | [Program](./program/README.md) |
+| Active | 当前执行、当前计划、当前差距、合同引用 baton 与 closeout evidence | [Active](./active/README.md) |
+| Specs | 当前仍有效的技术规格索引 | [Specs](./specs/README.md) |
 | References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
 | History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.zh-CN.md) |
 
 这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；program 记录 active 或 contract-linked baton；references 与 history 分别保留支撑上下文和历史 provenance。
+RCA 采用 OPL-family canonical docs taxonomy：
+`active/public/product/runtime/delivery/source/policies/specs/references/history`。
+旧 `docs/program/` active baton 目录已物理退役：当前 baton brief 进入
+`docs/active/`，已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`，
+upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:program_*`
+语义 ID 继续作为稳定读者上下文 ID，不代表物理路径承诺。
 
 ## 维护者治理入口
 
 - 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
-- 仍被 `human_doc:*` 语义 ID 引用的 program brief 继续留在 `docs/program/`。如果标题或文件名里含有旧 gateway、bridge、harness 或 Hermes-first 语言，先在文件内加生命周期说明，把材料标成已吸收、内部集成或 provenance，再考虑移动。
+- 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前 baton 在 `docs/active/`，absorbed / proof 材料在 `docs/history/`。
 - RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 program，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
 - `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
 - 仓库目录治理现在通过 `scripts/repo-hygiene.sh` 在 `scripts/verify.sh` 各 lane 和 grouped test 执行前运行。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json` 这类生成物 / 本地状态；`.agents/` 下唯一允许跟踪的插件入口是 `.agents/plugins/marketplace.json`。
@@ -73,7 +86,8 @@
 - `docs/delivery/`：deliverable family、route、proof、export 与示例材料
 - `docs/source/`：source readiness 与 augmentation 材料
 - `docs/policies/`：稳定治理与运行规则
-- `docs/program/`：合同引用的 baton、已吸收 tranche brief 与 follow-on records 的人类可读记录
+- `docs/active/`：当前 baton 与 active closeout 记录
+- `docs/history/phase-2/`：已吸收 tranche brief 与 follow-on records
 - `docs/references/`：解释当前运行、目标状态或维护者实践的支持性技术参考，但不承担公开身份
 - `docs/history/`：归档 provenance、tombstone、repo-local migration 记录，以及不再服务当前 active program baton 的历史计划
 - 本地 AI / Superpowers 过程草稿继续在被忽略的 `docs/superpowers/` 下维护，不进入 repo-tracked history。

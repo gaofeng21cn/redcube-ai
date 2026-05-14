@@ -43,7 +43,7 @@
 - 公开发布包装固定为 `RedCube AI Foundry Agent / OPL-compatible package built on OPL Framework`：single `redcube-ai` app skill、service-safe domain entry、product sidecar/projection、stage control projection 和 standard domain-agent skeleton mapping 是同一 package 的不同 surface。
 - `OPL` 在 RCA 文档中固定解释为 stage-led 的完整智能体运行框架，可作为外部依赖托管 RCA；它不成为 RCA 对外第一身份，也不接管 visual-domain truth、canonical artifacts、review/export gate 或 publication projection。
 - `Codex CLI` 是 RCA direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的默认最小具体执行单元。
-- 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 口径只能出现在内部集成、provenance、合同引用、或 tombstone 语境中；仍被 runtime-program 合同引用的 program brief 留在 `docs/program/`，通过 lifecycle note 降级，不因标题旧而先物理迁移。
+- 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 口径只能出现在内部集成、provenance、合同引用、或 tombstone 语境中；仍被 runtime-program 合同引用的 reader-context brief 按生命周期迁入 `docs/active/` 或 `docs/history/`，通过 lifecycle note 降级，不再保留旧 `docs/program/` 活跃目录。
 
 ### 决策：RCA 对齐 OPL Temporal-backed production runtime，Temporal 为 OPL 生产必需 substrate
 
@@ -112,11 +112,11 @@
 
 原因：让 AI 和维护者能快速定位项目目标、当前主线、硬约束和关键决策。
 
-### 决策：Phase 2 tranche brief 统一下沉到 `docs/program/phase-2/`
+### 决策：Phase 2 tranche brief 统一下沉到 `docs/history/phase-2/`
 
-原因：`phase_2_*.md` 继续平铺在 docs 根目录会让入口混乱；它们保留为活跃 program brief，但不再占据根目录层级。
+原因：`phase_2_*.md` 继续平铺在 docs 根目录会让入口混乱；它们保留为 absorbed provenance brief，但不再占据根目录层级或 active 层级。
 
-### 决策：`contracts/runtime-program/*.json` 与 `docs/program/phase-2/*.md` 成对维护
+### 决策：`contracts/runtime-program/*.json` 与 `docs/history/phase-2/*.md` 成对维护
 
 原因：一个是机器真相，一个是人类可读 brief，不能再各自漂移。
 

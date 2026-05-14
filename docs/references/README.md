@@ -2,7 +2,7 @@
 
 `docs/references/` holds supporting technical material that still helps explain current RedCube operation, target-state thinking, or maintainer practice.
 
-Active contract-linked program briefs stay in `../program/`, stable rules stay in `../policies/`, and no-longer-current provenance stays in `../history/`.
+Active contract-linked baton briefs stay in `../active/`, stable rules stay in `../policies/`, and no-longer-current provenance stays in `../history/`.
 Reference documents may discuss OPL, gateway, harness, bridge, federation, or hosted runtime context; those terms are read as internal integration, target-state, or provenance language. The default public identity remains `RedCube AI` as a visual-deliverable domain agent.
 If a reference is still named by `human_doc:*`, keep it in place and clarify reader stance before moving it. In the current contract set, `human_doc:domain_harness_os_positioning` still protects the positioning reference from archival movement.
 

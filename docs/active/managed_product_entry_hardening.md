@@ -2,7 +2,7 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文是 current baton / absorbed hardening brief，解释 product-entry session continuity 与用户级 runtime-state 行为。它仍被 runtime-program 当前合同引用，因此保留在 `docs/program/`；它不定义新的公开 GUI、WebUI 或第二产品入口。
+生命周期说明：本文是 current baton / absorbed hardening brief，解释 product-entry session continuity 与用户级 runtime-state 行为。它由旧 `docs/program/` active baton 层迁入 `docs/active/`；runtime-program 当前合同继续通过 `human_doc:program_managed_product_entry_hardening` 指向本文语义。它不定义新的公开 GUI、WebUI 或第二产品入口。
 
 ## 一句话结论
 

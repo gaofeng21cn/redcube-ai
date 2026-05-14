@@ -12,11 +12,11 @@ Use this layer for:
 
 Current groups:
 
-- `hermes/`: repo-local Hermes migration provenance. These files do not prove that upstream `Hermes-Agent` owns the active runtime.
+- `hermes/`: repo-local Hermes migration provenance and upstream Hermes proof records. These files do not prove that upstream `Hermes-Agent` owns the active runtime.
+- `phase-2/`: absorbed Phase 2 tranche records retained for runtime-program reader context and provenance.
 - `plans/`: historical plans that are retained for traceability but no longer serve the active program baton.
 - `tombstones/`: retired wording and route narratives that should stay searchable without returning to the active public identity. Current tombstone: `tombstones/retired-route-narratives-2026-05-11.md`.
 - Future tombstone notes should state the retired wording, the current owner surface, and whether any machine-readable `human_doc:*` links still require an in-place program brief.
 
-Active program briefs that are still linked from machine-readable runtime-program contracts remain in `../program/`.
-Contract-linked Phase 2 and upstream Hermes proof briefs remain there until their `human_doc:*` semantic IDs are retired or remapped.
+Current contract-linked baton briefs live in `../active/`. Contract-linked Phase 2 and upstream Hermes proof briefs live in `phase-2/` and `hermes/`; their `human_doc:*` semantic IDs remain stable reader context.
 Local AI/Superpowers process drafts stay ignored under `../superpowers/` and are not imported into repo-tracked history.

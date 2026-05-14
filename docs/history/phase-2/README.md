@@ -1,6 +1,6 @@
 # Phase 2 Program Records
 
-生命周期说明：本目录只保留已吸收的 Phase 2 tranche、continuation board 与 closeout provenance。它仍在 `docs/program/` 原位保留，因为多个 runtime-program contracts 通过 `human_doc:program_phase_2_*` 语义 ID 指向这些 brief。
+生命周期说明：本目录只保留已吸收的 Phase 2 tranche、continuation board 与 closeout provenance。它由旧 `docs/program/phase-2/` 迁入 history；多个 runtime-program contracts 继续通过 `human_doc:program_phase_2_*` 语义 ID 指向这些 brief 的读者上下文。
 
 ## Current Stance
 
@@ -15,9 +15,9 @@
 
 ## Handling Rules
 
-- 被 `human_doc:*` 引用的 brief 原位保留，并通过文件头 lifecycle note 降级为 absorbed / provenance。
-- 只有当对应 runtime-program contract 不再引用某个 brief 时，才把该 brief 迁入 `docs/history/` 或 tombstone 语境。
-- 新增当前主线工作不要继续写进本目录；需要 program tracking 时，在 `docs/program/` 根层建立新的 owner brief，并同步 machine-readable contract。
+- 被 `human_doc:*` 引用的 brief 可以迁入 canonical lifecycle 目录；语义 ID 保持稳定。
+- 如果某个 brief 后续不再被 runtime-program contract 引用，仍保留在 history 或 tombstone 语境，不回到 active。
+- 新增当前主线工作不要继续写进本目录；需要 active tracking 时，在 `docs/active/` 建立新的 owner brief，并同步 machine-readable contract。
 - 本目录中的 old gateway / harness / OPL-hosted / Hermes wording 都按当时 tranche 的历史语境读取，不覆盖当前 owner surface。
 
 ## Current Entry Points

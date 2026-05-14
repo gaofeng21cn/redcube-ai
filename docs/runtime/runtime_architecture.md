@@ -1,6 +1,6 @@
 # 运行架构说明
 
-生命周期说明：本文是当前 runtime topology 的人读说明，服务 `human_doc:runtime_architecture` 语义引用。它不承载 program closeout、Phase 2 provenance、Hermes 迁移证明或 gateway / harness 历史叙事；这些材料分别归入 `docs/program/`、`docs/references/` 与 `docs/history/`。
+生命周期说明：本文是当前 runtime topology 的人读说明，服务 `human_doc:runtime_architecture` 语义引用。它不承载 active baton closeout、Phase 2 provenance、Hermes 迁移证明或 gateway / harness 历史叙事；这些材料分别归入 `docs/active/`、`docs/references/` 与 `docs/history/`。
 
 ## 文档边界
 
@@ -133,8 +133,8 @@ Codex App direct skill 调用与 OPL-hosted 调用必须在 `invokeDomainEntry` 
 
 本文只保留当前 runtime 拓扑。下列内容不再放在这里展开：
 
-- Phase 2 hardening closeout：`docs/program/phase-2/`
-- upstream Hermes proof / blocker / closeout：`docs/program/upstream_hermes_agent_*.md`
+- Phase 2 hardening closeout：`docs/history/phase-2/`
+- upstream Hermes proof / blocker / closeout：`docs/history/hermes/upstream_hermes_agent_*.md`
 - repo-local Hermes migration history：`docs/history/hermes/`
 - gateway / harness / bridge / Hermes-first 退役读法：`docs/history/tombstones/retired-route-narratives-2026-05-11.md`
 - OPL handoff 与 family contract 支撑材料：`docs/references/`

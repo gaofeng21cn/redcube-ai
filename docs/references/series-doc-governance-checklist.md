@@ -3,13 +3,13 @@
 ## 目标
 
 本清单用于把 `RedCube AI` 放进 `One Person Lab`、`Med Auto Science`、`Med Auto Grant`、`RedCube AI` 这组系列项目的统一文档管理口径里做巡检。
-它服务跨仓 docs intake、回归与持续对齐，不替代核心五件套、`docs/program/**`、`docs/policies/**`、typed boundary audit 或 machine-readable contracts。
+它服务跨仓 docs intake、回归与持续对齐，不替代核心五件套、`docs/active/**`、`docs/policies/**`、typed boundary audit 或 machine-readable contracts。
 
 ## 一、默认入口
 
 - `README.md` / `README.zh-CN.md` 是默认公开首页。
 - `docs/README.md` / `docs/README.zh-CN.md` 是默认 docs 索引。
-- 外部读者先走公开入口；AI / 维护者先走核心五件套，再进入 `docs/program/**`、`docs/references/**`、`docs/policies/**` 与 `contracts/**`。
+- 外部读者先走公开入口；AI / 维护者先走核心五件套，再进入 `docs/active/**`、`docs/references/**`、`docs/policies/**`、`docs/history/phase-2/**` 与 `contracts/**`。
 
 ## 二、核心五件套
 
@@ -25,7 +25,7 @@
 ## 三、公开层与内部层
 
 - `README*` 与 `docs/README*` 继续承担双语公开入口。
-- `docs/program/**` 承担 active mainline、absorbed tranche 与 provenance brief。
+- `docs/active/**` 承担 active mainline brief；`docs/history/phase-2/**` 与 `docs/history/hermes/**` 承担 absorbed tranche 与 provenance brief。
 - `docs/references/**` 承担内部参考说明；默认中文维护。
 - `docs/policies/**` 承担稳定内部规则。
 - 详细 `docs/*.md` 继续作为 repo-tracked 的内部 operator / collaborator 文档，不自动升格为公开面。

@@ -8,13 +8,13 @@
 
 这份文档现在保留的是 `2026-04-12` 同日稍早出现过的历史 blocker 证据。
 
-它曾经真实阻塞过 `docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 closeout，
+它曾经真实阻塞过 `docs/history/hermes/upstream_hermes_agent_fast_cutover_board.md` 的 F4 closeout，
 但它现在已经不再是当前 stop boundary。
 
 当前 fresh closeout 证据已冻结到：
 
 - `contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json`
-- `docs/program/upstream_hermes_agent_live_verification_closeout.md`
+- `docs/history/hermes/upstream_hermes_agent_live_verification_closeout.md`
 
 ## 已冻结的通过证据
 

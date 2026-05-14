@@ -14,7 +14,22 @@ The current public reading path starts from RedCube as the `RedCube AI Foundry A
 | --- | --- | --- |
 | Potential users and domain experts | [Repository home](../README.md) | Understand what RedCube delivers before opening technical files |
 | Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and active governance surface |
-| Developers and maintainers | [Product](./product/README.md), [Runtime](./runtime/README.md), [Delivery](./delivery/README.md), [Source](./source/README.md), [Policies](./policies/README.md), [Program](./program/README.md), [References](./references/README.md), [History](./history/README.md) | Track lifecycle docs, stable rules, active baton records, references, and archived provenance |
+| Developers and maintainers | [Product](./product/README.md), [Runtime](./runtime/README.md), [Delivery](./delivery/README.md), [Source](./source/README.md), [Policies](./policies/README.md), [Active](./active/README.md), [References](./references/README.md), [History](./history/README.md) | Track lifecycle docs, stable rules, active baton records, references, and archived provenance |
+
+## OPL Family Layering
+
+The global OPL-family development reference lives at
+`/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.zh-CN.md`.
+It owns OPL Framework global targets, global gaps, generic primitive
+absorption, App/workbench targets, and cross-repo execution order.
+
+This RCA repo only owns the visual-deliverable domain-agent target state,
+current gaps, visual truth, review/export verdicts, artifact authority, the
+direct product-entry path, OPL-hosted sidecar/projection/receipt boundaries,
+and the list of generic source/workspace intake, artifact gallery,
+route/decision graph, review/repair transport, native-helper envelope, memory
+locator, and observability primitives that should move up into OPL. MAS, MAG,
+MDS, and OPL-owned App/workbench backlogs are not maintained in RCA docs.
 
 ## Current Baseline
 
@@ -51,20 +66,28 @@ The current public reading path starts from RedCube as the `RedCube AI Foundry A
 | Delivery | Deliverable families, routes, proof environments, export expectations, examples | [Delivery docs](./delivery/README.md) |
 | Source | Source readiness, augmentation, deep research trigger/gate, source truth consumption | [Source docs](./source/README.md) |
 | Policies | Stable governance and operating rules | [Policies](./policies/README.md) |
-| Program | Contract-linked baton, absorbed closeout records, and in-place legacy briefs that still have `human_doc:*` links | [Program](./program/README.md) |
+| Active | Current execution, current plans, current gaps, contract-linked baton, and closeout evidence | [Active](./active/README.md) |
+| Specs | Current technical spec index | [Specs](./specs/README.md) |
 | References | Supporting technical references that do not own the active baton or public identity | [References](./references/README.md) |
 | History | Archived provenance, tombstones, and historical plans | [History](./history/README.md) |
 
 Read this table as hierarchy: current truth and machine truth come first;
-product/runtime/delivery/source/policies explain current work; program records
+product/runtime/delivery/source/policies explain current work; active records
 track active or contract-linked baton material; references and history preserve
 support context and provenance.
+RCA follows the OPL-family canonical docs taxonomy:
+`active/public/product/runtime/delivery/source/policies/specs/references/history`.
+The former `docs/program/` active baton directory has been physically retired:
+current baton records live in `docs/active/`, absorbed Phase 2 records live in
+`docs/history/phase-2/`, and upstream Hermes proof records live in
+`docs/history/hermes/`. `human_doc:program_*` IDs remain stable semantic reader
+context, not physical path commitments.
 
 ## Maintainer Governance Surface
 
 - Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
 - Historical and provenance audits stay in `docs/history/` when they no longer serve the active program baton; still-current operator references stay in `docs/references/`.
-- Contract-linked program briefs stay in `docs/program/` until their `human_doc:*` references move. If their title or file name contains older gateway, bridge, harness, or Hermes-first language, add an in-file lifecycle note that marks the material as absorbed, internal, or provenance instead of moving it first.
+- Contract-linked reader context uses stable `human_doc:*` IDs while the physical documents live in their lifecycle layer. Current baton briefs are in `docs/active/`; absorbed and proof material is in `docs/history/`.
 - RCA docs are maintained by content lifecycle. A file can stay in place while only part of its body is current; merge current facts into the owner doc, keep active baton records in program, move support explanation to references, and archive completed or superseded plan text after link review.
 - `README*` and `docs/**` are human-readable surfaces. Runtime contracts, tests, scripts, and dashboards may expose `human_doc:*` semantic pointers for reader context, but they must not pin repo documentation paths as stable machine-readable APIs.
 - Repository hygiene now runs before `scripts/verify.sh` lanes and before grouped test execution through `scripts/repo-hygiene.sh`. The tracked mainline must not contain generated or local-state payloads such as `dist/`, `build/`, `out/`, `__pycache__`, `*.egg-info`, `.DS_Store`, project-level `.codex/`, `.omx/`, `.runtime-program/`, `runtime-state/`, or `.agent-contract-baseline.json`. `.agents/plugins/marketplace.json` is the only tracked `.agents/` plugin source entrypoint.
@@ -76,7 +99,8 @@ support context and provenance.
 - `docs/delivery/`: deliverable family, route, proof, export, and example materials
 - `docs/source/`: source readiness and augmentation materials
 - `docs/policies/`: stable governance and operating rules
-- `docs/program/`: human-readable contract-linked baton, absorbed tranche briefs, and follow-on records
+- `docs/active/`: human-readable current baton and active closeout records
+- `docs/history/phase-2/`: absorbed tranche briefs and follow-on records
 - `docs/references/`: supporting technical references that explain current operation, target states, or maintainer practice without becoming public identity
 - `docs/history/`: archived provenance, tombstones, repo-local migration records, and historical plans that no longer serve the active program baton
 - Local AI/Superpowers process drafts stay ignored under `docs/superpowers/` and are not part of repo-tracked history.

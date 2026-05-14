@@ -11,7 +11,7 @@
 
 - `contracts/runtime-program/current-program.json` 是当前 active mainline pointer。
 - `contracts/runtime-program/*.json` 是 tranche / board / provenance 的机器可读真相面。
-- `docs/program/*/*.md` 是对应的人类可读 brief，必须与 contracts 和 tests 同步。
+- `docs/active/*.md` 与 `docs/history/phase-2/*.md` 是对应的人类可读 brief，必须与 contracts 和 tests 同步。
 - `Hermes-Agent` 一词只允许指上游外部 runtime 项目 / 服务；仓内自写 package、pilot、shim 或 scaffold 不得写成“已接入 Hermes-Agent”。
 - 对外主语固定为“独立 visual-deliverable domain agent”；`gateway / harness` 只作为内部架构边界语言。
 - repo-verified direct route 与 OPL-hosted route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。

@@ -217,7 +217,8 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 
 ### 4. Program briefs
 
-- `docs/program/*/*.md`
+- `docs/active/*.md`
+- `docs/history/phase-2/*.md`
 
 这层负责与 contracts 对应的人类可读 tranche brief，不是默认公开首页叙事。
 

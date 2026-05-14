@@ -6,7 +6,7 @@
 
 ## 一句话结论
 
-`docs/program/upstream_hermes_agent_fast_cutover_board.md` 的 F4 端到端验证与 absorb，
+`docs/history/hermes/upstream_hermes_agent_fast_cutover_board.md` 的 F4 端到端验证与 absorb，
 现在已经可以在当前验证宿主上诚实写成 completed。
 
 这不是因为 repo-local runtime 回来了，
@@ -37,7 +37,7 @@
 ## 对历史 blocker 的诚实处理
 
 `contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json`
-与 `docs/program/upstream_hermes_agent_live_verification_blocker.md`
+与 `docs/history/hermes/upstream_hermes_agent_live_verification_blocker.md`
 不会被改写成“从未发生过”。
 
 这次 closeout 只说明两件事：
