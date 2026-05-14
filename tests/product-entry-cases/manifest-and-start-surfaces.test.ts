@@ -736,16 +736,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.sidecar.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.provider_transport_owner, 'opl_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.control_plane_owner, 'opl');
-    assert.deepEqual(manifest.product_entry_shell.sidecar.allowed_actions, [
-      'runtime_watch',
-      'supervise_managed_run',
-      'product_entry_continuation',
-      'emit_no_regression_evidence',
-      'emit_domain_owner_receipt',
-      'apply_visual_memory_writeback',
-      'apply_visual_workspace_lifecycle',
-      'notification_receipt',
-    ]);
+    assert.deepEqual(manifest.product_entry_shell.sidecar.allowed_actions, ['runtime_watch', 'supervise_managed_run', 'product_entry_continuation', 'emit_no_regression_evidence', 'emit_domain_owner_receipt', 'apply_visual_memory_writeback', 'apply_visual_workspace_lifecycle', 'notification_receipt']);
     assert.match(manifest.product_entry_shell.status.purpose, /product-entry overview/i);
     assert.equal(
       manifest.product_entry_shell.status.canonical_entry_semantics,
