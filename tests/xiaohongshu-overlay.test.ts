@@ -110,7 +110,7 @@ test('xiaohongshu built-in image-first style template is sanitized and style-onl
 
   assert.equal(profile.profile_id, 'xiaohongshu_image_first_medical_handdrawn_note_default_v1');
   assert.equal(profile.default_canvas.aspect_ratio, '3:4');
-  assert.equal(profile.production_quality_system.source_workbench_evidence.length, 6);
+  assert.equal(profile.production_quality_system.source_visual_reference_evidence.length, 6);
   assert.equal(profile.production_quality_system.density_standard, 'medium_density_mobile_readable');
   assert.equal(profile.production_quality_system.default_information_page_structure.includes('one core judgement'), true);
   assert.equal(profile.production_quality_system.default_information_page_structure.includes('three short main information modules'), true);

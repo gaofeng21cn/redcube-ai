@@ -1,7 +1,7 @@
 {
   "template_id": "medical_handdrawn_note_no_author_v1",
   "profile_id": "xiaohongshu_image_first_medical_handdrawn_note_default_v1",
-  "source_workbench": "AI小红书笔记/output/胸痛科普系列",
+  "source_visual_reference": "AI小红书笔记/output/胸痛科普系列",
   "curation_date": "2026-05-06",
   "reference_scope": "visual_style_only",
   "runtime_use": {

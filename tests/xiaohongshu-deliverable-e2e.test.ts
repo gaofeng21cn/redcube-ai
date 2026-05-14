@@ -153,7 +153,7 @@ test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets 
       true,
     );
     assert.equal(authoredStyleManifest.style_profile.profile_id, 'xiaohongshu_image_first_medical_handdrawn_note_default_v1');
-    assert.equal(authoredStyleManifest.production_quality_policy.source_workbench_sample.length, 6);
+    assert.equal(authoredStyleManifest.production_quality_policy.source_visual_reference_sample.length, 6);
     assert.equal(authoredStyleManifest.production_quality_policy.density_standard, 'medium_density_mobile_readable');
     assert.equal(authoredStyleManifest.delivery_quality_policy.clean_final_image_set_required, true);
     assert.equal(authoredStyleManifest.delivery_quality_policy.contact_sheet_or_gallery_review_expected_for_series, true);

@@ -68,6 +68,8 @@ const RETIRED_ACTIVE_PATTERNS = Object.freeze([
   /opl-gateway-shared/,
   /\blegacy_command_key\b/,
   /\bcompat_product_entry_overview_command\b/,
+  /\bsource_workbench\b/,
+  /\bsource_workbench_[A-Za-z0-9_]*\b/,
 ]);
 
 function listTextFiles(root) {

@@ -51,7 +51,7 @@ Bad memory writebacks include:
 
 | surface | memory treatment |
 | --- | --- |
-| xiaohongshu production quality lessons from external workbench absorption | Natural-language visual pattern memory candidate. |
+| xiaohongshu production quality lessons from external visual-reference absorption | Natural-language visual pattern memory candidate. |
 | PPT executive / defense / peer deck examples and contact-sheet review lessons | Natural-language memory candidate when described as reusable judgment, not copied artifact truth. |
 | poster / one-pager visual hierarchy lessons | Natural-language memory candidate. |
 | default image-first style profiles and prompt templates | Prompt/profile assets with optional memory refs; not a runtime recipe engine. |

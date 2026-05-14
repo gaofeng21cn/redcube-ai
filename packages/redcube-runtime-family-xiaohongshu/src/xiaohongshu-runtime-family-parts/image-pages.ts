@@ -140,7 +140,7 @@ export function createXiaohongshuImagePageParts(deps) {
     const promptTemplate = defaultPromptTemplate();
     const styleReferences = copyStyleReferences(contract, paths);
     const productionQualityPolicy = {
-      source_workbench_sample: [
+      source_visual_reference_sample: [
         'AI小红书笔记/output/男性备孕科普系列',
         'AI小红书笔记/output/女性备孕科普系列',
         'AI小红书笔记/output/备孕科普系列',

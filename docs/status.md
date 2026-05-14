@@ -38,6 +38,7 @@
 - 旧面退役校准：默认公开能力已收口到单一 `redcube-ai` app skill、CLI/MCP、`invokeDomainEntry` / `invokeProductEntry`、service-safe domain entry 和 product-entry/session surfaces；旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot 与 OPL bridge wording 只保留为 migration provenance、internal integration contract 或 tombstone 语境。它们当前不拥有默认 public entry、runtime owner、visual truth 或 artifact authority；active surface 继续以 direct route、product sidecar、stage descriptor、service-safe domain entry 和 OPL-hosted handoff parity 为准。
 - 2026-05-14 active-surface cleanup：旧 workbench/runtime residue 和 standalone upstream probe surface 已从 active code/tests/package surface 清理；`REDCUBE_WORKBENCH_ROOT` 不再作为 workspace root 兼容环境变量；`scripts/probe-upstream-hermes-agent.ts` 与退役 `@redcube/hermes-agent-client` package surface 不再作为证明入口。Hermes proof 现在通过 `@redcube/runtime-protocol` 的 Hermes API client / loop bridge 与 `tests/runtime-topology-regression.test.ts`、`tests/python-native-helper-catalog.test.ts` 覆盖。CLI / MCP 内部可注入 action 面也已从 `gateway actions` 命名收口为 product/domain actions，避免把历史 gateway wording 写回 public action API。
 - 2026-05-14 retired surface guard：原 `rca-compat-retirement-guard` 已改成 `rca-retired-surface-guard`。这条测试不是兼容层保留测试，而是 active source surface 的退役词汇守门；它只扫描源码、contracts、plugins、scripts、tests、tools 与 Python helper，不把 `README*` / `docs/**` 的历史 prose 当成机器接口。
+- 2026-05-14 xiaohongshu active field cleanup：image-first style profile、style-reference manifest、runtime production quality policy 和测试断言中的 `source_workbench*` 字段已收口为 `source_visual_reference*`，保留的是视觉参考样例语义，不再保留 workbench 命名接口。
 
 ## 当前执行口径
 
@@ -121,3 +122,4 @@
 - runtime proof surface：Hermes 只保留为显式 opt-in executor/proof backend；证明入口是 runtime-protocol tests 和 Python helper catalog tests，不恢复 standalone upstream probe script。
 - Python helper surface：当前仍允许 `script` / `compatibility_script` 作为 thin wrapper ref，但 preferred invocation 是 package module；后续退链要先完成 catalog、runtime callsite 和 native helper proof 同步，不能保留第二套 helper authority。
 - docs/program surface：仍被 `human_doc:*` 引用的 Phase 2 / Hermes / harness brief 原位保留为 absorbed provenance；无合同引用的旧计划直接进 `docs/history/` 或 tombstone，不再新增兼容性计划。
+- target-state / gap surface：RCA 理想目标态与当前差距统一读 `docs/references/rca-visual-deliverable-agent-ideal-state.zh-CN.md` 的“当前差距与完善计划”；该文档只作为 north-star 和 gap planning reference，不能替代当前 truth surface。

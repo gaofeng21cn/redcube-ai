@@ -144,6 +144,7 @@
 - Old workbench root compatibility is retired from active config loading; `REDCUBE_WORKSPACE_ROOT` and explicit workspace options are the current workspace root inputs.
 - CLI / MCP injection terminology is product/domain action and domain tool terminology. New tests and docs should not reintroduce `GatewayActionMap` / `getCliGatewayActions` / `callGatewayTool` / `listGatewayTools` / `GatewayTool*` names or equivalent aliases.
 - The active retired-wording guard is `tests/rca-retired-surface-guard.test.ts`; it protects source and machine surfaces, while `docs/**` remains human prose with lifecycle context.
+- Xiaohongshu image-first quality reference fields now use `source_visual_reference*`; active manifests, runtime policy objects, prompts, and tests should not restore `source_workbench*` fields.
 - Development plans should use `planned / done / deferred / skipped / verification / commit-push state`. Items listed as `deferred` must point to a contract link, explicit blocker, or history/tombstone landing zone.
 
 ## 验证口径

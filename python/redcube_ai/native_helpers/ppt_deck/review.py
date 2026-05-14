@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import json
+import statistics
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple

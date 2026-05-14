@@ -66,7 +66,7 @@
     "avoid asking for isolated stickers, icon packs, component sheets, HTML screenshots, or separate design elements"
   ],
   "production_quality_system": {
-    "source_workbench_evidence": [
+    "source_visual_reference_evidence": [
       "AI小红书笔记/output/男性备孕科普系列",
       "AI小红书笔记/output/女性备孕科普系列",
       "AI小红书笔记/output/备孕科普系列",
