@@ -6,7 +6,7 @@
 当前公开阅读路径从 `RedCube AI Foundry Agent` 身份开始：它是 built on OPL Framework 的 OPL-compatible visual-deliverable package。OPL 是 stage-led 的智能体运行框架，可以把 RedCube 作为外部依赖托管，因此 OPL 路径在这里只作为内部托管集成路径记录：
 
 - RedCube 直达路径：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- OPL 托管路径：`User -> OPL Product Entry -> OPL Runtime Manager -> Temporal-backed family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- OPL 托管路径：`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## 按读者类型进入
 
@@ -27,7 +27,7 @@ RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、v
 - `RedCube AI` 持有视觉领域真相、`invokeDomainEntry`、direct repo-verified 的 product-entry service surface，以及由单一 `redcube-ai` 应用技能、`CLI`、`MCP`、本地脚本与仓库跟踪合同组成的稳定可调用面。
 - 当前发布形态是 `RedCube AI Foundry Agent`：一个 app skill、一个 service-safe domain entry、product sidecar / projection refs 和只读 stage-control projection metadata 共同组成 OPL-compatible package surface。它不是 GUI/WebUI 壳，也不会把 route、review、export 或 artifact authority 迁给 OPL。
 - `Codex CLI` 继续作为 executor-adapter 合同后面的默认具体执行器和最小执行单元，服务本地操作者工作流。
-- `OPL Runtime Manager` 是 OPL 侧托管集成管理层，位于 Temporal-backed family runtime provider 之上；Temporal 是 OPL production online runtime 的必需 substrate，Hermes 保留为 legacy/optional provider 或 proof lane，local provider 只用于 dev/CI/offline diagnostics。它可以索引 product-entry registration、session continuity、runtimeWatch、artifact、review/publication projection，但不持有 RedCube visual truth。
+- OPL 持有 stage-led 托管集成与 provider-backed family runtime 路径；Temporal 是 OPL production online runtime 的必需 substrate，Hermes 保留为 legacy/optional provider 或 proof lane，local provider 只用于 dev/CI/offline diagnostics。OPL 可以索引 product-entry registration、session continuity、runtimeWatch、artifact、review/publication projection，但不持有 RedCube visual truth。
 - `Hermes-Agent` 这类 hosted runtime carrier 只保留在显式 opt-in backend/proof lane 或技术参考层，不改写默认公开合同。
 - `OPL` 只在需要 family-level routing、托管、唤醒或投影时进入；它不是 RedCube 的公开身份。
 - 实现语言目标是 `TypeScript + Python`：TypeScript 持有 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
@@ -62,7 +62,7 @@ RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、v
 | References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
 | History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.zh-CN.md) |
 
-这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；program 记录 active 或 contract-linked baton；references 与 history 分别保留支撑上下文和历史 provenance。
+这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；`docs/active` 记录 active 或 contract-linked baton；references 与 history 分别保留支撑上下文和历史 provenance。
 RCA 采用 OPL-family canonical docs taxonomy：
 `active/public/product/runtime/delivery/source/policies/specs/references/history`。
 旧 `docs/program/` active baton 目录已物理退役：当前 baton brief 进入
@@ -75,7 +75,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:prog
 - 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
 - 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前 baton 在 `docs/active/`，absorbed / proof 材料在 `docs/history/`。
-- RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 program，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
+- RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 `docs/active/`，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
 - `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
 - 仓库目录治理现在通过 `scripts/repo-hygiene.sh` 在 `scripts/verify.sh` 各 lane 和 grouped test 执行前运行。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json` 这类生成物 / 本地状态；`.agents/` 下唯一允许跟踪的插件入口是 `.agents/plugins/marketplace.json`。
 

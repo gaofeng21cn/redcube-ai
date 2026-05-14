@@ -20,7 +20,7 @@
 
 理想型上，`RedCube AI` 应收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点，而不是把视觉 domain 重新吸回 family-level federation 本体：
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 ## 2. 统一约束（跨 family）
 
@@ -48,7 +48,7 @@
 
 当前产品 runtime 形态：
 
-- `OPL Runtime Manager`（OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 registration / status / doctor / repair / resume 投影）
+- OPL stage-led hosted integration（OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 registration / status / doctor / repair / resume 投影）
 - configured family runtime provider（Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只作为 legacy/optional provider 或显式 hosted/proof lane）
 - 本地 Codex CLI host-agent runtime（当前默认 concrete executor）
 - `Codex` 本地 operator host（当前本地部署宿主 / workspace bridge）
@@ -81,7 +81,7 @@
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
 - `docs/history/hermes/*` 相关 activation package 已转为历史本地迁移工件；它们不再代表“上游 `Hermes-Agent` 已接管 runtime”
 - `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 都已吸收为同一主线 provenance
-- 当前 active tranche 应按 `repo-verified product entry + OPL Runtime Manager hosted integration + managed product-entry hardening` 理解：OPL 托管路径通过 thin product-managed adapter/projection layer 挂到 configured family runtime provider，默认 concrete executor 仍是本地 Codex CLI host-agent runtime；product-entry service surface 与 session continuity 已 landed，而 mature end-user product shell 仍未落地；stable family runtime output、`xiaohongshu` human-publication closure 与 guarded `poster_onepager` 仍在同一 RedCube visual-domain truth 上收口
+- 当前 active tranche 应按 `repo-verified product entry + OPL stage-led hosted integration + managed product-entry hardening` 理解：OPL 托管路径通过 thin product-managed adapter/projection layer 挂到 configured family runtime provider，默认 concrete executor 仍是本地 Codex CLI host-agent runtime；product-entry service surface 与 session continuity 已 landed，而 mature end-user product shell 仍未落地；stable family runtime output、`xiaohongshu` human-publication closure 与 guarded `poster_onepager` 仍在同一 RedCube visual-domain truth 上收口
 - authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 

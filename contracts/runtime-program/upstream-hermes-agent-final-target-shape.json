@@ -8,12 +8,12 @@
   },
   "final_target_route": {
     "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-    "opl_hosted_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+    "opl_hosted_entry": "User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
   },
   "runtime_boundary": {
     "runtime_owner": "optional_hosted_runtime_carrier",
     "opl_runtime_manager": {
-      "manager": "OPL Runtime Manager",
+      "manager": "OPL stage-led hosted integration",
       "layer_role": "product-managed adapter/projection layer over the configured family runtime provider",
       "owns": [
         "profile/provisioning",

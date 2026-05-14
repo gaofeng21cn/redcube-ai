@@ -4,7 +4,7 @@
   "status": "closeout_completed",
   "goal": "Land a repo-verified OPL-hosted stage runtime handoff surface that converges onto the same RedCube product-entry downstream contract.",
   "current_facing_boundary": {
-    "manager": "OPL Runtime Manager",
+    "manager": "OPL stage-led hosted integration",
     "entry_mode": "opl_hosted",
     "layer_role": "thin product-managed adapter/projection layer over the configured family runtime provider",
     "does_not_own": [

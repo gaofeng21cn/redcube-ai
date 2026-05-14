@@ -16,7 +16,7 @@
 - 对外主语固定为“独立 visual-deliverable domain agent”；`gateway / harness` 只作为内部架构边界语言。
 - repo-verified direct route 与 OPL-hosted route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
 - `OPL` 在 RCA 主线中是可外部依赖的 stage-led、以 Agent executor 为最小执行单位的智能体运行框架；它只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不成为 RCA 第一公开身份。
-- `OPL Runtime Manager` 只允许作为 OPL 侧 thin adapter/projection layer over the Temporal-backed family runtime provider；Temporal 是 OPL production online runtime 的必需 substrate，`Hermes-Agent` 只保留为迁移期 legacy/optional provider、显式 hosted/proof backend 或 executor proof lane，local provider 只用于 dev/CI/offline diagnostics。它不得成为 RedCube visual-domain truth owner、canonical artifact owner、review/publication projection owner、scheduler kernel、session store、memory store、concrete executor 或 private Hermes fork。
+- OPL hosted integration 只允许作为 OPL 侧 thin adapter/projection layer over the Temporal-backed family runtime provider；Temporal 是 OPL production online runtime 的必需 substrate，`Hermes-Agent` 只保留为迁移期 legacy/optional provider、显式 hosted/proof backend 或 executor proof lane，local provider 只用于 dev/CI/offline diagnostics。它不得成为 RedCube visual-domain truth owner、canonical artifact owner、review/publication projection owner、scheduler kernel、session store、memory store、concrete executor 或 private Hermes fork。
 
 ## 目标优先级
 

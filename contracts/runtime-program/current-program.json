@@ -50,14 +50,14 @@
     }
   },
   "longrun_goal": {
-    "label": "RedCube AI Foundry Agent / OPL-compatible visual-deliverable package with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL Runtime Manager when oplHosted",
+    "label": "RedCube AI Foundry Agent / OPL-compatible visual-deliverable package with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL stage-led hosted integration when oplHosted",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
       "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-      "opl_hosted_entry": "User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+      "opl_hosted_entry": "User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
     },
     "runtime_manager_boundary": {
-      "manager": "OPL Runtime Manager",
+      "manager": "OPL stage-led hosted integration",
       "layer_role": "product-managed adapter/projection layer over the configured family runtime provider",
       "consumes_redcube_surfaces": [
         "redcube product-entry registration",
@@ -122,7 +122,7 @@
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
       "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
-      "keep OPL Runtime Manager as a thin oplHosted runtime manager over configured family runtime providers rather than a RedCube truth owner",
+      "keep OPL hosted integration as a thin oplHosted adapter/projection layer over configured family runtime providers rather than a RedCube truth owner",
       "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
       "move implementation toward TypeScript for product/runtime contracts and Python for native PPT/Office/document helpers that share the MAS/MAG automation ecosystem",
       "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
@@ -253,7 +253,7 @@
     "product_mainline_mode": "auto_only",
     "runtime_substrate_owner": "optional_hosted_runtime_carrier",
     "runtime_manager_status": {
-      "target_layer": "OPL Runtime Manager",
+      "target_layer": "OPL stage-led hosted integration",
       "status": "target_contract_alignment",
       "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
       "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",

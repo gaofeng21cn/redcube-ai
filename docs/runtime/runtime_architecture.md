@@ -31,12 +31,11 @@ OPL-hosted route 是内部托管集成读法：
 ```text
 User / Agent
   -> OPL Product Entry
-      -> OPL Runtime Manager
-          -> configured family runtime provider
-              -> RedCube service-safe domain entry
-                  -> executor adapter
-                      -> concrete executor
-                          -> RedCube visual-domain truth surfaces
+      -> OPL stage-led family runtime provider
+          -> RedCube service-safe domain entry
+              -> executor adapter
+                  -> concrete executor
+                      -> RedCube visual-domain truth surfaces
 ```
 
 两条路线在进入 RedCube service-safe domain entry 后必须收敛到同一套 route、review、artifact、publication projection 与 export authority。OPL 可以托管、唤醒、排队、投影和接收 receipt；RCA 继续持有 visual-domain truth、review/export verdict、canonical artifacts 与 domain memory content。
@@ -86,18 +85,18 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 OPL 侧可通过 product sidecar 读取和派发受控动作：
 
 - `product sidecar export` 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。
-- `product sidecar dispatch` 只允许 `runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`emit_no_regression_evidence`、`notification_receipt` 这类 guarded actions。
+- `product sidecar dispatch` 只允许 `runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`notification_receipt` 这类 guarded actions。
 - `emit_no_regression_evidence` 只生成 RCA-owned runtime evidence ref，落在 workspace `.redcube/runtime/evidence/no-regression/`；它证明 descriptor/runtime refs、physical skeleton anchor、legacy active-path retirement 和 no-forbidden-write 边界未回退，不写 visual artifact blob，也不声明 provider-hosted visual long soak 完成。
 
 Sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。任何需要生成、修复、审阅或导出视觉交付物的动作都必须回到 RCA-owned route 与 gate。
 
-后续 runtime apply surface 名称预留为：
+当前 runtime apply surface 包括：
 
 - `emit_domain_owner_receipt`：写 RCA-owned domain receipt、typed blocker 或 no-regression evidence ref，用于真实 artifact-producing attempt 的 owner closeout。
 - `apply_visual_memory_writeback`：写 RCA-owned memory proposal / accepted-rejected receipt refs，并由 RCA 持有 visual lesson body、accept/reject authority 和 route caveat 判断。
 - `apply_visual_workspace_lifecycle`：写 RCA-owned cleanup / restore / retention mutation receipt 或 typed blocker，用于真实 visual workspace 生命周期操作。
 
-这些 surface 只写 workspace/runtime refs，不写 repo source tree，不把 RCA visual truth、review/export verdict、memory body、canonical artifacts 或 artifact mutation authority 移给 OPL。OPL Runtime Manager 和 Temporal provider 只能调度、唤醒、投影并保存 locator/projection/receipt refs；真实 OPL Temporal controlled visual-stage long soak 仍是 pending runtime proof。
+这些 surface 只写 workspace/runtime refs，不写 repo source tree，不把 RCA visual truth、review/export verdict、memory body、canonical artifacts 或 artifact mutation authority 移给 OPL。OPL hosted integration 和 Temporal provider 只能调度、唤醒、投影并保存 locator/projection/receipt refs；真实 OPL Temporal controlled visual-stage long soak 仍是 pending runtime proof。
 
 ## Family Lifecycle
 

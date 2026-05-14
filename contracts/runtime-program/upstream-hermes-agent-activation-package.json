@@ -52,7 +52,7 @@
       "CLI",
       "MCP"
     ],
-    "service_safe_entry_goal": "OPL Runtime Manager -> RedCube service-safe domain entry -> upstream Hermes-Agent runtime"
+    "service_safe_entry_goal": "OPL stage-led hosted integration -> RedCube service-safe domain entry -> upstream Hermes-Agent runtime"
   },
   "verified_preconditions": [
     "reachable upstream Hermes-Agent API server",

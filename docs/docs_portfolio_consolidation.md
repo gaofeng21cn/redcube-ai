@@ -74,7 +74,7 @@ ID 稳定，并同步 README / lifecycle / tombstone 读法。
 | 公开身份与读者入口 | `README*`、`docs/README*`、核心五件套 | 无；人读入口 | 只呈现 RCA visual-deliverable domain agent 第一身份，OPL 作为托管路径 |
 | Visual truth / route truth / review verdict / artifact authority | RCA runtime-family、review/export gate、canonical artifact surfaces | contracts、schema、runtime artifacts、CLI/MCP/API surface | 合入 `docs/architecture.md`、`docs/status.md`、`docs/runtime/`、`docs/delivery/` |
 | Product entry / session continuity | RCA product entry 与 `invokeProductEntry` | `contracts/runtime-program/current-program.json`、product-entry contracts | `docs/active/redcube_product_entry_mvp.md` 与 `managed_product_entry_hardening.md` 保留为 current baton |
-| OPL-hosted integration | OPL Runtime Manager / configured family runtime provider；RCA 仍持有下游 visual truth | `human_doc:program_opl_framework_hosted_product_entry`、runtime-program contracts | `docs/active/opl_framework_hosted_product_entry.md` |
+| OPL-hosted integration | OPL stage-led hosted integration / configured family runtime provider；RCA 仍持有下游 visual truth | `human_doc:program_opl_framework_hosted_product_entry`、runtime-program contracts | `docs/active/opl_framework_hosted_product_entry.md` |
 | Upstream Hermes proof lane | 显式 hosted/proof backend 与历史 proof 证据 | `human_doc:program_upstream_hermes_agent_*`、proof contracts | `docs/history/hermes/` proof/provenance |
 | Phase 2 hardening tranche | 已吸收到 RCA current mainline 的分项 hardening evidence | `human_doc:program_phase_2_*` 与 phase-2 runtime-program contracts | `docs/history/phase-2/` absorbed tranche |
 | Gateway / harness / bridge / federation / Hermes-first 旧叙事 | 无当前公开 owner；只剩内部边界、proof、reference 或 history | 部分仍有 `human_doc:*` link | 迁入 active/history/reference 对应生命周期层；无链接材料进入 `docs/history/` 或 tombstone |

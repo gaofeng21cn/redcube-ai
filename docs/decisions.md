@@ -4,10 +4,10 @@
 
 ### 决策：owner receipt / memory writeback / workspace lifecycle apply 由 RCA 持有 authority
 
-- 后续代码 surface 名称预留为 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`。
+- `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 已作为 product sidecar guarded actions 落地。
 - 这三个 surface 只写 RCA-owned workspace/runtime refs，并返回 domain receipt、typed blocker、no-regression evidence、memory receipt refs 或 lifecycle mutation receipt；不把 visual truth、review/export verdict、memory body、canonical artifacts 或 artifact mutation authority 写入 OPL。
 - OPL 只消费 locator、projection、receipt refs、operator projection 和 repair hints；OPL stage completion、provider completion 或 no-regression ref 不能被升级为 RCA visual ready、exportable、handoffable 或 production soak success。
-- 真实 OPL Temporal controlled visual-stage long soak 当前仍未完成；本轮仅完成文档 closeout，不修改机器合同、代码或 tests。
+- 真实 OPL Temporal controlled visual-stage long soak 当前仍未完成；本轮完成的是 RCA-owned workspace/runtime receipt 写入面、机器合同、focused tests 与文档同步，不声明 production soak success。
 
 ### 决策：退役旧 active 接口时直接清理，不保留兼容别名
 
@@ -54,10 +54,10 @@
 
 ### 决策：RCA 对齐 OPL Temporal-backed production runtime，Temporal 为 OPL 生产必需 substrate
 
-- `RedCube AI` 的 OPL 长期托管口径更新为 `OPL Runtime Manager / opl family-runtime -> Temporal-backed family runtime provider -> RCA product sidecar export/dispatch -> RedCube service-safe domain entry`。
+- `RedCube AI` 的 OPL 长期托管口径更新为 `OPL Product Entry -> OPL stage-led family runtime provider -> RCA product sidecar export/dispatch -> RedCube service-safe domain entry`。
 - Temporal 是 OPL production online runtime 的必需 provider；Hermes-Agent 迁移后作为可选 Agent executor adapter、显式 hosted/proof backend 或 executor proof lane 保留，不再作为目标 24h session/wakeup substrate。
 - `redcube product sidecar export|dispatch` 继续是 OPL provider 到 RCA owner surface 的受控桥接。OPL/Temporal/Hermes/local provider 只能 enqueue、dispatch、signal、query、投影 attempt/receipt，不得写 visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
-- RedCube 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。下方 Hermes-oriented OPL Runtime Manager 决策保留为迁移背景，后续新投入按 Temporal-backed production runtime 解释。
+- RedCube 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。下方 Hermes-oriented thin-manager 决策保留为迁移背景，后续新投入按 Temporal-backed production runtime 解释。
 
 ### 决策：RCA 消费 OPL 统一 Agent Executor Adapter receipt
 
@@ -91,11 +91,11 @@
 
 ## 2026-04-26
 
-### 决策：RCA 对齐 OPL Runtime Manager 与 TS/Python 目标形态
+### 决策：RCA 对齐 OPL hosted integration 与 TS/Python 目标形态
 
-- 状态：Runtime Manager 薄管理层、TS/Python 目标和 RCA owner split 继续有效；`external Hermes-Agent runtime substrate` 已被 2026-05-10 Temporal-backed production runtime 决策 supersede。
-- OPL-hosted route 的目标形态改为 `OPL Product Entry -> OPL Runtime Manager -> Temporal-backed family runtime provider -> RedCube service-safe domain entry`。
-- `OPL Runtime Manager` 只负责 OPL 侧 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引，不持有 RedCube visual-domain truth、canonical artifacts、review/publication projection truth 或 concrete executor。
+- 状态：薄管理层命名已被 2026-05-10 Temporal-backed production runtime 与 2026-05-11 OPL stage-led framework 口径 supersede；TS/Python 目标和 RCA owner split 继续有效。
+- OPL-hosted route 的目标形态改为 `OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry`。
+- OPL hosted integration 只负责 OPL 侧 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引，不持有 RedCube visual-domain truth、canonical artifacts、review/publication projection truth 或 concrete executor。
 - RCA 的实现语言目标固定为 `TypeScript + Python`：TypeScript 管 product/runtime contract、CLI/MCP、gateway 与 typed service boundaries；Python 管 native Office/PPT、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 共享自动化生态。
 - RCA product sidecar adapter 只作为 OPL typed family queue / OPL family runtime provider wakeup 的受控投影与 dispatch 面启用；它不成为 OPL 自有 visual truth sidecar，也不持有 review verdict、publication gate 或 canonical artifact authority。
 
@@ -175,7 +175,7 @@
 ### 历史决策：保持 honest owner split，不改 default executor owner
 
 - 状态：此段保留为 2026-04-21 owner split 背景；当前 active owner split 以 2026-05-10 provider-backed OPL runtime target 为准。
-- `Hermes-Agent` 不再作为默认 managed runtime owner；OPL Runtime Manager 通过 Temporal-backed family runtime provider 承担托管路径，Temporal 是 production required provider，Hermes 只保留为可选 Agent executor adapter 或 proof lane。
+- `Hermes-Agent` 不再作为默认 managed runtime owner；OPL stage-led family runtime provider 承担托管路径，Temporal 是 production required provider，Hermes 只保留为可选 Agent executor adapter 或 proof lane。
 - `RedCube AI` 继续持有 visual-domain truth 与 domain durable surfaces。
 - `Codex CLI` 继续是 executor adapter 选中的第一公民 concrete executor，除非拿到显式 proof，不改默认 owner split。
 

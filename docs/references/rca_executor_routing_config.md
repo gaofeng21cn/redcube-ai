@@ -7,7 +7,7 @@
 1. 用户交互层：由 Codex CLI、OPL 或其他 shell 决定用户从哪里进入。RCA 不管理这个默认入口。
 2. effective default executor：RCA 每次执行 route 前解析出的默认执行器。优先级固定为：
    - request explicit executor
-   - OPL Runtime Manager / handoff default executor
+   - OPL hosted handoff default executor
    - RCA domain local user config
    - RCA built-in default `codex_cli`
 3. route-level `structured_call` routing：RCA 只对单轮任务保存 route policy，例如 `render_html`、`fix_html` 可显式指向某个 Hermes profile。未命中时继承 effective default executor。

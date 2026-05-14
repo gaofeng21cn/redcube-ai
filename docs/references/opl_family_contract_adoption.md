@@ -8,7 +8,7 @@
 
 RCA 通过 product-entry session、`runtimeWatch`、artifact inventory 和 runtime health 映射 `opl_family_runtime_attempt_contract.v1`。这些 surface 可以向 `OPL` 投影 attempt state、retry/backoff、workspace boundary、failure reason、reconciliation status 和 last observed projection。
 
-`OPL Runtime Manager` 只能读取和索引；visual deliverable runtime、route truth、canonical artifacts 继续由 RCA 持有。
+OPL hosted integration 只能读取和索引；visual deliverable runtime、route truth、canonical artifacts 继续由 RCA 持有。
 
 ## Quality Projection
 
@@ -36,7 +36,7 @@ RCA 通过 product entry、product session、OPL-hosted integration、artifact i
 
 `opl_family_lifecycle_adapter` 是 RCA 侧的厚 adapter 投影。它把已有 managed-runs、product-entry sessions、artifact inventory、review state、publication projection 与 runtime loop closure 映射为 OPL family persistence / lifecycle / owner-route discovery / adoption surface。
 
-manifest 暴露 `discoverable_manifest_projection`，用于 OPL Runtime Manager 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。
+manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。
 
 该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite sidecar 保持 `deferred_for_rca`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估。
 

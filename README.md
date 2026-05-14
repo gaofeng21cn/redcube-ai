@@ -88,7 +88,7 @@ You can start with prompts like:
 
 1. Potential users should start here, then continue to the [Docs Guide](./docs/README.md).
 2. Technical readers and planners should read [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
-3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/program/`, `docs/references/`, and `docs/policies/`.
+3. Developers and maintainers should continue from the [Docs Guide](./docs/README.md) into `docs/active/`, `docs/references/`, and `docs/policies/`.
 
 ## Agent And Operator Quick Start
 
@@ -103,7 +103,7 @@ You can start with prompts like:
 - Treat the implementation surface as TypeScript orchestration plus Python native helpers. Repo-tracked JavaScript is retired; new product, test, or script JavaScript is blocked by the closeout audit.
 - When an external agent or OPL wants the repo-tracked skill surface directly, use the single `redcube-ai` app skill and launch CLI-backed commands through `npm run --prefix <redcube-ai-repo> redcube -- ...`; `status` / `invoke` / `session` remain machine-readable command contracts underneath that one skill. `redcube product status` is the current product-status command for the product-entry overview / intake shell; it does not imply a mature human-facing GUI or WebUI. The OPL-hosted path stays an internal integration surface.
 - Test lane truth lives in `scripts/test-registry.ts` and the current verification matrix is maintained in [Status](./docs/status.md). `smoke` is the minimal local entry, `fast` is the core regression lane, hosted CI is equivalent to `npm run test:ci`, and `historical` runs only when explicitly requested.
-- Use `docs/program/` for absorbed mainline milestones and `docs/references/` for bridge or provenance material, instead of reconstructing execution truth from scattered implementation files.
+- Use `docs/active/` for current baton records, `docs/history/phase-2/` for absorbed mainline milestones, and `docs/references/` for bridge or provenance material, instead of reconstructing execution truth from scattered implementation files.
 
 </details>
 

@@ -6,20 +6,20 @@
 
 ## 一句话结论
 
-`OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，可以通过 repo-verified hosted integration surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
+OPL stage-led hosted integration 作为 OPL 侧 thin product-managed adapter/projection layer，可以通过 repo-verified hosted integration surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
 
 ## 这一步解决什么
 
 它把上层 handoff 收口成：
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 关键不变量是：
 
 - OPL handoff 不再需要分叉成另一套 RedCube 私有入口协议
-- direct `RedCube Product Entry` 与 `OPL Runtime Manager` hosted integration 共用同一 downstream `product entry`
+- direct `RedCube Product Entry` 与 OPL hosted integration 共用同一 downstream `product entry`
 - `invokeDomainEntry` 继续是 domain-level service-safe adapter
-- `OPL Runtime Manager` 不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor
+- OPL hosted integration 不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor
 
 ## 合同与调用面
 

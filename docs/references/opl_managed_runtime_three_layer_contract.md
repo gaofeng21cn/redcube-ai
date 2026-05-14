@@ -10,7 +10,7 @@
 
 统一按三层理解：
 
-- `OPL Runtime Manager / configured family runtime provider`
+- OPL stage-led hosted integration / configured family runtime provider
   - 长期运行与托管能力 owner；Temporal 是 production online runtime 的必需 substrate，Hermes 只保留 legacy/optional provider 或显式 proof lane
 - domain supervision
   - 领域治理、质量门控、进度真相、恢复判断 owner
@@ -19,7 +19,7 @@
 
 对应到 `RedCube AI`：
 
-- `OPL Runtime Manager / configured family runtime provider`
+- OPL stage-led hosted integration / configured family runtime provider
   - managed runtime / session / run / watch / resume owner；不持有 RCA visual truth
 - `RedCube AI`
   - visual governance / audit / review / publication projection owner
@@ -36,7 +36,7 @@
 
 三层切开后：
 
-- `OPL Runtime Manager / configured family runtime provider` 只负责长期在线、调度、恢复和托管宿主
+- OPL stage-led hosted integration / configured family runtime provider 只负责长期在线、调度、恢复和托管宿主
 - `RedCube AI` 只负责 visual-domain truth、review gate 与 publication projection
 - concrete executor 只负责按已放行 route 把活干出来
 

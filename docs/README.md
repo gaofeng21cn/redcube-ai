@@ -6,7 +6,7 @@ This directory is the technical reading layer for `RedCube AI`.
 The current public reading path starts from RedCube as the `RedCube AI Foundry Agent`: an OPL-compatible visual-deliverable package built on the OPL Framework. OPL is the stage-led agent runtime framework that can host RedCube as an external dependency, so the OPL path is documented as an internal hosted integration path rather than the first public story:
 
 - direct route: `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- OPL-hosted route: `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- OPL-hosted route: `User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
 ## Start Here By Audience
 
@@ -36,7 +36,7 @@ MDS, and OPL-owned App/workbench backlogs are not maintained in RCA docs.
 - `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the direct repo-verified product-entry service surface, and the stable callable surface built from the single `redcube-ai` app skill, `CLI`, `MCP`, local scripts, and repo-tracked contracts.
 - The release shape is `RedCube AI Foundry Agent`: one app skill, one service-safe domain entry, product sidecar/projection refs, and read-only stage-control projection metadata. This is the OPL-compatible package surface; it is not a GUI/WebUI shell and it does not move route, review, export, or artifact authority into OPL.
 - `Codex CLI` remains the default concrete executor and the minimum execution unit selected behind the executor-adapter contract for local operator workflows.
-- `OPL Runtime Manager` is the OPL-side hosted integration manager over the configured family runtime provider. Temporal is the production substrate target; Hermes remains a legacy/optional provider or proof lane. OPL may index product-entry registration, session continuity, runtimeWatch, artifacts, and review/publication projection, but it does not own RedCube visual truth.
+- OPL owns the stage-led hosted integration and provider-backed family runtime path. Temporal is the production substrate target; Hermes remains a legacy/optional provider or proof lane. OPL may index product-entry registration, session continuity, runtimeWatch, artifacts, and review/publication projection, but it does not own RedCube visual truth.
 - Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.
 - `OPL` joins only when family-level routing, hosting, wakeup, or projection is needed; it is not RedCube's public identity.
 - The implementation target is `TypeScript + Python`: TypeScript owns product/runtime contracts and service boundaries, while Python owns native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
@@ -72,8 +72,8 @@ MDS, and OPL-owned App/workbench backlogs are not maintained in RCA docs.
 | History | Archived provenance, tombstones, and historical plans | [History](./history/README.md) |
 
 Read this table as hierarchy: current truth and machine truth come first;
-product/runtime/delivery/source/policies explain current work; active records
-track active or contract-linked baton material; references and history preserve
+product/runtime/delivery/source/policies explain current work; `docs/active`
+tracks active or contract-linked baton material; references and history preserve
 support context and provenance.
 RCA follows the OPL-family canonical docs taxonomy:
 `active/public/product/runtime/delivery/source/policies/specs/references/history`.

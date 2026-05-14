@@ -41,7 +41,7 @@
 - `docs/runtime/`：runtime topology、executor / substrate、service-safe entry、watch / projection 语义说明。
 - `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。
 - `docs/source/`：source readiness、augmentation、research trigger / gate 与 source truth 消费说明。
-- `docs/active/`：active baton 与仍服务当前 reader context 的 contract-linked brief；旧 `docs/program/` active baton 目录已物理退役。
+- `docs/active/`：当前执行、当前计划、当前差距、contract-linked active baton 与 closeout evidence；旧 `docs/program/` active baton 目录已物理退役，新增 recurring active material 不再进入旧目录。
 - `docs/history/phase-2/`：已吸收 Phase 2 tranche、prefrozen follow-on board 与 provenance brief；旧 `docs/program/phase-2/` 已迁入 history。
 - `docs/history/hermes/`：upstream Hermes proof / cutover provenance；旧 `docs/program/` 下 Hermes 记录已迁入 history。
 - `contracts/runtime-program/current-program.json`：当前机器可读主线合同与 active baton 指针。
