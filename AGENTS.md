@@ -34,14 +34,16 @@
 - `docs/status.md`：当前默认入口链路、执行口径、验证口径与历史索引。
 - `docs/docs_portfolio_consolidation.md` 是当前文档组合治理入口；维护者应先读核心五件套，再按该文件判断新增、更新、归档或 tombstone。
 - 每份长期文档都必须能说明 `owner`、`purpose`、`state`、`machine boundary`；缺少任一信号时，先补入口或归位，再继续扩写。
-- 文档治理按内容生命周期判断，文件名和目录名只作为辅助信号；同一文档内的当前事实、active baton、absorbed tranche、support reference、legacy brief 和历史计划应分别归入当前 owner doc、program/reference 层或 history/tombstone 语境。
+- 文档治理按内容生命周期判断，文件名和目录名只作为辅助信号；同一文档内的当前事实、active baton、absorbed tranche、support reference、legacy brief 和历史计划应分别归入当前 owner doc、active/reference 层或 history/tombstone 语境。
 - 入口文档应先呈现当前状态、层级、新旧关系和下一跳；旧 gateway / bridge / harness / Hermes-first 材料进入 internal integration、provenance 或 tombstone 语境。
 - `AGENTS.md` 只保留协作方式、硬约束和少量稳定身份边界；项目事实的完整当前态以 `docs/status.md`、`docs/project.md`、`docs/architecture.md`、`docs/invariants.md` 和 `contracts/runtime-program/current-program.json` 为准。
 - `docs/product/`：product entry、quickstart、operator handoff、profile 设置与发布协作。
 - `docs/runtime/`：runtime topology、executor / substrate、service-safe entry、watch / projection 语义说明。
 - `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。
 - `docs/source/`：source readiness、augmentation、research trigger / gate 与 source truth 消费说明。
-- `docs/program/`：active baton、absorbed tranche 与 contract-linked program records；`docs/program/phase-2/` 保留 Phase 2 absorbed tranche、prefrozen follow-on board 与 provenance brief。
+- `docs/active/`：active baton 与仍服务当前 reader context 的 contract-linked brief；旧 `docs/program/` active baton 目录已物理退役。
+- `docs/history/phase-2/`：已吸收 Phase 2 tranche、prefrozen follow-on board 与 provenance brief；旧 `docs/program/phase-2/` 已迁入 history。
+- `docs/history/hermes/`：upstream Hermes proof / cutover provenance；旧 `docs/program/` 下 Hermes 记录已迁入 history。
 - `contracts/runtime-program/current-program.json`：当前机器可读主线合同与 active baton 指针。
 - `contracts/runtime-program/*.json`：机器可读主线合同。
 - `docs/policies/*`：稳定规则。
