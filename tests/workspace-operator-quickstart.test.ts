@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildCommandHelp, buildHelp, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
-import { getDomainActions as getMcpDomainActions, listGatewayTools } from '../apps/redcube-mcp/dist/server.js';
+import { getDomainActions as getMcpDomainActions, listDomainTools } from '../apps/redcube-mcp/dist/server.js';
 import { buildRedCubeActionMetadata } from '../packages/redcube-gateway/dist/index.js';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
@@ -85,7 +85,7 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
   const commands = help.commonTasks.map((item) => item.command);
   const cliActions = getCliDomainActions();
   const mcpActions = getMcpDomainActions();
-  const toolNames = new Set(listGatewayTools().map((tool) => tool.name));
+  const toolNames = new Set(listDomainTools().map((tool) => tool.name));
 
   assert.equal(new Set(commands).size, commands.length);
   assert.equal(commands.filter((command) => command.includes('deliverable execute')).length, 1);

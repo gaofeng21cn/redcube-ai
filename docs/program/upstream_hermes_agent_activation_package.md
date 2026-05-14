@@ -31,11 +31,13 @@
 
 ## Probe 命令
 
+旧 `scripts/probe-upstream-hermes-agent.ts` 已退役。当前 proof 入口改为 repo-owned runtime topology / Python helper tests；它们覆盖 Hermes API client、loop bridge、run events 读取和 native helper catalog，不再依赖单独 probe 脚本或退役 `@redcube/hermes-agent-client` package。
+
 ```bash
 hermes gateway run -q
 REDCUBE_HERMES_GATEWAY_COMMAND='<known-good upstream gateway launch command>' scripts/verify.sh integration
-node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json
-node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface
+node --experimental-strip-types --test tests/runtime-topology-regression.test.ts
+node --experimental-strip-types --test tests/python-native-helper-catalog.test.ts
 ```
 
 ## 已冻结的 fresh proof
@@ -43,7 +45,8 @@ node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --
 - `hermes gateway run -q` 可启动 upstream API server
 - `curl http://127.0.0.1:8642/v1/health` 返回 `ok`
 - `curl http://127.0.0.1:8642/v1/models` 返回 `hermes-agent`
-- `node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface` 返回 `ok: true`
+- `node --experimental-strip-types --test tests/runtime-topology-regression.test.ts` 覆盖 Hermes API structured_call / agent_loop run-event proof
+- `node --experimental-strip-types --test tests/python-native-helper-catalog.test.ts` 覆盖 loop bridge 与 Python helper catalog proof
 
 ## 环境变量
 

@@ -20,9 +20,9 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 import {
-  callGatewayTool,
+  callDomainTool,
   getToolDefinitions,
-  listGatewayTools,
+  listDomainTools,
 } from '../apps/redcube-mcp/dist/server.js';
 import {
   createDeliverable,
@@ -245,7 +245,7 @@ export {
   assertRuntimeLoopClosureShape,
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
-  callGatewayTool,
+  callDomainTool,
   chmodSync,
   completeSourceReadiness,
   createDeliverable,
@@ -265,7 +265,7 @@ export {
   intakeSource,
   invokeOplHostedProductEntry,
   invokeProductEntry,
-  listGatewayTools,
+  listDomainTools,
   mkdirSync,
   mkdtempSync,
   os,

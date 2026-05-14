@@ -1,5 +1,15 @@
 # RedCube AI 关键决策
 
+## 2026-05-14
+
+### 决策：退役旧 active 接口时直接清理，不保留兼容别名
+
+- `REDCUBE_WORKBENCH_ROOT` 不再作为 workspace root 输入；当前只认显式 workspace 参数、`REDCUBE_WORKSPACE_ROOT` 与用户级 runtime-state 配置。
+- standalone `scripts/probe-upstream-hermes-agent.ts` 已退役；Hermes proof 入口统一走 runtime-protocol Hermes API / loop bridge tests 与 Python helper catalog tests。
+- CLI / MCP 注入接口统一使用 product/domain action / domain tool 命名；不保留 `GatewayActionMap`、`getCliGatewayActions`、`callGatewayTool`、`listGatewayTools`、`GatewayTool*` 或 `deps.gateway` 兼容别名。
+- 退役词汇守门测试改为 `tests/rca-retired-surface-guard.test.ts`，表达“旧 surface 不复活”，不再把这类测试写成 compat 保留。
+- 仍被 `human_doc:*` 指向的历史计划文档原位保留为 provenance；新计划不再围绕 workbench、frontdoor、federation、source-pack-federation、repo-local Hermes substrate 或 product frontdesk 继续扩展。
+
 ## 2026-05-13
 
 ### 决策：RCA functional closure 以 owner receipt / memory receipt refs / lifecycle guarded proof 收口

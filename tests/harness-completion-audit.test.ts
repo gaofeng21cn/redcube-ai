@@ -105,7 +105,7 @@ test('harness audit: reference quality is a formal operating surface, not only t
   assert.equal(relativeQuality.includes("surface_kind: 'reference_replacement_report'"), true);
 });
 
-test('harness audit: gateway product surface is stable across success and failure paths', () => {
+test('harness audit: product/domain surface is stable across success and failure paths', () => {
   const cli = readCliSource();
   const mcp = read('apps/redcube-mcp/src/server.ts');
   const getDeliverable = readImplementation('packages/redcube-gateway/src/actions/get-deliverable.ts');
@@ -119,7 +119,7 @@ test('harness audit: gateway product surface is stable across success and failur
   assert.equal(cli.includes('review get --workspace-root'), true);
   assert.equal(cli.includes('review projection --workspace-root'), true);
   assert.equal(cli.includes('review watch --workspace-root'), true);
-  assert.equal(mcp.includes("error_kind: 'gateway_tool_error'"), true);
+  assert.equal(mcp.includes("error_kind: 'domain_tool_error'"), true);
   assert.equal(mcp.includes("recommended_action: 'inspect_tool_request'"), true);
   assert.equal(getDeliverable.includes("surface_kind: 'deliverable_record'"), true);
   assert.equal(runRoute.includes("surface_kind: 'route_run'"), true);

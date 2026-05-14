@@ -53,7 +53,7 @@ test('P16 slice 3: CLI exposes a TypeScript service entrypoint and typed command
   assert.match(types, /interface CliRunResult/);
 });
 
-test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed tool gateway contracts', () => {
+test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed domain tool contracts', () => {
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/types.ts')), true);
 
@@ -65,9 +65,9 @@ test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed tool ga
   assert.equal(pkg.bin['redcube-mcp'], './dist/server.js');
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), false);
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/dist/server.js')), true);
-  assert.match(entry, /callGatewayTool/);
+  assert.match(entry, /callDomainTool/);
   assert.match(entry, /createMcpServer/);
-  assert.match(types, /interface GatewayToolDefinition/);
+  assert.match(types, /interface DomainToolDefinition/);
   assert.match(types, /interface DomainActionMap/);
 });
 

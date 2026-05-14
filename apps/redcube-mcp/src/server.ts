@@ -338,7 +338,7 @@ function toToolError(error: unknown) {
     ],
     structuredContent: {
       ok: false,
-      error_kind: 'gateway_tool_error',
+      error_kind: 'domain_tool_error',
       recommended_action: 'inspect_tool_request',
       error: message,
     },
@@ -346,7 +346,7 @@ function toToolError(error: unknown) {
   };
 }
 
-export function listGatewayTools() {
+export function listDomainTools() {
   return TOOL_DEFINITIONS.map(({ name, description }) => ({
     name,
     description,
@@ -357,7 +357,7 @@ export function getToolDefinitions() {
   return TOOL_DEFINITIONS;
 }
 
-export async function callGatewayTool(name: string, args: ToolArgs, deps: Partial<DomainActionMap> = {}) {
+export async function callDomainTool(name: string, args: ToolArgs, deps: Partial<DomainActionMap> = {}) {
   const definition = findToolDefinition(name);
   if (!definition) {
     throw new Error(`Unknown tool: ${name}`);
@@ -386,7 +386,7 @@ export async function callGatewayTool(name: string, args: ToolArgs, deps: Partia
   const actions = getDomainActions(deps) as Partial<DomainActionMap>;
   const action = actions[actionKey];
   if (typeof action !== 'function') {
-    throw new Error(`Gateway action not configured: ${actionKey}`);
+    throw new Error(`Domain action not configured: ${actionKey}`);
   }
 
   return action(forwardedArgs);
@@ -407,7 +407,7 @@ export function createMcpServer(deps: Partial<DomainActionMap> = {}) {
       },
       (async (args: ToolArgs) => {
         try {
-          const result = await callGatewayTool(tool.name, args, deps);
+          const result = await callDomainTool(tool.name, args, deps);
           return toToolResponse(result);
         } catch (error) {
           return toToolError(error);

@@ -1,15 +1,15 @@
-export interface GatewayToolDefinition {
+export interface DomainToolDefinition {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
 }
 
-export interface GatewayToolSummary {
+export interface DomainToolSummary {
   name: string;
   description: string;
 }
 
-export interface GatewayToolResponse extends Record<string, unknown> {
+export interface DomainToolResponse extends Record<string, unknown> {
   content: Array<{
     type: string;
     text: string;

@@ -1,11 +1,11 @@
 // @ts-nocheck
 import {
   assert,
-  callGatewayTool,
+  callDomainTool,
   completeSourceReadiness,
   createDeliverable,
   intakeSource,
-  listGatewayTools,
+  listDomainTools,
   mkdtempSync,
   os,
   path,
@@ -17,8 +17,8 @@ import {
   withOperation,
 } from '../product-domain-action-case-shared.ts';
 
-test('callGatewayTool delegates product-entry product/domain actions', async () => {
-  const direct = await callGatewayTool(
+test('callDomainTool delegates product-entry product/domain actions', async () => {
+  const direct = await callDomainTool(
     'redcube_product_entry',
     withAction('invoke_product_entry', {
       workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
@@ -54,7 +54,7 @@ test('callGatewayTool delegates product-entry product/domain actions', async () 
       }),
     },
   );
-  const oplHosted = await callGatewayTool(
+  const oplHosted = await callDomainTool(
     'redcube_product_entry',
     withAction('dispatch_product_sidecar', {
       task: {
@@ -106,7 +106,7 @@ test('callGatewayTool delegates product-entry product/domain actions', async () 
       }),
     },
   );
-  const session = await callGatewayTool(
+  const session = await callDomainTool(
     'redcube_product_entry',
     withAction('get_product_entry_session', {
       entry_session_id: 'session-a',
@@ -135,7 +135,7 @@ test('callGatewayTool delegates product-entry product/domain actions', async () 
       }),
     },
   );
-  const status = await callGatewayTool(
+  const status = await callDomainTool(
     'redcube_product_entry',
     withAction('get_product_status', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -151,7 +151,7 @@ test('callGatewayTool delegates product-entry product/domain actions', async () 
       }),
     },
   );
-  const start = await callGatewayTool(
+  const start = await callDomainTool(
     'redcube_product_entry',
     withAction('get_product_start', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -166,7 +166,7 @@ test('callGatewayTool delegates product-entry product/domain actions', async () 
       }),
     },
   );
-  const preflight = await callGatewayTool(
+  const preflight = await callDomainTool(
     'redcube_product_entry',
     withAction('get_product_preflight', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -204,8 +204,8 @@ test('callGatewayTool delegates product-entry product/domain actions', async () 
   assert.equal(preflight.workspace_locator.workspace_root, '/tmp/redcube-workspace');
 });
 
-test('callGatewayTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
-  const doctor = await callGatewayTool(
+test('callDomainTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
+  const doctor = await callDomainTool(
     'redcube_workspace',
     withAction('doctor_workspace', { workspaceRoot: '/tmp/redcube-workspace' }),
     {
@@ -219,7 +219,7 @@ test('callGatewayTool can return normalized discovery surfaces for doctor and to
       }),
     },
   );
-  const topics = await callGatewayTool(
+  const topics = await callDomainTool(
     'redcube_workspace',
     withAction('list_topics', { workspaceRoot: '/tmp/redcube-workspace' }),
     {
@@ -242,8 +242,8 @@ test('callGatewayTool can return normalized discovery surfaces for doctor and to
   assert.equal(topics.summary.total_topics, 0);
 });
 
-test('callGatewayTool delegates publication projection product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates publication projection product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_review',
     withAction('get_publication_projection', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -267,8 +267,8 @@ test('callGatewayTool delegates publication projection product/domain action', a
   assert.equal(result.canonical_source.kind, 'review_state.publish_state');
 });
 
-test('callGatewayTool can return operator-facing deliverable and route-run surfaces', async () => {
-  const deliverable = await callGatewayTool(
+test('callDomainTool can return operator-facing deliverable and route-run surfaces', async () => {
+  const deliverable = await callDomainTool(
     'redcube_deliverable',
     withAction('get_deliverable', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -285,7 +285,7 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
       }),
     },
   );
-  const routeRun = await callGatewayTool(
+  const routeRun = await callDomainTool(
     'redcube_deliverable',
     withAction('run_deliverable_route', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -311,8 +311,8 @@ test('callGatewayTool can return operator-facing deliverable and route-run surfa
   assert.equal(routeRun.summary.route, 'storyline');
 });
 
-test('callGatewayTool delegates managed deliverable execution and managed run lookup actions', async () => {
-  const managed = await callGatewayTool(
+test('callDomainTool delegates managed deliverable execution and managed run lookup actions', async () => {
+  const managed = await callDomainTool(
     'redcube_deliverable',
     withAction('run_managed_deliverable', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -394,7 +394,7 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
     },
   );
 
-  const stored = await callGatewayTool(
+  const stored = await callDomainTool(
     'redcube_deliverable',
     withAction('get_managed_run', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -427,7 +427,7 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
     },
   );
 
-  const supervised = await callGatewayTool(
+  const supervised = await callDomainTool(
     'redcube_deliverable',
     withAction('supervise_managed_run', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -470,8 +470,8 @@ test('callGatewayTool delegates managed deliverable execution and managed run lo
 
 
 
-test('callGatewayTool delegates review mutation product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates review mutation product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_review',
     withAction('apply_review_mutation', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -496,8 +496,8 @@ test('callGatewayTool delegates review mutation product/domain action', async ()
   assert.equal(result.state.deliverable_id, 'deck-a');
 });
 
-test('callGatewayTool can return operator-facing quality summary surfaces', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool can return operator-facing quality summary surfaces', async () => {
+  const result = await callDomainTool(
     'redcube_review',
     withAction('get_review_state', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -522,8 +522,8 @@ test('callGatewayTool can return operator-facing quality summary surfaces', asyn
   assert.equal(result.surface_kind, 'review_state');
 });
 
-test('listGatewayTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {
-  const tools = listGatewayTools();
+test('listDomainTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {
+  const tools = listDomainTools();
   const reviewTool = tools.find((tool) => tool.name === 'redcube_review');
   const deliverableTool = tools.find((tool) => tool.name === 'redcube_deliverable');
   const sourcesTool = tools.find((tool) => tool.name === 'redcube_sources');

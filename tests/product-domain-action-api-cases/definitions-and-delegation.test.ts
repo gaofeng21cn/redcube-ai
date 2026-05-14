@@ -1,13 +1,13 @@
 // @ts-nocheck
 import {
   assert,
-  callGatewayTool,
+  callDomainTool,
   Client,
   completeSourceReadiness,
   createDeliverable,
   fileURLToPath,
   getToolDefinitions,
-  listGatewayTools,
+  listDomainTools,
   mkdtempSync,
   os,
   path,
@@ -24,8 +24,8 @@ import {
   getRedCubeFamilyActionCatalog,
 } from '../../packages/redcube-gateway/dist/index.js';
 
-test('listGatewayTools exposes deliverable-centric product/domain action API tools in stable order', () => {
-  const tools = listGatewayTools();
+test('listDomainTools exposes deliverable-centric product/domain action API tools in stable order', () => {
+  const tools = listDomainTools();
 
   assert.deepEqual(
     tools.map((tool) => tool.name),
@@ -69,7 +69,7 @@ test('MCP catalog definitions are projected from the RedCube family action catal
   const catalog = getRedCubeFamilyActionCatalog();
   const metadata = buildRedCubeActionMetadata();
   const definitions = getToolDefinitions();
-  const listedTools = listGatewayTools();
+  const listedTools = listDomainTools();
 
   assert.equal(catalog.surface_kind, 'family_action_catalog');
   assert.equal(metadata.parity.status, 'aligned');
@@ -102,8 +102,8 @@ test('MCP catalog definitions are projected from the RedCube family action catal
   );
 });
 
-test('callGatewayTool delegates to injected product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates to injected product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_deliverable',
     withAction('create_deliverable', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -132,8 +132,8 @@ test('callGatewayTool delegates to injected product/domain action', async () => 
   assert.equal(result.deliverable.deliverable_id, 'deck-a');
 });
 
-test('callGatewayTool delegates source intake product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates source intake product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_sources',
     withOperation('intake_source', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -159,8 +159,8 @@ test('callGatewayTool delegates source intake product/domain action', async () =
   assert.equal(result.audit.status, 'pass');
 });
 
-test('callGatewayTool delegates source research product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates source research product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_sources',
     withOperation('source_research', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -190,8 +190,8 @@ test('callGatewayTool delegates source research product/domain action', async ()
   assert.equal(result.planningReady, true);
 });
 
-test('callGatewayTool delegates source augmentation product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates source augmentation product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_sources',
     withOperation('prepare_source_augmentation', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -215,8 +215,8 @@ test('callGatewayTool delegates source augmentation product/domain action', asyn
   assert.equal(result.augmentation.readiness_target, 'planning_ready');
 });
 
-test('callGatewayTool delegates source augmentation result preparation product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates source augmentation result preparation product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_sources',
     withOperation('prepare_source_augmentation_result', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -241,8 +241,8 @@ test('callGatewayTool delegates source augmentation result preparation product/d
   assert.equal(result.resultDraft.topic_id, 'topic-a');
 });
 
-test('callGatewayTool delegates source augmentation result write product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates source augmentation result write product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_sources',
     withOperation('write_source_augmentation_result', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -269,8 +269,8 @@ test('callGatewayTool delegates source augmentation result write product/domain 
   assert.equal(result.resultContract.status, 'completed');
 });
 
-test('callGatewayTool delegates source augmentation execution product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates source augmentation execution product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_sources',
     withOperation('execute_source_augmentation', {
       workspaceRoot: '/tmp/redcube-workspace',
@@ -294,8 +294,8 @@ test('callGatewayTool delegates source augmentation execution product/domain act
   assert.equal(result.report.readiness_target, 'planning_ready');
 });
 
-test('callGatewayTool delegates overlay catalog product/domain action', async () => {
-  const result = await callGatewayTool(
+test('callDomainTool delegates overlay catalog product/domain action', async () => {
+  const result = await callDomainTool(
     'redcube_workspace',
     withAction('get_overlay_catalog'),
     {
@@ -319,9 +319,9 @@ test('callGatewayTool delegates overlay catalog product/domain action', async ()
   assert.deepEqual(result.overlays, [{ overlay_id: 'poster', profiles: ['default'] }]);
 });
 
-test('callGatewayTool rejects unknown tool names', async () => {
+test('callDomainTool rejects unknown tool names', async () => {
   await assert.rejects(
-    () => callGatewayTool('unknown_tool', {}),
+    () => callDomainTool('unknown_tool', {}),
     /Unknown tool: unknown_tool/,
   );
 });
@@ -493,7 +493,7 @@ test('stdio MCP server rejects runtime_watch when the topic locator does not mat
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /runtimeWatch topicId 与 run\.topic_id 不一致/);
     assert.equal(result.structuredContent.ok, false);
-    assert.equal(result.structuredContent.error_kind, 'gateway_tool_error');
+    assert.equal(result.structuredContent.error_kind, 'domain_tool_error');
   } finally {
     await transport.close();
   }
@@ -598,7 +598,7 @@ test('stdio MCP server returns operator-facing error metadata for failing tools'
 
     assert.equal(result.isError, true);
     assert.equal(result.structuredContent.ok, false);
-    assert.equal(result.structuredContent.error_kind, 'gateway_tool_error');
+    assert.equal(result.structuredContent.error_kind, 'domain_tool_error');
     assert.equal(result.structuredContent.recommended_action, 'inspect_tool_request');
     assert.match(result.structuredContent.error, /Unknown overlay/i);
   } finally {

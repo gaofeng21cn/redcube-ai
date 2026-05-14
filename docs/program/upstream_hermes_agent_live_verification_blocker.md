@@ -25,8 +25,8 @@
    - `task_intent -> surface_kind` 不匹配会拒绝
 2. 显式 API-server 启动的 upstream gateway probe 可通过：
    - 启动命令：`API_SERVER_ENABLED=true API_SERVER_HOST=127.0.0.1 API_SERVER_PORT=8642 API_SERVER_MODEL_NAME=hermes-agent hermes gateway run --replace`
-   - probe：`REDCUBE_HERMES_UPSTREAM_BASE_URL=http://127.0.0.1:8642 REDCUBE_HERMES_UPSTREAM_MODEL=hermes-agent node --experimental-strip-types scripts/probe-upstream-hermes-agent.ts --json --require-run-surface`
-   - probe 返回：`run.completed`
+   - 当前证明入口：`node --experimental-strip-types --test tests/runtime-topology-regression.test.ts`
+   - proof 返回面：Hermes API structured_call / agent_loop run-event proof 可读取 terminal `run.completed`
 
 ## 历史 blocker
 

@@ -53,3 +53,14 @@ Historical material moved out of this layer:
 - repo-local Hermes migration provenance: `../history/hermes/`
 - historical plans with no active runtime-program contract link: `../history/plans/`
 - local AI / Superpowers process drafts stay ignored under `../superpowers/` and are not repo-tracked history.
+
+## 2026-05-14 Development Plan Readout
+
+Current development planning should start from the active product/domain action and Foundry Agent package surface, not from old gateway, workbench, federation, or standalone Hermes probe surfaces.
+
+- `planned`: keep hardening product/domain action parity across CLI, MCP, manifest and app-skill contracts; continue package-module Python helper migration where wrappers still appear in the catalog.
+- `done`: retired workbench root compatibility (`REDCUBE_WORKBENCH_ROOT`), removed standalone upstream Hermes probe script, removed stale legacy cleanup test, removed retired `@redcube/hermes-agent-client` package residue, and renamed the active retired-surface guard away from compat wording.
+- `deferred`: physical migration of contract-linked Phase 2 / Hermes / harness briefs into history waits until their `human_doc:*` links are remapped or retired.
+- `skipped`: no compatibility aliases for `GatewayActionMap`, `getCliGatewayActions`, `callGatewayTool`, `listGatewayTools`, `GatewayTool*`, old workbench env roots, source-pack federation, product frontdesk, or standalone probe command.
+- `verification`: use `npm run test:smoke` for the small active-entry check; use focused runtime topology / Python helper catalog tests for Hermes proof references; use `npm run test:meta` when changing registry, retired-surface guards, or TypeScript closeout policy.
+- `commit-push state`: this readout documents local mainline state; push/PR state is separate from the docs lifecycle.

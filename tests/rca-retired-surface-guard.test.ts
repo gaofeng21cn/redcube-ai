@@ -82,7 +82,7 @@ function listTextFiles(root) {
   });
 }
 
-test('RCA active surfaces do not reintroduce retired runtime compatibility terms', () => {
+test('RCA active source surfaces do not reintroduce retired runtime terms', () => {
   for (const contractFile of RETIRED_CONTRACTS) {
     assert.equal(existsSync(path.resolve(contractFile)), false, contractFile);
   }
@@ -93,7 +93,7 @@ test('RCA active surfaces do not reintroduce retired runtime compatibility terms
     if (!existsSync(path.resolve(root))) return [];
     return path.extname(root) ? [root] : listTextFiles(root);
   })) {
-    if (file === 'tests/rca-compat-retirement-guard.test.ts') continue;
+    if (file === 'tests/rca-retired-surface-guard.test.ts') continue;
     const text = readFileSync(file, 'utf-8');
     for (const pattern of RETIRED_ACTIVE_PATTERNS) {
       if (pattern.test(text)) {

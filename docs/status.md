@@ -1,6 +1,6 @@
 # RedCube AI 当前状态
 
-更新时间：`2026-05-13`
+更新时间：`2026-05-14`
 
 ## 一眼看当前层次
 
@@ -36,6 +36,8 @@
 - 2026-05-13 production functional closure follow-through：排除真实 visual-stage long-run soak 后，RCA 侧可工程实现的功能闭环已落到 manifest/sidecar/test 可消费 surface。`owner-receipt-contract-generalization` 通过 `domain_owner_receipt_contract` 统一 `domain_receipt | typed_blocker | no_regression_evidence` return shape；`redcube product sidecar dispatch` 的 `emit_no_regression_evidence` 可在真实 workspace 下写出 RCA-owned no-regression evidence ref 到 `.redcube/runtime/evidence/no-regression/<evidence-id>.json`，只包含 descriptor/runtime refs、legacy active-path retirement proof 和 no-forbidden-write 边界，不写 visual artifact blob、review/export verdict、memory body 或 repo-tracked receipt instance，也不声明 visual long soak 完成。`domain-memory-apply-generalization` 在 `controlled_memory_apply_proof/runtime_receipt_instances` 暴露 accepted/rejected runtime receipt refs；`lifecycle-guarded-apply-generalization` 通过 `lifecycle_guarded_apply_proof` 覆盖 cleanup/restore/retention；`physical-skeleton-follow-through` 记录 `agent/ contracts/ runtime/ docs/` 低风险 repo-source entrypoint parity；`review_helper_baseline_follow_through` 已拆出 geometry audit、markdown report 与 summary projection helper，并删除 `review.py` line-budget baseline。剩余 blocker 是真实 OPL-hosted controlled visual stage long soak 和真实 artifact-producing owner receipt 尚未跑出。
 - 2026-05-12 OPL family index 校准：OPL `agents list --json` 当前为 `aligned_count=3`、`missing_count=0`、`drift_detected_count=0`，`stages list --json` 为 `resolved_planes_count=3`、`stages_count=18`，`domain-memory list --json` 为 `resolved_memory_descriptor_count=3`、`missing_memory_descriptor_count=0`。RCA 当前能被 OPL 识别为 aligned standard domain-agent skeleton 和 6-stage family stage plane；MAS/MAG/RCA 的 domain memory descriptor 也全部 resolved。RCA 本仓已落地 visual pattern memory migration/proposal/receipt/operator projection surface、标准 `family-domain-memory-ref.v1` adapter、`controlled_visual_stage_attempt` proof descriptor、`controlled_memory_apply_proof`、no-forbidden-write audit 和 physical skeleton repo-source layout audit。该 skeleton 只让 OPL family index 解析 RCA memory refs；RCA visual pattern memory body、accept/reject authority、visual route、review/export verdict 与 artifact authority 不迁出 RCA。
 - 旧面退役校准：默认公开能力已收口到单一 `redcube-ai` app skill、CLI/MCP、`invokeDomainEntry` / `invokeProductEntry`、service-safe domain entry 和 product-entry/session surfaces；旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot 与 OPL bridge wording 只保留为 migration provenance、internal integration contract 或 tombstone 语境。它们当前不拥有默认 public entry、runtime owner、visual truth 或 artifact authority；active surface 继续以 direct route、product sidecar、stage descriptor、service-safe domain entry 和 OPL-hosted handoff parity 为准。
+- 2026-05-14 active-surface cleanup：旧 workbench/runtime residue 和 standalone upstream probe surface 已从 active code/tests/package surface 清理；`REDCUBE_WORKBENCH_ROOT` 不再作为 workspace root 兼容环境变量；`scripts/probe-upstream-hermes-agent.ts` 与退役 `@redcube/hermes-agent-client` package surface 不再作为证明入口。Hermes proof 现在通过 `@redcube/runtime-protocol` 的 Hermes API client / loop bridge 与 `tests/runtime-topology-regression.test.ts`、`tests/python-native-helper-catalog.test.ts` 覆盖。CLI / MCP 内部可注入 action 面也已从 `gateway actions` 命名收口为 product/domain actions，避免把历史 gateway wording 写回 public action API。
+- 2026-05-14 retired surface guard：原 `rca-compat-retirement-guard` 已改成 `rca-retired-surface-guard`。这条测试不是兼容层保留测试，而是 active source surface 的退役词汇守门；它只扫描源码、contracts、plugins、scripts、tests、tools 与 Python helper，不把 `README*` / `docs/**` 的历史 prose 当成机器接口。
 
 ## 当前执行口径
 
@@ -82,6 +84,7 @@
 - runtime/product-entry route 覆盖分层为 fast 入口 smoke / fail-closed 与 `integration:remaining` 完整 happy path：`product-entry-route-integration.test.ts` 和 `runtime-deliverable-route-integration.test.ts` 承载 create -> run -> session / watch / projection 主路径，CLI / MCP 继续保留 public entry 代理与关键 shape smoke
 - 旧 gateway/frontdoor/Hermes-default 等语义污染 guard 只覆盖源码、contracts、plugins、scripts、tests、tools 与 Python helper 等机器 / 源码面；`README*` 与 `docs/**` 是人读 prose，不作为测试断言对象。
 - `scripts/verify.sh` 与 `scripts/run-test-group.ts` 现在都会先执行 `scripts/repo-hygiene.sh`；tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json`，并且 `.agents/` 只允许 `.agents/plugins/marketplace.json` 作为当前插件入口 source。
+- 退役面守门测试当前文件名是 `tests/rca-retired-surface-guard.test.ts`；它替代旧 compat 命名，继续 fail-closed 阻止 frontdoor、federation、OPL bridge、source-pack-federation、repo-local Hermes substrate 和 product frontdesk 等旧 active-path 词汇回到机器 / 源码面。
 
 ## 历史记录与追溯层
 
@@ -103,8 +106,18 @@
 
 - 保持 direct route 与 OPL-hosted route 共用同一条 downstream domain-agent entry（service-safe domain entry）下游
 - 保持 `OPL Runtime Manager`、provider-backed family runtime、repo-verified product-entry surface 与 visual-domain truth 的 docs/contracts/tests 同步
+- 新投入优先走 product/domain action、service-safe domain entry、product sidecar、stage descriptor 和 package-module Python helper；不得新增 gateway/frontdoor/workbench/federated/source-pack-federation 兼容入口或 standalone probe 脚本
 - 保持 AI-first 质量边界：story / visual / markup authorship 与最终视觉 reviewer 判断由 AI-authored artifact 持有；pack、schema、gate、audit、scorecard 与 projection 只表达结构、证据、机械状态和 rerun hints
 - 保持视觉模式经验的 natural-language-first 边界：视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 可作为 stage memory 被引用；当前已 landed repo-source migration plan / seed fixture locator / writeback receipt locator surface，用于表达可迁移和可验收流程；真实 memory content、receipt instance 与具体 reusable visual lesson 迁移仍留在 RCA-owned runtime/domain-memory surface。image-first/native/HTML route、review/export gate、canonical artifact 与 publication projection 继续是结构化权威
 - OPL family memory 标准化当前已经把 RCA `domain_memory_descriptor_locator` 投影为顶层 `domain_memory_descriptor` / `family-domain-memory-ref.v1`，并通过 `controlled_memory_apply_proof` 证明 consumed-memory refs、writeback proposal、accepted/rejected runtime receipt refs 和 operator projection 都是 locator/projection-only。真实 PNG/PPTX/PDF、review verdict、visual truth、memory body 和 receipt instance 仍不进入 OPL 或 repo source。
 - 保持 image-first 为 `ppt_deck` 与 `xiaohongshu` 默认视觉路线；HTML 与 native editable PPTX 都保持生产可选、显式选择，并继续经过对应的 `visual_director_review`、`screenshot_review` 与 export gate
 - 保持维护者验证与历史 provenance 停留在 reference / policy 层
+
+## 开发计划口径
+
+当前计划不再围绕旧 gateway / workbench / repo-local Hermes proof surface 继续扩展。仍有效的开发方向只保留四类：
+
+- product/domain action surface：CLI/MCP/help/manifest 从 `family_action_catalog` 派生，注入 API 使用 `domainActions` / `callDomainTool` / `listDomainTools` / `DomainTool*`，不恢复 `GatewayActionMap` / `getCliGatewayActions` / `callGatewayTool` / `listGatewayTools` 等旧命名。
+- runtime proof surface：Hermes 只保留为显式 opt-in executor/proof backend；证明入口是 runtime-protocol tests 和 Python helper catalog tests，不恢复 standalone upstream probe script。
+- Python helper surface：当前仍允许 `script` / `compatibility_script` 作为 thin wrapper ref，但 preferred invocation 是 package module；后续退链要先完成 catalog、runtime callsite 和 native helper proof 同步，不能保留第二套 helper authority。
+- docs/program surface：仍被 `human_doc:*` 引用的 Phase 2 / Hermes / harness brief 原位保留为 absorbed provenance；无合同引用的旧计划直接进 `docs/history/` 或 tombstone，不再新增兼容性计划。

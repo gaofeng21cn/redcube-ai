@@ -1,6 +1,6 @@
 # Docs Portfolio Consolidation
 
-日期锚点：`2026-05-11`
+日期锚点：`2026-05-14`
 
 ## 本轮边界
 
@@ -137,6 +137,14 @@
 - runtime-program contracts、CLI/MCP surfaces、tests 与 dashboards 可以使用 `human_doc:*` 语义 ID 指向读者上下文。
 - 机器面不得把 `README*` 或具体 `docs/**/*.md` prose path 当成稳定 API；可执行真相应引用 contract/schema/source/artifact 路径。
 - 文档迁移时，优先维护人读链接与目录 README；机器合同只在语义 ID 变化时修改。
+
+## 2026-05-14 active surface cleanup addendum
+
+- Standalone upstream Hermes probe docs now point to `tests/runtime-topology-regression.test.ts` and `tests/python-native-helper-catalog.test.ts`; the removed `scripts/probe-upstream-hermes-agent.ts` must not be restored as a compatibility command.
+- Old workbench root compatibility is retired from active config loading; `REDCUBE_WORKSPACE_ROOT` and explicit workspace options are the current workspace root inputs.
+- CLI / MCP injection terminology is product/domain action and domain tool terminology. New tests and docs should not reintroduce `GatewayActionMap` / `getCliGatewayActions` / `callGatewayTool` / `listGatewayTools` / `GatewayTool*` names or equivalent aliases.
+- The active retired-wording guard is `tests/rca-retired-surface-guard.test.ts`; it protects source and machine surfaces, while `docs/**` remains human prose with lifecycle context.
+- Development plans should use `planned / done / deferred / skipped / verification / commit-push state`. Items listed as `deferred` must point to a contract link, explicit blocker, or history/tombstone landing zone.
 
 ## 验证口径
 

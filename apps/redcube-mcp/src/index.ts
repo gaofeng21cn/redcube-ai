@@ -1,36 +1,36 @@
 import {
-  callGatewayTool as callGatewayToolJs,
+  callDomainTool as callDomainToolJs,
   createMcpServer as createMcpServerJs,
   getDomainActions as getDomainActionsJs,
   getToolDefinitions as getToolDefinitionsJs,
-  listGatewayTools as listGatewayToolsJs,
+  listDomainTools as listDomainToolsJs,
   runStdioServer as runStdioServerJs,
 } from './server.js';
 
 import type {
   DomainActionMap,
-  GatewayToolDefinition,
-  GatewayToolSummary,
+  DomainToolDefinition,
+  DomainToolSummary,
 } from './types.js';
 
 export function getDomainActions(overrides: DomainActionMap = {}): DomainActionMap {
   return getDomainActionsJs(overrides) as unknown as DomainActionMap;
 }
 
-export function getToolDefinitions(): GatewayToolDefinition[] {
-  return getToolDefinitionsJs() as GatewayToolDefinition[];
+export function getToolDefinitions(): DomainToolDefinition[] {
+  return getToolDefinitionsJs() as DomainToolDefinition[];
 }
 
-export function listGatewayTools(): GatewayToolSummary[] {
-  return listGatewayToolsJs() as GatewayToolSummary[];
+export function listDomainTools(): DomainToolSummary[] {
+  return listDomainToolsJs() as DomainToolSummary[];
 }
 
-export async function callGatewayTool(
+export async function callDomainTool(
   name: string,
   args: Record<string, unknown>,
   deps: DomainActionMap = {},
 ): Promise<unknown> {
-  return callGatewayToolJs(name, args, deps);
+  return callDomainToolJs(name, args, deps);
 }
 
 export function createMcpServer(deps: DomainActionMap = {}) {
@@ -43,8 +43,8 @@ export async function runStdioServer(deps: DomainActionMap = {}) {
 
 export type {
   DomainActionMap,
-  GatewayToolDefinition,
-  GatewayToolResponse,
-  GatewayToolSummary,
+  DomainToolDefinition,
+  DomainToolResponse,
+  DomainToolSummary,
   McpServerDependencies,
 } from './types.js';
