@@ -80,7 +80,7 @@
 
 - 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` hosted integration 写成已落地
 - 但不能把它们写成成熟的最终用户前台壳或真实线上托管产品入口
-- 当前 route / managed run surface 已切到上游 `Hermes-Agent` managed runtime
+- 当前 OPL-hosted route / managed run 口径已切到 provider-backed / Temporal-target family runtime；`Hermes-Agent` 只作为显式 opt-in executor adapter、hosted/proof backend 或 provenance reference 保留
 - 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行
 - 所以这份文档现在冻结的是目标边界、调用合同与 repo-verified service surface，不是过度宣称“前台产品已经做完”
 
