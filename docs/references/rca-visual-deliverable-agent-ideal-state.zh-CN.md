@@ -303,6 +303,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。
 | Review / repair transport | blocked item queue、repair target threading、rerun request envelope、screenshot/export proof locator、human approval lane | visual director review、screenshot review verdict、repair decision、ready/exportable/handoffable verdict |
 | Native helper catalog / execution envelope | helper registration、environment/provisioning metadata、execution receipt、version/proof index、operator-safe launch shell | Python helper implementation、PPT/image/export mutation logic、helper-specific RCA proof、review gate integration |
 | Memory locator / writeback transport | memory descriptor discovery、body-free inventory、consumed refs、proposal refs、accepted/rejected receipt refs、freshness grouping | visual pattern memory body、route caveat、accept/reject authority、lesson quality judgment |
+| State-machine runner / transition matrix | transition schema、幂等 tick、retry/dead-letter、human gate transport、dispatch receipt、matrix runner | visual route transition table、source/readiness/review/export guard、repair action、blocked item typed blocker、artifact owner receipt |
 | Observability / SLO / repair projection | trace/log/event transport、freshness/SLO projection、stale scan、repair command projection、attention queue | domain blocker meaning、safe repair hint、visual quality facts、artifact/export authority boundary |
 
 上收边界的验收标准：
@@ -319,6 +320,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。
 | Deliverable family proof | `ppt_deck` 与 `xiaohongshu` 已以 image-first 为默认路线；HTML/native PPTX 是显式可选路线；`poster_onepager` 保持 guarded route。 | 三个 family 的长期、重复、真实 artifact proof 还没有全部达到生产 soak 水平；poster 仍是受控 knowledge poster 边界。 | 逐 family 跑 direct proof、OPL-hosted proof、review/export proof 和 repair proof；新增 family 必须先有 descriptor、route policy、artifact locator、review/export gate 与 no-forbidden-write proof。 |
 | Stage attempt receipts | stage descriptor、route artifacts、runtime watch、review/export projection 已存在；domain owner receipt contract 已 landed。 | 每个真实 stage attempt 的 source refs、artifact refs、review refs、blocked reason、human gate receipt 和 owner receipt 还未全部常态化。 | 把 attempt receipt 写入 workspace/runtime root，并从 product shell / OPL projection 只读展示；repo 只保留 descriptor、schema、test fixture 和 locator。 |
 | Domain memory | descriptor locator、seed fixture locator、writeback proposal、accept/reject contract、receipt locator 和 operator projection 已进入 repo-source contract surface。 | 真实 visual pattern memory body、accepted/rejected receipt instances 和 review/export closeout writeback 尚未作为常态运行流闭环。 | 先在 RCA runtime/domain-memory root 产生真实 receipt instance，再让 OPL 消费 locator/projection；不把 memory body 或视觉 verdict 迁入 OPL。 |
+| Domain transition spec | RCA 已有 stage control projection、route equivalence、review/export gate 和 controlled visual attempt proof；OPL 已有 generic transition runner / matrix runner 基础。 | 视觉路线从 source/readiness 到 visual direction、artifact creation、review/repair、package/export 的转换还没有固化为 RCA-owned transition table，也没有接入 OPL runner / provider attempt bridge。 | RCA 声明 visual transition table、guard、oracle fixture、blocked item typed blocker 和 owner action；OPL 只执行 spec，不生成 visual/export verdict。 |
 | Native helper / Python surface | Python helper catalog 已声明 package module 为 preferred invocation，仍允许 thin script wrapper 作为迁移期 ref。 | 部分 helper 仍有 `script` / `compatibility_script` 形态；这不是理想终态。 | 按 catalog 逐项迁到 package-module invocation，更新 runtime callsite 和 helper tests；完成后再把 wrapper allowance 收紧。 |
 | User workbench | 当前是 CLI/product shell/operator projection；面向人的 desktop/Web 工作台不是 RCA 仓内已完成产品。 | 进度、阻塞、artifact gallery、review state、attention queue 的人用 UI 仍属于 OPL App 或 product shell 后续形态。 | 先保证 projection source 稳定，再在 OPL App 或 RCA product shell 读取这些 source；UI 不持有 visual truth 或 artifact rewrite authority。 |
 | Persistence / lifecycle | 当前坚持 file authority + rebuildable artifact indexes；SQLite 仍是 deferred option。 | 还没有达到跨 deliverable 全局查询、长期 retention ledger 和 session index 的成熟侧车索引形态。 | 只有在真实文件规模、查询压力或 retention 维护成本出现后，再引入 rebuildable SQLite sidecar；不得把 SQLite 升级成 visual truth 或 artifact blob owner。 |
@@ -333,9 +335,11 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。
    已作为 RCA-owned callable surface 落地。它从 locator-only proposal 执行 RCA owner accept/reject，写 accepted/rejected runtime receipt refs；memory body 仍由 RCA-owned runtime/workspace memory store 持有，OPL 只消费 locator 和 receipt refs。
 4. `apply_visual_workspace_lifecycle`
    已作为 RCA-owned callable surface 落地。它对 visual workspace cleanup / restore / retention 请求返回 lifecycle receipt 或 typed blocker；真实 artifact mutation 仍要求 RCA domain receipt，OPL 只维护 locator、retention ledger 和 restore/provenance projection。
-5. `opl_app_projection`
+5. `declare_visual_transition_spec`
+   预留为 RCA-owned visual transition spec surface。它把 source readiness、communication strategy、visual direction、artifact creation、review/repair、export handoff 的状态组合映射成下一 owner、repair action、typed blocker 或 receipt requirement；OPL generic runner 只执行这份 spec，不裁决 visual ready / exportable。
+6. `opl_app_projection`
    让 OPL App 或 RCA product shell 展示 workspace、deliverables、review、artifacts、attention 和 safe actions；所有动作路由到 OPL provider signal、RCA product-entry、RCA sidecar 或 manual handoff，并返回 receipt/typed blocker。
-6. `legacy_physical_cleanup`
+7. `legacy_physical_cleanup`
    有 direct/hosted parity、fixture/provenance 和 no-active-caller proof 后，再删除或 tombstone 旧 Hermes / Gateway / local-manager / bridge residue。
 
 ### 本轮计划 closeout
