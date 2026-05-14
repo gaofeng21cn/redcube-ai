@@ -29,6 +29,11 @@ const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.ts',
   'packages/redcube-runtime-protocol/src/hermes-agent-loop-bridge-client.ts',
 ];
+const TEST_PYTHON_PROOF_CALLER_FILES = [
+  'tests/block-content-fit-review-cases/shared.ts',
+  'tests/block-content-fit-review-surface-children.test.ts',
+  'tests/ppt-creative-ownership-cases/foundation-and-routes.test.ts',
+];
 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
@@ -390,6 +395,20 @@ test('Runtime Python helper callers prefer package module invocation over wrappe
     const source = combinedSource.includes(helper.helper_id);
     assert.equal(source, true, `${helper.helper_id} must be resolved from the helper catalog by id`);
   }
+});
+
+test('Runtime and test proof callers do not prefer ppt deck wrapper scripts', () => {
+  const testProofSource = TEST_PYTHON_PROOF_CALLER_FILES
+    .map((file) => readImplementation(file))
+    .join('\n');
+  const wrapperInvocationPathPattern = new RegExp(
+    ['path\\.resolve\\([\'"]packages/redcube-runtime/scripts/', 'ppt_deck_[a-z_]+', '\\.py[\'"]\\)'].join(''),
+  );
+
+  assert.doesNotMatch(testProofSource, wrapperInvocationPathPattern);
+  assert.match(testProofSource, /redcube_ai\.native_helpers\.ppt_deck\.review/);
+  assert.match(testProofSource, /'-m',\s*PPT_DECK_REVIEW_MODULE/);
+  assert.match(testProofSource, /PYTHONPATH/);
 });
 
 test('Hermes-Agent loop client defaults to the package module bridge', () => {

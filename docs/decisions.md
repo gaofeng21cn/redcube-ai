@@ -2,6 +2,13 @@
 
 ## 2026-05-14
 
+### 决策：owner receipt / memory writeback / workspace lifecycle apply 由 RCA 持有 authority
+
+- 后续代码 surface 名称预留为 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`。
+- 这三个 surface 只写 RCA-owned workspace/runtime refs，并返回 domain receipt、typed blocker、no-regression evidence、memory receipt refs 或 lifecycle mutation receipt；不把 visual truth、review/export verdict、memory body、canonical artifacts 或 artifact mutation authority 写入 OPL。
+- OPL 只消费 locator、projection、receipt refs、operator projection 和 repair hints；OPL stage completion、provider completion 或 no-regression ref 不能被升级为 RCA visual ready、exportable、handoffable 或 production soak success。
+- 真实 OPL Temporal controlled visual-stage long soak 当前仍未完成；本轮仅完成文档 closeout，不修改机器合同、代码或 tests。
+
 ### 决策：退役旧 active 接口时直接清理，不保留兼容别名
 
 - `REDCUBE_WORKBENCH_ROOT` 不再作为 workspace root 输入；当前只认显式 workspace 参数、`REDCUBE_WORKSPACE_ROOT` 与用户级 runtime-state 配置。

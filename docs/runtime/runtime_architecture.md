@@ -91,6 +91,14 @@ OPL 侧可通过 product sidecar 读取和派发受控动作：
 
 Sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。任何需要生成、修复、审阅或导出视觉交付物的动作都必须回到 RCA-owned route 与 gate。
 
+后续 runtime apply surface 名称预留为：
+
+- `emit_domain_owner_receipt`：写 RCA-owned domain receipt、typed blocker 或 no-regression evidence ref，用于真实 artifact-producing attempt 的 owner closeout。
+- `apply_visual_memory_writeback`：写 RCA-owned memory proposal / accepted-rejected receipt refs，并由 RCA 持有 visual lesson body、accept/reject authority 和 route caveat 判断。
+- `apply_visual_workspace_lifecycle`：写 RCA-owned cleanup / restore / retention mutation receipt 或 typed blocker，用于真实 visual workspace 生命周期操作。
+
+这些 surface 只写 workspace/runtime refs，不写 repo source tree，不把 RCA visual truth、review/export verdict、memory body、canonical artifacts 或 artifact mutation authority 移给 OPL。OPL Runtime Manager 和 Temporal provider 只能调度、唤醒、投影并保存 locator/projection/receipt refs；真实 OPL Temporal controlled visual-stage long soak 仍是 pending runtime proof。
+
 ## Family Lifecycle
 
 当前 family 共享同一宏观生命周期：

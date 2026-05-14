@@ -323,16 +323,56 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。
 
 1. `controlled_visual_stage_attempt`
    选一个低风险真实 workspace，优先 `ppt_deck` 或 `xiaohongshu`，从 OPL-hosted attempt 或 direct product-entry continuation 进入同一 RCA service-safe domain entry，返回 `domain_receipt`、`typed_blocker` 或 `no_regression_evidence`。
-2. `artifact_producing_owner_receipt`
-   把 artifact delta、review state、repair target、export proof、handoff packet、residual risk 和 no-forbidden-write proof 纳入同一 owner receipt shape；direct path 与 OPL-hosted path 使用同一 return shape。
-3. `visual_pattern_memory_live_apply`
-   从真实 closeout 生成 reusable visual lesson proposal，由 RCA owner accept/reject；accepted body 写入 RCA-owned runtime/workspace memory store，OPL 只消费 locator 和 receipt refs。
-4. `visual_workspace_lifecycle_apply`
-   对真实 visual workspace 执行 cleanup / restore / retention guarded apply；RCA 返回 artifact mutation receipt 或 typed blocker，OPL 只维护 locator、retention ledger 和 restore/provenance projection。
+2. `emit_domain_owner_receipt`
+   预留为 artifact-producing owner receipt 的 RCA-owned callable surface。它把 artifact delta、review state、repair target、export proof、handoff packet、residual risk 和 no-forbidden-write proof 纳入同一 owner receipt shape；direct path 与 OPL-hosted path 使用同一 return shape。
+3. `apply_visual_memory_writeback`
+   预留为 visual pattern memory live apply 的 RCA-owned callable surface。从真实 closeout 生成 reusable visual lesson proposal，由 RCA owner accept/reject；accepted body 写入 RCA-owned runtime/workspace memory store，OPL 只消费 locator 和 receipt refs。
+4. `apply_visual_workspace_lifecycle`
+   预留为 visual workspace lifecycle guarded apply 的 RCA-owned callable surface。它对真实 visual workspace 执行 cleanup / restore / retention guarded apply；RCA 返回 artifact mutation receipt 或 typed blocker，OPL 只维护 locator、retention ledger 和 restore/provenance projection。
 5. `opl_app_projection`
    让 OPL App 或 RCA product shell 展示 workspace、deliverables、review、artifacts、attention 和 safe actions；所有动作路由到 OPL provider signal、RCA product-entry、RCA sidecar 或 manual handoff，并返回 receipt/typed blocker。
 6. `legacy_physical_cleanup`
    有 direct/hosted parity、fixture/provenance 和 no-active-caller proof 后，再删除或 tombstone 旧 Hermes / Gateway / local-manager / bridge residue。
+
+### 本轮计划 closeout
+
+#### planned
+
+- 把 RCA ideal-state / gap 计划从泛化 backlog 收口成可执行 closeout 结构，保留 current truth 与 target-state 的区别。
+- 预留 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 三个后续代码 surface 名称，作为 RCA-owned workspace/runtime apply surface，而不是 OPL-owned truth surface。
+- 在 status、architecture、decisions 与 runtime architecture 中同步说明：这些 surface 只写 workspace runtime refs、domain receipt、typed blocker、no-regression evidence 或 lifecycle receipt；RCA 持有 authority，OPL 只消费 locator/projection/receipt refs。
+- 明确真实 OPL Temporal controlled visual-stage long soak 尚未完成，不能把 OPL stage completion、provider completion 或 no-regression ref 写成 RCA visual ready / production soak success。
+
+#### done
+
+- 本文把 RCA-only 完善顺序改成后续代码 surface 可直接承接的命名：`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`。
+- 本文把本轮计划按 `planned / done / deferred / skipped / verification / commit-push state` 结构记录，方便后续实现 lane 和吸收 lane 接力。
+- 核心维护文档同步了 owner split：RCA 写 domain-owned workspace/runtime refs 并持有 visual truth、review/export verdict、memory body 和 canonical artifact authority；OPL 只读取 descriptor、locator、projection、receipt refs、operator projection 和 repair hints。
+
+#### deferred
+
+- `emit_domain_owner_receipt` 的代码实现、CLI/MCP/product sidecar wiring、真实 artifact-producing receipt instance 与对应 tests 延后到代码 shape 确认后处理。
+- `apply_visual_memory_writeback` 的代码实现、真实 reusable visual lesson body 写入、accepted/rejected runtime receipt instance 与 restore/no-forbidden-write proof 延后到 runtime/domain-memory lane。
+- `apply_visual_workspace_lifecycle` 的 cleanup / restore / retention apply implementation、真实 workspace mutation receipt、retention ledger 对齐与 projection UI 延后到 lifecycle lane。
+- 真实 OPL Temporal controlled visual-stage long soak、真实 domain owner receipt 或 no-regression evidence 的长时证明仍未完成；当前文档只描述计划与边界。
+
+#### skipped
+
+- 本轮不修改代码、tests、fixtures、package surface 或 generated artifacts。
+- 本轮不修改 `contracts/runtime-program/current-program.json`，避免在代码 shape 未确认前改变机器合同。
+- 本轮不声明 OPL Temporal long soak、artifact-producing owner receipt、memory writeback 或 workspace lifecycle apply 已完成。
+- 本轮不移动旧历史文档，也不恢复旧 gateway / frontdoor / workbench / repo-local Hermes active surface。
+
+#### verification
+
+- 文档 lane 建议先跑只读验证：`git diff -- docs/references/rca-visual-deliverable-agent-ideal-state.zh-CN.md docs/status.md docs/architecture.md docs/decisions.md docs/runtime/runtime_architecture.md`
+- 建议跑文档/格式轻量检查：`npm run test:meta -- --test-name-pattern docs`，若该 lane 不支持 pattern，则改跑 `npm run test:meta`。
+- 若需要确认未触碰代码面，跑：`git diff --name-only`，预期只出现本 closeout 限定的五个 Markdown 文件。
+
+#### commit-push state
+
+- 本轮是文档 lane 更新；提交、push、吸收到 main 与 worktree 清理由协调者统一处理。
+- 当前计划不要求立即 open production soak claim；代码实现 lane 完成后再更新机器合同和 status truth。
 
 本轮明确退役并清理的旧面：
 

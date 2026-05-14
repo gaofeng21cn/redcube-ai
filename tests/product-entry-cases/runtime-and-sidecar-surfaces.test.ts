@@ -131,6 +131,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'supervise_managed_run',
       'product_entry_continuation',
       'emit_no_regression_evidence',
+      'emit_domain_owner_receipt',
+      'apply_visual_memory_writeback',
+      'apply_visual_workspace_lifecycle',
       'notification_receipt',
     ],
   );
@@ -183,6 +186,128 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(evidenceFile.source_manifest_refs.skeleton_repo_source_layout_audit_status, 'pass');
     assert.equal(evidenceFile.coverage.verifies_legacy_default_active_path_retired, true);
     assert.equal(evidenceFile.coverage.long_visual_soak_claimed, false);
+
+    const missingReceiptRefs = await dispatchProductSidecar({
+      task: {
+        action: 'emit_domain_owner_receipt',
+        workspace_root: workspaceRoot,
+        receipt_id: 'missing-domain-refs',
+      },
+    });
+    assert.equal(missingReceiptRefs.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(missingReceiptRefs.result_surface.return_shape, 'typed_blocker');
+    assert.equal(missingReceiptRefs.result_surface.blocker_kind, 'domain_owner_receipt_missing_required_refs');
+    assert.equal(missingReceiptRefs.result_surface.owner, 'redcube_ai');
+    assert.equal(missingReceiptRefs.result_surface.visual_ready_claimed, false);
+
+    const domainReceipt = await dispatchProductSidecar({
+      task: {
+        action: 'emit_domain_owner_receipt',
+        workspace_root: workspaceRoot,
+        receipt_id: 'unit-domain-receipt',
+        attempt_ref: 'workspace-runtime-ref:attempt:run-a',
+        artifact_locator_ref: '/artifact_locator_contract',
+        memory_receipt_ref: 'rca-memory-receipt:visual-pattern:accepted-a',
+        lifecycle_receipt_ref: 'rca-lifecycle-receipt:retention:unit-lifecycle',
+        review_export_ref: 'workspace-runtime-ref:review-export:run-a',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        artifact_refs: [
+          {
+            artifact_kind: 'png_page',
+            ref_kind: 'workspace_runtime_artifact',
+            artifact_ref: 'workspace-runtime-ref:artifact:slide-1',
+            sha256: 'sha256-slide-1',
+          },
+        ],
+        repair_target_refs: ['workspace-runtime-ref:repair:slide-1'],
+        handoff_packet_ref: 'workspace-runtime-ref:handoff:run-a',
+        residual_risk_refs: ['workspace-runtime-ref:risk:manual-review'],
+      },
+    });
+    assert.equal(domainReceipt.result_surface.surface_kind, 'domain_owner_receipt');
+    assert.equal(domainReceipt.result_surface.return_shape, 'domain_receipt');
+    assert.equal(domainReceipt.result_surface.receipt_ref, 'rca-owner-receipt:visual-stage:unit-domain-receipt');
+    assert.equal(
+      domainReceipt.result_surface.runtime_locator_ref,
+      'workspace-runtime-ref:domain-owner-receipt:unit-domain-receipt',
+    );
+    assert.equal(domainReceipt.result_surface.coverage.visual_ready_claimed, false);
+    assert.equal(domainReceipt.result_surface.coverage.opl_completion_promoted_to_visual_ready, false);
+    assert.equal(domainReceipt.result_surface.repository_boundary.repo_tracks_live_receipt_instances, false);
+    const domainReceiptFile = readJson(domainReceipt.result_surface.receipt_file);
+    assert.equal(domainReceiptFile.surface_kind, 'domain_owner_receipt');
+    assert.equal(domainReceiptFile.required_refs.attempt_ref, 'workspace-runtime-ref:attempt:run-a');
+    assert.equal(domainReceiptFile.artifact_delta.artifact_refs.length, 1);
+    assert.equal(domainReceiptFile.coverage.visual_ready_claimed, false);
+
+    const memoryReceipt = await dispatchProductSidecar({
+      task: {
+        action: 'apply_visual_memory_writeback',
+        workspace_root: workspaceRoot,
+        proposal_id: 'proposal-a',
+        decision: 'accepted',
+        decision_owner: 'redcube_ai',
+        source_review_ref: 'workspace-runtime-ref:review:run-a',
+        candidate_memory_ref: 'rca-memory:visual-pattern:memory-a',
+        memory_locator_ref: 'rca-memory:visual-pattern:memory-a',
+        memory_content_body_ref: 'rca-memory-content-ref:visual-pattern:memory-a',
+      },
+    });
+    assert.equal(memoryReceipt.result_surface.surface_kind, 'visual_pattern_memory_writeback_receipt');
+    assert.equal(memoryReceipt.result_surface.writeback_status, 'accepted');
+    assert.equal(memoryReceipt.result_surface.receipt_ref, 'rca-memory-receipt:visual-pattern:proposal-a-accepted');
+    assert.equal(memoryReceipt.result_surface.memory_content_body, undefined);
+    assert.equal(memoryReceipt.result_surface.review_verdict, undefined);
+    const memoryReceiptFile = readJson(memoryReceipt.result_surface.receipt_file);
+    assert.equal(memoryReceiptFile.writeback_status, 'accepted');
+    assert.equal(memoryReceiptFile.memory_content_body, undefined);
+    assert.equal(memoryReceiptFile.repository_boundary.repo_tracks_receipt_instance, false);
+
+    const blockedMemory = await dispatchProductSidecar({
+      task: {
+        action: 'apply_visual_memory_writeback',
+        workspace_root: workspaceRoot,
+        proposal_id: 'proposal-blocked',
+        decision: 'accepted',
+        decision_owner: 'opl',
+        source_review_ref: 'workspace-runtime-ref:review:run-a',
+        candidate_memory_ref: 'rca-memory:visual-pattern:memory-a',
+      },
+    });
+    assert.equal(blockedMemory.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(blockedMemory.result_surface.blocker_kind, 'visual_memory_writeback_owner_required');
+
+    const lifecycleReceipt = await dispatchProductSidecar({
+      task: {
+        action: 'apply_visual_workspace_lifecycle',
+        workspace_root: workspaceRoot,
+        operation: 'retention',
+        receipt_id: 'unit-lifecycle',
+        domain_receipt_ref: 'rca-owner-receipt:visual-stage:unit-domain-receipt',
+        artifact_locator_ref: '/artifact_locator_contract',
+        artifact_refs: ['workspace-runtime-ref:artifact:slide-1'],
+      },
+    });
+    assert.equal(lifecycleReceipt.result_surface.surface_kind, 'visual_workspace_lifecycle_receipt');
+    assert.equal(lifecycleReceipt.result_surface.operation, 'retention');
+    assert.equal(lifecycleReceipt.result_surface.receipt_ref, 'rca-lifecycle-receipt:retention:unit-lifecycle');
+    assert.equal(lifecycleReceipt.result_surface.artifact_mutation_applied, false);
+    assert.equal(lifecycleReceipt.result_surface.review_export_verdict_written, false);
+    const lifecycleReceiptFile = readJson(lifecycleReceipt.result_surface.receipt_file);
+    assert.equal(lifecycleReceiptFile.operation, 'retention');
+    assert.equal(lifecycleReceiptFile.artifact_mutation_applied, false);
+
+    const blockedLifecycle = await dispatchProductSidecar({
+      task: {
+        action: 'apply_visual_workspace_lifecycle',
+        workspace_root: workspaceRoot,
+        operation: 'cleanup',
+        receipt_id: 'blocked-cleanup',
+        requested_artifact_mutation: true,
+      },
+    });
+    assert.equal(blockedLifecycle.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(blockedLifecycle.result_surface.blocker_kind, 'lifecycle_domain_receipt_required');
 
     await assert.rejects(
       () => dispatchProductSidecar({

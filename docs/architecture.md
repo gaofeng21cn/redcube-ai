@@ -26,6 +26,8 @@
 
 RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract` 统一 domain receipt、typed blocker 与 no-regression evidence return shape；`lifecycle_guarded_apply_proof` 覆盖 cleanup/restore/retention 的 guarded apply 语义；`physical_skeleton_follow_through` 证明 `agent/ contracts/ runtime/ docs/` 入口可被 OPL 消费；`review_helper_baseline_follow_through` 记录 PPT review helper 的 baseline removal、geometry audit / markdown report / summary projection 拆分与剩余 screenshot capture 边界。这些 surface 仍是 RCA-owned projection，不把 visual truth、review/export verdict、canonical artifact 或 memory body 移给 OPL。
 
+后续代码 surface 预留为 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`。三者都属于 RCA-owned workspace/runtime apply surface：写入和返回的是 workspace runtime refs、domain receipt、typed blocker、no-regression evidence、memory receipt refs 或 lifecycle mutation receipt；RCA 继续持有 visual truth、review/export verdict、memory body、canonical artifacts 和 artifact mutation authority。OPL-hosted path 只能消费 locator、projection、receipt refs、operator projection 和 repair hints，不能把 provider completion 或 stage metadata 升级成 RCA visual ready / exportable / handoffable verdict。真实 OPL Temporal controlled visual-stage long soak 当前仍未完成。
+
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
 当前仓内可执行的 runtime 基线按三层 owner 收口：

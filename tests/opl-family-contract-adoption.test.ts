@@ -197,6 +197,17 @@ test('RCA controlled soak remains deferred without descriptor index skeleton reg
 
   assert.equal(controlledSoak.state, 'deferred');
   assert.equal(controlledSoak.required_opl_substrate, 'Temporal production online runtime');
+  assert.deepEqual(controlledSoak.owner_runtime_receipt_actions, {
+    state: 'runtime_receipt_refs_available',
+    domain_owner_receipt_action: 'emit_domain_owner_receipt',
+    visual_memory_writeback_action: 'apply_visual_memory_writeback',
+    workspace_lifecycle_action: 'apply_visual_workspace_lifecycle',
+    workspace_receipt_root: '<workspace-root>/.redcube/runtime/receipts/',
+    typed_blocker_on_missing_required_refs: true,
+    visual_ready_claimed: false,
+    repo_tracks_live_receipt_instances: false,
+    opl_consumes_locator_and_receipt_refs_only: true,
+  });
   assert.deepEqual(controlledSoak.no_regression_surfaces, [
     'family_action_catalog',
     'stage_control_projection',

@@ -50,6 +50,7 @@ const DEFAULT_PPT_CREATIVE_METADATA = {
 const PPT_ROUTES_TO_RENDER_HTML = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html'];
 const PPT_ROUTES_TO_SCREENSHOT_REVIEW = [...PPT_ROUTES_TO_RENDER_HTML, 'visual_director_review', 'screenshot_review'];
 const PPT_ROUTES_TO_EXPORT_PPTX = [...PPT_ROUTES_TO_SCREENSHOT_REVIEW, 'export_pptx'];
+const PPT_DECK_REVIEW_MODULE = 'redcube_ai.native_helpers.ppt_deck.review';
 const preparedPptWorkspaceCache = new Map();
 let cachedPythonCommand = null;
 
@@ -68,8 +69,16 @@ function runReviewScript(args) {
   const python = resolveTestPythonCommand();
   return spawnSync(
     python.command,
-    [...(python.args || []), path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'), ...args],
-    { encoding: 'utf-8' },
+    [...(python.args || []), '-m', PPT_DECK_REVIEW_MODULE, ...args],
+    {
+      encoding: 'utf-8',
+      env: {
+        ...process.env,
+        PYTHONPATH: process.env.PYTHONPATH
+          ? `${path.resolve('python')}${path.delimiter}${process.env.PYTHONPATH}`
+          : path.resolve('python'),
+      },
+    },
   );
 }
 
@@ -220,9 +229,9 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   const directorReviewPrompt = read('prompts/ppt_deck/director_review.md');
   const screenshotReviewPrompt = read('prompts/ppt_deck/screenshot_review.md');
   const reviewScript = [
-    read('packages/redcube-runtime/scripts/ppt_deck_review.py'),
     read('python/redcube_ai/native_helpers/ppt_deck/review.py'),
     read('python/redcube_ai/native_helpers/ppt_deck/review_consistency.py'),
+    read('python/redcube_ai/native_helpers/ppt_deck/review_geometry.py'),
   ].join('\n');
   const overlayProfiles = readImplementation('packages/redcube-overlay-ppt/src/profiles.ts');
 

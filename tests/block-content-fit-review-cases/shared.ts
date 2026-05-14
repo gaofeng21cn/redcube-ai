@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts';
 
 let cachedPythonCommand = null;
+const PPT_DECK_REVIEW_MODULE = 'redcube_ai.native_helpers.ppt_deck.review';
 
 function resolveTestPythonCommand() {
   if (cachedPythonCommand) {
@@ -25,8 +26,16 @@ function runReview(args) {
   const python = resolveTestPythonCommand();
   return spawnSync(
     python.command,
-    [...(python.args || []), path.resolve('packages/redcube-runtime/scripts/ppt_deck_review.py'), ...args],
-    { encoding: 'utf-8' },
+    [...(python.args || []), '-m', PPT_DECK_REVIEW_MODULE, ...args],
+    {
+      encoding: 'utf-8',
+      env: {
+        ...process.env,
+        PYTHONPATH: process.env.PYTHONPATH
+          ? `${path.resolve('python')}${path.delimiter}${process.env.PYTHONPATH}`
+          : path.resolve('python'),
+      },
+    },
   );
 }
 

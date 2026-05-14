@@ -1202,6 +1202,20 @@
             "repo_tracks_runtime_evidence_instance": false,
             "writes_visual_or_export_artifact": false
           },
+          "runtime_receipt_actions": {
+            "domain_owner_receipt_action": "emit_domain_owner_receipt",
+            "domain_owner_receipt_surface_kind": "domain_owner_receipt",
+            "domain_owner_receipt_workspace_path_model": "<workspace-root>/.redcube/runtime/receipts/domain-owner/<receipt-id>.json",
+            "visual_memory_writeback_action": "apply_visual_memory_writeback",
+            "visual_memory_writeback_surface_kind": "visual_pattern_memory_writeback_receipt",
+            "visual_memory_receipt_workspace_path_model": "<workspace-root>/.redcube/runtime/receipts/memory/visual-pattern/<receipt-id>.json",
+            "workspace_lifecycle_action": "apply_visual_workspace_lifecycle",
+            "workspace_lifecycle_surface_kind": "visual_workspace_lifecycle_receipt",
+            "workspace_lifecycle_receipt_path_model": "<workspace-root>/.redcube/runtime/receipts/lifecycle/<operation>/<receipt-id>.json",
+            "typed_blocker_on_missing_required_refs": true,
+            "visual_ready_claimed": false,
+            "repo_tracks_live_receipt_instances": false
+          },
           "opl_can_store_receipt_refs": true,
           "opl_can_store_visual_truth": false,
           "opl_can_store_review_export_verdict": false,
@@ -1217,6 +1231,8 @@
             "retention"
           ],
           "domain_artifact_mutation_requires_domain_receipt": true,
+          "runtime_receipt_action": "apply_visual_workspace_lifecycle",
+          "workspace_receipt_path_model": "<workspace-root>/.redcube/runtime/receipts/lifecycle/<operation>/<receipt-id>.json",
           "opl_can_apply_domain_artifact_mutation": false,
           "repo_tracks_lifecycle_receipt_instances": false,
           "repo_tracks_visual_or_export_artifacts": false
