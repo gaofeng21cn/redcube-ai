@@ -10,5 +10,6 @@
   },
   "bin": {
     "redcube": "dist/cli.js"
-  }
+  },
+  "license": "Apache-2.0"
 }

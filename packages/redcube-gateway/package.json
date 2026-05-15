@@ -13,5 +13,6 @@
     "@redcube/runtime": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
     "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#e3fd0b6be41e858958d42ea400a3e63c4205ff8a"
-  }
+  },
+  "license": "Apache-2.0"
 }

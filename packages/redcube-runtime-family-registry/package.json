@@ -33,5 +33,6 @@
     "@redcube/runtime-family-ppt": "0.1.0",
     "@redcube/runtime-family-xiaohongshu": "0.1.0",
     "@redcube/runtime-family-poster-onepager": "0.1.0"
-  }
+  },
+  "license": "Apache-2.0"
 }

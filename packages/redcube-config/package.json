@@ -17,5 +17,6 @@
       "types": "./dist/xiaohongshu-author-profile.d.ts",
       "default": "./dist/xiaohongshu-author-profile.js"
     }
-  }
+  },
+  "license": "Apache-2.0"
 }
