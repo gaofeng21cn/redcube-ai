@@ -6,9 +6,9 @@
 
 ## 定位
 
-- `AGENTS.md` 只约束工作方式，不承载项目知识细节。
+- `AGENTS.md` 只约束工作方式、少量稳定身份边界和文档生命周期纪律，不承载项目知识细节或阶段完成判断。
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
-- `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，Agent executor 是 stage 内最小执行单位；`Codex CLI` 是当前第一公民 executor，其他 executor adapter 只能显式接入且不承诺行为效果等价。RCA 持有 visual truth、layout/review verdict、route owner 和 artifact authority。
+- `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，Agent executor 是 stage 内最小执行单位；`Codex CLI` 是当前第一公民 executor，其他 executor adapter 只能显式接入且不承诺行为效果等价。RCA 持有 visual truth、layout/review/export verdict、route owner、artifact authority、visual memory accept/reject authority 和 owner receipt；通用 runtime、queue、attempt ledger、state-machine runner、workspace/source intake shell、artifact gallery/handoff shell、review/repair transport、native-helper envelope、memory locator 与 App/workbench shell 归 OPL Framework / shared family layer。
 - `gateway / harness` 只作为仓内边界层、执行层或历史语境保留；对外第一身份是 RedCube AI visual-deliverable domain agent。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
@@ -22,6 +22,7 @@
 - repo-tracked 源码与测试默认都应保持文件边界清晰，优先控制在 `1000` 行以内；超过 `1500` 行应视为明确的拆分信号，而不是继续堆叠实现。
 - 新增能力或继续重构时，优先采用稳定薄入口加 `parts/`、`cases/`、`modules/` 等子模块拆分；不要把新逻辑继续堆回单个超长文件。
 - 一旦新的 runtime substrate 目标已经明确，新增投入默认服务目标形态；旧宿主只允许作为迁移桥、兼容层或回归对照存在。
+- 已被当前 owner surface 替代的模块、接口、CLI alias、wrapper、facade、聚合测试和文档入口，默认迁移 active caller 后直接退役；需要来龙去脉时只保留 history/tombstone/provenance，不新增 compatibility shim、re-export facade、别名或兼容测试。
 - 不做降级处理、兜底补丁、启发式修补或“先糊住再说”式实现。
 
 ## 文档分层与生命周期治理
@@ -42,6 +43,8 @@
 - `docs/delivery/`：交付物 family、route、proof 环境、示例与人工验证材料。
 - `docs/source/`：source readiness、augmentation、research trigger / gate 与 source truth 消费说明。
 - `docs/active/`：当前执行、当前计划、当前差距、contract-linked active baton 与 closeout evidence；旧 `docs/program/` active baton 目录已物理退役，新增 recurring active material 不再进入旧目录。
+- `docs/public/`：public narrative index；当前较薄，除非未来有真正公开材料，否则保持索引职责。
+- `docs/specs/`：当前仍有效的技术规格索引；不扩成杂物层。
 - `docs/history/phase-2/`：已吸收 Phase 2 tranche、prefrozen follow-on board 与 provenance brief；旧 `docs/program/phase-2/` 已迁入 history。
 - `docs/history/hermes/`：upstream Hermes proof / cutover provenance；旧 `docs/program/` 下 Hermes 记录已迁入 history。
 - `contracts/runtime-program/current-program.json`：当前机器可读主线合同与 active baton 指针。
