@@ -361,11 +361,13 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'product_sidecar_adapter',
       'projection_builder',
       'lifecycle_adapter',
+      'visual_transition_spec',
       'domain_memory_descriptor_locator',
     ]);
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
     assert.equal(manifest.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
     assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');

@@ -114,6 +114,17 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     ]);
     assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.opl_can_apply_domain_artifact_mutation, false);
     assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.domain_receipt_required, true);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.ref, '/visual_transition_spec');
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.spec_id, 'rca.visual_transition_spec.v1');
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.status, 'contract_landed_runner_integration_pending');
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.transition_count, 5);
+    assert.equal(
+      sidecar.mapped_surfaces.visual_transition_spec.oracle_fixture_id,
+      'rca.visual_transition_oracle.fixture.v1',
+    );
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.opl_can_execute_transition_spec, true);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.opl_can_declare_visual_ready, false);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.opl_can_declare_exportable, false);
     assert.equal(
       sidecar.mapped_surfaces.visual_pattern_memory_writeback.runtime_receipt_instances_ref,
       '/controlled_memory_apply_proof/runtime_receipt_instances',
@@ -124,6 +135,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(sidecar.source_manifest_refs.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
     assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
+    assert.equal(sidecar.source_manifest_refs.visual_transition_spec_ref, '/visual_transition_spec');
   assert.deepEqual(
     sidecar.guarded_actions.map((entry) => entry.action),
     [

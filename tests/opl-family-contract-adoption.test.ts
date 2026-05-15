@@ -179,6 +179,7 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'product_sidecar_adapter',
     'projection_builder',
     'lifecycle_adapter',
+    'visual_transition_spec',
     'domain_memory_descriptor_locator',
     'domain_owner_receipt_contract',
     'lifecycle_guarded_apply_proof',
@@ -186,6 +187,7 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   assert.equal(skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
   assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
   assert.equal(skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
+  assert.equal(skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
   assert.equal(skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
   assert.equal(skeleton.runtime_declarations.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
   assert.equal(skeleton.runtime_declarations.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
@@ -221,6 +223,7 @@ test('RCA controlled soak remains deferred without descriptor index skeleton reg
     'controlled_memory_apply_proof',
     'domain_owner_receipt_contract',
     'lifecycle_guarded_apply_proof',
+    'visual_transition_spec',
     'physical_skeleton_follow_through',
     'review_helper_baseline_follow_through',
   ]);
@@ -651,6 +654,15 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.deepEqual(lifecycleApply.operations, ['cleanup', 'restore', 'retention']);
   assert.equal(lifecycleApply.domain_artifact_mutation_requires_domain_receipt, true);
   assert.equal(lifecycleApply.opl_can_apply_domain_artifact_mutation, false);
+
+  const transitionSpec = payload.current_state.active_baton.scope.visual_transition_spec;
+  assert.equal(transitionSpec.status, 'contract_landed_runner_integration_pending');
+  assert.equal(transitionSpec.spec_id, 'rca.visual_transition_spec.v1');
+  assert.equal(transitionSpec.transition_count, 5);
+  assert.equal(transitionSpec.opl_can_execute_transition_spec, true);
+  assert.equal(transitionSpec.opl_can_declare_visual_ready, false);
+  assert.equal(transitionSpec.opl_can_declare_exportable, false);
+  assert.equal(transitionSpec.repo_tracks_runner_state, false);
 
   const physicalFollowThrough = payload.current_state.active_baton.scope.physical_skeleton_follow_through;
   assert.equal(physicalFollowThrough.status, 'low_risk_repo_source_follow_through_landed');

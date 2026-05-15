@@ -300,6 +300,18 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         guarded_action: 'apply_visual_workspace_lifecycle',
         receipt_root_model: '<workspace-root>/.redcube/runtime/receipts/lifecycle/<operation>/<receipt-id>.json',
       },
+      visual_transition_spec: {
+        ref: '/visual_transition_spec',
+        owner: DOMAIN_ID,
+        spec_id: manifest.visual_transition_spec?.spec_id || 'rca.visual_transition_spec.v1',
+        status: manifest.visual_transition_spec?.status || 'contract_landed_runner_integration_pending',
+        transition_count: manifest.visual_transition_spec?.transition_table?.length || 0,
+        oracle_fixture_id: manifest.visual_transition_spec?.oracle_fixture?.fixture_id || null,
+        opl_can_execute_transition_spec: true,
+        opl_can_declare_visual_ready: false,
+        opl_can_declare_exportable: false,
+        writable_by_sidecar: false,
+      },
     },
     guarded_actions: buildGuardedActionCatalog(),
     blocked_actions: [
@@ -325,6 +337,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       controlled_soak_no_regression_attempt_ref: '/controlled_soak_no_regression_attempt',
       domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
+      visual_transition_spec_ref: '/visual_transition_spec',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {

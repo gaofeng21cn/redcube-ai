@@ -134,6 +134,36 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     assert.equal(lifecycleApply.repository_boundary.repo_tracks_lifecycle_receipt_instances, false);
     assert.equal(lifecycleApply.repository_boundary.repo_tracks_visual_or_export_artifacts, false);
 
+    const transitionSpec = manifest.visual_transition_spec;
+    assert.equal(transitionSpec.surface_kind, 'visual_transition_spec');
+    assert.equal(transitionSpec.spec_id, 'rca.visual_transition_spec.v1');
+    assert.equal(transitionSpec.status, 'contract_landed_runner_integration_pending');
+    assert.equal(transitionSpec.owner, 'redcube_ai');
+    assert.deepEqual(
+      transitionSpec.transition_table.map((transition) => [
+        transition.transition_id,
+        transition.from_stage,
+        transition.to_stage,
+        transition.owner_action,
+      ]),
+      [
+        ['source_ready_to_strategy', 'source_intake', 'communication_strategy', 'continue_to_communication_strategy'],
+        ['strategy_ready_to_visual_direction', 'communication_strategy', 'visual_direction', 'continue_to_visual_direction'],
+        ['visual_direction_ready_to_artifact_creation', 'visual_direction', 'artifact_creation', 'create_visual_artifacts'],
+        ['artifact_ready_to_review', 'artifact_creation', 'review_and_revision', 'run_review_and_repair_gate'],
+        ['review_ready_to_package', 'review_and_revision', 'package_and_handoff', 'export_or_return_typed_blocker'],
+      ],
+    );
+    assert.equal(transitionSpec.guard_contract.guard_model, 'refs_and_typed_blockers_only');
+    assert.equal(transitionSpec.oracle_fixture.fixture_id, 'rca.visual_transition_oracle.fixture.v1');
+    assert.equal(transitionSpec.oracle_fixture.forbidden_oracle_fields.includes('visual_verdict'), true);
+    assert.equal(transitionSpec.oracle_fixture.forbidden_oracle_fields.includes('canonical_artifact_blob'), true);
+    assert.equal(transitionSpec.runner_boundary.opl_can_execute_transition_spec, true);
+    assert.equal(transitionSpec.runner_boundary.opl_can_declare_visual_ready, false);
+    assert.equal(transitionSpec.runner_boundary.opl_can_mutate_artifacts, false);
+    assert.equal(transitionSpec.repository_boundary.repo_tracks_transition_spec, true);
+    assert.equal(transitionSpec.repository_boundary.repo_tracks_runner_state, false);
+
     const followThrough = manifest.physical_skeleton_follow_through;
     assert.equal(followThrough.surface_kind, 'physical_skeleton_follow_through');
     assert.equal(followThrough.status, 'low_risk_repo_source_follow_through_landed');

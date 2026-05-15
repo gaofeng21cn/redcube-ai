@@ -12,6 +12,7 @@ import {
   buildLifecycleGuardedApplyProof,
   buildPhysicalSkeletonFollowThrough,
   buildReviewHelperBaselineFollowThrough,
+  buildVisualTransitionSpec,
 } from './standard-domain-agent-skeleton-parts/functional-closure.js';
 
 export {
@@ -19,6 +20,7 @@ export {
   buildLifecycleGuardedApplyProof,
   buildPhysicalSkeletonFollowThrough,
   buildReviewHelperBaselineFollowThrough,
+  buildVisualTransitionSpec,
   buildRuntimeResidueRetirementAudit,
   buildVisualPatternMemoryWritebackProjection,
 };
@@ -848,6 +850,7 @@ export function buildStandardDomainAgentSkeleton({
   const controlledSoakNoRegressionAttempt = buildControlledSoakNoRegressionAttempt();
   const domainOwnerReceiptContract = buildDomainOwnerReceiptContract();
   const lifecycleGuardedApplyProof = buildLifecycleGuardedApplyProof();
+  const visualTransitionSpec = buildVisualTransitionSpec();
   const physicalSkeletonFollowThrough = buildPhysicalSkeletonFollowThrough();
   const reviewHelperBaselineFollowThrough = buildReviewHelperBaselineFollowThrough();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
@@ -872,11 +875,13 @@ export function buildStandardDomainAgentSkeleton({
         'product_sidecar_adapter',
         'projection_builder',
         'lifecycle_adapter',
+        'visual_transition_spec',
         'domain_memory_descriptor_locator',
       ],
       sidecar_adapter_ref: productSidecarRef,
       projection_builder_ref: familyStageControlPlaneRef,
       lifecycle_adapter_ref: lifecycleAdapterRef,
+      visual_transition_spec_ref: '/visual_transition_spec',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
       session_command_template: productEntrySessionCommand || 'redcube product session --entry-session-id <entry-session-id>',
       runtime_owner: runtime?.runtime_owner || 'codex_cli',
@@ -891,6 +896,7 @@ export function buildStandardDomainAgentSkeleton({
     controlled_soak_no_regression_attempt: controlledSoakNoRegressionAttempt,
     domain_owner_receipt_contract: domainOwnerReceiptContract,
     lifecycle_guarded_apply_proof: lifecycleGuardedApplyProof,
+    visual_transition_spec: visualTransitionSpec,
     physical_skeleton_follow_through: physicalSkeletonFollowThrough,
     review_helper_baseline_follow_through: reviewHelperBaselineFollowThrough,
     opl_consumption_boundary: {
