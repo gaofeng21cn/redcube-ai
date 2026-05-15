@@ -8,6 +8,12 @@ import { getProductEntrySession } from './get-product-entry-session.js';
 import { invokeProductEntry } from './invoke-product-entry.js';
 import { runtimeWatch } from './runtime-watch.js';
 import { superviseManagedRun } from './supervise-managed-run.js';
+export {
+  assertReceiptOnlyHostedAttemptProjection,
+  buildHostedAttemptBridgeFixture,
+  isReceiptOnlyHostedAttemptProjection,
+  reconcileHostedAttemptReceipt,
+} from './product-sidecar-parts/hosted-attempt-reconciliation.js';
 
 const SIDECAR_ID = 'redcube_product_sidecar_adapter.v1';
 const DOMAIN_ID = 'redcube_ai';

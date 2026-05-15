@@ -82,6 +82,21 @@ async function dispatchProductSidecar(request) {
   return module.dispatchProductSidecar(request);
 }
 
+async function buildHostedAttemptBridgeFixture(request) {
+  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  return module.buildHostedAttemptBridgeFixture(request);
+}
+
+async function reconcileHostedAttemptReceipt(request) {
+  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  return module.reconcileHostedAttemptReceipt(request);
+}
+
+async function assertReceiptOnlyHostedAttemptProjection(projection) {
+  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  return module.assertReceiptOnlyHostedAttemptProjection(projection);
+}
+
 async function withMockCodexRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
@@ -242,9 +257,11 @@ export {
   StdioClientTransport,
   assert,
   assertFamilyOrchestrationCompanion,
+  assertReceiptOnlyHostedAttemptProjection,
   assertRuntimeLoopClosureShape,
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
+  buildHostedAttemptBridgeFixture,
   callDomainTool,
   chmodSync,
   completeSourceReadiness,
@@ -274,6 +291,7 @@ export {
   prepareSourceAugmentationResult,
   readFileSync,
   readJson,
+  reconcileHostedAttemptReceipt,
   researchSource,
   runDeliverableRoute,
   runManagedDeliverable,
