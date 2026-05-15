@@ -81,7 +81,7 @@ Visual pattern memory can guide the AI author and reviewer. It does not move aut
 
 OPL may index memory refs, surface consumed-memory provenance, and carry closeout writeback receipts. OPL must not own RCA visual pattern content, choose visual routes, issue review/export verdicts, or mutate canonical artifacts.
 
-Family-level governance for this boundary is tracked in `/Users/gaofeng/workspace/one-person-lab/docs/references/operating-governance/family-domain-memory-governance.zh-CN.md`.
+Family-level governance for this boundary is tracked in `/Users/gaofeng/workspace/one-person-lab/docs/references/operating-governance/family-domain-memory-governance.md`.
 
 ## Now / Next / Defer
 

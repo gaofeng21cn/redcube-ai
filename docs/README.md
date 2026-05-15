@@ -1,118 +1,103 @@
-# Docs Guide
+# 文档索引
 
-**English** | [中文](./README.zh-CN.md)
+这个目录是 `RedCube AI` 的技术阅读层。
+当前公开阅读路径从 `RedCube AI Foundry Agent` 身份开始：它是 built on OPL Framework 的 OPL-compatible visual-deliverable package。OPL 是 stage-led 的智能体运行框架，可以把 RedCube 作为外部依赖托管，因此 OPL 路径在这里只作为内部托管集成路径记录：
 
-This directory is the technical reading layer for `RedCube AI`.
-The current public reading path starts from RedCube as the `RedCube AI Foundry Agent`: an OPL-compatible visual-deliverable package built on the OPL Framework. OPL is the stage-led agent runtime framework that can host RedCube as an external dependency, so the OPL path is documented as an internal hosted integration path rather than the first public story:
+- RedCube 直达路径：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- OPL 托管路径：`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 
-- direct route: `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- OPL-hosted route: `User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+## 按读者类型进入
 
-## Start Here By Audience
-
-| Audience | Start here | Why |
+| 读者 | 建议起点 | 目的 |
 | --- | --- | --- |
-| Potential users and domain experts | [Repository home](../README.md) | Understand what RedCube delivers before opening technical files |
-| Technical readers and planners | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md), [Contracts Overview](../contracts/README.md) | Read current boundary, execution model, and active governance surface |
-| Developers and maintainers | [Product](./product/README.md), [Runtime](./runtime/README.md), [Delivery](./delivery/README.md), [Source](./source/README.md), [Policies](./policies/README.md), [Active](./active/README.md), [References](./references/README.md), [History](./history/README.md) | Track lifecycle docs, stable rules, active baton records, references, and archived provenance |
+| 潜在用户与领域专家 | [仓库首页](../README.md) | 先理解 RedCube 交付什么，再进入技术细节 |
+| 技术规划与架构读者 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md)、[合同说明](../contracts/README.md) | 读取当前边界、执行模型和当前治理面 |
+| 开发者与维护者 | [Product](./product/README.md)、[Runtime](./runtime/README.md)、[Delivery](./delivery/README.md)、[Source](./source/README.md)、[Policies](./policies/README.md)、[Active](./active/README.md)、[References](./references/README.md)、[History](./history/README.md) | 追踪生命周期文档、稳定规则、当前 baton、参考资料与历史 provenance |
 
-## OPL Family Layering
+## OPL 系列分层
 
-The global OPL-family development reference lives at
-`/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.zh-CN.md`.
-It owns OPL Framework global targets, global gaps, generic primitive
-absorption, App/workbench targets, and cross-repo execution order.
+OPL 系列项目的全局主参考是 `/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.md`。它维护 OPL Framework 的全局目标、全局差距、通用能力上收边界、App/workbench 目标和跨仓开发顺序。
 
-This RCA repo only owns the visual-deliverable domain-agent target state,
-current gaps, visual truth, review/export verdicts, artifact authority, the
-direct product-entry path, OPL-hosted sidecar/projection/receipt boundaries,
-and the list of generic source/workspace intake, artifact gallery,
-route/decision graph, review/repair transport, native-helper envelope, memory
-locator, and observability primitives that should move up into OPL. MAS, MAG,
-MDS, and OPL-owned App/workbench backlogs are not maintained in RCA docs.
+RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、visual truth、review/export verdict、artifact authority、direct product-entry path、OPL-hosted sidecar/projection/receipt 边界，以及哪些通用 source/workspace intake、artifact gallery、route/decision graph、review/repair transport、native-helper envelope、memory locator 和 observability primitive 应上收到 OPL。MAS、MAG、MDS 或 OPL-owned App/workbench 的并行 backlog 不写入 RCA 文档。
 
-## Current Baseline
+## 当前基线
 
-- `RedCube AI` holds visual-domain truth, `invokeDomainEntry`, the direct repo-verified product-entry service surface, and the stable callable surface built from the single `redcube-ai` app skill, `CLI`, `MCP`, local scripts, and repo-tracked contracts.
-- The release shape is `RedCube AI Foundry Agent`: one app skill, one service-safe domain entry, product sidecar/projection refs, and read-only stage-control projection metadata. This is the OPL-compatible package surface; it is not a GUI/WebUI shell and it does not move route, review, export, or artifact authority into OPL.
-- `Codex CLI` remains the default concrete executor and the minimum execution unit selected behind the executor-adapter contract for local operator workflows.
-- OPL owns the stage-led hosted integration and provider-backed family runtime path. Temporal is the production substrate target; Hermes remains a legacy/optional provider or proof lane. OPL may index product-entry registration, session continuity, runtimeWatch, artifacts, and review/publication projection, but it does not own RedCube visual truth.
-- Hosted runtime carriers such as `Hermes-Agent` stay in explicit opt-in backend/proof lanes or technical-reference positions; they do not redefine the default public contract.
-- `OPL` joins only when family-level routing, hosting, wakeup, or projection is needed; it is not RedCube's public identity.
-- The implementation target is `TypeScript + Python`: TypeScript owns product/runtime contracts and service boundaries, while Python owns native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
-- `ppt_deck` defaults to image-first full-slide PNG authoring through `author_image_pages`; HTML `render_html/fix_html` and editable native PPTX `author_pptx_native/repair_pptx_native` remain explicit selectable routes.
-- `xiaohongshu` now follows the same image-first product route: `author_image_pages` generates full 3:4 PNG note pages with GPT-Image-2, `screenshot_review` consumes the PNG/page manifest, and `repair_image_pages` redraws only blocked pages. HTML `render_html/fix_html` remains explicit for deterministic web drafts and historical maintenance.
-- Runtime truth remains file-authority first with rebuildable artifact indexes. SQLite persistence is deferred for RCA until measured artifact/session file growth or cross-deliverable query pressure justifies a rebuildable sidecar index.
-- `status` command keys remain agent-facing product-entry overview / intake / entry-shell contracts below the single `redcube-ai` app skill; they do not imply a mature GUI, WebUI, or end-user front office.
+- `RedCube AI` 持有视觉领域真相、`invokeDomainEntry`、direct repo-verified 的 product-entry service surface，以及由单一 `redcube-ai` 应用技能、`CLI`、`MCP`、本地脚本与仓库跟踪合同组成的稳定可调用面。
+- 当前发布形态是 `RedCube AI Foundry Agent`：一个 app skill、一个 service-safe domain entry、product sidecar / projection refs 和只读 stage-control projection metadata 共同组成 OPL-compatible package surface。它不是 GUI/WebUI 壳，也不会把 route、review、export 或 artifact authority 迁给 OPL。
+- `Codex CLI` 继续作为 executor-adapter 合同后面的默认具体执行器和最小执行单元，服务本地操作者工作流。
+- OPL 持有 stage-led 托管集成与 provider-backed family runtime 路径；Temporal 是 OPL production online runtime 的必需 substrate，Hermes 保留为 legacy/optional provider 或 proof lane，local provider 只用于 dev/CI/offline diagnostics。OPL 可以索引 product-entry registration、session continuity、runtimeWatch、artifact、review/publication projection，但不持有 RedCube visual truth。
+- `Hermes-Agent` 这类 hosted runtime carrier 只保留在显式 opt-in backend/proof lane 或技术参考层，不改写默认公开合同。
+- `OPL` 只在需要 family-level routing、托管、唤醒或投影时进入；它不是 RedCube 的公开身份。
+- 实现语言目标是 `TypeScript + Python`：TypeScript 持有 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
+- `ppt_deck` 默认通过 `author_image_pages` 走 image-first 整页 PNG 视觉生成；HTML `render_html/fix_html` 与可编辑原生 PPTX `author_pptx_native/repair_pptx_native` 继续作为显式可选路线。
+- runtime truth 继续以文件 authority 和可重建 artifact index 为主。SQLite 持久层在 RCA 当前阶段 deferred，只有当实测 artifact/session 文件增长或跨交付物查询压力足够明确时，才作为可重建 sidecar index 评估。
+- `status` 命令键只作为单一 `redcube-ai` app skill 之下的 agent-facing product-entry overview / intake / entry-shell contract 保留，不代表成熟 GUI、WebUI 或最终用户前台壳已落地。
+- `stage_control_projection` 与 `family_action_catalog` 已让 OPL 可发现 RCA stage/action descriptor，但 OPL 只做 discovery / queue / projection / receipt，不持有 visual route、review/export verdict 或 canonical artifact authority。
 
-## Technical Working Set
+## 技术工作集
 
-- [Project](./project.md)
-- [Status](./status.md)
-- [Architecture](./architecture.md)
-- [Invariants](./invariants.md)
-- [Decisions](./decisions.md)
-- [Contracts Overview](../contracts/README.md)
-- [Docs Portfolio Consolidation](./docs_portfolio_consolidation.md)
+- [项目概览](./project.md)
+- [当前状态](./status.md)
+- [架构](./architecture.md)
+- [硬约束](./invariants.md)
+- [关键决策](./decisions.md)
+- [合同说明](../contracts/README.md)
+- [Docs portfolio consolidation](./docs_portfolio_consolidation.md)
 
-## Lifecycle Layers
+## 生命周期分层
 
-| Layer | Responsibility | Start here |
+| 分层 | 职责 | 入口 |
 | --- | --- | --- |
-| Current truth | Current product role, active boundary, execution model, invariants, and durable decisions | [Project](./project.md), [Status](./status.md), [Architecture](./architecture.md), [Invariants](./invariants.md), [Decisions](./decisions.md) |
-| Machine truth | Runtime-program contracts, schemas, source, generated artifacts, and callable surfaces | [Contracts Overview](../contracts/README.md) |
-| Product | Human/operator entry, product handoff, profile and publishing coordination | [Product docs](./product/README.md) |
-| Runtime | Runtime topology, executor/backend boundaries, service-safe entry, watch/projection semantics | [Runtime docs](./runtime/README.md) |
-| Delivery | Deliverable families, routes, proof environments, export expectations, examples | [Delivery docs](./delivery/README.md) |
-| Source | Source readiness, augmentation, deep research trigger/gate, source truth consumption | [Source docs](./source/README.md) |
-| Policies | Stable governance and operating rules | [Policies](./policies/README.md) |
-| Active | Current execution, current plans, current gaps, contract-linked baton, and closeout evidence | [Active](./active/README.md) |
-| Specs | Current technical spec index | [Specs](./specs/README.md) |
-| References | Supporting technical references that do not own the active baton or public identity | [References](./references/README.md) |
-| History | Archived provenance, tombstones, and historical plans | [History](./history/README.md) |
+| 当前真相 | 当前产品角色、活跃边界、执行模型、硬约束和持久决策 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md) |
+| 机器真相 | runtime-program contracts、schema、source、generated artifacts 和 callable surfaces | [合同说明](../contracts/README.md) |
+| Product | 人类 / operator 入口、product handoff、profile 与发布协作 | [Product docs](./product/README.md) |
+| Runtime | runtime topology、executor/backend 边界、service-safe entry、watch/projection 语义 | [Runtime docs](./runtime/README.md) |
+| Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
+| Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) |
+| Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) |
+| Active | 当前执行、当前计划、当前差距、合同引用 baton 与 closeout evidence | [Active](./active/README.md) |
+| Specs | 当前仍有效的技术规格索引 | [Specs](./specs/README.md) |
+| References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
+| History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.md) |
 
-Read this table as hierarchy: current truth and machine truth come first;
-product/runtime/delivery/source/policies explain current work; `docs/active`
-tracks active or contract-linked baton material; references and history preserve
-support context and provenance.
-RCA follows the OPL-family canonical docs taxonomy:
-`active/public/product/runtime/delivery/source/policies/specs/references/history`.
-The former `docs/program/` active baton directory has been physically retired:
-current baton records live in `docs/active/`, absorbed Phase 2 records live in
-`docs/history/phase-2/`, and upstream Hermes proof records live in
-`docs/history/hermes/`. `human_doc:program_*` IDs remain stable semantic reader
-context, not physical path commitments.
+这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；`docs/active` 记录 active 或 contract-linked baton；references 与 history 分别保留支撑上下文和历史 provenance。
+RCA 采用 OPL-family canonical docs taxonomy：
+`active/public/product/runtime/delivery/source/policies/specs/references/history`。
+旧 `docs/program/` active baton 目录已物理退役：当前 baton brief 进入
+`docs/active/`，已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`，
+upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:program_*`
+语义 ID 继续作为稳定读者上下文 ID，不代表物理路径承诺。
 
-## Maintainer Governance Surface
+## 维护者治理入口
 
-- Maintainer verification and documentation governance live in `docs/references/series-doc-governance-checklist.md`.
-- Historical and provenance audits stay in `docs/history/` when they no longer serve the active program baton; still-current operator references stay in `docs/references/`.
-- Contract-linked reader context uses stable `human_doc:*` IDs while the physical documents live in their lifecycle layer. Current baton briefs are in `docs/active/`; absorbed and proof material is in `docs/history/`.
-- RCA docs are maintained by content lifecycle. A file can stay in place while only part of its body is current; merge current facts into the owner doc, keep active baton records in `docs/active/`, move support explanation to references, and archive completed or superseded plan text after link review.
-- `README*` and `docs/**` are human-readable surfaces. Runtime contracts, tests, scripts, and dashboards may expose `human_doc:*` semantic pointers for reader context, but they must not pin repo documentation paths as stable machine-readable APIs.
-- Repository hygiene now runs before `scripts/verify.sh` lanes and before grouped test execution through `scripts/repo-hygiene.sh`. The tracked mainline must not contain generated or local-state payloads such as `dist/`, `build/`, `out/`, `__pycache__`, `*.egg-info`, `.DS_Store`, project-level `.codex/`, `.omx/`, `.runtime-program/`, `runtime-state/`, or `.agent-contract-baseline.json`. `.agents/plugins/marketplace.json` is the only tracked `.agents/` plugin source entrypoint.
+- 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
+- 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
+- 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前 baton 在 `docs/active/`，absorbed / proof 材料在 `docs/history/`。
+- RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 `docs/active/`，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
+- `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
+- 仓库目录治理现在通过 `scripts/repo-hygiene.sh` 在 `scripts/verify.sh` 各 lane 和 grouped test 执行前运行。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json` 这类生成物 / 本地状态；`.agents/` 下唯一允许跟踪的插件入口是 `.agents/plugins/marketplace.json`。
 
-## Reference Layers
+## 参考层
 
-- `docs/product/`: product-facing and operator-facing human guides
-- `docs/runtime/`: runtime topology and execution/projection explanations
-- `docs/delivery/`: deliverable family, route, proof, export, and example materials
-- `docs/source/`: source readiness and augmentation materials
-- `docs/policies/`: stable governance and operating rules
-- `docs/active/`: human-readable current baton and active closeout records
-- `docs/history/phase-2/`: absorbed tranche briefs and follow-on records
-- `docs/references/`: supporting technical references that explain current operation, target states, or maintainer practice without becoming public identity
-- `docs/history/`: archived provenance, tombstones, repo-local migration records, and historical plans that no longer serve the active program baton
-- Local AI/Superpowers process drafts stay ignored under `docs/superpowers/` and are not part of repo-tracked history.
-- [AI-first quality boundary policy](./policies/ai_first_quality_boundary.md): stable rule that keeps author/reviewer judgment in AI-authored artifacts while packs, schemas, gates, audits, and projections stay mechanical.
-- [Visual pattern memory policy](./policies/visual_pattern_memory_policy.md): stable rule that keeps visual story, style, density, route caveats, and review failure lessons as natural-language memory without replacing AI author/reviewer artifacts, route contracts, export gates, or canonical artifact authority.
-- [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md): future-facing design reference kept outside the active root doc surface
-- [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md): source-plane future target kept in the same reference layer
+- `docs/product/`：面向 product 与 operator 的人类可读指南
+- `docs/runtime/`：runtime topology 与 execution/projection 说明
+- `docs/delivery/`：deliverable family、route、proof、export 与示例材料
+- `docs/source/`：source readiness 与 augmentation 材料
+- `docs/policies/`：稳定治理与运行规则
+- `docs/active/`：当前 baton 与 active closeout 记录
+- `docs/history/phase-2/`：已吸收 tranche brief 与 follow-on records
+- `docs/references/`：解释当前运行、目标状态或维护者实践的支持性技术参考，但不承担公开身份
+- `docs/history/`：归档 provenance、tombstone、repo-local migration 记录，以及不再服务当前 active program baton 的历史计划
+- 本地 AI / Superpowers 过程草稿继续在被忽略的 `docs/superpowers/` 下维护，不进入 repo-tracked history。
+- [AI-first 质量边界 Policy](./policies/ai_first_quality_boundary.md)：固定 author / reviewer 判断必须由 AI-authored artifact 持有，pack、schema、gate、audit 与 projection 只承担机械约束和证据传递。
+- [视觉模式记忆 Policy](./policies/visual_pattern_memory_policy.md)：固定视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 先按自然语言 memory 管理，不能替代 AI author/reviewer artifact、route contract、export gate 或 canonical artifact authority。
+- [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md)：保留 future-facing 设计目标的参考文档，退出根层活跃表面
+- [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md)：source-plane 的 future target 继续留在同一 reference 层
 
-## Documentation Rules
+## 文档规则
 
-- Keep `README*` and `docs/README*` aligned with the repo-verified direct route, the OPL-hosted integration path, and the service-safe domain entry surface.
-- Keep English and Chinese public docs mirrored where applicable.
-- Keep reference materials only when they still support current contracts.
-- Keep OPL, gateway, bridge, harness, and legacy route wording out of the first public identity unless the sentence is explicitly about internal integration, runtime hosting, provenance, or tombstone context.
-- Machine-readable runtime-program contracts should point to contract/schema/source paths for executable truth, or to `human_doc:*` semantic IDs for reader context; they should not make prose documentation layout a test/runtime compatibility constraint.
+- `README*` 与 `docs/README*` 统一围绕 repo-verified direct route、OPL 托管集成路径与 service-safe domain entry surface 叙事。
+- `docs/**` 是中文内部开发与维护参考。稳定文档路径优先使用无语言后缀 `.md` 承载中文 canonical 内容。
+- 参考材料只在仍支撑当前合同时保留。
+- OPL、gateway、bridge、harness 和旧 route 词汇不得回到第一公开身份；只有在明确说明内部集成、运行托管、provenance 或 tombstone 语境时才使用。
+- 机器可读 runtime-program contract 应引用 contract/schema/source 路径来表达可执行真相，或使用 `human_doc:*` 语义 ID 表达读者上下文；不应让 prose 文档层级变成测试或 runtime 的路径兼容约束。

@@ -52,7 +52,8 @@
 
 ## 文档规则
 
-- 公开文档保持中英双语；内部操作、规划与审计说明默认中文。
+- `docs/**` 默认只维护中文 canonical 内容；稳定路径优先使用无语言后缀 `.md`。
+- 根层 `README*` 是否保留公开双语入口，由产品分发和 public 需求单独决定。
 - narrative 规则放根 `AGENTS.md`、`docs/README*` 与核心五件套；machine-readable contract 放 `contracts/runtime-program/*.json`。
 - 新文档先判断角色，再决定落点；不要把核心知识、program brief、参考材料和历史记录混在同一层。
 - `README*`、`docs/**` 与参考文档是人读面。代码、测试、contracts、dashboard 或 runtime 不得把 prose path、Markdown 章节或文案当成稳定机器接口；确需关联人读材料时，使用 contract/schema/source 路径或 `human_doc:*` 语义 ID。

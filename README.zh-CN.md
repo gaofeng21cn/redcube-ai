@@ -87,16 +87,16 @@
 
 ## 这个仓库应该怎么读
 
-1. 潜在用户先读当前首页，再继续看 [文档索引](./docs/README.zh-CN.md)。
+1. 潜在用户先读当前首页，再继续看 [文档索引](./docs/README.md)。
 2. 技术规划、架构判断和方向同步，继续读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 以及 [合同说明](./contracts/README.md)。
-3. 开发者和维护者继续从 [文档索引](./docs/README.zh-CN.md) 进入 `docs/active/`、`docs/references/` 与 `docs/policies/`。
+3. 开发者和维护者继续从 [文档索引](./docs/README.md) 进入 `docs/active/`、`docs/references/` 与 `docs/policies/`。
 
 ## 给 Agent 和技术操作者的快速入口
 
 <details>
   <summary><strong>如果你准备把这个仓直接交给 Codex 或其他 Agent，先看这里</strong></summary>
 
-- 先读 [文档索引](./docs/README.zh-CN.md)。这里已经说明 RedCube 直达路径、OPL 托管集成路径、稳定能力面，以及当前技术基线。
+- 先读 [文档索引](./docs/README.md)。这里已经说明 RedCube 直达路径、OPL 托管集成路径、稳定能力面，以及当前技术基线。
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
 - 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product sidecar / projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
 - 当前已验证的公开入口面是单一 `redcube-ai` 应用技能、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与仓库跟踪合同，就构成了稳定可调用面。本地默认具体执行器仍是 `Codex CLI`，hosted/proof 后端继续只在显式选择时出现。
@@ -110,7 +110,7 @@
 
 ## 延伸阅读
 
-- [文档索引](./docs/README.zh-CN.md)
+- [文档索引](./docs/README.md)
 - [项目概览](./docs/project.md)
 - [当前状态](./docs/status.md)
 - [架构](./docs/architecture.md)

@@ -1,7 +1,7 @@
 # Domain Harness OS 定位与映射
 
 这份文档用于统一 `RedCube AI` 在历史 `Unified Harness Engineering Substrate` 口径中的位置与边界。
-它是仓库跟踪的内部技术口径文档，不属于默认对外双语公开正文面。
+它是仓库跟踪的内部技术口径文档，不属于默认公开入口。
 当前公开第一身份是独立 visual-deliverable domain agent 与单一 `redcube-ai` app skill；本文的 `Domain Gateway` / `Domain Harness OS` 词汇只按内部边界层与执行层语言理解。
 
 ## 1. 项目在统一基座中的位置

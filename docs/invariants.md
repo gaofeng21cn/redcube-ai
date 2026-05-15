@@ -33,7 +33,8 @@
 
 - `AGENTS.md` 只管工作方式，不堆项目事实。
 - 核心项目知识优先收敛到 `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md`。
-- 公开文档双语；内部规划、审计与维护文档默认中文。
+- `docs/**` 是中文内部开发与维护参考；稳定路径优先使用无语言后缀 `.md` 承载中文 canonical 内容。
+- 根层 `README*` 是否保留公开双语入口，由产品分发和 public 需求单独决定。
 - `README*` 与 `docs/README*` 必须先写 RCA 的视觉交付身份，再写 OPL 托管 / 内部集成路径。
 - 含有旧 gateway、bridge、harness、Hermes-first 或 OPL-first 口径的文档，若仍被 `human_doc:*` 或 runtime-program 合同引用，留在原生命周期层并补充 lifecycle/provenance 说明；无合同引用且不服务当前 baton 的旧计划进入 `docs/history/` 或 tombstone 语境。
 - 开发计划 closeout 必须显式列出 `planned`、`done`、`deferred`、`skipped`、`verification`、`commit-push state`；`deferred` 必须可追溯到合同引用、真实 blocker 或明确 history/tombstone 落点。

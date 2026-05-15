@@ -1,10 +1,10 @@
-# Specs Docs
+# Specs 文档
 
 Owner: `RedCube AI`
 Purpose: `active_spec_index`
 State: `active_support`
-Machine boundary: Human-readable spec index. Machine truth remains in runtime-program contracts, schemas, source, generated artifacts, runtime evidence, and owner receipts.
+Machine boundary: 人读规格索引。机器真相继续归 runtime-program contracts、schemas、source、generated artifacts、runtime evidence 与 owner receipts。
 
-This directory is the canonical OPL-family location for current RCA technical specs. Older dated specs must be classified as active, support reference, or history before expansion.
+本目录是 OPL-family canonical 目录中承接 RCA 当前技术规格的位置。旧 dated spec 在扩写前必须先标清 active、support reference 或 history。
 
-Current RCA product/runtime/delivery/source truth primarily lives in the core docs, lifecycle directories, contracts, source, and generated artifacts.
+当前 RCA product/runtime/delivery/source 真相主要由核心文档、生命周期目录、contracts、source 和 generated artifacts 承担。
