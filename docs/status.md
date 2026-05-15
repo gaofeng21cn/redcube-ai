@@ -9,6 +9,7 @@
 | Public identity | `RedCube AI` Foundry Agent / OPL-compatible package | 对外第一身份是单一 `redcube-ai` app skill / direct 调用入口；发布形态是 built on OPL Framework 的 visual-deliverable package。 |
 | Direct route | `landed` | `RedCube Product Entry -> service-safe domain entry -> executor adapter -> visual-domain truth surfaces`。 |
 | OPL-hosted route | `contract/projection landed; production provider soak pending` | OPL 可以托管、唤醒和投影 RCA，但不持有 visual truth、artifact authority 或 review/export verdict。 |
+| Transition hosted attempt receipt | `repo-local receipt reconciliation fixture landed` | fixture 模拟 OPL provider attempt bridge 消费 `visual_transition_spec` 后，只对账 RCA 返回的 `domain_owner_receipt_ref`、`typed_blocker` 或 `no_regression_evidence_ref`；不代表真实 Temporal long soak。 |
 | Default visual routes | `ppt_deck` and `xiaohongshu` image-first landed | HTML/native PPTX 是显式可选路线。 |
 | Domain memory | `controlled apply proof landed; runtime receipt refs generalized` | repo 保存 descriptor、locator、consumed-memory refs、proposal/receipt projection、accepted/rejected runtime receipt refs 和 no-forbidden-write proof；不保存 reusable visual lesson body、receipt instance 或 artifact blob。 |
 | GUI/WebUI | `not current public surface` | 当前不把 GUI/WebUI 写成成熟产品入口。 |
@@ -24,6 +25,7 @@
 - formal-entry matrix：`CLI`（默认正式入口）、`MCP`（支持协议层）、`controller`（内部控制面）
 - repo-verified direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
 - OPL-hosted route：`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
+- Transition hosted attempt receipt：当前新增的是 repo-local focused fixture，模拟 OPL provider attempt bridge 消费 `redcube product manifest#/visual_transition_spec` 后的 receipt 对账；bridge 只保存 RCA owner receipt ref、typed blocker 或 no-regression evidence ref，不生成 visual_ready、exportable、handoffable 或 production soak complete 结论。
 - 默认公开能力面：`RedCube AI` 持有稳定 capability surface 与 visual-domain truth，`redcube-ai` app skill / `Codex CLI` 继续作为主要可见 surface 与第一公民 concrete executor；`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现，且不承诺行为或输出质量与 Codex CLI 等价
 - OPL boundary：`OPL` 作为运行框架只保留 family-level session/runtime/projection 与 shared modules/contracts/indexes，不接管 RedCube domain truth
 - Codex App direct skill 调用与 OPL 托管调用都必须回到同一套 RCA-owned route、review、artifact 和 export surface。
