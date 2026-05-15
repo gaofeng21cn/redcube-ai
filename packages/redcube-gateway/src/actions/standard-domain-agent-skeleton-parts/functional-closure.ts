@@ -78,6 +78,58 @@ export function buildDomainOwnerReceiptContract() {
   };
 }
 
+export function buildNoRegressionOwnerReceiptOplConsumptionProof() {
+  return {
+    surface_kind: 'no_regression_owner_receipt_opl_consumption_proof',
+    proof_id: 'rca.no_regression_owner_receipt.opl_consumption.v1',
+    owner: DOMAIN_OWNER,
+    status: 'repo_local_focused_proof_landed_production_soak_pending',
+    proof_model: 'sidecar_guarded_actions_emit_refs_and_return_shapes_only',
+    guarded_actions: [
+      {
+        action: 'emit_no_regression_evidence',
+        expected_return_shape: 'no_regression_evidence',
+        opl_consumable_ref_field: 'evidence_ref',
+        runtime_locator_field: 'runtime_locator_ref',
+      },
+      {
+        action: 'emit_domain_owner_receipt',
+        expected_return_shapes: ['domain_receipt', 'typed_blocker'],
+        opl_consumable_ref_field: 'receipt_ref',
+        runtime_locator_field: 'runtime_locator_ref',
+      },
+    ],
+    opl_consumption_policy: {
+      opl_can_store_no_regression_evidence_ref: true,
+      opl_can_store_domain_owner_receipt_ref: true,
+      opl_can_store_typed_blocker: true,
+      opl_can_use_as_controlled_attempt_closeout_input: true,
+      opl_can_declare_visual_ready: false,
+      opl_can_declare_exportable: false,
+      opl_can_declare_handoffable: false,
+      opl_can_claim_production_soak_complete: false,
+      opl_can_store_visual_truth: false,
+      opl_can_store_review_export_verdict: false,
+      opl_can_store_canonical_artifact_blob: false,
+      opl_can_mutate_domain_artifacts: false,
+    },
+    repository_boundary: {
+      repo_tracks_focused_proof_contract: true,
+      repo_tracks_runtime_evidence_instances: false,
+      repo_tracks_live_receipt_instances: false,
+      repo_tracks_visual_or_export_artifacts: false,
+      repo_tracks_production_soak_result: false,
+    },
+    source_refs: [
+      '/product_entry_shell/sidecar',
+      '/controlled_soak_no_regression_attempt',
+      '/domain_owner_receipt_contract',
+      '/controlled_memory_apply_proof/forbidden_write_audit',
+      '/runtime_residue_retirement',
+    ],
+  };
+}
+
 export function buildRuntimeMemoryReceiptInstances() {
   return {
     surface_kind: 'visual_pattern_memory_runtime_receipt_instances',

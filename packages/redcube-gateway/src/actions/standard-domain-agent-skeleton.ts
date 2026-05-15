@@ -10,6 +10,7 @@ import {
 import {
   buildDomainOwnerReceiptContract,
   buildLifecycleGuardedApplyProof,
+  buildNoRegressionOwnerReceiptOplConsumptionProof,
   buildPhysicalSkeletonFollowThrough,
   buildReviewHelperBaselineFollowThrough,
   buildVisualTransitionSpec,
@@ -18,6 +19,7 @@ import {
 export {
   buildDomainOwnerReceiptContract,
   buildLifecycleGuardedApplyProof,
+  buildNoRegressionOwnerReceiptOplConsumptionProof,
   buildPhysicalSkeletonFollowThrough,
   buildReviewHelperBaselineFollowThrough,
   buildVisualTransitionSpec,
@@ -849,6 +851,7 @@ export function buildStandardDomainAgentSkeleton({
   const controlledMemoryApplyProof = buildControlledMemoryApplyProof();
   const controlledSoakNoRegressionAttempt = buildControlledSoakNoRegressionAttempt();
   const domainOwnerReceiptContract = buildDomainOwnerReceiptContract();
+  const noRegressionOwnerReceiptOplConsumptionProof = buildNoRegressionOwnerReceiptOplConsumptionProof();
   const lifecycleGuardedApplyProof = buildLifecycleGuardedApplyProof();
   const visualTransitionSpec = buildVisualTransitionSpec();
   const physicalSkeletonFollowThrough = buildPhysicalSkeletonFollowThrough();
@@ -895,6 +898,7 @@ export function buildStandardDomainAgentSkeleton({
     controlled_memory_apply_proof: controlledMemoryApplyProof,
     controlled_soak_no_regression_attempt: controlledSoakNoRegressionAttempt,
     domain_owner_receipt_contract: domainOwnerReceiptContract,
+    no_regression_owner_receipt_opl_consumption_proof: noRegressionOwnerReceiptOplConsumptionProof,
     lifecycle_guarded_apply_proof: lifecycleGuardedApplyProof,
     visual_transition_spec: visualTransitionSpec,
     physical_skeleton_follow_through: physicalSkeletonFollowThrough,
