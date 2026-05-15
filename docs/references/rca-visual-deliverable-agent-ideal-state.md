@@ -166,7 +166,7 @@ RCA repo 应保存：
 
 OPL 应保存或投影：
 
-- workspace locator、runtime root locator、stage attempt metadata、queue metadata、provider receipt refs、operator projection、freshness、repair hints 和 domain receipt refs。
+- workspace locator、runtime root locator、stage attempt metadata、queue metadata、provider receipt refs、transition evidence refs-only projection、operator projection、freshness、repair hints 和 domain receipt refs。
 
 这个边界保证开发仓库干净、可发布、可审查；真实运行文件有生命周期、可恢复、可清理、可迁移；RCA visual truth 不被 framework 或 host runtime 改写。
 
@@ -210,7 +210,7 @@ OPL-hosted path 应提供：
 
 - OPL discovery 读取 RCA descriptor、family action catalog、stage control projection 和 memory descriptor。
 - OPL queue/wakeup/provider runtime 通过 product sidecar export/dispatch 进入 RCA。
-- OPL 保存 attempt metadata、provider receipt、domain receipt ref、blocked reason、human gate 和 operator projection。
+- OPL 保存 attempt metadata、provider receipt、domain receipt ref、transition evidence refs-only projection、blocked reason、human gate 和 operator projection。
 - OPL App 展示 progress、artifact refs、review state、blocked items 和 next action。
 
 等价门槛：
