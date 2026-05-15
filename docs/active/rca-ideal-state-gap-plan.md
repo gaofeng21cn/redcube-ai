@@ -12,11 +12,13 @@ Date: `2026-05-14`
 
 截至 `2026-05-14`，RCA 已经具备 direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first 主线、review/export gate、domain memory descriptor locator、controlled memory apply proof、domain owner receipt contract 和 no-regression evidence ref 等主要 repo-verified surface。它还没有达到完整生产级理想态。
 
+RCA 的单仓计划只维护视觉交付领域真相和 domain package 薄程序面。薄程序面包括 descriptor、contract/schema、sidecar/thin adapter、projection builder、domain transition spec/table、review/export gate、artifact locator、receipt schema、tests 和 domain entry；它们服务 OPL 发现、托管、审计和投影，不构成第二套 generic framework/runtime。
+
 OPL 系列项目的全局主参考是 `/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.md`。涉及跨仓总顺序、shared primitive owner、App/workbench 通用目标和旧兼容面退役纪律时，以该主参考和 OPL docs 为准。
 
 ## 通用模块上收 OPL 清单
 
-RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。下列能力具有跨 domain 复用价值，应优先沉淀到 OPL，而不是在 RCA 内长期维护一套私有平台：
+RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + thin program surface`。下列能力具有跨 domain 复用价值，应优先沉淀到 OPL，而不是在 RCA 内长期维护一套私有平台：
 
 | 模块 | 上收后的 OPL 责任 | RCA 保留的 authority |
 | --- | --- | --- |
@@ -69,45 +71,23 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack`。
 7. `legacy_physical_cleanup`
    有 direct/hosted parity、fixture/provenance 和 no-active-caller proof 后，再删除或 tombstone 旧 Hermes / Gateway / local-manager / bridge residue。
 
-## 本轮计划 closeout
+## 当前基础面与后续证据缺口
 
-### planned
-
-- 把 RCA ideal-state / gap 计划从泛化 backlog 收口成可执行 closeout 结构，保留 current truth 与 target-state 的区别。
-- 落地 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 三个 sidecar guarded actions，作为 RCA-owned workspace/runtime apply surface，而不是 OPL-owned truth surface。
-- 在 status、architecture、decisions 与 runtime architecture 中同步说明：这些 surface 只写 workspace runtime refs、domain receipt、typed blocker、no-regression evidence 或 lifecycle receipt；RCA 持有 authority，OPL 只消费 locator/projection/receipt refs。
-- 明确真实 OPL Temporal controlled visual-stage long soak 尚未完成，不能把 OPL stage completion、provider completion 或 no-regression ref 写成 RCA visual ready / production soak success。
-
-### done
+RCA 当前可作为后续完善基础的 repo surface 包括：
 
 - `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 已进入 product sidecar guarded action、manifest、family action catalog、runtime-program contract 和 focused tests。
-- 本文把本轮计划按 `planned / done / deferred / skipped / verification / commit-push state` 结构记录，方便后续真实 OPL-hosted long soak 和 UI/projection lane 接力。
-- 核心维护文档同步了 owner split：RCA 写 domain-owned workspace/runtime refs，并持有 visual truth、review/export verdict、memory body 和 canonical artifact authority；OPL 只读取 descriptor、locator、projection、receipt refs、operator projection 和 repair hints。
+- RCA 写 domain-owned workspace/runtime refs，并持有 visual truth、review/export verdict、memory body 和 canonical artifact authority；OPL 只读取 descriptor、locator、projection、receipt refs、operator projection 和 repair hints。
+- direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first route、review/export gate 与 domain owner receipt contract 是当前 active surface。
 
-### deferred
+这些基础面仍不能升级成 production soak claim。后续缺口是：
 
 - 真实 OPL Temporal controlled visual-stage long soak 仍未完成；不能声明 provider-hosted production soak success。
 - 真实长时 artifact-producing attempt、跨 family 重复 proof、真实 visual pattern memory body 积累、retention ledger 规模化验证和 OPL App / product shell 工作台投影仍是后续 runtime/product lane。
 - `poster_onepager` 仍保持 guarded knowledge poster 边界，尚未扩展为 academic/conference poster production lane。
 
-### skipped
+维护验证时优先跑 repo-native verification，再按变更范围选择 focused owner-boundary tests。叙述性 docs 不作为测试断言对象；验证证据应来自 contracts、manifest、CLI/MCP 行为、workspace/runtime receipt、artifact locator、review/export gate 和真实交付物证据。
 
-- 本轮不生成真实 PNG/PPTX/PDF 运行产物，不把 receipt instance 写入 repo source tree。
-- 本轮不声明 OPL Temporal long soak、跨 family production soak、UI workbench 或外部发布动作已完成。
-- 本轮不移动旧历史文档，也不恢复旧 gateway / frontdoor / workbench / repo-local Hermes active surface。
-
-### verification
-
-- 已验证 `./scripts/verify.sh`。
-- 已验证 `npm run test:fast`。
-- 已验证 focused owner-boundary tests：`tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts`、`tests/opl-family-contract-adoption.test.ts`、`tests/product-entry-cases/manifest-and-start-surfaces.test.ts`、`tests/product-entry-cases/memory-skeleton-retirement-proof.test.ts`、`tests/product-domain-action-api.test.ts`、`tests/cli-v2-smoke-cases/runtime-and-product-entry.test.ts`、`tests/python-native-helper-catalog.test.ts`、`tests/block-content-fit-review*.test.ts`、`tests/ppt-creative-ownership-cases/foundation-and-routes.test.ts`。
-
-### commit-push state
-
-- 代码、合同、测试和文档已吸收到 `main`。
-- 本轮没有 push；真实 production soak claim 仍等待 OPL Temporal controlled visual-stage long-run proof。
-
-## 本轮明确退役并清理的旧面
+## 已退役并清理的旧面
 
 - `REDCUBE_WORKBENCH_ROOT` workspace root 兼容输入。
 - standalone `scripts/probe-upstream-hermes-agent.ts` proof 入口。
