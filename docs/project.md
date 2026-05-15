@@ -27,7 +27,7 @@
 - 把公开定位收口为 `Foundry Agent / OPL-compatible package built on OPL Framework`，并让 app skill、service-safe domain entry、sidecar/projection 和 stage control projection 指向同一发布形态。
 - 用 machine-readable contracts 与显式校验收紧 runtime mainline。
 - 保持稳定 capability surface、默认 `Codex CLI` concrete executor 与 visual-domain boundary 一起对齐；hosted runtime carrier 只作为显式可选 backend，不改写默认公开合同。
-- 将实现目标收敛到 `TypeScript + Python`：TypeScript 持有 product entry、CLI/MCP、contracts、gateway、runtime-family shell 与 typed service boundaries；Python 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 自动化生态共享工具链。
+- 将实现目标收敛到 `TypeScript + Python`：TypeScript 持有 product entry、CLI/MCP、contracts、domain-entry/runtime-family shell 与 typed service boundaries；Python 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，并与 MAS/MAG 自动化生态共享工具链。
 - 冻结一个可被 `OPL` 托管路径调用的 service-safe domain entry adapter，而不是先做聊天 UI。
 - 落地可 direct 调用、也可由 `OPL` 通过托管集成路径调用的 lightweight domain `product entry` service surface，并把 session continuity 收到用户级 runtime-state。
 - 保持 Codex App direct skill path 与 OPL 托管 path 的语义等价：两条路径都必须回到 RCA-owned route、review、artifact 和 export surface；Agent executor 是最小具体执行单位，`Codex CLI` 是当前第一公民 executor。

@@ -1,21 +1,17 @@
-# Product Docs
+# Product 文档
 
-`docs/product/` holds human-facing product and operator materials: quickstart guidance, product-entry handoff notes, profile setup, and publishing coordination.
+`docs/product/` 保存面向人和 operator 的 product 材料：quickstart、product-entry handoff、profile setup 和 publishing coordination。
 
-This layer explains how a person or agent should approach RedCube AI as a product surface. It does not define machine-readable runtime truth.
+本层说明人或 agent 如何把 RedCube AI 当作 product surface 使用；它不定义机器可读 runtime truth。
 
-## Current Role
+## 当前角色
 
-Product docs sit below the repository home and above runtime/delivery details.
-They explain how a human or operator approaches RedCube AI today. Historical
-publishing or setup notes stay here only while they still support the current
-product surface; completed or superseded plans move to history after link
-review.
+Product docs 位于仓库首页之下、runtime/delivery 细节之上，解释当前 human/operator 如何进入 RedCube AI。历史 publishing 或 setup notes 只有在仍支撑当前 product surface 时才留在这里；完成或被替代的计划在链接复核后进入 history。
 
-Current product-facing materials still being consolidated:
+当前 product-facing 材料：
 
 - [Human quickstart](./human_quickstart.md)
 - [Private profile setup](./private-profile-setup.md)
 - [Public GitHub publishing](./public-github-publish.md)
 
-Runtime contracts should continue to use `human_doc:*` semantic pointers or contract/schema/source paths, not prose document paths.
+Runtime contracts 应继续使用 `human_doc:*` semantic pointers 或 contract/schema/source paths，不使用 prose document paths 作为机器接口。
