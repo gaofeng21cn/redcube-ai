@@ -18,7 +18,7 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 
-2026-05-15 当前代码已把 RCA transition hosted-attempt receipt 对账推进到 repo-local focused fixture：fixture 模拟 OPL provider attempt bridge 消费 `visual_transition_spec` 后，只保存 RCA 返回的 `domain_owner_receipt_ref`、`typed_blocker` 或 `no_regression_evidence_ref`，并禁止生成 `visual_ready`、`exportable`、`handoffable` 或 production soak complete 结论。该能力是理想态中 OPL-hosted visual transition attempt 的对账形状证明，不是 artifact-producing owner receipt，也不是 Temporal long soak。
+2026-05-15 当前代码已把 RCA transition hosted-attempt receipt 对账推进到 repo-local focused fixture：fixture 模拟 OPL provider attempt bridge 消费 `visual_transition_spec` 后，只保存 RCA 返回的 `domain_owner_receipt_ref`、`typed_blocker` 或 `no_regression_evidence_ref`，要求 transition receipt 显式引用 provider attempt ref，并递归禁止 `visual_ready`、`exportable`、`handoffable`、production soak complete、artifact blob、memory body 或 review/export verdict payload。该能力是理想态中 OPL-hosted visual transition attempt 的对账形状证明，不是 artifact-producing owner receipt，也不是 Temporal long soak。
 
 ## 产品分层
 
@@ -274,7 +274,7 @@ RCA 达到理想生产级状态时，应满足以下门槛：
 
 - Direct product entry、CLI/MCP、app skill 和 service-safe domain entry 长期稳定。
 - OPL-hosted path 能真实运行 controlled visual stage attempt，并产出 RCA-owned domain receipt 或 no-regression evidence。
-- Transition hosted-attempt receipt proof 必须从 repo-local fixture 推进到真实 provider attempt 证据，同时保持 OPL 只存 refs，不裁决 visual ready / exportable / handoffable。
+- Transition hosted-attempt receipt proof 必须从 repo-local fixture 推进到真实 provider attempt 证据，同时保持 OPL 只存 refs，不裁决 visual ready / exportable / handoffable，不携带 artifact blob、memory body 或 review/export verdict。
 - `ppt_deck`、`xiaohongshu`、`poster_onepager` 的默认 route、显式可选 route、review gate 和 export gate 都有可重复 proof。
 - 每个 stage attempt 都有 source refs、artifact refs、review refs、owner receipt、blocked reason 或 human gate receipt。
 - Review/export gate 能 fail closed，并能从明确 blocked item 进入 repair stage。

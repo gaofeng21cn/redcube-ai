@@ -4,10 +4,72 @@ const BRIDGE_KIND = 'repo_local_opl_provider_attempt_bridge_fixture';
 const CONSUMED_SURFACE = 'redcube product manifest#/visual_transition_spec';
 const DOMAIN_ID = 'redcube_ai';
 const DOMAIN_TICK_EVENT = 'domain_tick';
+const FORBIDDEN_COMPLETION_CLAIM_FIELDS = new Set([
+  'visual_ready',
+  'exportable',
+  'handoffable',
+  'production_soak_complete',
+  'production_soak_success',
+  'visual_ready_claimed',
+  'exportable_claimed',
+  'handoffable_claimed',
+  'long_visual_soak_claimed',
+  'opl_completion_promoted_to_visual_ready',
+]);
+const FORBIDDEN_TRANSITION_PAYLOAD_FIELDS = new Set([
+  'visual_truth',
+  'visual_verdict',
+  'review_verdict',
+  'export_verdict',
+  'canonical_artifact_blob',
+  'artifact_blob',
+  'memory_content_body',
+  'png_blob',
+  'pptx_blob',
+  'pdf_blob',
+]);
 
 function safeText(value) {
   const text = String(value || '').trim();
   return text || null;
+}
+
+function inspectObjectFields(value, visitor, path = []) {
+  if (!value || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => inspectObjectFields(item, visitor, path.concat(String(index))));
+    return;
+  }
+
+  Object.entries(value).forEach(([key, nested]) => {
+    const nestedPath = path.concat(key);
+    visitor(key, nested, nestedPath.join('.'));
+    inspectObjectFields(nested, visitor, nestedPath);
+  });
+}
+
+function assertNoForbiddenCompletionClaims(surface, label) {
+  let claimed = null;
+  inspectObjectFields(surface, (key, value, path) => {
+    if (!claimed && FORBIDDEN_COMPLETION_CLAIM_FIELDS.has(key) && value === true) {
+      claimed = path;
+    }
+  });
+  if (claimed) {
+    throw new Error(`${label} 不得声明 ${claimed}`);
+  }
+}
+
+function assertNoForbiddenTransitionPayload(surface) {
+  let forbidden = null;
+  inspectObjectFields(surface, (key, value, path) => {
+    if (!forbidden && FORBIDDEN_TRANSITION_PAYLOAD_FIELDS.has(key) && value != null) {
+      forbidden = path;
+    }
+  });
+  if (forbidden) {
+    throw new Error(`transition result 不得携带 ${forbidden}`);
+  }
 }
 
 function defaultTransitionResult({ visualTransitionSpec, transition, providerAttemptRef }) {
@@ -66,7 +128,12 @@ function defaultTransitionResult({ visualTransitionSpec, transition, providerAtt
   };
 }
 
-function assertTransitionResultMatchesSpec({ transitionResult, visualTransitionSpec, transition }) {
+function assertTransitionResultMatchesSpec({
+  transitionResult,
+  visualTransitionSpec,
+  transition,
+  providerAttemptRef,
+}) {
   if (transitionResult?.surface_kind !== 'family_transition_result') {
     throw new Error('transition result 必须是 family_transition_result');
   }
@@ -100,6 +167,15 @@ function assertTransitionResultMatchesSpec({ transitionResult, visualTransitionS
   if (transitionResult.receipt?.transition_id !== transition.transition_id) {
     throw new Error('transition result receipt.transition_id 与 visual_transition_spec 不一致');
   }
+  const receiptContextRefs = Array.isArray(transitionResult.receipt?.context_refs)
+    ? transitionResult.receipt.context_refs
+    : [];
+  const receiptRefs = Array.isArray(transitionResult.receipt?.receipt_refs)
+    ? transitionResult.receipt.receipt_refs
+    : [];
+  if (!receiptContextRefs.includes(providerAttemptRef) && !receiptRefs.includes(providerAttemptRef)) {
+    throw new Error('transition result receipt 必须显式引用 provider attempt ref');
+  }
   if (transitionResult.projection?.transition_id !== transition.transition_id) {
     throw new Error('transition result projection.transition_id 与 visual_transition_spec 不一致');
   }
@@ -115,27 +191,12 @@ function assertTransitionResultMatchesSpec({ transitionResult, visualTransitionS
   if (transitionResult.authority_boundary?.opl_can_authorize_handoffable === true) {
     throw new Error('transition result 不得授权 OPL 声明 handoffable');
   }
+  assertNoForbiddenCompletionClaims(transitionResult, 'transition result');
+  assertNoForbiddenTransitionPayload(transitionResult);
 }
 
 function assertNoCompletionClaim(resultSurface) {
-  const forbiddenTrueFields = [
-    ['visual_ready', resultSurface.visual_ready],
-    ['exportable', resultSurface.exportable],
-    ['handoffable', resultSurface.handoffable],
-    ['production_soak_complete', resultSurface.production_soak_complete],
-    ['visual_ready_claimed', resultSurface.visual_ready_claimed],
-    ['exportable_claimed', resultSurface.exportable_claimed],
-    ['handoffable_claimed', resultSurface.handoffable_claimed],
-    ['coverage.visual_ready_claimed', resultSurface.coverage?.visual_ready_claimed],
-    ['coverage.exportable_claimed', resultSurface.coverage?.exportable_claimed],
-    ['coverage.handoffable_claimed', resultSurface.coverage?.handoffable_claimed],
-    ['coverage.long_visual_soak_claimed', resultSurface.coverage?.long_visual_soak_claimed],
-    ['coverage.opl_completion_promoted_to_visual_ready', resultSurface.coverage?.opl_completion_promoted_to_visual_ready],
-  ];
-  const claimed = forbiddenTrueFields.find(([, value]) => value === true);
-  if (claimed) {
-    throw new Error(`RCA sidecar result 不得声明 ${claimed[0]}`);
-  }
+  assertNoForbiddenCompletionClaims(resultSurface, 'RCA sidecar result');
 }
 
 function transitionReceiptRefs(transitionResult) {
@@ -191,6 +252,7 @@ export function buildHostedAttemptBridgeFixture({
     transitionResult: resolvedTransitionResult,
     visualTransitionSpec,
     transition,
+    providerAttemptRef,
   });
 
   return {

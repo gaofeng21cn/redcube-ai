@@ -207,5 +207,57 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
       }),
       /RCA sidecar result 不得声明 coverage\.visual_ready_claimed/,
     );
+
+    await assert.rejects(
+      () => buildHostedAttemptBridgeFixture({
+        visualTransitionSpec: manifest.visual_transition_spec,
+        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        transitionResult: {
+          ...transitionResult,
+          receipt: {
+            ...transitionResult.receipt,
+            receipt_refs: ['family-transition-receipt:review-ready-to-package'],
+            context_refs: [],
+          },
+        },
+      }),
+      /transition result receipt 必须显式引用 provider attempt ref/,
+    );
+
+    await assert.rejects(
+      () => buildHostedAttemptBridgeFixture({
+        visualTransitionSpec: manifest.visual_transition_spec,
+        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        transitionResult: {
+          ...transitionResult,
+          projection: {
+            ...transitionResult.projection,
+            coverage: {
+              nested: {
+                exportable_claimed: true,
+              },
+            },
+          },
+        },
+      }),
+      /transition result 不得声明 projection\.coverage\.nested\.exportable_claimed/,
+    );
+
+    await assert.rejects(
+      () => buildHostedAttemptBridgeFixture({
+        visualTransitionSpec: manifest.visual_transition_spec,
+        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        transitionResult: {
+          ...transitionResult,
+          projection: {
+            ...transitionResult.projection,
+            artifact_payload: {
+              canonical_artifact_blob: 'base64:pptx',
+            },
+          },
+        },
+      }),
+      /transition result 不得携带 projection\.artifact_payload\.canonical_artifact_blob/,
+    );
   });
 });
