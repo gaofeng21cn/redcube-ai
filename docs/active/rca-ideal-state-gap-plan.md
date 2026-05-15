@@ -10,7 +10,7 @@ Date: `2026-05-15`
 
 本文对照 [RedCube AI 理想目标态](../references/rca-visual-deliverable-agent-ideal-state.md)，只维护 RCA 自己的当前差距、完善顺序、与 OPL 的 owner 边界和通用能力上收清单。MAS、MAG、MDS 或 One Person Lab App 的并行 backlog 不写入本文；RCA 只说明哪些 visual-deliverable 能力由 RCA 持有，哪些通用外围应上收到 OPL Framework / One Person Lab App。
 
-截至 `2026-05-14`，RCA 已经具备 direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first 主线、review/export gate、domain memory descriptor locator、controlled memory apply proof、domain owner receipt contract 和 no-regression evidence ref 等主要 repo-verified surface。它还没有达到完整生产级理想态。
+截至 `2026-05-15`，RCA 已经具备 direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first 主线、review/export gate、domain memory descriptor locator、controlled memory apply proof、domain owner receipt contract、no-regression evidence ref 和 OPL 可消费的 no-regression / owner receipt focused proof 等主要 repo-verified surface。它还没有达到完整生产级理想态。
 
 RCA 的单仓计划只维护视觉交付领域真相和 domain package 薄程序面。薄程序面包括 descriptor、contract/schema、sidecar/thin adapter、projection builder、domain transition spec/table、review/export gate、artifact locator、receipt schema、tests 和 domain entry；它们服务 OPL 发现、托管、审计和投影，不构成第二套 generic framework/runtime。
 
@@ -45,7 +45,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + t
 | 目标面 | 当前实际状态 | 差距 | 完善计划 |
 | --- | --- | --- | --- |
 | Public entry / package | 单一 `redcube-ai` app skill、CLI、MCP、`invokeProductEntry`、`invokeDomainEntry` 和 sidecar surface 已是当前公开入口。旧 workbench、frontdoor、federation、standalone Hermes probe 与 gateway-action alias 已退出 active surface。 | CLI/MCP/product manifest 仍需要持续保持 action parity；任何新增 action 都必须从 `family_action_catalog` 派生并进入同一命名体系。 | 新增或修改入口时同步 CLI、MCP、manifest、tests 和 status；保持 `domainActions`、`callDomainTool`、`listDomainTools`、`DomainTool*` 命名，不恢复旧 alias。 |
-| OPL-hosted controlled stage | RCA 已提供 OPL discovery、stage control projection、product sidecar dispatch、owner receipt / typed blocker / no-regression evidence ref 合同。 | 真实 OPL-hosted controlled visual stage long soak 和 artifact-producing domain owner receipt 尚未作为完成证据跑出。 | 下一步只补真实 hosted attempt 证明：由 OPL provider 发起 attempt，RCA 产出 domain receipt 或 typed blocker / no-regression evidence ref；不把 OPL completion 提升为 RCA visual ready。 |
+| OPL-hosted controlled stage | RCA 已提供 OPL discovery、stage control projection、product sidecar dispatch、owner receipt / typed blocker / no-regression evidence ref 合同，并通过 repo-local focused proof 证明 OPL 可消费 `emit_no_regression_evidence` / `emit_domain_owner_receipt` 的 return shape 和 refs。 | 真实 OPL-hosted controlled visual stage long soak 和真实 artifact-producing domain owner receipt 尚未作为完成证据跑出。 | 下一步只补真实 hosted attempt 证明：由 OPL provider 发起 attempt，RCA 产出 domain receipt 或 typed blocker / no-regression evidence ref；不把 OPL completion 提升为 RCA visual ready。 |
 | Deliverable family proof | `ppt_deck` 与 `xiaohongshu` 已以 image-first 为默认路线；HTML/native PPTX 是显式可选路线；`poster_onepager` 保持 guarded route。 | 三个 family 的长期、重复、真实 artifact proof 还没有全部达到生产 soak 水平；poster 仍是受控 knowledge poster 边界。 | 逐 family 跑 direct proof、OPL-hosted proof、review/export proof 和 repair proof；新增 family 必须先有 descriptor、route policy、artifact locator、review/export gate 与 no-forbidden-write proof。 |
 | Stage attempt receipts | stage descriptor、route artifacts、runtime watch、review/export projection 已存在；domain owner receipt contract 已 landed。 | 每个真实 stage attempt 的 source refs、artifact refs、review refs、blocked reason、human gate receipt 和 owner receipt 还未全部常态化。 | 把 attempt receipt 写入 workspace/runtime root，并从 product shell / OPL projection 只读展示；repo 只保留 descriptor、schema、test fixture 和 locator。 |
 | Domain memory | descriptor locator、seed fixture locator、writeback proposal、accept/reject contract、receipt locator 和 operator projection 已进入 repo-source contract surface。 | 真实 visual pattern memory body、accepted/rejected receipt instances 和 review/export closeout writeback 尚未作为常态运行流闭环。 | 先在 RCA runtime/domain-memory root 产生真实 receipt instance，再让 OPL 消费 locator/projection；不把 memory body 或视觉 verdict 迁入 OPL。 |
@@ -76,6 +76,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + t
 RCA 当前可作为后续完善基础的 repo surface 包括：
 
 - `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 已进入 product sidecar guarded action、manifest、family action catalog、runtime-program contract 和 focused tests。
+- `no_regression_owner_receipt_opl_consumption_proof` 已进入 manifest / sidecar projection / focused tests；它只证明 OPL 可保存 no-regression evidence ref、domain owner receipt ref 或 typed blocker，并显式禁止 visual ready、exportable、handoffable 或 production soak success claim。
 - RCA 写 domain-owned workspace/runtime refs，并持有 visual truth、review/export verdict、memory body 和 canonical artifact authority；OPL 只读取 descriptor、locator、projection、receipt refs、operator projection 和 repair hints。
 - direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first route、review/export gate 与 domain owner receipt contract 是当前 active surface。
 

@@ -105,7 +105,31 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'typed_blocker',
       'no_regression_evidence',
     ]);
-    assert.equal(sidecar.mapped_surfaces.owner_receipt_contract.writable_by_sidecar, false);
+    assert.equal(sidecar.mapped_surfaces.owner_receipt_contract.writable_by_sidecar, true);
+    assert.equal(
+      sidecar.mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.ref,
+      '/no_regression_owner_receipt_opl_consumption_proof',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.status,
+      'repo_local_focused_proof_landed_production_soak_pending',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.opl_consumption_policy.opl_can_store_no_regression_evidence_ref,
+      true,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.opl_consumption_policy.opl_can_store_domain_owner_receipt_ref,
+      true,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.opl_consumption_policy.opl_can_claim_production_soak_complete,
+      false,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.opl_consumption_policy.opl_can_store_visual_truth,
+      false,
+    );
     assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.ref, '/lifecycle_guarded_apply_proof');
     assert.deepEqual(sidecar.mapped_surfaces.lifecycle_guarded_apply.operations, [
       'cleanup',
@@ -134,6 +158,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       '/controlled_soak_no_regression_attempt',
     );
     assert.equal(sidecar.source_manifest_refs.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
+    assert.equal(
+      sidecar.source_manifest_refs.no_regression_owner_receipt_opl_consumption_proof_ref,
+      '/no_regression_owner_receipt_opl_consumption_proof',
+    );
     assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
     assert.equal(sidecar.source_manifest_refs.visual_transition_spec_ref, '/visual_transition_spec');
   assert.deepEqual(
@@ -190,7 +218,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(evidence.result_surface.coverage.review_export_verdict_written, false);
     assert.equal(evidence.result_surface.coverage.memory_content_body_written, false);
     assert.equal(evidence.result_surface.repository_boundary.repo_tracks_runtime_evidence_instance, false);
+    assert.equal(evidence.result_surface.repository_boundary.repo_tracks_visual_or_export_artifacts, false);
     assert.equal(evidence.result_surface.authority_boundary.opl_can_store_no_regression_evidence_ref, true);
+    assert.equal(evidence.result_surface.authority_boundary.opl_can_store_visual_truth, false);
     const evidenceFile = readJson(evidence.result_surface.evidence_file);
     assert.equal(evidenceFile.surface_kind, 'no_regression_evidence');
     assert.equal(evidenceFile.evidence_ref, evidence.result_surface.evidence_ref);
@@ -245,7 +275,14 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(domainReceipt.result_surface.coverage.visual_ready_claimed, false);
     assert.equal(domainReceipt.result_surface.coverage.opl_completion_promoted_to_visual_ready, false);
+    assert.equal(domainReceipt.result_surface.coverage.exportable_claimed, false);
+    assert.equal(domainReceipt.result_surface.coverage.handoffable_claimed, false);
+    assert.equal(domainReceipt.result_surface.coverage.visual_artifact_blob_written, false);
+    assert.equal(domainReceipt.result_surface.coverage.review_export_verdict_written, false);
     assert.equal(domainReceipt.result_surface.repository_boundary.repo_tracks_live_receipt_instances, false);
+    assert.equal(domainReceipt.result_surface.authority_boundary.opl_can_store_receipt_ref, true);
+    assert.equal(domainReceipt.result_surface.authority_boundary.opl_can_store_visual_truth, false);
+    assert.equal(domainReceipt.result_surface.authority_boundary.opl_can_mutate_domain_artifacts, false);
     const domainReceiptFile = readJson(domainReceipt.result_surface.receipt_file);
     assert.equal(domainReceiptFile.surface_kind, 'domain_owner_receipt');
     assert.equal(domainReceiptFile.required_refs.attempt_ref, 'workspace-runtime-ref:attempt:run-a');
