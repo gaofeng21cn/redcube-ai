@@ -4,29 +4,30 @@
 
 ## 项目定位
 
-`RedCube AI` 对外是独立 visual-deliverable domain agent，第一公开主语是 `redcube-ai` app skill、direct product entry 与 service-safe domain entry；`gateway / harness` 只作为仓内边界层与执行层语言保留。它不再是面向人类点击操作的 Web / Workbench 产品。
+`RedCube AI` 对外是独立 visual-deliverable domain agent，第一公开主语是 `redcube-ai` app skill、direct product entry 与 service-safe domain entry；`gateway / harness` 只作为仓内边界层、包名或历史执行层语言保留。它不承担 generic framework/runtime，也不再是面向人类点击操作的 Web / Workbench 产品。
 
 ## 稳定原则
 
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`
 - `domain-agent entry` 是 `CLI / MCP` 共享的唯一正式控制面
 - `controller` 当前不是独立、可验证的仓内公开正式入口
-- `Overlay` 负责领域约束与交付质量协议
-- `Harness OS` 只负责执行、记录、重跑与审计
-- 正式主线优先复用宿主 Agent runtime
-- 显式 proof lane 固定为 `hermes_agent`
+- RCA overlay / route / review gate 负责领域约束与交付质量协议
+- RCA runtime-family shell 只负责 visual-deliverable stage pack、artifact refs、review/export gate 与 owner receipt
+- 通用 stage attempt、queue、wakeup、retry/dead-letter、operator projection 与 App/workbench shell 归 OPL Framework 或产品壳
+- 正式主线优先复用宿主 Agent runtime，不在 RCA 内重建 generic runtime platform
+- 显式 proof lane 可以使用 `hermes_agent`，但它不是默认 runtime owner
 - 默认 concrete executor 是本地 `Codex CLI host-agent runtime`
 - `Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留
 - `Codex` 本地 operator host 是当前 deployment host / development shell
-- 历史 `repo-local managed runtime pilot` 只作为迁移 provenance / compatibility bridge，不是当前 owner
-- 未来可迁移到同一 substrate 上的 managed web runtime，但不改变 RedCube 的 domain 语义
-- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为兼容 sibling 或 upper-layer product 复用同一 substrate
+- 历史 `repo-local managed runtime pilot` 只作为迁移 provenance，不是兼容桥、当前 owner 或可继续扩展的 active path
+- 未来人用 workbench / product shell 应读取 projection 和 receipt refs；它不持有 visual truth、review/export verdict 或 artifact rewrite authority
+- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为 upper-layer product 复用同一 RCA domain contract
 
 补充执行原则：
 
 - `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_agent` proof lane 共同成立
-- 在当前 Codex-native 语境里，`Codex` 继续承担本地 operator / development host 与默认 concrete executor，而不是长期 managed-runtime owner
-- code 必须退回 contract、governance、audit、artifact persistence 与 render boundary
+- 在当前 Codex-native 语境里，`Codex` 继续承担本地 operator / development host 与默认 concrete executor，而不是 generic managed-runtime owner
+- code 必须退回 contract、governance、audit、artifact persistence、review/export gate 与 render boundary
 
 ## 执行句柄与 durable surface 原则
 
@@ -60,7 +61,7 @@
 - `auditDeliverable` 与 `runtimeWatch` 在同一 deliverable/topic 边界上，不得脱离 canonical `review_state`、topic 级 `publication_projection` 与 hydrated `delivery_contract`
 - `getReviewState` / `getPublicationProjection` 是权威表面；audit / watch 只能围绕它们收口，不能另写一套平行语义
 
-后续即使迁移到 managed web runtime，也只能迁移宿主形态，不能改写这些 execution handle 与 durable surface 语义。
+后续即使接入 upper-layer product shell、OPL App workbench 或托管展示面，也只能迁移宿主展示、projection 消费和 operator action transport，不能迁移 RCA execution handle、visual truth、review/export verdict 或 artifact authority。
 
 ## 长线目标与当前 program 必须分开理解
 
@@ -142,6 +143,9 @@
 - Web UI
 - Workbench
 - 旧的双真相同步链
+- frontdoor / federation / source-pack-federation / product frontdesk
+- repo-local Hermes substrate package / standalone upstream probe
+- gateway-action / gateway-tool 兼容 alias
 
 ## 面向未来的约束
 
@@ -150,7 +154,7 @@
   - `xiaohongshu`
   - `poster_onepager`（当前只代表 knowledge poster，不代表 academic poster closeout）
 - 新交付物类型应通过 overlay 扩展，而不是重新引入独立主线
-- 新入口应挂在 Gateway 之上，而不是在外面包一层平行系统
+- 新入口应通过 product/domain action、service-safe domain entry、product sidecar 或 RCA-owned route/gate 接入；不得恢复 Gateway / frontdoor / federation alias 或在外面包一层平行系统
 - 新的质量规则应进入 contract / gate / policy，而不是依赖 prompt 补救
 - 在 `OPL` 顶层语义里，`RedCube AI` 是独立 visual-deliverable domain agent，不是 `OPL` 顶层 gateway 的替代物
 - 不允许把 deterministic code authorship 重新包装成 `pack-first` 或 `typed` 进展

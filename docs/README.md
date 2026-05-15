@@ -16,7 +16,7 @@
 
 ## OPL 系列分层
 
-OPL 系列项目的全局主参考是 `/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.md`。它维护 OPL Framework 的全局目标、全局差距、通用能力上收边界、App/workbench 目标和跨仓开发顺序。
+OPL 系列项目的全局主参考是 OPL 仓的 `docs/active/opl-family-development-reference.md`。它维护 OPL Framework 的全局目标、全局差距、通用能力上收边界、App/workbench 目标和跨仓开发顺序；机器或跨仓定位应使用 semantic id、contract/source ref 或 repo owner 口径，不把本机绝对路径当稳定接口。
 
 RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、visual truth、review/export verdict、artifact authority、direct product-entry path、OPL-hosted sidecar/projection/receipt 边界，以及哪些通用 source/workspace intake、artifact gallery、route/decision graph、review/repair transport、native-helper envelope、memory locator 和 observability primitive 应上收到 OPL。RCA 理想目标态读 [RedCube AI 理想目标态](./references/rca-visual-deliverable-agent-ideal-state.md)，当前差距和完善计划读 [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md)。MAS、MAG、MDS 或 OPL-owned App/workbench 的并行 backlog 不写入 RCA 文档。
 

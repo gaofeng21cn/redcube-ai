@@ -2,12 +2,13 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文是 current baton brief，解释 RCA direct product-entry service surface。它由旧 `docs/program/` active baton 层迁入 `docs/active/`；runtime-program 当前合同继续通过 `human_doc:program_redcube_product_entry_mvp` 指向本文语义。当前公开身份仍以 visual-deliverable domain agent、单一 `redcube-ai` app skill、CLI/MCP 和 `invokeProductEntry` 为准。
+生命周期说明：本文是 contract-linked support brief，唯一任务是解释 RCA direct product-entry service surface 的已落地合同和调用面。它由旧 `docs/program/` active baton 层迁入 `docs/active/`；runtime-program 当前合同继续通过 `human_doc:program_redcube_product_entry_mvp` 指向本文语义。后续完善顺序、OPL 上收边界和生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](./rca-ideal-state-gap-plan.md)。当前公开身份仍以 visual-deliverable domain agent、单一 `redcube-ai` app skill、CLI/MCP 和 `invokeProductEntry` 为准。
 
 ## 一句话结论
 
-`RedCube AI` 现在补上的，不是聊天 UI，也不是新 runtime。
-而是一个 repo-verified 的 direct `product entry` service surface：`invokeProductEntry`。
+`RedCube AI` 当前保留的是 repo-verified 的 direct `product entry` service surface：`invokeProductEntry`。
+
+这不是聊天 UI、旧 workbench、frontdoor、federation、repo-local Hermes proof 或新的 generic runtime。本文不再承接新的 active plan；新增 action 必须进入 `family_action_catalog`、CLI/MCP/product manifest 同源命名体系，并继续回到 RCA-owned domain entry。
 
 ## 这一步解决什么
 
@@ -42,3 +43,5 @@
 - 不把这一步写成成熟 end-user UI 已落地
 - 不把 repo-local `Hermes` 包装成 runtime owner
 - 不新开 family，不扩 academic poster，不先做聊天壳
+- 不恢复 `frontdoor`、`federation`、`product frontdesk`、`GatewayActionMap` 或 gateway-tool 兼容别名
+- 不把退役接口改写成 compatibility layer；无 active caller 后直接删除或归入 history / tombstone

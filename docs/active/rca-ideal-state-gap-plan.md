@@ -14,7 +14,7 @@ Date: `2026-05-14`
 
 RCA 的单仓计划只维护视觉交付领域真相和 domain package 薄程序面。薄程序面包括 descriptor、contract/schema、sidecar/thin adapter、projection builder、domain transition spec/table、review/export gate、artifact locator、receipt schema、tests 和 domain entry；它们服务 OPL 发现、托管、审计和投影，不构成第二套 generic framework/runtime。
 
-OPL 系列项目的全局主参考是 `/Users/gaofeng/workspace/one-person-lab/docs/active/opl-family-development-reference.md`。涉及跨仓总顺序、shared primitive owner、App/workbench 通用目标和旧兼容面退役纪律时，以该主参考和 OPL docs 为准。
+OPL 系列项目的全局主参考是 OPL 仓的 `docs/active/opl-family-development-reference.md`。涉及跨仓总顺序、shared primitive owner、App/workbench 通用目标和旧兼容面退役纪律时，以该主参考和 OPL docs 为准；机器或跨仓定位应使用 semantic id、contract/source ref 或 repo owner 口径，不把本机绝对路径当稳定接口。
 
 ## 通用模块上收 OPL 清单
 
@@ -50,7 +50,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + t
 | Stage attempt receipts | stage descriptor、route artifacts、runtime watch、review/export projection 已存在；domain owner receipt contract 已 landed。 | 每个真实 stage attempt 的 source refs、artifact refs、review refs、blocked reason、human gate receipt 和 owner receipt 还未全部常态化。 | 把 attempt receipt 写入 workspace/runtime root，并从 product shell / OPL projection 只读展示；repo 只保留 descriptor、schema、test fixture 和 locator。 |
 | Domain memory | descriptor locator、seed fixture locator、writeback proposal、accept/reject contract、receipt locator 和 operator projection 已进入 repo-source contract surface。 | 真实 visual pattern memory body、accepted/rejected receipt instances 和 review/export closeout writeback 尚未作为常态运行流闭环。 | 先在 RCA runtime/domain-memory root 产生真实 receipt instance，再让 OPL 消费 locator/projection；不把 memory body 或视觉 verdict 迁入 OPL。 |
 | Domain transition spec | RCA 已有 stage control projection、route equivalence、review/export gate 和 controlled visual attempt proof；OPL 已有 generic transition runner / matrix runner 基础。 | 视觉路线从 source/readiness 到 visual direction、artifact creation、review/repair、package/export 的转换还没有固化为 RCA-owned transition table，也没有接入 OPL runner / provider attempt bridge。 | RCA 声明 visual transition table、guard、oracle fixture、blocked item typed blocker 和 owner action；OPL 只执行 spec，不生成 visual/export verdict。 |
-| Native helper / Python surface | Python helper catalog 已声明 package module 为 preferred invocation，仍允许 thin script wrapper 作为迁移期 ref。 | 部分 helper 仍有 `script` / `compatibility_script` 形态；这不是理想终态。 | 按 catalog 逐项迁到 package-module invocation，更新 runtime callsite 和 helper tests；完成后再把 wrapper allowance 收紧。 |
+| Native helper / Python surface | Python helper catalog 已声明 package module 为 preferred invocation，thin script wrapper 只作为迁移 inventory ref。 | 部分 helper 仍有 `script` / `compatibility_script` 形态；这不是理想终态。 | 按 catalog 逐项迁到 package-module invocation，更新 runtime callsite 和 helper tests；满足 no-active-caller / replacement proof 后直接删除或 tombstone wrapper，不保留 compatibility layer。 |
 | User workbench | 当前是 CLI/product shell/operator projection；面向人的 desktop/Web 工作台不是 RCA 仓内已完成产品。 | 进度、阻塞、artifact gallery、review state、attention queue 的人用 UI 仍属于 OPL App 或 product shell 后续形态。 | 先保证 projection source 稳定，再在 OPL App 或 RCA product shell 读取这些 source；UI 不持有 visual truth 或 artifact rewrite authority。 |
 | Persistence / lifecycle | 当前坚持 file authority + rebuildable artifact indexes；SQLite 仍是 deferred option。 | 还没有达到跨 deliverable 全局查询、长期 retention ledger 和 session index 的成熟侧车索引形态。 | 只有在真实文件规模、查询压力或 retention 维护成本出现后，再引入 rebuildable SQLite sidecar；不得把 SQLite 升级成 visual truth 或 artifact blob owner。 |
 

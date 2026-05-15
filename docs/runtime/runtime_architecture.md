@@ -9,9 +9,9 @@
 | owner | RCA runtime / product-entry docs |
 | purpose | 解释 direct route、OPL-hosted route、executor/backend、watch/projection 的当前边界 |
 | state | current runtime explanation |
-| machine boundary | 可执行真相在 runtime-program contracts、CLI/MCP surfaces、gateway/runtime source、workspace/runtime artifacts；本文只是读者上下文 |
+| machine boundary | 可执行真相在 runtime-program contracts、CLI/MCP surfaces、product-entry / domain-entry / runtime-family source、workspace/runtime artifacts；本文只是读者上下文 |
 
-旧 `Gateway`、`Domain Harness OS`、Hermes-first、managed web runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner 或 visual truth owner。
+旧 `Gateway`、`Domain Harness OS`、Hermes-first、managed web runtime、local runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner、generic framework/runtime owner 或 visual truth owner。
 
 ## 当前拓扑
 
@@ -49,9 +49,11 @@ User / Agent
 
 OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 
+因此本文的 `runtime` 只指 RCA domain-agent runtime boundary，不表示 RCA 仓维护 generic scheduler、generic queue、generic attempt ledger、generic state-machine runner、generic memory locator、generic observability 或通用 App/workbench runtime。
+
 RCA 长线实现语言面保持 `TypeScript + Python`：
 
-- TypeScript 持有 product entry、CLI/MCP、contracts、gateway、runtime-family shell 与 typed service boundaries。
+- TypeScript 持有 product entry、CLI/MCP、contracts、domain-entry/runtime-family shell 与 typed service boundaries。
 - Python 持有 native Office/PPT helper、截图/导出 helper 与文档/PPT 修复循环。
 - Python helper 必须挂在 RedCube route/proof lane、review/export gate 与 repo-tracked contract 下，不能绕过 product-entry 或 runtime-family。
 
