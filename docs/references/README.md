@@ -1,31 +1,31 @@
-# References
+# 参考文档
 
-`docs/references/` holds supporting technical material that still helps explain current RedCube operation, target-state thinking, or maintainer practice.
+`docs/references/` 保存仍能解释当前 RedCube 运行、目标态思考或维护者实践的支撑性技术材料。
 
-Active contract-linked baton briefs stay in `../active/`, stable rules stay in `../policies/`, and no-longer-current provenance stays in `../history/`.
-Reference documents may discuss OPL, gateway, harness, bridge, federation, or hosted runtime context; those terms are read as internal integration, target-state, or provenance language. The default public identity remains `RedCube AI` as a visual-deliverable domain agent.
-If a reference is still named by `human_doc:*`, keep it in place and clarify reader stance before moving it. In the current contract set, `human_doc:domain_harness_os_positioning` still protects the positioning reference from archival movement.
+仍服务合同或 active baton 的 brief 放在 `../active/`，稳定规则放在 `../policies/`，不再代表当前事实的 provenance 放在 `../history/`。
+参考文档可以讨论 OPL、gateway、harness、bridge、federation 或 hosted runtime 语境；这些词只按内部集成、目标态或历史 provenance 阅读。默认公开身份仍是 visual-deliverable domain agent：`RedCube AI`。
+如果某份参考仍被 `human_doc:*` 命名引用，应先保留原位并说明读者口径，再考虑迁移。当前合同集中，`human_doc:domain_harness_os_positioning` 仍让定位参考不进入归档移动。
 
-Current groups:
+当前分组：
 
-- Maintainer and series governance: `series-doc-governance-checklist.md`
-- Positioning references: `positioning/domain-harness-os-positioning.md` (internal boundary vocabulary, not public first identity)
-- Current operator references: `rca_executor_routing_config.md`, `opl_family_contract_adoption.md`, `opl_managed_runtime_three_layer_contract.md`, `lightweight_product_entry_and_opl_handoff.md`, `domain_memory_descriptor_locator.md`
-- Future-facing target states: `direct_delivery_longrun_target_state.md`, `source_readiness_deep_research_longrun_target_state.md`, `rca-visual-deliverable-agent-ideal-state.zh-CN.md`
-- Audits and closeouts still relevant to current interpretation: `creative-stage-ai-first-audit-2026-04-13.md`, `ppt_mainline_quality_closeout.md`
+- 维护者与系列治理：`series-doc-governance-checklist.md`
+- 定位参考：`positioning/domain-harness-os-positioning.md`，只作为内部边界词汇，不作为公开第一身份
+- 当前 operator 参考：`rca_executor_routing_config.md`、`opl_family_contract_adoption.md`、`opl_managed_runtime_three_layer_contract.md`、`lightweight_product_entry_and_opl_handoff.md`、`domain_memory_descriptor_locator.md`
+- 面向未来的目标态：`direct_delivery_longrun_target_state.md`、`source_readiness_deep_research_longrun_target_state.md`、`rca-visual-deliverable-agent-ideal-state.md`
+- 对当前解释仍有帮助的审计与 closeout：`creative-stage-ai-first-audit-2026-04-13.md`、`ppt_mainline_quality_closeout.md`
 
-## Current Disposition
+## 当前处置口径
 
-| Reference | Lifecycle state | Reader stance |
+| 参考文档 | 生命周期状态 | 读者口径 |
 | --- | --- | --- |
-| `positioning/domain-harness-os-positioning.md` | contract-linked positioning reference | Internal gateway / harness vocabulary only; public identity stays RCA visual delivery. |
-| `lightweight_product_entry_and_opl_handoff.md` | supporting integration reference | Explains direct RCA entry and OPL-hosted handoff converging on the same downstream domain entry. |
-| `opl_family_contract_adoption.md` | active support reference | Explains how RCA projects attempt/quality/incident/operator data to OPL without yielding visual truth. |
-| `opl_managed_runtime_three_layer_contract.md` | historical/supporting owner reference | Read through the current provider-backed OPL runtime target; Temporal is the required production online substrate, Hermes is legacy/optional/proof. |
-| `rca_executor_routing_config.md` | active operator reference | Explains opt-in executor routing; built-in default remains `codex_cli`. |
-| `domain_memory_descriptor_locator.md` | active contract-linked reference | RCA owns visual pattern memory descriptors, locators, and receipts; OPL consumes refs only. |
-| `direct_delivery_longrun_target_state.md` | future-facing reference | Target-state thinking; current runtime truth stays with runtime/source/delivery owner docs and contracts. |
-| `source_readiness_deep_research_longrun_target_state.md` | future-facing reference | Source-plane target-state thinking only. |
-| `rca-visual-deliverable-agent-ideal-state.zh-CN.md` | north-star reference | Target-state thinking for RCA as a visual-deliverable Foundry Agent; current truth stays in core docs, contracts, product-entry manifest, workspace artifacts, and RCA-owned gates. |
-| `creative-stage-ai-first-audit-2026-04-13.md` | audit provenance with current caution | Useful to understand AI-first closure; older `render_html` defaults must be read against current image-first default. |
-| `ppt_mainline_quality_closeout.md` | resolved historical quality closeout | HTML quality debt closeout; current PPT default is image-first. |
+| `positioning/domain-harness-os-positioning.md` | 合同引用的定位参考 | 只读作内部 gateway / harness 词汇；公开身份仍是 RCA visual delivery。 |
+| `lightweight_product_entry_and_opl_handoff.md` | 支撑性集成参考 | 说明 RCA direct entry 与 OPL-hosted handoff 如何收敛到同一下游 domain entry。 |
+| `opl_family_contract_adoption.md` | active support reference | 说明 RCA 如何把 attempt、quality、incident、operator 数据投影给 OPL，同时不交出 visual truth。 |
+| `opl_managed_runtime_three_layer_contract.md` | 历史 / 支撑 owner 参考 | 按当前 provider-backed OPL runtime 目标阅读；Temporal 是生产在线必需 substrate，Hermes 是 legacy / optional / proof。 |
+| `rca_executor_routing_config.md` | active operator reference | 说明 opt-in executor routing；内置默认仍是 `codex_cli`。 |
+| `domain_memory_descriptor_locator.md` | active contract-linked reference | RCA 持有 visual pattern memory descriptor、locator 和 receipt；OPL 只消费 refs。 |
+| `direct_delivery_longrun_target_state.md` | 面向未来的参考 | 只作为目标态思考；当前 runtime truth 留在 runtime/source/delivery owner docs 和 contracts。 |
+| `source_readiness_deep_research_longrun_target_state.md` | 面向未来的参考 | 只作为 source plane 目标态思考。 |
+| `rca-visual-deliverable-agent-ideal-state.md` | north-star 参考 | 说明 RCA 作为 visual-deliverable Foundry Agent 的目标态；当前 truth 留在核心文档、contracts、product-entry manifest、workspace artifacts 和 RCA-owned gates。当前差距和完善计划读 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md)。 |
+| `creative-stage-ai-first-audit-2026-04-13.md` | 带当前 caution 的审计 provenance | 可用于理解 AI-first closure；旧 `render_html` 默认口径必须按当前 image-first default 重新阅读。 |
+| `ppt_mainline_quality_closeout.md` | 已解决的历史质量 closeout | HTML quality debt closeout；当前 PPT 默认路线是 image-first。 |

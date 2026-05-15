@@ -13,6 +13,7 @@ Machine boundary: 人读索引。机器真相继续归 runtime-program contracts
 
 - [文档索引](../README.md)
 - [当前状态](../status.md)
+- [RCA 理想目标态差距与完善计划](./rca-ideal-state-gap-plan.md)
 - [RedCube product-entry MVP](./redcube_product_entry_mvp.md)
 - [Managed product-entry hardening](./managed_product_entry_hardening.md)
 - [OPL Framework hosted product entry](./opl_framework_hosted_product_entry.md)

@@ -123,5 +123,5 @@
 - runtime proof surface：Hermes 只保留为显式 opt-in executor/proof backend；证明入口是 runtime-protocol tests 和 Python helper catalog tests，不恢复 standalone upstream probe script。
 - Python helper surface：当前仍允许 `script` / `compatibility_script` 作为 thin wrapper ref，但 preferred invocation 是 package module；后续退链要先完成 catalog、runtime callsite 和 native helper proof 同步，不能保留第二套 helper authority。
 - docs active/history surface：仍被 `human_doc:*` 引用的 current baton、Phase 2 / Hermes / harness brief 按生命周期保留为 current baton 或 absorbed provenance；无合同引用的旧计划直接进 `docs/history/` 或 tombstone，不再新增兼容性计划。
-- target-state / gap surface：RCA 理想目标态与当前差距统一读 `docs/references/rca-visual-deliverable-agent-ideal-state.md` 的“当前差距与完善计划”；该文档只作为 north-star 和 gap planning reference，不能替代当前 truth surface。
+- target-state / gap surface：RCA 理想目标态读 `docs/references/rca-visual-deliverable-agent-ideal-state.md`；当前差距和完善计划读 `docs/active/rca-ideal-state-gap-plan.md`。两者都是人读参考，不能替代当前 truth surface。
 - owner receipt / memory / lifecycle apply surface：后续实现优先使用 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 三个命名。它们应写入 workspace runtime refs，并返回 RCA-owned receipt、typed blocker 或 no-regression evidence；OPL-hosted path 只能保存和投影这些 refs，不能生成 RCA visual ready、exportable、handoffable 或 memory accept/reject verdict。
