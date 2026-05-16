@@ -62,16 +62,26 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'visual_deliverable_internal_dag_only',
     );
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.generic_surfaces_owner, 'opl');
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_functional_harness_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_runtime_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_scheduler_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_daemon_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_lifecycle_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_queue_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_stage_attempt_orchestrator_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_attempt_ledger_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_typed_closeout_transport_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_runner_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_transition_runner_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_workbench_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_memory_transport_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_memory_refs_only_writeback_chain_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_artifact_lifecycle_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_review_repair_transport_owner, false);
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.rca_is_restart_dead_letter_repair_human_gate_state_chain_owner,
+      false,
+    );
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_native_helper_generic_envelope_owner, false);
     assert.equal(
       sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.status,
@@ -97,20 +107,35 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.authority_boundary.opl_can_authorize_visual_ready,
       false,
     );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.functional_harness_consumer_coverage.pass_claim_scope,
+      'consumer_contract_coverage_only',
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt,
+      false,
+    );
     assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
     assert.equal(sidecar.owner_boundary.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(sidecar.owner_boundary.rca_owns_functional_harness, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_runtime, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_scheduler, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_daemon, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_lifecycle, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_queue, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_stage_attempt_orchestrator, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_attempt_ledger, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_typed_closeout_transport, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_runner, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_transition_runner, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_workbench, false);
     assert.equal(sidecar.owner_boundary.rca_owns_memory_transport, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_memory_refs_only_writeback_chain, false);
     assert.equal(sidecar.owner_boundary.rca_owns_artifact_lifecycle, false);
     assert.equal(sidecar.owner_boundary.rca_owns_review_repair_transport, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_restart_dead_letter_repair_human_gate_state_chain, false);
     assert.equal(sidecar.owner_boundary.rca_owns_native_helper_generic_envelope, false);
     assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);
     assert.equal(sidecar.owner_boundary.rca_owns_review_publication_projection, true);
@@ -181,15 +206,22 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.opl_generic_primitive_consumption.rca_does_not_own,
       [
         'standard_domain_agent_scaffold',
+        'functional_harness',
+        'generic_runtime',
         'generic_scheduler',
         'daemon',
         'typed_queue',
+        'stage_attempt_orchestrator',
         'attempt_ledger',
+        'typed_closeout_transport',
         'generic_runner',
+        'generic_transition_runner',
         'workbench_shell',
         'memory_transport',
+        'memory_refs_only_writeback_chain',
         'artifact_lifecycle',
         'review_repair_transport',
+        'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
       ],
     );

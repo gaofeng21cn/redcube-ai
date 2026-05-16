@@ -23,16 +23,23 @@ test('managed DAG scheduler exposes dependency layers for a single deliverable w
 
   assert.equal(plan.scheduler_kind, 'managed_deliverable_dag');
   assert.equal(plan.domain_scope, 'visual_deliverable_internal_dag_only');
+  assert.equal(plan.functional_harness_owner, false);
+  assert.equal(plan.generic_runtime_owner, false);
   assert.equal(plan.generic_scheduler_owner, false);
   assert.equal(plan.generic_daemon_owner, false);
   assert.equal(plan.generic_lifecycle_owner, false);
   assert.equal(plan.generic_queue_owner, false);
+  assert.equal(plan.stage_attempt_orchestrator_owner, false);
   assert.equal(plan.generic_attempt_ledger_owner, false);
+  assert.equal(plan.typed_closeout_transport_owner, false);
   assert.equal(plan.generic_runner_owner, false);
+  assert.equal(plan.generic_transition_runner_owner, false);
   assert.equal(plan.generic_workbench_owner, false);
   assert.equal(plan.memory_transport_owner, false);
+  assert.equal(plan.memory_refs_only_writeback_chain_owner, false);
   assert.equal(plan.artifact_lifecycle_owner, false);
   assert.equal(plan.review_repair_transport_owner, false);
+  assert.equal(plan.restart_dead_letter_repair_human_gate_state_chain_owner, false);
   assert.equal(plan.native_helper_generic_envelope_owner, false);
   assert.equal(plan.authority_boundary.owner, 'redcube_ai');
   assert.equal(plan.authority_boundary.opl_family_scheduler_owner, 'opl');

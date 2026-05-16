@@ -198,15 +198,22 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
   const current = currentProgram();
   const expectedGenericPrimitives = [
     'standard_domain_agent_scaffold',
+    'functional_harness',
+    'generic_runtime',
     'generic_scheduler',
     'daemon',
     'typed_queue',
+    'stage_attempt_orchestrator',
     'attempt_ledger',
+    'typed_closeout_transport',
     'generic_runner',
+    'generic_transition_runner',
     'workbench_shell',
     'memory_transport',
+    'memory_refs_only_writeback_chain',
     'artifact_lifecycle',
     'review_repair_transport',
+    'restart_dead_letter_repair_human_gate_state_chain',
     'native_helper_generic_envelope',
   ];
   const expectedRetainedAuthority = [
@@ -236,6 +243,35 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
     assert.equal(surface.live_soak_claimed, false);
     assert.deepEqual(surface.rca_does_not_own, expectedGenericPrimitives);
     assert.deepEqual(surface.rca_retained_authority, expectedRetainedAuthority);
+    assert.equal(surface.functional_harness_consumer_coverage.harness_role, 'functional_harness_consumer');
+    assert.equal(surface.functional_harness_consumer_coverage.pass_claim_scope, 'consumer_contract_coverage_only');
+    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_visual_ready, false);
+    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_exportable, false);
+    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_handoffable, false);
+    assert.equal(surface.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt, false);
+    assert.equal(surface.functional_harness_consumer_coverage.rca_generic_runtime_owner, false);
+    assert.deepEqual(surface.functional_harness_consumer_coverage.covered_chains, [
+      'memory_refs_only_writeback_chain',
+      'queue_stage_attempt_typed_closeout',
+      'generic_transition_runner',
+      'restart_dead_letter_repair_human_gate_state_chain',
+    ]);
+    assert.equal(
+      surface.functional_harness_consumer_coverage.chain_authority.memory_refs_only_writeback_chain.memory_body_written_by_opl,
+      false,
+    );
+    assert.equal(
+      surface.functional_harness_consumer_coverage.chain_authority.queue_stage_attempt_typed_closeout.artifact_produced_by_harness_pass,
+      false,
+    );
+    assert.equal(
+      surface.functional_harness_consumer_coverage.chain_authority.generic_transition_runner.visual_ready_declared_by_runner,
+      false,
+    );
+    assert.equal(
+      surface.functional_harness_consumer_coverage.chain_authority.restart_dead_letter_repair_human_gate_state_chain.handoffable_declared_by_state_chain,
+      false,
+    );
   }
 
   assert.deepEqual(

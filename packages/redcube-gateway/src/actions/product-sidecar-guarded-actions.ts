@@ -110,15 +110,22 @@ export const RCA_RETAINED_VISUAL_AUTHORITY = Object.freeze([
 
 export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
   'standard_domain_agent_scaffold',
+  'functional_harness',
+  'generic_runtime',
   'generic_scheduler',
   'daemon',
   'typed_queue',
+  'stage_attempt_orchestrator',
   'attempt_ledger',
+  'typed_closeout_transport',
   'generic_runner',
+  'generic_transition_runner',
   'workbench_shell',
   'memory_transport',
+  'memory_refs_only_writeback_chain',
   'artifact_lifecycle',
   'review_repair_transport',
+  'restart_dead_letter_repair_human_gate_state_chain',
   'native_helper_generic_envelope',
 ]);
 
@@ -130,6 +137,49 @@ export const OPL_STABILITY_READ_MODEL_SURFACES = Object.freeze([
   'observability_export',
   'external_stability_policy',
 ]);
+
+export const OPL_FUNCTIONAL_HARNESS_COVERAGE = Object.freeze({
+  harness_role: 'functional_harness_consumer',
+  coverage_status: 'domain_authority_pack_landed',
+  pass_claim_scope: 'consumer_contract_coverage_only',
+  opl_harness_pass_is_visual_ready: false,
+  opl_harness_pass_is_exportable: false,
+  opl_harness_pass_is_handoffable: false,
+  opl_harness_pass_is_artifact_producing_owner_receipt: false,
+  rca_generic_runtime_owner: false,
+  covered_chains: [
+    'memory_refs_only_writeback_chain',
+    'queue_stage_attempt_typed_closeout',
+    'generic_transition_runner',
+    'restart_dead_letter_repair_human_gate_state_chain',
+  ],
+  chain_authority: {
+    memory_refs_only_writeback_chain: {
+      owner: 'opl',
+      rca_retains: ['visual_memory_body', 'owner_receipt', 'typed_blocker'],
+      rca_exports_only: ['memory_locator_refs', 'writeback_receipt_refs', 'safe_action_refs'],
+      memory_body_written_by_opl: false,
+    },
+    queue_stage_attempt_typed_closeout: {
+      owner: 'opl',
+      rca_retains: ['visual_truth', 'review_export_verdict', 'artifact_authority', 'owner_receipt'],
+      rca_exports_only: ['stage_descriptor_refs', 'attempt_source_refs', 'typed_closeout_receipt_refs'],
+      artifact_produced_by_harness_pass: false,
+    },
+    generic_transition_runner: {
+      owner: 'opl',
+      rca_retains: ['visual_transition_spec', 'typed_blocker', 'safe_action_refs'],
+      rca_exports_only: ['transition_spec_ref', 'transition_result_refs', 'owner_receipt_refs'],
+      visual_ready_declared_by_runner: false,
+    },
+    restart_dead_letter_repair_human_gate_state_chain: {
+      owner: 'opl',
+      rca_retains: ['typed_blocker', 'safe_action_refs', 'review_export_verdict'],
+      rca_exports_only: ['repair_hint_refs', 'human_gate_reason_refs', 'dead_letter_receipt_refs'],
+      handoffable_declared_by_state_chain: false,
+    },
+  },
+});
 
 export function buildFamilySchedulerReplacementProjection() {
   return {
@@ -261,6 +311,7 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
     rca_does_not_own: [...OPL_OWNED_GENERIC_PRIMITIVES],
     opl_owned_generic_primitives: [...OPL_OWNED_GENERIC_PRIMITIVES],
     rca_retained_authority: [...RCA_RETAINED_VISUAL_AUTHORITY],
+    functional_harness_consumer_coverage: OPL_FUNCTIONAL_HARNESS_COVERAGE,
     rca_thin_program_surfaces: [
       'single redcube-ai app skill',
       'service-safe domain entry',
@@ -312,14 +363,20 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
     ],
     forbidden_rca_generic_owner_flags: {
       rca_generic_scheduler_owner: false,
+      rca_generic_runtime_owner: false,
       rca_generic_daemon_owner: false,
       rca_generic_queue_owner: false,
+      rca_stage_attempt_orchestrator_owner: false,
       rca_generic_attempt_ledger_owner: false,
+      rca_typed_closeout_transport_owner: false,
       rca_generic_runner_owner: false,
+      rca_generic_transition_runner_owner: false,
       rca_generic_workbench_owner: false,
       rca_memory_transport_owner: false,
+      rca_memory_refs_only_writeback_chain_owner: false,
       rca_artifact_lifecycle_owner: false,
       rca_review_repair_transport_owner: false,
+      rca_restart_dead_letter_repair_human_gate_state_chain_owner: false,
       rca_native_helper_generic_envelope_owner: false,
     },
   };

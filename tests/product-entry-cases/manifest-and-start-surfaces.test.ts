@@ -270,17 +270,49 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.opl_generic_primitive_consumption.rca_does_not_own,
       [
         'standard_domain_agent_scaffold',
+        'functional_harness',
+        'generic_runtime',
         'generic_scheduler',
         'daemon',
         'typed_queue',
+        'stage_attempt_orchestrator',
         'attempt_ledger',
+        'typed_closeout_transport',
         'generic_runner',
+        'generic_transition_runner',
         'workbench_shell',
         'memory_transport',
+        'memory_refs_only_writeback_chain',
         'artifact_lifecycle',
         'review_repair_transport',
+        'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
       ],
+    );
+    assert.deepEqual(
+      manifest.opl_generic_primitive_consumption.functional_harness_consumer_coverage.covered_chains,
+      [
+        'memory_refs_only_writeback_chain',
+        'queue_stage_attempt_typed_closeout',
+        'generic_transition_runner',
+        'restart_dead_letter_repair_human_gate_state_chain',
+      ],
+    );
+    assert.equal(
+      manifest.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_visual_ready,
+      false,
+    );
+    assert.equal(
+      manifest.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_exportable,
+      false,
+    );
+    assert.equal(
+      manifest.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_handoffable,
+      false,
+    );
+    assert.equal(
+      manifest.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt,
+      false,
     );
     assert.deepEqual(
       manifest.opl_generic_primitive_consumption.rca_retained_authority,

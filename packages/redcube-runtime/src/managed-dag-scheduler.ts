@@ -21,16 +21,23 @@ interface ManagedDagPlan {
   scheduler_kind: 'managed_deliverable_dag';
   schema_version: 1;
   domain_scope: 'visual_deliverable_internal_dag_only';
+  functional_harness_owner: false;
+  generic_runtime_owner: false;
   generic_scheduler_owner: false;
   generic_daemon_owner: false;
   generic_lifecycle_owner: false;
   generic_queue_owner: false;
+  stage_attempt_orchestrator_owner: false;
   generic_attempt_ledger_owner: false;
+  typed_closeout_transport_owner: false;
   generic_runner_owner: false;
+  generic_transition_runner_owner: false;
   generic_workbench_owner: false;
   memory_transport_owner: false;
+  memory_refs_only_writeback_chain_owner: false;
   artifact_lifecycle_owner: false;
   review_repair_transport_owner: false;
+  restart_dead_letter_repair_human_gate_state_chain_owner: false;
   native_helper_generic_envelope_owner: false;
   authority_boundary: {
     owner: 'redcube_ai';
@@ -206,16 +213,23 @@ export function planManagedDeliverableDag({
     scheduler_kind: 'managed_deliverable_dag',
     schema_version: 1,
     domain_scope: 'visual_deliverable_internal_dag_only',
+    functional_harness_owner: false,
+    generic_runtime_owner: false,
     generic_scheduler_owner: false,
     generic_daemon_owner: false,
     generic_lifecycle_owner: false,
     generic_queue_owner: false,
+    stage_attempt_orchestrator_owner: false,
     generic_attempt_ledger_owner: false,
+    typed_closeout_transport_owner: false,
     generic_runner_owner: false,
+    generic_transition_runner_owner: false,
     generic_workbench_owner: false,
     memory_transport_owner: false,
+    memory_refs_only_writeback_chain_owner: false,
     artifact_lifecycle_owner: false,
     review_repair_transport_owner: false,
+    restart_dead_letter_repair_human_gate_state_chain_owner: false,
     native_helper_generic_envelope_owner: false,
     authority_boundary: {
       owner: 'redcube_ai',
