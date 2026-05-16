@@ -179,10 +179,11 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'product_sidecar_adapter',
     'projection_builder',
     'lifecycle_adapter',
-      'visual_transition_spec',
-      'domain_memory_descriptor_locator',
-      'domain_owner_receipt_contract',
-      'lifecycle_guarded_apply_proof',
+    'visual_transition_spec',
+    'domain_memory_descriptor_locator',
+    'domain_owner_receipt_contract',
+    'lifecycle_guarded_apply_proof',
+    'workspace_receipt_inventory_projection',
   ]);
   assert.equal(skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
   assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
@@ -191,6 +192,7 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   assert.equal(skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
   assert.equal(skeleton.runtime_declarations.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
   assert.equal(skeleton.runtime_declarations.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
+  assert.equal(skeleton.runtime_declarations.workspace_receipt_inventory_projection_ref, '/workspace_receipt_inventory_projection');
 });
 
 test('RCA standard OPL primitive consumption is complete as a functional consumer projection', () => {
@@ -387,6 +389,7 @@ test('RCA controlled soak remains deferred without descriptor index skeleton reg
     'domain_memory_descriptor_locator',
     'controlled_visual_stage_attempt',
     'controlled_memory_apply_proof',
+    'workspace_receipt_inventory_projection',
     'domain_owner_receipt_contract',
     'lifecycle_guarded_apply_proof',
     'visual_transition_spec',

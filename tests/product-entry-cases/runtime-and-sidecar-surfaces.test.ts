@@ -1,5 +1,10 @@
 // @ts-nocheck
 import {
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
+
+import {
   GATEWAY_PACKAGE_JSON,
   PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
   SERIAL_ENV_TEST,
@@ -615,6 +620,176 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       readJson(workspaceReceiptProof.result_surface.runtime_files.domain_owner_receipt_file).required_refs.memory_receipt_ref,
       workspaceReceiptProof.result_surface.receipt_refs.accepted_memory_receipt_ref,
+    );
+
+    const manifestWithReceipts = await getProductEntryManifest({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.surface_kind,
+      'workspace_receipt_inventory_projection',
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.projection_id,
+      'rca.workspace_receipt_inventory.v1',
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.status,
+      'workspace_receipt_instances_visible_refs_only',
+    );
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.read_only, true);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.refs_only, true);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.writes_visual_truth, false);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.writes_artifact_blob, false);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.writes_memory_body, false);
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.declares_production_soak_complete,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.implements_opl_artifact_gallery,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.implements_opl_workbench,
+      false,
+    );
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.receipt_counts.domain_owner, 2);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.receipt_counts.memory_visual_pattern, 3);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.receipt_counts.lifecycle_cleanup, 1);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.receipt_counts.lifecycle_restore, 1);
+    assert.equal(manifestWithReceipts.workspace_receipt_inventory_projection.receipt_counts.lifecycle_retention, 2);
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.coverage.required_memory_lifecycle_receipts_visible,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.coverage.required_receipt_kinds_visible,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.coverage.invalid_receipt_payloads_detected,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.coverage.no_forbidden_payload_fields_detected,
+      true,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.workspace_receipt_inventory_projection.gap_projection,
+      {
+        gap_id: 'real_memory_lifecycle_receipt_instances',
+        status: 'runtime_receipt_instances_visible_not_production_soak',
+        current_best_ref: '/workspace_receipt_inventory_projection',
+        missing_receipt_kinds: [],
+      },
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.authority_boundary.opl_app_can_index_receipt_refs,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.authority_boundary.opl_app_can_write_receipt_instance,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.authority_boundary.opl_app_can_claim_production_soak_complete,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.repository_boundary.repo_tracks_live_receipt_instances,
+      false,
+    );
+    assert.ok(
+      manifestWithReceipts.workspace_receipt_inventory_projection.receipt_refs.some(
+        (receiptRef) => receiptRef.receipt_ref === workspaceReceiptProof.result_surface.receipt_refs.domain_owner_receipt_ref,
+      ),
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.source_refs.some(
+        (source) => source.source_id === 'workspace_receipt_inventory_projection'
+          && source.required_memory_lifecycle_receipts_visible === true,
+      ),
+      true,
+    );
+    const memoryLifecycleGap = manifestWithReceipts.operator_evidence_readiness_projection.next_evidence_gaps.find(
+      (gap) => gap.gap_id === 'real_memory_lifecycle_receipt_instances',
+    );
+    assert.equal(memoryLifecycleGap.status, 'runtime_receipt_instances_visible_not_production_soak');
+    assert.equal(memoryLifecycleGap.current_best_ref, '/workspace_receipt_inventory_projection');
+    assert.deepEqual(memoryLifecycleGap.missing_receipt_kinds, []);
+
+    const sidecarWithReceipts = await exportProductSidecar({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(
+      sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.ref,
+      '/workspace_receipt_inventory_projection',
+    );
+    assert.equal(
+      sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.status,
+      'workspace_receipt_instances_visible_refs_only',
+    );
+    assert.equal(
+      sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.opl_can_write_receipt_instance,
+      false,
+    );
+    assert.equal(
+      sidecarWithReceipts.source_manifest_refs.workspace_receipt_inventory_projection_ref,
+      '/workspace_receipt_inventory_projection',
+    );
+
+    const acceptedMemoryReceiptPayload = readJson(workspaceReceiptProof.result_surface.runtime_files.accepted_memory_receipt_file);
+    writeFileSync(
+      workspaceReceiptProof.result_surface.runtime_files.accepted_memory_receipt_file,
+      `${JSON.stringify({
+        ...acceptedMemoryReceiptPayload,
+        memory_content_body: 'forbidden body payload must stay out of OPL-facing inventory',
+      }, null, 2)}\n`,
+      'utf-8',
+    );
+    const manifestWithForbiddenReceiptPayload = await getProductEntryManifest({
+      workspace_root: workspaceRoot,
+    });
+    assert.equal(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.status,
+      'blocked_forbidden_receipt_payload_fields',
+    );
+    assert.equal(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.coverage.required_receipt_kinds_visible,
+      true,
+    );
+    assert.equal(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.coverage.required_memory_lifecycle_receipts_visible,
+      false,
+    );
+    assert.deepEqual(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.coverage.forbidden_payload_fields_detected,
+      ['memory_content_body'],
+    );
+    assert.equal(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.coverage.memory_content_body_projected,
+      false,
+    );
+    assert.equal(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.gap_projection.status,
+      'blocked_forbidden_receipt_payload_fields',
+    );
+    assert.deepEqual(
+      manifestWithForbiddenReceiptPayload.workspace_receipt_inventory_projection.gap_projection.missing_receipt_kinds,
+      [],
+    );
+    assert.equal(
+      manifestWithForbiddenReceiptPayload.operator_evidence_readiness_projection.next_evidence_gaps.find(
+        (gap) => gap.gap_id === 'real_memory_lifecycle_receipt_instances',
+      ).status,
+      'blocked_forbidden_receipt_payload_fields',
+    );
+    writeFileSync(
+      workspaceReceiptProof.result_surface.runtime_files.accepted_memory_receipt_file,
+      readFileSync(workspaceReceiptProof.result_surface.runtime_files.accepted_memory_receipt_file, 'utf-8')
+        .replace(/,\n  "memory_content_body": "forbidden body payload must stay out of OPL-facing inventory"/, ''),
+      'utf-8',
     );
 
     const blockedWorkspaceReceiptProof = await dispatchProductSidecar({

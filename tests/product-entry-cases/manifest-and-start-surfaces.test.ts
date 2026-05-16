@@ -389,6 +389,55 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.operator_evidence_readiness_projection.implements_opl_generic_runtime, false);
     assert.equal(manifest.operator_evidence_readiness_projection.implements_opl_workbench, false);
     assert.equal(manifest.operator_evidence_readiness_projection.implements_opl_observability, false);
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.surface_kind,
+      'workspace_receipt_inventory_projection',
+    );
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.projection_id,
+      'rca.workspace_receipt_inventory.v1',
+    );
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.status,
+      'awaiting_runtime_receipt_instances',
+    );
+    assert.equal(manifest.workspace_receipt_inventory_projection.read_only, true);
+    assert.equal(manifest.workspace_receipt_inventory_projection.refs_only, true);
+    assert.equal(manifest.workspace_receipt_inventory_projection.writes_visual_truth, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.writes_artifact_blob, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.writes_memory_body, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.declares_production_soak_complete, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.implements_opl_generic_runtime, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.implements_opl_artifact_gallery, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.implements_opl_workbench, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.receipt_counts.total, 0);
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.gap_projection.status,
+      'pending_runtime_receipt_instances',
+    );
+    assert.deepEqual(
+      manifest.workspace_receipt_inventory_projection.gap_projection.missing_receipt_kinds,
+      [
+        'accepted_memory',
+        'rejected_memory',
+        'lifecycle_cleanup',
+        'lifecycle_restore',
+        'lifecycle_retention',
+        'domain_owner',
+      ],
+    );
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.authority_boundary.opl_app_can_index_receipt_refs,
+      true,
+    );
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.authority_boundary.opl_app_can_write_receipt_instance,
+      false,
+    );
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.repository_boundary.repo_tracks_live_receipt_instances,
+      false,
+    );
     assert.deepEqual(
       manifest.operator_evidence_readiness_projection.source_refs.map((source) => source.source_id),
       [
@@ -397,6 +446,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'controlled_memory_apply_runtime_receipt_refs',
         'lifecycle_guarded_apply_proof',
         'controlled_soak_no_regression_attempt',
+        'workspace_receipt_inventory_projection',
         'opl_generic_primitive_consumption',
         'opl_stability_read_model_consumption',
       ],
@@ -1084,6 +1134,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(status.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.deepEqual(status.product_entry_start, manifest.product_entry_start);
     assert.deepEqual(status.native_ppt_operator_ux, manifest.native_ppt_operator_ux);
+    assert.deepEqual(
+      status.workspace_receipt_inventory_projection,
+      manifest.workspace_receipt_inventory_projection,
+    );
     assert.deepEqual(
       status.operator_evidence_readiness_projection,
       manifest.operator_evidence_readiness_projection,

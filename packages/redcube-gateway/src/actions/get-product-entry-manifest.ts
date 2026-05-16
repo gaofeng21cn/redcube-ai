@@ -80,6 +80,7 @@ import {
   SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
 } from './get-product-entry-manifest-parts/policy.js';
 import { normalizeWorkspaceRoot, readCurrentProgramContract, safeText } from './get-product-entry-manifest-parts/utils.js';
+import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
@@ -285,6 +286,7 @@ export async function getProductEntryManifest(request) {
   });
   const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: standardDomainAgentSkeleton.domain_memory_descriptor_locator });
   const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ standardDomainAgentSkeleton });
+  const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({ workspaceRoot });
   const runtimeResidueRetirement = buildRuntimeResidueRetirementAudit({ runtime });
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,
@@ -751,6 +753,7 @@ export async function getProductEntryManifest(request) {
         family_scheduler_replacement: familySchedulerReplacement,
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
+        workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
       },
     },
     native_ppt_proof: {
@@ -882,6 +885,7 @@ export async function getProductEntryManifest(request) {
     product_sidecar_receipt_refs: standardDomainAgentSkeleton.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
@@ -965,5 +969,6 @@ export async function getProductEntryManifest(request) {
     runtimeResidueRetirement,
     standardDomainAgentSkeleton,
     visualPatternMemoryWriteback,
+    workspaceReceiptInventoryProjection,
   });
 		}
