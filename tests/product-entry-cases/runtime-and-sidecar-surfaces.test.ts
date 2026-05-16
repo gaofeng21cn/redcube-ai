@@ -265,12 +265,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.map((entry) => entry.module_id),
       [
         'managed_dag_scheduler',
-        'native_helper_envelope_wrapper',
-        'workspace_receipt_inventory',
-        'artifact_gallery_handoff_shell',
+        'attempt_state_machine_runner',
+        'managed_run_json_store',
+        'product_entry_session_store',
+        'workspace_source_intake',
+        'memory_writeback_receipt_transport',
+        'artifact_export_lifecycle',
         'review_repair_transport',
+        'native_helper_envelope',
+        'operator_projection_shell',
+        'generic_cli_mcp_wrappers',
+        'codex_executor_adapter',
         'observability_stability_read_model',
-        'sidecar_status_action_parity',
       ],
     );
     assert.equal(sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.length, 0);
@@ -279,6 +285,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').rca_scope,
       'visual_deliverable_internal_dag_only',
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'codex_executor_adapter').codePaths,
+      [
+        'packages/redcube-runtime/src/executors.ts',
+        'packages/redcube-gateway/src/actions/run-deliverable-route.ts',
+        'packages/redcube-gateway/src/actions/domain-entry-contract.ts',
+        'tests/rca-executor-backend-contract.test.ts',
+      ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').cannotAbsorbReason,
+      'OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.',
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'observability_stability_read_model').rca_owned_visual_domain_authority,

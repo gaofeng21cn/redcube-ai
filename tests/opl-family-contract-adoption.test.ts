@@ -305,12 +305,18 @@ test('RCA privatized functional module audit is machine readable for OPL without
   ];
   const expectedModules = [
     'managed_dag_scheduler',
-    'native_helper_envelope_wrapper',
-    'workspace_receipt_inventory',
-    'artifact_gallery_handoff_shell',
+    'attempt_state_machine_runner',
+    'managed_run_json_store',
+    'product_entry_session_store',
+    'workspace_source_intake',
+    'memory_writeback_receipt_transport',
+    'artifact_export_lifecycle',
     'review_repair_transport',
+    'native_helper_envelope',
+    'operator_projection_shell',
+    'generic_cli_mcp_wrappers',
+    'codex_executor_adapter',
     'observability_stability_read_model',
-    'sidecar_status_action_parity',
   ];
 
   for (const surface of surfaces) {
@@ -335,6 +341,13 @@ test('RCA privatized functional module audit is machine readable for OPL without
       assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
       assert.equal(entry.retire_tombstone, false, entry.module_id);
       assert.equal(entry.tombstone_required, false, entry.module_id);
+      assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
+      assert.ok(Array.isArray(entry.codePaths) && entry.codePaths.length > 0, entry.module_id);
+      assert.ok(Array.isArray(entry.activeCallers) && entry.activeCallers.length > 0, entry.module_id);
+      assert.equal(typeof entry.activeCallerStatus, 'string', entry.module_id);
+      assert.equal(typeof entry.migrationAction, 'string', entry.module_id);
+      assert.equal(typeof entry.retentionReason, 'string', entry.module_id);
+      assert.equal(typeof entry.cannotAbsorbReason, 'string', entry.module_id);
       assert.equal(entry.writes_visual_truth, false, entry.module_id);
       assert.equal(entry.writes_artifact_blob, false, entry.module_id);
       assert.equal(entry.writes_memory_body, false, entry.module_id);
@@ -346,8 +359,16 @@ test('RCA privatized functional module audit is machine readable for OPL without
 
   const byId = Object.fromEntries(surfaces[0].modules.map((entry) => [entry.module_id, entry]));
   assert.equal(byId.managed_dag_scheduler.rca_scope, 'visual_deliverable_internal_dag_only');
-  assert.equal(byId.native_helper_envelope_wrapper.rca_scope, 'python_native_helper_implementation');
+  assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
+  assert.equal(byId.managed_run_json_store.activeCallerStatus, 'active_private_json_store');
+  assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
+  assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
+  assert.equal(byId.memory_writeback_receipt_transport.rca_scope, 'visual_memory_accept_reject_and_receipt_refs');
+  assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
+  assert.equal(byId.operator_projection_shell.activeCallerStatus, 'active_refs_only_projection_shell');
+  assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'product_sidecar_status_action_metadata_projection');
+  assert.equal(byId.codex_executor_adapter.opl_generic_primitive, 'agent_executor_adapter');
   assert.equal(byId.observability_stability_read_model.rca_owned_visual_domain_authority, false);
 });
 

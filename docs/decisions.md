@@ -4,9 +4,9 @@
 
 ### 决策：privatized functional module audit 成为 OPL 可读的机器审计面
 
-- RCA 在 runtime-program contracts、manifest、status 和 product sidecar projection 中新增 `privatized_functional_module_audit`，统一盘点 managed-dag-scheduler、native helper envelope/wrapper、workspace receipt inventory、artifact gallery/handoff shell、review/repair transport、observability/stability read model 与 sidecar/status/action parity。
+- RCA 在 runtime-program contracts、manifest、status 和 product sidecar projection 中维护 `privatized_functional_module_audit`，统一盘点 managed DAG scheduler、attempt/state-machine runner、managed-run JSON store、product-entry session store、workspace/source intake、memory/writeback receipt transport、artifact export lifecycle、review/repair transport、native helper envelope、operator projection shell、generic CLI/MCP wrappers、Codex executor adapter 与 observability/stability read model。
 - 该 audit 只做 refs-only read model：OPL 可以索引模块边界和 generic primitive consumer 关系，但不能据此写 RCA visual truth、artifact blob、memory body，不能声明 visual-ready、exportable、handoffable 或 production soak complete。
-- 当前没有新增 retire/tombstone candidate；`managed-dag-scheduler` 保留为 visual deliverable 内部 DAG，review/export gate、artifact authority、owner receipt 和 Python native helper implementation 继续归 RCA。
+- 当前没有要求物理删除的 tombstone candidate；这不表示 RCA 私有功能面已经清空。`managed-dag-scheduler` 保留为 visual deliverable 内部 DAG，review/export gate、artifact authority、owner receipt、route-level executor policy 和 Python native helper implementation 继续归 RCA。
 - 真实仍需由 OPL 上收的代码面是 generic scheduler/runner/attempt ledger、native-helper generic envelope、artifact lifecycle/handoff shell、review/repair transport、observability/SLO/read-model 与 App/workbench shell；RCA 只消费这些通用 primitive 的 projection。
 
 ### 决策：product sidecar / action / status parity 由 canonical metadata 驱动
