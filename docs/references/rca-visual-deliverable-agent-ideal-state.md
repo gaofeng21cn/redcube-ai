@@ -4,7 +4,15 @@ Owner: `RedCube AI`
 Purpose: `north_star_reference`
 State: `active_support`
 Machine boundary: 本文是人读目标态参考。机器可读真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-14`
+Date: `2026-05-16`
+
+## 文档读法
+
+- `定位`：本文只写 RCA 的 north-star 目标态和长期 owner boundary；当前差距、执行顺序和 evidence 缺口回到 `rca-ideal-state-gap-plan.md`。
+- `当前实态校准`：带日期的校准段只记录当前 repo surface 或 fresh evidence，不把目标态写成已完成事实。
+- `Owner 边界`：RCA 持有 source readiness verdict、communication strategy、visual direction、review/export verdict、canonical artifact、visual memory body/accept-reject 和 owner receipt；OPL 持有 provider runtime、queue、attempt ledger、workspace/source intake shell、artifact gallery/handoff shell、review/repair transport、native-helper execution envelope、observability/SLO 和 App/workbench shell。
+- `最短路径`：先把 source/workspace intake、artifact gallery/handoff、review/repair transport、native helper execution envelope、route/decision graph、observability/SLO、App drilldown 和 scaffold/template checklist 归位到 OPL / App，再跑 focused hosted attempt 和 Temporal long soak。
+- `禁写口径`：RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
 
 ## 结论
 
@@ -19,6 +27,10 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 
 2026-05-15 当前代码已把 RCA transition hosted-attempt receipt 对账推进到 repo-local focused fixture：fixture 模拟 OPL provider attempt bridge 消费 `visual_transition_spec` 后，只保存 RCA 返回的 `domain_owner_receipt_ref`、`typed_blocker` 或 `no_regression_evidence_ref`，要求 transition receipt 显式引用 provider attempt ref，并递归禁止 `visual_ready`、`exportable`、`handoffable`、production soak complete、artifact blob、memory body 或 review/export verdict payload。该能力是理想态中 OPL-hosted visual transition attempt 的对账形状证明，不是 artifact-producing owner receipt，也不是 Temporal long soak。
+
+2026-05-16 校准：RCA 当前目录和 surface 已适合展示“artifact-heavy Foundry Agent”如何接入 OPL：repo 根层具备 `agent/`、`apps/redcube-cli|redcube-mcp`、`contracts/runtime-program/`、`packages/` runtime families、`plugins/rca`、`python/redcube_ai` native helpers、`runtime/`、`prompts/` 和 canonical docs taxonomy。它的范本价值在于 TypeScript orchestration + Python native helper、deliverable family、review/export gate、artifact locator、sidecar/projection 和 visual transition spec 的 owner 边界；它不是通用新 Agent scaffold 的直接目录模板，因为 packages/families/prompts/native helper 结构高度服务 visual deliverable domain。通用 skeleton/checklist 应由 OPL 抽取，RCA 保持 visual authority pack。
+
+执行顺序上，RCA 理想态要求先把已知通用外围上收到 OPL / App，并把 RCA adapter 保持薄：source/workspace intake、artifact gallery/handoff、review/repair transport、native helper execution envelope、route/decision graph、observability/SLO、App drilldown 和 scaffold/template checklist 应先完成归位。真实 OPL-hosted visual stage、Temporal long soak、跨 family 重复 proof 和 production closure 是后置验收，不应阻塞这些功能迁移、helper wrapper cleanup 和旧面退役。
 
 ## 产品分层
 
