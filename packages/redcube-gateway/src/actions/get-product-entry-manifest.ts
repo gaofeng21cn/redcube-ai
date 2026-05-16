@@ -81,6 +81,7 @@ import {
 } from './get-product-entry-manifest-parts/policy.js';
 import { normalizeWorkspaceRoot, readCurrentProgramContract, safeText } from './get-product-entry-manifest-parts/utils.js';
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
+import { buildVisualTransitionEvaluatorProjection } from './product-sidecar-parts/visual-transition-evaluator.js';
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
@@ -283,6 +284,9 @@ export async function getProductEntryManifest(request) {
     workspaceRoot,
     runtime,
     productEntrySessionCommand,
+  });
+  const visualTransitionEvaluator = buildVisualTransitionEvaluatorProjection({
+    visualTransitionSpec: standardDomainAgentSkeleton.visual_transition_spec,
   });
   const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: standardDomainAgentSkeleton.domain_memory_descriptor_locator });
   const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ standardDomainAgentSkeleton });
@@ -754,6 +758,7 @@ export async function getProductEntryManifest(request) {
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
         workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
+        visual_transition_evaluator_ref: '/visual_transition_evaluator',
       },
     },
     native_ppt_proof: {
@@ -891,6 +896,7 @@ export async function getProductEntryManifest(request) {
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
     lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
+    visual_transition_evaluator: visualTransitionEvaluator,
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
     opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
@@ -968,6 +974,7 @@ export async function getProductEntryManifest(request) {
     pptRoutePolicy,
     runtimeResidueRetirement,
     standardDomainAgentSkeleton,
+    visualTransitionEvaluator,
     visualPatternMemoryWriteback,
     workspaceReceiptInventoryProjection,
   });

@@ -317,7 +317,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'dispatch_product_sidecar',
       title: 'Dispatch RedCube product sidecar guarded action',
-      summary: '调度 RCA-owned guarded actions：runtime watch、supervise managed run、product-entry continuation、no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、notification receipt；禁止写 visual truth、review verdict 或 publication gate。',
+      summary: '调度 RCA-owned guarded actions：runtime watch、supervise managed run、product-entry continuation、no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、notification receipt；禁止写 visual truth、review verdict 或 publication gate。',
       effect: 'mutating',
       command: PRODUCT_SIDECAR_DISPATCH_COMMAND,
       surfaceKind: 'product_sidecar_dispatch',

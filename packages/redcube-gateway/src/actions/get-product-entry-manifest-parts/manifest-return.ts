@@ -4,6 +4,7 @@ export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
   oplStabilityReadModelConsumption,
   standardDomainAgentSkeleton,
+  visualTransitionEvaluator,
   workspaceReceiptInventoryProjection,
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
@@ -48,6 +49,12 @@ export function buildOperatorEvidenceReadinessProjection({
         required_memory_lifecycle_receipts_visible: (
           workspaceReceiptInventoryProjection?.coverage?.required_memory_lifecycle_receipts_visible === true
         ),
+      },
+      {
+        source_id: 'visual_transition_evaluator',
+        ref: '/visual_transition_evaluator',
+        status: visualTransitionEvaluator?.status || 'unknown',
+        callable_action: visualTransitionEvaluator?.callable_action || 'evaluate_visual_transition',
       },
       {
         source_id: 'opl_generic_primitive_consumption',
@@ -133,6 +140,7 @@ export function buildReturnedManifestProjection({
   pptRoutePolicy,
   runtimeResidueRetirement,
   standardDomainAgentSkeleton,
+  visualTransitionEvaluator,
   visualPatternMemoryWriteback,
   workspaceReceiptInventoryProjection,
 }) {
@@ -140,6 +148,7 @@ export function buildReturnedManifestProjection({
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
     standardDomainAgentSkeleton,
+    visualTransitionEvaluator,
     workspaceReceiptInventoryProjection,
   });
   return {
@@ -224,6 +233,7 @@ export function buildReturnedManifestProjection({
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
     lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
+    visual_transition_evaluator: visualTransitionEvaluator,
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption || manifest.opl_generic_primitive_consumption,
     opl_stability_read_model_consumption: (

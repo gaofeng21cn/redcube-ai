@@ -241,6 +241,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'projection_builder',
       'lifecycle_adapter',
       'visual_transition_spec',
+      'visual_transition_evaluator',
       'domain_memory_descriptor_locator',
       'domain_owner_receipt_contract',
       'lifecycle_guarded_apply_proof',
@@ -249,6 +250,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_evaluator_ref, '/visual_transition_evaluator');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
     assert.equal(manifest.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
     assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
@@ -447,6 +449,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'lifecycle_guarded_apply_proof',
         'controlled_soak_no_regression_attempt',
         'workspace_receipt_inventory_projection',
+        'visual_transition_evaluator',
         'opl_generic_primitive_consumption',
         'opl_stability_read_model_consumption',
       ],

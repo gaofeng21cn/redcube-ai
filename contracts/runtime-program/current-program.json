@@ -1636,7 +1636,7 @@
           "repo_tracks_live_receipt_instances": false
         },
         "visual_transition_spec": {
-          "status": "contract_landed_runner_integration_pending",
+          "status": "contract_landed_thin_evaluator_landed_runner_owned_by_opl",
           "spec_id": "rca.visual_transition_spec.v1",
           "source_manifest_surface": "redcube product manifest#/visual_transition_spec",
           "transition_model": "rca_owned_transition_table_oracle_fixture_refs_only",
@@ -1655,7 +1655,13 @@
           "opl_can_declare_exportable": false,
           "opl_can_mutate_artifacts": false,
           "repo_tracks_runner_state": false,
-          "repo_tracks_visual_or_export_artifacts": false
+          "repo_tracks_visual_or_export_artifacts": false,
+          "evaluator_descriptor_id": "rca.visual_transition_evaluator.v1",
+          "evaluator_action": "evaluate_visual_transition",
+          "family_transition_spec_descriptor_ref": "/visual_transition_spec/family_transition_spec_descriptor",
+          "rca_can_evaluate_guard_refs": true,
+          "rca_implements_opl_generic_transition_runner": false,
+          "repo_tracks_evaluator_contract": true
         },
         "physical_skeleton_follow_through": {
           "status": "low_risk_repo_source_follow_through_landed",
@@ -1869,6 +1875,7 @@
             "lifecycle_guarded_apply_proof",
             "controlled_soak_no_regression_attempt",
             "workspace_receipt_inventory_projection",
+            "visual_transition_evaluator",
             "opl_generic_primitive_consumption/functional_harness_consumer_coverage",
             "opl_stability_read_model_consumption"
           ],
@@ -1914,7 +1921,8 @@
         "physical_skeleton_follow_through_manifest_surface": "redcube product manifest#/physical_skeleton_follow_through",
         "review_helper_baseline_follow_through_manifest_surface": "redcube product manifest#/review_helper_baseline_follow_through",
         "opl_stability_read_model_consumption_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
-        "operator_evidence_readiness_projection_manifest_surface": "redcube product manifest#/operator_evidence_readiness_projection"
+        "operator_evidence_readiness_projection_manifest_surface": "redcube product manifest#/operator_evidence_readiness_projection",
+        "visual_transition_evaluator_manifest_surface": "redcube product manifest#/visual_transition_evaluator"
       },
       "closeout": {
         "executed_at": "2026-04-12",

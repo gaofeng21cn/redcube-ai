@@ -17,6 +17,10 @@ import {
 import { runtimeWatch } from './runtime-watch.js';
 import { superviseManagedRun } from './supervise-managed-run.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './product-sidecar-parts/workspace-receipt-proof.js';
+import {
+  buildVisualTransitionEvaluatorProjection,
+  evaluateVisualTransition,
+} from './product-sidecar-parts/visual-transition-evaluator.js';
 export {
   assertReceiptOnlyHostedAttemptProjection,
   buildHostedAttemptBridgeFixture,
@@ -111,6 +115,12 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
   const oplStabilityReadModelConsumption = (
     manifest.opl_stability_read_model_consumption
     || buildOplStabilityReadModelConsumptionProjection()
+  );
+  const visualTransitionEvaluator = (
+    manifest.visual_transition_evaluator
+    || buildVisualTransitionEvaluatorProjection({
+      visualTransitionSpec: manifest.visual_transition_spec,
+    })
   );
   return {
     ok: true,
@@ -330,14 +340,17 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         ref: '/visual_transition_spec',
         owner: DOMAIN_ID,
         spec_id: manifest.visual_transition_spec?.spec_id || 'rca.visual_transition_spec.v1',
-        status: manifest.visual_transition_spec?.status || 'contract_landed_runner_integration_pending',
+        status: manifest.visual_transition_spec?.status || 'contract_landed_thin_evaluator_landed_runner_owned_by_opl',
         transition_count: manifest.visual_transition_spec?.transition_table?.length || 0,
         oracle_fixture_id: manifest.visual_transition_spec?.oracle_fixture?.fixture_id || null,
+        evaluator_ref: '/visual_transition_evaluator',
+        family_transition_spec_descriptor_ref: '/visual_transition_spec/family_transition_spec_descriptor',
         opl_can_execute_transition_spec: true,
         opl_can_declare_visual_ready: false,
         opl_can_declare_exportable: false,
         writable_by_sidecar: false,
       },
+      visual_transition_evaluator: visualTransitionEvaluator,
       family_scheduler_replacement: familySchedulerReplacement,
       opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
       opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
@@ -362,6 +375,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',
+      visual_transition_evaluator_ref: '/visual_transition_evaluator',
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
@@ -948,6 +962,17 @@ export async function dispatchProductSidecar(request) {
 
   if (action === 'apply_visual_workspace_lifecycle') {
     const result = await applyVisualWorkspaceLifecycle(task);
+    return buildDispatchEnvelope({ task, result, action });
+  }
+
+  if (action === 'evaluate_visual_transition') {
+    const manifest = await getProductEntryManifest({ workspace_root: workspaceRootFromTask(task) });
+    const result = evaluateVisualTransition({
+      task,
+      workspaceRoot: workspaceRootFromTask(task),
+      visualTransitionSpec: manifest.visual_transition_spec,
+      buildTypedBlocker,
+    });
     return buildDispatchEnvelope({ task, result, action });
   }
 

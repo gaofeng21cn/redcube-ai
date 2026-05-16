@@ -124,6 +124,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       'projection_builder',
       'lifecycle_adapter',
       'visual_transition_spec',
+      'visual_transition_evaluator',
       'domain_memory_descriptor_locator',
       'domain_owner_receipt_contract',
       'lifecycle_guarded_apply_proof',

@@ -321,7 +321,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.lifecycle_guarded_apply.domain_receipt_required, true);
     assert.equal(sidecar.mapped_surfaces.visual_transition_spec.ref, '/visual_transition_spec');
     assert.equal(sidecar.mapped_surfaces.visual_transition_spec.spec_id, 'rca.visual_transition_spec.v1');
-    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.status, 'contract_landed_runner_integration_pending');
+    assert.equal(
+      sidecar.mapped_surfaces.visual_transition_spec.status,
+      'contract_landed_thin_evaluator_landed_runner_owned_by_opl',
+    );
     assert.equal(sidecar.mapped_surfaces.visual_transition_spec.transition_count, 5);
     assert.equal(
       sidecar.mapped_surfaces.visual_transition_spec.oracle_fixture_id,
@@ -330,6 +333,13 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.visual_transition_spec.opl_can_execute_transition_spec, true);
     assert.equal(sidecar.mapped_surfaces.visual_transition_spec.opl_can_declare_visual_ready, false);
     assert.equal(sidecar.mapped_surfaces.visual_transition_spec.opl_can_declare_exportable, false);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_spec.evaluator_ref, '/visual_transition_evaluator');
+    assert.equal(sidecar.mapped_surfaces.visual_transition_evaluator.evaluator_id, 'rca.visual_transition_evaluator.v1');
+    assert.equal(sidecar.mapped_surfaces.visual_transition_evaluator.callable_action, 'evaluate_visual_transition');
+    assert.equal(sidecar.mapped_surfaces.visual_transition_evaluator.authority_boundary.implements_opl_generic_transition_runner, false);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_evaluator.authority_boundary.writes_runner_state, false);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_evaluator.authority_boundary.declares_visual_ready, false);
+    assert.equal(sidecar.mapped_surfaces.visual_transition_evaluator.bridge_evidence_projection.refs_only, true);
     assert.equal(
       sidecar.mapped_surfaces.visual_pattern_memory_writeback.runtime_receipt_instances_ref,
       '/controlled_memory_apply_proof/runtime_receipt_instances',
@@ -345,6 +355,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
     assert.equal(sidecar.source_manifest_refs.visual_transition_spec_ref, '/visual_transition_spec');
+    assert.equal(sidecar.source_manifest_refs.visual_transition_evaluator_ref, '/visual_transition_evaluator');
     assert.equal(sidecar.source_manifest_refs.family_scheduler_replacement_ref, '/family_scheduler_replacement');
     assert.equal(sidecar.source_manifest_refs.opl_generic_primitive_consumption_ref, '/opl_generic_primitive_consumption');
     assert.equal(
@@ -370,6 +381,57 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(receipt.sidecar_policy.writes_visual_truth, false);
     assert.equal(receipt.sidecar_policy.writes_review_verdict, false);
     assert.equal(receipt.sidecar_policy.writes_publication_gate, false);
+
+    const transitionEvaluation = await dispatchProductSidecar({
+      task: {
+        action: 'evaluate_visual_transition',
+        workspace_root: workspaceRoot,
+        transition_id: 'review_ready_to_package',
+        current_stage: 'review_and_revision',
+        guard_refs: {
+          review_state_ref: 'workspace-runtime-ref:review:ok',
+          blocked_item_ref: 'workspace-runtime-ref:blocker:none',
+          export_proof_ref: 'workspace-runtime-ref:export-proof:ok',
+        },
+        provider_attempt_ref: 'opl-provider-attempt:review-ready',
+        domain_owner_receipt_ref: 'rca-owner-receipt:visual-stage:review-ready',
+      },
+    });
+    assert.equal(transitionEvaluation.result_surface.surface_kind, 'visual_transition_evaluation');
+    assert.equal(transitionEvaluation.result_surface.next_stage, 'package_and_handoff');
+    assert.equal(transitionEvaluation.result_surface.owner_action, 'export_or_return_typed_blocker');
+    assert.equal(transitionEvaluation.result_surface.required_guard_refs_present, true);
+    assert.equal(transitionEvaluation.result_surface.coverage.visual_ready_claimed, false);
+    assert.equal(transitionEvaluation.result_surface.coverage.exportable_claimed, false);
+    assert.equal(transitionEvaluation.result_surface.coverage.writes_runner_state, false);
+    assert.equal(
+      transitionEvaluation.result_surface.bridge_evidence_refs.domain_owner_receipt_ref,
+      'rca-owner-receipt:visual-stage:review-ready',
+    );
+    assert.equal(
+      transitionEvaluation.result_surface.authority_boundary.implements_opl_generic_transition_runner,
+      false,
+    );
+
+    const blockedTransition = await dispatchProductSidecar({
+      task: {
+        action: 'evaluate_visual_transition',
+        workspace_root: workspaceRoot,
+        transition_id: 'review_ready_to_package',
+        current_stage: 'review_and_revision',
+        guard_refs: {
+          review_state_ref: 'workspace-runtime-ref:review:blocked',
+        },
+      },
+    });
+    assert.equal(blockedTransition.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(blockedTransition.result_surface.blocker_kind, 'visual_transition_missing_guard_refs');
+    assert.deepEqual(blockedTransition.result_surface.missing_required_fields, [
+      'blocked_item_ref',
+      'export_proof_ref',
+    ]);
+    assert.equal(blockedTransition.result_surface.visual_ready_claimed, false);
+    assert.equal(blockedTransition.result_surface.exportable_claimed, false);
 
     const evidence = await dispatchProductSidecar({
       task: {

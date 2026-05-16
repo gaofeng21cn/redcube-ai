@@ -137,7 +137,7 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     const transitionSpec = manifest.visual_transition_spec;
     assert.equal(transitionSpec.surface_kind, 'visual_transition_spec');
     assert.equal(transitionSpec.spec_id, 'rca.visual_transition_spec.v1');
-    assert.equal(transitionSpec.status, 'contract_landed_runner_integration_pending');
+    assert.equal(transitionSpec.status, 'contract_landed_thin_evaluator_landed_runner_owned_by_opl');
     assert.equal(transitionSpec.owner, 'redcube_ai');
     assert.deepEqual(
       transitionSpec.transition_table.map((transition) => [
@@ -161,7 +161,13 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     assert.equal(transitionSpec.runner_boundary.opl_can_execute_transition_spec, true);
     assert.equal(transitionSpec.runner_boundary.opl_can_declare_visual_ready, false);
     assert.equal(transitionSpec.runner_boundary.opl_can_mutate_artifacts, false);
+    assert.equal(transitionSpec.evaluator_descriptor.descriptor_id, 'rca.visual_transition_evaluator.v1');
+    assert.equal(transitionSpec.evaluator_descriptor.sidecar_action, 'evaluate_visual_transition');
+    assert.equal(transitionSpec.family_transition_spec_descriptor.rca_implements_opl_generic_runner, false);
+    assert.equal(transitionSpec.runner_boundary.rca_can_evaluate_guard_refs, true);
+    assert.equal(transitionSpec.runner_boundary.rca_implements_generic_transition_runner, false);
     assert.equal(transitionSpec.repository_boundary.repo_tracks_transition_spec, true);
+    assert.equal(transitionSpec.repository_boundary.repo_tracks_evaluator_contract, true);
     assert.equal(transitionSpec.repository_boundary.repo_tracks_runner_state, false);
 
     const followThrough = manifest.physical_skeleton_follow_through;

@@ -649,6 +649,7 @@
         "domain_owner_receipt_contract",
         "lifecycle_guarded_apply_proof",
         "visual_transition_spec",
+        "visual_transition_evaluator",
         "physical_skeleton_follow_through",
         "review_helper_baseline_follow_through"
       ],
@@ -665,6 +666,7 @@
         "projection_builder",
         "lifecycle_adapter",
         "visual_transition_spec",
+        "visual_transition_evaluator",
         "domain_memory_descriptor_locator",
         "domain_owner_receipt_contract",
         "lifecycle_guarded_apply_proof",
@@ -677,7 +679,8 @@
       "domain_memory_descriptor_locator_ref": "/domain_memory_descriptor_locator",
       "domain_owner_receipt_contract_ref": "/domain_owner_receipt_contract",
       "lifecycle_guarded_apply_proof_ref": "/lifecycle_guarded_apply_proof",
-      "workspace_receipt_inventory_projection_ref": "/workspace_receipt_inventory_projection"
+      "workspace_receipt_inventory_projection_ref": "/workspace_receipt_inventory_projection",
+      "visual_transition_evaluator_ref": "/visual_transition_evaluator"
     },
     "workspace_receipt_inventory_projection": {
       "projection_id": "rca.workspace_receipt_inventory.v1",
@@ -1077,14 +1080,20 @@
     },
     "visual_transition_spec": {
       "spec_id": "rca.visual_transition_spec.v1",
-      "status": "contract_landed_runner_integration_pending",
+      "status": "contract_landed_thin_evaluator_landed_runner_owned_by_opl",
       "transition_model": "rca_owned_transition_table_oracle_fixture_refs_only",
       "oracle_fixture_id": "rca.visual_transition_oracle.fixture.v1",
       "transition_count": 5,
       "opl_can_execute_transition_spec": true,
       "opl_can_declare_visual_ready": false,
       "opl_can_declare_exportable": false,
-      "repo_tracks_runner_state": false
+      "repo_tracks_runner_state": false,
+      "evaluator_descriptor_id": "rca.visual_transition_evaluator.v1",
+      "evaluator_action": "evaluate_visual_transition",
+      "family_transition_spec_descriptor_ref": "/visual_transition_spec/family_transition_spec_descriptor",
+      "rca_can_evaluate_guard_refs": true,
+      "rca_implements_opl_generic_transition_runner": false,
+      "repo_tracks_evaluator_contract": true
     },
     "physical_skeleton_follow_through": {
       "follow_through_id": "rca.standard_domain_agent_skeleton.follow_through.v1",
@@ -1138,6 +1147,7 @@
       "redcube product manifest#/lifecycle_guarded_apply_proof",
       "redcube product manifest#/controlled_soak_no_regression_attempt",
       "redcube product manifest#/workspace_receipt_inventory_projection",
+      "redcube product manifest#/visual_transition_evaluator",
       "redcube product manifest#/opl_generic_primitive_consumption/functional_harness_consumer_coverage",
       "redcube product manifest#/opl_stability_read_model_consumption"
     ],

@@ -41,6 +41,13 @@
 - 该 read model 只让 OPL/App/operator 索引当前 workspace 的 receipt coverage，并把 `real_memory_lifecycle_receipt_instances` 缺口指向可见 refs；它不写 receipt instance、不读取 memory body、不生成 artifact gallery/handoff shell，也不实现 workbench。
 - 该 projection 不声明 visual-ready、exportable、handoffable、artifact-producing owner receipt 或 production soak complete；真实 OPL-hosted controlled visual-stage long soak、真实 reusable visual memory body 和真实 artifact-producing attempt 仍是后续 runtime evidence。
 
+### 决策：visual transition evaluator 是 RCA-owned thin guard surface，generic runner 归 OPL
+
+- RCA 在 manifest、product sidecar、runtime-program contracts 和 focused tests 中新增 `visual_transition_evaluator` 与 `evaluate_visual_transition` guarded action。
+- 该 evaluator 只消费 `visual_transition_spec`、`transition_id`、`current_stage` 和显式 guard refs，返回 `visual_transition_evaluation` 或 RCA typed blocker；它可以投出 next stage、owner action、repair action、domain owner receipt ref、no-regression evidence ref 和 transition bridge evidence refs。
+- OPL 继续持有 generic transition runner、matrix runner、retry/dead-letter、route-decision graph、transition bridge evidence workbench、provider attempt ledger 和 App projection；RCA 不写 runner state、不实现 workbench、不复制 OPL runtime。
+- 该 evaluator 不写 visual truth、review/export verdict、artifact blob、memory body 或 receipt instance，也不声明 visual-ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak。
+
 ## 2026-05-14
 
 ### 决策：owner receipt / memory writeback / workspace lifecycle apply 由 RCA 持有 authority
