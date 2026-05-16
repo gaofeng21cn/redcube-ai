@@ -1,5 +1,10 @@
 # Runtime 文档
 
+Owner: `RedCube AI`
+Purpose: `runtime_docs_index`
+State: `active_support`
+Machine boundary: 人读 runtime 索引。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和 runtime projections。
+
 `docs/runtime/` 保存人读 runtime lifecycle 材料：topology、executor/backend 边界、service-safe domain entry、runtime watch、review/projection 对齐和 substrate owner 说明。
 
 本层只解释 runtime 职责。机器可读合同仍在 `contracts/runtime-program/`；runtime/projection 真相继续归源码、schema、contracts、workspace artifacts 和 owner receipts。

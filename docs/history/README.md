@@ -1,6 +1,9 @@
 # 历史文档
 
-[English](./README.md)
+Owner: `RedCube AI`
+Purpose: `history_index`
+State: `history`
+Machine boundary: 人读历史索引。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和当前 owner docs。
 
 本目录存放归档 provenance 与过程记录；它们不应被读成当前 runtime 或 product-entry 合同。
 
@@ -14,8 +17,9 @@
 
 - `hermes/`：repo-local Hermes migration provenance 与 upstream Hermes proof records。这些文件不证明上游 `Hermes-Agent` 已经持有当前 runtime owner。
 - `phase-2/`：已吸收 Phase 2 tranche records，用于 runtime-program 读者上下文和 provenance。
-- `plans/`：保留用于追溯、但不再服务当前 active program baton 的历史计划。
+- `plans/`：保留用于追溯、但不再服务当前 active program baton 的历史计划；目录 README 记录历史计划不复活为 implementation checklist 的读法。
 - `tombstones/`：已退役词汇与路线叙事，保留可检索性，但不得回到当前公开身份。当前 tombstone：`tombstones/retired-route-narratives-2026-05-11.md`。
+- `opl_managed_runtime_three_layer_contract.md`：历史 OPL 托管运行时三层 owner 讨论。当前 runtime owner 与 production substrate 口径以核心五件套、`docs/runtime/`、`docs/active/rca-ideal-state-gap-plan.md` 和 runtime-program contracts 为准。
 - 后续 tombstone 应写清退役词汇、当前 truth owner，以及是否仍有机器可读 `human_doc:*` 链接要求 program brief 原位保留。
 
 仍被 runtime-program 机器合同引用的当前 baton brief 进入 `../active/`。

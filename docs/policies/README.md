@@ -1,5 +1,10 @@
 # Policies
 
+Owner: `RedCube AI`
+Purpose: `policy_index`
+State: `active_support`
+Machine boundary: 人读 policy 索引。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和 current owner docs。
+
 这里存放 `RedCube AI` 已经稳定、适合长期仓库跟踪的规则性文档。
 
 它们默认服务于内部技术同事与 Agent 的稳定操作面，不默认进入公开入口。

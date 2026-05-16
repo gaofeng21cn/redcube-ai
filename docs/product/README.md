@@ -1,5 +1,10 @@
 # Product 文档
 
+Owner: `RedCube AI`
+Purpose: `product_docs_index`
+State: `active_support`
+Machine boundary: 人读 product 索引。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和 product-entry manifest。
+
 `docs/product/` 保存面向人和 operator 的 product 材料：quickstart、product-entry handoff、profile setup 和 publishing coordination。
 
 本层说明人或 agent 如何把 RedCube AI 当作 product surface 使用；它不定义机器可读 runtime truth。

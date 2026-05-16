@@ -8,7 +8,7 @@ Machine boundary: 本文是人读治理入口。RCA 机器真相继续归 `contr
 
 ## 当前结论
 
-`docs/**` 是 RCA 的中文内部开发与维护参考，不再维护 docs 层双语镜像。稳定路径优先使用无语言后缀 `.md` 承载中文 canonical 内容。历史文件可以保留旧双语或旧路径描述作为 provenance，但 active/reference 索引必须指向当前无后缀路径。
+`docs/**` 是 RCA 的中文内部开发与维护参考，不再维护 docs 层双语镜像。稳定路径优先使用无语言后缀 `.md` 承载中文 canonical 内容。历史文件可以保留旧双语或旧路径描述作为 provenance，但 active/reference 索引必须指向当前无后缀路径。历史目录 README 也按中文 canonical 维护；不要保留指向自身的旧 English 镜像链接。
 
 RCA 采用 OPL-family canonical docs taxonomy：
 
@@ -43,6 +43,14 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 旧 `docs/program/` active baton 目录已物理退役。当前 baton brief 进入 `docs/active/`；已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`；upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:program_*` 继续作为语义化读者上下文 ID，不暗示物理目录名。
 
 `capabilities` 不作为 RCA docs active 目录复活。Capability truth 优先归 contracts、runtime manifest、CLI/MCP surface、delivery/source/runtime owner docs 或 domain action catalog。
+
+2026-05-16 docs 生命周期复核结论：
+
+- `docs/public/` 和 `docs/specs/` 继续保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。
+- `docs/references/opl_managed_runtime_three_layer_contract.md` 已迁入 `docs/history/opl_managed_runtime_three_layer_contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
+- `docs/references/lightweight_product_entry_and_opl_handoff.md`、`docs/references/domain_memory_descriptor_locator.md`、`docs/references/opl_family_contract_adoption.md`、`docs/references/rca_executor_routing_config.md` 仍是 support reference；它们解释 direct / hosted 边界、memory locator、family contract adoption 和 opt-in executor routing，不承担 active plan。
+- `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/` 和 `docs/history/tombstones/` 只保留 provenance / tombstone；其中的旧 Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。
+- 没有恢复 `docs/capabilities/`；新增 capability-like 内容应先进入 contracts、manifest、domain action catalog 或对应 owner doc。
 
 ## 内容级整合规则
 

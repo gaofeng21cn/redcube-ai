@@ -1,5 +1,10 @@
 # Source 文档
 
+Owner: `RedCube AI`
+Purpose: `source_docs_index`
+State: `active_support`
+Machine boundary: 人读 source 索引。机器真相继续归 workspace artifacts、runtime-family contracts、schemas、generated reports、owner receipts 和 source readiness runtime surfaces。
+
 `docs/source/` 保存人读 source lifecycle 材料：source readiness、source augmentation、deep research trigger/gate 行为、source truth consumption 和 external research executor expectations。
 
 本层只解释 source 职责。Canonical source truth 继续归 workspace artifacts、runtime-family contracts、schemas 和 generated reports。

@@ -1,8 +1,8 @@
 # OPL 托管运行时三层合同
 
-这份参考文档冻结 `OPL` 家族仓在托管运行时上的统一 owner 口径。
+生命周期说明：本文是历史 owner-boundary 讨论，已从 `docs/references/` 迁入 `docs/history/`。它只保留三层 owner 语境的 provenance，不再承担 current support reference、runtime target、OPL production substrate 或 RCA active plan 职责。当前 RCA runtime truth 以 `docs/runtime/`、核心五件套、`docs/active/rca-ideal-state-gap-plan.md` 和 runtime-program contracts 为准。
 
-生命周期说明：本文保留历史三层 owner 讨论的参考价值。当前系列口径已经更新为 provider-backed OPL runtime：OPL 是 stage-led、以 Agent executor 为最小执行单位的运行框架，Temporal 是 production online runtime 的必需 substrate，Hermes 只是 legacy/optional provider 或显式 proof lane；RCA 默认最小具体执行单元仍是 `Codex CLI`。
+这份历史文档曾冻结 `OPL` 家族仓在托管运行时上的统一 owner 口径。当前系列口径已经更新为 provider-backed OPL runtime：OPL 是 stage-led、以 Agent executor 为最小执行单位的运行框架，Temporal 是 production online runtime 的必需 substrate，Hermes 只是 legacy/optional provider 或显式 proof lane；RCA 默认最小具体执行单元仍是 `Codex CLI`。
 
 目标不是这轮就完成跨仓共享代码抽取，而是先把跨仓不能再漂移的 contract 写死。
 

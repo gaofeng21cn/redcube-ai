@@ -1,0 +1,18 @@
+# 历史计划
+
+Owner: `RedCube AI`
+Purpose: `historical_plan_index`
+State: `history`
+Machine boundary: 人读历史计划索引。机器真相继续归 contracts、source、CLI/MCP/API 行为、workspace artifacts、owner receipts 和当前 lifecycle owner docs。
+
+本目录只保留用于追溯、但不再服务当前 active baton 的历史计划。计划中的文件路径、测试名、旧 public docs wording、federated route、source-pack-federation 或 capabilities 口径只按当时设计语境阅读；当前 source / delivery / runtime truth 回到核心五件套、`docs/source/`、`docs/delivery/`、`docs/runtime/`、`docs/active/rca-ideal-state-gap-plan.md` 和 runtime-program contracts。
+
+## 当前文件
+
+- `2026-04-08-deep-research-source-readiness-pack-phase-1.md`：历史 Deep Research / Source Readiness Pack Phase 1 计划。它已被后续 source readiness、source augmentation、deep research trigger/gate 与 workspace quickstart hardening 吸收，不再作为当前 implementation checklist。
+
+## 维护规则
+
+- 无合同引用且不服务 current support 的旧计划进入本目录或 tombstone。
+- 本目录不得成为新的 active plan 落点。
+- 新增 source、delivery、runtime 或 product 计划前，先判断是否应进入 `docs/active/`、对应 owner doc、OPL 主仓，或继续作为 history/provenance。

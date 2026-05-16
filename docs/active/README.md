@@ -20,6 +20,8 @@ Machine boundary: 人读索引。机器真相继续归 runtime-program contracts
 
 旧 `gateway`、`frontdoor`、`federation`、repo-local Hermes、workbench 和 product frontdesk 词汇不得在本目录中重新获得 active truth。它们只能作为 provenance、tombstone 或合同引用上下文出现；已退役模块、接口、测试入口和文档入口默认 direct retirement，不保留兼容别名或 compatibility-only 聚合测试。
 
+`redcube_product_entry_mvp.md`、`managed_product_entry_hardening.md` 与 `opl_framework_hosted_product_entry.md` 的任务只限 contract-linked support。它们不再承接新的 completion plan；新增 active plan 必须先判断是否属于 `rca-ideal-state-gap-plan.md`、某个 owner doc、history/tombstone，或 OPL 主仓。
+
 ## 当前入口
 
 - [文档索引](../README.md)

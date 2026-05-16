@@ -1,5 +1,10 @@
 # 文档索引
 
+Owner: `RedCube AI`
+Purpose: `docs_entry_index`
+State: `active_support`
+Machine boundary: 人读 docs 入口。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和语义化 `human_doc:*` id。
+
 这个目录是 `RedCube AI` 的技术阅读层。
 当前公开阅读路径从 `RedCube AI Foundry Agent` 身份开始：它是 built on OPL Framework 的 OPL-compatible visual-deliverable package。OPL 是 stage-led 的智能体运行框架，可以把 RedCube 作为外部依赖托管，因此 OPL 路径在这里只作为内部托管集成路径记录：
 
@@ -85,6 +90,8 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:prog
 - `docs/source/`：source readiness 与 augmentation 材料
 - `docs/policies/`：稳定治理与运行规则
 - `docs/active/`：当前 baton 与 active closeout 记录
+- `docs/public/`：公开叙事薄索引；除非未来有真实公开材料，不承接旧 program/capability 正文
+- `docs/specs/`：当前技术规格薄索引；正文优先回到 contracts、runtime/delivery/source owner docs 或 machine surface
 - `docs/history/phase-2/`：已吸收 tranche brief 与 follow-on records
 - `docs/references/`：解释当前运行、目标状态或维护者实践的支持性技术参考，但不承担公开身份
 - `docs/history/`：归档 provenance、tombstone、repo-local migration 记录，以及不再服务当前 active program baton 的历史计划
@@ -93,6 +100,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:prog
 - [视觉模式记忆 Policy](./policies/visual_pattern_memory_policy.md)：固定视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 先按自然语言 memory 管理，不能替代 AI author/reviewer artifact、route contract、export gate 或 canonical artifact authority。
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md)：保留 future-facing 设计目标的参考文档，退出根层活跃表面
 - [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md)：source-plane 的 future target 继续留在同一 reference 层
+- [Historical OPL managed runtime three-layer contract](./history/opl_managed_runtime_three_layer_contract.md)：历史 owner-boundary provenance，当前 runtime 口径回到核心五件套、runtime docs、active gap plan 和 contracts
 
 ## 文档规则
 
