@@ -5,7 +5,7 @@ Purpose: `contract_linked_positioning_reference`
 State: `legacy_positioning_support`
 Machine boundary: 本文是人读历史定位参考。机器真相继续归 contracts、CLI/MCP 行为、product-entry manifest、runtime workspace、review/export gate、artifact locator 与 owner receipts。
 
-这份文档用于解释 `RedCube AI` 在历史 `Unified Harness Engineering Substrate` 口径中的位置与边界。它不属于默认公开入口，也不承担 active plan。
+这份文档用于解释 `RedCube AI` 在历史 `Unified Harness Engineering Substrate` 口径中的位置与边界。它已迁入 `docs/history/positioning/`，不属于默认公开入口、support reference 或 active plan；`human_doc:domain_harness_os_positioning` 只保留语义可检索性，不保留旧 reference 路径兼容承诺。
 
 当前公开第一身份是独立 visual-deliverable domain agent 与单一 `redcube-ai` app skill。本文的 `Domain Gateway` / `Domain Harness OS` 词汇只能按历史内部边界层与执行层语言理解，不能读成当前 public identity、generic framework/runtime owner、frontdoor、federation 或 workbench truth。
 

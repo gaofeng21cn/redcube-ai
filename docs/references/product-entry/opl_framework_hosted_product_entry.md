@@ -2,7 +2,7 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文是 contract-linked support brief，由早期 `OPL Gateway` handoff brief 迁移而来。唯一任务是解释 OPL Framework 托管路径如何进入同一 RCA service-safe domain entry。当前口径以 `OPL Framework` 的 stage-led、以 Agent executor 为最小执行单位的通用运行框架为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth、review/export verdict、canonical artifact 或 domain memory body。
+生命周期说明：本文是 contract-linked support brief，由早期 `OPL Gateway` handoff brief 迁移而来。唯一任务是解释 OPL Framework 托管路径如何进入同一 RCA service-safe domain entry。它由旧 `docs/program/` active baton 层迁入 reference support，不再承担新的 active plan。当前口径以 `OPL Framework` 的 stage-led、以 Agent executor 为最小执行单位的通用运行框架为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth、review/export verdict、canonical artifact 或 domain memory body。
 
 ## 一句话结论
 

@@ -2,7 +2,7 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文是 contract-linked support / absorbed hardening brief，唯一任务是解释 product-entry session continuity 与用户级 runtime-state 行为。它由旧 `docs/program/` active baton 层迁入 `docs/active/`；runtime-program 当前合同继续通过 `human_doc:program_managed_product_entry_hardening` 指向本文语义。它不定义新的公开 GUI、WebUI、generic managed runtime 或第二产品入口；后续生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](./rca-ideal-state-gap-plan.md)。
+生命周期说明：本文是 contract-linked support / absorbed hardening brief，唯一任务是解释 product-entry session continuity 与用户级 runtime-state 行为。它由旧 `docs/program/` active baton 层迁入 reference support；runtime-program 当前合同继续通过 `human_doc:program_managed_product_entry_hardening` 指向本文语义。它不定义新的公开 GUI、WebUI、generic managed runtime 或第二产品入口；后续生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](../../active/rca-ideal-state-gap-plan.md)。
 
 ## 一句话结论
 
