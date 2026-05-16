@@ -12,6 +12,21 @@
     "rca_generic_scheduler_owner": false,
     "rca_generic_daemon_owner": false,
     "rca_generic_lifecycle_owner": false,
+    "rca_generic_queue_owner": false,
+    "rca_generic_attempt_ledger_owner": false,
+    "rca_generic_runner_owner": false,
+    "rca_generic_workbench_owner": false,
+    "rca_thin_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
+    "projection_scope": "consumer_projection_and_visual_domain_authority_refs_only",
+    "opl_owned_generic_surfaces": [
+      "family_scheduler",
+      "daemon",
+      "generic_lifecycle",
+      "typed_queue",
+      "attempt_ledger",
+      "generic_runner",
+      "workbench_shell"
+    ],
     "managed_dag_scheduler_scope": "visual_deliverable_internal_dag_only",
     "rca_retained_authority": [
       "visual_truth",

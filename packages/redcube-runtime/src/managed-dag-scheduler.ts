@@ -20,6 +20,20 @@ interface ManagedDagLayer {
 interface ManagedDagPlan {
   scheduler_kind: 'managed_deliverable_dag';
   schema_version: 1;
+  domain_scope: 'visual_deliverable_internal_dag_only';
+  generic_scheduler_owner: false;
+  generic_daemon_owner: false;
+  generic_lifecycle_owner: false;
+  generic_queue_owner: false;
+  generic_attempt_ledger_owner: false;
+  generic_runner_owner: false;
+  generic_workbench_owner: false;
+  authority_boundary: {
+    owner: 'redcube_ai';
+    opl_family_scheduler_owner: 'opl';
+    managed_dag_scheduler_scope: 'visual_deliverable_internal_dag_only';
+    retained_authority: string[];
+  };
   parallel_safe: true;
   tasks: ManagedDagTask[];
   layers: ManagedDagLayer[];
@@ -187,6 +201,26 @@ export function planManagedDeliverableDag({
   return {
     scheduler_kind: 'managed_deliverable_dag',
     schema_version: 1,
+    domain_scope: 'visual_deliverable_internal_dag_only',
+    generic_scheduler_owner: false,
+    generic_daemon_owner: false,
+    generic_lifecycle_owner: false,
+    generic_queue_owner: false,
+    generic_attempt_ledger_owner: false,
+    generic_runner_owner: false,
+    generic_workbench_owner: false,
+    authority_boundary: {
+      owner: 'redcube_ai',
+      opl_family_scheduler_owner: 'opl',
+      managed_dag_scheduler_scope: 'visual_deliverable_internal_dag_only',
+      retained_authority: [
+        'visual_truth',
+        'review_export_verdict',
+        'artifact_authority',
+        'visual_memory_body',
+        'owner_receipt',
+      ],
+    },
     parallel_safe: true,
     tasks,
     layers,

@@ -40,13 +40,46 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_scheduler_owner, false);
     assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_daemon_owner, false);
     assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_lifecycle_owner, false);
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_queue_owner, false);
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_attempt_ledger_owner, false);
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_runner_owner, false);
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_workbench_owner, false);
+    assert.equal(
+      sidecar.runtime_framework.family_scheduler_replacement.projection_scope,
+      'consumer_projection_and_visual_domain_authority_refs_only',
+    );
+    assert.deepEqual(sidecar.runtime_framework.family_scheduler_replacement.opl_owned_generic_surfaces, [
+      'family_scheduler',
+      'daemon',
+      'generic_lifecycle',
+      'typed_queue',
+      'attempt_ledger',
+      'generic_runner',
+      'workbench_shell',
+    ]);
     assert.equal(
       sidecar.runtime_framework.family_scheduler_replacement.managed_dag_scheduler_scope,
       'visual_deliverable_internal_dag_only',
     );
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.generic_surfaces_owner, 'opl');
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_scheduler_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_daemon_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_lifecycle_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_queue_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_attempt_ledger_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_runner_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_workbench_owner, false);
     assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
+    assert.equal(sidecar.owner_boundary.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_scheduler, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_daemon, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_lifecycle, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_queue, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_attempt_ledger, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_runner, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_generic_workbench, false);
     assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);
     assert.equal(sidecar.owner_boundary.rca_owns_review_publication_projection, true);
     assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');

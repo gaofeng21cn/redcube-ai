@@ -138,6 +138,21 @@ test('RCA consumes OPL family scheduler replacement without owning generic sched
     assert.equal(surface.rca_generic_scheduler_owner, false);
     assert.equal(surface.rca_generic_daemon_owner, false);
     assert.equal(surface.rca_generic_lifecycle_owner, false);
+    assert.equal(surface.rca_generic_queue_owner, false);
+    assert.equal(surface.rca_generic_attempt_ledger_owner, false);
+    assert.equal(surface.rca_generic_runner_owner, false);
+    assert.equal(surface.rca_generic_workbench_owner, false);
+    assert.equal(surface.rca_thin_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(surface.projection_scope, 'consumer_projection_and_visual_domain_authority_refs_only');
+    assert.deepEqual(surface.opl_owned_generic_surfaces, [
+      'family_scheduler',
+      'daemon',
+      'generic_lifecycle',
+      'typed_queue',
+      'attempt_ledger',
+      'generic_runner',
+      'workbench_shell',
+    ]);
     assert.equal(surface.managed_dag_scheduler_scope, 'visual_deliverable_internal_dag_only');
     assert.deepEqual(surface.rca_retained_authority, [
       'visual_truth',
