@@ -60,24 +60,26 @@ RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、v
 | Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
 | Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) |
 | Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) |
-| Active | 当前执行、当前计划、当前差距、合同引用 baton 与 closeout evidence | [Active](./active/README.md) |
+| Active | 当前执行、当前计划、当前差距与 closeout evidence | [Active](./active/README.md) |
 | Specs | 当前仍有效的技术规格索引 | [Specs](./specs/README.md) |
 | References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
 | History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.md) |
 
-这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；`docs/active` 记录 active 或 contract-linked baton；references 与 history 分别保留支撑上下文和历史 provenance。
+这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；`docs/active` 记录仍在推进的 active plan；references 与 history 分别保留支撑上下文和历史 provenance。
 RCA 采用 OPL-family canonical docs taxonomy：
 `active/public/product/runtime/delivery/source/policies/specs/references/history`。
-旧 `docs/program/` active baton 目录已物理退役：当前 baton brief 进入
-`docs/active/`，已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`，
-upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:program_*`
-语义 ID 继续作为稳定读者上下文 ID，不代表物理路径承诺。
+旧 `docs/program/` active baton 目录已物理退役：当前计划进入
+`docs/active/`，已吸收 product-entry support brief 进入 `docs/references/product-entry/`，
+已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`，
+upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材料进入
+`docs/history/positioning/`。`human_doc:*` 语义 ID 继续作为稳定读者上下文 ID，
+不代表物理路径承诺。
 
 ## 维护者治理入口
 
 - 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
-- 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前 baton 在 `docs/active/`，absorbed / proof 材料在 `docs/history/`。
+- 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前计划在 `docs/active/`，support brief 在 `docs/references/`，absorbed / proof / historical positioning 材料在 `docs/history/`。
 - RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 `docs/active/`，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
 - `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
 - 仓库目录治理现在通过 `scripts/repo-hygiene.sh` 在 `scripts/verify.sh` 各 lane 和 grouped test 执行前运行。`scripts/run-test-group.ts` 同时给 Python native helper 子进程注入仓外 cache 环境。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json` 这类生成物 / 本地状态；`.agents/` 下唯一允许跟踪的插件入口是 `.agents/plugins/marketplace.json`。
@@ -89,10 +91,11 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:prog
 - `docs/delivery/`：deliverable family、route、proof、export 与示例材料
 - `docs/source/`：source readiness 与 augmentation 材料
 - `docs/policies/`：稳定治理与运行规则
-- `docs/active/`：当前 baton 与 active closeout 记录
+- `docs/active/`：当前计划、当前差距与 active closeout 记录
 - `docs/public/`：公开叙事薄索引；除非未来有真实公开材料，不承接旧 program/capability 正文
 - `docs/specs/`：当前技术规格薄索引；正文优先回到 contracts、runtime/delivery/source owner docs 或 machine surface
 - `docs/history/phase-2/`：已吸收 tranche brief 与 follow-on records
+- `docs/references/product-entry/`：已落地 product-entry 合同面的支撑说明
 - `docs/references/`：解释当前运行、目标状态或维护者实践的支持性技术参考，但不承担公开身份
 - `docs/history/`：归档 provenance、tombstone、repo-local migration 记录，以及不再服务当前 active program baton 的历史计划
 - 本地 AI / Superpowers 过程草稿继续在被忽略的 `docs/superpowers/` 下维护，不进入 repo-tracked history。

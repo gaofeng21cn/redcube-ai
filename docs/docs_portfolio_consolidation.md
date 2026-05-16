@@ -27,7 +27,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | 目录 | 长期职责 | 当前 RCA 承载 |
 | --- | --- | --- |
 | `docs/` root | docs 入口、核心五件套、docs governance | `README.md`、核心五件套、本文件。 |
-| `docs/active/` | 当前执行、当前计划、当前差距、contract-linked active baton、closeout evidence | product entry / managed entry / OPL-hosted entry 等 current baton。 |
+| `docs/active/` | 当前执行、当前计划、当前差距、active baton、closeout evidence | 当前只承接 `rca-ideal-state-gap-plan.md` 这类仍在推进的完成计划。 |
 | `docs/public/` | public narrative index | 当前较薄；除非未来有真正公开材料，否则保持薄索引。 |
 | `docs/product/` | quickstart、profile、public publish、product/operator handoff | 真实承载。 |
 | `docs/runtime/` | runtime topology、executor/backend、service-safe entry、watch/projection | 真实承载但较薄，核心是 runtime architecture。 |
@@ -35,12 +35,12 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | `docs/source/` | source readiness、augmentation、deep research trigger/gate | 真实承载。 |
 | `docs/policies/` | AI-first、visual memory、runtime operating model、deliverable contract model 等稳定规则 | 真实承载。 |
 | `docs/specs/` | 当前仍有效的技术规格索引 | 当前较薄；不扩成杂物层。 |
-| `docs/references/` | target state、OPL handoff、memory locator、治理 checklist、support references | 真实承载；不承担 active owner。 |
-| `docs/history/` | Hermes proof/provenance、absorbed tranche、历史计划、tombstone | 真实承载。 |
+| `docs/references/` | target state、OPL handoff、memory locator、product-entry support、治理 checklist、support references | 真实承载；不承担 active owner。 |
+| `docs/history/` | Hermes proof/provenance、absorbed tranche、历史定位、历史计划、tombstone | 真实承载。 |
 
 ## 非 canonical 目录
 
-旧 `docs/program/` active baton 目录已物理退役。当前 baton brief 进入 `docs/active/`；已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`；upstream Hermes proof/provenance 进入 `docs/history/hermes/`。`human_doc:program_*` 继续作为语义化读者上下文 ID，不暗示物理目录名。
+旧 `docs/program/` active baton 目录已物理退役。当前计划和差距进入 `docs/active/`；已吸收 product-entry support brief 进入 `docs/references/product-entry/`；已吸收 Phase 2 tranche 进入 `docs/history/phase-2/`；upstream Hermes proof/provenance 进入 `docs/history/hermes/`；历史定位材料进入 `docs/history/positioning/`。`human_doc:program_*` 与 `human_doc:domain_harness_os_positioning` 继续作为语义化读者上下文 ID，不暗示物理目录名。
 
 `capabilities` 不作为 RCA docs active 目录复活。Capability truth 优先归 contracts、runtime manifest、CLI/MCP surface、delivery/source/runtime owner docs 或 domain action catalog。
 
@@ -48,14 +48,16 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 
 - `docs/public/` 和 `docs/specs/` 继续保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。
 - `docs/references/opl_managed_runtime_three_layer_contract.md` 已迁入 `docs/history/opl_managed_runtime_three_layer_contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
+- `docs/references/product-entry/` 承接已落地的 `redcube_product_entry_mvp`、`managed_product_entry_hardening` 与 `opl_framework_hosted_product_entry` support brief；它们解释 contract surface，不承担 active plan。
 - `docs/references/lightweight_product_entry_and_opl_handoff.md`、`docs/references/domain_memory_descriptor_locator.md`、`docs/references/opl_family_contract_adoption.md`、`docs/references/rca_executor_routing_config.md` 仍是 support reference；它们解释 direct / hosted 边界、memory locator、family contract adoption 和 opt-in executor routing，不承担 active plan。
+- `docs/references/positioning/domain-harness-os-positioning.md` 已迁入 `docs/history/positioning/domain-harness-os-positioning.md`；该语义 ID 只作为 historical positioning / internal boundary vocabulary 保留。
 - `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/` 和 `docs/history/tombstones/` 只保留 provenance / tombstone；其中的旧 Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。
 - 没有恢复 `docs/capabilities/`；新增 capability-like 内容应先进入 contracts、manifest、domain action catalog 或对应 owner doc。
 
 ## 内容级整合规则
 
 1. 当前 visual truth、route truth、review/export verdict、artifact authority 合入核心五件套、runtime/delivery/source owner docs 或 machine surfaces。
-2. 当前 baton 和 contract-linked active brief 留在 `docs/active/`。
+2. 当前 baton 和 active plan 留在 `docs/active/`；已完成且只解释合同面的 support brief 进入 `docs/references/`。
 3. Product/operator/profile/release 支撑进入 `docs/product/`。
 4. Runtime topology、service-safe entry、watch/projection 进入 `docs/runtime/`。
 5. Deliverable route/proof/export/manual validation 进入 `docs/delivery/`。

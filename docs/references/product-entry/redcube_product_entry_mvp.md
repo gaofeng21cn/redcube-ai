@@ -2,7 +2,7 @@
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文是 contract-linked support brief，唯一任务是解释 RCA direct product-entry service surface 的已落地合同和调用面。它由旧 `docs/program/` active baton 层迁入 `docs/active/`；runtime-program 当前合同继续通过 `human_doc:program_redcube_product_entry_mvp` 指向本文语义。后续完善顺序、OPL 上收边界和生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](./rca-ideal-state-gap-plan.md)。当前公开身份仍以 visual-deliverable domain agent、单一 `redcube-ai` app skill、CLI/MCP 和 `invokeProductEntry` 为准。
+生命周期说明：本文是 contract-linked support brief，唯一任务是解释 RCA direct product-entry service surface 的已落地合同和调用面。它由旧 `docs/program/` active baton 层迁入 reference support；runtime-program 当前合同继续通过 `human_doc:program_redcube_product_entry_mvp` 指向本文语义。后续完善顺序、OPL 上收边界和生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](../../active/rca-ideal-state-gap-plan.md)。当前公开身份仍以 visual-deliverable domain agent、单一 `redcube-ai` app skill、CLI/MCP 和 `invokeProductEntry` 为准。
 
 ## 一句话结论
 
