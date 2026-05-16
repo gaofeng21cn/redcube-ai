@@ -325,6 +325,23 @@ test('RCA privatized functional module audit is machine readable for OPL without
     assert.equal(surface.status, 'machine_audit_projection_landed');
     assert.equal(surface.read_only, true);
     assert.equal(surface.refs_only, true);
+    assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
+    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
+    assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /active callers/);
+    assert.deepEqual(surface.rca_visual_authority_allowlist, [
+      'visual_stage_semantics',
+      'source_readiness_verdict',
+      'visual_memory_body',
+      'review_export_verdict',
+      'canonical_artifact_authority',
+      'native_helper_implementation',
+      'route_level_executor_policy',
+      'typed_blocker',
+      'owner_receipt_refs',
+    ]);
+    for (const value of Object.values(surface.forbidden_generic_owner_flags)) {
+      assert.equal(value, false);
+    }
     assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
     assert.deepEqual(surface.retire_tombstone_candidates, []);
     assert.equal(surface.authority_boundary.opl_can_index_audit_projection, true);
@@ -348,6 +365,25 @@ test('RCA privatized functional module audit is machine readable for OPL without
       assert.equal(typeof entry.migrationAction, 'string', entry.module_id);
       assert.equal(typeof entry.retentionReason, 'string', entry.module_id);
       assert.equal(typeof entry.cannotAbsorbReason, 'string', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.expected_mode, 'opl_replacement_expectation', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
+      assert.equal(typeof entry.opl_replacement_expectation.expectation_ref, 'string', entry.module_id);
+      assert.equal(typeof entry.opl_replacement_expectation.replacement_surface, 'string', entry.module_id);
+      assert.equal(typeof entry.rca_projection_mode, 'string', entry.module_id);
+      assert.ok(Array.isArray(entry.rca_exports_only) && entry.rca_exports_only.length > 0, entry.module_id);
+      assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
+      assert.match(entry.physical_deletion_guard.reason, /active callers|retained RCA visual authority refs/, entry.module_id);
+      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+        'opl_replacement_surface_live',
+        'active_callers_migrated',
+        'domain_authority_refs_preserved',
+        'no_regression_proof_recorded',
+      ], entry.module_id);
+      for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
+        assert.equal(value, false, entry.module_id);
+      }
       assert.equal(entry.writes_visual_truth, false, entry.module_id);
       assert.equal(entry.writes_artifact_blob, false, entry.module_id);
       assert.equal(entry.writes_memory_body, false, entry.module_id);
@@ -361,8 +397,19 @@ test('RCA privatized functional module audit is machine readable for OPL without
   assert.equal(byId.managed_dag_scheduler.rca_scope, 'visual_deliverable_internal_dag_only');
   assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
   assert.equal(byId.managed_run_json_store.activeCallerStatus, 'active_private_json_store');
+  assert.equal(
+    byId.managed_run_json_store.opl_replacement_expectation.replacement_surface,
+    'opl_attempt_ledger_provider_receipts',
+  );
+  assert.equal(byId.managed_run_json_store.rca_projection_mode, 'managed_run_locator_and_visual_summary_refs_only');
+  assert.deepEqual(byId.managed_run_json_store.rca_exports_only, [
+    'managed_run_locator_refs',
+    'visual_run_projection_refs',
+    'provider_receipt_correlation_refs',
+  ]);
   assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
+  assert.equal(byId.workspace_source_intake.rca_exports_only.includes('source_readiness_verdict_ref'), true);
   assert.equal(byId.memory_writeback_receipt_transport.rca_scope, 'visual_memory_accept_reject_and_receipt_refs');
   assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
@@ -370,6 +417,10 @@ test('RCA privatized functional module audit is machine readable for OPL without
   assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'product_sidecar_status_action_metadata_projection');
   assert.equal(byId.codex_executor_adapter.opl_generic_primitive, 'agent_executor_adapter');
   assert.equal(byId.observability_stability_read_model.rca_owned_visual_domain_authority, false);
+  assert.equal(
+    byId.observability_stability_read_model.opl_replacement_expectation.replacement_surface,
+    'opl_stability_read_model_and_observability_export',
+  );
 });
 
 test('RCA consumes OPL stability read-model surfaces as refs-only projections', () => {

@@ -301,3 +301,61 @@ test('RCA consumes OPL stability read-model surfaces without implementing observ
     true,
   );
 });
+
+test('RCA functional audit exposes OPL replacement expectations without safe tombstone candidates', () => {
+  const currentProgram = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/current-program.json'),
+    'utf-8',
+  ));
+  const adoption = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
+    'utf-8',
+  ));
+
+  const surfaces = [
+    currentProgram.product_release_metadata.privatized_functional_module_audit,
+    currentProgram.current_state.privatized_functional_module_audit,
+    currentProgram.current_state.active_baton.scope.privatized_functional_module_audit,
+    adoption.privatized_functional_module_audit,
+  ];
+  const expectedReplacementSurfaces = {
+    managed_run_json_store: 'opl_attempt_ledger_provider_receipts',
+    product_entry_session_store: 'opl_app_session_shell_and_workbench',
+    artifact_export_lifecycle: 'opl_artifact_lifecycle_gallery_handoff_shell',
+    review_repair_transport: 'opl_review_repair_transport',
+    native_helper_envelope: 'opl_native_helper_execution_envelope',
+    operator_projection_shell: 'opl_app_operator_workbench_shell',
+    generic_cli_mcp_wrappers: 'opl_standard_domain_agent_generated_cli_mcp_wrappers',
+    codex_executor_adapter: 'opl_agent_executor_adapter',
+    observability_stability_read_model: 'opl_stability_read_model_and_observability_export',
+  };
+
+  for (const surface of surfaces) {
+    assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
+    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
+    assert.equal(surface.retire_tombstone_candidates.length, 0);
+    assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /deletion waits for OPL replacement adoption/);
+    for (const value of Object.values(surface.forbidden_generic_owner_flags)) {
+      assert.equal(value, false);
+    }
+
+    for (const entry of surface.modules) {
+      assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
+      assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
+      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+        'opl_replacement_surface_live',
+        'active_callers_migrated',
+        'domain_authority_refs_preserved',
+        'no_regression_proof_recorded',
+      ], entry.module_id);
+      assert.equal(entry.declares_production_soak_complete, false, entry.module_id);
+    }
+
+    const byId = Object.fromEntries(surface.modules.map((entry) => [entry.module_id, entry]));
+    for (const [moduleId, replacementSurface] of Object.entries(expectedReplacementSurfaces)) {
+      assert.equal(byId[moduleId].opl_replacement_expectation.replacement_surface, replacementSurface);
+    }
+  }
+});

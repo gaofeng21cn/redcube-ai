@@ -280,6 +280,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       ],
     );
     assert.equal(sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.length, 0);
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.replacement_expectation_mode,
+      'opl_replacement_expectation_or_refs_only_projection',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.current_safe_tombstone_candidate_count,
+      0,
+    );
+    assert.match(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.no_safe_tombstone_candidate_reason,
+      /active callers/,
+    );
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('native_helper_implementation'));
     assert.equal(
@@ -296,13 +308,62 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       ],
     );
     assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').opl_replacement_expectation.replacement_surface,
+      'opl_attempt_ledger_provider_receipts',
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').rca_exports_only,
+      [
+        'managed_run_locator_refs',
+        'visual_run_projection_refs',
+        'provider_receipt_correlation_refs',
+      ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').opl_replacement_expectation.replacement_surface,
+      'opl_app_session_shell_and_workbench',
+    );
+    assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').cannotAbsorbReason,
       'OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').opl_replacement_expectation.replacement_surface,
+      'opl_artifact_lifecycle_gallery_handoff_shell',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'review_repair_transport').opl_replacement_expectation.replacement_surface,
+      'opl_review_repair_transport',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'native_helper_envelope').opl_replacement_expectation.replacement_surface,
+      'opl_native_helper_execution_envelope',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'operator_projection_shell').rca_projection_mode,
+      'operator_evidence_readiness_refs_only',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'generic_cli_mcp_wrappers').opl_replacement_expectation.replacement_surface,
+      'opl_standard_domain_agent_generated_cli_mcp_wrappers',
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'observability_stability_read_model').rca_owned_visual_domain_authority,
       false,
     );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'observability_stability_read_model').opl_replacement_expectation.replacement_surface,
+      'opl_stability_read_model_and_observability_export',
+    );
+    for (const entry of sidecar.mapped_surfaces.privatized_functional_module_audit.modules) {
+      assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
+      assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
+      assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
+      assert.ok(Array.isArray(entry.rca_exports_only) && entry.rca_exports_only.length > 0, entry.module_id);
+      for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
+        assert.equal(value, false, entry.module_id);
+      }
+    }
     assert.equal(sidecar.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
     assert.equal(sidecar.source_manifest_refs.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');

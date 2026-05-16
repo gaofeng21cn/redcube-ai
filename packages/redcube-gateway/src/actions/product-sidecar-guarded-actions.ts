@@ -1,5 +1,11 @@
 // @ts-nocheck
 
+import {
+  FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS,
+  RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS,
+  buildFunctionalModulePhysicalDeletionGuard,
+} from './product-sidecar-parts/privatized-functional-module-audit.js';
+
 export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
   {
     action: 'runtime_watch',
@@ -561,31 +567,69 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'rca_owned_visual_domain_authority',
       'retire_tombstone',
     ],
-    modules: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) => ({
-      ...entry,
-      opl_owned_generic_primitive_consumer: true,
-      rca_owned_visual_domain_authority: [
-        'managed_dag_scheduler',
-        'attempt_state_machine_runner',
-        'workspace_source_intake',
-        'memory_writeback_receipt_transport',
-        'artifact_export_lifecycle',
-        'review_repair_transport',
-        'native_helper_envelope',
-        'generic_cli_mcp_wrappers',
-        'codex_executor_adapter',
-      ].includes(entry.module_id),
-      opl_absorb_candidate: entry.oplAbsorbCandidate === true,
-      rca_retains: entry.rcaRetains || [],
-      retire_tombstone: false,
-      writes_visual_truth: false,
-      writes_artifact_blob: false,
-      writes_memory_body: false,
-      declares_visual_ready: false,
-      declares_exportable: false,
-      declares_handoffable: false,
-      declares_production_soak_complete: false,
-    })),
+    replacement_expectation_mode: 'opl_replacement_expectation_or_refs_only_projection',
+    physical_deletion_guard: {
+      current_safe_tombstone_candidate_count: 0,
+      no_safe_tombstone_candidate_reason: 'Audited modules still have active callers or retained RCA visual authority refs; deletion waits for OPL replacement adoption, caller migration, no-regression proof, and preserved domain authority refs.',
+      required_before_physical_delete: [
+        'opl_replacement_surface_live',
+        'active_callers_migrated',
+        'domain_authority_refs_preserved',
+        'no_regression_proof_recorded',
+      ],
+    },
+    forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+    rca_visual_authority_allowlist: [
+      'visual_stage_semantics',
+      'source_readiness_verdict',
+      'visual_memory_body',
+      'review_export_verdict',
+      'canonical_artifact_authority',
+      'native_helper_implementation',
+      'route_level_executor_policy',
+      'typed_blocker',
+      'owner_receipt_refs',
+    ],
+    modules: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) => {
+      const replacementGuard = RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS[entry.module_id] || {};
+      return {
+        ...entry,
+        opl_owned_generic_primitive_consumer: true,
+        rca_owned_visual_domain_authority: [
+          'managed_dag_scheduler',
+          'attempt_state_machine_runner',
+          'workspace_source_intake',
+          'memory_writeback_receipt_transport',
+          'artifact_export_lifecycle',
+          'review_repair_transport',
+          'native_helper_envelope',
+          'generic_cli_mcp_wrappers',
+          'codex_executor_adapter',
+        ].includes(entry.module_id),
+        opl_absorb_candidate: entry.oplAbsorbCandidate === true,
+        opl_replacement_expectation: {
+          owner: 'opl',
+          expectation_ref: replacementGuard.expectation_ref || '/opl_generic_primitive_consumption',
+          replacement_surface: replacementGuard.opl_replacement_surface || entry.opl_generic_primitive,
+          expected_mode: 'opl_replacement_expectation',
+          rca_consumes_as: 'consumer_projection_only',
+          rca_owns_replacement_runtime: false,
+        },
+        rca_projection_mode: replacementGuard.rca_projection_mode || 'refs_only_projection',
+        rca_exports_only: replacementGuard.rca_exports_only || [],
+        forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+        physical_deletion_guard: buildFunctionalModulePhysicalDeletionGuard(entry),
+        rca_retains: entry.rcaRetains || [],
+        retire_tombstone: false,
+        writes_visual_truth: false,
+        writes_artifact_blob: false,
+        writes_memory_body: false,
+        declares_visual_ready: false,
+        declares_exportable: false,
+        declares_handoffable: false,
+        declares_production_soak_complete: false,
+      };
+    }),
     opl_owned_generic_primitives: [
       ...new Set([
         ...(familySchedulerReplacement.opl_owned_generic_surfaces || []),

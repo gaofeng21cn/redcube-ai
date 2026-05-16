@@ -478,6 +478,38 @@
         "rca_owned_visual_domain_authority",
         "retire_tombstone"
       ],
+      "replacement_expectation_mode": "opl_replacement_expectation_or_refs_only_projection",
+      "physical_deletion_guard": {
+        "current_safe_tombstone_candidate_count": 0,
+        "no_safe_tombstone_candidate_reason": "Audited modules still have active callers or retained RCA visual authority refs; deletion waits for OPL replacement adoption, caller migration, no-regression proof, and preserved domain authority refs.",
+        "required_before_physical_delete": [
+          "opl_replacement_surface_live",
+          "active_callers_migrated",
+          "domain_authority_refs_preserved",
+          "no_regression_proof_recorded"
+        ]
+      },
+      "forbidden_generic_owner_flags": {
+        "rca_owns_generic_runtime": false,
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_session_shell": false,
+        "rca_owns_generic_workbench": false,
+        "rca_owns_native_helper_generic_envelope": false,
+        "rca_owns_generic_cli_mcp_wrapper_generator": false,
+        "rca_owns_generic_executor_adapter": false,
+        "rca_owns_observability_exporter": false
+      },
+      "rca_visual_authority_allowlist": [
+        "visual_stage_semantics",
+        "source_readiness_verdict",
+        "visual_memory_body",
+        "review_export_verdict",
+        "canonical_artifact_authority",
+        "native_helper_implementation",
+        "route_level_executor_policy",
+        "typed_blocker",
+        "owner_receipt_refs"
+      ],
       "modules": [
         {
           "module_id": "managed_dag_scheduler",
@@ -511,6 +543,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/family_scheduler_replacement",
+            "replacement_surface": "opl_family_scheduler",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "visual_stage_dag_refs_only",
+          "rca_exports_only": [
+            "stage_dag_ref",
+            "route_policy_refs",
+            "visual_stage_order_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "managed_dag_scheduler still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_deliverable_internal_dag",
             "route_policy_refs",
@@ -560,6 +626,41 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
+            "replacement_surface": "opl_generic_transition_runner",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "transition_spec_and_guard_result_refs_only",
+          "rca_exports_only": [
+            "visual_transition_spec_ref",
+            "guard_result_refs",
+            "owner_receipt_refs",
+            "typed_blocker_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "attempt_state_machine_runner still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_transition_spec",
             "visual_guard_evaluator",
@@ -607,6 +708,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
+            "replacement_surface": "opl_attempt_ledger_provider_receipts",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "managed_run_locator_and_visual_summary_refs_only",
+          "rca_exports_only": [
+            "managed_run_locator_refs",
+            "visual_run_projection_refs",
+            "provider_receipt_correlation_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "managed_run_json_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "managed_run_locator_refs",
             "visual_run_projection_refs"
@@ -652,6 +787,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption",
+            "replacement_surface": "opl_app_session_shell_and_workbench",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
+          "rca_exports_only": [
+            "entry_session_id",
+            "topic_deliverable_run_locator_refs",
+            "latest_visual_run_ref"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "product_entry_session_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "entry_session_domain_refs",
             "deliverable_locator_refs",
@@ -699,6 +868,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_substrate_adapter_export",
+            "replacement_surface": "opl_workspace_source_intake_shell",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
+          "rca_exports_only": [
+            "source_locator_refs",
+            "source_readiness_verdict_ref",
+            "communication_strategy_input_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "workspace_source_intake still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "source_readiness_verdict",
             "communication_strategy_inputs",
@@ -745,6 +948,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
+            "replacement_surface": "opl_memory_locator_writeback_transport",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "memory_receipt_locator_refs_only",
+          "rca_exports_only": [
+            "memory_locator_refs",
+            "writeback_receipt_refs",
+            "accept_reject_receipt_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "memory_writeback_receipt_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_memory_body",
             "accept_reject_authority",
@@ -792,6 +1029,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
+            "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
+          "rca_exports_only": [
+            "artifact_locator_refs",
+            "export_verdict_refs",
+            "lifecycle_receipt_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "artifact_export_lifecycle still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "canonical_artifact_authority",
             "export_verdict",
@@ -839,6 +1110,41 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
+            "replacement_surface": "opl_review_repair_transport",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
+          "rca_exports_only": [
+            "review_state_refs",
+            "blocked_item_refs",
+            "repair_hint_refs",
+            "export_verdict_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "review_repair_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_review_verdict",
             "repair_decision",
@@ -886,6 +1192,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
+            "replacement_surface": "opl_native_helper_execution_envelope",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
+          "rca_exports_only": [
+            "helper_catalog_refs",
+            "package_module_refs",
+            "helper_proof_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "native_helper_envelope still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "python_native_helper_implementation",
             "ppt_image_export_mutation_logic",
@@ -933,6 +1273,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/operator_evidence_readiness_projection",
+            "replacement_surface": "opl_app_operator_workbench_shell",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "operator_evidence_readiness_refs_only",
+          "rca_exports_only": [
+            "evidence_gap_refs",
+            "typed_blocker_refs",
+            "safe_repair_hint_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "operator_projection_shell still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "operator_evidence_refs",
             "domain_gap_semantics",
@@ -981,6 +1355,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/family_action_catalog",
+            "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "canonical_action_metadata_refs_only",
+          "rca_exports_only": [
+            "family_action_catalog_refs",
+            "guarded_action_refs",
+            "domain_handler_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "generic_cli_mcp_wrappers still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "rca_action_metadata",
             "domain_action_handlers",
@@ -1028,6 +1436,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/domain_entry_contract/executor",
+            "replacement_surface": "opl_agent_executor_adapter",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "route_level_executor_policy_refs_only",
+          "rca_exports_only": [
+            "executor_requirement_refs",
+            "executor_receipt_refs",
+            "route_policy_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "codex_executor_adapter still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "default_codex_executor_policy",
             "route_executor_requirements",
@@ -1074,6 +1516,41 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_stability_read_model_consumption",
+            "replacement_surface": "opl_stability_read_model_and_observability_export",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "observability_refs_only",
+          "rca_exports_only": [
+            "owner_receipt_refs",
+            "typed_blocker_refs",
+            "no_regression_evidence_refs",
+            "resource_pressure_signal_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "observability_stability_read_model still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "domain_blocker_meaning",
             "safe_repair_hint_refs",
@@ -2707,6 +3184,38 @@
             "rca_owned_visual_domain_authority",
             "retire_tombstone"
           ],
+          "replacement_expectation_mode": "opl_replacement_expectation_or_refs_only_projection",
+          "physical_deletion_guard": {
+            "current_safe_tombstone_candidate_count": 0,
+            "no_safe_tombstone_candidate_reason": "Audited modules still have active callers or retained RCA visual authority refs; deletion waits for OPL replacement adoption, caller migration, no-regression proof, and preserved domain authority refs.",
+            "required_before_physical_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "rca_visual_authority_allowlist": [
+            "visual_stage_semantics",
+            "source_readiness_verdict",
+            "visual_memory_body",
+            "review_export_verdict",
+            "canonical_artifact_authority",
+            "native_helper_implementation",
+            "route_level_executor_policy",
+            "typed_blocker",
+            "owner_receipt_refs"
+          ],
           "modules": [
             {
               "module_id": "managed_dag_scheduler",
@@ -2740,6 +3249,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/family_scheduler_replacement",
+                "replacement_surface": "opl_family_scheduler",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "visual_stage_dag_refs_only",
+              "rca_exports_only": [
+                "stage_dag_ref",
+                "route_policy_refs",
+                "visual_stage_order_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "managed_dag_scheduler still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "visual_deliverable_internal_dag",
                 "route_policy_refs",
@@ -2789,6 +3332,41 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
+                "replacement_surface": "opl_generic_transition_runner",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "transition_spec_and_guard_result_refs_only",
+              "rca_exports_only": [
+                "visual_transition_spec_ref",
+                "guard_result_refs",
+                "owner_receipt_refs",
+                "typed_blocker_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "attempt_state_machine_runner still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "visual_transition_spec",
                 "visual_guard_evaluator",
@@ -2836,6 +3414,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": false,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
+                "replacement_surface": "opl_attempt_ledger_provider_receipts",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "managed_run_locator_and_visual_summary_refs_only",
+              "rca_exports_only": [
+                "managed_run_locator_refs",
+                "visual_run_projection_refs",
+                "provider_receipt_correlation_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "managed_run_json_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "managed_run_locator_refs",
                 "visual_run_projection_refs"
@@ -2881,6 +3493,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": false,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption",
+                "replacement_surface": "opl_app_session_shell_and_workbench",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
+              "rca_exports_only": [
+                "entry_session_id",
+                "topic_deliverable_run_locator_refs",
+                "latest_visual_run_ref"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "product_entry_session_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "entry_session_domain_refs",
                 "deliverable_locator_refs",
@@ -2928,6 +3574,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_substrate_adapter_export",
+                "replacement_surface": "opl_workspace_source_intake_shell",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
+              "rca_exports_only": [
+                "source_locator_refs",
+                "source_readiness_verdict_ref",
+                "communication_strategy_input_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "workspace_source_intake still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "source_readiness_verdict",
                 "communication_strategy_inputs",
@@ -2974,6 +3654,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
+                "replacement_surface": "opl_memory_locator_writeback_transport",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "memory_receipt_locator_refs_only",
+              "rca_exports_only": [
+                "memory_locator_refs",
+                "writeback_receipt_refs",
+                "accept_reject_receipt_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "memory_writeback_receipt_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "visual_memory_body",
                 "accept_reject_authority",
@@ -3021,6 +3735,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
+                "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
+              "rca_exports_only": [
+                "artifact_locator_refs",
+                "export_verdict_refs",
+                "lifecycle_receipt_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "artifact_export_lifecycle still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "canonical_artifact_authority",
                 "export_verdict",
@@ -3068,6 +3816,41 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
+                "replacement_surface": "opl_review_repair_transport",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
+              "rca_exports_only": [
+                "review_state_refs",
+                "blocked_item_refs",
+                "repair_hint_refs",
+                "export_verdict_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "review_repair_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "visual_review_verdict",
                 "repair_decision",
@@ -3115,6 +3898,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
+                "replacement_surface": "opl_native_helper_execution_envelope",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
+              "rca_exports_only": [
+                "helper_catalog_refs",
+                "package_module_refs",
+                "helper_proof_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "native_helper_envelope still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "python_native_helper_implementation",
                 "ppt_image_export_mutation_logic",
@@ -3162,6 +3979,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": false,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/operator_evidence_readiness_projection",
+                "replacement_surface": "opl_app_operator_workbench_shell",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "operator_evidence_readiness_refs_only",
+              "rca_exports_only": [
+                "evidence_gap_refs",
+                "typed_blocker_refs",
+                "safe_repair_hint_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "operator_projection_shell still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "operator_evidence_refs",
                 "domain_gap_semantics",
@@ -3210,6 +4061,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/family_action_catalog",
+                "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "canonical_action_metadata_refs_only",
+              "rca_exports_only": [
+                "family_action_catalog_refs",
+                "guarded_action_refs",
+                "domain_handler_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "generic_cli_mcp_wrappers still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "rca_action_metadata",
                 "domain_action_handlers",
@@ -3257,6 +4142,40 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": true,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/domain_entry_contract/executor",
+                "replacement_surface": "opl_agent_executor_adapter",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "route_level_executor_policy_refs_only",
+              "rca_exports_only": [
+                "executor_requirement_refs",
+                "executor_receipt_refs",
+                "route_policy_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "codex_executor_adapter still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "default_codex_executor_policy",
                 "route_executor_requirements",
@@ -3303,6 +4222,41 @@
               "opl_owned_generic_primitive_consumer": true,
               "rca_owned_visual_domain_authority": false,
               "opl_absorb_candidate": true,
+              "opl_replacement_expectation": {
+                "owner": "opl",
+                "expectation_ref": "/opl_stability_read_model_consumption",
+                "replacement_surface": "opl_stability_read_model_and_observability_export",
+                "expected_mode": "opl_replacement_expectation",
+                "rca_consumes_as": "consumer_projection_only",
+                "rca_owns_replacement_runtime": false
+              },
+              "rca_projection_mode": "observability_refs_only",
+              "rca_exports_only": [
+                "owner_receipt_refs",
+                "typed_blocker_refs",
+                "no_regression_evidence_refs",
+                "resource_pressure_signal_refs"
+              ],
+              "forbidden_generic_owner_flags": {
+                "rca_owns_generic_runtime": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_session_shell": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_native_helper_generic_envelope": false,
+                "rca_owns_generic_cli_mcp_wrapper_generator": false,
+                "rca_owns_generic_executor_adapter": false,
+                "rca_owns_observability_exporter": false
+              },
+              "physical_deletion_guard": {
+                "safe_to_delete_now": false,
+                "reason": "observability_stability_read_model still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+                "required_before_delete": [
+                  "opl_replacement_surface_live",
+                  "active_callers_migrated",
+                  "domain_authority_refs_preserved",
+                  "no_regression_proof_recorded"
+                ]
+              },
               "rca_retains": [
                 "domain_blocker_meaning",
                 "safe_repair_hint_refs",
@@ -3769,6 +4723,38 @@
         "rca_owned_visual_domain_authority",
         "retire_tombstone"
       ],
+      "replacement_expectation_mode": "opl_replacement_expectation_or_refs_only_projection",
+      "physical_deletion_guard": {
+        "current_safe_tombstone_candidate_count": 0,
+        "no_safe_tombstone_candidate_reason": "Audited modules still have active callers or retained RCA visual authority refs; deletion waits for OPL replacement adoption, caller migration, no-regression proof, and preserved domain authority refs.",
+        "required_before_physical_delete": [
+          "opl_replacement_surface_live",
+          "active_callers_migrated",
+          "domain_authority_refs_preserved",
+          "no_regression_proof_recorded"
+        ]
+      },
+      "forbidden_generic_owner_flags": {
+        "rca_owns_generic_runtime": false,
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_session_shell": false,
+        "rca_owns_generic_workbench": false,
+        "rca_owns_native_helper_generic_envelope": false,
+        "rca_owns_generic_cli_mcp_wrapper_generator": false,
+        "rca_owns_generic_executor_adapter": false,
+        "rca_owns_observability_exporter": false
+      },
+      "rca_visual_authority_allowlist": [
+        "visual_stage_semantics",
+        "source_readiness_verdict",
+        "visual_memory_body",
+        "review_export_verdict",
+        "canonical_artifact_authority",
+        "native_helper_implementation",
+        "route_level_executor_policy",
+        "typed_blocker",
+        "owner_receipt_refs"
+      ],
       "modules": [
         {
           "module_id": "managed_dag_scheduler",
@@ -3802,6 +4788,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/family_scheduler_replacement",
+            "replacement_surface": "opl_family_scheduler",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "visual_stage_dag_refs_only",
+          "rca_exports_only": [
+            "stage_dag_ref",
+            "route_policy_refs",
+            "visual_stage_order_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "managed_dag_scheduler still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_deliverable_internal_dag",
             "route_policy_refs",
@@ -3851,6 +4871,41 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
+            "replacement_surface": "opl_generic_transition_runner",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "transition_spec_and_guard_result_refs_only",
+          "rca_exports_only": [
+            "visual_transition_spec_ref",
+            "guard_result_refs",
+            "owner_receipt_refs",
+            "typed_blocker_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "attempt_state_machine_runner still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_transition_spec",
             "visual_guard_evaluator",
@@ -3898,6 +4953,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
+            "replacement_surface": "opl_attempt_ledger_provider_receipts",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "managed_run_locator_and_visual_summary_refs_only",
+          "rca_exports_only": [
+            "managed_run_locator_refs",
+            "visual_run_projection_refs",
+            "provider_receipt_correlation_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "managed_run_json_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "managed_run_locator_refs",
             "visual_run_projection_refs"
@@ -3943,6 +5032,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption",
+            "replacement_surface": "opl_app_session_shell_and_workbench",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
+          "rca_exports_only": [
+            "entry_session_id",
+            "topic_deliverable_run_locator_refs",
+            "latest_visual_run_ref"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "product_entry_session_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "entry_session_domain_refs",
             "deliverable_locator_refs",
@@ -3990,6 +5113,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_substrate_adapter_export",
+            "replacement_surface": "opl_workspace_source_intake_shell",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
+          "rca_exports_only": [
+            "source_locator_refs",
+            "source_readiness_verdict_ref",
+            "communication_strategy_input_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "workspace_source_intake still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "source_readiness_verdict",
             "communication_strategy_inputs",
@@ -4036,6 +5193,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
+            "replacement_surface": "opl_memory_locator_writeback_transport",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "memory_receipt_locator_refs_only",
+          "rca_exports_only": [
+            "memory_locator_refs",
+            "writeback_receipt_refs",
+            "accept_reject_receipt_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "memory_writeback_receipt_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_memory_body",
             "accept_reject_authority",
@@ -4083,6 +5274,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
+            "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
+          "rca_exports_only": [
+            "artifact_locator_refs",
+            "export_verdict_refs",
+            "lifecycle_receipt_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "artifact_export_lifecycle still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "canonical_artifact_authority",
             "export_verdict",
@@ -4130,6 +5355,41 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
+            "replacement_surface": "opl_review_repair_transport",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
+          "rca_exports_only": [
+            "review_state_refs",
+            "blocked_item_refs",
+            "repair_hint_refs",
+            "export_verdict_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "review_repair_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "visual_review_verdict",
             "repair_decision",
@@ -4177,6 +5437,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
+            "replacement_surface": "opl_native_helper_execution_envelope",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
+          "rca_exports_only": [
+            "helper_catalog_refs",
+            "package_module_refs",
+            "helper_proof_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "native_helper_envelope still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "python_native_helper_implementation",
             "ppt_image_export_mutation_logic",
@@ -4224,6 +5518,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/operator_evidence_readiness_projection",
+            "replacement_surface": "opl_app_operator_workbench_shell",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "operator_evidence_readiness_refs_only",
+          "rca_exports_only": [
+            "evidence_gap_refs",
+            "typed_blocker_refs",
+            "safe_repair_hint_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "operator_projection_shell still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "operator_evidence_refs",
             "domain_gap_semantics",
@@ -4272,6 +5600,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/family_action_catalog",
+            "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "canonical_action_metadata_refs_only",
+          "rca_exports_only": [
+            "family_action_catalog_refs",
+            "guarded_action_refs",
+            "domain_handler_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "generic_cli_mcp_wrappers still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "rca_action_metadata",
             "domain_action_handlers",
@@ -4319,6 +5681,40 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": true,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/domain_entry_contract/executor",
+            "replacement_surface": "opl_agent_executor_adapter",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "route_level_executor_policy_refs_only",
+          "rca_exports_only": [
+            "executor_requirement_refs",
+            "executor_receipt_refs",
+            "route_policy_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "codex_executor_adapter still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "default_codex_executor_policy",
             "route_executor_requirements",
@@ -4365,6 +5761,41 @@
           "opl_owned_generic_primitive_consumer": true,
           "rca_owned_visual_domain_authority": false,
           "opl_absorb_candidate": true,
+          "opl_replacement_expectation": {
+            "owner": "opl",
+            "expectation_ref": "/opl_stability_read_model_consumption",
+            "replacement_surface": "opl_stability_read_model_and_observability_export",
+            "expected_mode": "opl_replacement_expectation",
+            "rca_consumes_as": "consumer_projection_only",
+            "rca_owns_replacement_runtime": false
+          },
+          "rca_projection_mode": "observability_refs_only",
+          "rca_exports_only": [
+            "owner_receipt_refs",
+            "typed_blocker_refs",
+            "no_regression_evidence_refs",
+            "resource_pressure_signal_refs"
+          ],
+          "forbidden_generic_owner_flags": {
+            "rca_owns_generic_runtime": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_session_shell": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_native_helper_generic_envelope": false,
+            "rca_owns_generic_cli_mcp_wrapper_generator": false,
+            "rca_owns_generic_executor_adapter": false,
+            "rca_owns_observability_exporter": false
+          },
+          "physical_deletion_guard": {
+            "safe_to_delete_now": false,
+            "reason": "observability_stability_read_model still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+            "required_before_delete": [
+              "opl_replacement_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ]
+          },
           "rca_retains": [
             "domain_blocker_meaning",
             "safe_repair_hint_refs",
