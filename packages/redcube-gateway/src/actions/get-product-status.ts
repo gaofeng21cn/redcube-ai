@@ -14,6 +14,7 @@ type GatewayProductEntryManifest = ProductEntryManifestResponse & {
     family_route_policy?: Record<string, unknown>;
   } & Record<string, unknown>;
   native_ppt_operator_ux?: unknown;
+  operator_evidence_readiness_projection?: unknown;
   ppt_deck_visual_route_truth?: unknown;
   schema_ref?: string;
 };
@@ -21,6 +22,7 @@ type GatewayProductEntryManifest = ProductEntryManifestResponse & {
 type ProductStatusSurface = ProductStatusResponse & {
   deliverable_facade?: unknown;
   native_ppt_operator_ux?: unknown;
+  operator_evidence_readiness_projection?: unknown;
   ppt_deck_visual_route_truth?: unknown;
   overlay_stage_sequences: Record<string, unknown>;
   runtime_loop_closure: RuntimeLoopClosureSurface;
@@ -76,6 +78,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
     schema_ref: manifest.schema_ref,
     deliverable_facade: manifest.deliverable_facade,
     native_ppt_operator_ux: manifest.native_ppt_operator_ux,
+    operator_evidence_readiness_projection: manifest.operator_evidence_readiness_projection,
     ppt_deck_visual_route_truth: manifest.ppt_deck_visual_route_truth,
     overlay_stage_sequences: manifest.deliverable_facade?.family_route_policy || {},
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({

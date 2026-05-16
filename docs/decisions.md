@@ -29,6 +29,12 @@
 - 该投影只提升 OPL/App/operator 对 RCA stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和资源压力信号的可见性；不能写 RCA domain truth，不能执行 RCA domain action，不能授权 visual-ready、quality verdict、exportable、artifact blob 或 visual memory body。
 - 外部 `cybernetics` 类模式只作为 vocabulary/reference：generic fallback 只能成为 degraded attempt 或 alternative route proposal，字符串 retry 必须进入 typed SLO/retry policy schema，event bus 只能是只读分类，runtime adapter started 不能写成行为、质量或 resume 等价。
 
+### 决策：operator evidence readiness 只做 RCA-owned refs-only next-gap projection
+
+- RCA 在 manifest、status 与 runtime-program contracts 中新增 `operator_evidence_readiness_projection`，聚合 no-regression / owner receipt proof、domain owner receipt contract、controlled memory runtime receipt refs、lifecycle guarded apply proof、controlled soak blocker、OPL generic primitive consumer coverage 与 stability read-model consumer refs。
+- 该 projection 面向 OPL/App/operator 展示 next evidence gaps：真实 artifact-producing domain owner receipt、真实 OPL-hosted controlled visual-stage long soak、真实 memory/lifecycle receipt instances 和跨 family repeated no-regression evidence。
+- 该 projection 不写 visual truth、artifact blob 或 memory body，不声明 production soak complete 或 artifact-producing owner receipt 已完成，也不实现 OPL generic runtime、workbench 或 observability。
+
 ## 2026-05-14
 
 ### 决策：owner receipt / memory writeback / workspace lifecycle apply 由 RCA 持有 authority

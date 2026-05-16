@@ -1,5 +1,110 @@
 // @ts-nocheck
 
+export function buildOperatorEvidenceReadinessProjection({
+  oplGenericPrimitiveConsumption,
+  oplStabilityReadModelConsumption,
+  standardDomainAgentSkeleton,
+}) {
+  return {
+    surface_kind: 'operator_evidence_readiness_projection',
+    projection_id: 'rca.operator_evidence_readiness.v1',
+    owner: 'redcube_ai',
+    consumer: 'opl_app_operator',
+    status: 'refs_only_operator_projection_landed',
+    projection_model: 'derived_from_existing_manifest_source_refs_only',
+    source_refs: [
+      {
+        source_id: 'no_regression_owner_receipt_opl_consumption_proof',
+        ref: '/no_regression_owner_receipt_opl_consumption_proof',
+        status: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof?.status || 'unknown',
+      },
+      {
+        source_id: 'domain_owner_receipt_contract',
+        ref: '/domain_owner_receipt_contract',
+        allowed_return_shapes: standardDomainAgentSkeleton.domain_owner_receipt_contract?.allowed_return_shapes || [],
+      },
+      {
+        source_id: 'controlled_memory_apply_runtime_receipt_refs',
+        ref: '/controlled_memory_apply_proof/runtime_receipt_instances',
+        instance_model: standardDomainAgentSkeleton.controlled_memory_apply_proof?.runtime_receipt_instances?.instance_model || 'runtime_locator_refs_only',
+      },
+      {
+        source_id: 'lifecycle_guarded_apply_proof',
+        ref: '/lifecycle_guarded_apply_proof',
+        operations: (standardDomainAgentSkeleton.lifecycle_guarded_apply_proof?.operations || []).map((operation) => operation.operation),
+      },
+      {
+        source_id: 'controlled_soak_no_regression_attempt',
+        ref: '/controlled_soak_no_regression_attempt',
+        state: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt?.state || 'unknown',
+      },
+      {
+        source_id: 'opl_generic_primitive_consumption',
+        ref: '/opl_generic_primitive_consumption',
+        status: oplGenericPrimitiveConsumption?.status || 'unknown',
+        functional_harness_coverage_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage',
+      },
+      {
+        source_id: 'opl_stability_read_model_consumption',
+        ref: '/opl_stability_read_model_consumption',
+        status: oplStabilityReadModelConsumption?.status || 'unknown',
+        observability_only: oplStabilityReadModelConsumption?.observability_only === true,
+      },
+    ],
+    ready_for_operator_gap_projection: true,
+    ready_for_opl_app_consumption: true,
+    read_only: true,
+    refs_only: true,
+    writes_visual_truth: false,
+    writes_artifact_blob: false,
+    writes_memory_body: false,
+    declares_production_soak_complete: false,
+    declares_artifact_producing_owner_receipt: false,
+    implements_opl_generic_runtime: false,
+    implements_opl_workbench: false,
+    implements_opl_observability: false,
+    next_evidence_gaps: [
+      {
+        gap_id: 'real_artifact_producing_domain_owner_receipt',
+        owner: 'redcube_ai',
+        status: 'pending_runtime_evidence',
+        required_evidence: 'A real RCA visual-stage attempt returns a domain owner receipt with artifact refs, review/export refs, memory/lifecycle receipt refs, and forbidden-write proof refs.',
+        current_best_ref: '/domain_owner_receipt_contract',
+      },
+      {
+        gap_id: 'opl_hosted_controlled_visual_stage_long_soak',
+        owner: 'opl_provider_then_redcube_ai_receipt',
+        status: 'pending_production_soak',
+        required_evidence: 'A real OPL-hosted controlled visual-stage run repeatedly consumes RCA sidecar refs and receives RCA domain receipt, typed blocker, or no-regression evidence refs without writing RCA visual truth.',
+        current_best_ref: '/controlled_soak_no_regression_attempt',
+      },
+      {
+        gap_id: 'real_memory_lifecycle_receipt_instances',
+        owner: 'redcube_ai',
+        status: 'pending_runtime_receipt_instances',
+        required_evidence: 'Accepted/rejected memory writeback and cleanup/restore/retention lifecycle receipts exist in workspace runtime roots and remain refs-only for OPL.',
+        current_best_ref: '/controlled_memory_apply_proof/runtime_receipt_instances',
+      },
+      {
+        gap_id: 'cross_family_repeated_no_regression_evidence',
+        owner: 'redcube_ai',
+        status: 'pending_repeated_runtime_evidence',
+        required_evidence: 'Repeated no-regression evidence refs across at least two deliverable families without artifact blobs, memory bodies, or review/export verdict payloads in OPL state.',
+        current_best_ref: '/no_regression_owner_receipt_opl_consumption_proof',
+      },
+    ],
+    authority_boundary: {
+      opl_app_can_show_next_gaps: true,
+      opl_app_can_store_projection_refs: true,
+      opl_app_can_write_rca_visual_truth: false,
+      opl_app_can_store_artifact_blob: false,
+      opl_app_can_declare_visual_ready: false,
+      opl_app_can_declare_exportable: false,
+      opl_app_can_claim_production_soak_complete: false,
+    },
+  };
+}
+
 export function buildReturnedManifestProjection({
   actionMetadata,
   domainMemoryDescriptor,
@@ -18,6 +123,11 @@ export function buildReturnedManifestProjection({
   standardDomainAgentSkeleton,
   visualPatternMemoryWriteback,
 }) {
+  const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
+    oplGenericPrimitiveConsumption,
+    oplStabilityReadModelConsumption,
+    standardDomainAgentSkeleton,
+  });
   return {
     ...manifest,
     entry_status_surface: entryStatusSurface,
@@ -105,6 +215,7 @@ export function buildReturnedManifestProjection({
       oplStabilityReadModelConsumption
       || manifest.opl_stability_read_model_consumption
     ),
+    operator_evidence_readiness_projection: operatorEvidenceReadinessProjection,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
