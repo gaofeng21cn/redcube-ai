@@ -22,6 +22,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/line-budget.test.ts',
     'tests/overlay-registry.test.ts',
     'tests/opl-family-contract-adoption.test.ts',
+    'tests/opl-agent-lab-longline-migration.test.ts',
     'tests/opl-transition-hosted-attempt-receipt.test.ts',
     'tests/pack-first-completion.test.ts',
     'tests/ppt-mainline-quality-closeout.test.ts',
