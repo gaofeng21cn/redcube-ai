@@ -359,6 +359,69 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.opl_stability_read_model_consumption.authority_boundary.generic_fallback_can_mark_success,
       false,
     );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.surface_kind,
+      'operator_evidence_readiness_projection',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.projection_id,
+      'rca.operator_evidence_readiness.v1',
+    );
+    assert.equal(manifest.operator_evidence_readiness_projection.owner, 'redcube_ai');
+    assert.equal(manifest.operator_evidence_readiness_projection.consumer, 'opl_app_operator');
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.status,
+      'refs_only_operator_projection_landed',
+    );
+    assert.equal(manifest.operator_evidence_readiness_projection.read_only, true);
+    assert.equal(manifest.operator_evidence_readiness_projection.refs_only, true);
+    assert.equal(manifest.operator_evidence_readiness_projection.writes_visual_truth, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.writes_artifact_blob, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.writes_memory_body, false);
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.declares_production_soak_complete,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.declares_artifact_producing_owner_receipt,
+      false,
+    );
+    assert.equal(manifest.operator_evidence_readiness_projection.implements_opl_generic_runtime, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.implements_opl_workbench, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.implements_opl_observability, false);
+    assert.deepEqual(
+      manifest.operator_evidence_readiness_projection.source_refs.map((source) => source.source_id),
+      [
+        'no_regression_owner_receipt_opl_consumption_proof',
+        'domain_owner_receipt_contract',
+        'controlled_memory_apply_runtime_receipt_refs',
+        'lifecycle_guarded_apply_proof',
+        'controlled_soak_no_regression_attempt',
+        'opl_generic_primitive_consumption',
+        'opl_stability_read_model_consumption',
+      ],
+    );
+    assert.deepEqual(
+      manifest.operator_evidence_readiness_projection.next_evidence_gaps.map((gap) => gap.gap_id),
+      [
+        'real_artifact_producing_domain_owner_receipt',
+        'opl_hosted_controlled_visual_stage_long_soak',
+        'real_memory_lifecycle_receipt_instances',
+        'cross_family_repeated_no_regression_evidence',
+      ],
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_show_next_gaps,
+      true,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_write_rca_visual_truth,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_claim_production_soak_complete,
+      false,
+    );
     assert.equal(manifest.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
     assert.equal(
       manifest.domain_memory_descriptor_locator.status,
@@ -1021,6 +1084,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(status.product_entry_start.modes[3].mode_id, 'resume_session');
     assert.deepEqual(status.product_entry_start, manifest.product_entry_start);
     assert.deepEqual(status.native_ppt_operator_ux, manifest.native_ppt_operator_ux);
+    assert.deepEqual(
+      status.operator_evidence_readiness_projection,
+      manifest.operator_evidence_readiness_projection,
+    );
     assert.equal(status.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(status.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
     assert.equal(status.runtime_loop_closure.source_linkage.entry_mode, 'product_entry_overview_projection');
