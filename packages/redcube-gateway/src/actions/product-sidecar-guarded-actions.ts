@@ -97,6 +97,31 @@ export const SIDECAR_BLOCKED_ACTIONS = Object.freeze([
   'publish_export_bundle',
 ]);
 
+export const RCA_RETAINED_VISUAL_AUTHORITY = Object.freeze([
+  'visual_truth',
+  'review_export_verdict',
+  'artifact_authority',
+  'visual_memory_body',
+  'owner_receipt',
+  'native_helper_implementation',
+  'typed_blocker',
+  'safe_action_refs',
+]);
+
+export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
+  'standard_domain_agent_scaffold',
+  'generic_scheduler',
+  'daemon',
+  'typed_queue',
+  'attempt_ledger',
+  'generic_runner',
+  'workbench_shell',
+  'memory_transport',
+  'artifact_lifecycle',
+  'review_repair_transport',
+  'native_helper_generic_envelope',
+]);
+
 export function buildFamilySchedulerReplacementProjection() {
   return {
     ref: '/family_scheduler_replacement',
@@ -123,15 +148,85 @@ export function buildFamilySchedulerReplacementProjection() {
       'workbench_shell',
     ],
     managed_dag_scheduler_scope: 'visual_deliverable_internal_dag_only',
-    rca_retained_authority: [
-      'visual_truth',
-      'review_export_verdict',
-      'artifact_authority',
-      'visual_memory_body',
-      'owner_receipt',
-      'typed_blocker',
-      'safe_action_refs',
+    rca_retained_authority: [...RCA_RETAINED_VISUAL_AUTHORITY],
+  };
+}
+
+export function buildOplGenericPrimitiveConsumptionProjection() {
+  return {
+    ref: '/opl_generic_primitive_consumption',
+    contract_ref: 'opl.standard_domain_agent_scaffold_and_generic_primitives.v1',
+    owner: 'opl',
+    consumer: 'redcube_ai',
+    status: 'functional_consumer_follow_through_landed',
+    projection_mode: 'consumer_projection_only',
+    rca_surface_role: 'visual_domain_authority_pack_plus_thin_program_surface',
+    completion_scope: 'functional_consumer_follow_through_complete_not_live_soak',
+    live_soak_claimed: false,
+    rca_does_not_own: [...OPL_OWNED_GENERIC_PRIMITIVES],
+    opl_owned_generic_primitives: [...OPL_OWNED_GENERIC_PRIMITIVES],
+    rca_retained_authority: [...RCA_RETAINED_VISUAL_AUTHORITY],
+    rca_thin_program_surfaces: [
+      'single redcube-ai app skill',
+      'service-safe domain entry',
+      'product sidecar projection',
+      'stage control projection',
+      'visual transition spec',
+      'artifact locator refs',
+      'review/export gate refs',
+      'owner receipt refs',
+      'native helper implementation refs',
     ],
+    consumed_projection_surfaces: [
+      {
+        primitive: 'standard_domain_agent_scaffold',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton',
+        manifest_ref: '/standard_domain_agent_skeleton',
+        sidecar_ref: '/mapped_surfaces/standard_domain_agent_skeleton',
+      },
+      {
+        primitive: 'generic_scheduler',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement',
+        manifest_ref: '/family_scheduler_replacement',
+        sidecar_ref: '/runtime_framework/family_scheduler_replacement',
+      },
+      {
+        primitive: 'memory_transport',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator',
+        manifest_ref: '/domain_memory_descriptor_locator',
+        sidecar_ref: '/mapped_surfaces/visual_pattern_memory_writeback',
+      },
+      {
+        primitive: 'artifact_lifecycle',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof',
+        manifest_ref: '/lifecycle_guarded_apply_proof',
+        sidecar_ref: '/mapped_surfaces/lifecycle_guarded_apply',
+      },
+      {
+        primitive: 'review_repair_transport',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection',
+        manifest_ref: '/review_state',
+        sidecar_ref: '/mapped_surfaces/review_projection',
+      },
+      {
+        primitive: 'native_helper_generic_envelope',
+        contract_ref: 'contracts/runtime-program/python-native-helper-catalog.json',
+        manifest_ref: '/native_ppt_operator_ux',
+        sidecar_ref: '/mapped_surfaces/native_helper_implementation',
+      },
+    ],
+    forbidden_rca_generic_owner_flags: {
+      rca_generic_scheduler_owner: false,
+      rca_generic_daemon_owner: false,
+      rca_generic_queue_owner: false,
+      rca_generic_attempt_ledger_owner: false,
+      rca_generic_runner_owner: false,
+      rca_generic_workbench_owner: false,
+      rca_memory_transport_owner: false,
+      rca_artifact_lifecycle_owner: false,
+      rca_review_repair_transport_owner: false,
+      rca_native_helper_generic_envelope_owner: false,
+    },
   };
 }
 

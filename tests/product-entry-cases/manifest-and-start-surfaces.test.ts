@@ -242,6 +242,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'lifecycle_adapter',
       'visual_transition_spec',
       'domain_memory_descriptor_locator',
+      'domain_owner_receipt_contract',
+      'lifecycle_guarded_apply_proof',
     ]);
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
@@ -255,6 +257,44 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_store_root, manifest.runtime.session_store_root);
     assert.equal(manifest.artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs, false);
     assert.equal(manifest.artifact_locator_contract.opl_consumption_policy.forbidden.includes('declare_visual_export_verdict'), true);
+    assert.equal(manifest.opl_generic_primitive_consumption.ref, '/opl_generic_primitive_consumption');
+    assert.equal(manifest.opl_generic_primitive_consumption.owner, 'opl');
+    assert.equal(manifest.opl_generic_primitive_consumption.consumer, 'redcube_ai');
+    assert.equal(manifest.opl_generic_primitive_consumption.status, 'functional_consumer_follow_through_landed');
+    assert.equal(
+      manifest.opl_generic_primitive_consumption.completion_scope,
+      'functional_consumer_follow_through_complete_not_live_soak',
+    );
+    assert.equal(manifest.opl_generic_primitive_consumption.live_soak_claimed, false);
+    assert.deepEqual(
+      manifest.opl_generic_primitive_consumption.rca_does_not_own,
+      [
+        'standard_domain_agent_scaffold',
+        'generic_scheduler',
+        'daemon',
+        'typed_queue',
+        'attempt_ledger',
+        'generic_runner',
+        'workbench_shell',
+        'memory_transport',
+        'artifact_lifecycle',
+        'review_repair_transport',
+        'native_helper_generic_envelope',
+      ],
+    );
+    assert.deepEqual(
+      manifest.opl_generic_primitive_consumption.rca_retained_authority,
+      [
+        'visual_truth',
+        'review_export_verdict',
+        'artifact_authority',
+        'visual_memory_body',
+        'owner_receipt',
+        'native_helper_implementation',
+        'typed_blocker',
+        'safe_action_refs',
+      ],
+    );
     assert.equal(manifest.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
     assert.equal(
       manifest.domain_memory_descriptor_locator.status,
@@ -617,6 +657,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.sidecar.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.provider_transport_owner, 'opl_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.control_plane_owner, 'opl');
+    assert.equal(
+      manifest.product_entry_shell.sidecar.opl_generic_primitive_consumption.status,
+      'functional_consumer_follow_through_landed',
+    );
     assert.deepEqual(
       manifest.product_entry_shell.sidecar.allowed_actions,
       sidecarGuardedActionMetadata.guardedActionIds,

@@ -179,10 +179,10 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'product_sidecar_adapter',
     'projection_builder',
     'lifecycle_adapter',
-    'visual_transition_spec',
-    'domain_memory_descriptor_locator',
-    'domain_owner_receipt_contract',
-    'lifecycle_guarded_apply_proof',
+      'visual_transition_spec',
+      'domain_memory_descriptor_locator',
+      'domain_owner_receipt_contract',
+      'lifecycle_guarded_apply_proof',
   ]);
   assert.equal(skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
   assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
@@ -191,6 +191,67 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   assert.equal(skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
   assert.equal(skeleton.runtime_declarations.domain_owner_receipt_contract_ref, '/domain_owner_receipt_contract');
   assert.equal(skeleton.runtime_declarations.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
+});
+
+test('RCA standard OPL primitive consumption is complete as a functional consumer projection', () => {
+  const payload = contract();
+  const current = currentProgram();
+  const expectedGenericPrimitives = [
+    'standard_domain_agent_scaffold',
+    'generic_scheduler',
+    'daemon',
+    'typed_queue',
+    'attempt_ledger',
+    'generic_runner',
+    'workbench_shell',
+    'memory_transport',
+    'artifact_lifecycle',
+    'review_repair_transport',
+    'native_helper_generic_envelope',
+  ];
+  const expectedRetainedAuthority = [
+    'visual_truth',
+    'review_export_verdict',
+    'artifact_authority',
+    'visual_memory_body',
+    'owner_receipt',
+    'native_helper_implementation',
+    'typed_blocker',
+    'safe_action_refs',
+  ];
+
+  for (const surface of [
+    payload.opl_generic_primitive_consumption,
+    current.product_release_metadata.opl_generic_primitive_consumption,
+    current.current_state.opl_generic_primitive_consumption,
+    current.current_state.active_baton.scope.opl_generic_primitive_consumption,
+  ]) {
+    assert.equal(surface.contract_ref, 'opl.standard_domain_agent_scaffold_and_generic_primitives.v1');
+    assert.equal(surface.owner, 'opl');
+    assert.equal(surface.consumer, 'redcube_ai');
+    assert.equal(surface.status, 'functional_consumer_follow_through_landed');
+    assert.equal(surface.projection_mode, 'consumer_projection_only');
+    assert.equal(surface.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(surface.completion_scope, 'functional_consumer_follow_through_complete_not_live_soak');
+    assert.equal(surface.live_soak_claimed, false);
+    assert.deepEqual(surface.rca_does_not_own, expectedGenericPrimitives);
+    assert.deepEqual(surface.rca_retained_authority, expectedRetainedAuthority);
+  }
+
+  assert.deepEqual(
+    payload.opl_generic_primitive_consumption.consumed_projection_surfaces.map((entry) => entry.primitive),
+    [
+      'standard_domain_agent_scaffold',
+      'generic_scheduler',
+      'memory_transport',
+      'artifact_lifecycle',
+      'review_repair_transport',
+      'native_helper_generic_envelope',
+    ],
+  );
+  for (const value of Object.values(payload.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {
+    assert.equal(value, false);
+  }
 });
 
 test('RCA controlled soak remains deferred without descriptor index skeleton regression', () => {

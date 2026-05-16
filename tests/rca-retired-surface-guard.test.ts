@@ -160,8 +160,76 @@ test('RCA consumes OPL family scheduler replacement without owning generic sched
       'artifact_authority',
       'visual_memory_body',
       'owner_receipt',
+      'native_helper_implementation',
       'typed_blocker',
       'safe_action_refs',
     ]);
+  }
+});
+
+test('RCA consumes OPL generic primitives as projections while retaining only visual authority', () => {
+  const currentProgram = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/current-program.json'),
+    'utf-8',
+  ));
+  const adoption = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
+    'utf-8',
+  ));
+
+  const expectedGenericPrimitives = [
+    'standard_domain_agent_scaffold',
+    'generic_scheduler',
+    'daemon',
+    'typed_queue',
+    'attempt_ledger',
+    'generic_runner',
+    'workbench_shell',
+    'memory_transport',
+    'artifact_lifecycle',
+    'review_repair_transport',
+    'native_helper_generic_envelope',
+  ];
+  const expectedRetainedAuthority = [
+    'visual_truth',
+    'review_export_verdict',
+    'artifact_authority',
+    'visual_memory_body',
+    'owner_receipt',
+    'native_helper_implementation',
+    'typed_blocker',
+    'safe_action_refs',
+  ];
+
+  for (const surface of [
+    currentProgram.product_release_metadata.opl_generic_primitive_consumption,
+    currentProgram.current_state.opl_generic_primitive_consumption,
+    currentProgram.current_state.active_baton.scope.opl_generic_primitive_consumption,
+    adoption.opl_generic_primitive_consumption,
+  ]) {
+    assert.equal(surface.owner, 'opl');
+    assert.equal(surface.consumer, 'redcube_ai');
+    assert.equal(surface.status, 'functional_consumer_follow_through_landed');
+    assert.equal(surface.projection_mode, 'consumer_projection_only');
+    assert.equal(surface.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(surface.completion_scope, 'functional_consumer_follow_through_complete_not_live_soak');
+    assert.equal(surface.live_soak_claimed, false);
+    assert.deepEqual(surface.rca_does_not_own, expectedGenericPrimitives);
+    assert.deepEqual(surface.rca_retained_authority, expectedRetainedAuthority);
+  }
+
+  assert.deepEqual(
+    adoption.opl_generic_primitive_consumption.consumed_projection_surfaces.map((surface) => surface.primitive),
+    [
+      'standard_domain_agent_scaffold',
+      'generic_scheduler',
+      'memory_transport',
+      'artifact_lifecycle',
+      'review_repair_transport',
+      'native_helper_generic_envelope',
+    ],
+  );
+  for (const value of Object.values(adoption.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {
+    assert.equal(value, false);
   }
 });

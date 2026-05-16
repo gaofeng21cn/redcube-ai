@@ -28,6 +28,10 @@ interface ManagedDagPlan {
   generic_attempt_ledger_owner: false;
   generic_runner_owner: false;
   generic_workbench_owner: false;
+  memory_transport_owner: false;
+  artifact_lifecycle_owner: false;
+  review_repair_transport_owner: false;
+  native_helper_generic_envelope_owner: false;
   authority_boundary: {
     owner: 'redcube_ai';
     opl_family_scheduler_owner: 'opl';
@@ -209,6 +213,10 @@ export function planManagedDeliverableDag({
     generic_attempt_ledger_owner: false,
     generic_runner_owner: false,
     generic_workbench_owner: false,
+    memory_transport_owner: false,
+    artifact_lifecycle_owner: false,
+    review_repair_transport_owner: false,
+    native_helper_generic_envelope_owner: false,
     authority_boundary: {
       owner: 'redcube_ai',
       opl_family_scheduler_owner: 'opl',
@@ -219,6 +227,9 @@ export function planManagedDeliverableDag({
         'artifact_authority',
         'visual_memory_body',
         'owner_receipt',
+        'native_helper_implementation',
+        'typed_blocker',
+        'safe_action_refs',
       ],
     },
     parallel_safe: true,
