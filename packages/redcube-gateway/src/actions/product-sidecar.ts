@@ -9,6 +9,7 @@ import { invokeProductEntry } from './invoke-product-entry.js';
 import {
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
+  buildOplStabilityReadModelConsumptionProjection,
   listProductSidecarBlockedActions,
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
@@ -99,6 +100,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
     manifest.opl_generic_primitive_consumption
     || buildOplGenericPrimitiveConsumptionProjection()
   );
+  const oplStabilityReadModelConsumption = (
+    manifest.opl_stability_read_model_consumption
+    || buildOplStabilityReadModelConsumptionProjection()
+  );
   return {
     ok: true,
     surface_kind: 'product_sidecar_export',
@@ -125,6 +130,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         managed_dag_scheduler_scope: familySchedulerReplacement.managed_dag_scheduler_scope,
         generic_surfaces_owner: 'opl',
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
+        opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
         rca_is_generic_scheduler_owner: false,
         rca_is_generic_daemon_owner: false,
         rca_is_generic_lifecycle_owner: false,
@@ -300,6 +306,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       },
       family_scheduler_replacement: familySchedulerReplacement,
       opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
+      opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
     },
     guarded_actions: listProductSidecarGuardedActions(),
     blocked_actions: listProductSidecarBlockedActions(),
@@ -322,6 +329,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       visual_transition_spec_ref: '/visual_transition_spec',
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
+      opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {

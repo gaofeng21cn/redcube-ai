@@ -30,6 +30,8 @@ RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract
 
 RCA 现在消费 OPL `family_scheduler_replacement` projection：OPL 持有 family scheduler、daemon 和 generic lifecycle owner；RCA 不在仓内实现 generic scheduler/runtime manager。仓内 `managed-dag-scheduler` 只描述 visual deliverable 内部 DAG 分层，继续受 RCA route truth、review/export verdict、artifact authority、visual memory body 和 owner receipt 约束。
 
+RCA 也消费 OPL stability read-model projection：`opl_stability_read_model_consumption` 只挂 OPL `family-conflict-envelope`、`control_loop_summary`、`usage_projection`、`resource_pressure`、`runtime observability-export` 和 external stability policy 的 refs。它让 OPL/App/operator 能看到 RCA stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和已观测资源压力信号；它不执行 domain action、不写 RCA domain truth、不授权 visual-ready / quality / export verdict、不写 artifact blob 或 memory body，也不把 generic fallback、字符串 retry、event bus 或 runtime adapter started 写成成功语义。
+
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
 当前仓内可执行的 runtime 基线按三层 owner 收口：

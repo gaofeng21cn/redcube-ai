@@ -233,3 +233,58 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
     assert.equal(value, false);
   }
 });
+
+test('RCA consumes OPL stability read-model surfaces without implementing observability runtime', () => {
+  const currentProgram = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/current-program.json'),
+    'utf-8',
+  ));
+  const adoption = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
+    'utf-8',
+  ));
+
+  const expectedReadModelSurfaces = [
+    'family_conflict_envelope',
+    'control_loop_summary',
+    'usage_projection',
+    'resource_pressure',
+    'observability_export',
+    'external_stability_policy',
+  ];
+
+  for (const surface of [
+    currentProgram.product_release_metadata.opl_stability_read_model_consumption,
+    currentProgram.current_state.opl_stability_read_model_consumption,
+    currentProgram.current_state.active_baton.scope.opl_stability_read_model_consumption,
+    adoption.opl_stability_read_model_consumption,
+  ]) {
+    assert.equal(surface.owner, 'opl');
+    assert.equal(surface.consumer, 'redcube_ai');
+    assert.equal(surface.status, 'refs_only_consumer_projection_landed');
+    assert.equal(surface.projection_mode, 'consumer_projection_only');
+    assert.equal(surface.observability_only, true);
+    assert.equal(surface.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(surface.completion_scope, 'stability_read_model_refs_projected_not_live_soak');
+    assert.equal(surface.live_soak_claimed, false);
+  }
+
+  assert.deepEqual(
+    adoption.opl_stability_read_model_consumption.consumed_read_model_surfaces.map((surface) => surface.surface),
+    expectedReadModelSurfaces,
+  );
+  for (const value of Object.values(adoption.opl_stability_read_model_consumption.authority_boundary)) {
+    assert.equal(value, false);
+  }
+  for (const value of Object.values(adoption.opl_stability_read_model_consumption.forbidden_rca_stability_owner_flags)) {
+    assert.equal(value, false);
+  }
+  assert.equal(
+    adoption.opl_stability_read_model_consumption.rca_does_not_own.includes('runtime_observability_exporter'),
+    true,
+  );
+  assert.equal(
+    adoption.opl_stability_read_model_consumption.rca_does_not_own.includes('generic_runtime_adapter_success_semantics'),
+    true,
+  );
+});

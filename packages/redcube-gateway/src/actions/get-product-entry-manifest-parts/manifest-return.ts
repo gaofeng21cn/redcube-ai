@@ -9,6 +9,7 @@ export function buildReturnedManifestProjection({
   manifest,
   nativePptOperatorUx,
   oplGenericPrimitiveConsumption,
+  oplStabilityReadModelConsumption,
   oplFamilyLifecycleAdapter,
   operatorLoopActions,
   productEntryShell,
@@ -100,6 +101,10 @@ export function buildReturnedManifestProjection({
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption || manifest.opl_generic_primitive_consumption,
+    opl_stability_read_model_consumption: (
+      oplStabilityReadModelConsumption
+      || manifest.opl_stability_read_model_consumption
+    ),
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,

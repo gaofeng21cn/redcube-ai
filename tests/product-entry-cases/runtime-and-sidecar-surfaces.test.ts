@@ -81,6 +81,22 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.live_soak_claimed,
       false,
     );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.status,
+      'refs_only_consumer_projection_landed',
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.observability_only,
+      true,
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.authority_boundary.opl_can_execute_rca_domain_action,
+      false,
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.authority_boundary.opl_can_authorize_visual_ready,
+      false,
+    );
     assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
@@ -177,6 +193,31 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'native_helper_generic_envelope',
       ],
     );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_stability_read_model_consumption.ref,
+      '/opl_stability_read_model_consumption',
+    );
+    assert.equal(sidecar.mapped_surfaces.opl_stability_read_model_consumption.owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.opl_stability_read_model_consumption.consumer, 'redcube_ai');
+    assert.deepEqual(
+      sidecar.mapped_surfaces.opl_stability_read_model_consumption.consumed_read_model_surfaces.map((entry) => entry.surface),
+      [
+        'family_conflict_envelope',
+        'control_loop_summary',
+        'usage_projection',
+        'resource_pressure',
+        'observability_export',
+        'external_stability_policy',
+      ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_stability_read_model_consumption.authority_boundary.generic_fallback_can_mark_success,
+      false,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_stability_read_model_consumption.authority_boundary.event_bus_can_be_truth_source,
+      false,
+    );
     assert.equal(sidecar.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
     assert.equal(sidecar.source_manifest_refs.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
@@ -269,6 +310,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.source_manifest_refs.visual_transition_spec_ref, '/visual_transition_spec');
     assert.equal(sidecar.source_manifest_refs.family_scheduler_replacement_ref, '/family_scheduler_replacement');
     assert.equal(sidecar.source_manifest_refs.opl_generic_primitive_consumption_ref, '/opl_generic_primitive_consumption');
+    assert.equal(
+      sidecar.source_manifest_refs.opl_stability_read_model_consumption_ref,
+      '/opl_stability_read_model_consumption',
+    );
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       sidecarGuardedActionMetadata.guardedActionIds,

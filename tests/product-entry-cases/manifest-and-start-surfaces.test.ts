@@ -295,6 +295,38 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'safe_action_refs',
       ],
     );
+    assert.equal(manifest.opl_stability_read_model_consumption.ref, '/opl_stability_read_model_consumption');
+    assert.equal(manifest.opl_stability_read_model_consumption.owner, 'opl');
+    assert.equal(manifest.opl_stability_read_model_consumption.consumer, 'redcube_ai');
+    assert.equal(
+      manifest.opl_stability_read_model_consumption.status,
+      'refs_only_consumer_projection_landed',
+    );
+    assert.equal(manifest.opl_stability_read_model_consumption.observability_only, true);
+    assert.equal(manifest.opl_stability_read_model_consumption.live_soak_claimed, false);
+    assert.deepEqual(
+      manifest.opl_stability_read_model_consumption.consumed_read_model_surfaces.map((entry) => entry.surface),
+      [
+        'family_conflict_envelope',
+        'control_loop_summary',
+        'usage_projection',
+        'resource_pressure',
+        'observability_export',
+        'external_stability_policy',
+      ],
+    );
+    assert.equal(
+      manifest.opl_stability_read_model_consumption.authority_boundary.opl_can_write_rca_domain_truth,
+      false,
+    );
+    assert.equal(
+      manifest.opl_stability_read_model_consumption.authority_boundary.opl_can_authorize_visual_ready,
+      false,
+    );
+    assert.equal(
+      manifest.opl_stability_read_model_consumption.authority_boundary.generic_fallback_can_mark_success,
+      false,
+    );
     assert.equal(manifest.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
     assert.equal(
       manifest.domain_memory_descriptor_locator.status,

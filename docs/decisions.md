@@ -22,6 +22,13 @@
 - Catalog / proof lane 不再声明 `script` / `compatibility_script` wrapper authority；后续不得恢复 compatibility layer、script caller 或 contract anchor。
 - Native helpers 继续受 RCA route、visual director review、screenshot review 和 export gate 约束，不能绕过 product-entry/runtime-family mainline。
 
+### 决策：RCA 只消费 OPL stability read-model，不实现观测/控制 runtime
+
+- RCA 在 runtime-program contracts、manifest 和 product sidecar projection 中新增 `opl_stability_read_model_consumption`，只引用 OPL `family-conflict-envelope`、`control_loop_summary`、`usage_projection`、`resource_pressure`、`runtime observability-export` 和 external stability policy 的 refs-only read model。
+- OPL 继续持有 conflict envelope schema、control-loop summary builder、usage/resource pressure aggregator、observability exporter、external stability policy runtime、fallback/retry/event-bus/runtime-adapter 稳定性语义；RCA 不复制这些 generic surface。
+- 该投影只提升 OPL/App/operator 对 RCA stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和资源压力信号的可见性；不能写 RCA domain truth，不能执行 RCA domain action，不能授权 visual-ready、quality verdict、exportable、artifact blob 或 visual memory body。
+- 外部 `cybernetics` 类模式只作为 vocabulary/reference：generic fallback 只能成为 degraded attempt 或 alternative route proposal，字符串 retry 必须进入 typed SLO/retry policy schema，event bus 只能是只读分类，runtime adapter started 不能写成行为、质量或 resume 等价。
+
 ## 2026-05-14
 
 ### 决策：owner receipt / memory writeback / workspace lifecycle apply 由 RCA 持有 authority

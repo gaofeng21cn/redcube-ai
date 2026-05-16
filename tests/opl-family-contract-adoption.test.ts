@@ -254,6 +254,75 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
   }
 });
 
+test('RCA consumes OPL stability read-model surfaces as refs-only projections', () => {
+  const payload = contract();
+  const current = currentProgram();
+  const expectedSurfaces = [
+    'family_conflict_envelope',
+    'control_loop_summary',
+    'usage_projection',
+    'resource_pressure',
+    'observability_export',
+    'external_stability_policy',
+  ];
+  const expectedRetainedAuthority = [
+    'visual_truth',
+    'review_export_verdict',
+    'artifact_authority',
+    'visual_memory_body',
+    'owner_receipt',
+    'native_helper_implementation',
+    'typed_blocker',
+    'safe_action_refs',
+  ];
+
+  for (const surface of [
+    payload.opl_stability_read_model_consumption,
+    current.product_release_metadata.opl_stability_read_model_consumption,
+    current.current_state.opl_stability_read_model_consumption,
+    current.current_state.active_baton.scope.opl_stability_read_model_consumption,
+  ]) {
+    assert.equal(surface.contract_ref, 'opl.family_operator_stability_read_model.v1');
+    assert.equal(surface.owner, 'opl');
+    assert.equal(surface.consumer, 'redcube_ai');
+    assert.equal(surface.status, 'refs_only_consumer_projection_landed');
+    assert.equal(surface.projection_mode, 'consumer_projection_only');
+    assert.equal(surface.observability_only, true);
+    assert.equal(surface.rca_surface_role, 'visual_domain_authority_pack_plus_thin_program_surface');
+    assert.equal(surface.completion_scope, 'stability_read_model_refs_projected_not_live_soak');
+    assert.equal(surface.live_soak_claimed, false);
+    assert.deepEqual(surface.rca_retained_authority, expectedRetainedAuthority);
+  }
+
+  assert.deepEqual(
+    payload.opl_stability_read_model_consumption.consumed_read_model_surfaces.map((entry) => entry.surface),
+    expectedSurfaces,
+  );
+  assert.ok(
+    payload.opl_stability_read_model_consumption.rca_does_not_own.includes('runtime_observability_exporter'),
+  );
+  assert.ok(
+    payload.opl_stability_read_model_consumption.rca_does_not_own.includes('generic_fallback_completion'),
+  );
+  assert.deepEqual(payload.opl_stability_read_model_consumption.authority_boundary, {
+    opl_can_execute_rca_domain_action: false,
+    opl_can_write_rca_domain_truth: false,
+    opl_can_authorize_visual_ready: false,
+    opl_can_authorize_quality_verdict: false,
+    opl_can_authorize_exportable: false,
+    opl_can_write_artifact_blob: false,
+    opl_can_write_visual_memory_body: false,
+    provider_completion_is_visual_ready: false,
+    generic_fallback_can_mark_success: false,
+    string_retry_can_drive_execution: false,
+    event_bus_can_be_truth_source: false,
+    runtime_adapter_started_is_behavior_equivalent: false,
+  });
+  for (const value of Object.values(payload.opl_stability_read_model_consumption.forbidden_rca_stability_owner_flags)) {
+    assert.equal(value, false);
+  }
+});
+
 test('RCA controlled soak remains deferred without descriptor index skeleton regression', () => {
   const payload = contract();
   const controlledSoak = payload.standard_domain_agent_skeleton.controlled_soak;

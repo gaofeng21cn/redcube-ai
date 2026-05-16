@@ -11,7 +11,7 @@ Date: `2026-05-16`
 - `定位`：本文只写 RCA 的 north-star 目标态和长期 owner boundary；当前差距、执行顺序和 evidence 缺口回到 `rca-ideal-state-gap-plan.md`。
 - `当前实态校准`：带日期的校准段只记录当前 repo surface 或 fresh evidence，不把目标态写成已完成事实。
 - `Owner 边界`：RCA 持有 source readiness verdict、communication strategy、visual direction、review/export verdict、canonical artifact、visual memory body/accept-reject、owner receipt 和 native helper implementation；OPL 持有 provider runtime、standard scaffold、queue、attempt ledger、generic runner/workbench、workspace/source intake shell、artifact gallery/handoff shell、memory transport、review/repair transport、native-helper generic envelope、observability/SLO 和 App/workbench shell。
-- `当前功能面`：2026-05-16 已把 RCA 侧 OPL consumer follow-through 落到合同、manifest、sidecar projection 和 guard；后续不再把 generic primitive handoff 当成 RCA 功能缺口。
+- `当前功能面`：2026-05-16 已把 RCA 侧 OPL consumer follow-through 落到合同、manifest、sidecar projection 和 guard；OPL stability read-model 也已作为 refs-only consumer projection 挂入 RCA surface。后续不再把 generic primitive handoff 或 observability/control read-model 当成 RCA 功能缺口。
 - `最短路径`：后续先跑真实 memory/lifecycle receipt 实例、focused hosted attempt 和 OPL App / product shell projection，再推进 Temporal long soak。
 - `禁写口径`：RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
 
@@ -29,13 +29,15 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 
 2026-05-16 follow-through：RCA 已新增 `opl_generic_primitive_consumption`，并在 `contracts/runtime-program/current-program.json`、`contracts/runtime-program/opl-family-contract-adoption.json`、product-entry manifest、product sidecar export、managed DAG guard 和 retired-surface guard 中同步声明：standard domain-agent scaffold、generic scheduler/daemon/queue/attempt ledger/runner/workbench、memory transport、artifact lifecycle、review/repair transport 和 native-helper generic envelope 都由 OPL 持有。RCA 是这些 generic primitives 的消费方，不是 owner。
 
+2026-05-16 stability read-model follow-through：RCA 已新增 `opl_stability_read_model_consumption`，把 OPL `family-conflict-envelope`、`control_loop_summary`、`usage_projection`、`resource_pressure`、`runtime observability-export` 和 external stability policy 写成 refs-only consumer projection。RCA 可以提供或消费 stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和已观测资源压力信号；RCA 不实现 OPL conflict engine、control-loop builder、usage/resource pressure aggregator、observability exporter、generic fallback、string-rule retry、generic event bus 或 runtime adapter success semantics。该投影不声明 live soak 完成，也不能授权 visual-ready、quality verdict、exportable、artifact blob 或 visual memory body。
+
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 
 2026-05-15 当前代码已把 RCA transition hosted-attempt receipt 对账推进到 repo-local focused fixture：fixture 模拟 OPL provider attempt bridge 消费 `visual_transition_spec` 后，只保存 RCA 返回的 `domain_owner_receipt_ref`、`typed_blocker` 或 `no_regression_evidence_ref`，要求 transition receipt 显式引用 provider attempt ref，并递归禁止 `visual_ready`、`exportable`、`handoffable`、production soak complete、artifact blob、memory body 或 review/export verdict payload。该能力是理想态中 OPL-hosted visual transition attempt 的对账形状证明，不是 artifact-producing owner receipt，也不是 Temporal long soak。
 
 2026-05-16 校准：RCA 当前目录和 surface 已适合展示“artifact-heavy Foundry Agent”如何接入 OPL：repo 根层具备 `agent/`、`apps/redcube-cli|redcube-mcp`、`contracts/runtime-program/`、`packages/` runtime families、`plugins/rca`、`python/redcube_ai` native helpers、`runtime/`、`prompts/` 和 canonical docs taxonomy。它的范本价值在于 TypeScript orchestration + Python native helper implementation、deliverable family、review/export gate、artifact locator、sidecar/projection 和 visual transition spec 的 owner 边界；它不是通用新 Agent scaffold 的直接目录模板，因为 packages/families/prompts/native helper 结构高度服务 visual deliverable domain。通用 skeleton/checklist 由 OPL 持有，RCA 保持 visual authority pack。
 
-执行顺序上，RCA 侧的功能面归位已经完成到 consumer projection：source/workspace intake、artifact gallery/handoff、review/repair transport、native-helper generic envelope、route/decision graph、observability/SLO、App drilldown 和 scaffold/template checklist 的 owner 都是 OPL / App；RCA adapter 保持薄。真实 OPL-hosted visual stage、Temporal long soak、跨 family 重复 proof 和 production closure 是后置运行验收，不应再被写成 RCA 侧 generic primitive 功能缺口。
+执行顺序上，RCA 侧的功能面归位已经完成到 consumer projection：source/workspace intake、artifact gallery/handoff、review/repair transport、native-helper generic envelope、route/decision graph、observability/SLO、App drilldown、stability read-model 和 scaffold/template checklist 的 owner 都是 OPL / App；RCA adapter 保持薄。真实 OPL-hosted visual stage、Temporal long soak、跨 family 重复 proof 和 production closure 是后置运行验收，不应再被写成 RCA 侧 generic primitive 或 generic observability 功能缺口。
 
 ## 产品分层
 

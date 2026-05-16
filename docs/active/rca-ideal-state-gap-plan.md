@@ -9,7 +9,7 @@ Date: `2026-05-16`
 ## 文档读法
 
 - `定位`：本文是 RCA 的 active gap / implementation order，不是 north-star 目标态本身；目标态回到 `rca-visual-deliverable-agent-ideal-state.md`。
-- `当前实态`：RCA 已把 OPL standard scaffold / generic primitives 消费面收成合同、manifest、sidecar projection 和 focused guard：RCA 不持有 generic scheduler、daemon、typed queue、attempt ledger、generic runner、workbench、memory transport、artifact lifecycle、review/repair transport 或 native-helper generic envelope；RCA 保留 visual truth、review/export verdict、artifact authority、visual memory body、owner receipt 和 native helper implementation。sidecar/action/status parity cleanup 与 native helper wrapper retirement 的当前 repo tranche 已落地。
+- `当前实态`：RCA 已把 OPL standard scaffold / generic primitives 和 OPL stability read-model 消费面收成合同、manifest、sidecar projection 和 focused guard：RCA 不持有 generic scheduler、daemon、typed queue、attempt ledger、generic runner、workbench、memory transport、artifact lifecycle、review/repair transport、native-helper generic envelope、conflict engine、control-loop builder、usage/resource pressure aggregator、observability exporter 或 external stability policy runtime；RCA 保留 visual truth、review/export verdict、artifact authority、visual memory body、owner receipt 和 native helper implementation。sidecar/action/status parity cleanup 与 native helper wrapper retirement 的当前 repo tranche 已落地。
 - `最短路径`：功能面 follow-through 已按 OPL consumer projection 完成；后续只推进真实 memory/lifecycle receipt 实例、focused OPL-hosted controlled attempt、OPL App / product shell projection polish、跨 family 重复 proof 和 Temporal long soak。
 - `验收顺序`：focused OPL-hosted controlled attempt 不再等待 scaffold/generic primitive 功能上收；它只等待真实 workspace/receipt 输入。Temporal long soak 与 legacy physical cleanup 是最后生产验收和收尾。
 - `禁写口径`：不能把 OPL completion、transition hosted-attempt fixture、no-regression evidence 或 provider completion 写成 RCA visual ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak 完成。
@@ -26,7 +26,9 @@ RCA 的单仓计划只维护视觉交付领域真相和 domain package 薄程序
 
 2026-05-16 follow-through：RCA 已新增 `opl_generic_primitive_consumption` 合同/manifest/sidecar projection，把 standard domain-agent scaffold、generic scheduler/daemon/queue/attempt ledger/runner/workbench、memory transport、artifact lifecycle、review/repair transport 和 native-helper generic envelope 统一声明为 OPL-owned generic primitives；RCA 只消费 projection，并保留 visual authority pack 与薄程序面。`managed-dag-scheduler` 的仓内含义也已由 guard 锁定为 `visual_deliverable_internal_dag_only`，不是系统级 scheduler。
 
-后续完善顺序不再把 generic primitive handoff、adapter thinning 或 scaffold extraction 当成 RCA 功能缺口。OPL-hosted attempt、no-regression evidence 和 long soak 是运行证据与生产验收手段；它们不阻塞 RCA 作为 OPL consumer 的功能面完成口径。
+2026-05-16 stability read-model follow-through：RCA 已新增 `opl_stability_read_model_consumption` 合同/manifest/sidecar projection，把 OPL `family-conflict-envelope`、`control_loop_summary`、`usage_projection`、`resource_pressure`、`runtime observability-export` 和 external stability policy 写成 refs-only consumer surface。RCA 只暴露/消费 stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和已观测资源压力信号；不实现 OPL generic conflict engine、control-loop summary builder、usage/resource pressure aggregator、observability exporter、generic fallback、string-rule retry、event bus truth source 或 runtime adapter success semantics。
+
+后续完善顺序不再把 generic primitive handoff、adapter thinning、scaffold extraction 或 stability read-model handoff 当成 RCA 功能缺口。OPL-hosted attempt、no-regression evidence 和 long soak 是运行证据与生产验收手段；它们不阻塞 RCA 作为 OPL consumer 的功能面完成口径。
 
 OPL 系列项目的全局主参考是 OPL 仓的 `docs/active/opl-family-development-reference.md`。涉及跨仓总顺序、shared primitive owner、App/workbench 通用目标和旧兼容面退役纪律时，以该主参考和 OPL docs 为准；机器或跨仓定位应使用 semantic id、contract/source ref 或 repo owner 口径，不把本机绝对路径当稳定接口。
 
@@ -45,7 +47,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + t
 | Native helper catalog / execution envelope | helper registration、environment/provisioning metadata、execution receipt、version/proof index、operator-safe launch shell | Python helper implementation、PPT/image/export mutation logic、helper-specific RCA proof、review gate integration |
 | Memory locator / writeback transport | memory descriptor discovery、body-free inventory、consumed refs、proposal refs、accepted/rejected receipt refs、freshness grouping | visual pattern memory body、route caveat、accept/reject authority、lesson quality judgment |
 | State-machine runner / transition matrix | transition schema、幂等 tick、retry/dead-letter、human gate transport、dispatch receipt、matrix runner、transition bridge evidence refs-only workbench drilldown | visual route transition table、source/readiness/review/export guard、repair action、blocked item typed blocker、artifact owner receipt |
-| Observability / SLO / repair projection | trace/log/event transport、freshness/SLO projection、stale scan、repair command projection、attention queue | domain blocker meaning、safe repair hint、visual quality facts、artifact/export authority boundary |
+| Observability / SLO / repair projection | trace/log/event transport、freshness/SLO projection、stale scan、repair command projection、attention queue、control-loop summary、usage/resource pressure、read-only observability export、external stability policy | domain blocker meaning、safe repair hint、visual quality facts、artifact/export authority boundary、owner receipt / typed blocker / no-regression evidence refs |
 
 上收边界的验收标准：
 
@@ -59,7 +61,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + t
 | 目标面 | 当前实际状态 | 差距 | 完善计划 |
 | --- | --- | --- | --- |
 | Public entry / package | 单一 `redcube-ai` app skill、CLI、MCP、`invokeProductEntry`、`invokeDomainEntry` 和 sidecar surface 已是当前公开入口。2026-05-16 已把 sidecar guarded actions / forbidden writes、manifest sidecar、family action catalog、CLI help 和 MCP product-entry routes 收到 canonical metadata；`invoke_opl_hosted_product_entry` 已退出公开 MCP action。旧 workbench、frontdoor、federation、standalone Hermes probe 与 gateway-action alias 已退出 active surface。 | CLI/MCP/product manifest 仍需要持续保持 action parity；任何新增 action 都必须从 `family_action_catalog` 派生并进入同一命名体系。 | 新增或修改入口时同步 CLI、MCP、manifest、tests 和 status；保持 `domainActions`、`callDomainTool`、`listDomainTools`、`DomainTool*` 命名，不恢复旧 alias；`invokeOplHostedProductEntry` 只保留为 internal OPL integration contract。 |
-| OPL-hosted controlled stage | RCA 已提供 OPL discovery、stage control projection、product sidecar dispatch、owner receipt / typed blocker / no-regression evidence ref 合同，并通过 repo-local focused proof 证明 OPL 可消费 `emit_no_regression_evidence` / `emit_domain_owner_receipt` 的 return shape 和 refs。2026-05-16 已补齐 `opl_generic_primitive_consumption`，把 scaffold / scheduler / memory transport / artifact lifecycle / review-repair transport / native-helper generic envelope 明确为 OPL-owned consumer projection。 | 真实 OPL-hosted controlled visual stage long soak、真实 artifact-producing domain owner receipt 和跨 family 重复运行证据尚未产出。 | 由 OPL provider 发起 focused hosted attempt，RCA 产出 domain receipt、typed blocker 或 no-regression evidence ref；最后扩展到 live soak，不把 OPL completion 提升为 RCA visual ready。 |
+| OPL-hosted controlled stage | RCA 已提供 OPL discovery、stage control projection、product sidecar dispatch、owner receipt / typed blocker / no-regression evidence ref 合同，并通过 repo-local focused proof 证明 OPL 可消费 `emit_no_regression_evidence` / `emit_domain_owner_receipt` 的 return shape 和 refs。2026-05-16 已补齐 `opl_generic_primitive_consumption`，把 scaffold / scheduler / memory transport / artifact lifecycle / review-repair transport / native-helper generic envelope 明确为 OPL-owned consumer projection；并补齐 `opl_stability_read_model_consumption`，把 conflict envelope、control-loop summary、usage/resource pressure、observability export 和 external stability policy 明确为 OPL-owned refs-only read model。 | 真实 OPL-hosted controlled visual stage long soak、真实 artifact-producing domain owner receipt 和跨 family 重复运行证据尚未产出。 | 由 OPL provider 发起 focused hosted attempt，RCA 产出 domain receipt、typed blocker 或 no-regression evidence ref；最后扩展到 live soak，不把 OPL completion、stability projection 或 observability export 提升为 RCA visual ready。 |
 | Deliverable family proof | `ppt_deck` 与 `xiaohongshu` 已以 image-first 为默认路线；HTML/native PPTX 是显式可选路线；`poster_onepager` 保持 guarded route。 | 三个 family 的长期、重复、真实 artifact proof 还没有全部达到生产 soak 水平；poster 仍是受控 knowledge poster 边界。 | 逐 family 跑 direct proof、OPL-hosted proof、review/export proof 和 repair proof；新增 family 必须先有 descriptor、route policy、artifact locator、review/export gate 与 no-forbidden-write proof。 |
 | Stage attempt receipts | stage descriptor、route artifacts、runtime watch、review/export projection 已存在；domain owner receipt contract 已 landed。 | 每个真实 stage attempt 的 source refs、artifact refs、review refs、blocked reason、human gate receipt 和 owner receipt 还未全部常态化。 | 把 attempt receipt 写入 workspace/runtime root，并从 product shell / OPL projection 只读展示；repo 只保留 descriptor、schema、test fixture 和 locator。 |
 | Domain memory | descriptor locator、seed fixture locator、writeback proposal、accept/reject contract、receipt locator 和 operator projection 已进入 repo-source contract surface。 | 真实 visual pattern memory body、accepted/rejected receipt instances 和 review/export closeout writeback 尚未作为常态运行流闭环。 | 先在 RCA runtime/domain-memory root 产生真实 receipt instance，再让 OPL 消费 locator/projection；不把 memory body 或视觉 verdict 迁入 OPL。 |
@@ -74,7 +76,7 @@ RCA 的目标形态是 `visual-deliverable Domain Knowledge / Authority Pack + t
 1. `sidecar_action_status_parity_cleanup`
    2026-05-16 已完成当前可落地 tranche：direct product entry、CLI/MCP、service-safe domain entry、product sidecar、manifest、family action catalog 和 status 口径已由 canonical metadata 对齐；`invoke_opl_hosted_product_entry` 不再作为公开 MCP action。后续新增或修改 action 仍必须从 canonical action/stage metadata 派生，进入同一命名体系，并同步 tests/status；旧 gateway/frontdoor/federation/Hermes-first alias 继续保持退役或 history 语境。
 2. `opl_generic_visual_primitives_handoff`
-   2026-05-16 已完成当前 RCA consumer follow-through：`opl_generic_primitive_consumption`、manifest、sidecar、managed DAG guard 和 retired-surface guard 均声明 RCA 不持有 standard scaffold、generic scheduler/daemon/queue/attempt ledger/runner/workbench、memory transport、artifact lifecycle、review/repair transport 或 native-helper generic envelope。后续新增 surface 必须继续挂到该 consumer projection。
+   2026-05-16 已完成当前 RCA consumer follow-through：`opl_generic_primitive_consumption`、manifest、sidecar、managed DAG guard 和 retired-surface guard 均声明 RCA 不持有 standard scaffold、generic scheduler/daemon/queue/attempt ledger/runner/workbench、memory transport、artifact lifecycle、review/repair transport 或 native-helper generic envelope；`opl_stability_read_model_consumption` 也已声明 conflict envelope、control-loop summary、usage/resource pressure、observability export 和 external stability policy 归 OPL。后续新增 generic 或 observability/stability surface 必须继续挂到 consumer projection。
 3. `native_helper_wrapper_cleanup`
    2026-05-16 已完成当前 wrapper retirement tranche：helper catalog、proof lane、runtime callsite 和 tests 收敛到 package module invocation，thin script / compatibility wrapper 删除并进入 retired guard。后续只维护 package-module-only helper surface，不恢复 compatibility layer。
 4. `scaffold_template_extraction`
@@ -96,6 +98,7 @@ RCA 当前可作为后续完善基础的 repo surface 包括：
 - sidecar/action/status parity cleanup 已把 product sidecar guarded actions / forbidden writes、manifest sidecar、family action catalog、CLI help 和 MCP product-entry routes 收到 canonical metadata；`invokeOplHostedProductEntry` 仍是 internal OPL integration contract，不是公开 MCP action。
 - native helper wrapper cleanup 已完成 package-module-only 收敛和 no-active-caller proof；deleted wrapper paths 由 retired-surface guard 防止复活。
 - `no_regression_owner_receipt_opl_consumption_proof` 已进入 manifest / sidecar projection / focused tests；它只证明 OPL 可保存 no-regression evidence ref、domain owner receipt ref 或 typed blocker，并显式禁止 visual ready、exportable、handoffable 或 production soak success claim。
+- `opl_stability_read_model_consumption` 已进入 manifest / sidecar projection / runtime-program contract / focused tests；它只证明 RCA 对 OPL control-loop、usage/resource pressure、conflict envelope、observability export 和 external stability policy 的 refs-only 消费边界，不生成 OPL exporter、fallback runtime、event bus 或 visual-stage success claim。
 - RCA 写 domain-owned workspace/runtime refs，并持有 visual truth、review/export verdict、memory body 和 canonical artifact authority；OPL 只读取 descriptor、locator、projection、receipt refs、operator projection 和 repair hints。
 - direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first route、review/export gate 与 domain owner receipt contract 是当前 active surface。
 
@@ -103,7 +106,7 @@ RCA 当前可作为后续完善基础的 repo surface 包括：
 
 - 真实 OPL Temporal controlled visual-stage long soak 仍未完成；不能声明 provider-hosted production soak success；当前 transition hosted-attempt 证据只覆盖 repo-local receipt 对账形状，不升级为 visual_ready、exportable 或 handoffable。
 - 真实长时 artifact-producing attempt、跨 family 重复 proof、真实 visual pattern memory body 积累、retention ledger 规模化验证和 OPL App / product shell 工作台投影仍是后续 runtime/product lane。
-- OPL standard scaffold / generic primitives 在 RCA 侧的消费合同、manifest、sidecar 和 guard 已完成；后续只需要防回归，不再作为功能缺口重复跟踪。
+- OPL standard scaffold / generic primitives / stability read-model 在 RCA 侧的消费合同、manifest、sidecar 和 guard 已完成；后续只需要防回归，不再作为功能缺口重复跟踪。
 - `poster_onepager` 仍保持 guarded knowledge poster 边界，尚未扩展为 academic/conference poster production lane。
 
 维护验证时优先跑 repo-native verification，再按变更范围选择 focused owner-boundary tests。叙述性 docs 不作为测试断言对象；验证证据应来自 contracts、manifest、CLI/MCP 行为、workspace/runtime receipt、artifact locator、review/export gate 和真实交付物证据。
@@ -122,6 +125,7 @@ RCA 当前可作为后续完善基础的 repo surface 包括：
 - 不能写成 RCA 已完成 production visual-stage long soak。
 - 不能写成 OPL provider completion 等于 RCA visual ready、exportable 或 handoffable。
 - 不能把 transition hosted-attempt fixture、no-regression evidence 或 focused receipt proof 写成 artifact-producing owner receipt。
+- 不能把 OPL control-loop summary、usage/resource pressure、observability export 或 external stability policy 写成 RCA visual quality/export verdict、自动降级、自动修复或 production success。
 - 不能写成 OPL 持有 RCA visual truth、canonical artifact、review/export verdict、artifact mutation permission 或 visual memory body。
 - 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。
 - 不能恢复 gateway/frontdoor/federation/Hermes-first/local-manager/bridge residue 为 active public entry、runtime owner 或 compatibility alias。
