@@ -16,6 +16,7 @@ import {
 } from './product-sidecar-guarded-actions.js';
 import { runtimeWatch } from './runtime-watch.js';
 import { superviseManagedRun } from './supervise-managed-run.js';
+import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './product-sidecar-parts/workspace-receipt-proof.js';
 export {
   assertReceiptOnlyHostedAttemptProjection,
   buildHostedAttemptBridgeFixture,
@@ -927,6 +928,19 @@ export async function dispatchProductSidecar(request) {
 
   if (action === 'apply_visual_workspace_lifecycle') {
     const result = await applyVisualWorkspaceLifecycle(task);
+    return buildDispatchEnvelope({ task, result, action });
+  }
+
+  if (action === 'emit_workspace_receipt_proof') {
+    const result = await emitWorkspaceReceiptProofPack({
+      task,
+      workspaceRoot: workspaceRootFromTask(task),
+      buildTypedBlocker,
+      applyVisualMemoryWriteback,
+      applyVisualWorkspaceLifecycle,
+      emitNoRegressionEvidence,
+      emitDomainOwnerReceipt,
+    });
     return buildDispatchEnvelope({ task, result, action });
   }
 

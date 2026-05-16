@@ -73,6 +73,20 @@ export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
     api_surface: 'productSidecarApplyVisualWorkspaceLifecycle',
   },
   {
+    action: 'emit_workspace_receipt_proof',
+    effect: 'guarded_workspace_receipt_proof_write',
+    summary: 'Emit a workspace-runtime proof pack that chains RCA-owned memory, lifecycle, no-regression, and domain owner receipt refs without writing visual artifacts or OPL generic runtime state.',
+    required_fields: [
+      'workspace_root',
+      'proof_id',
+      'attempt_ref',
+      'artifact_locator_ref',
+      'review_export_ref',
+      'forbidden_write_proof_ref',
+    ],
+    api_surface: 'productSidecarEmitWorkspaceReceiptProof',
+  },
+  {
     action: 'notification_receipt',
     effect: 'control_plane_ack_only',
     summary: 'Acknowledge an OPL/Hermes notification without writing RCA visual truth, review verdict, or publication gate.',

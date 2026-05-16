@@ -525,6 +525,112 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(blockedLifecycle.result_surface.surface_kind, 'typed_blocker');
     assert.equal(blockedLifecycle.result_surface.blocker_kind, 'lifecycle_domain_receipt_required');
 
+    const workspaceReceiptProof = await dispatchProductSidecar({
+      task: {
+        action: 'emit_workspace_receipt_proof',
+        workspace_root: workspaceRoot,
+        proof_id: 'unit-workspace-receipts',
+        attempt_ref: 'workspace-runtime-ref:attempt:run-proof',
+        artifact_locator_ref: '/artifact_locator_contract',
+        review_export_ref: 'workspace-runtime-ref:review-export:run-proof',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        artifact_refs: ['workspace-runtime-ref:artifact:slide-proof'],
+      },
+    });
+    assert.equal(workspaceReceiptProof.result_surface.surface_kind, 'workspace_receipt_proof');
+    assert.equal(workspaceReceiptProof.result_surface.return_shape, 'workspace_receipt_proof');
+    assert.equal(
+      workspaceReceiptProof.result_surface.proof_ref,
+      'rca-workspace-receipt-proof:visual-stage:unit-workspace-receipts',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.accepted_memory_receipt_ref,
+      'rca-memory-receipt:visual-pattern:unit-workspace-receipts-accepted-memory-accepted',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.rejected_memory_receipt_ref,
+      'rca-memory-receipt:visual-pattern:unit-workspace-receipts-rejected-memory-rejected',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.cleanup_lifecycle_receipt_ref,
+      'rca-lifecycle-receipt:cleanup:unit-workspace-receipts-cleanup',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.restore_lifecycle_receipt_ref,
+      'rca-lifecycle-receipt:restore:unit-workspace-receipts-restore',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.retention_lifecycle_receipt_ref,
+      'rca-lifecycle-receipt:retention:unit-workspace-receipts-retention',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.no_regression_evidence_ref,
+      'rca-no-regression:visual-stage:unit-workspace-receipts-no-regression',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.receipt_refs.domain_owner_receipt_ref,
+      'rca-owner-receipt:visual-stage:unit-workspace-receipts-domain-owner',
+    );
+    assert.equal(workspaceReceiptProof.result_surface.coverage.accepted_memory_receipt_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.rejected_memory_receipt_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.cleanup_lifecycle_receipt_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.restore_lifecycle_receipt_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.retention_lifecycle_receipt_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.no_regression_evidence_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.domain_owner_receipt_written, true);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.visual_ready_claimed, false);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.exportable_claimed, false);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.handoffable_claimed, false);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.production_soak_claimed, false);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.visual_artifact_blob_written, false);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.memory_content_body_written, false);
+    assert.equal(workspaceReceiptProof.result_surface.coverage.generic_runtime_state_written, false);
+    assert.equal(workspaceReceiptProof.result_surface.repository_boundary.repo_tracks_live_receipt_instances, false);
+    assert.equal(workspaceReceiptProof.result_surface.authority_boundary.opl_can_store_receipt_refs, true);
+    assert.equal(workspaceReceiptProof.result_surface.authority_boundary.opl_can_store_visual_truth, false);
+    assert.equal(workspaceReceiptProof.result_surface.authority_boundary.opl_can_write_visual_memory_body, false);
+    const workspaceReceiptProofFile = readJson(workspaceReceiptProof.result_surface.proof_file);
+    assert.equal(workspaceReceiptProofFile.surface_kind, 'workspace_receipt_proof');
+    assert.equal(workspaceReceiptProofFile.coverage.production_soak_claimed, false);
+    assert.equal(
+      readJson(workspaceReceiptProof.result_surface.runtime_files.accepted_memory_receipt_file).writeback_status,
+      'accepted',
+    );
+    assert.equal(
+      readJson(workspaceReceiptProof.result_surface.runtime_files.rejected_memory_receipt_file).writeback_status,
+      'rejected',
+    );
+    assert.equal(
+      readJson(workspaceReceiptProof.result_surface.runtime_files.cleanup_lifecycle_receipt_file).operation,
+      'cleanup',
+    );
+    assert.equal(
+      readJson(workspaceReceiptProof.result_surface.runtime_files.restore_lifecycle_receipt_file).operation,
+      'restore',
+    );
+    assert.equal(
+      readJson(workspaceReceiptProof.result_surface.runtime_files.retention_lifecycle_receipt_file).operation,
+      'retention',
+    );
+    assert.equal(
+      readJson(workspaceReceiptProof.result_surface.runtime_files.domain_owner_receipt_file).required_refs.memory_receipt_ref,
+      workspaceReceiptProof.result_surface.receipt_refs.accepted_memory_receipt_ref,
+    );
+
+    const blockedWorkspaceReceiptProof = await dispatchProductSidecar({
+      task: {
+        action: 'emit_workspace_receipt_proof',
+        workspace_root: workspaceRoot,
+        proof_id: 'blocked-workspace-receipts',
+      },
+    });
+    assert.equal(blockedWorkspaceReceiptProof.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(
+      blockedWorkspaceReceiptProof.result_surface.blocker_kind,
+      'workspace_receipt_proof_missing_required_refs',
+    );
+    assert.equal(blockedWorkspaceReceiptProof.result_surface.visual_ready_claimed, false);
+
     await assert.rejects(
       () => dispatchProductSidecar({
         task: {
