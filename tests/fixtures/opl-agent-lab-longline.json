@@ -1,0 +1,77 @@
+{
+  "agent_lab_longline": {
+    "authority_boundary": {
+      "can_authorize_quality_verdict": false,
+      "can_write_domain_truth": false,
+      "can_write_memory_body": false
+    },
+    "suite_result": {
+      "authority_boundary": {
+        "can_authorize_quality_verdict": false,
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false
+      },
+      "longline_summary": {
+        "authority_boundary": {
+          "can_authorize_quality_verdict": false,
+          "can_write_domain_truth": false,
+          "can_write_memory_body": false
+        },
+        "domain_ids": [
+          "med-autoscience",
+          "med-autogrant",
+          "redcube-ai"
+        ],
+        "ready_to_reduce_domain_longline_tests": true,
+        "recommended_repo_test_disposition": [
+          {
+            "domain_id": "redcube-ai",
+            "keep_in_domain_repo": [
+              "visual quality scorer",
+              "render/export owner receipt fixture",
+              "artifact authority checks"
+            ],
+            "move_to_opl_agent_lab": [
+              "controlled visual-stage soak orchestration",
+              "hosted-attempt reconciliation projection",
+              "no-forbidden-write cross-domain regression"
+            ]
+          }
+        ]
+      },
+      "runs": [
+        {
+          "authority_boundary": {
+            "can_authorize_quality_verdict": false,
+            "can_write_domain_truth": false,
+            "can_write_memory_body": false
+          },
+          "domain_id": "redcube-ai",
+          "promotion_gate": {
+            "authority_boundary": {
+              "can_authorize_quality_verdict": false,
+              "can_write_domain_truth": false,
+              "can_write_memory_body": false
+            }
+          },
+          "scorecard": {
+            "authority_boundary": {
+              "can_authorize_quality_verdict": false,
+              "can_write_domain_truth": false,
+              "can_write_memory_body": false
+            }
+          },
+          "status": "passed",
+          "trajectory": {
+            "authority_boundary": {
+              "can_authorize_quality_verdict": false,
+              "can_write_domain_truth": false,
+              "can_write_memory_body": false
+            }
+          }
+        }
+      ],
+      "status": "passed"
+    }
+  }
+}

@@ -2,12 +2,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
-const DEFAULT_OPL_BIN = '/Users/gaofeng/workspace/one-person-lab/bin/opl';
+const DEFAULT_AGENT_LAB_FIXTURE = new URL('./fixtures/opl-agent-lab-longline.json', import.meta.url);
 const RCA_DOMAIN_ID = 'redcube-ai';
 
-function runOplAgentLabLongline() {
-  const oplBin = process.env.OPL_BIN || DEFAULT_OPL_BIN;
+function readOplAgentLabLongline() {
+  const fixturePath = process.env.OPL_AGENT_LAB_LONGLINE_JSON || DEFAULT_AGENT_LAB_FIXTURE;
+  return JSON.parse(readFileSync(fixturePath, 'utf8'));
+}
+
+function runOplAgentLabLongline(oplBin) {
   const result = spawnSync(oplBin, ['agent-lab', 'longline', '--json'], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -26,6 +31,15 @@ function runOplAgentLabLongline() {
   return JSON.parse(result.stdout);
 }
 
+function loadOplAgentLabLongline() {
+  const liveOplBin = process.env.OPL_AGENT_LAB_LONGLINE_BIN || process.env.OPL_BIN;
+  if (liveOplBin) {
+    return runOplAgentLabLongline(liveOplBin);
+  }
+
+  return readOplAgentLabLongline();
+}
+
 function assertIncludesAll(actual, expected) {
   for (const value of expected) {
     assert.ok(actual.includes(value), `expected ${JSON.stringify(actual)} to include ${value}`);
@@ -39,7 +53,7 @@ function assertNoAuthorityWrite(boundary) {
 }
 
 test('RCA longline migration guard is delegated to OPL Agent Lab while visual authority stays in RCA', () => {
-  const payload = runOplAgentLabLongline();
+  const payload = loadOplAgentLabLongline();
   const suite = payload.agent_lab_longline?.suite_result;
 
   assert.equal(suite?.status, 'passed');
