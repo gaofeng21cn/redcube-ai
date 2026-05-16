@@ -10,6 +10,7 @@ import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts
 
 let cachedPythonCommand = null;
 const PPT_DECK_REVIEW_MODULE = 'redcube_ai.native_helpers.ppt_deck.review';
+const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-review-python-cache-'));
 
 function resolveTestPythonCommand() {
   if (cachedPythonCommand) {
@@ -34,6 +35,9 @@ function runReview(args) {
         PYTHONPATH: process.env.PYTHONPATH
           ? `${path.resolve('python')}${path.delimiter}${process.env.PYTHONPATH}`
           : path.resolve('python'),
+        PYTHONDONTWRITEBYTECODE: '1',
+        PYTHONPYCACHEPREFIX: path.join(PYTHON_CACHE_ROOT, 'pycache'),
+        PYTEST_ADDOPTS: `${process.env.PYTEST_ADDOPTS || ''} -p no:cacheprovider -o cache_dir=${path.join(PYTHON_CACHE_ROOT, 'pytest-cache')}`.trim(),
       },
     },
   );

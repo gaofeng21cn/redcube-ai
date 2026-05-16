@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdtempSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -32,6 +33,15 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
+const pythonCacheRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-python-test-cache-'));
+process.env.PYTHONDONTWRITEBYTECODE = process.env.PYTHONDONTWRITEBYTECODE || '1';
+process.env.PYTHONPYCACHEPREFIX = process.env.PYTHONPYCACHEPREFIX || path.join(pythonCacheRoot, 'pycache');
+process.env.PYTEST_ADDOPTS = [
+  process.env.PYTEST_ADDOPTS || '',
+  '-p no:cacheprovider',
+  `-o cache_dir=${path.join(pythonCacheRoot, 'pytest-cache')}`,
+].filter(Boolean).join(' ');
+
 const hygieneResult = spawnSync('scripts/repo-hygiene.sh', {
   cwd: repoRoot,
   encoding: 'utf8',

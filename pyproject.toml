@@ -23,3 +23,6 @@ redcube-hermes-agent-loop-bridge = "redcube_ai.hermes.agent_loop_bridge_impl:mai
 
 [tool.setuptools.packages.find]
 where = ["python"]
+
+[tool.pytest.ini_options]
+cache_dir = "/tmp/redcube-ai-pytest-cache"

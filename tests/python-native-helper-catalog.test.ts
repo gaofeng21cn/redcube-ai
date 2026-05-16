@@ -18,6 +18,7 @@ const NATIVE_PPT_PACKAGE_MODULE = 'redcube_ai.native_helpers.ppt_deck.native';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 let cachedPythonCommand = null;
+const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-python-native-helper-cache-'));
 
 const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-protocol/src/python-native-helper.ts',
@@ -69,6 +70,9 @@ function runPython(args, options = {}) {
     env: {
       ...process.env,
       PYTHONPATH: path.resolve('python'),
+      PYTHONDONTWRITEBYTECODE: '1',
+      PYTHONPYCACHEPREFIX: path.join(PYTHON_CACHE_ROOT, 'pycache'),
+      PYTEST_ADDOPTS: `${process.env.PYTEST_ADDOPTS || ''} -p no:cacheprovider -o cache_dir=${path.join(PYTHON_CACHE_ROOT, 'pytest-cache')}`.trim(),
       ...(options.env || {}),
     },
   });

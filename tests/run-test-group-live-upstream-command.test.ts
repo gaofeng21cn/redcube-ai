@@ -72,6 +72,19 @@ test('run-test-group only adds file-level serialization to explicit route-heavy 
   assert.match(runner, /one process per file/);
 });
 
+test('run-test-group routes Python cache outside the checkout', () => {
+  const runner = readFileSync('scripts/run-test-group.ts', 'utf-8');
+  const pyproject = readFileSync('pyproject.toml', 'utf-8');
+
+  assert.match(runner, /mkdtempSync\(path\.join\(os\.tmpdir\(\), 'redcube-python-test-cache-'\)\)/);
+  assert.match(runner, /PYTHONDONTWRITEBYTECODE/);
+  assert.match(runner, /PYTHONPYCACHEPREFIX/);
+  assert.match(runner, /-p no:cacheprovider/);
+  assert.match(runner, /cache_dir=\$\{path\.join\(pythonCacheRoot, 'pytest-cache'\)\}/);
+  assert.match(pyproject, /\[tool\.pytest\.ini_options\]/);
+  assert.match(pyproject, /cache_dir = "\/tmp\/redcube-ai-pytest-cache"/);
+});
+
 test('run-test-group partitions route-heavy files away from the default parallel batch', () => {
   assert.deepEqual(
     partitionTestFilesForExecution({

@@ -8,6 +8,8 @@ import path from 'node:path';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
+const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-layouts-python-cache-'));
+
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
@@ -21,6 +23,16 @@ function resolveTestPythonCommand() {
   return explicitTestPython
     ? { command: explicitTestPython, args: [] }
     : resolveRedCubePythonCommand();
+}
+
+function pythonTestEnv() {
+  return {
+    ...process.env,
+    PYTHONPATH: path.resolve('python'),
+    PYTHONDONTWRITEBYTECODE: '1',
+    PYTHONPYCACHEPREFIX: path.join(PYTHON_CACHE_ROOT, 'pycache'),
+    PYTEST_ADDOPTS: `${process.env.PYTEST_ADDOPTS || ''} -p no:cacheprovider -o cache_dir=${path.join(PYTHON_CACHE_ROOT, 'pytest-cache')}`.trim(),
+  };
 }
 
 function runNativeLayoutWriter(payload, workspacePrefix = 'redcube-native-layouts-') {
@@ -64,7 +76,7 @@ print(json.dumps({'slides': manifest, 'pptx_slides': pptx_slides, 'pptx_file': $
   const python = resolveTestPythonCommand();
   const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
     cwd: path.resolve('.'),
-    env: { ...process.env, PYTHONPATH: path.resolve('python') },
+    env: pythonTestEnv(),
     encoding: 'utf-8',
   });
   return { workspaceRoot, outputPptx, ...JSON.parse(stdout) };
@@ -96,7 +108,7 @@ print(json.dumps(entries, ensure_ascii=False))
   const python = resolveTestPythonCommand();
   const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
     cwd: path.resolve('.'),
-    env: { ...process.env, PYTHONPATH: path.resolve('python') },
+    env: pythonTestEnv(),
     encoding: 'utf-8',
   });
   return JSON.parse(stdout);
@@ -407,7 +419,7 @@ print(json.dumps(attach_rendered_previews(payload['slides'], payload['render_pro
     const python = resolveTestPythonCommand();
     const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
       cwd: path.resolve('.'),
-      env: { ...process.env, PYTHONPATH: path.resolve('python') },
+      env: pythonTestEnv(),
       encoding: 'utf-8',
     });
     const attachedSlides = JSON.parse(stdout);
