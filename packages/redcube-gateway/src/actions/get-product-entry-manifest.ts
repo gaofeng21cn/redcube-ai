@@ -55,6 +55,7 @@ import {
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
   buildPrivatizedFunctionalModuleAuditProjection,
+  buildOplSubstrateAdapterExportProjection,
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
 } from './product-sidecar-guarded-actions.js';
@@ -705,6 +706,7 @@ export async function getProductEntryManifest(request) {
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
   });
+  const oplSubstrateAdapterExport = buildOplSubstrateAdapterExportProjection();
   const productEntryShell = buildProductEntryShellCatalog({
     status: {
       command: PRODUCT_STATUS_COMMAND,
@@ -763,6 +765,8 @@ export async function getProductEntryManifest(request) {
         family_scheduler_replacement: familySchedulerReplacement,
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
+        privatized_functional_module_audit: privatizedFunctionalModuleAudit,
+        opl_substrate_adapter_export: oplSubstrateAdapterExport,
         workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
         visual_transition_evaluator_ref: '/visual_transition_evaluator',
       },
@@ -906,6 +910,8 @@ export async function getProductEntryManifest(request) {
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
     opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
+    privatized_functional_module_audit: privatizedFunctionalModuleAudit,
+    opl_substrate_adapter_export: oplSubstrateAdapterExport,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
@@ -975,6 +981,7 @@ export async function getProductEntryManifest(request) {
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
     privatizedFunctionalModuleAudit,
+    oplSubstrateAdapterExport,
     oplFamilyLifecycleAdapter,
     operatorLoopActions,
     productEntryShell,

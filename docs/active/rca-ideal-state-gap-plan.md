@@ -38,6 +38,8 @@ RCA 的单仓计划只维护视觉交付领域真相和 domain package 薄程序
 
 2026-05-16 privatized functional module audit closeout：RCA 已新增 `privatized_functional_module_audit` 合同/manifest/status/sidecar projection 和 focused guard，把非知识层面的私有功能模块统一分成三类：OPL-owned generic primitive consumer、RCA-owned visual authority、retire/tombstone。当前 audit 覆盖 managed-dag-scheduler、native helper envelope/wrapper、workspace receipt inventory、artifact gallery/handoff shell、review/repair transport、observability/stability read model 与 sidecar/status/action parity；没有新增 retire/tombstone candidate。`managed-dag-scheduler` 保留为 visual deliverable internal DAG；review/export gate、artifact gallery/export refs、owner receipt 和 Python native helper implementation 继续归 RCA，不能被 OPL 统一审计误读成可删除或可接管的 generic runtime。
 
+2026-05-16 substrate adapter export follow-through：RCA 已新增 `opl_substrate_adapter_export` 合同/manifest/sidecar projection，把 OPL 可消费的 workspace/source/artifact/memory surface 收成 opaque/index-only refs。它只导出 locator、index、lifecycle 和 operator projection refs；不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority。
+
 后续完善顺序不再把 generic primitive handoff、adapter thinning、scaffold extraction 或 stability read-model handoff 当成 RCA 功能缺口。OPL-hosted attempt、no-regression evidence 和 long soak 是运行证据与生产验收手段；它们不阻塞 RCA 作为 OPL consumer 的功能面完成口径。
 
 OPL 系列项目的全局主参考是 OPL 仓的 `docs/active/opl-family-development-reference.md`。涉及跨仓总顺序、shared primitive owner、App/workbench 通用目标和旧兼容面退役纪律时，以该主参考和 OPL docs 为准；机器或跨仓定位应使用 semantic id、contract/source ref 或 repo owner 口径，不把本机绝对路径当稳定接口。
@@ -112,6 +114,7 @@ RCA 当前可作为后续完善基础的 repo surface 包括：
 - `operator_evidence_readiness_projection` 已进入 manifest / status / runtime-program contract / focused tests；它只聚合现有 refs-only surfaces 并展示 next evidence gaps，不生成 visual truth、artifact blob、memory body、artifact-producing receipt 或 production soak claim。
 - `workspace_receipt_inventory_projection` 已进入 manifest / status / session / sidecar / runtime-program contract / focused tests；它只读取 workspace receipt refs 并展示 coverage，不生成 receipt instance、artifact gallery、workbench、visual truth、memory body 或 production soak claim。
 - `visual_transition_evaluator` 已进入 manifest / sidecar / runtime-program contract / focused tests；它只评估 RCA-owned transition guard refs 并返回 next-stage metadata、owner action、receipt refs 或 typed blocker，不实现 OPL generic runner、route graph、dead-letter、workbench 或 provider attempt ledger。
+- `opl_substrate_adapter_export` 已进入 manifest / sidecar / runtime-program contract / focused tests；它只导出 OPL 可消费的 opaque/index-only workspace/source/artifact/memory refs，不导出 artifact body、memory body、layout/review/export verdict 或 owner receipt authority。
 - RCA 写 domain-owned workspace/runtime refs，并持有 visual truth、review/export verdict、memory body 和 canonical artifact authority；OPL 只读取 descriptor、locator、projection、receipt refs、operator projection 和 repair hints。
 - direct product entry、CLI/MCP、service-safe domain entry、product sidecar、stage descriptor、family action catalog、image-first route、review/export gate 与 domain owner receipt contract 是当前 active surface。
 

@@ -34,6 +34,8 @@ RCA 也消费 OPL stability read-model projection：`opl_stability_read_model_co
 
 RCA 现在也暴露 `operator_evidence_readiness_projection`：这是 RCA-owned read-only operator surface，从 `no_regression_owner_receipt_opl_consumption_proof`、`domain_owner_receipt_contract`、`controlled_memory_apply_proof/runtime_receipt_instances`、`lifecycle_guarded_apply_proof`、`controlled_soak_no_regression_attempt`、`workspace_receipt_inventory_projection`、`opl_generic_primitive_consumption/functional_harness_consumer_coverage` 与 `opl_stability_read_model_consumption` 派生。它给 OPL/App/operator 展示 next evidence gaps，包括真实 artifact-producing owner receipt、真实 OPL-hosted controlled visual-stage long soak、真实 memory/lifecycle receipt instances 和跨 family repeated no-regression evidence。该 projection 只读、refs-only，不写 visual truth、artifact blob 或 memory body，不声明 production soak complete，也不实现 OPL generic runtime、workbench 或 observability。
 
+RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL substrate adapter/export surface，只把 workspace/source/artifact/memory 的 locator、index、lifecycle 与 operator projection refs 投给 OPL。它是 opaque/index-only export，不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority；OPL 只能索引这些 refs 并路由回 RCA owner surface，不能把 refs 提升成 visual-ready、exportable、handoffable 或 memory accept/reject verdict。
+
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
 当前仓内可执行的 runtime 基线按三层 owner 收口：

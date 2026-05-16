@@ -16,6 +16,12 @@
 - `invokeOplHostedProductEntry` 继续保留为 internal OPL integration contract，供 OPL hosted handoff 调用；它不是第二公开 skill，也不是独立 RCA runtime owner。
 - 该决策不把 OPL provider completion、transition hosted-attempt fixture、no-regression evidence 或 focused receipt proof 写成 visual-ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak。
 
+### 决策：RCA substrate adapter export 只导出 opaque/index-only refs
+
+- RCA 在 manifest、product sidecar 和 runtime-program contracts 中新增 `opl_substrate_adapter_export`，作为 RCA domain-owned OPL substrate adapter/export surface。
+- 该 surface 只导出 OPL 可消费的 workspace/source/artifact/memory locator、index、lifecycle 与 operator projection refs；它不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority。
+- OPL 可以索引和路由 refs，但不能读取或写入 RCA visual truth，不能授权 layout/review/export verdict，不能存储 artifact body，不能读写 visual memory body，不能 accept/reject memory，也不能签发 RCA owner receipt。
+
 ### 决策：RCA 只消费 OPL family scheduler replacement，不实现 generic scheduler
 
 - RCA 在 runtime-program contracts、manifest/sidecar projection 和 guards 中声明消费 OPL `family_scheduler_replacement`。

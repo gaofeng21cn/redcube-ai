@@ -11,6 +11,7 @@ import {
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
   buildPrivatizedFunctionalModuleAuditProjection,
+  buildOplSubstrateAdapterExportProjection,
   listProductSidecarBlockedActions,
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
@@ -18,6 +19,7 @@ import {
 import { runtimeWatch } from './runtime-watch.js';
 import { superviseManagedRun } from './supervise-managed-run.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './product-sidecar-parts/workspace-receipt-proof.js';
+import { buildSidecarOwnerBoundary } from './product-sidecar-parts/owner-boundary.js';
 import {
   buildVisualTransitionEvaluatorProjection,
   evaluateVisualTransition,
@@ -67,45 +69,6 @@ function readTaskPayload(request) {
   return JSON.parse(readFileSync(taskFile, 'utf-8'));
 }
 
-function buildOwnerBoundary() {
-  return {
-    provider_role: 'stage_attempt_queue_wakeup_transport_only',
-    opl_role: 'typed_family_queue_and_control_plane',
-    rca_role: 'visual_domain_truth_review_artifact_owner',
-    rca_surface_role: 'visual_domain_authority_pack_plus_thin_program_surface',
-    provider_owns_visual_truth: false,
-    opl_owns_visual_truth: false,
-    provider_owns_review_verdict: false,
-    opl_owns_review_verdict: false,
-    provider_owns_publication_gate: false,
-    opl_owns_publication_gate: false,
-    rca_owns_functional_harness: false,
-    rca_owns_generic_runtime: false,
-    rca_owns_generic_scheduler: false,
-    rca_owns_generic_daemon: false,
-    rca_owns_generic_lifecycle: false,
-    rca_owns_generic_queue: false,
-    rca_owns_stage_attempt_orchestrator: false,
-    rca_owns_generic_attempt_ledger: false,
-    rca_owns_typed_closeout_transport: false,
-    rca_owns_generic_runner: false,
-    rca_owns_generic_transition_runner: false,
-    rca_owns_generic_workbench: false,
-    rca_owns_visual_truth: true,
-    rca_owns_review_publication_projection: true,
-    rca_owns_artifacts: true,
-    rca_owns_visual_memory_body: true,
-    rca_owns_owner_receipt: true,
-    rca_owns_native_helper_implementation: true,
-    rca_owns_memory_transport: false,
-    rca_owns_memory_refs_only_writeback_chain: false,
-    rca_owns_artifact_lifecycle: false,
-    rca_owns_review_repair_transport: false,
-    rca_owns_restart_dead_letter_repair_human_gate_state_chain: false,
-    rca_owns_native_helper_generic_envelope: false,
-  };
-}
-
 function buildSidecarProjection({ workspaceRoot, manifest }) {
   const sessionSurface = manifest.product_entry_shell?.session || {};
   const familySchedulerReplacement = manifest.family_scheduler_replacement || buildFamilySchedulerReplacementProjection();
@@ -124,6 +87,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       oplGenericPrimitiveConsumption,
       oplStabilityReadModelConsumption,
     })
+  );
+  const oplSubstrateAdapterExport = (
+    manifest.opl_substrate_adapter_export
+    || buildOplSubstrateAdapterExportProjection()
   );
   const visualTransitionEvaluator = (
     manifest.visual_transition_evaluator
@@ -159,6 +126,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
         privatized_functional_module_audit: privatizedFunctionalModuleAudit,
+        opl_substrate_adapter_export: oplSubstrateAdapterExport,
         rca_is_functional_harness_owner: false,
         rca_is_generic_runtime_owner: false,
         rca_is_generic_scheduler_owner: false,
@@ -179,7 +147,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         rca_is_native_helper_generic_envelope_owner: false,
       },
     },
-    owner_boundary: buildOwnerBoundary(),
+    owner_boundary: buildSidecarOwnerBoundary(),
     mapped_surfaces: {
       product_entry_session: {
         command: sessionSurface.command || 'redcube product session',
@@ -365,6 +333,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
       opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
       privatized_functional_module_audit: privatizedFunctionalModuleAudit,
+      opl_substrate_adapter_export: oplSubstrateAdapterExport,
     },
     guarded_actions: listProductSidecarGuardedActions(),
     blocked_actions: listProductSidecarBlockedActions(),
@@ -391,6 +360,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
+      opl_substrate_adapter_export_ref: '/opl_substrate_adapter_export',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {
@@ -457,7 +427,7 @@ function buildDispatchEnvelope({ task, result, action }) {
       writes_publication_gate: false,
       writes_canonical_artifacts: false,
     },
-    owner_boundary: buildOwnerBoundary(),
+    owner_boundary: buildSidecarOwnerBoundary(),
     task_id: task.task_id || task.id || null,
     result_surface: result,
     summary: {

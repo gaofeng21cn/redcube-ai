@@ -10,6 +10,7 @@
 
 - `runtime-program/current-program.json`：当前 active mainline pointer，包含 OPL stage-led hosted integration / provider-backed family runtime 边界与 `TypeScript + Python` 实现目标
 - `runtime-program/current-program.json#/product_release_metadata`：`RedCube AI Foundry Agent` 的产品层发布 metadata，声明它是 built on `OPL Framework` 的 OPL-compatible package，并把 single app skill、service-safe domain entry、product sidecar/projection 与 stage control projection 归入同一发布形态；该 metadata 不持有 visual truth、review/export verdict 或 artifact authority
+- `runtime-program/current-program.json#/product_release_metadata/opl_substrate_adapter_export` 与 `runtime-program/opl-family-contract-adoption.json#/opl_substrate_adapter_export`：RCA domain-owned OPL substrate adapter/export 合同；只导出 opaque/index-only workspace/source/artifact/memory refs 与 lifecycle/operator projection refs，不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority
 - `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct route 与 OPL-hosted handoff 共用同一下游 domain entry）
 - `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
 - `runtime-program/opl-framework-hosted-product-entry.json`：当前 OPL-hosted stage runtime handoff / integration 冻结件

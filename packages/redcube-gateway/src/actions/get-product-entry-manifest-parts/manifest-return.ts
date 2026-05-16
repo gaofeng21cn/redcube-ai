@@ -135,6 +135,7 @@ export function buildReturnedManifestProjection({
   oplGenericPrimitiveConsumption,
   oplStabilityReadModelConsumption,
   privatizedFunctionalModuleAudit,
+  oplSubstrateAdapterExport,
   oplFamilyLifecycleAdapter,
   operatorLoopActions,
   productEntryShell,
@@ -244,6 +245,10 @@ export function buildReturnedManifestProjection({
     privatized_functional_module_audit: (
       privatizedFunctionalModuleAudit
       || manifest.privatized_functional_module_audit
+    ),
+    opl_substrate_adapter_export: (
+      oplSubstrateAdapterExport
+      || manifest.opl_substrate_adapter_export
     ),
     operator_evidence_readiness_projection: operatorEvidenceReadinessProjection,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
