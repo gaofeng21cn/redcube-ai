@@ -31,9 +31,15 @@
 
 ### 决策：operator evidence readiness 只做 RCA-owned refs-only next-gap projection
 
-- RCA 在 manifest、status 与 runtime-program contracts 中新增 `operator_evidence_readiness_projection`，聚合 no-regression / owner receipt proof、domain owner receipt contract、controlled memory runtime receipt refs、lifecycle guarded apply proof、controlled soak blocker、OPL generic primitive consumer coverage 与 stability read-model consumer refs。
+- RCA 在 manifest、status 与 runtime-program contracts 中新增 `operator_evidence_readiness_projection`，聚合 no-regression / owner receipt proof、domain owner receipt contract、controlled memory runtime receipt refs、lifecycle guarded apply proof、controlled soak blocker、workspace receipt inventory、OPL generic primitive consumer coverage 与 stability read-model consumer refs。
 - 该 projection 面向 OPL/App/operator 展示 next evidence gaps：真实 artifact-producing domain owner receipt、真实 OPL-hosted controlled visual-stage long soak、真实 memory/lifecycle receipt instances 和跨 family repeated no-regression evidence。
 - 该 projection 不写 visual truth、artifact blob 或 memory body，不声明 production soak complete 或 artifact-producing owner receipt 已完成，也不实现 OPL generic runtime、workbench 或 observability。
+
+### 决策：workspace receipt inventory 只做 RCA-owned refs-only read model
+
+- RCA 在 manifest、status、session 和 product sidecar 中新增 `workspace_receipt_inventory_projection`，从 workspace runtime receipt root 读取 domain owner、visual pattern memory accepted/rejected 与 lifecycle cleanup/restore/retention receipt refs。
+- 该 read model 只让 OPL/App/operator 索引当前 workspace 的 receipt coverage，并把 `real_memory_lifecycle_receipt_instances` 缺口指向可见 refs；它不写 receipt instance、不读取 memory body、不生成 artifact gallery/handoff shell，也不实现 workbench。
+- 该 projection 不声明 visual-ready、exportable、handoffable、artifact-producing owner receipt 或 production soak complete；真实 OPL-hosted controlled visual-stage long soak、真实 reusable visual memory body 和真实 artifact-producing attempt 仍是后续 runtime evidence。
 
 ## 2026-05-14
 

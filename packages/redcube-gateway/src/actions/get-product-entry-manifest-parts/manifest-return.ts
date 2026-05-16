@@ -4,7 +4,9 @@ export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
   oplStabilityReadModelConsumption,
   standardDomainAgentSkeleton,
+  workspaceReceiptInventoryProjection,
 }) {
+  const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
   return {
     surface_kind: 'operator_evidence_readiness_projection',
     projection_id: 'rca.operator_evidence_readiness.v1',
@@ -37,6 +39,15 @@ export function buildOperatorEvidenceReadinessProjection({
         source_id: 'controlled_soak_no_regression_attempt',
         ref: '/controlled_soak_no_regression_attempt',
         state: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt?.state || 'unknown',
+      },
+      {
+        source_id: 'workspace_receipt_inventory_projection',
+        ref: '/workspace_receipt_inventory_projection',
+        status: workspaceReceiptInventoryProjection?.status || 'unknown',
+        receipt_count: workspaceReceiptInventoryProjection?.receipt_counts?.total || 0,
+        required_memory_lifecycle_receipts_visible: (
+          workspaceReceiptInventoryProjection?.coverage?.required_memory_lifecycle_receipts_visible === true
+        ),
       },
       {
         source_id: 'opl_generic_primitive_consumption',
@@ -81,9 +92,10 @@ export function buildOperatorEvidenceReadinessProjection({
       {
         gap_id: 'real_memory_lifecycle_receipt_instances',
         owner: 'redcube_ai',
-        status: 'pending_runtime_receipt_instances',
+        status: receiptInventoryGapProjection.status || 'pending_runtime_receipt_instances',
         required_evidence: 'Accepted/rejected memory writeback and cleanup/restore/retention lifecycle receipts exist in workspace runtime roots and remain refs-only for OPL.',
-        current_best_ref: '/controlled_memory_apply_proof/runtime_receipt_instances',
+        current_best_ref: receiptInventoryGapProjection.current_best_ref || '/controlled_memory_apply_proof/runtime_receipt_instances',
+        missing_receipt_kinds: receiptInventoryGapProjection.missing_receipt_kinds || [],
       },
       {
         gap_id: 'cross_family_repeated_no_regression_evidence',
@@ -122,11 +134,13 @@ export function buildReturnedManifestProjection({
   runtimeResidueRetirement,
   standardDomainAgentSkeleton,
   visualPatternMemoryWriteback,
+  workspaceReceiptInventoryProjection,
 }) {
   const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
     standardDomainAgentSkeleton,
+    workspaceReceiptInventoryProjection,
   });
   return {
     ...manifest,
@@ -204,6 +218,7 @@ export function buildReturnedManifestProjection({
     product_sidecar_receipt_refs: standardDomainAgentSkeleton.product_sidecar_receipt_refs,
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,

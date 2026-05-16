@@ -17,6 +17,7 @@ type GatewayProductEntryManifest = ProductEntryManifestResponse & {
   operator_evidence_readiness_projection?: unknown;
   ppt_deck_visual_route_truth?: unknown;
   schema_ref?: string;
+  workspace_receipt_inventory_projection?: unknown;
 };
 
 type ProductStatusSurface = ProductStatusResponse & {
@@ -26,6 +27,7 @@ type ProductStatusSurface = ProductStatusResponse & {
   ppt_deck_visual_route_truth?: unknown;
   overlay_stage_sequences: Record<string, unknown>;
   runtime_loop_closure: RuntimeLoopClosureSurface;
+  workspace_receipt_inventory_projection?: unknown;
 };
 
 export async function getProductStatus(request: Record<string, unknown>): Promise<ProductStatusSurface> {
@@ -79,6 +81,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
     deliverable_facade: manifest.deliverable_facade,
     native_ppt_operator_ux: manifest.native_ppt_operator_ux,
     operator_evidence_readiness_projection: manifest.operator_evidence_readiness_projection,
+    workspace_receipt_inventory_projection: manifest.workspace_receipt_inventory_projection,
     ppt_deck_visual_route_truth: manifest.ppt_deck_visual_route_truth,
     overlay_stage_sequences: manifest.deliverable_facade?.family_route_policy || {},
     runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({

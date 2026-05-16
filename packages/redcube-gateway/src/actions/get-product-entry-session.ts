@@ -25,6 +25,7 @@ import {
   buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
 } from './product-entry-continuity-surfaces.js';
+import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 
 const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
@@ -367,6 +368,9 @@ export async function getProductEntrySession(request) {
     publicationProjection,
     deliverableId: session.deliverable_id,
   });
+  const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({
+    workspaceRoot: session.workspace_root,
+  });
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,
     sessionFile: productEntrySessionPath(entrySessionId),
@@ -421,6 +425,7 @@ export async function getProductEntrySession(request) {
     session_continuity: sessionContinuity,
     progress_projection: progressProjection,
     artifact_inventory: artifactInventory,
+    workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
     native_proof_artifact_inventory: nativeProofArtifactInventory,
     ppt_deck_visual_route_session: pptImageRouteSession,
     runtime_loop_closure: runtimeLoopClosure,
