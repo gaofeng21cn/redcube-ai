@@ -22,6 +22,24 @@ test('managed DAG scheduler exposes dependency layers for a single deliverable w
   });
 
   assert.equal(plan.scheduler_kind, 'managed_deliverable_dag');
+  assert.equal(plan.domain_scope, 'visual_deliverable_internal_dag_only');
+  assert.equal(plan.generic_scheduler_owner, false);
+  assert.equal(plan.generic_daemon_owner, false);
+  assert.equal(plan.generic_lifecycle_owner, false);
+  assert.equal(plan.generic_queue_owner, false);
+  assert.equal(plan.generic_attempt_ledger_owner, false);
+  assert.equal(plan.generic_runner_owner, false);
+  assert.equal(plan.generic_workbench_owner, false);
+  assert.equal(plan.authority_boundary.owner, 'redcube_ai');
+  assert.equal(plan.authority_boundary.opl_family_scheduler_owner, 'opl');
+  assert.equal(plan.authority_boundary.managed_dag_scheduler_scope, 'visual_deliverable_internal_dag_only');
+  assert.deepEqual(plan.authority_boundary.retained_authority, [
+    'visual_truth',
+    'review_export_verdict',
+    'artifact_authority',
+    'visual_memory_body',
+    'owner_receipt',
+  ]);
   assert.equal(plan.parallel_safe, true);
   assert.deepEqual(plan.layers.map((layer) => layer.task_ids), [
     ['ppt_deck:deck-a:storyline'],
