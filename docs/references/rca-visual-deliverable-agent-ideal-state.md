@@ -270,7 +270,7 @@ OPL-hosted path 应提供：
 
 ## 开发者与维护者体验
 
-理想维护体验是：新增能力主要补 family stage、route、review gate、native helper、manifest 和 domain package 薄程序面，而不是复制 runtime 外围。
+理想维护体验是：新增能力主要补 family stage、route、review gate、native helper、manifest、declarative visual pack 和 minimal authority function，而不是复制 runtime 外围或手写可由 OPL 生成的产品外壳。
 
 开发者应能：
 
