@@ -134,6 +134,7 @@ export function buildReturnedManifestProjection({
   nativePptOperatorUx,
   oplGenericPrimitiveConsumption,
   oplStabilityReadModelConsumption,
+  privatizedFunctionalModuleAudit,
   oplFamilyLifecycleAdapter,
   operatorLoopActions,
   productEntryShell,
@@ -239,6 +240,10 @@ export function buildReturnedManifestProjection({
     opl_stability_read_model_consumption: (
       oplStabilityReadModelConsumption
       || manifest.opl_stability_read_model_consumption
+    ),
+    privatized_functional_module_audit: (
+      privatizedFunctionalModuleAudit
+      || manifest.privatized_functional_module_audit
     ),
     operator_evidence_readiness_projection: operatorEvidenceReadinessProjection,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,

@@ -10,6 +10,7 @@ import {
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
+  buildPrivatizedFunctionalModuleAuditProjection,
   listProductSidecarBlockedActions,
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
@@ -116,6 +117,14 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
     manifest.opl_stability_read_model_consumption
     || buildOplStabilityReadModelConsumptionProjection()
   );
+  const privatizedFunctionalModuleAudit = (
+    manifest.privatized_functional_module_audit
+    || buildPrivatizedFunctionalModuleAuditProjection({
+      familySchedulerReplacement,
+      oplGenericPrimitiveConsumption,
+      oplStabilityReadModelConsumption,
+    })
+  );
   const visualTransitionEvaluator = (
     manifest.visual_transition_evaluator
     || buildVisualTransitionEvaluatorProjection({
@@ -149,6 +158,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         generic_surfaces_owner: 'opl',
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
+        privatized_functional_module_audit: privatizedFunctionalModuleAudit,
         rca_is_functional_harness_owner: false,
         rca_is_generic_runtime_owner: false,
         rca_is_generic_scheduler_owner: false,
@@ -354,6 +364,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       family_scheduler_replacement: familySchedulerReplacement,
       opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
       opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
+      privatized_functional_module_audit: privatizedFunctionalModuleAudit,
     },
     guarded_actions: listProductSidecarGuardedActions(),
     blocked_actions: listProductSidecarBlockedActions(),
@@ -379,6 +390,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
+      privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {

@@ -113,6 +113,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       false,
     );
     assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.privatized_functional_module_audit.status,
+      'machine_audit_projection_landed',
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.privatized_functional_module_audit.authority_boundary.rca_generic_scheduler_owner,
+      false,
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.privatized_functional_module_audit.authority_boundary.opl_can_claim_production_soak_complete,
+      false,
+    );
+    assert.equal(
       sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.functional_harness_consumer_coverage.pass_claim_scope,
       'consumer_contract_coverage_only',
     );
@@ -255,6 +267,30 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.opl_stability_read_model_consumption.authority_boundary.event_bus_can_be_truth_source,
       false,
     );
+    assert.equal(sidecar.mapped_surfaces.privatized_functional_module_audit.ref, '/privatized_functional_module_audit');
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.map((entry) => entry.module_id),
+      [
+        'managed_dag_scheduler',
+        'native_helper_envelope_wrapper',
+        'workspace_receipt_inventory',
+        'artifact_gallery_handoff_shell',
+        'review_repair_transport',
+        'observability_stability_read_model',
+        'sidecar_status_action_parity',
+      ],
+    );
+    assert.equal(sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.length, 0);
+    assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
+    assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('native_helper_implementation'));
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').rca_scope,
+      'visual_deliverable_internal_dag_only',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'observability_stability_read_model').rca_owned_visual_domain_authority,
+      false,
+    );
     assert.equal(sidecar.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
     assert.equal(sidecar.source_manifest_refs.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
@@ -361,6 +397,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       sidecar.source_manifest_refs.opl_stability_read_model_consumption_ref,
       '/opl_stability_read_model_consumption',
+    );
+    assert.equal(
+      sidecar.source_manifest_refs.privatized_functional_module_audit_ref,
+      '/privatized_functional_module_audit',
     );
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),

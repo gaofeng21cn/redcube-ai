@@ -294,6 +294,63 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
   }
 });
 
+test('RCA privatized functional module audit is machine readable for OPL without retiring domain surfaces', () => {
+  const adoption = contract();
+  const current = currentProgram();
+  const surfaces = [
+    adoption.privatized_functional_module_audit,
+    current.product_release_metadata.privatized_functional_module_audit,
+    current.current_state.privatized_functional_module_audit,
+    current.current_state.active_baton.scope.privatized_functional_module_audit,
+  ];
+  const expectedModules = [
+    'managed_dag_scheduler',
+    'native_helper_envelope_wrapper',
+    'workspace_receipt_inventory',
+    'artifact_gallery_handoff_shell',
+    'review_repair_transport',
+    'observability_stability_read_model',
+    'sidecar_status_action_parity',
+  ];
+
+  for (const surface of surfaces) {
+    assert.equal(surface.ref, '/privatized_functional_module_audit');
+    assert.equal(surface.contract_ref, 'rca.privatized_functional_module_audit.v1');
+    assert.equal(surface.status, 'machine_audit_projection_landed');
+    assert.equal(surface.read_only, true);
+    assert.equal(surface.refs_only, true);
+    assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
+    assert.deepEqual(surface.retire_tombstone_candidates, []);
+    assert.equal(surface.authority_boundary.opl_can_index_audit_projection, true);
+    assert.equal(surface.authority_boundary.opl_can_write_rca_visual_truth, false);
+    assert.equal(surface.authority_boundary.opl_can_claim_production_soak_complete, false);
+    assert.equal(surface.authority_boundary.rca_generic_scheduler_owner, false);
+    assert.equal(surface.authority_boundary.rca_native_helper_generic_envelope_owner, false);
+    assert.equal(surface.authority_boundary.rca_review_repair_transport_owner, false);
+    assert.ok(surface.must_not_retire.includes('managed_deliverable_internal_dag'));
+    assert.ok(surface.must_not_retire.includes('visual_review_export_gate'));
+    assert.ok(surface.must_not_retire.includes('native_helper_implementation'));
+
+    for (const entry of surface.modules) {
+      assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
+      assert.equal(entry.retire_tombstone, false, entry.module_id);
+      assert.equal(entry.tombstone_required, false, entry.module_id);
+      assert.equal(entry.writes_visual_truth, false, entry.module_id);
+      assert.equal(entry.writes_artifact_blob, false, entry.module_id);
+      assert.equal(entry.writes_memory_body, false, entry.module_id);
+      assert.equal(entry.declares_visual_ready, false, entry.module_id);
+      assert.equal(entry.declares_exportable, false, entry.module_id);
+      assert.equal(entry.declares_handoffable, false, entry.module_id);
+    }
+  }
+
+  const byId = Object.fromEntries(surfaces[0].modules.map((entry) => [entry.module_id, entry]));
+  assert.equal(byId.managed_dag_scheduler.rca_scope, 'visual_deliverable_internal_dag_only');
+  assert.equal(byId.native_helper_envelope_wrapper.rca_scope, 'python_native_helper_implementation');
+  assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
+  assert.equal(byId.observability_stability_read_model.rca_owned_visual_domain_authority, false);
+});
+
 test('RCA consumes OPL stability read-model surfaces as refs-only projections', () => {
   const payload = contract();
   const current = currentProgram();

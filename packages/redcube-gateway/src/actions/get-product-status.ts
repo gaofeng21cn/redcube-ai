@@ -16,6 +16,7 @@ type GatewayProductEntryManifest = ProductEntryManifestResponse & {
   native_ppt_operator_ux?: unknown;
   operator_evidence_readiness_projection?: unknown;
   ppt_deck_visual_route_truth?: unknown;
+  privatized_functional_module_audit?: unknown;
   schema_ref?: string;
   visual_transition_evaluator?: unknown;
   workspace_receipt_inventory_projection?: unknown;
@@ -26,6 +27,7 @@ type ProductStatusSurface = ProductStatusResponse & {
   native_ppt_operator_ux?: unknown;
   operator_evidence_readiness_projection?: unknown;
   ppt_deck_visual_route_truth?: unknown;
+  privatized_functional_module_audit?: unknown;
   overlay_stage_sequences: Record<string, unknown>;
   runtime_loop_closure: RuntimeLoopClosureSurface;
   visual_transition_evaluator?: unknown;
@@ -83,6 +85,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
     deliverable_facade: manifest.deliverable_facade,
     native_ppt_operator_ux: manifest.native_ppt_operator_ux,
     operator_evidence_readiness_projection: manifest.operator_evidence_readiness_projection,
+    privatized_functional_module_audit: manifest.privatized_functional_module_audit,
     visual_transition_evaluator: manifest.visual_transition_evaluator,
     workspace_receipt_inventory_projection: manifest.workspace_receipt_inventory_projection,
     ppt_deck_visual_route_truth: manifest.ppt_deck_visual_route_truth,

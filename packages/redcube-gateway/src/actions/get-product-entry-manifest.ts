@@ -54,6 +54,7 @@ import {
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
+  buildPrivatizedFunctionalModuleAuditProjection,
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
 } from './product-sidecar-guarded-actions.js';
@@ -699,6 +700,11 @@ export async function getProductEntryManifest(request) {
   const familySchedulerReplacement = buildFamilySchedulerReplacementProjection();
   const oplGenericPrimitiveConsumption = buildOplGenericPrimitiveConsumptionProjection();
   const oplStabilityReadModelConsumption = buildOplStabilityReadModelConsumptionProjection();
+  const privatizedFunctionalModuleAudit = buildPrivatizedFunctionalModuleAuditProjection({
+    familySchedulerReplacement,
+    oplGenericPrimitiveConsumption,
+    oplStabilityReadModelConsumption,
+  });
   const productEntryShell = buildProductEntryShellCatalog({
     status: {
       command: PRODUCT_STATUS_COMMAND,
@@ -968,6 +974,7 @@ export async function getProductEntryManifest(request) {
     nativePptOperatorUx,
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
+    privatizedFunctionalModuleAudit,
     oplFamilyLifecycleAdapter,
     operatorLoopActions,
     productEntryShell,

@@ -2,6 +2,13 @@
 
 ## 2026-05-16
 
+### 决策：privatized functional module audit 成为 OPL 可读的机器审计面
+
+- RCA 在 runtime-program contracts、manifest、status 和 product sidecar projection 中新增 `privatized_functional_module_audit`，统一盘点 managed-dag-scheduler、native helper envelope/wrapper、workspace receipt inventory、artifact gallery/handoff shell、review/repair transport、observability/stability read model 与 sidecar/status/action parity。
+- 该 audit 只做 refs-only read model：OPL 可以索引模块边界和 generic primitive consumer 关系，但不能据此写 RCA visual truth、artifact blob、memory body，不能声明 visual-ready、exportable、handoffable 或 production soak complete。
+- 当前没有新增 retire/tombstone candidate；`managed-dag-scheduler` 保留为 visual deliverable 内部 DAG，review/export gate、artifact authority、owner receipt 和 Python native helper implementation 继续归 RCA。
+- 真实仍需由 OPL 上收的代码面是 generic scheduler/runner/attempt ledger、native-helper generic envelope、artifact lifecycle/handoff shell、review/repair transport、observability/SLO/read-model 与 App/workbench shell；RCA 只消费这些通用 primitive 的 projection。
+
 ### 决策：product sidecar / action / status parity 由 canonical metadata 驱动
 
 - Product sidecar guarded actions、forbidden writes、manifest sidecar、family action catalog、CLI help 和 MCP product-entry routes 统一从 RCA-owned canonical action/status metadata 派生。
