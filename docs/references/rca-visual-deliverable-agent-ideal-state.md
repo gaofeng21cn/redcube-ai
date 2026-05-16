@@ -24,13 +24,15 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 
 因此，RCA 的理想形态是视觉交付 `Domain Knowledge / Authority Pack + thin program surface`。RCA 不维护独立 agent runtime platform，也不长期维护 generic scheduler、generic queue、generic attempt ledger、generic state-machine runner、generic workspace/source intake shell、generic artifact gallery、generic memory locator、generic review/repair transport、generic observability 或通用 App/workbench runtime。RCA 的 descriptor、contract/schema、product sidecar、service-safe domain entry、projection builder、domain transition spec/table、review/export gate、artifact locator、receipt schema、tests 和 lifecycle adapter 只把 visual stage pack、route truth、review/export verdict、artifact refs、typed blocker 和 owner receipt 暴露给 OPL。这些薄程序面服务 OPL 发现、托管、审计和投影，不构成第二套通用平台。
 
+2026-05-16 P2 口径：RCA 消费 OPL `family_scheduler_replacement`，OPL 持有 family scheduler / daemon / generic lifecycle owner；RCA 不新增 generic scheduler。仓内 `managed-dag-scheduler` 只表示 visual deliverable 内部 DAG 分层，不是系统级 scheduler。RCA 保留 visual truth、review/export verdict、artifact authority、visual memory body、owner receipt、typed blocker 和 safe action refs。
+
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 
 2026-05-15 当前代码已把 RCA transition hosted-attempt receipt 对账推进到 repo-local focused fixture：fixture 模拟 OPL provider attempt bridge 消费 `visual_transition_spec` 后，只保存 RCA 返回的 `domain_owner_receipt_ref`、`typed_blocker` 或 `no_regression_evidence_ref`，要求 transition receipt 显式引用 provider attempt ref，并递归禁止 `visual_ready`、`exportable`、`handoffable`、production soak complete、artifact blob、memory body 或 review/export verdict payload。该能力是理想态中 OPL-hosted visual transition attempt 的对账形状证明，不是 artifact-producing owner receipt，也不是 Temporal long soak。
 
 2026-05-16 校准：RCA 当前目录和 surface 已适合展示“artifact-heavy Foundry Agent”如何接入 OPL：repo 根层具备 `agent/`、`apps/redcube-cli|redcube-mcp`、`contracts/runtime-program/`、`packages/` runtime families、`plugins/rca`、`python/redcube_ai` native helpers、`runtime/`、`prompts/` 和 canonical docs taxonomy。它的范本价值在于 TypeScript orchestration + Python native helper、deliverable family、review/export gate、artifact locator、sidecar/projection 和 visual transition spec 的 owner 边界；它不是通用新 Agent scaffold 的直接目录模板，因为 packages/families/prompts/native helper 结构高度服务 visual deliverable domain。通用 skeleton/checklist 应由 OPL 抽取，RCA 保持 visual authority pack。
 
-执行顺序上，RCA 理想态要求先把已知通用外围上收到 OPL / App，并把 RCA adapter 保持薄：source/workspace intake、artifact gallery/handoff、review/repair transport、native helper execution envelope、route/decision graph、observability/SLO、App drilldown 和 scaffold/template checklist 应先完成归位。真实 OPL-hosted visual stage、Temporal long soak、跨 family 重复 proof 和 production closure 是后置验收，不应阻塞这些功能迁移、helper wrapper cleanup 和旧面退役。
+执行顺序上，RCA 理想态要求先把已知通用外围上收到 OPL / App，并把 RCA adapter 保持薄：source/workspace intake、artifact gallery/handoff、review/repair transport、native helper execution envelope、route/decision graph、observability/SLO、App drilldown 和 scaffold/template checklist 应先完成归位。真实 OPL-hosted visual stage、Temporal long soak、跨 family 重复 proof 和 production closure 是后置验收，不应阻塞这些功能迁移、package-module-only helper guard 维护和旧面退役。
 
 ## 产品分层
 

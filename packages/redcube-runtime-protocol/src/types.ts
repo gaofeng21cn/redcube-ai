@@ -15,7 +15,6 @@ export interface RedCubePythonNativeHelper {
   helperId: string;
   packageModule: string;
   pythonRoot: string;
-  compatibilityScript: string | null;
   catalogFile: string;
 }
 
@@ -26,7 +25,6 @@ export interface ResolveRedCubePythonNativeHelperOptions {
 export interface RedCubePythonHelperInvocation {
   helperId: string;
   packageModule: string | null;
-  compatibilityScript: string | null;
   argv: string[];
   env: Record<string, string | undefined>;
   label: string;
@@ -35,7 +33,6 @@ export interface RedCubePythonHelperInvocation {
 export interface RedCubePythonHelperReference {
   helper_id: string;
   package_module: string | null;
-  compatibility_script: string | null;
 }
 
 export interface RunRedCubePythonHelperOptions {
@@ -51,7 +48,6 @@ export interface RedCubePythonHelperRunResult {
   command: string;
   helper_id: string;
   package_module: string | null;
-  compatibility_script: string | null;
   argv: string[];
   payload: unknown;
 }

@@ -148,7 +148,11 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   }
 
   if (options.help === true) {
-    const commandHelp = buildCommandHelp([command, subcommand].filter(Boolean).join(' '));
+    const commandHelp = buildCommandHelp(
+      command === 'product' && subcommand === 'sidecar'
+        ? [command, subcommand, rest[1]].filter(Boolean).join(' ')
+        : [command, subcommand].filter(Boolean).join(' '),
+    );
     if (commandHelp) {
       return commandHelp;
     }

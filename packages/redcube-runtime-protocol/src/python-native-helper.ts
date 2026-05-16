@@ -43,7 +43,6 @@ export function resolvePythonNativeHelper(
     helpers?: Array<{
       helper_id?: string;
       package_module?: string;
-      script?: string;
     }>;
   };
   const helper = (Array.isArray(catalog.helpers) ? catalog.helpers : [])
@@ -55,7 +54,6 @@ export function resolvePythonNativeHelper(
     helperId,
     packageModule: helper.package_module,
     pythonRoot: path.resolve(repoRoot, catalog.package?.source_root || 'python'),
-    compatibilityScript: helper.script ? path.resolve(repoRoot, helper.script) : null,
     catalogFile,
   });
 }
@@ -74,7 +72,6 @@ export function resolvePythonHelperInvocation(
     return {
       helperId: helper.helperId || helper.packageModule,
       packageModule: helper.packageModule,
-      compatibilityScript: helper.compatibilityScript || null,
       argv: ['-m', helper.packageModule],
       env: buildPythonHelperEnv(pythonRoot, env),
       label: helper.packageModule,
@@ -88,7 +85,6 @@ export function resolvePythonHelperInvocation(
   return {
     helperId: path.basename(script),
     packageModule: null,
-    compatibilityScript: script,
     argv: [script],
     env,
     label: script,
@@ -102,7 +98,6 @@ export function pythonHelperReference(
     return {
       helper_id: helper.helperId || helper.packageModule,
       package_module: helper.packageModule,
-      compatibility_script: helper.compatibilityScript || null,
     };
   }
   const script = safeText(helper);
@@ -110,7 +105,6 @@ export function pythonHelperReference(
     ? {
         helper_id: path.basename(script),
         package_module: null,
-        compatibility_script: script,
       }
     : null;
 }
@@ -139,7 +133,6 @@ export function runRedCubePythonHelper(
     command: pythonCommand.command,
     helper_id: invocation.helperId,
     package_module: invocation.packageModule,
-    compatibility_script: invocation.compatibilityScript,
     argv: invocation.argv,
     payload: JSON.parse(String(result.stdout || '{}')),
   };

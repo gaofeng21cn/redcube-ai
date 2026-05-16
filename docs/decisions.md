@@ -1,5 +1,27 @@
 # RedCube AI 关键决策
 
+## 2026-05-16
+
+### 决策：product sidecar / action / status parity 由 canonical metadata 驱动
+
+- Product sidecar guarded actions、forbidden writes、manifest sidecar、family action catalog、CLI help 和 MCP product-entry routes 统一从 RCA-owned canonical action/status metadata 派生。
+- `redcube_product_entry` MCP public routes 只暴露 `family_action_catalog` 中的 action；`invoke_opl_hosted_product_entry` 不再作为公开 MCP action。
+- `invokeOplHostedProductEntry` 继续保留为 internal OPL integration contract，供 OPL hosted handoff 调用；它不是第二公开 skill，也不是独立 RCA runtime owner。
+- 该决策不把 OPL provider completion、transition hosted-attempt fixture、no-regression evidence 或 focused receipt proof 写成 visual-ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak。
+
+### 决策：RCA 只消费 OPL family scheduler replacement，不实现 generic scheduler
+
+- RCA 在 runtime-program contracts、manifest/sidecar projection 和 guards 中声明消费 OPL `family_scheduler_replacement`。
+- OPL 持有 family scheduler、daemon 和 generic lifecycle owner；RCA 不新增 generic scheduler、generic daemon、generic transition runner 或 App/workbench shell。
+- 仓内 `managed-dag-scheduler` 只表示 visual deliverable 内部 DAG 分层，RCA 继续持有 visual truth、review/export verdict、artifact authority、visual memory body、owner receipt、typed blocker 和 safe action refs。
+
+### 决策：Python native helper wrapper 退役为 package-module-only
+
+- Python helper catalog、runtime callsite 和 native proof lane 统一使用 `python -m redcube_ai.<helper_module>` package module invocation。
+- `packages/redcube-runtime/scripts/ppt_deck_review.py`、`packages/redcube-runtime/scripts/ppt_deck_export.py`、`packages/redcube-runtime/scripts/ppt_deck_native.py` 与 `python/redcube_ai/hermes/agent_loop_bridge.py` thin wrapper 已退役。
+- Catalog / proof lane 不再声明 `script` / `compatibility_script` wrapper authority；后续不得恢复 compatibility layer、script caller 或 contract anchor。
+- Native helpers 继续受 RCA route、visual director review、screenshot review 和 export gate 约束，不能绕过 product-entry/runtime-family mainline。
+
 ## 2026-05-14
 
 ### 决策：owner receipt / memory writeback / workspace lifecycle apply 由 RCA 持有 authority

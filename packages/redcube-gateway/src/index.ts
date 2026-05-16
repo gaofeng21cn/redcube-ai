@@ -390,6 +390,13 @@ export {
   getRedCubeFamilyActionCatalog,
 } from './actions/family-action-catalog.js';
 
+export {
+  listProductSidecarBlockedActions,
+  listProductSidecarForbiddenWrites,
+  listProductSidecarGuardedActionIds,
+  listProductSidecarGuardedActions,
+} from './actions/product-sidecar-guarded-actions.js';
+
 export type {
   CreateDeliverableRequest,
   DeliverableAuditRequest,

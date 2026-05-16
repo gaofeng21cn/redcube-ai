@@ -494,7 +494,6 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
       tool: string;
       helper_id: string;
       package_module: string | null;
-      compatibility_script: string | null;
       command: string[];
     };
   };

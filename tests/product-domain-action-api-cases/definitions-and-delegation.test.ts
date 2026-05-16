@@ -87,18 +87,49 @@ test('MCP catalog definitions are projected from the RedCube family action catal
   const productEntryActions = metadata.mcp_actions
     .filter((action) => action.tool_name === 'redcube_product_entry')
     .map((action) => action.action_key);
+  const productEntryActionIds = metadata.mcp_actions
+    .filter((action) => action.tool_name === 'redcube_product_entry')
+    .map((action) => action.action_id);
+  const catalogActionIds = new Set(catalog.actions.map((action) => action.action_id));
 
   assert.deepEqual(
     productEntryActions,
     productEntryTool?.action_catalog_projection?.action_keys,
   );
+  assert.deepEqual(
+    productEntryActionIds,
+    productEntryTool?.action_catalog_projection?.action_ids,
+  );
+  assert.equal(productEntryActionIds.every((actionId) => catalogActionIds.has(actionId)), true);
   assert.equal(productEntryActions.includes('export_product_sidecar'), true);
   assert.equal(productEntryActions.includes('dispatch_product_sidecar'), true);
   assert.equal(productEntryActions.includes('invoke_domain_entry'), true);
+  assert.equal(productEntryActions.includes('invoke_opl_hosted_product_entry'), false);
   assert.equal(productEntryTool?.description, metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.description);
   assert.deepEqual(
     productEntryTool?.action_catalog_projection,
     metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.action_catalog_projection,
+  );
+});
+
+test('MCP product-entry routes are limited to the canonical family action catalog', async () => {
+  const metadata = buildRedCubeActionMetadata();
+  const definitions = getToolDefinitions();
+  const productEntryTool = definitions.find((tool) => tool.name === 'redcube_product_entry');
+  const productEntryActionKeys = metadata.mcp_actions
+    .filter((action) => action.tool_name === 'redcube_product_entry')
+    .map((action) => action.action_key);
+
+  assert.deepEqual(productEntryTool?.action_catalog_projection?.action_keys, productEntryActionKeys);
+  await assert.rejects(
+    () => callDomainTool(
+      'redcube_product_entry',
+      { action: 'invoke_opl_hosted_product_entry' },
+      {
+        invokeOplHostedProductEntry: async () => ({ ok: true }),
+      },
+    ),
+    /Unsupported redcube_product_entry action: invoke_opl_hosted_product_entry/,
   );
 });
 

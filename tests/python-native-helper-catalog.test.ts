@@ -1,7 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -126,7 +126,7 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
   assert.deepEqual(catalog.invocation_policy, {
     preferred_internal_invocation: 'package_module',
     preferred_argv_shape: ['python', '-m', '<package_module>'],
-    compatibility_script_wrappers_allowed: true,
+    compatibility_script_wrappers_allowed: false,
     compatibility_script_wrappers_are_preferred: false,
   });
   assert.equal(catalog.bypass_policy.generic_bypass_allowed, false);
@@ -153,7 +153,7 @@ test('Python native helper catalog records doctor as diagnostics, not an executi
   assert.equal(catalog.helpers.some((helper) => helper.package_module === catalog.package.diagnostics.package_module), false);
 });
 
-test('Python native helper catalog only points at tracked Python helper scripts', () => {
+test('Python native helper catalog only points at tracked package modules', () => {
   const catalog = readJson(CATALOG_FILE);
   const helpers = helperById(catalog);
 
@@ -164,7 +164,7 @@ test('Python native helper catalog only points at tracked Python helper scripts'
 
   for (const helper of catalog.helpers) {
     assert.equal(helper.owner, 'python_native_helper');
-    assert.equal(helper.script.endsWith('.py'), true, helper.helper_id);
+    assert.equal(Object.hasOwn(helper, 'script'), false, helper.helper_id);
     assert.equal(typeof helper.package_module, 'string', helper.helper_id);
     assert.match(helper.package_module, /^redcube_ai\./, helper.helper_id);
     assert.equal(helper.package_entrypoint.module, helper.package_module, helper.helper_id);
@@ -175,7 +175,6 @@ test('Python native helper catalog only points at tracked Python helper scripts'
       argv: ['-m', helper.package_module],
     }, helper.helper_id);
     assert.match(helper.package_entrypoint.console_script, /^redcube-/, helper.helper_id);
-    assert.equal(existsSync(path.resolve(helper.script)), true, helper.script);
   }
 
   assert.equal(helpers.ppt_deck_review.deliverable_family, 'ppt_deck');
@@ -366,14 +365,24 @@ test('Fast and meta diagnostic coverage does not invoke the native PPT renderer'
   assert.match(rendererDependencies, /shutil\.which/);
 });
 
-test('Compatibility wrapper scripts remain thin package entrypoints', () => {
+test('Python helper catalog has retired compatibility wrapper scripts', () => {
   const catalog = readJson(CATALOG_FILE);
+  const proofLane = readJson(PROOF_LANE_FILE);
 
   for (const helper of catalog.helpers) {
-    const wrapper = readFileSync(path.resolve(helper.script), 'utf-8');
-    assert.match(wrapper, new RegExp(`from ${helper.package_module.replaceAll('.', '\\.')} import main`), helper.helper_id);
-    assert.match(wrapper, /if __name__ == ['"]__main__['"]:/, helper.helper_id);
+    assert.equal(Object.hasOwn(helper, 'script'), false, helper.helper_id);
+    assert.equal(helper.preferred_invocation.kind, 'package_module', helper.helper_id);
+    assert.deepEqual(helper.preferred_invocation.argv, ['-m', helper.package_module], helper.helper_id);
   }
+
+  const runtimeExecutorProof = proofLane.candidate_route_model.runtime_executor_proof;
+
+  assert.equal(runtimeExecutorProof.native_writer_package_module, NATIVE_PPT_PACKAGE_MODULE);
+  assert.equal(
+    runtimeExecutorProof.native_writer_module_command,
+    `python -m ${NATIVE_PPT_PACKAGE_MODULE}`,
+  );
+  assert.equal(Object.hasOwn(runtimeExecutorProof, 'native_writer'), false);
 });
 
 test('Runtime Python helper callers prefer package module invocation over wrapper script paths', () => {
@@ -409,6 +418,55 @@ test('Runtime and test proof callers do not prefer ppt deck wrapper scripts', ()
   assert.match(testProofSource, /redcube_ai\.native_helpers\.ppt_deck\.review/);
   assert.match(testProofSource, /'-m',\s*PPT_DECK_REVIEW_MODULE/);
   assert.match(testProofSource, /PYTHONPATH/);
+});
+
+test('Retired wrapper paths have no active callers or contract anchors', () => {
+  const retiredWrapperPaths = [
+    'packages/redcube-runtime/scripts/ppt_deck_review.py',
+    'packages/redcube-runtime/scripts/ppt_deck_export.py',
+    'packages/redcube-runtime/scripts/ppt_deck_native.py',
+    'python/redcube_ai/hermes/agent_loop_bridge.py',
+  ];
+  const allowedFiles = new Set([
+    'tests/python-native-helper-catalog.test.ts',
+    'tests/rca-retired-surface-guard.test.ts',
+    'docs/status.md',
+    'docs/active/rca-ideal-state-gap-plan.md',
+  ]);
+  const activeRoots = ['apps', 'packages', 'contracts', 'scripts', 'tests', 'tools', 'python'];
+  const textExtensions = new Set(['.json', '.ts', '.tsx', '.js', '.mjs', '.cjs', '.py', '.sh', '.yaml', '.yml']);
+  const listFiles = (root) => {
+    if (!existsSync(path.resolve(root))) return [];
+    return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+      const file = path.join(root, entry.name);
+      if (entry.isDirectory()) {
+        if (['dist', 'build', 'node_modules'].includes(entry.name)) return [];
+        return listFiles(file);
+      }
+      return entry.isFile() && textExtensions.has(path.extname(entry.name)) ? [file] : [];
+    });
+  };
+
+  for (const retiredPath of retiredWrapperPaths) {
+    assert.equal(existsSync(path.resolve(retiredPath)), false, retiredPath);
+  }
+
+  const violations = [];
+  for (const file of activeRoots.flatMap(listFiles)) {
+    const normalized = file.split(path.sep).join('/');
+    if (allowedFiles.has(normalized)) continue;
+    const text = readFileSync(file, 'utf-8');
+    for (const retiredPath of retiredWrapperPaths) {
+      if (text.includes(retiredPath)) {
+        violations.push(`${normalized}: ${retiredPath}`);
+      }
+    }
+    if (/\bcompatibility_script\b|\bcompatibilityScript\b/.test(text)) {
+      violations.push(`${normalized}: compatibility_script`);
+    }
+  }
+
+  assert.deepEqual(violations, []);
 });
 
 test('Hermes-Agent loop client defaults to the package module bridge', () => {
