@@ -17,8 +17,8 @@
 
 当前 route equivalence 的可验证边界由 product-entry manifest 暴露：`status`、`invoke`、`session continuation` 与 internal OPL integration 的共享真相面固定为 `domain_entry_surface`、`session_continuity`、`progress_projection`、`artifact_inventory`、`runtime_loop_closure`、`review_state`、`publication_projection`。这条边界只证明多入口落到同一 deliverable/runtime truth，不创建第二公开 skill，也不创建第二套运行语义；direct product-entry 默认 runtime / executor 都是 `codex_cli`，OPL-hosted integration 声明 `configured_family_runtime_provider`，显式 Hermes proof lane 才声明 `upstream_hermes_agent`。
 这里的 `status` 是 agent-facing product-entry overview / intake / entry-shell contract；`redcube product status` 是当前 product-status command，不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
-`family_action_catalog` 是 RCA-owned callable action metadata 单一声明面；product-entry manifest、CLI help、MCP descriptors/routes 与 app skill command contracts 都从它派生。`OPL` 只读取该 catalog 做 family-level discovery/export/parity，不写 RedCube visual-domain truth、managed run truth、review/publication projection 或 canonical artifacts。
-`redcube product sidecar export --workspace-root <dir> --format json` 是给 OPL typed family queue / OPL family runtime provider 在线唤醒使用的 product sidecar adapter projection；`redcube product sidecar dispatch --task <task.json> --format json` 只接受 RCA-owned guarded actions：`runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`notification_receipt`。该 sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。
+`family_action_catalog` 是 RCA-owned callable action metadata 单一声明面；product-entry manifest、CLI help、MCP descriptors/routes 与 app skill command contracts 都从它派生。`OPL` 只读取该 catalog 做 family-level discovery/export/parity，不写 RedCube visual-domain truth、managed run truth、review/publication projection 或 canonical artifacts。Product-entry MCP public routes 只暴露 catalog actions；`invokeOplHostedProductEntry` 保留为 internal OPL integration contract，不作为公开 MCP action。
+`redcube product sidecar export --workspace-root <dir> --format json` 是给 OPL typed family queue / OPL family runtime provider 在线唤醒使用的 product sidecar adapter projection；`redcube product sidecar dispatch --task <task.json> --format json` 只接受 RCA-owned guarded actions：`runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`notification_receipt`。这些 guarded actions 与 forbidden writes 来自 canonical sidecar action metadata，并同步到 manifest、family action catalog、product sidecar export 和 CLI/MCP guards。该 sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。
 `standard_domain_agent_skeleton` 是 RCA 对 OPL standard domain-agent skeleton 的 manifest mapping 与低风险 repo-source follow-through：repo-source 边界限定为 `agent / contracts / runtime / docs`，runtime 只声明 product sidecar、projection builder、lifecycle adapter、owner receipt contract 和 domain memory locator；真实 PNG/PPTX/PDF、receipt 实例和 export bundle 继续落在 workspace/runtime artifact root，并通过 `artifact_locator_contract`、`product_sidecar_receipt_refs`、`domain_owner_receipt_contract` 与 `controlled_memory_apply_proof/runtime_receipt_instances` 暴露 ref。
 `stage_control_projection` 是给 OPL family Stage Control Plane 的 descriptor/read-only adapter：它把 RCA 已有 `ppt_deck`、`xiaohongshu`、`poster_onepager` route stages 投影到 `source_intake`、`communication_strategy`、`visual_direction`、`artifact_creation`、`review_and_revision`、`package_and_handoff` 等 family stage kinds。product-entry manifest 中的每个 stage descriptor 都包含 goal、owner、skills、allowed_action_refs、handoff、source refs、freshness、stage-to-action parity 与 authority boundary，供 OPL 真实 discovery smoke 消费；它不创建调度器、不改变 hydrated `stage_sequence`，也不接管 RedCube managed deliverable runtime。Codex App direct skill 调用与 OPL 托管调用必须在 `invokeDomainEntry` / product-entry command contract 后收敛；OPL stage metadata 不能成为第二 route truth、第二 review owner 或第二 artifact authority。
 
@@ -27,6 +27,8 @@
 RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract` 统一 domain receipt、typed blocker 与 no-regression evidence return shape；`lifecycle_guarded_apply_proof` 覆盖 cleanup/restore/retention 的 guarded apply 语义；`visual_transition_spec` 声明 RCA-owned transition table、guard contract、oracle fixture 与 owner action；`physical_skeleton_follow_through` 证明 `agent/ contracts/ runtime/ docs/` 入口可被 OPL 消费；`review_helper_baseline_follow_through` 记录 PPT review helper 的 baseline removal、geometry audit / markdown report / summary projection 拆分与剩余 screenshot capture 边界。这些 surface 仍是 RCA-owned projection，不把 visual truth、review/export verdict、canonical artifact 或 memory body 移给 OPL。
 
 当前 sidecar runtime apply surface 已包含 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`。三者都属于 RCA-owned workspace/runtime apply surface：写入和返回的是 workspace runtime refs、domain receipt、typed blocker、no-regression evidence、memory receipt refs 或 lifecycle mutation receipt；RCA 继续持有 visual truth、review/export verdict、memory body、canonical artifacts 和 artifact mutation authority。OPL-hosted path 只能消费 locator、projection、receipt refs、operator projection 和 repair hints，不能把 provider completion 或 stage metadata 升级成 RCA visual ready / exportable / handoffable verdict。真实 OPL Temporal controlled visual-stage long soak 当前仍未完成。
+
+RCA 现在消费 OPL `family_scheduler_replacement` projection：OPL 持有 family scheduler、daemon 和 generic lifecycle owner；RCA 不在仓内实现 generic scheduler/runtime manager。仓内 `managed-dag-scheduler` 只描述 visual deliverable 内部 DAG 分层，继续受 RCA route truth、review/export verdict、artifact authority、visual memory body 和 owner receipt 约束。
 
 当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface，并继续复用 `createDeliverable`、`runManagedDeliverable`、`runDeliverableRoute`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。facade 是 contract / docs / test guardrail，不接管或重写核心生成链路。
 
@@ -190,6 +192,18 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
   - `@redcube/gateway` `getProductEntrySession`
 
 它们继续把执行下沉到同一个 `invokeDomainEntry`，同时把 session continuity 持久化到用户级 runtime-state，而不是把 product entry 写成 repo-local runtime 自己的新宿主。
+
+公开 MCP product-entry route 只承载 `family_action_catalog` 中的 action。`invokeOplHostedProductEntry` 仍是 internal OPL-hosted integration callable surface，供 OPL handoff contract 使用，不作为 `redcube_product_entry` MCP action key 暴露。
+
+## Python Native Helper Surface
+
+当前 repo-owned Python helper surface 是 package-module-only：
+
+- catalog: `contracts/runtime-program/python-native-helper-catalog.json`
+- invocation: `python -m redcube_ai.<helper_module>`
+- proof lane: `contracts/runtime-program/ppt-native-authoring-proof-lane.json`
+
+退役的 thin wrapper 包括 `packages/redcube-runtime/scripts/ppt_deck_review.py`、`packages/redcube-runtime/scripts/ppt_deck_export.py`、`packages/redcube-runtime/scripts/ppt_deck_native.py` 与 `python/redcube_ai/hermes/agent_loop_bridge.py`。这些路径不得作为 active caller、contract anchor 或 compatibility layer 恢复；no-active-caller proof 与 retired-surface guard 由 native helper catalog tests 和 retired surface guard 维护。
 
 ## 结构角色
 

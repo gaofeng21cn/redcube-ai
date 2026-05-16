@@ -137,16 +137,6 @@ const TOOL_ROUTE_DEFINITIONS = {
   redcube_product_entry: {
     selector: 'action',
     routes: {
-      invoke_domain_entry: 'invokeDomainEntry',
-      invoke_product_entry: 'invokeProductEntry',
-      get_product_entry_session: 'getProductEntrySession',
-      get_product_entry_manifest: 'getProductEntryManifest',
-      get_product_status: 'getProductStatus',
-      get_product_start: 'getProductStart',
-      get_product_preflight: 'getProductPreflight',
-      invoke_opl_hosted_product_entry: 'invokeOplHostedProductEntry',
-      export_product_sidecar: 'exportProductSidecar',
-      dispatch_product_sidecar: 'dispatchProductSidecar',
     },
   },
 };
@@ -156,14 +146,15 @@ const MCP_TOOL_METADATA = new Map(ACTION_METADATA.mcp_tools.map((tool) => [tool.
 const MCP_ROUTE_METADATA = Object.fromEntries(
   Object.entries(ACTION_METADATA.mcp_route_definitions).map(([name, definition]) => {
     const base = TOOL_ROUTE_DEFINITIONS[name as ToolName];
+    const catalogRoutes = definition.routes || {};
+    const routes = Object.keys(catalogRoutes).length > 0
+      ? catalogRoutes
+      : base?.routes || {};
     return [
       name,
       {
         selector: definition.selector || base?.selector,
-        routes: {
-          ...(base?.routes || {}),
-          ...(definition.routes || {}),
-        },
+        routes,
       },
     ];
   }),
@@ -249,7 +240,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_product_entry',
     description: MCP_TOOL_METADATA.get('redcube_product_entry')?.description
-      || 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, sidecar, domain-entry, and OPL-hosted handoff actions.',
+      || 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, sidecar, and domain-entry actions.',
     action_catalog_projection: getMcpToolProjection('redcube_product_entry'),
     inputSchema: {
       action: ACTION_STRING,

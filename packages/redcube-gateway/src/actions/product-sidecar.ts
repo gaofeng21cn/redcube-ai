@@ -6,6 +6,12 @@ import path from 'node:path';
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
 import { getProductEntrySession } from './get-product-entry-session.js';
 import { invokeProductEntry } from './invoke-product-entry.js';
+import {
+  buildFamilySchedulerReplacementProjection,
+  listProductSidecarBlockedActions,
+  listProductSidecarGuardedActions,
+  productSidecarGuardedActionSet,
+} from './product-sidecar-guarded-actions.js';
 import { runtimeWatch } from './runtime-watch.js';
 import { superviseManagedRun } from './supervise-managed-run.js';
 export {
@@ -19,17 +25,7 @@ const SIDECAR_ID = 'redcube_product_sidecar_adapter.v1';
 const DOMAIN_ID = 'redcube_ai';
 const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const OPL_PROVIDER_TRANSPORT = 'opl_family_runtime_provider';
-
-const GUARDED_ACTIONS = new Set([
-  'runtime_watch',
-  'supervise_managed_run',
-  'product_entry_continuation',
-  'emit_no_regression_evidence',
-  'emit_domain_owner_receipt',
-  'apply_visual_memory_writeback',
-  'apply_visual_workspace_lifecycle',
-  'notification_receipt',
-]);
+const GUARDED_ACTIONS = productSidecarGuardedActionSet();
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -80,91 +76,9 @@ function buildOwnerBoundary() {
   };
 }
 
-function buildGuardedActionCatalog() {
-  return [
-    {
-      action: 'runtime_watch',
-      effect: 'read_only',
-      summary: 'Read RCA runtimeWatch for an existing run locator.',
-      required_fields: ['workspace_root', 'topic_id', 'deliverable_id', 'run_id'],
-      api_surface: 'runtimeWatch',
-    },
-    {
-      action: 'supervise_managed_run',
-      effect: 'guarded_runtime_tick',
-      summary: 'Run one RCA-owned superviseManagedRun tick for an existing managed run.',
-      required_fields: ['workspace_root', 'managed_run_id'],
-      api_surface: 'superviseManagedRun',
-    },
-    {
-      action: 'product_entry_continuation',
-      effect: 'guarded_product_entry_continuation',
-      summary: 'Continue the same RCA product-entry session through RCA-owned gates.',
-      required_fields: ['workspace_root', 'entry_session_id'],
-      api_surface: 'invokeProductEntry',
-    },
-    {
-      action: 'emit_no_regression_evidence',
-      effect: 'guarded_runtime_evidence_write',
-      summary: 'Emit RCA-owned no-regression evidence refs for descriptor/runtime surfaces without writing visual artifacts or claiming long soak.',
-      required_fields: ['workspace_root', 'evidence_id'],
-      api_surface: 'productSidecarEmitNoRegressionEvidence',
-    },
-    {
-      action: 'emit_domain_owner_receipt',
-      effect: 'guarded_domain_owner_receipt_write',
-      summary: 'Emit an RCA-owned domain receipt instance into workspace runtime receipts when required refs are present; otherwise return a typed blocker.',
-      required_fields: [
-        'workspace_root',
-        'receipt_id',
-        'attempt_ref',
-        'artifact_locator_ref',
-        'memory_receipt_ref',
-        'lifecycle_receipt_ref',
-        'review_export_ref',
-        'forbidden_write_proof_ref',
-      ],
-      api_surface: 'productSidecarEmitDomainOwnerReceipt',
-    },
-    {
-      action: 'apply_visual_memory_writeback',
-      effect: 'guarded_domain_memory_receipt_write',
-      summary: 'Apply an RCA-owned visual pattern memory accept/reject decision and write a locator-only runtime receipt.',
-      required_fields: [
-        'workspace_root',
-        'proposal_id',
-        'decision',
-        'decision_owner',
-        'source_review_ref',
-        'candidate_memory_ref',
-      ],
-      api_surface: 'productSidecarApplyVisualMemoryWriteback',
-    },
-    {
-      action: 'apply_visual_workspace_lifecycle',
-      effect: 'guarded_lifecycle_receipt_write',
-      summary: 'Emit RCA-owned cleanup/restore/retention receipts for visual workspace lifecycle requests without mutating artifacts from the sidecar.',
-      required_fields: [
-        'workspace_root',
-        'operation',
-        'receipt_id',
-        'domain_receipt_ref',
-        'artifact_locator_ref',
-      ],
-      api_surface: 'productSidecarApplyVisualWorkspaceLifecycle',
-    },
-    {
-      action: 'notification_receipt',
-      effect: 'control_plane_ack_only',
-      summary: 'Acknowledge an OPL/Hermes notification without writing RCA visual truth, review verdict, or publication gate.',
-      required_fields: ['notification_id'],
-      api_surface: 'none',
-    },
-  ];
-}
-
 function buildSidecarProjection({ workspaceRoot, manifest }) {
   const sessionSurface = manifest.product_entry_shell?.session || {};
+  const familySchedulerReplacement = manifest.family_scheduler_replacement || buildFamilySchedulerReplacementProjection();
   return {
     ok: true,
     surface_kind: 'product_sidecar_export',
@@ -180,6 +94,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       managed_by: 'opl_runtime_manager',
       queue_owner: 'opl',
       online_wakeup_owner: OPL_PROVIDER_TRANSPORT,
+      family_scheduler_replacement: familySchedulerReplacement,
       default_executor_policy: {
         selected_by: 'codex_or_domain_selected_executor',
         domain_default_executor_owner: manifest.managed_runtime_contract?.executor_owner || 'codex_cli',
@@ -327,16 +242,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         opl_can_declare_exportable: false,
         writable_by_sidecar: false,
       },
+      family_scheduler_replacement: familySchedulerReplacement,
     },
-    guarded_actions: buildGuardedActionCatalog(),
-    blocked_actions: [
-      'write_visual_truth',
-      'write_canonical_artifacts',
-      'write_review_verdict',
-      'write_publication_gate',
-      'mutate_review_state',
-      'publish_export_bundle',
-    ],
+    guarded_actions: listProductSidecarGuardedActions(),
+    blocked_actions: listProductSidecarBlockedActions(),
     source_manifest_refs: {
       manifest_kind: manifest.manifest_kind,
       manifest_version: manifest.manifest_version,
@@ -354,6 +263,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',
+      family_scheduler_replacement_ref: '/family_scheduler_replacement',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {

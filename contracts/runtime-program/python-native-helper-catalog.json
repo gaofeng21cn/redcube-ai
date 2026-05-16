@@ -29,7 +29,7 @@
       "-m",
       "<package_module>"
     ],
-    "compatibility_script_wrappers_allowed": true,
+    "compatibility_script_wrappers_allowed": false,
     "compatibility_script_wrappers_are_preferred": false
   },
   "bypass_policy": {
@@ -44,7 +44,6 @@
   "helpers": [
     {
       "helper_id": "ppt_deck_review",
-      "script": "packages/redcube-runtime/scripts/ppt_deck_review.py",
       "package_module": "redcube_ai.native_helpers.ppt_deck.review",
       "package_entrypoint": {
         "console_script": "redcube-ppt-deck-review",
@@ -80,7 +79,6 @@
     },
     {
       "helper_id": "ppt_deck_export",
-      "script": "packages/redcube-runtime/scripts/ppt_deck_export.py",
       "package_module": "redcube_ai.native_helpers.ppt_deck.export",
       "package_entrypoint": {
         "console_script": "redcube-ppt-deck-export",
@@ -119,7 +117,6 @@
     },
     {
       "helper_id": "ppt_deck_native",
-      "script": "packages/redcube-runtime/scripts/ppt_deck_native.py",
       "package_module": "redcube_ai.native_helpers.ppt_deck.native",
       "package_entrypoint": {
         "console_script": "redcube-ppt-deck-native",
@@ -197,7 +194,6 @@
     },
     {
       "helper_id": "hermes_agent_loop_bridge",
-      "script": "python/redcube_ai/hermes/agent_loop_bridge.py",
       "package_module": "redcube_ai.hermes.agent_loop_bridge_impl",
       "package_entrypoint": {
         "console_script": "redcube-hermes-agent-loop-bridge",

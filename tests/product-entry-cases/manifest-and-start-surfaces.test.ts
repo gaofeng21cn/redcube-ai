@@ -9,6 +9,7 @@ import {
   getProductEntryManifest,
   getProductStatus,
   getProductPreflight,
+  getProductSidecarGuardedActionMetadata,
   importGatewaySharedModule,
   test,
   withMockCodexRuntimeState,
@@ -24,6 +25,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     const manifest = await getProductEntryManifest({
       workspace_root: workspaceRoot,
     });
+    const sidecarGuardedActionMetadata = await getProductSidecarGuardedActionMetadata();
 
     assert.equal(manifest.ok, true);
     assert.equal(manifest.surface_kind, 'product_entry_manifest');
@@ -257,6 +259,16 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'redcube image-ppt proof',
         'redcube native-ppt proof',
       ],
+    );
+    const sidecarDispatchAction = manifest.family_action_catalog.actions
+      .find((action) => action.action_id === 'dispatch_product_sidecar');
+    assert.deepEqual(
+      sidecarDispatchAction.authority_boundary.allowed_actions,
+      sidecarGuardedActionMetadata.guardedActionIds,
+    );
+    assert.deepEqual(
+      sidecarDispatchAction.authority_boundary.forbidden_writes,
+      sidecarGuardedActionMetadata.forbiddenWrites,
     );
     assert.equal(manifest.family_action_catalog_parity.surface_kind, 'family_action_catalog_parity');
     assert.equal(manifest.family_action_catalog_parity.status, 'aligned');
@@ -738,7 +750,14 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.sidecar.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.provider_transport_owner, 'opl_family_runtime_provider');
     assert.equal(manifest.product_entry_shell.sidecar.control_plane_owner, 'opl');
-    assert.deepEqual(manifest.product_entry_shell.sidecar.allowed_actions, ['runtime_watch', 'supervise_managed_run', 'product_entry_continuation', 'emit_no_regression_evidence', 'emit_domain_owner_receipt', 'apply_visual_memory_writeback', 'apply_visual_workspace_lifecycle', 'notification_receipt']);
+    assert.deepEqual(
+      manifest.product_entry_shell.sidecar.allowed_actions,
+      sidecarGuardedActionMetadata.guardedActionIds,
+    );
+    assert.deepEqual(
+      manifest.product_entry_shell.sidecar.forbidden_writes,
+      sidecarGuardedActionMetadata.forbiddenWrites,
+    );
     assert.match(manifest.product_entry_shell.status.purpose, /product-entry overview/i);
     assert.equal(
       manifest.product_entry_shell.status.canonical_entry_semantics,

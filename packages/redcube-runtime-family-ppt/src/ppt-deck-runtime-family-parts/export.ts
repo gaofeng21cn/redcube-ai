@@ -637,7 +637,6 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           tool: python.command,
           helper_id: python.helper_id,
           package_module: python.package_module,
-          compatibility_script: python.compatibility_script,
           command: conversionCommand,
         },
       },

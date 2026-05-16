@@ -82,6 +82,16 @@ async function dispatchProductSidecar(request) {
   return module.dispatchProductSidecar(request);
 }
 
+async function getProductSidecarGuardedActionMetadata() {
+  const module = await import('../packages/redcube-gateway/dist/index.js');
+  return {
+    guardedActions: module.listProductSidecarGuardedActions(),
+    guardedActionIds: module.listProductSidecarGuardedActionIds(),
+    forbiddenWrites: module.listProductSidecarForbiddenWrites(),
+    blockedActions: module.listProductSidecarBlockedActions(),
+  };
+}
+
 async function buildHostedAttemptBridgeFixture(request) {
   const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
   return module.buildHostedAttemptBridgeFixture(request);
@@ -277,6 +287,7 @@ export {
   getProductStatus,
   getProductPreflight,
   getProductStart,
+  getProductSidecarGuardedActionMetadata,
   getToolDefinitions,
   importGatewaySharedModule,
   intakeSource,

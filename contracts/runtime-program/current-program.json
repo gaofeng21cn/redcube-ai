@@ -47,6 +47,26 @@
         "domain memory content"
       ],
       "status_command_semantics": "entry shell only; not GUI/WebUI"
+    },
+    "opl_family_scheduler_replacement": {
+      "ref": "/family_scheduler_replacement",
+      "contract_ref": "opl.family_scheduler_replacement.v1",
+      "owner": "opl",
+      "consumer": "redcube_ai",
+      "projection_mode": "consumer_projection_only",
+      "rca_generic_scheduler_owner": false,
+      "rca_generic_daemon_owner": false,
+      "rca_generic_lifecycle_owner": false,
+      "managed_dag_scheduler_scope": "visual_deliverable_internal_dag_only",
+      "rca_retained_authority": [
+        "visual_truth",
+        "review_export_verdict",
+        "artifact_authority",
+        "visual_memory_body",
+        "owner_receipt",
+        "typed_blocker",
+        "safe_action_refs"
+      ]
     }
   },
   "longrun_goal": {
@@ -263,6 +283,26 @@
         "artifact indexing",
         "state indexing",
         "PPT/Office/document helper catalog"
+      ]
+    },
+    "opl_family_scheduler_replacement": {
+      "ref": "/family_scheduler_replacement",
+      "contract_ref": "opl.family_scheduler_replacement.v1",
+      "owner": "opl",
+      "consumer": "redcube_ai",
+      "projection_mode": "consumer_projection_only",
+      "rca_generic_scheduler_owner": false,
+      "rca_generic_daemon_owner": false,
+      "rca_generic_lifecycle_owner": false,
+      "managed_dag_scheduler_scope": "visual_deliverable_internal_dag_only",
+      "rca_retained_authority": [
+        "visual_truth",
+        "review_export_verdict",
+        "artifact_authority",
+        "visual_memory_body",
+        "owner_receipt",
+        "typed_blocker",
+        "safe_action_refs"
       ]
     },
     "deployment_host": "codex_local_operator_host",

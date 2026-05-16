@@ -7,6 +7,7 @@ import {
   getProductEntryManifest,
   getProductStatus,
   getProductStart,
+  getProductSidecarGuardedActionMetadata,
   exportProductSidecar,
   dispatchProductSidecar,
   importGatewaySharedModule,
@@ -26,6 +27,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     const sidecar = await exportProductSidecar({
       workspace_root: workspaceRoot,
     });
+    const sidecarGuardedActionMetadata = await getProductSidecarGuardedActionMetadata();
 
     assert.equal(sidecar.ok, true);
     assert.equal(sidecar.surface_kind, 'product_sidecar_export');
@@ -33,6 +35,15 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.runtime_framework.provider_transport_owner, 'opl_family_runtime_provider');
     assert.equal(sidecar.runtime_framework.managed_by, 'opl_runtime_manager');
     assert.equal(sidecar.runtime_framework.queue_owner, 'opl');
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.consumer, 'redcube_ai');
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.owner, 'opl');
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_scheduler_owner, false);
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_daemon_owner, false);
+    assert.equal(sidecar.runtime_framework.family_scheduler_replacement.rca_generic_lifecycle_owner, false);
+    assert.equal(
+      sidecar.runtime_framework.family_scheduler_replacement.managed_dag_scheduler_scope,
+      'visual_deliverable_internal_dag_only',
+    );
     assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
@@ -74,6 +85,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_holds_visual_or_export_verdict, false);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.controlled_memory_apply_proof_ref, '/controlled_memory_apply_proof');
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.apply_proof_state, 'controlled_apply_proof_landed_memory_body_external');
+    assert.equal(sidecar.mapped_surfaces.family_scheduler_replacement.ref, '/family_scheduler_replacement');
+    assert.equal(sidecar.mapped_surfaces.family_scheduler_replacement.owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.family_scheduler_replacement.consumer, 'redcube_ai');
+    assert.equal(sidecar.mapped_surfaces.family_scheduler_replacement.projection_mode, 'consumer_projection_only');
+    assert.deepEqual(sidecar.mapped_surfaces.family_scheduler_replacement.rca_retained_authority, [
+      'visual_truth',
+      'review_export_verdict',
+      'artifact_authority',
+      'visual_memory_body',
+      'owner_receipt',
+      'typed_blocker',
+      'safe_action_refs',
+    ]);
     assert.equal(sidecar.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
     assert.equal(sidecar.source_manifest_refs.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
@@ -164,27 +188,13 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
     assert.equal(sidecar.source_manifest_refs.visual_transition_spec_ref, '/visual_transition_spec');
-  assert.deepEqual(
-    sidecar.guarded_actions.map((entry) => entry.action),
-    [
-      'runtime_watch',
-      'supervise_managed_run',
-      'product_entry_continuation',
-      'emit_no_regression_evidence',
-      'emit_domain_owner_receipt',
-      'apply_visual_memory_writeback',
-      'apply_visual_workspace_lifecycle',
-      'notification_receipt',
-    ],
-  );
-    assert.deepEqual(sidecar.blocked_actions, [
-      'write_visual_truth',
-      'write_canonical_artifacts',
-      'write_review_verdict',
-      'write_publication_gate',
-      'mutate_review_state',
-      'publish_export_bundle',
-    ]);
+    assert.equal(sidecar.source_manifest_refs.family_scheduler_replacement_ref, '/family_scheduler_replacement');
+    assert.deepEqual(
+      sidecar.guarded_actions.map((entry) => entry.action),
+      sidecarGuardedActionMetadata.guardedActionIds,
+    );
+    assert.deepEqual(sidecar.guarded_actions, sidecarGuardedActionMetadata.guardedActions);
+    assert.deepEqual(sidecar.blocked_actions, sidecarGuardedActionMetadata.blockedActions);
 
     const receipt = await dispatchProductSidecar({
       task: {

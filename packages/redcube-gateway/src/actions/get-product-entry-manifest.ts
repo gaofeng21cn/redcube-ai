@@ -51,6 +51,11 @@ import {
   buildVisualPatternMemoryWritebackProjection,
 } from './standard-domain-agent-skeleton.js';
 import {
+  buildFamilySchedulerReplacementProjection,
+  listProductSidecarForbiddenWrites,
+  listProductSidecarGuardedActionIds,
+} from './product-sidecar-guarded-actions.js';
+import {
   OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
   buildRouteEquivalenceContract,
   buildDeliverableFacadeContract,
@@ -682,6 +687,7 @@ export async function getProductEntryManifest(request) {
       'Autopilot continuation stays tracked_follow_on while operator review gate remains repo_tracked and active.'
     ),
   });
+  const familySchedulerReplacement = buildFamilySchedulerReplacementProjection();
   const productEntryShell = buildProductEntryShellCatalog({
     status: {
       command: PRODUCT_STATUS_COMMAND,
@@ -735,13 +741,9 @@ export async function getProductEntryManifest(request) {
         provider_transport_owner: 'opl_family_runtime_provider',
         control_plane_owner: 'opl',
         domain_truth_owner: 'redcube_ai',
-        allowed_actions: ['runtime_watch', 'supervise_managed_run', 'product_entry_continuation', 'emit_no_regression_evidence', 'emit_domain_owner_receipt', 'apply_visual_memory_writeback', 'apply_visual_workspace_lifecycle', 'notification_receipt'],
-        forbidden_writes: [
-          'visual_truth',
-          'review_verdict',
-          'publication_gate',
-          'canonical_artifacts',
-        ],
+        allowed_actions: listProductSidecarGuardedActionIds(),
+        forbidden_writes: listProductSidecarForbiddenWrites(),
+        family_scheduler_replacement: familySchedulerReplacement,
       },
     },
     native_ppt_proof: {
@@ -878,6 +880,7 @@ export async function getProductEntryManifest(request) {
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
     lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
+    family_scheduler_replacement: familySchedulerReplacement,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
@@ -1002,6 +1005,7 @@ export async function getProductEntryManifest(request) {
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
     lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
+    family_scheduler_replacement: familySchedulerReplacement,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,

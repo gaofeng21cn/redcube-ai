@@ -12,6 +12,10 @@ import {
   PRODUCT_START_COMMAND,
   PRODUCT_STATUS_COMMAND,
 } from './get-product-entry-manifest-parts/policy.js';
+import {
+  listProductSidecarForbiddenWrites,
+  listProductSidecarGuardedActionIds,
+} from './product-sidecar-guarded-actions.js';
 
 type JsonMap = Record<string, any>;
 
@@ -325,22 +329,8 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
         product_entry: { action_key: 'dispatch_product_sidecar', surface_kind: 'product_sidecar_dispatch' },
       },
       authorityBoundary: {
-        allowed_actions: [
-          'runtime_watch',
-          'supervise_managed_run',
-          'product_entry_continuation',
-          'emit_no_regression_evidence',
-          'emit_domain_owner_receipt',
-          'apply_visual_memory_writeback',
-          'apply_visual_workspace_lifecycle',
-          'notification_receipt',
-        ],
-        forbidden_writes: [
-          'visual_truth',
-          'review_verdict',
-          'publication_gate',
-          'canonical_artifacts',
-        ],
+        allowed_actions: listProductSidecarGuardedActionIds(),
+        forbidden_writes: listProductSidecarForbiddenWrites(),
       },
     }),
     action({
@@ -450,6 +440,7 @@ function mcpAction(actionEntry: JsonMap): JsonMap | null {
   const metadata = PROJECTION_METADATA[actionEntry.action_id]?.mcp ?? {};
   return {
     ...projected,
+    action_id: actionEntry.action_id,
     tool_name: descriptor.tool_name,
     action_key: descriptor.action_key,
     api_surface: metadata.api_surface,

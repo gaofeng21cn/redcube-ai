@@ -70,6 +70,12 @@ const RETIRED_ACTIVE_PATTERNS = Object.freeze([
   /\bcompat_product_entry_overview_command\b/,
   /\bsource_workbench\b/,
   /\bsource_workbench_[A-Za-z0-9_]*\b/,
+  /packages\/redcube-runtime\/scripts\/ppt_deck_review\.py/,
+  /packages\/redcube-runtime\/scripts\/ppt_deck_export\.py/,
+  /packages\/redcube-runtime\/scripts\/ppt_deck_native\.py/,
+  /python\/redcube_ai\/hermes\/agent_loop_bridge\.py/,
+  /\bcompatibility_script\b/,
+  /\bcompatibilityScript\b/,
 ]);
 
 function listTextFiles(root) {
@@ -95,7 +101,10 @@ test('RCA active source surfaces do not reintroduce retired runtime terms', () =
     if (!existsSync(path.resolve(root))) return [];
     return path.extname(root) ? [root] : listTextFiles(root);
   })) {
-    if (file === 'tests/rca-retired-surface-guard.test.ts') continue;
+    if (
+      file === 'tests/rca-retired-surface-guard.test.ts'
+      || file === 'tests/python-native-helper-catalog.test.ts'
+    ) continue;
     const text = readFileSync(file, 'utf-8');
     for (const pattern of RETIRED_ACTIVE_PATTERNS) {
       if (pattern.test(text)) {
@@ -105,4 +114,39 @@ test('RCA active source surfaces do not reintroduce retired runtime terms', () =
   }
 
   assert.deepEqual(violations, []);
+});
+
+test('RCA consumes OPL family scheduler replacement without owning generic scheduling surfaces', () => {
+  const currentProgram = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/current-program.json'),
+    'utf-8',
+  ));
+  const adoption = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
+    'utf-8',
+  ));
+
+  for (const surface of [
+    currentProgram.product_release_metadata.opl_family_scheduler_replacement,
+    currentProgram.current_state.opl_family_scheduler_replacement,
+    adoption.family_scheduler_replacement,
+  ]) {
+    assert.equal(surface.contract_ref, 'opl.family_scheduler_replacement.v1');
+    assert.equal(surface.owner, 'opl');
+    assert.equal(surface.consumer, 'redcube_ai');
+    assert.equal(surface.projection_mode, 'consumer_projection_only');
+    assert.equal(surface.rca_generic_scheduler_owner, false);
+    assert.equal(surface.rca_generic_daemon_owner, false);
+    assert.equal(surface.rca_generic_lifecycle_owner, false);
+    assert.equal(surface.managed_dag_scheduler_scope, 'visual_deliverable_internal_dag_only');
+    assert.deepEqual(surface.rca_retained_authority, [
+      'visual_truth',
+      'review_export_verdict',
+      'artifact_authority',
+      'visual_memory_body',
+      'owner_receipt',
+      'typed_blocker',
+      'safe_action_refs',
+    ]);
+  }
 });

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { buildCommandHelp, buildHelp, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
+import { buildCommandHelp, buildHelp, executeCli, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
 import { getDomainActions as getMcpDomainActions, listDomainTools } from '../apps/redcube-mcp/dist/server.js';
 import { buildRedCubeActionMetadata } from '../packages/redcube-gateway/dist/index.js';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
@@ -135,6 +135,23 @@ test('CLI product-entry and proof command help is projected from family action m
     assert.equal(help.action_ref, entry.action_ref);
     assert.equal(help.api_surface, entry.api_surface);
     assert.deepEqual(help.boundary_fields, entry.boundary_fields);
+  }
+});
+
+test('CLI product sidecar subcommand help uses family action metadata at runtime', async () => {
+  for (const [argv, actionId] of [
+    [['product', 'sidecar', 'export', '--help'], 'export_product_sidecar'],
+    [['product', 'sidecar', 'dispatch', '--help'], 'dispatch_product_sidecar'],
+  ]) {
+    const help = await executeCli(argv);
+    const commandKey = argv.slice(0, 3).join(' ');
+    const catalogHelp = buildCommandHelp(commandKey);
+
+    assert.equal(help.surface_kind, 'command_help');
+    assert.equal(help.source_metadata, 'redcube_family_action_catalog');
+    assert.equal(help.action_id, actionId);
+    assert.equal(help.summary, catalogHelp.summary);
+    assert.equal(help.usage, catalogHelp.usage);
   }
 });
 
