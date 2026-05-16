@@ -8,6 +8,7 @@ import { getProductEntrySession } from './get-product-entry-session.js';
 import { invokeProductEntry } from './invoke-product-entry.js';
 import {
   buildFamilySchedulerReplacementProjection,
+  buildOplGenericPrimitiveConsumptionProjection,
   listProductSidecarBlockedActions,
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
@@ -81,12 +82,23 @@ function buildOwnerBoundary() {
     rca_owns_visual_truth: true,
     rca_owns_review_publication_projection: true,
     rca_owns_artifacts: true,
+    rca_owns_visual_memory_body: true,
+    rca_owns_owner_receipt: true,
+    rca_owns_native_helper_implementation: true,
+    rca_owns_memory_transport: false,
+    rca_owns_artifact_lifecycle: false,
+    rca_owns_review_repair_transport: false,
+    rca_owns_native_helper_generic_envelope: false,
   };
 }
 
 function buildSidecarProjection({ workspaceRoot, manifest }) {
   const sessionSurface = manifest.product_entry_shell?.session || {};
   const familySchedulerReplacement = manifest.family_scheduler_replacement || buildFamilySchedulerReplacementProjection();
+  const oplGenericPrimitiveConsumption = (
+    manifest.opl_generic_primitive_consumption
+    || buildOplGenericPrimitiveConsumptionProjection()
+  );
   return {
     ok: true,
     surface_kind: 'product_sidecar_export',
@@ -112,6 +124,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         projection_scope: familySchedulerReplacement.projection_scope || 'consumer_projection_and_visual_domain_authority_refs_only',
         managed_dag_scheduler_scope: familySchedulerReplacement.managed_dag_scheduler_scope,
         generic_surfaces_owner: 'opl',
+        opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         rca_is_generic_scheduler_owner: false,
         rca_is_generic_daemon_owner: false,
         rca_is_generic_lifecycle_owner: false,
@@ -119,6 +132,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         rca_is_generic_attempt_ledger_owner: false,
         rca_is_generic_runner_owner: false,
         rca_is_generic_workbench_owner: false,
+        rca_is_memory_transport_owner: false,
+        rca_is_artifact_lifecycle_owner: false,
+        rca_is_review_repair_transport_owner: false,
+        rca_is_native_helper_generic_envelope_owner: false,
       },
     },
     owner_boundary: buildOwnerBoundary(),
@@ -145,6 +162,12 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         operator_handoff_ref: '/operator_handoff',
         owner: DOMAIN_ID,
         writable_by_sidecar: false,
+        transport_owner: 'opl',
+        rca_retained_authority: [
+          'review_export_verdict',
+          'repair_decision',
+          'visual_quality_facts',
+        ],
       },
       operator_handoff: {
         source_refs: [
@@ -168,6 +191,8 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         owner: DOMAIN_ID,
         locator_model: manifest.artifact_locator_contract?.locator_model || 'workspace_runtime_artifact_root_refs_only',
         writable_by_sidecar: false,
+        lifecycle_transport_owner: 'opl',
+        rca_retained_authority: ['artifact_authority'],
       },
       receipt_refs: {
         ref: '/product_sidecar_receipt_refs',
@@ -183,6 +208,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         operator_receipt_projection_ref: '/domain_memory_descriptor_locator/operator_receipt_projection',
         runtime_receipt_instances_ref: '/controlled_memory_apply_proof/runtime_receipt_instances',
         owner: DOMAIN_ID,
+        transport_owner: 'opl',
         writable_by_sidecar: false,
         controlled_apply_proof_ref: '/controlled_memory_apply_proof',
         opl_can_generate_memory_content: false,
@@ -190,6 +216,16 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         opl_can_write_receipt_instance: false,
         opl_can_write_visual_truth: false,
         opl_can_write_artifact_blob: false,
+        rca_retained_authority: ['visual_memory_body'],
+      },
+      native_helper_implementation: {
+        ref: '/native_ppt_operator_ux',
+        owner: DOMAIN_ID,
+        generic_envelope_owner: 'opl',
+        helper_catalog_ref: 'contracts/runtime-program/python-native-helper-catalog.json',
+        implementation_owner: DOMAIN_ID,
+        package_module_only: true,
+        writable_by_sidecar: false,
       },
       controlled_visual_stage_attempt: {
         ref: '/controlled_visual_stage_attempt',
@@ -263,6 +299,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         writable_by_sidecar: false,
       },
       family_scheduler_replacement: familySchedulerReplacement,
+      opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
     },
     guarded_actions: listProductSidecarGuardedActions(),
     blocked_actions: listProductSidecarBlockedActions(),
@@ -284,6 +321,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
+      opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
     },
     runtime_residue_retirement: manifest.runtime_residue_retirement,
     summary: {

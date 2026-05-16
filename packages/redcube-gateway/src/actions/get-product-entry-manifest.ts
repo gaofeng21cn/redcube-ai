@@ -52,6 +52,7 @@ import {
 } from './standard-domain-agent-skeleton.js';
 import {
   buildFamilySchedulerReplacementProjection,
+  buildOplGenericPrimitiveConsumptionProjection,
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
 } from './product-sidecar-guarded-actions.js';
@@ -689,6 +690,7 @@ export async function getProductEntryManifest(request) {
     ),
   });
   const familySchedulerReplacement = buildFamilySchedulerReplacementProjection();
+  const oplGenericPrimitiveConsumption = buildOplGenericPrimitiveConsumptionProjection();
   const productEntryShell = buildProductEntryShellCatalog({
     status: {
       command: PRODUCT_STATUS_COMMAND,
@@ -745,6 +747,7 @@ export async function getProductEntryManifest(request) {
         allowed_actions: listProductSidecarGuardedActionIds(),
         forbidden_writes: listProductSidecarForbiddenWrites(),
         family_scheduler_replacement: familySchedulerReplacement,
+        opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
       },
     },
     native_ppt_proof: {
@@ -882,6 +885,7 @@ export async function getProductEntryManifest(request) {
     lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
     family_scheduler_replacement: familySchedulerReplacement,
+    opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
@@ -948,6 +952,7 @@ export async function getProductEntryManifest(request) {
     familyStageControlPlane,
     manifest,
     nativePptOperatorUx,
+    oplGenericPrimitiveConsumption,
     oplFamilyLifecycleAdapter,
     operatorLoopActions,
     productEntryShell,

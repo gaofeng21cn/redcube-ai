@@ -30,6 +30,10 @@ test('managed DAG scheduler exposes dependency layers for a single deliverable w
   assert.equal(plan.generic_attempt_ledger_owner, false);
   assert.equal(plan.generic_runner_owner, false);
   assert.equal(plan.generic_workbench_owner, false);
+  assert.equal(plan.memory_transport_owner, false);
+  assert.equal(plan.artifact_lifecycle_owner, false);
+  assert.equal(plan.review_repair_transport_owner, false);
+  assert.equal(plan.native_helper_generic_envelope_owner, false);
   assert.equal(plan.authority_boundary.owner, 'redcube_ai');
   assert.equal(plan.authority_boundary.opl_family_scheduler_owner, 'opl');
   assert.equal(plan.authority_boundary.managed_dag_scheduler_scope, 'visual_deliverable_internal_dag_only');
@@ -39,6 +43,9 @@ test('managed DAG scheduler exposes dependency layers for a single deliverable w
     'artifact_authority',
     'visual_memory_body',
     'owner_receipt',
+    'native_helper_implementation',
+    'typed_blocker',
+    'safe_action_refs',
   ]);
   assert.equal(plan.parallel_safe, true);
   assert.deepEqual(plan.layers.map((layer) => layer.task_ids), [

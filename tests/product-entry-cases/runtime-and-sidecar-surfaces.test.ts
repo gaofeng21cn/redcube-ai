@@ -69,6 +69,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_attempt_ledger_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_runner_owner, false);
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_generic_workbench_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_memory_transport_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_artifact_lifecycle_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_review_repair_transport_owner, false);
+    assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_native_helper_generic_envelope_owner, false);
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.status,
+      'functional_consumer_follow_through_landed',
+    );
+    assert.equal(
+      sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.live_soak_claimed,
+      false,
+    );
     assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
@@ -80,17 +92,26 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.owner_boundary.rca_owns_generic_attempt_ledger, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_runner, false);
     assert.equal(sidecar.owner_boundary.rca_owns_generic_workbench, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_memory_transport, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_artifact_lifecycle, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_review_repair_transport, false);
+    assert.equal(sidecar.owner_boundary.rca_owns_native_helper_generic_envelope, false);
     assert.equal(sidecar.owner_boundary.rca_owns_visual_truth, true);
     assert.equal(sidecar.owner_boundary.rca_owns_review_publication_projection, true);
+    assert.equal(sidecar.owner_boundary.rca_owns_visual_memory_body, true);
+    assert.equal(sidecar.owner_boundary.rca_owns_owner_receipt, true);
+    assert.equal(sidecar.owner_boundary.rca_owns_native_helper_implementation, true);
     assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
     assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_ref, '/standard_domain_agent_skeleton/repo_source_boundary/audit_surface');
     assert.equal(sidecar.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_status, 'pass');
     assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.ref, '/artifact_locator_contract');
     assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+    assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.lifecycle_transport_owner, 'opl');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.ref, '/product_sidecar_receipt_refs');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.forbidden_receipt_fields.includes('export_verdict'), true);
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.descriptor_ref, '/domain_memory_descriptor_locator');
+    assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.transport_owner, 'opl');
     assert.equal(
       sidecar.mapped_surfaces.visual_pattern_memory_writeback.proposal_generator_ref,
       '/domain_memory_descriptor_locator/writeback_proposal_generator',
@@ -109,6 +130,11 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.controlled_apply_proof_ref, '/controlled_memory_apply_proof');
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_visual_truth, false);
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_artifact_blob, false);
+    assert.deepEqual(sidecar.mapped_surfaces.visual_pattern_memory_writeback.rca_retained_authority, ['visual_memory_body']);
+    assert.equal(sidecar.mapped_surfaces.native_helper_implementation.ref, '/native_ppt_operator_ux');
+    assert.equal(sidecar.mapped_surfaces.native_helper_implementation.generic_envelope_owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.native_helper_implementation.implementation_owner, 'redcube_ai');
+    assert.equal(sidecar.mapped_surfaces.native_helper_implementation.package_module_only, true);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.ref, '/controlled_visual_stage_attempt');
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_consumes_descriptor_refs, true);
     assert.equal(sidecar.mapped_surfaces.controlled_visual_stage_attempt.opl_consumes_quality_refs, true);
@@ -128,9 +154,29 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'artifact_authority',
       'visual_memory_body',
       'owner_receipt',
+      'native_helper_implementation',
       'typed_blocker',
       'safe_action_refs',
     ]);
+    assert.equal(sidecar.mapped_surfaces.opl_generic_primitive_consumption.ref, '/opl_generic_primitive_consumption');
+    assert.equal(sidecar.mapped_surfaces.opl_generic_primitive_consumption.owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.opl_generic_primitive_consumption.status, 'functional_consumer_follow_through_landed');
+    assert.deepEqual(
+      sidecar.mapped_surfaces.opl_generic_primitive_consumption.rca_does_not_own,
+      [
+        'standard_domain_agent_scaffold',
+        'generic_scheduler',
+        'daemon',
+        'typed_queue',
+        'attempt_ledger',
+        'generic_runner',
+        'workbench_shell',
+        'memory_transport',
+        'artifact_lifecycle',
+        'review_repair_transport',
+        'native_helper_generic_envelope',
+      ],
+    );
     assert.equal(sidecar.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(sidecar.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
     assert.equal(sidecar.source_manifest_refs.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
@@ -222,6 +268,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.source_manifest_refs.lifecycle_guarded_apply_proof_ref, '/lifecycle_guarded_apply_proof');
     assert.equal(sidecar.source_manifest_refs.visual_transition_spec_ref, '/visual_transition_spec');
     assert.equal(sidecar.source_manifest_refs.family_scheduler_replacement_ref, '/family_scheduler_replacement');
+    assert.equal(sidecar.source_manifest_refs.opl_generic_primitive_consumption_ref, '/opl_generic_primitive_consumption');
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       sidecarGuardedActionMetadata.guardedActionIds,

@@ -880,6 +880,8 @@ export function buildStandardDomainAgentSkeleton({
         'lifecycle_adapter',
         'visual_transition_spec',
         'domain_memory_descriptor_locator',
+        'domain_owner_receipt_contract',
+        'lifecycle_guarded_apply_proof',
       ],
       sidecar_adapter_ref: productSidecarRef,
       projection_builder_ref: familyStageControlPlaneRef,

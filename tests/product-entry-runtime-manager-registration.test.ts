@@ -125,6 +125,8 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       'lifecycle_adapter',
       'visual_transition_spec',
       'domain_memory_descriptor_locator',
+      'domain_owner_receipt_contract',
+      'lifecycle_guarded_apply_proof',
     ]);
     assert.equal(registration.domain_memory_descriptor_locator.ref, '/domain_memory_descriptor_locator');
     assert.equal(registration.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
