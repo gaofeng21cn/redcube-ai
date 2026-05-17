@@ -34,7 +34,12 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     expectation_ref: '/opl_generic_primitive_consumption',
     opl_replacement_surface: 'opl_app_session_shell_and_workbench',
     rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
-    rca_exports_only: ['entry_session_id', 'topic_deliverable_run_locator_refs', 'latest_visual_run_ref'],
+    rca_exports_only: [
+      'entry_session_id',
+      'topic_deliverable_run_locator_refs',
+      'latest_visual_run_ref',
+      'domain_snapshot_ref',
+    ],
   },
   workspace_source_intake: {
     expectation_ref: '/opl_substrate_adapter_export',
@@ -76,7 +81,12 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     expectation_ref: '/family_action_catalog',
     opl_replacement_surface: 'opl_standard_domain_agent_generated_cli_mcp_wrappers',
     rca_projection_mode: 'canonical_action_metadata_refs_only',
-    rca_exports_only: ['family_action_catalog_refs', 'guarded_action_refs', 'domain_handler_refs'],
+    rca_exports_only: [
+      'family_action_catalog_refs',
+      'guarded_action_refs',
+      'domain_handler_refs',
+      'direct_domain_entry_refs',
+    ],
   },
   codex_executor_adapter: {
     expectation_ref: '/domain_entry_contract/executor',

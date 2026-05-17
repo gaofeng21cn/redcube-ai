@@ -21,6 +21,26 @@ export const OPL_GENERATED_SURFACE_TARGETS = Object.freeze([
   'functional_harness_wrapper',
 ]);
 
+export const OPL_GENERATED_DESCRIPTOR_SCOPE = Object.freeze([
+  'cli',
+  'mcp',
+  'skill',
+  'product_entry',
+  'product_status',
+  'product_session',
+  'sidecar',
+  'workbench',
+]);
+
+export const RCA_REPO_LOCAL_HANDLER_TARGETS = Object.freeze([
+  'redcube_cli',
+  'redcube_mcp',
+  'invokeProductEntry',
+  'invokeDomainEntry',
+  'product_sidecar',
+  'product_entry_session_store',
+]);
+
 export function buildVisualPackCompilerHandoffProjection() {
   return {
     surface_kind: 'visual_pack_compiler_handoff',
@@ -73,6 +93,15 @@ export function buildVisualPackCompilerHandoffProjection() {
         retained_function_count: RCA_MINIMAL_AUTHORITY_FUNCTIONS.length,
         all_other_generic_shells_generated_by_opl: true,
       },
+      generated_descriptor_contract: {
+        owner: 'opl',
+        unified_metadata_owner: 'one-person-lab',
+        descriptor_scope: [...OPL_GENERATED_DESCRIPTOR_SCOPE],
+        repo_local_handler_targets: [...RCA_REPO_LOCAL_HANDLER_TARGETS],
+        repo_local_handlers_are_generated_surface_owners: false,
+        redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
+        redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+      },
       repository_boundary: {
         repo_tracks_declarative_pack_input: true,
         repo_tracks_generated_wrapper_outputs: false,
@@ -89,8 +118,10 @@ export function buildVisualPackCompilerHandoffProjection() {
       generation_owner: 'opl_pack_compiler',
       rca_role: 'declarative_visual_pack_provider_and_authority_function_owner',
       generated_surface_targets: [...OPL_GENERATED_SURFACE_TARGETS],
+      generated_descriptor_scope: [...OPL_GENERATED_DESCRIPTOR_SCOPE],
+      repo_local_handler_targets: [...RCA_REPO_LOCAL_HANDLER_TARGETS],
       rca_generated_surface_owner: false,
-      current_rca_shell_status: 'migration_bridge_until_opl_generated_surface_live',
+      current_rca_shell_status: 'domain_handler_target_or_direct_entry_only',
       rca_may_keep_migration_bridge_until: [
         'opl_generated_surface_live',
         'active_callers_migrated',
@@ -98,13 +129,22 @@ export function buildVisualPackCompilerHandoffProjection() {
         'no_regression_proof_recorded',
       ],
       generated_surfaces_are_not_rca_long_term_owner: true,
+      repo_local_launcher_policy: {
+        generated_descriptor_owner: 'one-person-lab',
+        domain_handler_owner: 'redcube_ai',
+        redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
+        redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+        product_entry_session_store_role: 'entry_session_domain_snapshot_refs_only_adapter',
+        redcube_cli_is_unified_metadata_owner: false,
+        redcube_mcp_is_unified_metadata_owner: false,
+      },
       wrappers: {
-        cli: { owner: 'opl', current_rca_role: 'migration_bridge', long_term_rca_owner: false },
-        mcp: { owner: 'opl', current_rca_role: 'migration_bridge', long_term_rca_owner: false },
-        product_entry: { owner: 'opl', current_rca_role: 'migration_bridge', long_term_rca_owner: false },
-        sidecar: { owner: 'opl', current_rca_role: 'migration_bridge', long_term_rca_owner: false },
-        status: { owner: 'opl', current_rca_role: 'migration_bridge', long_term_rca_owner: false },
-        session: { owner: 'opl', current_rca_role: 'migration_bridge', long_term_rca_owner: false },
+        cli: { owner: 'opl', current_rca_role: 'domain_handler_target', long_term_rca_owner: false },
+        mcp: { owner: 'opl', current_rca_role: 'domain_handler_target', long_term_rca_owner: false },
+        product_entry: { owner: 'opl', current_rca_role: 'direct_domain_entry_target', long_term_rca_owner: false },
+        sidecar: { owner: 'opl', current_rca_role: 'domain_sidecar_target', long_term_rca_owner: false },
+        status: { owner: 'opl', current_rca_role: 'domain_status_projection_target', long_term_rca_owner: false },
+        session: { owner: 'opl', current_rca_role: 'domain_session_snapshot_refs_adapter', long_term_rca_owner: false },
         workbench: { owner: 'opl', current_rca_role: 'generated_surface', long_term_rca_owner: false },
         harness: { owner: 'opl', current_rca_role: 'generated_surface', long_term_rca_owner: false },
       },

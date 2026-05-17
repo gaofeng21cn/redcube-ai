@@ -186,7 +186,17 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
   return {
     ok: true,
     whatIsRedCube: 'RedCube AI 是面向专家与 PIs 的视觉交付运行入口，当前重点支持 PPT deck、小红书图文与单页知识海报。',
-    preferredEntry: ['CLI', 'MCP'],
+    preferredEntry: ['OPL generated descriptors', 'RCA direct domain entry'],
+    generated_interface_owner: 'one-person-lab',
+    domain_handler_owner: 'redcube_ai',
+    repo_local_redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
+    repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+    launcher_boundary: {
+      redcube_cli_is_unified_metadata_owner: false,
+      redcube_mcp_is_unified_metadata_owner: false,
+      cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
+      domain_action_handler_owner: 'redcube_ai',
+    },
     discovery: {
       profileList: 'redcube profile --action list',
     },

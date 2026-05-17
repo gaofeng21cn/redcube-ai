@@ -165,6 +165,10 @@ function action({
     title,
     summary,
     owner: 'redcube_ai',
+    generated_interface_owner: 'one-person-lab',
+    domain_handler_owner: 'redcube_ai',
+    owner_model: 'opl_generated_descriptor_invokes_rca_domain_handler',
+    repo_local_handler_target_only: true,
     effect,
     source_command: {
       command,
@@ -192,9 +196,15 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
   catalog_id: 'redcube_product_entry_action_catalog',
   target_domain_id: 'redcube_ai',
   owner: 'redcube_ai',
+  generated_interface_owner: 'one-person-lab',
+  domain_handler_owner: 'redcube_ai',
+  owner_model: 'opl_generated_descriptor_catalog_with_rca_domain_handlers',
   authority_boundary: {
     domain_truth_owner: 'redcube_ai',
-    opl_role: 'projection_consumer_only',
+    opl_role: 'generated_interface_metadata_owner',
+    generated_interface_owner: 'one-person-lab',
+    repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
+    repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
     write_policy: 'no_domain_truth_writes',
   },
   actions: [
@@ -382,8 +392,8 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     }),
   ],
   notes: [
-    'RCA owns this action catalog as a projection surface; OPL consumes it without writing RedCube domain truth.',
-    'CLI help, MCP tool routing metadata, skill command contracts, and product-entry operator actions derive from this catalog.',
+    'RCA owns action semantics and domain handlers; OPL owns generated CLI/MCP/Skill/product/status/workbench descriptors derived from this catalog.',
+    'Repo-local redcube CLI/MCP remain domain handler targets and direct diagnostic entries, not unified metadata owners.',
   ],
 });
 
@@ -471,6 +481,16 @@ export function buildRedCubeActionMetadata() {
 
   return {
     surface_kind: 'redcube_action_metadata',
+    generated_interface_owner: 'one-person-lab',
+    domain_handler_owner: 'redcube_ai',
+    owner_model: 'opl_generated_descriptors_with_rca_domain_handler_targets',
+    repo_local_handler_targets: [
+      'redcube_cli',
+      'redcube_mcp',
+      'invokeProductEntry',
+      'invokeDomainEntry',
+      'product_sidecar',
+    ],
     family_action_catalog: catalog,
     cli_commands: cliCommands,
     product_entry: productEntryActions,

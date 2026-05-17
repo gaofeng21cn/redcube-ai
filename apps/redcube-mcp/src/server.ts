@@ -78,6 +78,14 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   applyReviewMutation,
 };
 
+export const MCP_SURFACE_OWNER_BOUNDARY = Object.freeze({
+  surface_kind: 'mcp_surface_owner_boundary',
+  generated_interface_owner: 'one-person-lab',
+  domain_handler_owner: 'redcube_ai',
+  repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+  redcube_mcp_is_unified_metadata_owner: false,
+});
+
 const ACTION_STRING = z.string().describe('Grouped task action selector.');
 const OPERATION_STRING = z.string().describe('Grouped source operation selector.');
 const WORKSPACE_ROOT = z.string().describe('Absolute workspace root path.');
@@ -341,6 +349,9 @@ export function listDomainTools() {
   return TOOL_DEFINITIONS.map(({ name, description }) => ({
     name,
     description,
+    generated_interface_owner: 'one-person-lab',
+    domain_handler_owner: 'redcube_ai',
+    repo_local_handler_target_only: true,
   }));
 }
 
