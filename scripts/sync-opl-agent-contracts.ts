@@ -43,10 +43,12 @@ const FORBIDDEN_GENERIC_OWNER_ROLES = [
 const GENERATED_SURFACES = [
   'cli',
   'mcp',
-  'product_entry_manifest',
-  'sidecar_export_dispatch',
-  'status_read_model',
-  'workbench_drilldown',
+  'skill',
+  'product_entry',
+  'product_status',
+  'product_session',
+  'sidecar',
+  'workbench',
   'functional_harness_cases',
 ];
 

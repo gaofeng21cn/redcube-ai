@@ -29,10 +29,12 @@
   "generated_surfaces_requested": [
     "cli",
     "mcp",
-    "product_entry_manifest",
-    "sidecar_export_dispatch",
-    "status_read_model",
-    "workbench_drilldown",
+    "skill",
+    "product_entry",
+    "product_status",
+    "product_session",
+    "sidecar",
+    "workbench",
     "functional_harness_cases"
   ],
   "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
