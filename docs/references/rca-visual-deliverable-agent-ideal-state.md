@@ -4,16 +4,16 @@ Owner: `RedCube AI`
 Purpose: `north_star_reference`
 State: `active_support`
 Machine boundary: 本文是人读目标态参考。机器可读真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-16`
+Date: `2026-05-17`
 
 ## 文档读法
 
 - `定位`：本文只写 RCA 的 north-star 目标态和长期 owner boundary；当前差距、执行顺序和 evidence 缺口回到 `rca-ideal-state-gap-plan.md`。
 - `当前实态校准`：带日期的校准段只记录当前 repo surface 或 fresh evidence，不把目标态写成已完成事实。
 - `Owner 边界`：RCA 持有 source readiness verdict、communication strategy、visual direction、review/export verdict、canonical artifact、visual memory body/accept-reject、owner receipt、native helper implementation、typed blocker 和 safe action refs；OPL 持有 provider runtime、standard scaffold、functional harness、queue、stage attempt、attempt ledger、typed closeout、generic transition runner、restart/dead-letter/repair/human gate 状态链、generic runner/workbench、workspace/source intake shell、artifact gallery/handoff shell、memory transport、memory refs-only writeback chain、review/repair transport、native-helper generic envelope、observability/SLO、stability read-model 和 App/workbench shell。
-- `当前功能面`：2026-05-16 已把 RCA 侧 OPL consumer follow-through 落到合同、manifest、sidecar projection 和 guard；OPL stability read-model 也已作为 refs-only consumer projection 挂入 RCA surface；`visual_transition_evaluator` 已补齐 RCA-owned transition guard evaluation。后续不再把 generic primitive handoff、functional harness coverage、generic transition runner 或 observability/control read-model 当成 RCA 功能缺口。
+- `当前功能面`：2026-05-16/17 已把 RCA 侧 OPL consumer follow-through、stability read-model、visual transition evaluator、workspace receipt inventory、operator evidence readiness、private functional audit 和 default generic sidecar dispatch cleanup 落到合同、manifest、sidecar projection 和 focused guard。`functional_structure_gap_closure.functional_structure_gap_count=0`、`unclassified_private_generic_residue_count=0`、`long_term_rca_generic_owner_claim_count=0` 是当前机器清零口径；后续不再把 generic primitive handoff、functional harness coverage、generic transition runner、observability/control read-model、pack compiler handoff 或 generated shell 迁移写成 RCA 功能缺口。
 - `目标态优先`：RCA 当前已有的 managed DAG、attempt/state-machine runner、session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/sidecar/status wrapper 只能作为迁移输入，不是理想态约束。理想 RCA 是标准 OPL Agent：声明式 visual pack + OPL generated/hosted surfaces + 最小 visual authority functions。
-- `最短路径`：后续先跑真实 memory/lifecycle receipt 实例、focused hosted attempt 和 OPL App / product shell projection，再推进 Temporal long soak。2026-05-17 后目标进一步收紧为 OPL pack compiler / generated surface：RCA 默认提交声明式 visual pack 和少量 visual authority functions，CLI/MCP/product-entry/sidecar/status/workbench 等通用外壳由 OPL 生成或托管。
+- `最短路径`：功能/结构差距已按当前机器面清零；后续先跑真实 memory/lifecycle receipt 实例、focused hosted attempt、OPL generated surface production consumption 和 OPL App / product shell projection，再推进 Temporal long soak。2026-05-17 后目标进一步收紧为 OPL pack compiler / generated surface：RCA 默认提交声明式 visual pack 和少量 visual authority functions，CLI/MCP/product-entry/sidecar/status/workbench 等通用外壳由 OPL 生成或托管。
 - `禁写口径`：RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
 
 ## 结论
@@ -28,7 +28,7 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 
 这条目标态高于当前 RCA 物理目录和实现方式。artifact-heavy 代码可以保留 visual authority 和 native helper implementation，但当前 managed-run/session、generic runner、workspace/source shell、artifact gallery/handoff、review/repair transport、operator projection、generic CLI/MCP/product shell 等不因为已经存在就成为长期 RCA 私有平台。必要时可以革命式重构 RCA，而不是在现状上做保守改革。能由 OPL primitive、pack compiler 或 App shell 承接的，必须列为上收或 generated surface 替换；不能承接的，必须收窄成明确的 visual authority function 或 refs-only adapter。
 
-RCA 可以为了清洁目标态重构 packages、runtime families、prompts、native helper callsite 和 product shell。保留项必须回答它是否直接作出 source readiness、visual direction、review/export verdict、artifact mutation、visual memory accept/reject 或 owner receipt signing；否则默认不是 RCA 长期私有功能。
+RCA 可以为了清洁目标态重构 packages、runtime families、prompts、native helper callsite 和 product shell。保留项必须回答它是否直接作出 source readiness、visual direction、review/export verdict、artifact mutation、visual memory accept/reject 或 owner receipt signing；否则默认不能作为 RCA 长期私有功能。2026-05-17 当前已知非知识功能面已经由 `privatized_functional_module_audit` 分类并清零为 evidence-gated；后续只有新增未分类 generic owner、generated shell 回流为 RCA 长期 owner，或 tombstone/diagnostic 重新获得默认 caller，才重新构成功能/结构差距。
 
 2026-05-16 P2 口径：RCA 消费 OPL `family_scheduler_replacement`，OPL 持有 family scheduler、daemon、generic lifecycle、typed queue、attempt ledger、generic runner 和 workbench shell；RCA 不新增这些 generic owner。fresh sidecar evidence 显示 `redcube product sidecar export --workspace-root /tmp/redcube-opl-doc-check --format json` 返回 `family_scheduler_replacement.owner=opl`、`consumer=redcube_ai`、`projection_mode=consumer_projection_only`、`rca_generic_scheduler_owner=false`、`rca_generic_daemon_owner=false`、`rca_generic_lifecycle_owner=false`、`rca_generic_queue_owner=false`、`rca_generic_attempt_ledger_owner=false`、`rca_generic_runner_owner=false`、`rca_generic_workbench_owner=false`、`managed_dag_scheduler_scope=visual_deliverable_internal_dag_only`。仓内 `managed-dag-scheduler` 只表示 visual deliverable 内部 DAG 分层，不是系统级 scheduler。RCA 保留 visual truth、review/export verdict、artifact authority、visual memory body、owner receipt、native helper implementation、typed blocker 和 safe action refs。
 
