@@ -72,7 +72,7 @@
 - 默认 smoke 是 `npm test` / `npm run test:fast`。
 - `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:historical` 是显式 lane。
 - `npm run test:full` 是 clean-clone 基线。
-- `scripts/run-test-group.ts` 是默认 Node 测试分组入口；它必须给所有 Python native helper 子进程注入仓外 cache 环境。新增直接启动 Python 的测试或脚本时，必须显式继承 `PYTHONDONTWRITEBYTECODE`、`PYTHONPYCACHEPREFIX` 和 pytest 仓外 `cache_dir`，不得把 `__pycache__`、`.pytest_cache` 或 `*.egg-info` 写回开发 checkout。
+- `scripts/run-test-group.ts` 是默认 Node 测试分组入口；它必须给所有 Python native helper 子进程注入仓外 cache 环境。新增直接启动 Python 的测试或脚本时，必须显式继承 `PYTHONDONTWRITEBYTECODE`、`PYTHONPYCACHEPREFIX`、pytest 仓外 `cache_dir` 和仓外 project venv 路径，不得把 `.venv`、`__pycache__`、`.pytest_cache` 或 `*.egg-info` 写回开发 checkout。
 - plan-closeout 必须显式列出 `planned`、`done`、`deferred`、`skipped`、`verification`、`commit-push state`；任何 `deferred` 项都要写成可检索 backlog，不得让计划项静默消失。
 
 ## 并行开发与工作树
