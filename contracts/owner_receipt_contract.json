@@ -1,18 +1,73 @@
 {
-  "surface_kind": "owner_receipt_contract",
-  "schema_version": 1,
-  "domain_id": "redcube_ai",
-  "allowed_receipt_classes": [
-    "owner_receipt",
+  "surface_kind": "domain_owner_receipt_contract",
+  "contract_id": "rca.domain_owner_receipt.v1",
+  "owner": "redcube_ai",
+  "contract_model": "domain_receipt_typed_blocker_no_regression_refs_only",
+  "allowed_return_shapes": [
+    "domain_receipt",
     "typed_blocker",
-    "no_regression_evidence",
-    "memory_writeback_receipt",
-    "artifact_lifecycle_receipt"
+    "no_regression_evidence"
   ],
-  "forbidden_claims": [
-    "opl_authorized_domain_ready",
-    "opl_authorized_quality_or_export_verdict",
-    "opl_wrote_domain_truth",
-    "opl_wrote_memory_body"
-  ]
+  "required_refs": [
+    "attempt_ref",
+    "artifact_locator_ref",
+    "memory_receipt_ref",
+    "lifecycle_receipt_ref",
+    "review_export_ref",
+    "forbidden_write_proof_ref"
+  ],
+  "receipt_cases": [
+    {
+      "return_shape": "domain_receipt",
+      "receipt_ref": "rca-owner-receipt:visual-stage:<receipt-id>",
+      "attempt_ref": "/controlled_visual_stage_attempt",
+      "artifact_locator_ref": "/artifact_locator_contract",
+      "memory_receipt_ref": "rca-memory-receipt:visual-pattern:<accepted-receipt-id>",
+      "lifecycle_receipt_ref": "rca-lifecycle-receipt:cleanup:<receipt-id>",
+      "review_export_ref": "/review_state",
+      "forbidden_write_proof_ref": "/controlled_memory_apply_proof/forbidden_write_audit",
+      "owner": "redcube_ai"
+    },
+    {
+      "return_shape": "typed_blocker",
+      "blocker_ref": "rca-typed-blocker:controlled-soak:<blocker-id>",
+      "blocker_kind": "domain_owner_receipt_required",
+      "source_contract": "opl_temporal_controlled_visual_stage_attempt_apply_contract",
+      "owner": "redcube_ai",
+      "next_required_owner_action": "run_rca_owned_visual_stage_attempt_or_emit_no_regression_evidence"
+    },
+    {
+      "return_shape": "no_regression_evidence",
+      "evidence_ref": "rca-no-regression:visual-stage:<evidence-id>",
+      "runtime_locator_ref": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",
+      "generator_action": "emit_no_regression_evidence",
+      "attempt_ref": "/controlled_visual_stage_attempt",
+      "surface_refs": [
+        "/controlled_memory_apply_proof",
+        "/lifecycle_guarded_apply_proof",
+        "/runtime_residue_retirement"
+      ],
+      "forbidden_write_proof_ref": "/controlled_memory_apply_proof/forbidden_write_audit",
+      "owner": "redcube_ai"
+    }
+  ],
+  "opl_consumption_policy": {
+    "opl_can_store_receipt_refs": true,
+    "opl_can_store_typed_blocker": true,
+    "opl_can_store_no_regression_evidence_ref": true,
+    "opl_can_store_visual_truth": false,
+    "opl_can_store_review_export_verdict": false,
+    "opl_can_store_canonical_artifact_blob": false,
+    "opl_can_accept_or_reject_memory_writeback": false,
+    "opl_can_mutate_domain_artifacts": false
+  },
+  "repository_boundary": {
+    "repo_tracks_contract_and_fixture_refs": true,
+    "repo_tracks_live_receipt_instances": false,
+    "repo_tracks_runtime_evidence_instances": false,
+    "repo_tracks_visual_truth": false,
+    "repo_tracks_review_export_verdict": false,
+    "repo_tracks_canonical_artifact_blob": false,
+    "repo_tracks_memory_content_body": false
+  }
 }

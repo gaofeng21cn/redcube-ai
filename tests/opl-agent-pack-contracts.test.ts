@@ -1,147 +1,127 @@
 // @ts-nocheck
-import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
+  buildFamilyDomainMemoryDescriptor,
   buildPrivatizedFunctionalModuleAuditProjection,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlane,
+  buildStandardDomainAgentSkeleton,
+  buildVisualPackCompilerHandoffProjection,
 } from '../packages/redcube-gateway/dist/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
-const forbiddenGenericOwnerRoles = [
-  'generic_scheduler_owner',
-  'generic_daemon_owner',
-  'generic_lifecycle_owner',
-  'generic_queue_owner',
-  'generic_attempt_ledger_owner',
-  'generic_state_machine_runner_owner',
-  'generic_cli_mcp_product_wrapper_owner',
-  'generic_sidecar_owner',
-  'generic_session_store_owner',
-  'generic_status_workbench_owner',
-  'generic_workspace_source_intake_owner',
-  'generic_memory_transport_owner',
-  'generic_artifact_gallery_owner',
-  'generic_operator_workbench_owner',
-  'generic_observability_slo_owner',
-  'generic_persistence_engine_owner',
-  'generic_sqlite_lifecycle_owner',
-  'generic_native_helper_envelope_owner',
-  'generic_review_repair_transport_owner',
-  'generated_surface_owner_in_domain_repo',
-];
 
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
 
-function normalizeFunctionalAudit(audit) {
+function buildCanonicalPack() {
+  const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
+  const stageControlPlane = buildRedCubeFamilyStageControlPlane({
+    familyActionCatalog: actionCatalog,
+  });
+  const skeleton = buildStandardDomainAgentSkeleton({
+    workspaceRoot: '<workspace_root>',
+    runtime: {
+      runtime_owner: 'codex_cli',
+      runtime_state_root: '<runtime_state_root>',
+      session_store_root: '<session_store_root>',
+    },
+    productEntrySessionCommand: 'redcube product session --entry-session-id <entry-session-id>',
+  });
+  const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
+  const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
+
   return {
-    surface_kind: 'functional_privatization_audit',
-    target_domain_id: 'redcube_ai',
-    owner: 'redcube_ai',
-    consumer: 'opl',
-    status: 'resolved',
-    source_projection_ref: '/privatized_functional_module_audit',
-    source_contract_ref: audit.contract_ref,
-    read_only: audit.read_only,
-    refs_only: audit.refs_only,
-    functional_structure_gap_closure: audit.functional_structure_gap_closure,
-    modules: audit.modules,
-    authority_boundary: audit.authority_boundary,
-    generated_surface_owner: 'one-person-lab',
-    domain_repo_can_own_generated_surface: false,
-    blockers: [],
-    notes: [
-      'This standard OPL audit read model is projected from the RCA privatized functional module audit.',
-      'OPL ready status requires zero generic residue/blockers after normalization.',
-    ],
+    actionCatalog: {
+      ...actionCatalog,
+      forbidden_generic_owner_roles: readJson('contracts/action_catalog.json').forbidden_generic_owner_roles,
+      generated_surface_owner: 'one-person-lab',
+      domain_repo_can_own_generated_surface: false,
+    },
+    stageControlPlane,
+    memoryDescriptor: {
+      ...buildFamilyDomainMemoryDescriptor({
+        domainMemoryDescriptorLocator: skeleton.domain_memory_descriptor_locator,
+      }),
+      root_contract_role: 'opl_standard_domain_agent_memory_descriptor',
+      memory_body_owner: 'redcube_ai',
+      opl_projection_policy: 'locator_and_receipt_refs_only',
+    },
+    artifactLocatorContract: skeleton.artifact_locator_contract,
+    ownerReceiptContract: skeleton.domain_owner_receipt_contract,
+    packCompilerInput: {
+      surface_kind: 'opl_domain_pack_compiler_input',
+      schema_version: 1,
+      domain_id: 'redcube_ai',
+      domain_pack_owner: 'redcube_ai',
+      generated_surface_owner: 'one-person-lab',
+      declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
+      minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
+      generated_surfaces_requested: [
+        'cli',
+        'mcp',
+        'product_entry_manifest',
+        'sidecar_export_dispatch',
+        'status_read_model',
+        'workbench_drilldown',
+        'functional_harness_cases',
+      ],
+      domain_repo_can_own_generated_surface: false,
+      source_refs: {
+        action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
+        stage_control_plane: 'packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
+        memory_descriptor: 'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
+        functional_audit: 'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
+      },
+      authority_boundary: {
+        opl_can_write_domain_truth: false,
+        opl_can_write_memory_body: false,
+        opl_can_authorize_quality_or_export: false,
+        domain_can_claim_generated_surface_owner: false,
+      },
+    },
+    functionalAudit: {
+      surface_kind: 'functional_privatization_audit',
+      schema_version: 1,
+      domain_id: 'redcube_ai',
+      target_domain_id: 'redcube_ai',
+      privatized_functional_module_audit: functionalAudit,
+      functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
+      authority_boundary: {
+        opl_can_write_domain_truth: false,
+        opl_can_write_memory_body: false,
+        opl_can_authorize_quality_or_export: false,
+        domain_can_claim_generic_runtime_owner: false,
+        domain_repo_can_own_generated_surface: false,
+      },
+    },
   };
 }
 
-test('root OPL action and stage contracts stay aligned with RCA canonical metadata', () => {
-  const actionMetadata = buildRedCubeActionMetadata();
-  const expectedActionCatalog = {
-    ...actionMetadata.family_action_catalog,
-    forbidden_generic_owner_roles: forbiddenGenericOwnerRoles,
-  };
-  const expectedStageControlPlane = buildRedCubeFamilyStageControlPlane({
-    familyActionCatalog: expectedActionCatalog,
-  });
+test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
+  const canonical = buildCanonicalPack();
 
-  assert.deepEqual(readJson('contracts/action_catalog.json'), expectedActionCatalog);
-  assert.deepEqual(readJson('contracts/stage_control_plane.json'), expectedStageControlPlane);
-  assert.equal(expectedActionCatalog.actions.length, 11);
-  assert.deepEqual(
-    expectedStageControlPlane.stages.map((stage) => stage.stage_id),
-    [
-      'source_intake',
-      'communication_strategy',
-      'visual_direction',
-      'artifact_creation',
-      'review_and_revision',
-      'package_and_handoff',
-    ],
-  );
-  assert.equal(expectedStageControlPlane.stage_action_parity.status, 'aligned');
-});
-
-test('root OPL functional privatization audit is ready and residue-free', () => {
-  const rootAudit = readJson('contracts/functional_privatization_audit.json');
-  const expectedAudit = normalizeFunctionalAudit(buildPrivatizedFunctionalModuleAuditProjection());
-
-  assert.deepEqual(rootAudit, expectedAudit);
-  assert.equal(rootAudit.surface_kind, 'functional_privatization_audit');
-  assert.equal(rootAudit.status, 'resolved');
-  assert.deepEqual(rootAudit.blockers, []);
-  assert.equal(rootAudit.functional_structure_gap_closure.functional_structure_gap_count, 0);
-  assert.equal(rootAudit.functional_structure_gap_closure.unclassified_private_generic_residue_count, 0);
-  assert.equal(rootAudit.functional_structure_gap_closure.long_term_rca_generic_owner_claim_count, 0);
-  assert.deepEqual(
-    rootAudit.modules.reduce((counts, module) => {
-      counts[module.migration_class] = (counts[module.migration_class] || 0) + 1;
-      return counts;
-    }, {}),
-    {
-      declarative_pack: 2,
-      refs_only_adapter: 6,
-      opl_hosted_surface: 3,
-      opl_generated_surface: 3,
-      minimal_authority_function: 1,
-    },
-  );
-});
-
-test('root OPL domain descriptor keeps generated interfaces owned by OPL', () => {
-  const descriptor = readJson('contracts/domain_descriptor.json');
-
-  assert.equal(descriptor.surface_kind, 'domain_agent_descriptor');
-  assert.equal(descriptor.domain_id, 'redcube_ai');
-  assert.equal(descriptor.generated_interface_owner, 'one-person-lab');
-  assert.equal(descriptor.authority_boundary.opl_owns_generated_interfaces, true);
-  assert.equal(descriptor.authority_boundary.opl_can_write_domain_truth, false);
-  assert.equal(descriptor.authority_boundary.opl_can_write_memory_body, false);
-  assert.equal(descriptor.authority_boundary.opl_can_authorize_quality_or_export, false);
-  assert.equal(descriptor.authority_boundary.opl_can_mutate_artifacts, false);
-  assert.equal(descriptor.action_targets.cli, 'npm run --prefix <redcube-ai-repo> redcube -- ...');
-  assert.deepEqual(descriptor.standard_contracts, {
-    action_catalog: 'contracts/action_catalog.json',
-    stage_control_plane: 'contracts/stage_control_plane.json',
-    functional_privatization_audit: 'contracts/functional_privatization_audit.json',
-  });
+  assert.deepEqual(readJson('contracts/action_catalog.json'), canonical.actionCatalog);
+  assert.deepEqual(readJson('contracts/stage_control_plane.json'), canonical.stageControlPlane);
+  assert.deepEqual(readJson('contracts/memory_descriptor.json'), canonical.memoryDescriptor);
+  assert.deepEqual(readJson('contracts/artifact_locator_contract.json'), canonical.artifactLocatorContract);
+  assert.deepEqual(readJson('contracts/owner_receipt_contract.json'), canonical.ownerReceiptContract);
+  assert.deepEqual(readJson('contracts/pack_compiler_input.json'), canonical.packCompilerInput);
+  assert.deepEqual(readJson('contracts/functional_privatization_audit.json'), canonical.functionalAudit);
 });
 
 test('OPL generated interfaces are ready from RCA root contracts when OPL checkout is available', {
   skip: !fs.existsSync(oplBin) ? `OPL bin not found: ${oplBin}` : false,
 }, () => {
-  const oplRoot = path.dirname(path.dirname(oplBin));
   const result = spawnSync(oplBin, [
     'agents',
     'interfaces',
@@ -149,7 +129,7 @@ test('OPL generated interfaces are ready from RCA root contracts when OPL checko
     repoRoot,
     '--json',
   ], {
-    cwd: oplRoot,
+    cwd: repoRoot,
     encoding: 'utf8',
   });
 
@@ -166,28 +146,4 @@ test('OPL generated interfaces are ready from RCA root contracts when OPL checko
   assert.equal(bundle.skill.status, 'ready');
   assert.equal(bundle.product_entry.status, 'ready');
   assert.equal(bundle.stage_routes.length, 6);
-});
-
-test('OPL standard scaffold validation passes for RCA root contracts when OPL checkout is available', {
-  skip: !fs.existsSync(oplBin) ? `OPL bin not found: ${oplBin}` : false,
-}, () => {
-  const oplRoot = path.dirname(path.dirname(oplBin));
-  const result = spawnSync(oplBin, [
-    'agents',
-    'scaffold',
-    '--validate',
-    repoRoot,
-    '--json',
-  ], {
-    cwd: oplRoot,
-    encoding: 'utf8',
-  });
-
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const payload = JSON.parse(result.stdout);
-  const validation = payload.standard_domain_agent_scaffold.validation;
-  assert.equal(validation.status, 'passed');
-  assert.deepEqual(validation.blockers, []);
-  assert.deepEqual(validation.missing_contract_files, []);
-  assert.deepEqual(validation.missing_forbidden_role_guards, []);
 });

@@ -1,12 +1,64 @@
 {
   "surface_kind": "artifact_locator_contract",
-  "schema_version": 1,
+  "contract_id": "rca.workspace_runtime_artifact_locator.v1",
   "domain_id": "redcube_ai",
-  "canonical_artifact_authority": "redcube_ai",
-  "opl_projection_policy": "locator_lifecycle_and_receipt_refs_only",
-  "authority_boundary": {
-    "opl_can_mutate_artifacts": false,
-    "opl_can_authorize_quality_or_export": false,
-    "domain_artifact_authority_owner": "redcube_ai"
+  "owner": "redcube_ai",
+  "locator_model": "workspace_runtime_artifact_root_refs_only",
+  "workspace_runtime_artifact_root": {
+    "ref_kind": "runtime_path",
+    "root_id": "workspace_runtime_artifact_root",
+    "workspace_root": "<workspace_root>",
+    "runtime_state_root": "<runtime_state_root>",
+    "session_store_root": "<session_store_root>",
+    "path_template": "<workspace-root>/.redcube/runtime/artifacts/<topic_id>/<deliverable_id>/<run_id>"
+  },
+  "artifact_ref_schema": {
+    "required_fields": [
+      "artifact_kind",
+      "ref_kind",
+      "artifact_ref",
+      "topic_id",
+      "deliverable_id",
+      "run_id",
+      "sha256"
+    ],
+    "allowed_artifact_kinds": [
+      "png_page",
+      "pptx_export",
+      "pdf_export",
+      "prompt_manifest",
+      "style_manifest",
+      "review_capture",
+      "export_bundle"
+    ],
+    "allowed_ref_kinds": [
+      "workspace_runtime_artifact",
+      "product_entry_session_ref",
+      "managed_run_artifact_ref"
+    ]
+  },
+  "repo_source_boundary": {
+    "repo_tracks_descriptors_and_contracts": true,
+    "repo_tracks_visual_or_export_artifact_blobs": false,
+    "forbidden_repo_artifact_roots": [
+      "artifacts/",
+      "runtime-state/",
+      ".runtime-program/",
+      ".redcube/runtime/artifacts/"
+    ]
+  },
+  "opl_consumption_policy": {
+    "allowed": [
+      "read_artifact_descriptor",
+      "read_artifact_ref",
+      "read_hash_and_locator",
+      "pickup_via_redcube_session_surface"
+    ],
+    "forbidden": [
+      "store_png_pptx_pdf_blob",
+      "declare_visual_export_verdict",
+      "rewrite_canonical_artifact",
+      "mutate_review_state"
+    ]
   }
 }

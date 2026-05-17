@@ -1,13 +1,1418 @@
 {
   "surface_kind": "functional_privatization_audit",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
   "target_domain_id": "redcube_ai",
-  "owner": "redcube_ai",
-  "consumer": "opl",
-  "status": "resolved",
-  "source_projection_ref": "/privatized_functional_module_audit",
-  "source_contract_ref": "rca.privatized_functional_module_audit.v1",
-  "read_only": true,
-  "refs_only": true,
+  "privatized_functional_module_audit": {
+    "ref": "/privatized_functional_module_audit",
+    "contract_ref": "rca.privatized_functional_module_audit.v1",
+    "owner": "redcube_ai",
+    "consumer": "opl",
+    "status": "machine_audit_projection_landed",
+    "projection_mode": "module_boundary_audit_read_model",
+    "read_only": true,
+    "refs_only": true,
+    "audit_scope": [
+      "managed-dag-scheduler",
+      "attempt/state-machine runner",
+      "managed-run JSON store",
+      "product-entry session store",
+      "workspace/source intake",
+      "memory/writeback receipt transport",
+      "artifact export lifecycle",
+      "review/repair transport",
+      "native helper envelope",
+      "operator projection shell",
+      "generic CLI/MCP wrappers",
+      "generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers",
+      "Codex executor adapter",
+      "observability/stability read model"
+    ],
+    "classification_values": [
+      "opl_hosted_surface",
+      "opl_generated_surface",
+      "refs_only_adapter",
+      "declarative_pack",
+      "minimal_authority_function",
+      "retire_tombstone"
+    ],
+    "replacement_expectation_mode": "opl_replacement_expectation_or_refs_only_projection",
+    "functional_structure_gap_closure": {
+      "status": "closed_for_rca_consumer_thinning",
+      "closed_at": "2026-05-17",
+      "closure_scope": "rca_functional_structure_gap_classification",
+      "functional_structure_gap_count": 0,
+      "unclassified_private_generic_residue_count": 0,
+      "long_term_rca_generic_owner_claim_count": 0,
+      "remaining_gap_class": "testing_evidence_gap_only",
+      "remaining_evidence_gate_ids": [
+        "real_artifact_producing_domain_owner_receipt",
+        "opl_hosted_controlled_visual_stage_long_soak",
+        "real_memory_lifecycle_receipt_instances",
+        "cross_family_repeated_no_regression_evidence",
+        "opl_generated_surface_production_consumption",
+        "opl_app_operator_drilldown"
+      ],
+      "closure_basis_refs": [
+        "/family_scheduler_replacement",
+        "/opl_generic_primitive_consumption",
+        "/opl_stability_read_model_consumption",
+        "/visual_pack_compiler_handoff",
+        "/operator_evidence_readiness_projection",
+        "/opl_substrate_adapter_export"
+      ],
+      "allowed_remaining_module_classes": [
+        "opl_hosted_surface",
+        "opl_generated_surface",
+        "refs_only_adapter",
+        "declarative_pack",
+        "minimal_authority_function"
+      ]
+    },
+    "physical_deletion_guard": {
+      "current_safe_tombstone_candidate_count": 2,
+      "deleted_or_thinned_default_surfaces": [
+        "product_sidecar_dispatch.supervise_managed_run",
+        "product_sidecar_dispatch.product_entry_continuation"
+      ],
+      "deletion_status": "sidecar_default_generic_dispatch_removed",
+      "remaining_deletion_scope": "Only visual authority functions, refs-only projections, diagnostic direct CLI surfaces, and declared visual pack inputs remain in RCA default package surfaces.",
+      "required_before_remaining_physical_delete": [
+        "active_direct_cli_mcp_callers_migrated_to_opl_generated_surfaces",
+        "domain_authority_refs_preserved",
+        "no_regression_proof_recorded"
+      ]
+    },
+    "forbidden_generic_owner_flags": {
+      "rca_owns_generic_runtime": false,
+      "rca_owns_generic_attempt_ledger": false,
+      "rca_owns_generic_session_shell": false,
+      "rca_owns_generic_workbench": false,
+      "rca_owns_native_helper_generic_envelope": false,
+      "rca_owns_generic_cli_mcp_wrapper_generator": false,
+      "rca_owns_generic_executor_adapter": false,
+      "rca_owns_observability_exporter": false
+    },
+    "rca_visual_authority_allowlist": [
+      "source_readiness_verdict",
+      "communication_visual_direction_decision",
+      "review_export_verdict",
+      "artifact_mutation_authorization",
+      "visual_memory_accept_reject",
+      "owner_receipt_signer",
+      "native_helper_implementation"
+    ],
+    "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
+    "modules": [
+      {
+        "module_id": "managed_dag_scheduler",
+        "surface_ref": "/managed_runtime_contract/stage_dag",
+        "status": "rca_domain_thin_surface_retained",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "generic_scheduler",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "visual_deliverable_internal_dag",
+          "route_policy_refs",
+          "visual_stage_order"
+        ],
+        "rca_scope": "visual_deliverable_internal_dag_only",
+        "audit_readout": "retain",
+        "codePaths": [
+          "packages/redcube-runtime/src/managed-dag-scheduler.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/family_scheduler_replacement"
+        ],
+        "activeCallers": [
+          "managed runtime contract",
+          "product-entry manifest",
+          "product sidecar export",
+          "managed DAG guard tests"
+        ],
+        "activeCallerStatus": "active_thin_domain_dag",
+        "migrationAction": "Move generic scheduling, queueing, daemon, retry and attempt lifecycle ownership to OPL family scheduler; keep only RCA visual stage DAG refs.",
+        "retentionReason": "RCA must define visual deliverable stage order and route-specific gate meaning for ppt_deck, xiaohongshu and poster families.",
+        "cannotAbsorbReason": "OPL can absorb scheduler mechanics but cannot own visual stage semantics, route policy or visual readiness authority.",
+        "tombstone_required": false,
+        "migration_class": "declarative_pack",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/family_scheduler_replacement",
+          "replacement_surface": "opl_family_scheduler",
+          "expected_mode": "declarative_pack_consumed_by_opl_hosted_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "visual_stage_dag_refs_only",
+        "rca_exports_only": [
+          "stage_dag_ref",
+          "route_policy_refs",
+          "visual_stage_order_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "managed_dag_scheduler still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "visual_deliverable_internal_dag",
+          "route_policy_refs",
+          "visual_stage_order"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "attempt_state_machine_runner",
+        "surface_ref": "/controlled_visual_stage_attempt",
+        "status": "opl_generic_transition_runner_consumed_refs_only",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "generic_transition_runner",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "visual_transition_spec",
+          "visual_guard_evaluator",
+          "typed_blocker",
+          "owner_receipt_refs"
+        ],
+        "rca_scope": "visual_transition_spec_and_guard_evaluator_only",
+        "audit_readout": "project_opl_runner_retain_visual_transition_authority",
+        "codePaths": [
+          "packages/redcube-runtime/src/managed-deliverable.ts",
+          "packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts",
+          "packages/redcube-runtime/src/managed-deliverable-parts/execution-orchestration.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+        ],
+        "activeCallers": [
+          "runManagedDeliverable",
+          "superviseManagedRun",
+          "evaluate_visual_transition sidecar action",
+          "OPL hosted attempt receipt fixture"
+        ],
+        "activeCallerStatus": "refs_only_visual_transition_adapter_consuming_opl_runner",
+        "migrationAction": "Consume OPL generic transition runner for idempotent tick, retry/dead-letter, provider attempt bridge and state-machine runner mechanics; keep RCA visual transition guard refs only.",
+        "retentionReason": "RCA keeps the visual transition table, guard refs, repair action meaning, typed blockers and owner receipt refs.",
+        "cannotAbsorbReason": "A generic runner cannot decide source readiness, visual review readiness, repair target meaning or export authority.",
+        "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
+          "replacement_surface": "opl_generic_transition_runner",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "transition_spec_and_guard_result_refs_only",
+        "rca_exports_only": [
+          "visual_transition_spec_ref",
+          "guard_result_refs",
+          "owner_receipt_refs",
+          "typed_blocker_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "attempt_state_machine_runner still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "visual_transition_spec",
+          "visual_guard_evaluator",
+          "typed_blocker",
+          "owner_receipt_refs"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "managed_run_json_store",
+        "surface_ref": "/runtime_inventory/managed_runs",
+        "status": "opl_attempt_ledger_provider_receipts_consumed",
+        "classification": "opl_owned_attempt_ledger_consumer",
+        "opl_generic_primitive": "attempt_ledger",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "managed_run_locator_refs",
+          "visual_run_projection_refs"
+        ],
+        "rca_scope": "opl_attempt_ledger_consumer_locator_refs",
+        "audit_readout": "migrate_store_to_opl_attempt_ledger_keep_locator_projection",
+        "codePaths": [
+          "packages/redcube-runtime/src/managed-run-store.ts",
+          "packages/redcube-runtime/src/managed-run-surfaces.ts",
+          "packages/redcube-gateway/src/actions/get-managed-run.ts",
+          "packages/redcube-gateway/src/actions/supervise-managed-run.ts"
+        ],
+        "activeCallers": [
+          "redcube product session",
+          "supervise managed run",
+          "runtime watch/session projection"
+        ],
+        "activeCallerStatus": "opl_provider_receipt_refs_with_rca_visual_summary",
+        "migrationAction": "Consume OPL attempt ledger/provider receipt storage while RCA exposes managed-run locator refs and visual-domain summaries.",
+        "retentionReason": "RCA keeps locator refs and visual run summaries needed to correlate provider receipts with domain-owned deliverable truth.",
+        "cannotAbsorbReason": "OPL owns the generic attempt ledger; it must not absorb canonical artifacts, review verdicts or visual run truth.",
+        "tombstone_required": false,
+        "migration_class": "opl_hosted_surface",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
+          "replacement_surface": "opl_attempt_ledger_provider_receipts",
+          "expected_mode": "opl_hosted_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "managed_run_locator_and_visual_summary_refs_only",
+        "rca_exports_only": [
+          "managed_run_locator_refs",
+          "visual_run_projection_refs",
+          "provider_receipt_correlation_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "managed_run_json_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "managed_run_locator_refs",
+          "visual_run_projection_refs"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "product_entry_session_store",
+        "surface_ref": "/session_continuity",
+        "status": "opl_generated_workbench_session_surface_consumed",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "workbench_shell",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "entry_session_domain_refs",
+          "deliverable_locator_refs",
+          "latest_visual_run_ref"
+        ],
+        "rca_scope": "product_entry_session_domain_snapshot_refs",
+        "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
+        "codePaths": [
+          "packages/redcube-runtime/src/product-entry-session-store.ts",
+          "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
+          "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+        ],
+        "activeCallers": [
+          "redcube product session",
+          "product-entry continuation",
+          "operator loop actions"
+        ],
+        "activeCallerStatus": "opl_generated_session_shell_domain_refs",
+        "migrationAction": "Consume OPL/App generic session shell, resume token, operator navigation and workbench state; keep RCA entry-session domain snapshot refs only.",
+        "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
+        "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
+        "tombstone_required": false,
+        "migration_class": "opl_generated_surface",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption",
+          "replacement_surface": "opl_app_session_shell_and_workbench",
+          "expected_mode": "opl_generated_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
+        "rca_exports_only": [
+          "entry_session_id",
+          "topic_deliverable_run_locator_refs",
+          "latest_visual_run_ref"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "product_entry_session_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "entry_session_domain_refs",
+          "deliverable_locator_refs",
+          "latest_visual_run_ref"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "workspace_source_intake",
+        "surface_ref": "/source_intake",
+        "status": "generic_intake_shell_migration_candidate",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "workspace_source_intake_shell",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "source_readiness_verdict",
+          "communication_strategy_inputs",
+          "visual_source_pack_refs"
+        ],
+        "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
+        "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/intake-source.ts",
+          "packages/redcube-runtime/src/source-intake.ts",
+          "packages/redcube-runtime/src/source-readiness-pack.ts",
+          "packages/redcube-runtime/src/shared-source-truth.ts"
+        ],
+        "activeCallers": [
+          "source intake CLI/MCP action",
+          "source-first fanout",
+          "product-entry manifest source readiness"
+        ],
+        "activeCallerStatus": "active_rca_source_intake",
+        "migrationAction": "Move generic workspace locator, source receipt shell, material gap queue and provenance navigation to OPL.",
+        "retentionReason": "RCA must judge visual source readiness, audience promise inputs and communication strategy source adequacy.",
+        "cannotAbsorbReason": "OPL can host source transport but cannot own RCA source readiness verdict or narrative/visual source interpretation.",
+        "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_substrate_adapter_export",
+          "replacement_surface": "opl_workspace_source_intake_shell",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
+        "rca_exports_only": [
+          "source_locator_refs",
+          "source_readiness_verdict_ref",
+          "communication_strategy_input_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "workspace_source_intake still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "source_readiness_verdict",
+          "communication_strategy_inputs",
+          "visual_source_pack_refs"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "memory_writeback_receipt_transport",
+        "surface_ref": "/controlled_memory_apply_proof",
+        "status": "split_owner_boundary_landed",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "memory_refs_only_writeback_chain",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "visual_memory_body",
+          "accept_reject_authority",
+          "memory_quality_judgment"
+        ],
+        "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
+        "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_memory_writeback",
+          "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+        ],
+        "activeCallers": [
+          "apply_visual_memory_writeback sidecar action",
+          "workspace receipt inventory",
+          "operator evidence readiness projection"
+        ],
+        "activeCallerStatus": "active_refs_only_transport",
+        "migrationAction": "Move body-free memory transport, freshness grouping and receipt inventory shell to OPL.",
+        "retentionReason": "RCA owns visual pattern memory body, accept/reject decision and lesson quality semantics.",
+        "cannotAbsorbReason": "OPL must not store visual memory body or decide whether a visual pattern is reusable for RCA deliverables.",
+        "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
+          "replacement_surface": "opl_memory_locator_writeback_transport",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "memory_receipt_locator_refs_only",
+        "rca_exports_only": [
+          "memory_locator_refs",
+          "writeback_receipt_refs",
+          "accept_reject_receipt_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "memory_writeback_receipt_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "visual_memory_body",
+          "accept_reject_authority",
+          "memory_quality_judgment"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "artifact_export_lifecycle",
+        "surface_ref": "/artifact_locator_contract",
+        "status": "opl_artifact_lifecycle_shell_consumed_refs_only",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "artifact_lifecycle",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "canonical_artifact_authority",
+          "export_verdict",
+          "artifact_mutation_permission"
+        ],
+        "rca_scope": "visual_artifact_export_authority_and_locator_refs",
+        "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
+          "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+        ],
+        "activeCallers": [
+          "artifact locator contract",
+          "export_pptx route",
+          "workspace lifecycle guarded apply",
+          "product sidecar export"
+        ],
+        "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
+        "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
+        "retentionReason": "RCA owns canonical visual artifacts, exportability verdict and artifact mutation permission.",
+        "cannotAbsorbReason": "OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.",
+        "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
+          "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
+        "rca_exports_only": [
+          "artifact_locator_refs",
+          "export_verdict_refs",
+          "lifecycle_receipt_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "artifact_export_lifecycle still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "canonical_artifact_authority",
+          "export_verdict",
+          "artifact_mutation_permission"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "review_repair_transport",
+        "surface_ref": "/review_state",
+        "status": "split_owner_boundary_landed",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "review_repair_transport",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "visual_review_verdict",
+          "repair_decision",
+          "blocked_item_semantics"
+        ],
+        "rca_scope": "visual_review_export_verdict_and_repair_decision",
+        "audit_readout": "retain_domain_gate_project_transport_refs",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
+          "packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts"
+        ],
+        "activeCallers": [
+          "visual director review",
+          "screenshot review",
+          "repair_image_pages",
+          "product sidecar review projection"
+        ],
+        "activeCallerStatus": "active_domain_review_gate",
+        "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
+        "retentionReason": "RCA owns visual review/export verdicts, blocked-item meaning and repair target selection.",
+        "cannotAbsorbReason": "OPL transport cannot decide if a slide/page is visually acceptable, exportable or needs a specific RCA repair route.",
+        "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
+          "replacement_surface": "opl_review_repair_transport",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
+        "rca_exports_only": [
+          "review_state_refs",
+          "blocked_item_refs",
+          "repair_hint_refs",
+          "export_verdict_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "review_repair_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "visual_review_verdict",
+          "repair_decision",
+          "blocked_item_semantics"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "native_helper_envelope",
+        "surface_ref": "/native_ppt_operator_ux",
+        "status": "split_owner_boundary_landed",
+        "classification": "split_owner_boundary",
+        "opl_generic_primitive": "native_helper_generic_envelope",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "python_native_helper_implementation",
+          "ppt_image_export_mutation_logic",
+          "helper_specific_proof"
+        ],
+        "rca_scope": "python_native_helper_implementation",
+        "audit_readout": "retain_rca_implementation_project_opl_envelope",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+          "contracts/runtime-program/python-native-helper-catalog.json",
+          "python/redcube_ai"
+        ],
+        "activeCallers": [
+          "native PPT proof lane",
+          "author_pptx_native route",
+          "repair_pptx_native route",
+          "python native helper catalog tests"
+        ],
+        "activeCallerStatus": "active_rca_native_implementation_package_module_only",
+        "migrationAction": "Move helper registration, environment/provisioning metadata, execution receipt and operator-safe launch envelope to OPL.",
+        "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
+        "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
+        "tombstone_required": false,
+        "migration_class": "opl_hosted_surface",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
+          "replacement_surface": "opl_native_helper_execution_envelope",
+          "expected_mode": "opl_hosted_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
+        "rca_exports_only": [
+          "helper_catalog_refs",
+          "package_module_refs",
+          "helper_proof_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "native_helper_envelope still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "python_native_helper_implementation",
+          "ppt_image_export_mutation_logic",
+          "helper_specific_proof"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "operator_projection_shell",
+        "surface_ref": "/operator_evidence_readiness_projection",
+        "status": "workbench_shell_migration_candidate",
+        "classification": "opl_owned_workbench_consumer_projection",
+        "opl_generic_primitive": "workbench_shell",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "operator_evidence_refs",
+          "domain_gap_semantics",
+          "safe_repair_hints"
+        ],
+        "rca_scope": "rca_operator_projection_refs_only",
+        "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+          "packages/redcube-gateway/src/actions/get-product-status.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+        ],
+        "activeCallers": [
+          "redcube product status",
+          "product-entry manifest",
+          "product sidecar export",
+          "operator evidence readiness tests"
+        ],
+        "activeCallerStatus": "active_refs_only_projection_shell",
+        "migrationAction": "Move generic dashboard/workbench layout, attention queue, repair command projection and drilldown shell to OPL App.",
+        "retentionReason": "RCA provides domain evidence refs, blocker meaning and safe repair hints for visual deliverable readiness.",
+        "cannotAbsorbReason": "OPL App may render projections but cannot turn them into RCA visual ready/exportable claims.",
+        "tombstone_required": false,
+        "migration_class": "opl_generated_surface",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/operator_evidence_readiness_projection",
+          "replacement_surface": "opl_app_operator_workbench_shell",
+          "expected_mode": "opl_generated_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "operator_evidence_readiness_refs_only",
+        "rca_exports_only": [
+          "evidence_gap_refs",
+          "typed_blocker_refs",
+          "safe_repair_hint_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "operator_projection_shell still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "operator_evidence_refs",
+          "domain_gap_semantics",
+          "safe_repair_hints"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "generic_cli_mcp_wrappers",
+        "surface_ref": "/family_action_catalog_parity",
+        "status": "canonical_metadata_parity_landed",
+        "classification": "opl_discoverable_projection_rca_owned_action_metadata",
+        "opl_generic_primitive": "standard_domain_agent_scaffold",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "rca_action_metadata",
+          "domain_action_handlers",
+          "safe_action_refs"
+        ],
+        "rca_scope": "product_sidecar_status_action_metadata_projection",
+        "audit_readout": "retain_thin_projection_project_generated_wrappers",
+        "codePaths": [
+          "apps/redcube-cli/src/cli.ts",
+          "apps/redcube-mcp/src/server.ts",
+          "packages/redcube-gateway/src/actions/family-action-catalog.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+        ],
+        "activeCallers": [
+          "redcube CLI",
+          "redcube MCP server",
+          "family action catalog",
+          "product sidecar guarded action list"
+        ],
+        "activeCallerStatus": "active_thin_wrappers_derived_from_canonical_metadata",
+        "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
+        "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
+        "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+        "tombstone_required": false,
+        "migration_class": "opl_generated_surface",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/family_action_catalog",
+          "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
+          "expected_mode": "opl_generated_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "canonical_action_metadata_refs_only",
+        "rca_exports_only": [
+          "family_action_catalog_refs",
+          "guarded_action_refs",
+          "domain_handler_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "generic_cli_mcp_wrappers still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "rca_action_metadata",
+          "domain_action_handlers",
+          "safe_action_refs"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "codex_executor_adapter",
+        "surface_ref": "/domain_entry_contract/executor",
+        "status": "split_owner_boundary_landed",
+        "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
+        "opl_generic_primitive": "agent_executor_adapter",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "default_codex_executor_policy",
+          "route_executor_requirements",
+          "executor_receipt_refs"
+        ],
+        "rca_scope": "route_level_executor_policy_and_receipt_refs",
+        "audit_readout": "project_opl_executor_adapter_retain_rca_route_policy",
+        "codePaths": [
+          "packages/redcube-runtime/src/executors.ts",
+          "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
+          "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
+          "tests/rca-executor-backend-contract.test.ts"
+        ],
+        "activeCallers": [
+          "deliverable route runner",
+          "domain entry contract",
+          "runtime route executor tests"
+        ],
+        "activeCallerStatus": "active_codex_cli_first_class_default",
+        "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
+        "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
+        "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
+        "tombstone_required": false,
+        "migration_class": "opl_hosted_surface",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/domain_entry_contract/executor",
+          "replacement_surface": "opl_agent_executor_adapter",
+          "expected_mode": "opl_hosted_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "route_level_executor_policy_refs_only",
+        "rca_exports_only": [
+          "executor_requirement_refs",
+          "executor_receipt_refs",
+          "route_policy_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "codex_executor_adapter still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "default_codex_executor_policy",
+          "route_executor_requirements",
+          "executor_receipt_refs"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "observability_stability_read_model",
+        "surface_ref": "/opl_stability_read_model_consumption",
+        "status": "refs_only_consumer_projection_landed",
+        "classification": "opl_owned_observability_stability_read_model_consumed_by_rca",
+        "opl_generic_primitive": "runtime_observability_exporter",
+        "oplAbsorbCandidate": true,
+        "rcaRetains": [
+          "domain_blocker_meaning",
+          "safe_repair_hint_refs",
+          "no_regression_evidence_refs"
+        ],
+        "rca_scope": "visual_domain_status_projection_refs_only",
+        "audit_readout": "project_only",
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
+          "packages/redcube-gateway/src/actions/get-product-status.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+        ],
+        "activeCallers": [
+          "product status",
+          "product sidecar runtime framework",
+          "operator evidence readiness projection"
+        ],
+        "activeCallerStatus": "active_refs_only_consumer_projection",
+        "migrationAction": "Keep observability exporter, SLO, control-loop summary, usage and resource-pressure aggregation in OPL.",
+        "retentionReason": "RCA contributes domain blocker meaning, visual-safe repair hints and no-regression evidence refs.",
+        "cannotAbsorbReason": "OPL observability cannot authorize RCA quality, exportability or visual remediation decisions.",
+        "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
+        "opl_owned_generic_primitive_consumer": true,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": true,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/opl_stability_read_model_consumption",
+          "replacement_surface": "opl_stability_read_model_and_observability_export",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
+          "rca_consumes_as": "consumer_projection_only",
+          "rca_owns_replacement_runtime": false
+        },
+        "rca_projection_mode": "observability_refs_only",
+        "rca_exports_only": [
+          "owner_receipt_refs",
+          "typed_blocker_refs",
+          "no_regression_evidence_refs",
+          "resource_pressure_signal_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "observability_stability_read_model still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "required_before_delete": [
+            "opl_replacement_surface_live",
+            "active_callers_migrated",
+            "domain_authority_refs_preserved",
+            "no_regression_proof_recorded"
+          ]
+        },
+        "rca_retains": [
+          "domain_blocker_meaning",
+          "safe_repair_hint_refs",
+          "no_regression_evidence_refs"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "visual_pack_compiler_handoff",
+        "surface_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
+        "status": "declarative_pack_input_landed",
+        "classification": "declarative_pack",
+        "migration_class": "declarative_pack",
+        "owner": "redcube_ai",
+        "opl_owned_generic_primitive_consumer": false,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": false,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+          "replacement_surface": "opl_pack_compiler_generated_surface",
+          "expected_mode": "opl_generated_surface_from_declarative_pack",
+          "rca_consumes_as": "declarative_pack_provider",
+          "rca_owns_replacement_runtime": false
+        },
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+        ],
+        "activeCallers": [
+          "product-entry manifest",
+          "product sidecar export",
+          "product status"
+        ],
+        "activeCallerStatus": "declarative_pack_input_active",
+        "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+        "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
+        "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
+        "rca_projection_mode": "declarative_pack_refs_only",
+        "rca_exports_only": [
+          "stage_refs",
+          "action_metadata_refs",
+          "visual_transition_refs",
+          "receipt_schema_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
+          "required_before_delete": [
+            "domain_package_replaced_by_new_rca_pack_contract"
+          ]
+        },
+        "rca_retains": [
+          "visual_stage_pack",
+          "action_metadata",
+          "authority_policy",
+          "oracle_fixtures"
+        ],
+        "retire_tombstone": false,
+        "tombstone_required": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "visual_authority_functions",
+        "surface_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
+        "status": "minimal_authority_function_manifest_landed",
+        "classification": "minimal_authority_function",
+        "migration_class": "minimal_authority_function",
+        "owner": "redcube_ai",
+        "opl_owned_generic_primitive_consumer": false,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": false,
+        "opl_replacement_expectation": {
+          "owner": "redcube_ai",
+          "expectation_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
+          "replacement_surface": "not_absorbable_domain_authority_function",
+          "expected_mode": "domain_authority_function_called_by_generated_surface",
+          "rca_consumes_as": "authority_function_owner",
+          "rca_owns_replacement_runtime": false
+        },
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts",
+          "packages/redcube-runtime/src"
+        ],
+        "activeCallers": [
+          "visual route execution",
+          "review/export gates",
+          "memory writeback acceptance",
+          "owner receipt signing"
+        ],
+        "activeCallerStatus": "minimal_authority_functions_active",
+        "migrationAction": "Retain only visual authority functions while OPL generates generic wrappers and runtime shells.",
+        "retentionReason": "RCA must decide visual source readiness, visual direction, review/export verdicts, artifact mutation, visual memory acceptance and owner receipts.",
+        "cannotAbsorbReason": "These functions are RCA domain authority and cannot be moved to OPL without moving visual truth.",
+        "rca_projection_mode": "authority_receipt_refs_only",
+        "rca_exports_only": [
+          "verdict_refs",
+          "owner_receipt_refs",
+          "typed_blocker_refs",
+          "safe_action_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "Minimal authority functions are the allowed RCA retention surface.",
+          "required_before_delete": [
+            "visual_domain_authority_moved_by_explicit_product_decision"
+          ]
+        },
+        "rca_retains": [
+          "source_readiness_verdict",
+          "communication_visual_direction_decision",
+          "review_export_verdict",
+          "artifact_mutation_authorization",
+          "visual_memory_accept_reject",
+          "owner_receipt_signer",
+          "native_helper_implementation"
+        ],
+        "retire_tombstone": false,
+        "tombstone_required": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false
+      }
+    ],
+    "opl_owned_generic_primitives": [
+      "family_scheduler",
+      "daemon",
+      "generic_lifecycle",
+      "typed_queue",
+      "attempt_ledger",
+      "generic_runner",
+      "workbench_shell",
+      "standard_domain_agent_scaffold",
+      "functional_harness",
+      "generic_runtime",
+      "generic_scheduler",
+      "stage_attempt_orchestrator",
+      "typed_closeout_transport",
+      "generic_transition_runner",
+      "memory_transport",
+      "memory_refs_only_writeback_chain",
+      "artifact_lifecycle",
+      "review_repair_transport",
+      "restart_dead_letter_repair_human_gate_state_chain",
+      "native_helper_generic_envelope",
+      "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+      "family_conflict_envelope_schema",
+      "control_loop_summary_builder",
+      "usage_projection_aggregator",
+      "resource_pressure_projection",
+      "runtime_observability_exporter",
+      "external_stability_policy_runtime",
+      "generic_fallback_completion",
+      "string_rule_retry_execution",
+      "generic_event_bus_truth_source",
+      "generic_runtime_adapter_success_semantics"
+    ],
+    "rca_retained_authority": [
+      "visual_truth",
+      "review_export_verdict",
+      "artifact_authority",
+      "visual_memory_body",
+      "owner_receipt",
+      "native_helper_implementation",
+      "typed_blocker",
+      "safe_action_refs"
+    ],
+    "protected_rca_surfaces": [
+      "visual_deliverable_internal_dag",
+      "visual_truth",
+      "review_export_verdict",
+      "repair_decision",
+      "artifact_authority",
+      "visual_memory_body",
+      "owner_receipt",
+      "native_helper_implementation"
+    ],
+    "retire_tombstone_candidates": [
+      {
+        "surface_id": "product_sidecar_dispatch.supervise_managed_run",
+        "retired_at": "2026-05-17",
+        "replacement_owner": "opl",
+        "replacement_surface": "opl_generic_runner_and_supervisor_tick",
+        "retained_rca_surface": "direct deliverable managed supervision diagnostic surface",
+        "active_default_caller": false
+      },
+      {
+        "surface_id": "product_sidecar_dispatch.product_entry_continuation",
+        "retired_at": "2026-05-17",
+        "replacement_owner": "opl",
+        "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
+        "retained_rca_surface": "direct product entry invoke/session surfaces",
+        "active_default_caller": false
+      }
+    ],
+    "must_not_retire": [
+      "managed_deliverable_internal_dag",
+      "visual_review_export_gate",
+      "native_helper_implementation",
+      "artifact_gallery_export_refs",
+      "codex_cli_default_route_policy"
+    ],
+    "authority_boundary": {
+      "opl_can_index_audit_projection": true,
+      "opl_can_import_generic_primitives": true,
+      "opl_can_write_rca_visual_truth": false,
+      "opl_can_write_rca_artifact_blob": false,
+      "opl_can_write_rca_memory_body": false,
+      "opl_can_declare_visual_ready": false,
+      "opl_can_declare_exportable": false,
+      "opl_can_declare_handoffable": false,
+      "opl_can_claim_production_soak_complete": false,
+      "rca_generic_scheduler_owner": false,
+      "rca_native_helper_generic_envelope_owner": false,
+      "rca_artifact_lifecycle_owner": false,
+      "rca_review_repair_transport_owner": false,
+      "rca_observability_export_owner": false
+    }
+  },
   "functional_structure_gap_closure": {
     "status": "closed_for_rca_consumer_thinning",
     "closed_at": "2026-05-17",
@@ -40,1242 +1445,11 @@
       "minimal_authority_function"
     ]
   },
-  "modules": [
-    {
-      "module_id": "managed_dag_scheduler",
-      "surface_ref": "/managed_runtime_contract/stage_dag",
-      "status": "rca_domain_thin_surface_retained",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "generic_scheduler",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "visual_deliverable_internal_dag",
-        "route_policy_refs",
-        "visual_stage_order"
-      ],
-      "rca_scope": "visual_deliverable_internal_dag_only",
-      "audit_readout": "retain",
-      "codePaths": [
-        "packages/redcube-runtime/src/managed-dag-scheduler.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/family_scheduler_replacement"
-      ],
-      "activeCallers": [
-        "managed runtime contract",
-        "product-entry manifest",
-        "product sidecar export",
-        "managed DAG guard tests"
-      ],
-      "activeCallerStatus": "active_thin_domain_dag",
-      "migrationAction": "Move generic scheduling, queueing, daemon, retry and attempt lifecycle ownership to OPL family scheduler; keep only RCA visual stage DAG refs.",
-      "retentionReason": "RCA must define visual deliverable stage order and route-specific gate meaning for ppt_deck, xiaohongshu and poster families.",
-      "cannotAbsorbReason": "OPL can absorb scheduler mechanics but cannot own visual stage semantics, route policy or visual readiness authority.",
-      "tombstone_required": false,
-      "migration_class": "declarative_pack",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/family_scheduler_replacement",
-        "replacement_surface": "opl_family_scheduler",
-        "expected_mode": "declarative_pack_consumed_by_opl_hosted_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "visual_stage_dag_refs_only",
-      "rca_exports_only": [
-        "stage_dag_ref",
-        "route_policy_refs",
-        "visual_stage_order_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "managed_dag_scheduler still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "visual_deliverable_internal_dag",
-        "route_policy_refs",
-        "visual_stage_order"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "attempt_state_machine_runner",
-      "surface_ref": "/controlled_visual_stage_attempt",
-      "status": "opl_generic_transition_runner_consumed_refs_only",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "generic_transition_runner",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "visual_transition_spec",
-        "visual_guard_evaluator",
-        "typed_blocker",
-        "owner_receipt_refs"
-      ],
-      "rca_scope": "visual_transition_spec_and_guard_evaluator_only",
-      "audit_readout": "project_opl_runner_retain_visual_transition_authority",
-      "codePaths": [
-        "packages/redcube-runtime/src/managed-deliverable.ts",
-        "packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts",
-        "packages/redcube-runtime/src/managed-deliverable-parts/execution-orchestration.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
-      ],
-      "activeCallers": [
-        "runManagedDeliverable",
-        "superviseManagedRun",
-        "evaluate_visual_transition sidecar action",
-        "OPL hosted attempt receipt fixture"
-      ],
-      "activeCallerStatus": "refs_only_visual_transition_adapter_consuming_opl_runner",
-      "migrationAction": "Consume OPL generic transition runner for idempotent tick, retry/dead-letter, provider attempt bridge and state-machine runner mechanics; keep RCA visual transition guard refs only.",
-      "retentionReason": "RCA keeps the visual transition table, guard refs, repair action meaning, typed blockers and owner receipt refs.",
-      "cannotAbsorbReason": "A generic runner cannot decide source readiness, visual review readiness, repair target meaning or export authority.",
-      "tombstone_required": false,
-      "migration_class": "refs_only_adapter",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
-        "replacement_surface": "opl_generic_transition_runner",
-        "expected_mode": "refs_only_adapter_to_opl_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "transition_spec_and_guard_result_refs_only",
-      "rca_exports_only": [
-        "visual_transition_spec_ref",
-        "guard_result_refs",
-        "owner_receipt_refs",
-        "typed_blocker_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "attempt_state_machine_runner still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "visual_transition_spec",
-        "visual_guard_evaluator",
-        "typed_blocker",
-        "owner_receipt_refs"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "managed_run_json_store",
-      "surface_ref": "/runtime_inventory/managed_runs",
-      "status": "opl_attempt_ledger_provider_receipts_consumed",
-      "classification": "opl_owned_attempt_ledger_consumer",
-      "opl_generic_primitive": "attempt_ledger",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "managed_run_locator_refs",
-        "visual_run_projection_refs"
-      ],
-      "rca_scope": "opl_attempt_ledger_consumer_locator_refs",
-      "audit_readout": "migrate_store_to_opl_attempt_ledger_keep_locator_projection",
-      "codePaths": [
-        "packages/redcube-runtime/src/managed-run-store.ts",
-        "packages/redcube-runtime/src/managed-run-surfaces.ts",
-        "packages/redcube-gateway/src/actions/get-managed-run.ts",
-        "packages/redcube-gateway/src/actions/supervise-managed-run.ts"
-      ],
-      "activeCallers": [
-        "redcube product session",
-        "supervise managed run",
-        "runtime watch/session projection"
-      ],
-      "activeCallerStatus": "opl_provider_receipt_refs_with_rca_visual_summary",
-      "migrationAction": "Consume OPL attempt ledger/provider receipt storage while RCA exposes managed-run locator refs and visual-domain summaries.",
-      "retentionReason": "RCA keeps locator refs and visual run summaries needed to correlate provider receipts with domain-owned deliverable truth.",
-      "cannotAbsorbReason": "OPL owns the generic attempt ledger; it must not absorb canonical artifacts, review verdicts or visual run truth.",
-      "tombstone_required": false,
-      "migration_class": "opl_hosted_surface",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": false,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
-        "replacement_surface": "opl_attempt_ledger_provider_receipts",
-        "expected_mode": "opl_hosted_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "managed_run_locator_and_visual_summary_refs_only",
-      "rca_exports_only": [
-        "managed_run_locator_refs",
-        "visual_run_projection_refs",
-        "provider_receipt_correlation_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "managed_run_json_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "managed_run_locator_refs",
-        "visual_run_projection_refs"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "product_entry_session_store",
-      "surface_ref": "/session_continuity",
-      "status": "opl_generated_workbench_session_surface_consumed",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "workbench_shell",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "entry_session_domain_refs",
-        "deliverable_locator_refs",
-        "latest_visual_run_ref"
-      ],
-      "rca_scope": "product_entry_session_domain_snapshot_refs",
-      "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
-      "codePaths": [
-        "packages/redcube-runtime/src/product-entry-session-store.ts",
-        "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-        "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
-      ],
-      "activeCallers": [
-        "redcube product session",
-        "product-entry continuation",
-        "operator loop actions"
-      ],
-      "activeCallerStatus": "opl_generated_session_shell_domain_refs",
-      "migrationAction": "Consume OPL/App generic session shell, resume token, operator navigation and workbench state; keep RCA entry-session domain snapshot refs only.",
-      "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
-      "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
-      "tombstone_required": false,
-      "migration_class": "opl_generated_surface",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": false,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption",
-        "replacement_surface": "opl_app_session_shell_and_workbench",
-        "expected_mode": "opl_generated_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
-      "rca_exports_only": [
-        "entry_session_id",
-        "topic_deliverable_run_locator_refs",
-        "latest_visual_run_ref"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "product_entry_session_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "entry_session_domain_refs",
-        "deliverable_locator_refs",
-        "latest_visual_run_ref"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "workspace_source_intake",
-      "surface_ref": "/source_intake",
-      "status": "generic_intake_shell_migration_candidate",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "workspace_source_intake_shell",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "source_readiness_verdict",
-        "communication_strategy_inputs",
-        "visual_source_pack_refs"
-      ],
-      "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
-      "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/intake-source.ts",
-        "packages/redcube-runtime/src/source-intake.ts",
-        "packages/redcube-runtime/src/source-readiness-pack.ts",
-        "packages/redcube-runtime/src/shared-source-truth.ts"
-      ],
-      "activeCallers": [
-        "source intake CLI/MCP action",
-        "source-first fanout",
-        "product-entry manifest source readiness"
-      ],
-      "activeCallerStatus": "active_rca_source_intake",
-      "migrationAction": "Move generic workspace locator, source receipt shell, material gap queue and provenance navigation to OPL.",
-      "retentionReason": "RCA must judge visual source readiness, audience promise inputs and communication strategy source adequacy.",
-      "cannotAbsorbReason": "OPL can host source transport but cannot own RCA source readiness verdict or narrative/visual source interpretation.",
-      "tombstone_required": false,
-      "migration_class": "refs_only_adapter",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_substrate_adapter_export",
-        "replacement_surface": "opl_workspace_source_intake_shell",
-        "expected_mode": "refs_only_adapter_to_opl_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
-      "rca_exports_only": [
-        "source_locator_refs",
-        "source_readiness_verdict_ref",
-        "communication_strategy_input_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "workspace_source_intake still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "source_readiness_verdict",
-        "communication_strategy_inputs",
-        "visual_source_pack_refs"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "memory_writeback_receipt_transport",
-      "surface_ref": "/controlled_memory_apply_proof",
-      "status": "split_owner_boundary_landed",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "memory_refs_only_writeback_chain",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "visual_memory_body",
-        "accept_reject_authority",
-        "memory_quality_judgment"
-      ],
-      "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
-      "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_memory_writeback",
-        "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
-      ],
-      "activeCallers": [
-        "apply_visual_memory_writeback sidecar action",
-        "workspace receipt inventory",
-        "operator evidence readiness projection"
-      ],
-      "activeCallerStatus": "active_refs_only_transport",
-      "migrationAction": "Move body-free memory transport, freshness grouping and receipt inventory shell to OPL.",
-      "retentionReason": "RCA owns visual pattern memory body, accept/reject decision and lesson quality semantics.",
-      "cannotAbsorbReason": "OPL must not store visual memory body or decide whether a visual pattern is reusable for RCA deliverables.",
-      "tombstone_required": false,
-      "migration_class": "refs_only_adapter",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
-        "replacement_surface": "opl_memory_locator_writeback_transport",
-        "expected_mode": "refs_only_adapter_to_opl_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "memory_receipt_locator_refs_only",
-      "rca_exports_only": [
-        "memory_locator_refs",
-        "writeback_receipt_refs",
-        "accept_reject_receipt_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "memory_writeback_receipt_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "visual_memory_body",
-        "accept_reject_authority",
-        "memory_quality_judgment"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "artifact_export_lifecycle",
-      "surface_ref": "/artifact_locator_contract",
-      "status": "opl_artifact_lifecycle_shell_consumed_refs_only",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "artifact_lifecycle",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "canonical_artifact_authority",
-        "export_verdict",
-        "artifact_mutation_permission"
-      ],
-      "rca_scope": "visual_artifact_export_authority_and_locator_refs",
-      "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
-        "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
-        "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
-      ],
-      "activeCallers": [
-        "artifact locator contract",
-        "export_pptx route",
-        "workspace lifecycle guarded apply",
-        "product sidecar export"
-      ],
-      "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
-      "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
-      "retentionReason": "RCA owns canonical visual artifacts, exportability verdict and artifact mutation permission.",
-      "cannotAbsorbReason": "OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.",
-      "tombstone_required": false,
-      "migration_class": "refs_only_adapter",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
-        "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
-        "expected_mode": "refs_only_adapter_to_opl_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
-      "rca_exports_only": [
-        "artifact_locator_refs",
-        "export_verdict_refs",
-        "lifecycle_receipt_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "artifact_export_lifecycle still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "canonical_artifact_authority",
-        "export_verdict",
-        "artifact_mutation_permission"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "review_repair_transport",
-      "surface_ref": "/review_state",
-      "status": "split_owner_boundary_landed",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "review_repair_transport",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "visual_review_verdict",
-        "repair_decision",
-        "blocked_item_semantics"
-      ],
-      "rca_scope": "visual_review_export_verdict_and_repair_decision",
-      "audit_readout": "retain_domain_gate_project_transport_refs",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-        "packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts"
-      ],
-      "activeCallers": [
-        "visual director review",
-        "screenshot review",
-        "repair_image_pages",
-        "product sidecar review projection"
-      ],
-      "activeCallerStatus": "active_domain_review_gate",
-      "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
-      "retentionReason": "RCA owns visual review/export verdicts, blocked-item meaning and repair target selection.",
-      "cannotAbsorbReason": "OPL transport cannot decide if a slide/page is visually acceptable, exportable or needs a specific RCA repair route.",
-      "tombstone_required": false,
-      "migration_class": "refs_only_adapter",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
-        "replacement_surface": "opl_review_repair_transport",
-        "expected_mode": "refs_only_adapter_to_opl_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
-      "rca_exports_only": [
-        "review_state_refs",
-        "blocked_item_refs",
-        "repair_hint_refs",
-        "export_verdict_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "review_repair_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "visual_review_verdict",
-        "repair_decision",
-        "blocked_item_semantics"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "native_helper_envelope",
-      "surface_ref": "/native_ppt_operator_ux",
-      "status": "split_owner_boundary_landed",
-      "classification": "split_owner_boundary",
-      "opl_generic_primitive": "native_helper_generic_envelope",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "python_native_helper_implementation",
-        "ppt_image_export_mutation_logic",
-        "helper_specific_proof"
-      ],
-      "rca_scope": "python_native_helper_implementation",
-      "audit_readout": "retain_rca_implementation_project_opl_envelope",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
-        "contracts/runtime-program/python-native-helper-catalog.json",
-        "python/redcube_ai"
-      ],
-      "activeCallers": [
-        "native PPT proof lane",
-        "author_pptx_native route",
-        "repair_pptx_native route",
-        "python native helper catalog tests"
-      ],
-      "activeCallerStatus": "active_rca_native_implementation_package_module_only",
-      "migrationAction": "Move helper registration, environment/provisioning metadata, execution receipt and operator-safe launch envelope to OPL.",
-      "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
-      "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
-      "tombstone_required": false,
-      "migration_class": "opl_hosted_surface",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
-        "replacement_surface": "opl_native_helper_execution_envelope",
-        "expected_mode": "opl_hosted_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
-      "rca_exports_only": [
-        "helper_catalog_refs",
-        "package_module_refs",
-        "helper_proof_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "native_helper_envelope still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "python_native_helper_implementation",
-        "ppt_image_export_mutation_logic",
-        "helper_specific_proof"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "operator_projection_shell",
-      "surface_ref": "/operator_evidence_readiness_projection",
-      "status": "workbench_shell_migration_candidate",
-      "classification": "opl_owned_workbench_consumer_projection",
-      "opl_generic_primitive": "workbench_shell",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "operator_evidence_refs",
-        "domain_gap_semantics",
-        "safe_repair_hints"
-      ],
-      "rca_scope": "rca_operator_projection_refs_only",
-      "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-        "packages/redcube-gateway/src/actions/get-product-status.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
-      ],
-      "activeCallers": [
-        "redcube product status",
-        "product-entry manifest",
-        "product sidecar export",
-        "operator evidence readiness tests"
-      ],
-      "activeCallerStatus": "active_refs_only_projection_shell",
-      "migrationAction": "Move generic dashboard/workbench layout, attention queue, repair command projection and drilldown shell to OPL App.",
-      "retentionReason": "RCA provides domain evidence refs, blocker meaning and safe repair hints for visual deliverable readiness.",
-      "cannotAbsorbReason": "OPL App may render projections but cannot turn them into RCA visual ready/exportable claims.",
-      "tombstone_required": false,
-      "migration_class": "opl_generated_surface",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": false,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/operator_evidence_readiness_projection",
-        "replacement_surface": "opl_app_operator_workbench_shell",
-        "expected_mode": "opl_generated_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "operator_evidence_readiness_refs_only",
-      "rca_exports_only": [
-        "evidence_gap_refs",
-        "typed_blocker_refs",
-        "safe_repair_hint_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "operator_projection_shell still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "operator_evidence_refs",
-        "domain_gap_semantics",
-        "safe_repair_hints"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "generic_cli_mcp_wrappers",
-      "surface_ref": "/family_action_catalog_parity",
-      "status": "canonical_metadata_parity_landed",
-      "classification": "opl_discoverable_projection_rca_owned_action_metadata",
-      "opl_generic_primitive": "standard_domain_agent_scaffold",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "rca_action_metadata",
-        "domain_action_handlers",
-        "safe_action_refs"
-      ],
-      "rca_scope": "product_sidecar_status_action_metadata_projection",
-      "audit_readout": "retain_thin_projection_project_generated_wrappers",
-      "codePaths": [
-        "apps/redcube-cli/src/cli.ts",
-        "apps/redcube-mcp/src/server.ts",
-        "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
-      ],
-      "activeCallers": [
-        "redcube CLI",
-        "redcube MCP server",
-        "family action catalog",
-        "product sidecar guarded action list"
-      ],
-      "activeCallerStatus": "active_thin_wrappers_derived_from_canonical_metadata",
-      "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
-      "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-      "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
-      "tombstone_required": false,
-      "migration_class": "opl_generated_surface",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/family_action_catalog",
-        "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
-        "expected_mode": "opl_generated_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "canonical_action_metadata_refs_only",
-      "rca_exports_only": [
-        "family_action_catalog_refs",
-        "guarded_action_refs",
-        "domain_handler_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "generic_cli_mcp_wrappers still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "rca_action_metadata",
-        "domain_action_handlers",
-        "safe_action_refs"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "codex_executor_adapter",
-      "surface_ref": "/domain_entry_contract/executor",
-      "status": "split_owner_boundary_landed",
-      "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
-      "opl_generic_primitive": "agent_executor_adapter",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "default_codex_executor_policy",
-        "route_executor_requirements",
-        "executor_receipt_refs"
-      ],
-      "rca_scope": "route_level_executor_policy_and_receipt_refs",
-      "audit_readout": "project_opl_executor_adapter_retain_rca_route_policy",
-      "codePaths": [
-        "packages/redcube-runtime/src/executors.ts",
-        "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
-        "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
-        "tests/rca-executor-backend-contract.test.ts"
-      ],
-      "activeCallers": [
-        "deliverable route runner",
-        "domain entry contract",
-        "runtime route executor tests"
-      ],
-      "activeCallerStatus": "active_codex_cli_first_class_default",
-      "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
-      "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
-      "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
-      "tombstone_required": false,
-      "migration_class": "opl_hosted_surface",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/domain_entry_contract/executor",
-        "replacement_surface": "opl_agent_executor_adapter",
-        "expected_mode": "opl_hosted_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "route_level_executor_policy_refs_only",
-      "rca_exports_only": [
-        "executor_requirement_refs",
-        "executor_receipt_refs",
-        "route_policy_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "codex_executor_adapter still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "default_codex_executor_policy",
-        "route_executor_requirements",
-        "executor_receipt_refs"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "observability_stability_read_model",
-      "surface_ref": "/opl_stability_read_model_consumption",
-      "status": "refs_only_consumer_projection_landed",
-      "classification": "opl_owned_observability_stability_read_model_consumed_by_rca",
-      "opl_generic_primitive": "runtime_observability_exporter",
-      "oplAbsorbCandidate": true,
-      "rcaRetains": [
-        "domain_blocker_meaning",
-        "safe_repair_hint_refs",
-        "no_regression_evidence_refs"
-      ],
-      "rca_scope": "visual_domain_status_projection_refs_only",
-      "audit_readout": "project_only",
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
-        "packages/redcube-gateway/src/actions/get-product-status.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
-      ],
-      "activeCallers": [
-        "product status",
-        "product sidecar runtime framework",
-        "operator evidence readiness projection"
-      ],
-      "activeCallerStatus": "active_refs_only_consumer_projection",
-      "migrationAction": "Keep observability exporter, SLO, control-loop summary, usage and resource-pressure aggregation in OPL.",
-      "retentionReason": "RCA contributes domain blocker meaning, visual-safe repair hints and no-regression evidence refs.",
-      "cannotAbsorbReason": "OPL observability cannot authorize RCA quality, exportability or visual remediation decisions.",
-      "tombstone_required": false,
-      "migration_class": "refs_only_adapter",
-      "opl_owned_generic_primitive_consumer": true,
-      "rca_owned_visual_domain_authority": false,
-      "opl_absorb_candidate": true,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/opl_stability_read_model_consumption",
-        "replacement_surface": "opl_stability_read_model_and_observability_export",
-        "expected_mode": "refs_only_adapter_to_opl_surface",
-        "rca_consumes_as": "consumer_projection_only",
-        "rca_owns_replacement_runtime": false
-      },
-      "rca_projection_mode": "observability_refs_only",
-      "rca_exports_only": [
-        "owner_receipt_refs",
-        "typed_blocker_refs",
-        "no_regression_evidence_refs",
-        "resource_pressure_signal_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "observability_stability_read_model still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-        "required_before_delete": [
-          "opl_replacement_surface_live",
-          "active_callers_migrated",
-          "domain_authority_refs_preserved",
-          "no_regression_proof_recorded"
-        ]
-      },
-      "rca_retains": [
-        "domain_blocker_meaning",
-        "safe_repair_hint_refs",
-        "no_regression_evidence_refs"
-      ],
-      "retire_tombstone": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "visual_pack_compiler_handoff",
-      "surface_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
-      "status": "declarative_pack_input_landed",
-      "classification": "declarative_pack",
-      "migration_class": "declarative_pack",
-      "owner": "redcube_ai",
-      "opl_owned_generic_primitive_consumer": false,
-      "rca_owned_visual_domain_authority": false,
-      "opl_absorb_candidate": false,
-      "opl_replacement_expectation": {
-        "owner": "opl",
-        "expectation_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-        "replacement_surface": "opl_pack_compiler_generated_surface",
-        "expected_mode": "opl_generated_surface_from_declarative_pack",
-        "rca_consumes_as": "declarative_pack_provider",
-        "rca_owns_replacement_runtime": false
-      },
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
-      ],
-      "activeCallers": [
-        "product-entry manifest",
-        "product sidecar export",
-        "product status"
-      ],
-      "activeCallerStatus": "declarative_pack_input_active",
-      "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
-      "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
-      "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
-      "rca_projection_mode": "declarative_pack_refs_only",
-      "rca_exports_only": [
-        "stage_refs",
-        "action_metadata_refs",
-        "visual_transition_refs",
-        "receipt_schema_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
-        "required_before_delete": [
-          "domain_package_replaced_by_new_rca_pack_contract"
-        ]
-      },
-      "rca_retains": [
-        "visual_stage_pack",
-        "action_metadata",
-        "authority_policy",
-        "oracle_fixtures"
-      ],
-      "retire_tombstone": false,
-      "tombstone_required": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    },
-    {
-      "module_id": "visual_authority_functions",
-      "surface_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
-      "status": "minimal_authority_function_manifest_landed",
-      "classification": "minimal_authority_function",
-      "migration_class": "minimal_authority_function",
-      "owner": "redcube_ai",
-      "opl_owned_generic_primitive_consumer": false,
-      "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": false,
-      "opl_replacement_expectation": {
-        "owner": "redcube_ai",
-        "expectation_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
-        "replacement_surface": "not_absorbable_domain_authority_function",
-        "expected_mode": "domain_authority_function_called_by_generated_surface",
-        "rca_consumes_as": "authority_function_owner",
-        "rca_owns_replacement_runtime": false
-      },
-      "codePaths": [
-        "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar.ts",
-        "packages/redcube-runtime/src"
-      ],
-      "activeCallers": [
-        "visual route execution",
-        "review/export gates",
-        "memory writeback acceptance",
-        "owner receipt signing"
-      ],
-      "activeCallerStatus": "minimal_authority_functions_active",
-      "migrationAction": "Retain only visual authority functions while OPL generates generic wrappers and runtime shells.",
-      "retentionReason": "RCA must decide visual source readiness, visual direction, review/export verdicts, artifact mutation, visual memory acceptance and owner receipts.",
-      "cannotAbsorbReason": "These functions are RCA domain authority and cannot be moved to OPL without moving visual truth.",
-      "rca_projection_mode": "authority_receipt_refs_only",
-      "rca_exports_only": [
-        "verdict_refs",
-        "owner_receipt_refs",
-        "typed_blocker_refs",
-        "safe_action_refs"
-      ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
-      "physical_deletion_guard": {
-        "safe_to_delete_now": false,
-        "reason": "Minimal authority functions are the allowed RCA retention surface.",
-        "required_before_delete": [
-          "visual_domain_authority_moved_by_explicit_product_decision"
-        ]
-      },
-      "rca_retains": [
-        "source_readiness_verdict",
-        "communication_visual_direction_decision",
-        "review_export_verdict",
-        "artifact_mutation_authorization",
-        "visual_memory_accept_reject",
-        "owner_receipt_signer",
-        "native_helper_implementation"
-      ],
-      "retire_tombstone": false,
-      "tombstone_required": false,
-      "writes_visual_truth": false,
-      "writes_artifact_blob": false,
-      "writes_memory_body": false,
-      "declares_visual_ready": false,
-      "declares_exportable": false,
-      "declares_handoffable": false,
-      "declares_production_soak_complete": false
-    }
-  ],
   "authority_boundary": {
-    "opl_can_index_audit_projection": true,
-    "opl_can_import_generic_primitives": true,
-    "opl_can_write_rca_visual_truth": false,
-    "opl_can_write_rca_artifact_blob": false,
-    "opl_can_write_rca_memory_body": false,
-    "opl_can_declare_visual_ready": false,
-    "opl_can_declare_exportable": false,
-    "opl_can_declare_handoffable": false,
-    "opl_can_claim_production_soak_complete": false,
-    "rca_generic_scheduler_owner": false,
-    "rca_native_helper_generic_envelope_owner": false,
-    "rca_artifact_lifecycle_owner": false,
-    "rca_review_repair_transport_owner": false,
-    "rca_observability_export_owner": false
-  },
-  "generated_surface_owner": "one-person-lab",
-  "domain_repo_can_own_generated_surface": false,
-  "blockers": [],
-  "notes": [
-    "This standard OPL audit read model is projected from the RCA privatized functional module audit.",
-    "OPL ready status requires zero generic residue/blockers after normalization."
-  ]
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "domain_can_claim_generic_runtime_owner": false,
+    "domain_repo_can_own_generated_surface": false
+  }
 }

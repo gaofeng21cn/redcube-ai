@@ -4,12 +4,18 @@ import path from 'node:path';
 import process from 'node:process';
 
 import {
+  buildFamilyDomainMemoryDescriptor,
+  buildPrivatizedFunctionalModuleAuditProjection,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlane,
-  buildPrivatizedFunctionalModuleAuditProjection,
+  buildStandardDomainAgentSkeleton,
+  buildVisualPackCompilerHandoffProjection,
 } from '../packages/redcube-gateway/dist/index.js';
 
 const CONTRACTS_DIR = path.resolve('contracts');
+const DOMAIN_ID = 'redcube_ai';
+const GENERATED_SURFACE_OWNER = 'one-person-lab';
+
 const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generic_scheduler_owner',
   'generic_daemon_owner',
@@ -32,6 +38,7 @@ const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generic_review_repair_transport_owner',
   'generated_surface_owner_in_domain_repo',
 ];
+
 const GENERATED_SURFACES = [
   'cli',
   'mcp',
@@ -40,24 +47,6 @@ const GENERATED_SURFACES = [
   'status_read_model',
   'workbench_drilldown',
   'functional_harness_cases',
-];
-const DECLARATIVE_DOMAIN_PACK = [
-  'stage_descriptors',
-  'action_catalog',
-  'visual_pack_policy',
-  'domain_memory_locator',
-  'artifact_locator_contract',
-  'owner_receipt_schema',
-  'review_export_gate_refs',
-];
-const MINIMAL_AUTHORITY_FUNCTIONS = [
-  'source_readiness_verdict',
-  'visual_direction_authorizer',
-  'review_export_verdict_authorizer',
-  'artifact_mutation_authorizer',
-  'visual_memory_accept_reject_decider',
-  'owner_receipt_signer',
-  'native_visual_helper_implementation',
 ];
 
 function stable(value: unknown): string {
@@ -70,38 +59,37 @@ function writeJson(relativePath: string, payload: unknown) {
   fs.writeFileSync(targetPath, stable(payload));
 }
 
+function buildSkeleton() {
+  return buildStandardDomainAgentSkeleton({
+    workspaceRoot: '<workspace_root>',
+    runtime: {
+      runtime_owner: 'codex_cli',
+      runtime_state_root: '<runtime_state_root>',
+      session_store_root: '<session_store_root>',
+    },
+    productEntrySessionCommand: 'redcube product session --entry-session-id <entry-session-id>',
+  });
+}
+
 function buildDomainDescriptor() {
   return {
     surface_kind: 'domain_agent_descriptor',
     schema_version: 1,
-    domain_id: 'redcube_ai',
+    domain_id: DOMAIN_ID,
     domain_label: 'RedCube AI',
     package_id: 'redcube-ai',
+    package_role: 'opl_standard_domain_agent',
     agent_kind: 'visual_deliverable_foundry_agent',
     release_shape: 'opl_compatible_package',
-    owner: 'redcube_ai',
-    generated_interface_owner: 'one-person-lab',
-    default_executor: 'codex_cli',
-    formal_entry: {
-      default: 'CLI',
-      supported_protocols: ['MCP'],
-      internal_surface: 'controller',
-    },
-    standard_contracts: {
+    owner: DOMAIN_ID,
+    generated_surface_owner: GENERATED_SURFACE_OWNER,
+    domain_repo_can_own_generated_surface: false,
+    standard_contract_refs: {
       action_catalog: 'contracts/action_catalog.json',
       stage_control_plane: 'contracts/stage_control_plane.json',
+      pack_compiler_input: 'contracts/pack_compiler_input.json',
+      generated_surface_handoff: 'contracts/generated_surface_handoff.json',
       functional_privatization_audit: 'contracts/functional_privatization_audit.json',
-    },
-    canonical_metadata_sources: [
-      'packages/redcube-gateway/src/actions/family-action-catalog.ts',
-      'packages/redcube-gateway/src/actions/family-stage-control-plane.ts',
-      'packages/redcube-gateway/src/actions/get-product-entry-manifest.ts',
-    ],
-    action_targets: {
-      cli: 'npm run --prefix <redcube-ai-repo> redcube -- ...',
-      product_entry: 'redcube product status | invoke | session | manifest',
-      sidecar: 'redcube product sidecar export | dispatch',
-      service_safe_domain_entry: 'invokeDomainEntry',
     },
     authority_boundary: {
       redcube_ai_owns_visual_truth: true,
@@ -116,51 +104,24 @@ function buildDomainDescriptor() {
       opl_can_mutate_artifacts: false,
       provider_completion_is_domain_ready: false,
     },
-    notes: [
-      'Root contracts are static OPL pack-compiler inputs generated from RCA-owned canonical action/stage metadata.',
-      'Existing CLI, product-entry and sidecar implementations remain action targets, not generated-interface owners.',
-    ],
   };
 }
 
-function normalizeFunctionalAudit(audit: Record<string, unknown>) {
-  return {
-    surface_kind: 'functional_privatization_audit',
-    target_domain_id: 'redcube_ai',
-    owner: 'redcube_ai',
-    consumer: 'opl',
-    status: 'resolved',
-    source_projection_ref: '/privatized_functional_module_audit',
-    source_contract_ref: audit.contract_ref,
-    read_only: audit.read_only,
-    refs_only: audit.refs_only,
-    functional_structure_gap_closure: audit.functional_structure_gap_closure,
-    modules: audit.modules,
-    authority_boundary: audit.authority_boundary,
-    generated_surface_owner: 'one-person-lab',
-    domain_repo_can_own_generated_surface: false,
-    blockers: [],
-    notes: [
-      'This standard OPL audit read model is projected from the RCA privatized functional module audit.',
-      'OPL ready status requires zero generic residue/blockers after normalization.',
-    ],
-  };
-}
-
-function buildPackCompilerInput() {
+function buildPackCompilerInput(visualPackCompilerHandoff) {
   return {
     surface_kind: 'opl_domain_pack_compiler_input',
     schema_version: 1,
-    domain_id: 'redcube_ai',
-    domain_pack_owner: 'redcube_ai',
-    generated_surface_owner: 'one-person-lab',
-    declarative_domain_pack: DECLARATIVE_DOMAIN_PACK,
-    minimal_authority_functions: MINIMAL_AUTHORITY_FUNCTIONS,
+    domain_id: DOMAIN_ID,
+    domain_pack_owner: DOMAIN_ID,
+    generated_surface_owner: GENERATED_SURFACE_OWNER,
+    declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
+    minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
     generated_surfaces_requested: GENERATED_SURFACES,
     domain_repo_can_own_generated_surface: false,
     source_refs: {
-      action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::getRedCubeFamilyActionCatalog',
+      action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
       stage_control_plane: 'packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
+      memory_descriptor: 'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
       functional_audit: 'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
     },
     authority_boundary: {
@@ -176,13 +137,13 @@ function buildGeneratedSurfaceHandoff() {
   return {
     surface_kind: 'opl_generated_surface_handoff',
     schema_version: 1,
-    domain_id: 'redcube_ai',
-    generated_surface_owner: 'one-person-lab',
+    domain_id: DOMAIN_ID,
+    generated_surface_owner: GENERATED_SURFACE_OWNER,
     domain_repo_can_own_generated_surface: false,
     source_contract_ref: 'contracts/pack_compiler_input.json',
     generated_surfaces: GENERATED_SURFACES.map((surfaceId) => ({
       surface_id: surfaceId,
-      owner: 'one-person-lab',
+      owner: GENERATED_SURFACE_OWNER,
       domain_repo_can_own_generated_surface: false,
       status: 'descriptor_source_available',
     })),
@@ -195,54 +156,41 @@ function buildGeneratedSurfaceHandoff() {
   };
 }
 
-function buildMemoryDescriptor() {
+function withActionCatalogGuards(actionCatalog) {
   return {
-    surface_kind: 'domain_memory_descriptor_locator',
-    schema_version: 1,
-    domain_id: 'redcube_ai',
-    memory_body_owner: 'redcube_ai',
+    ...actionCatalog,
+    forbidden_generic_owner_roles: FORBIDDEN_GENERIC_OWNER_ROLES,
+    generated_surface_owner: GENERATED_SURFACE_OWNER,
+    domain_repo_can_own_generated_surface: false,
+  };
+}
+
+function buildMemoryDescriptor(skeleton) {
+  return {
+    ...buildFamilyDomainMemoryDescriptor({
+      domainMemoryDescriptorLocator: skeleton.domain_memory_descriptor_locator,
+    }),
+    root_contract_role: 'opl_standard_domain_agent_memory_descriptor',
+    memory_body_owner: DOMAIN_ID,
     opl_projection_policy: 'locator_and_receipt_refs_only',
+  };
+}
+
+function buildFunctionalAudit(functionalAudit) {
+  return {
+    surface_kind: 'functional_privatization_audit',
+    schema_version: 1,
+    domain_id: DOMAIN_ID,
+    target_domain_id: DOMAIN_ID,
+    privatized_functional_module_audit: functionalAudit,
+    functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
     authority_boundary: {
+      opl_can_write_domain_truth: false,
       opl_can_write_memory_body: false,
-      opl_can_accept_or_reject_writeback: false,
-      domain_memory_accept_reject_owner: 'redcube_ai',
-    },
-  };
-}
-
-function buildArtifactLocatorContract() {
-  return {
-    surface_kind: 'artifact_locator_contract',
-    schema_version: 1,
-    domain_id: 'redcube_ai',
-    canonical_artifact_authority: 'redcube_ai',
-    opl_projection_policy: 'locator_lifecycle_and_receipt_refs_only',
-    authority_boundary: {
-      opl_can_mutate_artifacts: false,
       opl_can_authorize_quality_or_export: false,
-      domain_artifact_authority_owner: 'redcube_ai',
+      domain_can_claim_generic_runtime_owner: false,
+      domain_repo_can_own_generated_surface: false,
     },
-  };
-}
-
-function buildOwnerReceiptContract() {
-  return {
-    surface_kind: 'owner_receipt_contract',
-    schema_version: 1,
-    domain_id: 'redcube_ai',
-    allowed_receipt_classes: [
-      'owner_receipt',
-      'typed_blocker',
-      'no_regression_evidence',
-      'memory_writeback_receipt',
-      'artifact_lifecycle_receipt',
-    ],
-    forbidden_claims: [
-      'opl_authorized_domain_ready',
-      'opl_authorized_quality_or_export_verdict',
-      'opl_wrote_domain_truth',
-      'opl_wrote_memory_body',
-    ],
   };
 }
 
@@ -250,7 +198,7 @@ function buildPrivateFunctionalSurfacePolicy() {
   return {
     surface_kind: 'opl_domain_private_functional_surface_admission_policy',
     schema_version: 1,
-    domain_id: 'redcube_ai',
+    domain_id: DOMAIN_ID,
     default_posture: 'forbidden_until_classified_and_receipted',
     forbidden_private_surface_classes: [
       'generic_scheduler',
@@ -262,38 +210,49 @@ function buildPrivateFunctionalSurfacePolicy() {
     allowed_private_surface_classes: [
       'minimal_authority_function',
       'visual_native_helper_implementation',
-      'review_export_verdict_authorizer',
+      'review_or_export_verdict_authorizer',
     ],
+    forbidden_generic_owner_roles: FORBIDDEN_GENERIC_OWNER_ROLES,
   };
 }
 
-async function main() {
-  const actionMetadata = buildRedCubeActionMetadata();
-  const actionCatalog = {
-    ...actionMetadata.family_action_catalog,
-    forbidden_generic_owner_roles: FORBIDDEN_GENERIC_OWNER_ROLES,
-  };
+function buildContracts() {
+  const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
   const stageControlPlane = buildRedCubeFamilyStageControlPlane({
     familyActionCatalog: actionCatalog,
   });
-  const functionalAudit = normalizeFunctionalAudit(
-    buildPrivatizedFunctionalModuleAuditProjection(),
-  );
+  const skeleton = buildSkeleton();
+  const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
+  const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
 
-  fs.mkdirSync(CONTRACTS_DIR, { recursive: true });
-  writeJson('contracts/domain_descriptor.json', buildDomainDescriptor());
-  writeJson('contracts/pack_compiler_input.json', buildPackCompilerInput());
-  writeJson('contracts/generated_surface_handoff.json', buildGeneratedSurfaceHandoff());
-  writeJson('contracts/action_catalog.json', actionCatalog);
-  writeJson('contracts/stage_control_plane.json', stageControlPlane);
-  writeJson('contracts/memory_descriptor.json', buildMemoryDescriptor());
-  writeJson('contracts/artifact_locator_contract.json', buildArtifactLocatorContract());
-  writeJson('contracts/owner_receipt_contract.json', buildOwnerReceiptContract());
-  writeJson('contracts/functional_privatization_audit.json', functionalAudit);
-  writeJson('contracts/private_functional_surface_policy.json', buildPrivateFunctionalSurfacePolicy());
+  return {
+    domain_descriptor: buildDomainDescriptor(),
+    pack_compiler_input: buildPackCompilerInput(visualPackCompilerHandoff),
+    generated_surface_handoff: buildGeneratedSurfaceHandoff(),
+    action_catalog: withActionCatalogGuards(actionCatalog),
+    stage_control_plane: stageControlPlane,
+    memory_descriptor: buildMemoryDescriptor(skeleton),
+    artifact_locator_contract: skeleton.artifact_locator_contract,
+    owner_receipt_contract: skeleton.domain_owner_receipt_contract,
+    functional_privatization_audit: buildFunctionalAudit(functionalAudit),
+    private_functional_surface_policy: buildPrivateFunctionalSurfacePolicy(),
+  };
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.stack : String(error)}\n`);
-  process.exit(1);
-});
+function main() {
+  const contracts = buildContracts();
+  fs.mkdirSync(CONTRACTS_DIR, { recursive: true });
+  const written = [];
+  for (const [name, payload] of Object.entries(contracts)) {
+    const relativePath = `contracts/${name}.json`;
+    writeJson(relativePath, payload);
+    written.push(relativePath);
+  }
+  process.stdout.write(stable({
+    surface_kind: 'rca_opl_standard_pack_sync',
+    target_domain_id: DOMAIN_ID,
+    written,
+  }));
+}
+
+main();

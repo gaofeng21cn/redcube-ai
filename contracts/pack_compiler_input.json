@@ -5,22 +5,26 @@
   "domain_pack_owner": "redcube_ai",
   "generated_surface_owner": "one-person-lab",
   "declarative_domain_pack": [
-    "stage_descriptors",
-    "action_catalog",
-    "visual_pack_policy",
-    "domain_memory_locator",
-    "artifact_locator_contract",
-    "owner_receipt_schema",
-    "review_export_gate_refs"
+    "domain_descriptor",
+    "deliverable_family_graph",
+    "stage_action_metadata",
+    "source_readiness_policy",
+    "visual_transition_spec",
+    "review_export_policy",
+    "artifact_locator_policy",
+    "memory_locator_policy",
+    "receipt_schema",
+    "authority_function_manifest",
+    "oracle_fixtures"
   ],
   "minimal_authority_functions": [
     "source_readiness_verdict",
-    "visual_direction_authorizer",
-    "review_export_verdict_authorizer",
-    "artifact_mutation_authorizer",
-    "visual_memory_accept_reject_decider",
+    "communication_visual_direction_decision",
+    "review_export_verdict",
+    "artifact_mutation_authorization",
+    "visual_memory_accept_reject",
     "owner_receipt_signer",
-    "native_visual_helper_implementation"
+    "native_helper_implementation"
   ],
   "generated_surfaces_requested": [
     "cli",
@@ -33,8 +37,9 @@
   ],
   "domain_repo_can_own_generated_surface": false,
   "source_refs": {
-    "action_catalog": "packages/redcube-gateway/src/actions/family-action-catalog.ts::getRedCubeFamilyActionCatalog",
+    "action_catalog": "packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata",
     "stage_control_plane": "packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane",
+    "memory_descriptor": "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor",
     "functional_audit": "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection"
   },
   "authority_boundary": {

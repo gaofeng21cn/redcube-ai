@@ -385,6 +385,11 @@ export function applyReviewMutation(request: ReviewMutationRequest): Promise<Rev
 }
 
 export {
+  buildFamilyDomainMemoryDescriptor,
+  buildStandardDomainAgentSkeleton,
+} from './actions/standard-domain-agent-skeleton.js';
+
+export {
   buildRedCubeActionMetadata,
   findRedCubeCliCommand,
   getRedCubeFamilyActionCatalog,

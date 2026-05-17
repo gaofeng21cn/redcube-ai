@@ -4,33 +4,18 @@
   "domain_id": "redcube_ai",
   "domain_label": "RedCube AI",
   "package_id": "redcube-ai",
+  "package_role": "opl_standard_domain_agent",
   "agent_kind": "visual_deliverable_foundry_agent",
   "release_shape": "opl_compatible_package",
   "owner": "redcube_ai",
-  "generated_interface_owner": "one-person-lab",
-  "default_executor": "codex_cli",
-  "formal_entry": {
-    "default": "CLI",
-    "supported_protocols": [
-      "MCP"
-    ],
-    "internal_surface": "controller"
-  },
-  "standard_contracts": {
+  "generated_surface_owner": "one-person-lab",
+  "domain_repo_can_own_generated_surface": false,
+  "standard_contract_refs": {
     "action_catalog": "contracts/action_catalog.json",
     "stage_control_plane": "contracts/stage_control_plane.json",
+    "pack_compiler_input": "contracts/pack_compiler_input.json",
+    "generated_surface_handoff": "contracts/generated_surface_handoff.json",
     "functional_privatization_audit": "contracts/functional_privatization_audit.json"
-  },
-  "canonical_metadata_sources": [
-    "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-    "packages/redcube-gateway/src/actions/family-stage-control-plane.ts",
-    "packages/redcube-gateway/src/actions/get-product-entry-manifest.ts"
-  ],
-  "action_targets": {
-    "cli": "npm run --prefix <redcube-ai-repo> redcube -- ...",
-    "product_entry": "redcube product status | invoke | session | manifest",
-    "sidecar": "redcube product sidecar export | dispatch",
-    "service_safe_domain_entry": "invokeDomainEntry"
   },
   "authority_boundary": {
     "redcube_ai_owns_visual_truth": true,
@@ -44,9 +29,5 @@
     "opl_can_authorize_quality_or_export": false,
     "opl_can_mutate_artifacts": false,
     "provider_completion_is_domain_ready": false
-  },
-  "notes": [
-    "Root contracts are static OPL pack-compiler inputs generated from RCA-owned canonical action/stage metadata.",
-    "Existing CLI, product-entry and sidecar implementations remain action targets, not generated-interface owners."
-  ]
+  }
 }
