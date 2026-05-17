@@ -401,6 +401,7 @@ export {
 
 export {
   buildPrivatizedFunctionalModuleAuditProjection,
+  OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildVisualPackCompilerHandoffProjection,
   listProductSidecarBlockedActions,
   listProductSidecarForbiddenWrites,

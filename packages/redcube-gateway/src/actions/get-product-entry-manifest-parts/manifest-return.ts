@@ -2,6 +2,7 @@
 
 export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
+  oplGeneratedInterfaceConsumption,
   oplStabilityReadModelConsumption,
   standardDomainAgentSkeleton,
   visualTransitionEvaluator,
@@ -61,6 +62,13 @@ export function buildOperatorEvidenceReadinessProjection({
         ref: '/opl_generic_primitive_consumption',
         status: oplGenericPrimitiveConsumption?.status || 'unknown',
         functional_harness_coverage_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage',
+      },
+      {
+        source_id: 'opl_generated_interface_consumption',
+        ref: '/opl_generated_interface_consumption',
+        status: oplGeneratedInterfaceConsumption?.status || 'unknown',
+        generated_interface_owner: oplGeneratedInterfaceConsumption?.generated_interface_owner || 'one-person-lab',
+        domain_handler_owner: oplGeneratedInterfaceConsumption?.domain_handler_owner || 'redcube_ai',
       },
       {
         source_id: 'opl_stability_read_model_consumption',
@@ -146,6 +154,7 @@ export function buildReturnedManifestProjection({
   manifest,
   nativePptOperatorUx,
   oplGenericPrimitiveConsumption,
+  oplGeneratedInterfaceConsumption,
   oplStabilityReadModelConsumption,
   visualPackCompilerHandoff,
   privatizedFunctionalModuleAudit,
@@ -162,6 +171,7 @@ export function buildReturnedManifestProjection({
 }) {
   const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
     oplGenericPrimitiveConsumption,
+    oplGeneratedInterfaceConsumption,
     oplStabilityReadModelConsumption,
     standardDomainAgentSkeleton,
     visualTransitionEvaluator,
@@ -256,6 +266,11 @@ export function buildReturnedManifestProjection({
     ),
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption || manifest.opl_generic_primitive_consumption,
+    opl_generated_interface_consumption: (
+      oplGeneratedInterfaceConsumption
+      || manifest.opl_generated_interface_consumption
+      || manifest.privatized_functional_module_audit?.opl_generated_interface_consumption
+    ),
     opl_stability_read_model_consumption: (
       oplStabilityReadModelConsumption
       || manifest.opl_stability_read_model_consumption
@@ -279,6 +294,10 @@ export function buildReturnedManifestProjection({
       mcp_tools: actionMetadata.mcp_tools,
       mcp_actions: actionMetadata.mcp_actions,
       skill_commands: actionMetadata.skill_commands,
+      generated_interface_owner: actionMetadata.generated_interface_owner,
+      domain_handler_owner: actionMetadata.domain_handler_owner,
+      owner_model: actionMetadata.owner_model,
+      repo_local_handler_targets: actionMetadata.repo_local_handler_targets,
     },
   };
 }
