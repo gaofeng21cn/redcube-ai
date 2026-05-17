@@ -366,6 +366,22 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_attempt_ledger_provider_receipts',
     );
     assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'attempt_state_machine_runner').status,
+      'opl_generic_transition_runner_consumed_refs_only',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'attempt_state_machine_runner').activeCallerStatus,
+      'refs_only_visual_transition_adapter_consuming_opl_runner',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').status,
+      'opl_attempt_ledger_provider_receipts_consumed',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').activeCallerStatus,
+      'opl_provider_receipt_refs_with_rca_visual_summary',
+    );
+    assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').migration_class,
       'opl_hosted_surface',
     );
@@ -382,6 +398,14 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_app_session_shell_and_workbench',
     );
     assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').status,
+      'opl_generated_workbench_session_surface_consumed',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').activeCallerStatus,
+      'opl_generated_session_shell_domain_refs',
+    );
+    assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').migration_class,
       'opl_generated_surface',
     );
@@ -390,9 +414,32 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.',
     );
     assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').status,
+      'opl_artifact_lifecycle_shell_consumed_refs_only',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').activeCallerStatus,
+      'refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell',
+    );
+    assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').opl_replacement_expectation.replacement_surface,
       'opl_artifact_lifecycle_gallery_handoff_shell',
     );
+    const closedFunctionalModuleIds = [
+      'attempt_state_machine_runner',
+      'managed_run_json_store',
+      'product_entry_session_store',
+      'artifact_export_lifecycle',
+    ];
+    for (const moduleId of closedFunctionalModuleIds) {
+      const entry = sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((moduleEntry) => moduleEntry.module_id === moduleId);
+      assert.ok(entry, moduleId);
+      assert.doesNotMatch(
+        [entry.status, entry.activeCallerStatus, entry.migrationAction, entry.rca_scope, entry.audit_readout].join(' '),
+        /active_private|pending|should_move|handoff_required|lifecycle_candidate|migration_candidate|until_opl_generic_runner_exists/i,
+        moduleId,
+      );
+    }
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'review_repair_transport').opl_replacement_expectation.replacement_surface,
       'opl_review_repair_transport',

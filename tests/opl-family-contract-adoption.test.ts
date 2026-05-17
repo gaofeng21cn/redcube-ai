@@ -463,7 +463,35 @@ test('RCA privatized functional module audit is machine readable for OPL without
   assert.equal(byId.managed_dag_scheduler.migration_class, 'declarative_pack');
   assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
   assert.equal(byId.native_helper_envelope.migration_class, 'opl_hosted_surface');
-  assert.equal(byId.managed_run_json_store.activeCallerStatus, 'active_private_json_store');
+  const closedFunctionalModuleIds = [
+    'attempt_state_machine_runner',
+    'managed_run_json_store',
+    'product_entry_session_store',
+    'artifact_export_lifecycle',
+  ];
+  for (const moduleId of closedFunctionalModuleIds) {
+    const entry = byId[moduleId];
+    assert.ok(entry, moduleId);
+    const readout = [
+      entry.status,
+      entry.activeCallerStatus,
+      entry.migrationAction,
+      entry.rca_scope,
+      entry.audit_readout,
+    ].join(' ');
+    assert.doesNotMatch(
+      readout,
+      /active_private|pending|should_move|handoff_required|lifecycle_candidate|migration_candidate|until_opl_generic_runner_exists/i,
+      moduleId,
+    );
+    assert.equal(entry.opl_replacement_expectation.owner, 'opl', moduleId);
+    assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', moduleId);
+    assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, moduleId);
+  }
+  assert.equal(byId.attempt_state_machine_runner.status, 'opl_generic_transition_runner_consumed_refs_only');
+  assert.equal(byId.attempt_state_machine_runner.activeCallerStatus, 'refs_only_visual_transition_adapter_consuming_opl_runner');
+  assert.equal(byId.managed_run_json_store.status, 'opl_attempt_ledger_provider_receipts_consumed');
+  assert.equal(byId.managed_run_json_store.activeCallerStatus, 'opl_provider_receipt_refs_with_rca_visual_summary');
   assert.equal(byId.managed_run_json_store.migration_class, 'opl_hosted_surface');
   assert.equal(
     byId.managed_run_json_store.opl_replacement_expectation.replacement_surface,
@@ -475,12 +503,19 @@ test('RCA privatized functional module audit is machine readable for OPL without
     'visual_run_projection_refs',
     'provider_receipt_correlation_refs',
   ]);
+  assert.equal(byId.product_entry_session_store.status, 'opl_generated_workbench_session_surface_consumed');
+  assert.equal(byId.product_entry_session_store.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
   assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
   assert.equal(byId.product_entry_session_store.migration_class, 'opl_generated_surface');
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
   assert.equal(byId.workspace_source_intake.migration_class, 'refs_only_adapter');
   assert.equal(byId.workspace_source_intake.rca_exports_only.includes('source_readiness_verdict_ref'), true);
   assert.equal(byId.memory_writeback_receipt_transport.rca_scope, 'visual_memory_accept_reject_and_receipt_refs');
+  assert.equal(byId.artifact_export_lifecycle.status, 'opl_artifact_lifecycle_shell_consumed_refs_only');
+  assert.equal(
+    byId.artifact_export_lifecycle.activeCallerStatus,
+    'refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell',
+  );
   assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
   assert.equal(byId.operator_projection_shell.activeCallerStatus, 'active_refs_only_projection_shell');

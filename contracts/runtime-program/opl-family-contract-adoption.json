@@ -1479,7 +1479,7 @@
       {
         "module_id": "attempt_state_machine_runner",
         "surface_ref": "/controlled_visual_stage_attempt",
-        "status": "generic_runner_migration_candidate",
+        "status": "opl_generic_transition_runner_consumed_refs_only",
         "classification": "split_owner_boundary",
         "opl_generic_primitive": "generic_transition_runner",
         "oplAbsorbCandidate": true,
@@ -1503,8 +1503,8 @@
           "evaluate_visual_transition sidecar action",
           "OPL hosted attempt receipt fixture"
         ],
-        "activeCallerStatus": "active_rca_runner_until_opl_generic_runner_exists",
-        "migrationAction": "Move idempotent tick, retry/dead-letter, provider attempt bridge and state-machine runner mechanics to OPL generic runner.",
+        "activeCallerStatus": "refs_only_visual_transition_adapter_consuming_opl_runner",
+        "migrationAction": "Consume OPL generic transition runner for idempotent tick, retry/dead-letter, provider attempt bridge and state-machine runner mechanics; keep RCA visual transition guard refs only.",
         "retentionReason": "RCA keeps the visual transition table, guard refs, repair action meaning, typed blockers and owner receipt refs.",
         "cannotAbsorbReason": "A generic runner cannot decide source readiness, visual review readiness, repair target meaning or export authority.",
         "tombstone_required": false,
@@ -1565,7 +1565,7 @@
       {
         "module_id": "managed_run_json_store",
         "surface_ref": "/runtime_inventory/managed_runs",
-        "status": "durable_store_migration_candidate",
+        "status": "opl_attempt_ledger_provider_receipts_consumed",
         "classification": "opl_owned_attempt_ledger_consumer",
         "opl_generic_primitive": "attempt_ledger",
         "oplAbsorbCandidate": true,
@@ -1573,7 +1573,7 @@
           "managed_run_locator_refs",
           "visual_run_projection_refs"
         ],
-        "rca_scope": "workspace_scoped_json_store_until_opl_attempt_ledger_replacement",
+        "rca_scope": "opl_attempt_ledger_consumer_locator_refs",
         "audit_readout": "migrate_store_to_opl_attempt_ledger_keep_locator_projection",
         "codePaths": [
           "packages/redcube-runtime/src/managed-run-store.ts",
@@ -1586,10 +1586,10 @@
           "supervise managed run",
           "runtime watch/session projection"
         ],
-        "activeCallerStatus": "active_private_json_store",
-        "migrationAction": "Replace RCA private JSON run store with OPL attempt ledger/provider receipt storage, leaving RCA to expose locator refs and visual domain summaries.",
-        "retentionReason": "Until OPL ledger is the durable owner, RCA needs workspace-local continuity for same-session visual deliverable runs.",
-        "cannotAbsorbReason": "OPL should absorb the store mechanics; it must not absorb canonical artifacts, review verdicts or visual run truth.",
+        "activeCallerStatus": "opl_provider_receipt_refs_with_rca_visual_summary",
+        "migrationAction": "Consume OPL attempt ledger/provider receipt storage while RCA exposes managed-run locator refs and visual-domain summaries.",
+        "retentionReason": "RCA keeps locator refs and visual run summaries needed to correlate provider receipts with domain-owned deliverable truth.",
+        "cannotAbsorbReason": "OPL owns the generic attempt ledger; it must not absorb canonical artifacts, review verdicts or visual run truth.",
         "tombstone_required": false,
         "migration_class": "opl_hosted_surface",
         "opl_owned_generic_primitive_consumer": true,
@@ -1645,7 +1645,7 @@
       {
         "module_id": "product_entry_session_store",
         "surface_ref": "/session_continuity",
-        "status": "session_shell_migration_candidate",
+        "status": "opl_generated_workbench_session_surface_consumed",
         "classification": "split_owner_boundary",
         "opl_generic_primitive": "workbench_shell",
         "oplAbsorbCandidate": true,
@@ -1666,8 +1666,8 @@
           "product-entry continuation",
           "operator loop actions"
         ],
-        "activeCallerStatus": "active_private_session_store",
-        "migrationAction": "Move generic session shell, resume token, operator navigation and workbench state to OPL/App.",
+        "activeCallerStatus": "opl_generated_session_shell_domain_refs",
+        "migrationAction": "Consume OPL/App generic session shell, resume token, operator navigation and workbench state; keep RCA entry-session domain snapshot refs only.",
         "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
         "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
         "tombstone_required": false,
@@ -1889,7 +1889,7 @@
       {
         "module_id": "artifact_export_lifecycle",
         "surface_ref": "/artifact_locator_contract",
-        "status": "split_owner_boundary_landed",
+        "status": "opl_artifact_lifecycle_shell_consumed_refs_only",
         "classification": "split_owner_boundary",
         "opl_generic_primitive": "artifact_lifecycle",
         "oplAbsorbCandidate": true,
@@ -1911,8 +1911,8 @@
           "workspace lifecycle guarded apply",
           "product sidecar export"
         ],
-        "activeCallerStatus": "active_rca_artifact_authority_with_opl_lifecycle_candidate",
-        "migrationAction": "Move generic artifact inventory, gallery, restore/provenance navigation and handoff shell to OPL/App.",
+        "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
+        "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
         "retentionReason": "RCA owns canonical visual artifacts, exportability verdict and artifact mutation permission.",
         "cannotAbsorbReason": "OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.",
         "tombstone_required": false,
