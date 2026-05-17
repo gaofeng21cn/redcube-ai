@@ -327,6 +327,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
           '/family_scheduler_replacement',
           '/opl_generic_primitive_consumption',
           '/opl_stability_read_model_consumption',
+          '/opl_generated_interface_consumption',
           '/visual_pack_compiler_handoff',
           '/operator_evidence_readiness_projection',
           '/opl_substrate_adapter_export',
@@ -528,6 +529,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       [
         'cli_wrapper',
         'mcp_wrapper',
+        'skill_wrapper',
         'product_entry_wrapper',
         'product_sidecar_wrapper',
         'status_projection_wrapper',
@@ -535,6 +537,27 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'workbench_wrapper',
         'functional_harness_wrapper',
       ],
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.generated_descriptor_scope,
+      [
+        'cli',
+        'mcp',
+        'skill',
+        'product_entry',
+        'product_status',
+        'product_session',
+        'sidecar',
+        'workbench',
+      ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner,
+      'one-person-lab',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.wrappers.skill.owner,
+      'opl',
     );
     assert.equal(
       sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.generated_surfaces_are_not_rca_long_term_owner,

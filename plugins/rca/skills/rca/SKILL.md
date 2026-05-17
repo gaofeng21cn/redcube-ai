@@ -10,8 +10,8 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 ## 这个 plugin 是什么
 
 - `RedCube AI` 面向 Codex 的单一 app skill 薄入口层
-- 建立在现有 CLI、gateway、runtime contract 与 deliverable loop 之上
-- 不替代 `redcube` CLI、gateway contract，也不替代 repo 内其他自动化入口；这些入口只能作为 RedCube runtime 的受控 surface，不能成为绕开 runtime 的替代执行路径
+- 消费 OPL generated descriptors；CLI/MCP/Skill/product/status/session/sidecar/workbench metadata 的统一 owner 是 `one-person-lab`
+- repo-local `redcube` CLI / `redcube-mcp` / product-entry API 只是 RCA domain handler target 或 direct domain entry，不是 generated surface owner、generic runner、generic session shell 或通用 workbench owner
 
 ## Agent 语言面
 
@@ -22,14 +22,14 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## 核心入口
 
-自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
+自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。这个 launcher 只用于命中 RCA domain handler / direct domain entry；不要把它写成 CLI/MCP/Skill/product/status/session/workbench metadata owner，也不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
 
 - `npm run --prefix <redcube-ai-repo> redcube -- product manifest --workspace-root <dir>`
 - `npm run --prefix <redcube-ai-repo> redcube -- product status --workspace-root <dir>`
 - `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `npm run --prefix <redcube-ai-repo> redcube -- product session --entry-session-id <entry-session-id>`
 
-`product manifest` 暴露 RCA-owned `family_action_catalog`；CLI help、MCP descriptors/routes、skill command contracts 与 product-entry action metadata 从同一份 action definition 派生，`OPL` 只做 discovery/export/parity。
+`product manifest` 暴露 RCA-owned `family_action_catalog` 和 OPL 可消费的 generated-interface handoff；CLI help、MCP descriptors/routes、skill command contracts、product-entry action metadata、status/session/workbench metadata 的 generated descriptor owner 是 `OPL`，RCA 只提供 action/stage metadata、domain handler targets、direct diagnostic entry 和 visual authority functions。
 
 `redcube product status` 是当前 product overview 命令；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
 
@@ -39,14 +39,14 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - 对于不需要人工中途审阅的新交付，使用一次 `redcube product invoke`，不指定 `route`、不指定 `stop_after_stage`，让 RCA managed runtime 按 `auto_to_terminal` 自主推进到 review/export gate。
 - 只有在用户明确要求先审阅计划、批准后继续、定点回修、重跑某个 stage，或 runtime gate 已给出明确 `rerun_from_stage` 时，才使用 route-level invoke，例如 `--route repair_image_pages`。
-- `redcube product session` 是恢复、检查进度和拾取产物的控制面，不应被当成外层 Codex 逐 stage 手工创作的替代品。
+- `redcube product session` 是 entry-session domain snapshot refs adapter；generic session shell、resume/workbench navigation 与默认 product/session wrapper 归 OPL generated surface，不应被当成外层 Codex 逐 stage 手工创作的替代品。
 
 ## Domain runtime 护栏
 
 - 用户点名 `RCA` / `RedCube AI` 或任务属于 slide deck、视觉交付、讲稿、海报、小红书等 RedCube 覆盖范围时，必须通过 RedCube product-entry / deliverable runtime 推进。
 - 不得用通用 `Presentations`、`python-pptx`、artifact-tool 原生 deck、手写脚本或直接编辑文件来替代 RedCube 的默认创作与审阅链路，除非用户明确要求“探索替代技术路线”或“绕开 RedCube runtime”。
 - 直接产出 HTML、截图、PPTX、PDF 或其他文件前，必须先确认当前 overlay 的 stage sequence，并把产物落在同一 `topic_id` / `deliverable_id` / `entry_session_id` 的 deliverable loop 中。
-- 使用 repo-local `npm run --prefix <redcube-ai-repo> redcube -- ...` 继续走同一 product-entry contract；不得因为全局 `redcube` 缺失或过期而改走通用工具路径。
+- 使用 repo-local `npm run --prefix <redcube-ai-repo> redcube -- ...` 继续走同一 RCA domain handler / direct domain entry；不得因为全局 `redcube` 缺失或过期而改走通用工具路径，也不得把 repo-local launcher 升级成 generic wrapper/session/workbench owner。
 
 ## PPT deck 默认路线
 
@@ -80,6 +80,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - 任何写操作前，先读取当前 workspace 与 product-entry manifest
 - 把 `product_entry_manifest`、`domain_entry_contract`、`task_lifecycle` 当作正式 contract surface
+- 把 `opl_generated_interface_consumption`、`generated_surface_handoff` 与 `pack_compiler_input` 当作 OPL generated metadata owner 的当前机器合同；repo-local redcube/redcube-mcp 只按 handler target / direct entry 读取
 - 保持 `status -> direct invoke -> session continuation` 同一条 same-session deliverable loop；这里的 `status` 指 machine-readable product-entry overview / intake shell
 - 长 PPT 任务必须先拆成 `source/material intake -> plan -> deliverable -> review`，每段使用同一 session 可恢复推进
 - 不绕开 gateway contract 直接手改 runtime state

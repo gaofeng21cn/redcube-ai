@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildFamilyDomainMemoryDescriptor,
+  OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildPrivatizedFunctionalModuleAuditProjection,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlane,
@@ -21,6 +22,10 @@ const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/b
 
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
+}
+
+function jsonStable(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function buildCanonicalPack() {
@@ -39,8 +44,12 @@ function buildCanonicalPack() {
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
   const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
+  const generatedSurfaceIds = [
+    ...OPL_GENERATED_INTERFACE_CONSUMPTION.generated_descriptor_scope,
+    'functional_harness_cases',
+  ];
 
-  return {
+  return jsonStable({
     actionCatalog: {
       ...actionCatalog,
       forbidden_generic_owner_roles: readJson('contracts/action_catalog.json').forbidden_generic_owner_roles,
@@ -66,15 +75,10 @@ function buildCanonicalPack() {
       generated_surface_owner: 'one-person-lab',
       declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
       minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
-      generated_surfaces_requested: [
-        'cli',
-        'mcp',
-        'product_entry_manifest',
-        'sidecar_export_dispatch',
-        'status_read_model',
-        'workbench_drilldown',
-        'functional_harness_cases',
-      ],
+      generated_surfaces_requested: generatedSurfaceIds,
+      generated_interface_consumption_ref: '/opl_generated_interface_consumption',
+      repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
+      repo_local_handlers_are_generated_surface_owners: false,
       domain_repo_can_own_generated_surface: false,
       source_refs: {
         action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
@@ -95,6 +99,7 @@ function buildCanonicalPack() {
       domain_id: 'redcube_ai',
       target_domain_id: 'redcube_ai',
       privatized_functional_module_audit: functionalAudit,
+      opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
       functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
       authority_boundary: {
         opl_can_write_domain_truth: false,
@@ -104,7 +109,7 @@ function buildCanonicalPack() {
         domain_repo_can_own_generated_surface: false,
       },
     },
-  };
+  });
 }
 
 test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
@@ -117,6 +122,35 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.deepEqual(readJson('contracts/owner_receipt_contract.json'), canonical.ownerReceiptContract);
   assert.deepEqual(readJson('contracts/pack_compiler_input.json'), canonical.packCompilerInput);
   assert.deepEqual(readJson('contracts/functional_privatization_audit.json'), canonical.functionalAudit);
+});
+
+test('RCA root generated surface handoff names OPL as owner for skill, product status, and session metadata', () => {
+  const packCompilerInput = readJson('contracts/pack_compiler_input.json');
+  const generatedSurfaceHandoff = readJson('contracts/generated_surface_handoff.json');
+  const functionalAudit = readJson('contracts/functional_privatization_audit.json');
+  const generatedScope = functionalAudit
+    .privatized_functional_module_audit
+    .generated_interface_consumption
+    .generated_descriptor_scope;
+  const requestedSurfaces = packCompilerInput.generated_surfaces_requested;
+  const handoffSurfaceIds = generatedSurfaceHandoff.generated_surfaces.map((surface) => surface.surface_id);
+
+  for (const surfaceId of generatedScope) {
+    assert.equal(requestedSurfaces.includes(surfaceId), true, surfaceId);
+    assert.equal(handoffSurfaceIds.includes(surfaceId), true, surfaceId);
+  }
+  for (const surface of generatedSurfaceHandoff.generated_surfaces) {
+    assert.equal(surface.owner, 'one-person-lab', surface.surface_id);
+    assert.equal(surface.domain_repo_can_own_generated_surface, false, surface.surface_id);
+  }
+  assert.equal(
+    generatedSurfaceHandoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner,
+    'one-person-lab',
+  );
+  assert.equal(
+    generatedSurfaceHandoff.repo_local_launcher_policy.default_generic_dispatch_owner,
+    'one-person-lab',
+  );
 });
 
 test('OPL generated interfaces are ready from RCA root contracts when OPL checkout is available', {

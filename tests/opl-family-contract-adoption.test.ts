@@ -355,11 +355,12 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         'opl_app_operator_drilldown',
       ],
       closure_basis_refs: [
-        '/family_scheduler_replacement',
-        '/opl_generic_primitive_consumption',
-        '/opl_stability_read_model_consumption',
-        '/visual_pack_compiler_handoff',
-        '/operator_evidence_readiness_projection',
+          '/family_scheduler_replacement',
+          '/opl_generic_primitive_consumption',
+          '/opl_stability_read_model_consumption',
+          '/opl_generated_interface_consumption',
+          '/visual_pack_compiler_handoff',
+          '/operator_evidence_readiness_projection',
         '/opl_substrate_adapter_export',
       ],
       allowed_remaining_module_classes: [
@@ -540,6 +541,40 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     byId.observability_stability_read_model.opl_replacement_expectation.replacement_surface,
     'opl_stability_read_model_and_observability_export',
   );
+  const expectedGeneratedTargets = [
+    'cli_wrapper',
+    'mcp_wrapper',
+    'skill_wrapper',
+    'product_entry_wrapper',
+    'product_sidecar_wrapper',
+    'status_projection_wrapper',
+    'session_wrapper',
+    'workbench_wrapper',
+    'functional_harness_wrapper',
+  ];
+  const expectedDescriptorScope = [
+    'cli',
+    'mcp',
+    'skill',
+    'product_entry',
+    'product_status',
+    'product_session',
+    'sidecar',
+    'workbench',
+  ];
+  for (const handoff of [
+    current.product_release_metadata.visual_pack_compiler_handoff.generated_surface_handoff,
+    current.current_state.visual_pack_compiler_handoff.generated_surface_handoff,
+    current.current_state.active_baton.scope.visual_pack_compiler_handoff.generated_surface_handoff,
+    adoption.visual_pack_compiler_handoff.generated_surface_handoff,
+  ]) {
+    assert.deepEqual(handoff.generated_surface_targets, expectedGeneratedTargets);
+    assert.deepEqual(handoff.generated_descriptor_scope, expectedDescriptorScope);
+    assert.equal(handoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner, 'one-person-lab');
+    assert.equal(handoff.repo_local_launcher_policy.product_entry_session_store_is_generic_session_owner, false);
+    assert.equal(handoff.wrappers.skill.owner, 'opl');
+    assert.equal(handoff.wrappers.skill.long_term_rca_owner, false);
+  }
 });
 
 test('RCA consumes OPL stability read-model surfaces as refs-only projections', () => {

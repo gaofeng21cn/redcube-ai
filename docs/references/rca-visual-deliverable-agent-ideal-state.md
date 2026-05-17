@@ -52,6 +52,8 @@ RCA 可以为了清洁目标态重构 packages、runtime families、prompts、na
 
 2026-05-17 functional equivalence 校准：`attempt_state_machine_runner`、`managed_run_json_store`、`product_entry_session_store`、`artifact_export_lifecycle` 在目标态中已经分别读作 OPL generic transition runner consumer、OPL attempt ledger / provider receipt consumer、OPL/App generated session shell consumer、OPL artifact lifecycle / gallery / handoff shell consumer。RCA adapter 只输出 visual transition refs、managed-run locator / visual summary refs、entry-session domain snapshot refs、artifact locator / export verdict / lifecycle receipt refs，并保留 canonical artifact authority、artifact mutation permission、typed blocker 与 owner receipt authority。
 
+2026-05-17 OPL generated interface 校准：理想目标态中的 generated surface 不再只写成泛化 CLI/MCP/product shell。RCA 现在把 `cli`、`mcp`、`skill`、`product_entry`、`product_status`、`product_session`、`sidecar`、`workbench` 作为 OPL generated descriptor scope，并把 `functional_harness_cases` 作为 OPL generated test surface。repo-local `redcube` / `redcube-mcp` / product-entry/session store 只保留为 RCA domain handler target、direct domain entry 或 refs-only adapter；统一 metadata owner、generic dispatch owner、generic session shell 和 workbench owner 都归 OPL。
+
 2026-05-17 default generic sidecar dispatch 校准：`supervise_managed_run` 与 `product_entry_continuation` 已从 RCA product sidecar 默认 dispatch/action 面物理删除/收薄。generic supervision / continuation 归 OPL runner/session shell；RCA 可保留 direct product-entry/session API、managed supervision diagnostic 和内部 visual authority surfaces，但它们不是 standard sidecar template、default generated surface 或新 Agent 默认 sidecar action。
 
 ## 产品分层
