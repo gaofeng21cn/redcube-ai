@@ -289,6 +289,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'review_repair_transport',
         'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
+        'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
       ],
     );
     assert.deepEqual(

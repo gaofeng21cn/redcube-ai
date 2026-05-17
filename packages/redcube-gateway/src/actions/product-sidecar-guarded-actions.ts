@@ -5,6 +5,9 @@ import {
   RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS,
   buildFunctionalModulePhysicalDeletionGuard,
 } from './product-sidecar-parts/privatized-functional-module-audit.js';
+import {
+  buildVisualPackCompilerHandoffProjection,
+} from './product-sidecar-parts/visual-pack-compiler-handoff.js';
 
 export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
   {
@@ -154,6 +157,7 @@ export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
   'review_repair_transport',
   'restart_dead_letter_repair_human_gate_state_chain',
   'native_helper_generic_envelope',
+  'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
 ]);
 
 export const OPL_STABILITY_READ_MODEL_SURFACES = Object.freeze([
@@ -559,12 +563,15 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'native helper envelope',
       'operator projection shell',
       'generic CLI/MCP wrappers',
+      'generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers',
       'Codex executor adapter',
       'observability/stability read model',
     ],
     classification_values: [
-      'opl_owned_generic_primitive_consumer',
-      'rca_owned_visual_domain_authority',
+      'opl_owned_replacement',
+      'opl_generated_surface',
+      'declarative_pack',
+      'minimal_authority_function',
       'retire_tombstone',
     ],
     replacement_expectation_mode: 'opl_replacement_expectation_or_refs_only_projection',
@@ -580,20 +587,23 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     },
     forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
     rca_visual_authority_allowlist: [
-      'visual_stage_semantics',
       'source_readiness_verdict',
-      'visual_memory_body',
+      'communication_visual_direction_decision',
       'review_export_verdict',
-      'canonical_artifact_authority',
+      'artifact_mutation_authorization',
+      'visual_memory_accept_reject',
+      'owner_receipt_signer',
       'native_helper_implementation',
-      'route_level_executor_policy',
-      'typed_blocker',
-      'owner_receipt_refs',
     ],
+    visual_pack_compiler_handoff_ref: '/visual_pack_compiler_handoff',
     modules: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) => {
       const replacementGuard = RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS[entry.module_id] || {};
+      const migrationClass = entry.module_id === 'generic_cli_mcp_wrappers'
+        ? 'opl_generated_surface'
+        : 'opl_owned_replacement';
       return {
         ...entry,
+        migration_class: migrationClass,
         opl_owned_generic_primitive_consumer: true,
         rca_owned_visual_domain_authority: [
           'managed_dag_scheduler',
@@ -629,7 +639,106 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         declares_handoffable: false,
         declares_production_soak_complete: false,
       };
-    }),
+    }).concat([
+      {
+        module_id: 'visual_pack_compiler_handoff',
+        surface_ref: '/visual_pack_compiler_handoff/declarative_visual_pack_input',
+        status: 'declarative_pack_input_landed',
+        classification: 'declarative_pack',
+        migration_class: 'declarative_pack',
+        owner: 'redcube_ai',
+        opl_owned_generic_primitive_consumer: false,
+        rca_owned_visual_domain_authority: false,
+        opl_absorb_candidate: false,
+        opl_replacement_expectation: {
+          owner: 'opl',
+          expectation_ref: '/visual_pack_compiler_handoff/generated_surface_handoff',
+          replacement_surface: 'opl_pack_compiler_generated_surface',
+          expected_mode: 'opl_generated_surface_from_declarative_pack',
+          rca_consumes_as: 'declarative_pack_provider',
+          rca_owns_replacement_runtime: false,
+        },
+        codePaths: [
+          'packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts',
+        ],
+        activeCallers: ['product-entry manifest', 'product sidecar export', 'product status'],
+        activeCallerStatus: 'declarative_pack_input_active',
+        migrationAction: 'Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.',
+        retentionReason: 'RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.',
+        cannotAbsorbReason: 'OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.',
+        rca_projection_mode: 'declarative_pack_refs_only',
+        rca_exports_only: ['stage_refs', 'action_metadata_refs', 'visual_transition_refs', 'receipt_schema_refs'],
+        forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+        physical_deletion_guard: {
+          safe_to_delete_now: false,
+          reason: 'Declarative pack input is a required RCA domain package surface, not a generic runtime shell.',
+          required_before_delete: ['domain_package_replaced_by_new_rca_pack_contract'],
+        },
+        rca_retains: ['visual_stage_pack', 'action_metadata', 'authority_policy', 'oracle_fixtures'],
+        retire_tombstone: false,
+        writes_visual_truth: false,
+        writes_artifact_blob: false,
+        writes_memory_body: false,
+        declares_visual_ready: false,
+        declares_exportable: false,
+        declares_handoffable: false,
+        declares_production_soak_complete: false,
+      },
+      {
+        module_id: 'visual_authority_functions',
+        surface_ref: '/visual_pack_compiler_handoff/minimal_authority_function_contract',
+        status: 'minimal_authority_function_manifest_landed',
+        classification: 'minimal_authority_function',
+        migration_class: 'minimal_authority_function',
+        owner: 'redcube_ai',
+        opl_owned_generic_primitive_consumer: false,
+        rca_owned_visual_domain_authority: true,
+        opl_absorb_candidate: false,
+        opl_replacement_expectation: {
+          owner: 'redcube_ai',
+          expectation_ref: '/visual_pack_compiler_handoff/minimal_authority_function_contract',
+          replacement_surface: 'not_absorbable_domain_authority_function',
+          expected_mode: 'domain_authority_function_called_by_generated_surface',
+          rca_consumes_as: 'authority_function_owner',
+          rca_owns_replacement_runtime: false,
+        },
+        codePaths: [
+          'packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts',
+          'packages/redcube-gateway/src/actions/product-sidecar.ts',
+          'packages/redcube-runtime/src',
+        ],
+        activeCallers: ['visual route execution', 'review/export gates', 'memory writeback acceptance', 'owner receipt signing'],
+        activeCallerStatus: 'minimal_authority_functions_active',
+        migrationAction: 'Retain only visual authority functions while OPL generates generic wrappers and runtime shells.',
+        retentionReason: 'RCA must decide visual source readiness, visual direction, review/export verdicts, artifact mutation, visual memory acceptance and owner receipts.',
+        cannotAbsorbReason: 'These functions are RCA domain authority and cannot be moved to OPL without moving visual truth.',
+        rca_projection_mode: 'authority_receipt_refs_only',
+        rca_exports_only: ['verdict_refs', 'owner_receipt_refs', 'typed_blocker_refs', 'safe_action_refs'],
+        forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+        physical_deletion_guard: {
+          safe_to_delete_now: false,
+          reason: 'Minimal authority functions are the allowed RCA retention surface.',
+          required_before_delete: ['visual_domain_authority_moved_by_explicit_product_decision'],
+        },
+        rca_retains: [
+          'source_readiness_verdict',
+          'communication_visual_direction_decision',
+          'review_export_verdict',
+          'artifact_mutation_authorization',
+          'visual_memory_accept_reject',
+          'owner_receipt_signer',
+          'native_helper_implementation',
+        ],
+        retire_tombstone: false,
+        writes_visual_truth: false,
+        writes_artifact_blob: false,
+        writes_memory_body: false,
+        declares_visual_ready: false,
+        declares_exportable: false,
+        declares_handoffable: false,
+        declares_production_soak_complete: false,
+      },
+    ]),
     opl_owned_generic_primitives: [
       ...new Set([
         ...(familySchedulerReplacement.opl_owned_generic_surfaces || []),
@@ -825,6 +934,12 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
         manifest_ref: '/native_ppt_operator_ux',
         sidecar_ref: '/mapped_surfaces/native_helper_implementation',
       },
+      {
+        primitive: 'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
+        contract_ref: 'rca.visual_pack_compiler_handoff.v1',
+        manifest_ref: '/visual_pack_compiler_handoff/generated_surface_handoff',
+        sidecar_ref: '/mapped_surfaces/visual_pack_compiler_handoff',
+      },
     ],
     forbidden_rca_generic_owner_flags: {
       rca_generic_scheduler_owner: false,
@@ -843,9 +958,12 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
       rca_review_repair_transport_owner: false,
       rca_restart_dead_letter_repair_human_gate_state_chain_owner: false,
       rca_native_helper_generic_envelope_owner: false,
+      rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner: false,
     },
   };
 }
+
+export { buildVisualPackCompilerHandoffProjection };
 
 export function buildOplSubstrateAdapterExportProjection() {
   return {

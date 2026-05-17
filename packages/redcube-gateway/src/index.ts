@@ -391,6 +391,7 @@ export {
 } from './actions/family-action-catalog.js';
 
 export {
+  buildVisualPackCompilerHandoffProjection,
   listProductSidecarBlockedActions,
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
