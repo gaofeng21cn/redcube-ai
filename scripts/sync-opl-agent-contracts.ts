@@ -5,6 +5,7 @@ import process from 'node:process';
 
 import {
   buildFamilyDomainMemoryDescriptor,
+  OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildPrivatizedFunctionalModuleAuditProjection,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlane,
@@ -117,6 +118,9 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
     minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
     generated_surfaces_requested: GENERATED_SURFACES,
+    generated_interface_consumption_ref: '/opl_generated_interface_consumption',
+    repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
+    repo_local_handlers_are_generated_surface_owners: false,
     domain_repo_can_own_generated_surface: false,
     source_refs: {
       action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
@@ -141,12 +145,15 @@ function buildGeneratedSurfaceHandoff() {
     generated_surface_owner: GENERATED_SURFACE_OWNER,
     domain_repo_can_own_generated_surface: false,
     source_contract_ref: 'contracts/pack_compiler_input.json',
+    generated_interface_consumption_ref: '/opl_generated_interface_consumption',
     generated_surfaces: GENERATED_SURFACES.map((surfaceId) => ({
       surface_id: surfaceId,
       owner: GENERATED_SURFACE_OWNER,
       domain_repo_can_own_generated_surface: false,
       status: 'descriptor_source_available',
     })),
+    repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
+    repo_local_launcher_policy: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_launcher_policy,
     required_domain_handoff: [
       'owner_receipt_schema',
       'typed_blocker_schema',
@@ -183,6 +190,7 @@ function buildFunctionalAudit(functionalAudit) {
     domain_id: DOMAIN_ID,
     target_domain_id: DOMAIN_ID,
     privatized_functional_module_audit: functionalAudit,
+    opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
     functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
     authority_boundary: {
       opl_can_write_domain_truth: false,
