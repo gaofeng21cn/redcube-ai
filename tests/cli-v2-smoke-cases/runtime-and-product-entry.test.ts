@@ -154,10 +154,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayPackagePath, 'node_modules', 'prompts'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime/scripts'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'redcube-runtime', 'scripts'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-registry'),
     path.join(gatewayNodeModulesDir, 'overlay-registry'),
   );
@@ -511,23 +507,11 @@ test('CLI product status, product invoke, product sidecar, and product session p
     writeFileSync(
       sidecarTaskFile,
       JSON.stringify({
-        action: 'product_entry_continuation',
+        action: 'notification_receipt',
         workspace_locator: {
           workspace_root: workspaceRoot,
         },
-        entry_session_id: 'session-oplHosted',
-        task_intent: 'run_managed_deliverable',
-        entry_mode: 'opl_hosted',
-        delivery_request: {
-          deliverable_family: 'ppt_deck',
-          topic_id: 'topic-a',
-          deliverable_id: 'deck-oplHosted',
-          profile_id: 'lecture_student',
-          title: '甲状腺门诊科普 deck oplHosted',
-          goal: '验证 OPL-hosted stage runtime handoff',
-          user_intent: '先给我主线故事',
-          stop_after_stage: 'storyline',
-        },
+        notification_id: 'notice-oplHosted',
       }),
       'utf-8',
     );
@@ -553,36 +537,13 @@ test('CLI product status, product invoke, product sidecar, and product session p
     );
     assert.equal(oplHostedSidecar.ok, true);
     assert.equal(oplHostedSidecar.surface_kind, 'product_sidecar_dispatch');
-    assert.equal(oplHostedSidecar.action, 'product_entry_continuation');
+    assert.equal(oplHostedSidecar.action, 'notification_receipt');
 
     const oplHostedParsed = oplHostedSidecar.result_surface;
     assert.equal(oplHostedParsed.ok, true);
-    assert.equal(oplHostedParsed.surface_kind, 'product_entry');
-    assert.equal(oplHostedParsed.entry_session.entry_session_id, 'session-oplHosted');
-    assert.equal(oplHostedParsed.domain_entry_surface.entry_mode, 'opl_hosted');
-    assert.equal(oplHostedParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(oplHostedParsed.family_orchestration.action_graph.edges.length, 4);
-    assert.equal(oplHostedParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
-    assert.equal(oplHostedParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
-    assert.equal(oplHostedParsed.summary.latest_handle, oplHostedParsed.summary.target_handle);
-    assert.equal(
-      oplHostedParsed.summary.approval_required,
-      oplHostedParsed.runtime_loop_closure.control_policy.approval_required,
-    );
-    assert.equal(oplHostedParsed.summary.gate_status, oplHostedParsed.runtime_loop_closure.control_policy.gate_status);
-    assert.equal(
-      oplHostedParsed.summary.resume_command,
-      oplHostedParsed.runtime_loop_closure.control_policy.continue_action.command,
-    );
-    assert.equal(
-      oplHostedParsed.summary.session_locator_field,
-      oplHostedParsed.family_orchestration.resume_contract.session_locator_field,
-    );
-    assert.equal(
-      oplHostedParsed.summary.checkpoint_locator_field,
-      oplHostedParsed.family_orchestration.resume_contract.checkpoint_locator_field,
-    );
-    assert.equal(oplHostedParsed.runtime_loop_closure.source_linkage.current_source, 'opl_hosted');
+    assert.equal(oplHostedParsed.surface_kind, 'notification_receipt');
+    assert.equal(oplHostedParsed.notification_id, 'notice-oplHosted');
+    assert.equal(oplHostedParsed.receipt_status, 'accepted');
 
     const sessionParsed = await execCliAsync(
       cliPath,

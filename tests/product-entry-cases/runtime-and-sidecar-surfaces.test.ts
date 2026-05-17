@@ -282,14 +282,20 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'visual_authority_functions',
       ],
     );
-    assert.equal(sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.length, 0);
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.map((entry) => entry.surface_id),
+      [
+        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.product_entry_continuation',
+      ],
+    );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.replacement_expectation_mode,
       'opl_replacement_expectation_or_refs_only_projection',
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.current_safe_tombstone_candidate_count,
-      0,
+      2,
     );
     assert.deepEqual(sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values, [
       'opl_hosted_surface',
@@ -338,12 +344,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.privatized_functional_module_audit.visual_pack_compiler_handoff_ref,
       '/visual_pack_compiler_handoff',
     );
-    assert.match(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.no_safe_tombstone_candidate_reason,
-      /active callers/,
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces,
+      [
+        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.product_entry_continuation',
+      ],
     );
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('native_helper_implementation'));
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('sidecar_status_action_metadata_projection'),
+      false,
+    );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').rca_scope,
       'visual_deliverable_internal_dag_only',
@@ -650,6 +663,14 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.guarded_actions.map((entry) => entry.action),
       sidecarGuardedActionMetadata.guardedActionIds,
+    );
+    assert.equal(
+      sidecar.guarded_actions.some((entry) => entry.action === 'supervise_managed_run'),
+      false,
+    );
+    assert.equal(
+      sidecar.guarded_actions.some((entry) => entry.action === 'product_entry_continuation'),
+      false,
     );
     assert.deepEqual(sidecar.guarded_actions, sidecarGuardedActionMetadata.guardedActions);
     assert.deepEqual(sidecar.blocked_actions, sidecarGuardedActionMetadata.blockedActions);
@@ -1168,6 +1189,28 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'workspace_receipt_proof_missing_required_refs',
     );
     assert.equal(blockedWorkspaceReceiptProof.result_surface.visual_ready_claimed, false);
+
+    await assert.rejects(
+      () => dispatchProductSidecar({
+        task: {
+          action: 'supervise_managed_run',
+          workspace_root: workspaceRoot,
+          managed_run_id: 'managed-removed',
+        },
+      }),
+      /product sidecar action 不允许/,
+    );
+
+    await assert.rejects(
+      () => dispatchProductSidecar({
+        task: {
+          action: 'product_entry_continuation',
+          workspace_root: workspaceRoot,
+          entry_session_id: 'session-removed',
+        },
+      }),
+      /product sidecar action 不允许/,
+    );
 
     await assert.rejects(
       () => dispatchProductSidecar({

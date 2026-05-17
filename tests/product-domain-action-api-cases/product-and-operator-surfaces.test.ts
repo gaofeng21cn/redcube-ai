@@ -54,20 +54,13 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
       }),
     },
   );
-  const oplHosted = await callDomainTool(
+  const sidecarReceipt = await callDomainTool(
     'redcube_product_entry',
     withAction('dispatch_product_sidecar', {
       task: {
-        action: 'product_entry_continuation',
+        action: 'notification_receipt',
         workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
-        entry_session_id: 'session-a',
-        task_intent: 'run_managed_deliverable',
-        entry_mode: 'opl_hosted',
-        delivery_request: {
-          deliverable_family: 'ppt_deck',
-          topic_id: 'topic-a',
-          deliverable_id: 'deck-a',
-        },
+        notification_id: 'notice-a',
       },
     }),
     {
@@ -80,28 +73,9 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
         },
         result_surface: {
           ok: true,
-          surface_kind: 'product_entry',
-          product_entry_contract_id: 'redcube_product_entry',
-          entry_session: {
-            entry_session_id: request.task.entry_session_id,
-          },
-          domain_entry_surface: {
-            entry_mode: request.task.entry_mode,
-          },
-          family_orchestration: {
-            action_graph_ref: {
-              ref_kind: 'json_pointer',
-              ref: '/family_orchestration/action_graph',
-            },
-            action_graph: {
-              graph_id: 'redcube_product_entry_overview_graph',
-            },
-            human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
-            resume_contract: {
-              surface_kind: 'product_entry_session',
-              session_locator_field: 'entry_session.entry_session_id',
-            },
-          },
+          surface_kind: 'notification_receipt',
+          notification_id: request.task.notification_id,
+          receipt_status: 'acknowledged',
         },
       }),
     },
@@ -186,13 +160,11 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
   assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
   assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-  assert.equal(oplHosted.surface_kind, 'product_sidecar_dispatch');
-  assert.equal(oplHosted.action, 'product_entry_continuation');
-  assert.equal(oplHosted.sidecar_policy.writes_visual_truth, false);
-  assert.equal(oplHosted.result_surface.surface_kind, 'product_entry');
-  assert.equal(oplHosted.result_surface.entry_session.entry_session_id, 'session-a');
-  assert.equal(oplHosted.result_surface.domain_entry_surface.entry_mode, 'opl_hosted');
-  assert.equal(oplHosted.result_surface.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
+  assert.equal(sidecarReceipt.surface_kind, 'product_sidecar_dispatch');
+  assert.equal(sidecarReceipt.action, 'notification_receipt');
+  assert.equal(sidecarReceipt.sidecar_policy.writes_visual_truth, false);
+  assert.equal(sidecarReceipt.result_surface.surface_kind, 'notification_receipt');
+  assert.equal(sidecarReceipt.result_surface.notification_id, 'notice-a');
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');

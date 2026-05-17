@@ -13,23 +13,9 @@ export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
   {
     action: 'runtime_watch',
     effect: 'read_only',
-    summary: 'Read RCA runtimeWatch for an existing run locator.',
+    summary: 'Read RCA runtimeWatch for an existing run locator as a refs-only projection; this does not run a generic supervisor or continuation loop.',
     required_fields: ['workspace_root', 'topic_id', 'deliverable_id', 'run_id'],
     api_surface: 'runtimeWatch',
-  },
-  {
-    action: 'supervise_managed_run',
-    effect: 'guarded_runtime_tick',
-    summary: 'Run one RCA-owned superviseManagedRun tick for an existing managed run.',
-    required_fields: ['workspace_root', 'managed_run_id'],
-    api_surface: 'superviseManagedRun',
-  },
-  {
-    action: 'product_entry_continuation',
-    effect: 'guarded_product_entry_continuation',
-    summary: 'Continue the same RCA product-entry session through RCA-owned gates.',
-    required_fields: ['workspace_root', 'entry_session_id'],
-    api_surface: 'invokeProductEntry',
   },
   {
     action: 'emit_no_regression_evidence',
@@ -635,11 +621,15 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       ],
     },
     physical_deletion_guard: {
-      current_safe_tombstone_candidate_count: 0,
-      no_safe_tombstone_candidate_reason: 'Audited modules still have active callers or retained RCA visual authority refs; deletion waits for OPL replacement adoption, caller migration, no-regression proof, and preserved domain authority refs.',
-      required_before_physical_delete: [
-        'opl_replacement_surface_live',
-        'active_callers_migrated',
+      current_safe_tombstone_candidate_count: 2,
+      deleted_or_thinned_default_surfaces: [
+        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.product_entry_continuation',
+      ],
+      deletion_status: 'sidecar_default_generic_dispatch_removed',
+      remaining_deletion_scope: 'Only visual authority functions, refs-only projections, diagnostic direct CLI surfaces, and declared visual pack inputs remain in RCA default package surfaces.',
+      required_before_remaining_physical_delete: [
+        'active_direct_cli_mcp_callers_migrated_to_opl_generated_surfaces',
         'domain_authority_refs_preserved',
         'no_regression_proof_recorded',
       ],
@@ -816,13 +806,29 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'owner_receipt',
       'native_helper_implementation',
     ],
-    retire_tombstone_candidates: [],
+    retire_tombstone_candidates: [
+      {
+        surface_id: 'product_sidecar_dispatch.supervise_managed_run',
+        retired_at: '2026-05-17',
+        replacement_owner: 'opl',
+        replacement_surface: 'opl_generic_runner_and_supervisor_tick',
+        retained_rca_surface: 'direct deliverable managed supervision diagnostic surface',
+        active_default_caller: false,
+      },
+      {
+        surface_id: 'product_sidecar_dispatch.product_entry_continuation',
+        retired_at: '2026-05-17',
+        replacement_owner: 'opl',
+        replacement_surface: 'opl_generated_session_shell_and_product_entry_wrapper',
+        retained_rca_surface: 'direct product entry invoke/session surfaces',
+        active_default_caller: false,
+      },
+    ],
     must_not_retire: [
       'managed_deliverable_internal_dag',
       'visual_review_export_gate',
       'native_helper_implementation',
       'artifact_gallery_export_refs',
-      'sidecar_status_action_metadata_projection',
       'codex_cli_default_route_policy',
     ],
     authority_boundary: {

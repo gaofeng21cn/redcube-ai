@@ -67,7 +67,8 @@
       "artifact_lifecycle",
       "review_repair_transport",
       "restart_dead_letter_repair_human_gate_state_chain",
-      "native_helper_generic_envelope"
+      "native_helper_generic_envelope",
+      "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
     ],
     "opl_owned_generic_primitives": [
       "standard_domain_agent_scaffold",
@@ -87,7 +88,8 @@
       "artifact_lifecycle",
       "review_repair_transport",
       "restart_dead_letter_repair_human_gate_state_chain",
-      "native_helper_generic_envelope"
+      "native_helper_generic_envelope",
+      "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
     ],
     "rca_retained_authority": [
       "visual_truth",
@@ -189,38 +191,44 @@
       {
         "primitive": "standard_domain_agent_scaffold",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
-        "manifest_ref": "redcube product manifest#/standard_domain_agent_skeleton",
-        "sidecar_ref": "redcube product sidecar export#/mapped_surfaces/standard_domain_agent_skeleton"
+        "manifest_ref": "/standard_domain_agent_skeleton",
+        "sidecar_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
       },
       {
         "primitive": "generic_scheduler",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
-        "manifest_ref": "redcube product manifest#/family_scheduler_replacement",
-        "sidecar_ref": "redcube product sidecar export#/runtime_framework/family_scheduler_replacement"
+        "manifest_ref": "/family_scheduler_replacement",
+        "sidecar_ref": "/runtime_framework/family_scheduler_replacement"
       },
       {
         "primitive": "memory_transport",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
-        "manifest_ref": "redcube product manifest#/domain_memory_descriptor_locator",
-        "sidecar_ref": "redcube product sidecar export#/mapped_surfaces/visual_pattern_memory_writeback"
+        "manifest_ref": "/domain_memory_descriptor_locator",
+        "sidecar_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
       },
       {
         "primitive": "artifact_lifecycle",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
-        "manifest_ref": "redcube product manifest#/lifecycle_guarded_apply_proof",
-        "sidecar_ref": "redcube product sidecar export#/mapped_surfaces/lifecycle_guarded_apply"
+        "manifest_ref": "/lifecycle_guarded_apply_proof",
+        "sidecar_ref": "/mapped_surfaces/lifecycle_guarded_apply"
       },
       {
         "primitive": "review_repair_transport",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
-        "manifest_ref": "redcube product manifest#/review_state",
-        "sidecar_ref": "redcube product sidecar export#/mapped_surfaces/review_projection"
+        "manifest_ref": "/review_state",
+        "sidecar_ref": "/mapped_surfaces/review_projection"
       },
       {
         "primitive": "native_helper_generic_envelope",
         "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
-        "manifest_ref": "redcube product manifest#/native_ppt_operator_ux",
-        "sidecar_ref": "redcube product sidecar export#/mapped_surfaces/native_helper_implementation"
+        "manifest_ref": "/native_ppt_operator_ux",
+        "sidecar_ref": "/mapped_surfaces/native_helper_implementation"
+      },
+      {
+        "primitive": "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+        "contract_ref": "rca.visual_pack_compiler_handoff.v1",
+        "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+        "sidecar_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
       }
     ],
     "forbidden_rca_generic_owner_flags": {
@@ -239,7 +247,8 @@
       "rca_artifact_lifecycle_owner": false,
       "rca_review_repair_transport_owner": false,
       "rca_restart_dead_letter_repair_human_gate_state_chain_owner": false,
-      "rca_native_helper_generic_envelope_owner": false
+      "rca_native_helper_generic_envelope_owner": false,
+      "rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner": false
     }
   },
   "attempt_projection": {
@@ -1365,11 +1374,15 @@
       ]
     },
     "physical_deletion_guard": {
-      "current_safe_tombstone_candidate_count": 0,
-      "no_safe_tombstone_candidate_reason": "Audited modules still have active callers or retained RCA visual authority refs; deletion waits for OPL replacement adoption, caller migration, no-regression proof, and preserved domain authority refs.",
-      "required_before_physical_delete": [
-        "opl_replacement_surface_live",
-        "active_callers_migrated",
+      "current_safe_tombstone_candidate_count": 2,
+      "deleted_or_thinned_default_surfaces": [
+        "product_sidecar_dispatch.supervise_managed_run",
+        "product_sidecar_dispatch.product_entry_continuation"
+      ],
+      "deletion_status": "sidecar_default_generic_dispatch_removed",
+      "remaining_deletion_scope": "Only visual authority functions, refs-only projections, diagnostic direct CLI surfaces, and declared visual pack inputs remain in RCA default package surfaces.",
+      "required_before_remaining_physical_delete": [
+        "active_direct_cli_mcp_callers_migrated_to_opl_generated_surfaces",
         "domain_authority_refs_preserved",
         "no_regression_proof_recorded"
       ]
@@ -2523,14 +2536,14 @@
           "oracle_fixtures"
         ],
         "retire_tombstone": false,
+        "tombstone_required": false,
         "writes_visual_truth": false,
         "writes_artifact_blob": false,
         "writes_memory_body": false,
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "tombstone_required": false
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "visual_authority_functions",
@@ -2599,14 +2612,14 @@
           "native_helper_implementation"
         ],
         "retire_tombstone": false,
+        "tombstone_required": false,
         "writes_visual_truth": false,
         "writes_artifact_blob": false,
         "writes_memory_body": false,
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "tombstone_required": false
+        "declares_production_soak_complete": false
       }
     ],
     "opl_owned_generic_primitives": [
@@ -2662,13 +2675,29 @@
       "owner_receipt",
       "native_helper_implementation"
     ],
-    "retire_tombstone_candidates": [],
+    "retire_tombstone_candidates": [
+      {
+        "surface_id": "product_sidecar_dispatch.supervise_managed_run",
+        "retired_at": "2026-05-17",
+        "replacement_owner": "opl",
+        "replacement_surface": "opl_generic_runner_and_supervisor_tick",
+        "retained_rca_surface": "direct deliverable managed supervision diagnostic surface",
+        "active_default_caller": false
+      },
+      {
+        "surface_id": "product_sidecar_dispatch.product_entry_continuation",
+        "retired_at": "2026-05-17",
+        "replacement_owner": "opl",
+        "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
+        "retained_rca_surface": "direct product entry invoke/session surfaces",
+        "active_default_caller": false
+      }
+    ],
     "must_not_retire": [
       "managed_deliverable_internal_dag",
       "visual_review_export_gate",
       "native_helper_implementation",
       "artifact_gallery_export_refs",
-      "sidecar_status_action_metadata_projection",
       "codex_cli_default_route_policy"
     ],
     "authority_boundary": {

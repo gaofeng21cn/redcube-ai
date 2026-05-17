@@ -87,7 +87,8 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 OPL 侧可通过 product sidecar 读取和派发受控动作：
 
 - `product sidecar export` 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。
-- `product sidecar dispatch` 只允许 `runtime_watch`、`supervise_managed_run`、`product_entry_continuation`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`notification_receipt` 这类 guarded actions。
+- `product sidecar dispatch` 只允许 `runtime_watch`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`evaluate_visual_transition`、`emit_workspace_receipt_proof`、`notification_receipt` 这类 guarded actions。
+- `supervise_managed_run` 与 `product_entry_continuation` 已从 default generic sidecar dispatch 物理删除/收薄；generic supervision / continuation 归 OPL runner/session shell。RCA 保留 direct product-entry/session API、managed supervision diagnostic 和内部 visual authority surfaces，但不把它们作为 standard sidecar template 或 default generated surface。
 - `emit_no_regression_evidence` 只生成 RCA-owned runtime evidence ref，落在 workspace `.redcube/runtime/evidence/no-regression/`；它证明 descriptor/runtime refs、physical skeleton anchor、legacy active-path retirement 和 no-forbidden-write 边界未回退，不写 visual artifact blob，也不声明 provider-hosted visual long soak 完成。
 
 Sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。任何需要生成、修复、审阅或导出视觉交付物的动作都必须回到 RCA-owned route 与 gate。

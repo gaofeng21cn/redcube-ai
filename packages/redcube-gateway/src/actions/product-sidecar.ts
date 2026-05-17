@@ -4,8 +4,6 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
-import { getProductEntrySession } from './get-product-entry-session.js';
-import { invokeProductEntry } from './invoke-product-entry.js';
 import {
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
@@ -18,7 +16,6 @@ import {
   productSidecarGuardedActionSet,
 } from './product-sidecar-guarded-actions.js';
 import { runtimeWatch } from './runtime-watch.js';
-import { superviseManagedRun } from './supervise-managed-run.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './product-sidecar-parts/workspace-receipt-proof.js';
 import { buildSidecarOwnerBoundary } from './product-sidecar-parts/owner-boundary.js';
 import {
@@ -165,11 +162,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         command: 'redcube review watch',
         api_surface: 'runtimeWatch',
         owner: DOMAIN_ID,
-      },
-      supervise_managed_run: {
-        command: 'redcube managed supervise',
-        api_surface: 'superviseManagedRun',
-        owner: DOMAIN_ID,
+        read_only: true,
+        projection_mode: 'runtime_watch_refs_only',
+        dispatch_owner: 'redcube_ai',
+        generic_supervisor_owner: 'opl',
       },
       review_projection: {
         review_state_ref: '/review_state',
@@ -399,25 +395,6 @@ function workspaceRootFromTask(task) {
       || task?.workspace_locator?.workspace_root
       || task?.workspaceLocator?.workspaceRoot,
   );
-}
-
-function normalizeDeliveryRequest(task) {
-  const delivery = task?.delivery_request || task?.deliveryRequest || {};
-  return {
-    deliverable_family: safeText(delivery.deliverable_family || delivery.deliverableFamily || delivery.overlay),
-    topic_id: safeText(delivery.topic_id || delivery.topicId || task.topic_id || task.topicId),
-    deliverable_id: safeText(delivery.deliverable_id || delivery.deliverableId || task.deliverable_id || task.deliverableId),
-    profile_id: safeText(delivery.profile_id || delivery.profileId),
-    title: safeText(delivery.title),
-    goal: safeText(delivery.goal),
-    route: safeText(delivery.route),
-    adapter: safeText(delivery.adapter),
-    user_intent: safeText(delivery.user_intent || delivery.userIntent || task.user_intent || task.userIntent),
-    lifecycle_policy: safeText(delivery.lifecycle_policy || delivery.lifecyclePolicy),
-    stop_after_stage: safeText(delivery.stop_after_stage || delivery.stopAfterStage),
-    mode: safeText(delivery.mode, 'draft_new'),
-    baseline_deliverable_id: safeText(delivery.baseline_deliverable_id || delivery.baselineDeliverableId),
-  };
 }
 
 function buildDispatchEnvelope({ task, result, action }) {
@@ -908,29 +885,6 @@ export async function dispatchProductSidecar(request) {
       topicId: requireField('topic_id', task.topic_id || task.topicId),
       deliverableId: requireField('deliverable_id', task.deliverable_id || task.deliverableId),
       runId: requireField('run_id', task.run_id || task.runId),
-    });
-    return buildDispatchEnvelope({ task, result, action });
-  }
-
-  if (action === 'supervise_managed_run') {
-    const result = await superviseManagedRun({
-      workspaceRoot: workspaceRootFromTask(task),
-      managedRunId: requireField('managed_run_id', task.managed_run_id || task.managedRunId),
-    });
-    return buildDispatchEnvelope({ task, result, action });
-  }
-
-  if (action === 'product_entry_continuation') {
-    const result = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRootFromTask(task),
-      },
-      entry_session_contract: {
-        entry_session_id: requireField('entry_session_id', task.entry_session_id || task.entrySessionId),
-      },
-      task_intent: safeText(task.task_intent || task.taskIntent, 'run_managed_deliverable'),
-      entry_mode: safeText(task.entry_mode || task.entryMode, 'opl_sidecar'),
-      delivery_request: normalizeDeliveryRequest(task),
     });
     return buildDispatchEnvelope({ task, result, action });
   }

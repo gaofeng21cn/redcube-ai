@@ -756,7 +756,7 @@ export async function getProductEntryManifest(request) {
       command_template: `redcube product sidecar export --workspace-root ${workspaceRoot} --format json`,
       dispatch_command_template: 'redcube product sidecar dispatch --task <task.json> --format json',
       surface_kind: 'product_sidecar_adapter',
-      purpose: 'RCA product sidecar adapter for the configured OPL family runtime provider; it exposes guarded runtime/product-entry actions without owning visual truth, review verdicts, or publication gates.',
+      purpose: 'RCA product sidecar adapter for the configured OPL family runtime provider; dispatch exposes only RCA receipt/verdict/ref authority actions plus read-only watch, while generic supervise and product-entry continuation stay with OPL runner/session shell.',
       extra_payload: {
         runtime_owner: 'configured_family_runtime_provider',
         provider_transport_owner: 'opl_family_runtime_provider',

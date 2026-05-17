@@ -219,6 +219,7 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
     'review_repair_transport',
     'restart_dead_letter_repair_human_gate_state_chain',
     'native_helper_generic_envelope',
+    'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
   ];
   const expectedRetainedAuthority = [
     'visual_truth',
@@ -287,6 +288,7 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
       'artifact_lifecycle',
       'review_repair_transport',
       'native_helper_generic_envelope',
+      'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
     ],
   );
   for (const value of Object.values(payload.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {
@@ -294,7 +296,7 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
   }
 });
 
-test('RCA privatized functional module audit is machine readable for OPL without retiring domain surfaces', () => {
+test('RCA privatized functional module audit is machine readable for OPL with generic sidecar dispatch retired', () => {
   const adoption = contract();
   const current = currentProgram();
   const surfaces = [
@@ -368,8 +370,12 @@ test('RCA privatized functional module audit is machine readable for OPL without
         'minimal_authority_function',
       ],
     });
-    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
-    assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /active callers/);
+    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 2);
+    assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
+      'product_sidecar_dispatch.supervise_managed_run',
+      'product_sidecar_dispatch.product_entry_continuation',
+    ]);
+    assert.equal(surface.physical_deletion_guard.deletion_status, 'sidecar_default_generic_dispatch_removed');
     assert.deepEqual(surface.rca_visual_authority_allowlist, [
       'source_readiness_verdict',
       'communication_visual_direction_decision',
@@ -383,16 +389,22 @@ test('RCA privatized functional module audit is machine readable for OPL without
       assert.equal(value, false);
     }
     assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
-    assert.deepEqual(surface.retire_tombstone_candidates, []);
+    assert.deepEqual(
+      surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
+      [
+        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.product_entry_continuation',
+      ],
+    );
     assert.equal(surface.authority_boundary.opl_can_index_audit_projection, true);
     assert.equal(surface.authority_boundary.opl_can_write_rca_visual_truth, false);
     assert.equal(surface.authority_boundary.opl_can_claim_production_soak_complete, false);
     assert.equal(surface.authority_boundary.rca_generic_scheduler_owner, false);
     assert.equal(surface.authority_boundary.rca_native_helper_generic_envelope_owner, false);
     assert.equal(surface.authority_boundary.rca_review_repair_transport_owner, false);
-    assert.ok(surface.must_not_retire.includes('managed_deliverable_internal_dag'));
     assert.ok(surface.must_not_retire.includes('visual_review_export_gate'));
     assert.ok(surface.must_not_retire.includes('native_helper_implementation'));
+    assert.equal(surface.must_not_retire.includes('sidecar_status_action_metadata_projection'), false);
 
     for (const entry of surface.modules) {
       assert.equal(entry.retire_tombstone, false, entry.module_id);

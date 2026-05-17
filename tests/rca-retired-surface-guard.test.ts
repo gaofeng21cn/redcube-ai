@@ -196,6 +196,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
     'review_repair_transport',
     'restart_dead_letter_repair_human_gate_state_chain',
     'native_helper_generic_envelope',
+    'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
   ];
   const expectedRetainedAuthority = [
     'visual_truth',
@@ -240,6 +241,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
       'artifact_lifecycle',
       'review_repair_transport',
       'native_helper_generic_envelope',
+      'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
     ],
   );
   for (const value of Object.values(adoption.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {
@@ -302,7 +304,7 @@ test('RCA consumes OPL stability read-model surfaces without implementing observ
   );
 });
 
-test('RCA functional audit exposes OPL replacement expectations without safe tombstone candidates', () => {
+test('RCA functional audit exposes OPL replacement expectations and retired generic sidecar dispatch', () => {
   const currentProgram = JSON.parse(readFileSync(
     path.resolve('contracts/runtime-program/current-program.json'),
     'utf-8',
@@ -332,9 +334,18 @@ test('RCA functional audit exposes OPL replacement expectations without safe tom
 
   for (const surface of surfaces) {
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
-    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
-    assert.equal(surface.retire_tombstone_candidates.length, 0);
-    assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /deletion waits for OPL replacement adoption/);
+    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 2);
+    assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
+      'product_sidecar_dispatch.supervise_managed_run',
+      'product_sidecar_dispatch.product_entry_continuation',
+    ]);
+    assert.deepEqual(
+      surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
+      [
+        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.product_entry_continuation',
+      ],
+    );
     assert.deepEqual(surface.classification_values, [
       'opl_hosted_surface',
       'opl_generated_surface',
