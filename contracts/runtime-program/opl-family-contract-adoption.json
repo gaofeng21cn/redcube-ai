@@ -1306,12 +1306,16 @@
       "native helper envelope",
       "operator projection shell",
       "generic CLI/MCP wrappers",
+      "generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers",
       "Codex executor adapter",
       "observability/stability read model"
     ],
     "classification_values": [
-      "opl_owned_generic_primitive_consumer",
-      "rca_owned_visual_domain_authority",
+      "opl_hosted_surface",
+      "opl_generated_surface",
+      "refs_only_adapter",
+      "declarative_pack",
+      "minimal_authority_function",
       "retire_tombstone"
     ],
     "replacement_expectation_mode": "opl_replacement_expectation_or_refs_only_projection",
@@ -1336,16 +1340,15 @@
       "rca_owns_observability_exporter": false
     },
     "rca_visual_authority_allowlist": [
-      "visual_stage_semantics",
       "source_readiness_verdict",
-      "visual_memory_body",
+      "communication_visual_direction_decision",
       "review_export_verdict",
-      "canonical_artifact_authority",
-      "native_helper_implementation",
-      "route_level_executor_policy",
-      "typed_blocker",
-      "owner_receipt_refs"
+      "artifact_mutation_authorization",
+      "visual_memory_accept_reject",
+      "owner_receipt_signer",
+      "native_helper_implementation"
     ],
+    "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
     "modules": [
       {
         "module_id": "managed_dag_scheduler",
@@ -1376,6 +1379,7 @@
         "retentionReason": "RCA must define visual deliverable stage order and route-specific gate meaning for ppt_deck, xiaohongshu and poster families.",
         "cannotAbsorbReason": "OPL can absorb scheduler mechanics but cannot own visual stage semantics, route policy or visual readiness authority.",
         "tombstone_required": false,
+        "migration_class": "declarative_pack",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -1383,7 +1387,7 @@
           "owner": "opl",
           "expectation_ref": "/family_scheduler_replacement",
           "replacement_surface": "opl_family_scheduler",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "declarative_pack_consumed_by_opl_hosted_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1459,6 +1463,7 @@
         "retentionReason": "RCA keeps the visual transition table, guard refs, repair action meaning, typed blockers and owner receipt refs.",
         "cannotAbsorbReason": "A generic runner cannot decide source readiness, visual review readiness, repair target meaning or export authority.",
         "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -1466,7 +1471,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
           "replacement_surface": "opl_generic_transition_runner",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1541,6 +1546,7 @@
         "retentionReason": "Until OPL ledger is the durable owner, RCA needs workspace-local continuity for same-session visual deliverable runs.",
         "cannotAbsorbReason": "OPL should absorb the store mechanics; it must not absorb canonical artifacts, review verdicts or visual run truth.",
         "tombstone_required": false,
+        "migration_class": "opl_hosted_surface",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": false,
         "opl_absorb_candidate": true,
@@ -1548,7 +1554,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
           "replacement_surface": "opl_attempt_ledger_provider_receipts",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "opl_hosted_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1620,6 +1626,7 @@
         "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
         "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
         "tombstone_required": false,
+        "migration_class": "opl_generated_surface",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": false,
         "opl_absorb_candidate": true,
@@ -1627,7 +1634,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption",
           "replacement_surface": "opl_app_session_shell_and_workbench",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "opl_generated_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1701,6 +1708,7 @@
         "retentionReason": "RCA must judge visual source readiness, audience promise inputs and communication strategy source adequacy.",
         "cannotAbsorbReason": "OPL can host source transport but cannot own RCA source readiness verdict or narrative/visual source interpretation.",
         "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -1708,7 +1716,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_substrate_adapter_export",
           "replacement_surface": "opl_workspace_source_intake_shell",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1781,6 +1789,7 @@
         "retentionReason": "RCA owns visual pattern memory body, accept/reject decision and lesson quality semantics.",
         "cannotAbsorbReason": "OPL must not store visual memory body or decide whether a visual pattern is reusable for RCA deliverables.",
         "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -1788,7 +1797,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
           "replacement_surface": "opl_memory_locator_writeback_transport",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1862,6 +1871,7 @@
         "retentionReason": "RCA owns canonical visual artifacts, exportability verdict and artifact mutation permission.",
         "cannotAbsorbReason": "OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.",
         "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -1869,7 +1879,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
           "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -1943,6 +1953,7 @@
         "retentionReason": "RCA owns visual review/export verdicts, blocked-item meaning and repair target selection.",
         "cannotAbsorbReason": "OPL transport cannot decide if a slide/page is visually acceptable, exportable or needs a specific RCA repair route.",
         "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -1950,7 +1961,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
           "replacement_surface": "opl_review_repair_transport",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -2025,6 +2036,7 @@
         "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
         "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
         "tombstone_required": false,
+        "migration_class": "opl_hosted_surface",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -2032,7 +2044,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
           "replacement_surface": "opl_native_helper_execution_envelope",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "opl_hosted_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -2106,6 +2118,7 @@
         "retentionReason": "RCA provides domain evidence refs, blocker meaning and safe repair hints for visual deliverable readiness.",
         "cannotAbsorbReason": "OPL App may render projections but cannot turn them into RCA visual ready/exportable claims.",
         "tombstone_required": false,
+        "migration_class": "opl_generated_surface",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": false,
         "opl_absorb_candidate": true,
@@ -2113,7 +2126,7 @@
           "owner": "opl",
           "expectation_ref": "/operator_evidence_readiness_projection",
           "replacement_surface": "opl_app_operator_workbench_shell",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "opl_generated_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -2188,6 +2201,7 @@
         "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
         "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
         "tombstone_required": false,
+        "migration_class": "opl_generated_surface",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -2195,7 +2209,7 @@
           "owner": "opl",
           "expectation_ref": "/family_action_catalog",
           "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "opl_generated_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -2269,6 +2283,7 @@
         "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
         "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
         "tombstone_required": false,
+        "migration_class": "opl_hosted_surface",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": true,
         "opl_absorb_candidate": true,
@@ -2276,7 +2291,7 @@
           "owner": "opl",
           "expectation_ref": "/domain_entry_contract/executor",
           "replacement_surface": "opl_agent_executor_adapter",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "opl_hosted_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -2349,6 +2364,7 @@
         "retentionReason": "RCA contributes domain blocker meaning, visual-safe repair hints and no-regression evidence refs.",
         "cannotAbsorbReason": "OPL observability cannot authorize RCA quality, exportability or visual remediation decisions.",
         "tombstone_required": false,
+        "migration_class": "refs_only_adapter",
         "opl_owned_generic_primitive_consumer": true,
         "rca_owned_visual_domain_authority": false,
         "opl_absorb_candidate": true,
@@ -2356,7 +2372,7 @@
           "owner": "opl",
           "expectation_ref": "/opl_stability_read_model_consumption",
           "replacement_surface": "opl_stability_read_model_and_observability_export",
-          "expected_mode": "opl_replacement_expectation",
+          "expected_mode": "refs_only_adapter_to_opl_surface",
           "rca_consumes_as": "consumer_projection_only",
           "rca_owns_replacement_runtime": false
         },
@@ -2400,6 +2416,152 @@
         "declares_exportable": false,
         "declares_handoffable": false,
         "declares_production_soak_complete": false
+      },
+      {
+        "module_id": "visual_pack_compiler_handoff",
+        "surface_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
+        "status": "declarative_pack_input_landed",
+        "classification": "declarative_pack",
+        "migration_class": "declarative_pack",
+        "owner": "redcube_ai",
+        "opl_owned_generic_primitive_consumer": false,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": false,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+          "replacement_surface": "opl_pack_compiler_generated_surface",
+          "expected_mode": "opl_generated_surface_from_declarative_pack",
+          "rca_consumes_as": "declarative_pack_provider",
+          "rca_owns_replacement_runtime": false
+        },
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+        ],
+        "activeCallers": [
+          "product-entry manifest",
+          "product sidecar export",
+          "product status"
+        ],
+        "activeCallerStatus": "declarative_pack_input_active",
+        "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+        "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
+        "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
+        "rca_projection_mode": "declarative_pack_refs_only",
+        "rca_exports_only": [
+          "stage_refs",
+          "action_metadata_refs",
+          "visual_transition_refs",
+          "receipt_schema_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
+          "required_before_delete": [
+            "domain_package_replaced_by_new_rca_pack_contract"
+          ]
+        },
+        "rca_retains": [
+          "visual_stage_pack",
+          "action_metadata",
+          "authority_policy",
+          "oracle_fixtures"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false,
+        "tombstone_required": false
+      },
+      {
+        "module_id": "visual_authority_functions",
+        "surface_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
+        "status": "minimal_authority_function_manifest_landed",
+        "classification": "minimal_authority_function",
+        "migration_class": "minimal_authority_function",
+        "owner": "redcube_ai",
+        "opl_owned_generic_primitive_consumer": false,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": false,
+        "opl_replacement_expectation": {
+          "owner": "redcube_ai",
+          "expectation_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
+          "replacement_surface": "not_absorbable_domain_authority_function",
+          "expected_mode": "domain_authority_function_called_by_generated_surface",
+          "rca_consumes_as": "authority_function_owner",
+          "rca_owns_replacement_runtime": false
+        },
+        "codePaths": [
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
+          "packages/redcube-gateway/src/actions/product-sidecar.ts",
+          "packages/redcube-runtime/src"
+        ],
+        "activeCallers": [
+          "visual route execution",
+          "review/export gates",
+          "memory writeback acceptance",
+          "owner receipt signing"
+        ],
+        "activeCallerStatus": "minimal_authority_functions_active",
+        "migrationAction": "Retain only visual authority functions while OPL generates generic wrappers and runtime shells.",
+        "retentionReason": "RCA must decide visual source readiness, visual direction, review/export verdicts, artifact mutation, visual memory acceptance and owner receipts.",
+        "cannotAbsorbReason": "These functions are RCA domain authority and cannot be moved to OPL without moving visual truth.",
+        "rca_projection_mode": "authority_receipt_refs_only",
+        "rca_exports_only": [
+          "verdict_refs",
+          "owner_receipt_refs",
+          "typed_blocker_refs",
+          "safe_action_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "Minimal authority functions are the allowed RCA retention surface.",
+          "required_before_delete": [
+            "visual_domain_authority_moved_by_explicit_product_decision"
+          ]
+        },
+        "rca_retains": [
+          "source_readiness_verdict",
+          "communication_visual_direction_decision",
+          "review_export_verdict",
+          "artifact_mutation_authorization",
+          "visual_memory_accept_reject",
+          "owner_receipt_signer",
+          "native_helper_implementation"
+        ],
+        "retire_tombstone": false,
+        "writes_visual_truth": false,
+        "writes_artifact_blob": false,
+        "writes_memory_body": false,
+        "declares_visual_ready": false,
+        "declares_exportable": false,
+        "declares_handoffable": false,
+        "declares_production_soak_complete": false,
+        "tombstone_required": false
       }
     ],
     "opl_owned_generic_primitives": [
@@ -2423,6 +2585,7 @@
       "review_repair_transport",
       "restart_dead_letter_repair_human_gate_state_chain",
       "native_helper_generic_envelope",
+      "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
       "family_conflict_envelope_schema",
       "control_loop_summary_builder",
       "usage_projection_aggregator",

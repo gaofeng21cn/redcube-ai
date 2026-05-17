@@ -317,6 +317,8 @@ test('RCA privatized functional module audit is machine readable for OPL without
     'generic_cli_mcp_wrappers',
     'codex_executor_adapter',
     'observability_stability_read_model',
+    'visual_pack_compiler_handoff',
+    'visual_authority_functions',
   ];
 
   for (const surface of surfaces) {
@@ -326,18 +328,24 @@ test('RCA privatized functional module audit is machine readable for OPL without
     assert.equal(surface.read_only, true);
     assert.equal(surface.refs_only, true);
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
+    assert.deepEqual(surface.classification_values, [
+      'opl_hosted_surface',
+      'opl_generated_surface',
+      'refs_only_adapter',
+      'declarative_pack',
+      'minimal_authority_function',
+      'retire_tombstone',
+    ]);
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /active callers/);
     assert.deepEqual(surface.rca_visual_authority_allowlist, [
-      'visual_stage_semantics',
       'source_readiness_verdict',
-      'visual_memory_body',
+      'communication_visual_direction_decision',
       'review_export_verdict',
-      'canonical_artifact_authority',
+      'artifact_mutation_authorization',
+      'visual_memory_accept_reject',
+      'owner_receipt_signer',
       'native_helper_implementation',
-      'route_level_executor_policy',
-      'typed_blocker',
-      'owner_receipt_refs',
     ]);
     for (const value of Object.values(surface.forbidden_generic_owner_flags)) {
       assert.equal(value, false);
@@ -355,32 +363,57 @@ test('RCA privatized functional module audit is machine readable for OPL without
     assert.ok(surface.must_not_retire.includes('native_helper_implementation'));
 
     for (const entry of surface.modules) {
-      assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
       assert.equal(entry.retire_tombstone, false, entry.module_id);
       assert.equal(entry.tombstone_required, false, entry.module_id);
-      assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
       assert.ok(Array.isArray(entry.codePaths) && entry.codePaths.length > 0, entry.module_id);
       assert.ok(Array.isArray(entry.activeCallers) && entry.activeCallers.length > 0, entry.module_id);
       assert.equal(typeof entry.activeCallerStatus, 'string', entry.module_id);
       assert.equal(typeof entry.migrationAction, 'string', entry.module_id);
       assert.equal(typeof entry.retentionReason, 'string', entry.module_id);
       assert.equal(typeof entry.cannotAbsorbReason, 'string', entry.module_id);
-      assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
-      assert.equal(entry.opl_replacement_expectation.expected_mode, 'opl_replacement_expectation', entry.module_id);
-      assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', entry.module_id);
+      assert.ok(['opl', 'redcube_ai'].includes(entry.opl_replacement_expectation.owner), entry.module_id);
+      assert.ok([
+        'declarative_pack_consumed_by_opl_hosted_surface',
+        'opl_generated_surface_from_declarative_pack',
+        'domain_authority_function_called_by_generated_surface',
+        'refs_only_adapter_to_opl_surface',
+        'opl_hosted_surface',
+        'opl_generated_surface',
+      ].includes(entry.opl_replacement_expectation.expected_mode), entry.module_id);
+      assert.ok([
+        'consumer_projection_only',
+        'declarative_pack_provider',
+        'authority_function_owner',
+      ].includes(entry.opl_replacement_expectation.rca_consumes_as), entry.module_id);
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(typeof entry.opl_replacement_expectation.expectation_ref, 'string', entry.module_id);
       assert.equal(typeof entry.opl_replacement_expectation.replacement_surface, 'string', entry.module_id);
       assert.equal(typeof entry.rca_projection_mode, 'string', entry.module_id);
       assert.ok(Array.isArray(entry.rca_exports_only) && entry.rca_exports_only.length > 0, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
-      assert.match(entry.physical_deletion_guard.reason, /active callers|retained RCA visual authority refs/, entry.module_id);
-      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-        'opl_replacement_surface_live',
-        'active_callers_migrated',
-        'domain_authority_refs_preserved',
-        'no_regression_proof_recorded',
-      ], entry.module_id);
+      if (entry.module_id === 'visual_pack_compiler_handoff') {
+        assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
+        assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
+        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+          'domain_package_replaced_by_new_rca_pack_contract',
+        ], entry.module_id);
+      } else if (entry.module_id === 'visual_authority_functions') {
+        assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
+        assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
+        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+          'visual_domain_authority_moved_by_explicit_product_decision',
+        ], entry.module_id);
+      } else {
+        assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
+        assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
+        assert.match(entry.physical_deletion_guard.reason, /active callers|retained RCA visual authority refs/, entry.module_id);
+        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+          'opl_replacement_surface_live',
+          'active_callers_migrated',
+          'domain_authority_refs_preserved',
+          'no_regression_proof_recorded',
+        ], entry.module_id);
+      }
       for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
         assert.equal(value, false, entry.module_id);
       }
@@ -395,8 +428,11 @@ test('RCA privatized functional module audit is machine readable for OPL without
 
   const byId = Object.fromEntries(surfaces[0].modules.map((entry) => [entry.module_id, entry]));
   assert.equal(byId.managed_dag_scheduler.rca_scope, 'visual_deliverable_internal_dag_only');
+  assert.equal(byId.managed_dag_scheduler.migration_class, 'declarative_pack');
   assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
+  assert.equal(byId.native_helper_envelope.migration_class, 'opl_hosted_surface');
   assert.equal(byId.managed_run_json_store.activeCallerStatus, 'active_private_json_store');
+  assert.equal(byId.managed_run_json_store.migration_class, 'opl_hosted_surface');
   assert.equal(
     byId.managed_run_json_store.opl_replacement_expectation.replacement_surface,
     'opl_attempt_ledger_provider_receipts',
@@ -408,14 +444,18 @@ test('RCA privatized functional module audit is machine readable for OPL without
     'provider_receipt_correlation_refs',
   ]);
   assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
+  assert.equal(byId.product_entry_session_store.migration_class, 'opl_generated_surface');
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
+  assert.equal(byId.workspace_source_intake.migration_class, 'refs_only_adapter');
   assert.equal(byId.workspace_source_intake.rca_exports_only.includes('source_readiness_verdict_ref'), true);
   assert.equal(byId.memory_writeback_receipt_transport.rca_scope, 'visual_memory_accept_reject_and_receipt_refs');
   assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
   assert.equal(byId.operator_projection_shell.activeCallerStatus, 'active_refs_only_projection_shell');
   assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'product_sidecar_status_action_metadata_projection');
+  assert.equal(byId.generic_cli_mcp_wrappers.migration_class, 'opl_generated_surface');
   assert.equal(byId.codex_executor_adapter.opl_generic_primitive, 'agent_executor_adapter');
+  assert.equal(byId.codex_executor_adapter.migration_class, 'opl_hosted_surface');
   assert.equal(byId.observability_stability_read_model.rca_owned_visual_domain_authority, false);
   assert.equal(
     byId.observability_stability_read_model.opl_replacement_expectation.replacement_surface,

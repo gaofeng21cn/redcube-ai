@@ -292,8 +292,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       0,
     );
     assert.deepEqual(sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values, [
-      'opl_owned_replacement',
+      'opl_hosted_surface',
       'opl_generated_surface',
+      'refs_only_adapter',
       'declarative_pack',
       'minimal_authority_function',
       'retire_tombstone',
@@ -312,6 +313,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').rca_scope,
       'visual_deliverable_internal_dag_only',
     );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').migration_class,
+      'declarative_pack',
+    );
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'codex_executor_adapter').codePaths,
       [
@@ -324,6 +329,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').opl_replacement_expectation.replacement_surface,
       'opl_attempt_ledger_provider_receipts',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').migration_class,
+      'opl_hosted_surface',
     );
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').rca_exports_only,
@@ -338,6 +347,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_app_session_shell_and_workbench',
     );
     assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').migration_class,
+      'opl_generated_surface',
+    );
+    assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').cannotAbsorbReason,
       'OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.',
     );
@@ -348,6 +361,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'review_repair_transport').opl_replacement_expectation.replacement_surface,
       'opl_review_repair_transport',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'review_repair_transport').migration_class,
+      'refs_only_adapter',
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'native_helper_envelope').opl_replacement_expectation.replacement_surface,

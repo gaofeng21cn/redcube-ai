@@ -335,21 +335,44 @@ test('RCA functional audit exposes OPL replacement expectations without safe tom
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.equal(surface.retire_tombstone_candidates.length, 0);
     assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /deletion waits for OPL replacement adoption/);
+    assert.deepEqual(surface.classification_values, [
+      'opl_hosted_surface',
+      'opl_generated_surface',
+      'refs_only_adapter',
+      'declarative_pack',
+      'minimal_authority_function',
+      'retire_tombstone',
+    ]);
     for (const value of Object.values(surface.forbidden_generic_owner_flags)) {
       assert.equal(value, false);
     }
 
     for (const entry of surface.modules) {
-      assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
-      assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', entry.module_id);
+      assert.ok(['opl', 'redcube_ai'].includes(entry.opl_replacement_expectation.owner), entry.module_id);
+      assert.ok([
+        'consumer_projection_only',
+        'declarative_pack_provider',
+        'authority_function_owner',
+      ].includes(entry.opl_replacement_expectation.rca_consumes_as), entry.module_id);
+      assert.notEqual(entry.migration_class, 'opl_owned_replacement', entry.module_id);
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
-      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-        'opl_replacement_surface_live',
-        'active_callers_migrated',
-        'domain_authority_refs_preserved',
-        'no_regression_proof_recorded',
-      ], entry.module_id);
+      if (entry.module_id === 'visual_pack_compiler_handoff') {
+        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+          'domain_package_replaced_by_new_rca_pack_contract',
+        ], entry.module_id);
+      } else if (entry.module_id === 'visual_authority_functions') {
+        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+          'visual_domain_authority_moved_by_explicit_product_decision',
+        ], entry.module_id);
+      } else {
+        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+          'opl_replacement_surface_live',
+          'active_callers_migrated',
+          'domain_authority_refs_preserved',
+          'no_regression_proof_recorded',
+        ], entry.module_id);
+      }
       assert.equal(entry.declares_production_soak_complete, false, entry.module_id);
     }
 

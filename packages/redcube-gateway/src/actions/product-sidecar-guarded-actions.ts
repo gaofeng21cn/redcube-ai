@@ -462,6 +462,30 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   },
 ]);
 
+const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
+  managed_dag_scheduler: 'declarative_pack',
+  attempt_state_machine_runner: 'refs_only_adapter',
+  managed_run_json_store: 'opl_hosted_surface',
+  product_entry_session_store: 'opl_generated_surface',
+  workspace_source_intake: 'refs_only_adapter',
+  memory_writeback_receipt_transport: 'refs_only_adapter',
+  artifact_export_lifecycle: 'refs_only_adapter',
+  review_repair_transport: 'refs_only_adapter',
+  native_helper_envelope: 'opl_hosted_surface',
+  operator_projection_shell: 'opl_generated_surface',
+  generic_cli_mcp_wrappers: 'opl_generated_surface',
+  codex_executor_adapter: 'opl_hosted_surface',
+  observability_stability_read_model: 'refs_only_adapter',
+});
+
+const FUNCTIONAL_MODULE_EXPECTED_MODES = Object.freeze({
+  declarative_pack: 'declarative_pack_consumed_by_opl_hosted_surface',
+  refs_only_adapter: 'refs_only_adapter_to_opl_surface',
+  opl_hosted_surface: 'opl_hosted_surface',
+  opl_generated_surface: 'opl_generated_surface',
+  minimal_authority_function: 'domain_authority_function_called_by_generated_surface',
+});
+
 export const OPL_FUNCTIONAL_HARNESS_COVERAGE = Object.freeze({
   harness_role: 'functional_harness_consumer',
   coverage_status: 'domain_authority_pack_landed',
@@ -568,8 +592,9 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'observability/stability read model',
     ],
     classification_values: [
-      'opl_owned_replacement',
+      'opl_hosted_surface',
       'opl_generated_surface',
+      'refs_only_adapter',
       'declarative_pack',
       'minimal_authority_function',
       'retire_tombstone',
@@ -598,9 +623,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     visual_pack_compiler_handoff_ref: '/visual_pack_compiler_handoff',
     modules: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) => {
       const replacementGuard = RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS[entry.module_id] || {};
-      const migrationClass = entry.module_id === 'generic_cli_mcp_wrappers'
-        ? 'opl_generated_surface'
-        : 'opl_owned_replacement';
+      const migrationClass = FUNCTIONAL_MODULE_MIGRATION_CLASSES[entry.module_id] || 'refs_only_adapter';
       return {
         ...entry,
         migration_class: migrationClass,
@@ -621,7 +644,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
           owner: 'opl',
           expectation_ref: replacementGuard.expectation_ref || '/opl_generic_primitive_consumption',
           replacement_surface: replacementGuard.opl_replacement_surface || entry.opl_generic_primitive,
-          expected_mode: 'opl_replacement_expectation',
+          expected_mode: FUNCTIONAL_MODULE_EXPECTED_MODES[migrationClass] || 'refs_only_adapter_to_opl_surface',
           rca_consumes_as: 'consumer_projection_only',
           rca_owns_replacement_runtime: false,
         },
@@ -676,6 +699,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         },
         rca_retains: ['visual_stage_pack', 'action_metadata', 'authority_policy', 'oracle_fixtures'],
         retire_tombstone: false,
+        tombstone_required: false,
         writes_visual_truth: false,
         writes_artifact_blob: false,
         writes_memory_body: false,
@@ -730,6 +754,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
           'native_helper_implementation',
         ],
         retire_tombstone: false,
+        tombstone_required: false,
         writes_visual_truth: false,
         writes_artifact_blob: false,
         writes_memory_body: false,
