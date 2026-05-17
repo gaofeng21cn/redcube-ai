@@ -336,6 +336,38 @@ test('RCA privatized functional module audit is machine readable for OPL without
       'minimal_authority_function',
       'retire_tombstone',
     ]);
+    assert.deepEqual(surface.functional_structure_gap_closure, {
+      status: 'closed_for_rca_consumer_thinning',
+      closed_at: '2026-05-17',
+      closure_scope: 'rca_functional_structure_gap_classification',
+      functional_structure_gap_count: 0,
+      unclassified_private_generic_residue_count: 0,
+      long_term_rca_generic_owner_claim_count: 0,
+      remaining_gap_class: 'testing_evidence_gap_only',
+      remaining_evidence_gate_ids: [
+        'real_artifact_producing_domain_owner_receipt',
+        'opl_hosted_controlled_visual_stage_long_soak',
+        'real_memory_lifecycle_receipt_instances',
+        'cross_family_repeated_no_regression_evidence',
+        'opl_generated_surface_production_consumption',
+        'opl_app_operator_drilldown',
+      ],
+      closure_basis_refs: [
+        '/family_scheduler_replacement',
+        '/opl_generic_primitive_consumption',
+        '/opl_stability_read_model_consumption',
+        '/visual_pack_compiler_handoff',
+        '/operator_evidence_readiness_projection',
+        '/opl_substrate_adapter_export',
+      ],
+      allowed_remaining_module_classes: [
+        'opl_hosted_surface',
+        'opl_generated_surface',
+        'refs_only_adapter',
+        'declarative_pack',
+        'minimal_authority_function',
+      ],
+    });
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.match(surface.physical_deletion_guard.no_safe_tombstone_candidate_reason, /active callers/);
     assert.deepEqual(surface.rca_visual_authority_allowlist, [

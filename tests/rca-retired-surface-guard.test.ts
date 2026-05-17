@@ -343,6 +343,22 @@ test('RCA functional audit exposes OPL replacement expectations without safe tom
       'minimal_authority_function',
       'retire_tombstone',
     ]);
+    assert.equal(
+      surface.functional_structure_gap_closure.status,
+      'closed_for_rca_consumer_thinning',
+    );
+    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 0);
+    assert.equal(surface.functional_structure_gap_closure.remaining_gap_class, 'testing_evidence_gap_only');
+    assert.ok(
+      surface.functional_structure_gap_closure.remaining_evidence_gate_ids.includes(
+        'opl_generated_surface_production_consumption',
+      ),
+    );
+    assert.ok(
+      surface.functional_structure_gap_closure.remaining_evidence_gate_ids.includes(
+        'opl_app_operator_drilldown',
+      ),
+    );
     for (const value of Object.values(surface.forbidden_generic_owner_flags)) {
       assert.equal(value, false);
     }
