@@ -1,12 +1,20 @@
 # RedCube AI 关键决策
 
+## 2026-05-17
+
+### 决策：退役 default generic sidecar dispatch
+
+- `supervise_managed_run` 与 `product_entry_continuation` 已从 RCA product sidecar 默认 dispatch / guarded action 面物理删除或收薄；generic supervision 和 product-entry continuation 归 OPL runner / generated session shell。
+- RCA 保留 direct product-entry/session API、managed supervision diagnostic、`runtime_watch` refs-only projection、owner receipt、visual memory/workspace lifecycle、visual transition、workspace receipt proof、notification receipt 和 visual authority surfaces；这些保留项不构成 standard sidecar template 或新 Agent 默认 sidecar action。
+- `privatized_functional_module_audit.physical_deletion_guard` 现在把这两个 default generic dispatch surface 列为已删除/已收薄 tombstone candidate；剩余 active code path 只能是 declarative visual pack、refs-only adapter、diagnostic direct surface 或 minimal visual authority function。
+
 ## 2026-05-16
 
 ### 决策：privatized functional module audit 成为 OPL 可读的机器审计面
 
 - RCA 在 runtime-program contracts、manifest、status 和 product sidecar projection 中维护 `privatized_functional_module_audit`，统一盘点 managed DAG scheduler、attempt/state-machine runner、managed-run JSON store、product-entry session store、workspace/source intake、memory/writeback receipt transport、artifact export lifecycle、review/repair transport、native helper envelope、operator projection shell、generic CLI/MCP wrappers、Codex executor adapter 与 observability/stability read model。
 - 该 audit 只做 refs-only read model：OPL 可以索引模块边界、generic primitive consumer 关系、hosted/generated surface expectation、refs-only adapter 和 declarative pack handoff，但不能据此写 RCA visual truth、artifact blob、memory body，不能声明 visual-ready、exportable、handoffable 或 production soak complete。
-- 当前没有可安全物理删除的 tombstone candidate；这不表示 RCA 私有功能面已经清空。`managed-dag-scheduler` 保留为 visual deliverable 内部 DAG，review/export gate、artifact authority、owner receipt、route-level executor policy 和 Python native helper implementation 继续归 RCA。物理删除必须等到 OPL replacement surface live、active callers migrated、domain authority refs preserved 和 no-regression proof recorded。
+- 2026-05-17 后，default sidecar dispatch 里的 `supervise_managed_run` 与 `product_entry_continuation` 已成为已删除/已收薄 tombstone candidate；这不表示 RCA 私有功能面已经清空。`managed-dag-scheduler` 保留为 visual deliverable 内部 DAG，review/export gate、artifact authority、owner receipt、route-level executor policy 和 Python native helper implementation 继续归 RCA。其他物理删除必须等到 OPL replacement surface live、active callers migrated、domain authority refs preserved 和 no-regression proof recorded。
 - 真实仍需由 OPL 生成或托管的代码面是 generic scheduler/runner/attempt ledger、session/workbench shell、native-helper generic envelope、artifact lifecycle/handoff shell、review/repair transport、observability/SLO/read-model、executor adapter 与 CLI/MCP/product/status wrapper；RCA 只消费这些通用 primitive 的 projection，或提供 declarative visual pack / refs-only adapter / minimal authority function。
 
 ### 决策：product sidecar / action / status parity 由 canonical metadata 驱动
