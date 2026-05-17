@@ -1,0 +1,441 @@
+{
+  "surface_kind": "family_action_catalog",
+  "version": "family-action-catalog.v1",
+  "catalog_id": "redcube_product_entry_action_catalog",
+  "target_domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "authority_boundary": {
+    "domain_truth_owner": "redcube_ai",
+    "opl_role": "projection_consumer_only",
+    "write_policy": "no_domain_truth_writes"
+  },
+  "actions": [
+    {
+      "action_id": "get_product_status",
+      "title": "Read RedCube product status",
+      "summary": "读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted stage runtime handoff 合同。",
+      "owner": "redcube_ai",
+      "effect": "read_only",
+      "source_command": {
+        "command": "redcube product status",
+        "surface_kind": "product_status"
+      },
+      "input_schema_ref": "schema:redcube.product_status.request.v1",
+      "output_schema_ref": "schema:redcube.product_status.response.v1",
+      "workspace_locator_fields": [],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_status"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "get_product_status"
+        },
+        "skill": {
+          "surface_kind": "product_status",
+          "command_contract_id": "get_product_status"
+        },
+        "product_entry": {
+          "surface_kind": "product_status",
+          "action_key": "get_product_status"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "get_product_start",
+      "title": "Read RedCube product start surface",
+      "summary": "读取统一的 product-entry start surface，直接查看 overview / direct / OPL-hosted handoff / resume 四类启动方式。",
+      "owner": "redcube_ai",
+      "effect": "read_only",
+      "source_command": {
+        "command": "redcube product start",
+        "surface_kind": "product_entry_start"
+      },
+      "input_schema_ref": "schema:redcube.product_start.request.v1",
+      "output_schema_ref": "schema:redcube.product_start.response.v1",
+      "workspace_locator_fields": [],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_entry_start"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "get_product_start"
+        },
+        "skill": null,
+        "product_entry": {
+          "surface_kind": "product_entry_start",
+          "action_key": "get_product_start"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "get_product_preflight",
+      "title": "Read RedCube product preflight",
+      "summary": "读取当前 direct product-entry overview contract 的开机前真实自检面。",
+      "owner": "redcube_ai",
+      "effect": "read_only",
+      "source_command": {
+        "command": "redcube product preflight",
+        "surface_kind": "product_entry_preflight"
+      },
+      "input_schema_ref": "schema:redcube.product_preflight.request.v1",
+      "output_schema_ref": "schema:redcube.product_preflight.response.v1",
+      "workspace_locator_fields": [],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_entry_preflight"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "get_product_preflight"
+        },
+        "skill": null,
+        "product_entry": {
+          "surface_kind": "product_entry_preflight",
+          "action_key": "get_product_preflight"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "invoke_product_entry",
+      "title": "Invoke RedCube product entry",
+      "summary": "以 direct RedCube product entry 方式创建或继续同一 deliverable，并下沉到同一个 service-safe domain entry。",
+      "owner": "redcube_ai",
+      "effect": "mutating",
+      "source_command": {
+        "command": "redcube product invoke",
+        "surface_kind": "product_entry"
+      },
+      "input_schema_ref": "schema:redcube.product_entry.invoke.request.v1",
+      "output_schema_ref": "schema:redcube.product_entry.invoke.response.v1",
+      "workspace_locator_fields": [
+        "entry_session_id",
+        "overlay",
+        "topic_id",
+        "deliverable_id"
+      ],
+      "human_gate_ids": [
+        "redcube_operator_review_gate"
+      ],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_entry"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "invoke_product_entry"
+        },
+        "skill": {
+          "surface_kind": "product_entry",
+          "command_contract_id": "invoke_product_entry"
+        },
+        "product_entry": {
+          "surface_kind": "product_entry",
+          "action_key": "start_deliverable"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "get_product_entry_session",
+      "title": "Read RedCube product-entry session",
+      "summary": "读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。",
+      "owner": "redcube_ai",
+      "effect": "read_only",
+      "source_command": {
+        "command": "redcube product session",
+        "surface_kind": "product_entry_session"
+      },
+      "input_schema_ref": "schema:redcube.product_entry.session.request.v1",
+      "output_schema_ref": "schema:redcube.product_entry.session.response.v1",
+      "workspace_locator_fields": [
+        "entry_session_id"
+      ],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_entry_session"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "get_product_entry_session"
+        },
+        "skill": {
+          "surface_kind": "product_entry_session",
+          "command_contract_id": "get_product_entry_session"
+        },
+        "product_entry": {
+          "surface_kind": "product_entry_session",
+          "action_key": "continue_session"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "get_product_entry_manifest",
+      "title": "Read RedCube product-entry manifest",
+      "summary": "读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / OPL-hosted handoff / session 三个入口面。",
+      "owner": "redcube_ai",
+      "effect": "read_only",
+      "source_command": {
+        "command": "redcube product manifest",
+        "surface_kind": "product_entry_manifest"
+      },
+      "input_schema_ref": "schema:redcube.product_entry.manifest.request.v1",
+      "output_schema_ref": "schema:redcube.product_entry.manifest.response.v2",
+      "workspace_locator_fields": [],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_entry_manifest"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "get_product_entry_manifest"
+        },
+        "skill": null,
+        "product_entry": {
+          "surface_kind": "product_entry_manifest",
+          "action_key": "get_product_entry_manifest"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "export_product_sidecar",
+      "title": "Export RedCube product sidecar adapter",
+      "summary": "导出 RCA product sidecar adapter，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。",
+      "owner": "redcube_ai",
+      "effect": "read_only",
+      "source_command": {
+        "command": "redcube product sidecar export",
+        "surface_kind": "product_sidecar_export"
+      },
+      "input_schema_ref": "schema:redcube.product_sidecar.export.request.v1",
+      "output_schema_ref": "schema:redcube.product_sidecar.export.response.v1",
+      "workspace_locator_fields": [],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_sidecar_export"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "export_product_sidecar"
+        },
+        "skill": null,
+        "product_entry": {
+          "surface_kind": "product_sidecar_export",
+          "action_key": "export_product_sidecar"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {
+        "opl_role": "typed_family_control_plane",
+        "provider_role": "stage_attempt_queue_wakeup_transport",
+        "write_policy": "read_projection_only"
+      }
+    },
+    {
+      "action_id": "dispatch_product_sidecar",
+      "title": "Dispatch RedCube product sidecar guarded action",
+      "summary": "调度 RCA-owned guarded actions：read-only runtime watch、no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；generic supervise/continuation 入口归 OPL runner/session shell，不在 RCA sidecar 默认派发面暴露。",
+      "owner": "redcube_ai",
+      "effect": "mutating",
+      "source_command": {
+        "command": "redcube product sidecar dispatch",
+        "surface_kind": "product_sidecar_dispatch"
+      },
+      "input_schema_ref": "schema:redcube.product_sidecar.dispatch.request.v1",
+      "output_schema_ref": "schema:redcube.product_sidecar.dispatch.response.v1",
+      "workspace_locator_fields": [],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "product_sidecar_dispatch"
+        },
+        "mcp": {
+          "tool_name": "redcube_product_entry",
+          "action_key": "dispatch_product_sidecar"
+        },
+        "skill": null,
+        "product_entry": {
+          "surface_kind": "product_sidecar_dispatch",
+          "action_key": "dispatch_product_sidecar"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {
+        "allowed_actions": [
+          "runtime_watch",
+          "emit_no_regression_evidence",
+          "emit_domain_owner_receipt",
+          "apply_visual_memory_writeback",
+          "apply_visual_workspace_lifecycle",
+          "evaluate_visual_transition",
+          "emit_workspace_receipt_proof",
+          "notification_receipt"
+        ],
+        "forbidden_writes": [
+          "visual_truth",
+          "review_verdict",
+          "publication_gate",
+          "canonical_artifacts"
+        ]
+      }
+    },
+    {
+      "action_id": "run_image_ppt_proof",
+      "title": "Run image-first PPT proof",
+      "summary": "受控执行 ppt_deck image-first lightweight proof runner；默认 mock，不调用真实图片 API，live 必须显式开启。",
+      "owner": "redcube_ai",
+      "effect": "mutating",
+      "source_command": {
+        "command": "redcube image-ppt proof",
+        "surface_kind": "image_ppt_product_entry_proof"
+      },
+      "input_schema_ref": "schema:redcube.image_ppt_proof.request.v1",
+      "output_schema_ref": "schema:redcube.image_ppt_proof.response.v1",
+      "workspace_locator_fields": [
+        "entry_session_id",
+        "topic_id",
+        "deliverable_id"
+      ],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "image_ppt_product_entry_proof"
+        },
+        "mcp": null,
+        "skill": {
+          "surface_kind": "image_ppt_product_entry_proof",
+          "command_contract_id": "run_image_ppt_proof"
+        },
+        "product_entry": {
+          "surface_kind": "image_ppt_product_entry_proof",
+          "action_key": "run_image_ppt_proof"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "run_native_ppt_proof",
+      "title": "Run native PPT proof",
+      "summary": "受控执行 ppt_deck native PPT proof route；只调用 repo-owned proof runner，并保持 product-entry review/export gates。",
+      "owner": "redcube_ai",
+      "effect": "mutating",
+      "source_command": {
+        "command": "redcube native-ppt proof",
+        "surface_kind": "native_ppt_product_entry_proof"
+      },
+      "input_schema_ref": "schema:redcube.native_ppt_proof.request.v1",
+      "output_schema_ref": "schema:redcube.native_ppt_proof.response.v1",
+      "workspace_locator_fields": [
+        "entry_session_id",
+        "topic_id",
+        "deliverable_id"
+      ],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": {
+          "surface_kind": "native_ppt_product_entry_proof"
+        },
+        "mcp": null,
+        "skill": {
+          "surface_kind": "native_ppt_product_entry_proof",
+          "command_contract_id": "run_native_ppt_proof"
+        },
+        "product_entry": {
+          "surface_kind": "native_ppt_product_entry_proof",
+          "action_key": "run_native_ppt_proof"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    },
+    {
+      "action_id": "invoke_domain_entry",
+      "title": "Invoke service-safe RedCube domain entry",
+      "summary": "Invoke the shared service-safe RedCube domain entry underneath direct product entry and OPL-hosted stage runtime callers.",
+      "owner": "redcube_ai",
+      "effect": "mutating",
+      "source_command": {
+        "command": "redcube service-safe domain entry",
+        "surface_kind": "domain_entry"
+      },
+      "input_schema_ref": "schema:redcube.domain_entry.request.v1",
+      "output_schema_ref": "schema:redcube.domain_entry.response.v1",
+      "workspace_locator_fields": [
+        "workspace_root",
+        "task_intent"
+      ],
+      "human_gate_ids": [],
+      "supported_surfaces": {
+        "cli": null,
+        "mcp": {
+          "command": "redcube service-safe domain entry",
+          "tool_name": "redcube_product_entry",
+          "action_key": "invoke_domain_entry"
+        },
+        "skill": null,
+        "product_entry": {
+          "surface_kind": "domain_entry",
+          "action_key": "invoke_domain_entry"
+        },
+        "openai": null,
+        "ai_sdk": null
+      },
+      "authority_boundary": {}
+    }
+  ],
+  "notes": [
+    "RCA owns this action catalog as a projection surface; OPL consumes it without writing RedCube domain truth.",
+    "CLI help, MCP tool routing metadata, skill command contracts, and product-entry operator actions derive from this catalog."
+  ],
+  "forbidden_generic_owner_roles": [
+    "generic_scheduler_owner",
+    "generic_daemon_owner",
+    "generic_lifecycle_owner",
+    "generic_queue_owner",
+    "generic_attempt_ledger_owner",
+    "generic_state_machine_runner_owner",
+    "generic_cli_mcp_product_wrapper_owner",
+    "generic_sidecar_owner",
+    "generic_session_store_owner",
+    "generic_status_workbench_owner",
+    "generic_workspace_source_intake_owner",
+    "generic_memory_transport_owner",
+    "generic_artifact_gallery_owner",
+    "generic_operator_workbench_owner",
+    "generic_observability_slo_owner",
+    "generic_persistence_engine_owner",
+    "generic_sqlite_lifecycle_owner",
+    "generic_native_helper_envelope_owner",
+    "generic_review_repair_transport_owner",
+    "generated_surface_owner_in_domain_repo"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "surface_kind": "domain_agent_descriptor",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "domain_label": "RedCube AI",
+  "package_id": "redcube-ai",
+  "agent_kind": "visual_deliverable_foundry_agent",
+  "release_shape": "opl_compatible_package",
+  "owner": "redcube_ai",
+  "generated_interface_owner": "one-person-lab",
+  "default_executor": "codex_cli",
+  "formal_entry": {
+    "default": "CLI",
+    "supported_protocols": [
+      "MCP"
+    ],
+    "internal_surface": "controller"
+  },
+  "standard_contracts": {
+    "action_catalog": "contracts/action_catalog.json",
+    "stage_control_plane": "contracts/stage_control_plane.json",
+    "functional_privatization_audit": "contracts/functional_privatization_audit.json"
+  },
+  "canonical_metadata_sources": [
+    "packages/redcube-gateway/src/actions/family-action-catalog.ts",
+    "packages/redcube-gateway/src/actions/family-stage-control-plane.ts",
+    "packages/redcube-gateway/src/actions/get-product-entry-manifest.ts"
+  ],
+  "action_targets": {
+    "cli": "npm run --prefix <redcube-ai-repo> redcube -- ...",
+    "product_entry": "redcube product status | invoke | session | manifest",
+    "sidecar": "redcube product sidecar export | dispatch",
+    "service_safe_domain_entry": "invokeDomainEntry"
+  },
+  "authority_boundary": {
+    "redcube_ai_owns_visual_truth": true,
+    "redcube_ai_owns_route_truth": true,
+    "redcube_ai_owns_review_export_verdict": true,
+    "redcube_ai_owns_artifact_authority": true,
+    "redcube_ai_owns_visual_memory_body": true,
+    "opl_owns_generated_interfaces": true,
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "opl_can_mutate_artifacts": false,
+    "provider_completion_is_domain_ready": false
+  },
+  "notes": [
+    "Root contracts are static OPL pack-compiler inputs generated from RCA-owned canonical action/stage metadata.",
+    "Existing CLI, product-entry and sidecar implementations remain action targets, not generated-interface owners."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "surface_kind": "artifact_locator_contract",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "canonical_artifact_authority": "redcube_ai",
+  "opl_projection_policy": "locator_lifecycle_and_receipt_refs_only",
+  "authority_boundary": {
+    "opl_can_mutate_artifacts": false,
+    "opl_can_authorize_quality_or_export": false,
+    "domain_artifact_authority_owner": "redcube_ai"
+  }
+}

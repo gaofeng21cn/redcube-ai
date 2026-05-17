@@ -1,0 +1,12 @@
+{
+  "surface_kind": "domain_memory_descriptor_locator",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "memory_body_owner": "redcube_ai",
+  "opl_projection_policy": "locator_and_receipt_refs_only",
+  "authority_boundary": {
+    "opl_can_write_memory_body": false,
+    "opl_can_accept_or_reject_writeback": false,
+    "domain_memory_accept_reject_owner": "redcube_ai"
+  }
+}

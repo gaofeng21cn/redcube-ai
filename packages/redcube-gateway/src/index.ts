@@ -391,6 +391,11 @@ export {
 } from './actions/family-action-catalog.js';
 
 export {
+  buildRedCubeFamilyStageControlPlane,
+} from './actions/family-stage-control-plane.js';
+
+export {
+  buildPrivatizedFunctionalModuleAuditProjection,
   buildVisualPackCompilerHandoffProjection,
   listProductSidecarBlockedActions,
   listProductSidecarForbiddenWrites,

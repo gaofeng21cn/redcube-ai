@@ -1,0 +1,1184 @@
+{
+  "surface_kind": "family_stage_control_plane",
+  "version": "family-stage-control-plane.v1",
+  "plane_id": "redcube_ai_stage_control_plane",
+  "target_domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "source_refs": [
+    {
+      "ref_kind": "json_pointer",
+      "ref": "/family_action_catalog",
+      "role": "allowed_action_catalog"
+    },
+    {
+      "ref_kind": "json_pointer",
+      "ref": "/deliverable_facade/family_route_policy",
+      "role": "route_stage_policy"
+    },
+    {
+      "ref_kind": "json_pointer",
+      "ref": "/progress_projection",
+      "role": "runtime_watch_projection"
+    },
+    {
+      "ref_kind": "json_pointer",
+      "ref": "/review_state",
+      "role": "review_truth_projection"
+    },
+    {
+      "ref_kind": "json_pointer",
+      "ref": "/publication_projection",
+      "role": "publication_projection"
+    },
+    {
+      "ref_kind": "json_pointer",
+      "ref": "/artifact_inventory",
+      "role": "artifact_authority_projection"
+    }
+  ],
+  "freshness": {
+    "status": "current",
+    "checked_at": "manifest_build",
+    "source_ref_count": 6,
+    "stale_if_missing": [
+      "/family_action_catalog",
+      "/deliverable_facade/family_route_policy",
+      "/progress_projection",
+      "/review_state",
+      "/publication_projection",
+      "/artifact_inventory"
+    ]
+  },
+  "stage_action_parity": {
+    "surface_kind": "family_stage_action_parity",
+    "status": "aligned",
+    "family_action_catalog_ref": "/family_action_catalog",
+    "missing_action_refs": []
+  },
+  "authority_boundary": {
+    "domain_truth_owner": "redcube_ai",
+    "opl_role": "projection_consumer_only",
+    "write_policy": "no_visual_truth_writes",
+    "no_quality_verdict": true,
+    "rca_owns_visual_truth": true,
+    "rca_owns_review_publication_projection": true,
+    "rca_owns_artifact_authority": true,
+    "opl_can_schedule_stage": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_write_review_truth": false,
+    "opl_can_write_publication_projection": false,
+    "default_ppt_route_changed": false,
+    "managed_deliverable_runtime_changed": false
+  },
+  "stages": [
+    {
+      "stage_id": "source_intake",
+      "stage_kind": "intake",
+      "title": "Source intake",
+      "goal": "Freeze source truth, audience, constraints, and missing-material risk before visual planning.",
+      "domain_stage_refs": [
+        "source_readiness",
+        "research",
+        "storyline"
+      ],
+      "allowed_action_refs": [
+        "get_product_status",
+        "get_product_entry_manifest"
+      ],
+      "outputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/source_readiness",
+          "role": "source_truth"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_projection"
+        }
+      ],
+      "owner": "redcube_ai",
+      "summary": "Source intake projected from RCA-owned route stages for OPL family discovery.",
+      "source_refs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/deliverable_facade/family_route_policy",
+          "role": "route_stage_policy"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "runtime_watch_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_truth_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_authority_projection"
+        },
+        {
+          "ref_kind": "route_stage_refs",
+          "ref": [
+            "source_readiness",
+            "research",
+            "storyline"
+          ],
+          "role": "domain_stage_projection"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "checked_at": "manifest_build",
+        "source_ref_count": 7,
+        "stale_if_missing": [
+          "/family_action_catalog",
+          "/deliverable_facade/family_route_policy",
+          "/progress_projection",
+          "/review_state",
+          "/publication_projection",
+          "/artifact_inventory",
+          [
+            "source_readiness",
+            "research",
+            "storyline"
+          ]
+        ]
+      },
+      "action_parity": {
+        "status": "aligned",
+        "family_action_catalog_ref": "/family_action_catalog",
+        "allowed_action_refs": [
+          "get_product_status",
+          "get_product_entry_manifest"
+        ],
+        "missing_action_refs": []
+      },
+      "inputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_read_model"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_context"
+        }
+      ],
+      "skills": [
+        {
+          "ref_kind": "skill_id",
+          "ref": "redcube-ai",
+          "role": "domain_skill"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "imagegen",
+          "role": "visual_generation"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "presentations",
+          "role": "presentation_output"
+        }
+      ],
+      "prompt_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/ppt_deck",
+          "role": "ppt_prompt_pack"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/xiaohongshu",
+          "role": "xiaohongshu_prompt_pack"
+        }
+      ],
+      "visual_pattern_memory_refs": [],
+      "evaluation": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "rca_review_state"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "rca_publication_projection"
+        }
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "resume_surface_ref": "/session_continuity",
+        "artifact_surface_ref": "/artifact_inventory"
+      },
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "visual_truth_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "review_publication_projection_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "opl_can_schedule_stage": false,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_review_truth": false,
+        "opl_can_write_publication_projection": false,
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_publication_projection": true,
+        "rca_owns_artifact_authority": true,
+        "default_ppt_route_changed": false,
+        "managed_deliverable_runtime_changed": false
+      }
+    },
+    {
+      "stage_id": "communication_strategy",
+      "stage_kind": "planning",
+      "title": "Communication strategy",
+      "goal": "Shape storyline, outline, audience fit, information density, and key takeaways.",
+      "domain_stage_refs": [
+        "storyline",
+        "detailed_outline",
+        "slide_blueprint",
+        "single_note_plan",
+        "poster_blueprint"
+      ],
+      "allowed_action_refs": [
+        "invoke_product_entry",
+        "get_product_entry_session"
+      ],
+      "outputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "strategy_checkpoint"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "stage_progress"
+        }
+      ],
+      "owner": "redcube_ai",
+      "summary": "Communication strategy projected from RCA-owned route stages for OPL family discovery.",
+      "source_refs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/deliverable_facade/family_route_policy",
+          "role": "route_stage_policy"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "runtime_watch_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_truth_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_authority_projection"
+        },
+        {
+          "ref_kind": "route_stage_refs",
+          "ref": [
+            "storyline",
+            "detailed_outline",
+            "slide_blueprint",
+            "single_note_plan",
+            "poster_blueprint"
+          ],
+          "role": "domain_stage_projection"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "checked_at": "manifest_build",
+        "source_ref_count": 7,
+        "stale_if_missing": [
+          "/family_action_catalog",
+          "/deliverable_facade/family_route_policy",
+          "/progress_projection",
+          "/review_state",
+          "/publication_projection",
+          "/artifact_inventory",
+          [
+            "storyline",
+            "detailed_outline",
+            "slide_blueprint",
+            "single_note_plan",
+            "poster_blueprint"
+          ]
+        ]
+      },
+      "action_parity": {
+        "status": "aligned",
+        "family_action_catalog_ref": "/family_action_catalog",
+        "allowed_action_refs": [
+          "invoke_product_entry",
+          "get_product_entry_session"
+        ],
+        "missing_action_refs": []
+      },
+      "inputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_read_model"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_context"
+        }
+      ],
+      "skills": [
+        {
+          "ref_kind": "skill_id",
+          "ref": "redcube-ai",
+          "role": "domain_skill"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "imagegen",
+          "role": "visual_generation"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "presentations",
+          "role": "presentation_output"
+        }
+      ],
+      "prompt_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/ppt_deck",
+          "role": "ppt_prompt_pack"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/xiaohongshu",
+          "role": "xiaohongshu_prompt_pack"
+        }
+      ],
+      "visual_pattern_memory_refs": [],
+      "evaluation": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "rca_review_state"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "rca_publication_projection"
+        }
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "resume_surface_ref": "/session_continuity",
+        "artifact_surface_ref": "/artifact_inventory"
+      },
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "visual_truth_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "review_publication_projection_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "opl_can_schedule_stage": false,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_review_truth": false,
+        "opl_can_write_publication_projection": false,
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_publication_projection": true,
+        "rca_owns_artifact_authority": true,
+        "default_ppt_route_changed": false,
+        "managed_deliverable_runtime_changed": false
+      }
+    },
+    {
+      "stage_id": "visual_direction",
+      "stage_kind": "planning",
+      "title": "Visual direction",
+      "goal": "Define layout density, image strategy, visual language, and feasibility before artifact creation.",
+      "domain_stage_refs": [
+        "visual_direction"
+      ],
+      "allowed_action_refs": [
+        "invoke_product_entry",
+        "get_product_entry_session"
+      ],
+      "outputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "visual_direction_status"
+        }
+      ],
+      "owner": "redcube_ai",
+      "summary": "Visual direction projected from RCA-owned route stages for OPL family discovery.",
+      "source_refs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/deliverable_facade/family_route_policy",
+          "role": "route_stage_policy"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "runtime_watch_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_truth_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_authority_projection"
+        },
+        {
+          "ref_kind": "route_stage_refs",
+          "ref": [
+            "visual_direction"
+          ],
+          "role": "domain_stage_projection"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "checked_at": "manifest_build",
+        "source_ref_count": 7,
+        "stale_if_missing": [
+          "/family_action_catalog",
+          "/deliverable_facade/family_route_policy",
+          "/progress_projection",
+          "/review_state",
+          "/publication_projection",
+          "/artifact_inventory",
+          [
+            "visual_direction"
+          ]
+        ]
+      },
+      "action_parity": {
+        "status": "aligned",
+        "family_action_catalog_ref": "/family_action_catalog",
+        "allowed_action_refs": [
+          "invoke_product_entry",
+          "get_product_entry_session"
+        ],
+        "missing_action_refs": []
+      },
+      "inputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_read_model"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_context"
+        }
+      ],
+      "skills": [
+        {
+          "ref_kind": "skill_id",
+          "ref": "redcube-ai",
+          "role": "domain_skill"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "imagegen",
+          "role": "visual_generation"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "presentations",
+          "role": "presentation_output"
+        }
+      ],
+      "prompt_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/ppt_deck",
+          "role": "ppt_prompt_pack"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/xiaohongshu",
+          "role": "xiaohongshu_prompt_pack"
+        }
+      ],
+      "visual_pattern_memory_refs": [],
+      "evaluation": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "rca_review_state"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "rca_publication_projection"
+        }
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "resume_surface_ref": "/session_continuity",
+        "artifact_surface_ref": "/artifact_inventory"
+      },
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "visual_truth_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "review_publication_projection_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "opl_can_schedule_stage": false,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_review_truth": false,
+        "opl_can_write_publication_projection": false,
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_publication_projection": true,
+        "rca_owns_artifact_authority": true,
+        "default_ppt_route_changed": false,
+        "managed_deliverable_runtime_changed": false
+      }
+    },
+    {
+      "stage_id": "artifact_creation",
+      "stage_kind": "creation",
+      "title": "Artifact creation",
+      "goal": "Create the visual deliverable through the selected RCA route while preserving source truth.",
+      "domain_stage_refs": [
+        "author_image_pages",
+        "render_html",
+        "author_pptx_native"
+      ],
+      "allowed_action_refs": [
+        "invoke_product_entry",
+        "run_image_ppt_proof",
+        "run_native_ppt_proof"
+      ],
+      "outputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_inventory"
+        }
+      ],
+      "owner": "redcube_ai",
+      "summary": "Artifact creation projected from RCA-owned route stages for OPL family discovery.",
+      "source_refs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/deliverable_facade/family_route_policy",
+          "role": "route_stage_policy"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "runtime_watch_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_truth_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_authority_projection"
+        },
+        {
+          "ref_kind": "route_stage_refs",
+          "ref": [
+            "author_image_pages",
+            "render_html",
+            "author_pptx_native"
+          ],
+          "role": "domain_stage_projection"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "checked_at": "manifest_build",
+        "source_ref_count": 7,
+        "stale_if_missing": [
+          "/family_action_catalog",
+          "/deliverable_facade/family_route_policy",
+          "/progress_projection",
+          "/review_state",
+          "/publication_projection",
+          "/artifact_inventory",
+          [
+            "author_image_pages",
+            "render_html",
+            "author_pptx_native"
+          ]
+        ]
+      },
+      "action_parity": {
+        "status": "aligned",
+        "family_action_catalog_ref": "/family_action_catalog",
+        "allowed_action_refs": [
+          "invoke_product_entry",
+          "run_image_ppt_proof",
+          "run_native_ppt_proof"
+        ],
+        "missing_action_refs": []
+      },
+      "inputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_read_model"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_context"
+        }
+      ],
+      "skills": [
+        {
+          "ref_kind": "skill_id",
+          "ref": "redcube-ai",
+          "role": "domain_skill"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "imagegen",
+          "role": "visual_generation"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "presentations",
+          "role": "presentation_output"
+        }
+      ],
+      "prompt_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/ppt_deck",
+          "role": "ppt_prompt_pack"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/xiaohongshu",
+          "role": "xiaohongshu_prompt_pack"
+        }
+      ],
+      "visual_pattern_memory_refs": [],
+      "evaluation": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "rca_review_state"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "rca_publication_projection"
+        }
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "resume_surface_ref": "/session_continuity",
+        "artifact_surface_ref": "/artifact_inventory"
+      },
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "visual_truth_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "review_publication_projection_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "opl_can_schedule_stage": false,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_review_truth": false,
+        "opl_can_write_publication_projection": false,
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_publication_projection": true,
+        "rca_owns_artifact_authority": true,
+        "default_ppt_route_changed": false,
+        "managed_deliverable_runtime_changed": false
+      }
+    },
+    {
+      "stage_id": "review_and_revision",
+      "stage_kind": "review",
+      "title": "Review and revision",
+      "goal": "Run visual, screenshot, source-fidelity, and repair gates before export.",
+      "domain_stage_refs": [
+        "visual_director_review",
+        "screenshot_review",
+        "repair_image_pages",
+        "fix_html",
+        "repair_pptx_native"
+      ],
+      "allowed_action_refs": [
+        "invoke_product_entry",
+        "get_product_entry_session"
+      ],
+      "visual_pattern_memory_refs": [
+        "/domain_memory_descriptor_locator/writeback_proposal_generator",
+        "/domain_memory_descriptor_locator/accept_reject_command"
+      ],
+      "outputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_memory_descriptor_locator/writeback_proposal_generator",
+          "role": "memory_writeback_proposal_contract"
+        }
+      ],
+      "owner": "redcube_ai",
+      "summary": "Review and revision projected from RCA-owned route stages for OPL family discovery.",
+      "source_refs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/deliverable_facade/family_route_policy",
+          "role": "route_stage_policy"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "runtime_watch_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_truth_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_authority_projection"
+        },
+        {
+          "ref_kind": "route_stage_refs",
+          "ref": [
+            "visual_director_review",
+            "screenshot_review",
+            "repair_image_pages",
+            "fix_html",
+            "repair_pptx_native"
+          ],
+          "role": "domain_stage_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_memory_descriptor_locator/writeback_proposal_generator",
+          "role": "visual_pattern_memory_contract"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_memory_descriptor_locator/accept_reject_command",
+          "role": "visual_pattern_memory_contract"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "checked_at": "manifest_build",
+        "source_ref_count": 9,
+        "stale_if_missing": [
+          "/family_action_catalog",
+          "/deliverable_facade/family_route_policy",
+          "/progress_projection",
+          "/review_state",
+          "/publication_projection",
+          "/artifact_inventory",
+          [
+            "visual_director_review",
+            "screenshot_review",
+            "repair_image_pages",
+            "fix_html",
+            "repair_pptx_native"
+          ],
+          "/domain_memory_descriptor_locator/writeback_proposal_generator",
+          "/domain_memory_descriptor_locator/accept_reject_command"
+        ]
+      },
+      "action_parity": {
+        "status": "aligned",
+        "family_action_catalog_ref": "/family_action_catalog",
+        "allowed_action_refs": [
+          "invoke_product_entry",
+          "get_product_entry_session"
+        ],
+        "missing_action_refs": []
+      },
+      "inputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_read_model"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_context"
+        }
+      ],
+      "skills": [
+        {
+          "ref_kind": "skill_id",
+          "ref": "redcube-ai",
+          "role": "domain_skill"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "imagegen",
+          "role": "visual_generation"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "presentations",
+          "role": "presentation_output"
+        }
+      ],
+      "prompt_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/ppt_deck",
+          "role": "ppt_prompt_pack"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/xiaohongshu",
+          "role": "xiaohongshu_prompt_pack"
+        }
+      ],
+      "evaluation": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "rca_review_state"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "rca_publication_projection"
+        }
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "resume_surface_ref": "/session_continuity",
+        "artifact_surface_ref": "/artifact_inventory"
+      },
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "visual_truth_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "review_publication_projection_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "opl_can_schedule_stage": false,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_review_truth": false,
+        "opl_can_write_publication_projection": false,
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_publication_projection": true,
+        "rca_owns_artifact_authority": true,
+        "default_ppt_route_changed": false,
+        "managed_deliverable_runtime_changed": false
+      }
+    },
+    {
+      "stage_id": "package_and_handoff",
+      "stage_kind": "packaging",
+      "title": "Package and handoff",
+      "goal": "Export final files, preview metadata, resume handles, and operator handoff refs.",
+      "domain_stage_refs": [
+        "export_pptx",
+        "publish_copy",
+        "export_bundle",
+        "export_poster"
+      ],
+      "allowed_action_refs": [
+        "get_product_entry_session",
+        "get_product_entry_manifest",
+        "export_product_sidecar"
+      ],
+      "visual_pattern_memory_refs": [
+        "/domain_memory_descriptor_locator/writeback_receipt_locator",
+        "/domain_memory_descriptor_locator/operator_receipt_projection"
+      ],
+      "outputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "final_artifacts"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_handle"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_memory_descriptor_locator/operator_receipt_projection",
+          "role": "operator_memory_receipt_projection"
+        }
+      ],
+      "owner": "redcube_ai",
+      "summary": "Package and handoff projected from RCA-owned route stages for OPL family discovery.",
+      "source_refs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/deliverable_facade/family_route_policy",
+          "role": "route_stage_policy"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "runtime_watch_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "review_truth_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/artifact_inventory",
+          "role": "artifact_authority_projection"
+        },
+        {
+          "ref_kind": "route_stage_refs",
+          "ref": [
+            "export_pptx",
+            "publish_copy",
+            "export_bundle",
+            "export_poster"
+          ],
+          "role": "domain_stage_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_memory_descriptor_locator/writeback_receipt_locator",
+          "role": "visual_pattern_memory_contract"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_memory_descriptor_locator/operator_receipt_projection",
+          "role": "visual_pattern_memory_contract"
+        }
+      ],
+      "freshness": {
+        "status": "current",
+        "checked_at": "manifest_build",
+        "source_ref_count": 9,
+        "stale_if_missing": [
+          "/family_action_catalog",
+          "/deliverable_facade/family_route_policy",
+          "/progress_projection",
+          "/review_state",
+          "/publication_projection",
+          "/artifact_inventory",
+          [
+            "export_pptx",
+            "publish_copy",
+            "export_bundle",
+            "export_poster"
+          ],
+          "/domain_memory_descriptor_locator/writeback_receipt_locator",
+          "/domain_memory_descriptor_locator/operator_receipt_projection"
+        ]
+      },
+      "action_parity": {
+        "status": "aligned",
+        "family_action_catalog_ref": "/family_action_catalog",
+        "allowed_action_refs": [
+          "get_product_entry_session",
+          "get_product_entry_manifest",
+          "export_product_sidecar"
+        ],
+        "missing_action_refs": []
+      },
+      "inputs": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/family_action_catalog",
+          "role": "allowed_action_catalog"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/progress_projection",
+          "role": "progress_read_model"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/session_continuity",
+          "role": "resume_context"
+        }
+      ],
+      "skills": [
+        {
+          "ref_kind": "skill_id",
+          "ref": "redcube-ai",
+          "role": "domain_skill"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "imagegen",
+          "role": "visual_generation"
+        },
+        {
+          "ref_kind": "skill_id",
+          "ref": "presentations",
+          "role": "presentation_output"
+        }
+      ],
+      "prompt_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/ppt_deck",
+          "role": "ppt_prompt_pack"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "prompts/xiaohongshu",
+          "role": "xiaohongshu_prompt_pack"
+        }
+      ],
+      "evaluation": [
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/review_state",
+          "role": "rca_review_state"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/publication_projection",
+          "role": "rca_publication_projection"
+        }
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "resume_surface_ref": "/session_continuity",
+        "artifact_surface_ref": "/artifact_inventory"
+      },
+      "authority_boundary": {
+        "domain_truth_owner": "redcube_ai",
+        "visual_truth_owner": "redcube_ai",
+        "artifact_authority_owner": "redcube_ai",
+        "review_publication_projection_owner": "redcube_ai",
+        "opl_role": "projection_consumer_only",
+        "opl_can_schedule_stage": false,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_review_truth": false,
+        "opl_can_write_publication_projection": false,
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_publication_projection": true,
+        "rca_owns_artifact_authority": true,
+        "default_ppt_route_changed": false,
+        "managed_deliverable_runtime_changed": false
+      }
+    }
+  ],
+  "notes": [
+    "Descriptor-only projection over existing RCA route stages.",
+    "OPL discovery must not schedule routes, change default PPT route, or own visual/artifact authority."
+  ]
+}

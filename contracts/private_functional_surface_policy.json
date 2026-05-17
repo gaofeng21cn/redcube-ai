@@ -1,0 +1,18 @@
+{
+  "surface_kind": "opl_domain_private_functional_surface_admission_policy",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "default_posture": "forbidden_until_classified_and_receipted",
+  "forbidden_private_surface_classes": [
+    "generic_scheduler",
+    "generic_queue_or_attempt_ledger",
+    "generic_cli_mcp_product_wrapper",
+    "generic_workbench_shell",
+    "generic_observability_runtime"
+  ],
+  "allowed_private_surface_classes": [
+    "minimal_authority_function",
+    "visual_native_helper_implementation",
+    "review_export_verdict_authorizer"
+  ]
+}

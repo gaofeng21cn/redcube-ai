@@ -1,0 +1,46 @@
+{
+  "surface_kind": "opl_domain_pack_compiler_input",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "domain_pack_owner": "redcube_ai",
+  "generated_surface_owner": "one-person-lab",
+  "declarative_domain_pack": [
+    "stage_descriptors",
+    "action_catalog",
+    "visual_pack_policy",
+    "domain_memory_locator",
+    "artifact_locator_contract",
+    "owner_receipt_schema",
+    "review_export_gate_refs"
+  ],
+  "minimal_authority_functions": [
+    "source_readiness_verdict",
+    "visual_direction_authorizer",
+    "review_export_verdict_authorizer",
+    "artifact_mutation_authorizer",
+    "visual_memory_accept_reject_decider",
+    "owner_receipt_signer",
+    "native_visual_helper_implementation"
+  ],
+  "generated_surfaces_requested": [
+    "cli",
+    "mcp",
+    "product_entry_manifest",
+    "sidecar_export_dispatch",
+    "status_read_model",
+    "workbench_drilldown",
+    "functional_harness_cases"
+  ],
+  "domain_repo_can_own_generated_surface": false,
+  "source_refs": {
+    "action_catalog": "packages/redcube-gateway/src/actions/family-action-catalog.ts::getRedCubeFamilyActionCatalog",
+    "stage_control_plane": "packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane",
+    "functional_audit": "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection"
+  },
+  "authority_boundary": {
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "domain_can_claim_generated_surface_owner": false
+  }
+}

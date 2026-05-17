@@ -1,0 +1,58 @@
+{
+  "surface_kind": "opl_generated_surface_handoff",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "generated_surface_owner": "one-person-lab",
+  "domain_repo_can_own_generated_surface": false,
+  "source_contract_ref": "contracts/pack_compiler_input.json",
+  "generated_surfaces": [
+    {
+      "surface_id": "cli",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "mcp",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "product_entry_manifest",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "sidecar_export_dispatch",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "status_read_model",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "workbench_drilldown",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "functional_harness_cases",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    }
+  ],
+  "required_domain_handoff": [
+    "owner_receipt_schema",
+    "typed_blocker_schema",
+    "minimal_authority_function_refs",
+    "no_forbidden_write_evidence"
+  ]
+}
