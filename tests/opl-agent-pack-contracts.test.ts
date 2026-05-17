@@ -7,6 +7,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
+  OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildFamilyDomainMemoryDescriptor,
   buildPrivatizedFunctionalModuleAuditProjection,
   buildRedCubeActionMetadata,
@@ -21,6 +22,10 @@ const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/b
 
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
+}
+
+function jsonReady(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function buildCanonicalPack() {
@@ -75,6 +80,9 @@ function buildCanonicalPack() {
         'workbench_drilldown',
         'functional_harness_cases',
       ],
+      generated_interface_consumption_ref: '/opl_generated_interface_consumption',
+      repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
+      repo_local_handlers_are_generated_surface_owners: false,
       domain_repo_can_own_generated_surface: false,
       source_refs: {
         action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
@@ -94,8 +102,9 @@ function buildCanonicalPack() {
       schema_version: 1,
       domain_id: 'redcube_ai',
       target_domain_id: 'redcube_ai',
-      privatized_functional_module_audit: functionalAudit,
-      functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
+      privatized_functional_module_audit: jsonReady(functionalAudit),
+      opl_generated_interface_consumption: jsonReady(OPL_GENERATED_INTERFACE_CONSUMPTION),
+      functional_structure_gap_closure: jsonReady(functionalAudit.functional_structure_gap_closure),
       authority_boundary: {
         opl_can_write_domain_truth: false,
         opl_can_write_memory_body: false,

@@ -327,6 +327,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
           '/family_scheduler_replacement',
           '/opl_generic_primitive_consumption',
           '/opl_stability_read_model_consumption',
+          '/opl_generated_interface_consumption',
           '/visual_pack_compiler_handoff',
           '/operator_evidence_readiness_projection',
           '/opl_substrate_adapter_export',
