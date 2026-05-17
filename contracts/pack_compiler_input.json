@@ -35,6 +35,16 @@
     "workbench_drilldown",
     "functional_harness_cases"
   ],
+  "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
+  "repo_local_handler_targets": [
+    "redcube_cli",
+    "redcube_mcp",
+    "invokeProductEntry",
+    "invokeDomainEntry",
+    "product_sidecar",
+    "product_entry_session_store"
+  ],
+  "repo_local_handlers_are_generated_surface_owners": false,
   "domain_repo_can_own_generated_surface": false,
   "source_refs": {
     "action_catalog": "packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata",

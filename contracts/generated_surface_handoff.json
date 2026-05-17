@@ -5,6 +5,7 @@
   "generated_surface_owner": "one-person-lab",
   "domain_repo_can_own_generated_surface": false,
   "source_contract_ref": "contracts/pack_compiler_input.json",
+  "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
   "generated_surfaces": [
     {
       "surface_id": "cli",
@@ -49,6 +50,24 @@
       "status": "descriptor_source_available"
     }
   ],
+  "repo_local_handler_targets": [
+    "redcube_cli",
+    "redcube_mcp",
+    "invokeProductEntry",
+    "invokeDomainEntry",
+    "product_sidecar",
+    "product_entry_session_store"
+  ],
+  "repo_local_launcher_policy": {
+    "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
+    "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
+    "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+    "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
+    "default_generic_dispatch_owner": "one-person-lab",
+    "redcube_cli_is_unified_metadata_owner": false,
+    "redcube_mcp_is_unified_metadata_owner": false,
+    "product_entry_session_store_is_generic_session_owner": false
+  },
   "required_domain_handoff": [
     "owner_receipt_schema",
     "typed_blocker_schema",

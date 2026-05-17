@@ -6,7 +6,10 @@
   "owner": "redcube_ai",
   "authority_boundary": {
     "domain_truth_owner": "redcube_ai",
-    "opl_role": "projection_consumer_only",
+    "opl_role": "generated_interface_metadata_owner",
+    "generated_interface_owner": "one-person-lab",
+    "repo_local_redcube_cli_role": "domain_handler_target_or_direct_entry_only",
+    "repo_local_redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
     "write_policy": "no_domain_truth_writes"
   },
   "actions": [
@@ -413,8 +416,8 @@
     }
   ],
   "notes": [
-    "RCA owns this action catalog as a projection surface; OPL consumes it without writing RedCube domain truth.",
-    "CLI help, MCP tool routing metadata, skill command contracts, and product-entry operator actions derive from this catalog."
+    "RCA owns action semantics and domain handlers; OPL owns generated CLI/MCP/Skill/product/status/workbench descriptors derived from this catalog.",
+    "Repo-local redcube CLI/MCP remain domain handler targets and direct diagnostic entries, not unified metadata owners."
   ],
   "forbidden_generic_owner_roles": [
     "generic_scheduler_owner",

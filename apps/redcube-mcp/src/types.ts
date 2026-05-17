@@ -7,6 +7,9 @@ export interface DomainToolDefinition {
 export interface DomainToolSummary {
   name: string;
   description: string;
+  generated_interface_owner?: string;
+  domain_handler_owner?: string;
+  repo_local_handler_target_only?: boolean;
 }
 
 export interface DomainToolResponse extends Record<string, unknown> {

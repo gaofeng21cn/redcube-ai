@@ -56,6 +56,7 @@ import {
   planManagedDeliverableDag as planManagedDeliverableDagJs,
 } from './managed-dag-scheduler.js';
 import {
+  PRODUCT_ENTRY_SESSION_STORE_BOUNDARY as PRODUCT_ENTRY_SESSION_STORE_BOUNDARY_JS,
   loadProductEntrySession as loadProductEntrySessionJs,
   productEntrySessionDir as productEntrySessionDirJs,
   productEntrySessionFile as productEntrySessionFileJs,
@@ -269,6 +270,8 @@ export function productEntrySessionDir(): string {
 export function productEntrySessionFile(entrySessionId: string): string {
   return productEntrySessionFileJs(entrySessionId) as string;
 }
+
+export const PRODUCT_ENTRY_SESSION_STORE_BOUNDARY = PRODUCT_ENTRY_SESSION_STORE_BOUNDARY_JS;
 
 export function loadProductEntrySession(request: {
   entrySessionId: string;
